@@ -1,0 +1,8 @@
+This is the place where we are defining how to use PeerConnection from within a
+Javascript environment along with our PeerConnection version of the plugin.
+But this time we're doing it in XMPP land.
+
+There are some  hardwired notions here like "video.gocast.it" and "conference.video.gocast.it"
+are the domains being used in XMPP land.
+
+Bob Wolff
