@@ -1,0 +1,3 @@
+[submodule "projects/xmpp-peerconnection/strophejs-plugins"]
+	path = projects/xmpp-peerconnection/strophejs-plugins
+	url = https://github.com/bobwolff68/strophejs-plugins.git

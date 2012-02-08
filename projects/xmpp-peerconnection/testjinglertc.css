@@ -1,0 +1,20 @@
+@CHARSET "UTF-8";
+body {
+    font-family: Helvetica;
+}
+
+h1 {
+    text-align: center;
+}
+
+.hidden {
+    display: none;
+}
+
+#log {
+    padding: 10px;
+}
+
+#rooms {
+	width: 120px;
+}
