@@ -2,6 +2,7 @@
  * Callcast - protocol utilizing general xmpp as well as disco, muc, and jingle.
  */
 
+// TODO - trigger and .bind on the object rather than on 'document'
 var Callcast = {
 	NS_CALLCAST: "urn:xmpp:callcast",
     connection: null,
@@ -16,6 +17,19 @@ var Callcast = {
     	CONNECTED: 2
     },
     
+    keepAlive: function() {
+    	setInterval(function() {
+    		this.connection.sendIQ($iq({to: "video.gocast.it", from: this.connection.jid, type: 'get', id: 'ping1'})
+    						.c('ping', {xmlns: 'urn:xmpp:ping'}), 
+    		function() {
+    			//console.log("ping answered.");
+    		}, 
+    		function() { 
+    			alert("Ping failed. Lost connection with server?"); 
+    		});
+    	}, 10000);
+    },
+    
     Callee: function(nickname, room) {
     	// Ojbect for participants in the call or being called (in progress)
     	this.jid = room + "/" + nickname;
@@ -24,6 +38,7 @@ var Callcast = {
     	// TODO - FIX - Need a truly UNIQUE adder here - not nick which can change and be replaced during the lifetime of the call.
     	$("#rtcobjects").append('<li id="li_WebrtcPeerConnection'+nickname+'"><object id="WebrtcPeerConnection'+nickname+'" type="application/x-webrtcpeerconnection" width="0" height="0"></object></li>');
     	this.peer_connection = document.getElementById('WebrtcPeerConnection'+nickname);
+    	//TODO - use jquery $('#Webrtc..... instead.
     	
     	self = this;
     	
@@ -205,6 +220,7 @@ var Callcast = {
     	        title: 'Incoming Call From ' + Strophe.getBareJidFromJid(from),
     	        buttons: {
     	            "Answer": function () {
+    	            	// TODO - not needed? Call RefreshRooms() instead
     	            	$("#rooms select").append('<option id="inbound" jid=' + roomjid 
     	            			+ ' room=' + Strophe.getNodeFromJid(roomjid) + '>' 
     	            			+ Strophe.getNodeFromJid(roomjid) + '</option>').attr("selected", "selected");
@@ -324,6 +340,7 @@ var Callcast = {
     JoinSession: function(roomname, roomjid) {
     	Callcast.room = roomjid.toLowerCase();
     	Callcast.nick = Strophe.getNodeFromJid(this.connection.jid);
+    	// TODO - iterate this list and delete rather than just nuking it.
     	Callcast.participants = {};
     	Callcast.joined = false;
     	
@@ -340,6 +357,7 @@ var Callcast = {
 		 else
 	     	 this.connection.muc.join(roomjid, Callcast.nick, Callcast.MsgHandler, Callcast.PresHandler); //, null);
 
+         $(document).trigger('joined_session');
     	// Handle all webrtc-based chat messages within a MUC room session
     	// Also to handle all INVITATIONS to join a session which are sent directly to the jid and not within the MUC
 // Already registered globally on connect        Callcast.connection.addHandler(Callcast.CallMsgHandler, Callcast.NS_CALLCAST, "message", "chat");
@@ -348,7 +366,10 @@ var Callcast = {
 
     LeaveSession: function() {
     	if (Callcast.room === null || Callcast.room === "")
-    		alert("Not currently in a session.");
+		{
+//    		alert("Not currently in a session.");
+    		return;
+		}
     	else
     	{
     		this.connection.muc.leave(Callcast.room, Callcast.nick, null);
@@ -362,6 +383,7 @@ var Callcast = {
     		Callcast.joined = false;
     		Callcast.room = "";
     		Callcast.participants = {};
+            $(document).trigger('left_session');
     	}
     },
 
@@ -380,48 +402,63 @@ var Callcast = {
 
 		 $(document).bind('my_join_complete', function(event) {
 			 Callcast.connection.sendIQ($iq({to: room + "@conference.video.gocast.it", type: "set"}).c("query", {xmlns: "http://jabber.org/protocol/muc#owner"}).c("x", {xmlns: "jabber:x:data", type: "submit"}),
-					 function() {
-				 // IQ received without error.
-				 Callcast.RefreshRooms();
-				 
-				 // Formulate an invitation to 
-				 var invite = $msg({from: Callcast.connection.jid, to: to_whom, type: 'chat'}).c('x', {xmlns: Callcast.NS_CALLCAST, jid: room + '@conference.video.gocast.it', reason: reason});
-				 Callcast.connection.send(invite);
-
-		    	    // TODO - or wait for "x" seconds of timeout - if no one else in the room, then we quit the room. No answer.
-				 var no_answer = setTimeout(function() {
-					// No one answered.
-					 Callcast.LeaveSession();
+				function() {
+					 // IQ received without error.
+					 Callcast.RefreshRooms();
 					 
-					 // Must delete the room and alert the caller.
-					 Callcast.connection.sendIQ($iq({from: Callcast.connection.jid, id: "destroy1", to: room + "@conference.video.gocast.it", type: 'set'})
-							 .c('query', {xmlns: Strophe.NS.MUC_OWNER})
-							 .c('destroy').c('reason').t('No Answer. Call setup failed.'), function() {
-						 alert("No answer on the other end of the line. Hanging up.");
-					 }, function() {
-							alert("Destroying room and call failed. Should not happen."); 
-					 });
-				 }, 5000);
-				 
-/*		    		$('#calling_dialog').append('<p>Ringing other party...</p>');
+					 // Formulate an invitation to 
+					 var invite = $msg({from: Callcast.connection.jid, to: to_whom, type: 'chat'}).c('x', {xmlns: Callcast.NS_CALLCAST, jid: room + '@conference.video.gocast.it', reason: reason});
+					 Callcast.connection.send(invite);
+	
+			    	    // TODO - or wait for "x" seconds of timeout - if no one else in the room, then we quit the room. No answer.
+					 var no_answer = setTimeout(function() {
+							// No one answered.
+							 
+							 // Our "ringing/calling" dialog should be closed if we timeout.
+							 $('#calling_dialog').dialog('close');
+							 alert("No Answer.");
+					 }, 5000);
+
+					 // Now open up the "calling" dialog box until the timer goes off or the user hits 'hangup'
+		    		$('#calling_dialog').append('<p>Ringing other party...</p>');
 		    			
+		    		var isAnswered = false;
 		    	    $('#calling_dialog').dialog({
 		    	        autoOpen: true,
 		    	        draggable: false,
 		    	        modal: true,
-		    	        title: 'Calling ' + to_whom,
-		    	        buttons: {
-		    	            "End Call": function () {
-		    	            	// Cancel the timer for the ringing / hangup / destroy
+		    	        closeOnEscape: false,
+		    	        open: function() {
+		    	        	// If someone joins the session while we're calling, then we have an answer - hurray.
+				    	    $(document).bind('user_joined', function(event) {
+				    	    	// TODO really need to enusre the 'user_joined' is the person invited and not just another person joining at the same time.
+				    	    	clearTimeout(no_answer);
+				    	    	$(this).unbind();
+				    	    	
+				    	    	// This time - close the dialog but we're successful!
+				    	    	isAnswered = true;
+				    	    	$(this).close();	// Closing because we're on the call.
+				    	    });
+		    	        },
+		    	        close: function() { 
+		    	        	if (isAnswered) return;
+		    	        	
+	    	            	// Cancel the timer for the ringing / hangup / destroy
 		    	             clearTimeout(no_answer);
 
 		   					 Callcast.LeaveSession();
+		    	        },
+		    	        title: 'Calling ' + to_whom,
+		    	        buttons: {
+		    	            "End Call": function () {
+//		    	            	alert("Hung up.");
 		    	            	// TODO - drop from call - leave room and possibly destroy room if no one else is in it. Right action?
 		    	                $(this).dialog('close');
 		    	            }
 		    	        }
 		    	    });
-*/
+
+		    	    // TODO - evaluate - this is no longer needed due to open: above, right???
 		    	    $(document).bind('user_joined', function(event) {
 					 // When a single user joins this room, we're all set - the call was answered. Cancel the timer.
 					 clearTimeout(no_answer);
@@ -585,10 +622,10 @@ $(document).bind('connect', function (ev, data) {
  $('#rooms select').removeAttr('disabled');
 
  Callcast.connection = conn;
- Callcast.connection.webrtcclient.log = function(level, msg) {
+/* Callcast.connection.webrtcclient.log = function(level, msg) {
  	console.log(msg);
  };
- Callcast.connection.webrtcclient.info("Info-Message-Test.");
+ Callcast.connection.webrtcclient.info("Info-Message-Test."); */
 });
 
 $(document).bind('connected', function () {
@@ -602,6 +639,7 @@ $(document).bind('connected', function () {
     };
 
 	Callcast.connection.send($pres());
+	Callcast.keepAlive();
 
 	// Set "who am i" at the top
 	$("#myjid").text("My JID: " + Callcast.connection.jid);
