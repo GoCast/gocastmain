@@ -4,12 +4,17 @@
 
 // TODO - trigger and .bind on the object rather than on 'document'
 var Callcast = {
+	NOANSWER_TIMEOUT_MS: 6000,
+	CALLCAST_XMPPSERVER: "video.gocast.it",
+	CALLCAST_ROOMS: "gocastconference.video.gocast.it",
+	AT_CALLCAST_ROOMS: "@gocastconference.video.gocast.it",
 	NS_CALLCAST: "urn:xmpp:callcast",
     connection: null,
     participants: {},
     room: "",
     nick: "",
     joined: false,
+    keepAliveTimer: null,
 
     CallStates: {
     	NONE: 0,
@@ -18,18 +23,35 @@ var Callcast = {
     },
     
     keepAlive: function() {
-    	setInterval(function() {
-    		this.connection.sendIQ($iq({to: "video.gocast.it", from: this.connection.jid, type: 'get', id: 'ping1'})
-    						.c('ping', {xmlns: 'urn:xmpp:ping'}), 
-    		function() {
-    			//console.log("ping answered.");
-    		}, 
-    		function() { 
-    			alert("Ping failed. Lost connection with server?"); 
-    		});
-    	}, 10000);
+    	this.keepAliveTimer = setInterval(function() {
+    		if (Callcast.connection)
+			{
+	    		Callcast.connection.sendIQ($iq({to: Callcast.CALLCAST_XMPPSERVER, from: Callcast.connection.jid, type: 'get', id: 'ping1'})
+	    						.c('ping', {xmlns: 'urn:xmpp:ping'}), 
+	    		null, // No action for a successful 'pong' 
+	    		function() { 
+	    			alert("Ping failed. Lost connection with server?"); 
+	    		});
+			}
+    		else
+    			alert("Server connection failed.");
+		}, 10000);
     },
     
+    onErrorStanza: function(err) {
+    	alert("Error Stanza: " + $(err).children('error').children('text').text());
+    	return true;
+    },
+    
+    DropAllParticipants: function() {
+		for (k in Callcast.participants) {
+			Callcast.participants[k].DropCall();
+			delete Callcast.participants[k];
+		}
+
+		Callcast.participants = {};
+    },
+
     Callee: function(nickname, room) {
     	// Ojbect for participants in the call or being called (in progress)
     	this.jid = room + "/" + nickname;
@@ -37,8 +59,10 @@ var Callcast = {
     	this.CallState = Callcast.CallStates.NONE;
     	// TODO - FIX - Need a truly UNIQUE adder here - not nick which can change and be replaced during the lifetime of the call.
     	$("#rtcobjects").append('<li id="li_WebrtcPeerConnection'+nickname+'"><object id="WebrtcPeerConnection'+nickname+'" type="application/x-webrtcpeerconnection" width="0" height="0"></object></li>');
-    	this.peer_connection = document.getElementById('WebrtcPeerConnection'+nickname);
-    	//TODO - use jquery $('#Webrtc..... instead.
+    	
+    	this.peer_connection = $('#WebrtcPeerConnection'+nickname).get(0);
+    	if (!this.peer_connection)
+    		alert("Peer connection object not found in DOM. Plugin problem?");
     	
     	self = this;
     	
@@ -157,7 +181,7 @@ var Callcast = {
     },
     
     RefreshRooms: function() {
-    	 Callcast.connection.muc.listRooms("conference.video.gocast.it", function(thelist) {
+    	 Callcast.connection.muc.listRooms(Callcast.CALLCAST_ROOMS, function(thelist) {
     		 $('#rooms select').empty();
     		 
     	     $(thelist).find("item").each(function () {
@@ -220,11 +244,6 @@ var Callcast = {
     	        title: 'Incoming Call From ' + Strophe.getBareJidFromJid(from),
     	        buttons: {
     	            "Answer": function () {
-    	            	// TODO - not needed? Call RefreshRooms() instead
-    	            	$("#rooms select").append('<option id="inbound" jid=' + roomjid 
-    	            			+ ' room=' + Strophe.getNodeFromJid(roomjid) + '>' 
-    	            			+ Strophe.getNodeFromJid(roomjid) + '</option>').attr("selected", "selected");
-
     	            	Callcast.JoinSession(Strophe.getNodeFromJid(roomjid), roomjid);
     	                $(this).dialog('close');
     	            },
@@ -262,7 +281,7 @@ var Callcast = {
                     !Callcast.joined) {
                     // error joining room; reset app
                 	alert("Error joining room. Disconnecting.");
-                    Callcast.connection.disconnect();
+                    Callcast.disconnect();
                 } else if (!Callcast.participants[nick] && $(presence).attr('type') !== 'unavailable') {
                     // add to participant list
                 	// Make sure we ONLY add **OTHERS** to the participants list.
@@ -340,10 +359,10 @@ var Callcast = {
     JoinSession: function(roomname, roomjid) {
     	Callcast.room = roomjid.toLowerCase();
     	Callcast.nick = Strophe.getNodeFromJid(this.connection.jid);
-    	// TODO - iterate this list and delete rather than just nuking it.
-    	Callcast.participants = {};
     	Callcast.joined = false;
-    	
+
+    	Callcast.DropAllParticipants();
+
 		 if (roomname == "" || roomjid == "")
 		 {
 			 alert("Room and RoomJid must be given to join a session.");
@@ -374,15 +393,11 @@ var Callcast = {
     	{
     		this.connection.muc.leave(Callcast.room, Callcast.nick, null);
     		
-    		for (k in Callcast.participants) {
-    			Callcast.participants[k].DropCall();
-    			delete Callcast.participants[k];
-    		}
+    		Callcast.DropAllParticipants();
     		
     		$("#participant-list").empty();
     		Callcast.joined = false;
     		Callcast.room = "";
-    		Callcast.participants = {};
             $(document).trigger('left_session');
     	}
     },
@@ -396,28 +411,29 @@ var Callcast = {
 		 alert("'Call-To' is missing. Must give a full JID/resource to call to.");
 	 else
 	 {
-		 Callcast.JoinSession(room, room + "@conference.video.gocast.it");
+		 Callcast.JoinSession(room, room + Callcast.AT_CALLCAST_ROOMS);
 		 
 		 // Now we need to wait until we've actually joined prior to sending the invite.
 
 		 $(document).bind('my_join_complete', function(event) {
-			 Callcast.connection.sendIQ($iq({to: room + "@conference.video.gocast.it", type: "set"}).c("query", {xmlns: "http://jabber.org/protocol/muc#owner"}).c("x", {xmlns: "jabber:x:data", type: "submit"}),
+			 Callcast.connection.sendIQ($iq({to: room + Callcast.AT_CALLCAST_ROOMS, type: "set"}).c("query", {xmlns: "http://jabber.org/protocol/muc#owner"}).c("x", {xmlns: "jabber:x:data", type: "submit"}),
 				function() {
 					 // IQ received without error.
 					 Callcast.RefreshRooms();
 					 
 					 // Formulate an invitation to 
-					 var invite = $msg({from: Callcast.connection.jid, to: to_whom, type: 'chat'}).c('x', {xmlns: Callcast.NS_CALLCAST, jid: room + '@conference.video.gocast.it', reason: reason});
+					 var invite = $msg({from: Callcast.connection.jid, to: to_whom, type: 'chat'})
+					 				.c('x', {xmlns: Callcast.NS_CALLCAST, jid: room + Callcast.AT_CALLCAST_ROOMS, reason: reason});
 					 Callcast.connection.send(invite);
 	
-			    	    // TODO - or wait for "x" seconds of timeout - if no one else in the room, then we quit the room. No answer.
+			    	    //  Wait for "x" seconds of timeout - if no one else in the room, then we quit the room. No answer.
 					 var no_answer = setTimeout(function() {
 							// No one answered.
 							 
 							 // Our "ringing/calling" dialog should be closed if we timeout.
 							 $('#calling_dialog').dialog('close');
 							 alert("No Answer.");
-					 }, 5000);
+					 }, Callcast.NOANSWER_TIMEOUT_MS);
 
 					 // Now open up the "calling" dialog box until the timer goes off or the user hits 'hangup'
 		    		$('#calling_dialog').append('<p>Ringing other party...</p>');
@@ -437,7 +453,7 @@ var Callcast = {
 				    	    	
 				    	    	// This time - close the dialog but we're successful!
 				    	    	isAnswered = true;
-				    	    	$(this).close();	// Closing because we're on the call.
+				    	    	$('#calling_dialog').dialog('close');	// Closing because we're on the call.
 				    	    });
 		    	        },
 		    	        close: function() { 
@@ -453,17 +469,12 @@ var Callcast = {
 		    	            "End Call": function () {
 //		    	            	alert("Hung up.");
 		    	            	// TODO - drop from call - leave room and possibly destroy room if no one else is in it. Right action?
-		    	                $(this).dialog('close');
+		    	            	// Currently we're just closing the dialog which will in turn have us leave the room.
+		    	            	$('#calling_dialog').dialog('close');
 		    	            }
 		    	        }
 		    	    });
 
-		    	    // TODO - evaluate - this is no longer needed due to open: above, right???
-		    	    $(document).bind('user_joined', function(event) {
-					 // When a single user joins this room, we're all set - the call was answered. Cancel the timer.
-					 clearTimeout(no_answer);
-					 $(this).unbind(event);
-				 });
 			 },
 			 function() {
 				 // IQ error. Room config must not have worked??
@@ -483,7 +494,62 @@ var Callcast = {
     	this.connection.send($iq({to: $(iq).attr('from'), id: $(iq).attr('id'), type: 'result'}));
 //    	this.connection.send($iq({from: this.connection.jid, to: $(iq).attr('from'), id: $(iq).attr('id'), type: 'result'}));
     },
+    
+    disconnect: function() {
+    	clearInterval(this.keepAliveTimer);
+    	
+		this.DropAllParticipants();
+		
+		this.connection.sync = true;
+		this.connection.flush();
+		this.connection.disconnect();
 
+    	// remove dead connection object
+		this.connection = null;
+		this.joined = false;
+		this.room = "";
+		this.nick = "";
+		
+		$(document).trigger('disconnected');
+    },
+
+    connect: function(id, pw) {
+    	
+    	if (this.connection)
+    		this.disconnect();
+    	
+    	this.connection = new Strophe.Connection("/xmpp-httpbind");
+    	this.connection.reset();
+
+    	this.connection.connect(id, pw, function (status) {
+	         if (status === Strophe.Status.CONNECTED) {
+	        	 Callcast.finalizeConnect();
+	             $(document).trigger('connected');
+	         } else if (status === Strophe.Status.DISCONNECTED) {
+	        	 Callcast.disconnect();
+	             $(document).trigger('disconnected');
+	         }
+    	 });
+
+    },
+    
+    finalizeConnect: function() {
+    	this.connection.send($pres());
+    	this.keepAlive();
+
+    	// Handle inbound signaling messages
+    	//Callcast.connection.addHandler(Callcast.handle_webrtc_message, null, "message", "webrtc-message");
+    	this.connection.addHandler(Callcast.handle_ping, "urn:xmpp:ping", "iq", "get");
+	 
+		// handle all INVITATIONS to join a session which are sent directly to the jid and not within the MUC
+    	this.connection.addHandler(Callcast.CallMsgHandler, Callcast.NS_CALLCAST, "message", "chat");
+	    
+	    // handle any inbound error stanzas (for now) via an alert message.
+    	this.connection.addHandler(Callcast.onErrorStanza, null, null, 'error');
+
+	    // Kick things off by refreshing the rooms list.
+    	this.RefreshRooms();
+    },
  };
 
 //
@@ -516,14 +582,12 @@ $(document).ready(function () {
 		jid = $.getUrlVar('jid');
 	if ($.getUrlVar('password'))
 		password = $.getUrlVar('password');
-	
+
+	///
+	/// Handle the login via URL which got passed or via dialog box.
+	///
 	if (jid != "" && password != "")
-	{ 
-		$(document).trigger('connect', { 
-			jid: jid,
-			password: password
-		});
-	}
+		Callcast.connect(jid, password);
 	else
 	{
 	    $('#login_dialog').dialog({
@@ -533,10 +597,7 @@ $(document).ready(function () {
 	        title: 'Connect to XMPP',
 	        buttons: {
 	            "Connect": function () {
-	                $(document).trigger('connect', {
-	                    jid: $('#jid').val(),
-	                    password: $('#password').val()
-	                });
+	            	Callcast.connect(jid, password);
 	                
 	                $('#password').val('');
 	                $(this).dialog('close');
@@ -572,64 +633,39 @@ $(document).ready(function () {
 		 }
 	 });
 
- $('#get_roster_button').click(function () {
- 	Callcast.log("**NO_CODE_HERE** Getting user's roster...");
- 	
- });
-
- $('#subscribe_button').click(function () {
- 	Callcast.log("Subscription requested to " + $('#input').val() + "...");
- 	
- 	Callcast.connection.roster.subscribe($('#input').val());
- });
-
- $('#test_button').click(function() {
- });
- 
- $('#call_button').click(function () {
-
-	 var to_whom = $('#to_whom').val();
-	 var reason = $('#reason').val();
-	 var room = $('#roomname').val().toLowerCase();
-
-	 $('#participant-list').empty();
-
-	 Callcast.MakeCall(to_whom, room, reason);
+	 $('#get_roster_button').click(function () {
+	 	Callcast.log("**NO_CODE_HERE** Getting user's roster...");
+	 	
+	 });
+	
+	 $('#subscribe_button').click(function () {
+	 	Callcast.log("Subscription requested to " + $('#input').val() + "...");
+	 	
+	 	Callcast.connection.roster.subscribe($('#input').val());
+	 });
+	
+	 $('#test_button').click(function() {
+	 });
 	 
- });
+	 $('#call_button').click(function () {
+	
+		 var to_whom = $('#to_whom').val();
+		 var reason = $('#reason').val();
+		 var room = $('#roomname').val().toLowerCase();
+	
+		 $('#participant-list').empty();
+	
+		 Callcast.MakeCall(to_whom, room, reason);
+		 
+	 });
 
- // Bind a click event to all the sub-lists and not the parents (for only online people)
-//   $("#rooms option:selected").live("click", function(){
-// 	var roomname = $(this).text();
-//		Callcast.log(roomname + " selected with room=" + $(this).attr('room') + " and jid=" + $(this).attr('jid'));
-// } );
- 
-});
-
-$(document).bind('connect', function (ev, data) {
- var conn = new Strophe.Connection(
-     "/xmpp-httpbind");
-
- conn.connect(data.jid, data.password, function (status) {
-     if (status === Strophe.Status.CONNECTED) {
-         $(document).trigger('connected');
-     } else if (status === Strophe.Status.DISCONNECTED) {
-         $(document).trigger('disconnected');
-     }
- });
-
- $('.button').removeAttr('disabled');
- $('#rooms select').removeAttr('disabled');
-
- Callcast.connection = conn;
-/* Callcast.connection.webrtcclient.log = function(level, msg) {
- 	console.log(msg);
- };
- Callcast.connection.webrtcclient.info("Info-Message-Test."); */
-});
+});	// document ready
 
 $(document).bind('connected', function () {
 
+	$('.button').removeAttr('disabled');
+	$('#rooms select').removeAttr('disabled');
+	
     Callcast.connection.xmlInput = function(data) {
 //        console.log("XML-IN:", $(data).children()[0]);
     };
@@ -638,29 +674,14 @@ $(document).bind('connected', function () {
         //console.log("XML-OUT:", $(data).children()[0]);
     };
 
-	Callcast.connection.send($pres());
-	Callcast.keepAlive();
-
 	// Set "who am i" at the top
 	$("#myjid").text("My JID: " + Callcast.connection.jid);
 	
-    Callcast.RefreshRooms();
- // Handle inbound signaling messages
-//Callcast.connection.addHandler(Callcast.handle_webrtc_message, null, "message", "webrtc-message");
-    Callcast.connection.addHandler(Callcast.handle_ping, "urn:xmpp:ping", "iq", "get");
- 
-	// handle all INVITATIONS to join a session which are sent directly to the jid and not within the MUC
-    Callcast.connection.addHandler(Callcast.CallMsgHandler, Callcast.NS_CALLCAST, "message", "chat");
 });
 
 $(document).bind('disconnected', function () {
  Callcast.log("Connection terminated.");
 
- // remove dead connection object
- Callcast.connection = null;
- Callcast.joined = false;
- Callcast.room = "";
- Callcast.nick = "";
  $("#rooms select").empty();
  $("#rooms select").append("<li>[None Yet]</li>");
  $("#participant-list").empty();
@@ -668,6 +689,10 @@ $(document).bind('disconnected', function () {
  $("#leave_button").attr('disabled', 'disabled');
  $('#join_button').removeAttr('disabled');
  $('#rooms select').removeAttr('disabled');
+ $('#myjid').html("<b>[Disconnected]</b>");
 
- alert("Disconnected.");
 });
+
+$(window).unload(function() {
+	  Callcast.disconnect();
+	});
