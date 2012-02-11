@@ -2,7 +2,6 @@
  * Callcast - protocol utilizing general xmpp as well as disco, muc, and jingle.
  */
 
-// TODO - trigger and .bind on the object rather than on 'document'
 var Callcast = {
 	NOANSWER_TIMEOUT_MS: 6000,
 	CALLCAST_XMPPSERVER: "video.gocast.it",
@@ -297,39 +296,27 @@ var Callcast = {
 	                    Callcast.participants[nick] = new Callcast.Callee(nick, room);
 	                    if (user_jid)
 	                    	Callcast.participants[nick].non_muc_jid = user_jid;
+
+	                    // Now, if we are new to the session (not fully joined ye) then it's our job to call everyone.
+	                    if (!Callcast.joined)
+                        	Callcast.participants[nick].InitiateCall();
+                    }
+
+                    //
+                    // Inform the UI that we have a new user
+                    //
+                    $(document).trigger('user_joined', nick);
+
+                    //
+                    // Handle our own join in the room which completes the session-join.
+                    //
+                    if (!Callcast.joined && nick === Callcast.nick)
+                    {
+                		Callcast.joined = true;
+                        $(Callcast).trigger('my_join_complete', nick);
                     }
                     
-                    if (!Callcast.joined)
-                    {
-                    	// Since we're not joined yet officially, call each person until we are joined.
-	                	if (nick !== Callcast.nick)
-	                	{
-	                        $('#participant-list').append('<li>' + nick + '</li>');
-
-	                        if (Callcast.participants[nick])
-	                        	Callcast.participants[nick].InitiateCall();
-	                        else
-	                        	console.log("Participant nick=" + nick + " doesn't seem to exist. CANNOT CALL.");
-	                	}
-	                	else
-	                	{
-	                		Callcast.joined = true;
-	                        $(document).trigger('my_join_complete', nick);
-	                	}
-                    }
-                    else // (Callcast.joined) 
-                    {
-                        $('#participant-list').append('<li>' + nick + '</li>');
-                    	// User joined AFTER we already entered (fully) the room.
-                        $(document).trigger('user_joined', nick);
-                    }
                 } else if (Callcast.participants[nick] && $(presence).attr('type') === 'unavailable') {
-                    // remove from participants list
-                    $('#participant-list li').each(function () {
-                        if (nick === $(this).text()) {
-                            $(this).remove();
-                        }
-                    });
 
                     console.log("Caller '" + nick + "' has dropped. Destroying connection.");
                     Callcast.participants[nick].DropCall();
@@ -348,7 +335,7 @@ var Callcast = {
                         }
 
                         // room join complete
-                        $(document).trigger("room_joined");
+                        $(document).trigger("joined_session");
                     }
                 }
             }
@@ -415,7 +402,7 @@ var Callcast = {
 		 
 		 // Now we need to wait until we've actually joined prior to sending the invite.
 
-		 $(document).bind('my_join_complete', function(event) {
+		 $(Callcast).bind('my_join_complete', function(event) {
 			 Callcast.connection.sendIQ($iq({to: room + Callcast.AT_CALLCAST_ROOMS, type: "set"}).c("query", {xmlns: "http://jabber.org/protocol/muc#owner"}).c("x", {xmlns: "jabber:x:data", type: "submit"}),
 				function() {
 					 // IQ received without error.
@@ -612,25 +599,15 @@ $(document).ready(function () {
 		 if (sel !== "")
 			 $('#participant-list').empty();
 	    	
-		 if (Callcast.JoinSession($(sel).text(), $(sel).attr('jid')))
-		 {
-			 $('#leave_button').removeAttr('disabled');
-			 $("#join_button").attr('disabled', 'disabled');
-			 $("#rooms select").attr('disabled', 'disabled');
-		 }
+		 Callcast.JoinSession($(sel).text(), $(sel).attr('jid'));
 
 	 });
 
 	 $('#leave_button').click(function () {
 		 if (!Callcast.joined)
-			 alert("Not currently in session. Cannot leave.");
+			 alert("Not currently in session. Nothing to leave.");
 		 else
-		 {
 			 Callcast.LeaveSession();
-			 $("#leave_button").attr('disabled', 'disabled');
-			 $('#join_button').removeAttr('disabled');
-			 $('#rooms select').removeAttr('disabled');
-		 }
 	 });
 
 	 $('#get_roster_button').click(function () {
@@ -660,6 +637,34 @@ $(document).ready(function () {
 	 });
 
 });	// document ready
+
+$(document).bind('joined_session', function () {
+	 $('#leave_button').removeAttr('disabled');
+	 $("#join_button").attr('disabled', 'disabled');
+	 $("#rooms select").attr('disabled', 'disabled');
+});
+
+$(document).bind('left_session', function () {
+	 $('#participant-list').empty();
+	 $('#participant-list').append('<p>[None Yet]</p>');
+	 
+	 $("#leave_button").attr('disabled', 'disabled');
+	 $('#join_button').removeAttr('disabled');
+	 $('#rooms select').removeAttr('disabled');
+});
+
+$(document).bind('user_joined', function (ev, nick) {
+	$('#participant-list').append('<li>' + nick + '</li>');
+});
+
+$(document).bind('user_left', function (ev, nick) {
+    // remove from participants list
+    $('#participant-list li').each(function () {
+        if (nick === $(this).text()) {
+            $(this).remove();
+        }
+    });
+});
 
 $(document).bind('connected', function () {
 
