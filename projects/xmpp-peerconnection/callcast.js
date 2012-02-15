@@ -11,6 +11,7 @@ var Callcast = {
     connection: null,
     participants: {},
     room: "",
+    roomlist: {},
     nick: "",
     joined: false,
     keepAliveTimer: null,
@@ -179,22 +180,19 @@ var Callcast = {
     	Callcast.log("Initiating call resulted in an error.");
     },
     
-    RefreshRooms: function() {
+    ///
+    /// Grab the room list from the server, and put it in an array of .roomlist[jid] = roomname
+    /// Then trigger 'roomlist_updated' for the UI portion to react.
+    ///
+    RefreshRooms: function(ui_element) {
     	 Callcast.connection.muc.listRooms(Callcast.CALLCAST_ROOMS, function(thelist) {
-    		 $('#rooms select').empty();
+    		 Callcast.roomlist = {};	// Remove all entries from the rooms list.
     		 
     	     $(thelist).find("item").each(function () {
-    	    	 var optionline = '<option jid=' + $(this).attr('jid') + ' room=' + Strophe.getNodeFromJid($(this).attr('jid'));
-    	    	 //
-    	    	 // If the room we're adding here is the same room we're already *IN*, then select it in the list.
-    	    	 //
-    	    	 if (Callcast.room === $(this).attr('jid'))
-    	    		 optionline += ' selected=selected';
-    	    	 
-    	    	 optionline += '>' + $(this).attr('name') + '</option>';
-
-	    		 $('#rooms select').append(optionline);
-    		}) ;
+    	    	 Callcast.roomlist[$(this).attr('jid')] = $(this).attr('name');
+    	     }) ;
+    	     
+    	     $(document).trigger('roomlist_updated');
     	 });
     },
     
@@ -382,7 +380,6 @@ var Callcast = {
     		
     		Callcast.DropAllParticipants();
     		
-    		$("#participant-list").empty();
     		Callcast.joined = false;
     		Callcast.room = "";
             $(document).trigger('left_session');
@@ -500,12 +497,18 @@ var Callcast = {
 		$(document).trigger('disconnected');
     },
 
-    connect: function(id, pw) {
+    ///
+    /// connect using this JID and password -- and optionally use this URL for the BOSH connection.
+    ///
+    connect: function(id, pw, url) {
+    	var boshconn = "/xmpp-httpbind";
+    	if (url)
+    		boshconn = url;
     	
     	if (this.connection)
     		this.disconnect();
     	
-    	this.connection = new Strophe.Connection("/xmpp-httpbind");
+    	this.connection = new Strophe.Connection(boshconn);
     	this.connection.reset();
 
     	this.connection.connect(id, pw, function (status) {
@@ -597,9 +600,10 @@ $(document).ready(function () {
 		 var sel =  $("#rooms option:selected");
 
 		 if (sel !== "")
+		 {
 			 $('#participant-list').empty();
-	    	
-		 Callcast.JoinSession($(sel).text(), $(sel).attr('jid'));
+	    	 Callcast.JoinSession($(sel).text(), $(sel).attr('jid'));
+		 }
 
 	 });
 
@@ -607,7 +611,10 @@ $(document).ready(function () {
 		 if (!Callcast.joined)
 			 alert("Not currently in session. Nothing to leave.");
 		 else
-			 Callcast.LeaveSession();
+		 {
+			Callcast.LeaveSession();
+		 	$('#participant-list').empty();
+		 }
 	 });
 
 	 $('#get_roster_button').click(function () {
@@ -651,6 +658,29 @@ $(document).bind('left_session', function () {
 	 $("#leave_button").attr('disabled', 'disabled');
 	 $('#join_button').removeAttr('disabled');
 	 $('#rooms select').removeAttr('disabled');
+});
+
+$(document).bind('roomlist_updated', function () {
+	 $('#rooms select').empty();
+	 var room_added = false;
+	 
+	 for (k in Callcast.roomlist)
+	 {
+		 var optionline = '<option jid=' + k + ' room=' + Strophe.getNodeFromJid(k);
+		 //
+		 // If the room we're adding here is the same room we're already *IN*, then select it in the list.
+		 //
+		 if (Callcast.room === k)
+			 optionline += ' selected=selected';
+		 
+		 optionline += '>' + Callcast.roomlist[k] + '</option>';
+	
+		 $('#rooms select').append(optionline);
+		 room_added = true;
+	 }
+	 
+	 if (!room_added)
+		 $('#rooms select').append("<option>[None Yet]</option>");
 });
 
 $(document).bind('user_joined', function (ev, nick) {
