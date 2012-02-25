@@ -1,6 +1,6 @@
 solutions = [
   { "name"        : "DEPS",
-    "url"         : "/DEPS",
+    "url"         : None,
     "deps_file"   : "DEPS",
     "managed"     : True,
     "custom_deps" : {
