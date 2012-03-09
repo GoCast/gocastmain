@@ -647,7 +647,7 @@ $(document).ready(function () {
 	        title: 'Connect to XMPP',
 	        buttons: {
 	            "Connect": function () {
-	            	Callcast.connect(jid, password);
+	            	Callcast.connect($('#jid').val(), $('#password').val());
 	                
 	                $('#password').val('');
 	                $(this).dialog('close');
@@ -762,11 +762,11 @@ $(document).bind('connected', function () {
 	$('#rooms select').removeAttr('disabled');
 	
     Callcast.connection.xmlInput = function(data) {
-//        console.log("XML-IN:", $(data).children()[0]);
+        console.log("XML-IN:", $(data).children()[0]);
     };
     
     Callcast.connection.xmlOutput = function(data) {
-        //console.log("XML-OUT:", $(data).children()[0]);
+        console.log("XML-OUT:", $(data).children()[0]);
     };
 
 	// Set "who am i" at the top
