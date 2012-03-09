@@ -5,13 +5,13 @@
     android:orientation="vertical" >
 
     <TextView
-        android:id="@+id/connect_to_label"
+        android:id="@+id/connect_as_label"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="@string/connect_to_text" />
+        android:text="@string/connect_as_text" />
 
     <EditText
-        android:id="@+id/peer_ip"
+        android:id="@+id/peer_name"
         android:inputType="text"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -22,5 +22,36 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/connect_button_text" />
+    
+    <Button 
+        android:id="@+id/disconnect_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/disconnect_button_text" />
+    
+    <TextView
+        android:id="@+id/call_peer_id_label"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/call_peer_id_text" />
+
+    <EditText
+        android:id="@+id/call_peer_id"
+        android:inputType="text"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:drawable/editbox_background" />
+    
+    <Button 
+        android:id="@+id/call_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/call_button_text" />
+
+    <Button 
+        android:id="@+id/hangup_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/hangup_button_text" />
     
 </LinearLayout>

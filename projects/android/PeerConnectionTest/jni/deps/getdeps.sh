@@ -27,5 +27,6 @@ if [[ $1 = "webrtc" || $* = "" ]]; then
     echo "Running [gclient sync -r $WEBRTC_REV --force] to obtain webrtc source..."
     gclient sync -r "$WEBRTC_REV" --force
     cd ..
+    cp -R ../dep_mods/ ./
 fi
 

@@ -347,7 +347,7 @@ bool WebRtcVoiceEngine::InitInternal() {
   }
 
   // Save the default AGC configuration settings.
-  if (voe_wrapper_->processing()->SetAgcConfig(default_agc_config_) == -1) {
+  if (voe_wrapper_->processing()->GetAgcConfig(default_agc_config_) == -1) {
     LOG_RTCERR0(GetAGCConfig);
     return false;
   }

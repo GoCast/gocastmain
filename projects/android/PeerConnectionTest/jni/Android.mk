@@ -20,9 +20,15 @@ LOCAL_MODULE := libandroid-peerconnection-test
 LOCAL_MODULE_TAGS := optional
 
 LOCAL_CPP_EXTENSION := .cpp
-LOCAL_SRC_FILES := src/noop.cpp
+LOCAL_SRC_FILES := \
+    src/pctest.cpp \
+    src/pcobserver.cpp \
+    src/pcsocketserver.cpp \
+    src/pcthreadsafemessagequeue.cpp
+
 LOCAL_CFLAGS := \
     '-DPOSIX' \
+    '-DANDROID' \
     '-DWEBRTC_ANDROID' \
     '-DWEBRTC_RELATIVE_PATH'
 
