@@ -1,5 +1,65 @@
 /**
- * Callcast - protocol utilizing general xmpp as well as disco, muc, and jingle.
+ * Callcast - protocol utilizing general xmpp as well as disco and MUC.
+ *
+ * Copyright 2012 GoCast - www.GoCast.it
+ * Author: Robert Wolff - rwolff@gocast.it / bob.wolff68@gmail.com
+ *
+ * Purpose: Use a more robust server signalling protocol than the current example peerconnection*
+ *   version in webrtc/libjingle examples. The TCP connection in peerconnection is not very
+ *   robust against dropped TCP connections and isn't a 'standard' either. Utilizing a standard
+ *   XMPP server with a BOSH connection, we can envision a more flexible and further reaching
+ *   approach which gives us a more natural call/session control, group controls, and built-in
+ *   instant messaging as well as other flexible mechanisms for add-on features.
+ *
+ * See callcast.html for a very simple (poor UI) sample of this signalling.
+ *
+ * TODO: a) Remove the rest of the UI from the Callcast object. Currently .Makecall() utilizes
+ *          jqueryUI dialogs as does the reception of an incoming call.
+ *       b) Change code to be a Strophe plugin which will help in (a) above making the calling
+ *          application cope with all UI items.
+ *       c) Update use of PeerConnection from rev 1080 of webrtc to ROAP/JSEP model when appropriate.
+ *       d) Remove the custom OnMessage() message modification in the plugin today. Currently,
+ *          the offer message is prepended with the jid of the user to which it belongs + '~'
+ *       e) Use DISCO to determine if a jid is capable of handling an invite. Otherwise, possibly
+ *          send them a link to the plugin or to a webrtc resource.
+ *
+ * How it is done:
+ *  General Theory:
+ *    Use MUC chat rooms for session engagement, presence, and signalling between peers for call
+ *    setup. Use directed chat for invitations to join an existing/new room/session outside of
+ *    MUC. And once a person joins the MUC room, they have at that point said "accept" to the
+ *    call and as such, when they enter the room, it is their responsibility to make a new
+ *    PeerConnection with each of the existing members of the call. So, the new person sends
+ *    an 'initiate' with their signalling info to each existing entity and anyone who is already
+ *    in the room will automatically respond with their information by making a Peerconnection
+ *    with the new person.
+ *
+ *  Joining an existing MUC room:
+ *    If a user joins a MUC room and they are Callcast enabled, they take the inbound presence
+ *    list given to them upon entry and they send a directed "chat" message with a stanza inside it
+ *    of <initiating >Signalling message offer from PeerConnection</initiating>. This stanza
+ *    is sent to each of the existing members of the room. Upon reception of an <initiating>,
+ *    the message body is used to complete the call via peer_connection.processSignalingMessage().
+ *
+ *  Inviting a new person to a call:
+ *    Using the chat message, we simply formulate an invitation with our namespace. When a Callcast
+ *    enabled peer receives such a message, they can choose to prompt the user to accept the
+ *    incoming call and if they do accept it, the invitation had the MUC room to join as part of
+ *    the invitation. The new entrant then joins the room and the flow of events is the same
+ *    as above (Joining an existing MUC room:)
+ *
+ *
+ *  Customization to existing PeerConnection.onsignallingmessage()
+ *    It is necessary for us to know which Peerconnection message belongs with which peer, and
+ *    the onsignallingmessage(message) does not contain any identification natively. So, we
+ *    decided to prepend "jid~" to the exisitng message so that we can properly identify which
+ *    jid is being signaled. Each PeerConnection keeps track of which jid they belong to via
+ *    the change to Init() below.
+ *  Customization to existing PeerConnection.init()
+ *    In order to keep track and 'pair' each PeerConnection to a particular jid, init() is used
+ *    to make that pairing so that when onsignallingmessage is called, it is called with the
+ *    identifying jid prepended to the signalling message.
+ *
  */
 
 var Callcast = {
