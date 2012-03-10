@@ -239,12 +239,26 @@ namespace GoCast
 
                 sstrm << msg["peerid"];
                 sstrm >> peerId;
-                bStatus = AttemptConnection(peerId);
-                if(false == bStatus)
+
+                if("audioonly" == msg["credentials"])
                 {
-                    std::string errmsg = "Unable to attempt connection with: ";
-                    errmsg += msg["peerid"];
-                    PCTEST_LOG_ERR(errmsg.c_str());
+                    bStatus = AttemptConnection(peerId);
+                    if(false == bStatus)
+                    {
+                        std::string errmsg = "Unable to attempt connection with: ";
+                        errmsg += msg["peerid"];
+                        PCTEST_LOG_ERR(errmsg.c_str());
+                    }
+                }
+                else
+                {
+                    bStatus = SendToPeer(peerId, "credentialsreq audioonly");
+                    if(false == bStatus)
+                    {
+                        std::string errmsg = "Unable to send credentials request to: ";
+                        errmsg += msg["peerid"];
+                        PCTEST_LOG_ERR(errmsg.c_str());
+                    }
                 }
             }
             else if("hangup" == msg["command"])
@@ -843,6 +857,36 @@ namespace GoCast
                         return false;
                     }
                 }
+
+                return true;
+            }
+
+            if(std::string::npos != msg.find("credentialsreq"))
+            {
+                ParsedMessage message;
+                std::stringstream sstrm;
+
+                message["command"] = "sendtopeer";
+                sstrm << peerId;
+                message["peerid"] = sstrm.str();
+                message["message"] = "credentialsrep audioonly";
+                m_pMsgQ->Post(message);
+                PCTEST_LOG_DBG(msg.c_str());
+
+                return true;
+            }
+
+            if(std::string::npos != msg.find("credentialsrep"))
+            {
+                ParsedMessage message;
+                std::stringstream sstrm;
+                
+                message["command"] = "call";
+                sstrm << peerId;
+                message["peerid"] = sstrm.str();
+                message["credentials"] = "audioonly";
+                m_pMsgQ->Post(message);
+                PCTEST_LOG_DBG(msg.c_str());
 
                 return true;
             }
