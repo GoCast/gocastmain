@@ -192,8 +192,15 @@ var Callcast = {
 	        //
 	        // Now that we're ready, bring the peer_connection online and kick it off.
 	        //
-	        console.log("Commencing to call " + this.jid);
-	        this.peer_connection.addStream('audio', false);
+	        var calltype = " - Audio Only.";
+	        var bVideo = $('#video_enabled') && $('#video_enabled').is(':checked');
+	        
+	        if (bVideo)
+	        	calltype = " - Audio+Video.";
+	        	
+	        console.log("Commencing to call " + this.jid + calltype);
+	        
+	        this.peer_connection.addStream('audio', bVideo);
 	        this.peer_connection.connect();
     	};
 
@@ -363,7 +370,11 @@ var Callcast = {
                     //
                     // Inform the UI that we have a new user
                     //
-                    $(document).trigger('user_joined', nick);
+                    // Have an odd case where we get re-informed that WE are in the room.
+                    // So, if we are already 'joined' and we see ourselves, then don't add to list.
+                    //
+                    if (!Callcast.joined || (nick !== Callcast.nick))
+	                    $(document).trigger('user_joined', nick);
 
                     //
                     // Handle our own join in the room which completes the session-join.
@@ -578,6 +589,10 @@ var Callcast = {
 	         } else if (status === Strophe.Status.DISCONNECTED) {
 	        	 Callcast.disconnect();
 	             $(document).trigger('disconnected');
+	        } else if (status === Strophe.Status.AUTHFAIL) {
+	        	 Callcast.disconnect();
+	             $(document).trigger('disconnected');
+	             alert("Authentication failed. Bad password or username.");
 	         }
     	 });
 
