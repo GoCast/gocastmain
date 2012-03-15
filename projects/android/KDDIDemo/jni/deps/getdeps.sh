@@ -17,7 +17,7 @@ if [[ $1 = "webrtc" || $* = "" ]]; then
         gclient config http://webrtc.googlecode.com/svn/"$WEBRTC_TAG"/
     fi
 
-    if [ $WEBRTC_TAG != "trunk"]; then
+    if [ $WEBRTC_TAG != "trunk" ]; then
         if [ ! -L trunk ]; then
             echo "Creating a soft link [trunk] to the directory [stable]"
             ln -s stable trunk
