@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VariablesViewState
+   version = "1.0">
+   <ContextStates>
+      <ContextState
+         contextName = "-[ViewController tableView:numberOfRowsInSection:]:ViewController.mm">
+         <PersistentStrings>
+            <PersistentString
+               value = "peers">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "webrtc::videocapturemodule::VideoCaptureAVCaptureInfo::GetDeviceName(unsigned int, unsigned char*, unsigned int, unsigned char*, unsigned int, unsigned char*, unsigned int):video_capture_iphone.mm">
+      </ContextState>
+      <ContextState
+         contextName = "(null):(null)">
+         <PersistentStrings>
+            <PersistentString
+               value = "watch *(int*)0x">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+   </ContextStates>
+</VariablesViewState>

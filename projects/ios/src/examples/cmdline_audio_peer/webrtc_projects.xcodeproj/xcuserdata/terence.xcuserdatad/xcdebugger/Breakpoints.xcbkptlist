@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Bucket
+   type = "1"
+   version = "1.0">
+   <FileBreakpoints>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "../../../third_party/webrtc/trunk/third_party/libjingle/source/talk/session/phone/channelmanager.cc"
+         timestampString = "353492302.728941"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "253"
+         endingLineNumber = "253"
+         landmarkName = "ChannelManager::Init()"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "../../../third_party/webrtc/trunk/third_party/libjingle/source/talk/session/phone/channelmanager.cc"
+         timestampString = "353493280.653066"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "735"
+         endingLineNumber = "735"
+         landmarkName = "ChannelManager::OnMessage(talk_base::Message* message)"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "../../../third_party/webrtc/trunk/third_party/libjingle/source/talk/session/phone/webrtcvideoengine.cc"
+         timestampString = "353493628.190127"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "382"
+         endingLineNumber = "382"
+         landmarkName = "WebRtcVideoEngine::SetCaptureDevice(const Device* cam)"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "../../../third_party/webrtc/trunk/src/video_engine/vie_input_manager.cc"
+         timestampString = "353494914.857464"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "289"
+         endingLineNumber = "289"
+         landmarkName = "ViEInputManager::CreateCaptureDevice(const WebRtc_UWord8* deviceUniqueIdUTF8, const WebRtc_UWord32 deviceUniqueIdUTF8Length, int&amp; captureId)"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "../../../third_party/webrtc/trunk/src/video_engine/vie_input_manager.cc"
+         timestampString = "353494916.308769"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "293"
+         endingLineNumber = "293"
+         landmarkName = "ViEInputManager::CreateCaptureDevice(const WebRtc_UWord8* deviceUniqueIdUTF8, const WebRtc_UWord32 deviceUniqueIdUTF8Length, int&amp; captureId)"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "../../../third_party/webrtc/trunk/src/video_engine/vie_input_manager.cc"
+         timestampString = "353494941.84741"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "278"
+         endingLineNumber = "278"
+         landmarkName = "ViEInputManager::CreateCaptureDevice(const WebRtc_UWord8* deviceUniqueIdUTF8, const WebRtc_UWord32 deviceUniqueIdUTF8Length, int&amp; captureId)"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "../../../third_party/webrtc/trunk/src/video_engine/vie_capturer.cc"
+         timestampString = "353495446.928749"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "220"
+         endingLineNumber = "220"
+         landmarkName = "ViECapturer::Init(const WebRtc_UWord8* deviceUniqueIdUTF8, const WebRtc_UWord32 deviceUniqueIdUTF8Length)"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "../../../third_party/webrtc/trunk/src/modules/video_capture/main/source/Mac/video_capture_iphone.mm"
+         timestampString = "353534802.795298"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "232"
+         endingLineNumber = "232"
+         landmarkName = "-captureFrame:"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "../../../third_party/webrtc/trunk/src/video_engine/vie_input_manager.cc"
+         timestampString = "353534899.725643"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "294"
+         endingLineNumber = "294"
+         landmarkName = "ViEInputManager::CreateCaptureDevice(const WebRtc_UWord8* deviceUniqueIdUTF8, const WebRtc_UWord32 deviceUniqueIdUTF8Length, int&amp; captureId)"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "../../../third_party/webrtc/trunk/src/modules/video_capture/main/source/Mac/video_capture_iphone.mm"
+         timestampString = "353534960.870723"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "230"
+         endingLineNumber = "230"
+         landmarkName = "-captureFrame:"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "../../../third_party/webrtc/trunk/src/modules/video_capture/main/source/Mac/video_capture_iphone.mm"
+         timestampString = "353535037.325223"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "258"
+         endingLineNumber = "258"
+         landmarkName = "-captureOutput:didOutputSampleBuffer:fromConnection:"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "Yes"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "../../js_api/projects/WebrtcPlugin/iOS/WPLVideoRenderer.cpp"
+         timestampString = "353621718.605008"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "145"
+         endingLineNumber = "145"
+         landmarkName = "VideoRenderer::RenderFrame(const cricket::VideoFrame* pFrame)"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "Yes"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "../../js_api/projects/WebrtcPlugin/iOS/WPLVideoRenderer.mm"
+         timestampString = "353621938.305257"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "36"
+         endingLineNumber = "36"
+         landmarkName = "VideoRenderer::OnRefreshRenderArea(void* pEvt, void* pWin)"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "Yes"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "../../js_api/projects/WebrtcPlugin/iOS/WPLVideoRenderer.mm"
+         timestampString = "353621943.038432"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "51"
+         endingLineNumber = "51"
+         landmarkName = "VideoRenderer::Init()"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "Yes"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "../../js_api/projects/WebrtcPlugin/iOS/WPLVideoRenderer.mm"
+         timestampString = "353621944.423247"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "69"
+         endingLineNumber = "69"
+         landmarkName = "VideoRenderer::Deinit()"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "Yes"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "../../js_api/projects/WebrtcPlugin/iOS/WPLVideoRenderer.mm"
+         timestampString = "353621949.258292"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "96"
+         endingLineNumber = "96"
+         landmarkName = "VideoRenderer::RedrawRenderArea(void* pEvt, void* pWin)"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "Yes"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "../../js_api/projects/WebrtcPlugin/iOS/WPLVideoRenderer.mm"
+         timestampString = "353621952.838207"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "140"
+         endingLineNumber = "140"
+         landmarkName = "VideoRenderer::SetSize(int width, int height, int reserved)"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "Yes"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "../../js_api/projects/WebrtcPlugin/iOS/WPLVideoRenderer.mm"
+         timestampString = "353621957.36059"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "193"
+         endingLineNumber = "193"
+         landmarkName = "VideoRenderer::VideoRenderer(const std::string&amp; peerName, const int width, const int height, ThreadSafeMessageQueue* pEvtQ)"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "Yes"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "../../js_api/projects/WebrtcPlugin/iOS/WPLVideoRenderer.mm"
+         timestampString = "353621960.645289"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "208"
+         endingLineNumber = "208"
+         landmarkName = "VideoRenderer::~VideoRenderer()"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "Yes"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "../../js_api/projects/WebrtcPlugin/iOS/WPLVideoRenderer.mm"
+         timestampString = "353621966.192378"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "30"
+         endingLineNumber = "30"
+         landmarkName = "VideoRenderer::Destroy(VideoRenderer* pRenderer)"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "Yes"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "../../js_api/projects/WebrtcPlugin/iOS/WPLVideoRenderer.mm"
+         timestampString = "353621967.879246"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "25"
+         endingLineNumber = "25"
+         landmarkName = "VideoRenderer::Create(const std::string&amp; peerName, const int width, const int height, ThreadSafeMessageQueue* pEvtQ)"
+         landmarkType = "5">
+      </FileBreakpoint>
+   </FileBreakpoints>
+</Bucket>
