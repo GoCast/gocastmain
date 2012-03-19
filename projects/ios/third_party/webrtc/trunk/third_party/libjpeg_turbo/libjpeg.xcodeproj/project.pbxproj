@@ -504,14 +504,6 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				OTHER_CFLAGS = (
 					"-fno-strict-aliasing",
-					"-Xclang",
-					"-load",
-					"-Xclang",
-					"/Volumes/GCI/webrtc_plugin_ios/third_party/webrtc/trunk/tools/clang/scripts/../../../third_party/llvm-build/Release+Asserts/lib/libFindBadConstructs.dylib",
-					"-Xclang",
-					"-add-plugin",
-					"-Xclang",
-					"find-bad-constructs",
 					"-fstack-protector-all",
 				);
 				PREBINDING = NO;
