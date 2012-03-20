@@ -15,6 +15,10 @@
 
 @interface CLAPViewController : UIViewController <UITableViewDelegate, UITableViewDataSource>
 {
+	EAGLContext* glContext;
+    OGLView*     renderView;
+	CADisplayLink*      displayLink;
+//--
     UILabel* nameLabel;
     UILabel* serverLabel;
     UILabel* portLabel;
@@ -24,9 +28,6 @@
     UITextField* portEdit;
 
     UITableView* peerList;
-
-	EAGLContext* glContext;
-    OGLView*     renderView;
     
     UIButton* signInSignOutButton;
     UIButton* addButton;
@@ -41,7 +42,8 @@
 
 -(void) openGLInit;
 -(void) openGLTerminate;
--(void) openGLDraw:(void*)buffer withWidth:(int)nw withHeight:(int)nh;
+-(void) openGLRefresh;
+//-(void) openGLDraw:(void*)buffer withWidth:(int)nw withHeight:(int)nh;
 
 -(IBAction)signInSignOutPressed:(id)sender;
 -(IBAction)addPressed:(id)sender;

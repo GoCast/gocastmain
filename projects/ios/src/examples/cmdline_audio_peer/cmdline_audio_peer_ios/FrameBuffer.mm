@@ -76,6 +76,7 @@ void FrameBufferUtils::Destroy(FrameBuffer& buffer)
 void FrameBufferUtils::Set(const FrameBuffer& buffer)
 {
     glBindFramebufferOES(GL_FRAMEBUFFER_OES, buffer.m_frameBufferHandle);	
+	CHECK_GL_ERRORS();
     glBindRenderbufferOES(GL_RENDERBUFFER_OES, buffer.m_colorBufferHandle);
 	CHECK_GL_ERRORS();
 	
