@@ -17,6 +17,9 @@
 #define GOCAST_DEFAULT_RENDER_WIDTH     352
 #define GOCAST_DEFAULT_RENDER_HEIGHT    288
 
+@interface genTextureHelperObject : NSObject
+@end
+
 namespace GoCast
 {
 	class VideoRenderer : public cricket::VideoRenderer
@@ -38,6 +41,9 @@ namespace GoCast
                               void* pWin);
 		virtual bool SetSize(int width, int height, int reserved);
 		virtual bool RenderFrame(const cricket::VideoFrame* pFrame);
+
+    protected:
+        void _genTexture(void* buf, int width, int height);
 
 	protected:	
 		explicit VideoRenderer(const std::string& peerName, 
@@ -70,6 +76,10 @@ namespace GoCast
         static VideoRenderer* s_pHead;
         static int s_numRenderers;      
         static std::deque<VideoRenderer*> s_refreshQueue;
+        
+    public:
+        unsigned int textureID;
+        bool hadTexture;
 	};
 }
 

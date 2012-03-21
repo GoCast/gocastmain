@@ -147,7 +147,7 @@
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
-         shouldBeEnabled = "Yes"
+         shouldBeEnabled = "No"
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "../../js_api/projects/WebrtcPlugin/iOS/WPLVideoRenderer.cpp"
@@ -160,163 +160,150 @@
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
-         shouldBeEnabled = "Yes"
+         shouldBeEnabled = "No"
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "../../js_api/projects/WebrtcPlugin/iOS/WPLVideoRenderer.mm"
-         timestampString = "353621938.305257"
+         timestampString = "354053586.619831"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "36"
-         endingLineNumber = "36"
+         startingLineNumber = "86"
+         endingLineNumber = "86"
          landmarkName = "VideoRenderer::OnRefreshRenderArea(void* pEvt, void* pWin)"
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
-         shouldBeEnabled = "Yes"
+         shouldBeEnabled = "No"
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "../../js_api/projects/WebrtcPlugin/iOS/WPLVideoRenderer.mm"
-         timestampString = "353621943.038432"
+         timestampString = "354053586.619831"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "51"
-         endingLineNumber = "51"
+         startingLineNumber = "101"
+         endingLineNumber = "101"
          landmarkName = "VideoRenderer::Init()"
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
-         shouldBeEnabled = "Yes"
+         shouldBeEnabled = "No"
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "../../js_api/projects/WebrtcPlugin/iOS/WPLVideoRenderer.mm"
-         timestampString = "353621944.423247"
+         timestampString = "354053586.619831"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "69"
-         endingLineNumber = "69"
+         startingLineNumber = "119"
+         endingLineNumber = "119"
          landmarkName = "VideoRenderer::Deinit()"
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
-         shouldBeEnabled = "Yes"
+         shouldBeEnabled = "No"
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "../../js_api/projects/WebrtcPlugin/iOS/WPLVideoRenderer.mm"
-         timestampString = "353621949.258292"
+         timestampString = "354053586.619831"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "96"
-         endingLineNumber = "96"
+         startingLineNumber = "146"
+         endingLineNumber = "146"
          landmarkName = "VideoRenderer::RedrawRenderArea(void* pEvt, void* pWin)"
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
-         shouldBeEnabled = "Yes"
+         shouldBeEnabled = "No"
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "../../js_api/projects/WebrtcPlugin/iOS/WPLVideoRenderer.mm"
-         timestampString = "353621952.838207"
+         timestampString = "354053586.619831"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "140"
-         endingLineNumber = "140"
-         landmarkName = "VideoRenderer::SetSize(int width, int height, int reserved)"
-         landmarkType = "5">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "Yes"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         filePath = "../../js_api/projects/WebrtcPlugin/iOS/WPLVideoRenderer.mm"
-         timestampString = "353621957.36059"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "193"
-         endingLineNumber = "193"
+         startingLineNumber = "240"
+         endingLineNumber = "240"
          landmarkName = "VideoRenderer::VideoRenderer(const std::string&amp; peerName, const int width, const int height, ThreadSafeMessageQueue* pEvtQ)"
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
-         shouldBeEnabled = "Yes"
+         shouldBeEnabled = "No"
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "../../js_api/projects/WebrtcPlugin/iOS/WPLVideoRenderer.mm"
-         timestampString = "353621960.645289"
+         timestampString = "354053586.619831"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "208"
-         endingLineNumber = "208"
+         startingLineNumber = "255"
+         endingLineNumber = "255"
          landmarkName = "VideoRenderer::~VideoRenderer()"
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
-         shouldBeEnabled = "Yes"
+         shouldBeEnabled = "No"
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "../../js_api/projects/WebrtcPlugin/iOS/WPLVideoRenderer.mm"
-         timestampString = "353621966.192378"
+         timestampString = "354053586.619831"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "30"
-         endingLineNumber = "30"
+         startingLineNumber = "80"
+         endingLineNumber = "80"
          landmarkName = "VideoRenderer::Destroy(VideoRenderer* pRenderer)"
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
-         shouldBeEnabled = "Yes"
+         shouldBeEnabled = "No"
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "../../js_api/projects/WebrtcPlugin/iOS/WPLVideoRenderer.mm"
-         timestampString = "353621967.879246"
+         timestampString = "354053586.619831"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "25"
-         endingLineNumber = "25"
+         startingLineNumber = "75"
+         endingLineNumber = "75"
          landmarkName = "VideoRenderer::Create(const std::string&amp; peerName, const int width, const int height, ThreadSafeMessageQueue* pEvtQ)"
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
-         shouldBeEnabled = "Yes"
+         shouldBeEnabled = "No"
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "../../js_api/projects/WebrtcPlugin/WPLCall.cpp"
-         timestampString = "353880822.535249"
+         timestampString = "354052993.862193"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "90"
-         endingLineNumber = "90"
+         startingLineNumber = "93"
+         endingLineNumber = "93"
          landmarkName = "Call::AddParticipant(int peerId, std::string&amp; peerName, bool bRemoteCall, bool bAudioOnly)"
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
-         shouldBeEnabled = "Yes"
+         shouldBeEnabled = "No"
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "../../js_api/projects/WebrtcPlugin/WPLCall.cpp"
-         timestampString = "353880837.891477"
+         timestampString = "354052993.862193"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "172"
-         endingLineNumber = "172"
+         startingLineNumber = "179"
+         endingLineNumber = "179"
          landmarkName = "Call::RemoveParticipant(int peerId, bool bRemoteHangup)"
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
-         shouldBeEnabled = "Yes"
+         shouldBeEnabled = "No"
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "../../js_api/projects/WebrtcPlugin/WPLCall.cpp"
-         timestampString = "353880852.685213"
+         timestampString = "354052993.862193"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "301"
-         endingLineNumber = "301"
+         startingLineNumber = "310"
+         endingLineNumber = "310"
          landmarkName = "Call::SetRemoteVideoRenderer(const int peerId, const std::string&amp; streamId)"
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
-         shouldBeEnabled = "Yes"
+         shouldBeEnabled = "No"
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "../../js_api/projects/WebrtcPlugin/WPLPeerConnectionClient.cpp"
@@ -329,91 +316,78 @@
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
-         shouldBeEnabled = "Yes"
+         shouldBeEnabled = "No"
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "../../js_api/projects/WebrtcPlugin/WPLPeerConnectionObserver.cpp"
-         timestampString = "353881353.772312"
+         timestampString = "354052993.862193"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "123"
-         endingLineNumber = "123"
+         startingLineNumber = "125"
+         endingLineNumber = "125"
          landmarkName = "PeerConnectionObserver::OnAddStream(const std::string &amp;streamId, bool video)"
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
-         shouldBeEnabled = "Yes"
+         shouldBeEnabled = "No"
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "../../js_api/projects/WebrtcPlugin/WPLPeerConnectionObserver.cpp"
-         timestampString = "353881362.88924"
+         timestampString = "354052993.862193"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "153"
-         endingLineNumber = "153"
+         startingLineNumber = "155"
+         endingLineNumber = "155"
          landmarkName = "PeerConnectionObserver::OnMessageFromRemotePeer(int peerId, const std::string&amp; msg)"
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
-         shouldBeEnabled = "Yes"
+         shouldBeEnabled = "No"
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "../../js_api/projects/WebrtcPlugin/WPLPeerConnectionObserver.cpp"
-         timestampString = "353881370.006542"
+         timestampString = "354052993.862193"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "216"
-         endingLineNumber = "216"
+         startingLineNumber = "220"
+         endingLineNumber = "220"
          landmarkName = "PeerConnectionObserver::ConnectToPeer(int peerId, const std::string&amp; peerName)"
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
-         shouldBeEnabled = "Yes"
+         shouldBeEnabled = "No"
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "../../js_api/projects/WebrtcPlugin/WPLPeerConnectionObserver.cpp"
-         timestampString = "353881374.573702"
+         timestampString = "354052993.862193"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "232"
-         endingLineNumber = "232"
+         startingLineNumber = "236"
+         endingLineNumber = "236"
          landmarkName = "PeerConnectionObserver::DisconnectFromCurrentPeer(void)"
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
-         shouldBeEnabled = "Yes"
+         shouldBeEnabled = "No"
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "../../js_api/projects/WebrtcPlugin/WPLPeerConnectionObserver.cpp"
-         timestampString = "353881379.422834"
+         timestampString = "354052993.862193"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "257"
-         endingLineNumber = "257">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "No"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         filePath = "../../js_api/projects/WebrtcPlugin/iOS/WPLVideoRenderer.mm"
-         timestampString = "353883153.025194"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "145"
-         endingLineNumber = "145"
-         landmarkName = "VideoRenderer::RenderFrame(const cricket::VideoFrame* pFrame)"
-         landmarkType = "5">
+         startingLineNumber = "263"
+         endingLineNumber = "263">
       </FileBreakpoint>
       <FileBreakpoint
          shouldBeEnabled = "No"
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "cmdline_audio_peer_ios/CLAPViewController.mm"
-         timestampString = "353966864.340929"
+         timestampString = "354052993.862193"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "127"
-         endingLineNumber = "127"
+         startingLineNumber = "144"
+         endingLineNumber = "144"
          landmarkName = "-drawTexture:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -422,11 +396,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "cmdline_audio_peer_ios/CLAPViewController.mm"
-         timestampString = "353966864.340929"
+         timestampString = "354052993.862193"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "136"
-         endingLineNumber = "136"
+         startingLineNumber = "153"
+         endingLineNumber = "153"
          landmarkName = "-drawTexture:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -435,11 +409,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "cmdline_audio_peer_ios/CLAPViewController.mm"
-         timestampString = "353966864.340929"
+         timestampString = "354052993.862193"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "133"
-         endingLineNumber = "133"
+         startingLineNumber = "150"
+         endingLineNumber = "150"
          landmarkName = "-drawTexture:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -448,11 +422,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "cmdline_audio_peer_ios/CLAPViewController.mm"
-         timestampString = "353966864.340929"
+         timestampString = "354054473.195097"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "279"
-         endingLineNumber = "279"
+         startingLineNumber = "312"
+         endingLineNumber = "312"
          landmarkName = "-signInSignOutPressed:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -461,11 +435,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "cmdline_audio_peer_ios/CLAPViewController.mm"
-         timestampString = "353966864.340929"
+         timestampString = "354054473.195097"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "165"
-         endingLineNumber = "165"
+         startingLineNumber = "196"
+         endingLineNumber = "196"
          landmarkName = "-openGLRefresh"
          landmarkType = "5">
       </FileBreakpoint>
@@ -474,11 +448,24 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "cmdline_audio_peer_ios/CLAPViewController.mm"
-         timestampString = "353966864.340929"
+         timestampString = "354054473.195097"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "149"
-         endingLineNumber = "149"
+         startingLineNumber = "163"
+         endingLineNumber = "163"
+         landmarkName = "-openGLRefresh"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "cmdline_audio_peer_ios/CLAPViewController.mm"
+         timestampString = "354054473.195097"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "176"
+         endingLineNumber = "176"
          landmarkName = "-openGLRefresh"
          landmarkType = "5">
       </FileBreakpoint>

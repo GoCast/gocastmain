@@ -13,10 +13,14 @@
 #import "OGLView.h"
 #include <string>
 
+void openGLGenFakeTexture();
+
 @interface CLAPViewController : UIViewController <UITableViewDelegate, UITableViewDataSource>
 {
+@public
 	EAGLContext* glContext;
-    OGLView*     renderView;
+    OGLView*     renderViewLocal;
+    OGLView*     renderViewRemote;
 	CADisplayLink*      displayLink;
 //--
     UILabel* nameLabel;
@@ -63,7 +67,8 @@
 
 @property (retain) IBOutlet UITableView* peerList;
 
-@property (retain) IBOutlet OGLView* renderView;
+@property (retain) IBOutlet OGLView* renderViewLocal;
+@property (retain) IBOutlet OGLView* renderViewRemote;
 
 @property (retain) IBOutlet UIButton* signInSignOutButton;
 @property (retain) IBOutlet UIButton* addButton;
