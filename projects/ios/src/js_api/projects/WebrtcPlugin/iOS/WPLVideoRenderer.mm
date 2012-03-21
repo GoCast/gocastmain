@@ -58,7 +58,7 @@ std::deque<GoCast::VideoRenderer*> GoCast::VideoRenderer::s_refreshQueue;
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     
     // Using BGRA extension to pull in video frame data directly
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, params->width, params->height, 0, GL_BGRA, GL_UNSIGNED_BYTE, params->buf);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, params->width, params->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, params->buf);
     CHECK_GL_ERRORS();
     
     params->parent->hadTexture = true;
@@ -202,7 +202,25 @@ namespace GoCast
 	      frmBufSize,
 	      m_width*4
 	    );
-        
+
+        //Convert ABGR -> ARGB
+        uint8* pBufIter = m_spFrmBuf.get();
+	    uint8* pBufEnd = pBufIter + frmBufSize;
+        union
+        {
+            unsigned int src;
+            unsigned char srcdata[4];
+        };
+	    while(pBufIter < pBufEnd)
+	    {
+            src     = ((unsigned int*)pBufIter)[0];
+		    pBufIter[0] = srcdata[2];   //R
+            pBufIter[1] = srcdata[1];   //G
+            pBufIter[2] = srcdata[0];   //B
+            pBufIter[3] = srcdata[3];   //A
+		    pBufIter += 4;
+	    }
+
         this->_genTexture(m_spFrmBuf.get(), m_width, m_height);
 
         pthread_mutex_unlock(&pluginWinMutex);
