@@ -40,6 +40,9 @@
 #include <uuids.h>
 #include "talk/base/win32.h"  // ToUtf8
 #include "talk/base/win32window.h"
+#elif defined(MAC_IPHONE)
+#import <Foundation/Foundation.h>
+#import <AVFoundation/AVFoundation.h>
 //RMW#elif MAC_IPHONE
 //#import <AudioToolbox/AudioToolbox.h>
 //#include <vector>
@@ -135,12 +138,32 @@ static bool ShouldVideoDeviceBeIgnored(const std::string& device_name);
 #ifndef OSX
 #if defined (MAC_IPHONE)
 static bool GetVideoDevices(std::vector<Device>* out)
+{
+    //TJG: According to libjingle 0.6.13
+    Device devFront("front camera", "1");    // name and ID
+    Device devBack("back camera", "2");    // name and ID
+    bool hasFront = false;
+    bool hasBack = false;
+
+    NSArray *devices = [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo];
+    
+    for (AVCaptureDevice *device in devices) 
     {
-        //TJG: According to libjingle 0.6.13
-        Device dev("camera", "1");    // name and ID
-        out->push_back(dev);
-        return true;    //TJG 2012-03-15 Won't succeed otherwise
-    };
+        if ([device position] == AVCaptureDevicePositionFront)
+        {
+            hasFront = true;
+        }
+        if ([device position] == AVCaptureDevicePositionBack)
+        {
+            hasBack = true;
+        }
+    }
+
+    if (hasFront)   out->push_back(devFront);
+    if (hasBack)    out->push_back(devBack);
+
+    return true;    //TJG 2012-03-15 Won't succeed otherwise
+};
 #endif
 #endif
 #if WIN32

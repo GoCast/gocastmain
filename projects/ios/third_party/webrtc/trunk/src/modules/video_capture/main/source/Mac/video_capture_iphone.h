@@ -79,10 +79,8 @@ protected:
     // Help functions
     WebRtc_Word32 SetCameraOutput();
     
-private:
-    void* _captureDevice;
-//    VideoCaptureAVCaptureObjC*        _captureDevice;
-//    VideoCaptureAVCaptureInfoObjC*    _captureInfo;
+protected:
+    void*                   _captureDevice;
     bool                    _isCapturing;
     WebRtc_Word32           _id;
     WebRtc_Word32           _captureWidth;
@@ -149,8 +147,9 @@ public:
     
 protected:
     virtual WebRtc_Word32 CreateCapabilityMap(const WebRtc_UWord8* deviceUniqueIdUTF8);
-    
-//    VideoCaptureAVCaptureInfoObjC*    _captureInfo;
+
+protected:
+    void* _captureDeviceInfo;
 };
 
     };

@@ -435,11 +435,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "../../../third_party/webrtc/trunk/src/modules/video_capture/main/source/Mac/video_capture_iphone.mm"
-         timestampString = "354228126.052373"
+         timestampString = "354237959.347761"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "348"
-         endingLineNumber = "348"
+         startingLineNumber = "420"
+         endingLineNumber = "420"
          landmarkName = "VideoCaptureAVCapture::StartCapture(const VideoCaptureCapability&amp; capability)"
          landmarkType = "5">
       </FileBreakpoint>
@@ -467,6 +467,58 @@
          startingLineNumber = "282"
          endingLineNumber = "282"
          landmarkName = "ViECapturer::Start(const CaptureCapability captureCapability)"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "../../../third_party/webrtc/trunk/src/modules/video_capture/main/source/Mac/video_capture_iphone.mm"
+         timestampString = "354237959.347761"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "377"
+         endingLineNumber = "377"
+         landmarkName = "VideoCaptureAVCapture::Init(const WebRtc_Word32 id, const WebRtc_UWord8* iDeviceUniqueIdUTF8)"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "../../../third_party/webrtc/trunk/src/modules/video_capture/main/source/Mac/video_capture_iphone.mm"
+         timestampString = "354237959.347761"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "505"
+         endingLineNumber = "505"
+         landmarkName = "VideoCaptureAVCaptureInfo::GetDeviceName( WebRtc_UWord32 deviceNumber, WebRtc_UWord8* deviceNameUTF8, WebRtc_UWord32 deviceNameLength, WebRtc_UWord8* deviceUniqueIdUTF8, WebRtc_UWord32 deviceUniqueIdUTF8Length, WebRtc_UWord8* productUniqueIdUTF8, WebRtc_UWord32 productUniqueIdUTF8Length)"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "../../../third_party/webrtc/trunk/third_party/libjingle/source/talk/session/phone/webrtcvideoengine.cc"
+         timestampString = "354234747.596212"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "363"
+         endingLineNumber = "363"
+         landmarkName = "WebRtcVideoEngine::SetCaptureDevice(const Device* cam)"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "../../../third_party/webrtc/trunk/src/modules/video_capture/main/source/Mac/video_capture_iphone.mm"
+         timestampString = "354237959.347761"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "486"
+         endingLineNumber = "486"
+         landmarkName = "VideoCaptureAVCaptureInfo::NumberOfDevices()"
          landmarkType = "5">
       </FileBreakpoint>
    </FileBreakpoints>

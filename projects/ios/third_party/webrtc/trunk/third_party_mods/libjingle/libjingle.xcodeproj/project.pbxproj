@@ -265,7 +265,7 @@
 		38A037502606A994701C0CFA /* xmppclient.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = xmppclient.cc; sourceTree = "<group>"; };
 		393673C257E82F337A87E63B /* udpport.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = udpport.h; sourceTree = "<group>"; };
 		393AB88C449FCEDCA8DA89FA /* socketpool.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = socketpool.cc; sourceTree = "<group>"; };
-		3BFACF8828CC07AFD58EAB0B /* devicemanager.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = devicemanager.cc; sourceTree = "<group>"; };
+		3BFACF8828CC07AFD58EAB0B /* devicemanager.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; path = devicemanager.cc; sourceTree = "<group>"; };
 		3D65A60BC1D01F2D13CE07D9 /* taskrunner.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = taskrunner.h; sourceTree = "<group>"; };
 		3F4E0C2F72B77F8E1B265E8C /* libjingle_app.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libjingle_app.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		3F8398BE4C9D6E66E9E5C97C /* libjingle.gyp */ = {isa = PBXFileReference; lastKnownFileType = text; path = libjingle.gyp; sourceTree = "<group>"; };
