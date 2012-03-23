@@ -210,7 +210,7 @@ namespace GoCast
         bool m_bAudioOnly;
         
 #if(defined(GOCAST_ENABLE_VIDEO) && !defined(GOCAST_WINDOWS))
-    protected:
+    public:
         VideoRenderer* m_pRemoteRenderer;
 #endif
 

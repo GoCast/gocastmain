@@ -236,7 +236,25 @@ using namespace webrtc::videocapturemodule;
         tempCaptureCapability.height = frameHeight;
         tempCaptureCapability.maxFPS = 30;
         tempCaptureCapability.rawType = webrtc::kVideoARGB;
-        
+
+        //Convert BGRA -> ARGB
+        unsigned char* pBufIter = (unsigned char*)baseAddress;
+	    unsigned char* pBufEnd = pBufIter + (frameWidth * frameHeight * 4);
+        union
+        {
+            unsigned int src;
+            unsigned char srcdata[4];
+        };
+	    while(pBufIter < pBufEnd)
+	    {
+            src     = ((unsigned int*)pBufIter)[0];
+		    pBufIter[0] = srcdata[3];   //R
+            pBufIter[1] = srcdata[2];   //G
+            pBufIter[2] = srcdata[1];   //B
+            pBufIter[3] = srcdata[0];   //A
+		    pBufIter += 4;
+	    }
+
         _owner->IncomingFrame((unsigned char*)baseAddress,
                               frameSize,
                               tempCaptureCapability,

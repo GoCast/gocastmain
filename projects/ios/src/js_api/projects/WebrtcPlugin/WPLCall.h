@@ -188,6 +188,7 @@ namespace GoCast
         talk_base::scoped_ptr<webrtc::PeerConnectionFactory> m_pPeerConnectionFactory;
         
 #if(defined(GOCAST_ENABLE_VIDEO) && !defined(GOCAST_WINDOWS))
+    public:
         VideoRenderer* m_pLocalRenderer;
 #endif
 

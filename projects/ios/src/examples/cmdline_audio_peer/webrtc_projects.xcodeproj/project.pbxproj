@@ -1574,7 +1574,7 @@
 		14747A3D84CC04BA1A98C14F /* anyoption.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = anyoption.h; sourceTree = "<group>"; };
 		1F67A4A13C3274535D7A921D /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = System/Library/Frameworks/CoreAudio.framework; sourceTree = SDKROOT; };
 		1F6B06CB1E5C57375776AE5F /* cmdline_audio_peer_monolithic */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "compiled.mach-o.executable"; path = cmdline_audio_peer_monolithic; sourceTree = BUILT_PRODUCTS_DIR; };
-		227C0EFE541BAF0E3A91D92C /* WPLSocketServer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = WPLSocketServer.cpp; sourceTree = "<group>"; };
+		227C0EFE541BAF0E3A91D92C /* WPLSocketServer.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; path = WPLSocketServer.cpp; sourceTree = "<group>"; };
 		23190421003F1A868E0165A6 /* shell.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = shell.cpp; sourceTree = "<group>"; };
 		28C274708DCD172C762F0810 /* peerconnection_server */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "compiled.mach-o.executable"; path = peerconnection_server; sourceTree = BUILT_PRODUCTS_DIR; };
 		2DFA60C497067F55812BB7BE /* utils.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = utils.cc; sourceTree = "<group>"; };
@@ -1583,7 +1583,7 @@
 		3D48746EC43DFD357DD976DA /* webrtc_projects.gyp */ = {isa = PBXFileReference; lastKnownFileType = text; path = webrtc_projects.gyp; sourceTree = "<group>"; };
 		3F78CFE7BEC18BB89F2E82B8 /* common_video.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = common_video.xcodeproj; path = ../../../third_party/webrtc/trunk/src/common_video/common_video.xcodeproj; sourceTree = SOURCE_ROOT; };
 		4B429E798E857BA8A4D2E1B1 /* common.gypi */ = {isa = PBXFileReference; lastKnownFileType = text; name = common.gypi; path = ../../../third_party/webrtc/trunk/build/common.gypi; sourceTree = "<group>"; };
-		4D1F7AFF8E80DFFF7F5E2357 /* WPLCall.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = WPLCall.cpp; sourceTree = "<group>"; };
+		4D1F7AFF8E80DFFF7F5E2357 /* WPLCall.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; path = WPLCall.cpp; sourceTree = "<group>"; };
 		51787E018ACDFA76638E81CE /* release.gypi */ = {isa = PBXFileReference; lastKnownFileType = text; name = release.gypi; path = ../../../third_party/webrtc/trunk/build/release.gypi; sourceTree = "<group>"; };
 		586D5BD1B103CDDE754B1BB9 /* libjpeg.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = libjpeg.xcodeproj; path = ../../../third_party/webrtc/trunk/third_party/libjpeg_turbo/libjpeg.xcodeproj; sourceTree = SOURCE_ROOT; };
 		5A3CFA3DD958A65A0E228E26 /* voice_engine.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = voice_engine.xcodeproj; path = ../../../third_party/webrtc/trunk/src/voice_engine/voice_engine.xcodeproj; sourceTree = SOURCE_ROOT; };
@@ -1598,7 +1598,7 @@
 		950678E3253E1E4059665C28 /* release_impl.gypi */ = {isa = PBXFileReference; lastKnownFileType = text; name = release_impl.gypi; path = ../../../third_party/webrtc/trunk/build/internal/release_impl.gypi; sourceTree = "<group>"; };
 		9508102B0779AC14FB3E7DFA /* expat.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = expat.xcodeproj; path = ../../../third_party/webrtc/trunk/third_party/expat/expat.xcodeproj; sourceTree = SOURCE_ROOT; };
 		952E581208DE860729FC1605 /* WPLCall.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WPLCall.h; sourceTree = "<group>"; };
-		99903CA8CD06A10F8E219523 /* WPLPeerConnectionObserver.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = WPLPeerConnectionObserver.cpp; sourceTree = "<group>"; };
+		99903CA8CD06A10F8E219523 /* WPLPeerConnectionObserver.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; path = WPLPeerConnectionObserver.cpp; sourceTree = "<group>"; };
 		9CF39A0C207CC75195E1F141 /* libvpx.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = libvpx.xcodeproj; path = ../../../third_party/webrtc/trunk/third_party/libvpx/libvpx.xcodeproj; sourceTree = SOURCE_ROOT; };
 		9FE145AC582025301B78B976 /* WPLThreadSafeMessageQueue.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WPLThreadSafeMessageQueue.h; sourceTree = "<group>"; };
 		A1CE73B82546B686B7FB713D /* WPLPeerConnectionClient.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WPLPeerConnectionClient.h; sourceTree = "<group>"; };
@@ -1607,7 +1607,7 @@
 		BF08EBA3901A479F50D5C943 /* anyoption.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = anyoption.cpp; sourceTree = "<group>"; };
 		C03D44C27D14A21411053C10 /* video_engine.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = video_engine.xcodeproj; path = ../../../third_party/webrtc/trunk/src/video_engine/video_engine.xcodeproj; sourceTree = SOURCE_ROOT; };
 		C0E167C5F030604D9A572F2D /* WPLPeerConnectionClient.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; path = WPLPeerConnectionClient.cpp; sourceTree = "<group>"; };
-		C47026708C613DC9767E234D /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		C47026708C613DC9767E234D /* main.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; path = main.cpp; sourceTree = "<group>"; };
 		CB2B30B2640881E963B86181 /* WPLPeerConnectionObserver.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WPLPeerConnectionObserver.h; sourceTree = "<group>"; };
 		CF6106A9D7D956ED04A012C3 /* shell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = shell.h; sourceTree = "<group>"; };
 		DC3002D113D6AE9E8498ADBD /* cmdline_audio_peer */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "compiled.mach-o.executable"; path = cmdline_audio_peer; sourceTree = BUILT_PRODUCTS_DIR; };

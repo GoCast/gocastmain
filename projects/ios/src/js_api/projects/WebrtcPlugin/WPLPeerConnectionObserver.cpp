@@ -19,6 +19,8 @@
 #include "talk/base/common.h"
 #include "talk/session/phone/mediaengine.h"
 
+extern GoCast::VideoRenderer* gRemoteStream;
+
 namespace GoCast
 {
     PeerConnectionObserver::PeerConnectionObserver(
@@ -153,6 +155,8 @@ namespace GoCast
                 m_pPeerConnection->SetVideoRenderer("video", NULL);
                 if(NULL != m_pRemoteRenderer)
                 {
+                    gRemoteStream = NULL; //iPhone only
+
                     m_pRemoteRenderer->Deinit();
                     VideoRenderer::Destroy(m_pRemoteRenderer);
                     m_pRemoteRenderer = NULL;
@@ -232,6 +236,8 @@ namespace GoCast
         m_pPeerConnection->SetVideoRenderer("video", NULL);
         if(NULL != m_pRemoteRenderer)
         {
+            gRemoteStream = NULL; //iPhone only
+
             m_pRemoteRenderer->Deinit();
             VideoRenderer::Destroy(m_pRemoteRenderer);
             m_pRemoteRenderer = NULL;
@@ -270,6 +276,7 @@ namespace GoCast
                 return false;
             }
             
+            gRemoteStream = m_pRemoteRenderer; //iPhone only
             return m_pPeerConnection->SetVideoRenderer(streamId, m_pRemoteRenderer);
         }
 #endif

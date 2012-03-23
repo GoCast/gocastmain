@@ -18,6 +18,11 @@
 #include <vector>
 #include <string>
 
+#import <QuartzCore/QuartzCore.h>
+#import <UIKit/UIKit.h>
+#import <OpenGLES/EAGLDrawable.h>
+#include <OpenGLES/ES1/glext.h>
+
 using namespace std;
 
 extern int cmd_main (int argc, const char * argv[]);
@@ -28,29 +33,175 @@ extern GoCast::ThreadSafeMessageQueue mq;
 @synthesize nameLabel, serverLabel, portLabel;
 @synthesize nameEdit, serverEdit, portEdit;
 @synthesize peerList;
-@synthesize renderView;
+@synthesize renderViewLocal, renderViewRemote;
 @synthesize signInSignOutButton, addButton, removeButton, quitButton;
 
 static vector<string> peers;
 int peerSelected = -1;
 string peerToCallHangup;
 CLAPViewController* gInstance = nil;
+GoCast::VideoRenderer *gLocalStream = NULL, *gRemoteStream = NULL;
+
+bool isInited = false;
+bool hadTexture = false;
+uint textureID = 0;
+
+unsigned char buf[] =
+{
+    0x00, 0x00, 0xff, 0xff,     0x00, 0xff, 0x00, 0xff,
+    0xff, 0x00, 0x00, 0xff,     0xff, 0x00, 0xff, 0xff,
+};
+
+//void openGLGenFakeTexture()
+//{
+//    [EAGLContext setCurrentContext:gInstance->glContext];
+//    //--
+//    [gInstance->renderView bind];
+//
+//    if (hadTexture)
+//    {
+//        glDeleteTextures(1, &textureID);
+//    }
+//
+//	int bufferHeight    = 2;
+//	int bufferWidth     = 2;
+//    
+//    int count = 0;
+//    for (int j = 0; j < 2; j++)
+//    {
+//        for (int i = 0; i < 2; i++)
+//        {
+//            buf[count + 0] = rand() % 0x100;
+//            buf[count + 1] = rand() % 0x100;
+//            buf[count + 2] = rand() % 0x100;
+//            count += 4;
+//        }
+//    }
+//    
+//	// Create a new texture from the camera frame data, display that using the shaders
+//	glGenTextures(1, &textureID);
+//	glBindTexture(GL_TEXTURE_2D, textureID);
+//
+//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+//	
+//    // This is necessary for non-power-of-two textures
+//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+//	
+//	// Using BGRA extension to pull in video frame data directly
+//	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, bufferWidth, bufferHeight, 0, GL_BGRA, GL_UNSIGNED_BYTE, buf);
+//
+//    hadTexture = true;
+//}
 
 -(void) openGLInit
 {
+    glContext = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES1];
+    assert(glContext);
     
+    BOOL result = [EAGLContext setCurrentContext:glContext];
+    assert(result == true);
+    
+    glDisable(GL_CULL_FACE);
+    glDisable(GL_DEPTH_TEST);
+
+    isInited = true;
 }
 
 -(void) openGLTerminate
 {
-    
+    //TODO...
 }
 
--(void) openGLDraw:(void*)buffer withWidth:(int)nw withHeight:(int)nh
+void setUpTransforms();
+void setUpTransforms()
 {
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glOrthof(0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f);   //Set up projection from [0,0]-[1,1]
     
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
 }
 
+static float vertices[] = {
+    0.0f, 0.0f, //top-left
+    0.0f, 1.0f, //bot-left
+    1.0f, 0.0f, //top-right
+    1.0f, 1.0f, //bot-right
+};
+
+static float textureCoords[] = {
+    0.0f, 0.0f, //top-left
+    1.0f, 0.0f, //top-right
+    0.0f, 1.0f, //bot-left
+    1.0f, 1.0f, //bot-right
+};
+
+-(void) drawTexture:(uint)th
+{
+    glVertexPointer(2, GL_FLOAT, 0, &vertices[0]);
+    glTexCoordPointer(2, GL_FLOAT, 0, &textureCoords[0]);    //textcoords are coincidentally same as vertex coords
+    
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+    
+    if (th)
+    {
+        glBindTexture(GL_TEXTURE_2D, th);
+        glEnable(GL_TEXTURE_2D);
+	}
+
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+}
+
+-(void) openGLRefresh
+{
+    if (renderViewLocal.hidden == NO)
+    {
+        if (isInited)
+        {
+            [EAGLContext setCurrentContext:glContext];
+            //--
+            [renderViewLocal bind];
+            
+            glClearColor(0.2f, 0.2f, 0.3f, 1.0f);
+            glClear(GL_COLOR_BUFFER_BIT| GL_DEPTH_BUFFER_BIT);
+            
+            setUpTransforms();
+            
+            if (gLocalStream)
+            {
+                [self drawTexture:gLocalStream->textureID];
+            }
+            [glContext presentRenderbuffer:GL_RENDERBUFFER_OES];
+
+            //--
+            [renderViewRemote bind];
+            
+            glClearColor(0.2f, 0.2f, 0.3f, 1.0f);
+            glClear(GL_COLOR_BUFFER_BIT| GL_DEPTH_BUFFER_BIT);
+            
+            setUpTransforms();
+            
+            if (gRemoteStream)
+            {
+                [self drawTexture:gRemoteStream->textureID];
+            }
+            [glContext presentRenderbuffer:GL_RENDERBUFFER_OES];
+        }
+        else
+        {
+            [self openGLInit];
+        }
+    }
+}
+
+//-(void) openGLDraw:(void*)buffer withWidth:(int)nw withHeight:(int)nh
+//{
+//    
+//}
 
 -(void) updatePeerList
 {
@@ -126,7 +277,8 @@ int getNextState(int prevState, int event)
             self.nameLabel.hidden               = NO;  self.nameEdit.hidden               = NO;
             self.serverLabel.hidden             = NO;  self.serverEdit.hidden             = NO;
             self.portLabel.hidden               = NO;  self.portEdit.hidden               = NO;
-            self.renderView.hidden              = YES;
+            self.renderViewLocal.hidden         = YES;
+            self.renderViewRemote.hidden        = YES;
             self.peerList.scrollEnabled = NO; self.peerList.allowsSelection = NO; self.peerList.backgroundColor = [UIColor lightGrayColor];
             self.signInSignOutButton.enabled    = YES;
             self.addButton.enabled              = NO;
@@ -140,7 +292,8 @@ int getNextState(int prevState, int event)
             self.nameLabel.hidden               = YES;  self.nameEdit.hidden               = YES;
             self.serverLabel.hidden             = YES;  self.serverEdit.hidden             = YES;
             self.portLabel.hidden               = YES;  self.portEdit.hidden               = YES;
-            self.renderView.hidden              = NO;
+            self.renderViewLocal.hidden         = NO;
+            self.renderViewRemote.hidden        = NO;
             self.peerList.scrollEnabled = YES; self.peerList.allowsSelection = YES; self.peerList.backgroundColor = [UIColor whiteColor];
             self.signInSignOutButton.enabled    = YES;
             self.addButton.enabled              = YES;
@@ -274,11 +427,23 @@ int getNextState(int prevState, int event)
     cmd_main (0, argv);
 }
 
+- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil 
+{
+    if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) 
+	{
+        [self openGLInit];
+    }
+    return self;
+}
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+
 	// Do any additional setup after loading the view, typically from a nib.
     gInstance = self;
+    [renderViewLocal initialize:glContext];
+    [renderViewRemote initialize:glContext];
 
     [self runStateUILogic:EVENT_START];
 
@@ -294,7 +459,10 @@ int getNextState(int prevState, int event)
 
 - (void)viewWillAppear:(BOOL)animated
 {
-    [super viewWillAppear:animated];
+	displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(openGLRefresh)];
+	displayLink.frameInterval = 1;
+	[displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];	
+//    [super viewWillAppear:animated];
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -309,7 +477,7 @@ int getNextState(int prevState, int event)
 
 - (void)viewDidDisappear:(BOOL)animated
 {
-	[super viewDidDisappear:animated];
+	[displayLink invalidate];
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation

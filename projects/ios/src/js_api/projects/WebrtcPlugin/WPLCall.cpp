@@ -13,6 +13,8 @@
 #include <assert.h>
 #include <iostream>
 #include "WPLCall.h"
+#include "WPLVideoRenderer.h"
+
 #include "talk/session/phone/mediaengine.h"
 #include "talk/session/phone/webrtcvoiceengine.h"
 
@@ -24,6 +26,7 @@
 #include "talk/session/phone/webrtcvideoengine.h"
 #endif
 
+extern GoCast::VideoRenderer* gLocalStream;
 
 namespace GoCast
 {
@@ -97,12 +100,16 @@ namespace GoCast
                                );
             if(false == m_pLocalRenderer->Init())
             {
+                gLocalStream = NULL;  //TJG iPhone only
+
                 VideoRenderer::Destroy(m_pLocalRenderer);
                 return false;
             }
             
             m_pMediaEngine->SetVideoCapture(true);
             m_pMediaEngine->SetLocalRenderer(m_pLocalRenderer);
+
+            gLocalStream = m_pLocalRenderer;  //TJG iPhone only
         }
 #endif
 
@@ -169,6 +176,8 @@ namespace GoCast
 #if(defined(GOCAST_ENABLE_VIDEO) && !defined(GOCAST_WINDOWS))
             if(NULL != m_pLocalRenderer && true == m_AVParticipants.empty())
             {
+                gLocalStream = NULL;  //TJG iPhone only
+
                 m_pMediaEngine->SetLocalRenderer(NULL);
                 m_pLocalRenderer->Deinit();
                 VideoRenderer::Destroy(m_pLocalRenderer);
