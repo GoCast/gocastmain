@@ -30,11 +30,11 @@
 
 #define AVCAPTURE_MIN_WIDTH             0
 #define AVCAPTURE_MAX_WIDTH             640
-#define AVCAPTURE_DEFAULT_WIDTH         352
+#define AVCAPTURE_DEFAULT_WIDTH         288
 
 #define AVCAPTURE_MIN_HEIGHT            0
 #define AVCAPTURE_MAX_HEIGHT            480
-#define AVCAPTURE_DEFAULT_HEIGHT        288
+#define AVCAPTURE_DEFAULT_HEIGHT        352
 
 #define AVCAPTURE_MIN_FRAME_RATE        1
 #define AVCAPTURE_MAX_FRAME_RATE        30

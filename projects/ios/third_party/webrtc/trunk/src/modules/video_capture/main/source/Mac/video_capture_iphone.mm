@@ -172,37 +172,21 @@ using namespace webrtc::videocapturemodule;
 	[captureSession stopRunning];
 }
 
-//uint textureID = 0;
-//bool hadTexture = false;
-//-(void) captureToTexture:(CMSampleBufferRef)sampleBuffer
-//{
-//    if (hadTexture)
-//    {
-//        glDeleteTextures(1, &textureID);
-//    }
-//    
-//	CVImageBufferRef cameraFrame = CMSampleBufferGetImageBuffer(sampleBuffer);
-//    
-//    //	[self.delegate processNewCameraFrame:pixelBuffer];
-//	CVPixelBufferLockBaseAddress(cameraFrame, 0);
-//	int bufferHeight = CVPixelBufferGetHeight(cameraFrame);
-//	int bufferWidth = CVPixelBufferGetWidth(cameraFrame);
-//    
-//	// Create a new texture from the camera frame data, display that using the shaders
-//	glGenTextures(1, &textureID);
-//	glBindTexture(GL_TEXTURE_2D, textureID);
-//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-//	// This is necessary for non-power-of-two textures
-//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-//	
-//	// Using BGRA extension to pull in video frame data directly
-//	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, bufferWidth, bufferHeight, 0, GL_BGRA, GL_UNSIGNED_BYTE, CVPixelBufferGetBaseAddress(cameraFrame));
-//    
-//	CVPixelBufferUnlockBaseAddress(cameraFrame, 0);    
-//    hadTexture = true;
-//}
+inline int xyToIndex(int x, int y, int width, int height)
+{
+    return y*width + x;
+}
+
+void rotateBufferBy90(unsigned int* outBuf, unsigned int* inBuf, int inWidth, int inHeight)
+{
+    for (int j = 0; j < inHeight; j++)
+    {
+        for (int i = 0; i < inWidth; i++)
+        {
+            outBuf[xyToIndex(j, i, inHeight, inWidth)] = inBuf[xyToIndex(i, j, inWidth, inHeight)];
+        }
+    }
+}
 
 -(void) captureFrame:(CMSampleBufferRef)sampleBuffer
 {
@@ -255,11 +239,17 @@ using namespace webrtc::videocapturemodule;
 		    pBufIter += 4;
 	    }
 
+//TJG - This rotates the buffer properly if uncommented, however it seems that VP8 can't handle an odd sized frame right now.
+//        unsigned int* newBuf = new unsigned int[frameWidth * frameHeight * 4];
+//        rotateBufferBy90(newBuf, (unsigned int*)baseAddress, frameWidth, frameHeight);
+//        _owner->IncomingFrame((unsigned char*)newBuf, frameSize, tempCaptureCapability, 0);
+//        delete [] newBuf;
+
         _owner->IncomingFrame((unsigned char*)baseAddress,
                               frameSize,
                               tempCaptureCapability,
                               0);
-        
+
         CVBufferRelease(videoFrame);
     }
 

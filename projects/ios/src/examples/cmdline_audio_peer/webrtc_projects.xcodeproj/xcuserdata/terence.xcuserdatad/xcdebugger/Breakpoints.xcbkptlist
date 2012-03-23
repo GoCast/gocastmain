@@ -98,19 +98,6 @@
          shouldBeEnabled = "No"
          ignoreCount = "0"
          continueAfterRunningActions = "No"
-         filePath = "../../../third_party/webrtc/trunk/src/modules/video_capture/main/source/Mac/video_capture_iphone.mm"
-         timestampString = "353534802.795298"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "232"
-         endingLineNumber = "232"
-         landmarkName = "-captureFrame:"
-         landmarkType = "5">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "No"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
          filePath = "../../../third_party/webrtc/trunk/src/video_engine/vie_input_manager.cc"
          timestampString = "353534899.725643"
          startingColumnNumber = "9223372036854775807"
@@ -118,19 +105,6 @@
          startingLineNumber = "294"
          endingLineNumber = "294"
          landmarkName = "ViEInputManager::CreateCaptureDevice(const WebRtc_UWord8* deviceUniqueIdUTF8, const WebRtc_UWord32 deviceUniqueIdUTF8Length, int&amp; captureId)"
-         landmarkType = "5">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "No"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         filePath = "../../../third_party/webrtc/trunk/src/modules/video_capture/main/source/Mac/video_capture_iphone.mm"
-         timestampString = "353534960.870723"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "230"
-         endingLineNumber = "230"
-         landmarkName = "-captureFrame:"
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
@@ -454,6 +428,45 @@
          startingLineNumber = "176"
          endingLineNumber = "176"
          landmarkName = "-openGLRefresh"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "../../../third_party/webrtc/trunk/src/modules/video_capture/main/source/Mac/video_capture_iphone.mm"
+         timestampString = "354228126.052373"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "348"
+         endingLineNumber = "348"
+         landmarkName = "VideoCaptureAVCapture::StartCapture(const VideoCaptureCapability&amp; capability)"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "../../../third_party/webrtc/trunk/src/video_engine/vie_capturer.cc"
+         timestampString = "354225825.667663"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "273"
+         endingLineNumber = "273"
+         landmarkName = "ViECapturer::Start(const CaptureCapability captureCapability)"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "../../../third_party/webrtc/trunk/src/video_engine/vie_capturer.cc"
+         timestampString = "354225827.086823"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "282"
+         endingLineNumber = "282"
+         landmarkName = "ViECapturer::Start(const CaptureCapability captureCapability)"
          landmarkType = "5">
       </FileBreakpoint>
    </FileBreakpoints>

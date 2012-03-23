@@ -52,10 +52,17 @@ enum { kViEMaxModuleVersionSize = 960 };
 
 // ViECapture
 enum { kViEMaxCaptureDevices=10};
+#if defined(MAC_IPHONE)
+    // Width used if no send codec has been set when a capture device is started
+    enum { kViECaptureDefaultWidth = 288};
+    // Height used if no send codec has been set when a capture device is started
+    enum { kViECaptureDefaultHeight = 352};
+#else
 // Width used if no send codec has been set when a capture device is started
 enum { kViECaptureDefaultWidth = 352};
 // Height used if no send codec has been set when a capture device is started
 enum { kViECaptureDefaultHeight = 288};
+#endif
 enum { kViECaptureDefaultFramerate = 30};
 enum { kViECaptureMaxSnapshotWaitTimeMs = 500 };
 
