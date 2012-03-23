@@ -76,6 +76,61 @@ using namespace webrtc::videocapturemodule;
 
 #pragma mark - ObjC Capture class
 
+@interface iOSCaptureInfoClass : NSObject
+{
+    bool _hasFront;
+    bool _hasBack;
+    int _deviceCount;
+}
+
+-(bool) hasFrontCamera;
+-(bool) hasBackCamera;
+-(int) getDeviceCount;
+
+@end
+
+@implementation iOSCaptureInfoClass
+-(void) infoInit
+{
+    _deviceCount = 0;
+    _hasFront =
+    _hasBack = false;
+    
+    //Grab all possible cameras
+	NSArray *devices = [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo];
+	
+    //For each camera
+    for (AVCaptureDevice *device in devices) 
+	{
+        if ([device position] == AVCaptureDevicePositionFront) 
+        {
+            self->_hasFront = true;     //detect prescence
+            self->_deviceCount++;       //add to device count
+        }
+        if ([device position] == AVCaptureDevicePositionBack) 
+        {
+            self->_hasBack = true;      //detect prescence
+            self->_deviceCount++;       //add to device count
+        }
+	}
+}
+-(bool) hasFrontCamera
+{
+    return _hasFront;
+}
+
+-(bool) hasBackCamera
+{
+    return _hasBack;
+}
+
+-(int) getDeviceCount
+{
+    return _deviceCount;
+}
+
+@end
+
 @interface iOSCaptureClass : NSObject <AVCaptureVideoDataOutputSampleBufferDelegate>
 {
 	AVCaptureSession*           captureSession;
@@ -86,35 +141,52 @@ using namespace webrtc::videocapturemodule;
 }
 
 -(void) registerOwner:(VideoCaptureImpl*)newOwner;
--(void) captureInit;
+-(void) captureInit:(bool)useFrontCamera;
 -(void) captureTerminate;
 -(void) captureStart;
 -(void) captureStop;
 -(void) captureFrame:(CMSampleBufferRef)sampleBuffer;
 -(void) captureOutput:(AVCaptureOutput *)captureOutput didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection;
-
 @end
 
 @implementation iOSCaptureClass
-
 -(void) registerOwner:(VideoCaptureImpl*)newOwner
 {
     self->_owner = newOwner;
 }
 
--(void) captureInit
+-(void) captureInit:(bool)useFrontCamera
 {
+    self->_rLock = [[VideoCaptureRecursiveLock alloc] init];
+
     self->_owner = NULL;
-    
-	// Grab the front-facing camera
-	AVCaptureDevice *frontFacingCamera = nil;
+
+	AVCaptureDevice *targetCamera = nil;
+
+    //Grab all possible cameras
 	NSArray *devices = [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo];
-	for (AVCaptureDevice *device in devices) 
+	
+    //For each camera
+    for (AVCaptureDevice *device in devices) 
 	{
-		if ([device position] == AVCaptureDevicePositionFront) 
-		{
-			frontFacingCamera = device;
-		}
+        if (useFrontCamera) //Grab the front-facing camera
+        {
+            //If this is a suitable candidate, grab it
+            if ([device position] == AVCaptureDevicePositionFront) 
+            {
+                targetCamera = device;
+                break;
+            }
+        }
+        else                //Grab the back-facing camera
+        {
+            //If this is a suitable candidate, grab it
+            if ([device position] == AVCaptureDevicePositionBack) 
+            {
+                targetCamera = device;
+                break;
+            }
+        }
 	}
 	
 	// Create the capture session
@@ -122,7 +194,7 @@ using namespace webrtc::videocapturemodule;
 	
 	// Add the video input	
 	NSError *error = nil;
-	videoInput = [[[AVCaptureDeviceInput alloc] initWithDevice:frontFacingCamera error:&error] autorelease];
+	videoInput = [[[AVCaptureDeviceInput alloc] initWithDevice:targetCamera error:&error] autorelease];
 	if ([captureSession canAddInput:videoInput]) 
 	{
 		[captureSession addInput:videoInput];
@@ -154,6 +226,7 @@ using namespace webrtc::videocapturemodule;
 	[captureSession release];
 	[videoOutput release];
 	[videoInput release];
+    [_rLock release];
 }
 
 -(void) captureStart
@@ -172,48 +245,32 @@ using namespace webrtc::videocapturemodule;
 	[captureSession stopRunning];
 }
 
-//uint textureID = 0;
-//bool hadTexture = false;
-//-(void) captureToTexture:(CMSampleBufferRef)sampleBuffer
-//{
-//    if (hadTexture)
-//    {
-//        glDeleteTextures(1, &textureID);
-//    }
-//    
-//	CVImageBufferRef cameraFrame = CMSampleBufferGetImageBuffer(sampleBuffer);
-//    
-//    //	[self.delegate processNewCameraFrame:pixelBuffer];
-//	CVPixelBufferLockBaseAddress(cameraFrame, 0);
-//	int bufferHeight = CVPixelBufferGetHeight(cameraFrame);
-//	int bufferWidth = CVPixelBufferGetWidth(cameraFrame);
-//    
-//	// Create a new texture from the camera frame data, display that using the shaders
-//	glGenTextures(1, &textureID);
-//	glBindTexture(GL_TEXTURE_2D, textureID);
-//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-//	// This is necessary for non-power-of-two textures
-//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-//	
-//	// Using BGRA extension to pull in video frame data directly
-//	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, bufferWidth, bufferHeight, 0, GL_BGRA, GL_UNSIGNED_BYTE, CVPixelBufferGetBaseAddress(cameraFrame));
-//    
-//	CVPixelBufferUnlockBaseAddress(cameraFrame, 0);    
-//    hadTexture = true;
-//}
+inline int xyToIndex(int x, int y, int width, int height)
+{
+    return y*width + x;
+}
+
+void rotateBufferBy90(unsigned int* outBuf, unsigned int* inBuf, int inWidth, int inHeight)
+{
+    for (int j = 0; j < inHeight; j++)
+    {
+        for (int i = 0; i < inWidth; i++)
+        {
+            outBuf[xyToIndex(j, i, inHeight, inWidth)] = inBuf[xyToIndex(i, j, inWidth, inHeight)];
+        }
+    }
+}
 
 -(void) captureFrame:(CMSampleBufferRef)sampleBuffer
 {
-//    if(YES == [_rLock tryLock])
-//    {
-//        [_rLock lock];
-//    }
-//    else
-//    {
-//        return;
-//    }
+    if(YES == [_rLock tryLock])
+    {
+        [_rLock lock];
+    }
+    else
+    {
+        return;
+    }
 
 	CVImageBufferRef videoFrame = CMSampleBufferGetImageBuffer(sampleBuffer);
 
@@ -255,18 +312,24 @@ using namespace webrtc::videocapturemodule;
 		    pBufIter += 4;
 	    }
 
+//TJG - This rotates the buffer properly if uncommented, however it seems that VP8 can't handle an odd sized frame right now.
+//        unsigned int* newBuf = new unsigned int[frameWidth * frameHeight * 4];
+//        rotateBufferBy90(newBuf, (unsigned int*)baseAddress, frameWidth, frameHeight);
+//        _owner->IncomingFrame((unsigned char*)newBuf, frameSize, tempCaptureCapability, 0);
+//        delete [] newBuf;
+
         _owner->IncomingFrame((unsigned char*)baseAddress,
                               frameSize,
                               tempCaptureCapability,
                               0);
-        
+
         CVBufferRelease(videoFrame);
     }
 
-//    if(YES == [_rLock locked])
-//    {
-//        [_rLock unlock];
-//    }
+    if(YES == [_rLock locked])
+    {
+        [_rLock unlock];
+    }
 }
 
 #pragma mark AVCaptureVideoDataOutputSampleBufferDelegate
@@ -277,7 +340,6 @@ using namespace webrtc::videocapturemodule;
 }
 
 @end
-
 
 #pragma mark - VideoCaptureAVCapture
 
@@ -313,20 +375,20 @@ VideoCaptureAVCapture::~VideoCaptureAVCapture()
 WebRtc_Word32 VideoCaptureAVCapture::Init(const WebRtc_Word32 id, const WebRtc_UWord8* iDeviceUniqueIdUTF8)
 {
     CriticalSectionScoped cs(_apiCs);
-    
+
     WEBRTC_TRACE(webrtc::kTraceModuleCall, webrtc::kTraceVideoCapture, id,
                  "VideoCaptureAVCapture::Init() called with id %d and unique "
                  "device %s", id, iDeviceUniqueIdUTF8);
-    
+
     const WebRtc_Word32 nameLength =
     (WebRtc_Word32) strlen((char*)iDeviceUniqueIdUTF8);
     if(nameLength > kVideoCaptureUniqueNameLength)
         return -1;
-    
+
     // Store the device name
     _deviceUniqueId = new WebRtc_UWord8[nameLength+1];
     memcpy(_deviceUniqueId, iDeviceUniqueIdUTF8,nameLength+1);
-    
+
     _captureDevice = [[iOSCaptureClass alloc] init];
     if(NULL == _captureDevice)
     {
@@ -335,19 +397,19 @@ WebRtc_Word32 VideoCaptureAVCapture::Init(const WebRtc_Word32 id, const WebRtc_U
                      "VideoCaptureAVCaptureObjC");
         return -1;
     }
-    
-    [(iOSCaptureClass*)_captureDevice captureInit];
-    [(iOSCaptureClass*)_captureDevice registerOwner:this];
 
     if(0 == strcmp((char*)iDeviceUniqueIdUTF8, ""))
     {
         // the user doesn't want to set a capture device at this time
         return 0;
     }
-    
+
+    [(iOSCaptureClass*)_captureDevice captureInit:(strcmp((char*)iDeviceUniqueIdUTF8, "front camera") == 0)];
+    [(iOSCaptureClass*)_captureDevice registerOwner:this];
+
     // at this point we know that the user has passed in a valid camera. Let's
     // set it as the current.
-    
+
     WEBRTC_TRACE(webrtc::kTraceInfo, webrtc::kTraceVideoCapture, _id,
                  "successfully Init VideoCaptureAVCapture" );
     return 0;
@@ -393,18 +455,22 @@ WebRtc_Word32 VideoCaptureAVCapture::CaptureSettings(VideoCaptureCapability& set
 
 #pragma mark - VideoCaptureAVCaptureInfo 
 VideoCaptureAVCaptureInfo::VideoCaptureAVCaptureInfo(const WebRtc_Word32 id) :
-DeviceInfoImpl(id)
+DeviceInfoImpl(id),
+_captureDeviceInfo(NULL)
 {
     WEBRTC_TRACE(webrtc::kTraceModuleCall, webrtc::kTraceVideoCapture, 0,
                  "%s:%d", __FUNCTION__, __LINE__);
-//    _captureInfo = [[VideoCaptureAVCaptureInfoObjC alloc] init];
+
+    _captureDeviceInfo = [[iOSCaptureInfoClass alloc] init];
+    [(iOSCaptureInfoClass*)_captureDeviceInfo infoInit];
 }
 
 VideoCaptureAVCaptureInfo::~VideoCaptureAVCaptureInfo()
 {
     WEBRTC_TRACE(webrtc::kTraceModuleCall, webrtc::kTraceVideoCapture, 0,
                  "%s:%d", __FUNCTION__, __LINE__);
-//    [_captureInfo release];
+
+    [(iOSCaptureInfoClass*)_captureDeviceInfo release];
 }
 
 WebRtc_Word32 VideoCaptureAVCaptureInfo::Init()
@@ -420,7 +486,7 @@ WebRtc_UWord32 VideoCaptureAVCaptureInfo::NumberOfDevices()
     WEBRTC_TRACE(webrtc::kTraceModuleCall, webrtc::kTraceVideoCapture, 0,
                  "%s:%d", __FUNCTION__, __LINE__);
 
-    return 1;   //TJG Fakeout, just assume and support front camera for now
+    return [(iOSCaptureInfoClass*)_captureDeviceInfo getDeviceCount];
 }
 
 // Returns the available capture devices.
@@ -439,12 +505,49 @@ WebRtc_Word32 VideoCaptureAVCaptureInfo::GetDeviceName(
     WEBRTC_TRACE(webrtc::kTraceModuleCall, webrtc::kTraceVideoCapture, 0,
                  "%s:%d", __FUNCTION__, __LINE__);
 
-    //TJG Fakeout, just assume and support front camera for now
-    sprintf((char*)deviceNameUTF8, "%s", "camera");
-    sprintf((char*)deviceUniqueIdUTF8, "%s", "camera");
-//    sprintf((char*)productUniqueIdUTF8, "%s", "");
+    bool hasFront       = [(iOSCaptureInfoClass*)_captureDeviceInfo hasFrontCamera];
+    bool hasBack        = [(iOSCaptureInfoClass*)_captureDeviceInfo hasBackCamera];
 
-    return 0;
+    const char* devName = NULL;
+    
+    if (hasFront)
+    {
+        if (hasBack)    //front & back camera
+        {
+            switch (deviceNumber)
+            {
+                case 0: devName = "front camera"; break;            
+                case 1: devName = "back camera"; break;
+            }
+        }
+        else            //front camera only
+        {
+            switch (deviceNumber)
+            {
+                case 0: devName = "front camera"; break;            
+            }
+        }
+    }
+    else
+    {
+        if (hasBack)    //back camera only
+        {
+            switch (deviceNumber)
+            {
+                case 0: devName = "back camera"; break;            
+            }
+        }
+    }
+    
+    if (devName)    //Had at least one camera (index 0 or 1), and found it
+    {
+        sprintf((char*)deviceNameUTF8, "%s", devName);
+        sprintf((char*)deviceUniqueIdUTF8, "%s", devName);
+        
+        return 0;
+    }
+
+    return -1;
 }
 
 WebRtc_Word32 VideoCaptureAVCaptureInfo::NumberOfCapabilities(const WebRtc_UWord8* deviceUniqueIdUTF8)

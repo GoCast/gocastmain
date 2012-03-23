@@ -14,6 +14,7 @@
 //#include "PluginEvents/DrawingEvents.h"
 //#include "PluginWindow.h"
 
+//iPhone has a 90 degrees flipped resolution
 #define GOCAST_DEFAULT_RENDER_WIDTH     352
 #define GOCAST_DEFAULT_RENDER_HEIGHT    288
 
