@@ -13,17 +13,23 @@ LOCAL_MODULE_TAGS := optional
 LOCAL_CPP_EXTENSION := .cpp
 LOCAL_SRC_FILES := \
     src/voetest.cpp \
-    src/voemanager.cpp
+    src/voemanager.cpp \
+    src/viemanager.cpp
 
 LOCAL_CFLAGS := \
     '-DPOSIX' \
     '-DANDROID' \
     '-DWEBRTC_ANDROID' \
+    '-DANDROID_LOG' \
     '-DWEBRTC_RELATIVE_PATH'
 
 LOCAL_C_INCLUDES := \
     $(LOCAL_PATH)/deps/webrtc/trunk/src \
     $(LOCAL_PATH)/deps/webrtc/trunk/src/voice_engine/main/interface \
+    $(LOCAL_PATH)/deps/webrtc/trunk/src/video_engine/main/interface \
+    $(LOCAL_PATH)/deps/webrtc/trunk/src/modules/video_capture/main/interface \
+    $(LOCAL_PATH)/deps/webrtc/trunk/src/modules/video_render/main/interface \
+    $(LOCAL_PATH)/deps/webrtc/trunk/src/modules/interface \
     $(LOCAL_PATH)/deps/webrtc/trunk/src/system_wrappers/interface
 
 

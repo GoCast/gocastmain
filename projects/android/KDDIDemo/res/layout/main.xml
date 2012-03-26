@@ -4,7 +4,12 @@
     android:layout_height="fill_parent"
     android:orientation="vertical" >
 
-    <TextView
+    <SurfaceView
+        android:id="@+id/localView" 
+        android:layout_width="320dip"
+        android:layout_height="240dip" />
+    
+    <!--<TextView
         android:id="@+id/dest_ip_label"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -65,6 +70,6 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/local_port"
         android:layout_alignParentRight="true"
-        android:text="@string/disconnect_button_label" />
+        android:text="@string/disconnect_button_label" />-->
             
 </RelativeLayout>

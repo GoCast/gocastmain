@@ -1,3 +1,4 @@
+#include <sstream>
 #include "voemanager.h"
 #include "logging.h"
 
@@ -104,25 +105,50 @@ namespace GoCast
                                        const int recvPort,
                                        int& channel)
     {
+        channel = -1;
         channel = m_pVoEBase->CreateChannel();
         if(0 > channel)
         {
-            GOCAST_LOG_ERROR("VOETEST-NDK", "m_pVoEBase->CreateChannel() failed");
+            std::stringstream sstrm;
+            sstrm << "m_pVoEBase->CreateChannel() error: " << m_pVoEBase->LastError();
+            GOCAST_LOG_ERROR("VOETEST-NDK", sstrm.str().c_str());
             return false;
+        }
+        else
+        {
+            std::stringstream sstrm;
+            sstrm << "m_pVoEBase->CreateChannel(): " << channel;
+            GOCAST_LOG_DEBUG("VOETEST-NDK", sstrm.str().c_str());
         }
 
         int res = m_pVoEBase->SetSendDestination(channel, sendPort, destIp.c_str());
         if(0 != res)
         {
-            GOCAST_LOG_ERROR("VOETEST-NDK", "m_pVoEBase->SetSendDestination() failed");
+            std::stringstream sstrm;
+            sstrm << "m_pVoEBase->SetSendDestination() error: " << m_pVoEBase->LastError();
+            GOCAST_LOG_ERROR("VOETEST-NDK", sstrm.str().c_str());
             return false;
+        }
+        else
+        {
+            std::stringstream sstrm;
+            sstrm << "m_pVoEBase->SetSendDestination(" << channel << ", " << sendPort << ", " << destIp << ")";
+            GOCAST_LOG_DEBUG("VOETEST-NDK", sstrm.str().c_str());
         }
 
         res = m_pVoEBase->SetLocalReceiver(channel, recvPort);
         if(0 != res)
         {
-            GOCAST_LOG_ERROR("VOETEST-NDK", "m_pVoEBase->SetLocalReceiver() failed");
+            std::stringstream sstrm;
+            sstrm << "m_pVoEbase->SetLocalReceiver() error: " << m_pVoEBase->LastError();
+            GOCAST_LOG_ERROR("VOETEST-NDK", sstrm.str().c_str());
             return false;
+        }
+        else
+        {
+            std::stringstream sstrm;
+            sstrm << "m_pVoEBase->SetLocalReceiver(" << channel << ", " << recvPort << ")";
+            GOCAST_LOG_DEBUG("VOETEST-NDK", sstrm.str().c_str());
         }
 
         return true;
