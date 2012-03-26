@@ -324,6 +324,98 @@ var Callcast = {
     	return true;
     },
     
+    SendSyncLink: function(txt) {
+    	var sync = $msg({to: this.room, type: 'groupchat', xmlns: Callcast.NS_CALLCAST}).c('body').t(txt);
+    	this.connection.send(sync);
+    },
+    
+    on_sync_link: function(message) {
+        var from = $(message).attr('from');
+        var room = Strophe.getBareJidFromJid(from);
+        var nick = Strophe.getResourceFromJid(from);
+
+		if (room == Callcast.room)
+		{
+			if (nick == Callcast.nick)
+				return true;
+			
+			$(document).trigger('synclink', $(message).children('body').text());
+		}
+		
+		return true;
+    },
+    
+    SendPublicChat: function(msg) {
+      var chat = $msg({to: this.room, type: 'groupchat'}).c('body').t(msg);
+      this.connection.send(chat);
+    },
+    
+    on_public_message: function(message) {
+        var xmlns = $(message).attr('xmlns');
+        var from = $(message).attr('from');
+        var room = Strophe.getBareJidFromJid(from);
+        var nick = Strophe.getResourceFromJid(from);
+
+        // make sure message is from the right place
+        if (room === Callcast.room && xmlns !== Callcast.NS_CALLCAST) {
+            // is message from a user or the room itself?
+            var notice = !nick;
+
+            // messages from ourself will be styled differently
+            var nick_class = "nick";
+            if (nick === Callcast.nick) {
+                nick_class += " self";
+            }
+            
+            var body = $(message).children('body').text();
+
+            var delayed = $(message).children("delay").length > 0  ||
+                $(message).children("x[xmlns='jabber:x:delay']").length > 0;
+
+            // look for room topic change
+//            var subject = $(message).children('subject').text();
+//            if (subject) {
+//                $('#room-topic').text(subject);
+//            }
+
+            if (!notice) {
+                var delay_css = delayed ? " delayed" : "";
+
+                var action = body.match(/\/me (.*)$/);
+                if (!action) {
+                    Callcast.add_message(
+                        "<div class='message" + delay_css + "'>" +
+                            "&lt;<span class='" + nick_class + "'>" +
+                            nick + "</span>&gt; <span class='body'>" +
+                            body + "</span></div>");
+                } else {
+                    Callcast.add_message(
+                        "<div class='message action " + delay_css + "'>" +
+                            "* " + nick + " " + action[1] + "</div>");
+                }
+            } else {
+                Callcast.add_message("<div class='notice'>*** " + body +
+                                    "</div>");
+            }
+        }
+
+        return true;    
+    },
+    
+    add_message: function (msg) {
+        // detect if we are scrolled all the way down
+        var chat = $('#chat').get(0);
+        var at_bottom = chat.scrollTop >= chat.scrollHeight - 
+            chat.clientHeight;
+        
+        $('#chat').append(msg);
+
+        // if we were at the bottom, keep us at the bottom
+        if (at_bottom) {
+            chat.scrollTop = chat.scrollHeight;
+        }
+    },
+
     MsgHandler: function(msg) {
 //    	console.log("STANDARD MESSAGE:");
 //    	console.log(msg);
@@ -609,6 +701,12 @@ var Callcast = {
 		// handle all INVITATIONS to join a session which are sent directly to the jid and not within the MUC
     	this.connection.addHandler(Callcast.CallMsgHandler, Callcast.NS_CALLCAST, "message", "chat");
 	    
+		// handle all GROUP CHATS within the MUC
+    	this.connection.addHandler(Callcast.on_public_message, null, "message", "groupchat");
+	    
+		// handle all GROUP CHATS within the MUC
+    	this.connection.addHandler(Callcast.on_sync_link, Callcast.NS_CALLCAST, "message", "groupchat");
+	    
 	    // handle any inbound error stanzas (for now) via an alert message.
     	this.connection.addHandler(Callcast.onErrorStanza, null, null, 'error');
 
@@ -691,6 +789,28 @@ $(document).ready(function () {
 		 	$('#participant-list').empty();
 		 }
 	 });
+	 
+	 $('#chat_text').keypress(function (ev) {
+		if (ev.which === 13) {
+			ev.preventDefault();
+
+			var body = $(this).val();
+			Callcast.SendPublicChat(body);
+			
+			$(this).val('');
+		}
+	 });
+
+	 $('#send_chat').click(function() {
+	 	var body = $('#chat_text').val();
+	 	Callcast.SendPublicChat(body);
+	 	$('chat_text').val('');
+	 });
+	 
+	 $('#send_link').click(function() {
+	    Callcast.SendSyncLink($('#link_text').val());
+	 	$('#link_text').val('<sent>');
+	 });
 
 	 $('#get_roster_button').click(function () {
 	 	Callcast.log("**NO_CODE_HERE** Getting user's roster...");
@@ -724,6 +844,12 @@ $(document).bind('joined_session', function () {
 	 $('#leave_button').removeAttr('disabled');
 	 $("#join_button").attr('disabled', 'disabled');
 	 $("#rooms select").attr('disabled', 'disabled');
+
+	 $('#send_chat').removeAttr('disabled');
+	 $('#chat_text').removeAttr('disabled');
+
+	 $('#send_link').removeAttr('disabled');
+	 $('#link_text').removeAttr('disabled');
 });
 
 $(document).bind('left_session', function () {
@@ -733,6 +859,12 @@ $(document).bind('left_session', function () {
 	 $("#leave_button").attr('disabled', 'disabled');
 	 $('#join_button').removeAttr('disabled');
 	 $('#rooms select').removeAttr('disabled');
+	 
+	 $('#send_chat').attr('disabled', 'disabled');
+	 $('#chat_text').attr('disabled', 'disabled');
+	 
+	 $('#send_link').attr('disabled', 'disabled');
+	 $('#link_text').attr('disabled', 'disabled');
 });
 
 $(document).bind('roomlist_updated', function () {
@@ -756,6 +888,10 @@ $(document).bind('roomlist_updated', function () {
 	 
 	 if (!room_added)
 		 $('#rooms select').append("<option>[None Yet]</option>");
+});
+
+$(document).bind('synclink', function (ev, link) {
+	$('#link_text').val(link);
 });
 
 $(document).bind('user_joined', function (ev, nick) {

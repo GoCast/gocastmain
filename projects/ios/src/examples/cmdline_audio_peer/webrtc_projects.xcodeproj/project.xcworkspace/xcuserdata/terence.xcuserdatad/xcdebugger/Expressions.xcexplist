@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VariablesViewState
+   version = "1.0">
+   <ContextStates>
+      <ContextState
+         contextName = "-[ViewController tableView:numberOfRowsInSection:]:ViewController.mm">
+         <PersistentStrings>
+            <PersistentString
+               value = "peers">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "-[CLAPViewController openGLRefresh]:CLAPViewController.mm">
+         <PersistentStrings>
+            <PersistentString
+               value = "textureID">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "webrtc::videocapturemodule::VideoCaptureAVCaptureInfo::GetDeviceName(unsigned int, unsigned char*, unsigned int, unsigned char*, unsigned int, unsigned char*, unsigned int):video_capture_iphone.mm">
+         <PersistentStrings>
+            <PersistentString
+               value = "(char*)deviceUniqueIdUTF8">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "webrtc::videocapturemodule::VideoCaptureAVCapture::Init(int, unsigned char const*):video_capture_iphone.mm">
+         <PersistentStrings>
+            <PersistentString
+               value = "(char*)iDeviceUniqueIdUTF8">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "GoCast::VideoRenderer::_genTexture(void*, int, int):WPLVideoRenderer.mm">
+         <PersistentStrings>
+            <PersistentString
+               value = "textureID">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "(null):(null)">
+         <PersistentStrings>
+            <PersistentString
+               value = "watch *(int*)0x">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+   </ContextStates>
+</VariablesViewState>
