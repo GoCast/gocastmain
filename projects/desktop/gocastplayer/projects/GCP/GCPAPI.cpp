@@ -64,3 +64,38 @@ void GCPAPI::testEvent()
 {
     fire_test();
 }
+
+FB::variant GCPAPI::InitLocalResources(const std::string& stunIP,
+                                       const int stunPort,
+                                       FB::JSObjectPtr pSuccCallback,
+                                       FB::JSObjectPtr pFailCallback)
+{
+    boost::mutex::scoped_lock lock_(GCP::deqMutex);
+    GCP::stunIP = stunIP;
+    GCP::stunPort = stunPort;
+    GCP::successCallback = pSuccCallback;
+    GCP::failureCallback = pFailCallback;
+    (GCP::wrtInstructions).push_back(WEBRTC_RESOURCES_INIT);
+    return true;
+}
+
+FB::variant GCPAPI::DeinitLocalResources()
+{
+    boost::mutex::scoped_lock lock_(GCP::deqMutex);
+    (GCP::wrtInstructions).push_back(WEBRTC_RESOURCES_DEINIT);
+    return true;
+}
+
+FB::variant GCPAPI::StartLocalVideo()
+{
+    boost::mutex::scoped_lock lock_(GCP::deqMutex);
+    (GCP::wrtInstructions).push_back(START_LOCAL_VIDEO);
+    return true;
+}
+
+FB::variant GCPAPI::StopLocalVideo()
+{
+    boost::mutex::scoped_lock lock_(GCP::deqMutex);
+    (GCP::wrtInstructions).push_back(STOP_LOCAL_VIDEO);
+    return true;
+}

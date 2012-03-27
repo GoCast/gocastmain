@@ -11,6 +11,8 @@
 #include "BrowserHost.h"
 #include "GCP.h"
 
+//#include "talk/app/webrtc/peerconnection.h"
+
 #ifndef H_GCPAPI
 #define H_GCPAPI
 
@@ -28,11 +30,23 @@ public:
     /// @see FB::JSAPIAuto::registerProperty
     /// @see FB::JSAPIAuto::registerEvent
     ////////////////////////////////////////////////////////////////////////////
-    GCPAPI(const GCPPtr& plugin, const FB::BrowserHostPtr& host) :
-        m_plugin(plugin), m_host(host)
+    GCPAPI(const GCPPtr& plugin, const FB::BrowserHostPtr& host, const bool bLocal) :
+        m_plugin(plugin), m_host(host), m_bLocal(bLocal)
     {
         registerMethod("echo",      make_method(this, &GCPAPI::echo));
         registerMethod("testEvent", make_method(this, &GCPAPI::testEvent));
+        
+        if(true == m_bLocal)
+        {
+            registerMethod("initLocalResources", make_method(this, &GCPAPI::InitLocalResources));
+            registerMethod("deinitLocalResources", make_method(this, &GCPAPI::DeinitLocalResources));
+            registerMethod("startLocalVideo", make_method(this, &GCPAPI::StartLocalVideo));
+            registerMethod("stopLocalVideo", make_method(this, &GCPAPI::StopLocalVideo));
+        }
+        else
+        {
+            ;
+        }
         
         // Read-write property
         registerProperty("testString",
@@ -43,7 +57,7 @@ public:
         // Read-only property
         registerProperty("version",
                          make_property(this,
-                                       &GCPAPI::get_version));
+                                       &GCPAPI::get_version));        
     }
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -74,12 +88,33 @@ public:
     // Method test-event
     void testEvent();
 
+
+    
+public:
+    //---------------------- Plugin Properties ------------------
+    
+    
+    //---------------------- Plugin Methods ---------------------
+    FB::variant InitLocalResources(const std::string& stunIP,
+                                   const int stunPort,
+                                   FB::JSObjectPtr pSuccCallback,
+                                   FB::JSObjectPtr pFailCallback);
+    FB::variant DeinitLocalResources();
+    FB::variant StartLocalVideo();
+    FB::variant StopLocalVideo();
+
 private:
     GCPWeakPtr m_plugin;
     FB::BrowserHostPtr m_host;
-
     std::string m_testString;
+    bool m_bLocal;
+    
+/*private:
+    FB::JSObjectPtr m_jsCallbackOnSignalingMessage;
+    FB::JSObjectPtr m_jsCallbackOnAddStream;
+    FB::JSObjectPtr m_jsCallbackOnRemoveStream;
+    FB::JSObjectPtr m_jsCallbackOnLogMessage;    
+    talk_base::scoped_ptr<webrtc::PeerConnection> m_pWebrtcPeerConn;*/
 };
 
 #endif // H_GCPAPI
-
