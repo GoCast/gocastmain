@@ -1,1 +1,11 @@
 /libjingle/
+/CMakeScripts/
+/CMakeFiles/
+/CMakeCache.txt
+/Makefile
+/cmake_install.cmake
+/liblibjingle.a
+/stunserver
+/libjingle.xcodeproj/
+/Debug/
+/libjingle.build/

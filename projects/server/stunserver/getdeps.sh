@@ -27,6 +27,12 @@ if [[ $1 = "libjingle" || $* = "" ]]; then
     echo "Running [gclient sync -r $LIBJINGLE_REV --force] to obtain libjingle source..."
     gclient sync -r "$LIBJINGLE_REV" --force
     cd ..
+    
+# Untar the dependency library expat
+    cd libjingle/trunk/talk/third_party
+    tar xzf ../../../../expat-2.0.1.tar.gz
+    cd ../../../..
+    
 #    cp -R ../dep_mods/ ./
 fi
 
