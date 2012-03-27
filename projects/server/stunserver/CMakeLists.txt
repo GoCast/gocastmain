@@ -15,11 +15,11 @@ set(LINSOURCES
                libjingle/trunk/talk/session/phone/libudevsymboltable.cc
                libjingle/trunk/talk/session/phone/linuxdevicemanager.cc
                libjingle/trunk/talk/session/phone/v4llookup.cc
-               libjingle/trunk/talk/sound/alsasoundsystem.cc
-               libjingle/trunk/talk/sound/alsasymboltable.cc
-               libjingle/trunk/talk/sound/linuxsoundsystem.cc
-               libjingle/trunk/talk/sound/pulseaudiosoundsystem.cc
-               libjingle/trunk/talk/sound/pulseaudiosymboltable.cc
+#               libjingle/trunk/talk/sound/alsasoundsystem.cc
+#               libjingle/trunk/talk/sound/alsasymboltable.cc
+#               libjingle/trunk/talk/sound/linuxsoundsystem.cc
+#               libjingle/trunk/talk/sound/pulseaudiosoundsystem.cc
+#               libjingle/trunk/talk/sound/pulseaudiosymboltable.cc
 )
 
 set(MACSOURCES
