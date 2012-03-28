@@ -549,6 +549,13 @@ var Callcast = {
             return true;
         },
 
+	CreateUnlistedAndJoin: function(roomname) {
+	
+		// Must create the room as unlisted, confirm settings if room doesn't exist and join it.
+		
+		Callcast.JoinSession(roomname, roomname+Callcast.AT_CALLCAST_ROOMS);
+	},
+	
     JoinSession: function(roomname, roomjid) {
     	Callcast.room = roomjid.toLowerCase();
     	
@@ -761,6 +768,11 @@ var Callcast = {
 
 	    // Kick things off by refreshing the rooms list.
     	this.RefreshRooms();
+    	
+    	// Now -- if a room was specified in the URL, then jump directly in.
+    	if ($.getUrlVar('unlistedroom'))
+			Callcast.CreateUnlistedAndJoin($.getUrlVar('unlistedroom'));
+
     },
  };
 
@@ -794,12 +806,17 @@ $(document).ready(function () {
 		jid = $.getUrlVar('jid');
 	if ($.getUrlVar('password'))
 		password = $.getUrlVar('password');
+		
+	if ($.getUrlVar('nickname'))
+		Callcast.SetNickname($.getUrlVar('nickname'));
 
 	///
 	/// Handle the login via URL which got passed or via dialog box.
 	///
-	if (jid != "" && password != "")
+	if ((jid != "" && password != "")
 		Callcast.connect(jid, password);
+	else if (jid === "anonymous")
+		Callcast.connect(Callcast.CALLCAST_XMPPSERVER, "");	// Anonymous login.
 	else
 	{
 	    $('#login_dialog').dialog({
