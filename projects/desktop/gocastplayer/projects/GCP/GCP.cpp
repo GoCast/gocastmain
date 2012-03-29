@@ -13,12 +13,11 @@
 
 #include <iostream>
 #include "variant_list.h"
-#include "talk/session/phone/mediaengine.h"
 #include "talk/session/phone/webrtcvoiceengine.h"
 #include "talk/session/phone/webrtcvideoengine.h"
 #include "talk/p2p/client/basicportallocator.h"
 
-int GCP::instCount = 0;
+bool GCP::bLocalResourceMgrAssigned = false;
 boost::thread GCP::webrtcResThread;
 boost::mutex GCP::deqMutex;
 std::deque<int> GCP::wrtInstructions;
@@ -224,6 +223,7 @@ void GCP::StaticDeinitialize()
 ///         the JSAPI object until the onPluginReady method is called
 ///////////////////////////////////////////////////////////////////////////////
 GCP::GCP()
+: m_pRenderer(NULL)
 {
 }
 
@@ -239,8 +239,8 @@ GCP::~GCP()
     releaseRootJSAPI();
     m_host->freeRetainedObjects();
     
-    boost::mutex::scoped_lock lock_(GCP::deqMutex);
-    (GCP::instCount)--;
+//    boost::mutex::scoped_lock lock_(GCP::deqMutex);
+//    (GCP::instCount)--;
 }
 
 void GCP::onPluginReady()
@@ -274,11 +274,7 @@ void GCP::shutdown()
 FB::JSAPIPtr GCP::createJSAPI()
 {
     // m_host is the BrowserHost
-    
-    boost::mutex::scoped_lock lock_(GCP::deqMutex);
-    (GCP::instCount)++;
-    m_bLocal = (bool)(1==(GCP::instCount));
-    return boost::make_shared<GCPAPI>(FB::ptr_cast<GCP>(shared_from_this()), m_host, m_bLocal);
+    return boost::make_shared<GCPAPI>(FB::ptr_cast<GCP>(shared_from_this()), m_host);
 }
 
 bool GCP::onMouseDown(FB::MouseDownEvent *evt, FB::PluginWindow *)
@@ -301,11 +297,12 @@ bool GCP::onMouseMove(FB::MouseMoveEvent *evt, FB::PluginWindow *)
 bool GCP::onWindowAttached(FB::AttachedEvent *evt, FB::PluginWindow *pWin)
 {
     // The window is attached; act appropriately
-    m_pRenderer = new GoCast::GCPVideoRenderer(pWin, GOCAST_DEFAULT_RENDER_WIDTH, GOCAST_DEFAULT_RENDER_HEIGHT);
-    if(true == m_bLocal)
+    if(NULL != pWin)
     {
-        boost::mutex::scoped_lock lock_(GCP::deqMutex);
-        GCP::pLocalRenderer = m_pRenderer;
+        if(NULL == m_pRenderer)
+        {
+            m_pRenderer = new GoCast::GCPVideoRenderer(pWin, GOCAST_DEFAULT_RENDER_WIDTH, GOCAST_DEFAULT_RENDER_HEIGHT);
+        }
     }
     
     return false;
@@ -314,24 +311,28 @@ bool GCP::onWindowAttached(FB::AttachedEvent *evt, FB::PluginWindow *pWin)
 bool GCP::onWindowDetached(FB::DetachedEvent *evt, FB::PluginWindow *)
 {
     // The window is about to be detached; act appropriately
-    delete m_pRenderer;
-    if(true == m_bLocal)
+    if(NULL != m_pRenderer)
     {
-        GCP::pLocalRenderer = NULL;
+        if((GCP::pLocalRenderer) == m_pRenderer)
+        {
+            GCP::pLocalRenderer = NULL;
+        }
+        
+        delete m_pRenderer;
+        m_pRenderer = NULL;
     }
-    
+        
     return false;
 }
 
 bool GCP::onWindowRefresh(FB::RefreshEvent *evt, FB::PluginWindow *pWin)
 {
-    if(true == m_bLocal)
+    if(NULL != pWin)
     {
-        (GCP::pLocalRenderer)->OnWindowRefresh(evt, pWin);
-    }
-    else
-    {
-        m_pRenderer->OnWindowRefresh(evt, pWin);
+        if(NULL != m_pRenderer)
+        {
+            m_pRenderer->OnWindowRefresh(evt, pWin);
+        }
     }
     
     return false;

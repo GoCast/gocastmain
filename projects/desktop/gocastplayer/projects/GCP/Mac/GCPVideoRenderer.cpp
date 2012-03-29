@@ -74,14 +74,14 @@ namespace GoCast
         {
             return false;
         }
-
+        
         int winWidth = pCgDrawEvt->bounds.right - pCgDrawEvt->bounds.left;
         int winHeight = pCgDrawEvt->bounds.bottom - pCgDrawEvt->bounds.top;
-        
+
         if(winWidth<=1 || winHeight<=1)
             return false;
         
-        CGContextSaveGState(pContext);
+        CGContextSaveGState(pContext);        
         CGContextSetShouldAntialias(pContext, false);
         CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
         CGImageRef cgImage = CGImageCreate(m_width, m_height, 8, 32, stride, colorSpace, 
@@ -105,7 +105,7 @@ namespace GoCast
         
         CGImageRelease(cgImage);
         CGColorSpaceRelease(colorSpace);
-        CGContextRestoreGState(pContext);        
+        CGContextRestoreGState(pContext);
 
         return false;
     }

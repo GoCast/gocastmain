@@ -18,6 +18,7 @@
 #include <deque>
 #include <boost/thread.hpp>
 #include "talk/app/webrtc/peerconnectionfactory.h"
+#include "talk/session/phone/mediaengine.h"
 #include "talk/base/scoped_ptr.h"
 #include "talk/base/thread.h"
 #include "Mac/GCPVideoRenderer.h"
@@ -27,6 +28,11 @@
 #define WEBRTC_RES_WORKER_QUIT 2
 #define START_LOCAL_VIDEO 3
 #define STOP_LOCAL_VIDEO 4
+
+#define GOCAST_AUDIO_OPTS (cricket::MediaEngineInterface::ECHO_CANCELLATION |\
+                           cricket::MediaEngineInterface::NOISE_SUPPRESSION |\
+                           cricket::MediaEngineInterface::AUTO_GAIN_CONTROL)
+
 
 FB_FORWARD_PTR(GCP)
 class GCP : public FB::PluginCore
@@ -45,6 +51,7 @@ public:
 public:
     GCP();
     virtual ~GCP();
+    GoCast::GCPVideoRenderer* Renderer() { return m_pRenderer; }
 
 public:
     void onPluginReady();
@@ -76,7 +83,7 @@ public:
     /** END EVENTDEF -- DON'T CHANGE THIS LINE **/
     
 public:
-    static int instCount;
+    static bool bLocalResourceMgrAssigned;
     static boost::thread webrtcResThread;
     static boost::mutex deqMutex;
     static std::deque<int> wrtInstructions;
@@ -94,7 +101,6 @@ public:
     
 private:
     GoCast::GCPVideoRenderer* m_pRenderer;
-    bool m_bLocal;
 };
 
 

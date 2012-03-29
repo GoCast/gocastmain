@@ -11,12 +11,12 @@
 #include "BrowserHost.h"
 #include "GCP.h"
 
-//#include "talk/app/webrtc/peerconnection.h"
+#include "talk/app/webrtc/peerconnection.h"
 
 #ifndef H_GCPAPI
 #define H_GCPAPI
 
-class GCPAPI : public FB::JSAPIAuto
+class GCPAPI : public FB::JSAPIAuto, public webrtc::PeerConnectionObserver
 {
 public:
     ////////////////////////////////////////////////////////////////////////////
@@ -30,23 +30,35 @@ public:
     /// @see FB::JSAPIAuto::registerProperty
     /// @see FB::JSAPIAuto::registerEvent
     ////////////////////////////////////////////////////////////////////////////
-    GCPAPI(const GCPPtr& plugin, const FB::BrowserHostPtr& host, const bool bLocal) :
-        m_plugin(plugin), m_host(host), m_bLocal(bLocal)
+    GCPAPI(const GCPPtr& plugin, const FB::BrowserHostPtr& host) :
+        m_plugin(plugin), m_host(host), m_bLocal(false)
     {
         registerMethod("echo",      make_method(this, &GCPAPI::echo));
         registerMethod("testEvent", make_method(this, &GCPAPI::testEvent));
         
-        if(true == m_bLocal)
-        {
-            registerMethod("initLocalResources", make_method(this, &GCPAPI::InitLocalResources));
-            registerMethod("deinitLocalResources", make_method(this, &GCPAPI::DeinitLocalResources));
-            registerMethod("startLocalVideo", make_method(this, &GCPAPI::StartLocalVideo));
-            registerMethod("stopLocalVideo", make_method(this, &GCPAPI::StopLocalVideo));
-        }
-        else
-        {
-            ;
-        }
+        // APIs for local media (available only with first loaded plugin instance
+        registerMethod("initLocalResources", make_method(this, &GCPAPI::InitLocalResources));
+        registerMethod("deinitLocalResources", make_method(this, &GCPAPI::DeinitLocalResources));
+        registerMethod("startLocalVideo", make_method(this, &GCPAPI::StartLocalVideo));
+        registerMethod("stopLocalVideo", make_method(this, &GCPAPI::StopLocalVideo));
+
+        // APIs for webrtc peer connection
+        registerMethod("addStream", make_method(this, &GCPAPI::AddStream));
+        registerMethod("removeStream", make_method(this, &GCPAPI::RemoveStream));
+        registerMethod("processSignalingMessage", make_method(this, &GCPAPI::ProcessSignalingMessage));
+        registerMethod("close", make_method(this, &GCPAPI::Close));
+        registerMethod("init", make_method(this, &GCPAPI::Init));
+        registerMethod("connect", make_method(this, &GCPAPI::Connect));            
+
+        registerProperty("onlogmessage",make_property(this, &GCPAPI::get_logCallback,
+                                                      &GCPAPI::set_logCallback));
+        registerProperty("onaddstream",make_property(this, &GCPAPI::get_onAddStreamCallback,
+                                                     &GCPAPI::set_onAddStreamCallback));
+        registerProperty("onremovestream",make_property(this, &GCPAPI::get_onRemoveStreamCallback,
+                                                        &GCPAPI::set_onRemoveStreamCallback));
+        registerProperty("onsignalingmessage",make_property(this, &GCPAPI::get_onSignalingMessageCallback,
+                                                                &GCPAPI::set_onSignalingMessageCallback));
+        
         
         // Read-write property
         registerProperty("testString",
@@ -92,6 +104,21 @@ public:
     
 public:
     //---------------------- Plugin Properties ------------------
+    //logCallback
+    FB::JSObjectPtr get_logCallback();
+    void set_logCallback(const FB::JSObjectPtr& pJSCallback);
+    
+    //onAddStreamCallback
+    FB::JSObjectPtr get_onAddStreamCallback();
+    void set_onAddStreamCallback(const FB::JSObjectPtr& pJSCallback);
+    
+    //onRemoveStreamCallback
+    FB::JSObjectPtr get_onRemoveStreamCallback();
+    void set_onRemoveStreamCallback(const FB::JSObjectPtr& pJSCallback);
+    
+    //onSignalingMessageCallback
+    FB::JSObjectPtr get_onSignalingMessageCallback();
+    void set_onSignalingMessageCallback(const FB::JSObjectPtr& pJSCallback);
     
     
     //---------------------- Plugin Methods ---------------------
@@ -102,6 +129,17 @@ public:
     FB::variant DeinitLocalResources();
     FB::variant StartLocalVideo();
     FB::variant StopLocalVideo();
+    FB::variant Init(const std::string& destJid);
+    FB::variant Connect();
+    FB::variant AddStream(const std::string& streamId, bool bVideo);
+    FB::variant RemoveStream(const std::string& streamId);
+    FB::variant ProcessSignalingMessage(const std::string& message);
+    FB::variant Close();
+    
+    //-------------- PeerConnection Observer Methods -----------------------
+    virtual void OnAddStream(const std::string& streamId, bool bVideo);
+    virtual void OnRemoveStream(const std::string& streamId, bool bVideo);
+    virtual void OnSignalingMessage(const std::string& message);
 
 private:
     GCPWeakPtr m_plugin;
@@ -109,12 +147,13 @@ private:
     std::string m_testString;
     bool m_bLocal;
     
-/*private:
+private:
+    std::string m_destJid;
     FB::JSObjectPtr m_jsCallbackOnSignalingMessage;
     FB::JSObjectPtr m_jsCallbackOnAddStream;
     FB::JSObjectPtr m_jsCallbackOnRemoveStream;
     FB::JSObjectPtr m_jsCallbackOnLogMessage;    
-    talk_base::scoped_ptr<webrtc::PeerConnection> m_pWebrtcPeerConn;*/
+    talk_base::scoped_ptr<webrtc::PeerConnection> m_pWebrtcPeerConn;
 };
 
 #endif // H_GCPAPI
