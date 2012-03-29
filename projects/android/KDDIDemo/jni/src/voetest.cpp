@@ -1,6 +1,7 @@
 #include <vector>
 #include "logging.h"
 #include "voemanager.h"
+#include "viemanager.h"
 #include "com_gocast_kddidemo_KDDIDemoActivity.h"
 
 class Globals
@@ -9,12 +10,14 @@ class Globals
         static JavaVM* pJVM;
         static JNIEnv* pEnv;
         static GoCast::VoEManager* pVoEManager;
+        static GoCast::ViEManager* pViEManager;
         static std::vector<int> activeChannels;
 };
 
 JavaVM* Globals::pJVM = NULL;
 JNIEnv* Globals::pEnv = NULL;
 GoCast::VoEManager* Globals::pVoEManager = NULL;
+GoCast::ViEManager* Globals::pViEManager = NULL;
 std::vector<int> Globals::activeChannels;
 
 #ifdef __cplusplus
@@ -47,6 +50,7 @@ jint JNI_OnLoad(JavaVM* pJVM, void*)
 JNIEXPORT jboolean JNICALL Java_com_gocast_kddidemo_KDDIDemoActivity_init
   (JNIEnv *, jclass)
 {
+    webrtc::VoiceEngine::SetTraceFilter(webrtc::kTraceAll);
     Globals::pVoEManager = new GoCast::VoEManager();
 
     bool res = (Globals::pVoEManager)->GetSubAPIs(BASE_SUBAPI|CODEC_SUBAPI|APM_SUBAPI);
@@ -179,6 +183,104 @@ JNIEXPORT jboolean JNICALL Java_com_gocast_kddidemo_KDDIDemoActivity_disconnect
     }
 
     (Globals::activeChannels).clear();
+
+    return true;
+}
+
+/*
+ * Class:     com_gocast_kddidemo_KDDIDemoActivity
+ * Method:    localRenderTestStart
+ * Signature: (Landroid/view/SurfaceView;)Z
+ */
+JNIEXPORT jboolean JNICALL Java_com_gocast_kddidemo_KDDIDemoActivity_localRenderTestStart
+  (JNIEnv *, jobject context, jobject localViewWindow)
+{
+    if(0 != webrtc::VideoEngine::SetAndroidObjects(Globals::pJVM, context))
+    {
+        GOCAST_LOG_ERROR("VIETEST-NDK", "VideoEngine::SetAndroidObjects() error");
+        return false;
+    }
+
+    Globals::pViEManager = new GoCast::ViEManager();
+
+    if(false == (Globals::pViEManager)->GetSubAPIs(BASE_SUBAPI|CAPTURE_SUBAPI|RENDER_SUBAPI))
+    {
+        GOCAST_LOG_ERROR("VIETEST-NDK", "pViEManager->GetSubAPIs() error");
+        return false;
+    }
+
+    if(false == (Globals::pViEManager)->BaseAPIInit())
+    {
+        GOCAST_LOG_ERROR("VIETEST-NDK", "pViEManager->BaseAPIInit() error");
+        return false; 
+    }
+
+    if(false == (Globals::pViEManager)->AllocDefaultCaptureDevice())
+    {
+        GOCAST_LOG_ERROR("VIETEST-NDK", "pViEManager->AllocDefaultCaptureDevice() error");
+        return false;
+    }
+
+    if(false == (Globals::pViEManager)->StartCapture())
+    {
+        GOCAST_LOG_ERROR("VIETEST-NDK", "pViEManager->StartCapture() error");
+        return false;
+    }
+
+    if(false == (Globals::pViEManager)->AllocLocalRenderer(localViewWindow, 0))
+    {
+        GOCAST_LOG_ERROR("VIETEST-NDK", "pViEManager->AllocLocalRenderer() error");
+        return false;
+    }
+
+    if(false == (Globals::pViEManager)->StartRenderer())
+    {
+        GOCAST_LOG_ERROR("VIETEST-NDK", "pViEManager->StartRenderer()error");
+        return false;
+    }
+
+    return true;
+}
+
+/*
+ * Class:     com_gocast_kddidemo_KDDIDemoActivity
+ * Method:    localRenderTestStop
+ * Signature: ()Z
+ */
+JNIEXPORT jboolean JNICALL Java_com_gocast_kddidemo_KDDIDemoActivity_localRenderTestStop
+  (JNIEnv *, jobject)
+{
+    if(false == (Globals::pViEManager)->StopRenderer())
+    {
+        GOCAST_LOG_ERROR("VIETEST-NDK", "pViEManager->StopRenderer() error");
+        return false;
+    }
+
+    if(false == (Globals::pViEManager)->DeallocLocalRenderer())
+    {
+        GOCAST_LOG_ERROR("VIETEST-NDK", "pViEManager->DeallocLocalRenderer() error");
+        return false;
+    }
+
+    if(false == (Globals::pViEManager)->StopCapture())
+    {
+        GOCAST_LOG_ERROR("VIETEST-NDK", "pViEManager->StopCapture() error");
+        return false;
+    }
+
+    if(false == (Globals::pViEManager)->DeallocDefaultCaptureDevice())
+    {
+        GOCAST_LOG_ERROR("VIETEST-NDK", "pViEManager->DeallocCaptureDevice() error");
+        return false;
+    }
+
+    if(false == (Globals::pViEManager)->BaseAPIDeinit())
+    {
+        GOCAST_LOG_ERROR("VIETEST-NDK", "pViEManager->BaseAPIDeinit() error");
+        return false;
+    }
+
+    delete (Globals::pViEManager);
 
     return true;
 }

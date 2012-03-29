@@ -39,6 +39,22 @@ JNIEXPORT jboolean JNICALL Java_com_gocast_kddidemo_KDDIDemoActivity_connect
 JNIEXPORT jboolean JNICALL Java_com_gocast_kddidemo_KDDIDemoActivity_disconnect
   (JNIEnv *, jobject);
 
+/*
+ * Class:     com_gocast_kddidemo_KDDIDemoActivity
+ * Method:    localRenderTestStart
+ * Signature: (Landroid/view/SurfaceView;)Z
+ */
+JNIEXPORT jboolean JNICALL Java_com_gocast_kddidemo_KDDIDemoActivity_localRenderTestStart
+  (JNIEnv *, jobject, jobject);
+
+/*
+ * Class:     com_gocast_kddidemo_KDDIDemoActivity
+ * Method:    localRenderTestStop
+ * Signature: ()Z
+ */
+JNIEXPORT jboolean JNICALL Java_com_gocast_kddidemo_KDDIDemoActivity_localRenderTestStop
+  (JNIEnv *, jobject);
+
 #ifdef __cplusplus
 }
 #endif

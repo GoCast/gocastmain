@@ -2,9 +2,7 @@ package com.gocast.kddidemo;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.widget.Button;
-import android.widget.EditText;
-import android.view.View;
+import android.view.SurfaceView;
 
 public class KDDIDemoActivity extends Activity {
     /** Called when the activity is first created. */
@@ -13,7 +11,7 @@ public class KDDIDemoActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         
-        Button connectButton = (Button) findViewById(R.id.connect_button);
+        /*Button connectButton = (Button) findViewById(R.id.connect_button);
         connectButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				EditText destIpInput = (EditText) findViewById(R.id.dest_ip);
@@ -31,14 +29,17 @@ public class KDDIDemoActivity extends Activity {
 			public void onClick(View v) {
 				disconnect();
 			}
-		});
+		});*/
+        
+        localRenderTestStart((SurfaceView) findViewById(R.id.localView));
     }
     
     @Override
     public void onStop() {
     	super.onStop();
-    	disconnect();
-    	KDDIDemoActivity.deinit();
+    	//disconnect();
+    	//KDDIDemoActivity.deinit();
+    	localRenderTestStop();
     	finish();
     }
     
@@ -46,12 +47,14 @@ public class KDDIDemoActivity extends Activity {
     public static native boolean deinit();
     public native boolean connect(final String destIp, final int destPort, final int localPort);
     public native boolean disconnect();
+    public native boolean localRenderTestStart(SurfaceView localView);
+    public native boolean localRenderTestStop();
     
     static {
     	System.loadLibrary("webrtc_audio_preprocessing");
     	System.loadLibrary("webrtc");
     	System.loadLibrary("android-kddidemo");
-    	init();
+    	//init();
     }
 
 }
