@@ -79,6 +79,8 @@ var Callcast = {
     joined: false,
     keepAliveTimer: null,
     bUseVideo: true,
+    WIDTH: 352,
+    HEIGHT: 288,
 
     CallStates: {
     	NONE: 0,
@@ -149,9 +151,17 @@ var Callcast = {
 		if (this.localplayer && this.joined)
 		{
 			if (send_it===true)
+			{
+				$('#GocastPlayerLocal').attr('width',this.WIDTH);
+				$('#GocastPlayerLocal').attr('height',this.HEIGHT);
 				this.localplayer.startLocalVideo();
+			}
 			else
+			{
 				this.localplayer.stopLocalVideo();
+				$('#GocastPlayerLocal').attr('width',0);
+				$('#GocastPlayerLocal').attr('height',0);
+			}
 
 			// Finally - for each of the connections, add/remove sending our video.
 			for (k in this.participants) {
@@ -177,8 +187,11 @@ var Callcast = {
 		// Initialize local and show local video.
 		this.localplayer.initLocalResources(stunserver, stunport, 
 			function(message) {
-				Callcast.localplayer.startLocalVideo();
+				Callcast.localplayer.onlogmessage = function(message) { console.log("GCP-Local: " + message); }
 				
+				$('#GocastPlayerLocal').attr('width',0);
+				$('#GocastPlayerLocal').attr('height',0);
+
 				if (success)
 					success(message);
 			},
@@ -212,7 +225,7 @@ var Callcast = {
     	this.non_muc_jid = "";
     	this.CallState = Callcast.CallStates.NONE;
     	// TODO - FIX - Need a truly UNIQUE adder here - not nick which can change and be replaced during the lifetime of the call.
-    	$("#rtcobjects").append('<li id="li_GocastPlayer'+nickname+'"><object id="GocastPlayer'+nickname+'" type="application/x-gocastplayer" width="320" height="240"></object></li>');
+    	$("#rtcobjects").append('<li id="li_GocastPlayer'+nickname+'"><object id="GocastPlayer'+nickname+'" type="application/x-gocastplayer" width="'+Callcast.WIDTH+'" height="'+Callcast.HEIGHT+'"></object></li>');
     	
     	this.peer_connection = $('#GocastPlayer'+nickname).get(0);
     	if (!this.peer_connection)
@@ -292,7 +305,7 @@ var Callcast = {
 				// Now that we're ready, bring the peer_connection online and kick it off.
 				//
 				var calltype = " - Audio Only.";
-				var bVideo = this.bUseVideo;
+				var bVideo = Callcast.bUseVideo;
 				
 				if (bVideo)
 					calltype = " - Audio+Video.";
@@ -660,8 +673,12 @@ var Callcast = {
 		 {
 	     	 this.connection.muc.join(roomjid, Callcast.nick, Callcast.MsgHandler, Callcast.PresHandler); //, null);
  			 if (Callcast.localplayer && Callcast.bUseVideo)
- 			 	Callcast.localplayer.startLocalVideo();
-
+ 			 {
+				$('#GocastPlayerLocal').attr('width',this.WIDTH);
+				$('#GocastPlayerLocal').attr('height',this.HEIGHT);
+				this.localplayer.startLocalVideo();
+			 }
+			 
     	     $(document).trigger('joined_session');
 	     }
 
@@ -789,9 +806,12 @@ var Callcast = {
     	
 		this.DropAllParticipants();
 		
-		this.connection.sync = true;
-		this.connection.flush();
-		this.connection.disconnect();
+		if (this.connection)
+		{
+			this.connection.sync = true;
+			this.connection.flush();
+			this.connection.disconnect();
+		}
 
     	// remove dead connection object
 		this.connection = null;
@@ -856,7 +876,7 @@ var Callcast = {
 	    // Kick things off by refreshing the rooms list.
     	this.RefreshRooms();
     	
-    	this.InitGocastPlayer();
+//    	this.InitGocastPlayer();
 //	     	 this.InitGocastPlayer("stun.l.google.com", 19302, function(m){alert("Succ: "+m);},function(m){alert("Fail: "+m);});
 
     	// Now -- if a room was specified in the URL, then jump directly in.
@@ -1005,6 +1025,7 @@ $(document).ready(function () {
 
 });	// document ready
 
+
 $(document).bind('joined_session', function () {
 	 $('#leave_button').removeAttr('disabled');
 	 $("#join_button").attr('disabled', 'disabled');
@@ -1077,7 +1098,7 @@ $(document).bind('connected', function () {
 	$('.button').removeAttr('disabled');
 	$('#rooms select').removeAttr('disabled');
 	
-	Callcast.connection.xmlInput = function(data) {
+/*	Callcast.connection.xmlInput = function(data) {
 		if ($(data).children()[0])
 			console.log("XML-IN:", $(data).children()[0]);
 		else
@@ -1092,9 +1113,9 @@ $(document).bind('connected', function () {
 			console.log("XML-OUT:", $(data));
 		
 	};
-
+*/
 	// Set "who am i" at the top
-	$("#myjid").text("My JID: " + Callcast.connection.jid);
+//	$("#myjid").text("My JID: " + Callcast.connection.jid);
 	$('#version').text("Plug-in Version: " + (Callcast.GetVersion() || "None"));
 	
 });
@@ -1116,3 +1137,8 @@ $(document).bind('disconnected', function () {
 $(window).unload(function() {
 	  Callcast.disconnect();
 	});
+
+function pluginLoaded() {
+	console.log("Plugin loaded!");
+	Callcast.InitGocastPlayer();
+};
