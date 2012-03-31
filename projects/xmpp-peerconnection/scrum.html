@@ -18,17 +18,19 @@
   </head>
   <body>
   
-    <h1>SCRUM Dogfood Test</h1><br/>
+    <h1>GCP Video SCRUM Dogfood Test</h1><br/>
     <h2>Select a room and click 'Join'.</h2>
-    <h3 id=myjid></h3>
+    <h3 id='myjid'></h3>
+    <h4 id='version'></h4>
 
     <div id='buttons'>
-<!--	    <input id="video_enabled" type='checkbox' disabled='disabled' value='video' class='button-out-of-the-way'/>Enable Video.<br/> -->
+<!--    		<input id="test_button" type="button" value="test" class="button"/>  -->
+	    <input id="video_enabled" type='checkbox' value='video' class='button'/>Enable My Video Camera<br/>
 	</div>
 	
 	<table border="0" cellpadding="5" cellspacing="0">
 		<tr>
-			<th>Active Sessions</th><th>Current Roster in session</th>
+			<th>Active Sessions</th><th>People In Session</th>
 		</tr>
 		<tr>
 			<td width="150px" valign="top">
@@ -55,6 +57,12 @@
 		</tr>
 	</table>
 
+	<div id="rtcobjects">
+	<li id="li_GocastPlayerLocal"><object id="GocastPlayerLocal" type="application/x-gocastplayer" width="352" height="288">
+			 <param name="onload" value="pluginLoaded" />
+			</object></li>
+	</div>    
+
     <div>
 	        <div id='chat'>
 	        </div>
@@ -64,6 +72,7 @@
     
 	<br/>Test Sync Link: <input id="link_text" type='text' size=100 disabled='disabled' class='button'/>
 	<input id="send_link" type='button' disabled='disabled' value='Send SyncLink' class='button'/>
+
     <div id='log'>
     </div>
 
@@ -80,7 +89,5 @@
     <div id='calling_dialog' class='hidden'>
     </div>
 
-<div id="rtcobjects"></div>    
-    
    </body>
 </html>

@@ -1,0 +1,33 @@
+<pkmkdoc spec="1.12"><properties><title>GoCast Player Web Plug-In</title><build>/Users/rwolff/GoCast Player Web Plug-In.pkg</build><organization>it.GoCast</organization><userSees ui="easy"/><min-target os="3"/><domain system="true"/></properties><distribution><versions min-spec="1.000000"/><scripts></scripts></distribution><description>This installer will add the GoCast Player browser plug-in to your computer. This will enable you to have video and voice conversations on the web.</description><contents><choice title="GCP" id="choice3" starts_selected="true" starts_enabled="true" starts_hidden="true"><pkgref id="it.GoCast.gocastPlayerWebPlugin.GCP.pkg"/></choice></contents><resources bg-scale="proportional" bg-align="topleft"><locale lang="en"><resource mime-type="text/rtf" kind="embedded" type="license"><![CDATA[{\rtf1\ansi\ansicpg1252\cocoartf1138\cocoasubrtf320
+{\fonttbl\f0\fnil\fcharset0 LucidaGrande;}
+{\colortbl;\red255\green255\blue255;}
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
+
+\f0\fs26 \cf0 \
+TODO\
+\
+GoCast License agreement here\'85.}]]></resource><resource mime-type="text/rtf" kind="embedded" type="readme"><![CDATA[{\rtf1\ansi\ansicpg1252\cocoartf1138\cocoasubrtf320
+{\fonttbl\f0\fnil\fcharset0 LucidaGrande;}
+{\colortbl;\red255\green255\blue255;}
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
+
+\f0\fs26 \cf0 Currently there are a few limitations to note:\
+\
+Choosing which video camera to use cannot be configured within the web application. In most cases, this is not an issue as there is only one camera.\
+\
+The microphone cannot be configured from within the web application. Please use system preferences for audio input.}]]></resource><resource mime-type="text/rtf" kind="embedded" type="welcome"><![CDATA[{\rtf1\ansi\ansicpg1252\cocoartf1138\cocoasubrtf320
+{\fonttbl\f0\fnil\fcharset0 LucidaGrande;}
+{\colortbl;\red255\green255\blue255;}
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
+
+\f0\fs26 \cf0 We will install the browser plug-in for GoCast Player at this time.\
+\
+You may find that you need to restart your browser in order to use the newly installed plug-in the first time.}]]></resource><resource mime-type="text/rtf" kind="embedded" type="conclusion"><![CDATA[{\rtf1\ansi\ansicpg1252\cocoartf1138\cocoasubrtf320
+{\fonttbl\f0\fnil\fcharset0 LucidaGrande;}
+{\colortbl;\red255\green255\blue255;}
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
+
+\f0\fs26 \cf0 \
+Congratulations. Enjoy using GoCast Player.\
+\
+Don't forget - you may have to restart your browser to use the plug-in the first time.}]]></resource></locale></resources><requirements><requirement id="64bi" operator="eq" value="false" required="false"><message-title>32-bit plug-in</message-title><message>The browser plug-in is 32-bit only. This means on your computer each browser acts differently.\n\n- Safari may have issues with the plug-in.\n- Firefox may require a restart into 32-bit mode.\n- Chrome will work with no issues.</message></requirement></requirements><flags/><item type="file">01gcp.xml</item><mod>properties.anywhereDomain</mod><mod>properties.title</mod><mod>properties.userDomain</mod><mod>description</mod><mod>properties.systemDomain</mod></pkmkdoc>
