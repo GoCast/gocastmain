@@ -11,13 +11,12 @@
 
 #include "GCP.h"
 
-#include <iostream>
 #include "variant_list.h"
 #include "talk/session/phone/webrtcvoiceengine.h"
 #include "talk/session/phone/webrtcvideoengine.h"
 #include "talk/p2p/client/basicportallocator.h"
 
-bool GCP::bLocalResourceMgrAssigned = false;
+bool GCP::bLocalVideoRunning = false;
 boost::thread GCP::webrtcResThread;
 boost::mutex GCP::deqMutex;
 std::deque<int> GCP::wrtInstructions;
@@ -126,6 +125,19 @@ bool GCP::WebrtcResourcesInit()
         }        
     }
     
+    //SetVideoOptions here
+    cricket::Device camDevice;
+    if(false == (GCP::pWebrtcDeviceManager)->GetVideoCaptureDevice("", &camDevice))
+    {
+        return false;
+    }
+    
+    if(false == (GCP::pWebrtcMediaEngine)->SetVideoCaptureDevice(&camDevice))
+    {
+        return false;
+    }        
+
+    (GCP::pWebrtcMediaEngine)->SetVideoCapture(false);
     (GCP::successCallback)->InvokeAsync("", FB::variant_list_of("Init success"));
     return true;
     
@@ -157,21 +169,10 @@ bool GCP::WebrtcResourcesDeinit()
 }
 
 bool GCP::StartLocalVideo()
-{
-    //SetVideoOptions here
-    cricket::Device camDevice;
-    if(false == (GCP::pWebrtcDeviceManager)->GetVideoCaptureDevice("", &camDevice))
-    {
-        return false;
-    }
-    
-    if(false == (GCP::pWebrtcMediaEngine)->SetVideoCaptureDevice(&camDevice))
-    {
-        return false;
-    }        
-    
-    (GCP::pWebrtcMediaEngine)->SetVideoCapture(true);
+{    
+    (GCP::pWebrtcMediaEngine)->SetVideoCapture(true);    
     (GCP::pWebrtcMediaEngine)->SetLocalRenderer(GCP::pLocalRenderer);
+    GCP::bLocalVideoRunning = true;
     return true;
 }
 
@@ -179,6 +180,7 @@ bool GCP::StopLocalVideo()
 {
     (GCP::pWebrtcMediaEngine)->SetVideoCapture(false);
     (GCP::pWebrtcMediaEngine)->SetLocalRenderer(NULL);
+    GCP::bLocalVideoRunning = false;
     return true;
 }
 
@@ -211,6 +213,12 @@ void GCP::StaticDeinitialize()
     
     {
         boost::mutex::scoped_lock lock_(GCP::deqMutex);
+        
+        if(NULL != (GCP::pWebrtcPeerConnFactory).get())
+        {
+            (GCP::wrtInstructions).push_back(WEBRTC_RESOURCES_DEINIT);
+        }
+        
         (GCP::wrtInstructions).push_back(WEBRTC_RES_WORKER_QUIT);
     }
     
@@ -238,9 +246,6 @@ GCP::~GCP()
     // they will be released here.
     releaseRootJSAPI();
     m_host->freeRetainedObjects();
-    
-//    boost::mutex::scoped_lock lock_(GCP::deqMutex);
-//    (GCP::instCount)--;
 }
 
 void GCP::onPluginReady()
@@ -301,7 +306,7 @@ bool GCP::onWindowAttached(FB::AttachedEvent *evt, FB::PluginWindow *pWin)
     {
         if(NULL == m_pRenderer)
         {
-            m_pRenderer = new GoCast::GCPVideoRenderer(pWin, GOCAST_DEFAULT_RENDER_WIDTH, GOCAST_DEFAULT_RENDER_HEIGHT);
+            m_pRenderer = new GoCast::GCPVideoRenderer(pWin, pWin->getWindowWidth(), pWin->getWindowHeight());
         }
     }
     
@@ -311,10 +316,16 @@ bool GCP::onWindowAttached(FB::AttachedEvent *evt, FB::PluginWindow *pWin)
 bool GCP::onWindowDetached(FB::DetachedEvent *evt, FB::PluginWindow *)
 {
     // The window is about to be detached; act appropriately
+    
     if(NULL != m_pRenderer)
     {
-        if((GCP::pLocalRenderer) == m_pRenderer)
+        if(m_pRenderer == (GCP::pLocalRenderer))
         {
+            if(true == (GCP::bLocalVideoRunning))
+            {
+                (GCP::StopLocalVideo)();
+            }
+            
             GCP::pLocalRenderer = NULL;
         }
         

@@ -31,7 +31,7 @@ public:
     /// @see FB::JSAPIAuto::registerEvent
     ////////////////////////////////////////////////////////////////////////////
     GCPAPI(const GCPPtr& plugin, const FB::BrowserHostPtr& host) :
-        m_plugin(plugin), m_host(host), m_bLocal(false)
+        m_plugin(plugin), m_host(host)
     {
         registerMethod("echo",      make_method(this, &GCPAPI::echo));
         registerMethod("testEvent", make_method(this, &GCPAPI::testEvent));
@@ -79,7 +79,12 @@ public:
     ///         the browser is done with it; this will almost definitely be after
     ///         the plugin is released.
     ///////////////////////////////////////////////////////////////////////////////
-    virtual ~GCPAPI() {};
+    virtual ~GCPAPI() {
+        if(NULL != m_pWebrtcPeerConn.get())
+        {
+            m_pWebrtcPeerConn->Close();
+        }
+    };
 
     GCPPtr getPlugin();
 
@@ -145,7 +150,6 @@ private:
     GCPWeakPtr m_plugin;
     FB::BrowserHostPtr m_host;
     std::string m_testString;
-    bool m_bLocal;
     
 private:
     std::string m_destJid;
