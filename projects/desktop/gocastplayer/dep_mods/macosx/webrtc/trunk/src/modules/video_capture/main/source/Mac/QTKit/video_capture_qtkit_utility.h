@@ -21,11 +21,11 @@
 
 #define QTKIT_MIN_WIDTH                0
 #define QTKIT_MAX_WIDTH                2560
-#define QTKIT_DEFAULT_WIDTH            352
+#define QTKIT_DEFAULT_WIDTH            160
 
 #define QTKIT_MIN_HEIGHT            0
 #define QTKIT_MAX_HEIGHT            1440
-#define QTKIT_DEFAULT_HEIGHT        288
+#define QTKIT_DEFAULT_HEIGHT        120
 
 #define QTKIT_MIN_FRAME_RATE        1
 #define QTKIT_MAX_FRAME_RATE        60

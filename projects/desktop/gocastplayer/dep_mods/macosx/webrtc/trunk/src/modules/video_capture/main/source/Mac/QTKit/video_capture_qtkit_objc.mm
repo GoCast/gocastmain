@@ -6,8 +6,8 @@
 
 #define DEFAULT_CAPTURE_DEVICE_INDEX    1
 #define DEFAULT_FRAME_RATE              30
-#define DEFAULT_FRAME_WIDTH             352
-#define DEFAULT_FRAME_HEIGHT            288
+#define DEFAULT_FRAME_WIDTH             160
+#define DEFAULT_FRAME_HEIGHT            120
 #define ROTATE_CAPTURED_FRAME           1
 #define LOW_QUALITY                     1
 
