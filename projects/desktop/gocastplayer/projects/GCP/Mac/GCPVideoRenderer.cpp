@@ -107,6 +107,6 @@ namespace GoCast
         CGColorSpaceRelease(colorSpace);
         CGContextRestoreGState(pContext);
 
-        return false;
+        return true;
     }
 }

@@ -1,4 +1,4 @@
 cd deps/webrtc
-./prep.sh
+./prep.sh $1
 cd ../..
 

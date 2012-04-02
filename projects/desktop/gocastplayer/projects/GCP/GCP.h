@@ -83,7 +83,7 @@ public:
     /** END EVENTDEF -- DON'T CHANGE THIS LINE **/
     
 public:
-    static bool bLocalResourceMgrAssigned;
+    static bool bLocalVideoRunning;
     static boost::thread webrtcResThread;
     static boost::mutex deqMutex;
     static std::deque<int> wrtInstructions;

@@ -20,9 +20,6 @@
 #include "PluginEvents/DrawingEvents.h"
 #include "PluginWindow.h"
 
-#define GOCAST_DEFAULT_RENDER_WIDTH     352
-#define GOCAST_DEFAULT_RENDER_HEIGHT    288
-
 namespace GoCast
 {
     class GCPVideoRenderer : public cricket::VideoRenderer

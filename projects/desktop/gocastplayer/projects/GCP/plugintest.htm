@@ -10,12 +10,14 @@
         {
             return document.getElementById('plugin0');
         }
+        
         function plugin1()
         {
             return document.getElementById('plugin1');
         }
-
+        
         plugin = plugin0;
+
         function addEvent(obj, name, func)
         {
             if (window.addEventListener) {
@@ -31,11 +33,12 @@
                 alert("Received a test event from the plugin.")
             });
         }
+
         function pluginLoaded() {
             console.log("Plugin loaded!");
         }
 
-        function pluginLoaded1() {
+        function plugin1Loaded() {
             console.log("Plugin1 loaded!");
             plugin0().onlogmessage = function(message) { console.log(message); }
             plugin0().initLocalResources("stun.l.google.com",19302,
@@ -82,25 +85,17 @@
             } else {
                 alert("Plugin is not working :(");
             }
-        }
-        
-        function closeApp()
-        {
-            plugin1().close();
-            plugin0().stopLocalVideo();
-            plugin0().deinitLocalResources();
-            console.log("closed");
-        }
+        }        
     </script>
 <body onload="load()">
 <object id="plugin0" type="application/x-gocastplayer" width="352" height="288">
     <param name="onload" value="pluginLoaded" />
 </object><br />
 <object id="plugin1" type="application/x-gocastplayer" width="352" height="288">
-    <param name="onload" value="pluginLoaded1" />
+    <param name="onload" value="plugin1Loaded" />
 </object><br />
 
-<a href="#" onclick="javascript:closeApp()">Close</a> <br />
+<p>
 <a href="#" onclick="javascript:pluginValid()">Click me!</a> <br />
 <a href="#" onclick="javascript:addTestEvent()">Activate click counter</a> <br />
 <a href="#" onclick="javascript:testEvent()">Fire a test event</a> <br />
