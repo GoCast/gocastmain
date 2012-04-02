@@ -316,7 +316,6 @@ bool GCP::onWindowAttached(FB::AttachedEvent *evt, FB::PluginWindow *pWin)
 bool GCP::onWindowDetached(FB::DetachedEvent *evt, FB::PluginWindow *)
 {
     // The window is about to be detached; act appropriately
-    
     if(NULL != m_pRenderer)
     {
         if(m_pRenderer == (GCP::pLocalRenderer))

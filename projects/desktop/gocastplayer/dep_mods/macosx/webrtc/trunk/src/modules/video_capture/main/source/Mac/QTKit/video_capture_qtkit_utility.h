@@ -29,7 +29,7 @@
 
 #define QTKIT_MIN_FRAME_RATE        1
 #define QTKIT_MAX_FRAME_RATE        60
-#define QTKIT_DEFAULT_FRAME_RATE    30
+#define QTKIT_DEFAULT_FRAME_RATE    24
 
 #define RELEASE_AND_CLEAR(p)        if (p) { (p) -> Release () ; (p) = NULL ; }
 
