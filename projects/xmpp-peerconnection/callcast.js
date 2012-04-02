@@ -298,6 +298,10 @@ var Callcast = {
 
 	        };
 
+			this.peer_connection.onreadystatechange = function(state) {
+				console.log("Ready-State=" + state);
+			};
+			
 	        this.peer_connection.init(this.jid);
 
     	};
