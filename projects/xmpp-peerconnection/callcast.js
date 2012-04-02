@@ -74,13 +74,14 @@ var Callcast = {
     localplayer: null,
     participants: {},
     room: "",
+    roomjid: "",
     roomlist: {},
     nick: "",
     joined: false,
     keepAliveTimer: null,
     bUseVideo: true,
-    WIDTH: 352,
-    HEIGHT: 288,
+    WIDTH: 160,
+    HEIGHT: 120,
 
     CallStates: {
     	NONE: 0,
@@ -105,7 +106,8 @@ var Callcast = {
     },
     
     onErrorStanza: function(err) {
-    	alert("Error Stanza: " + $(err).children('error').children('text').text());
+    	alert("Error Stanza: " + $(err).children('error').text());
+    	console.log($(err));
     	return true;
     },
     
@@ -161,14 +163,6 @@ var Callcast = {
 				this.localplayer.stopLocalVideo();
 				$('#GocastPlayerLocal').attr('width',0);
 				$('#GocastPlayerLocal').attr('height',0);
-			}
-
-			// Finally - for each of the connections, add/remove sending our video.
-			for (k in this.participants) {
-				if (send_it===true)
-					this.participants[k].peer_connection.addStream('video'+this.nick, true);
-				else
-					this.participants[k].peer_connection.removeStream('video'+this.nick);
 			}
 
 		}		
@@ -283,14 +277,24 @@ var Callcast = {
                     console.log("ERROR - message to be sent - but no recipient yet.");
 	        	else
                     {
+						var nick = Strophe.getResourceFromJid(callback_jid);
+						if (nick)
+							nick = nick.replace(/\\20/g, ' ');
+							
+                    	if (Callcast.participants[nick].CallState === Callcast.CallStates.NONE)
+                    	{
                             var offer = $msg({to: callback_jid, type: "chat"}).c('initiating', {xmlns: Callcast.NS_CALLCAST}).t(callback_msg);
-        	                console.log("Sending message to peer...");
+        	                console.log("Sending initiation message to peer...");
                             Callcast.connection.send(offer);
-                            var nick = Strophe.getResourceFromJid(callback_jid);
-                            if (nick)
-                            	nick = nick.replace(/\\20/g, ' ');
                             Callcast.participants[nick].CallState = Callcast.CallStates.AWAITING_RESPONSE;
-                    }
+                        }
+                        else
+                        {
+                            var offer = $msg({to: callback_jid, type: "chat"}).c('signaling', {xmlns: Callcast.NS_CALLCAST}).t(callback_msg);
+        	                console.log("Sending other (candidates) message to peer...");
+                            Callcast.connection.send(offer);
+                        }
+                }
 
 	        };
 
@@ -313,10 +317,15 @@ var Callcast = {
 				console.log("Commencing to call " + this.jid + calltype);
 				
 				this.peer_connection.addStream('audio'+Callcast.nick, false);
-				if (bVideo)
-					this.peer_connection.addStream('video'+Callcast.nick, true);
+				// We will always add the stream -- but may not send the video.
+				this.peer_connection.addStream('video'+Callcast.nick, true);
 					
 				this.peer_connection.connect();
+				
+				// Oddball case where peer connection will wind up sending our video
+				// to the peer if they offer video and we don't.
+				if (Callcast.bUseVideo === false)
+					Callcast.localplayer.stopLocalVideo();
 			}
 			else
 				console.log("Cannot InitiateCall - peer_connection is invalid.");
@@ -359,7 +368,8 @@ var Callcast = {
  //    	$('#log').append(this.escapeit(msg) + "<br>");
  
     	// This version is required for peer_connection.onlogmessage -- console.log doesn't work and escaped <br> version doesnt work.
-    	$('#log').append("<p>" + msg + "</p>");
+    	console.log(msg);
+//    	$('#log').append("<p>" + msg + "</p>");
     },
 
     accepted: function(iq) {
@@ -415,6 +425,18 @@ var Callcast = {
 	    	Callcast.participants[res_nick].CompleteCall(inbound);
     	}
     	
+       	if ($(msg).find('signaling').length > 0)
+    	{
+	    	console.log("Got inbound signaling-message from " + $(msg).attr('from'));
+
+	    	var inbound = $(msg).children('signaling').text().replace(/&quot;/g, '"');
+
+	    	if (Callcast.participants[res_nick] && Callcast.participants[res_nick].peer_connection)
+	    		Callcast.participants[res_nick].peer_connection.processSignalingMessage(inbound);
+	    	else
+	    		console.log("Error with inbound signaling. Didn't know this person: " + res_nick);
+		}
+		
     	if ($(msg).find('x').length > 0)
     	{
     		console.log("Got inbound INVITATION to join a session.");
@@ -573,7 +595,15 @@ var Callcast = {
                     // error joining room; reset app
                 	alert("Error joining room. Disconnecting.");
                     Callcast.disconnect();
-                } else if (!Callcast.participants[nick] && $(presence).attr('type') !== 'unavailable') {
+                }
+                else if (nick == Callcast.nick && $(presence).attr('type') == 'unavailable')
+                {
+                	// We got kicked out
+                	// So leave and come back?
+                	Callcast.LeaveSession();
+                	alert("We got kicked out of the session for some reason.");
+                }
+                else if (!Callcast.participants[nick] && $(presence).attr('type') !== 'unavailable') {
                     // add to participant list
                 	// Make sure we ONLY add **OTHERS** to the participants list.
                 	// Otherwise we'll wind up calling ourselves.
@@ -650,6 +680,7 @@ var Callcast = {
 	
     JoinSession: function(roomname, roomjid) {
     	Callcast.room = roomjid.toLowerCase();
+    	Callcast.roomjid = roomjid;
     	
 		// We need to ensure we have a nickname. If one is not set, use the JID username
     	if (!Callcast.nick || Callcast.nick==="")
@@ -704,6 +735,7 @@ var Callcast = {
     		
     		Callcast.joined = false;
     		Callcast.room = "";
+    		Callcast.roomjid = "";
             $(document).trigger('left_session');
     	}
     },
