@@ -147,12 +147,51 @@ var Callcast = {
 			this.bUseVideo = false;
 	},
 	
+	//
+	// info is JSON formatted. Expectation is:
+	//  info.nick - nickname to modify size of.
+	//  info.hasVid - if this variable is used/present, set video to this.(WIDTH,HEIGHT), else if false, set to 0,0
+	//  info.width - if this is present AND info.height is present, set width,height to these values.
+	//
+	ShowRemoteVideo: function(info) {
+		var nick = info.nick;
+				
+		if (nick && this.participants[nick])
+		{
+		
+			if (info.width>=0 && info.height>=0)
+			{
+				this.participants[nick].peer_connection.width  = info.width;
+				this.participants[nick].peer_connection.height = info.height;
+			}
+			else if (info.hasVid===true)
+			{
+				this.participants[nick].peer_connection.width  = this.WIDTH;
+				this.participants[nick].peer_connection.height = this.HEIGHT;
+			}
+			else if (info.hasVid===false)
+			{
+				this.participants[nick].peer_connection.width  = 0;
+				this.participants[nick].peer_connection.height = 0;
+			}
+		}
+		else
+			console.log("ShowRemoteVideo: nickname not found: " + nick);
+	},
+	
+	MuteLocalVoice: function(bMute) {
+		if (Callcast.localplayer)
+			Callcast.localplayer.muteLocalVoice(bMute);
+	},
+	
 	SendLocalVideoToPeers: function(send_it) {
-		this.bUseVideo = send_it;
+		if (send_it !== null)
+			this.bUseVideo = send_it;
+			
 		// Turn on/off our preview based on this muting of video too.
 		if (this.localplayer)
 		{
-			if (send_it===true)
+			if (this.bUseVideo===true)
 			{
 				this.localplayer.width = this.WIDTH;
 				this.localplayer.height = this.HEIGHT;
@@ -196,8 +235,14 @@ var Callcast = {
 			function(message) {
 				Callcast.localplayer.onlogmessage = function(message) { console.log("GCP-Local: " + message); }
 				
-				$('#GocastPlayerLocal').attr('width',0);
-				$('#GocastPlayerLocal').attr('height',0);
+				//
+				// Despite Manjesh making a call upon init to stop the capture, on first load
+				// the capture continues on Mac - so we'll force it to stop here just in case.
+				//
+				Callcast.localplayer.stopLocalVideo();
+				
+				Callcast.localplayer.width=0;
+				Callcast.localplayer.height=0;
 
 				if (success)
 					success(message);
@@ -699,6 +744,7 @@ var Callcast = {
                     if (!Callcast.joined && nick === Callcast.nick)
                     {
                 		Callcast.joined = true;
+                		Callcast.SendVideoPresence();
                         $(Callcast).trigger('my_join_complete', nick);
                     }
                     
@@ -963,6 +1009,7 @@ var Callcast = {
 
 	    // Kick things off by refreshing the rooms list.
     	this.RefreshRooms();
+    	this.SendLocalVideoToPeers();	// Update the video status locally upon signin.
     	
 //    	this.InitGocastPlayer();
 //	     	 this.InitGocastPlayer("stun.l.google.com", 19302, function(m){alert("Succ: "+m);},function(m){alert("Fail: "+m);});
@@ -1040,6 +1087,11 @@ $(document).ready(function () {
  	$('#video_enabled').click(function() {
 		var bVideo = $(this).is(':checked');
 		Callcast.SendLocalVideoToPeers(bVideo);
+ 	});
+ 	
+ 	$('#audio_muted').click(function() {
+		var bMuteAudio = $(this).is(':checked');
+		Callcast.MuteLocalVoice(bMuteAudio);
  	});
  	
 	 $('#join_button').click(function () {
@@ -1181,8 +1233,25 @@ $(document).bind('user_joined', function (ev, info) {
 		joinstr += ' (Video Off)</li>';
 
 	$('#participant-list').append(joinstr);
+    Callcast.ShowRemoteVideo(info);
 });
 
+//
+// UI section for being told that a user's status has changed.
+// This means video was turned on or off.
+// info.nick is the 'who' while info.hasVid tells the video
+// status. NOTE: If info.hasVid is null, no video status is being
+// reported by the other end. Otherwise it'll be true or false
+// to indicate status.
+//
+// Also, Callcast.ShowRemoteVideo() is being called in order to
+// make the UI pane disappear (0,0 size) if hasVid==false.
+// If the caller wishes to set an actual width and height,
+// all that is necessary is to set:
+// info.width = <value1>
+// info.height = <value2>
+// prior to calling ShowRemoteVideo. This overrides info.hasVid
+//
 $(document).bind('user_updated', function (ev, info) {
 	var nick = info.nick;
 	var hasVid = info.hasVid;
@@ -1196,6 +1265,7 @@ $(document).bind('user_updated', function (ev, info) {
     $('#participant-list li').each(function () {
         if (nick === $(this).attr('nick')) {
             $(this).text(nickstr);
+            Callcast.ShowRemoteVideo(info);
         }
     });
 	
