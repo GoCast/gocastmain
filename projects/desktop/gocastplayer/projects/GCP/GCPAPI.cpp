@@ -152,6 +152,11 @@ void GCPAPI::OnSignalingMessage(const std::string& message)
     m_jsCallbackOnSignalingMessage->InvokeAsync("", FB::variant_list_of(finalMessage));
 }
 
+void GCPAPI::OnReadyStateChange(const webrtc::PeerConnection::ReadyState& readyState)
+{
+    m_jsCallbackOnReadyStateChange->InvokeAsync("", FB::variant_list_of(readyState));
+}
+
 FB::variant GCPAPI::AddStream(const std::string& streamId, bool bVideo)
 {
     FB::variant ret = m_pWebrtcPeerConn->AddStream(streamId, bVideo);
@@ -195,9 +200,11 @@ FB::variant GCPAPI::Close()
 {
     FB::variant ret = m_pWebrtcPeerConn->Close();
 
+    m_pWebrtcPeerConn.reset();
     std::string logMsg = "Close(): ==> ";
     logMsg += (ret.convert_cast<bool>()?"successful":"failed"); 
     m_jsCallbackOnLogMessage->InvokeAsync("", FB::variant_list_of(logMsg));
+    //StopPollingReadyState();
     
     return ret;
 }
@@ -236,6 +243,8 @@ FB::variant GCPAPI::Init(const std::string& destJid)
         return ret;
     }
     
+    //m_curReadyState = m_pWebrtcPeerConn->GetReadyState();
+    //StartPollingReadyState();
     logMsg += "successful";
     m_jsCallbackOnLogMessage->InvokeAsync("", FB::variant_list_of(logMsg));
     
@@ -291,3 +300,51 @@ void GCPAPI::set_onSignalingMessageCallback(const FB::JSObjectPtr& pJSCallback)
 {
     m_jsCallbackOnSignalingMessage = pJSCallback;
 }
+
+FB::JSObjectPtr GCPAPI::get_onReadyStateChangeCallback()
+{
+    return m_jsCallbackOnReadyStateChange;
+}
+
+void GCPAPI::set_onReadyStateChangeCallback(const FB::JSObjectPtr& pJSCallback)
+{
+    m_jsCallbackOnReadyStateChange = pJSCallback;
+}
+
+/*void GCPAPI::StartPollingReadyState()
+{
+    m_bStopPollingReadyState = false;
+    m_pollReadyStateThread = boost::thread(&GCPAPI::PollReadyState, this);
+}
+
+void GCPAPI::StopPollingReadyState()
+{
+    {
+        boost::mutex::scoped_lock lock_(m_pollReadyStateMutex);
+        m_bStopPollingReadyState = true;
+    }
+    
+    m_pollReadyStateThread.join();
+}
+
+void GCPAPI::PollReadyState()
+{
+    while(1)
+    {
+        boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+        
+        boost::mutex::scoped_lock lock_(m_pollReadyStateMutex);
+        if(true == m_bStopPollingReadyState)
+        {
+            break;
+        }
+        else
+        {
+            if(m_curReadyState != m_pWebrtcPeerConn->GetReadyState())
+            {
+                m_curReadyState = m_pWebrtcPeerConn->GetReadyState();
+                OnReadyStateChange(m_curReadyState);
+            }
+        }
+    }
+}*/
