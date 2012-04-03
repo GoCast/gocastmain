@@ -150,22 +150,35 @@ var Callcast = {
 	SendLocalVideoToPeers: function(send_it) {
 		this.bUseVideo = send_it;
 		// Turn on/off our preview based on this muting of video too.
-		if (this.localplayer && this.joined)
+		if (this.localplayer)
 		{
 			if (send_it===true)
 			{
-				$('#GocastPlayerLocal').attr('width',this.WIDTH);
-				$('#GocastPlayerLocal').attr('height',this.HEIGHT);
+				this.localplayer.width = this.WIDTH;
+				this.localplayer.height = this.HEIGHT;
 				this.localplayer.startLocalVideo();
 			}
 			else
 			{
 				this.localplayer.stopLocalVideo();
-				$('#GocastPlayerLocal').attr('width',0);
-				$('#GocastPlayerLocal').attr('height',0);
+				this.localplayer.width = 0;
+				this.localplayer.height = 0;
 			}
 
+			if (this.joined)
+				this.SendVideoPresence();
 		}		
+	},
+	
+	SendVideoPresence: function() {
+		var pres;
+		if (this.bUseVideo==true)
+			pres = $pres({to: this.roomjid + "/" + this.nick, video: 'on'}).c('x',{xmlns: 'http://jabber.org/protocol/muc'});
+		else
+			pres = $pres({to: this.roomjid + "/" + this.nick, video: 'off'}).c('x',{xmlns: 'http://jabber.org/protocol/muc'});
+			
+		console.log("SendVideoPresence: ", pres.toString());
+		this.connection.send(pres);
 	},
 	
     InitGocastPlayer: function(stunserver_in, stunport_in, success, failure) {
@@ -211,6 +224,8 @@ var Callcast = {
     Callee: function(nickin, room) {
     	// Ojbect for participants in the call or being called (in progress)
     	var nickname = nickin;
+    	var videoOn = null;	// Unknown if video is on, off, or unknown. So unknown for now...
+    	
     	// Nickname must be sure to NOT have spaces here.
     	nickname = nickname.replace(/ /g,'');
     	
@@ -329,7 +344,7 @@ var Callcast = {
 				// Oddball case where peer connection will wind up sending our video
 				// to the peer if they offer video and we don't.
 				if (Callcast.bUseVideo === false)
-					Callcast.localplayer.stopLocalVideo();
+					Callcast.SendLocalVideoToPeers(Callcast.bUseVideo);
 			}
 			else
 				console.log("Cannot InitiateCall - peer_connection is invalid.");
@@ -594,6 +609,27 @@ var Callcast = {
                 if (nick)
                 	nick = nick.replace(/\\20/g,' ');
 
+				// Marking presence of video or lack of video if other side has noted it.
+				if (Callcast.participants[nick])
+				{
+					if ($(presence).attr('video'))
+					{
+						Callcast.participants[nick].videoOn = $(presence).attr('video')==='on';
+					}
+					else
+						Callcast.participants[nick].videoOn = null;
+
+					// Update the presence information.					
+					var info = {nick: nick, hasVid: Callcast.participants[nick].videoOn};
+					$(document).trigger('user_updated', info);
+				}
+				else if (nick == Callcast.nick && $(presence).attr('video'))
+				{
+					// Update the presence information.					
+					var info = {nick: nick, hasVid: Callcast.bUseVideo};
+					$(document).trigger('user_updated', info);
+				}
+				
                 if ($(presence).attr('type') === 'error' &&
                     !Callcast.joined) {
                     // error joining room; reset app
@@ -628,6 +664,17 @@ var Callcast = {
                         	Callcast.participants[nick].InitiateCall();
                     }
 
+					// Check to see if video-on/off is specified.
+					if (nick !== Callcast.nick)
+					{
+						if ($(presence).attr('video'))
+						{
+							Callcast.participants[nick].videoOn = $(presence).attr('video')==='on';
+						}
+						else
+							Callcast.participants[nick].videoOn = null;
+					}
+
                     //
                     // Inform the UI that we have a new user
                     //
@@ -635,7 +682,16 @@ var Callcast = {
                     // So, if we are already 'joined' and we see ourselves, then don't add to list.
                     //
                     if (!Callcast.joined || (nick !== Callcast.nick))
-	                    $(document).trigger('user_joined', nick);
+                    {
+                    	var info = {nick: nick};
+                    	
+                    	if (nick !== Callcast.nick)
+                    		info.hasVid = Callcast.participants[nick].videoOn;
+                    	else
+                    		info.hasVid = Callcast.bUseVideo;
+                    		
+	                    $(document).trigger('user_joined', info);
+	                }
 
                     //
                     // Handle our own join in the room which completes the session-join.
@@ -707,12 +763,7 @@ var Callcast = {
 		 else
 		 {
 	     	 this.connection.muc.join(roomjid, Callcast.nick, Callcast.MsgHandler, Callcast.PresHandler); //, null);
- 			 if (Callcast.localplayer && Callcast.bUseVideo)
- 			 {
-				$('#GocastPlayerLocal').attr('width',this.WIDTH);
-				$('#GocastPlayerLocal').attr('height',this.HEIGHT);
-				this.localplayer.startLocalVideo();
-			 }
+ 			 Callcast.SendLocalVideoToPeers(Callcast.bUseVideo);
 			 
     	     $(document).trigger('joined_session');
 	     }
@@ -734,12 +785,13 @@ var Callcast = {
     		this.connection.muc.leave(Callcast.room, Callcast.nick, null);
     		
     		this.DropAllParticipants();
-    		if (this.localplayer)
-	    		this.localplayer.stopLocalVideo();
     		
     		Callcast.joined = false;
     		Callcast.room = "";
     		Callcast.roomjid = "";
+    		
+    		this.SendLocalVideoToPeers(this.bUseVideo);
+
             $(document).trigger('left_session');
     	}
     },
@@ -1116,14 +1168,43 @@ $(document).bind('synclink', function (ev, link) {
 	$('#link_text').val(link);
 });
 
-$(document).bind('user_joined', function (ev, nick) {
-	$('#participant-list').append('<li>' + nick + '</li>');
+$(document).bind('user_joined', function (ev, info) {
+	var nick = info.nick;
+	var hasVid = info.hasVid;
+	var joinstr = '<li nick="'+nick+'">' + nick;
+	
+	if (hasVid===null)
+		joinstr += '</li>';
+	else if (hasVid===true)
+		joinstr += ' (Video On)</li>';
+	else if (hasVid===false)
+		joinstr += ' (Video Off)</li>';
+
+	$('#participant-list').append(joinstr);
+});
+
+$(document).bind('user_updated', function (ev, info) {
+	var nick = info.nick;
+	var hasVid = info.hasVid;
+	var nickstr = nick;
+	
+	if (hasVid===true)
+		nickstr += ' (Video On)';
+	else if (hasVid===false)
+		nickstr += ' (Video Off)';
+
+    $('#participant-list li').each(function () {
+        if (nick === $(this).attr('nick')) {
+            $(this).text(nickstr);
+        }
+    });
+	
 });
 
 $(document).bind('user_left', function (ev, nick) {
     // remove from participants list
     $('#participant-list li').each(function () {
-        if (nick === $(this).text()) {
+        if (nick === $(this).attr('nick')) {
             $(this).remove();
         }
     });
