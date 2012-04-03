@@ -31,7 +31,7 @@ public:
     /// @see FB::JSAPIAuto::registerEvent
     ////////////////////////////////////////////////////////////////////////////
     GCPAPI(const GCPPtr& plugin, const FB::BrowserHostPtr& host) :
-        m_plugin(plugin), m_host(host)
+        m_plugin(plugin), m_host(host), m_destJid("")//, m_bStopPollingReadyState(false)
     {
         registerMethod("echo",      make_method(this, &GCPAPI::echo));
         registerMethod("testEvent", make_method(this, &GCPAPI::testEvent));
@@ -58,6 +58,8 @@ public:
                                                         &GCPAPI::set_onRemoveStreamCallback));
         registerProperty("onsignalingmessage",make_property(this, &GCPAPI::get_onSignalingMessageCallback,
                                                                 &GCPAPI::set_onSignalingMessageCallback));
+        registerProperty("onreadystatechange",make_property(this, &GCPAPI::get_onReadyStateChangeCallback,
+                                                            &GCPAPI::set_onReadyStateChangeCallback));
         
         
         // Read-write property
@@ -82,7 +84,7 @@ public:
     virtual ~GCPAPI() {
         if(NULL != m_pWebrtcPeerConn.get())
         {
-            m_pWebrtcPeerConn->Close();
+            Close();
         }
     };
 
@@ -125,6 +127,8 @@ public:
     FB::JSObjectPtr get_onSignalingMessageCallback();
     void set_onSignalingMessageCallback(const FB::JSObjectPtr& pJSCallback);
     
+    FB::JSObjectPtr get_onReadyStateChangeCallback();
+    void set_onReadyStateChangeCallback(const FB::JSObjectPtr& pJSCallback);
     
     //---------------------- Plugin Methods ---------------------
     FB::variant InitLocalResources(const std::string& stunIP,
@@ -145,7 +149,15 @@ public:
     virtual void OnAddStream(const std::string& streamId, bool bVideo);
     virtual void OnRemoveStream(const std::string& streamId, bool bVideo);
     virtual void OnSignalingMessage(const std::string& message);
+    virtual void OnReadyStateChange(const webrtc::PeerConnection::ReadyState& readyState);
 
+/*private:
+    void StartPollingReadyState();
+    void StopPollingReadyState();
+    
+public:
+    void PollReadyState();*/
+        
 private:
     GCPWeakPtr m_plugin;
     FB::BrowserHostPtr m_host;
@@ -156,8 +168,15 @@ private:
     FB::JSObjectPtr m_jsCallbackOnSignalingMessage;
     FB::JSObjectPtr m_jsCallbackOnAddStream;
     FB::JSObjectPtr m_jsCallbackOnRemoveStream;
-    FB::JSObjectPtr m_jsCallbackOnLogMessage;    
+    FB::JSObjectPtr m_jsCallbackOnLogMessage;
+    FB::JSObjectPtr m_jsCallbackOnReadyStateChange;
     talk_base::scoped_ptr<webrtc::PeerConnection> m_pWebrtcPeerConn;
+
+private:
+    /*webrtc::PeerConnection::ReadyState m_curReadyState;
+    boost::thread m_pollReadyStateThread;
+    boost::mutex m_pollReadyStateMutex;
+    bool m_bStopPollingReadyState;*/
 };
 
 #endif // H_GCPAPI
