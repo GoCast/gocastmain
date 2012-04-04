@@ -29,7 +29,7 @@ namespace GoCast
         virtual ~GCPVideoRenderer();
         virtual bool SetSize(int width, int height, int reserved);
         virtual bool RenderFrame(const cricket::VideoFrame* pFrame);
-        virtual bool OnWindowRefresh(FB::RefreshEvent* pEvt, FB::PluginWindow* pWin);
+        virtual bool OnWindowRefresh(FB::RefreshEvent* pEvt);
         
     protected:
         talk_base::scoped_array<uint8> m_pFrameBuffer;

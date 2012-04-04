@@ -61,8 +61,7 @@ namespace GoCast
         return true;
     }
 
-    bool GCPVideoRenderer::OnWindowRefresh(FB::RefreshEvent* pEvt,
-                                           FB::PluginWindow* pWin)
+    bool GCPVideoRenderer::OnWindowRefresh(FB::RefreshEvent* pEvt)
     {
         static const int stride = m_width*4;    
         static const int frameBufferSize = m_height*stride;

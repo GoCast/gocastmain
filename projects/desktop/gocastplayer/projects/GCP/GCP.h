@@ -35,6 +35,8 @@
                            cricket::MediaEngineInterface::NOISE_SUPPRESSION |\
                            cricket::MediaEngineInterface::AUTO_GAIN_CONTROL)
 
+#define GOCAST_DEFAULT_RENDER_WIDTH  160
+#define GOCAST_DEFAULT_RENDER_HEIGHT 120
 
 FB_FORWARD_PTR(GCP)
 class GCP : public FB::PluginCore

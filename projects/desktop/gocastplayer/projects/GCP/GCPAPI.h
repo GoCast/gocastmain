@@ -31,7 +31,7 @@ public:
     /// @see FB::JSAPIAuto::registerEvent
     ////////////////////////////////////////////////////////////////////////////
     GCPAPI(const GCPPtr& plugin, const FB::BrowserHostPtr& host) :
-        m_plugin(plugin), m_host(host), m_destJid("")//, m_bStopPollingReadyState(false)
+        m_plugin(plugin), m_host(host), m_destJid("")
     {
         registerMethod("echo",      make_method(this, &GCPAPI::echo));
         registerMethod("testEvent", make_method(this, &GCPAPI::testEvent));
@@ -152,13 +152,6 @@ public:
     virtual void OnRemoveStream(const std::string& streamId, bool bVideo);
     virtual void OnSignalingMessage(const std::string& message);
     virtual void OnReadyStateChange(const webrtc::PeerConnection::ReadyState& readyState);
-
-/*private:
-    void StartPollingReadyState();
-    void StopPollingReadyState();
-    
-public:
-    void PollReadyState();*/
         
 private:
     GCPWeakPtr m_plugin;
@@ -173,12 +166,6 @@ private:
     FB::JSObjectPtr m_jsCallbackOnLogMessage;
     FB::JSObjectPtr m_jsCallbackOnReadyStateChange;
     talk_base::scoped_ptr<webrtc::PeerConnection> m_pWebrtcPeerConn;
-
-private:
-    /*webrtc::PeerConnection::ReadyState m_curReadyState;
-    boost::thread m_pollReadyStateThread;
-    boost::mutex m_pollReadyStateMutex;
-    bool m_bStopPollingReadyState;*/
 };
 
 #endif // H_GCPAPI
