@@ -224,7 +224,7 @@ var Callcast = {
 		var stunserver = stunserver_in || this.STUNSERVER;
 		var stunport = stunport_in || this.STUNSERVERPORT;
 
-//    	$("#rtcobjects").append('<li id="li_GocastPlayerLocal"><object id="GocastPlayerLocal" type="application/x-gocastplayer" width="352" height="288"></object></li>');
+//    	$("#rtcobjects").append('<div id="div_GocastPlayerLocal"><object id="GocastPlayerLocal" type="application/x-gocastplayer" width="352" height="288"></object></div>');
     	
     	this.localplayer = $('#GocastPlayerLocal').get(0);
     	if (!this.localplayer)
@@ -279,7 +279,7 @@ var Callcast = {
     	this.non_muc_jid = "";
     	this.CallState = Callcast.CallStates.NONE;
     	// TODO - FIX - Need a truly UNIQUE adder here - not nick which can change and be replaced during the lifetime of the call.
-    	$("#rtcobjects").append('<li id="li_GocastPlayer'+nickname+'"><object id="GocastPlayer'+nickname+'" type="application/x-gocastplayer" width="'+Callcast.WIDTH+'" height="'+Callcast.HEIGHT+'"></object></li>');
+    	$("#rtcobjects").append('<div id="div_GocastPlayer'+nickname+'"><object id="GocastPlayer'+nickname+'" type="application/x-gocastplayer" width="'+Callcast.WIDTH+'" height="'+Callcast.HEIGHT+'"></object></div>');
     	
     	this.peer_connection = $('#GocastPlayer'+nickname).get(0);
     	if (!this.peer_connection)
@@ -417,7 +417,7 @@ var Callcast = {
     			// Make sure it has no spaces...
 				if (nick)
 					nick = nick.replace(/ /g, '');
-    			$("#li_GocastPlayer" + nick).remove();
+    			$("#div_GocastPlayer"+nick).remove();
     		}
     		else
     			console.log("Dropping FAILED. Cant find peer_connection (or self)");
@@ -567,6 +567,11 @@ var Callcast = {
       this.connection.send(chat);
     },
     
+    SendPrivateChat: function(msg, to) {
+      var chat = $msg({to: this.room + "/" + to.replace(/ /g,'\\20'), type: 'chat'}).c('body').t(msg);
+      this.connection.send(chat);
+    },
+    
     on_public_message: function(message) {
         var xmlns = $(message).attr('xmlns');
         var from = $(message).attr('from');
@@ -616,6 +621,32 @@ var Callcast = {
                 Callcast.add_message("<div class='notice'>*** " + body +
                                     "</div>");
             }
+        }
+
+        return true;    
+    },
+    
+    on_private_message: function(message) {
+        var xmlns = $(message).attr('xmlns');
+        var from = $(message).attr('from');
+        var room = Strophe.getBareJidFromJid(from);
+        var nick = Strophe.getResourceFromJid(from);
+        if (nick)
+        	nick = nick.replace(/\\20/g,' ');
+
+        // make sure message is from the right place
+        if (room === Callcast.room && xmlns !== Callcast.NS_CALLCAST) {
+            var body = $(message).children('body').text();
+
+			if (!body)
+				return true;	// Empty body - likely a signalling message.
+				
+			Callcast.add_message(
+				"<div class='message private'>" +
+					"@@ &lt;<span class='nick'>" +
+					"Private From " +
+					nick + "</span>&gt; <span class='body'>" +
+					body + "</span> @@</div>");
         }
 
         return true;    
@@ -1001,7 +1032,10 @@ var Callcast = {
 		// handle all GROUP CHATS within the MUC
     	this.connection.addHandler(Callcast.on_public_message, null, "message", "groupchat");
 	    
-		// handle all GROUP CHATS within the MUC
+		// handle all PRIVATE CHATS within the MUC
+    	this.connection.addHandler(Callcast.on_private_message, null, "message", "chat");
+	    
+		// handle all SYNC_LINKS within the MUC
     	this.connection.addHandler(Callcast.on_sync_link, Callcast.NS_CALLCAST, "message", "groupchat");
 	    
 	    // handle any inbound error stanzas (for now) via an alert message.
@@ -1009,7 +1043,6 @@ var Callcast = {
 
 	    // Kick things off by refreshing the rooms list.
     	this.RefreshRooms();
-    	this.SendLocalVideoToPeers();	// Update the video status locally upon signin.
     	
 //    	this.InitGocastPlayer();
 //	     	 this.InitGocastPlayer("stun.l.google.com", 19302, function(m){alert("Succ: "+m);},function(m){alert("Fail: "+m);});
@@ -1074,9 +1107,14 @@ $(document).ready(function () {
 	        title: 'Connect to XMPP',
 	        buttons: {
 	            "Connect": function () {
-	            	Callcast.connect($('#jid').val(), $('#password').val());
+	            	if ($('#jid').val() === "anonymous" && $('#password')==="")
+						Callcast.connect(Callcast.CALLCAST_XMPPSERVER, "");	// Anonymous login.
+					else
+		            	Callcast.connect($('#jid').val(), $('#password').val());
+		            	
 	                if ($('#nickname').val())
 	                	Callcast.SetNickname($('#nickname').val());
+	                	
 	                $('#password').val('');
 	                $(this).dialog('close');
 	            }
@@ -1304,6 +1342,7 @@ $(document).bind('connected', function () {
 	// Set "who am i" at the top
 //	$("#myjid").text("My JID: " + Callcast.connection.jid);
 	$('#version').text("Plug-in Version: " + (Callcast.GetVersion() || "None"));
+   	Callcast.SendLocalVideoToPeers($('#video_enabled').is(':checked'));	// Update the video status locally upon signin.
 	
 });
 
