@@ -41,7 +41,8 @@ public:
         registerMethod("deinitLocalResources", make_method(this, &GCPAPI::DeinitLocalResources));
         registerMethod("startLocalVideo", make_method(this, &GCPAPI::StartLocalVideo));
         registerMethod("stopLocalVideo", make_method(this, &GCPAPI::StopLocalVideo));
-
+        registerMethod("muteLocalVoice", make_method(this, &GCPAPI::MuteLocalVoice));
+        
         // APIs for webrtc peer connection
         registerMethod("addStream", make_method(this, &GCPAPI::AddStream));
         registerMethod("removeStream", make_method(this, &GCPAPI::RemoveStream));
@@ -138,6 +139,7 @@ public:
     FB::variant DeinitLocalResources();
     FB::variant StartLocalVideo();
     FB::variant StopLocalVideo();
+    FB::variant MuteLocalVoice(bool bEnable);
     FB::variant Init(const std::string& destJid);
     FB::variant Connect();
     FB::variant AddStream(const std::string& streamId, bool bVideo);

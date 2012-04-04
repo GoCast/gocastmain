@@ -98,10 +98,10 @@ namespace GoCast
             return false;
         }
         
-        CGContextSetInterpolationQuality(pContext, kCGInterpolationNone);
+        CGContextSetInterpolationQuality(pContext, kCGInterpolationDefault);
         CGContextTranslateCTM(pContext, 0, winHeight);
         CGContextScaleCTM(pContext, 1, -1);
-        CGContextDrawImage(pContext, CGRectMake(0, 0, m_width, m_height), cgImage);
+        CGContextDrawImage(pContext, CGRectMake(0, 0, winWidth, winHeight), cgImage);
         
         CGImageRelease(cgImage);
         CGColorSpaceRelease(colorSpace);

@@ -117,6 +117,13 @@ FB::variant GCPAPI::StopLocalVideo()
     return true;
 }
 
+FB::variant GCPAPI::MuteLocalVoice(bool bEnable)
+{
+    boost::mutex::scoped_lock lock_(GCP::deqMutex);
+    (GCP::wrtInstructions).push_back((bEnable? MUTE_LOCAL_VOICE: UNMUTE_LOCAL_VOICE));
+    return true;    
+}
+
 void GCPAPI::OnAddStream(const std::string& streamId, bool bVideo)
 {
     m_jsCallbackOnAddStream->InvokeAsync("", FB::variant_list_of(streamId)(bVideo));

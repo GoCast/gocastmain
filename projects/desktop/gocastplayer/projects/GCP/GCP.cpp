@@ -63,6 +63,14 @@ bool GCP::WebrtcResThreadWorker()
                 case STOP_LOCAL_VIDEO:
                     (GCP::StopLocalVideo)();
                     break;
+                    
+                case MUTE_LOCAL_VOICE:
+                    (GCP::pWebrtcMediaEngine)->SetMicMute(true);
+                    break;
+                    
+                case UNMUTE_LOCAL_VOICE:
+                    (GCP::pWebrtcMediaEngine)->SetMicMute(false);
+                    break;
             }
         }
     }

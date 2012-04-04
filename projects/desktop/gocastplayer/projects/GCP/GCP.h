@@ -28,6 +28,8 @@
 #define WEBRTC_RES_WORKER_QUIT 2
 #define START_LOCAL_VIDEO 3
 #define STOP_LOCAL_VIDEO 4
+#define MUTE_LOCAL_VOICE 5
+#define UNMUTE_LOCAL_VOICE 6
 
 #define GOCAST_AUDIO_OPTS (cricket::MediaEngineInterface::ECHO_CANCELLATION |\
                            cricket::MediaEngineInterface::NOISE_SUPPRESSION |\
