@@ -28,11 +28,15 @@
 #define WEBRTC_RES_WORKER_QUIT 2
 #define START_LOCAL_VIDEO 3
 #define STOP_LOCAL_VIDEO 4
+#define MUTE_LOCAL_VOICE 5
+#define UNMUTE_LOCAL_VOICE 6
 
 #define GOCAST_AUDIO_OPTS (cricket::MediaEngineInterface::ECHO_CANCELLATION |\
                            cricket::MediaEngineInterface::NOISE_SUPPRESSION |\
                            cricket::MediaEngineInterface::AUTO_GAIN_CONTROL)
 
+#define GOCAST_DEFAULT_RENDER_WIDTH  160
+#define GOCAST_DEFAULT_RENDER_HEIGHT 120
 
 FB_FORWARD_PTR(GCP)
 class GCP : public FB::PluginCore

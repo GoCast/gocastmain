@@ -63,6 +63,14 @@ bool GCP::WebrtcResThreadWorker()
                 case STOP_LOCAL_VIDEO:
                     (GCP::StopLocalVideo)();
                     break;
+                    
+                case MUTE_LOCAL_VOICE:
+                    (GCP::pWebrtcMediaEngine)->SetMicMute(true);
+                    break;
+                    
+                case UNMUTE_LOCAL_VOICE:
+                    (GCP::pWebrtcMediaEngine)->SetMicMute(false);
+                    break;
             }
         }
     }
@@ -306,7 +314,7 @@ bool GCP::onWindowAttached(FB::AttachedEvent *evt, FB::PluginWindow *pWin)
     {
         if(NULL == m_pRenderer)
         {
-            m_pRenderer = new GoCast::GCPVideoRenderer(pWin, pWin->getWindowWidth(), pWin->getWindowHeight());
+            m_pRenderer = new GoCast::GCPVideoRenderer(pWin, GOCAST_DEFAULT_RENDER_WIDTH, GOCAST_DEFAULT_RENDER_HEIGHT);
         }
     }
     
@@ -337,11 +345,11 @@ bool GCP::onWindowDetached(FB::DetachedEvent *evt, FB::PluginWindow *)
 
 bool GCP::onWindowRefresh(FB::RefreshEvent *evt, FB::PluginWindow *pWin)
 {
-    if(NULL != pWin)
+    if(NULL != evt && NULL != pWin)
     {
         if(NULL != m_pRenderer)
         {
-            m_pRenderer->OnWindowRefresh(evt, pWin);
+            m_pRenderer->OnWindowRefresh(evt);
         }
     }
     

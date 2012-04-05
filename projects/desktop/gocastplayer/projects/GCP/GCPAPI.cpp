@@ -117,6 +117,13 @@ FB::variant GCPAPI::StopLocalVideo()
     return true;
 }
 
+FB::variant GCPAPI::MuteLocalVoice(bool bEnable)
+{
+    boost::mutex::scoped_lock lock_(GCP::deqMutex);
+    (GCP::wrtInstructions).push_back((bEnable? MUTE_LOCAL_VOICE: UNMUTE_LOCAL_VOICE));
+    return true;    
+}
+
 void GCPAPI::OnAddStream(const std::string& streamId, bool bVideo)
 {
     m_jsCallbackOnAddStream->InvokeAsync("", FB::variant_list_of(streamId)(bVideo));
@@ -310,41 +317,3 @@ void GCPAPI::set_onReadyStateChangeCallback(const FB::JSObjectPtr& pJSCallback)
 {
     m_jsCallbackOnReadyStateChange = pJSCallback;
 }
-
-/*void GCPAPI::StartPollingReadyState()
-{
-    m_bStopPollingReadyState = false;
-    m_pollReadyStateThread = boost::thread(&GCPAPI::PollReadyState, this);
-}
-
-void GCPAPI::StopPollingReadyState()
-{
-    {
-        boost::mutex::scoped_lock lock_(m_pollReadyStateMutex);
-        m_bStopPollingReadyState = true;
-    }
-    
-    m_pollReadyStateThread.join();
-}
-
-void GCPAPI::PollReadyState()
-{
-    while(1)
-    {
-        boost::this_thread::sleep(boost::posix_time::milliseconds(100));
-        
-        boost::mutex::scoped_lock lock_(m_pollReadyStateMutex);
-        if(true == m_bStopPollingReadyState)
-        {
-            break;
-        }
-        else
-        {
-            if(m_curReadyState != m_pWebrtcPeerConn->GetReadyState())
-            {
-                m_curReadyState = m_pWebrtcPeerConn->GetReadyState();
-                OnReadyStateChange(m_curReadyState);
-            }
-        }
-    }
-}*/

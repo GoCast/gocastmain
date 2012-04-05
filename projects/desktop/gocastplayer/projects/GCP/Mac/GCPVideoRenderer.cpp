@@ -61,8 +61,7 @@ namespace GoCast
         return true;
     }
 
-    bool GCPVideoRenderer::OnWindowRefresh(FB::RefreshEvent* pEvt,
-                                           FB::PluginWindow* pWin)
+    bool GCPVideoRenderer::OnWindowRefresh(FB::RefreshEvent* pEvt)
     {
         static const int stride = m_width*4;    
         static const int frameBufferSize = m_height*stride;
@@ -98,10 +97,10 @@ namespace GoCast
             return false;
         }
         
-        CGContextSetInterpolationQuality(pContext, kCGInterpolationNone);
+        CGContextSetInterpolationQuality(pContext, kCGInterpolationDefault);
         CGContextTranslateCTM(pContext, 0, winHeight);
         CGContextScaleCTM(pContext, 1, -1);
-        CGContextDrawImage(pContext, CGRectMake(0, 0, m_width, m_height), cgImage);
+        CGContextDrawImage(pContext, CGRectMake(0, 0, winWidth, winHeight), cgImage);
         
         CGImageRelease(cgImage);
         CGColorSpaceRelease(colorSpace);
