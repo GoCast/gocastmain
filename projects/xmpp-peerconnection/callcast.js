@@ -69,6 +69,7 @@ var Callcast = {
 	AT_CALLCAST_ROOMS: "@gocastconference.video.gocast.it",
 	NS_CALLCAST: "urn:xmpp:callcast",
 	STUNSERVER: "video.gocast.it",
+	FEEDBACK_BOT: "feedback_bot_test1@video.gocast.it",
 	STUNSERVERPORT: 19302,
     connection: null,
     localplayer: null,
@@ -105,9 +106,47 @@ var Callcast = {
 		}, 10000);
     },
     
+    NoSpaces: function(str) {
+    	if (str)
+	    	return str.replace(/ /g, '\\20');
+	    else
+	    	return null;
+    },
+    
+    WithSpaces: function(str) {
+    	if (str)
+	    	return str.replace(/\\20/g, ' ');
+	    else
+	    	return null;
+    },
+    
     onErrorStanza: function(err) {
-    	alert("Error Stanza: " + $(err).children('error').text());
-    	console.log($(err));
+        var from = $(err).attr('from');
+        var nick = Strophe.getResourceFromJid(from);
+        if (nick)
+        	nick = nick.replace(/\\20/g,' ');
+        
+        // Need to cope with a few error stanzas.
+    	
+    	// #1 - If a user becomes unavailable and we're sending signaling / invitation messages, we'll get an error.
+    	if ($(err).find("recipient-unavailable").length > 0)
+    		console.log("INFO: Recipient " + nick + " became unavailable.");
+    	else if ($(err).find("conflict").length > 0)
+    	{
+    		alert("The nickname '" + nick + "' is already in use.\nPlease choose a different nickname.");
+    		this.disconnect();
+    	}
+    	else if ($(err).find("service-unavailable").length > 0)
+    	{
+    		alert("Could not enter room. Likely max # users reached in this room.");
+    		this.LeaveSession();
+    	}
+    	else
+    	{
+			alert("Unknown Error Stanza: " + $(err).children('error').text());
+			console.log($(err));
+    	}
+    	
     	return true;
     },
     
@@ -212,9 +251,9 @@ var Callcast = {
 	SendVideoPresence: function() {
 		var pres;
 		if (this.bUseVideo==true)
-			pres = $pres({to: this.roomjid + "/" + this.nick, video: 'on'}).c('x',{xmlns: 'http://jabber.org/protocol/muc'});
+			pres = $pres({to: this.roomjid + "/" + this.NoSpaces(this.nick), video: 'on'}).c('x',{xmlns: 'http://jabber.org/protocol/muc'});
 		else
-			pres = $pres({to: this.roomjid + "/" + this.nick, video: 'off'}).c('x',{xmlns: 'http://jabber.org/protocol/muc'});
+			pres = $pres({to: this.roomjid + "/" + this.NoSpaces(this.nick), video: 'off'}).c('x',{xmlns: 'http://jabber.org/protocol/muc'});
 			
 		console.log("SendVideoPresence: ", pres.toString());
 		this.connection.send(pres);
@@ -572,6 +611,11 @@ var Callcast = {
       this.connection.send(chat);
     },
     
+    SendFeedback: function(msg) {
+    	if (this.connection)
+		    this.connection.send($msg({to:this.FEEDBACK_BOT}).c('body').t(msg))
+    },
+    
     on_public_message: function(message) {
         var xmlns = $(message).attr('xmlns');
         var from = $(message).attr('from');
@@ -709,7 +753,7 @@ var Callcast = {
                 if ($(presence).attr('type') === 'error' &&
                     !Callcast.joined) {
                     // error joining room; reset app
-                	alert("Error joining room. Disconnecting.");
+                	console.log("PresHandler: Error joining room. Disconnecting.");
                     Callcast.disconnect();
                 }
                 else if (nick == Callcast.nick && $(presence).attr('type') == 'unavailable')
@@ -970,6 +1014,7 @@ var Callcast = {
     	clearInterval(this.keepAliveTimer);
     	
 		this.DropAllParticipants();
+		this.MuteLocalVoice(false);
 		
 		if (this.connection)
 		{
