@@ -88,6 +88,7 @@ public:
     
 public:
     static bool bLocalVideoRunning;
+    static int pluginInsts;
     static boost::thread webrtcResThread;
     static boost::mutex deqMutex;
     static std::deque<int> wrtInstructions;

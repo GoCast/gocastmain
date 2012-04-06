@@ -84,7 +84,6 @@ FB::variant GCPAPI::InitLocalResources(const std::string& stunIP,
         return true;        
     }
     
-
     (GCP::wrtInstructions).push_back(WEBRTC_RESOURCES_INIT);
     return true;
 }
@@ -211,7 +210,6 @@ FB::variant GCPAPI::Close()
     std::string logMsg = "Close(): ==> ";
     logMsg += (ret.convert_cast<bool>()?"successful":"failed"); 
     m_jsCallbackOnLogMessage->InvokeAsync("", FB::variant_list_of(logMsg));
-    //StopPollingReadyState();
     
     return ret;
 }
@@ -250,8 +248,6 @@ FB::variant GCPAPI::Init(const std::string& destJid)
         return ret;
     }
     
-    //m_curReadyState = m_pWebrtcPeerConn->GetReadyState();
-    //StartPollingReadyState();
     logMsg += "successful";
     m_jsCallbackOnLogMessage->InvokeAsync("", FB::variant_list_of(logMsg));
     
