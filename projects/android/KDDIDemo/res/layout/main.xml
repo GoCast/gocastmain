@@ -5,9 +5,15 @@
     android:orientation="vertical" >
 
     <SurfaceView
-        android:id="@+id/localView" 
-        android:layout_width="320dip"
-        android:layout_height="240dip" />
+        android:id="@+id/remoteView0" 
+        android:layout_width="176dip"
+        android:layout_height="144dip" />
+
+    <SurfaceView
+        android:id="@+id/remoteView1"
+        android:layout_width="176dip"
+        android:layout_height="144dip"
+        android:layout_below="@+id/remoteView0" />
     
     <!--<TextView
         android:id="@+id/dest_ip_label"

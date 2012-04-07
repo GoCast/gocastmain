@@ -13,7 +13,7 @@ extern "C" {
  * Signature: ()Z
  */
 JNIEXPORT jboolean JNICALL Java_com_gocast_kddidemo_KDDIDemoActivity_init
-  (JNIEnv *, jclass);
+  (JNIEnv *, jobject);
 
 /*
  * Class:     com_gocast_kddidemo_KDDIDemoActivity
@@ -21,38 +21,22 @@ JNIEXPORT jboolean JNICALL Java_com_gocast_kddidemo_KDDIDemoActivity_init
  * Signature: ()Z
  */
 JNIEXPORT jboolean JNICALL Java_com_gocast_kddidemo_KDDIDemoActivity_deinit
-  (JNIEnv *, jclass);
-
-/*
- * Class:     com_gocast_kddidemo_KDDIDemoActivity
- * Method:    connect
- * Signature: (Ljava/lang/String;II)Z
- */
-JNIEXPORT jboolean JNICALL Java_com_gocast_kddidemo_KDDIDemoActivity_connect
-  (JNIEnv *, jobject, jstring, jint, jint);
-
-/*
- * Class:     com_gocast_kddidemo_KDDIDemoActivity
- * Method:    disconnect
- * Signature: ()Z
- */
-JNIEXPORT jboolean JNICALL Java_com_gocast_kddidemo_KDDIDemoActivity_disconnect
   (JNIEnv *, jobject);
 
 /*
  * Class:     com_gocast_kddidemo_KDDIDemoActivity
- * Method:    localRenderTestStart
- * Signature: (Landroid/view/SurfaceView;)Z
+ * Method:    start
+ * Signature: (Ljava/lang/String;Landroid/view/SurfaceView;)Z
  */
-JNIEXPORT jboolean JNICALL Java_com_gocast_kddidemo_KDDIDemoActivity_localRenderTestStart
-  (JNIEnv *, jobject, jobject);
+JNIEXPORT jboolean JNICALL Java_com_gocast_kddidemo_KDDIDemoActivity_start
+  (JNIEnv *, jobject, jstring, jobject);
 
 /*
  * Class:     com_gocast_kddidemo_KDDIDemoActivity
- * Method:    localRenderTestStop
+ * Method:    stop
  * Signature: ()Z
  */
-JNIEXPORT jboolean JNICALL Java_com_gocast_kddidemo_KDDIDemoActivity_localRenderTestStop
+JNIEXPORT jboolean JNICALL Java_com_gocast_kddidemo_KDDIDemoActivity_stop
   (JNIEnv *, jobject);
 
 #ifdef __cplusplus

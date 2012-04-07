@@ -2,6 +2,10 @@ package com.gocast.kddidemo;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.os.AsyncTask;
+import android.util.Log;
+import android.text.format.Formatter;
+import android.net.wifi.WifiManager;
 import android.view.SurfaceView;
 
 public class KDDIDemoActivity extends Activity {
@@ -11,50 +15,53 @@ public class KDDIDemoActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         
-        /*Button connectButton = (Button) findViewById(R.id.connect_button);
-        connectButton.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				EditText destIpInput = (EditText) findViewById(R.id.dest_ip);
-				EditText destPortInput = (EditText) findViewById(R.id.dest_port);
-				EditText localPortInput = (EditText) findViewById(R.id.local_port);
-				
-				connect(destIpInput.getText().toString(),
-						Integer.parseInt(destPortInput.getText().toString()),
-						Integer.parseInt(localPortInput.getText().toString()));
-			}
-		});
-        
-        Button disconnectButton = (Button) findViewById(R.id.disconnect_button);
-        disconnectButton.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				disconnect();
-			}
-		});*/
-        
-        localRenderTestStart((SurfaceView) findViewById(R.id.localView));
+        new AsyncStartTask().execute();
     }
     
     @Override
     public void onStop() {
     	super.onStop();
-    	//disconnect();
-    	//KDDIDemoActivity.deinit();
-    	localRenderTestStop();
+    	stop();
+    	deinit();
     	finish();
     }
     
-    public static native boolean init();
-    public static native boolean deinit();
-    public native boolean connect(final String destIp, final int destPort, final int localPort);
-    public native boolean disconnect();
-    public native boolean localRenderTestStart(SurfaceView localView);
-    public native boolean localRenderTestStop();
+    public native boolean init();
+    public native boolean deinit();
+    public native boolean start(final String localIp, SurfaceView remoteView);
+    public native boolean stop();
+
+    private String localIp;
+    
+    private class AsyncStartTask extends AsyncTask<Void, Void, Void> {
+    	protected Void doInBackground(Void... arg) {
+    		localIp = getLocalIp();
+    		return null;
+    	}
+    	
+    	protected void onPostExecute(Void result) {
+    		init();
+    		start(localIp, (SurfaceView) findViewById(R.id.remoteView0));
+    	}
+    }
+    
+    private String getLocalIp() {
+    	String localIp = "";
+    	try {
+    		WifiManager wifi = (WifiManager) getSystemService(WIFI_SERVICE);
+    		localIp = Formatter.formatIpAddress(wifi.getConnectionInfo().getIpAddress());
+    		Log.d("KDDIDEMO-SDK", localIp);
+    	} catch(Exception e) {
+    		Log.e("KDDIDEMO-SDK", e.toString());
+    	}
+    	
+    	return localIp;
+    }
     
     static {
     	System.loadLibrary("webrtc_audio_preprocessing");
     	System.loadLibrary("webrtc");
     	System.loadLibrary("android-kddidemo");
-    	//init();
     }
 
 }
