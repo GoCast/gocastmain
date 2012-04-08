@@ -22,6 +22,8 @@ namespace GoCast
                            float zIdx = 0.0,
                            const bool bAddVideo = false);
         bool DeleteConnection(const std::string destIp);
+        bool ActivateLocalRender(void* pRenderWin, float zIdx);
+        bool RemoveLocalRender();
         
     private:
         WebrtcVoeInterface* m_pVoeInterface;

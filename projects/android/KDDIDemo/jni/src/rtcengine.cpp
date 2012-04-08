@@ -109,11 +109,33 @@ namespace GoCast
         
         if(false == m_pVoeInterface->RemoveChannel(m_voiceConnections[destIp]))
         {
-            GOCAST_LOG_ERROR("KDDIDEMO-NDK", "m_pVoeInterface->RemoveChannel() error");
+            GOCAST_LOG_ERROR("KDDIDEMO-NDK", "m_pVieInterface->RemoveChannel() error");
             return false;
         }
         
         m_voiceConnections.erase(destIp);
+        return true;
+    }
+    
+    bool RtcEngine::ActivateLocalRender(void* pRenderWin, float zIdx)
+    {
+        if(false == m_pVieInterface->ActivateLocalRender(pRenderWin, zIdx))
+        {
+            GOCAST_LOG_ERROR("KDDIDEMO-NDK", "m_pVieInterface->ActivateLocalRender() error");
+            return false;
+        }
+        
+        return true;
+    }
+    
+    bool RtcEngine::RemoveLocalRender()
+    {
+        if(false == m_pVieInterface->RemoveLocalRender())
+        {
+            GOCAST_LOG_ERROR("KDDIDEMO-NDK", "m_pVieInterface->RemoveLocalRender() error");
+            return false;
+        }
+
         return true;
     }
 }

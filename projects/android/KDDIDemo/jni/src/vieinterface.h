@@ -2,6 +2,7 @@
 #define GOCASTMAIN_KDDIDEMO_VIEINTERFACE_H_
 
 #include <string>
+#include <map>
 #include "vie_base.h"
 #include "vie_codec.h"
 #include "vie_capture.h"
@@ -30,6 +31,8 @@ namespace GoCast
                              const std::string destIp,
                              const int destPort);
         bool RemoveChannel(const int channel);
+        bool ActivateLocalRender(void* pRenderWin, float zIdx);
+        bool RemoveLocalRender();
         
     private:
         webrtc::ViEBase* Base(); 
@@ -42,14 +45,14 @@ namespace GoCast
     private:
         bool AllocDefaultCaptureDevice();
         bool DeallocDefaultCaptureDevice();
-        bool AllocRenderModule(void* pWin, float zIdx);
-        bool DeallocRenderModule();
+        bool AllocRenderModule(int channel, void* pWin);
+        bool DeallocRenderModule(int channel);
         
     private:
         int m_captureId;
         webrtc::VideoEngine* m_pVie;
         webrtc::VideoCaptureModule* m_pCapModule;
-        webrtc::VideoRender* m_pRenderModule;
+        std::map<int, webrtc::VideoRender*> m_renderModules;
     };
 }
 

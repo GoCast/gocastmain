@@ -1,8 +1,10 @@
+#include <sstream>
 #include "rtcengine.h"
 #include "logging.h"
 #include "com_gocast_kddidemo_KDDIDemoActivity.h"
 
-#define ANDROID_DEVICES {"192.168.1.52", "192.168.1.58"}
+#define NUM_ANDROID_DEVICES 3
+#define ANDROID_DEVICES {"192.168.20.101", "192.168.20.104", "192.168.20.102"}
 #define ANDROID_CONNECTION(ip1, ip2) ((ip1) + "+" + (ip2))
 
 class Globals
@@ -11,7 +13,7 @@ public:
     static JavaVM* pJVM;
     static JNIEnv* pEnv;
     static GoCast::RtcEngine* pRtcEngine;
-    static std::string peers[2];
+    static std::string peers[NUM_ANDROID_DEVICES];
     static std::string localIp;
     static std::map<std::string, int> voiceConnectionPorts;
     static std::map<std::string, int> videoConnectionPorts;
@@ -20,7 +22,7 @@ public:
 JavaVM* Globals::pJVM = NULL;
 JNIEnv* Globals::pEnv = NULL;
 GoCast::RtcEngine* Globals::pRtcEngine = NULL;
-std::string (Globals::peers)[2] = ANDROID_DEVICES;
+std::string (Globals::peers)[NUM_ANDROID_DEVICES] = ANDROID_DEVICES;
 std::string Globals::localIp = "";
 std::map<std::string, int> Globals::voiceConnectionPorts;
 std::map<std::string, int> Globals::videoConnectionPorts;
@@ -68,25 +70,49 @@ JNIEXPORT jboolean JNICALL Java_com_gocast_kddidemo_KDDIDemoActivity_init
         return false;
     }
     
-    (Globals::voiceConnectionPorts)[
-        ANDROID_CONNECTION((Globals::peers)[0],
-                           (Globals::peers)[1])
-    ] = 2000;
-
-    (Globals::voiceConnectionPorts)[
-        ANDROID_CONNECTION((Globals::peers)[1],
-                           (Globals::peers)[0])
-    ] = 2000;
+    int voicePort = 2000;
+    int videoPort = 3000;
     
-    (Globals::videoConnectionPorts)[
-        ANDROID_CONNECTION((Globals::peers)[0],
-                           (Globals::peers)[1])
-    ] = 3000;
+    for(int i=0; i<NUM_ANDROID_DEVICES; i++)
+    {
+        for(int j=0; j<NUM_ANDROID_DEVICES; j++)
+        {
+            if(i < j)
+            {
+                (Globals::voiceConnectionPorts)[
+                    ANDROID_CONNECTION((Globals::peers)[i],
+                                       (Globals::peers)[j])
+                ] = voicePort;
+                voicePort += 2;
 
-    (Globals::videoConnectionPorts)[
-        ANDROID_CONNECTION((Globals::peers)[1],
-                           (Globals::peers)[0])
-    ] = 3000;
+                
+                
+                (Globals::videoConnectionPorts)[
+                    ANDROID_CONNECTION((Globals::peers)[i],
+                                       (Globals::peers)[j])
+                ] = videoPort;
+                videoPort += 2;
+            }
+            else if(i > j)
+            {
+                (Globals::voiceConnectionPorts)[
+                    ANDROID_CONNECTION((Globals::peers)[i],
+                                       (Globals::peers)[j])
+                ] = (Globals::voiceConnectionPorts)[
+                        ANDROID_CONNECTION((Globals::peers)[j],
+                                           (Globals::peers)[i])
+                    ];
+
+                (Globals::videoConnectionPorts)[
+                    ANDROID_CONNECTION((Globals::peers)[i],
+                                       (Globals::peers)[j])
+                ] = (Globals::videoConnectionPorts)[
+                        ANDROID_CONNECTION((Globals::peers)[j],
+                                           (Globals::peers)[i])
+                    ];
+            }
+        }
+    }
 
     return true;
 }
@@ -114,13 +140,22 @@ JNIEXPORT jboolean JNICALL Java_com_gocast_kddidemo_KDDIDemoActivity_deinit
 /*
  * Class:     com_gocast_kddidemo_KDDIDemoActivity
  * Method:    start
- * Signature: (Ljava/lang/String;Landroid/view/SurfaceView;)Z
+ * Signature: (Ljava/lang/String;[Landroid/view/SurfaceView;)Z
  */
 JNIEXPORT jboolean JNICALL Java_com_gocast_kddidemo_KDDIDemoActivity_start
-(JNIEnv *, jobject context, jstring jLocalIp, jobject remoteView)
-{                                                   
+(JNIEnv *, jobject context, jstring jLocalIp, jobjectArray views)
+{
+    int viewIdx = 0;
+    
+    jobject view = (Globals::pEnv)->GetObjectArrayElement(views, viewIdx++);
+    if(false == (Globals::pRtcEngine)->ActivateLocalRender(view, 0))
+    {
+        GOCAST_LOG_ERROR("KDDIDEMO-NDK", "pRtcEngine->ActivateLocalRender failed");
+        return false;
+    }
+    
     Globals::localIp = (Globals::pEnv)->GetStringUTFChars(jLocalIp, NULL);
-    for(int i=0; i<2; i++)
+    for(int i=0; i<NUM_ANDROID_DEVICES; i++)
     {
         GOCAST_LOG_DEBUG("KDDIDEMO-NDK", (Globals::peers)[i].c_str());
         
@@ -137,10 +172,11 @@ JNIEXPORT jboolean JNICALL Java_com_gocast_kddidemo_KDDIDemoActivity_start
             int recvPorts[2] = {(Globals::voiceConnectionPorts)[revConn],
                                 (Globals::videoConnectionPorts)[revConn]};
             
+            jobject view = (Globals::pEnv)->GetObjectArrayElement(views, viewIdx++);
             if(false == (Globals::pRtcEngine)->NewConnection((Globals::peers)[i],
                                                              destPorts,
                                                              recvPorts,
-                                                             remoteView,
+                                                             view,
                                                              0,
                                                              true))
             {
@@ -170,6 +206,12 @@ JNIEXPORT jboolean JNICALL Java_com_gocast_kddidemo_KDDIDemoActivity_stop
                 GOCAST_LOG_ERROR("KDDIDEMO-NDK", "pRtcEngine->DeleteConnection() error");
                 return false;
             }
+        }
+        
+        if(false == (Globals::pRtcEngine)->RemoveLocalRender())
+        {
+            GOCAST_LOG_ERROR("KDDIDEMO-NDK", "pRtcEngine->RemoveLocalRender() error");
+            return false;
         }
     }
     

@@ -26,10 +26,10 @@ JNIEXPORT jboolean JNICALL Java_com_gocast_kddidemo_KDDIDemoActivity_deinit
 /*
  * Class:     com_gocast_kddidemo_KDDIDemoActivity
  * Method:    start
- * Signature: (Ljava/lang/String;Landroid/view/SurfaceView;)Z
+ * Signature: (Ljava/lang/String;[Landroid/view/SurfaceView;)Z
  */
 JNIEXPORT jboolean JNICALL Java_com_gocast_kddidemo_KDDIDemoActivity_start
-  (JNIEnv *, jobject, jstring, jobject);
+  (JNIEnv *, jobject, jstring, jobjectArray);
 
 /*
  * Class:     com_gocast_kddidemo_KDDIDemoActivity

@@ -28,7 +28,7 @@ public class KDDIDemoActivity extends Activity {
     
     public native boolean init();
     public native boolean deinit();
-    public native boolean start(final String localIp, SurfaceView remoteView);
+    public native boolean start(final String localIp, SurfaceView [] views);
     public native boolean stop();
 
     private String localIp;
@@ -41,7 +41,13 @@ public class KDDIDemoActivity extends Activity {
     	
     	protected void onPostExecute(Void result) {
     		init();
-    		start(localIp, (SurfaceView) findViewById(R.id.remoteView0));
+    		
+    		SurfaceView [] views = new SurfaceView[3];
+    		views[0] = (SurfaceView) findViewById(R.id.localView);
+    		views[1] = (SurfaceView) findViewById(R.id.remoteView0);
+    		views[2] = (SurfaceView) findViewById(R.id.remoteView1);
+
+    		start(localIp, views);
     	}
     }
     

@@ -9,7 +9,6 @@ namespace GoCast
     : m_captureId(-1)
     , m_pVie(webrtc::VideoEngine::Create())
     , m_pCapModule(NULL)
-    , m_pRenderModule(NULL)
     {
     }
     
@@ -63,12 +62,6 @@ namespace GoCast
             GOCAST_LOG_ERROR("KDDIDEMO-NDK", "DeallocDefaultCaptureDevice() failed");
             return false;
         }
-        
-        /*if(0 != Base()->Release())
-        {
-            GOCAST_LOG_ERROR("KDDIDEMO-NDK", "Base()->Release() failed");
-            return false;
-        }*/
         
         return true;
     }
@@ -149,7 +142,7 @@ namespace GoCast
             return false;
         }
         
-        if(false == AllocRenderModule(pRenderWin, zIdx))
+        if(false == AllocRenderModule(channel, pRenderWin))
         {
             GOCAST_LOG_ERROR("KDDIDEMO-NDK", "AllocRenderModule() failed");
             return false;
@@ -209,7 +202,7 @@ namespace GoCast
             return false;
         }
         
-        if(false == DeallocRenderModule())
+        if(false == DeallocRenderModule(channel))
         {
             GOCAST_LOG_ERROR("KDDIDEMO-NDK", "DeallocRenderModule() failed");
             return false;
@@ -239,6 +232,52 @@ namespace GoCast
             return false;
         }
 
+        return true;
+    }
+    
+    bool WebrtcVieInterface::ActivateLocalRender(void* pRenderWin, float zIdx)
+    {
+        if(false == AllocRenderModule(m_captureId, pRenderWin))
+        {
+            GOCAST_LOG_ERROR("KDDIDEMO-NDK", "AllocRenderModule(local) failed");
+            return false;
+        }
+        
+        if(0 != Render()->AddRenderer(m_captureId, pRenderWin, (int) zIdx, 0.0, 0.0, 1.0, 1.0))
+        {
+            GOCAST_LOG_ERROR("KDDIDEMO-NDK", "Render()->AddRenderer(local) failed");
+            return false;
+        }
+        
+        if(0 != Render()->StartRender(m_captureId))
+        {
+            GOCAST_LOG_ERROR("KDDIDEMO-NDK", "Render()->StartRender(local) failed");
+            return false;
+        }
+        
+        return true;
+    }
+    
+    bool WebrtcVieInterface::RemoveLocalRender()
+    {
+        if(0 != Render()->StopRender(m_captureId))
+        {
+            GOCAST_LOG_ERROR("KDDIDEMO-NDK", "Render()->StopRender(local) failed");
+            return false;
+        }
+        
+        if(0 != Render()->RemoveRenderer(m_captureId))
+        {
+            GOCAST_LOG_ERROR("KDDIDEMO-NDK", "Render()->RemoveRenderer(local) failed");
+            return false;
+        }
+        
+        if(false == DeallocRenderModule(m_captureId))
+        {
+            GOCAST_LOG_ERROR("KDDIDEMO-NDK", "DeallocRenderModule(local) failed");
+            return false;
+        }
+     
         return true;
     }
     
@@ -333,19 +372,22 @@ namespace GoCast
         return true;
     }
     
-    bool WebrtcVieInterface::AllocRenderModule(void* pWin, float zIdx)
+    bool WebrtcVieInterface::AllocRenderModule(int channel, void* pWin)
     {
-        m_pRenderModule = webrtc::VideoRender::CreateVideoRender(4561,
-                                                                 pWin, 
-                                                                 false, 
-                                                                 webrtc::kRenderDefault);
-        if(NULL == m_pRenderModule)
+        static int renderModuleId = 4561;
+        
+        m_renderModules[channel] = webrtc::VideoRender::CreateVideoRender(renderModuleId++,
+                                                                         pWin, 
+                                                                         false, 
+                                                                         webrtc::kRenderDefault);
+        if(NULL == m_renderModules[channel])
         {
             GOCAST_LOG_ERROR("KDDIDEMO-NDK", "VideoRender::CreateVideoRender() failed");
+            m_renderModules.erase(channel);
             return false;
         }
 
-        if(0 != Render()->RegisterVideoRenderModule(*m_pRenderModule))
+        if(0 != Render()->RegisterVideoRenderModule(*m_renderModules[channel]))
         {
             GOCAST_LOG_ERROR("KDDIDEMO-NDK", "Render()->RegisterVideoRenderModule() failed");
             return false;
@@ -354,16 +396,16 @@ namespace GoCast
         return true;
     }
     
-    bool WebrtcVieInterface::DeallocRenderModule()
+    bool WebrtcVieInterface::DeallocRenderModule(int channel)
     {
-        if(0 != Render()->DeRegisterVideoRenderModule(*m_pRenderModule))
+        if(0 != Render()->DeRegisterVideoRenderModule(*m_renderModules[channel]))
         {
             GOCAST_LOG_ERROR("KDDIDEMO-NDK", "Render()->DeRegisterVideoRenderModule() failed");
             return false;
         }
 
-        webrtc::VideoRender::DestroyVideoRender(m_pRenderModule);
-        m_pRenderModule = NULL;
+        webrtc::VideoRender::DestroyVideoRender(m_renderModules[channel]);
+        m_renderModules.erase(channel);
         return true;
     }
 }
