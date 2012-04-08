@@ -1,4 +1,3 @@
-#include <sstream>
 #include "rtcengine.h"
 #include "logging.h"
 #include "com_gocast_kddidemo_KDDIDemoActivity.h"
@@ -197,7 +196,7 @@ JNIEXPORT jboolean JNICALL Java_com_gocast_kddidemo_KDDIDemoActivity_start
 JNIEXPORT jboolean JNICALL Java_com_gocast_kddidemo_KDDIDemoActivity_stop
 (JNIEnv *, jobject)
 {
-    for(int i=0; i<2; i++)
+    for(int i=0; i<NUM_ANDROID_DEVICES; i++)
     {
         if(Globals::localIp != (Globals::peers)[i])
         {
