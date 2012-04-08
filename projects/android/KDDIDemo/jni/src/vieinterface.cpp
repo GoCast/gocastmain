@@ -1,3 +1,4 @@
+#include <sstream>
 #include "logging.h"
 #include "video_render.h"
 #include "vieinterface.h"
@@ -262,7 +263,9 @@ namespace GoCast
     {
         if(0 != Render()->StopRender(m_captureId))
         {
-            GOCAST_LOG_ERROR("KDDIDEMO-NDK", "Render()->StopRender(local) failed");
+            std::stringstream sstrm;
+            sstrm << "Render()->StopRender(local) failed: " << Base()->LastError();
+            GOCAST_LOG_ERROR("KDDIDEMO-NDK", sstrm.str().c_str());
             return false;
         }
         
