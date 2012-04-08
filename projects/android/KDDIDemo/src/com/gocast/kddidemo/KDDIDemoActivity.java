@@ -60,8 +60,7 @@ public class KDDIDemoActivity extends Activity {
     		for(int i=0; i<3; i++) {
     			if(!localIp.equals(participantIps[i])) {
     				Log.d("KDDIDEMO-SDK", participantIps[i]);
-    				viewLabels[viewLabelIdx].setText(viewLabelValues[i]);
-    				viewLabelIdx++;
+    				viewLabels[viewLabelIdx++].setText(viewLabelValues[i]);
     			}
     		}
     		
