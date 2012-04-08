@@ -7,6 +7,7 @@ import android.util.Log;
 import android.text.format.Formatter;
 import android.net.wifi.WifiManager;
 import android.view.SurfaceView;
+import android.widget.TextView;
 
 public class KDDIDemoActivity extends Activity {
     /** Called when the activity is first created. */
@@ -40,13 +41,37 @@ public class KDDIDemoActivity extends Activity {
     	}
     	
     	protected void onPostExecute(Void result) {
-    		init();
+    		String [] viewLabelValues = new String[3];
+    		viewLabelValues[0] = "moto xoom";
+    		viewLabelValues[1] = "acer iconia";
+    		viewLabelValues[2] = "google nexus";
+    		
+    		String [] participantIps = new String[3];
+    		participantIps[0] = "192.168.20.101";
+    		participantIps[1] = "192.168.20.104";
+    		participantIps[2] = "192.168.20.102";
+    		
+    		TextView [] viewLabels = new TextView[3];
+    		viewLabels[0] = (TextView) findViewById(R.id.localViewLabel);
+    		viewLabels[1] = (TextView) findViewById(R.id.remoteViewLabel0);
+    		viewLabels[2] = (TextView) findViewById(R.id.remoteViewLabel1);    		
+    		
+    		int viewLabelIdx = 1;
+    		for(int i=0; i<3; i++) {
+    			if(!localIp.equals(participantIps[i])) {
+    				Log.d("KDDIDEMO-SDK", participantIps[i]);
+    				viewLabels[viewLabelIdx].setText(viewLabelValues[i]);
+    				viewLabelIdx++;
+    			}
+    		}
     		
     		SurfaceView [] views = new SurfaceView[3];
     		views[0] = (SurfaceView) findViewById(R.id.localView);
     		views[1] = (SurfaceView) findViewById(R.id.remoteView0);
     		views[2] = (SurfaceView) findViewById(R.id.remoteView1);
-
+    		
+    		
+    		init();
     		start(localIp, views);
     	}
     }

@@ -13,25 +13,38 @@
         android:id="@+id/remoteView0" 
         android:layout_width="176dip"
         android:layout_height="144dip"
-        android:layout_below="@+id/localView" />
+        android:layout_toRightOf="@+id/localView" />
 
     <SurfaceView
         android:id="@+id/remoteView1"
         android:layout_width="176dip"
         android:layout_height="144dip"
-        android:layout_below="@+id/remoteView0" />
+        android:layout_toRightOf="@+id/remoteView0" />
     
-    <!--<TextView
-        android:id="@+id/dest_ip_label"
-        android:layout_width="fill_parent"
+    <TextView
+        android:id="@+id/localViewLabel"
+        android:layout_width="176dip"
         android:layout_height="wrap_content"
-        android:text="@string/dest_ip_label" />
+        android:layout_below="@+id/localView"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="@string/localViewName" />
 
     <TextView
-        android:id="@+id/local_port_label"
-        android:layout_width="fill_parent"
+        android:id="@+id/remoteViewLabel0"
+        android:layout_width="176dip"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/dest_port"
-        android:text="@string/local_port_label" />-->
+        android:layout_below="@+id/remoteView0"
+        android:layout_toRightOf="@+id/localViewLabel"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="@string/localViewName" />
+    
+    <TextView
+        android:id="@+id/remoteViewLabel1"
+        android:layout_width="176dip"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/remoteView1"
+        android:layout_toRightOf="@+id/remoteViewLabel0"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="@string/localViewName" />
             
 </RelativeLayout>
