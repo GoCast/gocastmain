@@ -12,9 +12,10 @@ LOCAL_MODULE_TAGS := optional
 
 LOCAL_CPP_EXTENSION := .cpp
 LOCAL_SRC_FILES := \
-    src/voetest.cpp \
-    src/voemanager.cpp \
-    src/viemanager.cpp
+    src/kddidemo.cpp \
+    src/rtcengine.cpp \
+    src/voeinterface.cpp \
+    src/vieinterface.cpp
 
 LOCAL_CFLAGS := \
     '-DPOSIX' \

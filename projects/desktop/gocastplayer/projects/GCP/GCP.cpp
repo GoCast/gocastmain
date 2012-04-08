@@ -11,12 +11,14 @@
 
 #include "GCP.h"
 
+#include <iostream>
 #include "variant_list.h"
 #include "talk/session/phone/webrtcvoiceengine.h"
 #include "talk/session/phone/webrtcvideoengine.h"
 #include "talk/p2p/client/basicportallocator.h"
 
 bool GCP::bLocalVideoRunning = false;
+int GCP::pluginInsts = 0;
 boost::thread GCP::webrtcResThread;
 boost::mutex GCP::deqMutex;
 std::deque<int> GCP::wrtInstructions;
@@ -35,14 +37,20 @@ bool GCP::WebrtcResThreadWorker()
 {
     while(1)
     {
-        boost::this_thread::sleep(boost::posix_time::seconds(1));
+        int instruction = -1;
+        boost::this_thread::sleep(boost::posix_time::milliseconds(200));
         
-        boost::mutex::scoped_lock lock_(GCP::deqMutex);
-        if(false == (GCP::wrtInstructions).empty())        
         {
-            int instruction = (GCP::wrtInstructions).front();
-            (GCP::wrtInstructions).pop_front();
+            boost::mutex::scoped_lock lock_(GCP::deqMutex);
+            if(false == (GCP::wrtInstructions).empty())
+            {
+                instruction = (GCP::wrtInstructions).front();
+                (GCP::wrtInstructions).pop_front();
+            }
+        }
             
+        if(WEBRTC_RESOURCES_INIT <= instruction)        
+        {            
             switch(instruction)
             {
                 case WEBRTC_RESOURCES_INIT:
@@ -65,11 +73,19 @@ bool GCP::WebrtcResThreadWorker()
                     break;
                     
                 case MUTE_LOCAL_VOICE:
-                    (GCP::pWebrtcMediaEngine)->SetMicMute(true);
+                    if(NULL != (GCP::pWebrtcMediaEngine))
+                    {
+                        (GCP::pWebrtcMediaEngine)->SetMicMute(true);
+                    }
+                    
                     break;
                     
                 case UNMUTE_LOCAL_VOICE:
-                    (GCP::pWebrtcMediaEngine)->SetMicMute(false);
+                    if(NULL != (GCP::pWebrtcMediaEngine))
+                    {
+                        (GCP::pWebrtcMediaEngine)->SetMicMute(false);
+                    }
+                    
                     break;
             }
         }
@@ -91,6 +107,8 @@ bool GCP::WebrtcResourcesInit()
             (GCP::failureCallback)->InvokeAsync("", FB::variant_list_of("Worker thread start error"));
             return false;
         }
+        
+        std::cout << "Inited Jingle Worker Thhread" << std::endl;
     }
     
     // Instantiate webrtc media engine
@@ -99,12 +117,17 @@ bool GCP::WebrtcResourcesInit()
         GCP::pWebrtcMediaEngine = new cricket::CompositeMediaEngine
         <cricket::WebRtcVoiceEngine,
         cricket::WebRtcVideoEngine>();
+        
+        std::cout << "Inited Media Engine" << std::endl;
     }
     
     // Instantiate webrtc device manager
     if(NULL == GCP::pWebrtcDeviceManager)
     {
         GCP::pWebrtcDeviceManager = new cricket::DeviceManager();
+        
+        std::cout << "Inited Device Manager" << std::endl;
+
     }
     
     // Instantiate peer connection factory
@@ -130,7 +153,9 @@ bool GCP::WebrtcResourcesInit()
             (GCP::WebrtcResourcesDeinit)();
             (GCP::failureCallback)->InvokeAsync("", FB::variant_list_of("PeerConnectionFactory Init() fail"));
             return false;
-        }        
+        }
+        
+        std::cout << "Inited PeerConnection Factory" << std::endl;
     }
     
     //SetVideoOptions here
@@ -143,16 +168,22 @@ bool GCP::WebrtcResourcesInit()
     if(false == (GCP::pWebrtcMediaEngine)->SetVideoCaptureDevice(&camDevice))
     {
         return false;
-    }        
+    }      
 
-    (GCP::pWebrtcMediaEngine)->SetVideoCapture(false);
     (GCP::successCallback)->InvokeAsync("", FB::variant_list_of("Init success"));
     return true;
     
 }
 
 bool GCP::WebrtcResourcesDeinit()
-{    
+{
+    std::cout << "Number of instances left: " << (GCP::pluginInsts) << std::endl; 
+    if(1 < (GCP::pluginInsts))
+    {
+        std::cout << "Ignoring deinit >1 instances left" << std::endl;
+        return true;
+    }
+    
     if(NULL != (GCP::pWebrtcPeerConnFactory).get())
     {
         (GCP::pWebrtcPeerConnFactory).reset();
@@ -177,18 +208,42 @@ bool GCP::WebrtcResourcesDeinit()
 }
 
 bool GCP::StartLocalVideo()
-{    
-    (GCP::pWebrtcMediaEngine)->SetVideoCapture(true);    
-    (GCP::pWebrtcMediaEngine)->SetLocalRenderer(GCP::pLocalRenderer);
-    GCP::bLocalVideoRunning = true;
+{
+    if(NULL == (GCP::pWebrtcMediaEngine))
+    {
+        std::cout << "GCP: MediaEngine Null" << std::endl;
+        return false;
+    }
+    
+    if(false == (GCP::bLocalVideoRunning))
+    {
+        GCP::bLocalVideoRunning = true;
+        (GCP::pWebrtcMediaEngine)->SetVideoCapture(true);
+        
+        if(NULL != (GCP::pLocalRenderer))
+        {
+            (GCP::pWebrtcMediaEngine)->SetLocalRenderer(GCP::pLocalRenderer);
+        }        
+    }
+    
     return true;
 }
 
 bool GCP::StopLocalVideo()
 {
-    (GCP::pWebrtcMediaEngine)->SetVideoCapture(false);
-    (GCP::pWebrtcMediaEngine)->SetLocalRenderer(NULL);
-    GCP::bLocalVideoRunning = false;
+    if(NULL == (GCP::pWebrtcMediaEngine))
+    {
+        std::cout << "GCP: MediaEngine Null" << std::endl;
+        return false;
+    }
+
+    if(true == (GCP::bLocalVideoRunning))
+    {
+        GCP::bLocalVideoRunning = false;
+        (GCP::pWebrtcMediaEngine)->SetLocalRenderer(NULL);
+        (GCP::pWebrtcMediaEngine)->SetVideoCapture(false);
+    }
+    
     return true;
 }
 
@@ -218,18 +273,7 @@ void GCP::StaticDeinitialize()
 {
     // Place one-time deinitialization stuff here. As of FireBreath 1.4 this should
     // always be called just before the plugin library is unloaded
-    
-    {
-        boost::mutex::scoped_lock lock_(GCP::deqMutex);
-        
-        if(NULL != (GCP::pWebrtcPeerConnFactory).get())
-        {
-            (GCP::wrtInstructions).push_back(WEBRTC_RESOURCES_DEINIT);
-        }
-        
-        (GCP::wrtInstructions).push_back(WEBRTC_RES_WORKER_QUIT);
-    }
-    
+    (GCP::wrtInstructions).push_back(WEBRTC_RES_WORKER_QUIT); 
     (GCP::webrtcResThread).join();
 }
 
@@ -254,6 +298,17 @@ GCP::~GCP()
     // they will be released here.
     releaseRootJSAPI();
     m_host->freeRetainedObjects();
+    
+    boost::mutex::scoped_lock lock_(GCP::deqMutex);
+    (GCP::pluginInsts)--;
+    
+    if(0 == (GCP::pluginInsts))
+    {        
+        if(NULL != (GCP::pWebrtcPeerConnFactory).get())
+        {
+            (GCP::wrtInstructions).push_back(WEBRTC_RESOURCES_DEINIT);
+        }
+    }
 }
 
 void GCP::onPluginReady()
@@ -287,6 +342,8 @@ void GCP::shutdown()
 FB::JSAPIPtr GCP::createJSAPI()
 {
     // m_host is the BrowserHost
+    boost::mutex::scoped_lock lock_(GCP::deqMutex);
+    (GCP::pluginInsts)++;
     return boost::make_shared<GCPAPI>(FB::ptr_cast<GCP>(shared_from_this()), m_host);
 }
 
@@ -326,6 +383,9 @@ bool GCP::onWindowDetached(FB::DetachedEvent *evt, FB::PluginWindow *)
     // The window is about to be detached; act appropriately
     if(NULL != m_pRenderer)
     {
+        boost::mutex::scoped_lock lock_(GCP::deqMutex);
+        
+        std::cout << "localVideoRunning: " << (GCP::bLocalVideoRunning? "true": "false") << std::endl;
         if(m_pRenderer == (GCP::pLocalRenderer))
         {
             if(true == (GCP::bLocalVideoRunning))

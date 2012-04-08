@@ -3,10 +3,10 @@
 
     <string name="hello">Hello World, KDDIDemoActivity!</string>
     <string name="app_name">KDDIDemo</string>
-    <string name="dest_ip_label">Dest IP: </string>
-    <string name="dest_port_label">Dest Port: </string>
+    <string name="localViewName">me</string>
+    <!--<string name="dest_port_label">Dest Port: </string>
     <string name="local_port_label">Local Port: </string>
     <string name="connect_button_label">Connect</string>
-    <string name="disconnect_button_label">Disconnect</string>
+    <string name="disconnect_button_label">Disconnect</string>-->
     
 </resources>

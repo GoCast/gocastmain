@@ -1,75 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:orientation="vertical" >
 
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical" >
+    
     <SurfaceView
         android:id="@+id/localView" 
-        android:layout_width="320dip"
-        android:layout_height="240dip" />
+        android:layout_width="176dip"
+        android:layout_height="144dip"
+        android:layout_marginTop="10dip"
+        android:layout_marginLeft="5dip" />
+
+    <SurfaceView
+        android:id="@+id/remoteView0" 
+        android:layout_width="176dip"
+        android:layout_height="144dip"
+        android:layout_marginTop="10dip"
+        android:layout_marginLeft="5dip"
+        android:layout_toRightOf="@+id/localView" />
+
+    <SurfaceView
+        android:id="@+id/remoteView1"
+        android:layout_width="176dip"
+        android:layout_height="144dip"
+        android:layout_marginTop="10dip"
+        android:layout_marginLeft="5dip"
+        android:layout_toRightOf="@+id/remoteView0" />
     
-    <!--<TextView
-        android:id="@+id/dest_ip_label"
-        android:layout_width="fill_parent"
+    <TextView
+        android:id="@+id/localViewLabel"
+        android:layout_width="176dip"
         android:layout_height="wrap_content"
-        android:text="@string/dest_ip_label" />
-
-    <EditText
-        android:id="@+id/dest_ip"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/dest_ip_label"
-        android:background="@android:drawable/editbox_background"
-        android:inputType="text" />
+        android:layout_marginLeft="5dip"
+        android:layout_below="@+id/localView"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="@string/localViewName" />
 
     <TextView
-        android:id="@+id/dest_port_label"
-        android:layout_width="fill_parent"
+        android:id="@+id/remoteViewLabel0"
+        android:layout_width="176dip"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/dest_ip"
-        android:text="@string/dest_port_label" />
-
-    <EditText
-        android:id="@+id/dest_port"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/dest_port_label"
-        android:background="@android:drawable/editbox_background"
-        android:inputType="text" />
-
+        android:layout_marginLeft="5dip"
+        android:layout_below="@+id/remoteView0"
+        android:layout_toRightOf="@+id/localViewLabel"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="@string/localViewName" />
+    
     <TextView
-        android:id="@+id/local_port_label"
-        android:layout_width="fill_parent"
+        android:id="@+id/remoteViewLabel1"
+        android:layout_width="176dip"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/dest_port"
-        android:text="@string/local_port_label" />
-
-    <EditText
-        android:id="@+id/local_port"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/local_port_label"
-        android:background="@android:drawable/editbox_background"
-        android:inputType="text" />
-
-    <Button
-        android:id="@+id/connect_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/local_port"
-        android:layout_alignParentLeft="true"
-        android:text="@string/connect_button_label" />
-        
-    <Button
-        android:id="@+id/disconnect_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/local_port"
-        android:layout_alignParentRight="true"
-        android:text="@string/disconnect_button_label" />-->
-            
+        android:layout_marginLeft="5dip"
+        android:layout_below="@+id/remoteView1"
+        android:layout_toRightOf="@+id/remoteViewLabel0"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="@string/localViewName" />
+                
 </RelativeLayout>
