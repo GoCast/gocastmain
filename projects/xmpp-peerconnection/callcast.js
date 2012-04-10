@@ -81,8 +81,8 @@ var Callcast = {
     joined: false,
     keepAliveTimer: null,
     bUseVideo: true,
-    WIDTH: 160,
-    HEIGHT: 120,
+    WIDTH: 256,
+    HEIGHT: 192,
 
     CallStates: {
     	NONE: 0,
@@ -194,6 +194,7 @@ var Callcast = {
 	//
 	ShowRemoteVideo: function(info) {
 		var nick = info.nick;
+		nick = this.WithSpaces(nick);
 				
 		if (nick && this.participants[nick])
 		{
@@ -238,7 +239,9 @@ var Callcast = {
 			}
 			else
 			{
+//			console.log("DEBUG: Pre-StopLocalVideo() inside SendLocalVideoToPeers");
 				this.localplayer.stopLocalVideo();
+//			console.log("DEBUG: Post-StopLocalVideo() inside SendLocalVideoToPeers");
 				this.localplayer.width = 0;
 				this.localplayer.height = 0;
 			}
@@ -278,6 +281,7 @@ var Callcast = {
 				// Despite Manjesh making a call upon init to stop the capture, on first load
 				// the capture continues on Mac - so we'll force it to stop here just in case.
 				//
+				Callcast.localplayer.startLocalVideo();
 				Callcast.localplayer.stopLocalVideo();
 				
 				Callcast.localplayer.width=0;
@@ -1121,9 +1125,15 @@ getUrlVar: function(name){
 }
 });
 
-$(document).ready(function () {
+//
+// Changing from document-ready to plugin-loaded for initialization items.
+//
+//$(document).ready(function () {
+$(document).bind('plugin-initialized', function() {
 	var jid = "";
 	var password = "";
+
+	console.log("trigger happened for plugin-initialized");
 	
 	if ($.getUrlVar('jid'))
 		jid = $.getUrlVar('jid');
@@ -1405,11 +1415,18 @@ $(document).bind('disconnected', function () {
 
 });
 
+$(window).bind('beforeunload', function() {
+	Callcast.disconnect();
+});
+
 $(window).unload(function() {
+// After v1.15, no need to DeInit.	  Callcast.DeInitGocastPlayer();
 	  Callcast.disconnect();
 	});
 
 function pluginLoaded() {
 	console.log("Plugin loaded!");
-	Callcast.InitGocastPlayer();
+	Callcast.InitGocastPlayer(null, null, function(message) {
+		$(document).trigger('plugin-initialized');
+	});
 };
