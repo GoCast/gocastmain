@@ -338,8 +338,8 @@ WebRtc_Word32 AudioDeviceModuleImpl::CreatePlatformSpecificObjects()
     if (audioLayer == kPlatformDefaultAudio)
     {
         // Create *iPhone Audio* implementation
-        ptrAudioDevice = Singleton<AudioDeviceIPhone>::instance(Id());  //TJG
-//        ptrAudioDevice = new AudioDeviceIPhone(Id());   //TJG
+        ptrAudioDevice = new AudioDeviceIPhone(Id());
+
         WEBRTC_TRACE(kTraceInfo, kTraceAudioDevice, _id, "iPhone Audio APIs will be utilized");
     }
 
