@@ -53,14 +53,12 @@ enum
 
 const WebRtc_UWord32 TIMER_PERIOD_MS = (2 * 10 * N_BLOCKS_IO * 1000000);
 
-const WebRtc_UWord32 REC_BUF_SIZE_IN_SAMPLES = (ENGINE_REC_BUF_SIZE_IN_SAMPLES
-    * N_DEVICE_CHANNELS * N_BUFFERS_IN);
-const WebRtc_UWord32 PLAY_BUF_SIZE_IN_SAMPLES =
-    (ENGINE_PLAY_BUF_SIZE_IN_SAMPLES * N_PLAY_CHANNELS * N_BUFFERS_OUT);
+const WebRtc_UWord32 REC_BUF_SIZE_IN_SAMPLES = (ENGINE_REC_BUF_SIZE_IN_SAMPLES * N_DEVICE_CHANNELS * N_BUFFERS_IN);
+const WebRtc_UWord32 PLAY_BUF_SIZE_IN_SAMPLES = (ENGINE_PLAY_BUF_SIZE_IN_SAMPLES * N_PLAY_CHANNELS * N_BUFFERS_OUT);
 
 #define AudioDeviceID SInt32
 #define kAudioObjectUnknown -1
-    
+
 class AudioDeviceIPhone: public AudioDeviceGeneric
 {
 public:
@@ -195,7 +193,7 @@ public:
 public:
     virtual void AttachAudioBuffer(AudioDeviceBuffer* audioBuffer);
 
-private:
+public:
     void Lock()
     {
         _critSect.Enter();
@@ -295,7 +293,7 @@ private:
     bool CaptureWorkerThread();
     bool RenderWorkerThread();
     
-private:
+public:
     AudioDeviceBuffer* _ptrAudioBuffer;
 
     CriticalSectionWrapper& _critSect;
