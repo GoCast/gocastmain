@@ -208,6 +208,60 @@ $(document).bind('synclink', function (ev, link) {
 	$('#link_text').val(link);
 });
 
+$(document).bind('public-message', function(ev, msginfo) {
+	var notice = msginfo.notice;
+	var delayed = msginfo.delayed;
+	var body = msginfo.body;
+	var nick = msginfo.nick;
+	var nick_class = msginfo.nick_class;
+	
+	if (!notice) {
+		var delay_css = delayed ? " delayed" : "";
+
+		var action = body.match(/\/me (.*)$/);
+		if (!action) {
+			add_message(
+				"<div class='message" + delay_css + "'>" +
+					"&lt;<span class='" + nick_class + "'>" +
+					nick + "</span>&gt; <span class='body'>" +
+					body + "</span></div>");
+		} else {
+			add_message(
+				"<div class='message action " + delay_css + "'>" +
+					"* " + nick + " " + action[1] + "</div>");
+		}
+	} else {
+		add_message("<div class='notice'>*** " + body +
+							"</div>");
+	}
+});
+
+$(document).bind('private-message', function(ev, msginfo) {
+	var body = msginfo.body;
+	var nick = msginfo.nick;
+	
+	add_message(
+		"<div class='message private'>" +
+			"@@ &lt;<span class='nick'>" +
+			"Private From " +
+			nick + "</span>&gt; <span class='body'>" +
+			body + "</span> @@</div>");
+});
+
+add_message = function (msg) {
+	// detect if we are scrolled all the way down
+	var chat = $('#chat').get(0);
+	var at_bottom = chat.scrollTop >= chat.scrollHeight - 
+		chat.clientHeight;
+	
+	$('#chat').append(msg);
+
+	// if we were at the bottom, keep us at the bottom
+	if (at_bottom) {
+		chat.scrollTop = chat.scrollHeight;
+	}
+};
+
 $(document).bind('user_joined', function (ev, info) {
 	var nick = info.nick;
 	var hasVid = info.hasVid;

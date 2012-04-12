@@ -672,25 +672,10 @@ var Callcast = {
 //                $('#room-topic').text(subject);
 //            }
 
-            if (!notice) {
-                var delay_css = delayed ? " delayed" : "";
-
-                var action = body.match(/\/me (.*)$/);
-                if (!action) {
-                    Callcast.add_message(
-                        "<div class='message" + delay_css + "'>" +
-                            "&lt;<span class='" + nick_class + "'>" +
-                            nick + "</span>&gt; <span class='body'>" +
-                            body + "</span></div>");
-                } else {
-                    Callcast.add_message(
-                        "<div class='message action " + delay_css + "'>" +
-                            "* " + nick + " " + action[1] + "</div>");
-                }
-            } else {
-                Callcast.add_message("<div class='notice'>*** " + body +
-                                    "</div>");
-            }
+			var msginfo = { nick: nick, nick_class: nick_class, body: body, delayed: delayed, notice: notice };
+			
+			$(document).trigger('public-message', msginfo);
+			
         }
 
         return true;    
@@ -711,31 +696,14 @@ var Callcast = {
 			if (!body)
 				return true;	// Empty body - likely a signalling message.
 				
-			Callcast.add_message(
-				"<div class='message private'>" +
-					"@@ &lt;<span class='nick'>" +
-					"Private From " +
-					nick + "</span>&gt; <span class='body'>" +
-					body + "</span> @@</div>");
+			var msginfo = { nick: nick, body: body };
+			
+			$(document).trigger('private-message', msginfo);
         }
 
         return true;    
     },
     
-    add_message: function (msg) {
-        // detect if we are scrolled all the way down
-        var chat = $('#chat').get(0);
-        var at_bottom = chat.scrollTop >= chat.scrollHeight - 
-            chat.clientHeight;
-        
-        $('#chat').append(msg);
-
-        // if we were at the bottom, keep us at the bottom
-        if (at_bottom) {
-            chat.scrollTop = chat.scrollHeight;
-        }
-    },
-
     MsgHandler: function(msg) {
 //    	console.log("STANDARD MESSAGE:");
 //    	console.log(msg);
