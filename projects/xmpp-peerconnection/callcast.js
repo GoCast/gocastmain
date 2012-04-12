@@ -63,6 +63,9 @@
  */
 
 var Callcast = {
+	PLUGIN_VERSION_CURRENT: 1.19,
+	PLUGIN_VERSION_REQUIRED: 1.18,
+	PLUGIN_DOWNLOAD_URL: "http://video.gocast.it/plugin.html",
 	NOANSWER_TIMEOUT_MS: 6000,
 	CALLCAST_XMPPSERVER: "video.gocast.it",
 	CALLCAST_ROOMS: "gocastconference.video.gocast.it",
@@ -89,7 +92,7 @@ var Callcast = {
     	AWAITING_RESPONSE: 1,
     	CONNECTED: 2
     },
-    
+	
     keepAlive: function() {
     	this.keepAliveTimer = setInterval(function() {
     		if (Callcast.connection)
@@ -159,6 +162,21 @@ var Callcast = {
 		Callcast.participants = {};
     },
     
+
+	pluginUpdateAvailable: function() {
+		if (this.localplayer)
+			return this.GetVersion() < this.PLUGIN_VERSION_CURRENT;
+		else
+			return true;
+	},
+	
+	pluginUpdateRequired: function() {
+		if (this.localplayer)
+			return this.GetVersion() < this.PLUGIN_VERSION_REQUIRED;
+		else
+			return true;
+	},
+
     GetVersion: function() {
     	if (this.localplayer)
     		return parseFloat(this.localplayer.version);
@@ -1396,7 +1414,14 @@ $(document).bind('connected', function () {
 */
 	// Set "who am i" at the top
 //	$("#myjid").text("My JID: " + Callcast.connection.jid);
-	$('#version').text("Plug-in Version: " + (Callcast.GetVersion() || "None"));
+	var vertext = "Plug-in Version: " + (Callcast.GetVersion() || "None");
+	if (Callcast.pluginUpdateRequired())
+		vertext += " -- Version update REQUIRED." + " Visit " + Callcast.PLUGIN_DOWNLOAD_URL;
+	else if (Callcast.pluginUpdateAvailable())
+		vertext += " -- Version update AVAILABLE." + " Visit " + Callcast.PLUGIN_DOWNLOAD_URL;
+		
+	$('#version').text(vertext);
+	
    	Callcast.SendLocalVideoToPeers($('#video_enabled').is(':checked'));	// Update the video status locally upon signin.
 	
 });
