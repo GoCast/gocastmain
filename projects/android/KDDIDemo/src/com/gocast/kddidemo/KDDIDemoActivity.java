@@ -8,6 +8,7 @@ import android.text.format.Formatter;
 import android.net.wifi.WifiManager;
 import android.view.SurfaceView;
 import android.widget.TextView;
+import android.content.res.Configuration;
 
 public class KDDIDemoActivity extends Activity {
     /** Called when the activity is first created. */
@@ -27,6 +28,12 @@ public class KDDIDemoActivity extends Activity {
     	finish();
     }
     
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+    	//Ignore portrait-landscape changes
+    	super.onConfigurationChanged(newConfig);
+    }
+    
     public native boolean init();
     public native boolean deinit();
     public native boolean start(final String localIp, SurfaceView [] views);
@@ -44,12 +51,12 @@ public class KDDIDemoActivity extends Activity {
     		String [] viewLabelValues = new String[3];
     		viewLabelValues[0] = "moto xoom";
     		viewLabelValues[1] = "acer iconia";
-    		viewLabelValues[2] = "google nexus";
+    		viewLabelValues[2] = "lg nitro";
     		
     		String [] participantIps = new String[3];
-    		participantIps[0] = "192.168.20.101";
-    		participantIps[1] = "192.168.20.104";
-    		participantIps[2] = "192.168.20.102";
+    		participantIps[0] = "192.168.20.105";
+    		participantIps[1] = "192.168.20.106";
+    		participantIps[2] = "192.168.20.103";
     		
     		TextView [] viewLabels = new TextView[3];
     		viewLabels[0] = (TextView) findViewById(R.id.localViewLabel);

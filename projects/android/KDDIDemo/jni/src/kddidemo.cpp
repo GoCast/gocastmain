@@ -3,7 +3,7 @@
 #include "com_gocast_kddidemo_KDDIDemoActivity.h"
 
 #define NUM_ANDROID_DEVICES 3
-#define ANDROID_DEVICES {"192.168.20.101", "192.168.20.104", "192.168.20.102"}
+#define ANDROID_DEVICES {"192.168.20.105", "192.168.20.106", "192.168.20.103"}
 #define ANDROID_CONNECTION(ip1, ip2) ((ip1) + "+" + (ip2))
 
 class Globals
