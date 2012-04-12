@@ -63,6 +63,9 @@
  */
 
 var Callcast = {
+	PLUGIN_VERSION_CURRENT: 1.19,
+	PLUGIN_VERSION_REQUIRED: 1.18,
+	PLUGIN_DOWNLOAD_URL: "http://video.gocast.it/plugin.html",
 	NOANSWER_TIMEOUT_MS: 6000,
 	CALLCAST_XMPPSERVER: "video.gocast.it",
 	CALLCAST_ROOMS: "gocastconference.video.gocast.it",
@@ -81,15 +84,15 @@ var Callcast = {
     joined: false,
     keepAliveTimer: null,
     bUseVideo: true,
-    WIDTH: 160,
-    HEIGHT: 120,
+    WIDTH: 256,
+    HEIGHT: 192,
 
     CallStates: {
     	NONE: 0,
     	AWAITING_RESPONSE: 1,
     	CONNECTED: 2
     },
-    
+	
     keepAlive: function() {
     	this.keepAliveTimer = setInterval(function() {
     		if (Callcast.connection)
@@ -159,6 +162,21 @@ var Callcast = {
 		Callcast.participants = {};
     },
     
+
+	pluginUpdateAvailable: function() {
+		if (this.localplayer)
+			return this.GetVersion() < this.PLUGIN_VERSION_CURRENT;
+		else
+			return true;
+	},
+	
+	pluginUpdateRequired: function() {
+		if (this.localplayer)
+			return this.GetVersion() < this.PLUGIN_VERSION_REQUIRED;
+		else
+			return true;
+	},
+
     GetVersion: function() {
     	if (this.localplayer)
     		return parseFloat(this.localplayer.version);
@@ -194,6 +212,7 @@ var Callcast = {
 	//
 	ShowRemoteVideo: function(info) {
 		var nick = info.nick;
+		nick = this.WithSpaces(nick);
 				
 		if (nick && this.participants[nick])
 		{
@@ -238,7 +257,9 @@ var Callcast = {
 			}
 			else
 			{
+//			console.log("DEBUG: Pre-StopLocalVideo() inside SendLocalVideoToPeers");
 				this.localplayer.stopLocalVideo();
+//			console.log("DEBUG: Post-StopLocalVideo() inside SendLocalVideoToPeers");
 				this.localplayer.width = 0;
 				this.localplayer.height = 0;
 			}
@@ -278,6 +299,7 @@ var Callcast = {
 				// Despite Manjesh making a call upon init to stop the capture, on first load
 				// the capture continues on Mac - so we'll force it to stop here just in case.
 				//
+				Callcast.localplayer.startLocalVideo();
 				Callcast.localplayer.stopLocalVideo();
 				
 				Callcast.localplayer.width=0;
@@ -1121,9 +1143,15 @@ getUrlVar: function(name){
 }
 });
 
-$(document).ready(function () {
+//
+// Changing from document-ready to plugin-loaded for initialization items.
+//
+//$(document).ready(function () {
+$(document).bind('plugin-initialized', function() {
 	var jid = "";
 	var password = "";
+
+	console.log("trigger happened for plugin-initialized");
 	
 	if ($.getUrlVar('jid'))
 		jid = $.getUrlVar('jid');
@@ -1386,7 +1414,14 @@ $(document).bind('connected', function () {
 */
 	// Set "who am i" at the top
 //	$("#myjid").text("My JID: " + Callcast.connection.jid);
-	$('#version').text("Plug-in Version: " + (Callcast.GetVersion() || "None"));
+	var vertext = "Plug-in Version: " + (Callcast.GetVersion() || "None");
+	if (Callcast.pluginUpdateRequired())
+		vertext += " -- Version update REQUIRED." + " Visit " + Callcast.PLUGIN_DOWNLOAD_URL;
+	else if (Callcast.pluginUpdateAvailable())
+		vertext += " -- Version update AVAILABLE." + " Visit " + Callcast.PLUGIN_DOWNLOAD_URL;
+		
+	$('#version').text(vertext);
+	
    	Callcast.SendLocalVideoToPeers($('#video_enabled').is(':checked'));	// Update the video status locally upon signin.
 	
 });
@@ -1405,11 +1440,18 @@ $(document).bind('disconnected', function () {
 
 });
 
+$(window).bind('beforeunload', function() {
+	Callcast.disconnect();
+});
+
 $(window).unload(function() {
+// After v1.15, no need to DeInit.	  Callcast.DeInitGocastPlayer();
 	  Callcast.disconnect();
 	});
 
 function pluginLoaded() {
 	console.log("Plugin loaded!");
-	Callcast.InitGocastPlayer();
+	Callcast.InitGocastPlayer(null, null, function(message) {
+		$(document).trigger('plugin-initialized');
+	});
 };
