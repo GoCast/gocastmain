@@ -20,6 +20,17 @@ getUrlVar: function(name){
 }
 });
 
+AddPlugin = function(nickname) {
+	// TODO - FIX - Need a truly UNIQUE adder here - not nick which can change and be replaced during the lifetime of the call.
+	$("#rtcobjects").append('<div id="div_GocastPlayer'+nickname+'"><object id="GocastPlayer'+nickname+'" type="application/x-gocastplayer" width="'+Callcast.WIDTH+'" height="'+Callcast.HEIGHT+'"></object></div>');
+	
+	return $('#GocastPlayer'+nickname).get(0);
+};
+
+RemovePlugin = function(nickname) {
+	$("#div_GocastPlayer"+nickname).remove();
+};
+
 //
 // Changing from document-ready to plugin-loaded for initialization items.
 //
@@ -40,6 +51,12 @@ $(document).bind('plugin-initialized', function() {
 
 	var bVideo = $('#video_enabled') && $('#video_enabled').is(':checked');
 	Callcast.SetUseVideo(bVideo);
+	
+	//
+	// Setup the callbacks needed for adding and removing the plugins as they come and go.
+	//
+	Callcast.setCallbackForAddPlugin(AddPlugin);
+	Callcast.setCallbackForRemovePlugin(RemovePlugin);
 	
 	///
 	/// Handle the login via URL which got passed or via dialog box.
@@ -208,6 +225,22 @@ $(document).bind('synclink', function (ev, link) {
 	$('#link_text').val(link);
 });
 
+/*
+Private and public chat inbound now create trigger callbacks…with json arguments.
+
+For both:
+- msginfo.nick = nickname
+- msginfo.body = body of the message
+
+For public-message only:
+- msginfo.delayed    = if the message inbound is an old queued message, this is flagged so it 
+                       can be treated differently by the UI.
+- msginfo.action     = if a message comes from the ROOM and not from an individual, 
+                       this is set for UI purposes.
+- msginfo.nick_class = 'nick' if from someone else. and is = 'nick self' if it is a message 
+                       which came from myself. All outbound messages wind up coming back as 
+                       'nick self' messages from xmpp servers.
+*/
 $(document).bind('public-message', function(ev, msginfo) {
 	var notice = msginfo.notice;
 	var delayed = msginfo.delayed;

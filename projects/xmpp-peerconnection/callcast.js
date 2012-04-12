@@ -74,6 +74,8 @@ var Callcast = {
 	STUNSERVER: "video.gocast.it",
 	FEEDBACK_BOT: "feedback_bot_test1@video.gocast.it",
 	STUNSERVERPORT: 19302,
+	Callback_AddPlugin: null,
+	Callback_RemovePlugin: null,
     connection: null,
     localplayer: null,
     participants: {},
@@ -92,6 +94,14 @@ var Callcast = {
     	AWAITING_RESPONSE: 1,
     	CONNECTED: 2
     },
+	
+	setCallbackForAddPlugin: function(cb) {
+		this.Callback_AddPlugin = cb;
+	},
+	
+	setCallbackForRemovePlugin: function(cb) {
+		this.Callback_RemovePlugin = cb;
+	},
 	
     keepAlive: function() {
     	this.keepAliveTimer = setInterval(function() {
@@ -343,12 +353,16 @@ var Callcast = {
     	this.jid = room + "/" + nickin.replace(/ /g,'\\20');
     	this.non_muc_jid = "";
     	this.CallState = Callcast.CallStates.NONE;
-    	// TODO - FIX - Need a truly UNIQUE adder here - not nick which can change and be replaced during the lifetime of the call.
-    	$("#rtcobjects").append('<div id="div_GocastPlayer'+nickname+'"><object id="GocastPlayer'+nickname+'" type="application/x-gocastplayer" width="'+Callcast.WIDTH+'" height="'+Callcast.HEIGHT+'"></object></div>');
     	
-    	this.peer_connection = $('#GocastPlayer'+nickname).get(0);
-    	if (!this.peer_connection)
-    		alert("Gocast Player object not found in DOM. Plugin problem?");
+    	if (Callcast.Callback_AddPlugin)
+    	{
+    		this.peer_connection = Callcast.Callback_AddPlugin(nickname);
+    		
+			if (!this.peer_connection)
+				alert("Gocast Player object not found in DOM. Plugin problem?");
+    	}
+    	else
+    		alert("ERROR: Callcast.setCallbackForAddPlugin() has not been called yet.");
     	
     	self = this;
     	
@@ -482,7 +496,11 @@ var Callcast = {
     			// Make sure it has no spaces...
 				if (nick)
 					nick = nick.replace(/ /g, '');
-    			$("#div_GocastPlayer"+nick).remove();
+					
+				if (Callcast.Callback_RemovePlugin)
+					Callcast.Callback_RemovePlugin(nick);
+				else
+					alert("ERROR: Callcast.setCallbackForRemovePlugin() has not been called yet.");
     		}
     		else
     			console.log("Dropping FAILED. Cant find peer_connection (or self)");
