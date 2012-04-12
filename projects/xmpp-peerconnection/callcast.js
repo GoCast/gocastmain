@@ -1116,7 +1116,9 @@ var Callcast = {
 
     	// Now -- if a room was specified in the URL, then jump directly in.
     	if ($.getUrlVar('unlistedroom'))
-			Callcast.CreateUnlistedAndJoin($.getUrlVar('unlistedroom'));
+    	{
+			Callcast.JoinSession($.getUrlVar('unlistedroom'), $.getUrlVar('unlistedroom')+Callcast.AT_CALLCAST_ROOMS);
+		}
 
     },
  };
