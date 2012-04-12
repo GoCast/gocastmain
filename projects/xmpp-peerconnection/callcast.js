@@ -144,6 +144,10 @@ var Callcast = {
     		alert("Could not enter room. Likely max # users reached in this room.");
     		this.LeaveSession();
     	}
+    	else if ($(err).find('not-allowed').length > 0)
+    	{
+          // Handled inside PresHandler           	$(document).trigger('room-creation-not-allowed', room);
+		}
     	else
     	{
 			alert("Unknown Error Stanza: " + $(err).children('error').text());
@@ -772,10 +776,13 @@ var Callcast = {
 					$(document).trigger('user_updated', info);
 				}
 				
-                if ($(presence).attr('type') === 'error' &&
-                    !Callcast.joined) {
+                if ($(presence).attr('type') === 'error' && !Callcast.joined) {
                     // error joining room; reset app
-                	console.log("PresHandler: Error joining room. Disconnecting.");
+                    if ($(presence).find('not-allowed').length > 0)
+                    	$(document).trigger('room-creation-not-allowed', Strophe.getNodeFromJid(room));
+                    else
+	                	console.log("PresHandler: Error joining room. Disconnecting.");
+	                	
                     Callcast.disconnect();
                 }
                 else if (nick == Callcast.nick && $(presence).attr('type') == 'unavailable')

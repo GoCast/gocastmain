@@ -268,6 +268,16 @@ $(document).bind('user_left', function (ev, nick) {
     });
 });
 
+$(document).bind('room-creation-not-allowed', function(ev, roomname) {
+	
+	// Our system does not allow creating rooms. 
+	// Joining a non-existent room is the same as trying to create a room.
+	// This error occurs due to being disallowed of creating a room.
+	// Likely the room used to exist but does not exist any longer.
+	
+	alert("Joining room '" + roomname + "' failed. Room may not exist.");
+});
+
 $(document).bind('connected', function () {
 
 	$('.button').removeAttr('disabled');
