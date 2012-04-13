@@ -60,12 +60,6 @@ function mucRoom(client) {
 		return;
 	}
 	
-	var becomeOwner = function() {
-//			var jfrom = new xmpp.JID(stanza.attrs.from);
-//			var roomName = jfrom.user + '@' + jfrom.domain;
-		
-	};
-
 	client.on('stanza', function(in_stanza) {
 		var stanza = in_stanza.clone();
 		
@@ -84,153 +78,162 @@ function mucRoom(client) {
 			console.log("MUC UNHANDLED: " + stanza.tree());
 	});
 
-	//
-	// In a MUC room, we want to only handle our own messages destined for us.
-	// We also only want to handle 'chat' messages and not 'groupchat' inbound.
-	//
-	this.handleMessage = function(msg) {
-		if (msg.attrs.type != 'groupchat')
-		{
-			// Ignore topic changes.
-			if (msg.getChild('subject'))
-				return;
-				
-			console.log("MUC msg @" + this.roomname.split('@')[0] + ": From:" + msg.attrs.from.split('/')[1] + ": " + msg.getChild('body').getText());
-		}
-	};
+};
+
+mucRoom.prototype.handlePresence = function(pres) {
+	var fromnick = pres.attrs.from.split('/')[1];
+	var fromjid = null;
+	var self = this;
 	
-	//
-	// If we have a result coming at us and there is a tagged callback for it,
-	// then make the callback and remove the entry in the callbacks list.
-	//
-	this.handleIQ = function(iq) {
-/*		if (iq.attrs.from.split('@')[0] !== this.roomname.split('@')[0])
-		{
-			console.log("ERROR: NAME MISMATCH. this.roomname="+this.roomname+" while iq="+iq.tree());
-		}
-*/		
-		if (iq.attrs.type === 'result' && iq.attrs.id && this.iq_callbacks[iq.attrs.id])
-		{
-			var iqid = iq.attrs.id;
-			var callback = this.iq_callbacks[iqid];
-
-			// Need to be sure to not use values from 'iq' after the callback.
-			// As the callback itself can modify iq and sometimes does.
-			delete this.iq_callbacks[iqid];
-			// We have a callback to make on this ID.
-			callback.call(this, iq);
-		}
-		else if (iq.attrs.type !== 'result')
-			console.log("handleIQ msg @" + this.roomname.split('@')[0] + " was ignored: " + iq);
-		else
-		{
-/*			console.log("handleIQ: MUC @" + this.roomname.split('@')[0] + " - Callback list: ");
-			for (k in this.iq_callbacks)
-				console.log("  CB_ID: " + k);
-		*/
-			console.log("handleIQ: IQ result msg @" + this.roomname.split('@')[0] + " was ignored: " + iq);
-		}
-	};
-
-	this.handlePresence = function(pres) {
-		var fromnick = pres.attrs.from.split('/')[1];
-		var fromjid = null;
-		var self = this;
+	if (pres.getChild('x') && pres.getChild('x').getChild('item') && pres.getChild('x').getChild('item').attrs.jid)
+		fromjid = pres.getChild('x').getChild('item').attrs.jid.split('/')[0];
+	
+	// We need to deal with non-configured rooms. If we get a status code 201, we need to config.
+	if (pres.getChild('x') && pres.getChild('x').getChildrenByAttr('code','201').length > 0)
+	{
+		console.log("Room: " + this.roomname.split('@')[0] + " needs configured. Configuring...");
 		
-		if (pres.getChild('x') && pres.getChild('x').getChild('item') && pres.getChild('x').getChild('item').attrs.jid)
-			fromjid = pres.getChild('x').getChild('item').attrs.jid.split('/')[0];
-		
-		// We need to deal with non-configured rooms. If we get a status code 201, we need to config.
-		if (pres.getChild('x') && pres.getChild('x').getChildrenByAttr('code','201').length > 0)
-		{
-			console.log("Room: " + this.roomname.split('@')[0] + " needs configured. Configuring...");
+		// Request room configuration form.
+		var getRoomConf = new xmpp.Element('iq', {to: this.roomname, type: 'get'})
+			.c('query', {xmlns: 'http://jabber.org/protocol/muc#owner'}); 
 			
-			// Request room configuration form.
-			var getRoomConf = new xmpp.Element('iq', {to: this.roomname, type: 'get'})
-				.c('query', {xmlns: 'http://jabber.org/protocol/muc#owner'}); 
-				
-			console.log("Requesting room configuration... ");
-			this.sendIQ(getRoomConf.root(), function(resp) {
-				console.log("Got room configuration. Going for setup.");
-				self.setupRoom(resp);
-			});
-			
-		}
+		console.log("Requesting room configuration... ");
+		this.sendIQ(getRoomConf.root(), function(resp) {
+			console.log("Got room configuration. Going for setup.");
+			self.setupRoom(resp);
+		});
 		
-		if (pres.getChild('error'))
+	}
+	
+	if (pres.getChild('error'))
+	{
+		// Special case where someone has already taken my nickname...kick them out.
+		if (pres.getChild('error').getChild('conflict'))
 		{
-			// Special case where someone has already taken my nickname...kick them out.
-			if (pres.getChild('error').getChild('conflict'))
-			{
-				console.log("Kicking out overseer imposter. His jid=" + fromjid);
-				self.kick(self.nick, function() {
-				
+			console.log("Kicking out overseer imposter. His jid=" + fromjid);
+			self.kick(self.nick, function() {
 				// Once the kick is complete, we need to re-establish ourselves.
 				// TODO - not sure how to unjoin, rejoin, etc all from here...
 				//    Is it true that we will have a conflict but we are still joined as 
 				//    another nick (our resource id possibly?) - so we could change
 				//    our nick then?
-				});
-			}
-			else
-					console.log("Couldn't kick -- didn't find their jid. Hmm. Are we not moderator/admin/owner?");
-			
-			console.log("Room: " + this.roomname.split('@')[0] + " Error: " + pres);
-			
-			return;
-		}
-		
-		//
-		// If this is 'available', add the person to the participants array.
-		//
-		// Always address items in the array by nickname. Value is nickname or jid if one is available.
-		//
-		if (pres.attrs.type !== 'unavailable')
-		{
-			console.log("Adding: " + fromjid + " as Nickname: " + fromnick);
-			self.participants[fromnick] = fromjid || fromnick;
-		}
-		else if (pres.attrs.type === 'unavailable' && self.participants[fromnick])
-		{
-			console.log("Removing: " + fromnick);
-			delete self.participants[fromnick];
-			if (fromnick === self.nick)
-			{
-				console.log("We got kicked out...room destroyed? Or we disconnected??");
-				self.joined = false;
-				for (k in self.participants)
-					delete self.participants[k];
-				
-				console.log("MUC @" + self.roomname.split('@')[0] + " - Re-joining (and creating?) room.");
-				self.join(self.roomname, self.nick);
-			}
-		}
 
-		// If the 'from' is myself -- then I'm here. And so we'll print the current list.
+				// TODO actually need to join with NO NICK and KICK overseer - then re-join.
+				//
+				// Actually - from here...we aren't joined...so join with null.
+				// Then in presence, we'll have to detect our own presence as a match of 'to'
+				// with the resource in 'from' and realize why we're there.
+				// At that point, kick the imposter and then 'leave' and rejoin()
+				console.log("Re-joining room after kicking the imposter.");				
+				self.rejoin(self.roomname, null);
+			});
+		}
+		else
+				console.log("Couldn't kick -- didn't find their jid. Hmm. Are we not moderator/admin/owner?");
+		
+		console.log("Room: " + this.roomname.split('@')[0] + " Error: " + pres);
+		
+		return;
+	}
+	
+	//
+	// If this is 'available', add the person to the participants array.
+	//
+	// Always address items in the array by nickname. Value is nickname or jid if one is available.
+	//
+	if (pres.attrs.type !== 'unavailable')
+	{
+		console.log("Adding: " + fromjid + " as Nickname: " + fromnick);
+		self.participants[fromnick] = fromjid || fromnick;
+	}
+	else if (pres.attrs.type === 'unavailable' && self.participants[fromnick])
+	{
+		console.log("Removing: " + fromnick);
+		delete self.participants[fromnick];
 		if (fromnick === self.nick)
 		{
-			var parts = "";
-
+			console.log("We got kicked out...room destroyed? Or we disconnected??");
+			self.joined = false;
 			for (k in self.participants)
-			{
-				// Add in a ',' if we're not first in line.
-				if (parts !== "")
-					parts += ", ";
-
-				parts += k;
-			}
-
-			console.log("Participants list: " + parts);
+				delete self.participants[k];
 			
-			if (!self.joined)
-				self.joined = true;
+			console.log("MUC @" + self.roomname.split('@')[0] + " - Re-joining (and creating?) room.");
+			self.rejoin(self.roomname, self.nick_original);
 		}
+	}
+
+	// If the 'from' is myself -- then I'm here. And so we'll print the current list.
+	if (fromnick === self.nick)
+	{
+		var parts = "";
+
+		for (k in self.participants)
+		{
+			// Add in a ',' if we're not first in line.
+			if (parts !== "")
+				parts += ", ";
+
+			parts += k;
+		}
+
+		console.log("Participants list: " + parts);
 		
-		console.log("MUC pres: @" + this.roomname.split('@')[0] + ": " + pres.getChild('x'));
+		if (!self.joined)
+			self.joined = true;
+	}
 	
-	};
+	console.log("MUC pres: @" + this.roomname.split('@')[0] + ": " + pres.getChild('x'));
 
 };
+
+//
+// If we have a result coming at us and there is a tagged callback for it,
+// then make the callback and remove the entry in the callbacks list.
+//
+mucRoom.prototype.handleIQ = function(iq) {
+/*		if (iq.attrs.from.split('@')[0] !== this.roomname.split('@')[0])
+	{
+		console.log("ERROR: NAME MISMATCH. this.roomname="+this.roomname+" while iq="+iq.tree());
+	}
+*/		
+	if (iq.attrs.type === 'result' && iq.attrs.id && this.iq_callbacks[iq.attrs.id])
+	{
+		var iqid = iq.attrs.id;
+		var callback = this.iq_callbacks[iqid];
+
+		// Need to be sure to not use values from 'iq' after the callback.
+		// As the callback itself can modify iq and sometimes does.
+		delete this.iq_callbacks[iqid];
+		// We have a callback to make on this ID.
+		callback.call(this, iq);
+	}
+	else if (iq.attrs.type !== 'result')
+		console.log("handleIQ msg @" + this.roomname.split('@')[0] + " was ignored: " + iq);
+	else
+	{
+/*			console.log("handleIQ: MUC @" + this.roomname.split('@')[0] + " - Callback list: ");
+		for (k in this.iq_callbacks)
+			console.log("  CB_ID: " + k);
+	*/
+		console.log("handleIQ: IQ result msg @" + this.roomname.split('@')[0] + " was ignored: " + iq);
+	}
+};
+
+//
+// In a MUC room, we want to only handle our own messages destined for us.
+// We also only want to handle 'chat' messages and not 'groupchat' inbound.
+//
+mucRoom.prototype.handleMessage = function(msg) {
+	if (msg.attrs.type != 'groupchat')
+	{
+		// Ignore topic changes.
+		if (msg.getChild('subject'))
+			return;
+			
+		console.log("MUC msg @" + this.roomname.split('@')[0] + ": From:" + msg.attrs.from.split('/')[1] + ": " + msg.getChild('body').getText());
+	}
+};
+	
 
 mucRoom.prototype.setupRoom = function(form) {
 	// We have received a form from the server. We need to make changes and send it back.
@@ -294,9 +297,9 @@ mucRoom.prototype.kick = function(nick, cb) {
 	if (jid && jid !== nick)
 	{
 		// Kicking the user out forcefully. BANNED.
-		this.client.send(new xmpp.Element('iq', {to: this.room, type: 'set'})
-						.c('query', {xmlns: 'http://jabber.org/protocol/muc#admin'})
-						.c('item', {jid: jid, affiliation: 'outcast'}));
+		this.sendIQ(new xmpp.Element('iq', {to: this.room, type: 'set'})
+					.c('query', {xmlns: 'http://jabber.org/protocol/muc#admin'})
+					.c('item', {jid: jid, affiliation: 'outcast'}), cb);
 	}
 	else
 		console.log("Couldn't seem to find '" + nick + "'. Must have scrammed.");
@@ -329,22 +332,51 @@ mucRoom.prototype.sendIQ = function(iq, cb) {
 	this.client.send(iq);
 };
 
-mucRoom.prototype.join = function(rmname, nick) {
-		this.client.on('presence', function(pres) {
-			console.log("room presence: " + pres);
-			return true;
-		});
+mucRoom.prototype.leave = function() {
+	var to = this.roomname;
+	if (this.nick)
+		to += "/" + this.nick;
 		
-		el = new xmpp.Element('presence', {to: rmname + "/" + nick, usertype: 'silent'})
-						.c('x', {xmlns: 'http://jabber.org/protocol/muc'})
-		
-		console.log("Joining: " + rmname + " as " + nick + ". "); // + el.tree());
-		this.client.send(el);
-						
-		this.roomname = rmname;
-		this.nick = nick;
+	el = new xmpp.Element('presence', {to: to, usertype: 'silent', type: 'unavailable'})
+					.c('x', {xmlns: 'http://jabber.org/protocol/muc'})
+	
+	console.log("Joining: " + rmname + " as " + nick + ". "); // + el.tree());
+	this.client.send(el);
 };
+
+mucRoom.prototype.join = function(rmname, nick) {
+	// The sole purpose of this nick_original is to allow us to exit/re-join as non-original and kick
+	// a user out who is an imposter to the overseer and then re-join again
+	this.nick_original = nick;
+	
+	this.rejoin(rmname, nick);
+};
+
+mucRoom.prototype.rejoin = function(rmname, nick) {
+	var to = rmname;
+	
+	// If no nick is specified, then just join. This must be a signal that we are coming in
+	// to kick out an imposter to the original overseer nickname.
+	if (nick)
+		to += "/" + nick;
 		
+	el = new xmpp.Element('presence', {to: to, usertype: 'silent'})
+					.c('x', {xmlns: 'http://jabber.org/protocol/muc'})
+	
+	console.log("Joining: " + rmname + " as " + nick + ". "); // + el.tree());
+	this.client.send(el);
+					
+	this.roomname = rmname;
+	this.nick = nick;
+};
+
+///
+///
+///
+///  O  V  E  R  S  E  E  R
+///
+///
+///
 
 function overseer(user, pw, rooms) {
 	var self = this;
@@ -355,10 +387,10 @@ function overseer(user, pw, rooms) {
 //		for k in rooms each ...
 		var room1 = new mucRoom(client);
 		room1.join("bobtestroom@gocastconference.video.gocast.it", "overseer");
-		var room2 = new mucRoom(client);
-		room2.join("newroom@gocastconference.video.gocast.it", "overseer");
-		var room3 = new mucRoom(client);
-		room3.join("other_newroom@gocastconference.video.gocast.it", "overseer");
+//		var room2 = new mucRoom(client);
+//		room2.join("newroom@gocastconference.video.gocast.it", "overseer");
+//		var room3 = new mucRoom(client);
+//		room3.join("other_newroom@gocastconference.video.gocast.it", "overseer");
 	});
 	
 	client.on('offline', function() {
