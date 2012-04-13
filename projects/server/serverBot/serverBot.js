@@ -2,6 +2,14 @@
  * Server Bot - All-encompassing mechanism for listening/logging feedback
  *              as well as acting as the overseer of rooms to control the network.
  **/
+ 
+ /*
+ TODO
+** Then add command reception and notification broadcast.
+** Then recovery when kicked from a room or room destroyed etc.
+** Then reading of config file and periodic re-reading.
+
+ */
 var sys = require('util');
 var xmpp = require('node-xmpp');
 var argv = process.argv;
@@ -28,8 +36,23 @@ function mucRoom(client) {
 //	this.state = 
 	var self = this;
 	
-	this.options['muc#roomconfig_maxusers'] = '9';
-//	this.options[
+	// Max # users.
+	this.options['muc#roomconfig_maxusers'] = '11';
+	
+	// Hidden room.
+	this.options['muc#roomconfig_publicroom'] = '0';	// Non-listed room.
+	this.options['muc#roomconfig_moderatedroom'] = '0';
+	this.options['muc#roomconfig_passwordprotectedroom'] = '0';
+	this.options['muc#roomconfig_whois'] = 'moderators';
+	this.options['x-muc#roomconfig_reservednick'] = '0';
+	
+	// TODO: It appears that OpenFire does not auto-prune rooms which are persistent.
+	// Making persistent for now. Plan to have the server prune non-used rooms. 
+	// This way the serverBot doesn't have to clean up non-xml-spec'd rooms when they disappear.
+	this.options['muc#roomconfig_persistentroom'] = '1';	
+	
+	// Initially, all rooms are unlocked.
+	this.options['muc#roomconfig_membersonly'] = '0';
 	
 	if (!client)
 	{
@@ -171,6 +194,16 @@ function mucRoom(client) {
 		{
 			console.log("Removing: " + fromnick);
 			delete self.participants[fromnick];
+			if (fromnick === self.nick)
+			{
+				console.log("We got kicked out...room destroyed? Or we disconnected??");
+				self.joined = false;
+				for (k in self.participants)
+					delete self.participants[k];
+				
+				console.log("MUC @" + self.roomname.split('@')[0] + " - Re-joining (and creating?) room.");
+				self.join(self.roomname, self.nick);
+			}
 		}
 
 		// If the 'from' is myself -- then I'm here. And so we'll print the current list.
