@@ -28,11 +28,9 @@
 .project
 .pydevproject
 .settings
-/build
 /gyp-mac-tool
 /out
 /resources
-/testing
 /tools/clang
 /tools/gyp
 /tools/python
