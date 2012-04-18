@@ -34,6 +34,8 @@ function mucRoom(client) {
 	this.nick = "";
 	this.joined = false;
 	this.participants = {};
+	this.islocked = false;
+	this.bannedlist = {};
 	this.options = {};
 	this.iq_callbacks = {};
 	this.client = client;
@@ -220,7 +222,20 @@ mucRoom.prototype.handleIQ = function(iq) {
 		callback.call(this, iq);
 	}
 	else if (iq.attrs.type !== 'result')
-		console.log("handleIQ @" + this.roomname.split('@')[0] + " was ignored: " + iq);
+	{
+		if (iq.attrs.type === 'get' && iq.getChild('query') && iq.getChild('query').attrs.xmlns === 'http://jabber.org/protocol/disco#info')
+		{
+			// Ignore disco info requests. Just reply with 'result'
+			iq.attrs.to = iq.attrs.from;
+			delete iq.attrs.from;
+			iq.attrs.type = 'result';
+			
+			console.log("disco#info");
+			this.sendIQ(iq, function() { });	// Don't care about any callback.
+		}
+		else
+			console.log("handleIQ @" + this.roomname.split('@')[0] + " was ignored: " + iq);
+	}
 	else
 	{
 /*			console.log("handleIQ: MUC @" + this.roomname.split('@')[0] + " - Callback list: ");
@@ -252,9 +267,10 @@ mucRoom.prototype.handleMessage = function(msg) {
 		// Language:
 		// CMD [arg [arg...]]
 		//
-		// KICK nickname
+		// KICK ; nickname
 		// LOCK
 		// UNLOCK
+		// INVITE ; jid ; nickname
 		//
 		if (msg.getChild('body') && msg.getChild('body').getText())
 		{
@@ -292,6 +308,17 @@ mucRoom.prototype.handleMessage = function(msg) {
 				this.unlock();
 				self.sendGroupMessage(nickfrom + " un-locked the room.");
 			}
+			else if (cmd[0] === 'INVITE')
+			{
+				if (!cmd[1] || !cmd[2])
+					console.log("MUC @"+this.roomname.split('@')[0] + " - Command: INVITE Invalid. No jid(" + cmd[1] + ") or no nickname(" + cmd[2] + ")");
+				else
+				{
+					console.log("MUC @"+this.roomname.split('@')[0] + " - Command: Approving Invite to room of jid:" + cmd[1] + " - nickname:" + cmd[2]);
+					this.invite(cmd[1]);	// Nickname only gets used for identification purposes.
+					self.sendGroupMessage(nickfrom + " invited " + cmd[1] + " to join the room as nickname: " + cmd[2]);
+				}
+			}
 			else
 			  console.log("MUC @"+this.roomname.split('@')[0] + " - Invalid Inbound-Command: " + msg.getChild('body').getText());
 		}
@@ -299,7 +326,20 @@ mucRoom.prototype.handleMessage = function(msg) {
 			console.log("MUC msg @" + this.roomname.split('@')[0] + ": From:" + msg.attrs.from.split('/')[1] + ": " + msg.getChild('body').getText());
 	}
 };
+
+mucRoom.prototype.invite = function(invitejid) {
+	var self = this;
 	
+	// Adding this particular jid to the members list.
+	this.sendIQ(new xmpp.Element('iq', {to: this.roomname, type: 'set'})
+		.c('query', {xmlns: 'http://jabber.org/protocol/muc#admin'})
+		.c('item', {affiliation: 'member', jid: invitejid}), function(resp) {
+			if (resp.attrs.type === 'result')
+				console.log("MUC msg @" + self.roomname.split('@')[0] + ": Invite of " + invitejid + " successful.");
+			else		
+				console.log("MUC msg @" + self.roomname.split('@')[0] + ": ERROR: Invite of " + invitejid + " failed:" + resp);
+		});
+};
 
 mucRoom.prototype.setupRoom = function(form) {
 	// We have received a form from the server. We need to make changes and send it back.
@@ -356,27 +396,26 @@ mucRoom.prototype.setupRoom = function(form) {
 		console.log("setupRoom: No <query><x> ...");
 };
 
-mucRoom.prototype.lock = function() {
+//
+// \brief Request, get, and clear the members list for this room.
+//        Once this is complete. Call the callback.
+//
+mucRoom.prototype.clearMembersList = function(cb) {
+	// Ask for the current list.
 	var self = this;
 	
-	// locking a room requires bumping each person to 'member'
-	// In this version, we'll first ask the server for the member list. If there is anyone on the
-	// list, we'll remove them from the list and then we'll set the current member list 'cleanly'.
-	// And then on response, lock the room.
-
-	// Ask for the current list.
 	this.sendIQ(new xmpp.Element('iq', {to: this.roomname, type: 'get'})
 		.c('query', {xmlns: 'http://jabber.org/protocol/muc#admin'})
 		.c('item', {affiliation: 'member'}), function(curlist) {
 		
 			if (curlist.attrs.type !== 'result')
-				console.log("MUC LOCK @" + self.roomname.split('@')[0] + ": Get-Curlist failed: " + curlist.tree());
+				console.log("MUC clearMembers @" + self.roomname.split('@')[0] + ": Get-Curlist failed: " + curlist.tree());
 			
 			if (curlist.getChild('query') && curlist.getChild('query').getChild('item'))
 			{
 				var items = curlist.getChild('query').getChildren('item');
 				
-//				console.log("MUC LOCK @" + self.roomname.split('@')[0] + ": Current entries: " + curlist.tree());
+				console.log("MUC clearMembers @" + self.roomname.split('@')[0] + ": Current entries: " + curlist.tree());
 				
 				// Iterate through all items and 'zero them out' -- no affiliation and nuke nick/role
 				for (k in items)
@@ -389,7 +428,7 @@ mucRoom.prototype.lock = function() {
 						delete items[k].attrs.role;
 				}
 				
-//				console.log("MUC LOCK @" + self.roomname.split('@')[0] + ": Modified entries: " + curlist.tree());
+				console.log("MUC clearMembers @" + self.roomname.split('@')[0] + ": Modified entries: " + curlist.tree());
 			}
 		
 			// Going to turn this iq around regardless so the logic flow is identical.
@@ -400,6 +439,27 @@ mucRoom.prototype.lock = function() {
 			// After sending this, we'll have a cleared member list.
 			// Then we can set our own.
 			self.sendIQ(curlist, function(res) {
+				if (cb)
+					cb.call(self, res)
+			});
+	});
+};
+
+mucRoom.prototype.lock = function() {
+	var self = this;
+	
+	if (this.islocked)
+	{
+		console.log("MUC LOCK @" + this.roomname.split('@')[0] + ": ERROR: Room is already locked.");
+		return;
+	}
+
+	// locking a room requires bumping each person to 'member'
+	// In this version, we'll first ask the server for the member list. If there is anyone on the
+	// list, we'll remove them from the list and then we'll set the current member list 'cleanly'.
+	// And then on response, lock the room.
+
+	this.clearMembersList(function(res) {
 
 				if (res.attrs.type !== 'result')
 					console.log("MUC LOCK @" + self.roomname.split('@')[0] + ": Mod-entries failed: " + res.tree());
@@ -441,7 +501,10 @@ mucRoom.prototype.lock = function() {
 								.c('field', {var: 'muc#roomconfig_membersonly', type: 'boolean'})
 								.c('value').t('1'), function(resp) {
 									if (resp.attrs.type === 'result')
+									{
 										console.log("MUC Lock @" + self.roomname.split('@')[0] + " locked successfully.");
+										self.islocked = true;
+									}
 									else
 										console.log("MUC Lock @" + self.roomname.split('@')[0] + " NOT LOCKED. Resp: " + resp.tree());
 								});
@@ -450,12 +513,17 @@ mucRoom.prototype.lock = function() {
 						console.log("MUC Lock @" + self.roomname.split('@')[0] + " NOT LOCKED. Member-List failed Resp: " + resp.tree());
 				});
 			});
-		});
 	
 };
 
 mucRoom.prototype.lock_dangerous = function() {
 	var self = this;
+	
+	if (this.islocked)
+	{
+		console.log("MUC LOCK @" + this.roomname.split('@')[0] + ": ERROR: Room is already locked.");
+		return;
+	}
 	
 	// locking a room requires bumping each person to 'member'
 	for (k in this.participants)
@@ -497,7 +565,10 @@ mucRoom.prototype.lock_dangerous = function() {
 					.c('field', {var: 'muc#roomconfig_membersonly', type: 'boolean'})
 					.c('value').t('1'), function(resp) {
 						if (resp.attrs.type === 'result')
+						{
 							console.log("MUC Lock @" + self.roomname.split('@')[0] + " locked successfully.");
+							self.islocked = true;
+						}
 						else
 							console.log("MUC Lock @" + self.roomname.split('@')[0] + " NOT LOCKED. Resp: " + resp.tree());
 					});
@@ -521,7 +592,10 @@ mucRoom.prototype.unlock = function() {
 					.c('field', {var: 'muc#roomconfig_membersonly', type: 'boolean'})
 					.c('value').t('0'), function(resp) {
 						if (resp.attrs.type === 'result')
+						{
 							console.log("MUC Un-Lock @" + self.roomname.split('@')[0] + " unlocked successfully.");
+							self.islocked = false;
+						}
 						else
 							console.log("MUC Un-Lock @" + self.roomname.split('@')[0] + " NOT UNLOCKED. Resp: " + resp.tree());
 					});
@@ -719,6 +793,13 @@ overseer.prototype.sendGroupMessage = function(room, msg_body) {
 	this.client.send(msg);
 };
 
+//
+// \brief Need to check the room's banned-list for this person.
+//
+overseer.prototype.isBanned = function(jid) {
+	// Need 
+};
+
 overseer.prototype.handleMessage = function(msg) {
 	// Listen to pure chat messages to the overseer.
 	if (msg.attrs.type === 'groupchat')
@@ -746,8 +827,15 @@ overseer.prototype.handleMessage = function(msg) {
 					console.log("KNOCK Invalid. No JID (" + fromjid + "), nickname (" + fromnick + "), room (" + toroom + ") or room not found:");
 				else
 				{
-					// We have a room by that name, so let's send the message down...
-					this.sendGroupMessage(toroom + this.CONF_SERVICE, "KNOCK ; FROM ; " + fromjid + " ; AS ; " + fromnick + " ; " + (plea ? plea : ""));
+					// We have a room by that name.
+					// First, see if the jid is banned. If so, don't do anything.
+					if (!this.roomnames[toroom].isBanned(fromjid))
+					{
+						// If they are not banned, let's send the message down...
+						this.sendGroupMessage(toroom + this.CONF_SERVICE, "KNOCK ; FROM ; " + fromjid + " ; AS ; " + fromnick + " ; " + (plea ? plea : ""));
+					}
+					else
+						console.log("KNOCK refused. JID (" + fromjid + "), is on the banned list for room (" + toroom + ")");
 				}
 			}
 			else
@@ -831,7 +919,7 @@ function feedbackBot(feedback_jid, feedback_pw) {
 //
 // Login as test feedback bot.
 //
-var fb = new feedbackBot("feedback_bot_test1@video.gocast.it", "test1");
+//var fb = new feedbackBot("feedback_bot_test1@video.gocast.it", "test1");
 
 //
 // Login as Overseer
