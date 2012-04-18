@@ -194,7 +194,7 @@ mucRoom.prototype.printParticipants = function() {
 		if (parts !== "")
 			parts += ", ";
 
-		parts += k;
+		parts += k.replace(/\\20/g, ' ');
 	}
 
 	console.log("Participants list: " + parts);
@@ -271,6 +271,7 @@ mucRoom.prototype.handleMessage = function(msg) {
 		// LOCK
 		// UNLOCK
 		// INVITE ; jid ; nickname
+		// BAN ; jid ; nickname
 		//
 		if (msg.getChild('body') && msg.getChild('body').getText())
 		{
@@ -287,11 +288,12 @@ mucRoom.prototype.handleMessage = function(msg) {
 				{
 					console.log("MUC @"+this.roomname.split('@')[0] + " - Command: KICKing out: " + cmd[1]);
 					
-					this.kick(cmd[1], function() {
+					if (!this.kick(cmd[1], function() {
 						console.log("MUC @"+this.roomname.split('@')[0] + " - Command: KICK complete.");
 						
 						self.sendGroupMessage(nickfrom + " kicked " + cmd[1] + " out of the room.");
-					});
+					}))
+						console.log("MUC @"+this.roomname.split('@')[0] + " - Command: KICK failed");
 				}
 				else
 					console.log("MUC @"+this.roomname.split('@')[0] + " - Command: KICK - requires nickname.");
@@ -299,8 +301,8 @@ mucRoom.prototype.handleMessage = function(msg) {
 			else if (cmd[0] === 'LOCK')
 			{
 				console.log("MUC @"+this.roomname.split('@')[0] + " - Command: LOCKing room.");
-				this.lock();
-				self.sendGroupMessage(nickfrom + " locked the room.");
+				if (this.lock() === true)
+					self.sendGroupMessage(nickfrom + " locked the room.");
 			}
 			else if (cmd[0] === 'UNLOCK')
 			{
@@ -323,7 +325,7 @@ mucRoom.prototype.handleMessage = function(msg) {
 			  console.log("MUC @"+this.roomname.split('@')[0] + " - Invalid Inbound-Command: " + msg.getChild('body').getText());
 		}
 		else
-			console.log("MUC msg @" + this.roomname.split('@')[0] + ": From:" + msg.attrs.from.split('/')[1] + ": " + msg.getChild('body').getText());
+			console.log("MUC msg @" + this.roomname.split('@')[0] + ": From:" + msg.attrs.from.split('/')[1] + ": " + msg.getChild('body'));
 	}
 };
 
@@ -403,10 +405,14 @@ mucRoom.prototype.setupRoom = function(form) {
 mucRoom.prototype.clearMembersList = function(cb) {
 	// Ask for the current list.
 	var self = this;
-	
-	this.sendIQ(new xmpp.Element('iq', {to: this.roomname, type: 'get'})
+
+	var getmemb = new xmpp.Element('iq', {to: this.roomname, type: 'get'})
 		.c('query', {xmlns: 'http://jabber.org/protocol/muc#admin'})
-		.c('item', {affiliation: 'member'}), function(curlist) {
+		.c('item', {affiliation: 'member'});
+		
+//	console.log("clearMemberList - get request is: " + getmemb.tree());
+
+	this.sendIQ(getmemb, function(curlist) {
 		
 			if (curlist.attrs.type !== 'result')
 				console.log("MUC clearMembers @" + self.roomname.split('@')[0] + ": Get-Curlist failed: " + curlist.tree());
@@ -415,7 +421,7 @@ mucRoom.prototype.clearMembersList = function(cb) {
 			{
 				var items = curlist.getChild('query').getChildren('item');
 				
-				console.log("MUC clearMembers @" + self.roomname.split('@')[0] + ": Current entries: " + curlist.tree());
+//				console.log("MUC clearMembers @" + self.roomname.split('@')[0] + ": Current entries: " + curlist.tree());
 				
 				// Iterate through all items and 'zero them out' -- no affiliation and nuke nick/role
 				for (k in items)
@@ -428,20 +434,98 @@ mucRoom.prototype.clearMembersList = function(cb) {
 						delete items[k].attrs.role;
 				}
 				
-				console.log("MUC clearMembers @" + self.roomname.split('@')[0] + ": Modified entries: " + curlist.tree());
+//				console.log("MUC clearMembers @" + self.roomname.split('@')[0] + ": Modified entries: " + curlist.tree());
+				
+				// Going to turn this iq around regardless so the logic flow is identical.
+				curlist.root().attrs.type = 'set';
+				curlist.root().attrs.to = curlist.root().attrs.from;
+				delete curlist.root().attrs.from;
+				
+				// After sending this, we'll have a cleared member list.
+				// Then we can set our own.
+				self.sendIQ(curlist, function(res) {
+					if (cb)
+						cb.call(self, res)
+				});
+			}
+			else
+			{
+				// No items in the list from the server. So we're already clear. Just callback.
+				
+//				console.log("MUC clearMembers @" + self.roomname.split('@')[0] + ": No members yet.");
+				
+				if (cb)
+					cb.call(self, curlist);
 			}
 		
-			// Going to turn this iq around regardless so the logic flow is identical.
-			curlist.root().attrs.type = 'set';
-			curlist.root().attrs.to = curlist.root().attrs.from;
-			delete curlist.root().attrs.from;
+	});
+};
+
+//
+// \brief Request, get, and clear the banned list for this room.
+//        Once this is complete. Call the callback.
+//
+mucRoom.prototype.clearBannedList = function(cb) {
+	// Ask for the current list.
+	var self = this;
+	
+	var getoutcast = new xmpp.Element('iq', {to: this.roomname, type: 'get'})
+		.c('query', {xmlns: 'http://jabber.org/protocol/muc#admin'})
+		.c('item', {affiliation: 'outcast'});
+		
+//	console.log("clearBannedList - get request is: " + getoutcast.tree());
+	
+	this.sendIQ(getoutcast, function(curlist) {
+		
+			if (curlist.attrs.type !== 'result')
+				console.log("MUC clearBanned @" + self.roomname.split('@')[0] + ": Get-Curlist failed: " + curlist.tree());
 			
-			// After sending this, we'll have a cleared member list.
-			// Then we can set our own.
-			self.sendIQ(curlist, function(res) {
+			if (curlist.getChild('query') && curlist.getChild('query').getChild('item'))
+			{
+				var items = curlist.getChild('query').getChildren('item');
+				
+//				console.log("MUC clearBanned @" + self.roomname.split('@')[0] + ": Current entries: " + curlist.tree());
+				
+				// Iterate through all items and 'zero them out' -- no affiliation and nuke nick/role
+				for (k in items)
+				{
+					items[k].attrs.affiliation = 'none';
+					
+					if (items[k].attrs.nick)
+						delete items[k].attrs.nick;
+					if (items[k].attrs.role)
+						delete items[k].attrs.role;
+				}
+				
+//				console.log("MUC clearBanned @" + self.roomname.split('@')[0] + ": Modified entries: " + curlist.tree());
+
+				// Going to turn this iq around regardless so the logic flow is identical.
+				curlist.root().attrs.type = 'set';
+				curlist.root().attrs.to = curlist.root().attrs.from;
+				delete curlist.root().attrs.from;
+				
+				// After sending this, we'll have a cleared member list.
+				// Then we can set our own.
+				self.sendIQ(curlist, function(res) {
+					for (k in self.bannedlist)
+						delete self.bannedlist[k];
+						
+					if (cb)
+						cb.call(self, res)
+				});
+			}
+			else
+			{
+				// No items in the list from the server. So we're already clear. Just callback.
+				for (k in self.bannedlist)
+					delete self.bannedlist[k];
+				
+//				console.log("MUC clearBanned @" + self.roomname.split('@')[0] + ": No banned jids.");
+				
 				if (cb)
-					cb.call(self, res)
-			});
+					cb.call(self, curlist);
+			}
+		
 	});
 };
 
@@ -451,7 +535,7 @@ mucRoom.prototype.lock = function() {
 	if (this.islocked)
 	{
 		console.log("MUC LOCK @" + this.roomname.split('@')[0] + ": ERROR: Room is already locked.");
-		return;
+		return false;
 	}
 
 	// locking a room requires bumping each person to 'member'
@@ -461,9 +545,15 @@ mucRoom.prototype.lock = function() {
 
 	this.clearMembersList(function(res) {
 
-				if (res.attrs.type !== 'result')
-					console.log("MUC LOCK @" + self.roomname.split('@')[0] + ": Mod-entries failed: " + res.tree());
+		if (res.attrs.type !== 'result')
+			console.log("MUC LOCK @" + self.roomname.split('@')[0] + ": clearMembers failed: " + res.tree());
 				
+		// Now clear the banned list prior to locking the room.
+		this.clearBannedList(function(res) {
+		
+			if (res.attrs.type !== 'result')
+				console.log("MUC LOCK @" + self.roomname.split('@')[0] + ": clearBanned failed: " + res.tree());
+					
 				// Setup the head of the iq-set	
 				var memblist = new xmpp.Element('iq', {to: self.roomname, type: 'set'})
 					.c('query', {xmlns: 'http://jabber.org/protocol/muc#admin'});
@@ -513,66 +603,9 @@ mucRoom.prototype.lock = function() {
 						console.log("MUC Lock @" + self.roomname.split('@')[0] + " NOT LOCKED. Member-List failed Resp: " + resp.tree());
 				});
 			});
+		});
 	
-};
-
-mucRoom.prototype.lock_dangerous = function() {
-	var self = this;
-	
-	if (this.islocked)
-	{
-		console.log("MUC LOCK @" + this.roomname.split('@')[0] + ": ERROR: Room is already locked.");
-		return;
-	}
-	
-	// locking a room requires bumping each person to 'member'
-	for (k in this.participants)
-	{
-		if (k != this.nick)	// Don't modify myself
-		{
-			if (k !== this.participants[k])
-			{
-				// Sending each IQ with no callback. Could wind up in a race for locking the room.
-				this.sendIQ(new xmpp.Element('iq', {to: this.roomname, type: 'set'})
-					.c('query', {xmlns: 'http://jabber.org/protocol/muc#admin'})
-					.c('item', {affiliation: 'member', jid: this.participants[k]}), null);
-			}
-			else
-				console.log("MUC LOCK @" + this.roomname.split('@')[0] + ": Cannot make member. No jid found for: " + k);
-				
-		}
-	}
-	
-	// Now we need to change the room to be members-only.
-	// The only trouble is that the last member-change-affiliation may not be complete.
-	// If this occurs, it may be possible that some person would get effectively kicked
-	// from the room as the room changes to members only but they aren't on the list yet.
-	/*
-	<iq type="result" from="newroom@gocastconference.video.gocast.it" to="overseer@video.gocast.it/a41e7053" xmlns:stream="http://etherx.jabber.org/streams">
- <query xmlns="http://jabber.org/protocol/muc#owner">
-  <x xmlns="jabber:x:data" type="form">
-   <field var="FORM_TYPE" type="hidden">
-		<value>http://jabber.org/protocol/muc#roomconfig</value>
-	</field>
-	<field var="muc#roomconfig_membersonly" type="boolean" label="Room is Members-only"><value>1</value></field>
-*/
-	this.sendIQ(new xmpp.Element('iq', {to: this.roomname, type: 'set'})
-					.c('query', {xmlns: 'http://jabber.org/protocol/muc#owner'})
-					.c('x', {xmlns: 'jabber:x:data', type: 'submit'})
-					.c('field', {var: "FORM_TYPE", type: 'hidden'})
-					.c('value').t('http://jabber.org/protocol/muc#roomconfig')
-					.up().up()
-					.c('field', {var: 'muc#roomconfig_membersonly', type: 'boolean'})
-					.c('value').t('1'), function(resp) {
-						if (resp.attrs.type === 'result')
-						{
-							console.log("MUC Lock @" + self.roomname.split('@')[0] + " locked successfully.");
-							self.islocked = true;
-						}
-						else
-							console.log("MUC Lock @" + self.roomname.split('@')[0] + " NOT LOCKED. Resp: " + resp.tree());
-					});
-	
+	return true;
 };
 
 mucRoom.prototype.unlock = function() {
@@ -610,20 +643,21 @@ mucRoom.prototype.unlock = function() {
 //
 mucRoom.prototype.kick = function(nick, cb) {
 	var role = 'none';
-		
+	var nickToKick = nick.replace(/ /g, '\\20');
+	
 	// See if nickname exists.
-	if (!this.participants[nick])
+	if (!this.participants[nickToKick])
 		return false;
 		
 	// Kicking the user out forcefully. Not banning them however.
 	this.sendIQ(new xmpp.Element('iq', {to: this.roomname, type: 'set'})
 				.c('query', {xmlns: 'http://jabber.org/protocol/muc#admin'})
-				.c('item', {nick: nick, role: role}), cb);
+				.c('item', {nick: nickToKick, role: role}), cb);
 	return true;
 };
 
 //
-// Ban is much more permenant.
+// Ban is much more permanent.
 // Ban removes the person from the room using the jid and not the nickname.
 // Ban sets affiliation to 'outcast'
 // Ban keeps track of the jid who was banned and disallows entry in the future.
@@ -631,18 +665,23 @@ mucRoom.prototype.kick = function(nick, cb) {
 mucRoom.prototype.ban = function(nick, cb) {
 	var jid = this.participants[nick];
 	var affil = 'outcast';
+	var nickToBan = nick.replace(/ /g, '\\20');
 							
 	// See if nickname exists.
-	if (!this.participants[nick])
+	if (!this.participants[nickToBan])
 		return false;
 		
 	// Found an entry in the array and it wasn't just a nick.	
-	if (jid && jid !== nick)
+	if (jid && jid !== nickToBan)
 	{
 		// Kicking the user out forcefully. BANNED.
 		this.sendIQ(new xmpp.Element('iq', {to: this.roomname, type: 'set'})
 					.c('query', {xmlns: 'http://jabber.org/protocol/muc#admin'})
 					.c('item', {jid: jid, affiliation: affil}), cb);
+		
+		// Add person to banned list internally.
+		this.bannedlist[jid] = true;
+		
 		return true;
 	}
 	else
@@ -650,6 +689,13 @@ mucRoom.prototype.ban = function(nick, cb) {
 		console.log("Couldn't seem to find '" + nick + "'. Must have scrammed.");
 		return false;
 	}
+};
+
+mucRoom.prototype.isBanned = function(jid) {
+	if (this.bannedlist[jid])
+		return true;
+	else
+		return false;
 };
 
 mucRoom.prototype.sendGroupMessage = function(msg_body) {
@@ -680,9 +726,9 @@ mucRoom.prototype.sendIQ = function(iq, cb) {
 /*	console.log("sendIQ: MUC @" + this.roomname.split('@')[0] + " - Callback list: ");
 	for (k in this.iq_callbacks)
 		console.log("  CB_ID: " + k);
-		
-	console.log("sendIQ: MUC @" + this.roomname.split('@')[0] + ": SendingIQ: " + iq.tree());
-*/
+*/		
+//	console.log("sendIQ: MUC @" + this.roomname.split('@')[0] + ": SendingIQ: " + iq.tree());
+
 	this.client.send(iq.root());
 };
 
@@ -733,10 +779,14 @@ mucRoom.prototype.rejoin = function(rmname, nick) {
 ///
 
 function overseer(user, pw, rooms) {
-	this.client = new xmpp.Client({ jid: user, password: pw, reconnect: true, host: "video.gocast.it", port: 5222 });
+	this.CONF_SERVICE = "@gocastconference.video.gocast.it";
+	this.SERVER = 'video.gocast.it';
+	this.client = new xmpp.Client({ jid: user, password: pw, reconnect: true, host: this.SERVER, port: 5222 });
 	this.roomnames = {};
 	this.mucRoomObjects = {};
-	this.CONF_SERVICE = "@gocastconference.video.gocast.it";
+	
+	this.iqnum = 0;
+	this.iq_callbacks = {};
 	
 	this.roomnames["bobtestroom"] = true;
 //	this.roomnames["newroom"] = true;
@@ -755,6 +805,23 @@ function overseer(user, pw, rooms) {
 			self.mucRoomObjects[k] = new mucRoom(self.client);
 			self.mucRoomObjects[k].join( k + self.CONF_SERVICE, "overseer");
 		}
+		
+		// Now we need to make sure we stay connected to the server. We will do this via a ping-check
+		// to the server every 5 seconds. If we don't get a reply, we can decide what to do about that.
+		setInterval(function() {
+			console.log("pinging server...");
+			
+			var nopong = setTimeout(function() {
+				console.log("ERROR: No pong received. Server connection died?");
+			}, 3000);
+			
+			self.sendIQ(new xmpp.Element('iq', {to: self.SERVER, type: 'get'})
+						.c('ping', {xmlns: 'urn:xmpp:ping'}), function(res) {
+//							console.log("Got pong.");
+							clearTimeout(nopong);
+						});
+		}, 5000);
+
 	});
 	
 	this.client.on('offline', function() {
@@ -786,6 +853,33 @@ function overseer(user, pw, rooms) {
 	
 };
 
+overseer.prototype.sendIQ = function(iq, cb) {
+	var iqid = "overseer_iqid" + this.iqnum++;
+	var self = this;
+
+	if (!iq.root().is('iq'))
+	{
+		console.log("overseer sendIQ - malformed inbound iq message. No <iq> stanza: " + iq.tree());
+		return;
+	}
+
+	// Add in our ever-increasing room-based id.		
+	iq.root().attr('id', iqid);
+	
+	if (cb)
+		this.iq_callbacks[iqid] = cb;	
+	else
+		console.log("overseer sendIQ: - No callback for id=" + iqid);
+	
+/*	console.log("overseer sendIQ: - Callback list: ");
+	for (k in this.iq_callbacks)
+		console.log("  CB_ID: " + k);
+*/		
+//	console.log("overseer sendIQ: SendingIQ: " + iq.tree());
+
+	this.client.send(iq.root());
+};
+
 overseer.prototype.sendGroupMessage = function(room, msg_body) {
 	var msg = new xmpp.Element('message', {to: room, type: 'groupchat'})
 		.c('body').t(msg_body);
@@ -796,17 +890,22 @@ overseer.prototype.sendGroupMessage = function(room, msg_body) {
 //
 // \brief Need to check the room's banned-list for this person.
 //
-overseer.prototype.isBanned = function(jid) {
-	// Need 
-};
-
 overseer.prototype.handleMessage = function(msg) {
 	// Listen to pure chat messages to the overseer.
-	if (msg.attrs.type === 'groupchat')
+
+	// Now, if we get a direct chat, it could be from a person in a room who is sending commands to
+	// the overseer 'in the room' but it'll be received directly by the overseer as well.
+	// So, we need to distinguish this.
+	// Messages which are room-commands will come "from" "room@gocastconference.video.gocast.it/nickname"
+	// while private external messages (for KNOCK especially) will come from true personal jids.
+	// So, we'll look for '@gocastconference.video.gocast.it' in the string.
+	if (msg.attrs.type === 'groupchat' || msg.attrs.from.indexOf(this.CONF_SERVICE) != -1)
 		return;
 	else
 	{
-		if (msg.getChild('body') && msg.getChild('body').getText())
+//		console.log("DEBUG: InMsg: " + msg);
+		
+		if (msg.getChild('body') && msg.getChild('body').getText() && !msg.getChild('delay'))
 		{
 			// Now we need to split the message up and trim spaces just in case.
 			var cmd = msg.getChild('body').getText().split(';');
@@ -857,7 +956,18 @@ overseer.prototype.handlePresence = function(pres) {
 	
 overseer.prototype.handleIq = function(iq) {
 	// Handle all pings and all queries for #info
-	if (iq.getChild('ping') 
+	if (iq.attrs.type === 'result' && iq.attrs.id && this.iq_callbacks[iq.attrs.id])
+	{
+		var iqid = iq.attrs.id;
+		var callback = this.iq_callbacks[iqid];
+
+		// Need to be sure to not use values from 'iq' after the callback.
+		// As the callback itself can modify iq and sometimes does.
+		delete this.iq_callbacks[iqid];
+		// We have a callback to make on this ID.
+		callback.call(this, iq);
+	}
+	else if (iq.getChild('ping') 
 		|| (iq.getChild('query') && iq.getChildByAttr('xmlns','http://jabber.org/protocol/disco#info')))
 	{
 		iq.attrs.to = iq.attrs.from;
@@ -925,3 +1035,4 @@ function feedbackBot(feedback_jid, feedback_pw) {
 // Login as Overseer
 //
 var overseer = new overseer("overseer@video.gocast.it", "the.overseer.rocks");
+
