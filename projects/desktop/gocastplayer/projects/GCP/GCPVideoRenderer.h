@@ -1,13 +1,5 @@
-//
-//  WebrtcVideoRenderer.h
-//  FireBreath
-//
-//  Created by Manjesh Malavalli on 1/23/12.
-//  Copyright (c) 2012 XVDTH. All rights reserved.
-//
-
-#ifndef FireBreath_WebrtcVideoRenderer_h
-#define FireBreath_WebrtcVideoRenderer_h
+#ifndef Firebreath_GCPVideoRenderer_h
+#define Firebreath_GCPVideoRenderer_h
 
 //-------------- WebRTC headers ----------------------
 #include "talk/session/phone/videorenderer.h"
@@ -15,14 +7,14 @@
 #include "talk/session/phone/videocommon.h"
 #include "talk/base/scoped_ptr.h"
 
-//-------------- Firebreath Headers-------------------
+//-------------- Firebreath Headers -------------------
 #include <boost/thread/mutex.hpp>
 #include "PluginEvents/DrawingEvents.h"
 #include "PluginWindow.h"
 
 namespace GoCast
 {
-    class GCPVideoRenderer : public cricket::VideoRenderer
+    class GCPVideoRenderer: public cricket::VideoRenderer
     {
     public:
         explicit GCPVideoRenderer(FB::PluginWindow* pWin, int width, int height);

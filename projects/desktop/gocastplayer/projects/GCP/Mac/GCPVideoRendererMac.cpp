@@ -1,43 +1,13 @@
-//
-//  WebrtcVideoRenderer.cpp
-//  FireBreath
-//
-//  Created by Manjesh Malavalli on 1/23/12.
-//  Copyright (c) 2012 XVDTH. All rights reserved.
-//
-
-#include "GCPVideoRenderer.h"
+#include "../GCPVideoRenderer.h"
 
 namespace GoCast
 {
-    GCPVideoRenderer::GCPVideoRenderer(FB::PluginWindow* pWin,
-                                       int width,
-                                       int height)
-    : m_pWin(pWin)
-    , m_width(width)
-    , m_height(height)
-
-    {
-        m_pFrameBuffer.reset(new uint8[m_width*m_height*4]);
-    }
-
-    GCPVideoRenderer::~GCPVideoRenderer()
-    {
-        m_pFrameBuffer.reset(NULL);
-    }
-
-    bool GCPVideoRenderer::SetSize(int width, int height, int reserved)
-    {
-        //resize not implemented yet
-        return true;
-    }
-
     bool GCPVideoRenderer::RenderFrame(const cricket::VideoFrame* pFrame)
     {
         static const int stride = m_width*4;
         static const int frameBufferSize = m_height*stride;
         boost::mutex::scoped_lock winLock(m_winMutex);
-
+        
         pFrame->ConvertToRgbBuffer(cricket::FOURCC_ARGB,
                                    m_pFrameBuffer.get(),
                                    frameBufferSize,
@@ -54,13 +24,13 @@ namespace GoCast
             pBufIter[3] = 0xff;
             pBufIter += 4;
         }
-
+        
         //trigger window refresh event
         m_pWin->InvalidateWindow();
         
         return true;
     }
-
+    
     bool GCPVideoRenderer::OnWindowRefresh(FB::RefreshEvent* pEvt)
     {
         static const int stride = m_width*4;    
@@ -76,7 +46,7 @@ namespace GoCast
         
         int winWidth = pCgDrawEvt->bounds.right - pCgDrawEvt->bounds.left;
         int winHeight = pCgDrawEvt->bounds.bottom - pCgDrawEvt->bounds.top;
-
+        
         if(winWidth<=1 || winHeight<=1)
             return false;
         
@@ -105,7 +75,7 @@ namespace GoCast
         CGImageRelease(cgImage);
         CGColorSpaceRelease(colorSpace);
         CGContextRestoreGState(pContext);
-
+        
         return true;
     }
 }
