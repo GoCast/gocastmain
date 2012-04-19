@@ -21,36 +21,6 @@
 
 struct PaUtilRingBuffer;
 
-template <class T>
-class Singleton
-{
-public:
-    // Return existing or create new instance
-    static T* instance(const WebRtc_Word32 uniqueid)
-    {
-        // Do we have an instance of this type? If so return it, otherwise create a new one.
-        return m_pInstance ? m_pInstance : m_pInstance = new T(uniqueid);
-    }
-    
-    // Manually destroy an existing instance. Call at end of program to clean up.
-    static void destroy()
-    {
-        delete m_pInstance;
-        m_pInstance = NULL;
-    }
-    
-private:
-    Singleton();                            // Constructor                   (empty & cannot be called externally)
-    ~Singleton();                           // Destructor                    (empty & cannot be called externally)
-    Singleton(Singleton const&);            // Copy constructor              (empty & cannot be called externally - no copies allowed)
-    Singleton& operator=(Singleton const&); // Assignment operator           (empty & cannot be called externally - no assignment allowed)
-    static T* m_pInstance;                  // Static template-type instance
-};
-
-// Set static instance value to NULL
-template <class T> T* Singleton<T>::m_pInstance = NULL;
-
-
 namespace webrtc
 {
 class EventWrapper;
@@ -83,14 +53,12 @@ enum
 
 const WebRtc_UWord32 TIMER_PERIOD_MS = (2 * 10 * N_BLOCKS_IO * 1000000);
 
-const WebRtc_UWord32 REC_BUF_SIZE_IN_SAMPLES = (ENGINE_REC_BUF_SIZE_IN_SAMPLES
-    * N_DEVICE_CHANNELS * N_BUFFERS_IN);
-const WebRtc_UWord32 PLAY_BUF_SIZE_IN_SAMPLES =
-    (ENGINE_PLAY_BUF_SIZE_IN_SAMPLES * N_PLAY_CHANNELS * N_BUFFERS_OUT);
+const WebRtc_UWord32 REC_BUF_SIZE_IN_SAMPLES = (ENGINE_REC_BUF_SIZE_IN_SAMPLES * N_DEVICE_CHANNELS * N_BUFFERS_IN);
+const WebRtc_UWord32 PLAY_BUF_SIZE_IN_SAMPLES = (ENGINE_PLAY_BUF_SIZE_IN_SAMPLES * N_PLAY_CHANNELS * N_BUFFERS_OUT);
 
 #define AudioDeviceID SInt32
 #define kAudioObjectUnknown -1
-    
+
 class AudioDeviceIPhone: public AudioDeviceGeneric
 {
 public:
@@ -225,7 +193,7 @@ public:
 public:
     virtual void AttachAudioBuffer(AudioDeviceBuffer* audioBuffer);
 
-private:
+public:
     void Lock()
     {
         _critSect.Enter();
@@ -325,7 +293,7 @@ private:
     bool CaptureWorkerThread();
     bool RenderWorkerThread();
     
-private:
+public:
     AudioDeviceBuffer* _ptrAudioBuffer;
 
     CriticalSectionWrapper& _critSect;

@@ -63,6 +63,9 @@
  */
 
 var Callcast = {
+	PLUGIN_VERSION_CURRENT: 1.19,
+	PLUGIN_VERSION_REQUIRED: 1.18,
+	PLUGIN_DOWNLOAD_URL: "http://video.gocast.it/plugin.html",
 	NOANSWER_TIMEOUT_MS: 6000,
 	CALLCAST_XMPPSERVER: "video.gocast.it",
 	CALLCAST_ROOMS: "gocastconference.video.gocast.it",
@@ -71,6 +74,8 @@ var Callcast = {
 	STUNSERVER: "video.gocast.it",
 	FEEDBACK_BOT: "feedback_bot_test1@video.gocast.it",
 	STUNSERVERPORT: 19302,
+	Callback_AddPlugin: null,
+	Callback_RemovePlugin: null,
     connection: null,
     localplayer: null,
     participants: {},
@@ -81,15 +86,23 @@ var Callcast = {
     joined: false,
     keepAliveTimer: null,
     bUseVideo: true,
-    WIDTH: 160,
-    HEIGHT: 120,
+    WIDTH: 256,
+    HEIGHT: 192,
 
     CallStates: {
     	NONE: 0,
     	AWAITING_RESPONSE: 1,
     	CONNECTED: 2
     },
-    
+	
+	setCallbackForAddPlugin: function(cb) {
+		this.Callback_AddPlugin = cb;
+	},
+	
+	setCallbackForRemovePlugin: function(cb) {
+		this.Callback_RemovePlugin = cb;
+	},
+	
     keepAlive: function() {
     	this.keepAliveTimer = setInterval(function() {
     		if (Callcast.connection)
@@ -141,6 +154,10 @@ var Callcast = {
     		alert("Could not enter room. Likely max # users reached in this room.");
     		this.LeaveSession();
     	}
+    	else if ($(err).find('not-allowed').length > 0)
+    	{
+          // Handled inside PresHandler           	$(document).trigger('room-creation-not-allowed', room);
+		}
     	else
     	{
 			alert("Unknown Error Stanza: " + $(err).children('error').text());
@@ -159,6 +176,21 @@ var Callcast = {
 		Callcast.participants = {};
     },
     
+
+	pluginUpdateAvailable: function() {
+		if (this.localplayer)
+			return this.GetVersion() < this.PLUGIN_VERSION_CURRENT;
+		else
+			return true;
+	},
+	
+	pluginUpdateRequired: function() {
+		if (this.localplayer)
+			return this.GetVersion() < this.PLUGIN_VERSION_REQUIRED;
+		else
+			return true;
+	},
+
     GetVersion: function() {
     	if (this.localplayer)
     		return parseFloat(this.localplayer.version);
@@ -194,6 +226,7 @@ var Callcast = {
 	//
 	ShowRemoteVideo: function(info) {
 		var nick = info.nick;
+		nick = this.WithSpaces(nick);
 				
 		if (nick && this.participants[nick])
 		{
@@ -238,7 +271,9 @@ var Callcast = {
 			}
 			else
 			{
+//			console.log("DEBUG: Pre-StopLocalVideo() inside SendLocalVideoToPeers");
 				this.localplayer.stopLocalVideo();
+//			console.log("DEBUG: Post-StopLocalVideo() inside SendLocalVideoToPeers");
 				this.localplayer.width = 0;
 				this.localplayer.height = 0;
 			}
@@ -278,6 +313,7 @@ var Callcast = {
 				// Despite Manjesh making a call upon init to stop the capture, on first load
 				// the capture continues on Mac - so we'll force it to stop here just in case.
 				//
+				Callcast.localplayer.startLocalVideo();
 				Callcast.localplayer.stopLocalVideo();
 				
 				Callcast.localplayer.width=0;
@@ -317,12 +353,16 @@ var Callcast = {
     	this.jid = room + "/" + nickin.replace(/ /g,'\\20');
     	this.non_muc_jid = "";
     	this.CallState = Callcast.CallStates.NONE;
-    	// TODO - FIX - Need a truly UNIQUE adder here - not nick which can change and be replaced during the lifetime of the call.
-    	$("#rtcobjects").append('<div id="div_GocastPlayer'+nickname+'"><object id="GocastPlayer'+nickname+'" type="application/x-gocastplayer" width="'+Callcast.WIDTH+'" height="'+Callcast.HEIGHT+'"></object></div>');
     	
-    	this.peer_connection = $('#GocastPlayer'+nickname).get(0);
-    	if (!this.peer_connection)
-    		alert("Gocast Player object not found in DOM. Plugin problem?");
+    	if (Callcast.Callback_AddPlugin)
+    	{
+    		this.peer_connection = Callcast.Callback_AddPlugin(nickname);
+    		
+			if (!this.peer_connection)
+				alert("Gocast Player object not found in DOM. Plugin problem?");
+    	}
+    	else
+    		alert("ERROR: Callcast.setCallbackForAddPlugin() has not been called yet.");
     	
     	self = this;
     	
@@ -456,7 +496,11 @@ var Callcast = {
     			// Make sure it has no spaces...
 				if (nick)
 					nick = nick.replace(/ /g, '');
-    			$("#div_GocastPlayer"+nick).remove();
+					
+				if (Callcast.Callback_RemovePlugin)
+					Callcast.Callback_RemovePlugin(nick);
+				else
+					alert("ERROR: Callcast.setCallbackForRemovePlugin() has not been called yet.");
     		}
     		else
     			console.log("Dropping FAILED. Cant find peer_connection (or self)");
@@ -646,25 +690,10 @@ var Callcast = {
 //                $('#room-topic').text(subject);
 //            }
 
-            if (!notice) {
-                var delay_css = delayed ? " delayed" : "";
-
-                var action = body.match(/\/me (.*)$/);
-                if (!action) {
-                    Callcast.add_message(
-                        "<div class='message" + delay_css + "'>" +
-                            "&lt;<span class='" + nick_class + "'>" +
-                            nick + "</span>&gt; <span class='body'>" +
-                            body + "</span></div>");
-                } else {
-                    Callcast.add_message(
-                        "<div class='message action " + delay_css + "'>" +
-                            "* " + nick + " " + action[1] + "</div>");
-                }
-            } else {
-                Callcast.add_message("<div class='notice'>*** " + body +
-                                    "</div>");
-            }
+			var msginfo = { nick: nick, nick_class: nick_class, body: body, delayed: delayed, notice: notice };
+			
+			$(document).trigger('public-message', msginfo);
+			
         }
 
         return true;    
@@ -685,31 +714,14 @@ var Callcast = {
 			if (!body)
 				return true;	// Empty body - likely a signalling message.
 				
-			Callcast.add_message(
-				"<div class='message private'>" +
-					"@@ &lt;<span class='nick'>" +
-					"Private From " +
-					nick + "</span>&gt; <span class='body'>" +
-					body + "</span> @@</div>");
+			var msginfo = { nick: nick, body: body };
+			
+			$(document).trigger('private-message', msginfo);
         }
 
         return true;    
     },
     
-    add_message: function (msg) {
-        // detect if we are scrolled all the way down
-        var chat = $('#chat').get(0);
-        var at_bottom = chat.scrollTop >= chat.scrollHeight - 
-            chat.clientHeight;
-        
-        $('#chat').append(msg);
-
-        // if we were at the bottom, keep us at the bottom
-        if (at_bottom) {
-            chat.scrollTop = chat.scrollHeight;
-        }
-    },
-
     MsgHandler: function(msg) {
 //    	console.log("STANDARD MESSAGE:");
 //    	console.log(msg);
@@ -750,10 +762,13 @@ var Callcast = {
 					$(document).trigger('user_updated', info);
 				}
 				
-                if ($(presence).attr('type') === 'error' &&
-                    !Callcast.joined) {
+                if ($(presence).attr('type') === 'error' && !Callcast.joined) {
                     // error joining room; reset app
-                	console.log("PresHandler: Error joining room. Disconnecting.");
+                    if ($(presence).find('not-allowed').length > 0)
+                    	$(document).trigger('room-creation-not-allowed', Strophe.getNodeFromJid(room));
+                    else
+	                	console.log("PresHandler: Error joining room. Disconnecting.");
+	                	
                     Callcast.disconnect();
                 }
                 else if (nick == Callcast.nick && $(presence).attr('type') == 'unavailable')
@@ -1094,7 +1109,9 @@ var Callcast = {
 
     	// Now -- if a room was specified in the URL, then jump directly in.
     	if ($.getUrlVar('unlistedroom'))
-			Callcast.CreateUnlistedAndJoin($.getUrlVar('unlistedroom'));
+    	{
+			Callcast.JoinSession($.getUrlVar('unlistedroom'), $.getUrlVar('unlistedroom')+Callcast.AT_CALLCAST_ROOMS);
+		}
 
     },
  };
@@ -1121,295 +1138,3 @@ getUrlVar: function(name){
 }
 });
 
-$(document).ready(function () {
-	var jid = "";
-	var password = "";
-	
-	if ($.getUrlVar('jid'))
-		jid = $.getUrlVar('jid');
-	if ($.getUrlVar('password'))
-		password = $.getUrlVar('password');
-		
-	if ($.getUrlVar('nickname'))
-		Callcast.SetNickname($.getUrlVar('nickname'));
-
-	var bVideo = $('#video_enabled') && $('#video_enabled').is(':checked');
-	Callcast.SetUseVideo(bVideo);
-	
-	///
-	/// Handle the login via URL which got passed or via dialog box.
-	///
-	if (jid != "" && password != "")
-		Callcast.connect(jid, password);
-	else if (jid === "anonymous")
-		Callcast.connect(Callcast.CALLCAST_XMPPSERVER, "");	// Anonymous login.
-	else
-	{
-	    $('#login_dialog').dialog({
-	        autoOpen: true,
-	        draggable: false,
-	        modal: true,
-	        title: 'Connect to XMPP',
-	        buttons: {
-	            "Connect": function () {
-	            	if ($('#jid').val() === "anonymous" && $('#password')==="")
-						Callcast.connect(Callcast.CALLCAST_XMPPSERVER, "");	// Anonymous login.
-					else
-		            	Callcast.connect($('#jid').val(), $('#password').val());
-		            	
-	                if ($('#nickname').val())
-	                	Callcast.SetNickname($('#nickname').val());
-	                	
-	                $('#password').val('');
-	                $(this).dialog('close');
-	            }
-	        }
-	    });
-	}
- 
- 	$('#video_enabled').click(function() {
-		var bVideo = $(this).is(':checked');
-		Callcast.SendLocalVideoToPeers(bVideo);
- 	});
- 	
- 	$('#audio_muted').click(function() {
-		var bMuteAudio = $(this).is(':checked');
-		Callcast.MuteLocalVoice(bMuteAudio);
- 	});
- 	
-	 $('#join_button').click(function () {
-		 var sel =  $("#rooms option:selected");
-
-		 if (sel !== "")
-		 {
-			 $('#participant-list').empty();
-	    	 Callcast.JoinSession($(sel).text(), $(sel).attr('jid'));
-		 }
-
-	 });
-
-	 $('#leave_button').click(function () {
-		 if (!Callcast.joined)
-			 alert("Not currently in session. Nothing to leave.");
-		 else
-		 {
-			Callcast.LeaveSession();
-		 	$('#participant-list').empty();
-		 }
-	 });
-	 
-	 $('#chat_text').keypress(function (ev) {
-		if (ev.which === 13) {
-			ev.preventDefault();
-
-			var body = $(this).val();
-			Callcast.SendPublicChat(body);
-			
-			$(this).val('');
-		}
-	 });
-
-	 $('#send_chat').click(function() {
-	 	var body = $('#chat_text').val();
-	 	Callcast.SendPublicChat(body);
-	 	$('chat_text').val('');
-	 });
-	 
-	 $('#send_link').click(function() {
-	    Callcast.SendSyncLink($('#link_text').val());
-	 	$('#link_text').val('<sent>');
-	 });
-
-	 $('#get_roster_button').click(function () {
-	 	Callcast.log("**NO_CODE_HERE** Getting user's roster...");
-	 	
-	 });
-	
-	 $('#subscribe_button').click(function () {
-	 	Callcast.log("Subscription requested to " + $('#input').val() + "...");
-	 	
-	 	Callcast.connection.roster.subscribe($('#input').val());
-	 });
-	
-	 $('#test_button').click(function() {
-	 });
-	 
-	 $('#call_button').click(function () {
-	
-		 var to_whom = $('#to_whom').val();
-		 var reason = $('#reason').val();
-		 var room = $('#roomname').val().toLowerCase();
-	
-		 $('#participant-list').empty();
-	
-		 Callcast.MakeCall(to_whom, room, reason);
-		 
-	 });
-
-});	// document ready
-
-
-$(document).bind('joined_session', function () {
-	 $('#leave_button').removeAttr('disabled');
-	 $("#join_button").attr('disabled', 'disabled');
-	 $("#rooms select").attr('disabled', 'disabled');
-
-	 $('#send_chat').removeAttr('disabled');
-	 $('#chat_text').removeAttr('disabled');
-
-	 $('#send_link').removeAttr('disabled');
-	 $('#link_text').removeAttr('disabled');
-});
-
-$(document).bind('left_session', function () {
-	 $('#participant-list').empty();
-	 $('#participant-list').append('<p>[None Yet]</p>');
-	 
-	 $("#leave_button").attr('disabled', 'disabled');
-	 $('#join_button').removeAttr('disabled');
-	 $('#rooms select').removeAttr('disabled');
-	 
-	 $('#send_chat').attr('disabled', 'disabled');
-	 $('#chat_text').attr('disabled', 'disabled');
-	 
-	 $('#send_link').attr('disabled', 'disabled');
-	 $('#link_text').attr('disabled', 'disabled');
-});
-
-$(document).bind('roomlist_updated', function () {
-	 $('#rooms select').empty();
-	 var room_added = false;
-	 
-	 for (k in Callcast.roomlist)
-	 {
-		 var optionline = '<option jid=' + k + ' room=' + Strophe.getNodeFromJid(k);
-		 //
-		 // If the room we're adding here is the same room we're already *IN*, then select it in the list.
-		 //
-		 if (Callcast.room === k)
-			 optionline += ' selected=selected';
-		 
-		 optionline += '>' + Callcast.roomlist[k] + '</option>';
-	
-		 $('#rooms select').append(optionline);
-		 room_added = true;
-	 }
-	 
-	 if (!room_added)
-		 $('#rooms select').append("<option>[None Yet]</option>");
-});
-
-$(document).bind('synclink', function (ev, link) {
-	$('#link_text').val(link);
-});
-
-$(document).bind('user_joined', function (ev, info) {
-	var nick = info.nick;
-	var hasVid = info.hasVid;
-	var joinstr = '<li nick="'+nick+'">' + nick;
-	
-	if (hasVid===null)
-		joinstr += '</li>';
-	else if (hasVid===true)
-		joinstr += ' (Video On)</li>';
-	else if (hasVid===false)
-		joinstr += ' (Video Off)</li>';
-
-	$('#participant-list').append(joinstr);
-    Callcast.ShowRemoteVideo(info);
-});
-
-//
-// UI section for being told that a user's status has changed.
-// This means video was turned on or off.
-// info.nick is the 'who' while info.hasVid tells the video
-// status. NOTE: If info.hasVid is null, no video status is being
-// reported by the other end. Otherwise it'll be true or false
-// to indicate status.
-//
-// Also, Callcast.ShowRemoteVideo() is being called in order to
-// make the UI pane disappear (0,0 size) if hasVid==false.
-// If the caller wishes to set an actual width and height,
-// all that is necessary is to set:
-// info.width = <value1>
-// info.height = <value2>
-// prior to calling ShowRemoteVideo. This overrides info.hasVid
-//
-$(document).bind('user_updated', function (ev, info) {
-	var nick = info.nick;
-	var hasVid = info.hasVid;
-	var nickstr = nick;
-	
-	if (hasVid===true)
-		nickstr += ' (Video On)';
-	else if (hasVid===false)
-		nickstr += ' (Video Off)';
-
-    $('#participant-list li').each(function () {
-        if (nick === $(this).attr('nick')) {
-            $(this).text(nickstr);
-            Callcast.ShowRemoteVideo(info);
-        }
-    });
-	
-});
-
-$(document).bind('user_left', function (ev, nick) {
-    // remove from participants list
-    $('#participant-list li').each(function () {
-        if (nick === $(this).attr('nick')) {
-            $(this).remove();
-        }
-    });
-});
-
-$(document).bind('connected', function () {
-
-	$('.button').removeAttr('disabled');
-	$('#rooms select').removeAttr('disabled');
-	
-/*	Callcast.connection.xmlInput = function(data) {
-		if ($(data).children()[0])
-			console.log("XML-IN:", $(data).children()[0]);
-		else
-			console.log("XML-IN:", $(data));
-		
-	};
-	
-	Callcast.connection.xmlOutput = function(data) {
-		if ($(data).children()[0])
-			console.log("XML-OUT:", $(data).children()[0]);
-		else
-			console.log("XML-OUT:", $(data));
-		
-	};
-*/
-	// Set "who am i" at the top
-//	$("#myjid").text("My JID: " + Callcast.connection.jid);
-	$('#version').text("Plug-in Version: " + (Callcast.GetVersion() || "None"));
-   	Callcast.SendLocalVideoToPeers($('#video_enabled').is(':checked'));	// Update the video status locally upon signin.
-	
-});
-
-$(document).bind('disconnected', function () {
- Callcast.log("Connection terminated.");
-
- $("#rooms select").empty();
- $("#rooms select").append("<li>[None Yet]</li>");
- $("#participant-list").empty();
- 
- $("#leave_button").attr('disabled', 'disabled');
- $('#join_button').removeAttr('disabled');
- $('#rooms select').removeAttr('disabled');
- $('#myjid').html("<b>[Disconnected]</b>");
-
-});
-
-$(window).unload(function() {
-	  Callcast.disconnect();
-	});
-
-function pluginLoaded() {
-	console.log("Plugin loaded!");
-	Callcast.InitGocastPlayer();
-};

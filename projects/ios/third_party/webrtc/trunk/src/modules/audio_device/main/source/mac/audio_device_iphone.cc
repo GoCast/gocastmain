@@ -34,6 +34,35 @@
 #define kOutputBus 0
 #define kInputBus  1
 
+template <class T>
+class Singleton
+{
+public:
+    // Return existing or create new instance
+    static T* instance(const WebRtc_Word32 uniqueid)
+    {
+        // Do we have an instance of this type? If so return it, otherwise create a new one.
+        return m_pInstance ? m_pInstance : m_pInstance = new T(uniqueid);
+    }
+    
+    // Manually destroy an existing instance. Call at end of program to clean up.
+    static void destroy()
+    {
+        delete m_pInstance;
+        m_pInstance = NULL;
+    }
+    
+private:
+    Singleton();                            // Constructor                   (empty & cannot be called externally)
+    ~Singleton();                           // Destructor                    (empty & cannot be called externally)
+    Singleton(Singleton const&);            // Copy constructor              (empty & cannot be called externally - no copies allowed)
+    Singleton& operator=(Singleton const&); // Assignment operator           (empty & cannot be called externally - no assignment allowed)
+    static T* m_pInstance;                  // Static template-type instance
+};
+
+// Set static instance value to NULL
+template <class T> T* Singleton<T>::m_pInstance = NULL;
+
 //static AudioComponentInstance _audioUnit;
 //static bool _audioUnitInit = false;
 
@@ -57,9 +86,6 @@
 //
 //    return strdup(str);
 //}
-
-namespace webrtc
-{
 
 #define WEBRTC_CA_RETURN_ON_ERR(expr)                                   \
     do {                                                                \
@@ -89,6 +115,300 @@ namespace webrtc
         }                                                               \
     } while(0)
 
+namespace webrtc
+{
+    class AudioDeviceIPhoneInternal
+    {
+    public:
+        AudioDeviceIPhoneInternal(const WebRtc_Word32 _id);
+        ~AudioDeviceIPhoneInternal();
+        
+        WebRtc_Word32 AudioDeviceIPhoneInternal::Init(const WebRtc_Word32 _id);
+
+        void logCAMsg(const webrtc::TraceLevel level,
+                      const webrtc::TraceModule module,
+                      const WebRtc_Word32 id, const char *msg,
+                      const char *err);
+        static OSStatus inDeviceIOProc(void                        *inRefCon,
+                                       AudioUnitRenderActionFlags  *ioActionFlags,
+                                       const AudioTimeStamp        *inTimeStamp,
+                                       UInt32                      inBusNumber,
+                                       UInt32                      inNumberFrames,
+                                       AudioBufferList             *ioData);
+        
+        static OSStatus outDeviceIOProc(void                        *inRefCon,
+                                        AudioUnitRenderActionFlags  *ioActionFlags,
+                                        const AudioTimeStamp        *inTimeStamp,
+                                        UInt32                      inBusNumber,
+                                        UInt32                      inNumberFrames,
+                                        AudioBufferList             *ioData);
+        
+    public:
+        AudioDeviceIPhone* parent;
+
+        SInt16* _captureBufData;
+        SInt16* _renderBufData;
+        
+        WebRtc_UWord32 _captureBufSizeSamples;
+        WebRtc_UWord32 _renderBufSizeSamples;
+        
+        PaUtilRingBuffer* _paCaptureBuffer;
+        PaUtilRingBuffer* _paRenderBuffer;
+        
+        AudioComponentInstance _audioUnit;
+        
+        AudioStreamBasicDescription _outStreamFormat;
+        AudioStreamBasicDescription _outDesiredFormat;
+        AudioStreamBasicDescription _inStreamFormat;
+        AudioStreamBasicDescription _inDesiredFormat;
+    };
+    
+#pragma mark - AudioDeviceIPhoneInternal -
+
+AudioDeviceIPhoneInternal::AudioDeviceIPhoneInternal(const WebRtc_Word32 _id)
+{
+    this->parent = NULL;
+    this->Init(_id);
+}
+    
+WebRtc_Word32 AudioDeviceIPhoneInternal::Init(const WebRtc_Word32 _id)
+{
+    // PortAudio ring buffers require an elementCount which is a power of two.
+    if (_renderBufData == NULL)
+    {
+        UInt32 powerOfTwo = 1;
+        while (powerOfTwo < PLAY_BUF_SIZE_IN_SAMPLES)
+        {
+            powerOfTwo <<= 1;
+        }
+        _renderBufSizeSamples = powerOfTwo;
+        _renderBufData = new SInt16[_renderBufSizeSamples];
+    }
+    
+    if (_paRenderBuffer == NULL)
+    {
+        _paRenderBuffer = new PaUtilRingBuffer;
+        ring_buffer_size_t bufSize = -1;
+        bufSize = PaUtil_InitializeRingBuffer(_paRenderBuffer, 
+                                              sizeof(SInt16),
+                                              _renderBufSizeSamples,
+                                              _renderBufData);
+        if (bufSize == -1)
+        {
+            WEBRTC_TRACE(kTraceCritical, kTraceAudioDevice,
+                         _id, " PaUtil_InitializeRingBuffer() error");
+            return -1;
+        }
+    }
+    
+    if (_captureBufData == NULL)
+    {
+        UInt32 powerOfTwo = 1;
+        while (powerOfTwo < REC_BUF_SIZE_IN_SAMPLES)
+        {
+            powerOfTwo <<= 1;
+        }
+        _captureBufSizeSamples = powerOfTwo;
+        _captureBufData = new SInt16[_captureBufSizeSamples];
+    }
+    
+    if (_paCaptureBuffer == NULL)
+    {
+        _paCaptureBuffer = new PaUtilRingBuffer;
+        ring_buffer_size_t bufSize = -1;
+        bufSize = PaUtil_InitializeRingBuffer(_paCaptureBuffer,
+                                              sizeof(SInt16),
+                                              _captureBufSizeSamples,
+                                              _captureBufData);
+        if (bufSize == -1)
+        {
+            WEBRTC_TRACE(kTraceCritical, kTraceAudioDevice,
+                         _id, " PaUtil_InitializeRingBuffer() error");
+            return -1;
+        }
+    }
+    
+    OSStatus err = noErr;
+    
+    //TODO: Interruption listener
+    AudioSessionInitialize(NULL, NULL, NULL, NULL);
+    
+    UInt32 cat = kAudioSessionCategory_PlayAndRecord;
+    err = AudioSessionSetProperty(kAudioSessionProperty_AudioCategory,
+                                  sizeof(cat),
+                                  &cat);
+    
+    //    Float32 preferredBufferSize = .010; //10 msecs
+    //    err = AudioSessionSetProperty(kAudioSessionProperty_PreferredHardwareIOBufferDuration, 
+    //                                  sizeof(preferredBufferSize), 
+    //                                  &preferredBufferSize);
+    
+    AudioComponentDescription desc;
+    
+    desc.componentType = kAudioUnitType_Output;
+    desc.componentSubType = kAudioUnitSubType_VoiceProcessingIO;
+    desc.componentFlags = 0;
+    desc.componentFlagsMask = 0;
+    desc.componentManufacturer = kAudioUnitManufacturer_Apple;
+    
+    // Get component
+    AudioComponent inputComponent = AudioComponentFindNext(NULL, &desc);
+    
+    WEBRTC_CA_RETURN_ON_ERR(AudioComponentInstanceNew(inputComponent, &_audioUnit));
+    
+    AudioStreamBasicDescription format;
+    format.mSampleRate			= N_REC_SAMPLES_PER_SEC;
+    format.mFormatID			= kAudioFormatLinearPCM;
+    format.mFormatFlags		    = kAudioFormatFlagIsSignedInteger | kAudioFormatFlagIsPacked;
+#ifdef WEBRTC_BIG_ENDIAN
+    format.mFormatFlags        |= kLinearPCMFormatFlagIsBigEndian;
+#endif
+    format.mFramesPerPacket	    = 1;
+    format.mChannelsPerFrame	= N_REC_CHANNELS;
+    format.mBitsPerChannel		= sizeof(SInt16) * 8;
+    format.mBytesPerPacket		= format.mChannelsPerFrame * sizeof(SInt16);
+    format.mBytesPerFrame		= format.mChannelsPerFrame * sizeof(SInt16);
+    
+    _inDesiredFormat = _outDesiredFormat = format;
+    
+    // Apply format
+    WEBRTC_CA_RETURN_ON_ERR(AudioUnitSetProperty(_audioUnit, 
+                                                 kAudioUnitProperty_StreamFormat, 
+                                                 kAudioUnitScope_Output, 
+                                                 kInputBus, 
+                                                 &format, 
+                                                 sizeof(format)));
+    
+    
+    WEBRTC_CA_RETURN_ON_ERR(AudioUnitSetProperty(_audioUnit, 
+                                                 kAudioUnitProperty_StreamFormat, 
+                                                 kAudioUnitScope_Input, 
+                                                 kOutputBus, 
+                                                 &format, 
+                                                 sizeof(format)));
+    
+    UInt32 ioSize = sizeof(_inStreamFormat);
+    WEBRTC_CA_RETURN_ON_ERR(AudioUnitGetProperty(_audioUnit, 
+                                                 kAudioUnitProperty_StreamFormat, 
+                                                 kAudioUnitScope_Input, 
+                                                 kOutputBus, 
+                                                 &_inStreamFormat, 
+                                                 &ioSize));
+    
+    ioSize = sizeof(_outStreamFormat);
+    WEBRTC_CA_RETURN_ON_ERR(AudioUnitGetProperty(_audioUnit, 
+                                                 kAudioUnitProperty_StreamFormat, 
+                                                 kAudioUnitScope_Output, 
+                                                 kInputBus, 
+                                                 &_outStreamFormat, 
+                                                 &ioSize));
+    
+    {        
+        AURenderCallbackStruct callbackStruct;
+        callbackStruct.inputProc = inDeviceIOProc;
+        callbackStruct.inputProcRefCon = this;
+        err = AudioUnitSetProperty(_audioUnit, 
+                                   kAudioOutputUnitProperty_SetInputCallback, 
+                                   kAudioUnitScope_Global, 
+                                   kInputBus, 
+                                   &callbackStruct, 
+                                   sizeof(callbackStruct));
+        if (err != noErr) {
+            
+        }
+    }
+    {
+        UInt32 enable = 1;
+        err = AudioUnitSetProperty(_audioUnit,
+                                   kAudioOutputUnitProperty_EnableIO,
+                                   kAudioUnitScope_Input,
+                                   kInputBus,
+                                   &enable,
+                                   sizeof(enable));
+        
+        if (err != noErr) {
+        }
+        
+        AURenderCallbackStruct callbackStruct;
+        callbackStruct.inputProc = outDeviceIOProc;
+        callbackStruct.inputProcRefCon = this;
+        err = AudioUnitSetProperty(_audioUnit, 
+                                   kAudioUnitProperty_SetRenderCallback, 
+                                   kAudioUnitScope_Input, 
+                                   kOutputBus,
+                                   &callbackStruct, 
+                                   sizeof(callbackStruct));
+        if (err != noErr) {
+        }
+    }
+    
+    WEBRTC_CA_RETURN_ON_ERR(AudioUnitInitialize(_audioUnit));
+}
+    
+    
+void AudioDeviceIPhoneInternal::logCAMsg(const TraceLevel level,
+                                         const TraceModule module,
+                                         const WebRtc_Word32 id, const char *msg,
+                                         const char *err)
+{
+    assert(msg != NULL);
+    assert(err != NULL);
+    
+#ifdef WEBRTC_BIG_ENDIAN
+    WEBRTC_TRACE(level, module, id, "%s: %.4s", msg, err);
+#else
+    // We need to flip the characters in this case.
+    WEBRTC_TRACE(level, module, id, "%s: %.1s%.1s%.1s%.1s", msg, err + 3, err
+                 + 2, err + 1, err);
+#endif
+}
+
+AudioDeviceIPhoneInternal::~AudioDeviceIPhoneInternal()
+{
+    AudioUnitUninitialize(_audioUnit);
+    AudioComponentInstanceDispose(_audioUnit);
+}
+
+OSStatus AudioDeviceIPhoneInternal::inDeviceIOProc(void                        *inRefCon,
+                                           AudioUnitRenderActionFlags  *ioActionFlags,
+                                           const AudioTimeStamp        *inTimeStamp,
+                                           UInt32                      inBusNumber,
+                                           UInt32                      inNumberFrames,
+                                           AudioBufferList             *ioData)
+{
+    WEBRTC_TRACE(kTraceModuleCall, kTraceAudioDevice, -1,
+                 "%s samples: %d", __FUNCTION__, inNumberFrames);
+    
+    AudioDeviceIPhoneInternal *ptrThis = (AudioDeviceIPhoneInternal *)inRefCon;
+    assert(ptrThis != NULL);
+    
+    AudioBufferList buffers;
+    buffers.mNumberBuffers = 1;
+    buffers.mBuffers[0].mData = ptrThis->parent->_captureData;
+    buffers.mBuffers[0].mNumberChannels = ptrThis->_inStreamFormat.mChannelsPerFrame;
+    buffers.mBuffers[0].mDataByteSize = inNumberFrames * ptrThis->_inStreamFormat.mBytesPerFrame *
+    ptrThis->_inStreamFormat.mChannelsPerFrame;
+    
+    ioData = &buffers;
+    OSStatus err = noErr;
+    err = AudioUnitRender(ptrThis->_audioUnit,
+                          ioActionFlags, 
+                          inTimeStamp, 
+                          inBusNumber, 
+                          inNumberFrames, 
+                          ioData);
+    
+    err = ptrThis->parent->implInDeviceIOProc(ioData, inTimeStamp);
+    return err;
+}
+
+};
+
+#pragma mark -
+
+namespace webrtc
+{
+
 enum
 {
     MaxNumberDevices = 64
@@ -100,6 +420,11 @@ UInt64 AudioConvertHostTimeToNanos(UInt64 time)
     mach_timebase_info(&timebase);
     return (double)time * (double)timebase.numer / (double)timebase.denom / 1e3;
 }
+
+#pragma mark - static AudioDeviceIPhoneInternal _internal; -
+
+static AudioDeviceIPhoneInternal* _internal = NULL;
+
     
 void AudioDeviceIPhone::AtomicSet32(int32_t* theValue, int32_t newValue)
 {
@@ -306,101 +631,25 @@ WebRtc_Word32 AudioDeviceIPhone::ActiveAudioLayer(
     return 0;
 }
 
+
+#pragma mark - AudioDeviceIPhone::Init -
 WebRtc_Word32 AudioDeviceIPhone::Init()
 {
     WEBRTC_TRACE(kTraceModuleCall, kTraceAudioDevice, _id,
                  "%s", __FUNCTION__);
-
+    
     CriticalSectionScoped lock(_critSect);
-
+    
     if (_initialized)
     {
         return 0;
     }
-
+    
     _isShutDown = false;
 
-    // PortAudio ring buffers require an elementCount which is a power of two.
-    if (_renderBufData == NULL)
-    {
-        UInt32 powerOfTwo = 1;
-        while (powerOfTwo < PLAY_BUF_SIZE_IN_SAMPLES)
-        {
-            powerOfTwo <<= 1;
-        }
-        _renderBufSizeSamples = powerOfTwo;
-        _renderBufData = new SInt16[_renderBufSizeSamples];
-    }
-
-    if (_paRenderBuffer == NULL)
-    {
-        _paRenderBuffer = new PaUtilRingBuffer;
-        ring_buffer_size_t bufSize = -1;
-        bufSize = PaUtil_InitializeRingBuffer(_paRenderBuffer, 
-                                              sizeof(SInt16),
-                                              _renderBufSizeSamples,
-                                              _renderBufData);
-        if (bufSize == -1)
-        {
-            WEBRTC_TRACE(kTraceCritical, kTraceAudioDevice,
-                         _id, " PaUtil_InitializeRingBuffer() error");
-            return -1;
-        }
-    }
-
-    if (_captureBufData == NULL)
-    {
-        UInt32 powerOfTwo = 1;
-        while (powerOfTwo < REC_BUF_SIZE_IN_SAMPLES)
-        {
-            powerOfTwo <<= 1;
-        }
-        _captureBufSizeSamples = powerOfTwo;
-        _captureBufData = new SInt16[_captureBufSizeSamples];
-    }
-
-    if (_paCaptureBuffer == NULL)
-    {
-        _paCaptureBuffer = new PaUtilRingBuffer;
-        ring_buffer_size_t bufSize = -1;
-        bufSize = PaUtil_InitializeRingBuffer(_paCaptureBuffer,
-                                              sizeof(SInt16),
-                                              _captureBufSizeSamples,
-                                              _captureBufData);
-        if (bufSize == -1)
-        {
-            WEBRTC_TRACE(kTraceCritical, kTraceAudioDevice,
-                         _id, " PaUtil_InitializeRingBuffer() error");
-            return -1;
-        }
-    }
-
-    if (_renderWorkerThread == NULL)
-    {
-        _renderWorkerThread
-             = ThreadWrapper::CreateThread(RunRender, this, kRealtimePriority,
-                                           "RenderWorkerThread");
-        if (_renderWorkerThread == NULL)
-        {
-            WEBRTC_TRACE(kTraceCritical, kTraceAudioDevice,
-                         _id, " Render CreateThread() error");
-            return -1;
-        }
-    }
-
-    if (_captureWorkerThread == NULL)
-    {
-         _captureWorkerThread
-             = ThreadWrapper::CreateThread(RunCapture, this, kRealtimePriority,
-                                           "CaptureWorkerThread");
-        if (_captureWorkerThread == NULL)
-        {
-            WEBRTC_TRACE(kTraceCritical, kTraceAudioDevice,
-                         _id, " Capture CreateThread() error");
-            return -1;
-        }
-    }
-
+    //-- Initialize internal audio hardware
+    _internal = Singleton<AudioDeviceIPhoneInternal>::instance(_id);
+    
     kern_return_t kernErr = KERN_SUCCESS;
     kernErr = semaphore_create(mach_task_self(), &_renderSemaphore,
                                SYNC_POLICY_FIFO, 0);
@@ -410,7 +659,7 @@ WebRtc_Word32 AudioDeviceIPhone::Init()
                      " semaphore_create() error: %d", kernErr);
         return -1;
     }
-
+    
     kernErr = semaphore_create(mach_task_self(), &_captureSemaphore,
                                SYNC_POLICY_FIFO, 0);
     if (kernErr != KERN_SUCCESS)
@@ -420,127 +669,35 @@ WebRtc_Word32 AudioDeviceIPhone::Init()
         return -1;
     }
 
-    OSStatus err = noErr;
-
-    //TODO: Interruption listener
-    AudioSessionInitialize(NULL, NULL, NULL, NULL);
-    
-    UInt32 cat = kAudioSessionCategory_PlayAndRecord;
-    err = AudioSessionSetProperty(kAudioSessionProperty_AudioCategory,
-                                  sizeof(cat),
-                                  &cat);
-    
-//    Float32 preferredBufferSize = .010; //10 msecs
-//    err = AudioSessionSetProperty(kAudioSessionProperty_PreferredHardwareIOBufferDuration, 
-//                                  sizeof(preferredBufferSize), 
-//                                  &preferredBufferSize);
-    
-    AudioComponentDescription desc;
-    
-    desc.componentType = kAudioUnitType_Output;
-    desc.componentSubType = kAudioUnitSubType_VoiceProcessingIO;
-    desc.componentFlags = 0;
-    desc.componentFlagsMask = 0;
-    desc.componentManufacturer = kAudioUnitManufacturer_Apple;
-    
-    // Get component
-    AudioComponent inputComponent = AudioComponentFindNext(NULL, &desc);
-    
-    WEBRTC_CA_RETURN_ON_ERR(AudioComponentInstanceNew(inputComponent, &_audioUnit));
-    
-    AudioStreamBasicDescription format;
-    format.mSampleRate			= N_REC_SAMPLES_PER_SEC;
-    format.mFormatID			= kAudioFormatLinearPCM;
-    format.mFormatFlags		    = kAudioFormatFlagIsSignedInteger | kAudioFormatFlagIsPacked;
-#ifdef WEBRTC_BIG_ENDIAN
-    format.mFormatFlags        |= kLinearPCMFormatFlagIsBigEndian;
-#endif
-    format.mFramesPerPacket	    = 1;
-    format.mChannelsPerFrame	= N_REC_CHANNELS;
-    format.mBitsPerChannel		= sizeof(SInt16) * 8;
-    format.mBytesPerPacket		= format.mChannelsPerFrame * sizeof(SInt16);
-    format.mBytesPerFrame		= format.mChannelsPerFrame * sizeof(SInt16);
-    
-    _inDesiredFormat = _outDesiredFormat = format;
-    
-    // Apply format
-    WEBRTC_CA_RETURN_ON_ERR(AudioUnitSetProperty(_audioUnit, 
-                                  kAudioUnitProperty_StreamFormat, 
-                                  kAudioUnitScope_Output, 
-                                  kInputBus, 
-                                  &format, 
-                                  sizeof(format)));
-    
-    
-    WEBRTC_CA_RETURN_ON_ERR(AudioUnitSetProperty(_audioUnit, 
-                                  kAudioUnitProperty_StreamFormat, 
-                                  kAudioUnitScope_Input, 
-                                  kOutputBus, 
-                                  &format, 
-                                  sizeof(format)));
-    
-    UInt32 ioSize = sizeof(_inStreamFormat);
-    WEBRTC_CA_RETURN_ON_ERR(AudioUnitGetProperty(_audioUnit, 
-                                                 kAudioUnitProperty_StreamFormat, 
-                                                 kAudioUnitScope_Input, 
-                                                 kOutputBus, 
-                                                 &_inStreamFormat, 
-                                                 &ioSize));
-    
-    ioSize = sizeof(_outStreamFormat);
-    WEBRTC_CA_RETURN_ON_ERR(AudioUnitGetProperty(_audioUnit, 
-                                                 kAudioUnitProperty_StreamFormat, 
-                                                 kAudioUnitScope_Output, 
-                                                 kInputBus, 
-                                                 &_outStreamFormat, 
-                                                 &ioSize));
-    
-    {        
-        AURenderCallbackStruct callbackStruct;
-        callbackStruct.inputProc = inDeviceIOProc;
-        callbackStruct.inputProcRefCon = this;
-        err = AudioUnitSetProperty(_audioUnit, 
-                                   kAudioOutputUnitProperty_SetInputCallback, 
-                                   kAudioUnitScope_Global, 
-                                   kInputBus, 
-                                   &callbackStruct, 
-                                   sizeof(callbackStruct));
-        if (err != noErr) {
-            
-        }
-    }
+    if (_renderWorkerThread == NULL)
     {
-        UInt32 enable = 1;
-        err = AudioUnitSetProperty(_audioUnit,
-                                   kAudioOutputUnitProperty_EnableIO,
-                                   kAudioUnitScope_Input,
-                                   kInputBus,
-                                   &enable,
-                                   sizeof(enable));
-        
-        if (err != noErr) {
-        }
-        
-        AURenderCallbackStruct callbackStruct;
-        callbackStruct.inputProc = outDeviceIOProc;
-        callbackStruct.inputProcRefCon = this;
-        err = AudioUnitSetProperty(_audioUnit, 
-                                   kAudioUnitProperty_SetRenderCallback, 
-                                   kAudioUnitScope_Input, 
-                                   kOutputBus,
-                                   &callbackStruct, 
-                                   sizeof(callbackStruct));
-        if (err != noErr) {
+        _renderWorkerThread = ThreadWrapper::CreateThread(RunRender, this, kRealtimePriority,
+                                                          "RenderWorkerThread");
+        if (_renderWorkerThread == NULL)
+        {
+            WEBRTC_TRACE(kTraceCritical, kTraceAudioDevice,
+                         _id, " Render CreateThread() error");
+            return -1;
         }
     }
-
-    WEBRTC_CA_RETURN_ON_ERR(AudioUnitInitialize(_audioUnit));
+    
+    if (_captureWorkerThread == NULL)
+    {
+        _captureWorkerThread = ThreadWrapper::CreateThread(RunCapture, this, kRealtimePriority,
+                                                           "CaptureWorkerThread");
+        if (_captureWorkerThread == NULL)
+        {
+            WEBRTC_TRACE(kTraceCritical, kTraceAudioDevice,
+                         _id, " Capture CreateThread() error");
+            return -1;
+        }
+    }
 
     _playWarning = 0;
     _playError = 0;
     _recWarning = 0;
     _recError = 0;
-
+    
     _initialized = true;
 
     return 0;
@@ -548,8 +705,6 @@ WebRtc_Word32 AudioDeviceIPhone::Init()
 
 WebRtc_Word32 AudioDeviceIPhone::Terminate()
 {
-//TJG
-#if 0
     WEBRTC_TRACE(kTraceModuleCall, kTraceAudioDevice, _id,
                  "%s", __FUNCTION__);
 
@@ -576,10 +731,7 @@ WebRtc_Word32 AudioDeviceIPhone::Terminate()
 
     int retVal = 0;
 
-    WEBRTC_TRACE(kTraceWarning, kTraceAudioDevice, _id, getOSSError(status));
-
-    AudioUnitUninitialize(_audioUnit);
-    AudioComponentInstanceDispose(_audioUnit);
+//    WEBRTC_TRACE(kTraceWarning, kTraceAudioDevice, _id, getOSSError(status));
     
     _critSect.Leave();
 
@@ -589,8 +741,6 @@ WebRtc_Word32 AudioDeviceIPhone::Terminate()
     _inputDeviceIsSpecified = false;
 
     return retVal;
-#endif
-    return 0;
 }
 
 bool AudioDeviceIPhone::Initialized() const
@@ -1936,39 +2086,6 @@ OSStatus AudioDeviceIPhone::implOutConverterProc(UInt32 *numberDataPackets,
     }
     
     return 0;
-}
-
-OSStatus AudioDeviceIPhone::inDeviceIOProc(void                        *inRefCon,
-                                           AudioUnitRenderActionFlags  *ioActionFlags,
-                                           const AudioTimeStamp        *inTimeStamp,
-                                           UInt32                      inBusNumber,
-                                           UInt32                      inNumberFrames,
-                                           AudioBufferList             *ioData)
-{
-    WEBRTC_TRACE(kTraceModuleCall, kTraceAudioDevice, -1,
-                 "%s samples: %d", __FUNCTION__, inNumberFrames);
-    
-    AudioDeviceIPhone *ptrThis = (AudioDeviceIPhone *)inRefCon;
-    assert(ptrThis != NULL);
-    
-    AudioBufferList buffers;
-    buffers.mNumberBuffers = 1;
-    buffers.mBuffers[0].mData = ptrThis->_captureData;
-    buffers.mBuffers[0].mNumberChannels = ptrThis->_inStreamFormat.mChannelsPerFrame;
-    buffers.mBuffers[0].mDataByteSize = inNumberFrames * ptrThis->_inStreamFormat.mBytesPerFrame *
-    ptrThis->_inStreamFormat.mChannelsPerFrame;
-    
-    ioData = &buffers;
-    OSStatus err = noErr;
-    err = AudioUnitRender(ptrThis->_audioUnit,
-                             ioActionFlags, 
-                             inTimeStamp, 
-                             inBusNumber, 
-                             inNumberFrames, 
-                             ioData);
-    
-    err = ptrThis->implInDeviceIOProc(ioData, inTimeStamp);
-    return err;
 }
     
 OSStatus AudioDeviceIPhone::implInDeviceIOProc(const AudioBufferList *inputData,
