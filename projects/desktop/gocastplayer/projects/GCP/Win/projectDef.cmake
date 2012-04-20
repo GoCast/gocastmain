@@ -45,8 +45,16 @@ add_windows_plugin(${PROJECT_NAME} SOURCES)
 #    "http://timestamp.verisign.com/scripts/timestamp.dll")
 
 # add library dependencies here; leave ${PLUGIN_INTERNAL_DEPS} there unless you know what you're doing!
+
+find_library(LIBWEBRTC webrtc_Release.lib ../../deps/webrtc/trunk/build/Release/lib)
+
 target_link_libraries(${PROJECT_NAME}
     ${PLUGIN_INTERNAL_DEPS}
+    ${LIBWEBRTC}
+    secur32.lib
+    msdmo.lib
+    dmoguids.lib
+    wmcodecdspuuid.lib
     )
 
 set(WIX_HEAT_FLAGS
