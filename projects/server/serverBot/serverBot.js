@@ -1151,6 +1151,15 @@ function feedbackBot(feedback_jid, feedback_pw) {
 	// The clients should be sending:
 	// Their jid, their room name, their nick
 	// plus any message sent by the user.
+	var d = new Date();
+	var fname = feedback_jid.split('@')[0]+'_'+(d.getMonth()+1)+'_'+d.getDate()+'_'+d.getFullYear()+'.txt'
+	this.logfile = fs.createWriteStream(fname, {'flags': 'a'});
+// use {'flags': 'a'} to append and {'flags': 'w'} to erase and write a new file
+	this.logfile.write("this is a message" + "\n");
+	this.logfile.write("this is a 2nd message." + "\n");
+
+	var self = this;
+
 	var client = new xmpp.Client({ jid: feedback_jid, password: feedback_pw, reconnect: true, host: "video.gocast.it", port: 5222 });
 
 	client.on('online',
@@ -1172,10 +1181,16 @@ function feedbackBot(feedback_jid, feedback_pw) {
 					var nick = stanza.attrs.nick || 'no-nick';
 					var room = stanza.attrs.room || 'no-room';
 
-					sys.puts("From: " + stanza.attrs.from
+					var d = new Date();
+					var ts = "" + (d.getMonth()+1) + "-" + d.getDate() + "-" + d.getFullYear() + " "
+						+ d.getHours() + ":" + d.getMinutes() + ":" + d.getSeconds() + " - ";
+					var line = ts + "From: " + stanza.attrs.from
 						+ ", Nick: " + nick
 						+ ", Room: " + room
-						+ ", Body: " + stanza.getChild('body').getText());
+						+ ", Body: " + stanza.getChild('body').getText();
+
+					sys.puts(line);
+					self.logfile.write(line + "\n");
 				  }
 
 				  // Swap addresses...
@@ -1200,6 +1215,7 @@ function loadRooms(filename) {
 // Login as test feedback bot.
 //
 //var fb = new feedbackBot("feedback_bot_test1@video.gocast.it", "test1");
+var fb_etzchayim = new feedbackBot("feedback_bot_etzchayim@video.gocast.it", "feedback.gocast.etzchayim");
 
 //
 // Login as Overseer
