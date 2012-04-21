@@ -21,7 +21,7 @@
 #include "talk/session/phone/mediaengine.h"
 #include "talk/base/scoped_ptr.h"
 #include "talk/base/thread.h"
-#include "Mac/GCPVideoRenderer.h"
+#include "GCPVideoRenderer.h"
 
 #define WEBRTC_RESOURCES_INIT 0
 #define WEBRTC_RESOURCES_DEINIT 1
@@ -65,7 +65,7 @@ public:
     // If you want your plugin to be optionally windowless based on the
     // value of the "windowless" param tag, remove this method or return
     // FB::PluginCore::isWindowless()
-    virtual bool isWindowless() { return false; }
+    virtual bool isWindowless() { return true; }
 
     BEGIN_PLUGIN_EVENT_MAP()
         EVENTTYPE_CASE(FB::MouseDownEvent, onMouseDown, FB::PluginWindow)

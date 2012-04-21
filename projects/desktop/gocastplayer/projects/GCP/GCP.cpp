@@ -375,7 +375,7 @@ bool GCP::onWindowAttached(FB::AttachedEvent *evt, FB::PluginWindow *pWin)
         }
     }
     
-    return false;
+    return true;
 }
 
 bool GCP::onWindowDetached(FB::DetachedEvent *evt, FB::PluginWindow *)
@@ -400,7 +400,7 @@ bool GCP::onWindowDetached(FB::DetachedEvent *evt, FB::PluginWindow *)
         m_pRenderer = NULL;
     }
         
-    return false;
+    return true;
 }
 
 bool GCP::onWindowRefresh(FB::RefreshEvent *evt, FB::PluginWindow *pWin)
@@ -413,5 +413,5 @@ bool GCP::onWindowRefresh(FB::RefreshEvent *evt, FB::PluginWindow *pWin)
         }
     }
     
-    return false;
+    return true;
 }
