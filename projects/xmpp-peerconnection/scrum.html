@@ -3,22 +3,23 @@
 <html>
   <head>
     <title>SCRUM Dogfood Test</title>
-    
+
     <link rel='stylesheet' href='http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.0/themes/cupertino/jquery-ui.css'>
     <script src='http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.js'></script>
     <script src='http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/jquery-ui.js'></script>
-    <script src='../scripts/strophe.js'></script>
-    <script src='../scripts/strophe.roster.js'></script>
-    <script src='../scripts/strophe.disco.js'></script>
-    <script src='../scripts/strophe.muc.js'></script>
-    <script src='../scripts/strophe.jingle.js'></script>
+
+    <script src='/scripts/strophe.js'></script>
+    <script src='/scripts/strophe.roster.js'></script>
+    <script src='/scripts/strophe.disco.js'></script>
+    <script src='/scripts/strophe.muc.js'></script>
+    <script src='/scripts/strophe.jingle.js'></script>
 
     <link rel='stylesheet' href='testjinglertc.css'>
     <script src='callcast.js'></script>
     <script src='scrum.js'></script>
   </head>
   <body>
-  
+
     <h1>GCP Video SCRUM Dogfood Test</h1><br/>
     <h2>Select a room and click 'Join'.</h2>
     <h3 id='myjid'></h3>
@@ -27,9 +28,14 @@
     <div id='buttons'>
 <!--    		<input id="test_button" type="button" value="test" class="button"/>  -->
 	    <input id="video_enabled" type='checkbox' value='video' class='button'/>Enable My Video Camera<br/>
-	    <input id="audio_muted" type='checkbox' value='audio' class='button'/>Mute My Microphone (reqs V1.11)<br/>
-	</div>
-	
+	    <input id="audio_muted" type='checkbox' value='audio' class='button'/>Mute My Microphone<br/>
+	    <input id="lock_room" type="button" value="Lock Room" class="button/>
+	    <input id="unlock_room" type="button" value="Un-Lock Room" class="button/>
+Kick (nickname): <input id='kickban_text' type='text' disabled='disabled' class='button'/>
+    <input id="kick_button" type='button' disabled='disabled' value='Kick Out' class='button'/>
+    <input id="ban_button" type='button' disabled='disabled' value='Ignore/Ban' class='button'/>
+    </div>
+
 	<table border="0" cellpadding="5" cellspacing="0">
 		<tr>
 			<th>Active Sessions</th><th>People In Session</th>
@@ -42,7 +48,7 @@
 				</select>
 			</div>
 			</td>
-			
+
 			<td width="300px" valign="top" align="left">
 			<div id="participant-list">
 				<li>[None Yet.]</li>
@@ -65,7 +71,7 @@
 			 <param name="onload" value="pluginLoaded" />
 		</object>
 	  </div>
-	</div>    
+	</div>
 
     <div>
 	        <div id='chat'>
@@ -73,7 +79,7 @@
 	</div>
     Group Chat: <input id='chat_text' type='text' disabled='disabled' class='button'/>
     <input id="send_chat" type='button' disabled='disabled' value='Send Chat' class='button'/>
-    
+
 	<br/>Test Sync Link: <input id="link_text" type='text' size=100 disabled='disabled' class='button'/>
 	<input id="send_link" type='button' disabled='disabled' value='Send SyncLink' class='button'/>
 

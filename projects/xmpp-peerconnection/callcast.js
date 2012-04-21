@@ -63,8 +63,12 @@
  */
 
 var Callcast = {
-	PLUGIN_VERSION_CURRENT: 1.19,
-	PLUGIN_VERSION_REQUIRED: 1.18,
+	PLUGIN_VERSION_CURRENT: 0.0,
+	PLUGIN_VERSION_REQUIRED: 0.0,
+	PLUGIN_VERSION_CURRENT_MAC: 1.19,
+	PLUGIN_VERSION_REQUIRED_MAC: 1.19,
+	PLUGIN_VERSION_CURRENT_WIN: 1.2,
+	PLUGIN_VERSION_REQUIRED_WIN: 1.2,
 	PLUGIN_DOWNLOAD_URL: "http://video.gocast.it/plugin.html",
 	NOANSWER_TIMEOUT_MS: 6000,
 	CALLCAST_XMPPSERVER: "video.gocast.it",
@@ -72,7 +76,7 @@ var Callcast = {
 	AT_CALLCAST_ROOMS: "@gocastconference.video.gocast.it",
 	NS_CALLCAST: "urn:xmpp:callcast",
 	STUNSERVER: "video.gocast.it",
-	FEEDBACK_BOT: "feedback_bot_test1@video.gocast.it",
+	FEEDBACK_BOT: "feedback_bot_etzchayim@video.gocast.it",
 	STUNSERVERPORT: 19302,
 	Callback_AddPlugin: null,
 	Callback_RemovePlugin: null,
@@ -88,6 +92,7 @@ var Callcast = {
     bUseVideo: true,
     WIDTH: 256,
     HEIGHT: 192,
+    overseer: null,
 
     CallStates: {
     	NONE: 0,
@@ -165,7 +170,7 @@ var Callcast = {
 		}
 		else if ($(err).find('forbidden').length > 0)
 		{
-			alert("You have been banned from entering this room.\nKnocking is ignored as well.");
+			alert("Someone in the room has blocked your admission.\nKnocking is being ignored as well.");
 			this.LeaveSession();
 		}
     	else
@@ -186,8 +191,28 @@ var Callcast = {
 		Callcast.participants = {};
     },
 
+	figurePlatformVersion: function() {
+		if (PLUGIN_VERSION_CURRENT===0.0)
+		{
+			// Figure out which platform we're on and use versions appropriately.
+			if (navigator.appVersion.indexOf("Win")!=-1)
+			{
+				this.PLUGIN_VERSION_CURRENT = this.PLUGIN_VERSION_CURRENT_WIN;
+				this.PLUGIN_VERSION_REQUIRED = this.PLUGIN_VERSION_REQUIRED_WIN;
+			}
+			else if (navigator.appVersion.indexOf("Mac")!=-1)
+			{
+				this.PLUGIN_VERSION_CURRENT = this.PLUGIN_VERSION_CURRENT_MAC;
+				this.PLUGIN_VERSION_REQUIRED = this.PLUGIN_VERSION_REQUIRED_MAC;
+			}
+			else
+				alert("Unsupported Operating System.");
+		}
+	},
 
 	pluginUpdateAvailable: function() {
+		this.figurePlatformVersion();
+
 		if (this.localplayer)
 			return this.GetVersion() < this.PLUGIN_VERSION_CURRENT;
 		else
@@ -195,6 +220,8 @@ var Callcast = {
 	},
 
 	pluginUpdateRequired: function() {
+		this.figurePlatformVersion();
+
 		if (this.localplayer)
 			return this.GetVersion() < this.PLUGIN_VERSION_REQUIRED;
 		else
@@ -667,7 +694,7 @@ var Callcast = {
 
     SendFeedback: function(msg) {
     	if (this.connection)
-		    this.connection.send($msg({to:this.FEEDBACK_BOT}).c('body').t(msg))
+		    this.connection.send($msg({to:this.FEEDBACK_BOT, nick: this.nick, room: this.room.split('@')[0]}).c('body').t(msg))
     },
 
     on_public_message: function(message) {
@@ -741,6 +768,13 @@ var Callcast = {
     PresHandler: function(presence) {
             var from = $(presence).attr('from');
             var room = Strophe.getBareJidFromJid(from);
+
+			if ($(presence).attr('usertype')==='silent')	// Overseer/serverBot
+			{
+				// Let's grab the name of the overseer for future reference...
+				this.overseer = from;
+				return true;
+			}
 
         	console.log(presence);
         	console.log("From-NICK: " + $(presence).attr('from'));
