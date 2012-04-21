@@ -17,6 +17,9 @@ then send a message to the group saying 'nick' is requesting to come in the room
  */
 var sys = require('util');
 var xmpp = require('node-xmpp');
+var fs = require('fs');
+var ltx = require('ltx');
+
 var argv = process.argv;
 
 //if (argv.length != 4) {
@@ -44,7 +47,7 @@ function mucRoom(client) {
 	var self = this;
 
 	// Max # users.
-	this.options['muc#roomconfig_maxusers'] = '11';
+	this.options['muc#roomconfig_maxusers'] = '16';
 
 	// Hidden room.
 	this.options['muc#roomconfig_publicroom'] = '0';	// Non-listed room.
@@ -935,7 +938,21 @@ function overseer(user, pw, rooms) {
 	this.iqnum = 0;
 	this.iq_callbacks = {};
 
+	if (process.argv.length > 2)
+	{
+		this.roomsxml = loadRooms(process.argv[process.argv.length-1]); // '/var/www/etzchayim/xml/schedules.xml');
+		var par = new ltx.parse(this.roomsxml);
+		var rooms = par.getChildren('room');
+
+		for (k in rooms)
+		{
+			console.log("Monitoring room: " + rooms[k].attrs.jid);
+			this.roomnames[rooms[k].attrs.jid.split('@')[0]] = true;
+		}
+	}
+
 	this.roomnames["bobtestroom"] = true;
+//	this.roomnames["lobby"] = true;
 //	this.roomnames["newroom"] = true;
 //	this.roomnames["other_newroom"] = true;
 
@@ -1172,6 +1189,11 @@ function feedbackBot(feedback_jid, feedback_pw) {
 		  function(e) {
 		  sys.puts(e);
 		  });
+};
+
+function loadRooms(filename) {
+	console.log("Loading rooms database from: " + filename);
+	return fs.readFileSync(filename, 'utf8');
 };
 
 //

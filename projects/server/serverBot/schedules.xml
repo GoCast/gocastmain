@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
+<!--
+ ! File: schedules.xml
+ !
+ ! Brief: Gocast.it small groups schedules
+ !
+ ! Author: Net-Scale Technologies, Inc., www.net-scale.com
+ !         Created April 13, 2012 (paula.muller@net-scale.com)
+ !
+ ! Copyright (c) 2012 XVD Technology Holdings (USA). All rights reserved.
+ -->
+<!--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
+
+<schedules>
+  <room date="Mon, 04/09/2012" time="5:30pm" name="Paulas Tests" 
+        jid="etzchayim-torah@gocastconference.video.gocast.it"
+        title="Torah class" />
+  <room date="Thursdays" time="noon" name="Paulas Tests" 
+        jid="etzchayim-talmud@gocastconference.video.gocast.it"
+        title="Talmud class" />
+  <room date="Mon, 04/11/2012" time="7:30pm" name="Paulas Tests" 
+        jid="etzchayim-kabalah@gocastconference.video.gocast.it"
+        title="Kabalah class" />
+  <room date="Daily Sunday-Friday" time="9:00am" name="Paulas Tests" 
+        jid="etzchayim-sachrit@gocastconference.video.gocast.it"
+        title="Sachrit" />
+</schedules>
