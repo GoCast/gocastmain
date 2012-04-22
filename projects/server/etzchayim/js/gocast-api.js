@@ -33,10 +33,9 @@ function joinedSession(
    * Enable button activities except join. */
   $("#meeting > #mystream > #myctrls > input#video").removeAttr('disabled');
   $("#meeting > #mystream > #myctrls > input#audio").removeAttr('disabled');
-  $("#meeting > #mystream > #myctrls > input#leave").removeClass("inactive");
-  $("#meeting > #mystream > #myctrls > input#join").addClass("inactive");
   $("#meeting > #controls > input").removeAttr('disabled');
   $("#meeting > #sharingView > div > input").removeAttr('disabled');
+  closeWindow();
   return false;
 } /* joinedSession() */
 
@@ -57,9 +56,8 @@ function leftSession(
   app.log(2, "User has successfully left the session.");
   /*
    * Remove all the objects in carousel. */
-  $("#meeting > #streams > #scarousel div.cloudcarousel").each(function(i, e) {
-    $(e).addClass("unoccupied");
-    $("object", e).remove();
+  $("#meeting > #streams > #scarousel div.cloudcarousel:not(.unoccupied)").each(function(i, e) {
+    removePluginFromCarousel($(e).attr("encname"));
   });
   /*
    * Disable button activities except join. */
@@ -67,8 +65,6 @@ function leftSession(
     .attr('disabled', 'disabled');
   $("#meeting > #mystream > #myctrls > input#audio")
     .attr('disabled', 'disabled');
-  $("#meeting > #mystream > #myctrls > input#leave").addClass("inactive");
-  $("#meeting > #mystream > #myctrls > input#join").removeClass("inactive");
   $("#meeting > #controls > input").attr('disabled', 'disabled');
   $("#meeting > #sharingView > div > input").attr('disabled', 'disabled');
   return false;
@@ -138,7 +134,8 @@ function publicMessage(
   /*
    * Add message to Message Board. */
   $("#meeting > #msgBoard > .scrollcontainer > ul")
-    .prepend('<li><span class="sender">' + msginfo.nick + ': </span>' +
+    .prepend('<li><span class="sender">' + decodeURI(msginfo.nick) +
+             ': </span>' +
              '<span class="message">' + msginfo.body + '</span></li>');
   app.log(2, "A public message arrived.");
 } /* publicMessage() */
@@ -260,7 +257,12 @@ function connected(
     vertext += " -- Version update REQUIRED." + " Visit " +
       Callcast.PLUGIN_DOWNLOAD_URL;
     /*
-     * To do show message. */  
+     * Force user to update plugin. */  
+    app.log(4, "Plugin update required: " + vertext);
+    $("#errorMsgPlugin").empty();
+    $("#errorMsgPlugin").append('<h1>Gocast.it plugin version update required</h1><p>Please visit <a href=' + Callcast.PLUGIN_DOWNLOAD_URL + '>' + Callcast.PLUGIN_DOWNLOAD_URL + '</a> to reinstall.</p>');
+    openWindow('#errorMsgPlugin');
+    return false;
   }
   else if (Callcast.pluginUpdateAvailable()) {
     vertext += " -- Version update AVAILABLE." + " Visit " +
@@ -268,9 +270,11 @@ function connected(
   }
   app.log(2, vertext);
   /*
-   * Enable join button. */
-  $('#meeting > #mystream > #myctrls > input#join').removeClass("inactive");
-  $('#meeting > #mystream > #myctrls > input#leave').addClass("inactive");
+   * Proceed to connect user automatically. */
+  /*
+   * Open waiting room in case it takes too long to join. */
+  openWindow("#waitingToJoin");
+  Callcast.JoinSession(app.user.scheduleName, app.user.scheduleJid);
   return false;  
 } /* connected() */
 
@@ -290,9 +294,6 @@ function disconnected(
 {
   app.log(2, "User has disconnected.");
   Callcast.log("Connection terminated.");
-
-  $('#mystream > #myctrls > input#leave').addClass("inactive");
-  $('#mystream > #myctrls > input#join').removeClass("inactive");
   return false;
 } /* disconnected() */
 
@@ -335,17 +336,22 @@ function addPluginToCarousel(
 )
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
+  var dispname = decodeURI(nickname);
+  var id = app.str2id(nickname);
   /*
    * Check next available cloudcarousel. */
   var oo = $("#meeting > #streams > #scarousel div.unoccupied").get(0);
   if (oo) {
-    $(oo).attr("title", nickname);
-    $(oo).append('<object id="GocastPlayer'+nickname+'" type="application/x-gocastplayer" width="128" height="96"></object>');
+    $(oo).attr("id", id);
+    $(oo).attr("encname", nickname);  
+    $(oo).attr("title", dispname);
+    $(oo).append('<object id="GocastPlayer'+id+'" type="application/x-gocastplayer" width="128" height="96"></object>');
     $("img", oo).hide();
+    $("div.name", oo).text(dispname);
     $(oo).removeClass("unoccupied");
 
-    app.log(2, "Added GocastPlayer" + nickname + " object.");
-    return $("object#GocastPlayer" + nickname, oo).get(0);
+    app.log(2, "Added GocastPlayer" + id + " object.");
+    return $("object#GocastPlayer" + id, oo).get(0);
   }
   else {
     app.log(4, "Maximum number of participants reached.");
@@ -368,15 +374,19 @@ function removePluginFromCarousel(
 {
   /*
    * Get parent object and modify accordingly. */
-  var jqOo = $('#meeting > #streams > #scarousel div.cloudcarousel[title="' + nickname + '"]');
+  var id = app.str2id(nickname);
+  var jqOo = $('#meeting > #streams > #scarousel div.cloudcarousel#' + id + '"');
   jqOo.addClass("unoccupied");
   jqOo.removeAttr("title");
+  jqOo.removeAttr("id");
+  jqOo.removeAttr("encname");
   /*
    * Remove player. */
   jqOo.empty();
   /*
    * Add image. */
   jqOo.append(app.imgPerson.clone());
+  jqOo.append('<div class="name"></div>');
   return false;
 } /* removePluginFromCarousel() */
 

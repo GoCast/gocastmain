@@ -117,6 +117,25 @@ var app = {
     }    
   }, /* app.checkBrowser() */
   /**
+   * The OS platform. */
+  osPlatform: (function(){
+    var ua = navigator.platform.toLowerCase();
+    return {
+      isWin: /win/.test(ua),
+      isMac: /mac/.test(ua),
+      isLinux: /linux/.test(ua),      
+    };
+  }()),
+  /**
+   * Calculate number from string. */
+  str2id: function(str) {
+    var nn = 0;
+    for (var i = 0; i < str.length; i++) {
+      nn += str.charCodeAt(i);
+    };
+    return nn;
+  }, /* app.str2id() */
+  /**
    * Check if gocast.it plugin is installed. */
   pluginInstalled: function() {
     var rtnFlag = false;
@@ -165,7 +184,7 @@ function openPersonalChat(
   /*
    * Set content. */
   var jqWin = $("#boxes > div#personalChat");
-  $("div.content > h1.title").text(msginfo.nick + " wrote you...");
+  $("div.content > h1.title").text(decodeURI(msginfo.nick) + " wrote you...");
   $("div.content > p.msg").text(msginfo.body);
   /*
    * Transition effect for Personal Chat Window.*/
@@ -202,10 +221,15 @@ function openChat(
   if ($(cTarget).hasClass("group")) {
     $('span', jqWin).attr("id", "group").text("Message to Group:");
   }
+  else if ($(cTarget).hasClass("feedback")) {
+    $('span', jqWin).attr("id", "feedback").text("Feedback message:");
+  }
   else {
+    var recipientId = $(cTarget).attr("id");
     var recipient = $(cTarget).attr("title");
-    if (recipient) {
-      $('span', jqWin).attr("id", recipient)
+    var ename = $(cTarget).attr("encname");
+    if (recipientId) {
+      $('span', jqWin).attr("id", recipientId).attr("ename", ename)
         .text("Message to " + recipient + ":");
     }
     else {
@@ -275,7 +299,7 @@ function openMeeting(
       fadeIn("fast");
     return false;
   }
-  app.user.name = usrNm;
+  app.user.name = encodeURI(usrNm);
   app.log(2, "User name:" + usrNm);
   /*
    * Deactivate window.*/
@@ -484,11 +508,16 @@ function sendChat(
     if (id.match("group")) {
       Callcast.SendPublicChat(ltext);
     }
+    else if (id.match("feedback")) {
+      Callcast.SendFeedback(ltext);
+    }
     else {
-      Callcast.SendPrivateChat(ltext, id);
+      var ename = jqChatSpan.attr("ename");
+      Callcast.SendPrivateChat(ltext, ename);
     }
     app.log(2, "Sending chat to " + id);
-    jqChatSpan.attr("id", '');
+    jqChatSpan.removeAttr("id");
+    jqChatSpan.removeAttr("ename");
   }
   jqChatText.val('');
   closeWindow();
@@ -543,7 +572,7 @@ function changeAudio(
   $(this).toggleClass("off");
   if (bMuteAudio) {
     app.log(2, "Audio muted.");
-    $(this).attr("title", "Unmute audio")
+    $(this).attr("title", "Unmute audio");
   }
   else {
     app.log(2, "Audio unmuted.");
@@ -551,53 +580,6 @@ function changeAudio(
   }
   return false;
 } /* changeAudio() */
-
-
-
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-/**
- * \brief Action Join Session.
- */
-function joinSession(
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-    /**
-     * Event object. */
-  event
-)
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-{
-  Callcast.JoinSession(app.user.scheduleName, app.user.scheduleJid);
-  $(this).addClass("inactive");
-  $(this).next("#leave").removeClass("inactive");
-  app.log(2, "Join session name:" + app.user.scheduleName);
-  return false;
-} /* joinSession() */
-
-
-
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-/**
- * \brief Action Leave Session.
- */
-function leaveSession(
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-    /**
-     * Event object. */
-  event
-)
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-{
-  if (!Callcast.joined) {
-    alert("Not currently in session. Nothing to leave.");
-  }
-  else {
-    Callcast.LeaveSession();
-  }
-  $(this).addClass("inactive");
-  $(this).prev("#join").removeClass("inactive");
-  app.log(2, "Leave session.");
-  return false;
-} /* leaveSession() */
 
 
 
@@ -630,12 +612,9 @@ function activateWindow(
       .on("click.s04172012a", changeVideo);
     $('#mystream > #myctrls > #audio', winId)
       .on("click.s04172012b", changeAudio);
-    $('#mystream > #myctrls > #join', winId)
-      .on("click.s04172012c", joinSession);
-    $('#mystream > #myctrls > #leave', winId)
-      .on("click.s04172012d", leaveSession);
 
     $('#controls > input.group', winId).on("click.s04172012e", openChat);
+    $('#controls > input.feedback', winId).on("click.s04212012e", openChat);
 
     $('#streams > #scarousel div.cloudcarousel', winId)
       .on("click.s04172012f", openChat);
@@ -681,12 +660,9 @@ function deactivateWindow(
       .off("click.s04172012a", changeVideo);
     $('#mystream > #myctrls > #audio', winId)
       .off("click.s04172012b", changeAudio);
-    $('#mystream > #myctrls > #join', winId)
-      .off("click.s04172012c", joinSession);
-    $('#mystream > #myctrls > #leave', winId)
-      .off("click.s04172012d", leaveSession);
 
     $('#controls > input.group', winId).off("click.s04172012e", openChat);
+    $('#controls > input.feedback', winId).off("click.s04212012e", openChat);
 
     $('#streams > #scarousel div.cloudcarousel', winId)
       .off("click.s04172012f", openChat);
@@ -795,8 +771,8 @@ function resizeWindows(
    * Set mask height and width to fill the whole screen. */
   $('#mask').css({'width':winW,'height':winH});
   /*
-   * Update windows in boxes. */
-  $('#boxes .window').each(function(i, e) {
+   * Update resizable windows. */
+  $('#boxes .window.resizable').each(function(i, e) {
     $(e).css('top',  winH/2 - $(e).height()/2);
     $(e).css('left', winW/2 - $(e).width()/2);
   });
@@ -898,6 +874,18 @@ $(document).ready(function(
   else {
     /*
      * Alert user to download and install the plugin. */
+    if (app.osPlatform.isWin) {
+      $("#errorMsgPlugin > p > a#dlLink").attr("href","javascript:closeWindow();openWindow('#winEula');void(null);");
+    }
+    else if (app.osPlatform.isMac) {
+      $("#errorMsgPlugin > p > a#dlLink").attr("href","GoCastPlayer.pkg");
+    }
+    else if (app.osPlatform.isLinux) {
+      $("#errorMsgPlugin > p > a#dlLink").parent().text("The plugin for Linux will be available shortly.");
+    }
+    else {
+      $("#errorMsgPlugin > p > a#dlLink").parent().text("We are sorry. We couldn't identify your OS.")
+    }
     openWindow('#errorMsgPlugin');
   }
   /*

@@ -277,23 +277,14 @@ body > div#meeting > div#mystream > div#myctrls > input#audio.off {
 body > div#meeting > div#mystream > div#myctrls > input#audio {
   background-image: url("../images/sound.png");
 }
-body > div#meeting > div#mystream > div#myctrls > input#join {
-  background-image: url("../images/join.png");
-}
-body > div#meeting > div#mystream > div#myctrls > input#join.inactive {
-  visibility: hidden;
-}
-body > div#meeting > div#mystream > div#myctrls > input#leave {
-  background-image: url("../images/leave.png");
-}
-body > div#meeting > div#mystream > div#myctrls > input#leave.inactive {
-  visibility: hidden;
+body > div#meeting > div#mystream > div#myctrls > input#help {
+  background-image: url("../images/help.png");
 }
 body > div#meeting > div#controls {
   position: absolute;
   bottom: 0px;
   right: 0px;
-  width: 20%;
+  width: 22%;
   height: 26px;
   margin: 5px;
 }
@@ -303,7 +294,7 @@ body > div#meeting > div#controls > input {
   background-position: center;
   background-repeat: no-repeat;
   border-radius: 5px;
-  margin-right: 5px;
+  margin-right: 3px;
 }
 body > div#meeting > div#controls > input.left {
   background-image: url("../images/btn-left.png");
@@ -323,6 +314,13 @@ body > div#meeting > div#controls > input.group {
 body > div#meeting > div#controls > input.group:hover {
   background-image: url("../images/btn-group-a.png");
 }
+body > div#meeting > div#controls > input.feedback {
+  margin-left: 5px;
+  background-image: url("../images/btn-feedback.png");
+}
+body > div#meeting > div#controls > input.feedback:hover {
+  background-image: url("../images/btn-feedback-a.png");
+}
 body > div#meeting > div#streams {
   position: absolute;
   bottom: 30px;
@@ -335,17 +333,31 @@ body > div#meeting > div#streams > div#scarousel {
   height: 100%;
 }
 body > div#meeting > div#streams > div#scarousel div.cloudcarousel {
-  width: 128px;
-  height: 96px;
+  width: 132px;
+  height: 116px;
   opacity: 1;
   transition: opacity 0.5s;
   -moz-transition: opacity 0.5s;
   -webkit-transition: opacity 0.5s;
   -o-transition: opacity 0.5s;
+  border: 3px solid darkgreen;
+  border-radius: 6px;
+  background-color: darkgreen;
+}
+body > div#meeting > div#streams > div#scarousel div.cloudcarousel > object {
+  margin: 2px;
+}
+body > div#meeting > div#streams > div#scarousel div.cloudcarousel > div.name {
+  text-align: center;
+  font-weight: bold;
+  white-space: nowrap; 
+  width: 98%; 
+  overflow: hidden; 
+  text-overflow: ellipsis;
+  color: white;
 }
 body > div#meeting > div#streams > div#scarousel div.unoccupied {
   opacity: 0.1;
-  border: 2px solid yellowgreen;
 }
 body > div#meeting > div#logo {
   position: absolute;
@@ -533,6 +545,66 @@ body > div#meeting > div#add.hidden {
 }
 #boxes #personalChat > div.controls > input.close:hover {
   background-image: url("../images/btn-close-a.png");
+}
+#boxes #helpPage {
+  width: 660px;
+  height: 536px;
+  background: white;
+  border: 4px solid lightgreen;
+  border-radius: 16px;  
+}
+#boxes #helpPage > h1 {
+  color: darkgreen;
+  font-size: 1.2em;
+  margin-left: 15px;
+  width: 90%;
+}
+#boxes #helpPage > img.helpContent {
+  margin-left: 5px;
+}
+#boxes #helpPage > img.close {
+  float: right;
+  border: 2px solid gray;
+  border-radius: 5px;  
+  margin: 5px;
+}
+#boxes #waitingToJoin {
+  width: 200px;
+  height: 200px;
+}
+#boxes #waitingToJoin > img {
+  border: 4px solid lightgreen;
+  border-radius: 8px;  
+}
+#boxes #winEula {
+  width: 660px;
+  height: 600px;
+  background: white;
+  border: 4px solid lightgreen;
+  border-radius: 16px;  
+}
+#boxes #winEula > iframe {
+  width: 98%;
+  height: 93.2%;
+  margin-left: 0.8%;
+  margin-top: 5px;
+  overflow: auto;
+}
+#boxes #winEula > iframe::-webkit-scrollbar {
+  width: 9px;
+}
+#boxes #winEula > iframe::-webkit-scrollbar-thumb {
+  border-radius: 3px;
+  background: rgba(128, 128, 128, 0.8);
+  border: 2px solid #c0db67;
+  box-shadow: inset 0 0 3px rgba(208, 107, 0, 0.8);
+}
+#boxes #winEula > iframe::-webkit-scrollbar-thumb:window-inactive {
+  background: white;
+}
+#boxes #winEula input {
+  float: right;
+  margin-right: 5px;
 }
 body div.scrollcontainer {
   overflow-x: hidden;

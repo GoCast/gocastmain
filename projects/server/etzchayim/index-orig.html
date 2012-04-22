@@ -45,17 +45,32 @@
 
   <body>
     <div id="boxes">
-      <div id="errorMsgPlugin" class="window">
+      <div id="winEula" class="window resizable">
+        <iframe src="eula.html">
+        </iframe>
+        <form action="GoCastPlayer.msi" method="post">
+          <input type="submit" value="Accept"/>
+        </form>
+      </div>
+      <div id="waitingToJoin" class="window resizable">
+        <img src="images/waiting-join.gif" />
+      </div>
+      <div id="helpPage" class="window resizable">
+        <img class="close" src="images/button-close.png" alt="Close window"
+             title="Close window" />
+        <h1>Help</h1>
+        <img src="images/helpPage.png" class="helpContent" />
+      </div>
+      <div id="errorMsgPlugin" class="window resizable">
         <h1>Gocast.it plugin was not found</h1>
         <p>In order to participate in a meeting you will need the
         Gocast.it plugin installed.</p>
-        <p>Please click
-        here <a href="http://video.gocast.it/plugin/gocast.it.plugin.pkg">
+        <p>Please click here <a id="dlLink">
         Download Gocast.it.plugin</a> to download and then click on the
         downloaded file to install.</p>
         <p>Thanks!  We will be waiting for you.</p>
       </div>
-      <div id="credentials" class="window">
+      <div id="credentials" class="window resizable">
         <img class="close" src="images/button-close.png" alt="Close window"
              title="Close window" />
         <p>Hi! Before you join the meeting, we would like to know your name.</p>
@@ -157,25 +172,45 @@
       <div id="streams">
         <div id="scarousel">
           <div class="cloudcarousel unoccupied">
-            <img src="images/person.png"/></div>
+            <img src="images/person.png"/>
+            <div class="name"></div>
+          </div>
           <div class="cloudcarousel unoccupied">
-            <img src="images/person.png"/></div>
+            <img src="images/person.png"/>
+            <div class="name"></div>
+          </div>
           <div class="cloudcarousel unoccupied">
-            <img src="images/person.png"/></div>
+            <img src="images/person.png"/>
+            <div class="name"></div>
+          </div>
           <div class="cloudcarousel unoccupied">
-            <img src="images/person.png"/></div>
+            <img src="images/person.png"/>
+            <div class="name"></div>
+          </div>
           <div class="cloudcarousel unoccupied">
-            <img src="images/person.png"/></div>
+            <img src="images/person.png"/>
+            <div class="name"></div>
+          </div>
           <div class="cloudcarousel unoccupied">
-            <img src="images/person.png"/></div>
+            <img src="images/person.png"/>
+            <div class="name"></div>
+          </div>
           <div class="cloudcarousel unoccupied">
-            <img src="images/person.png"/></div>
+            <img src="images/person.png"/>
+            <div class="name"></div>
+          </div>
           <div class="cloudcarousel unoccupied">
-            <img src="images/person.png"/></div>
+            <img src="images/person.png"/>
+            <div class="name"></div>
+          </div>
           <div class="cloudcarousel unoccupied">
-            <img src="images/person.png"/></div>
+            <img src="images/person.png"/>
+            <div class="name"></div>
+          </div>
           <div class="cloudcarousel unoccupied">
-            <img src="images/person.png"/></div>
+            <img src="images/person.png"/>
+            <div class="name"></div>
+          </div>
         </div>
       </div>
       <div id="mystream">
@@ -187,14 +222,14 @@
         <div id="myctrls">
           <input id="video" type="button" class="on" title="Enable video" />
           <input id="audio" type="button" class="off" title="Mute audio" />
-          <input id="join" type="button" class="inactive" title="Join session" />
-          <input id="leave" type="button" class="inactive" title="Leave session" />
+          <input id="help" type="button" onclick="openWindow('#helpPage');" />
         </div>
       </div>
       <div id="controls">
         <input type="button" class="left" title="To the left." />
         <input type="button" class="group" title="Send chat to group." />
         <input type="button" class="right" title="To the right." />
+        <input type="button" class="feedback" title="Send us your feedback." />
       </div>
       <div id="logo">
         <img src="images/gologo.png"></img>

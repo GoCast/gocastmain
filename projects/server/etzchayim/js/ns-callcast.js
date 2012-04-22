@@ -90,7 +90,7 @@ var Callcast = {
 	AT_CALLCAST_ROOMS: "@gocastconference.video.gocast.it",
 	NS_CALLCAST: "urn:xmpp:callcast",
 	STUNSERVER: "video.gocast.it",
-	FEEDBACK_BOT: "feedback_bot_test1@video.gocast.it",
+	FEEDBACK_BOT: "feedback_bot_etzchayim@video.gocast.it",
 	STUNSERVERPORT: 19302,
 	Callback_AddPlugin: null,
 	Callback_RemovePlugin: null,
@@ -106,6 +106,7 @@ var Callcast = {
     bUseVideo: true,
     WIDTH: 128,
     HEIGHT: 96,
+    overseer: null,
 
     CallStates: {
     	NONE: 0,
@@ -176,6 +177,16 @@ var Callcast = {
     	{
           // Handled inside PresHandler          roomCreationNotAllowed(room);
         }
+	else if ($(err).find('registration-required').length > 0)
+	{
+			alert("Room is currently locked. You may attempt to KNOCK to request entry.");
+			this.LeaveSession();
+	}
+	else if ($(err).find('forbidden').length > 0)
+	{
+			alert("Someone in the room has blocked your admission.\nKnocking is being ignored as well.");
+			this.LeaveSession();
+	}
     	else
     	{
 			alert("Unknown Error Stanza: " + $(err).children('error').text());
@@ -672,7 +683,7 @@ var Callcast = {
     
     SendFeedback: function(msg) {
     	if (this.connection)
-		    this.connection.send($msg({to:this.FEEDBACK_BOT}).c('body').t(msg))
+	    this.connection.send($msg({to:this.FEEDBACK_BOT, nick: this.nick, room: this.room.split('@')[0]}).c('body').t(msg))
     },
     
     on_public_message: function(message) {
@@ -746,6 +757,14 @@ var Callcast = {
     PresHandler: function(presence) {
             var from = $(presence).attr('from');
             var room = Strophe.getBareJidFromJid(from);
+
+		if ($(presence).attr('usertype')==='silent')	// Overseer/serverBot
+		{
+			// Let's grab the name of the overseer for future reference...
+			this.overseer = from;
+			return true;
+		}
+
 
         	console.log(presence);
         	console.log("From-NICK: " + $(presence).attr('from'));
