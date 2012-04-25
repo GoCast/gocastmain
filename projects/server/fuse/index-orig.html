@@ -1,0 +1,241 @@
+<!--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
+<!--
+ ! File: index-orig.html
+ !
+ ! Brief: Gocast.it plug-in
+ !
+ ! Author: Net-Scale Technologies, Inc., www.net-scale.com
+ !         Created April 5  , 2012 (paula.muller@net-scale.com)
+ !
+ ! Copyright (c) 2012 XVD. All rights reserved.
+ -->
+<!--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta content="text/html; charset=UTF-8" http-equiv="content-type" />
+    <meta name="viewport"
+          content="height = device-height, width = device-width,
+                   initial-scale = 1.0, user-scalable = no" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta names="apple-mobile-web-app-status-bar-style"
+          content="black-translucent" />
+    <link rel="apple-touch-icon" href="images/apple-touch-icon.png" />
+    <link rel="apple-touch-icon" sizes="72x72"
+          href="images/apple-touch-icon-ipad.png" />
+    <link rel="apple-touch-icon" sizes="114x114"
+          href="images/apple-touch-icon-iphone4.png" />
+    <link rel="apple-touch-startup-image" href="images/startup.png">
+    <link rel="stylesheet" href="css/index.css" type="text/css" />
+    <script src="js/jquery-1.7.2.min.js" type="text/javascript"></script>
+    <script src="/scripts/strophe.js"></script>
+    <script src="/scripts/strophe.roster.js" type="text/javascript"></script>
+    <script src="/scripts/strophe.disco.js" type="text/javascript"></script>
+    <script src="/scripts/strophe.muc.js" type="text/javascript"></script>
+    <script src="/scripts/strophe.jingle.js" type="text/javascript"></script>
+    <script src="js/ns-callcast.js" type="text/javascript"></script>
+    <script src="js/gocast-api.js" type="text/javascript"></script>
+    <script src="js/jquery.mousewheel.js" type="text/javascript"></script>
+    <script src="js/cloud-carousel.1.0.5.js" type="text/javascript"></script>
+    <script src="js/index.js" type="text/javascript"></script>
+    <link rel="shortcut icon" href="images/favicon.ico" type="x-icon" />
+    <title>Gocast.it</title>
+  </head>
+
+  <body>
+    <div id="boxes">
+      <div id="winEula" class="window resizable">
+        <iframe src="eula.html">
+        </iframe>
+        <form action="GoCastPlayer.msi" method="post">
+          <input type="submit" value="Accept"/>
+        </form>
+      </div>
+      <div id="waitingToJoin" class="window resizable">
+        <img src="images/waiting-join.gif" />
+      </div>
+      <div id="helpPage" class="window resizable">
+        <img class="close" src="images/button-close.png" alt="Close window"
+             title="Close window" />
+        <h1>Help</h1>
+        <img src="images/helpPage.png" class="helpContent" />
+      </div>
+      <div id="errorMsgPlugin" class="window resizable">
+        <h1>Gocast.it plugin was not found</h1>
+        <p>In order to participate in a meeting you will need the
+        Gocast.it plugin installed.</p>
+        <p>Please click here <a id="dlLink">
+        Download Gocast.it.plugin</a> to download and then click on the
+        downloaded file to install.</p>
+        <p>Thanks!  We will be waiting for you.</p>
+      </div>
+      <div id="credentials" class="window resizable">
+        <img class="close" src="images/button-close.png" alt="Close window"
+             title="Close window" />
+        <p>Hi! Before you join the meeting, we would like to know your name.</p>
+        <input id="name" type="text" placeholder="Please enter your name" />
+        <input id="btn" type="image" src="images/joinnow.png" />
+        <p class="error"></p>
+      </div>
+      <div id="chatInp" class="window">
+        <span class="recipient"></span>
+        <img class="close" src="images/button-close.png" alt="Close window"
+             title="Close window" />
+        <input class="chatTo" type="text"></input>
+        <input class="send" type="button" title="Send chat."></input>
+      </div>
+      <div id="personalChat" class="window">
+        <img class="close" src="images/button-close.png" alt="Close window"
+             title="Close window" />
+        <div class="content">
+          <h1 class="title"></h1>
+          <p class="msg"></p>
+          <div id="replyMsg" class="hidden">
+            <span class="recipient"></span>
+            <input class="chatTo" type="text"></input>
+            <input class="send" type="button" title="Send chat."></input>
+          </div>
+        </div>
+        <div class="controls">
+          <input type="button" class="reply" title="Reply."></input>
+        </div>  
+      </div>      
+      <!-- Mask to cover the whole screen -->
+      <div id="mask"></div>      
+    </div>
+    <div id="schedules">
+      <div id="header">
+        <img src="images/gocastit.png" />
+      </div>
+      <div id="top">
+        <div id="images-show">
+          <div id="section-1">
+            <img src="images/people10.jpg" />
+          </div>
+          <div id="section-2">
+            <img src="images/people7.jpg" />
+          </div>
+          <div id="section-3">
+            <img src="images/people2.jpg" />
+          </div>
+          <div id="section-4">
+            <img src="images/people5.jpg" />
+          </div>
+        </div>
+        <div class="curved-border"></div>
+      </div>
+      <div id="separator"></div>
+      <div id="container">
+        <div id="ctop">
+          <h1 class="title">Welcome to Gocast.it small groups</h1>
+          <p>Here you will find the schedules of meetings taking place
+            in your community, and eventhough you may be far from
+            where they take place, Gocast.it brings you all
+            closer together. <strong>Select your meeting and Enjoy!</strong>
+          </p>
+        </div>
+        <div id="cbottom">
+          <div class="block">
+            <h2>Upcoming Meetings</h2>
+            <div class="scrollcontainer">
+            <ul>
+            </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="footer">
+        <p>&copy; 2012 XVD Technology Holdings (USA), Inc. All rights
+        reserved.<br/>
+        Gocast.it logo and all other Gocast.it marks contained
+        heirein are trademarks of XVD Technology Holdings (USA)
+        Intellectual Property.</p>
+      </div>
+    </div><!-- schedules -->
+    <div id="meeting">
+      <div id="sharingView">
+        <h1 class="title">Shared View</h1>
+        <div>
+          <input type="text" placeholder="Please enter link to share." />
+          <input type="button" title="Send link" />
+        </div>
+        <iframe></iframe>
+      </div>
+      <div id="msgBoard">
+        <h1 class="title">Message Board</h1>
+        <div class="scrollcontainer">
+        <ul>
+        </ul>
+        </div>
+      </div>
+      <div id="streams">
+        <div id="scarousel">
+          <div class="cloudcarousel unoccupied">
+            <img src="images/person.png"/>
+            <div class="name"></div>
+          </div>
+          <div class="cloudcarousel unoccupied">
+            <img src="images/person.png"/>
+            <div class="name"></div>
+          </div>
+          <div class="cloudcarousel unoccupied">
+            <img src="images/person.png"/>
+            <div class="name"></div>
+          </div>
+          <div class="cloudcarousel unoccupied">
+            <img src="images/person.png"/>
+            <div class="name"></div>
+          </div>
+          <div class="cloudcarousel unoccupied">
+            <img src="images/person.png"/>
+            <div class="name"></div>
+          </div>
+          <div class="cloudcarousel unoccupied">
+            <img src="images/person.png"/>
+            <div class="name"></div>
+          </div>
+          <div class="cloudcarousel unoccupied">
+            <img src="images/person.png"/>
+            <div class="name"></div>
+          </div>
+          <div class="cloudcarousel unoccupied">
+            <img src="images/person.png"/>
+            <div class="name"></div>
+          </div>
+          <div class="cloudcarousel unoccupied">
+            <img src="images/person.png"/>
+            <div class="name"></div>
+          </div>
+          <div class="cloudcarousel unoccupied">
+            <img src="images/person.png"/>
+            <div class="name"></div>
+          </div>
+        </div>
+      </div>
+      <div id="mystream">
+        <img src="images/person.png"/>
+        <object class="localplayer" id="GocastPlayerLocal"
+                type="application/x-gocastplayer" width="1" height="1">
+	  <param name="onload" value="pluginLoaded" />
+	</object>
+        <div id="myctrls">
+          <input id="video" type="button" class="on" title="Enable video" />
+          <input id="audio" type="button" class="off" title="Mute audio" />
+          <input id="help" type="button" onclick="openWindow('#helpPage');" />
+        </div>
+      </div>
+      <div id="controls">
+        <input type="button" class="left" title="To the left." />
+        <input type="button" class="group" title="Send chat to group." />
+        <input type="button" class="right" title="To the right." />
+        <input type="button" class="feedback" title="Send us your feedback." />
+      </div>
+      <div id="logo">
+        <img src="images/gologo.png"></img>
+      </div>
+      <div id="ad" class="hidden">
+      </div>
+    </div><!-- meeting -->
+  </body>
+</html>
