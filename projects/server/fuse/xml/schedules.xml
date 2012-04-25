@@ -13,16 +13,16 @@
 <!--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
 
 <schedules>
-  <room date="Mon, 04/09/2012" time="5:30pm" name="Paulas Tests" 
-        jid="etzchayim-torah@gocastconference.video.gocast.it"
-        title="Torah class" />
-  <room date="Thursdays" time="noon" name="Paulas Tests" 
-        jid="etzchayim-talmud@gocastconference.video.gocast.it"
-        title="Talmud class" />
-  <room date="Mon, 04/11/2012" time="7:30pm" name="Paulas Tests" 
-        jid="etzchayim-kabalah@gocastconference.video.gocast.it"
-        title="Kabalah class" />
-  <room date="Daily Sunday-Friday" time="9:00am" name="Paulas Tests" 
-        jid="etzchayim-sachrit@gocastconference.video.gocast.it"
-        title="Sachrit" />
+  <room date="Mon, 04/09/2012" time="5:30pm" name="Tests" 
+        jid="fuse-designers@gocastconference.video.gocast.it"
+        title="Designers' discussion" />
+  <room date="Thursdays" time="noon" name="Tests" 
+        jid="fuse-yves@gocastconference.video.gocast.it"
+        title="Conference room for Yves" />
+  <room date="Mon, 04/11/2012" time="7:30pm" name="Tests" 
+        jid="fuse-mitch@gocastconference.video.gocast.it"
+        title="Conference room for Mitch" />
+  <room date="Daily Sunday-Friday" time="9:00am" name="Tests" 
+        jid="fuse-room1@gocastconference.video.gocast.it"
+        title="General conference room" />
 </schedules>
