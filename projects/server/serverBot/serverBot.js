@@ -47,7 +47,7 @@ function mucRoom(client) {
 	var self = this;
 
 	// Max # users.
-	this.options['muc#roomconfig_maxusers'] = '16';
+	this.options['muc#roomconfig_maxusers'] = '11';
 
 	// Hidden room.
 	this.options['muc#roomconfig_publicroom'] = '0';	// Non-listed room.
@@ -940,21 +940,39 @@ function overseer(user, pw, rooms) {
 
 	if (process.argv.length > 2)
 	{
-		this.roomsxml = loadRooms(process.argv[process.argv.length-1]); // '/var/www/etzchayim/xml/schedules.xml');
-		var par = new ltx.parse(this.roomsxml);
-		var rooms = par.getChildren('room');
+		var starting_arg = 2;
 
-		for (k in rooms)
+		for (i in process.argv)
 		{
-			console.log("Monitoring room: " + rooms[k].attrs.jid);
-			this.roomnames[rooms[k].attrs.jid.split('@')[0]] = true;
+			// Don't start processing args until we get beyond the .js itself.
+			if (i < starting_arg)
+				continue;
+
+			console.log("Reading XML File: " + process.argv[i]);
+
+			var roomsxml = loadRooms(process.argv[i]); // '/var/www/etzchayim/xml/schedules.xml');
+			var par = new ltx.parse(roomsxml);
+			var rooms = par.getChildren('room');
+
+			for (k in rooms)
+			{
+				if (this.roomnames[rooms[k].attrs.jid.split('@')[0]])
+					console.log("  WARNING: Duplicate Room: " + rooms[k].attrs.jid);
+				else
+					console.log("  Monitoring room: " + rooms[k].attrs.jid);
+				this.roomnames[rooms[k].attrs.jid.split('@')[0]] = true;
+			}
+
+			delete par;
 		}
 	}
-
-	this.roomnames["bobtestroom"] = true;
-//	this.roomnames["lobby"] = true;
-//	this.roomnames["newroom"] = true;
-//	this.roomnames["other_newroom"] = true;
+	else
+	{
+		this.roomnames["offlinetest"] = true;
+	//	this.roomnames["lobby"] = true;
+	//	this.roomnames["newroom"] = true;
+	//	this.roomnames["other_newroom"] = true;
+	}
 
 	var self = this;
 
@@ -973,7 +991,7 @@ function overseer(user, pw, rooms) {
 		// Now we need to make sure we stay connected to the server. We will do this via a ping-check
 		// to the server every 10 seconds. If we don't get a reply, we can decide what to do about that.
 		setInterval(function() {
-			console.log("pinging server...");
+//			console.log("pinging server...");
 
 			var nopong = setTimeout(function() {
 				console.log("ERROR: No pong received. Server connection died?");
@@ -1155,8 +1173,6 @@ function feedbackBot(feedback_jid, feedback_pw) {
 	var fname = feedback_jid.split('@')[0]+'_'+(d.getMonth()+1)+'_'+d.getDate()+'_'+d.getFullYear()+'.txt'
 	this.logfile = fs.createWriteStream(fname, {'flags': 'a'});
 // use {'flags': 'a'} to append and {'flags': 'w'} to erase and write a new file
-	this.logfile.write("this is a message" + "\n");
-	this.logfile.write("this is a 2nd message." + "\n");
 
 	var self = this;
 
@@ -1211,11 +1227,19 @@ function loadRooms(filename) {
 	return fs.readFileSync(filename, 'utf8');
 };
 
+console.log("****************************************************");
+console.log("****************************************************");
+console.log("*                                                  *");
+console.log("STARTED SERVERBOT @ " + Date());
+console.log("*                                                  *");
+console.log("****************************************************");
+console.log("****************************************************");
 //
 // Login as test feedback bot.
 //
 //var fb = new feedbackBot("feedback_bot_test1@video.gocast.it", "test1");
 var fb_etzchayim = new feedbackBot("feedback_bot_etzchayim@video.gocast.it", "feedback.gocast.etzchayim");
+var fb_fuse = new feedbackBot("feedback_bot_fuse@video.gocast.it", "feedback.gocast.fuse");
 
 //
 // Login as Overseer
