@@ -935,6 +935,10 @@ function overseer(user, pw, rooms) {
 	this.roomnames = {};
 	this.mucRoomObjects = {};
 
+	// Very important - because we listen to a single node-xmpp client connection here,
+	// we have a lot of potential listeners to an emitter. To avoid the warning about this...
+	this.client.setMaxListeners(0);
+
 	this.iqnum = 0;
 	this.iq_callbacks = {};
 
@@ -1234,12 +1238,14 @@ console.log("STARTED SERVERBOT @ " + Date());
 console.log("*                                                  *");
 console.log("****************************************************");
 console.log("****************************************************");
+
 //
 // Login as test feedback bot.
 //
 //var fb = new feedbackBot("feedback_bot_test1@video.gocast.it", "test1");
 var fb_etzchayim = new feedbackBot("feedback_bot_etzchayim@video.gocast.it", "feedback.gocast.etzchayim");
 var fb_fuse = new feedbackBot("feedback_bot_fuse@video.gocast.it", "feedback.gocast.fuse");
+var fb_friends = new feedbackBot("feedback_bot_friends@video.gocast.it", "feedback.gocast.friends");
 
 //
 // Login as Overseer

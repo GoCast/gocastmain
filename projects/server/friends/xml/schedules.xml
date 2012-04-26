@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
+<!--
+ ! File: schedules.xml
+ !
+ ! Brief: Gocast.it small groups schedules
+ !
+ ! Author: Net-Scale Technologies, Inc., www.net-scale.com
+ !         Created April 13, 2012 (paula.muller@net-scale.com)
+ !
+ ! Copyright (c) 2012 XVD Technology Holdings (USA). All rights reserved.
+ -->
+<!--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
+
+<schedules>
+  <room date="Visiting" time="Anytime" name="Tests"
+        jid="friends-manjesh@gocastconference.video.gocast.it"
+        title="Manjesh's spot" />
+  <room date="Visiting" time="Anytime" name="Tests"
+        jid="friends-bob@gocastconference.video.gocast.it"
+        title="Bob's spot" />
+  <room date="Visiting" time="Anytime" name="Tests"
+        jid="friends-stu@gocastconference.video.gocast.it"
+        title="Stu's spot" />
+  <room date="Visiting" time="Anytime" name="Tests"
+        jid="friends-sandra@gocastconference.video.gocast.it"
+        title="Sandra's spot" />
+  <room date="Visiting" time="Anytime" name="Tests"
+        jid="friends-general@gocastconference.video.gocast.it"
+        title="General conference room" />
+</schedules>
