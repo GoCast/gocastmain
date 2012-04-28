@@ -31,7 +31,7 @@ var argv = process.argv;
 //  console.log('Caught exception: ' + err);
 //});
 
-function mucRoom(client) {
+function mucRoom(client, notifier) {
 	this.isOwner = false;	// Assume we're not the owner yet until we're told so.
 	this.roomname = "";
 	this.nick = "";
@@ -43,6 +43,7 @@ function mucRoom(client) {
 	this.iq_callbacks = {};
 	this.client = client;
 	this.iqnum = 0;
+	this.notifier = notifier;
 //	this.state =
 	var self = this;
 
@@ -262,7 +263,9 @@ mucRoom.prototype.printParticipants = function() {
 		parts += k.replace(/\\20/g, ' ');
 	}
 
-	console.log("Participants list: " + parts);
+	console.log("MUC@"+ this.roomname.split('@')[0] + " participants list: " + parts);
+	if (this.notifier)
+		this.notifier.sendMessage("MUC@" + this.roomname.split('@')[0] + " Participants: " + parts);
 };
 
 //
@@ -928,12 +931,13 @@ mucRoom.prototype.rejoin = function(rmname, nick) {
 ///
 ///
 
-function overseer(user, pw, rooms) {
+function overseer(user, pw, notifier) {
 	this.CONF_SERVICE = "@gocastconference.video.gocast.it";
 	this.SERVER = 'video.gocast.it';
 	this.client = new xmpp.Client({ jid: user, password: pw, reconnect: true, host: this.SERVER, port: 5222 });
 	this.roomnames = {};
 	this.mucRoomObjects = {};
+	this.notifier = notifier;
 
 	// Very important - because we listen to a single node-xmpp client connection here,
 	// we have a lot of potential listeners to an emitter. To avoid the warning about this...
@@ -952,7 +956,7 @@ function overseer(user, pw, rooms) {
 			if (i < starting_arg)
 				continue;
 
-			console.log("Reading XML File: " + process.argv[i]);
+			this.log("Reading XML File: " + process.argv[i]);
 
 			var roomsxml = loadRooms(process.argv[i]); // '/var/www/etzchayim/xml/schedules.xml');
 			var par = new ltx.parse(roomsxml);
@@ -961,9 +965,9 @@ function overseer(user, pw, rooms) {
 			for (k in rooms)
 			{
 				if (this.roomnames[rooms[k].attrs.jid.split('@')[0]])
-					console.log("  WARNING: Duplicate Room: " + rooms[k].attrs.jid);
+					this.log("  WARNING: Duplicate Room: " + rooms[k].attrs.jid);
 				else
-					console.log("  Monitoring room: " + rooms[k].attrs.jid);
+					this.log("  Monitoring room: " + rooms[k].attrs.jid);
 				this.roomnames[rooms[k].attrs.jid.split('@')[0]] = true;
 			}
 
@@ -988,7 +992,7 @@ function overseer(user, pw, rooms) {
 		// Need to join all rooms in 'rooms'
 		for (k in self.roomnames)
 		{
-			self.mucRoomObjects[k] = new mucRoom(self.client);
+			self.mucRoomObjects[k] = new mucRoom(self.client, self.notifier);
 			self.mucRoomObjects[k].join( k + self.CONF_SERVICE, "overseer");
 		}
 
@@ -998,8 +1002,8 @@ function overseer(user, pw, rooms) {
 //			console.log("pinging server...");
 
 			var nopong = setTimeout(function() {
-				console.log("ERROR: No pong received. Server connection died?");
-			}, 4000);
+				self.log("ERROR: No pong received. Server connection died?");
+			}, 5000);
 
 			self.sendIQ(new xmpp.Element('iq', {to: self.SERVER, type: 'get'})
 						.c('ping', {xmlns: 'urn:xmpp:ping'}), function(res) {
@@ -1015,7 +1019,7 @@ function overseer(user, pw, rooms) {
 		for (k in self.roomnames)
 			delete self.mucRoomObjects[k];
 
-		console.log('Overseer went offline. Reconnection should happen automatically.');
+		self.log('Overseer went offline. Reconnection should happen automatically.');
 	});
 
 	//
@@ -1030,7 +1034,7 @@ function overseer(user, pw, rooms) {
 		else if (stanza.is('iq') && stanza.attrs.type !== 'error')
 			self.handleIq(stanza);
 		else
-			console.log("UNHANDLED: " + stanza.tree());
+			self.log("UNHANDLED: " + stanza.tree());
 	});
 
 	this.client.on('error', function(e) {
@@ -1039,13 +1043,17 @@ function overseer(user, pw, rooms) {
 
 };
 
+overseer.prototype.log = function(msg) {
+	console.log("Overseer: " + msg);
+};
+
 overseer.prototype.sendIQ = function(iq, cb) {
 	var iqid = "overseer_iqid" + this.iqnum++;
 	var self = this;
 
 	if (!iq.root().is('iq'))
 	{
-		console.log("overseer sendIQ - malformed inbound iq message. No <iq> stanza: " + iq.tree());
+		this.log("sendIQ - malformed inbound iq message. No <iq> stanza: " + iq.tree());
 		return;
 	}
 
@@ -1055,7 +1063,7 @@ overseer.prototype.sendIQ = function(iq, cb) {
 	if (cb)
 		this.iq_callbacks[iqid] = cb;
 	else
-		console.log("overseer sendIQ: - No callback for id=" + iqid);
+		this.log("sendIQ: - No callback for id=" + iqid);
 
 /*	console.log("overseer sendIQ: - Callback list: ");
 	for (k in this.iq_callbacks)
@@ -1109,10 +1117,10 @@ overseer.prototype.handleMessage = function(msg) {
 				// Format of KNOCK
 				// KNOCK ; <from-jid> ; <from-nickname> ; <bare-roomname> ; [message]
 				if (!fromjid || !fromnick || !toroom || !this.mucRoomObjects[toroom])
-					console.log("KNOCK Invalid. No JID (" + fromjid + "), nickname (" + fromnick + "), room (" + toroom + ") or room not found:");
+					this.log("KNOCK Invalid. No JID (" + fromjid + "), nickname (" + fromnick + "), room (" + toroom + ") or room not found:");
 				else
 				{
-				console.log("DEBUG: Checking on ban-status for: " + fromjid);
+//				console.log("DEBUG: Checking on ban-status for: " + fromjid);
 					// We have a room by that name.
 					// First, see if the jid is banned. If so, don't do anything.
 					if (!this.mucRoomObjects[toroom].isBanned(fromjid))
@@ -1121,11 +1129,11 @@ overseer.prototype.handleMessage = function(msg) {
 						this.sendGroupMessage(toroom + this.CONF_SERVICE, "KNOCK ; FROM ; " + fromjid + " ; AS ; " + fromnick + " ; " + (plea ? plea : ""));
 					}
 					else
-						console.log("KNOCK refused. JID (" + fromjid + "), is on the banned list for room (" + toroom + ")");
+						this.log("KNOCK refused. JID (" + fromjid + "), is on the banned list for room (" + toroom + ")");
 				}
 			}
 			else
-				console.log("Direct message: Unknown command: " + msg.getChild('body').getText());
+				this.log("Direct message: Unknown command: " + msg.getChild('body').getText());
 		}
 	}
 };
@@ -1137,7 +1145,7 @@ overseer.prototype.handleMessage = function(msg) {
 overseer.prototype.handlePresence = function(pres) {
 	if (!pres.attrs.from.split('@'))
 	{
-		console.log("Got pres: " + pres);
+		this.log("Got pres: " + pres);
 	}
 };
 
@@ -1165,10 +1173,10 @@ overseer.prototype.handleIq = function(iq) {
 		this.client.send(iq);
 	}
 	else if (!iq.attrs.from.split('@'))
-		console.log("UNHANDLED IQ: " + iq);
+		this.log("UNHANDLED IQ: " + iq);
 };
 
-function feedbackBot(feedback_jid, feedback_pw) {
+function feedbackBot(feedback_jid, feedback_pw, notifier) {
 	// Login and then log any and all messages coming our way.
 	// The clients should be sending:
 	// Their jid, their room name, their nick
@@ -1176,7 +1184,9 @@ function feedbackBot(feedback_jid, feedback_pw) {
 	var d = new Date();
 	var fname = feedback_jid.split('@')[0]+'_'+(d.getMonth()+1)+'_'+d.getDate()+'_'+d.getFullYear()+'.txt'
 	this.logfile = fs.createWriteStream(fname, {'flags': 'a'});
-// use {'flags': 'a'} to append and {'flags': 'w'} to erase and write a new file
+	// use {'flags': 'a'} to append and {'flags': 'w'} to erase and write a new file
+	this.notifier = notifier;
+	this.jid = feedback_jid;
 
 	var self = this;
 
@@ -1211,6 +1221,8 @@ function feedbackBot(feedback_jid, feedback_pw) {
 
 					sys.puts(line);
 					self.logfile.write(line + "\n");
+					if (self.notifier)
+						self.notifier.sendMessage("FB given @" + self.jid.split('@')[0] + ":" + line);
 				  }
 
 				  // Swap addresses...
@@ -1231,6 +1243,62 @@ function loadRooms(filename) {
 	return fs.readFileSync(filename, 'utf8');
 };
 
+function notifier(serverinfo, jidlist) {
+	this.server = serverinfo.server || "video.gocast.it";
+	this.port = serverinfo.port || 5222;
+	this.jid = serverinfo.jid;
+	this.password = serverinfo.password;
+
+	this.informlist = jidlist;
+	this.isOnline = false;
+
+	console.log("Notifier started:");
+	var users = "  Users to notify: ";
+	for (k in this.informlist)
+	{
+		if (users !== "  Users to notify: ")
+			users += ", ";
+
+		users += this.informlist[k];
+	}
+	console.log(users);
+
+	this.client = new xmpp.Client({ jid: this.jid, password: this.password, reconnect: true, host: this.server, port: this.port });
+
+	var self = this;
+
+	this.client.on('online',
+		  function() {
+		  	console.log("Notifier online.");
+		  	self.isOnline = true;
+//		  	self.sendMessage("Notifier online.");
+		  });
+	this.client.on('offline',
+		  function() {
+		  	console.log("Notifier offline.");
+		  	self.isOnline = false;
+		  });
+
+};
+
+notifier.prototype.sendMessage = function(msg) {
+	if (this.client && this.isOnline)
+	{
+		for (k in this.informlist)
+		{
+			var msg_stanza = new xmpp.Element('message', {to: this.informlist[k], type: 'chat'})
+				.c('body').t(msg);
+			this.client.send(msg_stanza);
+		}
+	}
+};
+
+//
+//
+//  Main
+//
+//
+
 console.log("****************************************************");
 console.log("****************************************************");
 console.log("*                                                  *");
@@ -1239,16 +1307,20 @@ console.log("*                                                  *");
 console.log("****************************************************");
 console.log("****************************************************");
 
+var notify = new notifier({jid: "overseer@video.gocast.it", password: "the.overseer.rocks",
+							server: "video.gocast.it", port: 5222},
+			["rwolff@video.gocast.it"]); // , "bob.wolff68@jabber.org" ]);
+
 //
 // Login as test feedback bot.
 //
-//var fb = new feedbackBot("feedback_bot_test1@video.gocast.it", "test1");
-var fb_etzchayim = new feedbackBot("feedback_bot_etzchayim@video.gocast.it", "feedback.gocast.etzchayim");
-var fb_fuse = new feedbackBot("feedback_bot_fuse@video.gocast.it", "feedback.gocast.fuse");
-var fb_friends = new feedbackBot("feedback_bot_friends@video.gocast.it", "feedback.gocast.friends");
+//var fb = new feedbackBot("feedback_bot_test1@video.gocast.it", "test1", notify);
+var fb_etzchayim = new feedbackBot("feedback_bot_etzchayim@video.gocast.it", "feedback.gocast.etzchayim", notify);
+var fb_fuse = new feedbackBot("feedback_bot_fuse@video.gocast.it", "feedback.gocast.fuse", notify);
+var fb_friends = new feedbackBot("feedback_bot_friends@video.gocast.it", "feedback.gocast.friends", notify);
 
 //
 // Login as Overseer
 //
-var overseer = new overseer("overseer@video.gocast.it", "the.overseer.rocks");
+var overseer = new overseer("overseer@video.gocast.it", "the.overseer.rocks", notify);
 
