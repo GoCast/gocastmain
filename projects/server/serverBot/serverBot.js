@@ -86,9 +86,13 @@ function mucRoom(client, notifier) {
 		else if (stanza.is('iq') && stanza.attrs.type !== 'error')
 			self.handleIQ(stanza);
 		else
-			console.log("MUC UNHANDLED: " + stanza.tree());
+			this.log("ERROR: UNHANDLED Stanza: " + stanza.tree());
 	});
 
+};
+
+mucRoom.prototype.log = function(msg) {
+	console.log(logDate() + " - @" + this.roomname.split('@')[0] + ": " + msg);
 };
 
 mucRoom.prototype.getRoomConfiguration = function(cb) {
@@ -98,7 +102,7 @@ mucRoom.prototype.getRoomConfiguration = function(cb) {
 	var getRoomConf = new xmpp.Element('iq', {to: this.roomname, type: 'get'})
 		.c('query', {xmlns: 'http://jabber.org/protocol/muc#owner'});
 
-	console.log("Requesting room configuration... ");
+	this.log("Requesting room configuration... ");
 	this.sendIQ(getRoomConf, function(resp) {
 		if (cb)
 			cb.call(self, resp);
@@ -116,10 +120,10 @@ mucRoom.prototype.handlePresence = function(pres) {
 	// We need to deal with non-configured rooms. If we get a status code 201, we need to config.
 	if (pres.getChild('x') && pres.getChild('x').getChildrenByAttr('code','201').length > 0)
 	{
-		console.log("Room: " + this.roomname.split('@')[0] + " needs configured. Configuring...");
+		this.log("needs configured. Configuring...");
 
 		this.getRoomConfiguration(function(resp) {
-			console.log("Got room configuration. Going for setup.");
+			this.log("Got room configuration. Going for setup.");
 			self.setupRoom(resp);
 		});
 
@@ -130,7 +134,7 @@ mucRoom.prototype.handlePresence = function(pres) {
 		// Special case where someone has already taken my nickname...kick them out.
 		if (pres.getChild('error').getChild('conflict'))
 		{
-			console.log("Kicking out overseer imposter. His jid=" + fromjid);
+			this.log("Kicking out overseer imposter. His jid=" + fromjid);
 			self.kick(self.nick, function() {
 				// Once the kick is complete, we need to re-establish ourselves.
 				// TODO - not sure how to unjoin, rejoin, etc all from here...
@@ -144,14 +148,14 @@ mucRoom.prototype.handlePresence = function(pres) {
 				// Then in presence, we'll have to detect our own presence as a match of 'to'
 				// with the resource in 'from' and realize why we're there.
 				// At that point, kick the imposter and then 'leave' and rejoin()
-				console.log("Re-joining room after kicking the imposter.");
+				self.log("Re-joining room after kicking the imposter.");
 				self.rejoin(self.roomname, null);
 			});
 		}
 		else
-				console.log("Couldn't kick -- didn't find their jid. Hmm. Are we not moderator/admin/owner?");
+				this.log("Couldn't kick -- didn't find their jid. Hmm. Are we not moderator/admin/owner?");
 
-		console.log("Room: " + this.roomname.split('@')[0] + " Error: " + pres);
+		this.log("Error: " + pres);
 
 		return;
 	}
@@ -163,21 +167,21 @@ mucRoom.prototype.handlePresence = function(pres) {
 	//
 	if (pres.attrs.type !== 'unavailable')
 	{
-		console.log("Adding: " + fromjid + " as Nickname: " + fromnick);
+		this.log("Adding: " + fromjid + " as Nickname: " + fromnick);
 		this.participants[fromnick] = fromjid || fromnick;
 	}
 	else if (pres.attrs.type === 'unavailable' && this.participants[fromnick])
 	{
-		console.log("Removing: " + fromnick);
+		this.log(fromnick + " left room.");
 		delete this.participants[fromnick];
 		if (fromnick === self.nick)
 		{
-			console.log("We got kicked out...room destroyed? Or we disconnected??");
+			this.log("We got kicked out...room destroyed? Or we disconnected??");
 			this.joined = false;
 			for (k in this.participants)
 				delete this.participants[k];
 
-			console.log("MUC @" + this.roomname.split('@')[0] + " - Re-joining (and creating?) room.");
+			this.log("Re-joining (and re-creating?) room.");
 			this.rejoin(self.roomname, self.nick_original);
 		}
 
@@ -192,7 +196,7 @@ mucRoom.prototype.handlePresence = function(pres) {
 
 			// Upon joining, get context of the room. Get the banned list.
 			this.loadBannedList(function() {
-				console.log("Received Banned List for room: " + this.roomname.split('@')[0]);
+				this.log("Received Banned List");
 				this.printParticipants();
 				this.printBannedList();
 			});
@@ -211,7 +215,7 @@ mucRoom.prototype.handlePresence = function(pres) {
 					{
 						if (form.getChild('query').getChild('x').getChildByAttr('var', 'muc#roomconfig_membersonly').getChild('value').getText() === '1')
 						{
-							console.log("Walking in, room is locked.");
+							this.log("Upon entry - room is locked.");
 							this.islocked = true;
 						}
 						else
@@ -229,7 +233,7 @@ mucRoom.prototype.handlePresence = function(pres) {
 			this.printParticipants();
 	}
 
-	console.log("MUC pres: @" + this.roomname.split('@')[0] + ": " + pres.getChild('x'));
+//	this.log("Pres: " + pres.getChild('x'));
 
 };
 
@@ -246,9 +250,9 @@ mucRoom.prototype.printBannedList = function() {
 	}
 
 	if (parts !== "")
-		console.log("Banned list: " + parts);
+		this.log("Banned list: " + parts);
 	else
-		console.log("No one on the banned list.");
+		this.log("No one on the banned list.");
 };
 
 mucRoom.prototype.printParticipants = function() {
@@ -263,7 +267,7 @@ mucRoom.prototype.printParticipants = function() {
 		parts += k.replace(/\\20/g, ' ');
 	}
 
-	console.log("MUC@"+ this.roomname.split('@')[0] + " participants list: " + parts);
+	this.log("Participants list: " + parts);
 	if (this.notifier)
 		this.notifier.sendMessage("MUC@" + this.roomname.split('@')[0] + " Participants: " + parts);
 };
@@ -275,7 +279,7 @@ mucRoom.prototype.printParticipants = function() {
 mucRoom.prototype.handleIQ = function(iq) {
 /*		if (iq.attrs.from.split('@')[0] !== this.roomname.split('@')[0])
 	{
-		console.log("ERROR: NAME MISMATCH. this.roomname="+this.roomname+" while iq="+iq.tree());
+		this.log("ERROR: NAME MISMATCH. this.roomname="+this.roomname+" while iq="+iq.tree());
 	}
 */
 	if (iq.attrs.type === 'result' && iq.attrs.id && this.iq_callbacks[iq.attrs.id])
@@ -298,11 +302,11 @@ mucRoom.prototype.handleIQ = function(iq) {
 			delete iq.attrs.from;
 			iq.attrs.type = 'result';
 
-			console.log("disco#info");
+			this.log("disco#info");
 			this.sendIQ(iq, function() { });	// Don't care about any callback.
 		}
 		else
-			console.log("handleIQ @" + this.roomname.split('@')[0] + " was ignored: " + iq);
+			this.log("handleIQ was ignored: " + iq);
 	}
 	else
 	{
@@ -310,7 +314,7 @@ mucRoom.prototype.handleIQ = function(iq) {
 		for (k in this.iq_callbacks)
 			console.log("  CB_ID: " + k);
 	*/
-		console.log("handleIQ: IQ result msg @" + this.roomname.split('@')[0] + " was ignored: " + iq);
+		this.log("handleIQ: IQ result msg was ignored: " + iq);
 	}
 };
 
@@ -354,37 +358,37 @@ mucRoom.prototype.handleMessage = function(msg) {
 				// Must have a nickname as an argument.
 				if (cmd[1])
 				{
-					console.log("MUC @"+this.roomname.split('@')[0] + " - Command: KICKing out: " + cmd[1]);
+					this.log("Command: KICKing out: " + cmd[1]);
 
 					if (!this.kick(cmd[1], function() {
-						console.log("MUC @"+this.roomname.split('@')[0] + " - Command: KICK complete.");
+						self.log("Command: KICK complete.");
 
 						self.sendGroupMessage(nickfrom + " kicked " + cmd[1] + " out of the room.");
 					}))
-						console.log("MUC @"+this.roomname.split('@')[0] + " - Command: KICK failed");
+						this.log("Command: KICK failed");
 				}
 				else
-					console.log("MUC @"+this.roomname.split('@')[0] + " - Command: KICK - requires nickname.");
+					this.log("Command: KICK - requires nickname.");
 			}
 			else if (cmd[0] === 'LOCK')
 			{
-				console.log("MUC @"+this.roomname.split('@')[0] + " - Command: LOCKing room.");
+				this.log("Command: LOCKing room.");
 				if (this.lock() === true)
 					self.sendGroupMessage(nickfrom + " locked the room.");
 			}
 			else if (cmd[0] === 'UNLOCK')
 			{
-				console.log("MUC @"+this.roomname.split('@')[0] + " - Command: UNLOCKing room.");
+				this.log("Command: UNLOCKing room.");
 				this.unlock();
 				self.sendGroupMessage(nickfrom + " un-locked the room.");
 			}
 			else if (cmd[0] === 'INVITE')
 			{
 				if (!cmd[1] || !cmd[2])
-					console.log("MUC @"+this.roomname.split('@')[0] + " - Command: INVITE Invalid. No jid(" + cmd[1] + ") or no nickname(" + cmd[2] + ")");
+					this.log("Command: INVITE Invalid. No jid(" + cmd[1] + ") or no nickname(" + cmd[2] + ")");
 				else
 				{
-					console.log("MUC @"+this.roomname.split('@')[0] + " - Command: Approving Invite to room of jid:" + cmd[1] + " - nickname:" + cmd[2]);
+					this.log("Command: Approving Invite to room of jid:" + cmd[1] + " - nickname:" + cmd[2]);
 					this.invite(cmd[1]);	// Nickname only gets used for identification purposes.
 					self.sendGroupMessage(nickfrom + " invited " + cmd[1] + " to join the room as nickname: " + cmd[2]);
 				}
@@ -393,23 +397,23 @@ mucRoom.prototype.handleMessage = function(msg) {
 			{
 //				console.log("DEBUG: message:" + msg.tree());
 				if (!cmd[1] || !cmd[2])
-					console.log("MUC @"+this.roomname.split('@')[0] + " - Command: BAN Invalid. No jid(" + cmd[1] + ") or no nickname(" + cmd[2] + ")");
+					this.log("Command: BAN Invalid. No jid(" + cmd[1] + ") or no nickname(" + cmd[2] + ")");
 				else
 				{
 					// in case we get a chat-formulated 'name@email.com <mailto:name@email.com>'
 					cmd[1] = cmd[1].split(' ')[0];
 
-					console.log("MUC @"+this.roomname.split('@')[0] + " - Command: Banning jid:" + cmd[1] + " - nickname:" + cmd[2]);
+					this.log("Command: Banning jid:" + cmd[1] + " - nickname:" + cmd[2]);
 					this.banOutsiderByJid(cmd[1], function(resp) {
 						self.sendGroupMessage(nickfrom + " banned " + cmd[1] + " from joining the room who was using nickname: " + cmd[2]);
 					});
 				}
 			}
 			else
-			  console.log("MUC @"+this.roomname.split('@')[0] + " - Invalid Inbound-Command: " + msg.getChild('body').getText());
+			  this.log("Invalid Command: " + msg.getChild('body').getText());
 		}
 		else
-			console.log("MUC msg @" + this.roomname.split('@')[0] + ": From:" + msg.attrs.from.split('/')[1] + ": " + msg.getChild('body'));
+			this.log("From:" + msg.attrs.from.split('/')[1] + ": " + msg.getChild('body'));
 	}
 };
 
@@ -421,17 +425,19 @@ mucRoom.prototype.invite = function(invitejid) {
 		.c('query', {xmlns: 'http://jabber.org/protocol/muc#admin'})
 		.c('item', {affiliation: 'member', jid: invitejid}), function(resp) {
 			if (resp.attrs.type === 'result')
-				console.log("MUC msg @" + self.roomname.split('@')[0] + ": Invite of " + invitejid + " successful.");
+				self.log("Invite of " + invitejid + " successful.");
 			else
-				console.log("MUC msg @" + self.roomname.split('@')[0] + ": ERROR: Invite of " + invitejid + " failed:" + resp);
+				self.log("ERROR: Invite of " + invitejid + " failed:" + resp);
 		});
 };
 
 mucRoom.prototype.setupRoom = function(form) {
+	var self = this;
+
 	// We have received a form from the server. We need to make changes and send it back.
 	if (!form.is('iq'))
 	{
-		console.log("ERROR: Server configuration form is not of type iq. Ignoring.");
+		this.log("ERROR: Server configuration form is not of type iq. Ignoring.");
 		return;
 	}
 
@@ -460,7 +466,7 @@ mucRoom.prototype.setupRoom = function(form) {
 //				console.log("Change-Post: " + form.getChild('query').getChild('x').getChildByAttr('var', k));
 			}
 			else
-				console.log("Skipping option: " + k);
+				this.log("Skipping option: " + k);
 		}
 
 //		console.log("ROOM_SETUP: FINAL: " + form.tree());
@@ -470,14 +476,14 @@ mucRoom.prototype.setupRoom = function(form) {
 			// Handle the response to the room setup.
 			if (resp.attrs.type === 'result')
 			{
-				console.log("Room setup successful.");
+				self.log("Room setup successful.");
 			}
 			else
-				console.log("Room setup failed. Response: " + resp.tree());
+				self.log("Room setup failed. Response: " + resp.tree());
 		});
 	}
 	else
-		console.log("setupRoom: No <query><x> ...");
+		this.log("setupRoom: No <query><x> ...");
 };
 
 //
@@ -497,7 +503,7 @@ mucRoom.prototype.clearMembersList = function(cb) {
 	this.sendIQ(getmemb, function(curlist) {
 
 			if (curlist.attrs.type !== 'result')
-				console.log("MUC clearMembers @" + self.roomname.split('@')[0] + ": Get-Curlist failed: " + curlist.tree());
+				self.log("ClearMembers: Get-Curlist failed: " + curlist.tree());
 
 			if (curlist.getChild('query') && curlist.getChild('query').getChild('item'))
 			{
@@ -562,7 +568,7 @@ mucRoom.prototype.loadBannedList = function(cb) {
 		self.bannedlist = {};
 
 		if (curlist.attrs.type !== 'result')
-			console.log("MUC loadBanned @" + self.roomname.split('@')[0] + ": Get-Curlist failed: " + curlist.tree());
+			self.log("loadBanned: Get-Curlist failed: " + curlist.tree());
 
 		if (curlist.getChild('query') && curlist.getChild('query').getChild('item'))
 		{
@@ -600,7 +606,7 @@ mucRoom.prototype.clearBannedList = function(cb) {
 	this.sendIQ(getoutcast, function(curlist) {
 
 			if (curlist.attrs.type !== 'result')
-				console.log("MUC clearBanned @" + self.roomname.split('@')[0] + ": Get-Curlist failed: " + curlist.tree());
+				self.log("clearBanned: Get-Curlist failed: " + curlist.tree());
 
 			if (curlist.getChild('query') && curlist.getChild('query').getChild('item'))
 			{
@@ -656,7 +662,7 @@ mucRoom.prototype.lock = function() {
 
 	if (this.islocked)
 	{
-		console.log("MUC LOCK @" + this.roomname.split('@')[0] + ": ERROR: Room is already locked.");
+		this.log("ERROR: Room is already locked.");
 		return false;
 	}
 
@@ -668,13 +674,13 @@ mucRoom.prototype.lock = function() {
 	this.clearMembersList(function(res) {
 
 		if (res.attrs.type !== 'result')
-			console.log("MUC LOCK @" + self.roomname.split('@')[0] + ": clearMembers failed: " + res.tree());
+			self.log("LOCK: clearMembers failed: " + res.tree());
 
 		// Now clear the banned list prior to locking the room.
 		self.clearBannedList(function(res) {
 
 			if (res.attrs.type !== 'result')
-				console.log("MUC LOCK @" + self.roomname.split('@')[0] + ": clearBanned failed: " + res.tree());
+				self.log("LOCK: clearBanned failed: " + res.tree());
 
 				// Setup the head of the iq-set
 				var memblist = new xmpp.Element('iq', {to: self.roomname, type: 'set'})
@@ -690,7 +696,7 @@ mucRoom.prototype.lock = function() {
 							memblist.c('item', {affiliation: 'member', jid: self.participants[k]}).up();
 						}
 						else
-							console.log("MUC LOCK @" + self.roomname.split('@')[0] + ": Cannot make member. No jid found for: " + k);
+							self.log("LOCK: Cannot make member. No jid found for: " + k);
 					}
 				}
 
@@ -711,15 +717,15 @@ mucRoom.prototype.lock = function() {
 								.c('value').t('1'), function(resp) {
 									if (resp.attrs.type === 'result')
 									{
-										console.log("MUC Lock @" + self.roomname.split('@')[0] + " locked successfully.");
+										self.log("Locked successfully.");
 										self.islocked = true;
 									}
 									else
-										console.log("MUC Lock @" + self.roomname.split('@')[0] + " NOT LOCKED. Resp: " + resp.tree());
+										self.log("ERROR: NOT LOCKED. Resp: " + resp.tree());
 								});
 					}
 					else
-						console.log("MUC Lock @" + self.roomname.split('@')[0] + " NOT LOCKED. Member-List failed Resp: " + resp.tree());
+						self.log("ERROR: NOT LOCKED. Member-List failed Resp: " + resp.tree());
 				});
 			});
 		});
@@ -744,26 +750,26 @@ mucRoom.prototype.unlock = function() {
 			.c('value').t('0'), function(resp) {
 				if (resp.attrs.type === 'result')
 				{
-					console.log("MUC Un-Lock @" + self.roomname.split('@')[0] + " unlocked successfully.");
+					self.log("Unlocked successfully.");
 					self.islocked = false;
 
 					// Now we shall clear the memebers list and the banned list.
 					this.clearMembersList(function(res) {
 
 						if (res.attrs.type !== 'result')
-							console.log("MUC LOCK @" + self.roomname.split('@')[0] + ": clearMembers failed: " + res.tree());
+							self.log("Unlock: clearMembers failed: " + res.tree());
 
 						// Now clear the banned list prior to locking the room.
 						self.clearBannedList(function(res) {
 
 							if (res.attrs.type !== 'result')
-								console.log("MUC LOCK @" + self.roomname.split('@')[0] + ": clearBanned failed: " + res.tree());
+								self.log("Unlock: clearBanned failed: " + res.tree());
 
 						});
 					});
 				}
 				else
-					console.log("MUC Un-Lock @" + self.roomname.split('@')[0] + " NOT UNLOCKED. Resp: " + resp.tree());
+					self.log("Unlock: ERROR: NOT UNLOCKED. Resp: " + resp.tree());
 			});
 };
 
@@ -818,7 +824,7 @@ mucRoom.prototype.banFromRoomByNick = function(nick, cb) {
 	}
 	else
 	{
-		console.log("Couldn't seem to find '" + nick + "'. Must have scrammed.");
+		this.log("Ban: Couldn't seem to find '" + nick + "'. Must have scrammed.");
 		return false;
 	}
 };
@@ -864,7 +870,7 @@ mucRoom.prototype.sendIQ = function(iq, cb) {
 
 	if (!iq.root().is('iq'))
 	{
-		console.log("sendIQ - malformed inbound iq message. No <iq> stanza: " + iq.tree());
+		this.log("sendIQ: malformed inbound iq message. No <iq> stanza: " + iq.tree());
 		return;
 	}
 
@@ -874,13 +880,13 @@ mucRoom.prototype.sendIQ = function(iq, cb) {
 	if (cb)
 		this.iq_callbacks[iqid] = cb;
 	else
-		console.log("sendIQ: MUC @" + this.roomname.split('@')[0] + " - No callback for id=" + iqid);
+		this.log("sendIQ: INFO: No callback for id=" + iqid);
 
-/*	console.log("sendIQ: MUC @" + this.roomname.split('@')[0] + " - Callback list: ");
+/*	this.log("sendIQ: Callback list: ");
 	for (k in this.iq_callbacks)
-		console.log("  CB_ID: " + k);
+		this.log("  CB_ID: " + k);
 */
-//	console.log("sendIQ: MUC @" + this.roomname.split('@')[0] + ": SendingIQ: " + iq.tree());
+//	this.log("sendIQ: SendingIQ: " + iq.tree());
 
 	this.client.send(iq.root());
 };
@@ -893,7 +899,7 @@ mucRoom.prototype.leave = function() {
 	el = new xmpp.Element('presence', {to: to, usertype: 'silent', type: 'unavailable'})
 					.c('x', {xmlns: 'http://jabber.org/protocol/muc'})
 
-	console.log("Joining: " + rmname + " as " + nick + ". "); // + el.tree());
+	this.log("Leaving."); // + el.tree());
 	this.client.send(el);
 };
 
@@ -916,11 +922,12 @@ mucRoom.prototype.rejoin = function(rmname, nick) {
 	el = new xmpp.Element('presence', {to: to, usertype: 'silent'})
 					.c('x', {xmlns: 'http://jabber.org/protocol/muc'})
 
-	console.log("Joining: " + rmname + " as " + nick + ". "); // + el.tree());
-	this.client.send(el);
-
+	// Want to set the roomname in particular before calling .log so formatting is correct.
 	this.roomname = rmname;
 	this.nick = nick;
+
+	this.log("Joining: " + rmname + " as " + nick + ". "); // + el.tree());
+	this.client.send(el);
 };
 
 ///
@@ -1044,7 +1051,7 @@ function overseer(user, pw, notifier) {
 };
 
 overseer.prototype.log = function(msg) {
-	console.log("Overseer: " + msg);
+	console.log(logDate() + " - Overseer: " + msg);
 };
 
 overseer.prototype.sendIQ = function(iq, cb) {
@@ -1182,7 +1189,7 @@ function feedbackBot(feedback_jid, feedback_pw, notifier) {
 	// Their jid, their room name, their nick
 	// plus any message sent by the user.
 	var d = new Date();
-	var fname = feedback_jid.split('@')[0]+'_'+(d.getMonth()+1)+'_'+d.getDate()+'_'+d.getFullYear()+'.txt'
+	var fname = feedback_jid.split('@')[0]+'_'+pad2(d.getMonth()+1)+'_'+pad2(d.getDate())+'_'+d.getFullYear()+'.txt'
 	this.logfile = fs.createWriteStream(fname, {'flags': 'a'});
 	// use {'flags': 'a'} to append and {'flags': 'w'} to erase and write a new file
 	this.notifier = notifier;
@@ -1211,9 +1218,7 @@ function feedbackBot(feedback_jid, feedback_pw, notifier) {
 					var nick = stanza.attrs.nick || 'no-nick';
 					var room = stanza.attrs.room || 'no-room';
 
-					var d = new Date();
-					var ts = "" + (d.getMonth()+1) + "-" + d.getDate() + "-" + d.getFullYear() + " "
-						+ d.getHours() + ":" + d.getMinutes() + ":" + d.getSeconds() + " - ";
+					var ts = logDate() + " - ";
 					var line = ts + "From: " + stanza.attrs.from
 						+ ", Nick: " + nick
 						+ ", Room: " + room
@@ -1239,8 +1244,25 @@ function feedbackBot(feedback_jid, feedback_pw, notifier) {
 };
 
 function loadRooms(filename) {
-	console.log("Loading rooms database from: " + filename);
+	console.log(logDate() + " - Loading rooms database from: " + filename);
 	return fs.readFileSync(filename, 'utf8');
+};
+
+function pad(num, size) {
+    var s = "000000000" + num;
+    return s.substr(s.length-size);
+}
+
+function pad2(num) { return pad(num, 2); };
+
+//
+// Return Date/Time as mm-dd-yyyy hh:mm::ss
+//
+function logDate() {
+	var d = new Date();
+
+	return pad2(d.getMonth()+1) + "-" + pad2(d.getDate()) + "-" + d.getFullYear() + " "
+			+ pad2(d.getHours()) + ":" + pad2(d.getMinutes()) + ":" + pad2(d.getSeconds());
 };
 
 function notifier(serverinfo, jidlist) {
@@ -1252,7 +1274,7 @@ function notifier(serverinfo, jidlist) {
 	this.informlist = jidlist;
 	this.isOnline = false;
 
-	console.log("Notifier started:");
+	console.log(logDate() + " - Notifier started:");
 	var users = "  Users to notify: ";
 	for (k in this.informlist)
 	{
@@ -1269,13 +1291,13 @@ function notifier(serverinfo, jidlist) {
 
 	this.client.on('online',
 		  function() {
-		  	console.log("Notifier online.");
+		  	console.log(logDate() + " - Notifier online.");
 		  	self.isOnline = true;
 //		  	self.sendMessage("Notifier online.");
 		  });
 	this.client.on('offline',
 		  function() {
-		  	console.log("Notifier offline.");
+		  	console.log(logDate() + " - Notifier offline.");
 		  	self.isOnline = false;
 		  });
 
