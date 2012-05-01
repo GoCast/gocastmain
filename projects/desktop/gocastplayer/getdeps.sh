@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 ##########
 # webrtc #
@@ -47,10 +47,10 @@ fi
 
 if [ `uname` = "Darwin" ]; then
     echo "Copying dep_mods/macosx to deps"
-    cp -R ../dep_mods/macosx/ ./
+    cp -R ../dep_mods/macosx/* ./
 else
     echo "Copying dep_mods/linux to deps"
-    cp -R ../dep_mods/linux/ ./
+    cp -R ../dep_mods/linux/* ./
 fi
 
 cd ..
