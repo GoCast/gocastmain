@@ -28,4 +28,10 @@
   <room date="Visiting" time="Anytime" name="Tests"
         jid="friends-general@gocastconference.video.gocast.it"
         title="General conference room" />
+  <room date="Visiting" time="Anytime" name="Mozilla-Trial"
+        jid="friends-mozilla-dev@gocastconference.video.gocast.it"
+        title="Mozilla Dev Discussion" />
+  <room date="Visiting" time="Anytime" name="Mozilla-Trial"
+        jid="friends-mozilla-general@gocastconference.video.gocast.it"
+        title="Mozilla General Discussion" />
 </schedules>
