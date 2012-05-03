@@ -660,7 +660,13 @@ var Callcast = {
 		if (nick)
 			nick = nick.replace(/\\20/g, ' ');
 
-		if (room == Callcast.room)
+		var delayed = $(message).children("delay").length > 0  ||
+				$(message).children("x[xmlns='jabber:x:delay']").length > 0;
+
+		if (delayed)
+				console.log("Ignoring delayed sync link:" + $(message).children('body').text());
+
+		if (room == Callcast.room && !delayed)
 		{
 			if (nick == Callcast.nick)
 				return true;
