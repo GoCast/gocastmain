@@ -12,6 +12,7 @@
 #include "GCP.h"
 
 #include <iostream>
+#include "GCPSocketServer.h"
 #include "variant_list.h"
 #include "talk/session/phone/webrtcvoiceengine.h"
 #include "talk/session/phone/webrtcvideoengine.h"
@@ -33,12 +34,11 @@ int GCP::stunPort = 19302;
 FB::JSObjectPtr GCP::successCallback;
 FB::JSObjectPtr GCP::failureCallback;
 
-bool GCP::WebrtcResThreadWorker()
+namespace GoCast
 {
-    while(1)
+    bool SocketServer::Wait(int cms, bool process_io)
     {
         int instruction = -1;
-        boost::this_thread::sleep(boost::posix_time::milliseconds(200));
         
         {
             boost::mutex::scoped_lock lock_(GCP::deqMutex);
@@ -62,7 +62,8 @@ bool GCP::WebrtcResThreadWorker()
                     break;
                     
                 case WEBRTC_RES_WORKER_QUIT:
-                    return true;
+                    m_pThread->Quit();
+                    break;
                     
                 case START_LOCAL_VIDEO:
                     (GCP::StartLocalVideo)();
@@ -89,8 +90,19 @@ bool GCP::WebrtcResThreadWorker()
                     break;
             }
         }
+        
+        return talk_base::PhysicalSocketServer::Wait(20, process_io);
     }
+}
+
+bool GCP::WebrtcResThreadWorker()
+{
+    talk_base::AutoThread pluginThread;
+    GoCast::SocketServer socketServer;
     
+    talk_base::Thread::Current()->set_socketserver(&socketServer);
+    talk_base::Thread::Current()->Run();
+    talk_base::Thread::Current()->set_socketserver(NULL);
     return true;
 }
 
@@ -108,7 +120,7 @@ bool GCP::WebrtcResourcesInit()
             return false;
         }
         
-        std::cout << "Inited Jingle Worker Thhread" << std::endl;
+        std::cout << "Inited Jingle Worker Thread" << std::endl;
     }
     
     // Instantiate webrtc media engine
@@ -126,13 +138,15 @@ bool GCP::WebrtcResourcesInit()
     {
         GCP::pWebrtcDeviceManager = new cricket::DeviceManager();
         
-        std::cout << "Inited Device Manager" << std::endl;
+        std::cout << "Inited Device Manager ===" << std::endl;
 
     }
     
     // Instantiate peer connection factory
     if(NULL == (GCP::pWebrtcPeerConnFactory).get())
     {
+        std::cout << "PeerConnection Factory NULL" << std::endl;
+    
         (GCP::pWebrtcPeerConnFactory).reset(
             new webrtc::PeerConnectionFactory(
                 new cricket::BasicPortAllocator(
@@ -147,6 +161,8 @@ bool GCP::WebrtcResourcesInit()
                 (GCP::pJingleWorkerThread).get()
             )
         );
+        
+        std::cout << "PeerConnection Factory reset" << std::endl;
         
         if(false == (GCP::pWebrtcPeerConnFactory)->Initialize())
         {

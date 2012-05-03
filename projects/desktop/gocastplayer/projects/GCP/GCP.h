@@ -65,7 +65,9 @@ public:
     // If you want your plugin to be optionally windowless based on the
     // value of the "windowless" param tag, remove this method or return
     // FB::PluginCore::isWindowless()
+#ifdef GOCAST_WINDOWS
     virtual bool isWindowless() { return true; }
+#endif
 
     BEGIN_PLUGIN_EVENT_MAP()
         EVENTTYPE_CASE(FB::MouseDownEvent, onMouseDown, FB::PluginWindow)
