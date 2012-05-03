@@ -28,8 +28,8 @@ echo "" >> GoCastPlayer/install.sh
 chmod u+x GoCastPlayer/install.sh
 
 #Package install.sh and npGCP_[i686|x86_64].so
-rm -f GoCastPlayer.tar.gz
-tar czvf GoCastPlayer.tar.gz GoCastPlayer/install.sh GoCastPlayer/npGCP_`uname -m`.so
+rm -f GoCastPlayer_`uname -m`.tar.gz
+tar czvf GoCastPlayer_`uname -m`.tar.gz GoCastPlayer/install.sh GoCastPlayer/npGCP_`uname -m`.so
 
 cd ..
 
