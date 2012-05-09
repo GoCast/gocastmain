@@ -5,4 +5,5 @@ scp strophejs-plugins/muc/strophe.muc.js ec2-user@video.gocast.it:html/scripts
 scp ./strophe.roster.js ec2-user@video.gocast.it:html/scripts
 scp ./strophe.webrtcClient.js ec2-user@video.gocast.it:html/scripts
 scp *.html *.js *.css ec2-user@video.gocast.it:html
+scp callcast.js ec2-user@video.gocast.it:/var/www/scripts
 
