@@ -1022,6 +1022,7 @@ var Callcast = {
 	        	 Callcast.finalizeConnect();
                          connected();
 	         } else if (status === Strophe.Status.DISCONNECTED) {
+                 console.log("***STROPHE DISCONNECTED***");
 	        	 Callcast.disconnect();
                          disconnected();
 	        } else if (status === Strophe.Status.AUTHFAIL) {

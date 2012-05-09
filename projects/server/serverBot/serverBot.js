@@ -930,6 +930,28 @@ mucRoom.prototype.rejoin = function(rmname, nick) {
 	this.client.send(el);
 };
 
+//
+// TODO: Finish this - process the list of xml files building 'roomnames'
+//       Then upon any changes, find the missing entries and add them.
+//       And find the removed entries and delete those rooms.
+//
+function loadRoomsAndProcess(filenames, roomnames)
+{
+	var temp_rooms = {};
+
+	for (k in filenames)
+	{
+		// load filename &
+		fs.watchFile(filenames[k], {persistent: true, interval: 3000}, function (curr, prev) {
+		  if (curr.mtime > prev.mtime)
+		  {
+		    var temp_xml;
+			temp_xml = fs.readFileSync(filenames[k], 'utf8');
+//			console.log('Changed contents: ' + contents);
+		  }
+	}
+};
+
 ///
 ///
 ///
