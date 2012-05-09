@@ -1,0 +1,131 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>GoCast Friends</title>
+
+    <link href="assets/application.css?body=1" media="all" rel="stylesheet" type="text/css" />
+    <script src="assets/application.js" type="text/javascript"></script>
+    <script src="assets/strophe.js" type="text/javascript"></script>
+    <script src="assets/strophe_facebook.js" type="text/javascript"></script>
+
+    <script src="people.js" type="text/javascript"></script>
+    <script src="/scripts/callcast.js" type="text/javascript"></script>
+
+    <link rel='stylesheet' type='text/css' href='people.css'>
+
+    <script src="assets/test.js" type="text/javascript"></script>
+
+    <meta content="authenticity_token" name="csrf-param" />
+    <meta content="0rjuAgacZ+/Vv4njBdRfXBphJvUOoynj+AkFQTOQzEk=" name="csrf-token" />
+    <link href='http://fonts.googleapis.com/css?family=Telex' rel='stylesheet' type='text/css'>
+  </head>
+</html>
+<body>
+  <div class='hide' id='login'>
+    <div class='header'>
+      <img src='images/logo.png'>
+    </div>
+    <div class='content'>
+      <p>To start the application please:</p>
+      <img id='facebook_login' src='images/fb-connect-large.png'>
+    </div>
+  </div>
+
+   <div id='console'></div>
+    <textarea id='input' class='disabled'
+              disabled='disabled'></textarea>
+
+    <div id='buttonbar'>
+      <input id='send_button' type='button' value='Send Data'
+             disabled='disabled' class='button'>
+      <input id='disconnect_button' type='button' value='Disconnect'
+             disabled='disabled' class='button'>
+    </div>
+
+  <div id='myjid'></div>
+
+	<div id="rtcobjects">
+	  <div id="div_GocastPlayerLocal">
+		<object id="GocastPlayerLocal" type="application/x-gocastplayer" width="1" height="1">
+			 <param name="onload" value="pluginLoaded" />
+		</object>
+	  </div>
+	</div>
+
+  <div class='hide' id='connected'>
+    <div id='header'>
+      <img src='images/logo.png'>
+    </div>
+    <div id='content'>
+      <div id='on_call'>
+        <div class='call'>
+          <h2>Friends on Call #1</h2>
+          <ul class='friends'></ul>
+        </div>
+      </div>
+      <div id='available_users'>
+        Available Users
+        <input id='filter' type='text'>
+        <ul class='friends'></ul>
+      </div>
+    </div>
+    <script id='friend_template' type='text/mustache'>
+      <li class='friend'>
+        <div class='img'>
+          <img alt="Picture" src="https://graph.facebook.com/{{ id }}/picture" />
+        </div>
+        <div class='info'>
+          <h5>{{ name }}</h5>
+          <div class='status'>
+            <span class='on'>On Call</span>
+            <span class='available'>Available on FB</span>
+          </div>
+          <div class='actions'>
+            <span class='drop'>Drop from call</span>
+            <span class='add'>Add to call</span>
+          </div>
+        </div>
+        <div class='keywords'>{{ keywords }}</div>
+      </li>
+    </script>
+  </div>
+  <div id="fb-root"></div>
+  <script>
+    window.fbAsyncInit = function() {
+      FB.init({
+        appId      : '303607593050243', // App ID
+        status     : true, // check login status
+        cookie     : true, // enable cookies to allow the server to access the session
+        xfbml      : true,  // parse XFBML
+	oauth	   : true,
+      });
+
+      FB.getLoginStatus(function(response) {
+        if (response.status == "connected") {
+          $(document).trigger("FacebookConnected", response.authResponse)
+	  console.log('authResponse-Object', response.authResponse);
+	  console.log('accessToken', response.authResponse.accessToken);
+	  globalAuthResponse = response.authResponse;
+//	  xmppland.xmpp_alive(response.authResponse, Peek);
+//RMW	  $(document).trigger("connected");	// Let peek know...
+        } else {
+          $(document).trigger("NotConnectedToFacebook")
+        }
+      });
+
+    };
+
+    // Load the SDK Asynchronously
+    (function(d){
+       var js, id = 'facebook-jssdk'; if (d.getElementById(id)) {return;}
+       js = d.createElement('script'); js.id = id; js.async = true;
+       js.src = "http://connect.facebook.net/en_US/all.js";
+       d.getElementsByTagName('head')[0].appendChild(js);
+     }(document));
+
+  </script>
+  <div class="fb-login-button" data-scope="email">
+        Login with Facebook
+  </div>
+</body>
