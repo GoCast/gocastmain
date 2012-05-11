@@ -27,10 +27,13 @@ function useritem(properties) {
 	if (properties)
 	{
 		for (k in properties)
-			this.k = properties[k];
+		{
+			console.log("Adding: " + k + " = " + properties[k]);
+			this[k] = properties[k];
+		}
 	}
 
-	this.jids = [];
+	this.jids = {};
 };
 
 useritem.prototype.addJid = function(jid) {
@@ -160,11 +163,27 @@ switchboard.prototype.sendIQ = function(iq, cb) {
 	this.client.send(iq.root());
 };
 
-switchboard.prototype.sendGroupMessage = function(room, msg_body) {
-	var msg = new xmpp.Element('message', {to: room, type: 'groupchat'})
-		.c('body').t(msg_body);
+switchboard.prototype.sendPrivateMessage = function(tojid, msg) {
+	if (this.client)
+	{
+		var msg_stanza = new xmpp.Element('message', {to: tojid, type: 'chat'})
+			.c('body').t(msg);
+		this.client.send(msg_stanza);
+	}
+	else
+		this.log("ERROR: Client invalid.");
+};
 
-	this.client.send(msg);
+switchboard.prototype.sendGroupMessage = function(room, msg_body) {
+	if (this.client)
+	{
+		var msg = new xmpp.Element('message', {to: room, type: 'groupchat'})
+			.c('body').t(msg_body);
+
+		this.client.send(msg);
+	}
+	else
+		this.log("ERROR: Client invalid.");
 };
 
 //
@@ -190,15 +209,45 @@ switchboard.prototype.handleMessage = function(msg) {
 				cmd[k] = cmd[k].trim();
 
 			cmd[0] = cmd[0].toUpperCase();
-			if (cmd[0] === 'INTRO_SR')
+/*			if (cmd[0] === 'INTRO_SR')
 				this.intro_sr(msg.attrs.from, cmd[1]);
+			else */
+			if (cmd[0] === 'FB_LOOKUP_JID' && cmd[1])
+			{
+				if (this.userlist[cmd[1]])
+					this.log("FB_LOOKUP_ID: Found FB ID: " + cmd[1] + " online. FB Name: " + this.userlist[cmd[1]].name);
+				else
+					this.log("FB_LOOKUP_ID: ID: " + cmd[1] + " not found online.");
+			}
+			else if (debugCommands && cmd[0] === 'LISTJIDS')
+			{
+				var the_list = "";
+				for (k in this.jidlist)
+					the_list += k + '\n';
+
+				if (the_list === "")
+					this.sendPrivateMessage(msg.attrs.from, "No JIDs online currently.");
+				else
+					this.sendPrivateMessage(msg.attrs.from, "Current JIDs online:\n" + the_list);
+			}
+			else if (debugCommands && cmd[0] === 'LISTUSERS')
+			{
+				var the_list = "";
+				for (k in this.userlist)
+					the_list += k + ": name: " + this.userlist[k].name + ", ID: " + this.userlist[k].id + '\n';
+
+				if (the_list === "")
+					this.sendPrivateMessage(msg.attrs.from, "No USERS online currently.");
+				else
+					this.sendPrivateMessage(msg.attrs.from, "Current USERS online:\n" + the_list);
+			}
 			else
 				this.log("Direct message: Unknown command: " + msg.getChild('body').getText());
 		}
 	}
 };
 
-switchboard.prototype.intro_sr = function(from, blob) {
+switchboard.prototype.intro_sr = function(from, blob, cb) {
 	var inbound_sig = blob.split('.')[0];	// signature is followed by '.' followed by payload.
 	var inbound_payload = blob.split('.')[1];
 	var fromjid = from.split('/')[0];	// Ensure this is the bare jid.
@@ -235,17 +284,20 @@ switchboard.prototype.intro_sr = function(from, blob) {
 						//
 						// Add this jid to the list for this facebook user.
 						//
-						self.userlist.addJid(from);
+						self.userlist[result.id].addJid(fromjid);
 
 						//
 						// Now cross-link jids back to user items.
 						//
-						if (self.jidlist[from])
-							self.log("ERROR: JID already in database. Hmm - jid=" + from);
-						self.jidlist[from] = self.userlist[result.id];
+						if (self.jidlist[fromjid])
+							self.log("ERROR: JID already in database. Hmm - jid=" + fromjid);
+						self.jidlist[fromjid] = self.userlist[result.id];
 
 						self.log('Username is:' + result.name);
 						console.log("DEBUG: ", result);
+
+						if (cb)
+							cb(result.id);
 					}
 				});
 
@@ -264,9 +316,32 @@ switchboard.prototype.findFacebookUser = function(id) {
 // This means only listen to presence from jids with no username.
 //
 switchboard.prototype.handlePresence = function(pres) {
-	if (!pres.attrs.from.split('@'))
+//	if (!pres.attrs.from.split('@'))
 	{
-		this.log("Got pres: " + pres);
+		var from = pres.attrs.from.split('/')[0];
+		var fbname = "";
+		var self = this;
+
+		if (this.jidlist[from])
+			fbname = this.jidlist[from].name;
+
+		if (pres.attrs.type === 'unavailable')
+			this.log("Got pres (OFFLINE): " + from + (fbname ? (" - Facebook: " + fbname) : ""));
+		else
+		{
+			// Only announcing online status if signed request is part of the presence info.
+			if (pres.attrs.intro_sr)
+			{
+				this.intro_sr(from, pres.attrs.intro_sr, function(fbid) {
+					var who = "";
+					for (k in self.userlist[fbid].jids)
+						who += k + ", ";
+
+					who += " - Facebook: " + self.userlist[fbid].name;
+					self.log("Got pres (ONLINE): " + who);
+				});
+			}
+		}
 	}
 };
 
@@ -340,7 +415,8 @@ function notifier(serverinfo, jidlist) {
 
 	this.client.on('online',
 		  function() {
-		  	console.log(logDate() + " - Notifier online.");
+		    if (!self.isOnline)
+			  	console.log(logDate() + " - Notifier online.");
 		  	self.isOnline = true;
 //		  	self.sendMessage("Notifier online.");
 		  });
@@ -377,6 +453,37 @@ console.log("STARTED SWITCHBOARD @ " + Date());
 console.log("*                                                  *");
 console.log("****************************************************");
 console.log("****************************************************");
+
+// Setup defaults
+debugCommands = false;
+
+if (process.argv.length > 2)
+{
+	for (i in process.argv)
+	{
+		// Don't start processing args until we get beyond the .js itself.
+		if (i < 2)
+			continue;
+
+		var arg = process.argv[i].toLowerCase();
+
+		if (arg === '--help' || arg === '-help')
+		{
+			console.log("***********");
+			console.log("*");
+			console.log("* Switchboard usage:");
+			console.log("* --help - this usage help.");
+			console.log("* --debugcommands - Allow direct chat to switchboard for backend commands.");
+			console.log("*");
+			console.log("***********");
+		}
+		else if (arg === '--debugcommands' || arg === '-debugcommands')
+		{
+			debugCommands = true;
+			console.log(":: Enabling debug commands backend.");
+		}
+	}
+}
 
 var notify = new notifier({jid: "overseer@video.gocast.it", password: "the.overseer.rocks",
 							server: "video.gocast.it", port: 5222},
