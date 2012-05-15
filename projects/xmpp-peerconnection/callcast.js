@@ -69,6 +69,8 @@ var Callcast = {
 	PLUGIN_VERSION_REQUIRED_MAC: 1.19,
 	PLUGIN_VERSION_CURRENT_WIN: 1.2,
 	PLUGIN_VERSION_REQUIRED_WIN: 1.2,
+	PLUGIN_VERSION_CURRENT_LINUX: 1.2,
+	PLUGIN_VERSION_REQUIRED_LINUX: 1.2,
 	PLUGIN_DOWNLOAD_URL: "http://video.gocast.it/plugin.html",
 	NOANSWER_TIMEOUT_MS: 6000,
 	CALLCAST_XMPPSERVER: "video.gocast.it",
@@ -204,6 +206,11 @@ var Callcast = {
 			{
 				this.PLUGIN_VERSION_CURRENT = this.PLUGIN_VERSION_CURRENT_MAC;
 				this.PLUGIN_VERSION_REQUIRED = this.PLUGIN_VERSION_REQUIRED_MAC;
+			}
+			else if (navigator.appVersion.indexOf("Linux")!=-1)
+			{
+				this.PLUGIN_VERSION_CURRENT = this.PLUGIN_VERSION_CURRENT_LINUX;
+				this.PLUGIN_VERSION_REQUIRED = this.PLUGIN_VERSION_REQUIRED_LINUX;
 			}
 			else
 				alert("Unsupported Operating System.");
@@ -671,7 +678,13 @@ var Callcast = {
 		if (nick)
 			nick = nick.replace(/\\20/g, ' ');
 
-		if (room == Callcast.room)
+		var delayed = $(message).children("delay").length > 0  ||
+			$(message).children("x[xmlns='jabber:x:delay']").length > 0;
+
+		if (delayed)
+			this.log("Ignoring delayed sync link:" + $(message).children('body').text());
+
+		if (room == Callcast.room && !delayed)
 		{
 			if (nick == Callcast.nick)
 				return true;
@@ -1074,6 +1087,8 @@ var Callcast = {
 
 		this.DropAllParticipants();
 		this.MuteLocalVoice(false);
+
+		this.LeaveSession();
 
 		if (this.connection)
 		{

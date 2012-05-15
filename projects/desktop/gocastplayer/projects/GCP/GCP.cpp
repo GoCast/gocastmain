@@ -91,7 +91,7 @@ namespace GoCast
             }
         }
         
-        return talk_base::PhysicalSocketServer::Wait(100, process_io);
+        return talk_base::PhysicalSocketServer::Wait(20, process_io);
     }
 }
 
@@ -147,9 +147,6 @@ bool GCP::WebrtcResourcesInit()
     {
         std::cout << "PeerConnection Factory NULL" << std::endl;
     
-        if (!(GCP::pJingleWorkerThread).get())
-            std::cout << "Trouble. Thread before call is NULL." << std::endl;
-            
         (GCP::pWebrtcPeerConnFactory).reset(
             new webrtc::PeerConnectionFactory(
                 new cricket::BasicPortAllocator(

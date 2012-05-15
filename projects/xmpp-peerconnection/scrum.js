@@ -422,6 +422,12 @@ $(window).bind('beforeunload', function() {
 	Callcast.disconnect();
 });
 
+window.onbeforeunload = function()
+{
+	alert("window.onbeforeunload");
+//or put whatever function you need to call when a user closes the web //browser.
+}
+
 $(window).unload(function() {
 // After v1.15, no need to DeInit.	  Callcast.DeInitGocastPlayer();
 	  Callcast.disconnect();
