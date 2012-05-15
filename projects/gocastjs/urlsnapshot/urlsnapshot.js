@@ -1,0 +1,73 @@
+var GoCastJS = (undefined !== GoCastJS)? GoCastJS: {};
+
+GoCastJS.UrlSnapshot = function(snapshotDivSelector, options) {
+	//image desired instead of canvas as it is easier to resize
+	var canvasToImage = function(canvas, newDims) {
+		var canvasDataURL = canvas.toDataURL("image/png");
+		var canvasImg = document.createElement("image");
+		
+		canvasImg.width = newDims.width;
+		canvasImg.height = newDims.height;
+		canvasImg.src = canvasDataURL;
+		
+		return canvasImg;
+	};
+	
+	var jqSnapshotDiv = $(snapshotDivSelector);
+	
+	$.ajax({
+		url      : options.proxyUrl,					//customizable
+		data     : {xhr2: false, url: options.webUrl},	//customizable
+		cache    : true,
+		dataType : "jsonp",
+		success  : function(response) {
+						var link = document.createElement("a");
+						link.href = options.webUrl;
+			
+						var frame = document.createElement("iframe");
+						frame.width = options.width;
+						frame.height = options.height;
+						$(frame).css({visibility: "hidden"});
+						jqSnapshotDiv.append(frame);
+						
+						//base url for ajax requests is the domain from which this page is served.
+						//change it to the domain of residence of the web page.
+						response = response.replace(
+										"<head>",
+										"<head><base href='"
+											+ link.protocol
+											+ "//"
+											+ link.hostname
+											+ "/"
+											+ link.pathname
+											+ "' />"
+								   );
+						
+						if(true === options.disableJS) {
+							response = response.replace(/\<script/gi,"<!--<script");
+							response = response.replace(/\<\/script\>/gi,"<\/script>-->");
+						}
+						
+						//Fill iframe's body with ajax response
+						frame.contentWindow.document.open();
+						$(frame.contentWindow).load(function() {
+							var jqFrameBody = $(frame).contents().find("body");
+							
+							//html2canvas creates a canvas element containing the rendered image
+							//and passes it through the following callback
+							html2canvas(jqFrameBody, {
+								onrendered: function(snapshotCanvas) {
+												jqSnapshotDiv.empty().append(
+													canvasToImage(snapshotCanvas, {
+														width  : options.width,
+														height : options.height
+													})
+												);
+											}
+							});
+						});
+						frame.contentWindow.document.write(response);
+						frame.contentWindow.document.close();
+				   }
+	});
+};
