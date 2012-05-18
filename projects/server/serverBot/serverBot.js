@@ -31,7 +31,13 @@ var argv = process.argv;
 //  console.log('Caught exception: ' + err);
 //});
 
-function mucRoom(client, notifier) {
+function mucRoom(client, notifier, success, failure) {
+	// -- Handle room create request --
+	this.bNewRoom = false;
+	this.successCallback = (success? success: null);
+	this.failureCallback = (failure? failure: null);
+	// --------------------------------
+	
 	this.isOwner = false;	// Assume we're not the owner yet until we're told so.
 	this.roomname = "";
 	this.nick = "";
@@ -121,7 +127,8 @@ mucRoom.prototype.handlePresence = function(pres) {
 	if (pres.getChild('x') && pres.getChild('x').getChildrenByAttr('code','201').length > 0)
 	{
 		this.log("needs configured. Configuring...");
-
+		this.bNewRoom = true;
+		
 		this.getRoomConfiguration(function(resp) {
 			this.log("Got room configuration. Going for setup.");
 			self.setupRoom(resp);
@@ -194,6 +201,12 @@ mucRoom.prototype.handlePresence = function(pres) {
 		{
 			this.joined = true;
 
+			if(false === this.bNewRoom)
+			{
+				if(self.successCallback)
+					self.successCallback();
+			}
+			
 			// Upon joining, get context of the room. Get the banned list.
 			this.loadBannedList(function() {
 				this.log("Received Banned List");
@@ -477,13 +490,28 @@ mucRoom.prototype.setupRoom = function(form) {
 			if (resp.attrs.type === 'result')
 			{
 				self.log("Room setup successful.");
+				
+				if(self.successCallback)
+					self.successCallback();
+
+				self.bNewRoom = false;
 			}
 			else
+			{
 				self.log("Room setup failed. Response: " + resp.tree());
+				
+				if(self.failureCallback)
+					self.failureCallback();
+			}
 		});
 	}
 	else
+	{
 		this.log("setupRoom: No <query><x> ...");
+		
+		if(self.failureCallback)
+			self.failureCallback();
+	}
 };
 
 //
@@ -920,7 +948,7 @@ mucRoom.prototype.rejoin = function(rmname, nick) {
 		to += "/" + nick;
 
 	el = new xmpp.Element('presence', {to: to, usertype: 'silent'})
-					.c('x', {xmlns: 'http://jabber.org/protocol/muc'})
+					.c('x', {xmlns: 'http://jabber.org/protocol/muc'});
 
 	// Want to set the roomname in particular before calling .log so formatting is correct.
 	this.roomname = rmname;
@@ -949,6 +977,7 @@ function loadRoomsAndProcess(filenames, roomnames)
 			temp_xml = fs.readFileSync(filenames[k], 'utf8');
 //			console.log('Changed contents: ' + contents);
 		  }
+		});
 	}
 };
 
@@ -963,15 +992,9 @@ function loadRoomsAndProcess(filenames, roomnames)
 function overseer(user, pw, notifier) {
 	this.CONF_SERVICE = "@gocastconference.video.gocast.it";
 	this.SERVER = 'video.gocast.it';
-	this.client = new xmpp.Client({ jid: user, password: pw, reconnect: true, host: this.SERVER, port: 5222 });
 	this.roomnames = {};
 	this.mucRoomObjects = {};
 	this.notifier = notifier;
-
-	// Very important - because we listen to a single node-xmpp client connection here,
-	// we have a lot of potential listeners to an emitter. To avoid the warning about this...
-	this.client.setMaxListeners(0);
-
 	this.iqnum = 0;
 	this.iq_callbacks = {};
 
@@ -985,6 +1008,18 @@ function overseer(user, pw, notifier) {
 			if (i < starting_arg)
 				continue;
 
+			if(process.argv[i].charAt(0) == "-") {
+				var option = process.argv[i].substring(1);
+				
+				if("roommanager" === option) {
+					this.log("OVERSEER: ROOM MANAGER MODE");
+					user  = user + "/" + option;
+					this.log("OVERSEER: JID = " + user);
+				}
+				
+				continue;
+			}
+			
 			this.log("Reading XML File: " + process.argv[i]);
 
 			var roomsxml = loadRooms(process.argv[i]); // '/var/www/etzchayim/xml/schedules.xml');
@@ -1012,7 +1047,12 @@ function overseer(user, pw, notifier) {
 	}
 
 	var self = this;
+	this.client = new xmpp.Client({ jid: user, password: pw, reconnect: true, host: this.SERVER, port: 5222 });
 
+	// Very important - because we listen to a single node-xmpp client connection here,
+	// we have a lot of potential listeners to an emitter. To avoid the warning about this...
+	this.client.setMaxListeners(0);
+	
 	this.client.on('online', function() {
 		// Mark ourself as online so that we can receive messages from direct clients.
 		el = new xmpp.Element('presence');
@@ -1203,6 +1243,45 @@ overseer.prototype.handleIq = function(iq) {
 	}
 	else if (!iq.attrs.from.split('@'))
 		this.log("UNHANDLED IQ: " + iq);
+	
+	// -- Handle room create request --
+	else
+	{		
+		if(iq.attrs.type === 'set' &&
+		   iq.getChild('room') &&
+		   iq.getChildByAttr('xmlns', 'urn:xmpp:callcast'))
+		{
+			var roomname = iq.getChild('room').attr('name');
+			this.log("overseer.handleIq: Room Name = " + roomname);
+			var self = this;
+			
+			if(!this.mucRoomObjects[roomname])
+			{
+				this.mucRoomObjects[roomname] = new mucRoom(this.client, this.notifier,
+						function(){
+							var iqResult = new xmpp.Element('iq', {to: iq.attrs.from, type: 'result', id: iq.attrs.id})
+											.c('ok', {xmlns: 'urn:xmpp:callcast'});							
+							self.client.send(iqResult.root());
+						},
+						
+						function(){
+							var iqResult = new xmpp.Element('iq', {to: iq.attrs.from, type: 'result', id: iq.attrs.id})
+											.c('err', {xmlns: 'urn:xmpp:callcast'});							
+							self.client.send(iqResult.root());
+						}
+				);
+				
+				this.mucRoomObjects[roomname].join(roomname + this.CONF_SERVICE, "overseer");
+			}
+			else
+			{
+				var iqResult = new xmpp.Element('iq', {to: iq.attrs.from, type: 'result', id: iq.attrs.id})
+								.c('ok', {xmlns: 'urn:xmpp:callcast'});							
+				self.client.send(iqResult.root());
+			}
+		}
+	}
+	// --------------------------------
 };
 
 function feedbackBot(feedback_jid, feedback_pw, notifier) {
