@@ -80,6 +80,7 @@ var Callcast = {
 	STUNSERVER: "video.gocast.it",
 	FEEDBACK_BOT: "feedback_bot_etzchayim@video.gocast.it",
 	STUNSERVERPORT: 19302,
+	ROOMMANAGER: "overseer@video.gocast.it/roommanager",
 	Callback_AddPlugin: null,
 	Callback_RemovePlugin: null,
     connection: null,
@@ -347,31 +348,32 @@ var Callcast = {
     	this.localplayer = $('#GocastPlayerLocal').get(0);
     	if (!this.localplayer)
     		alert("Gocast Player object not found in DOM. Plugin problem?");
+		else
+		{
+			// Initialize local and show local video.
+			this.localplayer.initLocalResources(stunserver, stunport,
+				function(message) {
+					Callcast.localplayer.onlogmessage = function(message) { console.log("GCP-Local: " + message); }
 
-		// Initialize local and show local video.
-		this.localplayer.initLocalResources(stunserver, stunport,
-			function(message) {
-				Callcast.localplayer.onlogmessage = function(message) { console.log("GCP-Local: " + message); }
+					//
+					// Despite Manjesh making a call upon init to stop the capture, on first load
+					// the capture continues on Mac - so we'll force it to stop here just in case.
+					//
+					Callcast.localplayer.startLocalVideo();
+					Callcast.localplayer.stopLocalVideo();
 
-				//
-				// Despite Manjesh making a call upon init to stop the capture, on first load
-				// the capture continues on Mac - so we'll force it to stop here just in case.
-				//
-				Callcast.localplayer.startLocalVideo();
-				Callcast.localplayer.stopLocalVideo();
+					Callcast.localplayer.width=0;
+					Callcast.localplayer.height=0;
 
-				Callcast.localplayer.width=0;
-				Callcast.localplayer.height=0;
-
-				if (success)
-					success(message);
-			},
-			function(message) {
-				alert("Gocast Player - Initialization of local resources failed." + message);
-				if (failure)
-					failure(message);
-			});
-
+					if (success)
+						success(message);
+				},
+				function(message) {
+					alert("Gocast Player - Initialization of local resources failed." + message);
+					if (failure)
+						failure(message);
+				});
+		}
     },
 
     DeInitGocastPlayer: function() {
@@ -925,15 +927,39 @@ var Callcast = {
         },
 
 	CreateUnlistedAndJoin: function(roomname) {
+		var roommanager = this.ROOMMANAGER;
+		var self = this;
 
-		// Must create the room as unlisted, confirm settings if room doesn't exist and join it.
+		//
+		this.connection.sendIQ($iq({
+			to: roommanager,
+			id: "roomcreate1",
+			type: "set",
+		  }).c("room", {xmlns: this.NS_CALLCAST, name: roomname.toLowerCase()}),
 
-		Callcast.JoinSession(roomname, roomname+Callcast.AT_CALLCAST_ROOMS);
+		// Successful callback...
+		  function(iq) {
+			  if($(iq).find("ok")) {
+				  self.JoinSession(roomname, roomname + self.AT_CALLCAST_ROOMS);
+				  alert("ROOM CREATED!!!");
+			  }
+
+			  return true;
+		  },
+
+		// Failure callback
+		  function(iq) {
+			  console.log("Error creating room", iq);
+		  }
+		);
 	},
 
+	//
+	// TODO: roomname seems to be unused and show be removed - will effect all current users of the function.
+	//
     JoinSession: function(roomname, roomjid) {
     	Callcast.room = roomjid.toLowerCase();
-    	Callcast.roomjid = roomjid;
+    	Callcast.roomjid = roomjid.toLowerCase();
 
 		// We need to ensure we have a nickname. If one is not set, use the JID username
     	if (!Callcast.nick || Callcast.nick==="")
