@@ -41,10 +41,31 @@ function size(assocArray) {
 	return n;
 }
 
+var MucroomObjectPool = {
+	objPool: [],
+	
+	init: function(poolCapacity, client, notifier) {
+		for(var i=0; i<poolCapacity; i++) {
+			var roomObj = new mucRoom(client, notifier, true);
+			this.objPool.push(roomObj);
+		}
+	},
+	
+	get: function() {
+		return this.objPool.pop();
+	},
+	
+	put: function(roomObj) {
+		roomObj.reset();
+		this.objPool.push(roomObj);
+	}
+};
 
-function mucRoom(client, notifier, success, failure) {
+
+function mucRoom(client, notifier, bSelfDestruct, success, failure) {
 	// -- Handle room create request --
 	this.bNewRoom = false;
+	this.bSelfDestruct = (bSelfDestruct? bSelfDestruct: false);
 	this.successCallback = (success? success: null);
 	this.failureCallback = (failure? failure: null);
 	this.presenceTimer = null;
@@ -62,7 +83,6 @@ function mucRoom(client, notifier, success, failure) {
 	this.client = client;
 	this.iqnum = 0;
 	this.notifier = notifier;
-//	this.state =
 	var self = this;
 
 	// Max # users.
@@ -83,13 +103,9 @@ function mucRoom(client, notifier, success, failure) {
 	// Initially, all rooms are unlocked.
 	this.options['muc#roomconfig_membersonly'] = '0';
 
-	if (!client)
-	{
-		alert("mucRoom() - No client specified.");
-		return;
-	}
-
-	client.on('stanza', function(in_stanza) {
+	// stanza callback is stored as a member so that 
+	// it can be removed from listener when object is no longer active
+	this.onstanza = function(in_stanza) {
 		var stanza = in_stanza.clone();
 
 		// Only handling our own stanzas.
@@ -104,9 +120,40 @@ function mucRoom(client, notifier, success, failure) {
 		else if (stanza.is('iq') && stanza.attrs.type !== 'error')
 			self.handleIQ(stanza);
 		else
-			this.log("ERROR: UNHANDLED Stanza: " + stanza.tree());
-	});
+			self.log("ERROR: UNHANDLED Stanza: " + stanza.tree());
+	};
+	
+	if (!client)
+	{
+		alert("mucRoom() - No client specified.");
+		return;
+	}
 
+	client.on('stanza', this.onstanza);
+};
+
+mucRoom.prototype.reset = function() {
+	this.bNewRoom = false;
+	this.bSelfDestruct = null;
+	this.successCallback = null;
+	this.failureCallback = null;
+	this.presenceTimer = null;
+	
+	this.isOwner = false;	// Assume we're not the owner yet until we're told so.
+	this.roomname = "";
+	this.nick = "";
+	this.joined = false;
+	this.participants = {};
+	this.islocked = false;
+	this.bannedlist = {};
+	this.options = {};
+	this.iq_callbacks = {};
+	this.iqnum = 0;
+};
+
+mucRoom.prototype.handleRoomCreateResult = function(success, failure) {
+	this.successCallback = success;
+	this.failureCallback = failure;
 };
 
 mucRoom.prototype.log = function(msg) {
@@ -132,6 +179,8 @@ mucRoom.prototype.handlePresence = function(pres) {
 	var fromjid = null;
 	var self = this;
 
+	this.log(pres);
+	
 	if (pres.getChild('x') && pres.getChild('x').getChild('item') && pres.getChild('x').getChild('item').attrs.jid)
 		fromjid = pres.getChild('x').getChild('item').attrs.jid.split('/')[0];
 
@@ -189,8 +238,11 @@ mucRoom.prototype.handlePresence = function(pres) {
 		this.log("Adding: " + fromjid + " as Nickname: " + fromnick);
 		this.participants[fromnick] = fromjid || fromnick;
 		
-		if(fromnick !== this.nick)
-			clearTimeout(this.presenceTimer);
+		if(this.bSelfDestruct === true)
+		{
+			if(fromnick !== this.nick)
+				clearTimeout(this.presenceTimer);
+		}
 	}
 	else if (pres.attrs.type === 'unavailable' && this.participants[fromnick])
 	{
@@ -198,7 +250,7 @@ mucRoom.prototype.handlePresence = function(pres) {
 		delete this.participants[fromnick];
 		if (fromnick === self.nick)
 		{
-			if(0 == size(this.participants)) {
+			if(this.bSelfDestruct === true && 0 == size(this.participants)) {
 				this.log("OVERSEER: Room destroyed... not trying to rejoin");
 			} else {
 				this.log("We got kicked out...room destroyed? Or we disconnected??");
@@ -212,13 +264,16 @@ mucRoom.prototype.handlePresence = function(pres) {
 		}
 		else
 		{
-			if(1 === size(this.participants) && this.participants[this.nick]) {
-				this.log("OVERSEER: Everybody else has left room... wait 10 sec...");
-				
-				this.presenceTimer = setTimeout(function() {
-					self.log("OVERSEER: No one in room after 10 seconds :( ...");
-					eventManager.emit('destroyroom', self.roomname.split('@')[0]);
-				}, 10000);
+			if(this.bSelfDestruct === true)
+			{
+				if(1 === size(this.participants) && this.participants[this.nick]) {
+					this.log("OVERSEER: Everybody else has left room... wait 10 sec...");
+					
+					this.presenceTimer = setTimeout(function() {
+						self.log("OVERSEER: No one in room after 10 seconds :( ...");
+						eventManager.emit('destroyroom', self.roomname.split('@')[0]);
+					}, 10000);
+				}
 			}
 		}
 
@@ -236,10 +291,13 @@ mucRoom.prototype.handlePresence = function(pres) {
 				if(self.successCallback)
 					self.successCallback();
 
-				this.presenceTimer = setTimeout(function() {
-					self.log("OVERSEER: No one in room after 10 seconds :( ...");
-					eventManager.emit('destroyroom', self.roomname.split('@')[0]);
-				}, 10000);			
+				if(this.bSelfDestruct === true)
+				{
+					this.presenceTimer = setTimeout(function() {
+						self.log("OVERSEER: No one in room after 10 seconds :( ...");
+						eventManager.emit('destroyroom', self.roomname.split('@')[0]);
+					}, 10000);
+				}
 			}
 			
 			// Upon joining, get context of the room. Get the banned list.
@@ -531,10 +589,13 @@ mucRoom.prototype.setupRoom = function(form) {
 
 				self.bNewRoom = false;
 				
-				self.presenceTimer = setTimeout(function() {
-					self.log("OVERSEER: No one in room after 10 seconds :( ...");
-					eventManager.emit('destroyroom', self.roomname.split('@')[0]);
-				}, 10000);
+				if(self.bSelfDestruct === true)
+				{
+					self.presenceTimer = setTimeout(function() {
+						self.log("OVERSEER: No one in room after 10 seconds :( ...");
+						eventManager.emit('destroyroom', self.roomname.split('@')[0]);
+					}, 10000);
+				}
 			}
 			else
 			{
@@ -1156,6 +1217,8 @@ function overseer(user, pw, notifier) {
 		self.destroyRoom(roomname);
 	});
 
+	// Init MucroomObjectPool
+	MucroomObjectPool.init(1000, this.client, this.notifier);
 };
 
 overseer.prototype.destroyRoom = function(roomname) {
@@ -1169,7 +1232,12 @@ overseer.prototype.destroyRoom = function(roomname) {
 		this.sendIQ(iqDestroyRoom.root(), function(iq) {
 			if('result' === iq.attrs.type) {
 				self.log("OVERSEER: Successfully deleted... removing mucRoomObject");
-				delete self.mucRoomObjects[roomname];				
+				self.client.removeListener('stanza', self.mucRoomObjects[roomname].onstanza);
+				
+				MucroomObjectPool.put(self.mucRoomObjects[roomname]);
+				self.log("Pool Size: " + MucroomObjectPool.objPool.length);
+				
+				delete self.mucRoomObjects[roomname];
 			}
 		});
 	} else {
@@ -1322,7 +1390,23 @@ overseer.prototype.handleIq = function(iq) {
 			
 			if(!this.mucRoomObjects[roomname])
 			{
-				this.mucRoomObjects[roomname] = new mucRoom(this.client, this.notifier,
+				this.mucRoomObjects[roomname] = MucroomObjectPool.get();
+				this.log("Pool Size: " + MucroomObjectPool.objPool.length);
+
+				this.mucRoomObjects[roomname].handleRoomCreateResult(function() {
+					var iqResult = new xmpp.Element('iq', {to: iq.attrs.from, type: 'result', id: iq.attrs.id})
+										.c('ok', {xmlns: 'urn:xmpp:callcast'});							
+					self.client.send(iqResult.root());
+					},
+					
+					function() {
+						var iqResult = new xmpp.Element('iq', {to: iq.attrs.from, type: 'result', id: iq.attrs.id})
+										.c('err', {xmlns: 'urn:xmpp:callcast'});							
+						self.client.send(iqResult.root());
+					}
+				);
+
+				/*this.mucRoomObjects[roomname] = new mucRoom(this.client, this.notifier, true,
 						function(){
 							var iqResult = new xmpp.Element('iq', {to: iq.attrs.from, type: 'result', id: iq.attrs.id})
 											.c('ok', {xmlns: 'urn:xmpp:callcast'});							
@@ -1334,7 +1418,7 @@ overseer.prototype.handleIq = function(iq) {
 											.c('err', {xmlns: 'urn:xmpp:callcast'});							
 							self.client.send(iqResult.root());
 						}
-				);
+				);*/
 				
 				this.mucRoomObjects[roomname].join(roomname + this.CONF_SERVICE, "overseer");
 			}
@@ -1344,10 +1428,13 @@ overseer.prototype.handleIq = function(iq) {
 								.c('ok', {xmlns: 'urn:xmpp:callcast'});							
 				self.client.send(iqResult.root());
 				
-				this.mucRoomObjects[roomname].presenceTimer = setTimeout(function() {
-					self.log("OVERSEER: No one in room after 10 seconds :( ...");
-					eventManager.emit('destroyRoom', roomname);
-				}, 10000);
+				if(mucRoomObjects[roomname].bSelfDestruct === true)
+				{
+					this.mucRoomObjects[roomname].presenceTimer = setTimeout(function() {
+						self.log("OVERSEER: No one in room after 10 seconds :( ...");
+						eventManager.emit('destroyRoom', roomname);
+					}, 10000);
+				}
 			}
 		}
 	}
