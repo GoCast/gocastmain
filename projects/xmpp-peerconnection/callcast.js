@@ -83,6 +83,8 @@ var Callcast = {
 	ROOMMANAGER: "overseer@video.gocast.it/roommanager",
 	Callback_AddPlugin: null,
 	Callback_RemovePlugin: null,
+	Callback_AddCarouselContent: null,
+	Callback_RemoveCarouselContent: null,
     connection: null,
     localplayer: null,
     participants: {},
@@ -109,6 +111,33 @@ var Callcast = {
 
 	setCallbackForRemovePlugin: function(cb) {
 		this.Callback_RemovePlugin = cb;
+	},
+
+	setCallbackForAddCarouselContent: function(cb) {
+		this.Callback_AddCarouselContent = cb;
+	},
+
+	setCallbackForRemoveCarouselContent: function(cb) {
+		this.Callback_RemoveCarouselContent = cb;
+	},
+
+	//
+	// Allows setting of contents in the carousel for non-live entities
+	//
+	// info JSON object is  {	id: a unique id (temporary for now),
+	//							image: url of the image to use (jpg/gif/png),
+	//							altText: the hover-text to show,
+	//							url: the url which will be used for opening a new browser window on click.
+	//						}
+	//
+	setCarouselContent: function(info) {
+		if (this.Callback_AddCarouselContent)
+			this.Callback_AddCarouselContent(info);
+	},
+
+	removeCarouselContent: function(info) {
+		if (this.Callback_RemoveCarouselContent)
+			this.Callback_RemoveCarouselContent(info);
 	},
 
     keepAlive: function() {
@@ -195,7 +224,7 @@ var Callcast = {
     },
 
 	figurePlatformVersion: function() {
-		if (PLUGIN_VERSION_CURRENT===0.0)
+		if (this.PLUGIN_VERSION_CURRENT===0.0)
 		{
 			// Figure out which platform we're on and use versions appropriately.
 			if (navigator.appVersion.indexOf("Win")!=-1)
@@ -302,13 +331,27 @@ var Callcast = {
 	},
 
 	SendLocalVideoToPeers: function(send_it) {
-		if (send_it !== null)
+		// This is used to detect a change in video on/off condition later in the function.
+		var old_bUseVideo = this.bUseVideo;
+
+		// Backwards compatibility allows true/false as an input and also a JSON object {width: w, height: h}
+		if (send_it === true || send_it === false)
 			this.bUseVideo = send_it;
 
 		// Turn on/off our preview based on this muting of video too.
 		if (this.localplayer)
 		{
-			if (this.bUseVideo===true)
+			if (send_it !== true && send_it !== false && send_it.width>=0 && send_it.height>=0)
+			{
+				if (this.localplayer.width<=1 || this.localplayer.height<=1)
+					this.localplayer.startLocalVideo();
+
+				this.localplayer.width  = send_it.width;
+				this.localplayer.height = send_it.height;
+
+				this.bUseVideo = true;
+			}
+			else if (this.bUseVideo===true)
 			{
 				this.localplayer.width = this.WIDTH;
 				this.localplayer.height = this.HEIGHT;
@@ -323,7 +366,12 @@ var Callcast = {
 				this.localplayer.height = 0;
 			}
 
-			if (this.joined)
+			// We only want to send a presence update when the video status changes
+			// **OR** this is the first time to ever be online/joined.
+			// The problem of first-time-online/joined is handled by the Presence handler.
+			// It calls SendVideoPresence() upon joining.
+			// So we only need to worry about video on/off change.
+			if (this.joined && (this.bUseVideo !== old_bUseVideo))
 				this.SendVideoPresence();
 		}
 	},
@@ -345,7 +393,9 @@ var Callcast = {
 
 //    	$("#rtcobjects").append('<div id="div_GocastPlayerLocal"><object id="GocastPlayerLocal" type="application/x-gocastplayer" width="352" height="288"></object></div>');
 
-    	this.localplayer = $('#GocastPlayerLocal').get(0);
+		if (!this.localplayer)
+	    	this.localplayer = $('#GocastPlayerLocal').get(0);
+
     	if (!this.localplayer)
     		alert("Gocast Player object not found in DOM. Plugin problem?");
 		else
