@@ -1,0 +1,406 @@
+/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+/**
+ * \file index.css
+ *
+ * \brief Style sheet for: Gocast.it Plug-in
+ *
+ * \author Net-Scale Technologies, Inc.,
+ *         <a href="http://www.net-scale.com">www.net-scale.com</a>\n
+ *         Created April 7, 2012 (paula.muller@net-scale.com)
+ *
+ * Copyright (c) 2012 XVD. All rights reserved.
+ */
+/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+
+body {
+  margin: 0;
+  padding: 0;  
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  -moz-user-select: -moz-none;
+  -webkit-user-select: none;  
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 13px;
+  overflow: hidden;
+  background: whitesmoke;
+}
+body input[type="button"] {
+  border: 0px;
+  background-color: transparent;
+}
+body > div#meeting {
+  display: none;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+}
+body > div#meeting > div#streams {
+  position: absolute;
+  padding: 10px;
+  top: 0px;
+  left: 0px;
+  width: 98%;
+  height: 80%;
+}
+body > div#meeting > div#streams > div#scarousel {
+  width: 100%;
+  height: 100%;
+}
+body > div#meeting > div#streams > div#scarousel div.cloudcarousel {
+  width: 260px;
+  height: 216px;
+  opacity: 1;
+  transition: opacity 0.5s;
+  -moz-transition: opacity 0.5s;
+  -webkit-transition: opacity 0.5s;
+  -o-transition: opacity 0.5s;
+  border: 3px solid darkgreen;
+  border-radius: 6px;
+  background: darkgreen center top no-repeat url("../images/gologo.png");
+  background-size: 70%;
+}
+body > div#meeting > div#streams > div#scarousel div.cloudcarousel.typeContent {
+  background-size: 98%;
+}
+body > div#meeting > div#streams > div#scarousel div.cloudcarousel > object {
+  margin: 2px;
+}
+body > div#meeting > div#streams > div#scarousel div.cloudcarousel > div.name {
+  position: absolute;
+  bottom: 0px;
+  text-align: center;
+  font-weight: bold;
+  white-space: nowrap; 
+  width: 98%; 
+  overflow: hidden; 
+  text-overflow: ellipsis;
+  color: white;
+}
+body > div#meeting > div#streams > div#scarousel div.unoccupied {
+  opacity: 0.1;
+}
+body > div#meeting > div#streams > div#scarousel div#mystream {
+  background-image: url("../images/person.png");  
+}
+body > div#meeting > div#streams > div#scarousel div#mystream > div#myctrls {
+  position: absolute;
+  bottom: 0px;
+  left: 40%;
+}
+body > div#meeting > div#streams > div#scarousel div#mystream > div#myctrls > input {
+  width: 24px;
+  height: 24px;
+  background-position: center;
+  background-repeat: no-repeat;
+  margin-right: 5px;
+}
+body > div#meeting > div#streams > div#scarousel div#mystream > div#myctrls > input#video {
+  background-image: url("../images/video-off.png");
+}
+body > div#meeting > div#streams > div#scarousel div#mystream > div#myctrls > input#video.on {
+  background-image: url("../images/video-on.png");
+}
+body > div#meeting > div#streams > div#scarousel div#mystream > div#myctrls > input#audio.off {
+  background-image: url("../images/mute.png");
+}
+body > div#meeting > div#streams > div#scarousel div#mystream > div#myctrls > input#audio {
+  background-image: url("../images/sound.png");
+}
+body > div#meeting > div#streams > div#scontrols {
+  width: 108px;
+  margin-left: 47%;
+}
+body > div#meeting > div#streams > div#scontrols > input {
+  width: 26px;
+  height: 50px;
+  background-position: center;
+  background-repeat: no-repeat;
+  margin-right: 3px;
+}
+body > div#meeting > div#streams > div#scontrols > input.left {
+  background-image: url("../images/btn-left.png");
+}
+body > div#meeting > div#streams > div#scontrols > input.right {
+  background-image: url("../images/btn-right.png");
+}
+body > div#meeting > div#streams > div#scontrols > input.help {
+  float: right;
+  background-image: url("../images/btn-help.png");
+}
+body > div#meeting > div#msgBoard {
+  position: absolute;
+  bottom: 32px;
+  left: 0px;
+  width: 100%;
+  height: 40px;
+  margin: 0px 10px 0px;
+}
+body > div#meeting > div#msgBoard > img.logo {
+  width: 36px;
+  vertical-align: middle;
+}
+body > div#meeting > div#msgBoard > span {
+  margin: 10px;
+  padding: 5px 10px;
+  background: #ebe3db;
+  border: 2px solid #999b9b;
+  border-radius: 8px;
+  transition: width 0.5s;
+  -moz-transition: width 0.5s;
+  -webkit-transition: width 0.5s;
+  -o-transition: width 0.5s;
+  display: inline-block;
+  max-width: 88%;
+  overflow: hidden;
+  white-space: nowrap; 
+  text-overflow: ellipsis;  
+}
+body > div#meeting > div#arrow4ctrls {
+  position: absolute;
+  bottom: 0px;
+  left: 0px;
+  width: 100%;
+  height: 24px;
+  border-bottom: 4px solid darkslategray;
+}
+body > div#meeting > div#arrow4ctrls > img.open {
+  margin-left: 48%;
+}
+#mask {
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  z-index: 9000;
+  background-color: #000;
+  display: none;
+}
+#boxes .window {
+  position: fixed;
+  display: none;
+  z-index: 9999;
+}
+#boxes #errorMsgPlugin {
+  width: 400px; 
+  height: 200px;
+  padding: 0px 7px 7px 7px;
+  background-color: #eeeeee;
+  border: 4px solid #812034;
+  border-radius: 16px;  
+}
+#boxes #errorMsgPlugin > h1 {
+  margin: 20px 10px;
+  color: darkred;
+}
+#boxes #errorMsgPlugin > p {
+  margin: 10px;
+}
+#boxes #errorMsgPlugin .hidden {
+  display: none;  
+}
+#boxes #credentials {
+  width: 300px; 
+  height: 200px;
+  padding: 0px 7px 7px 7px;
+  background-color: #eeeeee;
+  border: 4px solid #812034;
+  border-radius: 16px;  
+}
+#boxes #credentials > img.close {
+  float: right;
+  border: 2px solid gray;
+  border-radius: 5px;  
+  margin: 5px 0px;
+}
+#boxes #credentials > p {
+  margin: 30px 10px 20px 10px;
+}
+#boxes #credentials > input#name {
+  width: 20em;
+  border-radius: 5px;
+  margin-left: 10px;
+}
+#boxes #credentials > input#btn {
+  margin: 10px 10px;
+}
+#boxes #credentials > p.error {
+  color: yellow;
+  font-weight: bold;
+  font-size: 1.2em;
+  text-shadow: 0 0 10px white, 0 0 20px white, 0 0 30px white, 0 0 40px #FF00DE, 0 0 70px #FF00DE, 0 0 80px #FF00DE, 0 0 100px #FF00DE, 0 0 150px #FF00DE;
+  display: none;
+}
+#boxes #chatInp {
+  width: 600px;
+  height: 52px;
+  background-color: #eeeeee;
+  border: 4px solid #812034;
+  border-radius: 16px;  
+}
+#boxes #chatInp > img.close {
+  float: right;
+  border: 2px solid gray;
+  border-radius: 5px;  
+  margin: 5px;
+}
+#boxes #chatInp > br {
+  clear: both;
+}
+#boxes #chatInp > span.recipient {
+  font-weight: bold;
+  color: black;
+  display: inline-block;
+  width:  7em;
+  margin: 5px;
+}
+#boxes #chatInp > input.chatTo {
+  width: 30em;
+  border-radius: 5px;  
+}
+#boxes #chatInp > input.send {
+  background-image: url("../images/btn-send.png");
+  width: 50px;
+  height: 22px;
+  border-radius: 8px;
+}
+#boxes #personalChat {
+  width: 600px;
+  height: 52px;
+  background-color: whitesmoke;
+  border: 4px solid yellowgreen;
+  border-radius: 16px;  
+}
+#boxes #personalChat > img.close {
+  float: right;
+  border: 2px solid gray;
+  border-radius: 5px;  
+  margin: 5px;
+}
+#boxes #personalChat > div.content > h1 {
+  font-size: 1.1em;
+}
+#boxes #personalChat > p {
+  overflow: hidden;
+  margin: 5px;
+  width: 98%;
+  white-space: nowrap; 
+  text-overflow: ellipsis;
+}
+#boxes #helpPage {
+  width: 660px;
+  height: 536px;
+  background: white;
+  border: 4px solid lightgreen;
+  border-radius: 16px;  
+}
+#boxes #helpPage > h1 {
+  color: darkgreen;
+  font-size: 1.2em;
+  margin-left: 15px;
+  width: 90%;
+}
+#boxes #helpPage > img.helpContent {
+  margin-left: 5px;
+}
+#boxes #helpPage > img.close {
+  float: right;
+  border: 2px solid gray;
+  border-radius: 5px;  
+  margin: 5px;
+}
+#boxes #waitingToJoin {
+  width: 200px;
+  height: 200px;
+}
+#boxes #waitingToJoin > img {
+  border: 4px solid lightgreen;
+  border-radius: 8px;  
+}
+#boxes #winEula {
+  width: 660px;
+  height: 600px;
+  background: white;
+  border: 4px solid lightgreen;
+  border-radius: 16px;  
+}
+#boxes #winEula > iframe {
+  width: 98%;
+  height: 93.2%;
+  margin-left: 0.8%;
+  margin-top: 5px;
+  overflow: auto;
+}
+#boxes #winEula > iframe::-webkit-scrollbar {
+  width: 9px;
+}
+#boxes #winEula > iframe::-webkit-scrollbar-thumb {
+  border-radius: 3px;
+  background: rgba(128, 128, 128, 0.8);
+  border: 2px solid #c0db67;
+  box-shadow: inset 0 0 3px rgba(208, 107, 0, 0.8);
+}
+#boxes #winEula > iframe::-webkit-scrollbar-thumb:window-inactive {
+  background: white;
+}
+#boxes #winEula input {
+  float: right;
+  margin-right: 5px;
+}
+#boxes #controls {
+  bottom: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100px;
+  border-top: 4px solid darkslategray;
+  background: #eeeeee;
+}
+#boxes #controls > img.closeCtrls {
+  margin-left: 48%;
+  display: block;
+}
+#boxes #controls > img.logo {
+  width: 36px;
+  vertical-align: middle;
+  margin: 10px;
+}
+#boxes #controls > input[type="text"] {
+  padding: 5px 10px;
+  width: 60%;
+  background: #ebe3db;
+  border: 2px solid #999b9b;
+  border-radius: 8px;
+  margin: 10px 0px;
+}
+#boxes #controls > input[type="button"] {
+  vertical-align: middle;
+}
+#boxes #controls > input.send {
+  background-image: url("../images/btn-send.png");
+  width: 50px;
+  height: 22px;
+}
+#boxes #controls > input.feedback {
+  margin-left: 15px;
+  background-image: url("../images/btn-feedback.png");
+  width: 24px;
+  height: 24px;
+}
+#boxes #controls > input.facebook {
+  margin-left: 15px;
+  background-image: url("../images/btn-fb.png");
+  width: 24px;
+  height: 24px;
+}
+#boxes #controls > input.twitter {
+  background-image: url("../images/btn-twitter.png");
+  width: 24px;
+  height: 24px;
+}
+#boxes #controls > input.demobtn {
+  margin-left: 5px;
+  background-image: url("../images/demo.png");
+  width: 24px;
+  height: 24px;
+}
