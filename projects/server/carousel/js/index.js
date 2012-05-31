@@ -216,7 +216,7 @@ function openPersonalChat(
    * Transition effect. */
   var jqMask = $('#mask');
   jqMask.fadeIn(500, activateWindow("#personalChat"));
-  jqMask.fadeTo("fast", 0.3);	
+  jqMask.fadeTo("fast", 0.3);   
   /*
    * Set message. */
   var jqWin = $("#boxes > div#personalChat");
@@ -307,7 +307,7 @@ function openChat(
    * Transition effect. */
   var jqMask = $('#mask');
   jqMask.fadeIn(500, activateWindow("#chatInp"));
-  jqMask.fadeTo("fast", 0.3);	
+  jqMask.fadeTo("fast", 0.3);   
   /*
    * Position chat Inp. */
   var winW = $(window).width();
@@ -359,7 +359,7 @@ function openCtrlsWindow(
    * Transition effect mask. */
   var jqMask = $('#mask');
   jqMask.fadeIn(500, activateWindow('#controls'));
-  jqMask.fadeTo("fast", 0.5);	
+  jqMask.fadeTo("fast", 0.5);   
   /*
    * Transition effect window.*/
   var jqWin = $('#boxes #controls');
@@ -884,7 +884,7 @@ function openWindow(
   /*
    * Transition effect. */
   jqMask.fadeIn(1000, activateWindow(winId));
-  jqMask.fadeTo("slow",0.8);	
+  jqMask.fadeTo("slow",0.8);    
   /*
    * Center window. */
   var jqWin = $(winId);
@@ -970,26 +970,36 @@ function resizeWindows(
   return false;
 } /* resizeWindows() */
 
-
-
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
- * \brief The document ready event handler.
- *
- * This event handler is called right after the DOM finishes loading.
+ * \brief check login credential and display login dialog if necessary.
  */
-$(document).ready(function(
+function checkCredentials(
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
     /**
-     * The event object. */
-  event
+     * No argument. */
 )
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
-  /*
-   * Check the browser. */
-  app.getBrowser();
-  app.checkBrowser();
+    app.log(2, "checkCredentials");
+
+    app.user.scheduleName = "Paulas Tests";
+    app.user.scheduleJid = "paula@gocastconference.video.gocast.it";
+    app.user.scheduleTitle = "Open test room";
+    openWindow('#credentials');
+} /* checkCredentials() */
+
+/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+/**
+ * \brief check if plugin installed and prompt user if not
+ */
+function tryPluginInstall(
+/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+    /**
+     * No argument. */
+)
+/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+{
   /*
    * check plugin installed. */
   if (app.pluginInstalled()) {
@@ -999,12 +1009,7 @@ $(document).ready(function(
     /*
      * Resize window. */
     $(window).resize(resizeWindows);
-    /*
-     * Get credentials. */
-    app.user.scheduleName = "Paulas Tests";
-    app.user.scheduleJid = "paula@gocastconference.video.gocast.it";
-    app.user.scheduleTitle = "Open test room";
-    openWindow('#credentials');
+    /* old get credentials */
   }
   else {
     /*
@@ -1031,6 +1036,35 @@ $(document).ready(function(
     }
     openWindow('#errorMsgPlugin');
   }
+} /* tryPluginInstall() */
+
+/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+/**
+ * \brief The document ready event handler.
+ *
+ * This event handler is called right after the DOM finishes loading.
+ */
+$(document).ready(function(
+/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+    /**
+     * The event object. */
+  event
+)
+/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+{
+  /*
+   * Check the browser. */
+  app.getBrowser();
+  app.checkBrowser();
+
+  fbInit(); // init facebook api
+    
+  // check login credentials and display login dialog if necessary
+  // this will be moved to event handler fired by fb init complete
+  checkCredentials();
+
+  tryPluginInstall();
+    
   /*
    * Write greeting into console. */
   app.log(2, "Page loaded.");  
