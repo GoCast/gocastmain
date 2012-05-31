@@ -31,15 +31,10 @@ function fbInit(
       
       FB.getLoginStatus(function(response) {
         app.log(2, "fbLoginStatus callback");
-        if (response.status == "connected") {
-          $(document).trigger("FacebookConnected", response.authResponse)
-    //console.log('authResponse-Object', response.authResponse);
-    //console.log('accessToken', response.authResponse.accessToken);
-      globalAuthResponse = response.authResponse;
-//RMW     $(document).trigger("connected"); // Let peek know...
-        } else {
-          $(document).trigger("NotConnectedToFacebook")
-        }
+          globalAuthResponse = response.authResponse;
+          $(document).trigger("fbLoginStatus")
+          //console.log('authResponse-Object', response.authResponse);
+          //console.log('accessToken', response.authResponse.accessToken);
       });
 
         // listen for and handle auth.statusChange events

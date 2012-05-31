@@ -987,6 +987,7 @@ function checkCredentials(
     app.user.scheduleJid = "paula@gocastconference.video.gocast.it";
     app.user.scheduleTitle = "Open test room";
     openWindow('#credentials');
+    $(document).trigger("tryPluginInstall")
 } /* checkCredentials() */
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
@@ -1000,6 +1001,7 @@ function tryPluginInstall(
 )
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
+  app.log(2, "tryPluginInstall");
   /*
    * check plugin installed. */
   if (app.pluginInstalled()) {
@@ -1057,13 +1059,16 @@ $(document).ready(function(
   app.getBrowser();
   app.checkBrowser();
 
+  $(document).bind('fbLoginStatus', checkCredentials);
+  $(document).bind('tryPluginInstall', tryPluginInstall);
+
   fbInit(); // init facebook api
     
   // check login credentials and display login dialog if necessary
   // this will be moved to event handler fired by fb init complete
-  checkCredentials();
+  //checkCredentials();
 
-  tryPluginInstall();
+  //tryPluginInstall();
     
   /*
    * Write greeting into console. */
