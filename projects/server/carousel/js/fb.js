@@ -52,6 +52,8 @@ function fbInit(
               if (me.name) {
                 //document.getElementById('auth-displayname').innerHTML = me.name;
                 globalFBName = me.name;
+                // set nick name to fb name
+                app.user.name = me.name;
 
                 //
                 // NOTE: These functions really should not be called here - they should be called

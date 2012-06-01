@@ -421,8 +421,11 @@ function openMeeting(
 )
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
+  app.log(2, "openMeeting");
+
   /*
    * Check user name.*/
+  /*
   var usrNm = $("#credentials > input#name").val();
   if (usrNm.length < 1) {
     $("#credentials > p.error").text("Please enter your name to continue.").
@@ -431,13 +434,14 @@ function openMeeting(
   }
   app.user.name = encodeURI(usrNm);
   app.log(2, "User name:" + usrNm);
+  */
   /*
    * Add encname attribute to mystream. */
   $("#meeting > #streams > #scarousel #mystream")
     .attr("encname", app.user.name);
   /*
    * Deactivate window.*/
-  deactivateWindow("#credentials");
+  //deactivateWindow("#credentials");
   /*
    * Get window height and width. */
   var winH = $(window).height();
@@ -787,7 +791,7 @@ function activateWindow(
 {
   if (winId.match("credentials")) {
     $("input#name", winId).on("keydown.s04072012", keypressNameHandler);
-    $("input#btn", winId).on("click.s04072012", openMeeting);
+    $("input#btn", winId).on("click.s04072012", onJoinNow);
   }
   else if (winId.match("meeting")) {
     $('#streams > #scarousel #mystream > #myctrls > #video', winId)
@@ -834,7 +838,7 @@ function deactivateWindow(
      * Remove any message. */
     $("p.error", winId).hide().text("");
     $("input#name", winId).off("keydown.s04072012", keypressNameHandler);
-    $("input#btn", winId).off("click.s04072012", openMeeting);
+    $("input#btn", winId).off("click.s04072012", onJoinNow);
   }
   else if (winId.match("meeting")) {
     $('#streams > #scarousel #mystream > #myctrls > #video', winId)
@@ -972,6 +976,42 @@ function resizeWindows(
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
+ * \brief callback for login button press.
+ */
+function onJoinNow(
+/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+    /**
+     * No argument. */
+)
+/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+{
+    app.log(2, "onJoinNow");
+
+    // todo move
+    app.user.scheduleName = "Paulas Tests";
+    app.user.scheduleJid = "paula@gocastconference.video.gocast.it";
+    app.user.scheduleTitle = "Open test room";
+    
+    // get the nick name, return back to dialog if not defined
+    var usrNm = $("#credentials > input#name").val();
+    if (usrNm.length < 1) {
+      $("#credentials > p.error").text("Please enter your name to continue.").
+        fadeIn("fast");
+      return false;
+    }
+    
+    // set app name from dialog text field
+    app.user.name = encodeURI(usrNm);
+    app.log(2, "User name:" + usrNm);
+    
+    // close dialog
+    deactivateWindow("#credentials");
+
+    $(document).trigger("tryPluginInstall")
+} /* onJoinNow() */
+
+/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+/**
  * \brief check login credential and display login dialog if necessary.
  */
 function checkCredentials(
@@ -982,12 +1022,21 @@ function checkCredentials(
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
     app.log(2, "checkCredentials");
+    app.log(2, globalAuthResponse);
 
     app.user.scheduleName = "Paulas Tests";
     app.user.scheduleJid = "paula@gocastconference.video.gocast.it";
     app.user.scheduleTitle = "Open test room";
-    openWindow('#credentials');
-    $(document).trigger("tryPluginInstall")
+    
+    // check fb login status and prompt if not logged in
+    if (!globalAuthResponse)
+    {
+       openWindow('#credentials');
+    }
+    else // fb logged in todo update fb logged in status instead of tryPluginInstall
+    {
+      $(document).trigger("tryPluginInstall")
+    }
 } /* checkCredentials() */
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
@@ -1011,7 +1060,8 @@ function tryPluginInstall(
     /*
      * Resize window. */
     $(window).resize(resizeWindows);
-    /* old get credentials */
+    
+    openMeeting();
   }
   else {
     /*
@@ -1063,12 +1113,6 @@ $(document).ready(function(
   $(document).bind('tryPluginInstall', tryPluginInstall);
 
   fbInit(); // init facebook api
-    
-  // check login credentials and display login dialog if necessary
-  // this will be moved to event handler fired by fb init complete
-  //checkCredentials();
-
-  //tryPluginInstall();
     
   /*
    * Write greeting into console. */
