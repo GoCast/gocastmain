@@ -111,7 +111,7 @@ var app = {
     } /* switch (app.browser.name) */
     if (msg) {
       alert(msg);
-    }    
+    }
   }, /* app.checkBrowser() */
   /**
    * The OS platform. */
@@ -194,7 +194,7 @@ function startDemoContent(
   setTimeout(function() {
     Callcast.Callback_AddCarouselContent(new Object({id:"demo5", image:"url('images/demo5-wikipedia.jpg')", altText:"Wikipedia", url:"http://www.wikipedia.org"}));
   }, 4000);
-  closeWindow();  
+  closeWindow();
   return false;
 } /* startDemoContent() */
 
@@ -216,7 +216,7 @@ function openPersonalChat(
    * Transition effect. */
   var jqMask = $('#mask');
   jqMask.fadeIn(500, activateWindow("#personalChat"));
-  jqMask.fadeTo("fast", 0.3);   
+  jqMask.fadeTo("fast", 0.3);
   /*
    * Set message. */
   var jqWin = $("#boxes > div#personalChat");
@@ -242,7 +242,7 @@ function openPersonalChat(
   }
   else {
     jqWin.css("left", cX);
-  }  
+  }
   /*
    * Transition effect for Personal Chat Window.*/
   jqWin.fadeIn(700);
@@ -307,7 +307,7 @@ function openChat(
    * Transition effect. */
   var jqMask = $('#mask');
   jqMask.fadeIn(500, activateWindow("#chatInp"));
-  jqMask.fadeTo("fast", 0.3);   
+  jqMask.fadeTo("fast", 0.3);
   /*
    * Position chat Inp. */
   var winW = $(window).width();
@@ -359,7 +359,7 @@ function openCtrlsWindow(
    * Transition effect mask. */
   var jqMask = $('#mask');
   jqMask.fadeIn(500, activateWindow('#controls'));
-  jqMask.fadeTo("fast", 0.5);   
+  jqMask.fadeTo("fast", 0.5);
   /*
    * Transition effect window.*/
   var jqWin = $('#boxes #controls');
@@ -445,7 +445,7 @@ function openMeeting(
   /*
    * Set #meeting height and width to fill the whole screen. */
   var jqWin = $('#meeting');
-  jqWin.css({'width':winW,'height':winH}); 
+  jqWin.css({'width':winW,'height':winH});
   /*
    * Initialize carousel. */
   var rX = winW * 0.44; /* 50% of 88% */
@@ -851,7 +851,7 @@ function deactivateWindow(
   }
   else if (winId.match("controls")) {
     $('input.chatTo', winId).off("keydown.s05222012", keypressGrpChatHandler);
-    $('input.send', winId).off("click.s05222012", sendGrpChat);    
+    $('input.send', winId).off("click.s05222012", sendGrpChat);
     $('input.facebook', winId).off("click.s05222012a", sendFacebook);
     $('input.twitter', winId).off("click.s05222012b", sendTwitter);
     $('input.feedback', winId).off("click.s04212012e", openChat);
@@ -884,7 +884,7 @@ function openWindow(
   /*
    * Transition effect. */
   jqMask.fadeIn(1000, activateWindow(winId));
-  jqMask.fadeTo("slow",0.8);    
+  jqMask.fadeTo("slow",0.8);
   /*
    * Center window. */
   var jqWin = $(winId);
@@ -983,11 +983,32 @@ function checkCredentials(
 {
     app.log(2, "checkCredentials");
 
-    app.user.scheduleName = "Paulas Tests";
-    app.user.scheduleJid = "paula@gocastconference.video.gocast.it";
-    app.user.scheduleTitle = "Open test room";
     openWindow('#credentials');
 } /* checkCredentials() */
+
+//
+// If there is a specific room listed in the URL, then create/join that room.
+//
+// If there is no room specified, then we need to ask the server to create a random
+// room name and we'll join that room.
+//
+function handleRoomSetup() {
+	var room_to_create = $.getUrlVar("roomname") || "";
+
+	room_to_create = room_to_create.replace(/ /g, '');
+
+	Callcast.CreateUnlistedAndJoin(room_to_create, function(new_name) {
+		// We successfully created the room.
+		// Joining is in process now.
+		// trigger of joined_room will happen upon join complete.
+		
+		app.user.scheduleName = "Place to meet up";
+		app.user.scheduleJid = new_name + "@gocastconference.video.gocast.it";
+		app.user.scheduleTitle = "Open room";
+
+		app.log("Room named '" + new_name + "' has been created. Joining now.");
+	});
+};
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
@@ -1058,14 +1079,32 @@ $(document).ready(function(
   app.checkBrowser();
 
   fbInit(); // init facebook api
-    
+  // Login anonymously
+  Callcast.connect(Callcast.CALLCAST_XMPPSERVER, "");
+
   // check login credentials and display login dialog if necessary
   // this will be moved to event handler fired by fb init complete
   checkCredentials();
 
-  tryPluginInstall();
-    
   /*
    * Write greeting into console. */
-  app.log(2, "Page loaded.");  
+  app.log(2, "Page loaded.");
 }); /* $(document).ready(function()) */
+
+$.extend({
+getUrlVars: function(){
+ var vars = [], hash;
+ var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+ for(var i = 0; i < hashes.length; i++)
+ {
+   hash = hashes[i].split('=');
+   vars.push(hash[0]);
+   vars[hash[0]] = hash[1];
+ }
+ return vars;
+},
+getUrlVar: function(name){
+ return $.getUrlVars()[name];
+}
+});
+

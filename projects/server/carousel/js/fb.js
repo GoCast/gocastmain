@@ -28,7 +28,7 @@ function fbInit(
         xfbml      : true,  // parse XFBML
         oauth      : true,
       });
-      
+
       FB.getLoginStatus(function(response) {
         app.log(2, "fbLoginStatus callback");
         if (response.status == "connected") {
@@ -56,17 +56,11 @@ function fbInit(
             FB.api('/me', function(me){
               if (me.name) {
                 //document.getElementById('auth-displayname').innerHTML = me.name;
-                globalFBName = me.name;
+                app.user.name = me.name;
+			    Callcast.SetNickname(app.user.name);
 
-                //
-                // NOTE: These functions really should not be called here - they should be called
-                //       on plugin loaded / ready.
-                //       For this unit-test-style, this is fine.
-                //
-                //Callcast.SetNickname(me.name);
-                // Now login anonymously
-                //Callcast.connect(Callcast.CALLCAST_XMPPSERVER, "");
-
+//TODO:RMW - trigger the signal-join for login complete.
+				$(document).trigger("one-login-complete");	// One login complete.
               }
             })
             //document.getElementById('auth-loggedout').style.display = 'none';
