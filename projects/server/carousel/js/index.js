@@ -152,6 +152,7 @@ var app = {
    * User Information. */
   user: {
     name: null,
+    fbName: null,
     scheduleName: null,
     scheduleJid: null,
     scheduleTitle: null
@@ -518,7 +519,7 @@ function keypressNameHandler(
     case 13:                            /* 'Enter key' */
       app.log(2, "Enter key pressed");
       event.preventDefault();
-      openMeeting();
+      onJoinNow();
       break;
     } /* switch (event.which) */
   }
@@ -992,22 +993,40 @@ function onJoinNow(
     app.user.scheduleJid = "paula@gocastconference.video.gocast.it";
     app.user.scheduleTitle = "Open test room";
     
+    var fbNm  = $("#credentials > input#fbname").val();
+
     // get the nick name, return back to dialog if not defined
     var usrNm = $("#credentials > input#name").val();
-    if (usrNm.length < 1) {
-      $("#credentials > p.error").text("Please enter your name to continue.").
+    
+    // user must enter fb or nick name if both not entered
+    // display error
+    if (usrNm.length < 1 && fbNm.length < 1) {
+      $("#credentials > p.error").text("Please enter a name to continue.").
         fadeIn("fast");
       return false;
     }
     
     // set app name from dialog text field
     app.user.name = encodeURI(usrNm);
+    app.user.fbName = encodeURI(fbNm);
     app.log(2, "User name:" + usrNm);
+    app.log(2, "FB name:" + fbNm);
     
     // close dialog
     deactivateWindow("#credentials");
 
-    $(document).trigger("tryPluginInstall")
+    // at this point if we have a facebook name we are not logged in to
+    // facebook and the user entered an fb name so log in to facebook
+    // the fb status change will trigger checkCredentials and open the meeting
+    if (fbNm.length >= 1) 
+    {
+       app.log(2, "FB login");
+       FB.login();
+    }
+    else // fb name was not set but nick name was so proceed
+    {
+        $(document).trigger("tryPluginInstall");
+    }
 } /* onJoinNow() */
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
@@ -1109,7 +1128,7 @@ $(document).ready(function(
   app.getBrowser();
   app.checkBrowser();
 
-  $(document).bind('fbLoginStatus', checkCredentials);
+  $(document).bind('checkCredentials', checkCredentials);
   $(document).bind('tryPluginInstall', tryPluginInstall);
 
   fbInit(); // init facebook api

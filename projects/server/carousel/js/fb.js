@@ -32,7 +32,7 @@ function fbInit(
       FB.getLoginStatus(function(response) {
         app.log(2, "fbLoginStatus callback");
           globalAuthResponse = response.authResponse;
-          $(document).trigger("fbLoginStatus")
+          $(document).trigger("checkCredentials")
           //console.log('authResponse-Object', response.authResponse);
           //console.log('accessToken', response.authResponse.accessToken);
       });
@@ -41,6 +41,7 @@ function fbInit(
         FB.Event.subscribe('auth.statusChange', function(response) {
           app.log(2, "fbStatusChange callback");
           if (response.authResponse) {
+            app.log(2, "fbStatusChange callback user is authorized");
             //
             // NOTE: These two represent the keys to the kingdom. The signed response and the id.
             //
@@ -53,7 +54,7 @@ function fbInit(
                 //document.getElementById('auth-displayname').innerHTML = me.name;
                 globalFBName = me.name;
                 // set nick name to fb name
-                app.user.name = me.name;
+                app.user.fbName = me.name;
 
                 //
                 // NOTE: These functions really should not be called here - they should be called
@@ -77,7 +78,8 @@ function fbInit(
             //document.getElementById('auth-loggedin').style.display = 'none';
 
           }
+          globalAuthResponse = response.authResponse;
+          $(document).trigger("checkCredentials")
         });
     }
 }
-
