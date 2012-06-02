@@ -152,6 +152,7 @@ var app = {
    * User Information. */
   user: {
     name: null,
+    fbName: null,
     scheduleName: null,
     scheduleJid: null,
     scheduleTitle: null
@@ -421,8 +422,11 @@ function openMeeting(
 )
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
+  app.log(2, "openMeeting");
+
   /*
    * Check user name.*/
+  /*
   var usrNm = $("#credentials > input#name").val();
   if (usrNm.length < 1) {
     $("#credentials > p.error").text("Please enter your name to continue.").
@@ -431,13 +435,14 @@ function openMeeting(
   }
   app.user.name = encodeURI(usrNm);
   app.log(2, "User name:" + usrNm);
+  */
   /*
    * Add encname attribute to mystream. */
   $("#meeting > #streams > #scarousel #mystream")
     .attr("encname", app.user.name);
   /*
    * Deactivate window.*/
-  deactivateWindow("#credentials");
+  //deactivateWindow("#credentials");
   /*
    * Get window height and width. */
   var winH = $(window).height();
@@ -514,7 +519,7 @@ function keypressNameHandler(
     case 13:                            /* 'Enter key' */
       app.log(2, "Enter key pressed");
       event.preventDefault();
-      openMeeting();
+      onJoinNow();
       break;
     } /* switch (event.which) */
   }
@@ -787,7 +792,7 @@ function activateWindow(
 {
   if (winId.match("credentials")) {
     $("input#name", winId).on("keydown.s04072012", keypressNameHandler);
-    $("input#btn", winId).on("click.s04072012", openMeeting);
+    $("input#btn", winId).on("click.s04072012", onJoinNow);
   }
   else if (winId.match("meeting")) {
     $('#streams > #scarousel #mystream > #myctrls > #video', winId)
@@ -834,7 +839,7 @@ function deactivateWindow(
      * Remove any message. */
     $("p.error", winId).hide().text("");
     $("input#name", winId).off("keydown.s04072012", keypressNameHandler);
-    $("input#btn", winId).off("click.s04072012", openMeeting);
+    $("input#btn", winId).off("click.s04072012", onJoinNow);
   }
   else if (winId.match("meeting")) {
     $('#streams > #scarousel #mystream > #myctrls > #video', winId)
@@ -972,6 +977,60 @@ function resizeWindows(
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
+ * \brief callback for login button press.
+ */
+function onJoinNow(
+/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+    /**
+     * No argument. */
+)
+/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+{
+    app.log(2, "onJoinNow");
+
+    // todo move
+    app.user.scheduleName = "Paulas Tests";
+    app.user.scheduleJid = "paula@gocastconference.video.gocast.it";
+    app.user.scheduleTitle = "Open test room";
+    
+    var fbNm  = $("#credentials > input#fbname").val();
+
+    // get the nick name, return back to dialog if not defined
+    var usrNm = $("#credentials > input#name").val();
+    
+    // user must enter fb or nick name if both not entered
+    // display error
+    if (usrNm.length < 1 && fbNm.length < 1) {
+      $("#credentials > p.error").text("Please enter a name to continue.").
+        fadeIn("fast");
+      return false;
+    }
+    
+    // set app name from dialog text field
+    app.user.name = encodeURI(usrNm);
+    app.user.fbName = encodeURI(fbNm);
+    app.log(2, "User name:" + usrNm);
+    app.log(2, "FB name:" + fbNm);
+    
+    // close dialog
+    deactivateWindow("#credentials");
+
+    // at this point if we have a facebook name we are not logged in to
+    // facebook and the user entered an fb name so log in to facebook
+    // the fb status change will trigger checkCredentials and open the meeting
+    if (fbNm.length >= 1) 
+    {
+       app.log(2, "FB login");
+       FB.login();
+    }
+    else // fb name was not set but nick name was so proceed
+    {
+        $(document).trigger("one-login-complete", "OnJoinNow() -- non-FB-login");
+    }
+} /* onJoinNow() */
+
+/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+/**
  * \brief check login credential and display login dialog if necessary.
  */
 function checkCredentials(
@@ -982,8 +1041,17 @@ function checkCredentials(
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
     app.log(2, "checkCredentials");
+    app.log(2, globalAuthResponse);
 
-    openWindow('#credentials');
+    // check fb login status and prompt if not logged in
+    if (!globalAuthResponse)
+    {
+       openWindow('#credentials');
+    }
+    else // fb logged in todo update fb logged in status instead of tryPluginInstall
+    {
+      $(document).trigger("one-login-complete", "checkCredentials - FB Login")
+    }
 } /* checkCredentials() */
 
 //
@@ -993,6 +1061,7 @@ function checkCredentials(
 // room name and we'll join that room.
 //
 function handleRoomSetup() {
+	app.log(2, "handleRoomSetup entered");
 	var room_to_create = $.getUrlVar("roomname") || "";
 
 	room_to_create = room_to_create.replace(/ /g, '');
@@ -1003,10 +1072,10 @@ function handleRoomSetup() {
 		// trigger of joined_room will happen upon join complete.
 		
 		app.user.scheduleName = "Place to meet up";
-		app.user.scheduleJid = new_name + "@gocastconference.video.gocast.it";
+		app.user.scheduleJid = new_name + Callcast.AT_CALLCAST_ROOMS;
 		app.user.scheduleTitle = "Open room";
 
-		app.log("Room named '" + new_name + "' has been created. Joining now.");
+		app.log(2, "Room named '" + new_name + "' has been created. Joining now.");
 	});
 };
 
@@ -1021,6 +1090,7 @@ function tryPluginInstall(
 )
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
+  app.log(2, "tryPluginInstall");
   /*
    * check plugin installed. */
   if (app.pluginInstalled()) {
@@ -1030,7 +1100,6 @@ function tryPluginInstall(
     /*
      * Resize window. */
     $(window).resize(resizeWindows);
-    /* old get credentials */
   }
   else {
     /*
@@ -1078,13 +1147,11 @@ $(document).ready(function(
   app.getBrowser();
   app.checkBrowser();
 
+  $(document).bind('checkCredentials', checkCredentials);
+
   fbInit(); // init facebook api
   // Login anonymously
   Callcast.connect(Callcast.CALLCAST_XMPPSERVER, "");
-
-  // check login credentials and display login dialog if necessary
-  // this will be moved to event handler fired by fb init complete
-  checkCredentials();
 
   /*
    * Write greeting into console. */

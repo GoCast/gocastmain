@@ -35,6 +35,7 @@ $(document).on('joined_session', function (
   $("#meeting > #streams > #scarousel #mystream > #myctrls > input#audio").removeAttr('disabled');
   $("#meeting > #streams > #scontrols > input").removeAttr('disabled');
   closeWindow();
+  
   return false;
 }); /* joined_session() */
 
@@ -304,19 +305,26 @@ $(document).on('connected', function (
    * Open waiting room in case it takes too long to join. */
   openWindow("#waitingToJoin");
 
-  $(document).trigger("one-login-complete");		// One more login action complete.
+  $(document).trigger("one-login-complete", "XMPP GO.");		// One more login action complete.
   return false;
 }); /* connected() */
 
-$(document).on("one-login-complete", function() {
+$(document).on("one-login-complete", function(event, msg) {
 	if (!app.numLogins)
 	  app.numLogins = 0;
 
+	if (msg)
+		console.log("one-login-complete: Msg: " + msg);
+	else
+		console.log("one-login-complete: No Msg");
+	
 	app.numLogins++;
 
 	// Once we get facebook (or skip/set-nickname) + xmpp connected, then we're ready to go to the room.
 	if (app.numLogins === 2)
 	{
+	    openMeeting();
+
 		tryPluginInstall();
 		
 		handleRoomSetup();

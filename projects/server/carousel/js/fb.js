@@ -31,21 +31,15 @@ function fbInit(
 
       FB.getLoginStatus(function(response) {
         app.log(2, "fbLoginStatus callback");
-        if (response.status == "connected") {
-          $(document).trigger("FacebookConnected", response.authResponse)
-    //console.log('authResponse-Object', response.authResponse);
-    //console.log('accessToken', response.authResponse.accessToken);
-      globalAuthResponse = response.authResponse;
-//RMW     $(document).trigger("connected"); // Let peek know...
-        } else {
-          $(document).trigger("NotConnectedToFacebook")
-        }
+          //console.log('authResponse-Object', response.authResponse);
+          //console.log('accessToken', response.authResponse.accessToken);
       });
 
         // listen for and handle auth.statusChange events
         FB.Event.subscribe('auth.statusChange', function(response) {
           app.log(2, "fbStatusChange callback");
           if (response.authResponse) {
+            app.log(2, "fbStatusChange callback user is authorized");
             //
             // NOTE: These two represent the keys to the kingdom. The signed response and the id.
             //
@@ -57,10 +51,11 @@ function fbInit(
               if (me.name) {
                 //document.getElementById('auth-displayname').innerHTML = me.name;
                 app.user.name = me.name;
+                app.user.fbName = app.user.name;
 			    Callcast.SetNickname(app.user.name);
 
-//TODO:RMW - trigger the signal-join for login complete.
-				$(document).trigger("one-login-complete");	// One login complete.
+     		    globalAuthResponse = response.authResponse;
+				$(document).trigger("checkCredentials")
               }
             })
             //document.getElementById('auth-loggedout').style.display = 'none';
@@ -77,4 +72,3 @@ function fbInit(
         });
     }
 }
-

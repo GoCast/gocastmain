@@ -976,7 +976,13 @@ var Callcast = {
             return true;
         },
 
-	CreateUnlistedAndJoin: function(roomname) {
+//
+// Ask the server to create 'roomname' and then we can join it.
+// If 'roomname' is "", then we're asking the server to create a random unique
+// room name and when the 'ok' comes back, there will be an attribute of 'name' which
+// will be the newly created random/unique room name.
+//
+	CreateUnlistedAndJoin: function(roomname, cb) {
 		var roommanager = this.ROOMMANAGER;
 		var self = this;
 
@@ -990,8 +996,13 @@ var Callcast = {
 		// Successful callback...
 		  function(iq) {
 			  if($(iq).find("ok")) {
+			  	  if (roomname === "")	// Asked to create a random room - must retrieve name...
+			  	  	roomname = $(iq).find('ok').attr('name');
+
 				  self.JoinSession(roomname, roomname + self.AT_CALLCAST_ROOMS);
-				  alert("ROOM CREATED!!!");
+
+				  if (cb)
+				  	cb(roomname);
 			  }
 
 			  return true;
