@@ -993,14 +993,12 @@ function onJoinNow(
     app.user.scheduleJid = "paula@gocastconference.video.gocast.it";
     app.user.scheduleTitle = "Open test room";
     
-    var fbNm  = $("#credentials > input#fbname").val();
-
     // get the nick name, return back to dialog if not defined
     var usrNm = $("#credentials > input#name").val();
     
     // user must enter fb or nick name if both not entered
     // display error
-    if (usrNm.length < 1 && fbNm.length < 1) {
+    if (usrNm.length < 1) {
       $("#credentials > p.error").text("Please enter a name to continue.").
         fadeIn("fast");
       return false;
@@ -1008,25 +1006,12 @@ function onJoinNow(
     
     // set app name from dialog text field
     app.user.name = encodeURI(usrNm);
-    app.user.fbName = encodeURI(fbNm);
     app.log(2, "User name:" + usrNm);
-    app.log(2, "FB name:" + fbNm);
     
     // close dialog
     deactivateWindow("#credentials");
 
-    // at this point if we have a facebook name we are not logged in to
-    // facebook and the user entered an fb name so log in to facebook
-    // the fb status change will trigger checkCredentials and open the meeting
-    if (fbNm.length >= 1) 
-    {
-       app.log(2, "FB login");
-       FB.login();
-    }
-    else // fb name was not set but nick name was so proceed
-    {
-        $(document).trigger("tryPluginInstall");
-    }
+    // call one-login trigger
 } /* onJoinNow() */
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
