@@ -35,6 +35,7 @@ $(document).on('joined_session', function (
   $("#meeting > #streams > #scarousel #mystream > #myctrls > input#audio").removeAttr('disabled');
   $("#meeting > #streams > #scontrols > input").removeAttr('disabled');
   closeWindow();
+  
   return false;
 }); /* joined_session() */
 
@@ -202,7 +203,7 @@ $(document).on('user_joined', function (
   }
   Callcast.ShowRemoteVideo(info);
   app.log(2, "A new user joined.");
-}); /* user_joined() */ 
+}); /* user_joined() */
 
 
 
@@ -238,7 +239,7 @@ $(document).on('user_updated', function (
   }
   Callcast.ShowRemoteVideo(info);
   app.log(2, "User updated "+info.nick+", vid on:"+info.hasVid);
-}); /* user_updated() */ 
+}); /* user_updated() */
 
 
 
@@ -259,7 +260,7 @@ $(document).on('user_left', function (
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
   app.log(2, "User " + nick + " left.");
-}); /* user_left() */ 
+}); /* user_left() */
 
 
 
@@ -300,33 +301,36 @@ $(document).on('connected', function (
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
   app.log(2, "User is connected.");
-  var vertext = "Plug-in Version: " + (Callcast.GetVersion() || "None");
-  if (Callcast.pluginUpdateRequired()) {
-    vertext += " -- Version update REQUIRED." + " Visit " +
-      Callcast.PLUGIN_DOWNLOAD_URL;
-    /*
-     * Force user to update plugin. */  
-    app.log(4, "Plugin update required: " + vertext);
-    $("#errorMsgPlugin").empty();
-    $("#errorMsgPlugin").append('<h1>Gocast.it plugin version update required</h1><p>Please visit <a href=' + Callcast.PLUGIN_DOWNLOAD_URL + '>' + Callcast.PLUGIN_DOWNLOAD_URL + '</a> to reinstall.</p>');
-    openWindow('#errorMsgPlugin');
-    return false;
-  }
-  else if (Callcast.pluginUpdateAvailable()) {
-    vertext += " -- Version update AVAILABLE." + " Visit " +
-      Callcast.PLUGIN_DOWNLOAD_URL;
-  }
-  app.log(2, vertext);
-  /*
-   * Proceed to connect user automatically. */
   /*
    * Open waiting room in case it takes too long to join. */
   openWindow("#waitingToJoin");
-  Callcast.JoinSession(app.user.scheduleName, app.user.scheduleJid);
-  return false;  
+
+  $(document).trigger("one-login-complete", "XMPP GO.");		// One more login action complete.
+  return false;
 }); /* connected() */
 
+$(document).on("one-login-complete", function(event, msg) {
+	if (!app.numLogins)
+	  app.numLogins = 0;
 
+	if (msg)
+		console.log("one-login-complete: Msg: " + msg);
+	else
+		console.log("one-login-complete: No Msg");
+	
+	app.numLogins++;
+
+	// Once we get facebook (or skip/set-nickname) + xmpp connected, then we're ready to go to the room.
+	if (app.numLogins === 2)
+	{
+	    openMeeting();
+
+		tryPluginInstall();
+		
+		handleRoomSetup();
+	}
+
+});
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
@@ -360,13 +364,27 @@ function initializeLocalPlugin(
 )
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
+  var vertext = "Plug-in Version: " + (Callcast.GetVersion() || "None");
+  if (Callcast.pluginUpdateRequired()) {
+    vertext += " -- Version update REQUIRED." + " Visit " +
+      Callcast.PLUGIN_DOWNLOAD_URL;
+    /*
+     * Force user to update plugin. */
+    app.log(4, "Plugin update required: " + vertext);
+    $("#errorMsgPlugin").empty();
+    $("#errorMsgPlugin").append('<h1>Gocast.it plugin version update required</h1><p>Please visit <a href=' + Callcast.PLUGIN_DOWNLOAD_URL + '>' + Callcast.PLUGIN_DOWNLOAD_URL + '</a> to reinstall.</p>');
+    openWindow('#errorMsgPlugin');
+    return false;
+  }
+  else if (Callcast.pluginUpdateAvailable()) {
+    vertext += " -- Version update AVAILABLE." + " Visit " +
+      Callcast.PLUGIN_DOWNLOAD_URL;
+  }
+  app.log(2, vertext);
+
   /*
    * Callcast Seetings. */
-  Callcast.SetNickname(app.user.name);
   Callcast.SetUseVideo(false); /* Initially set to false, user must enable. */
-  /*
-   * Connect anonymous. */
-  Callcast.connect(Callcast.CALLCAST_XMPPSERVER, "");
   app.log(2, "initializeLocalPlugin complete.");
 } /* initializeLocalPlugin() */
 
@@ -391,7 +409,7 @@ function addPluginToCarousel(
   var oo = $("#meeting > #streams > #scarousel div.unoccupied").get(0);
   if (oo) {
     $(oo).attr("id", id);
-    $(oo).attr("encname", nickname);  
+    $(oo).attr("encname", nickname);
     $(oo).attr("title", dispname);
     /*
      * Get dimensions oo and scale plugin accordingly. */

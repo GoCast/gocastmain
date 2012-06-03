@@ -45,20 +45,20 @@ var MucroomObjectPool = {
 	objPool: [],
 	client: null,
 	notifier: null,
-	
+
 	init: function(client, notifier) {
 		this.client = client;
 		this.notifier = notifier;
 	},
-	
+
 	get: function() {
 		if(0 === this.objPool.length) {
 			this.objPool.push(new mucRoom(this.client, this.notifier, true));
 		}
-		
+
 		return this.objPool.pop();
 	},
-	
+
 	put: function(roomObj) {
 		roomObj.reset();
 		this.objPool.push(roomObj);
@@ -74,7 +74,7 @@ function mucRoom(client, notifier, bSelfDestruct, success, failure) {
 	this.failureCallback = (failure? failure: null);
 	this.presenceTimer = null;
 	// --------------------------------
-	
+
 	this.isOwner = false;	// Assume we're not the owner yet until we're told so.
 	this.roomname = "";
 	this.nick = "";
@@ -107,7 +107,7 @@ function mucRoom(client, notifier, bSelfDestruct, success, failure) {
 	// Initially, all rooms are unlocked.
 	this.options['muc#roomconfig_membersonly'] = '0';
 
-	// stanza callback is stored as a member so that 
+	// stanza callback is stored as a member so that
 	// it can be removed from listener when object is no longer active
 	this.onstanza = function(in_stanza) {
 		var stanza = in_stanza.clone();
@@ -126,7 +126,7 @@ function mucRoom(client, notifier, bSelfDestruct, success, failure) {
 		else
 			self.log("ERROR: UNHANDLED Stanza: " + stanza.tree());
 	};
-	
+
 	if (!client)
 	{
 		alert("mucRoom() - No client specified.");
@@ -139,7 +139,7 @@ mucRoom.prototype.reset = function() {
 	this.successCallback = null;
 	this.failureCallback = null;
 	this.presenceTimer = null;
-	
+
 	this.isOwner = false;	// Assume we're not the owner yet until we're told so.
 	this.roomname = "";
 	this.nick = "";
@@ -150,7 +150,7 @@ mucRoom.prototype.reset = function() {
 	this.options = {};
 	this.iq_callbacks = {};
 	this.iqnum = 0;
-	
+
 	this.client.removeListener('stanza', this.onstanza);
 };
 
@@ -184,7 +184,7 @@ mucRoom.prototype.handlePresence = function(pres) {
 	var self = this;
 
 	this.log(pres);
-	
+
 	if (pres.getChild('x') && pres.getChild('x').getChild('item') && pres.getChild('x').getChild('item').attrs.jid)
 		fromjid = pres.getChild('x').getChild('item').attrs.jid.split('/')[0];
 
@@ -193,7 +193,7 @@ mucRoom.prototype.handlePresence = function(pres) {
 	{
 		this.log("needs configured. Configuring...");
 		this.bNewRoom = true;
-		
+
 		this.getRoomConfiguration(function(resp) {
 			this.log("Got room configuration. Going for setup.");
 			self.setupRoom(resp);
@@ -241,7 +241,7 @@ mucRoom.prototype.handlePresence = function(pres) {
 	{
 		this.log("Adding: " + fromjid + " as Nickname: " + fromnick);
 		this.participants[fromnick] = fromjid || fromnick;
-		
+
 		if(this.bSelfDestruct === true)
 		{
 			if(fromnick !== this.nick)
@@ -261,7 +261,7 @@ mucRoom.prototype.handlePresence = function(pres) {
 				this.joined = false;
 				for (k in this.participants)
 					delete this.participants[k];
-	
+
 				this.log("Re-joining (and re-creating?) room.");
 				this.rejoin(self.roomname, self.nick_original);
 			}
@@ -272,11 +272,11 @@ mucRoom.prototype.handlePresence = function(pres) {
 			{
 				if(1 === size(this.participants) && this.participants[this.nick]) {
 					this.log("OVERSEER: Everybody else has left room... wait 10 sec...");
-					
+
 					this.presenceTimer = setTimeout(function() {
-						self.log("OVERSEER: No one in room after 10 seconds :( ...");
+						self.log("OVERSEER: No one in room after 60 seconds :( ...");
 						eventManager.emit('destroyroom', self.roomname.split('@')[0]);
-					}, 10000);
+					}, 60000);
 				}
 			}
 		}
@@ -298,12 +298,12 @@ mucRoom.prototype.handlePresence = function(pres) {
 				if(this.bSelfDestruct === true)
 				{
 					this.presenceTimer = setTimeout(function() {
-						self.log("OVERSEER: No one in room after 10 seconds :( ...");
+						self.log("OVERSEER: No one in room after 60 seconds :( ...");
 						eventManager.emit('destroyroom', self.roomname.split('@')[0]);
-					}, 10000);
+					}, 60000);
 				}
 			}
-			
+
 			// Upon joining, get context of the room. Get the banned list.
 			this.loadBannedList(function() {
 				this.log("Received Banned List");
@@ -587,24 +587,24 @@ mucRoom.prototype.setupRoom = function(form) {
 			if (resp.attrs.type === 'result')
 			{
 				self.log("Room setup successful.");
-				
+
 				if(self.successCallback)
 					self.successCallback();
 
 				self.bNewRoom = false;
-				
+
 				if(self.bSelfDestruct === true)
 				{
 					self.presenceTimer = setTimeout(function() {
-						self.log("OVERSEER: No one in room after 10 seconds :( ...");
+						self.log("OVERSEER: No one in room after 60 seconds :( ...");
 						eventManager.emit('destroyroom', self.roomname.split('@')[0]);
-					}, 10000);
+					}, 60000);
 				}
 			}
 			else
 			{
 				self.log("Room setup failed. Response: " + resp.tree());
-				
+
 				if(self.failureCallback)
 					self.failureCallback();
 			}
@@ -613,7 +613,7 @@ mucRoom.prototype.setupRoom = function(form) {
 	else
 	{
 		this.log("setupRoom: No <query><x> ...");
-		
+
 		if(self.failureCallback)
 			self.failureCallback();
 	}
@@ -1115,16 +1115,16 @@ function overseer(user, pw, notifier) {
 
 			if(process.argv[i].charAt(0) == "-") {
 				var option = process.argv[i].substring(1);
-				
+
 				if("roommanager" === option) {
 					this.log("OVERSEER: ROOM MANAGER MODE");
 					user  = user + "/" + option;
 					this.log("OVERSEER: JID = " + user);
 				}
-				
+
 				continue;
 			}
-			
+
 			this.log("Reading XML File: " + process.argv[i]);
 
 			var roomsxml = loadRooms(process.argv[i]); // '/var/www/etzchayim/xml/schedules.xml');
@@ -1157,7 +1157,7 @@ function overseer(user, pw, notifier) {
 	// Very important - because we listen to a single node-xmpp client connection here,
 	// we have a lot of potential listeners to an emitter. To avoid the warning about this...
 	this.client.setMaxListeners(0);
-	
+
 	this.client.on('online', function() {
 		// Mark ourself as online so that we can receive messages from direct clients.
 		el = new xmpp.Element('presence');
@@ -1214,7 +1214,7 @@ function overseer(user, pw, notifier) {
 	this.client.on('error', function(e) {
 		sys.puts(e);
 	});
-	
+
 	// Overseer events
 	eventManager.on('destroyroom', function(roomname) {
 		console.log("OVERSEER: Deleting room [" + roomname + "]");
@@ -1227,16 +1227,16 @@ function overseer(user, pw, notifier) {
 
 overseer.prototype.destroyRoom = function(roomname) {
 	var self = this;
-	
+
 	if(this.mucRoomObjects[roomname]) {
 		var iqDestroyRoom = new xmpp.Element('iq', {to: roomname + this.CONF_SERVICE, type: 'set'})
 								.c('query', {xmlns: 'http://jabber.org/protocol/muc#owner'})
 								.c('destroy');
-		
+
 		this.sendIQ(iqDestroyRoom.root(), function(iq) {
 			if('result' === iq.attrs.type) {
-				self.log("OVERSEER: Successfully deleted... removing mucRoomObject");				
-				MucroomObjectPool.put(self.mucRoomObjects[roomname]);				
+				self.log("OVERSEER: Successfully deleted... removing mucRoomObject");
+				MucroomObjectPool.put(self.mucRoomObjects[roomname]);
 				delete self.mucRoomObjects[roomname];
 			}
 		});
@@ -1351,6 +1351,20 @@ overseer.prototype.handlePresence = function(pres) {
 	}
 };
 
+overseer.prototype.generateRandomRoomName = function() {
+	var chars = "0123456789abcdefghijklmnopqrstuvwxyz";
+	var len = chars.length;
+	var genLength = 16;
+	var result = "";
+
+	for (var i = 0; i < genLength; ++i) {
+		var rnum = Math.floor(Math.random() * len);
+		result += chars.substring(rnum, rnum+1);
+	}
+
+	return result;
+};
+
 overseer.prototype.handleIq = function(iq) {
 	// Handle all pings and all queries for #info
 	if (iq.attrs.type === 'result' && iq.attrs.id && this.iq_callbacks[iq.attrs.id])
@@ -1376,50 +1390,65 @@ overseer.prototype.handleIq = function(iq) {
 	}
 	else if (!iq.attrs.from.split('@'))
 		this.log("UNHANDLED IQ: " + iq);
-	
+
 	// -- Handle room create request --
 	else
-	{		
+	{
 		if(iq.attrs.type === 'set' &&
 		   iq.getChild('room') &&
 		   iq.getChildByAttr('xmlns', 'urn:xmpp:callcast'))
 		{
 			var roomname = iq.getChild('room').attr('name');
-			this.log("overseer.handleIq: Room Name = " + roomname);
+
+			// If client wants a random room generated, they will send the attribute with a "" value.
+			if (roomname === "")
+			{
+				do
+				{
+					roomname = this.generateRandomRoomName();
+					this.log("Generated random room named: " + roomname);
+				}
+				while (this.mucRoomObjects[roomname]);
+			}
+
+			this.log("overseer.handleIq: Room Name request = " + roomname);
 			var self = this;
-			
+
+			//
+			// No room by that name currently exists.
+			//
 			if(!this.mucRoomObjects[roomname])
 			{
 				this.mucRoomObjects[roomname] = MucroomObjectPool.get();
 
 				this.mucRoomObjects[roomname].finishInit(function() {
 					var iqResult = new xmpp.Element('iq', {to: iq.attrs.from, type: 'result', id: iq.attrs.id})
-										.c('ok', {xmlns: 'urn:xmpp:callcast'});							
+										.c('ok', {xmlns: 'urn:xmpp:callcast', name: roomname});
 					self.client.send(iqResult.root());
 					},
-					
+
 					function() {
 						var iqResult = new xmpp.Element('iq', {to: iq.attrs.from, type: 'result', id: iq.attrs.id})
-										.c('err', {xmlns: 'urn:xmpp:callcast'});							
+										.c('err', {xmlns: 'urn:xmpp:callcast'});
 						self.client.send(iqResult.root());
 					}
 				);
-				
+
 				this.mucRoomObjects[roomname].join(roomname + this.CONF_SERVICE, "overseer");
 			}
-			else
+			else		// Room already exists -- just let 'em know all is ok.
 			{
 				var iqResult = new xmpp.Element('iq', {to: iq.attrs.from, type: 'result', id: iq.attrs.id})
-								.c('ok', {xmlns: 'urn:xmpp:callcast'});							
+								.c('ok', {xmlns: 'urn:xmpp:callcast'});
 				self.client.send(iqResult.root());
-				
+
 				if(this.mucRoomObjects[roomname].bSelfDestruct === true &&
 				   1 == size(this.mucRoomObjects[roomname].participants))
 				{
 					this.mucRoomObjects[roomname].presenceTimer = setTimeout(function() {
-						self.log("OVERSEER: No one in room after 10 seconds :( ...");
+						self.log("OVERSEER: No one in room after 60 seconds :( ...");
 						eventManager.emit('destroyRoom', roomname);
-					}, 10000);
+					}, 60000);
 				}
 			}
 		}

@@ -28,11 +28,9 @@ function fbInit(
         xfbml      : true,  // parse XFBML
         oauth      : true,
       });
-      
+
       FB.getLoginStatus(function(response) {
         app.log(2, "fbLoginStatus callback");
-          globalAuthResponse = response.authResponse;
-          $(document).trigger("checkCredentials")
           //console.log('authResponse-Object', response.authResponse);
           //console.log('accessToken', response.authResponse.accessToken);
       });
@@ -52,19 +50,12 @@ function fbInit(
             FB.api('/me', function(me){
               if (me.name) {
                 //document.getElementById('auth-displayname').innerHTML = me.name;
-                globalFBName = me.name;
-                // set nick name to fb name
-                app.user.fbName = me.name;
+                app.user.name = me.name;
+                app.user.fbName = app.user.name;
+			    Callcast.SetNickname(app.user.name);
 
-                //
-                // NOTE: These functions really should not be called here - they should be called
-                //       on plugin loaded / ready.
-                //       For this unit-test-style, this is fine.
-                //
-                //Callcast.SetNickname(me.name);
-                // Now login anonymously
-                //Callcast.connect(Callcast.CALLCAST_XMPPSERVER, "");
-
+     		    globalAuthResponse = response.authResponse;
+				$(document).trigger("checkCredentials")
               }
             })
             //document.getElementById('auth-loggedout').style.display = 'none';
@@ -78,8 +69,6 @@ function fbInit(
             //document.getElementById('auth-loggedin').style.display = 'none';
 
           }
-          globalAuthResponse = response.authResponse;
-          $(document).trigger("checkCredentials")
         });
     }
 }
