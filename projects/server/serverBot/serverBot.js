@@ -88,7 +88,7 @@ function mucRoom(client, notifier, bSelfDestruct, success, failure) {
 	this.iqnum = 0;
 	this.notifier = notifier;
 	var self = this;
-
+	
 	// Max # users.
 	this.options['muc#roomconfig_maxusers'] = '11';
 
@@ -240,18 +240,28 @@ mucRoom.prototype.handlePresence = function(pres) {
 	if (pres.attrs.type !== 'unavailable')
 	{
 		this.log("Adding: " + fromjid + " as Nickname: " + fromnick);
-		this.participants[fromnick] = fromjid || fromnick;
+		this.participants[fromnick] = { name: fromjid || fromnick };
+		
+		if (pres.attrs.video)
+			this.participants[fromnick].video = pres.attrs.video;
 
 		if(this.bSelfDestruct === true)
 		{
-			if(fromnick !== this.nick)
+			if(fromnick !== this.nick && this.presenceTimer)
+			{
 				clearTimeout(this.presenceTimer);
+				this.presenceTimer = null;
+			}
 		}
 	}
 	else if (pres.attrs.type === 'unavailable' && this.participants[fromnick])
 	{
 		this.log(fromnick + " left room.");
 		delete this.participants[fromnick];
+		
+		//
+		// Was it myself that left the room?
+		//
 		if (fromnick === self.nick)
 		{
 			if(this.bSelfDestruct === true && 0 == size(this.participants)) {
@@ -271,8 +281,15 @@ mucRoom.prototype.handlePresence = function(pres) {
 			if(this.bSelfDestruct === true)
 			{
 				if(1 === size(this.participants) && this.participants[this.nick]) {
-					this.log("OVERSEER: Everybody else has left room... wait 10 sec...");
+					this.log("OVERSEER: Everybody else has left room... wait 60 sec...");
 
+					if (this.presenceTimer)
+					{
+						this.log("OVERSEER: presenceTimer was already set. Clearing first.");
+						clearTimeout(this.presenceTimer);
+						this.presenceTimer = null;
+					}
+					
 					this.presenceTimer = setTimeout(function() {
 						self.log("OVERSEER: No one in room after 60 seconds :( ...");
 						eventManager.emit('destroyroom', self.roomname.split('@')[0]);
@@ -297,10 +314,17 @@ mucRoom.prototype.handlePresence = function(pres) {
 
 				if(this.bSelfDestruct === true)
 				{
+					if (this.presenceTimer)
+					{
+						this.log("OVERSEER: Clearing presenceTimer which was already set. New room entered.");
+						clearTimeout(this.presenceTimer);
+						this.presenceTimer = null;
+					}
+						
 					this.presenceTimer = setTimeout(function() {
-						self.log("OVERSEER: No one in room after 60 seconds :( ...");
+						self.log("OVERSEER: New room entered - no entrants...No joined new room after 30 seconds :( ...");
 						eventManager.emit('destroyroom', self.roomname.split('@')[0]);
-					}, 60000);
+					}, 30000);
 				}
 			}
 
@@ -374,7 +398,11 @@ mucRoom.prototype.printParticipants = function() {
 		if (parts !== "")
 			parts += ", ";
 
-		parts += k.replace(/\\20/g, ' ');
+		parts += k.name.replace(/\\20/g, ' ');
+		if (k.video === "on")
+			parts += '(Video)';
+		else if (k.video === "off")
+			parts += '(No-Video)';
 	}
 
 	this.log("Participants list: " + parts);
@@ -595,10 +623,13 @@ mucRoom.prototype.setupRoom = function(form) {
 
 				if(self.bSelfDestruct === true)
 				{
+					if (self.presenceTimer)
+						self.log("OVERSEER: ERROR: After init of room, presenceTimer should not already be set.");
+						
 					self.presenceTimer = setTimeout(function() {
-						self.log("OVERSEER: No one in room after 60 seconds :( ...");
+						self.log("OVERSEER: After Init-Room - No one in room after 30 seconds :( ...");
 						eventManager.emit('destroyroom', self.roomname.split('@')[0]);
-					}, 60000);
+					}, 30000);
 				}
 			}
 			else
@@ -934,7 +965,7 @@ mucRoom.prototype.kick = function(nick, cb) {
 // Ban keeps track of the jid who was banned and disallows entry in the future.
 //
 mucRoom.prototype.banFromRoomByNick = function(nick, cb) {
-	var jid = this.participants[nick];
+	var jid = this.participants[nick].name;
 	var affil = 'outcast';
 	var nickToBan = nick.replace(/ /g, '\\20');
 
@@ -1212,7 +1243,15 @@ function overseer(user, pw, notifier) {
 	});
 
 	this.client.on('error', function(e) {
-		sys.puts(e);
+		if (e.getChild('conflict'))
+		{
+			self.log("Username Conflict. Likely two roommanager logins simultaneously.");
+			self.log("Use 'ps ax | grep node' to determine if this is the case.");
+			self.log("Exiting node now. Return code = 1.");
+			process.exit(1);
+		}
+		else
+			sys.puts(e);
 	});
 
 	// Overseer events
@@ -1446,7 +1485,7 @@ overseer.prototype.handleIq = function(iq) {
 				   1 == size(this.mucRoomObjects[roomname].participants))
 				{
 					this.mucRoomObjects[roomname].presenceTimer = setTimeout(function() {
-						self.log("OVERSEER: No one in room after 60 seconds :( ...");
+						self.log("OVERSEER: Pre-existing room - No one in room after 60 seconds :( ...");
 						eventManager.emit('destroyRoom', roomname);
 					}, 60000);
 				}
