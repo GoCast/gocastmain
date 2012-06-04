@@ -9,8 +9,6 @@ function fbInit(
 )
 {
     // Load the SDK Asynchronously
-    //jk what is optimum place to load?
-    //jk why async load?
     (function(d){
        app.log(2, "fb load facebook-jssdk");
        var js, id = 'facebook-jssdk'; if (d.getElementById(id)) {return;}
@@ -23,16 +21,26 @@ function fbInit(
       app.log(2, "fbAsyncInit callback");
       FB.init({
         appId      : '458515917498757', // App ID
-        status     : true, // check login status
+        status     : true, // check login status trip to fb server
         cookie     : true, // enable cookies to allow the server to access the session
         xfbml      : true,  // parse XFBML
         oauth      : true,
       });
 
+      // not needed since the status : true arg to FB.init above 
+      // does the equivalent and fires statusChange
+      // but looks like the above stmt is not true, we don't get
+      // statusChange event on FB.init if we're not logged into fb
+      // so call this on page load, we may need a true 2nd arg
+      // to trip to fb server
       FB.getLoginStatus(function(response) {
-        app.log(2, "fbLoginStatus callback");
+        app.log(2, "fbLoginStatus callback response.authResponse" + response.authResponse);
           //console.log('authResponse-Object', response.authResponse);
           //console.log('accessToken', response.authResponse.accessToken);
+     	  if (!response.authResponse)
+     	  {
+		     $(document).trigger("checkCredentials");
+		  }
       });
 
         // listen for and handle auth.statusChange events
@@ -42,33 +50,23 @@ function fbInit(
             app.log(2, "fbStatusChange callback user is authorized");
             //
             // NOTE: These two represent the keys to the kingdom. The signed response and the id.
+            // the authResponse can be accessed using FB sync api calls
             //
-            globalFBSR = response.authResponse.signedRequest;
-            globalFBID = response.authResponse.id;
+            //globalFBSR = response.authResponse.signedRequest;
+            //globalFBID = response.authResponse.id;
 
             // user has auth'd your app and is logged into Facebook
             FB.api('/me', function(me){
               if (me.name) {
                 //document.getElementById('auth-displayname').innerHTML = me.name;
                 app.user.name = me.name;
-                app.user.fbName = app.user.name;
-			    Callcast.SetNickname(app.user.name);
+			    Callcast.SetNickname(app.user.name); // TODO should be somewhere else
 
-     		    globalAuthResponse = response.authResponse;
-				$(document).trigger("checkCredentials")
               }
             })
-            //document.getElementById('auth-loggedout').style.display = 'none';
-            //document.getElementById('auth-loggedin').style.display = 'block';
-          } else {
-
-            //Callcast.disconnect();
-
-            // user has not auth'd your app, or is not logged into Facebook
-            //document.getElementById('auth-loggedout').style.display = 'block';
-            //document.getElementById('auth-loggedin').style.display = 'none';
-
           }
+     	  globalAuthResponse = response.authResponse;
+		  $(document).trigger("checkCredentials")
         });
     }
 }

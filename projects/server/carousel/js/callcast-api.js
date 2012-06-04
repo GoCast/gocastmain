@@ -323,6 +323,7 @@ $(document).on("one-login-complete", function(event, msg) {
 	// Once we get facebook (or skip/set-nickname) + xmpp connected, then we're ready to go to the room.
 	if (app.numLogins === 2)
 	{
+		console.log("one-login-complete: opening meeting");
 	    openMeeting();
 
 		tryPluginInstall();

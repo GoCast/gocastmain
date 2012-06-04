@@ -152,7 +152,6 @@ var app = {
    * User Information. */
   user: {
     name: null,
-    fbName: null,
     scheduleName: null,
     scheduleJid: null,
     scheduleTitle: null
@@ -988,11 +987,6 @@ function onJoinNow(
 {
     app.log(2, "onJoinNow");
 
-    // todo move
-    app.user.scheduleName = "Paulas Tests";
-    app.user.scheduleJid = "paula@gocastconference.video.gocast.it";
-    app.user.scheduleTitle = "Open test room";
-    
     // get the nick name, return back to dialog if not defined
     var usrNm = $("#credentials > input#name").val();
     
@@ -1011,9 +1005,6 @@ function onJoinNow(
     // close dialog
     deactivateWindow("#credentials");
 
-<<<<<<< HEAD
-    // call one-login trigger
-=======
     // at this point if we have a facebook name we are not logged in to
     // facebook and the user entered an fb name so log in to facebook
     // the fb status change will trigger checkCredentials and open the meeting
@@ -1026,7 +1017,6 @@ function onJoinNow(
     {
         $(document).trigger("one-login-complete", "OnJoinNow() -- non-FB-login");
     }
->>>>>>> origin/master
 } /* onJoinNow() */
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
@@ -1041,14 +1031,14 @@ function checkCredentials(
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
     app.log(2, "checkCredentials");
-    app.log(2, globalAuthResponse);
+    //app.log(2, globalAuthResponse);
 
     // check fb login status and prompt if not logged in
-    if (!globalAuthResponse)
+    if (!FB.getAuthResponse())
     {
        openWindow('#credentials');
     }
-    else // fb logged in todo update fb logged in status instead of tryPluginInstall
+    else // fb logged in update fb logged in status
     {
       $(document).trigger("one-login-complete", "checkCredentials - FB Login")
     }
@@ -1065,6 +1055,7 @@ function handleRoomSetup() {
 	var room_to_create = $.getUrlVar("roomname") || "";
 
 	room_to_create = room_to_create.replace(/ /g, '');
+    app.log(2, "room_to_create " + room_to_create);
 
 	Callcast.CreateUnlistedAndJoin(room_to_create, function(new_name) {
 		// We successfully created the room.
@@ -1076,6 +1067,13 @@ function handleRoomSetup() {
 		app.user.scheduleTitle = "Open room";
 
 		app.log(2, "Room named '" + new_name + "' has been created. Joining now.");
+		app.log(2, "window.location " + window.location);
+		if (room_to_create.length < 1)
+		{
+		   var newUrl = window.location + "?roomname=" + new_name
+   		   app.log(2, "replacing state " + newUrl);
+		   history.replaceState(null, null, newUrl);
+		}
 	});
 };
 
