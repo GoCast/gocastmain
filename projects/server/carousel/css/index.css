@@ -214,23 +214,35 @@ body > div#meeting > div#arrow4ctrls > img.open {
   border-radius: 5px;  
   margin: 5px 0px;
 }
-#boxes #credentials > p {
+#boxes #credentials > p.title {
   margin: 30px 10px 20px 10px;
 }
 #boxes #credentials > input#name {
+  width: 15em;
+  border-radius: 5px;
+  margin-left: 10px;
+}
+#boxes #credentials > input#email {
   width: 20em;
   border-radius: 5px;
   margin-left: 10px;
 }
-#boxes #credentials > input#btn {
-  margin: 10px 10px;
+#boxes #credentials div#fb-login-button {
+  width: 20em;
+  border-radius: 5px;
+  margin-left: 10px;
+  margin-bottom: 10px;
 }
 #boxes #credentials > p.error {
-  color: yellow;
+  color: red;
   font-weight: bold;
   font-size: 1.2em;
   text-shadow: 0 0 10px white, 0 0 20px white, 0 0 30px white, 0 0 40px #FF00DE, 0 0 70px #FF00DE, 0 0 80px #FF00DE, 0 0 100px #FF00DE, 0 0 150px #FF00DE;
   display: none;
+}
+#boxes #credentials > p.skip-text {
+  font-size: 1.0em;
+  float: right;
 }
 #boxes #chatInp {
   width: 600px;

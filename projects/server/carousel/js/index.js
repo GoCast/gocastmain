@@ -148,6 +148,14 @@ var app = {
     });
     return rtnFlag;
   }, /* app.pluginInstalled() */
+  loggedInAll: function()
+  {
+     return app.xmppLoggedIn && app.userLoggedIn;
+  },
+  // logged in state
+  xmppLoggedIn : false,
+  userLoggedIn : false,
+  //meetingOpened: false,
   /*
    * User Information. */
   user: {
@@ -1000,23 +1008,15 @@ function onJoinNow(
     
     // set app name from dialog text field
     app.user.name = encodeURI(usrNm);
+    Callcast.SetNickname(app.user.name); // TODO should be somewhere else
     app.log(2, "User name:" + usrNm);
     
     // close dialog
     deactivateWindow("#credentials");
 
-    // at this point if we have a facebook name we are not logged in to
-    // facebook and the user entered an fb name so log in to facebook
-    // the fb status change will trigger checkCredentials and open the meeting
-    if (fbNm.length >= 1) 
-    {
-       app.log(2, "FB login");
-       FB.login();
-    }
-    else // fb name was not set but nick name was so proceed
-    {
-        $(document).trigger("one-login-complete", "OnJoinNow() -- non-FB-login");
-    }
+    app.userLoggedIn = true;
+    $(document).trigger("one-login-complete", "OnJoinNow() -- non-FB-login");
+
 } /* onJoinNow() */
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
@@ -1040,6 +1040,7 @@ function checkCredentials(
     }
     else // fb logged in update fb logged in status
     {
+      app.userLoggedIn = true;
       $(document).trigger("one-login-complete", "checkCredentials - FB Login")
     }
 } /* checkCredentials() */

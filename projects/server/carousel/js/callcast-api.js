@@ -36,6 +36,8 @@ $(document).on('joined_session', function (
   $("#meeting > #streams > #scontrols > input").removeAttr('disabled');
   closeWindow();
   
+  //todo put openmeeting here to load plugin earlier
+  
   return false;
 }); /* joined_session() */
 
@@ -305,30 +307,36 @@ $(document).on('connected', function (
    * Open waiting room in case it takes too long to join. */
   openWindow("#waitingToJoin");
 
+  app.xmppLoggedIn = true;
+  
   $(document).trigger("one-login-complete", "XMPP GO.");		// One more login action complete.
   return false;
 }); /* connected() */
 
 $(document).on("one-login-complete", function(event, msg) {
-	if (!app.numLogins)
-	  app.numLogins = 0;
 
 	if (msg)
 		console.log("one-login-complete: Msg: " + msg);
 	else
 		console.log("one-login-complete: No Msg");
 	
-	app.numLogins++;
-
 	// Once we get facebook (or skip/set-nickname) + xmpp connected, then we're ready to go to the room.
-	if (app.numLogins === 2)
+	// getting reentrance...
+	/*
+	if (app.meetingOpened)
+	{
+	   console.log("meeting already loaded");
+	   return;
+	}
+	*/
+	if (app.loggedInAll())
 	{
 		console.log("one-login-complete: opening meeting");
 	    openMeeting();
 
-		tryPluginInstall();
-		
-		handleRoomSetup();
+        // check, install plugin
+        tryPluginInstall();
+
 	}
 
 });
@@ -548,6 +556,8 @@ function pluginLoaded(
     Callcast.setCallbackForAddCarouselContent(addContentToCarousel);
     Callcast.setCallbackForRemoveCarouselContent(removeContentFromCarousel);
     initializeLocalPlugin();
+					
+    handleRoomSetup();
   }, function(message) {
     /*
      * Failure to initialize. */
