@@ -398,10 +398,10 @@ mucRoom.prototype.printParticipants = function() {
 		if (parts !== "")
 			parts += ", ";
 
-		parts += k.name.replace(/\\20/g, ' ');
-		if (k.video === "on")
+		parts += k.replace(/\\20/g, ' ');
+		if (this.participants[k].video === "on")
 			parts += '(Video)';
-		else if (k.video === "off")
+		else if (this.participants[k].video === "off")
 			parts += '(No-Video)';
 	}
 
@@ -1189,6 +1189,9 @@ function overseer(user, pw, notifier) {
 	// we have a lot of potential listeners to an emitter. To avoid the warning about this...
 	this.client.setMaxListeners(0);
 
+	// Init MucroomObjectPool
+	MucroomObjectPool.init(this.client, this.notifier);
+
 	this.client.on('online', function() {
 		// Mark ourself as online so that we can receive messages from direct clients.
 		el = new xmpp.Element('presence');
@@ -1197,7 +1200,9 @@ function overseer(user, pw, notifier) {
 		// Need to join all rooms in 'rooms'
 		for (k in self.roomnames)
 		{
-			self.mucRoomObjects[k] = new mucRoom(self.client, self.notifier);
+			self.mucRoomObjects[k] = new mucRoom(self.client, self.notifier, false);
+			self.mucRoomObjects[k].finishInit();
+
 			self.mucRoomObjects[k].join( k + self.CONF_SERVICE, "overseer");
 		}
 
@@ -1260,8 +1265,6 @@ function overseer(user, pw, notifier) {
 		self.destroyRoom(roomname);
 	});
 
-	// Init MucroomObjectPool
-	MucroomObjectPool.init(this.client, this.notifier);
 };
 
 overseer.prototype.destroyRoom = function(roomname) {
