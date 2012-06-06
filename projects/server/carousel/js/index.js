@@ -162,7 +162,8 @@ var app = {
     name: null,
     scheduleName: null,
     scheduleJid: null,
-    scheduleTitle: null
+    scheduleTitle: null,
+    fbProfilePicUrl: null // cache the url since user may log out of fb
   }
 }; /* app */
 
@@ -447,6 +448,13 @@ function openMeeting(
    * Add encname attribute to mystream. */
   $("#meeting > #streams > #scarousel #mystream")
     .attr("encname", app.user.name);
+    
+  // use fb profile pick as bg image if it exists
+  if (app.user.fbProfilePicUrl)
+  {
+     $("#meeting > #streams > #scarousel #mystream")
+        .css("background-image", "url(" + app.user.fbProfilePicUrl + ")");
+  }
   /*
    * Deactivate window.*/
   //deactivateWindow("#credentials");
@@ -480,8 +488,18 @@ function openMeeting(
     app.log(2, "On before unload.");
     Callcast.LeaveSession();
   });
+  /*/
+  // test for leave session on page unload
+  window.onbeforeunload = function() {
+    app.log(2, "On before unload.");
+    //alert("beforeunload");
+    Callcast.LeaveSession();
+    //return("Are you sure you want to navigate away from this page");
+  };
+  */
   $(window).unload(function() {
     app.log(2, "On unload.");
+    //alert("unload");
     Callcast.disconnect();
   });
   /*
