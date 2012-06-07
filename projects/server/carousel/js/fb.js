@@ -59,7 +59,7 @@ function fbInit(
             FB.api('/me', function(me){
               if (me && me.name) {
                 //document.getElementById('auth-displayname').innerHTML = me.name;
-                app.user.name = me.name;
+                app.user.name = encodeURI(me.name);
                 app.user.fbProfilePicUrl = "https://graph.facebook.com/" + me.id + "/picture?type=large";
 			    Callcast.SetNickname(app.user.name); // TODO should be somewhere else
 
