@@ -148,14 +148,22 @@ var app = {
     });
     return rtnFlag;
   }, /* app.pluginInstalled() */
+  loggedInAll: function()
+  {
+     return app.xmppLoggedIn && app.userLoggedIn;
+  },
+  // logged in state
+  xmppLoggedIn : false,
+  userLoggedIn : false,
+  //meetingOpened: false,
   /*
    * User Information. */
   user: {
     name: null,
-    fbName: null,
     scheduleName: null,
     scheduleJid: null,
-    scheduleTitle: null
+    scheduleTitle: null,
+    fbProfilePicUrl: null // cache the url since user may log out of fb
   }
 }; /* app */
 
@@ -440,6 +448,13 @@ function openMeeting(
    * Add encname attribute to mystream. */
   $("#meeting > #streams > #scarousel #mystream")
     .attr("encname", app.user.name);
+    
+  // use fb profile pick as bg image if it exists
+  if (app.user.fbProfilePicUrl)
+  {
+     $("#meeting > #streams > #scarousel #mystream")
+        .css("background-image", "url(" + app.user.fbProfilePicUrl + ")");
+  }
   /*
    * Deactivate window.*/
   //deactivateWindow("#credentials");
@@ -473,8 +488,18 @@ function openMeeting(
     app.log(2, "On before unload.");
     Callcast.LeaveSession();
   });
+  /*/
+  // test for leave session on page unload
+  window.onbeforeunload = function() {
+    app.log(2, "On before unload.");
+    //alert("beforeunload");
+    Callcast.LeaveSession();
+    //return("Are you sure you want to navigate away from this page");
+  };
+  */
   $(window).unload(function() {
     app.log(2, "On unload.");
+    //alert("unload");
     Callcast.disconnect();
   });
   /*
@@ -988,19 +1013,12 @@ function onJoinNow(
 {
     app.log(2, "onJoinNow");
 
-    // todo move
-    app.user.scheduleName = "Paulas Tests";
-    app.user.scheduleJid = "paula@gocastconference.video.gocast.it";
-    app.user.scheduleTitle = "Open test room";
-    
-    var fbNm  = $("#credentials > input#fbname").val();
-
     // get the nick name, return back to dialog if not defined
     var usrNm = $("#credentials > input#name").val();
     
     // user must enter fb or nick name if both not entered
     // display error
-    if (usrNm.length < 1 && fbNm.length < 1) {
+    if (usrNm.length < 1) {
       $("#credentials > p.error").text("Please enter a name to continue.").
         fadeIn("fast");
       return false;
@@ -1008,25 +1026,15 @@ function onJoinNow(
     
     // set app name from dialog text field
     app.user.name = encodeURI(usrNm);
-    app.user.fbName = encodeURI(fbNm);
+    Callcast.SetNickname(app.user.name); // TODO should be somewhere else
     app.log(2, "User name:" + usrNm);
-    app.log(2, "FB name:" + fbNm);
     
     // close dialog
     deactivateWindow("#credentials");
 
-    // at this point if we have a facebook name we are not logged in to
-    // facebook and the user entered an fb name so log in to facebook
-    // the fb status change will trigger checkCredentials and open the meeting
-    if (fbNm.length >= 1) 
-    {
-       app.log(2, "FB login");
-       FB.login();
-    }
-    else // fb name was not set but nick name was so proceed
-    {
-        $(document).trigger("one-login-complete", "OnJoinNow() -- non-FB-login");
-    }
+    app.userLoggedIn = true;
+    $(document).trigger("one-login-complete", "OnJoinNow() -- non-FB-login");
+
 } /* onJoinNow() */
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
@@ -1041,15 +1049,16 @@ function checkCredentials(
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
     app.log(2, "checkCredentials");
-    app.log(2, globalAuthResponse);
+    //app.log(2, globalAuthResponse);
 
     // check fb login status and prompt if not logged in
-    if (!globalAuthResponse)
+    if (!FB.getAuthResponse())
     {
        openWindow('#credentials');
     }
-    else // fb logged in todo update fb logged in status instead of tryPluginInstall
+    else // fb logged in update fb logged in status
     {
+      app.userLoggedIn = true;
       $(document).trigger("one-login-complete", "checkCredentials - FB Login")
     }
 } /* checkCredentials() */
@@ -1065,6 +1074,7 @@ function handleRoomSetup() {
 	var room_to_create = $.getUrlVar("roomname") || "";
 
 	room_to_create = room_to_create.replace(/ /g, '');
+    app.log(2, "room_to_create " + room_to_create);
 
 	Callcast.CreateUnlistedAndJoin(room_to_create, function(new_name) {
 		// We successfully created the room.
@@ -1076,6 +1086,13 @@ function handleRoomSetup() {
 		app.user.scheduleTitle = "Open room";
 
 		app.log(2, "Room named '" + new_name + "' has been created. Joining now.");
+		app.log(2, "window.location " + window.location);
+		if (room_to_create.length < 1)
+		{
+		   var newUrl = window.location + "?roomname=" + new_name
+   		   app.log(2, "replacing state " + newUrl);
+		   history.replaceState(null, null, newUrl);
+		}
 	});
 };
 
