@@ -87,6 +87,8 @@ function mucRoom(client, notifier, bSelfDestruct, success, failure) {
 	this.client = client;
 	this.iqnum = 0;
 	this.notifier = notifier;
+	this.pendingDeletion = false;
+	
 	var self = this;
 	
 	// Max # users.
@@ -126,7 +128,7 @@ function mucRoom(client, notifier, bSelfDestruct, success, failure) {
 		else
 			self.log("ERROR: UNHANDLED Stanza: " + stanza.tree());
 	};
-
+	
 	if (!client)
 	{
 		alert("mucRoom() - No client specified.");
@@ -150,6 +152,7 @@ mucRoom.prototype.reset = function() {
 	this.options = {};
 	this.iq_callbacks = {};
 	this.iqnum = 0;
+	this.pendingDeletion = false;
 
 	this.client.removeListener('stanza', this.onstanza);
 };
@@ -172,9 +175,14 @@ mucRoom.prototype.getRoomConfiguration = function(cb) {
 		.c('query', {xmlns: 'http://jabber.org/protocol/muc#owner'});
 
 	this.log("Requesting room configuration... ");
+	// DEBUG
+	this.log(getRoomConf.tree());
+	
 	this.sendIQ(getRoomConf, function(resp) {
 		if (cb)
 			cb.call(self, resp);
+	}, function(resperr) {
+		self.log("ERROR: Failed in requesting room configuration. Response is: " + resperr);
 	});
 };
 
@@ -239,7 +247,11 @@ mucRoom.prototype.handlePresence = function(pres) {
 	//
 	if (pres.attrs.type !== 'unavailable')
 	{
-		this.log("Adding: " + fromjid + " as Nickname: " + fromnick);
+		if (!this.participants[fromnick])
+			this.log("Adding: " + fromjid + " as Nickname: " + fromnick);
+		else
+			this.log("Updated Presence: " + fromjid + " as Nickname: " + fromnick);
+			
 		this.participants[fromnick] = { name: fromjid || fromnick };
 		
 		if (pres.attrs.video)
@@ -249,6 +261,7 @@ mucRoom.prototype.handlePresence = function(pres) {
 		{
 			if(fromnick !== this.nick && this.presenceTimer)
 			{
+				this.log("Room not empty -- clearing presenceTimer.");
 				clearTimeout(this.presenceTimer);
 				this.presenceTimer = null;
 			}
@@ -267,13 +280,29 @@ mucRoom.prototype.handlePresence = function(pres) {
 			if(this.bSelfDestruct === true && 0 == size(this.participants)) {
 				this.log("OVERSEER: Room destroyed... not trying to rejoin");
 			} else {
-				this.log("We got kicked out...room destroyed? Or we disconnected??");
+				this.log("We got kicked out...room destroyed? Or we got disconnected??");
 				this.joined = false;
 				for (k in this.participants)
 					delete this.participants[k];
 
-				this.log("Re-joining (and re-creating?) room.");
-				this.rejoin(self.roomname, self.nick_original);
+				// Need to make sure that the self-destruct timer is cleared if it's ticking...
+				if (this.presenceTimer)
+				{
+					this.log("OVERSEER: presenceTimer being cleared prior to re-join.");
+					clearTimeout(this.presenceTimer);
+					this.presenceTimer = null;
+				}
+				
+				if (!this.pendingDeletion)
+				{
+					this.log("Re-joining (and re-creating?) room:" + self.roomname + " as:" + self.nick_original);
+					this.rejoin(self.roomname, self.nick_original);
+				}
+				else
+					this.log("Room [" + self.roomname + "] is pending deletion. Not re-joining.");
+				
+				// After calling for a rejoin or noting pending deletion, let's get out of this processing of presence.
+				return;
 			}
 		}
 		else
@@ -281,7 +310,7 @@ mucRoom.prototype.handlePresence = function(pres) {
 			if(this.bSelfDestruct === true)
 			{
 				if(1 === size(this.participants) && this.participants[this.nick]) {
-					this.log("OVERSEER: Everybody else has left room... wait 60 sec...");
+					this.log("OVERSEER: (A-timer) Everybody else has left room [" + this.roomname.split('@')[0] + "]... wait 60 sec...");
 
 					if (this.presenceTimer)
 					{
@@ -291,7 +320,7 @@ mucRoom.prototype.handlePresence = function(pres) {
 					}
 					
 					this.presenceTimer = setTimeout(function() {
-						self.log("OVERSEER: No one in room after 60 seconds :( ...");
+						self.log("OVERSEER: (A-timer) No one in room [" + self.roomname.split('@')[0] + "] after 60 seconds :( ...");
 						eventManager.emit('destroyroom', self.roomname.split('@')[0]);
 					}, 60000);
 				}
@@ -316,15 +345,22 @@ mucRoom.prototype.handlePresence = function(pres) {
 				{
 					if (this.presenceTimer)
 					{
-						this.log("OVERSEER: Clearing presenceTimer which was already set. New room entered.");
+						this.log("OVERSEER: (B-timer) Clearing presenceTimer which was already set. New room entered.");
 						clearTimeout(this.presenceTimer);
 						this.presenceTimer = null;
 					}
-						
-					this.presenceTimer = setTimeout(function() {
-						self.log("OVERSEER: New room entered - no entrants...No joined new room after 30 seconds :( ...");
-						eventManager.emit('destroyroom', self.roomname.split('@')[0]);
-					}, 30000);
+
+					if (0 === size(this.participants))
+					{
+						this.log("OVERSEER: (B-timer) Just joined room [" + this.roomname.split('@')[0] + "] - waiting for others...");
+	
+						this.presenceTimer = setTimeout(function() {
+							self.log("OVERSEER: (B-timer) New room [" + self.roomname.split('@')[0] + "] entered - no entrants...No joined new room after 30 seconds :( ...");
+							eventManager.emit('destroyroom', self.roomname.split('@')[0]);
+						}, 30000);
+					}
+					else
+						this.log("OVERSEER: (B-timer) - Someone already in the room. All good. Moving forward.");
 				}
 			}
 
@@ -623,11 +659,13 @@ mucRoom.prototype.setupRoom = function(form) {
 
 				if(self.bSelfDestruct === true)
 				{
+					self.log("OVERSEER: (C-timer) Room setup - not in room [" + self.roomname.split('@')[0] + "] yet. Should be soon. Waiting...");
+					
 					if (self.presenceTimer)
-						self.log("OVERSEER: ERROR: After init of room, presenceTimer should not already be set.");
+						self.log("OVERSEER: ERROR: (C-timer) After init of room, presenceTimer should not already be set.");
 						
 					self.presenceTimer = setTimeout(function() {
-						self.log("OVERSEER: After Init-Room - No one in room after 30 seconds :( ...");
+						self.log("OVERSEER: (C-timer) After Init-Room [" + self.roomname.split('@')[0] + "] - No one in room after 30 seconds :( ...");
 						eventManager.emit('destroyroom', self.roomname.split('@')[0]);
 					}, 30000);
 				}
@@ -1256,7 +1294,11 @@ function overseer(user, pw, notifier) {
 			process.exit(1);
 		}
 		else
+		{
 			sys.puts(e);
+			if (self.notifier)
+				self.notifier.sendMessage("OVERSEER: ERROR-EMIT-RECEIVED: " + e);
+		}
 	});
 
 	// Overseer events
@@ -1265,6 +1307,11 @@ function overseer(user, pw, notifier) {
 		self.destroyRoom(roomname);
 	});
 
+	eventManager.on('error', function(e) {
+		sys.puts(e);
+		if (self.notifier)
+			self.notifier.sendMessage("OVERSEER-eventManager: ERROR-EMIT-RECEIVED: " + e);
+	});
 };
 
 overseer.prototype.destroyRoom = function(roomname) {
@@ -1275,15 +1322,23 @@ overseer.prototype.destroyRoom = function(roomname) {
 								.c('query', {xmlns: 'http://jabber.org/protocol/muc#owner'})
 								.c('destroy');
 
+		this.mucRoomObjects[roomname].pendingDeletion = true;
+		
 		this.sendIQ(iqDestroyRoom.root(), function(iq) {
 			if('result' === iq.attrs.type) {
-				self.log("OVERSEER: Successfully deleted... removing mucRoomObject");
+				self.log("OVERSEER: Successfully deleted [" + roomname + "]... removing mucRoomObject");
+				
+				self.mucRoomObjects[roomname].pendingDeletion = false;
+				
 				MucroomObjectPool.put(self.mucRoomObjects[roomname]);
 				delete self.mucRoomObjects[roomname];
 			}
 		});
 	} else {
-		console.log("OVERSEER: Room [" + roomname + "] object not present");
+		console.log("OVERSEER: Room [" + roomname + "] object not present. No room destruction.");
+		console.log("OVERSEER: Dumping list of rooms in mucRoomObjects[]...");
+		for (k in self.mucRoomObjects)
+			console.log("  " + k);
 	}
 }
 
@@ -1480,17 +1535,26 @@ overseer.prototype.handleIq = function(iq) {
 			}
 			else		// Room already exists -- just let 'em know all is ok.
 			{
-				var iqResult = new xmpp.Element('iq', {to: iq.attrs.from, type: 'result', id: iq.attrs.id})
-								.c('ok', {xmlns: 'urn:xmpp:callcast'});
-				self.client.send(iqResult.root());
-
-				if(this.mucRoomObjects[roomname].bSelfDestruct === true &&
-				   1 == size(this.mucRoomObjects[roomname].participants))
+				if (this.mucRoomObjects[roomname].pendingDeletion)
 				{
-					this.mucRoomObjects[roomname].presenceTimer = setTimeout(function() {
-						self.log("OVERSEER: Pre-existing room - No one in room after 60 seconds :( ...");
-						eventManager.emit('destroyRoom', roomname);
-					}, 60000);
+					var iqResult = new xmpp.Element('iq', {to: iq.attrs.from, type: 'error', id: iq.attrs.id})
+									.c('pendingdeletion', {xmlns: 'urn:xmpp:callcast'});
+					self.client.send(iqResult.root());
+				}
+				else
+				{
+					var iqResult = new xmpp.Element('iq', {to: iq.attrs.from, type: 'result', id: iq.attrs.id})
+									.c('ok', {xmlns: 'urn:xmpp:callcast'});
+					self.client.send(iqResult.root());
+	
+					if(this.mucRoomObjects[roomname].bSelfDestruct === true &&
+					   1 == size(this.mucRoomObjects[roomname].participants))
+					{
+						this.mucRoomObjects[roomname].presenceTimer = setTimeout(function() {
+							self.log("OVERSEER: Pre-existing room - No one in room after 60 seconds :( ...");
+							eventManager.emit('destroyRoom', roomname);
+						}, 60000);
+					}
 				}
 			}
 		}

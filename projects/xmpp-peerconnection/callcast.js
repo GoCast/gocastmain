@@ -719,10 +719,35 @@ var Callcast = {
     },
 
     SendSyncLink: function(txt) {
-    	var sync = $msg({to: this.room, type: 'groupchat', xmlns: Callcast.NS_CALLCAST}).c('body').t(txt);
+    	var sync = $msg({to: this.room, type: 'groupchat', cmd: 'synclink', xmlns: Callcast.NS_CALLCAST}).c('body').t(txt);
     	this.connection.send(sync);
     },
 
+	SendSpotInfo: function(info) {
+		var spotinfo = $msg({to: this.room, type: 'groupchat', cmd: 'spotinfo', xmlns: Callcast.NS_CALLCAST,
+			id: info.id, image: info.image, altText: info.altText, url: info.url}).c('body').t("spot info");
+
+      	this.connection.send(spotinfo);
+	},
+	
+	on_callcast_groupchat_command: function(message) {
+		var cmdtype = $(message).attr('cmd');
+		
+		if (cmdtype === 'synclink')
+			on_sync_link(message);
+		else if (cmdtype === 'spotinfo')
+			on_spot_info(message);
+	},
+	
+	on_spot_info: function(message) {
+		var info = { id: $(message).attr('id'), image: $(message).attr('image'),
+					altText: $(message).attr('altText'), url: $(message).attr('url') };
+		
+		this.log("Received spot info from: " + $(message).attr('from').split('/')[1]);
+		
+		this.setCarouselContent(info);
+	},
+	
     on_sync_link: function(message) {
         var from = $(message).attr('from');
         var room = Strophe.getBareJidFromJid(from);
@@ -1193,6 +1218,26 @@ var Callcast = {
 		$(document).trigger('disconnected');
     },
 
+	conn_callback: function(status) {
+		 if (status === Strophe.Status.CONNECTED) {
+			 console.log("Finalizing connection and then triggering connected...");
+			 Callcast.finalizeConnect();
+			 $(document).trigger('connected');
+		 } else if (status === Strophe.Status.ATTACHED) {
+			 console.log("Re-Attach of connection successful. Triggering re-attached...");
+			 $(document).trigger('re-attached');
+		 } else if (status === Strophe.Status.DISCONNECTED) {
+			 Callcast.disconnect();
+			 $(document).trigger('disconnected');
+		} else if (status === Strophe.Status.AUTHFAIL) {
+			 Callcast.disconnect();
+			 $(document).trigger('disconnected');
+			 alert("Authentication failed. Bad password or username.");
+		 }
+		 else
+			console.log("Strophe connection callback - unhandled status = " + status);
+	},
+	
     ///
     /// connect using this JID and password -- and optionally use this URL for the BOSH connection.
     ///
@@ -1207,21 +1252,21 @@ var Callcast = {
     	this.connection = new Strophe.Connection(boshconn);
     	this.connection.reset();
 
-    	this.connection.connect(id, pw, function (status) {
-	         if (status === Strophe.Status.CONNECTED) {
-	         	 console.log("Finalizing connection and then triggering connected...");
-	        	 Callcast.finalizeConnect();
-	             $(document).trigger('connected');
-	         } else if (status === Strophe.Status.DISCONNECTED) {
-	        	 Callcast.disconnect();
-	             $(document).trigger('disconnected');
-	        } else if (status === Strophe.Status.AUTHFAIL) {
-	        	 Callcast.disconnect();
-	             $(document).trigger('disconnected');
-	             alert("Authentication failed. Bad password or username.");
-	         }
-    	 });
+    	this.connection.connect(id, pw, this.conn_callback);
+    },
+    
+    reattach: function(jid, sid, rid, cb, url) {
+    	var boshconn = "/xmpp-httpbind";
+    	if (url)
+    		boshconn = url;
 
+    	if (this.connection)
+	    	delete this.connection;
+	    
+	    this.connection = new Strophe.Connection(boshconn);
+
+	 	console.log("Re-attaching -- jid="+jid+", sid="+sid+", rid="+rid);
+	 	conn2.attach(jid, sid, rid, this.conn_callback);
     },
 
     finalizeConnect: function() {
