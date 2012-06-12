@@ -140,7 +140,11 @@ mucRoom.prototype.reset = function() {
 	this.bNewRoom = false;
 	this.successCallback = null;
 	this.failureCallback = null;
-	this.presenceTimer = null;
+	if (this.presenceTimer)
+	{
+		clearTimeout(this.presenceTimer);
+		this.presenceTimer = null;
+	}
 
 	this.isOwner = false;	// Assume we're not the owner yet until we're told so.
 	this.roomname = "";
