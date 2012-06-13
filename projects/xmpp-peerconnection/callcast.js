@@ -1007,13 +1007,13 @@ var Callcast = {
                         	Callcast.participants[nick].InitiateCall();
                     }
 
-					// If info blob is embedded in presence, then capture it.
-					if ($(presence).children('info'))
-						Callcast.participants[nick].info = $(presence).children('info');
-						
 					// Check to see if video-on/off is specified.
 					if (nick !== Callcast.nick)
 					{
+						// If info blob is embedded in presence, then capture it.
+						if ($(presence).children('info'))
+							Callcast.participants[nick].info = $(presence).children('info');
+							
 						if ($(presence).attr('video'))
 						{
 							Callcast.participants[nick].videoOn = $(presence).attr('video')==='on';
