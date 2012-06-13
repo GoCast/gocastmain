@@ -98,6 +98,7 @@ var Callcast = {
     WIDTH: 256,
     HEIGHT: 192,
     overseer: null,
+    presenceBlob: null,
 
     CallStates: {
     	NONE: 0,
@@ -369,21 +370,36 @@ var Callcast = {
 			// We only want to send a presence update when the video status changes
 			// **OR** this is the first time to ever be online/joined.
 			// The problem of first-time-online/joined is handled by the Presence handler.
-			// It calls SendVideoPresence() upon joining.
+			// It calls SendMyPresence() upon joining.
 			// So we only need to worry about video on/off change.
 			if (this.joined && (this.bUseVideo !== old_bUseVideo))
-				this.SendVideoPresence();
+				this.SendMyPresence();
 		}
 	},
 
-	SendVideoPresence: function() {
+	// 
+	// This JSON argument will be sent as part of presence information in SendMyPresence()
+	//   <presence ...><x xmlns.../><info obj/></presence>
+	//
+	// obj is expected to be a JSON object.
+	//
+	setPresenceBlob: function(obj) {
+		this.presenceBlob = obj;
+	},
+	
+	SendMyPresence: function() {
 		var pres;
-		if (this.bUseVideo==true)
+		if (this.bUseVideo===true)
 			pres = $pres({to: this.roomjid + "/" + this.NoSpaces(this.nick), video: 'on'}).c('x',{xmlns: 'http://jabber.org/protocol/muc'});
-		else
+		else if (this.bUseVideo === false)
 			pres = $pres({to: this.roomjid + "/" + this.NoSpaces(this.nick), video: 'off'}).c('x',{xmlns: 'http://jabber.org/protocol/muc'});
+		else 
+			pres = $pres({to: this.roomjid + "/" + this.NoSpaces(this.nick)}).c('x',{xmlns: 'http://jabber.org/protocol/muc'});
 
-		console.log("SendVideoPresence: ", pres.toString());
+		if (this.presenceBlob)
+			pres.up().c('info', this.presenceBlob);
+			
+		console.log("SendMyPresence: ", pres.toString());
 		this.connection.send(pres);
 	},
 
@@ -455,7 +471,7 @@ var Callcast = {
     		this.peer_connection = Callcast.Callback_AddPlugin(nickname);
 
 			if (!this.peer_connection)
-				alert("Gocast Player object not found in DOM. Plugin problem?");
+				alert("Gocast Remote Player object for name:'" + nickname + "' not found in DOM. Plugin problem?");
     	}
     	else
     		alert("ERROR: Callcast.setCallbackForAddPlugin() has not been called yet.");
@@ -719,33 +735,82 @@ var Callcast = {
     },
 
     SendSyncLink: function(txt) {
-    	var sync = $msg({to: this.room, type: 'groupchat', cmd: 'synclink', xmlns: Callcast.NS_CALLCAST}).c('body').t(txt);
+    	var sync = $msg({to: this.room, type: 'groupchat', xmlns: Callcast.NS_CALLCAST}).c('body').t('.')
+    				.up().c('cmd', { cmdtype: 'synclink', xmlns: Callcast.NS_CALLCAST, link: txt });
     	this.connection.send(sync);
     },
 
 	SendSpotInfo: function(info) {
-		var spotinfo = $msg({to: this.room, type: 'groupchat', cmd: 'spotinfo', xmlns: Callcast.NS_CALLCAST,
-			id: info.id, image: info.image, altText: info.altText, url: info.url}).c('body').t("spot info");
+		var spotinfo = $msg({to: this.room, type: 'groupchat', xmlns: Callcast.NS_CALLCAST})
+			.c('cmd', { cmdtype: 'spotinfo', id: info.id, image: info.image, altText: info.altText, url: info.url, xmlns: Callcast.NS_CALLCAST});
 
+		console.log("SendSpotInfo: ", spotinfo.toString());
+		
       	this.connection.send(spotinfo);
 	},
 	
+	//
+	// Send to all other users a URL, altText, and ID. They should take that information
+	// and render the URL to an image and use that image as the display image for that carousel spot.
+	//
+	SendURLToRender: function(info) {
+		var urlRenderInfo = $msg({to: this.room, type: 'groupchat', xmlns: Callcast.NS_CALLCAST})
+			.c('cmd', { cmdtype: 'urlrenderinfo', id: info.id, altText: info.altText, url: info.url, xmlns: Callcast.NS_CALLCAST});
+
+		console.log("SendURLToRender: ", urlRenderInfo.toString());
+		
+      	this.connection.send(urlRenderInfo);
+	},
+	
 	on_callcast_groupchat_command: function(message) {
-		var cmdtype = $(message).attr('cmd');
+		var cmd = $(message).children('cmd');
+		var cmdtype = null;
+		
+		console.log("Groupchat command received: ", message);
+		
+		if (cmd)
+			cmdtype = $(cmd).attr('cmdtype');
+		else
+			console.log("on_callcast_groupchat_command -- malformed/unknown stanza: ", $(message));
 		
 		if (cmdtype === 'synclink')
-			on_sync_link(message);
+			return Callcast.on_sync_link(message);
 		else if (cmdtype === 'spotinfo')
-			on_spot_info(message);
+			return Callcast.on_spot_info(message);
+		else if (cmdtype === 'urlrenderinfo')
+			return Callcast.on_url_render(message);
+			
+		return true;
+	},
+	
+	on_url_render: function(message) {
+		var cmd = $(message).children('cmd');
+		var info = {};
+		
+		if (cmd)
+			info = { id: $(cmd).attr('id'),	altText: $(cmd).attr('altText'), url: $(cmd).attr('url') };
+		
+		this.log("Received URL to render from: " + $(message).attr('from').split('/')[1]);
+		
+		//TODO:RMW - How to render locally?
+//		this.setCarouselContent(info);
+		
+		return true;
 	},
 	
 	on_spot_info: function(message) {
-		var info = { id: $(message).attr('id'), image: $(message).attr('image'),
-					altText: $(message).attr('altText'), url: $(message).attr('url') };
+		var cmd = $(message).children('cmd');
+		var info = {};
+		
+		if (cmd)
+			info = { id: $(cmd).attr('id'), image: $(cmd).attr('image'),
+					altText: $(cmd).attr('altText'), url: $(cmd).attr('url') };
 		
 		this.log("Received spot info from: " + $(message).attr('from').split('/')[1]);
 		
 		this.setCarouselContent(info);
+		
+		return true;
 	},
 	
     on_sync_link: function(message) {
@@ -766,7 +831,7 @@ var Callcast = {
 			if (nick == Callcast.nick)
 				return true;
 
-			$(document).trigger('synclink', $(message).children('body').text());
+			$(document).trigger('synclink', $(message).children('cmd').attr('link'));
 		}
 
 		return true;
@@ -819,7 +884,10 @@ var Callcast = {
 
 			var msginfo = { nick: nick, nick_class: nick_class, body: body, delayed: delayed, notice: notice };
 
-			$(document).trigger('public-message', msginfo);
+			// Don't send out an update for a non-existent body message.
+			// This is what will happen when a signaling/spotinfo message comes in.
+			if (body)
+				$(document).trigger('public-message', msginfo);
 
         }
 
@@ -862,7 +930,7 @@ var Callcast = {
 			if ($(presence).attr('usertype')==='silent')	// Overseer/serverBot
 			{
 				// Let's grab the name of the overseer for future reference...
-				this.overseer = from;
+				Callcast.overseer = from;
 				return true;
 			}
 
@@ -886,13 +954,19 @@ var Callcast = {
 						Callcast.participants[nick].videoOn = null;
 
 					// Update the presence information.
-					var info = {nick: nick, hasVid: Callcast.participants[nick].videoOn};
+					var info = $(presence).children('info') | {};
+					info.nick = nick;
+					info.hasVid = Callcast.participants[nick].videoOn;
+					
 					$(document).trigger('user_updated', info);
 				}
 				else if (nick == Callcast.nick && $(presence).attr('video'))
 				{
 					// Update the presence information.
-					var info = {nick: nick, hasVid: Callcast.bUseVideo};
+					var info = $(presence).children('info') | {};
+					info.nick = nick;
+					info.hasVid = Callcast.bUseVideo;
+					
 					$(document).trigger('user_updated', info);
 				}
 
@@ -933,6 +1007,10 @@ var Callcast = {
                         	Callcast.participants[nick].InitiateCall();
                     }
 
+					// If info blob is embedded in presence, then capture it.
+					if ($(presence).children('info'))
+						Callcast.participants[nick].info = $(presence).children('info');
+						
 					// Check to see if video-on/off is specified.
 					if (nick !== Callcast.nick)
 					{
@@ -952,7 +1030,8 @@ var Callcast = {
                     //
                     if (!Callcast.joined || (nick !== Callcast.nick))
                     {
-                    	var info = {nick: nick};
+						var info = $(presence).children('info') | {};
+                    	info.nick = nick;
 
                     	if (nick !== Callcast.nick)
                     		info.hasVid = Callcast.participants[nick].videoOn;
@@ -968,7 +1047,7 @@ var Callcast = {
                     if (!Callcast.joined && nick === Callcast.nick)
                     {
                 		Callcast.joined = true;
-                		Callcast.SendVideoPresence();
+                		Callcast.SendMyPresence();
                         $(Callcast).trigger('my_join_complete', nick);
                     }
 
@@ -1280,14 +1359,14 @@ var Callcast = {
 		// handle all INVITATIONS to join a session which are sent directly to the jid and not within the MUC
     	this.connection.addHandler(Callcast.CallMsgHandler, Callcast.NS_CALLCAST, "message", "chat");
 
+		// handle all SYNC_LINKS and custom commands within the MUC
+    	this.connection.addHandler(Callcast.on_callcast_groupchat_command, Callcast.NS_CALLCAST, "message", "groupchat");
+
 		// handle all GROUP CHATS within the MUC
     	this.connection.addHandler(Callcast.on_public_message, null, "message", "groupchat");
 
 		// handle all PRIVATE CHATS within the MUC
     	this.connection.addHandler(Callcast.on_private_message, null, "message", "chat");
-
-		// handle all SYNC_LINKS within the MUC
-    	this.connection.addHandler(Callcast.on_sync_link, Callcast.NS_CALLCAST, "message", "groupchat");
 
 	    // handle any inbound error stanzas (for now) via an alert message.
     	this.connection.addHandler(Callcast.onErrorStanza, null, null, 'error');
