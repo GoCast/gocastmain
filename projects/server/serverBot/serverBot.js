@@ -1683,6 +1683,10 @@ function notifier(serverinfo, jidlist) {
 		  	console.log(logDate() + " - Notifier offline.");
 		  	self.isOnline = false;
 		  });
+	this.client.on('error', function(e) {
+		sys.puts("NOTIFIER ERROR:");
+		sys.puts(e);
+	});
 
 };
 
