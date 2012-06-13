@@ -31,9 +31,7 @@ $(document).on('joined_session', function (
   app.log(2, "User has successfully joined the session.");
   /*
    * Enable button activities except join. */
-  $("#meeting > #streams > #scarousel #mystream > #myctrls > input#video").removeAttr('disabled');
-  $("#meeting > #streams > #scarousel #mystream > #myctrls > input#audio").removeAttr('disabled');
-  $("#meeting > #streams > #scontrols > input").removeAttr('disabled');
+  app.enableButtons(true);
   closeWindow();
   
   //todo put openmeeting here to load plugin earlier
@@ -68,11 +66,7 @@ $(document).on('left_session', function (
   });
   /*
    * Disable button activities except join. */
-  $("#meeting > #streams > #scarousel #mystream > #myctrls > input#video")
-    .attr('disabled', 'disabled');
-  $("#meeting > #streams > #scarousel #mystream > #myctrls > input#audio")
-    .attr('disabled', 'disabled');
-  $("#meeting > #streams > #scontrols > input").attr('disabled', 'disabled');
+  app.enableButtons(false);
   return false;
 }); /* left_session() */
 
@@ -138,7 +132,8 @@ $(document).on('public-message', function (
 
   /*
    * Add message to Message Board. */
-  var jqMBspan = $("#meeting > #msgBoard > span");
+  //var jqMBspan = $("#meeting > #msgBoard > span");
+  var jqMBspan = $("#msgBoard > span");
   jqMBspan.prepend("<span></span>");
   if ($("span", jqMBspan).length > 3) {
     $("span:last-child", jqMBspan).remove();
@@ -204,7 +199,7 @@ $(document).on('user_joined', function (
     }
   }
   Callcast.ShowRemoteVideo(info);
-  app.log(2, "A new user joined.");
+  app.log(2, "A new user " + info.nick + " joined.");
 }); /* user_joined() */
 
 
@@ -303,6 +298,28 @@ $(document).on('connected', function (
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
   app.log(2, "User is connected.");
+
+  /* debug
+// Inside $(document).bind('connected'), function() { ....
+
+Callcast.connection.xmlInput = function(data) {
+                if ($(data).children()[0])
+                        console.log("XML-IN:", $(data).children()[0]);
+                else
+                        console.log("XML-IN:", $(data));
+
+        };
+
+Callcast.connection.xmlOutput = function(data) {
+                if ($(data).children()[0])
+                        console.log("XML-OUT:", $(data).children()[0]);
+                else
+                        console.log("XML-OUT:", $(data));
+
+        };
+        
+   */
+   
   /*
    * Open waiting room in case it takes too long to join. */
   openWindow("#waitingToJoin");
@@ -481,7 +498,29 @@ function addContentToCarousel(
 )
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
+  app.log(2, "addContentToCarousel " + info.id);
+  
+  // info.id is an encoded name, get an id from it to use to index 
+  // into carousel items
   var id = app.str2id(info.id);
+  
+  /*
+  // find the remote user by id
+  var jqOo = $('#meeting > #streams > #scarousel div.cloudcarousel#' + id + '"');
+  if (jqOo)
+  {
+    app.log(2, "Found remote user " + info.id + " setting spot info ");
+    $(jqOo).attr("id", id);
+    $(jqOo).attr("title", info.altText);
+    $(jqOo).attr("alt", info.altText);
+    $(jqOo).attr("url", info.url);
+    $(jqOo).attr("encname", info.id);
+    $(jqOo).css("background-image", info.image);
+  }
+  else
+  */
+  {  
+  // remote user not found this must be demo content
   /*
    * Check next available cloudcarousel. */
   var oo = $("#meeting > #streams > #scarousel div.unoccupied").get(0);
@@ -498,6 +537,7 @@ function addContentToCarousel(
   }
   else {
     app.log(4, "Maximum number of participants reached.");
+  }
   }
 } /* addContentToCarousel() */
 

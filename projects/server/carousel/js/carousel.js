@@ -190,7 +190,7 @@
             w = item.plgOrgWidth * scale;
             h = item.plgOrgHeight * scale;
             if ($(obj).attr("id").match("mystream")) {
-              if ($('#myctrls > input#video', obj).hasClass("on")) {
+              if (!app.videoEnabled) {
 //                app.log(2, "Nothing to do with resizing video.");
               }
               else {

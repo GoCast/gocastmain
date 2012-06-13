@@ -155,7 +155,6 @@ var app = {
   // logged in state
   xmppLoggedIn : false,
   userLoggedIn : false,
-  //meetingOpened: false,
   /*
    * User Information. */
   user: {
@@ -163,8 +162,28 @@ var app = {
     scheduleName: null,
     scheduleJid: null,
     scheduleTitle: null,
+    fbProfileUrl: null, // cache the url since user may log out of fb
     fbProfilePicUrl: null // cache the url since user may log out of fb
-  }
+  },
+  // enable the audio video mute buttons, global chat input
+  enableButtons: function(enable)
+  {
+     if (enable)
+     {
+        //$("#meeting > #streams > #scontrols > input#video").removeAttr('disabled');
+        //$("#meeting > #streams > #scontrols > input#audio").removeAttr('disabled');
+        $("#meeting > #streams > #scontrols > input").removeAttr('disabled');
+        $("#msgBoard > input").removeAttr('disabled');
+     }
+     else
+     {
+        //$("#meeting > #streams > #scontrols > input#video").attr('disabled','disabled');
+        //$("#meeting > #streams > #scontrols > input#audio").attr('disabled','disabled');
+        $("#meeting > #streams > #scontrols > input").attr('disabled', 'disabled');
+        $("#msgBoard > input").attr('disabled','disabled');
+     } 
+  },
+  videoEnabled : false // video enabled state
 }; /* app */
 
 
@@ -261,7 +280,33 @@ function openPersonalChat(
   return false;
 } /* openPersonalChat() */
 
-
+/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+/**
+ * \brief handle left mouse clock for carousel items.
+ */
+function carouselItemClick(
+/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+    /**
+     * The event object. */
+  event
+)
+/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+{
+   app.log(2, "carouselItemClick " + event);
+   if (event.currentTarget.className === "cloudcarousel unoccupied")
+   {
+      //var urlName = prompt("Enter a URL");
+      //app.log(2, "carouselItemClick got url " + urlName);
+   }
+   else if (event.currentTarget.title === "Me")
+   {
+   }
+   else // remote user
+   {
+      openChat(event);
+   }
+   
+} // carouselItemClick
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
@@ -465,7 +510,8 @@ function openMeeting(
   /*
    * Set #meeting height and width to fill the whole screen. */
   var jqWin = $('#meeting');
-  jqWin.css({'width':winW,'height':winH});
+  //todo finish resize carousel
+  //jqWin.css({'width':winW,'height':winH});
   /*
    * Initialize carousel. */
   var rX = winW * 0.44; /* 50% of 88% */
@@ -628,7 +674,51 @@ function sendChat(
   closeWindow();
 } /* sendChat() */
 
-
+/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+/**
+ * \brief Action send public chat.
+ */
+function sendPublicChat(
+/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+    /**
+     * The event object. */
+  event
+)
+/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+{
+  if (event) {
+    event.preventDefault();
+  }
+  /*
+  var jqChatText = $('#chatInp > input.chatTo');
+  var ltext = jqChatText.val();
+  if (ltext.length < 1) {
+    return false;
+  }
+  var jqChatSpan = $('#chatInp > span');
+  var id = jqChatSpan.attr("id");
+  if (id.length < 1) {
+    app.log(4, "Error in chat, no id.");
+  }
+  else {
+    if (id.match("group")) {
+      Callcast.SendPublicChat(encodeURI(ltext));
+    }
+    else if (id.match("feedback")) {
+      Callcast.SendFeedback(encodeURI(ltext));
+    }
+    else {
+      var ename = jqChatSpan.attr("ename");
+      Callcast.SendPrivateChat(encodeURI(ltext), ename);
+    }
+    app.log(2, "Sending chat to " + id);
+    jqChatSpan.removeAttr("id");
+    jqChatSpan.removeAttr("ename");
+  }
+  jqChatText.val('');
+  closeWindow();
+  */
+} /* sendChat() */
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
@@ -677,7 +767,8 @@ function sendGrpChat(
   if (event) {
     event.preventDefault();
   }
-  var jqChatText = $('#boxes #controls > input.chatTo');
+  //var jqChatText = $('#boxes #controls > input.chatTo');
+  var jqChatText = $('#msgBoard > input.chatTo');
   var ltext = jqChatText.val();
   if (ltext.length < 1) {
     return false;
@@ -746,20 +837,23 @@ function changeVideo(
 )
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
-  var bVideo = $(this).hasClass("on");
-  if (bVideo) {
-    /*
-     * Check object dimensions. */
-    var jqOo = $(this).parents('#mystream');
+  app.videoEnabled = $(this).hasClass("on");
+  //todo why do we send size of local video carousel item?
+  //SendLocalVidoe... takes a boolean arg
+  if (app.videoEnabled) {
+    // Check object dimensions.
+    //var jqOo = $(this).parents('#mystream');
+    var jqOo = $('#mystream');
     var w = jqOo.width() - 4;
     var h = Callcast.HEIGHT * (w / Callcast.WIDTH);
     Callcast.SendLocalVideoToPeers(new Object({width:w, height:h}));
   }
   else {
-    Callcast.SendLocalVideoToPeers(bVideo);
+    Callcast.SendLocalVideoToPeers(app.videoEnabled);
   }
+  Callcast.SendLocalVideoToPeers(app.videoEnabled);
   $(this).toggleClass("on");
-  if (bVideo) {
+  if (app.videoEnabled) {
     app.log(2, "Video turned on.");
     $(this).attr("title", "Disable video");
   }
@@ -820,18 +914,19 @@ function activateWindow(
     $("input#btn", winId).on("click.s04072012", onJoinNow);
   }
   else if (winId.match("meeting")) {
-    $('#streams > #scarousel #mystream > #myctrls > #video', winId)
+    $('#streams > #scontrols > #video', winId)
       .on("click.s04172012a", changeVideo);
-    $('#streams > #scarousel #mystream > #myctrls > #audio', winId)
+    $('#streams > #scontrols > #audio', winId)
       .on("click.s04172012b", changeAudio);
 
-    $('#streams > #scarousel div.cloudcarousel:not("#mystream")', winId)
-      .on("click.s04172012f", openChat);
+    //$('#streams > #scarousel div.cloudcarousel:not("#mystream")', winId)
+    //  .on("click.s04172012f", openChat);
   }
   else if (winId.match("chatInp")) {
     $('input.chatTo', winId).on("keydown.s04172012g", keypressChatHandler);
     $('input.send', winId).on("click.s04172012g", sendChat);
   }
+  /*
   else if (winId.match("controls")) {
     $('input.chatTo', winId).on("keydown.s05222012", keypressGrpChatHandler);
     $('input.send', winId).on("click.s05222012", sendGrpChat);
@@ -839,6 +934,7 @@ function activateWindow(
     $('input.twitter', winId).on("click.s05222012b", sendTwitter);
     $('input.feedback', winId).on("click.s04212012e", openChat);
   }
+  */
   return false;
 } /* activateWindow() */
 
@@ -867,13 +963,13 @@ function deactivateWindow(
     $("input#btn", winId).off("click.s04072012", onJoinNow);
   }
   else if (winId.match("meeting")) {
-    $('#streams > #scarousel #mystream > #myctrls > #video', winId)
+    $('#streams > #scontrols > #video', winId)
       .off("click.s04172012a", changeVideo);
-    $('#streams > #scarousel #mystream > #myctrls > #audio', winId)
+    $('#streams > #scontrols > #audio', winId)
       .off("click.s04172012b", changeAudio);
 
-    $('#streams > #scarousel div.cloudcarousel:not("#mystream")', winId)
-      .off("click.s04172012f", openChat);
+    //$('#streams > #scarousel div.cloudcarousel:not("#mystream")', winId)
+    //  .off("click.s04172012f", openChat);
   }
   else if (winId.match("chatInp")) {
     $('input.chatTo', winId).off("keydown.s04172012g", keypressChatHandler);
@@ -1039,6 +1135,32 @@ function onJoinNow(
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
+ * \brief send carousel info, name, picture, url
+ */
+function sendSpotInfo(
+/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+    /**
+     * No argument. */
+)
+/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+{
+      app.log(2, "sendSpotInfo fb pic " + app.user.fbProfilePicUrl);
+      // send the url to my fb image for display on my remote user spot
+      // when my video is off
+      if (app.user.fbProfilePicUrl)
+      {
+         app.log(2, "sendSpotInfo sending");
+         var info = new Object();
+         info.id = app.user.name;
+         info.image = app.user.fbProfilePicUrl;
+         info.url = app.user.fbProfileUrl; //profile url
+         info.altText = decodeURI(app.user.name);
+         Callcast.SendSpotInfo(info);
+      }
+}
+
+/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+/**
  * \brief check login credential and display login dialog if necessary.
  */
 function checkCredentials(
@@ -1059,7 +1181,7 @@ function checkCredentials(
     else // fb logged in update fb logged in status
     {
       app.userLoggedIn = true;
-      $(document).trigger("one-login-complete", "checkCredentials - FB Login")
+      $(document).trigger("one-login-complete", "checkCredentials - FB Login");
     }
 } /* checkCredentials() */
 
@@ -1093,6 +1215,7 @@ function handleRoomSetup() {
    		   app.log(2, "replacing state " + newUrl);
 		   history.replaceState(null, null, newUrl);
 		}
+		//sendSpotInfo();
 	});
 };
 

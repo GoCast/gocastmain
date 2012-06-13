@@ -29,7 +29,98 @@ body input[type="button"] {
   border: 0px;
   background-color: transparent;
 }
-body > div#meeting {
+body > div#upper-left
+{
+   position: absolute;
+   top: 0px;
+   left: 0px;
+   margin-top: 10px;
+   margin-left: 10px;
+   z-index: 1000;
+}
+body > div#upper-right
+{
+   float:right;
+   margin-top: 10px;
+   margin-right: 10px;
+   width:50%;
+   z-index: 1000;
+   line-height: 2em;
+}
+body > div#upper-right > input.help
+{
+   float:right;
+   margin-right: 10px;
+   width:3em;
+   height:3em;
+   vertical-align: middle;
+   background-image: url("../images/btn-help.png");
+   background-repeat: no-repeat;
+   z-index: 1000;
+}
+body > div#upper-right > A.logout
+{
+   float:right;
+   margin-right: 10px;
+   margin-top: auto;
+   margin-left: auto;
+   vertical-align: middle;
+}
+body > div#lower-right
+{
+   float:right;
+   position:absolute;
+   bottom:32px;
+   right:32px;
+   margin-top: 10px;
+   margin-right: 10px;
+   width:50%;
+   z-index: 1000;
+   line-height: 2em;
+}
+body > div#lower-right > input.feedback {
+  float:right;
+  margin-left: 15px;
+  background-image: url("../images/btn-feedback.png");
+  width: 24px;
+  height: 24px;
+}
+body > div#lower-right > input.facebook {
+  float:right;
+  margin-left: 15px;
+  background-image: url("../images/btn-fb.png");
+  width: 24px;
+  height: 24px;
+}
+body > div#lower-right > input.twitter {
+  float:right;
+  background-image: url("../images/btn-twitter.png");
+  width: 24px;
+  height: 24px;
+}
+body > div#lower-right > input.demobtn {
+  float:right;
+  margin-left: 5px;
+  background-image: url("../images/demo.png");
+  width: 24px;
+  height: 24px;
+}
+body > div#msgBoard {
+  position: absolute;
+  z-index: 1000;
+  bottom: 32px;
+  left: 0px;
+  width: 50%;
+  margin: 0px 10px 0px;
+  line-height: 2em;
+}
+body > div#msgBoard > input.send {
+  background-image: url("../images/btn-send.png");
+  width: 50px;
+  height: 22px;
+}
+body > div#meeting 
+{
   display: none;
   position: absolute;
   top: 0px;
@@ -97,6 +188,7 @@ body > div#meeting > div#streams > div#scarousel div#mystream > div#myctrls > in
   background-repeat: no-repeat;
   margin-right: 5px;
 }
+/*
 body > div#meeting > div#streams > div#scarousel div#mystream > div#myctrls > input#video {
   background-image: url("../images/video-off.png");
 }
@@ -109,9 +201,10 @@ body > div#meeting > div#streams > div#scarousel div#mystream > div#myctrls > in
 body > div#meeting > div#streams > div#scarousel div#mystream > div#myctrls > input#audio {
   background-image: url("../images/sound.png");
 }
+*/
 body > div#meeting > div#streams > div#scontrols {
-  width: 108px;
-  margin-left: 47%;
+  width: 132px;
+  margin-left: 42%;
 }
 body > div#meeting > div#streams > div#scontrols > input {
   width: 26px;
@@ -126,6 +219,19 @@ body > div#meeting > div#streams > div#scontrols > input.left {
 body > div#meeting > div#streams > div#scontrols > input.right {
   background-image: url("../images/btn-right.png");
 }
+body > div#meeting > div#streams > div#scontrols > input#video {
+  background-image: url("../images/video-on.png");
+}
+body > div#meeting > div#streams > div#scontrols > input#video.on {
+  background-image: url("../images/video-off.png");
+}
+body > div#meeting > div#streams > div#scontrols > input#audio.off {
+  background-image: url("../images/sound.png");
+}
+body > div#meeting > div#streams > div#scontrols > input#audio {
+  background-image: url("../images/mute.png");
+}
+/*
 body > div#meeting > div#streams > div#scontrols > input.help {
   float: right;
   background-image: url("../images/btn-help.png");
@@ -138,6 +244,7 @@ body > div#meeting > div#msgBoard {
   height: 40px;
   margin: 0px 10px 0px;
 }
+
 body > div#meeting > div#msgBoard > img.logo {
   width: 36px;
   vertical-align: middle;
@@ -169,6 +276,7 @@ body > div#meeting > div#arrow4ctrls {
 body > div#meeting > div#arrow4ctrls > img.open {
   margin-left: 48%;
 }
+*/
 #mask {
   position: absolute;
   left: 0px;
@@ -360,6 +468,7 @@ body > div#meeting > div#arrow4ctrls > img.open {
   float: right;
   margin-right: 5px;
 }
+/*
 #boxes #controls {
   bottom: 0px;
   left: 0px;
@@ -416,3 +525,4 @@ body > div#meeting > div#arrow4ctrls > img.open {
   width: 24px;
   height: 24px;
 }
+*/
