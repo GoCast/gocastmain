@@ -62,7 +62,7 @@
        <input class="facebook" type="button" title="Post to Facebook." onclick="sendFacebook();"/>
     </div>      
     <div id="msgBoard">
-        <span></span>
+        <div id="chatOut"></div>
         <input class="chatTo" type="text" onkeydown="keypressGrpChatHandler(event);"/>
         <input class="send" type="button" title="Send chat." onclick="sendGrpChat();"/>
     </div>      
@@ -192,17 +192,6 @@
           <input id="audio" type="button" class="off" title="Mute audio" disabled="disabled"/>
         </div><!-- scontrols -->
       </div><!-- streams -->
-      <!--
-      <div id="msgBoard">
-        <img class="logo" src="images/gologo.png" alt="Gocast.it"
-             title="Gocast.it" />
-        <span></span>
-      </div>
-      <div id="arrow4ctrls">
-        <img class="open" src="images/arrow-up.png" alt="Open Gocast"
-             title="Open Gocast" onclick="openCtrlsWindow(event);"/>
-      </div>
-      -->
     </div><!-- meeting -->
   </body>
 </html>

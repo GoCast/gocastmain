@@ -132,19 +132,13 @@ $(document).on('public-message', function (
 
   /*
    * Add message to Message Board. */
-  //var jqMBspan = $("#meeting > #msgBoard > span");
-  var jqMBspan = $("#msgBoard > span");
-  jqMBspan.prepend("<span></span>");
-  if ($("span", jqMBspan).length > 3) {
-    $("span:last-child", jqMBspan).remove();
-  }
-  $($("span", jqMBspan).get(0)).text("").
-    html('<b>'+ decodeURI(msginfo.nick) +'</b>'+': '+
-         decodeURI(msginfo.body) + " >  ");
-  app.log(2, "A public message arrived.");
+  var jqChat = $("#msgBoard > #chatOut");
+  var msg = '<b>'+ decodeURI(msginfo.nick) +'</b>'+': '+
+                   decodeURI(msginfo.body) + "<br>";
+  jqChat.append(msg);
+
+  app.log(2, "A public message arrived " + msg);
 }); /* public-message() */
-
-
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**

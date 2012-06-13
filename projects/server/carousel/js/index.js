@@ -170,15 +170,11 @@ var app = {
   {
      if (enable)
      {
-        //$("#meeting > #streams > #scontrols > input#video").removeAttr('disabled');
-        //$("#meeting > #streams > #scontrols > input#audio").removeAttr('disabled');
         $("#meeting > #streams > #scontrols > input").removeAttr('disabled');
         $("#msgBoard > input").removeAttr('disabled');
      }
      else
      {
-        //$("#meeting > #streams > #scontrols > input#video").attr('disabled','disabled');
-        //$("#meeting > #streams > #scontrols > input#audio").attr('disabled','disabled');
         $("#meeting > #streams > #scontrols > input").attr('disabled', 'disabled');
         $("#msgBoard > input").attr('disabled','disabled');
      } 
@@ -926,15 +922,6 @@ function activateWindow(
     $('input.chatTo', winId).on("keydown.s04172012g", keypressChatHandler);
     $('input.send', winId).on("click.s04172012g", sendChat);
   }
-  /*
-  else if (winId.match("controls")) {
-    $('input.chatTo', winId).on("keydown.s05222012", keypressGrpChatHandler);
-    $('input.send', winId).on("click.s05222012", sendGrpChat);
-    $('input.facebook', winId).on("click.s05222012a", sendFacebook);
-    $('input.twitter', winId).on("click.s05222012b", sendTwitter);
-    $('input.feedback', winId).on("click.s04212012e", openChat);
-  }
-  */
   return false;
 } /* activateWindow() */
 
@@ -968,8 +955,6 @@ function deactivateWindow(
     $('#streams > #scontrols > #audio', winId)
       .off("click.s04172012b", changeAudio);
 
-    //$('#streams > #scarousel div.cloudcarousel:not("#mystream")', winId)
-    //  .off("click.s04172012f", openChat);
   }
   else if (winId.match("chatInp")) {
     $('input.chatTo', winId).off("keydown.s04172012g", keypressChatHandler);
@@ -1215,7 +1200,6 @@ function handleRoomSetup() {
    		   app.log(2, "replacing state " + newUrl);
 		   history.replaceState(null, null, newUrl);
 		}
-		//sendSpotInfo();
 	});
 };
 
