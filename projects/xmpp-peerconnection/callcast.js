@@ -93,7 +93,6 @@ var Callcast = {
     roomlist: {},
     nick: "",
     joined: false,
-    keepAliveTimer: null,
     bUseVideo: true,
     WIDTH: 256,
     HEIGHT: 192,
@@ -140,22 +139,6 @@ var Callcast = {
 		if (this.Callback_RemoveCarouselContent)
 			this.Callback_RemoveCarouselContent(info);
 	},
-
-    keepAlive: function() {
-    	this.keepAliveTimer = setInterval(function() {
-    		if (Callcast.connection)
-			{
-	    		Callcast.connection.sendIQ($iq({to: Callcast.CALLCAST_XMPPSERVER, from: Callcast.connection.jid, type: 'get', id: 'ping1'})
-	    						.c('ping', {xmlns: 'urn:xmpp:ping'}),
-	    		null, // No action for a successful 'pong'
-	    		function() {
-	    			alert("Ping failed. Lost connection with server?");
-	    		});
-			}
-    		else
-    			alert("Server connection failed.");
-		}, 10000);
-    },
 
     NoSpaces: function(str) {
     	if (str)
@@ -322,7 +305,7 @@ var Callcast = {
 				this.participants[nick].peer_connection.height = 0;
 			}
 		}
-		else
+		else if (nick !== this.nick)
 			console.log("ShowRemoteVideo: nickname not found: " + nick);
 	},
 
@@ -954,7 +937,15 @@ var Callcast = {
 						Callcast.participants[nick].videoOn = null;
 
 					// Update the presence information.
-					var info = $(presence).children('info') | {};
+					var info = {};
+					if ($(presence).children('info')[0])
+					{
+						info.url = $(presence).children('info').attr('url');
+						info.id = $(presence).children('info').attr('id');
+						info.image = $(presence).children('info').attr('image');
+						info.altText = $(presence).children('info').attr('altText');
+					}
+					
 					info.nick = nick;
 					info.hasVid = Callcast.participants[nick].videoOn;
 					
@@ -963,7 +954,15 @@ var Callcast = {
 				else if (nick == Callcast.nick && $(presence).attr('video'))
 				{
 					// Update the presence information.
-					var info = $(presence).children('info') | {};
+					var info = {};
+					if ($(presence).children('info')[0])
+					{
+						info.url = $(presence).children('info').attr('url');
+						info.id = $(presence).children('info').attr('id');
+						info.image = $(presence).children('info').attr('image');
+						info.altText = $(presence).children('info').attr('altText');
+					}
+
 					info.nick = nick;
 					info.hasVid = Callcast.bUseVideo;
 					
@@ -1030,7 +1029,15 @@ var Callcast = {
                     //
                     if (!Callcast.joined || (nick !== Callcast.nick))
                     {
-						var info = $(presence).children('info') | {};
+						var info = {};
+						if ($(presence).children('info')[0])
+						{
+							info.url = $(presence).children('info').attr('url');
+							info.id = $(presence).children('info').attr('id');
+							info.image = $(presence).children('info').attr('image');
+							info.altText = $(presence).children('info').attr('altText');
+						}
+
                     	info.nick = nick;
 
                     	if (nick !== Callcast.nick)
@@ -1267,15 +1274,14 @@ var Callcast = {
     },
 
     handle_ping: function(iq) {
-    	console.log("PING Received:");
-    	console.log(iq);
-    	this.connection.send($iq({to: $(iq).attr('from'), id: $(iq).attr('id'), type: 'result'}));
-//    	this.connection.send($iq({from: this.connection.jid, to: $(iq).attr('from'), id: $(iq).attr('id'), type: 'result'}));
+    	var pong = $iq({to: $(iq).attr('from'), id: $(iq).attr('id'), type: 'result'});
+//    	console.log("PING Received: PONG = ", pong.toString());
+    	
+    	Callcast.connection.send(pong);
+    	return true;
     },
 
     disconnect: function() {
-    	clearInterval(this.keepAliveTimer);
-
 		this.DropAllParticipants();
 		this.MuteLocalVoice(false);
 
@@ -1302,13 +1308,19 @@ var Callcast = {
 			 console.log("Finalizing connection and then triggering connected...");
 			 Callcast.finalizeConnect();
 			 $(document).trigger('connected');
+		 } else if (status === Strophe.Status.AUTHENTICATING) {
+			 console.log("XMPP/Strophe Authenticating...");
+		 } else if (status === Strophe.Status.CONNECTING) {
+			 console.log("XMPP/Strophe Connecting...");
 		 } else if (status === Strophe.Status.ATTACHED) {
 			 console.log("Re-Attach of connection successful. Triggering re-attached...");
 			 $(document).trigger('re-attached');
 		 } else if (status === Strophe.Status.DISCONNECTED) {
 			 Callcast.disconnect();
 			 $(document).trigger('disconnected');
-		} else if (status === Strophe.Status.AUTHFAIL) {
+		 } else if (status === Strophe.Status.DISCONNECTING) {
+			 console.log("XMPP/Strophe is Dis-Connecting...should we try to re-attach here? TODO:RMW");
+		 } else if (status === Strophe.Status.AUTHFAIL) {
 			 Callcast.disconnect();
 			 $(document).trigger('disconnected');
 			 alert("Authentication failed. Bad password or username.");
@@ -1350,7 +1362,6 @@ var Callcast = {
 
     finalizeConnect: function() {
     	this.connection.send($pres());
-    	this.keepAlive();
 
     	// Handle inbound signaling messages
     	//Callcast.connection.addHandler(Callcast.handle_webrtc_message, null, "message", "webrtc-message");
