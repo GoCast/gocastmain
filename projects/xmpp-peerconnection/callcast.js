@@ -1320,6 +1320,10 @@ var Callcast = {
 			 $(document).trigger('disconnected');
 		 } else if (status === Strophe.Status.DISCONNECTING) {
 			 console.log("XMPP/Strophe is Dis-Connecting...should we try to re-attach here? TODO:RMW");
+		 } else if (status === Strophe.Status.CONNFAIL) {
+			 console.log("XMPP/Strophe reported connection failure...attempt to re-attach...");
+			 Callcast.reattach(Callcast.connection.jid, Callcast.connection.sid, Callcast.connection.rid, Callcast.conn_callback);
+			 alert("NOTICE -- attempted to auto-re-attach after connection failure. Did we succeed?");
 		 } else if (status === Strophe.Status.AUTHFAIL) {
 			 Callcast.disconnect();
 			 $(document).trigger('disconnected');
