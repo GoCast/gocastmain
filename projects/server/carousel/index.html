@@ -28,7 +28,7 @@
           href="images/apple-touch-icon-iphone4.png" />
     <link rel="apple-touch-startup-image" href="images/startup.png">
     <link rel="stylesheet" href="css/index.css" type="text/css" />
-    <script src="js/jquery-1.7.2.min.js" type="text/javascript"></script>
+    <script src="js/jquery-1.7.2.dev.js" type="text/javascript"></script>
     <script src="/scripts/strophe.js"></script>
     <script src="/scripts/strophe.roster.js" type="text/javascript"></script>
     <script src="/scripts/strophe.disco.js" type="text/javascript"></script>
@@ -59,7 +59,9 @@
        <input class="demobtn" type="button" title="Place demo content." onclick="startDemoContent();" />
        <input class="feedback" type="button" title="Send us your feedback." onclick="openChat(event);"/>
        <input class="twitter" type="button" title="Send message to Twitter." onclick="sendTwitter();"/>
-       <input class="facebook" type="button" title="Post to Facebook." onclick="sendFacebook();"/>
+       <input class="facebook" type="button" title="Post to Facebook." onclick="sendFacebook(event);"/>
+       <input id="audio" type="button" class="off" title="Mute audio" disabled="disabled"/>
+       <input id="video" type="button" class="on" title="Enable video" disabled="disabled"/>
     </div>      
     <div id="msgBoard">
         <div id="chatOut"></div>
@@ -109,24 +111,12 @@
         <img class="close" src="images/button-close.png" alt="Close window"
              title="Close window" />
         <p class="title">Hi! Welcome to Gocast.it.</p>
-        <div id="fb-login-button" class="fb-login-button" data-show-faces="false" data-width="200" data-max-rows="1"></div>
+        <div id="fb-login-button" class="fb-login-button" data-show-faces="false" data-width="200" data-max-rows="1"
+             scope="email,user_likes,friends_likes,publish_actions,friends_online_presence,publish_stream,xmpp_login"></div>
         <input id="name" type="text" placeholder="Please enter your name" /><p class="skip-text"> skip facebook login </p>
         <input id="email" type="text" placeholder="Enter your email (optional)" />
         <p class="error"></p>
       </div>
-      <div id="controls" class="window">
-        <img class="closeCtrls" src="images/arrow-down.png" alt="Close"
-             title="Close" onclick="closeCtrlsWindow(event);" />
-        <img class="logo" src="images/gologo.png" alt="Gocast.it"
-             title="Gocast.it" />
-        <input class="chatTo" type="text" />
-        <input class="send" type="button" title="Send chat." />
-        <input class="facebook" type="button" title="Post to Facebook." />
-        <input class="twitter" type="button" title="Send message to Twitter." />
-        <input class="feedback" type="button" title="Send us your feedback." />
-        <input class="demobtn" type="button" title="Place demo content."
-               onclick="startDemoContent();" />
-      </div>      
       <div id="chatInp" class="window">
         <span class="recipient"></span>
         <img class="close" src="images/button-close.png" alt="Close window"
@@ -141,6 +131,12 @@
       </div>      
       <!-- Mask to cover the whole screen -->
       <div id="mask"></div>      
+      <div id="fbPrompt" class="window">
+         <p>Post an invitation to this room on your wall</p>
+         <hr/>
+         <p>Send an invitation to this room to your friends</p>
+         <div class="fb-send" data-href="http://example.com" data-colorscheme="dark"></div>
+      </div>
     </div>
     <div id="meeting">
       <div id="streams">
@@ -188,8 +184,6 @@
         <div id="scontrols">
           <input type="button" class="left" title="To the left." disabled="disabled" />
           <input type="button" class="right" title="To the right." disabled="disabled" />
-          <input id="video" type="button" class="on" title="Enable video" disabled="disabled"/>
-          <input id="audio" type="button" class="off" title="Mute audio" disabled="disabled"/>
         </div><!-- scontrols -->
       </div><!-- streams -->
     </div><!-- meeting -->
