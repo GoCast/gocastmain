@@ -108,8 +108,6 @@ $(document).on('synclink', function (
   app.log(2, "A new synclink has been issued.");
 }); /* synclink() */
 
-
-
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
  * \brief Function that modifies the DOM when a public message arrives.
@@ -160,7 +158,22 @@ $(document).on('private-message', function (
   app.log(2, "A private message arrived.");
 }); /* private-message() */
 
-
+///
+/// extract spot info from info object 
+/// and set carousel item parameters
+///
+function setSpotInfo(oo, info)
+{
+    if (oo && info)
+    {
+       if (info.image)
+       {
+          $(oo).css("background-image", "url(" + info.image + ")");
+       }
+       app.log(2, "setSpotInfo nick " + info.nick + " image " + info.image);
+       console.log("setSpotInfo", oo, info);
+    }
+}
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
@@ -178,25 +191,36 @@ $(document).on('user_joined', function (
 )
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
-  /*
-   * Check dimensions of wrapper div to correct for video dimensions. */
-  if (info.hasVid) {
-    var id = app.str2id(info.nick);
-    var oo = $("#meeting > #streams > #scarousel div.#"+id).get(0);
-    if (oo) {
-      var w = $(oo).width() - 4;
-      var s = w / Callcast.WIDTH;
-      var h = Callcast.HEIGHT * s;
-      info.width = w;
-      info.height = h;
-      app.log(2, "User dim w "+info.width+", h "+info.height);
+  // get nickname and find carousel item 
+  // carousel item for this user was created in addplugin...
+  var id = app.str2id(info.nick);
+  var oo = $("#meeting > #streams > #scarousel div.#"+id).get(0);
+  
+  if (oo) { // item found
+     setSpotInfo(oo, info); // set the item data
+     // Check dimensions of wrapper div to correct for video dimensions.
+     // todo factor out
+     if (info.hasVid) {
+         var w = $(oo).width() - 4;
+         var s = w / Callcast.WIDTH;
+         var h = Callcast.HEIGHT * s;
+         info.width = w;
+         info.height = h;
+         app.log(2, "User dim w "+info.width+", h "+info.height);
+         Callcast.ShowRemoteVideo(info);
     }
+    else // if hasVid is null or false turn video off
+    {
+       info.hasVid = false;
+       Callcast.ShowRemoteVideo(info);
+    }
+    app.log(2, "A new user " + info.nick + " joined.");
   }
-  Callcast.ShowRemoteVideo(info);
-  app.log(2, "A new user " + info.nick + " joined.");
+  else
+  {
+     app.log(3, "user_joined item for " + info.nick + " not found");
+  }
 }); /* user_joined() */
-
-
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
@@ -214,25 +238,36 @@ $(document).on('user_updated', function (
 )
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
-  /*
-   * Check dimensions of wrapper div to correct for video dimensions. */
-  if (info.hasVid) {
-    var id = app.str2id(info.nick);
-    var oo = $("#meeting > #streams > #scarousel div.#"+id).get(0);
-    if (oo) {
-      var w = $(oo).width() - 4;
-      var s = w / Callcast.WIDTH;
-      var h = Callcast.HEIGHT * s;
-      info.width = w;
-      info.height = h;
-      app.log(2, "User dim w "+info.width+", h "+info.height);
+  // get nickname and find carousel item 
+  // carousel item for this user was created in addplugin...
+  var id = app.str2id(info.nick);
+  var oo = $("#meeting > #streams > #scarousel div.#"+id).get(0);
+  
+  if (oo) { // item found
+     setSpotInfo(oo, info); // set the item data
+     // Check dimensions of wrapper div to correct for video dimensions.
+     // todo factor out
+     if (info.hasVid) {
+         var w = $(oo).width() - 4;
+         var s = w / Callcast.WIDTH;
+         var h = Callcast.HEIGHT * s;
+         info.width = w;
+         info.height = h;
+         app.log(2, "User dim w "+info.width+", h "+info.height);
+         Callcast.ShowRemoteVideo(info);
     }
+    else // if hasVid is null or false turn video off
+    {
+       info.hasVid = false;
+       Callcast.ShowRemoteVideo(info);
+    }
+    app.log(2, "user " + info.nick + " updated.");
   }
-  Callcast.ShowRemoteVideo(info);
-  app.log(2, "User updated "+info.nick+", vid on:"+info.hasVid);
+  else
+  {
+     app.log(3, "user_updated item for " + info.nick + " not found");
+  }
 }); /* user_updated() */
-
-
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
@@ -252,8 +287,6 @@ $(document).on('user_left', function (
 {
   app.log(2, "User " + nick + " left.");
 }); /* user_left() */
-
-
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
@@ -331,15 +364,6 @@ $(document).on("one-login-complete", function(event, msg) {
 	else
 		console.log("one-login-complete: No Msg");
 	
-	// Once we get facebook (or skip/set-nickname) + xmpp connected, then we're ready to go to the room.
-	// getting reentrance...
-	/*
-	if (app.meetingOpened)
-	{
-	   console.log("meeting already loaded");
-	   return;
-	}
-	*/
 	if (app.loggedInAll())
 	{
 		console.log("one-login-complete: opening meeting");
@@ -475,6 +499,7 @@ function removePluginFromCarousel(
   /*
    * Add name placeholder. */
   jqOo.append('<div class="name"></div>');
+  jqOo.css("background-image", 'url("images/gologo.png")'); // reset background image
   return false;
 } /* removePluginFromCarousel() */
 
@@ -498,22 +523,6 @@ function addContentToCarousel(
   // into carousel items
   var id = app.str2id(info.id);
   
-  /*
-  // find the remote user by id
-  var jqOo = $('#meeting > #streams > #scarousel div.cloudcarousel#' + id + '"');
-  if (jqOo)
-  {
-    app.log(2, "Found remote user " + info.id + " setting spot info ");
-    $(jqOo).attr("id", id);
-    $(jqOo).attr("title", info.altText);
-    $(jqOo).attr("alt", info.altText);
-    $(jqOo).attr("url", info.url);
-    $(jqOo).attr("encname", info.id);
-    $(jqOo).css("background-image", info.image);
-  }
-  else
-  */
-  {  
   // remote user not found this must be demo content
   /*
    * Check next available cloudcarousel. */
@@ -531,7 +540,6 @@ function addContentToCarousel(
   }
   else {
     app.log(4, "Maximum number of participants reached.");
-  }
   }
 } /* addContentToCarousel() */
 

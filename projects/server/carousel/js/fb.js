@@ -37,10 +37,10 @@ function fbInit(
         app.log(2, "fbLoginStatus callback response.authResponse" + response.authResponse);
           //console.log('authResponse-Object', response.authResponse);
           //console.log('accessToken', response.authResponse.accessToken);
-     	  if (!response.authResponse)
-     	  {
-		     $(document).trigger("checkCredentials");
-		  }
+          if (!response.authResponse)
+          {
+             $(document).trigger("checkCredentials");
+          }
       });
 
         // listen for and handle auth.statusChange events
@@ -62,13 +62,16 @@ function fbInit(
                 app.user.name = encodeURI(me.name);
                 app.user.fbProfileUrl = "https://graph.facebook.com/" + me.id;
                 app.user.fbProfilePicUrl = "https://graph.facebook.com/" + me.id + "/picture?type=large";
-			    Callcast.SetNickname(app.user.name); // TODO should be somewhere else
+                Callcast.SetNickname(app.user.name); // TODO should be somewhere else
+                Callcast.setPresenceBlob(new Object({url:app.user.fbProfileUrl,
+		                                             image:app.user.fbProfilePicUrl
+		                                             } ) );
 
               }
             })
           }
-     	  globalAuthResponse = response.authResponse;
-		  $(document).trigger("checkCredentials")
+          globalAuthResponse = response.authResponse;
+          $(document).trigger("checkCredentials")
         });
     }
-}
+} // fbInit

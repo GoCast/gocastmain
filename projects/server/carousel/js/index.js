@@ -126,12 +126,21 @@ var app = {
   }()),
   /**
    * Calculate number from string. */
-  str2id: function(str) {
-    var nn = 0;
-    for (var i = 0; i < str.length; i++) {
-      nn += str.charCodeAt(i);
-    };
-    return nn;
+  str2id: function(str) 
+  {
+    if (str)
+    {
+       var nn = 0;
+       for (var i = 0; i < str.length; i++) 
+       {
+         nn += str.charCodeAt(i);
+       }
+       return nn;
+    }
+    else
+    {
+       app.log(4, "str2id str is null");
+    }
   }, /* app.str2id() */
   /**
    * Check if gocast.it plugin is installed. */
@@ -171,11 +180,15 @@ var app = {
      if (enable)
      {
         $("#meeting > #streams > #scontrols > input").removeAttr('disabled');
+        $("#lower-right > #video").removeAttr('disabled');
+        $("#lower-right > #audio").removeAttr('disabled');
         $("#msgBoard > input").removeAttr('disabled');
      }
      else
      {
         $("#meeting > #streams > #scontrols > input").attr('disabled', 'disabled');
+        $("#lower-right > input.video").attr('disabled', 'disabled');
+        $("#lower-right > input.audio").attr('disabled', 'disabled');
         $("#msgBoard > input").attr('disabled','disabled');
      } 
   },
@@ -392,12 +405,12 @@ function openChat(
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
- * \brief Open controls window.
+ * \brief Action send Facebook post.
  */
-function openCtrlsWindow(
+function sendFacebook(
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
     /**
-     * Event object. */
+     * The event object. */
   event
 )
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
@@ -405,60 +418,26 @@ function openCtrlsWindow(
   if (event) {
     event.preventDefault();
   }
-  /*
-   * Transition effect mask. */
-  var jqMask = $('#mask');
-  jqMask.fadeIn(500, activateWindow('#controls'));
-  jqMask.fadeTo("fast", 0.5);
-  /*
-   * Transition effect window.*/
-  var jqWin = $('#boxes #controls');
-  jqWin.slideDown('slow');
-  /*
-   * Add class active. */
-  jqWin.addClass("active");
-  /*
-   * Add focus to input name. */
-  $("input.chatTo", jqWin).focus();
-  return false;
-} /* openCtrlsWindow() */
-
-
-
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-/**
- * \brief Close controls window.
- */
-function closeCtrlsWindow(
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-    /**
-     * Event object */
-  event
-)
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-{
-  if (event) {
-    event.preventDefault();
-  }
-  /*
-   * Get active window. */
-  var jqActive = $('.window.active')
-  if (jqActive[0]) {
-    /*
-     * Remove class active and call deactivate function. */
-    jqActive.removeClass("active");
-    deactivateWindow('#' + jqActive.attr("id"));
-    jqActive.slideUp('slow', function() {
-      /*
-       * Hide mask and window. */
-      $('#mask').hide();
-      $('.window').hide();
-    });
-  }
-  return false;
-} /* closeCtrlsWindow() */
-
-
+  
+  var params = {};
+  params['message'] = 'Join us now on the carousel.';
+  params['name'] = 'Carousel room ' + $.getUrlVar('roomname');
+  params['description'] = 'We are here now';
+  params['link'] = window.location.href;
+  params['picture'] = 'http://carousel.gocast.it/images/gologo.png';
+  //params['caption'] = 'GoCast Carousel';
+  
+  FB.api('/me/feed', 'post', params, function(response) 
+  {
+    if (!response || response.error) {
+       alert('We couldn\'t post the meeting to your facebook feed.<br>Give us permission in facebook.');
+       console.log("sendFacebook error", response);
+    } else {
+       alert('We posted a link to this meeting on your wall');
+       console.log('Post ID: ' + response.id, response);
+    }
+  });
+} /* sendFacebook() */
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
@@ -763,7 +742,6 @@ function sendGrpChat(
   if (event) {
     event.preventDefault();
   }
-  //var jqChatText = $('#boxes #controls > input.chatTo');
   var jqChatText = $('#msgBoard > input.chatTo');
   var ltext = jqChatText.val();
   if (ltext.length < 1) {
@@ -774,30 +752,6 @@ function sendGrpChat(
   jqChatText.val('');
   closeWindow();
 } /* sendGrpChat() */
-
-
-
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-/**
- * \brief Action send Facebook post.
- */
-function sendFacebook(
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-    /**
-     * The event object. */
-  event
-)
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-{
-  if (event) {
-    event.preventDefault();
-  }
-  alert("Posting to Facebook will be coming soon.");
-  app.log(2, "Sending FB post: Not yet implemented");
-  closeWindow();
-} /* sendFacebook() */
-
-
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
@@ -818,8 +772,6 @@ function sendTwitter(
   app.log(2, "Sending message to Twitter: Not yet implemented");
   closeWindow();
 } /* sendTwitter() */
-
-
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
@@ -910,10 +862,8 @@ function activateWindow(
     $("input#btn", winId).on("click.s04072012", onJoinNow);
   }
   else if (winId.match("meeting")) {
-    $('#streams > #scontrols > #video', winId)
-      .on("click.s04172012a", changeVideo);
-    $('#streams > #scontrols > #audio', winId)
-      .on("click.s04172012b", changeAudio);
+    $('#lower-right > #video').on("click.s04172012a", changeVideo);
+    $('#lower-right > #audio').on("click.s04172012b", changeAudio);
 
     //$('#streams > #scarousel div.cloudcarousel:not("#mystream")', winId)
     //  .on("click.s04172012f", openChat);
@@ -950,22 +900,13 @@ function deactivateWindow(
     $("input#btn", winId).off("click.s04072012", onJoinNow);
   }
   else if (winId.match("meeting")) {
-    $('#streams > #scontrols > #video', winId)
-      .off("click.s04172012a", changeVideo);
-    $('#streams > #scontrols > #audio', winId)
-      .off("click.s04172012b", changeAudio);
+    $('#lower-right > #video').off("click.s04172012a", changeVideo);
+    $('#lower-right > #audio').off("click.s04172012b", changeAudio);
 
   }
   else if (winId.match("chatInp")) {
     $('input.chatTo', winId).off("keydown.s04172012g", keypressChatHandler);
     $('input.send', winId).off("click.s04172012g", sendChat);
-  }
-  else if (winId.match("controls")) {
-    $('input.chatTo', winId).off("keydown.s05222012", keypressGrpChatHandler);
-    $('input.send', winId).off("click.s05222012", sendGrpChat);
-    $('input.facebook', winId).off("click.s05222012a", sendFacebook);
-    $('input.twitter', winId).off("click.s05222012b", sendTwitter);
-    $('input.feedback', winId).off("click.s04212012e", openChat);
   }
   return false;
 } /* deactivateWindow() */

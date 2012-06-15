@@ -197,8 +197,14 @@
                 Callcast.SendLocalVideoToPeers(new Object({width:w, height:h}));
               }
             }
-            else {
-              Callcast.ShowRemoteVideo(new Object({nick:$(obj).attr("encname"), width:w, height:h}));
+            else 
+            {
+              var nick = $(obj).attr("encname");
+              if (nick && Callcast.participants[nick].videoOn)
+              {
+                 Callcast.ShowRemoteVideo(new Object({nick:nick, width:w, height:h}));
+              }
+              // else do nothing on resize
             }
             /*
              * Scale name text. */
