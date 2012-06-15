@@ -173,6 +173,7 @@ body > div#meeting > div#streams > div#scarousel div.cloudcarousel {
   border-radius: 6px;
   background: darkgreen center top no-repeat url("../images/gologo.png");
   background-size: 70%;
+  background-position: center center;
 }
 body > div#meeting > div#streams > div#scarousel div.cloudcarousel.typeContent {
   background-size: 98%;
