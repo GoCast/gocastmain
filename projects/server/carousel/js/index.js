@@ -433,7 +433,7 @@ function sendFacebook(
        alert('We couldn\'t post the meeting to your facebook feed.<br>Give us permission in facebook.');
        console.log("sendFacebook error", response);
     } else {
-       alert('We posted a link to this meeting on your wall');
+       alert('We posted a link to this room on your wall');
        console.log('Post ID: ' + response.id, response);
     }
   });
@@ -470,6 +470,9 @@ function openMeeting(
     .attr("encname", app.user.name);
     
   // use fb profile pick as bg image if it exists
+  // set this here initially because local video
+  // is off initially
+  // todo consider moving this
   if (app.user.fbProfilePicUrl)
   {
      $("#meeting > #streams > #scarousel #mystream")
@@ -651,52 +654,6 @@ function sendChat(
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
- * \brief Action send public chat.
- */
-function sendPublicChat(
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-    /**
-     * The event object. */
-  event
-)
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-{
-  if (event) {
-    event.preventDefault();
-  }
-  /*
-  var jqChatText = $('#chatInp > input.chatTo');
-  var ltext = jqChatText.val();
-  if (ltext.length < 1) {
-    return false;
-  }
-  var jqChatSpan = $('#chatInp > span');
-  var id = jqChatSpan.attr("id");
-  if (id.length < 1) {
-    app.log(4, "Error in chat, no id.");
-  }
-  else {
-    if (id.match("group")) {
-      Callcast.SendPublicChat(encodeURI(ltext));
-    }
-    else if (id.match("feedback")) {
-      Callcast.SendFeedback(encodeURI(ltext));
-    }
-    else {
-      var ename = jqChatSpan.attr("ename");
-      Callcast.SendPrivateChat(encodeURI(ltext), ename);
-    }
-    app.log(2, "Sending chat to " + id);
-    jqChatSpan.removeAttr("id");
-    jqChatSpan.removeAttr("ename");
-  }
-  jqChatText.val('');
-  closeWindow();
-  */
-} /* sendChat() */
-
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-/**
  * \brief Keypress for Group Chat handler.
  */
 function keypressGrpChatHandler(
@@ -786,20 +743,28 @@ function changeVideo(
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
   app.videoEnabled = $(this).hasClass("on");
-  //todo why do we send size of local video carousel item?
-  //SendLocalVidoe... takes a boolean arg
+  var jqOo = $('#mystream');
   if (app.videoEnabled) {
     // Check object dimensions.
-    //var jqOo = $(this).parents('#mystream');
-    var jqOo = $('#mystream');
     var w = jqOo.width() - 4;
     var h = Callcast.HEIGHT * (w / Callcast.WIDTH);
     Callcast.SendLocalVideoToPeers(new Object({width:w, height:h}));
+    // remove background image to prevent it from showing around the plugin
+    // if there is no fb image leave the default bg image since it does not show through
+    if (app.user.fbProfilePicUrl)
+    {
+       $(jqOo).css("background-image", "");
+    }
   }
   else {
     Callcast.SendLocalVideoToPeers(app.videoEnabled);
+    // show background image if fb image url exists
+    // if not the default is used and does not show around the plugin
+    if (app.user.fbProfilePicUrl)
+    {
+       $(jqOo).css("background-image", "url(" + app.user.fbProfilePicUrl + ")");
+    }
   }
-  Callcast.SendLocalVideoToPeers(app.videoEnabled);
   $(this).toggleClass("on");
   if (app.videoEnabled) {
     app.log(2, "Video turned on.");
@@ -864,9 +829,6 @@ function activateWindow(
   else if (winId.match("meeting")) {
     $('#lower-right > #video').on("click.s04172012a", changeVideo);
     $('#lower-right > #audio').on("click.s04172012b", changeAudio);
-
-    //$('#streams > #scarousel div.cloudcarousel:not("#mystream")', winId)
-    //  .on("click.s04172012f", openChat);
   }
   else if (winId.match("chatInp")) {
     $('input.chatTo', winId).on("keydown.s04172012g", keypressChatHandler);
@@ -1061,32 +1023,6 @@ function onJoinNow(
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
- * \brief send carousel info, name, picture, url
- */
-function sendSpotInfo(
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-    /**
-     * No argument. */
-)
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-{
-      app.log(2, "sendSpotInfo fb pic " + app.user.fbProfilePicUrl);
-      // send the url to my fb image for display on my remote user spot
-      // when my video is off
-      if (app.user.fbProfilePicUrl)
-      {
-         app.log(2, "sendSpotInfo sending");
-         var info = new Object();
-         info.id = app.user.name;
-         info.image = app.user.fbProfilePicUrl;
-         info.url = app.user.fbProfileUrl; //profile url
-         info.altText = decodeURI(app.user.name);
-         Callcast.SendSpotInfo(info);
-      }
-}
-
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-/**
  * \brief check login credential and display login dialog if necessary.
  */
 function checkCredentials(
@@ -1097,7 +1033,6 @@ function checkCredentials(
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
     app.log(2, "checkCredentials");
-    //app.log(2, globalAuthResponse);
 
     // check fb login status and prompt if not logged in
     if (!FB.getAuthResponse())

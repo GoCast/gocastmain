@@ -160,19 +160,74 @@ $(document).on('private-message', function (
 
 ///
 /// extract spot info from info object 
-/// and set carousel item parameters
+/// and set participant info
+/// the image participant item is in css format url(<url>)
 ///
-function setSpotInfo(oo, info)
+function setSpotInfo(info)
 {
-    if (oo && info)
+    if (info && info.nick)
     {
-       if (info.image)
+       var spot = Callcast.participants[info.nick];
+       if (spot)
        {
-          $(oo).css("background-image", "url(" + info.image + ")");
+          if (info.image)
+          {
+             spot.image = "url(" + info.image + ")";
+          }
+          else // use the default bg image
+          {
+             spot.image = 'url(images/person.png)';
+          }
        }
        app.log(2, "setSpotInfo nick " + info.nick + " image " + info.image);
-       console.log("setSpotInfo", oo, info);
+       console.log("setSpotInfo", info, spot);
     }
+}
+
+///
+/// set the carousel video based on the callcast participant state
+/// for an occupied spot
+///
+function setCarouselItemState(info)
+{
+try
+{
+  if (info && info.nick)
+  {
+    var id = app.str2id(info.nick);
+    var oo = $("#meeting > #streams > #scarousel div.#"+id).get(0);
+    if (oo)
+    {  // item found
+       // Check dimensions of wrapper div to correct for video dimensions.
+       if (info.hasVid) {
+           var w = $(oo).width() - 4;
+           var s = w / Callcast.WIDTH;
+           var h = Callcast.HEIGHT * s;
+           info.width = w;
+           info.height = h;
+           app.log(2, "setCarouselItemState video on user dim w "+info.width+", h "+info.height);
+           $(oo).css("background-image", ''); // remove any background image
+           Callcast.ShowRemoteVideo(info);
+       }
+       else // if hasVid is null or false turn video off
+       {
+          info.hasVid = false;
+          var image = Callcast.participants[info.nick].image;
+          $(oo).css("background-image", image);
+          Callcast.ShowRemoteVideo(info);
+          app.log(2, "setCarouselItemState video off image " + image);
+       }
+    }
+    else
+    {
+       //app.log(3, "setCarouselItemState item for " + info.nick + " not found");
+    }
+  }
+}
+catch (err)
+{
+   console.log("setCarouselItemState exception", err);
+}
 }
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
@@ -193,33 +248,9 @@ $(document).on('user_joined', function (
 {
   // get nickname and find carousel item 
   // carousel item for this user was created in addplugin...
-  var id = app.str2id(info.nick);
-  var oo = $("#meeting > #streams > #scarousel div.#"+id).get(0);
-  
-  if (oo) { // item found
-     setSpotInfo(oo, info); // set the item data
-     // Check dimensions of wrapper div to correct for video dimensions.
-     // todo factor out
-     if (info.hasVid) {
-         var w = $(oo).width() - 4;
-         var s = w / Callcast.WIDTH;
-         var h = Callcast.HEIGHT * s;
-         info.width = w;
-         info.height = h;
-         app.log(2, "User dim w "+info.width+", h "+info.height);
-         Callcast.ShowRemoteVideo(info);
-    }
-    else // if hasVid is null or false turn video off
-    {
-       info.hasVid = false;
-       Callcast.ShowRemoteVideo(info);
-    }
-    app.log(2, "A new user " + info.nick + " joined.");
-  }
-  else
-  {
-     app.log(3, "user_joined item for " + info.nick + " not found");
-  }
+  app.log(2, "A new user " + info.nick + " joined.");
+  setSpotInfo(info); // set the item data
+  setCarouselItemState(info); // set the carousel video state
 }); /* user_joined() */
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
@@ -240,33 +271,9 @@ $(document).on('user_updated', function (
 {
   // get nickname and find carousel item 
   // carousel item for this user was created in addplugin...
-  var id = app.str2id(info.nick);
-  var oo = $("#meeting > #streams > #scarousel div.#"+id).get(0);
-  
-  if (oo) { // item found
-     setSpotInfo(oo, info); // set the item data
-     // Check dimensions of wrapper div to correct for video dimensions.
-     // todo factor out
-     if (info.hasVid) {
-         var w = $(oo).width() - 4;
-         var s = w / Callcast.WIDTH;
-         var h = Callcast.HEIGHT * s;
-         info.width = w;
-         info.height = h;
-         app.log(2, "User dim w "+info.width+", h "+info.height);
-         Callcast.ShowRemoteVideo(info);
-    }
-    else // if hasVid is null or false turn video off
-    {
-       info.hasVid = false;
-       Callcast.ShowRemoteVideo(info);
-    }
-    app.log(2, "user " + info.nick + " updated.");
-  }
-  else
-  {
-     app.log(3, "user_updated item for " + info.nick + " not found");
-  }
+  app.log(2, "user " + info.nick + " updated.");
+  setSpotInfo(info); // set the item data
+  setCarouselItemState(info); // set the carousel video state
 }); /* user_updated() */
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
