@@ -430,7 +430,7 @@ function sendFacebook(
   FB.api('/me/feed', 'post', params, function(response) 
   {
     if (!response || response.error) {
-       alert('We couldn\'t post the meeting to your facebook feed.<br>Give us permission in facebook.');
+       alert('We couldn\'t post the meeting to your facebook feed.\n\nPlease give the GoCast Carousel app permission in facebook.');
        console.log("sendFacebook error", response);
     } else {
        alert('We posted a link to this room on your wall');
