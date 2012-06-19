@@ -28,6 +28,7 @@ body {
 body input[type="button"] {
   border: 0px;
   background-color: transparent;
+  background-repeat: no-repeat;
 }
 body > div#upper-left
 {
@@ -84,20 +85,27 @@ body > div#lower-right > input
   width: 24px;
   height: 24px;
 }
+body > div#lower-right > input.demobtn {
+  margin-left: 5px;
+  background-image: url("../images/demo.png");
+}
 body > div#lower-right > input.feedback {
   margin-left: 15px;
   background-image: url("../images/btn-feedback.png");
 }
-body > div#lower-right > input.facebook {
-  margin-left: 15px;
-  background-image: url("../images/btn-fb.png");
-}
 body > div#lower-right > input.twitter {
   background-image: url("../images/btn-twitter.png");
 }
-body > div#lower-right > input.demobtn {
-  margin-left: 5px;
-  background-image: url("../images/demo.png");
+body > div#lower-right > input.fbSend {
+  margin-top: 2px;
+  width: 61px;
+  background-image: url("../images/fbSend.png");
+}
+body > div#lower-right > input.fbShare {
+  margin-left: 15px;
+  margin-top: 2px;
+  width: 69px;
+  background-image: url("../images/fbShare.png");
 }
 body > div#lower-right > input#video {
   background-image: url("../images/video-on.png");

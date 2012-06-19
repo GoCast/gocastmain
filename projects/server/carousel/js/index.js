@@ -401,44 +401,6 @@ function openChat(
   return false;
 } /* openChat() */
 
-
-
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-/**
- * \brief Action send Facebook post.
- */
-function sendFacebook(
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-    /**
-     * The event object. */
-  event
-)
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-{
-  if (event) {
-    event.preventDefault();
-  }
-  
-  var params = {};
-  params['message'] = 'Join us now on the carousel.';
-  params['name'] = 'Carousel room ' + $.getUrlVar('roomname');
-  params['description'] = 'We are here now';
-  params['link'] = window.location.href;
-  params['picture'] = 'http://carousel.gocast.it/images/gologo.png';
-  //params['caption'] = 'GoCast Carousel';
-  
-  FB.api('/me/feed', 'post', params, function(response) 
-  {
-    if (!response || response.error) {
-       alert('We couldn\'t post the meeting to your facebook feed.\n\nPlease give the GoCast Carousel app permission in facebook.');
-       console.log("sendFacebook error", response);
-    } else {
-       alert('We posted a link to this room on your wall');
-       console.log('Post ID: ' + response.id, response);
-    }
-  });
-} /* sendFacebook() */
-
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
  * \brief Open meeting room.

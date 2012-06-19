@@ -21,6 +21,11 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta names="apple-mobile-web-app-status-bar-style"
           content="black-translucent" />
+    <meta property="og:type" content="website" />
+    <meta property="fb:admins" content="1291134692" />
+    <meta property="og:title" content="GoCast Carousel." />
+    <meta property="og:description" content="A place to be that's better than being there." />
+    <meta property="og:image" content="http://carousel.gocast.it/images/gologo200.png" />
     <link rel="apple-touch-icon" href="images/apple-touch-icon.png" />
     <link rel="apple-touch-icon" sizes="72x72"
           href="images/apple-touch-icon-ipad.png" />
@@ -59,7 +64,8 @@
        <input class="demobtn" type="button" title="Place demo content." onclick="startDemoContent();" />
        <input class="feedback" type="button" title="Send us your feedback." onclick="openChat(event);"/>
        <input class="twitter" type="button" title="Send message to Twitter." onclick="sendTwitter();"/>
-       <input class="facebook" type="button" title="Post to Facebook." onclick="sendFacebook(event);"/>
+       <input class="fbSend"  type="button" title="Send facebook message." onclick="fbSendDialog();"/>
+       <input class="fbShare" type="button" title="Share on wall." onclick="fbShare();"/>
        <input id="audio" type="button" class="off" title="Mute audio" disabled="disabled"/>
        <input id="video" type="button" class="on" title="Enable video" disabled="disabled"/>
     </div>      
@@ -111,8 +117,11 @@
         <img class="close" src="images/button-close.png" alt="Close window"
              title="Close window" />
         <p class="title">Hi! Welcome to Gocast.it.</p>
+        <!--
         <div id="fb-login-button" class="fb-login-button" data-show-faces="false" data-width="200" data-max-rows="1"
              scope="email,user_likes,friends_likes,publish_actions,friends_online_presence,publish_stream,xmpp_login"></div>
+        -->
+        <div id="fb-login-button" class="fb-login-button" data-show-faces="false" data-width="200" data-max-rows="1"></div>
         <input id="name" type="text" placeholder="Please enter your name" /><p class="skip-text"> skip facebook login </p>
         <input id="email" type="text" placeholder="Enter your email (optional)" />
         <p class="error"></p>
