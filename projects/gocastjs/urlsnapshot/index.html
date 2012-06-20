@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.js"></script>
+		<script type="text/javascript" src="html2canvas.js"></script>
+		<script type="text/javascript" src="urlsnapshot.js"></script>
+		<script type="text/javascript">
+			$(document).ready(function() {
+				$("#snapurl").click(function() {
+					GoCastJS.UrlSnapshot("#urlsnapshot", {
+						width     : parseInt($("#snapshotwidth").val()),
+						height    : parseInt($("#snapshotheight").val()),
+						webUrl    : $("#url").val(),
+//						proxyUrl  : "http://html2canvas.appspot.com",
+						proxyUrl  : "http://carousel.gocast.it/proxy",
+						disableJS : true
+					});
+				});
+			});
+		</script>
+	</head>
+	<body>
+		<label>Type URL to snapshot:</label>
+		<input id="url" type="text" size="100"/>
+		<input id="snapshotwidth" type="text" size="10"/>
+		<input id="snapshotheight" type="text" size="10"/>
+		<button id="snapurl">Snapshot</button>
+		
+		<div id="urlsnapshot">
+		</div>
+	</body>
+</html>
