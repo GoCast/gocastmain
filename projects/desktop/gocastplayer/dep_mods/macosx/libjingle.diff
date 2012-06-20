@@ -1,0 +1,85 @@
+Index: libjingle.gyp
+===================================================================
+--- libjingle.gyp	(revision 140240)
++++ libjingle.gyp	(working copy)
+@@ -4,6 +4,7 @@
+ 
+ {
+   'includes': [
++    '../../src/build/common.gypi',
+     '../../build/win_precompile.gypi',
+   ],
+   'target_defaults': {
+@@ -31,14 +32,14 @@
+       }
+     },
+     'include_dirs': [
+-      './overrides',
++      # './overrides',
+       './source',
+       '../../testing/gtest/include',
+       '../../third_party/libyuv/include',
+     ],
+     'dependencies': [
+-      '<(DEPTH)/base/base.gyp:base',
+-      '<(DEPTH)/net/net.gyp:net',
++      '<(DEPTH)/peerconnection/base/base.gyp:base',
++      '<(DEPTH)/peerconnection/net/net.gyp:net',
+       '<(DEPTH)/third_party/expat/expat.gyp:expat',
+     ],
+     'export_dependent_settings': [
+@@ -46,7 +47,7 @@
+     ],
+     'direct_dependent_settings': {
+       'include_dirs': [
+-        './overrides',
++        # './overrides',
+         './source',
+         '../../testing/gtest/include',
+       ],
+@@ -168,20 +169,20 @@
+       'target_name': 'libjingle',
+       'type': 'static_library',
+       'sources': [
+-        'overrides/talk/base/basictypes.h',
+-        'overrides/talk/base/constructormagic.h',
++        'source/talk/base/basictypes.h',
++        'source/talk/base/constructormagic.h',
+ 
+         # Overrides logging.h/.cc because libjingle logging should be done to
+         # the same place as the chromium logging.
+-        'overrides/talk/base/logging.cc',
+-        'overrides/talk/base/logging.h',
++        'source/talk/base/logging.cc',
++        'source/talk/base/logging.h',
+ 
+         # TODO(ronghuawu): Remove below overrides once below bug is fixed:
+         # http://crbug.com/115702
+-        'overrides/talk/base/messagequeue.cc',
+-        'overrides/talk/base/messagequeue.h',
+-        'overrides/talk/base/thread.cc',
+-        'overrides/talk/base/thread.h',
++        'source/talk/base/messagequeue.cc',
++        'source/talk/base/messagequeue.h',
++        'source/talk/base/thread.cc',
++        'source/talk/base/thread.h',
+ 
+         'source/talk/base/asyncfile.cc',
+         'source/talk/base/asyncfile.h',
+@@ -626,11 +627,11 @@
+           'dependencies': [
+             # We won't build with WebRTC on Android.
+             '<(DEPTH)/third_party/libsrtp/libsrtp.gyp:libsrtp',
+-            '<(DEPTH)/third_party/webrtc/modules/modules.gyp:video_capture_module',
+-            '<(DEPTH)/third_party/webrtc/modules/modules.gyp:video_render_module',
+-            '<(DEPTH)/third_party/webrtc/video_engine/video_engine.gyp:video_engine_core',
+-            '<(DEPTH)/third_party/webrtc/voice_engine/voice_engine.gyp:voice_engine_core',
+-            '<(DEPTH)/third_party/webrtc/system_wrappers/source/system_wrappers.gyp:system_wrappers',
++            '<(DEPTH)/src/modules/modules.gyp:video_capture_module',
++            '<(DEPTH)/src/modules/modules.gyp:video_render_module',
++            '<(DEPTH)/src/video_engine/video_engine.gyp:video_engine_core',
++            '<(DEPTH)/src/voice_engine/voice_engine.gyp:voice_engine_core',
++            '<(DEPTH)/src/system_wrappers/source/system_wrappers.gyp:system_wrappers',
+             'libjingle',
+             'libjingle_p2p',
+           ],
