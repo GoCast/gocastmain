@@ -25,6 +25,7 @@ function fbInit(
         cookie     : true, // enable cookies to allow the server to access the session
         xfbml      : true,  // parse XFBML
         oauth      : true,
+        logging    : true,
       });
 
       // not needed since the status : true arg to FB.init above 
@@ -37,10 +38,10 @@ function fbInit(
         app.log(2, "fbLoginStatus callback response.authResponse" + response.authResponse);
           //console.log('authResponse-Object', response.authResponse);
           //console.log('accessToken', response.authResponse.accessToken);
-     	  if (!response.authResponse)
-     	  {
-		     $(document).trigger("checkCredentials");
-		  }
+          if (!response.authResponse)
+          {
+             $(document).trigger("checkCredentials");
+          }
       });
 
         // listen for and handle auth.statusChange events
@@ -62,13 +63,108 @@ function fbInit(
                 app.user.name = encodeURI(me.name);
                 app.user.fbProfileUrl = "https://graph.facebook.com/" + me.id;
                 app.user.fbProfilePicUrl = "https://graph.facebook.com/" + me.id + "/picture?type=large";
-			    Callcast.SetNickname(app.user.name); // TODO should be somewhere else
+                Callcast.SetNickname(app.user.name); // TODO should be somewhere else
+                Callcast.setPresenceBlob(new Object({url:app.user.fbProfileUrl,
+		                                             image:app.user.fbProfilePicUrl
+		                                             } ) );
 
               }
             })
           }
-     	  globalAuthResponse = response.authResponse;
-		  $(document).trigger("checkCredentials")
+          globalAuthResponse = response.authResponse;
+          $(document).trigger("checkCredentials")
         });
     }
+
+} // fbInit
+
+/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+/**
+ * \brief Action send Facebook post.
+ * fb doc here:  http://developers.facebook.com/docs/reference/api/post/
+ * todo looks like can't specify that the link should open a new tab
+ *      check fb docs later to see if this features is added
+ */
+function fbShare(
+/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+    /**
+     * The event object. */
+  event
+)
+/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+{
+  if (event) {
+    event.preventDefault();
+  }
+  
+  var params = {};
+  params['message'] = 'Join us now on the carousel.';
+  params['name'] = 'Carousel room ' + $.getUrlVar('roomname');
+  params['description'] = 'We are here now';
+  params['link'] = window.location.href;
+  params['picture'] = 'http://carousel.gocast.it/images/gologo.png';
+  //params['caption'] = 'GoCast Carousel';
+  
+  FB.api('/me/feed', 'post', params, function(response) 
+  {
+    if (!response || response.error) {
+       alert('We couldn\'t post the meeting to your facebook feed.\n\nPlease give the GoCast Carousel app permission in facebook.');
+       console.log("sendFacebook error", response);
+    } else {
+       alert('We posted a link to this room on your wall');
+       console.log('Post ID: ' + response.id, response);
+    }
+  });
+} /* sendFacebook() */
+
+function fbSendDialog()
+{
+  FB.ui({
+       method: 'send',
+       name:   'Carousel room ' + $.getUrlVar('roomname'),
+       description: 'We are here now',
+       link: window.location.href,
+       picture: 'http://carousel.gocast.it/images/gologo.png'
+       }, function(response) 
+  {
+    if (!response) // cancel in the dialag calls back with no response
+                   // so do nothing if there is no response
+    {
+       console.log("fbSendDialog no response");
+    }
+    else if (response.error)
+    {
+       //alert('We couldn\'t send the message.\n\nPlease give the GoCast Carousel app permission in facebook.');
+       console.log("fbSendDialog error", response);
+    } else {
+       // success do nothing since the ui is the send dialog
+    }
+  });
 }
+
+/* version using stream.share
+function fbSendDialog()
+{
+  FB.ui(
+  {
+     method: 'stream.share',
+     display: 'dialog',
+     t:   'Carousel room ' + $.getUrlVar('roomname'),
+     u: window.location.href
+  }, function(response) 
+  {
+    if (!response) // cancel in the dialag calls back with no response
+                   // so do nothing if there is no response
+    {
+       console.log("fbSendDialog no response");
+    }
+    else if (response.error)
+    {
+       //alert('We couldn\'t send the message.\n\nPlease give the GoCast Carousel app permission in facebook.');
+       console.log("fbSendDialog error", response);
+    } else {
+       // success do nothing since the ui is the send dialog
+    }
+  });
+}
+*/

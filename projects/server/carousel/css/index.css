@@ -28,6 +28,7 @@ body {
 body input[type="button"] {
   border: 0px;
   background-color: transparent;
+  background-repeat: no-repeat;
 }
 body > div#upper-left
 {
@@ -78,32 +79,47 @@ body > div#lower-right
    z-index: 1000;
    line-height: 2em;
 }
-body > div#lower-right > input.feedback {
+body > div#lower-right > input 
+{
   float:right;
-  margin-left: 15px;
-  background-image: url("../images/btn-feedback.png");
-  width: 24px;
-  height: 24px;
-}
-body > div#lower-right > input.facebook {
-  float:right;
-  margin-left: 15px;
-  background-image: url("../images/btn-fb.png");
-  width: 24px;
-  height: 24px;
-}
-body > div#lower-right > input.twitter {
-  float:right;
-  background-image: url("../images/btn-twitter.png");
   width: 24px;
   height: 24px;
 }
 body > div#lower-right > input.demobtn {
-  float:right;
   margin-left: 5px;
   background-image: url("../images/demo.png");
-  width: 24px;
-  height: 24px;
+}
+body > div#lower-right > input.feedback {
+  margin-left: 15px;
+  background-image: url("../images/btn-feedback.png");
+}
+body > div#lower-right > input.twitter {
+  background-image: url("../images/btn-twitter.png");
+}
+body > div#lower-right > input.fbSend {
+  margin-top: 2px;
+  width: 61px;
+  background-image: url("../images/fbSend.png");
+}
+body > div#lower-right > input.fbShare {
+  margin-left: 15px;
+  margin-top: 2px;
+  width: 69px;
+  background-image: url("../images/fbShare.png");
+}
+body > div#lower-right > input#video {
+  background-image: url("../images/video-on.png");
+}
+body > div#lower-right > input#video.on {
+  background-image: url("../images/video-off.png");
+}
+body > div#lower-right > input#audio.off {
+  margin-left: 5px;
+  background-image: url("../images/sound.png");
+}
+body > div#lower-right > input#audio {
+  margin-left: 5px;
+  background-image: url("../images/mute.png");
 }
 body > div#msgBoard {
   position: absolute;
@@ -116,9 +132,12 @@ body > div#msgBoard {
 body>div#msgBoard > div#chatOut
 {
   height:125px;
-  width:250px;
+  width:300px;
   overflow:auto;
   line-height: 1em;
+  border-width: 2px;
+  border-style: inset;
+  background-color: white;
 }
 body>div#msgBoard > input.chatTo
 {
@@ -162,6 +181,7 @@ body > div#meeting > div#streams > div#scarousel div.cloudcarousel {
   border-radius: 6px;
   background: darkgreen center top no-repeat url("../images/gologo.png");
   background-size: 70%;
+  background-position: center center;
 }
 body > div#meeting > div#streams > div#scarousel div.cloudcarousel.typeContent {
   background-size: 98%;
@@ -199,8 +219,10 @@ body > div#meeting > div#streams > div#scarousel div#mystream > div#myctrls > in
   margin-right: 5px;
 }
 body > div#meeting > div#streams > div#scontrols {
-  width: 132px;
-  margin-left: 42%;
+  width: 100px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
 }
 body > div#meeting > div#streams > div#scontrols > input {
   width: 26px;
@@ -214,18 +236,6 @@ body > div#meeting > div#streams > div#scontrols > input.left {
 }
 body > div#meeting > div#streams > div#scontrols > input.right {
   background-image: url("../images/btn-right.png");
-}
-body > div#meeting > div#streams > div#scontrols > input#video {
-  background-image: url("../images/video-on.png");
-}
-body > div#meeting > div#streams > div#scontrols > input#video.on {
-  background-image: url("../images/video-off.png");
-}
-body > div#meeting > div#streams > div#scontrols > input#audio.off {
-  background-image: url("../images/sound.png");
-}
-body > div#meeting > div#streams > div#scontrols > input#audio {
-  background-image: url("../images/mute.png");
 }
 #mask {
   position: absolute;
@@ -417,4 +427,8 @@ body > div#meeting > div#streams > div#scontrols > input#audio {
 #boxes #winEula input {
   float: right;
   margin-right: 5px;
+}
+#boxes #fbPrompt
+{
+   display: none;
 }
