@@ -1,0 +1,55 @@
+Index: src/build/merge_libs.gyp
+===================================================================
+--- src/build/merge_libs.gyp	(revision 2407)
++++ src/build/merge_libs.gyp	(working copy)
+@@ -13,7 +13,8 @@
+       'target_name': 'no_op',
+       'type': 'executable',
+       'dependencies': [
+-        '../video_engine/video_engine.gyp:video_engine_core',
++#        '../video_engine/video_engine.gyp:video_engine_core',
++        '../../third_party/libjingle/libjingle.gyp:libjingle_peerconnection',
+       ],
+       'sources': [ 'no_op.cc', ],
+     },
+Index: DEPS
+===================================================================
+--- DEPS	(revision 2407)
++++ DEPS	(working copy)
+@@ -4,6 +4,7 @@
+   "googlecode_url": "http://%s.googlecode.com/svn",
+   "chromium_trunk" : "http://src.chromium.org/svn/trunk",
+   "chromium_revision": "140240",
++  "libjingle_revision": "153",
+ 
+   # External resources like video and audio files used for testing purposes.
+   # Downloaded on demand when needed.
+@@ -70,6 +71,28 @@
+   # Needed by build/common.gypi.
+   "trunk/tools/win/supalink":
+     Var("chromium_trunk") + "/src/tools/win/supalink@" + Var("chromium_revision"),
++
++
++  # --- libjingle dependencies ---
++
++  "trunk/third_party/libjingle/":
++    File(Var("chromium_trunk") + "/src/third_party/libjingle/libjingle.gyp@" + Var("chromium_revision")),
++
++  "trunk/third_party/libjingle/source":
++    From("trunk/chromium_deps", "src/third_party/libjingle/source"),
++
++  "trunk/third_party/libjingle/overrides/talk/base":
++    (Var("googlecode_url") % "libjingle") + "/trunk/talk/base@" + Var("libjingle_revision"),
++
++  "trunk/third_party/libsrtp/":
++    From("trunk/chromium_deps", "src/third_party/libsrtp"),
++
++  "trunk/third_party/jsoncpp/":
++    Var("chromium_trunk") + "/src/third_party/jsoncpp@" + Var("chromium_revision"),
++
++  "trunk/third_party/jsoncpp/source":
++    "http://jsoncpp.svn.sourceforge.net/svnroot/jsoncpp/trunk/jsoncpp@248",
++
+ }
+ 
+ deps_os = {

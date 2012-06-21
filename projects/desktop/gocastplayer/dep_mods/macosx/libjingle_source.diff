@@ -1,0 +1,26 @@
+Index: talk/p2p/base/stun.h
+===================================================================
+--- talk/p2p/base/stun.h	(revision 153)
++++ talk/p2p/base/stun.h	(working copy)
+@@ -140,7 +140,7 @@
+ class StunMessage {
+  public:
+   StunMessage();
+-  ~StunMessage();
++  virtual ~StunMessage();
+ 
+   int type() const { return type_; }
+   size_t length() const { return length_; }
+Index: talk/base/refcount.h
+===================================================================
+--- talk/base/refcount.h	(revision 153)
++++ talk/base/refcount.h	(working copy)
+@@ -69,6 +69,8 @@
+       : T(p1, p2, p3, p4, p5), ref_count_(0) {
+   }
+ 
++  virtual ~RefCountedObject() {}
++
+   virtual int AddRef() {
+     return talk_base::AtomicOps::Increment(&ref_count_);
+   }
