@@ -12,6 +12,23 @@
  */
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
+a:link
+{
+  color: #0000ff;
+}
+a:visited 
+{
+  color: #800080;
+}
+a:hover
+{
+  color: #0000ff;
+  text-decoration:underline
+}
+a:active
+{
+  color: #0000ff;
+}
 body {
   margin: 0;
   padding: 0;  
@@ -276,24 +293,8 @@ body > div#meeting > div#streams > div#scontrols > input.right {
   border: 4px solid #812034;
   border-radius: 16px;  
 }
-#boxes #credentials > img.close {
-  float: right;
-  border: 2px solid gray;
-  border-radius: 5px;  
-  margin: 5px 0px;
-}
 #boxes #credentials > p.title {
   margin: 30px 10px 20px 10px;
-}
-#boxes #credentials > input#name {
-  width: 15em;
-  border-radius: 5px;
-  margin-left: 10px;
-}
-#boxes #credentials > input#email {
-  width: 20em;
-  border-radius: 5px;
-  margin-left: 10px;
 }
 #boxes #credentials div#fb-login-button {
   width: 20em;
@@ -301,16 +302,51 @@ body > div#meeting > div#streams > div#scontrols > input.right {
   margin-left: 10px;
   margin-bottom: 10px;
 }
-#boxes #credentials > p.error {
-  color: red;
+#boxes #credentials #noThanks
+{
+  float: right;
+}
+#boxes #credentials2 {
+  width: 300px; 
+  height: 220px;
+  padding: 0px 7px 7px 7px;
+  background-color: #eeeeee;
+  border: 4px solid #812034;
+  border-radius: 16px;  
+}
+#boxes #credentials2 > p.title {
+  margin-left: 10px;
+}
+#boxes #credentials2 input#name {
+  width: 15em;
+  border-radius: 5px;
+  margin-left: 10px;
+}
+#boxes #credentials2 input#email {
+  width: 20em;
+  border-radius: 5px;
+  margin-left: 10px;
+}
+#boxes #credentials2 input#btn {
+  width: 10em;
+  height: 3em;
+  margin-left: 10px;
+}
+#boxes #credentials2 div#fb-login-button {
+  width: 20em;
+  border-radius: 5px;
+  margin-left: 10px;
+  margin-bottom: 10px;
+}
+#boxes #credentials2 > p.error {
+  position: absolute;
+  top: -2.5em;
+  margin-left: 10px;
+  color: black;
   font-weight: bold;
   font-size: 1.2em;
   text-shadow: 0 0 10px white, 0 0 20px white, 0 0 30px white, 0 0 40px #FF00DE, 0 0 70px #FF00DE, 0 0 80px #FF00DE, 0 0 100px #FF00DE, 0 0 150px #FF00DE;
   display: none;
-}
-#boxes #credentials > p.skip-text {
-  font-size: 1.0em;
-  float: right;
 }
 #boxes #chatInp {
   width: 600px;

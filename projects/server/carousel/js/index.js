@@ -171,8 +171,9 @@ var app = {
     scheduleName: null,
     scheduleJid: null,
     scheduleTitle: null,
-    fbProfileUrl: null, // cache the url since user may log out of fb
-    fbProfilePicUrl: null // cache the url since user may log out of fb
+    fbProfileUrl: null,    // cache the url since user may log out of fb
+    fbProfilePicUrl: null, // cache the url since user may log out of fb
+    fbSkipped: false,      // user chose to skip fb login
   },
   // enable the audio video mute buttons, global chat input
   enableButtons: function(enable)
@@ -415,18 +416,6 @@ function openMeeting(
   app.log(2, "openMeeting");
 
   /*
-   * Check user name.*/
-  /*
-  var usrNm = $("#credentials > input#name").val();
-  if (usrNm.length < 1) {
-    $("#credentials > p.error").text("Please enter your name to continue.").
-      fadeIn("fast");
-    return false;
-  }
-  app.user.name = encodeURI(usrNm);
-  app.log(2, "User name:" + usrNm);
-  */
-  /*
    * Add encname attribute to mystream. */
   $("#meeting > #streams > #scarousel #mystream")
     .attr("encname", app.user.name);
@@ -440,9 +429,6 @@ function openMeeting(
      $("#meeting > #streams > #scarousel #mystream")
         .css("background-image", "url(" + app.user.fbProfilePicUrl + ")");
   }
-  /*
-   * Deactivate window.*/
-  //deactivateWindow("#credentials");
   /*
    * Get window height and width. */
   var winH = $(window).height();
@@ -517,7 +503,7 @@ function keypressNameHandler(
 {
   /*
    * Remove any message. */
-  $("#credentials > p.error").hide().text("");
+  $("#credentials2 > p.error").hide().text("");
   /*
    * We have no action for key press combinations with the Alt key. */
   if (event.altKey) {
@@ -739,8 +725,6 @@ function changeVideo(
   return false;
 } /* changeVideo() */
 
-
-
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
  * \brief Action change Audio.
@@ -784,7 +768,7 @@ function activateWindow(
 )
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
-  if (winId.match("credentials")) {
+  if (winId.match("credentials2")) {
     $("input#name", winId).on("keydown.s04072012", keypressNameHandler);
     $("input#btn", winId).on("click.s04072012", onJoinNow);
   }
@@ -816,7 +800,7 @@ function deactivateWindow(
 )
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
-  if (winId.match("credentials")) {
+  if (winId.match("credentials2")) {
     /*
      * Remove any message. */
     $("p.error", winId).hide().text("");
@@ -960,12 +944,12 @@ function onJoinNow(
     app.log(2, "onJoinNow");
 
     // get the nick name, return back to dialog if not defined
-    var usrNm = $("#credentials > input#name").val();
+    var usrNm = $("#credentials2 > input#name").val();
     
     // user must enter fb or nick name if both not entered
     // display error
     if (usrNm.length < 1) {
-      $("#credentials > p.error").text("Please enter a name to continue.").
+      $("#credentials2 > p.error").text("Please enter a name to continue.").
         fadeIn("fast");
       return false;
     }
@@ -976,11 +960,29 @@ function onJoinNow(
     app.log(2, "User name:" + usrNm);
     
     // close dialog
-    deactivateWindow("#credentials");
+    deactivateWindow("#credentials2");
 
     app.userLoggedIn = true;
     $(document).trigger("one-login-complete", "OnJoinNow() -- non-FB-login");
 
+} /* onJoinNow() */
+
+/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+/**
+ * \brief callback for fb skip button press
+ */
+function enterId(
+/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+    /**
+     * No argument. */
+)
+/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+{
+    app.log(2, "enterId");
+    deactivateWindow("#credentials");
+    $('.window').hide();
+    //closeWindow();
+    openWindow('#credentials2');
 } /* onJoinNow() */
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
@@ -995,14 +997,22 @@ function checkCredentials(
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
     app.log(2, "checkCredentials");
+    
+    // this method is called on a fb status change
+    // so do nothing if we're already logged in
+    if (app.userLoggedIn)
+    {
+       return;
+    }
 
-    // check fb login status and prompt if not logged in
-    if (!FB.getAuthResponse())
+    // check fb login status and prompt if not skipped and not logged in
+    if (!app.user.fbSkipped && !FB.getAuthResponse())
     {
        openWindow('#credentials');
     }
     else // fb logged in update fb logged in status
     {
+      deactivateWindow("#credentials");
       app.userLoggedIn = true;
       $(document).trigger("one-login-complete", "checkCredentials - FB Login");
     }
