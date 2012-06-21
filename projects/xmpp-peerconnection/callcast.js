@@ -81,6 +81,7 @@ var Callcast = {
 	FEEDBACK_BOT: "feedback_bot_etzchayim@video.gocast.it",
 	STUNSERVERPORT: 19302,
 	ROOMMANAGER: "overseer@video.gocast.it/roommanager",
+	SWITCHBOARD_FB: 'switchboard_gocastfriends@video.gocast.it',
 	Callback_AddPlugin: null,
 	Callback_RemovePlugin: null,
 	Callback_AddCarouselContent: null,
@@ -745,6 +746,16 @@ var Callcast = {
       	this.connection.send(urlRenderInfo);
 	},
 	
+	SendFBInfoToServer: function(fbsr) {
+		var pres = $pres({to: this.SWITCHBOARD_FB, intro_sr: fbsr})
+			.c('x',{xmlns: 'http://jabber.org/protocol/muc'});
+
+		// Now that we're connected, let's send our presence info to the switchboard and FB info.
+		// Note - we're going to send our INTRO_SR buried in our presence.
+		//        This way, the switchboard will know who we are on facebook when our presence is seen.
+		this.connection.send(pres);
+	},
+	
 	on_callcast_groupchat_command: function(message) {
 		var cmd = $(message).children('cmd');
 		var cmdtype = null;
@@ -775,8 +786,7 @@ var Callcast = {
 		
 		this.log("Received URL to render from: " + $(message).attr('from').split('/')[1]);
 		
-		//TODO:RMW - How to render locally?
-//		this.setCarouselContent(info);
+		this.setCarouselContent(info);
 		
 		return true;
 	},
