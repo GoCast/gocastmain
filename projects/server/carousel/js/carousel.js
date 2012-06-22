@@ -193,8 +193,16 @@
               if (!app.videoEnabled) {
 //                app.log(2, "Nothing to do with resizing video.");
               }
-              else {
-                Callcast.SendLocalVideoToPeers(new Object({width:w, height:h}));
+              else 
+              {
+                if (w > 10 && h > 10)
+                {
+                  Callcast.SendLocalVideoToPeers(new Object({width:w, height:h}));
+                }
+                else
+                {
+                   app.log(3, "carousel local video width " + w + " height " + h);
+                }
               }
             }
             else 
@@ -202,7 +210,14 @@
               var nick = $(obj).attr("encname");
               if (nick && Callcast.participants[nick].videoOn)
               {
-                 Callcast.ShowRemoteVideo(new Object({nick:nick, width:w, height:h}));
+                if (w > 10 && h > 10)
+                {
+                    Callcast.ShowRemoteVideo(new Object({nick:nick, width:w, height:h}));
+                }
+                else
+                {
+                    app.log(3, "carousel remote video width " + w + " height " + h);
+                }
               }
               // else do nothing on resize
             }

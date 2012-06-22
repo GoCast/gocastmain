@@ -303,13 +303,24 @@ function carouselItemClick(
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
    app.log(2, "carouselItemClick " + event);
-   if (event.currentTarget.className === "cloudcarousel unoccupied")
+   if (event.currentTarget.className.indexOf("unoccupied") != -1)
    {
-      //var urlName = prompt("Enter a URL");
-      //app.log(2, "carouselItemClick got url " + urlName);
+      var urlName = prompt("Enter a URL to put in this spot.");
+      if (urlName && urlName.length > 0)
+      {
+         //todo canonicalize url
+         app.log(2, "carouselItemClick got url " + urlName);
+         
+         Callcast.SendURLToRender({
+            id:      urlName,
+            altText: urlName,
+            url:     urlName,
+            });
+      }
    }
    else if (event.currentTarget.title === "Me")
    {
+      // do nothing for now
    }
    else // remote user
    {

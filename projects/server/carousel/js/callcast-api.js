@@ -525,6 +525,7 @@ function addContentToCarousel(
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
   app.log(2, "addContentToCarousel " + info.id);
+  console.log("info", info);
   
   // info.id is an encoded name, get an id from it to use to index 
   // into carousel items
@@ -540,9 +541,34 @@ function addContentToCarousel(
     $(oo).attr("alt", info.altText);
     $(oo).attr("url", info.url);
     $(oo).attr("encname", info.id);
-    $(oo).css("background-image", info.image);
     $(oo).removeClass("unoccupied").addClass("typeContent");
 
+    // use the image in info if supplied
+    // else generate one from the url
+    if (info.image)
+    {
+       $(oo).css("background-image", info.image);
+    }
+    else // gen image from url
+    {
+       GoCastJS.UrlSnapshot
+       (
+          "#scratch",
+          {
+             width     : 200,
+             height    : 200,
+             webUrl    : info.url,
+             proxyUrl  : "http://carousel.gocast.it/proxy",
+             disableJS : true,
+           },
+           function(image)
+           {
+              $(oo).css("background-image", "url(" + image.src + ")");
+              $("#scratch").empty();
+           }
+           // todo handler failure
+       );
+    }
     app.log(2, "Added Content" + id + " object.");
   }
   else {
