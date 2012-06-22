@@ -1,6 +1,19 @@
 var GoCastJS = (undefined !== GoCastJS)? GoCastJS: {};
 
-GoCastJS.UrlSnapshot = function(snapshotDivSelector, options) {
+///
+/// \brief generate an image from a URL
+/// \param div jq div selector from main html to render needed to inherit window
+/// \param options JSON object with:
+///    width image width
+///    height image height
+///    webUrl normalized url to render to image
+///    proxyUrl normalized url of renderer
+///    disableJS boolean
+/// \param imageCallback returns rendered image on success
+///
+/// \todo failure callback
+/// 
+GoCastJS.UrlSnapshot = function(snapshotDivSelector, options, imageCallback) {
 	//image desired instead of canvas as it is easier to resize
 	var canvasToImage = function(canvas, newDims) {
 		var canvasDataURL = canvas.toDataURL("image/png");
@@ -57,12 +70,11 @@ GoCastJS.UrlSnapshot = function(snapshotDivSelector, options) {
 							//and passes it through the following callback
 							html2canvas(jqFrameBody, {
 								onrendered: function(snapshotCanvas) {
-												jqSnapshotDiv.empty().append(
-													canvasToImage(snapshotCanvas, {
+													var image = canvasToImage(snapshotCanvas, {
 														width  : options.width,
 														height : options.height
-													})
-												);
+													});
+													imageCallback(image);
 											}
 							});
 						});
