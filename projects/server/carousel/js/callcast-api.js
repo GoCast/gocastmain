@@ -531,10 +531,7 @@ function addContentToCarousel(
   // into carousel items
   var id = app.str2id(info.id);
   
-  // remote user not found this must be demo content
-  /*
-   * Check next available cloudcarousel. */
-  var oo = $("#meeting > #streams > #scarousel div.unoccupied").get(0);
+  oo = $("#meeting > #streams > #scarousel div.unoccupied").get(0);
   if (oo) {
     $(oo).attr("id", id);
     $(oo).attr("title", info.altText);
@@ -551,23 +548,32 @@ function addContentToCarousel(
     }
     else // gen image from url
     {
-       GoCastJS.UrlSnapshot
-       (
-          "#scratch",
+       GoCastJS.getUrlInfo(
+       { 
+         webUrl:   info.url,
+         proxyUrl: "http://carousel.gocast.it/proxy",
+       }, 
+       function(urlInfo)
+       {
+          // remove the spot backgrond
+          $(oo).css("background-image", "");
+          // create a child div with url info for spot
+          var div = $('<div class="spotUrlInfo"/>');
+          // hot link to http://getfavicon.appspot.com/ to get favicon
+          //$(div).css("background-image", "url(" + "http://g.etfv.co/" + info.url + ")");
+          $(div).append('<img class="icon" src="http://g.etfv.co/' + info.url + '" alt="images/gologo.png"/>');
+          
+          // add title
+          if (urlInfo.title)
           {
-             width     : 200,
-             height    : 200,
-             webUrl    : info.url,
-             proxyUrl  : "http://carousel.gocast.it/proxy",
-             disableJS : true,
-           },
-           function(image)
-           {
-              $(oo).css("background-image", "url(" + image.src + ")");
-              $("#scratch").empty();
-           }
-           // todo handler failure
-       );
+             $(div).append($('<p>' + urlInfo.title + '</p>'));
+          }
+          else 
+          {          
+             $(div).append($('<p>' + info.url + '</p>'));
+          }
+          $(oo).append(div);
+       });
     }
     app.log(2, "Added Content" + id + " object.");
   }
@@ -575,8 +581,6 @@ function addContentToCarousel(
     app.log(4, "Maximum number of participants reached.");
   }
 } /* addContentToCarousel() */
-
-
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
