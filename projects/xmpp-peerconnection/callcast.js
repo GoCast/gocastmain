@@ -99,6 +99,9 @@ var Callcast = {
     HEIGHT: 192,
     overseer: null,
     presenceBlob: null,
+    fbsr: "",
+    fbaccesstoken: "",
+    fb_sent_pres: false,
 
     CallStates: {
     	NONE: 0,
@@ -746,14 +749,20 @@ var Callcast = {
       	this.connection.send(urlRenderInfo);
 	},
 	
-	SetFBSignedRequest: function(fbsr) {
-		this.fbsr = fbsr;
-		
-		this.SendFBPres();
+	SetFBSignedRequestAndAccessToken: function(fbsr, access) {
+
+	// Only set/change and send presence if something has changed.	
+		if (!this.fb_sent_pres || this.fbsr !== fbsr || this.fbaccesstoken !== access)
+		{
+			this.fbsr = fbsr;
+			this.fbaccesstoken = access;
+			
+			this.SendFBPres();
+		}
 	},
 	
-	sendFBPres: function() {
-		var pres = $pres({to: this.SWITCHBOARD_FB, intro_sr: this.fbsr})
+	SendFBPres: function() {
+		var pres = $pres({to: this.SWITCHBOARD_FB, intro_sr: this.fbsr, intro_at: this.fbaccesstoken})
 			.c('x',{xmlns: 'http://jabber.org/protocol/muc'});
 
 		// Now that we're connected, let's send our presence info to the switchboard and FB info.
@@ -761,7 +770,10 @@ var Callcast = {
 		//        This way, the switchboard will know who we are on facebook when our presence is seen.
 		
 		if (this.connection)
+		{
+			this.fb_sent_pres = true;
 			this.connection.send(pres);
+		}
 	},
 	
 	on_callcast_groupchat_command: function(message) {
@@ -1384,7 +1396,7 @@ var Callcast = {
 
     finalizeConnect: function() {
     	this.connection.send($pres());
-    	this.sendFBPres();
+    	this.SendFBPres();
 
     	// Handle inbound signaling messages
     	//Callcast.connection.addHandler(Callcast.handle_webrtc_message, null, "message", "webrtc-message");
