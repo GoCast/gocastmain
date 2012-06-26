@@ -40,7 +40,7 @@ body {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 13px;
   overflow: hidden;
-  background: whitesmoke;
+  background: black;
 }
 body input[type="button"] {
   border: 0px;
@@ -61,7 +61,7 @@ body > div#upper-right
    float:right;
    margin-top: 10px;
    margin-right: 10px;
-   width:50%;
+   width:auto;
    z-index: 1000;
    line-height: 2em;
 }
@@ -88,11 +88,11 @@ body > div#lower-right
 {
    float:right;
    position:absolute;
-   bottom:32px;
+   bottom:10px;
    right:32px;
    margin-top: 10px;
    margin-right: 10px;
-   width:50%;
+   width:auto;
    z-index: 1000;
    line-height: 2em;
 }
@@ -141,7 +141,7 @@ body > div#lower-right > input#audio {
 body > div#msgBoard {
   position: absolute;
   z-index: 1000;
-  bottom: 32px;
+  bottom: 10px;
   left: 0px;
   margin: 0px 10px 0px;
   line-height: 2em;
@@ -153,7 +153,6 @@ body>div#msgBoard > div#chatOut
   overflow:auto;
   line-height: 1em;
   border-width: 2px;
-  border-style: inset;
   background-color: white;
 }
 body>div#msgBoard > input.chatTo
@@ -180,28 +179,56 @@ body > div#meeting > div#streams {
   top: 0px;
   left: 0px;
   width: 98%;
-  height: 80%;
+  height: 90%;
 }
 body > div#meeting > div#streams > div#scarousel {
   width: 100%;
   height: 100%;
 }
 body > div#meeting > div#streams > div#scarousel div.cloudcarousel {
-  width: 260px;
-  height: 216px;
+  width: 300px;
+  height: 248px;
   opacity: 1;
   transition: opacity 0.5s;
   -moz-transition: opacity 0.5s;
   -webkit-transition: opacity 0.5s;
   -o-transition: opacity 0.5s;
-  border: 3px solid darkgreen;
   border-radius: 6px;
-  background: darkgreen center top no-repeat url("../images/gologo.png");
+  background-color: #404040;
   background-size: 70%;
   background-position: center center;
+  background-repeat: no-repeat
 }
 body > div#meeting > div#streams > div#scarousel div.cloudcarousel.typeContent {
   background-size: 98%;
+  display: table;
+}
+/*
+.urlPad
+{
+   position:       relative; 
+   float:          left;
+   height:         50%;
+   margin-bottom: -150px;
+   width:          1px;
+}
+*/
+body > div#meeting > div#streams > div#scarousel div.cloudcarousel.typeContent > div.spotUrlInfo 
+{
+  position:relative; 
+  clear: left;
+  background-color: white;
+  width: 70%;
+  height:200px;
+  margin-left:auto;
+  margin-right:auto;
+  /*display: table-cell;*/
+  vertical-align: middle;
+}
+body > div#meeting > div#streams > div#scarousel div.cloudcarousel.typeContent > div.spotUrlInfo > img.icon
+{
+  width: 32px;
+  height: 32px;
 }
 body > div#meeting > div#streams > div#scarousel div.cloudcarousel > object {
   margin: 2px;
@@ -218,28 +245,18 @@ body > div#meeting > div#streams > div#scarousel div.cloudcarousel > div.name {
   color: white;
 }
 body > div#meeting > div#streams > div#scarousel div.unoccupied {
-  opacity: 0.1;
+  background-image: url("../images/gologo200.png");
+  opacity: 0.7;
 }
 body > div#meeting > div#streams > div#scarousel div#mystream {
   background-image: url("../images/person.png");  
-}
-body > div#meeting > div#streams > div#scarousel div#mystream > div#myctrls {
-  position: absolute;
-  bottom: 0px;
-  left: 40%;
-}
-body > div#meeting > div#streams > div#scarousel div#mystream > div#myctrls > input {
-  width: 24px;
-  height: 24px;
-  background-position: center;
-  background-repeat: no-repeat;
-  margin-right: 5px;
 }
 body > div#meeting > div#streams > div#scontrols {
   width: 100px;
   margin-left: auto;
   margin-right: auto;
   text-align: center;
+  z-index: 2000;
 }
 body > div#meeting > div#streams > div#scontrols > input {
   width: 26px;

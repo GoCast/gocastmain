@@ -525,32 +525,62 @@ function addContentToCarousel(
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
   app.log(2, "addContentToCarousel " + info.id);
+  console.log("info", info);
   
   // info.id is an encoded name, get an id from it to use to index 
   // into carousel items
   var id = app.str2id(info.id);
   
-  // remote user not found this must be demo content
-  /*
-   * Check next available cloudcarousel. */
-  var oo = $("#meeting > #streams > #scarousel div.unoccupied").get(0);
+  oo = $("#meeting > #streams > #scarousel div.unoccupied").get(0);
   if (oo) {
     $(oo).attr("id", id);
     $(oo).attr("title", info.altText);
     $(oo).attr("alt", info.altText);
     $(oo).attr("url", info.url);
     $(oo).attr("encname", info.id);
-    $(oo).css("background-image", info.image);
     $(oo).removeClass("unoccupied").addClass("typeContent");
 
+    // use the image in info if supplied
+    // else generate one from the url
+    if (info.image)
+    {
+       $(oo).css("background-image", info.image);
+    }
+    else // gen image from url
+    {
+       GoCastJS.getUrlInfo(
+       { 
+         webUrl:   info.url,
+         proxyUrl: "http://carousel.gocast.it/proxy",
+       }, 
+       function(urlInfo)
+       {
+          // remove the spot backgrond
+          $(oo).css("background-image", "");
+          // create a child div with url info for spot
+          var div = $('<div class="spotUrlInfo"/>');
+          // hot link to http://getfavicon.appspot.com/ to get favicon
+          $(div).append('<img class="icon" src="http://g.etfv.co/' + info.url + '" alt="images/gologo.png"/>');
+          
+          // add title
+          if (urlInfo.title)
+          {
+             $(div).append($('<p>' + urlInfo.title + '</p>'));
+          }
+          else 
+          {          
+             $(div).append($('<p>' + info.url + '</p>'));
+          }
+          $(oo).append('<div class="urlPad"/>');
+          $(oo).append(div);
+       });
+    }
     app.log(2, "Added Content" + id + " object.");
   }
   else {
     app.log(4, "Maximum number of participants reached.");
   }
 } /* addContentToCarousel() */
-
-
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
