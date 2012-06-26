@@ -1113,6 +1113,36 @@ function tryPluginInstall(
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
+ * \brief show the chat output div
+ *
+ * this is called on ticker mouse over
+ */
+function showChatOut()
+{
+   // hide the ticker
+   $('#msgTicker').css("display", "none");
+   
+   // show chatOut
+   $('#msgBoard > #chatOut').css("display", "block");
+   
+} // showChatOut
+
+/**
+ * \brief show the chat ticker div
+ *
+ */
+function showMsgTicker()
+{
+   // hide the ticker
+   $('#msgBoard > #chatOut').css("display", "none");
+   
+   // show chatOut
+   $('#msgTicker').css("display", "block");
+   
+} // showChatOut
+
+/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+/**
  * \brief The document ready event handler.
  *
  * This event handler is called right after the DOM finishes loading.

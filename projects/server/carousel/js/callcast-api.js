@@ -131,9 +131,13 @@ $(document).on('public-message', function (
   /*
    * Add message to Message Board. */
   var jqChat = $("#msgBoard > #chatOut");
+  var jqTick = $("#msgBoard > #msgTicker");
   var msg = '<b>'+ decodeURI(msginfo.nick) +'</b>'+': '+
                    decodeURI(msginfo.body) + "<br>";
   jqChat.append(msg);
+  var msgTicker = '<b>'+ decodeURI(msginfo.nick) +'</b>'+': '+
+                   decodeURI(msginfo.body) + " ";
+  jqTick.prepend(msgTicker);
 
   app.log(2, "A public message arrived " + msg);
 }); /* public-message() */

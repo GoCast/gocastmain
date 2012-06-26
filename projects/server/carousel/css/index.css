@@ -145,12 +145,28 @@ body > div#msgBoard {
   left: 0px;
   margin: 0px 10px 0px;
   line-height: 2em;
+  max-width: 40%
 }
 body>div#msgBoard > div#chatOut
 {
+  display:none;
   height:125px;
   width:300px;
   overflow:auto;
+  line-height: 1em;
+  border-width: 2px;
+  background-color: white;
+  -moz-user-select: text;
+  -khtml-user-select: text;
+  -webkit-user-select: text;
+  -o-user-select: text;
+  user-select: text;
+}
+body>div#msgBoard > div#msgTicker
+{
+  height:1.25em;
+  width:auto;
+  overflow:hidden;
   line-height: 1em;
   border-width: 2px;
   background-color: white;
