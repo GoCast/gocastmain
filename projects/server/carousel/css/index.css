@@ -201,16 +201,28 @@ body > div#meeting > div#streams > div#scarousel div.cloudcarousel {
 }
 body > div#meeting > div#streams > div#scarousel div.cloudcarousel.typeContent {
   background-size: 98%;
-  display:table;
+  display: table;
 }
+/*
+.urlPad
+{
+   position:       relative; 
+   float:          left;
+   height:         50%;
+   margin-bottom: -150px;
+   width:          1px;
+}
+*/
 body > div#meeting > div#streams > div#scarousel div.cloudcarousel.typeContent > div.spotUrlInfo 
 {
+  position:relative; 
+  clear: left;
   background-color: white;
   width: 70%;
-  height: 70%;
+  height:200px;
   margin-left:auto;
   margin-right:auto;
-  display: table-cell;
+  /*display: table-cell;*/
   vertical-align: middle;
 }
 body > div#meeting > div#streams > div#scarousel div.cloudcarousel.typeContent > div.spotUrlInfo > img.icon

@@ -560,7 +560,6 @@ function addContentToCarousel(
           // create a child div with url info for spot
           var div = $('<div class="spotUrlInfo"/>');
           // hot link to http://getfavicon.appspot.com/ to get favicon
-          //$(div).css("background-image", "url(" + "http://g.etfv.co/" + info.url + ")");
           $(div).append('<img class="icon" src="http://g.etfv.co/' + info.url + '" alt="images/gologo.png"/>');
           
           // add title
@@ -572,6 +571,7 @@ function addContentToCarousel(
           {          
              $(div).append($('<p>' + info.url + '</p>'));
           }
+          $(oo).append('<div class="urlPad"/>');
           $(oo).append(div);
        });
     }
