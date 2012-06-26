@@ -44,17 +44,20 @@ function fbInit(
           }
       });
 
-        // listen for and handle auth.statusChange events
-        FB.Event.subscribe('auth.statusChange', function(response) {
-          app.log(2, "fbStatusChange callback");
-          if (response.authResponse) {
-            app.log(2, "fbStatusChange callback user is authorized");
-            //
-            // NOTE: These two represent the keys to the kingdom. The signed response and the id.
-            // the authResponse can be accessed using FB sync api calls
-            //
+        // listen for and handle auth.authResponseChange events
+        FB.Event.subscribe('auth.authResponseChange', function(response) {
+          app.log(2, "authResponseChange callback");
+          console.log("response==", response);
+          if (response.authResponse)
+          {
+          	console.log("FB logged IN or got a new token.");
+		//
+		// NOTE: These two represent the keys to the kingdom. The signed response and the id.
+		// the authResponse can be accessed using FB sync api calls
+		//
             //globalFBSR = response.authResponse.signedRequest;
             //globalFBID = response.authResponse.id;
+            Callcast.SetFBSignedRequestAndAccessToken(response.authResponse.signedRequest, response.authResponse.accessToken);
 
             // user has auth'd your app and is logged into Facebook
             FB.api('/me', function(me)
@@ -74,9 +77,16 @@ function fbInit(
 
                 $(document).trigger("checkCredentials");
               }
-            })
+            });
+            
+          }
+          else
+          {
+          	console.log("FB logged out or token went bad?");
+            Callcast.SetFBSignedRequestAndAccessToken(null, null);
           }
         });
+        
     }
 
 } // fbInit
