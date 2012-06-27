@@ -131,9 +131,13 @@ $(document).on('public-message', function (
   /*
    * Add message to Message Board. */
   var jqChat = $("#msgBoard > #chatOut");
+  var jqTick = $("#msgBoard > #msgTicker");
   var msg = '<b>'+ decodeURI(msginfo.nick) +'</b>'+': '+
                    decodeURI(msginfo.body) + "<br>";
   jqChat.append(msg);
+  var msgTicker = '<b>'+ decodeURI(msginfo.nick) +'</b>'+': '+
+                   decodeURI(msginfo.body) + " ";
+  jqTick.prepend(msgTicker);
 
   app.log(2, "A public message arrived " + msg);
 }); /* public-message() */
@@ -555,24 +559,26 @@ function addContentToCarousel(
        }, 
        function(urlInfo)
        {
-          // remove the spot backgrond
+          // remove the spot background
           $(oo).css("background-image", "");
           // create a child div with url info for spot
-          var div = $('<div class="spotUrlInfo"/>');
+          var divIcon = $('<div class="spotUrlIcon"/>');
           // hot link to http://getfavicon.appspot.com/ to get favicon
-          $(div).append('<img class="icon" src="http://g.etfv.co/' + info.url + '" alt="images/gologo.png"/>');
+          $(divIcon).css("background-image", 'url(http://g.etfv.co/' + info.url + ')');
           
+          var divTitle = $('<div class="spotUrlTitle"/>');
           // add title
           if (urlInfo.title)
           {
-             $(div).append($('<p>' + urlInfo.title + '</p>'));
+             $(divTitle).append($('<p>' + urlInfo.title + '</p>'));
           }
           else 
           {          
-             $(div).append($('<p>' + info.url + '</p>'));
+             $(divTitle).append($('<p>' + info.url + '</p>'));
           }
           $(oo).append('<div class="urlPad"/>');
-          $(oo).append(div);
+          $(oo).append(divIcon);
+          $(oo).append(divTitle);
        });
     }
     app.log(2, "Added Content" + id + " object.");

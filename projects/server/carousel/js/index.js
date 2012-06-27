@@ -211,7 +211,8 @@ function startDemoContent(
 {
   /*
    * First content. */
-  Callcast.Callback_AddCarouselContent(new Object({id:"demo1", image:"url('images/demo1-egyptmap.gif')", altText:"Egyptians vote in first free presidential election", url:"http://www.google.com/hostednews/ap/article/ALeqM5iS0-q8BzFkHp3IV4ks-5tnbKnw-Q?docId=2b6df5e5e5fd40e0a8ab49103fda20bc"}));
+  // article is gone
+  //Callcast.Callback_AddCarouselContent(new Object({id:"demo1", image:"url('images/demo1-egyptmap.gif')", altText:"Egyptians vote in first free presidential election", url:"http://www.google.com/hostednews/ap/article/ALeqM5iS0-q8BzFkHp3IV4ks-5tnbKnw-Q?docId=2b6df5e5e5fd40e0a8ab49103fda20bc"}));
   /*
    * Second content delayed 1000 ms. */
   setTimeout(function() {
@@ -1110,6 +1111,36 @@ function tryPluginInstall(
     openWindow('#errorMsgPlugin');
   }
 } /* tryPluginInstall() */
+
+/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+/**
+ * \brief show the chat output div
+ *
+ * this is called on ticker mouse over
+ */
+function showChatOut()
+{
+   // hide the ticker
+   $('#msgTicker').css("display", "none");
+   
+   // show chatOut
+   $('#msgBoard > #chatOut').css("display", "block");
+   
+} // showChatOut
+
+/**
+ * \brief show the chat ticker div
+ *
+ */
+function showMsgTicker()
+{
+   // hide the ticker
+   $('#msgBoard > #chatOut').css("display", "none");
+   
+   // show chatOut
+   $('#msgTicker').css("display", "block");
+   
+} // showChatOut
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**

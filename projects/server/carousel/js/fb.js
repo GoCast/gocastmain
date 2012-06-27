@@ -2,6 +2,40 @@
 /**
  * \brief initialize facebook api.
  */
+function fbMe
+(
+   response // facebook response object
+)
+{
+   console.log("FB logged IN or got a new token.");
+   //
+   // NOTE: These two represent the keys to the kingdom. The signed response and the id.
+   // the authResponse can be accessed using FB sync api calls
+   //
+   Callcast.SetFBSignedRequestAndAccessToken(response.authResponse.signedRequest, response.authResponse.accessToken);
+
+   // user has auth'd your app and is logged into Facebook
+   FB.api('/me', function(me)
+   {
+      if (me && me.name)
+      {
+         app.user.name = encodeURI(me.name);
+         app.user.fbProfileUrl = "https://graph.facebook.com/" + me.id;
+         app.user.fbProfilePicUrl = "https://graph.facebook.com/" + me.id + "/picture?type=large";
+         Callcast.SetNickname(app.user.name); // TODO should be somewhere else
+         Callcast.setPresenceBlob(new Object({
+                                              url:app.user.fbProfileUrl,
+		                                      image:app.user.fbProfilePicUrl
+		                                     } ) );
+            $(document).trigger("checkCredentials");
+      }
+   });
+}
+
+/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+/**
+ * \brief initialize facebook api.
+ */
 function fbInit(
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
     /**
@@ -28,6 +62,21 @@ function fbInit(
         logging    : true,
       });
 
+        // listen for and handle auth.authResponseChange events
+        FB.Event.subscribe('auth.authResponseChange', function(response) {
+          app.log(2, "authResponseChange callback");
+          console.log("response==", response);
+          if (response.authResponse)
+          {
+             fbMe(response);
+          }
+          else
+          {
+          	console.log("FB logged out or token went bad?");
+            Callcast.SetFBSignedRequestAndAccessToken(null, null);
+          }
+        });
+
       // not needed since the status : true arg to FB.init above 
       // does the equivalent and fires statusChange
       // but looks like the above stmt is not true, we don't get
@@ -42,51 +91,13 @@ function fbInit(
           {
              $(document).trigger("checkCredentials");
           }
-      });
-
-        // listen for and handle auth.authResponseChange events
-        FB.Event.subscribe('auth.authResponseChange', function(response) {
-          app.log(2, "authResponseChange callback");
-          console.log("response==", response);
-          if (response.authResponse)
-          {
-          	console.log("FB logged IN or got a new token.");
-		//
-		// NOTE: These two represent the keys to the kingdom. The signed response and the id.
-		// the authResponse can be accessed using FB sync api calls
-		//
-            //globalFBSR = response.authResponse.signedRequest;
-            //globalFBID = response.authResponse.id;
-            Callcast.SetFBSignedRequestAndAccessToken(response.authResponse.signedRequest, response.authResponse.accessToken);
-
-            // user has auth'd your app and is logged into Facebook
-            FB.api('/me', function(me)
-            {
-              if (me && me.name)
-              {
-                //document.getElementById('auth-displayname').innerHTML = me.name;
-                app.user.name = encodeURI(me.name);
-                app.user.fbProfileUrl = "https://graph.facebook.com/" + me.id;
-                app.user.fbProfilePicUrl = "https://graph.facebook.com/" + me.id + "/picture?type=large";
-                Callcast.SetNickname(app.user.name); // TODO should be somewhere else
-                Callcast.setPresenceBlob(new Object(
-                                                    {
-                                                      url:app.user.fbProfileUrl,
-		                                              image:app.user.fbProfilePicUrl
-		                                            } ) );
-
-                $(document).trigger("checkCredentials");
-              }
-            });
-            
-          }
           else
           {
-          	console.log("FB logged out or token went bad?");
-            Callcast.SetFBSignedRequestAndAccessToken(null, null);
+             console.log("getLoginStatus response ", response);
+             fbMe(response);
           }
-        });
-        
+
+      });
     }
 
 } // fbInit
