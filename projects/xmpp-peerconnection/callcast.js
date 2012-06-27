@@ -1346,6 +1346,7 @@ var Callcast = {
 			 console.log("Re-Attach of connection successful. Triggering re-attached...");
 			 $(document).trigger('re-attached');
 		 } else if (status === Strophe.Status.DISCONNECTED) {
+		 	 console.log("XMPP/Strophe Disconnected.");
 			 Callcast.disconnect();
 			 $(document).trigger('disconnected');
 		 } else if (status === Strophe.Status.DISCONNECTING) {
@@ -1367,6 +1368,7 @@ var Callcast = {
     /// connect using this JID and password -- and optionally use this URL for the BOSH connection.
     ///
     connect: function(id, pw, url) {
+    	var self = this;
     	var boshconn = "/xmpp-httpbind";
     	if (url)
     		boshconn = url;
@@ -1377,10 +1379,14 @@ var Callcast = {
     	this.connection = new Strophe.Connection(boshconn);
     	this.connection.reset();
 
-    	this.connection.connect(id, pw, this.conn_callback);
+		// Seems to be a timing related issue for connect.
+		setTimeout(function() {
+	    	self.connection.connect(id, pw, self.conn_callback);
+	    }, 500);
     },
     
     reattach: function(jid, sid, rid, cb, url) {
+    	var self = this;
     	var boshconn = "/xmpp-httpbind";
     	if (url)
     		boshconn = url;
@@ -1389,9 +1395,13 @@ var Callcast = {
 	    	delete this.connection;
 	    
 	    this.connection = new Strophe.Connection(boshconn);
+	    this.connection.reset();
 
 	 	console.log("Re-attaching -- jid="+jid+", sid="+sid+", rid="+rid);
-	 	conn2.attach(jid, sid, rid, this.conn_callback);
+		// Seems to be a timing related issue for connect.
+		setTimeout(function() {
+		 	self.connection.attach(jid, sid, rid, self.conn_callback);
+		}, 500);
     },
 
     finalizeConnect: function() {
