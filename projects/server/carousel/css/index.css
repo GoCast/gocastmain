@@ -107,8 +107,12 @@ body > div#lower-right > input.demobtn {
   background-image: url("../images/demo.png");
 }
 body > div#lower-right > input.feedback {
-  margin-left: 15px;
   background-image: url("../images/btn-feedback.png");
+}
+body > div#lower-right > input.copyData {
+  margin-left: 15px;
+  background-image: url("../images/email.png");
+  background-size:100%
 }
 body > div#lower-right > input.twitter {
   background-image: url("../images/btn-twitter.png");
@@ -150,7 +154,9 @@ body > div#msgBoard {
 body>div#msgBoard > div#chatOut
 {
   display:none;
-  height:125px;
+  max-height:125px;
+  min-height: 3em;
+  height: auto;
   width:300px;
   overflow:auto;
   line-height: 1em;
@@ -225,6 +231,7 @@ body > div#meeting > div#streams > div#scarousel div.cloudcarousel.typeContent >
   clear: left;
   background-color: transparent;
   background-size: 98%;
+  background-repeat: no-repeat
   width: 40px;
   height:40px;
   margin-left:auto;
@@ -493,7 +500,43 @@ body > div#meeting > div#streams > div#scontrols > input.right {
   float: right;
   margin-right: 5px;
 }
-#boxes #fbPrompt
+#boxes #copyData
 {
-   display: none;
+   border: 5px solid rgba(40, 40, 40, .5);
+   margin-right: 20px;
+   margin-bottom: 100px;
+   background-color: #cccccc;
+   -moz-user-select: text;
+   -khtml-user-select: text;
+   -webkit-user-select: text;
+   -o-user-select: text;
+   user-select: text;
+}
+#boxes #copyData p
+{
+   text-align: center;
+}
+#boxes #copyData #copyContent
+{
+   overflow: hidden;
+   background-color: white;
+}
+#boxes #copyData #copyContent h2
+{
+   white-space: nowrap;
+   margin-left: 10px;
+   margin-right: 10px;
+}
+#boxes #copyData #copyContent #copyLogo
+{
+   margin-left: 3px;
+   margin-right: 3px;
+   float:left;
+}
+#boxes #copyData img.close 
+{
+  float: right;
+  width: 10px;
+  height: 10px;
+  margin: 5px;
 }

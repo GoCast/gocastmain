@@ -332,6 +332,73 @@ function carouselItemClick(
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
+ * \brief Open dialog with room description so user can copy to clipboard
+ */
+function openCopyData
+(
+  event
+)
+{
+  if (!event)
+  {
+    return false;
+  }
+  
+  // get the dialog
+  var jqWin = $("#boxes > div#copyData");
+  
+  // set the room name
+  var name = $('div#copyContent > #copyName', jqWin);
+
+  $(name).text('Carousel room ' + $.getUrlVar('roomname'));
+  $(name).attr("href", window.location.href);
+  
+  // position the dialog
+  cX = event.clientX;
+  cY = event.clientY;
+
+  var winW = $(window).width();
+  var winH = $(window).height();
+  var wcW = jqWin.outerWidth();
+  var wcH = jqWin.outerHeight();
+  
+  // todo parse css dimension and use it to place dlg
+  //var marginRight = $(jqWin).css("margin-right");
+  //var marginBottom = $(jqWin).css("margin-bottom");
+  var marginRight = 20;
+  var marginBottom = wcH/5 + 20;
+
+  // move dialog up if past bottom
+  if ((cY + wcH + marginBottom) > winH)
+  {
+    jqWin.css("top", winH - wcH - marginBottom);
+  }
+  else // place dialog at event location 
+  {
+    jqWin.css("top", cY);
+  }
+  
+  // move dialog right if past right edge
+  if ((cX + wcW + marginRight) > winW) 
+  {
+    jqWin.css("left", winW - wcW - marginRight);
+  }
+  else // place dialog at event location 
+  {
+    jqWin.css("left", cX);
+  }
+  
+  // display dlg
+  jqWin.fadeIn(700);
+  jqWin.addClass("active");
+
+  // set focus on message text input
+  //$("input.chatTo", jqWin).focus();
+  return false;
+}
+
+/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+/**
  * \brief Open Chat Input.
  */
 function openChat(
@@ -1120,11 +1187,15 @@ function tryPluginInstall(
  */
 function showChatOut()
 {
-   // hide the ticker
-   $('#msgTicker').css("display", "none");
+
+   if ($('#msgBoard > #chatOut').text().length > 0)
+   {
+      // hide the ticker
+      $('#msgTicker').css("display", "none");
    
-   // show chatOut
-   $('#msgBoard > #chatOut').css("display", "block");
+      // show chatOut
+      $('#msgBoard > #chatOut').css("display", "block");
+   }
    
 } // showChatOut
 
