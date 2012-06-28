@@ -38,14 +38,14 @@ function useritem(properties) {
 
 useritem.prototype.addJid = function(jid) {
 	if (this.jids[jid])
-		this.log("WARN: Jid already in list: " + jid);
+		console.log("WARN: Jid already in list: " + jid);
 	else
 		this.jids[jid] = true;
 };
 
 useritem.prototype.removeJid = function(jid) {
 	if (!this.jids[jid])
-		this.log("ERROR: Jid not in list: " + jid);
+		console.log("ERROR: Jid not in list: " + jid);
 	else
 		delete this.jids[jid];
 };
@@ -65,8 +65,13 @@ useritem.prototype.getJidList = function()
 
 function switchboard(user, pw, notifier) {
 	this.SERVER = 'video.gocast.it';
-	this.APP_ID = '303607593050243';
-	this.APP_SECRET = '48b900f452eb251407554283cc7f3d7f';
+// Gocast with Friends
+//	this.APP_ID = '303607593050243';
+//	this.APP_SECRET = '48b900f452eb251407554283cc7f3d7f';
+
+// GoCast Carousel
+	this.APP_ID = '458515917498757';
+	this.APP_SECRET = 'c3b7a2cc7f462b5e4cee252e93588d45';
 	this.client = new xmpp.Client({ jid: user, password: pw, reconnect: true, host: this.SERVER, port: 5222 });
 	this.notifier = notifier;
 
@@ -272,6 +277,11 @@ switchboard.prototype.intro_sr = function(from, blob, cb) {
 
 			if (session)
 			{
+			
+				console.log("Pre-oauth-code: ", session.oauth_code);
+				console.log("https://graph.facebook.com/oauth/access_token?client_id="+self.APP_ID+"&client_secret="+self.APP_SECRET+
+							"&grant_type=fb_exchange_token&fb_exchange_token="+session.oauth_code);
+				
 				session.graphCall("/me", {
 				})(function(result) {
 					if (!result)
@@ -326,9 +336,15 @@ switchboard.prototype.handlePresence = function(pres) {
 			fbname = this.jidlist[from].name;
 
 		if (pres.attrs.type === 'unavailable')
+		{
 			this.log("Got pres (OFFLINE): " + from + (fbname ? (" - Facebook: " + fbname) : ""));
+			
+			// Need to remove user and jid from online list.
+			
+		}
 		else
 		{
+			this.log("pres (ONline) " + pres.toString());
 			// Only announcing online status if signed request is part of the presence info.
 			if (pres.attrs.intro_sr)
 			{
@@ -339,8 +355,18 @@ switchboard.prototype.handlePresence = function(pres) {
 
 					who += " - Facebook: " + self.userlist[fbid].name;
 					self.log("Got pres (ONLINE): " + who);
+					self.log("  Access-Token from client: " + pres.attrs.intro_at);
+					self.log(" Swapping for long-term token...");
+					// Make the swap for a long term token.
+					self.facebook_client.getAccessToken({grant_type: "fb_exchange_token", fb_exchange_token: pres.attrs.intro_at})(function(token, expires) {
+						self.log("New long-term answer...");
+						self.log("  Token: " + token);
+						self.log("  Expires: " + expires + "secs, or: " + Math.round(expires/(60*60)) + "hrs, or: " + Math.round(expires/(60*60*24)) + "days.");
+					});
 				});
 			}
+			else
+				self.log("intro_sr is null or ''.");
 		}
 	}
 };
