@@ -1,0 +1,217 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+  <head>
+    <title>GoCast - background documenation to get started</title>
+    <link href="/stylesheets/reset.css" media="all" rel="stylesheet" type="text/css"/><link href="/stylesheets/screen.css" media="all" rel="stylesheet" type="text/css"/>
+  </head>
+  <body>
+    <a href="https://github.com/GoCast/webrtc_plugin"><img style="position: fixed; top: 0; right: 0; border: 0;" src="https://a248.e.akamai.net/assets.github.com/img/7afbc8b248c68eb468279e8c17986ad46549fb71/687474703a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" /></a>
+    <div id='main'>
+      <div id='top'>
+        <h1 id='logo'>
+          <a href="http://www.gocast.it">GoCast</a>
+        </h1>
+	  <!--#include file="header.html"-->
+      </div>
+      <div id='rest'>
+        <h2>Detailed source documentation</h2>
+This document provides getting started level documenation.  
+Detailed <a href="http://www.gocast.it/srcdocs/index.html">source code level documentation</a> is provided separately.
+        <h2>High level requirements</h2>
+        <p>
+Currently, our project works on Mac and Linux. Testing has been .dev oriented. - not professionally QA.d. Our development stations are:
+	</p>
+	<h3>Mac</h3>
+        <p>
+Mac OS 10.7.1 and 10.7.2 (Lion) (64-bit systems) using both XCode 4.1 and XCode 4.2. On the Mac, we have had the most success running the plugin under Chrome (15.x) but we have had some success with Firefox in 32-bit mode. (The binaries are 32-bit binaries currently). Safari loads the plugin currently, but it doesn.t function.
+<br /><br />
+We would love to get feedback from 10.6 (and 32/64-bit) users of Mac and if anyone gets Safari working etc.
+<br /><br />
+	</p>
+	<h3>Linux</h3>
+	<p>
+For our Linux stations, we use Ubuntu 10.04 (64-bit) and 11.04 (32-bit). 
+<br /><br />
+Our testing of the plugin has been successful against Chrome (12.x and 14.x).
+Our trials with Firefox (5.x) were functional on 32-bit ubuntu but spotty at best on 64-bit. It also appears the release version of the monster monolithic libWebRTC.a file has better results than the _Debug version for some reason but no formal investigation has been started here.
+<br /><br />
+Anyone running different flavors of Linux and/or getting Firefox working - we would love to hear from you.
+<br /><br />
+	</p>
+	<h3>Windows - not yet</h3>
+	<p>
+Currently we do not support Windows, but we do not see any major impediments to doing so. It was a matter of focus and time for this initial release. The scripts are all sh and bash based and so Windows would need to replicate similar in .bat files or other (ruby / python?). FireBreath supports Windows and WebRTC certainly builds on Windows and in most cases more easily than on Mac.
+        </p>
+        <h2>Getting Started</h2>
+        <p>
+There are 2 main requirements tools-wise for setup of WebRTC, FireBreath, and our additions. The first is 'git'. If you type 'which git' a the command line and get a response with a path to the tool, you're likely just fine. If not, please go to <a href="http://www.git-scm.org">http://www.git-scm.org</a> and download the sources or a binary package and install. In most cases for linux, you can 'sudo apt-get install git' to accomplish this.
+<br /><br />
+The second requirement is for some tools utilized by Chromium project in building. The tool 'gclient' is the key item. If you do not have gclient, you may go to the page which describes installation of the tool at https://sites.google.com/a/chromium.org/dev/developers/how-tos/install-depot-tools which basically tells you to svn co http://src.chromium.org/svn/trunk/tools/depot_tools followed by making sure you add 'depot_tools' to your PATH. The prep* scripts do indeed self-check that git and gclient are available and will error out / exit if they are not present.
+<br /><br />
+After cloning the git repository, there are a number of items which need to be prepared for initial use. Webrtc can be a difficult build procedure and so we've tried to automate this as much as possible. 
+<br /><br />
+./prep_WebRTC.sh -- this is the main script which will kick off all further processing to get an initial set of compiled binaries in both Debug and Release modes. It will (when successful) get a 'blessed' version of WebRTC, patch it as necessary, and then build the WebRTC libraries necessary to support cmdline_audio_peer, peerconnection_server, and WebRTC. It will then create a monolithic library named 'libWebRTC.a' and 'libWebRTC.a' in the output directories. These libraries can significanly ease the use of WebRTC by developers wishing to use the 'guts' programmatically rather than from a browser. At the end of prep_WebRTC.sh, you'll have the monolithic static libs along with the binaries for the above mentioned binaries. Lastly, this set of scripts calls rebuild_plugin.sh which will build the FireBreath based plugin for the project. See 'Giving it a try' for step by step instructions to validate your binaries are functional.
+        </p>
+        <h2>What the scripts are doing</h2>
+        <p>
+prep_webrtc_&lt;platform&gt;.sh - called by prep_webrtc.sh - These scripts utilize the 'gclient' application (a Chromium tool_depot item) to obtain the appropriate sources from the webrtc svn repo. These scripts actually pull specific versions so that we ensure we are able to build. Developers who follow these instructions carefully are welcomed to check out newer versions so long as they understand how the third_party_mods/ process works after checkout.
+
+<br /><br />
+Once a revision is sync'd with gclient, we have the webrtc repo in third_party/webrtc/trunk/. At this point, we actually copy our modification from third_party_mods/webrtc/ into (on top of) third_party/webrtc/. These mods are almost always required to support Mac/Darwin builds as the Linux builds tend to be fairly well behaved. Once these mods are put in place, libsrtp is config.d and built in prep for the rest of the build process. 
+
+<br /><br />
+At this point, 'rebuild_webrtc.sh' is called. This script is responsible for running the python script trunk/build/gyp_chromium which processes our .gyp file and produces either .xcodeproj projects in src/examples/cmdline_audio_peer/ on Mac or a Makefile in third_party/webrtc/trunk/ on Linux. The script then runs a 'clean' if the script was called with the argument 'clean'. It then kicks off a build of cmdline_audio_peer in both Debug and Release modes. This (due to gyp dependencies) will build all required webrtc libraries along with the desired output binary.
+
+<br /><br />
+If the builds are successful, then the script .create_libwebrtc.sh. is called which will take the myriad of .a files in the Debug and Release directories and sum them up into a monolithic set of two files: libwebrtc_Release.a and libwebrtc_Debug.a. If you are a developer wishing to create a project but have it be NOT intertwined with the webrtc project itself, this is your key to freedom. Link against these libraries and you'll be much happier with your project.
+
+<br /><br />
+Finally, at the end of the rebuild_webrtc.sh build, 4 .ls -lh. are done to show the resultant binaries (executable cmdline_audio_peer and libwebrtc_*.a) in both Release and Debug forms. Output is found in third_party/webrtc/trunk/out/[Debug|Release] on linux and on the Mac in third_party/webrtc/trunk/xcodebuild/[Debug|Release] .
+
+<br /><br />
+Note that .rebuild_webrtc.sh. and .create_libwebrtc.sh. are intended to be ran separately after .prep_webrtc.sh. has been ran in case you are making changes to the base code and need a quick way to have a repeatable build process. This is why the scripts are not housed as a single file.
+<br /><br />
+The final script which gets ran is .rebuild_plugin.sh., and this will populate the third_party/FireBreath submodule as well as its boost submodule and proceed to build both the support items in FireBreath as well as our particular plugin. In the end you'll have a plugin in src/js_api/build/bin/WebrtcPlugin/npWebrtcPlugin.so in linux and for the Mac the output is found in src/js_api/build/projects/WebrtcPlugin/Debug/WebrtcPlugin.plugin.
+</p>
+<h2>General notes</h2>
+<p>
+Due to the nature of both webrtc libraries and also FireBreath, as a developer, you need to be cognizant that your Makefiles and .xcodeproj files are not yours to modify as they are .output files. and not source files. 
+<br /><br />
+With regards to webrtc:
+rebuild_webrtc.sh runs a python script in the beginning of this file. This script takes the input .gyp file(s) from src/example/cmdline_audio_peer/webrtc_projects.gyp and creates output files. In the case of linux, it creates third_party/webrtc/trunk/Makefile and for Mac it creates src/examples/cmdline_audio_peer/webrtc_projects.xcodeproj .  It is perfectly legal to use XCode to load this project and do development in the IDE. However, be forewarned, if you make changes to your project settings, build settings, file inclusions, etc, these settings will be over-written the next time you run prep*.sh or rebuild_webrtc.sh. The same things applies to modifying the Makefile in linux but this tends to be less enticing to do than in an IDE.
+
+<br /><br />
+So, if you wish to make project modifications, you need to do that in src/examples/cmdline_audio_peer/webrtc_projects.gyp for those items related to anything but the plugin project.
+
+<br /><br />
+In the case of the plugin:
+<br />
+The plugin's Makefile and .xcodeproj file are created indirectly through cmake. The source file for this project is found in src/js_api/projects/WebrtcPlugin/[Mac|X11]/projectDef.cmake. The script third_party/FireBreath/prepmac_GoCast.sh is responsible for creating the .xcodeproj in src/js_api/build/FireBreath.xcodeproj. On linux, the script third_party/FireBreath/prepmake.sh is responsible for creating src/js_api/build/Makefile. 
+
+<br /><br />
+Again, it is perfectly legal to use the .xcodeproj file with XCode for interactive development.
+</p>
+<h2>Giving it a try at the command line</h2>
+<p>
+The cmdline_audio_peer application can be tested locally using your own server and it can be tested using our server as well. NOTE: Our server is a best-efforts up-time server. So, our IP and port will be given here, but if it doesn't work, run it locally and see whether the problem lies with the build locally or with our server.
+</p>
+<h3>Setting up the server locally</h3>
+<p>
+Trying locally:
+<br />
+Launch your local server:
+<br />
+(Linux): ./third_party/webrtc/trunk/out/Release/peerconnection_server
+<br />
+(Mac): ./third_party/webrtc/trunk/xcodebuild/Release/peerconnection_server
+<br /> <br />
+
+This should elicit .Server listening on port 8888.
+</p>
+<h3>Running the client</h3>
+<p>
+Not that this part could be skipped altogether if you simply wish to use the plugin and avoid the use of the command line altogether.
+<br /><br />
+Using the client:
+<br />
+(Linux): ./third_party/webrtc/trunk/out/Release/cmdline_audio_peer --server=localhost:8888 --peername=use-your-own-name
+<br />
+(Mac): ./third_party/webrtc/trunk/xcodebuild/Release/cmdline_audio_peer --server=localhost:8888 --peername=use-your-own-name
+<br /><br />
+
+If you wish to attempt to connect to our server, you may simply use "--server=50.18.56.81:8888" instead of the localhost.
+<br /><br />
+Once the client is running, issue the command "signin" and you should see the output of:
+<br />
+Signing in...
+<br />
+Server: localhost
+<br />
+Port: 8888
+<br />
+Client: Sign in complete
+<br /><br />
+
+If this occurs, you're in great shape. Once a second person runs the same command line (with a different peer name), you may issue a "call peer-name-to-call". This will create a connection for audio over the internet with that peer.
+
+<br /><br />
+Note that calling is not limited to 2-way. You may issue additional "call next-name" many times to create multi-party calls. However, there is a non-intuitive notion behind 'call'. Call is creating a peer connection directly to the person you ask it to call. When it is a 2-way call, this is perfect. When a 3-way call happens, there's a need for an extra 'link' or 'call' to be created. And with 4-way calls, there are more yet again. As an example, consider we have peers named A, B, C, and D.
+<br />
+A calls B. No problem. 2-way call.
+<br />
+<img src="http://www.gocast.it/images/AB.png" />
+<br />
+Now, with A+B in a call, A issues a call to C. At this point, A has a 3-way link with B and C. 
+<br />
+<img src="http://www.gocast.it/images/AB_AC.png" />
+<br /><br />
+
+HOWEVER, B does not have a link to C and therefore, there is a need for B to call C or for C to call B. This would establish the desired 3-way link.
+With a 3-way call in progress, if we wish to fully add D into the conversation, each peer (A, B, C) would have to call D in order to have a full link-up -- or D would have to call A, B, and C -- either way. In each case, the peer connections must be setup individually.
+
+<br />
+<img src="http://www.gocast.it/images/ABCD.png" />
+<br /><br />
+Conversely, the .hangup. command is similar. If you have a 4-way call going, and you're 'A', you may wish to hang up in which case you need to 'hangup D', 'hangup C', and 'hangup B'. This would fully hangup as it destroys each peer connection individually. The nice effect here is that in the 4-way call, it is possible to simply drop one individual by hanging up on them alone.
+
+<br /><br />
+While this is a bit confusing and may be non-intuitive, it was left this way to allow people to play with the notions of individual connections via 'call' and 'hangup'.
+</p>
+<h2>Running the Plug-in</h2>
+<p>
+The 'installation' of the plugin is quite simple. Once it is installed, make sure you've restarted your browser (so it picks up the new plugin) and load/open 'GoCast.html' file from src/GoCast.html. Please NOTE: The plugin will crash if loaded twice within a single browser instance.
+</p>
+<h3>Mac installation</h3>
+<p>
+Plug-ins must be installed in ~/Library/Internet Plug-Ins
+<br /><br />
+If you're a developer, the best way to handle this is with a symbolic link back to where your favorite build-output is located. For example, if you intend to use the debug version of the plugin and want to avoid copying it at the end of each build:
+<br />
+cd ~/Library/Internet Plug-Ins
+ln -s ~/&lt;your-dev-location&gt;/webrtc_plugin/third_party/src/js_api/build/projects/WebrtcPlugin/Debug/WebrtcPlugin.plugin
+<br /><br />
+If you're wanting to simply use the resultant build, you may wish to use Finder to copy ~/&lt;your-dev-location&gt;/webrtc_plugin/third_party/src/js_api/build/projects/WebrtcPlugin/Release/WebrtcPlugin.plugin into ~/Library/Internet Plug-Ins    Note: Finder many times will not show ~/Library in an effort to protect the innocent. Simply use the menu 'Go-&gt;Goto Folder...' to get to ~/Library/Internet Plug-Ins. or copy the plugin recursively from the command line.
+</p>
+<h3>Linux installation</h3>
+Plug-ins are often installed in ~/.mozilla/plugins on linux. As in the Mac, this is generally best handled by a symbolic link if you build and develop in the same directory all the time.
+
+<h3>Using the plugin from HTML/Javascript</h3>
+The best document for understanding how to use the plugin is the file src/GoCast.html . It is a relatively simple self-enclosed document which instantiates the plugin, allows for signin to a server, calling of individuals, coping with the callback when new users come online or leave, and doing call management as well. There are only 4 calls and one callback at this time:
+<ul>
+<li>
+Signin(myPeerName, serverName, port)
+</li>
+<li>
+Signout()
+</li>
+<li>
+Call(peerNameToCall)
+</li>
+<li>
+Hangup(peerToDisconnectFrom)
+</li>
+</ul>
+
+
+
+      </div>
+    </div>
+<script type="text/javascript">
+
+
+ var _gaq = _gaq || [];
+ _gaq.push(['_setAccount', 'UA-27135587-1']);
+ _gaq.push(['_trackPageview']);
+
+
+ (function() {
+   var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+   ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+   var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+ })();
+
+
+</script>
+
+  </body>
+</html>

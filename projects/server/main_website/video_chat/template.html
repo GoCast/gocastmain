@@ -1,0 +1,275 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+  <head>
+    <title>GoCast Voice Chat</title>
+    <link href="/stylesheets/reset.css" media="all" rel="stylesheet" type="text/css"/><link href="/stylesheets/screen.css" media="all" rel="stylesheet" type="text/css"/>
+    <script src='javascripts/jquery.js'></script>
+    <script src='javascripts/mustache.js'></script>
+    <script src='javascripts/application.js'></script>
+  </head>
+  <body>
+    <div class='panel hide' id='sign_in'>
+      <h1>Sign in</h1>
+      <form id='sign_in'>
+        <p>
+          <label>Email address</label>
+          <input id='username' type='text' value='franzpereira@gmail.com' />
+        </p>
+        <p>
+          <label>Ip Address</label>
+          <input id='ip' type='text' value='50.18.56.81' />
+        </p>
+        <p>
+          <label>Port</label>
+          <input id='port' type='text' value='8888' />
+        </p>
+        <p class='last'>
+          <input type='submit' value='Sign In' />
+        </p>
+      </form>
+    </div>
+    <div class='online_peers panel hide'>
+      <h1>Online peers</h1>
+      <ul class='peers'></ul>
+    </div>
+    <div id='panels-content'>
+      <div class='with_video'>
+        <div class='user'>
+          <div class='image'>
+            <img src='http://en.gravatar.com/userimage/1019288/0ad91bebe5b30451ed9ba05e3b0432ea.png' />
+          </div>
+          <div class='info'>
+            <h3>
+              {{ username }}
+              <a class='small' href='#'>Add to call</a>
+            </h3>
+            <a class='button' href='#'>Available</a>
+          </div>
+          <div class='video'>
+            <div class='plugin'>Hello</div>
+          </div>
+        </div>
+        <div class='user'>
+          <div class='image'>
+            <img src='http://en.gravatar.com/userimage/1019288/0ad91bebe5b30451ed9ba05e3b0432ea.png' />
+          </div>
+          <div class='info'>
+            <h3>
+              {{ username }}
+              <a class='small' href='#'>Add to call</a>
+            </h3>
+            <a class='button' href='#'>Available</a>
+          </div>
+          <div class='video'>
+            <div class='plugin'>Hello</div>
+          </div>
+        </div>
+        <div class='user'>
+          <div class='image'>
+            <img src='http://en.gravatar.com/userimage/1019288/0ad91bebe5b30451ed9ba05e3b0432ea.png' />
+          </div>
+          <div class='info'>
+            <h3>
+              {{ username }}
+              <a class='small' href='#'>Add to call</a>
+            </h3>
+            <a class='button' href='#'>Available</a>
+          </div>
+          <div class='video'>
+            <div class='plugin'>Hello</div>
+          </div>
+        </div>
+        <div class='user'>
+          <div class='image'>
+            <img src='http://en.gravatar.com/userimage/1019288/0ad91bebe5b30451ed9ba05e3b0432ea.png' />
+          </div>
+          <div class='info'>
+            <h3>
+              {{ username }}
+              <a class='small' href='#'>Add to call</a>
+            </h3>
+            <a class='button' href='#'>Available</a>
+          </div>
+          <div class='video'>
+            <div class='plugin'>Hello</div>
+          </div>
+        </div>
+      </div>
+      <h3>On Audio Call</h3>
+      <div class='available'>
+        <div class='user'>
+          <div class='image'>
+            <img src='http://en.gravatar.com/userimage/1019288/0ad91bebe5b30451ed9ba05e3b0432ea.png' />
+          </div>
+          <div class='info'>
+            <h3>
+              {{ username }}
+              <a class='small' href='#'>Video call</a>
+              <a class='small' href='#'>Audio call</a>
+            </h3>
+            <a class='button' href='#'>Available</a>
+          </div>
+        </div>
+        <div class='user'>
+          <div class='image'>
+            <img src='http://en.gravatar.com/userimage/1019288/0ad91bebe5b30451ed9ba05e3b0432ea.png' />
+          </div>
+          <div class='info'>
+            <h3>
+              {{ username }}
+              <a class='small' href='#'>Video call</a>
+              <a class='small' href='#'>Audio call</a>
+            </h3>
+            <a class='button' href='#'>Available</a>
+          </div>
+        </div>
+        <div class='user'>
+          <div class='image'>
+            <img src='http://en.gravatar.com/userimage/1019288/0ad91bebe5b30451ed9ba05e3b0432ea.png' />
+          </div>
+          <div class='info'>
+            <h3>
+              {{ username }}
+              <a class='small' href='#'>Video call</a>
+              <a class='small' href='#'>Audio call</a>
+            </h3>
+            <a class='button' href='#'>Available</a>
+          </div>
+        </div>
+        <div class='user'>
+          <div class='image'>
+            <img src='http://en.gravatar.com/userimage/1019288/0ad91bebe5b30451ed9ba05e3b0432ea.png' />
+          </div>
+          <div class='info'>
+            <h3>
+              {{ username }}
+              <a class='small' href='#'>Video call</a>
+              <a class='small' href='#'>Audio call</a>
+            </h3>
+            <a class='button' href='#'>Available</a>
+          </div>
+        </div>
+        <div class='user'>
+          <div class='image'>
+            <img src='http://en.gravatar.com/userimage/1019288/0ad91bebe5b30451ed9ba05e3b0432ea.png' />
+          </div>
+          <div class='info'>
+            <h3>
+              {{ username }}
+              <a class='small' href='#'>Video call</a>
+              <a class='small' href='#'>Audio call</a>
+            </h3>
+            <a class='button' href='#'>Available</a>
+          </div>
+        </div>
+        <div class='user'>
+          <div class='image'>
+            <img src='http://en.gravatar.com/userimage/1019288/0ad91bebe5b30451ed9ba05e3b0432ea.png' />
+          </div>
+          <div class='info'>
+            <h3>
+              {{ username }}
+              <a class='small' href='#'>Video call</a>
+              <a class='small' href='#'>Audio call</a>
+            </h3>
+            <a class='button' href='#'>Available</a>
+          </div>
+        </div>
+        <div class='user'>
+          <div class='image'>
+            <img src='http://en.gravatar.com/userimage/1019288/0ad91bebe5b30451ed9ba05e3b0432ea.png' />
+          </div>
+          <div class='info'>
+            <h3>
+              {{ username }}
+              <a class='small' href='#'>Video call</a>
+              <a class='small' href='#'>Audio call</a>
+            </h3>
+            <a class='button' href='#'>Available</a>
+          </div>
+        </div>
+      </div>
+      <h3>Available Users</h3>
+      <div class='available'>
+        <div class='user'>
+          <div class='image'>
+            <img src='http://en.gravatar.com/userimage/1019288/0ad91bebe5b30451ed9ba05e3b0432ea.png' />
+          </div>
+          <div class='info'>
+            <h3>
+              {{ username }}
+              <a class='small' href='#'>Video call</a>
+              <a class='small' href='#'>Audio call</a>
+            </h3>
+            <a class='button' href='#'>Available</a>
+          </div>
+        </div>
+        <div class='user'>
+          <div class='image'>
+            <img src='http://en.gravatar.com/userimage/1019288/0ad91bebe5b30451ed9ba05e3b0432ea.png' />
+          </div>
+          <div class='info'>
+            <h3>
+              {{ username }}
+              <a class='small' href='#'>Video call</a>
+              <a class='small' href='#'>Audio call</a>
+            </h3>
+            <a class='button' href='#'>Available</a>
+          </div>
+        </div>
+        <div class='user'>
+          <div class='image'>
+            <img src='http://en.gravatar.com/userimage/1019288/0ad91bebe5b30451ed9ba05e3b0432ea.png' />
+          </div>
+          <div class='info'>
+            <h3>
+              {{ username }}
+              <a class='small' href='#'>Video call</a>
+              <a class='small' href='#'>Audio call</a>
+            </h3>
+            <a class='button' href='#'>Available</a>
+          </div>
+        </div>
+        <div class='user'>
+          <div class='image'>
+            <img src='http://en.gravatar.com/userimage/1019288/0ad91bebe5b30451ed9ba05e3b0432ea.png' />
+          </div>
+          <div class='info'>
+            <h3>
+              {{ username }}
+              <a class='small' href='#'>Video call</a>
+              <a class='small' href='#'>Audio call</a>
+            </h3>
+            <a class='button' href='#'>Available</a>
+          </div>
+        </div>
+        <div class='user'>
+          <div class='image'>
+            <img src='http://en.gravatar.com/userimage/1019288/0ad91bebe5b30451ed9ba05e3b0432ea.png' />
+          </div>
+          <div class='info'>
+            <h3>
+              {{ username }}
+              <a class='small' href='#'>Video call</a>
+              <a class='small' href='#'>Audio call</a>
+            </h3>
+            <a class='button' href='#'>Available</a>
+          </div>
+        </div>
+        <div class='user'>
+          <div class='image'>
+            <img src='http://en.gravatar.com/userimage/1019288/0ad91bebe5b30451ed9ba05e3b0432ea.png' />
+          </div>
+          <div class='info'>
+            <h3>
+              {{ username }}
+              <a class='small' href='#'>Video call</a>
+              <a class='small' href='#'>Audio call</a>
+            </h3>
+            <a class='button' href='#'>Available</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

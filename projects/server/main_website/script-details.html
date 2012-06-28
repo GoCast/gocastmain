@@ -1,0 +1,83 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+  <head>
+    <title>GoCast - background documenation to get started</title>
+    <link href="/stylesheets/reset.css" media="all" rel="stylesheet" type="text/css"/><link href="/stylesheets/screen.css" media="all" rel="stylesheet" type="text/css"/>
+  </head>
+  <body>
+    <a href="https://github.com/GoCast/webrtc_plugin"><img style="position: fixed; top: 0; right: 0; border: 0;" src="https://a248.e.akamai.net/assets.github.com/img/7afbc8b248c68eb468279e8c17986ad46549fb71/687474703a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" /></a>
+    <div id='main'>
+      <div id='top'>
+        <h1 id='logo'>
+          <a href="http://www.gocast.it">GoCast</a>
+        </h1>
+	  <!--#include file="header.html"-->
+      </div>
+      <div id='rest'>
+        <h2>What the scripts are doing</h2>
+        <p>
+prep_webrtc_&lt;platform&gt;.sh is called by prep_webrtc.sh.  These scripts utilize the 'gclient' application which is a Chromium depot_tool item used to obtain the appropriate sources from the webrtc svn repo. These scripts actually pull specific versions so that we ensure we are able to build. Developers who follow these instructions carefully are welcomed to check out newer versions so long as they understand how the third_party_mods/ process works after checkout.
+
+<br /><br />
+Once a revision is sync'd with gclient, we have the webrtc repo in third_party/webrtc/trunk/. At this point, we actually copy our modifications from third_party_mods/webrtc/ into (on top of) third_party/webrtc/. These mods are almost always required to support Mac/Darwin builds as the Linux builds tend to be fairly well behaved. Once these mods are put in place, libsrtp is config'd and built in preparation for the rest of the build process. 
+
+<br /><br />
+At this point, 'rebuild_webrtc.sh' is called. This script is responsible for running the python script trunk/build/gyp_chromium which processes our .gyp file and produces either .xcodeproj projects in src/examples/cmdline_audio_peer/ on Mac or a Makefile in third_party/webrtc/trunk/ on Linux. The script then runs a 'clean' if the script was called with the argument 'clean'. It then kicks off a build of cmdline_audio_peer in both Debug and Release modes. This will build all required webrtc libraries and produce the desired output binaries.
+
+<br /><br />
+If the builds are successful, then the script .create_libwebrtc.sh. is called which will take the myriad of .a files in the Debug and Release directories and sum them up into a monolithic set of two files: libwebrtc_Release.a and libwebrtc_Debug.a. If you are a developer wishing to create a project with out intertwining it with the webrtc project itself, this is your key to freedom. Link against these libraries and you'll be much happier with your project due to the lack of complex dependencies.
+
+<br /><br />
+Finally, at the end of the rebuild_webrtc.sh build, 
+the targets are 
+found in third_party/webrtc/trunk/out/[Debug|Release] on linux and on the Mac in third_party/webrtc/trunk/xcodebuild/[Debug|Release] .
+
+<br /><br />
+Note an example of using the monolithic static libraries can be found in src/examples/cmdline_audio_peer/webrtc_projects.gyp as cmdline_audio_peer_monolithic.  This target is available for building and useful as instruction.  
+<br /><br />
+Note that rebuild_webrtc.sh and create_libwebrtc.sh as well as rebuild_plugin.sh are intended to be run separately by developers once an initial build is successful. 
+This gives a quick way to have a repeatable build process. 
+This is why the scripts are not housed as a single file.
+<br /><br />
+The final script which gets ran is 'rebuild_plugin.sh', and this will populate the third_party/FireBreath submodule as well as its boost submodule and proceed to build both the support items in FireBreath as well as our particular plugin. In the end you'll have a plugin in src/js_api/build/bin/WebrtcPlugin/npWebrtcPlugin.so in linux and for the Mac the output is found in src/js_api/build/projects/WebrtcPlugin/Debug/WebrtcPlugin.plugin.
+</p>
+<h2>General notes</h2>
+<p>
+Due to the nature of both webrtc libraries and also FireBreath, as a developer, you need to be cognizant that your Makefiles and .xcodeproj files are not yours to modify as they are "output files" and not source files. 
+<br /><br />
+With regards to webrtc:
+rebuild_webrtc.sh runs a python script in the beginning of this file. This script takes the input .gyp file(s) from src/examples/cmdline_audio_peer/webrtc_projects.gyp and creates output files. In the case of linux, it creates third_party/webrtc/trunk/Makefile and for Mac it creates src/examples/cmdline_audio_peer/webrtc_projects.xcodeproj.  It is perfectly legal to use XCode to load this project and do development in the IDE. However, be forewarned, if you make changes to your project settings, build settings, file inclusions, etc, these settings will be over-written the next time you run prep*.sh or rebuild_webrtc.sh. The same things applies to modifying the Makefile in linux but this tends to be less enticing to do than in an IDE.
+
+<br /><br />
+So, if you wish to make project modifications, you need to do that in src/examples/cmdline_audio_peer/webrtc_projects.gyp for those items related to anything but the plugin project.
+
+<br /><br />
+In the case of the plugin:
+<br />
+The plugin's Makefile and .xcodeproj file are created indirectly through cmake. The source file for this project is found in src/js_api/projects/WebrtcPlugin/[Mac|X11]/projectDef.cmake. The script third_party/FireBreath/prepmac_GoCast.sh is responsible for creating the .xcodeproj in src/js_api/build/FireBreath.xcodeproj. On linux, the script third_party/FireBreath/prepmake.sh is responsible for creating src/js_api/build/Makefile. 
+
+<br /><br />
+Again, it is perfectly legal to use the .xcodeproj file with XCode for interactive development.
+</p>
+
+      </div>
+    </div>
+<script type="text/javascript">
+
+
+ var _gaq = _gaq || [];
+ _gaq.push(['_setAccount', 'UA-27135587-1']);
+ _gaq.push(['_trackPageview']);
+
+
+ (function() {
+   var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+   ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+   var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+ })();
+
+
+</script>
+
+  </body>
+</html>

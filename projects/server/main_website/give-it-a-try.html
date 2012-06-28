@@ -1,0 +1,129 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+  <head>
+    <title>GoCast - background documenation to get started</title>
+    <link href="/stylesheets/reset.css" media="all" rel="stylesheet" type="text/css"/><link href="/stylesheets/screen.css" media="all" rel="stylesheet" type="text/css"/>
+  </head>
+  <body>
+    <a href="https://github.com/GoCast/webrtc_plugin"><img style="position: fixed; top: 0; right: 0; border: 0;" src="https://a248.e.akamai.net/assets.github.com/img/7afbc8b248c68eb468279e8c17986ad46549fb71/687474703a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" /></a>
+    <div id='main'>
+      <div id='top'>
+        <h1 id='logo'>
+          <a href="http://www.gocast.it">GoCast</a>
+        </h1>
+	  <!--#include file="header.html"-->
+      </div>
+      <div id='rest'>
+<h2>Giving it a try at the command line</h2>
+<p>
+The cmdline_audio_peer application can be tested locally using your own server and it can be tested using our server as well. NOTE: Our server is a best-efforts up-time server. So, our IP and port will be given here, but if it doesn't work, run it locally and see whether the problem lies with the build locally or with our server.
+</p>
+<h3>Setting up the server locally</h3>
+<p>
+Trying locally:
+<br />
+Launch your local server:
+<br />
+(Linux): ./third_party/webrtc/trunk/out/Release/peerconnection_server
+<br />
+(Mac): ./third_party/webrtc/trunk/xcodebuild/Release/peerconnection_server
+<br /> <br />
+
+This should elicit 'Server listening on port 8888'
+</p>
+<h3>Running the client</h3>
+<p>
+Note that this part could be skipped altogether if you simply wish to use the plugin and avoid the use of the command line altogether.
+<br /><br />
+Using the client:
+<br />
+(Linux): ./third_party/webrtc/trunk/out/Release/cmdline_audio_peer --server=localhost:8888 --peername=use-your-own-name
+<br />
+(Mac): ./third_party/webrtc/trunk/xcodebuild/Release/cmdline_audio_peer --server=localhost:8888 --peername=use-your-own-name
+<br /><br />
+
+If you wish to attempt to connect to our server, you may simply use "--server=50.18.56.81:8888" instead of the localhost. Please note --help can be used to get a full list of options for the command line.
+<br /><br />
+Once the client is running, issue the command "signin" and you should see the output of:
+<br />
+&nbsp;&nbsp;&nbsp;Signing in...
+<br />
+&nbsp;&nbsp;&nbsp;Server: localhost
+<br />
+&nbsp;&nbsp;&nbsp;Port: 8888
+<br />
+&nbsp;&nbsp;&nbsp;Client: Sign in complete
+<br /><br />
+
+If this occurs, you're in great shape. Once a second person runs the same command line (with a different peer name), you may issue a "call peer-name-to-call". This will create a connection for audio over the internet with that peer.
+
+<br /><br />
+Note that calling is not limited to 2-way. You may issue additional "call next-name" many times to create multi-party calls. However, there is a non-intuitive notion behind 'call'. Call is creating a peer connection directly to the person you ask it to call. When it is a 2-way call, this is perfect. When a 3-way call happens, there's a need for an extra 'link' or 'call' to be created. And with 4-way calls, there are more yet again. As an example, consider we have peers named A, B, C, and D.
+<br />
+A calls B. No problem. 2-way call.
+<br />
+<img src="http://www.gocast.it/images/AB.png" />
+<br />
+Now, with A+B in a call, A issues a call to C. At this point, A has a 3-way link with B and C. 
+<br />
+<img src="http://www.gocast.it/images/AB_AC.png" />
+<br /><br />
+
+HOWEVER, B does not have a link to C and therefore, there is a need for B to call C or for C to call B. This would establish the desired 3-way link.
+With a 3-way call in progress, if we wish to fully add D into the conversation, each peer (A, B, C) would have to call D in order to have a full link-up -- or D would have to call A, B, and C -- either way. In each case, the peer connections must be setup individually.
+
+<br />
+<img src="http://www.gocast.it/images/ABCD.png" />
+<br /><br />
+Conversely, the 'hangup' command is similar. If you have a 4-way call going, and you're 'A', you may wish to hang up in which case you need to 'hangup D', 'hangup C', and 'hangup B'. This would fully hangup as it destroys each peer connection individually. The nice effect here is that in the 4-way call, it is possible to simply drop one individual by hanging up on them alone.
+
+<br /><br />
+While this is a bit confusing and may be non-intuitive, it was left this way to allow people to play with the notions of individual connections via 'call' and 'hangup'.
+</p>
+<h2>Running the Plug-in</h2>
+<p>
+The 'installation' of the plugin is quite simple. Once it is installed, make sure you've restarted your browser (so it picks up the new plugin) and load/open 'GoCast.html' file from src/GoCast.html. Please NOTE: The plugin will crash if loaded twice within a single browser instance.
+</p>
+<p>
+Another option for trying out your plugin and server is to use the web page
+at <a href="http://www.gocast.it/voice_chat">Voice Chat</a>.
+</p>
+<h3>Mac installation</h3>
+<p>
+Plug-ins must be installed in ~/Library/Internet Plug-Ins
+<br /><br />
+If you're a developer, the best way to handle this is with a symbolic link back to where your favorite build-output is located. For example, if you intend to use the debug version of the plugin and want to avoid copying it at the end of each build:
+<br />
+&nbsp;&nbsp;cd ~/Library/Internet Plug-Ins
+<br />
+&nbsp;&nbsp;ln -s ~/&lt;your-dev-location&gt;/webrtc_plugin/third_party/src/js_api/build/projects/WebrtcPlugin/Debug/WebrtcPlugin.plugin
+<br /><br />
+If you're wanting to simply use the resultant build, you may wish to use Finder to copy ~/&lt;your-dev-location&gt;/webrtc_plugin/third_party/src/js_api/build/projects/WebrtcPlugin/Release/WebrtcPlugin.plugin into ~/Library/Internet Plug-Ins    Note: Finder many times will not show ~/Library in an effort to protect the innocent. Simply use the menu 'Go-&gt;Goto Folder...' to get to ~/Library/Internet Plug-Ins or copy the plugin recursively from the command line.
+</p>
+<h3>Linux installation</h3>
+Plug-ins are often installed in ~/.mozilla/plugins on linux. As in the Mac, this is generally best handled by a symbolic link if you build and develop in the same directory all the time.
+
+<h3>Using the plugin from HTML/Javascript</h3>
+The best document for understanding how to use the plugin is the file src/GoCast.html . It is a relatively simple self-enclosed document which instantiates the plugin, allows for signin to a server, calling of individuals, coping with callbacks for sign in and sign out and doing call management.  
+We document the <a href="http://www.gocast.it/plugin-api-spec.html">API calls</a> elsewhere. 
+      </div>
+    </div>
+<script type="text/javascript">
+
+
+ var _gaq = _gaq || [];
+ _gaq.push(['_setAccount', 'UA-27135587-1']);
+ _gaq.push(['_trackPageview']);
+
+
+ (function() {
+   var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+   ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+   var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+ })();
+
+
+</script>
+
+  </body>
+</html>

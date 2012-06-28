@@ -1,0 +1,72 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+  <head>
+    <title>GoCast - background documenation to get started</title>
+    <link href="/stylesheets/reset.css" media="all" rel="stylesheet" type="text/css"/><link href="/stylesheets/screen.css" media="all" rel="stylesheet" type="text/css"/>
+  </head>
+  <body>
+    <a href="https://github.com/GoCast/webrtc_plugin"><img style="position: fixed; top: 0; right: 0; border: 0;" src="https://a248.e.akamai.net/assets.github.com/img/7afbc8b248c68eb468279e8c17986ad46549fb71/687474703a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" /></a>
+    <div id='main'>
+      <div id='top'>
+        <h1 id='logo'>
+          <a href="http://www.gocast.it">GoCast</a>
+        </h1>
+	  <!--#include file="header.html"-->
+      </div>
+      <div id='rest'>
+The functions specified below describe the basic set of APIs
+provided by the plugin at this time. We have made a conscious
+effort to keep it simple for now, so that developers can quickly
+embed communications into their web applications. In the future,
+we will make the APIs reflect more and more of those specified
+in W3C's WebRTC API spec.
+
+<br /><br />
+Method to initiate sign-in to the specified signin server.
+Signin(string: peerName, string: serverIp, int: serverPort)
+
+<br /><br />
+Method to sign out from the signin server.
+Signout()
+
+<br /><br />
+Method to initiate an audio peer connection with desired peer.
+Call(string: remotePeerName)
+
+<br /><br />
+Method to initiate a disconnection with desired peer.
+Hangup(string: remotePeerName)
+<br /><br />
+Events fired by the plugin which are to be handled in JavaScript:
+<br />
+1. eventType: 'SignedIn', argument: list of online peers (grammar: [<peername>:]*).
+<br />
+2. eventType: 'PeerOnline', argument: name of newly online peer.
+<br />
+3. eventType: 'PeerOffline', argument: name of newly offline peer.
+<br />
+4. eventType: 'RemotePeerCall', argument: name of remote peer who just initiated an audio connection.
+<br />
+5. eventType: 'RemotePeerHangup', argument: name of remote peer who just disconnected.
+
+      </div>
+    </div>
+<script type="text/javascript">
+
+
+ var _gaq = _gaq || [];
+ _gaq.push(['_setAccount', 'UA-27135587-1']);
+ _gaq.push(['_trackPageview']);
+
+
+ (function() {
+   var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+   ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+   var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+ })();
+
+
+</script>
+
+  </body>
+</html>
