@@ -1,4 +1,5 @@
 #include "../GCPVideoRenderer.h"
+#include <iostream>
 
 namespace GoCast
 {
@@ -25,6 +26,9 @@ namespace GoCast
             pBufIter += 4;
         }
         
+        static int frameNumber = 0;
+        std::cout << "RenderFrame: " << frameNumber++ << std::endl;
+        
         //trigger window refresh event
         m_pWin->InvalidateWindow();
         
@@ -38,6 +42,9 @@ namespace GoCast
         FB::CoreGraphicsDraw* pCgDrawEvt(static_cast<FB::CoreGraphicsDraw*>(pEvt));
         CGContextRef pContext = pCgDrawEvt->context;
         boost::mutex::scoped_lock winLock(m_winMutex);
+        
+        static int frameNumber = 0;
+        std::cout << "RenderFrame: " << frameNumber++ << std::endl;
         
         if(NULL == pContext)
         {
