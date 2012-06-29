@@ -1,0 +1,142 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"> 
+  <head>
+    <title>GoCast - WebRTC based communications</title>
+    <meta name="description" content="GoCast provides multi-way video communications using WebRTC.  Prior to WebRTC browser support GoCast applications use a plugin that we share with the community." />
+    <link href="stylesheets/reset.css" media="all" rel="stylesheet" type="text/css"/>
+    <link href="stylesheets/screen.css" media="all" rel="stylesheet" type="text/css"/>
+    <link rel="shortcut icon" href="images/favicon.ico" type="x-icon" />
+  </head>
+  <body>
+    <div id='main'>
+      <div id='top'>
+       <a id="forkMe" style="float:right" href="https://github.com/GoCast/webrtc_plugin">
+       <!--
+       <img style="position: fixed; top: 0; right: 0; border: 0;" 
+       src="https://a248.e.akamai.net/assets.github.com/img/7afbc8b248c68eb468279e8c17986ad46549fb71/687474703a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" 
+       alt="Fork me on GitHub" 
+       />
+       -->
+       Fork me on GitHub
+       </a>
+        <h1 id='logo'>
+          <a href="/">GoCast</a>
+        </h1>
+ 	<!--#include virtual="header.html"-->
+      </div>
+
+      <div id='rest'>
+        <p class='italic'>
+	GoCast.it is an angel funded start up focusing on video communications. We will be contributing new services and video functionality shortly built on top of WebRTC. 
+	<br /><br />
+We're hiring top notch programmers and white box testers with 3+ years of  C++, Javascript, and  video background.
+Drop us a resume at 
+<a class="last" 
+href="&#109;&#97;&#105;&#108;&#116;&#111;&#58;&#106;&#111;&#98;&#115;&#64;&#103;&#111;&#99;&#97;&#115;&#116;&#46;&#105;&#116;">&#106;&#111;&#98;&#115;&#64;&#103;&#111;&#99;&#97;&#115;&#116;&#46;&#105;&#116; </a>   if you are interested.  We're located in Palo Alto CA.
+	<br /><br />
+	Overall project features:
+	<br />
+        </p>
+	<ul> 
+	<li>
+	<b>NEW:</b> Adding video support for Mac platform. Now Mac and Linux able to do multi-person video calls! If you're not building from the source, grab the binaries here (<a href="video_chat/files/WebrtcPlugin.plugin.zip">Mac</a>, <a href="video_chat/files/npWebrtcPlugin.tgz">Linux</a>) and then proceed to the <a href="http://www.gocast.it/video_chat/">Video and audio</a> web page example using our server or yours.<p/>
+	</li>
+	<li>
+	cmdline_video_peer and cmdline_audio_peer are now interoperable. This extends to the plugins as well.
+	</li>
+	<li>
+	Video now supported on Linux.  After building and 
+linking to the plugin give it a try by opening src/examples/GoCastVideo.html.
+(If you're having issues getting the plugin to work restart the browser.)
+	</li>
+	<li>
+	New command line video client on Linux - cmdline_video_peer (same options as cmdline_audio_peer)
+	</li>
+	<li>
+	Audio echo cancellation in conference mode.
+	</li>
+	<li>
+	Pretty web page for testing your audio-only 
+<a href="http://www.gocast.it/voice_chat">plugin and server</a>. You may use your own server or test with ours at 50.18.56.81 on port 8888.
+	</li>
+	<li>
+	Automated build scripts
+	</li>
+	<li>
+	Implementation/example of setup &amp; management for peer to peer audio connections
+	</li>
+	<li>
+	Ability to play with WebRTC functionality with no 'canary' builds of Chrome (standard production browsers)
+	</li>
+	<li>
+	Ability for developers to link to the complex myriad of WebRTC libraries without difficulty via the single monolithic static link library created by the build scripts.
+	</li>
+	<li>
+	Project is housed on <a href="https://www.github.com/GoCast/webrtc_plugin">github</a>.
+	</li>
+	</ul>
+	<p>
+<br />
+	The WebRTC project is a large body of work which is currently in flux and in many cases difficult to build and/or use. Since its intent is to be used directly inside browsers via its Javascript interface, a browser is conspicuously missing at the moment. This leaves the project in a state where it can be a challenge even for the more experienced developers to compile, link, and utilize the code. It is our intention to grant access to developers who wish to use the body of WebRTC from within a browser without having to use an alpha-build or dev-build of the browser itself. To this end, we are producing this Open Source project which places WebRTC into a plugin that can be used for a variety of purposes which are in line with its original intent; and which also, hopefully, offers developers a more automated set of build and prep scripts, and  allows them to make their own off-shoot projects which link to WebRTC without the confusion of the tremendous number of libraries in the standard build.
+        </p>
+<p>
+Join us in our <a href="http://www.gocast.it/forum">forums</a> and follow the discussion
+about <a href="http://www.webrtc.org">WebRTC.org</a> at the <a href="https://groups.google.com/group/discuss-webrtc/feeds">WebRTC RSS feed</a>.  Follow the main project source at <a href="code.google.com/p/webrtc">source code</a>.
+
+</p>
+        <h2>How to build</h2>
+        <script type="text/javascript" src="https://gist.github.com/1377700.js"></script>
+        <h2> This release provides:</h2>
+<ul>
+<li>
+<b>peerconnection_server</b> - The example signin server, which is part of the WebRTC source. The signaling protocol has been left unaltered for the initial release and trials.
+</li>
+<li>
+<b>cmdline_audio_peer</b> - Command line program that works in conjunction with peerconnection_server connecting 2 or more cmdline_audio_peer clients together in an audio conference call using WebRTC libraries. Options and commands are discussed later.
+</li>
+<li>
+<b>cmdline_video_peer</b> - (For Linux only currently) Command line program that works in conjunction with peerconnection_server connecting 2 or more clients together in a conference call.
+</li>
+<li>
+<b>Plugin</b> - A plugin built on FireBreath which mimics command line client.  Provides simple javascript API's to sign in, sign out, call and hangup.  This plugin is intended to give developers the ability to develop EARLY on multiple browsers while WebRTC's built-in browser integration is still evolving. In future releases it will allow the use of WebRTC APIs for browsers which do not directly support WebRTC integration.
+</li>
+<li>
+<b>Monolithic static libraries</b> - WebRTC static libraries created as a single debug or release archive.  This aids developers in using WebRTC at the C++ level without worrying about complex dependencies.
+</li>
+</ul>
+
+        <h2>RoadMap</h2>
+        <p>
+	This first product is our own internal proof of concept for using WebRTC. It is our hope that it will be useful for many people wondering how to use it themselves.  This first product also organizes and packages the WebRTC static library. This is valuable to developers wanting to utilize WebRTC at the C++ level.
+<br /><br />
+	Our next goal is to provide a plugin which emulates the W3C Javascript API being set forth for WebRTC within a browser. Our plugin will enable developers to build WebRTC applications in production browsers during WebRTC's evolution.  The WebRTC group is prepping a canary build of Chrome which supports the webkit interface to the WebRTC API. But many people will have issues doing WebRTC development in such an environment. Our plugin will fill that gap allowing the full use of the API set in a standard browser. Additionally, in the future, if a browser (like IE) does not support WebRTC directly, this plugin will enable vendors of WebRTC based applications to support IE by having users install the plugin rather than simply not supporting an entire browser base. We believe direct browser integration of WebRTC is the future - and is very important. But these things take time to gain energy. Our plugin fills this gap and we hope it will also raise the popularity of a technology that is in its infancy.
+<br /><br />
+	Our next addition will allow video on the Mac. The reason for not doing Mac video at this time were technical (WebRTC's Mac video implementation currently has issues in our experience). 
+        </p>
+        <h2>Support</h2>
+        <p>
+	As this is an Open Source project, we are intending to have the community support this along with us. 
+	Initially, we'll do our best to answer questions and fix bugs as well as advance things along in a timely manner. Please use the <a href="http://www.gocast.it/forum">discussion forums</a> to ask questions and pose problems. 
+	Also, please use the <a href="https://www.github.com/GoCast/webrtc_plugin/issues">issue tracking system</a> to log issues.
+        </p>
+      </div>
+    </div>
+<script type="text/javascript">
+
+
+ var _gaq = _gaq || [];
+ _gaq.push(['_setAccount', 'UA-27135587-1']);
+ _gaq.push(['_trackPageview']);
+
+
+ (function() {
+   var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+   ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+   var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+ })();
+
+
+</script>
+
+  </body>
+</html>
