@@ -58,7 +58,7 @@ body #main #logo a {
   width: 500px;
   height: 105px;
   margin: 0px 40px 15px 0px;
-  background: url("/images/logo.png");
+  background: url("../images/logo.png");
 }
 /* line 76 */
 body #main #navigation {

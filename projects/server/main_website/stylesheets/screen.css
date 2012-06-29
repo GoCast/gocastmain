@@ -62,7 +62,7 @@ body #main #logo a {
   width: 500px;
   height: 105px;
   margin: 0px 0px 15px 0px;
-  background: url("/images/logo.png");
+  background: url("../images/logo.png");
   background-position: center;
   background-repeat: no-repeat;
 }
