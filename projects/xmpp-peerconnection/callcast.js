@@ -102,7 +102,24 @@ var Callcast = {
     fbsr: "",
     fbaccesstoken: "",
     fb_sent_pres: false,
+    sessionInfo: {},
 
+	WriteUpdatedState: function() {
+		if(typeof(Storage)!=="undefined")
+		{
+			// If the connection is alive, store info.
+			// If it's not alive, then there's nothing to do here.
+			if (this.connection)
+			{
+				sessionStorage.setItem('jid', this.connection.jid);
+				sessionStorage.setItem('rid', this.connection.rid);
+				sessionStorage.setItem('sid', this.connection.sid);
+			}
+		}
+		else
+			alert("Non-HTML5 browser. Might you consider an upgrade? No 'Storage' available for refresh.");
+	},
+	
     CallStates: {
     	NONE: 0,
     	AWAITING_RESPONSE: 1,
@@ -1203,6 +1220,7 @@ var Callcast = {
 		}
     	else
     	{
+    		this.WriteUpdatedState();
     		this.connection.muc.leave(Callcast.room, Callcast.nick, null);
 
     		this.DropAllParticipants();
@@ -1312,6 +1330,8 @@ var Callcast = {
     },
 
     disconnect: function() {
+    	this.WriteUpdatedState();
+    	
 		this.DropAllParticipants();
 		this.MuteLocalVoice(false);
 
@@ -1344,7 +1364,9 @@ var Callcast = {
 			 console.log("XMPP/Strophe Connecting...");
 		 } else if (status === Strophe.Status.ATTACHED) {
 			 console.log("Re-Attach of connection successful. Triggering re-attached...");
+			 Callcast.finalizeConnect();
 			 $(document).trigger('re-attached');
+			 $(document).trigger('connected');
 		 } else if (status === Strophe.Status.DISCONNECTED) {
 		 	 console.log("XMPP/Strophe Disconnected.");
 			 Callcast.disconnect();
@@ -1373,13 +1395,33 @@ var Callcast = {
     	if (url)
     		boshconn = url;
 
+		// Determine if we're in a 'refresh' situation and if so, then re-attach.
+		if(typeof(Storage)!=="undefined")
+		{
+			if (sessionStorage.jid)
+			{
+				this.log(".connect() - we found prior stored info - attempting to re-attach.");
+				
+				// We have previous data.
+				this.reattach(sessionStorage.jid, sessionStorage.sid, sessionStorage.rid, this.conn_callback, boshconn);
+
+				// RMW:TODO - Should we be calling SetNickname() here with a prior-stored nickname?
+				//   and how does this integrate into facebook - just let it flow? If we were using non-facebook before,
+				//   then we should probably presume the same nickname and bypass getting credentials.
+				
+				return;
+			}
+		}
+		
     	if (this.connection)
+    	{
     		this.disconnect();
+    		this.reset();
+    		delete this.connection;
+    	}
 
     	this.connection = new Strophe.Connection(boshconn);
-    	this.connection.reset();
 
-		// Seems to be a timing related issue for connect.
 		setTimeout(function() {
 	    	self.connection.connect(id, pw, self.conn_callback);
 	    }, 500);
@@ -1398,9 +1440,9 @@ var Callcast = {
 	    this.connection.reset();
 
 	 	console.log("Re-attaching -- jid="+jid+", sid="+sid+", rid="+rid);
-		// Seems to be a timing related issue for connect.
+	
 		setTimeout(function() {
-		 	self.connection.attach(jid, sid, rid, self.conn_callback);
+		 	Callcast.connection.attach(jid, sid, rid, Callcast.conn_callback);
 		}, 500);
     },
 
