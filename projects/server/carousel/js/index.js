@@ -1179,6 +1179,51 @@ function tryPluginInstall(
   }
 } /* tryPluginInstall() */
 
+///
+/// \brief close the eula window, download the win install file, launch function to check for plugin
+///
+function winInstall(event)
+{
+   // close the eula window
+   closeWindow();
+   
+   // get the windows install file
+   $.post("https://video.gocast.it/downloads/GoCastPlayer.msi",
+          function(data)
+          {
+             console.log(data);
+          });
+
+   openWindow("#winWait");         
+   winCheckForPlugin();
+}
+
+///
+/// \brief periodically check for the player and reload page when found
+///
+function winCheckForPlugin()
+{
+   // instantiate gocast player
+   $("#scratch").append('<div id="GocastPlayerTest"><object id="GocastPlayerLocal" type="application/x-gocastplayer" width="0" height="0"></object></div>');
+   
+   // find player
+   for (i = 0; i < window.navigator.plugins.length; ++i)
+   {
+      var item = window.navigator.plugins[i];
+      app.log(2, 'plugin filename ' + item.filename);
+      if (item && item.filename === 'npGCP.dll')
+      {
+         clearTimeout(app.winTimeout);
+         app.log(2, "winCheckForPlugin found player, done.");
+         window.location.reload();
+      }
+   }
+   
+   // wait and recheck
+   app.winTimeout = setTimeout(winCheckForPlugin, 3000);
+   app.log(2, "winCheckForPlugin no player, waiting...");
+}
+
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
  * \brief show the chat output div
