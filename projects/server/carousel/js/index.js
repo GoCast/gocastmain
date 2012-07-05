@@ -1203,14 +1203,11 @@ function winInstall(event)
 ///
 function winCheckForPlugin()
 {
-   // instantiate gocast player
-   $("#scratch").append('<div id="GocastPlayerTest"><object id="GocastPlayerLocal" type="application/x-gocastplayer" width="0" height="0"></object></div>');
-   
    // find player
    for (i = 0; i < window.navigator.plugins.length; ++i)
    {
       var item = window.navigator.plugins[i];
-      app.log(2, 'plugin filename ' + item.filename);
+      //app.log(2, 'plugin filename ' + item.filename);
       if (item && item.filename === 'npGCP.dll')
       {
          clearTimeout(app.winTimeout);
