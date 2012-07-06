@@ -231,7 +231,7 @@ body > div#meeting > div#streams > div#scarousel div.cloudcarousel.typeContent >
   clear: left;
   background-color: transparent;
   background-size: 98%;
-  background-repeat: no-repeat
+  background-repeat: no-repeat;
   width: 40px;
   height:40px;
   margin-left:auto;
