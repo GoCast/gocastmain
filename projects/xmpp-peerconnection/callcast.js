@@ -110,9 +110,9 @@ var Callcast = {
 			// If the connection is alive, store info.
 			// If it's not alive, then there's nothing to do here.
 			//
-			// Due to odd bug found, we'll also check to ensure the jid is a full jid with something before the '@' sign.
+			// Due to odd bug found, we'll also check to ensure the jid is a full jid with something before/after the '@' sign.
 			//
-			if (this.connection && this.connection.authenticated && this.connection.connected && this.connection.jid.split('@')[0])
+			if (this.connection && this.connection.authenticated && this.connection.connected && this.connection.jid.split('@')[1])
 			{
 				sessionStorage.setItem('jid', this.connection.jid);
 				sessionStorage.setItem('rid', this.connection.rid);
@@ -1423,7 +1423,7 @@ var Callcast = {
 		{
 			// Found an odd bug where jid could have been stored as 'video.gocast.it' (non-authenticated state)
 			// This would be invalid for reattaching - so don't do it.
-			if (sessionStorage.jid && sessionStorage.jid.split('@')[0] && sessionStorage.sid && sessionStorage.rid)
+			if (sessionStorage.jid && sessionStorage.jid.split('@')[1] && sessionStorage.sid && sessionStorage.rid)
 			{
 				this.log(".connect() - we found prior stored info - attempting to re-attach.");
 				
