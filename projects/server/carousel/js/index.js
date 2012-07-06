@@ -164,6 +164,8 @@ var app = {
   // logged in state
   xmppLoggedIn : false,
   userLoggedIn : false,
+  // carousel instance
+  carousel: null,
   /*
    * User Information. */
   user: {
@@ -521,7 +523,7 @@ function openMeeting(
    * Initialize carousel. */
   var rX = winW * 0.44; /* 50% of 88% */
   var rY = winH * 0.276; /* 40% of 69% */
-  $("#scarousel").CloudCarousel(
+  app.carousel = $("#scarousel").CloudCarousel(
     {
       xPos: rX*1.10,
       yPos: rY*0.68,
@@ -1279,21 +1281,48 @@ function docKey(event)
    {
       return;
    }
+   app.log(2, "key code " + event.which);
+   
    switch (event.which || event.keyCode) 
    {
-     case 32: // space bar, toggle audio or video if Alt pressed
-       event.altKey ? changeVideo() : changeAudio();
+     case 32: // space bar
+       changeAudio();
        break;
-     case 160: // space bar, getting this for alt-space
-       changeVideo();
+     case 65: // alt-a, toggle audio
+       if (event.altKey)
+       {
+          changeAudio();
+       }
        break;
-     case 67, 231: // c key, chat input
+     case 86: // alt-v, toggle video
+       if (event.altKey)
+       {
+          changeVideo();
+       }
+       break;
+     case 67: // c key, chat input
        if (event.altKey)
        {
           // set focus to global chat input
           event.preventDefault();
           $('#msgBoard > input.chatTo').focus();
        }
+    /*
+     case 37: // left arrow, scroll carousel left
+     {
+        if (app.carousel)
+        {
+           app.carousel.rotate(-1);
+        }
+     }
+     case 39: // right arrow, scroll carousel right
+     {
+        if (app.carousel)
+        {
+           app.carousel.rotate(1);
+        }
+     }
+     */
    }
 }
 
@@ -1327,7 +1356,7 @@ $(document).ready(function(
   // login callback
   $(document).bind('checkCredentials', checkCredentials);
 
-  $(document).keypress(docKey); // global key handler
+  $(document).keydown(docKey); // global key handler
   
   fbInit(); // init facebook api
   
