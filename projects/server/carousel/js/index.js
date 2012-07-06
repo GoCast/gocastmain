@@ -551,7 +551,7 @@ function openMeeting(
   $(window).unload(function() {
     app.log(2, "On unload.");
     //alert("unload");
-    Callcast.disconnect();
+ //RMW-TRY   Callcast.disconnect();
   });
   /*
    * Activate meeting window. */
