@@ -109,11 +109,16 @@ var Callcast = {
 		{
 			// If the connection is alive, store info.
 			// If it's not alive, then there's nothing to do here.
-			if (this.connection)
+			if (this.connection && this.connection.authenticated && this.connection.connected)
 			{
 				sessionStorage.setItem('jid', this.connection.jid);
 				sessionStorage.setItem('rid', this.connection.rid);
 				sessionStorage.setItem('sid', this.connection.sid);
+			}
+			else
+			{
+				// Zero it out. The conneciton is not valid.
+				sessionStorage.clear();
 			}
 		}
 		else
@@ -1353,7 +1358,18 @@ var Callcast = {
 		$(document).trigger('disconnected');
     },
 
-	conn_callback: function(status) {
+	conn_callback_reconnect: function(status, err) {
+		console.log("Post-Reconnect conn_callback. Err:", err);
+		Callcast.conn_callback_guts(status);
+	},
+
+	conn_callback: function(status, err) {
+		console.log("Orig conn_callback. Err:", err);
+		Callcast.conn_callback_guts(status);
+	},
+	
+	conn_callback_guts: function(status) {
+		console.log("conn_callback: RID: " + Callcast.connection.rid);
 		 if (status === Strophe.Status.CONNECTED) {
 			 console.log("Finalizing connection and then triggering connected...");
 			 Callcast.finalizeConnect();
@@ -1364,9 +1380,11 @@ var Callcast = {
 			 console.log("XMPP/Strophe Connecting...");
 		 } else if (status === Strophe.Status.ATTACHED) {
 			 console.log("Re-Attach of connection successful. Triggering re-attached...");
-			 Callcast.finalizeConnect();
-			 $(document).trigger('re-attached');
-			 $(document).trigger('connected');
+			 setTimeout(function() {
+				 Callcast.finalizeConnect();
+				 $(document).trigger('re-attached');
+				 $(document).trigger('connected');
+			 }, 500);
 		 } else if (status === Strophe.Status.DISCONNECTED) {
 		 	 console.log("XMPP/Strophe Disconnected.");
 			 Callcast.disconnect();
@@ -1375,8 +1393,10 @@ var Callcast = {
 			 console.log("XMPP/Strophe is Dis-Connecting...should we try to re-attach here? TODO:RMW");
 		 } else if (status === Strophe.Status.CONNFAIL) {
 			 console.log("XMPP/Strophe reported connection failure...attempt to re-attach...");
+// RMW: In theory we are supposed to advance RID by one, but Chrome fails it while Firefox is ok. Sigh. No advancing...
+//   			 Callcast.reattach(Callcast.connection.jid, Callcast.connection.sid, new Number(Callcast.connection.rid) + 1, Callcast.conn_callback);
 			 Callcast.reattach(Callcast.connection.jid, Callcast.connection.sid, Callcast.connection.rid, Callcast.conn_callback);
-			 alert("NOTICE -- attempted to auto-re-attach after connection failure. Did we succeed?");
+//			 alert("NOTICE -- attempted to auto-re-attach after connection failure. Did we succeed?");
 		 } else if (status === Strophe.Status.AUTHFAIL) {
 			 Callcast.disconnect();
 			 $(document).trigger('disconnected');
@@ -1398,11 +1418,13 @@ var Callcast = {
 		// Determine if we're in a 'refresh' situation and if so, then re-attach.
 		if(typeof(Storage)!=="undefined")
 		{
-			if (sessionStorage.jid)
+			if (sessionStorage.jid && sessionStorage.sid && sessionStorage.rid)
 			{
 				this.log(".connect() - we found prior stored info - attempting to re-attach.");
 				
 				// We have previous data.
+// RMW: In theory we are supposed to advance RID by one, but Chrome fails it while Firefox is ok. Sigh. No advancing...
+//				this.reattach(sessionStorage.jid, sessionStorage.sid, new Number(sessionStorage.rid) + 1, this.conn_callback, boshconn);
 				this.reattach(sessionStorage.jid, sessionStorage.sid, sessionStorage.rid, this.conn_callback, boshconn);
 
 				// RMW:TODO - Should we be calling SetNickname() here with a prior-stored nickname?
@@ -1433,22 +1455,48 @@ var Callcast = {
     	if (url)
     		boshconn = url;
 
+		if (!jid || !sid || !rid)
+		{
+			console.log("Re-attach ERROR: RID/SID/JID is null. RID=" + rid + ", SID=" + sid + ", JID=" + jid);
+			return;
+		}
+		
     	if (this.connection)
-	    	delete this.connection;
-	    
-	    this.connection = new Strophe.Connection(boshconn);
+    	{
+    		this.connection.pause();
+    		delete this.connection;
+    	}
+    	
+		this.connection = new Strophe.Connection(boshconn);
 	    this.connection.reset();
 
 	 	console.log("Re-attaching -- jid="+jid+", sid="+sid+", rid="+rid);
 	
 		setTimeout(function() {
-		 	Callcast.connection.attach(jid, sid, rid, Callcast.conn_callback);
+		 	Callcast.connection.attach(jid, sid, rid, Callcast.conn_callback_reconnect);
 		}, 500);
     },
 
     finalizeConnect: function() {
     	this.connection.send($pres());
     	this.SendFBPres();
+
+/*
+ Callcast.connection.rawInput = function(data) {
+                if ($(data).children()[0])
+                        console.log("RAW-IN:", $(data).children()[0]);
+                else
+                        console.log("RAW-IN:", $(data));
+
+        };
+
+Callcast.connection.rawOutput = function(data) {
+                if ($(data).children()[0])
+                        console.log("RAW-OUT:", $(data).children()[0]);
+                else
+                        console.log("RAW-OUT:", $(data));
+        };
+*/
 
     	// Handle inbound signaling messages
     	//Callcast.connection.addHandler(Callcast.handle_webrtc_message, null, "message", "webrtc-message");
