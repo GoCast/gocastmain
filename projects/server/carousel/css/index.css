@@ -508,9 +508,12 @@ body > div#meeting > div#streams > div#scontrols > input.right {
   background-color: white;
   border: 4px solid #812034;
   border-radius: 16px;
+}
+#boxes #winWait #status
+{
   line-height: 2em;
 }
-#boxes #winWait > img#spinner 
+#boxes #winWait img#spinner 
 {
   float: left;
   width: 25px; 
