@@ -1342,12 +1342,15 @@ var Callcast = {
     },
 
     disconnect: function() {
-    	this.WriteUpdatedState();
-    	
+
 		this.DropAllParticipants();
 		this.MuteLocalVoice(false);
 
 		this.LeaveSession();
+		
+		// Zero it out. The conneciton is no longer valid.
+		if(typeof(Storage)!=="undefined")
+			sessionStorage.clear();
 
 		if (this.connection)
 		{
