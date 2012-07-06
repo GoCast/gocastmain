@@ -763,7 +763,12 @@ function sendTwitter(
  */
 function changeVideo()
 {
-  app.videoEnabled = $(this).hasClass("on");
+  var jqObj = $('#lower-right > #video');
+  if (!jqObj)
+  {
+     app.log(4, "couldn't find video button");
+  }
+  app.videoEnabled = $(jqObj).hasClass("on");
   var jqOo = $('#mystream');
   if (app.videoEnabled) {
     // Check object dimensions.
@@ -786,14 +791,14 @@ function changeVideo()
        $(jqOo).css("background-image", "url(" + app.user.fbProfilePicUrl + ")");
     }
   }
-  $(this).toggleClass("on");
+  $(jqObj).toggleClass("on");
   if (app.videoEnabled) {
     app.log(2, "Video turned on.");
-    $(this).attr("title", "Disable video");
+    $(jqObj).attr("title", "Disable video");
   }
   else {
     app.log(2, "Video turned off.");
-    $(this).attr("title", "Enable video");
+    $(jqObj).attr("title", "Enable video");
   }
   return false;
 } /* changeVideo() */
@@ -805,21 +810,24 @@ function changeVideo()
 function changeAudio()
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
-  var bMuteAudio = $(this).hasClass("off");
+  var jqObj = $('#lower-right > #audio');
+  if (!jqObj)
+  {
+     app.log(4, "couldn't find video button");
+  }
+  var bMuteAudio = $(jqObj).hasClass("off");
   Callcast.MuteLocalVoice(bMuteAudio);
-  $(this).toggleClass("off");
+  $(jqObj).toggleClass("off");
   if (bMuteAudio) {
     app.log(2, "Audio muted.");
-    $(this).attr("title", "Unmute audio");
+    $(jqObj).attr("title", "Unmute audio");
   }
   else {
     app.log(2, "Audio unmuted.");
-    $(this).attr("title", "Mute audio");
+    $(jqObj).attr("title", "Mute audio");
   }
   return false;
 } /* changeAudio() */
-
-
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
@@ -1264,7 +1272,7 @@ function showMsgTicker()
 ///
 /// \brief initialize ui handlers
 ///
-function meetingKey(event)
+function docKey(event)
 {
    /// no ctrl-<key> accelerators
    if (event.ctrlKey)
@@ -1276,11 +1284,15 @@ function meetingKey(event)
      case 32: // space bar, toggle audio or video if Alt pressed
        event.altKey ? changeVideo() : changeAudio();
        break;
-     case 67: // c key, chat input
+     case 160: // space bar, getting this for alt-space
+       changeVideo();
+       break;
+     case 67, 231: // c key, chat input
        if (event.altKey)
        {
           // set focus to global chat input
-          $('msgBoard > #chatTo').focus();
+          event.preventDefault();
+          $('#msgBoard > input.chatTo').focus();
        }
    }
 }
@@ -1292,7 +1304,6 @@ function uiInit()
 {
    // add global keyboard accelerators
    //$('meeting').keypress(meetingKey);
-   $().keypress(meetingKey);
 }
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
@@ -1309,23 +1320,24 @@ $(document).ready(function(
 )
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
-  /*
-   * Check the browser. */
+  // Check the browser.
   app.getBrowser();
   app.checkBrowser();
 
+  // login callback
   $(document).bind('checkCredentials', checkCredentials);
 
-  uiInit();
+  $(document).keypress(docKey); // global key handler
+  
   fbInit(); // init facebook api
   
-  // Login anonymously
+  // Login to xmpp anonymously
   Callcast.connect(Callcast.CALLCAST_XMPPSERVER, "");
 
-  /*
-   * Write greeting into console. */
+  // Write greeting into console.
   app.log(2, "Page loaded.");
-}); /* $(document).ready(function()) */
+  
+}); // $(document).ready(function())
 
 $.extend({
 getUrlVars: function(){
