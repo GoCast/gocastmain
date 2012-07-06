@@ -117,6 +117,10 @@ var Callcast = {
 				sessionStorage.setItem('jid', this.connection.jid);
 				sessionStorage.setItem('rid', this.connection.rid);
 				sessionStorage.setItem('sid', this.connection.sid);
+				
+				sessionStorage.setItem('room', this.room);
+				sessionStorage.setItem('nick', this.nick);
+				sessionStorage.setItem('bUseVideo', this.bUseVideo);
 			}
 			else
 			{
@@ -794,7 +798,7 @@ var Callcast = {
 		// Note - we're going to send our INTRO_SR buried in our presence.
 		//        This way, the switchboard will know who we are on facebook when our presence is seen.
 		
-		if (this.connection)
+		if (this.connection && this.connection.connected && this.connection.authenticated)
 		{
 			this.fb_sent_pres = true;
 			this.connection.send(pres);
@@ -1168,7 +1172,7 @@ var Callcast = {
 				  self.JoinSession(roomname, roomname + self.AT_CALLCAST_ROOMS);
 
 				  if (cb)
-				  	cb(roomname);
+					cb(roomname);
 			  }
 
 			  return true;
@@ -1338,12 +1342,15 @@ var Callcast = {
     },
 
     disconnect: function() {
-    	this.WriteUpdatedState();
-    	
+
 		this.DropAllParticipants();
 		this.MuteLocalVoice(false);
 
 		this.LeaveSession();
+		
+		// Zero it out. The conneciton is no longer valid.
+		if(typeof(Storage)!=="undefined")
+			sessionStorage.clear();
 
 		if (this.connection)
 		{
@@ -1383,6 +1390,16 @@ var Callcast = {
 			 console.log("XMPP/Strophe Connecting...");
 		 } else if (status === Strophe.Status.ATTACHED) {
 			 console.log("Re-Attach of connection successful. Triggering re-attached...");
+	 		// Determine if we're in a 'refresh' situation and if so, then re-attach.
+			if(typeof(Storage)!=="undefined" && sessionStorage.room)
+			{
+				// We need to force a LeaveSession and setup video state too.
+				Callcast.room = sessionStorage.room;
+				Callcast.nick = sessionStorage.nick;
+				Callcast.bUseVideo = sessionStorage.bUseVideo;
+				Callcast.LeaveSession();
+			}
+
 			 setTimeout(function() {
 				 Callcast.finalizeConnect();
 				 $(document).trigger('re-attached');
@@ -1398,7 +1415,11 @@ var Callcast = {
 			 console.log("XMPP/Strophe reported connection failure...attempt to re-attach...");
 // RMW: In theory we are supposed to advance RID by one, but Chrome fails it while Firefox is ok. Sigh. No advancing...
 //   			 Callcast.reattach(Callcast.connection.jid, Callcast.connection.sid, new Number(Callcast.connection.rid) + 1, Callcast.conn_callback);
-			 Callcast.reattach(Callcast.connection.jid, Callcast.connection.sid, Callcast.connection.rid, Callcast.conn_callback);
+
+// RMW: SPECIFICALLY SKIPPING RE-ATTACH on CONNFAIL right now. Think it's causing issues.
+//			 Callcast.reattach(Callcast.connection.jid, Callcast.connection.sid, Callcast.connection.rid, Callcast.conn_callback);
+
+
 //			 alert("NOTICE -- attempted to auto-re-attach after connection failure. Did we succeed?");
 		 } else if (status === Strophe.Status.AUTHFAIL) {
 			 Callcast.disconnect();
@@ -1449,9 +1470,7 @@ var Callcast = {
 
     	this.connection = new Strophe.Connection(boshconn);
 
-		setTimeout(function() {
-	    	self.connection.connect(id, pw, self.conn_callback);
-	    }, 500);
+    	self.connection.connect(id, pw, self.conn_callback);
     },
     
     reattach: function(jid, sid, rid, cb, url) {
@@ -1460,7 +1479,7 @@ var Callcast = {
     	if (url)
     		boshconn = url;
 
-		if (!jid || !sid || !rid)
+		if (!jid || !sid || !rid || !jid.split('@')[1])
 		{
 			console.log("Re-attach ERROR: RID/SID/JID is null. RID=" + rid + ", SID=" + sid + ", JID=" + jid);
 			return;
@@ -1477,9 +1496,7 @@ var Callcast = {
 
 	 	console.log("Re-attaching -- jid="+jid+", sid="+sid+", rid="+rid);
 	
-		setTimeout(function() {
-		 	Callcast.connection.attach(jid, sid, rid, Callcast.conn_callback_reconnect);
-		}, 500);
+	 	Callcast.connection.attach(jid, sid, rid, Callcast.conn_callback_reconnect);
     },
 
     finalizeConnect: function() {
