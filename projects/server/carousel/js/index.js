@@ -761,13 +761,7 @@ function sendTwitter(
 /**
  * \brief Action change Video.
  */
-function changeVideo(
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-    /**
-     * Event object. */
-  event
-)
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+function changeVideo()
 {
   app.videoEnabled = $(this).hasClass("on");
   var jqOo = $('#mystream');
@@ -808,12 +802,7 @@ function changeVideo(
 /**
  * \brief Action change Audio.
  */
-function changeAudio(
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-    /**
-     * Event object. */
-  event
-)
+function changeAudio()
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
   var bMuteAudio = $(this).hasClass("off");
@@ -1179,6 +1168,65 @@ function tryPluginInstall(
   }
 } /* tryPluginInstall() */
 
+///
+/// \brief close the eula window, download the win install file, launch function to check for plugin
+///
+function winInstall(event)
+{
+   // close the eula window
+   closeWindow();
+   
+   // get the windows install file
+   $.post("https://video.gocast.it/downloads/GoCastPlayer.msi",
+          function(data)
+          {
+             console.log(data);
+          });
+
+   openWindow("#winWait");         
+   winCheckForPlugin();
+}
+
+///
+/// \brief periodically check for the player to be installed and prompt user
+///
+function winCheckForPlugin()
+{
+   // find player
+   for (i = 0; i < window.navigator.plugins.length; ++i)
+   {
+      var item = window.navigator.plugins[i];
+      //app.log(2, 'plugin filename ' + item.filename);
+      if (item && item.filename === 'npGCP.dll')
+      {
+         clearTimeout(app.winTimeout);
+         app.log(2, "winCheckForPlugin found player.");
+         $('#winWait > #status > #spinner').attr("src", "images/green-tick.png");
+         $('#winWait > #status > #msg').text("The GoCast plugin is installed.");
+         
+         // display error msg after a timeout in case the plugin does not load
+         app.winTimeout = setTimeout(winPluginPunt, 10000);
+         return; // we're done since the plugin is in the list
+      }
+   }
+   
+   // plugin was not found in list wait and recheck
+   app.winTimeout = setTimeout(winCheckForPlugin, 3000);
+   app.log(2, "winCheckForPlugin no player, waiting...");
+}
+
+///
+/// \brief display a message to restart the browser
+///
+/// the pluginLoaded callback should close the winWait dialog
+/// if it doesn't prompt user to restart the browser
+///
+function winPluginPunt()
+{
+   $('#winWait > #status > #spinner').attr("src", "images/red-x.png");
+   $('#winWait > #status > #msg').text("Hmmm... looks like the plugin did not load.  Please restart the browser");
+}
+
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
  * \brief show the chat output div
@@ -1213,6 +1261,40 @@ function showMsgTicker()
    
 } // showChatOut
 
+///
+/// \brief initialize ui handlers
+///
+function meetingKey(event)
+{
+   /// no ctrl-<key> accelerators
+   if (event.ctrlKey)
+   {
+      return;
+   }
+   switch (event.which || event.keyCode) 
+   {
+     case 32: // space bar, toggle audio or video if Alt pressed
+       event.altKey ? changeVideo() : changeAudio();
+       break;
+     case 67: // c key, chat input
+       if (event.altKey)
+       {
+          // set focus to global chat input
+          $('msgBoard > #chatTo').focus();
+       }
+   }
+}
+
+///
+/// \brief initialize ui handlers
+///
+function uiInit()
+{
+   // add global keyboard accelerators
+   //$('meeting').keypress(meetingKey);
+   $().keypress(meetingKey);
+}
+
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
  * \brief The document ready event handler.
@@ -1234,7 +1316,9 @@ $(document).ready(function(
 
   $(document).bind('checkCredentials', checkCredentials);
 
+  uiInit();
   fbInit(); // init facebook api
+  
   // Login anonymously
   Callcast.connect(Callcast.CALLCAST_XMPPSERVER, "");
 

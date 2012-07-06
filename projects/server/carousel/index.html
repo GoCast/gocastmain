@@ -83,8 +83,14 @@
         <iframe src="eula.html">
         </iframe>
         <form action="https://video.gocast.it/downloads/GoCastPlayer.msi" method="post">
-          <input type="submit" value="Accept"/>
+          <input type="submit" value="Accept" onclick="winInstall();"/>
         </form>
+      </div>
+      <div id="winWait" class="window resizable">
+        <p class="title">Please run the downloaded file to install the GoCast Player.</p>
+        <div id="status">
+           <img id="spinner" src="images/waiting-join.gif" /><p id="msg">Waiting for plugin.</p>
+        </div>
       </div>
       <div id="copyData" class="window resizable">
          <img class="close" src="images/button-close.png" alt="Close" title="Close" />
@@ -136,8 +142,8 @@
         -->
         <hr>
         <a id="noThanks" href="javascript:enterId();">no thanks ></a>
-        </div>
-        <div id="credentials2" class="window resizable">
+      </div>
+      <div id="credentials2" class="window resizable">
         <p class="title">Choose a name to use in the room or login with facebook.</p>
         <p class="error"></p>
         <input id="name"  type="text" placeholder="Please enter your name" />
