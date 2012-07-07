@@ -164,7 +164,7 @@ var app = {
   // logged in state
   xmppLoggedIn : false,
   userLoggedIn : false,
-  // carousel instance
+  // carousel controller instance
   carousel: null,
   /*
    * User Information. */
@@ -523,7 +523,7 @@ function openMeeting(
    * Initialize carousel. */
   var rX = winW * 0.44; /* 50% of 88% */
   var rY = winH * 0.276; /* 40% of 69% */
-  app.carousel = $("#scarousel").CloudCarousel(
+  $("#scarousel").CloudCarousel(
     {
       xPos: rX*1.10,
       yPos: rY*0.68,
@@ -535,6 +535,8 @@ function openMeeting(
       minScale: 0.68
     }
   );
+  // set the controller instance
+  app.carousel = $("#scarousel").data('cloudcarousel');
   /*
    * Initialize Gocast events. */
   $(window).on('beforeunload', function() {
@@ -1307,22 +1309,19 @@ function docKey(event)
           event.preventDefault();
           $('#msgBoard > input.chatTo').focus();
        }
-    /*
+       break;
      case 37: // left arrow, scroll carousel left
-     {
         if (app.carousel)
         {
            app.carousel.rotate(-1);
         }
-     }
+       break;
      case 39: // right arrow, scroll carousel right
-     {
         if (app.carousel)
         {
            app.carousel.rotate(1);
         }
-     }
-     */
+       break;
    }
 }
 
