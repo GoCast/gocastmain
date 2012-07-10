@@ -1007,6 +1007,18 @@ function resizeWindows(
   var meetW = jqW.width();
   var meetOff = winW/2 - meetW/2;
   jqW.css('left', meetOff);
+  
+  // resize carousel
+  if (app.carousel)
+  {
+     var rX = winW * 0.44; /* 50% of 88% */
+     var rY = winH * 0.276; /* 40% of 69% */
+     app.carousel.xCentre = rX*1.10;
+     app.carousel.yCentre = rY*0.68;
+     app.carousel.xRadius = rX*0.94,
+     app.carousel.yRadius = rY;
+     app.carousel.updateAll();
+  }
   return false;
 } /* resizeWindows() */
 
