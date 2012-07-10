@@ -249,27 +249,64 @@
     /*
      * Object Loaded.  Check if objects have loaded. Valid widths and
      * heights needed. */
-    this.checkObjectsLoaded = function() {
+    this.checkObjectsLoaded = function()
+    {
       var i;
-      for (i = 0; i < objects.length; i++) {
-	if ( ($(objects[i]).width() === undefined) || ( objects[i].complete !== undefined) && (!objects[i].complete) ) {
-	  return;
-        }
-      }; /* for loop */
-      for( i = 0; i < objects.length; i++) {
-	items.push( new Item( objects[i], options ) );
-	$(objects[i]).data('itemIndex', i);
-      }; /* for loop */
-      /*
-       * If all objects have valid widths and heights, we can stop checking. */
+      for (i = 0; i < objects.length; i++)
+      {
+	     if ( ($(objects[i]).width() === undefined) || 
+	          ( objects[i].complete !== undefined) && (!objects[i].complete) ) 
+	     {
+	        return;
+         }
+      }; // for loop
+      app.log(2, "checkObjectsLoaded done");
+      //app.log(2, "container w " + $(this.container).width() + " h " + $(this.container).height());
+      // document layout seems to be done at this point so resize carousel
+      // todo find better place for this
+      this.resize();
+      for( i = 0; i < objects.length; i++) 
+      {
+	     items.push( new Item( objects[i], options ) );
+	      $(objects[i]).data('itemIndex', i);
+      }; // for loop
+      // If all objects have valid widths and heights, we can stop checking.
       clearInterval(this.tt);
       this.updateAll();
-    }; /* checkObjectsLoaded() */
+    }; // checkObjectsLoaded()
     /*
      * Bootstrapping. */
     this.tt = setInterval( function(){
       ctx.checkObjectsLoaded();
-    }, 50);    
+    }, 50);
+    // resize the carousel keeping the spot proportion
+    this.resize = function()
+    {
+      // get new width
+      var width = $(this.container).width(), height = $(this.container).height();
+      //app.log(2, "container w " + width + " h " + height);
+
+      // change size, todo remove hacks to position carousel correctly
+      /*
+      winW, winH were main window w, h
+      var rX = winW * 0.44; // 50% of 88%
+      var rY = winH * 0.276; // 40% of 69%
+      this.xCentre = rX*1.10;
+      this.yCentre = rY*0.68;
+      this.xRadius = rX*0.94,
+      this.yRadius = rY;
+      */
+      this.xCentre = (width  / 2) * 0.9 * 1.1;
+      this.yCentre = (height / 2) * 0.6 * 0.8;
+      this.xRadius = (width  / 2) * 0.9  ,
+      this.yRadius = (height / 2) * 0.6;
+
+      //app.log(2, "carousel sizes xCentre " + this.xCentre + " yCentre " + this.yCentre +
+      //                         " xRadius " + this.xRadius + " yRadius " + this.yRadius);
+      
+      // scale spots
+      this.updateAll();
+    }
   }; /* Controller object. */
 
 /*
@@ -279,6 +316,8 @@
    this.each( function() {
      options = $.extend({}, {
        minScale: 0.5,
+       xSpotRatio: 0.3,
+       ySpotRatio: 0.4,
        xPos: 0,
        yPos: 0,
        xRadius: 0,

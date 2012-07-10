@@ -510,24 +510,16 @@ function openMeeting(
      $("#meeting > #streams > #scarousel #mystream")
         .css("background-image", "url(" + app.user.fbProfilePicUrl + ")");
   }
-  /*
-   * Get window height and width. */
-  var winH = $(window).height();
-  var winW = $(window).width();
-  /*
-   * Set #meeting height and width to fill the whole screen. */
-  var jqWin = $('#meeting');
-  //todo finish resize carousel
-  //jqWin.css({'width':winW,'height':winH});
-  /*
-   * Initialize carousel. */
-  var rX = winW * 0.44; /* 50% of 88% */
-  var rY = winH * 0.276; /* 40% of 69% */
+  // center carousel in it's container
+  // the carousel positioning is handled by it's resize method 
+  var sCar = $("#scarousel");
+  var rX = sCar.width() / 2;
+  var rY = sCar.height() / 2;
   $("#scarousel").CloudCarousel(
     {
-      xPos: rX*1.10,
-      yPos: rY*0.68,
-      xRadius: rX*0.94,
+      xPos: rX,
+      yPos: rY,
+      xRadius: rX,
       yRadius: rY,
       buttonLeft: $("body > div#meeting > div#streams > div#scontrols > input.left"),
       buttonRight: $("body > div#meeting > div#streams > div#scontrols > input.right"),
@@ -566,7 +558,7 @@ function openMeeting(
   /*
    * Transition effect. */
   $('#mask').fadeOut(500);
-  jqWin.fadeIn(1000);
+  $('#meeting').fadeIn(1000);
   return false;
 } /* openMeeting() */
 
@@ -1011,13 +1003,7 @@ function resizeWindows(
   // resize carousel
   if (app.carousel)
   {
-     var rX = winW * 0.44; /* 50% of 88% */
-     var rY = winH * 0.276; /* 40% of 69% */
-     app.carousel.xCentre = rX*1.10;
-     app.carousel.yCentre = rY*0.68;
-     app.carousel.xRadius = rX*0.94,
-     app.carousel.yRadius = rY;
-     app.carousel.updateAll();
+     app.carousel.resize();
   }
   return false;
 } /* resizeWindows() */
@@ -1325,13 +1311,13 @@ function docKey(event)
      case 37: // left arrow, scroll carousel left
         if (app.carousel)
         {
-           app.carousel.rotate(-1);
+           app.carousel.rotate(1);
         }
        break;
      case 39: // right arrow, scroll carousel right
         if (app.carousel)
         {
-           app.carousel.rotate(1);
+           app.carousel.rotate(-1);
         }
        break;
    }
