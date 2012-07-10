@@ -19,6 +19,8 @@
 #include <deque>
 #include <boost/thread.hpp>
 
+#include "talk/app/webrtc/mediastreaminterface.h"
+#include "talk/base/scoped_ref_ptr.h"
 #include "GCPVideoRenderer.h"
 
 #define GOCAST_DEFAULT_RENDER_WIDTH  352
@@ -34,7 +36,7 @@ public:
 public:
     GCP();
     virtual ~GCP();    
-    //webrtc::VideoRendererWrapperInterface* Renderer() { return m_pRenderer.get(); }
+    talk_base::scoped_refptr<webrtc::VideoRendererWrapperInterface> Renderer() { return m_pRenderer; }
     
 public:
     void onPluginReady();
@@ -66,6 +68,9 @@ public:
     virtual bool onWindowDetached(FB::DetachedEvent *evt, FB::PluginWindow *);    
     virtual bool onWindowRefresh(FB::RefreshEvent *evt, FB::PluginWindow *);
     /** END EVENTDEF -- DON'T CHANGE THIS LINE **/
+    
+private:
+    talk_base::scoped_refptr<webrtc::VideoRendererWrapperInterface> m_pRenderer;
 
 };
 

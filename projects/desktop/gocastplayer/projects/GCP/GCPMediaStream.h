@@ -25,7 +25,7 @@ namespace GoCast
                                    const std::string label);
         explicit MediaStreamTrack(const std::string& kind,
                                   const std::string& label);
-        virtual ~MediaStreamTrack() { };
+        virtual ~MediaStreamTrack() { }
         
         //Javascript property get methods
         FB::variant get_kind() const { return m_kind; }
@@ -63,7 +63,7 @@ namespace GoCast
         static FB::JSAPIPtr Create(talk_base::scoped_refptr<webrtc::LocalVideoTrackInterface>& pTrack);
         static talk_base::scoped_refptr<webrtc::VideoCaptureModule> GetDefaultCaptureDevice();
         explicit LocalVideoTrack(const talk_base::scoped_refptr<webrtc::LocalVideoTrackInterface>& pTrack);
-        ~LocalVideoTrack() { };
+        ~LocalVideoTrack() { }
         
     private:
         talk_base::scoped_refptr<webrtc::LocalVideoTrackInterface> m_pTrack;
@@ -74,10 +74,32 @@ namespace GoCast
     public:
         static FB::JSAPIPtr Create(talk_base::scoped_refptr<webrtc::LocalAudioTrackInterface>& pTrack);
         explicit LocalAudioTrack(const talk_base::scoped_refptr<webrtc::LocalAudioTrackInterface>& pTrack);
-        ~LocalAudioTrack() { };
+        ~LocalAudioTrack() { }
         
     private:
         talk_base::scoped_refptr<webrtc::LocalAudioTrackInterface> m_pTrack;
+    };
+    
+    class RemoteVideoTrack : public MediaStreamTrack
+    {
+    public:
+        static FB::JSAPIPtr Create(talk_base::scoped_refptr<webrtc::VideoTrackInterface>& pTrack);
+        explicit RemoteVideoTrack(const talk_base::scoped_refptr<webrtc::VideoTrackInterface>& pTrack);
+        ~RemoteVideoTrack() { }
+        
+    private:
+        talk_base::scoped_refptr<webrtc::VideoTrackInterface> m_pTrack;
+    };
+    
+    class RemoteAudioTrack : public MediaStreamTrack
+    {
+    public:
+        static FB::JSAPIPtr Create(talk_base::scoped_refptr<webrtc::AudioTrackInterface>& pTrack);
+        explicit RemoteAudioTrack(const talk_base::scoped_refptr<webrtc::AudioTrackInterface>& pTrack);
+        ~RemoteAudioTrack() { }
+        
+    private:
+        talk_base::scoped_refptr<webrtc::AudioTrackInterface> m_pTrack;
     };
     
     class MediaStream : public FB::JSAPIAuto
@@ -85,14 +107,15 @@ namespace GoCast
     public:
         static FB::JSAPIPtr Create(talk_base::scoped_refptr<webrtc::LocalMediaStreamInterface>& pStream);
         explicit MediaStream(const talk_base::scoped_refptr<webrtc::LocalMediaStreamInterface>& pStream);
-        ~MediaStream() { };
+        ~MediaStream() { }
         
         //Javascript get property methods
         FB::variant get_label() const { return m_label; }
         FB::VariantList get_videoTracks() const { return m_videoTracks; }
         FB::VariantList get_audioTracks() const { return m_audioTracks; }
         
-    public:
+        //Public methods
+        const talk_base::scoped_refptr<webrtc::LocalMediaStreamInterface>& LocalMediaStreamInterface() const;
         void AddTrack(FB::JSAPIPtr pTrack);
         
     private:
@@ -102,6 +125,31 @@ namespace GoCast
         
     private:
         talk_base::scoped_refptr<webrtc::LocalMediaStreamInterface> m_pStream;
+    };
+    
+    class RemoteMediaStream : public FB::JSAPIAuto
+    {
+    public:
+        static FB::JSAPIPtr Create(talk_base::scoped_refptr<webrtc::MediaStreamInterface>& pStream);
+        explicit RemoteMediaStream(const talk_base::scoped_refptr<webrtc::MediaStreamInterface>& pStream);
+        ~RemoteMediaStream() { }
+        
+        //Javascript get property methods
+        FB::variant get_label() const { return m_label; }
+        FB::VariantList get_videoTracks() const { return m_videoTracks; }
+        FB::VariantList get_audioTracks() const { return m_audioTracks; }
+        
+        //Public methods
+        const talk_base::scoped_refptr<webrtc::MediaStreamInterface>& RemoteMediaStreamInterface() const;
+        void AddTrack(FB::JSAPIPtr pTrack);
+        
+    private:
+        FB::variant m_label;
+        FB::VariantList m_videoTracks;
+        FB::VariantList m_audioTracks;
+        
+    private:
+        talk_base::scoped_refptr<webrtc::MediaStreamInterface> m_pStream;
     };
 }
 

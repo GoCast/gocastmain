@@ -8,10 +8,7 @@
 \**********************************************************/
 
 #include "GCPAPI.h"
-
 #include "GCP.h"
-
-#include <iostream>
 #include "GCPWebrtcCenter.h"
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -28,11 +25,7 @@ void GCP::StaticInitialize()
     
     if(NULL == GoCast::RtcCenter::Instance())
     {
-        std::cout << "RtcCenter init failed..." << std::endl;
-    }
-    else
-    {
-        std::cout << "RtcCenter init done..." << std::endl;
+        //std::cout << "RtcCenter init failed..." << std::endl;
     }
 }
 
@@ -50,13 +43,9 @@ void GCP::StaticDeinitialize()
     
     if(NULL != GoCast::RtcCenter::Instance(true))
     {
-        std::cout << "RtcCenter destroy failed..." << std::endl;
+        //std::cout << "RtcCenter destroy failed..." << std::endl;
     }
-    else
-    {
-        std::cout << "RtcCenter destroy done..." << std::endl;
-    }
-}
+ }
 
 ///////////////////////////////////////////////////////////////////////////////
 /// @brief  GCP constructor.  Note that your API is not available
@@ -64,6 +53,7 @@ void GCP::StaticDeinitialize()
 ///         the JSAPI object until the onPluginReady method is called
 ///////////////////////////////////////////////////////////////////////////////
 GCP::GCP()
+: m_pRenderer(NULL)
 {
 }
 
@@ -134,7 +124,7 @@ bool GCP::onMouseMove(FB::MouseMoveEvent *evt, FB::PluginWindow *)
 bool GCP::onWindowAttached(FB::AttachedEvent *evt, FB::PluginWindow *pWin)
 {
     // The window is attached; act appropriately
-    /*if(NULL != pWin)
+    if(NULL != pWin)
     {
         if(NULL == m_pRenderer.get())
         {
@@ -145,7 +135,7 @@ bool GCP::onWindowAttached(FB::AttachedEvent *evt, FB::PluginWindow *pWin)
                     GOCAST_DEFAULT_RENDER_HEIGHT)
             );
         }
-    }*/
+    }
     
     return true;
 }
@@ -157,13 +147,13 @@ bool GCP::onWindowDetached(FB::DetachedEvent *evt, FB::PluginWindow *)
 
 bool GCP::onWindowRefresh(FB::RefreshEvent *evt, FB::PluginWindow *pWin)
 {
-    /*if(NULL != evt && NULL != pWin)
+    if(NULL != evt && NULL != pWin)
     {
         if(NULL != m_pRenderer.get())
         {
             static_cast<GoCast::GCPVideoRenderer*>(m_pRenderer->renderer())->OnWindowRefresh(evt);
         }
-    }*/
+    }
     
     return true;
 }
