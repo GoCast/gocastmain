@@ -1286,7 +1286,7 @@ function docKey(event)
    switch (event.which || event.keyCode) 
    {
      case 32: // space bar
-       changeAudio();
+       //changeAudio();
        break;
      case 65: // alt-a, toggle audio
        if (event.altKey)

@@ -1,0 +1,301 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		348D400D15AB9A0A00B62913 /* killgears.icns in Resources */ = {isa = PBXBuildFile; fileRef = 348D400C15AB9A0A00B62913 /* killgears.icns */; };
+		348E484D15A7B07B000324DD /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 348E484C15A7B07B000324DD /* Cocoa.framework */; };
+		348E485715A7B07B000324DD /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 348E485515A7B07B000324DD /* InfoPlist.strings */; };
+		348E485915A7B07B000324DD /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 348E485815A7B07B000324DD /* main.m */; };
+		348E485D15A7B07B000324DD /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 348E485B15A7B07B000324DD /* Credits.rtf */; };
+		348E486015A7B07B000324DD /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 348E485F15A7B07B000324DD /* AppDelegate.mm */; };
+		348E486315A7B07C000324DD /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 348E486115A7B07C000324DD /* MainMenu.xib */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		348D400C15AB9A0A00B62913 /* killgears.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = killgears.icns; sourceTree = "<group>"; };
+		348E484815A7B07B000324DD /* GoCast BigRedButton.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "GoCast BigRedButton.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		348E484C15A7B07B000324DD /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
+		348E484F15A7B07B000324DD /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
+		348E485015A7B07B000324DD /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
+		348E485115A7B07B000324DD /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		348E485415A7B07B000324DD /* GoCast BigRedButton-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoCast BigRedButton-Info.plist"; sourceTree = "<group>"; };
+		348E485615A7B07B000324DD /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		348E485815A7B07B000324DD /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		348E485A15A7B07B000324DD /* GoCast BigRedButton-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "GoCast BigRedButton-Prefix.pch"; sourceTree = "<group>"; };
+		348E485C15A7B07B000324DD /* en */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = en; path = en.lproj/Credits.rtf; sourceTree = "<group>"; };
+		348E485E15A7B07B000324DD /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		348E485F15A7B07B000324DD /* AppDelegate.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = AppDelegate.mm; sourceTree = "<group>"; };
+		348E486215A7B07C000324DD /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainMenu.xib; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		348E484515A7B07B000324DD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				348E484D15A7B07B000324DD /* Cocoa.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		348E483D15A7B07B000324DD = {
+			isa = PBXGroup;
+			children = (
+				348E485215A7B07B000324DD /* GoCast BigRedButton */,
+				348E484B15A7B07B000324DD /* Frameworks */,
+				348E484915A7B07B000324DD /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		348E484915A7B07B000324DD /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				348E484815A7B07B000324DD /* GoCast BigRedButton.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		348E484B15A7B07B000324DD /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				348E484C15A7B07B000324DD /* Cocoa.framework */,
+				348E484E15A7B07B000324DD /* Other Frameworks */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		348E484E15A7B07B000324DD /* Other Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				348E484F15A7B07B000324DD /* AppKit.framework */,
+				348E485015A7B07B000324DD /* CoreData.framework */,
+				348E485115A7B07B000324DD /* Foundation.framework */,
+			);
+			name = "Other Frameworks";
+			sourceTree = "<group>";
+		};
+		348E485215A7B07B000324DD /* GoCast BigRedButton */ = {
+			isa = PBXGroup;
+			children = (
+				348D400C15AB9A0A00B62913 /* killgears.icns */,
+				348E485E15A7B07B000324DD /* AppDelegate.h */,
+				348E485F15A7B07B000324DD /* AppDelegate.mm */,
+				348E486115A7B07C000324DD /* MainMenu.xib */,
+				348E485315A7B07B000324DD /* Supporting Files */,
+			);
+			path = "GoCast BigRedButton";
+			sourceTree = "<group>";
+		};
+		348E485315A7B07B000324DD /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				348E485415A7B07B000324DD /* GoCast BigRedButton-Info.plist */,
+				348E485515A7B07B000324DD /* InfoPlist.strings */,
+				348E485815A7B07B000324DD /* main.m */,
+				348E485A15A7B07B000324DD /* GoCast BigRedButton-Prefix.pch */,
+				348E485B15A7B07B000324DD /* Credits.rtf */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		348E484715A7B07B000324DD /* GoCast BigRedButton */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 348E486615A7B07C000324DD /* Build configuration list for PBXNativeTarget "GoCast BigRedButton" */;
+			buildPhases = (
+				348E484415A7B07B000324DD /* Sources */,
+				348E484515A7B07B000324DD /* Frameworks */,
+				348E484615A7B07B000324DD /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "GoCast BigRedButton";
+			productName = "GoCast BigRedButton";
+			productReference = 348E484815A7B07B000324DD /* GoCast BigRedButton.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		348E483F15A7B07B000324DD /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0420;
+				ORGANIZATIONNAME = "XVD Technology LTD USA";
+			};
+			buildConfigurationList = 348E484215A7B07B000324DD /* Build configuration list for PBXProject "GoCast BigRedButton" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 348E483D15A7B07B000324DD;
+			productRefGroup = 348E484915A7B07B000324DD /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				348E484715A7B07B000324DD /* GoCast BigRedButton */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		348E484615A7B07B000324DD /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				348E485715A7B07B000324DD /* InfoPlist.strings in Resources */,
+				348E485D15A7B07B000324DD /* Credits.rtf in Resources */,
+				348E486315A7B07C000324DD /* MainMenu.xib in Resources */,
+				348D400D15AB9A0A00B62913 /* killgears.icns in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		348E484415A7B07B000324DD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				348E485915A7B07B000324DD /* main.m in Sources */,
+				348E486015A7B07B000324DD /* AppDelegate.mm in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		348E485515A7B07B000324DD /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				348E485615A7B07B000324DD /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		348E485B15A7B07B000324DD /* Credits.rtf */ = {
+			isa = PBXVariantGroup;
+			children = (
+				348E485C15A7B07B000324DD /* en */,
+			);
+			name = Credits.rtf;
+			sourceTree = "<group>";
+		};
+		348E486115A7B07C000324DD /* MainMenu.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				348E486215A7B07C000324DD /* en */,
+			);
+			name = MainMenu.xib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		348E486415A7B07C000324DD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				CLANG_ENABLE_OBJC_ARC = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx10.6;
+			};
+			name = Debug;
+		};
+		348E486515A7B07C000324DD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				CLANG_ENABLE_OBJC_ARC = NO;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				SDKROOT = macosx10.6;
+			};
+			name = Release;
+		};
+		348E486715A7B07C000324DD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "GoCast BigRedButton/GoCast BigRedButton-Prefix.pch";
+				INFOPLIST_FILE = "GoCast BigRedButton/GoCast BigRedButton-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		348E486815A7B07C000324DD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "GoCast BigRedButton/GoCast BigRedButton-Prefix.pch";
+				INFOPLIST_FILE = "GoCast BigRedButton/GoCast BigRedButton-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		348E484215A7B07B000324DD /* Build configuration list for PBXProject "GoCast BigRedButton" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				348E486415A7B07C000324DD /* Debug */,
+				348E486515A7B07C000324DD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		348E486615A7B07C000324DD /* Build configuration list for PBXNativeTarget "GoCast BigRedButton" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				348E486715A7B07C000324DD /* Debug */,
+				348E486815A7B07C000324DD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 348E483F15A7B07B000324DD /* Project object */;
+}
