@@ -241,8 +241,8 @@ body > div#meeting > div#streams > div#scarousel div.cloudcarousel > img.close
 {
   visibility: hidden;
   opacity: 0.4;
-  width: 10px;
-  height: 10px;
+  width: 12px;
+  height: 12px;
   margin: 5px;
   position: absolute;
   right: 5px;
