@@ -241,10 +241,12 @@ body > div#meeting > div#streams > div#scarousel div.cloudcarousel > img.close
 {
   visibility: hidden;
   opacity: 0.4;
-  float: right;
   width: 10px;
   height: 10px;
   margin: 5px;
+  position: absolute;
+  right: 5px;
+  top: 5px;
 }
 body > div#meeting > div#streams > div#scarousel div.cloudcarousel.typeContent {
   background-size: 98%;
