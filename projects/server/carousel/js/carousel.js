@@ -107,6 +107,7 @@
      * with mouse events. */
     var Controller = function(container, objects, options) {
 	var funcSin = Math.sin, funcCos = Math.cos, ctx = this;
+	var widthOld = 0, heightOld = 0; // saved container dimensions
 	var items = new Items(); // collection of items by index with sorted iteration
 	/*
 	 * Initialization. */
@@ -406,6 +407,20 @@
 	    // get new width
 	    var width = $(this.container).width(), height = $(this.container).height();
 	    //app.log(2, "container w " + width + " h " + height);
+	    
+	    // scale spots, maintain aspect ratio
+	    // use average scale to prevent problems on repeated resize
+            spotWidthScale  = (this.widthOld > 0)  ? width/this.widthOld : 1.0;
+            spotHeightScale = (this.heightOld > 0) ? height/this.heightOld : 1.0;
+            spotScale = (spotWidthScale + spotHeightScale) / 2;
+
+	    items.iterateSorted(function(item)
+	    {
+	       item.orgWidth     *= spotScale;
+	       item.orgHeight    *= spotScale;
+	       item.plgOrgWidth  *= spotScale
+	       item.plgOrgHeight *= spotScale
+	    });
 
 	    // change size, todo remove hacks to position carousel correctly
 	    /*
@@ -425,6 +440,7 @@
 	    //app.log(2, "carousel sizes xCentre " + this.xCentre + " yCentre " + this.yCentre +
 	    //                         " xRadius " + this.xRadius + " yRadius " + this.yRadius);
 	    
+	    this.widthOld = width; this.heightOld = height; // save container dimensions
 	    // scale spots
 	    this.updateAll();
 	}
