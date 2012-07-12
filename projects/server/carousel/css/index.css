@@ -245,8 +245,8 @@ body > div#meeting > div#streams > div#scarousel div.cloudcarousel > img.close
   height: 12px;
   margin: 5px;
   position: absolute;
-  right: 5px;
-  top: 5px;
+  right: 3px;
+  top: 3px;
 }
 body > div#meeting > div#streams > div#scarousel div.cloudcarousel.typeContent {
   background-size: 98%;
