@@ -332,6 +332,15 @@ function carouselItemClick(
    
 } // carouselItemClick
 
+///
+/// \brief handle click on zoom button, zoom out spot
+///
+function carouselItemZoom(event)
+{
+   app.log(2, "carouselItemZoom ");
+   event && event.stopPropagation();
+} // carouselItemClick
+
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
  * \brief Open dialog with room description so user can copy to clipboard

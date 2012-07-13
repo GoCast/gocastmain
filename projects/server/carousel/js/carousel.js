@@ -35,79 +35,111 @@
 	this.objectOK = true;                
 	$(this.object).css('position','absolute');
 	// add controls
-	$(this.object).append('<img class="close" src="images/button-close-white.png" alt="Close" title="Close" />');
+	$(this.object).append('<img class="zoom control" src="images/green-plus.png" alt="Zoom" title="Zoom" onclick="carouselItemZoom(event);"/>');
+	$(this.object).append('<img class="close control" src="images/button-close-white.png" alt="Close" title="Close" />');
 	// add handlers
 	$(this.object).mouseover(function(event)
         {
 	    // only show close icon on unoccupied or content spots
 	    if ($(this).hasClass('unoccupied') || $(this).hasClass('typeContent'))
 	    {
-		$('.close', this).css("visibility", "visible");
+		$('.control', this).css("visibility", "visible");
 	    }
 	});
 	$(this.object).mouseout(function(event)
 	{
-	    $('.close', this).css("visibility", "hidden");
+	    $('.control', this).css("visibility", "hidden");
 	});
     }; /* Item object */
+
+    Item.prototype.updateSize = function(item)
+    {
+        this.orgWidth     = item.orgWidth;
+	this.orgHeight    = item.orgHeight;
+	this.plgOrgWidth  = item.plgOrgWidth;
+	this.plgOrgHeight = item.plgOrgHeight;
+    };
 
     /// \brief a numerically ordered collection of Item with insert an delete
     var Items = function()
     {
 	this.vals = {}; // assoc array
 	this.keys = []; // array of sorted keys
-	Items.prototype.set = function(index, item)
+    };
+    Items.prototype.set = function(index, item)
+    {
+        this.vals[index] = item;
+	this.updateKeys();
+    };
+    Items.prototype.get = function(index)
+    {
+        //todo check that index is numeric
+	return this.vals[index];
+    };
+    Items.prototype.remove = function(index)
+    {
+        //todo check that index is numeric
+	delete this.vals[index];
+	this.updateKeys();
+    };
+    Items.prototype.getLength = function()
+    {
+        return this.keys.length;
+    };
+    Items.prototype.updateKeys = function(worker)
+    {
+        this.keys = [];
+	for (var key in this.vals)
 	{
-	    this.vals[index] = item;
-	    this.updateKeys();
-	};
-	Items.prototype.get = function(index)
-	{
-	    //todo check that index is numeric
-	    return this.vals[index];
-	};
-	Items.prototype.remove = function(index)
-	{
-	    //todo check that index is numeric
-	    delete this.vals[index];
-	    this.updateKeys();
-	};
-	Items.prototype.getLength = function()
-	{
-	    return this.keys.length;
-	};
-	Items.prototype.updateKeys = function(worker)
-	{
-	    this.keys = [];
-	    for (var key in this.vals)
-	    {
-		if (this.vals.hasOwnProperty(key))
-		    this.keys.push(key);
-	    }
-	    // sort numeric ascending
-	    this.keys.sort(function(a,b){return a - b});
-	};
-	Items.prototype.iterateSorted = function(worker)
-	{
-	    for (var i = 0; i < this.keys.length; ++i)
-	    {
-		worker(this.vals[this.keys[i]]);
-	    }
-	};
-	// get an index for an item to be added 
-	// which is the highest element index incremented
-	Items.prototype.getNewIndex = function()
-	{   // keys are sorted so last element is greatest
-	    var last = this.keys[this.keys.length - 1];
-	    return last + 1;
+	    if (this.vals.hasOwnProperty(key))
+	    this.keys.push(key);
 	}
-    }; // Items
+        // sort numeric ascending
+	this.keys.sort(function(a,b){return a - b});
+    };
+    Items.prototype.iterateSorted = function(worker)
+    {	
+        for (var i = 0; i < this.keys.length; ++i)
+	{
+            worker(this.vals[this.keys[i]]);
+        }
+    };
+    // get an index for an item to be added 
+    // which is the highest element index incremented
+    Items.prototype.getNewIndex = function()
+    {   // keys are sorted so last element is greatest
+        if (this.keys.length == 0)
+        {
+           return 0;
+        }
+        else
+        {
+           var last = this.keys[this.keys.length - 1];
+	   return last + 1;
+	}
+     };
+     // add an item to the list
+     // assign an index to it that is <highest index> + 1
+     Items.prototype.addItem = function(item)
+     {
+         item.index = this.getNewIndex();
+	 this.set(item.index, item);
+     };
+     // call item.updateSize on all items
+     Items.prototype.updateItemSizes = function(newItem)
+     {
+         this.iterateSorted(function(item)
+	 {
+            item.updateSize(newItem);
+         });
+     };
     /*
      * Controller object. This handles moving all the items and dealing
      * with mouse events. */
     var Controller = function(container, objects, options) {
 	var funcSin = Math.sin, funcCos = Math.cos, ctx = this;
 	var widthOld = 0, heightOld = 0; // saved container dimensions
+	var item; // an extra item to store scales since items can be removed from items list
 	var items = new Items(); // collection of items by index with sorted iteration
 	/*
 	 * Initialization. */
@@ -176,7 +208,11 @@
 	*/
 	/*
 	 * Click on container event. */
-	$(container).on('click', this, function(event) {
+        /*
+	$(container).on('click', this, function(event)
+	{
+	    // todo with item add remove this code doesn't work
+	    // rewrite if we ever want to do this
 	    if (options.bringToFront) {
 		var idx = $(event.target).data('itemIndex');
 		var frontIndex = event.data.frontIndex;
@@ -187,7 +223,8 @@
 		}
 		event.data.rotate(-diff);
 	    }
-	}); /* onclick() */
+	}); // onclick()
+        */
 	/*
 	 * Mousedown on container, it prevents items from being selected
 	 * as mouse is moved and clicked in the container. */
@@ -345,9 +382,9 @@
 	   var newDiv = $('<div class="cloudcarousel unoccupied" onclick="carouselItemClick(event);"><div class="name"></div></div>');
 	   $(this.innerWrapper).append(newDiv);
 	   var item = new Item(newDiv[0], options);
-	   item.index = items.getNewIndex();
-	   items.set(item.index, item);
+	   item.updateSize(this.item);
 	   newDiv.data('item', item);
+	   items.addItem(item);
 	   this.setupItem(item);
 	   this.updateAll();
 	}
@@ -379,20 +416,22 @@
 		}
 	    }; // for loop
 	    app.log(2, "checkObjectsLoaded done");
-	    //app.log(2, "container w " + $(this.container).width() + " h " + $(this.container).height());
-	    // document layout seems to be done at this point so resize carousel
-	    // todo find better place for this
-	    this.resize();
 	    for( i = 0; i < objects.length; i++) 
 	    {  // create and setup item
 		var item = new Item(objects[i], options);
-		this.setupItem(item); 
-		$(objects[i]).data('itemIndex', i);
-		item.index = i;
-		items.set(item.index, item);
+		items.addItem(item);
+		this.setupItem(item);
 		$(objects[i]).data('item', item);
 	    }; // for loop
-	    // If all objects have valid widths and heights, we can stop checking.
+	    // save the storage item
+	    if (objects.length > 0)
+	    {  // construct a new object, todo this is too much because it sets css, handlers
+	       this.item = new Item(objects[0], options);
+	    }
+	    // document layout seems to be done at this point so resize carousel
+	    // todo find better place for this
+	    this.resize();
+	    // all objects have valid widths and heights, so stop checking.
 	    clearInterval(this.tt);
 	    this.updateAll();
 	}; // checkObjectsLoaded()
@@ -409,18 +448,18 @@
 	    //app.log(2, "container w " + width + " h " + height);
 	    
 	    // scale spots, maintain aspect ratio
-	    // use average scale to prevent problems on repeated resize
-            spotWidthScale  = (this.widthOld > 0)  ? width/this.widthOld : 1.0;
-            spotHeightScale = (this.heightOld > 0) ? height/this.heightOld : 1.0;
-            spotScale = (spotWidthScale + spotHeightScale) / 2;
+            var newWidth = width * options.xSpotRatio;
+	    var newHeight = height * options.ySpotRatio;
+	    var widthScale =  newWidth  / this.item.orgWidth;
+	    var heightScale = newHeight / this.item.orgHeight;
+	    var scale = (widthScale + heightScale) / 2;
+            this.item.orgWidth     *= scale;
+            this.item.orgHeight    *= scale;
+	    this.item.plgOrgWidth  *= scale
+	    this.item.plgOrgHeight *= scale
 
-	    items.iterateSorted(function(item)
-	    {
-	       item.orgWidth     *= spotScale;
-	       item.orgHeight    *= spotScale;
-	       item.plgOrgWidth  *= spotScale
-	       item.plgOrgHeight *= spotScale
-	    });
+            // update items in list
+            items.updateItemSizes(this.item);
 
 	    // change size, todo remove hacks to position carousel correctly
 	    /*
@@ -453,8 +492,8 @@
 	this.each( function() {
 	    options = $.extend({}, {
 		minScale: 0.5,
-		xSpotRatio: 0.3,
-		ySpotRatio: 0.4,
+		xSpotRatio: 0.3, // spot size percentage of window size
+		ySpotRatio: 0.4, // spot size percentage of window size
 		xPos: 0,
 		yPos: 0,
 		xRadius: 0,
