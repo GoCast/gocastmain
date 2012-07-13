@@ -248,6 +248,17 @@ body > div#meeting > div#streams > div#scarousel div.cloudcarousel > img.close
   right: 3px;
   top: 3px;
 }
+body > div#meeting > div#streams > div#scarousel div.cloudcarousel > img.zoom
+{
+  visibility: hidden;
+  opacity: 0.7;
+  width: 15px;
+  height: 15px;
+  margin: 5px;
+  position: absolute;
+  left: 13px;
+  top: 3px;
+}
 body > div#meeting > div#streams > div#scarousel div.cloudcarousel.typeContent {
   background-size: 98%;
   display: table;
