@@ -99,20 +99,9 @@ void GCPAPI::GetUserMedia(const FB::JSObjectPtr& mediaHints,
     pCtr->GetUserMedia(mediaHints, succCb, failCb);
 }
 
-void GCPAPI::RenderStream(const FB::JSAPIPtr& pStream)
-{
-    GoCast::RtcCenter* pCtr = GoCast::RtcCenter::Instance();
-    
-    if(NULL == pCtr)
-    {
-        FBLOG_ERROR_CUSTOM("GCPAPI::RenderStream()", "Failed to get RtcCenter singleton");
-        return;
-    }
-    
-    pCtr->RenderStream(pStream, this, getPlugin()->Renderer());
-}
-
-FB::variant GCPAPI::Init(const FB::variant& iceConfig, const FB::JSObjectPtr& iceCallback)
+FB::variant GCPAPI::Init(const FB::variant& htmlId,
+                         const FB::variant& iceConfig,
+                         const FB::JSObjectPtr& iceCallback)
 {
     GoCast::RtcCenter* pCtr = GoCast::RtcCenter::Instance();
     
@@ -122,8 +111,11 @@ FB::variant GCPAPI::Init(const FB::variant& iceConfig, const FB::JSObjectPtr& ic
         return false;
     }
     
+    m_htmlId = htmlId;
     m_iceCb = iceCallback;
-    return pCtr->NewPeerConnection(iceConfig.convert_cast<std::string>(), this);
+    return pCtr->NewPeerConnection(m_htmlId.convert_cast<std::string>(),
+                                   iceConfig.convert_cast<std::string>(),
+                                   this);
 }
 
 void GCPAPI::AddStream(const FB::JSAPIPtr& stream)
@@ -136,7 +128,8 @@ void GCPAPI::AddStream(const FB::JSAPIPtr& stream)
         return;
     }
 
-    pCtr->AddStream(this, static_cast<GoCast::MediaStream*>(stream.get())->LocalMediaStreamInterface());
+    pCtr->AddStream(m_htmlId.convert_cast<std::string>(),
+                    static_cast<GoCast::MediaStream*>(stream.get())->LocalMediaStreamInterface());
 }
 
 void GCPAPI::RemoveStream(const FB::JSAPIPtr& stream)
@@ -149,7 +142,8 @@ void GCPAPI::RemoveStream(const FB::JSAPIPtr& stream)
         return;
     }
     
-    pCtr->RemoveStream(this, static_cast<GoCast::MediaStream*>(stream.get())->LocalMediaStreamInterface());
+    pCtr->RemoveStream(m_htmlId.convert_cast<std::string>(),
+                       static_cast<GoCast::MediaStream*>(stream.get())->LocalMediaStreamInterface());
 }
 
 FB::variant GCPAPI::CreateOffer(const FB::JSObjectPtr& mediaHints)
@@ -174,7 +168,7 @@ FB::variant GCPAPI::CreateOffer(const FB::JSObjectPtr& mediaHints)
         bAudio = true;
     }
     
-    return pCtr->CreateOffer(this, webrtc::MediaHints(bAudio, bVideo));
+    return pCtr->CreateOffer(m_htmlId.convert_cast<std::string>(), webrtc::MediaHints(bAudio, bVideo));
 }
 
 FB::variant GCPAPI::CreateAnswer(const FB::variant& offer, const FB::JSObjectPtr& mediaHints)
@@ -199,7 +193,9 @@ FB::variant GCPAPI::CreateAnswer(const FB::variant& offer, const FB::JSObjectPtr
         bAudio = true;
     }
     
-    return pCtr->CreateAnswer(this, webrtc::MediaHints(bAudio, bVideo), offer.convert_cast<std::string>());
+    return pCtr->CreateAnswer(m_htmlId.convert_cast<std::string>(),
+                              webrtc::MediaHints(bAudio, bVideo),
+                              offer.convert_cast<std::string>());
 }
 
 void GCPAPI::SetLocalDescription(const FB::variant& action,
@@ -218,7 +214,12 @@ void GCPAPI::SetLocalDescription(const FB::variant& action,
         return;
     }
     
-    pCtr->SetLocalDescription(this, _action, sdp.convert_cast<std::string>(), succCb, failCb, false);
+    pCtr->SetLocalDescription(m_htmlId.convert_cast<std::string>(),
+                              _action,
+                              sdp.convert_cast<std::string>(),
+                              succCb,
+                              failCb,
+                              false);
 }
 
 void GCPAPI::SetRemoteDescription(const FB::variant& action, const FB::variant& sdp)
@@ -234,7 +235,9 @@ void GCPAPI::SetRemoteDescription(const FB::variant& action, const FB::variant& 
         return;
     }
     
-    pCtr->SetRemoteDescription(this, _action, sdp.convert_cast<std::string>());    
+    pCtr->SetRemoteDescription(m_htmlId.convert_cast<std::string>(),
+                               _action,
+                               sdp.convert_cast<std::string>());    
 }
 
 void GCPAPI::ProcessIceMessage(const FB::variant& sdp)
@@ -247,7 +250,7 @@ void GCPAPI::ProcessIceMessage(const FB::variant& sdp)
         return;
     }
     
-    pCtr->ProcessIceMessage(this, sdp.convert_cast<std::string>());
+    pCtr->ProcessIceMessage(m_htmlId.convert_cast<std::string>(), sdp.convert_cast<std::string>());
 }
 
 void GCPAPI::StartIce()
@@ -260,7 +263,7 @@ void GCPAPI::StartIce()
         return;
     }
     
-    pCtr->StartIce(this);    
+    pCtr->StartIce(m_htmlId.convert_cast<std::string>());    
 }
 
 void GCPAPI::OnAddStream(webrtc::MediaStreamInterface* pRemoteStream)
@@ -327,6 +330,6 @@ void GCPAPI::DeletePeerConnection()
     
     if(NULL != pCtr)
     {
-        pCtr->DeletePeerConnection(this);
+        pCtr->DeletePeerConnection(m_htmlId.convert_cast<std::string>());
     }
 }

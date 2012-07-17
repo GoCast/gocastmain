@@ -146,7 +146,7 @@ GoCastJS.PeerConnection = function(options, bUseGoCastAPI) {
 			container.appendChild(this.peerConn);
 			
 			//At this point the plugin instance is loaded
-			this.peerConn.init(options.iceConfig, options.onIceMessage);
+			this.peerConn.init(options.videoId, options.iceConfig, options.onIceMessage);
 			
 			//onaddstream callback
 			var peerConnRef = this.peerConn;
