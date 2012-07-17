@@ -193,10 +193,35 @@ body > div#meeting
   top: 0px;
   left: 0px;
   width: 100%;
-  height: 100%;
+  height: 90%;
+}
+body > div#meeting > div#zoom {
+  display: none;
+  position: relative;
+  width: 98%;
+  height: 80%;
+}
+body > div#meeting > div#zoom > img.close 
+{
+  opacity: 0.4;
+  width: 12px;
+  height: 12px;
+  position: absolute;
+  right: 3px;
+  top: 3px;
+}
+body > div#meeting > div#zoom > div.cloudcarousel 
+{
+  position: absolute;
+  background-color: white;
+  background-position: center center;
+  background-repeat: no-repeat
+}
+body > div#meeting > div#zoom > div.cloudcarousel > .control
+{
+   display: none;
 }
 body > div#meeting > div#streams {
-  position: absolute;
   padding: 10px;
   top: 0px;
   left: 0px;
@@ -226,7 +251,6 @@ body > div#meeting > div#streams > div#scarousel div#addItem > img
 body > div#meeting > div#streams > div#scarousel div.cloudcarousel {
   width: 300px;
   height: 248px;
-  opacity: 1;
   transition: opacity 0.5s;
   -moz-transition: opacity 0.5s;
   -webkit-transition: opacity 0.5s;
@@ -237,7 +261,7 @@ body > div#meeting > div#streams > div#scarousel div.cloudcarousel {
   background-position: center center;
   background-repeat: no-repeat
 }
-body > div#meeting > div#streams > div#scarousel div.cloudcarousel > img.close
+body > div#meeting > div#streams div.cloudcarousel > img.close
 {
   visibility: hidden;
   opacity: 0.4;
@@ -248,7 +272,7 @@ body > div#meeting > div#streams > div#scarousel div.cloudcarousel > img.close
   right: 3px;
   top: 3px;
 }
-body > div#meeting > div#streams > div#scarousel div.cloudcarousel > img.zoom
+body > div#meeting > div#streams div.cloudcarousel > img.zoom
 {
   visibility: hidden;
   opacity: 0.7;
@@ -301,7 +325,7 @@ body > div#meeting > div#streams > div#scarousel div.cloudcarousel > div.name {
   text-overflow: ellipsis;
   color: white;
 }
-body > div#meeting > div#streams > div#scarousel div.unoccupied {
+body > div#meeting div.unoccupied {
   background-image: url("../images/gologo200.png");
   opacity: 0.7;
 }

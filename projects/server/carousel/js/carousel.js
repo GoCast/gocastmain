@@ -115,7 +115,7 @@
         else
         {
            var last = this.keys[this.keys.length - 1];
-	   return last + 1;
+	   return parseInt(last) + 1;
 	}
      };
      // add an item to the list
@@ -146,6 +146,7 @@
 	this.controlTimer = 0;
 	this.stopped = false;
 	this.container = container;
+	this.options = options; // save options for other code, zoom resize todo access options here from this object
 	this.xRadius = options.xRadius;
 	this.yRadius = options.yRadius;
 	if (options.xRadius === 0) {
@@ -388,6 +389,14 @@
 	   this.setupItem(item);
 	   this.updateAll();
 	}
+	this.insertSpot = function(spot) // add a previously created spot to the carousel
+	{
+	   // put the spot div back in the carousel
+	   $(spot).appendTo($(this.innerWrapper));
+	   $(spot).css('position', 'absolute');
+	   var item = $(spot).data('item');
+	   items.set(item.index, item);
+	}
 	this.setupItem = function(item) // setup newly added item
 	{
 	    $('.close', item.object).click(function(event)
@@ -395,7 +404,7 @@
 		event && event.stopPropagation();
 		var jqDiv = $(this).parent();
 		var item = jqDiv.data('item');
-		console.log("removing", jqDiv);
+                console.log("removing", jqDiv);
 		jqDiv.remove(); // remove item from carousel
 		ctx.remove(item.index); // remove item
 		ctx.updateAll();
