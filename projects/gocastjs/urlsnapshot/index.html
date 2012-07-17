@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+	<head>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.js"></script>
+		<script type="text/javascript" src="html2canvas.js"></script>
+		<script type="text/javascript" src="urlsnapshot.js"></script>
+	<script type="text/javascript">
+			$(document).ready(function()
+			{
+			 	$("#snapurl").click(function()
+				{
+					GoCastJS.UrlSnapshot("#scratch", 
+					{
+						width     : parseInt($("#snapshotwidth").val()),
+						height    : parseInt($("#snapshotheight").val()),
+						webUrl    : $("#url").val(),
+//						proxyUrl  : "http://html2canvas.appspot.com",
+						proxyUrl  : "http://carousel.gocast.it/proxy",
+						disableJS : true,
+                    },
+                    function(image)
+                    {
+                        var src = image.src;
+                        $("#urlsnapshot").css("background-image", "url(" + src + ")");
+                        $("#urlsnapshot").css("width", parseInt($("#snapshotwidth").val()));
+                        $("#urlsnapshot").css("height", parseInt($("#snapshotheight").val()));
+                        $("#urlsnapshot").css("background-size", "98%");
+                        $("#urlsnapshot").css("background-position", "center center");
+                        $("#urlsnapshot").css("background-repeat", "no-repeat");
+                    } );
+                });
+			});
+		</script>
+	</head>
+	<body>
+		<label>Type URL to snapshot:</label>
+		<input id="url" type="text" size="100"/>
+		<input id="snapshotwidth" type="text" size="10"/>
+		<input id="snapshotheight" type="text" size="10"/>
+		<button id="snapurl">Snapshot</button>
+		
+		<div id="urlsnapshot">
+		</div>
+		<div id="scratch"/>
+	</body>
+</html>

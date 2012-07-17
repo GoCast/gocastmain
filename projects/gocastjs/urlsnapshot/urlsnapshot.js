@@ -1,11 +1,38 @@
 var GoCastJS = (undefined !== GoCastJS)? GoCastJS: {};
 
-GoCastJS.UrlSnapshot = function(snapshotDivSelector, options) {
+///
+/// \brief generate an image from a URL
+/// \param div jq div selector from main html to render needed to inherit window
+/// \param options JSON object with:
+///    width image width
+///    height image height
+///    webUrl normalized url to render to image
+///    proxyUrl normalized url of renderer
+///    disableJS boolean
+/// \param imageCallback returns rendered image on success
+///
+/// \todo failure callback
+/// 
+GoCastJS.UrlSnapshot = function(snapshotDivSelector, options, imageCallback)
+{
 	//image desired instead of canvas as it is easier to resize
-	var canvasToImage = function(canvas, newDims) {
-		var canvasDataURL = canvas.toDataURL("image/png");
+	var canvasToImage = function(canvas, newDims) 
+	{
+	    // create a thumbnail image of the top of the page
+	    // that is rectangular, canvas.width by canvas.width
+	    
+	    // get a CanvasPixelArray of the correct dimensions
+	    var pixArr = canvas.getContext("2d").getImageData(0, 0, canvas.width, canvas.width);
+	    
+	    // create a new canvas from the new pix arr
+	    var newCanvas = document.createElement("canvas");
+	    newCanvas.getContext("2d").putImageData(pixArr, 0, 0);
+	    
+	    // get png image data
+		var canvasDataURL = newCanvas.toDataURL("image/png");
 		var canvasImg = document.createElement("image");
 		
+		// create image
 		canvasImg.width = newDims.width;
 		canvasImg.height = newDims.height;
 		canvasImg.src = canvasDataURL;
@@ -57,12 +84,11 @@ GoCastJS.UrlSnapshot = function(snapshotDivSelector, options) {
 							//and passes it through the following callback
 							html2canvas(jqFrameBody, {
 								onrendered: function(snapshotCanvas) {
-												jqSnapshotDiv.empty().append(
-													canvasToImage(snapshotCanvas, {
+													var image = canvasToImage(snapshotCanvas, {
 														width  : options.width,
 														height : options.height
-													})
-												);
+													});
+													imageCallback(image);
 											}
 							});
 						});
@@ -70,4 +96,33 @@ GoCastJS.UrlSnapshot = function(snapshotDivSelector, options) {
 						frame.contentWindow.document.close();
 				   }
 	});
+};
+
+///
+/// \brief get info from url
+/// \param url target url
+/// \return JSON object with info:
+///    title header title tag
+///    type  mime type
+/// 
+GoCastJS.getUrlInfo = function(options, callback)
+{
+	$.ajax(
+	{
+		url      : options.proxyUrl,					//customizable
+		data     : {xhr2: false, url: options.webUrl},	//customizable
+		cache    : true,
+		dataType : "jsonp",
+		success  : function(response)
+        {
+           var result = (/<title>(.*?)<\/title>/m).exec(response);
+           var info = {};
+           if (result)
+           {
+               var title = result[1];
+               info.title = title;
+           }
+           callback(info);
+        }
+    });
 };

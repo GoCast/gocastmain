@@ -167,6 +167,13 @@ mucRoom.prototype.finishInit = function(success, failure) {
 	this.client.on('stanza', this.onstanza);
 };
 
+mucRoom.prototype.notifylog = function(msg) {
+	if (this.notifier)
+		this.notifier.sendMessage(logDate() + " @" + this.roomname.split('@')[0] + ": " + msg);
+	else
+		console.log(logDate() + " - NULL-NOTIFIER-MESSAGE: @" + this.roomname.split('@')[0] + ": " + msg);
+};
+
 mucRoom.prototype.log = function(msg) {
 	console.log(logDate() + " - @" + this.roomname.split('@')[0] + ": " + msg);
 };
@@ -203,14 +210,11 @@ mucRoom.prototype.handlePresence = function(pres) {
 	// We need to deal with non-configured rooms. If we get a status code 201, we need to config.
 	if (pres.getChild('x') && pres.getChild('x').getChildrenByAttr('code','201').length > 0)
 	{
-		this.log("needs configured. Configuring...");
+		this.log("needs configured. Setting flag for configuring...");
 		this.bNewRoom = true;
 
-		this.getRoomConfiguration(function(resp) {
-			this.log("Got room configuration. Going for setup.");
-			self.setupRoom(resp);
-		});
-
+		// We used to call getRoomConfiguration() here, but it gets called down below also.
+		// To avoid double requests to the server, we'll just do room setup from within there.
 	}
 
 	if (pres.getChild('error'))
@@ -318,7 +322,7 @@ mucRoom.prototype.handlePresence = function(pres) {
 
 					if (this.presenceTimer)
 					{
-						this.log("OVERSEER: presenceTimer was already set. Clearing first.");
+						this.log("OVERSEER: (A-timer) presenceTimer was already set. Clearing first.");
 						clearTimeout(this.presenceTimer);
 						this.presenceTimer = null;
 					}
@@ -336,7 +340,7 @@ mucRoom.prototype.handlePresence = function(pres) {
 	// If the 'from' is myself -- then I'm here. And so we're joined...
 	if (fromnick === this.nick)
 	{
-		if (!self.joined)
+		if (!this.joined)
 		{
 			this.joined = true;
 
@@ -377,6 +381,14 @@ mucRoom.prototype.handlePresence = function(pres) {
 
 			// Also to get context of the room, find out if the room is members-only or not.
 			this.getRoomConfiguration(function(form) {
+				// This is a change of venue for .setupRoom() ...
+				// Used to call it on recognizing it was a new room but that caused two getRoomConfiguration() calls
+				// which is wasteful to server resources.
+				if (self.bNewRoom) {
+					self.log("Got room configuration. Going for setup.");
+					self.setupRoom(form);
+				}
+				
 				// form should contain a list of current variable value entries.
 				// We are looking for: muc#roomconfig_membersonly
 
@@ -446,8 +458,7 @@ mucRoom.prototype.printParticipants = function() {
 	}
 
 	this.log("Participants list: " + parts);
-	if (this.notifier)
-		this.notifier.sendMessage("MUC@" + this.roomname.split('@')[0] + " Participants: " + parts);
+	this.notifylog("Participants: " + parts);
 };
 
 //
@@ -663,10 +674,14 @@ mucRoom.prototype.setupRoom = function(form) {
 
 				if(self.bSelfDestruct === true)
 				{
-					self.log("OVERSEER: (C-timer) Room setup - not in room [" + self.roomname.split('@')[0] + "] yet. Should be soon. Waiting...");
+					self.log("OVERSEER: (C-timer) Room setup - no one else in room [" + self.roomname.split('@')[0] + "] yet. Should be soon. Waiting...");
 					
 					if (self.presenceTimer)
-						self.log("OVERSEER: ERROR: (C-timer) After init of room, presenceTimer should not already be set.");
+					{
+						self.log("OVERSEER: ERROR: (C-timer) After init of room, presenceTimer should not already be set. Clearing.");
+						clearTimeout(self.presenceTimer);
+						self.presenceTimer = null;
+					}
 						
 					self.presenceTimer = setTimeout(function() {
 						self.log("OVERSEER: (C-timer) After Init-Room [" + self.roomname.split('@')[0] + "] - No one in room after 30 seconds :( ...");
@@ -1247,23 +1262,6 @@ function overseer(user, pw, notifier) {
 
 			self.mucRoomObjects[k].join( k + self.CONF_SERVICE, "overseer");
 		}
-
-		// Now we need to make sure we stay connected to the server. We will do this via a ping-check
-		// to the server every 10 seconds. If we don't get a reply, we can decide what to do about that.
-		setInterval(function() {
-//			console.log("pinging server...");
-
-			var nopong = setTimeout(function() {
-				self.log("ERROR: No pong received. Server connection died?");
-			}, 5000);
-
-			self.sendIQ(new xmpp.Element('iq', {to: self.SERVER, type: 'get'})
-						.c('ping', {xmlns: 'urn:xmpp:ping'}), function(res) {
-//							console.log("Got pong.");
-							clearTimeout(nopong);
-						});
-		}, 10000);
-
 	});
 
 	this.client.on('offline', function() {
@@ -1300,21 +1298,44 @@ function overseer(user, pw, notifier) {
 		else
 		{
 			sys.puts(e);
-			if (self.notifier)
-				self.notifier.sendMessage("OVERSEER: ERROR-EMIT-RECEIVED: " + e);
+			self.notifylog("OVERSEER: ERROR-EMIT-RECEIVED: " + e);
 		}
 	});
 
 	// Overseer events
-	eventManager.on('destroyroom', function(roomname) {
+	eventManager.on('destroyroom', function(roomname, force) {
+		if (!force)		// Sanity check no one is present unless 'force' is true.
+		{
+			var mroom = self.mucRoomObjects[roomname];
+			
+			// Check to see that we have a room by that name and see if anyone is in it.
+			if(mroom && size(mroom.participants) > 1 && mroom.participants[mroom.nick]) {
+				self.notifylog("OVERSEER: Being requested to delete room [" + roomname + "] -- but it's not empty. Skipping deletion.");
+				console.log("OVERSEER: Being requested to delete room [" + roomname + "] -- but it's not empty. Skipping deletion.");
+				var parts = "";
+			
+				for (k in mroom.participants)
+				{
+					// Add in a ',' if we're not first in line.
+					if (parts !== "")
+						parts += ", ";
+			
+					parts += k.replace(/\\20/g, ' ');
+				}
+				
+				self.notifylog("OVERSEER: Would have abandoned the following participants: " + parts);
+				console.log("OVERSEER: Would have abandoned the following participants: " + parts);
+				return;
+			}
+		}
+		
 		console.log("OVERSEER: Deleting room [" + roomname + "]");
 		self.destroyRoom(roomname);
 	});
 
 	eventManager.on('error', function(e) {
 		sys.puts(e);
-		if (self.notifier)
-			self.notifier.sendMessage("OVERSEER-eventManager: ERROR-EMIT-RECEIVED: " + e);
+		self.notifylog("OVERSEER-eventManager: ERROR-EMIT-RECEIVED: " + e);
 	});
 };
 
@@ -1345,6 +1366,13 @@ overseer.prototype.destroyRoom = function(roomname) {
 			console.log("  " + k);
 	}
 }
+
+overseer.prototype.notifylog = function(msg) {
+	if (this.notifier)
+		this.notifier.sendMessage(logDate() + " - Overseer: " + msg);
+	else
+		console.log(logDate() + " - Overseer: NULL-NOTIFIER-MESSAGE: " + msg);
+};
 
 overseer.prototype.log = function(msg) {
 	console.log(logDate() + " - Overseer: " + msg);
@@ -1512,7 +1540,7 @@ overseer.prototype.handleIq = function(iq) {
 				while (this.mucRoomObjects[roomname]);
 			}
 
-			this.log("overseer.handleIq: Room Name request = " + roomname);
+			this.log("overseer.handleIq: Room Name of [" + roomname + "] requested by: " + iq.attrs.from);
 			var self = this;
 
 			//
@@ -1554,8 +1582,17 @@ overseer.prototype.handleIq = function(iq) {
 					if(this.mucRoomObjects[roomname].bSelfDestruct === true &&
 					   1 == size(this.mucRoomObjects[roomname].participants))
 					{
+						this.log("(D-Timer) - Pre-existing room requested - should have a participant soon in here...");
+						
+						if (this.mucRoomObjects[roomname].presenceTimer)
+						{
+							this.log("OVERSEER: (D-Timer) presenceTimer was already set. Clearing first.");
+							clearTimeout(this.mucRoomObjects[roomname].presenceTimer);
+							this.mucRoomObjects[roomname].presenceTimer = null;
+						}
+						
 						this.mucRoomObjects[roomname].presenceTimer = setTimeout(function() {
-							self.log("OVERSEER: Pre-existing room - No one in room after 60 seconds :( ...");
+							self.log("(D-Timer) - Pre-existing room - No one in room after 60 seconds :( ...");
 							eventManager.emit('destroyRoom', roomname);
 						}, 60000);
 					}
@@ -1603,14 +1640,14 @@ function feedbackBot(feedback_jid, feedback_pw, notifier) {
 
 					var ts = logDate() + " - ";
 					var line = ts + "From: " + stanza.attrs.from
-						+ ", Nick: " + nick
+						+ ", aka: " + nick
 						+ ", Room: " + room
 						+ ", Body: " + stanza.getChild('body').getText();
 
 					sys.puts(line);
 					self.logfile.write(line + "\n");
 					if (self.notifier)
-						self.notifier.sendMessage("FB given @" + self.jid.split('@')[0] + ":" + line);
+						self.notifier.sendMessage("FB received @" + self.jid.split('@')[0] + ":" + line);
 				  }
 
 				  // Swap addresses...

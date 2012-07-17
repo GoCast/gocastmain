@@ -164,6 +164,8 @@ var app = {
   // logged in state
   xmppLoggedIn : false,
   userLoggedIn : false,
+  // carousel controller instance
+  carousel: null,
   /*
    * User Information. */
   user: {
@@ -171,8 +173,9 @@ var app = {
     scheduleName: null,
     scheduleJid: null,
     scheduleTitle: null,
-    fbProfileUrl: null, // cache the url since user may log out of fb
-    fbProfilePicUrl: null // cache the url since user may log out of fb
+    fbProfileUrl: null,    // cache the url since user may log out of fb
+    fbProfilePicUrl: null, // cache the url since user may log out of fb
+    fbSkipped: false,      // user chose to skip fb login
   },
   // enable the audio video mute buttons, global chat input
   enableButtons: function(enable)
@@ -210,7 +213,8 @@ function startDemoContent(
 {
   /*
    * First content. */
-  Callcast.Callback_AddCarouselContent(new Object({id:"demo1", image:"url('images/demo1-egyptmap.gif')", altText:"Egyptians vote in first free presidential election", url:"http://www.google.com/hostednews/ap/article/ALeqM5iS0-q8BzFkHp3IV4ks-5tnbKnw-Q?docId=2b6df5e5e5fd40e0a8ab49103fda20bc"}));
+  // article is gone
+  //Callcast.Callback_AddCarouselContent(new Object({id:"demo1", image:"url('images/demo1-egyptmap.gif')", altText:"Egyptians vote in first free presidential election", url:"http://www.google.com/hostednews/ap/article/ALeqM5iS0-q8BzFkHp3IV4ks-5tnbKnw-Q?docId=2b6df5e5e5fd40e0a8ab49103fda20bc"}));
   /*
    * Second content delayed 1000 ms. */
   setTimeout(function() {
@@ -302,13 +306,24 @@ function carouselItemClick(
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
    app.log(2, "carouselItemClick " + event);
-   if (event.currentTarget.className === "cloudcarousel unoccupied")
+   if (event.currentTarget.className.indexOf("unoccupied") != -1)
    {
-      //var urlName = prompt("Enter a URL");
-      //app.log(2, "carouselItemClick got url " + urlName);
+      var urlName = prompt("Enter a URL to put in this spot.");
+      if (urlName && urlName.length > 0)
+      {
+         //todo canonicalize url
+         app.log(2, "carouselItemClick got url " + urlName);
+         
+         Callcast.SendURLToRender({
+            id:      urlName,
+            altText: urlName,
+            url:     urlName,
+            });
+      }
    }
    else if (event.currentTarget.title === "Me")
    {
+      // do nothing for now
    }
    else // remote user
    {
@@ -316,6 +331,73 @@ function carouselItemClick(
    }
    
 } // carouselItemClick
+
+/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+/**
+ * \brief Open dialog with room description so user can copy to clipboard
+ */
+function openCopyData
+(
+  event
+)
+{
+  if (!event)
+  {
+    return false;
+  }
+  
+  // get the dialog
+  var jqWin = $("#boxes > div#copyData");
+  
+  // set the room name
+  var name = $('div#copyContent > #copyName', jqWin);
+
+  $(name).text('Carousel room ' + $.getUrlVar('roomname'));
+  $(name).attr("href", window.location.href);
+  
+  // position the dialog
+  cX = event.clientX;
+  cY = event.clientY;
+
+  var winW = $(window).width();
+  var winH = $(window).height();
+  var wcW = jqWin.outerWidth();
+  var wcH = jqWin.outerHeight();
+  
+  // todo parse css dimension and use it to place dlg
+  //var marginRight = $(jqWin).css("margin-right");
+  //var marginBottom = $(jqWin).css("margin-bottom");
+  var marginRight = 20;
+  var marginBottom = wcH/5 + 20;
+
+  // move dialog up if past bottom
+  if ((cY + wcH + marginBottom) > winH)
+  {
+    jqWin.css("top", winH - wcH - marginBottom);
+  }
+  else // place dialog at event location 
+  {
+    jqWin.css("top", cY);
+  }
+  
+  // move dialog right if past right edge
+  if ((cX + wcW + marginRight) > winW) 
+  {
+    jqWin.css("left", winW - wcW - marginRight);
+  }
+  else // place dialog at event location 
+  {
+    jqWin.css("left", cX);
+  }
+  
+  // display dlg
+  jqWin.fadeIn(700);
+  jqWin.addClass("active");
+
+  // set focus on message text input
+  //$("input.chatTo", jqWin).focus();
+  return false;
+}
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
@@ -415,18 +497,6 @@ function openMeeting(
   app.log(2, "openMeeting");
 
   /*
-   * Check user name.*/
-  /*
-  var usrNm = $("#credentials > input#name").val();
-  if (usrNm.length < 1) {
-    $("#credentials > p.error").text("Please enter your name to continue.").
-      fadeIn("fast");
-    return false;
-  }
-  app.user.name = encodeURI(usrNm);
-  app.log(2, "User name:" + usrNm);
-  */
-  /*
    * Add encname attribute to mystream. */
   $("#meeting > #streams > #scarousel #mystream")
     .attr("encname", app.user.name);
@@ -440,27 +510,16 @@ function openMeeting(
      $("#meeting > #streams > #scarousel #mystream")
         .css("background-image", "url(" + app.user.fbProfilePicUrl + ")");
   }
-  /*
-   * Deactivate window.*/
-  //deactivateWindow("#credentials");
-  /*
-   * Get window height and width. */
-  var winH = $(window).height();
-  var winW = $(window).width();
-  /*
-   * Set #meeting height and width to fill the whole screen. */
-  var jqWin = $('#meeting');
-  //todo finish resize carousel
-  //jqWin.css({'width':winW,'height':winH});
-  /*
-   * Initialize carousel. */
-  var rX = winW * 0.44; /* 50% of 88% */
-  var rY = winH * 0.276; /* 40% of 69% */
+  // center carousel in it's container
+  // the carousel positioning is handled by it's resize method 
+  var sCar = $("#scarousel");
+  var rX = sCar.width() / 2;
+  var rY = sCar.height() / 2;
   $("#scarousel").CloudCarousel(
     {
-      xPos: rX*1.10,
-      yPos: rY*0.68,
-      xRadius: rX*0.94,
+      xPos: rX,
+      yPos: rY,
+      xRadius: rX,
       yRadius: rY,
       buttonLeft: $("body > div#meeting > div#streams > div#scontrols > input.left"),
       buttonRight: $("body > div#meeting > div#streams > div#scontrols > input.right"),
@@ -468,6 +527,8 @@ function openMeeting(
       minScale: 0.68
     }
   );
+  // set the controller instance
+  app.carousel = $("#scarousel").data('cloudcarousel');
   /*
    * Initialize Gocast events. */
   $(window).on('beforeunload', function() {
@@ -486,7 +547,7 @@ function openMeeting(
   $(window).unload(function() {
     app.log(2, "On unload.");
     //alert("unload");
-    Callcast.disconnect();
+ //RMW-TRY   Callcast.disconnect();
   });
   /*
    * Activate meeting window. */
@@ -497,7 +558,7 @@ function openMeeting(
   /*
    * Transition effect. */
   $('#mask').fadeOut(500);
-  jqWin.fadeIn(1000);
+  $('#meeting').fadeIn(1000);
   return false;
 } /* openMeeting() */
 
@@ -517,7 +578,7 @@ function keypressNameHandler(
 {
   /*
    * Remove any message. */
-  $("#credentials > p.error").hide().text("");
+  $("#credentials2 > p.error").hide().text("");
   /*
    * We have no action for key press combinations with the Alt key. */
   if (event.altKey) {
@@ -696,15 +757,14 @@ function sendTwitter(
 /**
  * \brief Action change Video.
  */
-function changeVideo(
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-    /**
-     * Event object. */
-  event
-)
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+function changeVideo()
 {
-  app.videoEnabled = $(this).hasClass("on");
+  var jqObj = $('#lower-right > #video');
+  if (!jqObj)
+  {
+     app.log(4, "couldn't find video button");
+  }
+  app.videoEnabled = $(jqObj).hasClass("on");
   var jqOo = $('#mystream');
   if (app.videoEnabled) {
     // Check object dimensions.
@@ -727,47 +787,43 @@ function changeVideo(
        $(jqOo).css("background-image", "url(" + app.user.fbProfilePicUrl + ")");
     }
   }
-  $(this).toggleClass("on");
+  $(jqObj).toggleClass("on");
   if (app.videoEnabled) {
     app.log(2, "Video turned on.");
-    $(this).attr("title", "Disable video");
+    $(jqObj).attr("title", "Disable video");
   }
   else {
     app.log(2, "Video turned off.");
-    $(this).attr("title", "Enable video");
+    $(jqObj).attr("title", "Enable video");
   }
   return false;
 } /* changeVideo() */
-
-
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
  * \brief Action change Audio.
  */
-function changeAudio(
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-    /**
-     * Event object. */
-  event
-)
+function changeAudio()
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
-  var bMuteAudio = $(this).hasClass("off");
+  var jqObj = $('#lower-right > #audio');
+  if (!jqObj)
+  {
+     app.log(4, "couldn't find video button");
+  }
+  var bMuteAudio = $(jqObj).hasClass("off");
   Callcast.MuteLocalVoice(bMuteAudio);
-  $(this).toggleClass("off");
+  $(jqObj).toggleClass("off");
   if (bMuteAudio) {
     app.log(2, "Audio muted.");
-    $(this).attr("title", "Unmute audio");
+    $(jqObj).attr("title", "Unmute audio");
   }
   else {
     app.log(2, "Audio unmuted.");
-    $(this).attr("title", "Mute audio");
+    $(jqObj).attr("title", "Mute audio");
   }
   return false;
 } /* changeAudio() */
-
-
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
@@ -784,7 +840,7 @@ function activateWindow(
 )
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
-  if (winId.match("credentials")) {
+  if (winId.match("credentials2")) {
     $("input#name", winId).on("keydown.s04072012", keypressNameHandler);
     $("input#btn", winId).on("click.s04072012", onJoinNow);
   }
@@ -816,7 +872,7 @@ function deactivateWindow(
 )
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
-  if (winId.match("credentials")) {
+  if (winId.match("credentials2")) {
     /*
      * Remove any message. */
     $("p.error", winId).hide().text("");
@@ -943,6 +999,12 @@ function resizeWindows(
   var meetW = jqW.width();
   var meetOff = winW/2 - meetW/2;
   jqW.css('left', meetOff);
+  
+  // resize carousel
+  if (app.carousel)
+  {
+     app.carousel.resize();
+  }
   return false;
 } /* resizeWindows() */
 
@@ -960,12 +1022,12 @@ function onJoinNow(
     app.log(2, "onJoinNow");
 
     // get the nick name, return back to dialog if not defined
-    var usrNm = $("#credentials > input#name").val();
+    var usrNm = $("#credentials2 > input#name").val();
     
     // user must enter fb or nick name if both not entered
     // display error
     if (usrNm.length < 1) {
-      $("#credentials > p.error").text("Please enter a name to continue.").
+      $("#credentials2 > p.error").text("Please enter a name to continue.").
         fadeIn("fast");
       return false;
     }
@@ -976,11 +1038,29 @@ function onJoinNow(
     app.log(2, "User name:" + usrNm);
     
     // close dialog
-    deactivateWindow("#credentials");
+    deactivateWindow("#credentials2");
 
     app.userLoggedIn = true;
     $(document).trigger("one-login-complete", "OnJoinNow() -- non-FB-login");
 
+} /* onJoinNow() */
+
+/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+/**
+ * \brief callback for fb skip button press
+ */
+function enterId(
+/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+    /**
+     * No argument. */
+)
+/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+{
+    app.log(2, "enterId");
+    deactivateWindow("#credentials");
+    $('.window').hide();
+    //closeWindow();
+    openWindow('#credentials2');
 } /* onJoinNow() */
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
@@ -995,14 +1075,22 @@ function checkCredentials(
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
     app.log(2, "checkCredentials");
+    
+    // this method is called on a fb status change
+    // so do nothing if we're already logged in
+    if (app.userLoggedIn)
+    {
+       return;
+    }
 
-    // check fb login status and prompt if not logged in
-    if (!FB.getAuthResponse())
+    // check fb login status and prompt if not skipped and not logged in
+    if (!app.user.fbSkipped && !FB.getAuthResponse())
     {
        openWindow('#credentials');
     }
     else // fb logged in update fb logged in status
     {
+      deactivateWindow("#credentials");
       app.userLoggedIn = true;
       $(document).trigger("one-login-complete", "checkCredentials - FB Login");
     }
@@ -1090,6 +1178,160 @@ function tryPluginInstall(
   }
 } /* tryPluginInstall() */
 
+///
+/// \brief close the eula window, download the win install file, launch function to check for plugin
+///
+function winInstall(event)
+{
+   // close the eula window
+   closeWindow();
+   
+   // get the windows install file
+   $.post("https://video.gocast.it/downloads/GoCastPlayer.msi",
+          function(data)
+          {
+             console.log(data);
+          });
+
+   openWindow("#winWait");         
+   winCheckForPlugin();
+}
+
+///
+/// \brief periodically check for the player to be installed and prompt user
+///
+function winCheckForPlugin()
+{
+   // find player
+   for (i = 0; i < window.navigator.plugins.length; ++i)
+   {
+      var item = window.navigator.plugins[i];
+      //app.log(2, 'plugin filename ' + item.filename);
+      if (item && item.filename === 'npGCP.dll')
+      {
+         clearTimeout(app.winTimeout);
+         app.log(2, "winCheckForPlugin found player.");
+         $('#winWait > #status > #spinner').attr("src", "images/green-tick.png");
+         $('#winWait > #status > #msg').text("The GoCast plugin is installed.");
+         
+         // display error msg after a timeout in case the plugin does not load
+         app.winTimeout = setTimeout(winPluginPunt, 10000);
+         return; // we're done since the plugin is in the list
+      }
+   }
+   
+   // plugin was not found in list wait and recheck
+   app.winTimeout = setTimeout(winCheckForPlugin, 3000);
+   app.log(2, "winCheckForPlugin no player, waiting...");
+}
+
+///
+/// \brief display a message to restart the browser
+///
+/// the pluginLoaded callback should close the winWait dialog
+/// if it doesn't prompt user to restart the browser
+///
+function winPluginPunt()
+{
+   $('#winWait > #status > #spinner').attr("src", "images/red-x.png");
+   $('#winWait > #status > #msg').text("Hmmm... looks like the plugin did not load.  Please restart the browser");
+}
+
+/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+/**
+ * \brief show the chat output div
+ *
+ * this is called on ticker mouse over
+ */
+function showChatOut()
+{
+
+   if ($('#msgBoard > #chatOut').text().length > 0)
+   {
+      // hide the ticker
+      $('#msgTicker').css("display", "none");
+   
+      // show chatOut
+      $('#msgBoard > #chatOut').css("display", "block");
+   }
+   
+} // showChatOut
+
+/**
+ * \brief show the chat ticker div
+ *
+ */
+function showMsgTicker()
+{
+   // hide the ticker
+   $('#msgBoard > #chatOut').css("display", "none");
+   
+   // show chatOut
+   $('#msgTicker').css("display", "block");
+   
+} // showChatOut
+
+///
+/// \brief initialize ui handlers
+///
+function docKey(event)
+{
+   /// no ctrl-<key> accelerators
+   if (event.ctrlKey)
+   {
+      return;
+   }
+   app.log(2, "key code " + event.which);
+   
+   switch (event.which || event.keyCode) 
+   {
+     case 32: // space bar
+       //changeAudio();
+       break;
+     case 65: // alt-a, toggle audio
+       if (event.altKey)
+       {
+          changeAudio();
+       }
+       break;
+     case 86: // alt-v, toggle video
+       if (event.altKey)
+       {
+          changeVideo();
+       }
+       break;
+     case 67: // c key, chat input
+       if (event.altKey)
+       {
+          // set focus to global chat input
+          event.preventDefault();
+          $('#msgBoard > input.chatTo').focus();
+       }
+       break;
+     case 37: // left arrow, scroll carousel left
+        if (app.carousel)
+        {
+           app.carousel.rotate(1);
+        }
+       break;
+     case 39: // right arrow, scroll carousel right
+        if (app.carousel)
+        {
+           app.carousel.rotate(-1);
+        }
+       break;
+   }
+}
+
+///
+/// \brief initialize ui handlers
+///
+function uiInit()
+{
+   // add global keyboard accelerators
+   //$('meeting').keypress(meetingKey);
+}
+
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
  * \brief The document ready event handler.
@@ -1104,21 +1346,24 @@ $(document).ready(function(
 )
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
-  /*
-   * Check the browser. */
+  // Check the browser.
   app.getBrowser();
   app.checkBrowser();
 
+  // login callback
   $(document).bind('checkCredentials', checkCredentials);
 
+  $(document).keydown(docKey); // global key handler
+  
   fbInit(); // init facebook api
-  // Login anonymously
+  
+  // Login to xmpp anonymously
   Callcast.connect(Callcast.CALLCAST_XMPPSERVER, "");
 
-  /*
-   * Write greeting into console. */
+  // Write greeting into console.
   app.log(2, "Page loaded.");
-}); /* $(document).ready(function()) */
+  
+}); // $(document).ready(function())
 
 $.extend({
 getUrlVars: function(){

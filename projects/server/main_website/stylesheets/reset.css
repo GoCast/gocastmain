@@ -1,0 +1,65 @@
+/* line 1 */
+html, body, div, span, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, code, del, dfn, em, img, q, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-weight: inherit;
+  font-style: inherit;
+  font-size: 100%;
+  font-family: inherit;
+  vertical-align: baseline;
+}
+h3 {
+   font-weight:bold;
+}
+/* line 11 */
+body {
+  line-height: 1.5;
+}
+
+/* line 14 */
+table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+/* line 18 */
+caption, th, td {
+  text-align: left;
+  font-weight: normal;
+}
+
+/* line 22 */
+table, td, th {
+  vertical-align: middle;
+}
+
+/* line 26 */
+blockquote:before, blockquote:after {
+  content: "";
+}
+
+/* line 30 */
+q:before, q:after {
+  content: "";
+}
+
+/* line 33 */
+blockquote, q {
+  quotes: "" "";
+}
+
+/* line 36 */
+a img {
+  border: none;
+}
+
+/* line 39 */
+img.right {
+  float: right;
+}
+
+/* line 43 */
+article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section, summary {
+  display: block;
+}

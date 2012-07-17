@@ -1,0 +1,101 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"> 
+  <head>
+    <title>GoCast - WebRTC based communications</title>
+    <meta name="description" content="GoCast provides multi-way video communications using WebRTC.  Prior to WebRTC browser support GoCast applications use a plugin that we share with the community." />
+    <link href="/stylesheets/reset.css" media="all" rel="stylesheet" type="text/css"/><link href="/stylesheets/screen.css" media="all" rel="stylesheet" type="text/css"/>
+  </head>
+  <body>
+    <a href="https://github.com/GoCast/webrtc_plugin"><img style="position: fixed; top: 0; right: 0; border: 0;" src="https://a248.e.akamai.net/assets.github.com/img/7afbc8b248c68eb468279e8c17986ad46549fb71/687474703a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" /></a>
+    <div id='main'>
+      <div id='top'>
+        <h1 id='logo'>
+          <a href="/">GoCast</a>
+        </h1>
+        <p id='navigation'>
+          <a href="/#description">Description</a>
+          <a href="http://www.gocast.it/docs.html">Docs</a>
+          <a href="http://www.gocast.it/forum">Forums</a>
+          <a href="https://github/GoCast/webrtc_plugin/issues">Bugs</a>
+          <a href="license-rights.html">License</a>
+          <a class="last" href="/#about">About</a>
+        </p>
+      </div>
+      <div id='rest'>
+        <p class='italic'>
+	GoCast.it is an angel funded start up focusing video communications. We will be contributing new services and video functionality shortly built on top of webRTC. 
+	<br /><br />
+	The webRTC project is a large body of work which is currently in flux and in many cases difficult to build and/or use. Since its intent is to be used directly inside browsers via its Javascript interface, a browser is conspicuously missing at the moment. This leaves the project in a state where it can be a challenge even for the more experienced developers to compile, link, and utilize the code. It is our intention to grant access to developers who wish to use the body of webRTC from within a browser without having to use an alpha-build or dev-build of the browser itself. To this end, we are producing this Open Source project which places webRTC into a plugin that can be used for a variety of purposes which are in line with its original intent; and which also, hopefully, offers developers a more automated set of build and prep scripts, and  allows them to make their own off-shoot projects which link to webRTC without the confusion of the tremendous number of libraries in the standard build.
+        </p>
+        <h2>How to build</h2>
+        <script type="text/javascript" src="https://gist.github.com/2059.js"></script>
+        <h2> This release provides:</h2>
+<ul>
+<li>
+<b>peerconnection_server</b> - The example signin server, which is part of the WebRTC source. The signaling protocol has been left unaltered for the initial release and trials.
+</li>
+<li>
+<b>cmdline_audio_peer</b> - Command line program that works in conjunction with peerconnection_server connecting 2 or more cmdline_audio_peer clients together in an audio conference call using WebRTC libraries. Options and commands are discussed later.
+</li>
+<li>
+<b>WebRTC</b> - A plugin built on FireBreath which mimics command line audio peer.  Provides simple javascript API's to sign in, sign out, call and hangup.  This plugin is intended to give developers the ability to develop EARLY on multiple browsers while WebRTC's built-in browser integration is still evolving. In future releases it will allow the use of WebRTC APIs for browsers which do not directly support WebRTC integration.
+</li>
+</ul>
+
+        <h2>RoadMap</h2>
+        <p>
+	This first product is our own internal proof of concept for using webRTC. It is our hope that it will be useful for many people wondering how to use it themselves.  This first product also organizes and packages the WebRTC static library. This is valuable to developers wanting to utilize WebRTC at the C++ level.
+<br /><br />
+	Our next goal is to provide a plugin which emulates the W3C Javascript API being set forth for WebRTC within a browser. Our plugin will enable developers to build WebRTC applications in production browsers during WebRTC's evolution.  The WebRTC group is prepping a canary build of Chrome which supports the webkit interface to the WebRTC API. But many people will have issues doing WebRTC development in such an environment. Our plugin will fill that gap allowing the full use of the API set in a standard browser. Additionally, in the future, if a browser (like IE) does not support WebRTC directly, this plugin will enable vendors of WebRTC based applications to support IE by having users install the plugin rather than simply not supporting an entire browser base. We believe direct browser integration of WebRTC is the future - and is very important. But these things take time to gain energy. Our plugin fills this gap and we hope it will also raise the popularity of a technology that is in its infancy.
+<br /><br />
+	Our next addition will allow video in addition to audio. The primary reasons for not doing video at this time were technical (WebRTC's Mac video implementation currently has issues in our experience) and also instructional (using only audio made things a bit simpler to illustrate and lowered the bar for users to test/try).
+        </p>
+        <h2>Support</h2>
+        <p>
+	As this is an Open Source project, we are intending to have the community support this along with us. 
+	Initially, we'll do our best to answer questions and fix bugs as well as advance things along in a timely manner. Please use the <a href="http://www.gocast.it/forum">discussion forums</a> to ask questions and pose problems. 
+	Also, please use the <a href="https://www.github.com/GoCast/webrtc_plugin/issues">issue tracking system</a> to log issues.
+        </p>
+        <h2>High level requirements</h2>
+        <p>
+Currently, our project works on Mac and Linux. Testing has been .dev oriented. - not professionally QA.d. Our development stations are:
+	</p>
+	<h3>Mac</h3>
+        <p>
+Mac OS 10.7.1 and 10.7.2 (Lion) (64-bit systems) using both XCode 4.1 and XCode 4.2. On the Mac, we have had the most success running the plugin under Chrome (15.x) but we have had some success with Firefox in 32-bit mode. (The binaries are 32-bit binaries currently). Safari loads the plugin currently, but it doesn.t function.
+<br /><br />
+We would love to get feedback from 10.6 (and 32/64-bit) users of Mac and if anyone gets Safari working etc.
+<br /><br />
+	</p>
+	<h3>Linux</h3>
+	<p>
+For our Linux stations, we use Ubuntu 10.04 (64-bit) and 11.04 (32-bit). 
+<br /><br />
+Our testing of the plugin has been successful against Chrome (12.x and 14.x).
+Our trials with Firefox (5.x) were functional on 32-bit ubuntu but spotty at best on 64-bit. It also appears the release version of the monster monolithic libWebRTC.a file has better results than the _Debug version for some reason but no formal investigation has been started here.
+<br /><br />
+Anyone running different flavors of Linux and/or getting Firefox working - we would love to hear from you.
+<br /><br />
+	</p>
+	<h3>Windows - not yet</h3>
+	<p>
+Currently we do not support Windows, but we do not see any major impediments to doing so. It was a matter of focus and time for this initial release. The scripts are all sh and bash based and so Windows would need to replicate similar in .bat files or other (ruby / python?). FireBreath supports Windows and WebRTC certainly builds on Windows and in most cases more easily than on Mac.
+        </p>
+        <h2>Getting Started</h2>
+        <p>
+There are 2 main requirements tools-wise for setup of WebRTC, FireBreath, and our additions. The first is 'git'. If you type 'which git' a the command line and get a response with a path to the tool, you're likely just fine. If not, please go to <a href="http://www.git-scm.org">http://www.git-scm.org</a> and download the sources or a binary package and install. In most cases for linux, you can 'sudo apt-get install git' to accomplish this.
+<br /><br />
+The second requirement is for some tools utilized by Chromium project in building. The tool 'gclient' is the key item. If you do not have gclient, you may go to the page which describes installation of the tool at https://sites.google.com/a/chromium.org/dev/developers/how-tos/install-depot-tools which basically tells you to svn co http://src.chromium.org/svn/trunk/tools/depot_tools followed by making sure you add 'depot_tools' to your PATH. The prep* scripts do indeed self-check that git and gclient are available and will error out / exit if they are not present.
+<br /><br />
+After cloning the git repository, there are a number of items which need to be prepared for initial use. Webrtc can be a difficult build procedure and so we've tried to automate this as much as possible. 
+<br /><br />
+./prep_WebRTC.sh -- this is the main script which will kick off all further processing to get an initial set of compiled binaries in both Debug and Release modes. It will (when successful) get a 'blessed' version of WebRTC, patch it as necessary, and then build the WebRTC libraries necessary to support cmdline_audio_peer, peerconnection_server, and WebRTC. It will then create a monolithic library named 'libWebRTC.a' and 'libWebRTC.a' in the output directories. These libraries can significanly ease the use of WebRTC by developers wishing to use the 'guts' programmatically rather than from a browser. At the end of prep_WebRTC.sh, you'll have the monolithic static libs along with the binaries for the above mentioned binaries. Lastly, this set of scripts calls rebuild_plugin.sh which will build the FireBreath based plugin for the project. See 'Giving it a try' for step by step instructions to validate your binaries are functional.
+        </p>
+        <h2>What the scripts are doing</h2>
+	<p>
+	
+	</p>
+      </div>
+    </div>
+  </body>
+</html>

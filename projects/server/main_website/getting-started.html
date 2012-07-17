@@ -1,0 +1,49 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+  <head>
+    <title>GoCast - background documenation to get started</title>
+    <link href="/stylesheets/reset.css" media="all" rel="stylesheet" type="text/css"/><link href="/stylesheets/screen.css" media="all" rel="stylesheet" type="text/css"/>
+  </head>
+  <body>
+    <a href="https://github.com/GoCast/webrtc_plugin"><img style="position: fixed; top: 0; right: 0; border: 0;" src="https://a248.e.akamai.net/assets.github.com/img/7afbc8b248c68eb468279e8c17986ad46549fb71/687474703a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" /></a>
+    <div id='main'>
+      <div id='top'>
+        <h1 id='logo'>
+          <a href="http://www.gocast.it">GoCast</a>
+        </h1>
+	  <!--#include file="header.html"-->
+      </div>
+      <div id='rest'>
+        <h2>Getting Started</h2>
+        <p>
+There are 2 main requirements tools-wise for setup of WebRTC, FireBreath, and our additions. The first is 'git'. If you type 'which git' a the command line and get a response with a path to the tool, you're likely just fine. If not, please go to <a href="http://www.git-scm.org">http://www.git-scm.org</a> and download the sources or a binary package and install. In most cases for linux, you can 'sudo apt-get install git' to accomplish this. The second tool is 'cmake', if you do not have this tool it can be obtained from <a href="http://www.cmake.org">cmake.org</a>.
+<br /><br />
+The next requirement is the Chromium project build tools.  The tool 'gclient' is the key item. If you do not have gclient, you may go to the page which describes <a href="https://sites.google.com/a/chromium.org/dev/developers/how-tos/install-depot-tools">installation of the tool</a>.
+
+The prep* scripts do indeed self-check that git and gclient are available and will exit if they are not present.
+<br /><br />
+After cloning the git repository, there are a number of items which need to be prepared for initial use. Webrtc can be a difficult build procedure and so we've tried to automate this as much as possible. 
+<br /><br />
+./prep_webrtc.sh -- this is the main script which will kick off all further processing to get an initial set of compiled binaries in both Debug and Release modes. It will (when successful) get a 'blessed' version of WebRTC, patch it as necessary, and then build the WebRTC libraries necessary to support cmdline_audio_peer, peerconnection_server, and the audio call plugin. It will then create a monolithic library named 'libwebrtc_Release.a' and 'libwebrtc_Debug.a' in the output directories. These libraries can significanly ease the use of WebRTC by developers wishing to use the 'guts' programmatically rather than from a browser. At the end of prep_webrtc.sh, you'll have the monolithic static libs along with the binaries for the above mentioned items. Lastly, this set of scripts calls rebuild_plugin.sh which will build the FireBreath based plugin for the audio call plugin project. See <a href="http://www.gocast.it/give-it-a-try.html">Give it a try</a> for step by step instructions to validate your binaries are functional.
+        </p>
+      </div>
+    </div>
+<script type="text/javascript">
+
+
+ var _gaq = _gaq || [];
+ _gaq.push(['_setAccount', 'UA-27135587-1']);
+ _gaq.push(['_trackPageview']);
+
+
+ (function() {
+   var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+   ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+   var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+ })();
+
+
+</script>
+
+  </body>
+</html>

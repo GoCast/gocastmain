@@ -1,0 +1,95 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+  <head>
+    <title>GoCast Video Chat</title>
+    <link href="stylesheets/reset.css" media="all" rel="stylesheet" type="text/css"/><link href="stylesheets/screen.css" media="all" rel="stylesheet" type="text/css"/>
+    <script src='javascripts/jquery.js'></script>
+    <script src='javascripts/mustache.js'></script>
+    <script src='javascripts/video.js'></script>
+  </head>
+  <body>
+
+    <div class='panel hide' id='sign_in_panel'>
+      <h1>Sign in</h1>
+      <form id='sign_in'>
+        <p>
+          <label>Email address</label>
+          <input id='username' type='text' value='' />
+        </p>
+        <p>
+          <label>Url</label>
+          <input id='ip' type='text' value='video.gocast.it' />
+        </p>
+        <p>
+          <label>Port</label>
+          <input id='port' type='text' value='8888' />
+        </p>
+        <p class='last'>
+          <input type='submit' value='Sign In' />
+        </p>
+      </form>
+    </div>
+
+    <div class="panel hide" id="not_installed">
+      <h1>Plug in not installed</h1>
+      <p>It seems that the webrtc plugin did not load. Have you installed the plugin already?</p>
+      <p><b>Mac:</b> To install the plugin you need to:</p>
+      <ol>
+        <li>Download <a href="files/WebrtcPlugin.plugin.zip">WebrtcPlugin.plugin</a>. </li>
+        <li>Unzip the file. Copy WebrtcPlugin.plugin into "~/Library/Internet Plug-Ins".</li>
+      </ol>
+      <p><b>Linux:</b> To install the plugin you need to:</p>
+      <ol>
+        <li>Download <a href="files/npWebrtcPlugin.tgz">npWebrtcPlugin.so</a>. </li>
+        <li>Untar the file. Copy npWebrtcPlugin.so into "~/.mozilla/plugins".</li>
+      </ol>
+    </div>
+
+    <div id='panels-content'>
+
+      <div id='video-panel'>
+        <object id="GoCastPlugin" type="application/x-webrtcplugin" width="0" height="0">
+          <param name="onload" value="OnPluginLoad" />
+        </object>
+      </div>
+
+      <div id="peers-content" class="hiden">
+        <a href="#" class="logout">Log Out</a>
+
+        <h3>On Call</h3>
+        <div id="on-call-users"></div>
+
+        <h3>Available Users</h3>
+        <div id="available-users"></div>
+      </div>
+
+      <script id="user-template" type="text/html">
+        <div class='available'>
+          <div class='user {{ status }}'>
+            <div class='image'>
+              <img src='{{ avatar }}' />
+            </div>
+            <div class='info'>
+              <h3>
+                {{ username }}
+                <a class='small video-call' href='#' data-peername="{{ username }}">{{ action }} </a>
+              </h3>
+            <a class='button' href='#'>{{ caption }}</a>
+          </div>
+        </div>
+      </script>
+
+      <script id="no-peers" type="text/html">
+        <div class='available'>
+          <div class='user'>
+            <div class='info'>
+                {{ message }}
+            </div>
+          </div>
+        </div>
+      </script>
+     
+    </div>
+
+  </body>
+</html>

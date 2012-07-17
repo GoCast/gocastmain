@@ -1,0 +1,109 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+  <head>
+    <title>GoCast - background documenation to get started</title>
+    <link href="/stylesheets/reset.css" media="all" rel="stylesheet" type="text/css"/><link href="/stylesheets/widescreen.css" media="all" rel="stylesheet" type="text/css"/>
+  </head>
+  <body>
+    <a href="https://github.com/GoCast/webrtc_plugin"><img style="position: fixed; top: 0; right: 0; border: 0;" src="https://a248.e.akamai.net/assets.github.com/img/7afbc8b248c68eb468279e8c17986ad46549fb71/687474703a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" /></a>
+    <div id='main' style="width:500px">
+      <div id='top'>
+        <h1 id='logo'>
+          <a href="http://www.gocast.it">GoCast</a>
+        </h1>
+	  <!--#include file="header.html"-->
+      </div>
+      <div id='rest'>
+<div  >
+The following sequence diagrams describe in detail the different scenarios involved in the
+setup and teardown of peer connections. Before going through them, it helps to keep the
+following things in mind:
+<br /><br />
+
+1. A peer consists of PeerConnectionClient (PCC) which manages communication with the
+SigninServer (SS), and one each of PeerConnectionObserver (PO) and PeerConnection (PC)
+to manage a voice connection with one other remote peer.
+
+<br /><br />
+
+2. PO acts as a liason between PC and PCC, and is responsible for creating/destroying PC,
+forwarding signaling messages meant for the remote peer to PCC, and forwarding
+replies from the remote peer to PC.
+
+<br /><br />
+
+3. There are two diagrams for each scenario. The first one describes just the sequence of
+events in the scenario between just the elements involved in the peer connection. The
+second one describes the sequence of events with the involvement of PCC and SS. The purpose
+of having two sequence diagrams for each scenario is to show a clear demarcation between
+the peer-to-peer and the signaling aspects of setting up a peer connection. WebRTC is
+intended to manage only the peer-to-peer media connection, and what signaling protocol
+to use for call setup/teardown is left to the discretion of the developer.
+</div>
+
+<br /><br />
+<h3>Scenario 1 - local peer initiates connection with remote peer:</h3>
+
+
+  <h3>Sequence of actions:</h3>
+<br />
+  <a href="http://www.gocast.it/images/start_a_call.png"><img src="images/start_a_call.png" width="500" alt="Start A Call" title="Sequence of Actions" /> </a>
+
+<br /><br />
+
+  <h3>Sequence of actions with PCC and SS involved:</h3>
+<br />
+  <a href="http://www.gocast.it/images/start_a_call_client_server.png"><img src="images/start_a_call_client_server.png" width="500" alt="Sequence of actions with PCC and SS" title="Sequence of actions with PCC and SS" /> </a>
+<br /><br />
+
+<h3>Scenario 2 - remote peer initiates connection with local peer:</h3>
+
+  <h3>Sequence of actions:<h3>
+<br />
+  <a href="http://www.gocast.it/images/receive_a_call.png"><img src="images/receive_a_call.png" width="500" alt="remote peer intiates connections with local peer" title="remote peer intiates connections with local peer" /> </a>
+
+  <h3>Sequence of actions with PCC and SS involved:</h3>
+<br />
+  <a href="http://www.gocast.it/images/receive_a_call_client_server.png"><img src="images/receive_a_call_client_server.png" width="500" alt="remote peer intiates connections with local peer" title="remote peer intiates connections with local peer" /> </a>
+
+<h3>Scenario 3 - local peer initiates disconnection with remote peer:</h3>
+
+  <h3>Sequence of actions:</h3>
+<br />
+  <a href="http://www.gocast.it/images/hangup_a_call.png"><img src="images/hangup_a_call.png" width="500" alt="hang up a call" title="hang up a call" /> </a>
+
+  <h3>Sequence of actions with PCC and SS involved:</h3>
+<br />
+   <a href="http://www.gocast.it/images/hangup_a_call_client_server.png"><img src="images/hangup_a_call_client_server.png" width="500" alt="hang up a call" title="hang up a call" /> </a>
+
+<h3>Scenario 4 - remote peer initiates disconnection with local peer:</h3>
+
+  <h3>Sequence of actions:</h3>
+<br />
+  <a href="http://www.gocast.it/images/handle_remote_peer_hangup.png"><img src="images/handle_remote_peer_hangup.png" width="500" alt="hang up a call" title="hang up a call" /> </a>
+
+  <h3>Sequence of actions with PCC and SS involved:</h3>
+<br />
+  <a href="http://www.gocast.it/images/handle_remote_peer_hangup_client_server.png"><img src="images/handle_remote_peer_hangup_client_server.png" width="500" alt="hang up a call" title="hang up a call" /> </a>
+
+      </div>
+    </div>
+<script type="text/javascript">
+
+
+ var _gaq = _gaq || [];
+ _gaq.push(['_setAccount', 'UA-27135587-1']);
+ _gaq.push(['_trackPageview']);
+
+
+ (function() {
+   var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+   ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+   var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+ })();
+
+
+</script>
+
+  </body>
+</html>

@@ -12,6 +12,23 @@
  */
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
+a:link
+{
+  color: #0000ff;
+}
+a:visited 
+{
+  color: #800080;
+}
+a:hover
+{
+  color: #0000ff;
+  text-decoration:underline
+}
+a:active
+{
+  color: #0000ff;
+}
 body {
   margin: 0;
   padding: 0;  
@@ -23,7 +40,7 @@ body {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 13px;
   overflow: hidden;
-  background: whitesmoke;
+  background: black;
 }
 body input[type="button"] {
   border: 0px;
@@ -44,7 +61,7 @@ body > div#upper-right
    float:right;
    margin-top: 10px;
    margin-right: 10px;
-   width:50%;
+   width:auto;
    z-index: 1000;
    line-height: 2em;
 }
@@ -71,11 +88,11 @@ body > div#lower-right
 {
    float:right;
    position:absolute;
-   bottom:32px;
-   right:32px;
+   bottom:10px;
+   right:10px;
    margin-top: 10px;
    margin-right: 10px;
-   width:50%;
+   width:auto;
    z-index: 1000;
    line-height: 2em;
 }
@@ -90,8 +107,12 @@ body > div#lower-right > input.demobtn {
   background-image: url("../images/demo.png");
 }
 body > div#lower-right > input.feedback {
-  margin-left: 15px;
   background-image: url("../images/btn-feedback.png");
+}
+body > div#lower-right > input.copyData {
+  margin-left: 15px;
+  background-image: url("../images/email.png");
+  background-size:100%
 }
 body > div#lower-right > input.twitter {
   background-image: url("../images/btn-twitter.png");
@@ -124,19 +145,36 @@ body > div#lower-right > input#audio {
 body > div#msgBoard {
   position: absolute;
   z-index: 1000;
-  bottom: 32px;
+  bottom: 10px;
   left: 0px;
   margin: 0px 10px 0px;
   line-height: 2em;
+  max-width: 40%
 }
 body>div#msgBoard > div#chatOut
 {
-  height:125px;
+  display:none;
+  max-height:125px;
+  min-height: 3em;
+  height: auto;
   width:300px;
   overflow:auto;
   line-height: 1em;
   border-width: 2px;
-  border-style: inset;
+  background-color: white;
+  -moz-user-select: text;
+  -khtml-user-select: text;
+  -webkit-user-select: text;
+  -o-user-select: text;
+  user-select: text;
+}
+body>div#msgBoard > div#msgTicker
+{
+  height:1.25em;
+  width:auto;
+  overflow:hidden;
+  line-height: 1em;
+  border-width: 2px;
   background-color: white;
 }
 body>div#msgBoard > input.chatTo
@@ -163,28 +201,80 @@ body > div#meeting > div#streams {
   top: 0px;
   left: 0px;
   width: 98%;
-  height: 80%;
+  height: 90%;
 }
 body > div#meeting > div#streams > div#scarousel {
   width: 100%;
   height: 100%;
 }
+body > div#meeting > div#streams > div#scarousel div#addItem
+{
+  opacity: 0.4;
+  width: 20px;
+  height: 20px;
+  margin-right: 5px;
+  margin-bottom:5px;
+  position:absolute;
+  bottom:5px;
+  right:5px;
+}
+body > div#meeting > div#streams > div#scarousel div#addItem > img
+{
+   width:100%;
+   height:100%
+}
 body > div#meeting > div#streams > div#scarousel div.cloudcarousel {
-  width: 260px;
-  height: 216px;
+  width: 300px;
+  height: 248px;
   opacity: 1;
   transition: opacity 0.5s;
   -moz-transition: opacity 0.5s;
   -webkit-transition: opacity 0.5s;
   -o-transition: opacity 0.5s;
-  border: 3px solid darkgreen;
   border-radius: 6px;
-  background: darkgreen center top no-repeat url("../images/gologo.png");
+  background-color: #404040;
   background-size: 70%;
   background-position: center center;
+  background-repeat: no-repeat
+}
+body > div#meeting > div#streams > div#scarousel div.cloudcarousel > img.close
+{
+  visibility: hidden;
+  opacity: 0.4;
+  width: 12px;
+  height: 12px;
+  margin: 5px;
+  position: absolute;
+  right: 3px;
+  top: 3px;
 }
 body > div#meeting > div#streams > div#scarousel div.cloudcarousel.typeContent {
   background-size: 98%;
+  display: table;
+}
+body > div#meeting > div#streams > div#scarousel div.cloudcarousel.typeContent > div.spotUrlIcon
+{
+  position:relative; 
+  clear: left;
+  background-color: transparent;
+  background-size: 98%;
+  background-repeat: no-repeat;
+  width: 40px;
+  height:40px;
+  margin-left:auto;
+  margin-right:auto;
+  margin-top: 20px;
+}
+body > div#meeting > div#streams > div#scarousel div.cloudcarousel.typeContent > div.spotUrlTitle
+{
+  position:relative; 
+  clear: left;
+  background-color: white;
+  width: 70%;
+  height:auto;
+  margin-left:auto;
+  margin-right:auto;
+  border-radius: 5px;  
 }
 body > div#meeting > div#streams > div#scarousel div.cloudcarousel > object {
   margin: 2px;
@@ -201,28 +291,18 @@ body > div#meeting > div#streams > div#scarousel div.cloudcarousel > div.name {
   color: white;
 }
 body > div#meeting > div#streams > div#scarousel div.unoccupied {
-  opacity: 0.1;
+  background-image: url("../images/gologo200.png");
+  opacity: 0.7;
 }
 body > div#meeting > div#streams > div#scarousel div#mystream {
   background-image: url("../images/person.png");  
-}
-body > div#meeting > div#streams > div#scarousel div#mystream > div#myctrls {
-  position: absolute;
-  bottom: 0px;
-  left: 40%;
-}
-body > div#meeting > div#streams > div#scarousel div#mystream > div#myctrls > input {
-  width: 24px;
-  height: 24px;
-  background-position: center;
-  background-repeat: no-repeat;
-  margin-right: 5px;
 }
 body > div#meeting > div#streams > div#scontrols {
   width: 100px;
   margin-left: auto;
   margin-right: auto;
   text-align: center;
+  z-index: 2000;
 }
 body > div#meeting > div#streams > div#scontrols > input {
   width: 26px;
@@ -276,24 +356,8 @@ body > div#meeting > div#streams > div#scontrols > input.right {
   border: 4px solid #812034;
   border-radius: 16px;  
 }
-#boxes #credentials > img.close {
-  float: right;
-  border: 2px solid gray;
-  border-radius: 5px;  
-  margin: 5px 0px;
-}
 #boxes #credentials > p.title {
   margin: 30px 10px 20px 10px;
-}
-#boxes #credentials > input#name {
-  width: 15em;
-  border-radius: 5px;
-  margin-left: 10px;
-}
-#boxes #credentials > input#email {
-  width: 20em;
-  border-radius: 5px;
-  margin-left: 10px;
 }
 #boxes #credentials div#fb-login-button {
   width: 20em;
@@ -301,16 +365,52 @@ body > div#meeting > div#streams > div#scontrols > input.right {
   margin-left: 10px;
   margin-bottom: 10px;
 }
-#boxes #credentials > p.error {
-  color: red;
+#boxes #credentials #noThanks
+{
+  float: right;
+}
+#boxes #credentials2 {
+  width: 300px; 
+  height: auto;
+  padding: 0px 7px 7px 7px;
+  background-color: #eeeeee;
+  border: 4px solid #812034;
+  border-radius: 16px;  
+}
+#boxes #credentials2 > p.title {
+  margin-left: 10px;
+  margin-bottom: 10px;
+}
+#boxes #credentials2 input#name {
+  width: 15em;
+  border-radius: 5px;
+  margin-left: 10px;
+}
+#boxes #credentials2 input#email {
+  width: 20em;
+  border-radius: 5px;
+  margin-left: 10px;
+}
+#boxes #credentials2 input#btn {
+  width: 10em;
+  height: 3em;
+  margin-left: 10px;
+}
+#boxes #credentials2 div#fb-login-button {
+  width: 20em;
+  border-radius: 5px;
+  margin-left: 10px;
+  margin-bottom: 10px;
+}
+#boxes #credentials2 > p.error {
+  position: absolute;
+  top: -2.5em;
+  margin-left: 10px;
+  color: black;
   font-weight: bold;
   font-size: 1.2em;
   text-shadow: 0 0 10px white, 0 0 20px white, 0 0 30px white, 0 0 40px #FF00DE, 0 0 70px #FF00DE, 0 0 80px #FF00DE, 0 0 100px #FF00DE, 0 0 150px #FF00DE;
   display: none;
-}
-#boxes #credentials > p.skip-text {
-  font-size: 1.0em;
-  float: right;
 }
 #boxes #chatInp {
   width: 600px;
@@ -400,7 +500,7 @@ body > div#meeting > div#streams > div#scontrols > input.right {
 }
 #boxes #winEula {
   width: 660px;
-  height: 600px;
+  height: 80%;
   background: white;
   border: 4px solid lightgreen;
   border-radius: 16px;  
@@ -428,7 +528,61 @@ body > div#meeting > div#streams > div#scontrols > input.right {
   float: right;
   margin-right: 5px;
 }
-#boxes #fbPrompt
+#boxes #winWait {
+  width: 300px; 
+  height: auto;
+  padding: 0px 7px 7px 7px;
+  background-color: white;
+  border: 4px solid #812034;
+  border-radius: 16px;
+}
+#boxes #winWait #status
 {
-   display: none;
+  line-height: 2em;
+}
+#boxes #winWait img#spinner 
+{
+  float: left;
+  width: 25px; 
+  height: 25px;
+}
+#boxes #copyData
+{
+   border: 5px solid rgba(40, 40, 40, .5);
+   margin-right: 20px;
+   margin-bottom: 100px;
+   background-color: #cccccc;
+   -moz-user-select: text;
+   -khtml-user-select: text;
+   -webkit-user-select: text;
+   -o-user-select: text;
+   user-select: text;
+}
+#boxes #copyData p
+{
+   text-align: center;
+}
+#boxes #copyData #copyContent
+{
+   overflow: hidden;
+   background-color: white;
+}
+#boxes #copyData #copyContent h2
+{
+   white-space: nowrap;
+   margin-left: 10px;
+   margin-right: 10px;
+}
+#boxes #copyData #copyContent #copyLogo
+{
+   margin-left: 3px;
+   margin-right: 3px;
+   float:left;
+}
+#boxes #copyData img.close 
+{
+  float: right;
+  width: 10px;
+  height: 10px;
+  margin: 5px;
 }

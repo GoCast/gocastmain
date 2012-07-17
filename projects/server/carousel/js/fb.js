@@ -2,6 +2,40 @@
 /**
  * \brief initialize facebook api.
  */
+function fbMe
+(
+   response // facebook response object
+)
+{
+   console.log("FB logged IN or got a new token.");
+   //
+   // NOTE: These two represent the keys to the kingdom. The signed response and the id.
+   // the authResponse can be accessed using FB sync api calls
+   //
+   Callcast.SetFBSignedRequestAndAccessToken(response.authResponse.signedRequest, response.authResponse.accessToken);
+
+   // user has auth'd your app and is logged into Facebook
+   FB.api('/me', function(me)
+   {
+      if (me && me.name)
+      {
+         app.user.name = encodeURI(me.name);
+         app.user.fbProfileUrl = "https://graph.facebook.com/" + me.id;
+         app.user.fbProfilePicUrl = "https://graph.facebook.com/" + me.id + "/picture?type=large";
+         Callcast.SetNickname(app.user.name); // TODO should be somewhere else
+         Callcast.setPresenceBlob(new Object({
+                                              url:app.user.fbProfileUrl,
+		                                      image:app.user.fbProfilePicUrl
+		                                     } ) );
+            $(document).trigger("checkCredentials");
+      }
+   });
+}
+
+/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+/**
+ * \brief initialize facebook api.
+ */
 function fbInit(
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
     /**
@@ -28,6 +62,21 @@ function fbInit(
         logging    : true,
       });
 
+        // listen for and handle auth.authResponseChange events
+        FB.Event.subscribe('auth.authResponseChange', function(response) {
+          app.log(2, "authResponseChange callback");
+          console.log("response==", response);
+          if (response.authResponse)
+          {
+             fbMe(response);
+          }
+          else
+          {
+          	console.log("FB logged out or token went bad?");
+            Callcast.SetFBSignedRequestAndAccessToken(null, null);
+          }
+        });
+
       // not needed since the status : true arg to FB.init above 
       // does the equivalent and fires statusChange
       // but looks like the above stmt is not true, we don't get
@@ -42,38 +91,13 @@ function fbInit(
           {
              $(document).trigger("checkCredentials");
           }
-      });
-
-        // listen for and handle auth.statusChange events
-        FB.Event.subscribe('auth.statusChange', function(response) {
-          app.log(2, "fbStatusChange callback");
-          if (response.authResponse) {
-            app.log(2, "fbStatusChange callback user is authorized");
-            //
-            // NOTE: These two represent the keys to the kingdom. The signed response and the id.
-            // the authResponse can be accessed using FB sync api calls
-            //
-            //globalFBSR = response.authResponse.signedRequest;
-            //globalFBID = response.authResponse.id;
-
-            // user has auth'd your app and is logged into Facebook
-            FB.api('/me', function(me){
-              if (me && me.name) {
-                //document.getElementById('auth-displayname').innerHTML = me.name;
-                app.user.name = encodeURI(me.name);
-                app.user.fbProfileUrl = "https://graph.facebook.com/" + me.id;
-                app.user.fbProfilePicUrl = "https://graph.facebook.com/" + me.id + "/picture?type=large";
-                Callcast.SetNickname(app.user.name); // TODO should be somewhere else
-                Callcast.setPresenceBlob(new Object({url:app.user.fbProfileUrl,
-		                                             image:app.user.fbProfilePicUrl
-		                                             } ) );
-
-              }
-            })
+          else
+          {
+             console.log("getLoginStatus response ", response);
+             fbMe(response);
           }
-          globalAuthResponse = response.authResponse;
-          $(document).trigger("checkCredentials")
-        });
+
+      });
     }
 
 } // fbInit
@@ -96,48 +120,76 @@ function fbShare(
   if (event) {
     event.preventDefault();
   }
-  
-  var params = {};
-  params['message'] = 'Join us now on the carousel.';
-  params['name'] = 'Carousel room ' + $.getUrlVar('roomname');
-  params['description'] = 'We are here now';
-  params['link'] = window.location.href;
-  params['picture'] = 'http://carousel.gocast.it/images/gologo.png';
-  //params['caption'] = 'GoCast Carousel';
-  
-  FB.api('/me/feed', 'post', params, function(response) 
+
+  // check to see if we're logged in  
+  FB.api('/me', function(me)
   {
-    if (!response || response.error) {
-       alert('We couldn\'t post the meeting to your facebook feed.\n\nPlease give the GoCast Carousel app permission in facebook.');
-       console.log("sendFacebook error", response);
-    } else {
-       alert('We posted a link to this room on your wall');
-       console.log('Post ID: ' + response.id, response);
+    if (!me)
+    {
+       alert("Please login to facebook to post to your wall.");
+    }
+    else
+    {
+      var params = {};
+      params['method'] = 'feed';
+      params['link'] = window.location.href;
+      params['picture'] = 'http://carousel.gocast.it/images/gologo.png';
+      params['name'] = 'Carousel room ' + $.getUrlVar('roomname');
+      params['caption'] = 'Join us now on the carousel.';
+      params['description'] = 'We are here now';
+      params['message'] = 'Join us now on the carousel.';
+  
+      FB.ui(params, function(response) 
+      {
+        if (!response) // cancel in the dialag calls back with no response
+                       // so do nothing if there is no response
+        {
+           console.log("fbShare no response");
+        }
+        else if (response.error)
+        {
+           //alert('We couldn\'t send the message.\n\nPlease give the GoCast Carousel app permission in facebook.');
+           console.log("fbShare error", response);
+        } else {
+           // success do nothing since the ui is the send dialog
+        }
+      });
     }
   });
-} /* sendFacebook() */
+} /* fbShare() */
 
 function fbSendDialog()
 {
-  FB.ui({
-       method: 'send',
-       name:   'Carousel room ' + $.getUrlVar('roomname'),
-       description: 'We are here now',
-       link: window.location.href,
-       picture: 'http://carousel.gocast.it/images/gologo.png'
-       }, function(response) 
+  // check to see if we're logged in  
+  FB.api('/me', function(me)
   {
-    if (!response) // cancel in the dialag calls back with no response
-                   // so do nothing if there is no response
+    if (!me)
     {
-       console.log("fbSendDialog no response");
+       alert("Please login to facebook to send messages.");
     }
-    else if (response.error)
+    else
     {
-       //alert('We couldn\'t send the message.\n\nPlease give the GoCast Carousel app permission in facebook.');
-       console.log("fbSendDialog error", response);
-    } else {
-       // success do nothing since the ui is the send dialog
+       FB.ui({
+            method: 'send',
+            name:   'Carousel room ' + $.getUrlVar('roomname'),
+            description: 'We are here now',
+            link: window.location.href,
+            picture: 'http://carousel.gocast.it/images/gologo.png'
+            }, function(response) 
+       {
+         if (!response) // cancel in the dialag calls back with no response
+                        // so do nothing if there is no response
+         {
+            console.log("fbSendDialog no response");
+         }
+         else if (response.error)
+         {
+            //alert('We couldn\'t send the message.\n\nPlease give the GoCast Carousel app permission in facebook.');
+            console.log("fbSendDialog error", response);
+         } else {
+            // success do nothing since the ui is the send dialog
+         }
+       });
     }
   });
 }
