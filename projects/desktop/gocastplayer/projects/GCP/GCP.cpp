@@ -10,6 +10,10 @@
 #include "GCPAPI.h"
 #include "GCP.h"
 #include "GCPWebrtcCenter.h"
+#include <iostream>
+
+#define FBLOG_INFO_CUSTOM(func, msg) std::cout << func << " [INFO]: " << msg << std::endl;
+#define FBLOG_ERROR_CUSTOM(func, msg) std::cout << func << " [ERROR]: " << msg << std::endl;
 
 ///////////////////////////////////////////////////////////////////////////////
 /// @fn GCP::StaticInitialize()
@@ -23,10 +27,14 @@ void GCP::StaticInitialize()
     // Place one-time initialization stuff here; As of FireBreath 1.4 this should only
     // be called once per process
     
+    FBLOG_INFO_CUSTOM("GCP::StaticInitalize()", "Initing RtcCenter singleton...");
+    
     if(NULL == GoCast::RtcCenter::Instance())
     {
-        //std::cout << "RtcCenter init failed..." << std::endl;
+        FBLOG_ERROR_CUSTOM("GCP::StaticInitialize()", "Failed to init RtcCenter singleton");
     }
+
+    FBLOG_INFO_CUSTOM("GCP::StaticInitalize()", "Initing RtcCenter singleton DONE");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -41,11 +49,15 @@ void GCP::StaticDeinitialize()
     // Place one-time deinitialization stuff here. As of FireBreath 1.4 this should
     // always be called just before the plugin library is unloaded
     
+    FBLOG_INFO_CUSTOM("GCP::StaticDeinitalize()", "Destroying RtcCenter singleton...");
+
     if(NULL != GoCast::RtcCenter::Instance(true))
     {
-        //std::cout << "RtcCenter destroy failed..." << std::endl;
+        FBLOG_ERROR_CUSTOM("GCP::StaticDeinitialize()", "Failed to destroy RtcCenter singleton");
     }
- }
+ 
+    FBLOG_INFO_CUSTOM("GCP::StaticDeinitalize()", "Destroying RtcCenter singleton DONE");
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 /// @brief  GCP constructor.  Note that your API is not available
@@ -125,15 +137,19 @@ bool GCP::onWindowAttached(FB::AttachedEvent *evt, FB::PluginWindow *pWin)
 {
     // The window is attached; act appropriately
     if(NULL != pWin)
-    {
+    {        
         if(NULL == m_pRenderer.get())
         {
+            FBLOG_INFO_CUSTOM("GCP::onWindowAttached()", "Creating video renderer...");
+            
             m_pRenderer = webrtc::CreateVideoRenderer(
                 new GoCast::GCPVideoRenderer(
                     pWin,
                     GOCAST_DEFAULT_RENDER_WIDTH,
                     GOCAST_DEFAULT_RENDER_HEIGHT)
             );
+            
+            FBLOG_INFO_CUSTOM("GCP::onWindowAttached()", "Creating video renderer DONE");
         }
     }
     

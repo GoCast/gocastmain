@@ -9,6 +9,10 @@
 #include "GCPMediaStream.h"
 #include "DOM/Window.h"
 #include "variant_list.h"
+#include <iostream>
+
+#define FBLOG_INFO_CUSTOM(func, msg) std::cout << func << " [INFO]: " << msg << std::endl;
+#define FBLOG_ERROR_CUSTOM(func, msg) std::cout << func << " [ERROR]: " << msg << std::endl;
 
 namespace GoCast
 {
@@ -68,6 +72,21 @@ namespace GoCast
             //Try to open the device
             pDev = webrtc::VideoCaptureFactory::Create(0, deviceUniqueId);
             delete pDevInfo;            
+        }
+        
+        std::string msg("Found capture device [");
+        msg += deviceName;
+        msg += "]";
+        
+        if(NULL == pDev)
+        {
+            msg += " (failed to open)";
+            FBLOG_ERROR_CUSTOM("LocalVideoTrack::GetDefaultCaptureDevice()", msg);
+        }
+        else
+        {
+            msg += "...";
+            FBLOG_INFO_CUSTOM("LocalVideoTrack::GetDefaultCaptureDevice()", msg);
         }
         
         //If no device found or unable to open default device pDev.get() will be NULL

@@ -95,10 +95,13 @@ public:
     void RemoveStream(const FB::JSAPIPtr& stream);
     FB::variant CreateOffer(const FB::JSObjectPtr& mediaHints);
     FB::variant CreateAnswer(const FB::variant& offer, const FB::JSObjectPtr& mediaHints);
-    FB::variant SetLocalDescription(const FB::variant& action, const FB::variant& sdp);
-    FB::variant SetRemoteDescription(const FB::variant& action, const FB::variant& sdp);
-    FB::variant ProcessIceMessage(const FB::variant& sdp);
-    FB::variant StartIce();
+    void SetLocalDescription(const FB::variant& action,
+                             const FB::variant& sdp,
+                             const FB::JSObjectPtr& succCb,
+                             const FB::JSObjectPtr& failCb);
+    void SetRemoteDescription(const FB::variant& action, const FB::variant& sdp);
+    void ProcessIceMessage(const FB::variant& sdp);
+    void StartIce();
     
 private:
     // --------------------- PeerConnectionObserver Methods -----------------

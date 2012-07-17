@@ -26,7 +26,7 @@ GoCastJS.PeerConnectionOptions = function(iceConfig,
 										  height, 
 										  videoId, 
 										  containerId) {
-	this.iceConfig = stunConfig;
+	this.iceConfig = iceConfig;
 	this.onIceMessage = onIceMessage;
 	this.onAddStream = onAddStream;
 	this.onRemoveStream = onRemoveStream;
@@ -80,7 +80,7 @@ GoCastJS.getUserMedia = function(options, success, failure, bUseGoCastAPI) {
 			player.getUserMedia(
 				options.mediaHints,
 				function(stream) {
-					player.renderStream(stream);
+					//player.renderStream(stream);
 					
 					if("undefined" !== typeof(success)) {
 						success(stream);
@@ -137,6 +137,7 @@ GoCastJS.PeerConnection = function(options, bUseGoCastAPI) {
 		}
 	} else {
 		if(true === GoCastJS.CheckGoCastPlayer()) {
+			var container = document.getElementById(options.containerId);
 			this.peerConn = document.createElement("object");
 			this.peerConn.id = options.videoId;
 			this.peerConn.type = "application/x-gocastplayer";
@@ -182,7 +183,12 @@ GoCastJS.PeerConnection.prototype.RemoveStream = function(stream) {
 
 GoCastJS.PeerConnection.prototype.CreateOffer = function(mediaHints) {
 	if("undefined" !== typeof(this.peerConn)) {
-		return this.peerConn.createOffer(mediaHints);
+		if(null !== this.peerConn.toString().match(/PeerConnection00/g)) {
+			var offer = this.peerConn.createOffer(mediaHints);
+			return offer.toSdp();
+		} else {
+			return this.peerConn.createOffer(mediaHints);
+		}
 	};
 	
 	return null;
@@ -190,29 +196,30 @@ GoCastJS.PeerConnection.prototype.CreateOffer = function(mediaHints) {
 
 GoCastJS.PeerConnection.prototype.CreateAnswer = function(offer, mediaHints) {
 	if("undefined" !== typeof(this.peerConn)) {
-		if("string" === typeof(offer)) {
-			return this.peerConn.createAnswer(offer, mediaHints);
+		if(null !== this.peerConn.toString().match(/PeerConnection00/g)) {
+			var answer = this.peerConn.createAnswer(offer, mediaHints);
+			return answer.toSdp();
 		} else {
-			if("undefined" !== typeof(offer.toSdp)) {
-				var answer = this.peerConn.createAnswer(offer.toSdp(), mediaHints);
-				return answer.toSdp();
-			}
+			return this.peerConn.createAnswer(offer, mediaHints);
 		}
 	}
 	
 	return null;
 };
 
-GoCastJS.PeerConnection.prototype.SetLocalDescription = function(action, sdp) {
+GoCastJS.PeerConnection.prototype.SetLocalDescription = function(action,
+																 sdp,
+																 succCb,
+																 failCb) {
 	if("undefined" !== typeof(this.peerConn)) {
 		if(null !== this.peerConn.toString().match(/PeerConnection00/g)) {
 			var actionId = ("OFFER" === action)? 
 						   this.peerConn.SDP_OFFER:
 						   this.peerConn.SDP_ANSWER;
 			this.peerConn.setLocalDescription(actionId, new SessionDescription(sdp));
+		} else {
+			this.peerConn.setLocalDescription(action, sdp, succCb, failCb);
 		}
-	} else {
-		this.peerConn.setLocalDescription(action, sdp);
 	}
 };
 
@@ -223,9 +230,9 @@ GoCastJS.PeerConnection.prototype.SetRemoteDescription = function(action, sdp) {
 						   this.peerConn.SDP_OFFER:
 						   this.peerConn.SDP_ANSWER;
 			this.peerConn.setRemoteDescription(actionId, new SessionDescription(sdp));
+		} else {
+			this.peerConn.setRemoteDescription(action, sdp);
 		}
-	} else {
-		this.peerConn.setRemoteDescription(action, sdp);
 	}
 };
 

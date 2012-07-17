@@ -5,10 +5,17 @@ namespace GoCast
 {
     bool GCPVideoRenderer::RenderFrame(const cricket::VideoFrame* pFrame)
     {
-        static const int stride = m_width*4;
-        static const int frameBufferSize = m_height*stride;
         boost::mutex::scoped_lock winLock(m_winMutex);
         
+        if(NULL == m_pFrameBuffer.get())
+        {
+            m_width = pFrame->GetWidth();
+            m_height = pFrame->GetHeight();
+            m_pFrameBuffer.reset(new uint8[m_width*m_height*4]);
+        }
+        
+        const int stride = m_width*4;
+        const int frameBufferSize = m_height*stride;
         pFrame->ConvertToRgbBuffer(cricket::FOURCC_ARGB,
                                    m_pFrameBuffer.get(),
                                    frameBufferSize,
@@ -37,16 +44,16 @@ namespace GoCast
     
     bool GCPVideoRenderer::OnWindowRefresh(FB::RefreshEvent* pEvt)
     {
-        static const int stride = m_width*4;    
-        static const int frameBufferSize = m_height*stride;
         FB::CoreGraphicsDraw* pCgDrawEvt(static_cast<FB::CoreGraphicsDraw*>(pEvt));
         CGContextRef pContext = pCgDrawEvt->context;
         boost::mutex::scoped_lock winLock(m_winMutex);
-        
+
+        const int stride = m_width*4;    
+        const int frameBufferSize = m_height*stride;
         static int frameNumber = 0;
-        std::cout << "RenderFrame: " << frameNumber++ << std::endl;
+        std::cout << "RenderFrame[1]: " << frameNumber++ << std::endl;
         
-        if(NULL == pContext)
+        if(NULL == pContext || NULL == m_pFrameBuffer.get())
         {
             return false;
         }

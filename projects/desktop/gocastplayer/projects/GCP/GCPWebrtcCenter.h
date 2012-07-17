@@ -65,30 +65,44 @@ namespace GoCast
         //Thread-safe methods
         void GetUserMedia(FB::JSObjectPtr mediaHints,
                           FB::JSObjectPtr succCb,
-                          FB::JSObjectPtr failCb);
+                          FB::JSObjectPtr failCb,
+                          bool bSyncCall = true);
         void RenderStream(FB::JSAPIPtr pStream,
                           webrtc::PeerConnectionObserver* pObserver,
                           const talk_base::scoped_refptr<webrtc::VideoRendererWrapperInterface>& pRenderer);
-        bool NewPeerConnection(const std::string& iceConfig, webrtc::PeerConnectionObserver* pObserver);
+        bool NewPeerConnection(const std::string& iceConfig,
+                               webrtc::PeerConnectionObserver* pObserver,
+                               bool bSyncCall = true);
         void AddStream(webrtc::PeerConnectionObserver* pObserver,
-                       const talk_base::scoped_refptr<webrtc::LocalMediaStreamInterface>& pStream);
+                       const talk_base::scoped_refptr<webrtc::LocalMediaStreamInterface>& pStream,
+                       bool bSyncCall = true);
         void RemoveStream(webrtc::PeerConnectionObserver* pObserver,
-                          const talk_base::scoped_refptr<webrtc::LocalMediaStreamInterface>& pStream);
+                          const talk_base::scoped_refptr<webrtc::LocalMediaStreamInterface>& pStream,
+                          bool bSyncCall = true);
         std::string CreateOffer(webrtc::PeerConnectionObserver* pObserver,
-                                const webrtc::MediaHints& mediaHints);
+                                const webrtc::MediaHints& mediaHints,
+                                bool bSyncCall = true);
         std::string CreateAnswer(webrtc::PeerConnectionObserver* pObserver,
                                  const webrtc::MediaHints& mediaHints,
-                                 const std::string& offerSdp);
-        bool SetLocalDescription(webrtc::PeerConnectionObserver* pObserver,
+                                 const std::string& offerSdp,
+                                 bool bSyncCall = true);
+        void SetLocalDescription(webrtc::PeerConnectionObserver* pObserver,
                                  const webrtc::JsepInterface::Action& action,
-                                 const std::string& sdp);
-        bool SetRemoteDescription(webrtc::PeerConnectionObserver* pObserver,
+                                 const std::string& sdp,
+                                 const FB::JSObjectPtr& succCb,
+                                 const FB::JSObjectPtr& failCb,
+                                 bool bSyncCall = true);
+        void SetRemoteDescription(webrtc::PeerConnectionObserver* pObserver,
                                   const webrtc::JsepInterface::Action& action,
-                                  const std::string& sdp);
-        bool ProcessIceMessage(webrtc::PeerConnectionObserver* pObserver,
-                               const std::string& candidateSdp);
-        bool StartIce(webrtc::PeerConnectionObserver* pObserver);
-        void DeletePeerConnection(webrtc::PeerConnectionObserver* pObserver);
+                                  const std::string& sdp,
+                                  bool bSyncCall = true);
+        void ProcessIceMessage(webrtc::PeerConnectionObserver* pObserver,
+                               const std::string& candidateSdp,
+                               bool bSyncCall = true);
+        void StartIce(webrtc::PeerConnectionObserver* pObserver,
+                      bool bSyncCall = true);
+        void DeletePeerConnection(webrtc::PeerConnectionObserver* pObserver,
+                                  bool bSyncCall = true);
         
     private:
         RtcCenter();
@@ -114,15 +128,17 @@ namespace GoCast
         std::string CreateAnswer_w(webrtc::PeerConnectionObserver* pObserver,
                                    const webrtc::MediaHints& mediaHints,
                                    const std::string& offerSdp);
-        bool SetLocalDescription_w(webrtc::PeerConnectionObserver* pObserver,
+        void SetLocalDescription_w(webrtc::PeerConnectionObserver* pObserver,
                                    const webrtc::JsepInterface::Action& action,
-                                   const std::string& sdp);
-        bool SetRemoteDescription_w(webrtc::PeerConnectionObserver* pObserver,
+                                   const std::string& sdp,
+                                   const FB::JSObjectPtr& succCb,
+                                   const FB::JSObjectPtr& failCb);
+        void SetRemoteDescription_w(webrtc::PeerConnectionObserver* pObserver,
                                     const webrtc::JsepInterface::Action& action,
                                     const std::string& sdp);
-        bool ProcessIceMessage_w(webrtc::PeerConnectionObserver* pObserver,
+        void ProcessIceMessage_w(webrtc::PeerConnectionObserver* pObserver,
                                  const std::string& candidateSdp);
-        bool StartIce_w(webrtc::PeerConnectionObserver* pObserver);
+        void StartIce_w(webrtc::PeerConnectionObserver* pObserver);
         void DeletePeerConnection_w(webrtc::PeerConnectionObserver* pObserver);
         
     private:
