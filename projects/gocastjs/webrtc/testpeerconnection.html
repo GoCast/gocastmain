@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>PeerConnection API Test (JSEP)</title>
+		<script type="text/javascript" src="getusermedia.js"></script>
+		<script type="text/javascript">
+			var localStream = null;
+			var remoteStream = null;
+			var peerConn = null;
+			
+			function ongetusermediasuccess(bUseGoCastAPI) {
+				peerConn = new GoCastJS.PeerConnection(
+					new GoCastJS.PeerConnectionOptions(
+						"STUN stun.l.google.com:19302",
+						function(candidate, moreComing) {
+							if("string" === typeof(candidate) && null !== candidate) {
+								console.log("onicemessage: ", candidate);
+								peerConn.ProcessIceMessage(candidate);
+							}
+						},
+						function(stream) {
+							if("undefined" !== typeof(stream) && null !== stream) {
+								console.log("onaddstream: added remote stream [" +
+											stream.label + "]");
+								remoteStream = stream;
+							}
+						},
+						function(stream) {
+							if("undefined" !== typeof(stream) && null !== stream) {
+								console.log("onremovestream: removed remote stream [" +
+											stream.label + "]");
+								remoteStream = null;
+							}
+						},
+						352,
+						288,
+						"remoteVideo",
+						"videoContainer"
+					),
+					bUseGoCastAPI
+				);
+				
+				peerConn.AddStream(localStream);
+				var offer = peerConn.CreateOffer({audio:true, video:true});
+				var answer = peerConn.CreateAnswer(offer, {audio:true, video:true});
+								
+				console.log("ongetusermediasuccess: offer = ", offer);
+				peerConn.SetLocalDescription("OFFER", offer, function() {
+					console.log("ongetusermediasuccess: answer = ", answer);
+					peerConn.SetRemoteDescription("ANSWER", answer);
+					peerConn.StartIce();		
+				}, function(message) {
+					console.log("onsetlocalsdpfail: ", message);
+				});
+			}
+			
+			function start(bUseGoCastAPI) {
+				GoCastJS.getUserMedia(
+					new GoCastJS.UserMediaOptions(
+						{audio: true, video:true},
+						352,
+						288,
+						"localVideo",
+						"videoContainer"
+					),
+					function(stream) {
+						console.log("getUserMediaSuccess: ", stream);
+						localStream = stream;
+						ongetusermediasuccess(bUseGoCastAPI);
+					},
+					function(message) {
+						console.log("getUserMediaFailure: ", message);
+					},
+					bUseGoCastAPI
+				);
+			}
+		</script>
+	</head>
+	<body>
+		<button id="startButton" onclick="javascript:start(true)">Start</button>
+		<button id="startCanaryButton" onclick="javascript:start(false)">
+			Start Canary
+		</button>
+		<div id="videoContainer"></div>
+	</body>
+</html>

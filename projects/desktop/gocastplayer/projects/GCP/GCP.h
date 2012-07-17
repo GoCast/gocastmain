@@ -15,28 +15,16 @@
 
 #include "PluginCore.h"
 
+#include <map>
 #include <deque>
 #include <boost/thread.hpp>
-#include "talk/app/webrtc/peerconnectionfactory.h"
-#include "talk/session/phone/mediaengine.h"
-#include "talk/base/scoped_ptr.h"
-#include "talk/base/thread.h"
+
+#include "talk/app/webrtc/mediastreaminterface.h"
+#include "talk/base/scoped_ref_ptr.h"
 #include "GCPVideoRenderer.h"
 
-#define WEBRTC_RESOURCES_INIT 0
-#define WEBRTC_RESOURCES_DEINIT 1
-#define WEBRTC_RES_WORKER_QUIT 2
-#define START_LOCAL_VIDEO 3
-#define STOP_LOCAL_VIDEO 4
-#define MUTE_LOCAL_VOICE 5
-#define UNMUTE_LOCAL_VOICE 6
-
-#define GOCAST_AUDIO_OPTS (cricket::MediaEngineInterface::ECHO_CANCELLATION |\
-                           cricket::MediaEngineInterface::NOISE_SUPPRESSION |\
-                           cricket::MediaEngineInterface::AUTO_GAIN_CONTROL)
-
-#define GOCAST_DEFAULT_RENDER_WIDTH  160
-#define GOCAST_DEFAULT_RENDER_HEIGHT 120
+#define GOCAST_DEFAULT_RENDER_WIDTH  352
+#define GOCAST_DEFAULT_RENDER_HEIGHT 288
 
 FB_FORWARD_PTR(GCP)
 class GCP : public FB::PluginCore
@@ -44,19 +32,12 @@ class GCP : public FB::PluginCore
 public:
     static void StaticInitialize();
     static void StaticDeinitialize();
-
-public:
-    static bool WebrtcResThreadWorker();
-    static bool WebrtcResourcesInit();
-    static bool WebrtcResourcesDeinit();
-    static bool StartLocalVideo();
-    static bool StopLocalVideo();
     
 public:
     GCP();
-    virtual ~GCP();
-    GoCast::GCPVideoRenderer* Renderer() { return m_pRenderer; }
-
+    virtual ~GCP();    
+    talk_base::scoped_refptr<webrtc::VideoRendererWrapperInterface> Renderer() { return m_pRenderer; }
+    
 public:
     void onPluginReady();
     void shutdown();
@@ -84,32 +65,14 @@ public:
     virtual bool onMouseUp(FB::MouseUpEvent *evt, FB::PluginWindow *);
     virtual bool onMouseMove(FB::MouseMoveEvent *evt, FB::PluginWindow *);
     virtual bool onWindowAttached(FB::AttachedEvent *evt, FB::PluginWindow *);
-    virtual bool onWindowDetached(FB::DetachedEvent *evt, FB::PluginWindow *);
+    virtual bool onWindowDetached(FB::DetachedEvent *evt, FB::PluginWindow *);    
     virtual bool onWindowRefresh(FB::RefreshEvent *evt, FB::PluginWindow *);
     /** END EVENTDEF -- DON'T CHANGE THIS LINE **/
     
-public:
-    static bool bLocalVideoRunning;
-    static int pluginInsts;
-    static boost::thread webrtcResThread;
-    static boost::mutex deqMutex;
-    static std::deque<int> wrtInstructions;
-    static GoCast::GCPVideoRenderer* pLocalRenderer;
-    static cricket::MediaEngineInterface* pWebrtcMediaEngine;
-    static cricket::DeviceManagerInterface* pWebrtcDeviceManager;
-    static talk_base::scoped_ptr<talk_base::Thread> pJingleWorkerThread;
-    static talk_base::scoped_ptr<webrtc::PeerConnectionFactory> pWebrtcPeerConnFactory;
-    
-public:
-    static std::string stunIP;
-    static int stunPort;
-    static FB::JSObjectPtr successCallback;
-    static FB::JSObjectPtr failureCallback;
-    
 private:
-    GoCast::GCPVideoRenderer* m_pRenderer;
-};
+    talk_base::scoped_refptr<webrtc::VideoRendererWrapperInterface> m_pRenderer;
 
+};
 
 #endif
 

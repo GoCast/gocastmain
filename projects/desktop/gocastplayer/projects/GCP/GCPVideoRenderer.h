@@ -27,8 +27,8 @@ namespace GoCast
         talk_base::scoped_array<uint8> m_pFrameBuffer;
         FB::PluginWindow* m_pWin;
         boost::mutex m_winMutex;
-        const int m_width;
-        const int m_height;
+        int m_width;
+        int m_height;
     };
 }
 
