@@ -19,6 +19,12 @@
 #include "talk/base/scoped_ptr.h"
 #include "talk/base/thread.h"
 #include "JSAPIAuto.h"
+#include <iostream>
+
+#define FBLOG_INFO_CUSTOM(func, msg) std::cout << func << " [INFO]: " << msg << std::endl;
+#define FBLOG_ERROR_CUSTOM(func, msg) std::cout << func << " [ERROR]: " << msg << std::endl;
+
+std::string funcstr(const std::string& func, const std::string& pluginId);
 
 namespace GoCast
 {
@@ -102,6 +108,9 @@ namespace GoCast
                       bool bSyncCall = true);
         void DeletePeerConnection(const std::string& pluginId,
                                   bool bSyncCall = true);
+        
+    public:
+        std::string ReadyState(const std::string& pluginId);
         
     private:
         RtcCenter();

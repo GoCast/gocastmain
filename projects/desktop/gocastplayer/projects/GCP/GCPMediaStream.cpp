@@ -32,18 +32,23 @@ namespace GoCast
         registerProperty("label", make_property(this, &MediaStreamTrack::get_label));
     }
     
-    FB::JSAPIPtr LocalMediaStreamTrack::Create(const std::string& kind,
+    FB::JSAPIPtr LocalMediaStreamTrack::Create(talk_base::scoped_refptr<webrtc::MediaStreamTrackInterface>& pTrack,
+                                               const std::string& kind,
                                                const std::string label,
                                                const bool enabled)
     {
-        return boost::make_shared<LocalMediaStreamTrack>(kind, label, enabled);
+        return boost::make_shared<LocalMediaStreamTrack>(pTrack.get(), kind, label, enabled);
     }
     
-    LocalMediaStreamTrack::LocalMediaStreamTrack(const std::string& kind,
-                                                 const std::string& label,
-                                                 const bool enabled)
+    LocalMediaStreamTrack::LocalMediaStreamTrack(
+        const talk_base::scoped_refptr<webrtc::MediaStreamTrackInterface>& pTrack,
+        const std::string& kind,
+        const std::string& label,
+        const bool enabled
+    )
     : MediaStreamTrack(kind, label)
     , m_enabled(enabled)
+    , m_pTrack(pTrack)
     {
         registerProperty("enabled", make_property(this, &LocalMediaStreamTrack::get_enabled,
                                                         &LocalMediaStreamTrack::set_enabled));
@@ -94,7 +99,7 @@ namespace GoCast
     }
     
     LocalVideoTrack::LocalVideoTrack(const talk_base::scoped_refptr<webrtc::LocalVideoTrackInterface>& pTrack)
-    : LocalMediaStreamTrack(pTrack->kind(), pTrack->label(), pTrack->enabled())
+    : LocalMediaStreamTrack(pTrack.get(), pTrack->kind(), pTrack->label(), pTrack->enabled())
     , m_pTrack(pTrack)
     {
         
@@ -106,7 +111,7 @@ namespace GoCast
     }
     
     LocalAudioTrack::LocalAudioTrack(const talk_base::scoped_refptr<webrtc::LocalAudioTrackInterface>& pTrack)
-    : LocalMediaStreamTrack(pTrack->kind(), pTrack->label(), pTrack->enabled())
+    : LocalMediaStreamTrack(pTrack.get(), pTrack->kind(), pTrack->label(), pTrack->enabled())
     , m_pTrack(pTrack)
     {
         

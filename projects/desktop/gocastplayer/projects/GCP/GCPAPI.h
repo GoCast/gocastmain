@@ -111,7 +111,7 @@ private:
     virtual void OnError() {};
     virtual void OnMessage(const std::string& msg) {};
     virtual void OnSignalingMessage(const std::string& msg) {};    
-    virtual void OnStateChange(StateType state_changed) {};
+    virtual void OnStateChange(StateType state_changed);
     virtual void OnAddStream(webrtc::MediaStreamInterface* pRemoteStream);
     virtual void OnRemoveStream(webrtc::MediaStreamInterface* pRemoteStream);
     virtual void OnIceCandidate(const webrtc::IceCandidateInterface* pCandidate);

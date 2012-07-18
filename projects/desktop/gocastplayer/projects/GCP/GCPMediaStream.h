@@ -10,6 +10,7 @@
 #define FireBreath_GCPMediaStreamCenter_h
 
 #include <map>
+#include <iostream>
 
 #include "modules/video_capture/main/interface/video_capture_factory.h"
 #include "talk/app/webrtc/mediastreaminterface.h"
@@ -39,22 +40,30 @@ namespace GoCast
     class LocalMediaStreamTrack : public MediaStreamTrack
     {
     public:
-        static FB::JSAPIPtr Create(const std::string& kind,
+        static FB::JSAPIPtr Create(talk_base::scoped_refptr<webrtc::MediaStreamTrackInterface>& pTrack,
+                                   const std::string& kind,
                                    const std::string label,
                                    const bool enabled);
-        explicit LocalMediaStreamTrack(const std::string& kind,
+        explicit LocalMediaStreamTrack(const talk_base::scoped_refptr<webrtc::MediaStreamTrackInterface>& pTrack,
+                                       const std::string& kind,
                                        const std::string& label,
                                        const bool enabled);
         virtual ~LocalMediaStreamTrack() { };
         
         //Javascript property get methods
-        FB::variant get_enabled() const { return m_enabled; }
+        FB::variant get_enabled() {
+            return m_enabled;
+        }
         
         //Javascript property set methods
-        void set_enabled(FB::variant newVal) { m_enabled = newVal; }
+        void set_enabled(FB::variant newVal) {
+            m_enabled = newVal;
+            m_pTrack->set_enabled(m_enabled.convert_cast<bool>());
+        }
         
     protected:
         FB::variant m_enabled;
+        talk_base::scoped_refptr<webrtc::MediaStreamTrackInterface> m_pTrack;
     };
     
     class LocalVideoTrack : public LocalMediaStreamTrack
@@ -64,7 +73,7 @@ namespace GoCast
         static talk_base::scoped_refptr<webrtc::VideoCaptureModule> GetDefaultCaptureDevice();
         explicit LocalVideoTrack(const talk_base::scoped_refptr<webrtc::LocalVideoTrackInterface>& pTrack);
         ~LocalVideoTrack() { }
-        
+    
     private:
         talk_base::scoped_refptr<webrtc::LocalVideoTrackInterface> m_pTrack;
     };

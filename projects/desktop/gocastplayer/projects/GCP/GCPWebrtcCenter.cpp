@@ -9,10 +9,15 @@
 #include "GCPWebrtcCenter.h"
 #include "GCPMediaStream.h"
 #include "variant_list.h"
-#include <iostream>
 
-#define FBLOG_INFO_CUSTOM(func, msg) std::cout << func << " [INFO]: " << msg << std::endl;
-#define FBLOG_ERROR_CUSTOM(func, msg) std::cout << func << " [ERROR]: " << msg << std::endl;
+std::string funcstr(const std::string& func, const std::string& pluginId)
+{
+    std::string funcString = func + "(";
+    funcString += pluginId;
+    funcString += ")";
+    
+    return funcString;
+}
 
 namespace GoCast
 {    
@@ -49,6 +54,19 @@ namespace GoCast
             case MSG_START_ICE: return "MSG_START_ICE";
             case MSG_DELETE_PEERCONNECTION: return "MSG_DELETE_PEERCONNECTION";
             default: return "MSG_UNKNOWN_MSG";
+        }
+    }
+    
+    std::string GetReadyStateString(webrtc::PeerConnectionInterface::ReadyState state)
+    {
+        switch(state)
+        {
+            case webrtc::PeerConnectionInterface::kNew: return "NEW";
+            case webrtc::PeerConnectionInterface::kNegotiating: return "NEGOTIATING";
+            case webrtc::PeerConnectionInterface::kActive: return "ACTIVE";
+            case webrtc::PeerConnectionInterface::kClosing: return "CLOSING";
+            case webrtc::PeerConnectionInterface::kClosed: return "CLOSED";
+            default: return "UNKNOWN";
         }
     }
     
@@ -527,6 +545,14 @@ namespace GoCast
         }
     }
     
+    std::string RtcCenter::ReadyState(const std::string& pluginId)
+    {
+        std::string readyState = GetReadyStateString(m_pPeerConns[pluginId]->ready_state());
+        
+        FBLOG_INFO_CUSTOM(funcstr("RtcCenter::ReadyState", pluginId), readyState);
+        return readyState;
+    }
+    
     RtcCenter::RtcCenter()
     : m_msgq(this)
     , m_pConnFactory(webrtc::CreatePeerConnectionFactory())
@@ -730,30 +756,34 @@ namespace GoCast
     {
         if(NULL == m_pConnFactory.get())
         {
-            FBLOG_ERROR_CUSTOM("RtcCenter::NewPeerConnection_w()", "PeerConnection factory is NULL");
+            FBLOG_ERROR_CUSTOM(funcstr("RtcCenter::NewPeerConnection_w", pluginId),
+                               "PeerConnection factory is NULL");
             return false;
         }
         
         if(m_pPeerConns.end() != m_pPeerConns.find(pluginId))
         {
-            FBLOG_ERROR_CUSTOM("RtcCenter::NewPeerConnection_w()", "PeerConnection already created");            
+            FBLOG_ERROR_CUSTOM(funcstr("RtcCenter::NewPeerConnection_w", pluginId),
+                               "PeerConnection already created");            
             return false;
         }
         
         std::string msg("Creating new PeerConnection with ICEConfig [");
         msg += iceConfig;
         msg += "]...";
-        FBLOG_INFO_CUSTOM("RtcCenter::NewPeerConnection_w()", msg);
+        FBLOG_INFO_CUSTOM(funcstr("RtcCenter::NewPeerConnection_w", pluginId), msg);
         
         m_pPeerConns[pluginId] = m_pConnFactory->CreatePeerConnection(iceConfig, pObserver);
         if(NULL == m_pPeerConns[pluginId].get())
         {
-            FBLOG_ERROR_CUSTOM("", "Create PeerConnection FAILED");
+            FBLOG_ERROR_CUSTOM(funcstr("RtcCenter::NewPeerConnection_w", pluginId),
+                               "Create PeerConnection FAILED");
             m_pPeerConns.erase(pluginId);
             return false;
         }
         
-        FBLOG_INFO_CUSTOM("RtcCenter::NewPeerConnection_w()", "Creating new PeerConnection DONE");
+        FBLOG_INFO_CUSTOM(funcstr("RtcCenter::NewPeerConnection_w", pluginId),
+                          "Creating new PeerConnection DONE");
         return true;
     }
     
@@ -762,7 +792,8 @@ namespace GoCast
     {
         if(m_pPeerConns.end() == m_pPeerConns.find(pluginId))
         {
-            FBLOG_ERROR_CUSTOM("RtcCenter::AddStream_w()", "No PeerConnection found for this plugin instance");
+            FBLOG_ERROR_CUSTOM(funcstr("RtcCenter::AddStream_w", pluginId),
+                               "No PeerConnection found for this plugin instance");
         }
         else
         {
@@ -775,7 +806,8 @@ namespace GoCast
     {
         if(m_pPeerConns.end() == m_pPeerConns.find(pluginId))
         {
-            FBLOG_ERROR_CUSTOM("RtcCenter::RemoveStream_w()", "No PeerConnection found for this plugin instance");
+            FBLOG_ERROR_CUSTOM(funcstr("RtcCenter::RemoveStream_w", pluginId),
+                               "No PeerConnection found for this plugin instance");
         }
         else
         {
@@ -788,21 +820,22 @@ namespace GoCast
     {
         if(m_pPeerConns.end() == m_pPeerConns.find(pluginId))
         {
-            FBLOG_ERROR_CUSTOM("RtcCenter::CreateOffer_w()", "No PeerConnection found for this plugin instance");
+            FBLOG_ERROR_CUSTOM(funcstr("RtcCenter::CreateOffer_w", pluginId),
+                               "No PeerConnection found for this plugin instance");
             return "";
         }
         
         std::string offerSdp("");
         if(false == m_pPeerConns[pluginId]->CreateOffer(mediaHints)->ToString(&offerSdp))
         {
-            FBLOG_ERROR_CUSTOM("RtcCenter::CreateOffer_w()", "Failed to create offer");
+            FBLOG_ERROR_CUSTOM(funcstr("RtcCenter::CreateOffer_w", pluginId), "Failed to create offer");
             return "";
         }
         
         std::string msg("Offer = [");
         msg += offerSdp;
         msg += "]";
-        FBLOG_INFO_CUSTOM("RtcCenter::CreateOffer_w()", msg);
+        FBLOG_INFO_CUSTOM(funcstr("RtcCenter::CreateOffer_w", pluginId), msg);
         
         return offerSdp;
     }
@@ -813,7 +846,8 @@ namespace GoCast
     {
         if(m_pPeerConns.end() == m_pPeerConns.find(pluginId))
         {
-            FBLOG_ERROR_CUSTOM("RtcCenter::CreateAnswer_w()", "No PeerConnection found for this plugin instance");
+            FBLOG_ERROR_CUSTOM(funcstr("RtcCenter::CreateAnswer_w", pluginId),
+                               "No PeerConnection found for this plugin instance");
             return "";
         }
         
@@ -821,14 +855,14 @@ namespace GoCast
         webrtc::SessionDescriptionInterface* pOffer = webrtc::CreateSessionDescription(offerSdp);
         if(false == m_pPeerConns[pluginId]->CreateAnswer(mediaHints, pOffer)->ToString(&answerSdp))
         {
-            FBLOG_ERROR_CUSTOM("RtcCenter::CreateAnswer_w()", "Failed to create answer");
+            FBLOG_ERROR_CUSTOM(funcstr("RtcCenter::CreateAnswer_w", pluginId), "Failed to create answer");
             return "";
         }
         
         std::string msg("Answer = [");
         msg += answerSdp;
         msg += "]";
-        FBLOG_INFO_CUSTOM("RtcCenter::CreateAnswer_w()", msg);
+        FBLOG_INFO_CUSTOM(funcstr("RtcCenter::CreateAnswer_w", pluginId), msg);
 
         return offerSdp;
     }
@@ -841,7 +875,8 @@ namespace GoCast
     {
         if(m_pPeerConns.end() == m_pPeerConns.find(pluginId))
         {
-            FBLOG_ERROR_CUSTOM("RtcCenter::SetLocalDescription_w()", "No PeerConnection found for this plugin instance");
+            FBLOG_ERROR_CUSTOM(funcstr("RtcCenter::SetLocalDescription_w", pluginId),
+                               "No PeerConnection found for this plugin instance");
             failCb->InvokeAsync("", FB::variant_list_of("No peerconnection found for this plugin instance"));
             return;
         }
@@ -849,14 +884,16 @@ namespace GoCast
         webrtc::SessionDescriptionInterface* pSdp = webrtc::CreateSessionDescription(sdp);
         if(NULL == pSdp)
         {
-            FBLOG_ERROR_CUSTOM("RtcCenter::SetLocalDescription_w()", "Failed to create sdp object");
+            FBLOG_ERROR_CUSTOM(funcstr("RtcCenter::SetLocalDescription_w", pluginId),
+                               "Failed to create sdp object");
             failCb->InvokeAsync("", FB::variant_list_of("Failed to create sdp object"));
             return;
         }
         
         if(false == m_pPeerConns[pluginId]->SetLocalDescription(action, pSdp))
         {
-            FBLOG_ERROR_CUSTOM("RtcCenter::SetLocalDescription_w()", "Failed to set local description");
+            FBLOG_ERROR_CUSTOM(funcstr("RtcCenter::SetLocalDescription_w", pluginId),
+                               "Failed to set local description");
             failCb->InvokeAsync("", FB::variant_list_of("Failed to set local description"));
             return;
         }
@@ -870,20 +907,23 @@ namespace GoCast
     {
         if(m_pPeerConns.end() == m_pPeerConns.find(pluginId))
         {
-            FBLOG_ERROR_CUSTOM("RtcCenter::SetRemoteDescription_w()", "No PeerConnection found for this plugin instance");
+            FBLOG_ERROR_CUSTOM(funcstr("RtcCenter::SetRemoteDescription_w", pluginId),
+                               "No PeerConnection found for this plugin instance");
             return;
         }
         
         webrtc::SessionDescriptionInterface* pSdp = webrtc::CreateSessionDescription(sdp);
         if(NULL == pSdp)
         {
-            FBLOG_ERROR_CUSTOM("RtcCenter::SetRemoteDescription_w()", "Failed to create sdp object");
+            FBLOG_ERROR_CUSTOM(funcstr("RtcCenter::SetRemoteDescription_w", pluginId),
+                               "Failed to create sdp object");
             return;
         }
         
         if(false == m_pPeerConns[pluginId]->SetRemoteDescription(action, pSdp))
         {
-            FBLOG_ERROR_CUSTOM("RtcCenter::SetRemoteDescription_w()", "Failed to set remote description");
+            FBLOG_ERROR_CUSTOM(funcstr("RtcCenter::SetRemoteDescription_w", pluginId),
+                               "Failed to set remote description");
             return;                        
         }
     }
@@ -893,20 +933,23 @@ namespace GoCast
     {
         if(m_pPeerConns.end() == m_pPeerConns.find(pluginId))
         {
-            FBLOG_ERROR_CUSTOM("RtcCenter::ProcessIceMessage_w()", "No PeerConnection found for this plugin instance");
+            FBLOG_ERROR_CUSTOM(funcstr("RtcCenter::ProcessIceMessage_w", pluginId),
+                               "No PeerConnection found for this plugin instance");
             return;
         }
         
         webrtc::IceCandidateInterface* pCandidate = webrtc::CreateIceCandidate("0", candidateSdp);
         if(NULL == pCandidate)
         {
-            FBLOG_ERROR_CUSTOM("RtcCenter::ProcessIceMessage_w()", "Failed to create candidate object");
+            FBLOG_ERROR_CUSTOM(funcstr("RtcCenter::ProcessIceMessage_w", pluginId),
+                               "Failed to create candidate object");
             return;
         }
         
         if(false == m_pPeerConns[pluginId]->ProcessIceMessage(pCandidate))
         {
-            FBLOG_ERROR_CUSTOM("RtcCenter::ProcessIceMessage_w()", "Failed to process candidate");
+            FBLOG_ERROR_CUSTOM(funcstr("RtcCenter::ProcessIceMessage_w", pluginId),
+                               "Failed to process candidate");
             return;            
         }
     }
@@ -915,12 +958,13 @@ namespace GoCast
     {
         if(m_pPeerConns.end() == m_pPeerConns.find(pluginId))
         {
-            FBLOG_ERROR_CUSTOM("RtcCenter::StartIce_w()", "No PeerConnection found for this plugin instance");
+            FBLOG_ERROR_CUSTOM(funcstr("RtcCenter::StartIce_w", pluginId),
+                               "No PeerConnection found for this plugin instance");
         }
 
         if(false == m_pPeerConns[pluginId]->StartIce(webrtc::JsepInterface::kUseAll))
         {
-            FBLOG_ERROR_CUSTOM("RtcCenter::StartIce_w()", "Failed to start ICE process");
+            FBLOG_ERROR_CUSTOM(funcstr("RtcCenter::StartIce_w", pluginId), "Failed to start ICE process");
         }
     }
     
@@ -929,7 +973,8 @@ namespace GoCast
         FBLOG_INFO_CUSTOM(pluginId, ": (Plugin Id)");
         if(m_pPeerConns.end() == m_pPeerConns.find(pluginId))
         {
-            FBLOG_ERROR_CUSTOM("RtcCenter::DeletePeerConnection_w()", "No PeerConnection found for this plugin instance");
+            FBLOG_ERROR_CUSTOM(funcstr("RtcCenter::DeletePeerConnection_w", pluginId),
+                               "No PeerConnection found for this plugin instance");
             return;
         }
         
