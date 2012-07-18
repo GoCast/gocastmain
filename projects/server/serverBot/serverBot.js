@@ -494,6 +494,15 @@ mucRoom.prototype.handleIQ = function(iq) {
 			this.log("disco#info");
 			this.sendIQ(iq, function() { });	// Don't care about any callback.
 		}
+		else if (iq.attrs.type === 'set' && iq.getChildByAttr('xmlns', 'urn:xmpp:callcast'))
+		{
+			this.log("Received IQ 'set' -- ");
+			
+			if (iq.getChild('addspot'))
+				this.AddSpotReflection(iq);
+			else if (iq.getChild('removespot'))
+				this.RemoveSpotReflection(iq);
+		}
 		else
 			this.log("handleIQ was ignored: " + iq);
 	}
@@ -507,6 +516,58 @@ mucRoom.prototype.handleIQ = function(iq) {
 	}
 };
 
+mucRoom.prototype.SendGroupCmd = function(cmd, attribs_in) {
+		var attribs_out = attribs_in;
+
+		attribs_out.cmdtype = cmd;
+		attribs_out.xmlns = 'urn:xmpp:callcast';
+		
+		var msgToSend = new xmpp.Element('message', {to: this.roomname, type: 'groupchat', xmlns: 'urn:xmpp:callcast'})
+				.c('cmd', attribs_out);
+		
+		this.log("Outbound Group Command: ", msgToSend.toString());
+		
+		this.client.send(msgToSend);
+};
+
+mucRoom.prototype.AddSpotReflection = function(iq) {
+	// Need to pull out the 'info' object - which is the attributes to the 'addspot'
+	var info = {};
+	$(iq).find('addspot').each(function() {
+		$.each(this.attributes, function(i, attrib) {
+			info[attrib.name] = attrib.value;
+		});
+	});
+
+	this.SendGroupCmd('addspot', info);
+
+	// Now reply to the IQ message favorably.
+	iq.attrs.to = iq.attrs.from;
+	delete iq.attrs.from;
+	iq.attrs.type = 'result';
+	
+	this.client.send(iq);
+};
+
+mucRoom.prototype.RemoveSpotReflection = function(iq) {
+	// Need to pull out the 'info' object - which is the attributes to the 'removespot'
+	var info = {};
+	$(iq).find('removespot').each(function() {
+		$.each(this.attributes, function(i, attrib) {
+			info[attrib.name] = attrib.value;
+		});
+	});
+
+	this.SendGroupCmd('removespot', info);
+
+	// Now reply to the IQ message favorably.
+	iq.attrs.to = iq.attrs.from;
+	delete iq.attrs.from;
+	iq.attrs.type = 'result';
+	
+	this.client.send(iq);
+};
+
 //
 // In a MUC room, we want to only handle our own messages destined for us.
 // We also only want to handle 'chat' messages and not 'groupchat' inbound.
@@ -514,7 +575,7 @@ mucRoom.prototype.handleIQ = function(iq) {
 mucRoom.prototype.handleMessage = function(msg) {
 	var self = this;
 
-	if (msg.attrs.type != 'groupchat')
+	if (msg.attrs.type !== 'groupchat')
 	{
 		// Ignore topic changes.
 		if (msg.getChild('subject'))
@@ -1494,6 +1555,80 @@ overseer.prototype.generateRandomRoomName = function() {
 	return result;
 };
 
+overseer.prototype.CreateRoomRequest = function(iq) {
+	var roomname = iq.getChild('room').attr('name');
+
+	// If client wants a random room generated, they will send the attribute with a "" value.
+	if (roomname === "")
+	{
+		do
+		{
+			roomname = this.generateRandomRoomName();
+			this.log("Generated random room named: " + roomname);
+		}
+		while (this.mucRoomObjects[roomname]);
+	}
+
+	this.log("overseer.handleIq: Room Name of [" + roomname + "] requested by: " + iq.attrs.from);
+	var self = this;
+
+	//
+	// No room by that name currently exists.
+	//
+	if(!this.mucRoomObjects[roomname])
+	{
+		this.mucRoomObjects[roomname] = MucroomObjectPool.get();
+
+		this.mucRoomObjects[roomname].finishInit(function() {
+			var iqResult = new xmpp.Element('iq', {to: iq.attrs.from, type: 'result', id: iq.attrs.id})
+								.c('ok', {xmlns: 'urn:xmpp:callcast', name: roomname});
+			self.client.send(iqResult.root());
+			},
+
+			function() {
+				var iqResult = new xmpp.Element('iq', {to: iq.attrs.from, type: 'result', id: iq.attrs.id})
+								.c('err', {xmlns: 'urn:xmpp:callcast'});
+				self.client.send(iqResult.root());
+			}
+		);
+
+		this.mucRoomObjects[roomname].join(roomname + this.CONF_SERVICE, "overseer");
+	}
+	else		// Room already exists -- just let 'em know all is ok.
+	{
+		if (this.mucRoomObjects[roomname].pendingDeletion)
+		{
+			var iqResult = new xmpp.Element('iq', {to: iq.attrs.from, type: 'error', id: iq.attrs.id})
+							.c('pendingdeletion', {xmlns: 'urn:xmpp:callcast'});
+			self.client.send(iqResult.root());
+		}
+		else
+		{
+			var iqResult = new xmpp.Element('iq', {to: iq.attrs.from, type: 'result', id: iq.attrs.id})
+							.c('ok', {xmlns: 'urn:xmpp:callcast'});
+			self.client.send(iqResult.root());
+
+			if(this.mucRoomObjects[roomname].bSelfDestruct === true &&
+			   1 == size(this.mucRoomObjects[roomname].participants))
+			{
+				this.log("(D-Timer) - Pre-existing room requested - should have a participant soon in here...");
+				
+				if (this.mucRoomObjects[roomname].presenceTimer)
+				{
+					this.log("OVERSEER: (D-Timer) presenceTimer was already set. Clearing first.");
+					clearTimeout(this.mucRoomObjects[roomname].presenceTimer);
+					this.mucRoomObjects[roomname].presenceTimer = null;
+				}
+				
+				this.mucRoomObjects[roomname].presenceTimer = setTimeout(function() {
+					self.log("(D-Timer) - Pre-existing room - No one in room after 60 seconds :( ...");
+					eventManager.emit('destroyRoom', roomname);
+				}, 60000);
+			}
+		}
+	}
+};
+
 overseer.prototype.handleIq = function(iq) {
 	// Handle all pings and all queries for #info
 	if (iq.attrs.type === 'result' && iq.attrs.id && this.iq_callbacks[iq.attrs.id])
@@ -1519,86 +1654,11 @@ overseer.prototype.handleIq = function(iq) {
 	}
 	else if (!iq.attrs.from.split('@'))
 		this.log("UNHANDLED IQ: " + iq);
-
-	// -- Handle room create request --
-	else
+	else if (iq.attrs.type === 'set' && iq.getChildByAttr('xmlns', 'urn:xmpp:callcast'))
 	{
-		if(iq.attrs.type === 'set' &&
-		   iq.getChild('room') &&
-		   iq.getChildByAttr('xmlns', 'urn:xmpp:callcast'))
-		{
-			var roomname = iq.getChild('room').attr('name');
-
-			// If client wants a random room generated, they will send the attribute with a "" value.
-			if (roomname === "")
-			{
-				do
-				{
-					roomname = this.generateRandomRoomName();
-					this.log("Generated random room named: " + roomname);
-				}
-				while (this.mucRoomObjects[roomname]);
-			}
-
-			this.log("overseer.handleIq: Room Name of [" + roomname + "] requested by: " + iq.attrs.from);
-			var self = this;
-
-			//
-			// No room by that name currently exists.
-			//
-			if(!this.mucRoomObjects[roomname])
-			{
-				this.mucRoomObjects[roomname] = MucroomObjectPool.get();
-
-				this.mucRoomObjects[roomname].finishInit(function() {
-					var iqResult = new xmpp.Element('iq', {to: iq.attrs.from, type: 'result', id: iq.attrs.id})
-										.c('ok', {xmlns: 'urn:xmpp:callcast', name: roomname});
-					self.client.send(iqResult.root());
-					},
-
-					function() {
-						var iqResult = new xmpp.Element('iq', {to: iq.attrs.from, type: 'result', id: iq.attrs.id})
-										.c('err', {xmlns: 'urn:xmpp:callcast'});
-						self.client.send(iqResult.root());
-					}
-				);
-
-				this.mucRoomObjects[roomname].join(roomname + this.CONF_SERVICE, "overseer");
-			}
-			else		// Room already exists -- just let 'em know all is ok.
-			{
-				if (this.mucRoomObjects[roomname].pendingDeletion)
-				{
-					var iqResult = new xmpp.Element('iq', {to: iq.attrs.from, type: 'error', id: iq.attrs.id})
-									.c('pendingdeletion', {xmlns: 'urn:xmpp:callcast'});
-					self.client.send(iqResult.root());
-				}
-				else
-				{
-					var iqResult = new xmpp.Element('iq', {to: iq.attrs.from, type: 'result', id: iq.attrs.id})
-									.c('ok', {xmlns: 'urn:xmpp:callcast'});
-					self.client.send(iqResult.root());
-	
-					if(this.mucRoomObjects[roomname].bSelfDestruct === true &&
-					   1 == size(this.mucRoomObjects[roomname].participants))
-					{
-						this.log("(D-Timer) - Pre-existing room requested - should have a participant soon in here...");
-						
-						if (this.mucRoomObjects[roomname].presenceTimer)
-						{
-							this.log("OVERSEER: (D-Timer) presenceTimer was already set. Clearing first.");
-							clearTimeout(this.mucRoomObjects[roomname].presenceTimer);
-							this.mucRoomObjects[roomname].presenceTimer = null;
-						}
-						
-						this.mucRoomObjects[roomname].presenceTimer = setTimeout(function() {
-							self.log("(D-Timer) - Pre-existing room - No one in room after 60 seconds :( ...");
-							eventManager.emit('destroyRoom', roomname);
-						}, 60000);
-					}
-				}
-			}
-		}
+		// -- Handle room create request --
+		if(iq.getChild('room'))
+			this.CreateRoomRequest(iq);
 	}
 	// --------------------------------
 };
