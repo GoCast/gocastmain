@@ -332,6 +332,52 @@ function carouselItemClick(
    
 } // carouselItemClick
 
+///
+/// \brief handle click on zoom button, zoom out spot
+///
+function carouselItemZoom(event)
+{
+   app.log(2, "carouselItemZoom ");
+   event && event.stopPropagation();
+   
+   // do nothing if there's a zoomed spot
+   if ($('#meeting > #zoom > .cloudcarousel').length > 0)
+   {
+      return;
+   }
+      
+   $('#meeting > #zoom').css("display", "block"); // display zoom div
+   $('#meeting > #streams').css("height", "20%"); // unzoom carousel
+   
+   // get item and remove it from carousel
+   var spot = $(event.currentTarget).parent();
+   var item = $(spot).data('item');
+   app.carousel.remove(item.index);
+   
+   $(spot).appendTo($('#meeting > #zoom')); // move div to zoom area
+   $(spot).removeAttr('style');
+   
+   // style zoomed spot
+   app.carousel.resize(); // update carousel
+   resizeZoom();
+   
+} // carouselItemZoom
+
+///
+/// \brief handle click on zoom button, zoom out spot
+///
+function carouselItemUnzoom(event)
+{
+   app.log(2, "carouselItemUnzoom ");
+   event && event.stopPropagation();
+   
+   $('#meeting > #zoom').css("display", "none"); // undisplay zoom div
+   var spot = $('#meeting > #zoom > .cloudcarousel');
+   app.carousel.insertSpot(spot); // put spot back in carousel
+   $('#meeting > #streams').css("height", "100%"); // zoom carousel
+   app.carousel.resize();
+} // carouselItemUnzoom
+
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
  * \brief Open dialog with room description so user can copy to clipboard
@@ -967,8 +1013,6 @@ function closeWindow(
   return false;
 } /* closeWindow() */
 
-
-
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
  * \brief Resize windows.
@@ -1005,8 +1049,38 @@ function resizeWindows(
   {
      app.carousel.resize();
   }
+  resizeZoom();
   return false;
 } /* resizeWindows() */
+
+///
+/// \brief resize the zoom div and the spot in it
+///
+function resizeZoom(event)
+{
+   var width =  $('#meeting > #zoom').width();
+   var height = $('#meeting > #zoom').height();
+   var jqDiv = $('#meeting > #zoom > .cloudcarousel');
+   var item = $(jqDiv).data('item');
+   var newWidth  = width * 1.0; //app.carousel.options.xSpotRatio;
+   var newHeight = height * 1.0; //app.carousel.options.ySpotRatio;
+   var widthScale =  newWidth  / item.orgWidth;
+   var heightScale = newHeight / item.orgHeight;
+   var scale = (widthScale < heightScale) ? widthScale : heightScale;
+   item.orgWidth     *= scale;
+   item.orgHeight    *= scale;
+   item.plgOrgWidth  *= scale
+   item.plgOrgHeight *= scale
+
+   // center div in zoom div
+   var left = (width - item.orgWidth) / 2;
+   var top  = (height - item.orgHeight) / 2;
+   
+   $(jqDiv).css('width',  item.orgWidth  + 'px');
+   $(jqDiv).css('height', item.orgHeight + 'px');
+   $(jqDiv).css('left',   left + 'px');
+   $(jqDiv).css('top',    top  + 'px');
+}
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**

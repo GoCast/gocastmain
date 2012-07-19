@@ -82,6 +82,8 @@ var Callcast = {
 	STUNSERVERPORT: 19302,
 	ROOMMANAGER: "overseer@video.gocast.it/roommanager",
 	SWITCHBOARD_FB: 'switchboard_gocastfriends@video.gocast.it',
+	Callback_AddSpot: null,
+	Callback_RemoveSpot: null,
 	Callback_AddPlugin: null,
 	Callback_RemovePlugin: null,
 	Callback_AddCarouselContent: null,
@@ -137,6 +139,30 @@ var Callcast = {
     	AWAITING_RESPONSE: 1,
     	CONNECTED: 2
     },
+
+	//
+	// \brief External user sets this callback to be called when the server sends an 'addspot' command
+	//		for programmatically being told to add a new spot to the carousel. The argument to this
+	//		callback is the JSON object which was given by the original 'adder' of the spot. The only
+	//		server-dicted requirement in this JSON object is the 'spotNumber' property which is used
+	//		to give unique addressing to all spots in the carousel.
+	//
+	setCallbackForAddSpot: function(cb) {
+		this.Callback_AddSpot = cb;
+	},
+
+	//
+	// \brief External user sets this callback to be called when the server sends a 'removespot' command
+	//		for programmatically being told to remove a spot from the carousel. The argument to this
+	//		callback is the JSON object which was given by the original 'deleter' of the spot. The only
+	//		requirement in this JSON object is the 'spotNumber' property which is used to give unique 
+	//		addressing to all spots in the carousel such that the callback knows which spot to delete.
+	//		\note spotNumber should always be a valid (existing) spot as the server is responsible for
+	//			ensuring this is the case.
+	//
+	setCallbackForRemoveSpot: function(cb) {
+		this.Callback_RemoveSpot = cb;
+	},
 
 	setCallbackForAddPlugin: function(cb) {
 		this.Callback_AddPlugin = cb;
@@ -750,19 +776,26 @@ var Callcast = {
     	return true;
     },
 
+	SendGroupCmd: function(cmd, attribs_in) {
+		var attribs_out = attribs_in;
+
+		attribs_out.cmdtype = cmd;
+		attribs_out.xmlns = Callcast.NS_CALLCAST;
+		
+		var msgToSend = $msg({to: this.room, type: 'groupchat', xmlns: Callcast.NS_CALLCAST})
+				.c('cmd', attribs_out);
+		
+		console.log("Group Command: ", msgToSend.toString());
+		
+		this.connection.send(msgToSend);
+	},
+	
     SendSyncLink: function(txt) {
-    	var sync = $msg({to: this.room, type: 'groupchat', xmlns: Callcast.NS_CALLCAST}).c('body').t('.')
-    				.up().c('cmd', { cmdtype: 'synclink', xmlns: Callcast.NS_CALLCAST, link: txt });
-    	this.connection.send(sync);
+    	this.SendGroupCmd('synclink', {link: txt});
     },
 
 	SendSpotInfo: function(info) {
-		var spotinfo = $msg({to: this.room, type: 'groupchat', xmlns: Callcast.NS_CALLCAST})
-			.c('cmd', { cmdtype: 'spotinfo', id: info.id, image: info.image, altText: info.altText, url: info.url, xmlns: Callcast.NS_CALLCAST});
-
-		console.log("SendSpotInfo: ", spotinfo.toString());
-		
-      	this.connection.send(spotinfo);
+		this.SendGroupCmd('spotinfo', info);
 	},
 	
 	//
@@ -770,12 +803,7 @@ var Callcast = {
 	// and render the URL to an image and use that image as the display image for that carousel spot.
 	//
 	SendURLToRender: function(info) {
-		var urlRenderInfo = $msg({to: this.room, type: 'groupchat', xmlns: Callcast.NS_CALLCAST})
-			.c('cmd', { cmdtype: 'urlrenderinfo', id: info.id, altText: info.altText, url: info.url, xmlns: Callcast.NS_CALLCAST});
-
-		console.log("SendURLToRender: ", urlRenderInfo.toString());
-		
-      	this.connection.send(urlRenderInfo);
+		this.SendGroupCmd('urlrenderinfo', info);
 	},
 	
 	SetFBSignedRequestAndAccessToken: function(fbsr, access) {
@@ -808,6 +836,14 @@ var Callcast = {
 	on_callcast_groupchat_command: function(message) {
 		var cmd = $(message).children('cmd');
 		var cmdtype = null;
+		var info = {};
+
+		// Snatch out all the attributes from the 'cmd' child.		
+		$(message).find('cmd').each(function() {
+			$.each(this.attributes, function(i, attrib) {
+				info[attrib.name] = attrib.value;
+			});
+		});
 		
 		console.log("Groupchat command received: ", message);
 		
@@ -822,16 +858,31 @@ var Callcast = {
 			return Callcast.on_spot_info(message);
 		else if (cmdtype === 'urlrenderinfo')
 			return Callcast.on_url_render(message);
+		else if (cmdtype === 'addspot')
+		{
+			if (this.Callback_AddSpot)
+				this.Callback_AddSpot(info);
+			return true;
+		}
+		else if (cmdtype === 'removespot')
+		{
+			if (this.Callback_RemoveSpot)
+				this.Callback_RemoveSpot(info);
+			return true;
+		}
 			
 		return true;
 	},
 	
 	on_url_render: function(message) {
-		var cmd = $(message).children('cmd');
 		var info = {};
 		
-		if (cmd)
-			info = { id: $(cmd).attr('id'),	altText: $(cmd).attr('altText'), url: $(cmd).attr('url') };
+		$(message).find('cmd').each(function() {
+			$.each(this.attributes, function(i, attrib) {
+				info[attrib.name] = attrib.value;
+			});
+		});
+//			info = { id: $(cmd).attr('id'),	altText: $(cmd).attr('altText'), url: $(cmd).attr('url') };
 		
 		this.log("Received URL to render from: " + $(message).attr('from').split('/')[1]);
 		
@@ -841,12 +892,15 @@ var Callcast = {
 	},
 	
 	on_spot_info: function(message) {
-		var cmd = $(message).children('cmd');
 		var info = {};
 		
-		if (cmd)
-			info = { id: $(cmd).attr('id'), image: $(cmd).attr('image'),
-					altText: $(cmd).attr('altText'), url: $(cmd).attr('url') };
+		$(message).find('cmd').each(function() {
+			$.each(this.attributes, function(i, attrib) {
+				info[attrib.name] = attrib.value;
+			});
+		});
+//			info = { id: $(cmd).attr('id'), image: $(cmd).attr('image'),
+//					altText: $(cmd).attr('altText'), url: $(cmd).attr('url') };
 		
 		this.log("Received spot info from: " + $(message).attr('from').split('/')[1]);
 		
@@ -1146,6 +1200,101 @@ var Callcast = {
             return true;
         },
 
+	//
+	// \brief Function allows clients to request a new spot be added to everyone's carousel.
+	//		This IQ is sent to the server and when successful, the server will respond by
+	//		first sending a groupchat to the room with a '<cmd cmdtype='addspot' spotNumber='value' ..../>
+	//		And upon success the IQ is responded to with a 'result'.
+	//
+	// \param obj A generic JSON object the sender can use to communicate spot info to the other clients.
+	//		The server does not count on any particular items in this object. \note It does add a property
+	//		of obj.spotNumber which allows the server to dictate the spot numbers for new entries to ensure
+	//		no spotNumber collisions in a given mucRoom. Also, note that the amount of data in obj should be
+	//		kept to a minimum for both network conservation as well as database storage reasons. This obj is
+	//		stored in the NoSQL DynamoDB 'as is' for each and every spot.
+	//
+	// \param cb A callback which is called upon success with a null/empty argument cb();. On failure, this
+	//		callback is called with an error string such as cb("Error adding spot");
+	//
+	AddSpot: function(obj, cb) {
+		var myOverseer = this.overseer;
+		var self = this;
+		var tosend = obj;
+		
+		tosend.xmlns = this.NS_CALLCAST;
+		tosend.from = this.nick;
+		
+		//
+		this.connection.sendIQ($iq({
+			to: myOverseer,
+			id: "addspot1",
+			type: "set",
+		  }).c("addspot", tosend),
+
+		// Successful callback...
+		  function(iq) {
+			  if (cb)
+				cb();
+
+			  return true;
+		  },
+
+		// Failure callback
+		  function(iq) {
+			  self.log("Error adding spot", iq);
+			  if (cb)
+			  	cb("Error adding spot");
+		  }
+		);
+	},
+	
+	//
+	// \brief Function allows clients to request the deletion of a spot on everyone's carousel.
+	//		This IQ is sent to the server and when successful, the server will respond by
+	//		first sending a groupchat to the room with a '<cmd cmdtype='removespot' spotNumber='value' ..../>
+	//		And upon success the IQ is responded to with a 'result'.
+	//
+	// \param obj A generic JSON object the sender can use to communicate spot info to the other clients.
+	//		The server does not count on any particular items in this object aside from spotNumber. The
+	//		spotNumber property is used to ensure this spot actually exists. If it does, it will be removed
+	//		at the server and in the external database. If it does not exist, an error callback is given and
+	//		no broadcast of this deletion will occur.
+	//
+	// \param cb A callback which is called upon success with a null/empty argument cb();. On failure, this
+	//		callback is called with an error string such as cb("Error removing spot");
+	//
+	RemoveSpot: function(obj, cb) {
+		var myOverseer = this.overseer;
+		var self = this;
+		var tosend = obj;
+		
+		tosend.xmlns = this.NS_CALLCAST;
+		tosend.from = this.nick;
+		
+		//
+		this.connection.sendIQ($iq({
+			to: myOverseer,
+			id: "removespot1",
+			type: "set",
+		  }).c("removespot", tosend),
+
+		// Successful callback...
+		  function(iq) {
+			  if (cb)
+				cb();
+
+			  return true;
+		  },
+
+		// Failure callback
+		  function(iq) {
+			  self.log("Error removing spot", iq);
+			  if (cb)
+			  	cb("Error removing spot");
+		  }
+		);
+	},
+	
 //
 // Ask the server to create 'roomname' and then we can join it.
 // If 'roomname' is "", then we're asking the server to create a random unique

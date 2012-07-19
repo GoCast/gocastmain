@@ -54,15 +54,18 @@
 
   <body>
     <div id="fb-root"></div> <!-- fb integration required -->
+    <!-- removed
     <div id="upper-left">
        <a href="http://www.gocast.it">
         <img class="logo" src="images/gologo.png" />
        </a>
     </div>
+    <!-- removed
     <div id="upper-right">
        <input type="button" class="help" title="Open help window." onclick="openWindow('#helpPage');"/>
        <a class="logout" onclick="logout();">Logout</a>
     </div>
+    -->
     <div id="lower-right">
        <input class="demobtn" type="button" title="Place demo content." onclick="startDemoContent();" />
        <input class="feedback" type="button" title="Send us your feedback." onclick="openChat(event);"/>
@@ -74,6 +77,9 @@
        <input id="video" type="button" class="on" title="Enable video" disabled="disabled"/>
     </div>      
     <div id="msgBoard">
+       <a href="http://www.gocast.it" target="_blank"">
+        <img class="logo" src="images/gologo.png" />
+       </a>
         <div id="msgTicker" onmouseover="showChatOut();"></div>
         <div id="chatOut" onmouseout="showMsgTicker();"></div>
         <input class="chatTo" type="text" placeholder="Enter a chat message" onkeydown="keypressGrpChatHandler(event);"/>
@@ -169,7 +175,7 @@
       <!-- Mask to cover the whole screen -->
       <div id="mask"></div>      
       <div id="copy-this" class="window">
-         <a href="http://www.gocast.it">
+         <a href="http://www.gocast.it" target="_blank">
           <img class="logo" src="images/gologo.png" />
          </a>
       </div>
@@ -209,10 +215,13 @@
           </div>
         </div><!-- scarousel -->
         <div id="scontrols">
-          <input type="button" class="left" title="To the left." disabled="disabled" />
-          <input type="button" class="right" title="To the right." disabled="disabled" />
+          <input type="button" class="left"  title="To the left.  [Left Arrow]"  disabled="disabled" />
+          <input type="button" class="right" title="To the right. [Right Arrow]" disabled="disabled" />
         </div><!-- scontrols -->
       </div><!-- streams -->
+      <div id="zoom">
+        <img class="close" src="images/button-close-white.png" alt="Close window" onclick="carouselItemUnzoom(event);" />;
+      </div>
     </div><!-- meeting -->
     <div id="scratch"/>
   </body>

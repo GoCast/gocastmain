@@ -35,87 +35,121 @@
 	this.objectOK = true;                
 	$(this.object).css('position','absolute');
 	// add controls
-	$(this.object).append('<img class="close" src="images/button-close-white.png" alt="Close" title="Close" />');
+	$(this.object).append('<img class="zoom control" src="images/green-plus.png" alt="Zoom" title="Zoom" onclick="carouselItemZoom(event);"/>');
+	$(this.object).append('<img class="close control" src="images/button-close-white.png" alt="Close" title="Close" />');
 	// add handlers
 	$(this.object).mouseover(function(event)
         {
 	    // only show close icon on unoccupied or content spots
 	    if ($(this).hasClass('unoccupied') || $(this).hasClass('typeContent'))
 	    {
-		$('.close', this).css("visibility", "visible");
+		$('.control', this).css("visibility", "visible");
 	    }
 	});
 	$(this.object).mouseout(function(event)
 	{
-	    $('.close', this).css("visibility", "hidden");
+	    $('.control', this).css("visibility", "hidden");
 	});
     }; /* Item object */
+
+    Item.prototype.updateSize = function(item)
+    {
+        this.orgWidth     = item.orgWidth;
+	this.orgHeight    = item.orgHeight;
+	this.plgOrgWidth  = item.plgOrgWidth;
+	this.plgOrgHeight = item.plgOrgHeight;
+    };
 
     /// \brief a numerically ordered collection of Item with insert an delete
     var Items = function()
     {
 	this.vals = {}; // assoc array
 	this.keys = []; // array of sorted keys
-	Items.prototype.set = function(index, item)
+    };
+    Items.prototype.set = function(index, item)
+    {
+        this.vals[index] = item;
+	this.updateKeys();
+    };
+    Items.prototype.get = function(index)
+    {
+        //todo check that index is numeric
+	return this.vals[index];
+    };
+    Items.prototype.remove = function(index)
+    {
+        //todo check that index is numeric
+	delete this.vals[index];
+	this.updateKeys();
+    };
+    Items.prototype.getLength = function()
+    {
+        return this.keys.length;
+    };
+    Items.prototype.updateKeys = function(worker)
+    {
+        this.keys = [];
+	for (var key in this.vals)
 	{
-	    this.vals[index] = item;
-	    this.updateKeys();
-	};
-	Items.prototype.get = function(index)
-	{
-	    //todo check that index is numeric
-	    return this.vals[index];
-	};
-	Items.prototype.remove = function(index)
-	{
-	    //todo check that index is numeric
-	    delete this.vals[index];
-	    this.updateKeys();
-	};
-	Items.prototype.getLength = function()
-	{
-	    return this.keys.length;
-	};
-	Items.prototype.updateKeys = function(worker)
-	{
-	    this.keys = [];
-	    for (var key in this.vals)
-	    {
-		if (this.vals.hasOwnProperty(key))
-		    this.keys.push(key);
-	    }
-	    // sort numeric ascending
-	    this.keys.sort(function(a,b){return a - b});
-	};
-	Items.prototype.iterateSorted = function(worker)
-	{
-	    for (var i = 0; i < this.keys.length; ++i)
-	    {
-		worker(this.vals[this.keys[i]]);
-	    }
-	};
-	// get an index for an item to be added 
-	// which is the highest element index incremented
-	Items.prototype.getNewIndex = function()
-	{   // keys are sorted so last element is greatest
-	    var last = this.keys[this.keys.length - 1];
-	    return last + 1;
+	    if (this.vals.hasOwnProperty(key))
+	    this.keys.push(key);
 	}
-    }; // Items
+        // sort numeric ascending
+	this.keys.sort(function(a,b){return a - b});
+    };
+    Items.prototype.iterateSorted = function(worker)
+    {	
+        for (var i = 0; i < this.keys.length; ++i)
+	{
+            worker(this.vals[this.keys[i]]);
+        }
+    };
+    // get an index for an item to be added 
+    // which is the highest element index incremented
+    Items.prototype.getNewIndex = function()
+    {   // keys are sorted so last element is greatest
+        if (this.keys.length == 0)
+        {
+           return 0;
+        }
+        else
+        {
+           var last = this.keys[this.keys.length - 1];
+	   return parseInt(last) + 1;
+	}
+     };
+     // add an item to the list
+     // assign an index to it that is <highest index> + 1
+     Items.prototype.addItem = function(item)
+     {
+         item.index = this.getNewIndex();
+	 this.set(item.index, item);
+     };
+     // call item.updateSize on all items
+     Items.prototype.updateItemSizes = function(newItem)
+     {
+         this.iterateSorted(function(item)
+	 {
+            item.updateSize(newItem);
+         });
+     };
     /*
      * Controller object. This handles moving all the items and dealing
      * with mouse events. */
     var Controller = function(container, objects, options) {
 	var funcSin = Math.sin, funcCos = Math.cos, ctx = this;
 	var widthOld = 0, heightOld = 0; // saved container dimensions
+	var item; // an extra item to store scales since items can be removed from items list
 	var items = new Items(); // collection of items by index with sorted iteration
 	/*
 	 * Initialization. */
 	this.controlTimer = 0;
 	this.stopped = false;
 	this.container = container;
+	this.options = options; // save options for other code, zoom resize todo access options here from this object
 	this.xRadius = options.xRadius;
 	this.yRadius = options.yRadius;
+	this.round = true; // true draw round carousel false draw linear carousel
 	if (options.xRadius === 0) {
 	    this.xRadius = ($(container).width()/2.3);
 	}
@@ -176,7 +210,11 @@
 	*/
 	/*
 	 * Click on container event. */
-	$(container).on('click', this, function(event) {
+        /*
+	$(container).on('click', this, function(event)
+	{
+	    // todo with item add remove this code doesn't work
+	    // rewrite if we ever want to do this
 	    if (options.bringToFront) {
 		var idx = $(event.target).data('itemIndex');
 		var frontIndex = event.data.frontIndex;
@@ -187,7 +225,8 @@
 		}
 		event.data.rotate(-diff);
 	    }
-	}); /* onclick() */
+	}); // onclick()
+        */
 	/*
 	 * Mousedown on container, it prevents items from being selected
 	 * as mouse is moved and clicked in the container. */
@@ -221,16 +260,57 @@
 	 * is the number (+-) of carousel items to rotate by. */
 	this.rotate = function(direction) 
 	{
+	    app.log(2, "rotate " + direction);
 	    var itemsLength = items.getLength();
 	    this.frontIndex -= direction;
 	    this.frontIndex %= itemsLength;
 	    this.destRotation += ( Math.PI / itemsLength ) * ( 2*direction );
 	    this.go();
 	}; /* rotate() */
+	/// \brief adjust plugin after spot update
+	this.adjPlugin = function(item, scale)
+	{
+	    var px = 'px';
+	    var obj = item.object;
+	    var plgin = $(obj).find("object")[0];
+	    if (plgin) 
+	    {
+ 	        w = item.plgOrgWidth * scale;
+		h = item.plgOrgHeight * scale;
+                if (w < 10 && h < 10)
+                {
+                   app.log(3, "carousel video width " + w + " height " + h);
+                   return;
+	        }
+		if ($(obj).attr("id").match("mystream")) 
+		{
+		    if (!app.videoEnabled)
+		    {
+			//app.log(2, "Nothing to do with resizing video.");
+		    }
+		    else 
+		    {
+                       Callcast.SendLocalVideoToPeers(new Object({width:w, height:h}));
+                    }
+		}
+		else 
+		{
+		    var nick = $(obj).attr("encname");
+		    if (nick && Callcast.participants[nick].videoOn)
+		    {
+  		        Callcast.ShowRemoteVideo(new Object({nick:nick, width:w, height:h}));
+		    }
+		    // else do nothing on resize
+		}
+		$(obj).find("div.name").css("font-size", (item.orgFontSize * scale) + px);
+  	        // >>0 = Math.foor(). Firefox doesn't like fractional decimals in z-index.
+	        obj.style.zIndex = "" + (scale * 100)>>0;
+	    }
+        }
 	/*
 	 * Update All function. This is the main loop function that moves
 	 * everything. */
-	this.updateAll = function() {
+	this.updateRound = function() {
 	    /*
 	     * Definitions. */
 	    var w, h, x, y, scale, item, sinVal;
@@ -272,8 +352,9 @@
 		    obj.style.height = h + px;
 		    obj.style.left = x + px ;
 		    obj.style.top = y + px;
+		    // Adjust object dimensions.
+		    ctx.adjPlugin(item, scale);
 		    /*
-		     * Adjust object dimensions. */
 		    var plgin = $(obj).find("object")[0];
 		    if (plgin) {
 			w = item.plgOrgWidth * scale;
@@ -310,12 +391,11 @@
 			    }
 			    // else do nothing on resize
 			}
-			/*
-			 * Scale name text. */
+			// Scale name text. 
 			$(obj).find("div.name").css("font-size", (item.orgFontSize * scale) + px);
 		    }
-		    /* >>0 = Math.foor(). Firefox doesn't like fractional
-		       decimals in z-index. */
+   		    */
+		    // >>0 = Math.foor(). Firefox doesn't like fractional decimals in z-index.
 		    obj.style.zIndex = "" + (scale * 100)>>0;
 		}
 		radians += spacing;
@@ -334,7 +414,78 @@
 		/* Otherwise just stop completely. */
 		this.stop();
 	    }
-	}; /* updateAll() */
+	}; /* updateRound() */
+	this.updateLinear = function() // place spots in a row
+	{
+	    // calculate the scroll amount and update rotation
+	    var change = (this.destRotation - this.rotation);
+	    var absChange = Math.abs(change);
+	    this.rotation += change * options.speed;
+	    if (absChange < 0.001) {
+		this.rotation = this.destRotation;
+	    }
+	    
+	    var nItems = items.getLength();
+	    var height = $(this.container).height();
+	    
+	    // fit spots into carousel based on spot height
+	    var scale =  height / this.item.orgHeight;
+	    var spotWidth = this.item.orgWidth * scale;
+	    var spotSpace = 0.2 * spotWidth;
+	    
+	    // mystream is first in items
+	    // determine it's location to find the first item to display
+	    // pi/2 is the front spot in the carousel
+	    // get rotation 2pi remainder offset by front (pi/2)
+	    var fraction = (((Math.PI/2) + this.rotation) % (2*Math.PI)) / (2*Math.PI);
+            var xMax = ((spotWidth + spotSpace) * nItems);
+            var x    =  fraction * xMax;
+            //app.log(2, "updateLinear frontIndex " + this.frontIndex + " rotation " + this.rotation + " fraction " + fraction + " x " + x + " xMax " + xMax);
+            items.iterateSorted(function(item)
+            {
+               var obj = item.object;
+               $(obj).removeAttr('style');  // todo move this out of the update loop
+               $(obj).css('position', 'absolute');
+               if (x < -(spotWidth + spotSpace)) x += xMax;
+               else if (x > xMax)                x -= xMax; // wrap to start
+               obj.style.width = item.orgWidth * scale + 'px';
+               obj.style.height = item.orgHeight * scale + 'px';
+               obj.style.left = x + 'px';
+               obj.style.bottom = 0 + 'px';
+               ctx.adjPlugin(item, scale); // Adjust object dimensions.
+               //app.log(2, "updateLinear item " + item.index + " x " + x);
+               x += (spotWidth + spotSpace);
+            }); // end iteration
+
+            // If perceivable change in rotation then loop again next frame.
+	    if (absChange >= 0.001) 
+	    {
+		this.controlTimer = setTimeout( function()
+		{
+		    ctx.updateAll();
+		}, this.timeDelay);
+	    }
+	    else
+	    {
+		// Otherwise just stop completely.
+		this.stop();
+	    }
+	}
+	this.isRound = function() /// \return true display round carousel false display linear carousel
+	{
+	   return this.round;
+	}
+	this.updateAll = function()
+	{
+	   if (this.isRound())
+	   {
+	      this.updateRound();
+	   }
+	   else
+	   {
+	      this.updateLinear();
+	   }
+	}
 	this.remove = function(index) // remove item
 	{
 	    items.remove(index);
@@ -345,11 +496,19 @@
 	   var newDiv = $('<div class="cloudcarousel unoccupied" onclick="carouselItemClick(event);"><div class="name"></div></div>');
 	   $(this.innerWrapper).append(newDiv);
 	   var item = new Item(newDiv[0], options);
-	   item.index = items.getNewIndex();
-	   items.set(item.index, item);
+	   item.updateSize(this.item);
 	   newDiv.data('item', item);
+	   items.addItem(item);
 	   this.setupItem(item);
 	   this.updateAll();
+	}
+	this.insertSpot = function(spot) // add a previously created spot to the carousel
+	{
+	   // put the spot div back in the carousel
+	   $(spot).appendTo($(this.innerWrapper));
+	   $(spot).css('position', 'absolute');
+	   var item = $(spot).data('item');
+	   items.set(item.index, item);
 	}
 	this.setupItem = function(item) // setup newly added item
 	{
@@ -358,7 +517,7 @@
 		event && event.stopPropagation();
 		var jqDiv = $(this).parent();
 		var item = jqDiv.data('item');
-		console.log("removing", jqDiv);
+                console.log("removing", jqDiv);
 		jqDiv.remove(); // remove item from carousel
 		ctx.remove(item.index); // remove item
 		ctx.updateAll();
@@ -379,20 +538,22 @@
 		}
 	    }; // for loop
 	    app.log(2, "checkObjectsLoaded done");
-	    //app.log(2, "container w " + $(this.container).width() + " h " + $(this.container).height());
-	    // document layout seems to be done at this point so resize carousel
-	    // todo find better place for this
-	    this.resize();
 	    for( i = 0; i < objects.length; i++) 
 	    {  // create and setup item
 		var item = new Item(objects[i], options);
-		this.setupItem(item); 
-		$(objects[i]).data('itemIndex', i);
-		item.index = i;
-		items.set(item.index, item);
+		items.addItem(item);
+		this.setupItem(item);
 		$(objects[i]).data('item', item);
 	    }; // for loop
-	    // If all objects have valid widths and heights, we can stop checking.
+	    // save the storage item
+	    if (objects.length > 0)
+	    {  // construct a new object, todo this is too much because it sets css, handlers
+	       this.item = new Item(objects[0], options);
+	    }
+	    // document layout seems to be done at this point so resize carousel
+	    // todo find better place for this
+	    this.resize();
+	    // all objects have valid widths and heights, so stop checking.
 	    clearInterval(this.tt);
 	    this.updateAll();
 	}; // checkObjectsLoaded()
@@ -408,19 +569,22 @@
 	    var width = $(this.container).width(), height = $(this.container).height();
 	    //app.log(2, "container w " + width + " h " + height);
 	    
+	    // set round property based on height
+	    this.round = (height > 150) ? true : false;
+	    
 	    // scale spots, maintain aspect ratio
-	    // use average scale to prevent problems on repeated resize
-            spotWidthScale  = (this.widthOld > 0)  ? width/this.widthOld : 1.0;
-            spotHeightScale = (this.heightOld > 0) ? height/this.heightOld : 1.0;
-            spotScale = (spotWidthScale + spotHeightScale) / 2;
+            var newWidth = width * options.xSpotRatio;
+	    var newHeight = height * options.ySpotRatio;
+	    var widthScale =  newWidth  / this.item.orgWidth;
+	    var heightScale = newHeight / this.item.orgHeight;
+	    var scale = (widthScale + heightScale) / 2;
+            this.item.orgWidth     *= scale;
+            this.item.orgHeight    *= scale;
+	    this.item.plgOrgWidth  *= scale
+	    this.item.plgOrgHeight *= scale
 
-	    items.iterateSorted(function(item)
-	    {
-	       item.orgWidth     *= spotScale;
-	       item.orgHeight    *= spotScale;
-	       item.plgOrgWidth  *= spotScale
-	       item.plgOrgHeight *= spotScale
-	    });
+            // update items in list
+            items.updateItemSizes(this.item);
 
 	    // change size, todo remove hacks to position carousel correctly
 	    /*
@@ -453,8 +617,8 @@
 	this.each( function() {
 	    options = $.extend({}, {
 		minScale: 0.5,
-		xSpotRatio: 0.3,
-		ySpotRatio: 0.4,
+		xSpotRatio: 0.3, // spot size percentage of window size
+		ySpotRatio: 0.4, // spot size percentage of window size
 		xPos: 0,
 		yPos: 0,
 		xRadius: 0,
