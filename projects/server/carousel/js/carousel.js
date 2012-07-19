@@ -149,6 +149,7 @@
 	this.options = options; // save options for other code, zoom resize todo access options here from this object
 	this.xRadius = options.xRadius;
 	this.yRadius = options.yRadius;
+	this.round = true; // true draw round carousel false draw linear carousel
 	if (options.xRadius === 0) {
 	    this.xRadius = ($(container).width()/2.3);
 	}
@@ -259,16 +260,57 @@
 	 * is the number (+-) of carousel items to rotate by. */
 	this.rotate = function(direction) 
 	{
+	    app.log(2, "rotate " + direction);
 	    var itemsLength = items.getLength();
 	    this.frontIndex -= direction;
 	    this.frontIndex %= itemsLength;
 	    this.destRotation += ( Math.PI / itemsLength ) * ( 2*direction );
 	    this.go();
 	}; /* rotate() */
+	/// \brief adjust plugin after spot update
+	this.adjPlugin = function(item, scale)
+	{
+	    var px = 'px';
+	    var obj = item.object;
+	    var plgin = $(obj).find("object")[0];
+	    if (plgin) 
+	    {
+ 	        w = item.plgOrgWidth * scale;
+		h = item.plgOrgHeight * scale;
+                if (w < 10 && h < 10)
+                {
+                   app.log(3, "carousel video width " + w + " height " + h);
+                   return;
+	        }
+		if ($(obj).attr("id").match("mystream")) 
+		{
+		    if (!app.videoEnabled)
+		    {
+			//app.log(2, "Nothing to do with resizing video.");
+		    }
+		    else 
+		    {
+                       Callcast.SendLocalVideoToPeers(new Object({width:w, height:h}));
+                    }
+		}
+		else 
+		{
+		    var nick = $(obj).attr("encname");
+		    if (nick && Callcast.participants[nick].videoOn)
+		    {
+  		        Callcast.ShowRemoteVideo(new Object({nick:nick, width:w, height:h}));
+		    }
+		    // else do nothing on resize
+		}
+		$(obj).find("div.name").css("font-size", (item.orgFontSize * scale) + px);
+  	        // >>0 = Math.foor(). Firefox doesn't like fractional decimals in z-index.
+	        obj.style.zIndex = "" + (scale * 100)>>0;
+	    }
+        }
 	/*
 	 * Update All function. This is the main loop function that moves
 	 * everything. */
-	this.updateAll = function() {
+	this.updateRound = function() {
 	    /*
 	     * Definitions. */
 	    var w, h, x, y, scale, item, sinVal;
@@ -310,8 +352,9 @@
 		    obj.style.height = h + px;
 		    obj.style.left = x + px ;
 		    obj.style.top = y + px;
+		    // Adjust object dimensions.
+		    ctx.adjPlugin(item, scale);
 		    /*
-		     * Adjust object dimensions. */
 		    var plgin = $(obj).find("object")[0];
 		    if (plgin) {
 			w = item.plgOrgWidth * scale;
@@ -348,12 +391,11 @@
 			    }
 			    // else do nothing on resize
 			}
-			/*
-			 * Scale name text. */
+			// Scale name text. 
 			$(obj).find("div.name").css("font-size", (item.orgFontSize * scale) + px);
 		    }
-		    /* >>0 = Math.foor(). Firefox doesn't like fractional
-		       decimals in z-index. */
+   		    */
+		    // >>0 = Math.foor(). Firefox doesn't like fractional decimals in z-index.
 		    obj.style.zIndex = "" + (scale * 100)>>0;
 		}
 		radians += spacing;
@@ -372,7 +414,78 @@
 		/* Otherwise just stop completely. */
 		this.stop();
 	    }
-	}; /* updateAll() */
+	}; /* updateRound() */
+	this.updateLinear = function() // place spots in a row
+	{
+	    // calculate the scroll amount and update rotation
+	    var change = (this.destRotation - this.rotation);
+	    var absChange = Math.abs(change);
+	    this.rotation += change * options.speed;
+	    if (absChange < 0.001) {
+		this.rotation = this.destRotation;
+	    }
+	    
+	    var nItems = items.getLength();
+	    var height = $(this.container).height();
+	    
+	    // fit spots into carousel based on spot height
+	    var scale =  height / this.item.orgHeight;
+	    var spotWidth = this.item.orgWidth * scale;
+	    var spotSpace = 0.2 * spotWidth;
+	    
+	    // mystream is first in items
+	    // determine it's location to find the first item to display
+	    // pi/2 is the front spot in the carousel
+	    // get rotation 2pi remainder offset by front (pi/2)
+	    var fraction = (((Math.PI/2) + this.rotation) % (2*Math.PI)) / (2*Math.PI);
+            var xMax = ((spotWidth + spotSpace) * nItems);
+            var x    =  fraction * xMax;
+            //app.log(2, "updateLinear frontIndex " + this.frontIndex + " rotation " + this.rotation + " fraction " + fraction + " x " + x + " xMax " + xMax);
+            items.iterateSorted(function(item)
+            {
+               var obj = item.object;
+               $(obj).removeAttr('style');  // todo move this out of the update loop
+               $(obj).css('position', 'absolute');
+               if (x < -(spotWidth + spotSpace)) x += xMax;
+               else if (x > xMax)                x -= xMax; // wrap to start
+               obj.style.width = item.orgWidth * scale + 'px';
+               obj.style.height = item.orgHeight * scale + 'px';
+               obj.style.left = x + 'px';
+               obj.style.bottom = 0 + 'px';
+               ctx.adjPlugin(item, scale); // Adjust object dimensions.
+               //app.log(2, "updateLinear item " + item.index + " x " + x);
+               x += (spotWidth + spotSpace);
+            }); // end iteration
+
+            // If perceivable change in rotation then loop again next frame.
+	    if (absChange >= 0.001) 
+	    {
+		this.controlTimer = setTimeout( function()
+		{
+		    ctx.updateAll();
+		}, this.timeDelay);
+	    }
+	    else
+	    {
+		// Otherwise just stop completely.
+		this.stop();
+	    }
+	}
+	this.isRound = function() /// \return true display round carousel false display linear carousel
+	{
+	   return this.round;
+	}
+	this.updateAll = function()
+	{
+	   if (this.isRound())
+	   {
+	      this.updateRound();
+	   }
+	   else
+	   {
+	      this.updateLinear();
+	   }
+	}
 	this.remove = function(index) // remove item
 	{
 	    items.remove(index);
@@ -455,6 +568,9 @@
 	    // get new width
 	    var width = $(this.container).width(), height = $(this.container).height();
 	    //app.log(2, "container w " + width + " h " + height);
+	    
+	    // set round property based on height
+	    this.round = (height > 150) ? true : false;
 	    
 	    // scale spots, maintain aspect ratio
             var newWidth = width * options.xSpotRatio;

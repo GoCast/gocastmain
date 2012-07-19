@@ -340,6 +340,12 @@ function carouselItemZoom(event)
    app.log(2, "carouselItemZoom ");
    event && event.stopPropagation();
    
+   // do nothing if there's a zoomed spot
+   if ($('#meeting > #zoom > .cloudcarousel').length > 0)
+   {
+      return;
+   }
+      
    $('#meeting > #zoom').css("display", "block"); // display zoom div
    $('#meeting > #streams').css("height", "20%"); // unzoom carousel
    
