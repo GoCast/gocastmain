@@ -13,7 +13,7 @@
 #ifndef GoCastPlayer_GCPSocketServer_h
 #define GoCastPlayer_GCPSocketServer_h
 
-#include "talk/base/thread.h"
+/*#include "talk/base/thread.h"
 #include "talk/base/physicalsocketserver.h"
 
 namespace GoCast
@@ -28,6 +28,6 @@ namespace GoCast
         virtual ~SocketServer();
         virtual bool Wait(int cms, bool process_io);
     };
-}
+}*/
 
 #endif

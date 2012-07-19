@@ -20,9 +20,11 @@ include_directories(${PLUGIN_INCLUDE_DIRS})
 
 include_directories(../../deps/webrtc/trunk/src)
 include_directories(../../deps/webrtc/trunk/third_party/libjingle/source)
-include_directories(../../deps/webrtc/trunk/third_party_mods/libjingle/source)
+include_directories(../../deps/webrtc/trunk/testing/gtest/include)
+#include_directories(../../deps/webrtc/trunk/third_party_mods/libjingle/source)
 
 add_definitions(-DWEBRTC_RELATIVE_PATH)
+add_definitions(-DGTEST_RELATIVE_PATH)
 
 # Generated files are stored in ${GENERATED} by the project configuration
 SET_SOURCE_FILES_PROPERTIES(

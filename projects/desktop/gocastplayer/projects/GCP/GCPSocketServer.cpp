@@ -3,7 +3,7 @@
 
 #include "GCPSocketServer.h"
 
-namespace GoCast
+/*namespace GoCast
 {
     SocketServer::SocketServer()
     : m_pThread(talk_base::Thread::Current())
@@ -15,5 +15,5 @@ namespace GoCast
     {
         
     }
-}
+}*/
 

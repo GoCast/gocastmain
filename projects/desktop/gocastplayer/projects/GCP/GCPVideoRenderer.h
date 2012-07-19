@@ -17,7 +17,7 @@ namespace GoCast
     class GCPVideoRenderer: public cricket::VideoRenderer
     {
     public:
-        explicit GCPVideoRenderer(FB::PluginWindow* pWin, int width, int height);
+        explicit GCPVideoRenderer(FB::PluginWindow* pWin);
         virtual ~GCPVideoRenderer();
         virtual bool SetSize(int width, int height, int reserved);
         virtual bool RenderFrame(const cricket::VideoFrame* pFrame);
@@ -27,8 +27,8 @@ namespace GoCast
         talk_base::scoped_array<uint8> m_pFrameBuffer;
         FB::PluginWindow* m_pWin;
         boost::mutex m_winMutex;
-        const int m_width;
-        const int m_height;
+        int m_width;
+        int m_height;
     };
 }
 

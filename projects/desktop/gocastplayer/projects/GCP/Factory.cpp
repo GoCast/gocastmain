@@ -40,6 +40,32 @@ public:
     {
         GCP::StaticDeinitialize();
     }
+    
+    ///////////////////////////////////////////////////////////////////////////////
+    /// @fn void getLoggingMethods(FB::Log::LogMethodList& outMethods)
+    ///
+    /// @brief Configures plugin logging functionality
+    ///
+    ///////////////////////////////////////////////////////////////////////////////    
+    void getLoggingMethods(FB::Log::LogMethodList& outMethods)
+    {
+        // The next line will enable logging to the console (think: printf).
+        outMethods.push_back(std::make_pair(FB::Log::LogMethod_Console, std::string()));
+        
+        // The next line will enable logging to a logfile.
+        outMethods.push_back(std::make_pair(FB::Log::LogMethod_File, "gocastplayer.log"));        
+    }
+    
+    ///////////////////////////////////////////////////////////////////////////////
+    /// @fn FB::LogLogLevel getLogLevel()
+    ///
+    /// @brief Gets log level for the plugin
+    ///
+    ///////////////////////////////////////////////////////////////////////////////    
+    FB::Log::LogLevel getLogLevel()
+    {
+        return FB::Log::LogLevel_Error;
+    }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
