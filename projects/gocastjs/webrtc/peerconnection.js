@@ -392,6 +392,12 @@ GoCastJS.PeerConnection.prototype.StartIce = function() {
 	}
 };
 
+//!
+//! function: GoCastJS.PeerConnection.ReadyState()
+//!
+//! returns: ["INVALID" | "PRENEW" | "NEW" | "NEGOTIATING" | 
+//!			  "ACTIVE" | "CLOSING" | "CLOSED"];
+//!
 GoCastJS.PeerConnection.prototype.ReadyState = function() {
 	if("undefined" !== typeof(this.peerConn) && null !== this.peerConn) {
 		return this.peerConn.readyState;

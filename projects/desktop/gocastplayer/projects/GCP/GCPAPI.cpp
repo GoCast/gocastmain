@@ -13,23 +13,6 @@
 #include "GCPWebrtcCenter.h"
 #include "GCPMediaStream.h"
 
-GCPAPI::~GCPAPI()
-{
-    if("localPlayer" != m_htmlId.convert_cast<std::string>())
-    {
-        (GoCast::RtcCenter::Instance())->SetLocalVideoTrackRenderer(NULL);
-    }
-    else
-    {
-        (GoCast::RtcCenter::Instance())->SetRemoteVideoTrackRenderer(
-            m_htmlId.convert_cast<std::string>(),
-            NULL
-        );
-    }
-    
-    DeletePeerConnection();
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 /// @fn GCPPtr GCPAPI::getPlugin()
 ///
@@ -141,9 +124,16 @@ FB::variant GCPAPI::Init(const FB::variant& htmlId,
     
     m_htmlId = htmlId;
     m_iceCb = iceCallback;
-    return pCtr->NewPeerConnection(m_htmlId.convert_cast<std::string>(),
-                                   iceConfig.convert_cast<std::string>(),
-                                   this);
+    if(false == pCtr->NewPeerConnection(m_htmlId.convert_cast<std::string>(),
+                                        iceConfig.convert_cast<std::string>(),
+                                        this))
+    {
+        m_readyState = "INVALID";
+        return false;
+    }
+    
+    m_readyState = pCtr->ReadyState(m_htmlId.convert_cast<std::string>());
+    return true;
 }
 
 void GCPAPI::AddStream(const FB::JSAPIPtr& stream)
