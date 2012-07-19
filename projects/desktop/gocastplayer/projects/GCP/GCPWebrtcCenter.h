@@ -119,6 +119,14 @@ namespace GoCast
             m_pLocalStream->video_tracks()->at(0)->set_enabled(bEnable);
         }
         
+        void SetLocalVideoTrackRenderer(const talk_base::scoped_refptr
+                                        <webrtc::VideoRendererWrapperInterface>& pRenderer) {
+            if(0 < m_pLocalStream->video_tracks()->count())
+            {
+                m_pLocalStream->video_tracks()->at(0)->SetRenderer(pRenderer);
+            }
+        }
+        
         void SetRemoteVideoTrackRenderer(const std::string& pluginId,
                                          const talk_base::scoped_refptr
                                         <webrtc::VideoRendererWrapperInterface>& pRenderer) {

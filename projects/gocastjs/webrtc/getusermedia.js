@@ -79,10 +79,9 @@ GoCastJS.getUserMedia = function(options, success, failure, bUseGoCastAPI) {
 			
 			player.getUserMedia(
 				options.mediaHints,
-				function(stream) {
-					//player.renderStream(stream);
-					
+				function(stream) {					
 					if("undefined" !== typeof(success)) {
+						player.source = stream;
 						success(stream);
 					}
 				},

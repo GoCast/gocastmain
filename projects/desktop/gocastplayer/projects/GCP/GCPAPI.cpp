@@ -65,8 +65,15 @@ void GCPAPI::set_source(const FB::JSAPIPtr& stream)
     m_srcStream = stream;
     if(NULL != stream.get())
     {
-        (GoCast::RtcCenter::Instance())->SetRemoteVideoTrackRenderer(m_htmlId.convert_cast<std::string>(),
-                                                                     getPlugin()->Renderer());
+        if("localPlayer" == m_htmlId.convert_cast<std::string>())
+        {
+            (GoCast::RtcCenter::Instance())->SetLocalVideoTrackRenderer(getPlugin()->Renderer());
+        }
+        else
+        {
+            (GoCast::RtcCenter::Instance())->SetRemoteVideoTrackRenderer(m_htmlId.convert_cast<std::string>(),
+                                                                         getPlugin()->Renderer());
+        }
     }
 }
 
