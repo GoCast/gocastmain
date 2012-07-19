@@ -30,9 +30,10 @@ public:
     /// @see FB::JSAPIAuto::registerEvent
     ////////////////////////////////////////////////////////////////////////////
     GCPAPI(const GCPPtr& plugin, const FB::BrowserHostPtr& host)
-    : m_htmlId("localPlayer")
+    : m_readyState("PRENEW")
     , m_plugin(plugin)
     , m_host(host)
+    , m_htmlId("localPlayer")
     {
         // API for getting local media (if used, corresponding plugin instance
         // shouldn't call any of the peerconnection APIS)
@@ -51,10 +52,13 @@ public:
         
         // Properties
         registerProperty("version", make_property(this, &GCPAPI::get_version));
+        registerProperty("readyState", make_property(this, &GCPAPI::get_readyState));
         registerProperty("onaddstream", make_property(this, &GCPAPI::get_onaddstream,
                                                             &GCPAPI::set_onaddstream));
         registerProperty("onremovestream", make_property(this, &GCPAPI::get_onremovestream,
                                                                &GCPAPI::set_onremovestream));
+        registerProperty("onreadystatechange", make_property(this, &GCPAPI::get_onreadystatechange,
+                                                                   &GCPAPI::set_onreadystatechange));
         registerProperty("source", make_property(this, &GCPAPI::get_source, &GCPAPI::set_source));
     }
 
@@ -71,13 +75,16 @@ public:
 
     // Property get methods
     std::string get_version();
+    std::string get_readyState();
     FB::JSObjectPtr get_onaddstream();
     FB::JSObjectPtr get_onremovestream();
+    FB::JSObjectPtr get_onreadystatechange();
     FB::JSAPIPtr get_source();
     
     // Property set methods
     void set_onaddstream(const FB::JSObjectPtr& onaddstream);
     void set_onremovestream(const FB::JSObjectPtr& onremovestream);
+    void set_onreadystatechange(const FB::JSObjectPtr& onreadystatechange);
     void set_source(const FB::JSAPIPtr& stream);
     
     //---------------------- UserMedia Methods ---------------------
@@ -116,15 +123,17 @@ private:
     void DeletePeerConnection();
     
 private:
-    FB::variant m_htmlId;
+    std::string m_readyState;
     FB::JSObjectPtr m_iceCb;
     FB::JSObjectPtr m_onaddstreamCb;
     FB::JSObjectPtr m_onremovestreamCb;
+    FB::JSObjectPtr m_onreadystatechangeCb;
     
 private:
     GCPWeakPtr m_plugin;
     FB::BrowserHostPtr m_host;
     FB::JSAPIPtr m_srcStream;
+    FB::variant m_htmlId;
 };
 
 #endif // H_GCPAPI

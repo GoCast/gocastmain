@@ -120,10 +120,24 @@ GoCastJS.getUserMedia = function(options, success, failure, bUseGoCastAPI) {
 	}
 };
 
+//!
+//! constructor: GoCastJS.PeerConnectionOptions(mediaHints, width, height, videoId, containerId)
+//!
+//! members:
+//!		iceConfig <string>	: "STUN <ip>:<port>"
+//!		width <int>			: width of video element or plugin window
+//!		height <int>		: height of video element or plugin window
+//!		videoId <string>	: unique id of video element or plugin object
+//!		containerId <string>: unique id of div element that contains 'videoId'
+//!		onIceMessage <function(candidateSdp, moreComing)>	: new ice candidate callback
+//!		onAddStream <function(stream)> 						: new remote stream added
+//!		onRemoveStream <function(stream)>					: remote stream removed
+//!
 GoCastJS.PeerConnectionOptions = function(iceConfig,
 										  onIceMessage,
 										  onAddStream,
 										  onRemoveStream,
+										  onReadyStateChange,
 										  width, 
 										  height, 
 										  videoId, 
@@ -132,12 +146,20 @@ GoCastJS.PeerConnectionOptions = function(iceConfig,
 	this.onIceMessage = onIceMessage;
 	this.onAddStream = onAddStream;
 	this.onRemoveStream = onRemoveStream;
+	this.onReadyStateChange = onReadyStateChange;
 	this.width = width;
 	this.height = height;
 	this.videoId = videoId;
 	this.containerId = containerId;
 };
 
+//!
+//! constructor: GoCastJS.PeerConnection(options, bUseGoCastAPI)
+//!
+//! arguments:
+//!		options <GoCastJS.PeerConnectionOptions>	: options for creating peerconnection
+//!		bUseGoCastAPI							 	: see GoCastJS.GetUserMedia()
+//!
 GoCastJS.PeerConnection = function(options, bUseGoCastAPI) {
 	if(false == bUseGoCastAPI) {
 		if("undefined" !== typeof(webkitPeerConnection00)) {
@@ -183,7 +205,7 @@ GoCastJS.PeerConnection = function(options, bUseGoCastAPI) {
 			this.peerConn.height = options.height;
 			container.appendChild(this.peerConn);
 			
-			//At this point the plugin instance is loaded
+			//At this point the plugin instance is loaded because of appendChild()
 			this.peerConn.init(options.videoId, options.iceConfig, options.onIceMessage);
 			
 			var peerConnRef = this.peerConn;
@@ -201,24 +223,51 @@ GoCastJS.PeerConnection = function(options, bUseGoCastAPI) {
 					options.onRemoveStream(stream);
 				}
 			};
+			
+			this.peerConn.onreadystatechange = function() {
+				if("undefined" !== typeof(options.onReadyStateChange) &&
+				   null !== options.onReadyStateChange) {
+					options.onReadyStateChange();
+				}
+			};
 		} else {
 			alert("GoCastJS.PeerConnection(): PeerConnection API (GoCast) not supported.");
 		}
 	}
 };
 
+//!
+//! function: GoCastJS.PeerConnection.AddStream(stream)
+//!
+//! arguments:
+//!		stream<obj>	: stream to be added (returned by GetUserMedia's success callback)
+//!
 GoCastJS.PeerConnection.prototype.AddStream = function(stream) {
 	if("undefined" !== typeof(this.peerConn) && null !== this.peerConn) {
 		this.peerConn.addStream(stream);
 	}	
 };
 
+//!
+//! function: GoCastJS.PeerConnection.RemoveStream(stream)
+//!
+//! arguments:
+//!		stream<obj>	: stream to be removed (returned by GetUserMedia's success callback)
+//!
 GoCastJS.PeerConnection.prototype.RemoveStream = function(stream) {
 	if("undefined" !== typeof(this.peerConn) && null !== this.peerConn) {
 		this.peerConn.removeStream(stream);
 	}
 };
 
+//!
+//! function: GoCastJS.PeerConnection.CreateOffer(mediaHints)
+//!
+//! arguments:
+//!		mediaHints<obj>	: see GoCastJS.GetUserMedia()
+//!
+//! returns: sdp<string>
+//!
 GoCastJS.PeerConnection.prototype.CreateOffer = function(mediaHints) {
 	if("undefined" !== typeof(this.peerConn) && null !== this.peerConn) {
 		if(null !== this.peerConn.toString().match(/PeerConnection00/g)) {
@@ -232,6 +281,15 @@ GoCastJS.PeerConnection.prototype.CreateOffer = function(mediaHints) {
 	return null;
 };
 
+//!
+//! function: GoCastJS.PeerConnection.CreateAnswer(offer, mediaHints)
+//!
+//! arguments:
+//! 	offer<string>	: sdp offer of remote peer
+//!		mediaHints<obj>	: see GoCastJS.GetUserMedia()
+//!
+//! returns: sdp<string>
+//!
 GoCastJS.PeerConnection.prototype.CreateAnswer = function(offer, mediaHints) {
 	if("undefined" !== typeof(this.peerConn) && null !== this.peerConn) {
 		if(null !== this.peerConn.toString().match(/PeerConnection00/g)) {
@@ -245,6 +303,15 @@ GoCastJS.PeerConnection.prototype.CreateAnswer = function(offer, mediaHints) {
 	return null;
 };
 
+//!
+//! function: GoCastJS.PeerConnection.SetLocalDescription(action, sdp, success, failure)
+//!
+//! arguments:
+//!		action<string>	: "OFFER" (if sdp is an offer) or "ANSWER" (if sdp is an answer) 
+//!		sdp<string>		: sdp to be used as local peer's description
+//!		success<function()>			: success callback
+//!		failure<function(message)>	: failure callback with message 
+//!
 GoCastJS.PeerConnection.prototype.SetLocalDescription = function(action,
 																 sdp,
 																 success,
@@ -261,12 +328,14 @@ GoCastJS.PeerConnection.prototype.SetLocalDescription = function(action,
 			}
 		} else {
 			this.peerConn.setLocalDescription(
-				action, sdp,
+				action,
+				sdp,
 				function() {
 					if("undefined" !== typeof(success) && null !== success) {
 						success();
 					}
-				}, function(message) {
+				}, 
+				function(message) {
 					if("undefined" !== typeof(failure) && null !== failure) {
 						failure(message);
 					}
@@ -276,6 +345,13 @@ GoCastJS.PeerConnection.prototype.SetLocalDescription = function(action,
 	}
 };
 
+//!
+//! function: GoCastJS.PeerConnection.SetRemoteDescription(action, sdp)
+//!
+//! arguments:
+//!		action<string>	: "OFFER" (if sdp is an offer) or "ANSWER" (if sdp is an answer) 
+//!		sdp<string>		: sdp to be used as remote peer's description
+//!
 GoCastJS.PeerConnection.prototype.SetRemoteDescription = function(action, sdp) {
 	if("undefined" !== typeof(this.peerConn) && null !== this.peerConn) {
 		if(null !== this.peerConn.toString().match(/PeerConnection00/g)) {
@@ -289,6 +365,12 @@ GoCastJS.PeerConnection.prototype.SetRemoteDescription = function(action, sdp) {
 	}
 };
 
+//!
+//! function: GoCastJS.PeerConnection.ProcessIceMessage(sdp)
+//!
+//! arguments:
+//!		sdp<string>		: sdp of remote peer's ice candidate
+//!
 GoCastJS.PeerConnection.prototype.ProcessIceMessage = function(sdp) {
 	if("undefined" !== typeof(this.peerConn) && null !== this.peerConn) {
 		if(null !== this.peerConn.toString().match(/PeerConnection00/g)) {
@@ -299,8 +381,20 @@ GoCastJS.PeerConnection.prototype.ProcessIceMessage = function(sdp) {
 	}
 };
 
+//!
+//! function: GoCastJS.PeerConnection.StartIce()
+//!
+//! NOTE: should be called after GoCastJS.PeerConnection.SetLocalDescription()
+//!
 GoCastJS.PeerConnection.prototype.StartIce = function() {
 	if("undefined" !== typeof(this.peerConn) && null !== this.peerConn) {
 		this.peerConn.startIce();
 	}
+};
+
+GoCastJS.PeerConnection.prototype.ReadyState = function() {
+	if("undefined" !== typeof(this.peerConn) && null !== this.peerConn) {
+		return this.peerConn.readyState;
+	}
+	return "INVALID";
 };

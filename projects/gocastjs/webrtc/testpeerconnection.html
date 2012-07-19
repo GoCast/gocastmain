@@ -32,6 +32,9 @@
 								remoteStream = null;
 							}
 						},
+						function() {
+							console.log("PC[remoteVideo]: ", peerConn.ReadyState());
+						},
 						352,
 						288,
 						"remoteVideo",
@@ -91,10 +94,10 @@
 		</script>
 	</head>
 	<body>
-		<button id="startButton" onclick="javascript:start(true)">Start</button>
+		<!--<button id="startButton" onclick="javascript:start(true)">Start</button>
 		<button id="startCanaryButton" onclick="javascript:start(false)">
 			Start Canary
-		</button>
+		</button>-->
 		<button id="toggleMuteAudio" onclick="javascript:toggleMuteAudio()">
 			Toggle Mute Audio
 		</button>
@@ -102,5 +105,9 @@
 			Toggle Mute Video
 		</button>
 		<div id="videoContainer"></div>
+		
+		<script type="text/javascript">
+			start(true);
+		</script>
 	</body>
 </html>
