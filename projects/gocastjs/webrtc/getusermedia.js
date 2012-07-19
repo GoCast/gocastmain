@@ -80,8 +80,20 @@ GoCastJS.getUserMedia = function(options, success, failure, bUseGoCastAPI) {
 			player.getUserMedia(
 				options.mediaHints,
 				function(stream) {					
+					player.init(
+						"localPlayer",
+						"STUN stun.l.google.com:19302",
+						null
+					);
+					player.addStream(stream);
+					player.setLocalDescription(
+						"OFFER",
+						player.createOffer({audio: true, video: true}),
+						function() { player.source = stream; },
+						function(message) { console.log(message); }
+					);
+					
 					if("undefined" !== typeof(success)) {
-						player.source = stream;
 						success(stream);
 					}
 				},
