@@ -1,6 +1,11 @@
 var GoCastJS = ("undefined" !== typeof(GoCastJS))? GoCastJS: {};
 GoCastJS = (null !== GoCastJS)? GoCastJS: {};
 
+//!
+//! function: GoCastJS.CheckGoCastPlayer()
+//! 
+//! returns: 'true' if "GoCastPlayer" detected, 'false' if not.
+//!
 GoCastJS.CheckGoCastPlayer = function() {
 	for(i in navigator.plugins) {
 		if("GoCastPlayer" === navigator.plugins[i].name) {
@@ -10,6 +15,16 @@ GoCastJS.CheckGoCastPlayer = function() {
 	return false;
 };
 
+//!
+//! constructor: GoCastJS.UserMediaOptions(mediaHints, width, height, videoId, containerId)
+//!
+//! members:
+//!		mediaHints <obj>	: {audio: <bool>, video:<bool>}
+//!		width <int>			: width of video element or plugin window
+//!		height <int>		: height of video element or plugin window
+//!		videoId <string>	: unique id of video element or plugin object
+//!		containerId <string>: unique id of div element that contains 'videoId'
+//!
 GoCastJS.UserMediaOptions = function(mediaHints, width, height, videoId, containerId) {
 	this.mediaHints = mediaHints;
 	this.width = width;
@@ -18,24 +33,16 @@ GoCastJS.UserMediaOptions = function(mediaHints, width, height, videoId, contain
 	this.containerId = containerId;
 };
 
-GoCastJS.PeerConnectionOptions = function(iceConfig,
-										  onIceMessage,
-										  onAddStream,
-										  onRemoveStream,
-										  width, 
-										  height, 
-										  videoId, 
-										  containerId) {
-	this.iceConfig = iceConfig;
-	this.onIceMessage = onIceMessage;
-	this.onAddStream = onAddStream;
-	this.onRemoveStream = onRemoveStream;
-	this.width = width;
-	this.height = height;
-	this.videoId = videoId;
-	this.containerId = containerId;
-};
-
+//!
+//! function: GoCastJS.getUserMedia(options, success, failure, bUseGoCastAPI)
+//!
+//! arguments:
+//!		options <GoCastJS.UserMediaOptions>	: options for obtaining user media
+//!		success <function(stream)>			: success callback with stream object
+//!		failure <function(message)>			: failure callback with message
+//!		bUseGoCastAPI <bool>				: 'true' for using GoCastPlayer API, 'false'
+//!											  for using in-browser API
+//!
 GoCastJS.getUserMedia = function(options, success, failure, bUseGoCastAPI) {
 	if(false === bUseGoCastAPI) {
 		if("undefined" !== typeof(navigator.webkitGetUserMedia)) {
@@ -51,19 +58,19 @@ GoCastJS.getUserMedia = function(options, success, failure, bUseGoCastAPI) {
 					video.src = webkitURL.createObjectURL(stream);
 					container.appendChild(video);
 					
-					if("undefined" !== typeof(success)) {
+					if("undefined" !== typeof(success) && null !== success) {
 						success(stream);
 					}
 				}, 
 				function(message){
-					if("undefined" !== typeof(failure)) {
+					if("undefined" !== typeof(failure) && null !== failure) {
 						failure(message);
 					}
 				}
 			);
 		} else {
-			if("undefined" !== typeof(failure)) {
-				failure("GoCastJS: getUserMedia() API not supported.");
+			if("undefined" !== typeof(failure) && null !== failure) {
+				failure("GoCastJS.getUserMedia(): getUserMedia() API not supported.");
 			}
 		}
 	} else {
@@ -90,25 +97,45 @@ GoCastJS.getUserMedia = function(options, success, failure, bUseGoCastAPI) {
 						"OFFER",
 						player.createOffer({audio: true, video: true}),
 						function() { player.source = stream; },
-						function(message) { console.log(message); }
+						function(message) {
+							console.log("localPlayer.setLocalDescription(): ", message);
+						}
 					);
 					
-					if("undefined" !== typeof(success)) {
+					if("undefined" !== typeof(success) && null !== success) {
 						success(stream);
 					}
 				},
 				function(message) {
-					if("undefined" !== typeof(failure)) {
+					if("undefined" !== typeof(failure) && null !== success) {
 						failure(message);
 					}
 				}
 			);
 		} else {
-			if("undefined" !== typeof(failure)) {
-				failure("GoCastJS: getUserMedia API (GoCast) not supported.");
+			if("undefined" !== typeof(failure) && null !== failure) {
+				failure("GoCastJS.getUserMedia(): GoCastPlayer not detected.");
 			}
 		}
 	}
+};
+
+GoCastJS.PeerConnectionOptions = function(iceConfig,
+										  onIceMessage,
+										  onAddStream,
+										  onRemoveStream,
+										  width, 
+										  height, 
+										  videoId, 
+										  containerId) {
+	this.iceConfig = iceConfig;
+	this.onIceMessage = onIceMessage;
+	this.onAddStream = onAddStream;
+	this.onRemoveStream = onRemoveStream;
+	this.width = width;
+	this.height = height;
+	this.videoId = videoId;
+	this.containerId = containerId;
 };
 
 GoCastJS.PeerConnection = function(options, bUseGoCastAPI) {
@@ -121,7 +148,6 @@ GoCastJS.PeerConnection = function(options, bUseGoCastAPI) {
 								}
 							);
 							
-			//onaddstream callback
 			this.peerConn.onaddstream = function(stream) {
 				var container = document.getElementById(options.containerId);
 				var video = document.createElement("video");
@@ -132,19 +158,20 @@ GoCastJS.PeerConnection = function(options, bUseGoCastAPI) {
 				video.src = webkitURL.createObjectURL(stream.stream);
 				container.appendChild(video);
 				
-				if("undefined" !== typeof(options.onAddStream)) {
+				if("undefined" !== typeof(options.onAddStream) &&
+				   null !== options.onAddStream) {
 					options.onAddStream(stream.stream);
 				}		
 			};
 			
-			//onremovestream callback
 			this.peerConn.onremovestream = function(stream) {
-				if("undefined" !== typeof(options.onRemoveStream)) {
+				if("undefined" !== typeof(options.onRemoveStream) &&
+				   null !== options.onRemoveStream) {
 					options.onRemoveStream(stream.stream);
 				}
 			};
 		} else {
-			alert("GoCastJS: PeerConnection API not supported.");
+			alert("GoCastJS.PeerConnection(): PeerConnection API not supported.");
 		}
 	} else {
 		if(true === GoCastJS.CheckGoCastPlayer()) {
@@ -159,41 +186,41 @@ GoCastJS.PeerConnection = function(options, bUseGoCastAPI) {
 			//At this point the plugin instance is loaded
 			this.peerConn.init(options.videoId, options.iceConfig, options.onIceMessage);
 			
-			//onaddstream callback
 			var peerConnRef = this.peerConn;
 			this.peerConn.onaddstream = function(stream) {
 				peerConnRef.source = stream;
-				if("undefined" !== typeof(options.onAddStream)) {
+				if("undefined" !== typeof(options.onAddStream) &&
+				   null !== options.onAddStream) {
 					options.onAddStream(stream);
 				} 
 			};
 			
-			//onremovestream callback
 			this.peerConn.onremovestream = function(stream) {
-				if("undefined" !== typeof(options.onRemoveStream)) {
+				if("undefined" !== typeof(options.onRemoveStream) &&
+				   null !== options.onRemoveStream) {
 					options.onRemoveStream(stream);
 				}
 			};
 		} else {
-			alert("GoCastJS: PeerConnection API (GoCast) not supported.");
+			alert("GoCastJS.PeerConnection(): PeerConnection API (GoCast) not supported.");
 		}
 	}
 };
 
 GoCastJS.PeerConnection.prototype.AddStream = function(stream) {
-	if("undefined" !== typeof(this.peerConn)) {
+	if("undefined" !== typeof(this.peerConn) && null !== this.peerConn) {
 		this.peerConn.addStream(stream);
 	}	
 };
 
 GoCastJS.PeerConnection.prototype.RemoveStream = function(stream) {
-	if("undefined" !== typeof(this.peerConn)) {
+	if("undefined" !== typeof(this.peerConn) && null !== this.peerConn) {
 		this.peerConn.removeStream(stream);
 	}
 };
 
 GoCastJS.PeerConnection.prototype.CreateOffer = function(mediaHints) {
-	if("undefined" !== typeof(this.peerConn)) {
+	if("undefined" !== typeof(this.peerConn) && null !== this.peerConn) {
 		if(null !== this.peerConn.toString().match(/PeerConnection00/g)) {
 			var offer = this.peerConn.createOffer(mediaHints);
 			return offer.toSdp();
@@ -206,7 +233,7 @@ GoCastJS.PeerConnection.prototype.CreateOffer = function(mediaHints) {
 };
 
 GoCastJS.PeerConnection.prototype.CreateAnswer = function(offer, mediaHints) {
-	if("undefined" !== typeof(this.peerConn)) {
+	if("undefined" !== typeof(this.peerConn) && null !== this.peerConn) {
 		if(null !== this.peerConn.toString().match(/PeerConnection00/g)) {
 			var answer = this.peerConn.createAnswer(offer, mediaHints);
 			return answer.toSdp();
@@ -220,22 +247,37 @@ GoCastJS.PeerConnection.prototype.CreateAnswer = function(offer, mediaHints) {
 
 GoCastJS.PeerConnection.prototype.SetLocalDescription = function(action,
 																 sdp,
-																 succCb,
-																 failCb) {
-	if("undefined" !== typeof(this.peerConn)) {
+																 success,
+																 failure) {
+	if("undefined" !== typeof(this.peerConn) && null !== this.peerConn) {
 		if(null !== this.peerConn.toString().match(/PeerConnection00/g)) {
 			var actionId = ("OFFER" === action)? 
 						   this.peerConn.SDP_OFFER:
 						   this.peerConn.SDP_ANSWER;
+			
 			this.peerConn.setLocalDescription(actionId, new SessionDescription(sdp));
+			if("undefined" !== typeof(success) && null !== success) {
+				success();
+			}
 		} else {
-			this.peerConn.setLocalDescription(action, sdp, succCb, failCb);
+			this.peerConn.setLocalDescription(
+				action, sdp,
+				function() {
+					if("undefined" !== typeof(success) && null !== success) {
+						success();
+					}
+				}, function(message) {
+					if("undefined" !== typeof(failure) && null !== failure) {
+						failure(message);
+					}
+				}
+			);
 		}
 	}
 };
 
 GoCastJS.PeerConnection.prototype.SetRemoteDescription = function(action, sdp) {
-	if("undefined" !== typeof(this.peerConn)) {
+	if("undefined" !== typeof(this.peerConn) && null !== this.peerConn) {
 		if(null !== this.peerConn.toString().match(/PeerConnection00/g)) {
 			var actionId = ("OFFER" === action)? 
 						   this.peerConn.SDP_OFFER:
@@ -248,7 +290,7 @@ GoCastJS.PeerConnection.prototype.SetRemoteDescription = function(action, sdp) {
 };
 
 GoCastJS.PeerConnection.prototype.ProcessIceMessage = function(sdp) {
-	if("undefined" !== typeof(this.peerConn)) {
+	if("undefined" !== typeof(this.peerConn) && null !== this.peerConn) {
 		if(null !== this.peerConn.toString().match(/PeerConnection00/g)) {
 			this.peerConn.processIceMessage(new IceCandidate("0", sdp));
 		} else {
@@ -258,7 +300,7 @@ GoCastJS.PeerConnection.prototype.ProcessIceMessage = function(sdp) {
 };
 
 GoCastJS.PeerConnection.prototype.StartIce = function() {
-	if("undefined" !== typeof(this.peerConn)) {
+	if("undefined" !== typeof(this.peerConn) && null !== this.peerConn) {
 		this.peerConn.startIce();
 	}
 };
