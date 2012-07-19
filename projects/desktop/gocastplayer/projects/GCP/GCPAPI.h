@@ -30,13 +30,13 @@ public:
     /// @see FB::JSAPIAuto::registerEvent
     ////////////////////////////////////////////////////////////////////////////
     GCPAPI(const GCPPtr& plugin, const FB::BrowserHostPtr& host)
-    : m_plugin(plugin)
+    : m_htmlId("localPlayer")
+    , m_plugin(plugin)
     , m_host(host)
     {
         // API for getting local media (if used, corresponding plugin instance
         // shouldn't call any of the peerconnection APIS)
         registerMethod("getUserMedia", make_method(this, &GCPAPI::GetUserMedia));
-        registerMethod("renderStream", make_method(this, &GCPAPI::RenderStream));
         
         // PeerConnection APIs
         registerMethod("init", make_method(this, &GCPAPI::Init));
@@ -66,7 +66,10 @@ public:
     ///         the plugin is released.
     ///////////////////////////////////////////////////////////////////////////////
     virtual ~GCPAPI() {
-        DeletePeerConnection();
+        if("localPlayer" != m_htmlId.convert_cast<std::string>())
+        {
+            DeletePeerConnection();
+        }
     };
 
     GCPPtr getPlugin();
@@ -87,10 +90,10 @@ public:
                       const FB::JSObjectPtr& succCb,
                       const FB::JSObjectPtr& failCb);
     
-    void RenderStream(const FB::JSAPIPtr& pStream);
-    
     //---------------------- PeerConnection Methods ---------------------
-    FB::variant Init(const FB::variant& iceConfig, const FB::JSObjectPtr& iceCallback);
+    FB::variant Init(const FB::variant& htmlId,
+                     const FB::variant& iceConfig,
+                     const FB::JSObjectPtr& iceCallback);
     void AddStream(const FB::JSAPIPtr& stream);
     void RemoveStream(const FB::JSAPIPtr& stream);
     FB::variant CreateOffer(const FB::JSObjectPtr& mediaHints);
@@ -108,7 +111,7 @@ private:
     virtual void OnError() {};
     virtual void OnMessage(const std::string& msg) {};
     virtual void OnSignalingMessage(const std::string& msg) {};    
-    virtual void OnStateChange(StateType state_changed) {};
+    virtual void OnStateChange(StateType state_changed);
     virtual void OnAddStream(webrtc::MediaStreamInterface* pRemoteStream);
     virtual void OnRemoveStream(webrtc::MediaStreamInterface* pRemoteStream);
     virtual void OnIceCandidate(const webrtc::IceCandidateInterface* pCandidate);
@@ -118,6 +121,7 @@ private:
     void DeletePeerConnection();
     
 private:
+    FB::variant m_htmlId;
     FB::JSObjectPtr m_iceCb;
     FB::JSObjectPtr m_onaddstreamCb;
     FB::JSObjectPtr m_onremovestreamCb;

@@ -10,10 +10,6 @@
 #include "GCPAPI.h"
 #include "GCP.h"
 #include "GCPWebrtcCenter.h"
-#include <iostream>
-
-#define FBLOG_INFO_CUSTOM(func, msg) std::cout << func << " [INFO]: " << msg << std::endl;
-#define FBLOG_ERROR_CUSTOM(func, msg) std::cout << func << " [ERROR]: " << msg << std::endl;
 
 ///////////////////////////////////////////////////////////////////////////////
 /// @fn GCP::StaticInitialize()
@@ -28,7 +24,6 @@ void GCP::StaticInitialize()
     // be called once per process
     
     FBLOG_INFO_CUSTOM("GCP::StaticInitalize()", "Initing RtcCenter singleton...");
-    
     if(NULL == GoCast::RtcCenter::Instance())
     {
         FBLOG_ERROR_CUSTOM("GCP::StaticInitialize()", "Failed to init RtcCenter singleton");
@@ -50,7 +45,6 @@ void GCP::StaticDeinitialize()
     // always be called just before the plugin library is unloaded
     
     FBLOG_INFO_CUSTOM("GCP::StaticDeinitalize()", "Destroying RtcCenter singleton...");
-
     if(NULL != GoCast::RtcCenter::Instance(true))
     {
         FBLOG_ERROR_CUSTOM("GCP::StaticDeinitialize()", "Failed to destroy RtcCenter singleton");
@@ -141,14 +135,7 @@ bool GCP::onWindowAttached(FB::AttachedEvent *evt, FB::PluginWindow *pWin)
         if(NULL == m_pRenderer.get())
         {
             FBLOG_INFO_CUSTOM("GCP::onWindowAttached()", "Creating video renderer...");
-            
-            m_pRenderer = webrtc::CreateVideoRenderer(
-                new GoCast::GCPVideoRenderer(
-                    pWin,
-                    GOCAST_DEFAULT_RENDER_WIDTH,
-                    GOCAST_DEFAULT_RENDER_HEIGHT)
-            );
-            
+            m_pRenderer = webrtc::CreateVideoRenderer(new GoCast::GCPVideoRenderer(pWin));
             FBLOG_INFO_CUSTOM("GCP::onWindowAttached()", "Creating video renderer DONE");
         }
     }

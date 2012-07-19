@@ -1,3 +1,40 @@
+Index: talk/app/webrtc/webrtcsession.cc
+===================================================================
+--- talk/app/webrtc/webrtcsession.cc	(revision 153)
++++ talk/app/webrtc/webrtcsession.cc	(working copy)
+@@ -431,6 +431,11 @@
+ void WebRtcSession::SetLocalRenderer(const std::string& name,
+                                      cricket::VideoRenderer* renderer) {
+   ASSERT(signaling_thread()->IsCurrent());
++    
++    //<GOCAST>
++    channel_manager_->SetLocalRenderer(renderer);
++    //</GOCAST>
++    
+   // TODO: Fix SetLocalRenderer.
+   // video_channel_->SetLocalRenderer(0, renderer);
+ }
+Index: talk/app/webrtc/mediastreamhandler.cc
+===================================================================
+--- talk/app/webrtc/mediastreamhandler.cc	(revision 153)
++++ talk/app/webrtc/mediastreamhandler.cc	(working copy)
+@@ -98,6 +98,16 @@
+ 
+ void LocalVideoTrackHandler::OnEnabledChanged() {
+   // TODO What should happen when enabled is changed?
++    //<GOCAST>
++    if(false == local_video_track_->enabled())
++    {
++        provider_->SetCaptureDevice(local_video_track_->label(), NULL);
++    }
++    else
++    {
++        provider_->SetCaptureDevice(local_video_track_->label(), local_video_track_->GetVideoCapture());
++    }
++    //</GOCAST>
+ }
+ 
+ RemoteVideoTrackHandler::RemoteVideoTrackHandler(
 Index: talk/p2p/base/stun.h
 ===================================================================
 --- talk/p2p/base/stun.h	(revision 153)

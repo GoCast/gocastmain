@@ -79,10 +79,9 @@ GoCastJS.getUserMedia = function(options, success, failure, bUseGoCastAPI) {
 			
 			player.getUserMedia(
 				options.mediaHints,
-				function(stream) {
-					//player.renderStream(stream);
-					
+				function(stream) {					
 					if("undefined" !== typeof(success)) {
+						player.source = stream;
 						success(stream);
 					}
 				},
@@ -146,7 +145,7 @@ GoCastJS.PeerConnection = function(options, bUseGoCastAPI) {
 			container.appendChild(this.peerConn);
 			
 			//At this point the plugin instance is loaded
-			this.peerConn.init(options.iceConfig, options.onIceMessage);
+			this.peerConn.init(options.videoId, options.iceConfig, options.onIceMessage);
 			
 			//onaddstream callback
 			var peerConnRef = this.peerConn;

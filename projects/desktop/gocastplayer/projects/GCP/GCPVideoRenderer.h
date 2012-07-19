@@ -17,7 +17,7 @@ namespace GoCast
     class GCPVideoRenderer: public cricket::VideoRenderer
     {
     public:
-        explicit GCPVideoRenderer(FB::PluginWindow* pWin, int width, int height);
+        explicit GCPVideoRenderer(FB::PluginWindow* pWin);
         virtual ~GCPVideoRenderer();
         virtual bool SetSize(int width, int height, int reserved);
         virtual bool RenderFrame(const cricket::VideoFrame* pFrame);

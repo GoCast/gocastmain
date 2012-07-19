@@ -2,9 +2,7 @@
 
 namespace GoCast
 {
-    GCPVideoRenderer::GCPVideoRenderer(FB::PluginWindow* pWin,
-                                       int width,
-                                       int height)
+    GCPVideoRenderer::GCPVideoRenderer(FB::PluginWindow* pWin)
     : m_pWin(pWin)
     , m_width(0)
     , m_height(0)

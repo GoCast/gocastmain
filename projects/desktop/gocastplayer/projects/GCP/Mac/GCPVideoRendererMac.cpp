@@ -1,5 +1,4 @@
 #include "../GCPVideoRenderer.h"
-#include <iostream>
 
 namespace GoCast
 {
@@ -33,9 +32,6 @@ namespace GoCast
             pBufIter += 4;
         }
         
-        static int frameNumber = 0;
-        std::cout << "RenderFrame: " << frameNumber++ << std::endl;
-        
         //trigger window refresh event
         m_pWin->InvalidateWindow();
         
@@ -50,8 +46,6 @@ namespace GoCast
 
         const int stride = m_width*4;    
         const int frameBufferSize = m_height*stride;
-        static int frameNumber = 0;
-        std::cout << "RenderFrame[1]: " << frameNumber++ << std::endl;
         
         if(NULL == pContext || NULL == m_pFrameBuffer.get())
         {
