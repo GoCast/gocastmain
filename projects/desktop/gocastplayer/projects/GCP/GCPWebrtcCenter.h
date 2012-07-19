@@ -67,7 +67,6 @@ namespace GoCast
     {
     public:
         static RtcCenter* Instance(bool bDelete = false);
-        const talk_base::scoped_refptr<webrtc::PeerConnectionFactoryInterface>& PeerConnFactory() const;
         
         //Thread-safe methods
         void GetUserMedia(FB::JSObjectPtr mediaHints,
@@ -79,10 +78,10 @@ namespace GoCast
                                webrtc::PeerConnectionObserver* pObserver,
                                bool bSyncCall = true);
         void AddStream(const std::string& pluginId,
-                       const talk_base::scoped_refptr<webrtc::LocalMediaStreamInterface>& pStream,
+                       const std::string& label,
                        bool bSyncCall = true);
         void RemoveStream(const std::string& pluginId,
-                          const talk_base::scoped_refptr<webrtc::LocalMediaStreamInterface>& pStream,
+                          const std::string& label,
                           bool bSyncCall = true);
         std::string CreateOffer(const std::string& pluginId,
                                 const webrtc::MediaHints& mediaHints,
@@ -112,6 +111,31 @@ namespace GoCast
     public:
         std::string ReadyState(const std::string& pluginId);
         
+        bool GetLocalVideoTrackEnabled() const { 
+            return m_pLocalStream->video_tracks()->at(0)->enabled(); 
+        }
+        
+        void SetLocalVideoTrackEnabled(bool bEnable) {
+            m_pLocalStream->video_tracks()->at(0)->set_enabled(bEnable);
+        }
+        
+        void SetRemoteVideoTrackRenderer(const std::string& pluginId,
+                                         const talk_base::scoped_refptr
+                                        <webrtc::VideoRendererWrapperInterface>& pRenderer) {
+            if(0 < m_remoteStreams[pluginId]->video_tracks()->count()){
+                m_remoteStreams[pluginId]->video_tracks()->at(0)->SetRenderer(pRenderer);
+            }
+        }
+        
+        void AddRemoteStream(const std::string& pluginId,
+                             const talk_base::scoped_refptr<webrtc::MediaStreamInterface>& pStream) {
+            m_remoteStreams[pluginId] = pStream;
+        }
+        
+        void RemoveRemoteStream(const std::string& pluginId) {
+            m_remoteStreams.erase(pluginId);
+        }
+        
     private:
         RtcCenter();
         virtual ~RtcCenter();
@@ -127,9 +151,9 @@ namespace GoCast
                                  const std::string& iceConfig,
                                  webrtc::PeerConnectionObserver* pObserver);
         void AddStream_w(const std::string& pluginId,
-                         const talk_base::scoped_refptr<webrtc::LocalMediaStreamInterface>& pStream);
+                         const std::string& label);
         void RemoveStream_w(const std::string& pluginId,
-                            const talk_base::scoped_refptr<webrtc::LocalMediaStreamInterface>& pStream);
+                            const std::string& label);
         std::string CreateOffer_w(const std::string& pluginId,
                                   const webrtc::MediaHints& mediaHints);
         std::string CreateAnswer_w(const std::string& pluginId,
@@ -152,7 +176,10 @@ namespace GoCast
         MessageQueue m_msgq;
         std::map< std::string,
                   talk_base::scoped_refptr<webrtc::PeerConnectionInterface> > m_pPeerConns;
+        std::map< std::string,
+        talk_base::scoped_refptr<webrtc::MediaStreamInterface> > m_remoteStreams;
         talk_base::scoped_refptr<webrtc::PeerConnectionFactoryInterface> m_pConnFactory;
+        talk_base::scoped_refptr<webrtc::LocalMediaStreamInterface> m_pLocalStream;
     };
 }
 

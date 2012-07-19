@@ -63,20 +63,10 @@ void GCPAPI::set_onremovestream(const FB::JSObjectPtr &onremovestream)
 void GCPAPI::set_source(const FB::JSAPIPtr& stream)
 {
     m_srcStream = stream;
-    
     if(NULL != stream.get())
     {
-        talk_base::scoped_refptr<webrtc::MediaStreamInterface> pStream = static_cast<GoCast::RemoteMediaStream*>(stream.get())->RemoteMediaStreamInterface();
-    
-        if(0 < pStream->video_tracks()->count())
-        {
-            std::string msg("Rendering track [");
-            msg += pStream->video_tracks()->at(0)->label();
-            msg += "]...";
-            
-            FBLOG_INFO_CUSTOM(funcstr("GCPAPI::set_source", m_htmlId.convert_cast<std::string>()), msg);
-            pStream->video_tracks()->at(0)->SetRenderer(getPlugin()->Renderer());
-        }
+        (GoCast::RtcCenter::Instance())->SetRemoteVideoTrackRenderer(m_htmlId.convert_cast<std::string>(),
+                                                                     getPlugin()->Renderer());
     }
 }
 
@@ -129,7 +119,7 @@ void GCPAPI::AddStream(const FB::JSAPIPtr& stream)
     }
 
     pCtr->AddStream(m_htmlId.convert_cast<std::string>(),
-                    static_cast<GoCast::MediaStream*>(stream.get())->LocalMediaStreamInterface());
+                    stream->GetProperty("label").convert_cast<std::string>());
 }
 
 void GCPAPI::RemoveStream(const FB::JSAPIPtr& stream)
@@ -144,7 +134,7 @@ void GCPAPI::RemoveStream(const FB::JSAPIPtr& stream)
     }
     
     pCtr->RemoveStream(m_htmlId.convert_cast<std::string>(),
-                       static_cast<GoCast::MediaStream*>(stream.get())->LocalMediaStreamInterface());
+                       stream->GetProperty("label").convert_cast<std::string>());
 }
 
 FB::variant GCPAPI::CreateOffer(const FB::JSObjectPtr& mediaHints)
@@ -306,7 +296,8 @@ void GCPAPI::OnStateChange(StateType state_changed)
 void GCPAPI::OnAddStream(webrtc::MediaStreamInterface* pRemoteStream)
 {
     talk_base::scoped_refptr<webrtc::MediaStreamInterface> pStream(pRemoteStream);
-    
+
+    (GoCast::RtcCenter::Instance())->AddRemoteStream(m_htmlId.convert_cast<std::string>(),pStream);
     if(NULL != m_onaddstreamCb.get())
     {
         std::string msg("Added remote stream [");
@@ -321,6 +312,7 @@ void GCPAPI::OnRemoveStream(webrtc::MediaStreamInterface* pRemoteStream)
 {
     talk_base::scoped_refptr<webrtc::MediaStreamInterface> pStream(pRemoteStream);
     
+    (GoCast::RtcCenter::Instance())->RemoveRemoteStream(m_htmlId.convert_cast<std::string>());
     if(NULL != m_onremovestreamCb.get())
     {
         std::string msg("Removed remote stream [");

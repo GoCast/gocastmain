@@ -57,6 +57,26 @@ namespace GoCast
         }
     }
     
+    FB::variant LocalMediaStreamTrack::get_enabled() const
+    {
+        if("video" == m_kind.convert_cast<std::string>())
+        {
+           return (RtcCenter::Instance())->GetLocalVideoTrackEnabled();
+        }
+        
+        return m_enabled;
+    }
+    
+    void LocalMediaStreamTrack::set_enabled(FB::variant newVal)
+    {
+        if("video" == m_kind.convert_cast<std::string>())
+        {
+            (RtcCenter::Instance())->SetLocalVideoTrackEnabled(newVal.convert_cast<bool>());
+        }
+        
+        m_enabled = newVal;
+    }
+    
     std::string GetReadyStateString(webrtc::PeerConnectionInterface::ReadyState state)
     {
         switch(state)
@@ -109,29 +129,29 @@ namespace GoCast
     struct AddStreamParams : public talk_base::MessageData
     {
         AddStreamParams(const std::string& pluginId,
-                        const talk_base::scoped_refptr<webrtc::LocalMediaStreamInterface>& pStream)
+                        const std::string& label)
         : m_pluginId(pluginId)
-        , m_pStream(pStream)
+        , m_label(label)
         {
             
         }
         
         std::string m_pluginId;
-        talk_base::scoped_refptr<webrtc::LocalMediaStreamInterface> m_pStream;
+        std::string m_label;
     };
     
     struct RemoveStreamParams : public talk_base::MessageData
     {
         RemoveStreamParams(const std::string& pluginId,
-                           const talk_base::scoped_refptr<webrtc::LocalMediaStreamInterface>& pStream)
+                           const std::string& label)
         : m_pluginId(pluginId)
-        , m_pStream(pStream)
+        , m_label(label)
         {
             
         }
         
         std::string m_pluginId;
-        talk_base::scoped_refptr<webrtc::LocalMediaStreamInterface> m_pStream;
+        std::string m_label;
     };
 
     struct CreateOfferParams : public talk_base::MessageData
@@ -367,11 +387,6 @@ namespace GoCast
         return pInst;
     }
     
-    const talk_base::scoped_refptr<webrtc::PeerConnectionFactoryInterface>& RtcCenter::PeerConnFactory() const
-    {
-        return m_pConnFactory;
-    }
-    
     void RtcCenter::GetUserMedia(FB::JSObjectPtr mediaHints,
                                  FB::JSObjectPtr succCb,
                                  FB::JSObjectPtr failCb,
@@ -406,32 +421,32 @@ namespace GoCast
     }
     
     void RtcCenter::AddStream(const std::string& pluginId,
-                              const talk_base::scoped_refptr<webrtc::LocalMediaStreamInterface> &pStream,
+                              const std::string& label,
                               bool bSyncCall)
     {
         if(false == bSyncCall)
         {
-            AddStreamParams* pParams = new AddStreamParams(pluginId, pStream);
+            AddStreamParams* pParams = new AddStreamParams(pluginId, label);
             m_msgq.Send(MSG_ADD_STREAM, pParams);
         }
         else
         {
-            AddStream_w(pluginId, pStream);
+            AddStream_w(pluginId, label);
         }
     }
     
     void RtcCenter::RemoveStream(const std::string& pluginId,
-                                 const talk_base::scoped_refptr<webrtc::LocalMediaStreamInterface> &pStream,
+                                 const std::string& label,
                                  bool bSyncCall)
     {
         if(false == bSyncCall)
         {
-            RemoveStreamParams* pParams = new RemoveStreamParams(pluginId, pStream);
+            RemoveStreamParams* pParams = new RemoveStreamParams(pluginId, label);
             m_msgq.Send(MSG_REMOVE_STREAM, pParams);
         }
         else
         {
-            RemoveStream_w(pluginId, pStream);
+            RemoveStream_w(pluginId, label);
         }
     }
 
@@ -556,6 +571,7 @@ namespace GoCast
     RtcCenter::RtcCenter()
     : m_msgq(this)
     , m_pConnFactory(webrtc::CreatePeerConnectionFactory())
+    , m_pLocalStream(NULL)
     {
         if(NULL == m_pConnFactory.get())
         {
@@ -598,7 +614,7 @@ namespace GoCast
             case MSG_ADD_STREAM:
             {
                 AddStreamParams* pParams = static_cast<AddStreamParams*>(msg->pdata);
-                AddStream_w(pParams->m_pluginId, pParams->m_pStream);
+                AddStream_w(pParams->m_pluginId, pParams->m_label);
                 delete pParams;
                 break;
             }
@@ -606,7 +622,7 @@ namespace GoCast
             case MSG_REMOVE_STREAM:
             {
                 RemoveStreamParams* pParams = static_cast<RemoveStreamParams*>(msg->pdata);
-                RemoveStream_w(pParams->m_pluginId, pParams->m_pStream);
+                RemoveStream_w(pParams->m_pluginId, pParams->m_label);
                 delete pParams;
                 break;
             }
@@ -685,69 +701,41 @@ namespace GoCast
     {
         if(NULL == m_pConnFactory.get())
         {
-            m_pConnFactory = webrtc::CreatePeerConnectionFactory();
-            if(NULL == m_pConnFactory.get())
-            {
-                FBLOG_ERROR_CUSTOM("RtcCenter::GetUserMedia_w()", "Peerconnection factory is NULL...");
-                failCb->InvokeAsync("", FB::variant_list_of("Peerconnection factory NULL"));
-                return;
-            }
+            FBLOG_ERROR_CUSTOM("RtcCenter::GetUserMedia_w()", "Peerconnection factory is NULL...");
+            failCb->InvokeAsync("", FB::variant_list_of("Peerconnection factory NULL"));
+            return;
         }
-                
+        
+        if(NULL != m_pLocalStream.get())
+        {
+            succCb->InvokeAsync("", FB::variant_list_of(LocalMediaStream::Create(m_pLocalStream)));
+            return;
+        }
+        
         //Create local media stream object
         FBLOG_INFO_CUSTOM("RtcCenter::GetUserMedia_w()", "Creating local media stream interface object...");
-        talk_base::scoped_refptr<webrtc::LocalMediaStreamInterface> pLocalMedia(
-            m_pConnFactory->CreateLocalMediaStream("localmedia")
-        );
+        m_pLocalStream = m_pConnFactory->CreateLocalMediaStream("localStream");
         
-        FBLOG_INFO_CUSTOM("RtcCenter::GetUserMedia_w()", "Creating local media stream js object...");
-        FB::JSAPIPtr stream = MediaStream::Create(pLocalMedia);
-                
         //If mediaHints.video == true, add video track
         if(true == mediaHints->GetProperty("video").convert_cast<bool>())
         {
             FBLOG_INFO_CUSTOM("RtcCenter::GetUserMedia_w()", "Creating local video track interface object...");
-            talk_base::scoped_refptr<webrtc::LocalVideoTrackInterface> pLocalVideo(
-                m_pConnFactory->CreateLocalVideoTrack(
-                    "localvideo",
-                    webrtc::CreateVideoCapturer(
-                        LocalVideoTrack::GetDefaultCaptureDevice()
-                    )
-                )
-            );
-            
-            if(NULL == pLocalVideo.get())
-            {
-                FBLOG_ERROR_CUSTOM("RtcCenter::GetUserMedia_w()", "Creating local video track interface object FAILED");
-                failCb->InvokeAsync("", FB::variant_list_of("Local video track NULL"));
-                return;
-            }
-            
-            pLocalMedia->AddTrack(pLocalVideo);
-            static_cast<MediaStream*>(stream.get())->AddTrack(LocalVideoTrack::Create(pLocalVideo));
+            m_pLocalStream->AddTrack(m_pConnFactory->CreateLocalVideoTrack(
+                                            "localvideo",
+                                            webrtc::CreateVideoCapturer(LocalVideoTrack::GetDefaultCaptureDevice())
+                                    ));            
         }
         
         //If mediaHints.audio == true, add audio track
         if(true == mediaHints->GetProperty("audio").convert_cast<bool>())
         {
             FBLOG_INFO_CUSTOM("RtcCenter::GetUserMedia_w()", "Creating local audio track interface object...");
-            talk_base::scoped_refptr<webrtc::LocalAudioTrackInterface> pLocalAudio(
-                m_pConnFactory->CreateLocalAudioTrack("localaudio", NULL)
-            );
-            
-            if(NULL == pLocalAudio.get())
-            {
-                FBLOG_ERROR_CUSTOM("RtcCenter::GetUserMedia_w()", "Creating local audio track interface object FAILED");
-                failCb->InvokeAsync("", FB::variant_list_of("Local audio track NULL"));
-                return;
-            }
-            
-            pLocalMedia->AddTrack(pLocalAudio);
-            static_cast<MediaStream*>(stream.get())->AddTrack(LocalAudioTrack::Create(pLocalAudio));
+            m_pLocalStream->AddTrack(m_pConnFactory->CreateLocalAudioTrack("localaudio", NULL));
         }
         
+        
+        succCb->InvokeAsync("", FB::variant_list_of(LocalMediaStream::Create(m_pLocalStream)));
         FBLOG_INFO_CUSTOM("RtcCenter::GetUserMedia_w()", "GetUserMedia DONE");
-        succCb->InvokeAsync("", FB::variant_list_of(stream));
     }
     
     bool RtcCenter::NewPeerConnection_w(const std::string& pluginId,
@@ -788,31 +776,56 @@ namespace GoCast
     }
     
     void RtcCenter::AddStream_w(const std::string& pluginId,
-                                const talk_base::scoped_refptr<webrtc::LocalMediaStreamInterface>& pStream)
+                                const std::string& label)
     {
         if(m_pPeerConns.end() == m_pPeerConns.find(pluginId))
         {
             FBLOG_ERROR_CUSTOM(funcstr("RtcCenter::AddStream_w", pluginId),
                                "No PeerConnection found for this plugin instance");
+            return;
         }
-        else
+        
+        if(NULL == m_pLocalStream.get())
         {
-            m_pPeerConns[pluginId]->AddStream(pStream);
+            FBLOG_ERROR_CUSTOM(funcstr("RtcCenter::AddStream_w", pluginId), "No local stream present");
+            return;
         }
+        
+        if(label != m_pLocalStream->label())
+        {
+            std::string msg("No local stream [");
+            msg += (label + "] present");
+            FBLOG_ERROR_CUSTOM(funcstr("RtcCenter::AddStream_w", pluginId), msg);
+            return;            
+        }
+
+        m_pPeerConns[pluginId]->AddStream(m_pLocalStream);
     }
 
     void RtcCenter::RemoveStream_w(const std::string& pluginId,
-                                   const talk_base::scoped_refptr<webrtc::LocalMediaStreamInterface>& pStream)
+                                   const std::string& label)
     {
         if(m_pPeerConns.end() == m_pPeerConns.find(pluginId))
         {
             FBLOG_ERROR_CUSTOM(funcstr("RtcCenter::RemoveStream_w", pluginId),
                                "No PeerConnection found for this plugin instance");
         }
-        else
+        
+        if(NULL == m_pLocalStream.get())
         {
-            m_pPeerConns[pluginId]->RemoveStream(pStream);
+            FBLOG_ERROR_CUSTOM(funcstr("RtcCenter::RemoveStream_w", pluginId), "No local stream present");
+            return;
         }
+        
+        if(label != m_pLocalStream->label())
+        {
+            std::string msg("No local stream [");
+            msg += (label + "] present");
+            FBLOG_ERROR_CUSTOM(funcstr("RtcCenter::RemoveStream_w", pluginId), msg);
+            return;            
+        }
+        
+        m_pPeerConns[pluginId]->RemoveStream(m_pLocalStream);
     }
     
     std::string RtcCenter::CreateOffer_w(const std::string& pluginId,
@@ -970,7 +983,6 @@ namespace GoCast
     
     void RtcCenter::DeletePeerConnection_w(const std::string& pluginId)
     {
-        FBLOG_INFO_CUSTOM(pluginId, ": (Plugin Id)");
         if(m_pPeerConns.end() == m_pPeerConns.find(pluginId))
         {
             FBLOG_ERROR_CUSTOM(funcstr("RtcCenter::DeletePeerConnection_w", pluginId),
@@ -979,6 +991,9 @@ namespace GoCast
         }
         
         //erase calls destructor of peerconnection
+        //TODO: RemoveStream only if stream added
+        m_pPeerConns[pluginId]->RemoveStream(m_pLocalStream);
+        m_pPeerConns[pluginId]->Close();
         m_pPeerConns.erase(pluginId);
     }
 }

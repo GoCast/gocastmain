@@ -32,23 +32,18 @@ namespace GoCast
         registerProperty("label", make_property(this, &MediaStreamTrack::get_label));
     }
     
-    FB::JSAPIPtr LocalMediaStreamTrack::Create(talk_base::scoped_refptr<webrtc::MediaStreamTrackInterface>& pTrack,
-                                               const std::string& kind,
+    FB::JSAPIPtr LocalMediaStreamTrack::Create(const std::string& kind,
                                                const std::string label,
                                                const bool enabled)
     {
-        return boost::make_shared<LocalMediaStreamTrack>(pTrack.get(), kind, label, enabled);
+        return boost::make_shared<LocalMediaStreamTrack>(kind, label, enabled);
     }
     
-    LocalMediaStreamTrack::LocalMediaStreamTrack(
-        const talk_base::scoped_refptr<webrtc::MediaStreamTrackInterface>& pTrack,
-        const std::string& kind,
-        const std::string& label,
-        const bool enabled
-    )
+    LocalMediaStreamTrack::LocalMediaStreamTrack(const std::string& kind,
+                                                 const std::string& label,
+                                                 const bool enabled)
     : MediaStreamTrack(kind, label)
     , m_enabled(enabled)
-    , m_pTrack(pTrack)
     {
         registerProperty("enabled", make_property(this, &LocalMediaStreamTrack::get_enabled,
                                                         &LocalMediaStreamTrack::set_enabled));
@@ -99,8 +94,7 @@ namespace GoCast
     }
     
     LocalVideoTrack::LocalVideoTrack(const talk_base::scoped_refptr<webrtc::LocalVideoTrackInterface>& pTrack)
-    : LocalMediaStreamTrack(pTrack.get(), pTrack->kind(), pTrack->label(), pTrack->enabled())
-    , m_pTrack(pTrack)
+    : LocalMediaStreamTrack(pTrack->kind(), pTrack->label(), pTrack->enabled())
     {
         
     }
@@ -111,8 +105,7 @@ namespace GoCast
     }
     
     LocalAudioTrack::LocalAudioTrack(const talk_base::scoped_refptr<webrtc::LocalAudioTrackInterface>& pTrack)
-    : LocalMediaStreamTrack(pTrack.get(), pTrack->kind(), pTrack->label(), pTrack->enabled())
-    , m_pTrack(pTrack)
+    : LocalMediaStreamTrack(pTrack->kind(), pTrack->label(), pTrack->enabled())
     {
         
     }
@@ -124,7 +117,6 @@ namespace GoCast
     
     RemoteVideoTrack::RemoteVideoTrack(const talk_base::scoped_refptr<webrtc::VideoTrackInterface>& pTrack)
     : MediaStreamTrack(pTrack->kind(), pTrack->label())
-    , m_pTrack(pTrack)
     {
         
     }
@@ -136,34 +128,47 @@ namespace GoCast
     
     RemoteAudioTrack::RemoteAudioTrack(const talk_base::scoped_refptr<webrtc::AudioTrackInterface>& pTrack)
     : MediaStreamTrack(pTrack->kind(), pTrack->label())
-    , m_pTrack(pTrack)
     {
         
     }
 
-    FB::JSAPIPtr MediaStream::Create(talk_base::scoped_refptr<webrtc::LocalMediaStreamInterface>& pStream)
+    FB::JSAPIPtr LocalMediaStream::Create(talk_base::scoped_refptr<webrtc::LocalMediaStreamInterface>& pStream)
     {
-        return boost::make_shared<MediaStream>(pStream);
+        return boost::make_shared<LocalMediaStream>(pStream);
     }
     
-    MediaStream::MediaStream(const talk_base::scoped_refptr<webrtc::LocalMediaStreamInterface>& pStream)
+    LocalMediaStream::LocalMediaStream(const talk_base::scoped_refptr<webrtc::LocalMediaStreamInterface>& pStream)
     : FB::JSAPIAuto("MediaStream")
     , m_label(pStream->label())
     , m_videoTracks(FB::variant_list_of())
     , m_audioTracks(FB::variant_list_of())
-    , m_pStream(pStream)
     {
-        registerProperty("label", make_property(this, &MediaStream::get_label));
-        registerProperty("videoTracks", make_property(this,&MediaStream::get_videoTracks));
-        registerProperty("audioTracks", make_property(this, &MediaStream::get_audioTracks));
+        registerProperty("label", make_property(this, &LocalMediaStream::get_label));
+        registerProperty("videoTracks", make_property(this,&LocalMediaStream::get_videoTracks));
+        registerProperty("audioTracks", make_property(this, &LocalMediaStream::get_audioTracks));
+        
+        for(int i=0; i<pStream->video_tracks()->count(); i++)
+        {
+            talk_base::scoped_refptr<webrtc::VideoTrackInterface> pTrack(pStream->video_tracks()->at(i));
+            talk_base::scoped_refptr<webrtc::LocalVideoTrackInterface> pTrack_(
+                static_cast<webrtc::LocalVideoTrackInterface*>(pTrack.get())
+            );
+            
+            AddTrack(LocalVideoTrack::Create(pTrack_));
+        }
+        
+        for(int i=0; i<pStream->audio_tracks()->count(); i++)
+        {
+            talk_base::scoped_refptr<webrtc::AudioTrackInterface> pTrack(pStream->audio_tracks()->at(i));
+            talk_base::scoped_refptr<webrtc::LocalAudioTrackInterface> pTrack_(
+                static_cast<webrtc::LocalAudioTrackInterface*>(pTrack.get())
+            );
+            
+            AddTrack(LocalAudioTrack::Create(pTrack_));
+        }
     }
     
-    const talk_base::scoped_refptr<webrtc::LocalMediaStreamInterface>& MediaStream::LocalMediaStreamInterface() const
-    {
-        return m_pStream;
-    }
-    
-    void MediaStream::AddTrack(FB::JSAPIPtr pTrack)
+    void LocalMediaStream::AddTrack(FB::JSAPIPtr pTrack)
     {
         if("video" == pTrack->GetProperty("kind").convert_cast<std::string>())
         {
@@ -185,7 +190,6 @@ namespace GoCast
     , m_label(pStream->label())
     , m_videoTracks(FB::variant_list_of())
     , m_audioTracks(FB::variant_list_of())
-    , m_pStream(pStream)
     {
         registerProperty("label", make_property(this, &RemoteMediaStream::get_label));
         registerProperty("videoTracks", make_property(this,&RemoteMediaStream::get_videoTracks));
@@ -202,11 +206,6 @@ namespace GoCast
             talk_base::scoped_refptr<webrtc::AudioTrackInterface> pTrack(pStream->audio_tracks()->at(i));
             AddTrack(RemoteAudioTrack::Create(pTrack));
         }
-    }
-    
-    const talk_base::scoped_refptr<webrtc::MediaStreamInterface>& RemoteMediaStream::RemoteMediaStreamInterface() const
-    {
-        return m_pStream;
     }
     
     void RemoteMediaStream::AddTrack(FB::JSAPIPtr pTrack)
