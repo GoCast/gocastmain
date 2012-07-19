@@ -88,6 +88,7 @@ function mucRoom(client, notifier, bSelfDestruct, success, failure) {
 	this.iqnum = 0;
 	this.notifier = notifier;
 	this.pendingDeletion = false;
+	this.addSpotCeiling = 1000;		// Value doled-out upon addspot commands being given (and incremented afterwards)
 	
 	var self = this;
 	
@@ -471,6 +472,8 @@ mucRoom.prototype.handleIQ = function(iq) {
 		this.log("ERROR: NAME MISMATCH. this.roomname="+this.roomname+" while iq="+iq.tree());
 	}
 */
+//	this.log("IQ message received: " + iq.tree());
+	
 	if (iq.attrs.type === 'result' && iq.attrs.id && this.iq_callbacks[iq.attrs.id])
 	{
 		var iqid = iq.attrs.id;
@@ -533,12 +536,12 @@ mucRoom.prototype.SendGroupCmd = function(cmd, attribs_in) {
 mucRoom.prototype.AddSpotReflection = function(iq) {
 	// Need to pull out the 'info' object - which is the attributes to the 'addspot'
 	var info = {};
-	$(iq).find('addspot').each(function() {
-		$.each(this.attributes, function(i, attrib) {
-			info[attrib.name] = attrib.value;
-		});
-	});
-
+	if (iq.getChild('addspot'))
+		info = iq.getChild('addspot').attrs;
+		
+	// Be sure to give a spot number to everyone that's consistent.
+	info.spotNumber = this.addSpotCeiling++;
+	
 	this.SendGroupCmd('addspot', info);
 
 	// Now reply to the IQ message favorably.
@@ -552,11 +555,9 @@ mucRoom.prototype.AddSpotReflection = function(iq) {
 mucRoom.prototype.RemoveSpotReflection = function(iq) {
 	// Need to pull out the 'info' object - which is the attributes to the 'removespot'
 	var info = {};
-	$(iq).find('removespot').each(function() {
-		$.each(this.attributes, function(i, attrib) {
-			info[attrib.name] = attrib.value;
-		});
-	});
+	
+	if (iq.getChild('removespot'))
+		info = iq.getChild('removespot').attrs;
 
 	this.SendGroupCmd('removespot', info);
 
