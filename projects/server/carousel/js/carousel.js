@@ -444,8 +444,8 @@
             items.iterateSorted(function(item)
             {
                var obj = item.object;
-               $(obj).removeAttr('style');  // todo move this out of the update loop
-               $(obj).css('position', 'absolute');
+               $(obj).css('top', '');
+               $(obj).css('right', '');
                if (x < -(spotWidth + spotSpace)) x += xMax;
                else if (x > xMax)                x -= xMax; // wrap to start
                obj.style.width = item.orgWidth * scale + 'px';
