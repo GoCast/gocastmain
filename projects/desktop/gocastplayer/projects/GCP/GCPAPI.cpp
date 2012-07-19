@@ -13,6 +13,23 @@
 #include "GCPWebrtcCenter.h"
 #include "GCPMediaStream.h"
 
+GCPAPI::~GCPAPI()
+{
+    if("localPlayer" != m_htmlId.convert_cast<std::string>())
+    {
+        (GoCast::RtcCenter::Instance())->SetLocalVideoTrackRenderer(NULL);
+    }
+    else
+    {
+        (GoCast::RtcCenter::Instance())->SetRemoteVideoTrackRenderer(
+            m_htmlId.convert_cast<std::string>(),
+            NULL
+        );
+    }
+    
+    DeletePeerConnection();
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 /// @fn GCPPtr GCPAPI::getPlugin()
 ///

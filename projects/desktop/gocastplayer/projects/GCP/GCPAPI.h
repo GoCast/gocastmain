@@ -65,12 +65,7 @@ public:
     ///         the browser is done with it; this will almost definitely be after
     ///         the plugin is released.
     ///////////////////////////////////////////////////////////////////////////////
-    virtual ~GCPAPI() {
-        if("localPlayer" != m_htmlId.convert_cast<std::string>())
-        {
-            DeletePeerConnection();
-        }
-    };
+    virtual ~GCPAPI();
 
     GCPPtr getPlugin();
 
