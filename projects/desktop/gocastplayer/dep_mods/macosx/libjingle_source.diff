@@ -2,6 +2,20 @@ Index: talk/app/webrtc/webrtcsession.cc
 ===================================================================
 --- talk/app/webrtc/webrtcsession.cc	(revision 153)
 +++ talk/app/webrtc/webrtcsession.cc	(working copy)
+@@ -59,10 +59,10 @@
+ // Constants for setting the default encoder size.
+ // TODO: Implement proper negotiation of video resolution.
+ static const int kDefaultVideoCodecId = 100;
+-static const int kDefaultVideoCodecFramerate = 30;
++    static const int kDefaultVideoCodecFramerate = 24; // <GOCAST> 30;
+ static const char kDefaultVideoCodecName[] = "VP8";
+-static const int kDefaultVideoCodecWidth = 640;
+-static const int kDefaultVideoCodecHeight = 480;
++    static const int kDefaultVideoCodecWidth = 160; // <GOCAST> 640;
++    static const int kDefaultVideoCodecHeight = 120; // <GOCAST> 480;
+ 
+ static void CopyCandidatesFromSessionDescription(
+     const SessionDescriptionInterface* source_desc,
 @@ -431,6 +431,11 @@
  void WebRtcSession::SetLocalRenderer(const std::string& name,
                                       cricket::VideoRenderer* renderer) {
