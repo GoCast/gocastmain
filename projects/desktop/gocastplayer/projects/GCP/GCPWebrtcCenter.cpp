@@ -61,10 +61,14 @@ namespace GoCast
     {
         if("video" == m_kind.convert_cast<std::string>())
         {
-           return (RtcCenter::Instance())->GetLocalVideoTrackEnabled();
+            return (RtcCenter::Instance())->GetLocalVideoTrackEnabled();
+        }
+        else if("audio" == m_kind.convert_cast<std::string>())
+        {
+            return (RtcCenter::Instance())->GetLocalAudioTrackEnabled();
         }
         
-        return m_enabled;
+        return false;
     }
     
     void LocalMediaStreamTrack::set_enabled(FB::variant newVal)
@@ -73,6 +77,10 @@ namespace GoCast
         {
             (RtcCenter::Instance())->SetLocalVideoTrackEnabled(newVal.convert_cast<bool>());
         }
+        else if("audio" == m_kind.convert_cast<std::string>())
+        {
+            (RtcCenter::Instance())->SetLocalAudioTrackEnabled(newVal.convert_cast<bool>());
+        }        
         
         m_enabled = newVal;
     }
@@ -706,12 +714,6 @@ namespace GoCast
             return;
         }
         
-        if(NULL != m_pLocalStream.get())
-        {
-            succCb->InvokeAsync("", FB::variant_list_of(LocalMediaStream::Create(m_pLocalStream)));
-            return;
-        }
-        
         //Create local media stream object
         FBLOG_INFO_CUSTOM("RtcCenter::GetUserMedia_w()", "Creating local media stream interface object...");
         m_pLocalStream = m_pConnFactory->CreateLocalMediaStream("localStream");
@@ -988,6 +990,11 @@ namespace GoCast
             FBLOG_ERROR_CUSTOM(funcstr("RtcCenter::DeletePeerConnection_w", pluginId),
                                "No PeerConnection found for this plugin instance");
             return;
+        }
+        
+        if(0 < m_pLocalStream->audio_tracks()->count())
+        {
+            m_pLocalStream->audio_tracks()->at(0)->set_enabled(true);
         }
         
         //erase calls destructor of peerconnection

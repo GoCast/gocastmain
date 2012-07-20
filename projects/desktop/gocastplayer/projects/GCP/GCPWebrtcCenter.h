@@ -111,12 +111,30 @@ namespace GoCast
     public:
         std::string ReadyState(const std::string& pluginId);
         
-        bool GetLocalVideoTrackEnabled() const { 
-            return m_pLocalStream->video_tracks()->at(0)->enabled(); 
+        bool GetLocalVideoTrackEnabled() const {
+            if(0 < m_pLocalStream->video_tracks()->count()) {
+                return m_pLocalStream->video_tracks()->at(0)->enabled(); 
+            }
+            return false;
+        }
+        
+        bool GetLocalAudioTrackEnabled() const {
+            if(0 < m_pLocalStream->audio_tracks()->count()) {
+                return m_pLocalStream->audio_tracks()->at(0)->enabled();
+            }
+            return false;
         }
         
         void SetLocalVideoTrackEnabled(bool bEnable) {
-            m_pLocalStream->video_tracks()->at(0)->set_enabled(bEnable);
+            if(0 < m_pLocalStream->video_tracks()->count()) {
+                m_pLocalStream->video_tracks()->at(0)->set_enabled(bEnable);
+            }
+        }
+        
+        void SetLocalAudioTrackEnabled(bool bEnable) {
+            if(0 < m_pLocalStream->audio_tracks()->count()) {
+                m_pLocalStream->audio_tracks()->at(0)->set_enabled(bEnable);
+            }
         }
         
         void SetLocalVideoTrackRenderer(const talk_base::scoped_refptr
