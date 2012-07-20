@@ -107,7 +107,7 @@ var Callcast = {
     sessionInfo: {},
 
     WriteUpdatedState: function() {
-        if(typeof(Storage)!=="undefined")
+        if (typeof(Storage) !== 'undefined')
         {
             // If the connection is alive, store info.
             // If it's not alive, then there's nothing to do here.
@@ -217,21 +217,21 @@ var Callcast = {
         var from = $(err).attr('from');
         var nick = Strophe.getResourceFromJid(from);
         if (nick)
-            nick = nick.replace(/\\20/g,' ');
+            nick = nick.replace(/\\20/g, ' ');
 
         // Need to cope with a few error stanzas.
 
         // #1 - If a user becomes unavailable and we're sending signaling / invitation messages, we'll get an error.
-        if ($(err).find("recipient-unavailable").length > 0)
-            console.log("INFO: Recipient " + nick + " became unavailable.");
-        else if ($(err).find("conflict").length > 0)
+        if ($(err).find('recipient-unavailable').length > 0)
+            console.log('INFO: Recipient ' + nick + ' became unavailable.');
+        else if ($(err).find('conflict').length > 0)
         {
             alert("The nickname '" + nick + "' is already in use.\nPlease choose a different nickname.");
             this.disconnect();
         }
-        else if ($(err).find("service-unavailable").length > 0)
+        else if ($(err).find('service-unavailable').length > 0)
         {
-            alert("Could not enter room. Likely max # users reached in this room.");
+            alert('Could not enter room. Likely max # users reached in this room.');
             this.LeaveSession();
         }
         else if ($(err).find('not-allowed').length > 0)
@@ -240,7 +240,7 @@ var Callcast = {
         }
         else if ($(err).find('registration-required').length > 0)
         {
-            alert("Room is currently locked. You may attempt to KNOCK to request entry.");
+            alert('Room is currently locked. You may attempt to KNOCK to request entry.');
             this.LeaveSession();
         }
         else if ($(err).find('forbidden').length > 0)
@@ -350,17 +350,17 @@ var Callcast = {
 
             if (info.width>=0 && info.height>=0)
             {
-                this.participants[nick].peer_connection.width  = info.width;
+                this.participants[nick].peer_connection.width = info.width;
                 this.participants[nick].peer_connection.height = info.height;
             }
             else if (info.hasVid===true)
             {
-                this.participants[nick].peer_connection.width  = this.WIDTH;
+                this.participants[nick].peer_connection.width = this.WIDTH;
                 this.participants[nick].peer_connection.height = this.HEIGHT;
             }
             else if (info.hasVid===false)
             {
-                this.participants[nick].peer_connection.width  = 0;
+                this.participants[nick].peer_connection.width = 0;
                 this.participants[nick].peer_connection.height = 0;
             }
         }
@@ -389,7 +389,7 @@ var Callcast = {
                 if (this.localplayer.width<=1 || this.localplayer.height<=1)
                     this.localplayer.startLocalVideo();
 
-                this.localplayer.width  = send_it.width;
+                this.localplayer.width = send_it.width;
                 this.localplayer.height = send_it.height;
 
                 this.bUseVideo = true;
@@ -597,7 +597,7 @@ var Callcast = {
 
             this.peer_connection.init(this.jid);
 
-        };
+        }
 
         this.InitiateCall = function() {
             if (this.peer_connection)
@@ -665,7 +665,7 @@ var Callcast = {
         return msg.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
     },
 
-    log: function (msg) {
+    log: function(msg) {
  //     $('#log').append(this.escapeit(msg) + "<br>");
 
         // This version is required for peer_connection.onlogmessage -- console.log doesn't work and escaped <br> version doesnt work.
@@ -693,9 +693,9 @@ var Callcast = {
          Callcast.connection.muc.listRooms(Callcast.CALLCAST_ROOMS, function(thelist) {
              Callcast.roomlist = {};    // Remove all entries from the rooms list.
 
-             $(thelist).find("item").each(function () {
+             $(thelist).find("item").each(function() {
                  Callcast.roomlist[$(this).attr('jid')] = $(this).attr('name');
-             }) ;
+             });
 
              $(document).trigger('roomlist_updated');
          });
@@ -759,7 +759,7 @@ var Callcast = {
                 modal: true,
                 title: 'Incoming Call From ' + Strophe.getBareJidFromJid(from),
                 buttons: {
-                    "Answer": function () {
+                    "Answer": function() {
                         Callcast.JoinSession(Strophe.getNodeFromJid(roomjid), roomjid);
                         $(this).dialog('close');
                     },
@@ -916,7 +916,7 @@ var Callcast = {
         if (nick)
             nick = nick.replace(/\\20/g, ' ');
 
-        var delayed = $(message).children("delay").length > 0  ||
+        var delayed = $(message).children("delay").length > 0 ||
             $(message).children("x[xmlns='jabber:x:delay']").length > 0;
 
         if (delayed)
@@ -945,7 +945,7 @@ var Callcast = {
 
     SendFeedback: function(msg) {
         if (this.connection)
-            this.connection.send($msg({to:this.FEEDBACK_BOT, nick: this.nick, room: this.room.split('@')[0]}).c('body').t(msg))
+            this.connection.send($msg({to:this.FEEDBACK_BOT, nick: this.nick, room: this.room.split('@')[0]}).c('body').t(msg));
     },
 
     on_public_message: function(message) {
@@ -969,7 +969,7 @@ var Callcast = {
 
             var body = $(message).children('body').text();
 
-            var delayed = $(message).children("delay").length > 0  ||
+            var delayed = $(message).children("delay").length > 0 ||
                 $(message).children("x[xmlns='jabber:x:delay']").length > 0;
 
             // look for room topic change
@@ -1228,7 +1228,7 @@ var Callcast = {
         this.connection.sendIQ($iq({
             to: myOverseer,
             id: "addspot1",
-            type: "set",
+            type: "set"
           }).c("addspot", tosend),
 
         // Successful callback...
@@ -1275,7 +1275,7 @@ var Callcast = {
         this.connection.sendIQ($iq({
             to: myOverseer,
             id: "removespot1",
-            type: "set",
+            type: "set"
           }).c("removespot", tosend),
 
         // Successful callback...
@@ -1309,7 +1309,7 @@ var Callcast = {
         this.connection.sendIQ($iq({
             to: roommanager,
             id: "roomcreate1",
-            type: "set",
+            type: "set"
           }).c("room", {xmlns: this.NS_CALLCAST, name: roomname.toLowerCase()}),
 
         // Successful callback...
@@ -1460,7 +1460,7 @@ var Callcast = {
                         },
                         title: 'Calling ' + to_whom,
                         buttons: {
-                            "End Call": function () {
+                            "End Call": function() {
 //                              alert("Hung up.");
                                 // TODO - drop from call - leave room and possibly destroy room if no one else is in it. Right action?
                                 // Currently we're just closing the dialog which will in turn have us leave the room.
@@ -1701,7 +1701,7 @@ Callcast.connection.rawOutput = function(data) {
                                  $.getUrlVar('unlistedroom') + Callcast.AT_CALLCAST_ROOMS);
         }
 
-    },
+    }
  };
 
 //
