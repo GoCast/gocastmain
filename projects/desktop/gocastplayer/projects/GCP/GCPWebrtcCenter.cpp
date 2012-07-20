@@ -801,6 +801,9 @@ namespace GoCast
             return;            
         }
 
+        std::string msg("Adding local stream [");
+        msg += label;
+        FBLOG_INFO_CUSTOM(funcstr("RtcCenter::AddStream_w", pluginId), msg);
         m_pPeerConns[pluginId]->AddStream(m_pLocalStream);
     }
 
@@ -827,6 +830,9 @@ namespace GoCast
             return;            
         }
         
+        std::string msg("Removing local stream [");
+        msg += label;
+        FBLOG_INFO_CUSTOM(funcstr("RtcCenter::RemoveStream_w", pluginId), msg);
         m_pPeerConns[pluginId]->RemoveStream(m_pLocalStream);
     }
     
@@ -851,7 +857,6 @@ namespace GoCast
         msg += offerSdp;
         msg += "]";
         FBLOG_INFO_CUSTOM(funcstr("RtcCenter::CreateOffer_w", pluginId), msg);
-        
         return offerSdp;
     }
 
@@ -878,8 +883,7 @@ namespace GoCast
         msg += answerSdp;
         msg += "]";
         FBLOG_INFO_CUSTOM(funcstr("RtcCenter::CreateAnswer_w", pluginId), msg);
-
-        return offerSdp;
+        return answerSdp;
     }
     
     void RtcCenter::SetLocalDescription_w(const std::string& pluginId,
@@ -895,6 +899,10 @@ namespace GoCast
             failCb->InvokeAsync("", FB::variant_list_of("No peerconnection found for this plugin instance"));
             return;
         }
+        
+        std::string msg("Setting local sdp as ");
+        msg += ((webrtc::PeerConnectionInterface::kOffer == action) ? "OFFER..." : "ANSWER...");
+        FBLOG_INFO_CUSTOM(funcstr("RtcCenter::SetLocalDescription_w", pluginId), msg);
         
         webrtc::SessionDescriptionInterface* pSdp = webrtc::CreateSessionDescription(sdp);
         if(NULL == pSdp)
@@ -927,6 +935,10 @@ namespace GoCast
             return;
         }
         
+        std::string msg("Setting remote sdp as ");
+        msg += ((webrtc::PeerConnectionInterface::kOffer == action) ? "OFFER..." : "ANSWER...");
+        FBLOG_INFO_CUSTOM(funcstr("RtcCenter::SetRemoteDescription_w", pluginId), msg);
+
         webrtc::SessionDescriptionInterface* pSdp = webrtc::CreateSessionDescription(sdp);
         if(NULL == pSdp)
         {
@@ -953,6 +965,10 @@ namespace GoCast
             return;
         }
         
+        std::string msg("Processing candidate [");
+        msg += (candidateSdp + "]...");
+        FBLOG_INFO_CUSTOM(funcstr("RtcCenter::ProcessIceMessage_w", pluginId), msg);
+
         webrtc::IceCandidateInterface* pCandidate = webrtc::CreateIceCandidate("0", candidateSdp);
         if(NULL == pCandidate)
         {
@@ -960,7 +976,7 @@ namespace GoCast
                                "Failed to create candidate object");
             return;
         }
-        
+                
         if(false == m_pPeerConns[pluginId]->ProcessIceMessage(pCandidate))
         {
             FBLOG_ERROR_CUSTOM(funcstr("RtcCenter::ProcessIceMessage_w", pluginId),
@@ -977,6 +993,8 @@ namespace GoCast
                                "No PeerConnection found for this plugin instance");
         }
 
+        FBLOG_INFO_CUSTOM(funcstr("RtcCenter::StartIce_w", pluginId), "Starting ICE machine...");
+        
         if(false == m_pPeerConns[pluginId]->StartIce(webrtc::JsepInterface::kUseAll))
         {
             FBLOG_ERROR_CUSTOM(funcstr("RtcCenter::StartIce_w", pluginId), "Failed to start ICE process");
@@ -991,7 +1009,9 @@ namespace GoCast
                                "No PeerConnection found for this plugin instance");
             return;
         }
-        
+
+        FBLOG_INFO_CUSTOM(funcstr("RtcCenter::DeletePeerConnection_w", pluginId), "Deleting peerconnection...");
+
         if(0 < m_pLocalStream->audio_tracks()->count())
         {
             m_pLocalStream->audio_tracks()->at(0)->set_enabled(true);

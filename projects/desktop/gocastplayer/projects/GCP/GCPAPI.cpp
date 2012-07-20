@@ -82,10 +82,14 @@ void GCPAPI::set_source(const FB::JSAPIPtr& stream)
     {
         if("localPlayer" == m_htmlId.convert_cast<std::string>())
         {
+            FBLOG_INFO_CUSTOM(funcstr("GCAPAPI::set_source", m_htmlId.convert_cast<std::string>()),
+                              "Setting local video track renderer...");
             (GoCast::RtcCenter::Instance())->SetLocalVideoTrackRenderer(getPlugin()->Renderer());
         }
         else
         {
+            FBLOG_INFO_CUSTOM(funcstr("GCAPAPI::set_source", m_htmlId.convert_cast<std::string>()),
+                              "Setting remote video track renderer...");
             (GoCast::RtcCenter::Instance())->SetRemoteVideoTrackRenderer(m_htmlId.convert_cast<std::string>(),
                                                                          getPlugin()->Renderer());
         }
