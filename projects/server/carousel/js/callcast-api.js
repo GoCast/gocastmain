@@ -165,7 +165,7 @@ $(document).on('private-message', function (
 ///
 /// extract spot info from info object 
 /// and set participant info
-/// the image participant item is in css format url(<url>)
+/// the image participant property is in css format url(<url>)
 ///
 function setSpotInfo(info)
 {
@@ -614,7 +614,23 @@ function removeContentFromCarousel(
   return false;
 } /* removeContentFromCarousel() */
 
+///
+/// \brief addspot callback, forward spot add to carousel
+///
+function addSpot(info)
+{
+   console.log("addSpot", info);
+   app.carousel.addSpotCb(info);
+}
 
+///
+/// \brief removespot callback forward to carousel
+///
+function removeSpot(info)
+{
+   console.log("removeSpot", info);
+   app.carousel.removeSpotCb(info);
+}
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
@@ -640,6 +656,8 @@ function pluginLoaded(
     Callcast.setCallbackForRemovePlugin(removePluginFromCarousel);
     Callcast.setCallbackForAddCarouselContent(addContentToCarousel);
     Callcast.setCallbackForRemoveCarouselContent(removeContentFromCarousel);
+    Callcast.setCallbackForAddSpot(addSpot);
+    Callcast.setCallbackForRemoveSpot(removeSpot);
     initializeLocalPlugin();
 					
     handleRoomSetup();

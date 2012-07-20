@@ -22,9 +22,9 @@
  * jQuery Extension. */
 (function($) {
 
-    /*
-     * Item object.  A wrapper object for items within the carousel. */
-    var Item = function(objIn, options) {
+    /// Item object.  A wrapper object for items within the carousel.
+    var Item = function(objIn, options)
+    {
 	this.orgWidth = $(objIn).width();
 	this.orgHeight = $(objIn).height();
 	this.orgFontSize = parseInt($(objIn).css("font-size"));
@@ -65,16 +65,28 @@
     {
 	this.vals = {}; // assoc array
 	this.keys = []; // array of sorted keys
+	this.bySpot = []; // array of indexes by spotNumber
     };
     Items.prototype.set = function(index, item)
     {
-        this.vals[index] = item;
-	this.updateKeys();
+        this.vals[index] = item; // insert item in assoc array
+        if (item.spotNumber)     // index by spotNumber
+        {
+           this.bySpot[item.spotNumber] = item.index;
+        }
+	this.updateKeys();       // sort items
     };
     Items.prototype.get = function(index)
     {
         //todo check that index is numeric
 	return this.vals[index];
+    };
+    Items.prototype.getBySpotNumber = function(spotNumber)
+    {
+        //todo check that index is numeric
+        var spot = parseInt(spotNumber);
+	var index = this.bySpot[spot];
+	return index ? this.vals[index] : null;
     };
     Items.prototype.remove = function(index)
     {
@@ -92,7 +104,7 @@
 	for (var key in this.vals)
 	{
 	    if (this.vals.hasOwnProperty(key))
-	    this.keys.push(key);
+	       this.keys.push(key);
 	}
         // sort numeric ascending
 	this.keys.sort(function(a,b){return a - b});
@@ -192,7 +204,8 @@
 	// click on addItem
 	$("#addItem", container).click(function(event)
 	{
-	   ctx.addItem();
+	   //ctx.addItem();
+	   Callcast.AddSpot({});
 	});
 	// mouseover
 	/*
@@ -260,7 +273,7 @@
 	 * is the number (+-) of carousel items to rotate by. */
 	this.rotate = function(direction) 
 	{
-	    app.log(2, "rotate " + direction);
+	    //app.log(2, "rotate " + direction);
 	    var itemsLength = items.getLength();
 	    this.frontIndex -= direction;
 	    this.frontIndex %= itemsLength;
@@ -486,21 +499,30 @@
 	      this.updateLinear();
 	   }
 	}
-	this.remove = function(index) // remove item
-	{
-	    items.remove(index);
-	}
-	this.addItem = function() // add a new empty item
+	this.addSpotCb = function(info) // add spot callcast callback
 	{
 	   // add the html
 	   var newDiv = $('<div class="cloudcarousel unoccupied" onclick="carouselItemClick(event);"><div class="name"></div></div>');
 	   $(this.innerWrapper).append(newDiv);
 	   var item = new Item(newDiv[0], options);
 	   item.updateSize(this.item);
+	   item.spotNumber = info.spotnumber;
 	   newDiv.data('item', item);
 	   items.addItem(item);
 	   this.setupItem(item);
 	   this.updateAll();
+	}
+	this.removeSpotCb = function(info) // remove spot callcast callback
+	{
+	   var item = items.getBySpotNumber(info.spotnumber);
+	   if (!item)
+	   {
+	      var spot = parseInt(info.spotnumber);
+	      item = items.get(spot);
+	   }
+           $(item.object).remove();
+           items.remove(item.index);
+           this.updateAll();
 	}
 	this.insertSpot = function(spot) // add a previously created spot to the carousel
 	{
@@ -518,9 +540,7 @@
 		var jqDiv = $(this).parent();
 		var item = jqDiv.data('item');
                 console.log("removing", jqDiv);
-		jqDiv.remove(); // remove item from carousel
-		ctx.remove(item.index); // remove item
-		ctx.updateAll();
+                Callcast.RemoveSpot({spotNumber: (item.spotNumber) ? item.spotNumber : item.index});
 	    });
 	};
 	/*
