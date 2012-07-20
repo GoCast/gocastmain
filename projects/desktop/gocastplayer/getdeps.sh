@@ -5,7 +5,7 @@
 ##########
 
 WEBRTC_TAG="trunk"
-WEBRTC_REV="1080"
+WEBRTC_REV="2407"
 
 mkdir -p deps
 cd deps
@@ -32,6 +32,35 @@ if [[ $1 = "webrtc" || $* = "" ]]; then
     cd ..
 fi
 
+#############
+# libjingle #
+#############
+
+if [[ $1 = "libjingle" || $* = "" ]]; then
+    echo "Downloading [libjingle] and its dependencies..."
+    cd webrtc/trunk
+
+    echo "Patching webrtc_trunk.diff..."
+    patch -p0 -i ../../../dep_mods/macosx/webrtc_trunk.diff
+    cd chromium_deps
+
+    echo "Patching chromium_deps.diff..."
+    patch -p0 -i ../../../../dep_mods/macosx/chromium_deps.diff
+    cd ../../
+
+    echo "Running [gclient sync -r $WEBRTC_REV --force] to obtain webrtc source..."
+    gclient sync -r "$WEBRTC_REV" --force
+    cd trunk/third_party/libjingle
+    
+    echo "Patching libjingle.diff..."
+    patch -p0 -i ../../../../../dep_mods/macosx/libjingle.diff
+    cd source
+
+    echo "Patching libjingle_source.diff..."
+    patch -p0 -i ../../../../../../dep_mods/macosx/libjingle_source.diff
+    cd ../../../../..
+fi
+
 ##############
 # firebreath #
 ##############
@@ -42,16 +71,4 @@ if [[ $1 = "firebreath" || $* = "" ]]; then
         git clone git://github.com/firebreath/FireBreath.git -b firebreath-1.6 firebreath
     fi
 fi
-
-#### COPY MODS ####
-
-if [ `uname` = "Darwin" ]; then
-    echo "Copying dep_mods/macosx to deps"
-    cp -R ../dep_mods/macosx/* ./
-else
-    echo "Copying dep_mods/linux to deps"
-    cp -R ../dep_mods/linux/* ./
-fi
-
-cd ..
 
