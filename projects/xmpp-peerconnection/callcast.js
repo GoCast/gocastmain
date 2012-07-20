@@ -642,7 +642,7 @@ var Callcast = {
         this.DropCall = function() {
             if (this.peer_connection)
             {
-                console.log('Dropping call for '+ this.jid);
+                console.log('Dropping call for ' + this.jid);
                 this.peer_connection.close();
                 this.peer_connection = null;
                 // Now remove object from div
@@ -1643,7 +1643,7 @@ var Callcast = {
         this.connection = new Strophe.Connection(boshconn);
         this.connection.reset();
 
-        console.log('Re-attaching -- jid='+ jid + ', sid='+ sid + ', rid='+ rid);
+        console.log('Re-attaching -- jid=' + jid + ', sid=' + sid + ', rid=' + rid);
 
         Callcast.connection.attach(jid, sid, rid, Callcast.conn_callback_reconnect);
     },
