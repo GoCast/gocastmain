@@ -860,14 +860,14 @@ var Callcast = {
 			return Callcast.on_url_render(message);
 		else if (cmdtype === 'addspot')
 		{
-			if (this.Callback_AddSpot)
-				this.Callback_AddSpot(info);
+			if (Callcast.Callback_AddSpot)
+				Callcast.Callback_AddSpot(info);
 			return true;
 		}
 		else if (cmdtype === 'removespot')
 		{
-			if (this.Callback_RemoveSpot)
-				this.Callback_RemoveSpot(info);
+			if (Callcast.Callback_RemoveSpot)
+				Callcast.Callback_RemoveSpot(info);
 			return true;
 		}
 			
