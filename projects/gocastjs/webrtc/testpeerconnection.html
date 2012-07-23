@@ -8,13 +8,13 @@
 			var remoteStream = null;
 			var peerConn = null;
 			
-			function ongetusermediasuccess(bUseGoCastAPI) {
+			function ongetusermediasuccess() {
 				peerConn = new GoCastJS.PeerConnection(
 					new GoCastJS.PeerConnectionOptions(
 						"STUN stun.l.google.com:19302",
 						function(candidate, moreComing) {
-							if("string" === typeof(candidate) && null !== candidate) {
-								if("" !== candidate) {
+							if(true == moreComing) {
+								if("string" === typeof(candidate) && null !== candidate) {
 									console.log("onicemessage: ", candidate);
 									peerConn.ProcessIceMessage(candidate);
 								}
@@ -41,23 +41,27 @@
 						120,
 						"remoteVideo",
 						"videoContainer"
-					),
-					bUseGoCastAPI
+					)
 				);
 				
 				peerConn.AddStream(localStream);
-				var offer = peerConn.CreateOffer({audio:true, video:true});
-								
+				var offer = peerConn.CreateOffer({audio:true, video:true});				
 				console.log("ongetusermediasuccess: offer = ", offer);
-				peerConn.SetLocalDescription("OFFER", offer, function() {
-					peerConn.SetRemoteDescription("ANSWER", offer);
-					peerConn.StartIce();		
-				}, function(message) {
-					console.log("onsetlocalsdpfail: ", message);
-				});
+				
+				peerConn.SetLocalDescription(
+					"OFFER",
+					offer,
+					function() {
+						peerConn.SetRemoteDescription("ANSWER", offer);
+						peerConn.StartIce();		
+					},
+					function(message) {
+						console.log("onsetlocalsdpfail: ", message);
+					}
+				);
 			}
 			
-			function start(bUseGoCastAPI) {
+			function start() {
 				GoCastJS.getUserMedia(
 					new GoCastJS.UserMediaOptions(
 						{audio: true, video:true},
@@ -68,13 +72,12 @@
 					),
 					function(stream) {
 						console.log("getUserMediaSuccess: ", stream);
-						localStream = stream;
-						ongetusermediasuccess(bUseGoCastAPI);
+						localStream = stream;						
+						ongetusermediasuccess();
 					},
 					function(message) {
 						console.log("getUserMediaFailure: ", message);
-					},
-					bUseGoCastAPI
+					}
 				);
 			}
 			
@@ -94,10 +97,9 @@
 		</script>
 	</head>
 	<body>
-		<!--<button id="startButton" onclick="javascript:start(true)">Start</button>
-		<button id="startCanaryButton" onclick="javascript:start(false)">
-			Start Canary
-		</button>-->
+		<button id="start" onclick="javascript:start()">
+			Start
+		</button>
 		<button id="toggleMuteAudio" onclick="javascript:toggleMuteAudio()">
 			Toggle Mute Audio
 		</button>
@@ -105,9 +107,5 @@
 			Toggle Mute Video
 		</button>
 		<div id="videoContainer"></div>
-		
-		<script type="text/javascript">
-			start(true);
-		</script>
 	</body>
 </html>

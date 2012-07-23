@@ -1,0 +1,11 @@
+GoCastPlayer Build and Install Readme (all scripts should be executed from this README's current directory):
+
+  I. MAC:
+
+	1. Get dependencies: 		./getdeps.sh
+	2. Build libwebrtc: 		./prepdeps.sh [Release|Debug]
+	3. Build plugin project: 	./prepplugin.sh
+	4. Build plugin:		./buildplugin.sh [Release|Debug]
+	
+	NOTE: Plugin's location is [build/projects/GCP/<Debug|Release>/GCP.plugin]
+

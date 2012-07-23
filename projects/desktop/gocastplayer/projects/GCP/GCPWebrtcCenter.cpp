@@ -138,12 +138,14 @@ namespace GoCast
     {
         AddStreamParams(const std::string& pluginId,
                         const std::string& label)
-        : m_pluginId(pluginId)
+        : m_bResult(false)
+        , m_pluginId(pluginId)
         , m_label(label)
         {
             
         }
         
+        bool m_bResult;
         std::string m_pluginId;
         std::string m_label;
     };
@@ -152,12 +154,14 @@ namespace GoCast
     {
         RemoveStreamParams(const std::string& pluginId,
                            const std::string& label)
-        : m_pluginId(pluginId)
+        : m_bResult(false)
+        , m_pluginId(pluginId)
         , m_label(label)
         {
             
         }
         
+        bool m_bResult;
         std::string m_pluginId;
         std::string m_label;
     };
@@ -225,12 +229,14 @@ namespace GoCast
         SetRemoteSdpParams(const std::string& pluginId,
                            const webrtc::JsepInterface::Action& action,
                            const std::string& sdp)
-        : m_pluginId(pluginId)
+        : m_bResult(false)
+        , m_pluginId(pluginId)
         , m_sdp(sdp)
         {
             
         }
         
+        bool m_bResult;
         std::string m_pluginId;
         webrtc::JsepInterface::Action m_action;
         std::string m_sdp;
@@ -240,12 +246,14 @@ namespace GoCast
     {
         ProcessIceMessageParams(const std::string& pluginId,
                                 const std::string& candidateSdp)
-        : m_pluginId(pluginId)
+        : m_bResult(false)
+        , m_pluginId(pluginId)
         , m_candidateSdp(candidateSdp)
         {
             
         }
         
+        bool m_bResult;
         std::string m_pluginId;
         std::string m_candidateSdp;
     };
@@ -253,22 +261,26 @@ namespace GoCast
     struct StartIceParams : public talk_base::MessageData
     {
         StartIceParams(const std::string& pluginId)
-        : m_pluginId(pluginId)
+        : m_bResult(false)
+        , m_pluginId(pluginId)
         {
             
         }
         
+        bool m_bResult;
         std::string m_pluginId;
     };
     
     struct DeletePeerConnectionParams : public talk_base::MessageData
     {
         DeletePeerConnectionParams(const std::string& pluginId)
-        : m_pluginId(pluginId)
+        : m_bResult(false)
+        , m_pluginId(pluginId)
         {
             
         }
         
+        bool m_bResult;
         std::string m_pluginId;
     };
 
@@ -361,10 +373,7 @@ namespace GoCast
             
             m_pHandler->OnMessage(pMsg);
             
-            if(MSG_NEW_PEERCONNECTION == pMsg->message_id ||
-               MSG_CREATE_OFFER == pMsg->message_id ||
-               MSG_CREATE_ANSWER == pMsg->message_id ||
-               MSG_DELETE_PEERCONNECTION == pMsg->message_id)
+            if(MSG_SET_LOCAL_SDP != pMsg->message_id)
             {
                 FBLOG_INFO_CUSTOM("MessageQueue::ProcessMessage()", "Notifying waiting parent...");
                 m_done.notify_one();
@@ -428,34 +437,32 @@ namespace GoCast
         }
     }
     
-    void RtcCenter::AddStream(const std::string& pluginId,
+    bool RtcCenter::AddStream(const std::string& pluginId,
                               const std::string& label,
                               bool bSyncCall)
     {
         if(false == bSyncCall)
         {
-            AddStreamParams* pParams = new AddStreamParams(pluginId, label);
-            m_msgq.Send(MSG_ADD_STREAM, pParams);
+            AddStreamParams params(pluginId, label);
+            m_msgq.Send(MSG_ADD_STREAM, &params, true);
+            return params.m_bResult;
         }
-        else
-        {
-            AddStream_w(pluginId, label);
-        }
+        
+        return AddStream_w(pluginId, label);
     }
     
-    void RtcCenter::RemoveStream(const std::string& pluginId,
+    bool RtcCenter::RemoveStream(const std::string& pluginId,
                                  const std::string& label,
                                  bool bSyncCall)
     {
         if(false == bSyncCall)
         {
-            RemoveStreamParams* pParams = new RemoveStreamParams(pluginId, label);
-            m_msgq.Send(MSG_REMOVE_STREAM, pParams);
+            RemoveStreamParams params(pluginId, label);
+            m_msgq.Send(MSG_REMOVE_STREAM, &params, true);
+            return params.m_bResult;
         }
-        else
-        {
-            RemoveStream_w(pluginId, label);
-        }
+        
+        return RemoveStream_w(pluginId, label);
     }
 
     std::string RtcCenter::CreateOffer(const std::string& pluginId,
@@ -468,10 +475,8 @@ namespace GoCast
             m_msgq.Send(MSG_CREATE_OFFER, &params, true);
             return params.m_offerSdp;
         }
-        else
-        {
-            return CreateOffer_w(pluginId, mediaHints);
-        }
+
+        return CreateOffer_w(pluginId, mediaHints);
     }
     
     std::string RtcCenter::CreateAnswer(const std::string& pluginId,
@@ -485,10 +490,8 @@ namespace GoCast
             m_msgq.Send(MSG_CREATE_ANSWER, &params, true);
             return params.m_answerSdp;
         }
-        else
-        {
-            return CreateAnswer_w(pluginId, mediaHints, offerSdp);
-        }
+
+        return CreateAnswer_w(pluginId, mediaHints, offerSdp);
     }
     
     void RtcCenter::SetLocalDescription(const std::string& pluginId,
@@ -509,63 +512,59 @@ namespace GoCast
         }
     }
     
-    void RtcCenter::SetRemoteDescription(const std::string& pluginId,
+    bool RtcCenter::SetRemoteDescription(const std::string& pluginId,
                                          const webrtc::JsepInterface::Action &action,
                                          const std::string &sdp,
                                          bool bSyncCall)
     {
         if(false == bSyncCall)
         {
-            SetRemoteSdpParams* pParams = new SetRemoteSdpParams(pluginId, action, sdp);
-            m_msgq.Send(MSG_SET_REMOTE_SDP, pParams);
+            SetRemoteSdpParams params(pluginId, action, sdp);
+            m_msgq.Send(MSG_SET_REMOTE_SDP, &params, true);
+            return params.m_bResult;
         }
-        else
-        {
-            SetRemoteDescription_w(pluginId, action, sdp);
-        }
+
+        return SetRemoteDescription_w(pluginId, action, sdp);
     }
     
-    void RtcCenter::ProcessIceMessage(const std::string& pluginId,
+    bool RtcCenter::ProcessIceMessage(const std::string& pluginId,
                                       const std::string &candidateSdp,
                                       bool bSyncCall)
     {
         if(false == bSyncCall)
         {
-            ProcessIceMessageParams* pParams = new ProcessIceMessageParams(pluginId, candidateSdp);
-            m_msgq.Send(MSG_PROCESS_ICE_MSG, pParams);
+            ProcessIceMessageParams params(pluginId, candidateSdp);
+            m_msgq.Send(MSG_PROCESS_ICE_MSG, &params, true);
+            return params.m_bResult;
         }
-        else
-        {
-            ProcessIceMessage_w(pluginId, candidateSdp);
-        }
+            
+        return ProcessIceMessage_w(pluginId, candidateSdp);
     }
     
-    void RtcCenter::StartIce(const std::string& pluginId,
+    bool RtcCenter::StartIce(const std::string& pluginId,
                              bool bSyncCall)
     {
         if(false == bSyncCall)
         {
-            StartIceParams* pParams = new StartIceParams(pluginId);
-            m_msgq.Send(MSG_START_ICE, pParams);
+            StartIceParams params(pluginId);
+            m_msgq.Send(MSG_START_ICE, &params, true);
+            return params.m_bResult;
         }
-        else
-        {
-            StartIce_w(pluginId);
-        }
+
+        return StartIce_w(pluginId);
     }
     
-    void RtcCenter::DeletePeerConnection(const std::string& pluginId,
+    bool RtcCenter::DeletePeerConnection(const std::string& pluginId,
                                          bool bSyncCall)
     {
         if(false == bSyncCall)
         {
             DeletePeerConnectionParams params(pluginId);
             m_msgq.Send(MSG_DELETE_PEERCONNECTION, &params, true);
+            return params.m_bResult;
         }
-        else
-        {
-            DeletePeerConnection_w(pluginId);
-        }
+
+        return DeletePeerConnection_w(pluginId);
     }
     
     std::string RtcCenter::ReadyState(const std::string& pluginId)
@@ -622,16 +621,14 @@ namespace GoCast
             case MSG_ADD_STREAM:
             {
                 AddStreamParams* pParams = static_cast<AddStreamParams*>(msg->pdata);
-                AddStream_w(pParams->m_pluginId, pParams->m_label);
-                delete pParams;
+                pParams->m_bResult = AddStream_w(pParams->m_pluginId, pParams->m_label);
                 break;
             }
                 
             case MSG_REMOVE_STREAM:
             {
                 RemoveStreamParams* pParams = static_cast<RemoveStreamParams*>(msg->pdata);
-                RemoveStream_w(pParams->m_pluginId, pParams->m_label);
-                delete pParams;
+                pParams->m_bResult = RemoveStream_w(pParams->m_pluginId, pParams->m_label);
                 break;
             }
 
@@ -666,31 +663,30 @@ namespace GoCast
             case MSG_SET_REMOTE_SDP:
             {
                 SetRemoteSdpParams* pParams = static_cast<SetRemoteSdpParams*>(msg->pdata);
-                SetRemoteDescription_w(pParams->m_pluginId, pParams->m_action, pParams->m_sdp);
-                delete pParams;
+                pParams->m_bResult = SetRemoteDescription_w(pParams->m_pluginId,
+                                                            pParams->m_action,
+                                                            pParams->m_sdp);
                 break;
             }
 
             case MSG_PROCESS_ICE_MSG:
             {
                 ProcessIceMessageParams* pParams = static_cast<ProcessIceMessageParams*>(msg->pdata);
-                ProcessIceMessage_w(pParams->m_pluginId, pParams->m_candidateSdp);
-                delete pParams;
+                pParams->m_bResult = ProcessIceMessage_w(pParams->m_pluginId, pParams->m_candidateSdp);
                 break;
             }
                 
             case MSG_START_ICE:
             {
                 StartIceParams* pParams = static_cast<StartIceParams*>(msg->pdata);
-                StartIce_w(pParams->m_pluginId);
-                delete pParams;
+                pParams->m_bResult = StartIce_w(pParams->m_pluginId);
                 break;
             }
                 
             case MSG_DELETE_PEERCONNECTION:
             {
                 DeletePeerConnectionParams* pParams = static_cast<DeletePeerConnectionParams*>(msg->pdata);
-                DeletePeerConnection_w(pParams->m_pluginId);
+                pParams->m_bResult = DeletePeerConnection_w(pParams->m_pluginId);
                 break;
             }
                 
@@ -777,20 +773,20 @@ namespace GoCast
         return true;
     }
     
-    void RtcCenter::AddStream_w(const std::string& pluginId,
+    bool RtcCenter::AddStream_w(const std::string& pluginId,
                                 const std::string& label)
     {
         if(m_pPeerConns.end() == m_pPeerConns.find(pluginId))
         {
             FBLOG_ERROR_CUSTOM(funcstr("RtcCenter::AddStream_w", pluginId),
                                "No PeerConnection found for this plugin instance");
-            return;
+            return false;
         }
         
         if(NULL == m_pLocalStream.get())
         {
             FBLOG_ERROR_CUSTOM(funcstr("RtcCenter::AddStream_w", pluginId), "No local stream present");
-            return;
+            return false;
         }
         
         if(label != m_pLocalStream->label())
@@ -798,28 +794,31 @@ namespace GoCast
             std::string msg("No local stream [");
             msg += (label + "] present");
             FBLOG_ERROR_CUSTOM(funcstr("RtcCenter::AddStream_w", pluginId), msg);
-            return;            
+            return false;            
         }
 
         std::string msg("Adding local stream [");
-        msg += label;
+        msg += (label + "]...");
         FBLOG_INFO_CUSTOM(funcstr("RtcCenter::AddStream_w", pluginId), msg);
         m_pPeerConns[pluginId]->AddStream(m_pLocalStream);
+        
+        return true;
     }
 
-    void RtcCenter::RemoveStream_w(const std::string& pluginId,
+    bool RtcCenter::RemoveStream_w(const std::string& pluginId,
                                    const std::string& label)
     {
         if(m_pPeerConns.end() == m_pPeerConns.find(pluginId))
         {
             FBLOG_ERROR_CUSTOM(funcstr("RtcCenter::RemoveStream_w", pluginId),
                                "No PeerConnection found for this plugin instance");
+            return false;
         }
         
         if(NULL == m_pLocalStream.get())
         {
             FBLOG_ERROR_CUSTOM(funcstr("RtcCenter::RemoveStream_w", pluginId), "No local stream present");
-            return;
+            return false;
         }
         
         if(label != m_pLocalStream->label())
@@ -827,13 +826,15 @@ namespace GoCast
             std::string msg("No local stream [");
             msg += (label + "] present");
             FBLOG_ERROR_CUSTOM(funcstr("RtcCenter::RemoveStream_w", pluginId), msg);
-            return;            
+            return false;            
         }
         
         std::string msg("Removing local stream [");
-        msg += label;
+        msg += (label + "]...");
         FBLOG_INFO_CUSTOM(funcstr("RtcCenter::RemoveStream_w", pluginId), msg);
         m_pPeerConns[pluginId]->RemoveStream(m_pLocalStream);
+        
+        return true;
     }
     
     std::string RtcCenter::CreateOffer_w(const std::string& pluginId,
@@ -924,7 +925,7 @@ namespace GoCast
         succCb->InvokeAsync("", FB::variant_list_of());
     }
 
-    void RtcCenter::SetRemoteDescription_w(const std::string& pluginId,
+    bool RtcCenter::SetRemoteDescription_w(const std::string& pluginId,
                                            const webrtc::JsepInterface::Action &action,
                                            const std::string &sdp)
     {
@@ -932,7 +933,7 @@ namespace GoCast
         {
             FBLOG_ERROR_CUSTOM(funcstr("RtcCenter::SetRemoteDescription_w", pluginId),
                                "No PeerConnection found for this plugin instance");
-            return;
+            return false;
         }
         
         std::string msg("Setting remote sdp as ");
@@ -944,25 +945,27 @@ namespace GoCast
         {
             FBLOG_ERROR_CUSTOM(funcstr("RtcCenter::SetRemoteDescription_w", pluginId),
                                "Failed to create sdp object");
-            return;
+            return false;
         }
         
         if(false == m_pPeerConns[pluginId]->SetRemoteDescription(action, pSdp))
         {
             FBLOG_ERROR_CUSTOM(funcstr("RtcCenter::SetRemoteDescription_w", pluginId),
                                "Failed to set remote description");
-            return;                        
+            return false;                        
         }
+        
+        return true;
     }
     
-    void RtcCenter::ProcessIceMessage_w(const std::string& pluginId,
+    bool RtcCenter::ProcessIceMessage_w(const std::string& pluginId,
                                         const std::string &candidateSdp)
     {
         if(m_pPeerConns.end() == m_pPeerConns.find(pluginId))
         {
             FBLOG_ERROR_CUSTOM(funcstr("RtcCenter::ProcessIceMessage_w", pluginId),
                                "No PeerConnection found for this plugin instance");
-            return;
+            return false;
         }
         
         std::string msg("Processing candidate [");
@@ -974,23 +977,26 @@ namespace GoCast
         {
             FBLOG_ERROR_CUSTOM(funcstr("RtcCenter::ProcessIceMessage_w", pluginId),
                                "Failed to create candidate object");
-            return;
+            return false;
         }
                 
         if(false == m_pPeerConns[pluginId]->ProcessIceMessage(pCandidate))
         {
             FBLOG_ERROR_CUSTOM(funcstr("RtcCenter::ProcessIceMessage_w", pluginId),
                                "Failed to process candidate");
-            return;            
+            return false;            
         }
+        
+        return true;
     }
     
-    void RtcCenter::StartIce_w(const std::string& pluginId)
+    bool RtcCenter::StartIce_w(const std::string& pluginId)
     {
         if(m_pPeerConns.end() == m_pPeerConns.find(pluginId))
         {
             FBLOG_ERROR_CUSTOM(funcstr("RtcCenter::StartIce_w", pluginId),
                                "No PeerConnection found for this plugin instance");
+            return false;
         }
 
         FBLOG_INFO_CUSTOM(funcstr("RtcCenter::StartIce_w", pluginId), "Starting ICE machine...");
@@ -998,16 +1004,19 @@ namespace GoCast
         if(false == m_pPeerConns[pluginId]->StartIce(webrtc::JsepInterface::kUseAll))
         {
             FBLOG_ERROR_CUSTOM(funcstr("RtcCenter::StartIce_w", pluginId), "Failed to start ICE process");
+            return false;
         }
+        
+        return true;
     }
     
-    void RtcCenter::DeletePeerConnection_w(const std::string& pluginId)
+    bool RtcCenter::DeletePeerConnection_w(const std::string& pluginId)
     {
         if(m_pPeerConns.end() == m_pPeerConns.find(pluginId))
         {
             FBLOG_ERROR_CUSTOM(funcstr("RtcCenter::DeletePeerConnection_w", pluginId),
                                "No PeerConnection found for this plugin instance");
-            return;
+            return false;
         }
 
         FBLOG_INFO_CUSTOM(funcstr("RtcCenter::DeletePeerConnection_w", pluginId), "Deleting peerconnection...");
@@ -1022,5 +1031,7 @@ namespace GoCast
         m_pPeerConns[pluginId]->RemoveStream(m_pLocalStream);
         m_pPeerConns[pluginId]->Close();
         m_pPeerConns.erase(pluginId);
+        
+        return true;
     }
 }
