@@ -62,7 +62,8 @@
  *
  */
 
-"use strict";
+/*jslint sloppy: false, todo: true, white: true, browser: true, devel: true */
+'use strict';
 
 var Callcast = {
     PLUGIN_VERSION_CURRENT: 0.0,
@@ -509,8 +510,7 @@ var Callcast = {
 
     Callee: function(nickin, room) {
         // Ojbect for participants in the call or being called (in progress)
-        var nickname = nickin,
-            videoOn = null; // Unknown if video is on, off, or unknown. So unknown for now...
+        var nickname = nickin;
 
         // Nickname must be sure to NOT have spaces here.
         nickname = nickname.replace(/ /g, '');
@@ -566,12 +566,13 @@ var Callcast = {
             this.peer_connection.onsignalingmessage = function(message) {
                 // If message does *NOT* start with "{", then we have our special message.
                 // Special message is of the form JID~message
-                var callback_jid = '';
-                var callback_msg = '';
+                var callback_jid = '',
+                    callback_msg = '',
+                    msgsplit, nick, offer;
 
                 if (message[0] !== '{')
                 {
-                    var msgsplit = message.split('~');
+                    msgsplit = message.split('~');
                     callback_jid = msgsplit[0];
                     callback_msg = msgsplit[1];
                 }
@@ -586,8 +587,7 @@ var Callcast = {
                 }
                 else
                     {
-                        var nick = Strophe.getResourceFromJid(callback_jid);
-                        var offer;
+                        nick = Strophe.getResourceFromJid(callback_jid);
 
                         if (nick) {
                             nick = nick.replace(/\\20/g, ' ');
@@ -624,8 +624,8 @@ var Callcast = {
                 //
                 // Now that we're ready, bring the peer_connection online and kick it off.
                 //
-                var calltype = ' - Audio Only.';
-                var bVideo = Callcast.bUseVideo;
+                var calltype = ' - Audio Only.',
+                    bVideo = Callcast.bUseVideo;
 
                 if (bVideo) {
                     calltype = ' - Audio+Video.';
@@ -716,7 +716,7 @@ var Callcast = {
     /// Grab the room list from the server, and put it in an array of .roomlist[jid] = roomname
     /// Then trigger 'roomlist_updated' for the UI portion to react.
     ///
-    RefreshRooms: function(ui_element) {
+    RefreshRooms: function() {
          Callcast.connection.muc.listRooms(Callcast.CALLCAST_ROOMS, function(thelist) {
              Callcast.roomlist = {};    // Remove all entries from the rooms list.
 
@@ -729,8 +729,8 @@ var Callcast = {
     },
 
     CallMsgHandler: function(msg) {
-        var res_nick = Strophe.getResourceFromJid($(msg).attr('from'));
-        var inbound;
+        var res_nick = Strophe.getResourceFromJid($(msg).attr('from')),
+            inbound;
 
         if (res_nick) {
             res_nick = res_nick.replace(/\\20/g, ' ');
@@ -773,11 +773,11 @@ var Callcast = {
         if ($(msg).find('x').length > 0)
         {
             console.log('Got inbound INVITATION to join a session.');
-            var invite = $(msg).find('x');
-            var from = $(msg).attr('from');
-            var roomjid = $(invite).attr('jid');
-            var password = $(invite).attr('password');
-            var reason = $(invite).attr('reason');
+            var invite = $(msg).find('x'),
+                from = $(msg).attr('from'),
+                roomjid = $(invite).attr('jid'),
+                password = $(invite).attr('password'),
+                reason = $(invite).attr('reason');
 
             // Put up an approval dialog and work from there to join or not join the call.
 
@@ -810,12 +810,13 @@ var Callcast = {
     },
 
     SendGroupCmd: function(cmd, attribs_in) {
-        var attribs_out = attribs_in;
+        var attribs_out = attribs_in,
+            msgToSend;
 
         attribs_out.cmdtype = cmd;
         attribs_out.xmlns = Callcast.NS_CALLCAST;
 
-        var msgToSend = $msg({to: this.room, type: 'groupchat', xmlns: Callcast.NS_CALLCAST})
+        msgToSend = $msg({to: this.room, type: 'groupchat', xmlns: Callcast.NS_CALLCAST})
                 .c('cmd', attribs_out);
 
         console.log('Group Command: ', msgToSend.toString());
@@ -867,9 +868,10 @@ var Callcast = {
     },
 
     on_callcast_groupchat_command: function(message) {
-        var cmd = $(message).children('cmd');
-        var cmdtype = null;
-        var info = {};
+        var cmd = $(message).children('cmd'),
+            cmdtype = null,
+            info = {},
+            ret = true;
 
         // Snatch out all the attributes from the 'cmd' child.
         $(message).find('cmd').each(function() {
@@ -887,31 +889,32 @@ var Callcast = {
             console.log('on_callcast_groupchat_command -- malformed/unknown stanza: ', $(message));
         }
 
-        if (cmdtype === 'synclink') {
-            return Callcast.on_sync_link(message);
-        }
-        else if (cmdtype === 'spotinfo') {
-            return Callcast.on_spot_info(message);
-        }
-        else if (cmdtype === 'urlrenderinfo') {
-            return Callcast.on_url_render(message);
-        }
-        else if (cmdtype === 'addspot')
+        switch (cmdtype)
         {
+        case 'synclink':
+            ret = Callcast.on_sync_link(message);
+            break;
+        case 'spotinfo':
+            ret = Callcast.on_spot_info(message);
+            break;
+        case 'urlrenderinfo':
+            ret = Callcast.on_url_render(message);
+            break;
+        case 'addspot':
             if (Callcast.Callback_AddSpot) {
                 Callcast.Callback_AddSpot(info);
             }
-            return true;
-        }
-        else if (cmdtype === 'removespot')
-        {
+            ret = true;
+            break;
+        case 'removespot':
             if (Callcast.Callback_RemoveSpot) {
                 Callcast.Callback_RemoveSpot(info);
             }
-            return true;
+            ret = true;
+            break;
         }
 
-        return true;
+        return ret;
     },
 
     on_url_render: function(message) {
@@ -950,14 +953,16 @@ var Callcast = {
     },
 
     on_sync_link: function(message) {
-        var from = $(message).attr('from');
-        var room = Strophe.getBareJidFromJid(from);
-        var nick = Strophe.getResourceFromJid(from);
+        var from = $(message).attr('from'),
+            room = Strophe.getBareJidFromJid(from),
+            nick = Strophe.getResourceFromJid(from),
+            delayed;
+
         if (nick) {
             nick = nick.replace(/\\20/g, ' ');
         }
 
-        var delayed = $(message).children('delay').length > 0 ||
+        delayed = $(message).children('delay').length > 0 ||
             $(message).children("x[xmlns='jabber:x:delay']").length > 0;
 
         if (delayed) {
@@ -993,10 +998,12 @@ var Callcast = {
     },
 
     on_public_message: function(message) {
-        var xmlns = $(message).attr('xmlns');
-        var from = $(message).attr('from');
-        var room = Strophe.getBareJidFromJid(from);
-        var nick = Strophe.getResourceFromJid(from);
+        var xmlns = $(message).attr('xmlns'),
+            from = $(message).attr('from'),
+            room = Strophe.getBareJidFromJid(from),
+            nick = Strophe.getResourceFromJid(from),
+            notice, nick_class, body, delayed, msginfo;
+
         if (nick) {
             nick = nick.replace(/\\20/g, ' ');
         }
@@ -1004,17 +1011,17 @@ var Callcast = {
         // make sure message is from the right place
         if (room === Callcast.room && xmlns !== Callcast.NS_CALLCAST) {
             // is message from a user or the room itself?
-            var notice = !nick;
+            notice = !nick;
 
             // messages from ourself will be styled differently
-            var nick_class = 'nick';
+            nick_class = 'nick';
             if (nick === Callcast.nick) {
                 nick_class += ' self';
             }
 
-            var body = $(message).children('body').text();
+            body = $(message).children('body').text();
 
-            var delayed = $(message).children('delay').length > 0 ||
+            delayed = $(message).children('delay').length > 0 ||
                 $(message).children("x[xmlns='jabber:x:delay']").length > 0;
 
             // look for room topic change
@@ -1023,7 +1030,7 @@ var Callcast = {
 //                $('#room-topic').text(subject);
 //            }
 
-            var msginfo = { nick: nick, nick_class: nick_class, body: body, delayed: delayed, notice: notice };
+            msginfo = { nick: nick, nick_class: nick_class, body: body, delayed: delayed, notice: notice };
 
             // Don't send out an update for a non-existent body message.
             // This is what will happen when a signaling/spotinfo message comes in.
@@ -1037,23 +1044,25 @@ var Callcast = {
     },
 
     on_private_message: function(message) {
-        var xmlns = $(message).attr('xmlns');
-        var from = $(message).attr('from');
-        var room = Strophe.getBareJidFromJid(from);
-        var nick = Strophe.getResourceFromJid(from);
+        var xmlns = $(message).attr('xmlns'),
+            from = $(message).attr('from'),
+            room = Strophe.getBareJidFromJid(from),
+            nick = Strophe.getResourceFromJid(from),
+            body, msginfo;
+
         if (nick) {
             nick = nick.replace(/\\20/g, ' ');
         }
 
         // make sure message is from the right place
         if (room === Callcast.room && xmlns !== Callcast.NS_CALLCAST) {
-            var body = $(message).children('body').text();
+            body = $(message).children('body').text();
 
             if (!body) {
                 return true;    // Empty body - likely a signalling message.
             }
 
-            var msginfo = { nick: nick, body: body };
+            msginfo = { nick: nick, body: body };
 
             $(document).trigger('private-message', msginfo);
         }
@@ -1068,9 +1077,9 @@ var Callcast = {
     },
 
     PresHandler: function(presence) {
-            var from = $(presence).attr('from');
-            var room = Strophe.getBareJidFromJid(from);
-            var info;
+            var from = $(presence).attr('from'),
+                room = Strophe.getBareJidFromJid(from),
+                info, nick, user_jid;
 
             if ($(presence).attr('usertype') === 'silent')    // Overseer/serverBot
             {
@@ -1084,7 +1093,7 @@ var Callcast = {
 //          return true;
             // make sure this presence is for the right room
             if (room === Callcast.room) {
-                var nick = Strophe.getResourceFromJid(from);
+                nick = Strophe.getResourceFromJid(from);
                 if (nick) {
                     nick = nick.replace(/\\20/g, ' ');
                 }
@@ -1155,7 +1164,7 @@ var Callcast = {
                     // add to participant list
                     // Make sure we ONLY add **OTHERS** to the participants list.
                     // Otherwise we'll wind up calling ourselves.
-                    var user_jid = $(presence).find('item').attr('jid');
+                    user_jid = $(presence).find('item').attr('jid');
 
                     //
                     // No matter what, we need to add this participant to the room/call.
@@ -1277,9 +1286,9 @@ var Callcast = {
     //      callback is called with an error string such as cb("Error adding spot");
     //
     AddSpot: function(obj, cb) {
-        var myOverseer = this.overseer;
-        var self = this;
-        var tosend = obj;
+        var myOverseer = this.overseer,
+            self = this,
+            tosend = obj;
 
         tosend.xmlns = this.NS_CALLCAST;
         tosend.from = this.nick;
@@ -1326,9 +1335,9 @@ var Callcast = {
     //      callback is called with an error string such as cb("Error removing spot");
     //
     RemoveSpot: function(obj, cb) {
-        var myOverseer = this.overseer;
-        var self = this;
-        var tosend = obj;
+        var myOverseer = this.overseer,
+            self = this,
+            tosend = obj;
 
         tosend.xmlns = this.NS_CALLCAST;
         tosend.from = this.nick;
@@ -1366,8 +1375,8 @@ var Callcast = {
 // will be the newly created random/unique room name.
 //
     CreateUnlistedAndJoin: function(roomname, cb) {
-        var roommanager = this.ROOMMANAGER;
-        var self = this;
+        var roommanager = this.ROOMMANAGER,
+            self = this;
 
         //
         this.connection.sendIQ($iq({
@@ -1422,18 +1431,17 @@ var Callcast = {
              alert('Room and RoomJid must be given to join a session.');
              return false;
          }
-         else if (Callcast.joined)
+
+         if (Callcast.joined)
          {
              alert('Already in a session. Must leave session first.');
              return false;
          }
-         else
-         {
-             this.connection.muc.join(roomjid, Callcast.nick, Callcast.MsgHandler, Callcast.PresHandler); //, null);
-             Callcast.SendLocalVideoToPeers(Callcast.bUseVideo);
 
-             $(document).trigger('joined_session');
-         }
+         this.connection.muc.join(roomjid, Callcast.nick, Callcast.MsgHandler, Callcast.PresHandler); //, null);
+         Callcast.SendLocalVideoToPeers(Callcast.bUseVideo);
+
+         $(document).trigger('joined_session');
 
         // Handle all webrtc-based chat messages within a MUC room session
         // Also to handle all INVITATIONS to join a session which are sent directly to the jid and not within the MUC
@@ -1447,25 +1455,24 @@ var Callcast = {
 //          alert("Not currently in a session.");
             return;
         }
-        else
-        {
-            this.WriteUpdatedState();
-            this.connection.muc.leave(Callcast.room, Callcast.nick, null);
 
-            this.DropAllParticipants();
+        this.WriteUpdatedState();
+        this.connection.muc.leave(Callcast.room, Callcast.nick, null);
 
-            Callcast.joined = false;
-            Callcast.room = '';
-            Callcast.roomjid = '';
+        this.DropAllParticipants();
 
-            this.SendLocalVideoToPeers(this.bUseVideo);
+        Callcast.joined = false;
+        Callcast.room = '';
+        Callcast.roomjid = '';
 
-            $(document).trigger('left_session');
-        }
+        this.SendLocalVideoToPeers(this.bUseVideo);
+
+        $(document).trigger('left_session');
     },
 
     MakeCall: function(to_whom, room, reason)
     {
+      var invite, no_answer, isAnswered;
         // Ensure we plug this in as lower-case to avoid troubles when recognizing against presence information coming back.
      room = room.toLowerCase();
 
@@ -1485,12 +1492,12 @@ var Callcast = {
                      Callcast.RefreshRooms();
 
                      // Formulate an invitation to
-                     var invite = $msg({from: Callcast.connection.jid, to: to_whom, type: 'chat'})
+                     invite = $msg({from: Callcast.connection.jid, to: to_whom, type: 'chat'})
                                     .c('x', {xmlns: Callcast.NS_CALLCAST, jid: room + Callcast.AT_CALLCAST_ROOMS, reason: reason});
                      Callcast.connection.send(invite);
 
                         //  Wait for "x" seconds of timeout - if no one else in the room, then we quit the room. No answer.
-                     var no_answer = setTimeout(function() {
+                     no_answer = setTimeout(function() {
                             // No one answered.
 
                              // Our "ringing/calling" dialog should be closed if we timeout.
@@ -1501,7 +1508,7 @@ var Callcast = {
                      // Now open up the "calling" dialog box until the timer goes off or the user hits 'hangup'
                     $('#calling_dialog').append('<p>Ringing other party...</p>');
 
-                    var isAnswered = false;
+                    isAnswered = false;
                     $('#calling_dialog').dialog({
                         autoOpen: true,
                         draggable: false,
@@ -1569,7 +1576,7 @@ var Callcast = {
         this.LeaveSession();
 
         // Zero it out. The conneciton is no longer valid.
-        if (typeof(Storage) !== 'undefined') {
+        if (typeof (Storage) !== 'undefined') {
             sessionStorage.clear();
         }
 
@@ -1612,7 +1619,7 @@ var Callcast = {
          } else if (status === Strophe.Status.ATTACHED) {
              console.log('Re-Attach of connection successful. Triggering re-attached...');
             // Determine if we're in a 'refresh' situation and if so, then re-attach.
-            if (typeof(Storage) !== 'undefined' && sessionStorage.room)
+            if (typeof (Storage) !== 'undefined' && sessionStorage.room)
             {
                 // We need to force a LeaveSession and setup video state too.
                 Callcast.room = sessionStorage.room;
@@ -1656,14 +1663,14 @@ var Callcast = {
     /// connect using this JID and password -- and optionally use this URL for the BOSH connection.
     ///
     connect: function(id, pw, url) {
-        var self = this;
-        var boshconn = '/xmpp-httpbind';
+        var self = this,
+            boshconn = '/xmpp-httpbind';
         if (url) {
             boshconn = url;
         }
 
         // Determine if we're in a 'refresh' situation and if so, then re-attach.
-        if (typeof(Storage) !== 'undefined')
+        if (typeof (Storage) !== 'undefined')
         {
             // Found an odd bug where jid could have been stored as 'video.gocast.it' (non-authenticated state)
             // This would be invalid for reattaching - so don't do it.
@@ -1697,7 +1704,6 @@ var Callcast = {
     },
 
     reattach: function(jid, sid, rid, cb, url) {
-        var self = this;
         var boshconn = '/xmpp-httpbind';
         if (url) {
             boshconn = url;
@@ -1721,6 +1727,10 @@ var Callcast = {
         console.log('Re-attaching -- jid=' + jid + ', sid=' + sid + ', rid=' + rid);
 
         Callcast.connection.attach(jid, sid, rid, Callcast.conn_callback_reconnect);
+
+        if (cb) {
+          cb();
+        }
     },
 
     finalizeConnect: function() {
@@ -1786,9 +1796,9 @@ Callcast.connection.rawOutput = function(data) {
 //
 $.extend({
 getUrlVars: function() {
- var vars = [], hash;
- var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
- for (var i = 0; i < hashes.length; i++)
+ var vars = [], hash, i,
+     hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+ for (i = 0; i < hashes.length; i++)
  {
    hash = hashes[i].split('=');
    vars.push(hash[0]);
@@ -1800,4 +1810,3 @@ getUrlVar: function(name) {
  return $.getUrlVars()[name];
 }
 });
-
