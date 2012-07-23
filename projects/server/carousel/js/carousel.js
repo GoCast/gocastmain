@@ -36,7 +36,7 @@
 	$(this.object).css('position','absolute');
 	// add controls
 	$(this.object).append('<img class="zoom control" src="images/green-plus.png" alt="Zoom" title="Zoom" onclick="carouselItemZoom(event);"/>');
-	$(this.object).append('<img class="close control" src="images/button-close-white.png" alt="Close" title="Close" />');
+	$(this.object).append('<img class="close control" src="images/trash.png" alt="Close" title="Close" />');
 	// add handlers
 	$(this.object).mouseover(function(event)
         {
@@ -523,6 +523,11 @@
            $(item.object).remove();
            items.remove(item.index);
            this.updateAll();
+	}
+	/// \brief remove a spot from items
+	this.remove = function(index)
+	{
+	   items.remove(index);
 	}
 	this.insertSpot = function(spot) // add a previously created spot to the carousel
 	{
