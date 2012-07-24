@@ -35,7 +35,7 @@
 	this.objectOK = true;                
 	$(this.object).css('position','absolute');
 	// add controls
-	$(this.object).append('<img class="zoom control" src="images/green-plus.png" alt="Zoom" title="Zoom" onclick="carouselItemZoom(event);"/>');
+	$(this.object).append('<img class="zoom control" src="images/fullscreen.png" alt="Zoom" title="Zoom" onclick="carouselItemZoom(event);"/>');
 	$(this.object).append('<img class="close control" src="images/trash.png" alt="Close" title="Close" />');
 	// add handlers
 	$(this.object).mouseover(function(event)
