@@ -152,7 +152,7 @@
      * with mouse events. */
     var Controller = function(container, objects, options) {
     var funcSin = Math.sin, funcCos = Math.cos, ctx = this,
-        item; // an extra item to store scales since items can be removed from items list
+        item, // an extra item to store scales since items can be removed from items list
         items = new Items(); // collection of items by index with sorted iteration
     /*
      * Initialization. */
