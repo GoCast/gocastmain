@@ -27,13 +27,13 @@
     {
 	this.orgWidth = $(objIn).width();
 	this.orgHeight = $(objIn).height();
-	this.orgFontSize = parseInt($(objIn).css("font-size"));
+	this.orgFontSize = parseInt($(objIn).css('font-size'));
 	this.plgOrgWidth = this.orgWidth - 4;
 	this.plgOrgHeight = (this.plgOrgWidth / Callcast.WIDTH) * Callcast.HEIGHT;
 	this.object = objIn;
 	this.options = options;
-	this.objectOK = true;                
-	$(this.object).css('position','absolute');
+	this.objectOK = true;
+	$(this.object).css('position', 'absolute');
 	// add controls
 	$(this.object).append('<img class="zoom control" src="images/green-plus.png" alt="Zoom" title="Zoom" onclick="carouselItemZoom(event);"/>');
 	$(this.object).append('<img class="close control" src="images/button-close-white.png" alt="Close" title="Close" />');
@@ -43,20 +43,20 @@
 	    // only show close icon on unoccupied or content spots
 	    if ($(this).hasClass('unoccupied') || $(this).hasClass('typeContent'))
 	    {
-		$('.control', this).css("visibility", "visible");
+		$('.control', this).css('visibility', 'visible');
 	    }
 	});
 	$(this.object).mouseout(function(event)
 	{
-	    $('.control', this).css("visibility", "hidden");
+	    $('.control', this).css('visibility', 'hidden');
 	});
     }; /* Item object */
 
     Item.prototype.updateSize = function(item)
     {
-        this.orgWidth     = item.orgWidth;
-	this.orgHeight    = item.orgHeight;
-	this.plgOrgWidth  = item.plgOrgWidth;
+        this.orgWidth = item.orgWidth;
+	this.orgHeight = item.orgHeight;
+	this.plgOrgWidth = item.plgOrgWidth;
 	this.plgOrgHeight = item.plgOrgHeight;
     };
 
@@ -107,16 +107,16 @@
 	       this.keys.push(key);
 	}
         // sort numeric ascending
-	this.keys.sort(function(a,b){return a - b});
+	this.keys.sort(function(a,b) {return a - b});
     };
     Items.prototype.iterateSorted = function(worker)
-    {	
+    {
         for (var i = 0; i < this.keys.length; ++i)
 	{
             worker(this.vals[this.keys[i]]);
         }
     };
-    // get an index for an item to be added 
+    // get an index for an item to be added
     // which is the highest element index incremented
     Items.prototype.getNewIndex = function()
     {   // keys are sorted so last element is greatest
@@ -163,32 +163,32 @@
 	this.yRadius = options.yRadius;
 	this.round = true; // true draw round carousel false draw linear carousel
 	if (options.xRadius === 0) {
-	    this.xRadius = ($(container).width()/2.3);
+	    this.xRadius = ($(container).width() / 2.3);
 	}
 	if (options.yRadius === 0) {
-	    this.yRadius = ($(container).height()/6);
+	    this.yRadius = ($(container).height() / 6);
 	}
 	this.xCentre = options.xPos;
 	this.yCentre = options.yPos;
 	this.frontIndex = 0;        /* Index of the item at the front. */
         /* Start with the first item at the front. */
-	this.rotation = this.destRotation = Math.PI/2;
-	this.timeDelay = 1000/options.FPS;
+	this.rotation = this.destRotation = Math.PI / 2;
+	this.timeDelay = 1000 / options.FPS;
 	/*
 	 * Turn on relative position for container to allow absolutely
 	 * positioned elements within it to work.*/
-	$(container).css({ position:'relative', overflow:'hidden'} );
+	$(container).css({ position: 'relative', overflow: 'hidden'});
 	/*
 	 * Buttons configurations. */
-	$(options.buttonLeft).css('display','inline');
-	$(options.buttonRight).css('display','inline');
+	$(options.buttonLeft).css('display', 'inline');
+	$(options.buttonRight).css('display', 'inline');
 	/*
 	 * Buttons functionality. */
-	$(options.buttonLeft).on('mouseup', this, function(event){
+	$(options.buttonLeft).on('mouseup', this, function(event) {
 	    event.data.rotate(1);
 	    return false;
 	});
-	$(options.buttonRight).on('mouseup',this,function(event){
+	$(options.buttonRight).on('mouseup', this, function(event) {
 	    event.data.rotate(-1);
 	    return false;
 	});
@@ -202,7 +202,7 @@
 	    });
 	}
 	// click on addItem
-	$("#addItem", container).click(function(event)
+	$('#addItem', container).click(function(event)
 	{
 	   //ctx.addItem();
 	   Callcast.AddSpot({});
@@ -249,7 +249,7 @@
 	});
 	/*
 	 * Selectstart, defined for IE. */
-	container.onselectstart = function () { return false; };
+	container.onselectstart = function() { return false; };
 	/*
 	 * Addition of DIV innerwrapper. */
 	this.innerWrapper = $(container).wrapInner('<div style="position:absolute;width:100%;height:100%;"/>').children()[0];
@@ -258,7 +258,7 @@
 	this.go = function() {
 	    if (this.controlTimer !== 0) { return; }
 	    var context = this;
-	    this.controlTimer = setTimeout( function(){
+	    this.controlTimer = setTimeout(function() {
 		context.updateAll();
 	    }, this.timeDelay);
 	}; /* go() */
@@ -277,7 +277,7 @@
 	    var itemsLength = items.getLength();
 	    this.frontIndex -= direction;
 	    this.frontIndex %= itemsLength;
-	    this.destRotation += ( Math.PI / itemsLength ) * ( 2*direction );
+	    this.destRotation += (Math.PI / itemsLength) * (2 * direction);
 	    this.go();
 	}; /* rotate() */
 	/// \brief adjust plugin after spot update
@@ -285,39 +285,39 @@
 	{
 	    var px = 'px';
 	    var obj = item.object;
-	    var plgin = $(obj).find("object")[0];
-	    if (plgin) 
+	    var plgin = $(obj).find('object')[0];
+	    if (plgin)
 	    {
  	        w = item.plgOrgWidth * scale;
 		h = item.plgOrgHeight * scale;
                 if (w < 10 && h < 10)
                 {
-                   app.log(3, "carousel video width " + w + " height " + h);
+                   app.log(3, 'carousel video width ' + w + ' height ' + h);
                    return;
 	        }
-		if ($(obj).attr("id").match("mystream")) 
+		if ($(obj).attr('id').match('mystream'))
 		{
 		    if (!app.videoEnabled)
 		    {
 			//app.log(2, "Nothing to do with resizing video.");
 		    }
-		    else 
+		    else
 		    {
-                       Callcast.SendLocalVideoToPeers(new Object({width:w, height:h}));
+                       Callcast.SendLocalVideoToPeers(new Object({width: w, height: h}));
                     }
 		}
-		else 
+		else
 		{
-		    var nick = $(obj).attr("encname");
+		    var nick = $(obj).attr('encname');
 		    if (nick && Callcast.participants[nick].videoOn)
 		    {
-  		        Callcast.ShowRemoteVideo(new Object({nick:nick, width:w, height:h}));
+  		        Callcast.ShowRemoteVideo(new Object({nick: nick, width: w, height: h}));
 		    }
 		    // else do nothing on resize
 		}
-		$(obj).find("div.name").css("font-size", (item.orgFontSize * scale) + px);
+		$(obj).find('div.name').css('font-size', (item.orgFontSize * scale) + px);
   	        // >>0 = Math.foor(). Firefox doesn't like fractional decimals in z-index.
-	        obj.style.zIndex = "" + (scale * 100)>>0;
+	        obj.style.zIndex = '' + (scale * 100) >> 0;
 	    }
         }
 	/*
@@ -330,7 +330,7 @@
 	    var minScale = options.minScale;  /* This is the smallest scale
                                                * applied to the furthest
                                                * item. */
-	    var smallRange = (1-minScale) * 0.5;
+	    var smallRange = (1 - minScale) * 0.5;
 	    var change = (this.destRotation - this.rotation);
 	    var absChange = Math.abs(change);
 	    this.rotation += change * options.speed;
@@ -354,16 +354,16 @@
 	    items.iterateSorted(function(item)
 	    {
 		sinVal = funcSin(radians);
-		scale = ((sinVal+1) * smallRange) + minScale;
-		x = ctx.xCentre + (( (funcCos(radians) * ctx.xRadius) - (item.orgWidth*0.5)) * scale);
-		y = ctx.yCentre + (( (sinVal * ctx.yRadius)  ) * scale);
+		scale = ((sinVal + 1) * smallRange) + minScale;
+		x = ctx.xCentre + (((funcCos(radians) * ctx.xRadius) - (item.orgWidth * 0.5)) * scale);
+		y = ctx.yCentre + (((sinVal * ctx.yRadius)) * scale);
 		if (item.objectOK) {
 		    var obj = item.object;
 		    w = item.orgWidth * scale;
 		    h = item.orgHeight * scale;
 		    obj.style.width = w + px;
 		    obj.style.height = h + px;
-		    obj.style.left = x + px ;
+		    obj.style.left = x + px;
 		    obj.style.top = y + px;
 		    // Adjust object dimensions.
 		    ctx.adjPlugin(item, scale);
@@ -376,7 +376,7 @@
 			    if (!app.videoEnabled) {
 				//                app.log(2, "Nothing to do with resizing video.");
 			    }
-			    else 
+			    else
 			    {
 				if (w > 10 && h > 10)
 				{
@@ -388,7 +388,7 @@
 				}
 			    }
 			}
-			else 
+			else
 			{
 			    var nick = $(obj).attr("encname");
 			    if (nick && Callcast.participants[nick].videoOn)
@@ -404,12 +404,12 @@
 			    }
 			    // else do nothing on resize
 			}
-			// Scale name text. 
+			// Scale name text.
 			$(obj).find("div.name").css("font-size", (item.orgFontSize * scale) + px);
 		    }
    		    */
 		    // >>0 = Math.foor(). Firefox doesn't like fractional decimals in z-index.
-		    obj.style.zIndex = "" + (scale * 100)>>0;
+		    obj.style.zIndex = '' + (scale * 100) >> 0;
 		}
 		radians += spacing;
 	    }); /* end loop. */
@@ -419,7 +419,7 @@
 	    /*
 	     * If perceivable change in rotation then loop again next frame. */
 	    if (absChange >= 0.001) {
-		this.controlTimer = setTimeout( function(){
+		this.controlTimer = setTimeout(function() {
 		    context.updateAll();
 		}, this.timeDelay);
 	    }
@@ -437,22 +437,22 @@
 	    if (absChange < 0.001) {
 		this.rotation = this.destRotation;
 	    }
-	    
+
 	    var nItems = items.getLength();
 	    var height = $(this.container).height();
-	    
+
 	    // fit spots into carousel based on spot height
-	    var scale =  height / this.item.orgHeight;
+	    var scale = height / this.item.orgHeight;
 	    var spotWidth = this.item.orgWidth * scale;
 	    var spotSpace = 0.2 * spotWidth;
-	    
+
 	    // mystream is first in items
 	    // determine it's location to find the first item to display
 	    // pi/2 is the front spot in the carousel
 	    // get rotation 2pi remainder offset by front (pi/2)
-	    var fraction = (((Math.PI/2) + this.rotation) % (2*Math.PI)) / (2*Math.PI);
+	    var fraction = (((Math.PI / 2) + this.rotation) % (2 * Math.PI)) / (2 * Math.PI);
             var xMax = ((spotWidth + spotSpace) * nItems);
-            var x    =  fraction * xMax;
+            var x = fraction * xMax;
             //app.log(2, "updateLinear frontIndex " + this.frontIndex + " rotation " + this.rotation + " fraction " + fraction + " x " + x + " xMax " + xMax);
             items.iterateSorted(function(item)
             {
@@ -460,7 +460,7 @@
                $(obj).css('top', '');
                $(obj).css('right', '');
                if (x < -(spotWidth + spotSpace)) x += xMax;
-               else if (x > xMax)                x -= xMax; // wrap to start
+               else if (x > xMax) x -= xMax; // wrap to start
                obj.style.width = item.orgWidth * scale + 'px';
                obj.style.height = item.orgHeight * scale + 'px';
                obj.style.left = x + 'px';
@@ -471,9 +471,9 @@
             }); // end iteration
 
             // If perceivable change in rotation then loop again next frame.
-	    if (absChange >= 0.001) 
+	    if (absChange >= 0.001)
 	    {
-		this.controlTimer = setTimeout( function()
+		this.controlTimer = setTimeout(function()
 		{
 		    ctx.updateAll();
 		}, this.timeDelay);
@@ -539,7 +539,7 @@
 		event && event.stopPropagation();
 		var jqDiv = $(this).parent();
 		var item = jqDiv.data('item');
-                console.log("removing", jqDiv);
+                console.log('removing', jqDiv);
                 Callcast.RemoveSpot({spotNumber: (item.spotNumber) ? item.spotNumber : item.index});
 	    });
 	};
@@ -551,20 +551,20 @@
 	    var i;
 	    for (i = 0; i < objects.length; i++)
 	    {
-		if ( ($(objects[i]).width() === undefined) || 
-                     ( objects[i].complete !== undefined) && (!objects[i].complete) ) 
+		if (($(objects[i]).width() === undefined) ||
+                     (objects[i].complete !== undefined) && (!objects[i].complete))
 		{
                     return;
 		}
-	    }; // for loop
-	    app.log(2, "checkObjectsLoaded done");
-	    for( i = 0; i < objects.length; i++) 
+	    } // for loop
+	    app.log(2, 'checkObjectsLoaded done');
+	    for (i = 0; i < objects.length; i++)
 	    {  // create and setup item
 		var item = new Item(objects[i], options);
 		items.addItem(item);
 		this.setupItem(item);
 		$(objects[i]).data('item', item);
-	    }; // for loop
+	    } // for loop
 	    // save the storage item
 	    if (objects.length > 0)
 	    {  // construct a new object, todo this is too much because it sets css, handlers
@@ -579,7 +579,7 @@
 	}; // checkObjectsLoaded()
 	/*
 	 * Bootstrapping. */
-	this.tt = setInterval( function(){
+	this.tt = setInterval(function() {
 	    ctx.checkObjectsLoaded();
 	}, 50);
 	// resize the carousel keeping the spot proportion
@@ -588,20 +588,20 @@
 	    // get new width
 	    var width = $(this.container).width(), height = $(this.container).height();
 	    //app.log(2, "container w " + width + " h " + height);
-	    
+
 	    // set round property based on height
 	    this.round = (height > 150) ? true : false;
-	    
+
 	    // scale spots, maintain aspect ratio
             var newWidth = width * options.xSpotRatio;
 	    var newHeight = height * options.ySpotRatio;
-	    var widthScale =  newWidth  / this.item.orgWidth;
+	    var widthScale = newWidth / this.item.orgWidth;
 	    var heightScale = newHeight / this.item.orgHeight;
 	    var scale = (widthScale + heightScale) / 2;
-            this.item.orgWidth     *= scale;
-            this.item.orgHeight    *= scale;
-	    this.item.plgOrgWidth  *= scale
-	    this.item.plgOrgHeight *= scale
+            this.item.orgWidth *= scale;
+            this.item.orgHeight *= scale;
+	    this.item.plgOrgWidth *= scale;
+	    this.item.plgOrgHeight *= scale;
 
             // update items in list
             items.updateItemSizes(this.item);
@@ -616,14 +616,14 @@
 	      this.xRadius = rX*0.94,
 	      this.yRadius = rY;
 	    */
-	    this.xCentre = (width  / 2) * 0.9 * 1.1;
+	    this.xCentre = (width / 2) * 0.9 * 1.1;
 	    this.yCentre = (height / 2) * 0.6 * 0.8;
-	    this.xRadius = (width  / 2) * 0.9  ,
+	    this.xRadius = (width / 2) * 0.9 ,
 	    this.yRadius = (height / 2) * 0.6;
 
 	    //app.log(2, "carousel sizes xCentre " + this.xCentre + " yCentre " + this.yCentre +
 	    //                         " xRadius " + this.xRadius + " yRadius " + this.yRadius);
-	    
+
 	    this.widthOld = width; this.heightOld = height; // save container dimensions
 	    // scale spots
 	    this.updateAll();
@@ -634,7 +634,7 @@
      * The jQuery plugin part. Iterates through items specified in
      * selector and inits a Controller class for each one. */
     $.fn.CloudCarousel = function(options) {
-	this.each( function() {
+	this.each(function() {
 	    options = $.extend({}, {
 		minScale: 0.5,
 		xSpotRatio: 0.3, // spot size percentage of window size
@@ -650,7 +650,7 @@
 	    }, options);
 	    /*
 	     * Create a Controller for each carousel.*/
-	    $(this).data('cloudcarousel', new Controller( this, $('.cloudcarousel',$(this)), options) );
+	    $(this).data('cloudcarousel', new Controller(this, $('.cloudcarousel', $(this)), options));
 	});
 	return this;
     }; /* $.fn.CloudCarousel() */
