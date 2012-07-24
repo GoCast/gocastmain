@@ -77,10 +77,10 @@ namespace GoCast
                                const std::string& iceConfig,
                                webrtc::PeerConnectionObserver* pObserver,
                                bool bSyncCall = true);
-        void AddStream(const std::string& pluginId,
+        bool AddStream(const std::string& pluginId,
                        const std::string& label,
                        bool bSyncCall = true);
-        void RemoveStream(const std::string& pluginId,
+        bool RemoveStream(const std::string& pluginId,
                           const std::string& label,
                           bool bSyncCall = true);
         std::string CreateOffer(const std::string& pluginId,
@@ -96,27 +96,45 @@ namespace GoCast
                                  const FB::JSObjectPtr& succCb,
                                  const FB::JSObjectPtr& failCb,
                                  bool bSyncCall = true);
-        void SetRemoteDescription(const std::string& pluginId,
+        bool SetRemoteDescription(const std::string& pluginId,
                                   const webrtc::JsepInterface::Action& action,
                                   const std::string& sdp,
                                   bool bSyncCall = true);
-        void ProcessIceMessage(const std::string& pluginId,
+        bool ProcessIceMessage(const std::string& pluginId,
                                const std::string& candidateSdp,
                                bool bSyncCall = true);
-        void StartIce(const std::string& pluginId,
+        bool StartIce(const std::string& pluginId,
                       bool bSyncCall = true);
-        void DeletePeerConnection(const std::string& pluginId,
+        bool DeletePeerConnection(const std::string& pluginId,
                                   bool bSyncCall = true);
         
     public:
         std::string ReadyState(const std::string& pluginId);
         
-        bool GetLocalVideoTrackEnabled() const { 
-            return m_pLocalStream->video_tracks()->at(0)->enabled(); 
+        bool GetLocalVideoTrackEnabled() const {
+            if(0 < m_pLocalStream->video_tracks()->count()) {
+                return m_pLocalStream->video_tracks()->at(0)->enabled(); 
+            }
+            return false;
+        }
+        
+        bool GetLocalAudioTrackEnabled() const {
+            if(0 < m_pLocalStream->audio_tracks()->count()) {
+                return m_pLocalStream->audio_tracks()->at(0)->enabled();
+            }
+            return false;
         }
         
         void SetLocalVideoTrackEnabled(bool bEnable) {
-            m_pLocalStream->video_tracks()->at(0)->set_enabled(bEnable);
+            if(0 < m_pLocalStream->video_tracks()->count()) {
+                m_pLocalStream->video_tracks()->at(0)->set_enabled(bEnable);
+            }
+        }
+        
+        void SetLocalAudioTrackEnabled(bool bEnable) {
+            if(0 < m_pLocalStream->audio_tracks()->count()) {
+                m_pLocalStream->audio_tracks()->at(0)->set_enabled(bEnable);
+            }
         }
         
         void SetLocalVideoTrackRenderer(const talk_base::scoped_refptr
@@ -158,9 +176,9 @@ namespace GoCast
         bool NewPeerConnection_w(const std::string& pluginId,
                                  const std::string& iceConfig,
                                  webrtc::PeerConnectionObserver* pObserver);
-        void AddStream_w(const std::string& pluginId,
+        bool AddStream_w(const std::string& pluginId,
                          const std::string& label);
-        void RemoveStream_w(const std::string& pluginId,
+        bool RemoveStream_w(const std::string& pluginId,
                             const std::string& label);
         std::string CreateOffer_w(const std::string& pluginId,
                                   const webrtc::MediaHints& mediaHints);
@@ -172,13 +190,13 @@ namespace GoCast
                                    const std::string& sdp,
                                    const FB::JSObjectPtr& succCb,
                                    const FB::JSObjectPtr& failCb);
-        void SetRemoteDescription_w(const std::string& pluginId,
+        bool SetRemoteDescription_w(const std::string& pluginId,
                                     const webrtc::JsepInterface::Action& action,
                                     const std::string& sdp);
-        void ProcessIceMessage_w(const std::string& pluginId,
+        bool ProcessIceMessage_w(const std::string& pluginId,
                                  const std::string& candidateSdp);
-        void StartIce_w(const std::string& pluginId);
-        void DeletePeerConnection_w(const std::string& pluginId);
+        bool StartIce_w(const std::string& pluginId);
+        bool DeletePeerConnection_w(const std::string& pluginId);
         
     private:
         MessageQueue m_msgq;

@@ -1,3 +1,98 @@
+Index: talk/app/webrtc/mediastreamhandler.h
+===================================================================
+--- talk/app/webrtc/mediastreamhandler.h	(revision 153)
++++ talk/app/webrtc/mediastreamhandler.h	(working copy)
+@@ -65,7 +65,7 @@
+   bool enabled_;
+   talk_base::scoped_refptr<VideoRendererWrapperInterface> renderer_;
+ };
+-
++    
+ class LocalVideoTrackHandler : public VideoTrackHandler {
+  public:
+   LocalVideoTrackHandler(LocalVideoTrackInterface* track,
+@@ -96,6 +96,52 @@
+   talk_base::scoped_refptr<VideoTrackInterface> remote_video_track_;
+ };
+ 
++    // <GOCAST>
++    class AudioTrackHandler : public ObserverInterface {
++    public:
++        AudioTrackHandler(AudioTrackInterface* track,
++                          MediaProviderInterface* provider);
++        virtual ~AudioTrackHandler();
++        virtual void OnChanged();
++        
++    protected:
++        virtual void OnEnabledChanged() = 0;
++        
++    protected:
++        MediaProviderInterface* provider_;
++        AudioTrackInterface* audio_track_;
++        
++    private:
++        bool enabled_;
++    };
++    
++    class LocalAudioTrackHandler : public AudioTrackHandler {
++    public:
++        LocalAudioTrackHandler(LocalAudioTrackInterface* track,
++                               MediaProviderInterface* provider);
++        virtual ~LocalAudioTrackHandler();
++        
++    protected:
++        virtual void OnEnabledChanged();
++        
++    private:
++        talk_base::scoped_refptr<LocalAudioTrackInterface> local_audio_track_;
++    };
++    
++    class RemoteAudioTrackHandler : public AudioTrackHandler {
++    public:
++        RemoteAudioTrackHandler(AudioTrackInterface* track,
++                                MediaProviderInterface* provider);
++        virtual ~RemoteAudioTrackHandler();
++        
++    protected:
++        virtual void OnEnabledChanged();
++        
++    private:
++        talk_base::scoped_refptr<AudioTrackInterface> remote_audio_track_;
++    };
++    // </GOCAST>
++
+ class MediaStreamHandler : public ObserverInterface {
+  public:
+   MediaStreamHandler(MediaStreamInterface* stream,
+@@ -109,6 +155,11 @@
+   MediaProviderInterface* provider_;
+   typedef std::vector<VideoTrackHandler*> VideoTrackHandlers;
+   VideoTrackHandlers video_handlers_;
++    
++    // <GOCAST>
++    typedef std::vector<AudioTrackHandler*> AudioTrackHandlers;
++    AudioTrackHandlers audio_handlers_;
++    // </GOCAST>
+ };
+ 
+ class LocalMediaStreamHandler : public MediaStreamHandler {
+Index: talk/app/webrtc/webrtcsession.h
+===================================================================
+--- talk/app/webrtc/webrtcsession.h	(revision 153)
++++ talk/app/webrtc/webrtcsession.h	(working copy)
+@@ -114,7 +114,11 @@
+                                 cricket::VideoRenderer* renderer);
+   virtual void SetRemoteRenderer(const std::string& name,
+                                  cricket::VideoRenderer* renderer);
+-
++                          
++  // <GOCAST>
++  virtual bool SetMicMute(bool enable);
++  // </GOCAST>
++                          
+   // Transport related callbacks, override from cricket::BaseSession.
+   virtual void OnTransportRequestSignaling(cricket::Transport* transport);
+   virtual void OnTransportConnecting(cricket::Transport* transport);
 Index: talk/app/webrtc/webrtcsession.cc
 ===================================================================
 --- talk/app/webrtc/webrtcsession.cc	(revision 153)
@@ -28,6 +123,43 @@ Index: talk/app/webrtc/webrtcsession.cc
    // TODO: Fix SetLocalRenderer.
    // video_channel_->SetLocalRenderer(0, renderer);
  }
+@@ -449,7 +454,7 @@
+     LOG(LS_ERROR) << "Video not received in this call";
+     return;
+   }
+-
++    
+   const cricket::MediaContentDescription* video_content =
+       static_cast<const cricket::MediaContentDescription*>(
+           video_info->description);
+@@ -464,6 +469,12 @@
+   }
+ }
+ 
++    // <GOCAST>
++    bool WebRtcSession::SetMicMute(bool enable) {
++        return channel_manager_->SetMicMute(enable);
++    }
++    // </GOCAST>
++    
+ void WebRtcSession::OnTransportRequestSignaling(
+     cricket::Transport* transport) {
+   ASSERT(signaling_thread()->IsCurrent());
+Index: talk/app/webrtc/mediastreamprovider.h
+===================================================================
+--- talk/app/webrtc/mediastreamprovider.h	(revision 153)
++++ talk/app/webrtc/mediastreamprovider.h	(working copy)
+@@ -48,6 +48,10 @@
+                                 cricket::VideoRenderer* renderer) = 0;
+   virtual void SetRemoteRenderer(const std::string& name,
+                                  cricket::VideoRenderer* renderer) = 0;
++    // <GOCAST>
++    virtual bool SetMicMute(bool enable) = 0;
++    // </GOCAST>
++    
+  protected:
+   virtual ~MediaProviderInterface() {}
+ };
 Index: talk/app/webrtc/mediastreamhandler.cc
 ===================================================================
 --- talk/app/webrtc/mediastreamhandler.cc	(revision 153)
@@ -49,6 +181,114 @@ Index: talk/app/webrtc/mediastreamhandler.cc
  }
  
  RemoteVideoTrackHandler::RemoteVideoTrackHandler(
+@@ -129,6 +139,57 @@
+   // TODO: What should happen when enabled is changed?
+ }
+ 
++    // <GOCAST>
++    AudioTrackHandler::AudioTrackHandler(AudioTrackInterface* track,
++                                         MediaProviderInterface* provider)
++    : provider_(provider)
++    , audio_track_(track)
++    , enabled_(track->enabled()) {
++        audio_track_->RegisterObserver(this);
++    }
++    
++    AudioTrackHandler::~AudioTrackHandler() {
++        audio_track_->UnregisterObserver(this);
++    }
++    
++    void AudioTrackHandler::OnChanged() {
++        if(enabled_ != audio_track_->enabled()) {
++            enabled_ = audio_track_->enabled();
++            OnEnabledChanged();
++        }
++    }
++    
++    LocalAudioTrackHandler::LocalAudioTrackHandler(LocalAudioTrackInterface* track,
++                                                   MediaProviderInterface* provider)
++    : AudioTrackHandler(track, provider)
++    , local_audio_track_(track) {
++        
++    }
++    
++    LocalAudioTrackHandler::~LocalAudioTrackHandler() {
++        
++    }
++    
++    void LocalAudioTrackHandler::OnEnabledChanged() {
++        provider_->SetMicMute(!local_audio_track_->enabled());
++    }
++    
++    RemoteAudioTrackHandler::RemoteAudioTrackHandler(AudioTrackInterface* track,
++                                                     MediaProviderInterface* provider)
++    : AudioTrackHandler(track, provider)
++    , remote_audio_track_(track) {
++        
++    }
++    
++    RemoteAudioTrackHandler::~RemoteAudioTrackHandler() {
++        
++    }
++    
++    void RemoteAudioTrackHandler::OnEnabledChanged() {
++        //TODO:
++    }
++    // </GOCAST>
++    
+ MediaStreamHandler::MediaStreamHandler(MediaStreamInterface* stream,
+                                        MediaProviderInterface* provider)
+     : stream_(stream),
+@@ -140,6 +201,13 @@
+        it != video_handlers_.end(); ++it) {
+     delete *it;
+   }
++    
++    // <GOCAST>
++    for (AudioTrackHandlers::iterator it = audio_handlers_.begin(); 
++         it != audio_handlers_.end(); ++it) {
++        delete *it;
++    }
++    // </GOCAST>
+ }
+ 
+ MediaStreamInterface* MediaStreamHandler::stream() {
+@@ -163,6 +231,17 @@
+     VideoTrackHandler* handler(new LocalVideoTrackHandler(track, provider));
+     video_handlers_.push_back(handler);
+   }
++        
++    // <GOCAST>
++    AudioTracks* audioTracks(stream->audio_tracks());
++    
++    for (size_t j = 0; j < audioTracks->count(); ++j) {
++        LocalAudioTrackInterface* track =
++            static_cast<LocalAudioTrackInterface*>(audioTracks->at(j));
++        AudioTrackHandler* handler(new LocalAudioTrackHandler(track, provider));
++        audio_handlers_.push_back(handler);
++    }
++    // </GOCAST>
+ }
+ 
+ RemoteMediaStreamHandler::RemoteMediaStreamHandler(
+@@ -177,6 +256,17 @@
+     VideoTrackHandler* handler(new RemoteVideoTrackHandler(track, provider));
+     video_handlers_.push_back(handler);
+   }
++        
++    // <GOCAST>
++    AudioTracks* audioTracks(stream->audio_tracks());
++    
++    for (size_t j = 0; j < audioTracks->count(); ++j) {
++        AudioTrackInterface* track =
++        static_cast<AudioTrackInterface*>(audioTracks->at(j));
++        AudioTrackHandler* handler(new RemoteAudioTrackHandler(track, provider));
++        audio_handlers_.push_back(handler);
++    }
++    // </GOCAST>
+ }
+ 
+ MediaStreamHandlers::MediaStreamHandlers(MediaProviderInterface* provider)
 Index: talk/p2p/base/stun.h
 ===================================================================
 --- talk/p2p/base/stun.h	(revision 153)
@@ -62,6 +302,181 @@ Index: talk/p2p/base/stun.h
  
    int type() const { return type_; }
    size_t length() const { return length_; }
+Index: talk/session/phone/channelmanager.cc
+===================================================================
+--- talk/session/phone/channelmanager.cc	(revision 153)
++++ talk/session/phone/channelmanager.cc	(working copy)
+@@ -69,6 +69,10 @@
+   MSG_SETVIDEOCAPTURER = 26,
+   MSG_CREATEDATACHANNEL = 27,
+   MSG_DESTROYDATACHANNEL = 28,
++    
++    // <GOCAST>
++    MSG_SETMICMUTE = 29,
++    // </GOCAST>
+ };
+ 
+ static const int kNotSetOutputVolume = -1;
+@@ -170,6 +174,14 @@
+   bool result;
+ };
+ 
++    // <GOCAST>
++    struct SetMicMuteParams : public talk_base::MessageData {
++        SetMicMuteParams(bool e): result(false), enable(e) {}
++        bool result;
++        bool enable;
++    };
++    // </GOCAST>
++    
+ ChannelManager::ChannelManager(talk_base::Thread* worker_thread) {
+   Construct(MediaEngineFactory::Create(),
+             new DataEngine(),
+@@ -639,6 +651,23 @@
+   return media_engine_->SetOutputVolume(level);
+ }
+ 
++    // <GOCAST>
++    bool ChannelManager::SetMicMute(bool enable) {
++        bool ret = false;
++        if(initialized_) {
++            SetMicMuteParams params(enable);
++            Send(MSG_SETMICMUTE, &params);
++            ret = params.result;
++        }
++        
++        return ret;
++    }
++    
++    bool ChannelManager::SetMicMute_w(bool enable) {
++        return media_engine_->SetMicMute(enable);
++    }
++    // </GOCAST>
++    
+ bool ChannelManager::GetVideoOptions(std::string* cam_name) {
+   if (camera_device_.empty()) {
+     // Initialize camera_device_ with default.
+@@ -1055,6 +1084,13 @@
+                                               data->direction);
+       break;
+     }
++          // <GOCAST>
++      case MSG_SETMICMUTE: {
++          SetMicMuteParams* data = static_cast<SetMicMuteParams*>(message->pdata);
++          data->result = SetMicMute_w(data->enable);
++          break;
++      }
++          // </GOCAST>
+   }
+ }
+ 
+Index: talk/session/phone/channelmanager.h
+===================================================================
+--- talk/session/phone/channelmanager.h	(revision 153)
++++ talk/session/phone/channelmanager.h	(working copy)
+@@ -134,6 +134,11 @@
+                        const std::string& wave_out_device, int opts);
+   bool GetOutputVolume(int* level);
+   bool SetOutputVolume(int level);
++                           
++    // <GOCAST>
++    bool SetMicMute(bool enable);                   
++    // </GOCAST>
++                           
+   bool GetVideoOptions(std::string* cam_device);
+   bool SetVideoOptions(const std::string& cam_device);
+   bool SetDefaultVideoEncoderConfig(const VideoEncoderConfig& config);
+@@ -218,6 +223,11 @@
+                          const Device* out_dev);
+   bool GetOutputVolume_w(int* level);
+   bool SetOutputVolume_w(int level);
++                           
++   // <GOCAST>
++   bool SetMicMute_w(bool enable);                   
++   // </GOCAST>
++
+   bool SetLocalMonitor_w(bool enable);
+   bool SetVideoOptions_w(const Device* cam_device);
+   bool SetDefaultVideoEncoderConfig_w(const VideoEncoderConfig& config);
+Index: talk/session/phone/mediaengine.h
+===================================================================
+--- talk/session/phone/mediaengine.h	(revision 153)
++++ talk/session/phone/mediaengine.h	(working copy)
+@@ -137,6 +137,10 @@
+   virtual bool GetOutputVolume(int* level) = 0;
+   // Sets the current speaker volume, as a value between 0 and 255.
+   virtual bool SetOutputVolume(int level) = 0;
++    
++    // <GOCAST>
++    virtual bool SetMicMute(bool enable) = 0;
++    // </GOCAST>
+ 
+   // Local monitoring
+   // Gets the current microphone level, as a value between 0 and 10.
+@@ -243,6 +247,12 @@
+     return voice_.SetOutputVolume(level);
+   }
+ 
++    // <GOCAST>
++    virtual bool SetMicMute(bool enable) {
++        return voice_.SetMicMute(enable);
++    }
++    // </GOCAST>
++    
+   virtual int GetInputLevel() {
+     return voice_.GetInputLevel();
+   }
+@@ -315,6 +325,13 @@
+     return true;
+   }
+   bool SetOutputVolume(int level) { return true; }
++    
++    // <GOCAST>
++    bool SetMicMute(bool enable) {
++        return true;
++    }
++    // </GOCAST>
++
+   int GetInputLevel() { return 0; }
+   bool SetLocalMonitor(bool enable) { return true; }
+   const std::vector<AudioCodec>& codecs() { return codecs_; }
+Index: talk/session/phone/webrtcvoiceengine.cc
+===================================================================
+--- talk/session/phone/webrtcvoiceengine.cc	(revision 153)
++++ talk/session/phone/webrtcvoiceengine.cc	(working copy)
+@@ -712,6 +712,16 @@
+   return true;
+ }
+ 
++    // <GOCAST>
++    bool WebRtcVoiceEngine::SetMicMute(bool enable) {
++        if(voe_wrapper_->volume()->SetSystemInputMute(enable) == -1) {
++            LOG_RTCERR1(SetMicMute, enable);
++            return false;
++        }
++        return true;
++    }
++    // </GOCAST>
++    
+ int WebRtcVoiceEngine::GetInputLevel() {
+   unsigned int ulevel;
+   return (voe_wrapper_->volume()->GetSpeechInputLevel(ulevel) != -1) ?
+Index: talk/session/phone/webrtcvoiceengine.h
+===================================================================
+--- talk/session/phone/webrtcvoiceengine.h	(revision 153)
++++ talk/session/phone/webrtcvoiceengine.h	(working copy)
+@@ -107,6 +107,11 @@
+   bool SetDevices(const Device* in_device, const Device* out_device);
+   bool GetOutputVolume(int* level);
+   bool SetOutputVolume(int level);
++          
++          // <GOCAST>
++          bool SetMicMute(bool enable);
++          // </GOCAST>
++          
+   int GetInputLevel();
+   bool SetLocalMonitor(bool enable);
+ 
 Index: talk/base/refcount.h
 ===================================================================
 --- talk/base/refcount.h	(revision 153)

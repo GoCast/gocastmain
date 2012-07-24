@@ -126,12 +126,12 @@ var app = {
   }()),
   /**
    * Calculate number from string. */
-  str2id: function(str) 
+  str2id: function(str)
   {
     if (str)
     {
        var nn = 0;
-       for (var i = 0; i < str.length; i++) 
+       for (var i = 0; i < str.length; i++)
        {
          nn += str.charCodeAt(i);
        }
@@ -175,7 +175,7 @@ var app = {
     scheduleTitle: null,
     fbProfileUrl: null,    // cache the url since user may log out of fb
     fbProfilePicUrl: null, // cache the url since user may log out of fb
-    fbSkipped: false,      // user chose to skip fb login
+    fbSkipped: false      // user chose to skip fb login
   },
   // enable the audio video mute buttons, global chat input
   enableButtons: function(enable)
@@ -193,7 +193,7 @@ var app = {
         $("#lower-right > input.video").attr('disabled', 'disabled');
         $("#lower-right > input.audio").attr('disabled', 'disabled');
         $("#msgBoard > input").attr('disabled','disabled');
-     } 
+     }
   },
   videoEnabled : false // video enabled state
 }; /* app */
@@ -313,11 +313,11 @@ function carouselItemClick(
       {
          //todo canonicalize url
          app.log(2, "carouselItemClick got url " + urlName);
-         
+
          Callcast.SendURLToRender({
             id:      urlName,
             altText: urlName,
-            url:     urlName,
+            url:     urlName
             });
       }
    }
@@ -329,7 +329,7 @@ function carouselItemClick(
    {
       openChat(event);
    }
-   
+
 } // carouselItemClick
 
 ///
@@ -339,28 +339,28 @@ function carouselItemZoom(event)
 {
    app.log(2, "carouselItemZoom ");
    event && event.stopPropagation();
-   
+
    // do nothing if there's a zoomed spot
    if ($('#meeting > #zoom > .cloudcarousel').length > 0)
    {
       return;
    }
-      
+
    $('#meeting > #zoom').css("display", "block"); // display zoom div
    $('#meeting > #streams').css("height", "20%"); // unzoom carousel
-   
+
    // get item and remove it from carousel
    var spot = $(event.currentTarget).parent();
    var item = $(spot).data('item');
    app.carousel.remove(item.index);
-   
+
    $(spot).appendTo($('#meeting > #zoom')); // move div to zoom area
    $(spot).removeAttr('style');
-   
+
    // style zoomed spot
    app.carousel.resize(); // update carousel
    resizeZoom();
-   
+
 } // carouselItemZoom
 
 ///
@@ -370,7 +370,7 @@ function carouselItemUnzoom(event)
 {
    app.log(2, "carouselItemUnzoom ");
    event && event.stopPropagation();
-   
+
    $('#meeting > #zoom').css("display", "none"); // undisplay zoom div
    var spot = $('#meeting > #zoom > .cloudcarousel');
    app.carousel.insertSpot(spot); // put spot back in carousel
@@ -391,16 +391,16 @@ function openCopyData
   {
     return false;
   }
-  
+
   // get the dialog
   var jqWin = $("#boxes > div#copyData");
-  
+
   // set the room name
   var name = $('div#copyContent > #copyName', jqWin);
 
   $(name).text('Carousel room ' + $.getUrlVar('roomname'));
   $(name).attr("href", window.location.href);
-  
+
   // position the dialog
   cX = event.clientX;
   cY = event.clientY;
@@ -409,7 +409,7 @@ function openCopyData
   var winH = $(window).height();
   var wcW = jqWin.outerWidth();
   var wcH = jqWin.outerHeight();
-  
+
   // todo parse css dimension and use it to place dlg
   //var marginRight = $(jqWin).css("margin-right");
   //var marginBottom = $(jqWin).css("margin-bottom");
@@ -421,21 +421,21 @@ function openCopyData
   {
     jqWin.css("top", winH - wcH - marginBottom);
   }
-  else // place dialog at event location 
+  else // place dialog at event location
   {
     jqWin.css("top", cY);
   }
-  
+
   // move dialog right if past right edge
-  if ((cX + wcW + marginRight) > winW) 
+  if ((cX + wcW + marginRight) > winW)
   {
     jqWin.css("left", winW - wcW - marginRight);
   }
-  else // place dialog at event location 
+  else // place dialog at event location
   {
     jqWin.css("left", cX);
   }
-  
+
   // display dlg
   jqWin.fadeIn(700);
   jqWin.addClass("active");
@@ -546,7 +546,7 @@ function openMeeting(
    * Add encname attribute to mystream. */
   $("#meeting > #streams > #scarousel #mystream")
     .attr("encname", app.user.name);
-    
+
   // use fb profile pick as bg image if it exists
   // set this here initially because local video
   // is off initially
@@ -557,7 +557,7 @@ function openMeeting(
         .css("background-image", "url(" + app.user.fbProfilePicUrl + ")");
   }
   // center carousel in it's container
-  // the carousel positioning is handled by it's resize method 
+  // the carousel positioning is handled by it's resize method
   var sCar = $("#scarousel");
   var rX = sCar.width() / 2;
   var rY = sCar.height() / 2;
@@ -1043,7 +1043,7 @@ function resizeWindows(
   var meetW = jqW.width();
   var meetOff = winW/2 - meetW/2;
   jqW.css('left', meetOff);
-  
+
   // resize carousel
   if (app.carousel)
   {
@@ -1075,7 +1075,7 @@ function resizeZoom(event)
    // center div in zoom div
    var left = (width - item.orgWidth) / 2;
    var top  = (height - item.orgHeight) / 2;
-   
+
    $(jqDiv).css('width',  item.orgWidth  + 'px');
    $(jqDiv).css('height', item.orgHeight + 'px');
    $(jqDiv).css('left',   left + 'px');
@@ -1097,7 +1097,7 @@ function onJoinNow(
 
     // get the nick name, return back to dialog if not defined
     var usrNm = $("#credentials2 > input#name").val();
-    
+
     // user must enter fb or nick name if both not entered
     // display error
     if (usrNm.length < 1) {
@@ -1105,12 +1105,12 @@ function onJoinNow(
         fadeIn("fast");
       return false;
     }
-    
+
     // set app name from dialog text field
     app.user.name = encodeURI(usrNm);
     Callcast.SetNickname(app.user.name); // TODO should be somewhere else
     app.log(2, "User name:" + usrNm);
-    
+
     // close dialog
     deactivateWindow("#credentials2");
 
@@ -1149,7 +1149,7 @@ function checkCredentials(
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
     app.log(2, "checkCredentials");
-    
+
     // this method is called on a fb status change
     // so do nothing if we're already logged in
     if (app.userLoggedIn)
@@ -1187,7 +1187,7 @@ function handleRoomSetup() {
 		// We successfully created the room.
 		// Joining is in process now.
 		// trigger of joined_room will happen upon join complete.
-		
+
 		app.user.scheduleName = "Place to meet up";
 		app.user.scheduleJid = new_name + Callcast.AT_CALLCAST_ROOMS;
 		app.user.scheduleTitle = "Open room";
@@ -1259,7 +1259,7 @@ function winInstall(event)
 {
    // close the eula window
    closeWindow();
-   
+
    // get the windows install file
    $.post("https://video.gocast.it/downloads/GoCastPlayer.msi",
           function(data)
@@ -1267,7 +1267,7 @@ function winInstall(event)
              console.log(data);
           });
 
-   openWindow("#winWait");         
+   openWindow("#winWait");
    winCheckForPlugin();
 }
 
@@ -1287,13 +1287,13 @@ function winCheckForPlugin()
          app.log(2, "winCheckForPlugin found player.");
          $('#winWait > #status > #spinner').attr("src", "images/green-tick.png");
          $('#winWait > #status > #msg').text("The GoCast plugin is installed.");
-         
+
          // display error msg after a timeout in case the plugin does not load
          app.winTimeout = setTimeout(winPluginPunt, 10000);
          return; // we're done since the plugin is in the list
       }
    }
-   
+
    // plugin was not found in list wait and recheck
    app.winTimeout = setTimeout(winCheckForPlugin, 3000);
    app.log(2, "winCheckForPlugin no player, waiting...");
@@ -1324,11 +1324,11 @@ function showChatOut()
    {
       // hide the ticker
       $('#msgTicker').css("display", "none");
-   
+
       // show chatOut
       $('#msgBoard > #chatOut').css("display", "block");
    }
-   
+
 } // showChatOut
 
 /**
@@ -1339,10 +1339,10 @@ function showMsgTicker()
 {
    // hide the ticker
    $('#msgBoard > #chatOut').css("display", "none");
-   
+
    // show chatOut
    $('#msgTicker').css("display", "block");
-   
+
 } // showChatOut
 
 ///
@@ -1356,8 +1356,8 @@ function docKey(event)
       return;
    }
    app.log(2, "key code " + event.which);
-   
-   switch (event.which || event.keyCode) 
+
+   switch (event.which || event.keyCode)
    {
      case 32: // space bar
        //changeAudio();
@@ -1428,15 +1428,15 @@ $(document).ready(function(
   $(document).bind('checkCredentials', checkCredentials);
 
   $(document).keydown(docKey); // global key handler
-  
+
   fbInit(); // init facebook api
-  
+
   // Login to xmpp anonymously
   Callcast.connect(Callcast.CALLCAST_XMPPSERVER, "");
 
   // Write greeting into console.
   app.log(2, "Page loaded.");
-  
+
 }); // $(document).ready(function())
 
 $.extend({

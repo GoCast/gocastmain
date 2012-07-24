@@ -5,10 +5,17 @@ namespace GoCast
 {
     bool GCPVideoRenderer::RenderFrame(const cricket::VideoFrame* pFrame)
     {
-        static const int stride = m_width*4;
-        static const int frameBufferSize = m_height*stride;
         boost::mutex::scoped_lock winLock(m_winMutex);
 
+        if(NULL == m_pFrameBuffer.get())
+        {
+            m_width = pFrame->GetWidth();
+            m_height = pFrame->GetHeight();
+            m_pFrameBuffer.reset(new uint8[m_width*m_height*4]);
+        }
+
+		const int stride = m_width*4;
+        const int frameBufferSize = m_height*stride;
         pFrame->ConvertToRgbBuffer(cricket::FOURCC_ARGB,
                                    m_pFrameBuffer.get(),
                                    frameBufferSize,
@@ -37,7 +44,7 @@ namespace GoCast
 		bitmapInfo.bmiHeader.biHeight = m_height;
 
 		FB::PluginWindowlessWin* pWinlessWindowsWin = dynamic_cast<FB::PluginWindowlessWin*>(m_pWin);
-		if(NULL != pWinlessWindowsWin)
+		if(NULL != pWinlessWindowsWin && NULL != m_pFrameBuffer.get())
 		{
 			FB::Rect winRect = m_pWin->getWindowPosition();
 			hdc = pWinlessWindowsWin->getHDC();

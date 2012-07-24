@@ -98,17 +98,17 @@ public:
     FB::variant Init(const FB::variant& htmlId,
                      const FB::variant& iceConfig,
                      const FB::JSObjectPtr& iceCallback);
-    void AddStream(const FB::JSAPIPtr& stream);
-    void RemoveStream(const FB::JSAPIPtr& stream);
+    FB::variant AddStream(const FB::JSAPIPtr& stream);
+    FB::variant RemoveStream(const FB::JSAPIPtr& stream);
     FB::variant CreateOffer(const FB::JSObjectPtr& mediaHints);
     FB::variant CreateAnswer(const FB::variant& offer, const FB::JSObjectPtr& mediaHints);
     void SetLocalDescription(const FB::variant& action,
                              const FB::variant& sdp,
                              const FB::JSObjectPtr& succCb,
                              const FB::JSObjectPtr& failCb);
-    void SetRemoteDescription(const FB::variant& action, const FB::variant& sdp);
-    void ProcessIceMessage(const FB::variant& sdp);
-    void StartIce();
+    FB::variant SetRemoteDescription(const FB::variant& action, const FB::variant& sdp);
+    FB::variant ProcessIceMessage(const FB::variant& sdp);
+    FB::variant StartIce();
     
 private:
     // --------------------- PeerConnectionObserver Methods -----------------
@@ -122,7 +122,7 @@ private:
     virtual void OnIceComplete();
 
 private:
-    void DeletePeerConnection();
+    FB::variant DeletePeerConnection();
     
 private:
     std::string m_readyState;
