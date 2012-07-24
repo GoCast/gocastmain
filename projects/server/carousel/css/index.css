@@ -264,9 +264,8 @@ body > div#meeting > div#streams > div#scarousel div.cloudcarousel {
 body > div#meeting > div#streams div.cloudcarousel > img.close
 {
   visibility: hidden;
-  opacity: 0.4;
-  width: 12px;
-  height: 12px;
+  width: 25px;
+  height: 25px;
   margin: 5px;
   position: absolute;
   right: 3px;
@@ -275,13 +274,10 @@ body > div#meeting > div#streams div.cloudcarousel > img.close
 body > div#meeting > div#streams div.cloudcarousel > img.zoom
 {
   visibility: hidden;
-  opacity: 0.7;
-  width: 15px;
-  height: 15px;
-  margin: 5px;
+  width: 30px;
+  height: 30px;
+  margin: 3px;
   position: absolute;
-  left: 13px;
-  top: 3px;
 }
 body > div#meeting > div#streams > div#scarousel div.cloudcarousel.typeContent {
   background-size: 98%;
