@@ -33,9 +33,9 @@ $(document).on('joined_session', function (
    * Enable button activities except join. */
   app.enableButtons(true);
   closeWindow();
-  
+
   //todo put openmeeting here to load plugin earlier
-  
+
   return false;
 }); /* joined_session() */
 
@@ -163,7 +163,7 @@ $(document).on('private-message', function (
 }); /* private-message() */
 
 ///
-/// extract spot info from info object 
+/// extract spot info from info object
 /// and set participant info
 /// the image participant property is in css format url(<url>)
 ///
@@ -250,7 +250,7 @@ $(document).on('user_joined', function (
 )
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
-  // get nickname and find carousel item 
+  // get nickname and find carousel item
   // carousel item for this user was created in addplugin...
   app.log(2, "A new user " + info.nick + " joined.");
   setSpotInfo(info); // set the item data
@@ -273,7 +273,7 @@ $(document).on('user_updated', function (
 )
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
-  // get nickname and find carousel item 
+  // get nickname and find carousel item
   // carousel item for this user was created in addplugin...
   app.log(2, "user " + info.nick + " updated.");
   setSpotInfo(info); // set the item data
@@ -355,15 +355,15 @@ Callcast.connection.xmlOutput = function(data) {
                         console.log("XML-OUT:", $(data));
 
         };
-        
+
    */
-   
+
   /*
    * Open waiting room in case it takes too long to join. */
   openWindow("#waitingToJoin");
 
   app.xmppLoggedIn = true;
-  
+
   $(document).trigger("one-login-complete", "XMPP GO.");		// One more login action complete.
   return false;
 }); /* connected() */
@@ -374,7 +374,7 @@ $(document).on("one-login-complete", function(event, msg) {
 		console.log("one-login-complete: Msg: " + msg);
 	else
 		console.log("one-login-complete: No Msg");
-	
+
 	if (app.loggedInAll())
 	{
 		console.log("one-login-complete: opening meeting");
@@ -530,11 +530,11 @@ function addContentToCarousel(
 {
   app.log(2, "addContentToCarousel " + info.id);
   console.log("info", info);
-  
-  // info.id is an encoded name, get an id from it to use to index 
+
+  // info.id is an encoded name, get an id from it to use to index
   // into carousel items
   var id = app.str2id(info.id);
-  
+
   oo = $("#meeting > #streams > #scarousel div.unoccupied").get(0);
   if (oo) {
     $(oo).attr("id", id);
@@ -553,10 +553,10 @@ function addContentToCarousel(
     else // gen image from url
     {
        GoCastJS.getUrlInfo(
-       { 
+       {
          webUrl:   info.url,
-         proxyUrl: "http://carousel.gocast.it/proxy",
-       }, 
+         proxyUrl: "http://carousel.gocast.it/proxy"
+       },
        function(urlInfo)
        {
           // remove the spot background
@@ -565,15 +565,15 @@ function addContentToCarousel(
           var divIcon = $('<div class="spotUrlIcon"/>');
           // hot link to http://getfavicon.appspot.com/ to get favicon
           $(divIcon).css("background-image", 'url(http://g.etfv.co/' + info.url + ')');
-          
+
           var divTitle = $('<div class="spotUrlTitle"/>');
           // add title
           if (urlInfo.title)
           {
              $(divTitle).append($('<p>' + urlInfo.title + '</p>'));
           }
-          else 
-          {          
+          else
+          {
              $(divTitle).append($('<p>' + info.url + '</p>'));
           }
           $(oo).append('<div class="urlPad"/>');
@@ -659,7 +659,7 @@ function pluginLoaded(
     Callcast.setCallbackForAddSpot(addSpot);
     Callcast.setCallbackForRemoveSpot(removeSpot);
     initializeLocalPlugin();
-					
+
     handleRoomSetup();
   }, function(message) {
     /*
