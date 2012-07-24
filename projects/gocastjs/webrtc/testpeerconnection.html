@@ -13,7 +13,7 @@
 					new GoCastJS.PeerConnectionOptions(
 						"STUN stun.l.google.com:19302",
 						function(candidate, moreComing) {
-							if(true == moreComing) {
+							if(true === moreComing) {
 								if("string" === typeof(candidate) && null !== candidate) {
 									console.log("onicemessage: ", candidate);
 									peerConn.ProcessIceMessage(candidate);

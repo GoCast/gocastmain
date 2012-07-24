@@ -10,6 +10,10 @@ GoCastJS.Exception.prototype.toString = function() {
 	return ("[" + this.pluginId + "]: " + this.message);
 };
 
+GoCastJS.CheckBrowserSupport = function() {
+	return (null === navigator.userAgent.toLowerCase().match("msie"));
+};
+
 //!
 //! function: GoCastJS.CheckGoCastPlayer()
 //! 
@@ -29,9 +33,9 @@ GoCastJS.CheckGoCastPlayer = function() {
 //!
 //! members:
 //!		mediaHints <obj>	: {audio: <bool>, video:<bool>}
-//!		width <int>			: width of video element or plugin window
-//!		height <int>		: height of video element or plugin window
-//!		videoId <string>	: unique id of video element or plugin object
+//!		width <int>			: width of plugin window
+//!		height <int>		: height of plugin window
+//!		videoId <string>	: unique id of plugin object
 //!		containerId <string>: unique id of div element that contains 'videoId'
 //!
 GoCastJS.UserMediaOptions = function(mediaHints, width, height, videoId, containerId) {
@@ -51,7 +55,15 @@ GoCastJS.UserMediaOptions = function(mediaHints, width, height, videoId, contain
 //!		failure <function(message)>			: failure callback with message
 //!
 GoCastJS.getUserMedia = function(options, success, failure) {
-	if(true === this.CheckGoCastPlayer()) {
+	if(false === this.CheckBrowserSupport()) {
+		if("undefined" !== typeof(failure) && null !== failure) {
+			failure("GoCastJS.getUserMedia(): This browser not supported yet.");
+		}		
+	} else if(false === this.CheckGoCastPlayer()) {
+		if("undefined" !== typeof(failure) && null !== failure) {
+			failure("GoCastJS.getUserMedia(): GoCastPlayer not detected.");
+		}
+	} else {
 		var container = document.getElementById(options.containerId);
 		var player = document.createElement("object");
 		
@@ -64,11 +76,7 @@ GoCastJS.getUserMedia = function(options, success, failure) {
 		player.getUserMedia(
 			options.mediaHints,
 			function(stream) {					
-				player.init(
-					"localPlayer",
-					"STUN stun.l.google.com:19302",
-					null
-				);
+				player.init("localPlayer", "STUN stun.l.google.com:19302", null);
 				player.addStream(stream);
 				player.setLocalDescription(
 					"OFFER",
@@ -89,10 +97,6 @@ GoCastJS.getUserMedia = function(options, success, failure) {
 				}
 			}
 		);
-	} else {
-		if("undefined" !== typeof(failure) && null !== failure) {
-			failure("GoCastJS.getUserMedia(): GoCastPlayer not detected.");
-		}
 	}
 };
 
@@ -101,9 +105,9 @@ GoCastJS.getUserMedia = function(options, success, failure) {
 //!
 //! members:
 //!		iceConfig <string>	: "STUN <ip>:<port>"
-//!		width <int>			: width of video element or plugin window
-//!		height <int>		: height of video element or plugin window
-//!		videoId <string>	: unique id of video element or plugin object
+//!		width <int>			: width of plugin window
+//!		height <int>		: height of plugin window
+//!		videoId <string>	: unique id of plugin object
 //!		containerId <string>: unique id of div element that contains 'videoId'
 //!		onIceMessage <function(candidateSdp, moreComing)>	: new ice candidate callback
 //!		onAddStream <function(stream)> 						: new remote stream added
@@ -136,7 +140,11 @@ GoCastJS.PeerConnectionOptions = function(iceConfig,
 //!		options <GoCastJS.PeerConnectionOptions>	: options for creating peerconnection
 //!
 GoCastJS.PeerConnection = function(options) {
-	if(true === GoCastJS.CheckGoCastPlayer()) {
+	if(false === GoCastJS.CheckBrowserSupport()) {
+		throw new GoCastJS.Exception(this.peerConn.id, "This browser not supported.");
+	} else if(false === GoCastJS.CheckGoCastPlayer()) {
+		throw new GoCastJS.Exception(this.peerConn.id, "GoCastPlayer not detected.");
+	} else {
 		var container = document.getElementById(options.containerId);
 		this.peerConn = document.createElement("object");
 		this.peerConn.id = options.videoId;
@@ -175,8 +183,6 @@ GoCastJS.PeerConnection = function(options) {
 										options.onIceMessage)) {
 			throw new GoCastJS.Exception(this.peerConn.id, "init() failed.");
 		}
-	} else {
-		throw new GoCastJS.Exception(this.peerConn.id, "GoCastPlayer not detected.");
 	}
 };
 
