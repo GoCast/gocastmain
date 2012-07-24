@@ -14,21 +14,21 @@
  */
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
-
+'use strict';
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
  * \brief Function that modifies the DOM when user joined the session.
  *        This implements the trigger "joined_session".
  */
-$(document).on('joined_session', function (
+$(document).on('joined_session', function(
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
     /**
      * No arguments. */
 )
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
-  app.log(2, "User has successfully joined the session.");
+  app.log(2, 'User has successfully joined the session.');
   /*
    * Enable button activities except join. */
   app.enableButtons(true);
@@ -46,22 +46,22 @@ $(document).on('joined_session', function (
  * \brief Function that modifies the DOM when user left the session.
  *        This implements the trigger "left_session".
  */
-$(document).on('left_session', function (
+$(document).on('left_session', function(
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
     /**
      * No arguments. */
 )
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
-  app.log(2, "User has successfully left the session.");
+  app.log(2, 'User has successfully left the session.');
   /*
    * Remove all the objects in carousel. */
-  $("#meeting > #streams > #scarousel div.cloudcarousel:not(.unoccupied)").each(function(i, e) {
-    if ($(e).hasClass("typeContent")) {
-      removeContentFromCarousel($(e).attr("encname"));
+  $('#meeting > #streams > #scarousel div.cloudcarousel:not(.unoccupied)').each(function(i, e) {
+    if ($(e).hasClass('typeContent')) {
+      removeContentFromCarousel($(e).attr('encname'));
     }
     else {
-      removePluginFromCarousel($(e).attr("encname"));
+      removePluginFromCarousel($(e).attr('encname'));
     }
   });
   /*
@@ -77,14 +77,14 @@ $(document).on('left_session', function (
  * \brief Function that modifies the DOM when room list has been updated.
  *        This implemets the trigger "roomlist_updated".
  */
-$(document).on('roomlist_updated', function (
+$(document).on('roomlist_updated', function(
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
     /**
      * No arguments. */
 )
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
-  app.log(2, "The room list has been updated.");
+  app.log(2, 'The room list has been updated.');
 }); /* roomlist_updated() */
 
 
@@ -94,7 +94,7 @@ $(document).on('roomlist_updated', function (
  * \brief Function that modifies the DOM when a new sync link is issued.
  *        This implements the trigger "synclink".
  */
-$(document).on('synclink', function (
+$(document).on('synclink', function(
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
     /**
      * Event object. */
@@ -105,7 +105,7 @@ $(document).on('synclink', function (
 )
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
-  app.log(2, "A new synclink has been issued.");
+  app.log(2, 'A new synclink has been issued.');
 }); /* synclink() */
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
@@ -113,7 +113,7 @@ $(document).on('synclink', function (
  * \brief Function that modifies the DOM when a public message arrives.
  *        This implements the trigger "public-message".
  */
-$(document).on('public-message', function (
+$(document).on('public-message', function(
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
     /**
      * Event object. */
@@ -124,22 +124,22 @@ $(document).on('public-message', function (
 )
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
-  var notice = msginfo.notice;
-  var delayed = msginfo.delayed;
-  var nick_class = msginfo.nick_class;
-
+  var notice = msginfo.notice,
+      delayed = msginfo.delayed,
+      nick_class = msginfo.nick_class,
   /*
    * Add message to Message Board. */
-  var jqChat = $("#msgBoard > #chatOut");
-  var jqTick = $("#msgBoard > #msgTicker");
-  var msg = '<b>'+ decodeURI(msginfo.nick) +'</b>'+': '+
-                   decodeURI(msginfo.body) + "<br>";
+      jqChat = $('#msgBoard > #chatOut'),
+      jqTick = $('#msgBoard > #msgTicker'),
+      msgTicker,
+      msg = '<b>' + decodeURI(msginfo.nick) + '</b>' + ': ' +
+                   decodeURI(msginfo.body) + '<br>';
   jqChat.append(msg);
-  var msgTicker = '<b>'+ decodeURI(msginfo.nick) +'</b>'+': '+
-                   decodeURI(msginfo.body) + " ";
+  msgTicker = '<b>' + decodeURI(msginfo.nick) + '</b>' + ': ' +
+                   decodeURI(msginfo.body) + ' ';
   jqTick.prepend(msgTicker);
 
-  app.log(2, "A public message arrived " + msg);
+  app.log(2, 'A public message arrived ' + msg);
 }); /* public-message() */
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
@@ -147,7 +147,7 @@ $(document).on('public-message', function (
  * \brief Function that modifies the DOM when a private message arrives.
  *        This implements the trigger "private-message".
  */
-$(document).on('private-message', function (
+$(document).on('private-message', function(
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
     /**
      * Event object. */
@@ -159,7 +159,7 @@ $(document).on('private-message', function (
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
   openPersonalChat(msginfo);
-  app.log(2, "A private message arrived.");
+  app.log(2, 'A private message arrived.');
 }); /* private-message() */
 
 ///
@@ -176,15 +176,15 @@ function setSpotInfo(info)
        {
           if (info.image)
           {
-             spot.image = "url(" + info.image + ")";
+             spot.image = 'url(' + info.image + ')';
           }
           else // use the default bg image
           {
              spot.image = 'url(images/person.png)';
           }
        }
-       app.log(2, "setSpotInfo nick " + info.nick + " image " + info.image);
-       console.log("setSpotInfo", info, spot);
+       app.log(2, 'setSpotInfo nick ' + info.nick + ' image ' + info.image);
+       console.log('setSpotInfo', info, spot);
     }
 }
 
@@ -198,39 +198,40 @@ try
 {
   if (info && info.nick)
   {
-    var id = app.str2id(info.nick);
-    var oo = $("#meeting > #streams > #scarousel div.#"+id).get(0);
+    var id = app.str2id(info.nick),
+        oo = $('#meeting > #streams > #scarousel div.#' + id).get(0),
+        w, s, h, image;
     if (oo)
     {  // item found
        // Check dimensions of wrapper div to correct for video dimensions.
        if (info.hasVid) {
-           var w = $(oo).width() - 4;
-           var s = w / Callcast.WIDTH;
-           var h = Callcast.HEIGHT * s;
+           w = $(oo).width() - 4;
+           s = w / Callcast.WIDTH;
+           h = Callcast.HEIGHT * s;
            info.width = w;
            info.height = h;
-           app.log(2, "setCarouselItemState video on user dim w "+info.width+", h "+info.height);
-           $(oo).css("background-image", ''); // remove any background image
+           app.log(2, 'setCarouselItemState video on user dim w ' + info.width + ', h ' + info.height);
+           $(oo).css('background-image', ''); // remove any background image
            Callcast.ShowRemoteVideo(info);
        }
        else // if hasVid is null or false turn video off
        {
           info.hasVid = false;
-          var image = Callcast.participants[info.nick].image;
-          $(oo).css("background-image", image);
+          image = Callcast.participants[info.nick].image;
+          $(oo).css('background-image', image);
           Callcast.ShowRemoteVideo(info);
-          app.log(2, "setCarouselItemState video off image " + image);
+          app.log(2, 'setCarouselItemState video off image ' + image);
        }
     }
-    else
+/*    else
     {
        //app.log(3, "setCarouselItemState item for " + info.nick + " not found");
-    }
+    } */
   }
 }
 catch (err)
 {
-   console.log("setCarouselItemState exception", err);
+   console.log('setCarouselItemState exception', err);
 }
 }
 
@@ -239,7 +240,7 @@ catch (err)
  * \brief Function that modifies the DOM when a new user joined.
  *        This is implements the trigger "user_joined".
  */
-$(document).on('user_joined', function (
+$(document).on('user_joined', function(
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
     /**
      * Event object. */
@@ -252,7 +253,7 @@ $(document).on('user_joined', function (
 {
   // get nickname and find carousel item
   // carousel item for this user was created in addplugin...
-  app.log(2, "A new user " + info.nick + " joined.");
+  app.log(2, 'A new user ' + info.nick + ' joined.');
   setSpotInfo(info); // set the item data
   setCarouselItemState(info); // set the carousel video state
 }); /* user_joined() */
@@ -262,7 +263,7 @@ $(document).on('user_joined', function (
  * \brief Function that modifies the DOM when a user update its status.
  *        This implemets the trigger "user_updated'.
  */
-$(document).on('user_updated', function (
+$(document).on('user_updated', function(
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
     /**
      * Event object. */
@@ -275,7 +276,7 @@ $(document).on('user_updated', function (
 {
   // get nickname and find carousel item
   // carousel item for this user was created in addplugin...
-  app.log(2, "user " + info.nick + " updated.");
+  app.log(2, 'user ' + info.nick + ' updated.');
   setSpotInfo(info); // set the item data
   setCarouselItemState(info); // set the carousel video state
 }); /* user_updated() */
@@ -285,7 +286,7 @@ $(document).on('user_updated', function (
  * \brief Function that modifies the DOM when a user left.
  *        This implements the trigger "user_left".
  */
-$(document).on('user_left', function (
+$(document).on('user_left', function(
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
     /**
      * Event object. */
@@ -296,7 +297,7 @@ $(document).on('user_left', function (
 )
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
-  app.log(2, "User " + nick + " left.");
+  app.log(2, 'User ' + nick + ' left.');
 }); /* user_left() */
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
@@ -304,7 +305,7 @@ $(document).on('user_left', function (
  * \brief Function that modifies the DOM when room creation was not allowed.
  *        This implements the trigger "room-creation-not-allowed".
  */
-$(document).on('room-creation-not-allowed', function (
+$(document).on('room-creation-not-allowed', function(
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
     /**
      * Event object. */
@@ -315,9 +316,9 @@ $(document).on('room-creation-not-allowed', function (
 )
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
-  app.log(4, "The room creation was not allowed.");
-  $("#errorMsgPlugin").empty();
-  $("#errorMsgPlugin").append('<h1>Joining room ' + roomname+ ' failed</h1><p>Your room may not exist. Please reload and choose another room. [Ctrl + R]</p>');
+  app.log(4, 'The room creation was not allowed.');
+  $('#errorMsgPlugin').empty();
+  $('#errorMsgPlugin').append('<h1>Joining room ' + roomname + ' failed</h1><p>Your room may not exist. Please reload and choose another room. [Ctrl + R]</p>');
   openWindow('#errorMsgPlugin');
 }); /* room-creation-not-allowed() */
 
@@ -328,14 +329,14 @@ $(document).on('room-creation-not-allowed', function (
  * \brief Function that modifies the DOM when user is connected.
  *        This implements the trigger "connected".
  */
-$(document).on('connected', function (
+$(document).on('connected', function(
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
     /**
      * No arguments. */
 )
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
-  app.log(2, "User is connected.");
+  app.log(2, 'User is connected.');
 
   /* debug
 // Inside $(document).bind('connected'), function() { ....
@@ -360,30 +361,32 @@ Callcast.connection.xmlOutput = function(data) {
 
   /*
    * Open waiting room in case it takes too long to join. */
-  openWindow("#waitingToJoin");
+  openWindow('#waitingToJoin');
 
   app.xmppLoggedIn = true;
 
-  $(document).trigger("one-login-complete", "XMPP GO.");		// One more login action complete.
+  $(document).trigger('one-login-complete', 'XMPP GO.');    // One more login action complete.
   return false;
 }); /* connected() */
 
-$(document).on("one-login-complete", function(event, msg) {
+$(document).on('one-login-complete', function(event, msg) {
 
-	if (msg)
-		console.log("one-login-complete: Msg: " + msg);
-	else
-		console.log("one-login-complete: No Msg");
+  if (msg) {
+    console.log('one-login-complete: Msg: ' + msg);
+  }
+  else {
+    console.log('one-login-complete: No Msg');
+  }
 
-	if (app.loggedInAll())
-	{
-		console.log("one-login-complete: opening meeting");
-	    openMeeting();
+  if (app.loggedInAll())
+  {
+    console.log('one-login-complete: opening meeting');
+    openMeeting();
 
         // check, install plugin
         tryPluginInstall();
 
-	}
+  }
 
 });
 
@@ -392,15 +395,15 @@ $(document).on("one-login-complete", function(event, msg) {
  * \brief Function that modifies the DOM when user has disconnected.
  *        This implements the trigger "disconnected".
  */
-$(document).on('disconnected', function (
+$(document).on('disconnected', function(
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
     /**
      * No arguments. */
 )
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
-  app.log(2, "User has disconnected.");
-  Callcast.log("Connection terminated.");
+  app.log(2, 'User has disconnected.');
+  Callcast.log('Connection terminated.');
   return false;
 }); /* disconnected() */
 
@@ -414,25 +417,26 @@ $(document).on('disconnected', function (
  */
 function initializeLocalPlugin(
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-    /**
-     * No arguments. */
+     /* No arguments. */
 )
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
-  var vertext = "Plug-in Version: " + (Callcast.GetVersion() || "None");
+  var vertext = 'Plug-in Version: ' + (Callcast.GetVersion() || 'None');
   if (Callcast.pluginUpdateRequired()) {
-    vertext += " -- Version update REQUIRED." + " Visit " +
+    vertext += ' -- Version update REQUIRED.' + ' Visit ' +
       Callcast.PLUGIN_DOWNLOAD_URL;
     /*
      * Force user to update plugin. */
-    app.log(4, "Plugin update required: " + vertext);
-    $("#errorMsgPlugin").empty();
-    $("#errorMsgPlugin").append('<h1>Gocast.it plugin version update required</h1><p>Please visit <a href=' + Callcast.PLUGIN_DOWNLOAD_URL + '>' + Callcast.PLUGIN_DOWNLOAD_URL + '</a> to reinstall.</p>');
+    app.log(4, 'Plugin update required: ' + vertext);
+    $('#errorMsgPlugin').empty();
+    $('#errorMsgPlugin').append('<h1>Gocast.it plugin version update required</h1><p>Please visit <a href=' + Callcast.PLUGIN_DOWNLOAD_URL + '>' + Callcast.PLUGIN_DOWNLOAD_URL + '</a> to reinstall.</p>');
     openWindow('#errorMsgPlugin');
     return false;
   }
-  else if (Callcast.pluginUpdateAvailable()) {
-    vertext += " -- Version update AVAILABLE." + " Visit " +
+
+
+  if (Callcast.pluginUpdateAvailable()) {
+    vertext += ' -- Version update AVAILABLE.' + ' Visit ' +
       Callcast.PLUGIN_DOWNLOAD_URL;
   }
   app.log(2, vertext);
@@ -440,7 +444,7 @@ function initializeLocalPlugin(
   /*
    * Callcast Seetings. */
   Callcast.SetUseVideo(false); /* Initially set to false, user must enable. */
-  app.log(2, "initializeLocalPlugin complete.");
+  app.log(2, 'initializeLocalPlugin complete.');
 } /* initializeLocalPlugin() */
 
 
@@ -451,35 +455,34 @@ function initializeLocalPlugin(
  */
 function addPluginToCarousel(
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-    /**
-     * Other user nick name. */
+     /* Other user nick name. */
   nickname
 )
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
-  var dispname = decodeURI(nickname);
-  var id = app.str2id(nickname);
+  var dispname = decodeURI(nickname),
+      id = app.str2id(nickname),
   /*
    * Check next available cloudcarousel. */
-  var oo = $("#meeting > #streams > #scarousel div.unoccupied").get(0);
+      oo = $('#meeting > #streams > #scarousel div.unoccupied').get(0),
+      w, h;
   if (oo) {
-    $(oo).attr("id", id);
-    $(oo).attr("encname", nickname);
-    $(oo).attr("title", dispname);
+    $(oo).attr('id', id);
+    $(oo).attr('encname', nickname);
+    $(oo).attr('title', dispname);
     /*
      * Get dimensions oo and scale plugin accordingly. */
-    var w = Math.floor($(oo).width() - 4);
-    var h = Math.floor((w / Callcast.WIDTH) * Callcast.HEIGHT);
-    $(oo).append('<object id="GocastPlayer'+id+'" type="application/x-gocastplayer" width="' + w + '" height="' + h +'"></object>');
-    $("div.name", oo).text(dispname);
-    $(oo).removeClass("unoccupied");
+    w = Math.floor($(oo).width() - 4);
+    h = Math.floor((w / Callcast.WIDTH) * Callcast.HEIGHT);
+    $(oo).append('<object id="GocastPlayer' + id + '" type="application/x-gocastplayer" width="' + w + '" height="' + h + '"></object>');
+    $('div.name', oo).text(dispname);
+    $(oo).removeClass('unoccupied');
 
-    app.log(2, "Added GocastPlayer" + id + " object.");
-    return $("object#GocastPlayer" + id, oo).get(0);
+    app.log(2, 'Added GocastPlayer' + id + ' object.');
+    return $('object#GocastPlayer' + id, oo).get(0);
   }
-  else {
-    app.log(4, "Maximum number of participants reached.");
-  }
+
+  app.log(4, 'Maximum number of participants reached.');
 } /* addPluginToCarousel() */
 
 
@@ -498,19 +501,19 @@ function removePluginFromCarousel(
 {
   /*
    * Get parent object and modify accordingly. */
-  var id = app.str2id(nickname);
-  var jqOo = $('#meeting > #streams > #scarousel div.cloudcarousel#' + id + '"');
-  jqOo.addClass("unoccupied");
-  jqOo.removeAttr("title");
-  jqOo.removeAttr("id");
-  jqOo.removeAttr("encname");
+  var id = app.str2id(nickname),
+      jqOo = $('#meeting > #streams > #scarousel div.cloudcarousel#' + id + '"');
+  jqOo.addClass('unoccupied');
+  jqOo.removeAttr('title');
+  jqOo.removeAttr('id');
+  jqOo.removeAttr('encname');
   /*
    * Remove player. */
   jqOo.empty();
   /*
    * Add name placeholder. */
   jqOo.append('<div class="name"></div>');
-  jqOo.css("background-image", 'url("images/gologo.png")'); // reset background image
+  jqOo.css('background-image', 'url("images/gologo.png")'); // reset background image
   return false;
 } /* removePluginFromCarousel() */
 
@@ -528,45 +531,45 @@ function addContentToCarousel(
 )
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
-  app.log(2, "addContentToCarousel " + info.id);
-  console.log("info", info);
+  app.log(2, 'addContentToCarousel ' + info.id);
+  console.log('info', info);
 
   // info.id is an encoded name, get an id from it to use to index
   // into carousel items
-  var id = app.str2id(info.id);
-
-  oo = $("#meeting > #streams > #scarousel div.unoccupied").get(0);
+  var id = app.str2id(info.id),
+      oo = $('#meeting > #streams > #scarousel div.unoccupied').get(0),
+      divIcon, divTitle;
   if (oo) {
-    $(oo).attr("id", id);
-    $(oo).attr("title", info.altText);
-    $(oo).attr("alt", info.altText);
-    $(oo).attr("url", info.url);
-    $(oo).attr("encname", info.id);
-    $(oo).removeClass("unoccupied").addClass("typeContent");
+    $(oo).attr('id', id);
+    $(oo).attr('title', info.altText);
+    $(oo).attr('alt', info.altText);
+    $(oo).attr('url', info.url);
+    $(oo).attr('encname', info.id);
+    $(oo).removeClass('unoccupied').addClass('typeContent');
 
     // use the image in info if supplied
     // else generate one from the url
     if (info.image)
     {
-       $(oo).css("background-image", info.image);
+       $(oo).css('background-image', info.image);
     }
     else // gen image from url
     {
        GoCastJS.getUrlInfo(
        {
-         webUrl:   info.url,
-         proxyUrl: "http://carousel.gocast.it/proxy"
+         webUrl: info.url,
+         proxyUrl: 'http://carousel.gocast.it/proxy'
        },
        function(urlInfo)
        {
           // remove the spot background
-          $(oo).css("background-image", "");
+          $(oo).css('background-image', '');
           // create a child div with url info for spot
-          var divIcon = $('<div class="spotUrlIcon"/>');
+          divIcon = $('<div class="spotUrlIcon"/>');
           // hot link to http://getfavicon.appspot.com/ to get favicon
-          $(divIcon).css("background-image", 'url(http://g.etfv.co/' + info.url + ')');
+          $(divIcon).css('background-image', 'url(http://g.etfv.co/' + info.url + ')');
 
-          var divTitle = $('<div class="spotUrlTitle"/>');
+          divTitle = $('<div class="spotUrlTitle"/>');
           // add title
           if (urlInfo.title)
           {
@@ -581,10 +584,10 @@ function addContentToCarousel(
           $(oo).append(divTitle);
        });
     }
-    app.log(2, "Added Content" + id + " object.");
+    app.log(2, 'Added Content' + id + ' object.');
   }
   else {
-    app.log(4, "Maximum number of participants reached.");
+    app.log(4, 'Maximum number of participants reached.');
   }
 } /* addContentToCarousel() */
 
@@ -602,15 +605,15 @@ function removeContentFromCarousel(
 {
   /*
    * Get parent object and modify accordingly. */
-  var id = app.str2id(infoId);
-  var jqOo = $('#meeting > #streams > #scarousel div.cloudcarousel#' + id + '"');
-  jqOo.addClass("unoccupied").removeClass("typeContent");
-  jqOo.removeAttr("id");
-  jqOo.removeAttr("title");
-  jqOo.removeAttr("alt");
-  jqOo.removeAttr("url");
-  jqOo.removeAttr("encname");
-  jqOo.css("background-image", 'url("images/gologo.png")');
+  var id = app.str2id(infoId),
+      jqOo = $('#meeting > #streams > #scarousel div.cloudcarousel#' + id + '"');
+  jqOo.addClass('unoccupied').removeClass('typeContent');
+  jqOo.removeAttr('id');
+  jqOo.removeAttr('title');
+  jqOo.removeAttr('alt');
+  jqOo.removeAttr('url');
+  jqOo.removeAttr('encname');
+  jqOo.css('background-image', 'url("images/gologo.png")');
   return false;
 } /* removeContentFromCarousel() */
 
@@ -619,7 +622,7 @@ function removeContentFromCarousel(
 ///
 function addSpot(info)
 {
-   console.log("addSpot", info);
+   console.log('addSpot', info);
    app.carousel.addSpotCb(info);
 }
 
@@ -628,7 +631,7 @@ function addSpot(info)
 ///
 function removeSpot(info)
 {
-   console.log("removeSpot", info);
+   console.log('removeSpot', info);
    app.carousel.removeSpotCb(info);
 }
 
@@ -638,17 +641,16 @@ function removeSpot(info)
  */
 function pluginLoaded(
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-    /**
-     * No arguments. */
+     /* No arguments. */
 )
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
-  app.log(2, "Local Plugin Loaded.");
-  Callcast.localplayer = $("#mystream > object.localplayer").get(0);
+  app.log(2, 'Local Plugin Loaded.');
+  Callcast.localplayer = $('#mystream > object.localplayer').get(0);
   Callcast.InitGocastPlayer(null, null, function(message) {
     /*
      * Initialization successful. */
-    app.log(2, "Local plugin successfully initialized.");
+    app.log(2, 'Local plugin successfully initialized.');
     /*
      * Set callback functions to add and remove plugins for other
      * participants and content. */
@@ -664,9 +666,9 @@ function pluginLoaded(
   }, function(message) {
     /*
      * Failure to initialize. */
-    app.log(4, "Local plugin failed to initialize.");
-    $("#errorMsgPlugin").empty();
-    $("#errorMsgPlugin").append('<h1>Gocast.it plugin failed to initialize</h1><p>Please reload the page. [Ctrl + R]</p>');
+    app.log(4, 'Local plugin failed to initialize.');
+    $('#errorMsgPlugin').empty();
+    $('#errorMsgPlugin').append('<h1>Gocast.it plugin failed to initialize</h1><p>Please reload the page. [Ctrl + R]</p>');
     openWindow('#errorMsgPlugin');
   });
 } /* pluginLoaded() */
