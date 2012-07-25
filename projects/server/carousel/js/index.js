@@ -146,15 +146,27 @@ var app = {
    * Check if gocast.it plugin is installed. */
   pluginInstalled: function() {
     var rtnFlag = false;
-    $(navigator.plugins).each(function(i, e) {
-      $(e).each(function(ii, ee) {
-        if (ee.type &&
-            ee.type.match("application/x-gocastplayer")) {
+    if ($.browser.msie)
+    {
+       try
+       {
+          var object = new ActiveXObject("GoCast.GCP");
           rtnFlag = true;
-          return rtnFlag;
-        }
-      });
-    });
+       }
+       catch(err){} // do nothing on exception
+    }
+    else // not IE
+    {
+       $(navigator.plugins).each(function(i, e) {
+         $(e).each(function(ii, ee) {
+           if (ee.type &&
+               ee.type.match("application/x-gocastplayer")) {
+             rtnFlag = true;
+             return rtnFlag;
+           }
+         });
+       });
+    }
     return rtnFlag;
   }, /* app.pluginInstalled() */
   loggedInAll: function()
@@ -239,7 +251,20 @@ function startDemoContent(
   return false;
 } /* startDemoContent() */
 
-
+/*
+function loadVideo(playerUrl, autoplay, id, w, h) 
+{
+  swfobject.embedSWF(
+      playerUrl + '&rel=1&border=0&fs=1&autoplay=' + (autoplay?1:0), // url
+      id,                                                            // id 2b replace by player
+      '290',                                                         // width
+      '250',                                                         // height
+      '9.0.0',                                                       // min flash version
+      false,                                                         // height
+      false,                                                         // height
+      {allowfullscreen: 'false'});                                   // height
+}
+*/
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
