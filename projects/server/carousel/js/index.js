@@ -251,20 +251,97 @@ function startDemoContent(
   return false;
 } /* startDemoContent() */
 
-/*
-function loadVideo(playerUrl, autoplay, id, w, h) 
+function loadVideo(oo, id, playerUrl, autoplay) 
 {
-  swfobject.embedSWF(
-      playerUrl + '&rel=1&border=0&fs=1&autoplay=' + (autoplay?1:0), // url
-      id,                                                            // id 2b replace by player
-      '290',                                                         // width
-      '250',                                                         // height
-      '9.0.0',                                                       // min flash version
-      false,                                                         // height
-      false,                                                         // height
-      {allowfullscreen: 'false'});                                   // height
+  if (oo)
+  {
+    $(oo).attr('id', id);
+    $(oo).removeClass('unoccupied')
+         .addClass('typeContent')
+         .addClass('videoContent');
+    // create div to be replace by swf player
+    var playerId = id + '-player';
+    $(oo).append('<div id=' + playerId + '></div>');
+    var width = $(oo).width(),
+        height = $(oo).height();
+    // see http://code.google.com/p/swfobject/wiki/api
+    // https://developers.google.com/youtube/js_api_reference
+    // https://code.google.com/apis/ajax/playground/?exp=youtube#chromeless_player
+    var params = { allowScriptAccess: "always" }; // Lets Flash from another domain call JavaScript
+    var atts   = { id: playerId };                // The element id of the Flash embed
+    swfobject.embedSWF(
+       "http://www.youtube.com/apiplayer?version=3&enablejsapi=1&playerapiid=" + playerId, // url 
+       playerId, // div replace by embed
+       width,
+       height,
+       "9", // flash version
+       null, // express install url
+       null, // flashvars
+       params, // params
+       atts  // atts
+    );
+  }
 }
-*/
+///
+/// \brief This function is automatically called by the player once it loads
+///
+function onYouTubePlayerReady(playerId) 
+{
+  ytplayer = document.getElementById(playerId);
+  if (ytplayer)
+  {
+     var ytVideoId;
+     switch(playerId)
+     {
+     // 'xZLCoYrmZwk' // irate man smashing computer
+     // 'LyWnvAWEbWE' // mit medical mirror
+     // 'GAHZSW1XOCU' // woman vlog thunderbird
+     // 'ZAvL3j3hOCU' // youtube is a conference
+     // 'AkfvND215No' // open u interview
+     // 'BW44KXIu7Q8' // Daphne Koller coursera interview
+        case 'demo-video-1-player':
+           ytVideoId = 'ZAvL3j3hOCU'; // youtube is a conference
+           break;
+        case 'demo-video-2-player':
+           ytVideoId = 'BW44KXIu7Q8'; // Daphne Koller coursera interview
+           break;
+     }
+     console.log("onYouTubePlayerReady playerId " + playerId + " ytVideoId " + ytVideoId);
+     ytplayer.setLoop(true);
+     ytplayer.cueVideoById(ytVideoId);
+     ytplayer.mute();
+     ytplayer.playVideo();
+  }
+  /*
+  // This causes the updatePlayerInfo function to be called every 250ms to
+  // get fresh data from the player
+  setInterval(updatePlayerInfo, 250);
+  updatePlayerInfo();
+  ytplayer.addEventListener("onStateChange", "onPlayerStateChange");
+  ytplayer.addEventListener("onError", "onPlayerError");
+  //Load an initial video into the player
+  ytplayer.cueVideoById("ylLzyHk54Z0");
+  */
+}
+
+///
+/// \brief add demo video's to n spots
+///
+function startVideoContent()
+{
+  setTimeout(function()
+  {
+    var oo = $('#meeting > #streams > #scarousel div.unoccupied').get(0);
+    loadVideo(oo, 'demo-video-1', 'http://www.youtube.com/v/S4XJJhFhr_E?version=3&amp;f=user_uploads&amp;app=youtube_gdata', 1)
+  }, 1000);
+  setTimeout(function()
+  {
+    var divs = $('#meeting > #streams > #scarousel div.unoccupied');
+    var oo = $(divs).get(divs.length - 1);
+    loadVideo(oo, 'demo-video-2', 'http://www.youtube.com/v/UC9LwtA_MC8?version=3&amp;f=user_uploads&amp;app=youtube_gdata', 1)
+  }, 1000);
+  return false;
+} /* startDemoContent() */
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
@@ -1083,28 +1160,31 @@ function resizeWindows(
 ///
 function resizeZoom(event)
 {
-   var width =  $('#meeting > #zoom').width();
-   var height = $('#meeting > #zoom').height();
    var jqDiv = $('#meeting > #zoom > .cloudcarousel');
-   var item = $(jqDiv).data('item');
-   var newWidth  = width * 1.0; //app.carousel.options.xSpotRatio;
-   var newHeight = height * 1.0; //app.carousel.options.ySpotRatio;
-   var widthScale =  newWidth  / item.orgWidth;
-   var heightScale = newHeight / item.orgHeight;
-   var scale = (widthScale < heightScale) ? widthScale : heightScale;
-   item.orgWidth     *= scale;
-   item.orgHeight    *= scale;
-   item.plgOrgWidth  *= scale
-   item.plgOrgHeight *= scale
+   if (jqDiv.length > 0)
+   {
+      var width =  $('#meeting > #zoom').width();
+      var height = $('#meeting > #zoom').height();
+      var item = $(jqDiv).data('item');
+      var newWidth  = width * 1.0; //app.carousel.options.xSpotRatio;
+      var newHeight = height * 1.0; //app.carousel.options.ySpotRatio;
+      var widthScale =  newWidth  / item.orgWidth;
+      var heightScale = newHeight / item.orgHeight;
+      var scale = (widthScale < heightScale) ? widthScale : heightScale;
+      item.orgWidth     *= scale;
+      item.orgHeight    *= scale;
+      item.plgOrgWidth  *= scale
+      item.plgOrgHeight *= scale
 
-   // center div in zoom div
-   var left = (width - item.orgWidth) / 2;
-   var top  = (height - item.orgHeight) / 2;
+      // center div in zoom div
+      var left = (width - item.orgWidth) / 2;
+      var top  = (height - item.orgHeight) / 2;
 
-   $(jqDiv).css('width',  item.orgWidth  + 'px');
-   $(jqDiv).css('height', item.orgHeight + 'px');
-   $(jqDiv).css('left',   left + 'px');
-   $(jqDiv).css('top',    top  + 'px');
+      $(jqDiv).css('width',  item.orgWidth  + 'px');
+      $(jqDiv).css('height', item.orgHeight + 'px');
+      $(jqDiv).css('left',   left + 'px');
+      $(jqDiv).css('top',    top  + 'px');
+   }
 }
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
