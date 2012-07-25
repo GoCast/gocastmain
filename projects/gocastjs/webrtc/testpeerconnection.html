@@ -37,10 +37,7 @@
 						function() {
 							console.log("PC[remoteVideo]: ", peerConn.ReadyState());
 						},
-						160,
-						120,
-						"remoteVideo",
-						"videoContainer"
+						document.getElementById("remoteVideo")
 					)
 				);
 				
@@ -61,14 +58,11 @@
 				);
 			}
 			
-			function start() {
+			function onLocalPlayerLoaded() {
 				GoCastJS.getUserMedia(
 					new GoCastJS.UserMediaOptions(
 						{audio: true, video:true},
-						160,
-						120,
-						"localVideo",
-						"videoContainer"
+						document.getElementById("localVideo")
 					),
 					function(stream) {
 						console.log("getUserMediaSuccess: ", stream);
@@ -97,15 +91,24 @@
 		</script>
 	</head>
 	<body>
-		<button id="start" onclick="javascript:start()">
-			Start
-		</button>
 		<button id="toggleMuteAudio" onclick="javascript:toggleMuteAudio()">
 			Toggle Mute Audio
 		</button>
 		<button id="toggleMuteVideo" onclick="javascript:toggleMuteVideo()">
 			Toggle Mute Video
 		</button>
-		<div id="videoContainer"></div>
+		<div id="videoContainer">
+			<object id="localVideo"
+					type="application/x-gocastplayer"
+					width="160"
+					height="120">
+				<param name="onload" value="onLocalPlayerLoaded"></param>
+			</object>
+			<object id="remoteVideo"
+					type="application/x-gocastplayer"
+					width="160"
+					height="120">
+			</object>
+		</div>
 	</body>
 </html>
