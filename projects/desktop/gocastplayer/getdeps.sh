@@ -16,7 +16,7 @@ if [[ $1 = "webrtc" || $* = "" ]]; then
     cd webrtc
 
     if [ ! -f .gclient ]; then
-        echo "Running gclient config with targer url [http://webrtc.googlecode.com/svn/$WEBRTC_TAG/]"
+        echo "Running gclient config with target url [http://webrtc.googlecode.com/svn/$WEBRTC_TAG/]"
         gclient config http://webrtc.googlecode.com/svn/"$WEBRTC_TAG"/
     fi
 
