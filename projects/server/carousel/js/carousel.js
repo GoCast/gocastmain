@@ -56,9 +56,9 @@
     Item.prototype.updateSize = function(item)
     {
         this.orgWidth = item.orgWidth;
-    this.orgHeight = item.orgHeight;
-    this.plgOrgWidth = item.plgOrgWidth;
-    this.plgOrgHeight = item.plgOrgHeight;
+        this.orgHeight = item.orgHeight;
+        this.plgOrgWidth = item.plgOrgWidth;
+        this.plgOrgHeight = item.plgOrgHeight;
     };
 
     /// \brief a numerically ordered collection of Item with insert an delete
@@ -281,7 +281,9 @@
         this.destRotation += (Math.PI / itemsLength) * (2 * direction);
         this.go();
     }; /* rotate() */
+    ///
     /// \brief adjust plugin after spot update
+    ///
     this.adjPlugin = function(item, scale)
     {
         var w, h, nick, px = 'px',
@@ -289,6 +291,8 @@
             plgin = $(obj).find('object')[0];
         if (plgin)
         {
+            var type = $(plgin).attr('type');
+            //console.log('plgin type ' + type, plgin);
             w = item.plgOrgWidth * scale;
             h = item.plgOrgHeight * scale;
             if (w < 10 && h < 10)
@@ -298,16 +302,17 @@
             }
             if ($(obj).attr('id').match('mystream'))
             {
-                if (app.videoEnabled)
-                {
-                   Callcast.SendLocalVideoToPeers({width: w, height: h});
-                }
-/*            else
-                {
-                    app.log(2, "Nothing to do with resizing video.");
-                } */
+               if (app.videoEnabled)
+               {
+                  Callcast.SendLocalVideoToPeers({width: w, height: h});
+               }
             }
-            else
+            else if (type === 'application/x-shockwave-flash')
+            {
+               $(plgin).width(w);
+               $(plgin).height(h);
+            }
+            else if (type === 'application/x-gocastplayer')
             {
                 nick = $(obj).attr('encname');
                 if (nick && Callcast.participants[nick].videoOn)
@@ -316,10 +321,6 @@
                 }
                 // else do nothing on resize
             }
-
-            $(obj).find('div.name').css('font-size', (item.orgFontSize * scale) + px);
-            // >>0 = Math.foor(). Firefox doesn't like fractional decimals in z-index.
-            obj.style.zIndex = '' + (scale * 100) >> 0;
         }
     };
     /*
@@ -372,47 +373,8 @@
             obj.style.top = y + px;
             // Adjust object dimensions.
             ctx.adjPlugin(item, scale);
-            /*
-            var plgin = $(obj).find("object")[0];
-            if (plgin) {
-            w = item.plgOrgWidth * scale;
-            h = item.plgOrgHeight * scale;
-            if ($(obj).attr("id").match("mystream")) {
-                if (!app.videoEnabled) {
-                //                app.log(2, "Nothing to do with resizing video.");
-                }
-                else
-                {
-                if (w > 10 && h > 10)
-                {
-                    Callcast.SendLocalVideoToPeers(new Object({width:w, height:h}));
-                }
-                else
-                {
-                    app.log(3, "carousel local video width " + w + " height " + h);
-                }
-                }
-            }
-            else
-            {
-                var nick = $(obj).attr("encname");
-                if (nick && Callcast.participants[nick].videoOn)
-                {
-                if (w > 10 && h > 10)
-                {
-                    Callcast.ShowRemoteVideo(new Object({nick:nick, width:w, height:h}));
-                }
-                else
-                {
-                    app.log(3, "carousel remote video width " + w + " height " + h);
-                }
-                }
-                // else do nothing on resize
-            }
-            // Scale name text.
-            $(obj).find("div.name").css("font-size", (item.orgFontSize * scale) + px);
-            }
-            */
+
+            $(obj).find('div.name').css('font-size', (item.orgFontSize * scale) + px);
             // >>0 = Math.foor(). Firefox doesn't like fractional decimals in z-index.
             obj.style.zIndex = '' + (scale * 100) >> 0;
         }
@@ -651,7 +613,7 @@
         //app.log(2, "carousel sizes xCentre " + this.xCentre + " yCentre " + this.yCentre +
         //                         " xRadius " + this.xRadius + " yRadius " + this.yRadius);
 
-        this.widthOld = width; this.heightOld = height; // save container dimensions
+        this.widthOld = width; this.heightOld = height; // debug save container dimensions
         // scale spots
         this.updateAll();
     };
