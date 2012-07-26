@@ -466,6 +466,11 @@ function addPluginToCarousel(
    * Check next available cloudcarousel. */
       oo = $('#meeting > #streams > #scarousel div.unoccupied').get(0),
       w, h;
+  if (!oo) // if we're out of spots add one
+  {
+    oo = app.carousel.createSpot();
+    app.carousel.updateAll();
+  } 
   if (oo) {
     $(oo).attr('id', id);
     $(oo).attr('encname', nickname);

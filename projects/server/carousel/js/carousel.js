@@ -474,19 +474,92 @@
           this.updateLinear();
        }
     };
-
-    this.addSpotCb = function(info) // add spot callcast callback
+    this.doSpot = function(spotDiv, info) // perform action defined in info to spot
+    {
+       console.log("doSpot", info);
+       console.log("spotDiv", spotDiv);
+       //if (info.spotType)
+       if (info.spottype)
+       {
+          //if (info.spotType == 'youtube')
+          if (info.spottype == 'youtube')
+          {
+             console.log("doSpot youtube");
+             loadVideo(spotDiv, info);
+          }
+       }
+       // ... other spot commands
+    }
+    this.createSpot = function(info) // create a new spot
     {
        // add the html
        var newDiv = $('<div class="cloudcarousel unoccupied" onclick="carouselItemClick(event);"><div class="name"></div></div>'),
-           item = new Item(newDiv[0], options);
+       item = new Item(newDiv[0], options);
        $(this.innerWrapper).append(newDiv);
        item.updateSize(this.item);
-       item.spotNumber = info.spotnumber;
+       if (info) // info will be null when spots are created for remote video
+       {
+          item.spotNumber = info.spotnumber;
+       }
        newDiv.data('item', item);
        items.addItem(item);
        this.setupItem(item);
-       this.updateAll();
+       return newDiv;
+    }
+    this.addSpotCb = function(info) // add spot callcast callback
+    {
+       console.log("addSpotCb", info);
+       var spotDiv; // the desired spot to be replaced or added
+       // determine cmd type, add or replace
+       //if (info.spotReplace) // see if there is a spotReplace prop
+       if (info.spotreplace) // see if there is a spotReplace prop
+       {
+          // if there is a nodup prop == 1 and spot with spotId exists
+          // don't replace
+          //if (info.nodup && info.nodup == 1 && info.spotDivId)
+          if (info.spotnodup && info.spotnodup == 1 && info.spotdivid)
+          {
+             //var div = $('#meeting > #streams > #scarousel #' + info.spotDivId);
+             var div = $('#meeting > #streams > #scarousel #' + info.spotdivid);
+             if (div.length > 0)
+             {
+                return; // spot with id exists so we're done
+             }
+          }
+          var divs = $('#meeting > #streams > #scarousel div.unoccupied');
+          if (divs.length == 0) // no unoc spots to replace, create one
+          {
+             spotDiv = this.createSpot(info);
+          }
+          else // replace spot
+          {
+             //if (info.spotReplace === "first-unoc") // replace first unoc spot
+             if (info.spotreplace === "first-unoc") // replace first unoc spot
+             {
+                spotDiv = $(divs).get(0);
+             }
+             //else if (info.spotReplace === "last-unoc")
+             else if (info.spotreplace === "last-unoc")
+             {
+                spotDiv = $(divs).get(divs.length - 1);
+             }
+          }
+          item = $(spotDiv).data('item');
+          if (spotDiv && item)
+          {
+             item.spotNumber = info.spotnumber;
+          }
+          else
+          {
+             app.log(5, "addSpotCb problem with spot replace");
+          } 
+       }
+       else // new spot
+       {
+          spotDiv = this.createSpot(info);
+       }
+       this.doSpot(spotDiv, info);
+       this.updateAll(); // redraw carousel
     };
 
     this.removeSpotCb = function(info) // remove spot callcast callback
@@ -495,6 +568,7 @@
            spot = parseInt(info.spotnumber);
        if (!item)
        {
+          // todo try zoomed spot
           item = items.get(spot);
        }
 
@@ -503,11 +577,11 @@
        this.updateAll();
     };
 
-	/// \brief remove a spot from items
-	this.remove = function(index)
-	{
-	   items.remove(index);
-	}
+    /// \brief remove a spot from items
+    this.remove = function(index)
+    {
+       items.remove(index);
+    }
     this.insertSpot = function(spot) // add a previously created spot to the carousel
     {
        var item;

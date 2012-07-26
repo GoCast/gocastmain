@@ -251,16 +251,22 @@ function startDemoContent(
   return false;
 } /* startDemoContent() */
 
-function loadVideo(oo, id, playerUrl, autoplay) 
+function loadVideo(oo, info) 
 {
-  if (oo)
+  //if (oo && info && info.spotDivId)
+  if (oo && info && info.spotdivid)
   {
-    $(oo).attr('id', id);
+    var item = $(oo).data('item');
+    item.spotInfo = info; // save info so youtube player callback can get ytid vid id from it
+
+    //$(oo).attr('id', info.spotDivId);
+    $(oo).attr('id', info.spotdivid);
     $(oo).removeClass('unoccupied')
          .addClass('typeContent')
          .addClass('videoContent');
     // create div to be replace by swf player
-    var playerId = id + '-player';
+    //var playerId = info.spotDivId + '-player';
+    var playerId = info.spotdivid + '-player';
     $(oo).append('<div id=' + playerId + '></div>');
     var width = $(oo).width(),
         height = $(oo).height();
@@ -281,47 +287,45 @@ function loadVideo(oo, id, playerUrl, autoplay)
        atts  // atts
     );
   }
+  else
+  {
+     app.log(5, "loadVideo error div " + oo + " info " + info);
+     console.log("div", oo);
+     console.log("info", info);
+  }
 }
 ///
 /// \brief This function is automatically called by the player once it loads
 ///
+/// 'LyWnvAWEbWE' // mit medical mirror
+/// 'GAHZSW1XOCU' // woman vlog thunderbird
+/// 'ZAvL3j3hOCU' // youtube is a conference
+/// 'AkfvND215No' // open u interview
+/// 'BW44KXIu7Q8' // Daphne Koller coursera interview
 function onYouTubePlayerReady(playerId) 
 {
-  ytplayer = document.getElementById(playerId);
-  if (ytplayer)
+  try
   {
-     var ytVideoId;
-     switch(playerId)
-     {
-     // 'xZLCoYrmZwk' // irate man smashing computer
-     // 'LyWnvAWEbWE' // mit medical mirror
-     // 'GAHZSW1XOCU' // woman vlog thunderbird
-     // 'ZAvL3j3hOCU' // youtube is a conference
-     // 'AkfvND215No' // open u interview
-     // 'BW44KXIu7Q8' // Daphne Koller coursera interview
-        case 'demo-video-1-player':
-           ytVideoId = 'ZAvL3j3hOCU'; // youtube is a conference
-           break;
-        case 'demo-video-2-player':
-           ytVideoId = 'BW44KXIu7Q8'; // Daphne Koller coursera interview
-           break;
-     }
-     console.log("onYouTubePlayerReady playerId " + playerId + " ytVideoId " + ytVideoId);
+     ytplayer = document.getElementById(playerId);
+     if (!ytplayer) throw "ytplayer not found";
+     var spotDiv = $(ytplayer).parent();
+     if (spotDiv.length == 0) throw "ytplayer parentnot found";
+     var item = spotDiv.data('item');
+     if (!item) throw "item not found";
+     if (!item.spotInfo.ytid) throw "item.ytid not found";
+     console.log("onYouTubePlayerReady playerId " + playerId + " ytVideoId " + item.spotInfo.ytid);
+     var arr = [item.spotInfo.ytid];
+     ytplayer.loadPlaylist({playlist:arr,
+                            index:0,
+                            startSeconds:0,
+                            suggestedQuality:'small'});
      ytplayer.setLoop(true);
-     ytplayer.cueVideoById(ytVideoId);
      ytplayer.mute();
-     ytplayer.playVideo();
   }
-  /*
-  // This causes the updatePlayerInfo function to be called every 250ms to
-  // get fresh data from the player
-  setInterval(updatePlayerInfo, 250);
-  updatePlayerInfo();
-  ytplayer.addEventListener("onStateChange", "onPlayerStateChange");
-  ytplayer.addEventListener("onError", "onPlayerError");
-  //Load an initial video into the player
-  ytplayer.cueVideoById("ylLzyHk54Z0");
-  */
+  catch(err)
+  {
+     app.log(4, "onYouTubePlayerReady " + err);
+  }
 }
 
 ///
@@ -329,16 +333,20 @@ function onYouTubePlayerReady(playerId)
 ///
 function startVideoContent()
 {
+  app.log(2, "startVideoContent");
   setTimeout(function()
   {
-    var oo = $('#meeting > #streams > #scarousel div.unoccupied').get(0);
-    loadVideo(oo, 'demo-video-1', 'http://www.youtube.com/v/S4XJJhFhr_E?version=3&amp;f=user_uploads&amp;app=youtube_gdata', 1)
+    Callcast.AddSpot({spotReplace:"first-unoc", spotNodup:1, spotType:"youtube", 
+                      ytid: 'ZAvL3j3hOCU', // youtube is a conference
+                      spotDivId:"demo-video-1"
+                      });
   }, 1000);
   setTimeout(function()
   {
-    var divs = $('#meeting > #streams > #scarousel div.unoccupied');
-    var oo = $(divs).get(divs.length - 1);
-    loadVideo(oo, 'demo-video-2', 'http://www.youtube.com/v/UC9LwtA_MC8?version=3&amp;f=user_uploads&amp;app=youtube_gdata', 1)
+    Callcast.AddSpot({spotReplace:"last-unoc", spotNodup:1, spotType:"youtube", 
+                      ytid: 'BW44KXIu7Q8', // Daphne Koller coursera interview
+                      spotDivId:"demo-video-2"
+                      });
   }, 1000);
   return false;
 } /* startDemoContent() */
@@ -1460,7 +1468,7 @@ function docKey(event)
    {
       return;
    }
-   app.log(2, "key code " + event.which);
+   //app.log(2, "key code " + event.which);
 
    switch (event.which || event.keyCode)
    {
