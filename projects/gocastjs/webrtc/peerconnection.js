@@ -5,8 +5,8 @@ GoCastJS = (null !== GoCastJS)? GoCastJS: {};
 //! constructor: GoCastJS.Exception(pluginId, message)
 //!
 //! members:
-//!		pluginId<string>	: unique id of plugin instance generating the exception
-//!		message<string>		: description of the exception
+//!		pluginId <string> : unique id of plugin instance generating the exception
+//!		message	 <string> : description of the exception
 //!
 GoCastJS.Exception = function(pluginId, message) {
 	this.pluginId = pluginId;
@@ -41,25 +41,19 @@ GoCastJS.CheckGoCastPlayer = function() {
 };
 
 //!
-//! constructor: GoCastJS.UserMediaOptions(mediaHints, width, height, videoId, containerId)
+//! constructor: GoCastJS.UserMediaOptions(mediaHints, player)
 //!
-//! members:
-//!		mediaHints <obj>	: {audio: <bool>, video:<bool>}
-//!		width <int>			: width of plugin window
-//!		height <int>		: height of plugin window
-//!		videoId <string>	: unique id of plugin object
-//!		containerId <string>: unique id of div element that contains 'videoId'
+//! arguments/members:
+//!		mediaHints  <obj>        : {audio: <bool>, video: <bool>}
+//!		player      <HtmlObject> : plugin instance used for local preview
 //!
-GoCastJS.UserMediaOptions = function(mediaHints, width, height, videoId, containerId) {
+GoCastJS.UserMediaOptions = function(mediaHints, player) {
 	this.mediaHints = mediaHints;
-	this.width = width;
-	this.height = height;
-	this.videoId = videoId;
-	this.containerId = containerId;
+	this.player = player;
 };
 
 //!
-//! function: GoCastJS.getUserMedia(options, success, failure, bUseGoCastAPI)
+//! function: GoCastJS.getUserMedia(options, success, failure)
 //!
 //! arguments:
 //!		options <GoCastJS.UserMediaOptions>	: options for obtaining user media
@@ -76,20 +70,20 @@ GoCastJS.getUserMedia = function(options, success, failure) {
 			failure("GoCastJS.getUserMedia(): GoCastPlayer not detected.");
 		}
 	} else {
-		var container = document.getElementById(options.containerId);
-		var player = document.createElement("object");
-		
-		player.id = options.videoId;
-		player.type = "application/x-gocastplayer";
-		player.width = options.width;
-		player.height = options.height;
-		container.appendChild(player);
-		
+		var player = options.player;		
 		player.getUserMedia(
 			options.mediaHints,
 			function(stream) {					
-				player.init("localPlayer", "STUN stun.l.google.com:19302", null);
-				player.addStream(stream);
+				if(false === player.init("localPlayer",
+										 "STUN stun.l.google.com:19302",
+										 null)) {
+					throw new GoCastJS.Exception(player.id, "init() failed.");
+				}
+				
+				if(false === player.addStream(stream)) {
+					throw new GoCastJS.Exception(player.id, "addStream() failed.");
+				}
+				
 				player.setLocalDescription(
 					"OFFER",
 					player.createOffer({audio: true, video: true}),
@@ -113,47 +107,42 @@ GoCastJS.getUserMedia = function(options, success, failure) {
 };
 
 //!
-//! constructor: GoCastJS.PeerConnectionOptions(mediaHints, width, height, videoId, containerId)
+//! constructor: GoCastJS.PeerConnectionOptions(iceConfig,
+//!												onIceMessage,
+//!												onAddStream,
+//!												onRemoveStream,
+//!												player)
 //!
-//! members:
-//!		iceConfig <string>	: "STUN <ip>:<port>"
-//!		width <int>			: width of plugin window
-//!		height <int>		: height of plugin window
-//!		videoId <string>	: unique id of plugin object
-//!		containerId <string>: unique id of div element that contains 'videoId'
-//!		onIceMessage <function(candidateSdp, moreComing)>	: new ice candidate callback
-//!		onAddStream <function(stream)> 						: new remote stream added
-//!		onRemoveStream <function(stream)>					: remote stream removed
+//! arguments/members:
+//!		iceConfig   <string>     : "STUN <ip>:<port>"
+//!		player      <HtmlObject> : width of plugin window
+//!		onIceMessage       <function(candidateSdp, moreComing)> : new ice candidate
+//!		onAddStream        <function(stream)>                   : new remote stream added
+//!		onRemoveStream     <function(stream)>                   : remote stream removed
+//!		onReadyStateChange <function()>                         : ready state changed
 //!
 GoCastJS.PeerConnectionOptions = function(iceConfig,
 										  onIceMessage,
 										  onAddStream,
 										  onRemoveStream,
 										  onReadyStateChange,
-										  width, 
-										  height, 
-										  videoId, 
-										  containerId) {
+										  player) {
 	this.iceConfig = iceConfig;
 	this.onIceMessage = onIceMessage;
 	this.onAddStream = onAddStream;
 	this.onRemoveStream = onRemoveStream;
 	this.onReadyStateChange = onReadyStateChange;
-	this.width = width;
-	this.height = height;
-	this.videoId = videoId;
-	this.containerId = containerId;
+	this.player = player;
 };
 
 //!
-//! constructor: GoCastJS.PeerConnection(options, bUseGoCastAPI)
+//! constructor: GoCastJS.PeerConnection(options)
 //!
 //! arguments:
-//!		options <GoCastJS.PeerConnectionOptions>	: options for creating peerconnection
+//!		options <GoCastJS.PeerConnectionOptions> : options for creating peerconnection
 //!
 //! members:
-//!		peerConn	: 'GoCastPlayer' instance for this peerconnection
-//!		
+//!		player <HtmlObject> : 'GoCastPlayer' instance for this peerconnection
 //!
 GoCastJS.PeerConnection = function(options) {
 	if(false === GoCastJS.CheckBrowserSupport()) {
@@ -161,43 +150,35 @@ GoCastJS.PeerConnection = function(options) {
 	} else if(false === GoCastJS.CheckGoCastPlayer()) {
 		throw new GoCastJS.Exception(this.peerConn.id, "GoCastPlayer not detected.");
 	} else {
-		var container = document.getElementById(options.containerId);
-		this.peerConn = document.createElement("object");
-		this.peerConn.id = options.videoId;
-		this.peerConn.type = "application/x-gocastplayer";
-		this.peerConn.width = options.width;
-		this.peerConn.height = options.height;
+		this.player = options.player;
 		
-		//At this point the plugin instance is loaded because of appendChild()
-		container.appendChild(this.peerConn);
-		
-		var peerConnRef = this.peerConn;
-		this.peerConn.onaddstream = function(stream) {
-			peerConnRef.source = stream;
+		var playerRef = this.player;
+		this.player.onaddstream = function(stream) {
+			playerRef.source = stream;
 			if("undefined" !== typeof(options.onAddStream) &&
 			   null !== options.onAddStream) {
 				options.onAddStream(stream);
 			} 
 		};
 		
-		this.peerConn.onremovestream = function(stream) {
+		this.player.onremovestream = function(stream) {
 			if("undefined" !== typeof(options.onRemoveStream) &&
 			   null !== options.onRemoveStream) {
 				options.onRemoveStream(stream);
 			}
 		};
 		
-		this.peerConn.onreadystatechange = function() {
+		this.player.onreadystatechange = function() {
 			if("undefined" !== typeof(options.onReadyStateChange) &&
 			   null !== options.onReadyStateChange) {
 				options.onReadyStateChange();
 			}
 		};
 		
-		if(false === this.peerConn.init(options.videoId,
-										options.iceConfig,
-										options.onIceMessage)) {
-			throw new GoCastJS.Exception(this.peerConn.id, "init() failed.");
+		if(false === this.player.init(this.player.id,
+									  options.iceConfig,
+									  options.onIceMessage)) {
+			throw new GoCastJS.Exception(this.player.id, "init() failed.");
 		}
 	}
 };
@@ -206,11 +187,11 @@ GoCastJS.PeerConnection = function(options) {
 //! function: GoCastJS.PeerConnection.AddStream(stream)
 //!
 //! arguments:
-//!		stream<obj>	: stream to be added (returned by GetUserMedia's success callback)
+//!		stream <obj> : stream to be added (returned by GetUserMedia's success callback)
 //!
 GoCastJS.PeerConnection.prototype.AddStream = function(stream) {
-	if(false === this.peerConn.addStream(stream)) {
-		throw new GoCastJS.Exception(this.peerConn.id, "addStream() failed.");
+	if(false === this.player.addStream(stream)) {
+		throw new GoCastJS.Exception(this.player.id, "addStream() failed.");
 	}
 };
 
@@ -218,11 +199,11 @@ GoCastJS.PeerConnection.prototype.AddStream = function(stream) {
 //! function: GoCastJS.PeerConnection.RemoveStream(stream)
 //!
 //! arguments:
-//!		stream<obj>	: stream to be removed (returned by GetUserMedia's success callback)
+//!		stream <obj> : stream to be removed (returned by GetUserMedia's success callback)
 //!
 GoCastJS.PeerConnection.prototype.RemoveStream = function(stream) {
-	if(false === this.peerConn.removeStream(stream)) {
-		throw new GoCastJS.Exception(this.peerConn.id, "removeStream() failed.");		
+	if(false === this.player.removeStream(stream)) {
+		throw new GoCastJS.Exception(this.player.id, "removeStream() failed.");		
 	}
 };
 
@@ -230,14 +211,14 @@ GoCastJS.PeerConnection.prototype.RemoveStream = function(stream) {
 //! function: GoCastJS.PeerConnection.CreateOffer(mediaHints)
 //!
 //! arguments:
-//!		mediaHints<obj>	: see GoCastJS.GetUserMedia()
+//!		mediaHints <obj> : see GoCastJS.GetUserMedia()
 //!
-//! returns: sdp<string>
+//! returns: sdp <string>
 //!
 GoCastJS.PeerConnection.prototype.CreateOffer = function(mediaHints) {
-	var offer = this.peerConn.createOffer(mediaHints);
+	var offer = this.player.createOffer(mediaHints);
 	if("" === offer) {
-		throw new GoCastJS.Exception(this.peerConn.id, "createOffer() failed.");
+		throw new GoCastJS.Exception(this.player.id, "createOffer() failed.");
 	}
 	return offer;
 };
@@ -246,15 +227,15 @@ GoCastJS.PeerConnection.prototype.CreateOffer = function(mediaHints) {
 //! function: GoCastJS.PeerConnection.CreateAnswer(offer, mediaHints)
 //!
 //! arguments:
-//! 	offer<string>	: sdp offer of remote peer
-//!		mediaHints<obj>	: see GoCastJS.GetUserMedia()
+//! 	offer      <string> : sdp offer of remote peer
+//!		mediaHints <obj>    : see GoCastJS.GetUserMedia()
 //!
-//! returns: sdp<string>
+//! returns: sdp <string>
 //!
 GoCastJS.PeerConnection.prototype.CreateAnswer = function(offer, mediaHints) {
-	var answer = this.peerConn.createAnswer(offer, mediaHints);
+	var answer = this.player.createAnswer(offer, mediaHints);
 	if("" === answer) {
-		throw new GoCastJS.Exception(this.peerConn.id, "createAnswer() failed.");
+		throw new GoCastJS.Exception(this.player.id, "createAnswer() failed.");
 	}
 	return answer;
 };
@@ -263,16 +244,16 @@ GoCastJS.PeerConnection.prototype.CreateAnswer = function(offer, mediaHints) {
 //! function: GoCastJS.PeerConnection.SetLocalDescription(action, sdp, success, failure)
 //!
 //! arguments:
-//!		action<string>	: "OFFER" (if sdp is an offer) or "ANSWER" (if sdp is an answer) 
-//!		sdp<string>		: sdp to be used as local peer's description
-//!		success<function()>			: success callback
-//!		failure<function(message)>	: failure callback with message 
+//!		action <string> : "OFFER" (if sdp is an offer) or "ANSWER" (if sdp is an answer) 
+//!		sdp    <string> : sdp to be used as local peer's description
+//!		success <function()>        : success callback
+//!		failure <function(message)> : failure callback with message 
 //!
 GoCastJS.PeerConnection.prototype.SetLocalDescription = function(action,
 																 sdp,
 																 success,
 																 failure) {
-	this.peerConn.setLocalDescription(
+	this.player.setLocalDescription(
 		action,
 		sdp,
 		function() {
@@ -292,12 +273,12 @@ GoCastJS.PeerConnection.prototype.SetLocalDescription = function(action,
 //! function: GoCastJS.PeerConnection.SetRemoteDescription(action, sdp)
 //!
 //! arguments:
-//!		action<string>	: "OFFER" (if sdp is an offer) or "ANSWER" (if sdp is an answer) 
-//!		sdp<string>		: sdp to be used as remote peer's description
+//!		action <string> : "OFFER" (if sdp is an offer) or "ANSWER" (if sdp is an answer) 
+//!		sdp    <string> : sdp to be used as remote peer's description
 //!
 GoCastJS.PeerConnection.prototype.SetRemoteDescription = function(action, sdp) {
-	if(false === this.peerConn.setRemoteDescription(action, sdp)) {
-		throw new GoCastJS.Exception(this.peerConn.id, "setRemoteDescription() failed.");
+	if(false === this.player.setRemoteDescription(action, sdp)) {
+		throw new GoCastJS.Exception(this.player.id, "setRemoteDescription() failed.");
 	}
 };
 
@@ -305,11 +286,11 @@ GoCastJS.PeerConnection.prototype.SetRemoteDescription = function(action, sdp) {
 //! function: GoCastJS.PeerConnection.ProcessIceMessage(sdp)
 //!
 //! arguments:
-//!		sdp<string>		: sdp of remote peer's ice candidate
+//!		sdp <string> : sdp of remote peer's ice candidate
 //!
 GoCastJS.PeerConnection.prototype.ProcessIceMessage = function(sdp) {
-	if(false === this.peerConn.processIceMessage(sdp)) {
-		throw new GoCastJS.Exception(this.peerConn.id, "processIceMessage() failed.");
+	if(false === this.player.processIceMessage(sdp)) {
+		throw new GoCastJS.Exception(this.player.id, "processIceMessage() failed.");
 	}
 };
 
@@ -319,8 +300,8 @@ GoCastJS.PeerConnection.prototype.ProcessIceMessage = function(sdp) {
 //! NOTE: should be called after GoCastJS.PeerConnection.SetLocalDescription()
 //!
 GoCastJS.PeerConnection.prototype.StartIce = function() {
-	if(false === this.peerConn.startIce()) {
-		throw new GoCastJS.Exception(this.peerConn.id, "startIce() failed.");
+	if(false === this.player.startIce()) {
+		throw new GoCastJS.Exception(this.player.id, "startIce() failed.");
 	}
 };
 
@@ -331,37 +312,37 @@ GoCastJS.PeerConnection.prototype.StartIce = function() {
 //!			  "ACTIVE" | "CLOSING" | "CLOSED"];
 //!
 GoCastJS.PeerConnection.prototype.ReadyState = function() {
-	return this.peerConn.readyState;
+	return this.player.readyState;
 };
 
 //!
 //! function: GoCast.PeerConnection.Width([width])
 //!
 //! arguments:
-//!		width<int> (optional)	: new width value for the plugin instance
+//!		width <int> (optional) : new width value for the plugin instance
 //!
 //! returns:
 //!		current width value of the plugin instance
 //!
 GoCastJS.PeerConnection.prototype.Width = function(width) {
 	if("undefined" !== typeof(width) && null !== width) {
-		this.peerConn.width = width;
+		this.player.width = width;
 	}
-	return this.peerConn.width;
+	return this.player.width;
 };
 
 //!
 //! function: GoCast.PeerConnection.Height([height])
 //!
 //! arguments:
-//!		height<int> (optional)	: new height value for the plugin instance
+//!		height <int> (optional) : new height value for the plugin instance
 //!
 //! returns:
 //!		current height value of the plugin instance
 //!
 GoCastJS.PeerConnection.prototype.Height = function(height) {
 	if("undefined" !== typeof(height) && null !== height) {
-		this.peerConn.height = height;
+		this.player.height = height;
 	}
-	return this.peerConn.height;
+	return this.player.height;
 };
