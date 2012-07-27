@@ -646,8 +646,7 @@ function pluginLoaded(
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
   app.log(2, 'Local Plugin Loaded.');
-  Callcast.localplayer = $('#mystream > object.localplayer').get(0);
-  Callcast.InitGocastPlayer(null, null, function(message) {
+  Callcast.InitGocastPlayer('#mystream > object.localplayer', function(message) {
     /*
      * Initialization successful. */
     app.log(2, 'Local plugin successfully initialized.');
