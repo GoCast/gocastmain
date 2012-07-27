@@ -351,18 +351,18 @@ var Callcast = {
 
             if (info.width >= 0 && info.height >= 0)
             {
-                this.participants[nick].peer_connection.width = info.width;
-                this.participants[nick].peer_connection.height = info.height;
+                this.participants[nick].peer_connection.Width(info.width);
+                this.participants[nick].peer_connection.Height(info.height);
             }
             else if (info.hasVid === true)
             {
-                this.participants[nick].peer_connection.width = this.WIDTH;
-                this.participants[nick].peer_connection.height = this.HEIGHT;
+                this.participants[nick].peer_connection.Width(this.WIDTH);
+                this.participants[nick].peer_connection.Height(this.HEIGHT);
             }
             else if (info.hasVid === false)
             {
-                this.participants[nick].peer_connection.width = 0;
-                this.participants[nick].peer_connection.height = 0;
+                this.participants[nick].peer_connection.Width(0);
+                this.participants[nick].peer_connection.Height(0);
             }
         }
         else if (nick !== this.nick) {
