@@ -288,11 +288,12 @@
     {
         var w, h, nick, px = 'px',
             obj = item.object,
-            plgin = $(obj).find('object')[0];
+            plgin = $(obj).find('object')[0],
+            type;
         if (plgin)
         {
-            var type = $(plgin).attr('type');
-            //console.log('plgin type ' + type, plgin);
+            //type = $(plgin).attr('type');
+            type = plgin.type;
             w = item.plgOrgWidth * scale;
             h = item.plgOrgHeight * scale;
             if (w < 10 && h < 10)
@@ -312,7 +313,10 @@
                $(plgin).width(w);
                $(plgin).height(h);
             }
-            else if (type === 'application/x-gocastplayer')
+            //else if (type === 'application/x-gocastplayer') // fails type is undefined
+            //else if (plgin.outerHTML.indexOf('application/x-gocastplayer') != -1) // crashes outerHTML is undefined
+            //else if ($(plgin).html().indexOf('application/x-gocastplayer') != -1) // crashes in jquery
+            else // assume it's a gc plugin since type is undefined for gc plugin
             {
                 nick = $(obj).attr('encname');
                 if (nick && Callcast.participants[nick].videoOn)
@@ -321,6 +325,12 @@
                 }
                 // else do nothing on resize
             }
+            /*
+            else
+            {
+               console.log('plgin type ' + type, plgin, item);
+            }
+            */
         }
     };
     /*
