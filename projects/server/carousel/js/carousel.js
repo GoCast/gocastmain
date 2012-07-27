@@ -36,8 +36,7 @@
     this.objectOK = true;
     $(this.object).css('position', 'absolute');
     // add controls
-	$(this.object).append('<img class="zoom control" src="images/fullscreen.png" alt="Zoom" title="Zoom" onclick="carouselItemZoom(event);"/>');
-	$(this.object).append('<img class="close control" src="images/trash.png" alt="Close" title="Close" />');
+    this.addControls();
     // add handlers
     $(this.object).mouseover(function(event)
         {
@@ -60,6 +59,11 @@
         this.plgOrgWidth = item.plgOrgWidth;
         this.plgOrgHeight = item.plgOrgHeight;
     };
+    Item.prototype.addControls = function() // add controls to spot
+    {
+       $(this.object).append('<img class="zoom control" src="images/fullscreen.png" alt="Zoom" title="Zoom" onclick="carouselItemZoom(event);"/>');
+       $(this.object).append('<img class="close control" src="images/trash.png" alt="Close" title="Close" />');
+    }
 
     /// \brief a numerically ordered collection of Item with insert an delete
     var Items = function()
