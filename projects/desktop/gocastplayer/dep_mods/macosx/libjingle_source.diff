@@ -164,7 +164,35 @@ Index: talk/app/webrtc/mediastreamhandler.cc
 ===================================================================
 --- talk/app/webrtc/mediastreamhandler.cc	(revision 153)
 +++ talk/app/webrtc/mediastreamhandler.cc	(working copy)
-@@ -98,6 +98,16 @@
+@@ -69,8 +69,15 @@
+     MediaProviderInterface* provider)
+     : VideoTrackHandler(track, provider),
+       local_video_track_(track) {
++          // <GOCAST>
++          if(true == track->enabled()) {
++          // </GOCAST>
+   provider_->SetCaptureDevice(local_video_track_->label(),
+                               local_video_track_->GetVideoCapture());
++          // <GOCAST>
++          }
++          // </GOCAST>
++          
+   VideoRendererWrapperInterface* renderer = video_track_->GetRenderer();
+   if (renderer)
+     provider_->SetLocalRenderer(video_track_->label(), renderer->renderer());
+@@ -81,8 +88,9 @@
+   // the track. It must be removed from the media stream provider since it is
+   // possible that the tracks reference count is set to zero when
+   // local_video_track_ falls out of scope.
+-  provider_->SetLocalRenderer(local_video_track_->label(), NULL);
+-  provider_->SetCaptureDevice(local_video_track_->label(), NULL);
++    
++  // <GOCAST> provider_->SetLocalRenderer(local_video_track_->label(), NULL);
++  // <GOCAST> provider_->SetCaptureDevice(local_video_track_->label(), NULL);
+ }
+ 
+ void LocalVideoTrackHandler::OnRendererChanged() {
+@@ -98,6 +106,16 @@
  
  void LocalVideoTrackHandler::OnEnabledChanged() {
    // TODO What should happen when enabled is changed?
@@ -181,7 +209,7 @@ Index: talk/app/webrtc/mediastreamhandler.cc
  }
  
  RemoteVideoTrackHandler::RemoteVideoTrackHandler(
-@@ -129,6 +139,57 @@
+@@ -129,6 +147,57 @@
    // TODO: What should happen when enabled is changed?
  }
  
@@ -239,7 +267,7 @@ Index: talk/app/webrtc/mediastreamhandler.cc
  MediaStreamHandler::MediaStreamHandler(MediaStreamInterface* stream,
                                         MediaProviderInterface* provider)
      : stream_(stream),
-@@ -140,6 +201,13 @@
+@@ -140,6 +209,13 @@
         it != video_handlers_.end(); ++it) {
      delete *it;
    }
@@ -253,7 +281,7 @@ Index: talk/app/webrtc/mediastreamhandler.cc
  }
  
  MediaStreamInterface* MediaStreamHandler::stream() {
-@@ -163,6 +231,17 @@
+@@ -163,6 +239,17 @@
      VideoTrackHandler* handler(new LocalVideoTrackHandler(track, provider));
      video_handlers_.push_back(handler);
    }
@@ -271,7 +299,7 @@ Index: talk/app/webrtc/mediastreamhandler.cc
  }
  
  RemoteMediaStreamHandler::RemoteMediaStreamHandler(
-@@ -177,6 +256,17 @@
+@@ -177,6 +264,17 @@
      VideoTrackHandler* handler(new RemoteVideoTrackHandler(track, provider));
      video_handlers_.push_back(handler);
    }
