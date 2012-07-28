@@ -139,15 +139,14 @@ namespace GoCast
         
         void SetLocalVideoTrackRenderer(const talk_base::scoped_refptr
                                         <webrtc::VideoRendererWrapperInterface>& pRenderer) {
-            if(0 < m_pLocalStream->video_tracks()->count())
-            {
+            if(0 < m_pLocalStream->video_tracks()->count()){
                 m_pLocalStream->video_tracks()->at(0)->SetRenderer(pRenderer);
             }
         }
         
         void SetRemoteVideoTrackRenderer(const std::string& pluginId,
                                          const talk_base::scoped_refptr
-                                        <webrtc::VideoRendererWrapperInterface>& pRenderer) {
+                                         <webrtc::VideoRendererWrapperInterface>& pRenderer) {
             if(0 < m_remoteStreams[pluginId]->video_tracks()->count()){
                 m_remoteStreams[pluginId]->video_tracks()->at(0)->SetRenderer(pRenderer);
             }
@@ -155,11 +154,13 @@ namespace GoCast
         
         void AddRemoteStream(const std::string& pluginId,
                              const talk_base::scoped_refptr<webrtc::MediaStreamInterface>& pStream) {
-            m_remoteStreams[pluginId] = pStream;
+                m_remoteStreams[pluginId] = pStream;
         }
         
         void RemoveRemoteStream(const std::string& pluginId) {
-            m_remoteStreams.erase(pluginId);
+            if(m_remoteStreams.end() != m_remoteStreams.find(pluginId)) {
+                m_remoteStreams.erase(pluginId);
+            }
         }
         
     private:

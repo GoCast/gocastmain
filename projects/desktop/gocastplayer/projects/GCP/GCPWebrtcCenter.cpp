@@ -75,6 +75,7 @@ namespace GoCast
     {
         if("video" == m_kind.convert_cast<std::string>())
         {
+            FBLOG_INFO_CUSTOM("video_set_enabled(): ", newVal.convert_cast<bool>());
             (RtcCenter::Instance())->SetLocalVideoTrackEnabled(newVal.convert_cast<bool>());
         }
         else if("audio" == m_kind.convert_cast<std::string>())
@@ -373,7 +374,8 @@ namespace GoCast
             
             m_pHandler->OnMessage(pMsg);
             
-            if(MSG_SET_LOCAL_SDP != pMsg->message_id)
+            if(MSG_SET_LOCAL_SDP != pMsg->message_id &&
+               MSG_GET_USER_MEDIA != pMsg->message_id)
             {
                 FBLOG_INFO_CUSTOM("MessageQueue::ProcessMessage()", "Notifying waiting parent...");
                 m_done.notify_one();
@@ -800,7 +802,7 @@ namespace GoCast
         std::string msg("Adding local stream [");
         msg += (label + "]...");
         FBLOG_INFO_CUSTOM(funcstr("RtcCenter::AddStream_w", pluginId), msg);
-        m_pPeerConns[pluginId]->AddStream(m_pLocalStream);
+        m_pPeerConns[pluginId]->AddStream(m_pLocalStream.get());
         
         return true;
     }
@@ -832,7 +834,7 @@ namespace GoCast
         std::string msg("Removing local stream [");
         msg += (label + "]...");
         FBLOG_INFO_CUSTOM(funcstr("RtcCenter::RemoveStream_w", pluginId), msg);
-        m_pPeerConns[pluginId]->RemoveStream(m_pLocalStream);
+        m_pPeerConns[pluginId]->RemoveStream(m_pLocalStream.get());
         
         return true;
     }
@@ -1021,15 +1023,15 @@ namespace GoCast
 
         FBLOG_INFO_CUSTOM(funcstr("RtcCenter::DeletePeerConnection_w", pluginId), "Deleting peerconnection...");
 
-        if(0 < m_pLocalStream->audio_tracks()->count())
+        if( "localPlayer" == pluginId && 0 < m_pLocalStream->audio_tracks()->count())
         {
             m_pLocalStream->audio_tracks()->at(0)->set_enabled(true);
         }
+        else
+        {
+             RemoveRemoteStream(pluginId);
+        }
         
-        //erase calls destructor of peerconnection
-        //TODO: RemoveStream only if stream added
-        m_pPeerConns[pluginId]->RemoveStream(m_pLocalStream);
-        m_pPeerConns[pluginId]->Close();
         m_pPeerConns.erase(pluginId);
         
         return true;

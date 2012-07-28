@@ -87,15 +87,16 @@ GoCastJS.getUserMedia = function(options, success, failure) {
 				player.setLocalDescription(
 					"OFFER",
 					player.createOffer({audio: true, video: true}),
-					function() { player.source = stream; },
+					function() {
+						player.source = stream;
+						if("undefined" !== typeof(success) && null !== success) {
+							success(stream);
+						}
+					},
 					function(message) {
 						console.log("localPlayer.setLocalDescription(): ", message);
 					}
-				);
-				
-				if("undefined" !== typeof(success) && null !== success) {
-					success(stream);
-				}
+				);				
 			},
 			function(message) {
 				if("undefined" !== typeof(failure) && null !== success) {
