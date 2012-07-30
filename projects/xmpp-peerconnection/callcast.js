@@ -68,20 +68,20 @@
 var Callcast = {
     PLUGIN_VERSION_CURRENT: 0.0,
     PLUGIN_VERSION_REQUIRED: 0.0,
-    PLUGIN_VERSION_CURRENT_MAC: 1.19,
-    PLUGIN_VERSION_REQUIRED_MAC: 1.19,
-    PLUGIN_VERSION_CURRENT_WIN: 1.2,
-    PLUGIN_VERSION_REQUIRED_WIN: 1.2,
-    PLUGIN_VERSION_CURRENT_LINUX: 1.2,
-    PLUGIN_VERSION_REQUIRED_LINUX: 1.2,
+    PLUGIN_VERSION_CURRENT_MAC: 1.21,
+    PLUGIN_VERSION_REQUIRED_MAC: 1.21,
+    PLUGIN_VERSION_CURRENT_WIN: 1.21,
+    PLUGIN_VERSION_REQUIRED_WIN: 1.21,
+    PLUGIN_VERSION_CURRENT_LINUX: 1.21,
+    PLUGIN_VERSION_REQUIRED_LINUX: 1.21,
     PLUGIN_DOWNLOAD_URL: 'http://video.gocast.it/plugin.html',
     NOANSWER_TIMEOUT_MS: 6000,
     CALLCAST_XMPPSERVER: 'video.gocast.it',
     CALLCAST_ROOMS: 'gocastconference.video.gocast.it',
     AT_CALLCAST_ROOMS: '@gocastconference.video.gocast.it',
     NS_CALLCAST: 'urn:xmpp:callcast',
-    STUNSERVER: 'stun.l.google.com',
-//    STUNSERVER: 'video.gocast.it',
+//    STUNSERVER: 'stun.l.google.com',
+    STUNSERVER: 'video.gocast.it',
     FEEDBACK_BOT: 'feedback_bot_etzchayim@video.gocast.it',
     STUNSERVERPORT: 19302,
     ROOMMANAGER: 'overseer@video.gocast.it/roommanager',
@@ -528,6 +528,9 @@ var Callcast = {
         this.jid = room + '/' + nickin.replace(/ /g, '\\20');
         this.non_muc_jid = '';
         this.CallState = Callcast.CallStates.NONE;
+        this.bAmCaller = null;
+
+        // Need to call InitPeerConnection -- calling it at the bottom of this constructor.
 
         //
         // When a remote peer's stream has been added, I get called here.
@@ -567,32 +570,61 @@ var Callcast = {
 			console.log("OnReadyState: Current=" + self.peer_connection.ReadyState());
 		};
 
-		//
-		// Now we need to construct the peer connection and setup our stream
-		//
+        this.InitPeerConnection = function() {
+            try {
+    		//
+    		// Now we need to construct the peer connection and setup our stream
+    		//
 
-		if (Callcast.Callback_AddPlugin)
-		{
-			// Create a true PeerConnection object and attach it to the DOM.
-			this.peer_connection = new GoCastJS.PeerConnection(
-					new GoCastJS.PeerConnectionOptions(
-						"STUN " + Callcast.STUNSERVER + ":" + Callcast.STUNSERVERPORT,
-						this.onicecandidate, this.onaddstream,
-						this.onremovestream, this.onreadystatechange,
-						Callcast.Callback_AddPlugin(nickname)));
+        		if (Callcast.Callback_AddPlugin)
+        		{
+        			// Create a true PeerConnection object and attach it to the DOM.
+        			this.peer_connection = new GoCastJS.PeerConnection(
+        					new GoCastJS.PeerConnectionOptions(
+        						"STUN " + Callcast.STUNSERVER + ":" + Callcast.STUNSERVERPORT,
+        						this.onicecandidate, this.onaddstream,
+        						this.onremovestream, this.onreadystatechange,
+        						Callcast.Callback_AddPlugin(nickname)));
 
-			if (!this.peer_connection) {
-				alert("Gocast Remote Player object for name:'" + nickname + "' not found in DOM. Plugin problem?");
-			}
-            else
-			{
-				// Add my stream to this peer connection in preparation
-				this.peer_connection.AddStream(Callcast.localstream);
-			}
-		}
-		else {
-			alert('ERROR: Callcast.setCallbackForAddPlugin() has not been called yet.');
-		}
+        			if (!this.peer_connection) {
+        				alert("Gocast Remote Player object for name:'" + nickname + "' not found in DOM. Plugin problem?");
+        			}
+                    else
+        			{
+        				// Add my stream to this peer connection in preparation
+        				this.peer_connection.AddStream(Callcast.localstream);
+        			}
+        		}
+        		else {
+        			alert('ERROR: Callcast.setCallbackForAddPlugin() has not been called yet.');
+        		}
+            } catch(e) {
+                console.log('EXCEPTION: ', e);
+            }
+        };
+
+        this.ResetPeerConnection = function() {
+            try {
+                if (this.peer_connection) {
+                    console.log('Callee: ' + this.jid + ' - RESET PEER CONNECTION.');
+
+                    if (!Callcast.Callback_RemovePlugin) {
+                        console.log('ResetPeerConnection: ERROR: No RemovePlugin callback.');
+                        return;
+                    }
+
+                    this.RemovePlugin();
+
+                    this.InitPeerConnection();
+
+                    if (this.bAmCaller) {
+                        this.InitiateCall();
+                    }
+                }
+            } catch(e) {
+                console.log('EXCEPTION: ', e);
+            }
+        }
 
 /*                        if (Callcast.participants[nick].CallState === Callcast.CallStates.NONE)
                         {
@@ -610,6 +642,8 @@ var Callcast = {
                         */
 
         this.InitiateCall = function() {
+            this.bAmCaller = true;
+
         	try {
 				if (this.peer_connection)
 				{
@@ -654,6 +688,8 @@ var Callcast = {
         };
 
         this.CompleteCall = function(offer) {
+            this.bAmCaller = false;
+
         	try {
 				if (this.peer_connection)
 				{
@@ -693,7 +729,15 @@ var Callcast = {
 			{
 				if (this.bIceStarted) {
 					console.log('InboundIce: Got Candidate - ' + candidate);
-					this.peer_connection.ProcessIceMessage(candidate);
+                    // WORKAROUND: If we see a 'tcp' candidate, that's bad news.
+                    //   In rev 2407, this means the peerconnection will be
+                    //   failed. So, we're going to reset the connection.
+                    if (candidate.match(' tcp ')) {
+                        self.ResetPeerConnection();
+                    }
+                    else {
+    					this.peer_connection.ProcessIceMessage(candidate);
+                    }
 				}
 				else {
 					console.log('WARNING: Ice machine not started yet but received an inbound Ice Candidate.');
@@ -716,29 +760,36 @@ var Callcast = {
             }
 		};
 
+        this.RemovePlugin = function() {
+            // Now remove object from div
+            var nick = Strophe.getResourceFromJid(this.jid);
+            // Make sure it has no spaces...
+            if (nick) {
+                nick = nick.replace(/ /g, '');
+            }
+
+            if (Callcast.Callback_RemovePlugin) {
+                Callcast.Callback_RemovePlugin(nick);
+            }
+            else {
+                alert('ERROR: RemovePlugin: Callcast.setCallbackForRemovePlugin() has not been called yet.');
+            }
+        };
+
         this.DropCall = function() {
             if (this.peer_connection)
             {
                 console.log('Dropping call for ' + this.jid);
                 this.peer_connection = null;
-                // Now remove object from div
-                var nick = Strophe.getResourceFromJid(this.jid);
-                // Make sure it has no spaces...
-                if (nick) {
-                    nick = nick.replace(/ /g, '');
-                }
 
-                if (Callcast.Callback_RemovePlugin) {
-                    Callcast.Callback_RemovePlugin(nick);
-                }
-                else {
-                    alert('ERROR: Callcast.setCallbackForRemovePlugin() has not been called yet.');
-                }
+                this.RemovePlugin();
             }
             else {
                 console.log('Dropping FAILED. Cant find peer_connection (or self)');
             }
         };
+
+        this.InitPeerConnection();
     },
 
     escapeit: function(msg) {
