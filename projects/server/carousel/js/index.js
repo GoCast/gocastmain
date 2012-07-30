@@ -968,7 +968,7 @@ function changeAudio()
      app.log(4, "couldn't find video button");
   }
   var bMuteAudio = $(jqObj).hasClass("off");
-  Callcast.MuteLocalVoice(bMuteAudio);
+  Callcast.MuteLocalAudioCapture(bMuteAudio);
   $(jqObj).toggleClass("off");
   if (bMuteAudio) {
     app.log(2, "Audio muted.");
