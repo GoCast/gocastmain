@@ -1327,6 +1327,7 @@ function tryPluginInstall(
 )
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
+  var title, prompt;
   app.log(2, "tryPluginInstall");
   /*
    * check plugin installed. */
@@ -1340,6 +1341,16 @@ function tryPluginInstall(
     $(window).resize(resizeWindows);
   }
   else {
+    // prompt user to install plugin
+    // check if plugin is installed and out of data
+    // if so change prompt
+    if (app.pluginInstalled() && Callcast.pluginUpdateRequired())
+    {
+       title = $("#errorMsgPlugin > h1");
+       title.text("The Gocast.it plugin is out of date");
+       prompt = $("#errorMsgPlugin > p#prompt");
+       prompt.text("Please download and install the new version of the plugin");
+    }
     /*
      * Alert user to download and install the plugin. */
     if (app.osPlatform.isWin) {

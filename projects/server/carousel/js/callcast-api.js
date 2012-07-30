@@ -536,6 +536,32 @@ function removePluginFromCarousel(
   return false;
 } /* removePluginFromCarousel() */
 
+///
+/// \brief remove and re-instantiate local plugin
+///
+/// the local plugin is instantiated in index.html
+///
+function reloadLocalPlugin()
+{
+  try
+  {
+    // Get parent object and modify accordingly.
+    var jqDiv = $('#meeting > #streams > #scarousel div.cloudcarousel#mystream');
+    if (jqDiv.length != 1) return;
+    if (!item) throw "item not found";
+    // Remove plugin
+    // todo hack, have to empty div , remove doesn't work
+    //var foo = $('object', jqDiv);
+    //jqDiv.remove('object');
+    jqDiv.empty();
+    // instantiate the plugin
+    jqOo.append('<object class="localplayer" id="GocastPlayerLocal" type="application/x-gocastplayer" width="0" height="0"><param name="onload" value="pluginLoaded" /></object>');
+  }
+  catch (err)
+  {
+     app.log(4, "reloadLocalPlugin exception " + err);
+  }
+} /* removePluginFromCarousel() */
 
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
