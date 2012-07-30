@@ -445,6 +445,7 @@ function initializeLocalPlugin(
    * Callcast Seetings. */
   Callcast.SetUseVideo(false); /* Initially set to false, user must enable. */
   app.log(2, 'initializeLocalPlugin complete.');
+  return true;
 } /* initializeLocalPlugin() */
 
 
@@ -664,28 +665,28 @@ function pluginLoaded(
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
   app.log(2, 'Local Plugin Loaded.');
-  Callcast.InitGocastPlayer('#mystream > object.localplayer', function(message) {
-    /*
-     * Initialization successful. */
-    app.log(2, 'Local plugin successfully initialized.');
-    /*
-     * Set callback functions to add and remove plugins for other
-     * participants and content. */
-    Callcast.setCallbackForAddPlugin(addPluginToCarousel);
-    Callcast.setCallbackForRemovePlugin(removePluginFromCarousel);
-    Callcast.setCallbackForAddCarouselContent(addContentToCarousel);
-    Callcast.setCallbackForRemoveCarouselContent(removeContentFromCarousel);
-    Callcast.setCallbackForAddSpot(addSpot);
-    Callcast.setCallbackForRemoveSpot(removeSpot);
-    initializeLocalPlugin();
+  if (!Callcast.pluginUpdateRequired())
+  {
+     Callcast.InitGocastPlayer('#mystream > object.localplayer', function(message)
+     {
+       //Initialization successful.
+       app.log(2, 'Local plugin successfully initialized.');
+       // Set callback functions to add and remove plugins for other
+       // participants and content.
+       Callcast.setCallbackForAddPlugin(addPluginToCarousel);
+       Callcast.setCallbackForRemovePlugin(removePluginFromCarousel);
+       Callcast.setCallbackForAddCarouselContent(addContentToCarousel);
+       Callcast.setCallbackForRemoveCarouselContent(removeContentFromCarousel);
+       Callcast.setCallbackForAddSpot(addSpot);
+       Callcast.setCallbackForRemoveSpot(removeSpot);
 
-    handleRoomSetup();
-  }, function(message) {
-    /*
-     * Failure to initialize. */
-    app.log(4, 'Local plugin failed to initialize.');
-    $('#errorMsgPlugin').empty();
-    $('#errorMsgPlugin').append('<h1>Gocast.it plugin failed to initialize</h1><p>Please reload the page. [Ctrl + R]</p>');
-    openWindow('#errorMsgPlugin');
-  });
+       handleRoomSetup();
+     }, function(message) {
+       // Failure to initialize.
+       app.log(4, 'Local plugin failed to initialize.');
+       $('#errorMsgPlugin').empty();
+       $('#errorMsgPlugin').append('<h1>Gocast.it plugin failed to initialize</h1><p>Please reload the page. [Ctrl + R]</p>');
+       openWindow('#errorMsgPlugin');
+     });
+  }
 } /* pluginLoaded() */

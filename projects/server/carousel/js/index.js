@@ -1330,7 +1330,8 @@ function tryPluginInstall(
   app.log(2, "tryPluginInstall");
   /*
    * check plugin installed. */
-  if (app.pluginInstalled()) {
+  if (app.pluginInstalled() && !Callcast.pluginUpdateRequired())
+  {
     /*
      * Close buttons. */
     $('.window .close').on("click", closeWindow);
