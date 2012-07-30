@@ -251,20 +251,105 @@ function startDemoContent(
   return false;
 } /* startDemoContent() */
 
-/*
-function loadVideo(playerUrl, autoplay, id, w, h) 
+function loadVideo(oo, info) 
 {
-  swfobject.embedSWF(
-      playerUrl + '&rel=1&border=0&fs=1&autoplay=' + (autoplay?1:0), // url
-      id,                                                            // id 2b replace by player
-      '290',                                                         // width
-      '250',                                                         // height
-      '9.0.0',                                                       // min flash version
-      false,                                                         // height
-      false,                                                         // height
-      {allowfullscreen: 'false'});                                   // height
+  //if (oo && info && info.spotDivId)
+  if (oo && info && info.spotdivid)
+  {
+    var item = $(oo).data('item');
+    item.spotInfo = info; // save info so youtube player callback can get ytid vid id from it
+
+    //$(oo).attr('id', info.spotDivId);
+    $(oo).attr('id', info.spotdivid);
+    $(oo).removeClass('unoccupied')
+         .addClass('typeContent')
+         .addClass('videoContent');
+    // create div to be replace by swf player
+    //var playerId = info.spotDivId + '-player';
+    var playerId = info.spotdivid + '-player';
+    $(oo).append('<div id=' + playerId + '></div>');
+    var width = $(oo).width(),
+        height = $(oo).height();
+    // see http://code.google.com/p/swfobject/wiki/api
+    // https://developers.google.com/youtube/js_api_reference
+    // https://code.google.com/apis/ajax/playground/?exp=youtube#chromeless_player
+    var params = { allowScriptAccess: "always" }; // Lets Flash from another domain call JavaScript
+    var atts   = { id: playerId };                // The element id of the Flash embed
+    swfobject.embedSWF(
+       "http://www.youtube.com/apiplayer?version=3&enablejsapi=1&playerapiid=" + playerId, // url 
+       playerId, // div replace by embed
+       width,
+       height,
+       "9", // flash version
+       null, // express install url
+       null, // flashvars
+       params, // params
+       atts  // atts
+    );
+  }
+  else
+  {
+     app.log(5, "loadVideo error div " + oo + " info " + info);
+     console.log("div", oo);
+     console.log("info", info);
+  }
 }
-*/
+///
+/// \brief This function is automatically called by the player once it loads
+///
+/// 'LyWnvAWEbWE' // mit medical mirror
+/// 'GAHZSW1XOCU' // woman vlog thunderbird
+/// 'ZAvL3j3hOCU' // youtube is a conference
+/// 'AkfvND215No' // open u interview
+/// 'BW44KXIu7Q8' // Daphne Koller coursera interview
+function onYouTubePlayerReady(playerId) 
+{
+  try
+  {
+     ytplayer = document.getElementById(playerId);
+     if (!ytplayer) throw "ytplayer not found";
+     var spotDiv = $(ytplayer).parent();
+     if (spotDiv.length == 0) throw "ytplayer parentnot found";
+     var item = spotDiv.data('item');
+     if (!item) throw "item not found";
+     if (!item.spotInfo.ytid) throw "item.ytid not found";
+     console.log("onYouTubePlayerReady playerId " + playerId + " ytVideoId " + item.spotInfo.ytid);
+     var arr = [item.spotInfo.ytid];
+     ytplayer.loadPlaylist({playlist:arr,
+                            index:0,
+                            startSeconds:0,
+                            suggestedQuality:'small'});
+     ytplayer.setLoop(true);
+     ytplayer.mute();
+  }
+  catch(err)
+  {
+     app.log(4, "onYouTubePlayerReady " + err);
+  }
+}
+
+///
+/// \brief add demo video's to n spots
+///
+function startVideoContent()
+{
+  app.log(2, "startVideoContent");
+  setTimeout(function()
+  {
+    Callcast.AddSpot({spotReplace:"first-unoc", spotNodup:1, spotType:"youtube", 
+                      ytid: 'ZAvL3j3hOCU', // youtube is a conference
+                      spotDivId:"demo-video-1"
+                      });
+  }, 1000);
+  setTimeout(function()
+  {
+    Callcast.AddSpot({spotReplace:"last-unoc", spotNodup:1, spotType:"youtube", 
+                      ytid: 'BW44KXIu7Q8', // Daphne Koller coursera interview
+                      spotDivId:"demo-video-2"
+                      });
+  }, 1000);
+  return false;
+} /* startDemoContent() */
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
@@ -1083,28 +1168,31 @@ function resizeWindows(
 ///
 function resizeZoom(event)
 {
-   var width =  $('#meeting > #zoom').width();
-   var height = $('#meeting > #zoom').height();
    var jqDiv = $('#meeting > #zoom > .cloudcarousel');
-   var item = $(jqDiv).data('item');
-   var newWidth  = width * 1.0; //app.carousel.options.xSpotRatio;
-   var newHeight = height * 1.0; //app.carousel.options.ySpotRatio;
-   var widthScale =  newWidth  / item.orgWidth;
-   var heightScale = newHeight / item.orgHeight;
-   var scale = (widthScale < heightScale) ? widthScale : heightScale;
-   item.orgWidth     *= scale;
-   item.orgHeight    *= scale;
-   item.plgOrgWidth  *= scale
-   item.plgOrgHeight *= scale
+   if (jqDiv.length > 0)
+   {
+      var width =  $('#meeting > #zoom').width();
+      var height = $('#meeting > #zoom').height();
+      var item = $(jqDiv).data('item');
+      var newWidth  = width * 1.0; //app.carousel.options.xSpotRatio;
+      var newHeight = height * 1.0; //app.carousel.options.ySpotRatio;
+      var widthScale =  newWidth  / item.orgWidth;
+      var heightScale = newHeight / item.orgHeight;
+      var scale = (widthScale < heightScale) ? widthScale : heightScale;
+      item.orgWidth     *= scale;
+      item.orgHeight    *= scale;
+      item.plgOrgWidth  *= scale
+      item.plgOrgHeight *= scale
 
-   // center div in zoom div
-   var left = (width - item.orgWidth) / 2;
-   var top  = (height - item.orgHeight) / 2;
+      // center div in zoom div
+      var left = (width - item.orgWidth) / 2;
+      var top  = (height - item.orgHeight) / 2;
 
-   $(jqDiv).css('width',  item.orgWidth  + 'px');
-   $(jqDiv).css('height', item.orgHeight + 'px');
-   $(jqDiv).css('left',   left + 'px');
-   $(jqDiv).css('top',    top  + 'px');
+      $(jqDiv).css('width',  item.orgWidth  + 'px');
+      $(jqDiv).css('height', item.orgHeight + 'px');
+      $(jqDiv).css('left',   left + 'px');
+      $(jqDiv).css('top',    top  + 'px');
+   }
 }
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
@@ -1380,7 +1468,7 @@ function docKey(event)
    {
       return;
    }
-   app.log(2, "key code " + event.which);
+   //app.log(2, "key code " + event.which);
 
    switch (event.which || event.keyCode)
    {

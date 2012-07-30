@@ -22,7 +22,7 @@
     <meta names="apple-mobile-web-app-status-bar-style"
           content="black-translucent" />
     <meta property="og:type" content="website" />
-    <meta property="fb:admins" content="1291134692" />
+    <meta property="fb:admins" content="1219010428" />
     <meta property="og:title" content="GoCast Carousel." />
     <meta property="og:description" content="A place to be that's better than being there." />
     <meta property="og:image" content="http://carousel.gocast.it/images/gologo200.png" />
@@ -35,6 +35,8 @@
     <link rel="stylesheet" href="css/index.css" type="text/css" />
     <script src="js/jquery-1.7.2.min.js" type="text/javascript"></script>
     <script src="js/jquery-ui-1.8.21.custom.min.js" type="text/javascript"></script>
+    <!--<script type="text/javascript" src="http://swfobject.googlecode.com/svn/trunk/swfobject/swfobject.js"></script>-->
+    <!--<script type="text/javascript" src="js/swfobject.js"></script>-->
     <script src="/scripts/strophe.js"></script>
     <script src="/scripts/strophe.roster.js" type="text/javascript"></script>
     <script src="/scripts/strophe.disco.js" type="text/javascript"></script>
@@ -54,19 +56,8 @@
 
   <body>
     <div id="fb-root"></div> <!-- fb integration required -->
-    <!-- removed
-    <div id="upper-left">
-       <a href="http://www.gocast.it">
-        <img class="logo" src="images/gologo.png" />
-       </a>
-    </div>
-    <!-- removed
-    <div id="upper-right">
-       <input type="button" class="help" title="Open help window." onclick="openWindow('#helpPage');"/>
-       <a class="logout" onclick="logout();">Logout</a>
-    </div>
-    -->
     <div id="lower-right">
+       <!--<input class="vidbtn" type="button" title="Place video content." onclick="startVideoContent();" />-->
        <input class="demobtn" type="button" title="Place demo content." onclick="startDemoContent();" />
        <input class="feedback" type="button" title="Send us your feedback." onclick="openChat(event);"/>
        <input class="copyData" type="button" title="Copy data to clipboard." onclick="openCopyData(event);"/>

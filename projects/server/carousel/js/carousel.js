@@ -36,8 +36,7 @@
     this.objectOK = true;
     $(this.object).css('position', 'absolute');
     // add controls
-	$(this.object).append('<img class="zoom control" src="images/fullscreen.png" alt="Zoom" title="Zoom" onclick="carouselItemZoom(event);"/>');
-	$(this.object).append('<img class="close control" src="images/trash.png" alt="Close" title="Close" />');
+    this.addControls();
     // add handlers
     $(this.object).mouseover(function(event)
         {
@@ -56,10 +55,15 @@
     Item.prototype.updateSize = function(item)
     {
         this.orgWidth = item.orgWidth;
-    this.orgHeight = item.orgHeight;
-    this.plgOrgWidth = item.plgOrgWidth;
-    this.plgOrgHeight = item.plgOrgHeight;
+        this.orgHeight = item.orgHeight;
+        this.plgOrgWidth = item.plgOrgWidth;
+        this.plgOrgHeight = item.plgOrgHeight;
     };
+    Item.prototype.addControls = function() // add controls to spot
+    {
+       $(this.object).append('<img class="zoom control" src="images/fullscreen.png" alt="Zoom" title="Zoom" onclick="carouselItemZoom(event);"/>');
+       $(this.object).append('<img class="close control" src="images/trash.png" alt="Close" title="Close" />');
+    }
 
     /// \brief a numerically ordered collection of Item with insert an delete
     var Items = function()
@@ -281,14 +285,19 @@
         this.destRotation += (Math.PI / itemsLength) * (2 * direction);
         this.go();
     }; /* rotate() */
+    ///
     /// \brief adjust plugin after spot update
+    ///
     this.adjPlugin = function(item, scale)
     {
         var w, h, nick, px = 'px',
             obj = item.object,
-            plgin = $(obj).find('object')[0];
+            plgin = $(obj).find('object')[0],
+            type;
         if (plgin)
         {
+            //type = $(plgin).attr('type');
+            type = plgin.type;
             w = item.plgOrgWidth * scale;
             h = item.plgOrgHeight * scale;
             if (w < 10 && h < 10)
@@ -298,16 +307,20 @@
             }
             if ($(obj).attr('id').match('mystream'))
             {
-                if (app.videoEnabled)
-                {
-                   Callcast.SendLocalVideoToPeers({width: w, height: h});
-                }
-/*            else
-                {
-                    app.log(2, "Nothing to do with resizing video.");
-                } */
+               if (app.videoEnabled)
+               {
+                  Callcast.SendLocalVideoToPeers({width: w, height: h});
+               }
             }
-            else
+            else if (type === 'application/x-shockwave-flash')
+            {
+               $(plgin).width(w);
+               $(plgin).height(h);
+            }
+            //else if (type === 'application/x-gocastplayer') // fails type is undefined
+            //else if (plgin.outerHTML.indexOf('application/x-gocastplayer') != -1) // crashes outerHTML is undefined
+            //else if ($(plgin).html().indexOf('application/x-gocastplayer') != -1) // crashes in jquery
+            else // assume it's a gc plugin since type is undefined for gc plugin
             {
                 nick = $(obj).attr('encname');
                 if (nick && Callcast.participants[nick].videoOn)
@@ -316,10 +329,12 @@
                 }
                 // else do nothing on resize
             }
-
-            $(obj).find('div.name').css('font-size', (item.orgFontSize * scale) + px);
-            // >>0 = Math.foor(). Firefox doesn't like fractional decimals in z-index.
-            obj.style.zIndex = '' + (scale * 100) >> 0;
+            /*
+            else
+            {
+               console.log('plgin type ' + type, plgin, item);
+            }
+            */
         }
     };
     /*
@@ -372,47 +387,8 @@
             obj.style.top = y + px;
             // Adjust object dimensions.
             ctx.adjPlugin(item, scale);
-            /*
-            var plgin = $(obj).find("object")[0];
-            if (plgin) {
-            w = item.plgOrgWidth * scale;
-            h = item.plgOrgHeight * scale;
-            if ($(obj).attr("id").match("mystream")) {
-                if (!app.videoEnabled) {
-                //                app.log(2, "Nothing to do with resizing video.");
-                }
-                else
-                {
-                if (w > 10 && h > 10)
-                {
-                    Callcast.SendLocalVideoToPeers(new Object({width:w, height:h}));
-                }
-                else
-                {
-                    app.log(3, "carousel local video width " + w + " height " + h);
-                }
-                }
-            }
-            else
-            {
-                var nick = $(obj).attr("encname");
-                if (nick && Callcast.participants[nick].videoOn)
-                {
-                if (w > 10 && h > 10)
-                {
-                    Callcast.ShowRemoteVideo(new Object({nick:nick, width:w, height:h}));
-                }
-                else
-                {
-                    app.log(3, "carousel remote video width " + w + " height " + h);
-                }
-                }
-                // else do nothing on resize
-            }
-            // Scale name text.
-            $(obj).find("div.name").css("font-size", (item.orgFontSize * scale) + px);
-            }
-            */
+
+            $(obj).find('div.name').css('font-size', (item.orgFontSize * scale) + px);
             // >>0 = Math.foor(). Firefox doesn't like fractional decimals in z-index.
             obj.style.zIndex = '' + (scale * 100) >> 0;
         }
@@ -512,19 +488,92 @@
           this.updateLinear();
        }
     };
-
-    this.addSpotCb = function(info) // add spot callcast callback
+    this.doSpot = function(spotDiv, info) // perform action defined in info to spot
+    {
+       console.log("doSpot", info);
+       console.log("spotDiv", spotDiv);
+       //if (info.spotType)
+       if (info.spottype)
+       {
+          //if (info.spotType == 'youtube')
+          if (info.spottype == 'youtube')
+          {
+             console.log("doSpot youtube");
+             loadVideo(spotDiv, info);
+          }
+       }
+       // ... other spot commands
+    }
+    this.createSpot = function(info) // create a new spot
     {
        // add the html
        var newDiv = $('<div class="cloudcarousel unoccupied" onclick="carouselItemClick(event);"><div class="name"></div></div>'),
-           item = new Item(newDiv[0], options);
+       item = new Item(newDiv[0], options);
        $(this.innerWrapper).append(newDiv);
        item.updateSize(this.item);
-       item.spotNumber = info.spotnumber;
+       if (info) // info will be null when spots are created for remote video
+       {
+          item.spotNumber = info.spotnumber;
+       }
        newDiv.data('item', item);
        items.addItem(item);
        this.setupItem(item);
-       this.updateAll();
+       return newDiv;
+    }
+    this.addSpotCb = function(info) // add spot callcast callback
+    {
+       console.log("addSpotCb", info);
+       var spotDiv; // the desired spot to be replaced or added
+       // determine cmd type, add or replace
+       //if (info.spotReplace) // see if there is a spotReplace prop
+       if (info.spotreplace) // see if there is a spotReplace prop
+       {
+          // if there is a nodup prop == 1 and spot with spotId exists
+          // don't replace
+          //if (info.nodup && info.nodup == 1 && info.spotDivId)
+          if (info.spotnodup && info.spotnodup == 1 && info.spotdivid)
+          {
+             //var div = $('#meeting > #streams > #scarousel #' + info.spotDivId);
+             var div = $('#meeting > #streams > #scarousel #' + info.spotdivid);
+             if (div.length > 0)
+             {
+                return; // spot with id exists so we're done
+             }
+          }
+          var divs = $('#meeting > #streams > #scarousel div.unoccupied');
+          if (divs.length == 0) // no unoc spots to replace, create one
+          {
+             spotDiv = this.createSpot(info);
+          }
+          else // replace spot
+          {
+             //if (info.spotReplace === "first-unoc") // replace first unoc spot
+             if (info.spotreplace === "first-unoc") // replace first unoc spot
+             {
+                spotDiv = $(divs).get(0);
+             }
+             //else if (info.spotReplace === "last-unoc")
+             else if (info.spotreplace === "last-unoc")
+             {
+                spotDiv = $(divs).get(divs.length - 1);
+             }
+          }
+          item = $(spotDiv).data('item');
+          if (spotDiv && item)
+          {
+             item.spotNumber = info.spotnumber;
+          }
+          else
+          {
+             app.log(5, "addSpotCb problem with spot replace");
+          } 
+       }
+       else // new spot
+       {
+          spotDiv = this.createSpot(info);
+       }
+       this.doSpot(spotDiv, info);
+       this.updateAll(); // redraw carousel
     };
 
     this.removeSpotCb = function(info) // remove spot callcast callback
@@ -533,6 +582,7 @@
            spot = parseInt(info.spotnumber);
        if (!item)
        {
+          // todo try zoomed spot
           item = items.get(spot);
        }
 
@@ -541,11 +591,11 @@
        this.updateAll();
     };
 
-	/// \brief remove a spot from items
-	this.remove = function(index)
-	{
-	   items.remove(index);
-	}
+    /// \brief remove a spot from items
+    this.remove = function(index)
+    {
+       items.remove(index);
+    }
     this.insertSpot = function(spot) // add a previously created spot to the carousel
     {
        var item;
@@ -651,7 +701,7 @@
         //app.log(2, "carousel sizes xCentre " + this.xCentre + " yCentre " + this.yCentre +
         //                         " xRadius " + this.xRadius + " yRadius " + this.yRadius);
 
-        this.widthOld = width; this.heightOld = height; // save container dimensions
+        this.widthOld = width; this.heightOld = height; // debug save container dimensions
         // scale spots
         this.updateAll();
     };
