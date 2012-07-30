@@ -47,43 +47,6 @@ body input[type="button"] {
   background-color: transparent;
   background-repeat: no-repeat;
 }
-body > div#upper-left
-{
-   position: absolute;
-   top: 0px;
-   left: 0px;
-   margin-top: 10px;
-   margin-left: 10px;
-   z-index: 1000;
-}
-body > div#upper-right
-{
-   float:right;
-   margin-top: 10px;
-   margin-right: 10px;
-   width:auto;
-   z-index: 1000;
-   line-height: 2em;
-}
-body > div#upper-right > input.help
-{
-   float:right;
-   margin-right: 10px;
-   width:3em;
-   height:3em;
-   vertical-align: middle;
-   background-image: url("../images/btn-help.png");
-   background-repeat: no-repeat;
-   z-index: 1000;
-}
-body > div#upper-right > A.logout
-{
-   float:right;
-   margin-right: 10px;
-   margin-top: auto;
-   margin-left: auto;
-   vertical-align: middle;
-}
 body > div#lower-right
 {
    float:right;
@@ -147,7 +110,7 @@ body > div#lower-right > input#audio {
   margin-left: 5px;
   background-image: url("../images/mute.png");
 }
-body > div#msgBoard {
+body > div#lower-left {
   position: absolute;
   z-index: 1000;
   bottom: 10px;
@@ -156,7 +119,7 @@ body > div#msgBoard {
   line-height: 2em;
   max-width: 40%
 }
-body>div#msgBoard > div#chatOut
+body > div#lower-left > div#msgBoard > div#chatOut
 {
   display:none;
   max-height:125px;
@@ -173,7 +136,7 @@ body>div#msgBoard > div#chatOut
   -o-user-select: text;
   user-select: text;
 }
-body>div#msgBoard > div#msgTicker
+body> div#lower-left > div#msgBoard > div#msgTicker
 {
   height:1.25em;
   width:auto;
@@ -182,11 +145,11 @@ body>div#msgBoard > div#msgTicker
   border-width: 2px;
   background-color: white;
 }
-body>div#msgBoard > input.chatTo
+body> div#lower-left > div#msgBoard > input.chatTo
 {
   width:250px;
 }
-body > div#msgBoard > input.send {
+body > div#lower-left > div#msgBoard > input.send {
   background-image: url("../images/btn-send.png");
   width: 50px;
   height: 22px;
