@@ -79,19 +79,19 @@
         {
            this.bySpot[item.spotNumber] = item.index;
         }
-    this.updateKeys();       // sort items
+        this.updateKeys();       // sort items
     };
     Items.prototype.get = function(index)
     {
         //todo check that index is numeric
-    return this.vals[index];
+        return this.vals[index];
     };
     Items.prototype.getBySpotNumber = function(spotNumber)
     {
         //todo check that index is numeric
         var spot = parseInt(spotNumber),
             index = this.bySpot[spot];
-    return index ? this.vals[index] : null;
+        return index ? this.vals[index] : null;
     };
     Items.prototype.remove = function(index)
     {
@@ -103,7 +103,7 @@
     {
         return this.keys.length;
     };
-    Items.prototype.updateKeys = function(worker)
+    Items.prototype.updateKeys = function()
     {
         var key;
         this.keys = [];
@@ -578,17 +578,51 @@
 
     this.removeSpotCb = function(info) // remove spot callcast callback
     {
+       // todo refactor this out of carousel
        var item = items.getBySpotNumber(info.spotnumber),
-           spot = parseInt(info.spotnumber);
-       if (!item)
+           spot = parseInt(info.spotnumber),
+           zoomedSpot, zoomedItem;
+       if (!item) // item by spot number is not in carousel
        {
-          // todo try zoomed spot
-          item = items.get(spot);
+          // try zoomed spot
+          zoomedSpot = $('#meeting > #zoom > .cloudcarousel');
+          if (zoomedSpot.length == 1)
+          {
+             zoomedItem = $(zoomedSpot).data('item');
+             if (zoomedItem.spotNumber) // zoomed spot has spotNumber
+             {
+                if (zoomedItem.spotNumber == info.spotnumber)
+                {
+                   item = zoomedItem
+                }
+            }
+            else if (zoomedItem.index == info.spotnumber)
+            {
+               item = zoomedItem;
+            }
+            // unzoom
+            if (item)
+            {
+               carouselItemUnzoom();
+            }
+          }
+          else
+          {
+             item = items.get(spot);
+          }
        }
 
-       $(item.object).remove();
-       items.remove(item.index);
-       this.updateAll();
+       if (item)
+       {
+          $(item.object).remove();
+          items.remove(item.index);
+          this.updateAll();
+       }
+       else
+       {
+          app.log(4, "item " + info.spotnumber + " not found");
+          console.log("info", info);
+       }
     };
 
     /// \brief remove a spot from items
