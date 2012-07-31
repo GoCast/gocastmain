@@ -110,7 +110,6 @@ void GCPAPI::GetUserMedia(const FB::JSObjectPtr& mediaHints,
         return;
     }
     
-    static_cast<GoCast::GCPVideoRenderer*>(getPlugin()->Renderer()->renderer())->SetPreviewMode(true);
     pCtr->GetUserMedia(mediaHints, succCb, failCb);
 }
 

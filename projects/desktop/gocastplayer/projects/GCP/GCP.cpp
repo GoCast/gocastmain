@@ -76,18 +76,6 @@ GCP::~GCP()
     m_host->freeRetainedObjects();    
 }
 
-talk_base::scoped_refptr<webrtc::VideoRendererWrapperInterface> GCP::Renderer()
-{ 
-    boost::mutex::scoped_lock lock(m_rendererCreateMutex);
-    
-    if(NULL == m_pRenderer.get())
-    {
-        m_rendererCreateCondition.wait(m_rendererCreateMutex);
-    }
-    
-    return m_pRenderer;
-}
-
 void GCP::onPluginReady()
 {
     // When this is called, the BrowserHost is attached, the JSAPI object is
@@ -148,9 +136,13 @@ bool GCP::onWindowAttached(FB::AttachedEvent *evt, FB::PluginWindow *pWin)
         if(NULL == m_pRenderer.get())
         {
             FBLOG_INFO_CUSTOM("GCP::onWindowAttached()", "Creating video renderer...");
-            boost::mutex::scoped_lock lock(m_rendererCreateMutex);
+            
             m_pRenderer = webrtc::CreateVideoRenderer(new GoCast::GCPVideoRenderer(pWin));
-            m_rendererCreateCondition.notify_one();
+            if("localPlayer" == static_cast<GCPAPI*>(getRootJSAPI().get())->HtmlId())
+            {
+                static_cast<GoCast::GCPVideoRenderer*>(m_pRenderer->renderer())->SetPreviewMode(true);
+            }
+            
             FBLOG_INFO_CUSTOM("GCP::onWindowAttached()", "Creating video renderer DONE");
         }
     }

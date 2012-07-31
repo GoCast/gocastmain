@@ -24,9 +24,6 @@
 #include "talk/base/scoped_ref_ptr.h"
 #include "GCPVideoRenderer.h"
 
-#define GOCAST_DEFAULT_RENDER_WIDTH  352
-#define GOCAST_DEFAULT_RENDER_HEIGHT 288
-
 FB_FORWARD_PTR(GCP)
 class GCP : public FB::PluginCore
 {
@@ -37,7 +34,7 @@ public:
 public:
     GCP();
     virtual ~GCP();    
-    talk_base::scoped_refptr<webrtc::VideoRendererWrapperInterface> Renderer();
+    talk_base::scoped_refptr<webrtc::VideoRendererWrapperInterface> Renderer() { return m_pRenderer; }
     
 public:
     void onPluginReady();
@@ -72,8 +69,6 @@ public:
     
 private:
     talk_base::scoped_refptr<webrtc::VideoRendererWrapperInterface> m_pRenderer;
-    boost::condition m_rendererCreateCondition;
-    boost::mutex m_rendererCreateMutex;
 };
 
 #endif
