@@ -31,7 +31,9 @@ namespace GoCast
         void SetPreviewMode(bool bPreview) { m_bPreview = bPreview; }
 
     protected:
-        bool MirrorIfPreview(const cricket::VideoFrame* pFrame);        
+        bool MirrorIfPreview(const cricket::VideoFrame* pFrame);
+        void ConvertToRGBA();
+        void InvalidateWindow();
         
     protected:
         talk_base::scoped_array<uint8> m_pFrameBuffer;

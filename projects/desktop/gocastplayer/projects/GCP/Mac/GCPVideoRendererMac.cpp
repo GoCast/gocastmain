@@ -1,64 +1,7 @@
-#include "common_video/libyuv/include/libyuv.h"
 #include "../GCPVideoRenderer.h"
 
 namespace GoCast
 {
-    bool GCPVideoRenderer::RenderFrame(const cricket::VideoFrame* pFrame)
-    {
-        boost::mutex::scoped_lock winLock(m_winMutex);
-        
-        if(NULL == m_pFrameBuffer.get())
-        {
-            m_width = pFrame->GetWidth();
-            m_height = pFrame->GetHeight();
-            m_pFrameBuffer.reset(new uint8[m_width*m_height*4]);
-            m_pMirrorBuffers[0].reset(new uint8[pFrame->SizeOf(m_width, m_height)+4]);
-            m_pMirrorBuffers[1].reset(new uint8[pFrame->SizeOf(m_width, m_height)+4]);
-        }
-        
-        const int stride = m_width*4;
-        const int frameBufferSize = m_height*stride;
-        
-        if(false == MirrorIfPreview(pFrame))
-        {
-            return false;
-        }
-        
-        if(true == m_bPreview)
-        {
-            if(0 > webrtc::ConvertI420ToARGB8888(m_pMirrorBuffers[1].get(),
-                                                 m_pFrameBuffer.get(),
-                                                 m_width,
-                                                 m_height))
-            {
-                return false;
-            }
-        }
-        else
-        {
-            pFrame->ConvertToRgbBuffer(cricket::FOURCC_ARGB,
-                                       m_pFrameBuffer.get(),
-                                       frameBufferSize,
-                                       stride);
-        }
-        
-        //convert to rgba and correct alpha
-        uint8* pBufIter = m_pFrameBuffer.get();
-        uint8* pBufEnd = pBufIter + frameBufferSize;
-        while(pBufIter < pBufEnd)
-        {
-            pBufIter[3] = pBufIter[0];
-            pBufIter[0] = pBufIter[2];
-            pBufIter[2] = pBufIter[3];
-            pBufIter[3] = 0xff;
-            pBufIter += 4;
-        }
-        
-        //trigger window refresh event
-        m_pWin->InvalidateWindow();
-        
-        return true;
-    }
     
     bool GCPVideoRenderer::OnWindowRefresh(FB::RefreshEvent* pEvt)
     {
@@ -109,28 +52,25 @@ namespace GoCast
         return true;
     }
     
-    bool GCPVideoRenderer::MirrorIfPreview(const cricket::VideoFrame* pFrame)
+    void GCPVideoRenderer::ConvertToRGBA()
     {
-        if(NULL == pFrame)
+        const int stride = m_width*4;
+        const int frameBufferSize = m_height*stride;
+        uint8* pBufIter = m_pFrameBuffer.get();
+        uint8* pBufEnd = pBufIter + frameBufferSize;
+
+        while(pBufIter < pBufEnd)
         {
-            return false;
-        }
-        
-        if(false == m_bPreview)
-        {
-            return true;
-        }
-        
-        if(0 >= pFrame->CopyToBuffer(m_pMirrorBuffers[0].get(), pFrame->SizeOf(m_width, m_height)))
-        {
-            return false;
-        }
-        
-        if(0 > webrtc::MirrorI420LeftRight(m_pMirrorBuffers[0].get(), m_pMirrorBuffers[1].get(), m_width, m_height))
-        {
-            return false;
-        }
-        
-        return true;
+            pBufIter[3] = pBufIter[0];
+            pBufIter[0] = pBufIter[2];
+            pBufIter[2] = pBufIter[3];
+            pBufIter[3] = 0xff;
+            pBufIter += 4;
+        }        
+    }
+    
+    void GCPVideoRenderer::InvalidateWindow()
+    {
+        m_pWin->InvalidateWindow();
     }
 }
