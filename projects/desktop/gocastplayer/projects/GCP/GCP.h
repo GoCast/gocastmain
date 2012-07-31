@@ -18,13 +18,11 @@
 #include <map>
 #include <deque>
 #include <boost/thread.hpp>
+#include <boost/thread/condition.hpp>
 
 #include "talk/app/webrtc/mediastreaminterface.h"
 #include "talk/base/scoped_ref_ptr.h"
 #include "GCPVideoRenderer.h"
-
-#define GOCAST_DEFAULT_RENDER_WIDTH  352
-#define GOCAST_DEFAULT_RENDER_HEIGHT 288
 
 FB_FORWARD_PTR(GCP)
 class GCP : public FB::PluginCore
@@ -71,7 +69,6 @@ public:
     
 private:
     talk_base::scoped_refptr<webrtc::VideoRendererWrapperInterface> m_pRenderer;
-
 };
 
 #endif

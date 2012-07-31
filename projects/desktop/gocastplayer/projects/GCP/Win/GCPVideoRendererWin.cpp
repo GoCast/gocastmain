@@ -3,29 +3,6 @@
 
 namespace GoCast
 {
-    bool GCPVideoRenderer::RenderFrame(const cricket::VideoFrame* pFrame)
-    {
-        boost::mutex::scoped_lock winLock(m_winMutex);
-
-        if(NULL == m_pFrameBuffer.get())
-        {
-            m_width = pFrame->GetWidth();
-            m_height = pFrame->GetHeight();
-            m_pFrameBuffer.reset(new uint8[m_width*m_height*4]);
-        }
-
-		const int stride = m_width*4;
-        const int frameBufferSize = m_height*stride;
-        pFrame->ConvertToRgbBuffer(cricket::FOURCC_ARGB,
-                                   m_pFrameBuffer.get(),
-                                   frameBufferSize,
-                                   stride);
-
-        //trigger window refresh event
-        m_pWin->InvalidateWindow();
-        
-        return true;
-    }
 
     bool GCPVideoRenderer::OnWindowRefresh(FB::RefreshEvent* pEvt)
     {
@@ -53,5 +30,15 @@ namespace GoCast
 		}
 
         return true;
+    }
+    
+    void GCPVideoRenderer::ConvertToRGBA()
+    {
+        // Not needed so empty
+    }
+    
+    void GCPVideoRenderer::InvalidateWindow()
+    {
+        m_pWin->InvalidateWindow();
     }
 }

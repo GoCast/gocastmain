@@ -2,41 +2,6 @@
 
 namespace GoCast
 {
-    bool GCPVideoRenderer::RenderFrame(const cricket::VideoFrame* pFrame)
-    {
-        boost::mutex::scoped_lock winLock(m_winMutex);
-        
-        if(NULL == m_pFrameBuffer.get())
-        {
-            m_width = pFrame->GetWidth();
-            m_height = pFrame->GetHeight();
-            m_pFrameBuffer.reset(new uint8[m_width*m_height*4]);
-        }
-        
-        const int stride = m_width*4;
-        const int frameBufferSize = m_height*stride;
-        pFrame->ConvertToRgbBuffer(cricket::FOURCC_ARGB,
-                                   m_pFrameBuffer.get(),
-                                   frameBufferSize,
-                                   stride);
-        
-        //convert to rgba and correct alpha
-        uint8* pBufIter = m_pFrameBuffer.get();
-        uint8* pBufEnd = pBufIter + frameBufferSize;
-        while(pBufIter < pBufEnd)
-        {
-            pBufIter[3] = pBufIter[0];
-            pBufIter[0] = pBufIter[2];
-            pBufIter[2] = pBufIter[3];
-            pBufIter[3] = 0xff;
-            pBufIter += 4;
-        }
-        
-        //trigger window refresh event
-        m_pWin->InvalidateWindow();
-        
-        return true;
-    }
     
     bool GCPVideoRenderer::OnWindowRefresh(FB::RefreshEvent* pEvt)
     {
@@ -85,5 +50,27 @@ namespace GoCast
         CGContextRestoreGState(pContext);
         
         return true;
+    }
+    
+    void GCPVideoRenderer::ConvertToRGBA()
+    {
+        const int stride = m_width*4;
+        const int frameBufferSize = m_height*stride;
+        uint8* pBufIter = m_pFrameBuffer.get();
+        uint8* pBufEnd = pBufIter + frameBufferSize;
+
+        while(pBufIter < pBufEnd)
+        {
+            pBufIter[3] = pBufIter[0];
+            pBufIter[0] = pBufIter[2];
+            pBufIter[2] = pBufIter[3];
+            pBufIter[3] = 0xff;
+            pBufIter += 4;
+        }        
+    }
+    
+    void GCPVideoRenderer::InvalidateWindow()
+    {
+        m_pWin->InvalidateWindow();
     }
 }

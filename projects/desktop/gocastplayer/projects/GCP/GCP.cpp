@@ -127,6 +127,7 @@ bool GCP::onMouseMove(FB::MouseMoveEvent *evt, FB::PluginWindow *)
     //printf("Mouse move at: %d, %d\n", evt->m_x, evt->m_y);
     return false;
 }
+
 bool GCP::onWindowAttached(FB::AttachedEvent *evt, FB::PluginWindow *pWin)
 {
     // The window is attached; act appropriately
@@ -135,7 +136,13 @@ bool GCP::onWindowAttached(FB::AttachedEvent *evt, FB::PluginWindow *pWin)
         if(NULL == m_pRenderer.get())
         {
             FBLOG_INFO_CUSTOM("GCP::onWindowAttached()", "Creating video renderer...");
+            
             m_pRenderer = webrtc::CreateVideoRenderer(new GoCast::GCPVideoRenderer(pWin));
+            /*if("localPlayer" == static_cast<GCPAPI*>(getRootJSAPI().get())->HtmlId())
+            {
+                static_cast<GoCast::GCPVideoRenderer*>(m_pRenderer->renderer())->SetPreviewMode(true);
+            }*/
+            
             FBLOG_INFO_CUSTOM("GCP::onWindowAttached()", "Creating video renderer DONE");
         }
     }
