@@ -90,7 +90,7 @@ public:
     void set_source(const FB::JSAPIPtr& stream);
     
     // C++ member get methods
-    std::string HtmlId() const { return m_htmlId.convert_cast<std::string>(); }
+    //std::string HtmlId() const { return m_htmlId.convert_cast<std::string>(); }
     
     //---------------------- UserMedia Methods ---------------------
     void GetUserMedia(const FB::JSObjectPtr& mediaHints,
