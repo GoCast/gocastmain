@@ -19,16 +19,28 @@ namespace GoCast
     public:
         explicit GCPVideoRenderer(FB::PluginWindow* pWin);
         virtual ~GCPVideoRenderer();
+        
+        // cricket::VideoFrame overrides
         virtual bool SetSize(int width, int height, int reserved);
         virtual bool RenderFrame(const cricket::VideoFrame* pFrame);
+        
+        // Refresh event handler
         virtual bool OnWindowRefresh(FB::RefreshEvent* pEvt = NULL);
+        
+    public:
+        void SetPreviewMode(bool bPreview) { m_bPreview = bPreview; }
 
     protected:
+        bool MirrorIfPreview(const cricket::VideoFrame* pFrame);        
+        
+    protected:
         talk_base::scoped_array<uint8> m_pFrameBuffer;
+        talk_base::scoped_array<uint8> m_pMirrorBuffers[2];
         FB::PluginWindow* m_pWin;
         boost::mutex m_winMutex;
         int m_width;
         int m_height;
+        bool m_bPreview;
     };
 }
 
