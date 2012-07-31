@@ -18,6 +18,7 @@
 #include <map>
 #include <deque>
 #include <boost/thread.hpp>
+#include <boost/thread/condition.hpp>
 
 #include "talk/app/webrtc/mediastreaminterface.h"
 #include "talk/base/scoped_ref_ptr.h"
@@ -36,7 +37,7 @@ public:
 public:
     GCP();
     virtual ~GCP();    
-    talk_base::scoped_refptr<webrtc::VideoRendererWrapperInterface> Renderer() { return m_pRenderer; }
+    talk_base::scoped_refptr<webrtc::VideoRendererWrapperInterface> Renderer();
     
 public:
     void onPluginReady();
@@ -71,7 +72,8 @@ public:
     
 private:
     talk_base::scoped_refptr<webrtc::VideoRendererWrapperInterface> m_pRenderer;
-
+    boost::condition m_rendererCreateCondition;
+    boost::mutex m_rendererCreateMutex;
 };
 
 #endif
