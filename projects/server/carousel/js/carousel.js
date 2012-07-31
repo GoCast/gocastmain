@@ -285,9 +285,50 @@
         this.destRotation += (Math.PI / itemsLength) * (2 * direction);
         this.go();
     }; /* rotate() */
+    this.adjPlugin = function(item, scale)
+    {
+        var w, h, nick, px = 'px',
+            obj = item.object,
+            plgin = $(obj).find('object')[0];
+        if (plgin)
+        {
+            w = item.plgOrgWidth * scale;
+            h = item.plgOrgHeight * scale;
+            if (w < 10 && h < 10)
+            {
+               app.log(3, 'carousel video width ' + w + ' height ' + h);
+               return;
+            }
+            if ($(obj).attr('id').match('mystream'))
+            {
+                if (app.videoEnabled)
+                {
+                   Callcast.SendLocalVideoToPeers({width: w, height: h});
+                }
+/*            else
+                {
+                    app.log(2, "Nothing to do with resizing video.");
+                } */
+            }
+            else
+            {
+                nick = $(obj).attr('encname');
+                if (nick && Callcast.participants[nick].videoOn)
+                {
+                    Callcast.ShowRemoteVideo({nick: nick, width: w, height: h});
+                }
+                // else do nothing on resize
+            }
+
+            $(obj).find('div.name').css('font-size', (item.orgFontSize * scale) + px);
+            // >>0 = Math.foor(). Firefox doesn't like fractional decimals in z-index.
+            obj.style.zIndex = '' + (scale * 100) >> 0;
+        }
+    };
     ///
     /// \brief adjust plugin after spot update
     ///
+    /*
     this.adjPlugin = function(item, scale)
     {
         var w, h, nick, px = 'px',
@@ -329,14 +370,13 @@
                 }
                 // else do nothing on resize
             }
-            /*
-            else
-            {
-               console.log('plgin type ' + type, plgin, item);
-            }
-            */
+            //else
+            //{
+            //   console.log('plgin type ' + type, plgin, item);
+            //}
         }
     };
+    */
     /*
      * Update All function. This is the main loop function that moves
      * everything. */
