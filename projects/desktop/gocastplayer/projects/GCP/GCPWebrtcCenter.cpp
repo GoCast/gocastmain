@@ -1023,9 +1023,17 @@ namespace GoCast
 
         FBLOG_INFO_CUSTOM(funcstr("RtcCenter::DeletePeerConnection_w", pluginId), "Deleting peerconnection...");
 
-        if( "localPlayer" == pluginId && 0 < m_pLocalStream->audio_tracks()->count())
+        if("localPlayer" == pluginId)
         {
-            m_pLocalStream->audio_tracks()->at(0)->set_enabled(true);
+			if(0 < m_pLocalStream->audio_tracks()->count())
+			{
+				m_pLocalStream->audio_tracks()->at(0)->set_enabled(true);
+			}
+
+			if(0 < m_pLocalStream->video_tracks()->count())
+			{
+				m_pLocalStream->video_tracks()->at(0)->set_enabled(false);
+			}
         }
         else
         {
