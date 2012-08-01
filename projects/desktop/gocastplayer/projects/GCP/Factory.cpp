@@ -54,7 +54,12 @@ public:
         boost::filesystem::path appDataPath = FB::System::getLocalAppDataPath("GoCast");
         boost::filesystem::path logDirPath = appDataPath / "logs";
         
-        if(true == boost::filesystem::exists(logDirPath) &&
+        if(false == boost::filesystem::exists(logDirPath))
+        {
+            boost::filesystem::create_directories(logDirPath);
+        }
+        
+        if(true == boost::filesystem::exists(logDirPath) && 
            true == boost::filesystem::is_directory(logDirPath))
         {
             time_t timeInSeconds = time(NULL);
@@ -78,7 +83,7 @@ public:
     ///////////////////////////////////////////////////////////////////////////////    
     FB::Log::LogLevel getLogLevel()
     {
-        return FB::Log::LogLevel_Trace;
+        return FB::Log::LogLevel_Debug;
     }
 };
 
