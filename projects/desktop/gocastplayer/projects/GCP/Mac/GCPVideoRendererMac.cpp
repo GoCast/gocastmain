@@ -73,4 +73,24 @@ namespace GoCast
     {
         m_pWin->InvalidateWindow();
     }
+    
+    uint8* GCPVideoRenderer::AllocBuffer(size_t size)
+    {
+        uint8* pBuf = NULL;
+        
+        if(0 < size)
+        {
+            pBuf = new uint8[size];
+        }
+        
+        return pBuf;
+    }
+    
+    void GCPVideoRenderer::FreeBuffer(uint8 *pBuf)
+    {
+        if(NULL != pBuf)
+        {
+            delete pBuf;
+        }
+    }
 }
