@@ -1,5 +1,4 @@
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-/**
+/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/ /**
  * \file index.js
  *
  * \brief JavaScript code for Gocast.it plug-in.
@@ -14,6 +13,8 @@
  */
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
+/*jslint sloppy: false, todo: true, white: true, browser: true, devel: true */
+'use strict';
 
 
 /* global variables and objects */
@@ -27,10 +28,10 @@ var app = {
    * present. The meaning of logLevel is 1: debug, 2: info, 3:
    * warning, 4: error, 5: fatal. */
   log: function(logLevel, logMsg) {
-    var labels = ["", "DEBUG", "INFO", "WARNING", "ERROR", "FATAL"];
-    var now = new Date();
-    var logText = now.toTimeString().split(" ")[0] + " " +
-      labels[logLevel] + " " + logMsg;
+    var labels = ["", "DEBUG", "INFO", "WARNING", "ERROR", "FATAL"],
+        now = new Date(),
+        logText = now.toTimeString().split(" ")[0] + " " + labels[logLevel] + " " + logMsg,
+        msg;
     if (window.console) {
       console[["","log","info","warn","error","error"][logLevel]](logText);
     }
@@ -38,7 +39,7 @@ var app = {
      * For fatal errors pop-up an alert in addition to the console log
      * entry but do it only once, to avoid flooding the user with alerts. */
     if (logLevel >= 5 && !app.logFatalReported) {
-      var msg = "FATAL ERROR\n\n" + logMsg;
+      msg = "FATAL ERROR\n\n" + logMsg;
       alert(msg);
       app.logFatalReported = true;
     }
@@ -54,8 +55,8 @@ var app = {
    * Get the description of the browser and returns the browser object. */
   getBrowser: function() {
     var reVersion = new RegExp("(Chrome|Firefox|Mobile Safari|Safari)/" +
-                               "([0-9]+).([0-9]+)", 'g');
-    var matches = reVersion.exec(navigator.userAgent);
+                               "([0-9]+).([0-9]+)", 'g'),
+        matches = reVersion.exec(navigator.userAgent);
     if (!matches) {
       reVersion = new RegExp("(AppleWebKit)/([0-9]+).([0-9]+)", 'g');
       matches = reVersion.exec(navigator.userAgent);
@@ -74,11 +75,9 @@ var app = {
   /**
    * Check correct browser version. */
   checkBrowser: function() {
-    var expl = "Because this application uses advanced HTML5 features " +
-      "it may not work correctly with this browser.";
-    var recom = "Recommended browsers are Firefox 6+, Chrome 12+, and " +
-      "Mobile Safari 525+.";
-    var msg = undefined;
+    var expl = "Because this application uses advanced HTML5 features " + "it may not work correctly with this browser.",
+        recom = "Recommended browsers are Firefox 6+, Chrome 12+, and " + "Mobile Safari 525+.",
+        msg;
     switch (app.browser.name) {
     case "Chrome":
       if (app.browser.version < 12) {
@@ -130,8 +129,8 @@ var app = {
   {
     if (str)
     {
-       var nn = 0;
-       for (var i = 0; i < str.length; i++)
+       var nn = 0, i;
+       for (i = 0; i < str.length; i++)
        {
          nn += str.charCodeAt(i);
        }
@@ -145,12 +144,13 @@ var app = {
   /**
    * Check if gocast.it plugin is installed. */
   pluginInstalled: function() {
-    var rtnFlag = false;
+    var rtnFlag = false,
+        object;
     if ($.browser.msie)
     {
        try
        {
-          var object = new ActiveXObject("GoCast.GCP");
+          object = new ActiveXObject("GoCast.GCP");
           rtnFlag = true;
        }
        catch(err){} // do nothing on exception
@@ -232,22 +232,22 @@ function startDemoContent(
   /*
    * Second content delayed 1000 ms. */
   setTimeout(function() {
-    Callcast.Callback_AddCarouselContent(new Object({id:"demo2", image:"url('images/demo2-robertmoog.jpg')", altText:"Robert Moog: I would not call this music.", url:"http://www.guardian.co.uk/music/2012/may/23/robert-moog-interview-google-doodle"}));
+    Callcast.Callback_AddCarouselContent({id:"demo2", image:"url('images/demo2-robertmoog.jpg')", altText:"Robert Moog: I would not call this music.", url:"http://www.guardian.co.uk/music/2012/may/23/robert-moog-interview-google-doodle"});
   }, 1000);
   /*
    * Third content delayed 2000 ms. */
   setTimeout(function() {
-    Callcast.Callback_AddCarouselContent(new Object({id:"demo3", image:"url('images/demo3-spaceX.png')", altText:"Launch of SpaceX Falcon 9", url:"http://www.youtube.com/embed/4vkqBfv8OMM"}));
+    Callcast.Callback_AddCarouselContent({id:"demo3", image:"url('images/demo3-spaceX.png')", altText:"Launch of SpaceX Falcon 9", url:"http://www.youtube.com/embed/4vkqBfv8OMM"});
   }, 2000);
   /*
    * Fourth content delayed 3000 ms. */
   setTimeout(function() {
-    Callcast.Callback_AddCarouselContent(new Object({id:"demo4", image:"url('images/demo4-bawarriorsSF.jpg')", altText:"Warriors face many hurdles in building S.F. arena", url:"http://www.sfgate.com/cgi-bin/article.cgi?f=/c/a/2012/05/23/MNM41OLT8K.DTL"}));
+    Callcast.Callback_AddCarouselContent({id:"demo4", image:"url('images/demo4-bawarriorsSF.jpg')", altText:"Warriors face many hurdles in building S.F. arena", url:"http://www.sfgate.com/cgi-bin/article.cgi?f=/c/a/2012/05/23/MNM41OLT8K.DTL"});
   }, 3000);
   /*
    * Fifth content delayed 4000 ms. */
   setTimeout(function() {
-    Callcast.Callback_AddCarouselContent(new Object({id:"demo5", image:"url('images/demo5-wikipedia.jpg')", altText:"Wikipedia", url:"http://www.wikipedia.org"}));
+    Callcast.Callback_AddCarouselContent({id:"demo5", image:"url('images/demo5-wikipedia.jpg')", altText:"Wikipedia", url:"http://www.wikipedia.org"});
   }, 4000);
   closeWindow();
   return false;
@@ -255,10 +255,11 @@ function startDemoContent(
 
 function loadVideo(oo, info) 
 {
+  var item, playerId, width, height, params, atts;
   //if (oo && info && info.spotDivId)
   if (oo && info && info.spotdivid)
   {
-    var item = $(oo).data('item');
+    item = $(oo).data('item');
     item.spotInfo = info; // save info so youtube player callback can get ytid vid id from it
 
     //$(oo).attr('id', info.spotDivId);
@@ -268,15 +269,15 @@ function loadVideo(oo, info)
          .addClass('videoContent');
     // create div to be replace by swf player
     //var playerId = info.spotDivId + '-player';
-    var playerId = info.spotdivid + '-player';
+    playerId = info.spotdivid + '-player';
     $(oo).append('<div id=' + playerId + '></div>');
-    var width = $(oo).width(),
-        height = $(oo).height();
+    width = $(oo).width();
+    height = $(oo).height();
     // see http://code.google.com/p/swfobject/wiki/api
     // https://developers.google.com/youtube/js_api_reference
     // https://code.google.com/apis/ajax/playground/?exp=youtube#chromeless_player
-    var params = { allowScriptAccess: "always" }; // Lets Flash from another domain call JavaScript
-    var atts   = { id: playerId };                // The element id of the Flash embed
+    params = { allowScriptAccess: "always" }; // Lets Flash from another domain call JavaScript
+    atts   = { id: playerId };                // The element id of the Flash embed
     swfobject.embedSWF(
        "http://www.youtube.com/apiplayer?version=3&enablejsapi=1&playerapiid=" + playerId, // url 
        playerId, // div replace by embed
@@ -306,17 +307,18 @@ function loadVideo(oo, info)
 /// 'BW44KXIu7Q8' // Daphne Koller coursera interview
 function onYouTubePlayerReady(playerId) 
 {
+  var spotDiv, item, arr;
   try
   {
      ytplayer = document.getElementById(playerId);
      if (!ytplayer) throw "ytplayer not found";
-     var spotDiv = $(ytplayer).parent();
-     if (spotDiv.length == 0) throw "ytplayer parentnot found";
-     var item = spotDiv.data('item');
+     spotDiv = $(ytplayer).parent();
+     if (spotDiv.length === 0) throw "ytplayer parentnot found";
+     item = spotDiv.data('item');
      if (!item) throw "item not found";
      if (!item.spotInfo.ytid) throw "item.ytid not found";
      console.log("onYouTubePlayerReady playerId " + playerId + " ytVideoId " + item.spotInfo.ytid);
-     var arr = [item.spotInfo.ytid];
+     arr = [item.spotInfo.ytid];
      ytplayer.loadPlaylist({playlist:arr,
                             index:0,
                             startSeconds:0,
@@ -353,17 +355,12 @@ function startVideoContent()
   return false;
 } /* startDemoContent() */
 
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-/**
- * \brief Open Personal Chat.
- */
+///
+/// \brief Open Personal Chat.
+///
 function openPersonalChat(
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-    /**
-     * Message Information Object. */
-  msginfo
+  msginfo      // Message Information Object.
 )
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
   /*
    * Transition effect. */
@@ -1383,6 +1380,20 @@ function tryPluginInstall(
     openWindow('#errorMsgPlugin');
   }
 } /* tryPluginInstall() */
+
+var downloadURL = function downloadURL(url)
+{
+    var iframe;
+    iframe = document.getElementById("hiddenDownloader");
+    if (iframe === null)
+    {
+        iframe = document.createElement('iframe');  
+        iframe.id = "hiddenDownloader";
+        iframe.style.visibility = 'hidden';
+        document.body.appendChild(iframe);
+    }
+    iframe.src = url;   
+}
 
 ///
 /// \brief close the eula window, download the win install file, launch function to check for plugin
