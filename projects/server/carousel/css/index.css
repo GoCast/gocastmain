@@ -328,6 +328,9 @@ body > div#meeting > div#streams > div#scontrols > input.right {
   position: fixed;
   display: none;
   z-index: 9999;
+  background-color: #eeeeee;
+  border: 4px solid #812034;
+  border-radius: 16px;  
 }
 #boxes .window > h1 {
   margin: 20px 10px;
@@ -341,7 +344,6 @@ body > div#meeting > div#streams > div#scontrols > input.right {
   width: 400px; 
   height: 200px;
   padding: 0px 7px 7px 7px;
-  background-color: #eeeeee;
   border: 4px solid #812034;
   border-radius: 16px;  
 }
@@ -349,7 +351,6 @@ body > div#meeting > div#streams > div#scontrols > input.right {
   width: 400px; 
   height: 200px;
   padding: 0px 7px 7px 7px;
-  background-color: #eeeeee;
   border: 4px solid #812034;
   border-radius: 16px;  
 }
@@ -360,7 +361,6 @@ body > div#meeting > div#streams > div#scontrols > input.right {
   width: 300px; 
   height: 200px;
   padding: 0px 7px 7px 7px;
-  background-color: #eeeeee;
   border: 4px solid #812034;
   border-radius: 16px;  
 }
@@ -381,7 +381,6 @@ body > div#meeting > div#streams > div#scontrols > input.right {
   width: 300px; 
   height: auto;
   padding: 0px 7px 7px 7px;
-  background-color: #eeeeee;
   border: 4px solid #812034;
   border-radius: 16px;  
 }
@@ -423,7 +422,6 @@ body > div#meeting > div#streams > div#scontrols > input.right {
 #boxes #chatInp {
   width: 600px;
   height: 52px;
-  background-color: #eeeeee;
   border: 4px solid #812034;
   border-radius: 16px;  
 }
@@ -456,7 +454,6 @@ body > div#meeting > div#streams > div#scontrols > input.right {
 #boxes #personalChat {
   width: 600px;
   height: 52px;
-  background-color: whitesmoke;
   border: 4px solid yellowgreen;
   border-radius: 16px;  
 }
