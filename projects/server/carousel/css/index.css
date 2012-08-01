@@ -329,6 +329,13 @@ body > div#meeting > div#streams > div#scontrols > input.right {
   display: none;
   z-index: 9999;
 }
+#boxes .window > h1 {
+  margin: 20px 10px;
+  color: darkred;
+}
+#boxes .window > p {
+  margin: 10px;
+}
 /* todo make some style common */
 #boxes #chromeRestart {
   width: 400px; 
@@ -345,13 +352,6 @@ body > div#meeting > div#streams > div#scontrols > input.right {
   background-color: #eeeeee;
   border: 4px solid #812034;
   border-radius: 16px;  
-}
-#boxes #errorMsgPlugin > h1 {
-  margin: 20px 10px;
-  color: darkred;
-}
-#boxes #errorMsgPlugin > p {
-  margin: 10px;
 }
 #boxes #errorMsgPlugin .hidden {
   display: none;  
