@@ -1403,21 +1403,37 @@ var doDownload = function()
 
   // prompt user for next step
   // chrome can't load an upgraded plugin so prompt user to restart
-  if (app.browser.name === "Chrome" && app.pluginInstalled() && Callcast.pluginUpdateRequired())
+  if (app.osPlatform.isMac)
   {
-    closeWindow();
-    openWindow('#chromeRestart');
-  }
-  else if (app.osPlatform.isMac)
-  {
-    closeWindow();
-    openWindow("#winWait");
-    checkForPlugin(app.MAC_PL_NAME);
+     installPrompt(app.MAC_PL_NAME);
   }
   // windows install path is thru winEula
   // todo linux
 }
 
+///
+/// \brief display appropriate prompt depending on plugin install type
+///
+var installPrompt = function(pluginName)
+{
+  closeWindow();
+  if (app.pluginInstalled() && Callcast.pluginUpdateRequired())
+  {
+    if (app.browser.name === "Chrome")
+    {
+      openWindow('#chromeRestart');
+    }
+    else
+    {
+      openWindow('#pageReload');
+    }
+  }
+  else // wait for plugin
+  {
+    openWindow("#winWait");
+    checkForPlugin(pluginName);
+  }
+}
 ///
 /// \brief download from an url
 ///
@@ -1450,8 +1466,7 @@ function winInstall(event)
              console.log(data);
           });
 
-   openWindow("#winWait");
-   checkForPlugin(app.WIN_PL_NAME);
+   installPrompt(app.WIN_PL_NAME);
 }
 
 ///
