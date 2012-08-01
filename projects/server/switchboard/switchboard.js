@@ -28,12 +28,21 @@ function useritem(properties) {
 	{
 		for (k in properties)
 		{
-			console.log("Adding: " + k + " = " + properties[k]);
+//			console.log("Adding: " + k + " = " + properties[k]);
 			this[k] = properties[k];
 		}
 	}
 
 	this.jids = {};
+};
+
+useritem.prototype.numJidsAssociated = function() {
+	var numjids = 0;
+	
+	for (k in this.jids)
+		numjids ++;
+	
+	return numjids;
 };
 
 useritem.prototype.addJid = function(jid) {
@@ -93,27 +102,10 @@ function switchboard(user, pw, notifier) {
 		self.client.send(el);
 
 		self.log("Listening for switchboard presence and queries.");
-
-		// Now we need to make sure we stay connected to the server. We will do this via a ping-check
-		// to the server every 10 seconds. If we don't get a reply, we can decide what to do about that.
-		setInterval(function() {
-//			console.log("pinging server...");
-
-			var nopong = setTimeout(function() {
-				self.log("ERROR: No pong received. Server connection died?");
-			}, 5000);
-
-			self.sendIQ(new xmpp.Element('iq', {to: self.SERVER, type: 'get'})
-						.c('ping', {xmlns: 'urn:xmpp:ping'}), function(res) {
-//							console.log("Got pong.");
-							clearTimeout(nopong);
-						});
-		}, 10000);
-
 	});
 
 	this.client.on('offline', function() {
-		self.log('Switchboard went offline. Reconnection should happen automatically.');
+//		self.log('Switchboard went offline. Reconnection should happen automatically.');
 	});
 
 	//
@@ -135,6 +127,11 @@ function switchboard(user, pw, notifier) {
 		sys.puts(e);
 	});
 
+};
+
+switchboard.prototype.notifylog = function(msg) {
+	if (this.notifier)
+		this.notifier.sendMessage(logDate() + " - Switchboard: " + msg);
 };
 
 switchboard.prototype.log = function(msg) {
@@ -228,7 +225,7 @@ switchboard.prototype.handleMessage = function(msg) {
 			{
 				var the_list = "";
 				for (k in this.jidlist)
-					the_list += k + '\n';
+					the_list += k + ' = ' + this.jidlist[k].name + '\n';
 
 				if (the_list === "")
 					this.sendPrivateMessage(msg.attrs.from, "No JIDs online currently.");
@@ -239,7 +236,14 @@ switchboard.prototype.handleMessage = function(msg) {
 			{
 				var the_list = "";
 				for (k in this.userlist)
-					the_list += k + ": name: " + this.userlist[k].name + ", ID: " + this.userlist[k].id + '\n';
+				{
+					the_list += k + ": name: " + this.userlist[k].name + ", ID: " + this.userlist[k].id;
+					// Multiple jids?
+					for (m in this.userlist[k].getJidList())
+						the_list += ", jid:" + m;
+					
+					the_list += "\n";
+				}
 
 				if (the_list === "")
 					this.sendPrivateMessage(msg.attrs.from, "No USERS online currently.");
@@ -277,34 +281,50 @@ switchboard.prototype.intro_sr = function(from, blob, cb) {
 
 			if (session)
 			{
-			
-				console.log("Pre-oauth-code: ", session.oauth_code);
-				console.log("https://graph.facebook.com/oauth/access_token?client_id="+self.APP_ID+"&client_secret="+self.APP_SECRET+
-							"&grant_type=fb_exchange_token&fb_exchange_token="+session.oauth_code);
-				
 				session.graphCall("/me", {
 				})(function(result) {
 					if (!result)
 						self.log("ERROR: Did not successfully make graph call to /me for identity verification.");
 					else
 					{
-						if (!self.userlist[result.id])
+						// We don't know this facebook user yet. Add them.
+						if (!self.findFacebookUser(result.id))
 							self.userlist[result.id] = new useritem({name: result.name, id: result.id});
 
 						//
 						// Add this jid to the list for this facebook user.
 						//
-						self.userlist[result.id].addJid(fromjid);
+						if (!self.userlist[result.id].jids[fromjid])
+							self.userlist[result.id].addJid(fromjid);
 
 						//
 						// Now cross-link jids back to user items.
 						//
-						if (self.jidlist[fromjid])
-							self.log("ERROR: JID already in database. Hmm - jid=" + fromjid);
-						self.jidlist[fromjid] = self.userlist[result.id];
+						if (self.jidlist[fromjid] && self.jidlist[fromjid].id !== result.id)
+						{
+							// This would happen if a given anonymous jid logged out of facebook and back in as someone else.
+							self.log("ERROR: JID already in database. Clearing jid for FB user - " + self.jidlist[fromjid].name);
+							self.jidlist[fromjid].removeJid(fromjid);
+							
+							// Now that we've removed the jid from the useritem, if there are no other jids, then it's abandoned.
+							// So, we can remove the useritem altogether.
+							if (self.jidlist[fromjid].numJidsAssociated() === 0)
+							{
+								delete self.userlist[result.id];
+								delete self.jidlist[fromjid];
+							}
+						}
 
-						self.log('Username is:' + result.name);
-						console.log("DEBUG: ", result);
+						// Is this a repeat/refresh or a new entity
+						if (!self.jidlist[fromjid])
+						{
+							self.jidlist[fromjid] = self.userlist[result.id];
+
+							var wholog = "Online: FBName:" + result.name + ", FBID:" + result.id + ", email:" + result.email + ", jid:" + fromjid;
+							self.log(wholog);
+							self.notifylog(wholog);
+//							console.log("DEBUG: ", result);
+						}
 
 						if (cb)
 							cb(result.id);
@@ -329,22 +349,40 @@ switchboard.prototype.handlePresence = function(pres) {
 //	if (!pres.attrs.from.split('@'))
 	{
 		var from = pres.attrs.from.split('/')[0];
+		var fbuseritem = null;
 		var fbname = "";
 		var self = this;
 
 		if (this.jidlist[from])
-			fbname = this.jidlist[from].name;
-
+		{
+			fbuseritem = this.jidlist[from];
+			fbname = fbuseritem.name;
+		}
+		
 		if (pres.attrs.type === 'unavailable')
 		{
 			this.log("Got pres (OFFLINE): " + from + (fbname ? (" - Facebook: " + fbname) : ""));
 			
 			// Need to remove user and jid from online list.
+			if (fbuseritem)
+			{
+				// Definitely delete the jidlist[] entry.
+				delete this.jidlist[from];
+				
+				// If the useritem contains more than 1 jid entry, we can't delete the fb username.
+				if (this.userlist[fbuseritem.id])
+				{
+					this.userlist[fbuseritem.id].removeJid(from);
+					if (this.userlist[fbuseritem.id].numJidsAssociated() === 0)
+						delete this.userlist[fbuseritem.id];
+				}
+			}
 			
 		}
 		else
 		{
-			this.log("pres (ONline) " + pres.toString());
+//			this.log("pres (ONline) " + pres.toString());
+
 			// Only announcing online status if signed request is part of the presence info.
 			if (pres.attrs.intro_sr)
 			{
@@ -355,18 +393,25 @@ switchboard.prototype.handlePresence = function(pres) {
 
 					who += " - Facebook: " + self.userlist[fbid].name;
 					self.log("Got pres (ONLINE): " + who);
-					self.log("  Access-Token from client: " + pres.attrs.intro_at);
-					self.log(" Swapping for long-term token...");
 					// Make the swap for a long term token.
 					self.facebook_client.getAccessToken({grant_type: "fb_exchange_token", fb_exchange_token: pres.attrs.intro_at})(function(token, expires) {
-						self.log("New long-term answer...");
-						self.log("  Token: " + token);
-						self.log("  Expires: " + expires + "secs, or: " + Math.round(expires/(60*60)) + "hrs, or: " + Math.round(expires/(60*60*24)) + "days.");
+//						self.log("New long-term answer...");
+//						self.log("  Token: " + token);
+/*						var outtime = "";
+						if (expires >= 60*60*24)
+							outtime = "" + Math.round(expires/(60*60*24)) + " days.";
+						else if (expires >= 60*60)
+							outtime = "" + Math.round(expires/(60*60)) + " hours.";
+						else if (expires >= 60)
+							outtime = "" + Math.round(expires/60) + " minutes.";
+						else
+							outtime = "" + expires + " seconds.";
+
+						self.log("New long-term token expires in " + outtime);
+						*/
 					});
 				});
 			}
-			else
-				self.log("intro_sr is null or ''.");
 		}
 	}
 };
@@ -441,16 +486,21 @@ function notifier(serverinfo, jidlist) {
 
 	this.client.on('online',
 		  function() {
-		    if (!self.isOnline)
-			  	console.log(logDate() + " - Notifier online.");
+//		    if (!self.isOnline)
+//			  	console.log(logDate() + " - Notifier online.");
 		  	self.isOnline = true;
 //		  	self.sendMessage("Notifier online.");
 		  });
+
 	this.client.on('offline',
 		  function() {
-		  	console.log(logDate() + " - Notifier offline.");
+//		  	console.log(logDate() + " - Notifier offline.");
 		  	self.isOnline = false;
 		  });
+		  
+	this.client.on('error', function(e) {
+		sys.puts(e);
+	});
 
 };
 

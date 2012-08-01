@@ -34,10 +34,12 @@ namespace GoCast
         bool MirrorIfPreview(const cricket::VideoFrame* pFrame);
         void ConvertToRGBA();
         void InvalidateWindow();
+		uint8* AllocBuffer(size_t size);
+		void FreeBuffer(uint8* pBuf);
         
     protected:
         talk_base::scoped_array<uint8> m_pFrameBuffer;
-        talk_base::scoped_array<uint8> m_pMirrorBuffers[2];
+		uint8* m_pMirrorBuffers[2];
         FB::PluginWindow* m_pWin;
         boost::mutex m_winMutex;
         int m_width;

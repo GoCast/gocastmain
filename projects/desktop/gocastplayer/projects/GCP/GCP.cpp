@@ -24,11 +24,7 @@ void GCP::StaticInitialize()
     // be called once per process
     
     FBLOG_INFO_CUSTOM("GCP::StaticInitalize()", "Initing RtcCenter singleton...");
-    if(NULL == GoCast::RtcCenter::Instance())
-    {
-        FBLOG_ERROR_CUSTOM("GCP::StaticInitialize()", "Failed to init RtcCenter singleton");
-    }
-
+    GoCast::RtcCenter::Instance();
     FBLOG_INFO_CUSTOM("GCP::StaticInitalize()", "Initing RtcCenter singleton DONE");
 }
 
@@ -45,11 +41,7 @@ void GCP::StaticDeinitialize()
     // always be called just before the plugin library is unloaded
     
     FBLOG_INFO_CUSTOM("GCP::StaticDeinitalize()", "Destroying RtcCenter singleton...");
-    if(NULL != GoCast::RtcCenter::Instance(true))
-    {
-        FBLOG_ERROR_CUSTOM("GCP::StaticDeinitialize()", "Failed to destroy RtcCenter singleton");
-    }
- 
+    GoCast::RtcCenter::Instance(true);
     FBLOG_INFO_CUSTOM("GCP::StaticDeinitalize()", "Destroying RtcCenter singleton DONE");
 }
 
@@ -135,13 +127,22 @@ bool GCP::onWindowAttached(FB::AttachedEvent *evt, FB::PluginWindow *pWin)
     {        
         if(NULL == m_pRenderer.get())
         {
-            FBLOG_INFO_CUSTOM("GCP::onWindowAttached()", "Creating video renderer...");
+			GoCast::GCPVideoRenderer* pRenderer = new GoCast::GCPVideoRenderer(pWin);
+			GCPAPI* pJsapi = dynamic_cast<GCPAPI*>(getRootJSAPI().get());
             
-            m_pRenderer = webrtc::CreateVideoRenderer(new GoCast::GCPVideoRenderer(pWin));
-            /*if("localPlayer" == static_cast<GCPAPI*>(getRootJSAPI().get())->HtmlId())
-            {
-                static_cast<GoCast::GCPVideoRenderer*>(m_pRenderer->renderer())->SetPreviewMode(true);
-            }*/
+            FBLOG_INFO_CUSTOM("GCP::onWindowAttached()", "Creating video renderer...");
+            m_pRenderer = webrtc::CreateVideoRenderer(pRenderer);
+
+			if(NULL != pJsapi)
+			{
+				if("localPlayer" == pJsapi->HtmlId())
+				{
+                    FBLOG_INFO_CUSTOM("GCP::onWindowAttached()", "Setting preview mode for local video...");
+					pRenderer->SetPreviewMode(true);
+                    FBLOG_INFO_CUSTOM("GCP::onWindowAttached()", "Setting renderer local video...");
+					(GoCast::RtcCenter::Instance())->SetLocalVideoTrackRenderer(m_pRenderer);
+				}
+			}
             
             FBLOG_INFO_CUSTOM("GCP::onWindowAttached()", "Creating video renderer DONE");
         }

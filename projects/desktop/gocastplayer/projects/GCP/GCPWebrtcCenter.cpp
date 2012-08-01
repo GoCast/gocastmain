@@ -75,7 +75,6 @@ namespace GoCast
     {
         if("video" == m_kind.convert_cast<std::string>())
         {
-            FBLOG_INFO_CUSTOM("video_set_enabled(): ", newVal.convert_cast<bool>());
             (RtcCenter::Instance())->SetLocalVideoTrackEnabled(newVal.convert_cast<bool>());
         }
         else if("audio" == m_kind.convert_cast<std::string>())
@@ -338,7 +337,8 @@ namespace GoCast
     {        
         talk_base::AutoThread thread(this);
         
-        FBLOG_INFO_CUSTOM("MessageQueue::WorkerFunction()", "Msgq overrides PhysicalSocketServer::Wait() to process messages");
+        FBLOG_INFO_CUSTOM("MessageQueue::WorkerFunction()",
+                          "Msgq overrides PhysicalSocketServer::Wait() to process messages");
         talk_base::Thread::Current()->set_socketserver(this);
         
         FBLOG_INFO_CUSTOM("MessageQueue::WorkerFunction()", "Entering Run()...");
@@ -392,15 +392,15 @@ namespace GoCast
         if(true == bDelete)
         {
             FBLOG_INFO_CUSTOM("RtcCenter::Instance()", "Deleting RtcCenter Singleton...");
-            
             delete pInst;
             pInst = NULL;
-            
             FBLOG_INFO_CUSTOM("RtcCenter::Instance()", "Deleting RtcCenter Singleton DONE");
         }
         else if(NULL == pInst)
         {
+            FBLOG_INFO_CUSTOM("RtcCenter::Instance()", "Creating RtcCenter Singleton...");
             pInst = new RtcCenter();
+            FBLOG_INFO_CUSTOM("RtcCenter::Instance()", "Creating RtcCenter Singleton DONE...");
         }
         
         return pInst;
@@ -721,9 +721,9 @@ namespace GoCast
         {
             FBLOG_INFO_CUSTOM("RtcCenter::GetUserMedia_w()", "Creating local video track interface object...");
             m_pLocalStream->AddTrack(m_pConnFactory->CreateLocalVideoTrack(
-                                            "localvideo",
-                                            webrtc::CreateVideoCapturer(LocalVideoTrack::GetDefaultCaptureDevice())
-                                    ));            
+                "localvideo",
+                webrtc::CreateVideoCapturer(LocalVideoTrack::GetDefaultCaptureDevice())
+            ));            
         }
         
         //If mediaHints.audio == true, add audio track
@@ -1002,7 +1002,6 @@ namespace GoCast
         }
 
         FBLOG_INFO_CUSTOM(funcstr("RtcCenter::StartIce_w", pluginId), "Starting ICE machine...");
-        
         if(false == m_pPeerConns[pluginId]->StartIce(webrtc::JsepInterface::kUseAll))
         {
             FBLOG_ERROR_CUSTOM(funcstr("RtcCenter::StartIce_w", pluginId), "Failed to start ICE process");
@@ -1022,7 +1021,6 @@ namespace GoCast
         }
 
         FBLOG_INFO_CUSTOM(funcstr("RtcCenter::DeletePeerConnection_w", pluginId), "Deleting peerconnection...");
-
         if("localPlayer" == pluginId)
         {
 			if(0 < m_pLocalStream->audio_tracks()->count())
