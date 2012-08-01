@@ -34,7 +34,7 @@ set(MOZILLA_PLUGINID "gocast.it/GCP")
 # strings
 set(FBSTRING_CompanyName "GoCast")
 set(FBSTRING_FileDescription "GoCast Player")
-set(FBSTRING_PLUGIN_VERSION "1.22.1.0")
+set(FBSTRING_PLUGIN_VERSION "1.22.2.0")
 set(FBSTRING_LegalCopyright "Copyright 2012 GoCast")
 set(FBSTRING_PluginFileName "np${PLUGIN_NAME}.dll")
 set(FBSTRING_ProductName "GoCastPlayer")
@@ -60,3 +60,6 @@ set(FBMAC_USE_INVALIDATINGCOREANIMATION 0)
 
 # Add logging library
 add_firebreath_library(log4cplus)
+
+# Add boost's filesystem library
+add_boost_library(filesystem)

@@ -21,8 +21,11 @@
 #include "JSAPIAuto.h"
 #include <iostream>
 
-#define FBLOG_INFO_CUSTOM(func, msg) std::cout << func << " [INFO]: " << msg << std::endl
-#define FBLOG_ERROR_CUSTOM(func, msg) std::cout << func << " [ERROR]: " << msg << std::endl
+#define FBLOG_INFO_CUSTOM(func, msg) FBLOG_INFO(func, msg)
+#define FBLOG_ERROR_CUSTOM(func, msg) FBLOG_ERROR(func, msg)
+
+//std::cout << func << " [INFO]: " << msg << std::endl
+//std::cout << func << " [ERROR]: " << msg << std::endl
 
 std::string funcstr(const std::string& func, const std::string& pluginId);
 
@@ -110,6 +113,10 @@ namespace GoCast
         
     public:
         std::string ReadyState(const std::string& pluginId);
+        
+        bool Inited() const {
+            return static_cast<bool>(NULL != m_pConnFactory.get());
+        }
         
         bool GetLocalVideoTrackEnabled() const {
             if(0 < m_pLocalStream->video_tracks()->count()) {
