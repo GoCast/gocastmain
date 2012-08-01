@@ -65,15 +65,15 @@ var app = {
       reVersion = new RegExp("(AppleWebKit)/([0-9]+).([0-9]+)", 'g');
       matches = reVersion.exec(navigator.userAgent);
     }
-    app.browser = new Object();
+    app.browser = {};
     if (matches && matches[1]) {
       app.browser.name = matches[1];
     }
     if (matches && matches[2]) {
-      app.browser.version = parseInt(matches[2]) || 0;
+      app.browser.version = parseInt(matches[2], 10) || 0;
     }
     if (matches && matches[3]) {
-      app.browser.subversion = parseInt(matches[3]) || 0;
+      app.browser.subversion = parseInt(matches[3], 10) || 0;
     }
   }, /* app.getBrowser() */
   /**
@@ -134,7 +134,7 @@ var app = {
     if (str)
     {
        var nn = 0, i;
-       for (i = 0; i < str.length; i++)
+       for (i = 0; i < str.length; i += 1)
        {
          nn += str.charCodeAt(i);
        }
@@ -257,7 +257,7 @@ function startDemoContent(
   return false;
 } /* startDemoContent() */
 
-function loadVideo(oo, info) 
+function loadVideo(oo, info)
 {
   var item, playerId, width, height, params, atts;
   //if (oo && info && info.spotDivId)
@@ -283,7 +283,7 @@ function loadVideo(oo, info)
     params = { allowScriptAccess: "always" }; // Lets Flash from another domain call JavaScript
     atts   = { id: playerId };                // The element id of the Flash embed
     swfobject.embedSWF(
-       "http://www.youtube.com/apiplayer?version=3&enablejsapi=1&playerapiid=" + playerId, // url 
+       "http://www.youtube.com/apiplayer?version=3&enablejsapi=1&playerapiid=" + playerId, // url
        playerId, // div replace by embed
        width,
        height,
@@ -309,24 +309,32 @@ function loadVideo(oo, info)
 /// 'ZAvL3j3hOCU' // youtube is a conference
 /// 'AkfvND215No' // open u interview
 /// 'BW44KXIu7Q8' // Daphne Koller coursera interview
-function onYouTubePlayerReady(playerId) 
+function onYouTubePlayerReady(playerId)
 {
-  var spotDiv, item, arr;
+  var spotDiv, item, arr, ytplayer;
   try
   {
      ytplayer = document.getElementById(playerId);
-     if (!ytplayer) throw "ytplayer not found";
+     if (!ytplayer) {
+       throw "ytplayer not found";
+     }
      spotDiv = $(ytplayer).parent();
-     if (spotDiv.length === 0) throw "ytplayer parentnot found";
+     if (spotDiv.length === 0) {
+       throw "ytplayer parentnot found";
+     }
      item = spotDiv.data('item');
-     if (!item) throw "item not found";
-     if (!item.spotInfo.ytid) throw "item.ytid not found";
+     if (!item) {
+       throw "item not found";
+     }
+     if (!item.spotInfo.ytid) {
+       throw "item.ytid not found";
+     }
      console.log("onYouTubePlayerReady playerId " + playerId + " ytVideoId " + item.spotInfo.ytid);
      arr = [item.spotInfo.ytid];
-     ytplayer.loadPlaylist({playlist:arr,
-                            index:0,
-                            startSeconds:0,
-                            suggestedQuality:'small'});
+     ytplayer.loadPlaylist({playlist: arr,
+                            index: 0,
+                            startSeconds: 0,
+                            suggestedQuality: 'small'});
      ytplayer.setLoop(true);
      ytplayer.mute();
   }
@@ -344,14 +352,14 @@ function startVideoContent()
   app.log(2, "startVideoContent");
   setTimeout(function()
   {
-    Callcast.AddSpot({spotReplace:"first-unoc", spotNodup:1, spotType:"youtube", 
+    Callcast.AddSpot({spotReplace:"first-unoc", spotNodup:1, spotType:"youtube",
                       ytid: 'ZAvL3j3hOCU', // youtube is a conference
                       spotDivId:"demo-video-1"
                       });
   }, 1000);
   setTimeout(function()
   {
-    Callcast.AddSpot({spotReplace:"last-unoc", spotNodup:1, spotType:"youtube", 
+    Callcast.AddSpot({spotReplace:"last-unoc", spotNodup:1, spotType:"youtube",
                       ytid: 'BW44KXIu7Q8', // Daphne Koller coursera interview
                       spotDivId:"demo-video-2"
                       });
@@ -368,23 +376,25 @@ function openPersonalChat(
 {
   /*
    * Transition effect. */
-  var jqMask = $('#mask');
+  var jqMask = $('#mask'),
+      jqWin, id, jqO, cY, cX, winW, winH,
+      wcW, wcH;
   jqMask.fadeIn(500, activateWindow("#personalChat"));
   jqMask.fadeTo("fast", 0.3);
   /*
    * Set message. */
-  var jqWin = $("#boxes > div#personalChat");
+  jqWin = $("#boxes > div#personalChat");
   $("p.msg", jqWin).text("").html(decodeURI(msginfo.body));
   /*
    * Set position based on nick id. */
-  var id = app.str2id(msginfo.nick);
-  var jqO = $('#meeting > #streams > #scarousel div#' + id);
-  var cY = jqO.offset().top;
-  var cX = jqO.offset().left;
-  var winW = $(window).width();
-  var winH = $(window).height();
-  var wcW = jqWin.outerWidth();
-  var wcH = jqWin.outerHeight();
+  id = app.str2id(msginfo.nick);
+  jqO = $('#meeting > #streams > #scarousel div#' + id);
+  cY = jqO.offset().top;
+  cX = jqO.offset().left;
+  winW = $(window).width();
+  winH = $(window).height();
+  wcW = jqWin.outerWidth();
+  wcH = jqWin.outerHeight();
   if ((cY + wcH) > winH) {
     jqWin.css("top", winH - wcH);
   }
@@ -419,7 +429,7 @@ function carouselItemClick(
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
    app.log(2, "carouselItemClick " + event);
-   if (event.currentTarget.className.indexOf("unoccupied") != -1)
+   if (event.currentTarget.className.indexOf("unoccupied") !== -1)
    {
       var urlName = prompt("Enter a URL to put in this spot.");
       if (urlName && urlName.length > 0)
@@ -451,7 +461,9 @@ function carouselItemClick(
 function carouselItemZoom(event)
 {
    app.log(2, "carouselItemZoom ");
-   event && event.stopPropagation();
+   if (event) {
+      event.stopPropagation();
+   }
 
    // do nothing if there's a zoomed spot
    if ($('#meeting > #zoom > .cloudcarousel').length > 0)
@@ -463,8 +475,8 @@ function carouselItemZoom(event)
    $('#meeting > #streams').css("height", "20%"); // unzoom carousel
 
    // get item and remove it from carousel
-   var spot = $(event.currentTarget).parent();
-   var item = $(spot).data('item');
+   var spot = $(event.currentTarget).parent(),
+       item = $(spot).data('item');
    app.carousel.remove(item.index);
 
    $(spot).appendTo($('#meeting > #zoom')); // move div to zoom area
@@ -482,7 +494,9 @@ function carouselItemZoom(event)
 function carouselItemUnzoom(event)
 {
    app.log(2, "carouselItemUnzoom ");
-   event && event.stopPropagation();
+   if (event) {
+     event.stopPropagation();
+   }
 
    $('#meeting > #zoom').css("display", "none"); // undisplay zoom div
    var spot = $('#meeting > #zoom > .cloudcarousel');
@@ -495,10 +509,7 @@ function carouselItemUnzoom(event)
 /**
  * \brief Open dialog with room description so user can copy to clipboard
  */
-function openCopyData
-(
-  event
-)
+function openCopyData(event)
 {
   if (!event)
   {
@@ -506,10 +517,11 @@ function openCopyData
   }
 
   // get the dialog
-  var jqWin = $("#boxes > div#copyData");
-
+  var jqWin = $("#boxes > div#copyData"),
   // set the room name
-  var name = $('div#copyContent > #copyName', jqWin);
+      name = $('div#copyContent > #copyName', jqWin),
+      cX, cY, winW, winH, wcW, wcH,
+      marginRight, marginBottom;
 
   $(name).text('Carousel room ' + $.getUrlVar('roomname'));
   $(name).attr("href", window.location.href);
@@ -518,16 +530,16 @@ function openCopyData
   cX = event.clientX;
   cY = event.clientY;
 
-  var winW = $(window).width();
-  var winH = $(window).height();
-  var wcW = jqWin.outerWidth();
-  var wcH = jqWin.outerHeight();
+  winW = $(window).width();
+  winH = $(window).height();
+  wcW = jqWin.outerWidth();
+  wcH = jqWin.outerHeight();
 
   // todo parse css dimension and use it to place dlg
   //var marginRight = $(jqWin).css("margin-right");
   //var marginBottom = $(jqWin).css("margin-bottom");
-  var marginRight = 20;
-  var marginBottom = wcH/5 + 20;
+  marginRight = 20;
+  marginBottom = wcH/5 + 20;
 
   // move dialog up if past bottom
   if ((cY + wcH + marginBottom) > winH)
@@ -574,8 +586,10 @@ function openChat(
     return false;
   }
   event.preventDefault();
-  var cTarget, cX, cY;
-  var jqWin = $("#boxes > div#chatInp");
+  var cTarget, cX, cY,
+      jqWin = $("#boxes > div#chatInp"),
+      url, recipientId, recipient, ename,
+      jqMask, winW, winH, wcH, wcW;
   /*
    * Get target. */
   cTarget = event.currentTarget;
@@ -583,14 +597,14 @@ function openChat(
     $('span', jqWin).attr("id", "feedback").text("Feedback message:");
   }
   else if ($(cTarget).hasClass("typeContent")) {
-    var url = $(cTarget).attr("url");
+    url = $(cTarget).attr("url");
     window.open(url, '_blank', 'width=800,height=600');
     return false;
   }
   else {
-    var recipientId = $(cTarget).attr("id");
-    var recipient = $(cTarget).attr("title");
-    var ename = $(cTarget).attr("encname");
+    recipientId = $(cTarget).attr("id");
+    recipient = $(cTarget).attr("title");
+    ename = $(cTarget).attr("encname");
     if (recipientId && recipientId.match("mystream")) {
       app.log(2, "Local player clicked, do nothing.");
       return false;
@@ -609,15 +623,15 @@ function openChat(
   cY = event.clientY;
   /*
    * Transition effect. */
-  var jqMask = $('#mask');
+  jqMask = $('#mask');
   jqMask.fadeIn(500, activateWindow("#chatInp"));
   jqMask.fadeTo("fast", 0.3);
   /*
    * Position chat Inp. */
-  var winW = $(window).width();
-  var winH = $(window).height();
-  var wcW = jqWin.outerWidth();
-  var wcH = jqWin.outerHeight();
+  winW = $(window).width();
+  winH = $(window).height();
+  wcW = jqWin.outerWidth();
+  wcH = jqWin.outerHeight();
   if ((cY + wcH) > winH) {
     jqWin.css("top", winH - wcH);
   }
@@ -671,9 +685,9 @@ function openMeeting(
   }
   // center carousel in it's container
   // the carousel positioning is handled by it's resize method
-  var sCar = $("#scarousel");
-  var rX = sCar.width() / 2;
-  var rY = sCar.height() / 2;
+  var sCar = $("#scarousel"),
+      rX = sCar.width() / 2,
+      rY = sCar.height() / 2;
   $("#scarousel").CloudCarousel(
     {
       xPos: rX,
@@ -805,13 +819,14 @@ function sendChat(
   if (event) {
     event.preventDefault();
   }
-  var jqChatText = $('#chatInp > input.chatTo');
-  var ltext = jqChatText.val();
+  var jqChatText = $('#chatInp > input.chatTo'),
+      ltext = jqChatText.val(),
+      jqChatSpan, id, ename;
   if (ltext.length < 1) {
     return false;
   }
-  var jqChatSpan = $('#chatInp > span');
-  var id = jqChatSpan.attr("id");
+  jqChatSpan = $('#chatInp > span');
+  id = jqChatSpan.attr("id");
   if (id.length < 1) {
     app.log(4, "Error in chat, no id.");
   }
@@ -823,7 +838,7 @@ function sendChat(
       Callcast.SendFeedback(encodeURI(ltext));
     }
     else {
-      var ename = jqChatSpan.attr("ename");
+      ename = jqChatSpan.attr("ename");
       Callcast.SendPrivateChat(encodeURI(ltext), ename);
     }
     app.log(2, "Sending chat to " + id);
@@ -881,8 +896,8 @@ function sendGrpChat(
   if (event) {
     event.preventDefault();
   }
-  var jqChatText = $('#msgBoard > input.chatTo');
-  var ltext = jqChatText.val();
+  var jqChatText = $('#msgBoard > input.chatTo'),
+      ltext = jqChatText.val();
   if (ltext.length < 1) {
     return false;
   }
@@ -918,18 +933,19 @@ function sendTwitter(
  */
 function changeVideo()
 {
-  var jqObj = $('#lower-right > #video');
+  var jqObj = $('#lower-right > #video'),
+      jqOo, w, h;
   if (!jqObj)
   {
      app.log(4, "couldn't find video button");
   }
   app.videoEnabled = $(jqObj).hasClass("on");
-  var jqOo = $('#mystream');
+  jqOo = $('#mystream');
   if (app.videoEnabled) {
     // Check object dimensions.
-    var w = jqOo.width() - 4;
-    var h = Callcast.HEIGHT * (w / Callcast.WIDTH);
-    Callcast.SendLocalVideoToPeers(new Object({width:w, height:h}));
+    w = jqOo.width() - 4;
+    h = Callcast.HEIGHT * (w / Callcast.WIDTH);
+    Callcast.SendLocalVideoToPeers({width: w, height: h});
     // remove background image to prevent it from showing around the plugin
     // if there is no fb image leave the default bg image since it does not show through
     if (app.user.fbProfilePicUrl)
@@ -965,12 +981,13 @@ function changeVideo()
 function changeAudio()
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
-  var jqObj = $('#lower-right > #audio');
+  var jqObj = $('#lower-right > #audio'),
+      bMuteAudio;
   if (!jqObj)
   {
      app.log(4, "couldn't find video button");
   }
-  var bMuteAudio = $(jqObj).hasClass("off");
+  bMuteAudio = $(jqObj).hasClass("off");
   Callcast.MuteLocalAudioCapture(bMuteAudio);
   $(jqObj).toggleClass("off");
   if (bMuteAudio) {
@@ -1066,11 +1083,12 @@ function openWindow(
 {
   /*
    * Get window height and width. */
-  var winH = $(window).height();
-  var winW = $(window).width();
+  var winH = $(window).height(),
+      winW = $(window).width(),
+      jqMask, jqWin;
   /*
    * Set mask height and width to fill the whole screen. */
-  var jqMask = $('#mask');
+  jqMask = $('#mask');
   jqMask.css({'width':winW,'height':winH});
   /*
    * Transition effect. */
@@ -1078,7 +1096,7 @@ function openWindow(
   jqMask.fadeTo("slow",0.8);
   /*
    * Center window. */
-  var jqWin = $(winId);
+  jqWin = $(winId);
   jqWin.css('top',  winH/2 - jqWin.height()/2);
   jqWin.css('left', winW/2 - jqWin.width()/2);
   /*
@@ -1112,7 +1130,7 @@ function closeWindow(
   }
   /*
    * Get active window. */
-  var jqActive = $('.window.active')
+  var jqActive = $('.window.active');
   if (jqActive[0]) {
     /*
      * Remove class active and call deactivate function. */
@@ -1139,8 +1157,9 @@ function resizeWindows(
 {
   /*
    * Get the window height and width. */
-  var winH = $(window).height();
-  var winW = $(window).width();
+  var winH = $(window).height(),
+      winW = $(window).width(),
+      jqW, meetW, meetOff;
   /*
    * Set mask height and width to fill the whole screen. */
   $('#mask').css({'width':winW,'height':winH});
@@ -1152,9 +1171,9 @@ function resizeWindows(
   });
   /*
    * Update window #meeting. */
-  var jqW = $('#meeting');
-  var meetW = jqW.width();
-  var meetOff = winW/2 - meetW/2;
+  jqW = $('#meeting');
+  meetW = jqW.width();
+  meetOff = winW/2 - meetW/2;
   jqW.css('left', meetOff);
 
   // resize carousel
@@ -1171,30 +1190,32 @@ function resizeWindows(
 ///
 function resizeZoom(event)
 {
-   var jqDiv = $('#meeting > #zoom > .cloudcarousel');
+   var jqDiv = $('#meeting > #zoom > .cloudcarousel'),
+       width, height, item, newWidth, newHeight,
+       widthScale, heightScale, scale, left, top;
    if (jqDiv.length > 0)
    {
-      var width =  $('#meeting > #zoom').width();
-      var height = $('#meeting > #zoom').height();
-      var item = $(jqDiv).data('item');
-      var newWidth  = width * 1.0; //app.carousel.options.xSpotRatio;
-      var newHeight = height * 1.0; //app.carousel.options.ySpotRatio;
-      var widthScale =  newWidth  / item.orgWidth;
-      var heightScale = newHeight / item.orgHeight;
-      var scale = (widthScale < heightScale) ? widthScale : heightScale;
+      width =  $('#meeting > #zoom').width();
+      height = $('#meeting > #zoom').height();
+      item = $(jqDiv).data('item');
+      newWidth  = width * 1.0; //app.carousel.options.xSpotRatio;
+      newHeight = height * 1.0; //app.carousel.options.ySpotRatio;
+      widthScale =  newWidth  / item.orgWidth;
+      heightScale = newHeight / item.orgHeight;
+      scale = (widthScale < heightScale) ? widthScale : heightScale;
       item.orgWidth     *= scale;
       item.orgHeight    *= scale;
-      item.plgOrgWidth  *= scale
-      item.plgOrgHeight *= scale
+      item.plgOrgWidth  *= scale;
+      item.plgOrgHeight *= scale;
 
       // center div in zoom div
-      var left = (width - item.orgWidth) / 2;
-      var top  = (height - item.orgHeight) / 2;
+      left = (width - item.orgWidth) / 2;
+      top  = (height - item.orgHeight) / 2;
 
-      $(jqDiv).css('width',  item.orgWidth  + 'px');
+      $(jqDiv).css('width', item.orgWidth + 'px');
       $(jqDiv).css('height', item.orgHeight + 'px');
-      $(jqDiv).css('left',   left + 'px');
-      $(jqDiv).css('top',    top  + 'px');
+      $(jqDiv).css('left', left + 'px');
+      $(jqDiv).css('top', top + 'px');
    }
 }
 
@@ -1293,31 +1314,31 @@ function checkCredentials(
 // room name and we'll join that room.
 //
 function handleRoomSetup() {
-	app.log(2, "handleRoomSetup entered");
-	var room_to_create = $.getUrlVar("roomname") || "";
+  app.log(2, "handleRoomSetup entered");
+  var room_to_create = $.getUrlVar("roomname") || "";
 
-	room_to_create = room_to_create.replace(/ /g, '');
+  room_to_create = room_to_create.replace(/ /g, '');
     app.log(2, "room_to_create " + room_to_create);
 
-	Callcast.CreateUnlistedAndJoin(room_to_create, function(new_name) {
-		// We successfully created the room.
-		// Joining is in process now.
-		// trigger of joined_room will happen upon join complete.
+  Callcast.CreateUnlistedAndJoin(room_to_create, function(new_name) {
+    // We successfully created the room.
+    // Joining is in process now.
+    // trigger of joined_room will happen upon join complete.
 
-		app.user.scheduleName = "Place to meet up";
-		app.user.scheduleJid = new_name + Callcast.AT_CALLCAST_ROOMS;
-		app.user.scheduleTitle = "Open room";
+    app.user.scheduleName = "Place to meet up";
+    app.user.scheduleJid = new_name + Callcast.AT_CALLCAST_ROOMS;
+    app.user.scheduleTitle = "Open room";
 
-		app.log(2, "Room named '" + new_name + "' has been created. Joining now.");
-		app.log(2, "window.location " + window.location);
-		if (room_to_create.length < 1)
-		{
-		   var newUrl = window.location + "?roomname=" + new_name
-   		   app.log(2, "replacing state " + newUrl);
-		   history.replaceState(null, null, newUrl);
-		}
-	});
-};
+    app.log(2, "Room named '" + new_name + "' has been created. Joining now.");
+    app.log(2, "window.location " + window.location);
+    if (room_to_create.length < 1)
+    {
+       var newUrl = window.location + "?roomname=" + new_name;
+       app.log(2, "replacing state " + newUrl);
+       history.replaceState(null, null, newUrl);
+    }
+  });
+}
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
@@ -1345,7 +1366,7 @@ function tryPluginInstall(
     $('.window .close').on("click", closeWindow);
     // Resize window.
     $(window).resize(resizeWindows);
-    
+
     //pluginLoaded(); // init local plugin
   }
   else { // plugin not loaded or out of date
@@ -1359,7 +1380,7 @@ function tryPluginInstall(
        prompt = $("#errorMsgPlugin > p#prompt");
        prompt.text("Please download and install the new version of the plugin");
     }
-    if (app.osPlatform.isLinux64 || app.osPlatform.isLinux32) 
+    if (app.osPlatform.isLinux64 || app.osPlatform.isLinux32)
     {
       $("#errorMsgPlugin").css("height", 300);
       $("#errorMsgPlugin > p > a#dlLink").parent().find("span").addClass("hidden");
@@ -1371,7 +1392,7 @@ function tryPluginInstall(
     }
     else
     {
-      $("#errorMsgPlugin > p > a#dlLink").parent().text("We are sorry. We couldn't identify your OS.")
+      $("#errorMsgPlugin > p > a#dlLink").parent().text("We are sorry. We couldn't identify your OS.");
     }
     openWindow('#errorMsgPlugin');
   }
@@ -1392,7 +1413,7 @@ var doDownload = function()
   {
     downloadURL(app.MAC_DL_URL);
   }
-  else if (app.osPlatform.isLinux64) 
+  else if (app.osPlatform.isLinux64)
   {
     downloadURL("https://video.gocast.it/downloads/GoCastPlayer_x86_64.tar.gz");
   }
@@ -1409,7 +1430,7 @@ var doDownload = function()
   }
   // windows install path is thru winEula
   // todo linux
-}
+};
 
 ///
 /// \brief display appropriate prompt depending on plugin install type
@@ -1433,7 +1454,7 @@ var installPrompt = function(pluginName)
     openWindow("#winWait");
     checkForPlugin(pluginName);
   }
-}
+};
 ///
 /// \brief download from an url
 ///
@@ -1443,13 +1464,13 @@ var downloadURL = function downloadURL(url)
     iframe = document.getElementById("hiddenDownloader");
     if (iframe === null)
     {
-        iframe = document.createElement('iframe');  
+        iframe = document.createElement('iframe');
         iframe.id = "hiddenDownloader";
         iframe.style.visibility = 'hidden';
         document.body.appendChild(iframe);
     }
-    iframe.src = url;   
-}
+    iframe.src = url;
+};
 
 ///
 /// \brief close the eula window, download the win install file, launch function to check for plugin
@@ -1474,12 +1495,12 @@ function winInstall(event)
 ///
 function checkForPlugin(name)
 {
-   var i;
+   var i, item;
    navigator.plugins.refresh();
    // find player
-   for (i = 0; i < window.navigator.plugins.length; ++i)
+   for (i = 0; i < window.navigator.plugins.length; i += 1)
    {
-      var item = window.navigator.plugins[i];
+      item = window.navigator.plugins[i];
       app.log(2, 'plugin filename ' + item.filename);
       if (item && item.filename === name)
       {
@@ -1621,7 +1642,7 @@ $(document).ready(function(
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
   navigator.plugins.refresh(); // reload plugins to get any plugin updates
-  
+
   // Check the browser.
   app.getBrowser();
   app.checkBrowser();
@@ -1643,9 +1664,9 @@ $(document).ready(function(
 
 $.extend({
 getUrlVars: function(){
- var vars = [], hash;
- var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
- for(var i = 0; i < hashes.length; i++)
+ var vars = [], hash, i,
+     hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+ for(i = 0; i < hashes.length; i += 1)
  {
    hash = hashes[i].split('=');
    vars.push(hash[0]);
