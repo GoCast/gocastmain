@@ -1446,11 +1446,8 @@ function Overseer(user, pw, notifier) {
 
         for (i in process.argv)
         {
-            if (process.argv.hasOwnProperty(i)) {
-                // Don't start processing args until we get beyond the .js itself.
-                if (i < starting_arg) {
-                    continue;
-                }
+            // Don't start processing args until we get beyond the .js itself.
+            if (process.argv.hasOwnProperty(i) && i >= starting_arg) {
 
                 if (process.argv[i].charAt(0) === '-') {
                     option = process.argv[i].substring(1);
@@ -1460,30 +1457,28 @@ function Overseer(user, pw, notifier) {
                         user = user + '/' + option;
                         this.log('OVERSEER: JID = ' + user);
                     }
-
-                    continue;
                 }
+                else {
+                    this.log('Reading XML File: ' + process.argv[i]);
 
-                this.log('Reading XML File: ' + process.argv[i]);
+                    roomsxml = loadRooms(process.argv[i]); // '/var/www/etzchayim/xml/schedules.xml');
+                    par = new ltx.parse(roomsxml);
+                    rooms = par.getChildren('room');
 
-                roomsxml = loadRooms(process.argv[i]); // '/var/www/etzchayim/xml/schedules.xml');
-                par = new ltx.parse(roomsxml);
-                rooms = par.getChildren('room');
+                    for (k in rooms)
+                    {
+                        if (rooms.hasOwnProperty(k)) {
+                            if (this.roomnames[rooms[k].attrs.jid.split('@')[0]]) {
+                                this.log('  WARNING: Duplicate Room: ' + rooms[k].attrs.jid);
+                            }
+                            else {
+                                this.log('  Monitoring room: ' + rooms[k].attrs.jid);
+                            }
 
-                for (k in rooms)
-                {
-                    if (rooms.hasOwnProperty(k)) {
-                        if (this.roomnames[rooms[k].attrs.jid.split('@')[0]]) {
-                            this.log('  WARNING: Duplicate Room: ' + rooms[k].attrs.jid);
+                            this.roomnames[rooms[k].attrs.jid.split('@')[0]] = true;
                         }
-                        else {
-                            this.log('  Monitoring room: ' + rooms[k].attrs.jid);
-                        }
-
-                        this.roomnames[rooms[k].attrs.jid.split('@')[0]] = true;
                     }
                 }
-
             }
         }
     }
