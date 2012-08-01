@@ -541,6 +541,7 @@ function removePluginFromCarousel(
 ///
 /// the local plugin is instantiated in index.html
 ///
+/*
 function reloadLocalPlugin()
 {
   try
@@ -561,8 +562,8 @@ function reloadLocalPlugin()
   {
      app.log(4, "reloadLocalPlugin exception " + err);
   }
-} /* removePluginFromCarousel() */
-
+} // reloadLocalPlugin
+*/
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
@@ -690,9 +691,20 @@ function pluginLoaded(
 )
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
-  app.log(2, 'Local Plugin Loaded.');
-  if (!Callcast.pluginUpdateRequired())
+  app.log(2, 'pluginLoaded Local Plugin Loaded.');
+  if (Callcast.localplayer !== null)
   {
+     app.log(2, 'pluginLoaded Callcast.localplayer != null, plugin is already loaded');
+     return; // assume player is already loaded if localPlayer is not null
+  }
+  Callcast.localplayer = $('#mystream > object.localplayer').get(0);
+  app.log(2, 'pluginLoaded checking plugin update required');
+  if (!Callcast.pluginUpdateRequired()) // do not access plugin api if it needs to be upgraded
+  {
+     app.log(2, 'pluginLoaded plugin up to date ');
+     // set localPlayer to null since Init... checks for it to be null
+     // before it will proceed
+     Callcast.localplayer = null;
      Callcast.InitGocastPlayer('#mystream > object.localplayer', function(message)
      {
        //Initialization successful.
@@ -706,6 +718,10 @@ function pluginLoaded(
        Callcast.setCallbackForAddSpot(addSpot);
        Callcast.setCallbackForRemoveSpot(removeSpot);
 
+       // Callcast Seetings.
+       // todo there's an app member for video state, merge it with callcast video state
+       Callcast.SetUseVideo(false); // Initially set to false, user must enable.
+
        handleRoomSetup();
      }, function(message) {
        // Failure to initialize.
@@ -715,4 +731,9 @@ function pluginLoaded(
        openWindow('#errorMsgPlugin');
      });
   }
+  else // pluginLoaded but out of date
+  {
+     app.pluginUpgrade = true;
+  }
+  app.pluginLoaded = true;
 } /* pluginLoaded() */

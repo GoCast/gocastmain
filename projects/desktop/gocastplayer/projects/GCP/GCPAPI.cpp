@@ -84,15 +84,24 @@ void GCPAPI::set_source(const FB::JSAPIPtr& stream)
         {
             FBLOG_INFO_CUSTOM(funcstr("GCAPAPI::set_source", m_htmlId.convert_cast<std::string>()),
                               "Setting local video track renderer...");
-            (GoCast::RtcCenter::Instance())->SetLocalVideoTrackRenderer(getPlugin()->Renderer());
+			if(NULL != getPlugin()->Renderer().get())
+			{
+				GoCast::GCPVideoRenderer* pRenderer = dynamic_cast<GoCast::GCPVideoRenderer*>(getPlugin()->Renderer()->renderer());
+				if(NULL != pRenderer)
+				{
+					pRenderer->SetPreviewMode(true);
+				}
+
+				(GoCast::RtcCenter::Instance())->SetLocalVideoTrackRenderer(getPlugin()->Renderer());
+			}
         }
         else
         {
             FBLOG_INFO_CUSTOM(funcstr("GCAPAPI::set_source", m_htmlId.convert_cast<std::string>()),
                               "Setting remote video track renderer...");
             (GoCast::RtcCenter::Instance())->SetRemoteVideoTrackRenderer(m_htmlId.convert_cast<std::string>(),
-                                                                         getPlugin()->Renderer());
-        }
+		                                                                 getPlugin()->Renderer());
+		}
     }
 }
 
@@ -110,6 +119,7 @@ void GCPAPI::GetUserMedia(const FB::JSObjectPtr& mediaHints,
         return;
     }
     
+	m_htmlId = "localPlayer";
     pCtr->GetUserMedia(mediaHints, succCb, failCb);
 }
 

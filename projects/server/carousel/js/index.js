@@ -173,9 +173,11 @@ var app = {
   {
      return app.xmppLoggedIn && app.userLoggedIn;
   },
-  // logged in state
+  // logged in and loaded state
   xmppLoggedIn : false,
   userLoggedIn : false,
+  pluginLoaded : false,
+  pluginUpgrade : false,
   // carousel controller instance
   carousel: null,
   /*
@@ -1329,18 +1331,23 @@ function tryPluginInstall(
 {
   var title, prompt;
   app.log(2, "tryPluginInstall");
-  /*
-   * check plugin installed. */
-  if (app.pluginInstalled() && !Callcast.pluginUpdateRequired())
+  // check plugin installed.
+  // if plugin installed but not loaded wait
+  // todo get rid of multiple pluginInstalled calls
+  if (app.pluginInstalled() && !app.pluginLoaded)
   {
-    /*
-     * Close buttons. */
-    $('.window .close').on("click", closeWindow);
-    /*
-     * Resize window. */
-    $(window).resize(resizeWindows);
+     setTimeout(tryPluginInstall, 500);
   }
-  else {
+  else if (app.pluginInstalled() && app.pluginLoaded && !app.pluginUpgrade) // good to go
+  {
+    // Close buttons.
+    $('.window .close').on("click", closeWindow);
+    // Resize window.
+    $(window).resize(resizeWindows);
+    
+    //pluginLoaded(); // init local plugin
+  }
+  else { // plugin not loaded or out of date
     // prompt user to install plugin
     // check if plugin is installed and out of data
     // if so change prompt
@@ -1545,6 +1552,8 @@ $(document).ready(function(
 )
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
+  navigator.plugins.refresh(); // reload plugins to get any plugin updates
+  
   // Check the browser.
   app.getBrowser();
   app.checkBrowser();

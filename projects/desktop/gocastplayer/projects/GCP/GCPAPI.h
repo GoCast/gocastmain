@@ -33,7 +33,7 @@ public:
     : m_readyState("PRENEW")
     , m_plugin(plugin)
     , m_host(host)
-    , m_htmlId("localPlayer")
+    , m_htmlId("")
     {
         // API for getting local media (if used, corresponding plugin instance
         // shouldn't call any of the peerconnection APIS)
@@ -90,7 +90,7 @@ public:
     void set_source(const FB::JSAPIPtr& stream);
     
     // C++ member get methods
-    //std::string HtmlId() const { return m_htmlId.convert_cast<std::string>(); }
+    std::string HtmlId() const { return m_htmlId.convert_cast<std::string>(); }
     
     //---------------------- UserMedia Methods ---------------------
     void GetUserMedia(const FB::JSObjectPtr& mediaHints,
