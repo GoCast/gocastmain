@@ -137,11 +137,18 @@ bool GCP::onWindowAttached(FB::AttachedEvent *evt, FB::PluginWindow *pWin)
         {
             FBLOG_INFO_CUSTOM("GCP::onWindowAttached()", "Creating video renderer...");
             
-            m_pRenderer = webrtc::CreateVideoRenderer(new GoCast::GCPVideoRenderer(pWin));
-            /*if("localPlayer" == static_cast<GCPAPI*>(getRootJSAPI().get())->HtmlId())
-            {
-                static_cast<GoCast::GCPVideoRenderer*>(m_pRenderer->renderer())->SetPreviewMode(true);
-            }*/
+			GoCast::GCPVideoRenderer* pRenderer = new GoCast::GCPVideoRenderer(pWin);
+			GCPAPI* pJsapi = dynamic_cast<GCPAPI*>(getRootJSAPI().get());
+            m_pRenderer = webrtc::CreateVideoRenderer(pRenderer);
+
+			if(NULL != pJsapi)
+			{
+				if("localPlayer" == pJsapi->HtmlId())
+				{
+					pRenderer->SetPreviewMode(true);
+					(GoCast::RtcCenter::Instance())->SetLocalVideoTrackRenderer(m_pRenderer);
+				}
+			}
             
             FBLOG_INFO_CUSTOM("GCP::onWindowAttached()", "Creating video renderer DONE");
         }

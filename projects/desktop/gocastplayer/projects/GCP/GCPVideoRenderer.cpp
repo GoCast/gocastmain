@@ -10,14 +10,14 @@ namespace GoCast
     , m_bPreview(false)
     {
         m_pFrameBuffer.reset();
-        m_pMirrorBuffers[0].reset();
-        m_pMirrorBuffers[1].reset();
+        m_pMirrorBuffers[0] = NULL;
+        m_pMirrorBuffers[1] = NULL;
     }
     
     GCPVideoRenderer::~GCPVideoRenderer()
     {
-        m_pMirrorBuffers[0].reset(NULL);
-        m_pMirrorBuffers[1].reset(NULL);
+		FreeBuffer(m_pMirrorBuffers[0]);
+		FreeBuffer(m_pMirrorBuffers[1]);
         m_pFrameBuffer.reset(NULL);
     }
     
@@ -45,7 +45,7 @@ namespace GoCast
         
         if(true == m_bPreview)
         {
-            if(0 > webrtc::ConvertI420ToARGB8888(m_pMirrorBuffers[1].get(),
+            if(0 > webrtc::ConvertI420ToARGB8888(m_pMirrorBuffers[1],
                                                  m_pFrameBuffer.get(),
                                                  m_width,
                                                  m_height))
@@ -84,27 +84,31 @@ namespace GoCast
             return true;
         }
         
-        if(NULL == m_pMirrorBuffers[0].get())
+		if(0 >= m_width || 0 >= m_height)
+		{
+			return false;
+		}
+
+        if(NULL == m_pMirrorBuffers[0])
         {
-            m_pMirrorBuffers[0].reset(new uint8[pFrame->SizeOf(m_width, m_height)]);
+			m_pMirrorBuffers[0] = AllocBuffer(cricket::VideoFrame::SizeOf(m_width, m_height));
         }
         
-        if(NULL == m_pMirrorBuffers[1].get())
+        if(NULL == m_pMirrorBuffers[1])
         {
-            m_pMirrorBuffers[1].reset(new uint8[pFrame->SizeOf(m_width, m_height)]);
+            m_pMirrorBuffers[1] = AllocBuffer(cricket::VideoFrame::SizeOf(m_width, m_height));
         }
         
-        if(0 >= pFrame->CopyToBuffer(m_pMirrorBuffers[0].get(), pFrame->SizeOf(m_width, m_height)))
+        if(0 >= pFrame->CopyToBuffer(m_pMirrorBuffers[0], pFrame->SizeOf(m_width, m_height)))
         {
             return false;
         }
         
-        if(0 > webrtc::MirrorI420LeftRight(m_pMirrorBuffers[0].get(), m_pMirrorBuffers[1].get(), m_width, m_height))
+        if(0 > webrtc::MirrorI420LeftRight(m_pMirrorBuffers[0], m_pMirrorBuffers[1], m_width, m_height))
         {
             return false;
         }
         
         return true;
     }
-    
 }
