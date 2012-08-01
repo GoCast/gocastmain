@@ -23,6 +23,10 @@
  * \brief The main application object.
  */
 var app = {
+  MAC_DL_URL: "https://video.gocast.it/downloads/GoCastPlayer.pkg",
+  WIN_DL_URL: "https://video.gocast.it/downloads/GoCastPlayer.msi",
+  MAC_PL_NAME: "GCP.plugin",
+  WIN_PL_NAME: "npGCP.dll",
   /**
    * Writes the specified log entry into the console HTML element, if
    * present. The meaning of logLevel is 1: debug, 2: info, 3:
@@ -1346,7 +1350,7 @@ function tryPluginInstall(
   }
   else { // plugin not loaded or out of date
     // prompt user to install plugin
-    // check if plugin is installed and out of data
+    // check if plugin is installed and out of date
     // if so change prompt
     if (app.pluginInstalled() && Callcast.pluginUpdateRequired())
     {
@@ -1355,32 +1359,68 @@ function tryPluginInstall(
        prompt = $("#errorMsgPlugin > p#prompt");
        prompt.text("Please download and install the new version of the plugin");
     }
-    /*
-     * Alert user to download and install the plugin. */
-    if (app.osPlatform.isWin) {
-      $("#errorMsgPlugin > p > a#dlLink").attr("href","javascript:closeWindow();openWindow('#winEula');void(null);");
-    }
-    else if (app.osPlatform.isMac) {
-      $("#errorMsgPlugin > p > a#dlLink").attr("href","https://video.gocast.it/downloads/GoCastPlayer.pkg");
-    }
-    else if (app.osPlatform.isLinux64 || app.osPlatform.isLinux32) {
+    if (app.osPlatform.isLinux64 || app.osPlatform.isLinux32) 
+    {
       $("#errorMsgPlugin").css("height", 300);
-      if (app.osPlatform.isLinux64) {
-        $("#errorMsgPlugin > p > a#dlLink").attr("href","https://video.gocast.it/downloads/GoCastPlayer_x86_64.tar.gz");
-      }
-      else {
-        $("#errorMsgPlugin > p > a#dlLink").attr("href","https://video.gocast.it/downloads/GoCastPlayer_i686.tar.gz");
-      }
       $("#errorMsgPlugin > p > a#dlLink").parent().find("span").addClass("hidden");
       $("#errorMsgPlugin > .linuxExplanation").removeClass("hidden");
     }
-    else {
+    else if (app.osPlatform.isWin || app.osPlatform.isMac)
+    {
+      // do nothing
+    }
+    else
+    {
       $("#errorMsgPlugin > p > a#dlLink").parent().text("We are sorry. We couldn't identify your OS.")
     }
     openWindow('#errorMsgPlugin');
   }
 } /* tryPluginInstall() */
 
+///
+/// \brief update plugin dl msg and dl plugin
+///
+var doDownload = function()
+{
+  // Alert user to download and install the plugin.
+  if (app.osPlatform.isWin)
+  {
+    closeWindow();
+    openWindow('#winEula');
+  }
+  else if (app.osPlatform.isMac)
+  {
+    downloadURL(app.MAC_DL_URL);
+  }
+  else if (app.osPlatform.isLinux64) 
+  {
+    downloadURL("https://video.gocast.it/downloads/GoCastPlayer_x86_64.tar.gz");
+  }
+  else if (app.osPlatform.isLinux32)
+  {
+    downloadURL("href","https://video.gocast.it/downloads/GoCastPlayer_i686.tar.gz");
+  }
+
+  // prompt user for next step
+  // chrome can't load an upgraded plugin so prompt user to restart
+  if (app.browser.name === "Chrome" && app.pluginInstalled() && Callcast.pluginUpdateRequired())
+  {
+    closeWindow();
+    openWindow('#chromeRestart');
+  }
+  else if (app.osPlatform.isMac)
+  {
+    closeWindow();
+    openWindow("#winWait");
+    checkForPlugin(app.MAC_PL_NAME);
+  }
+  // windows install path is thru winEula
+  // todo linux
+}
+
+///
+/// \brief download from an url
+///
 var downloadURL = function downloadURL(url)
 {
     var iframe;
@@ -1404,30 +1444,32 @@ function winInstall(event)
    closeWindow();
 
    // get the windows install file
-   $.post("https://video.gocast.it/downloads/GoCastPlayer.msi",
+   $.post(app.WIN_DL_URL,
           function(data)
           {
              console.log(data);
           });
 
    openWindow("#winWait");
-   winCheckForPlugin();
+   checkForPlugin(app.WIN_PL_NAME);
 }
 
 ///
 /// \brief periodically check for the player to be installed and prompt user
 ///
-function winCheckForPlugin()
+function checkForPlugin(name)
 {
+   var i;
+   navigator.plugins.refresh();
    // find player
    for (i = 0; i < window.navigator.plugins.length; ++i)
    {
       var item = window.navigator.plugins[i];
-      //app.log(2, 'plugin filename ' + item.filename);
-      if (item && item.filename === 'npGCP.dll')
+      app.log(2, 'plugin filename ' + item.filename);
+      if (item && item.filename === name)
       {
          clearTimeout(app.winTimeout);
-         app.log(2, "winCheckForPlugin found player.");
+         app.log(2, "checkForPlugin found player " + name);
          $('#winWait > #status > #spinner').attr("src", "images/green-tick.png");
          $('#winWait > #status > #msg').text("The GoCast plugin is installed.");
 
@@ -1438,7 +1480,7 @@ function winCheckForPlugin()
    }
 
    // plugin was not found in list wait and recheck
-   app.winTimeout = setTimeout(winCheckForPlugin, 3000);
+   app.winTimeout = setTimeout(checkForPlugin(name), 3000);
    app.log(2, "winCheckForPlugin no player, waiting...");
 }
 
