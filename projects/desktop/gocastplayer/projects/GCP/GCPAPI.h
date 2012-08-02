@@ -49,6 +49,7 @@ public:
         registerMethod("setRemoteDescription", make_method(this, &GCPAPI::SetRemoteDescription));
         registerMethod("processIceMessage", make_method(this, &GCPAPI::ProcessIceMessage));
         registerMethod("startIce", make_method(this, &GCPAPI::StartIce));
+        registerMethod("deinit", make_method(this, &GCPAPI::DeletePeerConnection));
         
         // Properties
         registerProperty("version", make_property(this, &GCPAPI::get_version));
@@ -112,6 +113,7 @@ public:
     FB::variant SetRemoteDescription(const FB::variant& action, const FB::variant& sdp);
     FB::variant ProcessIceMessage(const FB::variant& sdp);
     FB::variant StartIce();
+    FB::variant DeletePeerConnection();
     
 private:
     // --------------------- PeerConnectionObserver Methods -----------------
@@ -123,9 +125,6 @@ private:
     virtual void OnRemoveStream(webrtc::MediaStreamInterface* pRemoteStream);
     virtual void OnIceCandidate(const webrtc::IceCandidateInterface* pCandidate);
     virtual void OnIceComplete();
-
-private:
-    FB::variant DeletePeerConnection();
     
 private:
     std::string m_readyState;

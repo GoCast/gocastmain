@@ -128,16 +128,17 @@ FB::variant GCPAPI::Init(const FB::variant& htmlId,
                          const FB::JSObjectPtr& iceCallback)
 {
     GoCast::RtcCenter* pCtr = GoCast::RtcCenter::Instance();
+    m_htmlId = htmlId;
+    m_iceCb = iceCallback;
     
     if(false == pCtr->Inited())
     {
-        FBLOG_ERROR_CUSTOM(funcstr("GCPAPI::Init", m_htmlId.convert_cast<std::string>()),
-                           "Failed to init RtcCenter singleton");
+        std::string msg = m_htmlId.convert_cast<std::string>();
+        msg += ": Failed to init RtcCenter singleton";
+        FBLOG_ERROR_CUSTOM("GCPAPI::Init",msg);
         return false;
     }
     
-    m_htmlId = htmlId;
-    m_iceCb = iceCallback;
     if(false == pCtr->NewPeerConnection(m_htmlId.convert_cast<std::string>(),
                                         iceConfig.convert_cast<std::string>(),
                                         this))
@@ -156,8 +157,9 @@ FB::variant GCPAPI::AddStream(const FB::JSAPIPtr& stream)
     
     if(false == pCtr->Inited())
     {
-        FBLOG_ERROR_CUSTOM(funcstr("GCPAPI::AddStream", m_htmlId.convert_cast<std::string>()),
-                           "Failed to init RtcCenter singleton");
+        std::string msg = m_htmlId.convert_cast<std::string>();
+        msg += ": Failed to init RtcCenter singleton";
+        FBLOG_ERROR_CUSTOM("GCPAPI::AddStream",msg);
         return false;
     }
 
@@ -171,8 +173,9 @@ FB::variant GCPAPI::RemoveStream(const FB::JSAPIPtr& stream)
     
     if(false == pCtr->Inited())
     {
-        FBLOG_ERROR_CUSTOM(funcstr("GCPAPI::RemoveStream", m_htmlId.convert_cast<std::string>()),
-                           "Failed to init RtcCenter singleton");
+        std::string msg = m_htmlId.convert_cast<std::string>();
+        msg += ": Failed to init RtcCenter singleton";
+        FBLOG_ERROR_CUSTOM("GCPAPI::RemoveStream",msg);
         return false;
     }
     
@@ -188,8 +191,9 @@ FB::variant GCPAPI::CreateOffer(const FB::JSObjectPtr& mediaHints)
     
     if(false == pCtr->Inited())
     {
-        FBLOG_ERROR_CUSTOM(funcstr("GCPAPI::CreateOffer", m_htmlId.convert_cast<std::string>()),
-                           "Failed to init RtcCenter singleton");
+        std::string msg = m_htmlId.convert_cast<std::string>();
+        msg += ": Failed to init RtcCenter singleton";
+        FBLOG_ERROR_CUSTOM("GCPAPI::CreateOffer",msg);
         return "";
     }
     
@@ -214,8 +218,9 @@ FB::variant GCPAPI::CreateAnswer(const FB::variant& offer, const FB::JSObjectPtr
     
     if(false == pCtr->Inited())
     {
-        FBLOG_ERROR_CUSTOM(funcstr("GCPAPI::CreateAnswer", m_htmlId.convert_cast<std::string>()),
-                           "Failed to init RtcCenter singleton");
+        std::string msg = m_htmlId.convert_cast<std::string>();
+        msg += ": Failed to init RtcCenter singleton";
+        FBLOG_ERROR_CUSTOM("GCPAPI::CreateAnswer", msg);
         return "";
     }
     
@@ -305,6 +310,20 @@ FB::variant GCPAPI::StartIce()
     }
     
     return pCtr->StartIce(m_htmlId.convert_cast<std::string>());    
+}
+
+FB::variant GCPAPI::DeletePeerConnection()
+{
+    GoCast::RtcCenter* pCtr = GoCast::RtcCenter::Instance();
+    
+    if(false == pCtr->Inited())
+    {
+        FBLOG_ERROR_CUSTOM(funcstr("GCPAPI::DeletePeerConnection", m_htmlId.convert_cast<std::string>()),
+                           "Failed to init RtcCenter singleton");
+        return false;
+    }
+    
+    return pCtr->DeletePeerConnection(m_htmlId.convert_cast<std::string>());
 }
 
 void GCPAPI::OnStateChange(StateType state_changed)
@@ -403,18 +422,4 @@ void GCPAPI::OnIceComplete()
                           "ICE process complete");
         m_iceCb->InvokeAsync("", FB::variant_list_of("")(false));
     }
-}
-
-FB::variant GCPAPI::DeletePeerConnection()
-{
-    GoCast::RtcCenter* pCtr = GoCast::RtcCenter::Instance();
-    
-    if(false == pCtr->Inited())
-    {
-        FBLOG_ERROR_CUSTOM(funcstr("GCPAPI::DeletePeerConnection", m_htmlId.convert_cast<std::string>()),
-                           "Failed to init RtcCenter singleton");
-        return false;
-    }
-    
-    return pCtr->DeletePeerConnection(m_htmlId.convert_cast<std::string>());
 }

@@ -254,7 +254,7 @@ GoCastJS.PeerConnection.prototype.CreateAnswer = function(offer, mediaHints) {
 //!                                                       failure)
 //!
 //! arguments:
-//!     action <string> : 'OFFER' (if offer) or 'ANSWER' (if answer)
+//!     action <string> : 'OFFER' (if offer) or 'ANSWER' (if Ôanswer)
 //!     sdp    <string> : sdp to be used as local peer's description
 //!     success <function()>        : success callback
 //!     failure <function(message)> : failure callback with message
@@ -315,6 +315,12 @@ GoCastJS.PeerConnection.prototype.StartIce = function() {
         throw new GoCastJS.Exception(this.player.id, 'startIce() failed.');
     }
 };
+
+GoCastJS.PeerConnection.prototype.Deinit = function() {
+    if(false === this.player.deinit()) {
+        throw new GoCastJS.Exception(this.player.id, 'deinit() failed.');
+    }
+}
 
 //!
 //! function: GoCastJS.PeerConnection.ReadyState()
