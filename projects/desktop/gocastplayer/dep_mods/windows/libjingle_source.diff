@@ -1,0 +1,788 @@
+Index: talk/app/webrtc/mediastreamhandler.h
+===================================================================
+--- talk/app/webrtc/mediastreamhandler.h	(revision 153)
++++ talk/app/webrtc/mediastreamhandler.h	(working copy)
+@@ -65,7 +65,7 @@
+   bool enabled_;
+   talk_base::scoped_refptr<VideoRendererWrapperInterface> renderer_;
+ };
+-
++    
+ class LocalVideoTrackHandler : public VideoTrackHandler {
+  public:
+   LocalVideoTrackHandler(LocalVideoTrackInterface* track,
+@@ -96,6 +96,52 @@
+   talk_base::scoped_refptr<VideoTrackInterface> remote_video_track_;
+ };
+ 
++    // <GOCAST>
++    class AudioTrackHandler : public ObserverInterface {
++    public:
++        AudioTrackHandler(AudioTrackInterface* track,
++                          MediaProviderInterface* provider);
++        virtual ~AudioTrackHandler();
++        virtual void OnChanged();
++        
++    protected:
++        virtual void OnEnabledChanged() = 0;
++        
++    protected:
++        MediaProviderInterface* provider_;
++        AudioTrackInterface* audio_track_;
++        
++    private:
++        bool enabled_;
++    };
++    
++    class LocalAudioTrackHandler : public AudioTrackHandler {
++    public:
++        LocalAudioTrackHandler(LocalAudioTrackInterface* track,
++                               MediaProviderInterface* provider);
++        virtual ~LocalAudioTrackHandler();
++        
++    protected:
++        virtual void OnEnabledChanged();
++        
++    private:
++        talk_base::scoped_refptr<LocalAudioTrackInterface> local_audio_track_;
++    };
++    
++    class RemoteAudioTrackHandler : public AudioTrackHandler {
++    public:
++        RemoteAudioTrackHandler(AudioTrackInterface* track,
++                                MediaProviderInterface* provider);
++        virtual ~RemoteAudioTrackHandler();
++        
++    protected:
++        virtual void OnEnabledChanged();
++        
++    private:
++        talk_base::scoped_refptr<AudioTrackInterface> remote_audio_track_;
++    };
++    // </GOCAST>
++
+ class MediaStreamHandler : public ObserverInterface {
+  public:
+   MediaStreamHandler(MediaStreamInterface* stream,
+@@ -109,6 +155,11 @@
+   MediaProviderInterface* provider_;
+   typedef std::vector<VideoTrackHandler*> VideoTrackHandlers;
+   VideoTrackHandlers video_handlers_;
++    
++    // <GOCAST>
++    typedef std::vector<AudioTrackHandler*> AudioTrackHandlers;
++    AudioTrackHandlers audio_handlers_;
++    // </GOCAST>
+ };
+ 
+ class LocalMediaStreamHandler : public MediaStreamHandler {
+Index: talk/app/webrtc/webrtcsession.h
+===================================================================
+--- talk/app/webrtc/webrtcsession.h	(revision 153)
++++ talk/app/webrtc/webrtcsession.h	(working copy)
+@@ -114,7 +114,11 @@
+                                 cricket::VideoRenderer* renderer);
+   virtual void SetRemoteRenderer(const std::string& name,
+                                  cricket::VideoRenderer* renderer);
+-
++                          
++  // <GOCAST>
++  virtual bool SetMicMute(bool enable);
++  // </GOCAST>
++                          
+   // Transport related callbacks, override from cricket::BaseSession.
+   virtual void OnTransportRequestSignaling(cricket::Transport* transport);
+   virtual void OnTransportConnecting(cricket::Transport* transport);
+Index: talk/app/webrtc/webrtcsession.cc
+===================================================================
+--- talk/app/webrtc/webrtcsession.cc	(revision 153)
++++ talk/app/webrtc/webrtcsession.cc	(working copy)
+@@ -59,10 +59,10 @@
+ // Constants for setting the default encoder size.
+ // TODO: Implement proper negotiation of video resolution.
+ static const int kDefaultVideoCodecId = 100;
+-static const int kDefaultVideoCodecFramerate = 30;
++    static const int kDefaultVideoCodecFramerate = 24; // <GOCAST> 30;
+ static const char kDefaultVideoCodecName[] = "VP8";
+-static const int kDefaultVideoCodecWidth = 640;
+-static const int kDefaultVideoCodecHeight = 480;
++    static const int kDefaultVideoCodecWidth = 160; // <GOCAST> 640;
++    static const int kDefaultVideoCodecHeight = 120; // <GOCAST> 480;
+ 
+ static void CopyCandidatesFromSessionDescription(
+     const SessionDescriptionInterface* source_desc,
+@@ -431,6 +431,11 @@
+ void WebRtcSession::SetLocalRenderer(const std::string& name,
+                                      cricket::VideoRenderer* renderer) {
+   ASSERT(signaling_thread()->IsCurrent());
++    
++    //<GOCAST>
++    channel_manager_->SetLocalRenderer(renderer);
++    //</GOCAST>
++    
+   // TODO: Fix SetLocalRenderer.
+   // video_channel_->SetLocalRenderer(0, renderer);
+ }
+@@ -449,7 +454,7 @@
+     LOG(LS_ERROR) << "Video not received in this call";
+     return;
+   }
+-
++    
+   const cricket::MediaContentDescription* video_content =
+       static_cast<const cricket::MediaContentDescription*>(
+           video_info->description);
+@@ -464,6 +469,12 @@
+   }
+ }
+ 
++    // <GOCAST>
++    bool WebRtcSession::SetMicMute(bool enable) {
++        return channel_manager_->SetMicMute(enable);
++    }
++    // </GOCAST>
++    
+ void WebRtcSession::OnTransportRequestSignaling(
+     cricket::Transport* transport) {
+   ASSERT(signaling_thread()->IsCurrent());
+Index: talk/app/webrtc/mediastreamprovider.h
+===================================================================
+--- talk/app/webrtc/mediastreamprovider.h	(revision 153)
++++ talk/app/webrtc/mediastreamprovider.h	(working copy)
+@@ -48,6 +48,10 @@
+                                 cricket::VideoRenderer* renderer) = 0;
+   virtual void SetRemoteRenderer(const std::string& name,
+                                  cricket::VideoRenderer* renderer) = 0;
++    // <GOCAST>
++    virtual bool SetMicMute(bool enable) = 0;
++    // </GOCAST>
++    
+  protected:
+   virtual ~MediaProviderInterface() {}
+ };
+Index: talk/app/webrtc/mediastreamhandler.cc
+===================================================================
+--- talk/app/webrtc/mediastreamhandler.cc	(revision 153)
++++ talk/app/webrtc/mediastreamhandler.cc	(working copy)
+@@ -69,8 +69,15 @@
+     MediaProviderInterface* provider)
+     : VideoTrackHandler(track, provider),
+       local_video_track_(track) {
++          // <GOCAST>
++          if(true == track->enabled()) {
++          // </GOCAST>
+   provider_->SetCaptureDevice(local_video_track_->label(),
+                               local_video_track_->GetVideoCapture());
++          // <GOCAST>
++          }
++          // </GOCAST>
++          
+   VideoRendererWrapperInterface* renderer = video_track_->GetRenderer();
+   if (renderer)
+     provider_->SetLocalRenderer(video_track_->label(), renderer->renderer());
+@@ -81,8 +88,9 @@
+   // the track. It must be removed from the media stream provider since it is
+   // possible that the tracks reference count is set to zero when
+   // local_video_track_ falls out of scope.
+-  provider_->SetLocalRenderer(local_video_track_->label(), NULL);
+-  provider_->SetCaptureDevice(local_video_track_->label(), NULL);
++    
++  // <GOCAST> provider_->SetLocalRenderer(local_video_track_->label(), NULL);
++  // <GOCAST> provider_->SetCaptureDevice(local_video_track_->label(), NULL);
+ }
+ 
+ void LocalVideoTrackHandler::OnRendererChanged() {
+@@ -98,6 +106,16 @@
+ 
+ void LocalVideoTrackHandler::OnEnabledChanged() {
+   // TODO What should happen when enabled is changed?
++    //<GOCAST>
++    if(false == local_video_track_->enabled())
++    {
++        provider_->SetCaptureDevice(local_video_track_->label(), NULL);
++    }
++    else
++    {
++        provider_->SetCaptureDevice(local_video_track_->label(), local_video_track_->GetVideoCapture());
++    }
++    //</GOCAST>
+ }
+ 
+ RemoteVideoTrackHandler::RemoteVideoTrackHandler(
+@@ -129,6 +147,57 @@
+   // TODO: What should happen when enabled is changed?
+ }
+ 
++    // <GOCAST>
++    AudioTrackHandler::AudioTrackHandler(AudioTrackInterface* track,
++                                         MediaProviderInterface* provider)
++    : provider_(provider)
++    , audio_track_(track)
++    , enabled_(track->enabled()) {
++        audio_track_->RegisterObserver(this);
++    }
++    
++    AudioTrackHandler::~AudioTrackHandler() {
++        audio_track_->UnregisterObserver(this);
++    }
++    
++    void AudioTrackHandler::OnChanged() {
++        if(enabled_ != audio_track_->enabled()) {
++            enabled_ = audio_track_->enabled();
++            OnEnabledChanged();
++        }
++    }
++    
++    LocalAudioTrackHandler::LocalAudioTrackHandler(LocalAudioTrackInterface* track,
++                                                   MediaProviderInterface* provider)
++    : AudioTrackHandler(track, provider)
++    , local_audio_track_(track) {
++        
++    }
++    
++    LocalAudioTrackHandler::~LocalAudioTrackHandler() {
++        
++    }
++    
++    void LocalAudioTrackHandler::OnEnabledChanged() {
++        provider_->SetMicMute(!local_audio_track_->enabled());
++    }
++    
++    RemoteAudioTrackHandler::RemoteAudioTrackHandler(AudioTrackInterface* track,
++                                                     MediaProviderInterface* provider)
++    : AudioTrackHandler(track, provider)
++    , remote_audio_track_(track) {
++        
++    }
++    
++    RemoteAudioTrackHandler::~RemoteAudioTrackHandler() {
++        
++    }
++    
++    void RemoteAudioTrackHandler::OnEnabledChanged() {
++        //TODO:
++    }
++    // </GOCAST>
++    
+ MediaStreamHandler::MediaStreamHandler(MediaStreamInterface* stream,
+                                        MediaProviderInterface* provider)
+     : stream_(stream),
+@@ -140,6 +209,13 @@
+        it != video_handlers_.end(); ++it) {
+     delete *it;
+   }
++    
++    // <GOCAST>
++    for (AudioTrackHandlers::iterator it = audio_handlers_.begin(); 
++         it != audio_handlers_.end(); ++it) {
++        delete *it;
++    }
++    // </GOCAST>
+ }
+ 
+ MediaStreamInterface* MediaStreamHandler::stream() {
+@@ -163,6 +239,17 @@
+     VideoTrackHandler* handler(new LocalVideoTrackHandler(track, provider));
+     video_handlers_.push_back(handler);
+   }
++        
++    // <GOCAST>
++    AudioTracks* audioTracks(stream->audio_tracks());
++    
++    for (size_t j = 0; j < audioTracks->count(); ++j) {
++        LocalAudioTrackInterface* track =
++            static_cast<LocalAudioTrackInterface*>(audioTracks->at(j));
++        AudioTrackHandler* handler(new LocalAudioTrackHandler(track, provider));
++        audio_handlers_.push_back(handler);
++    }
++    // </GOCAST>
+ }
+ 
+ RemoteMediaStreamHandler::RemoteMediaStreamHandler(
+@@ -177,6 +264,17 @@
+     VideoTrackHandler* handler(new RemoteVideoTrackHandler(track, provider));
+     video_handlers_.push_back(handler);
+   }
++        
++    // <GOCAST>
++    AudioTracks* audioTracks(stream->audio_tracks());
++    
++    for (size_t j = 0; j < audioTracks->count(); ++j) {
++        AudioTrackInterface* track =
++        static_cast<AudioTrackInterface*>(audioTracks->at(j));
++        AudioTrackHandler* handler(new RemoteAudioTrackHandler(track, provider));
++        audio_handlers_.push_back(handler);
++    }
++    // </GOCAST>
+ }
+ 
+ MediaStreamHandlers::MediaStreamHandlers(MediaProviderInterface* provider)
+Index: talk/p2p/base/stun.h
+===================================================================
+--- talk/p2p/base/stun.h	(revision 153)
++++ talk/p2p/base/stun.h	(working copy)
+@@ -140,7 +140,7 @@
+ class StunMessage {
+  public:
+   StunMessage();
+-  ~StunMessage();
++  virtual ~StunMessage();
+ 
+   int type() const { return type_; }
+   size_t length() const { return length_; }
+Index: talk/session/phone/channelmanager.cc
+===================================================================
+--- talk/session/phone/channelmanager.cc	(revision 153)
++++ talk/session/phone/channelmanager.cc	(working copy)
+@@ -69,6 +69,10 @@
+   MSG_SETVIDEOCAPTURER = 26,
+   MSG_CREATEDATACHANNEL = 27,
+   MSG_DESTROYDATACHANNEL = 28,
++    
++    // <GOCAST>
++    MSG_SETMICMUTE = 29,
++    // </GOCAST>
+ };
+ 
+ static const int kNotSetOutputVolume = -1;
+@@ -170,6 +174,14 @@
+   bool result;
+ };
+ 
++    // <GOCAST>
++    struct SetMicMuteParams : public talk_base::MessageData {
++        SetMicMuteParams(bool e): result(false), enable(e) {}
++        bool result;
++        bool enable;
++    };
++    // </GOCAST>
++    
+ ChannelManager::ChannelManager(talk_base::Thread* worker_thread) {
+   Construct(MediaEngineFactory::Create(),
+             new DataEngine(),
+@@ -639,6 +651,23 @@
+   return media_engine_->SetOutputVolume(level);
+ }
+ 
++    // <GOCAST>
++    bool ChannelManager::SetMicMute(bool enable) {
++        bool ret = false;
++        if(initialized_) {
++            SetMicMuteParams params(enable);
++            Send(MSG_SETMICMUTE, &params);
++            ret = params.result;
++        }
++        
++        return ret;
++    }
++    
++    bool ChannelManager::SetMicMute_w(bool enable) {
++        return media_engine_->SetMicMute(enable);
++    }
++    // </GOCAST>
++    
+ bool ChannelManager::GetVideoOptions(std::string* cam_name) {
+   if (camera_device_.empty()) {
+     // Initialize camera_device_ with default.
+@@ -1055,6 +1084,13 @@
+                                               data->direction);
+       break;
+     }
++          // <GOCAST>
++      case MSG_SETMICMUTE: {
++          SetMicMuteParams* data = static_cast<SetMicMuteParams*>(message->pdata);
++          data->result = SetMicMute_w(data->enable);
++          break;
++      }
++          // </GOCAST>
+   }
+ }
+ 
+Index: talk/session/phone/channelmanager.h
+===================================================================
+--- talk/session/phone/channelmanager.h	(revision 153)
++++ talk/session/phone/channelmanager.h	(working copy)
+@@ -134,6 +134,11 @@
+                        const std::string& wave_out_device, int opts);
+   bool GetOutputVolume(int* level);
+   bool SetOutputVolume(int level);
++                           
++    // <GOCAST>
++    bool SetMicMute(bool enable);                   
++    // </GOCAST>
++                           
+   bool GetVideoOptions(std::string* cam_device);
+   bool SetVideoOptions(const std::string& cam_device);
+   bool SetDefaultVideoEncoderConfig(const VideoEncoderConfig& config);
+@@ -218,6 +223,11 @@
+                          const Device* out_dev);
+   bool GetOutputVolume_w(int* level);
+   bool SetOutputVolume_w(int level);
++                           
++   // <GOCAST>
++   bool SetMicMute_w(bool enable);                   
++   // </GOCAST>
++
+   bool SetLocalMonitor_w(bool enable);
+   bool SetVideoOptions_w(const Device* cam_device);
+   bool SetDefaultVideoEncoderConfig_w(const VideoEncoderConfig& config);
+Index: talk/session/phone/devicemanager.cc
+===================================================================
+--- talk/session/phone/devicemanager.cc	(revision 153)
++++ talk/session/phone/devicemanager.cc	(working copy)
+@@ -245,7 +245,7 @@
+ 
+   int i = 0;
+   while (exclusion_list[i]) {
+-    if (strnicmp(device_name.c_str(), exclusion_list[i],
++    if (_strnicmp(device_name.c_str(), exclusion_list[i],
+         strlen(exclusion_list[i])) == 0) {
+       LOG(LS_INFO) << "Ignoring device " << device_name;
+       return true;
+Index: talk/session/phone/videocapturer.h
+===================================================================
+--- talk/session/phone/videocapturer.h	(revision 153)
++++ talk/session/phone/videocapturer.h	(working copy)
+@@ -37,6 +37,10 @@
+ #include "talk/session/phone/devicemanager.h"
+ #include "talk/session/phone/videocommon.h"
+ 
++//<GOCAST>
++#include "system_wrappers/interface/critical_section_wrapper.h"
++//</GOCAST>
++
+ namespace cricket {
+ 
+ // General capturer events.
+@@ -104,7 +108,12 @@
+ //
+ class VideoCapturer {
+  public:
+-  VideoCapturer() {}
++  VideoCapturer()
++    //<GOCAST>
++    : effect_("none")
++	, effectCrit_(webrtc::CriticalSectionWrapper::CreateCriticalSection())
++	//</GOCAST>
++    {}
+   virtual ~VideoCapturer() {}
+ 
+   // Gets the id of the underlying device, which is available after the capturer
+@@ -162,6 +171,20 @@
+   // Check if the video capturer is running.
+   virtual bool IsRunning() = 0;
+ 
++    //<GOCAST>
++    void SetEffect(const std::string& effect) {
++        if("gray" == effect || "sepia" == effect || "none" == effect) {
++			webrtc::CriticalSectionScoped crit(effectCrit_);
++            effect_ = effect;
++        }
++    };
++    
++    std::string GetEffect() const {
++		webrtc::CriticalSectionScoped crit(effectCrit_);
++        return effect_;
++    }
++    //</GOCAST>
++    
+   // Signal the result of Start() if it returned CR_PENDING.
+   sigslot::signal2<VideoCapturer*, CaptureResult> SignalStartResult;
+   // Signal the captured frame to downstream.
+@@ -195,6 +218,12 @@
+   std::string id_;
+   talk_base::scoped_ptr<VideoFormat> capture_format_;
+   talk_base::scoped_ptr<std::vector<VideoFormat> > supported_formats_;
++    
++    //<GOCAST>
++ protected:
++    std::string effect_;
++	webrtc::CriticalSectionWrapper* effectCrit_;
++    //</GOCAST>
+ 
+   DISALLOW_COPY_AND_ASSIGN(VideoCapturer);
+ };
+Index: talk/session/phone/mediaengine.h
+===================================================================
+--- talk/session/phone/mediaengine.h	(revision 153)
++++ talk/session/phone/mediaengine.h	(working copy)
+@@ -137,6 +137,10 @@
+   virtual bool GetOutputVolume(int* level) = 0;
+   // Sets the current speaker volume, as a value between 0 and 255.
+   virtual bool SetOutputVolume(int level) = 0;
++    
++    // <GOCAST>
++    virtual bool SetMicMute(bool enable) = 0;
++    // </GOCAST>
+ 
+   // Local monitoring
+   // Gets the current microphone level, as a value between 0 and 10.
+@@ -243,6 +247,12 @@
+     return voice_.SetOutputVolume(level);
+   }
+ 
++    // <GOCAST>
++    virtual bool SetMicMute(bool enable) {
++        return voice_.SetMicMute(enable);
++    }
++    // </GOCAST>
++    
+   virtual int GetInputLevel() {
+     return voice_.GetInputLevel();
+   }
+@@ -315,6 +325,13 @@
+     return true;
+   }
+   bool SetOutputVolume(int level) { return true; }
++    
++    // <GOCAST>
++    bool SetMicMute(bool enable) {
++        return true;
++    }
++    // </GOCAST>
++
+   int GetInputLevel() { return 0; }
+   bool SetLocalMonitor(bool enable) { return true; }
+   const std::vector<AudioCodec>& codecs() { return codecs_; }
+Index: talk/session/phone/webrtcvideocapturer.cc
+===================================================================
+--- talk/session/phone/webrtcvideocapturer.cc	(revision 153)
++++ talk/session/phone/webrtcvideocapturer.cc	(working copy)
+@@ -39,10 +39,24 @@
+ #include "talk/base/win32.h"  // Need this to #include the impl files
+ #ifdef WEBRTC_RELATIVE_PATH
+ #include "modules/video_capture/main/interface/video_capture_factory.h"
++
++//<GOCAST>
++#include "common_video/libyuv/include/libyuv.h"
++//</GOCAST>
+ #else
+ #include "third_party/webrtc/files/include/video_capture_factory.h"
+ #endif
+ 
++//<GOCAST>
++#ifdef POSIX
++#define ALLOCBUFFER(s) (new uint8[(s)])
++#define FREEBUFFER(p) (delete (p))
++#else
++#define ALLOCBUFFER(s) ((uint8*) (_aligned_malloc((s), 16)))
++#define FREEBUFFER(p) (_aligned_free(p))
++#endif
++//</GOCAST>
++
+ namespace cricket {
+ 
+ struct kVideoFourCCEntry {
+@@ -128,19 +142,33 @@
+ WebRtcVideoCapturer::WebRtcVideoCapturer()
+     : factory_(new WebRtcVcmFactory),
+       module_(NULL),
+-      captured_frames_(0) {
++      captured_frames_(0)
++    //<GOCAST>
++    , pEffectBuffer_(NULL)
++    //</GOCAST>
++                           {
+ }
+ 
+ WebRtcVideoCapturer::WebRtcVideoCapturer(WebRtcVcmFactoryInterface* factory)
+     : factory_(factory),
+       module_(NULL),
+-      captured_frames_(0) {
+-}
++      captured_frames_(0)
++    //<GOCAST>
++    , pEffectBuffer_(NULL)
++    //</GOCAST>
++    {
++    }
+ 
+ WebRtcVideoCapturer::~WebRtcVideoCapturer() {
+   if (module_) {
+     module_->Release();
+   }
++    
++    //<GOCAST>
++    if(NULL != pEffectBuffer_) {
++        FREEBUFFER(pEffectBuffer_);
++    }
++    //</GOCAST>
+ }
+ 
+ bool WebRtcVideoCapturer::Init(const Device& device) {
+@@ -320,6 +348,47 @@
+   return true;
+ }
+ 
++    //<GOCAST>
++    void WebRtcVideoCapturer::ApplyEffect(webrtc::VideoFrame &frame) {
++		webrtc::CriticalSectionScoped crit(effectCrit_);
++        if("none" == effect_) {
++            return;
++        } else {
++            if(NULL == pEffectBuffer_) {
++                pEffectBuffer_ = ALLOCBUFFER(frame.Width()*frame.Height()*4);
++            }
++            
++            if(0 > webrtc::ConvertI420ToARGB8888(frame.Buffer(),
++                                                 pEffectBuffer_,
++                                                 frame.Width(), 
++                                                 frame.Height())) {
++                return;
++            }
++            
++            if("sepia" == effect_) {
++                if( 0 < webrtc::ARGBSepia(pEffectBuffer_,
++                                          frame.Width()*4,
++                                          0, 0, frame.Width(),
++                                          frame.Height())) {
++                    return;
++                }
++            } else if("gray" == effect_) {
++                if( 0 < webrtc::ARGBGray(pEffectBuffer_,
++                                         frame.Width()*4,
++                                         0, 0, frame.Width(),
++                                         frame.Height())) {
++                    return;
++                }
++            }
++            
++            webrtc::ConvertToI420(webrtc::kARGB, pEffectBuffer_, 0, 0,
++                                  frame.Width(), frame.Height(), 0,
++                                  frame.Width(), frame.Height(),
++                                  frame.Width(), webrtc::kRotateNone, frame.Buffer());           
++        }
++    }
++    //</GOCAST>
++    
+ void WebRtcVideoCapturer::OnMessage(talk_base::Message* message) {
+   // TODO: Fire SignalCaptureEvent appropriately.
+   SignalStartResult(this, CR_SUCCESS);
+@@ -337,7 +406,11 @@
+                  << sample.Width() << "x" << sample.Height()
+                  << ". Expected format " << GetCaptureFormat()->ToString();
+   }
+-
++    
++    //<GOCAST>
++    ApplyEffect(sample);
++    //</GOCAST>
++    
+   // Signal down stream components on captured frame.
+   WebRtcCapturedFrame frame(sample);
+   SignalFrameCaptured(this, &frame);
+Index: talk/session/phone/webrtcvideocapturer.h
+===================================================================
+--- talk/session/phone/webrtcvideocapturer.h	(revision 153)
++++ talk/session/phone/webrtcvideocapturer.h	(working copy)
+@@ -76,6 +76,10 @@
+   // Override virtual methods of the parent class VideoCapturer.
+   virtual bool GetPreferredFourccs(std::vector<uint32>* fourccs);
+ 
++  //<GOCAST>
++  void ApplyEffect(webrtc::VideoFrame& frame);
++  //<GOCAST>
++
+  private:
+   // Callback for our started event.
+   virtual void OnMessage(talk_base::Message* message);
+@@ -89,6 +93,10 @@
+   talk_base::scoped_ptr<WebRtcVcmFactoryInterface> factory_;
+   webrtc::VideoCaptureModule* module_;
+   int captured_frames_;
++
++  //<GOCAST>
++  uint8* pEffectBuffer_;
++  //</GOCAST>
+ };
+ 
+ struct WebRtcCapturedFrame : public CapturedFrame {
+Index: talk/session/phone/webrtcvoiceengine.cc
+===================================================================
+--- talk/session/phone/webrtcvoiceengine.cc	(revision 153)
++++ talk/session/phone/webrtcvoiceengine.cc	(working copy)
+@@ -712,6 +712,16 @@
+   return true;
+ }
+ 
++    // <GOCAST>
++    bool WebRtcVoiceEngine::SetMicMute(bool enable) {
++        if(voe_wrapper_->volume()->SetSystemInputMute(enable) == -1) {
++            LOG_RTCERR1(SetMicMute, enable);
++            return false;
++        }
++        return true;
++    }
++    // </GOCAST>
++    
+ int WebRtcVoiceEngine::GetInputLevel() {
+   unsigned int ulevel;
+   return (voe_wrapper_->volume()->GetSpeechInputLevel(ulevel) != -1) ?
+Index: talk/session/phone/webrtcvoiceengine.h
+===================================================================
+--- talk/session/phone/webrtcvoiceengine.h	(revision 153)
++++ talk/session/phone/webrtcvoiceengine.h	(working copy)
+@@ -107,6 +107,11 @@
+   bool SetDevices(const Device* in_device, const Device* out_device);
+   bool GetOutputVolume(int* level);
+   bool SetOutputVolume(int level);
++          
++          // <GOCAST>
++          bool SetMicMute(bool enable);
++          // </GOCAST>
++          
+   int GetInputLevel();
+   bool SetLocalMonitor(bool enable);
+ 
+Index: talk/base/refcount.h
+===================================================================
+--- talk/base/refcount.h	(revision 153)
++++ talk/base/refcount.h	(working copy)
+@@ -69,6 +69,8 @@
+       : T(p1, p2, p3, p4, p5), ref_count_(0) {
+   }
+ 
++  virtual ~RefCountedObject() {}
++
+   virtual int AddRef() {
+     return talk_base::AtomicOps::Increment(&ref_count_);
+   }
+Index: talk/base/proxydetect.cc
+===================================================================
+--- talk/base/proxydetect.cc	(revision 153)
++++ talk/base/proxydetect.cc	(working copy)
+@@ -242,7 +242,7 @@
+   if (*item == '.') {
+     size_t hostlen = url.host().length();
+     return (hostlen > len)
+-        && (stricmp(url.host().c_str() + (hostlen - len), item) == 0);
++        && (_stricmp(url.host().c_str() + (hostlen - len), item) == 0);
+   }
+ 
+   // localhost or www.*.com
+Index: talk/base/physicalsocketserver.cc
+===================================================================
+--- talk/base/physicalsocketserver.cc	(revision 153)
++++ talk/base/physicalsocketserver.cc	(working copy)
+@@ -1546,7 +1546,7 @@
+     if (dw == WSA_WAIT_FAILED) {
+       // Failed?
+       // TODO: need a better strategy than this!
+-      int error = WSAGetLastError();
++//      int error = WSAGetLastError();
+       ASSERT(false);
+       return false;
+     } else if (dw == WSA_WAIT_TIMEOUT) {
+Index: talk/base/httpclient.cc
+===================================================================
+--- talk/base/httpclient.cc	(revision 153)
++++ talk/base/httpclient.cc	(working copy)
+@@ -178,7 +178,7 @@
+ HttpResponseValidatorLevel(const HttpResponseData& response) {
+   std::string value;
+   if (response.hasHeader(HH_ETAG, &value)) {
+-    bool is_weak = (strnicmp(value.c_str(), "W/", 2) == 0);
++    bool is_weak = (_strnicmp(value.c_str(), "W/", 2) == 0);
+     return is_weak ? HVS_WEAK : HVS_STRONG;
+   }
+   if (response.hasHeader(HH_LAST_MODIFIED, &value)) {
