@@ -11,8 +11,8 @@
 #include "variant_list.h"
 #include <iostream>
 
-#define FBLOG_INFO_CUSTOM(func, msg) std::cout << func << " [INFO]: " << msg << std::endl;
-#define FBLOG_ERROR_CUSTOM(func, msg) std::cout << func << " [ERROR]: " << msg << std::endl;
+#define FBLOG_INFO_CUSTOM(func, msg) FBLOG_INFO(func, msg) //std::cout << func << " [INFO]: " << msg << std::endl;
+#define FBLOG_ERROR_CUSTOM(func, msg) FBLOG_ERROR(func, msg) //std::cout << func << " [ERROR]: " << msg << std::endl;
 
 namespace GoCast
 {

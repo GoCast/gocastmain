@@ -135,7 +135,7 @@ namespace GoCast
         std::string GetLocalVideoTrackEffect() const {
             if(0 < m_pLocalStream->video_tracks()->count()){
                 talk_base::scoped_refptr<webrtc::LocalVideoTrackInterface> pTrack(
-                    dynamic_cast<webrtc::LocalVideoTrackInterface*>(m_pLocalStream->video_tracks()->at(0))
+                    static_cast<webrtc::LocalVideoTrackInterface*>(m_pLocalStream->video_tracks()->at(0))
                 );
                 
                 if(NULL == pTrack.get())
@@ -170,7 +170,7 @@ namespace GoCast
         void SetLocalVideoTrackEffect(const std::string& effect) {
             if(0 < m_pLocalStream->video_tracks()->count()){
                 talk_base::scoped_refptr<webrtc::LocalVideoTrackInterface> pTrack(
-                    dynamic_cast<webrtc::LocalVideoTrackInterface*>(m_pLocalStream->video_tracks()->at(0))
+                    static_cast<webrtc::LocalVideoTrackInterface*>(m_pLocalStream->video_tracks()->at(0))
                 );
                 
                 if(NULL != pTrack.get())
