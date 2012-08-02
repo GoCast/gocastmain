@@ -14,6 +14,7 @@
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
 /*jslint sloppy: false, todo: true, white: true, browser: true, devel: true */
+/*global Callcast, ActiveXObject, swfobject, FB, fbInit */
 'use strict';
 
 
@@ -218,45 +219,6 @@ var app = {
 
 
 
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-/**
- * \brief Populates carousel with demo content.
- */
-function startDemoContent(
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-    /**
-     * No argument. */
-)
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-{
-  /*
-   * First content. */
-  // article is gone
-  //Callcast.Callback_AddCarouselContent(new Object({id:"demo1", image:"url('images/demo1-egyptmap.gif')", altText:"Egyptians vote in first free presidential election", url:"http://www.google.com/hostednews/ap/article/ALeqM5iS0-q8BzFkHp3IV4ks-5tnbKnw-Q?docId=2b6df5e5e5fd40e0a8ab49103fda20bc"}));
-  /*
-   * Second content delayed 1000 ms. */
-  setTimeout(function() {
-    Callcast.Callback_AddCarouselContent({id: 'demo2', image: "url('images/demo2-robertmoog.jpg')", altText: 'Robert Moog: I would not call this music.', url: 'http://www.guardian.co.uk/music/2012/may/23/robert-moog-interview-google-doodle'});
-  }, 1000);
-  /*
-   * Third content delayed 2000 ms. */
-  setTimeout(function() {
-    Callcast.Callback_AddCarouselContent({id: 'demo3', image: "url('images/demo3-spaceX.png')", altText: 'Launch of SpaceX Falcon 9', url: 'http://www.youtube.com/embed/4vkqBfv8OMM'});
-  }, 2000);
-  /*
-   * Fourth content delayed 3000 ms. */
-  setTimeout(function() {
-    Callcast.Callback_AddCarouselContent({id: 'demo4', image: "url('images/demo4-bawarriorsSF.jpg')", altText: 'Warriors face many hurdles in building S.F. arena', url: 'http://www.sfgate.com/cgi-bin/article.cgi?f=/c/a/2012/05/23/MNM41OLT8K.DTL'});
-  }, 3000);
-  /*
-   * Fifth content delayed 4000 ms. */
-  setTimeout(function() {
-    Callcast.Callback_AddCarouselContent({id: 'demo5', image: "url('images/demo5-wikipedia.jpg')", altText: 'Wikipedia', url: 'http://www.wikipedia.org'});
-  }, 4000);
-  closeWindow();
-  return false;
-} /* startDemoContent() */
-
 function loadVideo(oo, info)
 {
   var item, playerId, width, height, params, atts;
@@ -365,7 +327,37 @@ function startVideoContent()
                       });
   }, 1000);
   return false;
-} /* startDemoContent() */
+} // startVideoContent()
+
+/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+/**
+ * \brief Add event listeners to opened window.
+ *
+ *        Auxiliary function to customize features in different windows,
+ *        and keep the open and close of modal window common.
+ */
+function activateWindow(
+/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+    /**
+     * Window Id with #. */
+  winId
+)
+/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+{
+  if (winId.match('credentials2')) {
+    $('input#name', winId).on('keydown.s04072012', keypressNameHandler);
+    $('input#btn', winId).on('click.s04072012', onJoinNow);
+  }
+  else if (winId.match('meeting')) {
+    $('#lower-right > #video').on('click.s04172012a', changeVideo);
+    $('#lower-right > #audio').on('click.s04172012b', changeAudio);
+  }
+  else if (winId.match('chatInp')) {
+    $('input.chatTo', winId).on('keydown.s04172012g', keypressChatHandler);
+    $('input.send', winId).on('click.s04172012g', sendChat);
+  }
+  return false;
+} /* activateWindow() */
 
 ///
 /// \brief Open Personal Chat.
@@ -1003,38 +995,6 @@ function changeAudio()
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
- * \brief Add event listeners to opened window.
- *
- *        Auxiliary function to customize features in different windows,
- *        and keep the open and close of modal window common.
- */
-function activateWindow(
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-    /**
-     * Window Id with #. */
-  winId
-)
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-{
-  if (winId.match('credentials2')) {
-    $('input#name', winId).on('keydown.s04072012', keypressNameHandler);
-    $('input#btn', winId).on('click.s04072012', onJoinNow);
-  }
-  else if (winId.match('meeting')) {
-    $('#lower-right > #video').on('click.s04172012a', changeVideo);
-    $('#lower-right > #audio').on('click.s04172012b', changeAudio);
-  }
-  else if (winId.match('chatInp')) {
-    $('input.chatTo', winId).on('keydown.s04172012g', keypressChatHandler);
-    $('input.send', winId).on('click.s04172012g', sendChat);
-  }
-  return false;
-} /* activateWindow() */
-
-
-
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-/**
  * \brief Remove event listeners to opened window.
  *
  *        Auxiliary function to customize features in different windows,
@@ -1412,6 +1372,22 @@ function tryPluginInstall(
 } /* tryPluginInstall() */
 
 ///
+/// \brief download from an url
+///
+function downloadURL(url)
+{
+    var iframe;
+    iframe = document.getElementById('hiddenDownloader');
+    if (iframe === null)
+    {
+        iframe = document.createElement('iframe');
+        iframe.id = 'hiddenDownloader';
+        iframe.style.visibility = 'hidden';
+        document.body.appendChild(iframe);
+    }
+    iframe.src = url;
+}
+///
 /// \brief update plugin dl msg and dl plugin
 ///
 function doDownload()
@@ -1442,7 +1418,7 @@ function doDownload()
   }
   // windows install path is thru winEula
   // todo linux
-};
+}
 
 ///
 /// \brief display appropriate prompt depending on plugin install type
@@ -1472,24 +1448,7 @@ function installPrompt(pluginName)
     openWindow('#winWait');
     checkForPlugin(pluginName);
   }
-};
-///
-/// \brief download from an url
-///
-function downloadURL(url)
-{
-    var iframe;
-    iframe = document.getElementById('hiddenDownloader');
-    if (iframe === null)
-    {
-        iframe = document.createElement('iframe');
-        iframe.id = 'hiddenDownloader';
-        iframe.style.visibility = 'hidden';
-        document.body.appendChild(iframe);
-    }
-    iframe.src = url;
-};
-
+}
 ///
 /// \brief close the eula window, download the win install file, launch function to check for plugin
 ///
@@ -1696,4 +1655,43 @@ getUrlVar: function(name) {
  return $.getUrlVars()[name];
 }
 });
+
+/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+/**
+ * \brief Populates carousel with demo content.
+ */
+function startDemoContent(
+/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+    /**
+     * No argument. */
+)
+/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+{
+  /*
+   * First content. */
+  // article is gone
+  //Callcast.Callback_AddCarouselContent(new Object({id:"demo1", image:"url('images/demo1-egyptmap.gif')", altText:"Egyptians vote in first free presidential election", url:"http://www.google.com/hostednews/ap/article/ALeqM5iS0-q8BzFkHp3IV4ks-5tnbKnw-Q?docId=2b6df5e5e5fd40e0a8ab49103fda20bc"}));
+  /*
+   * Second content delayed 1000 ms. */
+  setTimeout(function() {
+    Callcast.Callback_AddCarouselContent({id: 'demo2', image: "url('images/demo2-robertmoog.jpg')", altText: 'Robert Moog: I would not call this music.', url: 'http://www.guardian.co.uk/music/2012/may/23/robert-moog-interview-google-doodle'});
+  }, 1000);
+  /*
+   * Third content delayed 2000 ms. */
+  setTimeout(function() {
+    Callcast.Callback_AddCarouselContent({id: 'demo3', image: "url('images/demo3-spaceX.png')", altText: 'Launch of SpaceX Falcon 9', url: 'http://www.youtube.com/embed/4vkqBfv8OMM'});
+  }, 2000);
+  /*
+   * Fourth content delayed 3000 ms. */
+  setTimeout(function() {
+    Callcast.Callback_AddCarouselContent({id: 'demo4', image: "url('images/demo4-bawarriorsSF.jpg')", altText: 'Warriors face many hurdles in building S.F. arena', url: 'http://www.sfgate.com/cgi-bin/article.cgi?f=/c/a/2012/05/23/MNM41OLT8K.DTL'});
+  }, 3000);
+  /*
+   * Fifth content delayed 4000 ms. */
+  setTimeout(function() {
+    Callcast.Callback_AddCarouselContent({id: 'demo5', image: "url('images/demo5-wikipedia.jpg')", altText: 'Wikipedia', url: 'http://www.wikipedia.org'});
+  }, 4000);
+  closeWindow();
+  return false;
+} /* startDemoContent() */
 
