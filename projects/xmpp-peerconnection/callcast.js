@@ -152,7 +152,7 @@ var Callcast = {
     // \brief External user sets this callback to be called when the server sends an 'addspot' command
     //      for programmatically being told to add a new spot to the carousel. The argument to this
     //      callback is the JSON object which was given by the original 'adder' of the spot. The only
-    //      server-dicted requirement in this JSON object is the 'spotNumber' property which is used
+    //      server-dicted requirement in this JSON object is the 'spotnumber' property which is used
     //      to give unique addressing to all spots in the carousel.
     //
     setCallbackForAddSpot: function(cb) {
@@ -163,9 +163,9 @@ var Callcast = {
     // \brief External user sets this callback to be called when the server sends a 'removespot' command
     //      for programmatically being told to remove a spot from the carousel. The argument to this
     //      callback is the JSON object which was given by the original 'deleter' of the spot. The only
-    //      requirement in this JSON object is the 'spotNumber' property which is used to give unique
+    //      requirement in this JSON object is the 'spotnumber' property which is used to give unique
     //      addressing to all spots in the carousel such that the callback knows which spot to delete.
-    //      \note spotNumber should always be a valid (existing) spot as the server is responsible for
+    //      \note spotnumber should always be a valid (existing) spot as the server is responsible for
     //          ensuring this is the case.
     //
     setCallbackForRemoveSpot: function(cb) {
@@ -579,6 +579,13 @@ var Callcast = {
                     var ice = $msg({to: self.jid, type: 'chat'})
                             .c('signaling', {xmlns: Callcast.NS_CALLCAST}).t(candidate);
                     Callcast.connection.send(ice);
+
+                    // WORKAROUND: If we see a 'tcp' candidate, that's bad news.
+                    //   In rev 2407, this means the peerconnection will be
+                    //   failed. So, we're going to reset the connection.
+                    if (candidate.match(' tcp ')) {
+                        self.ResetPeerConnection();
+                    }
                 }
             }
         };
@@ -621,7 +628,7 @@ var Callcast = {
                     alert('ERROR: Callcast.setCallbackForAddPlugin() has not been called yet.');
                 }
             } catch (e) {
-                console.log('EXCEPTION: ', e);
+                console.log('EXCEPTION: ', e.toString(), e);
             }
         };
 
@@ -643,8 +650,11 @@ var Callcast = {
                         this.InitiateCall();
                     }
                 }
+                else {
+                    console.log('ResetPeerConnection: ERROR - peer_connection is already null.');
+                }
             } catch (e) {
-                console.log('EXCEPTION: ', e);
+                console.log('EXCEPTION: ', e.toString(), e);
             }
         };
 
@@ -708,7 +718,7 @@ var Callcast = {
                 }
             }
             catch (e) {
-                console.log('EXCEPTION: ', e);
+                console.log('EXCEPTION: ', e.toString(), e);
             }
         };
 
@@ -720,6 +730,12 @@ var Callcast = {
             try {
                 if (this.peer_connection)
                 {
+                    if (this.peer_connection.ReadyState()==='ACTIVE')
+                    {
+                        console.log('CompleteCall: Offer received while active. RESET PEER CONNECTION.');
+                        this.ResetPeerConnection();
+                    }
+
                     console.log('Completing call...');
     //                console.log('CompleteCall: Offer-SDP=' + offer);
 
@@ -747,7 +763,7 @@ var Callcast = {
                 }
             }
             catch (e) {
-                console.log('EXCEPTION: ', e);
+                console.log('EXCEPTION: ', e.toString(), e);
             }
         };
 
@@ -1047,6 +1063,7 @@ var Callcast = {
             ret = Callcast.on_url_render(message);
             break;
         case 'addspot':
+            console.log('addspot: Received object: ', info);
             if (Callcast.Callback_AddSpot) {
                 Callcast.Callback_AddSpot(info);
             }
@@ -1059,6 +1076,7 @@ var Callcast = {
             ret = true;
             break;
         case 'setspot':
+            console.log('setspot: Received object: ', info);
             if (Callcast.Callback_SetSpot) {
                 Callcast.Callback_SetSpot(info);
             }
@@ -1427,13 +1445,13 @@ var Callcast = {
     //
     // \brief Function allows clients to request a new spot be added to everyone's carousel.
     //      This IQ is sent to the server and when successful, the server will respond by
-    //      first sending a groupchat to the room with a '<cmd cmdtype='addspot' spotNumber='value' ..../>
+    //      first sending a groupchat to the room with a '<cmd cmdtype='addspot' spotnumber='value' ..../>
     //      And upon success the IQ is responded to with a 'result'.
     //
     // \param obj A generic JSON object the sender can use to communicate spot info to the other clients.
     //      The server does not count on any particular items in this object. \note It does add a property
-    //      of obj.spotNumber which allows the server to dictate the spot numbers for new entries to ensure
-    //      no spotNumber collisions in a given mucRoom. Also, note that the amount of data in obj should be
+    //      of obj.spotnumber which allows the server to dictate the spot numbers for new entries to ensure
+    //      no spotnumber collisions in a given mucRoom. Also, note that the amount of data in obj should be
     //      kept to a minimum for both network conservation as well as database storage reasons. This obj is
     //      stored in the NoSQL DynamoDB 'as is' for each and every spot.
     //
@@ -1477,12 +1495,12 @@ var Callcast = {
     //
     // \brief Function allows clients to request the deletion of a spot on everyone's carousel.
     //      This IQ is sent to the server and when successful, the server will respond by
-    //      first sending a groupchat to the room with a '<cmd cmdtype='removespot' spotNumber='value' ..../>
+    //      first sending a groupchat to the room with a '<cmd cmdtype='removespot' spotnumber='value' ..../>
     //      And upon success the IQ is responded to with a 'result'.
     //
     // \param obj A generic JSON object the sender can use to communicate spot info to the other clients.
-    //      The server does not count on any particular items in this object aside from spotNumber. The
-    //      spotNumber property is used to ensure this spot actually exists. If it does, it will be removed
+    //      The server does not count on any particular items in this object aside from spotnumber. The
+    //      spotnumber property is used to ensure this spot actually exists. If it does, it will be removed
     //      at the server and in the external database. If it does not exist, an error callback is given and
     //      no broadcast of this deletion will occur.
     //
@@ -1526,12 +1544,12 @@ var Callcast = {
     //
     // \brief Function allows clients to change info for an existing spot on everyone's carousel.
     //      This IQ is sent to the server and when successful, the server will respond by
-    //      first sending a groupchat to the room with a '<cmd cmdtype='setspot' spotNumber='value' ..../>
+    //      first sending a groupchat to the room with a '<cmd cmdtype='setspot' spotnumber='value' ..../>
     //      And upon success the IQ is responded to with a 'result'.
     //
     // \param obj A generic JSON object the sender can use to communicate spot info to the other clients.
-    //      The server does not count on any particular items in this object aside from spotNumber. The
-    //      spotNumber property is used to ensure this spot actually exists. If it does, it will be modified
+    //      The server does not count on any particular items in this object aside from spotnumber. The
+    //      spotnumber property is used to ensure this spot actually exists. If it does, it will be modified
     //      at the server and in the external database. If it does not exist, an error callback is given and
     //      no broadcast of this change will occur.
     //
@@ -1546,9 +1564,9 @@ var Callcast = {
         tosend.xmlns = this.NS_CALLCAST;
         tosend.from = this.nick;
 
-        if (!obj.spotNumber) {
+        if (!obj.spotnumber) {
             if (cb) {
-                cb('Missing obj property spotNumber.');
+                cb('Missing obj property spotnumber.');
             }
 
             return false;
