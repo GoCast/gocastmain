@@ -14,6 +14,18 @@
  */
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
+/*jslint sloppy: false, todo: true, white: true, browser: true, devel: true */
+/*global Callcast, app */
+// index.js methods
+/*global  closeWindow, 
+          removeContentFromCarousel, 
+          removePluginFromCarousel, 
+          openPersonalChat, 
+          openWindow, 
+          openMeeting, 
+          tryPluginInstall, 
+          checkForPluginOptionalUpgrades
+*/
 'use strict';
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
@@ -507,14 +519,15 @@ function removePluginFromCarousel(
 {
   try
   {
+    app.log(2, "removePluginFromCarousel nickname " + nickname);
     // Get parent object and modify accordingly.
     var id = app.str2id(nickname),
         jqOo = $('#meeting > #streams > #scarousel div.cloudcarousel#' + id + '"'),
         item = $(jqOo).data('item');
     // todo this method is called for all occupied spots
     // fix to call only for spot with id
-    if (jqOo.length != 1) return;
-    if (!item) throw "item not found";
+    if (jqOo.length !== 1) {return;}
+    if (!item) {throw "item not found";}
     jqOo.addClass('unoccupied');
     jqOo.removeAttr('title');
     jqOo.removeAttr('id');
