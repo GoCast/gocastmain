@@ -534,7 +534,7 @@ MucRoom.prototype.handleIQ = function(iq) {
         }
         else if (iq.attrs.type === 'set' && iq.getChildByAttr('xmlns', 'urn:xmpp:callcast'))
         {
-            this.log("Received IQ 'set' -- ");
+            this.log("Received IQ 'set' -- "); // + iq.root().toString());
 
             if (iq.getChild('addspot')) {
                 this.AddSpotReflection(iq);
@@ -544,6 +544,9 @@ MucRoom.prototype.handleIQ = function(iq) {
             }
             else if (iq.getChild('setspot')) {
                 this.SetSpotReflection(iq);
+            }
+            else {
+                this.log('Unknown set, iq is: ' + iq.root().toString());
             }
         }
         else {
@@ -570,7 +573,7 @@ MucRoom.prototype.SendGroupCmd = function(cmd, attribs_in) {
         msgToSend = new xmpp.Element('message', {to: this.roomname, type: 'groupchat', xmlns: 'urn:xmpp:callcast'})
                 .c('cmd', attribs_out);
 
-        this.log('Outbound Group Command: ', msgToSend.toString());
+        this.log('Outbound Group Command: ' + msgToSend.root().toString());
 
         this.client.send(msgToSend);
 };
@@ -583,7 +586,7 @@ MucRoom.prototype.AddSpotReflection = function(iq) {
     }
 
     // Be sure to give a spot number to everyone that's consistent.
-    info.spotNumber = this.addSpotCeiling;
+    info.spotnumber = this.addSpotCeiling;
     this.addSpotCeiling += 1;
 
     this.SendGroupCmd('addspot', info);
@@ -609,17 +612,21 @@ MucRoom.prototype.SetSpotReflection = function(iq) {
     }
 
     // Be sure a spot number attribute is present. Else it's an error.
-    if (!info.spotNumber) {
+    if (!info.spotnumber) {
+        this.log('Missing required spotnumber attribute.');
+
         iq.attrs.type = 'error';
-        iq.c('reason').t('Missing spotNumber attribute.');
+        iq.c('reason').t('Missing required spotnumber attribute.');
     }
     else if (false) {
-        // If we don't have a record of this spotNumber existing, then it's an error also.
+        this.log('Unknown spotnumber: ' + info.spotnumber);
+
+        // If we don't have a record of this spotnumber existing, then it's an error also.
         iq.attrs.type = 'error';
-        iq.c('reason').t('spotNumber' + iq.attrs.spotNumber + 'is unknown to the overseer.');
+        iq.c('reason').t('spotnumber' + info.spotnumber + 'is unknown to the overseer.');
     }
     else {
-        this.SendGroupCmd('addspot', info);
+        this.SendGroupCmd('setspot', info);
         iq.attrs.type = 'result';
     }
 
@@ -639,8 +646,14 @@ MucRoom.prototype.RemoveSpotReflection = function(iq) {
         info = iq.getChild('removespot').attrs;
     }
 
-    if (false) {
-        // When we don't have a record of this spotNumber, we don't delete it.
+    if (!info.spotnumber) {
+        iq.attrs.type = 'error';
+        iq.c('reason').t('Missing required spotnumber attribute.');
+    }
+    else if (false) {
+        // When we don't have a record of this spotnumber, we don't delete it.
+        iq.attrs.type = 'error';
+        iq.c('reason').t('spotnumber' + info.spotnumber + 'is unknown to the overseer.');
     }
     else {
         this.SendGroupCmd('removespot', info);
@@ -1387,6 +1400,18 @@ var MucroomObjectPool = {
     }
 };
 
+function watchFile(fname) {
+    // load filename &
+    fs.watchFile(fname, {persistent: true, interval: 3000}, function(curr, prev) {
+      if (curr.mtime > prev.mtime)
+      {
+        var temp_xml;
+        temp_xml = fs.readFileSync(fname, 'utf8');
+//          console.log('Changed contents: ' + contents);
+      }
+    });
+}
+
 //
 // TODO: Finish this - process the list of xml files building 'roomnames'
 //       Then upon any changes, find the missing entries and add them.
@@ -1400,15 +1425,7 @@ function loadRoomsAndProcess(filenames, roomnames)
     for (k in filenames)
     {
         if (filenames.hasOwnProperty(k)) {
-            // load filename &
-            fs.watchFile(filenames[k], {persistent: true, interval: 3000}, function(curr, prev) {
-              if (curr.mtime > prev.mtime)
-              {
-                var temp_xml;
-                temp_xml = fs.readFileSync(filenames[k], 'utf8');
-    //          console.log('Changed contents: ' + contents);
-              }
-            });
+            watchFile(filenames[k]);
         }
     }
 }
@@ -1926,7 +1943,7 @@ function FeedbackBot(feedback_jid, feedback_pw, notifier) {
                 stanza.attrs.type !== 'error') {
 
                 if (stanza.getChild('body'))
-                {   
+                {
                     nick = stanza.attrs.nick || 'no-nick';
                     room = stanza.attrs.room || 'no-room';
 
