@@ -96,7 +96,8 @@ namespace GoCast
     LocalVideoTrack::LocalVideoTrack(const talk_base::scoped_refptr<webrtc::LocalVideoTrackInterface>& pTrack)
     : LocalMediaStreamTrack(pTrack->kind(), pTrack->label(), pTrack->enabled())
     {
-        
+        registerProperty("effect", make_property(this, &LocalVideoTrack::get_effect,
+                                                       &LocalVideoTrack::set_effect));
     }
     
     FB::JSAPIPtr LocalAudioTrack::Create(talk_base::scoped_refptr<webrtc::LocalAudioTrackInterface>& pTrack)

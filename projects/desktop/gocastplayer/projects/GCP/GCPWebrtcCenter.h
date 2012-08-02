@@ -132,6 +132,22 @@ namespace GoCast
             return false;
         }
         
+        std::string GetLocalVideoTrackEffect() const {
+            if(0 < m_pLocalStream->video_tracks()->count()){
+                talk_base::scoped_refptr<webrtc::LocalVideoTrackInterface> pTrack(
+                    dynamic_cast<webrtc::LocalVideoTrackInterface*>(m_pLocalStream->video_tracks()->at(0))
+                );
+                
+                if(NULL == pTrack.get())
+                {
+                    return "none";
+                }
+                
+                return pTrack->GetVideoCapture()->GetEffect();
+            }            
+            return "none";
+        }
+        
         void SetLocalVideoTrackEnabled(bool bEnable) {
             if(0 < m_pLocalStream->video_tracks()->count()) {
                 m_pLocalStream->video_tracks()->at(0)->set_enabled(bEnable);
@@ -149,6 +165,19 @@ namespace GoCast
             if(0 < m_pLocalStream->video_tracks()->count()){
                 m_pLocalStream->video_tracks()->at(0)->SetRenderer(pRenderer);
             }
+        }
+        
+        void SetLocalVideoTrackEffect(const std::string& effect) {
+            if(0 < m_pLocalStream->video_tracks()->count()){
+                talk_base::scoped_refptr<webrtc::LocalVideoTrackInterface> pTrack(
+                    dynamic_cast<webrtc::LocalVideoTrackInterface*>(m_pLocalStream->video_tracks()->at(0))
+                );
+                
+                if(NULL != pTrack.get())
+                {
+                    pTrack->GetVideoCapture()->SetEffect(effect);
+                }
+            }            
         }
         
         void SetRemoteVideoTrackRenderer(const std::string& pluginId,

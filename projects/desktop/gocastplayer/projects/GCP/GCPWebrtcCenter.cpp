@@ -85,6 +85,14 @@ namespace GoCast
         m_enabled = newVal;
     }
     
+    FB::variant LocalVideoTrack::get_effect() const {
+        return (RtcCenter::Instance())->GetLocalVideoTrackEffect();
+    }
+    
+    void LocalVideoTrack::set_effect(FB::variant effect) {
+        (RtcCenter::Instance())->SetLocalVideoTrackEffect(effect.convert_cast<std::string>());
+    }
+    
     std::string GetReadyStateString(webrtc::PeerConnectionInterface::ReadyState state)
     {
         switch(state)

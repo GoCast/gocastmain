@@ -64,6 +64,12 @@ namespace GoCast
         static talk_base::scoped_refptr<webrtc::VideoCaptureModule> GetDefaultCaptureDevice();
         explicit LocalVideoTrack(const talk_base::scoped_refptr<webrtc::LocalVideoTrackInterface>& pTrack);
         ~LocalVideoTrack() { }
+        
+        //Javascript get property methods
+        FB::variant get_effect() const;
+        
+        //Javascript set property methods
+        void set_effect(FB::variant effect);
     };
     
     class LocalAudioTrack : public LocalMediaStreamTrack
@@ -71,7 +77,7 @@ namespace GoCast
     public:
         static FB::JSAPIPtr Create(talk_base::scoped_refptr<webrtc::LocalAudioTrackInterface>& pTrack);
         explicit LocalAudioTrack(const talk_base::scoped_refptr<webrtc::LocalAudioTrackInterface>& pTrack);
-        ~LocalAudioTrack() { }
+        ~LocalAudioTrack() { }        
     };
     
     class RemoteVideoTrack : public MediaStreamTrack

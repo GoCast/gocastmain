@@ -426,6 +426,54 @@ Index: talk/session/phone/channelmanager.h
    bool SetLocalMonitor_w(bool enable);
    bool SetVideoOptions_w(const Device* cam_device);
    bool SetDefaultVideoEncoderConfig_w(const VideoEncoderConfig& config);
+Index: talk/session/phone/videocapturer.h
+===================================================================
+--- talk/session/phone/videocapturer.h	(revision 153)
++++ talk/session/phone/videocapturer.h	(working copy)
+@@ -104,7 +104,11 @@
+ //
+ class VideoCapturer {
+  public:
+-  VideoCapturer() {}
++  VideoCapturer()
++    //<GOCAST>
++    : effect_("none")
++    //</GOCAST>
++    {}
+   virtual ~VideoCapturer() {}
+ 
+   // Gets the id of the underlying device, which is available after the capturer
+@@ -162,6 +166,18 @@
+   // Check if the video capturer is running.
+   virtual bool IsRunning() = 0;
+ 
++    //<GOCAST>
++    void SetEffect(const std::string& effect) {
++        if("gray" == effect || "sepia" == effect || "none" == effect) {
++            effect_ = effect;
++        }
++    };
++    
++    std::string GetEffect() const {
++        return effect_;
++    }
++    //</GOCAST>
++    
+   // Signal the result of Start() if it returned CR_PENDING.
+   sigslot::signal2<VideoCapturer*, CaptureResult> SignalStartResult;
+   // Signal the captured frame to downstream.
+@@ -195,6 +211,11 @@
+   std::string id_;
+   talk_base::scoped_ptr<VideoFormat> capture_format_;
+   talk_base::scoped_ptr<std::vector<VideoFormat> > supported_formats_;
++    
++    //<GOCAST>
++ protected:
++    std::string effect_;
++    //</GOCAST>
+ 
+   DISALLOW_COPY_AND_ASSIGN(VideoCapturer);
+ };
 Index: talk/session/phone/mediaengine.h
 ===================================================================
 --- talk/session/phone/mediaengine.h	(revision 153)
@@ -468,6 +516,144 @@ Index: talk/session/phone/mediaengine.h
    int GetInputLevel() { return 0; }
    bool SetLocalMonitor(bool enable) { return true; }
    const std::vector<AudioCodec>& codecs() { return codecs_; }
+Index: talk/session/phone/webrtcvideocapturer.cc
+===================================================================
+--- talk/session/phone/webrtcvideocapturer.cc	(revision 153)
++++ talk/session/phone/webrtcvideocapturer.cc	(working copy)
+@@ -39,6 +39,10 @@
+ #include "talk/base/win32.h"  // Need this to #include the impl files
+ #ifdef WEBRTC_RELATIVE_PATH
+ #include "modules/video_capture/main/interface/video_capture_factory.h"
++
++//<GOCAST>
++#include "common_video/libyuv/include/libyuv.h"
++//</GOCAST>
+ #else
+ #include "third_party/webrtc/files/include/video_capture_factory.h"
+ #endif
+@@ -128,19 +132,33 @@
+ WebRtcVideoCapturer::WebRtcVideoCapturer()
+     : factory_(new WebRtcVcmFactory),
+       module_(NULL),
+-      captured_frames_(0) {
++      captured_frames_(0)
++    //<GOCAST>
++    , pEffectBuffer_(NULL)
++    //</GOCAST>
++                           {
+ }
+ 
+ WebRtcVideoCapturer::WebRtcVideoCapturer(WebRtcVcmFactoryInterface* factory)
+     : factory_(factory),
+       module_(NULL),
+-      captured_frames_(0) {
+-}
++      captured_frames_(0)
++    //<GOCAST>
++    , pEffectBuffer_(NULL)
++    //</GOCAST>
++    {
++    }
+ 
+ WebRtcVideoCapturer::~WebRtcVideoCapturer() {
+   if (module_) {
+     module_->Release();
+   }
++    
++    //<GOCAST>
++    if(NULL != pEffectBuffer_) {
++        delete pEffectBuffer_;
++    }
++    //</GOCAST>
+ }
+ 
+ bool WebRtcVideoCapturer::Init(const Device& device) {
+@@ -320,6 +338,46 @@
+   return true;
+ }
+ 
++    //<GOCAST>
++    void WebRtcVideoCapturer::ApplyEffect(webrtc::VideoFrame &frame) {
++        if("none" == effect_) {
++            return;
++        } else {
++            if(NULL == pEffectBuffer_) {
++                pEffectBuffer_ = new uint8[frame.Width()*frame.Height()*4];
++            }
++            
++            if(0 > webrtc::ConvertI420ToARGB8888(frame.Buffer(),
++                                                 pEffectBuffer_,
++                                                 frame.Width(), 
++                                                 frame.Height())) {
++                return;
++            }
++            
++            if("sepia" == effect_) {
++                if( 0 < webrtc::ARGBSepia(pEffectBuffer_,
++                                          frame.Width()*4,
++                                          0, 0, frame.Width(),
++                                          frame.Height())) {
++                    return;
++                }
++            } else if("gray" == effect_) {
++                if( 0 < webrtc::ARGBGray(pEffectBuffer_,
++                                         frame.Width()*4,
++                                         0, 0, frame.Width(),
++                                         frame.Height())) {
++                    return;
++                }
++            }
++            
++            webrtc::ConvertToI420(webrtc::kARGB, pEffectBuffer_, 0, 0,
++                                  frame.Width(), frame.Height(), 0,
++                                  frame.Width(), frame.Height(),
++                                  frame.Width(), webrtc::kRotateNone, frame.Buffer());           
++        }
++    }
++    //</GOCAST>
++    
+ void WebRtcVideoCapturer::OnMessage(talk_base::Message* message) {
+   // TODO: Fire SignalCaptureEvent appropriately.
+   SignalStartResult(this, CR_SUCCESS);
+@@ -337,7 +395,11 @@
+                  << sample.Width() << "x" << sample.Height()
+                  << ". Expected format " << GetCaptureFormat()->ToString();
+   }
+-
++    
++    //<GOCAST>
++    ApplyEffect(sample);
++    //</GOCAST>
++    
+   // Signal down stream components on captured frame.
+   WebRtcCapturedFrame frame(sample);
+   SignalFrameCaptured(this, &frame);
+Index: talk/session/phone/webrtcvideocapturer.h
+===================================================================
+--- talk/session/phone/webrtcvideocapturer.h	(revision 153)
++++ talk/session/phone/webrtcvideocapturer.h	(working copy)
+@@ -76,6 +76,10 @@
+   // Override virtual methods of the parent class VideoCapturer.
+   virtual bool GetPreferredFourccs(std::vector<uint32>* fourccs);
+ 
++  //<GOCAST>
++  void ApplyEffect(webrtc::VideoFrame& frame);
++  //<GOCAST>
++
+  private:
+   // Callback for our started event.
+   virtual void OnMessage(talk_base::Message* message);
+@@ -89,6 +93,10 @@
+   talk_base::scoped_ptr<WebRtcVcmFactoryInterface> factory_;
+   webrtc::VideoCaptureModule* module_;
+   int captured_frames_;
++
++  //<GOCAST>
++  uint8* pEffectBuffer_;
++  //</GOCAST>
+ };
+ 
+ struct WebRtcCapturedFrame : public CapturedFrame {
 Index: talk/session/phone/webrtcvoiceengine.cc
 ===================================================================
 --- talk/session/phone/webrtcvoiceengine.cc	(revision 153)

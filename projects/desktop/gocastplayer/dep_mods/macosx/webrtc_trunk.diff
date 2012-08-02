@@ -12,6 +12,58 @@ Index: src/build/merge_libs.gyp
        ],
        'sources': [ 'no_op.cc', ],
      },
+Index: src/common_video/libyuv/include/libyuv.h
+===================================================================
+--- src/common_video/libyuv/include/libyuv.h	(revision 2407)
++++ src/common_video/libyuv/include/libyuv.h	(working copy)
+@@ -183,6 +183,18 @@
+                                  int src_width,
+                                  int src_height,
+                                  VideoType src_video_type);
++    
++    // <GOCAST>
++    int ARGBGray(uint8_t* dst_argb,
++                 int dst_stride_argb,
++                 int dst_x, int dst_y,
++                 int width, int height);
++    
++    int ARGBSepia(uint8_t* dst_argb,
++                  int dst_stride_argb,
++                  int dst_x, int dst_y,
++                  int width, int height);
++    // </GOCAST>
+ 
+ // Compute PSNR for an I420 frame (all planes).
+ double I420PSNR(const uint8_t* ref_frame,
+Index: src/common_video/libyuv/libyuv.cc
+===================================================================
+--- src/common_video/libyuv/libyuv.cc	(revision 2407)
++++ src/common_video/libyuv/libyuv.cc	(working copy)
+@@ -412,6 +412,24 @@
+                           src_width, -src_height);
+ }
+ 
++    // <GOCAST>
++    int ARGBGray(uint8_t* dst_argb,
++                 int dst_stride_argb,
++                 int dst_x, int dst_y,
++                 int width, int height)
++    {
++        return libyuv::ARGBGray(dst_argb, dst_stride_argb, dst_x, dst_y, width, height);
++    }
++    
++    int ARGBSepia(uint8_t* dst_argb,
++                  int dst_stride_argb,
++                  int dst_x, int dst_y,
++                  int width, int height)
++    {
++        return libyuv::ARGBSepia(dst_argb, dst_stride_argb, dst_x, dst_y, width, height);
++    }
++    // </GOCAST>
++    
+ // Compute PSNR for an I420 frame (all planes)
+ double I420PSNR(const uint8_t* ref_frame,
+                 const uint8_t* test_frame,
 Index: DEPS
 ===================================================================
 --- DEPS	(revision 2407)
@@ -24,6 +76,15 @@ Index: DEPS
  
    # External resources like video and audio files used for testing purposes.
    # Downloaded on demand when needed.
+@@ -44,7 +45,7 @@
+     "http://git.chromium.org/webm/libvpx.git@cab6ac16",
+ 
+   "trunk/third_party/libyuv":
+-    (Var("googlecode_url") % "libyuv") + "/trunk@255",
++    (Var("googlecode_url") % "libyuv") + "/trunk@312",
+ 
+   "trunk/third_party/protobuf":
+     Var("chromium_trunk") + "/src/third_party/protobuf@" + Var("chromium_revision"),
 @@ -70,6 +71,28 @@
    # Needed by build/common.gypi.
    "trunk/tools/win/supalink":
