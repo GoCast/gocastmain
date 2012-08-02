@@ -426,6 +426,19 @@ Index: talk/session/phone/channelmanager.h
    bool SetLocalMonitor_w(bool enable);
    bool SetVideoOptions_w(const Device* cam_device);
    bool SetDefaultVideoEncoderConfig_w(const VideoEncoderConfig& config);
+Index: talk/session/phone/devicemanager.cc
+===================================================================
+--- talk/session/phone/devicemanager.cc	(revision 153)
++++ talk/session/phone/devicemanager.cc	(working copy)
+@@ -245,7 +245,7 @@
+ 
+   int i = 0;
+   while (exclusion_list[i]) {
+-    if (strnicmp(device_name.c_str(), exclusion_list[i],
++    if (_strnicmp(device_name.c_str(), exclusion_list[i],
+         strlen(exclusion_list[i])) == 0) {
+       LOG(LS_INFO) << "Ignoring device " << device_name;
+       return true;
 Index: talk/session/phone/videocapturer.h
 ===================================================================
 --- talk/session/phone/videocapturer.h	(revision 153)
@@ -449,8 +462,8 @@ Index: talk/session/phone/videocapturer.h
 +  VideoCapturer()
 +    //<GOCAST>
 +    : effect_("none")
-+    , effectCrit_(webrtc::CriticalSectionWrapper::CreateCriticalSection())
-+    //</GOCAST>
++	, effectCrit_(webrtc::CriticalSectionWrapper::CreateCriticalSection())
++	//</GOCAST>
 +    {}
    virtual ~VideoCapturer() {}
  
@@ -462,13 +475,13 @@ Index: talk/session/phone/videocapturer.h
 +    //<GOCAST>
 +    void SetEffect(const std::string& effect) {
 +        if("gray" == effect || "sepia" == effect || "none" == effect) {
-+            webrtc::CriticalSectionScoped crit(effectCrit_);
++			webrtc::CriticalSectionScoped crit(effectCrit_);
 +            effect_ = effect;
 +        }
 +    };
 +    
 +    std::string GetEffect() const {
-+        webrtc::CriticalSectionScoped crit(effectCrit_);
++		webrtc::CriticalSectionScoped crit(effectCrit_);
 +        return effect_;
 +    }
 +    //</GOCAST>
@@ -484,7 +497,7 @@ Index: talk/session/phone/videocapturer.h
 +    //<GOCAST>
 + protected:
 +    std::string effect_;
-+    webrtc::CriticalSectionWrapper* effectCrit_;
++	webrtc::CriticalSectionWrapper* effectCrit_;
 +    //</GOCAST>
  
    DISALLOW_COPY_AND_ASSIGN(VideoCapturer);
@@ -603,7 +616,7 @@ Index: talk/session/phone/webrtcvideocapturer.cc
  
 +    //<GOCAST>
 +    void WebRtcVideoCapturer::ApplyEffect(webrtc::VideoFrame &frame) {
-+        webrtc::CriticalSectionScoped crit(effectCrit_);
++		webrtc::CriticalSectionScoped crit(effectCrit_);
 +        if("none" == effect_) {
 +            return;
 +        } else {
@@ -734,3 +747,42 @@ Index: talk/base/refcount.h
    virtual int AddRef() {
      return talk_base::AtomicOps::Increment(&ref_count_);
    }
+Index: talk/base/proxydetect.cc
+===================================================================
+--- talk/base/proxydetect.cc	(revision 153)
++++ talk/base/proxydetect.cc	(working copy)
+@@ -242,7 +242,7 @@
+   if (*item == '.') {
+     size_t hostlen = url.host().length();
+     return (hostlen > len)
+-        && (stricmp(url.host().c_str() + (hostlen - len), item) == 0);
++        && (_stricmp(url.host().c_str() + (hostlen - len), item) == 0);
+   }
+ 
+   // localhost or www.*.com
+Index: talk/base/physicalsocketserver.cc
+===================================================================
+--- talk/base/physicalsocketserver.cc	(revision 153)
++++ talk/base/physicalsocketserver.cc	(working copy)
+@@ -1546,7 +1546,7 @@
+     if (dw == WSA_WAIT_FAILED) {
+       // Failed?
+       // TODO: need a better strategy than this!
+-      int error = WSAGetLastError();
++//      int error = WSAGetLastError();
+       ASSERT(false);
+       return false;
+     } else if (dw == WSA_WAIT_TIMEOUT) {
+Index: talk/base/httpclient.cc
+===================================================================
+--- talk/base/httpclient.cc	(revision 153)
++++ talk/base/httpclient.cc	(working copy)
+@@ -178,7 +178,7 @@
+ HttpResponseValidatorLevel(const HttpResponseData& response) {
+   std::string value;
+   if (response.hasHeader(HH_ETAG, &value)) {
+-    bool is_weak = (strnicmp(value.c_str(), "W/", 2) == 0);
++    bool is_weak = (_strnicmp(value.c_str(), "W/", 2) == 0);
+     return is_weak ? HVS_WEAK : HVS_STRONG;
+   }
+   if (response.hasHeader(HH_LAST_MODIFIED, &value)) {
