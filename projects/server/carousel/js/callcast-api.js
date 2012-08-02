@@ -24,7 +24,8 @@
           openWindow, 
           openMeeting, 
           tryPluginInstall, 
-          checkForPluginOptionalUpgrades
+          checkForPluginOptionalUpgrades,
+          handleRoomSetup
 */
 'use strict';
 
@@ -506,48 +507,47 @@ function addPluginToCarousel(
 
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-/**
- * \brief Function called when other Gocast.it plugin object is removed.
- */
-function removePluginFromCarousel(
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-    /**
-     * Other user nick name. */
-  nickname
-)
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+///
+/// \brief Function called when other Gocast.it plugin object is removed.
+/// \arg nickname remote user name
+///
+function removePluginFromCarousel(nickname)
 {
-  try
+  if (nickname) // this method gets called for local user and nickname is null 
+                // so stop here if nickname is null
   {
-    app.log(2, "removePluginFromCarousel nickname " + nickname);
-    // Get parent object and modify accordingly.
-    var id = app.str2id(nickname),
-        jqOo = $('#meeting > #streams > #scarousel div.cloudcarousel#' + id + '"'),
-        item = $(jqOo).data('item');
-    // todo this method is called for all occupied spots
-    // fix to call only for spot with id
-    if (jqOo.length !== 1) {return;}
-    if (!item) {throw "item not found";}
-    jqOo.addClass('unoccupied');
-    jqOo.removeAttr('title');
-    jqOo.removeAttr('id');
-    jqOo.removeAttr('encname');
-    // Remove player.
-    // todo hack, have to empty div , remove doesn't work
-    //var foo = $('object', jqOo);
-    //jqOo.remove('object');
-    jqOo.empty();
-    // put back things that should not have been removed
-    jqOo.append('<div class="name"></div>');
-    jqOo.css('background-image', 'url("images/gologo.png")'); // reset background image
-    item.addControls();
-  }
-  catch (err)
-  {
-     app.log(4, "removePluginFromCarousel exception " + err);
+    try
+    {
+      app.log(2, "removePluginFromCarousel nickname " + nickname);
+      // Get parent object and modify accordingly.
+      var id = app.str2id(nickname),
+          jqOo = $('#meeting > #streams > #scarousel div.cloudcarousel#' + id + '"'),
+          item = $(jqOo).data('item');
+      // todo this method is called for all occupied spots
+      // fix to call only for spot with id
+      if (jqOo.length !== 1) {return;}
+      if (!item) {throw "item not found";}
+      jqOo.addClass('unoccupied');
+      jqOo.removeAttr('title');
+      jqOo.removeAttr('id');
+      jqOo.removeAttr('encname');
+      // Remove player.
+      // todo hack, have to empty div , remove doesn't work
+      //var foo = $('object', jqOo);
+      //jqOo.remove('object');
+      jqOo.empty();
+      // put back things that should not have been removed
+      jqOo.append('<div class="name"></div>');
+      jqOo.css('background-image', 'url("images/gologo.png")'); // reset background image
+      item.addControls();
+    }
+    catch (err)
+    {
+       app.log(4, "removePluginFromCarousel exception " + err);
+    }
   }
   return false;
-} /* removePluginFromCarousel() */
+} // removePluginFromCarousel()
 
 ///
 /// \brief remove and re-instantiate local plugin
