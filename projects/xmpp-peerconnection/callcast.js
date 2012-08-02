@@ -62,7 +62,7 @@
  *
  */
 
-/*jslint sloppy: false, todo: true, white: true, browser: true, devel: true */
+/*jslint sloppy: false, todo: true, browser: true, devel: true */
 'use strict';
 
 var Callcast = {
@@ -93,6 +93,7 @@ var Callcast = {
     Callback_RemovePlugin: null,
     Callback_AddCarouselContent: null,
     Callback_RemoveCarouselContent: null,
+    Callback_ReadyState: null,
     connection: null,
     localplayer: null,
     participants: {},
@@ -189,6 +190,17 @@ var Callcast = {
 
     setCallbackForRemoveCarouselContent: function(cb) {
         this.Callback_RemoveCarouselContent = cb;
+    },
+
+    //
+    // \brief The supplied callback will be called whenever the peer connection readystate changes.
+    //      The problem to wrestle with is that each participant has a readystate so there can be
+    //      many callbacks.
+    // \param cb - function to be called when state changes. Note that cb must allow for both a state
+    //      change status and a participant name. function cb(state, nickname)
+    //
+    setCallbackForReadyState: function(cb) {
+        this.Callback_ReadyState = cb;
     },
 
     //
@@ -476,11 +488,11 @@ var Callcast = {
         if (!this.localplayer) {
             GoCastJS.getUserMedia(
                     new GoCastJS.UserMediaOptions(
-                        {audio: true, video:true},
+                        {audio: true, video: true},
                         $(jqSelector).get(0)
                     ),
                     function(stream) {
-                        console.log("getUserMediaSuccess: ", stream);
+                        console.log('getUserMediaSuccess: ', stream);
                         Callcast.localstream = stream;
                         Callcast.localplayer = $(jqSelector).get(0);
                         if (!Callcast.localplayer && !Callcast.localplayer.version) {
@@ -499,7 +511,7 @@ var Callcast = {
                         }
                     },
                     function(message) {
-                        Callcast.log("ERROR: getUserMediaFailure: ", message);
+                        Callcast.log('ERROR: getUserMediaFailure: ', message);
                         if (failure) {
                             failure(message);
                         }
@@ -541,9 +553,9 @@ var Callcast = {
         // When a remote peer's stream has been added, I get called here.
         //
         this.onaddstream = function(stream) {
-            if("undefined" !== typeof(stream) && null !== stream) {
-                console.log("onaddstream: added remote stream [" +
-                            stream.label + "]");
+            if ('undefined' !== typeof(stream) && null !== stream) {
+                console.log('onaddstream: added remote stream [' +
+                            stream.label + ']');
                 self.stream = stream;
             }
         };
@@ -552,17 +564,17 @@ var Callcast = {
         // When a remote peer's stream gets removed, I get called here.
         //
         this.onremovestream = function(stream) {
-            if("undefined" !== typeof(stream) && null !== stream) {
-                console.log("onremovestream: removed remote stream [" +
-                            stream.label + "]");
+            if ('undefined' !== typeof(stream) && null !== stream) {
+                console.log('onremovestream: removed remote stream [' +
+                            stream.label + ']');
                 self.stream = null;
             }
         };
 
         this.onicecandidate = function(candidate, moreComing) {
-            if(true === moreComing) {
-                if("string" === typeof(candidate) && null !== candidate) {
-                    console.log("onicemessage: ", candidate);
+            if (true === moreComing) {
+                if ('string' === typeof(candidate) && null !== candidate) {
+                    console.log('onicemessage: ', candidate);
                     // Send ICE message to the other peer.
                     var ice = $msg({to: self.jid, type: 'chat'})
                             .c('signaling', {xmlns: Callcast.NS_CALLCAST}).t(candidate);
@@ -572,7 +584,12 @@ var Callcast = {
         };
 
         this.onreadystatechange = function() {
-            console.log("OnReadyState: Current=" + self.peer_connection.ReadyState());
+            var state = self.peer_connection.ReadyState();
+
+            console.log('OnReadyState: For ' + self.jid + ', Current=' + state);
+            if (Callcast.Callback_ReadyState) {
+                Callcast.Callback_ReadyState(state, self.jid);
+            }
         };
 
         this.InitPeerConnection = function() {
@@ -586,7 +603,7 @@ var Callcast = {
                     // Create a true PeerConnection object and attach it to the DOM.
                     this.peer_connection = new GoCastJS.PeerConnection(
                             new GoCastJS.PeerConnectionOptions(
-                                "STUN " + Callcast.STUNSERVER + ":" + Callcast.STUNSERVERPORT,
+                                'STUN ' + Callcast.STUNSERVER + ':' + Callcast.STUNSERVERPORT,
                                 this.onicecandidate, this.onaddstream,
                                 this.onremovestream, this.onreadystatechange,
                                 Callcast.Callback_AddPlugin(nickname)));
@@ -603,7 +620,7 @@ var Callcast = {
                 else {
                     alert('ERROR: Callcast.setCallbackForAddPlugin() has not been called yet.');
                 }
-            } catch(e) {
+            } catch (e) {
                 console.log('EXCEPTION: ', e);
             }
         };
@@ -626,7 +643,7 @@ var Callcast = {
                         this.InitiateCall();
                     }
                 }
-            } catch(e) {
+            } catch (e) {
                 console.log('EXCEPTION: ', e);
             }
         };
@@ -690,7 +707,7 @@ var Callcast = {
                     console.log('Cannot InitiateCall - peer_connection is invalid.');
                 }
             }
-            catch(e) {
+            catch (e) {
                 console.log('EXCEPTION: ', e);
             }
         };
@@ -1792,19 +1809,19 @@ var Callcast = {
     },
 
     conn_callback_reconnect: function(status, err) {
-        console.log('Post-Reconnect conn_callback. Err:', err);
+        console.log('Post-Reconnect conn_callback. Status: ' + status + ' Err:', err);
         Callcast.conn_callback_guts(status);
     },
 
     conn_callback: function(status, err) {
-        console.log('Orig conn_callback. Err:', err);
+        console.log('Orig conn_callback. Status: ' + status + ' Err:', err);
         Callcast.conn_callback_guts(status);
     },
 
     conn_callback_guts: function(status) {
-        console.log('conn_callback: RID: ' + Callcast.connection.rid);
+        console.log('conn_callback: RID: ' + Callcast.connection.rid + ' SID: ' + Callcast.connection.sid);
          if (status === Strophe.Status.CONNECTED) {
-             console.log('Finalizing connection and then triggering connected...');
+             console.log('XMPP/Strophe Finalizing connection and then triggering connected...');
              Callcast.finalizeConnect();
              $(document).trigger('connected');
          } else if (status === Strophe.Status.AUTHENTICATING) {
@@ -1812,7 +1829,7 @@ var Callcast = {
          } else if (status === Strophe.Status.CONNECTING) {
              console.log('XMPP/Strophe Connecting...');
          } else if (status === Strophe.Status.ATTACHED) {
-             console.log('Re-Attach of connection successful. Triggering re-attached...');
+             console.log('XMPP/Strophe Re-Attach of connection successful. Triggering re-attached...');
             // Determine if we're in a 'refresh' situation and if so, then re-attach.
             if (typeof (Storage) !== 'undefined' && sessionStorage.room)
             {
@@ -1836,6 +1853,7 @@ var Callcast = {
              console.log('XMPP/Strophe is Dis-Connecting...should we try to re-attach here? TODO:RMW');
          } else if (status === Strophe.Status.CONNFAIL) {
              console.log('XMPP/Strophe reported connection failure...attempt to re-attach...');
+             console.log('-- Not actually doing anything here yet. TODO: RMW');
 // RMW: In theory we are supposed to advance RID by one, but Chrome fails it while Firefox is ok. Sigh. No advancing...
 //               Callcast.reattach(Callcast.connection.jid, Callcast.connection.sid, new Number(Callcast.connection.rid) + 1, Callcast.conn_callback);
 
@@ -1847,10 +1865,10 @@ var Callcast = {
          } else if (status === Strophe.Status.AUTHFAIL) {
              Callcast.disconnect();
              $(document).trigger('disconnected');
-             alert('Authentication failed. Bad password or username.');
+             alert('XMPP/Strophe Authentication failed. Bad password or username.');
          }
          else {
-            console.log('Strophe connection callback - unhandled status = ' + status);
+            console.log('XMPP/Strophe connection callback - unhandled status = ' + status);
          }
     },
 

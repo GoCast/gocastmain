@@ -722,6 +722,8 @@ function pluginLoaded(
        // todo there's an app member for video state, merge it with callcast video state
        Callcast.SetUseVideo(false); // Initially set to false, user must enable.
 
+      checkForPluginOptionalUpgrades(); // display upgrade button if there are optional upgrades
+
        handleRoomSetup();
      }, function(message) {
        // Failure to initialize.
