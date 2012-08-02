@@ -430,7 +430,18 @@ Index: talk/session/phone/videocapturer.h
 ===================================================================
 --- talk/session/phone/videocapturer.h	(revision 153)
 +++ talk/session/phone/videocapturer.h	(working copy)
-@@ -104,7 +104,11 @@
+@@ -37,6 +37,10 @@
+ #include "talk/session/phone/devicemanager.h"
+ #include "talk/session/phone/videocommon.h"
+ 
++//<GOCAST>
++#include "system_wrappers/interface/critical_section_wrapper.h"
++//</GOCAST>
++
+ namespace cricket {
+ 
+ // General capturer events.
+@@ -104,7 +108,12 @@
  //
  class VideoCapturer {
   public:
@@ -438,23 +449,26 @@ Index: talk/session/phone/videocapturer.h
 +  VideoCapturer()
 +    //<GOCAST>
 +    : effect_("none")
++    , effectCrit_(webrtc::CriticalSectionWrapper::CreateCriticalSection())
 +    //</GOCAST>
 +    {}
    virtual ~VideoCapturer() {}
  
    // Gets the id of the underlying device, which is available after the capturer
-@@ -162,6 +166,18 @@
+@@ -162,6 +171,20 @@
    // Check if the video capturer is running.
    virtual bool IsRunning() = 0;
  
 +    //<GOCAST>
 +    void SetEffect(const std::string& effect) {
 +        if("gray" == effect || "sepia" == effect || "none" == effect) {
++            webrtc::CriticalSectionScoped crit(effectCrit_);
 +            effect_ = effect;
 +        }
 +    };
 +    
 +    std::string GetEffect() const {
++        webrtc::CriticalSectionScoped crit(effectCrit_);
 +        return effect_;
 +    }
 +    //</GOCAST>
@@ -462,7 +476,7 @@ Index: talk/session/phone/videocapturer.h
    // Signal the result of Start() if it returned CR_PENDING.
    sigslot::signal2<VideoCapturer*, CaptureResult> SignalStartResult;
    // Signal the captured frame to downstream.
-@@ -195,6 +211,11 @@
+@@ -195,6 +218,12 @@
    std::string id_;
    talk_base::scoped_ptr<VideoFormat> capture_format_;
    talk_base::scoped_ptr<std::vector<VideoFormat> > supported_formats_;
@@ -470,6 +484,7 @@ Index: talk/session/phone/videocapturer.h
 +    //<GOCAST>
 + protected:
 +    std::string effect_;
++    webrtc::CriticalSectionWrapper* effectCrit_;
 +    //</GOCAST>
  
    DISALLOW_COPY_AND_ASSIGN(VideoCapturer);
@@ -582,12 +597,13 @@ Index: talk/session/phone/webrtcvideocapturer.cc
  }
  
  bool WebRtcVideoCapturer::Init(const Device& device) {
-@@ -320,6 +348,46 @@
+@@ -320,6 +348,47 @@
    return true;
  }
  
 +    //<GOCAST>
 +    void WebRtcVideoCapturer::ApplyEffect(webrtc::VideoFrame &frame) {
++        webrtc::CriticalSectionScoped crit(effectCrit_);
 +        if("none" == effect_) {
 +            return;
 +        } else {
@@ -629,7 +645,7 @@ Index: talk/session/phone/webrtcvideocapturer.cc
  void WebRtcVideoCapturer::OnMessage(talk_base::Message* message) {
    // TODO: Fire SignalCaptureEvent appropriately.
    SignalStartResult(this, CR_SUCCESS);
-@@ -337,7 +405,11 @@
+@@ -337,7 +406,11 @@
                   << sample.Width() << "x" << sample.Height()
                   << ". Expected format " << GetCaptureFormat()->ToString();
    }

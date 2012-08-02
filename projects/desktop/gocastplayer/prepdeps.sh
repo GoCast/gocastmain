@@ -8,8 +8,8 @@ if [ `uname` = "Darwin" ]; then
     build/gyp_chromium --depth=. src/build/merge_libs.gyp
     cd src/build
 
-    echo "xcodebuild -project merge_libs.xcodeproj -target merged_lib -configuration $1 -sdk macosx10.6 GCC_ENABLE_CPP_RTTI=YES"
-    xcodebuild -project merge_libs.xcodeproj -target merged_lib -configuration $1 -sdk macosx10.6 GCC_ENABLE_CPP_RTTI=YES
+    echo "xcodebuild -project merge_libs.xcodeproj -target merged_lib -configuration $1 -arch i386 -sdk macosx10.6 GCC_ENABLE_CPP_RTTI=YES"
+    xcodebuild -project merge_libs.xcodeproj -target merged_lib -configuration $1 -arch i386 -sdk macosx10.6 GCC_ENABLE_CPP_RTTI=YES
     cd ../../../../..
 fi
 
