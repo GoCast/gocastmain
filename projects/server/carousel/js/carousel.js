@@ -17,6 +17,7 @@
  */
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
+/*jslint browser: true, debug: true */
 'use strict';
 
 /*
@@ -28,7 +29,7 @@
     {
     this.orgWidth = $(objIn).width();
     this.orgHeight = $(objIn).height();
-    this.orgFontSize = parseInt($(objIn).css('font-size'));
+    this.orgFontSize = parseInt($(objIn).css('font-size'), 10);
     this.plgOrgWidth = this.orgWidth - 4;
     this.plgOrgHeight = (this.plgOrgWidth / Callcast.WIDTH) * Callcast.HEIGHT;
     this.object = objIn;
@@ -63,7 +64,7 @@
     {
        $(this.object).append('<img class="zoom control" src="images/fullscreen.png" alt="Zoom" title="Zoom" onclick="carouselItemZoom(event);"/>');
        $(this.object).append('<img class="close control" src="images/trash.png" alt="Close" title="Close" />');
-    }
+    };
 
     /// \brief a numerically ordered collection of Item with insert an delete
     var Items = function()
@@ -89,7 +90,7 @@
     Items.prototype.getBySpotNumber = function(spotNumber)
     {
         //todo check that index is numeric
-        var spot = parseInt(spotNumber),
+        var spot = parseInt(spotNumber, 10),
             index = this.bySpot[spot];
         return index ? this.vals[index] : null;
     };
@@ -119,7 +120,7 @@
     Items.prototype.iterateSorted = function(worker)
     {
         var i;
-        for (i = 0; i < this.keys.length; ++i)
+        for (i = 0; i < this.keys.length; i += 1)
         {
             worker(this.vals[this.keys[i]]);
         }
@@ -134,7 +135,7 @@
         }
 
        var last = this.keys[this.keys.length - 1];
-       return parseInt(last) + 1;
+       return parseInt(last, 10) + 1;
      };
      // add an item to the list
      // assign an index to it that is <highest index> + 1
@@ -530,20 +531,20 @@
     };
     this.doSpot = function(spotDiv, info) // perform action defined in info to spot
     {
-       console.log("doSpot", info);
-       console.log("spotDiv", spotDiv);
+       console.log('doSpot', info);
+       console.log('spotDiv', spotDiv);
        //if (info.spotType)
        if (info.spottype)
        {
           //if (info.spotType == 'youtube')
-          if (info.spottype == 'youtube')
+          if (info.spottype === 'youtube')
           {
-             console.log("doSpot youtube");
+             console.log('doSpot youtube');
              loadVideo(spotDiv, info);
           }
        }
        // ... other spot commands
-    }
+    };
     this.createSpot = function(info) // create a new spot
     {
        // add the html
@@ -559,11 +560,12 @@
        items.addItem(item);
        this.setupItem(item);
        return newDiv;
-    }
+    };
     this.addSpotCb = function(info) // add spot callcast callback
     {
-       console.log("addSpotCb", info);
-       var spotDiv; // the desired spot to be replaced or added
+       console.log('addSpotCb', info);
+       var spotDiv, // the desired spot to be replaced or added
+           div, divs;
        // determine cmd type, add or replace
        //if (info.spotReplace) // see if there is a spotReplace prop
        if (info.spotreplace) // see if there is a spotReplace prop
@@ -571,29 +573,29 @@
           // if there is a nodup prop == 1 and spot with spotId exists
           // don't replace
           //if (info.nodup && info.nodup == 1 && info.spotDivId)
-          if (info.spotnodup && info.spotnodup == 1 && info.spotdivid)
+          if (info.spotnodup && info.spotnodup === 1 && info.spotdivid)
           {
              //var div = $('#meeting > #streams > #scarousel #' + info.spotDivId);
-             var div = $('#meeting > #streams > #scarousel #' + info.spotdivid);
+             div = $('#meeting > #streams > #scarousel #' + info.spotdivid);
              if (div.length > 0)
              {
                 return; // spot with id exists so we're done
              }
           }
-          var divs = $('#meeting > #streams > #scarousel div.unoccupied');
-          if (divs.length == 0) // no unoc spots to replace, create one
+          divs = $('#meeting > #streams > #scarousel div.unoccupied');
+          if (divs.length === 0) // no unoc spots to replace, create one
           {
              spotDiv = this.createSpot(info);
           }
           else // replace spot
           {
              //if (info.spotReplace === "first-unoc") // replace first unoc spot
-             if (info.spotreplace === "first-unoc") // replace first unoc spot
+             if (info.spotreplace === 'first-unoc') // replace first unoc spot
              {
                 spotDiv = $(divs).get(0);
              }
              //else if (info.spotReplace === "last-unoc")
-             else if (info.spotreplace === "last-unoc")
+             else if (info.spotreplace === 'last-unoc')
              {
                 spotDiv = $(divs).get(divs.length - 1);
              }
@@ -605,8 +607,8 @@
           }
           else
           {
-             app.log(5, "addSpotCb problem with spot replace");
-          } 
+             app.log(5, 'addSpotCb problem with spot replace');
+          }
        }
        else // new spot
        {
@@ -620,23 +622,23 @@
     {
        // todo refactor this out of carousel
        var item = items.getBySpotNumber(info.spotnumber),
-           spot = parseInt(info.spotnumber),
+           spot = parseInt(info.spotnumber, 10),
            zoomedSpot, zoomedItem;
        if (!item) // item by spot number is not in carousel
        {
           // try zoomed spot
           zoomedSpot = $('#meeting > #zoom > .cloudcarousel');
-          if (zoomedSpot.length == 1)
+          if (zoomedSpot.length === 1)
           {
              zoomedItem = $(zoomedSpot).data('item');
              if (zoomedItem.spotNumber) // zoomed spot has spotNumber
              {
-                if (zoomedItem.spotNumber == info.spotnumber)
+                if (zoomedItem.spotNumber === info.spotnumber)
                 {
-                   item = zoomedItem
+                   item = zoomedItem;
                 }
             }
-            else if (zoomedItem.index == info.spotnumber)
+            else if (zoomedItem.index === info.spotnumber)
             {
                item = zoomedItem;
             }
@@ -660,8 +662,8 @@
        }
        else
        {
-          app.log(4, "item " + info.spotnumber + " not found");
-          console.log("info", info);
+          app.log(4, 'item ' + info.spotnumber + ' not found');
+          console.log('info', info);
        }
     };
 
@@ -669,7 +671,7 @@
     this.remove = function(index)
     {
        items.remove(index);
-    }
+    };
     this.insertSpot = function(spot) // add a previously created spot to the carousel
     {
        var item;
@@ -691,7 +693,7 @@
                 item = jqDiv.data('item');
 
             console.log('removing', jqDiv);
-            Callcast.RemoveSpot({spotNumber: (item.spotNumber) ? item.spotNumber : item.index});
+            Callcast.RemoveSpot({spotNumber: item.spotNumber || item.index});
         });
     };
     /*
@@ -700,7 +702,7 @@
     this.checkObjectsLoaded = function()
     {
         var i, item;
-        for (i = 0; i < objects.length; i++)
+        for (i = 0; i < objects.length; i += 1)
         {
             if (($(objects[i]).width() === undefined) ||
                  ((objects[i].complete !== undefined) && (!objects[i].complete)))
@@ -709,7 +711,7 @@
             }
         } // for loop
         app.log(2, 'checkObjectsLoaded done');
-        for (i = 0; i < objects.length; i++)
+        for (i = 0; i < objects.length; i += 1)
         {  // create and setup item
             item = new Item(objects[i], options);
             items.addItem(item);
