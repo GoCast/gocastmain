@@ -65,6 +65,13 @@ body > div#lower-right > input
   width: 24px;
   height: 24px;
 }
+body > div#lower-right > input#dlbtn
+{
+  margin-left: 5px;
+  background-image: url("../images/download.png");
+  display: none;
+  background-size: 100%;
+}
 body > div#lower-right > input.demobtn {
   margin-left: 5px;
   background-image: url("../images/demo.png");

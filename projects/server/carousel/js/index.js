@@ -1340,6 +1340,20 @@ function handleRoomSetup() {
   });
 }
 
+///
+/// \brief display upgrade button if there are optional upgrades
+///
+function checkForPluginOptionalUpgrades()
+{
+  // assume that by the time we get here the plugin is loaded
+  // and the user has been prompted for any required update
+  // if a plugin update is available show the download button
+  if (Callcast.pluginUpdateAvailable())
+  {
+    app.log(2, "checkForPluginOptionalUpgrades upgrade available current " + Callcast.GetVersion() + " new " + Callcast.PLUGIN_VERSION_CURRENT);
+    $("#lower-right > #dlbtn").css("display", "block");
+  }
+}
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
  * \brief check if plugin installed and prompt user if not
@@ -1367,7 +1381,6 @@ function tryPluginInstall(
     // Resize window.
     $(window).resize(resizeWindows);
 
-    //pluginLoaded(); // init local plugin
   }
   else { // plugin not loaded or out of date
     // prompt user to install plugin
@@ -1401,7 +1414,7 @@ function tryPluginInstall(
 ///
 /// \brief update plugin dl msg and dl plugin
 ///
-var doDownload = function()
+function doDownload()
 {
   // Alert user to download and install the plugin.
   if (app.osPlatform.isWin)
@@ -1423,7 +1436,6 @@ var doDownload = function()
   }
 
   // prompt user for next step
-  // chrome can't load an upgraded plugin so prompt user to restart
   if (app.osPlatform.isMac)
   {
      installPrompt(app.MAC_PL_NAME);
@@ -1435,11 +1447,13 @@ var doDownload = function()
 ///
 /// \brief display appropriate prompt depending on plugin install type
 ///
-var installPrompt = function(pluginName)
+function installPrompt(pluginName)
 {
   closeWindow();
-  if (app.pluginInstalled() && Callcast.pluginUpdateRequired())
+  if (app.pluginInstalled() && 
+       (Callcast.pluginUpdateRequired() || Callcast.pluginUpdateAvailable()) )
   {
+    // chrome can't load an upgraded plugin so prompt user to restart
     if (app.browser.name === 'Chrome')
     {
       openWindow('#chromeRestart');
@@ -1448,6 +1462,10 @@ var installPrompt = function(pluginName)
     {
       openWindow('#pageReload');
     }
+  }
+  else if (app.browser.name === 'Firefox') // firefox seems to have a problem polling navigator.plugins
+  {
+    openWindow('#pageReload');
   }
   else // wait for plugin
   {
@@ -1458,7 +1476,7 @@ var installPrompt = function(pluginName)
 ///
 /// \brief download from an url
 ///
-var downloadURL = function downloadURL(url)
+function downloadURL(url)
 {
     var iframe;
     iframe = document.getElementById('hiddenDownloader');
