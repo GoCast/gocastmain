@@ -363,7 +363,7 @@ var Callcast = {
         var nick = info.nick;
         nick = this.WithSpaces(nick);
 
-        if (nick && this.participants[nick])
+        if (nick && this.participants[nick] && this.participants[nick].peer_connection)
         {
 
             if (info.width >= 0 && info.height >= 0)
@@ -384,6 +384,11 @@ var Callcast = {
         }
         else if (nick !== this.nick) {
             console.log('ShowRemoteVideo: nickname not found: ' + nick);
+        }
+
+        // If we're just missing the peer_connection, let's note an error.
+        if (nick && this.participants[nick] && !this.participants[nick].peer_connection) {
+            console.log('ShowRemoteVideo: ERROR - peer_connection is null.')
         }
     },
 
@@ -601,31 +606,29 @@ var Callcast = {
 
         this.InitPeerConnection = function() {
             try {
-            //
-            // Now we need to construct the peer connection and setup our stream
-            //
+                //
+                // Now we need to construct the peer connection and setup our stream
+                //
 
-                if (Callcast.Callback_AddPlugin)
-                {
-                    // Create a true PeerConnection object and attach it to the DOM.
-                    this.peer_connection = new GoCastJS.PeerConnection(
-                            new GoCastJS.PeerConnectionOptions(
-                                'STUN ' + Callcast.STUNSERVER + ':' + Callcast.STUNSERVERPORT,
-                                this.onicecandidate, this.onaddstream,
-                                this.onremovestream, this.onreadystatechange,
-                                Callcast.Callback_AddPlugin(nickname)));
-
-                    if (!this.peer_connection) {
-                        alert("Gocast Remote Player object for name:'" + nickname + "' not found in DOM. Plugin problem?");
-                    }
-                    else
-                    {
-                        // Add my stream to this peer connection in preparation
-                        this.peer_connection.AddStream(Callcast.localstream);
-                    }
+                if (this.peer_connection) {
+                    this.peer_connection.Deinit();
+                    this.peer_connection = null;
                 }
-                else {
-                    alert('ERROR: Callcast.setCallbackForAddPlugin() has not been called yet.');
+                // Create a true PeerConnection object and attach it to the DOM.
+                this.peer_connection = new GoCastJS.PeerConnection(
+                        new GoCastJS.PeerConnectionOptions(
+                            'STUN ' + Callcast.STUNSERVER + ':' + Callcast.STUNSERVERPORT,
+                            this.onicecandidate, this.onaddstream,
+                            this.onremovestream, this.onreadystatechange,
+                            this.AddPluginResult));
+
+                if (!this.peer_connection) {
+                    alert("Gocast Remote Player object for name:'" + nickname + "' not found in DOM. Plugin problem?");
+                }
+                else
+                {
+                    // Add my stream to this peer connection in preparation
+                    this.peer_connection.AddStream(Callcast.localstream);
                 }
             } catch (e) {
                 console.log('EXCEPTION: ', e.toString(), e);
@@ -636,13 +639,6 @@ var Callcast = {
             try {
                 if (this.peer_connection) {
                     console.log('Callee: ' + this.jid + ' - RESET PEER CONNECTION.');
-
-                    if (!Callcast.Callback_RemovePlugin) {
-                        console.log('ResetPeerConnection: ERROR: No RemovePlugin callback.');
-                        return;
-                    }
-
-                    this.RemovePlugin();
 
                     this.InitPeerConnection();
 
@@ -730,7 +726,7 @@ var Callcast = {
             try {
                 if (this.peer_connection)
                 {
-                    if (this.peer_connection.ReadyState()==='ACTIVE')
+                    if (this.peer_connection.ReadyState() === 'ACTIVE')
                     {
                         console.log('CompleteCall: Offer received while active. RESET PEER CONNECTION.');
                         this.ResetPeerConnection();
@@ -832,6 +828,12 @@ var Callcast = {
             }
         };
 
+        if (Callcast.Callback_AddPlugin) {
+            this.AddPluginResult = Callcast.Callback_AddPlugin(nickname);
+        }
+        else {
+            console.log('Callee: ERROR: Init failure. No AddPlugin callback available.');
+        }
         this.InitPeerConnection();
     },
 
@@ -1827,12 +1829,24 @@ var Callcast = {
     },
 
     conn_callback_reconnect: function(status, err) {
-        console.log('Post-Reconnect conn_callback. Status: ' + status + ' Err:', err);
+        if (err) {
+            console.log('Post-Reconnect conn_callback. Status: ' + status + ' Err:', err);
+        }
+        else {
+            console.log('Post-Reconnect conn_callback. Status: ' + status + ' No Err.');
+        }
+
         Callcast.conn_callback_guts(status);
     },
 
     conn_callback: function(status, err) {
-        console.log('Orig conn_callback. Status: ' + status + ' Err:', err);
+        if (err) {
+            console.log('Orig conn_callback. Status: ' + status + ' Err:', err);
+        }
+        else {
+            console.log('Orig conn_callback. Status: ' + status + ' No Err.');
+        }
+
         Callcast.conn_callback_guts(status);
     },
 
@@ -1876,7 +1890,8 @@ var Callcast = {
 //               Callcast.reattach(Callcast.connection.jid, Callcast.connection.sid, new Number(Callcast.connection.rid) + 1, Callcast.conn_callback);
 
 // RMW: SPECIFICALLY SKIPPING RE-ATTACH on CONNFAIL right now. Think it's causing issues.
-//           Callcast.reattach(Callcast.connection.jid, Callcast.connection.sid, Callcast.connection.rid, Callcast.conn_callback);
+            console.log('Attempting a reattach() here. Starting doing this again on Aug 2 2012.');
+            Callcast.reattach(Callcast.connection.jid, Callcast.connection.sid, Callcast.connection.rid, Callcast.conn_callback);
 
 
 //           alert("NOTICE -- attempted to auto-re-attach after connection failure. Did we succeed?");
