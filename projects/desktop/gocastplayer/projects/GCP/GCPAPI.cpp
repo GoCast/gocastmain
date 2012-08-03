@@ -120,7 +120,7 @@ void GCPAPI::GetUserMedia(const FB::JSObjectPtr& mediaHints,
     }
     
 	m_htmlId = "localPlayer";
-    pCtr->GetUserMedia(mediaHints, succCb, failCb);
+    pCtr->GetUserMedia(mediaHints, succCb, failCb, false);
 }
 
 FB::variant GCPAPI::Init(const FB::variant& htmlId,
@@ -207,7 +207,8 @@ FB::variant GCPAPI::CreateOffer(const FB::JSObjectPtr& mediaHints)
         bAudio = true;
     }
     
-    return pCtr->CreateOffer(m_htmlId.convert_cast<std::string>(), webrtc::MediaHints(bAudio, bVideo));
+    return pCtr->CreateOffer(m_htmlId.convert_cast<std::string>(),
+                             webrtc::MediaHints(bAudio, bVideo));
 }
 
 FB::variant GCPAPI::CreateAnswer(const FB::variant& offer, const FB::JSObjectPtr& mediaHints)
@@ -278,9 +279,12 @@ FB::variant GCPAPI::SetRemoteDescription(const FB::variant& action, const FB::va
         return false;
     }
     
+    std::string msg("action: ");
+    msg += action.convert_cast<std::string>();
+    FBLOG_INFO_CUSTOM("GCPAPI::SetRemoteDescription", msg);
+    
     return pCtr->SetRemoteDescription(m_htmlId.convert_cast<std::string>(),
-                                      _action,
-                                      sdp.convert_cast<std::string>());    
+                                      _action, sdp.convert_cast<std::string>());    
 }
 
 FB::variant GCPAPI::ProcessIceMessage(const FB::variant& sdp)
@@ -399,9 +403,24 @@ void GCPAPI::OnIceCandidate(const webrtc::IceCandidateInterface* pCandidate)
     std::string candidateSdp("");
     bool bMoreComing = true;
     
+    if("BLOCKED" == m_readyState)
+    {
+        return;
+    }
+    
     if(false == pCandidate->ToString(&candidateSdp))
     {
         candidateSdp = "";
+    }
+    
+    if(std::string::npos != candidateSdp.find(" tcp "))
+    {
+        m_readyState = "BLOCKED";
+        if(NULL != m_onreadystatechangeCb.get())
+        {
+            m_onreadystatechangeCb->InvokeAsync("", FB::variant_list_of());
+        }
+        return;
     }
     
     if(NULL != m_iceCb.get())

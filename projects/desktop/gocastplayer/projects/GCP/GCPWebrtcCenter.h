@@ -75,7 +75,7 @@ namespace GoCast
         void GetUserMedia(FB::JSObjectPtr mediaHints,
                           FB::JSObjectPtr succCb,
                           FB::JSObjectPtr failCb,
-                          bool bSyncCall = false);
+                          bool bSyncCall = true);
         bool NewPeerConnection(const std::string& pluginId,
                                const std::string& iceConfig,
                                webrtc::PeerConnectionObserver* pObserver,

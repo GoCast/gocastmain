@@ -529,6 +529,10 @@ namespace GoCast
     {
         if(false == bSyncCall)
         {
+            std::string msg("action: ");
+            msg += (webrtc::JsepInterface::kOffer==action ? "OFFER" : "ANSWER");
+            FBLOG_INFO_CUSTOM("RtcCenter::SetRemoteDescription", msg);
+
             SetRemoteSdpParams params(pluginId, action, sdp);
             m_msgq.Send(MSG_SET_REMOTE_SDP, &params, true);
             return params.m_bResult;
@@ -912,7 +916,7 @@ namespace GoCast
         }
         
         std::string msg("Setting local sdp as ");
-        msg += ((webrtc::PeerConnectionInterface::kOffer == action) ? "OFFER..." : "ANSWER...");
+        msg += ((webrtc::JsepInterface::kOffer == action) ? "OFFER..." : "ANSWER...");
         FBLOG_INFO_CUSTOM(funcstr("RtcCenter::SetLocalDescription_w", pluginId), msg);
         
         webrtc::SessionDescriptionInterface* pSdp = webrtc::CreateSessionDescription(sdp);
@@ -947,7 +951,7 @@ namespace GoCast
         }
         
         std::string msg("Setting remote sdp as ");
-        msg += ((webrtc::PeerConnectionInterface::kOffer == action) ? "OFFER..." : "ANSWER...");
+        msg += ((webrtc::JsepInterface::kOffer == action) ? "OFFER..." : "ANSWER...");
         FBLOG_INFO_CUSTOM(funcstr("RtcCenter::SetRemoteDescription_w", pluginId), msg);
 
         webrtc::SessionDescriptionInterface* pSdp = webrtc::CreateSessionDescription(sdp);
@@ -1046,8 +1050,8 @@ namespace GoCast
              RemoveRemoteStream(pluginId);
         }
         
+        m_pPeerConns[pluginId] = NULL;
         m_pPeerConns.erase(pluginId);
-        
         return true;
     }
 }
