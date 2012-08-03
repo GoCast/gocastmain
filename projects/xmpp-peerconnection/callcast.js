@@ -1829,12 +1829,24 @@ var Callcast = {
     },
 
     conn_callback_reconnect: function(status, err) {
-        console.log('Post-Reconnect conn_callback. Status: ' + status + ' Err:', err);
+        if (err) {
+            console.log('Post-Reconnect conn_callback. Status: ' + status + ' Err:', err);
+        }
+        else {
+            console.log('Post-Reconnect conn_callback. Status: ' + status + ' No Err.');
+        }
+
         Callcast.conn_callback_guts(status);
     },
 
     conn_callback: function(status, err) {
-        console.log('Orig conn_callback. Status: ' + status + ' Err:', err);
+        if (err) {
+            console.log('Orig conn_callback. Status: ' + status + ' Err:', err);
+        }
+        else {
+            console.log('Orig conn_callback. Status: ' + status + ' No Err.');
+        }
+
         Callcast.conn_callback_guts(status);
     },
 
@@ -1878,7 +1890,8 @@ var Callcast = {
 //               Callcast.reattach(Callcast.connection.jid, Callcast.connection.sid, new Number(Callcast.connection.rid) + 1, Callcast.conn_callback);
 
 // RMW: SPECIFICALLY SKIPPING RE-ATTACH on CONNFAIL right now. Think it's causing issues.
-//           Callcast.reattach(Callcast.connection.jid, Callcast.connection.sid, Callcast.connection.rid, Callcast.conn_callback);
+            console.log('Attempting a reattach() here. Starting doing this again on Aug 2 2012.');
+            Callcast.reattach(Callcast.connection.jid, Callcast.connection.sid, Callcast.connection.rid, Callcast.conn_callback);
 
 
 //           alert("NOTICE -- attempted to auto-re-attach after connection failure. Did we succeed?");
