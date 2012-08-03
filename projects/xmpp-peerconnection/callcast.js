@@ -589,20 +589,25 @@ var Callcast = {
         };
 
         this.onreadystatechange = function() {
-            var state = self.peer_connection.ReadyState();
+            try {
+                var state = self.peer_connection.ReadyState();
 
-            console.log('OnReadyState: For ' + self.jid + ', Current=' + state);
+                console.log('OnReadyState: For ' + self.jid + ', Current=' + state);
 
-            if (state === 'BLOCKED') {
-                // a blocked connection was detected by the C++ area.
-                // We need to reset the connection.
+                if (state === 'BLOCKED') {
+                    // a blocked connection was detected by the C++ area.
+                    // We need to reset the connection.
 
-                console.log('Callee: ReadyState===BLOCKED - RESET PEER CONNECTION.');
-                self.ResetPeerConnection();
+                    console.log('Callee: ReadyState===BLOCKED - RESET PEER CONNECTION.');
+                    self.ResetPeerConnection();
+                }
+
+                if (Callcast.Callback_ReadyState) {
+                    Callcast.Callback_ReadyState(state, self.jid);
+                }
             }
-
-            if (Callcast.Callback_ReadyState) {
-                Callcast.Callback_ReadyState(state, self.jid);
+            catch (e) {
+                console.log('EXCEPTION: ', e.toString(), e);
             }
         };
 
@@ -773,32 +778,48 @@ var Callcast = {
         };
 
         this.InboundIce = function(candidate) {
-            if (this.peer_connection)
-            {
-                if (this.bIceStarted) {
-                    console.log('InboundIce: Got Candidate - ' + candidate);
+            try {
+                if (this.peer_connection && this.peer_connection.ReadyState() === 'ACTIVE')
+                {
+                    if (this.bIceStarted) {
+                        console.log('InboundIce: Got Candidate - ' + candidate);
 
-                    this.peer_connection.ProcessIceMessage(candidate);
+                        this.peer_connection.ProcessIceMessage(candidate);
+                    }
+                    else {
+                        console.log('WARNING: Ice machine not started yet but received an inbound Ice Candidate.');
+                    }
                 }
                 else {
-                    console.log('WARNING: Ice machine not started yet but received an inbound Ice Candidate.');
+                    if (!this.peer_connection) {
+                        console.log('Could not process ICE message. Peer_connection is invalid.');
+                    }
+                    else {
+                        console.log('Could not process ICE message. Peer_connection state not ACTIVE. Currently === ' +
+                                this.peer_connection.ReadyState());
+                    }
                 }
             }
-            else {
-                console.log('Could not process ICE message. Peer_connection is invalid.');
+            catch (e) {
+                console.log('EXCEPTION: ', e.toString(), e);
             }
         };
 
         this.InboundAnswer = function(sdp) {
-            if (this.peer_connection)
-            {
-                console.log('  InboundAnswer: Setting SetRemoteDescription as ANSWER');
-                this.peer_connection.SetRemoteDescription('ANSWER', sdp);
-                self.peer_connection.StartIce();
-                self.bIceStarted = true;
+            try {
+                if (this.peer_connection)
+                {
+                    console.log('  InboundAnswer: Setting SetRemoteDescription as ANSWER');
+                    this.peer_connection.SetRemoteDescription('ANSWER', sdp);
+                    self.peer_connection.StartIce();
+                    self.bIceStarted = true;
+                }
+                else {
+                    console.log('Could not process answer message. Peer_connection is invalid.');
+                }
             }
-            else {
-                console.log('Could not process answer message. Peer_connection is invalid.');
+            catch (e) {
+                console.log('EXCEPTION: ', e.toString(), e);
             }
         };
 
