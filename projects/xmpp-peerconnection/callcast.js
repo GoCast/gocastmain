@@ -388,7 +388,7 @@ var Callcast = {
 
         // If we're just missing the peer_connection, let's note an error.
         if (nick && this.participants[nick] && !this.participants[nick].peer_connection) {
-            console.log('ShowRemoteVideo: ERROR - peer_connection is null.')
+            console.log('ShowRemoteVideo: ERROR - peer_connection is null.');
         }
     },
 
@@ -584,13 +584,6 @@ var Callcast = {
                     var ice = $msg({to: self.jid, type: 'chat'})
                             .c('signaling', {xmlns: Callcast.NS_CALLCAST}).t(candidate);
                     Callcast.connection.send(ice);
-
-                    // WORKAROUND: If we see a 'tcp' candidate, that's bad news.
-                    //   In rev 2407, this means the peerconnection will be
-                    //   failed. So, we're going to reset the connection.
-                    if (candidate.match(' tcp ')) {
-                        self.ResetPeerConnection();
-                    }
                 }
             }
         };
@@ -599,6 +592,15 @@ var Callcast = {
             var state = self.peer_connection.ReadyState();
 
             console.log('OnReadyState: For ' + self.jid + ', Current=' + state);
+
+            if (state === 'BLOCKED') {
+                // a blocked connection was detected by the C++ area.
+                // We need to reset the connection.
+
+                console.log('Callee: ReadyState===BLOCKED - RESET PEER CONNECTION.');
+                self.ResetPeerConnection();
+            }
+
             if (Callcast.Callback_ReadyState) {
                 Callcast.Callback_ReadyState(state, self.jid);
             }
@@ -638,12 +640,16 @@ var Callcast = {
         this.ResetPeerConnection = function() {
             try {
                 if (this.peer_connection) {
-                    console.log('Callee: ' + this.jid + ' - RESET PEER CONNECTION.');
+                    console.log('ResetPeerConnection: Resetting peer connection with: ' + this.jid);
 
                     this.InitPeerConnection();
 
                     if (this.bAmCaller) {
+                        console.log('  ResetPeerConnection - Re-establishing call to peer.');
                         this.InitiateCall();
+                    }
+                    else {
+                        console.log('  ResetPeerConnection - Waiting on Caller to call me back...');
                     }
                 }
                 else {
@@ -693,6 +699,7 @@ var Callcast = {
                     // Create with audio and video tracks in case they want to be used later.
                     sdp = this.peer_connection.CreateOffer({audio: true, video: true});
 
+                    console.log('  InitiateCall: Setting SetLocalDescription as OFFER');
                     this.peer_connection.SetLocalDescription('OFFER', sdp, function() {
                         var offer = $msg({to: self.jid, type: 'chat'})
                                 .c('offer', {xmlns: Callcast.NS_CALLCAST}).t(sdp);
@@ -735,10 +742,12 @@ var Callcast = {
                     console.log('Completing call...');
     //                console.log('CompleteCall: Offer-SDP=' + offer);
 
+                    console.log('  CompleteCall: Setting SetRemoteDescription as OFFER');
                     this.peer_connection.SetRemoteDescription('OFFER', offer);
 
                     sdp = this.peer_connection.CreateAnswer(offer, {audio: true, video: true});
 //                  console.log('CompleteCall: Answer-SDP=' + sdp);
+                    console.log('  CompleteCall: Setting SetLocalDescription as ANSWER');
                     this.peer_connection.SetLocalDescription('ANSWER', sdp, function() {
                         console.log('CompleteCall: Success - setting local and starting ICE machine.');
                         self.peer_connection.StartIce();
@@ -768,15 +777,8 @@ var Callcast = {
             {
                 if (this.bIceStarted) {
                     console.log('InboundIce: Got Candidate - ' + candidate);
-                    // WORKAROUND: If we see a 'tcp' candidate, that's bad news.
-                    //   In rev 2407, this means the peerconnection will be
-                    //   failed. So, we're going to reset the connection.
-                    if (candidate.match(' tcp ')) {
-                        self.ResetPeerConnection();
-                    }
-                    else {
-                        this.peer_connection.ProcessIceMessage(candidate);
-                    }
+
+                    this.peer_connection.ProcessIceMessage(candidate);
                 }
                 else {
                     console.log('WARNING: Ice machine not started yet but received an inbound Ice Candidate.');
@@ -790,6 +792,7 @@ var Callcast = {
         this.InboundAnswer = function(sdp) {
             if (this.peer_connection)
             {
+                console.log('  InboundAnswer: Setting SetRemoteDescription as ANSWER');
                 this.peer_connection.SetRemoteDescription('ANSWER', sdp);
                 self.peer_connection.StartIce();
                 self.bIceStarted = true;
