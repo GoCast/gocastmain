@@ -121,39 +121,77 @@ $(document).on('synclink', function(
   app.log(2, 'A new synclink has been issued.');
 }); /* synclink() */
 
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-/**
- * \brief Function that modifies the DOM when a public message arrives.
- *        This implements the trigger "public-message".
- */
+///
+/// \brief Function that modifies the DOM when a public message arrives.
+///        This implements the trigger "public-message".
 $(document).on('public-message', function(
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-    /**
-     * Event object. */
-  ev,
-    /**
-     * Message Information Object. */
-  msginfo
+  ev, // Event object.
+  msginfo // Message Information Object.
 )
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
-  var notice = msginfo.notice,
-      delayed = msginfo.delayed,
-      nick_class = msginfo.nick_class,
-  /*
-   * Add message to Message Board. */
-      jqChat = $('#msgBoard > #chatOut'),
-      jqTick = $('#msgBoard > #msgTicker'),
-      msgTicker,
-      msg = '<b>' + decodeURI(msginfo.nick) + '</b>' + ': ' +
-                   decodeURI(msginfo.body) + '<br>';
-  jqChat.append(msg);
-  msgTicker = '<b>' + decodeURI(msginfo.nick) + '</b>' + ': ' +
-                   decodeURI(msginfo.body) + ' ';
-  jqTick.prepend(msgTicker);
+  try
+  {
+    var notice = msginfo.notice,
+        delayed = msginfo.delayed,
+        nick_class = msginfo.nick_class,
+        jqChat = $('#msgBoard > #chatOut'),
+        //jqTick = $('#msgBoard > #msgTicker'),
+        msgTicker,
+        msg,
+        atBottom,
+        msgNumber,
+        span;
+    //msgTicker = '<b>' + decodeURI(msginfo.nick) + '</b>' + ': ' +
+    //                 decodeURI(msginfo.body) + ' ';
+    if (!jqChat[0]) {throw "no chat out div";}
+    msgNumber = jqChat.data('msgNumber'); // get next msgNumber
+    msgNumber = msgNumber || 0;           // init if not already
+    msg = '<span + id="'+ msgNumber + '"<b>' + 
+                          decodeURI(msginfo.nick) + '</b>' + ': ' +
+                          decodeURI(msginfo.body) + '<br></span>';
+    // get scroll pos
+    //app.log(2, 'public-message scrollTop ' + jqChat.scrollTop() 
+    //        + ' scrollHeight ' + jqChat[0].scrollHeight 
+    //        + ' clientHeight ' + jqChat[0].clientHeight);
+    // detect scroll bar at bottom
+    // looks like the mouse wheel can put the scroll pos < 1em from bottom so fudge it
+    atBottom = Math.abs((jqChat.scrollTop() + jqChat[0].clientHeight) - jqChat[0].scrollHeight) < 10;
+    jqChat.append(msg);       // Add message to Message Board.
+    if (atBottom) // if we were at bottom before msg append scroll to bottom
+    {
+      //jqChat.scrollTop(jqChat[0].scrollHeight);
+      jqChat.animate({scrollTop : jqChat[0].scrollHeight},'fast');
+      // flash new msg
+      span = $("span#" + msgNumber, jqChat);
+      span.animate({color:"red"},
+        {duration: 0,
+         complete: function()
+         {
+           span.animate({color:"white"}, 100);
+         }
+        });
+    }
+    else
+    {
+       // flash chat border
+       jqChat.animate({backgroundColor:"red"},
+        {duration: 0,
+         complete: function()
+         {
+           jqChat.animate({backgroundColor:"black"}, 100);
+         }
+        });
+    }
+    //jqTick.prepend(msgTicker);
 
-  app.log(2, 'A public message arrived ' + msg);
-}); /* public-message() */
+    jqChat.data('msgNumber', ++msgNumber); // increment next msg number
+    app.log(2, 'A public message arrived ' + msg);
+  }
+  catch(err)
+  {
+    app.log(4, "public-message err" + err);
+  }
+}); // public-message()
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
