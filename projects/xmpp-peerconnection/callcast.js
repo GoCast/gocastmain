@@ -552,6 +552,9 @@ var Callcast = {
         this.CallState = Callcast.CallStates.NONE;
         this.bAmCaller = null;
 
+        // Store a list of ICE candidates for batch-processing.
+        this.candidates = null;
+
         // Need to call InitPeerConnection -- calling it at the bottom of this constructor.
 
         //
@@ -612,6 +615,8 @@ var Callcast = {
         };
 
         this.InitPeerConnection = function() {
+            this.candidates = [];   // Start fresh with a new array.
+
             try {
                 //
                 // Now we need to construct the peer connection and setup our stream
@@ -778,13 +783,31 @@ var Callcast = {
         };
 
         this.InboundIce = function(candidate) {
+            var i, len;
+
             try {
                 if (this.peer_connection && this.peer_connection.ReadyState() === 'ACTIVE')
                 {
                     if (this.bIceStarted) {
                         console.log('InboundIce: Got Candidate - ' + candidate);
 
+                        // Process change: process the most recent candidate,
+                        // and then iterate through the .candidates array
+                        // processing each of them in turn as well.
                         this.peer_connection.ProcessIceMessage(candidate);
+
+                        // NOTE: If re-processing seems to cause a problem, it
+                        // can be defeated by simply deleting or commenting out
+                        // the for() loop below or setting 'len = 0;'
+                        len = this.candidates.length;
+                        for (i = 0 ; i < len ; i += 1)
+                        {
+                            console.log('  Re-processing prior candadate # ' + i);
+                            this.peer_connection.ProcessIceMessage(this.candidates[i]);
+                        }
+
+                        // Now add the current one to the array.
+                        this.candidates.push(candidate);
                     }
                     else {
                         console.log('WARNING: Ice machine not started yet but received an inbound Ice Candidate.');
