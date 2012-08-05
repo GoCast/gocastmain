@@ -24,7 +24,7 @@ namespace GoCast
             return false;
         
         CGContextSaveGState(pContext);        
-        CGContextSetShouldAntialias(pContext, false);
+        CGContextSetShouldAntialias(pContext, true);
         CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
         CGImageRef cgImage = CGImageCreate(m_width, m_height, 8, 32, stride, colorSpace, 
                                            kCGImageAlphaNoneSkipLast,
@@ -66,7 +66,7 @@ namespace GoCast
             pBufIter[2] = pBufIter[3];
             pBufIter[3] = 0xff;
             pBufIter += 4;
-        }        
+        }
     }
     
     void GCPVideoRenderer::InvalidateWindow()
