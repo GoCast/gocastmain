@@ -552,6 +552,9 @@ var Callcast = {
         this.CallState = Callcast.CallStates.NONE;
         this.bAmCaller = null;
 
+        // Store a list of ICE candidates for batch-processing.
+        this.candidates = null;
+
         // Need to call InitPeerConnection -- calling it at the bottom of this constructor.
 
         //
@@ -589,24 +592,31 @@ var Callcast = {
         };
 
         this.onreadystatechange = function() {
-            var state = self.peer_connection.ReadyState();
+            try {
+                var state = self.peer_connection.ReadyState();
 
-            console.log('OnReadyState: For ' + self.jid + ', Current=' + state);
+                console.log('OnReadyState: For ' + self.jid + ', Current=' + state);
 
-            if (state === 'BLOCKED') {
-                // a blocked connection was detected by the C++ area.
-                // We need to reset the connection.
+                if (state === 'BLOCKED') {
+                    // a blocked connection was detected by the C++ area.
+                    // We need to reset the connection.
 
-                console.log('Callee: ReadyState===BLOCKED - RESET PEER CONNECTION.');
-                self.ResetPeerConnection();
+                    console.log('Callee: ReadyState===BLOCKED - RESET PEER CONNECTION.');
+                    self.ResetPeerConnection();
+                }
+
+                if (Callcast.Callback_ReadyState) {
+                    Callcast.Callback_ReadyState(state, self.jid);
+                }
             }
-
-            if (Callcast.Callback_ReadyState) {
-                Callcast.Callback_ReadyState(state, self.jid);
+            catch (e) {
+                console.log('EXCEPTION: ', e.toString(), e);
             }
         };
 
         this.InitPeerConnection = function() {
+            this.candidates = [];   // Start fresh with a new array.
+
             try {
                 //
                 // Now we need to construct the peer connection and setup our stream
@@ -773,32 +783,66 @@ var Callcast = {
         };
 
         this.InboundIce = function(candidate) {
-            if (this.peer_connection)
-            {
-                if (this.bIceStarted) {
-                    console.log('InboundIce: Got Candidate - ' + candidate);
+            var i, len;
 
-                    this.peer_connection.ProcessIceMessage(candidate);
+            try {
+                if (this.peer_connection && this.peer_connection.ReadyState() === 'ACTIVE')
+                {
+                    if (this.bIceStarted) {
+                        console.log('InboundIce: Got Candidate - ' + candidate);
+
+                        // Process change: process the most recent candidate,
+                        // and then iterate through the .candidates array
+                        // processing each of them in turn as well.
+                        this.peer_connection.ProcessIceMessage(candidate);
+
+                        // NOTE: If re-processing seems to cause a problem, it
+                        // can be defeated by simply deleting or commenting out
+                        // the for() loop below or setting 'len = 0;'
+                        len = this.candidates.length;
+                        for (i = 0 ; i < len ; i += 1)
+                        {
+                            console.log('  Re-processing prior candadate # ' + i);
+                            this.peer_connection.ProcessIceMessage(this.candidates[i]);
+                        }
+
+                        // Now add the current one to the array.
+                        this.candidates.push(candidate);
+                    }
+                    else {
+                        console.log('WARNING: Ice machine not started yet but received an inbound Ice Candidate.');
+                    }
                 }
                 else {
-                    console.log('WARNING: Ice machine not started yet but received an inbound Ice Candidate.');
+                    if (!this.peer_connection) {
+                        console.log('Could not process ICE message. Peer_connection is invalid.');
+                    }
+                    else {
+                        console.log('Could not process ICE message. Peer_connection state not ACTIVE. Currently === ' +
+                                this.peer_connection.ReadyState());
+                    }
                 }
             }
-            else {
-                console.log('Could not process ICE message. Peer_connection is invalid.');
+            catch (e) {
+                console.log('EXCEPTION: ', e.toString(), e);
             }
         };
 
         this.InboundAnswer = function(sdp) {
-            if (this.peer_connection)
-            {
-                console.log('  InboundAnswer: Setting SetRemoteDescription as ANSWER');
-                this.peer_connection.SetRemoteDescription('ANSWER', sdp);
-                self.peer_connection.StartIce();
-                self.bIceStarted = true;
+            try {
+                if (this.peer_connection)
+                {
+                    console.log('  InboundAnswer: Setting SetRemoteDescription as ANSWER');
+                    this.peer_connection.SetRemoteDescription('ANSWER', sdp);
+                    self.peer_connection.StartIce();
+                    self.bIceStarted = true;
+                }
+                else {
+                    console.log('Could not process answer message. Peer_connection is invalid.');
+                }
             }
-            else {
-                console.log('Could not process answer message. Peer_connection is invalid.');
+            catch (e) {
+                console.log('EXCEPTION: ', e.toString(), e);
             }
         };
 
