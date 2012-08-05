@@ -115,6 +115,8 @@ namespace GoCast
         bool Inited() const;        
         bool GetLocalVideoTrackEnabled() const;        
         bool GetLocalAudioTrackEnabled() const;
+        bool GetSpkVol(int* pLevel) const;
+        bool GetSpkMute(bool* pbEnabled) const;
         std::string GetLocalVideoTrackEffect() const;
         void SetLocalVideoTrackEnabled(bool bEnable);
         void SetLocalAudioTrackEnabled(bool bEnable);

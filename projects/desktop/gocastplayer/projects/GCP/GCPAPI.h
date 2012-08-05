@@ -61,6 +61,7 @@ public:
         registerProperty("onreadystatechange", make_property(this, &GCPAPI::get_onreadystatechange,
                                                                    &GCPAPI::set_onreadystatechange));
         registerProperty("source", make_property(this, &GCPAPI::get_source, &GCPAPI::set_source));
+        registerProperty("volume", make_property(this, &GCPAPI::get_volume));
     }
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -83,6 +84,7 @@ public:
     FB::JSObjectPtr get_onremovestream();
     FB::JSObjectPtr get_onreadystatechange();
     FB::JSAPIPtr get_source();
+    FB::variant get_volume();
     
     // Property set methods
     void set_onaddstream(const FB::JSObjectPtr& onaddstream);

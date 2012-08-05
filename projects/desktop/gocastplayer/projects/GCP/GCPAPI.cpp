@@ -45,6 +45,29 @@ FB::JSAPIPtr GCPAPI::get_source()
     return m_srcStream;
 }
 
+FB::variant GCPAPI::get_volume()
+{
+    int level;
+    GoCast::RtcCenter* pCtr = GoCast::RtcCenter::Instance();
+    bool bSpkMuted = false;
+    
+    if(false == pCtr->Inited() || false == pCtr->GetSpkVol(&level))
+    {
+        level = -1;
+    }
+    
+    if(false == pCtr->GetSpkMute(&bSpkMuted))
+    {
+        level = -1;
+    }
+    else if(true == bSpkMuted)
+    {
+        level = 0;
+    }
+    
+    return level;
+}
+
 FB::JSObjectPtr GCPAPI::get_onaddstream()
 {
     return m_onaddstreamCb;
@@ -223,6 +246,13 @@ FB::variant GCPAPI::CreateAnswer(const FB::variant& offer, const FB::JSObjectPtr
     bool bAudio = false;
     GoCast::RtcCenter* pCtr = GoCast::RtcCenter::Instance();
     
+    if("localPlayer" == m_htmlId.convert_cast<std::string>())
+    {
+        FBLOG_ERROR_CUSTOM("GCPAPI::CreateAnswer",
+                           "localPlayer: Not allowed to call createAnswer()");
+        return "";
+    }
+    
     if(false == pCtr->Inited())
     {
         std::string msg = m_htmlId.convert_cast<std::string>();
@@ -284,6 +314,13 @@ FB::variant GCPAPI::SetRemoteDescription(const FB::variant& action, const FB::va
                                             webrtc::JsepInterface::kOffer:
                                             webrtc::JsepInterface::kAnswer;
     
+    if("localPlayer" == m_htmlId.convert_cast<std::string>())
+    {
+        FBLOG_ERROR_CUSTOM("GCPAPI::SetRemoteDescription",
+                           "localPlayer: Not allowed to call setRemoteDescription()");
+        return false;
+    }
+
     if(false == pCtr->Inited())
     {
         std::string msg = m_htmlId.convert_cast<std::string>();
@@ -300,6 +337,13 @@ FB::variant GCPAPI::ProcessIceMessage(const FB::variant& sdp)
 {
     GoCast::RtcCenter* pCtr = GoCast::RtcCenter::Instance();
     
+    if("localPlayer" == m_htmlId.convert_cast<std::string>())
+    {
+        FBLOG_ERROR_CUSTOM("GCPAPI::ProcessIceMessage",
+                           "localPlayer: Not allowed to call processIceMessage()");
+        return false;
+    }
+
     if(false == pCtr->Inited())
     {
         std::string msg = m_htmlId.convert_cast<std::string>();
@@ -316,6 +360,13 @@ FB::variant GCPAPI::StartIce()
 {
     GoCast::RtcCenter* pCtr = GoCast::RtcCenter::Instance();
     
+    if("localPlayer" == m_htmlId.convert_cast<std::string>())
+    {
+        FBLOG_ERROR_CUSTOM("GCPAPI::StartIce",
+                           "localPlayer: Not allowed to call startIce()");
+        return false;
+    }
+
     if(false == pCtr->Inited())
     {
         std::string msg = m_htmlId.convert_cast<std::string>();

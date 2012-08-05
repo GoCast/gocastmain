@@ -600,6 +600,26 @@ namespace GoCast
         return false;
     }
     
+    bool RtcCenter::GetSpkVol(int* pLevel) const
+    {
+        if(m_pPeerConns.end() == m_pPeerConns.find("localPlayer"))
+        {
+            return false;
+        }
+        
+        return (m_pPeerConns.find("localPlayer"))->second->system_volume(pLevel);
+    }
+    
+    bool RtcCenter::GetSpkMute(bool* pbEnabled) const
+    {
+        if(m_pPeerConns.end() == m_pPeerConns.find("localPlayer"))
+        {
+            return false;
+        }
+        
+        return (m_pPeerConns.find("localPlayer"))->second->speaker_mute_state(pbEnabled);
+    }    
+    
     std::string RtcCenter::GetLocalVideoTrackEffect() const
     {
         if(0 < m_pLocalStream->video_tracks()->count())
@@ -1243,7 +1263,8 @@ namespace GoCast
              RemoveRemoteStream(pluginId);
         }
         
-        FBLOG_INFO_CUSTOM("RtcCenter::DeletePeerConnection_w", (pluginId + ": Deleting peerconnection..."));
+        FBLOG_INFO_CUSTOM("RtcCenter::DeletePeerConnection_w",
+                          (pluginId + ": Deleting peerconnection..."));
         m_pPeerConns[pluginId] = NULL;
         m_pPeerConns.erase(pluginId);
         return true;
