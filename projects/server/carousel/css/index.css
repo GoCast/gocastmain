@@ -47,6 +47,27 @@ body input[type="button"] {
   background-color: transparent;
   background-repeat: no-repeat;
 }
+body > div#upper-right
+{
+   float:right;
+   margin-top: 10px;
+   margin-right: 10px;
+   width:50%;
+   z-index: 1000;
+   line-height: 2em;
+}
+body > div#upper-right > div#volume
+{
+   float:right;
+   margin-right: 10px;
+   width:20px;
+   height:20px;
+   vertical-align: middle;
+   background-image: url("../images/volume-high.png");
+   background-repeat: no-repeat;
+   background-size: 100%;
+   z-index: 1000;
+}
 body > div#lower-right
 {
    position:absolute;
@@ -204,7 +225,8 @@ body > div#meeting > div#zoom > div.cloudcarousel
   position: absolute;
   background-color: white;
   background-position: center center;
-  background-repeat: no-repeat
+  background-repeat: no-repeat;
+  background-size: 98%;
 }
 body > div#meeting > div#zoom > div.cloudcarousel > .control
 {

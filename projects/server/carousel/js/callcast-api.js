@@ -762,24 +762,52 @@ function pluginLoaded(
      Callcast.localplayer = null;
      Callcast.InitGocastPlayer('#mystream > object.localplayer', function(message)
      {
-       //Initialization successful.
-       app.log(2, 'Local plugin successfully initialized.');
-       // Set callback functions to add and remove plugins for other
-       // participants and content.
-       Callcast.setCallbackForAddPlugin(addPluginToCarousel);
-       Callcast.setCallbackForRemovePlugin(removePluginFromCarousel);
-       Callcast.setCallbackForAddCarouselContent(addContentToCarousel);
-       Callcast.setCallbackForRemoveCarouselContent(removeContentFromCarousel);
-       Callcast.setCallbackForAddSpot(addSpot);
-       Callcast.setCallbackForRemoveSpot(removeSpot);
+        //Initialization successful.
+        app.log(2, 'Local plugin successfully initialized.');
+        // Set callback functions to add and remove plugins for other
+        // participants and content.
+        Callcast.setCallbackForAddPlugin(addPluginToCarousel);
+        Callcast.setCallbackForRemovePlugin(removePluginFromCarousel);
+        Callcast.setCallbackForAddCarouselContent(addContentToCarousel);
+        Callcast.setCallbackForRemoveCarouselContent(removeContentFromCarousel);
+        Callcast.setCallbackForAddSpot(addSpot);
+        Callcast.setCallbackForRemoveSpot(removeSpot);
 
-       // Callcast Seetings.
-       // todo there's an app member for video state, merge it with callcast video state
-       Callcast.SetUseVideo(false); // Initially set to false, user must enable.
+        // Callcast Seetings.
+        // todo there's an app member for video state, merge it with callcast video state
+        Callcast.SetUseVideo(false); // Initially set to false, user must enable.
 
-      checkForPluginOptionalUpgrades(); // display upgrade button if there are optional upgrades
+        checkForPluginOptionalUpgrades(); // display upgrade button if there are optional upgrades
 
-       handleRoomSetup();
+        // set the speaker volume status callback
+        GoCastJS.SetSpkVolListener(1000, Callcast.localplayer, function(vol)
+        {
+          // set image based on volume
+          var img, div = $("#upper-right > div#volume");
+          console.log("speaker volume " + vol);
+          if (vol === 0)
+          {
+             img = 'url("../images/volume-muted.png");'
+             div.css("background-image", img);
+          }
+          else if (vol < 33)
+          {
+             img = 'url("../images/volume-low.png");'
+             div.css("background-image", img);
+          }
+          else if (vol < 66)
+          {
+             img = 'url("../images/volume-medium.png");'
+             div.css("background-image", img);
+          }
+          else
+          {
+             img = 'url("../images/volume-high.png");'
+             div.css("background-image", img);
+          }
+        });
+
+        handleRoomSetup();
      }, function(message) {
        // Failure to initialize.
        app.log(4, 'Local plugin failed to initialize.');

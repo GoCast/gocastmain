@@ -472,7 +472,7 @@ function carouselItemZoom(event)
    app.carousel.remove(item.index);
 
    $(spot).appendTo($('#meeting > #zoom')); // move div to zoom area
-   $(spot).removeAttr('style');
+   //$(spot).removeAttr('style');
 
    // style zoomed spot
    app.carousel.resize(); // update carousel
