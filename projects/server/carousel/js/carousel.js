@@ -71,14 +71,14 @@
     {
     this.vals = {}; // assoc array
     this.keys = []; // array of sorted keys
-    this.bySpot = []; // array of indexes by spotNumber
+    this.bySpot = []; // array of indexes by spotnumber
     };
     Items.prototype.set = function(index, item)
     {
         this.vals[index] = item; // insert item in assoc array
-        if (item.spotNumber)     // index by spotNumber
+        if (item.spotnumber)     // index by spotnumber
         {
-           this.bySpot[item.spotNumber] = item.index;
+           this.bySpot[item.spotnumber] = item.index;
         }
         this.updateKeys();       // sort items
     };
@@ -87,10 +87,10 @@
         //todo check that index is numeric
         return this.vals[index];
     };
-    Items.prototype.getBySpotNumber = function(spotNumber)
+    Items.prototype.getByspotnumber = function(spotnumber)
     {
         //todo check that index is numeric
-        var spot = parseInt(spotNumber, 10),
+        var spot = parseInt(spotnumber, 10),
             index = this.bySpot[spot];
         return index ? this.vals[index] : null;
     };
@@ -533,10 +533,8 @@
     {
        console.log('doSpot', info);
        console.log('spotDiv', spotDiv);
-       //if (info.spotType)
        if (info.spottype)
        {
-          //if (info.spotType == 'youtube')
           if (info.spottype === 'youtube')
           {
              console.log('doSpot youtube');
@@ -554,7 +552,7 @@
        item.updateSize(this.item);
        if (info) // info will be null when spots are created for remote video
        {
-          item.spotNumber = info.spotnumber;
+          item.spotnumber = info.spotnumber;
        }
        newDiv.data('item', item);
        items.addItem(item);
@@ -567,15 +565,12 @@
        var spotDiv, // the desired spot to be replaced or added
            div, divs;
        // determine cmd type, add or replace
-       //if (info.spotReplace) // see if there is a spotReplace prop
        if (info.spotreplace) // see if there is a spotReplace prop
        {
           // if there is a nodup prop == 1 and spot with spotId exists
           // don't replace
-          //if (info.nodup && info.nodup == 1 && info.spotDivId)
           if (info.spotnodup && info.spotnodup === 1 && info.spotdivid)
           {
-             //var div = $('#meeting > #streams > #scarousel #' + info.spotDivId);
              div = $('#meeting > #streams > #scarousel #' + info.spotdivid);
              if (div.length > 0)
              {
@@ -589,12 +584,10 @@
           }
           else // replace spot
           {
-             //if (info.spotReplace === "first-unoc") // replace first unoc spot
              if (info.spotreplace === 'first-unoc') // replace first unoc spot
              {
                 spotDiv = $(divs).get(0);
              }
-             //else if (info.spotReplace === "last-unoc")
              else if (info.spotreplace === 'last-unoc')
              {
                 spotDiv = $(divs).get(divs.length - 1);
@@ -603,7 +596,7 @@
           item = $(spotDiv).data('item');
           if (spotDiv && item)
           {
-             item.spotNumber = info.spotnumber;
+             item.spotnumber = info.spotnumber;
           }
           else
           {
@@ -621,7 +614,7 @@
     this.removeSpotCb = function(info) // remove spot callcast callback
     {
        // todo refactor this out of carousel
-       var item = items.getBySpotNumber(info.spotnumber),
+       var item = items.getByspotnumber(info.spotnumber),
            spot = parseInt(info.spotnumber, 10),
            zoomedSpot, zoomedItem;
        if (!item) // item by spot number is not in carousel
@@ -631,9 +624,9 @@
           if (zoomedSpot.length === 1)
           {
              zoomedItem = $(zoomedSpot).data('item');
-             if (zoomedItem.spotNumber) // zoomed spot has spotNumber
+             if (zoomedItem.spotnumber) // zoomed spot has spotnumber
              {
-                if (zoomedItem.spotNumber === info.spotnumber)
+                if (zoomedItem.spotnumber === info.spotnumber)
                 {
                    item = zoomedItem;
                 }
@@ -693,7 +686,7 @@
                 item = jqDiv.data('item');
 
             console.log('removing', jqDiv);
-            Callcast.RemoveSpot({spotNumber: item.spotNumber || item.index});
+            Callcast.RemoveSpot({spotnumber: item.spotnumber || item.index});
         });
     };
     /*

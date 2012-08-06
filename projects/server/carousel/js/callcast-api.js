@@ -121,39 +121,80 @@ $(document).on('synclink', function(
   app.log(2, 'A new synclink has been issued.');
 }); /* synclink() */
 
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-/**
- * \brief Function that modifies the DOM when a public message arrives.
- *        This implements the trigger "public-message".
- */
+///
+/// \brief Function that modifies the DOM when a public message arrives.
+///        This implements the trigger "public-message".
 $(document).on('public-message', function(
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-    /**
-     * Event object. */
-  ev,
-    /**
-     * Message Information Object. */
-  msginfo
+  ev, // Event object.
+  msginfo // Message Information Object.
 )
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
-  var notice = msginfo.notice,
-      delayed = msginfo.delayed,
-      nick_class = msginfo.nick_class,
-  /*
-   * Add message to Message Board. */
-      jqChat = $('#msgBoard > #chatOut'),
-      jqTick = $('#msgBoard > #msgTicker'),
-      msgTicker,
-      msg = '<b>' + decodeURI(msginfo.nick) + '</b>' + ': ' +
-                   decodeURI(msginfo.body) + '<br>';
-  jqChat.append(msg);
-  msgTicker = '<b>' + decodeURI(msginfo.nick) + '</b>' + ': ' +
-                   decodeURI(msginfo.body) + ' ';
-  jqTick.prepend(msgTicker);
+  try
+  {
+    var notice = msginfo.notice,
+        delayed = msginfo.delayed,
+        nick_class = msginfo.nick_class,
+        jqChat = $('#msgBoard > #chatOut'),
+        //jqTick = $('#msgBoard > #msgTicker'),
+        msgTicker,
+        msg,
+        atBottom,
+        msgNumber,
+        span;
+    //msgTicker = '<b>' + decodeURI(msginfo.nick) + '</b>' + ': ' +
+    //                 decodeURI(msginfo.body) + ' ';
+    if (!jqChat[0]) {throw "no chat out div";}
+    msgNumber = jqChat.data('msgNumber'); // get next msgNumber
+    msgNumber = msgNumber || 0;           // init if not already
+    msg = '<span id="'+ msgNumber + '"<b>' + 
+                        decodeURI(msginfo.nick) + '</b>' + ': ' +
+                        decodeURI(msginfo.body) + '<br></span>';
+    // get scroll pos
+    //app.log(2, 'public-message scrollTop ' + jqChat.scrollTop() 
+    //        + ' scrollHeight ' + jqChat[0].scrollHeight 
+    //        + ' clientHeight ' + jqChat[0].clientHeight);
+    // detect scroll bar at bottom
+    // looks like the mouse wheel can put the scroll pos < 1em from bottom so fudge it
+    atBottom = Math.abs((jqChat.scrollTop() + jqChat[0].clientHeight) - jqChat[0].scrollHeight) < 10;
+    jqChat.append(msg);       // Add message to Message Board.
+    if (atBottom) // if we were at bottom before msg append scroll to bottom
+    {
+      jqChat.scrollTop(jqChat[0].scrollHeight);
+      //jqChat.animate({scrollTop : jqChat[0].scrollHeight},'fast');
+      // flash new msg
+      span = $("span#" + msgNumber, jqChat);
+      //span.animate({color:"red"},
+      span.animate({backgroundColor:"red"},
+        {duration: 0,
+         complete: function()
+         {
+           //span.animate({backgroundColor:"transparent"}, 500); // doesn't work, end color is white
+           span.animate({backgroundColor:"black"}, 500);
+         }
+        });
+    }
+    else
+    {
+       // flash chat border
+       jqChat.animate({backgroundColor:"red"},
+        {duration: 0,
+         complete: function()
+         {
+           jqChat.animate({backgroundColor:"black"}, 500);
+           //jqChat.animate({backgroundColor:"transparent"}, 500); // doesn't work, end color is white
+         }
+        });
+    }
+    //jqTick.prepend(msgTicker);
 
-  app.log(2, 'A public message arrived ' + msg);
-}); /* public-message() */
+    jqChat.data('msgNumber', ++msgNumber); // increment next msg number
+    app.log(2, 'A public message arrived ' + msg);
+  }
+  catch(err)
+  {
+    app.log(4, "public-message err" + err);
+  }
+}); // public-message()
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
@@ -578,6 +619,35 @@ function reloadLocalPlugin()
   }
 } // reloadLocalPlugin
 */
+///
+/// \brief get info from url
+/// \param url target url
+/// \return JSON object with info:
+///    title header title tag
+///    type  mime type
+/// 
+function getUrlInfo(options, callback)
+{
+  $.ajax(
+  {
+    url      : options.proxyUrl,          //customizable
+    data     : {xhr2: false, url: options.webUrl},  //customizable
+    cache    : true,
+    dataType : "jsonp",
+    success  : function(response)
+        {
+           var result = (/<title>(.*?)<\/title>/m).exec(response),
+               info = {},
+               title;
+           if (result)
+           {
+               title = result[1];
+               info.title = title;
+           }
+           callback(info);
+        }
+    });
+}
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
@@ -615,7 +685,7 @@ function addContentToCarousel(
     }
     else // gen image from url
     {
-       GoCastJS.getUrlInfo(
+       getUrlInfo(
        {
          webUrl: info.url,
          proxyUrl: 'http://carousel.gocast.it/proxy'
@@ -721,24 +791,52 @@ function pluginLoaded(
      Callcast.localplayer = null;
      Callcast.InitGocastPlayer('#mystream > object.localplayer', function(message)
      {
-       //Initialization successful.
-       app.log(2, 'Local plugin successfully initialized.');
-       // Set callback functions to add and remove plugins for other
-       // participants and content.
-       Callcast.setCallbackForAddPlugin(addPluginToCarousel);
-       Callcast.setCallbackForRemovePlugin(removePluginFromCarousel);
-       Callcast.setCallbackForAddCarouselContent(addContentToCarousel);
-       Callcast.setCallbackForRemoveCarouselContent(removeContentFromCarousel);
-       Callcast.setCallbackForAddSpot(addSpot);
-       Callcast.setCallbackForRemoveSpot(removeSpot);
+        //Initialization successful.
+        app.log(2, 'Local plugin successfully initialized.');
+        // Set callback functions to add and remove plugins for other
+        // participants and content.
+        Callcast.setCallbackForAddPlugin(addPluginToCarousel);
+        Callcast.setCallbackForRemovePlugin(removePluginFromCarousel);
+        Callcast.setCallbackForAddCarouselContent(addContentToCarousel);
+        Callcast.setCallbackForRemoveCarouselContent(removeContentFromCarousel);
+        Callcast.setCallbackForAddSpot(addSpot);
+        Callcast.setCallbackForRemoveSpot(removeSpot);
 
-       // Callcast Seetings.
-       // todo there's an app member for video state, merge it with callcast video state
-       Callcast.SetUseVideo(false); // Initially set to false, user must enable.
+        // Callcast Seetings.
+        // todo there's an app member for video state, merge it with callcast video state
+        Callcast.SetUseVideo(false); // Initially set to false, user must enable.
 
-      checkForPluginOptionalUpgrades(); // display upgrade button if there are optional upgrades
+        checkForPluginOptionalUpgrades(); // display upgrade button if there are optional upgrades
 
-       handleRoomSetup();
+        // set the speaker volume status callback
+        GoCastJS.SetSpkVolListener(1000, Callcast.localplayer, function(vol)
+        {
+          // set image based on volume
+          var img, div = $("#upper-right > div#volume");
+          console.log("speaker volume " + vol);
+          if (vol === 0)
+          {
+             img = 'url("../images/volume-muted.png");';
+             div.css("background-image", img);
+          }
+          else if (vol < 33)
+          {
+             img = 'url("../images/volume-low.png");';
+             div.css("background-image", img);
+          }
+          else if (vol < 66)
+          {
+             img = 'url("../images/volume-medium.png");';
+             div.css("background-image", img);
+          }
+          else
+          {
+             img = 'url("../images/volume-high.png");';
+             div.css("background-image", img);
+          }
+        });
+
+        handleRoomSetup();
      }, function(message) {
        // Failure to initialize.
        app.log(4, 'Local plugin failed to initialize.');

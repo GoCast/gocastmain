@@ -472,7 +472,7 @@ function carouselItemZoom(event)
    app.carousel.remove(item.index);
 
    $(spot).appendTo($('#meeting > #zoom')); // move div to zoom area
-   $(spot).removeAttr('style');
+   //$(spot).removeAttr('style');
 
    // style zoomed spot
    app.carousel.resize(); // update carousel
@@ -557,8 +557,6 @@ function openCopyData(event)
   jqWin.fadeIn(700);
   jqWin.addClass('active');
 
-  // set focus on message text input
-  //$("input.chatTo", jqWin).focus();
   return false;
 }
 
@@ -1468,6 +1466,18 @@ function winInstall(event)
 }
 
 ///
+/// \brief display a message to restart the browser
+///
+/// the pluginLoaded callback should close the winWait dialog
+/// if it doesn't prompt user to restart the browser
+///
+function winPluginPunt()
+{
+   $('#winWait > #status > #spinner').attr('src', 'images/red-x.png');
+   $('#winWait > #status > #msg').text('Hmmm... looks like the plugin did not load.  Please restart the browser');
+}
+
+///
 /// \brief periodically check for the player to be installed and prompt user
 ///
 function checkForPlugin(name)
@@ -1495,18 +1505,6 @@ function checkForPlugin(name)
    // plugin was not found in list wait and recheck
    app.winTimeout = setTimeout(checkForPlugin(name), 3000);
    app.log(2, 'winCheckForPlugin no player, waiting...');
-}
-
-///
-/// \brief display a message to restart the browser
-///
-/// the pluginLoaded callback should close the winWait dialog
-/// if it doesn't prompt user to restart the browser
-///
-function winPluginPunt()
-{
-   $('#winWait > #status > #spinner').attr('src', 'images/red-x.png');
-   $('#winWait > #status > #msg').text('Hmmm... looks like the plugin did not load.  Please restart the browser');
 }
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
@@ -1600,8 +1598,7 @@ function docKey(event)
 ///
 function uiInit()
 {
-   // add global keyboard accelerators
-   //$('meeting').keypress(meetingKey);
+   //$('#msgBoard > #chatOut').resizable({handles: "ne"});
 }
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
@@ -1629,6 +1626,7 @@ $(document).ready(function(
 
   $(document).keydown(docKey); // global key handler
 
+  uiInit(); // init user interface
   fbInit(); // init facebook api
 
   // Login to xmpp anonymously

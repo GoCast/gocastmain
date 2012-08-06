@@ -27,14 +27,13 @@
     <meta property="og:description" content="A place to be that's better than being there." />
     <meta property="og:image" content="http://carousel.gocast.it/images/gologo200.png" />
     <link rel="apple-touch-icon" href="images/apple-touch-icon.png" />
-    <link rel="apple-touch-icon" sizes="72x72"
-          href="images/apple-touch-icon-ipad.png" />
-    <link rel="apple-touch-icon" sizes="114x114"
-          href="images/apple-touch-icon-iphone4.png" />
+    <link rel="apple-touch-icon" sizes="72x72" href="images/apple-touch-icon-ipad.png" />
+    <link rel="apple-touch-icon" sizes="114x114" href="images/apple-touch-icon-iphone4.png" />
     <link rel="apple-touch-startup-image" href="images/startup.png">
     <link rel="stylesheet" href="css/index.css" type="text/css" />
+    <link type="text/css" href="css/custom-theme/jquery-ui-1.8.22.custom.css" rel="stylesheet">
     <script src="js/jquery-1.7.2.min.js" type="text/javascript"></script>
-    <script src="js/jquery-ui-1.8.21.custom.min.js" type="text/javascript"></script>
+    <script src="js/jquery-ui-1.8.22.custom.min.js" type="text/javascript"></script>
     <!--<script type="text/javascript" src="js/swfobject.js"></script>-->
     <script src="/scripts/strophe.js"></script>
     <script src="/scripts/strophe.roster.js" type="text/javascript"></script>
@@ -43,8 +42,6 @@
     <script src="/scripts/strophe.jingle.js" type="text/javascript"></script>
     <script src="js/callcast.js" type="text/javascript"></script>
     <script src="js/peerconnection.js" type="text/javascript"></script>
-    <script src="/scripts/html2canvas.js" type="text/javascript"></script>
-    <script src="/scripts/urlsnapshot.js" type="text/javascript"></script>
     <script src="js/callcast-api.js" type="text/javascript"></script>
     <script src="js/jquery.mousewheel.js" type="text/javascript"></script>
     <script src="js/carousel.js" type="text/javascript"></script>
@@ -56,6 +53,9 @@
 
   <body>
     <div id="fb-root"></div> <!-- fb integration required -->
+    <div id="upper-right">
+       <!--<div id="volume"/></div>-->
+    </div>
     <div id="lower-right">
        <input id="dlbtn" type="button" title="Download Plugin." onclick="doDownload();" />
        <!--<input class="vidbtn" type="button" title="Place video content." onclick="startVideoContent();" />-->
@@ -69,12 +69,14 @@
        <input id="video" type="button" class="on" title="Enable video" disabled="disabled"/>
     </div>      
     <div id="lower-left">
-       <a href="http://www.gocast.it" target="_blank"">
+      <!--
+       <a href="http://www.gocast.it" target="_blank">
         <img class="logo" src="images/gologo.png" />
        </a>
+      -->
        <div id="msgBoard">
-        <div id="msgTicker" onmouseover="showChatOut();"></div>
-        <div id="chatOut" onmouseout="showMsgTicker();"></div>
+        <!--<div id="chatOut" class="ui-widget-content"></div>-->
+        <div id="chatOut"> </div>
         <input class="chatTo" type="text" placeholder="Enter a chat message" onkeydown="keypressGrpChatHandler(event);"/>
         <input class="send" type="button" title="Send chat." onclick="sendGrpChat();"/>
        </div>
