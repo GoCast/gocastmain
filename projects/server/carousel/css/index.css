@@ -134,7 +134,7 @@ body > div#lower-left > div#msgBoard > div#chatOut
   /*position: absolute; */
   bottom: 2em;
   max-height:125px;
-  min-height: 3em;
+  min-height: 1.1em;
   height: auto;
   width:300px;
   overflow-y:auto;
