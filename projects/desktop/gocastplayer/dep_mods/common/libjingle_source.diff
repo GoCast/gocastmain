@@ -843,23 +843,6 @@ Index: talk/session/phone/webrtcvoiceengine.h
    int GetInputLevel();
    bool SetLocalMonitor(bool enable);
  
-Index: talk/base/common.h
-===================================================================
---- talk/base/common.h	(revision 153)
-+++ talk/base/common.h	(working copy)
-@@ -68,6 +68,12 @@
- // NOMINMAX must be defined where we include <windows.h>.
- #define stdmax(x, y) std::max(x, y)
- #else
-+
-+//<GOCAST>
-+#define strnicmp(x, y, n) _strnicmp(x, y, n)
-+#define stricmp(x, y) _stricmp(x, y)
-+//</GOCAST>
-+
- #define stdmax(x, y) talk_base::_max(x, y)
- #endif
- 
 Index: talk/base/refcount.h
 ===================================================================
 --- talk/base/refcount.h	(revision 153)
