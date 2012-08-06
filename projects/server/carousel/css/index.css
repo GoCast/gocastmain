@@ -290,11 +290,11 @@ body > div#meeting > div#streams div.cloudcarousel > img.zoom
   margin: 3px;
   position: absolute;
 }
-body > div#meeting > div#streams > div#scarousel div.cloudcarousel.typeContent {
+div.cloudcarousel.typeContent {
   background-size: 98%;
   display: table;
 }
-body > div#meeting > div#streams > div#scarousel div.cloudcarousel.typeContent > div.spotUrlIcon
+div.cloudcarousel.typeContent > div.spotUrlIcon
 {
   position:relative; 
   clear: left;
@@ -307,7 +307,7 @@ body > div#meeting > div#streams > div#scarousel div.cloudcarousel.typeContent >
   margin-right:auto;
   margin-top: 20px;
 }
-body > div#meeting > div#streams > div#scarousel div.cloudcarousel.typeContent > div.spotUrlTitle
+div.cloudcarousel.typeContent > div.spotUrlTitle
 {
   position:relative; 
   clear: left;
