@@ -27,8 +27,6 @@
 //std::cout << func << " [INFO]: " << msg << std::endl
 //std::cout << func << " [ERROR]: " << msg << std::endl
 
-std::string funcstr(const std::string& func, const std::string& pluginId);
-
 namespace GoCast
 {
     class MessageHandler
@@ -113,92 +111,25 @@ namespace GoCast
         
     public:
         std::string ReadyState(const std::string& pluginId);
-        
-        bool Inited() const {
-            return static_cast<bool>(NULL != m_pConnFactory.get());
-        }
-        
-        bool GetLocalVideoTrackEnabled() const {
-            if(0 < m_pLocalStream->video_tracks()->count()) {
-                return m_pLocalStream->video_tracks()->at(0)->enabled(); 
-            }
-            return false;
-        }
-        
-        bool GetLocalAudioTrackEnabled() const {
-            if(0 < m_pLocalStream->audio_tracks()->count()) {
-                return m_pLocalStream->audio_tracks()->at(0)->enabled();
-            }
-            return false;
-        }
-        
-        std::string GetLocalVideoTrackEffect() const {
-            if(0 < m_pLocalStream->video_tracks()->count()){
-                talk_base::scoped_refptr<webrtc::LocalVideoTrackInterface> pTrack(
-                    static_cast<webrtc::LocalVideoTrackInterface*>(m_pLocalStream->video_tracks()->at(0))
-                );
                 
-                if(NULL == pTrack.get())
-                {
-                    return "none";
-                }
-                
-                return pTrack->GetVideoCapture()->GetEffect();
-            }            
-            return "none";
-        }
-        
-        void SetLocalVideoTrackEnabled(bool bEnable) {
-            if(0 < m_pLocalStream->video_tracks()->count()) {
-                m_pLocalStream->video_tracks()->at(0)->set_enabled(bEnable);
-            }
-        }
-        
-        void SetLocalAudioTrackEnabled(bool bEnable) {
-            if(0 < m_pLocalStream->audio_tracks()->count()) {
-                m_pLocalStream->audio_tracks()->at(0)->set_enabled(bEnable);
-            }
-        }
-        
+        bool Inited() const;        
+        bool GetLocalVideoTrackEnabled() const;        
+        bool GetLocalAudioTrackEnabled() const;
+        bool GetSpkVol(int* pLevel) const;
+        bool GetSpkMute(bool* pbEnabled) const;
+        std::string GetLocalVideoTrackEffect() const;
+        void SetLocalVideoTrackEnabled(bool bEnable);
+        void SetLocalAudioTrackEnabled(bool bEnable);
         void SetLocalVideoTrackRenderer(const talk_base::scoped_refptr
-                                        <webrtc::VideoRendererWrapperInterface>& pRenderer) {
-            if(0 < m_pLocalStream->video_tracks()->count()){
-                m_pLocalStream->video_tracks()->at(0)->SetRenderer(pRenderer);
-            }
-        }
-        
-        void SetLocalVideoTrackEffect(const std::string& effect) {
-            if(0 < m_pLocalStream->video_tracks()->count()){
-                talk_base::scoped_refptr<webrtc::LocalVideoTrackInterface> pTrack(
-                    static_cast<webrtc::LocalVideoTrackInterface*>(m_pLocalStream->video_tracks()->at(0))
-                );
-                
-                if(NULL != pTrack.get())
-                {
-                    pTrack->GetVideoCapture()->SetEffect(effect);
-                }
-            }            
-        }
-        
+                                        <webrtc::VideoRendererWrapperInterface>& pRenderer);
+        void SetLocalVideoTrackEffect(const std::string& effect);
         void SetRemoteVideoTrackRenderer(const std::string& pluginId,
                                          const talk_base::scoped_refptr
-                                         <webrtc::VideoRendererWrapperInterface>& pRenderer) {
-            if(0 < m_remoteStreams[pluginId]->video_tracks()->count()){
-                m_remoteStreams[pluginId]->video_tracks()->at(0)->SetRenderer(pRenderer);
-            }
-        }
-        
+                                         <webrtc::VideoRendererWrapperInterface>& pRenderer);
         void AddRemoteStream(const std::string& pluginId,
-                             const talk_base::scoped_refptr<webrtc::MediaStreamInterface>& pStream) {
-                m_remoteStreams[pluginId] = pStream;
-        }
-        
-        void RemoveRemoteStream(const std::string& pluginId) {
-            if(m_remoteStreams.end() != m_remoteStreams.find(pluginId)) {
-                m_remoteStreams.erase(pluginId);
-            }
-        }
-        
+                             const talk_base::scoped_refptr<webrtc::MediaStreamInterface>& pStream);
+        void RemoveRemoteStream(const std::string& pluginId);
+
     private:
         RtcCenter();
         virtual ~RtcCenter();
