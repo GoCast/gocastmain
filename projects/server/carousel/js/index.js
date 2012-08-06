@@ -307,6 +307,12 @@ function onYouTubePlayerReady(playerId)
 }
 
 ///
+/// \brief add people and whiteboards to room
+///
+function startPeopleContent()
+{
+}
+///
 /// \brief add demo video's to n spots
 ///
 function startVideoContent()

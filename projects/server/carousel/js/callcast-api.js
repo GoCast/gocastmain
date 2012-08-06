@@ -814,24 +814,24 @@ function pluginLoaded(
           // set image based on volume
           var img, div = $("#upper-right > div#volume");
           console.log("speaker volume " + vol);
-          if (vol === 0)
+          if (vol <= 0) // mute, if vol == -1 display mute symbol since sound's probably not getting out or in
           {
-             img = 'url("../images/volume-muted.png");';
+             img = 'url("images/volume-muted.png")';
              div.css("background-image", img);
           }
-          else if (vol < 33)
+          else if (vol < 255/3)
           {
-             img = 'url("../images/volume-low.png");';
+             img = 'url("images/volume-low.png")';
              div.css("background-image", img);
           }
-          else if (vol < 66)
+          else if (vol < 2*255/3)
           {
-             img = 'url("../images/volume-medium.png");';
+             img = 'url("images/volume-medium.png")';
              div.css("background-image", img);
           }
           else
           {
-             img = 'url("../images/volume-high.png");';
+             img = 'url("images/volume-high.png")';
              div.css("background-image", img);
           }
         });

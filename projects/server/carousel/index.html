@@ -54,11 +54,14 @@
   <body>
     <div id="fb-root"></div> <!-- fb integration required -->
     <div id="upper-right">
-       <!--<div id="volume"/></div>-->
+      <div id="volume"/></div>
+      <p id="connection-status">Connection Status</a>
+    </div>
     </div>
     <div id="lower-right">
        <input id="dlbtn" type="button" title="Download Plugin." onclick="doDownload();" />
        <!--<input class="vidbtn" type="button" title="Place video content." onclick="startVideoContent();" />-->
+       <input class="vidbtn" type="button" title="Place video content." onclick="startPeopleContent();" />
        <input class="demobtn" type="button" title="Place demo content." onclick="startDemoContent();" />
        <input class="feedback" type="button" title="Send us your feedback." onclick="openChat(event);"/>
        <input class="copyData" type="button" title="Copy data to clipboard." onclick="openCopyData(event);"/>
