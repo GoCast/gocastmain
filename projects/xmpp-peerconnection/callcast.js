@@ -68,10 +68,10 @@
 var Callcast = {
     PLUGIN_VERSION_CURRENT: 0.0,
     PLUGIN_VERSION_REQUIRED: 0.0,
-    PLUGIN_VERSION_CURRENT_MAC: 1.21,
-    PLUGIN_VERSION_REQUIRED_MAC: 1.21,
-    PLUGIN_VERSION_CURRENT_WIN: 1.21,
-    PLUGIN_VERSION_REQUIRED_WIN: 1.21,
+    PLUGIN_VERSION_CURRENT_MAC: 1.24,
+    PLUGIN_VERSION_REQUIRED_MAC: 1.24,
+    PLUGIN_VERSION_CURRENT_WIN: 1.24,
+    PLUGIN_VERSION_REQUIRED_WIN: 1.24,
     PLUGIN_VERSION_CURRENT_LINUX: 1.21,
     PLUGIN_VERSION_REQUIRED_LINUX: 1.21,
     PLUGIN_DOWNLOAD_URL: 'http://video.gocast.it/plugin.html',
@@ -152,7 +152,7 @@ var Callcast = {
     // \brief External user sets this callback to be called when the server sends an 'addspot' command
     //      for programmatically being told to add a new spot to the carousel. The argument to this
     //      callback is the JSON object which was given by the original 'adder' of the spot. The only
-    //      server-dicted requirement in this JSON object is the 'spotNumber' property which is used
+    //      server-dicted requirement in this JSON object is the 'spotnumber' property which is used
     //      to give unique addressing to all spots in the carousel.
     //
     setCallbackForAddSpot: function(cb) {
@@ -163,9 +163,9 @@ var Callcast = {
     // \brief External user sets this callback to be called when the server sends a 'removespot' command
     //      for programmatically being told to remove a spot from the carousel. The argument to this
     //      callback is the JSON object which was given by the original 'deleter' of the spot. The only
-    //      requirement in this JSON object is the 'spotNumber' property which is used to give unique
+    //      requirement in this JSON object is the 'spotnumber' property which is used to give unique
     //      addressing to all spots in the carousel such that the callback knows which spot to delete.
-    //      \note spotNumber should always be a valid (existing) spot as the server is responsible for
+    //      \note spotnumber should always be a valid (existing) spot as the server is responsible for
     //          ensuring this is the case.
     //
     setCallbackForRemoveSpot: function(cb) {
@@ -363,7 +363,7 @@ var Callcast = {
         var nick = info.nick;
         nick = this.WithSpaces(nick);
 
-        if (nick && this.participants[nick])
+        if (nick && this.participants[nick] && this.participants[nick].peer_connection)
         {
 
             if (info.width >= 0 && info.height >= 0)
@@ -384,6 +384,11 @@ var Callcast = {
         }
         else if (nick !== this.nick) {
             console.log('ShowRemoteVideo: nickname not found: ' + nick);
+        }
+
+        // If we're just missing the peer_connection, let's note an error.
+        if (nick && this.participants[nick] && !this.participants[nick].peer_connection) {
+            console.log('ShowRemoteVideo: ERROR - peer_connection is null.');
         }
     },
 
@@ -547,6 +552,9 @@ var Callcast = {
         this.CallState = Callcast.CallStates.NONE;
         this.bAmCaller = null;
 
+        // Store a list of ICE candidates for batch-processing.
+        this.candidates = null;
+
         // Need to call InitPeerConnection -- calling it at the bottom of this constructor.
 
         //
@@ -584,67 +592,81 @@ var Callcast = {
         };
 
         this.onreadystatechange = function() {
-            var state = self.peer_connection.ReadyState();
+            try {
+                var state = self.peer_connection.ReadyState();
 
-            console.log('OnReadyState: For ' + self.jid + ', Current=' + state);
-            if (Callcast.Callback_ReadyState) {
-                Callcast.Callback_ReadyState(state, self.jid);
+                console.log('OnReadyState: For ' + self.jid + ', Current=' + state);
+
+                if (state === 'BLOCKED') {
+                    // a blocked connection was detected by the C++ area.
+                    // We need to reset the connection.
+
+                    console.log('Callee: ReadyState===BLOCKED - RESET PEER CONNECTION.');
+                    self.ResetPeerConnection();
+                }
+
+                if (Callcast.Callback_ReadyState) {
+                    Callcast.Callback_ReadyState(state, self.jid);
+                }
+            }
+            catch (e) {
+                console.log('EXCEPTION: ', e.toString(), e);
             }
         };
 
         this.InitPeerConnection = function() {
+            this.candidates = [];   // Start fresh with a new array.
+
             try {
-            //
-            // Now we need to construct the peer connection and setup our stream
-            //
+                //
+                // Now we need to construct the peer connection and setup our stream
+                //
 
-                if (Callcast.Callback_AddPlugin)
-                {
-                    // Create a true PeerConnection object and attach it to the DOM.
-                    this.peer_connection = new GoCastJS.PeerConnection(
-                            new GoCastJS.PeerConnectionOptions(
-                                'STUN ' + Callcast.STUNSERVER + ':' + Callcast.STUNSERVERPORT,
-                                this.onicecandidate, this.onaddstream,
-                                this.onremovestream, this.onreadystatechange,
-                                Callcast.Callback_AddPlugin(nickname)));
-
-                    if (!this.peer_connection) {
-                        alert("Gocast Remote Player object for name:'" + nickname + "' not found in DOM. Plugin problem?");
-                    }
-                    else
-                    {
-                        // Add my stream to this peer connection in preparation
-                        this.peer_connection.AddStream(Callcast.localstream);
-                    }
+                if (this.peer_connection) {
+                    this.peer_connection.Deinit();
+                    this.peer_connection = null;
                 }
-                else {
-                    alert('ERROR: Callcast.setCallbackForAddPlugin() has not been called yet.');
+                // Create a true PeerConnection object and attach it to the DOM.
+                this.peer_connection = new GoCastJS.PeerConnection(
+                        new GoCastJS.PeerConnectionOptions(
+                            'STUN ' + Callcast.STUNSERVER + ':' + Callcast.STUNSERVERPORT,
+                            this.onicecandidate, this.onaddstream,
+                            this.onremovestream, this.onreadystatechange,
+                            this.AddPluginResult));
+
+                if (!this.peer_connection) {
+                    alert("Gocast Remote Player object for name:'" + nickname + "' not found in DOM. Plugin problem?");
+                }
+                else
+                {
+                    // Add my stream to this peer connection in preparation
+                    this.peer_connection.AddStream(Callcast.localstream);
                 }
             } catch (e) {
-                console.log('EXCEPTION: ', e);
+                console.log('EXCEPTION: ', e.toString(), e);
             }
         };
 
         this.ResetPeerConnection = function() {
             try {
                 if (this.peer_connection) {
-                    console.log('Callee: ' + this.jid + ' - RESET PEER CONNECTION.');
-
-                    if (!Callcast.Callback_RemovePlugin) {
-                        console.log('ResetPeerConnection: ERROR: No RemovePlugin callback.');
-                        return;
-                    }
-
-                    this.RemovePlugin();
+                    console.log('ResetPeerConnection: Resetting peer connection with: ' + this.jid);
 
                     this.InitPeerConnection();
 
                     if (this.bAmCaller) {
+                        console.log('  ResetPeerConnection - Re-establishing call to peer.');
                         this.InitiateCall();
                     }
+                    else {
+                        console.log('  ResetPeerConnection - Waiting on Caller to call me back...');
+                    }
+                }
+                else {
+                    console.log('ResetPeerConnection: ERROR - peer_connection is already null.');
                 }
             } catch (e) {
-                console.log('EXCEPTION: ', e);
+                console.log('EXCEPTION: ', e.toString(), e);
             }
         };
 
@@ -687,6 +709,7 @@ var Callcast = {
                     // Create with audio and video tracks in case they want to be used later.
                     sdp = this.peer_connection.CreateOffer({audio: true, video: true});
 
+                    console.log('  InitiateCall: Setting SetLocalDescription as OFFER');
                     this.peer_connection.SetLocalDescription('OFFER', sdp, function() {
                         var offer = $msg({to: self.jid, type: 'chat'})
                                 .c('offer', {xmlns: Callcast.NS_CALLCAST}).t(sdp);
@@ -708,7 +731,7 @@ var Callcast = {
                 }
             }
             catch (e) {
-                console.log('EXCEPTION: ', e);
+                console.log('EXCEPTION: ', e.toString(), e);
             }
         };
 
@@ -720,13 +743,21 @@ var Callcast = {
             try {
                 if (this.peer_connection)
                 {
+                    if (this.peer_connection.ReadyState() === 'ACTIVE')
+                    {
+                        console.log('CompleteCall: Offer received while active. RESET PEER CONNECTION.');
+                        this.ResetPeerConnection();
+                    }
+
                     console.log('Completing call...');
     //                console.log('CompleteCall: Offer-SDP=' + offer);
 
+                    console.log('  CompleteCall: Setting SetRemoteDescription as OFFER');
                     this.peer_connection.SetRemoteDescription('OFFER', offer);
 
                     sdp = this.peer_connection.CreateAnswer(offer, {audio: true, video: true});
 //                  console.log('CompleteCall: Answer-SDP=' + sdp);
+                    console.log('  CompleteCall: Setting SetLocalDescription as ANSWER');
                     this.peer_connection.SetLocalDescription('ANSWER', sdp, function() {
                         console.log('CompleteCall: Success - setting local and starting ICE machine.');
                         self.peer_connection.StartIce();
@@ -747,43 +778,71 @@ var Callcast = {
                 }
             }
             catch (e) {
-                console.log('EXCEPTION: ', e);
+                console.log('EXCEPTION: ', e.toString(), e);
             }
         };
 
         this.InboundIce = function(candidate) {
-            if (this.peer_connection)
-            {
-                if (this.bIceStarted) {
-                    console.log('InboundIce: Got Candidate - ' + candidate);
-                    // WORKAROUND: If we see a 'tcp' candidate, that's bad news.
-                    //   In rev 2407, this means the peerconnection will be
-                    //   failed. So, we're going to reset the connection.
-                    if (candidate.match(' tcp ')) {
-                        self.ResetPeerConnection();
+            var i, len;
+
+            try {
+                if (this.peer_connection && this.peer_connection.ReadyState() === 'ACTIVE')
+                {
+                    if (this.bIceStarted) {
+                        console.log('InboundIce: Got Candidate - ' + candidate);
+
+                        // Process change: process the most recent candidate,
+                        // and then iterate through the .candidates array
+                        // processing each of them in turn as well.
+                        this.peer_connection.ProcessIceMessage(candidate);
+
+                        // NOTE: If re-processing seems to cause a problem, it
+                        // can be defeated by simply deleting or commenting out
+                        // the for() loop below or setting 'len = 0;'
+                        len = this.candidates.length;
+                        for (i = 0 ; i < len ; i += 1)
+                        {
+                            console.log('  Re-processing prior candadate # ' + i);
+                            this.peer_connection.ProcessIceMessage(this.candidates[i]);
+                        }
+
+                        // Now add the current one to the array.
+                        this.candidates.push(candidate);
                     }
                     else {
-                        this.peer_connection.ProcessIceMessage(candidate);
+                        console.log('WARNING: Ice machine not started yet but received an inbound Ice Candidate.');
                     }
                 }
                 else {
-                    console.log('WARNING: Ice machine not started yet but received an inbound Ice Candidate.');
+                    if (!this.peer_connection) {
+                        console.log('Could not process ICE message. Peer_connection is invalid.');
+                    }
+                    else {
+                        console.log('Could not process ICE message. Peer_connection state not ACTIVE. Currently === ' +
+                                this.peer_connection.ReadyState());
+                    }
                 }
             }
-            else {
-                console.log('Could not process ICE message. Peer_connection is invalid.');
+            catch (e) {
+                console.log('EXCEPTION: ', e.toString(), e);
             }
         };
 
         this.InboundAnswer = function(sdp) {
-            if (this.peer_connection)
-            {
-                this.peer_connection.SetRemoteDescription('ANSWER', sdp);
-                self.peer_connection.StartIce();
-                self.bIceStarted = true;
+            try {
+                if (this.peer_connection)
+                {
+                    console.log('  InboundAnswer: Setting SetRemoteDescription as ANSWER');
+                    this.peer_connection.SetRemoteDescription('ANSWER', sdp);
+                    self.peer_connection.StartIce();
+                    self.bIceStarted = true;
+                }
+                else {
+                    console.log('Could not process answer message. Peer_connection is invalid.');
+                }
             }
-            else {
-                console.log('Could not process answer message. Peer_connection is invalid.');
+            catch (e) {
+                console.log('EXCEPTION: ', e.toString(), e);
             }
         };
 
@@ -816,6 +875,12 @@ var Callcast = {
             }
         };
 
+        if (Callcast.Callback_AddPlugin) {
+            this.AddPluginResult = Callcast.Callback_AddPlugin(nickname);
+        }
+        else {
+            console.log('Callee: ERROR: Init failure. No AddPlugin callback available.');
+        }
         this.InitPeerConnection();
     },
 
@@ -1047,6 +1112,7 @@ var Callcast = {
             ret = Callcast.on_url_render(message);
             break;
         case 'addspot':
+            console.log('addspot: Received object: ', info);
             if (Callcast.Callback_AddSpot) {
                 Callcast.Callback_AddSpot(info);
             }
@@ -1059,6 +1125,7 @@ var Callcast = {
             ret = true;
             break;
         case 'setspot':
+            console.log('setspot: Received object: ', info);
             if (Callcast.Callback_SetSpot) {
                 Callcast.Callback_SetSpot(info);
             }
@@ -1427,13 +1494,13 @@ var Callcast = {
     //
     // \brief Function allows clients to request a new spot be added to everyone's carousel.
     //      This IQ is sent to the server and when successful, the server will respond by
-    //      first sending a groupchat to the room with a '<cmd cmdtype='addspot' spotNumber='value' ..../>
+    //      first sending a groupchat to the room with a '<cmd cmdtype='addspot' spotnumber='value' ..../>
     //      And upon success the IQ is responded to with a 'result'.
     //
     // \param obj A generic JSON object the sender can use to communicate spot info to the other clients.
     //      The server does not count on any particular items in this object. \note It does add a property
-    //      of obj.spotNumber which allows the server to dictate the spot numbers for new entries to ensure
-    //      no spotNumber collisions in a given mucRoom. Also, note that the amount of data in obj should be
+    //      of obj.spotnumber which allows the server to dictate the spot numbers for new entries to ensure
+    //      no spotnumber collisions in a given mucRoom. Also, note that the amount of data in obj should be
     //      kept to a minimum for both network conservation as well as database storage reasons. This obj is
     //      stored in the NoSQL DynamoDB 'as is' for each and every spot.
     //
@@ -1477,12 +1544,12 @@ var Callcast = {
     //
     // \brief Function allows clients to request the deletion of a spot on everyone's carousel.
     //      This IQ is sent to the server and when successful, the server will respond by
-    //      first sending a groupchat to the room with a '<cmd cmdtype='removespot' spotNumber='value' ..../>
+    //      first sending a groupchat to the room with a '<cmd cmdtype='removespot' spotnumber='value' ..../>
     //      And upon success the IQ is responded to with a 'result'.
     //
     // \param obj A generic JSON object the sender can use to communicate spot info to the other clients.
-    //      The server does not count on any particular items in this object aside from spotNumber. The
-    //      spotNumber property is used to ensure this spot actually exists. If it does, it will be removed
+    //      The server does not count on any particular items in this object aside from spotnumber. The
+    //      spotnumber property is used to ensure this spot actually exists. If it does, it will be removed
     //      at the server and in the external database. If it does not exist, an error callback is given and
     //      no broadcast of this deletion will occur.
     //
@@ -1526,12 +1593,12 @@ var Callcast = {
     //
     // \brief Function allows clients to change info for an existing spot on everyone's carousel.
     //      This IQ is sent to the server and when successful, the server will respond by
-    //      first sending a groupchat to the room with a '<cmd cmdtype='setspot' spotNumber='value' ..../>
+    //      first sending a groupchat to the room with a '<cmd cmdtype='setspot' spotnumber='value' ..../>
     //      And upon success the IQ is responded to with a 'result'.
     //
     // \param obj A generic JSON object the sender can use to communicate spot info to the other clients.
-    //      The server does not count on any particular items in this object aside from spotNumber. The
-    //      spotNumber property is used to ensure this spot actually exists. If it does, it will be modified
+    //      The server does not count on any particular items in this object aside from spotnumber. The
+    //      spotnumber property is used to ensure this spot actually exists. If it does, it will be modified
     //      at the server and in the external database. If it does not exist, an error callback is given and
     //      no broadcast of this change will occur.
     //
@@ -1546,9 +1613,9 @@ var Callcast = {
         tosend.xmlns = this.NS_CALLCAST;
         tosend.from = this.nick;
 
-        if (!obj.spotNumber) {
+        if (!obj.spotnumber) {
             if (cb) {
-                cb('Missing obj property spotNumber.');
+                cb('Missing obj property spotnumber.');
             }
 
             return false;
@@ -1809,12 +1876,24 @@ var Callcast = {
     },
 
     conn_callback_reconnect: function(status, err) {
-        console.log('Post-Reconnect conn_callback. Status: ' + status + ' Err:', err);
+        if (err) {
+            console.log('Post-Reconnect conn_callback. Status: ' + status + ' Err:', err);
+        }
+        else {
+            console.log('Post-Reconnect conn_callback. Status: ' + status + ' No Err.');
+        }
+
         Callcast.conn_callback_guts(status);
     },
 
     conn_callback: function(status, err) {
-        console.log('Orig conn_callback. Status: ' + status + ' Err:', err);
+        if (err) {
+            console.log('Orig conn_callback. Status: ' + status + ' Err:', err);
+        }
+        else {
+            console.log('Orig conn_callback. Status: ' + status + ' No Err.');
+        }
+
         Callcast.conn_callback_guts(status);
     },
 
@@ -1858,7 +1937,8 @@ var Callcast = {
 //               Callcast.reattach(Callcast.connection.jid, Callcast.connection.sid, new Number(Callcast.connection.rid) + 1, Callcast.conn_callback);
 
 // RMW: SPECIFICALLY SKIPPING RE-ATTACH on CONNFAIL right now. Think it's causing issues.
-//           Callcast.reattach(Callcast.connection.jid, Callcast.connection.sid, Callcast.connection.rid, Callcast.conn_callback);
+            console.log('Attempting a reattach() here. Starting doing this again on Aug 2 2012.');
+            Callcast.reattach(Callcast.connection.jid, Callcast.connection.sid, Callcast.connection.rid, Callcast.conn_callback);
 
 
 //           alert("NOTICE -- attempted to auto-re-attach after connection failure. Did we succeed?");

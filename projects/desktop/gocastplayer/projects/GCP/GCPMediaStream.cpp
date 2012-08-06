@@ -11,8 +11,11 @@
 #include "variant_list.h"
 #include <iostream>
 
-#define FBLOG_INFO_CUSTOM(func, msg) FBLOG_INFO(func, msg) //std::cout << func << " [INFO]: " << msg << std::endl;
-#define FBLOG_ERROR_CUSTOM(func, msg) FBLOG_ERROR(func, msg) //std::cout << func << " [ERROR]: " << msg << std::endl;
+#define FBLOG_INFO_CUSTOM(func, msg) FBLOG_INFO(func, msg)
+#define FBLOG_ERROR_CUSTOM(func, msg) FBLOG_ERROR(func, msg)
+
+//std::cout << func << " [INFO]: " << msg << std::endl;
+//std::cout << func << " [ERROR]: " << msg << std::endl;
 
 namespace GoCast
 {
@@ -81,12 +84,12 @@ namespace GoCast
         if(NULL == pDev)
         {
             msg += " (failed to open)";
-            FBLOG_ERROR_CUSTOM("LocalVideoTrack::GetDefaultCaptureDevice()", msg);
+            FBLOG_ERROR_CUSTOM("LocalVideoTrack::GetDefaultCaptureDevice", msg);
         }
         else
         {
             msg += "...";
-            FBLOG_INFO_CUSTOM("LocalVideoTrack::GetDefaultCaptureDevice()", msg);
+            FBLOG_INFO_CUSTOM("LocalVideoTrack::GetDefaultCaptureDevice", msg);
         }
         
         //If no device found or unable to open default device pDev.get() will be NULL

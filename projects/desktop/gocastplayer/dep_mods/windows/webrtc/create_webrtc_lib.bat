@@ -1,4 +1,0 @@
-cd trunk\build\Release\lib
-del webrtc_Release.lib
-LIB /OUT:webrtc_Release.lib libjingle_app.lib jsoncpp.lib video_capture_module.lib webrtc_utility.lib audio_coding_module.lib CNG.lib G711.lib G722.lib iSAC.lib PCM16B.lib NetEq.lib vad.lib system_wrappers.lib webrtc_video_coding.lib webrtc_i420.lib webrtc_vp8.lib webrtc_vplib.lib genperf_libs.lib video_render_module.lib video_engine_core.lib webrtc_jpeg.lib libjpeg.lib media_file.lib rtp_rtcp.lib udp_transport.lib video_processing.lib audio_conference_mixer.lib audio_device.lib audio_processing.lib audioproc_debug_proto.lib aec.lib apm_util.lib aecm.lib agc.lib ns.lib libjingle_p2p.lib voice_engine_core.lib protobuf_lite.lib iLBC.lib resampler.lib iSACFix.lib libjingle.lib libvpx.lib expat.lib signal_processing.lib
-cd ..\..\..\..

@@ -49,6 +49,7 @@ public:
         registerMethod("setRemoteDescription", make_method(this, &GCPAPI::SetRemoteDescription));
         registerMethod("processIceMessage", make_method(this, &GCPAPI::ProcessIceMessage));
         registerMethod("startIce", make_method(this, &GCPAPI::StartIce));
+        registerMethod("deinit", make_method(this, &GCPAPI::DeletePeerConnection));
         
         // Properties
         registerProperty("version", make_property(this, &GCPAPI::get_version));
@@ -60,6 +61,7 @@ public:
         registerProperty("onreadystatechange", make_property(this, &GCPAPI::get_onreadystatechange,
                                                                    &GCPAPI::set_onreadystatechange));
         registerProperty("source", make_property(this, &GCPAPI::get_source, &GCPAPI::set_source));
+        registerProperty("volume", make_property(this, &GCPAPI::get_volume));
     }
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -82,6 +84,7 @@ public:
     FB::JSObjectPtr get_onremovestream();
     FB::JSObjectPtr get_onreadystatechange();
     FB::JSAPIPtr get_source();
+    FB::variant get_volume();
     
     // Property set methods
     void set_onaddstream(const FB::JSObjectPtr& onaddstream);
@@ -112,6 +115,7 @@ public:
     FB::variant SetRemoteDescription(const FB::variant& action, const FB::variant& sdp);
     FB::variant ProcessIceMessage(const FB::variant& sdp);
     FB::variant StartIce();
+    FB::variant DeletePeerConnection();
     
 private:
     // --------------------- PeerConnectionObserver Methods -----------------
@@ -123,9 +127,6 @@ private:
     virtual void OnRemoveStream(webrtc::MediaStreamInterface* pRemoteStream);
     virtual void OnIceCandidate(const webrtc::IceCandidateInterface* pCandidate);
     virtual void OnIceComplete();
-
-private:
-    FB::variant DeletePeerConnection();
     
 private:
     std::string m_readyState;

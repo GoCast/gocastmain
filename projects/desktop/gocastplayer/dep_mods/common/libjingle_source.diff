@@ -80,7 +80,7 @@ Index: talk/app/webrtc/webrtcsession.h
 ===================================================================
 --- talk/app/webrtc/webrtcsession.h	(revision 153)
 +++ talk/app/webrtc/webrtcsession.h	(working copy)
-@@ -114,7 +114,11 @@
+@@ -114,7 +114,13 @@
                                  cricket::VideoRenderer* renderer);
    virtual void SetRemoteRenderer(const std::string& name,
                                   cricket::VideoRenderer* renderer);
@@ -88,6 +88,8 @@ Index: talk/app/webrtc/webrtcsession.h
 +                          
 +  // <GOCAST>
 +  virtual bool SetMicMute(bool enable);
++  virtual bool GetSpkVol(int* level);
++  virtual bool GetOutputMute(bool* enabled);
 +  // </GOCAST>
 +                          
    // Transport related callbacks, override from cricket::BaseSession.
@@ -132,7 +134,7 @@ Index: talk/app/webrtc/webrtcsession.cc
    const cricket::MediaContentDescription* video_content =
        static_cast<const cricket::MediaContentDescription*>(
            video_info->description);
-@@ -464,6 +469,12 @@
+@@ -464,6 +469,20 @@
    }
  }
  
@@ -140,26 +142,91 @@ Index: talk/app/webrtc/webrtcsession.cc
 +    bool WebRtcSession::SetMicMute(bool enable) {
 +        return channel_manager_->SetMicMute(enable);
 +    }
++    
++    bool WebRtcSession::GetSpkVol(int *level) {
++        return channel_manager_->GetOutputVolume(level);
++    }
++    
++    bool WebRtcSession::GetOutputMute(bool *enabled) {
++        return channel_manager_->GetOutputMute(enabled);
++    }
 +    // </GOCAST>
 +    
  void WebRtcSession::OnTransportRequestSignaling(
      cricket::Transport* transport) {
    ASSERT(signaling_thread()->IsCurrent());
+Index: talk/app/webrtc/peerconnectioninterface.h
+===================================================================
+--- talk/app/webrtc/peerconnectioninterface.h	(revision 153)
++++ talk/app/webrtc/peerconnectioninterface.h	(working copy)
+@@ -193,6 +193,11 @@
+ 
+   // Returns the current SdpState.
+   virtual SdpState sdp_state() = 0;
++                                    
++  //<GOCAST>
++  virtual bool system_volume(int* level) = 0;
++  virtual bool speaker_mute_state(bool* enabled) = 0;
++  //</GOCAST>
+ 
+  protected:
+   // Dtor protected as objects shouldn't be deleted via this interface.
 Index: talk/app/webrtc/mediastreamprovider.h
 ===================================================================
 --- talk/app/webrtc/mediastreamprovider.h	(revision 153)
 +++ talk/app/webrtc/mediastreamprovider.h	(working copy)
-@@ -48,6 +48,10 @@
+@@ -48,6 +48,12 @@
                                  cricket::VideoRenderer* renderer) = 0;
    virtual void SetRemoteRenderer(const std::string& name,
                                   cricket::VideoRenderer* renderer) = 0;
 +    // <GOCAST>
 +    virtual bool SetMicMute(bool enable) = 0;
++    virtual bool GetSpkVol(int* level) = 0;
++    virtual bool GetOutputMute(bool* enabled) = 0;
 +    // </GOCAST>
 +    
   protected:
    virtual ~MediaProviderInterface() {}
  };
+Index: talk/app/webrtc/peerconnection.cc
+===================================================================
+--- talk/app/webrtc/peerconnection.cc	(revision 153)
++++ talk/app/webrtc/peerconnection.cc	(working copy)
+@@ -363,6 +363,18 @@
+   return msg.state;
+ }
+ 
++    //<GOCAST>
++    bool PeerConnection::system_volume(int *level) {
++        return static_cast<webrtc::MediaProviderInterface*>
++            (session_.get())->GetSpkVol(level);
++    }
++    
++    bool PeerConnection::speaker_mute_state(bool* enabled) {
++        return static_cast<webrtc::MediaProviderInterface*>
++            (session_.get())->GetOutputMute(enabled);
++    }
++    //</GOCAST>
++    
+ bool PeerConnection::StartIce(IceOptions options) {
+   IceOptionsParams msg(options);
+   signaling_thread()->Send(this, MSG_STARTICE, &msg);
+Index: talk/app/webrtc/peerconnection.h
+===================================================================
+--- talk/app/webrtc/peerconnection.h	(revision 153)
++++ talk/app/webrtc/peerconnection.h	(working copy)
+@@ -74,6 +74,11 @@
+   virtual void Close();
+   virtual ReadyState ready_state();
+   virtual SdpState sdp_state();
++                           
++  //<GOCAST>
++  virtual bool system_volume(int* level);
++  virtual bool speaker_mute_state(bool* enabled);
++  //</GOCAST>
+ 
+   // Jsep functions.
+   virtual SessionDescriptionInterface* CreateOffer(const MediaHints& hints);
 Index: talk/app/webrtc/mediastreamhandler.cc
 ===================================================================
 --- talk/app/webrtc/mediastreamhandler.cc	(revision 153)
@@ -334,22 +401,29 @@ Index: talk/session/phone/channelmanager.cc
 ===================================================================
 --- talk/session/phone/channelmanager.cc	(revision 153)
 +++ talk/session/phone/channelmanager.cc	(working copy)
-@@ -69,6 +69,10 @@
+@@ -69,6 +69,11 @@
    MSG_SETVIDEOCAPTURER = 26,
    MSG_CREATEDATACHANNEL = 27,
    MSG_DESTROYDATACHANNEL = 28,
 +    
 +    // <GOCAST>
 +    MSG_SETMICMUTE = 29,
++    MSG_GETOUTPUTMUTE = 30,
 +    // </GOCAST>
  };
  
  static const int kNotSetOutputVolume = -1;
-@@ -170,6 +174,14 @@
+@@ -170,6 +175,20 @@
    bool result;
  };
  
 +    // <GOCAST>
++    struct GetOutputMuteParams : public talk_base::MessageData {
++        GetOutputMuteParams(): result(false), enabled(false) {}
++        bool result;
++        bool enabled;
++    };
++    
 +    struct SetMicMuteParams : public talk_base::MessageData {
 +        SetMicMuteParams(bool e): result(false), enable(e) {}
 +        bool result;
@@ -360,7 +434,7 @@ Index: talk/session/phone/channelmanager.cc
  ChannelManager::ChannelManager(talk_base::Thread* worker_thread) {
    Construct(MediaEngineFactory::Create(),
              new DataEngine(),
-@@ -639,6 +651,23 @@
+@@ -639,6 +658,43 @@
    return media_engine_->SetOutputVolume(level);
  }
  
@@ -377,14 +451,34 @@ Index: talk/session/phone/channelmanager.cc
 +    }
 +    
 +    bool ChannelManager::SetMicMute_w(bool enable) {
++        ASSERT(worker_thread_ == talk_base::Thread::Current());
++        ASSERT(initialized_);
 +        return media_engine_->SetMicMute(enable);
++    }
++    
++    bool ChannelManager::GetOutputMute(bool *enabled) {
++        bool ret = false;
++        if(initialized_) {
++            GetOutputMuteParams params;
++            Send(MSG_GETOUTPUTMUTE, &params);
++            ret = params.result;
++            *enabled = params.enabled;
++        }
++        
++        return ret;
++    }
++    
++    bool ChannelManager::GetOutputMute_w(bool *enabled) {
++        ASSERT(worker_thread_ == talk_base::Thread::Current());
++        ASSERT(initialized_);
++        return media_engine_->GetOutputMute(enabled);
 +    }
 +    // </GOCAST>
 +    
  bool ChannelManager::GetVideoOptions(std::string* cam_name) {
    if (camera_device_.empty()) {
      // Initialize camera_device_ with default.
-@@ -1055,6 +1084,13 @@
+@@ -1055,6 +1111,18 @@
                                                data->direction);
        break;
      }
@@ -392,6 +486,11 @@ Index: talk/session/phone/channelmanager.cc
 +      case MSG_SETMICMUTE: {
 +          SetMicMuteParams* data = static_cast<SetMicMuteParams*>(message->pdata);
 +          data->result = SetMicMute_w(data->enable);
++          break;
++      }
++      case MSG_GETOUTPUTMUTE: {
++          GetOutputMuteParams* data = static_cast<GetOutputMuteParams*>(message->pdata);
++          data->result = GetOutputMute_w(&(data->enabled));
 +          break;
 +      }
 +          // </GOCAST>
@@ -402,43 +501,32 @@ Index: talk/session/phone/channelmanager.h
 ===================================================================
 --- talk/session/phone/channelmanager.h	(revision 153)
 +++ talk/session/phone/channelmanager.h	(working copy)
-@@ -134,6 +134,11 @@
+@@ -134,6 +134,12 @@
                         const std::string& wave_out_device, int opts);
    bool GetOutputVolume(int* level);
    bool SetOutputVolume(int level);
 +                           
 +    // <GOCAST>
-+    bool SetMicMute(bool enable);                   
++    bool GetOutputMute(bool* enabled);
++    bool SetMicMute(bool enable);
 +    // </GOCAST>
 +                           
    bool GetVideoOptions(std::string* cam_device);
    bool SetVideoOptions(const std::string& cam_device);
    bool SetDefaultVideoEncoderConfig(const VideoEncoderConfig& config);
-@@ -218,6 +223,11 @@
+@@ -218,6 +224,12 @@
                           const Device* out_dev);
    bool GetOutputVolume_w(int* level);
    bool SetOutputVolume_w(int level);
 +                           
 +   // <GOCAST>
++   bool GetOutputMute_w(bool* enabled);
 +   bool SetMicMute_w(bool enable);                   
 +   // </GOCAST>
 +
    bool SetLocalMonitor_w(bool enable);
    bool SetVideoOptions_w(const Device* cam_device);
    bool SetDefaultVideoEncoderConfig_w(const VideoEncoderConfig& config);
-Index: talk/session/phone/devicemanager.cc
-===================================================================
---- talk/session/phone/devicemanager.cc	(revision 153)
-+++ talk/session/phone/devicemanager.cc	(working copy)
-@@ -245,7 +245,7 @@
- 
-   int i = 0;
-   while (exclusion_list[i]) {
--    if (strnicmp(device_name.c_str(), exclusion_list[i],
-+    if (_strnicmp(device_name.c_str(), exclusion_list[i],
-         strlen(exclusion_list[i])) == 0) {
-       LOG(LS_INFO) << "Ignoring device " << device_name;
-       return true;
 Index: talk/session/phone/videocapturer.h
 ===================================================================
 --- talk/session/phone/videocapturer.h	(revision 153)
@@ -462,8 +550,8 @@ Index: talk/session/phone/videocapturer.h
 +  VideoCapturer()
 +    //<GOCAST>
 +    : effect_("none")
-+	, effectCrit_(webrtc::CriticalSectionWrapper::CreateCriticalSection())
-+	//</GOCAST>
++    , effectCrit_(webrtc::CriticalSectionWrapper::CreateCriticalSection())
++    //</GOCAST>
 +    {}
    virtual ~VideoCapturer() {}
  
@@ -475,13 +563,13 @@ Index: talk/session/phone/videocapturer.h
 +    //<GOCAST>
 +    void SetEffect(const std::string& effect) {
 +        if("gray" == effect || "sepia" == effect || "none" == effect) {
-+			webrtc::CriticalSectionScoped crit(effectCrit_);
++            webrtc::CriticalSectionScoped crit(effectCrit_);
 +            effect_ = effect;
 +        }
 +    };
 +    
 +    std::string GetEffect() const {
-+		webrtc::CriticalSectionScoped crit(effectCrit_);
++        webrtc::CriticalSectionScoped crit(effectCrit_);
 +        return effect_;
 +    }
 +    //</GOCAST>
@@ -497,7 +585,7 @@ Index: talk/session/phone/videocapturer.h
 +    //<GOCAST>
 + protected:
 +    std::string effect_;
-+	webrtc::CriticalSectionWrapper* effectCrit_;
++    webrtc::CriticalSectionWrapper* effectCrit_;
 +    //</GOCAST>
  
    DISALLOW_COPY_AND_ASSIGN(VideoCapturer);
@@ -506,22 +594,27 @@ Index: talk/session/phone/mediaengine.h
 ===================================================================
 --- talk/session/phone/mediaengine.h	(revision 153)
 +++ talk/session/phone/mediaengine.h	(working copy)
-@@ -137,6 +137,10 @@
+@@ -137,6 +137,11 @@
    virtual bool GetOutputVolume(int* level) = 0;
    // Sets the current speaker volume, as a value between 0 and 255.
    virtual bool SetOutputVolume(int level) = 0;
 +    
 +    // <GOCAST>
++    virtual bool GetOutputMute(bool* enabled) = 0;
 +    virtual bool SetMicMute(bool enable) = 0;
 +    // </GOCAST>
  
    // Local monitoring
    // Gets the current microphone level, as a value between 0 and 10.
-@@ -243,6 +247,12 @@
+@@ -243,6 +248,16 @@
      return voice_.SetOutputVolume(level);
    }
  
 +    // <GOCAST>
++    virtual bool GetOutputMute(bool* enabled) {
++        return voice_.GetOutputMute(enabled);
++    }
++    
 +    virtual bool SetMicMute(bool enable) {
 +        return voice_.SetMicMute(enable);
 +    }
@@ -530,12 +623,17 @@ Index: talk/session/phone/mediaengine.h
    virtual int GetInputLevel() {
      return voice_.GetInputLevel();
    }
-@@ -315,6 +325,13 @@
+@@ -315,6 +330,18 @@
      return true;
    }
    bool SetOutputVolume(int level) { return true; }
 +    
 +    // <GOCAST>
++    bool GetOutputMute(bool* enabled) {
++        *enabled = true;
++        return true;
++    }
++    
 +    bool SetMicMute(bool enable) {
 +        return true;
 +    }
@@ -616,7 +714,7 @@ Index: talk/session/phone/webrtcvideocapturer.cc
  
 +    //<GOCAST>
 +    void WebRtcVideoCapturer::ApplyEffect(webrtc::VideoFrame &frame) {
-+		webrtc::CriticalSectionScoped crit(effectCrit_);
++        webrtc::CriticalSectionScoped crit(effectCrit_);
 +        if("none" == effect_) {
 +            return;
 +        } else {
@@ -701,18 +799,28 @@ Index: talk/session/phone/webrtcvoiceengine.cc
 ===================================================================
 --- talk/session/phone/webrtcvoiceengine.cc	(revision 153)
 +++ talk/session/phone/webrtcvoiceengine.cc	(working copy)
-@@ -712,6 +712,16 @@
+@@ -712,6 +712,26 @@
    return true;
  }
  
 +    // <GOCAST>
++    bool WebRtcVoiceEngine::GetOutputMute(bool *enabled) {
++        bool _enabled;
++        if(voe_wrapper_->volume()->GetSystemOutputMute(_enabled) == -1) {
++            LOG_RTCERR1(GetOutputMute, enabled);
++            return false;
++        }
++        *enabled = _enabled;
++        return true;
++    }
++    
 +    bool WebRtcVoiceEngine::SetMicMute(bool enable) {
 +        if(voe_wrapper_->volume()->SetSystemInputMute(enable) == -1) {
 +            LOG_RTCERR1(SetMicMute, enable);
 +            return false;
 +        }
 +        return true;
-+    }
++    }    
 +    // </GOCAST>
 +    
  int WebRtcVoiceEngine::GetInputLevel() {
@@ -722,12 +830,13 @@ Index: talk/session/phone/webrtcvoiceengine.h
 ===================================================================
 --- talk/session/phone/webrtcvoiceengine.h	(revision 153)
 +++ talk/session/phone/webrtcvoiceengine.h	(working copy)
-@@ -107,6 +107,11 @@
+@@ -107,6 +107,12 @@
    bool SetDevices(const Device* in_device, const Device* out_device);
    bool GetOutputVolume(int* level);
    bool SetOutputVolume(int level);
 +          
 +          // <GOCAST>
++          bool GetOutputMute(bool* enabled);
 +          bool SetMicMute(bool enable);
 +          // </GOCAST>
 +          
@@ -747,42 +856,3 @@ Index: talk/base/refcount.h
    virtual int AddRef() {
      return talk_base::AtomicOps::Increment(&ref_count_);
    }
-Index: talk/base/proxydetect.cc
-===================================================================
---- talk/base/proxydetect.cc	(revision 153)
-+++ talk/base/proxydetect.cc	(working copy)
-@@ -242,7 +242,7 @@
-   if (*item == '.') {
-     size_t hostlen = url.host().length();
-     return (hostlen > len)
--        && (stricmp(url.host().c_str() + (hostlen - len), item) == 0);
-+        && (_stricmp(url.host().c_str() + (hostlen - len), item) == 0);
-   }
- 
-   // localhost or www.*.com
-Index: talk/base/physicalsocketserver.cc
-===================================================================
---- talk/base/physicalsocketserver.cc	(revision 153)
-+++ talk/base/physicalsocketserver.cc	(working copy)
-@@ -1546,7 +1546,7 @@
-     if (dw == WSA_WAIT_FAILED) {
-       // Failed?
-       // TODO: need a better strategy than this!
--      int error = WSAGetLastError();
-+//      int error = WSAGetLastError();
-       ASSERT(false);
-       return false;
-     } else if (dw == WSA_WAIT_TIMEOUT) {
-Index: talk/base/httpclient.cc
-===================================================================
---- talk/base/httpclient.cc	(revision 153)
-+++ talk/base/httpclient.cc	(working copy)
-@@ -178,7 +178,7 @@
- HttpResponseValidatorLevel(const HttpResponseData& response) {
-   std::string value;
-   if (response.hasHeader(HH_ETAG, &value)) {
--    bool is_weak = (strnicmp(value.c_str(), "W/", 2) == 0);
-+    bool is_weak = (_strnicmp(value.c_str(), "W/", 2) == 0);
-     return is_weak ? HVS_WEAK : HVS_STRONG;
-   }
-   if (response.hasHeader(HH_LAST_MODIFIED, &value)) {

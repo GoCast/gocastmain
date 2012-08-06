@@ -45,6 +45,29 @@ FB::JSAPIPtr GCPAPI::get_source()
     return m_srcStream;
 }
 
+FB::variant GCPAPI::get_volume()
+{
+    int level;
+    GoCast::RtcCenter* pCtr = GoCast::RtcCenter::Instance();
+    bool bSpkMuted = false;
+    
+    if(false == pCtr->Inited() || false == pCtr->GetSpkVol(&level))
+    {
+        level = -1;
+    }
+    
+    if(false == pCtr->GetSpkMute(&bSpkMuted))
+    {
+        level = -1;
+    }
+    else if(true == bSpkMuted)
+    {
+        level = 0;
+    }
+    
+    return level;
+}
+
 FB::JSObjectPtr GCPAPI::get_onaddstream()
 {
     return m_onaddstreamCb;
@@ -80,13 +103,16 @@ void GCPAPI::set_source(const FB::JSAPIPtr& stream)
     m_srcStream = stream;
     if(NULL != stream.get())
     {
+        std::string msg = m_htmlId.convert_cast<std::string>();
+        msg += ": Setting video track renderer...";
+        FBLOG_INFO_CUSTOM("GCAPAPI::set_source", msg);
+
         if("localPlayer" == m_htmlId.convert_cast<std::string>())
-        {
-            FBLOG_INFO_CUSTOM(funcstr("GCAPAPI::set_source", m_htmlId.convert_cast<std::string>()),
-                              "Setting local video track renderer...");
+        {            
 			if(NULL != getPlugin()->Renderer().get())
 			{
-				GoCast::GCPVideoRenderer* pRenderer = dynamic_cast<GoCast::GCPVideoRenderer*>(getPlugin()->Renderer()->renderer());
+				GoCast::GCPVideoRenderer* pRenderer = 
+                    dynamic_cast<GoCast::GCPVideoRenderer*>(getPlugin()->Renderer()->renderer());
 				if(NULL != pRenderer)
 				{
 					pRenderer->SetPreviewMode(true);
@@ -97,8 +123,6 @@ void GCPAPI::set_source(const FB::JSAPIPtr& stream)
         }
         else
         {
-            FBLOG_INFO_CUSTOM(funcstr("GCAPAPI::set_source", m_htmlId.convert_cast<std::string>()),
-                              "Setting remote video track renderer...");
             (GoCast::RtcCenter::Instance())->SetRemoteVideoTrackRenderer(m_htmlId.convert_cast<std::string>(),
 		                                                                 getPlugin()->Renderer());
 		}
@@ -110,17 +134,22 @@ void GCPAPI::GetUserMedia(const FB::JSObjectPtr& mediaHints,
                           const FB::JSObjectPtr& failCb)
 {
     GoCast::RtcCenter* pCtr = GoCast::RtcCenter::Instance();
+	m_htmlId = "localPlayer";
     
     if(false == pCtr->Inited())
     {
-        FBLOG_ERROR_CUSTOM(funcstr("GCPAPI::GetUserMedia", m_htmlId.convert_cast<std::string>()),
-                           "Failed to init RtcCenter singleton");
-        failCb->InvokeAsync("", FB::variant_list_of("RtcCenter init failed"));
+        std::string msg = m_htmlId.convert_cast<std::string>();
+        msg += ": Failed to init RtcCenter singleton...";
+        FBLOG_ERROR_CUSTOM("GCPAPI::GetUserMedia", msg);
+        
+        if(NULL != failCb.get())
+        {
+            failCb->InvokeAsync("", FB::variant_list_of("RtcCenter init failed"));
+        }
         return;
     }
     
-	m_htmlId = "localPlayer";
-    pCtr->GetUserMedia(mediaHints, succCb, failCb);
+    pCtr->GetUserMedia(mediaHints, succCb, failCb, false);
 }
 
 FB::variant GCPAPI::Init(const FB::variant& htmlId,
@@ -128,16 +157,17 @@ FB::variant GCPAPI::Init(const FB::variant& htmlId,
                          const FB::JSObjectPtr& iceCallback)
 {
     GoCast::RtcCenter* pCtr = GoCast::RtcCenter::Instance();
+    m_htmlId = htmlId;
+    m_iceCb = iceCallback;
     
     if(false == pCtr->Inited())
     {
-        FBLOG_ERROR_CUSTOM(funcstr("GCPAPI::Init", m_htmlId.convert_cast<std::string>()),
-                           "Failed to init RtcCenter singleton");
+        std::string msg = m_htmlId.convert_cast<std::string>();
+        msg += ": Failed to init RtcCenter singleton";
+        FBLOG_ERROR_CUSTOM("GCPAPI::Init",msg);
         return false;
     }
     
-    m_htmlId = htmlId;
-    m_iceCb = iceCallback;
     if(false == pCtr->NewPeerConnection(m_htmlId.convert_cast<std::string>(),
                                         iceConfig.convert_cast<std::string>(),
                                         this))
@@ -156,8 +186,9 @@ FB::variant GCPAPI::AddStream(const FB::JSAPIPtr& stream)
     
     if(false == pCtr->Inited())
     {
-        FBLOG_ERROR_CUSTOM(funcstr("GCPAPI::AddStream", m_htmlId.convert_cast<std::string>()),
-                           "Failed to init RtcCenter singleton");
+        std::string msg = m_htmlId.convert_cast<std::string>();
+        msg += ": Failed to init RtcCenter singleton";
+        FBLOG_ERROR_CUSTOM("GCPAPI::AddStream", msg);
         return false;
     }
 
@@ -171,8 +202,9 @@ FB::variant GCPAPI::RemoveStream(const FB::JSAPIPtr& stream)
     
     if(false == pCtr->Inited())
     {
-        FBLOG_ERROR_CUSTOM(funcstr("GCPAPI::RemoveStream", m_htmlId.convert_cast<std::string>()),
-                           "Failed to init RtcCenter singleton");
+        std::string msg = m_htmlId.convert_cast<std::string>();
+        msg += ": Failed to init RtcCenter singleton";
+        FBLOG_ERROR_CUSTOM("GCPAPI::RemoveStream", msg);
         return false;
     }
     
@@ -188,8 +220,9 @@ FB::variant GCPAPI::CreateOffer(const FB::JSObjectPtr& mediaHints)
     
     if(false == pCtr->Inited())
     {
-        FBLOG_ERROR_CUSTOM(funcstr("GCPAPI::CreateOffer", m_htmlId.convert_cast<std::string>()),
-                           "Failed to init RtcCenter singleton");
+        std::string msg = m_htmlId.convert_cast<std::string>();
+        msg += ": Failed to init RtcCenter singleton";
+        FBLOG_ERROR_CUSTOM("GCPAPI::CreateOffer", msg);
         return "";
     }
     
@@ -203,7 +236,8 @@ FB::variant GCPAPI::CreateOffer(const FB::JSObjectPtr& mediaHints)
         bAudio = true;
     }
     
-    return pCtr->CreateOffer(m_htmlId.convert_cast<std::string>(), webrtc::MediaHints(bAudio, bVideo));
+    return pCtr->CreateOffer(m_htmlId.convert_cast<std::string>(),
+                             webrtc::MediaHints(bAudio, bVideo));
 }
 
 FB::variant GCPAPI::CreateAnswer(const FB::variant& offer, const FB::JSObjectPtr& mediaHints)
@@ -212,10 +246,18 @@ FB::variant GCPAPI::CreateAnswer(const FB::variant& offer, const FB::JSObjectPtr
     bool bAudio = false;
     GoCast::RtcCenter* pCtr = GoCast::RtcCenter::Instance();
     
+    if("localPlayer" == m_htmlId.convert_cast<std::string>())
+    {
+        FBLOG_ERROR_CUSTOM("GCPAPI::CreateAnswer",
+                           "localPlayer: Not allowed to call createAnswer()");
+        return "";
+    }
+    
     if(false == pCtr->Inited())
     {
-        FBLOG_ERROR_CUSTOM(funcstr("GCPAPI::CreateAnswer", m_htmlId.convert_cast<std::string>()),
-                           "Failed to init RtcCenter singleton");
+        std::string msg = m_htmlId.convert_cast<std::string>();
+        msg += ": Failed to init RtcCenter singleton";
+        FBLOG_ERROR_CUSTOM("GCPAPI::CreateAnswer", msg);
         return "";
     }
     
@@ -246,8 +288,14 @@ void GCPAPI::SetLocalDescription(const FB::variant& action,
     
     if(false == pCtr->Inited())
     {
-        FBLOG_ERROR_CUSTOM(funcstr("GCPAPI::SetLocalDescription", m_htmlId.convert_cast<std::string>()),
-                           "Failed to init RtcCenter singleton");
+        std::string msg = m_htmlId.convert_cast<std::string>();
+        msg += ": Failed to init RtcCenter singleton...";
+        FBLOG_ERROR_CUSTOM("GCPAPI::SetLocalDescription", msg);
+        
+        if(NULL != failCb.get())
+        {
+            failCb->InvokeAsync("", FB::variant_list_of("RtcCenter init failed"));
+        }
         return;
     }
     
@@ -266,26 +314,41 @@ FB::variant GCPAPI::SetRemoteDescription(const FB::variant& action, const FB::va
                                             webrtc::JsepInterface::kOffer:
                                             webrtc::JsepInterface::kAnswer;
     
+    if("localPlayer" == m_htmlId.convert_cast<std::string>())
+    {
+        FBLOG_ERROR_CUSTOM("GCPAPI::SetRemoteDescription",
+                           "localPlayer: Not allowed to call setRemoteDescription()");
+        return false;
+    }
+
     if(false == pCtr->Inited())
     {
-        FBLOG_ERROR_CUSTOM(funcstr("GCPAPI::SetRemoteDescription", m_htmlId.convert_cast<std::string>()),
-                           "Failed to init RtcCenter singleton");
+        std::string msg = m_htmlId.convert_cast<std::string>();
+        msg += ": Failed to init RtcCenter singleton";
+        FBLOG_ERROR_CUSTOM("GCPAPI::SetRemoteDescription", msg);
         return false;
     }
     
     return pCtr->SetRemoteDescription(m_htmlId.convert_cast<std::string>(),
-                                      _action,
-                                      sdp.convert_cast<std::string>());    
+                                      _action, sdp.convert_cast<std::string>());    
 }
 
 FB::variant GCPAPI::ProcessIceMessage(const FB::variant& sdp)
 {
     GoCast::RtcCenter* pCtr = GoCast::RtcCenter::Instance();
     
+    if("localPlayer" == m_htmlId.convert_cast<std::string>())
+    {
+        FBLOG_ERROR_CUSTOM("GCPAPI::ProcessIceMessage",
+                           "localPlayer: Not allowed to call processIceMessage()");
+        return false;
+    }
+
     if(false == pCtr->Inited())
     {
-        FBLOG_ERROR_CUSTOM(funcstr("GCPAPI::ProcessIceMessage", m_htmlId.convert_cast<std::string>()),
-                           "Failed to init RtcCenter singleton");
+        std::string msg = m_htmlId.convert_cast<std::string>();
+        msg += ": Failed to init RtcCenter singleton";
+        FBLOG_ERROR_CUSTOM("GCPAPI::ProcessIceMessage", msg);
         return false;
     }
     
@@ -297,14 +360,37 @@ FB::variant GCPAPI::StartIce()
 {
     GoCast::RtcCenter* pCtr = GoCast::RtcCenter::Instance();
     
+    if("localPlayer" == m_htmlId.convert_cast<std::string>())
+    {
+        FBLOG_ERROR_CUSTOM("GCPAPI::StartIce",
+                           "localPlayer: Not allowed to call startIce()");
+        return false;
+    }
+
     if(false == pCtr->Inited())
     {
-        FBLOG_ERROR_CUSTOM(funcstr("GCPAPI::StartIce", m_htmlId.convert_cast<std::string>()),
-                           "Failed to init RtcCenter singleton");
+        std::string msg = m_htmlId.convert_cast<std::string>();
+        msg += ": Failed to init RtcCenter singleton";
+        FBLOG_ERROR_CUSTOM("GCPAPI::StartIce", msg);
         return false;
     }
     
     return pCtr->StartIce(m_htmlId.convert_cast<std::string>());    
+}
+
+FB::variant GCPAPI::DeletePeerConnection()
+{
+    GoCast::RtcCenter* pCtr = GoCast::RtcCenter::Instance();
+    
+    if(false == pCtr->Inited())
+    {
+        std::string msg = m_htmlId.convert_cast<std::string>();
+        msg += ": Failed to init RtcCenter singleton";
+        FBLOG_ERROR_CUSTOM("GCPAPI::DeletePeerConnection", msg);
+        return false;
+    }
+    
+    return pCtr->DeletePeerConnection(m_htmlId.convert_cast<std::string>());
 }
 
 void GCPAPI::OnStateChange(StateType state_changed)
@@ -313,8 +399,9 @@ void GCPAPI::OnStateChange(StateType state_changed)
     
     if(false == pCtr->Inited())
     {
-        FBLOG_ERROR_CUSTOM(funcstr("GCPAPI::OnStateChange", m_htmlId.convert_cast<std::string>()),
-                           "Failed to init RtcCenter singleton");
+        std::string msg = m_htmlId.convert_cast<std::string>();
+        msg += ": Failed to init RtcCenter singleton";
+        FBLOG_ERROR_CUSTOM("GCPAPI::OnStateChange", msg);
         return;
     }
 
@@ -323,22 +410,23 @@ void GCPAPI::OnStateChange(StateType state_changed)
         case webrtc::PeerConnectionObserver::kReadyState:
         {
             m_readyState = pCtr->ReadyState(m_htmlId.convert_cast<std::string>());
-            
             if(NULL != m_onreadystatechangeCb.get())
             {
                 m_onreadystatechangeCb->InvokeAsync("", FB::variant_list_of());
             }
             
-            std::string msg("ReadyState = ");
+            std::string msg = m_htmlId.convert_cast<std::string>();
+            msg += ": ReadyState = ";
             msg += m_readyState;
-            FBLOG_INFO_CUSTOM(funcstr("GCPAPI::OnStateChange", m_htmlId.convert_cast<std::string>()), msg);
+            FBLOG_INFO_CUSTOM("GCPAPI::OnStateChange", msg);
             break;
         }
             
         default:
         {
-            FBLOG_ERROR_CUSTOM(funcstr("GCPAPI::OnStateChange", m_htmlId.convert_cast<std::string>()),
-                               "Unhandled state change");
+            std::string msg = m_htmlId.convert_cast<std::string>();
+            msg += ": Unhandled state change";
+            FBLOG_INFO_CUSTOM("GCPAPI::OnStateChange", msg);
             break;
         }
     }
@@ -349,12 +437,15 @@ void GCPAPI::OnAddStream(webrtc::MediaStreamInterface* pRemoteStream)
     talk_base::scoped_refptr<webrtc::MediaStreamInterface> pStream(pRemoteStream);
 
     (GoCast::RtcCenter::Instance())->AddRemoteStream(m_htmlId.convert_cast<std::string>(),pStream);
+
+    std::string msg = m_htmlId.convert_cast<std::string>();
+    msg += ": Added remote stream [";
+    msg += pStream->label();
+    msg += "]...";
+    FBLOG_INFO_CUSTOM("GCPAPI::OnAddStream", msg);
+
     if(NULL != m_onaddstreamCb.get())
     {
-        std::string msg("Added remote stream [");
-        msg += pStream->label();
-        msg += "]...";
-        FBLOG_INFO_CUSTOM(funcstr("GCPAPI::OnAddStream", m_htmlId.convert_cast<std::string>()), msg);
         m_onaddstreamCb->InvokeAsync("", FB::variant_list_of(GoCast::RemoteMediaStream::Create(pStream)));
     }
 }
@@ -364,12 +455,15 @@ void GCPAPI::OnRemoveStream(webrtc::MediaStreamInterface* pRemoteStream)
     talk_base::scoped_refptr<webrtc::MediaStreamInterface> pStream(pRemoteStream);
     
     (GoCast::RtcCenter::Instance())->RemoveRemoteStream(m_htmlId.convert_cast<std::string>());
+
+    std::string msg = m_htmlId.convert_cast<std::string>();
+    msg += ": Removed remote stream [";
+    msg += pStream->label();
+    msg += "]...";
+    FBLOG_INFO_CUSTOM("GCPAPI::OnRemoveStream", msg);
+    
     if(NULL != m_onremovestreamCb.get())
     {
-        std::string msg("Removed remote stream [");
-        msg += pStream->label();
-        msg += "]...";
-        FBLOG_INFO_CUSTOM(funcstr("GCPAPI::OnRemoveStream", m_htmlId.convert_cast<std::string>()), msg);
         m_onremovestreamCb->InvokeAsync("", FB::variant_list_of(GoCast::RemoteMediaStream::Create(pStream)));
     }
     
@@ -380,41 +474,52 @@ void GCPAPI::OnIceCandidate(const webrtc::IceCandidateInterface* pCandidate)
     std::string candidateSdp("");
     bool bMoreComing = true;
     
+    if("BLOCKED" == m_readyState)
+    {
+        return;
+    }
+    
     if(false == pCandidate->ToString(&candidateSdp))
     {
         candidateSdp = "";
     }
     
+    if(std::string::npos != candidateSdp.find(" tcp "))
+    {
+        m_readyState = "BLOCKED";
+        
+        std::string msg = m_htmlId.convert_cast<std::string>();
+        msg += ": ReadyState = BLOCKED...";
+        FBLOG_INFO_CUSTOM("GCPAPI::OnIceCandidate", msg);
+        
+        if(NULL != m_onreadystatechangeCb.get())
+        {
+            m_onreadystatechangeCb->InvokeAsync("", FB::variant_list_of());
+        }
+        
+        return;
+    }
+    
+    std::string msg = m_htmlId.convert_cast<std::string>();
+    msg += ": New Ice Candidate [";
+    msg += candidateSdp;
+    msg += "]...";
+    FBLOG_INFO_CUSTOM("GCPAPI::OnIceCandidate", msg);
+
     if(NULL != m_iceCb.get())
     {
-        std::string msg("New Ice Candidate [");
-        msg += candidateSdp;
-        msg += "]...";
-        FBLOG_INFO_CUSTOM(funcstr("GCPAPI::OnIceCandidate", m_htmlId.convert_cast<std::string>()), msg);
         m_iceCb->InvokeAsync("", FB::variant_list_of(candidateSdp)(bMoreComing));
     }
 }
 
 void GCPAPI::OnIceComplete()
 {
+    std::string msg = m_htmlId.convert_cast<std::string>();
+    msg += ": ICE process complete...";
+    FBLOG_INFO_CUSTOM("GCPAPI::OnIceComplete", msg);
+
     if(NULL != m_iceCb.get())
     {
-        FBLOG_INFO_CUSTOM(funcstr("GCPAPI::OnIceComplete", m_htmlId.convert_cast<std::string>()),
-                          "ICE process complete");
         m_iceCb->InvokeAsync("", FB::variant_list_of("")(false));
     }
-}
-
-FB::variant GCPAPI::DeletePeerConnection()
-{
-    GoCast::RtcCenter* pCtr = GoCast::RtcCenter::Instance();
-    
-    if(false == pCtr->Inited())
-    {
-        FBLOG_ERROR_CUSTOM(funcstr("GCPAPI::DeletePeerConnection", m_htmlId.convert_cast<std::string>()),
-                           "Failed to init RtcCenter singleton");
-        return false;
-    }
-    
-    return pCtr->DeletePeerConnection(m_htmlId.convert_cast<std::string>());
 }

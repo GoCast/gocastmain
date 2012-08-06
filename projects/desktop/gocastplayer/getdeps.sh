@@ -41,11 +41,11 @@ if [[ $1 = "libjingle" || $* = "" ]]; then
     cd webrtc/trunk
 
     echo "Patching webrtc_trunk.diff..."
-    patch -p0 -i ../../../dep_mods/macosx/webrtc_trunk.diff
+    patch -p0 -i ../../../dep_mods/common/webrtc_trunk.diff
     cd chromium_deps
 
     echo "Patching chromium_deps.diff..."
-    patch -p0 -i ../../../../dep_mods/macosx/chromium_deps.diff
+    patch -p0 -i ../../../../dep_mods/common/chromium_deps.diff
     cd ../../
 
     echo "Running [gclient sync -r $WEBRTC_REV --force] to obtain webrtc source..."
@@ -53,11 +53,11 @@ if [[ $1 = "libjingle" || $* = "" ]]; then
     cd trunk/third_party/libjingle
     
     echo "Patching libjingle.diff..."
-    patch -p0 -i ../../../../../dep_mods/macosx/libjingle.diff
+    patch -p0 -i ../../../../../dep_mods/common/libjingle.diff
     cd source
 
     echo "Patching libjingle_source.diff..."
-    patch -p0 -i ../../../../../../dep_mods/macosx/libjingle_source.diff
+    patch -p0 -i ../../../../../../dep_mods/common/libjingle_source.diff
     cd ../../../../..
 fi
 

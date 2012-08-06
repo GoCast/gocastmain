@@ -111,6 +111,31 @@ GoCastJS.getUserMedia = function(options, success, failure) {
 };
 
 //!
+//! function: GoCastJS.SetSpkVolListener(volCheckInterval,
+//!                                      localplayer,
+//!                                      onSpkVolChanged)
+//!
+//! arguments:
+//!     volCheckInterval    <milliseconds> : interval for volume check
+//!     localPlayer         <HtmlObject>   : plugin used for local preview
+//!     onSpkVolChanged     <function()>   : callback for volume change
+//!
+GoCastJS.SetSpkVolListener = function(volCheckInterval,
+                                      localplayer,
+                                      onSpkVolChanged) {
+    //Inited to 256 (range is [0-255]) in order to always trigger
+    // the callback on the first access to localplayer.volume
+    var spkVol = 256;
+
+    setInterval(function() {
+        if (spkVol !== localplayer.volume) {
+            spkVol = localplayer.volume;
+            onSpkVolChanged();
+        }
+    }, volCheckInterval);
+};
+
+//!
 //! constructor: GoCastJS.PeerConnectionOptions(iceConfig,
 //!                                             onIceMessage,
 //!                                             onAddStream,
@@ -254,7 +279,7 @@ GoCastJS.PeerConnection.prototype.CreateAnswer = function(offer, mediaHints) {
 //!                                                       failure)
 //!
 //! arguments:
-//!     action <string> : 'OFFER' (if offer) or 'ANSWER' (if answer)
+//!     action <string> : 'OFFER' (if offer) or 'ANSWER' (if Ôanswer)
 //!     sdp    <string> : sdp to be used as local peer's description
 //!     success <function()>        : success callback
 //!     failure <function(message)> : failure callback with message
@@ -313,6 +338,17 @@ GoCastJS.PeerConnection.prototype.ProcessIceMessage = function(sdp) {
 GoCastJS.PeerConnection.prototype.StartIce = function() {
     if (false === this.player.startIce()) {
         throw new GoCastJS.Exception(this.player.id, 'startIce() failed.');
+    }
+};
+
+//!
+//! function: GoCastJS.PeerConnection.Deinit()
+//!
+//! NOTE: preferably should be called on an init-ed player instance
+//!
+GoCastJS.PeerConnection.prototype.Deinit = function() {
+    if (false === this.player.deinit()) {
+        throw new GoCastJS.Exception(this.player.id, 'deinit() failed.');
     }
 };
 

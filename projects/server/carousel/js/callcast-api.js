@@ -17,13 +17,13 @@
 /*jslint sloppy: false, todo: true, white: true, browser: true, devel: true */
 /*global Callcast, app */
 // index.js methods
-/*global  closeWindow, 
-          removeContentFromCarousel, 
-          removePluginFromCarousel, 
-          openPersonalChat, 
-          openWindow, 
-          openMeeting, 
-          tryPluginInstall, 
+/*global  closeWindow,
+          removeContentFromCarousel,
+          removePluginFromCarousel,
+          openPersonalChat,
+          openWindow,
+          openMeeting,
+          tryPluginInstall,
           checkForPluginOptionalUpgrades,
           handleRoomSetup
 */
@@ -236,9 +236,10 @@ function setSpotInfo(info)
           {
              spot.image = 'url(images/person.png)';
           }
+
+          console.log('setSpotInfo', info, spot);
        }
        app.log(2, 'setSpotInfo nick ' + info.nick + ' image ' + info.image);
-       console.log('setSpotInfo', info, spot);
     }
 }
 
@@ -525,7 +526,7 @@ function addPluginToCarousel(
   {
     oo = app.carousel.createSpot();
     app.carousel.updateAll();
-  } 
+  }
   if (oo) {
     $(oo).attr('id', id);
     $(oo).attr('encname', nickname);
@@ -554,7 +555,7 @@ function addPluginToCarousel(
 ///
 function removePluginFromCarousel(nickname)
 {
-  if (nickname) // this method gets called for local user and nickname is null 
+  if (nickname) // this method gets called for local user and nickname is null
                 // so stop here if nickname is null
   {
     try
