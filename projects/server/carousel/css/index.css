@@ -125,9 +125,13 @@ body > div#lower-left {
   line-height: 2em;
   max-width: 40%
 }
+body > div#lower-left > div#msgBoard
+{
+  display:inline;
+}
 body > div#lower-left > div#msgBoard > div#chatOut
 {
-  position: absolute;
+  /*position: absolute; */
   bottom: 2em;
   max-height:125px;
   min-height: 3em;
@@ -139,11 +143,17 @@ body > div#lower-left > div#msgBoard > div#chatOut
   line-height: 1.2em;
   padding: 3px;
   border-width: 2px;
+  border-color:gray;
   -moz-user-select: text;
   -khtml-user-select: text;
   -webkit-user-select: text;
   -o-user-select: text;
   user-select: text;
+}
+body > div#lower-left > div#msgBoard > div#chatOut > span
+{
+  color: white;
+  text-shadow: 0 0 10px gray, 0 0 20px gray, 0 0 30px gray, 0 0 40px #FF00DE, 0 0 70px #FF00DE, 0 0 80px #FF00DE, 0 0 100px #FF00DE, 0 0 150px #FF00DE;
 }
 body> div#lower-left > div#msgBoard > div#msgTicker
 {
@@ -156,6 +166,8 @@ body> div#lower-left > div#msgBoard > div#msgTicker
 }
 body> div#lower-left > div#msgBoard > input.chatTo
 {
+  background-color: transparent;
+  color: white;
   width:250px;
 }
 body > div#lower-left > div#msgBoard > input.send {

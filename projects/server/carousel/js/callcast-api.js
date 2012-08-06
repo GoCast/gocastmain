@@ -146,9 +146,9 @@ $(document).on('public-message', function(
     if (!jqChat[0]) {throw "no chat out div";}
     msgNumber = jqChat.data('msgNumber'); // get next msgNumber
     msgNumber = msgNumber || 0;           // init if not already
-    msg = '<span + id="'+ msgNumber + '"<b>' + 
-                          decodeURI(msginfo.nick) + '</b>' + ': ' +
-                          decodeURI(msginfo.body) + '<br></span>';
+    msg = '<span id="'+ msgNumber + '"<b>' + 
+                        decodeURI(msginfo.nick) + '</b>' + ': ' +
+                        decodeURI(msginfo.body) + '<br></span>';
     // get scroll pos
     //app.log(2, 'public-message scrollTop ' + jqChat.scrollTop() 
     //        + ' scrollHeight ' + jqChat[0].scrollHeight 
@@ -159,15 +159,17 @@ $(document).on('public-message', function(
     jqChat.append(msg);       // Add message to Message Board.
     if (atBottom) // if we were at bottom before msg append scroll to bottom
     {
-      //jqChat.scrollTop(jqChat[0].scrollHeight);
-      jqChat.animate({scrollTop : jqChat[0].scrollHeight},'fast');
+      jqChat.scrollTop(jqChat[0].scrollHeight);
+      //jqChat.animate({scrollTop : jqChat[0].scrollHeight},'fast');
       // flash new msg
       span = $("span#" + msgNumber, jqChat);
-      span.animate({color:"red"},
+      //span.animate({color:"red"},
+      span.animate({backgroundColor:"red"},
         {duration: 0,
          complete: function()
          {
-           span.animate({color:"white"}, 100);
+           //span.animate({backgroundColor:"transparent"}, 500); // doesn't work, end color is white
+           span.animate({backgroundColor:"black"}, 500);
          }
         });
     }
@@ -178,7 +180,8 @@ $(document).on('public-message', function(
         {duration: 0,
          complete: function()
          {
-           jqChat.animate({backgroundColor:"black"}, 100);
+           jqChat.animate({backgroundColor:"black"}, 500);
+           //jqChat.animate({backgroundColor:"transparent"}, 500); // doesn't work, end color is white
          }
         });
     }

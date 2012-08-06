@@ -66,12 +66,15 @@
        <input id="video" type="button" class="on" title="Enable video" disabled="disabled"/>
     </div>      
     <div id="lower-left">
-       <a href="http://www.gocast.it" target="_blank"">
+      <!--
+       <a href="http://www.gocast.it" target="_blank">
         <img class="logo" src="images/gologo.png" />
        </a>
+      -->
        <div id="msgBoard">
-        <div id="chatOut" class="ui-widget-content"></div>
-        <input class="chatTo ui-widget-content" type="text" placeholder="Enter a chat message" onkeydown="keypressGrpChatHandler(event);"/>
+        <!--<div id="chatOut" class="ui-widget-content"></div>-->
+        <div id="chatOut"> </div>
+        <input class="chatTo" type="text" placeholder="Enter a chat message" onkeydown="keypressGrpChatHandler(event);"/>
         <input class="send" type="button" title="Send chat." onclick="sendGrpChat();"/>
        </div>
     </div>      
