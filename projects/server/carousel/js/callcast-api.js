@@ -619,6 +619,35 @@ function reloadLocalPlugin()
   }
 } // reloadLocalPlugin
 */
+///
+/// \brief get info from url
+/// \param url target url
+/// \return JSON object with info:
+///    title header title tag
+///    type  mime type
+/// 
+function getUrlInfo(options, callback)
+{
+  $.ajax(
+  {
+    url      : options.proxyUrl,          //customizable
+    data     : {xhr2: false, url: options.webUrl},  //customizable
+    cache    : true,
+    dataType : "jsonp",
+    success  : function(response)
+        {
+           var result = (/<title>(.*?)<\/title>/m).exec(response),
+               info = {},
+               title;
+           if (result)
+           {
+               title = result[1];
+               info.title = title;
+           }
+           callback(info);
+        }
+    });
+}
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
@@ -656,7 +685,7 @@ function addContentToCarousel(
     }
     else // gen image from url
     {
-       GoCastJS.getUrlInfo(
+       getUrlInfo(
        {
          webUrl: info.url,
          proxyUrl: 'http://carousel.gocast.it/proxy'
@@ -787,22 +816,22 @@ function pluginLoaded(
           console.log("speaker volume " + vol);
           if (vol === 0)
           {
-             img = 'url("../images/volume-muted.png");'
+             img = 'url("../images/volume-muted.png");';
              div.css("background-image", img);
           }
           else if (vol < 33)
           {
-             img = 'url("../images/volume-low.png");'
+             img = 'url("../images/volume-low.png");';
              div.css("background-image", img);
           }
           else if (vol < 66)
           {
-             img = 'url("../images/volume-medium.png");'
+             img = 'url("../images/volume-medium.png");';
              div.css("background-image", img);
           }
           else
           {
-             img = 'url("../images/volume-high.png");'
+             img = 'url("../images/volume-high.png");';
              div.css("background-image", img);
           }
         });
