@@ -377,16 +377,26 @@ function openPersonalChat(
   var jqMask = $('#mask'),
       jqWin, id, jqO, cY, cX, winW, winH,
       wcW, wcH;
+  /*
+   * Set position based on nick id. */
+  id = app.str2id(msginfo.nick);
+  jqO = $('#meeting > #streams > #scarousel div#' + id);
+  
+  if (jqO.length == 0 && msginfo.nick === "overseer") // from user not found, check if overseer
+  {
+      var item = app.carousel.getItem(1);
+      if (!item)
+      {
+        return;
+      }
+      jqO = $(item.object);
+  }
   jqMask.fadeIn(500, activateWindow('#personalChat'));
   jqMask.fadeTo('fast', 0.3);
   /*
    * Set message. */
   jqWin = $('#boxes > div#personalChat');
   $('p.msg', jqWin).text('').html(decodeURI(msginfo.body));
-  /*
-   * Set position based on nick id. */
-  id = app.str2id(msginfo.nick);
-  jqO = $('#meeting > #streams > #scarousel div#' + id);
   cY = jqO.offset().top;
   cX = jqO.offset().left;
   winW = $(window).width();
