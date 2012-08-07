@@ -68,6 +68,16 @@ body > div#upper-right > div#volume
    background-size: 100%;
    z-index: 1000;
 }
+body > div#upper-right > p#connection-status
+{
+  float:right;
+  margin-right: 10px;
+  margin-top: auto;
+  margin-left: auto;
+  vertical-align: middle;
+  color: white;
+  font-size:11px;
+}
 body > div#lower-right
 {
    position:absolute;

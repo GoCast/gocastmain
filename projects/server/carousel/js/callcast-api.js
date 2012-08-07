@@ -459,6 +459,10 @@ $(document).on('disconnected', function(
 {
   app.log(2, 'User has disconnected.');
   Callcast.log('Connection terminated.');
+  app.log(4, "disonnected.");
+  $("#errorMsgPlugin").empty();
+  $("#errorMsgPlugin").append('<h1>We got disconnected.</h1><p>Please reload the page. [Ctrl + R]</p>');
+  openWindow('#errorMsgPlugin');
   return false;
 }); /* disconnected() */
 
@@ -669,6 +673,11 @@ function addContentToCarousel(
   var id = app.str2id(info.id),
       oo = $('#meeting > #streams > #scarousel div.unoccupied').get(0),
       divIcon, divTitle;
+    if (!oo) // if we're out of spots add one
+  {
+    oo = app.carousel.createSpot();
+    app.carousel.updateAll();
+  }
   if (oo) {
     $(oo).attr('id', id);
     $(oo).attr('title', info.altText);
@@ -765,6 +774,15 @@ function removeSpot(info)
    app.carousel.removeSpotCb(info);
 }
 
+///
+/// \brief connection status handler
+///
+function connectionStatus(statusStr)
+{
+   console.log('connectionStatus', statusStr);
+   $("#upper-right > #connection-status").text(statusStr);
+}
+
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
  * \brief Function called when LOCAL Gocast.it plugin object is loaded.
@@ -814,24 +832,24 @@ function pluginLoaded(
           // set image based on volume
           var img, div = $("#upper-right > div#volume");
           console.log("speaker volume " + vol);
-          if (vol === 0)
+          if (vol <= 0) // mute, if vol == -1 display mute symbol since sound's probably not getting out or in
           {
-             img = 'url("../images/volume-muted.png");';
+             img = 'url("images/volume-muted.png")';
              div.css("background-image", img);
           }
-          else if (vol < 33)
+          else if (vol < 255/3)
           {
-             img = 'url("../images/volume-low.png");';
+             img = 'url("images/volume-low.png")';
              div.css("background-image", img);
           }
-          else if (vol < 66)
+          else if (vol < 2*255/3)
           {
-             img = 'url("../images/volume-medium.png");';
+             img = 'url("images/volume-medium.png")';
              div.css("background-image", img);
           }
           else
           {
-             img = 'url("../images/volume-high.png");';
+             img = 'url("images/volume-high.png")';
              div.css("background-image", img);
           }
         });

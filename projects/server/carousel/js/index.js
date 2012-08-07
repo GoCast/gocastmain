@@ -371,16 +371,26 @@ function openPersonalChat(
   var jqMask = $('#mask'),
       jqWin, id, jqO, cY, cX, winW, winH,
       wcW, wcH;
+  /*
+   * Set position based on nick id. */
+  id = app.str2id(msginfo.nick);
+  jqO = $('#meeting > #streams > #scarousel div#' + id);
+  
+  if (jqO.length == 0 && msginfo.nick === "overseer") // from user not found, check if overseer
+  {
+      var item = app.carousel.getItem(1);
+      if (!item)
+      {
+        return;
+      }
+      jqO = $(item.object);
+  }
   jqMask.fadeIn(500, activateWindow('#personalChat'));
   jqMask.fadeTo('fast', 0.3);
   /*
    * Set message. */
   jqWin = $('#boxes > div#personalChat');
   $('p.msg', jqWin).text('').html(decodeURI(msginfo.body));
-  /*
-   * Set position based on nick id. */
-  id = app.str2id(msginfo.nick);
-  jqO = $('#meeting > #streams > #scarousel div#' + id);
   cY = jqO.offset().top;
   cX = jqO.offset().left;
   winW = $(window).width();
@@ -1635,6 +1645,10 @@ $(document).ready(function(
   // Write greeting into console.
   app.log(2, 'Page loaded.');
 
+  // set the connection status callback
+  Callcast.setCallbackForCallback_ConnectionStatus(connectionStatus);
+
+
 }); // $(document).ready(function())
 
 $.extend({
@@ -1693,3 +1707,30 @@ function startDemoContent(
   return false;
 } /* startDemoContent() */
 
+///
+/// \brief add people and whiteboards to room
+///
+function startPeopleContent()
+{
+  setTimeout(function() {
+    Callcast.Callback_AddCarouselContent({id: 'person1', image: "url('images/person1.png')", altText: 'person1', url: ''});
+  }, 1000);
+  setTimeout(function() {
+    Callcast.Callback_AddCarouselContent({id: 'person3', image: "url('images/person3.png')", altText: 'person3', url: ''});
+  }, 1000);
+  setTimeout(function() {
+    Callcast.Callback_AddCarouselContent({id: 'white-board-demo', image: "url('images/white-board-demo.png')", altText: 'white-board-demo', url: ''});
+  }, 1000);
+  setTimeout(function() {
+    Callcast.Callback_AddCarouselContent({id: 'person4', image: "url('images/person4.png')", altText: 'person4', url: ''});
+  }, 1000);
+  setTimeout(function() {
+    Callcast.Callback_AddCarouselContent({id: 'person2', image: "url('images/person2.png')", altText: 'person2', url: ''});
+  }, 1000);
+  setTimeout(function() {
+    Callcast.Callback_AddCarouselContent({id: 'zoe', image: "url('images/zoe.png')", altText: 'zoe', url: ''});
+  }, 1000);
+  setTimeout(function() {
+    Callcast.Callback_AddCarouselContent({id: 'person5', image: "url('images/person5.png')", altText: 'person5', url: ''});
+  }, 1000);
+}

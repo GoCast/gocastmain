@@ -17,7 +17,8 @@
  */
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
-/*jslint browser: true, debug: true */
+/*jslint browser: true, debug: true devel: true*/
+/*global Callcast, app */
 'use strict';
 
 /*
@@ -773,6 +774,17 @@
         this.widthOld = width; this.heightOld = height; // debug save container dimensions
         // scale spots
         this.updateAll();
+    };
+    this.getItem = function(index)
+    {
+      if (items.getLength() > index)
+      {
+        return items.get(index);
+      }
+      else
+      {
+        return null;
+      }
     };
     }; /* Controller object. */
 

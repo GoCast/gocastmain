@@ -1907,19 +1907,19 @@ var Callcast = {
          if (status === Strophe.Status.CONNECTED) {
              console.log('XMPP/Strophe Finalizing connection and then triggering connected...');
              Callcast.finalizeConnect();
-             if (Callcast.setCallbackForCallback_ConnectionStatus) {
-                Callcast.setCallbackForCallback_ConnectionStatus('Connected');
+             if (Callcast.Callback_ConnectionStatus) {
+                Callcast.Callback_ConnectionStatus('Connected');
              }
              $(document).trigger('connected');
          } else if (status === Strophe.Status.AUTHENTICATING) {
              console.log('XMPP/Strophe Authenticating...');
-             if (Callcast.setCallbackForCallback_ConnectionStatus) {
-                Callcast.setCallbackForCallback_ConnectionStatus('Authenticating');
+             if (Callcast.Callback_ConnectionStatus) {
+                Callcast.Callback_ConnectionStatus('Authenticating');
              }
          } else if (status === Strophe.Status.CONNECTING) {
              console.log('XMPP/Strophe Connecting...');
-             if (Callcast.setCallbackForCallback_ConnectionStatus) {
-                Callcast.setCallbackForCallback_ConnectionStatus('Connecting');
+             if (Callcast.Callback_ConnectionStatus) {
+                Callcast.Callback_ConnectionStatus('Connecting');
              }
          } else if (status === Strophe.Status.ATTACHED) {
              console.log('XMPP/Strophe Re-Attach of connection successful. Triggering re-attached...');
@@ -1937,8 +1937,8 @@ var Callcast = {
                  Callcast.finalizeConnect();
                  $(document).trigger('re-attached');
                  $(document).trigger('connected');
-                 if (Callcast.setCallbackForCallback_ConnectionStatus) {
-                    Callcast.setCallbackForCallback_ConnectionStatus('Re-Attached');
+                 if (Callcast.Callback_ConnectionStatus) {
+                    Callcast.Callback_ConnectionStatus('Re-Attached');
                  }
 
              }, 500);
@@ -1946,19 +1946,19 @@ var Callcast = {
              console.log('XMPP/Strophe Disconnected.');
              Callcast.disconnect();
              $(document).trigger('disconnected');
-             if (Callcast.setCallbackForCallback_ConnectionStatus) {
-                Callcast.setCallbackForCallback_ConnectionStatus('Disconnected');
+             if (Callcast.Callback_ConnectionStatus) {
+                Callcast.Callback_ConnectionStatus('Disconnected');
              }
          } else if (status === Strophe.Status.DISCONNECTING) {
              console.log('XMPP/Strophe is Dis-Connecting...should we try to re-attach here? TODO:RMW');
-             if (Callcast.setCallbackForCallback_ConnectionStatus) {
-                Callcast.setCallbackForCallback_ConnectionStatus('Disconnecting');
+             if (Callcast.Callback_ConnectionStatus) {
+                Callcast.Callback_ConnectionStatus('Disconnecting');
              }
          } else if (status === Strophe.Status.CONNFAIL) {
              console.log('XMPP/Strophe reported connection failure...attempt to re-attach...');
              console.log('-- Not actually doing anything here yet. TODO: RMW');
-             if (Callcast.setCallbackForCallback_ConnectionStatus) {
-                Callcast.setCallbackForCallback_ConnectionStatus('Connection failed');
+             if (Callcast.Callback_ConnectionStatus) {
+                Callcast.Callback_ConnectionStatus('Connection failed');
              }
 // RMW: In theory we are supposed to advance RID by one, but Chrome fails it while Firefox is ok. Sigh. No advancing...
 //               Callcast.reattach(Callcast.connection.jid, Callcast.connection.sid, new Number(Callcast.connection.rid) + 1, Callcast.conn_callback);
@@ -1972,15 +1972,15 @@ var Callcast = {
          } else if (status === Strophe.Status.AUTHFAIL) {
              Callcast.disconnect();
              $(document).trigger('disconnected');
-             if (Callcast.setCallbackForCallback_ConnectionStatus) {
-                Callcast.setCallbackForCallback_ConnectionStatus('Disconnected');
+             if (Callcast.Callback_ConnectionStatus) {
+                Callcast.Callback_ConnectionStatus('Disconnected');
              }
              alert('XMPP/Strophe Authentication failed. Bad password or username.');
          }
          else {
             console.log('XMPP/Strophe connection callback - unhandled status = ' + status);
-             if (Callcast.setCallbackForCallback_ConnectionStatus) {
-                Callcast.setCallbackForCallback_ConnectionStatus('Unknown status');
+             if (Callcast.Callback_ConnectionStatus) {
+                Callcast.Callback_ConnectionStatus('Unknown status');
              }
          }
     },
