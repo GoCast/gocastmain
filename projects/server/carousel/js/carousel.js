@@ -18,9 +18,9 @@
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
 /*jslint browser: true, debug: true devel: true*/
-/*global Callcast, app, jQuery */
+/*global Callcast, app, jQuery, getUrlInfo */
 /*global loadVideo, carouselItemUnzoom */
-'use strict';
+'use strict'; // jslint waiver
 
 /*
  * jQuery Extension. */
@@ -69,7 +69,7 @@
   };
 
   /// \brief a numerically ordered collection of Item with insert an delete
-  var Items = function()
+  var Items = function() // jslint waiver
   {
     this.vals = {}; // assoc array
     this.keys = []; // array of sorted keys
@@ -159,7 +159,7 @@
   /// \brief Controller object. This handles moving all the items and dealing
   /// with mouse events.
   ///
-  var Controller = function(container, objects, options) {
+  var Controller = function(container, objects, options) { // jslint waiver
     var funcSin = Math.sin, funcCos = Math.cos, ctx = this,
         item, // an extra item to store scales since items can be removed from items list
         items = new Items(); // collection of items by index with sorted iteration
@@ -327,7 +327,7 @@
 
             $(obj).find('div.name').css('font-size', (item.orgFontSize * scale) + px);
             // >>0 = Math.foor(). Firefox doesn't like fractional decimals in z-index.
-            obj.style.zIndex = "" + ((scale * 100) >> 0);
+            obj.style.zIndex = "" + ((scale * 100) >> 0); // jslint wiaver
         }
     };
     ///
@@ -435,7 +435,7 @@
 
             $(obj).find('div.name').css('font-size', (item.orgFontSize * scale) + px);
             // >>0 = Math.foor(). Firefox doesn't like fractional decimals in z-index.
-            obj.style.zIndex = '' + (scale * 100) >> 0;
+            obj.style.zIndex = '' + (scale * 100) >> 0; // jslint wiaver
         }
         radians += spacing;
         }); /* end loop. */
@@ -533,20 +533,6 @@
         this.updateLinear();
       }
     };
-    this.doSpot = function(spotDiv, info) // perform action defined in info to spot
-    {
-      console.log('doSpot', info);
-      console.log('spotDiv', spotDiv);
-      if (info.spottype)
-      {
-        if (info.spottype === 'youtube')
-        {
-          console.log('doSpot youtube');
-          loadVideo(spotDiv, info);
-        }
-      }
-      // ... other spot commands
-    };
     this.createSpot = function(info) // create a new spot
     {
       // add the html
@@ -563,107 +549,16 @@
       this.setupItem(item);
       return newDiv;
     };
-    this.addSpotCb = function(info) // add spot callcast callback
+    /// \brief get item by spot number
+    this.getByspotnumber = function(number)
     {
-       console.log('addSpotCb', info);
-       var spotDiv, // the desired spot to be replaced or added
-           div, divs;
-       // determine cmd type, add or replace
-       if (info.spotreplace) // see if there is a spotReplace prop
-       {
-          // if there is a nodup prop == 1 and spot with spotId exists
-          // don't replace
-          if (info.spotnodup && info.spotnodup === 1 && info.spotdivid)
-          {
-             div = $('#meeting > #streams > #scarousel #' + info.spotdivid);
-             if (div.length > 0)
-             {
-                return; // spot with id exists so we're done
-             }
-          }
-          divs = $('#meeting > #streams > #scarousel div.unoccupied');
-          if (divs.length === 0) // no unoc spots to replace, create one
-          {
-             spotDiv = this.createSpot(info);
-          }
-          else // replace spot
-          {
-             if (info.spotreplace === 'first-unoc') // replace first unoc spot
-             {
-                spotDiv = $(divs).get(0);
-             }
-             else if (info.spotreplace === 'last-unoc')
-             {
-                spotDiv = $(divs).get(divs.length - 1);
-             }
-          }
-          item = $(spotDiv).data('item');
-          if (spotDiv && item)
-          {
-             item.spotnumber = info.spotnumber;
-          }
-          else
-          {
-             app.log(5, 'addSpotCb problem with spot replace');
-          }
-       }
-       else // new spot
-       {
-          spotDiv = this.createSpot(info);
-       }
-       this.doSpot(spotDiv, info);
-       this.updateAll(); // redraw carousel
+      return items.getByspotnumber(number);
     };
-
-    this.removeSpotCb = function(info) // remove spot callcast callback
+    /// \brief get an item from items by index
+    this.getByIndex = function(index)
     {
-       // todo refactor this out of carousel
-       var item = items.getByspotnumber(info.spotnumber),
-           spot = parseInt(info.spotnumber, 10),
-           zoomedSpot, zoomedItem;
-       if (!item) // item by spot number is not in carousel
-       {
-          // try zoomed spot
-          zoomedSpot = $('#meeting > #zoom > .cloudcarousel');
-          if (zoomedSpot.length === 1)
-          {
-             zoomedItem = $(zoomedSpot).data('item');
-             if (zoomedItem.spotnumber) // zoomed spot has spotnumber
-             {
-                if (zoomedItem.spotnumber === info.spotnumber)
-                {
-                   item = zoomedItem;
-                }
-            }
-            else if (zoomedItem.index === info.spotnumber)
-            {
-               item = zoomedItem;
-            }
-            // unzoom
-            if (item)
-            {
-               carouselItemUnzoom();
-            }
-          }
-          else
-          {
-             item = items.get(spot);
-          }
-       }
-
-       if (item)
-       {
-          $(item.object).remove();
-          items.remove(item.index);
-          this.updateAll();
-       }
-       else
-       {
-          app.log(4, 'item ' + info.spotnumber + ' not found');
-          console.log('info', info);
-       }
+      return items.get(index);
     };
-
     /// \brief remove a spot from items
     this.remove = function(index)
     {
@@ -789,7 +684,7 @@
         return null;
       }
     };
-    }; /* Controller object. */
+  }; /* Controller object. */
 
     /*
      * The jQuery plugin part. Iterates through items specified in
@@ -816,4 +711,4 @@
     return this;
     }; /* $.fn.CloudCarousel() */
 
-})(jQuery);
+})(jQuery); // jslint waiver

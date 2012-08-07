@@ -370,15 +370,16 @@ function openPersonalChat(
    * Transition effect. */
   var jqMask = $('#mask'),
       jqWin, id, jqO, cY, cX, winW, winH,
-      wcW, wcH;
+      wcW, wcH,
+      item;
   /*
    * Set position based on nick id. */
   id = app.str2id(msginfo.nick);
   jqO = $('#meeting > #streams > #scarousel div#' + id);
   
-  if (jqO.length == 0 && msginfo.nick === "overseer") // from user not found, check if overseer
+  if (jqO.length === 0 && msginfo.nick === "overseer") // from user not found, check if overseer
   {
-      var item = app.carousel.getItem(1);
+      item = app.carousel.getItem(1);
       if (!item)
       {
         return;
@@ -418,43 +419,61 @@ function openPersonalChat(
   return false;
 } /* openPersonalChat() */
 
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-/**
- * \brief handle left mouse clock for carousel items.
- */
-function carouselItemClick(
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-    /**
-     * The event object. */
-  event
-)
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+///
+/// \brief handle left mouse clock for carousel items.
+///
+function carouselItemClick(event)
 {
-   app.log(2, 'carouselItemClick ' + event);
-   if (event.currentTarget.className.indexOf('unoccupied') !== -1)
-   {
-      var urlName = prompt('Enter a URL to put in this spot.');
+  try
+  {
+    var urlName,
+        item;
+    app.log(2, 'carouselItemClick ' + event);
+    if (event.currentTarget.className.indexOf('unoccupied') !== -1)
+    {
+      urlName = prompt('Enter a URL to put in this spot.');
       if (urlName && urlName.length > 0)
       {
-         //todo canonicalize url
-         app.log(2, 'carouselItemClick got url ' + urlName);
+        app.log(2, 'carouselItemClick got url ' + urlName);
+        //todo canonicalize url
+        item = $(event.currentTarget).data('item');
+        if (!item) {throw "no item for spot";}
+        // see if spot has number, if so use Callcast.SetSpot
+        if (item.spotnumber)
+        {
+          Callcast.SetSpot({spotnumber: item.spotnumber,
+                            spottype: 'url',
+                            spoturl: urlName});
+        }
+        else // no spotnumber call add spot but pass spot index so it gets the url
+        {
+          Callcast.AddSpot({spotreplace: 'exact',
+                            spotindex: item.index,
+                            spottype: 'url',
+                            spoturl: urlName
+                           });
+        }
 
+        /*
          Callcast.SendURLToRender({
             id: urlName,
             altText: urlName,
             url: urlName
             });
+        */
       }
-   }
-   else if (event.currentTarget.title === 'Me')
-   {
+    }
+    else if (event.currentTarget.title === 'Me')
+    {
       // do nothing for now
-   }
-   else // remote user
-   {
+    }
+    else // remote user
+    {
       openChat(event);
-   }
-
+    }
+  } catch(err) {
+    app.log(4, "carouselItemClick error " + err);
+  }
 } // carouselItemClick
 
 ///
@@ -1689,22 +1708,46 @@ function startDemoContent(
   /*
    * Second content delayed 1000 ms. */
   setTimeout(function() {
-    Callcast.Callback_AddCarouselContent({id: 'demo2', image: "url('images/demo2-robertmoog.jpg')", altText: 'Robert Moog: I would not call this music.', url: 'http://www.guardian.co.uk/music/2012/may/23/robert-moog-interview-google-doodle'});
+    //Callcast.Callback_AddCarouselContent({id: 'demo2', image: "url('images/demo2-robertmoog.jpg')", altText: 'Robert Moog: I would not call this music.', url: 'http://www.guardian.co.uk/music/2012/may/23/robert-moog-interview-google-doodle'});
+    Callcast.AddSpot({spotreplace: 'first-unoc',
+                      spottype: "url",
+                      spotdivid: 'demo2',
+                      spoturl: "http://www.guardian.co.uk/music/2012/may/23/robert-moog-interview-google-doodle",
+                      spotimage: "url('images/demo2-robertmoog.jpg')"
+                      });
   }, 1000);
   /*
    * Third content delayed 2000 ms. */
   setTimeout(function() {
-    Callcast.Callback_AddCarouselContent({id: 'demo3', image: "url('images/demo3-spaceX.png')", altText: 'Launch of SpaceX Falcon 9', url: 'http://www.youtube.com/embed/4vkqBfv8OMM'});
+    //Callcast.Callback_AddCarouselContent({id: 'demo3', image: "url('images/demo3-spaceX.png')", altText: 'Launch of SpaceX Falcon 9', url: 'http://www.youtube.com/embed/4vkqBfv8OMM'});
+    Callcast.AddSpot({spotreplace: 'first-unoc',
+                      spottype: "url",
+                      spotdivid: 'demo3',
+                      spoturl: 'http://www.youtube.com/embed/4vkqBfv8OMM',
+                      spotimage: "url('images/demo3-spaceX.png')"
+                      });
   }, 2000);
   /*
    * Fourth content delayed 3000 ms. */
   setTimeout(function() {
-    Callcast.Callback_AddCarouselContent({id: 'demo4', image: "url('images/demo4-bawarriorsSF.jpg')", altText: 'Warriors face many hurdles in building S.F. arena', url: 'http://www.sfgate.com/cgi-bin/article.cgi?f=/c/a/2012/05/23/MNM41OLT8K.DTL'});
+    //Callcast.Callback_AddCarouselContent({id: 'demo4', image: "url('images/demo4-bawarriorsSF.jpg')", altText: 'Warriors face many hurdles in building S.F. arena', url: 'http://www.sfgate.com/cgi-bin/article.cgi?f=/c/a/2012/05/23/MNM41OLT8K.DTL'});
+    Callcast.AddSpot({spotreplace: 'first-unoc',
+                      spottype: "url",
+                      spotdivid: 'demo4',
+                      spoturl: 'http://www.sfgate.com/cgi-bin/article.cgi?f=/c/a/2012/05/23/MNM41OLT8K.DTL',
+                      spotimage: "url('images/demo4-bawarriorsSF.jpg')"
+                      });
   }, 3000);
   /*
    * Fifth content delayed 4000 ms. */
   setTimeout(function() {
-    Callcast.Callback_AddCarouselContent({id: 'demo5', image: "url('images/demo5-wikipedia.jpg')", altText: 'Wikipedia', url: 'http://www.wikipedia.org'});
+    //Callcast.Callback_AddCarouselContent({id: 'demo5', image: "url('images/demo5-wikipedia.jpg')", altText: 'Wikipedia', url: 'http://www.wikipedia.org'});
+    Callcast.AddSpot({spotreplace: 'first-unoc',
+                      spottype: "url",
+                      spotdivid: 'demo5',
+                      spoturl: 'http://www.wikipedia.org',
+                      spotimage: "url('images/demo5-wikipedia.jpg')"
+                      });
   }, 4000);
   closeWindow();
   return false;
@@ -1716,24 +1759,66 @@ function startDemoContent(
 function startPeopleContent()
 {
   setTimeout(function() {
-    Callcast.Callback_AddCarouselContent({id: 'person1', image: "url('images/person1.png')", altText: 'person1', url: ''});
-  }, 1000);
+    //Callcast.Callback_AddCarouselContent({id: 'person1', image: "url('images/person1.png')", altText: 'person1', url: ''});
+    Callcast.AddSpot({spotreplace: 'first-unoc',
+                      spottype: "url",
+                      spotdivid: 'person1',
+                      spoturl: '',
+                      spotimage: "url('images/person1.png')"
+                      });
+  }, 0);
   setTimeout(function() {
-    Callcast.Callback_AddCarouselContent({id: 'person3', image: "url('images/person3.png')", altText: 'person3', url: ''});
-  }, 1000);
+    //Callcast.Callback_AddCarouselContent({id: 'person3', image: "url('images/person3.png')", altText: 'person3', url: ''});
+    Callcast.AddSpot({spotreplace: 'first-unoc',
+                      spottype: "url",
+                      spotdivid: 'person3',
+                      spoturl: '',
+                      spotimage: "url('images/person3.png')"
+                      });
+  }, 300);
   setTimeout(function() {
-    Callcast.Callback_AddCarouselContent({id: 'white-board-demo', image: "url('images/white-board-demo.png')", altText: 'white-board-demo', url: ''});
-  }, 1000);
+    //Callcast.Callback_AddCarouselContent({id: 'white-board-demo', image: "url('images/white-board-demo.png')", altText: 'white-board-demo', url: ''});
+    Callcast.AddSpot({spotreplace: 'first-unoc',
+                      spottype: "url",
+                      spotdivid: 'white-board-demo',
+                      spoturl: '',
+                      spotimage: "url('images/white-board-demo.png')"
+                      });
+  }, 600);
   setTimeout(function() {
-    Callcast.Callback_AddCarouselContent({id: 'person4', image: "url('images/person4.png')", altText: 'person4', url: ''});
-  }, 1000);
+    //Callcast.Callback_AddCarouselContent({id: 'person4', image: "url('images/person4.png')", altText: 'person4', url: ''});
+    Callcast.AddSpot({spotreplace: 'first-unoc',
+                      spottype: "url",
+                      spotdivid: 'person4',
+                      spoturl: '',
+                      spotimage: "url('images/person4.png')"
+                      });
+  }, 900);
   setTimeout(function() {
-    Callcast.Callback_AddCarouselContent({id: 'person2', image: "url('images/person2.png')", altText: 'person2', url: ''});
-  }, 1000);
+    //Callcast.Callback_AddCarouselContent({id: 'person2', image: "url('images/person2.png')", altText: 'person2', url: ''});
+    Callcast.AddSpot({spotreplace: 'first-unoc',
+                      spottype: "url",
+                      spotdivid: 'person2',
+                      spoturl: '',
+                      spotimage: "url('images/person2.png')"
+                      });
+  }, 1200);
   setTimeout(function() {
-    Callcast.Callback_AddCarouselContent({id: 'zoe', image: "url('images/zoe.png')", altText: 'zoe', url: ''});
-  }, 1000);
+    //Callcast.Callback_AddCarouselContent({id: 'zoe', image: "url('images/zoe.png')", altText: 'zoe', url: ''});
+    Callcast.AddSpot({spotreplace: 'first-unoc',
+                      spottype: "url",
+                      spotdivid: 'zoe',
+                      spoturl: '',
+                      spotimage: "url('images/zoe.png')"
+                      });
+  }, 1500);
   setTimeout(function() {
-    Callcast.Callback_AddCarouselContent({id: 'person5', image: "url('images/person5.png')", altText: 'person5', url: ''});
-  }, 1000);
+    //Callcast.Callback_AddCarouselContent({id: 'person5', image: "url('images/person5.png')", altText: 'person5', url: ''});
+    Callcast.AddSpot({spotreplace: 'first-unoc',
+                      spottype: "url",
+                      spotdivid: 'person5',
+                      spoturl: '',
+                      spotimage: "url('images/person5.png')"
+                      });
+  }, 1800);
 }
