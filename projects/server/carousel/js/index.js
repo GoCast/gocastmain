@@ -307,12 +307,6 @@ function onYouTubePlayerReady(playerId)
 }
 
 ///
-/// \brief add people and whiteboards to room
-///
-function startPeopleContent()
-{
-}
-///
 /// \brief add demo video's to n spots
 ///
 function startVideoContent()
@@ -1713,3 +1707,30 @@ function startDemoContent(
   return false;
 } /* startDemoContent() */
 
+///
+/// \brief add people and whiteboards to room
+///
+function startPeopleContent()
+{
+  setTimeout(function() {
+    Callcast.Callback_AddCarouselContent({id: 'person1', image: "url('images/person1.png')", altText: 'person1', url: ''});
+  }, 1000);
+  setTimeout(function() {
+    Callcast.Callback_AddCarouselContent({id: 'person3', image: "url('images/person3.png')", altText: 'person3', url: ''});
+  }, 1000);
+  setTimeout(function() {
+    Callcast.Callback_AddCarouselContent({id: 'white-board-demo', image: "url('images/white-board-demo.png')", altText: 'white-board-demo', url: ''});
+  }, 1000);
+  setTimeout(function() {
+    Callcast.Callback_AddCarouselContent({id: 'person4', image: "url('images/person4.png')", altText: 'person4', url: ''});
+  }, 1000);
+  setTimeout(function() {
+    Callcast.Callback_AddCarouselContent({id: 'person2', image: "url('images/person2.png')", altText: 'person2', url: ''});
+  }, 1000);
+  setTimeout(function() {
+    Callcast.Callback_AddCarouselContent({id: 'zoe', image: "url('images/zoe.png')", altText: 'zoe', url: ''});
+  }, 1000);
+  setTimeout(function() {
+    Callcast.Callback_AddCarouselContent({id: 'person5', image: "url('images/person5.png')", altText: 'person5', url: ''});
+  }, 1000);
+}
