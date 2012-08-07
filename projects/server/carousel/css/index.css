@@ -97,6 +97,7 @@ body > div#upper-right > p#connection-status
   vertical-align: middle;
   color: white;
   font-size:11px;
+   z-index: 1000;
 }
 body > div#lower-right
 {
