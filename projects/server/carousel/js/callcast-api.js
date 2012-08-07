@@ -459,6 +459,10 @@ $(document).on('disconnected', function(
 {
   app.log(2, 'User has disconnected.');
   Callcast.log('Connection terminated.');
+  app.log(4, "disonnected.");
+  $("#errorMsgPlugin").empty();
+  $("#errorMsgPlugin").append('<h1>We got disconnected.</h1><p>Please reload the page. [Ctrl + R]</p>');
+  openWindow('#errorMsgPlugin');
   return false;
 }); /* disconnected() */
 
@@ -763,6 +767,15 @@ function removeSpot(info)
 {
    console.log('removeSpot', info);
    app.carousel.removeSpotCb(info);
+}
+
+///
+/// \brief connection status handler
+///
+function connectionStatus(statusStr)
+{
+   console.log('connectionStatus', statusStr);
+   $("#upper-right > #connection-status").text(statusStr);
 }
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/

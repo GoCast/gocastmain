@@ -1641,6 +1641,10 @@ $(document).ready(function(
   // Write greeting into console.
   app.log(2, 'Page loaded.');
 
+  // set the connection status callback
+  Callcast.setCallbackForCallback_ConnectionStatus(connectionStatus);
+
+
 }); // $(document).ready(function())
 
 $.extend({
