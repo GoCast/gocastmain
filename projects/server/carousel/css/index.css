@@ -29,6 +29,26 @@ a:active
 {
   color: #0000ff;
 }
+/* style scrollbars
+   doesn't work in ff see:
+   https://bugzilla.mozilla.org/show_bug.cgi?id=77790
+*/
+::-webkit-scrollbar 
+{
+  height: 12px;
+  width: 12px;
+  background: #000;
+}
+::-webkit-scrollbar-thumb 
+{
+  background: #365283;
+  -webkit-border-radius: 1ex;
+  -webkit-box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.75);
+}
+::-webkit-scrollbar-corner 
+{
+  background: #000;
+}
 body {
   margin: 0;
   padding: 0;  
@@ -184,7 +204,7 @@ body > div#lower-left > div#msgBoard > div#chatOut
 body > div#lower-left > div#msgBoard > div#chatOut > span
 {
   color: white;
-  text-shadow: 0 0 10px gray, 0 0 20px gray, 0 0 30px gray, 0 0 40px #FF00DE, 0 0 70px #FF00DE, 0 0 80px #FF00DE, 0 0 100px #FF00DE, 0 0 150px #FF00DE;
+  /*text-shadow: 0 0 10px gray, 0 0 20px gray, 0 0 30px gray, 0 0 40px #FF00DE, 0 0 70px #FF00DE, 0 0 80px #FF00DE, 0 0 100px #FF00DE, 0 0 150px #FF00DE;*/
 }
 body> div#lower-left > div#msgBoard > div#msgTicker
 {
