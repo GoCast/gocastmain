@@ -578,6 +578,28 @@ MucRoom.prototype.SendGroupCmd = function(cmd, attribs_in) {
         this.client.send(msgToSend);
 };
 
+MucRoom.prototype.SendGroupChat = function(msg) {
+        var msgToSend;
+
+        msgToSend = new xmpp.Element('message', {to: this.roomname, type: 'groupchat'})
+                .c('body').t(msg);
+
+        this.log('Outbound Group Chat: ' + msgToSend.root().toString());
+
+        this.client.send(msgToSend);
+};
+
+MucRoom.prototype.SendPrivateChat = function(to, msg) {
+        var msgToSend;
+
+        msgToSend = new xmpp.Element('message', {'to': to, type: 'chat'})
+                .c('body').t(msg);
+
+        this.log('Outbound Private Chat to ' + to + ': ' + msgToSend.root().toString());
+
+        this.client.send(msgToSend);
+};
+
 MucRoom.prototype.AddSpotReflection = function(iq) {
     // Need to pull out the 'info' object - which is the attributes to the 'addspot'
     var info = {};
@@ -774,6 +796,47 @@ MucRoom.prototype.handleMessage = function(msg) {
             this.log('From:' + msg.attrs.from.split('/')[1] + ': ' + msg.getChild('body'));
         }
     }
+    else {
+        // Overseer received something from group chat ... we don't listen to much here.
+        // But we listen for "Overseer" as a keyword for responding...
+        // "Overseer, Hello" - elicits a public response.
+        // "Overseer, private" - elicits a private message back
+        // "Overseer, 42" - elicits "Hmm - you are asking a big one - What is the answer to life, the Universe, and everything?"
+        if (msg.getChild('body') && msg.getChild('body').getText())
+        {
+            // Now we need to split the message up and trim spaces just in case.
+            cmd = decodeURI(msg.getChild('body').getText());
+
+            // If we start with 'OVERSEER', then we answer...
+            if (cmd.match(/^overseer/i)) {
+                cmd = cmd.slice(cmd.search(' '));
+
+                if (cmd !== '') {
+                    if (cmd.match(/hello/i)) {
+                        // Response with a greeting publicly.
+                        this.sendGroupMessage("Well, hello there to you as well. I hope you are having a great day.");
+                    }
+                    else if (cmd.match(/private/) || cmd.match(/whisper/i) || cmd.match(/wisper/i)) {
+                        // Respond with a private chat
+                        this.SendPrivateChat(msg.attrs.from, "Shh, this is a private message just for you.");
+                    }
+                    else if (cmd.match('42')) {
+                        // Responsd publicly with Life, the Universe and Everything.
+                        this.sendGroupMessage("Hmm - the big answer to the big question - What is the answer to life, the Universe, and everything?");
+                    }
+                    else if (cmd.match('--help') || cmd.match('-help')) {
+                        this.sendGroupMessage("Usage: 'hello', 'private', '42', or random phrases come back.");
+                    }
+                    else {
+                        k = ["What is that you say?", "I'm sorry, I didn't get that...", "Can you speak up? I'm not a young computer.",
+                             "First things first. HUH?", "Am I allowed to hear this at my age?", "Oh, a wise-guy huh?", "Well...I never!"];
+                        this.sendGroupMessage(k[Math.floor(Math.random() * k.length)]);
+                    }
+                }
+            }
+        }
+    }
+
 };
 
 MucRoom.prototype.invite = function(invitejid) {
