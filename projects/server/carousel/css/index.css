@@ -37,7 +37,7 @@ a:active
 {
   height: 12px;
   width: 12px;
-  background: #000;
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb 
 {
@@ -47,7 +47,7 @@ a:active
 }
 ::-webkit-scrollbar-corner 
 {
-  background: #000;
+  background: transparent;
 }
 body {
   margin: 0;
