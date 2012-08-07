@@ -598,7 +598,10 @@ function openChat(
   }
   else if ($(cTarget).hasClass('typeContent')) {
     url = $(cTarget).attr('url');
-    window.open(url, '_blank', 'width=800,height=600');
+    if (url.length > 0)
+    {
+      window.open(url, '_blank', 'width=800,height=600');
+    }
     return false;
   }
   else {
