@@ -904,6 +904,8 @@ function addSpotCb(info)
    {
       spotDiv = app.carousel.createSpot(info);
    }
+   // set the item spot number to info.spotnumber
+   app.carousel.setSpotNumber(item, info.spotnumber);
    doSpot(spotDiv, info);
    app.carousel.updateAll(); // redraw carousel
 }

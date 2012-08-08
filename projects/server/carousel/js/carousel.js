@@ -554,6 +554,12 @@
     {
       return items.getByspotnumber(number);
     };
+    /// \brief set the spot number for an existing spot
+    this.setSpotNumber = function(item, number)
+    {
+      item.spotnumber = number;
+      items.set(item.index, item);
+    }
     /// \brief get an item from items by index
     this.getByIndex = function(index)
     {
