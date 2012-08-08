@@ -848,7 +848,7 @@ function addSpotCb(info)
    var spotDiv, // the desired spot to be replaced or added
        item,
        div, divs;
-   console.log('addSpot msg received', info);
+   console.log('addSpot msg received id ' + info.spotdivid + ' #' + info.spotnumber, info);
    // determine cmd type, add or replace
    if (info.spotreplace) // see if there is a spotReplace prop
    {
@@ -934,7 +934,7 @@ function removeSpotCb(info)
   var item = app.carousel.getByspotnumber(info.spotnumber),
       spot = parseInt(info.spotnumber, 10),
       zoomedSpot, zoomedItem;
-  console.log('removeSpot msg received', info);
+  console.log('removeSpot msg received id ' + info.spotdivid + ' #' + info.spotnumber, info);
   // find the spot
   if (!item) // item by spot number is not in carousel
   {
