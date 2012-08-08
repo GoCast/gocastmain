@@ -148,12 +148,12 @@ $(document).on('public-message', function(
     if (!jqChat[0]) {throw "no chat out div";}
     msgNumber = jqChat.data('msgNumber'); // get next msgNumber
     msgNumber = msgNumber || 0;           // init if not already
-    msg = '<span id="'+ msgNumber + '"<b>' + 
+    msg = '<span id="'+ msgNumber + '"<b>' +
                         decodeURI(msginfo.nick) + '</b>' + ': ' +
                         decodeURI(msginfo.body) + '<br></span>';
     // get scroll pos
-    //app.log(2, 'public-message scrollTop ' + jqChat.scrollTop() 
-    //        + ' scrollHeight ' + jqChat[0].scrollHeight 
+    //app.log(2, 'public-message scrollTop ' + jqChat.scrollTop()
+    //        + ' scrollHeight ' + jqChat[0].scrollHeight
     //        + ' clientHeight ' + jqChat[0].clientHeight);
     // detect scroll bar at bottom
     // looks like the mouse wheel can put the scroll pos < 1em from bottom so fudge it
@@ -530,7 +530,7 @@ function addPluginToCarousel(
       id = app.str2id(nickname),
       w, h,
       oo;
-  if (!nickname) 
+  if (!nickname)
   {
     app.log(4, "addPluginToCarousel error nickname undefined");
     return null;
@@ -551,7 +551,7 @@ function addPluginToCarousel(
     oo = app.carousel.createSpot();
     app.carousel.updateAll();
   }
-  if (oo) 
+  if (oo)
   {
     $(oo).attr('id', id);
     $(oo).attr('encname', nickname);
@@ -651,7 +651,7 @@ function reloadLocalPlugin()
 /// \return JSON object with info:
 ///    title header title tag
 ///    type  mime type
-/// 
+///
 function getUrlInfo(options, callback)
 {
   $.ajax(
@@ -781,11 +781,11 @@ function removeContentFromCarousel(
 ///
 /// \brief perform action defined in info to spot
 ///
-/// the possible actions so far 
+/// the possible actions so far
 /// are defined in info.spottype and can be
-/// "youtube" play a youtube video 
+/// "youtube" play a youtube video
 /// "url" display the url title and favicon
-function doSpot(spotDiv, info) 
+function doSpot(spotDiv, info)
 {
   try
   {
@@ -854,12 +854,12 @@ function doSpot(spotDiv, info)
 ///        info
 ///         |- spotreplace replace an existing spot
 ///         |  |- exact replace spot at info.spotindex or first unoc if exact is occupied or new spot
-///         |  |- first-unoc replace first unoccupied spot or new spot 
+///         |  |- first-unoc replace first unoccupied spot or new spot
 ///         |  |- last-unoc replace last unoccupied spot or new spot
 /// \throw
 ///
 function getSpotForAdd(info)
-{ 
+{
   var divs = $('#meeting > #streams > #scarousel div.unoccupied'),
       item;
   if (info.spotreplace === 'exact') // replace spot at spotindex
@@ -917,7 +917,7 @@ function getSpotForAdd(info)
   }
 } // getSpotForAdd
 ///
-/// \brief addspot callback add a new spot or replace an unoccupied spot 
+/// \brief addspot callback add a new spot or replace an unoccupied spot
 ///        depending on info contents
 ///        info
 ///         |- spotreplace replace an existing spot
@@ -1065,12 +1065,15 @@ function pluginLoaded(
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
   app.log(2, 'pluginLoaded Local Plugin Loaded.');
-  if (Callcast.localplayer !== null)
+  if (Callcast.localplayerLoaded)
   {
-     app.log(2, 'pluginLoaded Callcast.localplayer != null, plugin is already loaded');
+     app.log(2, 'pluginLoaded Callcast.localplayerLoaded - plugin is already loaded');
      return; // assume player is already loaded if localPlayer is not null
   }
+
+  Callcast.localplayerLoaded = true;
   Callcast.localplayer = $('#mystream > object.localplayer').get(0);
+
   app.log(2, 'pluginLoaded checking plugin update required');
   if (!Callcast.pluginUpdateRequired()) // do not access plugin api if it needs to be upgraded
   {

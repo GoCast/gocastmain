@@ -97,6 +97,7 @@ var Callcast = {
     Callback_ConnectionStatus: null,
     connection: null,
     localplayer: null,
+    localplayerLoaded: false,
     participants: {},
     room: '',
     roomjid: '',
