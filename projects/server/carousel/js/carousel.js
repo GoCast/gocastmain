@@ -66,7 +66,7 @@
   Item.prototype.addControls = function() // add controls to spot
   {
      $(this.object).append('<img class="zoom control" src="images/fullscreen.png" alt="Zoom" title="Zoom" onclick="carouselItemZoom(event);"/>');
-     $(this.object).append('<img class="close control" src="images/trash.png" alt="Close" title="Close" />');
+     $(this.object).append('<img class="close control" src="images/trash.png" alt="Close" title="Close" onclick="onSpotClose(event);"/>');
   };
 
   /// \brief a numerically ordered collection of Item with insert an delete
@@ -547,7 +547,6 @@
       }
       newDiv.data('item', item);
       items.addItem(item);
-      this.setupItem(item);
       return newDiv;
     };
     /// \brief get item by spot number
@@ -581,20 +580,6 @@
        items.set(item.index, item);
     };
 
-    this.setupItem = function(item) // setup newly added item
-    {
-        $('.close', item.object).click(function(event)
-        {
-            if (event) {
-                event.stopPropagation();
-            }
-            var jqDiv = $(this).parent(),
-                item = jqDiv.data('item');
-
-            console.log('removing', jqDiv);
-            Callcast.RemoveSpot({spotnumber: item.spotnumber || item.index});
-        });
-    };
     /*
      * Object Loaded.  Check if objects have loaded. Valid widths and
      * heights needed. */
@@ -614,7 +599,6 @@
         {  // create and setup item
             item = new Item(objects[i], options);
             items.addItem(item);
-            this.setupItem(item);
             $(objects[i]).data('item', item);
         } // for loop
         // save the storage item

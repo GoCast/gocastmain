@@ -217,8 +217,20 @@ var app = {
   videoEnabled: false // video enabled state
 }; /* app */
 
+///
+/// \brief global spot close handler, see defect 14
+///
+function onSpotClose(event)
+{
+  var spot = $(event.currentTarget).parent(),
+      item = spot.data('item');
 
+  console.log("onSpotClose", event);
 
+  Callcast.RemoveSpot({spotnumber: item.spotnumber || item.index});
+
+  event.stopPropagation();
+}
 function loadVideo(oo, info)
 {
   var item, playerId, width, height, params, atts;
