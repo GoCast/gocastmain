@@ -25,7 +25,8 @@
           openMeeting,
           tryPluginInstall,
           checkForPluginOptionalUpgrades,
-          handleRoomSetup
+          handleRoomSetup,
+          carouselItemUnzoom
 */
 'use strict';
 
@@ -673,7 +674,7 @@ function addContentToCarousel(
   var id = app.str2id(info.id),
       oo = $('#meeting > #streams > #scarousel div.unoccupied').get(0),
       divIcon, divTitle;
-    if (!oo) // if we're out of spots add one
+  if (!oo) // if we're out of spots add one
   {
     oo = app.carousel.createSpot();
     app.carousel.updateAll();
@@ -757,23 +758,237 @@ function removeContentFromCarousel(
 } /* removeContentFromCarousel() */
 
 ///
+/// \brief perform action defined in info to spot
+///
+/// the possible actions so far 
+/// are defined in info.spottype and can be
+/// "youtube" play a youtube video 
+/// "url" display the url title and favicon
+this.doSpot = function(spotDiv, info) 
+{
+  try
+  {
+    var divIcon, divTitle,
+        jqDiv = $(spotDiv);
+    console.log('doSpot', info);
+    console.log('spotDiv', spotDiv);
+    if (!spotDiv) {throw "no spotDiv";}
+    if (!info || !info.spottype) {throw "spottype not defined";}
+    if (info.spottype === 'youtube')
+    {
+      console.log('doSpot youtube');
+      loadVideo(spotDiv, info);
+    }
+    else if (info.spottype === 'url')
+    {
+      jqDiv.attr('id', app.str2id(info.spotdivid));
+      jqDiv.attr('title', info.spotdivid);
+      jqDiv.attr('alt', info.spotdivid);
+      jqDiv.attr('url', info.spoturl);
+      jqDiv.attr('encname', info.spotdivid);
+      jqDiv.removeClass('unoccupied').addClass('typeContent');
+
+      // use the image in info if supplied
+      // else generate one from the url
+      if (info.spotimage)
+      {
+         jqDiv.css('background-image', info.spotimage);
+      }
+      else
+      {
+        getUrlInfo(
+        {
+          webUrl: info.spoturl,
+          proxyUrl: 'http://carousel.gocast.it/proxy'
+        },
+        function(urlInfo)
+        {
+          console.log("doSpot getUrlInfo cb", urlInfo);
+          jqDiv.css('background-image', ''); // remove the spot background
+          divIcon = $('<div class="spotUrlIcon"/>'); // create a child div with url info for spot
+          // hot link to http://getfavicon.appspot.com/ to get favicon
+          $(divIcon).css('background-image', 'url(http://g.etfv.co/' + info.url + ')');
+          divTitle = $('<div class="spotUrlTitle"/>');
+          if (urlInfo.title) // add title
+          {
+             $(divTitle).append($('<p>' + urlInfo.title + '</p>'));
+          }
+          else
+          {
+             $(divTitle).append($('<p>' + info.url + '</p>'));
+          }
+          jqDiv.append('<div class="urlPad"/>');
+          jqDiv.append(divIcon);
+          jqDiv.append(divTitle);
+        });
+      }
+    }
+    // ... other spot commands
+  } catch(err) {
+    console.log("doSpot error " + err);
+  }
+}; // doSpot
+///
+/// \brief addspot callback add a new spot or replace an unoccupied spot 
+///        depending on info contents
+///        info
+///         |- spotreplace replace an existing spot
+///         |  |- exact replace spot at info.spotindex, spot must be unoccupied
+///         |  |- first-unoc replace first unoccupied spot
+///         |  |- last-unoc replace last unoccupied spot
+///         |- spotnodup stop spot add if spot with id already exists
+///         |- spotdivid spot id fo test spot existence
+///         |- spotnumber incoming spot address from server
+///         |- spotindex carousel spot index set at origin if spot does not have number
+///
+/// a spot may be created if there are no unoccupied spots or the spot with spotindex was deleted
+///
+function addSpotCb(info)
+{
+  try
+  {
+    var spotDiv, // the desired spot to be replaced or added
+       item,
+       div, divs;
+    console.log('addSpot msg received id ' + info.spotdivid + ' #' + info.spotnumber, info);
+    // determine cmd type, add or replace
+    if (info.spotreplace) // see if there is a spotReplace prop
+    {
+      // if there is a nodup prop == 1 and spot with spotId exists
+      // don't replace
+      if (info.spotnodup && info.spotnodup === 1 && info.spotdivid)
+      {
+         div = $('#meeting > #streams > #scarousel #' + info.spotdivid);
+         if (div.length > 0)
+         {
+            return; // spot with id exists so we're done
+         }
+      }
+      divs = $('#meeting > #streams > #scarousel div.unoccupied');
+      if (divs.length === 0) // no unoc spots to replace, create one
+      {
+         spotDiv = app.carousel.createSpot(info);
+      }
+      else // replace spot
+      {
+         if (info.spotreplace === 'exact') // replace spot at spotindex
+         {
+            item = app.carousel.getByIndex(info.spotindex);
+            if (!item) // item not there, probably was deleted, choose last-unoc
+            {
+              spotDiv = $(divs).get(divs.length - 1);
+            }
+            else
+            {
+              spotDiv = item.object;
+            }
+         }
+         else if (info.spotreplace === 'first-unoc') // replace first unoc spot
+         {
+            spotDiv = $(divs).get(0);
+         }
+         else if (info.spotreplace === 'last-unoc') // replace last unoccupied spot
+         {
+            spotDiv = $(divs).get(divs.length - 1);
+         }
+      }
+      item = $(spotDiv).data('item');
+      if (spotDiv && item)
+      {
+        app.carousel.setSpotNumber(item, info.spotnumber);
+      }
+      else
+      {
+        app.log(4, 'addSpotCb problem with spot replace');
+      }
+    }
+    else // add a new spot
+    {
+      spotDiv = app.carousel.createSpot(info);
+    }
+    // set the item spot number to info.spotnumber
+    doSpot(spotDiv, info);
+    app.carousel.updateAll(); // redraw carousel
+  } catch(err) {
+    console.log("Error addSpotCb exception " + err);
+  }
+}
+
+///
 /// \brief addspot callback, forward spot add to carousel
 ///
-function addSpot(info)
+function setSpotCb(info)
 {
-   console.log('addSpot', info);
-   app.carousel.addSpotCb(info);
+  console.log('setSpot msg received', info);
+  var spotDiv, // the desired spot to be replaced or added
+      item = app.carousel.getByspotnumber(info.spotnumber); // the item at spotnumber
+
+  // for setSpot there must be an item in the carousel with info.spotnumber
+  if (!item)
+  {
+    app.log(4, "spot with number " + info.spotnumber + " does not exist");
+  }
+  doSpot(item.object, info);
+  app.carousel.updateAll(); // redraw carousel
 }
 
 ///
 /// \brief removespot callback forward to carousel
 ///
-function removeSpot(info)
+function removeSpotCb(info)
 {
-   console.log('removeSpot', info);
-   app.carousel.removeSpotCb(info);
-}
+  try
+  {
+    var item = app.carousel.getByspotnumber(info.spotnumber),
+        spot = parseInt(info.spotnumber, 10),
+        zoomedSpot, zoomedItem;
+    console.log('removeSpot msg received id ' + info.spotdivid + ' #' + info.spotnumber + " index " + info.spotindex, info);
+    // find the spot
+    if (!item) // item by spot number is not in carousel
+    {
+      // try zoomed spot
+      zoomedSpot = $('#meeting > #zoom > .cloudcarousel');
+      if (zoomedSpot.length === 1)
+      {
+        zoomedItem = $(zoomedSpot).data('item');
+        if (zoomedItem.spotnumber) // zoomed spot has spotnumber
+        {
+          if (zoomedItem.spotnumber === info.spotnumber)
+          {
+            item = zoomedItem;
+          }
+        }
+        else if (zoomedItem.index === info.spotnumber)
+        {
+          item = zoomedItem;
+        }
+        // unzoom
+        if (item)
+        {
+          carouselItemUnzoom();
+        }
+      }
+      else // get by index
+      {
+         item = app.carousel.getByIndex(spot);
+      }
+    }
 
+    if (item)
+    {
+      $(item.object).remove();
+      app.carousel.remove(item.index);
+      app.carousel.updateAll();
+    }
+    else
+    {
+      app.log(4, 'item ' + info.spotnumber + ' not found');
+      console.log('info', info);
+    }
+  } catch(err) {
+    console.log("removeSpotCb exception " + err);
+  }
+}
 ///
 /// \brief connection status handler
 ///
@@ -817,8 +1032,9 @@ function pluginLoaded(
         Callcast.setCallbackForRemovePlugin(removePluginFromCarousel);
         Callcast.setCallbackForAddCarouselContent(addContentToCarousel);
         Callcast.setCallbackForRemoveCarouselContent(removeContentFromCarousel);
-        Callcast.setCallbackForAddSpot(addSpot);
-        Callcast.setCallbackForRemoveSpot(removeSpot);
+        Callcast.setCallbackForAddSpot(addSpotCb);
+        Callcast.setCallbackForSetSpot(setSpotCb);
+        Callcast.setCallbackForRemoveSpot(removeSpotCb);
 
         // Callcast Seetings.
         // todo there's an app member for video state, merge it with callcast video state
