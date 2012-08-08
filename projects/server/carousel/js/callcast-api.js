@@ -845,13 +845,15 @@ this.doSpot = function(spotDiv, info)
 ///
 function addSpotCb(info)
 {
-   var spotDiv, // the desired spot to be replaced or added
+  try
+  {
+    var spotDiv, // the desired spot to be replaced or added
        item,
        div, divs;
-   console.log('addSpot msg received id ' + info.spotdivid + ' #' + info.spotnumber, info);
-   // determine cmd type, add or replace
-   if (info.spotreplace) // see if there is a spotReplace prop
-   {
+    console.log('addSpot msg received id ' + info.spotdivid + ' #' + info.spotnumber, info);
+    // determine cmd type, add or replace
+    if (info.spotreplace) // see if there is a spotReplace prop
+    {
       // if there is a nodup prop == 1 and spot with spotId exists
       // don't replace
       if (info.spotnodup && info.spotnodup === 1 && info.spotdivid)
@@ -893,21 +895,23 @@ function addSpotCb(info)
       item = $(spotDiv).data('item');
       if (spotDiv && item)
       {
-         item.spotnumber = info.spotnumber;
+        app.carousel.setSpotNumber(item, info.spotnumber);
       }
       else
       {
-         app.log(4, 'addSpotCb problem with spot replace');
+        app.log(4, 'addSpotCb problem with spot replace');
       }
-   }
-   else // add a new spot
-   {
+    }
+    else // add a new spot
+    {
       spotDiv = app.carousel.createSpot(info);
-   }
-   // set the item spot number to info.spotnumber
-   app.carousel.setSpotNumber(item, info.spotnumber);
-   doSpot(spotDiv, info);
-   app.carousel.updateAll(); // redraw carousel
+    }
+    // set the item spot number to info.spotnumber
+    doSpot(spotDiv, info);
+    app.carousel.updateAll(); // redraw carousel
+  } catch(err) {
+    console.log("Error addSpotCb exception " + err);
+  }
 }
 
 ///
@@ -933,51 +937,56 @@ function setSpotCb(info)
 ///
 function removeSpotCb(info)
 {
-  var item = app.carousel.getByspotnumber(info.spotnumber),
-      spot = parseInt(info.spotnumber, 10),
-      zoomedSpot, zoomedItem;
-  console.log('removeSpot msg received id ' + info.spotdivid + ' #' + info.spotnumber, info);
-  // find the spot
-  if (!item) // item by spot number is not in carousel
+  try
   {
-    // try zoomed spot
-    zoomedSpot = $('#meeting > #zoom > .cloudcarousel');
-    if (zoomedSpot.length === 1)
+    var item = app.carousel.getByspotnumber(info.spotnumber),
+        spot = parseInt(info.spotnumber, 10),
+        zoomedSpot, zoomedItem;
+    console.log('removeSpot msg received id ' + info.spotdivid + ' #' + info.spotnumber + " index " + info.spotindex, info);
+    // find the spot
+    if (!item) // item by spot number is not in carousel
     {
-      zoomedItem = $(zoomedSpot).data('item');
-      if (zoomedItem.spotnumber) // zoomed spot has spotnumber
+      // try zoomed spot
+      zoomedSpot = $('#meeting > #zoom > .cloudcarousel');
+      if (zoomedSpot.length === 1)
       {
-        if (zoomedItem.spotnumber === info.spotnumber)
+        zoomedItem = $(zoomedSpot).data('item');
+        if (zoomedItem.spotnumber) // zoomed spot has spotnumber
+        {
+          if (zoomedItem.spotnumber === info.spotnumber)
+          {
+            item = zoomedItem;
+          }
+        }
+        else if (zoomedItem.index === info.spotnumber)
         {
           item = zoomedItem;
         }
+        // unzoom
+        if (item)
+        {
+          carouselItemUnzoom();
+        }
       }
-      else if (zoomedItem.index === info.spotnumber)
+      else // get by index
       {
-        item = zoomedItem;
-      }
-      // unzoom
-      if (item)
-      {
-        carouselItemUnzoom();
+         item = app.carousel.getByIndex(spot);
       }
     }
-    else // get by index
-    {
-       item = app.carousel.getByIndex(spot);
-    }
-  }
 
-  if (item)
-  {
-    $(item.object).remove();
-    app.carousel.remove(item.index);
-    app.carousel.updateAll();
-  }
-  else
-  {
-    app.log(4, 'item ' + info.spotnumber + ' not found');
-    console.log('info', info);
+    if (item)
+    {
+      $(item.object).remove();
+      app.carousel.remove(item.index);
+      app.carousel.updateAll();
+    }
+    else
+    {
+      app.log(4, 'item ' + info.spotnumber + ' not found');
+      console.log('info', info);
+    }
+  } catch(err) {
+    console.log("removeSpotCb exception " + err);
   }
 }
 ///

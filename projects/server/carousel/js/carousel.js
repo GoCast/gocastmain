@@ -43,10 +43,11 @@
     // add handlers
     $(this.object).mouseover(function(event)
     {
+      $('.zoom', this).css('visibility', 'visible');
       // only show close icon on unoccupied or content spots
       if ($(this).hasClass('unoccupied') || $(this).hasClass('typeContent'))
       {
-        $('.control', this).css('visibility', 'visible');
+        $('.close', this).css('visibility', 'visible');
       }
     });
     $(this.object).mouseout(function(event)
