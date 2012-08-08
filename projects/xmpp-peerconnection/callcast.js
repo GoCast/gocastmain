@@ -631,6 +631,7 @@ var Callcast = {
                     this.peer_connection.Deinit();
                     this.peer_connection = null;
                 }
+
                 // Create a true PeerConnection object and attach it to the DOM.
                 this.peer_connection = new GoCastJS.PeerConnection(
                         new GoCastJS.PeerConnectionOptions(
@@ -674,21 +675,6 @@ var Callcast = {
                 console.log('EXCEPTION: ', e.toString(), e);
             }
         };
-
-/*                        if (Callcast.participants[nick].CallState === Callcast.CallStates.NONE)
-                        {
-                            offer = $msg({to: callback_jid, type: 'chat'}).c('initiating', {xmlns: Callcast.NS_CALLCAST}).t(callback_msg);
-                            console.log('Sending initiation message to peer...');
-                            Callcast.connection.send(offer);
-                            Callcast.participants[nick].CallState = Callcast.CallStates.AWAITING_RESPONSE;
-                        }
-                        else
-                        {
-                            offer = $msg({to: callback_jid, type: 'chat'}).c('signaling', {xmlns: Callcast.NS_CALLCAST}).t(callback_msg);
-                            console.log('Sending other (candidates) message to peer...');
-                            Callcast.connection.send(offer);
-                        }
-                        */
 
         this.InitiateCall = function() {
             var sdp,
@@ -872,12 +858,9 @@ var Callcast = {
             {
                 console.log('Dropping call for ' + this.jid);
                 this.peer_connection = null;
+            }
 
-                this.RemovePlugin();
-            }
-            else {
-                console.log('Dropping FAILED. Cant find peer_connection (or self)');
-            }
+            this.RemovePlugin();
         };
 
         if (Callcast.Callback_AddPlugin) {
