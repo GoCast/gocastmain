@@ -24,6 +24,7 @@
           openWindow,
           openMeeting,
           tryPluginInstall,
+          loadVideo,
           checkForPluginOptionalUpgrades,
           handleRoomSetup,
           carouselItemUnzoom
@@ -527,16 +528,31 @@ function addPluginToCarousel(
 {
   var dispname = decodeURI(nickname),
       id = app.str2id(nickname),
-  /*
-   * Check next available cloudcarousel. */
-      oo = $('#meeting > #streams > #scarousel div.unoccupied').get(0),
-      w, h;
+      w, h,
+      oo;
+  if (!nickname) 
+  {
+    app.log(4, "addPluginToCarousel error nickname undefined");
+    return null;
+  }
+  // check if nickname already in carousel
+  oo = $('#meeting > #streams > #scarousel div#'+ nickname);
+  if (oo.length > 0)
+  {
+    app.log(4, "addPluginToCarousel error nickname " + nickname + "already in carousel");
+    alert("addPluginToCarousel error nickname " + nickname + "already in carousel");
+    return null;
+  }
+  // Check next available cloudcarousel
+  oo = $('#meeting > #streams > #scarousel div.unoccupied').get(0);
+
   if (!oo) // if we're out of spots add one
   {
     oo = app.carousel.createSpot();
     app.carousel.updateAll();
   }
-  if (oo) {
+  if (oo) 
+  {
     $(oo).attr('id', id);
     $(oo).attr('encname', nickname);
     $(oo).attr('title', dispname);
@@ -553,6 +569,7 @@ function addPluginToCarousel(
   }
 
   app.log(4, 'Maximum number of participants reached.');
+  return null;
 } /* addPluginToCarousel() */
 
 
@@ -768,7 +785,7 @@ function removeContentFromCarousel(
 /// are defined in info.spottype and can be
 /// "youtube" play a youtube video 
 /// "url" display the url title and favicon
-this.doSpot = function(spotDiv, info) 
+function doSpot(spotDiv, info) 
 {
   try
   {
@@ -831,7 +848,7 @@ this.doSpot = function(spotDiv, info)
   } catch(err) {
     console.log("doSpot error " + err);
   }
-}; // doSpot
+} // doSpot
 ///
 /// \brief get a spot for an addSpot operation by info.spotreplace
 ///        info
@@ -843,7 +860,8 @@ this.doSpot = function(spotDiv, info)
 ///
 function getSpotForAdd(info)
 { 
-  var divs = $('#meeting > #streams > #scarousel div.unoccupied');
+  var divs = $('#meeting > #streams > #scarousel div.unoccupied'),
+      item;
   if (info.spotreplace === 'exact') // replace spot at spotindex
   {
     item = app.carousel.getByIndex(info.spotindex);
