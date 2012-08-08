@@ -224,7 +224,7 @@ $(document).on('private-message', function(
 ///
 function setSpotInfo(info)
 {
-    if (info && info.nick)
+    if (info && info.nick && info.nick !== app.user.name)
     {
        var spot = Callcast.participants[info.nick];
        if (spot)
@@ -239,6 +239,10 @@ function setSpotInfo(info)
           }
 
           console.log('setSpotInfo', info, spot);
+       }
+       else
+       {
+         app.log(4, "setSpotInfo " + info.nick + " not in participants list");
        }
        app.log(2, 'setSpotInfo nick ' + info.nick + ' image ' + info.image);
     }
@@ -266,7 +270,7 @@ try
            h = Callcast.HEIGHT * s;
            info.width = w;
            info.height = h;
-           app.log(2, 'setCarouselItemState video on user dim w ' + info.width + ', h ' + info.height);
+           app.log(2, 'setCarouselItemState video on user ' + info.nick + ' dim w ' + info.width + ', h ' + info.height);
            $(oo).css('background-image', ''); // remove any background image
            Callcast.ShowRemoteVideo(info);
        }
@@ -276,7 +280,7 @@ try
           image = Callcast.participants[info.nick].image;
           $(oo).css('background-image', image);
           Callcast.ShowRemoteVideo(info);
-          app.log(2, 'setCarouselItemState video off image ' + image);
+          app.log(2, 'setCarouselItemState video off user ' + info.nick + ' image ' + image);
        }
     }
 /*    else
@@ -829,6 +833,72 @@ this.doSpot = function(spotDiv, info)
   }
 }; // doSpot
 ///
+/// \brief get a spot for an addSpot operation by info.spotreplace
+///        info
+///         |- spotreplace replace an existing spot
+///         |  |- exact replace spot at info.spotindex or first unoc if exact is occupied or new spot
+///         |  |- first-unoc replace first unoccupied spot or new spot 
+///         |  |- last-unoc replace last unoccupied spot or new spot
+/// \throw
+///
+function getSpotForAdd(info)
+{ 
+  var divs = $('#meeting > #streams > #scarousel div.unoccupied');
+  if (info.spotreplace === 'exact') // replace spot at spotindex
+  {
+    item = app.carousel.getByIndex(info.spotindex);
+    if (!item) // item not there, probably was deleted, choose first-unoc
+    {
+      if (divs.length > 0)
+      {
+        return divs.get(0);
+      }
+      else // no unoc spots, create one
+      {
+        return app.carousel.createSpot(info);
+      }
+    }
+    else if ($(item.object).hasClass("unoccupied")) // spot is there and unoccupied
+    {
+      return item.object;
+    }
+    else if (divs.length > 0) // item is there and occupied get an unoc div
+    {
+      return divs.get(0);
+    }
+    else // no unoc spots, create one
+    {
+      return app.carousel.createSpot(info);
+    }
+  }
+  else if (info.spotreplace === 'first-unoc') // replace first unoc spot
+  {
+    if (divs.length > 0)
+    {
+      return divs.get(0);
+    }
+    else // no unoc spots, create one
+    {
+      return app.carousel.createSpot(info);
+    }
+  }
+  else if (info.spotreplace === 'last-unoc') // replace last unoccupied spot
+  {
+    if (divs.length > 0)
+    {
+      return divs.get(divs.length - 1);
+    }
+    else // no unoc spots, create one
+    {
+      return app.carousel.createSpot(info);
+    }
+  }
+  else
+  {
+    throw "getSpotForAdd unknown spotreplace command " + info.spotreplace;
+  }
+} // getSpotForAdd
+///
 /// \brief addspot callback add a new spot or replace an unoccupied spot 
 ///        depending on info contents
 ///        info
@@ -864,43 +934,11 @@ function addSpotCb(info)
             return; // spot with id exists so we're done
          }
       }
-      divs = $('#meeting > #streams > #scarousel div.unoccupied');
-      if (divs.length === 0) // no unoc spots to replace, create one
-      {
-         spotDiv = app.carousel.createSpot(info);
-      }
-      else // replace spot
-      {
-         if (info.spotreplace === 'exact') // replace spot at spotindex
-         {
-            item = app.carousel.getByIndex(info.spotindex);
-            if (!item) // item not there, probably was deleted, choose last-unoc
-            {
-              spotDiv = $(divs).get(divs.length - 1);
-            }
-            else
-            {
-              spotDiv = item.object;
-            }
-         }
-         else if (info.spotreplace === 'first-unoc') // replace first unoc spot
-         {
-            spotDiv = $(divs).get(0);
-         }
-         else if (info.spotreplace === 'last-unoc') // replace last unoccupied spot
-         {
-            spotDiv = $(divs).get(divs.length - 1);
-         }
-      }
+      spotDiv = getSpotForAdd(info);
+      if (!spotDiv) {throw "couldn't get spot for addSpot";}
       item = $(spotDiv).data('item');
-      if (spotDiv && item)
-      {
-        app.carousel.setSpotNumber(item, info.spotnumber);
-      }
-      else
-      {
-        app.log(4, 'addSpotCb problem with spot replace');
-      }
+      if (!item) {throw "couldn't get item for addSpot";}
+      app.carousel.setSpotNumber(item, info.spotnumber);
     }
     else // add a new spot
     {
@@ -915,7 +953,7 @@ function addSpotCb(info)
 }
 
 ///
-/// \brief addspot callback, forward spot add to carousel
+/// \brief setspot callback, get spot by spotnumber and call doSpot on it
 ///
 function setSpotCb(info)
 {

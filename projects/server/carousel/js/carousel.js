@@ -319,7 +319,7 @@
             else
             {
                 nick = $(obj).attr('encname');
-                if (nick && Callcast.participants[nick].videoOn)
+                if (nick && Callcast.participants[nick] && Callcast.participants[nick].videoOn)
                 {
                     Callcast.ShowRemoteVideo({nick: nick, width: w, height: h});
                 }
