@@ -39,7 +39,7 @@
     this.objectOK = true;
     if (!dummy) // when dummy is set this object does not update the dom object
     {
-      console.log("item decorating object", objIn);
+      //console.log("item decorating object", objIn);
       $(this.object).css('position', 'absolute');
       // add controls
       this.addControls();
