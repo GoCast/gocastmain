@@ -19,7 +19,6 @@
 
 /*jslint browser: true, debug: true devel: true*/
 /*global Callcast, app, jQuery, getUrlInfo */
-/*global loadVideo, carouselItemUnzoom */
 'use strict'; // jslint waiver
 
 /*
@@ -27,7 +26,7 @@
 (function($) {
 
   /// Item object.  A wrapper object for items within the carousel.
-  var Item = function(objIn, options)
+  var Item = function(objIn, options, dummy)
   {
     this.orgWidth = $(objIn).width();
     this.orgHeight = $(objIn).height();
@@ -36,24 +35,29 @@
     this.plgOrgHeight = (this.plgOrgWidth / Callcast.WIDTH) * Callcast.HEIGHT;
     this.object = objIn;
     this.options = options;
+    this.dummy = dummy;
     this.objectOK = true;
-    $(this.object).css('position', 'absolute');
-    // add controls
-    this.addControls();
-    // add handlers
-    $(this.object).mouseover(function(event)
+    if (!dummy) // when dummy is set this object does not update the dom object
     {
-      // only show close icon on unoccupied or content spots
-      if ($(this).hasClass('unoccupied') || $(this).hasClass('typeContent'))
+      console.log("item decorating object", objIn);
+      $(this.object).css('position', 'absolute');
+      // add controls
+      this.addControls();
+      // add handlers
+      $(this.object).mouseover(function(event)
       {
-        $('.zoom', this).css('visibility', 'visible');
-        $('.close', this).css('visibility', 'visible');
-      }
-    });
-    $(this.object).mouseout(function(event)
-    {
-      $('.control', this).css('visibility', 'hidden');
-    });
+        // only show close icon on unoccupied or content spots
+        if ($(this).hasClass('unoccupied') || $(this).hasClass('typeContent'))
+        {
+          $('.zoom', this).css('visibility', 'visible');
+          $('.close', this).css('visibility', 'visible');
+        }
+      });
+      $(this.object).mouseout(function(event)
+      {
+        $('.control', this).css('visibility', 'hidden');
+      });
+    }
   }; /* Item object */
 
   Item.prototype.updateSize = function(item)
@@ -538,7 +542,7 @@
     {
       // add the html
       var newDiv = $('<div class="cloudcarousel unoccupied" onclick="carouselItemClick(event);"><div class="name"></div></div>'),
-      item = new Item(newDiv[0], options);
+      item = new Item(newDiv[0], options, false);
       $(this.innerWrapper).append(newDiv);
       item.updateSize(this.item);
       if (info) // info will be null when spots are created for remote video
@@ -597,14 +601,14 @@
         app.log(2, 'checkObjectsLoaded done');
         for (i = 0; i < objects.length; i += 1)
         {  // create and setup item
-            item = new Item(objects[i], options);
+            item = new Item(objects[i], options, false);
             items.addItem(item);
             $(objects[i]).data('item', item);
         } // for loop
         // save the storage item
         if (objects.length > 0)
-        {  // construct a new object, todo this is too much because it sets css, handlers
-           this.item = new Item(objects[0], options);
+        {
+           this.item = new Item(objects[0], options, true);
         }
         // document layout seems to be done at this point so resize carousel
         // todo find better place for this
