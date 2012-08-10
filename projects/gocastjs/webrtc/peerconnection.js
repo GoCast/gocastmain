@@ -79,6 +79,7 @@ GoCastJS.getUserMedia = function(options, success, failure) {
                 if ('undefined' === typeof(player.videoinopts['default'])) {
                     failure('GoCastJS.getUserMedia(): ' + 
                             'No video devices detected');
+                    return;
                 } else {
                     options.mediaHints.videoin = player.videoinopts['default'];
                     console.log('GoCastJS: Choosing default video: ' + 
