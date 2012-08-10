@@ -59,14 +59,33 @@
 			}
 			
 			function onLocalPlayerLoaded() {
+				var options = new GoCastJS.UserMediaOptions(
+					{audio: true, video: true},
+					document.getElementById("localVideo")
+				);
+
 				GoCastJS.getUserMedia(
-					new GoCastJS.UserMediaOptions(
-						{audio: true, video:true},
-						document.getElementById("localVideo")
-					),
+					options,
 					function(stream) {
+						var camera = document.getElementById("localVideo").videoinopts["default"];
 						console.log("getUserMediaSuccess: ", stream);
-						localStream = stream;						
+						localStream = stream;
+						var check = GoCastJS.SetVideoDevicesChangedListener(
+							1000,
+							document.getElementById("localVideo"),
+							function(devicesAdded, devicesRemoved) {
+								console.log("Added: ", devicesAdded);
+								console.log("Removed: ", devicesRemoved);
+
+								if(0 <= devicesRemoved.indexOf(camera) ||
+								   camera !== document.getElementById("localVideo").videoinopts["default"]) {
+									clearInterval(check);
+									peerConn.Deinit();
+									document.getElementById("localVideo").deinit();
+									onLocalPlayerLoaded();
+								}
+							}
+						);
 						ongetusermediasuccess();
 					},
 					function(message) {

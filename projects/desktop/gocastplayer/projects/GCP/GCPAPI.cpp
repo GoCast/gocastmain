@@ -83,6 +83,25 @@ FB::JSObjectPtr GCPAPI::get_onreadystatechange()
     return m_onreadystatechangeCb;
 }
 
+FB::VariantMap GCPAPI::get_videoinopts()
+{
+    GoCast::RtcCenter* pCtr = GoCast::RtcCenter::Instance();
+    
+    m_videoDevices.clear();
+    if(false == pCtr->Inited())
+    {
+        std::string msg = m_htmlId.convert_cast<std::string>();
+        msg += ": Failed to init RtcCenter singleton...";
+        FBLOG_ERROR_CUSTOM("GCPAPI::get_videoinopts", msg);
+    }
+    else
+    {
+        pCtr->QueryVideoDevices(m_videoDevices);
+    }
+    
+    return m_videoDevices;
+}
+
 void GCPAPI::set_onaddstream(const FB::JSObjectPtr &onaddstream)
 {
     m_onaddstreamCb = onaddstream;

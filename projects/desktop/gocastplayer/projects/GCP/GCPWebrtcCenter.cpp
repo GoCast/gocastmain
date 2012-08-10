@@ -407,6 +407,16 @@ namespace GoCast
         return pInst;
     }
     
+    void RtcCenter::QueryVideoDevices(FB::VariantMap& devices)
+    {
+        devices = LocalVideoTrack::GetVideoDevices();
+    }
+    
+    /*void RtcCenter::QueryAudioDevices(FB::VariantMap& devices)
+    {
+        devices = LocalAudioTrack::GetAudioDevices();
+    }*/
+    
     void RtcCenter::GetUserMedia(FB::JSObjectPtr mediaHints,
                                  FB::JSObjectPtr succCb,
                                  FB::JSObjectPtr failCb,
@@ -849,9 +859,13 @@ namespace GoCast
         //If mediaHints.video == true, add video track
         if(true == mediaHints->GetProperty("video").convert_cast<bool>())
         {
-            FBLOG_INFO_CUSTOM("RtcCenter::GetUserMedia_w", "Creating local video track interface object...");
+            std::string videoInUniqueId = mediaHints->GetProperty("videoin").convert_cast<std::string>();
             talk_base::scoped_refptr<webrtc::VideoCaptureModule> pCapture = 
-                LocalVideoTrack::GetDefaultCaptureDevice();
+                LocalVideoTrack::GetCaptureDevice(videoInUniqueId);
+            
+            std::string msg = "Creating local video track interface object [camId: ";
+            msg += (videoInUniqueId + "]...");
+            FBLOG_INFO_CUSTOM("RtcCenter::GetUserMedia_w", msg);
             
             if(NULL == pCapture.get())
             {
