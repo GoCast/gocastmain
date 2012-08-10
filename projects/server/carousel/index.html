@@ -46,16 +46,15 @@
     <script src="js/carousel.js" type="text/javascript"></script>
     <script src="js/fb.js" type="text/javascript"></script>
     <script src="js/index.js" type="text/javascript"></script>
-    <link rel="shortcut icon" href="images/favicon.ico" type="x-icon" />
+    <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon" />
     <title>Gocast.it</title>
   </head>
 
   <body>
     <div id="fb-root"></div> <!-- fb integration required -->
     <div id="upper-right">
-      <div id="volume"/></div>
-      <p id="connection-status">Connection Status</a>
-    </div>
+      <div id="volume"></div>
+      <p id="connection-status">Connection Status</p>
     </div>
     <div id="lower-right">
        <input id="dlbtn" type="button" title="Download Plugin." onclick="doDownload();" />
@@ -94,7 +93,7 @@
       <div id="winWait" class="window resizable">
         <p class="title">Please run the downloaded file to install the GoCast Player.</p>
         <div id="status">
-           <img id="spinner" src="images/waiting-join.gif" /><p id="msg">Waiting for plugin.</p>
+           <img id="spinner" src="images/waiting-join.gif" alt="Waiting for plugin"/><p id="msg">Waiting for plugin.</p>
         </div>
       </div>
       <div id="chromeRestart" class="window resizable">
@@ -110,18 +109,17 @@
          <p>Copy this and paste it into an email.</p>
          <div id="copyContent">
             <h2>Join us now on the Carousel</h2>
-            <img id="copyLogo" src="images/gologo.png" />
+            <img id="copyLogo" alt="Room Link" title="Room Link" src="images/gologo.png" />
             <a id="copyName"></a>
          </div>
       </div>
       <div id="waitingToJoin" class="window resizable">
-        <img src="images/waiting-join.gif" />
+        <img src="images/waiting-join.gif" alt="Waiting To Join"/>
       </div>
       <div id="helpPage" class="window resizable">
-        <img class="close" src="images/button-close.png" alt="Close Help"
-             title="Close Help" />
+        <img class="close" src="images/button-close.png" alt="Close Help" title="Close Help" />
         <h1>Help</h1>
-        <img src="images/helpPage.png" class="helpContent" />
+        <img src="images/helpPage.png" alt="Help" class="helpContent" />
       </div>
       <div id="errorMsgPlugin" class="window resizable">
         <h1>Gocast.it plugin was not found</h1>
@@ -160,28 +158,26 @@
         <p class="error"></p>
         <input id="name"  type="text" placeholder="Please enter your name" />
         <input id="email" type="text" placeholder="Enter your email (optional)" />
-        <input id="btn"   type="image" src="images/joinnow.png" />
+        <input id="btn"   type="image" alt="Join Now" src="images/joinnow.png" />
         <hr>
-        <div id="fb-login-button" class="fb-login-button" data-show-faces="false" data-width="200" data-max-rows="1">login with facebook</div>
+        <div id="fb-login-button2" class="fb-login-button" data-show-faces="false" data-width="200" data-max-rows="1">login with facebook</div>
         <p class="title">Login with facebook to show profile pictures in spots and post or send invites to this room.</p>
       </div>
       <div id="chatInp" class="window">
         <span class="recipient"></span>
-        <img class="close" src="images/button-close.png" alt="Close window"
-             title="Close window" />
-        <input class="chatTo" type="text"></input>
-        <input class="send" type="button" title="Send chat."></input>
+        <img class="close" src="images/button-close.png" alt="Close window" title="Close window" />
+        <input class="chatTo" type="text"/>
+        <input class="send" type="button" title="Send chat."/>
       </div>
       <div id="personalChat" class="window">
-        <img class="close" src="images/button-close.png" alt="Close window"
-             title="Close window" />
+        <img class="close" src="images/button-close.png" alt="Close window" title="Close window" />
         <p class="msg"></p>
       </div>      
       <!-- Mask to cover the whole screen -->
       <div id="mask"></div>      
       <div id="copy-this" class="window">
          <a href="http://www.gocast.it" target="_blank">
-          <img class="logo" src="images/gologo.png" />
+          <img class="logo" alt="logo" src="images/gologo.png" />
          </a>
       </div>
     </div>
@@ -216,7 +212,7 @@
             <div class="name"></div>
           </div>
           <div id="addItem" >
-          <img src="images/plus.png" />
+          <img alt="Add Item" title="Add Spot" src="images/plus.png" />
           </div>
         </div><!-- scarousel -->
         <div id="scontrols">
@@ -225,9 +221,9 @@
         </div><!-- scontrols -->
       </div><!-- streams -->
       <div id="zoom">
-        <img class="close" src="images/button-close-white.png" alt="Close window" onclick="carouselItemUnzoom(event);" />
+        <img class="close" src="images/button-close-white.png" alt="Close window" title="Close" onclick="carouselItemUnzoom(event);" />
       </div>
     </div><!-- meeting -->
-    <div id="scratch"/>
+    <div id="scratch"></div>
   </body>
 </html>
