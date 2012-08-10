@@ -125,11 +125,14 @@ namespace GoCast
         {
             std::string deviceId;
             offlineDevices >> deviceId;
-            videoDevices.erase(deviceId);
             
-            std::string msg = "Deleting offline device [";
-            msg += (deviceId + "]...");
-            FBLOG_INFO_CUSTOM("LocalVideTrack::GetVideoDevices", msg);
+            if("" != deviceId)
+            {
+                videoDevices.erase(deviceId);
+                std::string msg = "Deleting offline device [";
+                msg += (deviceId + "]...");
+                FBLOG_INFO_CUSTOM("LocalVideTrack::GetVideoDevices", msg);
+            }
         }
         
         delete pDevInfo;

@@ -108,9 +108,10 @@ GoCastJS.getUserMedia = function(options, success, failure) {
                                 player.videoinopts[options.
                                                    mediaHints.
                                                    videoin]);
-                    GoCastJS.Video.captureDevice = options.mediaHints.videoin;
                 }
             }
+
+            GoCastJS.Video.captureDevice = options.mediaHints.videoin;
         }
 
         player.getUserMedia(

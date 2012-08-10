@@ -58,13 +58,19 @@
 				);
 			}
 			
-			function onLocalPlayerLoaded() {
+			function onLocalPlayerLoaded(camera) {
+				var hints = {audio: true, video: true};
+				if("string" === typeof(camera)) {
+					hints.videoin = camera;
+				} 
+
 				var options = new GoCastJS.UserMediaOptions(
-					{audio: true, video: true},
+					hints,
 					document.getElementById("localVideo")
 				);
 
 				var checkVol;
+
 
 				GoCastJS.getUserMedia(
 					options,
@@ -89,22 +95,36 @@
 					1000,
 					document.getElementById("localVideo"),
 					function(devicesAdded, devicesRemoved) {
+						var newCamera = GoCastJS.Video.captureDevice;
 						console.log("Added: ", devicesAdded);
 						console.log("Removed: ", devicesRemoved);
 
-						if(0 <= devicesRemoved.indexOf(GoCastJS.Video.captureDevice) ||
-						   GoCastJS.Video.captureDevice !== document.
-						   									getElementById("localVideo").
-						   									videoinopts["default"]) {
+						if(0 < devicesAdded.length) {
+							newCamera = devicesAdded[0];
+						} else if(0 <= devicesRemoved.indexOf(GoCastJS.Video.captureDevice)) {
+							if("undefined" !== typeof(document.
+													  getElementById("localVideo").
+													  videoinopts["default"])) {
+								newCamera = document.getElementById("localVideo").videoinopts["default"];
+							} else {
+								newCamera = "";
+							}
+						}
+
+						if(newCamera !== GoCastJS.Video.captureDevice) {
 							clearInterval(check);
 							clearInterval(checkVol);
-
+							
 							if("" !== GoCastJS.Video.captureDevice) {
 								peerConn.Deinit();
 								document.getElementById("localVideo").deinit();
 							}
 
-							onLocalPlayerLoaded(); 
+							if("" !== newCamera) {
+								onLocalPlayerLoaded(newCamera);
+							} else {
+								onLocalPlayerLoaded();
+							}
 						}
 					}
 				);
