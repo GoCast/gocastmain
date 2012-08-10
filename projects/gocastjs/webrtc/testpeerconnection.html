@@ -64,40 +64,48 @@
 					document.getElementById("localVideo")
 				);
 
+				var checkVol;
+
 				GoCastJS.getUserMedia(
 					options,
 					function(stream) {
-						var camera = document.getElementById("localVideo").videoinopts["default"];
 						console.log("getUserMediaSuccess: ", stream);
 						localStream = stream;
-						var checkVol = GoCastJS.SetSpkVolListener(
+						checkVol = GoCastJS.SetSpkVolListener(
 							600,
 							document.getElementById("localVideo"),
 							function(newVolume) {
 								console.log("New Volume: " + newVolume);
 							}
 						);
-						var check = GoCastJS.SetVideoDevicesChangedListener(
-							1000,
-							document.getElementById("localVideo"),
-							function(devicesAdded, devicesRemoved) {
-								console.log("Added: ", devicesAdded);
-								console.log("Removed: ", devicesRemoved);
-
-								if(0 <= devicesRemoved.indexOf(camera) ||
-								   camera !== document.getElementById("localVideo").videoinopts["default"]) {
-									clearInterval(check);
-									clearInterval(checkVol);
-									peerConn.Deinit();
-									document.getElementById("localVideo").deinit();
-									onLocalPlayerLoaded();
-								}
-							}
-						);
 						ongetusermediasuccess();
 					},
 					function(message) {
 						console.log("getUserMediaFailure: ", message);
+					}
+				);
+
+				var check = GoCastJS.SetVideoDevicesChangedListener(
+					1000,
+					document.getElementById("localVideo"),
+					function(devicesAdded, devicesRemoved) {
+						console.log("Added: ", devicesAdded);
+						console.log("Removed: ", devicesRemoved);
+
+						if(0 <= devicesRemoved.indexOf(GoCastJS.Video.captureDevice) ||
+						   GoCastJS.Video.captureDevice !== document.
+						   									getElementById("localVideo").
+						   									videoinopts["default"]) {
+							clearInterval(check);
+							clearInterval(checkVol);
+
+							if("" !== GoCastJS.Video.captureDevice) {
+								peerConn.Deinit();
+								document.getElementById("localVideo").deinit();
+							}
+
+							onLocalPlayerLoaded(); 
+						}
 					}
 				);
 			}

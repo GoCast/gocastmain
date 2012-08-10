@@ -2,7 +2,8 @@ var GoCastJS = ('undefined' !== typeof(GoCastJS)) ? GoCastJS : {};
 GoCastJS = (null !== GoCastJS) ? GoCastJS : {};
 
 GoCastJS.Video = {
-    devices: []
+    devices: [],
+    captureDevice: ''
 };
 
 GoCastJS.Audio = {
@@ -69,6 +70,8 @@ GoCastJS.UserMediaOptions = function(mediaHints, player) {
 //!     failure <function(message)>         : failure callback with message
 //!
 GoCastJS.getUserMedia = function(options, success, failure) {
+    GoCastJS.Video.captureDevice = '';
+    
     if (false === this.CheckBrowserSupport()) {
         if ('undefined' !== typeof(failure) && null !== failure) {
             failure('GoCastJS.getUserMedia(): ' + 
@@ -94,6 +97,7 @@ GoCastJS.getUserMedia = function(options, success, failure) {
                                 player.videoinopts[options.
                                                    mediaHints.
                                                    videoin]);
+                    GoCastJS.Video.captureDevice = options.mediaHints.videoin;
                 }
             }
         }
@@ -176,7 +180,7 @@ GoCastJS.SetVideoDevicesChangedListener = function(checkInterval,
             if ('undefined' === typeof(
                     localplayer.videoinopts[GoCastJS.Video.devices[i]]
                 )) {
-                devicesDeleted.push(GoCast.Video.devices[i]);
+                devicesDeleted.push(GoCastJS.Video.devices[i]);
             }
         }
 
@@ -194,7 +198,7 @@ GoCastJS.SetVideoDevicesChangedListener = function(checkInterval,
         }
 
         // Call callback if device list has changed
-        if (0 < devicesAdded || 0 < devicesDeleted) {
+        if (0 < devicesAdded.length || 0 < devicesDeleted.length) {
             onChanged(devicesAdded, devicesDeleted);
         }
     }, checkInterval);
@@ -428,7 +432,7 @@ GoCastJS.PeerConnection.prototype.ReadyState = function() {
 };
 
 //!
-//! function: GoCast.PeerConnection.Width([width])
+//! function: GoCastJS.PeerConnection.Width([width])
 //!
 //! arguments:
 //!     width <int> (optional) : new width value for the plugin instance
@@ -444,7 +448,7 @@ GoCastJS.PeerConnection.prototype.Width = function(width) {
 };
 
 //!
-//! function: GoCast.PeerConnection.Height([height])
+//! function: GoCastJS.PeerConnection.Height([height])
 //!
 //! arguments:
 //!     height <int> (optional) : new height value for the plugin instance
