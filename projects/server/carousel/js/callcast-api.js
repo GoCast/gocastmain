@@ -551,7 +551,7 @@ function addPluginToCarousel(
     $(oo).append('<object id="GocastPlayer' + id + '" type="application/x-gocastplayer" width="' + w + '" height="' + h + '"></object>');
     $('div.name', oo).text(dispname);
     $(oo).removeClass('unoccupied');
-    //$("#showChat", oo).css("display", "block"); // display showChat button
+    $("#showChat", oo).css("display", "block"); // display showChat button
 
     app.log(2, 'Added GocastPlayer' + id + ' object.');
     return $('object#GocastPlayer' + id, oo).get(0);

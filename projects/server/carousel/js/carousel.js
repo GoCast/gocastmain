@@ -254,13 +254,16 @@
         }
     }); // onclick()
         */
-    /*
-     * Mousedown on container, it prevents items from being selected
-     * as mouse is moved and clicked in the container. */
+    /* turn this of because it prevents personal chat input from getting focus
+    ///
+    /// Mousedown on container, it prevents items from being selected
+    /// as mouse is moved and clicked in the container.
+    ///
     $(container).on('mousedown', this, function(event) {
-        event.data.container.focus();
-        return false;
+        //event.data.container.focus();
+        //return false;
     });
+    */
     /*
      * Selectstart, defined for IE. */
     container.onselectstart = function() { return false; };

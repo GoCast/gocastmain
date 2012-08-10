@@ -490,7 +490,7 @@ function carouselItemClick(event)
     }
     else // remote user
     {
-      openChat(event);
+      //openChat(event);
     }
   } catch(err) {
     app.log(4, "carouselItemClick exception " + err);
