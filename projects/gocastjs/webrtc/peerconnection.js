@@ -64,8 +64,12 @@ GoCastJS.CheckGoCastPlayer = function() {
 //! constructor: GoCastJS.UserMediaOptions(mediaHints, player)
 //!
 //! arguments/members:
-//!     mediaHints  <obj>        : {audio: <bool>, video: <bool>}
+//!     mediaHints  <obj>        : {audio: <bool>, video: <bool>,
+//!                                 [videoin: <string>]}
 //!     player      <HtmlObject> : plugin instance used for local preview
+//!     videoin     <string>     : guid of the camera you want to use
+//!
+//! NOTE: if 'videoin' is not given the 'default' camera is used.
 //!
 GoCastJS.UserMediaOptions = function(mediaHints, player) {
     this.mediaHints = mediaHints;
