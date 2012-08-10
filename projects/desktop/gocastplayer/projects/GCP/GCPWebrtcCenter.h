@@ -69,7 +69,10 @@ namespace GoCast
     public:
         static RtcCenter* Instance(bool bDelete = false);
         
-        //Thread-safe methods
+        // Query media devices
+        void QueryVideoDevices(FB::VariantMap& devices);
+        
+        //Thread-safe methods        
         void GetUserMedia(FB::JSObjectPtr mediaHints,
                           FB::JSObjectPtr succCb,
                           FB::JSObjectPtr failCb,
@@ -173,7 +176,7 @@ namespace GoCast
         std::map< std::string,
                   talk_base::scoped_refptr<webrtc::MediaStreamInterface> > m_remoteStreams;
         talk_base::scoped_refptr<webrtc::PeerConnectionFactoryInterface> m_pConnFactory;
-        talk_base::scoped_refptr<webrtc::LocalMediaStreamInterface> m_pLocalStream;
+        talk_base::scoped_refptr<webrtc::LocalMediaStreamInterface> m_pLocalStream;        
     };
 }
 

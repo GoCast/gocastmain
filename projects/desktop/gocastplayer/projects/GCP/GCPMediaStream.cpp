@@ -9,7 +9,6 @@
 #include "GCPMediaStream.h"
 #include "DOM/Window.h"
 #include "variant_list.h"
-#include <iostream>
 
 #define FBLOG_INFO_CUSTOM(func, msg) FBLOG_INFO(func, msg)
 #define FBLOG_ERROR_CUSTOM(func, msg) FBLOG_ERROR(func, msg)
@@ -52,48 +51,103 @@ namespace GoCast
                                                         &LocalMediaStreamTrack::set_enabled));
     }
     
+    std::map< std::string,
+              talk_base::scoped_refptr<webrtc::VideoCaptureModule> > LocalVideoTrack::videoDevices;
+    
     FB::JSAPIPtr LocalVideoTrack::Create(talk_base::scoped_refptr<webrtc::LocalVideoTrackInterface>& pTrack)
     {
         return boost::make_shared<LocalVideoTrack>(pTrack);
     }
     
-    talk_base::scoped_refptr<webrtc::VideoCaptureModule> LocalVideoTrack::GetDefaultCaptureDevice()
+    FB::VariantMap LocalVideoTrack::GetVideoDevices()
     {
-        talk_base::scoped_refptr<webrtc::VideoCaptureModule> pDev(NULL);
-        webrtc::VideoCaptureModule::DeviceInfo* pDevInfo(webrtc::VideoCaptureFactory::CreateDeviceInfo(0));
-        
+        static int deviceCount = 0;
         const size_t kMaxDeviceNameLength = 128;
         const size_t kMaxUniqueIdLength = 256;
         char deviceName[kMaxDeviceNameLength];
         char deviceUniqueId[kMaxUniqueIdLength];
+        webrtc::VideoCaptureModule::DeviceInfo* pDevInfo;
+        FB::VariantMap devices;
+        std::string key;
+        std::string val;
         
-        if(0 < pDevInfo->NumberOfDevices())
+        pDevInfo = webrtc::VideoCaptureFactory::CreateDeviceInfo(0);
+        for(size_t i=0; i<pDevInfo->NumberOfDevices(); i++)
         {
-            //Get unique id of default capture device
-            pDevInfo->GetDeviceName(0, deviceName, kMaxDeviceNameLength, deviceUniqueId, kMaxUniqueIdLength);
+            pDevInfo->GetDeviceName(i, deviceName, kMaxDeviceNameLength,
+                                    deviceUniqueId, kMaxUniqueIdLength);
+            key = deviceUniqueId;
+            val = deviceName;
+            devices[key] = val;
+            
+            if(videoDevices.end() == videoDevices.find(key))
+            {
+                videoDevices[key] = webrtc::VideoCaptureFactory::Create(deviceCount++, deviceUniqueId);
+                
+                std::string msg("Capture device [");
+                std::stringstream devIdxStr;
+                msg += deviceUniqueId;
+                msg += "][idx = ";
+                devIdxStr << (deviceCount-1);
+                msg += (devIdxStr.str() + "]");
+                
+                if(NULL == videoDevices[key])
+                {
+                    devices.erase(key);
+                    videoDevices.erase(key);
+                    msg += " (failed to open)";
+                    FBLOG_ERROR_CUSTOM("LocalVideoTrack::GetVideoDevices", msg);                    
+                }
+                else
+                {
+                    msg += "...";
+                    FBLOG_INFO_CUSTOM("LocalVideoTrack::GetVideoDevices", msg);
+                }
+            }
+            
+            if((0 == i) && (videoDevices.end() != videoDevices.find(key)))
+            {
+                devices["default"] = key;
+            }
+        }        
         
-            //Try to open the device
-            pDev = webrtc::VideoCaptureFactory::Create(0, deviceUniqueId);
-            delete pDevInfo;            
+        std::stringstream offlineDevices;
+        for(VideoDeviceList::iterator it = videoDevices.begin();
+            it != videoDevices.end(); it++)
+        {
+            if(devices.end() == devices.find(it->first))
+            {
+                offlineDevices << (it->first);
+            }
         }
         
-        std::string msg("Found capture device [");
-        msg += deviceName;
-        msg += "]";
-        
-        if(NULL == pDev)
+        while(offlineDevices)
         {
-            msg += " (failed to open)";
-            FBLOG_ERROR_CUSTOM("LocalVideoTrack::GetDefaultCaptureDevice", msg);
-        }
-        else
-        {
-            msg += "...";
-            FBLOG_INFO_CUSTOM("LocalVideoTrack::GetDefaultCaptureDevice", msg);
+            std::string deviceId;
+            offlineDevices >> deviceId;
+            
+            if("" != deviceId)
+            {
+                videoDevices.erase(deviceId);
+                std::string msg = "Deleting offline device [";
+                msg += (deviceId + "]...");
+                FBLOG_INFO_CUSTOM("LocalVideTrack::GetVideoDevices", msg);
+            }
         }
         
-        //If no device found or unable to open default device pDev.get() will be NULL
-        return pDev;
+        delete pDevInfo;
+        return devices;
+    }
+    
+    talk_base::scoped_refptr<webrtc::VideoCaptureModule>
+        LocalVideoTrack::GetCaptureDevice(const std::string& uniqueId)
+    {
+        if(videoDevices.end() != videoDevices.find(uniqueId))
+        {
+            return videoDevices[uniqueId];
+        }
+        
+        return NULL;
     }
     
     LocalVideoTrack::LocalVideoTrack(const talk_base::scoped_refptr<webrtc::LocalVideoTrackInterface>& pTrack)
@@ -102,7 +156,7 @@ namespace GoCast
         registerProperty("effect", make_property(this, &LocalVideoTrack::get_effect,
                                                        &LocalVideoTrack::set_effect));
     }
-    
+        
     FB::JSAPIPtr LocalAudioTrack::Create(talk_base::scoped_refptr<webrtc::LocalAudioTrackInterface>& pTrack)
     {
         return boost::make_shared<LocalAudioTrack>(pTrack);

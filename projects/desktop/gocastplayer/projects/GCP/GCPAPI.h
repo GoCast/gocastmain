@@ -62,6 +62,7 @@ public:
                                                                    &GCPAPI::set_onreadystatechange));
         registerProperty("source", make_property(this, &GCPAPI::get_source, &GCPAPI::set_source));
         registerProperty("volume", make_property(this, &GCPAPI::get_volume));
+        registerProperty("videoinopts", make_property(this, &GCPAPI::get_videoinopts));
     }
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -85,6 +86,7 @@ public:
     FB::JSObjectPtr get_onreadystatechange();
     FB::JSAPIPtr get_source();
     FB::variant get_volume();
+    FB::VariantMap get_videoinopts();
     
     // Property set methods
     void set_onaddstream(const FB::JSObjectPtr& onaddstream);
@@ -140,6 +142,7 @@ private:
     FB::BrowserHostPtr m_host;
     FB::JSAPIPtr m_srcStream;
     FB::variant m_htmlId;
+    FB::VariantMap m_videoDevices;
 };
 
 #endif // H_GCPAPI

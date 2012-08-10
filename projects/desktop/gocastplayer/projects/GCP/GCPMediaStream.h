@@ -60,8 +60,14 @@ namespace GoCast
     class LocalVideoTrack : public LocalMediaStreamTrack
     {
     public:
+        typedef std::map< std::string,
+                          talk_base::scoped_refptr<webrtc::VideoCaptureModule> > VideoDeviceList;
+        
+    public:
         static FB::JSAPIPtr Create(talk_base::scoped_refptr<webrtc::LocalVideoTrackInterface>& pTrack);
-        static talk_base::scoped_refptr<webrtc::VideoCaptureModule> GetDefaultCaptureDevice();
+        static FB::VariantMap GetVideoDevices();
+        static talk_base::scoped_refptr<webrtc::VideoCaptureModule>
+            GetCaptureDevice(const std::string& uniqueId);
         explicit LocalVideoTrack(const talk_base::scoped_refptr<webrtc::LocalVideoTrackInterface>& pTrack);
         ~LocalVideoTrack() { }
         
@@ -70,6 +76,9 @@ namespace GoCast
         
         //Javascript set property methods
         void set_effect(FB::variant effect);
+        
+    protected:
+        static VideoDeviceList videoDevices;
     };
     
     class LocalAudioTrack : public LocalMediaStreamTrack
@@ -77,7 +86,7 @@ namespace GoCast
     public:
         static FB::JSAPIPtr Create(talk_base::scoped_refptr<webrtc::LocalAudioTrackInterface>& pTrack);
         explicit LocalAudioTrack(const talk_base::scoped_refptr<webrtc::LocalAudioTrackInterface>& pTrack);
-        ~LocalAudioTrack() { }        
+        ~LocalAudioTrack() { }
     };
     
     class RemoteVideoTrack : public MediaStreamTrack

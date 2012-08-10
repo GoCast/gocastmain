@@ -68,10 +68,10 @@
 var Callcast = {
     PLUGIN_VERSION_CURRENT: 0.0,
     PLUGIN_VERSION_REQUIRED: 0.0,
-    PLUGIN_VERSION_CURRENT_MAC: 1.25,
-    PLUGIN_VERSION_REQUIRED_MAC: 1.25,
-    PLUGIN_VERSION_CURRENT_WIN: 1.25,
-    PLUGIN_VERSION_REQUIRED_WIN: 1.25,
+    PLUGIN_VERSION_CURRENT_MAC: 1.26,
+    PLUGIN_VERSION_REQUIRED_MAC: 1.26,
+    PLUGIN_VERSION_CURRENT_WIN: 1.26,
+    PLUGIN_VERSION_REQUIRED_WIN: 1.26,
     PLUGIN_VERSION_CURRENT_LINUX: 1.21,
     PLUGIN_VERSION_REQUIRED_LINUX: 1.21,
     PLUGIN_DOWNLOAD_URL: 'http://video.gocast.it/plugin.html',
@@ -1865,6 +1865,13 @@ var Callcast = {
     },
 
     conn_callback_reconnect: function(status, err) {
+
+        if (err === 'item-not-found') {
+            console.log('Post-Reconnect conn_callback: BOSH responded with item-not-found. Connection is invalid now.');
+            Callcast.connect(Callcast.CALLCAST_XMPPSERVER, '');
+            return;
+        }
+
         if (err) {
             console.log('Post-Reconnect conn_callback. Status: ' + status + ' Err:', err);
         }
@@ -1876,6 +1883,12 @@ var Callcast = {
     },
 
     conn_callback: function(status, err) {
+        if (err === 'item-not-found') {
+            console.log('Orig conn_callback: BOSH responded with item-not-found. Connection is invalid now.');
+            Callcast.connect(Callcast.CALLCAST_XMPPSERVER, '');
+            return;
+        }
+
         if (err) {
             console.log('Orig conn_callback. Status: ' + status + ' Err:', err);
         }
@@ -2005,7 +2018,7 @@ var Callcast = {
         {
             this.disconnect();
             this.reset();
-            delete this.connection;
+            this.connection = null;
         }
 
         this.connection = new Strophe.Connection(boshconn);
