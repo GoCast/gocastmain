@@ -70,6 +70,13 @@
 						var camera = document.getElementById("localVideo").videoinopts["default"];
 						console.log("getUserMediaSuccess: ", stream);
 						localStream = stream;
+						var checkVol = GoCastJS.SetSpkVolListener(
+							600,
+							document.getElementById("localVideo"),
+							function(newVolume) {
+								console.log("New Volume: " + newVolume);
+							}
+						);
 						var check = GoCastJS.SetVideoDevicesChangedListener(
 							1000,
 							document.getElementById("localVideo"),
@@ -80,6 +87,7 @@
 								if(0 <= devicesRemoved.indexOf(camera) ||
 								   camera !== document.getElementById("localVideo").videoinopts["default"]) {
 									clearInterval(check);
+									clearInterval(checkVol);
 									peerConn.Deinit();
 									document.getElementById("localVideo").deinit();
 									onLocalPlayerLoaded();

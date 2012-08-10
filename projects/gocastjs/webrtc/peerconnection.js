@@ -1,6 +1,14 @@
 var GoCastJS = ('undefined' !== typeof(GoCastJS)) ? GoCastJS : {};
 GoCastJS = (null !== GoCastJS) ? GoCastJS : {};
 
+GoCastJS.Video = {
+    devices: []
+};
+
+GoCastJS.Audio = {
+    spkVol: 256
+};
+
 //!
 //! constructor: GoCastJS.Exception(pluginId, message)
 //!
@@ -142,14 +150,11 @@ GoCastJS.getUserMedia = function(options, success, failure) {
 GoCastJS.SetSpkVolListener = function(volCheckInterval,
                                       localplayer,
                                       onSpkVolChanged) {
-    //Inited to 256 (range is [0-255]) in order to always trigger
-    // the callback on the first access to localplayer.volume
-    var spkVol = 256;
-
+    
     return setInterval(function() {
-        if (spkVol !== localplayer.volume) {
-            spkVol = localplayer.volume;
-            onSpkVolChanged(spkVol);
+        if (GoCastJS.Audio.spkVol !== localplayer.volume) {
+            GoCastJS.Audio.spkVol = localplayer.volume;
+            onSpkVolChanged(GoCastJS.Audio.spkVol);
         }
     }, volCheckInterval);
 };
@@ -157,37 +162,35 @@ GoCastJS.SetSpkVolListener = function(volCheckInterval,
 GoCastJS.SetVideoDevicesChangedListener = function(checkInterval,
                                                    localplayer,
                                                    onChanged) {
-    var videoDevices = [];
-    var videoInOpts = localplayer.videoinopts;
-
-    for (i in videoInOpts) {
-        videoDevices.push(i);
+    for (i in localplayer.videoinopts) {
+        GoCastJS.Video.devices.push(i);
     }
 
     return setInterval(function() {
-        var videoOptions = localplayer.videoinopts;
         var devicesAdded = [];
         var devicesDeleted = [];
         var i = 0;
 
         // Check for newly added devices
-        for (i=0; i<videoDevices.length; i++) {
-            if ('undefined' === typeof(videoOptions[videoDevices[i]])) {
-                devicesDeleted.push(videoDevices[i]);
+        for (i=0; i<GoCastJS.Video.devices.length; i++) {
+            if ('undefined' === typeof(
+                    localplayer.videoinopts[GoCastJS.Video.devices[i]]
+                )) {
+                devicesDeleted.push(GoCast.Video.devices[i]);
             }
         }
 
         // Check for newly deleted devices
-        for(j in videoOptions) {
-            if (-1 === videoDevices.indexOf(j)) {
+        for(j in localplayer.videoinopts) {
+            if (-1 === GoCastJS.Video.devices.indexOf(j)) {
                 devicesAdded.push(j);
             }
         }
 
         // Refresh the current devices list
-        videoDevices = [];
-        for(j in videoOptions) {
-            videoDevices.push(j);
+        GoCastJS.Video.devices = [];
+        for(j in localplayer.videoinopts) {
+            GoCastJS.Video.devices.push(j);
         }
 
         // Call callback if device list has changed
