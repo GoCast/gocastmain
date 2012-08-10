@@ -148,7 +148,7 @@ GoCastJS.SetSpkVolListener = function(volCheckInterval,
     return setInterval(function() {
         if (spkVol !== localplayer.volume) {
             spkVol = localplayer.volume;
-            onSpkVolChanged();
+            onSpkVolChanged(spkVol);
         }
     }, volCheckInterval);
 };

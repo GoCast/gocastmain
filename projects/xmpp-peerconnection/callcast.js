@@ -68,10 +68,10 @@
 var Callcast = {
     PLUGIN_VERSION_CURRENT: 0.0,
     PLUGIN_VERSION_REQUIRED: 0.0,
-    PLUGIN_VERSION_CURRENT_MAC: 1.24,
-    PLUGIN_VERSION_REQUIRED_MAC: 1.24,
-    PLUGIN_VERSION_CURRENT_WIN: 1.24,
-    PLUGIN_VERSION_REQUIRED_WIN: 1.24,
+    PLUGIN_VERSION_CURRENT_MAC: 1.25,
+    PLUGIN_VERSION_REQUIRED_MAC: 1.25,
+    PLUGIN_VERSION_CURRENT_WIN: 1.25,
+    PLUGIN_VERSION_REQUIRED_WIN: 1.25,
     PLUGIN_VERSION_CURRENT_LINUX: 1.21,
     PLUGIN_VERSION_REQUIRED_LINUX: 1.21,
     PLUGIN_DOWNLOAD_URL: 'http://video.gocast.it/plugin.html',
@@ -94,8 +94,10 @@ var Callcast = {
     Callback_AddCarouselContent: null,
     Callback_RemoveCarouselContent: null,
     Callback_ReadyState: null,
+    Callback_ConnectionStatus: null,
     connection: null,
     localplayer: null,
+    localplayerLoaded: false,
     participants: {},
     room: '',
     roomjid: '',
@@ -190,6 +192,10 @@ var Callcast = {
 
     setCallbackForRemoveCarouselContent: function(cb) {
         this.Callback_RemoveCarouselContent = cb;
+    },
+
+    setCallbackForCallback_ConnectionStatus: function(cb) {
+        this.Callback_ConnectionStatus = cb;
     },
 
     //
@@ -626,6 +632,7 @@ var Callcast = {
                     this.peer_connection.Deinit();
                     this.peer_connection = null;
                 }
+
                 // Create a true PeerConnection object and attach it to the DOM.
                 this.peer_connection = new GoCastJS.PeerConnection(
                         new GoCastJS.PeerConnectionOptions(
@@ -669,21 +676,6 @@ var Callcast = {
                 console.log('EXCEPTION: ', e.toString(), e);
             }
         };
-
-/*                        if (Callcast.participants[nick].CallState === Callcast.CallStates.NONE)
-                        {
-                            offer = $msg({to: callback_jid, type: 'chat'}).c('initiating', {xmlns: Callcast.NS_CALLCAST}).t(callback_msg);
-                            console.log('Sending initiation message to peer...');
-                            Callcast.connection.send(offer);
-                            Callcast.participants[nick].CallState = Callcast.CallStates.AWAITING_RESPONSE;
-                        }
-                        else
-                        {
-                            offer = $msg({to: callback_jid, type: 'chat'}).c('signaling', {xmlns: Callcast.NS_CALLCAST}).t(callback_msg);
-                            console.log('Sending other (candidates) message to peer...');
-                            Callcast.connection.send(offer);
-                        }
-                        */
 
         this.InitiateCall = function() {
             var sdp,
@@ -867,12 +859,9 @@ var Callcast = {
             {
                 console.log('Dropping call for ' + this.jid);
                 this.peer_connection = null;
+            }
 
-                this.RemovePlugin();
-            }
-            else {
-                console.log('Dropping FAILED. Cant find peer_connection (or self)');
-            }
+            this.RemovePlugin();
         };
 
         if (Callcast.Callback_AddPlugin) {
@@ -1902,11 +1891,20 @@ var Callcast = {
          if (status === Strophe.Status.CONNECTED) {
              console.log('XMPP/Strophe Finalizing connection and then triggering connected...');
              Callcast.finalizeConnect();
+             if (Callcast.Callback_ConnectionStatus) {
+                Callcast.Callback_ConnectionStatus('Connected');
+             }
              $(document).trigger('connected');
          } else if (status === Strophe.Status.AUTHENTICATING) {
              console.log('XMPP/Strophe Authenticating...');
+             if (Callcast.Callback_ConnectionStatus) {
+                Callcast.Callback_ConnectionStatus('Authenticating');
+             }
          } else if (status === Strophe.Status.CONNECTING) {
              console.log('XMPP/Strophe Connecting...');
+             if (Callcast.Callback_ConnectionStatus) {
+                Callcast.Callback_ConnectionStatus('Connecting');
+             }
          } else if (status === Strophe.Status.ATTACHED) {
              console.log('XMPP/Strophe Re-Attach of connection successful. Triggering re-attached...');
             // Determine if we're in a 'refresh' situation and if so, then re-attach.
@@ -1923,16 +1921,29 @@ var Callcast = {
                  Callcast.finalizeConnect();
                  $(document).trigger('re-attached');
                  $(document).trigger('connected');
+                 if (Callcast.Callback_ConnectionStatus) {
+                    Callcast.Callback_ConnectionStatus('Re-Attached');
+                 }
+
              }, 500);
          } else if (status === Strophe.Status.DISCONNECTED) {
              console.log('XMPP/Strophe Disconnected.');
              Callcast.disconnect();
              $(document).trigger('disconnected');
+             if (Callcast.Callback_ConnectionStatus) {
+                Callcast.Callback_ConnectionStatus('Disconnected');
+             }
          } else if (status === Strophe.Status.DISCONNECTING) {
              console.log('XMPP/Strophe is Dis-Connecting...should we try to re-attach here? TODO:RMW');
+             if (Callcast.Callback_ConnectionStatus) {
+                Callcast.Callback_ConnectionStatus('Disconnecting');
+             }
          } else if (status === Strophe.Status.CONNFAIL) {
              console.log('XMPP/Strophe reported connection failure...attempt to re-attach...');
              console.log('-- Not actually doing anything here yet. TODO: RMW');
+             if (Callcast.Callback_ConnectionStatus) {
+                Callcast.Callback_ConnectionStatus('Connection failed');
+             }
 // RMW: In theory we are supposed to advance RID by one, but Chrome fails it while Firefox is ok. Sigh. No advancing...
 //               Callcast.reattach(Callcast.connection.jid, Callcast.connection.sid, new Number(Callcast.connection.rid) + 1, Callcast.conn_callback);
 
@@ -1945,10 +1956,16 @@ var Callcast = {
          } else if (status === Strophe.Status.AUTHFAIL) {
              Callcast.disconnect();
              $(document).trigger('disconnected');
+             if (Callcast.Callback_ConnectionStatus) {
+                Callcast.Callback_ConnectionStatus('Disconnected');
+             }
              alert('XMPP/Strophe Authentication failed. Bad password or username.');
          }
          else {
             console.log('XMPP/Strophe connection callback - unhandled status = ' + status);
+             if (Callcast.Callback_ConnectionStatus) {
+                Callcast.Callback_ConnectionStatus('Unknown status');
+             }
          }
     },
 

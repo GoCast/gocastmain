@@ -17,16 +17,17 @@
  */
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
-/*jslint browser: true, debug: true */
-'use strict';
+/*jslint browser: true, debug: true devel: true*/
+/*global Callcast, app, jQuery, getUrlInfo */
+'use strict'; // jslint waiver
 
 /*
  * jQuery Extension. */
 (function($) {
 
-    /// Item object.  A wrapper object for items within the carousel.
-    var Item = function(objIn, options)
-    {
+  /// Item object.  A wrapper object for items within the carousel.
+  var Item = function(objIn, options, dummy)
+  {
     this.orgWidth = $(objIn).width();
     this.orgHeight = $(objIn).height();
     this.orgFontSize = parseInt($(objIn).css('font-size'), 10);
@@ -34,128 +35,136 @@
     this.plgOrgHeight = (this.plgOrgWidth / Callcast.WIDTH) * Callcast.HEIGHT;
     this.object = objIn;
     this.options = options;
+    this.dummy = dummy;
     this.objectOK = true;
-    $(this.object).css('position', 'absolute');
-    // add controls
-    this.addControls();
-    // add handlers
-    $(this.object).mouseover(function(event)
-        {
+    if (!dummy) // when dummy is set this object does not update the dom object
+    {
+      //console.log("item decorating object", objIn);
+      $(this.object).css('position', 'absolute');
+      // add controls
+      this.addControls();
+      // add handlers
+      $(this.object).mouseover(function(event)
+      {
         // only show close icon on unoccupied or content spots
         if ($(this).hasClass('unoccupied') || $(this).hasClass('typeContent'))
         {
-        $('.control', this).css('visibility', 'visible');
+          $('.zoom', this).css('visibility', 'visible');
+          $('.close', this).css('visibility', 'visible');
         }
-    });
-    $(this.object).mouseout(function(event)
-    {
+      });
+      $(this.object).mouseout(function(event)
+      {
         $('.control', this).css('visibility', 'hidden');
-    });
-    }; /* Item object */
+      });
+    }
+  }; /* Item object */
 
-    Item.prototype.updateSize = function(item)
-    {
-        this.orgWidth = item.orgWidth;
-        this.orgHeight = item.orgHeight;
-        this.plgOrgWidth = item.plgOrgWidth;
-        this.plgOrgHeight = item.plgOrgHeight;
-    };
-    Item.prototype.addControls = function() // add controls to spot
-    {
-       $(this.object).append('<img class="zoom control" src="images/fullscreen.png" alt="Zoom" title="Zoom" onclick="carouselItemZoom(event);"/>');
-       $(this.object).append('<img class="close control" src="images/trash.png" alt="Close" title="Close" />');
-    };
+  Item.prototype.updateSize = function(item)
+  {
+      this.orgWidth = item.orgWidth;
+      this.orgHeight = item.orgHeight;
+      this.plgOrgWidth = item.plgOrgWidth;
+      this.plgOrgHeight = item.plgOrgHeight;
+  };
+  Item.prototype.addControls = function() // add controls to spot
+  {
+     $(this.object).append('<img class="zoom control" src="images/fullscreen.png" alt="Zoom" title="Zoom" onclick="carouselItemZoom(event);"/>');
+     $(this.object).append('<img class="close control" src="images/trash.png" alt="Close" title="Close" onclick="onSpotClose(event);"/>');
+  };
 
-    /// \brief a numerically ordered collection of Item with insert an delete
-    var Items = function()
-    {
+  /// \brief a numerically ordered collection of Item with insert an delete
+  var Items = function() // jslint waiver
+  {
     this.vals = {}; // assoc array
     this.keys = []; // array of sorted keys
-    this.bySpot = []; // array of indexes by spotNumber
-    };
-    Items.prototype.set = function(index, item)
+    this.bySpot = []; // array of indexes by spotnumber
+  };
+  Items.prototype.set = function(index, item)
+  {
+    this.vals[index] = item; // insert item in assoc array
+    if (item.spotnumber)     // index by spotnumber
     {
-        this.vals[index] = item; // insert item in assoc array
-        if (item.spotNumber)     // index by spotNumber
-        {
-           this.bySpot[item.spotNumber] = item.index;
-        }
-        this.updateKeys();       // sort items
-    };
-    Items.prototype.get = function(index)
+       this.bySpot[item.spotnumber] = item.index;
+    }
+    this.updateKeys();       // sort items
+  };
+  Items.prototype.get = function(index)
+  {
+    //todo check that index is numeric
+    return this.vals[index];
+  };
+  Items.prototype.getByspotnumber = function(spotnumber)
+  {
+    //todo check that index is numeric
+    var spot = parseInt(spotnumber, 10),
+        index = this.bySpot[spot];
+    return index ? this.vals[index] : null;
+  };
+  Items.prototype.remove = function(index)
+  {
+    //todo check that index is numeric
+    delete this.vals[index];
+    this.updateKeys();
+  };
+  Items.prototype.getLength = function()
+  {
+    return this.keys.length;
+  };
+  Items.prototype.updateKeys = function()
+  {
+    var key;
+    this.keys = [];
+    for (key in this.vals)
     {
-        //todo check that index is numeric
-        return this.vals[index];
-    };
-    Items.prototype.getBySpotNumber = function(spotNumber)
+      if (this.vals.hasOwnProperty(key)) {
+         this.keys.push(key);
+      }
+    }
+    // sort numeric ascending
+    this.keys.sort(function(a, b) {return a - b;});
+  };
+  Items.prototype.iterateSorted = function(worker)
+  {
+    var i;
+    for (i = 0; i < this.keys.length; i += 1)
     {
-        //todo check that index is numeric
-        var spot = parseInt(spotNumber, 10),
-            index = this.bySpot[spot];
-        return index ? this.vals[index] : null;
-    };
-    Items.prototype.remove = function(index)
+        worker(this.vals[this.keys[i]]);
+    }
+  };
+  // get an index for an item to be added
+  // which is the highest element index incremented
+  Items.prototype.getNewIndex = function()
+  {
+    // keys are sorted so last element is greatest
+    if (this.keys.length === 0)
     {
-        //todo check that index is numeric
-        delete this.vals[index];
-        this.updateKeys();
-    };
-    Items.prototype.getLength = function()
-    {
-        return this.keys.length;
-    };
-    Items.prototype.updateKeys = function()
-    {
-        var key;
-        this.keys = [];
-        for (key in this.vals)
-        {
-            if (this.vals.hasOwnProperty(key)) {
-               this.keys.push(key);
-            }
-        }
-        // sort numeric ascending
-        this.keys.sort(function(a, b) {return a - b;});
-    };
-    Items.prototype.iterateSorted = function(worker)
-    {
-        var i;
-        for (i = 0; i < this.keys.length; i += 1)
-        {
-            worker(this.vals[this.keys[i]]);
-        }
-    };
-    // get an index for an item to be added
-    // which is the highest element index incremented
-    Items.prototype.getNewIndex = function()
-    {   // keys are sorted so last element is greatest
-        if (this.keys.length === 0)
-        {
-           return 0;
-        }
+       return 0;
+    }
 
-       var last = this.keys[this.keys.length - 1];
-       return parseInt(last, 10) + 1;
-     };
-     // add an item to the list
-     // assign an index to it that is <highest index> + 1
-     Items.prototype.addItem = function(item)
-     {
-         item.index = this.getNewIndex();
-         this.set(item.index, item);
-     };
-     // call item.updateSize on all items
-     Items.prototype.updateItemSizes = function(newItem)
-     {
-         this.iterateSorted(function(item)
-         {
-            item.updateSize(newItem);
-         });
-     };
-    /*
-     * Controller object. This handles moving all the items and dealing
-     * with mouse events. */
-    var Controller = function(container, objects, options) {
+    var last = this.keys[this.keys.length - 1];
+    return parseInt(last, 10) + 1;
+  };
+  // add an item to the list
+  // assign an index to it that is <highest index> + 1
+  Items.prototype.addItem = function(item)
+  {
+    item.index = this.getNewIndex();
+    this.set(item.index, item);
+  };
+  // call item.updateSize on all items
+  Items.prototype.updateItemSizes = function(newItem)
+  {
+    this.iterateSorted(function(item)
+    {
+      item.updateSize(newItem);
+    });
+  };
+  ///
+  /// \brief Controller object. This handles moving all the items and dealing
+  /// with mouse events.
+  ///
+  var Controller = function(container, objects, options) { // jslint waiver
     var funcSin = Math.sin, funcCos = Math.cos, ctx = this,
         item, // an extra item to store scales since items can be removed from items list
         items = new Items(); // collection of items by index with sorted iteration
@@ -314,7 +323,7 @@
             else
             {
                 nick = $(obj).attr('encname');
-                if (nick && Callcast.participants[nick].videoOn)
+                if (nick && Callcast.participants[nick] && Callcast.participants[nick].videoOn)
                 {
                     Callcast.ShowRemoteVideo({nick: nick, width: w, height: h});
                 }
@@ -323,7 +332,7 @@
 
             $(obj).find('div.name').css('font-size', (item.orgFontSize * scale) + px);
             // >>0 = Math.foor(). Firefox doesn't like fractional decimals in z-index.
-            obj.style.zIndex = '' + (scale * 100) >> 0;
+            obj.style.zIndex = "" + ((scale * 100) >> 0); // jslint wiaver
         }
     };
     ///
@@ -431,7 +440,7 @@
 
             $(obj).find('div.name').css('font-size', (item.orgFontSize * scale) + px);
             // >>0 = Math.foor(). Firefox doesn't like fractional decimals in z-index.
-            obj.style.zIndex = '' + (scale * 100) >> 0;
+            obj.style.zIndex = '' + (scale * 100) >> 0; // jslint wiaver
         }
         radians += spacing;
         }); /* end loop. */
@@ -477,7 +486,7 @@
         fraction = (((Math.PI / 2) + this.rotation) % (2 * Math.PI)) / (2 * Math.PI);
         xMax = ((spotWidth + spotSpace) * nItems);
         x = fraction * xMax;
-            //app.log(2, "updateLinear frontIndex " + this.frontIndex + " rotation " + this.rotation + " fraction " + fraction + " x " + x + " xMax " + xMax);
+        //app.log(2, "updateLinear frontIndex " + this.frontIndex + " rotation " + this.rotation + " fraction " + fraction + " x " + x + " xMax " + xMax);
         items.iterateSorted(function(item)
         {
            obj = item.object;
@@ -501,172 +510,65 @@
             // If perceivable change in rotation then loop again next frame.
         if (absChange >= 0.001)
         {
-            this.controlTimer = setTimeout(function()
-            {
-                ctx.updateAll();
-            }, this.timeDelay);
+          this.controlTimer = setTimeout(function()
+          {
+              ctx.updateAll();
+          }, this.timeDelay);
         }
         else
         {
-        // Otherwise just stop completely.
-            this.stop();
+          // Otherwise just stop completely.
+          this.stop();
         }
     };
 
     this.isRound = function() /// \return true display round carousel false display linear carousel
     {
-       return this.round;
+      return this.round;
     };
 
     this.updateAll = function()
     {
-       if (this.isRound())
-       {
-          this.updateRound();
-       }
-       else
-       {
-          this.updateLinear();
-       }
-    };
-    this.doSpot = function(spotDiv, info) // perform action defined in info to spot
-    {
-       console.log('doSpot', info);
-       console.log('spotDiv', spotDiv);
-       //if (info.spotType)
-       if (info.spottype)
-       {
-          //if (info.spotType == 'youtube')
-          if (info.spottype === 'youtube')
-          {
-             console.log('doSpot youtube');
-             loadVideo(spotDiv, info);
-          }
-       }
-       // ... other spot commands
+      if (this.isRound())
+      {
+        this.updateRound();
+      }
+      else
+      {
+        this.updateLinear();
+      }
     };
     this.createSpot = function(info) // create a new spot
     {
-       // add the html
-       var newDiv = $('<div class="cloudcarousel unoccupied" onclick="carouselItemClick(event);"><div class="name"></div></div>'),
-       item = new Item(newDiv[0], options);
-       $(this.innerWrapper).append(newDiv);
-       item.updateSize(this.item);
-       if (info) // info will be null when spots are created for remote video
-       {
-          item.spotNumber = info.spotnumber;
-       }
-       newDiv.data('item', item);
-       items.addItem(item);
-       this.setupItem(item);
-       return newDiv;
+      // add the html
+      var newDiv = $('<div class="cloudcarousel unoccupied" onclick="carouselItemClick(event);"><div class="name"></div></div>'),
+      item = new Item(newDiv[0], options, false);
+      $(this.innerWrapper).append(newDiv);
+      item.updateSize(this.item);
+      if (info) // info will be null when spots are created for remote video
+      {
+        item.spotnumber = info.spotnumber;
+      }
+      newDiv.data('item', item);
+      items.addItem(item);
+      return newDiv;
     };
-    this.addSpotCb = function(info) // add spot callcast callback
+    /// \brief get item by spot number
+    this.getByspotnumber = function(number)
     {
-       console.log('addSpotCb', info);
-       var spotDiv, // the desired spot to be replaced or added
-           div, divs;
-       // determine cmd type, add or replace
-       //if (info.spotReplace) // see if there is a spotReplace prop
-       if (info.spotreplace) // see if there is a spotReplace prop
-       {
-          // if there is a nodup prop == 1 and spot with spotId exists
-          // don't replace
-          //if (info.nodup && info.nodup == 1 && info.spotDivId)
-          if (info.spotnodup && info.spotnodup === 1 && info.spotdivid)
-          {
-             //var div = $('#meeting > #streams > #scarousel #' + info.spotDivId);
-             div = $('#meeting > #streams > #scarousel #' + info.spotdivid);
-             if (div.length > 0)
-             {
-                return; // spot with id exists so we're done
-             }
-          }
-          divs = $('#meeting > #streams > #scarousel div.unoccupied');
-          if (divs.length === 0) // no unoc spots to replace, create one
-          {
-             spotDiv = this.createSpot(info);
-          }
-          else // replace spot
-          {
-             //if (info.spotReplace === "first-unoc") // replace first unoc spot
-             if (info.spotreplace === 'first-unoc') // replace first unoc spot
-             {
-                spotDiv = $(divs).get(0);
-             }
-             //else if (info.spotReplace === "last-unoc")
-             else if (info.spotreplace === 'last-unoc')
-             {
-                spotDiv = $(divs).get(divs.length - 1);
-             }
-          }
-          item = $(spotDiv).data('item');
-          if (spotDiv && item)
-          {
-             item.spotNumber = info.spotnumber;
-          }
-          else
-          {
-             app.log(5, 'addSpotCb problem with spot replace');
-          }
-       }
-       else // new spot
-       {
-          spotDiv = this.createSpot(info);
-       }
-       this.doSpot(spotDiv, info);
-       this.updateAll(); // redraw carousel
+      return items.getByspotnumber(number);
     };
-
-    this.removeSpotCb = function(info) // remove spot callcast callback
+    /// \brief set the spot number for an existing spot
+    this.setSpotNumber = function(item, number)
     {
-       // todo refactor this out of carousel
-       var item = items.getBySpotNumber(info.spotnumber),
-           spot = parseInt(info.spotnumber, 10),
-           zoomedSpot, zoomedItem;
-       if (!item) // item by spot number is not in carousel
-       {
-          // try zoomed spot
-          zoomedSpot = $('#meeting > #zoom > .cloudcarousel');
-          if (zoomedSpot.length === 1)
-          {
-             zoomedItem = $(zoomedSpot).data('item');
-             if (zoomedItem.spotNumber) // zoomed spot has spotNumber
-             {
-                if (zoomedItem.spotNumber === info.spotnumber)
-                {
-                   item = zoomedItem;
-                }
-            }
-            else if (zoomedItem.index === info.spotnumber)
-            {
-               item = zoomedItem;
-            }
-            // unzoom
-            if (item)
-            {
-               carouselItemUnzoom();
-            }
-          }
-          else
-          {
-             item = items.get(spot);
-          }
-       }
-
-       if (item)
-       {
-          $(item.object).remove();
-          items.remove(item.index);
-          this.updateAll();
-       }
-       else
-       {
-          app.log(4, 'item ' + info.spotnumber + ' not found');
-          console.log('info', info);
-       }
+      item.spotnumber = number;
+      items.set(item.index, item);
     };
-
+    /// \brief get an item from items by index
+    this.getByIndex = function(index)
+    {
+      return items.get(index);
+    };
     /// \brief remove a spot from items
     this.remove = function(index)
     {
@@ -682,20 +584,6 @@
        items.set(item.index, item);
     };
 
-    this.setupItem = function(item) // setup newly added item
-    {
-        $('.close', item.object).click(function(event)
-        {
-            if (event) {
-                event.stopPropagation();
-            }
-            var jqDiv = $(this).parent(),
-                item = jqDiv.data('item');
-
-            console.log('removing', jqDiv);
-            Callcast.RemoveSpot({spotNumber: item.spotNumber || item.index});
-        });
-    };
     /*
      * Object Loaded.  Check if objects have loaded. Valid widths and
      * heights needed. */
@@ -713,15 +601,14 @@
         app.log(2, 'checkObjectsLoaded done');
         for (i = 0; i < objects.length; i += 1)
         {  // create and setup item
-            item = new Item(objects[i], options);
+            item = new Item(objects[i], options, false);
             items.addItem(item);
-            this.setupItem(item);
             $(objects[i]).data('item', item);
         } // for loop
         // save the storage item
         if (objects.length > 0)
-        {  // construct a new object, todo this is too much because it sets css, handlers
-           this.item = new Item(objects[0], options);
+        {
+           this.item = new Item(objects[0], options, true);
         }
         // document layout seems to be done at this point so resize carousel
         // todo find better place for this
@@ -756,8 +643,8 @@
         this.item.plgOrgWidth *= scale;
         this.item.plgOrgHeight *= scale;
 
-            // update items in list
-            items.updateItemSizes(this.item);
+        // update items in list
+        items.updateItemSizes(this.item);
 
         // change size, todo remove hacks to position carousel correctly
         /*
@@ -781,7 +668,18 @@
         // scale spots
         this.updateAll();
     };
-    }; /* Controller object. */
+    this.getItem = function(index)
+    {
+      if (items.getLength() > index)
+      {
+        return items.get(index);
+      }
+      else
+      {
+        return null;
+      }
+    };
+  }; /* Controller object. */
 
     /*
      * The jQuery plugin part. Iterates through items specified in
@@ -808,4 +706,4 @@
     return this;
     }; /* $.fn.CloudCarousel() */
 
-})(jQuery);
+})(jQuery); // jslint waiver

@@ -29,6 +29,26 @@ a:active
 {
   color: #0000ff;
 }
+/* style scrollbars
+   doesn't work in ff see:
+   https://bugzilla.mozilla.org/show_bug.cgi?id=77790
+*/
+::-webkit-scrollbar 
+{
+  height: 12px;
+  width: 12px;
+  background: transparent;
+}
+::-webkit-scrollbar-thumb 
+{
+  background: #365283;
+  -webkit-border-radius: 1ex;
+  -webkit-box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.75);
+}
+::-webkit-scrollbar-corner 
+{
+  background: transparent;
+}
 body {
   margin: 0;
   padding: 0;  
@@ -47,9 +67,40 @@ body input[type="button"] {
   background-color: transparent;
   background-repeat: no-repeat;
 }
-body > div#lower-right
+body > div#upper-right
 {
    float:right;
+   margin-top: 10px;
+   margin-right: 10px;
+   width:50%;
+   z-index: 1000;
+   line-height: 2em;
+}
+body > div#upper-right > div#volume
+{
+   float:right;
+   margin-right: 10px;
+   width:20px;
+   height:20px;
+   vertical-align: middle;
+   background-image: url("../images/volume-high.png");
+   background-repeat: no-repeat;
+   background-size: 100%;
+   z-index: 1000;
+}
+body > div#upper-right > p#connection-status
+{
+  float:right;
+  margin-right: 10px;
+  margin-top: auto;
+  margin-left: auto;
+  vertical-align: middle;
+  color: white;
+  font-size:11px;
+   z-index: 1000;
+}
+body > div#lower-right
+{
    position:absolute;
    bottom:10px;
    right:10px;
@@ -126,22 +177,35 @@ body > div#lower-left {
   line-height: 2em;
   max-width: 40%
 }
+body > div#lower-left > div#msgBoard
+{
+  display:inline;
+}
 body > div#lower-left > div#msgBoard > div#chatOut
 {
-  display:none;
+  /*position: absolute; */
+  bottom: 2em;
   max-height:125px;
-  min-height: 3em;
+  min-height: 1.1em;
   height: auto;
   width:300px;
-  overflow:auto;
-  line-height: 1em;
+  overflow-y:auto;
+  word-wrap:break-word;
+  font-size:11px;
+  line-height: 1.2em;
+  padding: 3px;
   border-width: 2px;
-  background-color: white;
+  border-color:gray;
   -moz-user-select: text;
   -khtml-user-select: text;
   -webkit-user-select: text;
   -o-user-select: text;
   user-select: text;
+}
+body > div#lower-left > div#msgBoard > div#chatOut > span
+{
+  color: white;
+  /*text-shadow: 0 0 10px gray, 0 0 20px gray, 0 0 30px gray, 0 0 40px #FF00DE, 0 0 70px #FF00DE, 0 0 80px #FF00DE, 0 0 100px #FF00DE, 0 0 150px #FF00DE;*/
 }
 body> div#lower-left > div#msgBoard > div#msgTicker
 {
@@ -154,6 +218,8 @@ body> div#lower-left > div#msgBoard > div#msgTicker
 }
 body> div#lower-left > div#msgBoard > input.chatTo
 {
+  background-color: transparent;
+  color: white;
   width:250px;
 }
 body > div#lower-left > div#msgBoard > input.send {
@@ -190,7 +256,8 @@ body > div#meeting > div#zoom > div.cloudcarousel
   position: absolute;
   background-color: white;
   background-position: center center;
-  background-repeat: no-repeat
+  background-repeat: no-repeat;
+  background-size: 98%;
 }
 body > div#meeting > div#zoom > div.cloudcarousel > .control
 {
@@ -254,11 +321,11 @@ body > div#meeting > div#streams div.cloudcarousel > img.zoom
   margin: 3px;
   position: absolute;
 }
-body > div#meeting > div#streams > div#scarousel div.cloudcarousel.typeContent {
+div.cloudcarousel.typeContent {
   background-size: 98%;
   display: table;
 }
-body > div#meeting > div#streams > div#scarousel div.cloudcarousel.typeContent > div.spotUrlIcon
+div.cloudcarousel.typeContent > div.spotUrlIcon
 {
   position:relative; 
   clear: left;
@@ -271,7 +338,7 @@ body > div#meeting > div#streams > div#scarousel div.cloudcarousel.typeContent >
   margin-right:auto;
   margin-top: 20px;
 }
-body > div#meeting > div#streams > div#scarousel div.cloudcarousel.typeContent > div.spotUrlTitle
+div.cloudcarousel.typeContent > div.spotUrlTitle
 {
   position:relative; 
   clear: left;
