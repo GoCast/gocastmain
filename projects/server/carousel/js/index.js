@@ -24,6 +24,8 @@
  * \brief The main application object.
  */
 var app = {
+  GROUP_CHAT_OUT: '#lower-left > #msgBoard > #chatOut',
+  GROUP_CHAT_IN: '#lower-left > #msgBoard > input.chatTo',
   MAC_DL_URL: 'https://video.gocast.it/downloads/GoCastPlayer.pkg',
   WIN_DL_URL: 'https://video.gocast.it/downloads/GoCastPlayer.msi',
   MAC_PL_NAME: 'GCP.plugin',
@@ -204,14 +206,14 @@ var app = {
         $('#meeting > #streams > #scontrols > input').removeAttr('disabled');
         $('#lower-right > #video').removeAttr('disabled');
         $('#lower-right > #audio').removeAttr('disabled');
-        $('#msgBoard > input').removeAttr('disabled');
+        $(app.GROUP_CHAT_OUT).removeAttr('disabled');
      }
      else
      {
         $('#meeting > #streams > #scontrols > input').attr('disabled', 'disabled');
         $('#lower-right > input.video').attr('disabled', 'disabled');
         $('#lower-right > input.audio').attr('disabled', 'disabled');
-        $('#msgBoard > input').attr('disabled', 'disabled');
+        $(app.GROUP_CHAT_OUT).attr('disabled', 'disabled');
      }
   },
   videoEnabled: false // video enabled state
@@ -231,6 +233,21 @@ function onSpotClose(event)
 
   event.stopPropagation();
 }
+///
+/// \brief global handler for showChat spot button press
+///
+function showPersonalChat(event)
+{
+  var spot = $(event.currentTarget).parent(),
+      item = spot.data('item');
+
+  console.log("showPersonalChat", event);
+  $("#showChat", item.object).css("display", "none"); // hide showChat button
+  $("#msgBoard", item.object).css("display", "block"); // show chat ui
+  $("msgBoard > input.chatTo").focus();
+  event.stopPropagation();
+}
+
 function loadVideo(oo, info)
 {
   var item, playerId, width, height, params, atts;
@@ -440,7 +457,7 @@ function carouselItemClick(event)
   {
     var urlName,
         item;
-    app.log(2, 'carouselItemClick ' + event);
+    console.log('carouselItemClick ', event);
     if (event.currentTarget.className.indexOf('unoccupied') !== -1)
     {
       urlName = prompt('Enter a URL to put in this spot.');
@@ -465,14 +482,6 @@ function carouselItemClick(event)
                             spoturl: urlName
                            });
         }
-
-        /*
-         Callcast.SendURLToRender({
-            id: urlName,
-            altText: urlName,
-            url: urlName
-            });
-        */
       }
     }
     else if (event.currentTarget.title === 'Me')
@@ -484,7 +493,7 @@ function carouselItemClick(event)
       openChat(event);
     }
   } catch(err) {
-    app.log(4, "carouselItemClick error " + err);
+    app.log(4, "carouselItemClick exception " + err);
   }
 } // carouselItemClick
 
@@ -736,6 +745,7 @@ function openMeeting(
   );
   // set the controller instance
   app.carousel = $('#scarousel').data('cloudcarousel');
+  app.carousel.init();
   /*
    * Initialize Gocast events. */
   $(window).on('beforeunload', function() {
@@ -895,6 +905,7 @@ function keypressGrpChatHandler(
 )
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
+  app.log(2, 'keypressGrpChatHandler');
   /*
    * We have no action for key press combinations with the Alt key. */
   if (event.altKey) {
@@ -913,24 +924,15 @@ function keypressGrpChatHandler(
   }
 } /* keypressGrpChatHandler() */
 
-
-
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-/**
- * \brief Action send Group Chat.
- */
-function sendGrpChat(
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-    /**
-     * The event object. */
-  event
-)
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+///
+/// \brief Action send Group Chat.
+///
+function sendGrpChat(event)
 {
   if (event) {
     event.preventDefault();
   }
-  var jqChatText = $('#msgBoard > input.chatTo'),
+  var jqChatText = $(app.GROUP_CHAT_IN),
       ltext = jqChatText.val();
   if (ltext.length < 1) {
     return false;
@@ -939,7 +941,33 @@ function sendGrpChat(
   app.log(2, 'Sending group chat: ' + ltext);
   jqChatText.val('');
   closeWindow();
-} /* sendGrpChat() */
+} // sendGrpChat()
+
+///
+/// \brief Action send personal chat
+///
+function sendPersonalChat(event)
+{
+  try
+  {
+    // div.cloudcarousel > div.msgBoard > input.send handler
+    //var spot = $(event.currentTarget).parent().parent(), // doesnt work returns input element
+    //    text = $("#msgBoard > input.chatTo", spot).val(),
+    //    name = spot.attr("ename");
+    var spot, msg, text, name;
+    msg = event.currentTarget.parentElement;
+    spot = msg.parentElement;
+    text = $("input.chatTo", msg).text();
+    name = $(spot).attr("encname");
+    event.stopPropagation();
+    console.log("sendPersonalChat text " + text + " name " + name, event);
+    if (text.length > 0) {
+      Callcast.SendPrivateChat(encodeURI(text), ename);
+    }
+  } catch (err) {
+    app.log(4, "sendPersonalChat exception " +  err);
+  }
+} // sendPersonalChat()
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
@@ -1551,42 +1579,8 @@ function checkForPlugin(name)
    app.log(2, 'winCheckForPlugin no player, waiting...');
 }
 
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-/**
- * \brief show the chat output div
- *
- * this is called on ticker mouse over
- */
-function showChatOut()
-{
-
-   if ($('#msgBoard > #chatOut').text().length > 0)
-   {
-      // hide the ticker
-      $('#msgTicker').css('display', 'none');
-
-      // show chatOut
-      $('#msgBoard > #chatOut').css('display', 'block');
-   }
-
-} // showChatOut
-
-/**
- * \brief show the chat ticker div
- *
- */
-function showMsgTicker()
-{
-   // hide the ticker
-   $('#msgBoard > #chatOut').css('display', 'none');
-
-   // show chatOut
-   $('#msgTicker').css('display', 'block');
-
-} // showChatOut
-
 ///
-/// \brief initialize ui handlers
+/// \brief global key handler
 ///
 function docKey(event)
 {
@@ -1595,7 +1589,7 @@ function docKey(event)
    {
       return;
    }
-   //app.log(2, "key code " + event.which);
+   app.log(2, "key code " + event.which);
 
    switch (event.which || event.keyCode)
    {

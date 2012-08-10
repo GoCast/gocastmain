@@ -136,15 +136,12 @@ $(document).on('public-message', function(
     var notice = msginfo.notice,
         delayed = msginfo.delayed,
         nick_class = msginfo.nick_class,
-        jqChat = $('#msgBoard > #chatOut'),
-        //jqTick = $('#msgBoard > #msgTicker'),
+        jqChat = $(app.GROUP_CHAT_OUT),
         msgTicker,
         msg,
         atBottom,
         msgNumber,
         span;
-    //msgTicker = '<b>' + decodeURI(msginfo.nick) + '</b>' + ': ' +
-    //                 decodeURI(msginfo.body) + ' ';
     if (!jqChat[0]) {throw "no chat out div";}
     msgNumber = jqChat.data('msgNumber'); // get next msgNumber
     msgNumber = msgNumber || 0;           // init if not already
@@ -187,7 +184,6 @@ $(document).on('public-message', function(
          }
         });
     }
-    //jqTick.prepend(msgTicker);
 
     jqChat.data('msgNumber', ++msgNumber); // increment next msg number
     app.log(2, 'A public message arrived ' + msg);
@@ -198,25 +194,17 @@ $(document).on('public-message', function(
   }
 }); // public-message()
 
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-/**
- * \brief Function that modifies the DOM when a private message arrives.
- *        This implements the trigger "private-message".
- */
+///
+/// \brief Function that modifies the DOM when a private message arrives.
+///        This implements the trigger "private-message".
 $(document).on('private-message', function(
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-    /**
-     * Event object. */
-  ev,
-    /**
-     * Message Information Object. */
-  msginfo
+  ev, // event
+  msginfo // * Message Information Object. */
 )
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
   openPersonalChat(msginfo);
   app.log(2, 'A private message arrived.');
-}); /* private-message() */
+}); // private-message()
 
 ///
 /// extract spot info from info object
@@ -255,45 +243,45 @@ function setSpotInfo(info)
 ///
 function setCarouselItemState(info)
 {
-try
-{
-  if (info && info.nick)
+  var id, oo, w, s, h, image;
+  try
   {
-    var id = app.str2id(info.nick),
-        oo = $('#meeting > #streams > #scarousel div.#' + id).get(0),
-        w, s, h, image;
-    if (oo)
-    {  // item found
-       // Check dimensions of wrapper div to correct for video dimensions.
-       if (info.hasVid) {
-           w = $(oo).width() - 4;
-           s = w / Callcast.WIDTH;
-           h = Callcast.HEIGHT * s;
-           info.width = w;
-           info.height = h;
-           app.log(2, 'setCarouselItemState video on user ' + info.nick + ' dim w ' + info.width + ', h ' + info.height);
-           $(oo).css('background-image', ''); // remove any background image
-           Callcast.ShowRemoteVideo(info);
-       }
-       else // if hasVid is null or false turn video off
-       {
-          info.hasVid = false;
-          image = Callcast.participants[info.nick].image;
-          $(oo).css('background-image', image);
-          Callcast.ShowRemoteVideo(info);
-          app.log(2, 'setCarouselItemState video off user ' + info.nick + ' image ' + image);
-       }
-    }
-/*    else
+    if (info && info.nick)
     {
-       //app.log(3, "setCarouselItemState item for " + info.nick + " not found");
-    } */
+      id = app.str2id(info.nick);
+      oo = $('#meeting > #streams > #scarousel div.cloudcarousel#' + id).get(0);
+      if (oo)
+      {  // item found
+         // Check dimensions of wrapper div to correct for video dimensions.
+         if (info.hasVid) {
+             w = $(oo).width() - 4;
+             s = w / Callcast.WIDTH;
+             h = Callcast.HEIGHT * s;
+             info.width = w;
+             info.height = h;
+             app.log(2, 'setCarouselItemState video on user ' + info.nick + ' dim w ' + info.width + ', h ' + info.height);
+             $(oo).css('background-image', ''); // remove any background image
+             Callcast.ShowRemoteVideo(info);
+         }
+         else // if hasVid is null or false turn video off
+         {
+            info.hasVid = false;
+            image = Callcast.participants[info.nick].image;
+            $(oo).css('background-image', image);
+            Callcast.ShowRemoteVideo(info);
+            app.log(2, 'setCarouselItemState video off user ' + info.nick + ' image ' + image);
+         }
+      }
+  /*    else
+      {
+         //app.log(3, "setCarouselItemState item for " + info.nick + " not found");
+      } */
+    }
   }
-}
-catch (err)
-{
-   console.log('setCarouselItemState exception', err);
-}
+  catch (err)
+  {
+     console.log('setCarouselItemState exception', err);
+  }
 }
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
@@ -444,8 +432,8 @@ $(document).on('one-login-complete', function(event, msg) {
     console.log('one-login-complete: opening meeting');
     openMeeting();
 
-        // check, install plugin
-        tryPluginInstall();
+    // check, install plugin
+    tryPluginInstall();
 
   }
 
@@ -536,7 +524,7 @@ function addPluginToCarousel(
     return null;
   }
   // check if nickname already in carousel
-  oo = $('#meeting > #streams > #scarousel div#'+ nickname);
+  oo = $('#meeting > #streams > #scarousel div.cloudcarousel#'+ id);
   if (oo.length > 0)
   {
     app.log(4, "addPluginToCarousel error nickname " + nickname + "already in carousel");
@@ -563,6 +551,7 @@ function addPluginToCarousel(
     $(oo).append('<object id="GocastPlayer' + id + '" type="application/x-gocastplayer" width="' + w + '" height="' + h + '"></object>');
     $('div.name', oo).text(dispname);
     $(oo).removeClass('unoccupied');
+    //$("#showChat", oo).css("display", "block"); // display showChat button
 
     app.log(2, 'Added GocastPlayer' + id + ' object.');
     return $('object#GocastPlayer' + id, oo).get(0);
@@ -589,7 +578,7 @@ function removePluginFromCarousel(nickname)
       app.log(2, "removePluginFromCarousel nickname " + nickname);
       // Get parent object and modify accordingly.
       var id = app.str2id(nickname),
-          jqOo = $('#meeting > #streams > #scarousel div.cloudcarousel#' + id + '"'),
+          jqOo = $('#meeting > #streams > #scarousel div.cloudcarousel#' + id),
           item = $(jqOo).data('item');
       // todo this method is called for all occupied spots
       // fix to call only for spot with id
@@ -767,7 +756,7 @@ function removeContentFromCarousel(
   /*
    * Get parent object and modify accordingly. */
   var id = app.str2id(infoId),
-      jqOo = $('#meeting > #streams > #scarousel div.cloudcarousel#' + id + '"');
+      jqOo = $('#meeting > #streams > #scarousel div.cloudcarousel#' + id);
   jqOo.addClass('unoccupied').removeClass('typeContent');
   jqOo.removeAttr('id');
   jqOo.removeAttr('title');
@@ -1054,6 +1043,35 @@ function connectionStatus(statusStr)
    $("#upper-right > #connection-status").text(statusStr);
 }
 
+///
+/// \brief show local speaker status
+///
+function setLocalSpeakerStatus(vol)
+{
+  // set image based on volume
+  var img, div = $("#upper-right > div#volume");
+  console.log("speaker volume " + vol);
+  if (vol <= 0) // mute, if vol == -1 display mute symbol since sound's probably not getting out or in
+  {
+     img = 'url("images/volume-muted.png")';
+     div.css("background-image", img);
+  }
+  else if (vol < 255/3)
+  {
+     img = 'url("images/volume-low.png")';
+     div.css("background-image", img);
+  }
+  else if (vol < 2*255/3)
+  {
+     img = 'url("images/volume-medium.png")';
+     div.css("background-image", img);
+  }
+  else
+  {
+     img = 'url("images/volume-high.png")';
+     div.css("background-image", img);
+  }
+}
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
  * \brief Function called when LOCAL Gocast.it plugin object is loaded.
@@ -1102,32 +1120,7 @@ function pluginLoaded(
         checkForPluginOptionalUpgrades(); // display upgrade button if there are optional upgrades
 
         // set the speaker volume status callback
-        GoCastJS.SetSpkVolListener(1000, Callcast.localplayer, function(vol)
-        {
-          // set image based on volume
-          var img, div = $("#upper-right > div#volume");
-          console.log("speaker volume " + vol);
-          if (vol <= 0) // mute, if vol == -1 display mute symbol since sound's probably not getting out or in
-          {
-             img = 'url("images/volume-muted.png")';
-             div.css("background-image", img);
-          }
-          else if (vol < 255/3)
-          {
-             img = 'url("images/volume-low.png")';
-             div.css("background-image", img);
-          }
-          else if (vol < 2*255/3)
-          {
-             img = 'url("images/volume-medium.png")';
-             div.css("background-image", img);
-          }
-          else
-          {
-             img = 'url("images/volume-high.png")';
-             div.css("background-image", img);
-          }
-        });
+        GoCastJS.SetSpkVolListener(1000, Callcast.localplayer, setLocalSpeakerStatus);
 
         handleRoomSetup();
      }, function(message) {

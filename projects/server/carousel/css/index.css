@@ -205,27 +205,23 @@ body > div#lower-left > div#msgBoard > div#chatOut
 body > div#lower-left > div#msgBoard > div#chatOut > span
 {
   color: white;
+  font-size: 14px;
   /*text-shadow: 0 0 10px gray, 0 0 20px gray, 0 0 30px gray, 0 0 40px #FF00DE, 0 0 70px #FF00DE, 0 0 80px #FF00DE, 0 0 100px #FF00DE, 0 0 150px #FF00DE;*/
-}
-body> div#lower-left > div#msgBoard > div#msgTicker
-{
-  height:1.25em;
-  width:auto;
-  overflow:hidden;
-  line-height: 1em;
-  border-width: 2px;
-  background-color: white;
 }
 body> div#lower-left > div#msgBoard > input.chatTo
 {
-  background-color: transparent;
-  color: white;
+  background-color: white;
+  color: black;
+  font-size:14px;
   width:250px;
 }
 body > div#lower-left > div#msgBoard > input.send {
+  /*background-image: url("../images/talk.png");*/
   background-image: url("../images/btn-send.png");
-  width: 50px;
-  height: 22px;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  width: 36px;
+  height: 19px;
 }
 body > div#meeting 
 {
@@ -263,6 +259,30 @@ body > div#meeting > div#zoom > div.cloudcarousel > .control
 {
    display: none;
 }
+div.cloudcarousel > div#msgBoard
+{
+  position: absolute;
+  bottom:22px;
+  display: none;
+}
+div.cloudcarousel > input#showChat
+{
+  position: absolute;
+  bottom:22px;
+  display: none;
+  background-image: url("../images/talk.png");
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  width: 36px;
+  height: 19px;
+}
+div.cloudcarousel > div#msgBoard > input.send {
+  background-image: url("../images/talk.png");
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  width: 36px;
+  height: 19px;
+}
 body > div#meeting > div#streams {
   padding: 10px;
   top: 0px;
@@ -293,10 +313,12 @@ body > div#meeting > div#streams > div#scarousel div#addItem > img
 body > div#meeting > div#streams > div#scarousel div.cloudcarousel {
   width: 300px;
   height: 248px;
+  /*
   transition: opacity 0.5s;
   -moz-transition: opacity 0.5s;
   -webkit-transition: opacity 0.5s;
   -o-transition: opacity 0.5s;
+  */
   border-radius: 6px;
   background-color: #404040;
   background-size: 70%;
@@ -441,7 +463,7 @@ body > div#meeting > div#streams > div#scontrols > input.right {
 #boxes #credentials > p.title {
   margin: 30px 10px 20px 10px;
 }
-#boxes #credentials div#fb-login-button {
+#boxes #credentials div.fb-login-button {
   width: 20em;
   border-radius: 5px;
   margin-left: 10px;
@@ -477,7 +499,7 @@ body > div#meeting > div#streams > div#scontrols > input.right {
   height: 3em;
   margin-left: 10px;
 }
-#boxes #credentials2 div#fb-login-button {
+#boxes #credentials2 div.fb-login-button {
   width: 20em;
   border-radius: 5px;
   margin-left: 10px;
@@ -520,7 +542,7 @@ body > div#meeting > div#streams > div#scontrols > input.right {
   border-radius: 5px;  
 }
 #boxes #chatInp > input.send {
-  background-image: url("../images/btn-send.png");
+  background-image: url("../images/talk.png");
   width: 50px;
   height: 22px;
   border-radius: 8px;

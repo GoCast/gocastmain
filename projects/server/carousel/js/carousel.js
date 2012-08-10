@@ -39,26 +39,11 @@
     this.objectOK = true;
     if (!dummy) // when dummy is set this object does not update the dom object
     {
-      //console.log("item decorating object", objIn);
+      console.log("item decorating object", objIn);
       $(this.object).css('position', 'absolute');
-      // add controls
-      this.addControls();
-      // add handlers
-      $(this.object).mouseover(function(event)
-      {
-        // only show close icon on unoccupied or content spots
-        if ($(this).hasClass('unoccupied') || $(this).hasClass('typeContent'))
-        {
-          $('.zoom', this).css('visibility', 'visible');
-          $('.close', this).css('visibility', 'visible');
-        }
-      });
-      $(this.object).mouseout(function(event)
-      {
-        $('.control', this).css('visibility', 'hidden');
-      });
+      this.addControls(); // add controls
     }
-  }; /* Item object */
+  }; // Item object
 
   Item.prototype.updateSize = function(item)
   {
@@ -69,8 +54,22 @@
   };
   Item.prototype.addControls = function() // add controls to spot
   {
-     $(this.object).append('<img class="zoom control" src="images/fullscreen.png" alt="Zoom" title="Zoom" onclick="carouselItemZoom(event);"/>');
-     $(this.object).append('<img class="close control" src="images/trash.png" alt="Close" title="Close" onclick="onSpotClose(event);"/>');
+    var jqObj = $(this.object);
+    jqObj.append('<img class="zoom control" src="images/fullscreen.png" alt="Zoom" title="Zoom" onclick="carouselItemZoom(event);"/>');
+    jqObj.append('<img class="close control" src="images/trash.png" alt="Close" title="Close" onclick="onSpotClose(event);"/>');
+    jqObj.append('<input id="showChat" type="button" title="Show Chat" onclick="showPersonalChat(event);"/>');
+    jqObj.append('<div id="msgBoard"><div id="chatOut"></div><input class="chatTo" type="text" placeholder="Enter a chat message" onkeydown="keypressGrpChatHandler(event);"/><input class="send" type="button" title="Send chat." onclick="sendPersonalChat(event);"/></div>');
+    // add handlers
+    jqObj.mouseover(function(event) {
+      // only show close icon on unoccupied or content spots
+      if ($(this).hasClass('unoccupied') || $(this).hasClass('typeContent')) {
+        $('.zoom', this).css('visibility', 'visible');
+        $('.close', this).css('visibility', 'visible');
+      }
+    });
+    jqObj.mouseout(function(event) {
+      $('.control', this).css('visibility', 'hidden');
+    });
   };
 
   /// \brief a numerically ordered collection of Item with insert an delete
@@ -617,11 +616,13 @@
         clearInterval(this.tt);
         this.updateAll();
     }; // checkObjectsLoaded()
-    /*
-     * Bootstrapping. */
-    this.tt = setInterval(function() {
-        ctx.checkObjectsLoaded();
-    }, 50);
+    this.init = function()
+    {
+      // Bootstrapping.
+      this.tt = setInterval(function() {
+          ctx.checkObjectsLoaded();
+      }, 50);
+    }
     // resize the carousel keeping the spot proportion
     this.resize = function()
     {
