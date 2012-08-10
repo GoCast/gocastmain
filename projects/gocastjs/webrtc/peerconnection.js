@@ -1,11 +1,22 @@
 var GoCastJS = ('undefined' !== typeof(GoCastJS)) ? GoCastJS : {};
 GoCastJS = (null !== GoCastJS) ? GoCastJS : {};
 
+//!
+//! GoCastJS.Video.devices[]     : array of available video devices (guids)
+//! GoCastJS.Video.captureDevice : current capture device (guid)
+//!
+//! NOTE: these are populated by GoCastJS.SetVideoDevicesChangedListener()
+//!
 GoCastJS.Video = {
     devices: [],
     captureDevice: ''
 };
 
+//!
+//! GoCastJS.Audio.spkVol : current speaker volume
+//!
+//! NOTE: this is populated by GoCastJS.SetSpkVolListener()
+//!
 GoCastJS.Audio = {
     spkVol: 256
 };
@@ -71,10 +82,10 @@ GoCastJS.UserMediaOptions = function(mediaHints, player) {
 //!
 GoCastJS.getUserMedia = function(options, success, failure) {
     GoCastJS.Video.captureDevice = '';
-    
+
     if (false === this.CheckBrowserSupport()) {
         if ('undefined' !== typeof(failure) && null !== failure) {
-            failure('GoCastJS.getUserMedia(): ' + 
+            failure('GoCastJS.getUserMedia(): ' +
                     'This browser not supported yet.');
         }
     } else if (false === this.CheckGoCastPlayer()) {
@@ -88,12 +99,12 @@ GoCastJS.getUserMedia = function(options, success, failure) {
             if ('undefined' === typeof(options.mediaHints.videoin) ||
                 null === options.mediaHints.videoin) {
                 if ('undefined' === typeof(player.videoinopts['default'])) {
-                    failure('GoCastJS.getUserMedia(): ' + 
+                    failure('GoCastJS.getUserMedia(): ' +
                             'No video devices detected');
                     return;
                 } else {
                     options.mediaHints.videoin = player.videoinopts['default'];
-                    console.log('GoCastJS: Choosing default video: ' + 
+                    console.log('GoCastJS: Choosing default video: ' +
                                 player.videoinopts[options.
                                                    mediaHints.
                                                    videoin]);
@@ -147,14 +158,15 @@ GoCastJS.getUserMedia = function(options, success, failure) {
 //!                                      onSpkVolChanged)
 //!
 //! arguments:
-//!     volCheckInterval    <milliseconds> : interval for volume check
-//!     localPlayer         <HtmlObject>   : plugin used for local preview
-//!     onSpkVolChanged     <function()>   : callback for volume change
+//!     volCheckInterval <milliseconds>     : interval for volume check
+//!     localPlayer      <HtmlObject>       : plugin used for local preview
+//!     onSpkVolChanged  <function(newVol)> : callback for volume change
+//!
+//! returns: the setInterval identifier (used to clear interval)
 //!
 GoCastJS.SetSpkVolListener = function(volCheckInterval,
                                       localplayer,
                                       onSpkVolChanged) {
-    
     return setInterval(function() {
         if (GoCastJS.Audio.spkVol !== localplayer.volume) {
             GoCastJS.Audio.spkVol = localplayer.volume;
@@ -163,6 +175,19 @@ GoCastJS.SetSpkVolListener = function(volCheckInterval,
     }, volCheckInterval);
 };
 
+//!
+//! function: GoCastJS.SetVideoDevicesChangedListener(checkInterval,
+//!                                                   localplayer,
+//!                                                   onChanged)
+//!
+//! arguments:
+//!     checkInterval <milliseconds>   : interval for check
+//!     localPlayer   <HtmlObject>     : plugin used for local preview
+//!     oChanged      <function(a, r)> : callback with 'a' (added devices)
+//!                                      and 'r' (removed devices)
+//!
+//! returns: the setInterval identifier (used to clear interval)
+//!
 GoCastJS.SetVideoDevicesChangedListener = function(checkInterval,
                                                    localplayer,
                                                    onChanged) {
@@ -176,7 +201,7 @@ GoCastJS.SetVideoDevicesChangedListener = function(checkInterval,
         var i = 0;
 
         // Check for newly added devices
-        for (i=0; i<GoCastJS.Video.devices.length; i++) {
+        for (i = 0; i < GoCastJS.Video.devices.length; i++) {
             if ('undefined' === typeof(
                     localplayer.videoinopts[GoCastJS.Video.devices[i]]
                 )) {
@@ -185,7 +210,7 @@ GoCastJS.SetVideoDevicesChangedListener = function(checkInterval,
         }
 
         // Check for newly deleted devices
-        for(j in localplayer.videoinopts) {
+        for (j in localplayer.videoinopts) {
             if (-1 === GoCastJS.Video.devices.indexOf(j)) {
                 devicesAdded.push(j);
             }
@@ -193,7 +218,7 @@ GoCastJS.SetVideoDevicesChangedListener = function(checkInterval,
 
         // Refresh the current devices list
         GoCastJS.Video.devices = [];
-        for(j in localplayer.videoinopts) {
+        for (j in localplayer.videoinopts) {
             GoCastJS.Video.devices.push(j);
         }
 
@@ -202,7 +227,7 @@ GoCastJS.SetVideoDevicesChangedListener = function(checkInterval,
             onChanged(devicesAdded, devicesDeleted);
         }
     }, checkInterval);
-}
+};
 
 //!
 //! constructor: GoCastJS.PeerConnectionOptions(iceConfig,
