@@ -58,7 +58,7 @@
     jqObj.append('<img class="zoom control" src="images/fullscreen.png" alt="Zoom" title="Zoom" onclick="carouselItemZoom(event);"/>');
     jqObj.append('<img class="close control" src="images/trash.png" alt="Close" title="Close" onclick="onSpotClose(event);"/>');
     jqObj.append('<input id="showChat" type="button" title="Show Chat" onclick="showPersonalChat(event);"/>');
-    jqObj.append('<div id="msgBoard"><div id="chatOut"></div><input class="chatTo" type="text" placeholder="Enter a chat message" onkeydown="keypressGrpChatHandler(event);"/><input class="send" type="button" title="Send chat." onclick="sendPersonalChat(event);"/></div>');
+    jqObj.append('<div id="msgBoard"><div id="chatOut"></div><input class="chatTo" type="text" placeholder="Enter a chat message" onkeydown="keypressPersonalChatHandler(event);"/><input class="send" type="button" title="Send chat." onclick="sendPersonalChat(event);"/><input class="close" type="button" title="Close" onclick="closePersonalChat(event);"/></div>');
     // add handlers
     jqObj.mouseover(function(event) {
       // only show close icon on unoccupied or content spots
@@ -255,6 +255,7 @@
     }); // onclick()
         */
     /* turn this of because it prevents personal chat input from getting focus
+       todo IE handler below must also be dealt with
     ///
     /// Mousedown on container, it prevents items from being selected
     /// as mouse is moved and clicked in the container.
@@ -625,7 +626,7 @@
       this.tt = setInterval(function() {
           ctx.checkObjectsLoaded();
       }, 50);
-    }
+    };
     // resize the carousel keeping the spot proportion
     this.resize = function()
     {

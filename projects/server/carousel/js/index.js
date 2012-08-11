@@ -244,7 +244,22 @@ function showPersonalChat(event)
   console.log("showPersonalChat", event);
   $("#showChat", item.object).css("display", "none"); // hide showChat button
   $("#msgBoard", item.object).css("display", "block"); // show chat ui
-  $("msgBoard > input.chatTo").focus();
+  $("msgBoard > input.chatTo", item.object).focus();
+  event.stopPropagation();
+}
+
+///
+/// \brief global handler for close personal chat
+///
+function closePersonalChat(event)
+{
+  var msgBoard = $(event.currentTarget).parent(),
+      spot = msgBoard.parent(),
+      item = spot.data('item');
+
+  console.log("closePersonalChat", event);
+  $("#showChat", item.object).css("display", "block"); // hide showChat button
+  $("#msgBoard", item.object).css("display", "none"); // show chat ui
   event.stopPropagation();
 }
 
@@ -893,6 +908,29 @@ function sendChat(
   closeWindow();
 } /* sendChat() */
 
+///
+/// \brief spot personal chat text input keypress handler
+///
+function keypressPersonalChatHandler(event)
+{
+  app.log(2, 'keypressPersonalChatHandler');
+  
+  /// We have no action for key press combinations with the Alt key.
+  if (event.altKey) {
+    return;
+  }
+  // Plain key presses (no Alt or Ctrl key combinations).
+  if (!event.ctrlKey) {
+    switch (event.which || event.keyCode) {
+    case 13:                            /* 'Enter key' */
+      app.log(2, 'Enter key pressed in personal chat handler');
+      event.preventDefault();
+      sendPersonalChat(event);
+      break;
+    } // switch (event.which)
+  }
+}
+
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
  * \brief Keypress for Group Chat handler.
@@ -954,15 +992,17 @@ function sendPersonalChat(event)
     //var spot = $(event.currentTarget).parent().parent(), // doesnt work returns input element
     //    text = $("#msgBoard > input.chatTo", spot).val(),
     //    name = spot.attr("ename");
-    var spot, msg, text, name;
+    var spot, msg, text, name, jqIn;
     msg = event.currentTarget.parentElement;
     spot = msg.parentElement;
-    text = $("input.chatTo", msg).text();
+    jqIn = $("input.chatTo", msg)
+    text = jqIn.val();
     name = $(spot).attr("encname");
     event.stopPropagation();
     console.log("sendPersonalChat text " + text + " name " + name, event);
     if (text.length > 0) {
-      Callcast.SendPrivateChat(encodeURI(text), ename);
+      Callcast.SendPrivateChat(encodeURI(text), name);
+      jqIn.val("");
     }
   } catch (err) {
     app.log(4, "sendPersonalChat exception " +  err);

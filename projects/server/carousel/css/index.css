@@ -283,6 +283,13 @@ div.cloudcarousel > div#msgBoard > input.send {
   width: 36px;
   height: 19px;
 }
+div.cloudcarousel > div#msgBoard > input.close {
+  background-image: url("../images/left-arrow.png");
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  width: 36px;
+  height: 19px;
+}
 body > div#meeting > div#streams {
   padding: 10px;
   top: 0px;

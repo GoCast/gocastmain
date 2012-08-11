@@ -126,6 +126,7 @@ $(document).on('synclink', function(
 ///
 /// \brief Function that modifies the DOM when a public message arrives.
 ///        This implements the trigger "public-message".
+///
 $(document).on('public-message', function(
   ev, // Event object.
   msginfo // Message Information Object.
@@ -202,8 +203,71 @@ $(document).on('private-message', function(
   msginfo // * Message Information Object. */
 )
 {
-  openPersonalChat(msginfo);
-  app.log(2, 'A private message arrived.');
+  try
+  {
+    var id, oo, 
+        jqChat,
+        msg,
+        atBottom,
+        msgNumber,
+        span;
+    app.log(2, 'A private message arrived.');
+    id = app.str2id(msginfo.nick);
+    oo = $('#meeting > #streams > #scarousel div.cloudcarousel#' + id).get(0);
+    if (oo)
+    {
+      jqChat = $("#msgBoard > #chatOut", oo);
+      console.log("jqChat", jqChat);
+      if (!jqChat[0]) {throw "no chat out div";}
+      msgNumber = jqChat.data('msgNumber'); // get next msgNumber
+      msgNumber = msgNumber || 0;           // init if not already
+      msg = '<span id="'+ msgNumber + '">' + decodeURI(msginfo.body) + '<br></span>';
+      // get scroll pos
+      //app.log(2, 'public-message scrollTop ' + jqChat.scrollTop()
+      //        + ' scrollHeight ' + jqChat[0].scrollHeight
+      //        + ' clientHeight ' + jqChat[0].clientHeight);
+      // detect scroll bar at bottom
+      // looks like the mouse wheel can put the scroll pos < 1em from bottom so fudge it
+      atBottom = Math.abs((jqChat.scrollTop() + jqChat[0].clientHeight) - jqChat[0].scrollHeight) < 10;
+      jqChat.append(msg); // Add message to Message Board.
+      if (atBottom) // if we were at bottom before msg append scroll to bottom
+      {
+        jqChat.scrollTop(jqChat[0].scrollHeight);
+        //jqChat.animate({scrollTop : jqChat[0].scrollHeight},'fast');
+        // flash new msg
+        span = $("span#" + msgNumber, jqChat);
+        //span.animate({color:"red"},
+        span.animate({backgroundColor:"red"},
+          {duration: 0,
+           complete: function()
+           {
+             //span.animate({backgroundColor:"transparent"}, 500); // doesn't work, end color is white
+             span.animate({backgroundColor:"black"}, 500);
+           }
+          });
+      }
+      else
+      {
+         // flash chat border
+         jqChat.animate({backgroundColor:"red"},
+          {duration: 0,
+           complete: function()
+           {
+             jqChat.animate({backgroundColor:"black"}, 500);
+             //jqChat.animate({backgroundColor:"transparent"}, 500); // doesn't work, end color is white
+           }
+          });
+      }
+
+      jqChat.data('msgNumber', ++msgNumber); // increment next msg number
+    }
+    else // spot not found
+    {
+      app.log(4, "private-message error message to " + msginfo.nick + " doesn't have a spot");
+    }
+  } catch (err) {
+    app.log(4, "private-message exception" + err);
+  }
 }); // private-message()
 
 ///
