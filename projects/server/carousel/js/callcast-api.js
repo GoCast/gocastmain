@@ -27,7 +27,8 @@
           loadVideo,
           checkForPluginOptionalUpgrades,
           handleRoomSetup,
-          carouselItemUnzoom
+          carouselItemUnzoom,
+          showPersonalChatWithSpot
 */
 'use strict';
 
@@ -216,6 +217,7 @@ $(document).on('private-message', function(
     oo = $('#meeting > #streams > #scarousel div.cloudcarousel#' + id).get(0);
     if (oo)
     {
+      showPersonalChatWithSpot(oo);
       jqChat = $("#msgBoard > #chatOut", oo);
       console.log("jqChat", jqChat);
       if (!jqChat[0]) {throw "no chat out div";}

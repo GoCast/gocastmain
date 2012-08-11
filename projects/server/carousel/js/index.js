@@ -234,18 +234,25 @@ function onSpotClose(event)
   event.stopPropagation();
 }
 ///
-/// \brief global handler for showChat spot button press
+/// \brief showChat in spot 
 ///
-function showPersonalChat(event)
+function showPersonalChatWithSpot(spot)
 {
-  var spot = $(event.currentTarget).parent(),
-      item = spot.data('item');
+  var item = $(spot).data('item');
 
   console.log("showPersonalChat", event);
   $("#showChat", item.object).css("display", "none"); // hide showChat button
   $("#msgBoard", item.object).css("display", "block"); // show chat ui
   $("msgBoard > input.chatTo", item.object).focus();
   event.stopPropagation();
+}
+///
+/// \brief global handler for showChat spot button press
+///
+function showPersonalChat(event)
+{
+  var spot = $(event.currentTarget).parent();
+  showPersonalChatWithSpot(spot.get(0));
 }
 
 ///
@@ -995,7 +1002,7 @@ function sendPersonalChat(event)
     var spot, msg, text, name, jqIn;
     msg = event.currentTarget.parentElement;
     spot = msg.parentElement;
-    jqIn = $("input.chatTo", msg)
+    jqIn = $("input.chatTo", msg);
     text = jqIn.val();
     name = $(spot).attr("encname");
     event.stopPropagation();
@@ -1653,7 +1660,7 @@ function docKey(event)
        {
           // set focus to global chat input
           event.preventDefault();
-          $('#msgBoard > input.chatTo').focus();
+          $(app.GROUP_CHAT_IN).focus();
        }
        break;
      case 37: // left arrow, scroll carousel left

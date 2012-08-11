@@ -303,9 +303,9 @@
     ///
     this.adjustChat = function(item, scale)
     {
-      var msg = $("#msgBoard", item.obj).get(0);
+      var msg = $("#msgBoard", item.object).get(0);
       msg.style.width = (item.plgOrgWidth * scale) + "px";
-    }
+    };
     ///
     /// \ brief adjust plugin in spot on resize or carousel spin
     ///

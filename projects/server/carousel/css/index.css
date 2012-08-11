@@ -287,7 +287,7 @@ div.cloudcarousel > div#msgBoard > input.close {
   background-image: url("../images/left-arrow.png");
   background-size: 100% 100%;
   background-repeat: no-repeat;
-  width: 36px;
+  width: 25px;
   height: 19px;
 }
 div.cloudcarousel > div#msgBoard > div#chatOut
@@ -299,7 +299,7 @@ div.cloudcarousel > div#msgBoard > div#chatOut
   width:300px;
   overflow-y:auto;
   word-wrap:break-word;
-  font-size:11px;
+  font-size:13px;
   line-height: 1.2em;
   padding: 3px;
   border-width: 2px;
@@ -313,6 +313,7 @@ div.cloudcarousel > div#msgBoard > div#chatOut
 div.cloudcarousel > div#msgBoard > div#chatOut > span
 {
   color: white;
+  width: 100%;
   /*text-shadow: 0 0 10px gray, 0 0 20px gray, 0 0 30px gray, 0 0 40px #FF00DE, 0 0 70px #FF00DE, 0 0 80px #FF00DE, 0 0 100px #FF00DE, 0 0 150px #FF00DE;*/
 }
 
