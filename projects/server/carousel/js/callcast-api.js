@@ -603,7 +603,6 @@ function addPluginToCarousel(
   if (!oo) // if we're out of spots add one
   {
     oo = app.carousel.createSpot();
-    app.carousel.updateAll();
   }
   if (oo)
   {
@@ -620,6 +619,7 @@ function addPluginToCarousel(
     $("#showChat", oo).css("display", "block"); // display showChat button
 
     app.log(2, 'Added GocastPlayer' + id + ' object.');
+    app.carousel.updateAll();
     return $('object#GocastPlayer' + id, oo).get(0);
   }
 

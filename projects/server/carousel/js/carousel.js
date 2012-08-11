@@ -39,7 +39,7 @@
     this.objectOK = true;
     if (!dummy) // when dummy is set this object does not update the dom object
     {
-      console.log("item decorating object", objIn);
+      //console.log("item decorating object", objIn);
       $(this.object).css('position', 'absolute');
       this.addControls(); // add controls
     }
@@ -303,8 +303,10 @@
     ///
     this.adjustChat = function(item, scale)
     {
-      var msg = $("#msgBoard", item.object).get(0);
-      msg.style.width = (item.plgOrgWidth * scale) + "px";
+      var msg = $("#msgBoard", item.object).get(0),
+          wCss = (item.plgOrgWidth * scale) + "px";
+      //console.log("adjustChat", wCss);
+      msg.style.width = wCss;
     };
     ///
     /// \ brief adjust plugin in spot on resize or carousel spin
@@ -314,6 +316,7 @@
         var w, h, nick, px = 'px',
             obj = item.object,
             plgin = $(obj).find('object')[0];
+        //console.log('adjPlugin ' + $(obj).attr('encname'));
         if (plgin)
         {
             w = item.plgOrgWidth * scale;
