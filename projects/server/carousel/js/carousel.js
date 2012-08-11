@@ -298,6 +298,17 @@
         this.destRotation += (Math.PI / itemsLength) * (2 * direction);
         this.go();
     }; /* rotate() */
+    ///
+    /// \brief adjust chat in spot on resize or carousel spin
+    ///
+    this.adjustChat = function(item, scale)
+    {
+      var msg = $("#msgBoard", item.obj).get(0);
+      msg.style.width = (item.plgOrgWidth * scale) + "px";
+    }
+    ///
+    /// \ brief adjust plugin in spot on resize or carousel spin
+    ///
     this.adjPlugin = function(item, scale)
     {
         var w, h, nick, px = 'px',
@@ -325,6 +336,7 @@
             }
             else
             {
+                this.adjustChat(item, scale);
                 nick = $(obj).attr('encname');
                 if (nick && Callcast.participants[nick] && Callcast.participants[nick].videoOn)
                 {

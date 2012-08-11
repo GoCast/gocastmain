@@ -290,6 +290,32 @@ div.cloudcarousel > div#msgBoard > input.close {
   width: 36px;
   height: 19px;
 }
+div.cloudcarousel > div#msgBoard > div#chatOut
+{
+  bottom: 2em;
+  max-height:75px;
+  min-height: 1.1em;
+  height: auto;
+  width:300px;
+  overflow-y:auto;
+  word-wrap:break-word;
+  font-size:11px;
+  line-height: 1.2em;
+  padding: 3px;
+  border-width: 2px;
+  border-color:gray;
+  -moz-user-select: text;
+  -khtml-user-select: text;
+  -webkit-user-select: text;
+  -o-user-select: text;
+  user-select: text;
+}
+div.cloudcarousel > div#msgBoard > div#chatOut > span
+{
+  color: white;
+  /*text-shadow: 0 0 10px gray, 0 0 20px gray, 0 0 30px gray, 0 0 40px #FF00DE, 0 0 70px #FF00DE, 0 0 80px #FF00DE, 0 0 100px #FF00DE, 0 0 150px #FF00DE;*/
+}
+
 body > div#meeting > div#streams {
   padding: 10px;
   top: 0px;
