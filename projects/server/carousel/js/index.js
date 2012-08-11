@@ -240,7 +240,7 @@ function showPersonalChatWithSpot(spot)
 {
   var item = $(spot).data('item');
 
-  console.log("showPersonalChat", event);
+  console.log("showPersonalChat");
   $("#showChat", item.object).css("display", "none"); // hide showChat button
   $("#msgBoard", item.object).css("display", "block"); // show chat ui
   $("msgBoard > input.chatTo", item.object).focus();
@@ -999,15 +999,20 @@ function sendPersonalChat(event)
     //var spot = $(event.currentTarget).parent().parent(), // doesnt work returns input element
     //    text = $("#msgBoard > input.chatTo", spot).val(),
     //    name = spot.attr("ename");
-    var spot, msg, text, name, jqIn;
+    var spot, msg, text, name, jqIn, jqOut, util;
+    event.stopPropagation();
     msg = event.currentTarget.parentElement;
     spot = msg.parentElement;
     jqIn = $("input.chatTo", msg);
+    jqOut = $("div#chatOut", msg);
     text = jqIn.val();
     name = $(spot).attr("encname");
-    event.stopPropagation();
     console.log("sendPersonalChat text " + text + " name " + name, event);
     if (text.length > 0) {
+      util = jqOut.data('util');
+      if (!util) {throw "no chat util";}
+      msg = '<b>me</b>: ' + text;
+      util.addMsg(msg);
       Callcast.SendPrivateChat(encodeURI(text), name);
       jqIn.val("");
     }
@@ -1683,7 +1688,11 @@ function docKey(event)
 ///
 function uiInit()
 {
-   //$('#msgBoard > #chatOut').resizable({handles: "ne"});
+   // add chat util to global chat out
+  var chatOut = $(app.GROUP_CHAT_OUT),
+      util = new GoCastJS.ChatUtil($(app.GROUP_CHAT_OUT).get(0));
+
+  chatOut.data('util', util);
 }
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/

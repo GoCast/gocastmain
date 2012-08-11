@@ -139,55 +139,13 @@ $(document).on('public-message', function(
         delayed = msginfo.delayed,
         nick_class = msginfo.nick_class,
         jqChat = $(app.GROUP_CHAT_OUT),
-        msgTicker,
         msg,
-        atBottom,
-        msgNumber,
-        span;
+        util;
     if (!jqChat[0]) {throw "no chat out div";}
-    msgNumber = jqChat.data('msgNumber'); // get next msgNumber
-    msgNumber = msgNumber || 0;           // init if not already
-    msg = '<span id="'+ msgNumber + '"<b>' +
-                        decodeURI(msginfo.nick) + '</b>' + ': ' +
-                        decodeURI(msginfo.body) + '<br></span>';
-    // get scroll pos
-    //app.log(2, 'public-message scrollTop ' + jqChat.scrollTop()
-    //        + ' scrollHeight ' + jqChat[0].scrollHeight
-    //        + ' clientHeight ' + jqChat[0].clientHeight);
-    // detect scroll bar at bottom
-    // looks like the mouse wheel can put the scroll pos < 1em from bottom so fudge it
-    atBottom = Math.abs((jqChat.scrollTop() + jqChat[0].clientHeight) - jqChat[0].scrollHeight) < 10;
-    jqChat.append(msg);       // Add message to Message Board.
-    if (atBottom) // if we were at bottom before msg append scroll to bottom
-    {
-      jqChat.scrollTop(jqChat[0].scrollHeight);
-      //jqChat.animate({scrollTop : jqChat[0].scrollHeight},'fast');
-      // flash new msg
-      span = $("span#" + msgNumber, jqChat);
-      //span.animate({color:"red"},
-      span.animate({backgroundColor:"red"},
-        {duration: 0,
-         complete: function()
-         {
-           //span.animate({backgroundColor:"transparent"}, 500); // doesn't work, end color is white
-           span.animate({backgroundColor:"black"}, 500);
-         }
-        });
-    }
-    else
-    {
-       // flash chat border
-       jqChat.animate({backgroundColor:"red"},
-        {duration: 0,
-         complete: function()
-         {
-           jqChat.animate({backgroundColor:"black"}, 500);
-           //jqChat.animate({backgroundColor:"transparent"}, 500); // doesn't work, end color is white
-         }
-        });
-    }
-
-    jqChat.data('msgNumber', ++msgNumber); // increment next msg number
+    util = jqChat.data('util');
+    if (!util) {throw "no chat util";}
+    msg = '<b>' + decodeURI(msginfo.nick) + '</b>' + ': ' + decodeURI(msginfo.body);
+    util.addMsg(msg);
     app.log(2, 'A public message arrived ' + msg);
   }
   catch(err)
@@ -211,7 +169,8 @@ $(document).on('private-message', function(
         msg,
         atBottom,
         msgNumber,
-        span;
+        span,
+        util;
     app.log(2, 'A private message arrived.');
     id = app.str2id(msginfo.nick);
     oo = $('#meeting > #streams > #scarousel div.cloudcarousel#' + id).get(0);
@@ -221,54 +180,17 @@ $(document).on('private-message', function(
       jqChat = $("#msgBoard > #chatOut", oo);
       console.log("jqChat", jqChat);
       if (!jqChat[0]) {throw "no chat out div";}
-      msgNumber = jqChat.data('msgNumber'); // get next msgNumber
-      msgNumber = msgNumber || 0;           // init if not already
-      msg = '<span id="'+ msgNumber + '">' + decodeURI(msginfo.body) + '<br></span>';
-      // get scroll pos
-      //app.log(2, 'public-message scrollTop ' + jqChat.scrollTop()
-      //        + ' scrollHeight ' + jqChat[0].scrollHeight
-      //        + ' clientHeight ' + jqChat[0].clientHeight);
-      // detect scroll bar at bottom
-      // looks like the mouse wheel can put the scroll pos < 1em from bottom so fudge it
-      atBottom = Math.abs((jqChat.scrollTop() + jqChat[0].clientHeight) - jqChat[0].scrollHeight) < 10;
-      jqChat.append(msg); // Add message to Message Board.
-      if (atBottom) // if we were at bottom before msg append scroll to bottom
-      {
-        jqChat.scrollTop(jqChat[0].scrollHeight);
-        //jqChat.animate({scrollTop : jqChat[0].scrollHeight},'fast');
-        // flash new msg
-        span = $("span#" + msgNumber, jqChat);
-        //span.animate({color:"red"},
-        span.animate({backgroundColor:"red"},
-          {duration: 0,
-           complete: function()
-           {
-             //span.animate({backgroundColor:"transparent"}, 500); // doesn't work, end color is white
-             span.animate({backgroundColor:"black"}, 500);
-           }
-          });
-      }
-      else
-      {
-         // flash chat border
-         jqChat.animate({backgroundColor:"red"},
-          {duration: 0,
-           complete: function()
-           {
-             jqChat.animate({backgroundColor:"black"}, 500);
-             //jqChat.animate({backgroundColor:"transparent"}, 500); // doesn't work, end color is white
-           }
-          });
-      }
-
-      jqChat.data('msgNumber', ++msgNumber); // increment next msg number
+      util = jqChat.data('util');
+      if (!util) {throw "no chat util";}
+      msg = '<b>' + decodeURI(msginfo.nick) + '</b>' + ': ' + decodeURI(msginfo.body);
+      util.addMsg(msg);
     }
     else // spot not found
     {
       app.log(4, "private-message error message to " + msginfo.nick + " doesn't have a spot");
     }
   } catch (err) {
-    app.log(4, "private-message exception" + err);
+    app.log(4, "private-message exception " + err);
   }
 }); // private-message()
 

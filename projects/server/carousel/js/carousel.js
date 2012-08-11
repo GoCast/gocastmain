@@ -59,6 +59,10 @@
     jqObj.append('<img class="close control" src="images/trash.png" alt="Close" title="Close" onclick="onSpotClose(event);"/>');
     jqObj.append('<input id="showChat" type="button" title="Show Chat" onclick="showPersonalChat(event);"/>');
     jqObj.append('<div id="msgBoard"><div id="chatOut"></div><input class="chatTo" type="text" placeholder="Enter a chat message" onkeydown="keypressPersonalChatHandler(event);"/><input class="send" type="button" title="Send chat." onclick="sendPersonalChat(event);"/><input class="close" type="button" title="Close" onclick="closePersonalChat(event);"/></div>');
+    // add chat util to personal chat out
+    var chatOut = $("#msgBoard > #chatOut", jqObj);
+    if (!chatOut[0]) {app.log(4, "Item error can't find chatOut");}
+    chatOut.data('util', new GoCastJS.ChatUtil(chatOut));
     // add handlers
     jqObj.mouseover(function(event) {
       // only show close icon on unoccupied or content spots
