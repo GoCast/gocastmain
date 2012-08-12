@@ -33,6 +33,8 @@
     this.orgFontSize = parseInt($(objIn).css('font-size'), 10);
     this.plgOrgWidth = this.orgWidth - 4;
     this.plgOrgHeight = (this.plgOrgWidth / Callcast.WIDTH) * Callcast.HEIGHT;
+    this.orgChatWidth = this.plgOrgWidth;
+    this.orgChatBot = 17;
     this.object = objIn;
     this.options = options;
     this.dummy = dummy;
@@ -51,6 +53,8 @@
       this.orgHeight = item.orgHeight;
       this.plgOrgWidth = item.plgOrgWidth;
       this.plgOrgHeight = item.plgOrgHeight;
+      this.orgChatWidth = item.orgChatWidth;
+      this.orgChatBot = item.orgChatBot;
   };
   Item.prototype.addControls = function() // add controls to spot
   {
@@ -308,9 +312,12 @@
     this.adjustChat = function(item, scale)
     {
       var msg = $("#msgBoard", item.object).get(0),
-          wCss = (item.plgOrgWidth * scale) + "px";
-      //console.log("adjustChat", wCss);
-      msg.style.width = wCss;
+          show = $("#showChat", item.object).get(0),
+          px = "px";
+      msg.style.width = (item.orgChatWidth * scale) + px;
+      msg.style.bottom = (item.orgChatBot * scale) + px;
+      show.style.bottom = (item.orgChatBot * scale) + px;
+      //console.log("adjustChat", msg.style);
     };
     ///
     /// \ brief adjust plugin in spot on resize or carousel spin
@@ -666,6 +673,8 @@
         this.item.orgHeight *= scale;
         this.item.plgOrgWidth *= scale;
         this.item.plgOrgHeight *= scale;
+        this.item.orgChatWidth *= scale;
+        this.item.orgChatBot *= scale;
 
         // update items in list
         items.updateItemSizes(this.item);

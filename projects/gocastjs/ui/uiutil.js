@@ -15,11 +15,14 @@ GoCastJS = (null !== GoCastJS) ? GoCastJS : {};
 ///
 GoCastJS.ChatUtil = function(objIn)
 {
-  this.domObj = objIn;
-  this.jqChat = $(this.domObj);
-  this.msgNumber = 0;
-}; // Item object
+  this.domObj = objIn;          // the chat div
+  this.jqChat = $(this.domObj); // jq chat div
+  this.msgNumber = 0;           // unique msg number assigned to msg's
+}; // ChatUtil constructor
 
+///
+/// \brief add a message to the chat output window and animate it
+///
 GoCastJS.ChatUtil.prototype.addMsg = function(msg)
 {
   var domMsg = '<span id="'+ this.msgNumber + '">    ' + msg + '<br></span>',

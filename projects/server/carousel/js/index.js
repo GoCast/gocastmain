@@ -920,7 +920,7 @@ function sendChat(
 ///
 function keypressPersonalChatHandler(event)
 {
-  app.log(2, 'keypressPersonalChatHandler');
+  //app.log(2, 'keypressPersonalChatHandler');
   
   /// We have no action for key press combinations with the Alt key.
   if (event.altKey) {
@@ -1016,6 +1016,7 @@ function sendPersonalChat(event)
       Callcast.SendPrivateChat(encodeURI(text), name);
       jqIn.val("");
     }
+    jqIn.focus();
   } catch (err) {
     app.log(4, "sendPersonalChat exception " +  err);
   }
@@ -1641,7 +1642,7 @@ function docKey(event)
    {
       return;
    }
-   app.log(2, "key code " + event.which);
+   //app.log(2, "key code " + event.which);
 
    switch (event.which || event.keyCode)
    {
