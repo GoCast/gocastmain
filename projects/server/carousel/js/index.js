@@ -243,7 +243,7 @@ function showPersonalChatWithSpot(spot)
   console.log("showPersonalChat");
   $("#showChat", item.object).css("display", "none"); // hide showChat button
   $("#msgBoard", item.object).css("display", "block"); // show chat ui
-  $("msgBoard > input.chatTo", item.object).focus();
+  $("#msgBoard > input.chatTo", item.object).focus();
   event.stopPropagation();
 }
 ///
