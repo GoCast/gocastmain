@@ -1476,11 +1476,11 @@ function watchFile(fname) {
 }
 
 //
-// TODO: Finish this - process the list of xml files building 'roomnames'
+// TODO: Finish this - process the list of xml files building 'static_roomnames'
 //       Then upon any changes, find the missing entries and add them.
 //       And find the removed entries and delete those rooms.
 //
-function loadRoomsAndProcess(filenames, roomnames)
+function loadRoomsAndProcess(filenames, static_roomnames)
 {
     var temp_rooms = {},
         k;
@@ -1514,7 +1514,7 @@ function Overseer(user, pw, notifier) {
 
     this.CONF_SERVICE = '@gocastconference.video.gocast.it';
     this.SERVER = 'video.gocast.it';
-    this.roomnames = {};
+    this.static_roomnames = {};
     this.MucRoomObjects = {};
     this.notifier = notifier;
     this.iqnum = 0;
@@ -1548,14 +1548,14 @@ function Overseer(user, pw, notifier) {
                     for (k in rooms)
                     {
                         if (rooms.hasOwnProperty(k)) {
-                            if (this.roomnames[rooms[k].attrs.jid.split('@')[0]]) {
+                            if (this.static_roomnames[rooms[k].attrs.jid.split('@')[0]]) {
                                 this.log('  WARNING: Duplicate Room: ' + rooms[k].attrs.jid);
                             }
                             else {
                                 this.log('  Monitoring room: ' + rooms[k].attrs.jid);
                             }
 
-                            this.roomnames[rooms[k].attrs.jid.split('@')[0]] = true;
+                            this.static_roomnames[rooms[k].attrs.jid.split('@')[0]] = true;
                         }
                     }
                 }
@@ -1564,10 +1564,10 @@ function Overseer(user, pw, notifier) {
     }
     else
     {
-        this.roomnames.offlinetest = true;
-    //  this.roomnames.lobby = true;
-    //  this.roomnames.newroom = true;
-    //  this.roomnames.other_newroom = true;
+        this.static_roomnames.offlinetest = true;
+    //  this.static_roomnames.lobby = true;
+    //  this.static_roomnames.newroom = true;
+    //  this.static_roomnames.other_newroom = true;
     }
 
     this.client = new xmpp.Client({ jid: user, password: pw, reconnect: true, host: this.SERVER, port: 5222 });
@@ -1587,9 +1587,9 @@ function Overseer(user, pw, notifier) {
         self.client.send(el);
 
         // Need to join all rooms in 'rooms'
-        for (k in self.roomnames)
+        for (k in self.static_roomnames)
         {
-            if (self.roomnames.hasOwnProperty(k)) {
+            if (self.static_roomnames.hasOwnProperty(k)) {
                 self.MucRoomObjects[k] = new MucRoom(self.client, self.notifier, false);
                 self.MucRoomObjects[k].finishInit();
 
@@ -1602,9 +1602,9 @@ function Overseer(user, pw, notifier) {
         var k;
 
         // Clean up / remove all existing rooms in memory.
-        for (k in self.roomnames)
+        for (k in self.static_roomnames)
         {
-            if (self.roomnames.hasOwnProperty(k)) {
+            if (self.static_roomnames.hasOwnProperty(k)) {
                 delete self.MucRoomObjects[k];
             }
         }
