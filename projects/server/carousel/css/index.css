@@ -175,7 +175,13 @@ body > div#lower-left {
   left: 0px;
   margin: 0px 10px 0px;
   line-height: 2em;
-  max-width: 40%
+  max-width: 50%
+}
+body > div#lower-right > p
+{
+  display:inline;
+  color:white;
+  margin-right:10px;
 }
 body > div#lower-left > div#msgBoard
 {
