@@ -490,7 +490,7 @@ body > div#meeting > div#streams > div#scontrols > input.right {
 }
 #boxes #installPlugin {
   width: 300px; 
-  height: 100px;
+  height: 200px;
   padding: 0px 7px 7px 7px;
   border: 2px solid red;
   border-radius: 6px;  

@@ -174,6 +174,7 @@ var app = {
          });
        });
     }
+    console.log("app.pluginInstalled ", rtnFlag);
     return rtnFlag;
   }, /* app.pluginInstalled() */
   loggedInAll: function()
