@@ -1469,16 +1469,16 @@ function tryPluginInstall(
     // if so change prompt
     if (app.pluginInstalled() && Callcast.pluginUpdateRequired())
     {
-       title = $('#errorMsgPlugin > h1');
+       title = $('#installPlugin > h1');
        title.text('The Gocast.it plugin is out of date');
-       prompt = $('#errorMsgPlugin > p#prompt');
+       prompt = $('#installPlugin > p#prompt');
        prompt.text('Please download and install the new version of the plugin');
     }
     if (app.osPlatform.isLinux64 || app.osPlatform.isLinux32)
     {
-      $('#errorMsgPlugin').css('height', 300);
-      $('#errorMsgPlugin > p > a#dlLink').parent().find('span').addClass('hidden');
-      $('#errorMsgPlugin > .linuxExplanation').removeClass('hidden');
+      $('#installPlugin').css('height', 300);
+      $('#installPlugin > p > a#dlLink').parent().find('span').addClass('hidden');
+      $('#installPlugin > .linuxExplanation').removeClass('hidden');
     }
     else if (app.osPlatform.isWin || app.osPlatform.isMac)
     {
@@ -1486,9 +1486,9 @@ function tryPluginInstall(
     }
     else
     {
-      $('#errorMsgPlugin > p > a#dlLink').parent().text("We are sorry. We couldn't identify your OS.");
+      $('#installPlugin > p > a#dlLink').parent().text("We are sorry. We couldn't identify your OS.");
     }
-    openWindow('#errorMsgPlugin');
+    openWindow('#installPlugin');
   }
 } /* tryPluginInstall() */
 
