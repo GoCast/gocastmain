@@ -1215,8 +1215,8 @@ function closeWindow(
    * Get active window. */
   var jqActive = $('.window.active');
   if (jqActive[0]) {
-    /*
-     * Remove class active and call deactivate function. */
+    // Remove class active and call deactivate function.
+    console.log("closeWindow", jqActive);
     jqActive.removeClass('active');
     deactivateWindow('#' + jqActive.attr('id'));
   }
@@ -1332,7 +1332,7 @@ function onJoinNow(
     app.log(2, 'User name:' + usrNm);
 
     // close dialog
-    deactivateWindow('#credentials2');
+    closeWindow();
 
     app.userLoggedIn = true;
     $(document).trigger('one-login-complete', 'OnJoinNow() -- non-FB-login');
@@ -1351,43 +1351,41 @@ function enterId(
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
     app.log(2, 'enterId');
-    deactivateWindow('#credentials');
-    $('.window').hide();
-    //closeWindow();
+    closeWindow();
     openWindow('#credentials2');
 } /* onJoinNow() */
 
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-/**
- * \brief check login credential and display login dialog if necessary.
- */
-function checkCredentials(
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-    /**
-     * No argument. */
-)
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+///
+/// \brief check login credential and display login dialog if necessary.
+///
+function checkCredentials()
 {
-    app.log(2, 'checkCredentials');
+  var jqActive;
+  app.log(2, 'checkCredentials');
 
-    // this method is called on a fb status change
-    // so do nothing if we're already logged in
-    if (app.userLoggedIn)
-    {
-       return;
-    }
+  // this method is called on a fb status change
+  // so do nothing if we're already logged in
+  if (app.userLoggedIn)
+  {
+     return;
+  }
 
+  // check if there's an error being displayed
+  jqActive = $('.window.active#errorMsgPlugin');
+  if (jqActive.length === 0)
+  {
     // check fb login status and prompt if not skipped and not logged in
     if (!app.user.fbSkipped && !FB.getAuthResponse())
     {
-       openWindow('#credentials');
+      openWindow('#credentials');
     }
     else // fb logged in update fb logged in status
     {
-      deactivateWindow('#credentials');
+      closeWindow();
       app.userLoggedIn = true;
       $(document).trigger('one-login-complete', 'checkCredentials - FB Login');
     }
+  }
 } /* checkCredentials() */
 
 //
@@ -1693,7 +1691,9 @@ function uiInit()
   var chatOut = $(app.GROUP_CHAT_OUT),
       util = new GoCastJS.ChatUtil($(app.GROUP_CHAT_OUT).get(0));
 
-  chatOut.data('util', util);
+  chatOut.data('util', util);  // install global chat util
+  $(document).keydown(docKey); // global key handler
+
 }
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
@@ -1718,8 +1718,6 @@ $(document).ready(function(
 
   // login callback
   $(document).bind('checkCredentials', checkCredentials);
-
-  $(document).keydown(docKey); // global key handler
 
   uiInit(); // init user interface
   fbInit(); // init facebook api

@@ -353,6 +353,7 @@ $(document).on('room-creation-not-allowed', function(
 )
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
+  closeWindow();
   app.log(4, 'The room creation was not allowed.');
   $('#errorMsgPlugin').empty();
   $('#errorMsgPlugin').append('<h1>Joining room ' + roomname + ' failed</h1><p>Your room may not exist. Please reload and choose another room. [Ctrl + R]</p>');
@@ -439,57 +440,14 @@ $(document).on('disconnected', function(
 )
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
-  app.log(2, 'User has disconnected.');
   Callcast.log('Connection terminated.');
-  app.log(4, "disonnected.");
+  app.log(4, "disconnected.");
   $("#errorMsgPlugin").empty();
   $("#errorMsgPlugin").append('<h1>We got disconnected.</h1><p>Please reload the page. [Ctrl + R]</p>');
+  closeWindow();
   openWindow('#errorMsgPlugin');
   return false;
 }); /* disconnected() */
-
-
-
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-/**
- * \brief Function that makes initializations associated to the local plugin.
- *        This makes some of the functionality from "plugin-initialized" in
- *        scrum.js
- */
-function initializeLocalPlugin(
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-     /* No arguments. */
-)
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-{
-  var vertext = 'Plug-in Version: ' + (Callcast.GetVersion() || 'None');
-  if (Callcast.pluginUpdateRequired()) {
-    vertext += ' -- Version update REQUIRED.' + ' Visit ' +
-      Callcast.PLUGIN_DOWNLOAD_URL;
-    /*
-     * Force user to update plugin. */
-    app.log(4, 'Plugin update required: ' + vertext);
-    $('#errorMsgPlugin').empty();
-    $('#errorMsgPlugin').append('<h1>Gocast.it plugin version update required</h1><p>Please visit <a href=' + Callcast.PLUGIN_DOWNLOAD_URL + '>' + Callcast.PLUGIN_DOWNLOAD_URL + '</a> to reinstall.</p>');
-    openWindow('#errorMsgPlugin');
-    return false;
-  }
-
-
-  if (Callcast.pluginUpdateAvailable()) {
-    vertext += ' -- Version update AVAILABLE.' + ' Visit ' +
-      Callcast.PLUGIN_DOWNLOAD_URL;
-  }
-  app.log(2, vertext);
-
-  /*
-   * Callcast Seetings. */
-  Callcast.SetUseVideo(false); /* Initially set to false, user must enable. */
-  app.log(2, 'initializeLocalPlugin complete.');
-  return true;
-} /* initializeLocalPlugin() */
-
-
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
@@ -1116,6 +1074,7 @@ function pluginLoaded(
        app.log(4, 'Local plugin failed to initialize.');
        $('#errorMsgPlugin').empty();
        $('#errorMsgPlugin').append('<h1>Gocast.it plugin failed to initialize</h1><p>Please reload the page. [Ctrl + R]</p>');
+       closeWindow();
        openWindow('#errorMsgPlugin');
      });
   }
