@@ -499,14 +499,17 @@ function carouselItemClick(event)
         {
           Callcast.SetSpot({spotnumber: item.spotnumber,
                             spottype: 'url',
-                            spoturl: urlName});
+                            spoturl: urlName,
+                            spotdivid: urlName
+                           });
         }
         else // no spotnumber call add spot but pass spot index so it gets the url
         {
           Callcast.AddSpot({spotreplace: 'exact',
                             spotindex: item.index,
                             spottype: 'url',
-                            spoturl: urlName
+                            spoturl: urlName,
+                            spotdivid: urlName
                            });
         }
       }
@@ -517,7 +520,7 @@ function carouselItemClick(event)
     }
     else // remote user
     {
-      //openChat(event);
+      openChat(event); //todo refactor doesn't open chat anymore, opens feedback or url spot
     }
   } catch(err) {
     app.log(4, "carouselItemClick exception " + err);
@@ -636,17 +639,11 @@ function openCopyData(event)
   return false;
 }
 
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-/**
- * \brief Open Chat Input.
- */
-function openChat(
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-    /**
-     * The event object. */
-  event
-)
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+///
+/// \brief Open Chat Input.
+/// todo refactor
+///
+function openChat(event)
 {
   if (!event) {
     return false;
@@ -670,6 +667,7 @@ function openChat(
     }
     return false;
   }
+  /*
   else {
     recipientId = $(cTarget).attr('id');
     recipient = $(cTarget).attr('title');
@@ -686,17 +684,14 @@ function openChat(
       return false;
     }
   }
-  /*
-   * Click position. */
+  // Click position.
   cX = event.clientX;
   cY = event.clientY;
-  /*
-   * Transition effect. */
+  // Transition effect.
   jqMask = $('#mask');
   jqMask.fadeIn(500, activateWindow('#chatInp'));
   jqMask.fadeTo('fast', 0.3);
-  /*
-   * Position chat Inp. */
+  // Position chat Inp.
   winW = $(window).width();
   winH = $(window).height();
   wcW = jqWin.outerWidth();
@@ -713,17 +708,15 @@ function openChat(
   else {
     jqWin.css('left', cX);
   }
-  /*
-   * Transition effect for Chat Input Window.*/
+  // Transition effect for Chat Input Window.
   jqWin.fadeIn(700);
-  /*
-   * Add class active. */
+  // Add class active.
   jqWin.addClass('active');
-  /*
-   * Add focus to input text. */
+  // Add focus to input text.
   $('input.chatTo', jqWin).focus();
+  */
   return false;
-} /* openChat() */
+} // openChat() 
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
