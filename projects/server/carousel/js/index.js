@@ -15,6 +15,24 @@
 
 /*jslint sloppy: false, todo: true, white: true, browser: true, devel: true */
 /*global Callcast, ActiveXObject, swfobject, FB, fbInit, removeSpotCb */
+// todo refactor below
+/*global 
+  keypressNameHandler,
+  onJoinNow,
+  changeVideo,
+  changeAudio,
+  keypressChatHandler,
+  sendChat,
+  openChat,
+  resizeZoom,
+  closeWindow,
+  sendPersonalChat,
+  sendGrpChat,
+  closeWindow,
+  installPrompt,
+  checkForPlugin,
+  connectionStatus
+*/
 'use strict';
 
 
@@ -30,6 +48,8 @@ var app = {
   WIN_DL_URL: 'https://video.gocast.it/downloads/GoCastPlayer.msi',
   MAC_PL_NAME: 'GCP.plugin',
   WIN_PL_NAME: 'npGCP.dll',
+  STATUS_PROMPT: "#upper-right > #status-prompt",
+  STATUS_PROMPT_STOP: "#upper-right > #status-prompt > #stop-showing",
   /**
    * Writes the specified log entry into the console HTML element, if
    * present. The meaning of logLevel is 1: debug, 2: info, 3:
@@ -186,6 +206,7 @@ var app = {
   userLoggedIn: false,
   pluginLoaded: false,
   pluginUpgrade: false,
+  volWarningDisplayed: false, // set to true when vol warning display code executes, it may or may not the warning depending on the cookie
   // carousel controller instance
   carousel: null,
   /*
@@ -795,6 +816,7 @@ function openMeeting(
    * Transition effect. */
   $('#mask').fadeOut(500);
   $('#meeting').fadeIn(1000);
+
   return false;
 } /* openMeeting() */
 
@@ -814,7 +836,7 @@ function keypressNameHandler(
 {
   /*
    * Remove any message. */
-  $('#credentials2 > p.error').hide().text('');
+  $('#credentials2 > p.login-error').hide().text('');
   /*
    * We have no action for key press combinations with the Alt key. */
   if (event.altKey) {
@@ -1039,6 +1061,22 @@ function sendTwitter(
   closeWindow();
 } /* sendTwitter() */
 
+///
+/// \brief status div stop checkbox handler
+///
+function stopStatusClicked(event)
+{
+   var checked = $(app.STATUS_PROMPT_STOP).attr("checked");
+   console.log("stopStatusChecked", checked);
+   $.cookie("stopVolumeStatus", checked);
+}
+///
+/// \brief status div close handler
+///
+function closeStatus(event)
+{
+   $(app.STATUS_PROMPT).css("display", "none");
+}
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
  * \brief Action change Video.
@@ -1131,7 +1169,7 @@ function deactivateWindow(
   if (winId.match('credentials2')) {
     /*
      * Remove any message. */
-    $('p.error', winId).hide().text('');
+    $('p.login-error', winId).hide().text('');
     $('input#name', winId).off('keydown.s04072012', keypressNameHandler);
     $('input#btn', winId).off('click.s04072012', onJoinNow);
   }
@@ -1278,8 +1316,8 @@ function resizeZoom(event)
       width = $('#meeting > #zoom').width();
       height = $('#meeting > #zoom').height();
       item = $(jqDiv).data('item');
-      newWidth = width * 1.0; //app.carousel.options.xSpotRatio;
-      newHeight = height * 1.0; //app.carousel.options.ySpotRatio;
+      newWidth = width; // * 1.0; //app.carousel.options.xSpotRatio;
+      newHeight = height; // * 1.0; //app.carousel.options.ySpotRatio;
       widthScale = newWidth / item.orgWidth;
       heightScale = newHeight / item.orgHeight;
       scale = (widthScale < heightScale) ? widthScale : heightScale;
@@ -1318,7 +1356,7 @@ function onJoinNow(
     // user must enter fb or nick name if both not entered
     // display error
     if (usrNm.length < 1) {
-      $('#credentials2 > p.error').text('Please enter a name to continue.').
+      $('#credentials2 > p.login-error').text('Please enter a name to continue.').
         fadeIn('fast');
       return false;
     }

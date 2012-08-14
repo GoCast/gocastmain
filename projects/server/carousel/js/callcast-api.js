@@ -999,22 +999,27 @@ function setLocalSpeakerStatus(vol)
   if (vol <= 0) // mute, if vol == -1 display mute symbol since sound's probably not getting out or in
   {
      img = 'url("images/volume-muted.png")';
-     div.css("background-image", img);
   }
   else if (vol < 255/3)
   {
      img = 'url("images/volume-low.png")';
-     div.css("background-image", img);
   }
   else if (vol < 2*255/3)
   {
      img = 'url("images/volume-medium.png")';
-     div.css("background-image", img);
   }
   else
   {
      img = 'url("images/volume-high.png")';
-     div.css("background-image", img);
+  }
+  div.css("background-image", img);
+
+  // display volume warning
+  if (app.volWarningDisplayed === false &&            // check volume only on first callback
+      ($.cookie("stopVolumeStatus") !== "checked") && // and if user has not disabled the check
+      (vol < 255*.05) )                               // if vol is < 5%
+  {
+    $(app.STATUS_PROMPT).css("display", "block"); // display warning
   }
 }
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
