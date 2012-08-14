@@ -1015,11 +1015,14 @@ function setLocalSpeakerStatus(vol)
   div.css("background-image", img);
 
   // display volume warning
-  if (app.volWarningDisplayed === false &&            // check volume only on first callback
-      ($.cookie("stopVolumeStatus") !== "checked") && // and if user has not disabled the check
-      (vol < 255*.05) )                               // if vol is < 5%
+  if (app.volWarningDisplayed === false)             // check volume only on first callback
   {
-    $(app.STATUS_PROMPT).css("display", "block"); // display warning
+    if($.cookie("stopVolumeStatus") !== "checked" && // and if user has not disabled the check
+      (vol < 255*0.07) )                             // if vol is < 5%
+    {
+      $(app.STATUS_PROMPT).css("display", "block");  // display warning
+    }
+    app.volWarningDisplayed = true;
   }
 }
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
