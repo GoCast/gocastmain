@@ -227,7 +227,7 @@
     $('#addItem', container).click(function(event)
     {
        //ctx.addItem();
-       Callcast.AddSpot({});
+       Callcast.AddSpot({spottype:"new"});
     });
     // mouseover
     /*
