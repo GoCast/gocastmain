@@ -360,8 +360,6 @@ $(document).on('room-creation-not-allowed', function(
   openWindow('#errorMsgPlugin');
 }); /* room-creation-not-allowed() */
 
-
-
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
  * \brief Function that modifies the DOM when user is connected.
@@ -720,6 +718,7 @@ function removeContentFromCarousel(
 /// are defined in info.spottype and can be
 /// "youtube" play a youtube video
 /// "url" display the url title and favicon
+/// "new" add an empty spot (does nothing here)
 function doSpot(spotDiv, info)
 {
   try
