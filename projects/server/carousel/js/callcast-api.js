@@ -360,8 +360,6 @@ $(document).on('room-creation-not-allowed', function(
   openWindow('#errorMsgPlugin');
 }); /* room-creation-not-allowed() */
 
-
-
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
  * \brief Function that modifies the DOM when user is connected.
@@ -720,6 +718,7 @@ function removeContentFromCarousel(
 /// are defined in info.spottype and can be
 /// "youtube" play a youtube video
 /// "url" display the url title and favicon
+/// "new" add an empty spot (does nothing here)
 function doSpot(spotDiv, info)
 {
   try
@@ -1000,22 +999,30 @@ function setLocalSpeakerStatus(vol)
   if (vol <= 0) // mute, if vol == -1 display mute symbol since sound's probably not getting out or in
   {
      img = 'url("images/volume-muted.png")';
-     div.css("background-image", img);
   }
   else if (vol < 255/3)
   {
      img = 'url("images/volume-low.png")';
-     div.css("background-image", img);
   }
   else if (vol < 2*255/3)
   {
      img = 'url("images/volume-medium.png")';
-     div.css("background-image", img);
   }
   else
   {
      img = 'url("images/volume-high.png")';
-     div.css("background-image", img);
+  }
+  div.css("background-image", img);
+
+  // display volume warning
+  if (app.volWarningDisplayed === false)             // check volume only on first callback
+  {
+    if($.cookie("stopVolumeStatus") !== "checked" && // and if user has not disabled the check
+      (vol < 255*0.07) )                             // if vol is < 5%
+    {
+      $(app.STATUS_PROMPT).css("display", "block");  // display warning
+    }
+    app.volWarningDisplayed = true;
   }
 }
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/

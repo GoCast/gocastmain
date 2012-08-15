@@ -49,6 +49,42 @@ a:active
 {
   background: transparent;
 }
+.info, .success, .warning, .error, .validation {
+    border: 1px solid;
+    border-radius: 5px;
+    margin: 10px 0px;
+    padding:15px 10px 15px 50px;
+    background-repeat: no-repeat;
+    background-position: 10px center;
+}
+.info {
+    color: #00529B;
+    background-color: #BDE5F8;
+    background-image: url('info.png');
+}
+.success {
+    color: #4F8A10;
+    background-color: #DFF2BF;
+    background-image:url('success.png');
+}
+.warning {
+    color: #9F6000;
+    background-color: #FEEFB3;
+    background-image: url('warning.png');
+}
+.error {
+    color: #D8000C;
+    background-color: #FFBABA;
+    background-image: url('error.png');
+}
+img.close 
+{
+  width: 12px;
+  height: 12px;
+  position: absolute;
+  right: 3px;
+  top: 3px;
+}
 body {
   margin: 0;
   padding: 0;  
@@ -98,6 +134,23 @@ body > div#upper-right > p#connection-status
   color: white;
   font-size:11px;
    z-index: 1000;
+}
+body > div#upper-right > div#status-prompt
+{
+  display: none;
+  position: absolute;
+  top:30px;
+  right: 10px;
+  float:right;
+  z-index: 1000;
+  line-height:1em;
+  background-image: url("../images/volume-muted.png");
+  background-size:32px;
+}
+body > div#upper-right > div#status-prompt > p#stop-showing-text
+{
+  display: inline;
+  font-size: 11px;
 }
 body > div#lower-right
 {
@@ -491,8 +544,8 @@ body > div#meeting > div#streams > div#scontrols > input.right {
 }
 #boxes #errorMsgPlugin > button#reload {
   position: absolute;
-  right: 3px;
-  bottom:3px;
+  right: 5px;
+  bottom:5px;
 }
 #boxes #installPlugin {
   width: 300px; 
@@ -556,7 +609,7 @@ body > div#meeting > div#streams > div#scontrols > input.right {
   margin-left: 10px;
   margin-bottom: 10px;
 }
-#boxes #credentials2 > p.error {
+#boxes #credentials2 > p.login-error {
   position: absolute;
   top: -2.5em;
   margin-left: 10px;
