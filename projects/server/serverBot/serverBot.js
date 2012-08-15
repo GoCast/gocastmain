@@ -280,6 +280,7 @@ MucRoom.prototype.handlePresence = function(pres) {
     {
         if (!this.participants[fromnick]) {
             this.log('Adding: ' + fromjid + ' as Nickname: ' + fromnick);
+            this.SendSpotListTo(pres.attrs.from);
         }
         else {
             this.log('Updated Presence: ' + fromjid + ' as Nickname: ' + fromnick);
@@ -575,6 +576,43 @@ MucRoom.prototype.handleIQ = function(iq) {
     }
 };
 
+MucRoom.prototype.SendSpotListTo = function(to) {
+    var k, msgToSend,
+        attribs_out;
+
+    msgToSend = null;
+
+    this.log('SendSpotListTo: sending full spot catch-up to: ' + to);
+
+    for (k in this.spotList)
+    {
+        if (this.spotList.hasOwnProperty(k)) {
+
+            // Copy the object for this spot as a starting point.
+            attribs_out = this.spotList[k];
+
+            // Now add the required items to make it a valid command.
+            attribs_out.cmdtype = 'addspot';
+            attribs_out.xmlns = 'urn:xmpp:callcast';
+
+            if (msgToSend) {
+                msgToSend.up().c('cmd', attribs_out);
+            }
+            else {
+                msgToSend = new xmpp.Element('message', {'to': to, type: 'chat', xmlns: 'urn:xmpp:callcast'})
+                    .c('cmd', attribs_out);
+            }
+
+        }
+    }
+
+    if (msgToSend) {
+        this.log('SendSpotListTo: msgToSend:' + msgToSend.root().toString());
+        this.client.send(msgToSend);
+    }
+
+};
+
 MucRoom.prototype.SendGroupCmd = function(cmd, attribs_in) {
         var attribs_out = attribs_in,
             msgToSend;
@@ -655,9 +693,28 @@ MucRoom.prototype.AddSpotReflection = function(iq) {
     else {
         this.spotList[info.spotnumber] = info;
 
+//        console.log(' spotList in: ' + this.roomname + ' is: ', this.spotList);
+
         // TODO: RMW - Now database this in room_contents
     }
 
+};
+
+MucRoom.prototype.createErrorIQ = function(iq_in, reason_in, err_type_in) {
+    var iq_out, e_type;
+
+    e_type = err_type_in || 'modify';
+
+    iq_out = new xmpp.Element('iq', {'to': iq_in.root().attrs.from, type: 'error', id: iq_in.root().attrs.id})
+                .c('error', {type: e_type})
+                .c('bad-request', {xmlns: 'urn:ietf:params:xml:ns:xmpp-stanzas'})
+                .up().c('reason', {xmlns: 'urn:ietf:params:xml:ns:xmpp-stanzas'}).t(reason_in);
+
+    if (iq_in.root().attrs.xmlns) {
+        iq_out.root().attrs.xmlns = iq_in.root().attrs.xmlns;
+    }
+
+    return iq_out;
 };
 
 MucRoom.prototype.SetSpotReflection = function(iq) {
@@ -691,6 +748,8 @@ MucRoom.prototype.SetSpotReflection = function(iq) {
 
         this.spotList[info.spotnumber] = info;
 
+ //       console.log(' spotList in: ' + this.roomname + ' is: ', this.spotList);
+
         // TODO: RMW - Now database this in room_contents.
 
         iq.attrs.type = 'result';
@@ -704,29 +763,33 @@ MucRoom.prototype.RemoveSpotReflection = function(iq) {
     // Need to pull out the 'info' object - which is the attributes to the 'removespot'
     var info = {};
 
-    // Prep to reply to the IQ message.
-    iq.attrs.to = iq.attrs.from;
-    delete iq.attrs.from;
-
     if (iq.getChild('removespot')) {
         info = iq.getChild('removespot').attrs;
     }
 
     if (!info.spotnumber) {
-        iq.attrs.type = 'error';
-        iq.c('reason').t('Missing required spotnumber attribute.');
+        this.log('RemoveSpotReflection: ERROR: Required spot number not specified.');
+        iq = this.createErrorIQ(iq, 'Missing required spotnumber attribute.');
+        console.log('iq error going back is:', iq);
     }
     else if (!this.spotList[info.spotnumber]) {
         // When we don't have a record of this spotnumber, we don't delete it.
-        iq.attrs.type = 'error';
-        iq.c('reason').t('spotnumber' + info.spotnumber + 'is unknown to the overseer.');
+        this.log('RemoveSpotReflection: ERROR: Unknown spot number.');
+        iq = this.createErrorIQ(iq, 'spotnumber ' + info.spotnumber + ' is unknown to the overseer.');
+        console.log('iq error going back is:', iq.root().toString());
     }
     else {
         this.SendGroupCmd('removespot', info);
 
         delete this.spotList[info.spotnumber];
 
+//        console.log(' spotList in: ' + this.roomname + ' is: ', this.spotList);
+
         // TODO: RMW - Now database this removal in room_contents.
+
+        // Prep to reply to the IQ message.
+        iq.attrs.to = iq.attrs.from;
+        delete iq.attrs.from;
 
         // Now reply to the IQ message favorably.
         iq.attrs.type = 'result';
@@ -1547,13 +1610,13 @@ function loadRooms(filename) {
     return fs.readFileSync(filename, 'utf8');
 }
 
-///
+////////////////////////////////////////////////////////////////////////////////////////
 ///
 ///
 ///  O  V  E  R  S  E  E  R
 ///
 ///
-///
+////////////////////////////////////////////////////////////////////////////////////////
 
 function Overseer(user, pw, notifier) {
     var roomsxml, par, rooms,
@@ -1917,6 +1980,7 @@ Overseer.prototype.generateRandomRoomName = function() {
 Overseer.prototype.AddTrackedRoom = function(roomname) {
     this.active_rooms[roomname] = { persistent: false };
 
+    console.log('Overseer: Adding room. Roomlist=', this.active_rooms);
     // TODO: RMW - Now database it.
     return true;
 };
@@ -1928,6 +1992,8 @@ Overseer.prototype.RemoveTrackedRoom = function(roomname) {
     }
 
     delete this.active_rooms[roomname];
+
+    console.log('Overseer: Removing room. Roomlist=', this.active_rooms);
 
     // TODO: RMW - Now database the removal.
 
