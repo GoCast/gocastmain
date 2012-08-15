@@ -970,6 +970,10 @@ var Callcast = {
                 console.log("Error with inbound signaling. Didn't know this person: " + res_nick);
             }
         }
+        else if ($(msg).find('cmd').length > 0)
+        {
+            Callcast.process_multi_command(msg);
+        }
         else if ($(msg).find('x').length > 0)
         {
             console.log('Got inbound INVITATION to join a session.');
@@ -1067,62 +1071,101 @@ var Callcast = {
         }
     },
 
-    on_callcast_groupchat_command: function(message) {
-        var cmd = $(message).children('cmd'),
-            cmdtype = null,
-            info = {},
-            ret = true;
+    //
+    // Stanza can be a single <message ><cmd > or <message><cmd ><cmd ><cmd >... at this stage.
+    //
+    process_multi_command: function(message) {
+        var ret = true, info,
+            cmdtype, newmsg,
+            len, i, items;
 
-        // Snatch out all the attributes from the 'cmd' child.
-        $(message).find('cmd').each(function() {
-            $.each(this.attributes, function(i, attrib) {
-                info[attrib.name] = attrib.value;
-            });
-        });
+        items = $(message).children('cmd');
+        len = items.length;
+
+        if (len) {
+            // Setup our new message 'header/parent'
+            newmsg = $(message).clone();
+
+            for (i = 0 ; i < len ; i += 1)
+            {
+                info = {};
+
+                // Snatch out all the attributes from the 'cmd' child.
+                $(items[i]).each(function() {
+                    $.each(this.attributes, function(i, attrib) {
+                        info[attrib.name] = attrib.value;
+                    });
+                });
+
+                console.log('Processing cmd: ', items[i]);
+//                console.log('info is: ', info);
+                cmdtype = $(items[i]).attr('cmdtype');
+
+                // Lop off all the children that may be present (originals or ones from the prior iteration)
+                $(newmsg).children('cmd').remove();
+                // Now we need to add the current 'items[i]' into the mix as a child.
+                $(newmsg).append(items[i]);
+
+                console.log('Newly constituted message: ', newmsg);
+
+                switch (cmdtype)
+                {
+                case 'synclink':
+                    ret = Callcast.on_sync_link(newmsg);
+                    break;
+                case 'spotinfo':
+                    ret = Callcast.on_spot_info(newmsg);
+                    break;
+                case 'urlrenderinfo':
+                    ret = Callcast.on_url_render(newmsg);
+                    break;
+                case 'addspot':
+                    console.log('addspot: Received object: ', info);
+                    if (Callcast.Callback_AddSpot) {
+                        Callcast.Callback_AddSpot(info);
+                    }
+                    ret = true;
+                    break;
+                case 'removespot':
+                    if (Callcast.Callback_RemoveSpot) {
+                        Callcast.Callback_RemoveSpot(info);
+                    }
+                    ret = true;
+                    break;
+                case 'setspot':
+                    console.log('setspot: Received object: ', info);
+                    if (Callcast.Callback_SetSpot) {
+                        Callcast.Callback_SetSpot(info);
+                    }
+                    ret = true;
+                    break;
+                default:
+                    Callcast.log('ERROR: Ignoring unknown inbound cmd: ' + cmdtype);
+                    break;
+                }
+
+                if (!ret) {
+                    console.log('process_multi_command: ERROR: failed processing cmd.');
+                    return false;
+                }
+            }
+        }
+        else {
+            console.log('Did not find cmd children in message. Ignoring.');
+        }
+
+        return ret;
+    },
+
+    on_callcast_groupchat_command: function(message) {
+        var ret;
 
         console.log('Groupchat command received: ', message);
 
-        if (cmd) {
-            cmdtype = $(cmd).attr('cmdtype');
-        }
-        else {
-            console.log('on_callcast_groupchat_command -- malformed/unknown stanza: ', $(message));
-        }
-
-        switch (cmdtype)
-        {
-        case 'synclink':
-            ret = Callcast.on_sync_link(message);
-            break;
-        case 'spotinfo':
-            ret = Callcast.on_spot_info(message);
-            break;
-        case 'urlrenderinfo':
-            ret = Callcast.on_url_render(message);
-            break;
-        case 'addspot':
-            console.log('addspot: Received object: ', info);
-            if (Callcast.Callback_AddSpot) {
-                Callcast.Callback_AddSpot(info);
-            }
-            ret = true;
-            break;
-        case 'removespot':
-            if (Callcast.Callback_RemoveSpot) {
-                Callcast.Callback_RemoveSpot(info);
-            }
-            ret = true;
-            break;
-        case 'setspot':
-            console.log('setspot: Received object: ', info);
-            if (Callcast.Callback_SetSpot) {
-                Callcast.Callback_SetSpot(info);
-            }
-            ret = true;
-            break;
-        default:
-            Callcast.log('ERROR: Ignoring unknown inbound cmd: ' + cmdtype);
-            break;
+        ret = Callcast.process_multi_command(message);
+        if (!ret) {
+            console.log('on_callcast_groupchat_command: ERROR: failed processing cmd.');
+            return false;
         }
 
         return ret;
@@ -1628,9 +1671,9 @@ var Callcast = {
 
         // Failure callback
           function(iq) {
-              self.log('Error removing spot', iq);
+              self.log('Error setting spot', iq);
               if (cb) {
-                cb('Error removing spot');
+                cb('Error setting spot');
               }
           }
         );

@@ -64,6 +64,12 @@ function logDate() {
             pad2(d.getHours()) + ':' + pad2(d.getMinutes()) + ':' + pad2(d.getSeconds());
 }
 
+//
+//
+// M U C R O O M
+//
+//
+
 function MucRoom(client, notifier, bSelfDestruct, success, failure) {
     // -- Handle room create request --
     this.bNewRoom = false;
@@ -87,6 +93,9 @@ function MucRoom(client, notifier, bSelfDestruct, success, failure) {
     this.notifier = notifier;
     this.pendingDeletion = false;
     this.addSpotCeiling = 1000;     // Value doled-out upon addspot commands being given (and incremented afterwards)
+
+    this.spotList = {};
+    this.spotStorage = {};
 
     var self = this;
 
@@ -161,6 +170,9 @@ MucRoom.prototype.reset = function() {
     this.iq_callbacks = {};
     this.iqnum = 0;
     this.pendingDeletion = false;
+
+    this.spotList = {};
+    this.spotStorage = {};
 
     this.client.removeListener('stanza', this.onstanza);
 };
@@ -268,6 +280,7 @@ MucRoom.prototype.handlePresence = function(pres) {
     {
         if (!this.participants[fromnick]) {
             this.log('Adding: ' + fromjid + ' as Nickname: ' + fromnick);
+            this.SendSpotListTo(pres.attrs.from);
         }
         else {
             this.log('Updated Presence: ' + fromjid + ' as Nickname: ' + fromnick);
@@ -563,6 +576,43 @@ MucRoom.prototype.handleIQ = function(iq) {
     }
 };
 
+MucRoom.prototype.SendSpotListTo = function(to) {
+    var k, msgToSend,
+        attribs_out;
+
+    msgToSend = null;
+
+    this.log('SendSpotListTo: sending full spot catch-up to: ' + to);
+
+    for (k in this.spotList)
+    {
+        if (this.spotList.hasOwnProperty(k)) {
+
+            // Copy the object for this spot as a starting point.
+            attribs_out = this.spotList[k];
+
+            // Now add the required items to make it a valid command.
+            attribs_out.cmdtype = 'addspot';
+            attribs_out.xmlns = 'urn:xmpp:callcast';
+
+            if (msgToSend) {
+                msgToSend.up().c('cmd', attribs_out);
+            }
+            else {
+                msgToSend = new xmpp.Element('message', {'to': to, type: 'chat', xmlns: 'urn:xmpp:callcast'})
+                    .c('cmd', attribs_out);
+            }
+
+        }
+    }
+
+    if (msgToSend) {
+        this.log('SendSpotListTo: msgToSend:' + msgToSend.root().toString());
+        this.client.send(msgToSend);
+    }
+
+};
+
 MucRoom.prototype.SendGroupCmd = function(cmd, attribs_in) {
         var attribs_out = attribs_in,
             msgToSend;
@@ -574,6 +624,21 @@ MucRoom.prototype.SendGroupCmd = function(cmd, attribs_in) {
                 .c('cmd', attribs_out);
 
         this.log('Outbound Group Command: ' + msgToSend.root().toString());
+
+        this.client.send(msgToSend);
+};
+
+MucRoom.prototype.SendPrivateCmd = function(to, cmd, attribs_in) {
+        var attribs_out = attribs_in,
+            msgToSend;
+
+        attribs_out.cmdtype = cmd;
+        attribs_out.xmlns = 'urn:xmpp:callcast';
+
+        msgToSend = new xmpp.Element('message', {'to': to, type: 'chat', xmlns: 'urn:xmpp:callcast'})
+                .c('cmd', attribs_out);
+
+        this.log('Outbound Private Command: ' + msgToSend.root().toString());
 
         this.client.send(msgToSend);
 };
@@ -619,6 +684,37 @@ MucRoom.prototype.AddSpotReflection = function(iq) {
     iq.attrs.type = 'result';
 
     this.client.send(iq);
+
+    // Now track the new spot item for the future
+    if (this.spotList[info.spotnumber]) {
+        this.log('ERROR: Adding a spot that already exists. spotnumber=' + info.spotnumber);
+        return false;
+    }
+    else {
+        this.spotList[info.spotnumber] = info;
+
+//        console.log(' spotList in: ' + this.roomname + ' is: ', this.spotList);
+
+        // TODO: RMW - Now database this in room_contents
+    }
+
+};
+
+MucRoom.prototype.createErrorIQ = function(iq_in, reason_in, err_type_in) {
+    var iq_out, e_type;
+
+    e_type = err_type_in || 'modify';
+
+    iq_out = new xmpp.Element('iq', {'to': iq_in.root().attrs.from, type: 'error', id: iq_in.root().attrs.id})
+                .c('error', {type: e_type})
+                .c('bad-request', {xmlns: 'urn:ietf:params:xml:ns:xmpp-stanzas'})
+                .up().c('reason', {xmlns: 'urn:ietf:params:xml:ns:xmpp-stanzas'}).t(reason_in);
+
+    if (iq_in.root().attrs.xmlns) {
+        iq_out.root().attrs.xmlns = iq_in.root().attrs.xmlns;
+    }
+
+    return iq_out;
 };
 
 MucRoom.prototype.SetSpotReflection = function(iq) {
@@ -640,7 +736,7 @@ MucRoom.prototype.SetSpotReflection = function(iq) {
         iq.attrs.type = 'error';
         iq.c('reason').t('Missing required spotnumber attribute.');
     }
-    else if (false) {
+    else if (!this.spotList[info.spotnumber]) {
         this.log('Unknown spotnumber: ' + info.spotnumber);
 
         // If we don't have a record of this spotnumber existing, then it's an error also.
@@ -649,6 +745,13 @@ MucRoom.prototype.SetSpotReflection = function(iq) {
     }
     else {
         this.SendGroupCmd('setspot', info);
+
+        this.spotList[info.spotnumber] = info;
+
+ //       console.log(' spotList in: ' + this.roomname + ' is: ', this.spotList);
+
+        // TODO: RMW - Now database this in room_contents.
+
         iq.attrs.type = 'result';
     }
 
@@ -660,25 +763,34 @@ MucRoom.prototype.RemoveSpotReflection = function(iq) {
     // Need to pull out the 'info' object - which is the attributes to the 'removespot'
     var info = {};
 
-    // Prep to reply to the IQ message.
-    iq.attrs.to = iq.attrs.from;
-    delete iq.attrs.from;
-
     if (iq.getChild('removespot')) {
         info = iq.getChild('removespot').attrs;
     }
 
     if (!info.spotnumber) {
-        iq.attrs.type = 'error';
-        iq.c('reason').t('Missing required spotnumber attribute.');
+        this.log('RemoveSpotReflection: ERROR: Required spot number not specified.');
+        iq = this.createErrorIQ(iq, 'Missing required spotnumber attribute.');
+        console.log('iq error going back is:', iq);
     }
-    else if (false) {
+    else if (!this.spotList[info.spotnumber]) {
         // When we don't have a record of this spotnumber, we don't delete it.
-        iq.attrs.type = 'error';
-        iq.c('reason').t('spotnumber' + info.spotnumber + 'is unknown to the overseer.');
+        this.log('RemoveSpotReflection: ERROR: Unknown spot number.');
+        iq = this.createErrorIQ(iq, 'spotnumber ' + info.spotnumber + ' is unknown to the overseer.');
+        console.log('iq error going back is:', iq.root().toString());
     }
     else {
         this.SendGroupCmd('removespot', info);
+
+        delete this.spotList[info.spotnumber];
+
+//        console.log(' spotList in: ' + this.roomname + ' is: ', this.spotList);
+
+        // TODO: RMW - Now database this removal in room_contents.
+
+        // Prep to reply to the IQ message.
+        iq.attrs.to = iq.attrs.from;
+        delete iq.attrs.from;
+
         // Now reply to the IQ message favorably.
         iq.attrs.type = 'result';
     }
@@ -814,22 +926,22 @@ MucRoom.prototype.handleMessage = function(msg) {
                 if (cmd !== '') {
                     if (cmd.match(/hello/i)) {
                         // Response with a greeting publicly.
-                        this.sendGroupMessage("Well, hello there to you as well. I hope you are having a great day.");
+                        this.sendGroupMessage('Well, hello there to you as well. I hope you are having a great day.');
                     }
                     else if (cmd.match(/private/) || cmd.match(/whisper/i) || cmd.match(/wisper/i)) {
                         // Respond with a private chat
-                        this.SendPrivateChat(msg.attrs.from, "Shh, this is a private message just for you.");
+                        this.SendPrivateChat(msg.attrs.from, 'Shh, this is a private message just for you.');
                     }
                     else if (cmd.match('42')) {
                         // Responsd publicly with Life, the Universe and Everything.
-                        this.sendGroupMessage("Hmm - the big answer to the big question - What is the answer to life, the Universe, and everything?");
+                        this.sendGroupMessage('Hmm - the big answer to the big question - What is the answer to life, the Universe, and everything?');
                     }
                     else if (cmd.match('--help') || cmd.match('-help')) {
                         this.sendGroupMessage("Usage: 'hello', 'private', '42', or random phrases come back.");
                     }
                     else {
-                        k = ["What is that you say?", "I'm sorry, I didn't get that...", "Can you speak up? I'm not a young computer.",
-                             "First things first. HUH?", "Am I allowed to hear this at my age?", "Oh, a wise-guy huh?", "Well...I never!"];
+                        k = ['What is that you say?', "I'm sorry, I didn't get that...", "Can you speak up? I'm not a young computer.",
+                             'First things first... HUH?', 'Am I allowed to hear all this talk?', 'Oh, a wise-guy huh?', 'Well...I never!'];
                         this.sendGroupMessage(k[Math.floor(Math.random() * k.length)]);
                     }
                 }
@@ -1206,10 +1318,10 @@ MucRoom.prototype.lock = function() {
                         this.sendIQ(new xmpp.Element('iq', {to: self.roomname, type: 'set'})
                                 .c('query', {xmlns: 'http://jabber.org/protocol/muc#owner'})
                                 .c('x', {xmlns: 'jabber:x:data', type: 'submit'})
-                                .c('field', {'var': 'FORM_TYPE', type : 'hidden'})
+                                .c('field', {'var': 'FORM_TYPE', type: 'hidden'})
                                 .c('value').t('http://jabber.org/protocol/muc#roomconfig')
                                 .up().up()
-                                .c('field', {'var': 'muc#roomconfig_membersonly', type : 'boolean'})
+                                .c('field', {'var': 'muc#roomconfig_membersonly', type: 'boolean'})
                                 .c('value').t('1'), function(resp) {
                                     if (resp.attrs.type === 'result')
                                     {
@@ -1241,10 +1353,10 @@ MucRoom.prototype.unlock = function() {
     this.sendIQ(new xmpp.Element('iq', {to: this.roomname, type: 'set'})
             .c('query', {xmlns: 'http://jabber.org/protocol/muc#owner'})
             .c('x', {xmlns: 'jabber:x:data', type: 'submit'})
-            .c('field', {'var': 'FORM_TYPE', type : 'hidden'})
+            .c('field', {'var': 'FORM_TYPE', type: 'hidden'})
             .c('value').t('http://jabber.org/protocol/muc#roomconfig')
             .up().up()
-            .c('field', {'var': 'muc#roomconfig_membersonly', type : 'boolean'})
+            .c('field', {'var': 'muc#roomconfig_membersonly', type: 'boolean'})
             .c('value').t('0'), function(resp) {
                 if (resp.attrs.type === 'result')
                 {
@@ -1444,12 +1556,12 @@ var MucroomObjectPool = {
     client: null,
     notifier: null,
 
-    init: function (client, notifier) {
+    init: function(client, notifier) {
         this.client = client;
         this.notifier = notifier;
     },
 
-    get: function () {
+    get: function() {
         if (0 === this.objPool.length) {
             this.objPool.push(new MucRoom(this.client, this.notifier, true));
         }
@@ -1476,11 +1588,11 @@ function watchFile(fname) {
 }
 
 //
-// TODO: Finish this - process the list of xml files building 'roomnames'
+// TODO: Finish this - process the list of xml files building 'static_roomnames'
 //       Then upon any changes, find the missing entries and add them.
 //       And find the removed entries and delete those rooms.
 //
-function loadRoomsAndProcess(filenames, roomnames)
+function loadRoomsAndProcess(filenames, static_roomnames)
 {
     var temp_rooms = {},
         k;
@@ -1498,13 +1610,13 @@ function loadRooms(filename) {
     return fs.readFileSync(filename, 'utf8');
 }
 
-///
+////////////////////////////////////////////////////////////////////////////////////////
 ///
 ///
 ///  O  V  E  R  S  E  E  R
 ///
 ///
-///
+////////////////////////////////////////////////////////////////////////////////////////
 
 function Overseer(user, pw, notifier) {
     var roomsxml, par, rooms,
@@ -1514,11 +1626,13 @@ function Overseer(user, pw, notifier) {
 
     this.CONF_SERVICE = '@gocastconference.video.gocast.it';
     this.SERVER = 'video.gocast.it';
-    this.roomnames = {};
+    this.static_roomnames = {};
     this.MucRoomObjects = {};
     this.notifier = notifier;
     this.iqnum = 0;
     this.iq_callbacks = {};
+
+    this.active_rooms = {};
 
     if (process.argv.length > 2)
     {
@@ -1548,14 +1662,14 @@ function Overseer(user, pw, notifier) {
                     for (k in rooms)
                     {
                         if (rooms.hasOwnProperty(k)) {
-                            if (this.roomnames[rooms[k].attrs.jid.split('@')[0]]) {
+                            if (this.static_roomnames[rooms[k].attrs.jid.split('@')[0]]) {
                                 this.log('  WARNING: Duplicate Room: ' + rooms[k].attrs.jid);
                             }
                             else {
                                 this.log('  Monitoring room: ' + rooms[k].attrs.jid);
                             }
 
-                            this.roomnames[rooms[k].attrs.jid.split('@')[0]] = true;
+                            this.static_roomnames[rooms[k].attrs.jid.split('@')[0]] = true;
                         }
                     }
                 }
@@ -1564,10 +1678,10 @@ function Overseer(user, pw, notifier) {
     }
     else
     {
-        this.roomnames.offlinetest = true;
-    //  this.roomnames.lobby = true;
-    //  this.roomnames.newroom = true;
-    //  this.roomnames.other_newroom = true;
+        this.static_roomnames.offlinetest = true;
+    //  this.static_roomnames.lobby = true;
+    //  this.static_roomnames.newroom = true;
+    //  this.static_roomnames.other_newroom = true;
     }
 
     this.client = new xmpp.Client({ jid: user, password: pw, reconnect: true, host: this.SERVER, port: 5222 });
@@ -1587,9 +1701,9 @@ function Overseer(user, pw, notifier) {
         self.client.send(el);
 
         // Need to join all rooms in 'rooms'
-        for (k in self.roomnames)
+        for (k in self.static_roomnames)
         {
-            if (self.roomnames.hasOwnProperty(k)) {
+            if (self.static_roomnames.hasOwnProperty(k)) {
                 self.MucRoomObjects[k] = new MucRoom(self.client, self.notifier, false);
                 self.MucRoomObjects[k].finishInit();
 
@@ -1602,9 +1716,9 @@ function Overseer(user, pw, notifier) {
         var k;
 
         // Clean up / remove all existing rooms in memory.
-        for (k in self.roomnames)
+        for (k in self.static_roomnames)
         {
-            if (self.roomnames.hasOwnProperty(k)) {
+            if (self.static_roomnames.hasOwnProperty(k)) {
                 delete self.MucRoomObjects[k];
             }
         }
@@ -1706,6 +1820,8 @@ Overseer.prototype.destroyRoom = function(roomname) {
 
                 MucroomObjectPool.put(self.MucRoomObjects[roomname]);
                 delete self.MucRoomObjects[roomname];
+
+                self.RemoveTrackedRoom(roomname);
             }
         });
     } else {
@@ -1861,6 +1977,29 @@ Overseer.prototype.generateRandomRoomName = function() {
     return result;
 };
 
+Overseer.prototype.AddTrackedRoom = function(roomname) {
+    this.active_rooms[roomname] = { persistent: false };
+
+    console.log('Overseer: Adding room. Roomlist=', this.active_rooms);
+    // TODO: RMW - Now database it.
+    return true;
+};
+
+Overseer.prototype.RemoveTrackedRoom = function(roomname) {
+    if (!this.active_rooms[roomname]) {
+        this.log('ERROR: Attempt to remove an unknown room: ' + roomname);
+        return false;
+    }
+
+    delete this.active_rooms[roomname];
+
+    console.log('Overseer: Removing room. Roomlist=', this.active_rooms);
+
+    // TODO: RMW - Now database the removal.
+
+    return true;
+};
+
 Overseer.prototype.CreateRoomRequest = function(iq) {
     var roomname = iq.getChild('room').attr('name'),
         self = this,
@@ -1886,6 +2025,12 @@ Overseer.prototype.CreateRoomRequest = function(iq) {
     {
         this.MucRoomObjects[roomname] = MucroomObjectPool.get();
 
+        //
+        // Need to track rooms created, their status (including things like persistence)
+        // and eventually database that information too.
+        //
+        this.AddTrackedRoom(roomname);
+
         this.MucRoomObjects[roomname].finishInit(function() {
             var iqResult = new xmpp.Element('iq', {to: iq.attrs.from, type: 'result', id: iq.attrs.id})
                                 .c('ok', {xmlns: 'urn:xmpp:callcast', name: roomname});
@@ -1905,6 +2050,7 @@ Overseer.prototype.CreateRoomRequest = function(iq) {
     {
         if (this.MucRoomObjects[roomname].pendingDeletion)
         {
+            self.log('WARNING: Room requested:' + roomname + ' is currently pending deletion. Cannot fulfill request.');
             iqResult = new xmpp.Element('iq', {to: iq.attrs.from, type: 'error', id: iq.attrs.id})
                             .c('pendingdeletion', {xmlns: 'urn:xmpp:callcast'});
             self.client.send(iqResult.root());
