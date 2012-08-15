@@ -274,13 +274,9 @@ body> div#lower-left > div#msgBoard > input.chatTo
   font-size:14px;
   width:250px;
 }
-body > div#lower-left > div#msgBoard > input.send {
-  /*background-image: url("../images/talk.png");*/
-  background-image: url("../images/btn-send.png");
-  background-size: 100% 100%;
-  background-repeat: no-repeat;
-  width: 36px;
-  height: 19px;
+body > div#lower-left > div#msgBoard > button#send {
+  padding: 4px;
+  padding-right: 7px;
 }
 body > div#meeting 
 {
