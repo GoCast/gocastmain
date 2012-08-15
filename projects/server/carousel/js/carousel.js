@@ -663,11 +663,12 @@
             newHeight = height * options.ySpotRatio,
             widthScale = newWidth / this.item.orgWidth,
             heightScale = newHeight / this.item.orgHeight,
-            scale = (widthScale + heightScale) / 2;
+            scale = (widthScale + heightScale) / 2,
+            zoomedSpot = $('#meeting > #zoom > .cloudcarousel');
 
         //app.log(2, "container w " + width + " h " + height);
         // set round property based on height
-        this.round = (height > 150) ? true : false;
+        this.round = (zoomedSpot.length === 0 && height > 150) ? true : false;
 
         this.item.orgWidth *= scale;
         this.item.orgHeight *= scale;
