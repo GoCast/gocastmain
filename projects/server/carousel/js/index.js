@@ -272,7 +272,6 @@ function showPersonalChatWithSpot(spot)
   $("#showChat", item.object).css("display", "none"); // hide showChat button
   $("#msgBoard", item.object).css("display", "block"); // show chat ui
   $("#msgBoard > input.chatTo", item.object).focus();
-  event.stopPropagation();
 }
 ///
 /// \brief global handler for showChat spot button press
