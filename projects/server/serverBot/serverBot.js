@@ -472,6 +472,8 @@ MucRoom.prototype.handlePresence = function(pres) {
             {
                 if (this.successCallback) {
                     this.successCallback();
+                    this.successCallback = null;
+                    this.failureCallback = null;
                 }
 
                 if (this.bSelfDestruct === true)
@@ -1110,6 +1112,12 @@ MucRoom.prototype.setupRoom = function(form) {
             {
                 self.log('Room setup successful.');
 
+                if (self.successCallback) {
+                    self.successCallback();
+                    self.successCallback = null;
+                    self.failureCallback = null;
+                }
+
                 self.bNewRoom = false;
 
                 if (self.bSelfDestruct === true)
@@ -1135,6 +1143,8 @@ MucRoom.prototype.setupRoom = function(form) {
 
                 if (self.failureCallback) {
                     self.failureCallback();
+                    self.successCallback = null;
+                    self.failureCallback = null;
                 }
             }
         });
@@ -1145,6 +1155,8 @@ MucRoom.prototype.setupRoom = function(form) {
 
         if (self.failureCallback) {
             self.failureCallback();
+            self.successCallback = null;
+            self.failureCallback = null;
         }
     }
 };
@@ -1917,6 +1929,11 @@ Overseer.prototype.LoadActiveRoomsFromDB = function() {
     var self = this;
 
     this.log('LoadActiveRoomsFromDB - Loading database list of rooms.');
+
+    if (!this.roomDB) {
+        this.log('ERROR: No roomDB created yet. Skipping LoadActiveRoomsFromDB.');
+        return false;
+    }
 
     this.roomDB.LoadRooms(function(rooms_in) {
         var k;
