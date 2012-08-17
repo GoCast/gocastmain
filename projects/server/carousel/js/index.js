@@ -46,6 +46,8 @@ var app = {
   GROUP_CHAT_IN: '#lower-left > #msgBoard > input.chatTo',
   MAC_DL_URL: 'https://video.gocast.it/downloads/GoCastPlayer.pkg',
   WIN_DL_URL: 'https://video.gocast.it/downloads/GoCastPlayer.msi',
+  LIN_64_DL_URL: 'https://video.gocast.it/downloads/GoCastPlayer_x86_64.tar.gz',
+  LIN_32_DL_URL: 'https://video.gocast.it/downloads/GoCastPlayer_i686.tar.gz',
   MAC_PL_NAME: 'GCP.plugin',
   WIN_PL_NAME: 'npGCP.dll',
   STATUS_PROMPT: "#upper-right > #status-prompt",
@@ -270,7 +272,6 @@ function showPersonalChatWithSpot(spot)
   $("#showChat", item.object).css("display", "none"); // hide showChat button
   $("#msgBoard", item.object).css("display", "block"); // show chat ui
   $("#msgBoard > input.chatTo", item.object).focus();
-  event.stopPropagation();
 }
 ///
 /// \brief global handler for showChat spot button press
@@ -1560,11 +1561,11 @@ function doDownload()
   }
   else if (app.osPlatform.isLinux64)
   {
-    downloadURL('https://video.gocast.it/downloads/GoCastPlayer_x86_64.tar.gz');
+    downloadURL(app.LIN_64_DL_URL);
   }
   else if (app.osPlatform.isLinux32)
   {
-    downloadURL('href', 'https://video.gocast.it/downloads/GoCastPlayer_i686.tar.gz');
+    downloadURL(app.LIN_32_DL_URL);
   }
 
   // prompt user for next step

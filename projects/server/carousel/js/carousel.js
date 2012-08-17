@@ -62,7 +62,7 @@
     jqObj.append('<img class="zoom control" src="images/fullscreen.png" alt="Zoom" title="Zoom" onclick="carouselItemZoom(event);"/>');
     jqObj.append('<img class="close control" src="images/trash.png" alt="Close" title="Close" onclick="onSpotClose(event);"/>');
     jqObj.append('<input id="showChat" type="button" title="Show Chat" onclick="showPersonalChat(event);"/>');
-    jqObj.append('<div id="msgBoard"><div id="chatOut"></div><input class="chatTo" type="text" placeholder="Enter a chat message" onkeydown="keypressPersonalChatHandler(event);"/><input class="send" type="button" title="Send chat." onclick="sendPersonalChat(event);"/><input class="close" type="button" title="Close" onclick="closePersonalChat(event);"/></div>');
+    jqObj.append('<div id="msgBoard"><div id="chatOut"></div><input class="chatTo" type="text" placeholder="Enter a message" onkeydown="keypressPersonalChatHandler(event);"/><input class="send" type="button" title="Send message." onclick="sendPersonalChat(event);"/><input class="close" type="button" title="Close" onclick="closePersonalChat(event);"/></div>');
     // add chat util to personal chat out
     var chatOut = $("#msgBoard > #chatOut", jqObj);
     if (!chatOut[0]) {app.log(4, "Item error can't find chatOut");}
@@ -663,11 +663,12 @@
             newHeight = height * options.ySpotRatio,
             widthScale = newWidth / this.item.orgWidth,
             heightScale = newHeight / this.item.orgHeight,
-            scale = (widthScale + heightScale) / 2;
+            scale = (widthScale + heightScale) / 2,
+            zoomedSpot = $('#meeting > #zoom > .cloudcarousel');
 
         //app.log(2, "container w " + width + " h " + height);
         // set round property based on height
-        this.round = (height > 150) ? true : false;
+        this.round = (zoomedSpot.length === 0 && height > 150) ? true : false;
 
         this.item.orgWidth *= scale;
         this.item.orgHeight *= scale;
