@@ -138,6 +138,24 @@ RoomDatabase.prototype.AddRoom = function(roomname, obj, cbSuccess, cbFailure) {
   });
 };
 
+RoomDatabase.prototype.RemoveRoom = function(roomname, cbSuccess, cbFailure) {
+    var self = this;
+
+    this.log('Removing room: ' + roomname);
+
+    ddb.deleteItem(this.ACTIVEROOMS, roomname, null, {}, function(err, res, cap) {
+        if (err)
+        {
+            self.log('RemoveRoom: ERROR: ' + err);
+            cbFailure(err);
+        } else {
+ //           self.log('RemoveRoom: Success: ' + cap);
+ //           self.log(res);
+            cbSuccess(res, cap);
+    }
+  });
+};
+
 //
 //
 // M U C R O O M
@@ -1092,10 +1110,6 @@ MucRoom.prototype.setupRoom = function(form) {
             {
                 self.log('Room setup successful.');
 
-                if (self.successCallback) {
-                    self.successCallback();
-                }
-
                 self.bNewRoom = false;
 
                 if (self.bSelfDestruct === true)
@@ -1903,13 +1917,15 @@ function Overseer(user, pw, notifier) {
 Overseer.prototype.LoadActiveRoomsFromDB = function() {
     var self = this;
 
+    this.log('LoadActiveRoomsFromDB - Loading database list of rooms.');
+
     this.roomDB.LoadRooms(function(rooms_in) {
         var k;
 
         self.active_rooms = rooms_in;
         for (k in rooms_in) {
             if (rooms_in.hasOwnProperty(k)) {
-                self.AddTrackedRoom(k, function() {
+                self.AddTrackedRoom(k, rooms_in[k], function() {
                     self.log('Added from DB: ' + k);
                 }, function(msg) {
                     self.log('LoadRooms: ERROR: Failed ' + k + ' with msg: ' + msg);
@@ -1937,12 +1953,7 @@ Overseer.prototype.destroyRoom = function(roomname) {
             if ('result' === iq.attrs.type) {
                 self.log('OVERSEER: Successfully deleted [' + roomname + ']... removing MucRoomObject');
 
-                self.MucRoomObjects[roomname].pendingDeletion = false;
-
-                MucroomObjectPool.put(self.MucRoomObjects[roomname]);
-                delete self.MucRoomObjects[roomname];
-
-                self.RemoveTrackedRoom(roomname);
+                self.RemoveTrackedRoom(roomname, function() {}, function() {});
             }
         });
     } else {
@@ -2098,7 +2109,7 @@ Overseer.prototype.generateRandomRoomName = function() {
     return result;
 };
 
-Overseer.prototype.AddTrackedRoom = function(roomname, cbSuccess, cbFailure) {
+Overseer.prototype.AddTrackedRoom = function(roomname, obj, cbSuccess, cbFailure) {
     var self = this;
 
     if (this.active_rooms[roomname] && this.MucRoomObjects[roomname]) {
@@ -2107,19 +2118,29 @@ Overseer.prototype.AddTrackedRoom = function(roomname, cbSuccess, cbFailure) {
         return true;
     }
 
-    this.MucRoomObjects[roomname] = MucroomObjectPool.get();
-    this.active_rooms[roomname] = { persistent: 0 };
+    if (obj) {
+ //       this.log('Adding room ' + roomname + ' with object: ', obj);
+        this.active_rooms[roomname] = obj;
+        delete this.active_rooms[roomname].roomname;
+    }
+    else {
+        this.active_rooms[roomname] = { persistent: 0 };
+    }
 
-    console.log('Overseer: Adding room. Roomlist=', this.active_rooms);
-    // TODO: RMW - Now database it.
+    this.MucRoomObjects[roomname] = MucroomObjectPool.get();
+    if (this.active_rooms[roomname].persistent) {
+        this.MucRoomObjects[roomname].bSelfDestruct = false;
+    }
+
+//    console.log('Overseer: Adding room ' + roomname + '. New Roomlist=', this.active_rooms);
 
     if (this.roomDB) {
         this.roomDB.AddRoom(roomname, this.active_rooms[roomname], function() {
             self.MucRoomObjects[roomname].finishInit(function() {
-                self.log('AddTrackedRoom: finishInit success.');
+//                self.log('AddTrackedRoom: finishInit successful for: ' + roomname);
                 cbSuccess();
             }, function() {
-                cbFailure('AddTrackedRoom: ERROR: finishInit failed.');
+                cbFailure('AddTrackedRoom: ERROR: finishInit failed for: ' + roomname);
             });
 
             self.MucRoomObjects[roomname].join(roomname + self.CONF_SERVICE, 'overseer');
@@ -2134,7 +2155,7 @@ Overseer.prototype.AddTrackedRoom = function(roomname, cbSuccess, cbFailure) {
         this.MucRoomObjects[roomname].finishInit(function() {
             cbSuccess();
         }, function() {
-            cbFailure("ERROR: non-DB-finishInit failed.");
+            cbFailure('ERROR: non-DB-finishInit failed.');
         });
 
         this.MucRoomObjects[roomname].join(roomname + self.CONF_SERVICE, 'overseer');
@@ -2143,7 +2164,9 @@ Overseer.prototype.AddTrackedRoom = function(roomname, cbSuccess, cbFailure) {
     return true;
 };
 
-Overseer.prototype.RemoveTrackedRoom = function(roomname) {
+Overseer.prototype.RemoveTrackedRoom = function(roomname, cbSuccess, cbFailure) {
+    var self = this;
+
     if (!this.active_rooms[roomname]) {
         this.log('ERROR: Attempt to remove an unknown room: ' + roomname);
         return false;
@@ -2151,9 +2174,22 @@ Overseer.prototype.RemoveTrackedRoom = function(roomname) {
 
     delete this.active_rooms[roomname];
 
-    console.log('Overseer: Removing room. Roomlist=', this.active_rooms);
+//    console.log('Overseer: Removing room. Roomlist=', this.active_rooms);
 
-    // TODO: RMW - Now database the removal.
+    if (this.roomDB) {
+        this.roomDB.RemoveRoom(roomname, function() {
+//            self.log('RemoveTrackedRoom: RemoveRoom success for: ' + roomname);
+            cbSuccess();
+        }, function() {
+            self.log('RemoveTrackedRoom: RemoveRoom failed.');
+            cbFailure('ERROR: RemoveRoom failed.');
+        });
+    }
+
+    // Clean up the MucRoomObjects pool.
+    self.MucRoomObjects[roomname].pendingDeletion = false;
+    MucroomObjectPool.put(self.MucRoomObjects[roomname]);
+    delete self.MucRoomObjects[roomname];
 
     return true;
 };
@@ -2185,7 +2221,7 @@ Overseer.prototype.CreateRoomRequest = function(iq) {
         // Need to track rooms created, their status (including things like persistence)
         // and eventually database that information too.
         //
-        this.AddTrackedRoom(roomname, function() {
+        this.AddTrackedRoom(roomname, null, function() {
             var iqResult = new xmpp.Element('iq', {to: iq.attrs.from, type: 'result', id: iq.attrs.id})
                                 .c('ok', {xmlns: 'urn:xmpp:callcast', name: roomname});
             self.client.send(iqResult.root());
