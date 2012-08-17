@@ -1747,8 +1747,7 @@ function Overseer(user, pw, notifier) {
 
                         this.roommanager = true;
 
-//                        this.roomDB = new RoomDatabase();
-//                        this.roomDB.LoadRooms();
+                        this.roomDB = new RoomDatabase();
                     }
 
                     if ('roommanagertest' === option) {
