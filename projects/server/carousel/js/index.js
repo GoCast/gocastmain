@@ -507,34 +507,10 @@ function carouselItemClick(event)
     var urlName,
         item;
     console.log('carouselItemClick ', event);
+    //todo add a class for remote video spots
     if (event.currentTarget.className.indexOf('unoccupied') !== -1)
     {
-      urlName = prompt('Enter a URL to put in this spot.');
-      if (urlName && urlName.length > 0)
-      {
-        app.log(2, 'carouselItemClick got url ' + urlName);
-        //todo canonicalize url
-        item = $(event.currentTarget).data('item');
-        if (!item) {throw "no item for spot";}
-        // see if spot has number, if so use Callcast.SetSpot
-        if (item.spotnumber)
-        {
-          Callcast.SetSpot({spotnumber: item.spotnumber,
-                            spottype: 'url',
-                            spoturl: urlName,
-                            spotdivid: urlName
-                           });
-        }
-        else // no spotnumber call add spot but pass spot index so it gets the url
-        {
-          Callcast.AddSpot({spotreplace: 'exact',
-                            spotindex: item.index,
-                            spottype: 'url',
-                            spoturl: urlName,
-                            spotdivid: urlName
-                           });
-        }
-      }
+      // do nothing
     }
     else if (event.currentTarget.title === 'Me')
     {
@@ -689,54 +665,6 @@ function openChat(event)
     }
     return false;
   }
-  /*
-  else {
-    recipientId = $(cTarget).attr('id');
-    recipient = $(cTarget).attr('title');
-    ename = $(cTarget).attr('encname');
-    if (recipientId && recipientId.match('mystream')) {
-      app.log(2, 'Local player clicked, do nothing.');
-      return false;
-    }
-    else if (recipientId) {
-      $('span', jqWin).attr('id', recipientId).attr('ename', ename)
-        .text('Message to ' + recipient + ':');
-    }
-    else {
-      return false;
-    }
-  }
-  // Click position.
-  cX = event.clientX;
-  cY = event.clientY;
-  // Transition effect.
-  jqMask = $('#mask');
-  jqMask.fadeIn(500, activateWindow('#chatInp'));
-  jqMask.fadeTo('fast', 0.3);
-  // Position chat Inp.
-  winW = $(window).width();
-  winH = $(window).height();
-  wcW = jqWin.outerWidth();
-  wcH = jqWin.outerHeight();
-  if ((cY + wcH) > winH) {
-    jqWin.css('top', winH - wcH);
-  }
-  else {
-    jqWin.css('top', cY);
-  }
-  if ((cX + wcW) > winW) {
-    jqWin.css('left', winW - wcW);
-  }
-  else {
-    jqWin.css('left', cX);
-  }
-  // Transition effect for Chat Input Window.
-  jqWin.fadeIn(700);
-  // Add class active.
-  jqWin.addClass('active');
-  // Add focus to input text.
-  $('input.chatTo', jqWin).focus();
-  */
   return false;
 } // openChat() 
 
