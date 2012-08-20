@@ -509,6 +509,7 @@ function carouselItemClick(event)
     console.log('carouselItemClick ', event);
     if (event.currentTarget.className.indexOf('unoccupied') !== -1)
     {
+      /*
       urlName = prompt('Enter a URL to put in this spot.');
       if (urlName && urlName.length > 0)
       {
@@ -535,6 +536,7 @@ function carouselItemClick(event)
                            });
         }
       }
+      */
     }
     else if (event.currentTarget.title === 'Me')
     {
