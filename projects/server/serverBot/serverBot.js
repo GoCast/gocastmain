@@ -72,15 +72,25 @@ function logDate() {
 // R O O M   D A T A B A S E
 //
 //
-function RoomDatabase() {
+function RoomDatabase(notifier) {
     this.roomList = {};
     // Table names on DynamoDB
     this.ACTIVEROOMS = 'room_active_list';
     this.ROOMCONTENTS = 'room_contents';
+    this.notifier = notifier;
 }
 
 RoomDatabase.prototype.log = function(msg) {
     console.log(logDate() + ' - roomDB: ', msg);
+};
+
+RoomDatabase.prototype.notifylog = function(msg) {
+    if (this.notifier) {
+        this.notifier.sendMessage(logDate() + ' RoomDatabase: ' + msg);
+    }
+    else {
+        console.log(logDate() + ' - NULL-NOTIFIER-MESSAGE: RoomDatabase: ' + msg);
+    }
 };
 
 RoomDatabase.prototype.LoadRooms = function(cbSuccess, cbFailure) {
@@ -90,6 +100,9 @@ RoomDatabase.prototype.LoadRooms = function(cbSuccess, cbFailure) {
         var i, len;
 
         if (err) {
+            if (err.statusCode === 400) {
+                self.notifylog('DynamoDB Throughput ERROR: LoadRooms scan.');
+            }
             self.log(err);
             if (cbFailure) {
                 cbFailure(err);
@@ -128,14 +141,17 @@ RoomDatabase.prototype.AddRoom = function(roomname, obj, cbSuccess, cbFailure) {
     ddb.putItem(this.ACTIVEROOMS, obj, {}, function(err, res, cap) {
         if (err)
         {
+            if (err.statusCode === 400) {
+                self.notifylog('DynamoDB Throughput ERROR: AddRoom room: ' + roomname);
+            }
             self.log('AddRoom: ERROR: ' + err);
             cbFailure(err);
         } else {
  //           self.log('AddRoom: Success: ' + cap);
  //           self.log(res);
             cbSuccess(res, cap);
-    }
-  });
+        }
+    });
 };
 
 RoomDatabase.prototype.RemoveRoom = function(roomname, cbSuccess, cbFailure) {
@@ -146,14 +162,197 @@ RoomDatabase.prototype.RemoveRoom = function(roomname, cbSuccess, cbFailure) {
     ddb.deleteItem(this.ACTIVEROOMS, roomname, null, {}, function(err, res, cap) {
         if (err)
         {
+            if (err.statusCode === 400) {
+                self.notifylog('DynamoDB Throughput ERROR: RemoveRoom room: ' + roomname);
+            }
             self.log('RemoveRoom: ERROR: ' + err);
             cbFailure(err);
         } else {
  //           self.log('RemoveRoom: Success: ' + cap);
  //           self.log(res);
             cbSuccess(res, cap);
+        }
+    });
+};
+
+//
+// Will auto-correct booleans and turn them into true==>1 and false==>0
+//
+RoomDatabase.prototype.validateObj = function(obj) {
+    var k, tk, retobj = {};
+
+    for (k in obj)
+    {
+        if (obj.hasOwnProperty(k)) {
+            tk = typeof obj[k];
+            if (tk === 'boolean') {
+                retobj[k] = obj[k] ? 1 : 0;
+            }
+            else if (tk !== 'string' && tk !== 'number') {
+                return null;
+            }
+            else {
+                retobj[k] = obj[k];
+            }
+        }
     }
-  });
+
+    return retobj;
+};
+
+RoomDatabase.prototype.AddContentToRoom = function(roomname, spotnumber, obj, cbSuccess, cbFailure) {
+    var self = this,
+        putobj = null;
+
+    if (!this.roomList[roomname]) {
+        this.log('AddContentToRoom: ERROR: roomname [' + roomname + '] doesnt exist yet. Cannot add contents.');
+        return false;
+    }
+
+    // Build our 'putobj' one property at a time ensuring each property of 'obj' is a string or a number.
+    putobj = this.validateObj(obj);
+    if (!putobj) {
+        this.log('AddContentToRoom: ERROR: obj given must be strings or numbers only.');
+        return false;
+    }
+
+    if (typeof roomname !== 'string' || typeof spotnumber !== 'string') {
+        this.log('AddContentToRoom: ERROR: roomname and spotnumber given must be strings.');
+        return false;
+    }
+
+    this.log('Adding content to room: ' + roomname + ' in spotnumber: ' + spotnumber);
+
+    putobj.roomname = roomname;
+    putobj.spotnumber = spotnumber;
+
+    ddb.putItem(this.ROOMCONTENTS, putobj, {}, function(err, res, cap) {
+        if (err)
+        {
+            if (err.statusCode === 400) {
+                self.notifylog('DynamoDB Throughput ERROR: AddContentToRoom room: ' + roomname + ' spotnumber: ' + spotnumber);
+            }
+            self.log('AddContentToRoom: ERROR: ' + err);
+            cbFailure(err);
+        } else {
+            self.log('AddContentToRoom: Success: ' + cap);
+            self.log(res);
+            cbSuccess(res, cap);
+        }
+    });
+
+    return true;
+};
+
+RoomDatabase.prototype.RemoveContentFromRoom = function(roomname, spotnumber, cbSuccess, cbFailure) {
+    var self = this;
+
+    if (!this.roomList[roomname]) {
+        this.log('RemoveContentFromRoom: ERROR: roomname [' + roomname + '] doesnt exist yet. Cannot remove contents.');
+        return false;
+    }
+
+    if (typeof roomname !== 'string' || typeof spotnumber !== 'string') {
+        this.log('RemoveContentFromRoom: ERROR: roomname and spotnumber given must be strings.');
+        return false;
+    }
+
+    this.log('Removing content from room: ' + roomname + ' in spotnumber: ' + spotnumber);
+
+    ddb.deleteItem(this.ROOMCONTENTS, roomname, spotnumber, {}, function(err, res, cap) {
+        if (err)
+        {
+            if (err.statusCode === 400) {
+                self.notifylog('DynamoDB Throughput ERROR: RemoveContentFromRoom room: ' + roomname + ' spotnumber: ' + spotnumber);
+            }
+            self.log('RemoveContentFromRoom: ERROR: ' + err);
+            cbFailure(err);
+        } else {
+            self.log('RemoveContentFromRoom: Success: ' + cap);
+            self.log(res);
+            cbSuccess(res, cap);
+        }
+    });
+};
+
+RoomDatabase.prototype.RemoveAllContentsFromRoom = function(roomname, cbSuccess, cbFailure) {
+    var self = this,
+        options = {},
+        buildup = [],
+        i, len,
+        toDel = {},
+        QueryCB = null,
+        batchDelay = 1000,
+        maxPerBatch = 2;
+
+    QueryCB = function(err, res, cap) {
+        if (err)
+        {
+            if (err.statusCode === 400) {
+                self.notifylog('DynamoDB Throughput ERROR: QueryCB room: ' + roomname);
+            }
+            self.log('RemoveAllContentsFromRoom:query ERROR: ' + err);
+            console.log('Raw err:', err);
+            cbFailure(err);
+        } else {
+            console.log('RemoveAllContentsFromRoom:query Success: ', res);
+            // Now we have an object in res.items which is an array of objects that contain 'roomname' and 'spotnumber'
+            len = res.items.length;
+            buildup = [];
+
+            for (i = 0; i < len; i += 1)
+            {
+                buildup.push([res.items[i].roomname, res.items[i].spotnumber]);
+            }
+
+            toDel[self.ROOMCONTENTS] = buildup;
+            console.log('Interim toDel....', toDel);
+                ddb.batchWriteItem(null, toDel, function(errdel, resdel) {
+                if (errdel)
+                {
+                    if (errdel.statusCode === 400) {
+                        self.notifylog('DynamoDB Throughput ERROR: batchWriteItem room: ' + roomname);
+                    }
+                    self.log('RemoveAllContentsFromRoom:batchWriteItem ERROR: ' + errdel);
+                    cbFailure(errdel);
+                } else {
+                    console.log('RemoveAllContentsFromRoom:batchWriteItem Success: ', resdel);
+
+                    // On a successful delete, we check to see if we go around again for more...
+                    if (res.lastEvaluatedKey.hash) {
+                        options.exclusiveStartKey = res.lastEvaluatedKey;
+                        console.log('Secondary iteration starting from:', res.lastEvaluatedKey);
+
+                        console.log('table:', self.ROOMCONTENTS, ' roomname:', roomname, ' options:', options);
+                        setTimeout(function() {
+                            ddb.query(self.ROOMCONTENTS, roomname, options, QueryCB);
+                        }, batchDelay);
+                    }
+                    else {
+                        console.log('RemoveAllContentsFromRoom: SUCCESS.');
+                        cbSuccess();
+                    }
+                }
+            });
+        }
+    };
+
+    if (!this.roomList[roomname]) {
+        this.log('RemoveAllContentsFromRoom: ERROR: roomname [' + roomname + '] doesnt exist yet. Cannot remove contents.');
+        return false;
+    }
+
+    if (typeof roomname !== 'string') {
+        this.log('RemoveAllContentsFromRoom: ERROR: roomname given must be a string.');
+        return false;
+    }
+
+    this.log('Removing ALL contents from room: ' + roomname);
+
+    options = { limit: maxPerBatch, attributesToGet: ["roomname", "spotnumber"] };
+
+    ddb.query(this.ROOMCONTENTS, roomname, options, QueryCB);
+
 };
 
 //
@@ -1759,7 +1958,7 @@ function Overseer(user, pw, notifier) {
 
                         this.roommanager = true;
 
-                        this.roomDB = new RoomDatabase();
+                        this.roomDB = new RoomDatabase(notifier);
                     }
 
                     if ('roommanagertest' === option) {
@@ -1769,7 +1968,7 @@ function Overseer(user, pw, notifier) {
 
                         this.roommanager = true;
 
-                        this.roomDB = new RoomDatabase();
+                        this.roomDB = new RoomDatabase(notifier);
                     }
                 }
                 else {
