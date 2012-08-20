@@ -240,7 +240,8 @@ var app = {
         $(app.GROUP_CHAT_OUT).attr('disabled', 'disabled');
      }
   },
-  videoEnabled: false // video enabled state
+  videoEnabled: true // video enabled state todo this must be initially in sync with video button class
+                     //       make either this var or button class the state variable
 }; /* app */
 
 ///
@@ -689,12 +690,14 @@ function openMeeting(
   // use fb profile pick as bg image if it exists
   // set this here initially because local video
   // is off initially
-  // todo consider moving this
+  /* todo below needs to be uncommented if initial video state is off
+          rewrite the video on/off background on/off code
   if (app.user.fbProfilePicUrl)
   {
      $('#meeting > #streams > #scarousel #mystream')
         .css('background-image', 'url(' + app.user.fbProfilePicUrl + ')');
   }
+  */
   // center carousel in it's container
   // the carousel positioning is handled by it's resize method
   var sCar = $('#scarousel'),

@@ -1018,7 +1018,7 @@ function setLocalSpeakerStatus(vol)
   if (app.volWarningDisplayed === false)             // check volume only on first callback
   {
     if($.cookie("stopVolumeStatus") !== "checked" && // and if user has not disabled the check
-      (vol < 255*0.07) )                             // if vol is < 5%
+      (vol < 255*0.07) )                             // if vol is below threshold
     {
       $(app.STATUS_PROMPT).css("display", "block");  // display warning
     }
@@ -1068,7 +1068,7 @@ function pluginLoaded(
 
         // Callcast Seetings.
         // todo there's an app member for video state, merge it with callcast video state
-        Callcast.SetUseVideo(false); // Initially set to false, user must enable.
+        // Callcast.SetUseVideo(false); // Initially set to false, user must enable.
 
         checkForPluginOptionalUpgrades(); // display upgrade button if there are optional upgrades
 
