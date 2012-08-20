@@ -170,7 +170,12 @@ RoomDatabase.prototype.RemoveRoom = function(roomname, cbSuccess, cbFailure) {
         } else {
  //           self.log('RemoveRoom: Success: ' + cap);
  //           self.log(res);
-            cbSuccess(res, cap);
+            // Make sure all contents for this room are removed automatically as well.
+            self.RemoveAllContentsFromRoom(roomname, function() {
+                cbSuccess(res, cap);
+            }, function(msg) {
+                self.log('RemoveRoom: RemoveAllContentsFromRoom: failed to complete: ' + msg);
+            });
         }
     });
 };
@@ -214,6 +219,11 @@ RoomDatabase.prototype.AddContentToRoom = function(roomname, spotnumber, obj, cb
     if (!putobj) {
         this.log('AddContentToRoom: ERROR: obj given must be strings or numbers only.');
         return false;
+    }
+
+    if (typeof spotnumber === 'number') {
+        // translate to a string.
+        spotnumber = '' + spotnumber;
     }
 
     if (typeof roomname !== 'string' || typeof spotnumber !== 'string') {
@@ -346,17 +356,19 @@ RoomDatabase.prototype.RemoveAllContentsFromRoom = function(roomname, cbSuccess,
 
     if (!this.roomList[roomname]) {
         this.log('RemoveAllContentsFromRoom: ERROR: roomname [' + roomname + '] doesnt exist yet. Cannot remove contents.');
+        cbFailure('No such room.');
         return false;
     }
 
     if (typeof roomname !== 'string') {
         this.log('RemoveAllContentsFromRoom: ERROR: roomname given must be a string.');
+        cbFailure('Room must be a string.');
         return false;
     }
 
     this.log('Removing ALL contents from room: ' + roomname);
 
-    options = { limit: maxPerBatch, attributesToGet: ["roomname", "spotnumber"] };
+    options = { limit: maxPerBatch, attributesToGet: ['roomname', 'spotnumber'] };
 
     ddb.query(this.ROOMCONTENTS, roomname, options, QueryCB);
 
@@ -967,7 +979,7 @@ MucRoom.prototype.SendPrivateChat = function(to, msg) {
 
 MucRoom.prototype.AddSpotReflection = function(iq) {
     // Need to pull out the 'info' object - which is the attributes to the 'addspot'
-    var info = {};
+    var info = {}, self = this;
     if (iq.getChild('addspot')) {
         info = iq.getChild('addspot').attrs;
     }
@@ -995,7 +1007,13 @@ MucRoom.prototype.AddSpotReflection = function(iq) {
 
 //        console.log(' spotList in: ' + this.roomname + ' is: ', this.spotList);
 
-        // TODO: RMW - Now database this in room_contents
+        if (this.ddb) {
+            this.ddb.AddContentToRoom(this.roomname, info.spotnumber, info, function() {
+                return true;
+            }, function(msg) {
+                self.log('AddSpotReflection: ERROR adding to database: ' + msg);
+            });
+        }
     }
 
 };
@@ -1019,7 +1037,7 @@ MucRoom.prototype.createErrorIQ = function(iq_in, reason_in, err_type_in) {
 
 MucRoom.prototype.SetSpotReflection = function(iq) {
     // Need to pull out the 'info' object - which is the attributes to the 'addspot'
-    var info = {};
+    var info = {}, self = this;
 
     // Prep to reply to the IQ message.
     iq.attrs.to = iq.attrs.from;
@@ -1050,7 +1068,13 @@ MucRoom.prototype.SetSpotReflection = function(iq) {
 
  //       console.log(' spotList in: ' + this.roomname + ' is: ', this.spotList);
 
-        // TODO: RMW - Now database this in room_contents.
+        if (this.ddb) {
+            this.ddb.AddContentToRoom(this.roomname, info.spotnumber, info, function() {
+                return true;
+            }, function(msg) {
+                self.log('SetSpotReflection: ERROR adding to database: ' + msg);
+            });
+        }
 
         iq.attrs.type = 'result';
     }
@@ -1061,7 +1085,7 @@ MucRoom.prototype.SetSpotReflection = function(iq) {
 
 MucRoom.prototype.RemoveSpotReflection = function(iq) {
     // Need to pull out the 'info' object - which is the attributes to the 'removespot'
-    var info = {};
+    var info = {}, self = this;
 
     if (iq.getChild('removespot')) {
         info = iq.getChild('removespot').attrs;
@@ -1086,6 +1110,13 @@ MucRoom.prototype.RemoveSpotReflection = function(iq) {
 //        console.log(' spotList in: ' + this.roomname + ' is: ', this.spotList);
 
         // TODO: RMW - Now database this removal in room_contents.
+        if (this.ddb) {
+            this.ddb.RemoveContentFromRoom(this.roomname, info.spotnumber, function() {
+                return true;
+            }, function(msg) {
+                self.log('AddSpotReflection: ERROR removing from database: ' + msg);
+            });
+        }
 
         // Prep to reply to the IQ message.
         iq.attrs.to = iq.attrs.from;
@@ -2142,9 +2173,13 @@ Overseer.prototype.LoadActiveRoomsFromDB = function() {
     }
 
     this.roomDB.LoadRooms(function(rooms_in) {
-        var k;
+        var k, addOne;
+
+        // Doing delay-load/add on rooms list.
 
         self.active_rooms = rooms_in;
+
+
         for (k in rooms_in) {
             if (rooms_in.hasOwnProperty(k)) {
                 self.AddTrackedRoom(k, rooms_in[k], function() {
