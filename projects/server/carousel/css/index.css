@@ -299,8 +299,8 @@ body > div#meeting
   position: absolute;
   top: 0px;
   left: 0px;
+  bottom: 37px;
   width: 100%;
-  height: 90%;
 }
 body > div#meeting > div#zoom {
   display: none;
@@ -391,7 +391,7 @@ body > div#meeting > div#streams {
   top: 0px;
   left: 0px;
   width: 98%;
-  height: 90%;
+  height: 100%;
 }
 body > div#meeting > div#streams > div#scarousel {
   width: 100%;
@@ -405,7 +405,7 @@ body > div#meeting > div#streams > div#scarousel div#addItem
   margin-right: 5px;
   margin-bottom:5px;
   position:absolute;
-  bottom:5px;
+  bottom:25px;
   right:5px;
 }
 body > div#meeting > div#streams > div#scarousel div#addItem > img
@@ -445,6 +445,12 @@ body > div#meeting > div#streams div.cloudcarousel > img.zoom
   height: 30px;
   margin: 3px;
   position: absolute;
+}
+div.cloudcarousel
+{
+  -moz-box-shadow: 0px 0px 3px #303030;
+  -webkit-box-shadow: 0px 0px 3px #303030;
+  box-shadow: 0px 0px 3px #303030;
 }
 div.cloudcarousel.typeContent {
   background-size: 98%;
