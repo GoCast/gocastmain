@@ -22,6 +22,9 @@ var xmpp = require('node-xmpp');
 var fs = require('fs');
 var ltx = require('ltx');
 var evt = require('events');
+var ddb = require('dynamodb').ddb({ endpoint: 'dynamodb.us-west-1.amazonaws.com',
+                                accessKeyId: 'AKIAJWJEBZBGT6TPH32A',
+                                secretAccessKey: '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' });
 
 var eventManager = new evt.EventEmitter();
 var argv = process.argv;
@@ -63,6 +66,95 @@ function logDate() {
     return pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()) + '-' + d.getFullYear() + ' ' +
             pad2(d.getHours()) + ':' + pad2(d.getMinutes()) + ':' + pad2(d.getSeconds());
 }
+
+//
+//
+// R O O M   D A T A B A S E
+//
+//
+function RoomDatabase() {
+    this.roomList = {};
+    // Table names on DynamoDB
+    this.ACTIVEROOMS = 'room_active_list';
+    this.ROOMCONTENTS = 'room_contents';
+}
+
+RoomDatabase.prototype.log = function(msg) {
+    console.log(logDate() + ' - roomDB: ', msg);
+};
+
+RoomDatabase.prototype.LoadRooms = function(cbSuccess, cbFailure) {
+    var self = this;
+
+    ddb.scan(this.ACTIVEROOMS, {}, function(err, res) {
+        var i, len;
+
+        if (err) {
+            self.log(err);
+            if (cbFailure) {
+                cbFailure(err);
+            }
+        } else {
+            self.log('Loading ' + res.count + ' rooms from the database.');
+
+            self.roomList = {};
+            len = res.count;
+
+            for (i = 0; i < len; i += 1)
+            {
+                self.roomList[res.items[i].roomname] = res.items[i];
+                // Roomname in the object is redundant. Remove it.
+                delete self.roomList[res.items[i].roomname].roomname;
+            }
+
+//            self.log(self.roomList);
+
+            if (cbSuccess) {
+                cbSuccess(self.roomList);
+            }
+        }
+      });
+};
+
+RoomDatabase.prototype.AddRoom = function(roomname, obj, cbSuccess, cbFailure) {
+    var self = this;
+
+    this.log('Adding room: ' + (roomname || obj.roomname));
+
+    if (!obj.roomname && roomname) {
+        obj.roomname = roomname;
+    }
+
+    ddb.putItem(this.ACTIVEROOMS, obj, {}, function(err, res, cap) {
+        if (err)
+        {
+            self.log('AddRoom: ERROR: ' + err);
+            cbFailure(err);
+        } else {
+ //           self.log('AddRoom: Success: ' + cap);
+ //           self.log(res);
+            cbSuccess(res, cap);
+    }
+  });
+};
+
+RoomDatabase.prototype.RemoveRoom = function(roomname, cbSuccess, cbFailure) {
+    var self = this;
+
+    this.log('Removing room: ' + roomname);
+
+    ddb.deleteItem(this.ACTIVEROOMS, roomname, null, {}, function(err, res, cap) {
+        if (err)
+        {
+            self.log('RemoveRoom: ERROR: ' + err);
+            cbFailure(err);
+        } else {
+ //           self.log('RemoveRoom: Success: ' + cap);
+ //           self.log(res);
+            cbSuccess(res, cap);
+    }
+  });
+};
 
 //
 //
@@ -278,7 +370,7 @@ MucRoom.prototype.handlePresence = function(pres) {
     //
     if (pres.attrs.type !== 'unavailable')
     {
-        if (!this.participants[fromnick]) {
+        if (!this.participants[fromnick] && fromnick !== this.nick) {
             this.log('Adding: ' + fromjid + ' as Nickname: ' + fromnick);
             this.SendSpotListTo(pres.attrs.from);
         }
@@ -380,6 +472,8 @@ MucRoom.prototype.handlePresence = function(pres) {
             {
                 if (this.successCallback) {
                     this.successCallback();
+                    this.successCallback = null;
+                    this.failureCallback = null;
                 }
 
                 if (this.bSelfDestruct === true)
@@ -705,7 +799,7 @@ MucRoom.prototype.createErrorIQ = function(iq_in, reason_in, err_type_in) {
 
     e_type = err_type_in || 'modify';
 
-    iq_out = new xmpp.Element('iq', {'to': iq_in.root().attrs.from, type: 'error', id: iq_in.root().attrs.id})
+    iq_out = new xmpp.Element('iq', {to: iq_in.root().attrs.from, type: 'error', id: iq_in.root().attrs.id})
                 .c('error', {type: e_type})
                 .c('bad-request', {xmlns: 'urn:ietf:params:xml:ns:xmpp-stanzas'})
                 .up().c('reason', {xmlns: 'urn:ietf:params:xml:ns:xmpp-stanzas'}).t(reason_in);
@@ -795,8 +889,8 @@ MucRoom.prototype.RemoveSpotReflection = function(iq) {
         iq.attrs.type = 'result';
     }
 
-    // Send back the IQ result.
-    this.client.send(iq);
+        // Send back the IQ result.
+        this.client.send(iq.root());
 };
 
 //
@@ -1020,6 +1114,8 @@ MucRoom.prototype.setupRoom = function(form) {
 
                 if (self.successCallback) {
                     self.successCallback();
+                    self.successCallback = null;
+                    self.failureCallback = null;
                 }
 
                 self.bNewRoom = false;
@@ -1047,6 +1143,8 @@ MucRoom.prototype.setupRoom = function(form) {
 
                 if (self.failureCallback) {
                     self.failureCallback();
+                    self.successCallback = null;
+                    self.failureCallback = null;
                 }
             }
         });
@@ -1057,6 +1155,8 @@ MucRoom.prototype.setupRoom = function(form) {
 
         if (self.failureCallback) {
             self.failureCallback();
+            self.successCallback = null;
+            self.failureCallback = null;
         }
     }
 };
@@ -1610,6 +1710,8 @@ function loadRooms(filename) {
     return fs.readFileSync(filename, 'utf8');
 }
 
+
+
 ////////////////////////////////////////////////////////////////////////////////////////
 ///
 ///
@@ -1617,6 +1719,8 @@ function loadRooms(filename) {
 ///
 ///
 ////////////////////////////////////////////////////////////////////////////////////////
+
+
 
 function Overseer(user, pw, notifier) {
     var roomsxml, par, rooms,
@@ -1631,6 +1735,8 @@ function Overseer(user, pw, notifier) {
     this.notifier = notifier;
     this.iqnum = 0;
     this.iq_callbacks = {};
+    this.roommanager = false;
+    this.roomDB = null;
 
     this.active_rooms = {};
 
@@ -1650,6 +1756,20 @@ function Overseer(user, pw, notifier) {
                         this.log('OVERSEER: ROOM MANAGER MODE');
                         user = user + '/' + option;
                         this.log('OVERSEER: JID = ' + user);
+
+                        this.roommanager = true;
+
+                        this.roomDB = new RoomDatabase();
+                    }
+
+                    if ('roommanagertest' === option) {
+                        this.log('OVERSEER: ROOM MANAGER MODE');
+                        user = user + '/' + option;
+                        this.log('OVERSEER: JID = ' + user);
+
+                        this.roommanager = true;
+
+                        this.roomDB = new RoomDatabase();
                     }
                 }
                 else {
@@ -1710,6 +1830,10 @@ function Overseer(user, pw, notifier) {
                 self.MucRoomObjects[k].join(k + self.CONF_SERVICE, 'overseer');
             }
         }
+
+        if (self.roommanager) {
+            self.LoadActiveRoomsFromDB();
+        }
     });
 
     this.client.on('offline', function() {
@@ -1741,7 +1865,7 @@ function Overseer(user, pw, notifier) {
             self.handleIq(stanza);
         }
         else {
-            self.log('UNHANDLED: ' + stanza.tree());
+            self.log('UNHANDLED: ' + stanza.toString());
         }
     });
 
@@ -1801,6 +1925,35 @@ function Overseer(user, pw, notifier) {
     });
 }
 
+Overseer.prototype.LoadActiveRoomsFromDB = function() {
+    var self = this;
+
+    this.log('LoadActiveRoomsFromDB - Loading database list of rooms.');
+
+    if (!this.roomDB) {
+        this.log('ERROR: No roomDB created yet. Skipping LoadActiveRoomsFromDB.');
+        return false;
+    }
+
+    this.roomDB.LoadRooms(function(rooms_in) {
+        var k;
+
+        self.active_rooms = rooms_in;
+        for (k in rooms_in) {
+            if (rooms_in.hasOwnProperty(k)) {
+                self.AddTrackedRoom(k, rooms_in[k], function() {
+                    self.log('Added from DB: ' + k);
+                }, function(msg) {
+                    self.log('LoadRooms: ERROR: Failed ' + k + ' with msg: ' + msg);
+                });
+            }
+        }
+    }, function(err) {
+        self.log('LoadRooms ERROR: ' + err);
+    });
+
+};
+
 Overseer.prototype.destroyRoom = function(roomname) {
     var self = this,
         iqDestroyRoom, k;
@@ -1816,12 +1969,7 @@ Overseer.prototype.destroyRoom = function(roomname) {
             if ('result' === iq.attrs.type) {
                 self.log('OVERSEER: Successfully deleted [' + roomname + ']... removing MucRoomObject');
 
-                self.MucRoomObjects[roomname].pendingDeletion = false;
-
-                MucroomObjectPool.put(self.MucRoomObjects[roomname]);
-                delete self.MucRoomObjects[roomname];
-
-                self.RemoveTrackedRoom(roomname);
+                self.RemoveTrackedRoom(roomname, function() {}, function() {});
             }
         });
     } else {
@@ -1977,15 +2125,64 @@ Overseer.prototype.generateRandomRoomName = function() {
     return result;
 };
 
-Overseer.prototype.AddTrackedRoom = function(roomname) {
-    this.active_rooms[roomname] = { persistent: false };
+Overseer.prototype.AddTrackedRoom = function(roomname, obj, cbSuccess, cbFailure) {
+    var self = this;
 
-    console.log('Overseer: Adding room. Roomlist=', this.active_rooms);
-    // TODO: RMW - Now database it.
+    if (this.active_rooms[roomname] && this.MucRoomObjects[roomname]) {
+        this.log('WARNING: Room already present: ' + roomname);
+        cbSuccess('WARNING: Room already present: ' + roomname);
+        return true;
+    }
+
+    if (obj) {
+ //       this.log('Adding room ' + roomname + ' with object: ', obj);
+        this.active_rooms[roomname] = obj;
+        delete this.active_rooms[roomname].roomname;
+    }
+    else {
+        this.active_rooms[roomname] = { persistent: 0 };
+    }
+
+    this.MucRoomObjects[roomname] = MucroomObjectPool.get();
+    if (this.active_rooms[roomname].persistent) {
+        this.MucRoomObjects[roomname].bSelfDestruct = false;
+    }
+
+//    console.log('Overseer: Adding room ' + roomname + '. New Roomlist=', this.active_rooms);
+
+    if (this.roomDB) {
+        this.roomDB.AddRoom(roomname, this.active_rooms[roomname], function() {
+            self.MucRoomObjects[roomname].finishInit(function() {
+//                self.log('AddTrackedRoom: finishInit successful for: ' + roomname);
+                cbSuccess();
+            }, function() {
+                cbFailure('AddTrackedRoom: ERROR: finishInit failed for: ' + roomname);
+            });
+
+            self.MucRoomObjects[roomname].join(roomname + self.CONF_SERVICE, 'overseer');
+        }, function() {
+            self.log('AddTrackedRoom: AddRoom failed.');
+            cbFailure('ERROR: AddRoom for DB failed.');
+        });
+    }
+    else {
+        this.log('WARNING: roomDB is not initialized. TrackedRoom will not be databased.');
+        // Even without the database, we need to finish the init process on the mucRoom.
+        this.MucRoomObjects[roomname].finishInit(function() {
+            cbSuccess();
+        }, function() {
+            cbFailure('ERROR: non-DB-finishInit failed.');
+        });
+
+        this.MucRoomObjects[roomname].join(roomname + self.CONF_SERVICE, 'overseer');
+    }
+
     return true;
 };
 
-Overseer.prototype.RemoveTrackedRoom = function(roomname) {
+Overseer.prototype.RemoveTrackedRoom = function(roomname, cbSuccess, cbFailure) {
+    var self = this;
+
     if (!this.active_rooms[roomname]) {
         this.log('ERROR: Attempt to remove an unknown room: ' + roomname);
         return false;
@@ -1993,9 +2190,22 @@ Overseer.prototype.RemoveTrackedRoom = function(roomname) {
 
     delete this.active_rooms[roomname];
 
-    console.log('Overseer: Removing room. Roomlist=', this.active_rooms);
+//    console.log('Overseer: Removing room. Roomlist=', this.active_rooms);
 
-    // TODO: RMW - Now database the removal.
+    if (this.roomDB) {
+        this.roomDB.RemoveRoom(roomname, function() {
+//            self.log('RemoveTrackedRoom: RemoveRoom success for: ' + roomname);
+            cbSuccess();
+        }, function() {
+            self.log('RemoveTrackedRoom: RemoveRoom failed.');
+            cbFailure('ERROR: RemoveRoom failed.');
+        });
+    }
+
+    // Clean up the MucRoomObjects pool.
+    self.MucRoomObjects[roomname].pendingDeletion = false;
+    MucroomObjectPool.put(self.MucRoomObjects[roomname]);
+    delete self.MucRoomObjects[roomname];
 
     return true;
 };
@@ -2023,28 +2233,25 @@ Overseer.prototype.CreateRoomRequest = function(iq) {
     //
     if (!this.MucRoomObjects[roomname])
     {
-        this.MucRoomObjects[roomname] = MucroomObjectPool.get();
-
         //
         // Need to track rooms created, their status (including things like persistence)
         // and eventually database that information too.
         //
-        this.AddTrackedRoom(roomname);
-
-        this.MucRoomObjects[roomname].finishInit(function() {
+        this.AddTrackedRoom(roomname, null, function() {
             var iqResult = new xmpp.Element('iq', {to: iq.attrs.from, type: 'result', id: iq.attrs.id})
                                 .c('ok', {xmlns: 'urn:xmpp:callcast', name: roomname});
             self.client.send(iqResult.root());
             },
 
-            function() {
-                var iqResult = new xmpp.Element('iq', {to: iq.attrs.from, type: 'result', id: iq.attrs.id})
+            function(msg) {
+                var iqResult = new xmpp.Element('iq', {to: iq.attrs.from, type: 'error', id: iq.attrs.id})
                                 .c('err', {xmlns: 'urn:xmpp:callcast'});
+
+                self.log('CreateRoomRequest: ERROR: ' + msg);
                 self.client.send(iqResult.root());
             }
         );
 
-        this.MucRoomObjects[roomname].join(roomname + this.CONF_SERVICE, 'overseer');
     }
     else        // Room already exists -- just let 'em know all is ok.
     {
@@ -2175,6 +2382,9 @@ function FeedbackBot(feedback_jid, feedback_pw, notifier) {
                 // and send back.
                 client.send(stanza);
             }
+//            else {
+//                console.log('feedback-bot stanza-error: ', stanza.toString());
+//            }
         });
     client.on('error',
         function(e) {
