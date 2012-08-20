@@ -300,6 +300,13 @@ RoomDatabase.prototype.RemoveAllContentsFromRoom = function(roomname, cbSuccess,
             len = res.items.length;
             buildup = [];
 
+            // If there were no results from the query, then we're all good here. No entries.
+            if (!len) {
+                console.log('RemoveAllContentsFromRoom: No Room contents to delete. SUCCESS.');
+                cbSuccess();
+                return true;
+            }
+
             for (i = 0; i < len; i += 1)
             {
                 buildup.push([res.items[i].roomname, res.items[i].spotnumber]);
