@@ -9,6 +9,7 @@
 #include "GCPMediaStream.h"
 #include "DOM/Window.h"
 #include "variant_list.h"
+//#include "modules/audio_device/main/interface/audio_device.h"
 
 #define FBLOG_INFO_CUSTOM(func, msg) FBLOG_INFO(func, msg)
 #define FBLOG_ERROR_CUSTOM(func, msg) FBLOG_ERROR(func, msg)
@@ -51,8 +52,7 @@ namespace GoCast
                                                         &LocalMediaStreamTrack::set_enabled));
     }
     
-    std::map< std::string,
-              talk_base::scoped_refptr<webrtc::VideoCaptureModule> > LocalVideoTrack::videoDevices;
+    LocalVideoTrack::VideoDeviceList LocalVideoTrack::videoDevices;
     
     FB::JSAPIPtr LocalVideoTrack::Create(talk_base::scoped_refptr<webrtc::LocalVideoTrackInterface>& pTrack)
     {

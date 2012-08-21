@@ -412,10 +412,24 @@ namespace GoCast
         devices = LocalVideoTrack::GetVideoDevices();
     }
     
-    /*void RtcCenter::QueryAudioDevices(FB::VariantMap& devices)
+    void RtcCenter::QueryAudioDevices(FB::VariantList& devices, bool bInput)
     {
-        devices = LocalAudioTrack::GetAudioDevices();
-    }*/
+        std::vector<std::string> deviceNames;
+        
+        if(true == bInput)
+        {
+            m_pConnFactory->channel_manager()->GetAudioInputDevices(&deviceNames);
+        }
+        else
+        {
+            m_pConnFactory->channel_manager()->GetAudioOutputDevices(&deviceNames);
+        }
+        
+        for(int16_t i=1; i<deviceNames.size(); i++)
+        {
+            devices.push_back(FB::variant(deviceNames[i]));            
+        }
+    }
     
     void RtcCenter::GetUserMedia(FB::JSObjectPtr mediaHints,
                                  FB::JSObjectPtr succCb,
@@ -612,22 +626,12 @@ namespace GoCast
     
     bool RtcCenter::GetSpkVol(int* pLevel) const
     {
-        if(m_pPeerConns.end() == m_pPeerConns.find("localPlayer"))
-        {
-            return false;
-        }
-        
-        return (m_pPeerConns.find("localPlayer"))->second->system_volume(pLevel);
+        return m_pConnFactory->channel_manager()->GetOutputVolume(pLevel);
     }
     
     bool RtcCenter::GetSpkMute(bool* pbEnabled) const
     {
-        if(m_pPeerConns.end() == m_pPeerConns.find("localPlayer"))
-        {
-            return false;
-        }
-        
-        return (m_pPeerConns.find("localPlayer"))->second->speaker_mute_state(pbEnabled);
+        return m_pConnFactory->channel_manager()->GetOutputMute(pbEnabled);
     }    
     
     std::string RtcCenter::GetLocalVideoTrackEffect() const
@@ -854,7 +858,7 @@ namespace GoCast
         
         //Create local media stream object
         FBLOG_INFO_CUSTOM("RtcCenter::GetUserMedia_w", "Creating local media stream interface object...");
-        m_pLocalStream = m_pConnFactory->CreateLocalMediaStream("localStream");
+        m_pLocalStream = m_pConnFactory->CreateLocalMediaStream("usermedia");
         
         //If mediaHints.video == true, add video track
         if(true == mediaHints->GetProperty("video").convert_cast<bool>())
@@ -877,17 +881,32 @@ namespace GoCast
                 return;
             }
             
-            m_pLocalStream->AddTrack(m_pConnFactory->CreateLocalVideoTrack(
-                "localvideo",
-                webrtc::CreateVideoCapturer(pCapture)
-            ));            
+            std::string videoTrackLabel = "camera_";
+            videoTrackLabel += videoInUniqueId;
+            m_pLocalStream->AddTrack(m_pConnFactory->CreateLocalVideoTrack(videoTrackLabel,
+                                                                           webrtc::CreateVideoCapturer(pCapture)));
         }
         
         //If mediaHints.audio == true, add audio track
         if(true == mediaHints->GetProperty("audio").convert_cast<bool>())
         {
-            FBLOG_INFO_CUSTOM("RtcCenter::GetUserMedia_w", "Creating local audio track interface object...");
-            m_pLocalStream->AddTrack(m_pConnFactory->CreateLocalAudioTrack("localaudio", NULL));
+            std::string audioIn;
+            std::string audioOut;
+            int opts;
+            
+            m_pConnFactory->channel_manager()->GetAudioOptions(&audioIn, &audioOut, &opts);
+            audioIn = mediaHints->GetProperty("audioin").convert_cast<std::string>();
+            audioOut = mediaHints->GetProperty("audioout").convert_cast<std::string>();
+
+            std::string msg = "Creating local audio track interface object [audioIn: ";
+            msg += (audioIn + ", audioOut: ");
+            msg += (audioOut + "]...");
+            FBLOG_INFO_CUSTOM("RtcCenter::GetUserMedia_w", msg);
+
+            std::string audioTrackLabel = "microphone_";
+            audioTrackLabel += audioIn;
+            m_pConnFactory->channel_manager()->SetAudioOptions(audioIn, audioOut, opts);
+            m_pLocalStream->AddTrack(m_pConnFactory->CreateLocalAudioTrack(audioTrackLabel, NULL));
         }
         
         if(NULL == succCb.get())

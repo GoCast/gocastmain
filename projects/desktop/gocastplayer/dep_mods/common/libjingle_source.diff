@@ -80,7 +80,7 @@ Index: talk/app/webrtc/webrtcsession.h
 ===================================================================
 --- talk/app/webrtc/webrtcsession.h	(revision 153)
 +++ talk/app/webrtc/webrtcsession.h	(working copy)
-@@ -114,7 +114,13 @@
+@@ -114,7 +114,11 @@
                                  cricket::VideoRenderer* renderer);
    virtual void SetRemoteRenderer(const std::string& name,
                                   cricket::VideoRenderer* renderer);
@@ -88,8 +88,6 @@ Index: talk/app/webrtc/webrtcsession.h
 +                          
 +  // <GOCAST>
 +  virtual bool SetMicMute(bool enable);
-+  virtual bool GetSpkVol(int* level);
-+  virtual bool GetOutputMute(bool* enabled);
 +  // </GOCAST>
 +                          
    // Transport related callbacks, override from cricket::BaseSession.
@@ -134,21 +132,13 @@ Index: talk/app/webrtc/webrtcsession.cc
    const cricket::MediaContentDescription* video_content =
        static_cast<const cricket::MediaContentDescription*>(
            video_info->description);
-@@ -464,6 +469,20 @@
+@@ -464,6 +469,12 @@
    }
  }
  
 +    // <GOCAST>
 +    bool WebRtcSession::SetMicMute(bool enable) {
 +        return channel_manager_->SetMicMute(enable);
-+    }
-+    
-+    bool WebRtcSession::GetSpkVol(int *level) {
-+        return channel_manager_->GetOutputVolume(level);
-+    }
-+    
-+    bool WebRtcSession::GetOutputMute(bool *enabled) {
-+        return channel_manager_->GetOutputMute(enabled);
 +    }
 +    // </GOCAST>
 +    
@@ -159,74 +149,56 @@ Index: talk/app/webrtc/peerconnectioninterface.h
 ===================================================================
 --- talk/app/webrtc/peerconnectioninterface.h	(revision 153)
 +++ talk/app/webrtc/peerconnectioninterface.h	(working copy)
-@@ -193,6 +193,11 @@
+@@ -86,6 +86,10 @@
  
-   // Returns the current SdpState.
-   virtual SdpState sdp_state() = 0;
-+                                    
-+  //<GOCAST>
-+  virtual bool system_volume(int* level) = 0;
-+  virtual bool speaker_mute_state(bool* enabled) = 0;
-+  //</GOCAST>
+ namespace cricket {
+ class PortAllocator;
++    
++//<GOCAST>
++class ChannelManager;
++//</GOCAST>
+ }
  
+ namespace webrtc {
+@@ -265,6 +269,10 @@
+       CreateLocalAudioTrack(const std::string& label,
+                             AudioDeviceModule* audio_device) = 0;
+ 
++    //<GOCAST>
++    virtual cricket::ChannelManager* channel_manager() = 0;
++    //</GOCAST>
++    
   protected:
-   // Dtor protected as objects shouldn't be deleted via this interface.
+   // Dtor and ctor protected as objects shouldn't be created or deleted via
+   // this interface.
 Index: talk/app/webrtc/mediastreamprovider.h
 ===================================================================
 --- talk/app/webrtc/mediastreamprovider.h	(revision 153)
 +++ talk/app/webrtc/mediastreamprovider.h	(working copy)
-@@ -48,6 +48,12 @@
+@@ -48,6 +48,10 @@
                                  cricket::VideoRenderer* renderer) = 0;
    virtual void SetRemoteRenderer(const std::string& name,
                                   cricket::VideoRenderer* renderer) = 0;
 +    // <GOCAST>
 +    virtual bool SetMicMute(bool enable) = 0;
-+    virtual bool GetSpkVol(int* level) = 0;
-+    virtual bool GetOutputMute(bool* enabled) = 0;
 +    // </GOCAST>
 +    
   protected:
    virtual ~MediaProviderInterface() {}
  };
-Index: talk/app/webrtc/peerconnection.cc
-===================================================================
---- talk/app/webrtc/peerconnection.cc	(revision 153)
-+++ talk/app/webrtc/peerconnection.cc	(working copy)
-@@ -363,6 +363,18 @@
-   return msg.state;
- }
- 
-+    //<GOCAST>
-+    bool PeerConnection::system_volume(int *level) {
-+        return static_cast<webrtc::MediaProviderInterface*>
-+            (session_.get())->GetSpkVol(level);
-+    }
-+    
-+    bool PeerConnection::speaker_mute_state(bool* enabled) {
-+        return static_cast<webrtc::MediaProviderInterface*>
-+            (session_.get())->GetOutputMute(enabled);
-+    }
-+    //</GOCAST>
-+    
- bool PeerConnection::StartIce(IceOptions options) {
-   IceOptionsParams msg(options);
-   signaling_thread()->Send(this, MSG_STARTICE, &msg);
 Index: talk/app/webrtc/peerconnection.h
 ===================================================================
 --- talk/app/webrtc/peerconnection.h	(revision 153)
 +++ talk/app/webrtc/peerconnection.h	(working copy)
-@@ -74,6 +74,11 @@
+@@ -74,7 +74,7 @@
    virtual void Close();
    virtual ReadyState ready_state();
    virtual SdpState sdp_state();
+-
 +                           
-+  //<GOCAST>
-+  virtual bool system_volume(int* level);
-+  virtual bool speaker_mute_state(bool* enabled);
-+  //</GOCAST>
- 
    // Jsep functions.
    virtual SessionDescriptionInterface* CreateOffer(const MediaHints& hints);
+   virtual SessionDescriptionInterface* CreateAnswer(
 Index: talk/app/webrtc/mediastreamhandler.cc
 ===================================================================
 --- talk/app/webrtc/mediastreamhandler.cc	(revision 153)
@@ -843,6 +815,121 @@ Index: talk/session/phone/webrtcvoiceengine.h
    int GetInputLevel();
    bool SetLocalMonitor(bool enable);
  
+Index: talk/session/phone/fakedevicemanager.h
+===================================================================
+--- talk/session/phone/fakedevicemanager.h	(revision 153)
++++ talk/session/phone/fakedevicemanager.h	(working copy)
+@@ -35,15 +35,33 @@
+ #include "talk/session/phone/fakevideocapturer.h"
+ #include "talk/session/phone/mediacommon.h"
+ 
++//<GOCAST>
++#include "modules/audio_device/main/interface/audio_device.h"
++//</GOCAST>
++
+ namespace cricket {
+ 
+ class FakeDeviceManager : public DeviceManagerInterface {
+  public:
+-  FakeDeviceManager() {}
++  FakeDeviceManager() /*<GOCAST>*/ : adm_(NULL) /*</GOCAST>*/{}
+   virtual bool Init() {
++      //<GOCAST>
++      adm_ = webrtc::CreateAudioDeviceModule(0, webrtc::AudioDeviceModule::kPlatformDefaultAudio);
++      if(NULL == adm_) {
++          return false;
++      }
++      if(0 > adm_->Init()){
++          return false;
++      }
++      //</GOCAST>
+     return true;
+   }
+   virtual void Terminate() {
++      //<GOCAST>
++      if(NULL != adm_) {
++          adm_->Terminate();
++      }
++      //</GOCAST>
+   }
+   virtual int GetCapabilities() {
+     std::vector<Device> devices;
+@@ -60,10 +78,64 @@
+     return caps;
+   }
+   virtual bool GetAudioInputDevices(std::vector<Device>* devs) {
++      //<GOCAST>
++      bool devicesChanged = false;
++      int deviceIdx = 0;
++      char deviceName[webrtc::kAdmMaxDeviceNameSize];
++      char deviceGuid[webrtc::kAdmMaxGuidSize];
++      
++      if(NULL == adm_) {
++          return false;
++      }
++      
++      if(false == adm_->Initialized()){
++          return false;
++      }
++      
++      devicesChanged = static_cast<bool>(adm_->RecordingDevices() != 
++                                         (int16_t)(input_devices_.size()-1));
++      input_devices_.clear();
++      input_devices_.push_back(Device(kDefaultDeviceName, deviceIdx++));
++      for(int16_t i=0; i<adm_->RecordingDevices(); i++) {
++          adm_->RecordingDeviceName(i, deviceName, deviceGuid);
++          input_devices_.push_back(Device(deviceName, deviceIdx++));
++      }
++      
++      if(true == devicesChanged) {
++          SignalDevicesChange();
++      }
++      //</GOCAST>
+     *devs = input_devices_;
+     return true;
+   }
+   virtual bool GetAudioOutputDevices(std::vector<Device>* devs) {
++      //<GOCAST>
++      bool devicesChanged = false;
++      int deviceIdx = 0;
++      char deviceName[webrtc::kAdmMaxDeviceNameSize];
++      char deviceGuid[webrtc::kAdmMaxGuidSize];
++      
++      if(NULL == adm_) {
++          return false;
++      }
++      
++      if(false == adm_->Initialized()){
++          return false;
++      }
++      
++      devicesChanged = static_cast<bool>(adm_->PlayoutDevices() != 
++                                         (int16_t)(output_devices_.size()-1));
++      output_devices_.clear();
++      output_devices_.push_back(Device(kDefaultDeviceName, deviceIdx++));
++      for(int16_t i=0; i<adm_->PlayoutDevices(); i++) {
++          adm_->PlayoutDeviceName(i, deviceName, deviceGuid);
++          output_devices_.push_back(Device(deviceName, deviceIdx++));
++      }
++      
++      if(true == devicesChanged) {
++          SignalDevicesChange();
++      }
++      //</GOCAST>
+     *devs = output_devices_;
+     return true;
+   }
+@@ -158,6 +230,10 @@
+   std::vector<Device> input_devices_;
+   std::vector<Device> output_devices_;
+   std::vector<Device> vidcap_devices_;
++    
++    //<GOCAST>
++    webrtc::AudioDeviceModule* adm_;
++    //</GOCAST>
+ };
+ 
+ }  // namespace cricket
 Index: talk/base/refcount.h
 ===================================================================
 --- talk/base/refcount.h	(revision 153)

@@ -21,7 +21,6 @@ include_directories(${PLUGIN_INCLUDE_DIRS})
 include_directories(../../deps/webrtc/trunk/src)
 include_directories(../../deps/webrtc/trunk/third_party/libjingle/source)
 include_directories(../../deps/webrtc/trunk/testing/gtest/include)
-#include_directories(../../deps/webrtc/trunk/third_party_mods/libjingle/source)
 
 add_definitions(-DWEBRTC_RELATIVE_PATH)
 add_definitions(-DGTEST_RELATIVE_PATH)
