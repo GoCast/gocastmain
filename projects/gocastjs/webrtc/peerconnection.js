@@ -18,6 +18,10 @@ GoCastJS.Video = {
 //! NOTE: this is populated by GoCastJS.SetSpkVolListener()
 //!
 GoCastJS.Audio = {
+    inputDevices: [],
+    inputDevice: '',
+    outputDevices: [],
+    outputDevice: '',
     spkVol: 256
 };
 
@@ -86,6 +90,8 @@ GoCastJS.UserMediaOptions = function(mediaHints, player) {
 //!
 GoCastJS.getUserMedia = function(options, success, failure) {
     GoCastJS.Video.captureDevice = '';
+    GoCastJS.Audio.inputDevice = '';
+    GoCastJS.Audio.outputDevice = '';
 
     if (false === this.CheckBrowserSupport()) {
         if ('undefined' !== typeof(failure) && null !== failure) {
@@ -108,14 +114,44 @@ GoCastJS.getUserMedia = function(options, success, failure) {
                     return;
                 } else {
                     options.mediaHints.videoin = player.videoinopts['default'];
-                    console.log('GoCastJS: Choosing default video: ' +
-                                player.videoinopts[options.
-                                                   mediaHints.
-                                                   videoin]);
                 }
             }
 
+            console.log('GoCastJS.getUserMedia(): Choosing video: ' +
+                        player.videoinopts[options.mediaHints.videoin]);
             GoCastJS.Video.captureDevice = options.mediaHints.videoin;
+        }
+
+        if (true === options.mediaHints.audio) {
+            if ('undefined' === typeof(options.mediaHints.audioin) ||
+                null === options.mediaHints.audioin) {
+                if (0 >= player.audioinopts.length) {
+                    failure('GoCastJS.getUserMedia(): ' +
+                            'No audio input devices detected');
+                    return;
+                } else {
+                    options.mediaHints.audioin = player.audioinopts[0];
+                }
+            }
+
+            if ('undefined' === typeof(options.mediaHints.audioout) ||
+                null === options.mediaHints.audioout) {
+                if (0 >= player.audiooutopts.length) {
+                    failure('GoCastJS.getUserMedia(): ' +
+                            'No audio output devices detected');
+                    return;
+                } else {
+                    options.mediaHints.audioout = player.audiooutopts[0];
+                }
+            }
+
+            console.log('GoCastJS.getUserMedia(): Choosing audio input: ' +
+                        options.mediaHints.audioin);
+            GoCastJS.Audio.inputDevice = options.mediaHints.audioin;
+
+            console.log('GoCastJS.getUserMedia(): Choosing audio output: ' +
+                        options.mediaHints.audioout);
+            GoCastJS.Audio.outputDevice = options.mediaHints.audioout;
         }
 
         player.getUserMedia(
@@ -193,43 +229,111 @@ GoCastJS.SetSpkVolListener = function(volCheckInterval,
 //!
 //! returns: the setInterval identifier (used to clear interval)
 //!
-GoCastJS.SetVideoDevicesChangedListener = function(checkInterval,
-                                                   localplayer,
-                                                   onChanged) {
-    for (i in localplayer.videoinopts) {
+GoCastJS.SetDevicesChangedListener = function(checkInterval,
+                                              localplayer,
+                                              onChanged) {
+    var videoInOpts = localplayer.videoinopts;
+    var audioInOpts = localplayer.audioinopts;
+    var audioOutOpts = localplayer.audiooutopts;
+
+    GoCastJS.Video.devices = [];
+    for (i in videoInOpts) {
         GoCastJS.Video.devices.push(i);
     }
 
-    return setInterval(function() {
-        var devicesAdded = [];
-        var devicesDeleted = [];
-        var i = 0;
+    GoCastJS.Audio.inputDevices = [];
+    for (i in audioInOpts) {
+        GoCastJS.Audio.inputDevices.push(audioInOpts[i]);
+    }
 
-        // Check for newly added devices
-        for (i = 0; i < GoCastJS.Video.devices.length; i++) {
-            if ('undefined' === typeof(
-                    localplayer.videoinopts[GoCastJS.Video.devices[i]]
-                )) {
-                devicesDeleted.push(GoCastJS.Video.devices[i]);
+    GoCastJS.Audio.outputDevices = [];
+    for (i in audioOutOpts) {
+        GoCastJS.Audio.outputDevices.push(audioOutOpts[i]);
+    }    
+
+    return setInterval(function() {
+        var videoDevicesDeleted = [];
+        var videoDevicesAdded = [];
+        var audioInDevicesDeleted = [];
+        var audioInDevicesAdded = [];
+        var audioOutDevicesDeleted = [];
+        var audioOutDevicesAdded = [];
+        var vInOpts = localplayer.videoinopts;
+        var aInOpts = localplayer.audioinopts;
+        var aOutOpts = localplayer.audiooutopts;
+
+        // Check for newly deleted devices
+        for (i in GoCastJS.Video.devices) {
+            if ('undefined' === typeof(vInOpts[GoCastJS.Video.devices[i]])) {
+                videoDevicesDeleted.push(GoCastJS.Video.devices[i]);
             }
         }
 
-        // Check for newly deleted devices
-        for (j in localplayer.videoinopts) {
+        for (i in GoCastJS.Audio.inputDevices) {
+            if (-1 === aInOpts.indexOf(GoCastJS.Audio.inputDevices[i])) {
+                audioInDevicesDeleted.push(GoCastJS.Audio.inputDevices[i]);
+            }
+        }
+
+        for (i in GoCastJS.Audio.outputDevices) {
+            if (-1 === aOutOpts.indexOf(GoCastJS.Audio.outputDevices[i])) {
+                audioOutDevicesDeleted.push(GoCastJS.Audio.outputDevices[i]);
+            }            
+        }
+
+        // Check for newly added devices
+        for (j in vInOpts) {
             if (-1 === GoCastJS.Video.devices.indexOf(j)) {
-                devicesAdded.push(j);
+                videoDevicesAdded.push(j);
+            }
+        }
+
+        for (j in aInOpts) {
+            if (-1 === GoCastJS.Audio.inputDevices.indexOf(aInOpts[j])) {
+                audioInDevicesAdded.push(aInOpts[j]);
+            }
+        }
+
+        for (j in aOutOpts) {
+            if (-1 === GoCastJS.Audio.outputDevices.indexOf(aOutOpts[j])) {
+                audioOutDevicesAdded.push(aOutOpts[j]);
             }
         }
 
         // Refresh the current devices list
-        GoCastJS.Video.devices = [];
-        for (j in localplayer.videoinopts) {
-            GoCastJS.Video.devices.push(j);
+        if (0 < videoDevicesAdded.length || 0 < videoDevicesDeleted.length) {
+            GoCastJS.Video.devices = [];
+            for (i in vInOpts) {
+                GoCastJS.Video.devices.push(i);
+            }
+        }
+
+        if (0 < audioInDevicesAdded.length ||
+            0 < audioInDevicesDeleted.length) {
+            GoCastJS.Audio.inputDevices = [];
+            for (i in aInOpts) {
+                GoCastJS.Audio.inputDevices.push(aInOpts[i]);
+            }
+        }
+
+        if (0 < audioOutDevicesAdded.length ||
+            0 < audioOutDevicesDeleted.length) {
+            GoCastJS.Audio.outputDevices = [];
+            for (i in aOutOpts) {
+                GoCastJS.Audio.outputDevices.push(aOutOpts[i]);
+            }
         }
 
         // Call callback if device list has changed
-        if (0 < devicesAdded.length || 0 < devicesDeleted.length) {
-            onChanged(devicesAdded, devicesDeleted);
+        if (0 < videoDevicesAdded.length ||
+            0 < videoDevicesDeleted.length ||
+            0 < audioInDevicesAdded.length ||
+            0 < audioInDevicesDeleted.length ||
+            0 < audioOutDevicesAdded.length ||
+            0 < audioOutDevicesDeleted.length) {
+            onChanged(videoDevicesAdded, videoDevicesDeleted,
+                      audioInDevicesAdded, audioInDevicesDeleted,
+                      audioOutDevicesAdded, audioOutDevicesDeleted);
         }
     }, checkInterval);
 };

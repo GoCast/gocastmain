@@ -7,6 +7,8 @@
 			var localStream = null;
 			var remoteStream = null;
 			var peerConn = null;
+			var volCheck = null;
+			var devCheck = null;
 			
 			function ongetusermediasuccess() {
 				peerConn = new GoCastJS.PeerConnection(
@@ -58,74 +60,110 @@
 				);
 			}
 			
-			function onLocalPlayerLoaded(camera) {
-				var hints = {audio: true, video: true, audioin: "3", audioout: "0"};
+			function onLocalPlayerLoaded(camera, audioin, audioout) {
+				var hints = {audio: true, video: true};
 				if("string" === typeof(camera)) {
 					hints.videoin = camera;
 				} 
+
+				if("string" === typeof(audioin)) {
+					hints.audioin = audioin;
+				}
+
+				if("string" === typeof(audioout)) {
+					hints.audioout = audioout;
+				}
 
 				var options = new GoCastJS.UserMediaOptions(
 					hints,
 					document.getElementById("localVideo")
 				);
 
-				var checkVol;
+				if(null === volCheck) {
+					volCheck = GoCastJS.SetSpkVolListener(
+						600,
+						document.getElementById("localVideo"),
+						function(newVolume) {
+							console.log("New Volume: " + newVolume);
+						}
+					);
+				}
 
+				if(null === devCheck) {
+					devCheck = GoCastJS.SetDevicesChangedListener(
+						1000,
+						document.getElementById("localVideo"),
+						function(devicesAdded, devicesRemoved,
+							     audioInAdded, audioInRemoved,
+							     audioOutAdded, audioOutRemoved) {
+							var newCamera = GoCastJS.Video.captureDevice;
+							var newAudioIn = GoCastJS.Audio.inputDevice;
+							var newAudioOut = GoCastJS.Audio.outputDevice;
+
+							console.log("Video Added: ", devicesAdded);
+							console.log("Video Removed: ", devicesRemoved);
+							console.log("AudioIn Added: ", audioInAdded);
+							console.log("AudioIn Removed: ", audioInRemoved);
+							console.log("AudioOut Added: ", audioOutAdded);
+							console.log("AudioOut Removed: ", audioOutRemoved);
+
+							if(0 < devicesAdded.length) {
+								newCamera = devicesAdded[0];
+							} else if(0 <= devicesRemoved.indexOf(GoCastJS.Video.captureDevice)) {
+								if("undefined" !== typeof(document.
+														  getElementById("localVideo").
+														  videoinopts["default"])) {
+									newCamera = document.getElementById("localVideo").videoinopts["default"];
+								} else {
+									newCamera = null;
+								}
+							}
+
+							if(0 < audioInAdded.length) {
+								newAudioIn = audioInAdded[0];
+							} else if(0 <= audioInRemoved.indexOf(GoCastJS.Audio.inputDevice)) {
+								if(0 < document.getElementById("localVideo").audioinopts.length) {
+									newAudioIn = document.getElementById("localVideo").audioinopts[0];
+								} else {
+									newAudioIn = null;
+								}
+							}
+
+							if(0 < audioOutAdded.length) {
+								newAudioOut = audioOutAdded[0];
+							} else if(0 <= audioOutRemoved.indexOf(GoCastJS.Audio.outputDevice)) {
+								if(0 < document.getElementById("localVideo").audiooutopts.length) {
+									newAudioOut = document.getElementById("localVideo").audiooutopts[0];
+								} else {
+									newAudioOut = null;
+								}
+							}
+
+							if(null !== newCamera || null !== newAudioIn || null !== newAudioOut) {
+								if(newCamera !== GoCastJS.Video.captureDevice ||
+								   newAudioIn !== GoCastJS.Audio.inputDevice ||
+								   newAudioOut !== GoCastJS.Audio.outputDevice) {
+									if("" !== GoCastJS.Video.captureDevice) {
+										peerConn.Deinit();
+										document.getElementById("localVideo").deinit();
+									}
+
+									onLocalPlayerLoaded(newCamera, newAudioIn, newAudioOut);
+								}
+							}
+						}
+					);
+				}
 
 				GoCastJS.getUserMedia(
 					options,
 					function(stream) {
 						console.log("getUserMediaSuccess: ", stream);
 						localStream = stream;
-						checkVol = GoCastJS.SetSpkVolListener(
-							600,
-							document.getElementById("localVideo"),
-							function(newVolume) {
-								console.log("New Volume: " + newVolume);
-							}
-						);
 						ongetusermediasuccess();
 					},
 					function(message) {
 						console.log("getUserMediaFailure: ", message);
-					}
-				);
-
-				var check = GoCastJS.SetVideoDevicesChangedListener(
-					1000,
-					document.getElementById("localVideo"),
-					function(devicesAdded, devicesRemoved) {
-						var newCamera = GoCastJS.Video.captureDevice;
-						console.log("Added: ", devicesAdded);
-						console.log("Removed: ", devicesRemoved);
-
-						if(0 < devicesAdded.length) {
-							newCamera = devicesAdded[0];
-						} else if(0 <= devicesRemoved.indexOf(GoCastJS.Video.captureDevice)) {
-							if("undefined" !== typeof(document.
-													  getElementById("localVideo").
-													  videoinopts["default"])) {
-								newCamera = document.getElementById("localVideo").videoinopts["default"];
-							} else {
-								newCamera = "";
-							}
-						}
-
-						if(newCamera !== GoCastJS.Video.captureDevice) {
-							clearInterval(check);
-							clearInterval(checkVol);
-
-							if("" !== GoCastJS.Video.captureDevice) {
-								peerConn.Deinit();
-								document.getElementById("localVideo").deinit();
-							}
-
-							if("" !== newCamera) {
-								onLocalPlayerLoaded(newCamera);
-							} else {
-								onLocalPlayerLoaded();
-							}
-						}
 					}
 				);
 			}

@@ -89,8 +89,8 @@ public:
     FB::JSAPIPtr get_source();
     FB::variant get_volume();
     FB::VariantMap get_videoinopts();
-    FB::VariantMap get_audioinopts();
-    FB::VariantMap get_audiooutopts();
+    FB::VariantList get_audioinopts();
+    FB::VariantList get_audiooutopts();
     
     // Property set methods
     void set_onaddstream(const FB::JSObjectPtr& onaddstream);
@@ -147,8 +147,8 @@ private:
     FB::JSAPIPtr m_srcStream;
     FB::variant m_htmlId;
     FB::VariantMap m_videoDevices;
-    FB::VariantMap m_audioInDevices;
-    FB::VariantMap m_audioOutDevices;
+    FB::VariantList m_audioInDevices;
+    FB::VariantList m_audioOutDevices;
 };
 
 #endif // H_GCPAPI
