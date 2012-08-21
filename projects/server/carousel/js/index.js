@@ -1016,13 +1016,19 @@ function closeStatus(event)
 function changeVideo()
 {
   var jqObj = $('#lower-right > #video'),
-      jqOo, w, h;
+      jqOo = $('#mystream'),
+      w, h;
   if (!jqObj)
   {
      app.log(4, "couldn't find video button");
   }
+  if (!jqOo)
+  {
+     app.log(4, "couldn't find local video spot");
+  }
+  $(jqObj).toggleClass('on');
   app.videoEnabled = $(jqObj).hasClass('on');
-  jqOo = $('#mystream');
+  console.log("changeVideo", app.video);
   if (app.videoEnabled) {
     // Check object dimensions.
     w = jqOo.width() - 4;
@@ -1044,7 +1050,6 @@ function changeVideo()
        $(jqOo).css('background-image', 'url(' + app.user.fbProfilePicUrl + ')');
     }
   }
-  $(jqObj).toggleClass('on');
   if (app.videoEnabled) {
     app.log(2, 'Video turned on.');
     $(jqObj).attr('title', 'Disable video');

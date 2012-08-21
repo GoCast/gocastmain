@@ -223,10 +223,10 @@ body > div#lower-right > input.fbShare {
   background-image: url("../images/fbShare.png");
 }
 body > div#lower-right > input#video {
-  background-image: url("../images/video-on.png");
+  background-image: url("../images/video-off.png");
 }
 body > div#lower-right > input#video.on {
-  background-image: url("../images/video-off.png");
+  background-image: url("../images/video-on.png");
 }
 body > div#lower-right > input#audio.off {
   margin-left: 5px;

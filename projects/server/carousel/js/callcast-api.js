@@ -234,41 +234,44 @@ function setCarouselItemState(info)
   var id, oo, w, s, h, image;
   try
   {
-    if (info && info.nick)
+    if (!info)      {throw "info is not defined";}
+    if (!info.nick) {throw "info.nick is not defined";}
+    id = app.str2id(info.nick);
+    oo = $('#meeting > #streams > #scarousel div.cloudcarousel#' + id).get(0);
+    if (oo)
+    {  // item found
+       // Check dimensions of wrapper div to correct for video dimensions.
+       if (info.hasVid) {
+           w = $(oo).width() - 4;
+           s = w / Callcast.WIDTH;
+           h = Callcast.HEIGHT * s;
+           info.width = w;
+           info.height = h;
+           app.log(2, 'setCarouselItemState video on user ' + info.nick + ' dim w ' + info.width + ', h ' + info.height);
+           $(oo).css('background-image', ''); // remove any background image
+           Callcast.ShowRemoteVideo(info);
+       }
+       else // if hasVid is null or false turn video off
+       {
+          info.hasVid = false;
+          image = Callcast.participants[info.nick].image;
+          $(oo).css('background-image', image);
+          Callcast.ShowRemoteVideo(info);
+          app.log(2, 'setCarouselItemState video off user ' + info.nick + ' image ' + info.image);
+       }
+    }
+    else if (info.nick === app.user.name) {
+      console.log('setCarouselItemState video changed for local user ', info);
+      app.carousel.updateAll();
+    }
+    else
     {
-      id = app.str2id(info.nick);
-      oo = $('#meeting > #streams > #scarousel div.cloudcarousel#' + id).get(0);
-      if (oo)
-      {  // item found
-         // Check dimensions of wrapper div to correct for video dimensions.
-         if (info.hasVid) {
-             w = $(oo).width() - 4;
-             s = w / Callcast.WIDTH;
-             h = Callcast.HEIGHT * s;
-             info.width = w;
-             info.height = h;
-             app.log(2, 'setCarouselItemState video on user ' + info.nick + ' dim w ' + info.width + ', h ' + info.height);
-             $(oo).css('background-image', ''); // remove any background image
-             Callcast.ShowRemoteVideo(info);
-         }
-         else // if hasVid is null or false turn video off
-         {
-            info.hasVid = false;
-            image = Callcast.participants[info.nick].image;
-            $(oo).css('background-image', image);
-            Callcast.ShowRemoteVideo(info);
-            app.log(2, 'setCarouselItemState video off user ' + info.nick + ' image ' + image);
-         }
-      }
-  /*    else
-      {
-         //app.log(3, "setCarouselItemState item for " + info.nick + " not found");
-      } */
+      app.log(3, "setCarouselItemState item for " + info.nick + " not found");
     }
   }
   catch (err)
   {
-     console.log('setCarouselItemState exception', err);
+    console.log('setCarouselItemState exception', err);
   }
 }
 
