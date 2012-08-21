@@ -121,7 +121,7 @@ var app = {
       }
       break;
     case 'Safari':
-      msg = "Sorry we don't support the Safari browser right now.\nPlease use Chrome or Firefox for now."
+      msg = "Sorry we don't support the Safari browser right now.\nPlease use Chrome or Firefox for now.";
       /*
       if (app.browser.version < 525) {
         msg = 'You appear to be using an older Safari version. ' +
@@ -904,6 +904,7 @@ function sendChat(
 ///
 function keypressPersonalChatHandler(event)
 {
+  event.stopPropagation();
   //app.log(2, 'keypressPersonalChatHandler');
   
   /// We have no action for key press combinations with the Alt key.
@@ -934,6 +935,7 @@ function keypressGrpChatHandler(
 )
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
+  event.stopPropagation();
   app.log(2, 'keypressGrpChatHandler');
   /*
    * We have no action for key press combinations with the Alt key. */
