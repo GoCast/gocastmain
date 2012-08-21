@@ -59,7 +59,7 @@
 			}
 			
 			function onLocalPlayerLoaded(camera) {
-				var hints = {audio: true, video: true};
+				var hints = {audio: true, video: true, audioin: "3", audioout: "0"};
 				if("string" === typeof(camera)) {
 					hints.videoin = camera;
 				} 
@@ -114,7 +114,7 @@
 						if(newCamera !== GoCastJS.Video.captureDevice) {
 							clearInterval(check);
 							clearInterval(checkVol);
-							
+
 							if("" !== GoCastJS.Video.captureDevice) {
 								peerConn.Deinit();
 								document.getElementById("localVideo").deinit();

@@ -71,6 +71,7 @@ namespace GoCast
         
         // Query media devices
         void QueryVideoDevices(FB::VariantMap& devices);
+        void QueryAudioDevices(FB::VariantMap& devices, bool bInput = true);
         
         //Thread-safe methods        
         void GetUserMedia(FB::JSObjectPtr mediaHints,
@@ -115,7 +116,7 @@ namespace GoCast
     public:
         std::string ReadyState(const std::string& pluginId);
                 
-        bool Inited() const;        
+        bool Inited() const;
         bool GetLocalVideoTrackEnabled() const;        
         bool GetLocalAudioTrackEnabled() const;
         bool GetSpkVol(int* pLevel) const;

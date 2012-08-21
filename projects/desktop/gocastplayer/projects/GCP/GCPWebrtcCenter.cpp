@@ -412,10 +412,32 @@ namespace GoCast
         devices = LocalVideoTrack::GetVideoDevices();
     }
     
-    /*void RtcCenter::QueryAudioDevices(FB::VariantMap& devices)
+    void RtcCenter::QueryAudioDevices(FB::VariantMap& devices, bool bInput)
     {
-        devices = LocalAudioTrack::GetAudioDevices();
-    }*/
+        std::vector<std::string> deviceNames;
+        
+        if(true == bInput)
+        {
+            m_pConnFactory->channel_manager()->GetAudioInputDevices(&deviceNames);
+            LocalAudioTrack::UpdateAudioInputDeviceList(deviceNames);
+        }
+        else
+        {
+            m_pConnFactory->channel_manager()->GetAudioOutputDevices(&deviceNames);
+            LocalAudioTrack::UpdateAudioOutputDeviceList(deviceNames);
+        }
+        
+        for(int16_t i=1; i<deviceNames.size(); i++)
+        {
+            std::stringstream istr;
+            istr << (i - 1);
+            devices[istr.str()] = deviceNames[i];            
+            if(1 == i)
+            {
+                devices["default"] = istr.str();
+            }
+        }
+    }
     
     void RtcCenter::GetUserMedia(FB::JSObjectPtr mediaHints,
                                  FB::JSObjectPtr succCb,
@@ -886,7 +908,23 @@ namespace GoCast
         //If mediaHints.audio == true, add audio track
         if(true == mediaHints->GetProperty("audio").convert_cast<bool>())
         {
-            FBLOG_INFO_CUSTOM("RtcCenter::GetUserMedia_w", "Creating local audio track interface object...");
+            std::string audioInUniqueId = mediaHints->GetProperty("audioin").convert_cast<std::string>();
+            std::string audioOutUniqueId = mediaHints->GetProperty("audioout").convert_cast<std::string>();
+            std::string audioIn;
+            std::string audioOut;
+            int opts;
+            
+
+            m_pConnFactory->channel_manager()->GetAudioOptions(&audioIn, &audioOut, &opts);
+            audioIn = LocalAudioTrack::GetAudioInputDevice(audioInUniqueId);
+            audioOut = LocalAudioTrack::GetAudioOutputDevice(audioOutUniqueId);
+
+            std::string msg = "Creating local audio track interface object [audioIn: ";
+            msg += (audioIn + ", audioOut: ");
+            msg += (audioOut + "]...");
+            FBLOG_INFO_CUSTOM("RtcCenter::GetUserMedia_w", msg);
+
+            m_pConnFactory->channel_manager()->SetAudioOptions(audioIn, audioOut, opts);
             m_pLocalStream->AddTrack(m_pConnFactory->CreateLocalAudioTrack("localaudio", NULL));
         }
         

@@ -9,6 +9,7 @@
 #include "GCPMediaStream.h"
 #include "DOM/Window.h"
 #include "variant_list.h"
+//#include "modules/audio_device/main/interface/audio_device.h"
 
 #define FBLOG_INFO_CUSTOM(func, msg) FBLOG_INFO(func, msg)
 #define FBLOG_ERROR_CUSTOM(func, msg) FBLOG_ERROR(func, msg)
@@ -51,8 +52,7 @@ namespace GoCast
                                                         &LocalMediaStreamTrack::set_enabled));
     }
     
-    std::map< std::string,
-              talk_base::scoped_refptr<webrtc::VideoCaptureModule> > LocalVideoTrack::videoDevices;
+    LocalVideoTrack::VideoDeviceList LocalVideoTrack::videoDevices;
     
     FB::JSAPIPtr LocalVideoTrack::Create(talk_base::scoped_refptr<webrtc::LocalVideoTrackInterface>& pTrack)
     {
@@ -157,11 +157,56 @@ namespace GoCast
                                                        &LocalVideoTrack::set_effect));
     }
         
+    LocalAudioTrack::AudioDeviceList LocalAudioTrack::audioInDevices;
+    LocalAudioTrack::AudioDeviceList LocalAudioTrack::audioOutDevices;
+    
     FB::JSAPIPtr LocalAudioTrack::Create(talk_base::scoped_refptr<webrtc::LocalAudioTrackInterface>& pTrack)
     {
         return boost::make_shared<LocalAudioTrack>(pTrack);
     }
     
+    std::string LocalAudioTrack::GetAudioInputDevice(const std::string& uniqueId)
+    {
+        return audioInDevices[uniqueId];
+    }
+    
+    std::string LocalAudioTrack::GetAudioOutputDevice(const std::string& uniqueId)
+    {
+        return audioOutDevices[uniqueId];
+    }
+    
+    void LocalAudioTrack::UpdateAudioInputDeviceList(std::vector<std::string>& deviceNames)
+    {
+        audioInDevices.clear();
+        for(int16_t i=1; i<deviceNames.size(); i++)
+        {
+            std::stringstream istr;
+            istr << (i - 1);
+            audioInDevices[istr.str()] = deviceNames[i];
+            
+            if(1 == i)
+            {
+                audioInDevices["default"] = istr.str();
+            }
+        }
+    }
+    
+    void LocalAudioTrack::UpdateAudioOutputDeviceList(std::vector<std::string>& deviceNames)
+    {
+        audioOutDevices.clear();
+        for(int16_t i=1; i<deviceNames.size(); i++)
+        {
+            std::stringstream istr;
+            istr << (i - 1);
+            audioOutDevices[istr.str()] = deviceNames[i];
+            
+            if(1 == i)
+            {
+                audioOutDevices["default"] = istr.str();
+            }
+        }
+    }
+
     LocalAudioTrack::LocalAudioTrack(const talk_base::scoped_refptr<webrtc::LocalAudioTrackInterface>& pTrack)
     : LocalMediaStreamTrack(pTrack->kind(), pTrack->label(), pTrack->enabled())
     {
