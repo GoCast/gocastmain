@@ -27,7 +27,8 @@
           loadVideo,
           checkForPluginOptionalUpgrades,
           handleRoomSetup,
-          carouselItemUnzoom
+          carouselItemUnzoom,
+          showPersonalChatWithSpot
 */
 'use strict';
 
@@ -126,6 +127,7 @@ $(document).on('synclink', function(
 ///
 /// \brief Function that modifies the DOM when a public message arrives.
 ///        This implements the trigger "public-message".
+///
 $(document).on('public-message', function(
   ev, // Event object.
   msginfo // Message Information Object.
@@ -136,60 +138,14 @@ $(document).on('public-message', function(
     var notice = msginfo.notice,
         delayed = msginfo.delayed,
         nick_class = msginfo.nick_class,
-        jqChat = $('#msgBoard > #chatOut'),
-        //jqTick = $('#msgBoard > #msgTicker'),
-        msgTicker,
+        jqChat = $(app.GROUP_CHAT_OUT),
         msg,
-        atBottom,
-        msgNumber,
-        span;
-    //msgTicker = '<b>' + decodeURI(msginfo.nick) + '</b>' + ': ' +
-    //                 decodeURI(msginfo.body) + ' ';
+        util;
     if (!jqChat[0]) {throw "no chat out div";}
-    msgNumber = jqChat.data('msgNumber'); // get next msgNumber
-    msgNumber = msgNumber || 0;           // init if not already
-    msg = '<span id="'+ msgNumber + '"<b>' +
-                        decodeURI(msginfo.nick) + '</b>' + ': ' +
-                        decodeURI(msginfo.body) + '<br></span>';
-    // get scroll pos
-    //app.log(2, 'public-message scrollTop ' + jqChat.scrollTop()
-    //        + ' scrollHeight ' + jqChat[0].scrollHeight
-    //        + ' clientHeight ' + jqChat[0].clientHeight);
-    // detect scroll bar at bottom
-    // looks like the mouse wheel can put the scroll pos < 1em from bottom so fudge it
-    atBottom = Math.abs((jqChat.scrollTop() + jqChat[0].clientHeight) - jqChat[0].scrollHeight) < 10;
-    jqChat.append(msg);       // Add message to Message Board.
-    if (atBottom) // if we were at bottom before msg append scroll to bottom
-    {
-      jqChat.scrollTop(jqChat[0].scrollHeight);
-      //jqChat.animate({scrollTop : jqChat[0].scrollHeight},'fast');
-      // flash new msg
-      span = $("span#" + msgNumber, jqChat);
-      //span.animate({color:"red"},
-      span.animate({backgroundColor:"red"},
-        {duration: 0,
-         complete: function()
-         {
-           //span.animate({backgroundColor:"transparent"}, 500); // doesn't work, end color is white
-           span.animate({backgroundColor:"black"}, 500);
-         }
-        });
-    }
-    else
-    {
-       // flash chat border
-       jqChat.animate({backgroundColor:"red"},
-        {duration: 0,
-         complete: function()
-         {
-           jqChat.animate({backgroundColor:"black"}, 500);
-           //jqChat.animate({backgroundColor:"transparent"}, 500); // doesn't work, end color is white
-         }
-        });
-    }
-    //jqTick.prepend(msgTicker);
-
-    jqChat.data('msgNumber', ++msgNumber); // increment next msg number
+    util = jqChat.data('util');
+    if (!util) {throw "no chat util";}
+    msg = '<b>' + decodeURI(msginfo.nick) + '</b>' + ': ' + decodeURI(msginfo.body);
+    util.addMsg(msg);
     app.log(2, 'A public message arrived ' + msg);
   }
   catch(err)
@@ -198,25 +154,45 @@ $(document).on('public-message', function(
   }
 }); // public-message()
 
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-/**
- * \brief Function that modifies the DOM when a private message arrives.
- *        This implements the trigger "private-message".
- */
+///
+/// \brief Function that modifies the DOM when a private message arrives.
+///        This implements the trigger "private-message".
 $(document).on('private-message', function(
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-    /**
-     * Event object. */
-  ev,
-    /**
-     * Message Information Object. */
-  msginfo
+  ev, // event
+  msginfo // * Message Information Object. */
 )
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
-  openPersonalChat(msginfo);
-  app.log(2, 'A private message arrived.');
-}); /* private-message() */
+  try
+  {
+    var id, oo, 
+        jqChat,
+        msg,
+        atBottom,
+        msgNumber,
+        span,
+        util;
+    app.log(2, 'A private message arrived.');
+    id = app.str2id(msginfo.nick);
+    oo = $('#meeting > #streams > #scarousel div.cloudcarousel#' + id).get(0);
+    if (oo)
+    {
+      showPersonalChatWithSpot(oo);
+      jqChat = $("#msgBoard > #chatOut", oo);
+      console.log("jqChat", jqChat);
+      if (!jqChat[0]) {throw "no chat out div";}
+      util = jqChat.data('util');
+      if (!util) {throw "no chat util";}
+      msg = '<b>' + decodeURI(msginfo.nick) + '</b>' + ': ' + decodeURI(msginfo.body);
+      util.addMsg(msg);
+    }
+    else // spot not found
+    {
+      app.log(4, "private-message error message to " + msginfo.nick + " doesn't have a spot");
+    }
+  } catch (err) {
+    app.log(4, "private-message exception " + err);
+  }
+}); // private-message()
 
 ///
 /// extract spot info from info object
@@ -255,13 +231,13 @@ function setSpotInfo(info)
 ///
 function setCarouselItemState(info)
 {
-try
-{
-  if (info && info.nick)
+  var id, oo, w, s, h, image;
+  try
   {
-    var id = app.str2id(info.nick),
-        oo = $('#meeting > #streams > #scarousel div.#' + id).get(0),
-        w, s, h, image;
+    if (!info)      {throw "info is not defined";}
+    if (!info.nick) {throw "info.nick is not defined";}
+    id = app.str2id(info.nick);
+    oo = $('#meeting > #streams > #scarousel div.cloudcarousel#' + id).get(0);
     if (oo)
     {  // item found
        // Check dimensions of wrapper div to correct for video dimensions.
@@ -281,19 +257,22 @@ try
           image = Callcast.participants[info.nick].image;
           $(oo).css('background-image', image);
           Callcast.ShowRemoteVideo(info);
-          app.log(2, 'setCarouselItemState video off user ' + info.nick + ' image ' + image);
+          app.log(2, 'setCarouselItemState video off user ' + info.nick + ' image ' + info.image);
        }
     }
-/*    else
+    else if (info.nick === app.user.name) {
+      console.log('setCarouselItemState video changed for local user ', info);
+      app.carousel.updateAll();
+    }
+    else
     {
-       //app.log(3, "setCarouselItemState item for " + info.nick + " not found");
-    } */
+      app.log(3, "setCarouselItemState item for " + info.nick + " not found");
+    }
   }
-}
-catch (err)
-{
-   console.log('setCarouselItemState exception', err);
-}
+  catch (err)
+  {
+    console.log('setCarouselItemState exception', err);
+  }
 }
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
@@ -377,13 +356,12 @@ $(document).on('room-creation-not-allowed', function(
 )
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
+  closeWindow();
   app.log(4, 'The room creation was not allowed.');
-  $('#errorMsgPlugin').empty();
-  $('#errorMsgPlugin').append('<h1>Joining room ' + roomname + ' failed</h1><p>Your room may not exist. Please reload and choose another room. [Ctrl + R]</p>');
+  $('#errorMsgPlugin > h1').text('Joining room ' + roomname + ' failed');
+  $('#errorMsgPlugin > p#prompt').text('Your room may not exist. Please reload and choose another room.');
   openWindow('#errorMsgPlugin');
 }); /* room-creation-not-allowed() */
-
-
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
@@ -444,8 +422,8 @@ $(document).on('one-login-complete', function(event, msg) {
     console.log('one-login-complete: opening meeting');
     openMeeting();
 
-        // check, install plugin
-        tryPluginInstall();
+    // check, install plugin
+    tryPluginInstall();
 
   }
 
@@ -463,57 +441,14 @@ $(document).on('disconnected', function(
 )
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
-  app.log(2, 'User has disconnected.');
   Callcast.log('Connection terminated.');
-  app.log(4, "disonnected.");
-  $("#errorMsgPlugin").empty();
-  $("#errorMsgPlugin").append('<h1>We got disconnected.</h1><p>Please reload the page. [Ctrl + R]</p>');
+  app.log(4, "disconnected.");
+  $('#errorMsgPlugin > h1').text('We got disconnected.');
+  $('#errorMsgPlugin > p#prompt').text('Please reload the page.');
+  closeWindow();
   openWindow('#errorMsgPlugin');
   return false;
 }); /* disconnected() */
-
-
-
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-/**
- * \brief Function that makes initializations associated to the local plugin.
- *        This makes some of the functionality from "plugin-initialized" in
- *        scrum.js
- */
-function initializeLocalPlugin(
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-     /* No arguments. */
-)
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-{
-  var vertext = 'Plug-in Version: ' + (Callcast.GetVersion() || 'None');
-  if (Callcast.pluginUpdateRequired()) {
-    vertext += ' -- Version update REQUIRED.' + ' Visit ' +
-      Callcast.PLUGIN_DOWNLOAD_URL;
-    /*
-     * Force user to update plugin. */
-    app.log(4, 'Plugin update required: ' + vertext);
-    $('#errorMsgPlugin').empty();
-    $('#errorMsgPlugin').append('<h1>Gocast.it plugin version update required</h1><p>Please visit <a href=' + Callcast.PLUGIN_DOWNLOAD_URL + '>' + Callcast.PLUGIN_DOWNLOAD_URL + '</a> to reinstall.</p>');
-    openWindow('#errorMsgPlugin');
-    return false;
-  }
-
-
-  if (Callcast.pluginUpdateAvailable()) {
-    vertext += ' -- Version update AVAILABLE.' + ' Visit ' +
-      Callcast.PLUGIN_DOWNLOAD_URL;
-  }
-  app.log(2, vertext);
-
-  /*
-   * Callcast Seetings. */
-  Callcast.SetUseVideo(false); /* Initially set to false, user must enable. */
-  app.log(2, 'initializeLocalPlugin complete.');
-  return true;
-} /* initializeLocalPlugin() */
-
-
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
@@ -536,7 +471,7 @@ function addPluginToCarousel(
     return null;
   }
   // check if nickname already in carousel
-  oo = $('#meeting > #streams > #scarousel div#'+ nickname);
+  oo = $('#meeting > #streams > #scarousel div.cloudcarousel#'+ id);
   if (oo.length > 0)
   {
     app.log(4, "addPluginToCarousel error nickname " + nickname + "already in carousel");
@@ -549,7 +484,6 @@ function addPluginToCarousel(
   if (!oo) // if we're out of spots add one
   {
     oo = app.carousel.createSpot();
-    app.carousel.updateAll();
   }
   if (oo)
   {
@@ -563,8 +497,10 @@ function addPluginToCarousel(
     $(oo).append('<object id="GocastPlayer' + id + '" type="application/x-gocastplayer" width="' + w + '" height="' + h + '"></object>');
     $('div.name', oo).text(dispname);
     $(oo).removeClass('unoccupied');
+    $("#showChat", oo).css("display", "block"); // display showChat button
 
     app.log(2, 'Added GocastPlayer' + id + ' object.');
+    app.carousel.updateAll();
     return $('object#GocastPlayer' + id, oo).get(0);
   }
 
@@ -589,7 +525,7 @@ function removePluginFromCarousel(nickname)
       app.log(2, "removePluginFromCarousel nickname " + nickname);
       // Get parent object and modify accordingly.
       var id = app.str2id(nickname),
-          jqOo = $('#meeting > #streams > #scarousel div.cloudcarousel#' + id + '"'),
+          jqOo = $('#meeting > #streams > #scarousel div.cloudcarousel#' + id),
           item = $(jqOo).data('item');
       // todo this method is called for all occupied spots
       // fix to call only for spot with id
@@ -767,7 +703,7 @@ function removeContentFromCarousel(
   /*
    * Get parent object and modify accordingly. */
   var id = app.str2id(infoId),
-      jqOo = $('#meeting > #streams > #scarousel div.cloudcarousel#' + id + '"');
+      jqOo = $('#meeting > #streams > #scarousel div.cloudcarousel#' + id);
   jqOo.addClass('unoccupied').removeClass('typeContent');
   jqOo.removeAttr('id');
   jqOo.removeAttr('title');
@@ -785,6 +721,7 @@ function removeContentFromCarousel(
 /// are defined in info.spottype and can be
 /// "youtube" play a youtube video
 /// "url" display the url title and favicon
+/// "new" add an empty spot (does nothing here)
 function doSpot(spotDiv, info)
 {
   try
@@ -1054,6 +991,43 @@ function connectionStatus(statusStr)
    $("#upper-right > #connection-status").text(statusStr);
 }
 
+///
+/// \brief show local speaker status
+///
+function setLocalSpeakerStatus(vol)
+{
+  // set image based on volume
+  var img, div = $("#upper-right > div#volume");
+  console.log("speaker volume " + vol);
+  if (vol <= 0) // mute, if vol == -1 display mute symbol since sound's probably not getting out or in
+  {
+     img = 'url("images/volume-muted.png")';
+  }
+  else if (vol < 255/3)
+  {
+     img = 'url("images/volume-low.png")';
+  }
+  else if (vol < 2*255/3)
+  {
+     img = 'url("images/volume-medium.png")';
+  }
+  else
+  {
+     img = 'url("images/volume-high.png")';
+  }
+  div.css("background-image", img);
+
+  // display volume warning
+  if (app.volWarningDisplayed === false)             // check volume only on first callback
+  {
+    if($.cookie("stopVolumeStatus") !== "checked" && // and if user has not disabled the check
+      (vol < 255*0.07) )                             // if vol is below threshold
+    {
+      $(app.STATUS_PROMPT).css("display", "block");  // display warning
+    }
+    app.volWarningDisplayed = true;
+  }
+}
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
  * \brief Function called when LOCAL Gocast.it plugin object is loaded.
@@ -1097,45 +1071,21 @@ function pluginLoaded(
 
         // Callcast Seetings.
         // todo there's an app member for video state, merge it with callcast video state
-        Callcast.SetUseVideo(false); // Initially set to false, user must enable.
+        // Callcast.SetUseVideo(false); // Initially set to false, user must enable.
 
         checkForPluginOptionalUpgrades(); // display upgrade button if there are optional upgrades
 
         // set the speaker volume status callback
-        GoCastJS.SetSpkVolListener(1000, Callcast.localplayer, function(vol)
-        {
-          // set image based on volume
-          var img, div = $("#upper-right > div#volume");
-          console.log("speaker volume " + vol);
-          if (vol <= 0) // mute, if vol == -1 display mute symbol since sound's probably not getting out or in
-          {
-             img = 'url("images/volume-muted.png")';
-             div.css("background-image", img);
-          }
-          else if (vol < 255/3)
-          {
-             img = 'url("images/volume-low.png")';
-             div.css("background-image", img);
-          }
-          else if (vol < 2*255/3)
-          {
-             img = 'url("images/volume-medium.png")';
-             div.css("background-image", img);
-          }
-          else
-          {
-             img = 'url("images/volume-high.png")';
-             div.css("background-image", img);
-          }
-        });
+        GoCastJS.SetSpkVolListener(1000, Callcast.localplayer, setLocalSpeakerStatus);
 
         handleRoomSetup();
      }, function(message) {
-       // Failure to initialize.
-       app.log(4, 'Local plugin failed to initialize.');
-       $('#errorMsgPlugin').empty();
-       $('#errorMsgPlugin').append('<h1>Gocast.it plugin failed to initialize</h1><p>Please reload the page. [Ctrl + R]</p>');
-       openWindow('#errorMsgPlugin');
+        // Failure to initialize.
+        app.log(4, 'Local plugin failed to initialize.');
+        $('#errorMsgPlugin > h1').text('Gocast.it plugin failed to initialize');
+        $('#errorMsgPlugin > p#prompt').text('Please reload the page.');
+        closeWindow();
+        openWindow('#errorMsgPlugin');
      });
   }
   else // pluginLoaded but out of date

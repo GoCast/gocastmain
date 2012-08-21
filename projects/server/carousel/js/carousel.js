@@ -33,6 +33,8 @@
     this.orgFontSize = parseInt($(objIn).css('font-size'), 10);
     this.plgOrgWidth = this.orgWidth - 4;
     this.plgOrgHeight = (this.plgOrgWidth / Callcast.WIDTH) * Callcast.HEIGHT;
+    this.orgChatWidth = this.plgOrgWidth;
+    this.orgChatBot = 17;
     this.object = objIn;
     this.options = options;
     this.dummy = dummy;
@@ -41,24 +43,9 @@
     {
       //console.log("item decorating object", objIn);
       $(this.object).css('position', 'absolute');
-      // add controls
-      this.addControls();
-      // add handlers
-      $(this.object).mouseover(function(event)
-      {
-        // only show close icon on unoccupied or content spots
-        if ($(this).hasClass('unoccupied') || $(this).hasClass('typeContent'))
-        {
-          $('.zoom', this).css('visibility', 'visible');
-          $('.close', this).css('visibility', 'visible');
-        }
-      });
-      $(this.object).mouseout(function(event)
-      {
-        $('.control', this).css('visibility', 'hidden');
-      });
+      this.addControls(); // add controls
     }
-  }; /* Item object */
+  }; // Item object
 
   Item.prototype.updateSize = function(item)
   {
@@ -66,11 +53,31 @@
       this.orgHeight = item.orgHeight;
       this.plgOrgWidth = item.plgOrgWidth;
       this.plgOrgHeight = item.plgOrgHeight;
+      this.orgChatWidth = item.orgChatWidth;
+      this.orgChatBot = item.orgChatBot;
   };
   Item.prototype.addControls = function() // add controls to spot
   {
-     $(this.object).append('<img class="zoom control" src="images/fullscreen.png" alt="Zoom" title="Zoom" onclick="carouselItemZoom(event);"/>');
-     $(this.object).append('<img class="close control" src="images/trash.png" alt="Close" title="Close" onclick="onSpotClose(event);"/>');
+    var jqObj = $(this.object);
+    jqObj.append('<img class="zoom control" src="images/fullscreen.png" alt="Zoom" title="Zoom" onclick="carouselItemZoom(event);"/>');
+    jqObj.append('<img class="close control" src="images/trash.png" alt="Close" title="Close" onclick="onSpotClose(event);"/>');
+    jqObj.append('<input id="showChat" type="button" title="Show Chat" onclick="showPersonalChat(event);"/>');
+    jqObj.append('<div id="msgBoard"><div id="chatOut"></div><input class="chatTo" type="text" placeholder="Enter a message" onkeydown="keypressPersonalChatHandler(event);"/><input class="send" type="button" title="Send message." onclick="sendPersonalChat(event);"/><input class="close" type="button" title="Close" onclick="closePersonalChat(event);"/></div>');
+    // add chat util to personal chat out
+    var chatOut = $("#msgBoard > #chatOut", jqObj);
+    if (!chatOut[0]) {app.log(4, "Item error can't find chatOut");}
+    chatOut.data('util', new GoCastJS.ChatUtil(chatOut));
+    // add handlers
+    jqObj.mouseover(function(event) {
+      // only show close icon on unoccupied or content spots
+      if ($(this).hasClass('unoccupied') || $(this).hasClass('typeContent')) {
+        $('.zoom', this).css('visibility', 'visible');
+        $('.close', this).css('visibility', 'visible');
+      }
+    });
+    jqObj.mouseout(function(event) {
+      $('.control', this).css('visibility', 'hidden');
+    });
   };
 
   /// \brief a numerically ordered collection of Item with insert an delete
@@ -220,7 +227,7 @@
     $('#addItem', container).click(function(event)
     {
        //ctx.addItem();
-       Callcast.AddSpot({});
+       Callcast.AddSpot({spottype: "new"});
     });
     // mouseover
     /*
@@ -255,13 +262,17 @@
         }
     }); // onclick()
         */
-    /*
-     * Mousedown on container, it prevents items from being selected
-     * as mouse is moved and clicked in the container. */
+    /* turn this of because it prevents personal chat input from getting focus
+       todo IE handler below must also be dealt with
+    ///
+    /// Mousedown on container, it prevents items from being selected
+    /// as mouse is moved and clicked in the container.
+    ///
     $(container).on('mousedown', this, function(event) {
-        event.data.container.focus();
-        return false;
+        //event.data.container.focus();
+        //return false;
     });
+    */
     /*
      * Selectstart, defined for IE. */
     container.onselectstart = function() { return false; };
@@ -295,11 +306,28 @@
         this.destRotation += (Math.PI / itemsLength) * (2 * direction);
         this.go();
     }; /* rotate() */
+    ///
+    /// \brief adjust chat in spot on resize or carousel spin
+    ///
+    this.adjustChat = function(item, scale)
+    {
+      var msg = $("#msgBoard", item.object).get(0),
+          show = $("#showChat", item.object).get(0),
+          px = "px";
+      msg.style.width = (item.orgChatWidth * scale) + px;
+      msg.style.bottom = (item.orgChatBot * scale) + px;
+      show.style.bottom = (item.orgChatBot * scale) + px;
+      //console.log("adjustChat", msg.style);
+    };
+    ///
+    /// \ brief adjust plugin in spot on resize or carousel spin
+    ///
     this.adjPlugin = function(item, scale)
     {
         var w, h, nick, px = 'px',
             obj = item.object,
             plgin = $(obj).find('object')[0];
+        //console.log('adjPlugin ' + $(obj).attr('encname'));
         if (plgin)
         {
             w = item.plgOrgWidth * scale;
@@ -322,6 +350,7 @@
             }
             else
             {
+                this.adjustChat(item, scale);
                 nick = $(obj).attr('encname');
                 if (nick && Callcast.participants[nick] && Callcast.participants[nick].videoOn)
                 {
@@ -617,11 +646,13 @@
         clearInterval(this.tt);
         this.updateAll();
     }; // checkObjectsLoaded()
-    /*
-     * Bootstrapping. */
-    this.tt = setInterval(function() {
-        ctx.checkObjectsLoaded();
-    }, 50);
+    this.init = function()
+    {
+      // Bootstrapping.
+      this.tt = setInterval(function() {
+          ctx.checkObjectsLoaded();
+      }, 50);
+    };
     // resize the carousel keeping the spot proportion
     this.resize = function()
     {
@@ -632,16 +663,19 @@
             newHeight = height * options.ySpotRatio,
             widthScale = newWidth / this.item.orgWidth,
             heightScale = newHeight / this.item.orgHeight,
-            scale = (widthScale + heightScale) / 2;
+            scale = (widthScale + heightScale) / 2,
+            zoomedSpot = $('#meeting > #zoom > .cloudcarousel');
 
         //app.log(2, "container w " + width + " h " + height);
         // set round property based on height
-        this.round = (height > 150) ? true : false;
+        this.round = (zoomedSpot.length === 0 && height > 150) ? true : false;
 
         this.item.orgWidth *= scale;
         this.item.orgHeight *= scale;
         this.item.plgOrgWidth *= scale;
         this.item.plgOrgHeight *= scale;
+        this.item.orgChatWidth *= scale;
+        this.item.orgChatBot *= scale;
 
         // update items in list
         items.updateItemSizes(this.item);
