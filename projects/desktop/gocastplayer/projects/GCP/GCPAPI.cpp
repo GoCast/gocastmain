@@ -102,6 +102,44 @@ FB::VariantMap GCPAPI::get_videoinopts()
     return m_videoDevices;
 }
 
+FB::VariantList GCPAPI::get_audioinopts()
+{
+    GoCast::RtcCenter* pCtr = GoCast::RtcCenter::Instance();
+    
+    m_audioInDevices.clear();
+    if(false == pCtr->Inited())
+    {
+        std::string msg = m_htmlId.convert_cast<std::string>();
+        msg += ": Failed to init RtcCenter singleton...";
+        FBLOG_ERROR_CUSTOM("GCPAPI::get_audioinopts", msg);
+    }
+    else
+    {
+        pCtr->QueryAudioDevices(m_audioInDevices);
+    }
+    
+    return m_audioInDevices;
+}
+
+FB::VariantList GCPAPI::get_audiooutopts()
+{
+    GoCast::RtcCenter* pCtr = GoCast::RtcCenter::Instance();
+    
+    m_audioOutDevices.clear();
+    if(false == pCtr->Inited())
+    {
+        std::string msg = m_htmlId.convert_cast<std::string>();
+        msg += ": Failed to init RtcCenter singleton...";
+        FBLOG_ERROR_CUSTOM("GCPAPI::get_audiooutopts", msg);
+    }
+    else
+    {
+        pCtr->QueryAudioDevices(m_audioOutDevices, false);
+    }
+    
+    return m_audioOutDevices;    
+}
+
 void GCPAPI::set_onaddstream(const FB::JSObjectPtr &onaddstream)
 {
     m_onaddstreamCb = onaddstream;

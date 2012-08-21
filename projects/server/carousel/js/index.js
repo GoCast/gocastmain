@@ -121,10 +121,13 @@ var app = {
       }
       break;
     case 'Safari':
+      msg = "Sorry we don't support the Safari browser right now.\nPlease use Chrome or Firefox for now.";
+      /*
       if (app.browser.version < 525) {
         msg = 'You appear to be using an older Safari version. ' +
           expl + ' ' + recom;
       }
+      */
       break;
     case 'Mobile Safari':
     case 'AppleWebKit':
@@ -240,7 +243,8 @@ var app = {
         $(app.GROUP_CHAT_OUT).attr('disabled', 'disabled');
      }
   },
-  videoEnabled: false // video enabled state
+  videoEnabled: true // video enabled state todo this must be initially in sync with video button class
+                     //       make either this var or button class the state variable
 }; /* app */
 
 ///
@@ -518,7 +522,7 @@ function carouselItemClick(event)
     }
     else // remote user
     {
-      openChat(event); //todo refactor doesn't open chat anymore, opens feedback or url spot
+      //openChat(event); //todo refactor doesn't open chat anymore, opens feedback or url spot
     }
   } catch(err) {
     app.log(4, "carouselItemClick exception " + err);
@@ -665,6 +669,36 @@ function openChat(event)
     }
     return false;
   }
+  // Click position.
+  cX = event.clientX;
+  cY = event.clientY;
+  // Transition effect.
+  jqMask = $('#mask');
+  jqMask.fadeIn(500, activateWindow('#chatInp'));
+  jqMask.fadeTo('fast', 0.3);
+  // Position chat Inp.
+  winW = $(window).width();
+  winH = $(window).height();
+  wcW = jqWin.outerWidth();
+  wcH = jqWin.outerHeight();
+  if ((cY + wcH) > winH) {
+    jqWin.css('top', winH - wcH);
+  }
+  else {
+    jqWin.css('top', cY);
+  }
+  if ((cX + wcW) > winW) {
+    jqWin.css('left', winW - wcW);
+  }
+  else {
+    jqWin.css('left', cX);
+  }
+  // Transition effect for Chat Input Window.
+  jqWin.fadeIn(700);
+  // Add class active.
+  jqWin.addClass('active');
+  // Add focus to input text.
+  $('input.chatTo', jqWin).focus();
   return false;
 } // openChat() 
 
@@ -689,12 +723,14 @@ function openMeeting(
   // use fb profile pick as bg image if it exists
   // set this here initially because local video
   // is off initially
-  // todo consider moving this
+  /* todo below needs to be uncommented if initial video state is off
+          rewrite the video on/off background on/off code
   if (app.user.fbProfilePicUrl)
   {
      $('#meeting > #streams > #scarousel #mystream')
         .css('background-image', 'url(' + app.user.fbProfilePicUrl + ')');
   }
+  */
   // center carousel in it's container
   // the carousel positioning is handled by it's resize method
   var sCar = $('#scarousel'),
@@ -855,7 +891,7 @@ function sendChat(
       ename = jqChatSpan.attr('ename');
       Callcast.SendPrivateChat(encodeURI(ltext), ename);
     }
-    app.log(2, 'Sending chat to ' + id);
+    app.log(2, 'Sending chat to ' + id + " " + ltext);
     jqChatSpan.removeAttr('id');
     jqChatSpan.removeAttr('ename');
   }
@@ -868,6 +904,7 @@ function sendChat(
 ///
 function keypressPersonalChatHandler(event)
 {
+  event.stopPropagation();
   //app.log(2, 'keypressPersonalChatHandler');
   
   /// We have no action for key press combinations with the Alt key.
@@ -898,6 +935,7 @@ function keypressGrpChatHandler(
 )
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
+  event.stopPropagation();
   app.log(2, 'keypressGrpChatHandler');
   /*
    * We have no action for key press combinations with the Alt key. */
@@ -1013,13 +1051,19 @@ function closeStatus(event)
 function changeVideo()
 {
   var jqObj = $('#lower-right > #video'),
-      jqOo, w, h;
+      jqOo = $('#mystream'),
+      w, h;
   if (!jqObj)
   {
      app.log(4, "couldn't find video button");
   }
+  if (!jqOo)
+  {
+     app.log(4, "couldn't find local video spot");
+  }
+  $(jqObj).toggleClass('on');
   app.videoEnabled = $(jqObj).hasClass('on');
-  jqOo = $('#mystream');
+  console.log("changeVideo", app.video);
   if (app.videoEnabled) {
     // Check object dimensions.
     w = jqOo.width() - 4;
@@ -1041,7 +1085,6 @@ function changeVideo()
        $(jqOo).css('background-image', 'url(' + app.user.fbProfilePicUrl + ')');
     }
   }
-  $(jqObj).toggleClass('on');
   if (app.videoEnabled) {
     app.log(2, 'Video turned on.');
     $(jqObj).attr('title', 'Disable video');
