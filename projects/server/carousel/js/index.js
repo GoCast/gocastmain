@@ -121,10 +121,13 @@ var app = {
       }
       break;
     case 'Safari':
+      msg = "Sorry we don't support the Safari browser right now.\nPlease use Chrome or Firefox for now."
+      /*
       if (app.browser.version < 525) {
         msg = 'You appear to be using an older Safari version. ' +
           expl + ' ' + recom;
       }
+      */
       break;
     case 'Mobile Safari':
     case 'AppleWebKit':
