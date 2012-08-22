@@ -9,16 +9,67 @@
 #include "GCPMediaStream.h"
 #include "DOM/Window.h"
 #include "variant_list.h"
-//#include "modules/audio_device/main/interface/audio_device.h"
-
-#define FBLOG_INFO_CUSTOM(func, msg) FBLOG_INFO(func, msg)
-#define FBLOG_ERROR_CUSTOM(func, msg) FBLOG_ERROR(func, msg)
-
-//std::cout << func << " [INFO]: " << msg << std::endl;
-//std::cout << func << " [ERROR]: " << msg << std::endl;
 
 namespace GoCast
 {
+    JSLogger* JSLogger::Instance(bool bDelete)
+    {
+        static JSLogger* pLogger = NULL;
+        
+        if(true == bDelete)
+        {
+            delete pLogger;
+            pLogger = NULL;
+        }
+        else if(NULL == pLogger)
+        {
+            pLogger = new JSLogger();
+        }
+        
+        return pLogger;
+    }
+    
+    void JSLogger::LogEntry(const std::string& entry)
+    {
+        boost::mutex::scoped_lock lock(m_mutex);
+        m_logEntries.push_back(FB::variant(entry));
+
+        if(NULL != m_logCb.get())
+        {
+            m_logCb->InvokeAsync("", FB::variant_list_of());
+        }
+    }
+    
+    void JSLogger::LogFunction(const FB::JSObjectPtr& func)
+    {
+        boost::mutex::scoped_lock lock(m_mutex);
+        m_logCb = func;
+    }
+    
+    void JSLogger::ClearLogFunction()
+    {
+        m_logCb.reset();
+    }
+    
+    FB::VariantList JSLogger::LogEntries()
+    {
+        boost::mutex::scoped_lock lock(m_mutex);
+        FB::VariantList entries(m_logEntries);
+        
+        m_logEntries.clear();
+        return entries;
+    }
+    
+    JSLogger::JSLogger()
+    {
+        m_logCb.reset();
+    }
+    
+    JSLogger::~JSLogger()
+    {
+        m_logCb.reset();
+    }
+    
     FB::JSAPIPtr MediaStreamTrack::Create(const std::string& kind,
                                           const std::string label)
     {

@@ -10,8 +10,8 @@
 #include "global/config.h"
 
 #include "GCPAPI.h"
-#include "GCPWebrtcCenter.h"
 #include "GCPMediaStream.h"
+#include "GCPWebrtcCenter.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 /// @fn GCPPtr GCPAPI::getPlugin()
@@ -138,6 +138,11 @@ FB::VariantList GCPAPI::get_audiooutopts()
     }
     
     return m_audioOutDevices;    
+}
+
+FB::VariantList GCPAPI::get_logentries()
+{
+    return GoCast::JSLogger::Instance()->LogEntries();
 }
 
 void GCPAPI::set_onaddstream(const FB::JSObjectPtr &onaddstream)
@@ -447,7 +452,17 @@ FB::variant GCPAPI::DeletePeerConnection()
         return false;
     }
     
+    if("localPlayer" == m_htmlId.convert_cast<std::string>())
+    {
+        GoCast::JSLogger::Instance()->ClearLogFunction();
+    }
+    
     return pCtr->DeletePeerConnection(m_htmlId.convert_cast<std::string>());
+}
+
+void GCPAPI::LogFunction(const FB::JSObjectPtr& func)
+{
+    GoCast::JSLogger::Instance()->LogFunction(func);
 }
 
 void GCPAPI::OnStateChange(StateType state_changed)

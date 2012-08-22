@@ -159,19 +159,24 @@ RoomDatabase.prototype.RemoveRoom = function(roomname, cbSuccess, cbFailure) {
 
     this.log('Removing room: ' + roomname);
 
-    ddb.deleteItem(this.ACTIVEROOMS, roomname, null, {}, function(err, res, cap) {
-        if (err)
-        {
-            if (err.statusCode === 400) {
-                self.notifylog('DynamoDB Throughput ERROR: RemoveRoom room: ' + roomname);
+    // Make sure all contents for this room are removed automatically as well.
+    self.RemoveAllContentsFromRoom(roomname, function() {
+        ddb.deleteItem(self.ACTIVEROOMS, roomname, null, {}, function(err, res, cap) {
+            if (err)
+            {
+                if (err.statusCode === 400) {
+                    self.notifylog('DynamoDB Throughput ERROR: RemoveRoom room: ' + roomname);
+                }
+                self.log('RemoveRoom: ERROR: ' + err);
+                cbFailure(err);
+            } else {
+     //           self.log('RemoveRoom: Success: ' + cap);
+     //           self.log(res);
+                cbSuccess(res, cap);
             }
-            self.log('RemoveRoom: ERROR: ' + err);
-            cbFailure(err);
-        } else {
- //           self.log('RemoveRoom: Success: ' + cap);
- //           self.log(res);
-            cbSuccess(res, cap);
-        }
+        });
+    }, function(msg) {
+        self.log('RemoveRoom: RemoveAllContentsFromRoom: failed to complete: ' + msg);
     });
 };
 
@@ -191,7 +196,7 @@ RoomDatabase.prototype.validateObj = function(obj) {
             else if (tk !== 'string' && tk !== 'number') {
                 return null;
             }
-            else {
+            else if (tk !== '') {
                 retobj[k] = obj[k];
             }
         }
@@ -216,12 +221,18 @@ RoomDatabase.prototype.AddContentToRoom = function(roomname, spotnumber, obj, cb
         return false;
     }
 
+    if (typeof spotnumber === 'number') {
+        // translate to a string.
+        spotnumber = '' + spotnumber;
+    }
+
     if (typeof roomname !== 'string' || typeof spotnumber !== 'string') {
         this.log('AddContentToRoom: ERROR: roomname and spotnumber given must be strings.');
         return false;
     }
 
     this.log('Adding content to room: ' + roomname + ' in spotnumber: ' + spotnumber);
+//    console.log('DEBUG:Adding content to room: full obj: ', obj);
 
     putobj.roomname = roomname;
     putobj.spotnumber = spotnumber;
@@ -235,13 +246,78 @@ RoomDatabase.prototype.AddContentToRoom = function(roomname, spotnumber, obj, cb
             self.log('AddContentToRoom: ERROR: ' + err);
             cbFailure(err);
         } else {
-            self.log('AddContentToRoom: Success: ' + cap);
-            self.log(res);
+//            self.log('AddContentToRoom: Success: ' + cap);
+//            self.log(res);
             cbSuccess(res, cap);
         }
     });
 
     return true;
+};
+
+RoomDatabase.prototype.LoadContentsFromDBForRoom = function(roomname, cbSuccess, cbFailure) {
+     var self = this,
+        options = {},
+        buildup = [],
+        i, len,
+        QueryCB = null,
+        batchDelay = 500,
+        maxPerBatch = 2;
+
+    QueryCB = function(err, res, cap) {
+        if (err)
+        {
+            if (err.statusCode === 400) {
+                self.notifylog('DynamoDB Throughput ERROR: QueryCB-Load room: ' + roomname);
+            }
+            self.log('LoadContentsFromDBForRoom:query ERROR: ' + err);
+            console.log('Raw err:', err);
+            cbFailure(err);
+        } else {
+//            console.log('LoadContentsFromDBForRoom:query Success: ', res);
+            // Now we have an object in res.items which is an array of objects that contain 'roomname' and 'spotnumber'
+            len = res.items.length;
+
+            // If there were no results from the query, then we're all good here. No entries.
+            if (!len) {
+                console.log('LoadContentsFromDBForRoom: No Room contents to load in ' + roomname + '. SUCCESS.');
+                cbSuccess();
+                return true;
+            }
+
+            // Building a master list to pass back of all contents in the room.
+            for (i = 0; i < len; i += 1)
+            {
+                buildup.push(res.items[i]);
+            }
+
+            // If there is more data in the query, delay and then query again.
+            if (res.lastEvaluatedKey.hash) {
+                options.exclusiveStartKey = res.lastEvaluatedKey;
+                setTimeout(function() {
+                    ddb.query(self.ROOMCONTENTS, roomname, options, QueryCB);
+                }, batchDelay);
+            }
+            else {
+                console.log('LoadContentsFromDBForRoom: SUCCESS. Loaded ' + buildup.length + ' spots for room: ' + roomname);
+//                console.log('LoadContentsFromDBForRoom: Calling back with: ', buildup);
+
+                cbSuccess(buildup);
+            }
+        }
+    };
+
+   if (typeof roomname !== 'string') {
+        this.log('LoadContentsFromDBForRoom: ERROR: roomname given must be a string.');
+        cbFailure('Room must be a string.');
+        return false;
+    }
+
+    this.log('Loading ALL contents from db for room: ' + roomname);
+
+    options = { limit: maxPerBatch };
+
+    ddb.query(this.ROOMCONTENTS, roomname, options, QueryCB);
 };
 
 RoomDatabase.prototype.RemoveContentFromRoom = function(roomname, spotnumber, cbSuccess, cbFailure) {
@@ -257,7 +333,7 @@ RoomDatabase.prototype.RemoveContentFromRoom = function(roomname, spotnumber, cb
         return false;
     }
 
-    this.log('Removing content from room: ' + roomname + ' in spotnumber: ' + spotnumber);
+//    this.log('Removing content from room: ' + roomname + ' in spotnumber: ' + spotnumber);
 
     ddb.deleteItem(this.ROOMCONTENTS, roomname, spotnumber, {}, function(err, res, cap) {
         if (err)
@@ -268,8 +344,8 @@ RoomDatabase.prototype.RemoveContentFromRoom = function(roomname, spotnumber, cb
             self.log('RemoveContentFromRoom: ERROR: ' + err);
             cbFailure(err);
         } else {
-            self.log('RemoveContentFromRoom: Success: ' + cap);
-            self.log(res);
+//            self.log('RemoveContentFromRoom: Success: ' + cap);
+//            self.log(res);
             cbSuccess(res, cap);
         }
     });
@@ -282,14 +358,14 @@ RoomDatabase.prototype.RemoveAllContentsFromRoom = function(roomname, cbSuccess,
         i, len,
         toDel = {},
         QueryCB = null,
-        batchDelay = 1000,
+        batchDelay = 500,
         maxPerBatch = 2;
 
     QueryCB = function(err, res, cap) {
         if (err)
         {
             if (err.statusCode === 400) {
-                self.notifylog('DynamoDB Throughput ERROR: QueryCB room: ' + roomname);
+                self.notifylog('DynamoDB Throughput ERROR: QueryCB-Remove room: ' + roomname);
             }
             self.log('RemoveAllContentsFromRoom:query ERROR: ' + err);
             console.log('Raw err:', err);
@@ -299,6 +375,13 @@ RoomDatabase.prototype.RemoveAllContentsFromRoom = function(roomname, cbSuccess,
             // Now we have an object in res.items which is an array of objects that contain 'roomname' and 'spotnumber'
             len = res.items.length;
             buildup = [];
+
+            // If there were no results from the query, then we're all good here. No entries.
+            if (!len) {
+                console.log('RemoveAllContentsFromRoom: No Room contents to delete. SUCCESS.');
+                cbSuccess();
+                return true;
+            }
 
             for (i = 0; i < len; i += 1)
             {
@@ -339,17 +422,19 @@ RoomDatabase.prototype.RemoveAllContentsFromRoom = function(roomname, cbSuccess,
 
     if (!this.roomList[roomname]) {
         this.log('RemoveAllContentsFromRoom: ERROR: roomname [' + roomname + '] doesnt exist yet. Cannot remove contents.');
+        cbFailure('No such room.');
         return false;
     }
 
     if (typeof roomname !== 'string') {
         this.log('RemoveAllContentsFromRoom: ERROR: roomname given must be a string.');
+        cbFailure('Room must be a string.');
         return false;
     }
 
     this.log('Removing ALL contents from room: ' + roomname);
 
-    options = { limit: maxPerBatch, attributesToGet: ["roomname", "spotnumber"] };
+    options = { limit: maxPerBatch, attributesToGet: ['roomname', 'spotnumber'] };
 
     ddb.query(this.ROOMCONTENTS, roomname, options, QueryCB);
 
@@ -497,7 +582,7 @@ MucRoom.prototype.getRoomConfiguration = function(cb) {
 
     this.log('Requesting room configuration... ');
     // DEBUG
-    this.log(getRoomConf.tree());
+//    this.log(getRoomConf.tree());
 
     this.sendIQ(getRoomConf, function(resp) {
         if (cb) {
@@ -514,7 +599,7 @@ MucRoom.prototype.handlePresence = function(pres) {
         self = this,
         k;
 
-    this.log(pres);
+//DEBUG    this.log(pres);
 
     if (pres.getChild('x') && pres.getChild('x').getChild('item') && pres.getChild('x').getChild('item').attrs.jid) {
         fromjid = pres.getChild('x').getChild('item').attrs.jid.split('/')[0];
@@ -701,7 +786,7 @@ MucRoom.prototype.handlePresence = function(pres) {
 
             // Upon joining, get context of the room. Get the banned list.
             this.loadBannedList(function() {
-                this.log('Received Banned List');
+//                this.log('Received Banned List');
                 this.printParticipants();
                 this.printBannedList();
             });
@@ -771,9 +856,10 @@ MucRoom.prototype.printBannedList = function() {
     if (parts !== '') {
         this.log('Banned list: ' + parts);
     }
-    else {
+/*    else {
         this.log('No one on the banned list.');
     }
+*/
 };
 
 MucRoom.prototype.printParticipants = function() {
@@ -840,7 +926,7 @@ MucRoom.prototype.handleIQ = function(iq) {
         }
         else if (iq.attrs.type === 'set' && iq.getChildByAttr('xmlns', 'urn:xmpp:callcast'))
         {
-            this.log("Received IQ 'set' -- "); // + iq.root().toString());
+//            this.log("Received IQ 'set' -- "); // + iq.root().toString());
 
             if (iq.getChild('addspot')) {
                 this.AddSpotReflection(iq);
@@ -960,7 +1046,7 @@ MucRoom.prototype.SendPrivateChat = function(to, msg) {
 
 MucRoom.prototype.AddSpotReflection = function(iq) {
     // Need to pull out the 'info' object - which is the attributes to the 'addspot'
-    var info = {};
+    var info = {}, self = this;
     if (iq.getChild('addspot')) {
         info = iq.getChild('addspot').attrs;
     }
@@ -988,7 +1074,13 @@ MucRoom.prototype.AddSpotReflection = function(iq) {
 
 //        console.log(' spotList in: ' + this.roomname + ' is: ', this.spotList);
 
-        // TODO: RMW - Now database this in room_contents
+        if (overseer.roomDB) {
+            overseer.roomDB.AddContentToRoom(this.roomname.split('@')[0], info.spotnumber, info, function() {
+                return true;
+            }, function(msg) {
+                self.log('AddSpotReflection: ERROR adding to database: ' + msg);
+            });
+        }
     }
 
 };
@@ -1012,7 +1104,7 @@ MucRoom.prototype.createErrorIQ = function(iq_in, reason_in, err_type_in) {
 
 MucRoom.prototype.SetSpotReflection = function(iq) {
     // Need to pull out the 'info' object - which is the attributes to the 'addspot'
-    var info = {};
+    var info = {}, self = this;
 
     // Prep to reply to the IQ message.
     iq.attrs.to = iq.attrs.from;
@@ -1043,7 +1135,13 @@ MucRoom.prototype.SetSpotReflection = function(iq) {
 
  //       console.log(' spotList in: ' + this.roomname + ' is: ', this.spotList);
 
-        // TODO: RMW - Now database this in room_contents.
+        if (overseer.roomDB) {
+            overseer.roomDB.AddContentToRoom(this.roomname.split('@')[0], info.spotnumber, info, function() {
+                return true;
+            }, function(msg) {
+                self.log('SetSpotReflection: ERROR adding to database: ' + msg);
+            });
+        }
 
         iq.attrs.type = 'result';
     }
@@ -1054,7 +1152,7 @@ MucRoom.prototype.SetSpotReflection = function(iq) {
 
 MucRoom.prototype.RemoveSpotReflection = function(iq) {
     // Need to pull out the 'info' object - which is the attributes to the 'removespot'
-    var info = {};
+    var info = {}, self = this;
 
     if (iq.getChild('removespot')) {
         info = iq.getChild('removespot').attrs;
@@ -1079,6 +1177,13 @@ MucRoom.prototype.RemoveSpotReflection = function(iq) {
 //        console.log(' spotList in: ' + this.roomname + ' is: ', this.spotList);
 
         // TODO: RMW - Now database this removal in room_contents.
+        if (overseer.roomDB) {
+            overseer.roomDB.RemoveContentFromRoom(this.roomname.split('@')[0], info.spotnumber, function() {
+                return true;
+            }, function(msg) {
+                self.log('AddSpotReflection: ERROR removing from database: ' + msg);
+            });
+        }
 
         // Prep to reply to the IQ message.
         iq.attrs.to = iq.attrs.from;
@@ -2135,16 +2240,56 @@ Overseer.prototype.LoadActiveRoomsFromDB = function() {
     }
 
     this.roomDB.LoadRooms(function(rooms_in) {
-        var k;
+        var k, addOne,
+            i, len,
+            batchDelay = 500;
+
+        // Doing delay-load/add on rooms list.
+        addOne = function(roomname, obj) {
+
+        };
 
         self.active_rooms = rooms_in;
+
+        // Note: We use bSkipDBPortion on AddTrackedRoom() call here to avoid DB hits.
         for (k in rooms_in) {
             if (rooms_in.hasOwnProperty(k)) {
                 self.AddTrackedRoom(k, rooms_in[k], function() {
                     self.log('Added from DB: ' + k);
                 }, function(msg) {
                     self.log('LoadRooms: ERROR: Failed ' + k + ' with msg: ' + msg);
-                });
+                }, true);
+
+                // Now load/add the contents of said room.
+                if (self.roomDB) {
+                    self.roomDB.LoadContentsFromDBForRoom(k, function(contents) {
+                        var temproomname, tempspotnumber;
+
+                        if (contents) {
+                            len = contents.length;
+
+                            // Iterate through contents and add them to the memory DB.
+                            for (i = 0; i < len; i += 1)
+                            {
+                                temproomname = contents[i].roomname;
+                                tempspotnumber = contents[i].spotnumber;
+
+                                if (!self.MucRoomObjects[temproomname]) {
+                                    self.log('ERROR: MucRoomObject for room: ' + temproomname + ' is missing.');
+                                }
+                                else {
+                                    self.MucRoomObjects[temproomname].spotList[tempspotnumber] = contents[i];
+                                    delete self.MucRoomObjects[temproomname].spotList[tempspotnumber].roomname;
+                                }
+                            }
+                        }
+                    }, function(msg) {
+                        self.log('LoadRooms: ERROR: Could not load contents for: ' + k);
+                    });
+                }
+                else {
+                    self.log('ERROR: RoomDB is not initialized for loading room contents.');
+                }
             }
         }
     }, function(err) {
@@ -2324,7 +2469,7 @@ Overseer.prototype.generateRandomRoomName = function() {
     return result;
 };
 
-Overseer.prototype.AddTrackedRoom = function(roomname, obj, cbSuccess, cbFailure) {
+Overseer.prototype.AddTrackedRoom = function(roomname, obj, cbSuccess, cbFailure, bSkipDBPortion) {
     var self = this;
 
     if (this.active_rooms[roomname] && this.MucRoomObjects[roomname]) {
@@ -2347,9 +2492,9 @@ Overseer.prototype.AddTrackedRoom = function(roomname, obj, cbSuccess, cbFailure
         this.MucRoomObjects[roomname].bSelfDestruct = false;
     }
 
-//    console.log('Overseer: Adding room ' + roomname + '. New Roomlist=', this.active_rooms);
+    console.log('Overseer: Adding room ' + roomname + '. New Roomlist=', this.active_rooms);
 
-    if (this.roomDB) {
+    if (this.roomDB && !bSkipDBPortion) {
         this.roomDB.AddRoom(roomname, this.active_rooms[roomname], function() {
             self.MucRoomObjects[roomname].finishInit(function() {
 //                self.log('AddTrackedRoom: finishInit successful for: ' + roomname);
@@ -2365,7 +2510,10 @@ Overseer.prototype.AddTrackedRoom = function(roomname, obj, cbSuccess, cbFailure
         });
     }
     else {
-        this.log('WARNING: roomDB is not initialized. TrackedRoom will not be databased.');
+        if (!bSkipDBPortion) {
+            this.log('WARNING: roomDB is not initialized. TrackedRoom will not be databased.');
+        }
+
         // Even without the database, we need to finish the init process on the mucRoom.
         this.MucRoomObjects[roomname].finishInit(function() {
             cbSuccess();
@@ -2387,8 +2535,6 @@ Overseer.prototype.RemoveTrackedRoom = function(roomname, cbSuccess, cbFailure) 
         return false;
     }
 
-    delete this.active_rooms[roomname];
-
 //    console.log('Overseer: Removing room. Roomlist=', this.active_rooms);
 
     if (this.roomDB) {
@@ -2400,6 +2546,8 @@ Overseer.prototype.RemoveTrackedRoom = function(roomname, cbSuccess, cbFailure) 
             cbFailure('ERROR: RemoveRoom failed.');
         });
     }
+
+    delete this.active_rooms[roomname];
 
     // Clean up the MucRoomObjects pool.
     self.MucRoomObjects[roomname].pendingDeletion = false;
@@ -2674,15 +2822,19 @@ var notify = new Notifier({jid: 'overseer@video.gocast.it', password: 'the.overs
             ['rwolff@video.gocast.it']); // , "bob.wolff68@jabber.org" ]);
 
 //
-// Login as test feedback bot.
-//
-//var fb = new FeedbackBot("feedback_bot_test1@video.gocast.it", "test1", notify);
-var fb_etzchayim = new FeedbackBot('feedback_bot_etzchayim@video.gocast.it', 'feedback.gocast.etzchayim', notify);
-//var fb_fuse = new FeedbackBot('feedback_bot_fuse@video.gocast.it', 'feedback.gocast.fuse', notify);
-var fb_friends = new FeedbackBot('feedback_bot_friends@video.gocast.it', 'feedback.gocast.friends', notify);
-
-//
 // Login as Overseer
 //
 var overseer = new Overseer('overseer@video.gocast.it', 'the.overseer.rocks', notify);
 
+//
+// The main serverBot/overseer should login as feedbackbot to receive feedback items. Not the room manager.
+//
+if (!overseer.roommanager) {
+    //
+    // Login as test feedback bot.
+    //
+    //var fb = new FeedbackBot("feedback_bot_test1@video.gocast.it", "test1", notify);
+    var fb_etzchayim = new FeedbackBot('feedback_bot_etzchayim@video.gocast.it', 'feedback.gocast.etzchayim', notify);
+    //var fb_fuse = new FeedbackBot('feedback_bot_fuse@video.gocast.it', 'feedback.gocast.fuse', notify);
+    var fb_friends = new FeedbackBot('feedback_bot_friends@video.gocast.it', 'feedback.gocast.friends', notify);
+}

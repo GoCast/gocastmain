@@ -16,8 +16,45 @@
 #include "talk/base/scoped_ptr.h"
 #include "JSAPIAuto.h"
 
+#define LOG_TO_JS(func, msg, debug) {\
+std::string logEntry = (debug) ? "[INFO] <--> " : "[ERROR] <--> ";\
+logEntry += func;\
+logEntry += "(): ";\
+logEntry += msg;\
+GoCast::JSLogger::Instance()->LogEntry(logEntry);\
+}
+
+#define FBLOG_INFO_CUSTOM(func, msg) {\
+FBLOG_INFO(func, msg);\
+LOG_TO_JS(func, msg, true);\
+}
+
+#define FBLOG_ERROR_CUSTOM(func, msg) {\
+FBLOG_ERROR(func, msg);\
+LOG_TO_JS(func, msg, false);\
+}
+
 namespace GoCast
 {
+    class JSLogger
+    {
+    public:
+        static JSLogger* Instance(bool bDelete = false);
+        void LogEntry(const std::string& entry);
+        void LogFunction(const FB::JSObjectPtr& func);
+        void ClearLogFunction();
+        FB::VariantList LogEntries();
+        
+    private:
+        JSLogger();
+        ~JSLogger();
+        
+    private:
+        boost::mutex m_mutex;
+        FB::JSObjectPtr m_logCb;
+        FB::VariantList m_logEntries;
+    };
+    
     class MediaStreamTrack : public FB::JSAPIAuto
     {
     public:

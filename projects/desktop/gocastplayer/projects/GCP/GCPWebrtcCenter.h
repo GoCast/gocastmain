@@ -19,13 +19,6 @@
 #include "talk/base/scoped_ptr.h"
 #include "talk/base/thread.h"
 #include "JSAPIAuto.h"
-#include <iostream>
-
-#define FBLOG_INFO_CUSTOM(func, msg) FBLOG_INFO(func, msg)
-#define FBLOG_ERROR_CUSTOM(func, msg) FBLOG_ERROR(func, msg)
-
-//std::cout << func << " [INFO]: " << msg << std::endl
-//std::cout << func << " [ERROR]: " << msg << std::endl
 
 namespace GoCast
 {

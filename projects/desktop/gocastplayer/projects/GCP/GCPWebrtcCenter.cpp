@@ -6,8 +6,8 @@
 //  Copyright (c) 2012 XVDTH. All rights reserved.
 //
 
-#include "GCPWebrtcCenter.h"
 #include "GCPMediaStream.h"
+#include "GCPWebrtcCenter.h"
 #include "variant_list.h"
 
 namespace GoCast
@@ -725,7 +725,7 @@ namespace GoCast
     {
         if(NULL == m_pConnFactory.get())
         {
-            FBLOG_INFO_CUSTOM("RtcCenter::RtcCenter", "Failed to create peerconnection factory...");
+            FBLOG_ERROR_CUSTOM("RtcCenter::RtcCenter", "Failed to create peerconnection factory...");
         }
         else
         {
