@@ -400,14 +400,14 @@ RoomDatabase.prototype.RemoveAllContentsFromRoom = function(roomname, cbSuccess,
                     self.log('RemoveAllContentsFromRoom:batchWriteItem ERROR: ' + errdel);
                     cbFailure(errdel);
                 } else {
-                    console.log('RemoveAllContentsFromRoom:batchWriteItem Success: ', resdel);
+//                    console.log('RemoveAllContentsFromRoom:batchWriteItem Success: ', resdel);
 
                     // On a successful delete, we check to see if we go around again for more...
                     if (res.lastEvaluatedKey.hash) {
                         options.exclusiveStartKey = res.lastEvaluatedKey;
-                        console.log('Secondary iteration starting from:', res.lastEvaluatedKey);
+//                        console.log('Secondary iteration starting from:', res.lastEvaluatedKey);
 
-                        console.log('table:', self.ROOMCONTENTS, ' roomname:', roomname, ' options:', options);
+//                        console.log('table:', self.ROOMCONTENTS, ' roomname:', roomname, ' options:', options);
                         setTimeout(function() {
                             ddb.query(self.ROOMCONTENTS, roomname, options, QueryCB);
                         }, batchDelay);
