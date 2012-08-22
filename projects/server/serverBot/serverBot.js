@@ -372,7 +372,7 @@ RoomDatabase.prototype.RemoveAllContentsFromRoom = function(roomname, cbSuccess,
             console.log('Raw err:', err);
             cbFailure(err);
         } else {
-            console.log('RemoveAllContentsFromRoom:query Success: ', res);
+//            console.log('RemoveAllContentsFromRoom:query Success: ', res);
             // Now we have an object in res.items which is an array of objects that contain 'roomname' and 'spotnumber'
             len = res.items.length;
             buildup = [];
@@ -390,7 +390,7 @@ RoomDatabase.prototype.RemoveAllContentsFromRoom = function(roomname, cbSuccess,
             }
 
             toDel[self.ROOMCONTENTS] = buildup;
-            console.log('Interim toDel....', toDel);
+//            console.log('Interim toDel....', toDel);
                 ddb.batchWriteItem(null, toDel, function(errdel, resdel) {
                 if (errdel)
                 {
@@ -2645,6 +2645,12 @@ Overseer.prototype.CreateRoomRequest = function(iq) {
 Overseer.prototype.handleIq = function(iq) {
     var iqid, callback;
 
+    if (!iq.attrs.from) {
+        this.log('ERROR: ERRANT IQ: ' + iq);
+        this.notifylog('ERROR: ERRANT IQ: ' + iq);
+        return;
+    }
+
     // Handle all pings and all queries for #info
     if (iq.attrs.type === 'result' && iq.attrs.id && this.iq_callbacks[iq.attrs.id])
     {
@@ -2825,7 +2831,7 @@ console.log('****************************************************');
 
 var notify = new Notifier({jid: 'overseer@video.gocast.it', password: 'the.overseer.rocks',
                             server: 'video.gocast.it', port: 5222},
-            ['rwolff@video.gocast.it']); // , "bob.wolff68@jabber.org" ]);
+            ['rwolff@video.gocast.it', 'jim@video.gocast.it']); // , "bob.wolff68@jabber.org" ]);
 
 //
 // Login as Overseer
