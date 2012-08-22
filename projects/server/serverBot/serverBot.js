@@ -2410,7 +2410,7 @@ Overseer.prototype.handleMessage = function(msg) {
 
         cmd[0] = cmd[0].toUpperCase();
 
-        switch (cmd) {
+        switch (cmd[0]) {
         case 'KNOCK':
             fromjid = cmd[1].split(' ')[0]; // Just in case chat client does <mailto:> tag following jid.
             fromnick = cmd[2];
