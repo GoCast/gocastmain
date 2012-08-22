@@ -65,6 +65,83 @@
 /*jslint sloppy: false, todo: true, browser: true, devel: true */
 'use strict';
 
+var GoCastJS = GoCastJS || {};
+
+//
+//
+// B Q U E U E - Buffer Queue
+//
+//
+GoCastJS.BQueue = function(maxBytes) {
+    this.q = null;
+    this.length = null;
+    this.maxLength = maxBytes;
+
+    this.clear();
+};
+
+GoCastJS.BQueue.prototype.clear = function(newMax) {
+    this.q = [];
+    this.length = 0;
+
+    if (newMax) {
+        this.maxLength = newMax;
+    }
+};
+
+GoCastJS.BQueue.prototype.log = function(msg) {
+    var stats = '';
+
+    if (typeof msg !== 'string') {
+        return false;
+    }
+
+    stats = 'log: pre:' + this.length + ', in:' + msg.length + ', post-nodrop:';
+
+    this.q.push(msg);
+    this.length += msg.length;
+
+    // Drop the head of the Queue until we are 'in spec' on total length.
+    while(this.length > this.maxLength && this.q.length) {
+        this.q.shift();
+    }
+
+    // If we had to delete every entry just to get below the threshold, that's an error.
+    if (!this.q.length) {
+        return false;
+    }
+
+    return true;
+};
+
+//
+// Returns bytes out of the logs up to max # bytes.
+// Only returns integral line items however.
+//
+GoCastJS.BQueue.prototype.getLinesWithMaxBytes = function(max) {
+    var out = '',
+        itemNext = this.q.shift(),
+        lenNext = itemNext.length;
+
+    this.length -= lenNext;
+
+    while (out.length + lenNext <= max) {
+        out += itemNext;
+
+        itemNext = this.q.shift();
+        lenNext = itemNext.length;
+
+        this.length -= lenNext;
+    }
+
+    // Once we're out, we have pulled one too many off the queue.
+    // Replace it back at the head.
+    this.q.unshift(itemNext);
+    this.length += lenNext;
+
+    return out;
+};
+
 var Callcast = {
     PLUGIN_VERSION_CURRENT: 0.0,
     PLUGIN_VERSION_REQUIRED: 0.0,
@@ -612,7 +689,7 @@ var Callcast = {
                 }
 
                 if (Callcast.Callback_ReadyState) {
-                    Callcast.Callback_ReadyState(state, self.jid);
+                    Callcast.Callback_ReadyState(state, self.jid, self.jid.split('/')[1]);
                 }
             }
             catch (e) {
