@@ -164,7 +164,7 @@ $(document).on('private-message', function(
 {
   try
   {
-    var id, oo, 
+    var id, oo,
         jqChat,
         msg,
         atBottom,
@@ -1082,6 +1082,7 @@ function pluginLoaded(
      }, function(message) {
         // Failure to initialize.
         app.log(4, 'Local plugin failed to initialize.');
+        Callcast.SendLiveLog('Local plugin failed to initialize.');
         $('#errorMsgPlugin > h1').text('Gocast.it plugin failed to initialize');
         $('#errorMsgPlugin > p#prompt').text('Please reload the page.');
         closeWindow();
@@ -1090,6 +1091,7 @@ function pluginLoaded(
   }
   else // pluginLoaded but out of date
   {
+     Callcast.SendLiveLog('Plugin upgrade available. Current version: ' + Callcast.GetVersion());
      app.pluginUpgrade = true;
   }
   app.pluginLoaded = true;

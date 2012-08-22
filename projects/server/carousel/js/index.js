@@ -16,7 +16,7 @@
 /*jslint sloppy: false, todo: true, white: true, browser: true, devel: true */
 /*global Callcast, ActiveXObject, swfobject, FB, fbInit, removeSpotCb */
 // todo refactor below
-/*global 
+/*global
   keypressNameHandler,
   onJoinNow,
   changeVideo,
@@ -266,7 +266,7 @@ function onSpotClose(event)
   event.stopPropagation();
 }
 ///
-/// \brief showChat in spot 
+/// \brief showChat in spot
 ///
 function showPersonalChatWithSpot(spot)
 {
@@ -458,7 +458,7 @@ function openPersonalChat(
    * Set position based on nick id. */
   id = app.str2id(msginfo.nick);
   jqO = $('#meeting > #streams > #scarousel div#' + id);
-  
+
   if (jqO.length === 0 && msginfo.nick === "overseer") // from user not found, check if overseer
   {
       item = app.carousel.getItem(1);
@@ -700,7 +700,7 @@ function openChat(event)
   // Add focus to input text.
   $('input.chatTo', jqWin).focus();
   return false;
-} // openChat() 
+} // openChat()
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
@@ -906,7 +906,7 @@ function keypressPersonalChatHandler(event)
 {
   event.stopPropagation();
   //app.log(2, 'keypressPersonalChatHandler');
-  
+
   /// We have no action for key press combinations with the Alt key.
   if (event.altKey) {
     return;
@@ -1476,10 +1476,14 @@ function tryPluginInstall(
     // if so change prompt
     if (app.pluginInstalled() && Callcast.pluginUpdateRequired())
     {
+       Callcast.SendLiveLog('Local plugin is out of date. Current version: ' + Callcast.GetVersion());
        title = $('#installPlugin > h1');
        title.text('The Gocast.it plugin is out of date');
        prompt = $('#installPlugin > p#prompt');
        prompt.text('Please download and install the new version of the plugin');
+    }
+    if (!app.pluginInstalled()) {
+       Callcast.SendLiveLog('Local plugin is not installed.');
     }
     if (app.osPlatform.isLinux64 || app.osPlatform.isLinux32)
     {
@@ -1554,7 +1558,7 @@ function doDownload()
 function installPrompt(pluginName)
 {
   closeWindow();
-  if (app.pluginInstalled() && 
+  if (app.pluginInstalled() &&
        (Callcast.pluginUpdateRequired() || Callcast.pluginUpdateAvailable()) )
   {
     // chrome can't load an upgraded plugin so prompt user to restart
