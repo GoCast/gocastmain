@@ -121,10 +121,13 @@ var app = {
       }
       break;
     case 'Safari':
+      msg = "Sorry we don't support the Safari browser right now.\nPlease use Chrome or Firefox for now.";
+      /*
       if (app.browser.version < 525) {
         msg = 'You appear to be using an older Safari version. ' +
           expl + ' ' + recom;
       }
+      */
       break;
     case 'Mobile Safari':
     case 'AppleWebKit':
@@ -519,7 +522,7 @@ function carouselItemClick(event)
     }
     else // remote user
     {
-      openChat(event); //todo refactor doesn't open chat anymore, opens feedback or url spot
+      //openChat(event); //todo refactor doesn't open chat anymore, opens feedback or url spot
     }
   } catch(err) {
     app.log(4, "carouselItemClick exception " + err);
@@ -666,6 +669,36 @@ function openChat(event)
     }
     return false;
   }
+  // Click position.
+  cX = event.clientX;
+  cY = event.clientY;
+  // Transition effect.
+  jqMask = $('#mask');
+  jqMask.fadeIn(500, activateWindow('#chatInp'));
+  jqMask.fadeTo('fast', 0.3);
+  // Position chat Inp.
+  winW = $(window).width();
+  winH = $(window).height();
+  wcW = jqWin.outerWidth();
+  wcH = jqWin.outerHeight();
+  if ((cY + wcH) > winH) {
+    jqWin.css('top', winH - wcH);
+  }
+  else {
+    jqWin.css('top', cY);
+  }
+  if ((cX + wcW) > winW) {
+    jqWin.css('left', winW - wcW);
+  }
+  else {
+    jqWin.css('left', cX);
+  }
+  // Transition effect for Chat Input Window.
+  jqWin.fadeIn(700);
+  // Add class active.
+  jqWin.addClass('active');
+  // Add focus to input text.
+  $('input.chatTo', jqWin).focus();
   return false;
 } // openChat() 
 
@@ -858,7 +891,7 @@ function sendChat(
       ename = jqChatSpan.attr('ename');
       Callcast.SendPrivateChat(encodeURI(ltext), ename);
     }
-    app.log(2, 'Sending chat to ' + id);
+    app.log(2, 'Sending chat to ' + id + " " + ltext);
     jqChatSpan.removeAttr('id');
     jqChatSpan.removeAttr('ename');
   }
@@ -871,6 +904,7 @@ function sendChat(
 ///
 function keypressPersonalChatHandler(event)
 {
+  event.stopPropagation();
   //app.log(2, 'keypressPersonalChatHandler');
   
   /// We have no action for key press combinations with the Alt key.
@@ -901,6 +935,7 @@ function keypressGrpChatHandler(
 )
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
+  event.stopPropagation();
   app.log(2, 'keypressGrpChatHandler');
   /*
    * We have no action for key press combinations with the Alt key. */

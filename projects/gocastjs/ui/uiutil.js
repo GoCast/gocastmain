@@ -27,7 +27,8 @@ GoCastJS.ChatUtil.prototype.addMsg = function(msg)
 {
   var domMsg = '<span id="'+ this.msgNumber + '">    ' + msg + '<br></span>',
       atBottom,
-      span;
+      span,
+      self = this; // ref for animate callbacks
   // get scroll pos
   //app.log(2, 'public-message scrollTop ' + jqChat.scrollTop()
   //        + ' scrollHeight ' + jqChat[0].scrollHeight
@@ -54,7 +55,7 @@ GoCastJS.ChatUtil.prototype.addMsg = function(msg)
       {duration: 0,
        complete: function()
        {
-         this.jqChat.animate({backgroundColor:"black"}, 500);
+         self.jqChat.animate({backgroundColor:"black"}, 500);
          //this.jqChat.animate({backgroundColor:"transparent"}, 500); // doesn't work, end color is white
        }
     });
