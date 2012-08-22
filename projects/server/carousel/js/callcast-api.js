@@ -992,6 +992,14 @@ function connectionStatus(statusStr)
 }
 
 ///
+/// \brief peer connection status handler
+///
+function readyStateCb(state, jid)
+{
+  console.log("readyStateCb", state, jid);
+}
+
+///
 /// \brief show local speaker status
 ///
 function setLocalSpeakerStatus(vol)
@@ -1068,6 +1076,7 @@ function pluginLoaded(
         Callcast.setCallbackForAddSpot(addSpotCb);
         Callcast.setCallbackForSetSpot(setSpotCb);
         Callcast.setCallbackForRemoveSpot(removeSpotCb);
+        Callcast.setCallbackForReadyState(readyStateCb);
 
         // Callcast Seetings.
         // todo there's an app member for video state, merge it with callcast video state
