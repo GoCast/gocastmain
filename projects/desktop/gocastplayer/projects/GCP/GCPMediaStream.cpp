@@ -46,6 +46,11 @@ namespace GoCast
         m_logCb = func;
     }
     
+    void JSLogger::ClearLogFunction()
+    {
+        m_logCb.reset();
+    }
+    
     FB::VariantList JSLogger::LogEntries()
     {
         boost::mutex::scoped_lock lock(m_mutex);
@@ -57,12 +62,12 @@ namespace GoCast
     
     JSLogger::JSLogger()
     {
-        
+        m_logCb.reset();
     }
     
     JSLogger::~JSLogger()
     {
-        
+        m_logCb.reset();
     }
     
     FB::JSAPIPtr MediaStreamTrack::Create(const std::string& kind,

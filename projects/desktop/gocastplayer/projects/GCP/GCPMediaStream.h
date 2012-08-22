@@ -42,6 +42,7 @@ namespace GoCast
         static JSLogger* Instance(bool bDelete = false);
         void LogEntry(const std::string& entry);
         void LogFunction(const FB::JSObjectPtr& func);
+        void ClearLogFunction();
         FB::VariantList LogEntries();
         
     private:

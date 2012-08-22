@@ -452,6 +452,11 @@ FB::variant GCPAPI::DeletePeerConnection()
         return false;
     }
     
+    if("localPlayer" == m_htmlId.convert_cast<std::string>())
+    {
+        GoCast::JSLogger::Instance()->ClearLogFunction();
+    }
+    
     return pCtr->DeletePeerConnection(m_htmlId.convert_cast<std::string>());
 }
 
