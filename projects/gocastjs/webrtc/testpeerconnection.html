@@ -9,6 +9,7 @@
 			var peerConn = null;
 			var volCheck = null;
 			var devCheck = null;
+			var logs = [];
 			
 			function ongetusermediasuccess() {
 				peerConn = new GoCastJS.PeerConnection(
@@ -62,6 +63,15 @@
 			
 			function onLocalPlayerLoaded(camera, audioin, audioout) {
 				var hints = {audio: true, video: true};
+
+				GoCastJS.PluginLog(document.getElementById("localVideo"),
+								   function(entries) {
+								   		console.log("PLUGIN: ", entries);
+								   		for (i in entries) {
+									   		logs.push(entries[i]);
+								   		}
+								   });
+
 				if("string" === typeof(camera)) {
 					hints.videoin = camera;
 				} 

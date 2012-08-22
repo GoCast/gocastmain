@@ -5,7 +5,7 @@ GoCastJS = (null !== GoCastJS) ? GoCastJS : {};
 //! GoCastJS.Video.devices[]     : array of available video devices (guids)
 //! GoCastJS.Video.captureDevice : current capture device (guid)
 //!
-//! NOTE: these are populated by GoCastJS.SetVideoDevicesChangedListener()
+//! NOTE: these are populated by GoCastJS.SetDevicesChangedListener()
 //!
 GoCastJS.Video = {
     devices: [],
@@ -13,9 +13,14 @@ GoCastJS.Video = {
 };
 
 //!
-//! GoCastJS.Audio.spkVol : current speaker volume
+//! GoCastJS.Audio.inputDevices[]  : array of available audio inputs
+//! GoCastJS.Audio.inputDevice     : current audio input
+//! GoCastJS.Audio.outputDevices[] : array of available audio outputs
+//! GoCastJS.Audio.outputDevice    : current audio output
+//! GoCastJS.Audio.spkVol          : current speaker volume
 //!
-//! NOTE: this is populated by GoCastJS.SetSpkVolListener()
+//! NOTE: spkVol is populated by GoCastJS.SetSpkVolListener()
+//! NOTE: the rest are populated bu GoCastJS.SetDevicesChangedListener()
 //!
 GoCastJS.Audio = {
     inputDevices: [],
@@ -199,13 +204,13 @@ GoCastJS.getUserMedia = function(options, success, failure) {
 //!                                      onSpkVolChanged)
 //!
 //! arguments:
-//!     volCheckInterval <milliseconds>     : interval for volume check
+//!     checkInterval    <milliseconds>     : interval for volume check
 //!     localPlayer      <HtmlObject>       : plugin used for local preview
 //!     onSpkVolChanged  <function(newVol)> : callback for volume change
 //!
 //! returns: the setInterval identifier (used to clear interval)
 //!
-GoCastJS.SetSpkVolListener = function(volCheckInterval,
+GoCastJS.SetSpkVolListener = function(checkInterval,
                                       localplayer,
                                       onSpkVolChanged) {
     return setInterval(function() {
@@ -213,19 +218,26 @@ GoCastJS.SetSpkVolListener = function(volCheckInterval,
             GoCastJS.Audio.spkVol = localplayer.volume;
             onSpkVolChanged(GoCastJS.Audio.spkVol);
         }
-    }, volCheckInterval);
+    }, checkInterval);
 };
 
 //!
-//! function: GoCastJS.SetVideoDevicesChangedListener(checkInterval,
-//!                                                   localplayer,
-//!                                                   onChanged)
+//! function: GoCastJS.SetDevicesChangedListener(checkInterval,
+//!                                              localplayer,
+//!                                              onChanged)
 //!
 //! arguments:
-//!     checkInterval <milliseconds>   : interval for check
-//!     localPlayer   <HtmlObject>     : plugin used for local preview
-//!     oChanged      <function(a, r)> : callback with 'a' (added devices)
-//!                                      and 'r' (removed devices)
+//!     checkInterval <milliseconds>       : interval for check
+//!     localPlayer   <HtmlObject>         : plugin used for local preview
+//!     oChanged      <function(va, vr,
+//!                             aia, air,
+//!                             aoa, aor)> : callback with
+//!                                          'va' (added video devices),
+//!                                          'vr' (removed video devices),
+//!                                          'aia' (added audio inputs),
+//!                                          'air' (removed audio inputs),
+//!                                          'aoa' (added audio outputs),
+//!                                          'aor' (removed audio outputs),
 //!
 //! returns: the setInterval identifier (used to clear interval)
 //!
@@ -249,7 +261,7 @@ GoCastJS.SetDevicesChangedListener = function(checkInterval,
     GoCastJS.Audio.outputDevices = [];
     for (i in audioOutOpts) {
         GoCastJS.Audio.outputDevices.push(audioOutOpts[i]);
-    }    
+    }
 
     return setInterval(function() {
         var videoDevicesDeleted = [];
@@ -278,7 +290,7 @@ GoCastJS.SetDevicesChangedListener = function(checkInterval,
         for (i in GoCastJS.Audio.outputDevices) {
             if (-1 === aOutOpts.indexOf(GoCastJS.Audio.outputDevices[i])) {
                 audioOutDevicesDeleted.push(GoCastJS.Audio.outputDevices[i]);
-            }            
+            }
         }
 
         // Check for newly added devices
@@ -595,4 +607,26 @@ GoCastJS.PeerConnection.prototype.Height = function(height) {
         this.player.height = height;
     }
     return this.player.height;
+};
+
+//!
+//! function: GoCastJS.PluginLog(localplayer, logCallback)
+//!
+//! arguments:
+//!     localplayer <HtmlObject>        : plugin instance for local preview
+//!     logCallback <function(entries)> : callback with array of log entries
+//!
+GoCastJS.PluginLog = function(localplayer, logCallback) {
+    if ('undefined' === localplayer || null === localplayer) {
+        return;
+    } else if ('undefined' === logCallback || null === logCallback) {
+        localplayer.logFunction(null);
+    } else {
+        localplayer.logFunction(function() {
+            var entries = localplayer.logentries;
+            if(0 < entries.length) {
+                logCallback(entries);
+            }
+        });
+    }
 };

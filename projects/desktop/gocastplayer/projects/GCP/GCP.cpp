@@ -9,6 +9,7 @@
 
 #include "GCPAPI.h"
 #include "GCP.h"
+#include "GCPMediaStream.h"
 #include "GCPWebrtcCenter.h"
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -43,6 +44,7 @@ void GCP::StaticDeinitialize()
     FBLOG_INFO_CUSTOM("GCP::StaticDeinitalize", "Destroying RtcCenter singleton...");
     GoCast::RtcCenter::Instance(true);
     FBLOG_INFO_CUSTOM("GCP::StaticDeinitalize", "Destroying RtcCenter singleton DONE...");
+    GoCast::JSLogger::Instance(true);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

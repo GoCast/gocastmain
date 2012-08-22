@@ -3,6 +3,8 @@
   Auto-generated GCPAPI.h
 
 \**********************************************************/
+#ifndef H_GCPAPI
+#define H_GCPAPI
 
 #include <string>
 #include <boost/weak_ptr.hpp>
@@ -11,9 +13,6 @@
 #include "GCP.h"
 
 #include "talk/app/webrtc/peerconnection.h"
-
-#ifndef H_GCPAPI
-#define H_GCPAPI
 
 class GCPAPI : public FB::JSAPIAuto, public webrtc::PeerConnectionObserver
 {
@@ -51,6 +50,9 @@ public:
         registerMethod("startIce", make_method(this, &GCPAPI::StartIce));
         registerMethod("deinit", make_method(this, &GCPAPI::DeletePeerConnection));
         
+        // Config plugin js log function
+        registerMethod("logFunction", make_method(this, &GCPAPI::LogFunction));
+        
         // Properties
         registerProperty("version", make_property(this, &GCPAPI::get_version));
         registerProperty("readyState", make_property(this, &GCPAPI::get_readyState));
@@ -65,6 +67,7 @@ public:
         registerProperty("videoinopts", make_property(this, &GCPAPI::get_videoinopts));
         registerProperty("audioinopts", make_property(this, &GCPAPI::get_audioinopts));
         registerProperty("audiooutopts", make_property(this, &GCPAPI::get_audiooutopts));
+        registerProperty("logentries", make_property(this, &GCPAPI::get_logentries)); 
     }
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -91,6 +94,7 @@ public:
     FB::VariantMap get_videoinopts();
     FB::VariantList get_audioinopts();
     FB::VariantList get_audiooutopts();
+    FB::VariantList get_logentries();
     
     // Property set methods
     void set_onaddstream(const FB::JSObjectPtr& onaddstream);
@@ -122,6 +126,9 @@ public:
     FB::variant ProcessIceMessage(const FB::variant& sdp);
     FB::variant StartIce();
     FB::variant DeletePeerConnection();
+    
+    //---------------------- JS Log Config Method -------------------------
+    void LogFunction(const FB::JSObjectPtr& func);
     
 private:
     // --------------------- PeerConnectionObserver Methods -----------------
