@@ -190,13 +190,14 @@ RoomDatabase.prototype.validateObj = function(obj) {
     {
         if (obj.hasOwnProperty(k)) {
             tk = typeof obj[k];
+
             if (tk === 'boolean') {
                 retobj[k] = obj[k] ? 1 : 0;
             }
             else if (tk !== 'string' && tk !== 'number') {
                 return null;
             }
-            else if (tk !== '') {
+            else if (obj[k] !== '') {   // Don't allow null values as dynamodb doesn't like them.
                 retobj[k] = obj[k];
             }
         }
@@ -231,11 +232,11 @@ RoomDatabase.prototype.AddContentToRoom = function(roomname, spotnumber, obj, cb
         return false;
     }
 
-    this.log('Adding content to room: ' + roomname + ' in spotnumber: ' + spotnumber);
-//    console.log('DEBUG:Adding content to room: full obj: ', obj);
-
     putobj.roomname = roomname;
     putobj.spotnumber = spotnumber;
+
+    this.log('Adding content to room: ' + roomname + ' in spotnumber: ' + spotnumber);
+//    console.log('DEBUG:Adding content to room: full validated obj: ', putobj);
 
     ddb.putItem(this.ROOMCONTENTS, putobj, {}, function(err, res, cap) {
         if (err)
@@ -2382,7 +2383,7 @@ Overseer.prototype.sendGroupMessage = function(room, msg_body) {
 // \brief Need to check the room's banned-list for this person.
 //
 Overseer.prototype.handleMessage = function(msg) {
-    var cmd, k,
+    var cmd, k, temp,
         fromjid, fromnick, toroom, plea;
     // Listen to pure chat messages to the overseer.
 
@@ -2435,6 +2436,11 @@ Overseer.prototype.handleMessage = function(msg) {
                     this.log('KNOCK refused. JID (' + fromjid + '), is on the banned list for room (' + toroom + ')');
                 }
             }
+            break;
+        case 'LIVELOG':
+            temp = 'LIVELOG: From: ' + cmd[1] + ' Msg: ' + cmd[2];
+            this.log(temp);
+            this.notifylog(temp);
             break;
         default:
             this.log('Direct message: Unknown command: ' + msg.getChild('body').getText());
