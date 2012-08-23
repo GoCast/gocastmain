@@ -559,7 +559,7 @@ body > div#meeting > div#streams > div#scontrols > input.right {
   border: 2px solid red;
   border-radius: 6px;  
 }
-#boxes #errorMsgPlugin > button#reload {
+#boxes button#reload {
   position: absolute;
   right: 5px;
   bottom:5px;

@@ -245,6 +245,24 @@ var app = {
         $(app.GROUP_CHAT_OUT).attr('disabled', 'disabled');
      }
   },
+  ///
+  /// \brief get the os specific plugin name as it appears in navigator.plugins
+  ///
+  getPluginName: function()
+  {
+    if (this.osPlatform.isMac)
+    {
+       return (this.MAC_PL_NAME);
+    }
+    else if (this.osPlatform.isWin)
+    {
+       return (this.WIN_PL_NAME);
+    }
+    else // todo linux
+    {
+      return null;
+    }
+  },
   videoEnabled: true // video enabled state todo this must be initially in sync with video button class
                      //       make either this var or button class the state variable
 }; /* app */
@@ -1522,6 +1540,7 @@ function downloadURL(url)
     }
     iframe.src = url;
 }
+
 ///
 /// \brief update plugin dl msg and dl plugin
 ///
@@ -1558,10 +1577,10 @@ function doDownload()
 ///
 /// \brief display appropriate prompt depending on plugin install type
 ///
-function installPrompt(pluginName)
+function installPrompt()
 {
   closeWindow();
-  if (app.pluginInstalled() &&
+  if (app.pluginInstalled() && // plugin already installed but needs upgrade
        (Callcast.pluginUpdateRequired() || Callcast.pluginUpdateAvailable()) )
   {
     // chrome can't load an upgraded plugin so prompt user to restart
@@ -1575,31 +1594,25 @@ function installPrompt(pluginName)
     }
   }
   else if (app.browser.name === 'Firefox') // firefox seems to have a problem polling navigator.plugins
+                                           // so prompt user to reload instead of polling plugins
   {
     openWindow('#pageReload');
   }
-  else // wait for plugin
+  else // no plugin installed, wait for plugin
   {
     openWindow('#winWait');
-    checkForPlugin(pluginName);
+    checkForPlugin();
+    //openWindow('#pageReload');
   }
 }
 ///
-/// \brief close the eula window, download the win install file, launch function to check for plugin
+/// \brief close the eula window, prompt user to reload
 ///
 function winInstall(event)
 {
-   // close the eula window
-   closeWindow();
-
-   // get the windows install file
-   $.post(app.WIN_DL_URL,
-          function(data)
-          {
-             console.log(data);
-          });
-
-   installPrompt(app.WIN_PL_NAME);
+  // close the eula window
+  closeWindow();
+  installPrompt(app.WIN_PL_NAME);
 }
 
 ///
@@ -1617,19 +1630,20 @@ function winPluginPunt()
 ///
 /// \brief periodically check for the player to be installed and prompt user
 ///
-function checkForPlugin(name)
+function checkForPlugin()
 {
-   var i, item;
+   var i, item,
+       name = app.getPluginName();
    navigator.plugins.refresh();
    // find player
    for (i = 0; i < window.navigator.plugins.length; i += 1)
    {
       item = window.navigator.plugins[i];
-      app.log(2, 'plugin filename ' + item.filename);
+      //app.log(2, 'plugin filename ' + item.filename);
       if (item && item.filename === name)
       {
          clearTimeout(app.winTimeout);
-         //app.log(2, 'checkForPlugin found player ' + name);
+         app.log(2, 'checkForPlugin found player ' + name);
          $('#winWait > #status > #spinner').attr('src', 'images/green-tick.png');
          $('#winWait > #status > #msg').text('The GoCast plugin is installed.');
 
@@ -1640,8 +1654,8 @@ function checkForPlugin(name)
    }
 
    // plugin was not found in list wait and recheck
-   app.winTimeout = setTimeout(checkForPlugin(name), 3000);
-   app.log(2, 'winCheckForPlugin no player, waiting...');
+   app.winTimeout = setTimeout(checkForPlugin, 3000);
+   app.log(2, 'checkForPlugin no player, waiting...');
 }
 
 ///
