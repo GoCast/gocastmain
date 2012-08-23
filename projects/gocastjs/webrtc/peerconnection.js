@@ -249,19 +249,8 @@ GoCastJS.SetDevicesChangedListener = function(checkInterval,
     var audioOutOpts = localplayer.audiooutopts;
 
     GoCastJS.Video.devices = [];
-    for (i in videoInOpts) {
-        GoCastJS.Video.devices.push(i);
-    }
-
     GoCastJS.Audio.inputDevices = [];
-    for (i in audioInOpts) {
-        GoCastJS.Audio.inputDevices.push(audioInOpts[i]);
-    }
-
     GoCastJS.Audio.outputDevices = [];
-    for (i in audioOutOpts) {
-        GoCastJS.Audio.outputDevices.push(audioOutOpts[i]);
-    }
 
     return setInterval(function() {
         var videoDevicesDeleted = [];
