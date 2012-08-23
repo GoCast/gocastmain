@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>GoCastPlayer Settings</title>
+		<link rel="stylesheet" type="text/css" href="style/index.css" />
+		<script type="text/javascript" src="jquery-1.7.2.dev.js"></script>
+		<script type="text/javascript" src="peerconnection.js"></script>
+		<script type="text/javascript" src="index.js"></script>
+	</head>
+	<body>
+		<div id="pagecontent">
+			<h1 id="pagetitle"><span id="pageicon">(</span> settings</h1>
+			<div id="views">
+				<ul id="viewslist">
+					<li id="settingsitem" class="viewitem">
+						<div id="settings" class="view borderless">
+							<ul id="settingslist">
+								<li id="videosettingsitem">
+									<table id="videosettings">
+										<tr>
+											<td>
+												<span class="icon-picto">h</span>
+											</td>
+											<td>
+												<select id="cameraselect">
+													<option value="" selected="selected">----- choose a camera -----</option>
+												</select>
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<span class="icon-entypo">F</span>
+											</td>
+											<td>
+												<select id="effectselect">
+													<option value="" selected="selected">----- choose an effect -----</option>
+													<option value="none">no effect</option>
+													<option value="gray">black and white</option>
+													<option value="sepia">sepia</option>
+												</select>
+											</td>
+										</tr>
+									</table>
+								</li>
+								<li id="audiosettingsitem">
+									<table id="audiosettings">
+										<tr>
+											<td>
+												<span class="icon-entypo">O</span>
+											</td>
+											<td>
+												<select id="micselect">
+													<option value="" selected="selected">--- choose a microphone ---</option>
+												</select>&nbsp;
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<span class="icon-picto">2</span>
+											</td>
+											<td>
+												<select id="spkselect">
+													<option value="" selected="selected">----- choose a speaker ----</option>
+												</select>&nbsp;
+											</td>
+										</tr>
+									</table>
+								</li>
+							</ul>
+						</div>
+					</li>
+					<li id="localitem" class="viewitem">
+						<div id="localcontainer" class="view">
+							<object id="local"
+									title="how you see yourself"
+									type="application/x-gocastplayer"
+									width="320"
+									height="240">
+							</object>
+						</div>
+					</li>
+					<li id="remoteitem" class="viewitem">
+						<div id="remotecontainer" class="view">
+							<object id="remote"
+									title="how others see you"
+									type="application/x-gocastplayer"
+									width="320"
+									height="240">
+							</object>
+						</div>
+					</li>
+				</ul>
+			</div>
+			<div id="settingsdescription">
+				0
+			</div>
+		</div>
+	</body>
+</html>
