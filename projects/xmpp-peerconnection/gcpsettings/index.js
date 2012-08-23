@@ -2,11 +2,14 @@ var SettingsUI = {
 	$camselect: null,
 	$micselect: null,
 	$spkselect: null,
+	$testsettings: null,
 
-	init: function(camselect, micselect, spkselect) {
+	init: function(camselect, micselect, spkselect, testsettings) {
 		this.$camselect = $(camselect);
 		this.$micselect = $(micselect);
 		this.$spkselect = $(spkselect);
+		this.$testsettings = $(testsettings);
+		this.$testsettings.click(this.testSettingsClickedCallback());
 	},
 
 	updateCameras: function(cameras) {
@@ -54,16 +57,59 @@ var SettingsUI = {
 		}
 
 		this.$spkselect.val(GoCastJS.Audio.outputDevice);
+	},
+
+	testSettingsClickedCallback: function() {
+		var self = this;
+
+		return function() {
+			if ('' === self.$camselect.val()) {
+				alert('Please choose a camera');
+			} else if ('' === self.$micselect.val()) {
+				alert('Please choose a microphone');
+			} else if ('' === self.$spkselect.val()) {
+				alert('Please choose a speaker');
+			} else {
+				SettingsApp.testSettings({
+					video: true,
+					audio: true,
+					videoin: self.$camselect.val(),
+					audioin: self.$micselect.val(),
+					audioout: self.$spkselect.val()
+				});
+			}
+		};
 	}
 };
 
 var SettingsApp = {
 	$localplayer: null,
 	$remoteplayer: null,
+	clearPlayers: null,
+	localStream: null,
+	remoteStream: null,
+	peerConnection: null,
 
 	init: function(local, remote) {
 		this.$localplayer = $(local);
 		this.$remoteplayer = $(remote);
+	},
+
+	testSettings: function(mediaHints) {
+		if (null !== this.clearPlayers) {
+			this.clearPlayers();
+		} else {
+			this.clearPlayers = function() {
+				this.$localplayer.get(0).deinit();
+				this.peerConnection.Deinit();
+			};
+		}
+
+		var options = new GoCastJS.UserMediaOptions(mediaHints,
+													this.$localplayer.get(0));
+		GoCastJS.getUserMedia(options,
+							  this.gerUserMediaSuccessCallback(),
+							  this.getUserMediaFailureCallback());
 	},
 
 	devicesChangedCallback: function() {
@@ -86,11 +132,100 @@ var SettingsApp = {
 				SettingsUI.updateSpks(spks);
 			}
 		}
+	},
+
+	gerUserMediaSuccessCallback: function() {
+		var self = this;
+
+		return function(stream) {
+			self.localStream = stream;
+
+			var hints = {};
+			if (0 < self.localStream.videoTracks.length) {
+				hints.video = true;
+			} else {
+				hints.video = false;
+			}
+			if (0 < self.localStream.audioTracks.length) {
+				hints.audio = true;
+			} else {
+				hints.audio = false;
+			}
+
+			var options = new GoCastJS.PeerConnectionOptions(
+				'STUN video.gocast.it:19302',
+				self.iceCallback(),
+				self.addStreamCallback(),
+				self.removeStreamCallback(),
+				self.readyStateChangedCallback(),
+				self.$remoteplayer.get(0)
+			);
+
+			self.peerConnection = new GoCastJS.PeerConnection(options);
+			self.peerConnection.AddStream(self.localStream);
+
+			var offer = self.peerConnection.CreateOffer(hints);
+			self.peerConnection.SetLocalDescription(
+				'OFFER',
+				offer,
+				function() {
+					self.peerConnection.SetRemoteDescription('ANSWER', offer);
+					self.peerConnection.StartIce();
+				},
+				function(msg) {
+					console.log('PeerConnection: ' + msg);
+				}
+			);
+		};
+	},
+
+	getUserMediaFailureCallback: function() {
+		var self = this;
+
+		return function(msg) {
+			console.log('SettingsApp.getUserMedia(): ' + msg);
+			self.clearPlayers = null;
+		};
+	},
+
+	iceCallback: function() {
+		var self = this;
+
+		return function(candidate, moreComing) {
+			if (true === moreComing) {
+				self.peerConnection.ProcessIceMessage(candidate);
+			}
+		};
+	},
+
+	addStreamCallback: function() {
+		var self = this;
+
+		return function(stream) {
+			self.remoteStream = stream;
+		};
+	},
+
+	removeStreamCallback: function() {
+		var self = this;
+
+		return function(stream) {
+			self.remoteStream = null;
+		};
+	},
+
+	readyStateChangedCallback: function() {
+		var self = this;
+
+		return function() {
+			console.log('PeerConnection: ReadyState = ' + self.peerConnection.ReadyState());
+		};
 	}
 };
 
 $(document).ready(function() {
-	SettingsUI.init('#cameraselect', '#micselect', '#spkselect');
+	SettingsUI.init('#cameraselect', '#micselect',
+					'#spkselect', '#testsettings');
 	SettingsApp.init(document.getElementById('local'),
 			 document.getElementById('remote'));
 	GoCastJS.SetDevicesChangedListener(1000, SettingsApp.$localplayer.get(0),
