@@ -108,12 +108,39 @@ select {
 	font-size: 15px;
 }
 
-/*ul {
-	padding: none;
-}*/
-
 .borderless {
 	border: none;
+}
+
+.button {
+	margin: 20%;
+	padding: 15px;
+	border-radius: 5px;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;	
+	text-decoration: none;
+	text-align: center;
+	font-family: sans-serif;
+	font-size: 20px;
+	background-color: #4169E1;
+	color: white;
+}
+
+.button:hover {
+	background-color: white;
+	color: #4169E1;
+}
+
+.button:active {	
+	background-color: red;
+	color: white;
+}
+
+#buttons {
+	margin-left: 20%;
+	margin-right: 20%;
+	margin-top: 20px;
+	text-align: center;
 }
 
 #settingsdescription {
