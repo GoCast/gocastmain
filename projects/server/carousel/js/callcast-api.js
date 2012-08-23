@@ -450,29 +450,23 @@ $(document).on('disconnected', function(
   return false;
 }); /* disconnected() */
 
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-/**
- * \brief Function called when other Gocast.it plugin object is created.
- */
-function addPluginToCarousel(
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-     /* Other user nick name. */
-  nickname
-)
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+///
+/// \brief Function called when other Gocast.it plugin object is created.
+///
+function addPluginToCarousel(nickname)
 {
   var dispname = decodeURI(nickname),
       id = app.str2id(nickname),
       w, h,
-      oo;
+      jqOo, oo;
   if (!nickname)
   {
     app.log(4, "addPluginToCarousel error nickname undefined");
     return null;
   }
   // check if nickname already in carousel
-  oo = $('#meeting > #streams > #scarousel div.cloudcarousel#'+ id);
-  if (oo.length > 0)
+  jqOo = $('#meeting > #streams > #scarousel div.cloudcarousel#'+ id);
+  if (jqOo.length > 0)
   {
     app.log(4, "addPluginToCarousel error nickname " + nickname + "already in carousel");
     alert("addPluginToCarousel error nickname " + nickname + "already in carousel");
@@ -487,9 +481,10 @@ function addPluginToCarousel(
   }
   if (oo)
   {
-    $(oo).attr('id', id);
-    $(oo).attr('encname', nickname);
-    $(oo).attr('title', dispname);
+    $(oo).attr('id', id)
+         .attr('encname', nickname)
+         .attr('title', dispname);
+    //$('#upper-right', oo).attr('class', 'status'); // clear the upper-right image class to be used for peer connection state
     /*
      * Get dimensions oo and scale plugin accordingly. */
     w = Math.floor($(oo).width() - 4);
@@ -526,6 +521,7 @@ function removePluginFromCarousel(nickname)
       // Get parent object and modify accordingly.
       var id = app.str2id(nickname),
           jqOo = $('#meeting > #streams > #scarousel div.cloudcarousel#' + id),
+      //    jqUR = $('#upper-right', jqOo),
           item = $(jqOo).data('item');
       // todo this method is called for all occupied spots
       // fix to call only for spot with id
@@ -535,6 +531,9 @@ function removePluginFromCarousel(nickname)
       jqOo.removeAttr('title');
       jqOo.removeAttr('id');
       jqOo.removeAttr('encname');
+      //jqUR.attr("class", app.spotUrDefaultClass)
+      //    .attr("src", app.spotUrDefaultImage);
+
       // Remove player.
       // todo hack, have to empty div , remove doesn't work
       //var foo = $('object', jqOo);
@@ -987,16 +986,58 @@ function removeSpotCb(info)
 ///
 function connectionStatus(statusStr)
 {
-   console.log('connectionStatus', statusStr);
-   $("#upper-right > #connection-status").text(statusStr);
+  console.log('connectionStatus', statusStr);
+  $("body > #upper-right > #connection-status").text(statusStr);
 }
 
 ///
 /// \brief peer connection status handler
 ///
-function readyStateCb(state, jid)
+/// todo use css and background image instead of setting image source
+///
+function readyStateCb(state, jid, nick)
 {
-  console.log("readyStateCb", state, jid);
+  try {
+    // find spot by nick
+    var id = app.str2id(nick),
+        jqOo = $('#meeting > #streams > #scarousel div.cloudcarousel#' + id),
+        participant;
+
+    console.log("readyStateCb", state, jid, nick);
+
+    if (jqOo.length > 0) {
+      switch(state) {
+        case 'NEGOTIATING':
+          /*
+          $("#upper-right", jqOo) .attr("class", "status NEGOTIATING")
+                                  .css("visibility", "visible")
+                                  .attr("src", "images/waiting-join.gif");
+          */
+          //jqOo.css("background-image", 'url("images/genericThrobber.gif")');
+          jqOo.css("background-image", 'url("images/waiting-trans.gif")');
+        break;
+        case 'ACTIVE':
+          /*
+          $("#upper-right", jqOo) .attr("class", "status ACTIVE")
+                                  //.css("visibility", "visible")
+                                  .css("visibility", "hidden")
+                                  .attr("src", "images/green-tick.png");
+          */
+          participant = Callcast.participants[nick];
+          if (!participant) {throw "participant " + nick + " not found";}
+          if (!participant.image) {throw "participant image for " + nick + " not found";}
+          console.log("participant", participant);
+          if (!participant.videoOn)
+          {
+            jqOo.css('background-image', participant.image);
+          }
+        break;
+      }
+    }
+
+  } catch (err) {
+    app.log(4, "readyStateCb exception " + err);
+  }
 }
 
 ///
@@ -1005,7 +1046,7 @@ function readyStateCb(state, jid)
 function setLocalSpeakerStatus(vol)
 {
   // set image based on volume
-  var img, div = $("#upper-right > div#volume");
+  var img, div = $("body > #upper-right > div#volume");
   console.log("speaker volume " + vol);
   if (vol <= 0) // mute, if vol == -1 display mute symbol since sound's probably not getting out or in
   {

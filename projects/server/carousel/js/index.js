@@ -52,6 +52,8 @@ var app = {
   WIN_PL_NAME: 'npGCP.dll',
   STATUS_PROMPT: "#upper-right > #status-prompt",
   STATUS_PROMPT_STOP: "#upper-right > #status-prompt > #stop-showing",
+  spotUrDefaultClass: "control close", // the class for #upper-right image for unoccupied spot
+  spotUrDefaultImage: "images/trash.png",
   /**
    * Writes the specified log entry into the console HTML element, if
    * present. The meaning of logLevel is 1: debug, 2: info, 3:
@@ -275,7 +277,7 @@ function showPersonalChatWithSpot(spot)
   console.log("showPersonalChat");
   $("#showChat", item.object).css("display", "none"); // hide showChat button
   $("#msgBoard", item.object).css("display", "block"); // show chat ui
-  $("#msgBoard > input.chatTo", item.object).focus();
+  //$("#msgBoard > input.chatTo", item.object).focus(); // todo consider setting focus if no other input has focus
 }
 ///
 /// \brief global handler for showChat spot button press
@@ -284,6 +286,7 @@ function showPersonalChat(event)
 {
   var spot = $(event.currentTarget).parent();
   showPersonalChatWithSpot(spot.get(0));
+  $("#msgBoard > input.chatTo", spot).focus();
 }
 
 ///
@@ -1622,7 +1625,7 @@ function checkForPlugin(name)
       if (item && item.filename === name)
       {
          clearTimeout(app.winTimeout);
-         app.log(2, 'checkForPlugin found player ' + name);
+         //app.log(2, 'checkForPlugin found player ' + name);
          $('#winWait > #status > #spinner').attr('src', 'images/green-tick.png');
          $('#winWait > #status > #msg').text('The GoCast plugin is installed.');
 

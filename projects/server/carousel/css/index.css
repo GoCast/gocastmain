@@ -424,11 +424,11 @@ body > div#meeting > div#streams > div#scarousel div.cloudcarousel {
   */
   border-radius: 6px;
   background-color: #404040;
-  background-size: 70%;
+  background-size: 50%;
   background-position: center center;
   background-repeat: no-repeat
 }
-body > div#meeting > div#streams div.cloudcarousel > img.close
+body > div#meeting > div#streams div.cloudcarousel > img#upper-right
 {
   visibility: hidden;
   width: 25px;
@@ -438,7 +438,7 @@ body > div#meeting > div#streams div.cloudcarousel > img.close
   right: 3px;
   top: 3px;
 }
-body > div#meeting > div#streams div.cloudcarousel > img.zoom
+body > div#meeting > div#streams div.cloudcarousel > img#upper-left
 {
   visibility: hidden;
   width: 30px;
