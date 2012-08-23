@@ -105,7 +105,12 @@ table {
 select {
 	max-width: 200px;
 	min-width: 200px;
+	font-size: 15px;
 }
+
+/*ul {
+	padding: none;
+}*/
 
 .borderless {
 	border: none;

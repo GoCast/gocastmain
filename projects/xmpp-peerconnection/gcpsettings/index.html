@@ -14,59 +14,51 @@
 				<ul id="viewslist">
 					<li id="settingsitem" class="viewitem">
 						<div id="settings" class="view borderless">
-							<ul id="settingslist">
-								<li id="videosettingsitem">
-									<table id="videosettings">
-										<tr>
-											<td>
-												<span class="icon-picto">h</span>
-											</td>
-											<td>
-												<select id="cameraselect">
-													<option value="" selected="selected">----- choose a camera -----</option>
-												</select>
-											</td>
-										</tr>
-										<tr>
-											<td>
-												<span class="icon-entypo">F</span>
-											</td>
-											<td>
-												<select id="effectselect">
-													<option value="" selected="selected">----- choose an effect -----</option>
-													<option value="none">no effect</option>
-													<option value="gray">black and white</option>
-													<option value="sepia">sepia</option>
-												</select>
-											</td>
-										</tr>
-									</table>
-								</li>
-								<li id="audiosettingsitem">
-									<table id="audiosettings">
-										<tr>
-											<td>
-												<span class="icon-entypo">O</span>
-											</td>
-											<td>
-												<select id="micselect">
-													<option value="" selected="selected">--- choose a microphone ---</option>
-												</select>&nbsp;
-											</td>
-										</tr>
-										<tr>
-											<td>
-												<span class="icon-picto">2</span>
-											</td>
-											<td>
-												<select id="spkselect">
-													<option value="" selected="selected">----- choose a speaker ----</option>
-												</select>&nbsp;
-											</td>
-										</tr>
-									</table>
-								</li>
-							</ul>
+							<table id="settingstable">
+								<tr>
+									<td>
+										<span class="icon-picto">h</span>
+									</td>
+									<td>
+										<select id="cameraselect">
+											<option value="" disabled="disabled" selected="selected">choose a camera</option>
+										</select>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<span class="icon-entypo">F</span>
+									</td>
+									<td>
+										<select id="effectselect">
+											<option value="" disabled="disabled" selected="selected">choose an effect</option>
+											<option value="none">no effect</option>
+											<option value="gray">black and white</option>
+											<option value="sepia">sepia</option>
+										</select>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<span class="icon-entypo">O</span>
+									</td>
+									<td>
+										<select id="micselect">
+											<option value="" disabled="disabled" selected="selected">choose a microphone</option>
+										</select>&nbsp;
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<span class="icon-picto">2</span>
+									</td>
+									<td>
+										<select id="spkselect">
+											<option value="" disabled="disabled" selected="selected">choose a speaker</option>
+										</select>&nbsp;
+									</td>
+								</tr>
+							</table>
 						</div>
 					</li>
 					<li id="localitem" class="viewitem">

@@ -11,8 +11,8 @@ var SettingsUI = {
 
 	updateCameras: function(cameras) {
 		this.$camselect.html('');
-		var firstOption = '<option value="">----- choose a camera -----' + 
-						  '</option>';
+		var firstOption = '<option value="" disabled="disabled">' +
+						  'choose a camera</option>';
 		$(firstOption).appendTo(this.$camselect);
 
 		for (i in cameras) {
@@ -28,8 +28,8 @@ var SettingsUI = {
 
 	updateMics: function(mics) {
 		this.$micselect.html('');
-		var firstOption = '<option value="">--- choose a microphone ---' + 
-						  '</option>';
+		var firstOption = '<option value="" disabled="disabled">' +
+						  'choose a microphone</option>';
 		$(firstOption).appendTo(this.$micselect);
 
 		for (i in mics) {
@@ -43,8 +43,8 @@ var SettingsUI = {
 
 	updateSpks: function(spks) {
 		this.$spkselect.html('');
-		var firstOption = '<option value="">----- choose a speaker ----' + 
-						  '</option>';
+		var firstOption = '<option value="" disabled="disabled">' +
+						  'choose a speaker</option>';
 		$(firstOption).appendTo(this.$spkselect);
 
 		for (i in spks) {
