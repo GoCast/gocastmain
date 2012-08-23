@@ -96,7 +96,7 @@ GoCastJS.BQueue.prototype.log = function(msg) {
         return false;
     }
 
-    stats = 'log: pre:' + this.length + ', in:' + msg.length + ', post-nodrop:';
+    stats = 'log: pre:' + this.length + ', in:' + msg.length + ', post-nodrop:' + (this.length+msg.length);
 
     this.q.push(msg);
     this.length += msg.length;
@@ -105,6 +105,9 @@ GoCastJS.BQueue.prototype.log = function(msg) {
     while(this.length > this.maxLength && this.q.length) {
         this.q.shift();
     }
+
+    stats += ', post-drop:' + this.length;
+    console.log('DEBUG: ' + stats);
 
     // If we had to delete every entry just to get below the threshold, that's an error.
     if (!this.q.length) {
@@ -117,37 +120,34 @@ GoCastJS.BQueue.prototype.log = function(msg) {
 //
 // Returns bytes out of the logs up to max # bytes.
 // Only returns integral line items however.
+// Returns null if no lines available.
 //
 GoCastJS.BQueue.prototype.getLinesWithMaxBytes = function(max) {
     var out = '',
-        itemNext = this.q.shift(),
-        lenNext = itemNext.length;
+        removed = 0;
 
-    this.length -= lenNext;
-
-    while (out.length + lenNext <= max) {
-        out += itemNext;
-
-        itemNext = this.q.shift();
-        lenNext = itemNext.length;
-
-        this.length -= lenNext;
+    if (!this.q.length) {
+        console.log('DEBUG: BQueue::getLinesWithMaxBytes: Empty Queue');
+        return null;
     }
 
-    // Once we're out, we have pulled one too many off the queue.
-    // Replace it back at the head.
-    this.q.unshift(itemNext);
-    this.length += lenNext;
+    while (this.q.length && out.length + this.q[0].length <= max)
+    {
+        this.length -= this.q[0].length;
+        out += this.q.shift();
+        removed += 1;
+    }
 
+    console.log('DEBUG: BQueue::getLinesWithMaxBytes: Removed ' + removed + ' lines. Returned ' + out.length + ' bytes.');
     return out;
 };
 
 var Callcast = {
     PLUGIN_VERSION_CURRENT: 0.0,
     PLUGIN_VERSION_REQUIRED: 0.0,
-    PLUGIN_VERSION_CURRENT_MAC: 1.26,
+    PLUGIN_VERSION_CURRENT_MAC: 1.27,
     PLUGIN_VERSION_REQUIRED_MAC: 1.26,
-    PLUGIN_VERSION_CURRENT_WIN: 1.26,
+    PLUGIN_VERSION_CURRENT_WIN: 1.27,
     PLUGIN_VERSION_REQUIRED_WIN: 1.26,
     PLUGIN_VERSION_CURRENT_LINUX: 1.21,
     PLUGIN_VERSION_REQUIRED_LINUX: 1.21,
@@ -1320,6 +1320,15 @@ var Callcast = {
     SendPrivateChat: function(msg, to) {
       var chat = $msg({to: this.room + '/' + to.replace(/ /g, '\\20'), type: 'chat'}).c('body').t(msg);
       this.connection.send(chat);
+    },
+
+    SendDirectPrivateChat: function(msg, to) {
+      var chat = $msg({to: to, type: 'chat'}).c('body').t(msg);
+      this.connection.send(chat);
+    },
+
+    SendLiveLog: function(msg) {
+        this.SendDirectPrivateChat('LIVELOG ; ' + this.nick + ' ; ' + msg, this.ROOMMANAGER);
     },
 
     SendFeedback: function(msg) {

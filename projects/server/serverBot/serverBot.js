@@ -190,13 +190,14 @@ RoomDatabase.prototype.validateObj = function(obj) {
     {
         if (obj.hasOwnProperty(k)) {
             tk = typeof obj[k];
+
             if (tk === 'boolean') {
                 retobj[k] = obj[k] ? 1 : 0;
             }
             else if (tk !== 'string' && tk !== 'number') {
                 return null;
             }
-            else if (tk !== '') {
+            else if (obj[k] !== '') {   // Don't allow null values as dynamodb doesn't like them.
                 retobj[k] = obj[k];
             }
         }
@@ -231,11 +232,11 @@ RoomDatabase.prototype.AddContentToRoom = function(roomname, spotnumber, obj, cb
         return false;
     }
 
-    this.log('Adding content to room: ' + roomname + ' in spotnumber: ' + spotnumber);
-//    console.log('DEBUG:Adding content to room: full obj: ', obj);
-
     putobj.roomname = roomname;
     putobj.spotnumber = spotnumber;
+
+    this.log('Adding content to room: ' + roomname + ' in spotnumber: ' + spotnumber);
+//    console.log('DEBUG:Adding content to room: full validated obj: ', putobj);
 
     ddb.putItem(this.ROOMCONTENTS, putobj, {}, function(err, res, cap) {
         if (err)
@@ -371,7 +372,7 @@ RoomDatabase.prototype.RemoveAllContentsFromRoom = function(roomname, cbSuccess,
             console.log('Raw err:', err);
             cbFailure(err);
         } else {
-            console.log('RemoveAllContentsFromRoom:query Success: ', res);
+//            console.log('RemoveAllContentsFromRoom:query Success: ', res);
             // Now we have an object in res.items which is an array of objects that contain 'roomname' and 'spotnumber'
             len = res.items.length;
             buildup = [];
@@ -389,7 +390,7 @@ RoomDatabase.prototype.RemoveAllContentsFromRoom = function(roomname, cbSuccess,
             }
 
             toDel[self.ROOMCONTENTS] = buildup;
-            console.log('Interim toDel....', toDel);
+//            console.log('Interim toDel....', toDel);
                 ddb.batchWriteItem(null, toDel, function(errdel, resdel) {
                 if (errdel)
                 {
@@ -399,14 +400,14 @@ RoomDatabase.prototype.RemoveAllContentsFromRoom = function(roomname, cbSuccess,
                     self.log('RemoveAllContentsFromRoom:batchWriteItem ERROR: ' + errdel);
                     cbFailure(errdel);
                 } else {
-                    console.log('RemoveAllContentsFromRoom:batchWriteItem Success: ', resdel);
+//                    console.log('RemoveAllContentsFromRoom:batchWriteItem Success: ', resdel);
 
                     // On a successful delete, we check to see if we go around again for more...
                     if (res.lastEvaluatedKey.hash) {
                         options.exclusiveStartKey = res.lastEvaluatedKey;
-                        console.log('Secondary iteration starting from:', res.lastEvaluatedKey);
+//                        console.log('Secondary iteration starting from:', res.lastEvaluatedKey);
 
-                        console.log('table:', self.ROOMCONTENTS, ' roomname:', roomname, ' options:', options);
+//                        console.log('table:', self.ROOMCONTENTS, ' roomname:', roomname, ' options:', options);
                         setTimeout(function() {
                             ddb.query(self.ROOMCONTENTS, roomname, options, QueryCB);
                         }, batchDelay);
@@ -2382,7 +2383,7 @@ Overseer.prototype.sendGroupMessage = function(room, msg_body) {
 // \brief Need to check the room's banned-list for this person.
 //
 Overseer.prototype.handleMessage = function(msg) {
-    var cmd, k,
+    var cmd, k, temp,
         fromjid, fromnick, toroom, plea;
     // Listen to pure chat messages to the overseer.
 
@@ -2409,7 +2410,7 @@ Overseer.prototype.handleMessage = function(msg) {
 
         cmd[0] = cmd[0].toUpperCase();
 
-        switch (cmd) {
+        switch (cmd[0]) {
         case 'KNOCK':
             fromjid = cmd[1].split(' ')[0]; // Just in case chat client does <mailto:> tag following jid.
             fromnick = cmd[2];
@@ -2435,6 +2436,11 @@ Overseer.prototype.handleMessage = function(msg) {
                     this.log('KNOCK refused. JID (' + fromjid + '), is on the banned list for room (' + toroom + ')');
                 }
             }
+            break;
+        case 'LIVELOG':
+            temp = 'LIVELOG: From: ' + cmd[1] + ' Msg: ' + cmd[2];
+            this.log(temp);
+            this.notifylog(temp);
             break;
         default:
             this.log('Direct message: Unknown command: ' + msg.getChild('body').getText());
@@ -2639,6 +2645,12 @@ Overseer.prototype.CreateRoomRequest = function(iq) {
 Overseer.prototype.handleIq = function(iq) {
     var iqid, callback;
 
+    if (!iq.attrs.from) {
+        this.log('ERROR: ERRANT IQ: ' + iq);
+        this.notifylog('ERROR: ERRANT IQ: ' + iq);
+        return;
+    }
+
     // Handle all pings and all queries for #info
     if (iq.attrs.type === 'result' && iq.attrs.id && this.iq_callbacks[iq.attrs.id])
     {
@@ -2819,7 +2831,7 @@ console.log('****************************************************');
 
 var notify = new Notifier({jid: 'overseer@video.gocast.it', password: 'the.overseer.rocks',
                             server: 'video.gocast.it', port: 5222},
-            ['rwolff@video.gocast.it']); // , "bob.wolff68@jabber.org" ]);
+            ['rwolff@video.gocast.it', 'jim@video.gocast.it']); // , "bob.wolff68@jabber.org" ]);
 
 //
 // Login as Overseer
