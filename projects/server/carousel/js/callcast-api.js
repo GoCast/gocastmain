@@ -1101,6 +1101,8 @@ function pluginLoaded(
   if (!Callcast.pluginUpdateRequired()) // do not access plugin api if it needs to be upgraded
   {
      app.log(2, 'pluginLoaded plugin up to date ');
+     GoCastJS.PluginLog(Callcast.localplayer, Callcast.PluginLogCallback);
+
      // set localPlayer to null since Init... checks for it to be null
      // before it will proceed
      Callcast.localplayer = null;
