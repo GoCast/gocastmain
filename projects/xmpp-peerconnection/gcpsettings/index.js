@@ -2,13 +2,16 @@ var SettingsUI = {
 	$camselect: null,
 	$micselect: null,
 	$spkselect: null,
+	$effects: null,
 	$testsettings: null,
 
-	init: function(camselect, micselect, spkselect, testsettings) {
+	init: function(camselect, micselect, spkselect, effects, testsettings) {
 		this.$camselect = $(camselect);
 		this.$micselect = $(micselect);
 		this.$spkselect = $(spkselect);
+		this.$effects = $(effects);
 		this.$testsettings = $(testsettings);
+		this.$effects.change(this.effectChangedCallback());
 		this.$testsettings.click(this.testSettingsClickedCallback());
 	},
 
@@ -59,6 +62,14 @@ var SettingsUI = {
 		this.$spkselect.val(GoCastJS.Audio.outputDevice);
 	},
 
+	effectChangedCallback: function() {
+		var self = this;
+
+		return function() {
+			SettingsApp.applyEffect(self.$effects.val());
+		};
+	},
+
 	testSettingsClickedCallback: function() {
 		var self = this;
 
@@ -102,13 +113,15 @@ var SettingsApp = {
 			this.clearPlayers = function() {
 				this.$localplayer.get(0).deinit();
 				this.peerConnection.Deinit();
+				this.peerConnection = null;
+				this.localStream = null;
 			};
 		}
 
 		var options = new GoCastJS.UserMediaOptions(mediaHints,
 													this.$localplayer.get(0));
 		GoCastJS.getUserMedia(options,
-							  this.gerUserMediaSuccessCallback(),
+							  this.getUserMediaSuccessCallback(),
 							  this.getUserMediaFailureCallback());
 	},
 
@@ -134,7 +147,7 @@ var SettingsApp = {
 		}
 	},
 
-	gerUserMediaSuccessCallback: function() {
+	getUserMediaSuccessCallback: function() {
 		var self = this;
 
 		return function(stream) {
@@ -177,6 +190,14 @@ var SettingsApp = {
 				}
 			);
 		};
+	},
+
+	applyEffect: function(effect) {
+		if (null !== this.localStream) {
+			if (0 < this.localStream.videoTracks.length) {
+				this.localStream.videoTracks[0].effect = effect;
+			}
+		}
 	},
 
 	getUserMediaFailureCallback: function() {
@@ -225,9 +246,9 @@ var SettingsApp = {
 
 $(document).ready(function() {
 	SettingsUI.init('#cameraselect', '#micselect',
-					'#spkselect', '#testsettings');
+					'#spkselect', '#effectselect', '#testsettings');
 	SettingsApp.init(document.getElementById('local'),
-			 document.getElementById('remote'));
+			 		 document.getElementById('remote'));
 	GoCastJS.SetDevicesChangedListener(1000, SettingsApp.$localplayer.get(0),
 									   SettingsApp.devicesChangedCallback());
 });
