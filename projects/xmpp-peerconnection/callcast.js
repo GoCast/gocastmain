@@ -63,6 +63,7 @@
  */
 
 /*jslint sloppy: false, todo: true, browser: true, devel: true */
+/*global Buffer */
 'use strict';
 
 var GoCastJS = GoCastJS || {};
@@ -874,14 +875,16 @@ var Callcast = {
         };
 
         this.CompleteCall = function(offer) {
-            var sdp;
+            var sdp, rs;
 
             this.bAmCaller = false;
 
             try {
                 if (this.peer_connection)
                 {
-                    if (this.peer_connection.ReadyState() === 'ACTIVE')
+                    rs = this.peer_connection.ReadyState();
+
+                    if (rs === 'ACTIVE' || rs === 'CONNECTING'|| rs === 'CONNECTED')
                     {
                         Callcast.log('CompleteCall: Offer received while active. RESET PEER CONNECTION.');
                         this.ResetPeerConnection();
@@ -921,10 +924,12 @@ var Callcast = {
         };
 
         this.InboundIce = function(candidate) {
-            var i, len;
+            var i, len, rs;
 
             try {
-                if (this.peer_connection && this.peer_connection.ReadyState() === 'ACTIVE')
+                rs = this.peer_connection.ReadyState();
+
+                if (this.peer_connection && (rs === 'ACTIVE' || rs === 'CONNECTING' || rs === 'CONNECTED'))
                 {
                     if (this.bIceStarted) {
                         Callcast.log('InboundIce: Got Candidate - ' + candidate);
@@ -1414,7 +1419,28 @@ var Callcast = {
         this.SendDirectPrivateChat('LIVELOG ; ' + this.nick + ' ; ' + msg, this.ROOMMANAGER);
     },
 
+    SendLogsToLogCatcher: function() {
+        var self = this, ibb;
+
+        ibb = new GoCastJS.IBBTransferClient(this.connection, this.room.split('@')[0], this.nick, function(max) {
+            var buf = logQ.removeLinesWithMaxBytes(max);
+            if (!buf || buf === '') {
+                return null;
+            }
+            else {
+                return buf;
+            }
+        }, Callcast.log, function(msg) {
+            self.log('SUCCESSFUL LogCatcher send. msg: ' + msg);
+        }, function(errmsg) {
+            self.log('ERROR: Failed LogCatcher send. msg: ' + msg);
+        });
+    },
+
     SendFeedback: function(msg) {
+        // TODO:RMW DEBUG -- REMOVE
+//        this.SendLogsToLogCatcher();
+
         if (this.connection) {
             this.connection.send($msg({to: this.FEEDBACK_BOT, nick: this.nick, room: this.room.split('@')[0]}).c('body').t(msg));
         }
