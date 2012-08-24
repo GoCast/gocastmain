@@ -67,7 +67,7 @@
       </div>
     </div>
     <div id="lower-right">
-       <input id="dlbtn" type="button" title="Download Plugin." onclick="doDownload();" />
+       <input id="dlbtn" type="button" title="Get Updated Plugin." onclick="doDownload();" />
        <!--<input class="vidbtn" type="button" title="Place video content." onclick="startVideoContent();" />-->
        <input class="vidbtn" type="button" title="Place video content." onclick="startPeopleContent();" />
        <!--<input class="demobtn" type="button" title="Place demo content." onclick="startDemoContent();" />-->
@@ -114,6 +114,7 @@
       <div id="pageReload" class="window resizable">
         <h1>Please reload the page after the install</h1>
         <p class="title">The new GoCast Player will be loaded when the page is reloaded.</p>
+        <button id="reload" type="button" onclick="location.reload()">Reload</button>
       </div>
       <div id="copyData" class="window resizable">
          <img class="close" src="images/button-close.png" alt="Close" title="Close" />

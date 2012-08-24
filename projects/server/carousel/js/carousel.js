@@ -58,13 +58,14 @@
   };
   Item.prototype.addControls = function() // add controls to spot
   {
-    var jqObj = $(this.object);
-    jqObj.append('<img class="zoom control" src="images/fullscreen.png" alt="Zoom" title="Zoom" onclick="carouselItemZoom(event);"/>');
-    jqObj.append('<img class="close control" src="images/trash.png" alt="Close" title="Close" onclick="onSpotClose(event);"/>');
+    var jqObj = $(this.object),
+        chatOut;
+    jqObj.append('<img id="upper-left" class="zoom control" src="images/fullscreen.png" alt="Zoom" title="Zoom" onclick="carouselItemZoom(event);"/>');
+    jqObj.append('<img id="upper-right" class="'+ app.spotUrDefaultClass + '" src="' + app.spotUrDefaultImage +'" alt="Close" title="Close" onclick="onSpotClose(event);"/>');
     jqObj.append('<input id="showChat" type="button" title="Show Chat" onclick="showPersonalChat(event);"/>');
     jqObj.append('<div id="msgBoard"><div id="chatOut"></div><input class="chatTo" type="text" placeholder="Enter a message" onkeydown="keypressPersonalChatHandler(event);"/><input class="send" type="button" title="Send message." onclick="sendPersonalChat(event);"/><input class="close" type="button" title="Close" onclick="closePersonalChat(event);"/></div>');
     // add chat util to personal chat out
-    var chatOut = $("#msgBoard > #chatOut", jqObj);
+    chatOut = $("#msgBoard > #chatOut", jqObj);
     if (!chatOut[0]) {app.log(4, "Item error can't find chatOut");}
     chatOut.data('util', new GoCastJS.ChatUtil(chatOut));
     // add handlers

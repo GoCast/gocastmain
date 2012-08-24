@@ -487,6 +487,20 @@ var Callcast = {
     },
 
     //
+    // filter is one of: 'sepia', 'gray', or 'none'
+    //
+    SetVideoFilter: function(filter) {
+
+        if (typeof(filter) === 'string' && this.localplayer && this.localstream) {
+            this.localstream.videoTracks[0].effect = filter;
+            return true;
+        }
+        else {
+            return false;
+        }
+    },
+
+    //
     // info is JSON formatted. Expectation is:
     //  info.nick - nickname to modify size of.
     //  info.hasVid - if this variable is used/present, set video to this.(WIDTH,HEIGHT), else if false, set to 0,0
