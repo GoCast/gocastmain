@@ -12,7 +12,15 @@ var SettingsUI = {
 		this.$effects = $(effects);
 		this.$testsettings = $(testsettings);
 		this.$effects.change(this.effectChangedCallback());
+		this.$effects.attr('disabled', 'true');
 		this.$testsettings.click(this.testSettingsClickedCallback());
+	},
+
+	enableEffectsSelect: function(enable) {
+		this.$effects.attr('disabled', !enable);
+		if (false === enable) {
+			this.$effects.val('');
+		}
 	},
 
 	updateCameras: function(cameras) {
@@ -115,6 +123,7 @@ var SettingsApp = {
 				this.peerConnection.Deinit();
 				this.peerConnection = null;
 				this.localStream = null;
+				SettingsUI.enableEffectsSelect(false);
 			};
 		}
 
@@ -152,6 +161,7 @@ var SettingsApp = {
 
 		return function(stream) {
 			self.localStream = stream;
+			SettingsUI.enableEffectsSelect(true);
 
 			var hints = {};
 			if (0 < self.localStream.videoTracks.length) {
