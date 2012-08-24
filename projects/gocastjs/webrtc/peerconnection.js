@@ -173,9 +173,14 @@ GoCastJS.getUserMedia = function(options, success, failure) {
                                                  'addStream() failed.');
                 }
 
+                var hints = {
+                    video: options.mediaHints.video,
+                    audio: options.mediaHints.audio
+                };
+
                 player.setLocalDescription(
                     'OFFER',
-                    player.createOffer({audio: true, video: true}),
+                    player.createOffer(hints),
                     function() {
                         player.source = stream;
                         if ('undefined' !== typeof(success) &&
