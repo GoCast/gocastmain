@@ -726,7 +726,8 @@ function doSpot(spotDiv, info)
   try
   {
     var divIcon, divTitle,
-        jqDiv = $(spotDiv);
+        jqDiv = $(spotDiv),
+        whiteBoard;
     console.log('doSpot', info);
     console.log('spotDiv', spotDiv);
     if (!spotDiv) {throw "no spotDiv";}
@@ -736,49 +737,15 @@ function doSpot(spotDiv, info)
       console.log('doSpot youtube');
       loadVideo(spotDiv, info);
     }
-    else if (info.spottype === 'url')
+    else if (info.spottype === 'whiteBoard')
     {
-      jqDiv.attr('id', app.str2id(info.spotdivid));
-      jqDiv.attr('title', info.spotdivid);
-      jqDiv.attr('alt', info.spotdivid);
-      jqDiv.attr('url', info.spoturl);
-      jqDiv.attr('encname', info.spotdivid);
+      // todo give wb unique id
+      jqDiv.attr('id', app.str2id('whiteBoard'));
+      jqDiv.attr('title', 'whiteBoard');
+      jqDiv.attr('alt', 'whiteBoard');
+      jqDiv.attr('encname', 'whiteBoard');
       jqDiv.removeClass('unoccupied').addClass('typeContent');
-
-      // use the image in info if supplied
-      // else generate one from the url
-      if (info.spotimage)
-      {
-         jqDiv.css('background-image', info.spotimage);
-      }
-      else
-      {
-        getUrlInfo(
-        {
-          webUrl: info.spoturl,
-          proxyUrl: 'http://carousel.gocast.it/proxy'
-        },
-        function(urlInfo)
-        {
-          console.log("doSpot getUrlInfo cb", urlInfo);
-          jqDiv.css('background-image', ''); // remove the spot background
-          divIcon = $('<div class="spotUrlIcon"/>'); // create a child div with url info for spot
-          // hot link to http://getfavicon.appspot.com/ to get favicon
-          $(divIcon).css('background-image', 'url(http://g.etfv.co/' + info.url + ')');
-          divTitle = $('<div class="spotUrlTitle"/>');
-          if (urlInfo.title) // add title
-          {
-             $(divTitle).append($('<p>' + urlInfo.title + '</p>'));
-          }
-          else
-          {
-             $(divTitle).append($('<p>' + info.url + '</p>'));
-          }
-          jqDiv.append('<div class="urlPad"/>');
-          jqDiv.append(divIcon);
-          jqDiv.append(divTitle);
-        });
-      }
+      whiteBoard = new jqDiv.GoCastJS.WhiteBoard(spotDiv);
     }
     // ... other spot commands
   } catch(err) {

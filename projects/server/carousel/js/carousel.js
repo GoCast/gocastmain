@@ -228,7 +228,11 @@
     $('#addItem', container).click(function(event)
     {
        //ctx.addItem();
-       Callcast.AddSpot({spottype: "new"});
+       //Callcast.AddSpot({spottype: "new"});
+       Callcast.AddSpot({spottype: "whiteBoard", spotreplace: "first-unoc"}, function()
+        {
+          console.log("carousel addItem callback");
+        });
     });
     // mouseover
     /*
