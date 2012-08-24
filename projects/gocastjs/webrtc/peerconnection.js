@@ -431,13 +431,13 @@ GoCastJS.PeerConnection = function(options) {
                 self.connState = 'CONNECTING';
                 if(prevState !== self.connState) {
                     playerRef.onreadystatechange();
+                } else {
+                    clearTimeout(self.connTimer);
+                    self.connTimer = setTimeout(function() {
+                        self.connState = 'CONNECTED';
+                        playerRef.onreadystatechange();
+                    }, 2000);                    
                 }
-
-                clearTimeout(self.connTimer);
-                self.connTimer = setTimeout(function() {
-                    self.connState = 'CONNECTED';
-                    playerRef.onreadystatechange();
-                }, 2000);
             }
 
             if('undefined' !== typeof(options.onIceMessage) &&
