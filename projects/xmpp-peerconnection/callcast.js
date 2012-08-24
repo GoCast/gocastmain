@@ -103,12 +103,19 @@ GoCastJS.BQueue.prototype.dump = function(msg) {
 
 GoCastJS.BQueue.prototype.log = function(msgin) {
     var msg = msgin,
-        i;
+        i, len;
  //   var stats = '';
 
     if (arguments.length > 1) {
- //       console.log('DEBUG: MULTI: ' + typeof(arguments), arguments);
-        msg = JSON.stringify(arguments);
+ //       msg = JSON.stringify(arguments);
+        len = arguments.length;
+
+        msg = '';
+
+        for (i = 0; i < len; i += 1)
+        {
+            msg += arguments[i];
+        }
     }
 
     if (typeof msg !== 'string') {
