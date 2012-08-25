@@ -115,7 +115,7 @@ GoCastJS.BQueue.prototype.log = function(msgin) {
 
         for (i = 0; i < len; i += 1)
         {
-            msg += arguments[i];
+            msg += arguments[i];        // TODO:JK - possibly walk the elements here.
         }
     }
 
@@ -1419,7 +1419,7 @@ var Callcast = {
         this.SendDirectPrivateChat('LIVELOG ; ' + this.nick + ' ; ' + msg, this.ROOMMANAGER);
     },
 
-    SendLogsToLogCatcher: function() {
+    SendLogsToLogCatcher: function(cbSuccess, cbFailure) {
         var self = this, ibb;
 
         ibb = new GoCastJS.IBBTransferClient(this.connection, this.room.split('@')[0], this.nick, function(max) {
@@ -1432,15 +1432,18 @@ var Callcast = {
             }
         }, Callcast.log, function(msg) {
             self.log('SUCCESSFUL LogCatcher send. msg: ' + msg);
+            if (cbSuccess) {
+                cbSuccess(msg);
+            }
         }, function(errmsg) {
             self.log('ERROR: Failed LogCatcher send. msg: ' + msg);
+            if (cbFailure) {
+                cbFailure(msg);
+            }
         });
     },
 
     SendFeedback: function(msg) {
-        // TODO:RMW DEBUG -- REMOVE
-//        this.SendLogsToLogCatcher();
-
         if (this.connection) {
             this.connection.send($msg({to: this.FEEDBACK_BOT, nick: this.nick, room: this.room.split('@')[0]}).c('body').t(msg));
         }
