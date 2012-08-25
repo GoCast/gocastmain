@@ -426,21 +426,21 @@ GoCastJS.PeerConnection = function(options) {
         };
 
         var iceCallback = function(candidate, moreComing) {
-            if(null !== candidate.match(' udp ')) {
-                var prevState = self.connState;
-                self.connState = 'CONNECTING';
-                if(prevState !== self.connState) {
+            var prevState = self.connState;
+            self.connState = 'CONNECTING';
+
+            if (prevState !== self.connState) {
+                self.connTimer = null;
+                playerRef.onreadystatechange();
+            } else {
+                clearTimeout(self.connTimer);
+                self.connTimer = setTimeout(function() {
+                    self.connState = 'CONNECTED';
                     playerRef.onreadystatechange();
-                } else {
-                    clearTimeout(self.connTimer);
-                    self.connTimer = setTimeout(function() {
-                        self.connState = 'CONNECTED';
-                        playerRef.onreadystatechange();
-                    }, 2000);                    
-                }
+                }, 2000);                    
             }
 
-            if('undefined' !== typeof(options.onIceMessage) &&
+            if ('undefined' !== typeof(options.onIceMessage) &&
                null !== options.onIceMessage) {
                 options.onIceMessage(candidate, moreComing);
             }
