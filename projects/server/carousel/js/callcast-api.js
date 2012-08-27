@@ -869,7 +869,7 @@ function addSpotCb(info)
     doSpot(spotDiv, info);
     app.carousel.updateAll(); // redraw carousel
   } catch(err) {
-    console.log("Error addSpotCb exception " + err);
+    app.log(4, "Error addSpotCb exception " + err);
   }
 }
 
