@@ -20,8 +20,7 @@
 										<span class="icon-picto">h</span>
 									</td>
 									<td>
-										<select id="cameraselect">
-											<option value="" disabled="disabled" selected="selected">choose a camera</option>
+										<select id="cameraselect" disabled="true">
 										</select>
 									</td>
 								</tr>
@@ -30,7 +29,7 @@
 										<span class="icon-entypo">F</span>
 									</td>
 									<td>
-										<select id="effectselect">
+										<select id="effectselect" disabled="true">
 											<option value="" disabled="disabled" selected="selected">choose an effect</option>
 											<option value="none">no effect</option>
 											<option value="gray">black and white</option>
@@ -43,8 +42,7 @@
 										<span class="icon-entypo">O</span>
 									</td>
 									<td>
-										<select id="micselect">
-											<option value="" disabled="disabled" selected="selected">choose a microphone</option>
+										<select id="micselect" disabled="true">
 										</select>&nbsp;
 									</td>
 								</tr>
@@ -53,9 +51,16 @@
 										<span class="icon-picto">2</span>
 									</td>
 									<td>
-										<select id="spkselect">
-											<option value="" disabled="disabled" selected="selected">choose a speaker</option>
+										<select id="spkselect" disabled="true">
 										</select>&nbsp;
+									</td>
+									<td>
+										<object id="remote"
+											title="how others see you"
+											type="application/x-gocastplayer"
+											width="0"
+											height="0">
+										</object>
 									</td>
 								</tr>
 							</table>
@@ -69,22 +74,15 @@
 									width="320"
 									height="240">
 							</object>
-						</div>
-					</li>
-					<li id="remoteitem" class="viewitem">
-						<div id="remotecontainer" class="view">
-							<object id="remote"
-									title="how others see you"
-									type="application/x-gocastplayer"
-									width="320"
-									height="240">
-							</object>
+							<div id="errmsg" class="error" style="display: none">
+								<span class="icon-picto">!</span> Error
+							</div>
 						</div>
 					</li>
 				</ul>
 			</div>
 			<div id="buttons">
-				<a id="testsettings" class="button" href="javascript:void(0);">test settings</a>
+				<a id="savesettings" class="button" href="javascript:void(0);">save settings</a>
 			</div>
 			<div id="settingsdescription">
 				0
