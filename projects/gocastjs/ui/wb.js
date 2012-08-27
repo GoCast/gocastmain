@@ -77,11 +77,11 @@ GoCastJS.WhiteBoard.prototype.onMouseDown = function(event)
 {
   var wb = $(this).data("wb");
   event.stopPropagation();
-  console.log('wb.onMouseDown', event);
+  console.log('wb.onMouseDown x' + event.offsetX + ' y ' + event.offsetY, event);
   // todo make sure event is a JQuery event
   wb.mouse.state = wb.mouse.DOWN;
   wb.wbCtx.beginPath();
-  wb.wbCtx.moveTo(event.pathX, event.pathY);
+  wb.wbCtx.moveTo(event.offsetX, event.offsetY);
 };
 
 ///
@@ -106,11 +106,11 @@ GoCastJS.WhiteBoard.prototype.onMouseUp = function(event)
 GoCastJS.WhiteBoard.prototype.onMouseMove = function(event)
 {
   var wb = $(this).data("wb");
-  console.log('wb.onMouseMove', event);
+  //console.log('wb.onMouseMove', event);
   event.stopPropagation();
   // todo make sure event is a JQuery event
   if (wb.mouse.DOWN === wb.mouse.state){
-    wb.wbCtx.lineTo(event.pathX, event.pathY);
+    wb.wbCtx.lineTo(event.offsetX, event.offsetY);
     wb.wbCtx.stroke();
   }
 };
