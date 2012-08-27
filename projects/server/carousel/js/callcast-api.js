@@ -975,21 +975,9 @@ function readyStateCb(state, jid, nick)
     if (jqOo.length > 0) {
       switch(state) {
         case 'NEGOTIATING':
-          /*
-          $("#upper-right", jqOo) .attr("class", "status NEGOTIATING")
-                                  .css("visibility", "visible")
-                                  .attr("src", "images/waiting-join.gif");
-          */
-          //jqOo.css("background-image", 'url("images/genericThrobber.gif")');
           jqOo.css("background-image", 'url("images/waiting-trans.gif")');
         break;
-        case 'ACTIVE':
-          /*
-          $("#upper-right", jqOo) .attr("class", "status ACTIVE")
-                                  //.css("visibility", "visible")
-                                  .css("visibility", "hidden")
-                                  .attr("src", "images/green-tick.png");
-          */
+        case 'CONNECTED':
           participant = Callcast.participants[nick];
           if (!participant) {throw "participant " + nick + " not found";}
           if (!participant.image) {throw "participant image for " + nick + " not found";}

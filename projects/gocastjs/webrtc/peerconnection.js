@@ -390,7 +390,10 @@ GoCastJS.PeerConnection = function(options) {
         throw new GoCastJS.Exception(this.peerConn.id, 'Plugin undetected.');
     } else {
         this.player = options.player;
+        this.connState = 'CONNECTING';
+        this.connTimer = null;
 
+        var self = this;
         var playerRef = this.player;
         this.player.onaddstream = function(stream) {
             playerRef.source = stream;
@@ -408,15 +411,44 @@ GoCastJS.PeerConnection = function(options) {
         };
 
         this.player.onreadystatechange = function() {
+            if ('CONNECTING' === self.ReadyState() &&
+                null === self.connTimer) {
+                self.connTimer = setTimeout(function() {
+                    self.connState = 'CONNECTED';
+                    playerRef.onreadystatechange();
+                }, 2000);
+            }
+
             if ('undefined' !== typeof(options.onReadyStateChange) &&
                 null !== options.onReadyStateChange) {
                 options.onReadyStateChange();
             }
         };
 
+        var iceCallback = function(candidate, moreComing) {
+            var prevState = self.connState;
+            self.connState = 'CONNECTING';
+
+            if (prevState !== self.connState) {
+                self.connTimer = null;
+                playerRef.onreadystatechange();
+            } else {
+                clearTimeout(self.connTimer);
+                self.connTimer = setTimeout(function() {
+                    self.connState = 'CONNECTED';
+                    playerRef.onreadystatechange();
+                }, 2000);                    
+            }
+
+            if ('undefined' !== typeof(options.onIceMessage) &&
+               null !== options.onIceMessage) {
+                options.onIceMessage(candidate, moreComing);
+            }
+        };
+
         if (false === this.player.init(this.player.id,
                                        options.iceConfig,
-                                       options.onIceMessage)) {
+                                       iceCallback)) {
             throw new GoCastJS.Exception(this.player.id, 'init() failed.');
         }
     }
@@ -565,10 +597,15 @@ GoCastJS.PeerConnection.prototype.Deinit = function() {
 //! function: GoCastJS.PeerConnection.ReadyState()
 //!
 //! returns: ['INVALID' | 'PRENEW' | 'NEW' | 'NEGOTIATING' |
-//!           'ACTIVE' | 'CLOSING' | 'CLOSED'];
+//!           'ACTIVE' | 'CONNECTING' | 'CONNECTED' | 'BLOCKED' |
+//!           'CLOSING' | 'CLOSED'];
 //!
 GoCastJS.PeerConnection.prototype.ReadyState = function() {
-    return this.player.readyState;
+    if ('ACTIVE' === this.player.readyState) {
+        return this.connState;
+    } else {
+        return this.player.readyState;
+    }
 };
 
 //!
