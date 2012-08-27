@@ -163,3 +163,7 @@ select {
 	font-family: 'EntypoRegular', sans-serif;
 	font-size: 55px;
 }
+
+.error {
+	position: absolute;
+}
