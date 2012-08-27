@@ -1849,12 +1849,15 @@ function startPeopleContent()
 {
   setTimeout(function() {
     //Callcast.Callback_AddCarouselContent({id: 'person1', image: "url('images/person1.png')", altText: 'person1', url: ''});
+    /*
     Callcast.AddSpot({spotreplace: 'first-unoc',
                       spottype: "url",
                       spotdivid: 'person1',
                       spoturl: '',
                       spotimage: "url('images/person1.png')"
                       });
+    */
+    Callcast.AddSpot({spotreplace: 'first-unoc', spottype:"whiteBoard"});
   }, 0);
   setTimeout(function() {
     //Callcast.Callback_AddCarouselContent({id: 'person3', image: "url('images/person3.png')", altText: 'person3', url: ''});
@@ -1876,12 +1879,15 @@ function startPeopleContent()
   }, 600);
   setTimeout(function() {
     //Callcast.Callback_AddCarouselContent({id: 'person4', image: "url('images/person4.png')", altText: 'person4', url: ''});
+    /*
     Callcast.AddSpot({spotreplace: 'first-unoc',
                       spottype: "url",
                       spotdivid: 'person4',
                       spoturl: '',
                       spotimage: "url('images/person4.png')"
                       });
+    */
+    Callcast.AddSpot({spotreplace: 'first-unoc', spottype:"whiteBoard"});
   }, 900);
   setTimeout(function() {
     //Callcast.Callback_AddCarouselContent({id: 'person2', image: "url('images/person2.png')", altText: 'person2', url: ''});
