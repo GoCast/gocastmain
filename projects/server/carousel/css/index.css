@@ -408,6 +408,19 @@ body > div#meeting > div#streams > div#scarousel div#addItem
   bottom:25px;
   right:5px;
 }
+body > div#meeting > div#streams > div#scarousel div#addWhiteBoard
+{
+  background-image: url("../images/whiteboard.png");
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  width: 20px;
+  height: 20px;
+  margin-right: 5px;
+  margin-bottom:5px;
+  position:absolute;
+  bottom:55px;
+  right:5px;
+}
 body > div#meeting > div#streams > div#scarousel div#addItem > img
 {
    width:100%;
@@ -483,6 +496,8 @@ div.cloudcarousel.typeContent > div.spotUrlTitle
 div.wbDiv
 {
   background-color: white;
+  width: 98%;
+  height: 98%;
 }
 body > div#meeting > div#streams > div#scarousel div.cloudcarousel > object {
   margin: 2px;
