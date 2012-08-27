@@ -114,9 +114,12 @@ namespace GoCast
         bool GetLocalAudioTrackEnabled() const;
         bool GetSpkVol(int* pLevel) const;
         bool GetSpkMute(bool* pbEnabled) const;
+        bool GetMicVol(int* pLevel) const;
         std::string GetLocalVideoTrackEffect() const;
         void SetLocalVideoTrackEnabled(bool bEnable);
         void SetLocalAudioTrackEnabled(bool bEnable);
+        bool SetSpkVol(int level);
+        bool SetMicVol(int level);
         void SetLocalVideoTrackRenderer(const talk_base::scoped_refptr
                                         <webrtc::VideoRendererWrapperInterface>& pRenderer);
         void SetLocalVideoTrackEffect(const std::string& effect);
