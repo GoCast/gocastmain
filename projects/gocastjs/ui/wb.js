@@ -90,7 +90,7 @@ GoCastJS.WhiteBoard.prototype.setScale = function(width, height)
   this.scale = (wScale + hScale) / 2; // isotropic, keep aspect ratio
   this.scaleW = wScale;
   this.scaleH = hScale;
-  console.log("scale width " + width + " height " + height + " wScale" + wScale + " hScale " + hScale + " scale " + this.scale);
+  //console.log("scale width " + width + " height " + height + " wScale" + wScale + " hScale " + hScale + " scale " + this.scale);
   this.wbCanvas.style.width = width + "px";
   this.wbCanvas.style.height = height + "px";
 };

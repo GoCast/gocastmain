@@ -740,12 +740,34 @@ function doSpot(spotDiv, info)
     else if (info.spottype === 'whiteBoard')
     {
       // todo give wb unique id
-      jqDiv.attr('id', app.str2id('whiteBoard'));
+      jqDiv.attr('id', app.str2id('whiteBoard' + info.spotnumber));
       jqDiv.attr('title', 'whiteBoard');
       jqDiv.attr('alt', 'whiteBoard');
       jqDiv.attr('encname', 'whiteBoard');
+      jqDiv.attr('spotnumber', info.spotnumber);
       jqDiv.removeClass('unoccupied').addClass('typeContent');
       whiteBoard = new GoCastJS.WhiteBoard(spotDiv);
+    }
+    else if (info.spottype === 'url')
+    {
+      jqDiv.attr('id', app.str2id(info.spotdivid));
+      jqDiv.attr('title', info.spotdivid);
+      jqDiv.attr('alt', info.spotdivid);
+      jqDiv.attr('url', info.spoturl);
+      jqDiv.attr('encname', info.spotdivid);
+      jqDiv.removeClass('unoccupied').addClass('typeContent');
+
+      // use the image in info if supplied
+      // else generate one from the url
+      if (info.spotimage)
+      {
+         jqDiv.css('background-image', info.spotimage);
+      }
+      else
+      {
+        // was get url info but that feature was ripped
+        app.log(4, "no image for url spot");
+      }
     }
     // ... other spot commands
   } catch(err) {
