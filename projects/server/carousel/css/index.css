@@ -480,6 +480,10 @@ div.cloudcarousel.typeContent > div.spotUrlTitle
   margin-right:auto;
   border-radius: 5px;  
 }
+div.wbDiv
+{
+  background-color: white;
+}
 body > div#meeting > div#streams > div#scarousel div.cloudcarousel > object {
   margin: 2px;
 }

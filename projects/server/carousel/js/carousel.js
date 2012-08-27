@@ -49,12 +49,21 @@
 
   Item.prototype.updateSize = function(item)
   {
-      this.orgWidth = item.orgWidth;
-      this.orgHeight = item.orgHeight;
-      this.plgOrgWidth = item.plgOrgWidth;
-      this.plgOrgHeight = item.plgOrgHeight;
-      this.orgChatWidth = item.orgChatWidth;
-      this.orgChatBot = item.orgChatBot;
+    var wbCanvas = $("#wbCanvas", this.object),
+        wb       = wbCanvas.data("wb");
+    this.orgWidth = item.orgWidth;
+    this.orgHeight = item.orgHeight;
+    this.plgOrgWidth = item.plgOrgWidth;
+    this.plgOrgHeight = item.plgOrgHeight;
+    this.orgChatWidth = item.orgChatWidth;
+    this.orgChatBot = item.orgChatBot;
+
+    // todo make wb a member of item
+    if (wb)
+    {
+      console.log("Item.updateSize resizing whiteboard");
+      wb.resize(this.orgWidth, this.orgHeight);
+    }
   };
   Item.prototype.addControls = function() // add controls to spot
   {

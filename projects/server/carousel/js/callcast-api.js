@@ -745,11 +745,11 @@ function doSpot(spotDiv, info)
       jqDiv.attr('alt', 'whiteBoard');
       jqDiv.attr('encname', 'whiteBoard');
       jqDiv.removeClass('unoccupied').addClass('typeContent');
-      whiteBoard = new jqDiv.GoCastJS.WhiteBoard(spotDiv);
+      whiteBoard = new GoCastJS.WhiteBoard(spotDiv);
     }
     // ... other spot commands
   } catch(err) {
-    console.log("doSpot error " + err);
+    app.log(4, "doSpot error " + err);
   }
 } // doSpot
 ///
