@@ -60,17 +60,20 @@ GoCastJS.fileDate = function() {
             GoCastJS.pad2(d.getHours()) + GoCastJS.pad2(d.getMinutes()) + GoCastJS.pad2(d.getSeconds());
 };
 
-GoCastJS.IBBTransfer = function(sender, notifier) {
-    if (!sender || typeof(sender) !== 'function') {
-        throw 'Must have a sender callback.';
-    }
+GoCastJS.IBBTransfer = function(client, notifier) {
+    var self = this;
 
     this.notifier = notifier;
-    this.send = sender;
+    this.client = client;
     this.transfers = {};    // List of ongoing transfers
     this.history = [];      // Array of transfer history for logging/query purposes.
 
     this.internalHistory('Starting LogCatcher @ ' + Date());
+    if (this.notifier) {
+        setTimeout(function() {
+            self.notifier.sendMessage('Starting LogCatcher @ ' + Date());
+        }, 2000);
+    }
 
 };
 
@@ -92,16 +95,16 @@ GoCastJS.IBBTransfer.prototype.SendError = function(iq, type, subtype, reason) {
     }
 
     this.internalHistory('ERROR: name: ' + this.GenName(iq) + ', ' + type + '/' + subtype + ', reason: ' + (reason || 'none'));
-    this.send(iqNew.root());
+    this.client.send(iqNew.root());
     return;
 };
 
 GoCastJS.IBBTransfer.prototype.SendResult = function(iq) {
-    this.send(new ltx.Element('iq', {to: iq.attrs.from, type: 'result', id: iq.attrs.id}).root());
+    this.client.send(new ltx.Element('iq', {to: iq.attrs.from, type: 'result', id: iq.attrs.id}).root());
 };
 
 GoCastJS.IBBTransfer.prototype.SendClose = function(iq, sid, error) {
-    this.send(new ltx.Element('iq', {to: iq.attrs.from, type: 'set', id: 'closeid'})
+    this.client.send(new ltx.Element('iq', {to: iq.attrs.from, type: 'set', id: 'closeid'})
             .c('close', {xmlns: 'http://jabber.org/protocol/ibb', sid: sid}).root());
 
     this.internalCloseTransfer(this.GenName(iq), error);
@@ -157,7 +160,7 @@ GoCastJS.IBBTransfer.prototype.GenName = function(iq) {
         return room + '_' + nick + '_' + sid;
     }
     else {
-        return iq.attrs.from + '_' + sid;
+        return iq.attrs.from.split('@')[0] + '_' + sid;
     }
 };
 
@@ -218,7 +221,13 @@ GoCastJS.IBBTransfer.prototype.internalCloseTransfer = function(keyname, error) 
         }
     }
     else {
+        if (this.notifier) {
+            this.notifier.sendMessage('LogCatcher: IBB - Successfully received log from room_nick_sid: ' + theTransfer.genname
+                + ', bytes: ' + theTransfer.bytesTransferred
+                + ', filename: ' + theTransfer.filename);
+        }
         this.internalHistory(out + ' Success. ');
+        console.log(out + ' Success. ');
     }
 
     // Now let's close it.
@@ -258,12 +267,12 @@ GoCastJS.IBBTransfer.prototype.internalProcessClose = function(iq) {
 GoCastJS.IBBTransfer.prototype.internalProcessData = function(iq) {
     var child = iq.getChildByAttr('xmlns', 'http://jabber.org/protocol/ibb'),
         size_inbound, seq_inbound, sid_inbound, genname, theTransfer, dataBlock,
-        self = this;
+        self = this, msg;
 
 //    console.log('DATA: iq: ', iq);
 //    console.log('DATA: child: ', child);
 
-    seq_inbound = child.attrs.seq;
+    seq_inbound = parseInt(child.attrs.seq, 10);
     sid_inbound = child.attrs.sid;
     genname = this.GenName(iq);
     theTransfer = this.transfers[genname];
@@ -277,6 +286,8 @@ GoCastJS.IBBTransfer.prototype.internalProcessData = function(iq) {
     }
 
     if (!theTransfer) {
+        console.log('Dump of transfers: ', this.transfers);
+
         this.SendError(iq, 'cancel', 'item-not-found',
                         'A transfer of this sid name is not open/active: ' + sid_inbound);
         this.SendClose(iq, sid_inbound, 'Data: active sid not found: ' + sid_inbound);
@@ -285,9 +296,11 @@ GoCastJS.IBBTransfer.prototype.internalProcessData = function(iq) {
 
     // Now we need to check to ensure the current sequence number is next in line.
     if (theTransfer.nextSeqExpected !== seq_inbound) {
-        this.SendError(iq, 'cancel', 'not-acceptable',
-                        'A transfer of this sid name is not open/active: ' + sid_inbound);
-        this.SendClose(iq, sid_inbound, 'Data: out of order seq. Got ' + seq_inbound + ', expected ' + theTransfer.nextSeqExpected);
+        console.log('Dump of transfers: ', this.transfers);
+
+        msg = 'Data: out of order seq. Got ' + seq_inbound + ', expected ' + theTransfer.nextSeqExpected;
+        this.SendError(iq, 'cancel', 'not-acceptable', msg);
+        this.SendClose(iq, sid_inbound, msg);
         return;
     }
 
@@ -309,7 +322,7 @@ GoCastJS.IBBTransfer.prototype.internalProcessData = function(iq) {
             self.SendClose(iq, sid_inbound, 'Data: Error writing to file: ' + theTransfer.filename);
         }
         else {
-            console.log('DATA: SID: ' + sid_inbound + ' # bytes written: ' + written);
+//            console.log('DATA: SID: ' + sid_inbound + ' # bytes written: ' + written);
             theTransfer.bytesTransferred += written;
             self.SendResult(iq);
         }
@@ -381,7 +394,7 @@ function LogCatcher(user, pw, notifier) {
 
     this.iqnum = 0;
     this.iq_callbacks = {};
-    this.IBB = new GoCastJS.IBBTransfer(this.sendIQ, notifier);
+    this.IBB = new GoCastJS.IBBTransfer(this.client, notifier);
 
     var self = this;
 
@@ -451,9 +464,6 @@ LogCatcher.prototype.sendIQ = function(iq, cb) {
 
     if (cb) {
         this.iq_callbacks[iqid] = cb;
-    }
-    else {
-        this.log("sendIQ: - No callback for id=" + iqid);
     }
 
     this.client.send(iq.root());
@@ -562,9 +572,6 @@ LogCatcher.prototype.handleIq = function(iq) {
     else if (iq.attrs.type === 'set' && iq.getChildByAttr('xmlns', 'http://jabber.org/protocol/ibb')) {
         // We have an inbound IBB log request.
         if (this.IBB) {
-            if (this.notifier) {
-                this.notifier.sendMessage('Got IBB Log-Catcher request. Opening transfer.');
-            }
             this.IBB.ProcessIQ(iq);
         }
 
@@ -694,7 +701,7 @@ var notify = new Notifier({jid: 'overseer@video.gocast.it', password: 'the.overs
 //
 // Login as Switchboard operator
 //
-var logcatcher = new LogCatcher("logcatcher@video.gocast.it", "log.catcher.gocast", notify);
+var logcatcher = new LogCatcher("logcatcher@video.gocast.it/logcatcher", "log.catcher.gocast", notify);
 //*/
 
 var ibb = new GoCastJS.IBBTransfer(function (tosend_back) {
