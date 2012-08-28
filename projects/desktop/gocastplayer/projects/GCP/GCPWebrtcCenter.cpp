@@ -1309,9 +1309,12 @@ namespace GoCast
         }
         else
         {
-            if(0 < m_remoteStreams[pluginId]->video_tracks()->count())
+            if(NULL != m_remoteStreams[pluginId].get())
             {
-                m_remoteStreams[pluginId]->video_tracks()->at(0)->SetRenderer(NULL);
+                if(0 < m_remoteStreams[pluginId]->video_tracks()->count())
+                {
+                    m_remoteStreams[pluginId]->video_tracks()->at(0)->SetRenderer(NULL);
+                }
             }
             RemoveRemoteStream(pluginId);
         }
