@@ -644,9 +644,27 @@ var Callcast = {
 
     InitGocastPlayer: function(jqSelector, success, failure) {
         if (!this.localplayer) {
+            var mediaHints = {audio: true, video: true};
+            var settings = JSON.parse(window.localStorage['gcpsettings'] || '{}');
+            mediaHints = GoCastJS.Utils.joinObjects(mediaHints, settings);
+
+            if (true === mediaHints.video) {
+                if (!($(jqSelector).get(0).videoinopts[mediaHints.videoin])) {
+                    mediaHints.videoin = $(jqSelector).get(0).videoinopts['default'] || '';
+                }
+            }
+            if (true === mediaHints.audio) {
+                if (-1 === $(jqSelector).get(0).audioinopts.indexOf(mediaHints.audioin)) {
+                    mediaHints.audioin = $(jqSelector).get(0).audioinopts[0] || '';
+                }
+                if (-1 === $(jqSelector).get(0).audiooutopts.indexOf(mediaHints.audioout)) {
+                    mediaHints.audioout = $(jqSelector).get(0).audiooutopts[0] || '';
+                }                
+            }
+
             GoCastJS.getUserMedia(
                     new GoCastJS.UserMediaOptions(
-                        {audio: true, video: true},
+                        mediaHints,
                         $(jqSelector).get(0)
                     ),
                     function(stream) {

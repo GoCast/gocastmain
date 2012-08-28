@@ -632,7 +632,12 @@ namespace GoCast
     bool RtcCenter::GetSpkMute(bool* pbEnabled) const
     {
         return m_pConnFactory->channel_manager()->GetOutputMute(pbEnabled);
-    }    
+    }
+    
+    bool RtcCenter::GetMicVol(int* pLevel) const
+    {
+        return m_pConnFactory->channel_manager()->GetInputVolume(pLevel);
+    }
     
     std::string RtcCenter::GetLocalVideoTrackEffect() const
     {
@@ -667,6 +672,16 @@ namespace GoCast
         {
             m_pLocalStream->audio_tracks()->at(0)->set_enabled(bEnable);
         }
+    }
+    
+    bool RtcCenter::SetSpkVol(int level)
+    {
+        return m_pConnFactory->channel_manager()->SetOutputVolume(level);
+    }
+    
+    bool RtcCenter::SetMicVol(int level)
+    {
+        return m_pConnFactory->channel_manager()->SetInputVolume(level);
     }
     
     void RtcCenter::SetLocalVideoTrackRenderer(const talk_base::scoped_refptr
@@ -1288,12 +1303,17 @@ namespace GoCast
 
 			if(0 < m_pLocalStream->video_tracks()->count())
 			{
+                m_pLocalStream->video_tracks()->at(0)->SetRenderer(NULL);
 				m_pLocalStream->video_tracks()->at(0)->set_enabled(false);
 			}
         }
         else
         {
-             RemoveRemoteStream(pluginId);
+            if(0 < m_remoteStreams[pluginId]->video_tracks()->count())
+            {
+                m_remoteStreams[pluginId]->video_tracks()->at(0)->SetRenderer(NULL);
+            }
+            RemoveRemoteStream(pluginId);
         }
         
         FBLOG_INFO_CUSTOM("RtcCenter::DeletePeerConnection_w",

@@ -68,6 +68,19 @@ FB::variant GCPAPI::get_volume()
     return level;
 }
 
+FB::variant GCPAPI::get_micvolume()
+{
+    int level;
+    GoCast::RtcCenter* pCtr = GoCast::RtcCenter::Instance();
+    
+    if(false == pCtr->Inited() || false == pCtr->GetMicVol(&level))
+    {
+        level = -1;
+    }
+    
+    return level;
+}
+
 FB::JSObjectPtr GCPAPI::get_onaddstream()
 {
     return m_onaddstreamCb;
@@ -188,6 +201,32 @@ void GCPAPI::set_source(const FB::JSAPIPtr& stream)
             (GoCast::RtcCenter::Instance())->SetRemoteVideoTrackRenderer(m_htmlId.convert_cast<std::string>(),
 		                                                                 getPlugin()->Renderer());
 		}
+    }
+}
+
+void GCPAPI::set_volume(FB::variant volume)
+{
+    int level = volume.convert_cast<int>();
+    GoCast::RtcCenter* pCtr = GoCast::RtcCenter::Instance();
+    
+    if(level > 255) level = 255;
+    if(level < 0)   level = 0;
+    if(true == pCtr->Inited())
+    {
+        pCtr->SetSpkVol(level); 
+    }
+}
+
+void GCPAPI::set_micvolume(FB::variant volume)
+{
+    int level = volume.convert_cast<int>();
+    GoCast::RtcCenter* pCtr = GoCast::RtcCenter::Instance();
+    
+    if(level > 255) level = 255;
+    if(level < 0)   level = 0;
+    if(true == pCtr->Inited())
+    {
+        pCtr->SetMicVol(level); 
     }
 }
 

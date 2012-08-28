@@ -158,10 +158,26 @@ select {
 	font-size: 30px;
 }
 
+.icon-small {
+	font-size: 15px;
+}
+
+.icon-right {
+	float: right;
+	padding-right: 5px;
+}
+
 .icon-entypo {
 	color: white;
 	font-family: 'EntypoRegular', sans-serif;
 	font-size: 55px;
+}
+
+.slider {
+	margin-left: 5px;
+	max-width: 187px;
+	min-width: 187px;
+	font-size: 7px;
 }
 
 .error {

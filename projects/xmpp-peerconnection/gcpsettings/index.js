@@ -3,17 +3,40 @@ var SettingsUI = {
 	$micselect: null,
 	$spkselect: null,
 	$effects: null,
+	$spkvol: null,
+	$savesettings: null,
 	timer: null,
 
-	init: function(camselect, micselect, spkselect, effects) {
-		this.$camselect = $(camselect);
+	init: function() {
+		this.$camselect = $('#cameraselect');
 		this.$camselect.change(this.deviceChangedCallback());
-		this.$micselect = $(micselect);
+		this.$micselect = $('#micselect');
 		this.$micselect.change(this.deviceChangedCallback());
-		this.$spkselect = $(spkselect);
+		this.$spkselect = $('#spkselect');
 		this.$spkselect.change(this.deviceChangedCallback());
-		this.$effects = $(effects);
+		this.$effects = $('#effectselect');
 		this.$effects.change(this.effectChangedCallback());
+
+		this.$spkvol = $('#spkvol');
+		this.$spkvol.slider({
+			min: 0,
+			max: 255,
+			step: 25,
+			value: SettingsApp.spkVol(),
+			slide: function(evt, ui) { SettingsApp.spkVol(ui.value); }
+		});
+
+		this.$micvol = $('#micvol');
+		this.$micvol.slider({
+			min: 0,
+			max: 255,
+			step: 25,
+			value: SettingsApp.micVol(),
+			slide: function(evt, ui) { SettingsApp.micVol(ui.value); }
+		});
+
+		this.$savesettings = $('#savesettings');
+		this.$savesettings.click(this.savesettingsClickedCallback());
 	},
 
 	enableEffectsSelect: function(enable) {
@@ -77,6 +100,14 @@ var SettingsUI = {
 		this.deviceChangedCallback()();
 	},
 
+	updateSpkVol: function(newVol) {
+		this.$spkvol.slider('option', 'value', newVol);
+	},
+
+	updateMicVol: function(newVol) {
+		this.$micvol.slider('option', 'value', newVol);
+	},
+
 	deviceChangedCallback: function() {
 		var self = this;
 
@@ -104,6 +135,24 @@ var SettingsUI = {
 		return function() {
 			SettingsApp.applyEffect(self.$effects.val());
 		};
+	},
+
+	savesettingsClickedCallback: function() {
+		var self = this;
+
+		return function() {
+			var settings = {
+				videoin: self.$camselect.val(),
+				audioin: self.$micselect.val(),
+				audioout: self.$spkselect.val()
+			};
+			var targetUrl = ('' !== document.referrer)?
+							document.referrer:
+							('http://' + window.location.hostname);
+
+			window.localStorage['gcpsettings'] = JSON.stringify(settings);
+			window.location.href = targetUrl;
+		};
 	}
 };
 
@@ -114,10 +163,33 @@ var SettingsApp = {
 	localStream: null,
 	remoteStream: null,
 	peerConnection: null,
+	deviceChecker: null,
 
-	init: function(local, remote) {
-		this.$localplayer = $(local);
-		this.$remoteplayer = $(remote);
+	init: function() {	 		 
+		this.$localplayer = $(document.getElementById('local'));
+		this.$remoteplayer = $(document.getElementById('remote'));
+		GoCastJS.SetDevicesChangedListener(1000, this.$localplayer.get(0),
+									   	   this.devicesChangedCallback());
+		GoCastJS.SetSpkVolListener(500, this.$localplayer.get(0),
+								   this.spkVolChangedCallback());
+		GoCastJS.SetMicVolListener(500, this.$localplayer.get(0),
+								   this.micVolChangedCallback());
+	},
+
+	spkVol: function(level) {
+		if (level) {
+			this.$localplayer.get(0).volume = level;
+		} else {
+			return this.$localplayer.get(0).volume;
+		}
+	},
+
+	micVol: function(level) {
+		if (level) {
+			this.$localplayer.get(0).micvolume = level;
+		} else {
+			return this.$localplayer.get(0).micvolume;
+		}
 	},
 
 	testSettings: function(mediaHints) {
@@ -180,6 +252,18 @@ var SettingsApp = {
 
 				SettingsUI.updateSpks(spks, newSpk);
 			}
+		}
+	},
+
+	spkVolChangedCallback: function() {
+		return function(newVol) {
+			SettingsUI.updateSpkVol(newVol);
+		}
+	},
+
+	micVolChangedCallback: function() {
+		return function(newVol) {
+			SettingsUI.updateMicVol(newVol);
 		}
 	},
 
@@ -282,10 +366,6 @@ var SettingsApp = {
 };
 
 $(document).ready(function() {
-	SettingsUI.init('#cameraselect', '#micselect',
-					'#spkselect', '#effectselect');
-	SettingsApp.init(document.getElementById('local'),
-			 		 document.getElementById('remote'));
-	GoCastJS.SetDevicesChangedListener(1000, SettingsApp.$localplayer.get(0),
-									   SettingsApp.devicesChangedCallback());
+	SettingsApp.init();
+	SettingsUI.init();
 });
