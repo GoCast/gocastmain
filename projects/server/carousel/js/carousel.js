@@ -49,12 +49,12 @@
 
   Item.prototype.updateSize = function(item)
   {
-      this.orgWidth = item.orgWidth;
-      this.orgHeight = item.orgHeight;
-      this.plgOrgWidth = item.plgOrgWidth;
-      this.plgOrgHeight = item.plgOrgHeight;
-      this.orgChatWidth = item.orgChatWidth;
-      this.orgChatBot = item.orgChatBot;
+    this.orgWidth = item.orgWidth;
+    this.orgHeight = item.orgHeight;
+    this.plgOrgWidth = item.plgOrgWidth;
+    this.plgOrgHeight = item.plgOrgHeight;
+    this.orgChatWidth = item.orgChatWidth;
+    this.orgChatBot = item.orgChatBot;
   };
   Item.prototype.addControls = function() // add controls to spot
   {
@@ -80,7 +80,20 @@
       $('.control', this).css('visibility', 'hidden');
     });
   };
-
+  ///
+  /// \brief change size of spot contents when physical spot size changes (due to spin or resize)
+  ///
+  Item.prototype.scale = function(scale)
+  {
+    var wbCanvas = $("#wbCanvas", this.object), // todo optimize
+        wb       = wbCanvas.data("wb");
+    if (wb)
+    {
+      //todo size to parent div, not spot
+      wb.setScale(this.plgOrgWidth * scale, this.plgOrgHeight * scale);
+    }
+  };
+  
   /// \brief a numerically ordered collection of Item with insert an delete
   var Items = function() // jslint waiver
   {
@@ -160,7 +173,12 @@
     item.index = this.getNewIndex();
     this.set(item.index, item);
   };
-  // call item.updateSize on all items
+  ///
+  /// \brief call item.updateSize on all items
+  ///        when carousel is resized
+  ///
+  /// \see scale for item size changes when carousel is spun
+  ///
   Items.prototype.updateItemSizes = function(newItem)
   {
     this.iterateSorted(function(item)
@@ -227,8 +245,18 @@
     // click on addItem
     $('#addItem', container).click(function(event)
     {
-       //ctx.addItem();
-       Callcast.AddSpot({spottype: "new"});
+       Callcast.AddSpot({spottype: "new"}, function()
+        {
+          console.log("carousel addItem callback");
+        });
+    });
+    // click on addWhiteBoard
+    $('#addWhiteBoard', container).click(function(event)
+    {
+       Callcast.AddSpot({spottype: "whiteBoard", spotreplace: "first-unoc"}, function()
+        {
+          console.log("carousel addWhiteBoard callback");
+        });
     });
     // mouseover
     /*
@@ -467,6 +495,7 @@
             obj.style.top = y + px;
             // Adjust object dimensions.
             ctx.adjPlugin(item, scale);
+            item.scale(scale);
 
             $(obj).find('div.name').css('font-size', (item.orgFontSize * scale) + px);
             // >>0 = Math.foor(). Firefox doesn't like fractional decimals in z-index.
@@ -677,6 +706,7 @@
         this.item.plgOrgHeight *= scale;
         this.item.orgChatWidth *= scale;
         this.item.orgChatBot *= scale;
+        this.item.scale(scale); // todo refactor with above, currently only scales whiteboard
 
         // update items in list
         items.updateItemSizes(this.item);
