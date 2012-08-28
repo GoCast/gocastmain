@@ -5,6 +5,7 @@
 
 "use strict";
 /*jslint sloppy: false, todo: true, white: true, browser: true, devel: true */
+/*global Callcast */
 
 var GoCastJS = ('undefined' !== typeof(GoCastJS)) ? GoCastJS : {};
 GoCastJS = (null !== GoCastJS) ? GoCastJS : {};
@@ -15,6 +16,7 @@ GoCastJS.WhiteBoardMouse = function(whiteBoard)
   this.UP   = "up";
 
   this.state = this.UP;
+  this.currentCommand = null; // the current path see mouse handlers
 };
 
 GoCastJS.WhiteBoardMouse.prototype.offsetEvent = function(event)
@@ -79,6 +81,28 @@ GoCastJS.WhiteBoard.prototype.init = function()
 }; // whiteboard init
 
 ///
+/// \brief send mouse command to server
+///
+GoCastJS.WhiteBoard.prototype.sendMouseCommand = function()
+{
+  var spotnumber = this.jqParent.attr('spotnumber'), // todo refactor spotnumber location
+      cmd        = {spotnumber: spotnumber, spottype: "whiteBoardCommand", whiteboardcommand: JSON.stringify(this.mouse.currentCommand)};
+  console.log("WhiteBoard.sendMouseCommand", cmd);
+  Callcast.SetSpot(cmd);
+};
+///
+/// \brief do received mouse command
+///
+/// \throw
+///
+GoCastJS.WhiteBoard.prototype.doCommand = function(info)
+{
+  var cmd; // the received command array
+  if (!info) {throw "WhiteBoard.doCommand info is null";}
+  if (!info.whiteboardcommand) {throw "WhiteBoard.doCommand info.whiteboardcommand is null";}
+  console.log("WhiteBoard.doCommand info.whiteBoardCommand", info.whiteboardcommand);
+  cmd = JSON.parse(info.whiteboardCommand);
+};
 /// \brief rezise the canvas, set css dimensions and scale member var
 /// 
 /// \arg width, height the target sizes as integers
@@ -127,6 +151,9 @@ GoCastJS.WhiteBoard.prototype.onMouseDown = function(event)
   wb.mouse.state = wb.mouse.DOWN;
   wb.wbCtx.beginPath();
   wb.wbCtx.moveTo(x, y);
+  wb.mouse.currentCommand = []; // new command array to be sent to server
+  wb.mouse.currentCommand.push({name: 'beginPath'});
+  wb.mouse.currentCommand.push({name: 'moveTo', x: x, y: y});
   // temp
   //wb.wbCtx.fillStyle = "blue";
   //wb.wbCtx.fillRect(5, 5, 490, 490);
@@ -149,6 +176,9 @@ GoCastJS.WhiteBoard.prototype.onMouseUp = function(event)
   // todo make sure event is a JQuery event
   if (wb.mouse.DOWN === wb.mouse.state) {
     wb.wbCtx.closePath();
+    wb.mouse.currentCommand.push({name: 'closePath'});
+    wb.sendMouseCommand();
+    wb.mouse.currentCommand = null;
   }
   wb.mouse.state = wb.mouse.UP;
 };
@@ -169,5 +199,7 @@ GoCastJS.WhiteBoard.prototype.onMouseMove = function(event)
   if (wb.mouse.DOWN === wb.mouse.state){
     wb.wbCtx.lineTo(x, y);
     wb.wbCtx.stroke();
+    wb.mouse.currentCommand.push({name: 'lineTo', x: x, y: y});
+    wb.mouse.currentCommand.push({name: 'stroke', x: x, y: y});
   }
 };

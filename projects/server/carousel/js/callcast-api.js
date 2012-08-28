@@ -378,23 +378,23 @@ $(document).on('connected', function(
   app.log(2, 'User is connected.');
 
   /* debug
-// Inside $(document).bind('connected'), function() { ....
+  // Inside $(document).bind('connected'), function() { ....
 
-Callcast.connection.xmlInput = function(data) {
-                if ($(data).children()[0])
-                        console.log("XML-IN:", $(data).children()[0]);
-                else
-                        console.log("XML-IN:", $(data));
+  Callcast.connection.xmlInput = function(data) {
+    if ($(data).children()[0]) {
+      console.log("XML-IN:", $(data).children()[0]);
+    } else {
+      console.log("XML-IN:", $(data));
+    }
+  };
 
-        };
-
-Callcast.connection.xmlOutput = function(data) {
-                if ($(data).children()[0])
-                        console.log("XML-OUT:", $(data).children()[0]);
-                else
-                        console.log("XML-OUT:", $(data));
-
-        };
+  Callcast.connection.xmlOutput = function(data) {
+    if ($(data).children()[0]) {
+      console.log("XML-OUT:", $(data).children()[0]);
+    } else {
+      console.log("XML-OUT:", $(data));
+    }
+  };
 
    */
 
@@ -747,6 +747,17 @@ function doSpot(spotDiv, info)
       jqDiv.attr('spotnumber', info.spotnumber);
       jqDiv.removeClass('unoccupied').addClass('typeContent');
       whiteBoard = new GoCastJS.WhiteBoard(spotDiv);
+    }
+    else if (info.spottype === 'whiteBoardCommand')
+    {
+      var wbCanvas = $("#wbCanvas", spotDiv),
+          wb       = wbCanvas.data("wb");
+      if (wb) {
+        wb.doCommand(info);
+      } else {
+        console.log("whiteBoardCommand error, can't find wb", info);
+        throw "can't find whiteboard for spot " + info.spotnumber;
+      }
     }
     else if (info.spottype === 'url')
     {
