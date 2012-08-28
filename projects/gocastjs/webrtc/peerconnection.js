@@ -3,7 +3,7 @@ GoCastJS = (null !== GoCastJS) ? GoCastJS : {};
 
 GoCastJS.Utils = {
     joinObjects: function(a, b) {
-        return (JSON.parse((JSON.stringify(o) + JSON.stringify(obj)).
+        return (JSON.parse((JSON.stringify(a) + JSON.stringify(b)).
                 replace(/}{/g, ',').
                 replace(/{,/g, '{').
                 replace(/,}/g, '}')));
