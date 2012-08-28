@@ -113,14 +113,14 @@ GoCastJS.WhiteBoard.prototype.doCommands = function(info)
     return;
   }
   cmds = JSON.parse(info.whiteboardcommandarray);
-  console.log("WhiteBoard.doCommands", info, cmds);
+  //console.log("WhiteBoard.doCommands", info, cmds);
   this.mouseCommands = []; // replace commands
   for (i = 0; i < cmds.length; ++i)
   {
     this.doCommand(cmds[i]);
     this.mouseCommands.push(cmds[i]); // add command to local list
   }
-  console.log("WhiteBoard.doCommands cmds ", this.mouseCommands);
+  //console.log("WhiteBoard.doCommands cmds ", this.mouseCommands);
 };
 ///
 /// \brief do received mouse command
@@ -130,7 +130,7 @@ GoCastJS.WhiteBoard.prototype.doCommands = function(info)
 GoCastJS.WhiteBoard.prototype.doCommand = function(cmdArray)
 {
   var i, cmd;
-  console.log("WhiteBoard.doCommand", cmdArray);
+  //console.log("WhiteBoard.doCommand", cmdArray);
   for (i = 0; i < cmdArray.length; ++i) {
     //console.log("cmd", cmdArray[i]);
     switch (cmdArray[i].name) {
@@ -196,7 +196,7 @@ GoCastJS.WhiteBoard.prototype.onMouseDown = function(event)
        x = event.offsetX / wb.scaleW,
        y = event.offsetY / wb.scaleH;
   event.stopPropagation();
-  console.log('wb.onMouseDown x' + event.offsetX + '(' + x + ') y ' + event.offsetY + '(' + y + ')' , event);
+  //console.log('wb.onMouseDown x' + event.offsetX + '(' + x + ') y ' + event.offsetY + '(' + y + ')' , event);
   wb.mouse.offsetEvent(event);
   // todo make sure event is a JQuery event
   wb.mouse.state = wb.mouse.DOWN;
@@ -217,7 +217,7 @@ GoCastJS.WhiteBoard.prototype.onMouseUp = function(event)
   var wb = $(this).data("wb"),
        x = event.offsetX / wb.scaleW,
        y = event.offsetY / wb.scaleH;
-  console.log('wb.onMouseUp x' + event.offsetX + '(' + x + ') y ' + event.offsetY + '(' + y + ')' , event);
+  //console.log('wb.onMouseUp x' + event.offsetX + '(' + x + ') y ' + event.offsetY + '(' + y + ')' , event);
   wb.mouse.offsetEvent(event);
   event.stopPropagation();
   // todo make sure event is a JQuery event
