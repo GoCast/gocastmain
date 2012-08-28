@@ -214,6 +214,8 @@ var SettingsApp = {
 
 	devicesChangedCallback: function() {
 		var localplayer = this.$localplayer.get(0);
+		var firstCall = true;
+		var settings = JSON.parse(window.localStorage['gcpsettings'] || '{}');
 
 		return function(camsAdded, camsRemoved, micsAdded,
 						micsRemoved, spksAdded, spksRemoved) {
@@ -221,7 +223,8 @@ var SettingsApp = {
 				var cameras = localplayer.videoinopts;
 				var newCamera = '';
 				if (0 < camsAdded.length) {
-					newCamera = camsAdded[0];
+					newCamera = firstCall ? (settings.videoin||camsAdded[0]) :
+					            camsAdded[0];
 				} else if (GoCastJS.Video.captureDevice === camsRemoved[0]) {
 					newCamera = (newCamera || cameras['default']);
 				}
@@ -233,7 +236,8 @@ var SettingsApp = {
 				var mics = localplayer.audioinopts;
 				var newMic = '';
 				if (0 < micsAdded.length) {
-					newMic = micsAdded[0];
+					newMic = firstCall ? (settings.audioin||micsAdded[0]) :
+					         micsAdded[0];
 				} else if (GoCastJS.Audio.inputDevice === micsRemoved[0]) {
 					newMic = (newMic || mics['default']);
 				}
@@ -245,11 +249,13 @@ var SettingsApp = {
 				var spks = localplayer.audiooutopts;
 				var newSpk = '';
 				if (0 < spksAdded.length) {
-					newSpk = spksAdded[0];
+					newSpk = firstCall ? (settings.audioout||spksAdded[0]) :
+					         spksAdded[0];
 				} else if (GoCastJS.Audio.outputDevice === spksRemoved[0]) {
 					newSpk = (newSpk || spks['default']);
 				}
 
+				firstCall = false;
 				SettingsUI.updateSpks(spks, newSpk);
 			}
 		}
