@@ -27,7 +27,8 @@ GoCastJS.Audio = {
     inputDevice: '',
     outputDevices: [],
     outputDevice: '',
-    spkVol: 256
+    spkVol: 256,
+    micVol: 256
 };
 
 //!
@@ -225,6 +226,29 @@ GoCastJS.SetSpkVolListener = function(checkInterval,
         }
     }, checkInterval);
 };
+
+//!
+//! function: GoCastJS.SetMicVolListener(volCheckInterval,
+//!                                      localplayer,
+//!                                      onMicVolChanged)
+//!
+//! arguments:
+//!     checkInterval    <milliseconds>     : interval for volume check
+//!     localPlayer      <HtmlObject>       : plugin used for local preview
+//!     onMicVolChanged  <function(newVol)> : callback for volume change
+//!
+//! returns: the setInterval identifier (used to clear interval)
+//!
+GoCastJS.SetMicVolListener = function(checkInterval,
+                                      localplayer,
+                                      onMicVolChanged) {
+    return setInterval(function() {
+        if (GoCastJS.Audio.micVol !== localplayer.micvolume) {
+            GoCastJS.Audio.micVol = localplayer.micvolume;
+            onMicVolChanged(GoCastJS.Audio.micVol);
+        }
+    }, checkInterval);
+}
 
 //!
 //! function: GoCastJS.SetDevicesChangedListener(checkInterval,
