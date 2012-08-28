@@ -1303,12 +1303,17 @@ namespace GoCast
 
 			if(0 < m_pLocalStream->video_tracks()->count())
 			{
+                m_pLocalStream->video_tracks()->at(0)->SetRenderer(NULL);
 				m_pLocalStream->video_tracks()->at(0)->set_enabled(false);
 			}
         }
         else
         {
-             RemoveRemoteStream(pluginId);
+            if(0 < m_remoteStreams[pluginId]->video_tracks()->count())
+            {
+                m_remoteStreams[pluginId]->video_tracks()->at(0)->SetRenderer(NULL);
+            }
+            RemoveRemoteStream(pluginId);
         }
         
         FBLOG_INFO_CUSTOM("RtcCenter::DeletePeerConnection_w",
