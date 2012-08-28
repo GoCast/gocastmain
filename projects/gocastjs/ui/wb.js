@@ -19,13 +19,17 @@ GoCastJS.WhiteBoardMouse = function(whiteBoard)
   this.currentCommand = []; // the current path see mouse handlers
 };
 
+///
+/// \brief calc mouse x,y relative to target across browser
+///
 GoCastJS.WhiteBoardMouse.prototype.offsetEvent = function(event)
 {
   var targetOffset = $(event.target).offset(),
       offX         = event.pageX - targetOffset.left,
       offY         = event.pageY - targetOffset.top;
-  console.log("event offsetX " + event.offsetX + "offX " + offX);
-  console.log("event offsetY " + event.offsetY + "offY " + offY);
+  //console.log("event offsetX " + event.offsetX + "offX " + offX);
+  //console.log("event offsetY " + event.offsetY + "offY " + offY);
+  return ({x:offX, y:offY});
   /*
   //firefox doesn't set event.offset[X,Y]
   if (typeof event.offsetX === "undefined" || typeof event.offsetY === "undefined") {
@@ -193,11 +197,11 @@ GoCastJS.WhiteBoard.prototype.resize = function(width, height)
 GoCastJS.WhiteBoard.prototype.onMouseDown = function(event)
 {
   var wb = $(this).data("wb"),
-       x = event.offsetX / wb.scaleW,
-       y = event.offsetY / wb.scaleH;
+      point = wb.mouse.offsetEvent(event),
+      x = point.x / wb.scaleW,
+      y = point.y / wb.scaleH;
   event.stopPropagation();
   //console.log('wb.onMouseDown x' + event.offsetX + '(' + x + ') y ' + event.offsetY + '(' + y + ')' , event);
-  wb.mouse.offsetEvent(event);
   // todo make sure event is a JQuery event
   wb.mouse.state = wb.mouse.DOWN;
   wb.wbCtx.beginPath();
@@ -215,8 +219,9 @@ GoCastJS.WhiteBoard.prototype.onMouseDown = function(event)
 GoCastJS.WhiteBoard.prototype.onMouseUp = function(event)
 {
   var wb = $(this).data("wb"),
-       x = event.offsetX / wb.scaleW,
-       y = event.offsetY / wb.scaleH;
+      point = wb.mouse.offsetEvent(event),
+      x = point.x / wb.scaleW,
+      y = point.y / wb.scaleH;
   //console.log('wb.onMouseUp x' + event.offsetX + '(' + x + ') y ' + event.offsetY + '(' + y + ')' , event);
   wb.mouse.offsetEvent(event);
   event.stopPropagation();
@@ -239,8 +244,9 @@ GoCastJS.WhiteBoard.prototype.onMouseUp = function(event)
 GoCastJS.WhiteBoard.prototype.onMouseMove = function(event)
 {
   var wb = $(this).data("wb"),
-       x = event.offsetX / wb.scaleW,
-       y = event.offsetY / wb.scaleH;
+      point = wb.mouse.offsetEvent(event),
+      x = point.x / wb.scaleW,
+      y = point.y / wb.scaleH;
   //console.log('wb.onMouseMove x' + event.offsetX + '(' + x + ') y ' + event.offsetY + '(' + y + ')' , event);
   event.stopPropagation();
   // todo make sure event is a JQuery event
