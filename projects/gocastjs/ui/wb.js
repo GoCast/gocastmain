@@ -97,11 +97,33 @@ GoCastJS.WhiteBoard.prototype.sendMouseCommand = function()
 ///
 GoCastJS.WhiteBoard.prototype.doCommand = function(info)
 {
-  var cmd; // the received command array
+  var cmds, i; // the received command array
   if (!info) {throw "WhiteBoard.doCommand info is null";}
   if (!info.whiteboardcommand) {throw "WhiteBoard.doCommand info.whiteboardcommand is null";}
   console.log("WhiteBoard.doCommand info.whiteBoardCommand", info.whiteboardcommand);
-  cmd = JSON.parse(info.whiteboardCommand);
+  cmds = JSON.parse(info.whiteboardcommand);
+  for (i = 0; i < cmds.length; ++i) {
+    console.log("cmd", cmds[i]);
+    switch (cmds[i].name) {
+      case "beginPath":
+        this.wbCtx.beginPath();
+        break;
+      case "closePath":
+        this.wbCtx.closePath();
+        break;
+      case "moveTo":
+        this.wbCtx.moveTo(cmds[i].x, cmds[i].y);
+        break;
+      case "lineTo":
+        this.wbCtx.lineTo(cmds[i].x, cmds[i].y);
+        break;
+      case "stroke":
+        this.wbCtx.stroke();
+      break;
+      default:
+         throw "WhiteBoard.doCommand info.whiteboardcommand unknown cmd " + cmds[i].name;
+    }
+  }
 };
 /// \brief rezise the canvas, set css dimensions and scale member var
 /// 
@@ -200,6 +222,6 @@ GoCastJS.WhiteBoard.prototype.onMouseMove = function(event)
     wb.wbCtx.lineTo(x, y);
     wb.wbCtx.stroke();
     wb.mouse.currentCommand.push({name: 'lineTo', x: x, y: y});
-    wb.mouse.currentCommand.push({name: 'stroke', x: x, y: y});
+    wb.mouse.currentCommand.push({name: 'stroke'});
   }
 };
