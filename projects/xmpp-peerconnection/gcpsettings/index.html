@@ -2,8 +2,10 @@
 <html>
 	<head>
 		<title>GoCastPlayer Settings</title>
+		<link rel="stylesheet" type="text/css" href="style/jquery-ui.css" />
 		<link rel="stylesheet" type="text/css" href="style/index.css" />
 		<script type="text/javascript" src="jquery-1.7.2.dev.js"></script>
+		<script type="text/javascript" src="jquery-ui-1.8.22.custom.min.js"></script>
 		<script type="text/javascript" src="peerconnection.js"></script>
 		<script type="text/javascript" src="index.js"></script>
 	</head>
@@ -48,12 +50,35 @@
 								</tr>
 								<tr>
 									<td>
+										&nbsp;&nbsp;&nbsp;&nbsp;
+									</td>
+									<td>
+										<span class="icon-picto icon-small">0</span>
+										<span class="icon-picto icon-small icon-right">2</span>
+										<div id="micvol" class="slider">
+										</div>&nbsp;
+									</td>
+								</tr>
+								<tr>
+									<td>
 										<span class="icon-picto">2</span>
 									</td>
 									<td>
 										<select id="spkselect" disabled="true">
 										</select>&nbsp;
 									</td>
+								</tr>
+								<tr>
+									<td>
+										&nbsp;&nbsp;&nbsp;&nbsp;
+									</td>
+									<td>
+										<span class="icon-picto icon-small">0</span>
+										<span class="icon-picto icon-small icon-right">2</span>
+										<div id="spkvol" class="slider">
+										</div>&nbsp;
+									</td>
+								</tr>
 									<td>
 										<object id="remote"
 											title="how others see you"

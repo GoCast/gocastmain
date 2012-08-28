@@ -1,6 +1,15 @@
 var GoCastJS = ('undefined' !== typeof(GoCastJS)) ? GoCastJS : {};
 GoCastJS = (null !== GoCastJS) ? GoCastJS : {};
 
+GoCastJS.Utils = {
+    joinObjects: function(a, b) {
+        return (JSON.parse((JSON.stringify(o) + JSON.stringify(obj)).
+                replace(/}{/g, ',').
+                replace(/{,/g, '{').
+                replace(/,}/g, '}')));
+    }
+};
+
 //!
 //! GoCastJS.Video.devices[]     : array of available video devices (guids)
 //! GoCastJS.Video.captureDevice : current capture device (guid)
@@ -27,7 +36,8 @@ GoCastJS.Audio = {
     inputDevice: '',
     outputDevices: [],
     outputDevice: '',
-    spkVol: 256
+    spkVol: 256,
+    micVol: 256
 };
 
 //!
@@ -225,6 +235,29 @@ GoCastJS.SetSpkVolListener = function(checkInterval,
         }
     }, checkInterval);
 };
+
+//!
+//! function: GoCastJS.SetMicVolListener(volCheckInterval,
+//!                                      localplayer,
+//!                                      onMicVolChanged)
+//!
+//! arguments:
+//!     checkInterval    <milliseconds>     : interval for volume check
+//!     localPlayer      <HtmlObject>       : plugin used for local preview
+//!     onMicVolChanged  <function(newVol)> : callback for volume change
+//!
+//! returns: the setInterval identifier (used to clear interval)
+//!
+GoCastJS.SetMicVolListener = function(checkInterval,
+                                      localplayer,
+                                      onMicVolChanged) {
+    return setInterval(function() {
+        if (GoCastJS.Audio.micVol !== localplayer.micvolume) {
+            GoCastJS.Audio.micVol = localplayer.micvolume;
+            onMicVolChanged(GoCastJS.Audio.micVol);
+        }
+    }, checkInterval);
+}
 
 //!
 //! function: GoCastJS.SetDevicesChangedListener(checkInterval,
