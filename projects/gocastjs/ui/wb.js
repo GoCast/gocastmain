@@ -54,6 +54,8 @@ GoCastJS.WhiteBoard = function(spot)
   this.parent = spot;           // the parent dom object
   this.jqParent = $(this.parent); // the parent jq object
 
+  this.mouseCommands = []; // array of mouse commands
+
   this.init(); // initialize
 }; // whiteboard constructor
 
@@ -83,11 +85,13 @@ GoCastJS.WhiteBoard.prototype.init = function()
 ///
 /// \brief send mouse command to server
 ///
-GoCastJS.WhiteBoard.prototype.sendMouseCommand = function()
+/// \throw
+///
+GoCastJS.WhiteBoard.prototype.sendSpot = function()
 {
   var spotnumber = this.jqParent.attr('spotnumber'), // todo refactor spotnumber location
-      cmd        = {spotnumber: spotnumber, spottype: "whiteBoardCommand", whiteboardcommand: JSON.stringify(this.mouse.currentCommand)};
-  console.log("WhiteBoard.sendMouseCommand", cmd);
+      cmd        = {spotnumber: spotnumber, spottype: "whiteBoard", whiteboardcommandarray: JSON.stringify(this.mouseCommands)};
+  console.log("WhiteBoard.sendSpot", cmd);
   Callcast.SetSpot(cmd);
 };
 ///
@@ -95,16 +99,31 @@ GoCastJS.WhiteBoard.prototype.sendMouseCommand = function()
 ///
 /// \throw
 ///
-GoCastJS.WhiteBoard.prototype.doCommand = function(info)
+GoCastJS.WhiteBoard.prototype.doCommands = function(info)
 {
-  var cmds, i; // the received command array
-  if (!info) {throw "WhiteBoard.doCommand info is null";}
-  if (!info.whiteboardcommand) {throw "WhiteBoard.doCommand info.whiteboardcommand is null";}
-  console.log("WhiteBoard.doCommand info.whiteBoardCommand", info.whiteboardcommand);
-  cmds = JSON.parse(info.whiteboardcommand);
-  for (i = 0; i < cmds.length; ++i) {
-    console.log("cmd", cmds[i]);
-    switch (cmds[i].name) {
+  if (!info) {throw "WhiteBoard.doCommands info is null";}
+  if (!info.whiteboardcommandarray) // no commands, must be a new whiteboard
+  {
+    return;
+  }
+  var i, cmds = JSON.parse(info.whiteboardcommandarray);
+  for (i = 0; i < cmds.length; ++i)
+  {
+    this.doCommand(cmds[i]);
+  }
+};
+///
+/// \brief do received mouse command
+///
+/// \throw
+///
+GoCastJS.WhiteBoard.prototype.doCommand = function(cmdArray)
+{
+  var i, cmd;
+  console.log("WhiteBoard.doCommand", cmdArray);
+  for (i = 0; i < cmdArray.length; ++i) {
+    console.log("cmd", cmdArray[i]);
+    switch (cmdArray[i].name) {
       case "beginPath":
         this.wbCtx.beginPath();
         break;
@@ -112,16 +131,16 @@ GoCastJS.WhiteBoard.prototype.doCommand = function(info)
         this.wbCtx.closePath();
         break;
       case "moveTo":
-        this.wbCtx.moveTo(cmds[i].x, cmds[i].y);
+        this.wbCtx.moveTo(cmdArray[i].x, cmdArray[i].y);
         break;
       case "lineTo":
-        this.wbCtx.lineTo(cmds[i].x, cmds[i].y);
+        this.wbCtx.lineTo(cmdArray[i].x, cmdArray[i].y);
         break;
       case "stroke":
         this.wbCtx.stroke();
       break;
       default:
-         throw "WhiteBoard.doCommand info.whiteboardcommand unknown cmd " + cmds[i].name;
+         throw "WhiteBoard.doCommand unknown cmd " + cmdArray[i].name;
     }
   }
 };
@@ -199,8 +218,9 @@ GoCastJS.WhiteBoard.prototype.onMouseUp = function(event)
   if (wb.mouse.DOWN === wb.mouse.state) {
     wb.wbCtx.closePath();
     wb.mouse.currentCommand.push({name: 'closePath'});
-    wb.sendMouseCommand();
+    wb.mouseCommands.push(wb.mouse.currentCommand);
     wb.mouse.currentCommand = null;
+    wb.sendSpot();
   }
   wb.mouse.state = wb.mouse.UP;
 };

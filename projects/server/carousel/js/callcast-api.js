@@ -719,8 +719,10 @@ function removeContentFromCarousel(
 /// the possible actions so far
 /// are defined in info.spottype and can be
 /// "youtube" play a youtube video
-/// "url" display the url title and favicon
+/// "url" display the url image in the spot and add a link to open
 /// "new" add an empty spot (does nothing here)
+/// "whiteBoard" add or update the whiteboard in the spot
+///
 function doSpot(spotDiv, info)
 {
   try
@@ -739,22 +741,26 @@ function doSpot(spotDiv, info)
     }
     else if (info.spottype === 'whiteBoard')
     {
-      // todo give wb unique id
-      jqDiv.attr('id', app.str2id('whiteBoard' + info.spotnumber));
-      jqDiv.attr('title', 'whiteBoard');
-      jqDiv.attr('alt', 'whiteBoard');
-      jqDiv.attr('encname', 'whiteBoard');
-      jqDiv.attr('spotnumber', info.spotnumber);
-      jqDiv.removeClass('unoccupied').addClass('typeContent');
-      whiteBoard = new GoCastJS.WhiteBoard(spotDiv);
-    }
-    else if (info.spottype === 'whiteBoardCommand')
-    {
-      var wbCanvas = $("#wbCanvas", spotDiv),
-          wb       = wbCanvas.data("wb");
-      if (wb) {
-        wb.doCommand(info);
-      } else {
+      if (info.cmdtype === "addspot") // set spot attr's for new whiteboard
+      {
+        jqDiv.attr('id', app.str2id('whiteBoard' + info.spotnumber));
+        jqDiv.attr('title', 'whiteBoard');
+        jqDiv.attr('alt', 'whiteBoard');
+        jqDiv.attr('encname', 'whiteBoard');
+        jqDiv.attr('spotnumber', info.spotnumber);
+        jqDiv.removeClass('unoccupied').addClass('typeContent');
+        whiteBoard = new GoCastJS.WhiteBoard(spotDiv);
+      }
+      else // get existing whiteboard
+      {
+        whiteBoard = $("#wbCanvas", spotDiv).data("wb");
+      }
+      if (whiteBoard) // play any commands in info
+      {
+        whiteBoard.doCommands(info);
+      } 
+      else // error, couldn't find wb
+      {
         console.log("whiteBoardCommand error, can't find wb", info);
         throw "can't find whiteboard for spot " + info.spotnumber;
       }
