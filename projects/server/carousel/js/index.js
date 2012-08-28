@@ -1302,6 +1302,8 @@ function resizeWindows(
 function resizeZoom(event)
 {
    var jqDiv = $('#meeting > #zoom > .cloudcarousel'),
+       wbCanvas = $("#wbCanvas", jqDiv), // todo better wb access
+       wb       = wbCanvas.data("wb"),
        width, height, item, newWidth, newHeight,
        widthScale, heightScale, scale, left, top;
    if (jqDiv.length > 0)
@@ -1318,7 +1320,10 @@ function resizeZoom(event)
       item.orgHeight *= scale;
       item.plgOrgWidth *= scale;
       item.plgOrgHeight *= scale;
-      item.scale(scale); // todo refactor with above, currently only scales whiteboard
+      if (wb) // todo better wb access
+      {
+        wb.setScale(item.plgOrgWidth, item.plgOrgHeight);
+      }
 
       // center div in zoom div
       left = (width - item.orgWidth) / 2;
