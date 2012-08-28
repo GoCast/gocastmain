@@ -1,6 +1,15 @@
 var GoCastJS = ('undefined' !== typeof(GoCastJS)) ? GoCastJS : {};
 GoCastJS = (null !== GoCastJS) ? GoCastJS : {};
 
+GoCastJS.Utils = {
+    joinObjects: function(a, b) {
+        return (JSON.parse((JSON.stringify(o) + JSON.stringify(obj)).
+                replace(/}{/g, ',').
+                replace(/{,/g, '{').
+                replace(/,}/g, '}')));
+    }
+};
+
 //!
 //! GoCastJS.Video.devices[]     : array of available video devices (guids)
 //! GoCastJS.Video.captureDevice : current capture device (guid)

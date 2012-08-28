@@ -4,6 +4,7 @@ var SettingsUI = {
 	$spkselect: null,
 	$effects: null,
 	$spkvol: null,
+	$savesettings: null,
 	timer: null,
 
 	init: function() {
@@ -33,6 +34,9 @@ var SettingsUI = {
 			value: SettingsApp.micVol(),
 			slide: function(evt, ui) { SettingsApp.micVol(ui.value); }
 		});
+
+		this.$savesettings = $('#savesettings');
+		this.$savesettings.click(this.savesettingsClickedCallback());
 	},
 
 	enableEffectsSelect: function(enable) {
@@ -130,6 +134,24 @@ var SettingsUI = {
 
 		return function() {
 			SettingsApp.applyEffect(self.$effects.val());
+		};
+	},
+
+	savesettingsClickedCallback: function() {
+		var self = this;
+
+		return function() {
+			var settings = {
+				videoin: self.$camselect.val(),
+				audioin: self.$micselect.val(),
+				audioout: self.$spkselect.val()
+			};
+			var targetUrl = ('' !== document.referrer)?
+							document.referrer:
+							('http://' + window.location.hostname);
+
+			window.localStorage['gcpsettings'] = JSON.stringify(settings);
+			window.location.href = targetUrl;
 		};
 	}
 };

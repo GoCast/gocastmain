@@ -644,9 +644,13 @@ var Callcast = {
 
     InitGocastPlayer: function(jqSelector, success, failure) {
         if (!this.localplayer) {
+            var mediaHints = {audio: true, video: true};
+            var settings = JSON.parse(window.localStorage['gcpsettings'] || '{}');
+            mediaHints = GoCastJS.Utils.joinObjects(mediaHints, settings);
+
             GoCastJS.getUserMedia(
                     new GoCastJS.UserMediaOptions(
-                        {audio: true, video: true},
+                        mediaHints,
                         $(jqSelector).get(0)
                     ),
                     function(stream) {
