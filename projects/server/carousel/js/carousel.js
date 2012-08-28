@@ -49,8 +49,6 @@
 
   Item.prototype.updateSize = function(item)
   {
-    var wbCanvas = $("#wbCanvas", this.object),
-        wb       = wbCanvas.data("wb");
     this.orgWidth = item.orgWidth;
     this.orgHeight = item.orgHeight;
     this.plgOrgWidth = item.plgOrgWidth;
@@ -708,6 +706,7 @@
         this.item.plgOrgHeight *= scale;
         this.item.orgChatWidth *= scale;
         this.item.orgChatBot *= scale;
+        this.item.scale(scale); // todo refactor with above, currently only scales whiteboard
 
         // update items in list
         items.updateItemSizes(this.item);

@@ -924,10 +924,22 @@ function setSpotCb(info)
   // for setSpot there must be an item in the carousel with info.spotnumber
   if (!item)
   {
+    // try zoomed spot
+    item = $('#meeting > #zoom > .cloudcarousel').data('item');
+    if (item.spotnumber === info.spotnumber)
+    {
+      item = zoomedItem;
+    }
+  }
+  if (!item)
+  {
     app.log(4, "spot with number " + info.spotnumber + " does not exist");
   }
-  doSpot(item.object, info);
-  app.carousel.updateAll(); // redraw carousel
+  else
+  {
+    doSpot(item.object, info);
+    app.carousel.updateAll(); // redraw carousel
+  }
 }
 
 ///

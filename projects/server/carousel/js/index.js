@@ -1318,6 +1318,7 @@ function resizeZoom(event)
       item.orgHeight *= scale;
       item.plgOrgWidth *= scale;
       item.plgOrgHeight *= scale;
+      item.scale(scale); // todo refactor with above, currently only scales whiteboard
 
       // center div in zoom div
       left = (width - item.orgWidth) / 2;
