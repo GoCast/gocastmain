@@ -1,5 +1,3 @@
-@import url(http://fonts.googleapis.com/css?family=Quicksand:300,400);
-
 @font-face {
     font-family: 'ModernPictogramsNormal';
     src: url('fonts/modernpictograms/modernpics-webfont.eot');
@@ -20,6 +18,15 @@
          url('fonts/entypo/Entypo-webfont.svg#EntypoRegular') format('svg');
     font-weight: normal;
     font-style: normal;
+}
+
+@font-face {
+	font-family: 'GillSans';
+	src: url('fonts/gillsans/gillsans.eot');
+	src: url('fonts/gillsans/gillsans.eot#iefix') format('embedded-opentype'),
+		 url('fonts/gillsans/gillsans.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
 }
 
 html {
@@ -47,8 +54,9 @@ body {
 
 #pagetitle {
 	color: #C4C4C4;
-	font-family: 'Quicksand', sans-serif;
-	font-weight: 300;
+	font-family: 'GillSans', sans-serif;
+	font-weight: normal;
+	letter-spacing: 3px;
 }
 
 #views {
@@ -113,15 +121,16 @@ select {
 }
 
 .button {
-	margin: 20%;
-	padding: 15px;
+	padding-left: 5px;
+	padding-right: 5px;
 	border-radius: 5px;
 	-webkit-border-radius: 5px;
 	-moz-border-radius: 5px;	
 	text-decoration: none;
 	text-align: center;
-	font-family: sans-serif;
+	font-family: 'GillSans', sans-serif;
 	font-size: 20px;
+	letter-spacing: 3px;
 	background-color: #4169E1;
 	color: white;
 }
@@ -137,9 +146,8 @@ select {
 }
 
 #buttons {
-	margin-left: 20%;
+	margin-left: 15%;
 	margin-right: 20%;
-	margin-top: 20px;
 	text-align: center;
 }
 
