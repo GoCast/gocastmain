@@ -255,22 +255,23 @@ var SettingsApp = {
 					newSpk = (newSpk || spks['default']);
 				}
 
-				firstCall = false;
 				SettingsUI.updateSpks(spks, newSpk);
 			}
-		}
+
+			firstCall = false;
+		};
 	},
 
 	spkVolChangedCallback: function() {
 		return function(newVol) {
 			SettingsUI.updateSpkVol(newVol);
-		}
+		};
 	},
 
 	micVolChangedCallback: function() {
 		return function(newVol) {
 			SettingsUI.updateMicVol(newVol);
-		}
+		};
 	},
 
 	getUserMediaSuccessCallback: function() {
