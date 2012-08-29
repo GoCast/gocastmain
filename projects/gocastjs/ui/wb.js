@@ -89,7 +89,7 @@ GoCastJS.WhiteBoard = function(spot)
   this.scaleH = 1.0;
   this.WB_DIV = '<div id="wbDiv" class="wbDiv"></div>'; // a container div
   this.WB_PEN_WIDTH = '<select class="wbSel"><option value="1">1</option><option value="3">3</option><option value="5">5</option><option value="7">7</option><option value="11">11</option></select>';
-  this.WB_PEN_COLOR = '<select class="wbSel"><option value="#000">Black</option><option value="#F00">Red</option><option value="#00F">Blue</option><option value="neon">Neon</option></select>';
+  this.WB_PEN_COLOR = '<select class="wbSel"><option value="#000">Black</option><option value="#F00">Red</option><option value="#00F">Blue</option><option value="#FD6703">Orange</option></select>';
 
   // the canvas html see init for jq, dom objects
   this.WB_CANVAS = '<canvas id="wbCanvas" class="wbCanvas" width="' + this.width + '" height="' + this.height + '"></canvas>';
