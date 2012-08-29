@@ -40,6 +40,44 @@ GoCastJS.WhiteBoardMouse.prototype.offsetEvent = function(event)
 };
 
 ///
+/// \brief whiteboard settings object
+///
+GoCastJS.WhiteBoardSettings = function()
+{
+  this.lineJoin = "round";
+  this.strokeStyle = "#00F";
+  this.lineWidth = 5;
+};
+///
+/// \brief apply settings to canvas
+///
+/// \arg context the canvas 2d context
+///
+GoCastJS.WhiteBoardSettings.prototype.apply = function(context)
+{
+  // configure canvas
+  context.lineJoin    = this.lineJoin;
+  context.strokeStyle = this.strokeStyle;
+  context.lineWidth   = this.lineWidth;
+};
+///
+/// \brief apply settings to canvas from a JSON object
+///
+/// \arg recieved json object with context settings
+///
+/// \throw
+///
+GoCastJS.WhiteBoardSettings.prototype.applyJson = function(settings, context)
+{
+  if (!settings)             {throw "WhiteBoardSettings.applyJson received settings is null";}
+  if (!settings.lineJoin)    {throw "WhiteBoardSettings.applyJson received settings lineJoin is null";}
+  if (!settings.strokeStyle) {throw "WhiteBoardSettings.applyJson received settings strokeStyle is null";}
+  if (!settings.lineWidth)   {throw "WhiteBoardSettings.applyJson received settings lineWidth is null";}
+  context.lineJoin    = settings.lineJoin;
+  context.strokeStyle = settings.strokeStyle;
+  context.lineWidth   = settings.lineWidth;
+};
+///
 /// \brief white board constuctor
 ///
 GoCastJS.WhiteBoard = function(spot)
@@ -50,11 +88,15 @@ GoCastJS.WhiteBoard = function(spot)
   this.scaleW = 1.0;
   this.scaleH = 1.0;
   this.WB_DIV = '<div id="wbDiv" class="wbDiv"></div>'; // a container div
+  this.WB_PEN_WIDTH = '<select class="wbSel"><option value="1">1</option><option value="3">3</option><option value="5">5</option><option value="7">7</option><option value="11">11</option></select>';
+  this.WB_PEN_COLOR = '<select class="wbSel"><option value="#000">Black</option><option value="#F00">Red</option><option value="#00F">Blue</option><option value="neon">Neon</option></select>';
 
   // the canvas html see init for jq, dom objects
   this.WB_CANVAS = '<canvas id="wbCanvas" class="wbCanvas" width="' + this.width + '" height="' + this.height + '"></canvas>';
 
   this.mouse = new GoCastJS.WhiteBoardMouse(this); // the mouse state
+  this.settings = new GoCastJS.WhiteBoardSettings();
+
   this.parent = spot;           // the parent dom object
   this.jqParent = $(this.parent); // the parent jq object
 
@@ -64,7 +106,7 @@ GoCastJS.WhiteBoard = function(spot)
 }; // whiteboard constructor
 
 ///
-/// \brief append  dom objects to parent and style them
+/// \brief init whiteboard
 ///
 GoCastJS.WhiteBoard.prototype.init = function()
 {
@@ -72,14 +114,29 @@ GoCastJS.WhiteBoard.prototype.init = function()
   this.jqWb     = $(this.WB_DIV).appendTo(this.jqParent);
   this.jqCanvas = $(this.WB_CANVAS).appendTo(this.jqWb);
   this.wbCanvas = this.jqCanvas[0];
-  this.wbCtx    = this.jqCanvas[0].getContext("2d");
+  this.wbCtx    = this.wbCanvas.getContext("2d");
+
+  // add controls and handlers
+  $(this.WB_PEN_WIDTH).appendTo(this.jqWb).data("wb", this).change(function(event)
+  {
+    var wb = $(this).data("wb"),
+        val = $(this).val();
+    console.log("wb pen width change", val);
+    wb.settings.lineWidth = val;
+    wb.settings.apply(wb.wbCtx);
+  }).val(this.settings.lineWidth);
+  $(this.WB_PEN_COLOR).appendTo(this.jqWb).data("wb", this).change(function(event)
+  {
+    var wb = $(this).data("wb"),
+        val = $(this).val();
+    console.log("wb pen color change", val);
+    wb.settings.strokeStyle = val;
+    wb.settings.apply(wb.wbCtx);
+  }).val(this.settings.strokeStyle);
 
   this.jqCanvas.data("wb", this); // create ref for handlers todo better way?
 
-  // configure canvas
-  this.wbCanvas.lineJoin = "round";
-  this.wbCtx.strokeStyle = "#00F";
-  this.wbCtx.lineWidth = 5;
+  this.settings.apply(this.wbCtx);
 
   // install handlers
   this.jqCanvas.mousedown(this.onMouseDown);
@@ -110,7 +167,7 @@ GoCastJS.WhiteBoard.prototype.sendSpot = function()
 ///
 GoCastJS.WhiteBoard.prototype.doCommands = function(info)
 {
-  var i, cmd, cmds;
+  var i, cmds;
   if (!info) {throw "WhiteBoard.doCommands info is null";}
   if (!info.whiteboardcommandarray) // no commands, must be a new whiteboard
   {
@@ -139,10 +196,13 @@ GoCastJS.WhiteBoard.prototype.doCommand = function(cmdArray)
     //console.log("cmd", cmdArray[i]);
     switch (cmdArray[i].name) {
       case "beginPath":
+        this.wbCtx.save();
+        this.settings.applyJson(cmdArray[i].settings, this.wbCtx);
         this.wbCtx.beginPath();
         break;
       case "closePath":
         this.wbCtx.closePath();
+        this.wbCtx.restore();
         break;
       case "moveTo":
         this.wbCtx.moveTo(cmdArray[i].x, cmdArray[i].y);
@@ -169,7 +229,7 @@ GoCastJS.WhiteBoard.prototype.setScale = function(width, height)
   this.scale = (wScale + hScale) / 2; // isotropic, keep aspect ratio
   this.scaleW = wScale;
   this.scaleH = hScale;
-  console.log("scale width " + width + " height " + height + " wScale" + wScale + " hScale " + hScale + " scale " + this.scale);
+  //console.log("scale width " + width + " height " + height + " wScale" + wScale + " hScale " + hScale + " scale " + this.scale);
   this.wbCanvas.style.width = width + "px";
   this.wbCanvas.style.height = height + "px";
 };
@@ -207,8 +267,8 @@ GoCastJS.WhiteBoard.prototype.onMouseDown = function(event)
   wb.wbCtx.beginPath();
   wb.wbCtx.moveTo(x, y);
   wb.mouse.currentCommand = []; // new command array to be sent to server
-  wb.mouse.currentCommand.push({name: 'beginPath'});
-  wb.mouse.currentCommand.push({name: 'moveTo', x: x, y: y});
+  wb.mouse.currentCommand.push({name: 'beginPath', settings: wb.settings});
+  wb.mouse.currentCommand.push({name: 'moveTo', x: (x >> 0), y: (y >> 0)});
 };
 
 ///
@@ -253,7 +313,7 @@ GoCastJS.WhiteBoard.prototype.onMouseMove = function(event)
   if (wb.mouse.DOWN === wb.mouse.state){
     wb.wbCtx.lineTo(x, y);
     wb.wbCtx.stroke();
-    wb.mouse.currentCommand.push({name: 'lineTo', x: x, y: y});
+    wb.mouse.currentCommand.push({name: 'lineTo', x: (x >> 0), y: (y >> 0)});
     wb.mouse.currentCommand.push({name: 'stroke'});
   }
 };
