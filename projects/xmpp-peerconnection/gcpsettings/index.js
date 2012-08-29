@@ -40,9 +40,13 @@ var SettingsUI = {
 	},
 
 	enableEffectsSelect: function(enable) {
+		var settings = JSON.parse(window.localStorage['gcpsettings'] || '{}');
 		this.$effects.attr('disabled', !enable);
 		if (false === enable) {
 			this.$effects.val('');
+		} else {
+			this.$effects.val(settings['effect'] || 'none');
+			this.effectChangedCallback()();
 		}
 	},
 
@@ -144,7 +148,9 @@ var SettingsUI = {
 			var settings = {
 				videoin: self.$camselect.val(),
 				audioin: self.$micselect.val(),
-				audioout: self.$spkselect.val()
+				audioout: self.$spkselect.val(),
+				effect: (('' !== self.$effects.val()) ? 
+						 self.$effects.val() : 'none')
 			};
 			var targetUrl = ('' !== document.referrer)?
 							document.referrer:

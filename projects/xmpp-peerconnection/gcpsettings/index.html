@@ -14,6 +14,19 @@
 			<h1 id="pagetitle"><span id="pageicon">(</span> settings</h1>
 			<div id="views">
 				<ul id="viewslist">
+					<li id="localitem" class="viewitem">
+						<div id="localcontainer" class="view">
+							<object id="local"
+									title="how you see yourself"
+									type="application/x-gocastplayer"
+									width="320"
+									height="240">
+							</object>
+							<div id="errmsg" class="error" style="display: none">
+								<span class="icon-picto">!</span> Error
+							</div>
+						</div>
+					</li>
 					<li id="settingsitem" class="viewitem">
 						<div id="settings" class="view borderless">
 							<table id="settingstable">
@@ -96,23 +109,24 @@
 							</table>
 						</div>
 					</li>
-					<li id="localitem" class="viewitem">
-						<div id="localcontainer" class="view">
-							<object id="local"
-									title="how you see yourself"
-									type="application/x-gocastplayer"
-									width="320"
-									height="240">
-							</object>
-							<div id="errmsg" class="error" style="display: none">
-								<span class="icon-picto">!</span> Error
-							</div>
-						</div>
-					</li>
 				</ul>
 			</div>
 			<div id="settingsdescription">
-				0
+				<h3>Tips:</h3><p />
+				<ul id="tipslist">
+					<li>
+						Try out different combinations of cameras, microphones and speakers. You should be able
+						to see yourself in the preview window and hear yourself when you speak.
+					</li>
+					<li>
+						If you're not hearing yourself speak, make sure your microphone and speakers are unmuted
+						and have high enough volumes.
+					</li>
+					<li>
+						Click the <span style="font-weight: bold;">save</span> button to save your settings and go
+						back to your room.
+					</li>
+				</ul>
 			</div>
 		</div>
 	</body>

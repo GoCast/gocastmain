@@ -37,7 +37,7 @@ body {
 	/* Dimensions */
 	height: 100%;
 	min-width: 1100px;
-	margin-left: 50px;
+	margin-left: 200px;
 	margin-right: 100px;
 
 	/* Background */
@@ -152,12 +152,12 @@ select {
 }
 
 #settingsdescription {
-	display: none;
 	margin-top: 15px;
 	border-radius: 5px;
 	-webkit-border-radius: 5px;
 	-moz-border-radius: 5px;	
 	background-color: #C4C4C4;
+	opacity: 0.5;
 }
 
 .icon-picto {
