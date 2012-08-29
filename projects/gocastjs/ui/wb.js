@@ -89,7 +89,15 @@ GoCastJS.WhiteBoard = function(spot)
   this.scaleH = 1.0;
   this.WB_DIV = '<div id="wbDiv" class="wbDiv"></div>'; // a container div
   this.WB_PEN_WIDTH = '<select class="wbSel"><option value="1">1</option><option value="3">3</option><option value="5">5</option><option value="7">7</option><option value="11">11</option></select>';
-  this.WB_PEN_COLOR = '<select class="wbSel"><option value="#000">Black</option><option value="#F00">Red</option><option value="#00F">Blue</option><option value="#FD6703">Orange</option></select>';
+  //this.WB_PEN_COLOR = '<select class="wbSel"><option value="#000">Black</option><option value="#F00">Red</option><option value="#00F">Blue</option><option value="#FD6703">Orange</option></select>';
+  this.WB_PEN_COLOR = '<select class="wbSel">\
+                         <option value="#000">Black</option>\
+                         <option value="#F00">Red</option>\
+                         <option value="#00F">Blue</option>\
+                         <option value="rgba(253, 103, 3, 0.05)">Orange</option>\
+                         <option value="#FFF">White</option>\
+                       </select>';
+  this.WB_ERASE_BUTTON = '<input type="checkbox" id="erase" /><label for="check">Eraser</label>';
 
   // the canvas html see init for jq, dom objects
   this.WB_CANVAS = '<canvas id="wbCanvas" class="wbCanvas" width="' + this.width + '" height="' + this.height + '"></canvas>';
@@ -133,7 +141,10 @@ GoCastJS.WhiteBoard.prototype.init = function()
     wb.settings.strokeStyle = val;
     wb.settings.apply(wb.wbCtx);
   }).val(this.settings.strokeStyle);
-
+  //$(this.WB_ERASE_BUTTON).appendTo(this.jqWb).data("wb", this).button().click(function(event)
+  //{
+  //  console.log("wb eraser click");
+  //});
   this.jqCanvas.data("wb", this); // create ref for handlers todo better way?
 
   this.settings.apply(this.wbCtx);
