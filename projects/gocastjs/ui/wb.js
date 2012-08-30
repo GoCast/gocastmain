@@ -97,7 +97,7 @@ GoCastJS.WhiteBoard = function(spot)
                          <option value="rgba(253, 103, 3, 0.05)">Orange</option>\
                          <option value="#FFF">White</option>\
                        </select>';
-  this.WB_ERASE_BUTTON = '<input type="checkbox" id="erase" /><label for="check">Eraser</label>';
+  this.WB_ERASE_BUTTON = '<input type="checkbox" class="ui-button-icon-only" id="erase" /><label for="check">Eraser</label>';
 
   // the canvas html see init for jq, dom objects
   this.WB_CANVAS = '<canvas id="wbCanvas" class="wbCanvas" width="' + this.width + '" height="' + this.height + '"></canvas>';
@@ -141,10 +141,15 @@ GoCastJS.WhiteBoard.prototype.init = function()
     wb.settings.strokeStyle = val;
     wb.settings.apply(wb.wbCtx);
   }).val(this.settings.strokeStyle);
-  //$(this.WB_ERASE_BUTTON).appendTo(this.jqWb).data("wb", this).button().click(function(event)
-  //{
-  //  console.log("wb eraser click");
-  //});
+  /*
+  $(this.WB_ERASE_BUTTON).appendTo(this.jqWb)
+                         .data("wb", this)
+                         .button()
+                         .click(function(event)
+  {
+    console.log("wb eraser click");
+  });
+  */
   this.jqCanvas.data("wb", this); // create ref for handlers todo better way?
 
   this.settings.apply(this.wbCtx);
@@ -153,6 +158,7 @@ GoCastJS.WhiteBoard.prototype.init = function()
   this.jqCanvas.mousedown(this.onMouseDown);
   this.jqCanvas.mousemove(this.onMouseMove);
   this.jqCanvas.mouseup(this.onMouseUp);
+  this.jqCanvas.mouseout(this.onMouseUp); // trigger mouseup on mouseout todo capture mouse and detect mouseup outside of target
 
 }; // whiteboard init
 
