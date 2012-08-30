@@ -926,10 +926,6 @@ function setSpotCb(info)
   {
     // try zoomed spot
     item = $('#meeting > #zoom > .cloudcarousel').data('item');
-    if (item.spotnumber === info.spotnumber)
-    {
-      item = zoomedItem;
-    }
   }
   if (!item)
   {
@@ -1075,8 +1071,8 @@ function setLocalSpeakerStatus(vol)
   // display volume warning
   if (app.volWarningDisplayed === false)             // check volume only on first callback
   {
-    if($.cookie("stopVolumeStatus") !== "checked" && // and if user has not disabled the check
-      (vol < 255*0.07) )                             // if vol is below threshold
+    if(window.localStorage.stopVolumeStatus !== "checked" && // and if user has not disabled the check
+      (vol < 255*0.07) )                                     // if vol is below threshold
     {
       $(app.STATUS_PROMPT).css("display", "block");  // display warning
     }

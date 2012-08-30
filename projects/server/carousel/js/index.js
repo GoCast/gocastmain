@@ -213,7 +213,7 @@ var app = {
   userLoggedIn: false,
   pluginLoaded: false,
   pluginUpgrade: false,
-  volWarningDisplayed: false, // set to true when vol warning display code executes, it may or may not the warning depending on the cookie
+  volWarningDisplayed: false, // set to true when vol warning display code executes, it may or may not the warning depending on localstorage
   // carousel controller instance
   carousel: null,
   /*
@@ -1056,7 +1056,7 @@ function stopStatusClicked(event)
 {
    var checked = $(app.STATUS_PROMPT_STOP).attr("checked");
    console.log("stopStatusChecked", checked);
-   $.cookie("stopVolumeStatus", checked);
+   window.localStorage.stopVolumeStatus = checked;
 }
 ///
 /// \brief status div close handler
