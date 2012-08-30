@@ -373,12 +373,15 @@ var SettingsApp = {
 		var self = this;
 
 		return function() {
-			console.log('PeerConnection: ReadyState = ' + self.peerConnection.ReadyState());
+			console.log('PeerConnection: ReadyState = ' +
+						self.peerConnection.ReadyState());
 		};
 	}
 };
 
 $(document).ready(function() {
-	SettingsApp.init();
-	SettingsUI.init();
+	$('body').fadeIn('slow', function() {
+		SettingsApp.init();
+		SettingsUI.init();
+	});
 });

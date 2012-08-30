@@ -34,6 +34,8 @@ html {
 }
 
 body {
+	display: none;
+
 	/* Dimensions */
 	height: 100%;
 	min-width: 1100px;
@@ -54,7 +56,7 @@ body {
 
 #pagetitle {
 	color: #C4C4C4;
-	font-family: 'GillSans', sans-serif;
+	font-family: 'GillSans', verdana;
 	font-weight: normal;
 	letter-spacing: 3px;
 }
@@ -85,7 +87,7 @@ body {
 	-moz-border-radius: 5px;
 	padding-left: 5px;
 	padding-right: 5px;
-	font-family: 'ModernPictogramsNormal', sans-serif;
+	font-family: 'ModernPictogramsNormal', verdana;
 	font-size: 30px;
 }
 
@@ -128,8 +130,8 @@ select {
 	-moz-border-radius: 5px;	
 	text-decoration: none;
 	text-align: center;
-	font-family: 'GillSans', sans-serif;
-	font-size: 20px;
+	font-family: 'GillSans', verdana;
+	font-size: 15px;
 	letter-spacing: 3px;
 	background-color: #4169E1;
 	color: white;
@@ -152,17 +154,39 @@ select {
 }
 
 #settingsdescription {
-	margin-top: 15px;
+	min-width: 400px;
+	max-width: 400px;
+	margin-top: 30px;
+	padding-top: 10px;
+	padding-bottom: 5px;
+	color: #F5F5F5;
+	font-family: verdana;
+	font-size: 10px;
+	font-weight: normal;
+}
+
+#settingsdescription li {
+	display: block;
+}
+
+#settingsdescription div {
+	margin-top: 20px;
+	margin-bottom: 20px;
+	text-align: justify;
+}
+
+#savespan {
+	font-weight: bold;
+	background-color: #4169E1;
+	padding: 5px;
 	border-radius: 5px;
 	-webkit-border-radius: 5px;
 	-moz-border-radius: 5px;	
-	background-color: #C4C4C4;
-	opacity: 0.5;
 }
 
 .icon-picto {
 	color: white;
-	font-family: 'ModernPictogramsNormal', sans-serif;
+	font-family: 'ModernPictogramsNormal', verdana;
 	font-size: 30px;
 }
 
@@ -177,7 +201,7 @@ select {
 
 .icon-entypo {
 	color: white;
-	font-family: 'EntypoRegular', sans-serif;
+	font-family: 'EntypoRegular', verdana;
 	font-size: 55px;
 }
 
