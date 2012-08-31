@@ -127,6 +127,18 @@ body > div#upper-right
   z-index: 1000;
   line-height: 2em;
 }
+body > div#upper-right > div#log
+{
+   float:right;
+   margin-right: 10px;
+   width:30px;
+   height:30px;
+   vertical-align: middle;
+   background-image: url("../images/vw.png");
+   background-repeat: no-repeat;
+   background-size: 100%;
+   z-index: 1000;
+}
 body > div#upper-right > div#settings
 {
    float:right;
@@ -504,6 +516,58 @@ div.cloudcarousel.typeContent > div.spotUrlTitle
   margin-left:auto;
   margin-right:auto;
   border-radius: 5px;  
+}
+div.wbPenW /* whiteboard pen width buttons */
+{
+  width: 20px;
+  height: 20px;
+  background-color: white;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  border: 1px solid;
+  border-radius: 3px;
+  margin-right: 0px;
+  float:left;
+}
+div.wbPenW.checked
+{
+  background-color: lightblue;
+}
+div.wbPenW.disabled
+{
+  background-color: gray;
+}
+div.wbPenColor /* whiteboard pen color button */
+{
+  width: 45px;
+  height: 20px;
+  background-color: white;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  border: 1px solid;
+  border-radius: 3px;
+  margin-left: 3px;
+  margin-right: 0px;
+  float:left;
+}
+div#wbPenColors
+{
+  position: absolute;
+  top: 0px;
+  left:0px;
+}
+table#wbPenColorTable
+{
+  background-color: white;
+  width: 45px;
+}
+table#wbPenColorTable td
+{
+  height: 17px;
+}
+table#wbPenColorTable td.check
+{
+  width: 17px;
 }
 div.wbDiv
 {
