@@ -505,6 +505,58 @@ div.cloudcarousel.typeContent > div.spotUrlTitle
   margin-right:auto;
   border-radius: 5px;  
 }
+div.wbPenW /* whiteboard pen width buttons */
+{
+  width: 20px;
+  height: 20px;
+  background-color: white;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  border: 1px solid;
+  border-radius: 3px;
+  margin-right: 0px;
+  float:left;
+}
+div.wbPenW.checked
+{
+  background-color: lightblue;
+}
+div.wbPenW.disabled
+{
+  background-color: gray;
+}
+div.wbPenColor /* whiteboard pen color button */
+{
+  width: 45px;
+  height: 20px;
+  background-color: white;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  border: 1px solid;
+  border-radius: 3px;
+  margin-left: 3px;
+  margin-right: 0px;
+  float:left;
+}
+div#wbPenColors
+{
+  position: absolute;
+  top: 0px;
+  left:0px;
+}
+table#wbPenColorTable
+{
+  background-color: white;
+  width: 45px;
+}
+table#wbPenColorTable td
+{
+  height: 17px;
+}
+table#wbPenColorTable td.check
+{
+  width: 17px;
+}
 div.wbDiv
 {
   background-color: white;

@@ -10,6 +10,177 @@
 var GoCastJS = ('undefined' !== typeof(GoCastJS)) ? GoCastJS : {};
 GoCastJS = (null !== GoCastJS) ? GoCastJS : {};
 
+///
+/// \brief the whiteboard toolbar
+///
+GoCastJS.WhiteBoardTools = function(whiteBoard)
+{
+  var button;
+  this.wb = whiteBoard;
+  this.DIV = '<div id="wbTools"></div>';
+
+  this.jqTools = $(this.DIV).appendTo(this.wb.jqWb); // todo encapsulate
+
+  // create pen width buttons
+  button = $('<div id="wbPenW1"  class="wbPenW" title="Pen Width 1"  penSize="1"></div>').appendTo(this.jqTools).click(this.penWidthClick).data('wb',this.wb);
+  this.initCanvas(button);
+  button = $('<div id="wbPenW5"  class="wbPenW" title="Pen Width 5"  penSize="5"></div>').appendTo(this.jqTools).click(this.penWidthClick).data('wb',this.wb);
+  this.initCanvas(button);
+  button = $('<div id="wbPenW7"  class="wbPenW" title="Pen Width 7"  penSize="7"></div>').appendTo(this.jqTools).click(this.penWidthClick).data('wb',this.wb);
+  this.initCanvas(button);
+  button = $('<div id="wbPenW11" class="wbPenW" title="Pen Width 11" penSize="11"></div>').appendTo(this.jqTools).click(this.penWidthClick).data('wb',this.wb);
+  this.initCanvas(button);
+
+  // create pen color button
+  button = $('<div id="wbPenColor" class="wbPenColor" title="Pen Color"></div>').appendTo(this.jqTools).click(this.penColorClick).data('wb',this.wb);
+  this.initCanvas(button);
+  this.initPenColors(this.jqTools);
+
+  this.drawTools(); // init toolbar
+};
+///
+/// \brief pen width button click handler
+///
+GoCastJS.WhiteBoardTools.prototype.penWidthClick = function(event)
+{
+  var penSize = $(this).attr('penSize'),
+      wb = $(this).data('wb');
+
+  console.log("wbPenW click", penSize, wb);
+  wb.settings.lineWidth = penSize;
+  wb.settings.apply(wb.wbCtx); // todo encapsulate
+  wb.tools.drawTools();
+};
+///
+/// \brief pen color button click handler
+///
+GoCastJS.WhiteBoardTools.prototype.penColorClick = function(event)
+{
+  var wb = $(this).data('wb');
+  console.log("wbPenColor click", this, wb);
+};
+///
+/// \brief add canvas, context, references to pen width buttons
+///
+GoCastJS.WhiteBoardTools.prototype.initCanvas = function(jqElem)
+{
+  var w = jqElem.width(),
+      h = jqElem.height(),
+      jqCanvas = $('<canvas width = ' + w + ' height = ' + h + '></canvas>').appendTo(jqElem),
+      ctx = jqCanvas[0].getContext('2d');
+  console.log("initCanvas ", w, h, jqElem);
+  jqElem.data("ctx", ctx).data('jqCanvas', jqCanvas); // set ref to context
+};
+///
+/// \brief add list of pen colors, canvas, context, references
+///
+GoCastJS.WhiteBoardTools.prototype.initPenColors = function(jqElem)
+{
+  // todo init from an array of objects
+  // todo better way?
+  var jqList = $('<div id="wbPenColors"></div>').appendTo(jqElem),
+      jqTable = $('<table id="wbPenColorTable"></table>').appendTo(jqList),
+      jqRow, jqTd;
+
+  jqRow = $('<tr id="black"></tr>').appendTo(jqTable);
+  jqTd = $('<td class="check"></td>').appendTo(jqRow);
+  jqTd = $('<td id="black" class="color" color="#000"></td>').appendTo(jqRow);
+  this.initCanvas(jqTd);
+  jqRow = $('<tr id="red"></tr>').appendTo(jqTable);
+  jqTd = $('<td class="check"></td>').appendTo(jqRow);
+  jqTd = $('<td id="blue" class="color" color="#F00"></td>').appendTo(jqRow);
+  this.initCanvas(jqTd);
+  jqRow = $('<tr id="blue"></tr>').appendTo(jqTable);
+  jqTd = $('<td class="check"></td>').appendTo(jqRow);
+  jqTd = $('<td id="blue" class="color" color="#00F"></td>').appendTo(jqRow);
+  this.initCanvas(jqTd);
+  jqRow = $('<tr id="orange"></tr>').appendTo(jqTable);
+  jqTd = $('<td class="check"></td>').appendTo(jqRow);
+  jqTd = $('<td id="orange" class="color" color="rgba(253, 103, 3, 0.05)"></td>').appendTo(jqRow);
+  this.initCanvas(jqTd);
+  jqRow = $('<tr id="white"></tr>').appendTo(jqTable);
+  jqTd = $('<td class="check"></td>').appendTo(jqRow);
+  jqTd = $('<td id="white" class="color" color="#FFF"></td>').appendTo(jqRow);
+  this.initCanvas(jqTd);
+
+  jqList.css("display", "none");
+};
+///
+/// \brief draw the tool images when the tool settings change
+///
+GoCastJS.WhiteBoardTools.prototype.drawTools = function()
+{
+  var canvas, ctx, w, h,
+      wb = this.wb; // closure var for each callback below
+  // set pen width button checked state
+  $(".wbPenW", this.jqTools).removeClass("checked"); // clear all checked state
+  $("#wbPenW" + this.wb.settings.lineWidth, this.jqTools).addClass("checked"); // set checked for current line width
+  $(".wbPenW", this.jqTools).each(function(index) // draw pen sizes in current pen color
+  {
+    var jqThis = $(this),
+        penSize = jqThis.attr('penSize'),
+        ctx = jqThis.data('ctx'),
+        jqCanvas = jqThis.data('jqCanvas'),
+        centerX = jqCanvas.attr('width') / 2,
+        centerY = jqCanvas.attr('height') / 2;
+    console.log("drawTools each", penSize, ctx, centerX, centerY);
+
+    // draw circle in strokeStyle
+    ctx.strokeStyle = wb.settings.strokeStyle;
+    ctx.fillStyle   = wb.settings.strokeStyle;
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, penSize/2, 0, 2 * Math.PI, false);
+    ctx.fill();
+  });
+  $(".wbPenColor", this.jqTools).each(function(index)
+  {
+    var jqThis = $(this),
+        penSize = wb.settings.lineWidth,
+        ctx = jqThis.data('ctx'),
+        jqCanvas = jqThis.data('jqCanvas'),
+        w = jqCanvas.attr('width'),
+        h = jqCanvas.attr('height'),
+        margin = 3,
+        downButtonWidth = 15,
+        downButtonMargin = 5;
+    console.log("drawTools wbPenColor", penSize, ctx, w, h, margin);
+
+    // draw down button
+    ctx.strokeStyle = '#000';
+    ctx.fillStyle = '#000';
+    ctx.lineWidth = 1;
+
+    // separate down button from pen color button
+    /*
+    ctx.beginPath();
+    ctx.moveTo(w - downButtonWidth, 0);
+    ctx.lineTo(w - downButtonWidth, h);
+    ctx.stroke();
+    ctx.closePath();
+    */
+    // draw down arrow
+    ctx.beginPath();
+    ctx.moveTo(w - downButtonWidth + downButtonMargin  ,     downButtonMargin);
+    ctx.lineTo(w                   - downButtonMargin  ,     downButtonMargin);
+    ctx.lineTo(w - downButtonWidth/2                   , h - downButtonMargin);
+    ctx.lineTo(w - downButtonWidth + downButtonMargin  ,     downButtonMargin);
+    ctx.fill();
+    ctx.stroke();
+    ctx.closePath();
+
+    // draw line in pen color and width todo hilite
+    ctx.strokeStyle = wb.settings.strokeStyle;
+    ctx.fillStyle   = wb.settings.strokeStyle;
+    ctx.beginPath();
+    ctx.moveTo(margin,     h/2);
+    ctx.lineTo(w - downButtonWidth - margin, h/2);
+    ctx.stroke();
+    ctx.closePath();
+  });
+};
+///
+/// /brief the whiteboard mouse event tracker
+///
 GoCastJS.WhiteBoardMouse = function(whiteBoard)
 {
   this.DOWN = "down";
@@ -88,15 +259,14 @@ GoCastJS.WhiteBoard = function(spot)
   this.scaleW = 1.0;
   this.scaleH = 1.0;
   this.WB_DIV = '<div id="wbDiv" class="wbDiv"></div>'; // a container div
-  this.WB_PEN_WIDTH = '<select class="wbSel"><option value="1">1</option><option value="3">3</option><option value="5">5</option><option value="7">7</option><option value="11">11</option></select>';
-  //this.WB_PEN_COLOR = '<select class="wbSel"><option value="#000">Black</option><option value="#F00">Red</option><option value="#00F">Blue</option><option value="#FD6703">Orange</option></select>';
-  this.WB_PEN_COLOR = '<select class="wbSel">\
-                         <option value="#000">Black</option>\
-                         <option value="#F00">Red</option>\
-                         <option value="#00F">Blue</option>\
-                         <option value="rgba(253, 103, 3, 0.05)">Orange</option>\
-                         <option value="#FFF">White</option>\
-                       </select>';
+  this.WB_PEN_WIDTH = '<select id="wbSelPenColor" class="wbSel"><option value="1">1</option><option value="3">3</option><option value="5">5</option><option value="7">7</option><option value="11">11</option></select>';
+  this.WB_PEN_COLOR = '<select id="wbSelPenColor" class="wbSel">'+
+                         '<option value="#000"                    data-imgsrc="images/btn-fb.png">Black</option>'+
+                         '<option value="#F00"                    data-imgsrc="images/btn-fb.png">Red</option>'+
+                         '<option value="#00F"                    data-imgsrc="images/btn-fb.png">Blue</option>'+
+                         '<option value="rgba(253, 103, 3, 0.05)" data-imgsrc="images/btn-fb.png">Orange</option>'+
+                         '<option value="#FFF"                    data-imgsrc="images/btn-fb.png">White</option>'+
+                       '</select>';
   this.WB_ERASE_BUTTON = '<input type="checkbox" class="ui-button-icon-only" id="erase" /><label for="check">Eraser</label>';
 
   // the canvas html see init for jq, dom objects
@@ -124,6 +294,9 @@ GoCastJS.WhiteBoard.prototype.init = function()
   this.wbCanvas = this.jqCanvas[0];
   this.wbCtx    = this.wbCanvas.getContext("2d");
 
+  this.tools = new GoCastJS.WhiteBoardTools(this); // add the toolboar
+
+  /*
   // add controls and handlers
   $(this.WB_PEN_WIDTH).appendTo(this.jqWb).data("wb", this).change(function(event)
   {
@@ -141,6 +314,7 @@ GoCastJS.WhiteBoard.prototype.init = function()
     wb.settings.strokeStyle = val;
     wb.settings.apply(wb.wbCtx);
   }).val(this.settings.strokeStyle);
+  */
   /*
   $(this.WB_ERASE_BUTTON).appendTo(this.jqWb)
                          .data("wb", this)
