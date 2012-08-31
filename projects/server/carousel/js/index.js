@@ -527,6 +527,7 @@ function openPersonalChat(
 ///
 function carouselItemClick(event)
 {
+  /*
   try
   {
     var urlName,
@@ -548,6 +549,7 @@ function carouselItemClick(event)
   } catch(err) {
     app.log(4, "carouselItemClick exception " + err);
   }
+  */
 } // carouselItemClick
 
 ///
@@ -1922,4 +1924,28 @@ function startPeopleContent()
                       spotimage: "url('images/person5.png')"
                       });
   }, 1800);
+}
+///
+/// \brief send log to server, display progress dialog
+/// todo create a separate div for log file upload
+///
+function sendLog()
+{
+  var jqDlg = $(app.STATUS_PROMPT).css("display", "block");  // display warning
+
+  jqDlg.css('background-image', 'url(images/waiting-trans.gif)');
+  $('#message', jqDlg).text('Sending log file to server.');
+  $('#stop-showing', jqDlg).css('display', 'none');
+  $('#stop-showing-text', jqDlg).css('display', 'none');
+  $('.close', jqDlg).css('display', 'none');
+  Callcast.SendLogsToLogCatcher(function()
+  {
+    // success callback
+    jqDlg.css("display", "none");
+    console.log("SendLogsToLogCatcher success", jqDlg);
+  },
+  function() // fail callback
+  {
+    Callcast.SendLiveLog("SendLogsToLogCatcher failed");
+  });
 }
