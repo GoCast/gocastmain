@@ -34,7 +34,6 @@
     <!--<script src="js/jquery-1.8.0.dev.js" type="text/javascript"></script> animate color does not work-->
     <script src="js/jquery-1.7.2.dev.js" type="text/javascript"></script>
     <script src="js/jquery.mousewheel.js" type="text/javascript"></script>
-    <script src="js/jquery.cookie.js" type="text/javascript"></script>
     <script src="js/jquery-ui-1.8.22.custom.min.js" type="text/javascript"></script>
     <!--<script type="text/javascript" src="js/swfobject.js"></script>-->
     <script src="/scripts/strophe.js"></script>
@@ -50,6 +49,7 @@
     <script src="js/carousel.js" type="text/javascript"></script>
     <script src="js/fb.js" type="text/javascript"></script>
     <script src="js/uiutil.js" type="text/javascript"></script>
+    <script src="js/wb.js" type="text/javascript"></script>
     <script src="js/index.js" type="text/javascript"></script>
     <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon" />
     <title>Gocast.it</title>
@@ -68,11 +68,12 @@
         <p id="stop-showing-text">Stop showing this message.</p>
         <img class="close" src="images/button-close.png" alt="Close" title="Close" onClick="closeStatus(event);"/>
       </div>
+      <div id="log" title="Send log file to GoCast." onClick="sendLog();"></div>
     </div>
     <div id="lower-right">
        <input id="dlbtn" type="button" title="Get Updated Plugin." onclick="doDownload();" />
        <!--<input class="vidbtn" type="button" title="Place video content." onclick="startVideoContent();" />-->
-       <input class="vidbtn" type="button" title="Place video content." onclick="startPeopleContent();" />
+       <input class="vidbtn" type="button" title="Place room content." onclick="startPeopleContent();" />
        <!--<input class="demobtn" type="button" title="Place demo content." onclick="startDemoContent();" />-->
        <input class="feedback" type="button" title="Send us your feedback." onclick="openChat(event);"/>
        <input class="copyData" type="button" title="Email link to room." onclick="openCopyData(event);"/>
@@ -231,6 +232,7 @@
           <div class="cloudcarousel unoccupied" onclick="carouselItemClick(event);">
             <div class="name"></div>
           </div>
+          <div id="addWhiteBoard" title="Add White Board"></div>
           <div id="addItem" >
           <img alt="Add Item" title="Add Spot" src="images/plus.png" />
           </div>
