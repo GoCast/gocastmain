@@ -127,6 +127,18 @@ body > div#upper-right
   z-index: 1000;
   line-height: 2em;
 }
+body > div#upper-right > div#log
+{
+   float:right;
+   margin-right: 10px;
+   width:30px;
+   height:30px;
+   vertical-align: middle;
+   background-image: url("../images/vw.png");
+   background-repeat: no-repeat;
+   background-size: 100%;
+   z-index: 1000;
+}
 body > div#upper-right > div#settings
 {
    float:right;

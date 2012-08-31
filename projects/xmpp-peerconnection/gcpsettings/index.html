@@ -22,9 +22,6 @@
 									width="320"
 									height="240">
 							</object>
-							<div id="errmsg" class="error" style="display: none">
-								<span class="icon-picto">!</span> Error
-							</div>
 						</div>
 					</li>
 					<li id="settingsitem" class="viewitem">
@@ -91,25 +88,21 @@
 										<div id="spkvol" class="slider">
 										</div>&nbsp;
 									</td>
-								</tr>
-									<td>
-										<object id="remote"
-											title="how others see you"
-											type="application/x-gocastplayer"
-											width="0"
-											height="0">
-										</object>&nbsp;&nbsp;&nbsp;&nbsp;
-									</td>
-									<td>
-										<div id="buttons">
-											<a id="savesettings" class="button" href="javascript:void(0);">save</a>
-										</div>
-									</td>
-								</tr>
 							</table>
 						</div>
 					</li>
 				</ul>
+			</div>
+			<div id="remotecontainer">
+				<object id="remote"
+					title="how others see you"
+					type="application/x-gocastplayer"
+					width="0"
+					height="0">
+				</object>
+			</div>
+			<div id="buttons">
+				<a id="savesettings" class="button" href="javascript:void(0);">save</a>
 			</div>
 			<div id="settingsdescription">
 				<h3><span class="icon-picto" style="color: green; font-size: 20px;">=</span> tips</h3><p />
@@ -129,6 +122,9 @@
 					<li>
 						<div>
 							Customize your video feed by applying an <span style="font-style: bold; font-weight: bold;">effect</span>.
+							Some effects like <span style="font-style: bold; font-weight: bold;">'gray'</span>
+							and <span style="font-style: bold; font-weight: bold;">'sepia'</span> can reduce
+							your bandwidth.
 						</div>
 					</li>					
 					<li>

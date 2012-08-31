@@ -37,6 +37,10 @@ var SettingsUI = {
 
 		this.$savesettings = $('#savesettings');
 		this.$savesettings.click(this.savesettingsClickedCallback());
+		$('.ui-slider-handle').css({
+			'border': '1px #2E8B57 solid',
+			'background-color': '#2E8B57'
+		});
 	},
 
 	enableEffectsSelect: function(enable) {
@@ -380,8 +384,6 @@ var SettingsApp = {
 };
 
 $(document).ready(function() {
-	$('body').fadeIn('slow', function() {
-		SettingsApp.init();
-		SettingsUI.init();
-	});
+	SettingsApp.init();
+	SettingsUI.init();
 });
