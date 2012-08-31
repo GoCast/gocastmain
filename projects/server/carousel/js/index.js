@@ -1948,4 +1948,10 @@ function sendLog()
   {
     Callcast.SendLiveLog("SendLogsToLogCatcher failed");
   });
+
+  // todo callbacks not getting called, close dialog after some timeout for now
+  setTimeout(function()
+  {
+    jqDlg.css("display", "none");
+  }, 5000);
 }
