@@ -378,23 +378,23 @@ $(document).on('connected', function(
   app.log(2, 'User is connected.');
 
   /* debug
-// Inside $(document).bind('connected'), function() { ....
+  // Inside $(document).bind('connected'), function() { ....
 
-Callcast.connection.xmlInput = function(data) {
-                if ($(data).children()[0])
-                        console.log("XML-IN:", $(data).children()[0]);
-                else
-                        console.log("XML-IN:", $(data));
+  Callcast.connection.xmlInput = function(data) {
+    if ($(data).children()[0]) {
+      console.log("XML-IN:", $(data).children()[0]);
+    } else {
+      console.log("XML-IN:", $(data));
+    }
+  };
 
-        };
-
-Callcast.connection.xmlOutput = function(data) {
-                if ($(data).children()[0])
-                        console.log("XML-OUT:", $(data).children()[0]);
-                else
-                        console.log("XML-OUT:", $(data));
-
-        };
+  Callcast.connection.xmlOutput = function(data) {
+    if ($(data).children()[0]) {
+      console.log("XML-OUT:", $(data).children()[0]);
+    } else {
+      console.log("XML-OUT:", $(data));
+    }
+  };
 
    */
 
@@ -719,14 +719,17 @@ function removeContentFromCarousel(
 /// the possible actions so far
 /// are defined in info.spottype and can be
 /// "youtube" play a youtube video
-/// "url" display the url title and favicon
+/// "url" display the url image in the spot and add a link to open
 /// "new" add an empty spot (does nothing here)
+/// "whiteBoard" add or update the whiteboard in the spot
+///
 function doSpot(spotDiv, info)
 {
   try
   {
     var divIcon, divTitle,
-        jqDiv = $(spotDiv);
+        jqDiv = $(spotDiv),
+        whiteBoard;
     console.log('doSpot', info);
     console.log('spotDiv', spotDiv);
     if (!spotDiv) {throw "no spotDiv";}
@@ -735,6 +738,32 @@ function doSpot(spotDiv, info)
     {
       console.log('doSpot youtube');
       loadVideo(spotDiv, info);
+    }
+    else if (info.spottype === 'whiteBoard')
+    {
+      if (info.cmdtype === "addspot") // set spot attr's for new whiteboard
+      {
+        jqDiv.attr('id', app.str2id('whiteBoard' + info.spotnumber));
+        jqDiv.attr('title', 'whiteBoard');
+        jqDiv.attr('alt', 'whiteBoard');
+        jqDiv.attr('encname', 'whiteBoard');
+        jqDiv.attr('spotnumber', info.spotnumber);
+        jqDiv.removeClass('unoccupied').addClass('typeContent');
+        whiteBoard = new GoCastJS.WhiteBoard(spotDiv);
+      }
+      else // get existing whiteboard
+      {
+        whiteBoard = $("#wbCanvas", spotDiv).data("wb");
+      }
+      if (whiteBoard) // play any commands in info
+      {
+        whiteBoard.doCommands(info);
+      } 
+      else // error, couldn't find wb
+      {
+        console.log("whiteBoardCommand error, can't find wb", info);
+        throw "can't find whiteboard for spot " + info.spotnumber;
+      }
     }
     else if (info.spottype === 'url')
     {
@@ -753,36 +782,13 @@ function doSpot(spotDiv, info)
       }
       else
       {
-        getUrlInfo(
-        {
-          webUrl: info.spoturl,
-          proxyUrl: 'http://carousel.gocast.it/proxy'
-        },
-        function(urlInfo)
-        {
-          console.log("doSpot getUrlInfo cb", urlInfo);
-          jqDiv.css('background-image', ''); // remove the spot background
-          divIcon = $('<div class="spotUrlIcon"/>'); // create a child div with url info for spot
-          // hot link to http://getfavicon.appspot.com/ to get favicon
-          $(divIcon).css('background-image', 'url(http://g.etfv.co/' + info.url + ')');
-          divTitle = $('<div class="spotUrlTitle"/>');
-          if (urlInfo.title) // add title
-          {
-             $(divTitle).append($('<p>' + urlInfo.title + '</p>'));
-          }
-          else
-          {
-             $(divTitle).append($('<p>' + info.url + '</p>'));
-          }
-          jqDiv.append('<div class="urlPad"/>');
-          jqDiv.append(divIcon);
-          jqDiv.append(divTitle);
-        });
+        // was get url info but that feature was ripped
+        app.log(4, "no image for url spot");
       }
     }
     // ... other spot commands
   } catch(err) {
-    console.log("doSpot error " + err);
+    app.log(4, "doSpot error " + err);
   }
 } // doSpot
 ///
@@ -902,7 +908,7 @@ function addSpotCb(info)
     doSpot(spotDiv, info);
     app.carousel.updateAll(); // redraw carousel
   } catch(err) {
-    console.log("Error addSpotCb exception " + err);
+    app.log(4, "Error addSpotCb exception " + err);
   }
 }
 
@@ -918,10 +924,18 @@ function setSpotCb(info)
   // for setSpot there must be an item in the carousel with info.spotnumber
   if (!item)
   {
+    // try zoomed spot
+    item = $('#meeting > #zoom > .cloudcarousel').data('item');
+  }
+  if (!item)
+  {
     app.log(4, "spot with number " + info.spotnumber + " does not exist");
   }
-  doSpot(item.object, info);
-  app.carousel.updateAll(); // redraw carousel
+  else
+  {
+    doSpot(item.object, info);
+    app.carousel.updateAll(); // redraw carousel
+  }
 }
 
 ///
@@ -1057,8 +1071,8 @@ function setLocalSpeakerStatus(vol)
   // display volume warning
   if (app.volWarningDisplayed === false)             // check volume only on first callback
   {
-    if($.cookie("stopVolumeStatus") !== "checked" && // and if user has not disabled the check
-      (vol < 255*0.07) )                             // if vol is below threshold
+    if(window.localStorage.stopVolumeStatus !== "checked" && // and if user has not disabled the check
+      (vol < 255*0.07) )                                     // if vol is below threshold
     {
       $(app.STATUS_PROMPT).css("display", "block");  // display warning
     }

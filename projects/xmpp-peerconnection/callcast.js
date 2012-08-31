@@ -671,6 +671,11 @@ var Callcast = {
                         Callcast.log('getUserMediaSuccess: ', stream.toString());
                         Callcast.localstream = stream;
                         Callcast.localplayer = $(jqSelector).get(0);
+
+                        if (0 < Callcast.localstream.videoTracks.length) {
+                            Callcast.localstream.videoTracks[0].effect = settings['effect'] || 'none';
+                        }
+
                         if (!Callcast.localplayer && !Callcast.localplayer.version) {
                             alert('ERROR: Gocast Player object not found in DOM. Plugin problem?');
                         }
