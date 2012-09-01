@@ -49,6 +49,7 @@ GoCastJS.WhiteBoardTools.prototype.penWidthClick = function(event)
   console.log("wbPenW click", penSize, wb);
   wb.settings.lineWidth = penSize;
   wb.settings.apply(wb.wbCtx); // todo encapsulate
+  wb.tools.jqPenList.css("display", "none"); // hide pen color list
   wb.tools.drawTools();
 };
 ///
@@ -56,8 +57,33 @@ GoCastJS.WhiteBoardTools.prototype.penWidthClick = function(event)
 ///
 GoCastJS.WhiteBoardTools.prototype.penColorClick = function(event)
 {
-  var wb = $(this).data('wb');
-  console.log("wbPenColor click", this, wb);
+  var jqThis = $(this),
+      pos    = jqThis.position(),
+      wb     = jqThis.data('wb');
+  console.log("wbPenColor click", this, pos, wb);
+
+  // position and display table, todo align selected color
+  wb.tools.jqPenList.css({ "top": pos.top,
+                           "left": pos.left,
+                           "display": "block"});
+};
+///
+/// \brief pen color table click handler
+///
+GoCastJS.WhiteBoardTools.prototype.penColorTrClick = function(event)
+{
+  var jqThis = $(this),
+      jqTd   = $('.color', jqThis),
+      name   = jqTd.attr('id'),
+      color  = jqTd.attr('color'),
+      wb     = jqThis.data('wb');
+  console.log("wbPenColorTr click", this, wb, name, color);
+
+  wb.settings.strokeStyle = color; // set current pen color
+  wb.settings.colorName   = name;
+  wb.settings.apply(wb.wbCtx);     // apply change to whiteboard
+  wb.tools.drawTools();            // update tools
+  wb.tools.jqPenList.css("display", "none"); // hide pen color table
 };
 ///
 /// \brief add canvas, context, references to pen width buttons
@@ -69,7 +95,7 @@ GoCastJS.WhiteBoardTools.prototype.initCanvas = function(jqElem)
       jqCanvas = $('<canvas width = ' + w + ' height = ' + h + '></canvas>').appendTo(jqElem),
       ctx = jqCanvas[0].getContext('2d');
   console.log("initCanvas ", w, h, jqElem);
-  jqElem.data("ctx", ctx).data('jqCanvas', jqCanvas); // set ref to context
+  jqElem.data("ctx", ctx); // set ref to context
 };
 ///
 /// \brief add list of pen colors, canvas, context, references
@@ -78,32 +104,33 @@ GoCastJS.WhiteBoardTools.prototype.initPenColors = function(jqElem)
 {
   // todo init from an array of objects
   // todo better way?
-  var jqList = $('<div id="wbPenColors"></div>').appendTo(jqElem),
-      jqTable = $('<table id="wbPenColorTable"></table>').appendTo(jqList),
-      jqRow, jqTd;
+  var jqRow, jqTd;
 
-  jqRow = $('<tr id="black"></tr>').appendTo(jqTable);
-  jqTd = $('<td class="check"></td>').appendTo(jqRow);
+  this.jqPenList = $('<div id="wbPenColors"></div>').appendTo(jqElem);
+  this.jqPenTable = $('<table id="wbPenColorTable"></table>').appendTo(this.jqPenList);
+
+  jqRow = $('<tr id="black"></tr>').appendTo(this.jqPenTable).click(this.penColorTrClick).data('wb', this.wb);
+  jqTd = $('<td id="black" class="check"></td>').appendTo(jqRow);
   jqTd = $('<td id="black" class="color" color="#000"></td>').appendTo(jqRow);
   this.initCanvas(jqTd);
-  jqRow = $('<tr id="red"></tr>').appendTo(jqTable);
-  jqTd = $('<td class="check"></td>').appendTo(jqRow);
-  jqTd = $('<td id="blue" class="color" color="#F00"></td>').appendTo(jqRow);
+  jqRow = $('<tr id="red"></tr>').appendTo(this.jqPenTable).click(this.penColorTrClick).data('wb', this.wb);
+  jqTd = $('<td id="red" class="check"></td>').appendTo(jqRow);
+  jqTd = $('<td id="red" class="color" color="#F00"></td>').appendTo(jqRow);
   this.initCanvas(jqTd);
-  jqRow = $('<tr id="blue"></tr>').appendTo(jqTable);
-  jqTd = $('<td class="check"></td>').appendTo(jqRow);
+  jqRow = $('<tr id="blue"></tr>').appendTo(this.jqPenTable).click(this.penColorTrClick).data('wb', this.wb);
+  jqTd = $('<td id="blue" class="check"></td>').appendTo(jqRow);
   jqTd = $('<td id="blue" class="color" color="#00F"></td>').appendTo(jqRow);
   this.initCanvas(jqTd);
-  jqRow = $('<tr id="orange"></tr>').appendTo(jqTable);
-  jqTd = $('<td class="check"></td>').appendTo(jqRow);
+  jqRow = $('<tr id="orange"></tr>').appendTo(this.jqPenTable).click(this.penColorTrClick).data('wb', this.wb);
+  jqTd = $('<td id="orange" class="check"></td>').appendTo(jqRow);
   jqTd = $('<td id="orange" class="color" color="rgba(253, 103, 3, 0.05)"></td>').appendTo(jqRow);
   this.initCanvas(jqTd);
-  jqRow = $('<tr id="white"></tr>').appendTo(jqTable);
-  jqTd = $('<td class="check"></td>').appendTo(jqRow);
+  jqRow = $('<tr id="white"></tr>').appendTo(this.jqPenTable).click(this.penColorTrClick).data('wb', this.wb);
+  jqTd = $('<td id="white" class="check"></td>').appendTo(jqRow);
   jqTd = $('<td id="white" class="color" color="#FFF"></td>').appendTo(jqRow);
   this.initCanvas(jqTd);
 
-  jqList.css("display", "none");
+  this.jqPenList.css("display", "none"); // hide after creation so table gets flowed and td's get width for canvas creation
 };
 ///
 /// \brief draw the tool images when the tool settings change
@@ -120,10 +147,12 @@ GoCastJS.WhiteBoardTools.prototype.drawTools = function()
     var jqThis = $(this),
         penSize = jqThis.attr('penSize'),
         ctx = jqThis.data('ctx'),
-        jqCanvas = jqThis.data('jqCanvas'),
-        centerX = jqCanvas.attr('width') / 2,
-        centerY = jqCanvas.attr('height') / 2;
+        centerX = ctx.canvas.width / 2,
+        centerY = ctx.canvas.height / 2;
+
     console.log("drawTools each", penSize, ctx, centerX, centerY);
+
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
     // draw circle in strokeStyle
     ctx.strokeStyle = wb.settings.strokeStyle;
@@ -137,13 +166,14 @@ GoCastJS.WhiteBoardTools.prototype.drawTools = function()
     var jqThis = $(this),
         penSize = wb.settings.lineWidth,
         ctx = jqThis.data('ctx'),
-        jqCanvas = jqThis.data('jqCanvas'),
-        w = jqCanvas.attr('width'),
-        h = jqCanvas.attr('height'),
+        w = ctx.canvas.width,
+        h = ctx.canvas.height,
         margin = 3,
         downButtonWidth = 15,
         downButtonMargin = 5;
     console.log("drawTools wbPenColor", penSize, ctx, w, h, margin);
+
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
     // draw down button
     ctx.strokeStyle = '#000';
@@ -171,9 +201,37 @@ GoCastJS.WhiteBoardTools.prototype.drawTools = function()
     // draw line in pen color and width todo hilite
     ctx.strokeStyle = wb.settings.strokeStyle;
     ctx.fillStyle   = wb.settings.strokeStyle;
+    ctx.lineWidth   = wb.settings.lineWidth;
     ctx.beginPath();
     ctx.moveTo(margin,     h/2);
     ctx.lineTo(w - downButtonWidth - margin, h/2);
+    ctx.stroke();
+    ctx.closePath();
+  });
+
+  // draw pen color table
+  $("td.check", this.jqTable).removeClass('wb-icon wb-icon-check'); // clear checked state of pen color list
+  $("td.check#"+this.wb.settings.colorName, this.jqTable).addClass('wb-icon wb-icon-check'); // set checked state of current pen color
+  $("td.color", this.jqTable).each(function(index) // draw the pen colors in the table in current pen width
+  {
+    var jqThis = $(this),
+        ctx      = jqThis.data('ctx'),
+        w        = ctx.canvas.width,
+        h        = ctx.canvas.height,
+        color    = jqThis.attr("color"),
+        margin   = 5;
+
+    console.log("draw pen color table entry", this);
+
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+    // draw line in td color and current pen width
+    ctx.strokeStyle = color;
+    ctx.fillStyle   = color;
+    ctx.lineWidth   = wb.settings.lineWidth;
+    ctx.beginPath();
+    ctx.moveTo(margin,     h/2);
+    ctx.lineTo(w - margin, h/2);
     ctx.stroke();
     ctx.closePath();
   });
@@ -215,6 +273,7 @@ GoCastJS.WhiteBoardMouse.prototype.offsetEvent = function(event)
 ///
 GoCastJS.WhiteBoardSettings = function()
 {
+  this.colorName = "blue";
   this.lineJoin = "round";
   this.strokeStyle = "#00F";
   this.lineWidth = 5;
@@ -452,6 +511,8 @@ GoCastJS.WhiteBoard.prototype.onMouseDown = function(event)
       x = point.x / wb.scaleW,
       y = point.y / wb.scaleH;
   event.stopPropagation();
+  wb.tools.jqPenList.css("display", "none"); // hide pen color list
+
   //console.log('wb.onMouseDown x' + event.offsetX + '(' + x + ') y ' + event.offsetY + '(' + y + ')' , event);
   // todo make sure event is a JQuery event
   wb.mouse.state = wb.mouse.DOWN;

@@ -517,6 +517,9 @@ div.cloudcarousel.typeContent > div.spotUrlTitle
   margin-right:auto;
   border-radius: 5px;  
 }
+.wb-icon { width: 16px; height: 16px; background-image: url(../images/wb-icons.png); }
+.wb-icon-check { background-position: -64px -144px; }
+
 div.wbPenW /* whiteboard pen width buttons */
 {
   width: 20px;
@@ -552,6 +555,9 @@ div.wbPenColor /* whiteboard pen color button */
 }
 div#wbPenColors
 {
+  border-color: black;
+  border-width: 1px;
+  border-radius: 3px;
   position: absolute;
   top: 0px;
   left:0px;
@@ -559,15 +565,15 @@ div#wbPenColors
 table#wbPenColorTable
 {
   background-color: white;
-  width: 45px;
+  width: 50px;
 }
 table#wbPenColorTable td
 {
-  height: 17px;
+  height: 13px;
 }
 table#wbPenColorTable td.check
 {
-  width: 17px;
+  width: 10px;
 }
 div.wbDiv
 {
