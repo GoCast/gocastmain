@@ -55,57 +55,62 @@ var SettingsUI = {
 	},
 
 	updateCameras: function(cameras, newCamera) {
+		var oldCamera = this.$camselect.val() || '';
+		var firstOption = '<option value="">no camera</option>';
+
 		this.$camselect.html('');
-		this.$camselect.attr('disabled', true);
+		$(firstOption).appendTo(this.$camselect);
 
 		for (i in cameras) {
 			if('default' !== i) {
 				var option = '<option value="' + i + '">' +
 							 cameras[i] + '</option>';
 				$(option).appendTo(this.$camselect);
-			} else {
-				this.$camselect.attr('disabled', false);
 			}
 		}
 
-		this.$camselect.val(newCamera);
-		this.deviceChangedCallback()();
+		if (newCamera !== oldCamera) {
+			this.$camselect.val(newCamera);
+			this.deviceChangedCallback()();
+		}
 	},
 
 	updateMics: function(mics, newMic) {
+		var oldMic = this.$micselect.val() || '';
+		var firstOption = '<option value="">no microphone</option>';
+
 		this.$micselect.html('');
-		this.$micselect.attr('disabled', true);
+		$(firstOption).appendTo(this.$micselect);
 
 		for (i in mics) {
 			var option = '<option value="' + mics[i] + '">' +
 						 mics[i] + '</option>';
 			$(option).appendTo(this.$micselect);
-
-			if ('0' === i) {
-				this.$micselect.attr('disabled', false);
-			}
 		}
 
-		this.$micselect.val(newMic);
-		this.deviceChangedCallback()();
+		if (newMic !== oldMic) {
+			this.$micselect.val(newMic);
+			this.deviceChangedCallback()();
+		}
 	},
 
 	updateSpks: function(spks, newSpk) {
+		var oldSpk = this.$spkselect.val() || '';
+		var firstOption = '<option value="">no speakers</option>';
+
 		this.$spkselect.html('');
-		this.$spkselect.attr('disabled', true);
+		$(firstOption).appendTo(this.$spkselect);
 
 		for (i in spks) {
 			var option = '<option value="' + spks[i] + '">' +
 						 spks[i] + '</option>';
 			$(option).appendTo(this.$spkselect);
-
-			if ('0' === i) {
-				this.$spkselect.attr('disabled', false);
-			}
 		}
 
-		this.$spkselect.val(newSpk);
-		this.deviceChangedCallback()();
+		if (newSpk !== oldSpk) {
+			this.$spkselect.val(newSpk);
+			this.deviceChangedCallback()();
+		}
 	},
 
 	updateSpkVol: function(newVol) {
@@ -125,13 +130,18 @@ var SettingsUI = {
 			}
 
 			self.timer = setTimeout(function() {
+				var vin = self.$camselect.val() || '';
+				var ain = self.$micselect.val() || '';
+				var aout = self.$spkselect.val() || '';
+
 				SettingsApp.testSettings({
-					video: true,
-					audio: true,
-					videoin: (self.$camselect.val() || ''),
-					audioin: (self.$micselect.val() || ''),
-					audioout: (self.$spkselect.val() || '')
+					video: ('' !== vin),
+					audio: ('' !== ain),
+					videoin: vin,
+					audioin: ain,
+					audioout: aout
 				});
+
 				self.timer = null;
 			}, 1000);
 		};
@@ -150,9 +160,9 @@ var SettingsUI = {
 
 		return function() {
 			var settings = {
-				videoin: self.$camselect.val(),
-				audioin: self.$micselect.val(),
-				audioout: self.$spkselect.val(),
+				videoin: self.$camselect.val() || '',
+				audioin: self.$micselect.val() || '',
+				audioout: self.$spkselect.val() || '',
 				effect: (('' !== self.$effects.val()) ? 
 						 self.$effects.val() : 'none')
 			};
@@ -184,6 +194,15 @@ var SettingsApp = {
 								   this.spkVolChangedCallback());
 		GoCastJS.SetMicVolListener(500, this.$localplayer.get(0),
 								   this.micVolChangedCallback());
+		GoCastJS.PluginLog(
+			this.$localplayer.get(0),
+		   	function(entries) {
+		   		for (i in entries) {
+		   			console.log('PLUGIN: ' +
+		   						entries[i]);
+		   		}
+		   	}
+		);
 	},
 
 	spkVol: function(level) {
@@ -231,12 +250,12 @@ var SettingsApp = {
 						micsRemoved, spksAdded, spksRemoved) {
 			if (0 < camsAdded.length || 0 < camsRemoved.length) {
 				var cameras = localplayer.videoinopts;
-				var newCamera = '';
+				var newCamera = GoCastJS.Video.captureDevice;
 				if (0 < camsAdded.length) {
 					newCamera = firstCall ? (settings.videoin||camsAdded[0]) :
 					            camsAdded[0];
 				} else if (GoCastJS.Video.captureDevice === camsRemoved[0]) {
-					newCamera = (newCamera || cameras['default']);
+					newCamera = (cameras['default'] || '');
 				}
 
 				SettingsUI.updateCameras(cameras, newCamera);
@@ -244,12 +263,12 @@ var SettingsApp = {
 
 			if (0 < micsAdded.length || 0 < micsRemoved.length) {
 				var mics = localplayer.audioinopts;
-				var newMic = '';
+				var newMic = GoCastJS.Audio.inputDevice;
 				if (0 < micsAdded.length) {
 					newMic = firstCall ? (settings.audioin||micsAdded[0]) :
 					         micsAdded[0];
 				} else if (GoCastJS.Audio.inputDevice === micsRemoved[0]) {
-					newMic = (newMic || mics['default']);
+					newMic = (mics[0] || '');
 				}
 
 				SettingsUI.updateMics(mics, newMic);
@@ -257,12 +276,12 @@ var SettingsApp = {
 
 			if (0 < spksAdded.length || 0 < spksRemoved.length) {
 				var spks = localplayer.audiooutopts;
-				var newSpk = '';
+				var newSpk = GoCastJS.Audio.outputDevice;
 				if (0 < spksAdded.length) {
 					newSpk = firstCall ? (settings.audioout||spksAdded[0]) :
 					         spksAdded[0];
 				} else if (GoCastJS.Audio.outputDevice === spksRemoved[0]) {
-					newSpk = (newSpk || spks['default']);
+					newSpk = (spks[0] || '');
 				}
 
 				SettingsUI.updateSpks(spks, newSpk);
@@ -289,18 +308,14 @@ var SettingsApp = {
 
 		return function(stream) {
 			self.localStream = stream;
-			SettingsUI.enableEffectsSelect(true);
 
-			var hints = {};
+			var hints = {video: false, audio: false};
 			if (0 < self.localStream.videoTracks.length) {
 				hints.video = true;
-			} else {
-				hints.video = false;
+				SettingsUI.enableEffectsSelect(true);
 			}
 			if (0 < self.localStream.audioTracks.length) {
 				hints.audio = true;
-			} else {
-				hints.audio = false;
 			}
 
 			var options = new GoCastJS.PeerConnectionOptions(

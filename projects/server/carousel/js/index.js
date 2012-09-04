@@ -1885,16 +1885,15 @@ function startPeopleContent()
                       spotimage: "url('images/white-board-demo.png')"
                       });
   }, 600);
+  /*
   setTimeout(function() {
     //Callcast.Callback_AddCarouselContent({id: 'person4', image: "url('images/person4.png')", altText: 'person4', url: ''});
-    /*
-    Callcast.AddSpot({spotreplace: 'first-unoc',
-                      spottype: "url",
-                      spotdivid: 'person4',
-                      spoturl: '',
-                      spotimage: "url('images/person4.png')"
-                      });
-    */
+    //Callcast.AddSpot({spotreplace: 'first-unoc',
+    //                  spottype: "url",
+    //                  spotdivid: 'person4',
+    //                  spoturl: '',
+    //                  spotimage: "url('images/person4.png')"
+    //                  });
     Callcast.AddSpot({spotreplace: 'first-unoc', spottype:"whiteBoard"});
   }, 900);
   setTimeout(function() {
@@ -1924,6 +1923,7 @@ function startPeopleContent()
                       spotimage: "url('images/person5.png')"
                       });
   }, 1800);
+  */
 }
 ///
 /// \brief send log to server, display progress dialog

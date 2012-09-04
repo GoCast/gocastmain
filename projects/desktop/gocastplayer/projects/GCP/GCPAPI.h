@@ -78,9 +78,7 @@ public:
     ///         the browser is done with it; this will almost definitely be after
     ///         the plugin is released.
     ///////////////////////////////////////////////////////////////////////////////
-    virtual ~GCPAPI() {
-        DeletePeerConnection();
-    }
+    virtual ~GCPAPI();
 
     GCPPtr getPlugin();
 

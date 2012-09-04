@@ -13,6 +13,15 @@
 #include "GCPMediaStream.h"
 #include "GCPWebrtcCenter.h"
 
+GCPAPI::~GCPAPI()
+{
+    DeletePeerConnection();
+    if("localPlayer" == m_htmlId.convert_cast<std::string>())
+    {
+        GoCast::JSLogger::Instance()->ClearLogFunction();
+    }
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 /// @fn GCPPtr GCPAPI::getPlugin()
 ///
@@ -490,12 +499,7 @@ FB::variant GCPAPI::DeletePeerConnection()
         FBLOG_ERROR_CUSTOM("GCPAPI::DeletePeerConnection", msg);
         return false;
     }
-    
-    if("localPlayer" == m_htmlId.convert_cast<std::string>())
-    {
-        GoCast::JSLogger::Instance()->ClearLogFunction();
-    }
-    
+        
     return pCtr->DeletePeerConnection(m_htmlId.convert_cast<std::string>());
 }
 
