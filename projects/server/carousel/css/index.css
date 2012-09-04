@@ -591,9 +591,6 @@ div.wbPenColor.disabled
 }
 div#wbPenColors
 {
-  border-color: black;
-  border-width: 1px;
-  border-radius: 3px;
   position: absolute;
   top: 0px;
   left:0px;
@@ -601,7 +598,10 @@ div#wbPenColors
 table#wbPenColorTable
 {
   background-color: white;
-  width: 50px;
+  border-color: black;
+  border-width: 1px;
+  border-radius: 3px;
+  width: 58px;
 }
 table#wbPenColorTable td
 {
