@@ -520,6 +520,12 @@ div.cloudcarousel.typeContent > div.spotUrlTitle
 .wb-icon { width: 16px; height: 16px; background-image: url(../images/wb-icons.png); }
 .wb-icon-check          { background-position: -64px -144px; }
 .wb-icon-triangle-2-n-s { background-position: -128px -16px; }
+.wbCanvas
+{
+  border: 1px solid;
+  border-color: black;
+  background-color: white;
+}
 div.wbButton
 {
   border: 1px solid;
@@ -603,7 +609,6 @@ table#wbPenColorTable td.check
 }
 div.wbDiv
 {
-  background-color: white;
   width: 98%;
   height: 98%;
 }

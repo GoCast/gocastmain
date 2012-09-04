@@ -331,15 +331,6 @@ GoCastJS.WhiteBoard = function(spot)
   this.scaleW = 1.0;
   this.scaleH = 1.0;
   this.WB_DIV = '<div id="wbDiv" class="wbDiv"></div>'; // a container div
-  this.WB_PEN_WIDTH = '<select id="wbSelPenColor" class="wbSel"><option value="1">1</option><option value="3">3</option><option value="5">5</option><option value="7">7</option><option value="11">11</option></select>';
-  this.WB_PEN_COLOR = '<select id="wbSelPenColor" class="wbSel">'+
-                         '<option value="#000"                    data-imgsrc="images/btn-fb.png">Black</option>'+
-                         '<option value="#F00"                    data-imgsrc="images/btn-fb.png">Red</option>'+
-                         '<option value="#00F"                    data-imgsrc="images/btn-fb.png">Blue</option>'+
-                         '<option value="rgba(253, 103, 3, 0.05)" data-imgsrc="images/btn-fb.png">Orange</option>'+
-                         '<option value="#FFF"                    data-imgsrc="images/btn-fb.png">White</option>'+
-                       '</select>';
-  this.WB_ERASE_BUTTON = '<input type="checkbox" class="ui-button-icon-only" id="erase" /><label for="check">Eraser</label>';
 
   // the canvas html see init for jq, dom objects
   this.WB_CANVAS = '<canvas id="wbCanvas" class="wbCanvas" width="' + this.width + '" height="' + this.height + '"></canvas>';
