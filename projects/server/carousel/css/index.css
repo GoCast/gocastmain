@@ -518,8 +518,27 @@ div.cloudcarousel.typeContent > div.spotUrlTitle
   border-radius: 5px;  
 }
 .wb-icon { width: 16px; height: 16px; background-image: url(../images/wb-icons.png); }
-.wb-icon-check { background-position: -64px -144px; }
-
+.wb-icon-check          { background-position: -64px -144px; }
+.wb-icon-triangle-2-n-s { background-position: -128px -16px; }
+div.wbButton
+{
+  border: 1px solid;
+  border-radius: 3px;
+  float:left;
+}
+div.wbEraser
+{
+  width:20px;
+  height:20px;
+  background-image: url(../images/erase.png);
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  background-color: white;
+}
+div.wbEraser:not(.checked)
+{
+  background-color: gray;
+}
 div.wbPenW /* whiteboard pen width buttons */
 {
   width: 20px;
@@ -530,7 +549,6 @@ div.wbPenW /* whiteboard pen width buttons */
   border: 1px solid;
   border-radius: 3px;
   margin-right: 0px;
-  float:left;
 }
 div.wbPenW.checked
 {
@@ -542,16 +560,24 @@ div.wbPenW.disabled
 }
 div.wbPenColor /* whiteboard pen color button */
 {
-  width: 45px;
+  position: relative;
+  width: 55px;
   height: 20px;
   background-color: white;
   background-repeat: no-repeat;
   background-size: 100% 100%;
-  border: 1px solid;
-  border-radius: 3px;
   margin-left: 3px;
   margin-right: 0px;
-  float:left;
+}
+div.wbPenColor > .wb-icon
+{
+  position: absolute;
+  right: -3px;
+  top: 2px;
+}
+div.wbPenColor.disabled
+{
+  background-color: gray;
 }
 div#wbPenColors
 {

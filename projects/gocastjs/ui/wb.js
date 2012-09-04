@@ -22,21 +22,36 @@ GoCastJS.WhiteBoardTools = function(whiteBoard)
   this.jqTools = $(this.DIV).appendTo(this.wb.jqWb); // todo encapsulate
 
   // create pen width buttons
-  button = $('<div id="wbPenW1"  class="wbPenW" title="Pen Width 1"  penSize="1"></div>').appendTo(this.jqTools).click(this.penWidthClick).data('wb',this.wb);
+  button = $('<div id="wbPenW1"  class="wbButton wbPenW" title="Pen Width 1"  penSize="1"></div>').appendTo(this.jqTools).click(this.penWidthClick).data('wb',this.wb);
   this.initCanvas(button);
-  button = $('<div id="wbPenW5"  class="wbPenW" title="Pen Width 5"  penSize="5"></div>').appendTo(this.jqTools).click(this.penWidthClick).data('wb',this.wb);
+  button = $('<div id="wbPenW5"  class="wbButton wbPenW" title="Pen Width 5"  penSize="5"></div>').appendTo(this.jqTools).click(this.penWidthClick).data('wb',this.wb);
   this.initCanvas(button);
-  button = $('<div id="wbPenW7"  class="wbPenW" title="Pen Width 7"  penSize="7"></div>').appendTo(this.jqTools).click(this.penWidthClick).data('wb',this.wb);
+  button = $('<div id="wbPenW7"  class="wbButton wbPenW" title="Pen Width 7"  penSize="7"></div>').appendTo(this.jqTools).click(this.penWidthClick).data('wb',this.wb);
   this.initCanvas(button);
-  button = $('<div id="wbPenW11" class="wbPenW" title="Pen Width 11" penSize="11"></div>').appendTo(this.jqTools).click(this.penWidthClick).data('wb',this.wb);
+  button = $('<div id="wbPenW11" class="wbButton wbPenW" title="Pen Width 11" penSize="11"></div>').appendTo(this.jqTools).click(this.penWidthClick).data('wb',this.wb);
   this.initCanvas(button);
 
   // create pen color button
-  button = $('<div id="wbPenColor" class="wbPenColor" title="Pen Color"></div>').appendTo(this.jqTools).click(this.penColorClick).data('wb',this.wb);
+  button = $('<div id="wbPenColor" class="wbButton wbPenColor" title="Pen Color"><div class="wb-icon wb-icon-triangle-2-n-s"></div></div>').appendTo(this.jqTools).click(this.penColorClick).data('wb',this.wb);
   this.initCanvas(button);
+
+  // create eraser
+  button = $('<div id="wbEraser"  class="wbButton wbEraser" title="Eraser"></div>').appendTo(this.jqTools).click(this.eraserClick).data('wb',this.wb);
+
   this.initPenColors(this.jqTools);
 
   this.drawTools(); // init toolbar
+};
+///
+/// \brief pen width button click handler
+///
+GoCastJS.WhiteBoardTools.prototype.eraserClick = function(event)
+{
+  var jqThis = $(this).toggleClass('checked'), // toggle class and get jq ref to this
+      wb     = jqThis.data('wb');
+
+  wb.tools.jqPenList.css("display", "none"); // hide pen color list
+  wb.tools.drawTools();                      // update tools
 };
 ///
 /// \brief pen width button click handler
@@ -46,9 +61,10 @@ GoCastJS.WhiteBoardTools.prototype.penWidthClick = function(event)
   var penSize = $(this).attr('penSize'),
       wb = $(this).data('wb');
 
+  $('.wbEraser', wb.tools.jqTools).removeClass('checked');
   console.log("wbPenW click", penSize, wb);
-  wb.settings.lineWidth = penSize;
-  wb.settings.apply(wb.wbCtx); // todo encapsulate
+  wb.penSettings.lineWidth = penSize;
+  wb.penSettings.apply(wb.wbCtx); // todo encapsulate
   wb.tools.jqPenList.css("display", "none"); // hide pen color list
   wb.tools.drawTools();
 };
@@ -62,6 +78,8 @@ GoCastJS.WhiteBoardTools.prototype.penColorClick = function(event)
       wb     = jqThis.data('wb');
   console.log("wbPenColor click", this, pos, wb);
 
+  $('.wbEraser', wb.tools.jqTools).removeClass('checked');
+  wb.tools.drawTools();
   // position and display table, todo align selected color
   wb.tools.jqPenList.css({ "top": pos.top,
                            "left": pos.left,
@@ -79,9 +97,8 @@ GoCastJS.WhiteBoardTools.prototype.penColorTrClick = function(event)
       wb     = jqThis.data('wb');
   console.log("wbPenColorTr click", this, wb, name, color);
 
-  wb.settings.strokeStyle = color; // set current pen color
-  wb.settings.colorName   = name;
-  wb.settings.apply(wb.wbCtx);     // apply change to whiteboard
+  wb.penSettings.strokeStyle = color; // set current pen color
+  wb.penSettings.colorName   = name;
   wb.tools.drawTools();            // update tools
   wb.tools.jqPenList.css("display", "none"); // hide pen color table
 };
@@ -138,10 +155,30 @@ GoCastJS.WhiteBoardTools.prototype.initPenColors = function(jqElem)
 GoCastJS.WhiteBoardTools.prototype.drawTools = function()
 {
   var canvas, ctx, w, h,
-      wb = this.wb; // closure var for each callback below
+      wb = this.wb, // closure var for each callback below
+      checked = $(".wbEraser", this.jqTools).hasClass('checked'),
+      jqPenWidths = $(".wbPenW", this.jqTools), // pen width buttons
+      jqPenColor  = $(".wbPenColor", this.jqTools); // pen color button
+
+  console.log("drawTools", checked);
+  // set the draw settings
+  if (checked)
+  {
+    wb.settings = wb.eraserSettings;
+    wb.settings.apply(wb.wbCtx); // todo encapsulate
+    jqPenWidths.addClass('disabled');
+    jqPenColor.addClass('disabled');
+  }
+  else // select checked pen
+  {
+    wb.settings = wb.penSettings;
+    wb.settings.apply(wb.wbCtx);
+    jqPenWidths.removeClass('disabled');
+    jqPenColor.removeClass('disabled');
+  }
   // set pen width button checked state
   $(".wbPenW", this.jqTools).removeClass("checked"); // clear all checked state
-  $("#wbPenW" + this.wb.settings.lineWidth, this.jqTools).addClass("checked"); // set checked for current line width
+  $("#wbPenW" + this.wb.penSettings.lineWidth, this.jqTools).addClass("checked"); // set checked for current line width
   $(".wbPenW", this.jqTools).each(function(index) // draw pen sizes in current pen color
   {
     var jqThis = $(this),
@@ -155,8 +192,8 @@ GoCastJS.WhiteBoardTools.prototype.drawTools = function()
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
     // draw circle in strokeStyle
-    ctx.strokeStyle = wb.settings.strokeStyle;
-    ctx.fillStyle   = wb.settings.strokeStyle;
+    ctx.strokeStyle = wb.penSettings.strokeStyle;
+    ctx.fillStyle   = wb.penSettings.strokeStyle;
     ctx.beginPath();
     ctx.arc(centerX, centerY, penSize/2, 0, 2 * Math.PI, false);
     ctx.fill();
@@ -164,54 +201,30 @@ GoCastJS.WhiteBoardTools.prototype.drawTools = function()
   $(".wbPenColor", this.jqTools).each(function(index)
   {
     var jqThis = $(this),
-        penSize = wb.settings.lineWidth,
+        iconPos = $('.wb-icon', jqThis).position(),
+        penSize = wb.penSettings.lineWidth,
         ctx = jqThis.data('ctx'),
         w = ctx.canvas.width,
         h = ctx.canvas.height,
-        margin = 3,
-        downButtonWidth = 15,
-        downButtonMargin = 5;
-    console.log("drawTools wbPenColor", penSize, ctx, w, h, margin);
+        marginL = 10, // make this big to line up with pen strokes in drop down
+        marginR = 0;
+    console.log("drawTools wbPenColor", penSize, ctx, w, h, iconPos);
 
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
-    // draw down button
-    ctx.strokeStyle = '#000';
-    ctx.fillStyle = '#000';
-    ctx.lineWidth = 1;
-
-    // separate down button from pen color button
-    /*
-    ctx.beginPath();
-    ctx.moveTo(w - downButtonWidth, 0);
-    ctx.lineTo(w - downButtonWidth, h);
-    ctx.stroke();
-    ctx.closePath();
-    */
-    // draw down arrow
-    ctx.beginPath();
-    ctx.moveTo(w - downButtonWidth + downButtonMargin  ,     downButtonMargin);
-    ctx.lineTo(w                   - downButtonMargin  ,     downButtonMargin);
-    ctx.lineTo(w - downButtonWidth/2                   , h - downButtonMargin);
-    ctx.lineTo(w - downButtonWidth + downButtonMargin  ,     downButtonMargin);
-    ctx.fill();
-    ctx.stroke();
-    ctx.closePath();
-
     // draw line in pen color and width todo hilite
-    ctx.strokeStyle = wb.settings.strokeStyle;
-    ctx.fillStyle   = wb.settings.strokeStyle;
-    ctx.lineWidth   = wb.settings.lineWidth;
+    ctx.strokeStyle = wb.penSettings.strokeStyle;
+    ctx.lineWidth   = wb.penSettings.lineWidth;
     ctx.beginPath();
-    ctx.moveTo(margin,     h/2);
-    ctx.lineTo(w - downButtonWidth - margin, h/2);
+    ctx.moveTo(marginL,                h/2);
+    ctx.lineTo(iconPos.left - marginR, h/2);
     ctx.stroke();
     ctx.closePath();
   });
 
   // draw pen color table
   $("td.check", this.jqTable).removeClass('wb-icon wb-icon-check'); // clear checked state of pen color list
-  $("td.check#"+this.wb.settings.colorName, this.jqTable).addClass('wb-icon wb-icon-check'); // set checked state of current pen color
+  $("td.check#"+this.wb.penSettings.colorName, this.jqTable).addClass('wb-icon wb-icon-check'); // set checked state of current pen color
   $("td.color", this.jqTable).each(function(index) // draw the pen colors in the table in current pen width
   {
     var jqThis = $(this),
@@ -228,7 +241,7 @@ GoCastJS.WhiteBoardTools.prototype.drawTools = function()
     // draw line in td color and current pen width
     ctx.strokeStyle = color;
     ctx.fillStyle   = color;
-    ctx.lineWidth   = wb.settings.lineWidth;
+    ctx.lineWidth   = wb.penSettings.lineWidth;
     ctx.beginPath();
     ctx.moveTo(margin,     h/2);
     ctx.lineTo(w - margin, h/2);
@@ -332,7 +345,13 @@ GoCastJS.WhiteBoard = function(spot)
   this.WB_CANVAS = '<canvas id="wbCanvas" class="wbCanvas" width="' + this.width + '" height="' + this.height + '"></canvas>';
 
   this.mouse = new GoCastJS.WhiteBoardMouse(this); // the mouse state
-  this.settings = new GoCastJS.WhiteBoardSettings();
+  this.penSettings = new GoCastJS.WhiteBoardSettings(); // current pen settings
+  this.eraserSettings = new GoCastJS.WhiteBoardSettings(); // eraser settings
+  this.eraserSettings.lineWidth = 24;
+  this.eraserSettings.strokeStyle = "#FFF";
+  this.eraserSettings.colorName = "white";
+
+  this.settings = this.penSettings; // the current settings
 
   this.parent = spot;           // the parent dom object
   this.jqParent = $(this.parent); // the parent jq object
@@ -355,34 +374,6 @@ GoCastJS.WhiteBoard.prototype.init = function()
 
   this.tools = new GoCastJS.WhiteBoardTools(this); // add the toolboar
 
-  /*
-  // add controls and handlers
-  $(this.WB_PEN_WIDTH).appendTo(this.jqWb).data("wb", this).change(function(event)
-  {
-    var wb = $(this).data("wb"),
-        val = $(this).val();
-    console.log("wb pen width change", val);
-    wb.settings.lineWidth = val;
-    wb.settings.apply(wb.wbCtx);
-  }).val(this.settings.lineWidth);
-  $(this.WB_PEN_COLOR).appendTo(this.jqWb).data("wb", this).change(function(event)
-  {
-    var wb = $(this).data("wb"),
-        val = $(this).val();
-    console.log("wb pen color change", val);
-    wb.settings.strokeStyle = val;
-    wb.settings.apply(wb.wbCtx);
-  }).val(this.settings.strokeStyle);
-  */
-  /*
-  $(this.WB_ERASE_BUTTON).appendTo(this.jqWb)
-                         .data("wb", this)
-                         .button()
-                         .click(function(event)
-  {
-    console.log("wb eraser click");
-  });
-  */
   this.jqCanvas.data("wb", this); // create ref for handlers todo better way?
 
   this.settings.apply(this.wbCtx);
@@ -516,6 +507,7 @@ GoCastJS.WhiteBoard.prototype.onMouseDown = function(event)
   //console.log('wb.onMouseDown x' + event.offsetX + '(' + x + ') y ' + event.offsetY + '(' + y + ')' , event);
   // todo make sure event is a JQuery event
   wb.mouse.state = wb.mouse.DOWN;
+  wb.settings.apply(wb.wbCtx);
   wb.wbCtx.beginPath();
   wb.wbCtx.moveTo(x, y);
   wb.mouse.currentCommand = []; // new command array to be sent to server
