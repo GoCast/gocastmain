@@ -526,6 +526,10 @@ div.cloudcarousel.typeContent > div.spotUrlTitle
   border-color: black;
   background-color: white;
 }
+.wbCanvas.erasing
+{
+  cursor: url(../images/erase-small.png), arrow;
+}
 div.wbButton
 {
   border: 1px solid;
