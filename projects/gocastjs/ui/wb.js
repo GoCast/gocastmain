@@ -387,6 +387,9 @@ GoCastJS.WhiteBoard.prototype.init = function()
   this.jqCanvas.mouseup(this.onMouseUp);
   this.jqCanvas.mouseout(this.onMouseUp); // trigger mouseup on mouseout todo capture mouse and detect mouseup outside of target
 
+  // change the zoom icon to black for white background
+  $("img#upper-left", this.jqParent).attr("src", "images/fullscreen-black.png");
+
 }; // whiteboard init
 
 ///
@@ -526,6 +529,7 @@ GoCastJS.WhiteBoard.prototype.onMouseDown = function(event)
   wb.mouse.currentCommand = []; // new command array to be sent to server
   wb.mouse.currentCommand.push({name: 'beginPath', settings: wb.settings});
   wb.mouse.currentCommand.push({name: 'moveTo', x: (x >> 0), y: (y >> 0)});
+  return false; // disable text selection
 };
 
 ///
