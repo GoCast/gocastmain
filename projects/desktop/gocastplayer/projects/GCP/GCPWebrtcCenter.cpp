@@ -923,6 +923,20 @@ namespace GoCast
             m_pConnFactory->channel_manager()->SetAudioOptions(audioIn, audioOut, opts);
             m_pLocalStream->AddTrack(m_pConnFactory->CreateLocalAudioTrack(audioTrackLabel, NULL));
         }
+        else
+        {
+            std::string audioIn;
+            std::string audioOut;
+            std::string msg = "Using speakers: [";
+            int opts;
+            
+            m_pConnFactory->channel_manager()->GetAudioOptions(&audioIn, &audioOut, &opts);
+            audioOut = mediaHints->GetProperty("audioout").convert_cast<std::string>();
+            m_pConnFactory->channel_manager()->SetAudioOptions(audioIn, audioOut, opts);
+            
+            msg += (audioOut + "]...");
+            FBLOG_INFO_CUSTOM("RtcCenter::GetUserMedia_w", msg);
+        }
         
         if(NULL == succCb.get())
         {
