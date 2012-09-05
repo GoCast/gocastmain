@@ -344,7 +344,6 @@ body > div#meeting > div#zoom > img.close
 body > div#meeting > div#zoom > div.cloudcarousel 
 {
   position: absolute;
-  background-color: white;
   background-position: center center;
   background-repeat: no-repeat;
   background-size: 98%;
