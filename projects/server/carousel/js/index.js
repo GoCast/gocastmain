@@ -1937,7 +1937,6 @@ function sendLog()
   $('#message', jqDlg).text('Sending log file to server.');
   $('#stop-showing', jqDlg).css('display', 'none');
   $('#stop-showing-text', jqDlg).css('display', 'none');
-  $('.close', jqDlg).css('display', 'none');
   Callcast.SendLogsToLogCatcher(function()
   {
     // success callback
@@ -1948,10 +1947,4 @@ function sendLog()
   {
     Callcast.SendLiveLog("SendLogsToLogCatcher failed");
   });
-
-  // todo callbacks not getting called, close dialog after some timeout for now
-  setTimeout(function()
-  {
-    jqDlg.css("display", "none");
-  }, 5000);
 }
