@@ -36,7 +36,7 @@ GoCastJS.WhiteBoardTools = function(whiteBoard)
   this.initCanvas(this.jqPenColor);
 
   // create eraser
-  this.jqEraser = $('<div id="wbEraser"  class="wbButton wbEraser" title="Eraser"></div>').appendTo(this.jqTools).click(this.eraserClick).data('wb',this.wb);
+  this.jqEraser = $('<div id="wbEraser"  class="wbEraser" title="Eraser"></div>').appendTo(this.jqTools).click(this.eraserClick).data('wb',this.wb);
 
   this.initPenColors(this.jqTools);
 
