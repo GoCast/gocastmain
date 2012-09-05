@@ -369,6 +369,19 @@ Index: talk/p2p/base/stun.h
  
    int type() const { return type_; }
    size_t length() const { return length_; }
+Index: talk/session/phone/srtpfilter.cc
+===================================================================
+--- talk/session/phone/srtpfilter.cc	(revision 153)
++++ talk/session/phone/srtpfilter.cc	(working copy)
+@@ -332,7 +332,7 @@
+                                  CryptoParams* selected_params) {
+   // We're processing an accept. We should have exactly one set of params,
+   // unless the offer didn't mention crypto, in which case we shouldn't be here.
+-  bool ret = (answer_params.size() == 1U && !offer_params_.empty());
++  bool ret = (answer_params.size() >= 1U && !offer_params_.empty());
+   if (ret) {
+     // We should find a match between the answer params and the offered params.
+     std::vector<CryptoParams>::const_iterator it;
 Index: talk/session/phone/channelmanager.cc
 ===================================================================
 --- talk/session/phone/channelmanager.cc	(revision 153)
