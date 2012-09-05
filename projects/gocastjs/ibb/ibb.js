@@ -101,7 +101,7 @@ GoCastJS.IBBTransferClient.prototype.SendClose = function() {
     // Successful callback...
     function(iq) {
         // We're complete-complete.
-        self.cbSuccess('Completed transfer of ' + self.bytesSent + ' bytes to ' + this.RECEIVER);
+        self.cbSuccess('Completed transfer of ' + self.bytesSent + ' bytes to ' + self.RECEIVER);
     },
     // Failure callback
     function(iq) {
