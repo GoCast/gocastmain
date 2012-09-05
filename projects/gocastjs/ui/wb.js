@@ -79,22 +79,27 @@ GoCastJS.WhiteBoardTools.prototype.penColorClick = function(event)
       wb     = jqThis.data('wb'),
       spotPos = wb.jqParent.position(),
       spotH   = wb.jqParent.height(),
-      containerH = $(app.carousel.container).height(),
+      toolsPos = wb.tools.jqTools.position(), // wb tools pos todo height is zero so calcs are off
+      jqContainer = wb.jqParent.parent(), // spot parent 
+      containerH = jqContainer.height(),
       listH   = wb.tools.jqPenList.height(),
       top = pos.top;
 
   //console.log("wbPenColor click pos ", pos, " h ", h);
   //console.log("wbPenColor spot pos ", spotPos, " h ", spotH);
+  //console.log("wbPenColor toolsPos ", toolsPos);
   //console.log("wbPenColor container h", containerH);
   //console.log("wbPenColor list h", listH);
 
-  if (pos.top + spotPos.top + listH > containerH) // shift up if off bottom of carousel
+  // this is pos absolute wb tools is pos relative
+  if (toolsPos.top + spotPos.top + listH > containerH) // shift up if off bottom of carousel
   {
-    top = /* pos.top - pos.top +*/ -(spotPos.top + listH - containerH);
+    top = -(toolsPos.top + spotPos.top + listH - containerH);
   }
   wb.tools.jqEraser.removeClass('checked');
   wb.tools.updateTools();
   // position and display table, todo align selected color
+  console.log("wbPenColor top ", top, " pos.left ", pos.left);
   wb.tools.jqPenList.css({ "top": top,
                            "left": pos.left,
                            "visibility": "visible"});
