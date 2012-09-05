@@ -625,41 +625,52 @@ var Callcast = {
     },
 
     ToggleLocalVideoCapture: function() {
-        if (this.localstream) {
+        if (this.localstream && this.localstream.videoTracks.length) {
             this.localstream.videoTracks[0].enabled = !(this.localstream.videoTracks[0].enabled);
         }
     },
 
     MuteLocalVideoCapture: function(bMute) {
-        if (this.localstream) {
+        if (this.localstream && this.localstream.videoTracks.length) {
             this.localstream.videoTracks[0].enabled = (typeof (bMute) !== 'undefined') ? !bMute : false;
         }
     },
 
     MuteLocalAudioCapture: function(bMute) {
-        if (this.localstream) {
+        if (this.localstream && this.localstream.audioTracks.length) {
             this.localstream.audioTracks[0].enabled = (typeof (bMute) !== 'undefined') ? !bMute : false;
         }
     },
 
     InitGocastPlayer: function(jqSelector, success, failure) {
         if (!this.localplayer) {
-            var mediaHints = {audio: true, video: true};
-            var settings = JSON.parse(window.localStorage['gcpsettings'] || '{}');
+            var mediaHints = {audio: true, video: true},
+                settings = JSON.parse(window.localStorage.gcpsettings || '{}');
             mediaHints = GoCastJS.Utils.joinObjects(mediaHints, settings);
 
             if (true === mediaHints.video) {
                 if (!($(jqSelector).get(0).videoinopts[mediaHints.videoin])) {
-                    mediaHints.videoin = $(jqSelector).get(0).videoinopts['default'] || '';
+                    if (mediaHints.videoin !== '') {
+                        mediaHints.videoin = $(jqSelector).get(0).videoinopts['default'] || '';
+                    }
                 }
+
+                // If we discover that we really don't have a video input device, then turn it off entirely.
+                mediaHints.video = mediaHints.videoin !== '';
             }
             if (true === mediaHints.audio) {
                 if (-1 === $(jqSelector).get(0).audioinopts.indexOf(mediaHints.audioin)) {
-                    mediaHints.audioin = $(jqSelector).get(0).audioinopts[0] || '';
+                    if (mediaHints.audioin !== '') {
+                        mediaHints.audioin = $(jqSelector).get(0).audioinopts[0] || '';
+                    }
                 }
+
+                // If we discover that we really don't have an audio input device, then turn it off entirely.
+                mediaHints.audio = mediaHints.audioin !== '';
+
                 if (-1 === $(jqSelector).get(0).audiooutopts.indexOf(mediaHints.audioout)) {
                     mediaHints.audioout = $(jqSelector).get(0).audiooutopts[0] || '';
-                }                
+                }
             }
 
             GoCastJS.getUserMedia(
@@ -673,7 +684,7 @@ var Callcast = {
                         Callcast.localplayer = $(jqSelector).get(0);
 
                         if (0 < Callcast.localstream.videoTracks.length) {
-                            Callcast.localstream.videoTracks[0].effect = settings['effect'] || 'none';
+                            Callcast.localstream.videoTracks[0].effect = settings.effect || 'none';
                         }
 
                         if (!Callcast.localplayer && !Callcast.localplayer.version) {
