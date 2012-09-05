@@ -5,7 +5,7 @@
 
 "use strict";
 /*jslint sloppy: false, todo: true, white: true, browser: true, devel: true */
-/*global Callcast */
+/*global Callcast, app */
 
 var GoCastJS = ('undefined' !== typeof(GoCastJS)) ? GoCastJS : {};
 GoCastJS = (null !== GoCastJS) ? GoCastJS : {};
@@ -32,8 +32,8 @@ GoCastJS.WhiteBoardTools = function(whiteBoard)
   this.initCanvas(button);
 
   // create pen color button
-  button = $('<div id="wbPenColor" class="wbButton wbPenColor" title="Pen Color"><div class="wb-icon wb-icon-triangle-2-n-s"></div></div>').appendTo(this.jqTools).click(this.penColorClick).data('wb',this.wb);
-  this.initCanvas(button);
+  this.jqPenColor = $('<div id="wbPenColor" class="wbButton wbPenColor" title="Pen Color"><div class="wb-icon wb-icon-triangle-2-n-s"></div></div>').appendTo(this.jqTools).click(this.penColorClick).data('wb',this.wb);
+  this.initCanvas(this.jqPenColor);
 
   // create eraser
   this.jqEraser = $('<div id="wbEraser"  class="wbButton wbEraser" title="Eraser"></div>').appendTo(this.jqTools).click(this.eraserClick).data('wb',this.wb);
@@ -62,7 +62,7 @@ GoCastJS.WhiteBoardTools.prototype.penWidthClick = function(event)
       wb = $(this).data('wb');
 
   wb.tools.jqEraser.removeClass('checked');
-  console.log("wbPenW click", penSize, wb);
+  //console.log("wbPenW click", penSize, wb);
   wb.penSettings.lineWidth = penSize;
   wb.penSettings.apply(wb.wbCtx); // todo encapsulate
   wb.tools.jqPenList.css("visibility", "hidden"); // hide pen color list
@@ -75,13 +75,27 @@ GoCastJS.WhiteBoardTools.prototype.penColorClick = function(event)
 {
   var jqThis = $(this),
       pos    = jqThis.position(),
-      wb     = jqThis.data('wb');
-  console.log("wbPenColor click", this, pos, wb);
+      h      = jqThis.height(),
+      wb     = jqThis.data('wb'),
+      spotPos = wb.jqParent.position(),
+      spotH   = wb.jqParent.height(),
+      containerH = $(app.carousel.container).height(),
+      listH   = wb.tools.jqPenList.height(),
+      top = pos.top;
 
+  //console.log("wbPenColor click pos ", pos, " h ", h);
+  //console.log("wbPenColor spot pos ", spotPos, " h ", spotH);
+  //console.log("wbPenColor container h", containerH);
+  //console.log("wbPenColor list h", listH);
+
+  if (pos.top + spotPos.top + listH > containerH) // shift up if off bottom of carousel
+  {
+    top = /* pos.top - pos.top +*/ -(spotPos.top + listH - containerH);
+  }
   wb.tools.jqEraser.removeClass('checked');
   wb.tools.updateTools();
   // position and display table, todo align selected color
-  wb.tools.jqPenList.css({ "top": pos.top,
+  wb.tools.jqPenList.css({ "top": top,
                            "left": pos.left,
                            "visibility": "visible"});
 };
@@ -95,7 +109,7 @@ GoCastJS.WhiteBoardTools.prototype.penColorTrClick = function(event)
       name   = jqTd.attr('id'),
       color  = jqTd.attr('color'),
       wb     = jqThis.data('wb');
-  console.log("wbPenColorTr click", this, wb, name, color);
+  //console.log("wbPenColorTr click", this, wb, name, color);
 
   wb.penSettings.strokeStyle = color; // set current pen color
   wb.penSettings.colorName   = name;
@@ -111,7 +125,7 @@ GoCastJS.WhiteBoardTools.prototype.initCanvas = function(jqElem)
       h = jqElem.height(),
       jqCanvas = $('<canvas width = ' + w + ' height = ' + h + '></canvas>').appendTo(jqElem),
       ctx = jqCanvas[0].getContext('2d');
-  console.log("initCanvas ", w, h, jqElem);
+  //console.log("initCanvas ", w, h, jqElem);
   jqElem.data("ctx", ctx); // set ref to context
 };
 ///
@@ -154,17 +168,16 @@ GoCastJS.WhiteBoardTools.prototype.updateTools = function()
   var canvas, ctx, w, h,
       wb = this.wb, // closure var for each callback below
       checked = this.jqEraser.hasClass('checked'),
-      jqPenWidths = $(".wbPenW", this.jqTools), // pen width buttons
-      jqPenColor  = $(".wbPenColor", this.jqTools); // pen color button
+      jqPenWidths = $(".wbPenW", this.jqTools); // pen width buttons
 
-  console.log("updateTools", checked);
+  //console.log("updateTools", checked);
   // set the draw settings
   if (checked)
   {
     wb.settings = wb.eraserSettings;
     wb.settings.apply(wb.wbCtx); // todo encapsulate
     jqPenWidths.addClass('disabled');
-    jqPenColor.addClass('disabled');
+    this.jqPenColor.addClass('disabled');
     wb.jqCanvas.addClass('erasing');
   }
   else // select checked pen
@@ -172,7 +185,7 @@ GoCastJS.WhiteBoardTools.prototype.updateTools = function()
     wb.settings = wb.penSettings;
     wb.settings.apply(wb.wbCtx);
     jqPenWidths.removeClass('disabled');
-    jqPenColor.removeClass('disabled');
+    this.jqPenColor.removeClass('disabled');
     wb.jqCanvas.removeClass('erasing');
   }
   // set pen width button checked state
@@ -186,7 +199,7 @@ GoCastJS.WhiteBoardTools.prototype.updateTools = function()
         centerX = ctx.canvas.width / 2,
         centerY = ctx.canvas.height / 2;
 
-    console.log("updateTools each", penSize, ctx, centerX, centerY);
+    //console.log("updateTools each", penSize, ctx, centerX, centerY);
 
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
@@ -207,7 +220,7 @@ GoCastJS.WhiteBoardTools.prototype.updateTools = function()
         h = ctx.canvas.height,
         marginL = 10, // make this big to line up with pen strokes in drop down
         marginR = 0;
-    console.log("updateTools wbPenColor", penSize, ctx, w, h, iconPos);
+    //console.log("updateTools wbPenColor", penSize, ctx, w, h, iconPos);
 
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
@@ -233,7 +246,7 @@ GoCastJS.WhiteBoardTools.prototype.updateTools = function()
         color    = jqThis.attr("color"),
         margin   = 5;
 
-    console.log("draw pen color table entry", this);
+    //console.log("draw pen color table entry", this);
 
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
@@ -388,7 +401,7 @@ GoCastJS.WhiteBoard.prototype.sendSpot = function()
                     spottype: "whiteBoard", // whiteboard
                     spotreplace: "first-unoc", // set replace for replayed setspot
                     whiteboardcommandarray: JSON.stringify(this.mouseCommands)}; // send command array
-  console.log("WhiteBoard.sendSpot", cmd);
+  //console.log("WhiteBoard.sendSpot", cmd);
   Callcast.SetSpot(cmd);
 };
 ///
@@ -457,12 +470,22 @@ GoCastJS.WhiteBoard.prototype.setScale = function(width, height)
 {
   var wScale = width/this.width,
       hScale = height/this.height;
+      //penColorPos = this.tools.jqPenColor.offset(),
+      //penColorH   = this.tools.jqPenColor.height();
+
   this.scale = (wScale + hScale) / 2; // isotropic, keep aspect ratio
   this.scaleW = wScale;
   this.scaleH = hScale;
   //console.log("scale width " + width + " height " + height + " wScale" + wScale + " hScale " + hScale + " scale " + this.scale);
   this.wbCanvas.style.width = width + "px";
   this.wbCanvas.style.height = height + "px";
+
+  // move pen color table
+  // todo causes plugin reloads set dom values instead of jquery works in carousel may work here
+  //      for now hide pencolor table on resize, rotate
+  //this.tools.jqPenList.css({ "bottom": penColorPos.top + penColorH,
+  //                           "left": penColorPos.left});
+  this.tools.jqPenList.css("visibility", "hidden");
 };
 
 ///
