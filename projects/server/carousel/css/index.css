@@ -535,24 +535,23 @@ div#wbTools
 {
   position: relative;
 }
-div.wbButton
-{
-  border: 1px solid;
-  border-radius: 3px;
-  float:left;
-}
-div.wbEraser
+div.wbEraser /* not a wbButton due to background property collisions */
 {
   width:20px;
   height:20px;
-  background-image: url(../images/erase.png);
+  background-image: url(../images/erase.png), -webkit-gradient(linear, left top, left bottom, color-stop(0, white), color-stop(.5, #AFAFAF), color-stop(.51, #A0A0A0), to(#A0A0A0));
+  background-image: url(../images/erase.png), -moz-linear-gradient(top, white, #AFAFAF 50%, #A0A0A0 51%, #A0A0A0);
   background-repeat: no-repeat;
   background-size: 100% 100%;
   background-color: white;
+  border: 1px solid;
+  border-radius: 3px;
+  float: left;
 }
 div.wbEraser:not(.checked)
 {
-  background-color: gray;
+  background-image: url(../images/erase.png), -webkit-gradient(linear, left top, left bottom, color-stop(0, #9F9F9F), color-stop(.5, #909090), color-stop(.51, #808080), to(#808080));
+  background-image: url(../images/erase.png), -moz-linear-gradient(top, #9F9F9F, #909090 50%, #808080 51%, #808080);
 }
 div.wbPenW /* whiteboard pen width buttons */
 {
@@ -564,14 +563,6 @@ div.wbPenW /* whiteboard pen width buttons */
   border: 1px solid;
   border-radius: 3px;
   margin-right: 0px;
-}
-div.wbPenW.checked
-{
-  background-color: lightblue;
-}
-div.wbPenW.disabled
-{
-  background-color: gray;
 }
 div.wbPenColor /* whiteboard pen color button */
 {
@@ -590,9 +581,23 @@ div.wbPenColor > .wb-icon
   right: -3px;
   top: 2px;
 }
-div.wbPenColor.disabled
+div.wbButton
 {
-  background-color: gray;
+  border: 1px solid;
+  border-radius: 3px;
+  float:left;
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, white), color-stop(.5, #AFAFAF), color-stop(.51, #A0A0A0), to(#A0A0A0));
+  background: -moz-linear-gradient(top, white, #AFAFAF 50%, #A0A0A0 51%, #A0A0A0);
+}
+div.wbButton.checked
+{
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #9F9FFF), color-stop(.5, #9090FF), color-stop(.51, #8080FF), to(#8080FF));
+  background: -moz-linear-gradient(top, #9F9FFF, #9090FF 50%, #8080FF 51%, #8080FF);
+}
+div.wbButton.disabled
+{
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #9F9F9F), color-stop(.5, #909090), color-stop(.51, #808080), to(#808080));
+  background: -moz-linear-gradient(top, #9F9F9F, #909090 50%, #808080 51%, #808080);
 }
 div#wbPenColors
 {

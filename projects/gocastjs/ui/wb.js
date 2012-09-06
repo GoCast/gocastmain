@@ -36,7 +36,7 @@ GoCastJS.WhiteBoardTools = function(whiteBoard)
   this.initCanvas(this.jqPenColor);
 
   // create eraser
-  this.jqEraser = $('<div id="wbEraser"  class="wbButton wbEraser" title="Eraser"></div>').appendTo(this.jqTools).click(this.eraserClick).data('wb',this.wb);
+  this.jqEraser = $('<div id="wbEraser"  class="wbEraser" title="Eraser"></div>').appendTo(this.jqTools).click(this.eraserClick).data('wb',this.wb);
 
   this.initPenColors(this.jqTools);
 
@@ -342,8 +342,8 @@ GoCastJS.WhiteBoardSettings.prototype.applyJson = function(settings, context)
 ///
 GoCastJS.WhiteBoard = function(spot)
 {
-  this.width = 500; // logicial canvas width
-  this.height = 500; // logical canvas height
+  this.width = 1500; // logicial canvas width
+  this.height = 1500; // logical canvas height
   this.scale = 1.0; // the scale for x, y dimensions for transform from window to logical coord system
   this.scaleW = 1.0;
   this.scaleH = 1.0;
@@ -428,6 +428,7 @@ GoCastJS.WhiteBoard.prototype.doCommands = function(info)
   cmds = JSON.parse(info.whiteboardcommandarray);
   //console.log("WhiteBoard.doCommands", info, cmds);
   this.mouseCommands = []; // replace commands
+  this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
   for (i = 0; i < cmds.length; ++i)
   {
     this.doCommand(cmds[i]);
