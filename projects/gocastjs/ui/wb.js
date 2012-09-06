@@ -355,7 +355,7 @@ GoCastJS.WhiteBoard = function(spot)
   this.mouse = new GoCastJS.WhiteBoardMouse(this); // the mouse state
   this.penSettings = new GoCastJS.WhiteBoardSettings(); // current pen settings
   this.eraserSettings = new GoCastJS.WhiteBoardSettings(); // eraser settings
-  this.eraserSettings.lineWidth = 24;
+  this.eraserSettings.lineWidth = (this.width / 20) >> 0;
   this.eraserSettings.strokeStyle = "#FFF";
   this.eraserSettings.colorName = "white";
 
@@ -428,7 +428,7 @@ GoCastJS.WhiteBoard.prototype.doCommands = function(info)
   cmds = JSON.parse(info.whiteboardcommandarray);
   //console.log("WhiteBoard.doCommands", info, cmds);
   this.mouseCommands = []; // replace commands
-  this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+  this.wbCtx.clearRect(0, 0, this.wbCtx.canvas.width, this.wbCtx.canvas.height);
   for (i = 0; i < cmds.length; ++i)
   {
     this.doCommand(cmds[i]);

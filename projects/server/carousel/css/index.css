@@ -529,7 +529,7 @@ div.cloudcarousel.typeContent > div.spotUrlTitle
 }
 .wbCanvas.erasing
 {
-  cursor: url(../images/erase-small.png) 15 15, arrow;
+  cursor: url(../images/erase-small.png) 7 7, arrow;
 }
 div#wbTools
 {
