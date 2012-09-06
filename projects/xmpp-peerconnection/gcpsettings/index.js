@@ -58,9 +58,7 @@ var SettingsUI = {
 		var oldCamera = this.$camselect.val() || '';
 		var firstOption = '<option value="">no camera</option>';
 
-		this.$camselect.html('');
-		$(firstOption).appendTo(this.$camselect);
-
+		this.$camselect.html(firstOption);
 		for (i in cameras) {
 			if('default' !== i) {
 				var option = '<option value="' + i + '">' +
@@ -79,9 +77,7 @@ var SettingsUI = {
 		var oldMic = this.$micselect.val() || '';
 		var firstOption = '<option value="">no microphone</option>';
 
-		this.$micselect.html('');
-		$(firstOption).appendTo(this.$micselect);
-
+		this.$micselect.html(firstOption);
 		for (i in mics) {
 			var option = '<option value="' + mics[i] + '">' +
 						 mics[i] + '</option>';
@@ -96,11 +92,8 @@ var SettingsUI = {
 
 	updateSpks: function(spks, newSpk) {
 		var oldSpk = this.$spkselect.val() || '';
-		var firstOption = '<option value="">no speakers</option>';
 
 		this.$spkselect.html('');
-		$(firstOption).appendTo(this.$spkselect);
-
 		for (i in spks) {
 			var option = '<option value="' + spks[i] + '">' +
 						 spks[i] + '</option>';
@@ -252,8 +245,17 @@ var SettingsApp = {
 				var cameras = localplayer.videoinopts;
 				var newCamera = GoCastJS.Video.captureDevice;
 				if (0 < camsAdded.length) {
-					newCamera = firstCall ? (settings.videoin||camsAdded[0]) :
-					            camsAdded[0];
+					if ('undefined' === typeof(settings.videoin) ||
+						!firstCall) {
+						newCamera = camsAdded[0];
+					} else {
+						if ('' === settings.videoin ||
+							cameras[settings.videoin]) {
+							newCamera = settings.videoin;
+						} else {
+							newCamera = (cameras['default'] || '');
+						}
+					}
 				} else if (GoCastJS.Video.captureDevice === camsRemoved[0]) {
 					newCamera = (cameras['default'] || '');
 				}
@@ -265,8 +267,17 @@ var SettingsApp = {
 				var mics = localplayer.audioinopts;
 				var newMic = GoCastJS.Audio.inputDevice;
 				if (0 < micsAdded.length) {
-					newMic = firstCall ? (settings.audioin||micsAdded[0]) :
-					         micsAdded[0];
+					if ('undefined' === typeof(settings.audioin) ||
+						!firstCall) {
+						newMic = micsAdded[0];
+					} else {
+						if ('' === settings.audioin ||
+							0 <= mics.indexOf(settings.audioin)) {
+							newMic = settings.audioin;
+						} else {
+							newMic = (mics[0] || '');
+						}
+					}
 				} else if (GoCastJS.Audio.inputDevice === micsRemoved[0]) {
 					newMic = (mics[0] || '');
 				}
@@ -278,8 +289,17 @@ var SettingsApp = {
 				var spks = localplayer.audiooutopts;
 				var newSpk = GoCastJS.Audio.outputDevice;
 				if (0 < spksAdded.length) {
-					newSpk = firstCall ? (settings.audioout||spksAdded[0]) :
-					         spksAdded[0];
+					if ('undefined' === typeof(settings.audioout) ||
+						!firstCall) {
+						newSpk = spksAdded[0];
+					} else {
+						if ('' === settings.audioout ||
+							0 <= spks.indexOf(settings.audioout)) {
+							newSpk = settings.audioout;
+						} else {
+							newSpk = (spks[0] || '');
+						}
+					}
 				} else if (GoCastJS.Audio.outputDevice === spksRemoved[0]) {
 					newSpk = (spks[0] || '');
 				}
@@ -330,18 +350,20 @@ var SettingsApp = {
 			self.peerConnection = new GoCastJS.PeerConnection(options);
 			self.peerConnection.AddStream(self.localStream);
 
-			var offer = self.peerConnection.CreateOffer(hints);
-			self.peerConnection.SetLocalDescription(
-				'OFFER',
-				offer,
-				function() {
-					self.peerConnection.SetRemoteDescription('ANSWER', offer);
-					self.peerConnection.StartIce();
-				},
-				function(msg) {
-					console.log('PeerConnection: ' + msg);
-				}
-			);
+			if (true === hints.video || true === hints.audio) {
+				var offer = self.peerConnection.CreateOffer(hints);
+				self.peerConnection.SetLocalDescription(
+					'OFFER',
+					offer,
+					function() {
+						self.peerConnection.SetRemoteDescription('ANSWER', offer);
+						self.peerConnection.StartIce();
+					},
+					function(msg) {
+						console.log('PeerConnection: ' + msg);
+					}
+				);
+			}
 		};
 	},
 

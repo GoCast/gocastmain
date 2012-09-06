@@ -173,7 +173,7 @@ GoCastJS.getUserMedia = function(options, success, failure) {
             options.mediaHints,
             function(stream) {
                 if (false === player.init('localPlayer',
-                                          'STUN stun.l.google.com:19302',
+                                          'STUN video.gocast.it:19302',
                                           null)) {
                     throw new GoCastJS.Exception(player.id, 'init() failed.');
                 }
@@ -188,21 +188,29 @@ GoCastJS.getUserMedia = function(options, success, failure) {
                     audio: options.mediaHints.audio
                 };
 
-                player.setLocalDescription(
-                    'OFFER',
-                    player.createOffer(hints),
-                    function() {
-                        player.source = stream;
-                        if ('undefined' !== typeof(success) &&
-                            null !== success) {
-                            success(stream);
+                if (true === hints.video || true === hints.audio) {
+                    player.setLocalDescription(
+                        'OFFER',
+                        player.createOffer(hints),
+                        function() {
+                            player.source = stream;
+                            if ('undefined' !== typeof(success) &&
+                                null !== success) {
+                                success(stream);
+                            }
+                        },
+                        function(message) {
+                            console.log('localPlayer.setLocalDescription(): ',
+                                        message);
                         }
-                    },
-                    function(message) {
-                        console.log('localPlayer.setLocalDescription(): ',
-                                    message);
+                    );
+                } else {
+                    player.source = stream;
+                    if ('undefined' !== typeof(success) &&
+                        null !== success) {
+                        success(stream);
                     }
-                );
+                }
             },
             function(message) {
                 if ('undefined' !== typeof(failure) && null !== success) {
