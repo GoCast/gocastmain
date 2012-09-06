@@ -344,7 +344,6 @@ body > div#meeting > div#zoom > img.close
 body > div#meeting > div#zoom > div.cloudcarousel 
 {
   position: absolute;
-  background-color: white;
   background-position: center center;
   background-repeat: no-repeat;
   background-size: 98%;
@@ -465,7 +464,7 @@ div.cloudcarousel {
   background-position: center center;
   background-repeat: no-repeat
 }
-body > div#meeting > div#streams div.cloudcarousel > img#upper-right
+div.cloudcarousel > img#upper-right
 {
   visibility: hidden;
   width: 25px;
@@ -474,14 +473,16 @@ body > div#meeting > div#streams div.cloudcarousel > img#upper-right
   position: absolute;
   right: 3px;
   top: 3px;
+  z-index: 1000;
 }
-body > div#meeting > div#streams div.cloudcarousel > img#upper-left
+div.cloudcarousel > img#upper-left
 {
   visibility: hidden;
   width: 30px;
   height: 30px;
   margin: 3px;
   position: absolute;
+  z-index: 1000;
 }
 div.cloudcarousel
 {
@@ -517,6 +518,41 @@ div.cloudcarousel.typeContent > div.spotUrlTitle
   margin-right:auto;
   border-radius: 5px;  
 }
+.wb-icon { width: 16px; height: 16px; background-image: url(../images/wb-icons.png); }
+.wb-icon-check          { background-position: -64px -144px; }
+.wb-icon-triangle-2-n-s { background-position: -128px -16px; }
+.wbCanvas
+{
+  border: 1px solid;
+  border-color: black;
+  background-color: white;
+}
+.wbCanvas.erasing
+{
+  cursor: url(../images/erase-small.png) 15 15, arrow;
+}
+div#wbTools
+{
+  position: relative;
+}
+div.wbEraser /* not a wbButton due to background property collisions */
+{
+  width:20px;
+  height:20px;
+  background-image: url(../images/erase.png), -webkit-gradient(linear, left top, left bottom, color-stop(0, white), color-stop(.5, #AFAFAF), color-stop(.51, #A0A0A0), to(#A0A0A0));
+  background-image: url(../images/erase.png), -moz-linear-gradient(top, white, #AFAFAF 50%, #A0A0A0 51%, #A0A0A0);
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  background-color: white;
+  border: 1px solid;
+  border-radius: 3px;
+  float: left;
+}
+div.wbEraser:not(.checked)
+{
+  background-image: url(../images/erase.png), -webkit-gradient(linear, left top, left bottom, color-stop(0, #9F9F9F), color-stop(.5, #909090), color-stop(.51, #808080), to(#808080));
+  background-image: url(../images/erase.png), -moz-linear-gradient(top, #9F9F9F, #909090 50%, #808080 51%, #808080);
+}
 div.wbPenW /* whiteboard pen width buttons */
 {
   width: 20px;
@@ -527,28 +563,41 @@ div.wbPenW /* whiteboard pen width buttons */
   border: 1px solid;
   border-radius: 3px;
   margin-right: 0px;
-  float:left;
-}
-div.wbPenW.checked
-{
-  background-color: lightblue;
-}
-div.wbPenW.disabled
-{
-  background-color: gray;
 }
 div.wbPenColor /* whiteboard pen color button */
 {
-  width: 45px;
+  position: relative;
+  width: 55px;
   height: 20px;
   background-color: white;
   background-repeat: no-repeat;
   background-size: 100% 100%;
-  border: 1px solid;
-  border-radius: 3px;
   margin-left: 3px;
   margin-right: 0px;
+}
+div.wbPenColor > .wb-icon
+{
+  position: absolute;
+  right: -3px;
+  top: 2px;
+}
+div.wbButton
+{
+  border: 1px solid;
+  border-radius: 3px;
   float:left;
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, white), color-stop(.5, #AFAFAF), color-stop(.51, #A0A0A0), to(#A0A0A0));
+  background: -moz-linear-gradient(top, white, #AFAFAF 50%, #A0A0A0 51%, #A0A0A0);
+}
+div.wbButton.checked
+{
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #9F9FFF), color-stop(.5, #9090FF), color-stop(.51, #8080FF), to(#8080FF));
+  background: -moz-linear-gradient(top, #9F9FFF, #9090FF 50%, #8080FF 51%, #8080FF);
+}
+div.wbButton.disabled
+{
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #9F9F9F), color-stop(.5, #909090), color-stop(.51, #808080), to(#808080));
+  background: -moz-linear-gradient(top, #9F9F9F, #909090 50%, #808080 51%, #808080);
 }
 div#wbPenColors
 {
@@ -559,19 +608,21 @@ div#wbPenColors
 table#wbPenColorTable
 {
   background-color: white;
-  width: 45px;
+  border-color: black;
+  border-width: 1px;
+  border-radius: 3px;
+  width: 58px;
 }
 table#wbPenColorTable td
 {
-  height: 17px;
+  height: 13px;
 }
 table#wbPenColorTable td.check
 {
-  width: 17px;
+  width: 10px;
 }
 div.wbDiv
 {
-  background-color: white;
   width: 98%;
   height: 98%;
 }
