@@ -248,6 +248,7 @@ var Callcast = {
     fbaccesstoken: '',
     fb_sent_pres: false,
     sessionInfo: {},
+    mediaHints: {},
 
     WriteUpdatedState: function() {
         if (typeof (Storage) !== 'undefined')
@@ -547,9 +548,47 @@ var Callcast = {
         }
     },
 
+    IsVideoEnabled: function() {
+        if (!this.mediaHints.video) {
+            this.bUseVideo = false;
+            return false;
+        }
+        else {
+            return this.bUseVideo;
+        }
+    },
+
+    IsVideoDeviceAvailable: function() {
+        if (!this.mediaHints.video) {
+            this.bUseVideo = false;
+        }
+
+        return this.mediaHints.video;
+    },
+
+    IsMicrophoneEnabled: function() {
+        if (!this.mediaHints.audio) {
+            return false;
+        }
+        else {
+            return this.localstream.audioTracks[0].enabled;
+        }
+    },
+
+    IsMicrophoneDeviceAvailable: function() {
+        return this.mediaHints.audio;
+    },
+
     SendLocalVideoToPeers: function(send_it) {
         // This is used to detect a change in video on/off condition later in the function.
         var old_bUseVideo = this.bUseVideo;
+
+        // If media hints says we actually have no video or that 'none' is selected as the
+        // video device, then we cannot send video, so we're going to short circuit send_it
+        // in this case and reset it to false.
+        if (!this.mediaHints.video && (send_it || send_it.width >= 0 || send_it.height >= 0)) {
+            send_it = false;
+        }
 
         // Backwards compatibility allows true/false as an input and also a JSON object {width: w, height: h}
         if (send_it === true || send_it === false) {
@@ -644,38 +683,38 @@ var Callcast = {
 
     InitGocastPlayer: function(jqSelector, success, failure) {
         if (!this.localplayer) {
-            var mediaHints = {audio: true, video: true},
-                settings = JSON.parse(window.localStorage.gcpsettings || '{}');
-            mediaHints = GoCastJS.Utils.joinObjects(mediaHints, settings);
+            var settings = JSON.parse(window.localStorage.gcpsettings || '{}');
+            this.mediaHints = {audio: true, video: true};
+            this.mediaHints = GoCastJS.Utils.joinObjects(this.mediaHints, settings);
 
-            if (true === mediaHints.video) {
-                if (!($(jqSelector).get(0).videoinopts[mediaHints.videoin])) {
-                    if (mediaHints.videoin !== '') {
-                        mediaHints.videoin = $(jqSelector).get(0).videoinopts['default'] || '';
+            if (true === this.mediaHints.video) {
+                if (!($(jqSelector).get(0).videoinopts[this.mediaHints.videoin])) {
+                    if (this.mediaHints.videoin !== '') {
+                        this.mediaHints.videoin = $(jqSelector).get(0).videoinopts['default'] || '';
                     }
                 }
 
                 // If we discover that we really don't have a video input device, then turn it off entirely.
-                mediaHints.video = mediaHints.videoin !== '';
+                this.mediaHints.video = this.mediaHints.videoin !== '';
             }
-            if (true === mediaHints.audio) {
-                if (-1 === $(jqSelector).get(0).audioinopts.indexOf(mediaHints.audioin)) {
-                    if (mediaHints.audioin !== '') {
-                        mediaHints.audioin = $(jqSelector).get(0).audioinopts[0] || '';
+            if (true === this.mediaHints.audio) {
+                if (-1 === $(jqSelector).get(0).audioinopts.indexOf(this.mediaHints.audioin)) {
+                    if (this.mediaHints.audioin !== '') {
+                        this.mediaHints.audioin = $(jqSelector).get(0).audioinopts[0] || '';
                     }
                 }
 
                 // If we discover that we really don't have an audio input device, then turn it off entirely.
-                mediaHints.audio = mediaHints.audioin !== '';
+                this.mediaHints.audio = this.mediaHints.audioin !== '';
 
-                if (-1 === $(jqSelector).get(0).audiooutopts.indexOf(mediaHints.audioout)) {
-                    mediaHints.audioout = $(jqSelector).get(0).audiooutopts[0] || '';
+                if (-1 === $(jqSelector).get(0).audiooutopts.indexOf(this.mediaHints.audioout)) {
+                    this.mediaHints.audioout = $(jqSelector).get(0).audiooutopts[0] || '';
                 }
             }
 
             GoCastJS.getUserMedia(
                     new GoCastJS.UserMediaOptions(
-                        mediaHints,
+                        this.mediaHints,
                         $(jqSelector).get(0)
                     ),
                     function(stream) {
