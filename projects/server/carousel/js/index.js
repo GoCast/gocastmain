@@ -54,6 +54,8 @@ var app = {
   STATUS_PROMPT_STOP: "#upper-right > #status-prompt > #stop-showing",
   spotUrDefaultClass: "control close", // the class for #upper-right image for unoccupied spot
   spotUrDefaultImage: "images/trash.png",
+  VID_BUTTON: '#lower-right > #video',
+  LOCAL_PLUGIN: '#mystream',
   /**
    * Writes the specified log entry into the console HTML element, if
    * present. The meaning of logLevel is 1: debug, 2: info, 3:
@@ -233,8 +235,14 @@ var app = {
      if (enable)
      {
         $('#meeting > #streams > #scontrols > input').removeAttr('disabled');
-        $('#lower-right > #video').removeAttr('disabled');
-        $('#lower-right > #audio').removeAttr('disabled');
+        if (Callcast.IsVideoDeviceAvailable())
+        {
+          $('#lower-right > #video').removeAttr('disabled');
+        }
+        if (Callcast.IsMicrophoneDeviceAvailable())
+        {
+          $('#lower-right > #audio').removeAttr('disabled');
+        }
         $(app.GROUP_CHAT_OUT).removeAttr('disabled');
      }
      else
@@ -252,19 +260,20 @@ var app = {
   {
     if (this.osPlatform.isMac)
     {
-       return (this.MAC_PL_NAME);
+      return (this.MAC_PL_NAME);
     }
     else if (this.osPlatform.isWin)
     {
-       return (this.WIN_PL_NAME);
+      return (this.WIN_PL_NAME);
     }
     else // todo linux
     {
       return null;
     }
-  },
-  videoEnabled: true // video enabled state todo this must be initially in sync with video button class
-                     //       make either this var or button class the state variable
+  }
+  // video enabled state todo this must be initially in sync with video button class and Callcast
+  //       make either this var or button class the state variable
+  //videoEnabled: true
 }; /* app */
 
 ///
@@ -452,7 +461,7 @@ function activateWindow(
     $('input#btn', winId).on('click.s04072012', onJoinNow);
   }
   else if (winId.match('meeting')) {
-    $('#lower-right > #video').on('click.s04172012a', changeVideo);
+    $('#lower-right > #video').on('click.s04172012a', videoButtonPress);
     $('#lower-right > #audio').on('click.s04172012b', changeAudio);
   }
   else if (winId.match('chatInp')) {
@@ -736,6 +745,11 @@ function openMeeting(
 )
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
+  // center carousel in it's container
+  // the carousel positioning is handled by it's resize method
+  var sCar = $('#scarousel'),
+      rX = sCar.width() / 2,
+      rY = sCar.height() / 2;
   app.log(2, 'openMeeting');
 
   /*
@@ -743,22 +757,6 @@ function openMeeting(
   $('#meeting > #streams > #scarousel #mystream')
     .attr('encname', app.user.name);
 
-  // use fb profile pick as bg image if it exists
-  // set this here initially because local video
-  // is off initially
-  /* todo below needs to be uncommented if initial video state is off
-          rewrite the video on/off background on/off code
-  if (app.user.fbProfilePicUrl)
-  {
-     $('#meeting > #streams > #scarousel #mystream')
-        .css('background-image', 'url(' + app.user.fbProfilePicUrl + ')');
-  }
-  */
-  // center carousel in it's container
-  // the carousel positioning is handled by it's resize method
-  var sCar = $('#scarousel'),
-      rX = sCar.width() / 2,
-      rY = sCar.height() / 2;
   $('#scarousel').CloudCarousel(
     {
       xPos: rX,
@@ -1067,27 +1065,47 @@ function closeStatus(event)
 {
    $(app.STATUS_PROMPT).css("display", "none");
 }
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-/**
- * \brief Action change Video.
- */
-function changeVideo()
+///
+/// \brief video button handler
+///
+function videoButtonPress(event)
 {
-  var jqObj = $('#lower-right > #video'),
-      jqOo = $('#mystream'),
+  changeVideo();
+}
+///
+/// \brief Action change Video.
+///
+function changeVideo(enableVideo)
+{
+  var jqObj = $(app.VID_BUTTON),
+      jqOo = $(app.LOCAL_PLUGIN),
+      enable,
       w, h;
   if (!jqObj)
   {
-     app.log(4, "couldn't find video button");
+     app.log(4, "changeVideo couldn't find video button");
   }
   if (!jqOo)
   {
-     app.log(4, "couldn't find local video spot");
+     app.log(4, "changeVideo couldn't find local video spot");
   }
-  $(jqObj).toggleClass('on');
-  app.videoEnabled = $(jqObj).hasClass('on');
-  console.log("changeVideo", app.video);
-  if (app.videoEnabled) {
+  if (!Callcast.IsVideoDeviceAvailable())
+  {
+     app.log(4, "changeVideo called when video is not available");
+  }
+  // if called without arg toggle video (old behavior)
+  if (undefined === enableVideo)
+  {
+    enable = !Callcast.IsVideoEnabled();
+  }
+  else // use arg
+  {
+    enable = enableVideo;
+  }
+  if (enable)
+  {
+    $(jqObj).addClass('on'). // change button
+             attr('title', 'Disable video');
     // Check object dimensions.
     w = jqOo.width() - 4;
     h = Callcast.HEIGHT * (w / Callcast.WIDTH);
@@ -1099,22 +1117,17 @@ function changeVideo()
        $(jqOo).css('background-image', '');
     }
   }
-  else {
-    Callcast.SendLocalVideoToPeers(app.videoEnabled);
+  else 
+  {
+    $(jqObj).removeClass('on'). // change button
+             attr('title', 'Enable video');
+    Callcast.SendLocalVideoToPeers(enable);
     // show background image if fb image url exists
     // if not the default is used and does not show around the plugin
     if (app.user.fbProfilePicUrl)
     {
        $(jqOo).css('background-image', 'url(' + app.user.fbProfilePicUrl + ')');
     }
-  }
-  if (app.videoEnabled) {
-    app.log(2, 'Video turned on.');
-    $(jqObj).attr('title', 'Disable video');
-  }
-  else {
-    app.log(2, 'Video turned off.');
-    $(jqObj).attr('title', 'Enable video');
   }
   return false;
 } /* changeVideo() */
@@ -1453,6 +1466,26 @@ function handleRoomSetup() {
        var newUrl = window.location + '?roomname=' + new_name;
        app.log(2, 'replacing state ' + newUrl);
        history.replaceState(null, null, newUrl);
+    }
+    // initialize video, audio state here since this method
+    // is called after the local plugin is loaded
+    // use fb profile pick as bg image if it exists
+    if (!Callcast.IsVideoDeviceAvailable())
+    {
+      if (app.user.fbProfilePicUrl)
+      {
+       $('#meeting > #streams > #scarousel #mystream')
+          .css('background-image', 'url(' + app.user.fbProfilePicUrl + ')');
+      }
+    }
+    else // video available
+    {
+      // turn video on todo save video state in session var
+      if (!Callcast.IsVideoEnabled())
+      {
+        console.log("openmeeting video initially disable, turning it on");
+        changeVideo(true);
+      }
     }
   });
 }

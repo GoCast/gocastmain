@@ -246,14 +246,25 @@ body > div#lower-right > input.fbShare {
   width: 69px;
   background-image: url("../images/fbShare.png");
 }
+body > div#lower-right > input#video:disabled {
+  background-image: url("../images/video-disabled.png");
+}
+body > div#lower-right > input#video.on:disabled {
+  background-image: url("../images/video-disabled.png");
+}
 body > div#lower-right > input#video {
   background-image: url("../images/video-off.png");
 }
 body > div#lower-right > input#video.on {
   background-image: url("../images/video-on.png");
 }
+body > div#lower-right > input#audio:disabled {
+  background-image: url("../images/sound-disabled.png");
+}
+body > div#lower-right > input#audio.off:disabled {
+  background-image: url("../images/sound-disabled.png");
+}
 body > div#lower-right > input#audio.off {
-  margin-left: 5px;
   background-image: url("../images/sound.png");
 }
 body > div#lower-right > input#audio {

@@ -368,14 +368,10 @@
             }
             if ($(obj).attr('id').match('mystream'))
             {
-                if (app.videoEnabled)
+                if (Callcast.IsVideoEnabled())
                 {
                    Callcast.SendLocalVideoToPeers({width: w, height: h});
                 }
-/*            else
-                {
-                    app.log(2, "Nothing to do with resizing video.");
-                } */
             }
             else
             {
@@ -416,7 +412,7 @@
             }
             if ($(obj).attr('id').match('mystream'))
             {
-               if (app.videoEnabled)
+               if (Callcast.IsVideoEnabled())
                {
                   Callcast.SendLocalVideoToPeers({width: w, height: h});
                }
