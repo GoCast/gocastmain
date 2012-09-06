@@ -448,14 +448,18 @@ GoCastJS.WhiteBoard.prototype.doCommand = function(cmdArray)
   for (i = 0; i < cmdArray.length; ++i) {
     //console.log("cmd", cmdArray[i]);
     switch (cmdArray[i].name) {
-      case "beginPath":
+      case "save":
         this.wbCtx.save();
         this.settings.applyJson(cmdArray[i].settings, this.wbCtx);
+        break;
+      case "restore":
+        this.wbCtx.restore();
+        break;
+      case "beginPath":
         this.wbCtx.beginPath();
         break;
       case "closePath":
         this.wbCtx.closePath();
-        this.wbCtx.restore();
         break;
       case "moveTo":
         this.wbCtx.moveTo(cmdArray[i].x, cmdArray[i].y);
@@ -533,7 +537,8 @@ GoCastJS.WhiteBoard.prototype.onMouseDown = function(event)
   wb.wbCtx.beginPath();
   wb.wbCtx.moveTo(x, y);
   wb.mouse.currentCommand = []; // new command array to be sent to server
-  wb.mouse.currentCommand.push({name: 'beginPath', settings: wb.settings});
+  wb.mouse.currentCommand.push({name: 'save', settings: wb.settings});
+  wb.mouse.currentCommand.push({name: 'beginPath'});
   wb.mouse.currentCommand.push({name: 'moveTo', x: (x >> 0), y: (y >> 0)});
   return false; // disable text selection
 };
@@ -554,8 +559,9 @@ GoCastJS.WhiteBoard.prototype.onMouseUp = function(event)
   event.stopPropagation();
   // todo make sure event is a JQuery event
   if (wb.mouse.DOWN === wb.mouse.state) {
-    wb.wbCtx.closePath();
-    wb.mouse.currentCommand.push({name: 'closePath'});
+    wb.wbCtx.stroke();
+    wb.mouse.currentCommand.push({name: 'stroke'});
+    wb.mouse.currentCommand.push({name: 'restore'});
     wb.mouseCommands.push(wb.mouse.currentCommand);
     wb.mouse.currentCommand = [];
     wb.sendSpot();
@@ -579,8 +585,7 @@ GoCastJS.WhiteBoard.prototype.onMouseMove = function(event)
   // todo make sure event is a JQuery event
   if (wb.mouse.DOWN === wb.mouse.state){
     wb.wbCtx.lineTo(x, y);
-    wb.wbCtx.stroke();
+    wb.wbCtx.stroke(); // draw stroke but don't push it, stroke is pushed on mouse up at end of cmd
     wb.mouse.currentCommand.push({name: 'lineTo', x: (x >> 0), y: (y >> 0)});
-    wb.mouse.currentCommand.push({name: 'stroke'});
   }
 };
