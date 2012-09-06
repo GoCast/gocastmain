@@ -562,6 +562,7 @@
            obj.style.left = x + 'px';
            obj.style.bottom = '0px';
            ctx.adjPlugin(item, scale); // Adjust object dimensions.
+           item.scale(scale);
            //app.log(2, "updateLinear item " + item.index + " x " + x);
            x += (spotWidth + spotSpace);
         }); // end iteration
