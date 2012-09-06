@@ -428,6 +428,7 @@ GoCastJS.WhiteBoard.prototype.doCommands = function(info)
   cmds = JSON.parse(info.whiteboardcommandarray);
   //console.log("WhiteBoard.doCommands", info, cmds);
   this.mouseCommands = []; // replace commands
+  this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
   for (i = 0; i < cmds.length; ++i)
   {
     this.doCommand(cmds[i]);
