@@ -76,6 +76,7 @@ GoCastJS.WhiteBoardTools.prototype.penColorClick = function(event)
   var jqThis = $(this),
       pos    = jqThis.position(),
       h      = jqThis.height(),
+      w      = (jqThis.width() + 1) + "px",
       wb     = jqThis.data('wb'),
       spotPos = wb.jqParent.position(),
       spotH   = wb.jqParent.height(),
@@ -102,6 +103,7 @@ GoCastJS.WhiteBoardTools.prototype.penColorClick = function(event)
   console.log("wbPenColor top ", top, " pos.left ", pos.left);
   wb.tools.jqPenList.css({ "top": top,
                            "left": pos.left,
+                           "width": w,
                            "visibility": "visible"});
 };
 ///

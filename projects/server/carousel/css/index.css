@@ -615,14 +615,17 @@ div#wbPenColors
   position: absolute;
   top: 0px;
   left:0px;
+  width: 55px;
+  margin-left: 3px;
+  margin-right: 0px;
 }
 table#wbPenColorTable
 {
   background-color: white;
   border-color: black;
-  border-width: 1px;
+  /*border-width: 1px;*/
   border-radius: 3px;
-  width: 58px;
+  width: 57px; /* needed to init canvas */
 }
 table#wbPenColorTable td
 {
