@@ -31,7 +31,9 @@
   closeWindow,
   installPrompt,
   checkForPlugin,
-  connectionStatus
+  connectionStatus,
+  videoButtonPress,
+  audioButtonPress
 */
 'use strict';
 
@@ -55,6 +57,7 @@ var app = {
   spotUrDefaultClass: "control close", // the class for #upper-right image for unoccupied spot
   spotUrDefaultImage: "images/trash.png",
   VID_BUTTON: '#lower-right > #video',
+  AUD_BUTTON: '#lower-right > #audio',
   LOCAL_PLUGIN: '#mystream',
   /**
    * Writes the specified log entry into the console HTML element, if
@@ -462,7 +465,7 @@ function activateWindow(
   }
   else if (winId.match('meeting')) {
     $('#lower-right > #video').on('click.s04172012a', videoButtonPress);
-    $('#lower-right > #audio').on('click.s04172012b', changeAudio);
+    $('#lower-right > #audio').on('click.s04172012b', audioButtonPress);
   }
   else if (winId.match('chatInp')) {
     $('input.chatTo', winId).on('keydown.s04172012g', keypressChatHandler);
@@ -1081,11 +1084,11 @@ function changeVideo(enableVideo)
       jqOo = $(app.LOCAL_PLUGIN),
       enable,
       w, h;
-  if (!jqObj)
+  if (!jqObj[0])
   {
      app.log(4, "changeVideo couldn't find video button");
   }
-  if (!jqOo)
+  if (!jqOo[0])
   {
      app.log(4, "changeVideo couldn't find local video spot");
   }
@@ -1104,8 +1107,8 @@ function changeVideo(enableVideo)
   }
   if (enable)
   {
-    $(jqObj).addClass('on'). // change button
-             attr('title', 'Disable video');
+    jqObj.addClass('on') // change button
+         .attr('title', 'Turn Video Off');
     // Check object dimensions.
     w = jqOo.width() - 4;
     h = Callcast.HEIGHT * (w / Callcast.WIDTH);
@@ -1114,50 +1117,65 @@ function changeVideo(enableVideo)
     // if there is no fb image leave the default bg image since it does not show through
     if (app.user.fbProfilePicUrl)
     {
-       $(jqOo).css('background-image', '');
+      jqOo.css('background-image', '');
     }
   }
   else 
   {
-    $(jqObj).removeClass('on'). // change button
-             attr('title', 'Enable video');
+    jqObj.removeClass('on') // change button
+         .attr('title', 'Turn Video On');
     Callcast.SendLocalVideoToPeers(enable);
     // show background image if fb image url exists
     // if not the default is used and does not show around the plugin
     if (app.user.fbProfilePicUrl)
     {
-       $(jqOo).css('background-image', 'url(' + app.user.fbProfilePicUrl + ')');
+       jqOo.css('background-image', 'url(' + app.user.fbProfilePicUrl + ')');
     }
   }
   return false;
-} /* changeVideo() */
+} // changeVideo()
 
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-/**
- * \brief Action change Audio.
- */
-function changeAudio()
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+///
+/// \brief audio button press handler
+///
+function audioButtonPress()
 {
-  var jqObj = $('#lower-right > #audio'),
+  changeAudio();
+}
+///
+/// \brief Action change Audio.
+///
+function changeAudio(enableAudio)
+{
+  var jqObj = $(app.AUD_BUTTON),
       bMuteAudio;
-  if (!jqObj)
+  if (!jqObj[0])
   {
-     app.log(4, "couldn't find video button");
+    app.log(4, "couldn't find video button");
   }
-  bMuteAudio = $(jqObj).hasClass('off');
+  if (undefined === enableAudio) // if arg not defined toggle audio
+  {
+    bMuteAudio = Callcast.IsMicrophoneEnabled(); // note inversion in var meaning
+  }
+  else // use arg
+  {
+    bMuteAudio = !enableAudio
+  }
   Callcast.MuteLocalAudioCapture(bMuteAudio);
-  $(jqObj).toggleClass('off');
-  if (bMuteAudio) {
+  if (bMuteAudio) 
+  {
     app.log(2, 'Audio muted.');
-    $(jqObj).attr('title', 'Unmute audio');
+    jqObj.addClass("off");
+    jqObj.attr('title', 'Unmute Audio');
   }
-  else {
+  else
+  {
     app.log(2, 'Audio unmuted.');
-    $(jqObj).attr('title', 'Mute audio');
+    jqObj.removeClass("off");
+    jqObj.attr('title', 'Mute Audio');
   }
   return false;
-} /* changeAudio() */
+} // changeAudio()
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
@@ -1480,12 +1498,11 @@ function handleRoomSetup() {
     }
     else // video available
     {
-      // turn video on todo save video state in session var
-      if (!Callcast.IsVideoEnabled())
-      {
-        console.log("openmeeting video initially disable, turning it on");
-        changeVideo(true);
-      }
+      changeVideo(true); // do this unconditionally so ui gets updated
+    }
+    if (Callcast.IsMicrophoneDeviceAvailable())
+    {
+      changeAudio(true); // do this unconditionally so ui gets updated
     }
   });
 }
