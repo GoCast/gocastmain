@@ -246,19 +246,30 @@ body > div#lower-right > input.fbShare {
   width: 69px;
   background-image: url("../images/fbShare.png");
 }
+body > div#lower-right > input#video:disabled {
+  background-image: url("../images/video-disabled.png");
+}
+body > div#lower-right > input#video.on:disabled {
+  background-image: url("../images/video-disabled.png");
+}
 body > div#lower-right > input#video {
   background-image: url("../images/video-off.png");
 }
 body > div#lower-right > input#video.on {
   background-image: url("../images/video-on.png");
 }
+body > div#lower-right > input#audio:disabled {
+  background-image: url("../images/sound-disabled.png");
+}
+body > div#lower-right > input#audio.off:disabled {
+  background-image: url("../images/sound-disabled.png");
+}
 body > div#lower-right > input#audio.off {
-  margin-left: 5px;
-  background-image: url("../images/sound.png");
+  background-image: url("../images/mute.png");
 }
 body > div#lower-right > input#audio {
   margin-left: 5px;
-  background-image: url("../images/mute.png");
+  background-image: url("../images/sound.png");
 }
 body > div#lower-left {
   position: absolute;
@@ -529,7 +540,7 @@ div.cloudcarousel.typeContent > div.spotUrlTitle
 }
 .wbCanvas.erasing
 {
-  cursor: url(../images/erase-small.png) 15 15, arrow;
+  cursor: url(../images/erase-small.png) 7 7, arrow;
 }
 div#wbTools
 {
@@ -604,14 +615,17 @@ div#wbPenColors
   position: absolute;
   top: 0px;
   left:0px;
+  width: 55px;
+  margin-left: 3px;
+  margin-right: 0px;
 }
 table#wbPenColorTable
 {
   background-color: white;
   border-color: black;
-  border-width: 1px;
+  /*border-width: 1px;*/
   border-radius: 3px;
-  width: 58px;
+  width: 57px; /* needed to init canvas */
 }
 table#wbPenColorTable td
 {

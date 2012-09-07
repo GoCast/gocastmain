@@ -368,14 +368,10 @@
             }
             if ($(obj).attr('id').match('mystream'))
             {
-                if (app.videoEnabled)
+                if (Callcast.IsVideoEnabled())
                 {
                    Callcast.SendLocalVideoToPeers({width: w, height: h});
                 }
-/*            else
-                {
-                    app.log(2, "Nothing to do with resizing video.");
-                } */
             }
             else
             {
@@ -416,7 +412,7 @@
             }
             if ($(obj).attr('id').match('mystream'))
             {
-               if (app.videoEnabled)
+               if (Callcast.IsVideoEnabled())
                {
                   Callcast.SendLocalVideoToPeers({width: w, height: h});
                }
@@ -562,6 +558,7 @@
            obj.style.left = x + 'px';
            obj.style.bottom = '0px';
            ctx.adjPlugin(item, scale); // Adjust object dimensions.
+           item.scale(scale);
            //app.log(2, "updateLinear item " + item.index + " x " + x);
            x += (spotWidth + spotSpace);
         }); // end iteration

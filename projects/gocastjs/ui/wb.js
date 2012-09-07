@@ -76,6 +76,7 @@ GoCastJS.WhiteBoardTools.prototype.penColorClick = function(event)
   var jqThis = $(this),
       pos    = jqThis.position(),
       h      = jqThis.height(),
+      w      = (jqThis.width() + 1) + "px",
       wb     = jqThis.data('wb'),
       spotPos = wb.jqParent.position(),
       spotH   = wb.jqParent.height(),
@@ -102,6 +103,7 @@ GoCastJS.WhiteBoardTools.prototype.penColorClick = function(event)
   console.log("wbPenColor top ", top, " pos.left ", pos.left);
   wb.tools.jqPenList.css({ "top": top,
                            "left": pos.left,
+                           "width": w,
                            "visibility": "visible"});
 };
 ///
@@ -355,7 +357,7 @@ GoCastJS.WhiteBoard = function(spot)
   this.mouse = new GoCastJS.WhiteBoardMouse(this); // the mouse state
   this.penSettings = new GoCastJS.WhiteBoardSettings(); // current pen settings
   this.eraserSettings = new GoCastJS.WhiteBoardSettings(); // eraser settings
-  this.eraserSettings.lineWidth = 24;
+  this.eraserSettings.lineWidth = (this.width / 20) >> 0;
   this.eraserSettings.strokeStyle = "#FFF";
   this.eraserSettings.colorName = "white";
 
@@ -428,7 +430,7 @@ GoCastJS.WhiteBoard.prototype.doCommands = function(info)
   cmds = JSON.parse(info.whiteboardcommandarray);
   //console.log("WhiteBoard.doCommands", info, cmds);
   this.mouseCommands = []; // replace commands
-  this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+  this.wbCtx.clearRect(0, 0, this.wbCtx.canvas.width, this.wbCtx.canvas.height);
   for (i = 0; i < cmds.length; ++i)
   {
     this.doCommand(cmds[i]);
@@ -448,14 +450,18 @@ GoCastJS.WhiteBoard.prototype.doCommand = function(cmdArray)
   for (i = 0; i < cmdArray.length; ++i) {
     //console.log("cmd", cmdArray[i]);
     switch (cmdArray[i].name) {
-      case "beginPath":
+      case "save":
         this.wbCtx.save();
         this.settings.applyJson(cmdArray[i].settings, this.wbCtx);
+        break;
+      case "restore":
+        this.wbCtx.restore();
+        break;
+      case "beginPath":
         this.wbCtx.beginPath();
         break;
       case "closePath":
         this.wbCtx.closePath();
-        this.wbCtx.restore();
         break;
       case "moveTo":
         this.wbCtx.moveTo(cmdArray[i].x, cmdArray[i].y);
@@ -533,7 +539,8 @@ GoCastJS.WhiteBoard.prototype.onMouseDown = function(event)
   wb.wbCtx.beginPath();
   wb.wbCtx.moveTo(x, y);
   wb.mouse.currentCommand = []; // new command array to be sent to server
-  wb.mouse.currentCommand.push({name: 'beginPath', settings: wb.settings});
+  wb.mouse.currentCommand.push({name: 'save', settings: wb.settings});
+  wb.mouse.currentCommand.push({name: 'beginPath'});
   wb.mouse.currentCommand.push({name: 'moveTo', x: (x >> 0), y: (y >> 0)});
   return false; // disable text selection
 };
@@ -554,8 +561,9 @@ GoCastJS.WhiteBoard.prototype.onMouseUp = function(event)
   event.stopPropagation();
   // todo make sure event is a JQuery event
   if (wb.mouse.DOWN === wb.mouse.state) {
-    wb.wbCtx.closePath();
-    wb.mouse.currentCommand.push({name: 'closePath'});
+    wb.wbCtx.stroke();
+    wb.mouse.currentCommand.push({name: 'stroke'});
+    wb.mouse.currentCommand.push({name: 'restore'});
     wb.mouseCommands.push(wb.mouse.currentCommand);
     wb.mouse.currentCommand = [];
     wb.sendSpot();
@@ -579,8 +587,7 @@ GoCastJS.WhiteBoard.prototype.onMouseMove = function(event)
   // todo make sure event is a JQuery event
   if (wb.mouse.DOWN === wb.mouse.state){
     wb.wbCtx.lineTo(x, y);
-    wb.wbCtx.stroke();
+    wb.wbCtx.stroke(); // draw stroke but don't push it, stroke is pushed on mouse up at end of cmd
     wb.mouse.currentCommand.push({name: 'lineTo', x: (x >> 0), y: (y >> 0)});
-    wb.mouse.currentCommand.push({name: 'stroke'});
   }
 };
