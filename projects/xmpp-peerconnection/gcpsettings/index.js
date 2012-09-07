@@ -348,22 +348,23 @@ var SettingsApp = {
 			);
 
 			self.peerConnection = new GoCastJS.PeerConnection(options);
-			self.peerConnection.AddStream(self.localStream);
 
-			if (true === hints.video || true === hints.audio) {
-				var offer = self.peerConnection.CreateOffer(hints);
-				self.peerConnection.SetLocalDescription(
-					'OFFER',
-					offer,
-					function() {
-						self.peerConnection.SetRemoteDescription('ANSWER', offer);
-						self.peerConnection.StartIce();
-					},
-					function(msg) {
-						console.log('PeerConnection: ' + msg);
-					}
-				);
+			if (hints.audio || hints.video) {
+				self.peerConnection.AddStream(self.localStream);
 			}
+
+			var offer = self.peerConnection.CreateOffer({audio: true, video: true});
+			self.peerConnection.SetLocalDescription(
+				'OFFER',
+				offer,
+				function() {
+					self.peerConnection.SetRemoteDescription('ANSWER', offer);
+					self.peerConnection.StartIce();
+				},
+				function(msg) {
+					console.log('PeerConnection: ' + msg);
+				}
+			);
 		};
 	},
 

@@ -172,45 +172,39 @@ GoCastJS.getUserMedia = function(options, success, failure) {
         player.getUserMedia(
             options.mediaHints,
             function(stream) {
+                var hints = {
+                    video: options.mediaHints.video,
+                    audio: options.mediaHints.audio
+                };
+
                 if (false === player.init('localPlayer',
                                           'STUN video.gocast.it:19302',
                                           null)) {
                     throw new GoCastJS.Exception(player.id, 'init() failed.');
                 }
 
-                if (false === player.addStream(stream)) {
-                    throw new GoCastJS.Exception(player.id,
-                                                 'addStream() failed.');
+                if (hints.audio || hints.video) {
+                    if (false === player.addStream(stream)) {
+                        throw new GoCastJS.Exception(player.id,
+                                                     'addStream() failed.');
+                    }                    
                 }
 
-                var hints = {
-                    video: options.mediaHints.video,
-                    audio: options.mediaHints.audio
-                };
-
-                if (true === hints.video || true === hints.audio) {
-                    player.setLocalDescription(
-                        'OFFER',
-                        player.createOffer(hints),
-                        function() {
-                            player.source = stream;
-                            if ('undefined' !== typeof(success) &&
-                                null !== success) {
-                                success(stream);
-                            }
-                        },
-                        function(message) {
-                            console.log('localPlayer.setLocalDescription(): ',
-                                        message);
+                player.setLocalDescription(
+                    'OFFER',
+                    player.createOffer({audio: true, video: true}),
+                    function() {
+                        player.source = stream;
+                        if ('undefined' !== typeof(success) &&
+                            null !== success) {
+                            success(stream);
                         }
-                    );
-                } else {
-                    player.source = stream;
-                    if ('undefined' !== typeof(success) &&
-                        null !== success) {
-                        success(stream);
+                    },
+                    function(message) {
+                        console.log('localPlayer.setLocalDescription(): ',
+                                    message);
                     }
-                }
+                );
             },
             function(message) {
                 if ('undefined' !== typeof(failure) && null !== success) {
