@@ -68,7 +68,15 @@
         <p id="stop-showing-text">Stop showing this message.</p>
         <img class="close" src="images/button-close.png" alt="Close" title="Close" onClick="closeStatus(event);"/>
       </div>
-      <div id="log" title="Send log file to GoCast." onClick="sendLog();"></div>
+      <div id="send-log-prompt" class="warning">
+        <button id="send" class="send button" onclick="sendLog()">Send</button>
+        <button id="stop" class="close button" onclick="closeSendLog()">Stop</button>
+        <p id="message">Send debug info to GoCast?</p><br>
+        <input id="stop-showing" type="checkbox" value="Stop"onclick="stopSendLogClicked(event);"/>
+        <p id="stop-showing-text">Stop showing this message.</p>
+        <img class="close" src="images/button-close.png" alt="Close" title="Close" onClick="closeSendLog();"/>
+      </div>
+      <div id="log" title="Send log file to GoCast." onClick="sendLogPrompt();"></div>
     </div>
     <div id="lower-right">
        <input id="dlbtn" type="button" title="Get Updated Plugin." onclick="doDownload();" />

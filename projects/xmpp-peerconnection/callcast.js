@@ -203,10 +203,10 @@ var logQ = new GoCastJS.BQueue(1024*1024);
 var Callcast = {
     PLUGIN_VERSION_CURRENT: 0.0,
     PLUGIN_VERSION_REQUIRED: 0.0,
-    PLUGIN_VERSION_CURRENT_MAC: 1.27,
-    PLUGIN_VERSION_REQUIRED_MAC: 1.27,
-    PLUGIN_VERSION_CURRENT_WIN: 1.27,
-    PLUGIN_VERSION_REQUIRED_WIN: 1.27,
+    PLUGIN_VERSION_CURRENT_MAC: 1.28,
+    PLUGIN_VERSION_REQUIRED_MAC: 1.28,
+    PLUGIN_VERSION_CURRENT_WIN: 1.28,
+    PLUGIN_VERSION_REQUIRED_WIN: 1.28,
     PLUGIN_VERSION_CURRENT_LINUX: 1.21,
     PLUGIN_VERSION_REQUIRED_LINUX: 1.21,
     PLUGIN_DOWNLOAD_URL: 'http://video.gocast.it/plugin.html',
@@ -867,7 +867,11 @@ var Callcast = {
                 else
                 {
                     // Add my stream to this peer connection in preparation
-                    this.peer_connection.AddStream(Callcast.localstream);
+                    //
+                    // Note: If we do not have a mic and we do not have video, then don't call AddStream!
+                    if (Callcast.IsVideoDeviceAvailable() || Callcast.IsMicrophoneDeviceAvailable()) {
+                        this.peer_connection.AddStream(Callcast.localstream);
+                    }
                 }
             } catch (e) {
                 Callcast.log('EXCEPTION: ', e.toString(), e);
@@ -1262,6 +1266,21 @@ var Callcast = {
                 .c('cmd', attribs_out);
 
         this.log('Group Command: ', msgToSend.toString());
+
+        this.connection.send(msgToSend);
+    },
+
+    SendPrivateCmd: function(to, cmd, attribs_in) {
+        var attribs_out = attribs_in,
+            msgToSend;
+
+        attribs_out.cmdtype = cmd;
+        attribs_out.xmlns = Callcast.NS_CALLCAST;
+
+        msgToSend = $msg({to: to, type: 'chat', xmlns: Callcast.NS_CALLCAST})
+                .c('cmd', attribs_out);
+
+        this.log('Private Command: ', msgToSend.toString());
 
         this.connection.send(msgToSend);
     },

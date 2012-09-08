@@ -52,6 +52,8 @@ var app = {
   LIN_32_DL_URL: 'https://video.gocast.it/downloads/GoCastPlayer_i686.tar.gz',
   MAC_PL_NAME: 'GCP.plugin',
   WIN_PL_NAME: 'npGCP.dll',
+  SENDLOG_PROMPT: "#upper-right > #send-log-prompt", 
+  SENDLOG_PROMPT_STOP: "#upper-right > #send-log-prompt > #stop-showing", 
   STATUS_PROMPT: "#upper-right > #status-prompt",
   STATUS_PROMPT_STOP: "#upper-right > #status-prompt > #stop-showing",
   spotUrDefaultClass: "control close", // the class for #upper-right image for unoccupied spot
@@ -1066,7 +1068,7 @@ function stopStatusClicked(event)
 ///
 function closeStatus(event)
 {
-   $(app.STATUS_PROMPT).css("display", "none");
+  $(app.STATUS_PROMPT).css("display", "none");
 }
 ///
 /// \brief video button handler
@@ -1159,7 +1161,7 @@ function changeAudio(enableAudio)
   }
   else // use arg
   {
-    bMuteAudio = !enableAudio
+    bMuteAudio = !enableAudio;
   }
   Callcast.MuteLocalAudioCapture(bMuteAudio);
   if (bMuteAudio) 
@@ -1975,13 +1977,22 @@ function startPeopleContent()
   }, 1800);
   */
 }
+function closeSendLog()
+{
+  $(app.SENDLOG_PROMPT).css("display", "none");
+}
+function stopSendLogClicked()
+{
+  var checked = $(app.SENDLOG_PROMPT_STOP).attr("checked");
+  window.localStorage.stopSendLogPrompt = checked;
+}
 ///
 /// \brief send log to server, display progress dialog
-/// todo create a separate div for log file upload
 ///
 function sendLog()
 {
   var jqDlg = $(app.STATUS_PROMPT).css("display", "block");  // display warning
+  closeSendLog();
 
   jqDlg.css('background-image', 'url(images/waiting-trans.gif)');
   $('#message', jqDlg).text('Sending log file to server.');
@@ -1997,4 +2008,18 @@ function sendLog()
   {
     Callcast.SendLiveLog("SendLogsToLogCatcher failed");
   });
+}
+///
+/// \brief display prompt to send log to server
+///
+function sendLogPrompt()
+{
+  if ("checked" !== window.localStorage.stopSendLogPrompt)
+  {  
+    $(app.SENDLOG_PROMPT).css("display", "block");
+  }
+  else
+  {
+    sendLog();
+  }
 }

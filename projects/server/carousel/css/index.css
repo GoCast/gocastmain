@@ -191,6 +191,27 @@ body > div#upper-right > div#status-prompt > p#stop-showing-text
   display: inline;
   font-size: 11px;
 }
+body > div#upper-right > div#send-log-prompt
+{
+  display: none;
+  position: absolute;
+  top:30px;
+  right: 10px;
+  float:right;
+  z-index: 1000;
+  line-height:1em;
+  padding:15px 10px 15px 10px;
+}
+body > div#upper-right > div#send-log-prompt > .button
+{
+  padding-bottom: .45em;
+  margin-bottom: 1em;
+}
+body > div#upper-right > div#send-log-prompt > p
+{
+  display: inline;
+  font-size: 11px;
+}
 body > div#lower-right
 {
    position:absolute;
