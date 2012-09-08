@@ -52,7 +52,11 @@
 								</tr>
 								<tr>
 									<td>
-										<span class="icon-entypo">O</span>
+										<a id="walkytalky"
+										   title="walky talky"
+										   class="icon-entypo button"
+										   style="margin-left:0px; padding:2px;"
+										   href="javascript:void(0);">O</a>
 									</td>
 									<td>
 										<select id="micselect">
@@ -107,34 +111,45 @@
 				<a id="savesettings" class="button" href="javascript:void(0);">save</a>
 			</div>
 			<div id="settingsdescription">
-				<h3><span class="icon-picto" style="color: green; font-size: 20px;">=</span> tips</h3><p />
-				<ul id="tipslist">
-					<li>
-						<div>
-							Try out different combinations of cameras, microphones and speakers. You should be able to see yourself
-							in the preview window and hear yourself when you speak.
-						</div>
-					</li>
-					<li>
-						<div>
-							If you're not hearing yourself speak, make sure your microphone and speakers are unmuted and have high
-							enough volumes.
-						</div>
-					</li>
-					<li>
-						<div>
-							Customize your video feed by applying an <span style="font-style: bold; font-weight: bold;">effect</span>.
-							Some effects like <span style="font-style: bold; font-weight: bold;">'gray'</span>
-							and <span style="font-style: bold; font-weight: bold;">'sepia'</span> can reduce
-							your bandwidth.
-						</div>
-					</li>					
-					<li>
-						<div>
-							Click the <span id="savespan">save</span> button to save your settings and go back to your room.
-						</div>
-					</li>
-				</ul>
+				<div id="tipsheader">
+					<h3><span class="icon-picto" style="color: green; font-size: 20px;">=</span> tips</h3><p />
+				</div>
+				<div id="tipscontent">
+					<ul id="tipslist">
+						<li>
+							<div>
+								Try out different combinations of cameras, microphones and speakers. You should be able to see yourself
+								in the preview window. 
+							</div>
+						</li>
+						<li>
+							<div>
+								Test your microphone by holding down the
+								<span id="walkyspan" class="icon-entypo" style="font-size:30px;">O</span>
+								button and saying something.
+							</div>
+						</li>
+						<li>
+							<div>
+								If you're not hearing yourself speak, make sure your microphone and speakers are unmuted and have high
+								enough volumes.
+							</div>
+						</li>
+						<li>
+							<div>
+								Customize your video feed by applying an <span style="font-style: bold; font-weight: bold;">effect</span>.
+								Some effects like <span style="font-style: bold; font-weight: bold;">'gray'</span>
+								and <span style="font-style: bold; font-weight: bold;">'sepia'</span> can reduce
+								your bandwidth.
+							</div>
+						</li>					
+						<li>
+							<div>
+								Click the <span id="savespan">save</span> button to save your settings and go back to your room.
+							</div>
+						</li>
+					</ul>
+				</div>
 			</div>
 		</div>
 	</body>

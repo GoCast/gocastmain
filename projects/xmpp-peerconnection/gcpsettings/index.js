@@ -35,6 +35,10 @@ var SettingsUI = {
 			slide: function(evt, ui) { SettingsApp.micVol(ui.value); }
 		});
 
+		this.$walkytalky = $('#walkytalky');
+		this.$walkytalky.mousedown(function() { SettingsApp.setMicMute(false); });
+		this.$walkytalky.mouseup(function() { SettingsApp.setMicMute(true); });
+
 		this.$savesettings = $('#savesettings');
 		this.$savesettings.click(this.savesettingsClickedCallback());
 		$('.ui-slider-handle').css({
@@ -234,6 +238,20 @@ var SettingsApp = {
 							  this.getUserMediaFailureCallback());
 	},
 
+	applyEffect: function(effect) {
+		if (null !== this.localStream) {
+			if (0 < this.localStream.videoTracks.length) {
+				this.localStream.videoTracks[0].effect = effect;
+			}
+		}
+	},
+
+	setMicMute: function(enable) {
+		if (this.localStream && this.localStream.audioTracks.length) {
+			this.localStream.audioTracks[0].enabled = !enable;
+		}
+	},
+
 	devicesChangedCallback: function() {
 		var localplayer = this.$localplayer.get(0);
 		var firstCall = true;
@@ -332,10 +350,17 @@ var SettingsApp = {
 			var hints = {video: false, audio: false};
 			if (0 < self.localStream.videoTracks.length) {
 				hints.video = true;
+				self.$localplayer.get(0).width = 320;
+				self.$localplayer.get(0).height = 240;
 				SettingsUI.enableEffectsSelect(true);
+			} else {
+				self.$localplayer.get(0).width = 0;
+				self.$localplayer.get(0).width = 0;				
 			}
+
 			if (0 < self.localStream.audioTracks.length) {
 				hints.audio = true;
+				self.setMicMute(true);
 			}
 
 			var options = new GoCastJS.PeerConnectionOptions(
@@ -366,14 +391,6 @@ var SettingsApp = {
 				}
 			);
 		};
-	},
-
-	applyEffect: function(effect) {
-		if (null !== this.localStream) {
-			if (0 < this.localStream.videoTracks.length) {
-				this.localStream.videoTracks[0].effect = effect;
-			}
-		}
 	},
 
 	getUserMediaFailureCallback: function() {
