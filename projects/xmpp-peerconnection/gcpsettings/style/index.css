@@ -24,6 +24,7 @@
 	font-family: 'GillSans';
 	src: url('fonts/gillsans/gillsans.eot');
 	src: url('fonts/gillsans/gillsans.eot#iefix') format('embedded-opentype'),
+		 url('fonts/gillsans/gillsans.woff') format('woff'),
 		 url('fonts/gillsans/gillsans.ttf') format('truetype');
 	font-weight: normal;
 	font-style: normal;
