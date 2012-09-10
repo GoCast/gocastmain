@@ -1981,18 +1981,16 @@ function closeSendLog()
 {
   $(app.SENDLOG_PROMPT).css("display", "none");
 }
-function stopSendLogClicked()
-{
-  var checked = $(app.SENDLOG_PROMPT_STOP).attr("checked");
-  window.localStorage.stopSendLogPrompt = checked;
-}
 ///
 /// \brief send log to server, display progress dialog
 ///
 function sendLog()
 {
-  var jqDlg = $(app.STATUS_PROMPT).css("display", "block");  // display warning
+  var jqDlg = $(app.STATUS_PROMPT).css("display", "block"),  // display warning
+      checked = $(app.SENDLOG_PROMPT_STOP).attr("checked");
   closeSendLog();
+
+  window.localStorage.stopSendLogPrompt = checked; // set localstorage 
 
   jqDlg.css('background-image', 'url(images/waiting-trans.gif)');
   $('#message', jqDlg).text('Sending log file to server.');
