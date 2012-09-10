@@ -395,25 +395,26 @@ div.cloudcarousel > input#showChat
   position: absolute;
   bottom:22px;
   display: none;
-  background-image: url("../images/talk.png");
+  background-image: url("../images/talk-white.png");
   background-size: 100% 100%;
   background-repeat: no-repeat;
-  width: 36px;
-  height: 19px;
+  width: 25px;
+  height: 20px;
 }
 div.cloudcarousel > div#msgBoard > input.send {
-  background-image: url("../images/talk.png");
+  background-image: url("../images/talk-white.png");
   background-size: 100% 100%;
   background-repeat: no-repeat;
-  width: 36px;
-  height: 19px;
+  width: 25px;
+  height: 20px;
 }
 div.cloudcarousel > div#msgBoard > input.close {
   background-image: url("../images/left-arrow.png");
   background-size: 100% 100%;
   background-repeat: no-repeat;
-  width: 25px;
-  height: 19px;
+  width: 15px;
+  height: 15px;
+  margin-bottom:-3px;
 }
 div.cloudcarousel > div#msgBoard > div#chatOut
 {
@@ -849,28 +850,6 @@ body > div#meeting > div#streams > div#scontrols > input.right {
   width: 50px;
   height: 22px;
   border-radius: 8px;
-}
-#boxes #personalChat {
-  width: 600px;
-  height: 52px;
-  border: 4px solid yellowgreen;
-  border-radius: 16px;  
-}
-#boxes #personalChat > img.close {
-  float: right;
-  border: 2px solid gray;
-  border-radius: 5px;  
-  margin: 5px;
-}
-#boxes #personalChat > div.content > h1 {
-  font-size: 1.1em;
-}
-#boxes #personalChat > p {
-  overflow: hidden;
-  margin: 5px;
-  width: 98%;
-  white-space: nowrap; 
-  text-overflow: ellipsis;
 }
 #boxes #helpPage {
   width: 660px;

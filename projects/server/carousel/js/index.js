@@ -46,10 +46,10 @@
 var app = {
   GROUP_CHAT_OUT: '#lower-left > #msgBoard > #chatOut',
   GROUP_CHAT_IN: '#lower-left > #msgBoard > input.chatTo',
-  MAC_DL_URL: 'https://video.gocast.it/downloads/GoCastPlayer.pkg',
-  WIN_DL_URL: 'https://video.gocast.it/downloads/GoCastPlayer.msi',
-  LIN_64_DL_URL: 'https://video.gocast.it/downloads/GoCastPlayer_x86_64.tar.gz',
-  LIN_32_DL_URL: 'https://video.gocast.it/downloads/GoCastPlayer_i686.tar.gz',
+  MAC_DL_URL: 'https://carousel.gocast.it/downloads/GoCastPlayer.pkg',
+  WIN_DL_URL: 'https://carousel.gocast.it/downloads/GoCastPlayer.msi',
+  LIN_64_DL_URL: 'https://carousel.gocast.it/downloads/GoCastPlayer_x86_64.tar.gz',
+  LIN_32_DL_URL: 'https://carousel.gocast.it/downloads/GoCastPlayer_i686.tar.gz',
   MAC_PL_NAME: 'GCP.plugin',
   WIN_PL_NAME: 'npGCP.dll',
   SENDLOG_PROMPT: "#upper-right > #send-log-prompt", 
@@ -118,13 +118,13 @@ var app = {
         msg;
     switch (app.browser.name) {
     case 'Chrome':
-      if (app.browser.version < 12) {
+      if (app.browser.version < 20) {
         msg = 'You appear to be using a Chrome version before 12. ' +
           expl + ' ' + recom;
       }
       break;
     case 'Firefox':
-      if (app.browser.version < 6) {
+      if (app.browser.version < 12) {
         msg = 'You appear to be using a Firefox version befor 6. ' +
           expl + ' ' + recom;
       }
@@ -464,6 +464,10 @@ function activateWindow(
   if (winId.match('credentials2')) {
     $('input#name', winId).on('keydown.s04072012', keypressNameHandler);
     $('input#btn', winId).on('click.s04072012', onJoinNow);
+    if ("undefined" !== Storage)
+    {
+      $('input#name', winId).val(sessionStorage.uiGoCastNick);
+    }
   }
   else if (winId.match('meeting')) {
     $('#lower-right > #video').on('click.s04172012a', videoButtonPress);
@@ -1059,9 +1063,12 @@ function sendTwitter(
 ///
 function stopStatusClicked(event)
 {
-   var checked = $(app.STATUS_PROMPT_STOP).attr("checked");
-   console.log("stopStatusChecked", checked);
-   window.localStorage.stopVolumeStatus = checked;
+  var checked = $(app.STATUS_PROMPT_STOP).attr("checked");
+  console.log("stopStatusChecked", checked);
+  if ("undefined" !== typeof(Storage))
+  {
+    window.localStorage.stopVolumeStatus = checked;
+  }
 }
 ///
 /// \brief status div close handler
@@ -1395,6 +1402,11 @@ function onJoinNow(
       return false;
     }
 
+    // store non fb user name
+    if("undefined" !== typeof(Storage))
+    {
+      sessionStorage.uiGoCastNick = usrNm;
+    }
     // set app name from dialog text field
     app.user.name = encodeURI(usrNm);
     Callcast.SetNickname(app.user.name); // TODO should be somewhere else
@@ -1981,18 +1993,19 @@ function closeSendLog()
 {
   $(app.SENDLOG_PROMPT).css("display", "none");
 }
-function stopSendLogClicked()
-{
-  var checked = $(app.SENDLOG_PROMPT_STOP).attr("checked");
-  window.localStorage.stopSendLogPrompt = checked;
-}
 ///
 /// \brief send log to server, display progress dialog
 ///
 function sendLog()
 {
-  var jqDlg = $(app.STATUS_PROMPT).css("display", "block");  // display warning
+  var jqDlg = $(app.STATUS_PROMPT).css("display", "block"),  // display warning
+      checked = $(app.SENDLOG_PROMPT_STOP).attr("checked");
   closeSendLog();
+
+  if ("undefined" !== typeof(Storage))
+  {
+    window.localStorage.stopSendLogPrompt = checked; // set localstorage 
+  }
 
   jqDlg.css('background-image', 'url(images/waiting-trans.gif)');
   $('#message', jqDlg).text('Sending log file to server.');
@@ -2014,7 +2027,7 @@ function sendLog()
 ///
 function sendLogPrompt()
 {
-  if ("checked" !== window.localStorage.stopSendLogPrompt)
+  if ("undefined" === typeof(Storage) || "checked" !== window.localStorage.stopSendLogPrompt)
   {  
     $(app.SENDLOG_PROMPT).css("display", "block");
   }

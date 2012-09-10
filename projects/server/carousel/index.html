@@ -72,7 +72,7 @@
         <button id="send" class="send button" onclick="sendLog()">Send</button>
         <button id="stop" class="close button" onclick="closeSendLog()">Stop</button>
         <p id="message">Send debug info to GoCast?</p><br>
-        <input id="stop-showing" type="checkbox" value="Stop"onclick="stopSendLogClicked(event);"/>
+        <input id="stop-showing" type="checkbox" value="Stop"/>
         <p id="stop-showing-text">Stop showing this message.</p>
         <img class="close" src="images/button-close.png" alt="Close" title="Close" onClick="closeSendLog();"/>
       </div>
@@ -197,10 +197,6 @@
         <img class="close" src="images/button-close.png" alt="Close window" title="Close window" />
         <input class="chatTo" type="text"/>
         <input class="send" type="button" title="Send chat."/>
-      </div>
-      <div id="personalChat" class="window">
-        <img class="close" src="images/button-close.png" alt="Close window" title="Close window" />
-        <p class="msg"></p>
       </div>
       <!-- Mask to cover the whole screen -->
       <div id="mask"></div>
