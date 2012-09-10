@@ -1499,6 +1499,7 @@ function handleRoomSetup() {
        app.log(2, 'replacing state ' + newUrl);
        history.replaceState(null, null, newUrl);
     }
+
     // initialize video, audio state here since this method
     // is called after the local plugin is loaded
     // use fb profile pick as bg image if it exists

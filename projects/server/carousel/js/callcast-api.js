@@ -1104,7 +1104,7 @@ function pluginLoaded(
   {
      app.log(2, 'pluginLoaded plugin up to date ');
      GoCastJS.PluginLog(Callcast.localplayer, Callcast.PluginLogCallback);
-
+ 
      // set localPlayer to null since Init... checks for it to be null
      // before it will proceed
      Callcast.localplayer = null;
@@ -1131,6 +1131,19 @@ function pluginLoaded(
 
         // set the speaker volume status callback
         GoCastJS.SetSpkVolListener(1000, Callcast.localplayer, setLocalSpeakerStatus);
+
+      // <MANJESH>
+      //Before we handle room setup, prompt first time users
+      //to set up their camera and microphone if they not on MacOS.
+      if ('undefined' !== typeof(Storage)) {
+        if(window.localStorage && !window.localStorage.gcpsettings &&
+           !app.osPlatform.isMac) {
+          if(confirm('First time user... wanna setup cam and mic?')) {
+            window.location.href = 'gcpsettings';
+          }
+        }
+      }
+      // </MANJESH>
 
         handleRoomSetup();
      }, function(message) {
