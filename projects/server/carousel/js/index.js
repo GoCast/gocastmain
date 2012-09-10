@@ -47,7 +47,7 @@ var app = {
   GROUP_CHAT_OUT: '#lower-left > #msgBoard > #chatOut',
   GROUP_CHAT_IN: '#lower-left > #msgBoard > input.chatTo',
   MAC_DL_URL: 'https://carousel.gocast.it/downloads/GoCastPlayer.pkg',
-  WIN_DL_URL: 'https://carousel.gocast.it/downloads/GoCastPlayer.msi',
+  WIN_DL_URL: 'https://carousel.gocast.it/downloads/GoCastPlayer.msi', // todo, link in index.html is used, switch to using this value
   LIN_64_DL_URL: 'https://carousel.gocast.it/downloads/GoCastPlayer_x86_64.tar.gz',
   LIN_32_DL_URL: 'https://carousel.gocast.it/downloads/GoCastPlayer_i686.tar.gz',
   MAC_PL_NAME: 'GCP.plugin',
