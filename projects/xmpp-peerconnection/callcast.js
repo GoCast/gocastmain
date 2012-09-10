@@ -209,7 +209,6 @@ var Callcast = {
     PLUGIN_VERSION_REQUIRED_WIN: 1.28,
     PLUGIN_VERSION_CURRENT_LINUX: 1.21,
     PLUGIN_VERSION_REQUIRED_LINUX: 1.21,
-    PLUGIN_DOWNLOAD_URL: 'http://video.gocast.it/plugin.html',
     NOANSWER_TIMEOUT_MS: 6000,
     CALLCAST_XMPPSERVER: 'video.gocast.it',
     CALLCAST_ROOMS: 'gocastconference.video.gocast.it',
@@ -2050,7 +2049,7 @@ var Callcast = {
         return true;
     },
 
-    LeaveSession: function() {
+    LeaveSession: function(cb) {
         if (Callcast.room === null || Callcast.room === '')
         {
 //          alert("Not currently in a session.");
@@ -2058,7 +2057,11 @@ var Callcast = {
         }
 
         this.WriteUpdatedState();
-        this.connection.muc.leave(Callcast.room, Callcast.nick, null);
+        this.connection.muc.leave(Callcast.room, Callcast.nick, function() {
+            if (cb) {
+                cb();
+            }
+        });
 
         this.DropAllParticipants();
 
