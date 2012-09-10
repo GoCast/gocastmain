@@ -464,6 +464,10 @@ function activateWindow(
   if (winId.match('credentials2')) {
     $('input#name', winId).on('keydown.s04072012', keypressNameHandler);
     $('input#btn', winId).on('click.s04072012', onJoinNow);
+    if ("undefined" !== Storage)
+    {
+      $('input#name', winId).val(sessionStorage.uiGoCastNick);
+    }
   }
   else if (winId.match('meeting')) {
     $('#lower-right > #video').on('click.s04172012a', videoButtonPress);
@@ -1059,9 +1063,12 @@ function sendTwitter(
 ///
 function stopStatusClicked(event)
 {
-   var checked = $(app.STATUS_PROMPT_STOP).attr("checked");
-   console.log("stopStatusChecked", checked);
-   window.localStorage.stopVolumeStatus = checked;
+  var checked = $(app.STATUS_PROMPT_STOP).attr("checked");
+  console.log("stopStatusChecked", checked);
+  if ("undefined" !== typeof(Storage))
+  {
+    window.localStorage.stopVolumeStatus = checked;
+  }
 }
 ///
 /// \brief status div close handler
@@ -1395,6 +1402,11 @@ function onJoinNow(
       return false;
     }
 
+    // store non fb user name
+    if("undefined" !== typeof(Storage))
+    {
+      sessionStorage.uiGoCastNick = usrNm;
+    }
     // set app name from dialog text field
     app.user.name = encodeURI(usrNm);
     Callcast.SetNickname(app.user.name); // TODO should be somewhere else
@@ -1990,7 +2002,10 @@ function sendLog()
       checked = $(app.SENDLOG_PROMPT_STOP).attr("checked");
   closeSendLog();
 
-  window.localStorage.stopSendLogPrompt = checked; // set localstorage 
+  if ("undefined" !== typeof(Storage))
+  {
+    window.localStorage.stopSendLogPrompt = checked; // set localstorage 
+  }
 
   jqDlg.css('background-image', 'url(images/waiting-trans.gif)');
   $('#message', jqDlg).text('Sending log file to server.');
@@ -2012,7 +2027,7 @@ function sendLog()
 ///
 function sendLogPrompt()
 {
-  if ("checked" !== window.localStorage.stopSendLogPrompt)
+  if ("undefined" === typeof(Storage) || "checked" !== window.localStorage.stopSendLogPrompt)
   {  
     $(app.SENDLOG_PROMPT).css("display", "block");
   }

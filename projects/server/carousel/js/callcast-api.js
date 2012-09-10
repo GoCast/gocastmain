@@ -597,7 +597,7 @@ function getUrlInfo(options, callback)
     dataType : "jsonp",
     success  : function(response)
         {
-           var result = (/<title>(.*?)<\/title>/m).exec(response),
+           var result = (/<title>(.*?)<\/title>/m).exec(response), // jslint waiver
                info = {},
                title;
            if (result)
@@ -1071,8 +1071,8 @@ function setLocalSpeakerStatus(vol)
   // display volume warning
   if (app.volWarningDisplayed === false)             // check volume only on first callback
   {
-    if(window.localStorage.stopVolumeStatus !== "checked" && // and if user has not disabled the check
-      (vol < 255*0.07) )                                     // if vol is below threshold
+    if(("undefined" === typeof(Storage) || window.localStorage.stopVolumeStatus !== "checked") && // and if user has not disabled the check
+      (vol < 255*0.07) )                             // if vol is below threshold
     {
       $(app.STATUS_PROMPT).css("display", "block");  // display warning
     }
