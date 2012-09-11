@@ -286,10 +286,14 @@ var app = {
       $('#settings-prompt').css({'display': 'block'});
       $('#settings-message').html('You\'re now leaving the room. Click <strong>SAVE</strong> in settings to re-enter.');
       $('#settings-prompt > span').css({'display': 'inline'});
+      
       $('#settings-ok').click(function() {
         window.localStorage.gcpDontShowSettingsPromptCheck = $('#settings-stop-showing').attr('checked');
         Callcast.LeaveSession(function() { window.location.href = 'gcpsettings'; });
       });
+
+      $('#settings-cancel').css({'display': 'block'});
+      $('#settings-cancel').click(function() { $('#settings-prompt').css({'display': 'none'}); });
     }
   },
 
@@ -320,6 +324,7 @@ var app = {
       $('#settings-prompt').css({'display': 'block'});
       $('#settings-message').html(ctDwnMsg + message);
       $('#settings-prompt > span').css({'display': 'none'});
+      $('#settings-cancel').css({'display': 'none'});
       $('#settings-ok').click(function() {
         clearTimeout(closeCountDown);
         $('#settings-prompt').css({'display': 'none'});
