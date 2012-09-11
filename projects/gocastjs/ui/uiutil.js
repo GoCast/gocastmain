@@ -45,7 +45,7 @@ GoCastJS.ChatUtil.prototype.addMsg = function(msg)
     span = $("span#" + this.msgNumber, this.jqChat);
     span.toggleClass('flash').toggleClass('flash', 500);
   } else { // flash chat border
-    this.jqChat.effect('highlight', { color:"red"}, 1000);
+    this.jqChat.effect('highlight', { color:"red"}, 500);
     //this.jqChat.toggleClass('flash').toggleClass('flash', 500);
   }
   ++this.msgNumber; // increment next msg number
