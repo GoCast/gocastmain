@@ -1104,7 +1104,7 @@ function pluginLoaded(
   {
      app.log(2, 'pluginLoaded plugin up to date ');
      GoCastJS.PluginLog(Callcast.localplayer, Callcast.PluginLogCallback);
-
+ 
      // set localPlayer to null since Init... checks for it to be null
      // before it will proceed
      Callcast.localplayer = null;
@@ -1132,13 +1132,38 @@ function pluginLoaded(
         // set the speaker volume status callback
         GoCastJS.SetSpkVolListener(1000, Callcast.localplayer, setLocalSpeakerStatus);
 
+        // <MANJESH>
+        // set devices changed listener
+        var firstCall = true;
+        GoCastJS.SetDevicesChangedListener(
+          1000, $('#mystream > object.localplayer').get(0),
+          function(va, vr, aia, air, aoa, aor) {
+            app.promptDevicesChanged(va.length || aia.length || aoa.length, firstCall);
+            if (firstCall) {
+              firstCall = false;
+            }
+          }
+        );
+
+        //Before we handle room setup, prompt first time users
+        //to set up their camera and microphone if they not on MacOS.
+        if ('undefined' !== typeof(Storage)) {
+          if(window.localStorage && !window.localStorage.gcpsettings &&
+             !app.osPlatform.isMac) {
+            if(confirm('First time user... wanna setup cam and mic?')) {
+              window.location.href = 'gcpsettings';
+            }
+          }
+        }
+        // </MANJESH>
+
         handleRoomSetup();
      }, function(message) {
         // Failure to initialize.
-        app.log(4, 'Local plugin failed to initialize.');
+        app.log(4, 'Local plugin failed to initialize [' + message + ']');
         Callcast.SendLiveLog('Local plugin failed to initialize.');
         $('#errorMsgPlugin > h1').text('Gocast.it plugin failed to initialize');
-        $('#errorMsgPlugin > p#prompt').text('Please reload the page.');
+        $('#errorMsgPlugin > p#prompt').text(message + '\r\n[Please reload the page.]');
         closeWindow();
         openWindow('#errorMsgPlugin');
      });

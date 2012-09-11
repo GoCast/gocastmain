@@ -59,7 +59,17 @@
     <img src="images/body-bg.png" alt="background image" id="body-bg" />
     <div id="fb-root"></div> <!-- fb integration required -->
     <div id="upper-right">
-      <div id="settings" title="Settings" onClick="window.location.href='gcpsettings'"></div>
+      <div id="settings" title="Settings" onClick="app.navToSettings()"></div>
+
+      <!-- <MANJESH> -->
+      <div id="settings-prompt" class="info">
+        <p id="settings-message"></p>
+        <span><input id="settings-stop-showing" type="checkbox" />&nbsp;&nbsp;Don't show again.</span>
+        <button id="settings-cancel" class="button" style="float:right;">&nbsp;&nbsp;Cancel&nbsp;&nbsp;</button>
+        <button id="settings-ok" class="button" style="float:right;">&nbsp;&nbsp;OK&nbsp;&nbsp;</button>
+      </div>
+      <!-- </MANJESH> -->
+
       <div id="volume"></div>
       <p id="connection-status">Connection Status</p>
       <div id="status-prompt" class="warning">
