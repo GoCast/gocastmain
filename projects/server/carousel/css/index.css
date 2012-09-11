@@ -139,6 +139,13 @@ body > div#upper-right > div#log
    background-size: 100%;
    z-index: 1000;
 }
+
+/*<MANJESH>*/
+body > div#upper-right > div#log:hover{
+  cursor: pointer;
+}
+/*</MANJESH>*/
+
 body > div#upper-right > div#settings
 {
    float:right;
@@ -151,6 +158,13 @@ body > div#upper-right > div#settings
    background-size: 100%;
    z-index: 1000;
 }
+
+/*<MANJESH>*/
+body > div#upper-right > div#settings:hover{
+  cursor: pointer;
+}
+/*</MANJESH>*/
+
 body > div#upper-right > div#volume
 {
    float:right;

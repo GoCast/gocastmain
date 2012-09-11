@@ -307,18 +307,24 @@ var app = {
       message = 'You just' + (added? ' added ': ' removed ') + 'new media device(s).<br/>' + message;
     }
 
-    setTimeout(function() {
-      clearTimeout(closeCountDown);
-      $('#settings-prompt').css({'display': 'none'});
-    }, 10000);
+    if ('undefined' !== typeof(Storage) && window.localStorage &&
+        window.localStorage.gcpDontShowSettingsPromptCheck &&
+        'checked' === window.localStorage.gcpDontShowSettingsPromptCheck) {
+      clearInterval(closeCountDown);
+    } else {
+      setTimeout(function() {
+        clearTimeout(closeCountDown);
+        $('#settings-prompt').css({'display': 'none'});
+      }, 10000);
 
-    $('#settings-prompt').css({'display': 'block'});
-    $('#settings-message').html(ctDwnMsg + message);
-    $('#settings-prompt > span').css({'display': 'none'});
-    $('#settings-ok').click(function() {
-      clearTimeout(closeCountDown);
-      $('#settings-prompt').css({'display': 'none'});
-    });
+      $('#settings-prompt').css({'display': 'block'});
+      $('#settings-message').html(ctDwnMsg + message);
+      $('#settings-prompt > span').css({'display': 'none'});
+      $('#settings-ok').click(function() {
+        clearTimeout(closeCountDown);
+        $('#settings-prompt').css({'display': 'none'});
+      });      
+    }
   }
 //</MANJESH>
 
