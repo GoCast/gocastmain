@@ -277,10 +277,50 @@ var app = {
     }
   },
 
+//<MANJESH>
   navToSettings: function() {
-    alert('You will leave the room now. Click "save" to reenter.');
-    Callcast.LeaveSession(function() { window.location.href = 'gcpsettings'; });
+    if ('undefined' !== typeof(Storage) && window.localStorage.gcpDontShowSettingsPromptCheck
+        && 'checked' === window.localStorage.gcpDontShowSettingsPromptCheck) {
+      Callcast.LeaveSession(function() { window.location.href = 'gcpsettings'; });
+    } else {
+      $('#settings-prompt').css({'display': 'block'});
+      $('#settings-message').html('You\'re now leaving the room. Click <strong>SAVE</strong> in settings to re-enter.');
+      $('#settings-prompt > span').css({'display': 'inline'});
+      $('#settings-ok').click(function() {
+        window.localStorage.gcpDontShowSettingsPromptCheck = $('#settings-stop-showing').attr('checked');
+        Callcast.LeaveSession(function() { window.location.href = 'gcpsettings'; });
+      });
+    }
+  },
+
+  promptDevicesChanged: function(added, firstCall) {
+    var message = 'Click on the <strong>GEAR ICON</strong> to change/test devices.<br/>';
+    var ctDwnMsg = '<span style="font-size:9px; float:right;">[Closing in ' +
+                   '<span id="secondsToClose" style="font-weight:bold;">10</span>]</span><br/><br/>';
+    var closeCountDown = setInterval(function() {
+      var seconds = parseInt($('#secondsToClose').html());
+      $('#secondsToClose').html((seconds-1).toString());
+      $('#settings').effect('pulsate', { times: 1 }, 1000);
+    }, 1000);
+
+    if (!firstCall) {
+      message = 'You just' + (added? ' added ': ' removed ') + 'new media device(s).<br/>' + message;
+    }
+
+    setTimeout(function() {
+      clearTimeout(closeCountDown);
+      $('#settings-prompt').css({'display': 'none'});
+    }, 10000);
+
+    $('#settings-prompt').css({'display': 'block'});
+    $('#settings-message').html(ctDwnMsg + message);
+    $('#settings-prompt > span').css({'display': 'none'});
+    $('#settings-ok').click(function() {
+      clearTimeout(closeCountDown);
+      $('#settings-prompt').css({'display': 'none'});
+    });
   }
+//</MANJESH>
 
   // video enabled state todo this must be initially in sync with video button class and Callcast
   //       make either this var or button class the state variable
