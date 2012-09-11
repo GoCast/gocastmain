@@ -2063,6 +2063,8 @@ var Callcast = {
             }
         });
 
+        // Due to Chrome async/ajax issues, we flush on all 'leave' requests.
+        this.connection.flush();
         this.DropAllParticipants();
 
         Callcast.joined = false;
