@@ -275,7 +275,13 @@ var app = {
     {
       return null;
     }
+  },
+
+  navToSettings: function() {
+    alert('You will leave the room now. Click "save" to reenter.');
+    Callcast.LeaveSession(function() { window.location.href = 'gcpsettings'; });
   }
+
   // video enabled state todo this must be initially in sync with video button class and Callcast
   //       make either this var or button class the state variable
   //videoEnabled: true
