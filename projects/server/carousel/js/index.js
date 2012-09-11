@@ -119,13 +119,13 @@ var app = {
     switch (app.browser.name) {
     case 'Chrome':
       if (app.browser.version < 20) {
-        msg = 'You appear to be using a Chrome version before 12. ' +
+        msg = 'You appear to be using a Chrome version before 20. ' +
           expl + ' ' + recom;
       }
       break;
     case 'Firefox':
       if (app.browser.version < 12) {
-        msg = 'You appear to be using a Firefox version befor 6. ' +
+        msg = 'You appear to be using a Firefox version befor 12. ' +
           expl + ' ' + recom;
       }
       break;

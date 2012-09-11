@@ -13,11 +13,12 @@ GoCastJS = (null !== GoCastJS) ? GoCastJS : {};
 ///        give msg's id's
 ///        animage msgs
 ///
-GoCastJS.ChatUtil = function(objIn)
+GoCastJS.ChatUtil = function(objIn, animCb)
 {
   this.domObj = objIn;          // the chat div
   this.jqChat = $(this.domObj); // jq chat div
   this.msgNumber = 0;           // unique msg number assigned to msg's
+  this.animCb = animCb;         // the animate callback
 }; // ChatUtil constructor
 
 ///
@@ -42,23 +43,10 @@ GoCastJS.ChatUtil.prototype.addMsg = function(msg)
     //this.jqChat.animate({scrollTop : this.jqChat[0].scrollHeight},'fast');
     // flash new msg
     span = $("span#" + this.msgNumber, this.jqChat);
-    //span.animate({color:"red"},
-    span.animate({backgroundColor:"red"},
-      {duration: 0,
-       complete: function() {
-        //span.animate({backgroundColor:"transparent"}, 500); // doesn't work, end color is white
-        span.animate({backgroundColor:"black"}, 500);
-       }
-    });
+    span.toggleClass('flash').toggleClass('flash', 500);
   } else { // flash chat border
-    this.jqChat.animate({backgroundColor:"red"},
-      {duration: 0,
-       complete: function()
-       {
-         self.jqChat.animate({backgroundColor:"black"}, 500);
-         //this.jqChat.animate({backgroundColor:"transparent"}, 500); // doesn't work, end color is white
-       }
-    });
+    this.jqChat.effect('highlight', { color:"red"}, 1000);
+    //this.jqChat.toggleClass('flash').toggleClass('flash', 500);
   }
   ++this.msgNumber; // increment next msg number
 }; // addMsg

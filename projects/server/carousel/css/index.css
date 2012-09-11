@@ -324,19 +324,26 @@ body > div#lower-left > div#msgBoard > div#chatOut
   font-size:11px;
   line-height: 1.2em;
   padding: 3px;
-  border-width: 2px;
-  border-color:gray;
   -moz-user-select: text;
   -khtml-user-select: text;
   -webkit-user-select: text;
   -o-user-select: text;
   user-select: text;
 }
+body > div#lower-left > div#msgBoard > div#chatOut.flash
+{
+  /*background-color: red; todo fix toggles -> white -> transparent*/
+  /*border: 5px solid red; */
+}
 body > div#lower-left > div#msgBoard > div#chatOut > span
 {
   color: white;
   font-size: 14px;
   /*text-shadow: 0 0 10px gray, 0 0 20px gray, 0 0 30px gray, 0 0 40px #FF00DE, 0 0 70px #FF00DE, 0 0 80px #FF00DE, 0 0 100px #FF00DE, 0 0 150px #FF00DE;*/
+}
+body > div#lower-left > div#msgBoard > div#chatOut > span.flash
+{
+  color: red;
 }
 body> div#lower-left > div#msgBoard > input.chatTo
 {
@@ -436,10 +443,19 @@ div.cloudcarousel > div#msgBoard > div#chatOut
   -o-user-select: text;
   user-select: text;
 }
+div.cloudcarousel > div#msgBoard > div#chatOut.flash
+{
+  /* background-color: red; todo toggles white -> transparent */
+  /*border: 1px solid red;   */
+}
 div.cloudcarousel > div#msgBoard > div#chatOut > span
 {
   color: white;
   /*text-shadow: 0 0 10px gray, 0 0 20px gray, 0 0 30px gray, 0 0 40px #FF00DE, 0 0 70px #FF00DE, 0 0 80px #FF00DE, 0 0 100px #FF00DE, 0 0 150px #FF00DE;*/
+}
+div.cloudcarousel > div#msgBoard > div#chatOut > span.flash
+{
+  color: red;
 }
 
 body > div#meeting > div#streams {
