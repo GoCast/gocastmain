@@ -1084,8 +1084,7 @@ function sendPersonalChat(event)
     if (text.length > 0) {
       util = jqOut.data('util');
       if (!util) {throw "no chat util";}
-      msg = '<b>me</b>: ' + text;
-      util.addMsg(msg);
+      util.addMsg("me", text);
       Callcast.SendPrivateChat(encodeURI(text), name);
       jqIn.val("");
     }
