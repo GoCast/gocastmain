@@ -13,7 +13,9 @@
 		evt: 'none',
 		callbacks: {
 			proceed: null,
-			reload: null
+			reload: null,
+			progress: null,
+			downloading: null,
 		},
 		suggestion: function() {
 			var wait = (('checking' === this.status) ||
@@ -59,6 +61,7 @@
 
 	$.appCacheEventHandler = function() {
 		var self = this;
+		var count = 0;
 
 		return function(evt) {
 			$$$.log('APPCACHE[' + evt.type + ']: ', evt);
@@ -66,6 +69,14 @@
 			self.appCacheResult.status = self.appCacheStatuses[self.applicationCache.status];
 			self.appCacheResult.evt = evt.type;
 			$$$.log('APPCACHE[suggestion]: ' + self.appCacheResult.suggestion());
+
+			if ('progress' === evt.type && evt.lengthComputable && self.appCacheResult.callbacks.progress) {
+				self.appCacheResult.callbacks.progress(Math.floor((evt.loaded*100)/evt.total));
+			} else if ('progress' === evt.type && !evt.lengthComputable) {
+				self.appCacheResult.callbacks.progress(Math.floor(++count));
+			} else if ('downloading' === evt.type && self.appCacheResult.callbacks.downloading) {
+				self.appCacheResult.callbacks.downloading();
+			}
 		}
 	};
 

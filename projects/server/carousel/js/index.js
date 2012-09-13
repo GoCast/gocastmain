@@ -301,10 +301,12 @@ var app = {
     var message = 'Click on the <strong>GEAR ICON</strong> to change/test devices.<br/>';
     var ctDwnMsg = '<span style="font-size:9px; float:right;">[Closing in ' +
                    '<span id="secondsToClose" style="font-weight:bold;">10</span>]</span><br/><br/>';
+    var opacity = 0.4;
     var closeCountDown = setInterval(function() {
       var seconds = parseInt($('#secondsToClose').html());
       $('#secondsToClose').html((seconds-1).toString());
-      $('#settings').effect('pulsate', { times: 1 }, 1000);
+      $('#settings').fadeTo(1000, opacity);
+      opacity = (0.4 === opacity) ? 1.0 : 0.4;
     }, 1000);
 
     if (!firstCall) {
@@ -315,9 +317,11 @@ var app = {
         window.localStorage.gcpDontShowSettingsPromptCheck &&
         'checked' === window.localStorage.gcpDontShowSettingsPromptCheck) {
       clearInterval(closeCountDown);
+      $('#settings').fadeTo(1000, 1.0);
     } else {
       setTimeout(function() {
-        clearTimeout(closeCountDown);
+        clearInterval(closeCountDown);
+        $('#settings').fadeTo(1000, 1.0);
         $('#settings-prompt').css({'display': 'none'});
       }, 10000);
 
@@ -326,7 +330,8 @@ var app = {
       $('#settings-prompt > span').css({'display': 'none'});
       $('#settings-cancel').css({'display': 'none'});
       $('#settings-ok').click(function() {
-        clearTimeout(closeCountDown);
+        clearInterval(closeCountDown);
+        $('#settings').fadeTo(1000, 1.0);
         $('#settings-prompt').css({'display': 'none'});
       });      
     }
@@ -1867,20 +1872,23 @@ $(document).ready(function(
 )
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
-  openWindow('#waitingForUpdates');
-  
-  var opacity = 0.4;
-  var blink = setInterval(function() {
-    $('#waitingForUpdates').fadeTo(1000, opacity);
-    opacity = (0.4 === opacity) ? 0.8 : 0.4;
-  }, 1000);
+  appCacheResult.callbacks.downloading = function() {
+    var opacity = 0.4;
+
+    openWindow('#waitingForUpdates');
+    setInterval(function() {
+      $('#boxes #waitingForUpdates > img').fadeTo(1000, opacity);
+      opacity = (0.4 === opacity) ? 0.8 : 0.4;
+    }, 1000);
+  };
+
+  appCacheResult.callbacks.progress = function(percentDone) {
+    $('#boxes #waitingForUpdates > progress').val(percentDone);
+  };
 
   appCacheResult.poll(
     1000,
     function(){
-      clearInterval(blink);
-      closeWindow();
-      
       navigator.plugins.refresh(); // reload plugins to get any plugin updates
 
       // Check the browser.
@@ -1903,6 +1911,7 @@ $(document).ready(function(
       Callcast.setCallbackForCallback_ConnectionStatus(connectionStatus);
     },
     function(){
+      closeWindow();
       window.location.reload();
     }
   );
