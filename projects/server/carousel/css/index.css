@@ -866,6 +866,10 @@ body > div#meeting > div#streams > div#scontrols > input.right {
   border: 4px solid lightgreen;
   border-radius: 8px;  
 }
+#boxes #waitingForUpdates {
+  width: 200px;
+  height: 200px;
+}
 #boxes #winEula {
   width: 660px;
   height: 80%;

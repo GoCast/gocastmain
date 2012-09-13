@@ -1867,9 +1867,20 @@ $(document).ready(function(
 )
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
+  openWindow('#waitingForUpdates');
+  
+  var opacity = 0.4;
+  var blink = setInterval(function() {
+    $('#waitingForUpdates').fadeTo(1000, opacity);
+    opacity = (0.4 === opacity) ? 0.8 : 0.4;
+  }, 1000);
+
   appCacheResult.poll(
     1000,
     function(){
+      clearInterval(blink);
+      closeWindow();
+      
       navigator.plugins.refresh(); // reload plugins to get any plugin updates
 
       // Check the browser.
