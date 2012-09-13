@@ -413,6 +413,10 @@ $(document).on('one-login-complete', function(event, msg) {
     console.log('one-login-complete: opening meeting');
     openMeeting();
 
+    // instantiate local plugin
+    // not working on firefix, object is appended but plugin does not load
+    //(app.LOCAL_PLUGIN_OBJECT).appendTo(app.LOCAL_PLUGIN);
+
     // check, install plugin
     tryPluginInstall();
 

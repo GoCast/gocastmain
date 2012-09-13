@@ -61,6 +61,10 @@ var app = {
   VID_BUTTON: '#lower-right > #video',
   AUD_BUTTON: '#lower-right > #audio',
   LOCAL_PLUGIN: '#mystream',
+  LOCAL_PLUGIN_OBJECT: '<object class="localplayer" id="GocastPlayerLocal"' + 
+                          'type="application/x-gocastplayer" width="100" height="100">' + 
+                          '<param name="onload" value="pluginLoaded" />' + 
+                        '</object>',
   /**
    * Writes the specified log entry into the console HTML element, if
    * present. The meaning of logLevel is 1: debug, 2: info, 3:
