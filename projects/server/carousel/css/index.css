@@ -394,14 +394,19 @@ body > div#lower-left > div#msgBoard > div#chatOut  td.val.flash
 }
 body> div#lower-left > div#msgBoard > input.chatTo
 {
+  border-radius: 8px;
+  border:none;
+  padding: 0px 5px 1px 5px;
   background-color: white;
   color: black;
   font-size:14px;
   width:250px;
 }
 body > div#lower-left > div#msgBoard > button#send {
-  padding: 4px;
-  padding-right: 7px;
+  padding: 0px 10px 1px 10px;
+  background-color: black;
+  color: white;
+  border-radius:15px;
 }
 body > div#meeting 
 {
