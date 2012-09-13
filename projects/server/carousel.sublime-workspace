@@ -1,0 +1,901 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"color",
+				"colorName"
+			],
+			[
+				"dra",
+				"drawTools"
+			],
+			[
+				"jqP",
+				"jqPenTable"
+			],
+			[
+				"line",
+				"lineWidth"
+			],
+			[
+				"mouse",
+				"mouseCommands"
+			],
+			[
+				"current",
+				"currentCommand"
+			],
+			[
+				"white",
+				"whiteBoard"
+			],
+			[
+				"background",
+				"background-image"
+			],
+			[
+				"stop",
+				"stopPropagation"
+			],
+			[
+				"STATUS",
+				"STATUS_PROMPT_STOP"
+			],
+			[
+				"error",
+				"errorMsgPlugin"
+			],
+			[
+				"showChat",
+				"showPersonalChatWithSpot"
+			],
+			[
+				"GROUP_CHAT",
+				"GROUP_CHAT_IN"
+			],
+			[
+				"pluginUp",
+				"pluginUpgrade"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "carousel/index.html",
+			"settings":
+			{
+				"buffer_size": 14120,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "carousel/css/index.css",
+			"settings":
+			{
+				"buffer_size": 22022,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "carousel/js/index.js",
+			"settings":
+			{
+				"buffer_size": 61456,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/Users/jimkoning/dev/gocastmain/projects/gocastjs/ui/uiutil.js",
+			"settings":
+			{
+				"buffer_size": 2067,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "Searching 36 files for \"addmsg\"\n\n/Users/jimkoning/dev/gocastmain/projects/server/carousel/js/callcast-api.js:\n  144      util = jqChat.data('util');\n  145      if (!util) {throw \"no chat util\";}\n  146:     util.addMsg(decodeURI(msginfo.nick), decodeURI(msginfo.body));\n  147      app.log(2, 'A public message arrived ' + decodeURI(msginfo.nick) + \" \" + decodeURI(msginfo.body));\n  148    }\n  ...\n  175        util = jqChat.data('util');\n  176        if (!util) {throw \"no chat util\";}\n  177:       util.addMsg(decodeURI(msginfo.nick), decodeURI(msginfo.body));\n  178      }\n  179      else // spot not found\n\n/Users/jimkoning/dev/gocastmain/projects/server/carousel/js/index.js:\n 1085        util = jqOut.data('util');\n 1086        if (!util) {throw \"no chat util\";}\n 1087:       util.addMsg(\"me\", text);\n 1088        Callcast.SendPrivateChat(encodeURI(text), name);\n 1089        jqIn.val(\"\");\n\n/Users/jimkoning/dev/gocastmain/projects/server/carousel/js/callcast-api.js:\n  144      util = jqChat.data('util');\n  145      if (!util) {throw \"no chat util\";}\n  146:     util.addMsg(decodeURI(msginfo.nick), decodeURI(msginfo.body));\n  147      app.log(2, 'A public message arrived ' + decodeURI(msginfo.nick) + \" \" + decodeURI(msginfo.body));\n  148    }\n  ...\n  175        util = jqChat.data('util');\n  176        if (!util) {throw \"no chat util\";}\n  177:       util.addMsg(decodeURI(msginfo.nick), decodeURI(msginfo.body));\n  178      }\n  179      else // spot not found\n\n/Users/jimkoning/dev/gocastmain/projects/server/carousel/js/index.js:\n 1085        util = jqOut.data('util');\n 1086        if (!util) {throw \"no chat util\";}\n 1087:       util.addMsg(\"me\", text);\n 1088        Callcast.SendPrivateChat(encodeURI(text), name);\n 1089        jqIn.val(\"\");\n\n/Users/jimkoning/dev/gocastmain/projects/gocastjs/ui/uiutil.js:\n   25  /// \\brief add a message to the chat output window and animate it\n   26  ///\n   27: GoCastJS.ChatUtil.prototype.addMsg = function(msg)\n   28  {\n   29    var domMsg = '<tr id=\"'+ this.msgNumber + '\"><td class=\"name\">    ' + msg + '<br></span>',\n   ..\n   50    }\n   51    ++this.msgNumber; // increment next msg number\n   52: }; // addMsg\n   53  \n\n8 matches across 5 files\n",
+			"settings":
+			{
+				"buffer_size": 2199,
+				"line_ending": "Unix",
+				"name": "Find Results",
+				"scratch": true
+			}
+		},
+		{
+			"file": "/Users/jimkoning/dev/gocastmain/projects/xmpp-peerconnection/callcast.js",
+			"settings":
+			{
+				"buffer_size": 92248,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "carousel/css/ipad.css",
+			"settings":
+			{
+				"buffer_size": 941,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "carousel/js/callcast-api.js",
+			"settings":
+			{
+				"buffer_size": 36261,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "carousel/js/carousel.js",
+			"settings":
+			{
+				"buffer_size": 26987,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "carousel/js/fb.js",
+			"settings":
+			{
+				"buffer_size": 6992,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/Users/jimkoning/dev/gocastmain/projects/gocastjs/ui/wb.js",
+			"settings":
+			{
+				"buffer_size": 21211,
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "",
+	"command_palette":
+	{
+		"height": 392.0,
+		"selected_items":
+		[
+			[
+				"remove",
+				"Package Control: Remove Package"
+			],
+			[
+				"install",
+				"Package Control: Install Package"
+			],
+			[
+				"ins",
+				"Package Control: Install Package"
+			],
+			[
+				"closure",
+				"Preferences: Closure Linter Settings – Default"
+			],
+			[
+				"closu",
+				"Preferences: Closure Linter Settings – Default"
+			],
+			[
+				"",
+				"Closure Linter: Run Closure Linter"
+			],
+			[
+				"reindent Lines",
+				"Indentation: Reindent Lines"
+			]
+		],
+		"width": 467.0
+	},
+	"console":
+	{
+		"height": 125.0
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/Users/jimkoning/dev/wrk/projects/server/carousel/js/index.js",
+		"/Users/jimkoning/dev/gocastmain/projects/server/carousel/js/jquery-ui-1.8.23.custom.patch.js",
+		"/Users/jimkoning/dev/gocastmain/projects/server/carousel/js/jquery-ui-1.8.23.custom.js",
+		"/Users/jimkoning/dev/gocastmain/projects/server/carousel/js/index.js",
+		"/Users/jimkoning/dev/gocastmain/projects/server/carousel/js/jquery-1.7.2.dev.js",
+		"/Users/jimkoning/Downloads/jquery-ui-1.8.23.custom/development-bundle/ui/jquery.ui.widget.js",
+		"/Users/jimkoning/Downloads/jquery-ui-1.8.23.custom/development-bundle/ui/jquery.ui.tabs.js",
+		"/Users/jimkoning/Downloads/jquery-ui-1.8.23.custom/development-bundle/ui/jquery.ui.sortable.js",
+		"/Users/jimkoning/Downloads/jquery-ui-1.8.23.custom/development-bundle/ui/jquery.ui.slider.js",
+		"/Users/jimkoning/Downloads/jquery-ui-1.8.23.custom/development-bundle/ui/jquery.ui.selectable.js",
+		"/Users/jimkoning/Downloads/jquery-ui-1.8.23.custom/development-bundle/ui/jquery.ui.resizable.js",
+		"/Users/jimkoning/Downloads/jquery-ui-1.8.23.custom/development-bundle/ui/jquery.ui.progressbar.js",
+		"/Users/jimkoning/Downloads/jquery-ui-1.8.23.custom/development-bundle/ui/jquery.ui.position.js",
+		"/Users/jimkoning/Downloads/jquery-ui-1.8.23.custom/development-bundle/ui/jquery.ui.mouse.js",
+		"/Users/jimkoning/Downloads/jquery-ui-1.8.23.custom/development-bundle/ui/jquery.ui.droppable.js",
+		"/Users/jimkoning/Downloads/jquery-ui-1.8.23.custom/development-bundle/ui/jquery.ui.draggable.js",
+		"/Users/jimkoning/Downloads/jquery-ui-1.8.23.custom/development-bundle/ui/jquery.ui.dialog.js",
+		"/Users/jimkoning/Downloads/jquery-ui-1.8.23.custom/development-bundle/ui/jquery.ui.datepicker.js",
+		"/Users/jimkoning/Downloads/jquery-ui-1.8.23.custom/development-bundle/ui/jquery.ui.core.js",
+		"/Users/jimkoning/Downloads/jquery-ui-1.8.23.custom/development-bundle/ui/jquery.ui.button.js",
+		"/Users/jimkoning/Downloads/jquery-ui-1.8.23.custom/development-bundle/ui/jquery.ui.autocomplete.js",
+		"/Users/jimkoning/Downloads/jquery-ui-1.8.23.custom/development-bundle/ui/jquery.ui.accordion.js",
+		"/Users/jimkoning/Downloads/jquery-ui-1.8.23.custom/development-bundle/ui/jquery.effects.transfer.js",
+		"/Users/jimkoning/Downloads/jquery-ui-1.8.23.custom/development-bundle/ui/jquery.effects.slide.js",
+		"/Users/jimkoning/Downloads/jquery-ui-1.8.23.custom/development-bundle/ui/jquery.effects.shake.js",
+		"/Users/jimkoning/Downloads/jquery-ui-1.8.23.custom/development-bundle/ui/jquery.effects.scale.js",
+		"/Users/jimkoning/Downloads/jquery-ui-1.8.23.custom/development-bundle/ui/jquery.effects.pulsate.js",
+		"/Users/jimkoning/Downloads/jquery-ui-1.8.23.custom/development-bundle/ui/jquery.effects.highlight.js",
+		"/Users/jimkoning/Downloads/jquery-ui-1.8.23.custom/development-bundle/ui/jquery.effects.fold.js",
+		"/Users/jimkoning/Downloads/jquery-ui-1.8.23.custom/development-bundle/ui/jquery.effects.fade.js",
+		"/Users/jimkoning/Downloads/jquery-ui-1.8.23.custom/development-bundle/ui/jquery.effects.explode.js",
+		"/Users/jimkoning/Downloads/jquery-ui-1.8.23.custom/development-bundle/ui/jquery.effects.core.js",
+		"/Users/jimkoning/Downloads/jquery-ui-1.8.23.custom/development-bundle/ui/jquery.effects.drop.js",
+		"/Users/jimkoning/Downloads/jquery-ui-1.8.23.custom/development-bundle/ui/jquery.effects.clip.js",
+		"/Users/jimkoning/Downloads/jquery-ui-1.8.23.custom/development-bundle/ui/jquery.effects.bounce.js",
+		"/Users/jimkoning/Downloads/jquery-ui-1.8.23.custom/development-bundle/ui/jquery.effects.blind.js",
+		"/Users/jimkoning/Downloads/jquery-ui-1.8.23.custom/development-bundle/ui/jquery-ui-1.8.23.custom.js",
+		"/Users/jimkoning/dev/gocastmain/projects/server/carousel/iframe.html",
+		"/Users/jimkoning/dev/gocastmain/projects/server/carousel/index.html",
+		"/Users/jimkoning/dev/gocastmain/projects/gocastjs/ui/uiutil.js",
+		"/Users/jimkoning/dev/gocastmain/projects/server/carousel/css/jquery-ui.css",
+		"/Users/jimkoning/dev/gocastmain/projects/server/carousel.sublime-project",
+		"/Users/jimkoning/dev/gocastmain/projects/server/carousel/eula.html",
+		"/Users/jimkoning/dev/gocastmain/projects/server/carousel/registration_complete.html",
+		"/Users/jimkoning/dev/gocastmain/projects/server/carousel/push.sh",
+		"/Users/jimkoning/dev/gocastmain/projects/server/carousel/push-jk.sh",
+		"/Users/jimkoning/dev/gocastmain/projects/server/carousel/push-jk-js.sh",
+		"/Users/jimkoning/dev/gocastmain/projects/server/carousel/index_reg.html",
+		"/Users/jimkoning/dev/gocastmain/projects/server/carousel/index_fb.html",
+		"/Users/jimkoning/dev/gocastmain/projects/server/carousel/demo.html",
+		"/Users/jimkoning/dev/gocastmain/projects/server/carousel/authtest.html",
+		"/Users/jimkoning/dev/gocastmain/projects/server/carousel/carousel.sublime-workspace",
+		"/Users/jimkoning/dev/gocastmain/projects/server/carousel/.DS_Store",
+		"/Users/jimkoning/dev/gocastmain/projects/gocastjs/ui/wb.js",
+		"/Users/jimkoning/dev/gocastmain/projects/server/carousel/js/callcast-api.js",
+		"/Users/jimkoning/dev/gocastmain/projects/server/serverBot/serverBot.js",
+		"/Users/jimkoning/dev/gocastmain/projects/xmpp-peerconnection/callcast.js",
+		"/Users/jimkoning/dev/gocastmain/projects/server/carousel/css/index.css",
+		"/Users/jimkoning/dev/gocastmain/projects/server/carousel/js/carousel.js",
+		"/Users/jimkoning/dev/gocastmain/projects/server/carousel/carousel.sublime-project",
+		"/Users/jimkoning/dev/gocastmain/projects/server/carousel/css/custom-theme/jquery-ui-1.8.22.custom.css",
+		"/Users/jimkoning/dev/gocastmain/projects/server/carousel/js/ddslick.js",
+		"/Users/jimkoning/Downloads/jquery-image-dropdown-2.3/jquery-image-dropdown-2.3/msdropdown/dd.css",
+		"/Users/jimkoning/Downloads/jquery-image-dropdown-2.3/jquery-image-dropdown-2.3/msdropdown/js/uncompressed.jquery.dd.js",
+		"/Users/jimkoning/dev/wrk/projects/server/carousel/index.html",
+		"/Users/jimkoning/dev/carousel_staging/projects/server/carousel/index.html",
+		"/Users/jimkoning/dev/wrk/projects/server/carousel/css/index.css",
+		"/Users/jimkoning/dev/wrk/projects/server/carousel/js/callcast-api.js",
+		"/Users/jimkoning/Library/Application Support/Sublime Text 2/Packages/sublime-jslint/sublime-jslint.sublime-settings",
+		"/Users/jimkoning/Library/Application Support/Sublime Text 2/Packages/User/sublime-jslint.sublime-settings",
+		"/Users/jimkoning/Library/Application Support/Sublime Text 2/Packages/User/Default (OSX).sublime-keymap",
+		"/Users/jimkoning/Library/Application Support/Sublime Text 2/Packages/User/Preferences.sublime-settings",
+		"/Users/jimkoning/dev/gocastmain/projects/gocastjs/webrtc/peerconnection.js",
+		"/Users/jimkoning/dev/wrk/projects/server/carousel/push.sh",
+		"/Users/jimkoning/dev/wrk/projects/server/carousel/push-jk.sh",
+		"/Users/jimkoning/dev/wrk/projects/gocastjs/webrtc/peerconnection.js",
+		"/Users/jimkoning/dev/carousel_staging/projects/server/carousel/css/index.css",
+		"/Users/jimkoning/Library/Application Support/Sublime Text 2/Packages/Default/Default (OSX).sublime-keymap",
+		"/Users/jimkoning/dev/gocastmain/projects/server/main_website/index.html",
+		"/Users/jimkoning/dev/gocastmain/projects/server/carousel/js/jquery.cookie.js",
+		"/Users/jimkoning/dev/carousel_staging/projects/server/carousel/js/carousel.js",
+		"/Users/jimkoning/dev/jScrollPane/README.md",
+		"/Users/jimkoning/Library/Application Support/Sublime Text 2/Packages/sublime-closure-linter/sublime-closure-linter.sublime-settings",
+		"/Users/jimkoning/dev/gocastmain/projects/server/carousel/js/jquery-1.8.0.dev.js",
+		"/Users/jimkoning/dev/logs/dup-spots.log",
+		"/Users/jimkoning/dev/gocastmain/projects/gocastjs/urlsnapshot/urlsnapshot.js",
+		"/Users/jimkoning/dev/temp/projects/server/carousel/js/callcast-api.js",
+		"/Users/jimkoning/dev/temp/projects/gocastjs/urlsnapshot/html2canvas.js",
+		"/Users/jimkoning/dev/temp/projects/gocastjs/urlsnapshot/urlsnapshot.js",
+		"/Users/jimkoning/Library/Application Support/Sublime Text 2/Packages/Default/Preferences.sublime-settings",
+		"/Users/jimkoning/dev/gocastmain/projects/server/carousel/js/jquery-ui.js"
+	],
+	"find":
+	{
+		"height": 35.0
+	},
+	"find_in_files":
+	{
+		"height": 93.0,
+		"where_history":
+		[
+			"",
+			"-*jquery*.js",
+			""
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"addmsg",
+			"jquery",
+			"getrgba",
+			"chatout",
+			".flash",
+			"#setting",
+			"setting",
+			"#setting",
+			"setting",
+			"#setting",
+			"setting",
+			"effect",
+			"setting",
+			"effect",
+			"effects",
+			"ipad",
+			"effect",
+			"animate",
+			".flash",
+			"flash",
+			"msgboard",
+			"flas",
+			"eula",
+			"talk.png",
+			"openpersonalchat",
+			"personal",
+			"onjoinnow",
+			"enterid",
+			"enter",
+			"credentials2",
+			"joinnow",
+			"stopvolume",
+			"storage",
+			"sessionstorage",
+			"setstop",
+			"logprompt",
+			"/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/",
+			"activex",
+			"acivex",
+			"dodownload",
+			"installprompt",
+			"prompt",
+			"osplatform",
+			"chat",
+			"dospot",
+			"addwhite",
+			"send-log-prompt",
+			"warning",
+			"status",
+			"vw.png",
+			"closestatus",
+			"button",
+			"upper-right",
+			"changevideo",
+			"videobuttonpress",
+			"audio",
+			"handleroom",
+			"fullscreen",
+			"relative",
+			"jqpencolor",
+			"visibility",
+			"/*",
+			"jqeraser",
+			".wberaser",
+			"visibility",
+			"jqpenlist",
+			"wbpencolors",
+			"wbcanvas",
+			"setscale",
+			"wbcanvas",
+			"drawtools",
+			"drawTools",
+			"wbdiv",
+			"wb_div",
+			"WB_PEN_WIDTH",
+			"wbdiv",
+			".wbcanvas",
+			"canvas",
+			"drawtools",
+			"pencolorclick",
+			"drawtools",
+			"mousedown",
+			"settings",
+			"settingspen",
+			"settings",
+			"eraser",
+			"settings",
+			"penw",
+			"settings",
+			"penwidth",
+			"checked",
+			"eraserclick",
+			"222222",
+			"ui-state-active",
+			"removeclass",
+			"name",
+			"jqcanvas",
+			"settings.name",
+			"jqcanvas",
+			"strokestyle",
+			"orange",
+			"fillstyle",
+			"td.check",
+			"click",
+			"position",
+			"bottom",
+			"position",
+			"bottom",
+			"pencolor",
+			"settings",
+			"pencolor",
+			"jqtable",
+			"sendlogstologcatcher",
+			"sending close",
+			"background-image",
+			"log",
+			"volume",
+			"wbpencolor",
+			"initpencolors",
+			"init",
+			"apply",
+			"input",
+			"apply",
+			"getcontext",
+			"canvas",
+			"button",
+			"canvas",
+			"button"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"updateTools",
+			"this.jqPenTable",
+			"offset",
+			"page",
+			"jqDiv",
+			"spotDiv",
+			"png",
+			"Callback_ConnectionStatus",
+			"spotnumber"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 1,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "carousel/index.html",
+					"settings":
+					{
+						"buffer_size": 14120,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2292,
+								2298
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/HTML/HTML.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 197.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "carousel/css/index.css",
+					"settings":
+					{
+						"buffer_size": 22022,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								7101,
+								7101
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/CSS/CSS.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 5320.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "carousel/js/index.js",
+					"settings":
+					{
+						"buffer_size": 61456,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								31487,
+								31487
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 16017.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "/Users/jimkoning/dev/gocastmain/projects/gocastjs/ui/uiutil.js",
+					"settings":
+					{
+						"buffer_size": 2067,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								929,
+								929
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 189.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"settings":
+					{
+						"buffer_size": 2199,
+						"regions":
+						{
+							"match":
+							{
+								"flags": 112,
+								"regions":
+								[
+									[
+										211,
+										217
+									],
+									[
+										503,
+										509
+									],
+									[
+										785,
+										791
+									],
+									[
+										1073,
+										1079
+									],
+									[
+										1365,
+										1371
+									],
+									[
+										1647,
+										1653
+									],
+									[
+										1940,
+										1946
+									],
+									[
+										2158,
+										2164
+									]
+								],
+								"scope": ""
+							}
+						},
+						"selection":
+						[
+							[
+								1943,
+								1943
+							]
+						],
+						"settings":
+						{
+							"detect_indentation": false,
+							"output_tag": 1,
+							"result_base_dir": "",
+							"result_file_regex": "^([A-Za-z\\\\/<].*):$",
+							"result_line_regex": "^ +([0-9]+):",
+							"scroll_past_end": true,
+							"syntax": "Packages/Default/Find Results.hidden-tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 135.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "/Users/jimkoning/dev/gocastmain/projects/xmpp-peerconnection/callcast.js",
+					"settings":
+					{
+						"buffer_size": 92248,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								9311,
+								9316
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 3606.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "carousel/css/ipad.css",
+					"settings":
+					{
+						"buffer_size": 941,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/CSS/CSS.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+					"file": "carousel/js/callcast-api.js",
+					"settings":
+					{
+						"buffer_size": 36261,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								18007,
+								18007
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 8562.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 8,
+					"file": "carousel/js/carousel.js",
+					"settings":
+					{
+						"buffer_size": 26987,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								26601,
+								26601
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 11017.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 9,
+					"file": "carousel/js/fb.js",
+					"settings":
+					{
+						"buffer_size": 6992,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								228,
+								231
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 10,
+					"file": "/Users/jimkoning/dev/gocastmain/projects/gocastjs/ui/wb.js",
+					"settings":
+					{
+						"buffer_size": 21211,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2944,
+								2944
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 1111.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 34.0
+	},
+	"input":
+	{
+		"height": 0.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.gjslint_result_view":
+	{
+		"height": 100.0
+	},
+	"output.jslint_result_view":
+	{
+		"height": 108.0
+	},
+	"replace":
+	{
+		"height": 64.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+			[
+				"",
+				"/Users/jimkoning/dev/gocastmain/projects/server/carousel/js/index.js"
+			]
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"show_minimap": true,
+	"show_open_files": true,
+	"show_tabs": true,
+	"side_bar_visible": false,
+	"side_bar_width": 150.0,
+	"status_bar_visible": true
+}

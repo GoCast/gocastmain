@@ -139,14 +139,12 @@ $(document).on('public-message', function(
         delayed = msginfo.delayed,
         nick_class = msginfo.nick_class,
         jqChat = $(app.GROUP_CHAT_OUT),
-        msg,
         util;
     if (!jqChat[0]) {throw "no chat out div";}
     util = jqChat.data('util');
     if (!util) {throw "no chat util";}
-    msg = '<b>' + decodeURI(msginfo.nick) + '</b>' + ': ' + decodeURI(msginfo.body);
-    util.addMsg(msg);
-    app.log(2, 'A public message arrived ' + msg);
+    util.addMsg(decodeURI(msginfo.nick), decodeURI(msginfo.body));
+    app.log(2, 'A public message arrived ' + decodeURI(msginfo.nick) + " " + decodeURI(msginfo.body));
   }
   catch(err)
   {
@@ -164,13 +162,7 @@ $(document).on('private-message', function(
 {
   try
   {
-    var id, oo,
-        jqChat,
-        msg,
-        atBottom,
-        msgNumber,
-        span,
-        util;
+    var id, oo, jqChat, atBottom, msgNumber, span, util;
     app.log(2, 'A private message arrived.');
     id = app.str2id(msginfo.nick);
     oo = $('#meeting > #streams > #scarousel div.cloudcarousel#' + id).get(0);
@@ -182,8 +174,7 @@ $(document).on('private-message', function(
       if (!jqChat[0]) {throw "no chat out div";}
       util = jqChat.data('util');
       if (!util) {throw "no chat util";}
-      msg = '<b>' + decodeURI(msginfo.nick) + '</b>' + ': ' + decodeURI(msginfo.body);
-      util.addMsg(msg);
+      util.addMsg(decodeURI(msginfo.nick), decodeURI(msginfo.body));
     }
     else // spot not found
     {

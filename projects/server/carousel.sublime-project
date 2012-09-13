@@ -1,0 +1,17 @@
+{
+	"folders":
+	[
+		{
+			"path": "carousel"
+		},
+		{
+			"path": "carousel/css"
+		},
+		{
+			"path": "carousel/images"
+		},
+		{
+			"path": "carousel/js"
+		}
+	]
+}
