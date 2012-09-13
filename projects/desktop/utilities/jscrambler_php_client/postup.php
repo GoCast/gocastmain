@@ -16,7 +16,14 @@ $jscrambler = new Jscrambler($access_key, $secret_key, 'api.jscrambler.com', '80
 
 $parameters = array('files'  => $path_to_project,
                        'rename_local' => '%DEFAULT%',
-                       'whitespace' => '%DEFAULT%');
+                       'whitespace' => '%DEFAULT%',
+                       'function_reorder' => '%DEFAULT%',
+                       'member_enum' => '%DEFAULT%',
+                       'literal' => '%DEFAULT%',
+                       'literal_duplicates' => '%DEFAULT%',
+                       'dic_compression' => '%DEFAULT%',
+                       'dot_notation' => '%DEFAULT%',
+                       'domain_lock' => 'gocast.it');
 // post
 // var_dump($parameters);
 $result = $jscrambler->post('/code.json', $parameters);
