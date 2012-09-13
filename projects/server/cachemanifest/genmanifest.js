@@ -1,4 +1,5 @@
 var fs = require('fs');
+var cr = require('crypto');
 
 var recursiveIterate = function(rootDirPath, rootDirAlias, excludes) {
 	var fileList = [],
@@ -23,6 +24,14 @@ var recursiveIterate = function(rootDirPath, rootDirAlias, excludes) {
 	});
 
 	return fileList;
+};
+
+var genHashofFiles = function(fileList) {
+	var md5 = cr.createHash('md5');
+};
+
+var genCacheManifest = function(fileList) {
+	var manifest = 'CACHE MANIFEST';
 };
 
 var parseArgv = function(argIndex) {
