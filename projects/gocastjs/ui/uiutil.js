@@ -13,21 +13,23 @@ GoCastJS = (null !== GoCastJS) ? GoCastJS : {};
 ///        give msg's id's
 ///        animage msgs
 ///
-GoCastJS.ChatUtil = function(objIn)
+GoCastJS.ChatUtil = function(objIn, animCb)
 {
   this.domObj = objIn;          // the chat div
   this.jqChat = $(this.domObj); // jq chat div
+  this.jqTable = $("<table></table>").appendTo(this.jqChat);
   this.msgNumber = 0;           // unique msg number assigned to msg's
+  this.animCb = animCb;         // the animate callback
 }; // ChatUtil constructor
 
 ///
 /// \brief add a message to the chat output window and animate it
 ///
-GoCastJS.ChatUtil.prototype.addMsg = function(msg)
+GoCastJS.ChatUtil.prototype.addMsg = function(name, val)
 {
-  var domMsg = '<span id="'+ this.msgNumber + '">    ' + msg + '<br></span>',
+  var domRow = '<tr id="'+ this.msgNumber + '"><td class="name">' + name + '</td><td class="val"><span class="val-span">' + val + '</span></td>',
       atBottom,
-      span,
+      jqFlash,
       self = this; // ref for animate callbacks
   // get scroll pos
   //app.log(2, 'public-message scrollTop ' + jqChat.scrollTop()
@@ -36,29 +38,16 @@ GoCastJS.ChatUtil.prototype.addMsg = function(msg)
   // detect scroll bar at bottom
   // looks like the mouse wheel can put the scroll pos < 1em from bottom so fudge it
   atBottom = Math.abs((this.jqChat.scrollTop() + this.jqChat[0].clientHeight) - this.jqChat[0].scrollHeight) < 10;
-  this.jqChat.append(domMsg); // Add message to Message Board.
+  this.jqTable.append(domRow); // Add message to Message Board.
   if (atBottom) { // if we were at bottom before msg append scroll to bottom
     this.jqChat.scrollTop(this.jqChat[0].scrollHeight);
     //this.jqChat.animate({scrollTop : this.jqChat[0].scrollHeight},'fast');
     // flash new msg
-    span = $("span#" + this.msgNumber, this.jqChat);
-    //span.animate({color:"red"},
-    span.animate({backgroundColor:"red"},
-      {duration: 0,
-       complete: function() {
-        //span.animate({backgroundColor:"transparent"}, 500); // doesn't work, end color is white
-        span.animate({backgroundColor:"black"}, 500);
-       }
-    });
+    jqFlash = $("tr#" + this.msgNumber + " span.val-span", this.jqTable);
+    jqFlash.toggleClass('flash').toggleClass('flash', 500);
   } else { // flash chat border
-    this.jqChat.animate({backgroundColor:"red"},
-      {duration: 0,
-       complete: function()
-       {
-         self.jqChat.animate({backgroundColor:"black"}, 500);
-         //this.jqChat.animate({backgroundColor:"transparent"}, 500); // doesn't work, end color is white
-       }
-    });
+    this.jqChat.effect('highlight', { color:"red"}, 500);
+    //this.jqChat.toggleClass('flash').toggleClass('flash', 500);
   }
   ++this.msgNumber; // increment next msg number
 }; // addMsg

@@ -29,17 +29,17 @@
     <link rel="apple-touch-icon" sizes="72x72" href="images/apple-touch-icon-ipad.png" />
     <link rel="apple-touch-icon" sizes="114x114" href="images/apple-touch-icon-iphone4.png" />
     <link rel="apple-touch-startup-image" href="images/startup.png">
+    <link rel="stylesheet" href="css/wb.css" type="text/css" />
     <link rel="stylesheet" href="css/index.css" type="text/css" />
-    <link type="text/css" href="css/custom-theme/jquery-ui-1.8.22.custom.css" rel="stylesheet">
-    <!--<script src="js/jquery-1.8.0.dev.js" type="text/javascript"></script> animate color does not work-->
+    <link rel="stylesheet" href="css/jquery-ui.css" type="text/css" />
 
     <!-- <MANJESH> -->
     <script src="js/appcachesetup.js" type="text/javascript"></script>
     <!-- </MANJESH> -->
 
-    <script src="js/jquery-1.7.2.dev.js" type="text/javascript"></script>
+    <script src="js/jquery-1.8.1.js" type="text/javascript"></script>
     <script src="js/jquery.mousewheel.js" type="text/javascript"></script>
-    <script src="js/jquery-ui-1.8.22.custom.min.js" type="text/javascript"></script>
+    <script src="js/jquery-ui.js" type="text/javascript"></script>
     <!--<script type="text/javascript" src="js/swfobject.js"></script>-->
     <script src="/scripts/strophe.js"></script>
     <script src="/scripts/strophe.roster.js" type="text/javascript"></script>
@@ -116,8 +116,8 @@
        <div id="msgBoard">
         <!--<div id="chatOut" class="ui-widget-content"></div>-->
         <div id="chatOut"> </div>
-        <input id="groupChatInput" class="chatTo" type="text" placeholder="Enter a meeting note" onkeydown="keypressGrpChatHandler(event);"/>
-        <button id="send" class="send" onclick="sendGrpChat">Note</button>
+        <input id="groupChatInput" class="chatTo" type="text" onkeydown="keypressGrpChatHandler(event);"/>
+        <button id="send" class="send" onclick="sendGrpChat">Post</button>
        </div>
     </div>
     <div id="boxes">

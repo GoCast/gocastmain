@@ -36,12 +36,12 @@ a:active
 ::-webkit-scrollbar 
 {
   height: 12px;
-  width: 12px;
-  background: transparent;
+  width: 3px;
+  background: gray;
 }
 ::-webkit-scrollbar-thumb 
 {
-  background: #365283;
+  background: white;
   -webkit-border-radius: 1ex;
   -webkit-box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.75);
 }
@@ -348,34 +348,65 @@ body > div#lower-left > div#msgBoard > div#chatOut
   height: auto;
   width:300px;
   overflow-y:auto;
+  overflow-x:hidden;
   word-wrap:break-word;
   font-size:11px;
   line-height: 1.2em;
   padding: 3px;
-  border-width: 2px;
-  border-color:gray;
   -moz-user-select: text;
   -khtml-user-select: text;
   -webkit-user-select: text;
   -o-user-select: text;
   user-select: text;
 }
-body > div#lower-left > div#msgBoard > div#chatOut > span
+body > div#lower-left > div#msgBoard > div#chatOut.flash
+{
+  /*background-color: red; todo fix toggles -> white -> transparent*/
+  /*border: 5px solid red; */
+}
+body > div#lower-left > div#msgBoard > div#chatOut  table
+{
+  width:100%;
+  table-layout: fixed;
+}
+body > div#lower-left > div#msgBoard > div#chatOut  td
+{
+  font-size: 16px;
+  /*text-shadow: 0 0 10px gray, 0 0 20px gray, 0 0 30px gray, 0 0 40px #FF00DE, 0 0 70px #FF00DE, 0 0 80px #FF00DE, 0 0 100px #FF00DE, 0 0 150px #FF00DE;*/
+}
+body > div#lower-left > div#msgBoard > div#chatOut  td > span.val-span
+{
+  display:block;
+  width:200px
+}
+body > div#lower-left > div#msgBoard > div#chatOut  td.name
+{
+  color: green;
+}
+body > div#lower-left > div#msgBoard > div#chatOut  td.val
 {
   color: white;
-  font-size: 14px;
-  /*text-shadow: 0 0 10px gray, 0 0 20px gray, 0 0 30px gray, 0 0 40px #FF00DE, 0 0 70px #FF00DE, 0 0 80px #FF00DE, 0 0 100px #FF00DE, 0 0 150px #FF00DE;*/
+  width: 70%;
+}
+body > div#lower-left > div#msgBoard > div#chatOut  td.val.flash
+{
+  color: red;
 }
 body> div#lower-left > div#msgBoard > input.chatTo
 {
+  border-radius: 8px;
+  border:none;
+  padding: 0px 5px 1px 5px;
   background-color: white;
   color: black;
   font-size:14px;
   width:250px;
 }
 body > div#lower-left > div#msgBoard > button#send {
-  padding: 4px;
-  padding-right: 7px;
+  padding: 0px 10px 1px 10px;
+  background-color: black;
+  color: white;
+  border-radius:15px;
 }
 body > div#meeting 
 {
@@ -464,12 +495,38 @@ div.cloudcarousel > div#msgBoard > div#chatOut
   -o-user-select: text;
   user-select: text;
 }
-div.cloudcarousel > div#msgBoard > div#chatOut > span
+div.cloudcarousel > div#msgBoard > div#chatOut.flash
+{
+  /* background-color: red; todo toggles white -> transparent */
+  /*border: 1px solid red;   */
+}
+/*
+div.cloudcarousel > div#msgBoard > div#chatOut  td
+{
+  font-size: 16px;
+}
+*/
+div.cloudcarousel > div#msgBoard > div#chatOut  td > span.val-span
+{
+  display:block;
+  width:200px
+}
+div.cloudcarousel > div#msgBoard > div#chatOut  td > span.val-span.flash
+{
+  color: red;
+}
+div.cloudcarousel > div#msgBoard > div#chatOut  td.name
 {
   color: white;
-  /*text-shadow: 0 0 10px gray, 0 0 20px gray, 0 0 30px gray, 0 0 40px #FF00DE, 0 0 70px #FF00DE, 0 0 80px #FF00DE, 0 0 100px #FF00DE, 0 0 150px #FF00DE;*/
 }
-
+div.cloudcarousel > div#msgBoard > div#chatOut  td.val
+{
+  color: white;
+}
+div.cloudcarousel > div#msgBoard > div#chatOut  td.val.flash
+{
+  color: red;
+}
 body > div#meeting > div#streams {
   padding: 10px;
   top: 0px;
@@ -536,6 +593,11 @@ div.cloudcarousel > img#upper-right
   top: 3px;
   z-index: 1000;
 }
+div.cloudcarousel.unoccupied > img#upper-right
+{
+  right:15%;
+  top:15%;
+}
 div.cloudcarousel > img#upper-left
 {
   visibility: hidden;
@@ -545,7 +607,12 @@ div.cloudcarousel > img#upper-left
   position: absolute;
   z-index: 1000;
 }
-div.cloudcarousel
+div.cloudcarousel.unoccupied > img#upper-left
+{
+  top:15%;
+  left:15%;
+}
+div.cloudcarousel:not(.unoccupied)
 {
   -moz-box-shadow: 0px 0px 3px #303030;
   -webkit-box-shadow: 0px 0px 3px #303030;
@@ -579,117 +646,6 @@ div.cloudcarousel.typeContent > div.spotUrlTitle
   margin-right:auto;
   border-radius: 5px;  
 }
-.wb-icon { width: 16px; height: 16px; background-image: url(../images/wb-icons.png); }
-.wb-icon-check          { background-position: -64px -144px; }
-.wb-icon-triangle-2-n-s { background-position: -128px -16px; }
-.wbCanvas
-{
-  border: 1px solid;
-  border-color: black;
-  background-color: white;
-}
-.wbCanvas.erasing
-{
-  cursor: url(../images/erase-small.png) 7 7, arrow;
-}
-div#wbTools
-{
-  position: relative;
-}
-div.wbEraser /* not a wbButton due to background property collisions */
-{
-  width:20px;
-  height:20px;
-  background-image: url(../images/erase.png), -webkit-gradient(linear, left top, left bottom, color-stop(0, white), color-stop(.5, #AFAFAF), color-stop(.51, #A0A0A0), to(#A0A0A0));
-  background-image: url(../images/erase.png), -moz-linear-gradient(top, white, #AFAFAF 50%, #A0A0A0 51%, #A0A0A0);
-  background-repeat: no-repeat;
-  background-size: 100% 100%;
-  background-color: white;
-  border: 1px solid;
-  border-radius: 3px;
-  float: left;
-}
-div.wbEraser:not(.checked)
-{
-  background-image: url(../images/erase.png), -webkit-gradient(linear, left top, left bottom, color-stop(0, #9F9F9F), color-stop(.5, #909090), color-stop(.51, #808080), to(#808080));
-  background-image: url(../images/erase.png), -moz-linear-gradient(top, #9F9F9F, #909090 50%, #808080 51%, #808080);
-}
-div.wbPenW /* whiteboard pen width buttons */
-{
-  width: 20px;
-  height: 20px;
-  background-color: white;
-  background-repeat: no-repeat;
-  background-size: 100% 100%;
-  border: 1px solid;
-  border-radius: 3px;
-  margin-right: 0px;
-}
-div.wbPenColor /* whiteboard pen color button */
-{
-  position: relative;
-  width: 55px;
-  height: 20px;
-  background-color: white;
-  background-repeat: no-repeat;
-  background-size: 100% 100%;
-  margin-left: 3px;
-  margin-right: 0px;
-}
-div.wbPenColor > .wb-icon
-{
-  position: absolute;
-  right: -3px;
-  top: 2px;
-}
-div.wbButton
-{
-  border: 1px solid;
-  border-radius: 3px;
-  float:left;
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, white), color-stop(.5, #AFAFAF), color-stop(.51, #A0A0A0), to(#A0A0A0));
-  background: -moz-linear-gradient(top, white, #AFAFAF 50%, #A0A0A0 51%, #A0A0A0);
-}
-div.wbButton.checked
-{
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #9F9FFF), color-stop(.5, #9090FF), color-stop(.51, #8080FF), to(#8080FF));
-  background: -moz-linear-gradient(top, #9F9FFF, #9090FF 50%, #8080FF 51%, #8080FF);
-}
-div.wbButton.disabled
-{
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #9F9F9F), color-stop(.5, #909090), color-stop(.51, #808080), to(#808080));
-  background: -moz-linear-gradient(top, #9F9F9F, #909090 50%, #808080 51%, #808080);
-}
-div#wbPenColors
-{
-  position: absolute;
-  top: 0px;
-  left:0px;
-  width: 55px;
-  margin-left: 3px;
-  margin-right: 0px;
-}
-table#wbPenColorTable
-{
-  background-color: white;
-  border-color: black;
-  /*border-width: 1px;*/
-  border-radius: 3px;
-  width: 57px; /* needed to init canvas */
-}
-table#wbPenColorTable td
-{
-  height: 13px;
-}
-table#wbPenColorTable td.check
-{
-  width: 10px;
-}
-div.wbDiv
-{
-  width: 98%;
-  height: 98%;
-}
 body > div#meeting > div#streams > div#scarousel div.cloudcarousel > object {
   margin: 2px;
 }
@@ -705,8 +661,9 @@ body > div#meeting > div#streams > div#scarousel div.cloudcarousel > div.name {
   color: white;
 }
 body > div#meeting div.unoccupied {
-  background-image: url("../images/gologo200.png");
-  opacity: 0.7;
+  background-image: url("../images/GoToken.png");
+  background-size: 90%;
+  background-color: transparent;
 }
 body > div#meeting > div#streams > div#scarousel div#mystream {
   background-image: url("../images/person.png");  
