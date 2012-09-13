@@ -1868,28 +1868,34 @@ $(document).ready(function(
 )
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
-  navigator.plugins.refresh(); // reload plugins to get any plugin updates
+  appCacheResult.poll(
+    1000,
+    function(){
+      navigator.plugins.refresh(); // reload plugins to get any plugin updates
 
-  // Check the browser.
-  app.getBrowser();
-  app.checkBrowser();
+      // Check the browser.
+      app.getBrowser();
+      app.checkBrowser();
 
-  // login callback
-  $(document).bind('checkCredentials', checkCredentials);
+      // login callback
+      $(document).bind('checkCredentials', checkCredentials);
 
-  uiInit(); // init user interface
-  fbInit(); // init facebook api
+      uiInit(); // init user interface
+      fbInit(); // init facebook api
 
-  // Login to xmpp anonymously
-  Callcast.connect(Callcast.CALLCAST_XMPPSERVER, '');
+      // Login to xmpp anonymously
+      Callcast.connect(Callcast.CALLCAST_XMPPSERVER, '');
 
-  // Write greeting into console.
-  app.log(2, 'Page loaded.');
+      // Write greeting into console.
+      app.log(2, 'Page loaded.');
 
-  // set the connection status callback
-  Callcast.setCallbackForCallback_ConnectionStatus(connectionStatus);
-
-
+      // set the connection status callback
+      Callcast.setCallbackForCallback_ConnectionStatus(connectionStatus);
+    },
+    function(){
+      window.location.reload();
+    }
+  );
 }); // $(document).ready(function())
 
 $.extend({
