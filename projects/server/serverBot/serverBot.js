@@ -470,9 +470,11 @@ function MucRoom(client, notifier, bSelfDestruct, success, failure) {
     this.notifier = notifier;
     this.pendingDeletion = false;
     this.addSpotCeiling = 1000;     // Value doled-out upon addspot commands being given (and incremented afterwards)
+    this.addWhiteboardCeiling = 1;  // Special value in each room for making unique whiteboard names for display.
 
     this.spotList = {};
     this.spotStorage = {};
+    this.wbStrokeList = {};
 
     var self = this;
 
@@ -550,6 +552,7 @@ MucRoom.prototype.reset = function() {
 
     this.spotList = {};
     this.spotStorage = {};
+    this.wbStrokeList = {};
 
     this.client.removeListener('stanza', this.onstanza);
 };
@@ -938,6 +941,9 @@ MucRoom.prototype.handleIQ = function(iq) {
             else if (iq.getChild('setspot')) {
                 this.SetSpotReflection(iq);
             }
+            else if (iq.getChild('wb_stroke')) {
+                this.WhiteboardSingleStrokeReflection(iq);
+            }
             else {
                 this.log('Unknown set, iq is: ' + iq.root().toString());
             }
@@ -971,16 +977,25 @@ MucRoom.prototype.SendSpotListTo = function(to) {
             // Copy the object for this spot as a starting point.
             attribs_out = this.spotList[k];
 
-            // Now add the required items to make it a valid command.
-            attribs_out.cmdtype = 'addspot';
-            attribs_out.xmlns = 'urn:xmpp:callcast';
-
-            if (msgToSend) {
-                msgToSend.up().c('cmd', attribs_out);
+            //
+            // If we have a whiteboard entry, we don't add it to the generic list
+            // because full stroke lists can be large.
+            //
+            if (attribs_out.spottype === 'whiteBoard') {
+                this.SendFullWhiteboardStrokeListTo(k, to);
             }
             else {
-                msgToSend = new xmpp.Element('message', {'to': to, type: 'chat', xmlns: 'urn:xmpp:callcast'})
-                    .c('cmd', attribs_out);
+                // Now add the required items to make it a valid command.
+                attribs_out.cmdtype = 'addspot';
+                attribs_out.xmlns = 'urn:xmpp:callcast';
+
+                if (msgToSend) {
+                    msgToSend.up().c('cmd', attribs_out);
+                }
+                else {
+                    msgToSend = new xmpp.Element('message', {'to': to, type: 'chat', xmlns: 'urn:xmpp:callcast'})
+                        .c('cmd', attribs_out);
+                }
             }
 
         }
@@ -988,6 +1003,49 @@ MucRoom.prototype.SendSpotListTo = function(to) {
 
     if (msgToSend) {
         this.log('SendSpotListTo: msgToSend:' + msgToSend.root().toString());
+        this.client.send(msgToSend);
+    }
+
+};
+
+MucRoom.prototype.SendFullWhiteboardStrokeListTo = function(spotnumber, to) {
+    var k, msgToSend,
+        attribs_out;
+
+    if (!this.spotList[spotnumber]) {
+        this.log('SendFullWhiteboardStrokeListTo: ERROR - unknown spotnumber: ' + spotnumber);
+        return;
+    }
+
+    if (this.spotList[spotnumber].spottype !== 'whiteBoard' || !this.wbStrokeList[spotnumber]) {
+        this.log('SendFullWhiteboardStrokeListTo: ERROR - Not a whiteboard spot: ' + spotnumber);
+        return;
+    }
+
+    msgToSend = null;
+
+    this.log('SendFullWhiteboardStrokeListTo: sending full whiteboard stroke catch-up to: ' + to + ' for ' + spotnumber);
+
+    // Copy the object for this spot as a starting point.
+    attribs_out = this.spotList[spotnumber];
+
+    // Now add the required items to make it a valid command.
+    attribs_out.cmdtype = 'addspot';
+    attribs_out.xmlns = 'urn:xmpp:callcast';
+
+    attribs_out.strokes = JSON.stringify(this.wbStrokeList[spotnumber]);
+    this.log('DEBUG: Full stroke list: ' + attribs_out.strokes);
+
+    if (msgToSend) {
+        msgToSend.up().c('cmd', attribs_out);
+    }
+    else {
+        msgToSend = new xmpp.Element('message', {'to': to, type: 'chat', xmlns: 'urn:xmpp:callcast'})
+            .c('cmd', attribs_out);
+    }
+
+    if (msgToSend) {
+//        this.log('DEBUG: SendFullWhiteboardStrokeListTo: msgToSend:' + msgToSend.root().toString());
         this.client.send(msgToSend);
     }
 
@@ -1055,6 +1113,16 @@ MucRoom.prototype.AddSpotReflection = function(iq) {
     // Be sure to give a spot number to everyone that's consistent.
     info.spotnumber = this.addSpotCeiling;
     this.addSpotCeiling += 1;
+
+    if (info.spottype === 'whiteBoard') {
+        // Need to generate a unique whiteboard name.
+        info.spotname = 'Whiteboard ' + this.addWhiteboardCeiling;
+        this.addWhiteboardCeiling += 1;
+
+        // Initialize the stroke list to nothing.
+        this.wbStrokeList[info.spotnumber] = {};
+        this.wbStrokeList[info.spotnumber].strokes = [];
+    }
 
     this.SendGroupCmd('addspot', info);
 
@@ -1151,6 +1219,59 @@ MucRoom.prototype.SetSpotReflection = function(iq) {
     this.client.send(iq);
 };
 
+MucRoom.prototype.WhiteboardSingleStrokeReflection = function(iq) {
+    // Need to pull out the 'info' object - which is the attributes to the 'addspot'
+    var info = {}, self = this;
+
+    // Prep to reply to the IQ message.
+    iq.attrs.to = iq.attrs.from;
+    delete iq.attrs.from;
+
+    if (iq.getChild('wb_stroke')) {
+        info = iq.getChild('wb_stroke').attrs;
+    }
+
+    // Be sure a spot number attribute is present. Else it's an error.
+    if (!info.spotnumber) {
+        this.log('Missing required spotnumber attribute.');
+
+        iq.attrs.type = 'error';
+        iq.c('reason').t('Missing required spotnumber attribute.');
+    }
+    else if (!this.spotList[info.spotnumber]) {
+        this.log('Unknown spotnumber: ' + info.spotnumber);
+
+        // If we don't have a record of this spotnumber existing, then it's an error also.
+        iq.attrs.type = 'error';
+        iq.c('reason').t('spotnumber' + info.spotnumber + 'is unknown to the overseer.');
+    }
+    else {
+        // Add this stroke to the (growing) stroke list for this spot.
+        this.wbStrokeList[info.spotnumber].strokes.push(info.stroke);
+
+        this.SendGroupCmd('setspot', info);
+
+// No update of spotList for a single stroke.        this.spotList[info.spotnumber] = info;
+
+ //       console.log(' spotList in: ' + this.roomname + ' is: ', this.spotList);
+
+// No databasing of single strokes. RMW:TODO revisit this for how to database/store images/stroke deltas.
+/*
+        if (overseer.roomDB) {
+            overseer.roomDB.AddContentToRoom(this.roomname.split('@')[0], info.spotnumber, info, function() {
+                return true;
+            }, function(msg) {
+                self.log('SetSpotReflection: ERROR adding to database: ' + msg);
+            });
+        }
+*/
+        iq.attrs.type = 'result';
+    }
+
+    // Send back the IQ result.
+    this.client.send(iq);
+};
+
 MucRoom.prototype.RemoveSpotReflection = function(iq) {
     // Need to pull out the 'info' object - which is the attributes to the 'removespot'
     var info = {}, self = this;
@@ -1172,6 +1293,11 @@ MucRoom.prototype.RemoveSpotReflection = function(iq) {
     }
     else {
         this.SendGroupCmd('removespot', info);
+
+        if (this.wbStrokeList[info.spotnumber]) {
+            // Need to erase our notion of any strokes for this spot since it is a whiteboard.
+            delete this.wbStrokeList[info.spotnumber];
+        }
 
         delete this.spotList[info.spotnumber];
 
@@ -2068,7 +2194,7 @@ function Overseer(user, pw, notifier) {
                     }
 
                     if ('roommanagertest' === option) {
-                        this.log('OVERSEER: ROOM MANAGER MODE');
+                        this.log('OVERSEER: ROOM MANAGER MODE --- TEST VERSION');
                         user = user + '/' + option;
                         this.log('OVERSEER: JID = ' + user);
 
