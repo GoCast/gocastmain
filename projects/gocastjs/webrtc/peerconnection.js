@@ -3,15 +3,6 @@ GoCastJS = (null !== GoCastJS) ? GoCastJS : {};
 
 GoCastJS.Utils = {
     joinObjects: function(a, b) {
-
-        if (!a || !b) {
-            Callcast.SendLiveLog('GoCastJS.Utils.joinObjects: ' +
-                                 'Occurence of defect #DE30 [a = ' +
-                                 JSON.stringify(a) + '] [b = ' +
-                                 JSON.stringify(b) + ']');
-        }
-
-
         a = a || {};
         b = b || {};
 
