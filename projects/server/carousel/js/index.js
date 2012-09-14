@@ -301,10 +301,12 @@ var app = {
     var message = 'Click on the <strong>GEAR ICON</strong> to change/test devices.<br/>';
     var ctDwnMsg = '<span style="font-size:9px; float:right;">[Closing in ' +
                    '<span id="secondsToClose" style="font-weight:bold;">10</span>]</span><br/><br/>';
+    var opacity = 0.4;
     var closeCountDown = setInterval(function() {
       var seconds = parseInt($('#secondsToClose').html());
       $('#secondsToClose').html((seconds-1).toString());
-      $('#settings').effect('pulsate', { times: 1 }, 1000);
+      $('#settings').fadeTo(1000, opacity);
+      opacity = (0.4 === opacity) ? 1.0 : 0.4;
     }, 1000);
 
     if (!firstCall) {
@@ -315,9 +317,11 @@ var app = {
         window.localStorage.gcpDontShowSettingsPromptCheck &&
         'checked' === window.localStorage.gcpDontShowSettingsPromptCheck) {
       clearInterval(closeCountDown);
+      $('#settings').fadeTo(1000, 1.0);
     } else {
       setTimeout(function() {
-        clearTimeout(closeCountDown);
+        clearInterval(closeCountDown);
+        $('#settings').fadeTo(1000, 1.0);
         $('#settings-prompt').css({'display': 'none'});
       }, 10000);
 
@@ -326,7 +330,8 @@ var app = {
       $('#settings-prompt > span').css({'display': 'none'});
       $('#settings-cancel').css({'display': 'none'});
       $('#settings-ok').click(function() {
-        clearTimeout(closeCountDown);
+        clearInterval(closeCountDown);
+        $('#settings').fadeTo(1000, 1.0);
         $('#settings-prompt').css({'display': 'none'});
       });      
     }
@@ -1867,28 +1872,49 @@ $(document).ready(function(
 )
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
-  navigator.plugins.refresh(); // reload plugins to get any plugin updates
+  /*appCacheResult.callbacks.downloading = function() {
+    var opacity = 0.4;
 
-  // Check the browser.
-  app.getBrowser();
-  app.checkBrowser();
+    openWindow('#waitingForUpdates');
+    setInterval(function() {
+      $('#boxes #waitingForUpdates > img').fadeTo(1000, opacity);
+      opacity = (0.4 === opacity) ? 0.8 : 0.4;
+    }, 1000);
+  };
 
-  // login callback
-  $(document).bind('checkCredentials', checkCredentials);
+  appCacheResult.callbacks.progress = function(percentDone) {
+    $('#boxes #waitingForUpdates > progress').val(percentDone);
+  };
 
-  uiInit(); // init user interface
-  fbInit(); // init facebook api
+  appCacheResult.poll(
+    1000,
+    function(){*/
+    navigator.plugins.refresh(); // reload plugins to get any plugin updates
 
-  // Login to xmpp anonymously
-  Callcast.connect(Callcast.CALLCAST_XMPPSERVER, '');
+    // Check the browser.
+    app.getBrowser();
+    app.checkBrowser();
 
-  // Write greeting into console.
-  app.log(2, 'Page loaded.');
+    // login callback
+    $(document).bind('checkCredentials', checkCredentials);
 
-  // set the connection status callback
-  Callcast.setCallbackForCallback_ConnectionStatus(connectionStatus);
+    uiInit(); // init user interface
+    fbInit(); // init facebook api
 
+    // Login to xmpp anonymously
+    Callcast.connect(Callcast.CALLCAST_XMPPSERVER, '');
 
+    // Write greeting into console.
+    app.log(2, 'Page loaded.');
+
+    // set the connection status callback
+    Callcast.setCallbackForCallback_ConnectionStatus(connectionStatus);
+    /*},
+    function(){
+      closeWindow();
+      window.location.reload();
+    }
+  );*/
 }); // $(document).ready(function())
 
 $.extend({

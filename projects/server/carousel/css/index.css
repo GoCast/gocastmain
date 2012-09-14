@@ -866,6 +866,31 @@ body > div#meeting > div#streams > div#scontrols > input.right {
   border: 4px solid lightgreen;
   border-radius: 8px;  
 }
+
+/*<MANJESH>
+#boxes #waitingForUpdates {
+  width: 200px;
+  height: 200px;
+}
+#boxes #waitingForUpdates > progress {
+  width: 220px;
+  height: 2px;
+  border: none;
+  border-radius: 5px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  background-color: black; 
+}
+
+#boxes #waitingForUpdates > progress::-webkit-progress-value {
+  background-color: #32CD32;
+}
+
+#boxes #waitingForUpdates > progress::-moz-progress-bar {
+  background-color: #32CD32;
+}
+/*</MANJESH>*/
+
 #boxes #winEula {
   width: 660px;
   height: 80%;
