@@ -1822,6 +1822,61 @@ var Callcast = {
         },
 
     //
+    // \brief Rather than sending all strokes to make the complete whiteboard each time, with this feature
+    //      we send single strokes to the server which then echos those out to the group.
+    //
+    // \param obj A JSON object which must have at least two properties:
+    //      a) obj.stroke - This is the item which will be echoed by the server to other participants.
+    //      b) obj.spotnumber - This is required to know which spot we are referring to.
+    //
+    // \param cb A callback which is called upon success with a null/empty argument cb();. On failure, this
+    //      callback is called with an error string such as cb("Error sending stroke");
+    //
+    SendSingleStroke: function(obj, cb) {
+        var myOverseer = this.overseer,
+            self = this,
+            tosend = obj;
+
+        if (!obj.stroke || !obj.spotnumber) {
+            if (cb) {
+                cb('SendSingleStroke: ERROR. Bad object passed.');
+            }
+
+            this.log('SendSingleStroke: ERROR. Bad object passed.');
+            return false;
+        }
+
+        tosend.spottype = 'whiteBoard';
+        tosend.xmlns = this.NS_CALLCAST;
+        tosend.from = this.nick;
+
+        //
+        this.connection.sendIQ($iq({
+            to: myOverseer,
+            id: 'sendstroke1',
+            type: 'set'
+          }).c('wb_stroke', tosend),
+
+        // Successful callback...
+          function(iq) {
+              if (cb) {
+                cb();
+              }
+
+              return true;
+          },
+
+        // Failure callback
+          function(iq) {
+              self.log('Error sending stroke', iq);
+              if (cb) {
+                cb('Error sending stroke');
+              }
+          }
+        );
+    },
+
+    //
     // \brief Function allows clients to request a new spot be added to everyone's carousel.
     //      This IQ is sent to the server and when successful, the server will respond by
     //      first sending a groupchat to the room with a '<cmd cmdtype='addspot' spotnumber='value' ..../>

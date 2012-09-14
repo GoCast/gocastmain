@@ -1017,7 +1017,7 @@ MucRoom.prototype.SendFullWhiteboardStrokeListTo = function(spotnumber, to) {
         return;
     }
 
-    if (this.spotList.spottype !== 'whiteBoard' || !this.wbStrokeList[spotnumber]) {
+    if (this.spotList[spotnumber].spottype !== 'whiteBoard' || !this.wbStrokeList[spotnumber]) {
         this.log('SendFullWhiteboardStrokeListTo: ERROR - Not a whiteboard spot: ' + spotnumber);
         return;
     }
@@ -1045,7 +1045,7 @@ MucRoom.prototype.SendFullWhiteboardStrokeListTo = function(spotnumber, to) {
     }
 
     if (msgToSend) {
-        this.log('DEBUG: SendFullWhiteboardStrokeListTo: msgToSend:' + msgToSend.root().toString());
+//        this.log('DEBUG: SendFullWhiteboardStrokeListTo: msgToSend:' + msgToSend.root().toString());
         this.client.send(msgToSend);
     }
 
@@ -2194,7 +2194,7 @@ function Overseer(user, pw, notifier) {
                     }
 
                     if ('roommanagertest' === option) {
-                        this.log('OVERSEER: ROOM MANAGER MODE');
+                        this.log('OVERSEER: ROOM MANAGER MODE --- TEST VERSION');
                         user = user + '/' + option;
                         this.log('OVERSEER: JID = ' + user);
 
