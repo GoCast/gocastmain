@@ -683,6 +683,15 @@ var Callcast = {
     InitGocastPlayer: function(jqSelector, success, failure) {
         if (!this.localplayer) {
             var settings = JSON.parse(window.localStorage.gcpsettings || '{}');
+
+            if (!settings) {
+                Callcast.SendLiveLog('Callcast.InitGocastPlayer: ' +
+                                     'Occurence of defect #DE30');
+                settings = {};
+                delete window.localStorage.gcpsettings;
+            }
+
+
             this.mediaHints = {audio: true, video: true};
             this.mediaHints = GoCastJS.Utils.joinObjects(this.mediaHints, settings);
 
