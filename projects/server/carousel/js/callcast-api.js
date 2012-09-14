@@ -135,15 +135,16 @@ $(document).on('public-message', function(
 {
   try
   {
-    var notice = msginfo.notice,
-        delayed = msginfo.delayed,
-        nick_class = msginfo.nick_class,
-        jqChat = $(app.GROUP_CHAT_OUT),
-        util;
+    var jqChat = $(app.GROUP_CHAT_OUT),
+        util,
+        item,
+        name;
     if (!jqChat[0]) {throw "no chat out div";}
     util = jqChat.data('util');
     if (!util) {throw "no chat util";}
-    util.addMsg(decodeURI(msginfo.nick), decodeURI(msginfo.body));
+    item = app.carousel.getByNick(msginfo.nick);
+    if (!item) {throw "no item by nick " + msginfo.nick;}
+    util.addMsg(item.chatName, decodeURI(msginfo.body));
     app.log(2, 'A public message arrived ' + decodeURI(msginfo.nick) + " " + decodeURI(msginfo.body));
   }
   catch(err)
@@ -162,7 +163,7 @@ $(document).on('private-message', function(
 {
   try
   {
-    var id, oo, jqChat, atBottom, msgNumber, span, util;
+    var id, oo, jqChat, atBottom, msgNumber, span, util, item;
     app.log(2, 'A private message arrived.');
     id = app.str2id(msginfo.nick);
     oo = $('#meeting > #streams > #scarousel div.cloudcarousel#' + id).get(0);
@@ -174,7 +175,9 @@ $(document).on('private-message', function(
       if (!jqChat[0]) {throw "no chat out div";}
       util = jqChat.data('util');
       if (!util) {throw "no chat util";}
-      util.addMsg(decodeURI(msginfo.nick), decodeURI(msginfo.body));
+      item = app.carousel.getByNick(msginfo.nick);
+      if (!util) {throw "no item by name " + msginfo.nick;}
+      util.addMsg(item.chatName, decodeURI(msginfo.body));
     }
     else // spot not found
     {
@@ -453,7 +456,8 @@ function addPluginToCarousel(nickname)
   var dispname = decodeURI(nickname),
       id = app.str2id(nickname),
       w, h,
-      jqOo, oo;
+      jqOo, oo,
+      item;
   if (!nickname)
   {
     app.log(4, "addPluginToCarousel error nickname undefined");
@@ -488,6 +492,11 @@ function addPluginToCarousel(nickname)
     $('div.name', oo).text(dispname);
     $(oo).removeClass('unoccupied');
     $("#showChat", oo).css("display", "block"); // display showChat button
+
+    // set spot item name
+    item = $(oo).data('item');
+    if (!item) {throw "item is not defined";}
+    app.carousel.setSpotName(item, nickname);
 
     app.log(2, 'Added GocastPlayer' + id + ' object.');
     app.carousel.updateAll();

@@ -1542,7 +1542,8 @@ function checkCredentials()
 //
 function handleRoomSetup() {
   app.log(2, 'handleRoomSetup entered');
-  var room_to_create = $.getUrlVar('roomname') || '';
+  var room_to_create = $.getUrlVar('roomname') || '',
+      item;
 
   room_to_create = room_to_create.replace(/ /g, '');
     app.log(2, 'room_to_create ' + room_to_create);
@@ -1555,6 +1556,10 @@ function handleRoomSetup() {
     app.user.scheduleName = 'Place to meet up';
     app.user.scheduleJid = new_name + Callcast.AT_CALLCAST_ROOMS;
     app.user.scheduleTitle = 'Open room';
+
+    // set local spot nick todo find a better place for this
+    item = app.carousel.getItem(0);
+    app.carousel.setSpotName(item, app.user.name);
 
     app.log(2, "Room named '" + new_name + "' has been created. Joining now.");
     app.log(2, 'window.location ' + window.location);

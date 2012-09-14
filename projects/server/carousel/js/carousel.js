@@ -35,6 +35,8 @@
     this.plgOrgHeight = (this.plgOrgWidth / Callcast.WIDTH) * Callcast.HEIGHT;
     this.orgChatWidth = this.plgOrgWidth;
     this.orgChatBot = 17;
+    this.nick = null;
+    this.chatName = null;
     this.object = objIn;
     this.options = options;
     this.dummy = dummy;
@@ -100,6 +102,7 @@
     this.vals = {}; // assoc array
     this.keys = []; // array of sorted keys
     this.bySpot = []; // array of indexes by spotnumber
+    this.byNick = {}; // array of indexes by nickname
   };
   Items.prototype.set = function(index, item)
   {
@@ -107,6 +110,10 @@
     if (item.spotnumber)     // index by spotnumber
     {
        this.bySpot[item.spotnumber] = item.index;
+    }
+    if (item.nick)
+    {
+      this.byNick[item.nick] = item.index;
     }
     this.updateKeys();       // sort items
   };
@@ -120,7 +127,12 @@
     //todo check that index is numeric
     var spot = parseInt(spotnumber, 10),
         index = this.bySpot[spot];
-    return index ? this.vals[index] : null;
+    return index !== null ? this.vals[index] : null;
+  };
+  Items.prototype.getByNick = function(name)
+  {
+    var index = this.byNick[name];
+    return index !== null ? this.vals[index] : null;
   };
   Items.prototype.remove = function(index)
   {
@@ -185,6 +197,96 @@
     {
       item.updateSize(newItem);
     });
+  };
+  ///
+  /// \brief get the chat name collisions for item's nick name
+  ///
+  /// \arg item the item
+  /// \arg chat name to test for collisions
+  Items.prototype.getNameCollisions = function(item, name)
+  {
+    var collisions = [];
+    this.iterateSorted(function(itemThat)
+    {
+      // exclude item from compare
+      if (itemThat.index !== item.index)
+      {
+        console.log("getNameCollisions other", itemThat);
+        if (itemThat.chatName && 0 === itemThat.chatName.indexOf(name))
+        {
+          collisions.push(itemThat);
+        }
+      }
+    });
+    return collisions;
+  };
+  ///
+  /// \brief set a unique shorter name for display in chat
+  ///
+  Items.prototype.setChatName = function(item)
+  {
+    var name, names, collisions;
+    if (null === item.nick || // no nickname
+        null !== item.chatName) // chatName already created
+    {
+      return;
+    }
+    else
+    {
+      name = decodeURI(item.nick);
+      names = name.split(' ');
+      console.log("setChatName", item.nick, name, names);
+      if (1 === names.length) // no first, last name, only nick name so use it
+      {
+        item.chatName = item.nick;
+      }
+      else
+      {
+        // if no collisions set chat name to first name
+        collisions = this.getNameCollisions(item, names[0]);
+        if (0 === collisions.length)
+        {
+          item.chatName = names[0];
+          console.log("setChatName chatName set", item);
+        }
+        else // resolve collisions
+        {
+          console.log("setChatName collisions", collisions);
+          this.resolveChatNameCollisions(item, names);
+        }
+      }
+    }
+  };
+  ///
+  /// \brief genarate a unique chat name given that the current name collides
+  ///
+  Items.prototype.resolveChatNameCollisions = function(item, names)
+  {
+    var suffix, // the str to append to name to make the chat name unique
+        newName,
+        collisions,
+        // try adding the first and second letter of the last name
+        // if that doesn't work use the whole nick
+        trys = [names[0] + " " + names[names.length - 1].substr(0, 1),
+                names[0] + " " + names[names.length - 1].substr(0, 2)],
+        i;
+
+    item.chatName = null;
+    for (i = 0; i < trys.length; ++i)
+    {    
+      newName = trys[i];
+      console.log("resolveChatNameCollisions newName", newName);
+      collisions = this.getNameCollisions(item, newName);
+      if (0 === collisions.length)
+      {
+        item.chatName = newName;
+        break;
+      }
+    }
+    if (null === item.chatName)
+    {
+      item.chatName = item.nick;
+    }
   };
   ///
   /// \brief Controller object. This handles moving all the items and dealing
@@ -614,16 +716,28 @@
     {
       return items.getByspotnumber(number);
     };
-    /// \brief set the spot number for an existing spot
+    /// \brief set the spot number for an existing spot and reindex
     this.setSpotNumber = function(item, number)
     {
       item.spotnumber = number;
       items.set(item.index, item);
     };
+    /// \brief set the spot name for an existing spot and reindex
+    this.setSpotName = function(item, name)
+    {
+      item.nick = name;
+      items.set(item.index, item);
+      items.setChatName(item);
+    };
     /// \brief get an item from items by index
     this.getByIndex = function(index)
     {
       return items.get(index);
+    };
+    /// \brief get item by spot number
+    this.getByNick = function(nick)
+    {
+      return items.getByNick(nick);
     };
     /// \brief remove a spot from items
     this.remove = function(index)
