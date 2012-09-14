@@ -688,6 +688,7 @@ var Callcast = {
                 Callcast.SendLiveLog('Callcast.InitGocastPlayer: ' +
                                      'Occurence of defect #DE30');
                 settings = {};
+                delete window.localStorage.gcpsettings;
             }
 
 
