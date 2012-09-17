@@ -1,0 +1,9 @@
+# Run on EC2 cloud LOCAL CREATESF sfipaddress=50.18.56.238 username="-i /home/ec2-user/.ssh/xvd-demo.pem ec2-user" sfid=6000 sfname=CloudFileSource
+LOCAL CREATESF sfipaddress=207.145.121.125 username="rwolff" sfid=6000 sfname=CloudFileSource
+SF WAITFORSFREADY sfid=6000 timeout=15000
+SF ADDSESSION sfid=6000 sessid=1001
+SF WAITFORSESSREADY sfid=6000 sessid=1001 timeout=25000
+SF ADDENTITY sfid=6000 sessid=1001 entid=999 enttype=FILESOURCE entname=Up resx=1280 resy=720
+LOCAL CREATESOURCE sfid=6000 sessid=1001 entid=999 sourcename=Up
+SF TREFRESH
+#

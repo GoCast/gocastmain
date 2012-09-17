@@ -1,0 +1,7 @@
+#!/bin/sh
+echo "Before..."
+ps ax | grep "edge -u"
+sudo edge -u 222 -g 500 -d tun0 -c session1001 -a 10.10.10.1 -l 207.145.121.125:3456 -E
+echo "After..."
+ps ax | grep "edge -u"
+

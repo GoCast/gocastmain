@@ -1,0 +1,12 @@
+#
+#
+LOCAL CREATESF sfid=7000 sfipaddress=10.10.10.84 username="rwolff" sfname=InternalRelayAppliance
+SF WAITFORSFREADY sfid=7000 timeout=25000
+SF ADDSESSION sfid=7000 sessid=1001
+SF WAITFORSESSREADY sfid=7000 sessid=1001 timeout=60000
+SF ADDENTITY sfid=7000 sessid=1001 entid=997 enttype=RP entname=UpRP srcentid=999
+#local sleep ms=3000
+#SF CHANGECONNECTION sfid=11555 sessid=1001 entid=32770 srcentid=997
+#local sleep ms=3000
+#SF CHANGECONNECTION sfid=11556 sessid=1001 entid=32771 srcentid=997
+
