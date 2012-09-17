@@ -94,7 +94,7 @@ new Lazy(fs.createReadStream(filelist))
     .lines
     .forEach(function(line) {
         entry = line.toString();
-        if (entry[0] !== '/' && entry[0] !== '~') {
+        if (entry[0] !== '/' && entry[0] !== '~' && entry[0] !== '#') {
             console.log('ERROR: bad entry. All entries must start with "/" or "~". (' + entry + ')');
             process.exit(1);
         }
