@@ -155,7 +155,9 @@ var app = {
     } /* switch (app.browser.name) */
     if (msg) {
       alert(msg);
+      return false;
     }
+    return true;
   }, /* app.checkBrowser() */
   /**
    * The OS platform. */
