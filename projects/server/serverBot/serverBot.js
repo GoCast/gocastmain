@@ -2544,7 +2544,7 @@ Overseer.prototype.sendGroupMessage = function(room, msg_body) {
 //
 Overseer.prototype.handleMessage = function(msg) {
     var cmd, k, l, temp,
-        fromjid, fromnick, toroom, plea;
+        fromjid, fromnick, toroom, plea, mroom;
     // Listen to pure chat messages to the overseer.
 
     // Now, if we get a direct chat, it could be from a person in a room who is sending commands to
@@ -2607,12 +2607,15 @@ Overseer.prototype.handleMessage = function(msg) {
                 temp = 'LISTROOMS Request: \n';
                 for (k in this.MucRoomObjects) {
                     if (this.MucRoomObjects.hasOwnProperty(k)) {
+                        mroom = this.MucRoomObjects[k];
                         temp += ' ROOM: ' + k;
-                        if (size(this.MucRoomObjects[k].participants > 1)) {
-                            temp += '\n';
-                            for (l in this.MucRoomObjects[k].participants) {
-                                if (this.MucRoomObjects[k].participants.hasOwnProperty(l)) {
-                                    temp += '       ' + l;
+                        // pendingDeletion && bSelfDestruct
+                        temp += mroom.bSelfDestruct ? ' Self-destruct' : ' Non-Self-destruct';
+                        temp += mroom.pendingDeletion ? ' Pending-deletion' : '';
+                        if (size(mroom.participants > 1)) {
+                            for (l in mroom.participants) {
+                                if (mroom.participants.hasOwnProperty(l)) {
+                                    temp += '\n       ' + l;
                                 }
                             }
                         }
