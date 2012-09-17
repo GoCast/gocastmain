@@ -415,28 +415,57 @@ GoCastJS.WhiteBoard.prototype.sendSpot = function()
   Callcast.SetSpot(cmd);
 };
 ///
+/// \brief send mouse stroke to server
+///
+/// \throw
+///
+GoCastJS.WhiteBoard.prototype.sendStroke = function(stroke)
+{
+  var spotnumber = this.jqParent.attr('spotnumber'); // todo refactor spotnumber location
+  Callcast.SendSingleStroke({stroke: JSON.stringify(this.mouse.currentCommand), spotnumber: spotnumber});
+};
+///
 /// \brief do received mouse command array
 ///
 /// \throw
 ///
 GoCastJS.WhiteBoard.prototype.doCommands = function(info)
 {
-  var i, cmds;
+  var i, cmds, stroke;
   if (!info) {throw "WhiteBoard.doCommands info is null";}
-  if (!info.whiteboardcommandarray) // no commands, must be a new whiteboard
-  {
-    return;
+  if (info.whiteboardcommandarray)
+  { // todo get rid of mouseCommands, they moved to server
+    cmds = JSON.parse(info.whiteboardcommandarray);
+    //console.log("WhiteBoard.doCommands", info, cmds);
+    this.mouseCommands = []; // replace commands
+    this.wbCtx.clearRect(0, 0, this.wbCtx.canvas.width, this.wbCtx.canvas.height);
+    for (i = 0; i < cmds.length; ++i)
+    {
+      this.doCommand(cmds[i]);
+      this.mouseCommands.push(cmds[i]); // add command to local list
+    }
+    //console.log("WhiteBoard.doCommands cmds ", this.mouseCommands);
   }
-  cmds = JSON.parse(info.whiteboardcommandarray);
-  //console.log("WhiteBoard.doCommands", info, cmds);
-  this.mouseCommands = []; // replace commands
-  this.wbCtx.clearRect(0, 0, this.wbCtx.canvas.width, this.wbCtx.canvas.height);
-  for (i = 0; i < cmds.length; ++i)
-  {
-    this.doCommand(cmds[i]);
-    this.mouseCommands.push(cmds[i]); // add command to local list
+  if (info.strokes)
+  { // todo get rid of mouseCommands, they moved to server
+    cmds = JSON.parse(info.strokes);
+    cmds = JSON.parse(cmds.strokes); // todo shouldn't need the 2nd parse
+    //console.log("WhiteBoard.doCommands", info, cmds);
+    this.mouseCommands = []; // replace commands
+    this.wbCtx.clearRect(0, 0, this.wbCtx.canvas.width, this.wbCtx.canvas.height);
+    for (i = 0; i < cmds.length; ++i)
+    {
+      this.doCommand(cmds[i]);
+      this.mouseCommands.push(cmds[i]); // add command to local list
+    }
+    console.log("WhiteBoard.doCommands strokes ", this.mouseCommands);
   }
-  //console.log("WhiteBoard.doCommands cmds ", this.mouseCommands);
+  if (info.stroke) // todo handle races at server, erase canvas and redraw everything
+  {
+    stroke = JSON.parse(info.stroke);
+    console.log("WhiteBoard.doCommands stroke ", stroke);
+    this.doCommand(stroke);
+  }
 };
 ///
 /// \brief do received mouse command
@@ -473,7 +502,7 @@ GoCastJS.WhiteBoard.prototype.doCommand = function(cmdArray)
         this.wbCtx.stroke();
       break;
       default:
-         throw "WhiteBoard.doCommand unknown cmd " + cmdArray[i].name;
+        throw "WhiteBoard.doCommand unknown cmd " + cmdArray[i].name;
     }
   }
 };
@@ -564,9 +593,8 @@ GoCastJS.WhiteBoard.prototype.onMouseUp = function(event)
     wb.wbCtx.stroke();
     wb.mouse.currentCommand.push({name: 'stroke'});
     wb.mouse.currentCommand.push({name: 'restore'});
-    wb.mouseCommands.push(wb.mouse.currentCommand);
+    wb.sendStroke(wb.mouse.currentCommand);
     wb.mouse.currentCommand = [];
-    wb.sendSpot();
   }
   wb.mouse.state = wb.mouse.UP;
 };
