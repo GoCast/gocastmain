@@ -81,6 +81,12 @@ var app = {
       alert(msg);
       app.logFatalReported = true;
     }
+
+    // <MANJESH>
+    if (Callcast && Callcast.log) {
+      Callcast.log(' ' + labels[logLevel] + ': ' + logMsg);
+    }
+    // </MANJESH>
   }, /* app.log() */
   /**
    * Flag to remember if a fatal error was reported through a pop-up

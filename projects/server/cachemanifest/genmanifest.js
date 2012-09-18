@@ -26,8 +26,18 @@ var recursiveIterate = function(rootDirPath, rootDirAlias, excludes) {
 	return fileList;
 };
 
-var genHashofFiles = function(fileList) {
+var genHashofFiles = function(fileList, rootDirPath, rootDirAlias) {
+	var actualPath,
 	var md5 = cr.createHash('md5');
+
+	fileList.forEach(function(item) {
+		var file,
+		var splitItem = item.split('/');
+
+		splitItem[0] = rootDirPath;
+		file = splitItem.join();
+		console.log()
+	});
 };
 
 var genCacheManifest = function(fileList) {
