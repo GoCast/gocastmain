@@ -226,8 +226,7 @@
   Items.prototype.setChatName = function(item)
   {
     var name, names, collisions;
-    if (null === item.nick || // no nickname
-        null !== item.chatName) // chatName already created
+    if (null === item.nick)
     {
       return;
     }
