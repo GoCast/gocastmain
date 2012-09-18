@@ -333,14 +333,34 @@ var app = {
 
       $('#settings-prompt').css({'display': 'block'});
       $('#settings-message').html(ctDwnMsg + message);
-      $('#settings-prompt > span').css({'display': 'none'});
+      //$('#settings-prompt > span').css({'display': 'none'});
       $('#settings-cancel').css({'display': 'none'});
       $('#settings-ok').click(function() {
         clearInterval(closeCountDown);
         $('#settings').fadeTo(1000, 1.0);
         $('#settings-prompt').css({'display': 'none'});
+        window.localStorage.gcpDontShowSettingsPromptCheck = $('#settings-stop-showing').attr('checked');
       });      
     }
+  },
+
+  pluginCrashed: function() {
+    $('#errorMsgPlugin > h1').text('Oops!!!');
+    $('#errorMsgPlugin > p#prompt').text('GoCastPlayer has crashed.');
+    closeWindow();
+    openWindow('#errorMsgPlugin');
+    $('#errorMsgPlugin > #sendLog').click(function() {
+      $(this).attr('disabled', 'disabled');
+      $('#errorMsgPlugin > #reload').attr('disabled', 'disabled');
+      $('#errorMsgPlugin > p#prompt').text('Sending log to GoCast...');
+      Callcast.SendLogsToLogCatcher(function(){
+        $('#errorMsgPlugin > p#prompt').text('Sending log to GoCast... done.');
+        $('#errorMsgPlugin > #reload').removeAttr('disabled');
+      }, function(){
+        $('#errorMsgPlugin > p#prompt').text('Sending log to GoCast... failed.');
+        $('#errorMsgPlugin > #reload').removeAttr('disabled');
+      });
+    });
   }
 //</MANJESH>
 

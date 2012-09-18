@@ -85,7 +85,7 @@
       </div>
       <div id="send-log-prompt" class="warning">
         <button id="send" class="send button" onclick="sendLog()">Send</button>
-        <button id="stop" class="close button" onclick="closeSendLog()">Stop</button>
+        <button id="stop" class="close button" onclick="closeSendLog()">Cancel</button>
         <p id="message">Send debug info to GoCast?</p><br>
         <input id="stop-showing" type="checkbox" value="Stop"/>
         <p id="stop-showing-text">Stop showing this message.</p>
@@ -155,14 +155,6 @@
       <div id="waitingToJoin" class="window resizable">
         <img src="images/waiting-join.gif" alt="Waiting To Join"/>
       </div>
-
-      <!-- <MANJESH> -->
-      <!--<div id="waitingForUpdates" style="border:none; background:none;" class="window resizable">
-        <img src="images/GoToken.png" alt="Waiting For Updates"/>
-        <progress value="0" min="0" max="100"></progress>
-      </div>-->
-      <!-- </MANJESH> -->
-
       <div id="helpPage" class="window resizable">
         <img class="close" src="images/button-close.png" alt="Close Help" title="Close Help" />
         <h1>Help</h1>
@@ -171,6 +163,7 @@
       <div id="errorMsgPlugin" class="window resizable">
         <h1>Error msg title here</h1>
         <p id ="prompt">Error msg here</p>
+        <button id="sendLog" type="button">Send Log to GoCast</button>
         <button id="reload" type="button" onclick="location.reload()">Reload</button>
       </div>
       <div id="installPlugin" class="window resizable">

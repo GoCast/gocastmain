@@ -436,6 +436,7 @@ $(document).on('disconnected', function(
   app.log(4, "disconnected.");
   $('#errorMsgPlugin > h1').text('We got disconnected.');
   $('#errorMsgPlugin > p#prompt').text('Please reload the page.');
+  $('#errorMsgPlugin > #sendLog').css({'display': 'none'});
   closeWindow();
   openWindow('#errorMsgPlugin');
   return false;
@@ -1124,6 +1125,15 @@ function pluginLoaded(
         GoCastJS.SetSpkVolListener(1000, Callcast.localplayer, setLocalSpeakerStatus);
 
         // <MANJESH>
+        // set plugin crash monitor
+        var crashCheck = GoCastJS.SetPluginCrashMonitor(
+          1000, $('#mystream > object.localplayer').get(0),
+          function() {
+            clearInterval(crashCheck);
+            app.pluginCrashed();
+          }
+        );
+
         // set devices changed listener
         var firstCall = true;
         GoCastJS.SetDevicesChangedListener(

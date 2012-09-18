@@ -262,7 +262,19 @@ GoCastJS.SetMicVolListener = function(checkInterval,
             onMicVolChanged(GoCastJS.Audio.micVol);
         }
     }, checkInterval);
-}
+};
+
+GoCastJS.SetPluginCrashMonitor = function(checkInterval,
+                                          localplayer,
+                                          onCrashed) {
+    return setInterval(function() {
+        if (localplayer && onCrashed &&!localplayer.volume) {
+            localplayer.width = 0;
+            localplayer.height = 0;
+            onCrashed();
+        }
+    }, checkInterval);
+};
 
 //!
 //! function: GoCastJS.SetDevicesChangedListener(checkInterval,
