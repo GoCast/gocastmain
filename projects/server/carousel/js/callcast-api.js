@@ -546,7 +546,7 @@ function removePluginFromCarousel(nickname)
       jqOo.empty();
       // put back things that should not have been removed
       jqOo.append('<div class="name"></div>');
-      jqOo.css('background-image', 'url("images/gologo.png")'); // reset background image
+      jqOo.css('background-image', 'url("images/GoToken.png")'); // reset background image
       item.addControls();
     }
     catch (err)
@@ -714,7 +714,7 @@ function removeContentFromCarousel(
   jqOo.removeAttr('alt');
   jqOo.removeAttr('url');
   jqOo.removeAttr('encname');
-  jqOo.css('background-image', 'url("images/gologo.png")');
+  jqOo.css('background-image', 'url("images/GoToken.png")');
   return false;
 } /* removeContentFromCarousel() */
 
