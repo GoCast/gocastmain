@@ -2612,13 +2612,15 @@ Overseer.prototype.handleMessage = function(msg) {
                         // pendingDeletion && bSelfDestruct
                         temp += mroom.bSelfDestruct ? ' Self-destruct' : ' Non-Self-destruct';
                         temp += mroom.pendingDeletion ? ' Pending-deletion' : '';
-                        if (size(mroom.participants > 1)) {
+                        if (size(mroom.participants) > 1) {
                             for (l in mroom.participants) {
                                 if (mroom.participants.hasOwnProperty(l)) {
                                     temp += '\n       ' + l;
                                 }
                             }
                         }
+
+                        temp += '\n';
                     }
                 }
                 this.log(temp);
@@ -3029,7 +3031,8 @@ if (!overseer.roommanager) {
     // Login as test feedback bot.
     //
     //var fb = new FeedbackBot("feedback_bot_test1@video.gocast.it", "test1", notify);
+    var fb_gocast = new FeedbackBot('feedback_bot_gocast@video.gocast.it', 'feedback.gocast.teambang', notify);
     var fb_etzchayim = new FeedbackBot('feedback_bot_etzchayim@video.gocast.it', 'feedback.gocast.etzchayim', notify);
     //var fb_fuse = new FeedbackBot('feedback_bot_fuse@video.gocast.it', 'feedback.gocast.fuse', notify);
-    var fb_friends = new FeedbackBot('feedback_bot_friends@video.gocast.it', 'feedback.gocast.friends', notify);
+    //var fb_friends = new FeedbackBot('feedback_bot_friends@video.gocast.it', 'feedback.gocast.friends', notify);
 }
