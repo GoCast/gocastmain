@@ -1,0 +1,9 @@
+#
+# Add an RP on sith as 11555 -- hijack of ./bin/sf with extra parameter 'appliance' to make an sf act as an endpoint.
+#
+SF ADDENTITY sfid=11555 sessid=1001 entid=997 enttype=RP entname=UpRP srcentid=999
+#local sleep ms=3000
+#SF CHANGECONNECTION sfid=11555 sessid=1001 entid=32770 srcentid=997
+#local sleep ms=3000
+#SF CHANGECONNECTION sfid=11556 sessid=1001 entid=32771 srcentid=997
+

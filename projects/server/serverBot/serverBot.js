@@ -454,6 +454,7 @@ function MucRoom(client, notifier, bSelfDestruct, success, failure) {
     this.successCallback = success || null;
     this.failureCallback = failure || null;
     this.presenceTimer = null;
+    this.joinTimer = null;      // Used to ensure that our 'join' actually succeeds.
     // --------------------------------
 
     this.isOwner = false;   // Assume we're not the owner yet until we're told so.
@@ -536,6 +537,12 @@ MucRoom.prototype.reset = function() {
     {
         clearTimeout(this.presenceTimer);
         this.presenceTimer = null;
+    }
+
+    if (this.joinTimer)
+    {
+        clearTimeout(this.joinTimer);
+        this.joinTimer = null;
     }
 
     this.isOwner = false;   // Assume we're not the owner yet until we're told so.
@@ -694,12 +701,14 @@ MucRoom.prototype.handlePresence = function(pres) {
         {
             if (this.bSelfDestruct === true && 0 === size(this.participants)) {
                 this.log('OVERSEER: Room destroyed... not trying to rejoin');
+                this.log('          Number of abandoned participants: ' + size(this.participants));
             } else {
                 this.log('We got kicked out...room destroyed? Or we got disconnected??');
                 this.joined = false;
                 for (k in this.participants)
                 {
                     if (this.participants.hasOwnProperty(k)) {
+                        this.log('    Abandoning participant: ' + k);
                         delete this.participants[k];
                     }
                 }
@@ -752,6 +761,13 @@ MucRoom.prototype.handlePresence = function(pres) {
     // If the 'from' is myself -- then I'm here. And so we're joined...
     if (fromnick === this.nick)
     {
+        // If we make it into the room, make sure the joinTimer is cleared.
+        if (this.joinTimer)
+        {
+            clearTimeout(this.joinTimer);
+            this.joinTimer = null;
+        }
+
         if (!this.joined)
         {
             this.joined = true;
@@ -2063,6 +2079,7 @@ MucRoom.prototype.join = function(rmname, nick) {
 
 MucRoom.prototype.rejoin = function(rmname, nick) {
     var to = rmname,
+        self = this,
         el;
 
     // If no nick is specified, then just join. This must be a signal that we are coming in
@@ -2080,6 +2097,23 @@ MucRoom.prototype.rejoin = function(rmname, nick) {
 
     this.log('Joining: ' + rmname + ' as ' + nick + '. '); // + el.tree());
     this.client.send(el);
+
+    if (this.joinTimer)
+    {
+        clearTimeout(this.joinTimer);
+        this.joinTimer = null;
+        this.log('ReJoin: WARNING: joinTimer was already set. Odd. Clearing it.');
+    }
+
+    this.joinTimer = setTimeout(function() {
+        // If we don't get our own presence in the room within a few seconds, then something's wrong.
+        // This is CRITICAL as we are the ones who create the room initially.
+        // If it didn't work, then we'll simply flag it and call rejoin() again.
+        self.log('ERROR: REJOIN Failed to give our presence in room. Re-joining again...');
+        self.joinTimer = null;
+
+        self.rejoin(rmname, nick);
+    }, 4000);
 };
 
 var MucroomObjectPool = {
@@ -2509,8 +2543,8 @@ Overseer.prototype.sendGroupMessage = function(room, msg_body) {
 // \brief Need to check the room's banned-list for this person.
 //
 Overseer.prototype.handleMessage = function(msg) {
-    var cmd, k, temp,
-        fromjid, fromnick, toroom, plea;
+    var cmd, k, l, temp,
+        fromjid, fromnick, toroom, plea, mroom;
     // Listen to pure chat messages to the overseer.
 
     // Now, if we get a direct chat, it could be from a person in a room who is sending commands to
@@ -2567,6 +2601,31 @@ Overseer.prototype.handleMessage = function(msg) {
             temp = 'LIVELOG: From: ' + cmd[1] + ' Msg: ' + cmd[2];
             this.log(temp);
             this.notifylog(temp);
+            break;
+        case 'LISTROOMS':
+            if (this.roommanager) {
+                temp = 'LISTROOMS Request: \n';
+                for (k in this.MucRoomObjects) {
+                    if (this.MucRoomObjects.hasOwnProperty(k)) {
+                        mroom = this.MucRoomObjects[k];
+                        temp += ' ROOM: ' + k;
+                        // pendingDeletion && bSelfDestruct
+                        temp += mroom.bSelfDestruct ? ' Self-destruct' : ' Non-Self-destruct';
+                        temp += mroom.pendingDeletion ? ' Pending-deletion' : '';
+                        if (size(mroom.participants) > 1) {
+                            for (l in mroom.participants) {
+                                if (mroom.participants.hasOwnProperty(l)) {
+                                    temp += '\n       ' + l;
+                                }
+                            }
+                        }
+
+                        temp += '\n';
+                    }
+                }
+                this.log(temp);
+                this.notifylog(temp);
+            }
             break;
         default:
             this.log('Direct message: Unknown command: ' + msg.getChild('body').getText());
@@ -2972,7 +3031,8 @@ if (!overseer.roommanager) {
     // Login as test feedback bot.
     //
     //var fb = new FeedbackBot("feedback_bot_test1@video.gocast.it", "test1", notify);
+    var fb_gocast = new FeedbackBot('feedback_bot_gocast@video.gocast.it', 'feedback.gocast.teambang', notify);
     var fb_etzchayim = new FeedbackBot('feedback_bot_etzchayim@video.gocast.it', 'feedback.gocast.etzchayim', notify);
     //var fb_fuse = new FeedbackBot('feedback_bot_fuse@video.gocast.it', 'feedback.gocast.fuse', notify);
-    var fb_friends = new FeedbackBot('feedback_bot_friends@video.gocast.it', 'feedback.gocast.friends', notify);
+    //var fb_friends = new FeedbackBot('feedback_bot_friends@video.gocast.it', 'feedback.gocast.friends', notify);
 }

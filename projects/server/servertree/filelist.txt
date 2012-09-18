@@ -1,0 +1,15 @@
+/etc/inittab
+/etc/bosh.js.conf
+/etc/sysconfig/openfire
+/etc/httpd/conf/httpd.conf
+/etc/httpd/conf.d/ssl.conf
+/usr/local/bin/bosh-server.sh
+~/.bashrc
+~/bin
+~/certinfo
+#
+# Another gathering/scattering system needed for:
+# /var/www/scripts
+# /var/www/html
+# /var/www/*
+#

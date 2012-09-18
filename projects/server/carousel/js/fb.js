@@ -9,7 +9,7 @@
 
 function fbMe(response) // facebook response object
 {
-   console.log('FB logged IN or got a new token.');
+   app.log(2, 'FB logged IN or got a new token.');
    //
    // NOTE: These two represent the keys to the kingdom. The signed response and the id.
    // the authResponse can be accessed using FB sync api calls
@@ -63,14 +63,15 @@ function fbInit()
         // listen for and handle auth.authResponseChange events
         FB.Event.subscribe('auth.authResponseChange', function(response) {
           app.log(2, 'authResponseChange callback');
-          console.log('response==', response);
+          app.log(2, 'response = ' + JSON.stringify(response));
+          console.log('response == ', response);
           if (response.authResponse)
           {
              fbMe(response);
           }
           else
           {
-            console.log('FB logged out or token went bad?');
+            app.log(2, 'FB logged out or token went bad?');
             Callcast.SetFBSignedRequestAndAccessToken(null, null);
           }
         });
@@ -92,6 +93,7 @@ function fbInit()
           else
           {
              console.log('getLoginStatus response ', response);
+             app.log(2, 'getLoginStatus response = ' + JSON.stringify(response));
              fbMe(response);
           }
 
@@ -138,12 +140,12 @@ function fbShare(event)
         if (!response) // cancel in the dialag calls back with no response
                        // so do nothing if there is no response
         {
-           console.log('fbShare no response');
+           app.log(2, 'fbShare no response');
         }
         else if (response.error)
         {
            //alert('We couldn\'t send the message.\n\nPlease give the GoCast Carousel app permission in facebook.');
-           console.log('fbShare error', response);
+           app.log(2, 'fbShare error', response);
         } // else {
            // success do nothing since the ui is the send dialog
         // } // else {
@@ -174,12 +176,13 @@ function fbSendDialog()
          if (!response) // cancel in the dialag calls back with no response
                         // so do nothing if there is no response
          {
-            console.log('fbSendDialog no response');
+            app.log(2, 'fbSendDialog no response');
          }
          else if (response.error)
          {
             //alert('We couldn\'t send the message.\n\nPlease give the GoCast Carousel app permission in facebook.');
             console.log('fbSendDialog error ', response);
+            app.log(2, 'fbSendDialog error = ' + JSON.stringify(response));
          } // else {
             // success do nothing since the ui is the send dialog
          // } // else {
