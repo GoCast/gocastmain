@@ -216,7 +216,7 @@ var Callcast = {
     NS_CALLCAST: 'urn:xmpp:callcast',
 //    STUNSERVER: 'stun.l.google.com',
     STUNSERVER: 'video.gocast.it',
-    FEEDBACK_BOT: 'feedback_bot_etzchayim@video.gocast.it',
+    FEEDBACK_BOT: 'feedback_bot_gocast@video.gocast.it',
     STUNSERVERPORT: 19302,
     ROOMMANAGER: 'overseer@video.gocast.it/roommanager',
     SWITCHBOARD_FB: 'switchboard_gocastfriends@video.gocast.it',
