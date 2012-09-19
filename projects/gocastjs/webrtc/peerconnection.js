@@ -268,7 +268,7 @@ GoCastJS.SetPluginCrashMonitor = function(checkInterval,
                                           localplayer,
                                           onCrashed) {
     return setInterval(function() {
-        if (localplayer && onCrashed &&!localplayer.volume) {
+        if (localplayer && onCrashed && ('undefined' === typeof(localplayer.volume))) {
             localplayer.width = 0;
             localplayer.height = 0;
             onCrashed();

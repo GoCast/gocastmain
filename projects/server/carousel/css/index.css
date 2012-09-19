@@ -36,7 +36,7 @@ a:active
 ::-webkit-scrollbar 
 {
   height: 12px;
-  width: 3px;
+  width: 5px;
   background: gray;
 }
 ::-webkit-scrollbar-thumb 
@@ -60,22 +60,22 @@ a:active
 .info {
     color: #00529B;
     background-color: #BDE5F8;
-    background-image: url('info.png');
+    /*background-image: url('info.png');*/
 }
 .success {
     color: #4F8A10;
     background-color: #DFF2BF;
-    background-image:url('success.png');
+    /*background-image:url('success.png');*/
 }
 .warning {
     color: #9F6000;
     background-color: #FEEFB3;
-    background-image: url('warning.png');
+    /*background-image: url('warning.png');*/
 }
 .error {
     color: #D8000C;
     background-color: #FFBABA;
-    background-image: url('error.png');
+    /*background-image: url('error.png');*/
 }
 img.close 
 {
@@ -359,11 +359,6 @@ body > div#lower-left > div#msgBoard > div#chatOut
   -o-user-select: text;
   user-select: text;
 }
-body > div#lower-left > div#msgBoard > div#chatOut.flash
-{
-  /*background-color: red; todo fix toggles -> white -> transparent*/
-  /*border: 5px solid red; */
-}
 body > div#lower-left > div#msgBoard > div#chatOut  table
 {
   width:100%;
@@ -379,6 +374,10 @@ body > div#lower-left > div#msgBoard > div#chatOut  td > span.val-span
   display:block;
   width:200px
 }
+body > div#lower-left > div#msgBoard > div#chatOut  td > span.val-span.flash
+{
+  color:red;
+}
 body > div#lower-left > div#msgBoard > div#chatOut  td.name
 {
   color: green;
@@ -387,10 +386,6 @@ body > div#lower-left > div#msgBoard > div#chatOut  td.val
 {
   color: white;
   width: 70%;
-}
-body > div#lower-left > div#msgBoard > div#chatOut  td.val.flash
-{
-  color: red;
 }
 body> div#lower-left > div#msgBoard > input.chatTo
 {
@@ -471,9 +466,13 @@ div.cloudcarousel > div#msgBoard > input.close {
   background-image: url("../images/left-arrow.png");
   background-size: 100% 100%;
   background-repeat: no-repeat;
-  width: 15px;
-  height: 15px;
+  width: 20px;
+  height: 20px;
   margin-bottom:-3px;
+}
+div.cloudcarousel > div#msgBoard > input.chatTo
+{
+  width:75%;
 }
 div.cloudcarousel > div#msgBoard > div#chatOut
 {
@@ -481,7 +480,7 @@ div.cloudcarousel > div#msgBoard > div#chatOut
   max-height:75px;
   min-height: 1.1em;
   height: auto;
-  width: 100%;
+  width: 99%;
   overflow-y:auto;
   word-wrap:break-word;
   font-size:13px;
@@ -495,17 +494,6 @@ div.cloudcarousel > div#msgBoard > div#chatOut
   -o-user-select: text;
   user-select: text;
 }
-div.cloudcarousel > div#msgBoard > div#chatOut.flash
-{
-  /* background-color: red; todo toggles white -> transparent */
-  /*border: 1px solid red;   */
-}
-/*
-div.cloudcarousel > div#msgBoard > div#chatOut  td
-{
-  font-size: 16px;
-}
-*/
 div.cloudcarousel > div#msgBoard > div#chatOut  td > span.val-span
 {
   display:block;
@@ -518,14 +506,12 @@ div.cloudcarousel > div#msgBoard > div#chatOut  td > span.val-span.flash
 div.cloudcarousel > div#msgBoard > div#chatOut  td.name
 {
   color: white;
+  text-shadow: 0.1em 0.1em 0.2em black
 }
 div.cloudcarousel > div#msgBoard > div#chatOut  td.val
 {
   color: white;
-}
-div.cloudcarousel > div#msgBoard > div#chatOut  td.val.flash
-{
-  color: red;
+  text-shadow: 0.1em 0.1em 0.2em black
 }
 body > div#meeting > div#streams {
   padding: 10px;
