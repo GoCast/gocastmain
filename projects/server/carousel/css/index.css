@@ -349,7 +349,6 @@ body > div#lower-left > div#msgBoard > div#chatOut
   width:300px;
   overflow-y:auto;
   overflow-x:hidden;
-  word-wrap:break-word;
   font-size:11px;
   line-height: 1.2em;
   padding: 3px;
@@ -361,7 +360,8 @@ body > div#lower-left > div#msgBoard > div#chatOut
 }
 body > div#lower-left > div#msgBoard > div#chatOut  table
 {
-  width:100%;
+  /*width:100%; not working */
+  width:300px;
   table-layout: fixed;
 }
 body > div#lower-left > div#msgBoard > div#chatOut  td
@@ -369,10 +369,21 @@ body > div#lower-left > div#msgBoard > div#chatOut  td
   font-size: 16px;
   /*text-shadow: 0 0 10px gray, 0 0 20px gray, 0 0 30px gray, 0 0 40px #FF00DE, 0 0 70px #FF00DE, 0 0 80px #FF00DE, 0 0 100px #FF00DE, 0 0 150px #FF00DE;*/
 }
+body > div#lower-left > div#msgBoard > div#chatOut  span#text-width
+{
+  font-size: 16px;
+  position:absolute;
+  visibility:hidden;
+  height:auto;
+  width:auto;
+}
+body > div#lower-left > div#msgBoard > div#chatOut  td > span
+{
+  word-wrap:break-word;
+}
 body > div#lower-left > div#msgBoard > div#chatOut  td > span.val-span
 {
   display:block;
-  width:200px
 }
 body > div#lower-left > div#msgBoard > div#chatOut  td > span.val-span.flash
 {
@@ -385,7 +396,6 @@ body > div#lower-left > div#msgBoard > div#chatOut  td.name
 body > div#lower-left > div#msgBoard > div#chatOut  td.val
 {
   color: white;
-  width: 70%;
 }
 body> div#lower-left > div#msgBoard > input.chatTo
 {
