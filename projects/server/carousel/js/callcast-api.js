@@ -143,8 +143,15 @@ $(document).on('public-message', function(
     util = jqChat.data('util');
     if (!util) {throw "no chat util";}
     item = app.carousel.getByNick(msginfo.nick);
-    if (!item) {throw "no item by nick " + msginfo.nick;}
-    util.addMsg(item.chatName, decodeURI(msginfo.body));
+    if (!item)
+    {
+      name = decodeURI(msginfo.nick);
+    }
+    else
+    {
+      name = item.chatName;
+    }
+    util.addMsg(name, decodeURI(msginfo.body));
     app.log(2, 'A public message arrived ' + decodeURI(msginfo.nick) + " " + decodeURI(msginfo.body));
   }
   catch(err)
