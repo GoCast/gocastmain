@@ -130,10 +130,10 @@ function fbShare(event)
       params.method = 'feed';
       params.link = window.location.href;
       params.picture = 'http://carousel.gocast.it/images/gologo.png';
-      params.name = 'Carousel room ' + $.getUrlVar('roomname');
-      params.caption = 'Join us now on the carousel.';
-      params.description = 'We are here now';
-      params.message = 'Join us now on the carousel.';
+      params.name = 'Join me at GoCast in room: ' + $.getUrlVar('roomname');
+      params.caption = 'This is an invitation to join my study group.';
+      params.description = 'I\'m looking forward to meeting you there.';
+      params.message = 'This is an invitation to join my study group.';
 
       FB.ui(params, function(response)
       {
@@ -167,8 +167,8 @@ function fbSendDialog()
     {
        FB.ui({
             method: 'send',
-            name: 'Carousel room ' + $.getUrlVar('roomname'),
-            description: 'We are here now',
+            name: 'Join me at GoCast in room: ' + $.getUrlVar('roomname'),
+            description: 'This is an invitation to join my study group.',
             link: window.location.href,
             picture: 'http://carousel.gocast.it/images/gologo.png'
             }, function(response)
