@@ -492,7 +492,7 @@ div.cloudcarousel > div#msgBoard > div#chatOut
   height: auto;
   width: 99%;
   overflow-y:auto;
-  word-wrap:break-word;
+  overflow-x:hidden;
   font-size:13px;
   line-height: 1.2em;
   padding: 3px;
@@ -504,10 +504,30 @@ div.cloudcarousel > div#msgBoard > div#chatOut
   -o-user-select: text;
   user-select: text;
 }
+div.cloudcarousel > div#msgBoard > div#chatOut  table
+{
+  /*
+  width:100%; not working 
+  width:300px;
+  */
+  table-layout: fixed;
+}
+
+div.cloudcarousel > div#msgBoard > div#chatOut  span#text-width
+{
+  font-size: 16px;
+  position:absolute;
+  visibility:hidden;
+  height:auto;
+  width:auto;
+}
+div.cloudcarousel > div#msgBoard > div#chatOut  td > span
+{
+  word-wrap: break-word;
+}
 div.cloudcarousel > div#msgBoard > div#chatOut  td > span.val-span
 {
   display:block;
-  width:200px
 }
 div.cloudcarousel > div#msgBoard > div#chatOut  td > span.val-span.flash
 {

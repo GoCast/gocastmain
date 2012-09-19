@@ -100,3 +100,14 @@ GoCastJS.ChatUtil.prototype.getTextWidth = function(text)
   this.span.html(text);
   return this.span.width();
 };
+///
+/// \brief adjust child dimensions
+///
+/// note don't use jquery .css because this is called on carousel resize
+///
+GoCastJS.ChatUtil.prototype.adjust = function(width)
+{
+  // adjust table
+  //var width = this.jqChat[0].style.width; // doesn't work
+  this.jqTable[0].style.width = width;
+};
