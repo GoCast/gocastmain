@@ -3,6 +3,8 @@
 ///
 
 /*jslint sloppy: false, todo: true, white: true, browser: true, devel: true */
+/*global app */
+
 "use strict";
 
 var GoCastJS = ('undefined' !== typeof(GoCastJS)) ? GoCastJS : {};
@@ -37,14 +39,17 @@ GoCastJS.ChatUtil.prototype.addMsg = function(name, val)
       atBottom,
       jqFlash,
       self = this; // ref for animate callbacks
-  // get scroll pos
-  //app.log(2, 'public-message scrollTop ' + jqChat.scrollTop()
-  //        + ' scrollHeight ' + jqChat[0].scrollHeight
-  //        + ' clientHeight ' + jqChat[0].clientHeight);
   // detect scroll bar at bottom
   // looks like the mouse wheel can put the scroll pos < 1em from bottom so fudge it
   atBottom = Math.abs((this.jqChat.scrollTop() + this.jqChat[0].clientHeight) - this.jqChat[0].scrollHeight) < 10;
+  // get scroll pos
+  //console.log("name " + name + " val " + val);
+  //console.log('public-message scrollTop ' + this.jqChat.scrollTop()
+  //        + ' scrollHeight ' + this.jqChat[0].scrollHeight
+  //        + ' clientHeight ' + this.jqChat[0].clientHeight
+  //        + 'atBottom' + atBottom);
   this.jqTable.append(domRow); // Add message to Message Board.
+  this.adjustWidths();
   if (atBottom) { // if we were at bottom before msg append scroll to bottom
     this.jqChat.scrollTop(this.jqChat[0].scrollHeight);
     //this.jqChat.animate({scrollTop : this.jqChat[0].scrollHeight},'fast');
@@ -57,7 +62,6 @@ GoCastJS.ChatUtil.prototype.addMsg = function(name, val)
   }
   ++this.msgNumber; // increment next msg number
 
-  this.adjustWidths();
 }; // addMsg
 ///
 /// \brief adjust widths of columns
@@ -67,20 +71,25 @@ GoCastJS.ChatUtil.prototype.adjustWidths = function()
   var nameWidth, valWidth, self = this,
       tableWidth = this.jqTable.width(),
       nameWidthMax = tableWidth * this.MAX_NAME_WIDTH,
-      nameWidthMin = tableWidth * this.MIN_NAME_WIDTH;
+      nameWidthMin = tableWidth * this.MIN_NAME_WIDTH,
+      nameWidthCur = nameWidthMin;
 
   // calc nameWidth
   $('tr', this.jqTable).each(function(index, val)
   {
-    console.log("adjustWidths ", index, " ", val);
+    //console.log("adjustWidths ", index, " ", val);
     nameWidth = self.getTextWidth($("td.name > span", val).html());
-    nameWidth = nameWidth > nameWidthMax ? nameWidthMax : nameWidth;
-    nameWidth = nameWidth < nameWidthMin ? nameWidthMin : nameWidth;
+    if (nameWidth > nameWidthCur)
+    {
+      nameWidth = nameWidth > nameWidthMax ? nameWidthMax : nameWidth;
+      nameWidth = nameWidth < nameWidthMin ? nameWidthMin : nameWidth;
+      nameWidthCur = nameWidth;
+    }
   });
   // given nameWidth use rest of table width for val and set column widths
-  valWidth = tableWidth - nameWidth;
-  console.log("nameWidth ", nameWidth, " valWidth ", valWidth);
-  $("td.name", this.jqTable).css("width", nameWidth >> 0 + "px");
+  valWidth = tableWidth - nameWidthCur;
+  //console.log("nameWidth ", nameWidthCur, " valWidth ", valWidth);
+  $("td.name", this.jqTable).css("width", nameWidthCur >> 0 + "px");
   $("td.val", this.jqTable).css("width", valWidth >> 0 + "px");
 };
 ///
