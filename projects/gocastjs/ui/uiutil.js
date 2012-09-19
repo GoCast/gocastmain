@@ -2,6 +2,7 @@
 /// ui util
 ///
 
+/*jslint sloppy: false, todo: true, white: true, browser: true, devel: true */
 "use strict";
 
 var GoCastJS = ('undefined' !== typeof(GoCastJS)) ? GoCastJS : {};
@@ -15,9 +16,12 @@ GoCastJS = (null !== GoCastJS) ? GoCastJS : {};
 ///
 GoCastJS.ChatUtil = function(objIn, animCb)
 {
+  this.MIN_NAME_WIDTH = 0.1; // 10%
+  this.MAX_NAME_WIDTH = 0.25; // 25%
   this.domObj = objIn;          // the chat div
   this.jqChat = $(this.domObj); // jq chat div
   this.jqTable = $("<table></table>").appendTo(this.jqChat);
+  this.span = $('<span id="text-width"></span>').appendTo(this.jqChat);
   this.msgNumber = 0;           // unique msg number assigned to msg's
   this.animCb = animCb;         // the animate callback
 }; // ChatUtil constructor
@@ -27,7 +31,9 @@ GoCastJS.ChatUtil = function(objIn, animCb)
 ///
 GoCastJS.ChatUtil.prototype.addMsg = function(name, val)
 {
-  var domRow = '<tr id="'+ this.msgNumber + '"><td class="name">' + name + '</td><td class="val"><span class="val-span">' + val + '</span></td>',
+  var domRow = '<tr id="'+ this.msgNumber + 
+                 '"><td class="name"><span class="name-span">' + name + 
+                 '</span></td><td class="val"><span class="val-span">' + val + '</span></td>',
       atBottom,
       jqFlash,
       self = this; // ref for animate callbacks
@@ -50,4 +56,38 @@ GoCastJS.ChatUtil.prototype.addMsg = function(name, val)
     //this.jqChat.toggleClass('flash').toggleClass('flash', 500);
   }
   ++this.msgNumber; // increment next msg number
+
+  this.adjustWidths();
 }; // addMsg
+///
+/// \brief adjust widths of columns
+///
+GoCastJS.ChatUtil.prototype.adjustWidths = function()
+{
+  var nameWidth, valWidth, self = this,
+      tableWidth = this.jqTable.width(),
+      nameWidthMax = tableWidth * this.MAX_NAME_WIDTH,
+      nameWidthMin = tableWidth * this.MIN_NAME_WIDTH;
+
+  // calc nameWidth
+  $('tr', this.jqTable).each(function(index, val)
+  {
+    console.log("adjustWidths ", index, " ", val);
+    nameWidth = self.getTextWidth($("td.name > span", val).html());
+    nameWidth = nameWidth > nameWidthMax ? nameWidthMax : nameWidth;
+    nameWidth = nameWidth < nameWidthMin ? nameWidthMin : nameWidth;
+  });
+  // given nameWidth use rest of table width for val and set column widths
+  valWidth = tableWidth - nameWidth;
+  console.log("nameWidth ", nameWidth, " valWidth ", valWidth);
+  $("td.name", this.jqTable).css("width", nameWidth >> 0 + "px");
+  $("td.val", this.jqTable).css("width", valWidth >> 0 + "px");
+};
+///
+/// \brief get text width of string
+///
+GoCastJS.ChatUtil.prototype.getTextWidth = function(text)
+{
+  this.span.html(text);
+  return this.span.width();
+};
