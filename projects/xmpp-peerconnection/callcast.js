@@ -229,6 +229,7 @@ var Callcast = {
     Callback_RemoveCarouselContent: null,
     Callback_ReadyState: null,
     Callback_ConnectionStatus: null,
+    Callback_OnEffectApplied: null,
     connection: null,
     localplayer: null,
     localplayerLoaded: false,
@@ -333,6 +334,9 @@ var Callcast = {
         this.Callback_ConnectionStatus = cb;
     },
 
+    setCallbackForCallback_OnEffectApplied: function(cb) {
+        this.Callback_OnEffectApplied = cb;
+    },
     //
     // \brief The supplied callback will be called whenever the peer connection readystate changes.
     //      The problem to wrestle with is that each participant has a readystate so there can be
@@ -501,6 +505,9 @@ var Callcast = {
 
         if (typeof(filter) === 'string' && this.localplayer && this.localstream) {
             this.localstream.videoTracks[0].effect = filter;
+            if (this.Callback_OnEffectApplied) {
+                this.Callback_OnEffectApplied(filter);
+            }
             return true;
         }
         else {
@@ -731,7 +738,7 @@ var Callcast = {
                         Callcast.localplayer = $(jqSelector).get(0);
 
                         if (0 < Callcast.localstream.videoTracks.length) {
-                            Callcast.localstream.videoTracks[0].effect = settings.effect || 'none';
+                            Callcast.SetVideoFilter(settings.effect || 'none');
                         }
 
                         if (!Callcast.localplayer && !Callcast.localplayer.version) {

@@ -1117,6 +1117,11 @@ function pluginLoaded(
      app.log(2, 'pluginLoaded plugin up to date ');
      GoCastJS.PluginLog(Callcast.localplayer, Callcast.PluginLogCallback);
  
+     // set callback for oneffectapplied
+     Callcast.setCallbackForCallback_OnEffectApplied(function(effect) {
+      onEffectApplied(effect);
+     });
+
      // set localPlayer to null since Init... checks for it to be null
      // before it will proceed
      Callcast.localplayer = null;

@@ -255,6 +255,7 @@ var app = {
         if (Callcast.IsVideoDeviceAvailable())
         {
           $('#lower-right > #video').removeAttr('disabled');
+          $('#effectsPanel').css({'display': 'block'});
         }
         if (Callcast.IsMicrophoneDeviceAvailable())
         {
@@ -663,6 +664,19 @@ function carouselItemClick(event)
   }
   */
 } // carouselItemClick
+
+// <MANJESH>
+function applyEffect(effect) {
+  if (Callcast && Callcast.SetVideoFilter) {
+    Callcast.SetVideoFilter(effect);
+  }
+}
+
+function onEffectApplied(effect) {
+  $('#effectsPanel > div.selected').removeClass('selected');
+  $('#effectsPanel > #effect-' + effect).addClass('selected');
+}
+// </MANJESH>
 
 ///
 /// \brief handle click on zoom button, zoom out spot
@@ -1209,6 +1223,7 @@ function changeVideo(enableVideo)
   }
   if (enable)
   {
+    $('#effectsPanel').css({'display': 'block'});
     jqObj.addClass('on') // change button
          .attr('title', 'Turn Video Off');
     // Check object dimensions.
@@ -1224,6 +1239,7 @@ function changeVideo(enableVideo)
   }
   else 
   {
+    $('#effectsPanel').css({'display': 'none'});
     jqObj.removeClass('on') // change button
          .attr('title', 'Turn Video On');
     Callcast.SendLocalVideoToPeers(enable);

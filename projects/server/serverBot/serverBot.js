@@ -508,6 +508,10 @@ function MucRoom(client, notifier, bSelfDestruct, success, failure) {
             return;
         }
 
+        if (overseer.debugmode === 'ALL' || overseer.debugmode === 'MUCROOMS') {
+            self.log('DEBUGSTANZAS: MUCROOMS: ' + stanza.toString());
+        }
+
         if (stanza.is('message') && stanza.attrs.type !== 'error') {
             self.handleMessage(stanza);
         }
@@ -1263,7 +1267,7 @@ MucRoom.prototype.WhiteboardSingleStrokeReflection = function(iq) {
     }
     else {
         // Add this stroke to the (growing) stroke list for this spot.
-        this.wbStrokeList[info.spotnumber].strokes.push(info.stroke);
+        this.wbStrokeList[info.spotnumber].strokes.push(JSON.parse(info.stroke));
 
         this.SendGroupCmd('setspot', info);
 
@@ -2201,7 +2205,9 @@ function Overseer(user, pw, notifier) {
     this.iqnum = 0;
     this.iq_callbacks = {};
     this.roommanager = false;
+    this.roommanagertest = false;
     this.roomDB = null;
+    this.debugmode = null;
 
     this.active_rooms = {};
 
@@ -2233,6 +2239,7 @@ function Overseer(user, pw, notifier) {
                         this.log('OVERSEER: JID = ' + user);
 
                         this.roommanager = true;
+                        this.roommanagertest = true;
 
                         this.roomDB = new RoomDatabase(notifier);
                     }
@@ -2285,19 +2292,22 @@ function Overseer(user, pw, notifier) {
         el = new xmpp.Element('presence');
         self.client.send(el);
 
-        // Need to join all rooms in 'rooms'
-        for (k in self.static_roomnames)
-        {
-            if (self.static_roomnames.hasOwnProperty(k)) {
-                self.MucRoomObjects[k] = new MucRoom(self.client, self.notifier, false);
-                self.MucRoomObjects[k].finishInit();
+        // RULE: If we're in roommanagertest mode, don't load/reload the database. It causes problems.
+        if (!self.roommanagertest) {
+            // Need to join all rooms in 'rooms'
+            for (k in self.static_roomnames)
+            {
+                if (self.static_roomnames.hasOwnProperty(k)) {
+                    self.MucRoomObjects[k] = new MucRoom(self.client, self.notifier, false);
+                    self.MucRoomObjects[k].finishInit();
 
-                self.MucRoomObjects[k].join(k + self.CONF_SERVICE, 'overseer');
+                    self.MucRoomObjects[k].join(k + self.CONF_SERVICE, 'overseer');
+                }
             }
-        }
 
-        if (self.roommanager) {
-            self.LoadActiveRoomsFromDB();
+            if (self.roommanager) {
+                self.LoadActiveRoomsFromDB();
+            }
         }
     });
 
@@ -2319,6 +2329,10 @@ function Overseer(user, pw, notifier) {
     // Now once we're online, we need to handle all incoming from each room.
     this.client.on('stanza', function(in_stanza) {
         var stanza = in_stanza.clone();
+
+        if (self.debugmode === 'ALL' || self.debugmode === 'OVERSEER') {
+            self.log('DEBUGSTANZAS: OVERSEER: ' + stanza.toString());
+        }
 
         if (stanza.is('message') && stanza.attrs.type !== 'error') {
             self.handleMessage(stanza);
@@ -2626,6 +2640,34 @@ Overseer.prototype.handleMessage = function(msg) {
                 this.log(temp);
                 this.notifylog(temp);
             }
+            break;
+        case 'DEBUGSTANZAS':
+            if (cmd[1]) {
+                cmd[1] = cmd[1].toUpperCase();
+
+                // Valid modes are: ALL (both overseer and all mucrooms)
+                //                  OVERSEER (only overseer stanzas)
+                //                  MUCROOMS (only mucroom stanzas)
+                if (cmd[1] === 'ALL' || cmd[1] === 'OVERSEER' || cmd[1] === 'MUCROOMS') {
+                    this.debugmode = cmd[1];
+                    temp = 'DEBUGSTANZAS set to: ' + cmd[1];
+                    this.log(temp);
+                    this.notifylog(temp);
+                }
+                else {
+                    temp = 'DEBUGSTANZAS - Illegal mode: ' + cmd[1] + ' - Use ALL/OVERSEER/MUCROOMS only';
+                    this.log(temp);
+                    this.notifylog(temp);
+                }
+            }
+            else {
+                temp = 'DEBUGSTANZAS status currently: ' + this.debugmode;
+                this.log(temp);
+                this.notifylog(temp);
+            }
+            break;
+        case 'HELP':
+            this.notifylog('Commands: LISTROOMS, DEBUGSTANZAS[;ALL|;OVERSEER|;MUCROOMS]')
             break;
         default:
             this.log('Direct message: Unknown command: ' + msg.getChild('body').getText());
