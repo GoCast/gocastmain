@@ -270,7 +270,7 @@ var Callcast = {
             else
             {
                 // Zero it out. The conneciton is not valid.
-                sessionStorage.clear();
+                this.SessionStorageClear();
             }
         }
         else
@@ -388,8 +388,7 @@ var Callcast = {
         }
         else if ($(err).find('conflict').length > 0)
         {
-            alert("The nickname '" + nick + "' is already in use.\nPlease choose a different nickname.");
-            Callcast.disconnect();
+            Callcast.HandleNicknameConflict(Strophe.getBareJidFromJid(from), nick);
         }
         else if ($(err).find('service-unavailable').length > 0)
         {
@@ -417,6 +416,36 @@ var Callcast = {
         }
 
         return true;
+    },
+
+    //
+    // \brief This is the handler for when we are told by the server that our nickname is
+    //          already being used. This is typically found when a network connection gets
+    //          dropped and the rid/sid/jid are invalidated locally but the server still
+    //          sees a 'ghost' user in the room. This can occur for a full minute and causes
+    //          a bad user experience. To rectivy this, we will attempt to tell the server that
+    //          we are really that ghost user and to kick that ghost out of the room so we can
+    //          get back in.
+    //
+    HandleNicknameConflict: function(room, nick) {
+        var self = this;
+
+        // Need to prepare a 'subjidfornickname' command and wait for response.
+        if (!this.GetOldJids()) {
+            alert("The nickname '" + nick + "' is already in use.\nPlease choose a different nickname.");
+            Callcast.disconnect();
+        }
+        else {
+            this.RequestNickSubstitution(room, nick, function() {
+                self.log('Nickname substitution succeeded.');
+            }, function(err) {
+                self.log('Nickname substitution failed. Err: ' + err);
+                self.log('    Now we erase all prior jids and try to join once more.');
+
+                self.JoinSession(room, room + self.AT_CALLCAST_ROOMS);
+
+            });
+        }
     },
 
     DropAllParticipants: function() {
@@ -2075,6 +2104,64 @@ var Callcast = {
     },
 
     //
+    // \brief Grabs any old jids in the current sessionObject and passes them to the roommanager
+    //          along with the room in question and the nickname desired via IQ.
+    //          If the server knows of any of the 'old jids', it will kick out the nickname from
+    //          the specified room.
+    // \param roomname - bare room name - without @domain
+    // \param nick - nickname with no spaces
+    //
+    RequestNickSubstitution: function(in_roomname, in_nick, cbSuccess, cbFailure) {
+        var roommanager = this.ROOMMANAGER,
+            self = this,
+            oldjids, ojo,
+            roomname, nick;
+
+        roomname = in_roomname.split('@')[0].toLowerCase();
+        nick = this.NoSpaces(in_nick);
+
+        ojo = this.GetOldJids();
+        if (!ojo) {
+            // There are no old jids. This is a failure case.
+            if (cbFailure) {
+                cbFailure('No old jids available. Cannot ask for substitution.');
+                return;
+            }
+        }
+        else {
+            oldjids = JSON.stringify(ojo);
+
+            //
+            this.connection.sendIQ($iq({
+                to: roommanager,
+                id: 'substitution1',
+                type: 'set'
+              }).c('subjidfornickname', {xmlns: this.NS_CALLCAST, room: roomname,
+                                    nick: nick, oldjids: oldjids}),
+
+            // Successful callback...
+              function(iq) {
+                  self.JoinSession(roomname, roomname + self.AT_CALLCAST_ROOMS);
+
+                  if (cbSuccess) {
+                    cbSuccess();
+                  }
+
+                  return true;
+              },
+
+            // Failure callback
+              function(iq) {
+                  Callcast.log('Error substituting new jid for nickname:' + nick, iq);
+                  if (cbFailure) {
+                    cbFailure('Error substituting at server side.');
+                  }
+              }
+            , 3000);    // 3 seconds for the server to respond...
+        }
+    },
+
+    //
     // TODO: roomname seems to be unused and show be removed - will effect all current users of the function.
     //
     JoinSession: function(roomname, roomjid) {
@@ -2238,6 +2325,62 @@ var Callcast = {
         return true;
     },
 
+    SessionStorageClear: function() {
+        var pers;
+
+        if (typeof (Storage) !== 'undefined') {
+            pers = sessionStorage.getItem('persist');  // Save all things here and below...
+
+            sessionStorage.clear();
+
+            sessionStorage.setItem('persist') = pers;  // And put it all back.
+        }
+    },
+
+    RememberCurrentJid: function() {
+        var ojids, newlen, persist;
+
+        if (!this.connection) {
+            this.log('RememberCurrentJid: No Connection.');
+        }
+        else if (!this.connection.jid || !this.connection.jid.split('@')[1]) {
+            this.log('RememberCurrentJid: No valid jid.');
+        }
+
+        if (this.connection && this.connection.jid && typeof (Storage) !== 'undefined') {
+            persist = sessionStorage.getItem('persist');
+
+            if (persist) {
+                persist = JSON.parse(persist);  // Turn it into an object.
+                ojids = persist.oldjids || [];
+            }
+
+            if (ojids.length && ojids[0] !== this.connection.jid) {
+                // We have a different jid than is at the top [0] of the array.
+                newlen = ojids.unshift(this.connection.jid);
+
+                // Store a max of 5 entries
+                if (newlen > 5) {
+                    ojids.pop();   // remove the oldest one.
+                }
+            }
+
+            // Now re-write out the final array regardless of change or initialization.
+            persist.oldjids = ojids;
+            sessionStorage.setItem('persist', JSON.stringify(persist));
+        }
+    },
+
+    GetOldJids: function() {
+        var oj;
+        if (typeof (Storage) !== 'undefined') {
+            oj = sessionStorage.getItem('persist');
+            return oj ? JSON.parse(oj).oldjids : null;
+        }
+
+        return null;
+    },
+
     disconnect: function() {
 
         this.DropAllParticipants();
@@ -2247,7 +2390,7 @@ var Callcast = {
 
         // Zero it out. The conneciton is no longer valid.
         if (typeof (Storage) !== 'undefined') {
-            sessionStorage.clear();
+            this.SessionStorageClear();
         }
 
         if (this.connection)
@@ -2350,12 +2493,15 @@ var Callcast = {
              }
          } else if (status === Strophe.Status.DISCONNECTING) {
              Callcast.log('XMPP/Strophe is Dis-Connecting...should we try to re-attach here? TODO:RMW');
+             Callcast.RememberCurrentJid();
              if (Callcast.Callback_ConnectionStatus) {
                 Callcast.Callback_ConnectionStatus('Disconnecting');
              }
          } else if (status === Strophe.Status.CONNFAIL) {
              Callcast.log('XMPP/Strophe reported connection failure...attempt to re-attach...');
              Callcast.log('-- Not actually doing anything here yet. TODO: RMW');
+             Callcast.RememberCurrentJid();
+
              if (Callcast.Callback_ConnectionStatus) {
                 Callcast.Callback_ConnectionStatus('Connection failed');
              }
@@ -2369,6 +2515,7 @@ var Callcast = {
 
 //           alert("NOTICE -- attempted to auto-re-attach after connection failure. Did we succeed?");
          } else if (status === Strophe.Status.AUTHFAIL) {
+             Callcast.RememberCurrentJid();
              Callcast.disconnect();
              $(document).trigger('disconnected');
              if (Callcast.Callback_ConnectionStatus) {
