@@ -124,23 +124,23 @@ var app = {
    * Check correct browser version. */
   checkBrowser: function() {
     var expl = 'Because this application uses advanced HTML5 features ' + 'it may not work correctly with this browser.',
-        recom = 'Recommended browsers are Firefox 6+, Chrome 12+, and ' + 'Mobile Safari 525+.',
+        recom = 'Recommended browsers are Firefox 12+ and Chrome 20+.',
         msg;
     switch (app.browser.name) {
     case 'Chrome':
       if (app.browser.version < 20) {
-        msg = 'You appear to be using a Chrome version before 20. ' +
+        msg = 'You appear to be using a Chrome version < 20. ' +
           expl + ' ' + recom;
       }
       break;
     case 'Firefox':
       if (app.browser.version < 12) {
-        msg = 'You appear to be using a Firefox version befor 12. ' +
+        msg = 'You appear to be using a Firefox version < 12. ' +
           expl + ' ' + recom;
       }
       break;
     case 'Safari':
-      msg = "Sorry we don't support the Safari browser right now.\nPlease use Chrome or Firefox for now.";
+      msg = "Sorry we don't support the Safari browser right now.\nPlease use Chrome 20+ or Firefox 12+ for now.";
       /*
       if (app.browser.version < 525) {
         msg = 'You appear to be using an older Safari version. ' +
@@ -150,17 +150,21 @@ var app = {
       break;
     case 'Mobile Safari':
     case 'AppleWebKit':
-      if (app.browser.version < 525) {
-        msg = 'You appear to be using an older Mobile Safari version. ' +
+      //if (app.browser.version < 525) {
+        msg = 'Sorry we don\'t support the Mobile Safari browser right now. ' +
           expl + ' ' + recom;
-      }
+      //}
       break;
     default:
       msg = "We don't recognize your browser. " + expl + ' ' + recom;
       break;
     } /* switch (app.browser.name) */
     if (msg) {
-      alert(msg);
+      $('#errorMsgPlugin > h1').text('Uh Oh!!!');
+      $('#errorMsgPlugin > p#prompt').text(msg);
+      $('#errorMsgPlugin > button').css({'display': 'none'});
+      closeWindow();
+      openWindow('#errorMsgPlugin');
       return false;
     }
     return true;
@@ -1946,22 +1950,22 @@ $(document).ready(function(
 
     // Check the browser.
     app.getBrowser();
-    app.checkBrowser();
+    if (app.checkBrowser()) {
+      // login callback
+      $(document).bind('checkCredentials', checkCredentials);
 
-    // login callback
-    $(document).bind('checkCredentials', checkCredentials);
+      uiInit(); // init user interface
+      fbInit(); // init facebook api
 
-    uiInit(); // init user interface
-    fbInit(); // init facebook api
+      // Login to xmpp anonymously
+      Callcast.connect(Callcast.CALLCAST_XMPPSERVER, '');
 
-    // Login to xmpp anonymously
-    Callcast.connect(Callcast.CALLCAST_XMPPSERVER, '');
+      // Write greeting into console.
+      app.log(2, 'Page loaded.');
 
-    // Write greeting into console.
-    app.log(2, 'Page loaded.');
-
-    // set the connection status callback
-    Callcast.setCallbackForCallback_ConnectionStatus(connectionStatus);
+      // set the connection status callback
+      Callcast.setCallbackForCallback_ConnectionStatus(connectionStatus);
+    }
     /*},
     function(){
       closeWindow();
