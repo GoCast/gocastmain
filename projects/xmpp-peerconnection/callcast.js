@@ -252,6 +252,8 @@ var Callcast = {
     WriteUpdatedState: function() {
         if (typeof (Storage) !== 'undefined')
         {
+            this.RememberCurrentJid();
+
             // If the connection is alive, store info.
             // If it's not alive, then there's nothing to do here.
             //
@@ -411,7 +413,7 @@ var Callcast = {
         }
         else
         {
-            alert('Unknown Error Stanza: ' + $(err).children('error').text());
+            alert('Unknown Error Stanza: ' + $(err).getChild('error').text());
             Callcast.log($(err));
         }
 
@@ -432,7 +434,7 @@ var Callcast = {
 
         // Need to prepare a 'subjidfornickname' command and wait for response.
         if (!this.GetOldJids()) {
-            alert("The nickname '" + nick + "' is already in use.\nPlease choose a different nickname.");
+            alert("The nickname '" + nick.replace(/%20/g, ' ') + "' is already in use.\nPlease choose a different nickname.");
             Callcast.disconnect();
         }
         else {
@@ -442,8 +444,11 @@ var Callcast = {
                 self.log('Nickname substitution failed. Err: ' + err);
                 self.log('    Now we erase all prior jids and try to join once more.');
 
-                self.JoinSession(room, room + self.AT_CALLCAST_ROOMS);
+                self.ClearOldJids();
 
+                // Now re-join. If we fail again, this time the error will 'stick' as we have no old jids.
+                // Note: At this stage, 'room' is a full roomname with domain. Gotta prune it down for the call.
+                self.JoinSession(room.split('@')[0], room);
             });
         }
     },
@@ -1728,6 +1733,10 @@ var Callcast = {
                     if ($(presence).find('not-allowed').length > 0) {
                         $(document).trigger('room-creation-not-allowed', Strophe.getNodeFromJid(room));
                     }
+                    else if ($(presence).find('conflict').length > 0) {
+                        Callcast.HandleNicknameConflict(room, nick);  // Likely 2nd time through here and a failure.
+                        return false;   // Kill handler.
+                    }
                     else {
                         Callcast.log('PresHandler: Error joining room. Disconnecting.');
                     }
@@ -2337,8 +2346,27 @@ var Callcast = {
         }
     },
 
+    ClearOldJids: function() {
+        var persist;
+
+        if (typeof (Storage) !== 'undefined') {
+            persist = localStorage.getItem('persist');
+
+            if (persist) {
+                persist = JSON.parse(persist);  // Turn it into an object.
+
+                // Now clear the old jids object.
+                delete persist.oldjids;
+
+                // Then re-stringify and store it.
+                localStorage.setItem('persist', JSON.stringify(persist));
+            }
+        }
+    },
+
     RememberCurrentJid: function() {
-        var ojids, newlen, persist;
+        var ojids,
+            newlen, persist;
 
         if (!this.connection) {
             this.log('RememberCurrentJid: No Connection.');
@@ -2348,14 +2376,18 @@ var Callcast = {
         }
 
         if (this.connection && this.connection.jid && typeof (Storage) !== 'undefined') {
-            persist = sessionStorage.getItem('persist');
+            persist = localStorage.getItem('persist');
 
             if (persist) {
                 persist = JSON.parse(persist);  // Turn it into an object.
                 ojids = persist.oldjids || [];
             }
+            else {
+                persist = {};
+                ojids = [];
+            }
 
-            if (ojids.length && ojids[0] !== this.connection.jid) {
+            if (ojids.length === 0 || ojids[0] !== this.connection.jid) {
                 // We have a different jid than is at the top [0] of the array.
                 newlen = ojids.unshift(this.connection.jid);
 
@@ -2367,14 +2399,14 @@ var Callcast = {
 
             // Now re-write out the final array regardless of change or initialization.
             persist.oldjids = ojids;
-            sessionStorage.setItem('persist', JSON.stringify(persist));
+            localStorage.setItem('persist', JSON.stringify(persist));
         }
     },
 
     GetOldJids: function() {
         var oj;
         if (typeof (Storage) !== 'undefined') {
-            oj = sessionStorage.getItem('persist');
+            oj = localStorage.getItem('persist');
             return oj ? JSON.parse(oj).oldjids : null;
         }
 
