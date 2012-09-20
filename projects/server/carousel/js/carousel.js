@@ -226,8 +226,7 @@
   Items.prototype.setChatName = function(item)
   {
     var name, names, collisions;
-    if (null === item.nick || // no nickname
-        null !== item.chatName) // chatName already created
+    if (null === item.nick)
     {
       return;
     }
@@ -444,11 +443,21 @@
     {
       var msg = $("#msgBoard", item.object).get(0),
           show = $("#showChat", item.object).get(0),
-          px = "px";
+          px = "px",
+          jqChat = $("#chatOut", msg),
+          util   = jqChat.data('util');
       msg.style.width = (item.orgChatWidth * scale) + px;
       msg.style.bottom = (item.orgChatBot * scale) + px;
       show.style.bottom = (item.orgChatBot * scale) + px;
-      //console.log("adjustChat", msg.style);
+      console.log("adjustChat", msg.style);
+      if (util)
+      {
+        util.adjust((item.orgChatWidth * scale) + px);
+      }
+      else
+      {
+        app.log(4, "carousel adjustChat can't find util");
+      }
     };
     ///
     /// \ brief adjust plugin in spot on resize or carousel spin

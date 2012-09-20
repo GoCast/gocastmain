@@ -225,11 +225,16 @@
     <div id="meeting">
       <div id="streams">
         <div id="scarousel">
-          <div class="cloudcarousel" id="mystream" title="Me" onclick="carouselItemClick(event);">
+          <div class="cloudcarousel" id="mystream">
             <object class="localplayer" id="GocastPlayerLocal"
                     type="application/x-gocastplayer" width="0" height="0">
                <param name="onload" value="pluginLoaded" />
             </object>
+            <div id="effectsPanel">
+              <div id="effect-none" effect="none" title="no effect" onclick="applyEffect('none');"></div>
+              <div id="effect-gray" effect="gray" title="black and white" onclick="applyEffect('gray');"></div>
+              <div id="effect-sepia" effect="sepia" title="sepia" onclick="applyEffect('sepia');"></div>
+            </div>
           </div><!-- mystream -->
           <div class="cloudcarousel unoccupied" onclick="carouselItemClick(event);">
             <div class="name"></div>
