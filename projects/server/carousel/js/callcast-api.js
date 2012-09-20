@@ -145,7 +145,7 @@ $(document).on('public-message', function(
     item = app.carousel.getByNick(msginfo.nick);
     if (!item) {throw "no item by nick " + msginfo.nick;}
     util.addMsg(item.chatName, decodeURI(msginfo.body));
-    app.log(2, 'A public message arrived ' + decodeURI(msginfo.nick) + " " + decodeURI(msginfo.body));
+    console.log('A public message arrived ' + decodeURI(msginfo.nick) + " " + decodeURI(msginfo.body));
   }
   catch(err)
   {
@@ -405,15 +405,15 @@ $(document).on('connected', function(
 $(document).on('one-login-complete', function(event, msg) {
 
   if (msg) {
-    console.log('one-login-complete: Msg: ' + msg);
+    app.log(2, 'one-login-complete: Msg: ' + msg);
   }
   else {
-    console.log('one-login-complete: No Msg');
+    app.log(2, 'one-login-complete: No Msg');
   }
 
   if (app.loggedInAll())
   {
-    console.log('one-login-complete: opening meeting');
+    app.log(2, 'one-login-complete: opening meeting');
     openMeeting();
 
     // instantiate local plugin
@@ -715,6 +715,7 @@ function removeContentFromCarousel(
   jqOo.removeAttr('url');
   jqOo.removeAttr('encname');
   jqOo.css('background-image', 'url("images/gologo.png")');
+  app.log(2, 'Removing content from spot [' + infoId + ', ' + id + ']');
   return false;
 } /* removeContentFromCarousel() */
 
@@ -1005,7 +1006,7 @@ function removeSpotCb(info)
 ///
 function connectionStatus(statusStr)
 {
-  console.log('connectionStatus', statusStr);
+  app.log(2, 'connectionStatus' + statusStr);
   $("body > #upper-right > #connection-status").text(statusStr);
 }
 
