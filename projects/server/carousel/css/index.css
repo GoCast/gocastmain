@@ -141,8 +141,9 @@ body > div#upper-right > div#log
 }
 
 /*<MANJESH>*/
-body > div#upper-right > div#log:hover{
+body > div#upper-right > div#log:hover {
   cursor: pointer;
+  opacity: 0.5;
 }
 /*</MANJESH>*/
 
@@ -160,8 +161,9 @@ body > div#upper-right > div#settings
 }
 
 /*<MANJESH>*/
-body > div#upper-right > div#settings:hover{
+body > div#upper-right > div#settings:hover {
   cursor: pointer;
+  opacity: 0.5;
 }
 /*</MANJESH>*/
 
@@ -413,6 +415,12 @@ body > div#lower-left > div#msgBoard > button#send {
   color: white;
   border-radius:15px;
 }
+/*<MANJESH>*/
+div#lower-left > div#msgBoard > button#send:hover {
+  cursor: pointer;
+  opacity: 0.5;
+}
+/*</MANJESH>*/
 body > div#meeting 
 {
   display: none;
@@ -578,6 +586,16 @@ body > div#meeting > div#streams > div#scarousel div#addWhiteBoard
   bottom:55px;
   right:5px;
 }
+/*<MANJESH>*/
+body > div#meeting > div#streams > div#scarousel div#addItem:hover {
+  cursor: pointer;
+  opacity: 1.0;
+}
+body > div#meeting > div#streams > div#scarousel div#addWhiteBoard:hover {
+  cursor: pointer;
+  opacity: 0.5;
+}
+/*</MANJESH>*/
 body > div#meeting > div#streams > div#scarousel div#addItem > img
 {
    width:100%;
@@ -1040,5 +1058,9 @@ body > div#meeting > div#streams > div#scontrols > input.right {
 }
 #effectsPanel > div[effect='sepia'] {
   background-image: url('../images/user-icon-sepia.png');
+}
+#lower-right > input[type='button']:hover {
+  cursor: pointer;
+  opacity: 0.5;
 }
 /*</MANJESH>*/
