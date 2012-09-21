@@ -276,7 +276,7 @@ GoCastJS.WhiteBoardMouse = function(whiteBoard)
   this.DOWN = "down";
   this.UP   = "up";
   this.state = this.UP; // mouse state
-  this.timeout = 500; // timeout in ms
+  this.timeout = 100; // timeout in ms
   this.currentCommand = []; // the current path see mouse handlers
   this.timer = null; // timer for periodic stroke send
   this.lineCt = 0; // count of lines in commands
@@ -385,14 +385,14 @@ GoCastJS.WhiteBoard.prototype.getStrokeTimeout = function()
     if (self.mouse.lineCt > 0) // there are lineto's
     {
       self.mouse.lineCt = 0;
-      stroke = self.mouse.currentCommand.slice(0);
+      stroke = self.mouse.currentCommand.slice(0);       // copy command
       self.mouse.currentCommand = [];                    // clear command
-      lastCmd = stroke[stroke.length - 1];
+      lastCmd = stroke[stroke.length - 1];               // get last lineTo, must be lineTo since lineCt > 0
       console.log("strokeTimeout lastCmd ", lastCmd);
       self.mouse.currentCommand.push({name: 'save', settings: self.settings}); // start new command
       self.mouse.currentCommand.push({name: 'beginPath'});
       self.mouse.currentCommand.push({name: 'moveTo', x: (lastCmd.x >> 0), y: (lastCmd.y >> 0)}); // make start point end of last stroke
-      // todo copy stroke
+      self.wbCtx.moveTo(lastCmd.x, lastCmd.y);
       stroke.push({name: 'stroke'}); // stroke lines
       stroke.push({name: 'restore'}); // finish command
       self.sendStroke(stroke);        // send it
@@ -463,38 +463,39 @@ GoCastJS.WhiteBoard.prototype.doCommands = function(info)
   var i, cmds, stroke;
   if (!info) {throw "WhiteBoard.doCommands info is null";}
   if (info.whiteboardcommandarray)
-  { // todo get rid of mouseCommands, they moved to server
+  { // todo get rid of info.whiteboardcommandarray, no longer used
     cmds = JSON.parse(info.whiteboardcommandarray);
     //console.log("WhiteBoard.doCommands", info, cmds);
     this.mouseCommands = []; // replace commands
-    this.wbCtx.clearRect(0, 0, this.wbCtx.canvas.width, this.wbCtx.canvas.height);
     for (i = 0; i < cmds.length; ++i)
     {
-      this.doCommand(cmds[i]);
       this.mouseCommands.push(cmds[i]); // add command to local list
     }
     //console.log("WhiteBoard.doCommands cmds ", this.mouseCommands);
   }
   if (info.strokes)
-  { // todo get rid of mouseCommands, they moved to server
+  { 
     cmds = JSON.parse(info.strokes);
-    //cmds = JSON.parse(cmds.strokes); // todo shouldn't need the 2nd parse
-    console.log("WhiteBoard.doCommands", info, cmds);
+    //console.log("WhiteBoard.doCommands", info, cmds);
     this.mouseCommands = []; // replace commands
-    this.wbCtx.clearRect(0, 0, this.wbCtx.canvas.width, this.wbCtx.canvas.height);
     for (i = 0; i < cmds.strokes.length; ++i)
     {
-      this.doCommand(cmds.strokes[i]);
       this.mouseCommands.push(cmds.strokes[i]); // add command to local list
     }
-    console.log("WhiteBoard.doCommands strokes ", this.mouseCommands);
+    //console.log("WhiteBoard.doCommands strokes ", this.mouseCommands);
   }
   if (info.stroke) // todo handle races at server, erase canvas and redraw everything
   {
     stroke = JSON.parse(info.stroke);
-    console.log("WhiteBoard.doCommands stroke ", stroke);
-    this.doCommand(stroke);
+    //console.log("WhiteBoard.doCommands stroke ", stroke);
+    this.mouseCommands.push(cmds.strokes[i]); // add command to local list
   }
+  this.wbCtx.clearRect(0, 0, this.wbCtx.canvas.width, this.wbCtx.canvas.height);
+  for (i = 0; i < this.mouseCommands.length; ++i)
+  {
+    this.doCommand(this.mouseCommands[i]);
+  }
+  this.restoreMouseLocation();
 };
 ///
 /// \brief do received mouse command
@@ -535,6 +536,23 @@ GoCastJS.WhiteBoard.prototype.doCommand = function(cmdArray)
     }
   }
 };
+///
+/// \brief moveTo last lineTo in mousecommands after received strokes are applied to canvas
+///
+GoCastJS.WhiteBoard.prototype.restoreMouseLocation = function()
+{
+  var length = this.mouse.currentCommand.length;
+  // if mouse not down or commands empty nothing to do
+  if (this.mouse.DOWN === this.mouse.state && // mouse is down
+      this.mouse.currentCommand.length > 0 && // there are mouse moves
+      "lineTo" === this.mouse.currentCommand[length-1].name) // the last command is lineTo
+  {
+    // move the mouse to last position
+    this.wbCtx.moveTo(this.mouse.currentCommand[length-1].x, this.mouse.currentCommand[length-1].y);
+    console.log("restoreMouseLocation ", this.mouse.currentCommand[length-1].x, this.mouse.currentCommand[length-1].y);
+  }
+};
+///
 /// \brief rezise the canvas, set css dimensions and scale member var
 /// 
 /// \arg width, height the target sizes as integers
@@ -560,22 +578,6 @@ GoCastJS.WhiteBoard.prototype.setScale = function(width, height)
   //                           "left": penColorPos.left});
   this.tools.jqPenList.css("visibility", "hidden");
 };
-
-///
-/// \brief rezise the canvas
-/// 
-/// \arg width, height the target sizes
-///
-GoCastJS.WhiteBoard.prototype.resize = function(width, height)
-{
-  /*
-  var wScale = width/this.width,
-      hScale = height/this.height,
-      scale = (wScale + hScale) / 2;
-  console.log("resize width " + width + " height " + height + " wScale" + wScale + " hScale " + hScale + " scale " + scale);
-  */
-};
-
 ///
 /// \brief wb jq canvas mouse down handler
 ///
@@ -590,7 +592,7 @@ GoCastJS.WhiteBoard.prototype.onMouseDown = function(event)
   event.stopPropagation();
   wb.tools.jqPenList.css("visibility", "hidden"); // hide pen color list
 
-  //wb.mouse.timer = setInterval(wb.getStrokeTimeout(), wb.mouse.timeout);
+  wb.mouse.timer = setInterval(wb.getStrokeTimeout(), wb.mouse.timeout);
   //console.log('wb.onMouseDown x' + event.offsetX + '(' + x + ') y ' + event.offsetY + '(' + y + ')' , event);
   wb.mouse.state = wb.mouse.DOWN;
   wb.settings.apply(wb.wbCtx);
