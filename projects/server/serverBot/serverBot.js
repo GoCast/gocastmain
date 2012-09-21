@@ -2654,8 +2654,14 @@ Overseer.prototype.handleMessage = function(msg) {
                     this.log(temp);
                     this.notifylog(temp);
                 }
+                else if (cmd[1] === 'NONE' || cmd[1] === 'OFF') {
+                    this.debugmode = null;
+                    temp = 'DEBUGSTANZAS are now off.';
+                    this.log(temp);
+                    this.notifylog(temp);
+                }
                 else {
-                    temp = 'DEBUGSTANZAS - Illegal mode: ' + cmd[1] + ' - Use ALL/OVERSEER/MUCROOMS only';
+                    temp = 'DEBUGSTANZAS - Illegal mode: ' + cmd[1] + ' - Use ALL/OVERSEER/MUCROOMS/NONE only';
                     this.log(temp);
                     this.notifylog(temp);
                 }
@@ -2667,7 +2673,7 @@ Overseer.prototype.handleMessage = function(msg) {
             }
             break;
         case 'HELP':
-            this.notifylog('Commands: LISTROOMS, DEBUGSTANZAS[;ALL|;OVERSEER|;MUCROOMS]');
+            this.notifylog('Commands: LISTROOMS, DEBUGSTANZAS[;ALL|;OVERSEER|;MUCROOMS|;NONE]');
             break;
         default:
             this.log('Direct message: Unknown command: ' + msg.getChild('body').getText());
