@@ -74,8 +74,16 @@
     jqObj.mouseover(function(event) {
       // only show close icon on unoccupied or content spots
       if ($(this).hasClass('unoccupied') || $(this).hasClass('typeContent')) {
-        $('.zoom', this).css('visibility', 'visible');
-        $('.close', this).css('visibility', 'visible');
+        $('.close', this).css({
+          'visibility': 'visible',
+          'opacity': '1.0'
+        });
+        if ($(this).hasClass('typeContent')) {
+          $('.zoom', this).css({
+            'visibility': 'visible',
+            'opacity': '1.0'
+          });
+        }
       }
     });
     jqObj.mouseout(function(event) {
@@ -343,22 +351,6 @@
         return false;
         });
     }
-    // click on addItem
-    $('#addItem', container).click(function(event)
-    {
-       Callcast.AddSpot({spottype: "new"}, function()
-        {
-          console.log("carousel addItem callback");
-        });
-    });
-    // click on addWhiteBoard
-    $('#addWhiteBoard', container).click(function(event)
-    {
-       Callcast.AddSpot({spottype: "whiteBoard", spotreplace: "first-unoc"}, function()
-        {
-          console.log("carousel addWhiteBoard callback");
-        });
-    });
     // mouseover
     /*
     $(container).mouseover(function(event)
@@ -566,7 +558,7 @@
             change = (this.destRotation - this.rotation),
             absChange = Math.abs(change),
             itemsLen, spacing, radians, isMSIE,
-            style, px, context, obj;
+            style, px, context, obj, opacity;
 
         this.rotation += change * options.speed;
         if (absChange < 0.001) {
@@ -590,6 +582,7 @@
         {
         sinVal = funcSin(radians);
         scale = ((sinVal + 1) * smallRange) + minScale;
+        opacity = 0.6 * (scale - minScale)/(1.0 - minScale) + 0.2 * (1.0 - scale)/(1.0 - minScale);
         x = ctx.xCentre + (((funcCos(radians) * ctx.xRadius) - (item.orgWidth * 0.5)) * scale);
         y = ctx.yCentre + (((sinVal * ctx.yRadius)) * scale);
         if (item.objectOK) {
@@ -600,6 +593,13 @@
             obj.style.height = h + px;
             obj.style.left = x + px;
             obj.style.top = y + px;
+
+            if ($(obj).hasClass('unoccupied')) {
+              obj.style.opacity = opacity;
+            } else {
+              obj.style.opacity = 1.0;
+            }
+
             // Adjust object dimensions.
             ctx.adjPlugin(item, scale);
             item.scale(scale);
@@ -668,6 +668,13 @@
            obj.style.height = item.orgHeight * scale + 'px';
            obj.style.left = x + 'px';
            obj.style.bottom = '0px';
+
+           if ($(obj).hasClass('unoccupied')) {
+            obj.style.opacity = 0.4;
+           } else {
+            obj.style.opacity = 1.0;
+           }
+
            ctx.adjPlugin(item, scale); // Adjust object dimensions.
            item.scale(scale);
            //app.log(2, "updateLinear item " + item.index + " x " + x);

@@ -2349,7 +2349,7 @@ var Callcast = {
 
             sessionStorage.clear();
 
-            sessionStorage.setItem('persist') = pers;  // And put it all back.
+            sessionStorage.setItem('persist', pers);  // And put it all back.
         }
     },
 

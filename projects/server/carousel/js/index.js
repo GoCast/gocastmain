@@ -87,7 +87,8 @@ var app = {
     }
 
     // <MANJESH>
-    if (Callcast && Callcast.log) {
+    if ('undefined' !== typeof(Callcast) &&
+        'undefined' !== typeof(Callcast.log)) {
       Callcast.log(' ' + labels[logLevel] + ': ' + logMsg);
     }
     // </MANJESH>
@@ -2175,4 +2176,20 @@ function sendLogPrompt()
   {
     sendLog();
   }
+}
+
+function addWhiteBoard() {
+  Callcast.AddSpot({
+      spottype: "whiteBoard",
+      spotreplace: "first-unoc"
+    },
+    function() {
+      console.log("carousel addWhiteBoard callback");
+  });
+}
+
+function addItem() {
+  Callcast.AddSpot({spottype: "new"}, function() {
+    console.log("carousel addItem callback");
+  });
 }
