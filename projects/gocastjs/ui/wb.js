@@ -478,7 +478,7 @@ GoCastJS.WhiteBoard.prototype.doCommands = function(info)
     cmds = JSON.parse(info.strokes);
     //console.log("WhiteBoard.doCommands", info, cmds);
     this.mouseCommands = []; // replace commands
-    for (i = 0; i < cmds.strokes.length; ++i)
+    for (i = 0; i < info.strokes.length; ++i)
     {
       this.mouseCommands.push(cmds.strokes[i]); // add command to local list
     }
@@ -488,7 +488,7 @@ GoCastJS.WhiteBoard.prototype.doCommands = function(info)
   {
     stroke = JSON.parse(info.stroke);
     //console.log("WhiteBoard.doCommands stroke ", stroke);
-    this.mouseCommands.push(cmds.strokes[i]); // add command to local list
+    this.mouseCommands.push(stroke); // add command to local list
   }
   this.wbCtx.clearRect(0, 0, this.wbCtx.canvas.width, this.wbCtx.canvas.height);
   for (i = 0; i < this.mouseCommands.length; ++i)
