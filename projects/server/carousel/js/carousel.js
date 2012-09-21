@@ -211,7 +211,7 @@
       // exclude item from compare
       if (itemThat.index !== item.index)
       {
-        console.log("getNameCollisions other", itemThat);
+        //console.log("getNameCollisions other", itemThat);
         if (itemThat.chatName && 0 === itemThat.chatName.indexOf(name))
         {
           collisions.push(itemThat);
@@ -274,7 +274,7 @@
     for (i = 0; i < trys.length; ++i)
     {    
       newName = trys[i];
-      console.log("resolveChatNameCollisions newName", newName);
+      //console.log("resolveChatNameCollisions newName", newName);
       collisions = this.getNameCollisions(item, newName);
       if (0 === collisions.length)
       {
@@ -449,7 +449,7 @@
       msg.style.width = (item.orgChatWidth * scale) + px;
       msg.style.bottom = (item.orgChatBot * scale) + px;
       show.style.bottom = (item.orgChatBot * scale) + px;
-      console.log("adjustChat", msg.style);
+      //console.log("adjustChat", msg.style);
       if (util)
       {
         util.adjust((item.orgChatWidth * scale) + px);

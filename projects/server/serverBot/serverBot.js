@@ -2667,7 +2667,7 @@ Overseer.prototype.handleMessage = function(msg) {
             }
             break;
         case 'HELP':
-            this.notifylog('Commands: LISTROOMS, DEBUGSTANZAS[;ALL|;OVERSEER|;MUCROOMS]')
+            this.notifylog('Commands: LISTROOMS, DEBUGSTANZAS[;ALL|;OVERSEER|;MUCROOMS]');
             break;
         default:
             this.log('Direct message: Unknown command: ' + msg.getChild('body').getText());
@@ -2869,6 +2869,107 @@ Overseer.prototype.CreateRoomRequest = function(iq) {
     }
 };
 
+Overseer.prototype.createErrorIQ = function(iq_in, reason_in, err_type_in) {
+    var iq_out, e_type;
+
+    e_type = err_type_in || 'modify';
+
+    iq_out = new xmpp.Element('iq', {to: iq_in.root().attrs.from, type: 'error', id: iq_in.root().attrs.id})
+                .c('error', {type: e_type})
+                .c('bad-request', {xmlns: 'urn:ietf:params:xml:ns:xmpp-stanzas'})
+                .up().c('reason', {xmlns: 'urn:ietf:params:xml:ns:xmpp-stanzas'}).t(reason_in);
+
+    if (iq_in.root().attrs.xmlns) {
+        iq_out.root().attrs.xmlns = iq_in.root().attrs.xmlns;
+    }
+
+    return iq_out;
+};
+
+//
+// \brief Accepts a message which must have a room name, nickname which was in conflict, and
+//          a list of old jids - any one of which may be a ghost in the room.
+//          If we find the room and one of the ghost jids, kick that one out and respond favorably.
+//          Otherwise, we respond with an error.
+//
+Overseer.prototype.SubstituteJidForNickname = function(iq) {
+    // Need to pull out the 'info' object - which is the attributes to the 'removespot'
+    var info = {},
+        ojids, i, len, mroom, targetjid,
+        bFound = false,
+        self = this;
+
+    if (iq.getChild('subjidfornickname')) {
+        info = iq.getChild('subjidfornickname').attrs;
+    }
+
+    // Validate room and nickname are present/valid. And there are oldjids as well.
+    if (!info.room || !this.MucRoomObjects[info.room]) {
+        this.log('SubstituteJidForNickname: ERROR: Invalid room: ' + info.room);
+        iq = this.createErrorIQ(iq, 'Missing or invalid required room attribute: ' + info.room);
+        console.log('iq error going back is:', iq.root().toString());
+    }
+    else if (!info.nick || !this.MucRoomObjects[info.room].participants[info.nick]) {
+        this.log('SubstituteJidForNickname: ERROR: No nickname given or nickname not found: ' + info.nick);
+        iq = this.createErrorIQ(iq, 'Required nick attribute not found.');
+        console.log('iq error going back is:', iq.root().toString());
+    }
+    else if (!info.oldjids) {
+        this.log('SubstituteJidForNickname: ERROR: No oldjids given.');
+        iq = this.createErrorIQ(iq, 'Required oldjids attribute not found.');
+        console.log('iq error going back is:', iq.root().toString());
+    }
+    else {
+        // Now we need to iterate through the list of oldjids...
+
+        mroom = this.MucRoomObjects[info.room];
+        targetjid = mroom.participants[info.nick].name.split('/')[0];
+
+        this.log('Nickname found. Target JID is: ' + targetjid);
+        this.log('SubstituteJidForNickname: INFO: Raw-oldjids: ' + info.oldjids);
+        ojids = JSON.parse(info.oldjids);
+        console.log('SubstituteJidForNickname: INFO: oldjids: ', ojids);
+
+        len = ojids.length;
+        for (i = 0; i < len; i += 1) {
+            if (ojids[i].split('/')[0] === targetjid) {
+                bFound = true;
+                i = len;    // Skip the rest.
+            }
+        }
+
+        if (!bFound) {
+            // Never found a match of the nickname and the 'oldjids' list.
+            this.log('SubstituteJidForNickname: ERROR: oldjids did not match. No substitution.');
+            iq = this.createErrorIQ(iq, 'No substitution. Oldjids did not match.');
+//            console.log('iq error going back is:', iq.root().toString());
+        }
+        else {
+            this.log('SubstituteJidForNickname: Found match. Kicking out nick: ' + info.nick);
+
+            // Kick out the nickname so the substitution can take place.
+            mroom.kick(info.nick, function() {
+                // Prep to reply to the IQ message.
+                iq.attrs.to = iq.attrs.from;
+                delete iq.attrs.from;
+
+                // Now reply to the IQ message favorably.
+                iq.attrs.type = 'result';
+
+//                console.log('DEBUG: IQ to send back: ', iq.root().toString());
+                self.log('SubstituteJidForNickname: Success. Substitution ready for completion by client.');
+                // Send back the IQ result.
+                this.client.send(iq.root());
+            });
+
+            return; // Cannot let this fall out below or we'll wind up sending the result too soon.
+        }
+    }
+
+    // Send back the IQ result.
+    this.client.send(iq.root());
+};
+
 Overseer.prototype.handleIq = function(iq) {
     var iqid, callback;
 
@@ -2908,6 +3009,9 @@ Overseer.prototype.handleIq = function(iq) {
         // -- Handle room create request --
         if (iq.getChild('room')) {
             this.CreateRoomRequest(iq);
+        }
+        else if (iq.getChild('subjidfornickname')) {
+            this.SubstituteJidForNickname(iq);
         }
     }
     // --------------------------------
