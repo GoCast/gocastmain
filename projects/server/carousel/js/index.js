@@ -707,6 +707,11 @@ function carouselItemZoom(event)
        item = $(spot).data('item');
    app.carousel.remove(item.index);
 
+  $('#zoom > .close').css({
+    'top': spot[0].style.top,
+    'left': parseFloat(spot[0].style.left) + parseFloat(spot[0].style.width) + 10.0 + 'px'
+  });
+
    $(spot).appendTo($('#meeting > #zoom')); // move div to zoom area, doesn't work with local, remote video spot
    //$('#meeting > #zoom')[0].appendChild(spot[0]); // move div to zoom area, doesn't work with local, remote video spot
 
@@ -1489,6 +1494,11 @@ function resizeZoom(event)
       $(jqDiv).css('height', item.orgHeight + 'px');
       $(jqDiv).css('left', left + 'px');
       $(jqDiv).css('top', top + 'px');
+
+      $('#zoom > .close').css({
+        'top': top,
+        'left': left + item.orgWidth + 10.0 + 'px'
+      });
    }
 }
 

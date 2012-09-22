@@ -74,15 +74,9 @@
     jqObj.mouseover(function(event) {
       // only show close icon on unoccupied or content spots
       if ($(this).hasClass('unoccupied') || $(this).hasClass('typeContent')) {
-        $('.close', this).css({
-          'visibility': 'visible',
-          'opacity': '1.0'
-        });
+        $('.close', this).css('visibility', 'visible');
         if ($(this).hasClass('typeContent')) {
-          $('.zoom', this).css({
-            'visibility': 'visible',
-            'opacity': '1.0'
-          });
+          $('.zoom', this).css('visibility', 'visible');
         }
       }
     });
