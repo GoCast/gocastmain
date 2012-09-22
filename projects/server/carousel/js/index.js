@@ -335,11 +335,10 @@ var app = {
         window.localStorage.gcpDontShowSettingsPromptCheck &&
         'checked' === window.localStorage.gcpDontShowSettingsPromptCheck) {
       clearInterval(closeCountDown);
-      $('#settings').fadeTo(1000, 1.0);
     } else {
       setTimeout(function() {
         clearInterval(closeCountDown);
-        $('#settings').fadeTo(1000, 1.0);
+        $('#settings').removeAttr('style');
         $('#settings-prompt').css({'display': 'none'});
       }, 10000);
 
@@ -349,7 +348,7 @@ var app = {
       $('#settings-cancel').css({'display': 'none'});
       $('#settings-ok').click(function() {
         clearInterval(closeCountDown);
-        $('#settings').fadeTo(1000, 1.0);
+        $('#settings').removeAttr('style');
         $('#settings-prompt').css({'display': 'none'});
         window.localStorage.gcpDontShowSettingsPromptCheck = $('#settings-stop-showing').attr('checked');
       });      
