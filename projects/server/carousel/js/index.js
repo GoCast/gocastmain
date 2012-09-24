@@ -33,7 +33,8 @@
   checkForPlugin,
   connectionStatus,
   videoButtonPress,
-  audioButtonPress
+  audioButtonPress,
+  openWindow
 */
 'use strict';
 
@@ -316,12 +317,12 @@ var app = {
   },
 
   promptDevicesChanged: function(added, firstCall) {
-    var message = 'Click on the <strong>GEAR ICON</strong> to change/test devices.<br/>';
-    var ctDwnMsg = '<span style="font-size:9px; float:right;">[Closing in ' +
-                   '<span id="secondsToClose" style="font-weight:bold;">10</span>]</span><br/><br/>';
-    var opacity = 0.4;
-    var closeCountDown = setInterval(function() {
-      var seconds = parseInt($('#secondsToClose').html());
+    var message = 'Click on the <strong>GEAR ICON</strong> to change/test devices.<br/>',
+        ctDwnMsg = '<span style="font-size:9px; float:right;">[Closing in ' +
+                   '<span id="secondsToClose" style="font-weight:bold;">10</span>]</span><br/><br/>',
+        opacity = 0.4,
+        closeCountDown = setInterval(function() {
+      var seconds = parseInt($('#secondsToClose').html(),10);
       $('#secondsToClose').html((seconds-1).toString());
       $('#settings').fadeTo(1000, opacity);
       opacity = (0.4 === opacity) ? 1.0 : 0.4;
@@ -1261,7 +1262,7 @@ function changeVideo(enableVideo)
   {
     $('#effectsPanel').css({'display': 'block'});
     jqObj.addClass('on') // change button
-         .attr('title', 'Turn Video Off');
+         .attr('title', 'Turn Video Off ' + app.videoKeyAccel);
     // Check object dimensions.
     w = jqOo.width() - 4;
     h = Callcast.HEIGHT * (w / Callcast.WIDTH);
@@ -1277,7 +1278,7 @@ function changeVideo(enableVideo)
   {
     $('#effectsPanel').css({'display': 'none'});
     jqObj.removeClass('on') // change button
-         .attr('title', 'Turn Video On');
+         .attr('title', 'Turn Video On ' + app.videoKeyAccel);
     Callcast.SendLocalVideoToPeers(enable);
     // show background image if fb image url exists
     // if not the default is used and does not show around the plugin
@@ -1320,13 +1321,13 @@ function changeAudio(enableAudio)
   {
     app.log(2, 'Audio muted.');
     jqObj.addClass("off");
-    jqObj.attr('title', 'Unmute Audio');
+    jqObj.attr('title', 'Unmute Audio ' + app.audioKeyAccel);
   }
   else
   {
     app.log(2, 'Audio unmuted.');
     jqObj.removeClass("off");
-    jqObj.attr('title', 'Mute Audio');
+    jqObj.attr('title', 'Mute Audio ' + app.audioKeyAccel);
   }
   return false;
 } // changeAudio()
@@ -1910,7 +1911,8 @@ function docKey(event)
           changeAudio();
        }
        break;
-     case 86: // alt-v, toggle video
+     //case 86: // alt-v, toggle video, problem on windows ff, displays main menu
+     case 90: // alt-z, toggle video
        if (event.altKey)
        {
           changeVideo();
@@ -1951,6 +1953,9 @@ function uiInit()
   chatOut.data('util', util);  // install global chat util
   $(document).keydown(docKey); // global key handler
 
+  app.altKeyName = app.osPlatform.isMac ? "Opt" : "Alt";
+  app.audioKeyAccel = app.altKeyName + "+A";
+  app.videoKeyAccel = app.altKeyName + "+Z";
 }
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
