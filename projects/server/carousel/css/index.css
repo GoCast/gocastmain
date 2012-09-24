@@ -12,6 +12,9 @@
  */
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
+input {
+  outline: none;
+}
 a:link
 {
   color: #0000ff;
@@ -129,6 +132,7 @@ body > div#upper-right
 }
 body > div#upper-right > div#log
 {
+   opacity: 0.6;
    float:right;
    margin-right: 10px;
    width:30px;
@@ -143,12 +147,13 @@ body > div#upper-right > div#log
 /*<MANJESH>*/
 body > div#upper-right > div#log:hover {
   cursor: pointer;
-  opacity: 0.5;
+  opacity: 1.0;
 }
 /*</MANJESH>*/
 
 body > div#upper-right > div#settings
 {
+   opacity: 0.6;
    float:right;
    margin-right: 10px;
    width:20px;
@@ -163,7 +168,7 @@ body > div#upper-right > div#settings
 /*<MANJESH>*/
 body > div#upper-right > div#settings:hover {
   cursor: pointer;
-  opacity: 0.5;
+  opacity: 1.0;
 }
 /*</MANJESH>*/
 
@@ -413,6 +418,7 @@ body > div#lower-left > div#msgBoard > div#chatOut  td.val
 }
 body> div#lower-left > div#msgBoard > input.chatTo
 {
+  opacity: 0.6;
   border-radius: 8px;
   border:none;
   padding: 0px 5px 1px 5px;
@@ -422,15 +428,19 @@ body> div#lower-left > div#msgBoard > input.chatTo
   width:250px;
 }
 body > div#lower-left > div#msgBoard > button#send {
+  opacity: 0.6;
   padding: 0px 10px 1px 10px;
   background-color: black;
   color: white;
   border-radius:15px;
 }
 /*<MANJESH>*/
+body> div#lower-left > div#msgBoard > input.chatTo:focus {
+  opacity: 1.0;
+}
 div#lower-left > div#msgBoard > button#send:hover {
   cursor: pointer;
-  opacity: 0.5;
+  opacity: 1.0;
 }
 /*</MANJESH>*/
 body > div#meeting 
@@ -451,8 +461,8 @@ body > div#meeting > div#zoom {
 body > div#meeting > div#zoom > img.close 
 {
   opacity: 0.6;
-  width: 12px;
-  height: 12px;
+  width: 20px;
+  height: 20px;
   position: absolute;
   right: 3px;
   top: 3px;
@@ -1047,13 +1057,13 @@ body > div#meeting > div#streams > div#scontrols > input.right {
   cursor: pointer;
   opacity: 1.0;
 }
-#zoom .close {
-  border: 2px red solid;
-  border-radius: 5px;
+#zoom > .close {
+  padding: 5px;
+  background-color: #eee;
+  border-radius: 20px;
   opacity: 0.6;
 }
-#zoom .close:hover {
-  border: 2px black solid;
+#zoom > .close:hover {
   cursor: pointer;
   opacity: 1.0;
 }
