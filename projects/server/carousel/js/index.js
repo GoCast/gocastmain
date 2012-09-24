@@ -1947,15 +1947,17 @@ function docKey(event)
 function uiInit()
 {
    // add chat util to global chat out
-  var chatOut = $(app.GROUP_CHAT_OUT),
+  var jqChatOut = $(app.GROUP_CHAT_OUT),
+      jqChatIn  = $(app.GROUP_CHAT_IN),
       util = new GoCastJS.ChatUtil($(app.GROUP_CHAT_OUT).get(0));
 
-  chatOut.data('util', util);  // install global chat util
+  jqChatOut.data('util', util);  // install global chat util
   $(document).keydown(docKey); // global key handler
 
   app.altKeyName = app.osPlatform.isMac ? "Opt" : "Alt";
   app.audioKeyAccel = app.altKeyName + "+A";
   app.videoKeyAccel = app.altKeyName + "+Z";
+  jqChatIn.attr("title", jqChatIn.attr("title") + " " + app.altKeyName + "+C"); // set chat in tooltip key accel
 }
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
