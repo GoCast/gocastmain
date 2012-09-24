@@ -230,6 +230,7 @@ var Callcast = {
     Callback_ReadyState: null,
     Callback_ConnectionStatus: null,
     Callback_OnEffectApplied: null,
+    Callback_OnNicknameInUse: null,
     connection: null,
     localplayer: null,
     localplayerLoaded: false,
@@ -339,6 +340,10 @@ var Callcast = {
     setCallbackForCallback_OnEffectApplied: function(cb) {
         this.Callback_OnEffectApplied = cb;
     },
+
+    setCallbackForCallback_OnNicknameInUse: function(cb) {
+        this.Callback_OnNicknameInUse = cb;
+    },
     //
     // \brief The supplied callback will be called whenever the peer connection readystate changes.
     //      The problem to wrestle with is that each participant has a readystate so there can be
@@ -438,8 +443,10 @@ var Callcast = {
 
         // Need to prepare a 'subjidfornickname' command and wait for response.
         if (!this.GetOldJids()) {
-            alert("The nickname '" + nick.replace(/%20/g, ' ') + "' is already in use.\nPlease choose a different nickname.");
-            Callcast.disconnect();
+            Callcast.LeaveSession();
+            if (Callcast.Callback_OnNicknameInUse) {
+                Callcast.Callback_OnNicknameInUse(nick.replace(/%20/g, ' '));
+            }
         }
         else {
             this.RequestNickSubstitution(room, nick, function() {
