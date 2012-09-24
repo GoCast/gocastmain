@@ -344,7 +344,6 @@ var app = {
 
       $('#settings-prompt').css({'display': 'block'});
       $('#settings-message').html(ctDwnMsg + message);
-      //$('#settings-prompt > span').css({'display': 'none'});
       $('#settings-cancel').css({'display': 'none'});
       $('#settings-ok').click(function() {
         clearInterval(closeCountDown);
@@ -358,6 +357,34 @@ var app = {
   pluginCrashed: function() {
     $('#errorMsgPlugin > h1').text('Oops!!!');
     $('#errorMsgPlugin > p#prompt').text('GoCastPlayer has crashed.');
+    closeWindow();
+    openWindow('#errorMsgPlugin');
+    $('#errorMsgPlugin > #sendLog').click(function() {
+      $(this).attr('disabled', 'disabled');
+      $('#errorMsgPlugin > #reload').attr('disabled', 'disabled');
+      $('#errorMsgPlugin > p#prompt').text('Sending log to GoCast...');
+      Callcast.SendLogsToLogCatcher(function(){
+        $('#errorMsgPlugin > p#prompt').text('Sending log to GoCast... done.');
+        $('#errorMsgPlugin > #reload').removeAttr('disabled');
+      }, function(){
+        $('#errorMsgPlugin > p#prompt').text('Sending log to GoCast... failed.');
+        $('#errorMsgPlugin > #reload').removeAttr('disabled');
+      });
+    });
+  },
+
+  nickInUse: function(nick) {
+    $('#errorMsgPlugin > h1').text('Uh Oh!!!');
+    if (this.user.fbSkipped) {
+      $('#errorMsgPlugin > p#prompt').text('Nickname [' + nick + '] already in use.' );
+      Callcast.SendLiveLog('Nickname Conflict [no-facebook]: [room = ' +
+                           $.getUrlVar('roomname') + ', nick = ' + nick + ']');
+    } else {
+      $('#errorMsgPlugin > p#prompt').text('You seem to have already logged in to this room through Facebook.');
+      Callcast.SendLiveLog('Nickname Conflict [facebook]: [room = ' +
+                           $.getUrlVar('roomname') + ', nick = ' + nick + ']');
+    }
+
     closeWindow();
     openWindow('#errorMsgPlugin');
     $('#errorMsgPlugin > #sendLog').click(function() {
@@ -1513,6 +1540,7 @@ function onJoinNow(
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
     app.log(2, 'onJoinNow');
+    app.user.fbSkipped = true;
 
     // get the nick name, return back to dialog if not defined
     var usrNm = $('#credentials2 > input#name').val();
@@ -1972,6 +2000,10 @@ $(document).ready(function(
 
       // Write greeting into console.
       app.log(2, 'Page loaded.');
+
+      Callcast.setCallbackForCallback_OnNicknameInUse(function(nick) {
+        app.nickInUse(nick);
+      });
 
       // set the connection status callback
       Callcast.setCallbackForCallback_ConnectionStatus(connectionStatus);
