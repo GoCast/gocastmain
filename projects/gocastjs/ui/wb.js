@@ -276,7 +276,7 @@ GoCastJS.WhiteBoardMouse = function(whiteBoard)
   this.DOWN = "down";
   this.UP   = "up";
   this.state = this.UP; // mouse state
-  this.timeout = 100; // timeout in ms
+  this.timeout = 300; // timeout in ms
   this.currentCommand = []; // the current path see mouse handlers
   this.timer = null; // timer for periodic stroke send
   this.lineCt = 0; // count of lines in commands
@@ -472,17 +472,19 @@ GoCastJS.WhiteBoard.prototype.doCommands = function(info)
       this.mouseCommands.push(cmds[i]); // add command to local list
     }
     //console.log("WhiteBoard.doCommands cmds ", this.mouseCommands);
+    this.wbCtx.clearRect(0, 0, this.wbCtx.canvas.width, this.wbCtx.canvas.height);
   }
   if (info.strokes)
   { 
     cmds = JSON.parse(info.strokes);
     //console.log("WhiteBoard.doCommands", info, cmds);
     this.mouseCommands = []; // replace commands
-    for (i = 0; i < info.strokes.length; ++i)
+    for (i = 0; i < cmds.strokes.length; ++i)
     {
       this.mouseCommands.push(cmds.strokes[i]); // add command to local list
     }
     //console.log("WhiteBoard.doCommands strokes ", this.mouseCommands);
+    this.wbCtx.clearRect(0, 0, this.wbCtx.canvas.width, this.wbCtx.canvas.height);
   }
   if (info.stroke) // todo handle races at server, erase canvas and redraw everything
   {
@@ -490,7 +492,6 @@ GoCastJS.WhiteBoard.prototype.doCommands = function(info)
     //console.log("WhiteBoard.doCommands stroke ", stroke);
     this.mouseCommands.push(stroke); // add command to local list
   }
-  this.wbCtx.clearRect(0, 0, this.wbCtx.canvas.width, this.wbCtx.canvas.height);
   for (i = 0; i < this.mouseCommands.length; ++i)
   {
     this.doCommand(this.mouseCommands[i]);
