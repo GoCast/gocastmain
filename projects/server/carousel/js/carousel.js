@@ -552,7 +552,7 @@
             change = (this.destRotation - this.rotation),
             absChange = Math.abs(change),
             itemsLen, spacing, radians, isMSIE,
-            style, px, context, obj, opacity;
+            style, px, context, obj/*, opacity*/;
 
         this.rotation += change * options.speed;
         if (absChange < 0.001) {
@@ -576,7 +576,7 @@
         {
         sinVal = funcSin(radians);
         scale = ((sinVal + 1) * smallRange) + minScale;
-        opacity = 0.6 * (scale - minScale)/(1.0 - minScale) + 0.2 * (1.0 - scale)/(1.0 - minScale);
+        //opacity = 0.6 * (scale - minScale)/(1.0 - minScale) + 0.2 * (1.0 - scale)/(1.0 - minScale);
         x = ctx.xCentre + (((funcCos(radians) * ctx.xRadius) - (item.orgWidth * 0.5)) * scale);
         y = ctx.yCentre + (((sinVal * ctx.yRadius)) * scale);
         if (item.objectOK) {
@@ -588,11 +588,11 @@
             obj.style.left = x + px;
             obj.style.top = y + px;
 
-            if ($(obj).hasClass('unoccupied')) {
+            /*if ($(obj).hasClass('unoccupied')) {
               obj.style.opacity = opacity;
             } else {
               obj.style.opacity = 1.0;
-            }
+            }*/
 
             // Adjust object dimensions.
             ctx.adjPlugin(item, scale);
