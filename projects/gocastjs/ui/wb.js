@@ -506,7 +506,7 @@ GoCastJS.WhiteBoard.prototype.doCommands = function(info)
 GoCastJS.WhiteBoard.prototype.doCommand = function(cmdArray)
 {
   var i, cmd;
-  console.log("WhiteBoard.doCommand", cmdArray);
+  //console.log("WhiteBoard.doCommand", cmdArray);
   for (i = 0; i < cmdArray.length; ++i) {
     //console.log("cmd", cmdArray[i]);
     switch (cmdArray[i].name) {
