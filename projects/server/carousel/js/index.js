@@ -261,11 +261,13 @@ var app = {
         if (Callcast.IsVideoDeviceAvailable())
         {
           $('#lower-right > #video').removeAttr('disabled');
+          $('#videoPreview').removeAttr('disabled');
           $('#effectsPanel').css({'display': 'block'});
         }
         if (Callcast.IsMicrophoneDeviceAvailable())
         {
           $('#lower-right > #audio').removeAttr('disabled');
+          $('#audioPreview').removeAttr('disabled');
         }
         $(app.GROUP_CHAT_OUT).removeAttr('disabled');
      }
@@ -273,7 +275,9 @@ var app = {
      {
         $('#meeting > #streams > #scontrols > input').attr('disabled', 'disabled');
         $('#lower-right > input.video').attr('disabled', 'disabled');
+        $('#videoPreview').attr('disabled', 'disabled');
         $('#lower-right > input.audio').attr('disabled', 'disabled');
+        $('#audioPreview').attr('disabled', 'disabled');
         $(app.GROUP_CHAT_OUT).attr('disabled', 'disabled');
      }
   },
@@ -599,6 +603,8 @@ function activateWindow(
   else if (winId.match('meeting')) {
     $('#lower-right > #video').on('click.s04172012a', videoButtonPress);
     $('#lower-right > #audio').on('click.s04172012b', audioButtonPress);
+    $('#videoPreview').on('click.s04172012a', videoButtonPress);
+    $('#audioPreview').on('click.s04172012b', audioButtonPress);
   }
   else if (winId.match('chatInp')) {
     $('input.chatTo', winId).on('keydown.s04172012g', keypressChatHandler);
@@ -1234,10 +1240,11 @@ function videoButtonPress(event)
 function changeVideo(enableVideo)
 {
   var jqObj = $(app.VID_BUTTON),
+      jqObj1 = $('#videoPreview'),
       jqOo = $(app.LOCAL_PLUGIN),
       enable,
       w, h;
-  if (!jqObj[0])
+  if (!jqObj[0] || !jqObj1[0])
   {
      app.log(4, "changeVideo couldn't find video button");
   }
@@ -1260,8 +1267,10 @@ function changeVideo(enableVideo)
   }
   if (enable)
   {
-    $('#effectsPanel').css({'display': 'block'});
+    $('#effectsPanel > div').css({'display': 'block'});
     jqObj.addClass('on') // change button
+         .attr('title', 'Turn Video Off ' + app.videoKeyAccel);
+    jqObj1.addClass('on') // change button
          .attr('title', 'Turn Video Off ' + app.videoKeyAccel);
     // Check object dimensions.
     w = jqOo.width() - 4;
@@ -1276,8 +1285,10 @@ function changeVideo(enableVideo)
   }
   else 
   {
-    $('#effectsPanel').css({'display': 'none'});
+    $('#effectsPanel > div').css({'display': 'none'});
     jqObj.removeClass('on') // change button
+         .attr('title', 'Turn Video On ' + app.videoKeyAccel);
+    jqObj1.removeClass('on') // change button
          .attr('title', 'Turn Video On ' + app.videoKeyAccel);
     Callcast.SendLocalVideoToPeers(enable);
     // show background image if fb image url exists
@@ -1303,6 +1314,7 @@ function audioButtonPress()
 function changeAudio(enableAudio)
 {
   var jqObj = $(app.AUD_BUTTON),
+      jqObj1 = $('#audioPreview'),
       bMuteAudio;
   if (!jqObj[0])
   {
@@ -1322,12 +1334,16 @@ function changeAudio(enableAudio)
     app.log(2, 'Audio muted.');
     jqObj.addClass("off");
     jqObj.attr('title', 'Unmute Audio ' + app.audioKeyAccel);
+    jqObj1.addClass("off");
+    jqObj1.attr('title', 'Unmute Audio ' + app.audioKeyAccel);
   }
   else
   {
     app.log(2, 'Audio unmuted.');
     jqObj.removeClass("off");
     jqObj.attr('title', 'Mute Audio ' + app.audioKeyAccel);
+    jqObj1.removeClass("off");
+    jqObj1.attr('title', 'Mute Audio ' + app.audioKeyAccel);
   }
   return false;
 } // changeAudio()
@@ -1357,7 +1373,8 @@ function deactivateWindow(
   else if (winId.match('meeting')) {
     $('#lower-right > #video').off('click.s04172012a', changeVideo);
     $('#lower-right > #audio').off('click.s04172012b', changeAudio);
-
+    $('#videoPreview').off('click.s04172012a', changeVideo);
+    $('#audioPreview').off('click.s04172012b', changeAudio);
   }
   else if (winId.match('chatInp')) {
     $('input.chatTo', winId).off('keydown.s04172012g', keypressChatHandler);
