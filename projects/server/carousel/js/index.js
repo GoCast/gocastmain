@@ -744,6 +744,7 @@ function carouselItemZoom(event)
     'top': spot[0].style.top,
     'left': parseFloat(spot[0].style.left) + parseFloat(spot[0].style.width) + 10.0 + 'px'
   });
+  $('body > div#upper-right').css({'top': $('#zoom').position().top + 'px'});
 
    $(spot).appendTo($('#meeting > #zoom')); // move div to zoom area, doesn't work with local, remote video spot
    //$('#meeting > #zoom')[0].appendChild(spot[0]); // move div to zoom area, doesn't work with local, remote video spot
@@ -767,6 +768,7 @@ function carouselItemUnzoom(event)
    var spot = $('#meeting > #zoom > .cloudcarousel');
    app.carousel.insertSpot(spot); // put spot back in carousel
    $('#meeting > #streams').css('height', '100%'); // zoom carousel
+   $('body > div#upper-right').css({'top': '10px'});
    app.carousel.resize();
 } // carouselItemUnzoom
 
