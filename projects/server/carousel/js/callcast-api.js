@@ -28,7 +28,8 @@
           checkForPluginOptionalUpgrades,
           handleRoomSetup,
           carouselItemUnzoom,
-          showPersonalChatWithSpot
+          showPersonalChatWithSpot,
+          onEffectApplied
 */
 'use strict';
 
@@ -987,12 +988,12 @@ function removeSpotCb(info)
           carouselItemUnzoom();
         }
       }
-      else // get by index
-      {
-         item = app.carousel.getByIndex(spot);
-      }
     }
 
+    if (!item) // get by index
+    {
+      item = app.carousel.getByIndex(spot);
+    }
     if (item)
     {
       $(item.object).remove();
