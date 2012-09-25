@@ -663,11 +663,13 @@
            obj.style.left = x + 'px';
            obj.style.bottom = '0px';
 
+           /*
            if ($(obj).hasClass('unoccupied')) {
             obj.style.opacity = 0.4;
            } else {
             obj.style.opacity = 1.0;
            }
+           */
 
            ctx.adjPlugin(item, scale); // Adjust object dimensions.
            item.scale(scale);
