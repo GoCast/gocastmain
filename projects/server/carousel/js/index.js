@@ -589,7 +589,7 @@ function activateWindow(
 {
   if (winId.match('credentials2')) {
     $('input#name', winId).on('keydown.s04072012', keypressNameHandler);
-    $('input#btn', winId).on('click.s04072012', onJoinNow);
+    $('a#btn', winId).on('click.s04072012', onJoinNow);
     if ("undefined" !== Storage)
     {
       $('input#name', winId).val(sessionStorage.uiGoCastNick);
@@ -1351,7 +1351,7 @@ function deactivateWindow(
      * Remove any message. */
     $('p.login-error', winId).hide().text('');
     $('input#name', winId).off('keydown.s04072012', keypressNameHandler);
-    $('input#btn', winId).off('click.s04072012', onJoinNow);
+    $('a#btn', winId).off('click.s04072012', onJoinNow);
   }
   else if (winId.match('meeting')) {
     $('#lower-right > #video').off('click.s04172012a', changeVideo);

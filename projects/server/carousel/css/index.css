@@ -12,6 +12,18 @@
  */
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
+@-webkit-keyframes greenPulse {
+from { background-color: #749a02; -webkit-box-shadow: 0 0 9px #333; }
+50% { background-color: #91bd09; -webkit-box-shadow: 0 0 18px #91bd09; }
+to { background-color: #749a02; -webkit-box-shadow: 0 0 9px #333; }
+}
+
+@-moz-keyframes greenPulse {
+from { background-color: #749a02; -moz-box-shadow: 0 0 9px #333; }
+50% { background-color: #91bd09; -moz-box-shadow: 0 0 18px #91bd09; }
+to { background-color: #749a02; -moz-box-shadow: 0 0 9px #333; }
+}
+
 input {
   outline: none;
 }
@@ -797,19 +809,46 @@ body > div#meeting > div#streams > div#scontrols > input.right {
   margin-bottom: 10px;
 }
 #boxes #credentials2 input#name {
-  width: 15em;
+  width: 18em;
   border-radius: 5px;
   margin-left: 10px;
+  padding: 5px;
 }
 #boxes #credentials2 input#email {
-  width: 20em;
+  width: 18em;
   border-radius: 5px;
   margin-left: 10px;
+  padding: 5px;
 }
-#boxes #credentials2 input#btn {
-  width: 10em;
-  height: 3em;
-  margin-left: 10px;
+.divider {
+  text-align: center;
+  width: 100%;
+  height: auto;
+  padding: 10px;
+}
+#boxes #credentials2 a#btn {
+  outline: none;
+  font-weight: bold;
+  text-decoration: none;
+  color: white !important;
+  background-color: #91BD09;
+  padding: 8px 19px 9px;
+  border-radius: 5px;
+  -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  text-shadow: 0 -1px 1px rgba(0, 0, 0, 0.25);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  overflow: visible;
+  width: auto;
+  font-size: 14px;
+
+  -webkit-animation-name: greenPulse;
+  -webkit-animation-duration: 2s;
+  -webkit-animation-iteration-count: infinite;
+  -moz-animation-name: greenPulse;
+  -moz-animation-duration: 2s;
+  -moz-animation-iteration-count: infinite;
 }
 #boxes #credentials2 div.fb-login-button {
   width: 20em;
