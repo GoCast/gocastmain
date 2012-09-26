@@ -246,6 +246,10 @@ body > div#upper-right > div#settings-prompt {
   line-height:1em;
   padding:15px 10px 15px 10px;
 }
+body > div#upper-right > .warning,
+body > div#upper-right > .info {
+  width: 300px;
+}
 /*</MANJESH>*/
 
 body > div#upper-right > div#send-log-prompt > .button
