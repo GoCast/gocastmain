@@ -33,7 +33,9 @@
   checkForPlugin,
   connectionStatus,
   videoButtonPress,
-  audioButtonPress
+  audioButtonPress,
+  openWindow,
+  carouselItemUnzoom
 */
 'use strict';
 
@@ -44,6 +46,8 @@
  * \brief The main application object.
  */
 var app = {
+  GROUP_CHAT: '#lower-left > #msgBoard',
+  GROUP_CHAT_SHOW: '#lower-left > #showChat',
   GROUP_CHAT_OUT: '#lower-left > #msgBoard > #chatOut',
   GROUP_CHAT_IN: '#lower-left > #msgBoard > input.chatTo',
   MAC_DL_URL: 'https://carousel.gocast.it/downloads/GoCastPlayer.pkg',
@@ -260,11 +264,13 @@ var app = {
         if (Callcast.IsVideoDeviceAvailable())
         {
           $('#lower-right > #video').removeAttr('disabled');
+          $('#videoPreview').removeAttr('disabled');
           $('#effectsPanel').css({'display': 'block'});
         }
         if (Callcast.IsMicrophoneDeviceAvailable())
         {
           $('#lower-right > #audio').removeAttr('disabled');
+          $('#audioPreview').removeAttr('disabled');
         }
         $(app.GROUP_CHAT_OUT).removeAttr('disabled');
      }
@@ -272,7 +278,9 @@ var app = {
      {
         $('#meeting > #streams > #scontrols > input').attr('disabled', 'disabled');
         $('#lower-right > input.video').attr('disabled', 'disabled');
+        $('#videoPreview').attr('disabled', 'disabled');
         $('#lower-right > input.audio').attr('disabled', 'disabled');
+        $('#audioPreview').attr('disabled', 'disabled');
         $(app.GROUP_CHAT_OUT).attr('disabled', 'disabled');
      }
   },
@@ -316,12 +324,12 @@ var app = {
   },
 
   promptDevicesChanged: function(added, firstCall) {
-    var message = 'Click on the <strong>GEAR ICON</strong> to change/test devices.<br/>';
-    var ctDwnMsg = '<span style="font-size:9px; float:right;">[Closing in ' +
-                   '<span id="secondsToClose" style="font-weight:bold;">10</span>]</span><br/><br/>';
-    var opacity = 0.4;
-    var closeCountDown = setInterval(function() {
-      var seconds = parseInt($('#secondsToClose').html());
+    var message = 'Click on the <strong>GEAR ICON</strong> to change/test devices.<br/>',
+        ctDwnMsg = '<span style="font-size:9px; float:right;">[Closing in ' +
+                   '<span id="secondsToClose" style="font-weight:bold;">10</span>]</span><br/><br/>',
+        opacity = 0.4,
+        closeCountDown = setInterval(function() {
+      var seconds = parseInt($('#secondsToClose').html(),10);
       $('#secondsToClose').html((seconds-1).toString());
       $('#settings').fadeTo(1000, opacity);
       opacity = (0.4 === opacity) ? 1.0 : 0.4;
@@ -335,21 +343,19 @@ var app = {
         window.localStorage.gcpDontShowSettingsPromptCheck &&
         'checked' === window.localStorage.gcpDontShowSettingsPromptCheck) {
       clearInterval(closeCountDown);
-      $('#settings').fadeTo(1000, 1.0);
     } else {
       setTimeout(function() {
         clearInterval(closeCountDown);
-        $('#settings').fadeTo(1000, 1.0);
+        $('#settings').removeAttr('style');
         $('#settings-prompt').css({'display': 'none'});
       }, 10000);
 
       $('#settings-prompt').css({'display': 'block'});
       $('#settings-message').html(ctDwnMsg + message);
-      //$('#settings-prompt > span').css({'display': 'none'});
       $('#settings-cancel').css({'display': 'none'});
       $('#settings-ok').click(function() {
         clearInterval(closeCountDown);
-        $('#settings').fadeTo(1000, 1.0);
+        $('#settings').removeAttr('style');
         $('#settings-prompt').css({'display': 'none'});
         window.localStorage.gcpDontShowSettingsPromptCheck = $('#settings-stop-showing').attr('checked');
       });      
@@ -359,6 +365,34 @@ var app = {
   pluginCrashed: function() {
     $('#errorMsgPlugin > h1').text('Oops!!!');
     $('#errorMsgPlugin > p#prompt').text('GoCastPlayer has crashed.');
+    closeWindow();
+    openWindow('#errorMsgPlugin');
+    $('#errorMsgPlugin > #sendLog').click(function() {
+      $(this).attr('disabled', 'disabled');
+      $('#errorMsgPlugin > #reload').attr('disabled', 'disabled');
+      $('#errorMsgPlugin > p#prompt').text('Sending log to GoCast...');
+      Callcast.SendLogsToLogCatcher(function(){
+        $('#errorMsgPlugin > p#prompt').text('Sending log to GoCast... done.');
+        $('#errorMsgPlugin > #reload').removeAttr('disabled');
+      }, function(){
+        $('#errorMsgPlugin > p#prompt').text('Sending log to GoCast... failed.');
+        $('#errorMsgPlugin > #reload').removeAttr('disabled');
+      });
+    });
+  },
+
+  nickInUse: function(nick) {
+    $('#errorMsgPlugin > h1').text('Uh Oh!!!');
+    if (this.user.fbSkipped) {
+      $('#errorMsgPlugin > p#prompt').text('Nickname [' + nick + '] already in use.' );
+      Callcast.SendLiveLog('Nickname Conflict [no-facebook]: [room = ' +
+                           $.getUrlVar('roomname') + ', nick = ' + nick + ']');
+    } else {
+      $('#errorMsgPlugin > p#prompt').text('You seem to have already logged in to this room through Facebook.');
+      Callcast.SendLiveLog('Nickname Conflict [facebook]: [room = ' +
+                           $.getUrlVar('roomname') + ', nick = ' + nick + ']');
+    }
+
     closeWindow();
     openWindow('#errorMsgPlugin');
     $('#errorMsgPlugin > #sendLog').click(function() {
@@ -420,7 +454,6 @@ function showPersonalChat(event)
   showPersonalChatWithSpot(spot.get(0));
   $("#msgBoard > input.chatTo", spot).focus();
 }
-
 ///
 /// \brief global handler for close personal chat
 ///
@@ -433,6 +466,26 @@ function closePersonalChat(event)
   console.log("closePersonalChat", event);
   $("#showChat", item.object).css("display", "block"); // hide showChat button
   $("#msgBoard", item.object).css("display", "none"); // show chat ui
+  event.stopPropagation();
+}
+///
+/// \brief handler for global chat showChat button press
+///
+function showGroupChat(event)
+{
+  $(app.GROUP_CHAT_SHOW).stop(true);
+  $(app.GROUP_CHAT_SHOW).css("display", "none");
+  $(app.GROUP_CHAT_SHOW).css("opacity", "1");
+  $(app.GROUP_CHAT).css("display", "block");
+  $(app.GROUP_CHAT_IN).focus();
+}
+///
+/// \brief global handler for close personal chat
+///
+function closeGroupChat(event)
+{
+  $(app.GROUP_CHAT_SHOW).css("display", "block");
+  $(app.GROUP_CHAT).css("display", "none");
   event.stopPropagation();
 }
 
@@ -563,7 +616,7 @@ function activateWindow(
 {
   if (winId.match('credentials2')) {
     $('input#name', winId).on('keydown.s04072012', keypressNameHandler);
-    $('input#btn', winId).on('click.s04072012', onJoinNow);
+    $('a#btn', winId).on('click.s04072012', onJoinNow);
     if ("undefined" !== Storage)
     {
       $('input#name', winId).val(sessionStorage.uiGoCastNick);
@@ -572,6 +625,8 @@ function activateWindow(
   else if (winId.match('meeting')) {
     $('#lower-right > #video').on('click.s04172012a', videoButtonPress);
     $('#lower-right > #audio').on('click.s04172012b', audioButtonPress);
+    $('#videoPreview').on('click.s04172012a', videoButtonPress);
+    $('#audioPreview').on('click.s04172012b', audioButtonPress);
   }
   else if (winId.match('chatInp')) {
     $('input.chatTo', winId).on('keydown.s04172012g', keypressChatHandler);
@@ -693,10 +748,10 @@ function carouselItemZoom(event)
       event.stopPropagation();
    }
 
-   // do nothing if there's a zoomed spot
+   // replace zoomed spot
    if ($('#meeting > #zoom > .cloudcarousel').length > 0)
    {
-      return;
+      carouselItemUnzoom(event);
    }
 
    $('#meeting > #zoom').css('display', 'block'); // display zoom div
@@ -706,6 +761,12 @@ function carouselItemZoom(event)
    var spot = $(event.currentTarget).parent(),
        item = $(spot).data('item');
    app.carousel.remove(item.index);
+
+  $('#zoom > .close').css({
+    'top': spot[0].style.top,
+    'left': parseFloat(spot[0].style.left) + parseFloat(spot[0].style.width) + 10.0 + 'px'
+  });
+  $('body > div#upper-right').css({'top': $('#zoom').position().top + 'px'});
 
    $(spot).appendTo($('#meeting > #zoom')); // move div to zoom area, doesn't work with local, remote video spot
    //$('#meeting > #zoom')[0].appendChild(spot[0]); // move div to zoom area, doesn't work with local, remote video spot
@@ -729,6 +790,7 @@ function carouselItemUnzoom(event)
    var spot = $('#meeting > #zoom > .cloudcarousel');
    app.carousel.insertSpot(spot); // put spot back in carousel
    $('#meeting > #streams').css('height', '100%'); // zoom carousel
+   $('body > div#upper-right').css({'top': '10px'});
    app.carousel.resize();
 } // carouselItemUnzoom
 
@@ -1202,10 +1264,11 @@ function videoButtonPress(event)
 function changeVideo(enableVideo)
 {
   var jqObj = $(app.VID_BUTTON),
+      jqObj1 = $('#videoPreview'),
       jqOo = $(app.LOCAL_PLUGIN),
       enable,
       w, h;
-  if (!jqObj[0])
+  if (!jqObj[0] || !jqObj1[0])
   {
      app.log(4, "changeVideo couldn't find video button");
   }
@@ -1228,9 +1291,11 @@ function changeVideo(enableVideo)
   }
   if (enable)
   {
-    $('#effectsPanel').css({'display': 'block'});
+    $('#effectsPanel > div').css({'display': 'block'});
     jqObj.addClass('on') // change button
-         .attr('title', 'Turn Video Off');
+         .attr('title', 'Turn Video Off ' + app.videoKeyAccel);
+    jqObj1.addClass('on') // change button
+         .attr('title', 'Turn Video Off ' + app.videoKeyAccel);
     // Check object dimensions.
     w = jqOo.width() - 4;
     h = Callcast.HEIGHT * (w / Callcast.WIDTH);
@@ -1244,9 +1309,11 @@ function changeVideo(enableVideo)
   }
   else 
   {
-    $('#effectsPanel').css({'display': 'none'});
+    $('#effectsPanel > div').css({'display': 'none'});
     jqObj.removeClass('on') // change button
-         .attr('title', 'Turn Video On');
+         .attr('title', 'Turn Video On ' + app.videoKeyAccel);
+    jqObj1.removeClass('on') // change button
+         .attr('title', 'Turn Video On ' + app.videoKeyAccel);
     Callcast.SendLocalVideoToPeers(enable);
     // show background image if fb image url exists
     // if not the default is used and does not show around the plugin
@@ -1271,6 +1338,7 @@ function audioButtonPress()
 function changeAudio(enableAudio)
 {
   var jqObj = $(app.AUD_BUTTON),
+      jqObj1 = $('#audioPreview'),
       bMuteAudio;
   if (!jqObj[0])
   {
@@ -1289,13 +1357,17 @@ function changeAudio(enableAudio)
   {
     app.log(2, 'Audio muted.');
     jqObj.addClass("off");
-    jqObj.attr('title', 'Unmute Audio');
+    jqObj.attr('title', 'Unmute Audio ' + app.audioKeyAccel);
+    jqObj1.addClass("off");
+    jqObj1.attr('title', 'Unmute Audio ' + app.audioKeyAccel);
   }
   else
   {
     app.log(2, 'Audio unmuted.');
     jqObj.removeClass("off");
-    jqObj.attr('title', 'Mute Audio');
+    jqObj.attr('title', 'Mute Audio ' + app.audioKeyAccel);
+    jqObj1.removeClass("off");
+    jqObj1.attr('title', 'Mute Audio ' + app.audioKeyAccel);
   }
   return false;
 } // changeAudio()
@@ -1320,12 +1392,13 @@ function deactivateWindow(
      * Remove any message. */
     $('p.login-error', winId).hide().text('');
     $('input#name', winId).off('keydown.s04072012', keypressNameHandler);
-    $('input#btn', winId).off('click.s04072012', onJoinNow);
+    $('a#btn', winId).off('click.s04072012', onJoinNow);
   }
   else if (winId.match('meeting')) {
     $('#lower-right > #video').off('click.s04172012a', changeVideo);
     $('#lower-right > #audio').off('click.s04172012b', changeAudio);
-
+    $('#videoPreview').off('click.s04172012a', changeVideo);
+    $('#audioPreview').off('click.s04172012b', changeAudio);
   }
   else if (winId.match('chatInp')) {
     $('input.chatTo', winId).off('keydown.s04172012g', keypressChatHandler);
@@ -1489,6 +1562,11 @@ function resizeZoom(event)
       $(jqDiv).css('height', item.orgHeight + 'px');
       $(jqDiv).css('left', left + 'px');
       $(jqDiv).css('top', top + 'px');
+
+      $('#zoom > .close').css({
+        'top': top,
+        'left': left + item.orgWidth + 10.0 + 'px'
+      });
    }
 }
 
@@ -1504,6 +1582,7 @@ function onJoinNow(
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
     app.log(2, 'onJoinNow');
+    app.user.fbSkipped = true;
 
     // get the nick name, return back to dialog if not defined
     var usrNm = $('#credentials2 > input#name').val();
@@ -1873,7 +1952,8 @@ function docKey(event)
           changeAudio();
        }
        break;
-     case 86: // alt-v, toggle video
+     //case 86: // alt-v, toggle video, problem on windows ff, displays main menu
+     case 90: // alt-z, toggle video
        if (event.altKey)
        {
           changeVideo();
@@ -1908,12 +1988,17 @@ function docKey(event)
 function uiInit()
 {
    // add chat util to global chat out
-  var chatOut = $(app.GROUP_CHAT_OUT),
+  var jqChatOut = $(app.GROUP_CHAT_OUT),
+      jqChatIn  = $(app.GROUP_CHAT_IN),
       util = new GoCastJS.ChatUtil($(app.GROUP_CHAT_OUT).get(0));
 
-  chatOut.data('util', util);  // install global chat util
+  jqChatOut.data('util', util);  // install global chat util
   $(document).keydown(docKey); // global key handler
 
+  app.altKeyName = app.osPlatform.isMac ? "Opt" : "Alt";
+  app.audioKeyAccel = app.altKeyName + "+A";
+  app.videoKeyAccel = app.altKeyName + "+Z";
+  jqChatIn.attr("title", jqChatIn.attr("title") + " " + app.altKeyName + "+C"); // set chat in tooltip key accel
 }
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
@@ -1963,6 +2048,10 @@ $(document).ready(function(
 
       // Write greeting into console.
       app.log(2, 'Page loaded.');
+
+      Callcast.setCallbackForCallback_OnNicknameInUse(function(nick) {
+        app.nickInUse(nick);
+      });
 
       // set the connection status callback
       Callcast.setCallbackForCallback_ConnectionStatus(connectionStatus);

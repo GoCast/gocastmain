@@ -96,15 +96,15 @@
     <div id="lower-right">
        <input id="dlbtn" type="button" title="Get Updated Plugin." onclick="doDownload();" />
        <!--<input class="vidbtn" type="button" title="Place video content." onclick="startVideoContent();" />-->
-       <input class="vidbtn" type="button" title="Place room content." onclick="startPeopleContent();" />
+       <!--<input class="vidbtn" type="button" title="Place room content." onclick="startPeopleContent();" />-->
        <!--<input class="demobtn" type="button" title="Place demo content." onclick="startDemoContent();" />-->
+       <input id="addItem" type="button" title="Add Spot" onclick="addItem();"/>
+       <input id="addWhiteBoard" type="button" title="Add White Board" onclick="addWhiteBoard();"/>
        <input class="feedback" type="button" title="Send us your feedback." onclick="openChat(event);"/>
        <input class="copyData" type="button" title="Email link to room." onclick="openCopyData(event);"/>
        <!--<input class="twitter" type="button" title="Send message to Twitter." onclick="sendTwitter();"/>-->
        <input class="fbSend"  type="button" title="Send facebook message." onclick="fbSendDialog();"/>
        <input class="fbShare" type="button" title="Share on wall." onclick="fbShare();"/>
-       <input id="addWhiteBoard" type="button" title="Add White Board" onclick="addWhiteBoard();"/>
-       <input id="addItem" type="button" title="Add Spot" onclick="addItem();"/>
        <input id="audio" type="button" class="off" title="Audio is Disabled" disabled="disabled"/>
        <input id="video" type="button" title="Video is Disabled" disabled="disabled"/>
        <p>GoCast.it ©2012 Beta        </p>
@@ -115,11 +115,13 @@
         <img class="logo" src="images/gologo.png" />
        </a>
       -->
-       <div id="msgBoard">
+        <input id="showChat" type="button" title="chat with your group" onclick="showGroupChat(event);"/>
+        <div id="msgBoard">
         <!--<div id="chatOut" class="ui-widget-content"></div>-->
         <div id="chatOut"> </div>
-        <input id="groupChatInput" class="chatTo" placeholder="chat with your group" type="text" onkeydown="keypressGrpChatHandler(event);"/>
-        <button id="send" class="send" onclick="sendGrpChat(event)">Post</button>
+        <input id="groupChatInput" class="chatTo" title="enter a message" placeholder="chat with your group" type="text" onkeydown="keypressGrpChatHandler(event);"/>
+        <button id="send" class="send" title="post it" onclick="sendGrpChat(event)">Post</button>
+        <input class="close" type="button" title="Close Group Chat" onclick="closeGroupChat(event);"/>
        </div>
     </div>
     <div id="boxes">
@@ -149,7 +151,7 @@
          <img class="close" src="images/button-close.png" alt="Close" title="Close" />
          <p>Copy this and paste it into an email.</p>
          <div id="copyContent">
-            <h2>Join us now on the Carousel</h2>
+            <h2>Join us now on GoCast</h2>
             <img id="copyLogo" alt="Room Link" title="Room Link" src="images/gologo.png" />
             <a id="copyName"></a>
          </div>
@@ -197,16 +199,16 @@
         <div id="fb-login-button" class="fb-login-button" data-show-faces="false" data-width="200" data-max-rows="1"
              scope="email,user_likes,friends_likes,publish_actions,friends_online_presence,publish_stream,xmpp_login"></div>
         -->
-        <hr>
         <a id="noThanks" href="javascript:enterId();">no thanks ></a>
       </div>
       <div id="credentials2" class="window resizable">
         <p class="title">Choose a name to use in the room or login with facebook.</p>
         <p class="login-error"></p>
-        <input id="name"  type="text" name="name" placeholder="Please enter your name" />
-        <input id="email" type="text" placeholder="Enter your email (optional)" />
-        <input id="btn"   type="image" alt="Join Now" src="images/joinnow.png" />
-        <hr>
+        <input id="name"  type="text" name="name" placeholder="Enter your nickname for the room" />
+        <input id="email" type="text" placeholder="Enter your email (optional)" /><p/>
+        <!--<input id="btn"   type="image" alt="Join Now" src="images/joinnow.png" />-->
+        <a id="btn" type="button" href="javascript:void(0);">GET STARTED</a><p/>
+        <div class="divider">-- OR --</div>
         <div id="fb-login-button2" class="fb-login-button" data-show-faces="false" data-width="200" data-max-rows="1">login with facebook</div>
         <p class="title">Login with facebook to show profile pictures in spots and post or send invites to this room.</p>
       </div>
@@ -236,6 +238,8 @@
               <div id="effect-none" effect="none" title="no effect" onclick="applyEffect('none');"></div>
               <div id="effect-gray" effect="gray" title="black and white" onclick="applyEffect('gray');"></div>
               <div id="effect-sepia" effect="sepia" title="sepia" onclick="applyEffect('sepia');"></div>
+              <input id="audioPreview" type="button" class="off" title="Audio is Disabled" disabled="disabled"/>
+              <input id="videoPreview" type="button" title="Video is Disabled" disabled="disabled"/>
             </div>
           </div><!-- mystream -->
           <div class="cloudcarousel unoccupied" onclick="carouselItemClick(event);">
@@ -268,7 +272,7 @@
         </div><!-- scontrols -->
       </div><!-- streams -->
       <div id="zoom">
-        <img class="close" src="images/button-close-white.png" alt="Close window" title="Exit zoom mode" onclick="carouselItemUnzoom(event);" />
+        <img class="close" src="images/button-close.png" alt="Close window" title="Exit zoom mode" onclick="carouselItemUnzoom(event);" />
       </div>
     </div><!-- meeting -->
     <div id="scratch"></div>

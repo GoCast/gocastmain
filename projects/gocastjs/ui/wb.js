@@ -38,6 +38,9 @@ GoCastJS.WhiteBoardTools = function(whiteBoard)
   // create eraser
   this.jqEraser = $('<div id="wbEraser"  class="wbEraser" title="Eraser"></div>').appendTo(this.jqTools).click(this.eraserClick).data('wb',this.wb);
 
+  // display whiteboard name
+  $('<span id="wbName"  class="wbName" title="Name">' + this.wb.name + '</span>').appendTo(this.jqTools);
+
   this.initPenColors(this.jqTools);
 
   this.updateTools(); // init toolbar
@@ -276,7 +279,7 @@ GoCastJS.WhiteBoardMouse = function(whiteBoard)
   this.DOWN = "down";
   this.UP   = "up";
   this.state = this.UP; // mouse state
-  this.timeout = 100; // timeout in ms
+  this.timeout = 300; // timeout in ms
   this.currentCommand = []; // the current path see mouse handlers
   this.timer = null; // timer for periodic stroke send
   this.lineCt = 0; // count of lines in commands
@@ -343,8 +346,9 @@ GoCastJS.WhiteBoardSettings.prototype.applyJson = function(settings, context)
 ///
 /// \brief white board constuctor
 ///
-GoCastJS.WhiteBoard = function(spot)
+GoCastJS.WhiteBoard = function(spot, info)
 {
+  this.name = info.spotname;
   this.width = 500; // logicial canvas width
   this.height = 500; // logical canvas height
   this.scale = 1.0; // the scale for x, y dimensions for transform from window to logical coord system
@@ -432,6 +436,7 @@ GoCastJS.WhiteBoard.prototype.init = function()
 ///
 /// \throw
 ///
+/* original hack, not used anymore
 GoCastJS.WhiteBoard.prototype.sendSpot = function()
 {
   var spotnumber = this.jqParent.attr('spotnumber'), // todo refactor spotnumber location
@@ -442,6 +447,7 @@ GoCastJS.WhiteBoard.prototype.sendSpot = function()
   //console.log("WhiteBoard.sendSpot", cmd);
   Callcast.SetSpot(cmd);
 };
+*/
 ///
 /// \brief send mouse stroke to server
 ///
@@ -472,6 +478,7 @@ GoCastJS.WhiteBoard.prototype.doCommands = function(info)
       this.mouseCommands.push(cmds[i]); // add command to local list
     }
     //console.log("WhiteBoard.doCommands cmds ", this.mouseCommands);
+    this.wbCtx.clearRect(0, 0, this.wbCtx.canvas.width, this.wbCtx.canvas.height);
   }
   if (info.strokes)
   { 
@@ -483,14 +490,14 @@ GoCastJS.WhiteBoard.prototype.doCommands = function(info)
       this.mouseCommands.push(cmds.strokes[i]); // add command to local list
     }
     //console.log("WhiteBoard.doCommands strokes ", this.mouseCommands);
+    this.wbCtx.clearRect(0, 0, this.wbCtx.canvas.width, this.wbCtx.canvas.height);
   }
   if (info.stroke) // todo handle races at server, erase canvas and redraw everything
   {
     stroke = JSON.parse(info.stroke);
     //console.log("WhiteBoard.doCommands stroke ", stroke);
-    this.mouseCommands.push(cmds.strokes[i]); // add command to local list
+    this.mouseCommands.push(stroke); // add command to local list
   }
-  this.wbCtx.clearRect(0, 0, this.wbCtx.canvas.width, this.wbCtx.canvas.height);
   for (i = 0; i < this.mouseCommands.length; ++i)
   {
     this.doCommand(this.mouseCommands[i]);
@@ -505,7 +512,7 @@ GoCastJS.WhiteBoard.prototype.doCommands = function(info)
 GoCastJS.WhiteBoard.prototype.doCommand = function(cmdArray)
 {
   var i, cmd;
-  console.log("WhiteBoard.doCommand", cmdArray);
+  //console.log("WhiteBoard.doCommand", cmdArray);
   for (i = 0; i < cmdArray.length; ++i) {
     //console.log("cmd", cmdArray[i]);
     switch (cmdArray[i].name) {
