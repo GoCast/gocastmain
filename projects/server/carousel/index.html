@@ -96,15 +96,15 @@
     <div id="lower-right">
        <input id="dlbtn" type="button" title="Get Updated Plugin." onclick="doDownload();" />
        <!--<input class="vidbtn" type="button" title="Place video content." onclick="startVideoContent();" />-->
-       <input class="vidbtn" type="button" title="Place room content." onclick="startPeopleContent();" />
+       <!--<input class="vidbtn" type="button" title="Place room content." onclick="startPeopleContent();" />-->
        <!--<input class="demobtn" type="button" title="Place demo content." onclick="startDemoContent();" />-->
+       <input id="addItem" type="button" title="Add Spot" onclick="addItem();"/>
+       <input id="addWhiteBoard" type="button" title="Add White Board" onclick="addWhiteBoard();"/>
        <input class="feedback" type="button" title="Send us your feedback." onclick="openChat(event);"/>
        <input class="copyData" type="button" title="Email link to room." onclick="openCopyData(event);"/>
        <!--<input class="twitter" type="button" title="Send message to Twitter." onclick="sendTwitter();"/>-->
        <input class="fbSend"  type="button" title="Send facebook message." onclick="fbSendDialog();"/>
        <input class="fbShare" type="button" title="Share on wall." onclick="fbShare();"/>
-       <input id="addWhiteBoard" type="button" title="Add White Board" onclick="addWhiteBoard();"/>
-       <input id="addItem" type="button" title="Add Spot" onclick="addItem();"/>
        <input id="audio" type="button" class="off" title="Audio is Disabled" disabled="disabled"/>
        <input id="video" type="button" title="Video is Disabled" disabled="disabled"/>
        <p>GoCast.it ©2012 Beta        </p>
@@ -151,7 +151,7 @@
          <img class="close" src="images/button-close.png" alt="Close" title="Close" />
          <p>Copy this and paste it into an email.</p>
          <div id="copyContent">
-            <h2>Join us now on the Carousel</h2>
+            <h2>Join us now on GoCast</h2>
             <img id="copyLogo" alt="Room Link" title="Room Link" src="images/gologo.png" />
             <a id="copyName"></a>
          </div>
