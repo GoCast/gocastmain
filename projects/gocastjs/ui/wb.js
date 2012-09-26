@@ -48,7 +48,7 @@ GoCastJS.WhiteBoardTools = function(whiteBoard)
 
   // display whiteboard name
   $('<span id="wbName"  class="wbName" title="Name">' + this.wb.name + '</span>').appendTo(this.jqTools);
-  //$('.name', this.wb.jq)
+  $('.name', this.wb.jqParent).text(this.wb.name); // set spot name
 
   this.initPenColors(this.jqTools);
 
