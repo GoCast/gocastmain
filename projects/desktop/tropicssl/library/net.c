@@ -79,10 +79,12 @@ static int wsa_init_done = 0;
 /*
  * htons() is not always available
  */
+#ifndef HTONS
 #if defined(__BYTE_ORDER) && defined(__BIG_ENDIAN) && __BYTE_ORDER == __BIG_ENDIAN
 #define HTONS(n) (n)
 #else
 #define HTONS(n) (((((unsigned short)(n) & 0xFF)) << 8) | (((unsigned short)(n) & 0xFF00) >> 8))
+#endif
 #endif
 #define net_htons(n) HTONS(n)
 /*
@@ -214,7 +216,7 @@ int net_accept(int bind_fd, int *client_fd, void *client_ip)
 {
 	struct sockaddr_in client_addr;
 
-#if defined(__socklen_t_defined)
+#if defined(__socklen_t_defined) || defined(_SOCKLEN_T)
 	socklen_t n = (socklen_t) sizeof(client_addr);
 #else
 	int n = (int)sizeof(client_addr);
