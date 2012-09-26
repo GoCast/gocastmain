@@ -377,6 +377,15 @@ body > div#lower-right > p
   color:white;
   margin-right:10px;
 }
+div#lower-left > input#showChat
+{
+  display: none;
+  background-image: url("../images/talk-white.png");
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  width: 25px;
+  height: 20px;
+}
 body > div#lower-left > div#msgBoard
 {
   display:inline;
@@ -466,6 +475,13 @@ body > div#lower-left > div#msgBoard > button#send {
   background-color: black;
   color: white;
   border-radius:15px;
+}
+body > div#lower-left > div#msgBoard > input.close {
+  background-image: url("../images/left-arrow.png");
+  background-size:100% 100%;
+  background-repeat: no-repeat;
+  width: 25px;
+  height: 25px;
 }
 /*<MANJESH>*/
 body> div#lower-left > div#msgBoard > input.chatTo:focus {

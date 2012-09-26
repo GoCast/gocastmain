@@ -45,6 +45,8 @@
  * \brief The main application object.
  */
 var app = {
+  GROUP_CHAT: '#lower-left > #msgBoard',
+  GROUP_CHAT_SHOW: '#lower-left > #showChat',
   GROUP_CHAT_OUT: '#lower-left > #msgBoard > #chatOut',
   GROUP_CHAT_IN: '#lower-left > #msgBoard > input.chatTo',
   MAC_DL_URL: 'https://carousel.gocast.it/downloads/GoCastPlayer.pkg',
@@ -451,7 +453,6 @@ function showPersonalChat(event)
   showPersonalChatWithSpot(spot.get(0));
   $("#msgBoard > input.chatTo", spot).focus();
 }
-
 ///
 /// \brief global handler for close personal chat
 ///
@@ -464,6 +465,26 @@ function closePersonalChat(event)
   console.log("closePersonalChat", event);
   $("#showChat", item.object).css("display", "block"); // hide showChat button
   $("#msgBoard", item.object).css("display", "none"); // show chat ui
+  event.stopPropagation();
+}
+///
+/// \brief handler for global chat showChat button press
+///
+function showGroupChat(event)
+{
+  $(app.GROUP_CHAT_SHOW).stop(true);
+  $(app.GROUP_CHAT_SHOW).css("display", "none");
+  $(app.GROUP_CHAT_SHOW).css("opacity", "1");
+  $(app.GROUP_CHAT).css("display", "block");
+  $(app.GROUP_CHAT_IN).focus();
+}
+///
+/// \brief global handler for close personal chat
+///
+function closeGroupChat(event)
+{
+  $(app.GROUP_CHAT_SHOW).css("display", "block");
+  $(app.GROUP_CHAT).css("display", "none");
   event.stopPropagation();
 }
 

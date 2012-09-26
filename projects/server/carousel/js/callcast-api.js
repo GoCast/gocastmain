@@ -153,6 +153,10 @@ $(document).on('public-message', function(
       name = item.chatName;
     }
     util.addMsg(name, decodeURI(msginfo.body));
+    if ($(app.GROUP_CHAT_SHOW).is(":visible"))
+    {
+      $(app.GROUP_CHAT_SHOW).effect("pulsate", { times:5 }, 5 * 2000);
+    }
     console.log('A public message arrived ' + decodeURI(msginfo.nick) + " " + decodeURI(msginfo.body));
   }
   catch(err)
@@ -763,7 +767,7 @@ function doSpot(spotDiv, info)
         jqDiv.attr('encname', 'whiteBoard');
         jqDiv.attr('spotnumber', info.spotnumber);
         jqDiv.removeClass('unoccupied').addClass('typeContent');
-        whiteBoard = new GoCastJS.WhiteBoard(spotDiv);
+        whiteBoard = new GoCastJS.WhiteBoard(spotDiv, info);
       }
       else // get existing whiteboard
       {
