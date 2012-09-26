@@ -527,6 +527,14 @@ body > div#meeting > div#zoom > div.cloudcarousel > .control
 {
    display: none;
 }
+div.cloudcarousel.whiteBoard > div.name
+{
+  display:none;
+}
+div#scarousel.linear div.cloudcarousel.whiteBoard > div.name
+{
+  display:block;
+}
 div.cloudcarousel > div#msgBoard
 {
   position: absolute;

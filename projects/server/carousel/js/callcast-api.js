@@ -766,7 +766,7 @@ function doSpot(spotDiv, info)
         jqDiv.attr('alt', 'whiteBoard');
         jqDiv.attr('encname', 'whiteBoard');
         jqDiv.attr('spotnumber', info.spotnumber);
-        jqDiv.removeClass('unoccupied').addClass('typeContent');
+        jqDiv.removeClass('unoccupied').addClass('typeContent whiteBoard');
         whiteBoard = new GoCastJS.WhiteBoard(spotDiv, info);
       }
       else // get existing whiteboard
