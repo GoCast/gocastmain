@@ -38,6 +38,9 @@ GoCastJS.WhiteBoardTools = function(whiteBoard)
   // create eraser
   this.jqEraser = $('<div id="wbEraser"  class="wbEraser" title="Eraser"></div>').appendTo(this.jqTools).click(this.eraserClick).data('wb',this.wb);
 
+  // display whiteboard name
+  $('<span id="wbName"  class="wbName" title="Name">' + this.wb.name + '</span>').appendTo(this.jqTools);
+
   this.initPenColors(this.jqTools);
 
   this.updateTools(); // init toolbar
@@ -343,8 +346,9 @@ GoCastJS.WhiteBoardSettings.prototype.applyJson = function(settings, context)
 ///
 /// \brief white board constuctor
 ///
-GoCastJS.WhiteBoard = function(spot)
+GoCastJS.WhiteBoard = function(spot, info)
 {
+  this.name = info.spotname;
   this.width = 500; // logicial canvas width
   this.height = 500; // logical canvas height
   this.scale = 1.0; // the scale for x, y dimensions for transform from window to logical coord system
@@ -432,6 +436,7 @@ GoCastJS.WhiteBoard.prototype.init = function()
 ///
 /// \throw
 ///
+/* original hack, not used anymore
 GoCastJS.WhiteBoard.prototype.sendSpot = function()
 {
   var spotnumber = this.jqParent.attr('spotnumber'), // todo refactor spotnumber location
@@ -442,6 +447,7 @@ GoCastJS.WhiteBoard.prototype.sendSpot = function()
   //console.log("WhiteBoard.sendSpot", cmd);
   Callcast.SetSpot(cmd);
 };
+*/
 ///
 /// \brief send mouse stroke to server
 ///

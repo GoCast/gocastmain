@@ -5,6 +5,11 @@
 .wb-icon { width: 16px; height: 16px; background-image: url(../images/wb-icons.png); }
 .wb-icon-check          { background-position: -64px -144px; }
 .wb-icon-triangle-2-n-s { background-position: -128px -16px; }
+.wbName
+{
+  color:white;
+  margin-left:10px;
+}
 .wbCanvas
 {
   border: 1px solid;
