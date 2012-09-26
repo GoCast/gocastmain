@@ -15,11 +15,19 @@ GoCastJS = (null !== GoCastJS) ? GoCastJS : {};
 ///
 GoCastJS.WhiteBoardTools = function(whiteBoard)
 {
-  var button;
+  var button, visible;
   this.wb = whiteBoard;
   this.DIV = '<div id="wbTools"></div>';
 
-  this.jqTools = $(this.DIV).appendTo(this.wb.jqWb); // todo encapsulate
+  this.jqTools = $(this.DIV).appendTo(this.wb.jqWb);
+
+  // tools may be hidden, get display state
+  visible = this.jqTools.is(":visible");
+
+  if (!visible) // display tools so it's flowed
+  {
+    this.jqTools.css("display", "block");
+  }
 
   // create pen width buttons
   button = $('<div id="wbPenW1"  class="wbButton wbPenW" title="Pen Width 1"  penSize="1"></div>').appendTo(this.jqTools).click(this.penWidthClick).data('wb',this.wb);
@@ -40,10 +48,16 @@ GoCastJS.WhiteBoardTools = function(whiteBoard)
 
   // display whiteboard name
   $('<span id="wbName"  class="wbName" title="Name">' + this.wb.name + '</span>').appendTo(this.jqTools);
+  //$('.name', this.wb.jq)
 
   this.initPenColors(this.jqTools);
 
   this.updateTools(); // init toolbar
+
+  if (!visible) // reset display property
+  {
+    this.jqTools.css("display", "");
+  }
 };
 ///
 /// \brief pen width button click handler
