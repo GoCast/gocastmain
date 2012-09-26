@@ -115,11 +115,13 @@
         <img class="logo" src="images/gologo.png" />
        </a>
       -->
-       <div id="msgBoard">
+        <input id="showChat" type="button" title="chat with your group" onclick="showGroupChat(event);"/>
+        <div id="msgBoard">
         <!--<div id="chatOut" class="ui-widget-content"></div>-->
         <div id="chatOut"> </div>
         <input id="groupChatInput" class="chatTo" title="enter a message" placeholder="chat with your group" type="text" onkeydown="keypressGrpChatHandler(event);"/>
         <button id="send" class="send" title="post it" onclick="sendGrpChat(event)">Post</button>
+        <input class="close" type="button" title="Close" onclick="closeGroupChat(event);"/>
        </div>
     </div>
     <div id="boxes">
