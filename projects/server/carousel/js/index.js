@@ -34,7 +34,8 @@
   connectionStatus,
   videoButtonPress,
   audioButtonPress,
-  openWindow
+  openWindow,
+  carouselItemUnzoom
 */
 'use strict';
 
@@ -747,10 +748,10 @@ function carouselItemZoom(event)
       event.stopPropagation();
    }
 
-   // do nothing if there's a zoomed spot
+   // replace zoomed spot
    if ($('#meeting > #zoom > .cloudcarousel').length > 0)
    {
-      return;
+      carouselItemUnzoom(event);
    }
 
    $('#meeting > #zoom').css('display', 'block'); // display zoom div
