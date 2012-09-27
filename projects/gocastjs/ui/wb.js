@@ -15,11 +15,19 @@ GoCastJS = (null !== GoCastJS) ? GoCastJS : {};
 ///
 GoCastJS.WhiteBoardTools = function(whiteBoard)
 {
-  var button;
+  var button, visible;
   this.wb = whiteBoard;
   this.DIV = '<div id="wbTools"></div>';
 
-  this.jqTools = $(this.DIV).appendTo(this.wb.jqWb); // todo encapsulate
+  this.jqTools = $(this.DIV).appendTo(this.wb.jqWb);
+
+  // tools may be hidden, get display state
+  visible = this.jqTools.is(":visible");
+
+  if (!visible) // display tools so it's flowed
+  {
+    this.jqTools.css("display", "block");
+  }
 
   // create pen width buttons
   button = $('<div id="wbPenW1"  class="wbButton wbPenW" title="Pen Width 1"  penSize="1"></div>').appendTo(this.jqTools).click(this.penWidthClick).data('wb',this.wb);
@@ -40,10 +48,16 @@ GoCastJS.WhiteBoardTools = function(whiteBoard)
 
   // display whiteboard name
   $('<span id="wbName"  class="wbName" title="Name">' + this.wb.name + '</span>').appendTo(this.jqTools);
+  $('.name', this.wb.jqParent).text(this.wb.name); // set spot name
 
   this.initPenColors(this.jqTools);
 
   this.updateTools(); // init toolbar
+
+  if (!visible) // reset display property
+  {
+    this.jqTools.css("display", "");
+  }
 };
 ///
 /// \brief pen width button click handler
@@ -422,7 +436,6 @@ GoCastJS.WhiteBoard.prototype.init = function()
 
   // install handlers
   this.jqCanvas.mousedown(this.onMouseDown);
-  this.jqCanvas.mousemove(this.onMouseMove);
   this.jqCanvas.mouseup(this.onMouseUp);
   this.jqCanvas.mouseout(this.onMouseUp); // trigger mouseup on mouseout todo capture mouse and detect mouseup outside of target
 
@@ -468,39 +481,25 @@ GoCastJS.WhiteBoard.prototype.doCommands = function(info)
 {
   var i, cmds, stroke;
   if (!info) {throw "WhiteBoard.doCommands info is null";}
-  if (info.whiteboardcommandarray)
-  { // todo get rid of info.whiteboardcommandarray, no longer used
-    cmds = JSON.parse(info.whiteboardcommandarray);
-    //console.log("WhiteBoard.doCommands", info, cmds);
-    this.mouseCommands = []; // replace commands
-    for (i = 0; i < cmds.length; ++i)
-    {
-      this.mouseCommands.push(cmds[i]); // add command to local list
-    }
-    //console.log("WhiteBoard.doCommands cmds ", this.mouseCommands);
-    this.wbCtx.clearRect(0, 0, this.wbCtx.canvas.width, this.wbCtx.canvas.height);
-  }
   if (info.strokes)
   { 
     cmds = JSON.parse(info.strokes);
     //console.log("WhiteBoard.doCommands", info, cmds);
+    this.wbCtx.clearRect(0, 0, this.wbCtx.canvas.width, this.wbCtx.canvas.height);
     this.mouseCommands = []; // replace commands
     for (i = 0; i < cmds.strokes.length; ++i)
     {
       this.mouseCommands.push(cmds.strokes[i]); // add command to local list
+      this.doCommand(cmds.strokes[i]);
     }
     //console.log("WhiteBoard.doCommands strokes ", this.mouseCommands);
-    this.wbCtx.clearRect(0, 0, this.wbCtx.canvas.width, this.wbCtx.canvas.height);
   }
   if (info.stroke) // todo handle races at server, erase canvas and redraw everything
   {
     stroke = JSON.parse(info.stroke);
     //console.log("WhiteBoard.doCommands stroke ", stroke);
     this.mouseCommands.push(stroke); // add command to local list
-  }
-  for (i = 0; i < this.mouseCommands.length; ++i)
-  {
-    this.doCommand(this.mouseCommands[i]);
+    this.doCommand(stroke);
   }
   this.restoreMouseLocation();
 };
@@ -592,10 +591,16 @@ GoCastJS.WhiteBoard.prototype.setScale = function(width, height)
 ///
 GoCastJS.WhiteBoard.prototype.onMouseDown = function(event)
 {
+  if (1 !== event.which) // left mouse button only
+  {
+    return;
+  }
+
   var wb = $(this).data("wb"),
       point = wb.mouse.offsetEvent(event),
       x = point.x / wb.scaleW,
       y = point.y / wb.scaleH;
+  wb.jqCanvas.bind('mousemove', wb.onMouseMove); // bind mouse move
   event.stopPropagation();
   wb.tools.jqPenList.css("visibility", "hidden"); // hide pen color list
 
@@ -623,6 +628,7 @@ GoCastJS.WhiteBoard.prototype.onMouseUp = function(event)
       point = wb.mouse.offsetEvent(event),
       x = point.x / wb.scaleW,
       y = point.y / wb.scaleH;
+  wb.jqCanvas.unbind('mousemove', this.onMouseMove); // unbind mouse move
   //console.log('wb.onMouseUp x' + event.offsetX + '(' + x + ') y ' + event.offsetY + '(' + y + ')' , event);
   clearInterval(wb.mouse.timer); 
   wb.mouse.offsetEvent(event);

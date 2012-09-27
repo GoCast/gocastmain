@@ -822,6 +822,14 @@
         //app.log(2, "container w " + width + " h " + height);
         // set round property based on height
         this.round = (zoomedSpot.length === 0 && height > 150) ? true : false;
+        if (!this.round)
+        {
+          $('div#scarousel').addClass('linear');
+        }
+        else
+        {
+          $('div#scarousel').removeClass('linear');
+        }
 
         this.item.orgWidth *= scale;
         this.item.orgHeight *= scale;
