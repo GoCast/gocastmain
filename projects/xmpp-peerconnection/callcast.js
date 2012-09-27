@@ -241,6 +241,7 @@ var Callcast = {
     nick: '',
     joined: false,
     bUseVideo: true,
+    bUseMicrophone: true,
     WIDTH: 256,
     HEIGHT: 192,
     overseer: null,
@@ -270,6 +271,7 @@ var Callcast = {
                 sessionStorage.setItem('room', this.room);
                 sessionStorage.setItem('nick', this.nick);
                 sessionStorage.setItem('bUseVideo', this.bUseVideo);
+                sessionStorage.setItem('bUseMicrophone', this.bUseMicrophone);
             }
             else
             {
@@ -726,6 +728,8 @@ var Callcast = {
         if (this.localstream && this.localstream.audioTracks.length) {
             this.localstream.audioTracks[0].enabled = (typeof (bMute) !== 'undefined') ? !bMute : false;
         }
+
+        this.bUseMicrophone = !bMute;
     },
 
     InitGocastPlayer: function(jqSelector, success, failure) {
@@ -2515,9 +2519,19 @@ var Callcast = {
             if (typeof (Storage) !== 'undefined' && sessionStorage.room)
             {
                 // We need to force a LeaveSession and setup video state too.
-                Callcast.room = sessionStorage.room;
-                Callcast.nick = sessionStorage.nick;
-                Callcast.bUseVideo = sessionStorage.bUseVideo;
+                if (typeof (Storage) !== 'undefined') {
+                    Callcast.room = sessionStorage.room;
+                    Callcast.nick = sessionStorage.nick;
+
+                    if (sessionStorage.bUseVideo === 'true' || sessionStorage.bUseVideo === 'false') {
+                        Callcast.bUseVideo = sessionStorage.bUseVideo;
+                    }
+
+                    if (sessionStorage.bUseMicrophone === 'true' || sessionStorage.bUseMicrophone === 'false') {
+                        Callcast.bUseMicrophone = sessionStorage.bUseMicrophone;
+                    }
+                }
+
                 Callcast.LeaveSession();
             }
 
