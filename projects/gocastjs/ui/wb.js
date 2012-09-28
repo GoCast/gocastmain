@@ -467,7 +467,8 @@ GoCastJS.WhiteBoard.prototype.doCommands = function(info)
       this.doCommand(cmds.strokes[i]);
     }
   }
-  if (info.stroke) // todo handle races at server, erase canvas and redraw everything
+  if (info.stroke && 
+      info.from !== app.user.name) // don't play stokes that we sent
   {
     stroke = JSON.parse(info.stroke);
     //console.log("WhiteBoard.doCommands stroke ", stroke);
@@ -606,10 +607,13 @@ GoCastJS.WhiteBoard.prototype.onMouseUp = function(event)
   //console.log('wb.onMouseUp x' + event.offsetX + '(' + x + ') y ' + event.offsetY + '(' + y + ')' , event);
   clearInterval(wb.mouse.timer); 
   event.stopPropagation();
-  wb.wbCtx.stroke();
-  wb.mouse.currentCommand.push({name: 'stroke'});
-  wb.mouse.currentCommand.push({name: 'restore'});
-  wb.sendStroke(wb.mouse.currentCommand);
+  if (wb.mouse.lineCt > 0)
+  {
+    wb.wbCtx.stroke();
+    wb.mouse.currentCommand.push({name: 'stroke'});
+    wb.mouse.currentCommand.push({name: 'restore'});
+    wb.sendStroke(wb.mouse.currentCommand);
+  }
   wb.mouse.currentCommand = [];
   wb.mouse.lineCt = 0;
 };
