@@ -56,8 +56,8 @@ var app = {
   LIN_32_DL_URL: 'https://carousel.gocast.it/downloads/GoCastPlayer_i686.tar.gz',
   MAC_PL_NAME: 'GCP.plugin',
   WIN_PL_NAME: 'npGCP.dll',
-  SENDLOG_PROMPT: "#upper-right > #send-log-prompt", 
-  SENDLOG_PROMPT_STOP: "#upper-right > #send-log-prompt > #stop-showing", 
+  SENDLOG_PROMPT: "#upper-right > #send-log-prompt",
+  SENDLOG_PROMPT_STOP: "#upper-right > #send-log-prompt > #stop-showing",
   STATUS_PROMPT: "#upper-right > #status-prompt",
   STATUS_PROMPT_STOP: "#upper-right > #status-prompt > #stop-showing",
   spotUrDefaultClass: "control close", // the class for #upper-right image for unoccupied spot
@@ -65,9 +65,9 @@ var app = {
   VID_BUTTON: '#lower-right > #video',
   AUD_BUTTON: '#lower-right > #audio',
   LOCAL_PLUGIN: '#mystream',
-  LOCAL_PLUGIN_OBJECT: '<object class="localplayer" id="GocastPlayerLocal"' + 
-                          'type="application/x-gocastplayer" width="100" height="100">' + 
-                          '<param name="onload" value="pluginLoaded" />' + 
+  LOCAL_PLUGIN_OBJECT: '<object class="localplayer" id="GocastPlayerLocal"' +
+                          'type="application/x-gocastplayer" width="100" height="100">' +
+                          '<param name="onload" value="pluginLoaded" />' +
                         '</object>',
   /**
    * Writes the specified log entry into the console HTML element, if
@@ -312,7 +312,7 @@ var app = {
       $('#settings-prompt').css({'display': 'block'});
       $('#settings-message').html('You\'re now leaving the room. Click <strong>SAVE</strong> in settings to re-enter.');
       $('#settings-prompt > span').css({'display': 'inline'});
-      
+
       $('#settings-ok').click(function() {
         window.localStorage.gcpDontShowSettingsPromptCheck = $('#settings-stop-showing').attr('checked');
         Callcast.LeaveSession(function() { window.location.href = 'gcpsettings'; });
@@ -358,7 +358,7 @@ var app = {
         $('#settings').removeAttr('style');
         $('#settings-prompt').css({'display': 'none'});
         window.localStorage.gcpDontShowSettingsPromptCheck = $('#settings-stop-showing').attr('checked');
-      });      
+      });
     }
   },
 
@@ -1303,7 +1303,7 @@ function changeVideo(enableVideo)
       jqOo.css('background-image', '');
     }
   }
-  else 
+  else
   {
     $('#effectsPanel > div').css({'display': 'none'});
     jqObj.removeClass('on') // change button
@@ -1349,7 +1349,7 @@ function changeAudio(enableAudio)
     bMuteAudio = !enableAudio;
   }
   Callcast.MuteLocalAudioCapture(bMuteAudio);
-  if (bMuteAudio) 
+  if (bMuteAudio)
   {
     app.log(2, 'Audio muted.');
     jqObj.addClass("off");
@@ -1707,11 +1707,21 @@ function handleRoomSetup() {
     }
     else // video available
     {
-      changeVideo(true); // do this unconditionally so ui gets updated
+      if (typeof (Storage) !== 'undefined' && sessionStorage.bUseVideo === 'false') {
+          changeVideo(false);
+      }
+      else {
+        changeVideo(true); // do this unconditionally so ui gets updated
+      }
     }
     if (Callcast.IsMicrophoneDeviceAvailable())
     {
-      changeAudio(true); // do this unconditionally so ui gets updated
+      if (typeof (Storage) !== 'undefined' && sessionStorage.bUseMicrophone === 'false') {
+          changeAudio(false);
+      }
+      else {
+        changeAudio(true); // do this unconditionally so ui gets updated
+      }
     }
   });
 }
@@ -2230,7 +2240,7 @@ function sendLog()
 
   if ("undefined" !== typeof(Storage))
   {
-    window.localStorage.stopSendLogPrompt = checked; // set localstorage 
+    window.localStorage.stopSendLogPrompt = checked; // set localstorage
   }
 
   jqDlg.css('background-image', 'url(images/waiting-trans.gif)');
@@ -2254,7 +2264,7 @@ function sendLog()
 function sendLogPrompt()
 {
   if ("undefined" === typeof(Storage) || "checked" !== window.localStorage.stopSendLogPrompt)
-  {  
+  {
     $(app.SENDLOG_PROMPT).css("display", "block");
   }
   else

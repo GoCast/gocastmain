@@ -241,6 +241,7 @@ var Callcast = {
     nick: '',
     joined: false,
     bUseVideo: true,
+    bUseMicrophone: true,
     WIDTH: 256,
     HEIGHT: 192,
     overseer: null,
@@ -270,6 +271,7 @@ var Callcast = {
                 sessionStorage.setItem('room', this.room);
                 sessionStorage.setItem('nick', this.nick);
                 sessionStorage.setItem('bUseVideo', this.bUseVideo);
+                sessionStorage.setItem('bUseMicrophone', this.bUseMicrophone);
             }
             else
             {
@@ -528,6 +530,10 @@ var Callcast = {
     //
     SetNickname: function(mynick) {
         Callcast.nick = mynick;
+
+        if (!this.fbsr || this.fbsr === '') {
+            this.SendAdHocPres();
+        }
     },
 
     SetUseVideo: function(v_use) {
@@ -726,6 +732,8 @@ var Callcast = {
         if (this.localstream && this.localstream.audioTracks.length) {
             this.localstream.audioTracks[0].enabled = (typeof (bMute) !== 'undefined') ? !bMute : false;
         }
+
+        this.bUseMicrophone = !bMute;
     },
 
     InitGocastPlayer: function(jqSelector, success, failure) {
@@ -1370,16 +1378,33 @@ var Callcast = {
     },
 
     SendFBPres: function() {
-        var pres = $pres({to: this.SWITCHBOARD_FB, intro_sr: this.fbsr, intro_at: this.fbaccesstoken})
-            .c('x', {xmlns: 'http://jabber.org/protocol/muc'});
+        var pres;
 
         // Now that we're connected, let's send our presence info to the switchboard and FB info.
         // Note - we're going to send our INTRO_SR buried in our presence.
         //        This way, the switchboard will know who we are on facebook when our presence is seen.
 
+        // Only send this if there is a fbsr -- they logged in as a facebook user.
+        if (this.fbsr !== '' && this.connection && this.connection.connected && this.connection.authenticated)
+        {
+            pres = $pres({to: this.SWITCHBOARD_FB, intro_sr: this.fbsr, intro_at: this.fbaccesstoken})
+                .c('x', {xmlns: 'http://jabber.org/protocol/muc'});
+
+            this.fb_sent_pres = true;
+            this.connection.send(pres);
+        }
+    },
+
+    SendAdHocPres: function() {
+        var pres;
+
+        // Now that we're connected, let's send our presence info to the switchboard
+
         if (this.connection && this.connection.connected && this.connection.authenticated)
         {
-            this.fb_sent_pres = true;
+            pres = $pres({to: this.SWITCHBOARD_FB, adhocname: this.nick})
+                .c('x', {xmlns: 'http://jabber.org/protocol/muc'});
+
             this.connection.send(pres);
         }
     },
@@ -2515,9 +2540,19 @@ var Callcast = {
             if (typeof (Storage) !== 'undefined' && sessionStorage.room)
             {
                 // We need to force a LeaveSession and setup video state too.
-                Callcast.room = sessionStorage.room;
-                Callcast.nick = sessionStorage.nick;
-                Callcast.bUseVideo = sessionStorage.bUseVideo;
+                if (typeof (Storage) !== 'undefined') {
+                    Callcast.room = sessionStorage.room;
+                    Callcast.nick = sessionStorage.nick;
+
+                    if (sessionStorage.bUseVideo === 'true' || sessionStorage.bUseVideo === 'false') {
+                        Callcast.bUseVideo = sessionStorage.bUseVideo;
+                    }
+
+                    if (sessionStorage.bUseMicrophone === 'true' || sessionStorage.bUseMicrophone === 'false') {
+                        Callcast.bUseMicrophone = sessionStorage.bUseMicrophone;
+                    }
+                }
+
                 Callcast.LeaveSession();
             }
 
@@ -2653,7 +2688,9 @@ var Callcast = {
 
     finalizeConnect: function() {
         this.connection.send($pres());
-        this.SendFBPres();
+        if (this.fbsr && this.fbsr !== '') {
+            this.SendFBPres();
+        }
 
 /*
  Callcast.connection.rawInput = function(data) {
