@@ -396,6 +396,9 @@ div#lower-left > input#showChat
   background-repeat: no-repeat;
   width: 25px;
   height: 20px;
+  position:absolute;
+  bottom:0px;
+  left:0px;
 }
 body > div#lower-left > div#msgBoard
 {

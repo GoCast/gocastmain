@@ -56,8 +56,8 @@ var app = {
   LIN_32_DL_URL: 'https://carousel.gocast.it/downloads/GoCastPlayer_i686.tar.gz',
   MAC_PL_NAME: 'GCP.plugin',
   WIN_PL_NAME: 'npGCP.dll',
-  SENDLOG_PROMPT: "#upper-right > #send-log-prompt", 
-  SENDLOG_PROMPT_STOP: "#upper-right > #send-log-prompt > #stop-showing", 
+  SENDLOG_PROMPT: "#upper-right > #send-log-prompt",
+  SENDLOG_PROMPT_STOP: "#upper-right > #send-log-prompt > #stop-showing",
   STATUS_PROMPT: "#upper-right > #status-prompt",
   STATUS_PROMPT_STOP: "#upper-right > #status-prompt > #stop-showing",
   spotUrDefaultClass: "control close", // the class for #upper-right image for unoccupied spot
@@ -312,7 +312,7 @@ var app = {
       $('#settings-prompt').css({'display': 'block'});
       $('#settings-message').html('You\'re now leaving the room. Click <strong>SAVE</strong> in settings to re-enter.');
       $('#settings-prompt > span').css({'display': 'inline'});
-      
+
       $('#settings-ok').click(function() {
         window.localStorage.gcpDontShowSettingsPromptCheck = $('#settings-stop-showing').attr('checked');
         Callcast.LeaveSession(function() { window.location.href = 'gcpsettings'; });
@@ -358,7 +358,7 @@ var app = {
         $('#settings').removeAttr('style');
         $('#settings-prompt').css({'display': 'none'});
         window.localStorage.gcpDontShowSettingsPromptCheck = $('#settings-stop-showing').attr('checked');
-      });      
+      });
     }
   },
 
@@ -409,10 +409,6 @@ var app = {
     });
   }
 //</MANJESH>
-
-  // video enabled state todo this must be initially in sync with video button class and Callcast
-  //       make either this var or button class the state variable
-  //videoEnabled: true
 }; /* app */
 
 ///
@@ -474,9 +470,9 @@ function closePersonalChat(event)
 function showGroupChat(event)
 {
   $(app.GROUP_CHAT_SHOW).stop(true);
-  $(app.GROUP_CHAT_SHOW).css("display", "none");
+  $(app.GROUP_CHAT_SHOW).hide();
   $(app.GROUP_CHAT_SHOW).css("opacity", "1");
-  $(app.GROUP_CHAT).css("display", "block");
+  $(app.GROUP_CHAT).css("visibility", "visible");
   $(app.GROUP_CHAT_IN).focus();
 }
 ///
@@ -484,8 +480,8 @@ function showGroupChat(event)
 ///
 function closeGroupChat(event)
 {
-  $(app.GROUP_CHAT_SHOW).css("display", "block");
-  $(app.GROUP_CHAT).css("display", "none");
+  $(app.GROUP_CHAT_SHOW).show();
+  $(app.GROUP_CHAT).css("visibility", "hidden");
   event.stopPropagation();
 }
 
@@ -1327,7 +1323,7 @@ function changeVideo(enableVideo)
       jqOo.css('background-image', '');
     }
   }
-  else 
+  else
   {
     $('#effectsPanel > div').css({'display': 'none'});
     jqObj.removeClass('on') // change button
@@ -1373,7 +1369,7 @@ function changeAudio(enableAudio)
     bMuteAudio = !enableAudio;
   }
   Callcast.MuteLocalAudioCapture(bMuteAudio);
-  if (bMuteAudio) 
+  if (bMuteAudio)
   {
     app.log(2, 'Audio muted.');
     jqObj.addClass("off");
@@ -1731,11 +1727,21 @@ function handleRoomSetup() {
     }
     else // video available
     {
-      changeVideo(true); // do this unconditionally so ui gets updated
+      if (typeof (Storage) !== 'undefined' && sessionStorage.bUseVideo === 'false') {
+          changeVideo(false);
+      }
+      else {
+        changeVideo(true); // do this unconditionally so ui gets updated
+      }
     }
     if (Callcast.IsMicrophoneDeviceAvailable())
     {
-      changeAudio(true); // do this unconditionally so ui gets updated
+      if (typeof (Storage) !== 'undefined' && sessionStorage.bUseMicrophone === 'false') {
+          changeAudio(false);
+      }
+      else {
+        changeAudio(true); // do this unconditionally so ui gets updated
+      }
     }
   });
 }
@@ -2273,7 +2279,7 @@ function sendLog()
 
   if ("undefined" !== typeof(Storage))
   {
-    window.localStorage.stopSendLogPrompt = checked; // set localstorage 
+    window.localStorage.stopSendLogPrompt = checked; // set localstorage
   }
 
   jqDlg.css('background-image', 'url(images/waiting-trans.gif)');
@@ -2297,7 +2303,7 @@ function sendLog()
 function sendLogPrompt()
 {
   if ("undefined" === typeof(Storage) || "checked" !== window.localStorage.stopSendLogPrompt)
-  {  
+  {
     $(app.SENDLOG_PROMPT).css("display", "block");
   }
   else

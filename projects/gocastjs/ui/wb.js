@@ -290,9 +290,6 @@ GoCastJS.WhiteBoardTools.prototype.updateTools = function()
 ///
 GoCastJS.WhiteBoardMouse = function(whiteBoard)
 {
-  this.DOWN = "down";
-  this.UP   = "up";
-  this.state = this.UP; // mouse state
   this.timeout = 300; // timeout in ms
   this.currentCommand = []; // the current path see mouse handlers
   this.timer = null; // timer for periodic stroke send
@@ -302,9 +299,9 @@ GoCastJS.WhiteBoardMouse = function(whiteBoard)
 ///
 /// \brief calc mouse x,y relative to target across browser
 ///
-GoCastJS.WhiteBoardMouse.prototype.offsetEvent = function(event)
+GoCastJS.WhiteBoardMouse.prototype.offsetEvent = function(event, jqTarget)
 {
-  var targetOffset = $(event.target).offset(),
+  var targetOffset = jqTarget.offset(),
       offX         = event.pageX - targetOffset.left,
       offY         = event.pageY - targetOffset.top;
   //console.log("event offsetX " + event.offsetX + "offX " + offX);
@@ -385,8 +382,6 @@ GoCastJS.WhiteBoard = function(spot, info)
   this.parent = spot;           // the parent dom object
   this.jqParent = $(this.parent); // the parent jq object
 
-  this.mouseCommands = []; // array of mouse commands
-
   this.init(); // initialize
 }; // whiteboard constructor
 ///
@@ -436,31 +431,12 @@ GoCastJS.WhiteBoard.prototype.init = function()
 
   // install handlers
   this.jqCanvas.mousedown(this.onMouseDown);
-  this.jqCanvas.mouseup(this.onMouseUp);
-  this.jqCanvas.mouseout(this.onMouseUp); // trigger mouseup on mouseout todo capture mouse and detect mouseup outside of target
 
   // change the zoom icon to black for white background
   $("img#upper-left", this.jqParent).attr("src", "images/fullscreen-black.png");
 
 }; // whiteboard init
 
-///
-/// \brief send mouse command to server
-///
-/// \throw
-///
-/* original hack, not used anymore
-GoCastJS.WhiteBoard.prototype.sendSpot = function()
-{
-  var spotnumber = this.jqParent.attr('spotnumber'), // todo refactor spotnumber location
-      cmd        = {spotnumber: spotnumber, // update 
-                    spottype: "whiteBoard", // whiteboard
-                    spotreplace: "first-unoc", // set replace for replayed setspot
-                    whiteboardcommandarray: JSON.stringify(this.mouseCommands)}; // send command array
-  //console.log("WhiteBoard.sendSpot", cmd);
-  Callcast.SetSpot(cmd);
-};
-*/
 ///
 /// \brief send mouse stroke to server
 ///
@@ -486,19 +462,16 @@ GoCastJS.WhiteBoard.prototype.doCommands = function(info)
     cmds = JSON.parse(info.strokes);
     //console.log("WhiteBoard.doCommands", info, cmds);
     this.wbCtx.clearRect(0, 0, this.wbCtx.canvas.width, this.wbCtx.canvas.height);
-    this.mouseCommands = []; // replace commands
     for (i = 0; i < cmds.strokes.length; ++i)
     {
-      this.mouseCommands.push(cmds.strokes[i]); // add command to local list
       this.doCommand(cmds.strokes[i]);
     }
-    //console.log("WhiteBoard.doCommands strokes ", this.mouseCommands);
   }
-  if (info.stroke) // todo handle races at server, erase canvas and redraw everything
+  if (info.stroke && 
+      info.from !== app.user.name) // don't play stokes that we sent
   {
     stroke = JSON.parse(info.stroke);
     //console.log("WhiteBoard.doCommands stroke ", stroke);
-    this.mouseCommands.push(stroke); // add command to local list
     this.doCommand(stroke);
   }
   this.restoreMouseLocation();
@@ -549,8 +522,7 @@ GoCastJS.WhiteBoard.prototype.restoreMouseLocation = function()
 {
   var length = this.mouse.currentCommand.length;
   // if mouse not down or commands empty nothing to do
-  if (this.mouse.DOWN === this.mouse.state && // mouse is down
-      this.mouse.currentCommand.length > 0 && // there are mouse moves
+  if (this.mouse.currentCommand.length > 0 && // there are mouse moves
       "lineTo" === this.mouse.currentCommand[length-1].name) // the last command is lineTo
   {
     // move the mouse to last position
@@ -597,16 +569,17 @@ GoCastJS.WhiteBoard.prototype.onMouseDown = function(event)
   }
 
   var wb = $(this).data("wb"),
-      point = wb.mouse.offsetEvent(event),
+      point = wb.mouse.offsetEvent(event, wb.jqCanvas),
       x = point.x / wb.scaleW,
       y = point.y / wb.scaleH;
-  wb.jqCanvas.bind('mousemove', wb.onMouseMove); // bind mouse move
+  $(window).bind('mousemove', wb.onMouseMove) // bind mouse handlers
+           .bind('mouseup', wb.onMouseUp)
+           .data('wb', wb);
   event.stopPropagation();
   wb.tools.jqPenList.css("visibility", "hidden"); // hide pen color list
 
   wb.mouse.timer = setInterval(wb.getStrokeTimeout(), wb.mouse.timeout);
   //console.log('wb.onMouseDown x' + event.offsetX + '(' + x + ') y ' + event.offsetY + '(' + y + ')' , event);
-  wb.mouse.state = wb.mouse.DOWN;
   wb.settings.apply(wb.wbCtx);
   wb.wbCtx.beginPath();
   wb.wbCtx.moveTo(x, y);
@@ -625,22 +598,23 @@ GoCastJS.WhiteBoard.prototype.onMouseDown = function(event)
 GoCastJS.WhiteBoard.prototype.onMouseUp = function(event)
 {
   var wb = $(this).data("wb"),
-      point = wb.mouse.offsetEvent(event),
+      point = wb.mouse.offsetEvent(event, wb.jqCanvas),
       x = point.x / wb.scaleW,
       y = point.y / wb.scaleH;
-  wb.jqCanvas.unbind('mousemove', this.onMouseMove); // unbind mouse move
+  $(window).unbind('mousemove', wb.onMouseMove) // unbind mouse handlers
+           .unbind('mouseup', wb.onMouseUp)
+           .removeData('wb');
   //console.log('wb.onMouseUp x' + event.offsetX + '(' + x + ') y ' + event.offsetY + '(' + y + ')' , event);
   clearInterval(wb.mouse.timer); 
-  wb.mouse.offsetEvent(event);
   event.stopPropagation();
-  if (wb.mouse.DOWN === wb.mouse.state) {
+  if (wb.mouse.lineCt > 0)
+  {
     wb.wbCtx.stroke();
     wb.mouse.currentCommand.push({name: 'stroke'});
     wb.mouse.currentCommand.push({name: 'restore'});
     wb.sendStroke(wb.mouse.currentCommand);
-    wb.mouse.currentCommand = [];
   }
-  wb.mouse.state = wb.mouse.UP;
+  wb.mouse.currentCommand = [];
   wb.mouse.lineCt = 0;
 };
 
@@ -652,16 +626,14 @@ GoCastJS.WhiteBoard.prototype.onMouseUp = function(event)
 GoCastJS.WhiteBoard.prototype.onMouseMove = function(event)
 {
   var wb = $(this).data("wb"),
-      point = wb.mouse.offsetEvent(event),
+      point = wb.mouse.offsetEvent(event, wb.jqCanvas),
       x = point.x / wb.scaleW,
       y = point.y / wb.scaleH;
   //console.log('wb.onMouseMove x' + event.offsetX + '(' + x + ') y ' + event.offsetY + '(' + y + ')' , event);
   event.stopPropagation();
   // todo make sure event is a JQuery event
-  if (wb.mouse.DOWN === wb.mouse.state){
-    wb.wbCtx.lineTo(x, y);
-    wb.wbCtx.stroke(); // draw stroke but don't push it, stroke is pushed on mouse up at end of cmd
-    wb.mouse.currentCommand.push({name: 'lineTo', x: (x >> 0), y: (y >> 0)});
-    ++wb.mouse.lineCt;
-  }
+  wb.wbCtx.lineTo(x, y);
+  wb.wbCtx.stroke(); // draw stroke but don't push it, stroke is pushed on mouse up at end of cmd
+  wb.mouse.currentCommand.push({name: 'lineTo', x: (x >> 0), y: (y >> 0)});
+  ++wb.mouse.lineCt;
 };

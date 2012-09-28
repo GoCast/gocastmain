@@ -38,10 +38,10 @@ function useritem(properties) {
 
 useritem.prototype.numJidsAssociated = function() {
 	var numjids = 0;
-	
+
 	for (k in this.jids)
 		numjids ++;
-	
+
 	return numjids;
 };
 
@@ -241,7 +241,7 @@ switchboard.prototype.handleMessage = function(msg) {
 					// Multiple jids?
 					for (m in this.userlist[k].getJidList())
 						the_list += ", jid:" + m;
-					
+
 					the_list += "\n";
 				}
 
@@ -305,7 +305,7 @@ switchboard.prototype.intro_sr = function(from, blob, cb) {
 							// This would happen if a given anonymous jid logged out of facebook and back in as someone else.
 							self.log("ERROR: JID already in database. Clearing jid for FB user - " + self.jidlist[fromjid].name);
 							self.jidlist[fromjid].removeJid(fromjid);
-							
+
 							// Now that we've removed the jid from the useritem, if there are no other jids, then it's abandoned.
 							// So, we can remove the useritem altogether.
 							if (self.jidlist[fromjid].numJidsAssociated() === 0)
@@ -320,7 +320,7 @@ switchboard.prototype.intro_sr = function(from, blob, cb) {
 						{
 							self.jidlist[fromjid] = self.userlist[result.id];
 
-							var wholog = "Online: FBName:" + result.name + ", FBID:" + result.id + ", email:" + result.email + ", jid:" + fromjid;
+							var wholog = "Online: FBName:" + result.name + ":, FBID:" + result.id + ", email:" + result.email + ", jid:" + fromjid;
 							self.log(wholog);
 							self.notifylog(wholog);
 //							console.log("DEBUG: ", result);
@@ -358,17 +358,17 @@ switchboard.prototype.handlePresence = function(pres) {
 			fbuseritem = this.jidlist[from];
 			fbname = fbuseritem.name;
 		}
-		
+
 		if (pres.attrs.type === 'unavailable')
 		{
 			this.log("Got pres (OFFLINE): " + from + (fbname ? (" - Facebook: " + fbname) : ""));
-			
+
 			// Need to remove user and jid from online list.
 			if (fbuseritem)
 			{
 				// Definitely delete the jidlist[] entry.
 				delete this.jidlist[from];
-				
+
 				// If the useritem contains more than 1 jid entry, we can't delete the fb username.
 				if (this.userlist[fbuseritem.id])
 				{
@@ -377,7 +377,7 @@ switchboard.prototype.handlePresence = function(pres) {
 						delete this.userlist[fbuseritem.id];
 				}
 			}
-			
+
 		}
 		else
 		{
@@ -411,6 +411,9 @@ switchboard.prototype.handlePresence = function(pres) {
 						*/
 					});
 				});
+			}
+			else if (pres.attrs.adhocname) {
+				self.log('Online: Ad-hoc-Name:' + pres.attrs.adhocname + ':');
 			}
 		}
 	}
@@ -497,7 +500,7 @@ function notifier(serverinfo, jidlist) {
 //		  	console.log(logDate() + " - Notifier offline.");
 		  	self.isOnline = false;
 		  });
-		  
+
 	this.client.on('error', function(e) {
 		sys.puts(e);
 	});

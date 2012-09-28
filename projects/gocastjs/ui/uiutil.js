@@ -23,7 +23,7 @@ GoCastJS.ChatUtil = function(objIn, animCb)
   this.domObj = objIn;          // the chat div
   this.jqChat = $(this.domObj); // jq chat div
   this.jqTable = $("<table></table>").appendTo(this.jqChat);
-  this.span = $('<span id="text-width"></span>').appendTo(this.jqChat);
+  this.jqSpan = $('<span id="text-width"></span>').appendTo(this.jqChat);
   this.msgNumber = 0;           // unique msg number assigned to msg's
   this.animCb = animCb;         // the animate callback
 }; // ChatUtil constructor
@@ -97,8 +97,8 @@ GoCastJS.ChatUtil.prototype.adjustWidths = function()
 ///
 GoCastJS.ChatUtil.prototype.getTextWidth = function(text)
 {
-  this.span.html(text);
-  return this.span.width();
+  this.jqSpan.html(text);
+  return this.jqSpan.width();
 };
 ///
 /// \brief adjust child dimensions
