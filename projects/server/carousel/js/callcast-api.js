@@ -50,6 +50,7 @@ $(document).on('joined_session', function(
    * Enable button activities except join. */
   app.enableButtons(true);
   closeWindow();
+  promptTour();
 
   //todo put openmeeting here to load plugin earlier
 

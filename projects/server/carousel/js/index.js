@@ -999,7 +999,7 @@ function promptTour() {
     });
     $('body > #tour > button#skip').css({'visibility': 'hidden'});
 
-    $('body > #tour > h3 > span#nick').text(app.user.name.replace(/%20/g, ' ') + ' !');
+    $('body > #tour > h3 > span#nick').text(app.user.name.replace(/%20/g, ' ') + '!');
     $('body > #tour > button#imgood').click(function() {
       $('body > #tour').css({'display': 'none'});
       if ('checked' === $('body > #tour > input#dontShowAgain').attr('checked')) {
@@ -1777,6 +1777,9 @@ function tryPluginInstall(
   // if plugin installed but not loaded wait
   // todo get rid of multiple pluginInstalled calls
 
+  //For Chrome to reload the plugin after its installed by calling
+  //navigator.plugins.refresh(), the object tag must already be in the
+  //html.
   if ('Chrome' === app.browser.name) {
     if(loadPluginOnce) {
       loadPluginOnce();
@@ -1797,7 +1800,6 @@ function tryPluginInstall(
     $('.window .close').on('click', closeWindow);
     // Resize window.
     $(window).resize(resizeWindows);
-    promptTour();
   }
   else { // plugin not loaded or out of date
     // prompt user to install plugin
@@ -2321,9 +2323,15 @@ function addItem() {
 }
 
 function describeTourObject(tourSelector, objSelector, objDescription) {
-  $(objSelector).effect('pulsate', {times: 7}, 14000);
+  var opacity = 1.0, pulsateTimer = setInterval(function(){
+    opacity = (1.0 === opacity) ? 0.0 : 1.0;
+    $(objSelector).fadeTo(1000, opacity);
+  }, 1000);
+  
   $(tourSelector + ' > h3').html(objDescription.title);
   $(tourSelector + ' > p#desc').text(objDescription.description);
+
+  return pulsateTimer;
 }
 
 function startTour(tourSelector) {
@@ -2367,51 +2375,51 @@ function startTour(tourSelector) {
     {title: 'Give Us Your Feedback', description: 'We\'d love to hear about your experience with our WebApp. ' +
                                                   'Click on the FEEDBACK button on the LOWER-RIGHT corner ' +
                                                   'of your screen.'}
-  ], tourTimer, tourIdx = 0;
+  ], tourTimer, pulsateTimer, tourIdx = 0;
 
-  $(tourSelector + ' > button#sure').css({'visibility': 'hidden'});
-  $(tourSelector + ' > button#imgood').css({'visibility': 'hidden'});
-  $(tourSelector + ' > input#dontShowAgain').css({'display': 'none'});
-  $(tourSelector + ' > span').css({'display': 'none'});
-  describeTourObject(tourSelector, tourObjects[0], tourDescriptions[0]);
   
-  tourTimer = setInterval(function() {
+  $(tourSelector + ' > button#imgood').unbind('click').text('NEXT')
+                                      .click(function() {
     tourIdx++;
+    clearInterval(pulsateTimer);
     $(tourObjects[tourIdx-1]).stop(true, true);
-
-    if (2 === tourIdx) {
-      $('.cloudcarousel.unoccupied').css({'visibility': 'hidden'});
-    } else if (2 < tourIdx) {
-      $(tourObjects[tourIdx-1]).removeAttr('style');
-    } else if (1 === tourIdx) {
-      $(tourObjects[tourIdx-1]).css({
-        'visibility': 'visible',
-        'opacity': '1.0' 
-      });
-
-    }
 
     if (2 <= tourIdx) {
       $(tourObjects[tourIdx]).width(function(idx) {
-        $(this).width($(this).width()*2);
-        $(this).height($(this).height()*2);
+        $(this).width($(this).width()*4);
+        $(this).height($(this).height()*4);
       });
+
+      if (2 === tourIdx) {
+        $('.cloudcarousel.unoccupied').css({'visibility': 'hidden'});
+      } else {
+        $(tourObjects[tourIdx-1]).removeAttr('style');
+      }
+    } 
+
+    if (2 >= tourIdx) {
+      $(tourObjects[tourIdx-1]).css({
+        'visibility': 'visible',
+        'opacity': '1.0' 
+      });      
     }
 
     if(tourIdx >= tourObjects.length) {
-      clearInterval(tourTimer);
+      $(this).attr('disabled', 'disabled');
       $('.cloudcarousel.unoccupied').css({'visibility': 'visible'});
       $(tourSelector + ' > button#skip').text('DONE');
+      $(tourSelector + ' > h3').html('You\'re All Set!');
+      $(tourSelector + ' > p#desc').text('Enjoy!!!');
     } else {
-      describeTourObject(tourSelector,
-                         tourObjects[tourIdx],
-                         tourDescriptions[tourIdx]);      
+      pulsateTimer = describeTourObject(tourSelector,
+                                        tourObjects[tourIdx],
+                                        tourDescriptions[tourIdx]);      
     }
-  }, 14000);
-
+  });
+    
   $(tourSelector + ' > button#skip').css({'visibility': 'visible'})
                                     .click(function() {
-    clearInterval(tourTimer);
+    clearInterval(pulsateTimer);
     $(tourObjects[0] + ', ' + tourObjects[1]).stop(true, true).css({
       'visibility': 'visible',
       'opacity': '1.0'
@@ -2428,4 +2436,11 @@ function startTour(tourSelector) {
 
     $(tourSelector).css({'display': 'none'});
   });
+
+  $(tourSelector + ' > button#sure').css({'visibility': 'hidden'});
+  $(tourSelector + ' > input#dontShowAgain').css({'display': 'none'});
+  $(tourSelector + ' > span').css({'display': 'none'});
+  pulsateTimer = describeTourObject(tourSelector,
+                                    tourObjects[0],
+                                    tourDescriptions[0]);
 }
