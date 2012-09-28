@@ -230,10 +230,10 @@
       <div id="streams">
         <div id="scarousel">
           <div class="cloudcarousel" id="mystream">
-            <object class="localplayer" id="GocastPlayerLocal"
+            <!--<object class="localplayer" id="GocastPlayerLocal"
                     type="application/x-gocastplayer" width="0" height="0">
                <param name="onload" value="pluginLoaded" />
-            </object>
+            </object>-->
             <div id="effectsPanel">
               <div id="effect-none" effect="none" title="no effect" onclick="applyEffect('none');"></div>
               <div id="effect-gray" effect="gray" title="black and white" onclick="applyEffect('gray');"></div>
@@ -276,5 +276,13 @@
       </div>
     </div><!-- meeting -->
     <div id="scratch"></div>
+    <div id="tour">
+      <h3>Hi, <span id="nick"></span></h3>
+      <p id="desc">Let's take a quick tour.</p>
+      <input id="dontShowAgain" type="checkbox" /><span style="color: grey;">Don't show this again.</span><p></p>
+      <button id="sure">SURE</button>
+      <button id="skip">SKIP TOUR</button>
+      <button id="imgood">I'M GOOD</button>
+    </div>
   </body>
 </html>

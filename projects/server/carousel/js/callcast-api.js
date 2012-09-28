@@ -429,8 +429,7 @@ $(document).on('one-login-complete', function(event, msg) {
     openMeeting();
 
     // instantiate local plugin
-    // not working on firefix, object is appended but plugin does not load
-    //(app.LOCAL_PLUGIN_OBJECT).appendTo(app.LOCAL_PLUGIN);
+    // not working on firefox, object is appended but plugin does not load
 
     // check, install plugin
     tryPluginInstall();
