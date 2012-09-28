@@ -1,4 +1,5 @@
 /etc/inittab
+/etc/rc.local
 /etc/bosh.js.conf
 /etc/sysconfig/openfire
 /etc/httpd/conf/httpd.conf

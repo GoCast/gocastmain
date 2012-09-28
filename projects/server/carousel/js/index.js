@@ -65,9 +65,9 @@ var app = {
   VID_BUTTON: '#lower-right > #video',
   AUD_BUTTON: '#lower-right > #audio',
   LOCAL_PLUGIN: '#mystream',
-  LOCAL_PLUGIN_OBJECT: '<object class="localplayer" id="GocastPlayerLocal"' +
-                          'type="application/x-gocastplayer" width="100" height="100">' +
-                          '<param name="onload" value="pluginLoaded" />' +
+  LOCAL_PLUGIN_OBJECT: '<object class="localplayer" id="GocastPlayerLocal"' + 
+                          ' type="application/x-gocastplayer" width="0" height="0">' + 
+                          '<param name="onload" value="pluginLoaded" />' + 
                         '</object>',
   /**
    * Writes the specified log entry into the console HTML element, if
@@ -986,7 +986,27 @@ function openMeeting(
   return false;
 } /* openMeeting() */
 
+function promptTour() {
+  if ('undefined' !== typeof(Storage) && !window.localStorage.gcpDontShowTourCheck) {
+    $('body > #tour').css({
+      'display': 'block',
+      'left'   : '0px',
+      'top'    : '0px'
+    });
+    $('body > #tour > button#skip').css({'visibility': 'hidden'});
 
+    $('body > #tour > h3 > span#nick').text(app.user.name.replace(/%20/g, ' ') + '!');
+    $('body > #tour > button#imgood').click(function() {
+      $('body > #tour').css({'display': 'none'});
+      if ('checked' === $('body > #tour > input#dontShowAgain').attr('checked')) {
+        window.localStorage.gcpDontShowTourCheck = 'true';
+      }
+    });
+    $('body > #tour > button#sure').click(function() {
+      startTour('body > #tour');
+    });
+  }
+}
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
@@ -1740,6 +1760,11 @@ function checkForPluginOptionalUpgrades()
     $("#lower-right > #dlbtn").css("display", "block");
   }
 }
+
+var loadPluginOnce = function() {
+  $(app.LOCAL_PLUGIN_OBJECT).prependTo(app.LOCAL_PLUGIN);
+  loadPluginOnce = null;
+};
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
  * \brief check if plugin installed and prompt user if not
@@ -1752,13 +1777,28 @@ function tryPluginInstall(
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
   var title, prompt;
+
   app.log(2, 'tryPluginInstall');
   // check plugin installed.
   // if plugin installed but not loaded wait
   // todo get rid of multiple pluginInstalled calls
+
+  //For Chrome to reload the plugin after its installed by calling
+  //navigator.plugins.refresh(), the object tag must already be in the
+  //html.
+  if ('Chrome' === app.browser.name) {
+    if(loadPluginOnce) {
+      loadPluginOnce();
+    }    
+  }
+
   if (app.pluginInstalled() && !app.pluginLoaded)
   {
-     setTimeout(tryPluginInstall, 500);
+    // Add the plugin object html to the carousel only once
+    if (loadPluginOnce) {
+      loadPluginOnce();
+    }
+    setTimeout(tryPluginInstall, 500);
   }
   else if (app.pluginInstalled() && app.pluginLoaded && !app.pluginUpgrade) // good to go
   {
@@ -1766,7 +1806,6 @@ function tryPluginInstall(
     $('.window .close').on('click', closeWindow);
     // Resize window.
     $(window).resize(resizeWindows);
-
   }
   else { // plugin not loaded or out of date
     // prompt user to install plugin
@@ -2287,4 +2326,127 @@ function addItem() {
   Callcast.AddSpot({spottype: "new"}, function() {
     console.log("carousel addItem callback");
   });
+}
+
+function describeTourObject(tourSelector, objSelector, objDescription) {
+  var opacity = 1.0, pulsateTimer = setInterval(function(){
+    opacity = (1.0 === opacity) ? 0.0 : 1.0;
+    $(objSelector).fadeTo(1000, opacity);
+  }, 1000);
+  
+  $(tourSelector + ' > h3').html(objDescription.title);
+  $(tourSelector + ' > p#desc').text(objDescription.description);
+
+  return pulsateTimer;
+}
+
+function startTour(tourSelector) {
+  var tourObjects = [
+    'body > #meeting > #streams > #scarousel',
+    '#mystream',
+    '#effectsPanel > div',
+    'input[id*=video], input[id*=audio]',
+    '#lower-right > input[id*=add]',
+    '#lower-left > div#msgBoard',
+    '#lower-right > input[class*=fb]',
+    '#lower-right > input[class=copyData]',
+    '#lower-right > input[class=feedback]'
+  ], tourDescriptions = [
+    {title: 'The Carousel', description: 'It contains your preview as well ' +
+                                         'as empty "spots". They can be ' +
+                                         'occupied by other people in the ' +
+                                         'room, as well as shared content. ' +
+                                         'Use your ARROW KEYS / MOUSE WHEEL ' +
+                                         'to rotate the carousel.'},
+    {title: 'Preview Window', description: 'It shows the mirrored feed of ' +
+                                           'your webcam.'},
+    {title: 'Video Effects', description: 'Change the look of your video feed by ' +
+                                          'choosing one of the effects [gray/sepia]. ' +
+                                          'The buttons are just below your preview.'},
+    {title: 'Media Controls', description: 'Turn on/off your video/audio. The buttons are ' +
+                                           'on the LOWER-RIGHT corner of your screen.'},
+    {title: 'Share Content On The Carousel', description: 'Add an empty spot to the ' +
+                                                          'by clicking on the PLUS icon ' +
+                                                          'on the LOWER-RIGHT corner of your screen. ' +
+                                                          'Add a WHITEBOARD by clicking on the ' +
+                                                          'whiteboard icon to it\'s left.'},
+    {title: 'Post Comments To The Room', description: 'Type your comments in the textbox on the ' +
+                                                      'LOWER-LEFT corner of your screen.'},
+    {title: 'Invite Your Facebook Friends', description: 'You can invite your Facebook friends ' +
+                                                         'to your room by posting on your wall, ' +
+                                                         'or sending a message to a specific friend.'},
+    {title: 'Invite Your Friends Through Email', description: 'If you\'re not using Facebook, invite ' +
+                                                              'others via email. The button is located to ' +
+                                                              'the right of the Facebook buttons.'},
+    {title: 'Give Us Your Feedback', description: 'We\'d love to hear about your experience with our WebApp. ' +
+                                                  'Click on the FEEDBACK button on the LOWER-RIGHT corner ' +
+                                                  'of your screen.'}
+  ], tourTimer, pulsateTimer, tourIdx = 0;
+
+  
+  $(tourSelector + ' > button#imgood').unbind('click').text('NEXT')
+                                      .click(function() {
+    tourIdx++;
+    clearInterval(pulsateTimer);
+    $(tourObjects[tourIdx-1]).stop(true, true);
+
+    if (2 <= tourIdx) {
+      $(tourObjects[tourIdx]).width(function(idx) {
+        $(this).width($(this).width()*4);
+        $(this).height($(this).height()*4);
+      });
+
+      if (2 === tourIdx) {
+        $('.cloudcarousel.unoccupied').css({'visibility': 'hidden'});
+      } else {
+        $(tourObjects[tourIdx-1]).removeAttr('style');
+      }
+    } 
+
+    if (2 >= tourIdx) {
+      $(tourObjects[tourIdx-1]).css({
+        'visibility': 'visible',
+        'opacity': '1.0' 
+      });      
+    }
+
+    if(tourIdx >= tourObjects.length) {
+      $(this).attr('disabled', 'disabled');
+      $('.cloudcarousel.unoccupied').css({'visibility': 'visible'});
+      $(tourSelector + ' > button#skip').text('DONE');
+      $(tourSelector + ' > h3').html('You\'re All Set!');
+      $(tourSelector + ' > p#desc').text('Enjoy!!!');
+    } else {
+      pulsateTimer = describeTourObject(tourSelector,
+                                        tourObjects[tourIdx],
+                                        tourDescriptions[tourIdx]);      
+    }
+  });
+    
+  $(tourSelector + ' > button#skip').css({'visibility': 'visible'})
+                                    .click(function() {
+    clearInterval(pulsateTimer);
+    $(tourObjects[0] + ', ' + tourObjects[1]).stop(true, true).css({
+      'visibility': 'visible',
+      'opacity': '1.0'
+    });
+    $('.cloudcarousel').css({
+      'visibility': 'visible',
+      'opacity': '1.0'
+    });
+    $(tourObjects[tourIdx]).stop(true, true);
+
+    if (2 <= tourIdx) {
+      $(tourObjects[tourIdx]).removeAttr('style');  
+    }
+
+    $(tourSelector).css({'display': 'none'});
+  });
+
+  $(tourSelector + ' > button#sure').css({'visibility': 'hidden'});
+  $(tourSelector + ' > input#dontShowAgain').css({'display': 'none'});
+  $(tourSelector + ' > span').css({'display': 'none'});
+  pulsateTimer = describeTourObject(tourSelector,
+                                    tourObjects[0],
+                                    tourDescriptions[0]);
 }
