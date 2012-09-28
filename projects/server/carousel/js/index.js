@@ -409,10 +409,6 @@ var app = {
     });
   }
 //</MANJESH>
-
-  // video enabled state todo this must be initially in sync with video button class and Callcast
-  //       make either this var or button class the state variable
-  //videoEnabled: true
 }; /* app */
 
 ///
@@ -474,9 +470,9 @@ function closePersonalChat(event)
 function showGroupChat(event)
 {
   $(app.GROUP_CHAT_SHOW).stop(true);
-  $(app.GROUP_CHAT_SHOW).css("display", "none");
+  $(app.GROUP_CHAT_SHOW).hide();
   $(app.GROUP_CHAT_SHOW).css("opacity", "1");
-  $(app.GROUP_CHAT).css("display", "block");
+  $(app.GROUP_CHAT).css("visibility", "visible");
   $(app.GROUP_CHAT_IN).focus();
 }
 ///
@@ -484,8 +480,8 @@ function showGroupChat(event)
 ///
 function closeGroupChat(event)
 {
-  $(app.GROUP_CHAT_SHOW).css("display", "block");
-  $(app.GROUP_CHAT).css("display", "none");
+  $(app.GROUP_CHAT_SHOW).show();
+  $(app.GROUP_CHAT).css("visibility", "hidden");
   event.stopPropagation();
 }
 
