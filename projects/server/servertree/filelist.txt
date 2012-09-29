@@ -4,6 +4,7 @@
 /etc/sysconfig/openfire
 /etc/httpd/conf/httpd.conf
 /etc/httpd/conf.d/ssl.conf
+/opt/openfire/conf
 /usr/local/bin/bosh-server.sh
 ~/.bashrc
 ~/bin
