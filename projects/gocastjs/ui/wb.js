@@ -294,6 +294,7 @@ GoCastJS.WhiteBoardMouse = function(whiteBoard)
   this.currentCommand = []; // the current path see mouse handlers
   this.timer = null; // timer for periodic stroke send
   this.lineCt = 0; // count of lines in commands
+  this.start = null; // the starting mouse point
 };
 
 ///
@@ -580,13 +581,11 @@ GoCastJS.WhiteBoard.prototype.onMouseDown = function(event)
 
   wb.mouse.timer = setInterval(wb.getStrokeTimeout(), wb.mouse.timeout);
   //console.log('wb.onMouseDown x' + event.offsetX + '(' + x + ') y ' + event.offsetY + '(' + y + ')' , event);
-  wb.settings.apply(wb.wbCtx);
-  wb.wbCtx.beginPath();
-  wb.wbCtx.moveTo(x, y);
   wb.mouse.currentCommand = []; // new command array to be sent to server
   wb.mouse.currentCommand.push({name: 'save', settings: wb.settings});
   wb.mouse.currentCommand.push({name: 'beginPath'});
   wb.mouse.currentCommand.push({name: 'moveTo', x: (x >> 0), y: (y >> 0)});
+  wb.mouse.start = {x: x, y: y}; // save starting point for mousemove
   return false; // disable text selection
 };
 
@@ -604,12 +603,12 @@ GoCastJS.WhiteBoard.prototype.onMouseUp = function(event)
   $(window).unbind('mousemove', wb.onMouseMove) // unbind mouse handlers
            .unbind('mouseup', wb.onMouseUp)
            .removeData('wb');
+  wb.mouse.start = null;
   //console.log('wb.onMouseUp x' + event.offsetX + '(' + x + ') y ' + event.offsetY + '(' + y + ')' , event);
   clearInterval(wb.mouse.timer); 
   event.stopPropagation();
   if (wb.mouse.lineCt > 0)
   {
-    wb.wbCtx.stroke();
     wb.mouse.currentCommand.push({name: 'stroke'});
     wb.mouse.currentCommand.push({name: 'restore'});
     wb.sendStroke(wb.mouse.currentCommand);
@@ -631,9 +630,21 @@ GoCastJS.WhiteBoard.prototype.onMouseMove = function(event)
       y = point.y / wb.scaleH;
   //console.log('wb.onMouseMove x' + event.offsetX + '(' + x + ') y ' + event.offsetY + '(' + y + ')' , event);
   event.stopPropagation();
-  // todo make sure event is a JQuery event
-  wb.wbCtx.lineTo(x, y);
-  wb.wbCtx.stroke(); // draw stroke but don't push it, stroke is pushed on mouse up at end of cmd
-  wb.mouse.currentCommand.push({name: 'lineTo', x: (x >> 0), y: (y >> 0)});
-  ++wb.mouse.lineCt;
+  if (wb.mouse.start)
+  {
+    wb.wbCtx.save();
+    wb.settings.apply(wb.wbCtx);
+    wb.wbCtx.beginPath();
+    wb.wbCtx.moveTo(wb.mouse.start.x, wb.mouse.start.y);
+    wb.wbCtx.lineTo(x, y);
+    wb.wbCtx.stroke();
+    wb.wbCtx.restore();
+    wb.mouse.currentCommand.push({name: 'lineTo', x: (x >> 0), y: (y >> 0)});
+    ++wb.mouse.lineCt;
+    wb.mouse.start = {x: x, y: y};
+  }
+  else
+  {
+    app.log(4, "wb onMouseMove wb.mouse.start is null");
+  }
 };
