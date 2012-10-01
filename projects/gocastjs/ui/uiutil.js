@@ -70,6 +70,7 @@ GoCastJS.ChatUtil.prototype.adjustWidths = function()
 {
   var nameWidth, valWidth, self = this,
       tableWidth = this.jqTable.width(),
+      chatWidth = this.jqChat.width(),
       nameWidthMax = tableWidth * this.MAX_NAME_WIDTH,
       nameWidthMin = tableWidth * this.MIN_NAME_WIDTH,
       nameWidthCur = nameWidthMin;
@@ -87,7 +88,7 @@ GoCastJS.ChatUtil.prototype.adjustWidths = function()
     }
   });
   // given nameWidth use rest of table width for val and set column widths
-  valWidth = tableWidth - nameWidthCur;
+  valWidth = chatWidth - nameWidthCur;
   //console.log("nameWidth ", nameWidthCur, " valWidth ", valWidth);
   $("td.name", this.jqTable).css("width", nameWidthCur >> 0 + "px");
   $("td.val", this.jqTable).css("width", valWidth >> 0 + "px");

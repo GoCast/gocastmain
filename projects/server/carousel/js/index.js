@@ -407,6 +407,45 @@ var app = {
         $('#errorMsgPlugin > #reload').removeAttr('disabled');
       });
     });
+  },
+
+  periodicStamp: function(interval) {
+    if ('undefined' !== typeof(Storage)) {
+      window.localStorage.gcpAppInstanceStamp = new Date().toString();
+      setInterval(function(){
+        window.localStorage.gcpAppInstanceStamp = new Date().toString();
+      }, interval||2000);      
+    }
+  },
+
+  removeAppStamp: function() {
+    if ('undefined' !== typeof(Storage)) {
+      delete window.localStorage.gcpAppInstanceStamp;
+    }
+  },
+
+  checkExclusive: function(onexclusive, onnotexclusive) {
+    if ('undefined' !== typeof(Storage)) {
+      var self = this;
+      setTimeout(function() {
+        if (!window.localStorage.gcpAppInstanceStamp) {
+          self.periodicStamp(2000);
+          onexclusive();
+        } else {
+          var appTS = new Date(window.localStorage.gcpAppInstanceStamp),
+          date = new Date(),
+          diff = date.getTime() - appTS.getTime();
+          if (diff > 5000) {
+            self.periodicStamp(2000);
+            onexclusive();
+          } else {
+            onnotexclusive();
+          }
+        }
+      }, 5000);
+    } else {
+      onexclusive();
+    }
   }
 //</MANJESH>
 }; /* app */
@@ -956,6 +995,7 @@ function openMeeting(
    * Initialize Gocast events. */
   $(window).on('beforeunload', function() {
     app.log(2, 'On before unload.');
+    app.removeAppStamp();
     Callcast.LeaveSession();
   });
   /*/
@@ -2060,23 +2100,16 @@ $(document).ready(function(
 )
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
-  /*appCacheResult.callbacks.downloading = function() {
-    var opacity = 0.4;
+  openWindow('#waitingToJoin');
+  var unmaskTimer = setInterval(function() {
+    $('#boxes #waitingToJoin > div#cover').height(
+      $('#boxes #waitingToJoin > div#cover').height() - 50
+    );
+  }, 1000);
 
-    openWindow('#waitingForUpdates');
-    setInterval(function() {
-      $('#boxes #waitingForUpdates > img').fadeTo(1000, opacity);
-      opacity = (0.4 === opacity) ? 0.8 : 0.4;
-    }, 1000);
-  };
-
-  appCacheResult.callbacks.progress = function(percentDone) {
-    $('#boxes #waitingForUpdates > progress').val(percentDone);
-  };
-
-  appCacheResult.poll(
-    1000,
-    function(){*/
+  app.checkExclusive(function() {
+    clearInterval(unmaskTimer);
+    closeWindow();
     navigator.plugins.refresh(); // reload plugins to get any plugin updates
 
     // Check the browser.
@@ -2100,13 +2133,15 @@ $(document).ready(function(
 
       // set the connection status callback
       Callcast.setCallbackForCallback_ConnectionStatus(connectionStatus);
-    }
-    /*},
-    function(){
-      closeWindow();
-      window.location.reload();
-    }
-  );*/
+    }    
+  }, function() {
+    closeWindow();
+    openWindow('#errorMsgPlugin');
+    $('#errorMsgPlugin > button').css({'display': 'none'});
+    $('#errorMsgPlugin > h1').text('App Already Running!!!');
+    $('#errorMsgPlugin > p#prompt').text('You seem to already have the app running ' +
+                                         'in a separate window or tab.');
+  });
 }); // $(document).ready(function())
 
 $.extend({

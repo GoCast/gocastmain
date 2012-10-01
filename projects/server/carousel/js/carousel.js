@@ -257,6 +257,8 @@
         }
       }
     }
+
+    $('#msgBoard > input.chatTo', $(item.object)).attr('placeholder', 'chat with ' + item.chatName.toLowerCase());
   };
   ///
   /// \brief genarate a unique chat name given that the current name collides
