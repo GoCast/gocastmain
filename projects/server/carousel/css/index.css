@@ -48,13 +48,13 @@ a:active
    doesn't work in ff see:
    https://bugzilla.mozilla.org/show_bug.cgi?id=77790
 */
-::-webkit-scrollbar 
+::-webkit-scrollbar
 {
   height: 12px;
   width: 5px;
-  background: gray;
+  background: none;
 }
-::-webkit-scrollbar-thumb 
+::-webkit-scrollbar-thumb
 {
   background: white;
   -webkit-border-radius: 1ex;
@@ -422,6 +422,12 @@ body > div#lower-left > div#msgBoard > div#chatOut
   -webkit-user-select: text;
   -o-user-select: text;
   user-select: text;
+  background: rgba(112,128,144,0.3);
+  border-radius: 5px;
+  -moz-box-shadow: 0px 0px 2px #303030;
+  -webkit-box-shadow: 0px 0px 2px #303030;
+  box-shadow: 0px 0px 2px #303030;
+
 }
 body > div#lower-left > div#msgBoard > div#chatOut  table
 {
@@ -436,7 +442,9 @@ body > div#lower-left > div#msgBoard > div#chatOut  table
 }
 body > div#lower-left > div#msgBoard > div#chatOut  td
 {
-  font-size: 16px;
+  font-size: 12px;
+  padding-top: 5px;
+  text-shadow: 0.1em 0.1em 0.2em black;
   /*text-shadow: 0 0 10px gray, 0 0 20px gray, 0 0 30px gray, 0 0 40px #FF00DE, 0 0 70px #FF00DE, 0 0 80px #FF00DE, 0 0 100px #FF00DE, 0 0 150px #FF00DE;*/
 }
 body > div#lower-left > div#msgBoard > div#chatOut  span#text-width
@@ -461,7 +469,7 @@ body > div#lower-left > div#msgBoard > div#chatOut  td > span.val-span.flash
 }
 body > div#lower-left > div#msgBoard > div#chatOut  td.name
 {
-  color: green;
+  color: lightgreen;
   overflow: hidden; /* for chrome */
   /* for chrome doesn't work
   overflow-x: hidden;
@@ -472,7 +480,8 @@ body > div#lower-left > div#msgBoard > div#chatOut  td.val
 {
   color: white;
 }
-body> div#lower-left > div#msgBoard > input.chatTo
+body> div#lower-left > div#msgBoard > input.chatTo,
+div.cloudcarousel > div#msgBoard > input.chatTo
 {
   opacity: 0.6;
   border-radius: 8px;
@@ -480,7 +489,7 @@ body> div#lower-left > div#msgBoard > input.chatTo
   padding: 0px 5px 1px 5px;
   background-color: white;
   color: black;
-  font-size:14px;
+  font-size:12px;
   width:250px;
 }
 body > div#lower-left > div#msgBoard > button#send {
@@ -498,7 +507,8 @@ body > div#lower-left > div#msgBoard > input.close {
   height: 25px;
 }
 /*<MANJESH>*/
-body> div#lower-left > div#msgBoard > input.chatTo:focus {
+body> div#lower-left > div#msgBoard > input.chatTo:focus,
+div.cloudcarousel > div#msgBoard > input.chatTo:focus {
   opacity: 1.0;
 }
 div#lower-left > div#msgBoard > button#send:hover {
@@ -583,7 +593,7 @@ div.cloudcarousel > div#msgBoard > input.close {
 }
 div.cloudcarousel > div#msgBoard > input.chatTo
 {
-  width:75%;
+  width:80%;
 }
 div.cloudcarousel > div#msgBoard > div#chatOut
 {
@@ -604,6 +614,12 @@ div.cloudcarousel > div#msgBoard > div#chatOut
   -webkit-user-select: text;
   -o-user-select: text;
   user-select: text;
+  background: rgba(112,128,144,0.3);
+  border-radius: 2px;
+  -moz-box-shadow: 0px 0px 2px #303030;
+  -webkit-box-shadow: 0px 0px 2px #303030;
+  box-shadow: 0px 0px 2px #303030;
+
 }
 div.cloudcarousel > div#msgBoard > div#chatOut  table
 {
@@ -637,14 +653,14 @@ div.cloudcarousel > div#msgBoard > div#chatOut  td > span.val-span.flash
 }
 div.cloudcarousel > div#msgBoard > div#chatOut  td.name
 {
-  color: white;
+  color: yellow;
   text-shadow: 0.1em 0.1em 0.2em black;
   overflow: hidden; /* for chrome */
 }
 div.cloudcarousel > div#msgBoard > div#chatOut  td.val
 {
   color: white;
-  text-shadow: 0.1em 0.1em 0.2em black
+  text-shadow: 0.1em 0.1em 0.2em black;
 }
 body > div#meeting > div#streams {
   padding: 10px;
@@ -1180,6 +1196,9 @@ body > #tour {
   font-family: Verdana, sans-serif;
   z-index: 10000;
   padding: 10px;
+  -moz-box-shadow: 0px 0px 2px #303030;
+  -webkit-box-shadow: 0px 0px 2px #303030;
+  box-shadow: 0px 0px 2px #303030;
 }
 body > #tour > #desc {
   width: 100%;
