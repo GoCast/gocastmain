@@ -432,9 +432,10 @@ body > div#lower-left > div#msgBoard > div#chatOut
 body > div#lower-left > div#msgBoard > div#chatOut  table
 {
   /*width:100%; not working */
-  width:300px;
+  width:100%;
   table-layout: fixed;
   overflow: hidden; /* for ff */
+  word-wrap:break-word;
   /* for ff, doesn't work
   overflow-x: hidden; 
   overflow-y: visible;
@@ -444,8 +445,10 @@ body > div#lower-left > div#msgBoard > div#chatOut  td
 {
   font-size: 12px;
   padding-top: 5px;
+  padding-bottom: 5px;
   text-shadow: 0.1em 0.1em 0.2em black;
   /*text-shadow: 0 0 10px gray, 0 0 20px gray, 0 0 30px gray, 0 0 40px #FF00DE, 0 0 70px #FF00DE, 0 0 80px #FF00DE, 0 0 100px #FF00DE, 0 0 150px #FF00DE;*/
+  border-bottom: 1px solid rgba(220,220,220,0.3);
 }
 body > div#lower-left > div#msgBoard > div#chatOut  span#text-width
 {
@@ -627,8 +630,10 @@ div.cloudcarousel > div#msgBoard > div#chatOut  table
   width:100%; not working 
   width:300px;
   */
+  width: 100%;
   table-layout: fixed;
   overflow: hidden; /* for ff */
+  word-wrap:break-word;
 }
 
 div.cloudcarousel > div#msgBoard > div#chatOut  span#text-width
@@ -650,6 +655,12 @@ div.cloudcarousel > div#msgBoard > div#chatOut  td > span.val-span
 div.cloudcarousel > div#msgBoard > div#chatOut  td > span.val-span.flash
 {
   color: red;
+}
+div.cloudcarousel > div#msgBoard > div#chatOut  td
+{
+  padding-top: 5px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid rgba(220,220,220,0.3);
 }
 div.cloudcarousel > div#msgBoard > div#chatOut  td.name
 {
