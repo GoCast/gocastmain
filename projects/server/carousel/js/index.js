@@ -35,7 +35,8 @@
   videoButtonPress,
   audioButtonPress,
   openWindow,
-  carouselItemUnzoom
+  carouselItemUnzoom,
+  startTour
 */
 'use strict';
 
@@ -511,7 +512,7 @@ function showGroupChat(event)
   $(app.GROUP_CHAT_SHOW).stop(true);
   $(app.GROUP_CHAT_SHOW).hide();
   $(app.GROUP_CHAT_SHOW).css("opacity", "1");
-  $(app.GROUP_CHAT).css("visibility", "visible");
+  $(app.GROUP_CHAT).css({"visibility": "visible", "left":  "0px"});
   $(app.GROUP_CHAT_IN).focus();
 }
 ///
@@ -519,8 +520,10 @@ function showGroupChat(event)
 ///
 function closeGroupChat(event)
 {
+  var width = $(app.GROUP_CHAT).width;
+  console.log("app.GROUP_CHAT width", width);
   $(app.GROUP_CHAT_SHOW).show();
-  $(app.GROUP_CHAT).css("visibility", "hidden");
+  $(app.GROUP_CHAT).css({"visibility": "hidden", "left": -width + "px"});
   event.stopPropagation();
 }
 
@@ -803,7 +806,8 @@ function carouselItemZoom(event)
   });
   $('body > div#upper-right').css({'top': $('#zoom').position().top + 'px'});
 
-   $(spot).appendTo($('#meeting > #zoom')); // move div to zoom area, doesn't work with local, remote video spot
+   $(spot).appendTo($('#meeting > #zoom')) // move div to zoom area, doesn't work with local, remote video spot
+          .css("z-index", "100");
    //$('#meeting > #zoom')[0].appendChild(spot[0]); // move div to zoom area, doesn't work with local, remote video spot
 
    app.carousel.resize(); // update carousel

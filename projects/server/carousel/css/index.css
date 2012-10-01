@@ -403,6 +403,9 @@ div#lower-left > input#showChat
 body > div#lower-left > div#msgBoard
 {
   display:inline;
+  position: absolute;
+  left: 0px;
+  bottom: 0px;
 }
 body > div#lower-left > div#msgBoard > div#chatOut
 {
@@ -411,7 +414,7 @@ body > div#lower-left > div#msgBoard > div#chatOut
   max-height:125px;
   min-height: 1.1em;
   height: auto;
-  width:300px;
+  width:350px;
   overflow-y:auto;
   overflow-x:hidden;
   font-size:11px;
