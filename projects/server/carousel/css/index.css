@@ -318,7 +318,7 @@ body > div#lower-right > input.fbSend {
   background-size: 100% 100%;
 }
 body > div#lower-right > input.fbShare {
-  margin-left: 15px;
+  /*margin-left: 15px;*/
   width: 30px;
   height: 30px;
   background-image: url("../images/ShareToFB.png");
@@ -401,6 +401,7 @@ div#lower-left > input#showChat
   position:absolute;
   bottom:0px;
   left:0px;
+  cursor: pointer;
 }
 body > div#lower-left > div#msgBoard
 {
@@ -513,6 +514,11 @@ body > div#lower-left > div#msgBoard > input.close {
   background-repeat: no-repeat;
   width: 25px;
   height: 25px;
+  opacity: 0.6;
+  cursor: pointer;
+}
+body > div#lower-left > div#msgBoard > input.close:hover {
+  opacity: 1.0;
 }
 /*<MANJESH>*/
 body> div#lower-left > div#msgBoard > input.chatTo:focus,
@@ -583,6 +589,7 @@ div.cloudcarousel > input#showChat
   background-repeat: no-repeat;
   width: 25px;
   height: 20px;
+  cursor: pointer;
 }
 div.cloudcarousel > div#msgBoard > input.send {
   background-image: url("../images/talk-white.png");
@@ -598,6 +605,11 @@ div.cloudcarousel > div#msgBoard > input.close {
   width: 20px;
   height: 20px;
   margin-bottom:-3px;
+  opacity: 0.6;
+  cursor: pointer;
+}
+div.cloudcarousel > div#msgBoard > input.close:hover {
+  opacity: 1.0;
 }
 div.cloudcarousel > div#msgBoard > input.chatTo
 {
@@ -1204,18 +1216,24 @@ body > div#meeting > div#streams > div#scontrols > input.right {
 body > #tour {
   display: none;
   position: absolute;
-  width: 300px;
-  height: 200px;
+  width: 400px;
+  height: auto;
   background: -webkit-gradient(linear, center bottom, center top, from(rgba(40,40,40,0.6)), to(rgba(40,40,40,0.3)));
   background: -moz-linear-gradient(bottom, rgba(40,40,40,0.6), rgba(40,40,40,0.3));
   border-radius: 5px;
   color: white;
   font-family: Verdana, sans-serif;
   z-index: 10000;
-  padding: 10px;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 5px;
+  padding-bottom: 20px;
   -moz-box-shadow: 0px 0px 2px #303030;
   -webkit-box-shadow: 0px 0px 2px #303030;
   box-shadow: 0px 0px 2px #303030;
+}
+body > #tour > h3 {
+  color: #40E0D0;
 }
 body > #tour > #desc {
   width: 100%;

@@ -2374,10 +2374,25 @@ function addItem() {
   });
 }
 
+function resizeTour(tourSelector) {
+    $(tourSelector).css({
+    'display': 'block',
+    'left'   : Math.floor(($(window).width() - $(tourSelector).width())/2) + 'px',
+    'top'    : Math.floor(($(window).height() - $(tourSelector).height())/2) + 'px'
+  });
+  $(tourSelector + ' > button#skip').css({
+    'left'      : Math.floor(($(tourSelector).width() - $(tourSelector + ' > button#skip').width())/2) + 'px',
+  });
+  $(tourSelector + ' > button#imgood').css({
+    'left' : ($('body > #tour').width() - $('body > #tour > button#imgood').width() - 5) + 'px',
+  });
+}
+
 function describeTourObject(tourSelector, objSelector, objDescription) {
   $(objSelector).effect('pulsate', {times: 3}, 6000);
   $(tourSelector + ' > h3').html(objDescription.title);
   $(tourSelector + ' > p#desc').text(objDescription.description);
+  resizeTour(tourSelector);
 }
 
 function startTour(tourSelector) {
@@ -2386,37 +2401,37 @@ function startTour(tourSelector) {
     '#effectsPanel > div',
     'input[id*=video], input[id*=audio]',
     '#lower-right > input#addWhiteBoard',
-    '#lower-left > div#msgBoard',
+    '#lower-left > div#msgBoard > input.chatTo',
     '#lower-right > input[class*=fb], #lower-right > input[class=copyData]',
     '#lower-right > input[class=feedback]'
   ], tourDescriptions = [
     {title:       '1. What\'s Flashing? The Carousel.',
      description: 'You are looking at the start of a GoCast live meeting. ' +
-                  'You start by seeing a preview of your roommates will see you on video. ' +
+                  'You start by seeing a preview of how your roommates will see you on video. ' +
                   'The "GO" spots can be occupied by other people or by shared content, '+ 
                   'such as our Whiteboard. You can also spin the Carousel spots. ' +
-                  'Use the arrow keys on your keyboard, your mouse wheel, or make a scroll ' +
-                  'gesture with a Macintosh trackpad. TRY IT!! (click NEXT for more)'},
+                  'Use the ARROW KEYS on your keyboard, your MOUSE WHEEL, or perform a SCROLL ' +
+                  'ACTION with a trackpad. TRY IT!! (click NEXT for more)'},
     {title:       '2. What\'s Flashing? Video Effects.',
      description: 'You can change the way other people will see you on GoCast. You can ' +
-                  'switch from full color to black and white, or to a sepia effect. ' +
-                  'Just click on any of the the three buttons below your preview on the left.' +
+                  'switch from full color to BLACK & WHITE, or to a SEPIA effect. ' +
+                  'Just click on any of the the three buttons below your preview on the left. ' +
                   'TRY IT!!'},
     {title:       '3. What\'s Flashing? Media Controls.',
      description: 'You can turn your webcam and microphone on and off. The buttons are in ' +
                   'two places: the LOWER-RIGHT corner of your preview window, and on ' +
                   'the ICON BAR. If you have logged in with Facebook, your profile photo will ' +
-                  'appear when you turn off your webcam.'},
+                  'appear when you turn off your webcam. TRY IT!!'},
     {title:       '4. What\'s Flashing? Share Content On The Carousel.',
      description: 'You can add one or more Whiteboards to the Carousel. Just click on the ' +
                   'WHITEBOARD ICON. The PLUS ICON, to its right, will be used to add ' +
                   'additional content, such as documents, images, videos and widgets in ' +
                   'the near future.You can also remove a Carousel spot by clicking on the ' +
-                  'TRASHCAN ICON on the upper right corner the spot.'},
+                  'TRASHCAN ICON on the upper right corner the spot. TRY IT!!'},
     {title:       '7. What\'s Flashing? Post Comments To The Room.',
      description: 'Type your comments in the textbox on the LOWER-LEFT corner of your screen. ' +
                   'Click the POST BUTTON or the RETURN KEY and your comments can be seen ' +
-                  'by your roommates.'},
+                  'by your roommates. TRY IT!!'},
     {title:       '8. What\'s Flashing? Invite Others To Your Room.',
      description: 'You can invite your Facebook friends to your room by posting on your wall, ' +
                   'or sending invites to your friends. You can also invite anybody via email. ' +
@@ -2434,8 +2449,8 @@ function startTour(tourSelector) {
 
     if (1 <= tourIdx) {
       $(tourObjects[tourIdx]).width(function(idx) {
-        $(this).width($(this).width()*4);
-        $(this).height($(this).height()*4);
+        $(this).width($(this).width()*2);
+        $(this).height($(this).height()*2);
       });
 
       if (1 === tourIdx) {
@@ -2444,13 +2459,6 @@ function startTour(tourSelector) {
         $(tourObjects[tourIdx-1]).removeAttr('style');
       }
     }
-
-/*    if (2 >= tourIdx) {
-      $(tourObjects[tourIdx-1]).css({
-        'visibility': 'visible',
-        'opacity': '1.0' 
-      });      
-    }*/
 
     if(tourIdx >= tourObjects.length) {
       $(this).attr('disabled', 'disabled');
@@ -2466,14 +2474,7 @@ function startTour(tourSelector) {
     
   $(tourSelector + ' > button#skip').css({'visibility': 'visible'})
                                     .click(function() {
-    $(tourObjects[0] + ', ' + tourObjects[1]).stop(true, true);/*.css({
-      'visibility': 'visible',
-      'opacity': '1.0'
-    });
-    $('.cloudcarousel').css({
-      'visibility': 'visible',
-      'opacity': '1.0'
-    });*/
+    $(tourObjects[0] + ', ' + tourObjects[1]).stop(true, true);
     $(tourObjects[tourIdx]).stop(true, true);
 
     if (1 <= tourIdx) {
