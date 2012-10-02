@@ -149,9 +149,9 @@ body > div#upper-right > div#log
    width:30px;
    height:30px;
    vertical-align: middle;
-   background-image: url("../images/vw.png");
+   background-image: url("../images/ReportBug.png");
    background-repeat: no-repeat;
-   background-size: 100%;
+   background-size: 100% 100%;
    z-index: 1000;
 }
 
@@ -170,9 +170,9 @@ body > div#upper-right > div#settings
    width:20px;
    height:20px;
    vertical-align: middle;
-   background-image: url("../images/gear.png");
+   background-image: url("../images/Settings.png");
    background-repeat: no-repeat;
-   background-size: 100%;
+   background-size: 100% 100%;
    z-index: 1000;
 }
 
@@ -300,8 +300,8 @@ body > div#lower-right > input.vidbtn {
   background-size: 100%;
 }
 body > div#lower-right > input.feedback {
-  background-image: url("../images/btn-feedback.png");
-  background-size: 100%;
+  background-image: url("../images/GiveFeedback.png");
+  background-size: 100% 100%;
 }
 body > div#lower-right > input.copyData {
   margin-left: 7px;
@@ -312,20 +312,22 @@ body > div#lower-right > input.twitter {
   background-image: url("../images/btn-twitter.png");
 }
 body > div#lower-right > input.fbSend {
-  width: 61px;
-  background-image: url("../images/fbSend.png");
-  background-size: 100%;
+  width: 30px;
+  height: 30px;
+  background-image: url("../images/SendFB.png");
+  background-size: 100% 100%;
 }
 body > div#lower-right > input.fbShare {
   margin-left: 15px;
-  width: 69px;
-  background-image: url("../images/fbShare.png");
-  background-size: 100%;
+  width: 30px;
+  height: 30px;
+  background-image: url("../images/ShareToFB.png");
+  background-size: 100% 100%;
 }
 /*<MANJESH>*/
 body > div#lower-right > input#addWhiteBoard {
-  background-image: url('../images/whiteboard.png');
-  background-size: 100%;
+  background-image: url('../images/AddWhiteboard.png');
+  background-size: 100% 100%;
 }
 body > div#lower-right > input#addItem {
   background-image: url('../images/plus.png');
@@ -334,44 +336,44 @@ body > div#lower-right > input#addItem {
 /*</MANJESH>*/
 body > div#lower-right > input#video:disabled,
 input#videoPreview:disabled {
-  background-image: url("../images/video-disabled.png");
-  background-size: 100%;
+  background-image: url("../images/VideoUnavail.png");
+  background-size: 100% 100%;
 }
 body > div#lower-right > input#video.on:disabled,
 input#videoPreview.on:disabled {
-  background-image: url("../images/video-disabled.png");
-  background-size: 100%;
+  background-image: url("../images/VideoUnavail.png");
+  background-size: 100% 100%;
 }
 body > div#lower-right > input#video,
 input#videoPreview {
-  background-image: url("../images/video-off.png");
-  background-size: 100%;
+  background-image: url("../images/videoOff.png");
+  background-size: 100% 100%;
 }
 body > div#lower-right > input#video.on,
 input#videoPreview.on {
-  background-image: url("../images/video-on.png");
-  background-size: 100%;
+  background-image: url("../images/VideoOn.png");
+  background-size: 100% 100%;
 }
 body > div#lower-right > input#audio:disabled,
 input#audioPreview:disabled {
-  background-image: url("../images/sound-disabled.png");
-  background-size: 100%;
+  background-image: url("../images/AudioUnavail.png");
+  background-size: 100% 100%;
 }
 body > div#lower-right > input#audio.off:disabled,
 input#audioPreview.off:disabled {
-  background-image: url("../images/sound-disabled.png");
-  background-size: 100%;
+  background-image: url("../images/AudioUnavail.png");
+  background-size: 100% 100%;
 }
 body > div#lower-right > input#audio.off,
 input#audioPreview.off {
-  background-image: url("../images/mute.png");
-  background-size: 100%;
+  background-image: url("../images/AudioOff.png");
+  background-size: 100% 100%;
 }
 body > div#lower-right > input#audio,
 input#audioPreview {
   margin-left: 5px;
-  background-image: url("../images/sound.png");
-  background-size: 100%;
+  background-image: url("../images/AudioOn.png");
+  background-size: 100% 100%;
 }
 body > div#lower-left {
   position: absolute;
@@ -403,6 +405,9 @@ div#lower-left > input#showChat
 body > div#lower-left > div#msgBoard
 {
   display:inline;
+  position: absolute;
+  left: 0px;
+  bottom: 0px;
 }
 body > div#lower-left > div#msgBoard > div#chatOut
 {
@@ -411,7 +416,7 @@ body > div#lower-left > div#msgBoard > div#chatOut
   max-height:125px;
   min-height: 1.1em;
   height: auto;
-  width:300px;
+  width:350px;
   overflow-y:auto;
   overflow-x:hidden;
   font-size:11px;
@@ -503,7 +508,7 @@ body > div#lower-left > div#msgBoard > button#send {
   border-radius:15px;
 }
 body > div#lower-left > div#msgBoard > input.close {
-  background-image: url("../images/left-arrow.png");
+  background-image: url("../images/backArrow.png");
   background-size:100% 100%;
   background-repeat: no-repeat;
   width: 25px;
@@ -587,7 +592,7 @@ div.cloudcarousel > div#msgBoard > input.send {
   height: 20px;
 }
 div.cloudcarousel > div#msgBoard > input.close {
-  background-image: url("../images/left-arrow.png");
+  background-image: url("../images/backArrow.png");
   background-size: 100% 100%;
   background-repeat: no-repeat;
   width: 20px;
