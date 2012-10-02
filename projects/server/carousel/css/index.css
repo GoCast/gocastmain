@@ -1113,8 +1113,12 @@ body > div#meeting > div#streams > div#scontrols > input.right {
 {
    overflow: hidden;
    background-color: white;
+   padding-left: 5px;
+   padding-right: 5px;
+   padding-bottom: 5px;
+   text-align: justify;
 }
-#boxes #copyData #copyContent h2
+#boxes #copyData #copyContent h3
 {
    white-space: nowrap;
    margin-left: 10px;
@@ -1122,9 +1126,11 @@ body > div#meeting > div#streams > div#scontrols > input.right {
 }
 #boxes #copyData #copyContent #copyLogo
 {
+   width: 30px;
+   height: 30px;
    margin-left: 3px;
    margin-right: 3px;
-   float:left;
+   float:right;
 }
 #boxes #copyData img.close 
 {
@@ -1218,8 +1224,8 @@ body > #tour {
   position: absolute;
   width: 400px;
   height: auto;
-  background: -webkit-gradient(linear, center bottom, center top, from(rgba(40,40,40,0.6)), to(rgba(40,40,40,0.3)));
-  background: -moz-linear-gradient(bottom, rgba(40,40,40,0.6), rgba(40,40,40,0.3));
+  background: -webkit-gradient(linear, center bottom, center top, from(rgba(40,40,40,1.0)), to(rgba(40,40,40,0.5)));
+  background: -moz-linear-gradient(bottom, rgba(40,40,40,1.0), rgba(40,40,40,0.5));
   border-radius: 5px;
   color: white;
   font-family: Verdana, sans-serif;
@@ -1233,11 +1239,11 @@ body > #tour {
   box-shadow: 0px 0px 2px #303030;
 }
 body > #tour > h3 {
-  color: #40E0D0;
+  color: lightgreen;
 }
 body > #tour > #desc {
   width: 100%;
-  opacity: 0.75;
+  opacity: 0.9;
 }
 body > #tour > button#sure {
   position: absolute;

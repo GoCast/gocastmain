@@ -798,8 +798,13 @@ function carouselItemZoom(event)
    // get item and remove it from carousel
    var spot = $(event.currentTarget).parent(),
        item = $(spot).data('item');
-   app.carousel.remove(item.index);
 
+   if (!item) {
+    spot = $(event.target).parent();
+    item = $(spot).data('item');
+   }
+
+  app.carousel.remove(item.index);
   $('#zoom > .close').css({
     'top': spot[0].style.top,
     'left': parseFloat(spot[0].style.left) + parseFloat(spot[0].style.width) + 10.0 + 'px'
@@ -851,7 +856,7 @@ function openCopyData(event)
       cX, cY, winW, winH, wcW, wcH,
       marginRight, marginBottom;
 
-  $(name).text('Carousel room ' + $.getUrlVar('roomname'));
+  //$(name).text('Carousel room ' + $.getUrlVar('roomname'));
   $(name).attr('href', window.location.href);
 
   // position the dialog
@@ -890,6 +895,7 @@ function openCopyData(event)
   }
 
   // display dlg
+  jqWin.width(400).height(200);
   jqWin.fadeIn(700);
   jqWin.addClass('active');
 
@@ -1034,8 +1040,8 @@ function promptTour() {
   if ('undefined' !== typeof(Storage) && !window.localStorage.gcpDontShowTourCheck) {
     $('body > #tour').css({
       'display': 'block',
-      'left'   : Math.floor(($(window).width() - $('body > #tour').width())/2) + 'px',
-      'top'    : Math.floor(($(window).height() - $('body > #tour').height())/2) + 'px'
+      'left'   : '5px', //Math.floor(($(window).width() - $('body > #tour').width())/2) + 'px',
+      'top'    : '5px'  //Math.floor(($(window).height() - $('body > #tour').height())/2) + 'px'
     });
     $('body > #tour > button#skip').css({
       'left'      : Math.floor(($('body > #tour').width() - $('body > #tour > button#skip').width())/2) + 'px',
@@ -2375,11 +2381,11 @@ function addItem() {
 }
 
 function resizeTour(tourSelector) {
-    $(tourSelector).css({
+  /*$(tourSelector).css({
     'display': 'block',
     'left'   : Math.floor(($(window).width() - $(tourSelector).width())/2) + 'px',
     'top'    : Math.floor(($(window).height() - $(tourSelector).height())/2) + 'px'
-  });
+  });*/
   $(tourSelector + ' > button#skip').css({
     'left'      : Math.floor(($(tourSelector).width() - $(tourSelector + ' > button#skip').width())/2) + 'px',
   });
@@ -2389,7 +2395,9 @@ function resizeTour(tourSelector) {
 }
 
 function describeTourObject(tourSelector, objSelector, objDescription) {
-  $(objSelector).effect('pulsate', {times: 3}, 6000);
+  setTimeout(function(){
+    $(objSelector).effect('pulsate', {times: 3}, 6000);
+  }, 1000);
   $(tourSelector + ' > h3').html(objDescription.title);
   $(tourSelector + ' > p#desc').text(objDescription.description);
   resizeTour(tourSelector);
@@ -2401,38 +2409,46 @@ function startTour(tourSelector) {
     '#effectsPanel > div',
     'input[id*=video], input[id*=audio]',
     '#lower-right > input#addWhiteBoard',
+    '.whiteBoard > .wbDiv > div#wbTools',
+    '.whiteBoard > .zoom, #zoom > .close',
     '#lower-left > div#msgBoard > input.chatTo',
     '#lower-right > input[class*=fb], #lower-right > input[class=copyData]',
     '#lower-right > input[class=feedback]'
   ], tourDescriptions = [
-    {title:       '1. What\'s Flashing? The Carousel.',
-     description: 'You are looking at the start of a GoCast live meeting. ' +
-                  'You start by seeing a preview of how your roommates will see you on video. ' +
-                  'The "GO" spots can be occupied by other people or by shared content, '+ 
-                  'such as our Whiteboard. You can also spin the Carousel spots. ' +
-                  'Use the ARROW KEYS on your keyboard, your MOUSE WHEEL, or perform a SCROLL ' +
-                  'ACTION with a trackpad. TRY IT!! (click NEXT for more)'},
-    {title:       '2. What\'s Flashing? Video Effects.',
+    {title:       '1. What\'s Flashing? The Carousel',
+     description: 'At first you\'ll see a preview of how you look on video. ' +
+                  'The "GO" spots hold other people or shared content such as ' +
+                  'our Whiteboard. To move the Carousel use the ARROW KEYS' +
+                  'on your keyboard or your MOUSE WHEEL. Go ahead, TRY IT!!' +
+                  '(click NEXT for more)'},
+    {title:       '2. What\'s Flashing? Video Effects',
      description: 'You can change the way other people will see you on GoCast. You can ' +
                   'switch from full color to BLACK & WHITE, or to a SEPIA effect. ' +
-                  'Just click on any of the the three buttons below your preview on the left. ' +
-                  'TRY IT!!'},
-    {title:       '3. What\'s Flashing? Media Controls.',
-     description: 'You can turn your webcam and microphone on and off. The buttons are in ' +
-                  'two places: the LOWER-RIGHT corner of your preview window, and on ' +
-                  'the ICON BAR. If you have logged in with Facebook, your profile photo will ' +
-                  'appear when you turn off your webcam. TRY IT!!'},
-    {title:       '4. What\'s Flashing? Share Content On The Carousel.',
-     description: 'You can add one or more Whiteboards to the Carousel. Just click on the ' +
-                  'WHITEBOARD ICON. The PLUS ICON, to its right, will be used to add ' +
-                  'additional content, such as documents, images, videos and widgets in ' +
-                  'the near future.You can also remove a Carousel spot by clicking on the ' +
-                  'TRASHCAN ICON on the upper right corner the spot. TRY IT!!'},
-    {title:       '7. What\'s Flashing? Post Comments To The Room.',
-     description: 'Type your comments in the textbox on the LOWER-LEFT corner of your screen. ' +
-                  'Click the POST BUTTON or the RETURN KEY and your comments can be seen ' +
-                  'by your roommates. TRY IT!!'},
-    {title:       '8. What\'s Flashing? Invite Others To Your Room.',
+                  'Just click on any of the the three buttons below your preview. ' +
+                  'Go ahead, TRY IT!!'},
+    {title:       '3. What\'s Flashing? Media Controls',
+     description: 'You can turn your webcam and microphone on and off. The buttons are on ' +
+                  'the LOWER-RIGHT corner of your preview window and on the ICON BAR.' + 
+                  'If you have logged in with Facebook your profile photo will appear when ' +
+                  'you turn off your webcam. Go ahead, TRY IT!!'},
+    {title:       '4. What\'s Flashing? Share Content',
+     description: 'You can add one or more Whiteboards to the Carousel by clicking on the ' +
+                  'WHITEBOARD ICON. You can remove a Carousel spot by clicking on the ' +
+                  'TRASHCAN ICON on the upper right corner the spot.'},
+    {title:       '5. What\'s Flashing? Whiteboard Controls',
+     description: 'To draw on the whiteboard choose a COLOR and PEN SIZE from the tray at the bottom. ' +
+                  'Click, hold, and drag your mouse to draw lines. Choose the ERASER to remove marks from ' +
+                  'the whiteboard. Other people can draw on the Whiteboard as well.' +
+                  'Then click NEXT to learn about ZOOMING the WHITEBOARD.'},
+    {title:       '6. What\'s Flashing? Zoomed Whiteboard',
+     description: 'Expand a Whiteboard by clicking on the ZOOM ICON on its ' +
+                  'UPPER-LEFT corner. Notice that the Carousel is now flattened above the Whiteboard and can still be moved. ' +
+                  'To UNZOOM the Whiteboard click on the LARGE "X" on its UPPER-RIGHT corner.'},
+    {title:       '7. What\'s Flashing? Post Comments',
+     description: 'Type comments in the text box on the LOWER-LEFT corner of your screen. ' +
+                  'Click the POST BUTTON or the RETURN KEY and your comments will be seen ' +
+                  'by your roommates. Go ahead, TRY IT!!'},
+    {title:       '8. What\'s Flashing? Invite Others To Your Room',
      description: 'You can invite your Facebook friends to your room by posting on your wall, ' +
                   'or sending invites to your friends. You can also invite anybody via email. ' +
                   'The EMAIL ICON is located to the right of the FACEBOOK BUTTONS.'},
@@ -2441,30 +2457,42 @@ function startTour(tourSelector) {
                   'Click on the FEEDBACK button on the LOWER-RIGHT corner of your screen.'}
   ], tourIdx = 0;
 
-  
+  $(tourSelector + ' > button#skip').text('SKIP');
   $(tourSelector + ' > button#imgood').unbind('click').text('NEXT')
+                                      .css({'visibility': 'visible'})
                                       .click(function() {
     tourIdx++;
     $(tourObjects[tourIdx-1]).stop(true, true);
 
     if (1 <= tourIdx) {
-      $(tourObjects[tourIdx]).width(function(idx) {
-        $(this).width($(this).width()*2);
-        $(this).height($(this).height()*2);
-      });
+      if (4 === tourIdx && 0 === $('.whiteBoard').length) {
+        $(tourObjects[3]).click();
+      }
+
+      if (5 === tourIdx) {
+        setTimeout(function(){
+          $('.whiteBoard > .zoom').click();
+          setTimeout(function() {
+            $('#zoom > .close').click();
+          }, 5000);
+        }, 5000);
+      }
 
       if (1 === tourIdx) {
-        $('.cloudcarousel.unoccupied').css({'visibility': 'hidden'});
+        $(tourObjects[tourIdx-1]).css({
+          'visibility': 'visible',
+          'opacity': '1.0'
+        });
       } else {
         $(tourObjects[tourIdx-1]).removeAttr('style');
       }
     }
 
     if(tourIdx >= tourObjects.length) {
-      $(this).attr('disabled', 'disabled');
-      $('.cloudcarousel.unoccupied').css({'visibility': 'visible'});
+      $(this).css({'visibility': 'hidden'});
+      $(tourSelector + ' > button#sure').text('REPEAT').css({'visibility': 'visible'});
       $(tourSelector + ' > button#skip').text('DONE');
-      $(tourSelector + ' > h3').html('You\'re All Set!');
+      $(tourSelector + ' > h3').html('10. You\'re All Set!');
       $(tourSelector + ' > p#desc').text('Thanks for taking the test drive. Enjoy!!!');
     } else {
       describeTourObject(tourSelector, tourObjects[tourIdx],
@@ -2474,8 +2502,12 @@ function startTour(tourSelector) {
     
   $(tourSelector + ' > button#skip').css({'visibility': 'visible'})
                                     .click(function() {
-    $(tourObjects[0] + ', ' + tourObjects[1]).stop(true, true);
+    $(tourObjects[0]).stop(true, true);
     $(tourObjects[tourIdx]).stop(true, true);
+    $(tourObjects[0]).css({
+      'visibility': 'visible',
+      'opacity': '1.0'
+    });
 
     if (1 <= tourIdx) {
       $(tourObjects[tourIdx]).removeAttr('style');  
