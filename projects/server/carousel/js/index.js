@@ -1030,19 +1030,26 @@ function promptTour() {
   if ('undefined' !== typeof(Storage) && !window.localStorage.gcpDontShowTourCheck) {
     $('body > #tour').css({
       'display': 'block',
-      'left'   : '0px',
-      'top'    : '0px'
+      'left'   : Math.floor(($(window).width() - $('body > #tour').width())/2) + 'px',
+      'top'    : Math.floor(($(window).height() - $('body > #tour').height())/2) + 'px'
     });
-    $('body > #tour > button#skip').css({'visibility': 'hidden'});
+    $('body > #tour > button#skip').css({
+      'left'      : Math.floor(($('body > #tour').width() - $('body > #tour > button#skip').width())/2) + 'px',
+      'visibility': 'hidden'
+    });
 
     $('body > #tour > h3 > span#nick').text(app.user.name.replace(/%20/g, ' ') + '!');
-    $('body > #tour > button#imgood').click(function() {
+    $('body > #tour > button#imgood').css({
+      'left' : ($('body > #tour').width() - $('body > #tour > button#imgood').width() - 5) + 'px',
+    }).click(function() {
       $('body > #tour').css({'display': 'none'});
       if ('checked' === $('body > #tour > input#dontShowAgain').attr('checked')) {
         window.localStorage.gcpDontShowTourCheck = 'true';
       }
     });
-    $('body > #tour > button#sure').click(function() {
+    $('body > #tour > button#sure').css({
+      'left' : '5px'
+    }).click(function() {
       startTour('body > #tour');
     });
   }
@@ -2364,114 +2371,108 @@ function addItem() {
 }
 
 function describeTourObject(tourSelector, objSelector, objDescription) {
-  var opacity = 1.0, pulsateTimer = setInterval(function(){
-    opacity = (1.0 === opacity) ? 0.0 : 1.0;
-    $(objSelector).fadeTo(1000, opacity);
-  }, 1000);
-  
+  $(objSelector).effect('pulsate', {times: 3}, 6000);
   $(tourSelector + ' > h3').html(objDescription.title);
   $(tourSelector + ' > p#desc').text(objDescription.description);
-
-  return pulsateTimer;
 }
 
 function startTour(tourSelector) {
   var tourObjects = [
     'body > #meeting > #streams > #scarousel',
-    '#mystream',
     '#effectsPanel > div',
     'input[id*=video], input[id*=audio]',
-    '#lower-right > input[id*=add]',
+    '#lower-right > input#addWhiteBoard',
     '#lower-left > div#msgBoard',
-    '#lower-right > input[class*=fb]',
-    '#lower-right > input[class=copyData]',
+    '#lower-right > input[class*=fb], #lower-right > input[class=copyData]',
     '#lower-right > input[class=feedback]'
   ], tourDescriptions = [
-    {title: 'The Carousel', description: 'It contains your preview as well ' +
-                                         'as empty "spots". They can be ' +
-                                         'occupied by other people in the ' +
-                                         'room, as well as shared content. ' +
-                                         'Use your ARROW KEYS / MOUSE WHEEL ' +
-                                         'to rotate the carousel.'},
-    {title: 'Preview Window', description: 'It shows the mirrored feed of ' +
-                                           'your webcam.'},
-    {title: 'Video Effects', description: 'Change the look of your video feed by ' +
-                                          'choosing one of the effects [gray/sepia]. ' +
-                                          'The buttons are just below your preview.'},
-    {title: 'Media Controls', description: 'Turn on/off your video/audio. The buttons are ' +
-                                           'on the LOWER-RIGHT corner of your screen.'},
-    {title: 'Share Content On The Carousel', description: 'Add an empty spot to the ' +
-                                                          'by clicking on the PLUS icon ' +
-                                                          'on the LOWER-RIGHT corner of your screen. ' +
-                                                          'Add a WHITEBOARD by clicking on the ' +
-                                                          'whiteboard icon to it\'s left.'},
-    {title: 'Post Comments To The Room', description: 'Type your comments in the textbox on the ' +
-                                                      'LOWER-LEFT corner of your screen.'},
-    {title: 'Invite Your Facebook Friends', description: 'You can invite your Facebook friends ' +
-                                                         'to your room by posting on your wall, ' +
-                                                         'or sending a message to a specific friend.'},
-    {title: 'Invite Your Friends Through Email', description: 'If you\'re not using Facebook, invite ' +
-                                                              'others via email. The button is located to ' +
-                                                              'the right of the Facebook buttons.'},
-    {title: 'Give Us Your Feedback', description: 'We\'d love to hear about your experience with our WebApp. ' +
-                                                  'Click on the FEEDBACK button on the LOWER-RIGHT corner ' +
-                                                  'of your screen.'}
-  ], tourTimer, pulsateTimer, tourIdx = 0;
+    {title:       '1. What\'s Flashing? The Carousel.',
+     description: 'You are looking at the start of a GoCast live meeting. ' +
+                  'You start by seeing a preview of your roommates will see you on video. ' +
+                  'The "GO" spots can be occupied by other people or by shared content, '+ 
+                  'such as our Whiteboard. You can also spin the Carousel spots. ' +
+                  'Use the arrow keys on your keyboard, your mouse wheel, or make a scroll ' +
+                  'gesture with a Macintosh trackpad. TRY IT!! (click NEXT for more)'},
+    {title:       '2. What\'s Flashing? Video Effects.',
+     description: 'You can change the way other people will see you on GoCast. You can ' +
+                  'switch from full color to black and white, or to a sepia effect. ' +
+                  'Just click on any of the the three buttons below your preview on the left.' +
+                  'TRY IT!!'},
+    {title:       '3. What\'s Flashing? Media Controls.',
+     description: 'You can turn your webcam and microphone on and off. The buttons are in ' +
+                  'two places: the LOWER-RIGHT corner of your preview window, and on ' +
+                  'the ICON BAR. If you have logged in with Facebook, your profile photo will ' +
+                  'appear when you turn off your webcam.'},
+    {title:       '4. What\'s Flashing? Share Content On The Carousel.',
+     description: 'You can add one or more Whiteboards to the Carousel. Just click on the ' +
+                  'WHITEBOARD ICON. The PLUS ICON, to its right, will be used to add ' +
+                  'additional content, such as documents, images, videos and widgets in ' +
+                  'the near future.You can also remove a Carousel spot by clicking on the ' +
+                  'TRASHCAN ICON on the upper right corner the spot.'},
+    {title:       '7. What\'s Flashing? Post Comments To The Room.',
+     description: 'Type your comments in the textbox on the LOWER-LEFT corner of your screen. ' +
+                  'Click the POST BUTTON or the RETURN KEY and your comments can be seen ' +
+                  'by your roommates.'},
+    {title:       '8. What\'s Flashing? Invite Others To Your Room.',
+     description: 'You can invite your Facebook friends to your room by posting on your wall, ' +
+                  'or sending invites to your friends. You can also invite anybody via email. ' +
+                  'The EMAIL ICON is located to the right of the FACEBOOK BUTTONS.'},
+    {title:       '9. What\'s Flashing? Give Us Your Feedback',
+     description: 'We\'d love to hear about your experience with the GoCast Carousel. ' +
+                  'Click on the FEEDBACK button on the LOWER-RIGHT corner of your screen.'}
+  ], tourIdx = 0;
 
   
   $(tourSelector + ' > button#imgood').unbind('click').text('NEXT')
                                       .click(function() {
     tourIdx++;
-    clearInterval(pulsateTimer);
     $(tourObjects[tourIdx-1]).stop(true, true);
 
-    if (2 <= tourIdx) {
+    if (1 <= tourIdx) {
       $(tourObjects[tourIdx]).width(function(idx) {
         $(this).width($(this).width()*4);
         $(this).height($(this).height()*4);
       });
 
-      if (2 === tourIdx) {
+      if (1 === tourIdx) {
         $('.cloudcarousel.unoccupied').css({'visibility': 'hidden'});
       } else {
         $(tourObjects[tourIdx-1]).removeAttr('style');
       }
-    } 
+    }
 
-    if (2 >= tourIdx) {
+/*    if (2 >= tourIdx) {
       $(tourObjects[tourIdx-1]).css({
         'visibility': 'visible',
         'opacity': '1.0' 
       });      
-    }
+    }*/
 
     if(tourIdx >= tourObjects.length) {
       $(this).attr('disabled', 'disabled');
       $('.cloudcarousel.unoccupied').css({'visibility': 'visible'});
       $(tourSelector + ' > button#skip').text('DONE');
       $(tourSelector + ' > h3').html('You\'re All Set!');
-      $(tourSelector + ' > p#desc').text('Enjoy!!!');
+      $(tourSelector + ' > p#desc').text('Thanks for taking the test drive. Enjoy!!!');
     } else {
-      pulsateTimer = describeTourObject(tourSelector,
-                                        tourObjects[tourIdx],
-                                        tourDescriptions[tourIdx]);      
+      describeTourObject(tourSelector, tourObjects[tourIdx],
+                         tourDescriptions[tourIdx]);      
     }
   });
     
   $(tourSelector + ' > button#skip').css({'visibility': 'visible'})
                                     .click(function() {
-    clearInterval(pulsateTimer);
-    $(tourObjects[0] + ', ' + tourObjects[1]).stop(true, true).css({
+    $(tourObjects[0] + ', ' + tourObjects[1]).stop(true, true);/*.css({
       'visibility': 'visible',
       'opacity': '1.0'
     });
     $('.cloudcarousel').css({
       'visibility': 'visible',
       'opacity': '1.0'
-    });
+    });*/
     $(tourObjects[tourIdx]).stop(true, true);
 
-    if (2 <= tourIdx) {
+    if (1 <= tourIdx) {
       $(tourObjects[tourIdx]).removeAttr('style');  
     }
 
@@ -2481,7 +2482,6 @@ function startTour(tourSelector) {
   $(tourSelector + ' > button#sure').css({'visibility': 'hidden'});
   $(tourSelector + ' > input#dontShowAgain').css({'display': 'none'});
   $(tourSelector + ' > span').css({'display': 'none'});
-  pulsateTimer = describeTourObject(tourSelector,
-                                    tourObjects[0],
-                                    tourDescriptions[0]);
+  describeTourObject(tourSelector, tourObjects[0],
+                     tourDescriptions[0]);
 }

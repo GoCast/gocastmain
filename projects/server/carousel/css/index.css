@@ -1199,8 +1199,8 @@ body > div#meeting > div#streams > div#scontrols > input.right {
 body > #tour {
   display: none;
   position: absolute;
-  width: 30%;
-  height: 20%;
+  width: 300px;
+  height: 200px;
   background: -webkit-gradient(linear, center bottom, center top, from(rgba(40,40,40,0.6)), to(rgba(40,40,40,0.3)));
   background: -moz-linear-gradient(bottom, rgba(40,40,40,0.6), rgba(40,40,40,0.3));
   border-radius: 5px;
@@ -1218,17 +1218,14 @@ body > #tour > #desc {
 }
 body > #tour > button#sure {
   position: absolute;
-  left: 0%;
   bottom: 1%;
 }
 body > #tour > button#skip {
   position: absolute;
-  left: 30%;
   bottom: 1%;
 }
 body > #tour > button#imgood {
   position: absolute;
-  left: 60%;
   bottom: 1%;
 }
 /*</MANJESH>*/
