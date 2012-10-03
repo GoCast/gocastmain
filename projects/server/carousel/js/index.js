@@ -1843,18 +1843,18 @@ function tryPluginInstall(
   //For Chrome to reload the plugin after its installed by calling
   //navigator.plugins.refresh(), the object tag must already be in the
   //html.
-  if ('Chrome' === app.browser.name) {
+  /*if ('Chrome' === app.browser.name) {
     if(loadPluginOnce) {
       loadPluginOnce();
     }    
-  }
+  }*/
 
   if (app.pluginInstalled() && !app.pluginLoaded)
   {
     // Add the plugin object html to the carousel only once
-    if (loadPluginOnce) {
+    /*if (loadPluginOnce) {
       loadPluginOnce();
-    }
+    }*/
     setTimeout(tryPluginInstall, 500);
   }
   else if (app.pluginInstalled() && app.pluginLoaded && !app.pluginUpgrade) // good to go
