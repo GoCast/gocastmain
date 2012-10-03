@@ -63,8 +63,13 @@
   <body>
     <img src="images/body-bg.png" alt="background image" id="body-bg" />
     <div id="fb-root"></div> <!-- fb integration required -->
+    <div id="upper-left">
+      <p>GoCast.it ©2012 Beta</p>
+      <div class="feedback gc-icon" id="feedback" title="Send us your feedback."   onclick="openChat(event);"></div>
+      <div class="gc-icon"          id="log"      title="Send log file to GoCast." onClick="sendLogPrompt();"></div>
+    </div>
     <div id="upper-right">
-      <div id="settings" title="Settings" onClick="app.navToSettings()"></div>
+      <div class="gc-icon" id="settings" title="Settings" onClick="app.navToSettings()"></div>
 
       <!-- <MANJESH> -->
       <div id="settings-prompt" class="info">
@@ -75,8 +80,15 @@
       </div>
       <!-- </MANJESH> -->
 
-      <div id="volume"></div>
       <p id="connection-status">Connection Status</p>
+      <div class="gc-icon" id="volume"></div>
+      <input class="gc-icon" id="audio" type="button" class="off" title="Audio is Disabled" disabled="disabled"/>
+      <input class="gc-icon" id="video" type="button" title="Video is Disabled" disabled="disabled"/>
+      <input class="copyData gc-icon" type="button" title="Email link to room." onclick="openCopyData(event);"/>
+      <!--<input class="twitter gc-icon" type="button" title="Send message to Twitter." onclick="sendTwitter();"/>-->
+      <input class="fbSend gc-icon"  type="button" title="Send facebook message." onclick="fbSendDialog();"/>
+      <input class="fbShare gc-icon" type="button" title="Share on wall." onclick="fbShare();"/>
+
       <div id="status-prompt" class="warning">
         <p id="message">The speaker volume is too low for you to hear!</p>
         <input id="stop-showing" type="checkbox" value="Stop"onclick="stopStatusClicked(event);"/>
@@ -91,7 +103,6 @@
         <p id="stop-showing-text">Stop showing this message.</p>
         <img class="close" src="images/button-close.png" alt="Close" title="Close" onClick="closeSendLog();"/>
       </div>
-      <div id="log" title="Send log file to GoCast." onClick="sendLogPrompt();"></div>
     </div>
     <div id="lower-right">
        <input id="dlbtn" type="button" title="Get Updated Plugin." onclick="doDownload();" />
@@ -100,14 +111,6 @@
        <!--<input class="demobtn" type="button" title="Place demo content." onclick="startDemoContent();" />-->
        <input id="addItem" type="button" title="Add Spot" onclick="addItem();"/>
        <input id="addWhiteBoard" type="button" title="Add White Board" onclick="addWhiteBoard();"/>
-       <input class="feedback" type="button" title="Send us your feedback." onclick="openChat(event);"/>
-       <input class="copyData" type="button" title="Email link to room." onclick="openCopyData(event);"/>
-       <!--<input class="twitter" type="button" title="Send message to Twitter." onclick="sendTwitter();"/>-->
-       <input class="fbSend"  type="button" title="Send facebook message." onclick="fbSendDialog();"/>
-       <input class="fbShare" type="button" title="Share on wall." onclick="fbShare();"/>
-       <input id="audio" type="button" class="off" title="Audio is Disabled" disabled="disabled"/>
-       <input id="video" type="button" title="Video is Disabled" disabled="disabled"/>
-       <p>GoCast.it ©2012 Beta        </p>
     </div>
     <div id="lower-left">
       <!--

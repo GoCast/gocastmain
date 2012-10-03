@@ -133,6 +133,19 @@ body input[type="button"] {
   background-color: transparent;
   background-repeat: no-repeat;
 }
+.gc-icon
+{
+  width:24px;
+  height:24px;
+  display:inline-block;
+  vertical-align: middle;
+  opacity: 0.6;
+}
+.gc-icon:hover 
+{
+  cursor: pointer;
+  opacity: 1.0;
+}
 body > div#upper-right
 {
   position: absolute;
@@ -140,73 +153,64 @@ body > div#upper-right
   right: 10px;
   z-index: 1000;
   line-height: 2em;
+  max-width: 50%;
 }
-body > div#upper-right > div#log
+body > div#upper-right > .gc-icon
 {
-   opacity: 0.6;
-   float:right;
+  float:right;
+}
+body > div#upper-left > p
+{
+  display:inline;
+  color:white;
+  margin-right:10px;
+}
+body > div#upper-left
+{
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 1000;
+  line-height: 2em;
+  min-width:300px;
+  max-width: 50%;
+}
+div#log
+{
    margin-right: 10px;
-   width:30px;
-   height:30px;
-   vertical-align: middle;
    background-image: url("../images/ReportBug.png");
    background-repeat: no-repeat;
    background-size: 100% 100%;
    z-index: 1000;
 }
-
-/*<MANJESH>*/
-body > div#upper-right > div#log:hover {
-  cursor: pointer;
-  opacity: 1.0;
-}
-/*</MANJESH>*/
-
-body > div#upper-right > div#settings
+div#settings
 {
-   opacity: 0.6;
    float:right;
    margin-right: 10px;
-   width:20px;
-   height:20px;
-   vertical-align: middle;
    background-image: url("../images/Settings.png");
    background-repeat: no-repeat;
    background-size: 100% 100%;
    z-index: 1000;
 }
-
-/*<MANJESH>*/
-body > div#upper-right > div#settings:hover {
-  cursor: pointer;
-  opacity: 1.0;
-}
-/*</MANJESH>*/
-
-body > div#upper-right > div#volume
+div#volume
 {
-   float:right;
    margin-right: 10px;
-   width:20px;
-   height:20px;
-   vertical-align: middle;
    background-image: url("../images/volume-high.png");
    background-repeat: no-repeat;
    background-size: 100%;
    z-index: 1000;
 }
-body > div#upper-right > p#connection-status
+p#connection-status
 {
   float:right;
   margin-right: 10px;
   margin-top: auto;
   margin-left: auto;
-  vertical-align: middle;
   color: white;
   font-size:11px;
-   z-index: 1000;
+  z-index: 1000;
 }
-body > div#upper-right > div#status-prompt
+div#status-prompt
 {
   display: none;
   position: absolute;
@@ -218,12 +222,12 @@ body > div#upper-right > div#status-prompt
   background-image: url("../images/volume-muted.png");
   background-size:32px;
 }
-body > div#upper-right > div#status-prompt > p#stop-showing-text
+div#status-prompt > p#stop-showing-text
 {
   display: inline;
   font-size: 11px;
 }
-body > div#upper-right > div#send-log-prompt
+div#send-log-prompt
 {
   display: none;
   position: absolute;
@@ -236,7 +240,7 @@ body > div#upper-right > div#send-log-prompt
 }
 
 /*<MANJESH>*/
-body > div#upper-right > div#settings-prompt {
+div#settings-prompt {
   display: none;
   position: absolute;
   top:30px;
@@ -252,12 +256,12 @@ body > div#upper-right > .info {
 }
 /*</MANJESH>*/
 
-body > div#upper-right > div#send-log-prompt > .button
+div#send-log-prompt > .button
 {
   padding-bottom: .45em;
   margin-bottom: 1em;
 }
-body > div#upper-right > div#send-log-prompt > p
+div#send-log-prompt > p
 {
   display: inline;
   font-size: 11px;
@@ -273,51 +277,57 @@ body > div#lower-right
    z-index: 1000;
    line-height: 2em;
 }
+body > div#upper-left > input,
 body > div#lower-right > input
 {
-  float:right;
   width: 24px;
   height: 24px;
   margin-left: 5px;
 }
+body > div#lower-right > input
+{
+  float:right;
+}
 body > div#lower-right > p {
   opacity: 0.6;
 }
-body > div#lower-right > input#dlbtn
+input#dlbtn
 {
   margin-left: 5px;
   background-image: url("../images/download.png");
   display: none;
   background-size: 100%;
 }
-body > div#lower-right > input.demobtn {
+input.demobtn {
   margin-left: 5px;
   background-image: url("../images/demo.png");
 }
-body > div#lower-right > input.vidbtn {
+input.vidbtn {
+  width:30px;
+  height:30px;
   margin-left: 5px;
   background-image: url("../images/people.png");
   background-size: 100%;
 }
-body > div#lower-right > input.feedback {
+div#feedback {
   background-image: url("../images/GiveFeedback.png");
   background-size: 100% 100%;
 }
-body > div#lower-right > input.copyData {
-  margin-left: 7px;
+input.copyData {
+  margin-right: 20px;
   background-image: url("../images/EmailLinktoMeeting.png");
   background-size:100% 100%;
 }
-body > div#lower-right > input.twitter {
+input.twitter {
   background-image: url("../images/btn-twitter.png");
 }
-body > div#lower-right > input.fbSend {
+input.fbSend {
   width: 30px;
   height: 30px;
   background-image: url("../images/SendFB.png");
   background-size: 100% 100%;
 }
-body > div#lower-right > input.fbShare {
+input.fbShare {
   margin-left: 15px;
   width: 30px;
   height: 30px;
@@ -325,51 +335,61 @@ body > div#lower-right > input.fbShare {
   background-size: 100% 100%;
 }
 /*<MANJESH>*/
-body > div#lower-right > input#addWhiteBoard {
+input#addWhiteBoard {
   background-image: url('../images/AddWhiteboard.png');
   background-size: 100% 100%;
 }
-body > div#lower-right > input#addItem {
+input#addItem {
   background-image: url('../images/plus.png');
   background-size: 100%;
 }
 /*</MANJESH>*/
-body > div#lower-right > input#video:disabled,
+input#video
+{
+  width:30px;
+  height:30px;
+}
+input#video:disabled,
 input#videoPreview:disabled {
   background-image: url("../images/VideoUnavail.png");
   background-size: 100% 100%;
 }
-body > div#lower-right > input#video.on:disabled,
+input#video.on:disabled,
 input#videoPreview.on:disabled {
   background-image: url("../images/VideoUnavail.png");
   background-size: 100% 100%;
 }
-body > div#lower-right > input#video,
+input#video,
 input#videoPreview {
   background-image: url("../images/videoOff.png");
   background-size: 100% 100%;
 }
-body > div#lower-right > input#video.on,
+input#video.on,
 input#videoPreview.on {
   background-image: url("../images/VideoOn.png");
   background-size: 100% 100%;
 }
-body > div#lower-right > input#audio:disabled,
+input#audio
+{
+  width:30px;
+  height:30px;
+}
+input#audio:disabled,
 input#audioPreview:disabled {
   background-image: url("../images/AudioUnavail.png");
   background-size: 100% 100%;
 }
-body > div#lower-right > input#audio.off:disabled,
+input#audio.off:disabled,
 input#audioPreview.off:disabled {
   background-image: url("../images/AudioUnavail.png");
   background-size: 100% 100%;
 }
-body > div#lower-right > input#audio.off,
+input#audio.off,
 input#audioPreview.off {
   background-image: url("../images/AudioOff.png");
   background-size: 100% 100%;
 }
-body > div#lower-right > input#audio,
+input#audio,
 input#audioPreview {
   margin-left: 5px;
   background-image: url("../images/AudioOn.png");
@@ -383,12 +403,6 @@ body > div#lower-left {
   margin: 0px 10px 0px;
   line-height: 2em;
   max-width: 50%
-}
-body > div#lower-right > p
-{
-  display:inline;
-  color:white;
-  margin-right:10px;
 }
 div#lower-left > input#showChat
 {
@@ -1084,7 +1098,7 @@ body > div#meeting > div#streams > div#scontrols > input.right {
 #boxes #copyData
 {
    border: 5px solid rgba(40, 40, 40, .5);
-   margin-right: 20px;
+   margin-right: 60px;
    margin-bottom: 100px;
    background-color: #cccccc;
    -moz-user-select: text;
