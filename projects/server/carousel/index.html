@@ -158,11 +158,14 @@
       </div>
       <div id="copyData" class="window resizable">
          <img class="close" src="images/button-close.png" alt="Close" title="Close" />
-         <p>Copy this and paste it into an email.</p>
+         <p>Copy this and paste this into an email.</p>
          <div id="copyContent">
-            <h2>Join us now on GoCast</h2>
-            <img id="copyLogo" alt="Room Link" title="Room Link" src="images/gologo.png" />
-            <a id="copyName"></a>
+            <h3>You're Invited To GoCast!</h3>
+            I am using <strong>GoCast</strong>, a new kind of "room" on the Web where people can meet and share on live video.
+            Get started by downloading the GoCast plug-in (currently for Firefox or Chrome only), and join me in my room.
+            To get started, click <a id="copyName">here</a>. See you soon!
+            <p></p>
+            <img id="copyLogo" alt="Room Link" title="Room Link" src="images/GoToken.png" />
          </div>
       </div>
       <div id="waitingToJoin" class="window resizable">
@@ -240,7 +243,10 @@
       <div id="streams">
         <div id="scarousel">
           <div class="cloudcarousel" id="mystream">
-            <div id="effectsPanel">
+              <object class="localplayer" id="GocastPlayerLocal" type="application/x-gocastplayer" width="0" height="0">
+                <param name="onload" value="pluginLoaded" />
+              </object>
+              <div id="effectsPanel">
               <div id="effect-none" effect="none" title="no effect" onclick="applyEffect('none');"></div>
               <div id="effect-gray" effect="gray" title="black and white" onclick="applyEffect('gray');"></div>
               <div id="effect-sepia" effect="sepia" title="sepia" onclick="applyEffect('sepia');"></div>
@@ -284,7 +290,7 @@
     <div id="scratch"></div>
     <div id="tour">
       <h3>Hi, <span id="nick"></span></h3>
-      <p id="desc">Let's take a quick tour.</p>
+      <p id="desc">Take a quick test drive of GoCast in 10 easy steps.</p>
       <input id="dontShowAgain" type="checkbox" /><span style="color: grey;">Don't show this again.</span><p></p>
       <button id="sure">SURE</button>
       <button id="skip">SKIP TOUR</button>
