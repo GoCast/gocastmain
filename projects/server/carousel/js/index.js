@@ -66,9 +66,9 @@ var app = {
   VID_BUTTON: '#lower-right > #video',
   AUD_BUTTON: '#lower-right > #audio',
   LOCAL_PLUGIN: '#mystream',
-  LOCAL_PLUGIN_OBJECT: '<object class="localplayer" id="GocastPlayerLocal"' + 
-                          ' type="application/x-gocastplayer" width="0" height="0">' + 
-                          '<param name="onload" value="pluginLoaded" />' + 
+  LOCAL_PLUGIN_OBJECT: '<object class="localplayer" id="GocastPlayerLocal"' +
+                          ' type="application/x-gocastplayer" width="0" height="0">' +
+                          '<param name="onload" value="pluginLoaded" />' +
                         '</object>',
   /**
    * Writes the specified log entry into the console HTML element, if
@@ -415,7 +415,7 @@ var app = {
       window.localStorage.gcpAppInstanceStamp = new Date().toString();
       setInterval(function(){
         window.localStorage.gcpAppInstanceStamp = new Date().toString();
-      }, interval||2000);      
+      }, interval||2000);
     }
   },
 
@@ -1050,7 +1050,7 @@ function promptTour() {
 
     $('body > #tour > h3 > span#nick').text(app.user.name.replace(/%20/g, ' ') + '!');
     $('body > #tour > button#imgood').css({
-      'left' : ($('body > #tour').width() - $('body > #tour > button#imgood').width() - 5) + 'px',
+      'left' : ($('body > #tour').width() - $('body > #tour > button#imgood').width() - 5) + 'px'
     }).click(function() {
       $('body > #tour').css({'display': 'none'});
       if ('checked' === $('body > #tour > input#dontShowAgain').attr('checked')) {
@@ -2150,7 +2150,7 @@ $(document).ready(function(
 
       // set the connection status callback
       Callcast.setCallbackForCallback_ConnectionStatus(connectionStatus);
-    }    
+    }
   }, function() {
     closeWindow();
     openWindow('#errorMsgPlugin');
@@ -2387,10 +2387,10 @@ function resizeTour(tourSelector) {
     'top'    : Math.floor(($(window).height() - $(tourSelector).height())/2) + 'px'
   });*/
   $(tourSelector + ' > button#skip').css({
-    'left'      : Math.floor(($(tourSelector).width() - $(tourSelector + ' > button#skip').width())/2) + 'px',
+    'left'      : Math.floor(($(tourSelector).width() - $(tourSelector + ' > button#skip').width())/2) + 'px'
   });
   $(tourSelector + ' > button#imgood').css({
-    'left' : ($('body > #tour').width() - $('body > #tour > button#imgood').width() - 5) + 'px',
+    'left' : ($('body > #tour').width() - $('body > #tour > button#imgood').width() - 5) + 'px'
   });
 }
 
@@ -2428,7 +2428,7 @@ function startTour(tourSelector) {
                   'Go ahead, TRY IT!!'},
     {title:       '3. What\'s Flashing? Media Controls',
      description: 'You can turn your webcam and microphone on and off. The buttons are on ' +
-                  'the LOWER-RIGHT corner of your preview window and on the ICON BAR.' + 
+                  'the LOWER-RIGHT corner of your preview window and on the ICON BAR.' +
                   'If you have logged in with Facebook your profile photo will appear when ' +
                   'you turn off your webcam. Go ahead, TRY IT!!'},
     {title:       '4. What\'s Flashing? Share Content',
@@ -2502,7 +2502,7 @@ function startTour(tourSelector) {
       $(tourSelector + ' > p#desc').text('Thanks for taking the test drive. Enjoy!!!');
     } else {
       describeTourObject(tourSelector, tourObjects[tourIdx],
-                         tourDescriptions[tourIdx]);      
+                         tourDescriptions[tourIdx]);
     }
   });
 
@@ -2547,7 +2547,7 @@ function startTour(tourSelector) {
     });
 
     if (1 <= tourIdx) {
-      $(tourObjects[tourIdx]).removeAttr('style');  
+      $(tourObjects[tourIdx]).removeAttr('style');
     }
 
     $(tourSelector).css({'display': 'none'});
