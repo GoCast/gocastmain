@@ -266,13 +266,13 @@ var app = {
         $('#meeting > #streams > #scontrols > input').removeAttr('disabled');
         if (Callcast.IsVideoDeviceAvailable())
         {
-          $('#lower-right > #video').removeAttr('disabled');
+          $(app.VID_BUTTON).removeAttr('disabled');
           $('#videoPreview').removeAttr('disabled');
           $('#effectsPanel').css({'display': 'block'});
         }
         if (Callcast.IsMicrophoneDeviceAvailable())
         {
-          $('#lower-right > #audio').removeAttr('disabled');
+          $(app.AUD_BUTTON).removeAttr('disabled');
           $('#audioPreview').removeAttr('disabled');
         }
         $(app.GROUP_CHAT_OUT).removeAttr('disabled');
@@ -280,9 +280,9 @@ var app = {
      else
      {
         $('#meeting > #streams > #scontrols > input').attr('disabled', 'disabled');
-        $('#lower-right > input.video').attr('disabled', 'disabled');
+        $(app.VID_BUTTON).attr('disabled', 'disabled');
         $('#videoPreview').attr('disabled', 'disabled');
-        $('#lower-right > input.audio').attr('disabled', 'disabled');
+        $(app.AUD_BUTTON).attr('disabled', 'disabled');
         $('#audioPreview').attr('disabled', 'disabled');
         $(app.GROUP_CHAT_OUT).attr('disabled', 'disabled');
      }
@@ -663,8 +663,8 @@ function activateWindow(
     }
   }
   else if (winId.match('meeting')) {
-    $('#lower-right > #video').on('click.s04172012a', videoButtonPress);
-    $('#lower-right > #audio').on('click.s04172012b', audioButtonPress);
+    $(app.VID_BUTTON).on('click.s04172012a', videoButtonPress);
+    $(app.AUD_BUTTON).on('click.s04172012b', audioButtonPress);
     $('#videoPreview').on('click.s04172012a', videoButtonPress);
     $('#audioPreview').on('click.s04172012b', audioButtonPress);
   }
@@ -1457,8 +1457,8 @@ function deactivateWindow(
     $('a#btn', winId).off('click.s04072012', onJoinNow);
   }
   else if (winId.match('meeting')) {
-    $('#lower-right > #video').off('click.s04172012a', changeVideo);
-    $('#lower-right > #audio').off('click.s04172012b', changeAudio);
+    $(app.VID_BUTTON).off('click.s04172012a', changeVideo);
+    $(app.AUD_BUTTON).off('click.s04172012b', changeAudio);
     $('#videoPreview').off('click.s04172012a', changeVideo);
     $('#audioPreview').off('click.s04172012b', changeAudio);
   }
