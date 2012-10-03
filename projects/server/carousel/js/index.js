@@ -57,14 +57,16 @@ var app = {
   LIN_32_DL_URL: 'https://carousel.gocast.it/downloads/GoCastPlayer_i686.tar.gz',
   MAC_PL_NAME: 'GCP.plugin',
   WIN_PL_NAME: 'npGCP.dll',
-  SENDLOG_PROMPT: "#upper-right > #send-log-prompt",
-  SENDLOG_PROMPT_STOP: "#upper-right > #send-log-prompt > #stop-showing",
+  SENDLOG_PROMPT: "#upper-left > #send-log-prompt",
+  SENDLOG_PROMPT_STOP: "#upper-left > #send-log-prompt > #stop-showing",
   STATUS_PROMPT: "#upper-right > #status-prompt",
   STATUS_PROMPT_STOP: "#upper-right > #status-prompt > #stop-showing",
+  STATUS_PROMPT_LEFT: "#upper-left > #status-prompt",
+  STATUS_PROMPT_LEFT_STOP: "#upper-left > #status-prompt > #stop-showing",
   spotUrDefaultClass: "control close", // the class for #upper-right image for unoccupied spot
   spotUrDefaultImage: "images/trash.png",
-  VID_BUTTON: '#lower-right > #video',
-  AUD_BUTTON: '#lower-right > #audio',
+  VID_BUTTON: '#upper-right > #video',
+  AUD_BUTTON: '#upper-right > #audio',
   LOCAL_PLUGIN: '#mystream',
   LOCAL_PLUGIN_OBJECT: '<object class="localplayer" id="GocastPlayerLocal"' + 
                           ' type="application/x-gocastplayer" width="0" height="0">' + 
@@ -2312,7 +2314,7 @@ function closeSendLog()
 ///
 function sendLog()
 {
-  var jqDlg = $(app.STATUS_PROMPT).css("display", "block"),  // display warning
+  var jqDlg = $(app.STATUS_PROMPT_LEFT).css("display", "block"),  // display warning
       checked = $(app.SENDLOG_PROMPT_STOP).attr("checked");
   closeSendLog();
 

@@ -67,6 +67,20 @@
       <p>GoCast.it ©2012 Beta</p>
       <div class="feedback gc-icon" id="feedback" title="Send us your feedback."   onclick="openChat(event);"></div>
       <div class="gc-icon"          id="log"      title="Send log file to GoCast." onClick="sendLogPrompt();"></div>
+      <div id="send-log-prompt" class="warning">
+        <button id="send" class="send button" onclick="sendLog()">Send</button>
+        <button id="stop" class="close button" onclick="closeSendLog()">Cancel</button>
+        <p id="message">Send debug info to GoCast?</p><br>
+        <input id="stop-showing" type="checkbox" value="Stop"/>
+        <p id="stop-showing-text">Stop showing this message.</p>
+        <img class="close" src="images/button-close.png" alt="Close" title="Close" onClick="closeSendLog();"/>
+      </div>
+      <div id="status-prompt" class="warning">
+        <p id="message">The speaker volume is too low for you to hear!</p>
+        <input id="stop-showing" type="checkbox" value="Stop"onclick="stopStatusClicked(event);"/>
+        <p id="stop-showing-text">Stop showing this message.</p>
+        <img class="close" src="images/button-close.png" alt="Close" title="Close" onClick="closeStatus(event);"/>
+      </div>
     </div>
     <div id="upper-right">
       <div class="gc-icon" id="settings" title="Settings" onClick="app.navToSettings()"></div>
@@ -94,14 +108,6 @@
         <input id="stop-showing" type="checkbox" value="Stop"onclick="stopStatusClicked(event);"/>
         <p id="stop-showing-text">Stop showing this message.</p>
         <img class="close" src="images/button-close.png" alt="Close" title="Close" onClick="closeStatus(event);"/>
-      </div>
-      <div id="send-log-prompt" class="warning">
-        <button id="send" class="send button" onclick="sendLog()">Send</button>
-        <button id="stop" class="close button" onclick="closeSendLog()">Cancel</button>
-        <p id="message">Send debug info to GoCast?</p><br>
-        <input id="stop-showing" type="checkbox" value="Stop"/>
-        <p id="stop-showing-text">Stop showing this message.</p>
-        <img class="close" src="images/button-close.png" alt="Close" title="Close" onClick="closeSendLog();"/>
       </div>
     </div>
     <div id="lower-right">
