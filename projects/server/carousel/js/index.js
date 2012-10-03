@@ -2396,7 +2396,7 @@ function resizeTour(tourSelector) {
 
 function describeTourObject(tourSelector, objSelector, objDescription) {
   setTimeout(function(){
-    $(objSelector).effect('pulsate', {times: 3}, 6000);
+    $(objSelector).effect('pulsate', {times: 4}, 8000);
   }, 1000);
   $(tourSelector + ' > h3').html(objDescription.title);
   $(tourSelector + ' > p#desc').text(objDescription.description);
@@ -2442,13 +2442,14 @@ function startTour(tourSelector) {
                   'Then click NEXT to learn about ZOOMING the WHITEBOARD.'},
     {title:       '6. What\'s Flashing? Zoomed Whiteboard',
      description: 'Expand a Whiteboard by clicking on the ZOOM ICON on its ' +
-                  'UPPER-LEFT corner. Notice that the Carousel is now flattened above the Whiteboard and can still be moved. ' +
-                  'To UNZOOM the Whiteboard click on the LARGE "X" on its UPPER-RIGHT corner.'},
+                  'UPPER-LEFT corner. Notice that the Carousel is now flattened above the ' +
+                  'Whiteboard and can still be moved. To UNZOOM the Whiteboard click on the ' +
+                  'LARGE "X" on its UPPER-RIGHT corner.'},
     {title:       '7. What\'s Flashing? Post Comments',
      description: 'Type comments in the text box on the LOWER-LEFT corner of your screen. ' +
                   'Click the POST BUTTON or the RETURN KEY and your comments will be seen ' +
                   'by your roommates. Go ahead, TRY IT!!'},
-    {title:       '8. What\'s Flashing? Invite Others To Your Room',
+    {title:       '8. What\'s Flashing? Invite Others',
      description: 'You can invite your Facebook friends to your room by posting on your wall, ' +
                   'or sending invites to your friends. You can also invite anybody via email. ' +
                   'The EMAIL ICON is located to the right of the FACEBOOK BUTTONS.'},
@@ -2483,6 +2484,7 @@ function startTour(tourSelector) {
           'visibility': 'visible',
           'opacity': '1.0'
         });
+        $(tourSelector + ' > button#sure').css({'visibility': 'visible'});
       } else {
         $(tourObjects[tourIdx-1]).removeAttr('style');
       }
@@ -2490,7 +2492,11 @@ function startTour(tourSelector) {
 
     if(tourIdx >= tourObjects.length) {
       $(this).css({'visibility': 'hidden'});
-      $(tourSelector + ' > button#sure').text('REPEAT').css({'visibility': 'visible'});
+      $(tourSelector + ' > button#sure').unbind('click').text('REPEAT')
+                                        .css({'visibility': 'visible'})
+                                        .click(function() {
+        startTour(tourSelector);
+      });
       $(tourSelector + ' > button#skip').text('DONE');
       $(tourSelector + ' > h3').html('10. You\'re All Set!');
       $(tourSelector + ' > p#desc').text('Thanks for taking the test drive. Enjoy!!!');
@@ -2499,7 +2505,38 @@ function startTour(tourSelector) {
                          tourDescriptions[tourIdx]);      
     }
   });
-    
+
+  $(tourSelector + ' > button#sure').unbind('click')
+                                    .css({'visibility': 'hidden'})
+                                    .text('PREVIOUS')
+                                    .click(function() {
+    tourIdx--;
+    $(tourObjects[tourIdx+1]).stop(true, true);
+    $(tourObjects[tourIdx+1]).removeAttr('style');
+
+    if (5 === tourIdx) {
+      if (0 === $('.whiteBoard').length) {
+        $(tourObjects[3]).click();
+      }
+      setTimeout(function(){
+        $('.whiteBoard > .zoom').click();
+        setTimeout(function() {
+          $('#zoom > .close').click();
+        }, 5000);
+      }, 5000);
+    }
+
+    if (0 === tourIdx) {
+      $(this).css({'visibility': 'hidden'});
+    } else if ((tourObjects.length-1) === tourIdx) {
+      $(tourSelector + ' > button#imgood').css({'visibility': 'visible'});
+    }
+
+    describeTourObject(tourSelector, tourObjects[tourIdx],
+                       tourDescriptions[tourIdx]);
+  });
+
+
   $(tourSelector + ' > button#skip').css({'visibility': 'visible'})
                                     .click(function() {
     $(tourObjects[0]).stop(true, true);
@@ -2516,7 +2553,6 @@ function startTour(tourSelector) {
     $(tourSelector).css({'display': 'none'});
   });
 
-  $(tourSelector + ' > button#sure').css({'visibility': 'hidden'});
   $(tourSelector + ' > input#dontShowAgain').css({'display': 'none'});
   $(tourSelector + ' > span').css({'display': 'none'});
   describeTourObject(tourSelector, tourObjects[0],
