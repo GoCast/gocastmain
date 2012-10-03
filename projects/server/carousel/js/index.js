@@ -811,7 +811,11 @@ function carouselItemZoom(event)
     'top': spot[0].style.top,
     'left': parseFloat(spot[0].style.left) + parseFloat(spot[0].style.width) + 10.0 + 'px'
   });
-  $('body > div#upper-right').css({'top': $('#zoom').position().top + 'px'});
+
+  $('body > div#upper-right').css({
+    'top': $('#zoom').position().top + 'px',
+    'width': '130px'
+  });
 
    $(spot).appendTo($('#meeting > #zoom')) // move div to zoom area, doesn't work with local, remote video spot
           .css("z-index", "100");
@@ -836,7 +840,8 @@ function carouselItemUnzoom(event)
    var spot = $('#meeting > #zoom > .cloudcarousel');
    app.carousel.insertSpot(spot); // put spot back in carousel
    $('#meeting > #streams').css('height', '100%'); // zoom carousel
-   $('body > div#upper-right').css({'top': '10px'});
+   //$('body > div#upper-right').css({'top': '10px'});
+   $('body > div#upper-right').removeAttr('style');
    app.carousel.resize();
 } // carouselItemUnzoom
 
@@ -1042,8 +1047,8 @@ function promptTour() {
   if ('undefined' !== typeof(Storage) && !window.localStorage.gcpDontShowTourCheck) {
     $('body > #tour').css({
       'display': 'block',
-      'left'   : '5px', //Math.floor(($(window).width() - $('body > #tour').width())/2) + 'px',
-      'top'    : '5px'  //Math.floor(($(window).height() - $('body > #tour').height())/2) + 'px'
+      'left'   : Math.floor(($(window).width() - $('body > #tour').width() - 60)/2) + 'px',
+      'top'    : Math.floor(($(window).height() - $('body > #tour').height() - 60)/2) + 'px'
     });
     $('body > #tour > button#skip').css({
       'left'      : Math.floor(($('body > #tour').width() - $('body > #tour > button#skip').width())/2) + 'px',
@@ -1639,8 +1644,8 @@ function resizeZoom(event)
       $(jqDiv).css('top', top + 'px');
 
       $('#zoom > .close').css({
-        'top': top,
-        'left': left + item.orgWidth + 10.0 + 'px'
+        'top': (top + 10.0) + 'px',
+        'left': (left + 10.0) + 'px'
       });
    }
 }
@@ -2383,11 +2388,11 @@ function addItem() {
 }
 
 function resizeTour(tourSelector) {
-  /*$(tourSelector).css({
+  $(tourSelector).css({
     'display': 'block',
-    'left'   : Math.floor(($(window).width() - $(tourSelector).width())/2) + 'px',
-    'top'    : Math.floor(($(window).height() - $(tourSelector).height())/2) + 'px'
-  });*/
+    'left'   : Math.floor(($(window).width() - $(tourSelector).width() - 60)/2) + 'px',
+    'top'    : Math.floor(($(window).height() - $(tourSelector).height() - 60)/2) + 'px'
+  });
   $(tourSelector + ' > button#skip').css({
     'left'      : Math.floor(($(tourSelector).width() - $(tourSelector + ' > button#skip').width())/2) + 'px'
   });
@@ -2396,13 +2401,26 @@ function resizeTour(tourSelector) {
   });
 }
 
-function describeTourObject(tourSelector, objSelector, objDescription) {
-  setTimeout(function(){
-    $(objSelector).effect('pulsate', {times: 4}, 8000);
-  }, 1000);
+function describeTourObject(tourSelector, objSelector, objDescription, stopFlashing) {
+  var flashTimer = null,
+      opacity = 1.0;
+
+  if (stopFlashing) {
+    setTimeout(function(){
+      $(objSelector).effect('pulsate', {times: 4}, 8000);
+    }, 1000);    
+  } else {
+    flashTimer = setInterval(function() {
+      opacity = (1.0 === opacity) ? 0.0 : 1.0;
+      $(objSelector).fadeTo(1000, opacity);
+    }, 1000);
+  }
+
   $(tourSelector + ' > h3').html(objDescription.title);
   $(tourSelector + ' > p#desc').text(objDescription.description);
   resizeTour(tourSelector);
+
+  return flashTimer;
 }
 
 function startTour(tourSelector) {
@@ -2414,57 +2432,58 @@ function startTour(tourSelector) {
     '.whiteBoard > .wbDiv > div#wbTools',
     '.whiteBoard > .zoom, #zoom > .close',
     '#lower-left > div#msgBoard > input.chatTo',
-    '#lower-right > input[class*=fb], #lower-right > input[class=copyData]',
-    '#lower-right > input[class=feedback]'
+    '#upper-right > input[class*=fb], #upper-right > input[class*=copyData]',
+    '#upper-left > div#feedback'
   ], tourDescriptions = [
-    {title:       '1. What\'s Flashing? The Carousel',
-     description: 'At first you\'ll see a preview of how you look on video. ' +
-                  'The "GO" spots hold other people or shared content such as ' +
-                  'our Whiteboard. To move the Carousel use the ARROW KEYS' +
-                  'on your keyboard or your MOUSE WHEEL. Go ahead, TRY IT!!' +
-                  '(click NEXT for more)'},
-    {title:       '2. What\'s Flashing? Video Effects',
-     description: 'You can change the way other people will see you on GoCast. You can ' +
-                  'switch from full color to BLACK & WHITE, or to a SEPIA effect. ' +
-                  'Just click on any of the the three buttons below your preview. ' +
-                  'Go ahead, TRY IT!!'},
-    {title:       '3. What\'s Flashing? Media Controls',
-     description: 'You can turn your webcam and microphone on and off. The buttons are on ' +
-                  'the LOWER-RIGHT corner of your preview window and on the ICON BAR.' +
+    {title:       'What\'s Flashing? The Carousel',
+     description: 'The preview in the spot below shows how others see you on video. ' +
+                  'The other "GO" spots are placeholders for people or shared content such as ' +
+                  'a Whiteboard. To rotate the Carousel use the left/right arrows ' +
+                  'on your keyboard or a mouse wheel. Try it. (click NEXT for more)'},
+    {title:       'Video Effects',
+     description: 'You can change the way other people see you by switching ' +
+                  'from full color to black and white or to a sepia effect. ' +
+                  'Just click on any of the the three icons below your preview. ' +
+                  'Try it.'},
+    {title:       'Media Controls',
+     description: 'You can turn your webcam and microphone on and off. The icons are on ' +
+                  'the lower right corner of your preview window and on the icon bar. ' + 
                   'If you have logged in with Facebook your profile photo will appear when ' +
-                  'you turn off your webcam. Go ahead, TRY IT!!'},
-    {title:       '4. What\'s Flashing? Share Content',
+                  'you turn off your webcam. Try it.'},
+    {title:       'Share Content On The Carousel',
      description: 'You can add one or more Whiteboards to the Carousel by clicking on the ' +
-                  'WHITEBOARD ICON. You can remove a Carousel spot by clicking on the ' +
-                  'TRASHCAN ICON on the upper right corner the spot.'},
-    {title:       '5. What\'s Flashing? Whiteboard Controls',
-     description: 'To draw on the whiteboard choose a COLOR and PEN SIZE from the tray at the bottom. ' +
-                  'Click, hold, and drag your mouse to draw lines. Choose the ERASER to remove marks from ' +
-                  'the whiteboard. Other people can draw on the Whiteboard as well.' +
-                  'Then click NEXT to learn about ZOOMING the WHITEBOARD.'},
-    {title:       '6. What\'s Flashing? Zoomed Whiteboard',
-     description: 'Expand a Whiteboard by clicking on the ZOOM ICON on its ' +
-                  'UPPER-LEFT corner. Notice that the Carousel is now flattened above the ' +
-                  'Whiteboard and can still be moved. To UNZOOM the Whiteboard click on the ' +
-                  'LARGE "X" on its UPPER-RIGHT corner.'},
-    {title:       '7. What\'s Flashing? Post Comments',
-     description: 'Type comments in the text box on the LOWER-LEFT corner of your screen. ' +
-                  'Click the POST BUTTON or the RETURN KEY and your comments will be seen ' +
-                  'by your roommates. Go ahead, TRY IT!!'},
-    {title:       '8. What\'s Flashing? Invite Others',
+                  'Whiteboard icon. You can remove a Carousel spot by clicking on the ' +
+                  'Trashcan icon on the upper right corner the spot. Try it.'},
+    {title:       ' Whiteboard Controls',
+     description: 'To draw on the Whiteboard choose a color and pen size from the tray at the bottom. ' +
+                  'Click, hold, and drag your mouse to draw lines. Other people can draw on the Whiteboard as well. Try it. ' +
+                  'Then click Next to learn about zooming the Whiteboard.'},
+    {title:       'Zoomed Whiteboard',
+     description: 'Expand a Whiteboard by clicking on the X icon on its ' +
+                  'upper-left corner. Notice that the Carousel is now flattened above the Whiteboard and can still be moved. ' +
+                  'To unzoom the Whiteboard click on the Shrink icon in its upper left corner.'},
+    {title:       'Post Comments To The Room',
+     description: 'Type comments in the text box on the lower left corner of your screen. ' +
+                  'Click the Post button or return on your keyboard and your comments will be displayed. Try it.'},
+    {title:       'Invite Others To Your Room',
      description: 'You can invite your Facebook friends to your room by posting on your wall, ' +
                   'or sending invites to your friends. You can also invite anybody via email. ' +
-                  'The EMAIL ICON is located to the right of the FACEBOOK BUTTONS.'},
-    {title:       '9. What\'s Flashing? Give Us Your Feedback',
+                  'The Email icon is located to the right of the Facebook Icons.'},
+    {title:       'Give Us Your Feedback',
      description: 'We\'d love to hear about your experience with the GoCast Carousel. ' +
-                  'Click on the FEEDBACK button on the LOWER-RIGHT corner of your screen.'}
-  ], tourIdx = 0;
+                  'Click on the Feedback icon on the lower right corner of your screen.'}
+  ], tourIdx = 0, flashTimer = null;
 
   $(tourSelector + ' > button#skip').text('SKIP');
   $(tourSelector + ' > button#imgood').unbind('click').text('NEXT')
                                       .css({'visibility': 'visible'})
                                       .click(function() {
     tourIdx++;
+
+    if (flashTimer) {
+      clearInterval(flashTimer);
+    }
+
     $(tourObjects[tourIdx-1]).stop(true, true);
 
     if (1 <= tourIdx) {
@@ -2503,16 +2522,22 @@ function startTour(tourSelector) {
       $(tourSelector + ' > h3').html('10. You\'re All Set!');
       $(tourSelector + ' > p#desc').text('Thanks for taking the test drive. Enjoy!!!');
     } else {
-      describeTourObject(tourSelector, tourObjects[tourIdx],
-                         tourDescriptions[tourIdx]);
+      flashTimer = describeTourObject(tourSelector, tourObjects[tourIdx],
+                                      tourDescriptions[tourIdx],
+                                      (0 === tourIdx));
     }
   });
 
   $(tourSelector + ' > button#sure').unbind('click')
                                     .css({'visibility': 'hidden'})
-                                    .text('PREVIOUS')
+                                    .text('BACK')
                                     .click(function() {
     tourIdx--;
+
+    if(flashTimer) {
+      clearInterval(flashTimer);
+    }
+
     $(tourObjects[tourIdx+1]).stop(true, true);
     $(tourObjects[tourIdx+1]).removeAttr('style');
 
@@ -2534,8 +2559,9 @@ function startTour(tourSelector) {
       $(tourSelector + ' > button#imgood').css({'visibility': 'visible'});
     }
 
-    describeTourObject(tourSelector, tourObjects[tourIdx],
-                       tourDescriptions[tourIdx]);
+    flashTimer = describeTourObject(tourSelector, tourObjects[tourIdx],
+                                    tourDescriptions[tourIdx],
+                                    (0 === tourIdx));
   });
 
 
@@ -2557,6 +2583,6 @@ function startTour(tourSelector) {
 
   $(tourSelector + ' > input#dontShowAgain').css({'display': 'none'});
   $(tourSelector + ' > span').css({'display': 'none'});
-  describeTourObject(tourSelector, tourObjects[0],
-                     tourDescriptions[0]);
+  flashTimer = describeTourObject(tourSelector, tourObjects[0],
+                                  tourDescriptions[0], true);
 }

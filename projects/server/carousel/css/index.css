@@ -1227,33 +1227,32 @@ body > div#meeting > div#streams > div#scontrols > input.right {
   padding: 5px;
   background-color: #eee;
   border-radius: 20px;
-  opacity: 0.6;
-}
-#zoom > .close:hover {
   cursor: pointer;
-  opacity: 1.0;
+  z-index: 10000;
 }
 body > #tour {
   display: none;
   position: absolute;
-  width: 400px;
+  width: 300px;
   height: auto;
-  background: -webkit-gradient(linear, center bottom, center top, from(rgba(40,40,40,1.0)), to(rgba(40,40,40,0.5)));
-  background: -moz-linear-gradient(bottom, rgba(40,40,40,1.0), rgba(40,40,40,0.5));
+  background: -webkit-gradient(linear, center bottom, center top, from(rgba(255,255,255,1.0)), to(rgba(255,255,255,0.7)));
+  background: -moz-linear-gradient(bottom, rgba(255,255,255,1.0), rgba(255,255,255,0.7));
   border-radius: 5px;
-  color: white;
+  border: 3px solid #812034;
+  color: black;
   font-family: Verdana, sans-serif;
   z-index: 10000;
   padding-left: 10px;
   padding-right: 10px;
-  padding-top: 5px;
+  padding-top: 2px;
   padding-bottom: 20px;
-  -moz-box-shadow: 0px 0px 2px #303030;
-  -webkit-box-shadow: 0px 0px 2px #303030;
+  -moz-box-shadow: 5px 5px 5px #000000;
+  -webkit-box-shadow: 5px 5px 5px #000000;
   box-shadow: 0px 0px 2px #303030;
 }
 body > #tour > h3 {
-  color: lightgreen;
+  text-align: center;
+  color: darkgreen;
 }
 body > #tour > #desc {
   width: 100%;
