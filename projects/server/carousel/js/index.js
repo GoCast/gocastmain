@@ -2525,7 +2525,7 @@ function startTour(tourSelector) {
         startTour(tourSelector);
       });
       $(tourSelector + ' > button#skip').text('DONE');
-      $(tourSelector + ' > h3').html('10. You\'re All Set!');
+      $(tourSelector + ' > h3').html('You\'re All Set!');
       $(tourSelector + ' > p#desc').text('Thanks for taking the test drive. Enjoy!!!');
     } else {
       flashTimer = describeTourObject(tourSelector, tourObjects[tourIdx],
