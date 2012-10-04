@@ -526,10 +526,11 @@ body > div#lower-left > div#msgBoard > input.close {
   background-image: url("../images/backArrow.png");
   background-size:100% 100%;
   background-repeat: no-repeat;
-  width: 25px;
-  height: 25px;
+  width: 15px;
+  height: 15px;
   opacity: 0.6;
   cursor: pointer;
+  vertical-align:middle;
 }
 body > div#lower-left > div#msgBoard > input.close:hover {
   opacity: 1.0;
