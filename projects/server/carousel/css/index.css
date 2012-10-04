@@ -558,7 +558,6 @@ body > div#meeting > div#zoom {
 }
 body > div#meeting > div#zoom > img.close 
 {
-  opacity: 1.0;
   width: 20px;
   height: 20px;
   position: absolute;
@@ -606,21 +605,15 @@ div.cloudcarousel > div#msgBoard > input.send {
   background-image: url("../images/talk-white.png");
   background-size: 100% 100%;
   background-repeat: no-repeat;
-  width: 25px;
-  height: 20px;
+  width: 20px;
+  height: 15px;
 }
 div.cloudcarousel > div#msgBoard > input.close {
   background-image: url("../images/backArrow.png");
   background-size: 100% 100%;
   background-repeat: no-repeat;
-  width: 20px;
-  height: 20px;
-  margin-bottom:-3px;
-  opacity: 0.6;
-  cursor: pointer;
-}
-div.cloudcarousel > div#msgBoard > input.close:hover {
-  opacity: 1.0;
+  width: 15px;
+  height: 15px;
 }
 div.cloudcarousel > div#msgBoard > input.chatTo
 {
