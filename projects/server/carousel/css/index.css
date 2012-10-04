@@ -154,6 +154,7 @@ body > div#upper-right
   z-index: 1000;
   line-height: 2em;
   max-width: 50%;
+  background-color: rgba(0,0,0,0.1);
 }
 body > div#upper-right > .gc-icon
 {

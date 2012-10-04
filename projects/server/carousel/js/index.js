@@ -812,10 +812,7 @@ function carouselItemZoom(event)
     'left': parseFloat(spot[0].style.left) + parseFloat(spot[0].style.width) + 10.0 + 'px'
   });
 
-  $('body > div#upper-right').css({
-    'top': $('#zoom').position().top + 'px',
-    'width': '130px'
-  });
+  $('body > div#upper-right').css('top', $('#zoom').position().top + 'px');
 
    $(spot).appendTo($('#meeting > #zoom')) // move div to zoom area, doesn't work with local, remote video spot
           .css("z-index", "100");
