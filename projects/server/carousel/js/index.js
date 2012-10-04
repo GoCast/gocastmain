@@ -1048,7 +1048,7 @@ function promptTour() {
     $('body > #tour').css({
       'display': 'block',
       'left'   : Math.floor(($(window).width() - $('body > #tour').width() - 60)/2) + 'px',
-      'top'    : Math.floor(($(window).height() - $('body > #tour').height() - 60)/2) + 'px'
+      'top'    : '50px'//Math.floor(($(window).height() - $('body > #tour').height() - 60)/2) + 'px'
     });
     $('body > #tour > button#skip').css({
       'left'      : Math.floor(($('body > #tour').width() - $('body > #tour > button#skip').width())/2) + 'px',
@@ -2391,7 +2391,7 @@ function resizeTour(tourSelector) {
   $(tourSelector).css({
     'display': 'block',
     'left'   : Math.floor(($(window).width() - $(tourSelector).width() - 60)/2) + 'px',
-    'top'    : Math.floor(($(window).height() - $(tourSelector).height() - 60)/2) + 'px'
+    'top'    : '50px'//Math.floor(($(window).height() - $(tourSelector).height() - 60)/2) + 'px'
   });
   $(tourSelector + ' > button#skip').css({
     'left'      : Math.floor(($(tourSelector).width() - $(tourSelector + ' > button#skip').width())/2) + 'px'
@@ -2487,6 +2487,12 @@ function startTour(tourSelector) {
     $(tourObjects[tourIdx-1]).stop(true, true);
 
     if (1 <= tourIdx) {
+      $(tourObjects[tourIdx]).width(function(idx, width) {
+        return 2*width;
+      }).height(function(idx, height) {
+        return 2*height;
+      });
+
       if (4 === tourIdx && 0 === $('.whiteBoard').length) {
         $(tourObjects[3]).click();
       }
@@ -2555,8 +2561,16 @@ function startTour(tourSelector) {
 
     if (0 === tourIdx) {
       $(this).css({'visibility': 'hidden'});
-    } else if ((tourObjects.length-1) === tourIdx) {
-      $(tourSelector + ' > button#imgood').css({'visibility': 'visible'});
+    } else {
+      $(tourObjects[tourIdx]).width(function(idx, width) {
+        return 2*width;
+      }).height(function(idx, height) {
+        return 2*height;
+      });
+
+      if ((tourObjects.length-1) === tourIdx) {
+        $(tourSelector + ' > button#imgood').css({'visibility': 'visible'});
+      }
     }
 
     flashTimer = describeTourObject(tourSelector, tourObjects[tourIdx],
@@ -2569,6 +2583,11 @@ function startTour(tourSelector) {
                                     .click(function() {
     $(tourObjects[0]).stop(true, true);
     $(tourObjects[tourIdx]).stop(true, true);
+
+    if (flashTimer) {
+      clearInterval(flashTimer);
+    }
+
     $(tourObjects[0]).css({
       'visibility': 'visible',
       'opacity': '1.0'

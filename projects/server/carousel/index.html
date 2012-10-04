@@ -205,25 +205,34 @@
         <p>Thanks!  We will be waiting for you.</p>
       </div>
       <div id="credentials" class="window resizable">
-        <p class="title">Hi! Welcome to Gocast.it.</p>
-        <div id="fb-login-button" class="fb-login-button" data-show-faces="false" data-width="200" data-max-rows="1">login with facebook</div>
-        <p class="title">Login with facebook to invite friends through wall posts or messages. </p>
+        <p class="title welcome">Welcome to Gocast!</p>
+        <div id="fb-login-button" class="fb-login-button" data-show-faces="false" data-width="200" data-max-rows="1">Login With Facebook</div>
+        <p class="title optiondesc">
+          By logging in with Facebook, you can invite your Facebook Friends by posting on your wall and/or 
+          sending a Facebook message invite from your room. Your Facebook name will be used as your screen name.
+          Also, when you turn your webcam off, your profile picture will appear instead.
+        </p>
+        <div class="divider">-- OR --</div>
+        <a id="noThanks" href="javascript:enterId();">Login Without Facebook</a>
+        <p class="title optiondesc">
+          By not logging in with Facebook, you can choose your own screen name for the room. You can invite others
+          to your room using email. Also, when you turn your webcam off, a blank silhouette will appear instead.  
+        </p>
         <!--
         <div id="fb-login-button" class="fb-login-button" data-show-faces="false" data-width="200" data-max-rows="1"
              scope="email,user_likes,friends_likes,publish_actions,friends_online_presence,publish_stream,xmpp_login"></div>
         -->
-        <a id="noThanks" href="javascript:enterId();">no thanks ></a>
+        
       </div>
       <div id="credentials2" class="window resizable">
-        <p class="title">Choose a name to use in the room or login with facebook.</p>
+        <p class="title welcome">Welcome to Gocast!</p>
         <p class="login-error"></p>
-        <input id="name"  type="text" name="name" placeholder="Enter your nickname for the room" />
+        <input id="name"  type="text" name="name" placeholder="Choose your nickname for the room" />
         <input id="email" type="text" placeholder="Enter your email (optional)" /><p/>
-        <!--<input id="btn"   type="image" alt="Join Now" src="images/joinnow.png" />-->
         <a id="btn" type="button" href="javascript:void(0);">GET STARTED</a><p/>
-        <div class="divider">-- OR --</div>
+        <!--<div class="divider">-- OR --</div>
         <div id="fb-login-button2" class="fb-login-button" data-show-faces="false" data-width="200" data-max-rows="1">login with facebook</div>
-        <p class="title">Login with facebook to show profile pictures in spots and post or send invites to this room.</p>
+        <p class="title">Login with facebook to show profile pictures in spots and post or send invites to this room.</p>-->
       </div>
       <div id="chatInp" class="window">
         <span class="recipient"></span>
