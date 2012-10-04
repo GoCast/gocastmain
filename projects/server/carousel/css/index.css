@@ -325,6 +325,7 @@ input.twitter {
   background-image: url("../images/btn-twitter.png");
 }
 input.fbSend {
+  margin-right:6px;
   width: 30px;
   height: 30px;
   background-image: url("../images/SendFB.png");
