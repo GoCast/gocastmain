@@ -95,7 +95,7 @@
       <!-- </MANJESH> -->
 
       <p id="connection-status">Connection Status</p>
-      <div class="gc-icon" id="volume"></div>
+      <div id="volume"></div>
       <input class="gc-icon" id="audio" type="button" class="off" title="Audio is Disabled" disabled="disabled"/>
       <input class="gc-icon" id="video" type="button" title="Video is Disabled" disabled="disabled"/>
       <input class="copyData gc-icon" type="button" title="Email link to room." onclick="openCopyData(event);"/>
@@ -115,8 +115,8 @@
        <!--<input class="vidbtn" type="button" title="Place video content." onclick="startVideoContent();" />-->
        <!--<input class="vidbtn" type="button" title="Place room content." onclick="startPeopleContent();" />-->
        <!--<input class="demobtn" type="button" title="Place demo content." onclick="startDemoContent();" />-->
-       <input id="addItem" type="button" title="Add Spot" onclick="addItem();"/>
-       <input id="addWhiteBoard" type="button" title="Add White Board" onclick="addWhiteBoard();"/>
+       <input class="gc-icon" id="addItem" type="button" title="Add Spot" onclick="addItem();"/>
+       <input class="gc-icon" id="addWhiteBoard" type="button" title="Add White Board" onclick="addWhiteBoard();"/>
     </div>
     <div id="lower-left">
       <!--
@@ -124,13 +124,13 @@
         <img class="logo" src="images/gologo.png" />
        </a>
       -->
-        <input id="showChat" type="button" title="chat with your group" onclick="showGroupChat(event);"/>
+        <input class"gc-icon" id="showChat" type="button" title="chat with your group" onclick="showGroupChat(event);"/>
         <div id="msgBoard">
         <!--<div id="chatOut" class="ui-widget-content"></div>-->
         <div id="chatOut"> </div>
         <input id="groupChatInput" class="chatTo" title="enter a message" placeholder="chat with your group" type="text" onkeydown="keypressGrpChatHandler(event);"/>
         <button id="send" class="send" title="post it" onclick="sendGrpChat(event)">Post</button>
-        <input class="close" type="button" title="Close Group Chat" onclick="closeGroupChat(event);"/>
+        <input class="close gc-icon" type="button" title="Close Group Chat" onclick="closeGroupChat(event);"/>
        </div>
     </div>
     <div id="boxes">
@@ -169,7 +169,7 @@
          </div>
       </div>
       <div id="waitingToJoin" class="window resizable">
-        <img src="images/GoToken.png" alt="Waiting To Join"/>
+        <img id="GoToken" src="images/GoToken.png" alt="Waiting To Join"/>
         <div id="cover"></div>
       </div>
       <div id="helpPage" class="window resizable">
