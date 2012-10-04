@@ -436,8 +436,18 @@ GoCastJS.WhiteBoard.prototype.init = function()
   // change the zoom icon to black for white background
   $("img#upper-left", this.jqParent).attr("src", "images/fullscreen-black.png");
 
-}; // whiteboard init
+  // load a test image
+  //this.loadTestImage();
 
+}; // whiteboard init
+///
+/// \brief load a test image into whiteboard
+///
+GoCastJS.WhiteBoard.prototype.loadTestImage = function()
+{
+  var jqImg = $("#GoToken");
+  this.wbCtx.drawImage(jqImg[0], 0, 0);
+};
 ///
 /// \brief send mouse stroke to server
 ///
