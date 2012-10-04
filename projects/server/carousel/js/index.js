@@ -2417,7 +2417,7 @@ function describeTourObject(tourSelector, objSelector, objDescription, stopFlash
   }
 
   $(tourSelector + ' > h3').html(objDescription.title);
-  $(tourSelector + ' > p#desc').text(objDescription.description);
+  $(tourSelector + ' > p#desc').html(objDescription.description);
   resizeTour(tourSelector);
 
   return flashTimer;
@@ -2439,32 +2439,32 @@ function startTour(tourSelector) {
      description: 'The preview in the spot below shows how others see you on video. ' +
                   'The other "GO" spots are placeholders for people or shared content such as ' +
                   'a Whiteboard. To rotate the Carousel use the left/right arrows ' +
-                  'on your keyboard or a mouse wheel. Try it. (click NEXT for more)'},
-    {title:       'Video Effects',
+                  'on your keyboard or a mouse wheel. <p></p>Try it. (click NEXT for more)'},
+    {title:       'Choosing Video Effects',
      description: 'You can change the way other people see you by switching ' +
                   'from full color to black and white or to a sepia effect. ' +
                   'Just click on any of the the three icons below your preview. ' +
-                  'Try it.'},
-    {title:       'Media Controls',
+                  '<p></p>Try it.'},
+    {title:       'Controlling Camera &amp; Microphone',
      description: 'You can turn your webcam and microphone on and off. The icons are on ' +
-                  'the lower right corner of your preview window and on the icon bar. ' + 
+                  'the lower right corner of your preview window and on the upper right icon bar. ' + 
                   'If you have logged in with Facebook your profile photo will appear when ' +
-                  'you turn off your webcam. Try it.'},
-    {title:       'Share Content On The Carousel',
+                  'you turn off your webcam. <p></p>Try it.'},
+    {title:       'Sharing Content On The Carousel',
      description: 'You can add one or more Whiteboards to the Carousel by clicking on the ' +
                   'Whiteboard icon. You can remove a Carousel spot by clicking on the ' +
-                  'Trashcan icon on the upper right corner the spot. Try it.'},
-    {title:       ' Whiteboard Controls',
+                  'Trashcan icon on the upper right corner the spot. <p></p>Try it.'},
+    {title:       'Using the Whiteboard',
      description: 'To draw on the Whiteboard choose a color and pen size from the tray at the bottom. ' +
-                  'Click, hold, and drag your mouse to draw lines. Other people can draw on the Whiteboard as well. Try it. ' +
+                  'Click, hold, and drag your mouse to draw lines. Other people can draw on the Whiteboard as well. <p></p>Try it. ' +
                   'Then click Next to learn about zooming the Whiteboard.'},
-    {title:       'Zoomed Whiteboard',
+    {title:       'Zooming the Whiteboard',
      description: 'Expand a Whiteboard by clicking on the X icon on its ' +
-                  'upper-left corner. Notice that the Carousel is now flattened above the Whiteboard and can still be moved. ' +
+                  'upper left corner. Notice that the Carousel is now flattened above the Whiteboard and can still be moved. ' +
                   'To unzoom the Whiteboard click on the Shrink icon in its upper left corner.'},
-    {title:       'Post Comments To The Room',
+    {title:       'Posting Comments To The Room',
      description: 'Type comments in the text box on the lower left corner of your screen. ' +
-                  'Click the Post button or return on your keyboard and your comments will be displayed. Try it.'},
+                  'Click the Post button or return on your keyboard and your comments will be displayed. <p></p>Try it.'},
     {title:       'Invite Others To Your Room',
      description: 'You can invite your Facebook friends to your room by posting on your wall, ' +
                   'or sending invites to your friends. You can also invite anybody via email. ' +
@@ -2487,14 +2487,17 @@ function startTour(tourSelector) {
     $(tourObjects[tourIdx-1]).stop(true, true);
 
     if (1 <= tourIdx) {
-      $(tourObjects[tourIdx]).width(function(idx, width) {
-        return 2*width;
-      }).height(function(idx, height) {
-        return 2*height;
-      });
 
-      if (4 === tourIdx && 0 === $('.whiteBoard').length) {
-        $(tourObjects[3]).click();
+      if (4 === tourIdx) {
+        if (0 === $('.whiteBoard').length) {
+          $(tourObjects[3]).click();
+        }
+      } else {
+        $(tourObjects[tourIdx]).width(function(idx, width) {
+          return 2*width;
+        }).height(function(idx, height) {
+          return 2*height;
+        });        
       }
 
       if (5 === tourIdx) {
@@ -2562,11 +2565,13 @@ function startTour(tourSelector) {
     if (0 === tourIdx) {
       $(this).css({'visibility': 'hidden'});
     } else {
-      $(tourObjects[tourIdx]).width(function(idx, width) {
-        return 2*width;
-      }).height(function(idx, height) {
-        return 2*height;
-      });
+      if (4 !== tourIdx) {
+        $(tourObjects[tourIdx]).width(function(idx, width) {
+          return 2*width;
+        }).height(function(idx, height) {
+          return 2*height;
+        });        
+      }
 
       if ((tourObjects.length-1) === tourIdx) {
         $(tourSelector + ' > button#imgood').css({'visibility': 'visible'});
