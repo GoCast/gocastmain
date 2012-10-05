@@ -177,11 +177,23 @@ body > div#upper-left
 }
 div#log
 {
-   margin-right: 10px;
    background-image: url("../images/ReportBug.png");
    background-repeat: no-repeat;
    background-size: 100% 100%;
    z-index: 1000;
+}
+div#taketour
+{
+  width: 18px;
+  height: 18px;
+  margin-right: 10px;
+  border-radius: 2px;
+  border: 2px white solid;
+  background-color: black;
+  background-image: url("../images/takeatour.png");
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  z-index: 1000;
 }
 div#settings
 {
