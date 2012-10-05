@@ -165,11 +165,20 @@ function minimize() {
 return 0
 }
 
+function genIndexHtml() {
+  curtime=`date +%s`
+  index_html=`cat index.html`
+  index_html_ts=${index_html//GOCASTTIMESTAMP/$curtime}
+  echo "$index_html_ts" > $1/index.html
+}
+
 if [ $devmode -eq 0 ]
 then
   obfuscate
   minimize
 fi
+
+genIndexHtml $tempdest
 
 if [ $confirm -eq 1 ]
 then
