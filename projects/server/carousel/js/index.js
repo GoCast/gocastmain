@@ -1057,7 +1057,7 @@ function promptTour() {
 
     $('body > #tour > h3 > span#nick').text(app.user.name.replace(/%20/g, ' ') + '!');
     $('body > #tour > button#imgood').css({
-      'left' : ($('body > #tour').width() - $('body > #tour > button#imgood').width() - 5) + 'px'
+      'left' : '5px'
     }).click(function() {
       $('body > #tour').css({'display': 'none'});
       if ('checked' === $('body > #tour > input#dontShowAgain').attr('checked')) {
@@ -1065,7 +1065,7 @@ function promptTour() {
       }
     });
     $('body > #tour > button#sure').css({
-      'left' : '5px'
+      'left' : ($('body > #tour').width() - $('body > #tour > button#sure').width() - 5) + 'px'
     }).click(function() {
       startTour('body > #tour');
     });
@@ -2399,6 +2399,9 @@ function resizeTour(tourSelector) {
   $(tourSelector + ' > button#imgood').css({
     'left' : ($('body > #tour').width() - $('body > #tour > button#imgood').width() - 5) + 'px'
   });
+  $(tourSelector + ' > button#sure').css({
+    'left' : '5px'
+  });  
 }
 
 function describeTourObject(tourSelector, objSelector, objDescription, stopFlashing) {
@@ -2438,8 +2441,8 @@ function startTour(tourSelector) {
     {title:       'What\'s Flashing? The Carousel',
      description: 'The preview in the spot below shows how others see you on video. ' +
                   'The other "GO" spots are placeholders for people or shared content such as ' +
-                  'a Whiteboard. To rotate the Carousel use the left/right arrows ' +
-                  'on your keyboard or a mouse wheel. <p></p>Try it. (click NEXT for more)'},
+                  'a whiteboard. To rotate the Carousel use the left/right arrows ' +
+                  'on your keyboard or a mouse wheel. <p></p>Try it. (click Next for more)'},
     {title:       'Choosing Video Effects',
      description: 'You can change the way other people see you by switching ' +
                   'from full color to black and white or to a sepia effect. ' +
@@ -2451,27 +2454,27 @@ function startTour(tourSelector) {
                   'If you have logged in with Facebook your profile photo will appear when ' +
                   'you turn off your webcam. <p></p>Try it.'},
     {title:       'Sharing Content On The Carousel',
-     description: 'You can add one or more Whiteboards to the Carousel by clicking on the ' +
-                  'Whiteboard icon. You can remove a Carousel spot by clicking on the ' +
-                  'Trashcan icon on the upper right corner the spot. <p></p>Try it.'},
+     description: 'You can add one or more whiteboards to the Carousel by clicking on the ' +
+                  'whiteboard icon. You can remove a Carousel spot by clicking on the ' +
+                  'trashcan icon on its upper right corner. <p></p>Try it.'},
     {title:       'Using the Whiteboard',
-     description: 'To draw on the Whiteboard choose a color and pen size from the tray at the bottom. ' +
-                  'Click, hold, and drag your mouse to draw lines. Other people can draw on the Whiteboard as well. <p></p>Try it. ' +
-                  'Then click Next to learn about zooming the Whiteboard.'},
+     description: 'To draw on the whiteboard choose a color and a pen size from the tray at the bottom. ' +
+                  'Click, hold, and drag your mouse to draw lines. Other people can draw on the whiteboard as well. <p></p>Try it. ' +
+                  'Then click Next to learn about zooming the whiteboard.'},
     {title:       'Zooming the Whiteboard',
-     description: 'Expand a Whiteboard by clicking on the X icon on its ' +
-                  'upper left corner. Notice that the Carousel is now flattened above the Whiteboard and can still be moved. ' +
-                  'To unzoom the Whiteboard click on the Shrink icon in its upper left corner.'},
+     description: 'Expand a whiteboard by clicking on the zoom icon on its ' +
+                  'upper left corner. Notice that the Carousel is now flattened above the whiteboard and can still be moved. ' +
+                  'To unzoom the whiteboard click on the shrink icon on its upper left corner.'},
     {title:       'Posting Comments To The Room',
      description: 'Type comments in the text box on the lower left corner of your screen. ' +
-                  'Click the Post button or return on your keyboard and your comments will be displayed. <p></p>Try it.'},
-    {title:       'Invite Others To Your Room',
-     description: 'You can invite your Facebook friends to your room by posting on your wall, ' +
+                  'Click the Post button or hit the Return key on your keyboard, and your comments will be displayed. <p></p>Try it.'},
+    {title:       'Inviting Others To The Room',
+     description: 'You can invite your Facebook friends to the room by posting on your wall, ' +
                   'or sending invites to your friends. You can also invite anybody via email. ' +
-                  'The Email icon is located to the right of the Facebook Icons.'},
-    {title:       'Give Us Your Feedback',
+                  'The email icon is located to the right of the Facebook Icons.'},
+    {title:       'Stay In Touch',
      description: 'We\'d love to hear about your experience with the GoCast Carousel. ' +
-                  'Click on the Feedback icon on the lower right corner of your screen.'}
+                  'Click on the feedback icon on the upper left corner of your screen.'}
   ], tourIdx = 0, flashTimer = null;
 
   $(tourSelector + ' > button#skip').text('SKIP');
