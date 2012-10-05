@@ -71,7 +71,12 @@
     if (!chatOut[0]) {app.log(4, "Item error can't find chatOut");}
     chatOut.data('util', new GoCastJS.ChatUtil(chatOut));
     // add handlers
-    jqObj.mouseover(function(event) {
+    jqObj.mouseover(function(event) 
+    {
+      if (event.isPropagationStopped())
+      {
+        return;
+      }
       // only show close icon on unoccupied or content spots
       if ($(this).hasClass('unoccupied') || $(this).hasClass('typeContent')) {
         $('.close', this).css('visibility', 'visible');

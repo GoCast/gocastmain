@@ -340,7 +340,8 @@ input.fbShare {
   background-size: 100% 100%;
 }
 /*<MANJESH>*/
-input#addWhiteBoard {
+input#addWhiteBoard,
+input#addEditor {
   background-image: url('../images/AddWhiteboard.png');
   background-size: 100% 100%;
 }
