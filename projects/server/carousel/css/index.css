@@ -12,7 +12,7 @@
  */
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
-@-webkit-keyframes greenPulse {
+/*@-webkit-keyframes greenPulse {
 from { background-color: #749a02; -webkit-box-shadow: 0 0 9px #333; }
 50% { background-color: #91bd09; -webkit-box-shadow: 0 0 18px #91bd09; }
 to { background-color: #749a02; -webkit-box-shadow: 0 0 9px #333; }
@@ -22,7 +22,7 @@ to { background-color: #749a02; -webkit-box-shadow: 0 0 9px #333; }
 from { background-color: #749a02; -moz-box-shadow: 0 0 9px #333; }
 50% { background-color: #91bd09; -moz-box-shadow: 0 0 18px #91bd09; }
 to { background-color: #749a02; -moz-box-shadow: 0 0 9px #333; }
-}
+}*/
 
 input {
   outline: none;
@@ -935,12 +935,17 @@ body > div#meeting > div#streams > div#scontrols > input.right {
   background: -webkit-gradient(linear, center bottom, center top, from(rgb(139,35,35)), to(rgb(166,42,42)));
   background: -moz-linear-gradient(bottom, rgb(139,35,35), rgb(166,42,42));
 }
+#boxes #credentials #noThanks:hover {
+  background: -webkit-gradient(linear, center bottom, center top, from(rgb(166,42,42)), to(rgb(139,35,35)));
+  background: -moz-linear-gradient(bottom, rgb(166,42,42), rgb(139,35,35));  
+}
 #boxes #credentials2 {
   width: 300px; 
   height: auto;
   padding: 0px 7px 7px 7px;
   border: 4px solid #812034;
-  border-radius: 5px;  
+  border-radius: 5px;
+  text-align: center;
 }
 #boxes #credentials2 > p.title {
   margin-left: 10px;
@@ -948,15 +953,24 @@ body > div#meeting > div#streams > div#scontrols > input.right {
 }
 #boxes #credentials2 input#name {
   width: 18em;
-  border-radius: 5px;
-  margin-left: 10px;
+  border: 2px lightgrey solid;
+  /*border-radius: 5px;*/
+  /*margin-left: 10px;*/
   padding: 5px;
+}
+#boxes #credentials2 input#name:focus {
+  border: 2px darkblue solid;
 }
 #boxes #credentials2 input#email {
   width: 18em;
-  border-radius: 5px;
-  margin-left: 10px;
+  border: none;
+  border: 2px lightgrey solid;
+  /*border-radius: 5px;*/
+  /*margin-left: 10px;*/
   padding: 5px;
+}
+#boxes #credentials2 input#email:focus {
+  border: 2px darkblue solid;
 }
 .divider {
   text-align: center;
@@ -968,27 +982,39 @@ body > div#meeting > div#streams > div#scontrols > input.right {
 }
 #boxes #credentials2 a#btn {
   outline: none;
+  margin-bottom: 10px;
   font-weight: bold;
   text-decoration: none;
   color: white !important;
-  background-color: #91BD09;
-  padding: 8px 19px 9px;
-  border-radius: 5px;
-  -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  background: -webkit-gradient(linear, center bottom, center top, from(rgb(46,139,87)), to(rgb(60,179,113)));
+  background: -moz-linear-gradient(bottom, rgb(46,139,87), rgb(60,179,113));  
+  /*background-color: #91BD09;*/
+  /*padding: 8px 19px 9px;*/
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  border-radius: 2px;
+  border: 1px darkgreen solid;
+  /*-webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
   -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
   text-shadow: 0 -1px 1px rgba(0, 0, 0, 0.25);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.25);*/
   cursor: pointer;
-  overflow: visible;
+  /*overflow: visible;*/
   width: auto;
   font-size: 14px;
 
-  -webkit-animation-name: greenPulse;
+/*-webkit-animation-name: greenPulse;
   -webkit-animation-duration: 2s;
   -webkit-animation-iteration-count: infinite;
   -moz-animation-name: greenPulse;
   -moz-animation-duration: 2s;
-  -moz-animation-iteration-count: infinite;
+  -moz-animation-iteration-count: infinite;*/
+}
+#boxes #credentials2 a#btn:hover {
+  background: -webkit-gradient(linear, center bottom, center top, from(rgb(60,179,113)), to(rgb(46,139,87)));
+  background: -moz-linear-gradient(bottom, rgb(60,179,113), rgb(46,139,87));    
 }
 #boxes #credentials2 div.fb-login-button {
   width: 20em;
