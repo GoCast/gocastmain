@@ -1268,7 +1268,6 @@ body > #tour > h3 {
 }
 body > #tour > #desc {
   width: 100%;
-  text-align: justify;
 }
 body > #tour > button#sure {
   position: absolute;

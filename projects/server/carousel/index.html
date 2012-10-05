@@ -15,7 +15,10 @@
 <html lang="en"><!--manifest="cache-manifest.appcache">-->
   <head>
     <meta content="text/html; charset=UTF-8" http-equiv="content-type" />
-    <meta http-equiv="cache-control" content="no-cache" />
+    <meta http-equiv="Cache-Control" content="no-store" />
+    <meta http-equiv="Cache-Control" content="max-age = 0" />
+    <meta http-equiv="Expires" content="-1" />
+    <meta http-equiv="Pragma" content="no-cache" />
     <meta name="viewport" content="height = device-height, width = device-width, initial-scale = 1.0, user-scalable = no" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta names="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -184,7 +187,7 @@
       </div>
       <div id="installPlugin" class="window resizable">
         <h1>Gocast.it plugin was not found</h1>
-        <p id ="prompt">In order to participate you will need the Gocast.it plugin installed.</p>
+        <p id ="prompt">In order to participate you will need the GoCast.it plugin installed.</p>
         <p>Please click here <a id="dlLink" href="javascript:doDownload();">
         Gocast.it.plugin</a> to download. <span>Then click on the
         downloaded file to install.</span></p>
