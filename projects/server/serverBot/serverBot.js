@@ -17,6 +17,14 @@ then send a message to the group saying 'nick' is requesting to come in the room
  */
 
 /*jslint node: true */
+var settings = require('./settings');   // Our GoCast settings JS
+if (!settings) {
+    settings = {};
+}
+if (!settings.roommanager) {
+    settings.roommanager = {};
+}
+
 var sys = require('util');
 var xmpp = require('node-xmpp');
 var fs = require('fs');
@@ -224,7 +232,7 @@ RoomDatabase.prototype.AddContentToRoom = function(roomname, spotnumber, obj, cb
 
     if (typeof spotnumber === 'number') {
         // translate to a string.
-        spotnumber = '' + spotnumber;
+        spotnumber = spotnumber.toString();
     }
 
     if (typeof roomname !== 'string' || typeof spotnumber !== 'string') {
@@ -476,11 +484,16 @@ function MucRoom(client, notifier, bSelfDestruct, success, failure) {
     this.spotList = {};
     this.spotStorage = {};
     this.wbStrokeList = {};
+    this.maxParticipants = -1;
 
     var self = this;
 
-    // Max # users.
-    this.options['muc#roomconfig_maxusers'] = '11';
+    // Need to have a 'ceiling' for checking against incoming requests for 'maxparticipants' being too large.
+    if (!settings.roommanager.maxparticipants_ceiling) {
+        settings.roommanager.maxparticipants_ceiling = 12;
+    }
+
+    this.SetMaxRoomParticipants(12);
 
     // Hidden room.
     this.options['muc#roomconfig_publicroom'] = '0';    // Non-listed room.
@@ -532,6 +545,40 @@ function MucRoom(client, notifier, bSelfDestruct, success, failure) {
         return;
     }
 }
+
+MucRoom.prototype.SetMaxRoomParticipants = function(max) {
+    // Check for validity before going forward.
+    if (settings.roommanager.maxparticipants_ceiling && max > settings.roommanager.maxparticipants_ceiling) {
+        this.log('ERROR: Cannot set maxParticipants > ' + settings.roommanager.maxparticipants_ceiling + '. Value requested was: ' + max);
+        return;
+    }
+
+    // Max # users.
+    // If it's not been set yet, use the settings value if there's one specified.
+    if (this.maxParticipants === -1) {
+        this.maxParticipants = settings.roommanager.maxparticipants_ceiling || max;
+    }
+    else {
+        this.maxParticipants = max;
+    }
+
+    this.maxParticipants = parseInt(this.maxParticipants, 10) + 1;   // Account for the roommanager being in the room.
+
+    // RMW:NOTE - We setup the room to the maximum ceiling value.
+    //      But we control entry to the room by the 'createroom' iq message. If the room is
+    //      'full' by our terms, we will disallow them entry, but this is a 'soft' disallow.
+    //      If someone is hacking, they could put their presence in the room regardless.
+    //      If we need to defend against this, we could watch for someone who comes into
+    //      a room which is technically full and if it happens, we KICK them out.
+    //      The reason this matters is because if we allow clients to artificially use lower
+    //      max participant values, we dont want to reconfigure a room just for this.
+    //      In most cases, MucRoomObjectPool items will come off and be created to the 'spec'
+    //      for the room and that won't change. But if we allow dynamic participant max sizing
+    //      at some point, this becomes messy. So, this handling of it now will be just fine
+    //      for now and the future.
+    this.options['muc#roomconfig_maxusers'] = this.maxParticipants.toString();    // Stringify.
+    console.log('Setting maxParticipants to: ' + this.options['muc#roomconfig_maxusers']);
+};
 
 MucRoom.prototype.reset = function() {
     this.bNewRoom = false;
@@ -587,6 +634,10 @@ MucRoom.prototype.log = function(msg) {
     console.log(logDate() + ' - @' + this.roomname.split('@')[0] + ': ' + msg);
 };
 
+MucRoom.prototype.IsFull = function() {
+    return size(this.participants) >= this.maxParticipants;
+};
+
 MucRoom.prototype.getRoomConfiguration = function(cb) {
     var self = this,
         getRoomConf;
@@ -636,7 +687,7 @@ MucRoom.prototype.handlePresence = function(pres) {
         if (pres.getChild('error').getChild('conflict'))
         {
             this.log('Kicking out overseer imposter. His jid=' + fromjid);
-            self.kick(self.nick, function() {
+            this.kick(self.nick, function() {
                 // Once the kick is complete, we need to re-establish ourselves.
                 // TODO - not sure how to unjoin, rejoin, etc all from here...
                 //    Is it true that we will have a conflict but we are still joined as
@@ -670,6 +721,21 @@ MucRoom.prototype.handlePresence = function(pres) {
     if (pres.attrs.type !== 'unavailable')
     {
         if (!this.participants[fromnick] && fromnick !== this.nick) {
+            if (size(this.participants) >= this.maxParticipants) {
+                // We are already at our 'stated' capacity. What to do?
+                // TODO:RMW - Kick out new person. This was not legal.
+                this.log('ERROR: Room is already full but we have new entry by: ' + fromnick);
+
+                // NOTE: We have to artificially add this person to the participants list or else
+                //       kick() won't kick them out as they are not in the room officially.
+                this.participants[fromnick] = { name: fromjid || fromnick };
+
+                this.kick(fromnick, function() {
+                    self.log('Kicked out: ' + fromnick);
+                });
+
+                return;
+            }
             this.log('Adding: ' + fromjid + ' as Nickname: ' + fromnick);
             this.SendSpotListTo(pres.attrs.from);
         }
@@ -2796,20 +2862,104 @@ Overseer.prototype.RemoveTrackedRoom = function(roomname, cbSuccess, cbFailure) 
     return true;
 };
 
+//
+// \brief Uses the requested room and checks to see if the room exists. If not,
+//      then it gives back the requested room name. If the room exists, it checks
+//      to see if the room is full. If not, it returns the requested room.
+//      Then the fun begins - if the room is full and overflow is NOT allowed,
+//      then it returns null.
+//      If, however, overflow is allowed, then it calculates roomnames by appending
+//      '-n' to the end of the name where 'n' is an increasing integer starting at 1
+//      until an empty or non-full room is found. When this happens, the newly
+//      calculated room name is returned.
+// \param desiredRoom - preferred room name.
+// \returns room name allowed based on overflow feature and availability
+//
+Overseer.prototype.FindOpenSpotInRoomOverflow = function(desiredRoom) {
+var k, mobs, curRoom, breakUp, curDigits, curBase,
+    roomExists, roomFull;
+
+    mobs = this.MucRoomObjects;
+    curRoom = desiredRoom;  // Starting point.
+
+    // Need to iterate through rooms starting from desiredRoom
+    // and see if they are full. If so, then formulate the 'next'
+    // room name and check there.
+    //
+    // Room name iteration is 'roomname' followed by 'roomname-1'
+    // then 'roomname-2' ...
+    //
+    while (true) {
+        roomExists = mobs[curRoom];
+        roomFull = roomExists && roomExists.IsFull();
+
+        // If we don't even have that room name yet...it's all good.
+        // Also - if it's not full, then we're also good.
+        if (!roomExists || !roomFull) {
+            return curRoom;
+        }
+
+        // If the room is full and we do not allow overflow, then return null.
+        if (roomExists && roomFull && !settings.roommanager.allow_overflow) {
+            return null;
+        }
+
+        // Otherwise we need to formulate the next 'curRoom' and try again.
+        if (curRoom.match(/-\d$/)) {
+            // Already have a '-digit(s)' at the end of curRoom - time to advance it +1
+            breakUp = curRoom.match(/(\w*?)-(\d+$)/);
+            curDigits = parseInt(breakUp[2], 10);
+            curDigits += 1;
+
+            curBase = breakUp[1];
+            curRoom = curBase + '-' + curDigits;  // Put it back together.
+        }
+        else {
+            // Currently the room name has no digits trailing - so add a '1'.
+            curRoom += '-1';
+        }
+    }
+
+};
+
 Overseer.prototype.CreateRoomRequest = function(iq) {
-    var roomname = iq.getChild('room').attr('name'),
+    var newRoomname, roomname = iq.getChild('room').attr('name'),
+        maxParticipantsRequested = iq.getChild('room').attr('maxparticipants'),
         self = this,
         iqResult;
+
+    if (roomname === '' && settings.roommanager.default_room) {
+        // Case where we always dump people into a particular room.
+        roomname = settings.roommanager.default_room.toLowerCase();
+    }
 
     // If client wants a random room generated, they will send the attribute with a "" value.
     if (roomname === '')
     {
+        // Create a random room name and ensure it's not already in use.
         do
         {
             roomname = this.generateRandomRoomName();
-            this.log('Generated random room named: ' + roomname);
+//                this.log('Generated random room named: ' + roomname);
         }
         while (this.MucRoomObjects[roomname]);
+    }
+    else {
+        // Check to see if we wind up in overflow
+        newRoomname = this.FindOpenSpotInRoomOverflow(roomname);
+
+        // If the room is full and no overflow is allowed, tell the client no room available.
+        if (!newRoomname) {
+            iqResult = new xmpp.Element('iq', {to: iq.attrs.from, type: 'error', id: iq.attrs.id})
+                            .c('roomfull', {xmlns: 'urn:xmpp:callcast'});
+
+            self.log('CreateRoomRequest: Requested room is full: ' + roomname);
+            self.client.send(iqResult.root());
+            return;
+        }
+
+        // Otherwise we're good. Assign it and let's roll...
+        roomname = newRoomname;
     }
 
     this.log('Overseer.handleIq: Room Name of [' + roomname + '] requested by: ' + iq.attrs.from);
@@ -2824,9 +2974,21 @@ Overseer.prototype.CreateRoomRequest = function(iq) {
         // and eventually database that information too.
         //
         this.AddTrackedRoom(roomname, null, function() {
-            var iqResult = new xmpp.Element('iq', {to: iq.attrs.from, type: 'result', id: iq.attrs.id})
-                                .c('ok', {xmlns: 'urn:xmpp:callcast', name: roomname});
-            self.client.send(iqResult.root());
+                var iqResult = new xmpp.Element('iq', {to: iq.attrs.from, type: 'result', id: iq.attrs.id})
+                                    .c('ok', {xmlns: 'urn:xmpp:callcast', name: roomname});
+                self.client.send(iqResult.root());
+
+                // Now set the max participants if settings allows it.
+                // Notice that clients setting max participants can only happen when a room is CREATED.
+                if (maxParticipantsRequested) {
+                    if (settings.roommanager.allow_maxparticipants_from_client) {
+                        self.log('Client requested max participants as: ' + maxParticipantsRequested);
+                        self.MucRoomObjects[roomname].SetMaxRoomParticipants(maxParticipantsRequested);
+                    }
+                    else {
+                        self.log('Client requested max participants but this feature is DISALLOWED currently.');
+                    }
+                }
             },
 
             function(msg) {
@@ -2851,7 +3013,7 @@ Overseer.prototype.CreateRoomRequest = function(iq) {
         else
         {
             iqResult = new xmpp.Element('iq', {to: iq.attrs.from, type: 'result', id: iq.attrs.id})
-                            .c('ok', {xmlns: 'urn:xmpp:callcast'});
+                            .c('ok', {xmlns: 'urn:xmpp:callcast', name: roomname});
             self.client.send(iqResult.root());
 
             if (this.MucRoomObjects[roomname].bSelfDestruct === true &&
