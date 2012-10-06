@@ -70,6 +70,7 @@
       <p>GoCast.it ©2012 Beta</p>
       <div class="feedback gc-icon" id="feedback" title="Send us your feedback."   onclick="openChat(event);"></div>
       <div class="gc-icon"          id="log"      title="Send log file to GoCast." onClick="sendLogPrompt();"></div>
+      <div class="gc-icon"          id="taketour" title="Take a tour of GoCast"    onclick="startTour('body > #tour')"></div>
       <div id="send-log-prompt" class="warning">
         <button id="send" class="send button" onclick="sendLog()">Send</button>
         <button id="stop" class="close button" onclick="closeSendLog()">Cancel</button>
@@ -258,10 +259,15 @@
       <div id="streams">
         <div id="scarousel">
           <div class="cloudcarousel" id="mystream">
-              <object class="localplayer" id="GocastPlayerLocal" type="application/x-gocastplayer" width="0" height="0">
-                <param name="onload" value="pluginLoaded" />
-              </object>
-              <div id="effectsPanel">
+            <script type="text/javascript">
+              app.getBrowser();
+              if (app.pluginInstalled() || 'Chrome' === app.browser.name) {
+                document.getElementById('mystream').innerHTML = '<object class="localplayer" id="GocastPlayerLocal" ' +
+                                                                'type="application/x-gocastplayer" width="0" height="0"> ' +
+                                                                '<param name="onload" value="pluginLoaded" /> </object>';
+              }
+            </script>
+            <div id="effectsPanel">
               <div id="effect-none" effect="none" title="no effect" onclick="applyEffect('none');"></div>
               <div id="effect-gray" effect="gray" title="black and white" onclick="applyEffect('gray');"></div>
               <div id="effect-sepia" effect="sepia" title="sepia" onclick="applyEffect('sepia');"></div>

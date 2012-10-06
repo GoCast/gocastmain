@@ -1863,10 +1863,13 @@ function checkForPluginOptionalUpgrades()
   }
 }
 
-var loadPluginOnce = function() {
-  $(app.LOCAL_PLUGIN_OBJECT).prependTo(app.LOCAL_PLUGIN);
-  loadPluginOnce = null;
+var openMeetingOnce = function() {
+  if ('Firefox' === app.browser.name) {
+    openMeeting();
+  }
+  openMeetingOnce = null;
 };
+
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
  * \brief check if plugin installed and prompt user if not
@@ -1885,21 +1888,11 @@ function tryPluginInstall(
   // if plugin installed but not loaded wait
   // todo get rid of multiple pluginInstalled calls
 
-  //For Chrome to reload the plugin after its installed by calling
-  //navigator.plugins.refresh(), the object tag must already be in the
-  //html.
-  /*if ('Chrome' === app.browser.name) {
-    if(loadPluginOnce) {
-      loadPluginOnce();
-    }    
-  }*/
-
   if (app.pluginInstalled() && !app.pluginLoaded)
   {
-    // Add the plugin object html to the carousel only once
-    /*if (loadPluginOnce) {
-      loadPluginOnce();
-    }*/
+    if (openMeetingOnce) {
+      openMeetingOnce();
+    }
     setTimeout(tryPluginInstall, 500);
   }
   else if (app.pluginInstalled() && app.pluginLoaded && !app.pluginUpgrade) // good to go
@@ -2476,44 +2469,42 @@ function startTour(tourSelector) {
     '#upper-right > input[class*=fb], #upper-right > input[class*=copyData]',
     '#upper-left > div#feedback'
   ], tourDescriptions = [
-    {title:       'What\'s Flashing? The Carousel',
-     description: 'The preview in the spot below shows how others see you on video. ' +
-                  'The other "GO" spots are placeholders for people or shared content such as ' +
-                  'a whiteboard. To rotate the Carousel use the left/right arrows ' +
-                  'on your keyboard or a mouse wheel. <p></p>Try it. (click Next for more)'},
+    {title:       'The GoCast Carousel',
+     description: 'Your preview (seen below) shows how others see you on video. ' +
+                  'The other "GO" spots are placeholders for people or shared content. To rotate the Carousel use the left/right arrows ' +
+                  'on your keyboard or the mouse wheel. <p></p>Try it.'},
     {title:       'Choosing Video Effects',
-     description: 'You can change the way other people see you by switching ' +
+     description: 'The three flashing icons below your preview apply effects to your video. You can switch ' +
                   'from full color to black and white or to a sepia effect. ' +
-                  'Just click on any of the the three icons below your preview. ' +
                   '<p></p>Try it.'},
-    {title:       'Controlling Camera &amp; Microphone',
-     description: 'You can turn your webcam and microphone on and off. The icons are on ' +
-                  'the lower right corner of your preview window and on the upper right icon bar. ' + 
-                  'If you have logged in with Facebook your profile photo will appear when ' +
+    {title:       'Controlling Your Camera &amp; Microphone',
+     description: 'The flashing icons on the lower right corner of your preview window (and on the upper right icon bar) ' +
+                  'turn your webcam and microphone on and off. If you have logged in with Facebook your profile photo will appear when ' +
                   'you turn off your webcam. <p></p>Try it.'},
     {title:       'Sharing Content On The Carousel',
-     description: 'You can add one or more whiteboards to the Carousel by clicking on the ' +
-                  'whiteboard icon. You can remove a Carousel spot by clicking on the ' +
-                  'trashcan icon on its upper right corner. <p></p>Try it.'},
+     description: 'The flashing icon on the lower right corner of your screen lets you add one or more whiteboards to the Carousel. ' +
+                  'You can remove a Carousel spot by clicking on the trashcan icon on its upper right corner. <p></p>Try it.'},
     {title:       'Using the Whiteboard',
-     description: 'To draw on the whiteboard choose a color and a pen size from the tray at the bottom. ' +
+     description: 'The flashing tool tray at the bottom of the whiteboard lets you mark and erase on it. Choose a color and a pen size. ' +
                   'Click, hold, and drag your mouse to draw lines. Other people can draw on the whiteboard as well. <p></p>Try it. ' +
                   'Then click Next to learn about zooming the whiteboard.'},
     {title:       'Zooming the Whiteboard',
-     description: 'Expand a whiteboard by clicking on the zoom icon on its ' +
-                  'upper left corner. Notice that the Carousel is now flattened above the whiteboard and can still be moved. ' +
+     description: 'Click on the zoom icon in the whiteboard\'s upper left hand corner to make it larger. ' +
+                  'Notice that the Carousel is now flattened above the whiteboard and can still be moved. ' +
                   'To unzoom the whiteboard click on the shrink icon on its upper left corner.'},
     {title:       'Posting Comments To The Room',
-     description: 'Type comments in the text box on the lower left corner of your screen. ' +
-                  'Click the Post button or hit the Return key on your keyboard, and your comments will be displayed. <p></p>Try it.'},
+     description: 'The flashing comments bar in the lower left hand corner of the screen is the place where you can type a comment to the room. ' +
+                  'Click in the text box to type a comment. Click the Post button or hit the Return key, and your comments will be displayed. ' +
+                  '<p></p>Try it.'},
     {title:       'Inviting Others To The Room',
-     description: 'You can invite your Facebook friends to the room by posting on your wall, ' +
-                  'or sending invites to your friends. You can also invite anybody via email. ' +
-                  'The email icon is located to the right of the Facebook Icons.'},
+     description: 'The flashing Facebook and email icons in the upper right hand part of the screen let you invite your Facebook friends ' +
+                  'to the room by posting on your wall, or by sending invites to your friends. You can also invite anybody via email.'},
     {title:       'Stay In Touch',
      description: 'We\'d love to hear about your experience with the GoCast Carousel. ' +
-                  'Click on the feedback icon on the upper left corner of your screen.'}
+                  'Click on the flashing feedback icon on the upper left corner of your screen.'}
   ], tourIdx = 0, flashTimer = null;
+
+  $(tourSelector).css({'display': 'block'});
 
   $(tourSelector + ' > button#skip').text('SKIP');
   $(tourSelector + ' > button#imgood').unbind('click').text('NEXT')

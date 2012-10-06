@@ -31,7 +31,7 @@ settings.roommanager = {
 //
 if (process.env.SETTINGS_DEVEL === 1 || process.env.SETTINGS_DEVEL === '1') {
     settings.roommanager = {
-        devel: true
+        devel: true,
         allow_overflow: true,
         allow_maxparticipants_from_client: true,
         maxparticipants_ceiling: 25,
