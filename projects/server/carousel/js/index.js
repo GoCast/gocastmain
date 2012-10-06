@@ -1332,6 +1332,13 @@ function closeStatus(event)
   $(app.STATUS_PROMPT).css("display", "none");
 }
 ///
+/// \brief upper left status div close handler
+///
+function closeStatusLeft(event)
+{
+  $(app.STATUS_PROMPT_LEFT).css("display", "none");
+}
+///
 /// \brief video button handler
 ///
 function videoButtonPress(event)
@@ -1757,6 +1764,7 @@ function handleRoomSetup() {
     app.log(2, 'room_to_create ' + room_to_create);
 
   Callcast.CreateUnlistedAndJoin(room_to_create, function(new_name) {
+    var jqDlg, newUrl;
     // We successfully created the room.
     // Joining is in process now.
     // trigger of joined_room will happen upon join complete.
@@ -1771,11 +1779,22 @@ function handleRoomSetup() {
 
     app.log(2, "Room named '" + new_name + "' has been created. Joining now.");
     app.log(2, 'window.location ' + window.location);
-    if (room_to_create.length < 1)
+    if (room_to_create !== new_name)
     {
-       var newUrl = window.location + '?roomname=' + new_name;
-       app.log(2, 'replacing state ' + newUrl);
-       history.replaceState(null, null, newUrl);
+      newUrl = window.location.origin + window.location.pathname + '?roomname=' + new_name;
+      app.log(2, 'replacing state ' + newUrl);
+      history.replaceState(null, null, newUrl);
+    }
+
+    // warn user if room name changed (overflow)
+    if (room_to_create.length > 0 && room_to_create !== new_name)
+    {
+      // display warning
+      jqDlg = $(app.STATUS_PROMPT_LEFT).css({"display": "block",
+                                             "background-image": 'url(images/warning.png)'});
+      $('#message', jqDlg).text('Room ' + room_to_create + ' overflowed.  You are now in room ' + new_name);
+      $('#stop-showing', jqDlg).css('display', 'none');
+      $('#stop-showing-text', jqDlg).css('display', 'none');
     }
 
     // initialize video, audio state here since this method
@@ -1807,6 +1826,25 @@ function handleRoomSetup() {
         changeAudio(true); // do this unconditionally so ui gets updated
       }
     }
+  },
+  function(iq)
+  {
+    var errorMsg;
+    if ($(iq).find('roomfull')) 
+    {
+      errorMsg = "Sorry the room " + room_to_create + " is full you can not enter it.";
+    }
+    else
+    {
+      errorMsg = 'There was a problem entering the room ' + room_to_create;
+    }
+
+    // display error
+    app.log(4, "handleRoomSetup Error " + iq.toString());
+    $('#errorMsgPlugin > h1').text('Oops!!!');
+    $('#errorMsgPlugin > p#prompt').text(errorMsg);
+    closeWindow();
+    openWindow('#errorMsgPlugin');
   });
 }
 

@@ -2178,11 +2178,6 @@ var Callcast = {
             function(iq) {
                 Callcast.log('Error creating room', iq);
 
-                if ($(iq).find('roomfull')) {
-                    alert("Room is full. Please try again later or create a new room.");
- //TODO:FIX                   alskjdf
-                }
-
                 if (cbError) {
                     cbError(iq);
                 }
