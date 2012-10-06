@@ -39,6 +39,8 @@ var argv = process.argv;
 
 'use strict';
 
+var overseer;   // Utilized much later. Defined now.
+
 //if (argv.length != 4) {
 //    sys.puts('Usage: node echo_bot.js <my-jid> <my-password>');
 //    process.exit(1);
@@ -2690,8 +2692,10 @@ Overseer.prototype.handleMessage = function(msg) {
                         mroom = this.MucRoomObjects[k];
                         temp += ' ROOM: ' + k;
                         // pendingDeletion && bSelfDestruct
-                        temp += mroom.bSelfDestruct ? ' Self-destruct' : ' Non-Self-destruct';
+                        temp += mroom.bSelfDestruct ? '' : ' Non-Self-destruct';
                         temp += mroom.pendingDeletion ? ' Pending-deletion' : '';
+                        temp += ' maxParticipants=' + mroom.maxParticipants;
+
                         if (size(mroom.participants) > 1) {
                             for (l in mroom.participants) {
                                 if (mroom.participants.hasOwnProperty(l)) {
@@ -3335,7 +3339,24 @@ var notify = new Notifier({jid: 'overseer@video.gocast.it', password: 'the.overs
 //
 // Login as Overseer
 //
-var overseer = new Overseer('overseer@video.gocast.it', 'the.overseer.rocks', notify);
+overseer = new Overseer('overseer@video.gocast.it', 'the.overseer.rocks', notify);
+
+//
+// Let's dump our settings so it's clear what we're running.
+//
+
+var setmsg = '';
+if (overseer.roommanagertest) {
+    setmsg = 'Roommanager TEST MODE (roommanagertest) - Current Settings: ';
+}
+else {
+    setmsg = 'Roommanager - Current Settings: ';
+}
+
+setmsg += JSON.stringify(settings);
+
+console.log(setmsg);
+notify.sendMessage(setmsg);
 
 //
 // The main serverBot/overseer should login as feedbackbot to receive feedback items. Not the room manager.
