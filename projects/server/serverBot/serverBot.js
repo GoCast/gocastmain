@@ -3356,7 +3356,8 @@ else {
 setmsg += JSON.stringify(settings);
 
 console.log(setmsg);
-notify.sendMessage(setmsg);
+// Send it to the notifier too but we're probably not logged in quite yet. So delay it. :-)
+setTimeout(function() { notify.sendMessage(setmsg); }, 2000);
 
 //
 // The main serverBot/overseer should login as feedbackbot to receive feedback items. Not the room manager.
