@@ -1825,10 +1825,13 @@ function checkForPluginOptionalUpgrades()
   }
 }
 
-var loadPluginOnce = function() {
-  $(app.LOCAL_PLUGIN_OBJECT).prependTo(app.LOCAL_PLUGIN);
-  loadPluginOnce = null;
+var openMeetingOnce = function() {
+  if ('Firefox' === app.browser.name) {
+    openMeeting();
+  }
+  openMeetingOnce = null;
 };
+
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
  * \brief check if plugin installed and prompt user if not
@@ -1847,21 +1850,11 @@ function tryPluginInstall(
   // if plugin installed but not loaded wait
   // todo get rid of multiple pluginInstalled calls
 
-  //For Chrome to reload the plugin after its installed by calling
-  //navigator.plugins.refresh(), the object tag must already be in the
-  //html.
-  /*if ('Chrome' === app.browser.name) {
-    if(loadPluginOnce) {
-      loadPluginOnce();
-    }    
-  }*/
-
   if (app.pluginInstalled() && !app.pluginLoaded)
   {
-    // Add the plugin object html to the carousel only once
-    /*if (loadPluginOnce) {
-      loadPluginOnce();
-    }*/
+    if (openMeetingOnce) {
+      openMeetingOnce();
+    }
     setTimeout(tryPluginInstall, 500);
   }
   else if (app.pluginInstalled() && app.pluginLoaded && !app.pluginUpgrade) // good to go
