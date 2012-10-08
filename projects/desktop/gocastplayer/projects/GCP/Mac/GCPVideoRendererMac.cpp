@@ -11,11 +11,11 @@ namespace GoCast
 
         const int stride = m_width*4;    
         const int frameBufferSize = m_height*stride;
-        //static SInt32 osMajorVersion = 0;
-        //static SInt32 osMinorVersion = 0;
+        static SInt32 osMajorVersion = 0;
+        static SInt32 osMinorVersion = 0;
         static CGInterpolationQuality interpolationMode = kCGInterpolationNone;
         
-        /*if(0 == osMajorVersion || 0 == osMinorVersion)
+        if(0 == osMajorVersion || 0 == osMinorVersion)
         {
             if(noErr != Gestalt(gestaltSystemVersionMajor, &osMajorVersion))
             {
@@ -27,9 +27,9 @@ namespace GoCast
             }
             if(10 <= osMajorVersion && 7 <= osMinorVersion)
             {
-                interpolationMode = kCGInterpolationLow;
+                interpolationMode = kCGInterpolationDefault;
             }
-        }*/
+        }
         
         if(NULL == pContext || NULL == m_pFrameBuffer.get())
         {

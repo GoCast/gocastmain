@@ -1054,7 +1054,7 @@ function promptTour() {
 
     $('body > #tour > h3 > span#nick').text(app.user.name.replace(/%20/g, ' ') + '!');
     $('body > #tour > button#imgood').css({
-      'left' : ($('body > #tour').width() - $('body > #tour > button#imgood').width() - 5) + 'px'
+      'left' : '5px'
     }).click(function() {
       $('body > #tour').css({'display': 'none'});
       if ('checked' === $('body > #tour > input#dontShowAgain').attr('checked')) {
@@ -1062,7 +1062,7 @@ function promptTour() {
       }
     });
     $('body > #tour > button#sure').css({
-      'left' : '5px'
+      'left' : ($('body > #tour').width() - $('body > #tour > button#sure').width() - 5) + 'px'
     }).click(function() {
       startTour('body > #tour');
     });
@@ -1327,6 +1327,13 @@ function stopStatusClicked(event)
 function closeStatus(event)
 {
   $(app.STATUS_PROMPT).css("display", "none");
+}
+///
+/// \brief upper left status div close handler
+///
+function closeStatusLeft(event)
+{
+  $(app.STATUS_PROMPT_LEFT).css("display", "none");
 }
 ///
 /// \brief video button handler
@@ -1754,6 +1761,7 @@ function handleRoomSetup() {
     app.log(2, 'room_to_create ' + room_to_create);
 
   Callcast.CreateUnlistedAndJoin(room_to_create, function(new_name) {
+    var jqDlg, newUrl;
     // We successfully created the room.
     // Joining is in process now.
     // trigger of joined_room will happen upon join complete.
@@ -1768,11 +1776,22 @@ function handleRoomSetup() {
 
     app.log(2, "Room named '" + new_name + "' has been created. Joining now.");
     app.log(2, 'window.location ' + window.location);
-    if (room_to_create.length < 1)
+    if (room_to_create !== new_name)
     {
-       var newUrl = window.location + '?roomname=' + new_name;
-       app.log(2, 'replacing state ' + newUrl);
-       history.replaceState(null, null, newUrl);
+      newUrl = window.location.origin + window.location.pathname + '?roomname=' + new_name;
+      app.log(2, 'replacing state ' + newUrl);
+      history.replaceState(null, null, newUrl);
+    }
+
+    // warn user if room name changed (overflow)
+    if (room_to_create.length > 0 && room_to_create !== new_name)
+    {
+      // display warning
+      jqDlg = $(app.STATUS_PROMPT_LEFT).css({"display": "block",
+                                             "background-image": 'url(images/warning.png)'});
+      $('#message', jqDlg).text('Room ' + room_to_create + ' overflowed.  You are now in room ' + new_name);
+      $('#stop-showing', jqDlg).css('display', 'none');
+      $('#stop-showing-text', jqDlg).css('display', 'none');
     }
 
     // initialize video, audio state here since this method
@@ -1804,6 +1823,25 @@ function handleRoomSetup() {
         changeAudio(true); // do this unconditionally so ui gets updated
       }
     }
+  },
+  function(iq)
+  {
+    var errorMsg;
+    if ($(iq).find('roomfull')) 
+    {
+      errorMsg = "Sorry the room " + room_to_create + " is full you can not enter it.";
+    }
+    else
+    {
+      errorMsg = 'There was a problem entering the room ' + room_to_create;
+    }
+
+    // display error
+    app.log(4, "handleRoomSetup Error " + iq.toString());
+    $('#errorMsgPlugin > h1').text('Oops!!!');
+    $('#errorMsgPlugin > p#prompt').text(errorMsg);
+    closeWindow();
+    openWindow('#errorMsgPlugin');
   });
 }
 
@@ -1822,10 +1860,13 @@ function checkForPluginOptionalUpgrades()
   }
 }
 
-var loadPluginOnce = function() {
-  $(app.LOCAL_PLUGIN_OBJECT).prependTo(app.LOCAL_PLUGIN);
-  loadPluginOnce = null;
+var openMeetingOnce = function() {
+  if ('Firefox' === app.browser.name) {
+    openMeeting();
+  }
+  openMeetingOnce = null;
 };
+
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
  * \brief check if plugin installed and prompt user if not
@@ -1844,21 +1885,11 @@ function tryPluginInstall(
   // if plugin installed but not loaded wait
   // todo get rid of multiple pluginInstalled calls
 
-  //For Chrome to reload the plugin after its installed by calling
-  //navigator.plugins.refresh(), the object tag must already be in the
-  //html.
-  /*if ('Chrome' === app.browser.name) {
-    if(loadPluginOnce) {
-      loadPluginOnce();
-    }    
-  }*/
-
   if (app.pluginInstalled() && !app.pluginLoaded)
   {
-    // Add the plugin object html to the carousel only once
-    /*if (loadPluginOnce) {
-      loadPluginOnce();
-    }*/
+    if (openMeetingOnce) {
+      openMeetingOnce();
+    }
     setTimeout(tryPluginInstall, 500);
   }
   else if (app.pluginInstalled() && app.pluginLoaded && !app.pluginUpgrade) // good to go
@@ -2407,6 +2438,9 @@ function resizeTour(tourSelector) {
   $(tourSelector + ' > button#imgood').css({
     'left' : ($('body > #tour').width() - $('body > #tour > button#imgood').width() - 5) + 'px'
   });
+  $(tourSelector + ' > button#sure').css({
+    'left' : '5px'
+  });  
 }
 
 function describeTourObject(tourSelector, objSelector, objDescription, stopFlashing) {
@@ -2425,7 +2459,7 @@ function describeTourObject(tourSelector, objSelector, objDescription, stopFlash
   }
 
   $(tourSelector + ' > h3').html(objDescription.title);
-  $(tourSelector + ' > p#desc').text(objDescription.description);
+  $(tourSelector + ' > p#desc').html(objDescription.description);
   resizeTour(tourSelector);
 
   return flashTimer;
@@ -2443,44 +2477,42 @@ function startTour(tourSelector) {
     '#upper-right > input[class*=fb], #upper-right > input[class*=copyData]',
     '#upper-left > div#feedback'
   ], tourDescriptions = [
-    {title:       'What\'s Flashing? The Carousel',
-     description: 'The preview in the spot below shows how others see you on video. ' +
-                  'The other "GO" spots are placeholders for people or shared content such as ' +
-                  'a Whiteboard. To rotate the Carousel use the left/right arrows ' +
-                  'on your keyboard or a mouse wheel. Try it. (click NEXT for more)'},
-    {title:       'Video Effects',
-     description: 'You can change the way other people see you by switching ' +
+    {title:       'The GoCast Carousel',
+     description: 'Your preview (seen below) shows how others see you on video. ' +
+                  'The other "GO" spots are placeholders for people or shared content. To rotate the Carousel use the left/right arrows ' +
+                  'on your keyboard or the mouse wheel. <p></p>Try it.'},
+    {title:       'Choosing Video Effects',
+     description: 'The three flashing icons below your preview apply effects to your video. You can switch ' +
                   'from full color to black and white or to a sepia effect. ' +
-                  'Just click on any of the the three icons below your preview. ' +
-                  'Try it.'},
-    {title:       'Media Controls',
-     description: 'You can turn your webcam and microphone on and off. The icons are on ' +
-                  'the lower right corner of your preview window and on the icon bar. ' + 
-                  'If you have logged in with Facebook your profile photo will appear when ' +
-                  'you turn off your webcam. Try it.'},
-    {title:       'Share Content On The Carousel',
-     description: 'You can add one or more Whiteboards to the Carousel by clicking on the ' +
-                  'Whiteboard icon. You can remove a Carousel spot by clicking on the ' +
-                  'Trashcan icon on the upper right corner the spot. Try it.'},
-    {title:       ' Whiteboard Controls',
-     description: 'To draw on the Whiteboard choose a color and pen size from the tray at the bottom. ' +
-                  'Click, hold, and drag your mouse to draw lines. Other people can draw on the Whiteboard as well. Try it. ' +
-                  'Then click Next to learn about zooming the Whiteboard.'},
-    {title:       'Zoomed Whiteboard',
-     description: 'Expand a Whiteboard by clicking on the X icon on its ' +
-                  'upper-left corner. Notice that the Carousel is now flattened above the Whiteboard and can still be moved. ' +
-                  'To unzoom the Whiteboard click on the Shrink icon in its upper left corner.'},
-    {title:       'Post Comments To The Room',
-     description: 'Type comments in the text box on the lower left corner of your screen. ' +
-                  'Click the Post button or return on your keyboard and your comments will be displayed. Try it.'},
-    {title:       'Invite Others To Your Room',
-     description: 'You can invite your Facebook friends to your room by posting on your wall, ' +
-                  'or sending invites to your friends. You can also invite anybody via email. ' +
-                  'The Email icon is located to the right of the Facebook Icons.'},
-    {title:       'Give Us Your Feedback',
+                  '<p></p>Try it.'},
+    {title:       'Controlling Your Camera &amp; Microphone',
+     description: 'The flashing icons on the lower right corner of your preview window (and on the upper right icon bar) ' +
+                  'turn your webcam and microphone on and off. If you have logged in with Facebook your profile photo will appear when ' +
+                  'you turn off your webcam. <p></p>Try it.'},
+    {title:       'Sharing Content On The Carousel',
+     description: 'The flashing icon on the lower right corner of your screen lets you add one or more whiteboards to the Carousel. ' +
+                  'You can remove a Carousel spot by clicking on the trashcan icon on its upper right corner. <p></p>Try it.'},
+    {title:       'Using the Whiteboard',
+     description: 'The flashing tool tray at the bottom of the whiteboard lets you mark and erase on it. Choose a color and a pen size. ' +
+                  'Click, hold, and drag your mouse to draw lines. Other people can draw on the whiteboard as well. <p></p>Try it. ' +
+                  'Then click Next to learn about zooming the whiteboard.'},
+    {title:       'Zooming the Whiteboard',
+     description: 'Click on the zoom icon in the whiteboard\'s upper left hand corner to make it larger. ' +
+                  'Notice that the Carousel is now flattened above the whiteboard and can still be moved. ' +
+                  'To unzoom the whiteboard click on the shrink icon on its upper left corner.'},
+    {title:       'Posting Comments To The Room',
+     description: 'The flashing comments bar in the lower left hand corner of the screen is the place where you can type a comment to the room. ' +
+                  'Click in the text box to type a comment. Click the Post button or hit the Return key, and your comments will be displayed. ' +
+                  '<p></p>Try it.'},
+    {title:       'Inviting Others To The Room',
+     description: 'The flashing Facebook and email icons in the upper right hand part of the screen let you invite your Facebook friends ' +
+                  'to the room by posting on your wall, or by sending invites to your friends. You can also invite anybody via email.'},
+    {title:       'Stay In Touch',
      description: 'We\'d love to hear about your experience with the GoCast Carousel. ' +
-                  'Click on the Feedback icon on the lower right corner of your screen.'}
+                  'Click on the flashing feedback icon on the upper left corner of your screen.'}
   ], tourIdx = 0, flashTimer = null;
+
+  $(tourSelector).css({'display': 'block'});
 
   $(tourSelector + ' > button#skip').text('SKIP');
   $(tourSelector + ' > button#imgood').unbind('click').text('NEXT')
@@ -2495,14 +2527,17 @@ function startTour(tourSelector) {
     $(tourObjects[tourIdx-1]).stop(true, true);
 
     if (1 <= tourIdx) {
-      $(tourObjects[tourIdx]).width(function(idx, width) {
-        return 2*width;
-      }).height(function(idx, height) {
-        return 2*height;
-      });
 
-      if (4 === tourIdx && 0 === $('.whiteBoard').length) {
-        $(tourObjects[3]).click();
+      if (4 === tourIdx) {
+        if (0 === $('.whiteBoard').length) {
+          $(tourObjects[3]).click();
+        }
+      } else {
+        $(tourObjects[tourIdx]).width(function(idx, width) {
+          return 2*width;
+        }).height(function(idx, height) {
+          return 2*height;
+        });        
       }
 
       if (5 === tourIdx) {
@@ -2570,11 +2605,13 @@ function startTour(tourSelector) {
     if (0 === tourIdx) {
       $(this).css({'visibility': 'hidden'});
     } else {
-      $(tourObjects[tourIdx]).width(function(idx, width) {
-        return 2*width;
-      }).height(function(idx, height) {
-        return 2*height;
-      });
+      if (4 !== tourIdx) {
+        $(tourObjects[tourIdx]).width(function(idx, width) {
+          return 2*width;
+        }).height(function(idx, height) {
+          return 2*height;
+        });        
+      }
 
       if ((tourObjects.length-1) === tourIdx) {
         $(tourSelector + ' > button#imgood').css({'visibility': 'visible'});

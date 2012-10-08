@@ -428,7 +428,10 @@ $(document).on('one-login-complete', function(event, msg) {
   if (app.loggedInAll())
   {
     app.log(2, 'one-login-complete: opening meeting');
-    openMeeting();
+
+    if ('Chrome' === app.browser.name) {
+      openMeeting();
+    }
 
     // instantiate local plugin
     // not working on firefox, object is appended but plugin does not load

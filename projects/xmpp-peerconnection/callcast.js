@@ -203,10 +203,10 @@ var logQ = new GoCastJS.BQueue(1024*1024);
 var Callcast = {
     PLUGIN_VERSION_CURRENT: 0.0,
     PLUGIN_VERSION_REQUIRED: 0.0,
-    PLUGIN_VERSION_CURRENT_MAC: 1.29,
-    PLUGIN_VERSION_REQUIRED_MAC: 1.29,
-    PLUGIN_VERSION_CURRENT_WIN: 1.29,
-    PLUGIN_VERSION_REQUIRED_WIN: 1.29,
+    PLUGIN_VERSION_CURRENT_MAC: 1.30,
+    PLUGIN_VERSION_REQUIRED_MAC: 1.30,
+    PLUGIN_VERSION_CURRENT_WIN: 1.30,
+    PLUGIN_VERSION_REQUIRED_WIN: 1.30,
     PLUGIN_VERSION_CURRENT_LINUX: 1.21,
     PLUGIN_VERSION_REQUIRED_LINUX: 1.21,
     NOANSWER_TIMEOUT_MS: 6000,
@@ -2115,40 +2115,73 @@ var Callcast = {
 // room name and when the 'ok' comes back, there will be an attribute of 'name' which
 // will be the newly created random/unique room name.
 //
-    CreateUnlistedAndJoin: function(roomname, cb) {
+    CreateUnlistedAndJoin: function(roomname, cb, cbError) {
         var roommanager = this.ROOMMANAGER,
-            self = this;
+            self = this, attrs;
+
+        attrs = {
+            xmlns: this.NS_CALLCAST,
+            name: roomname.toLowerCase()
+        };
+
+        // If the user has specified a maximum number of participants on the URL/command-line
+        // then we need to put it in the formulation to be sent up.
+        if ($.getUrlVar('maxparticipants')) {
+            attrs.maxparticipants = $.getUrlVar('maxparticipants');
+        }
 
         //
         this.connection.sendIQ($iq({
             to: roommanager,
             id: 'roomcreate1',
-            type: 'set'
-          }).c('room', {xmlns: this.NS_CALLCAST, name: roomname.toLowerCase()}),
+            type: 'set' }).c('room', attrs),
 
         // Successful callback...
-          function(iq) {
-              if ($(iq).find('ok')) {
-                  if (roomname === '') {
-                    // Asked to create a random room - must retrieve name...
-                    roomname = $(iq).find('ok').attr('name');
-                  }
+            function(iq) {
+                if ($(iq).find('ok')) {
+                    // Change of protocol here - we will ALWAYS listen to what name is given
+                    // by the server as our request for a room may turn out to be a room
+                    // which is 'full' and so we get an overflow name instead which is
+                    // the room we're supposed to join.
 
-                  self.JoinSession(roomname, roomname + self.AT_CALLCAST_ROOMS);
+                    console.log('DEBUG: roomcreate1 success. Local roomname: ' + roomname);
+                    console.log('DEBUG:    and IQ is: ', iq);
 
-                  if (cb) {
-                    cb(roomname);
-                  }
-              }
+                    if (roomname === '') {
+                        // Asked to create a random room - must retrieve name...
+                        roomname = $(iq).find('ok').attr('name');
+                    }
+                    else {
+                        // We check to see if we've been given a different room name. (overflow)
+                        if (roomname !== $(iq).find('ok').attr('name')) {
+                            // Overflow - we know which to join. All good.
+                            //     But we should change the URL in the address bar.
+                            // As it turns out, the caller of this (handleRoomSetup) will
+                            // wind up doing all the right things if we simply set the actual
+                            // given roomname now. Hurray!
 
-              return true;
-          },
+                            roomname = $(iq).find('ok').attr('name');
+                        }
+                    }
 
-        // Failure callback
-          function(iq) {
-              Callcast.log('Error creating room', iq);
-          }
-        );
+                    self.JoinSession(roomname, roomname + self.AT_CALLCAST_ROOMS);
+
+                    if (cb) {
+                        cb(roomname);
+                    }
+                }
+
+                return true;
+            },
+
+            // Failure callback
+            function(iq) {
+                Callcast.log('Error creating room', iq);
+
+                if (cbError) {
+                    cbError(iq);
+                }
+            });
     },
 
     //
@@ -2382,6 +2415,14 @@ var Callcast = {
             sessionStorage.clear();
 
             sessionStorage.setItem('persist', pers);  // And put it all back.
+        }
+    },
+
+    ForgetReconnectInfo: function() {
+        if (typeof (Storage) !== 'undefined') {
+            delete sessionStorage.jid;
+            delete sessionStorage.rid;
+            delete sessionStorage.sid;
         }
     },
 

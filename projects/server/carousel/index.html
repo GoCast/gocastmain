@@ -15,9 +15,11 @@
 <html lang="en"><!--manifest="cache-manifest.appcache">-->
   <head>
     <meta content="text/html; charset=UTF-8" http-equiv="content-type" />
-    <meta name="viewport"
-          content="height = device-height, width = device-width,
-                   initial-scale = 1.0, user-scalable = no" />
+    <meta http-equiv="Cache-Control" content="no-store" />
+    <meta http-equiv="Cache-Control" content="max-age = 0" />
+    <meta http-equiv="Expires" content="-1" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta name="viewport" content="height = device-height, width = device-width, initial-scale = 1.0, user-scalable = no" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta names="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta property="og:type" content="website" />
@@ -34,10 +36,28 @@
     <link rel="stylesheet" href="css/jquery-ui.css" type="text/css" />
     <link rel="stylesheet" href="css/jquery.cleditor.css" type="text/css" />
 
-    <!-- <MANJESH> -->
-    <!--<script src="js/appcachesetup.js" type="text/javascript"></script>-->
-    <!-- </MANJESH> -->
+    <script type="text/javascript" src="js/jquery-1.8.1.js?GOCASTTIMESTAMP"></script>
+    <script type="text/javascript" src="js/jquery.mousewheel.js?GOCASTTIMESTAMP"></script>
+    <script type="text/javascript" src="js/jquery-ui.js?GOCASTTIMESTAMP"></script>
+    <script type="text/javascript" src="/scripts/strophe.js?GOCASTTIMESTAMP"></script>
+    <script type="text/javascript" src="/scripts/strophe.roster.js?GOCASTTIMESTAMP"></script>
+    <script type="text/javascript" src="/scripts/strophe.disco.js?GOCASTTIMESTAMP"></script>
+    <script type="text/javascript" src="/scripts/strophe.muc.js?GOCASTTIMESTAMP"></script>
+    <script type="text/javascript" src="/scripts/strophe.jingle.js?GOCASTTIMESTAMP"></script>
+    <script type="text/javascript" src="/scripts/jquery.base64.min.js?GOCASTTIMESTAMP"></script>
+    <script type="text/javascript" src="js/callcast.js?GOCASTTIMESTAMP"></script>
+    <script type="text/javascript" src="js/ibb.js?GOCASTTIMESTAMP"></script>
+    <script type="text/javascript" src="js/peerconnection.js?GOCASTTIMESTAMP"></script>
+    <script type="text/javascript" src="js/callcast-api.js?GOCASTTIMESTAMP"></script>
+    <script type="text/javascript" src="js/carousel.js?GOCASTTIMESTAMP"></script>
+    <script type="text/javascript" src="js/fb.js?GOCASTTIMESTAMP"></script>
+    <script type="text/javascript" src="js/uiutil.js?GOCASTTIMESTAMP"></script>
+    <script type="text/javascript" src="js/wb.js?GOCASTTIMESTAMP"></script>
+    <script type="text/javascript" src="js/index.js?GOCASTTIMESTAMP"></script>
 
+    <!-- ---------------------------------------------------------- -->
+
+<<<<<<< HEAD
     <script src="js/jquery-1.8.1.js" type="text/javascript"></script>
     <script src="js/jquery.mousewheel.js" type="text/javascript"></script>
     <script src="js/jquery-ui.js" type="text/javascript"></script>
@@ -60,6 +80,8 @@
     <script src="js/wb.js" type="text/javascript"></script>
     <script src="js/gcedit.js" type="text/javascript"></script>
     <script src="js/index.js" type="text/javascript"></script>
+=======
+>>>>>>> origin/master
     <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon" />
     <title>Gocast.it</title>
   </head>
@@ -71,6 +93,7 @@
       <p>GoCast.it ©2012 Beta</p>
       <div class="feedback gc-icon" id="feedback" title="Send us your feedback."   onclick="openChat(event);"></div>
       <div class="gc-icon"          id="log"      title="Send log file to GoCast." onClick="sendLogPrompt();"></div>
+      <div class="gc-icon"          id="taketour" title="Take a tour of GoCast"    onclick="startTour('body > #tour')"></div>
       <div id="send-log-prompt" class="warning">
         <button id="send" class="send button" onclick="sendLog()">Send</button>
         <button id="stop" class="close button" onclick="closeSendLog()">Cancel</button>
@@ -83,7 +106,7 @@
         <p id="message">The speaker volume is too low for you to hear!</p>
         <input id="stop-showing" type="checkbox" value="Stop"onclick="stopStatusClicked(event);"/>
         <p id="stop-showing-text">Stop showing this message.</p>
-        <img class="close" src="images/button-close.png" alt="Close" title="Close" onClick="closeStatus(event);"/>
+        <img class="close" src="images/button-close.png" alt="Close" title="Close" onClick="closeStatusLeft(event);"/>
       </div>
     </div>
     <div id="upper-right">
@@ -190,7 +213,7 @@
       </div>
       <div id="installPlugin" class="window resizable">
         <h1>Gocast.it plugin was not found</h1>
-        <p id ="prompt">In order to participate you will need the Gocast.it plugin installed.</p>
+        <p id ="prompt">In order to participate you will need the GoCast.it plugin installed.</p>
         <p>Please click here <a id="dlLink" href="javascript:doDownload();">
         Gocast.it.plugin</a> to download. <span>Then click on the
         downloaded file to install.</span></p>
@@ -210,18 +233,19 @@
         <p>Thanks!  We will be waiting for you.</p>
       </div>
       <div id="credentials" class="window resizable">
-        <p class="title welcome">Welcome to Gocast!</p>
+        <p class="title welcome">Welcome to GoCast!</p>
         <div id="fb-login-button" class="fb-login-button" data-show-faces="false" data-width="200" data-max-rows="1">Login With Facebook</div>
         <p class="title optiondesc">
-          By logging in with Facebook, you can invite your Facebook Friends by posting on your wall and/or 
-          sending a Facebook message invite from your room. Your Facebook name will be used as your screen name.
-          Also, when you turn your webcam off, your profile picture will appear instead.
+          By logging in with Facebook you can invite your friends to your GoCast room. You can post to your wall or send a Facebook message. 
+          Your Facebook name will appear as your GoCast screen name. Also, when you turn your webcam off your Facebook profile image will 
+          replace your video.
         </p>
         <div class="divider">-- OR --</div>
         <a id="noThanks" href="javascript:enterId();">Login Without Facebook</a>
         <p class="title optiondesc">
-          By not logging in with Facebook, you can choose your own screen name for the room. You can invite others
-          to your room using email. Also, when you turn your webcam off, a blank silhouette will appear instead.  
+          By not logging in with Facebook you can choose your own screen name for the GoCast room. 
+          You can invite others to join your room by email. Also, when you turn your webcam off, 
+          a blank silhouette will replace your video.
         </p>
         <!--
         <div id="fb-login-button" class="fb-login-button" data-show-faces="false" data-width="200" data-max-rows="1"
@@ -233,8 +257,10 @@
         <p class="title welcome">GoCast Login</p>
         <p class="login-error"></p>
         <input id="name"  type="text" name="name" placeholder="Choose your nickname for the room" />
-        <input id="email" type="text" placeholder="Enter your email (optional)" /><p/>
-        <a id="btn" type="button" href="javascript:void(0);">GET STARTED</a><p/>
+        <p></p>
+        <input id="email" type="text" placeholder="Enter your email (optional)" />
+        <p></p>
+        <a id="btn" type="button" href="javascript:void(0);">GET STARTED</a>
         <!--<div class="divider">-- OR --</div>
         <div id="fb-login-button2" class="fb-login-button" data-show-faces="false" data-width="200" data-max-rows="1">login with facebook</div>
         <p class="title">Login with facebook to show profile pictures in spots and post or send invites to this room.</p>-->
@@ -257,10 +283,15 @@
       <div id="streams">
         <div id="scarousel">
           <div class="cloudcarousel" id="mystream">
-              <object class="localplayer" id="GocastPlayerLocal" type="application/x-gocastplayer" width="0" height="0">
-                <param name="onload" value="pluginLoaded" />
-              </object>
-              <div id="effectsPanel">
+            <script type="text/javascript">
+              app.getBrowser();
+              if (app.pluginInstalled() || 'Chrome' === app.browser.name) {
+                document.getElementById('mystream').innerHTML = '<object class="localplayer" id="GocastPlayerLocal" ' +
+                                                                'type="application/x-gocastplayer" width="0" height="0"> ' +
+                                                                '<param name="onload" value="pluginLoaded" /> </object>';
+              }
+            </script>
+            <div id="effectsPanel">
               <div id="effect-none" effect="none" title="no effect" onclick="applyEffect('none');"></div>
               <div id="effect-gray" effect="gray" title="black and white" onclick="applyEffect('gray');"></div>
               <div id="effect-sepia" effect="sepia" title="sepia" onclick="applyEffect('sepia');"></div>
