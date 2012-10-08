@@ -2267,6 +2267,7 @@ function Overseer(user, pw, notifier) {
 
     this.CONF_SERVICE = '@gocastconference.video.gocast.it';
     this.SERVER = 'video.gocast.it';
+    this.OVERSEER_NICKNAME = 'overseer';
     this.static_roomnames = {};
     this.MucRoomObjects = {};
     this.notifier = notifier;
@@ -2369,7 +2370,7 @@ function Overseer(user, pw, notifier) {
                     self.MucRoomObjects[k] = new MucRoom(self.client, self.notifier, false);
                     self.MucRoomObjects[k].finishInit();
 
-                    self.MucRoomObjects[k].join(k + self.CONF_SERVICE, 'overseer');
+                    self.MucRoomObjects[k].join(k + self.CONF_SERVICE, self.OVERSEER_NICKNAME);
                 }
             }
 
@@ -2812,7 +2813,7 @@ Overseer.prototype.AddTrackedRoom = function(roomname, obj, cbSuccess, cbFailure
                 cbFailure('AddTrackedRoom: ERROR: finishInit failed for: ' + roomname);
             });
 
-            self.MucRoomObjects[roomname].join(roomname + self.CONF_SERVICE, 'overseer');
+            self.MucRoomObjects[roomname].join(roomname + self.CONF_SERVICE, self.OVERSEER_NICKNAME);
         }, function() {
             self.log('AddTrackedRoom: AddRoom failed.');
             cbFailure('ERROR: AddRoom for DB failed.');
@@ -2830,7 +2831,7 @@ Overseer.prototype.AddTrackedRoom = function(roomname, obj, cbSuccess, cbFailure
             cbFailure('ERROR: non-DB-finishInit failed.');
         });
 
-        this.MucRoomObjects[roomname].join(roomname + self.CONF_SERVICE, 'overseer');
+        this.MucRoomObjects[roomname].join(roomname + self.CONF_SERVICE, self.OVERSEER_NICKNAME);
     }
 
     return true;
@@ -3356,7 +3357,8 @@ else {
 setmsg += JSON.stringify(settings);
 
 console.log(setmsg);
-notify.sendMessage(setmsg);
+// Send it to the notifier too but we're probably not logged in quite yet. So delay it. :-)
+setTimeout(function() { notify.sendMessage(setmsg); }, 2000);
 
 //
 // The main serverBot/overseer should login as feedbackbot to receive feedback items. Not the room manager.
