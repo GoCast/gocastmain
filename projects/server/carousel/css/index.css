@@ -206,7 +206,8 @@ div#settings
 }
 div#volume
 {
-  float:right;
+  display:inline-block;
+  vertical-align:middle;
   margin-right: 5px;
   width:24px;
   height:24px;
@@ -217,7 +218,6 @@ div#volume
 }
 p#connection-status
 {
-  float:right;
   margin-right: 10px;
   margin-top: auto;
   margin-left: auto;

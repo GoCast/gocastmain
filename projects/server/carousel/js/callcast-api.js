@@ -29,7 +29,8 @@
           handleRoomSetup,
           carouselItemUnzoom,
           showPersonalChatWithSpot,
-          onEffectApplied
+          onEffectApplied,
+          promptTour
 */
 'use strict';
 
@@ -51,8 +52,6 @@ $(document).on('joined_session', function(
   app.enableButtons(true);
   closeWindow();
   promptTour();
-
-  //todo put openmeeting here to load plugin earlier
 
   return false;
 }); /* joined_session() */
@@ -1022,7 +1021,7 @@ function removeSpotCb(info)
 function connectionStatus(statusStr)
 {
   app.log(2, 'connectionStatus' + statusStr);
-  $("body > #upper-right > #connection-status").text(statusStr);
+  $("#connection-status").text(statusStr);
 }
 
 ///
@@ -1069,7 +1068,7 @@ function readyStateCb(state, jid, nick)
 function setLocalSpeakerStatus(vol)
 {
   // set image based on volume
-  var img, div = $("body > #upper-right > div#volume");
+  var img, div = $("div#volume");
   console.log("speaker volume " + vol);
   if (vol <= 0) // mute, if vol == -1 display mute symbol since sound's probably not getting out or in
   {
