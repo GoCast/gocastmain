@@ -1089,6 +1089,7 @@ function setLocalSpeakerStatus(vol)
   div.css("background-image", img);
 
   // display volume warning
+  /* turn off volume prompt
   if (app.volWarningDisplayed === false)             // check volume only on first callback
   {
     if(("undefined" === typeof(Storage) || window.localStorage.stopVolumeStatus !== "checked") && // and if user has not disabled the check
@@ -1098,6 +1099,7 @@ function setLocalSpeakerStatus(vol)
     }
     app.volWarningDisplayed = true;
   }
+  */
 }
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
