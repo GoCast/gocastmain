@@ -2470,20 +2470,20 @@ function startTour(tourSelector) {
     '#upper-left > div#feedback'
   ], tourDescriptions = [
     {title:       'The GoCast Carousel',
-     description: 'Your preview (seen below) shows how others see you on video. ' +
-                  'The other "GO" spots are placeholders for people or shared content. To rotate the Carousel use the left/right arrows ' +
-                  'on your keyboard or the mouse wheel. <p></p>Try it.'},
+     description: 'The "GO" spots on the Carousel are placeholders for people and for shared content. ' +
+                  'You can rotate them with the left/right arrow keys on your keyboard or the mouse wheel. <p></p>Try it. ' +
+                  '<p></p>Your preview (seen below) shows how others see you.'},
     {title:       'Choosing Video Effects',
      description: 'The three flashing icons below your preview apply effects to your video. You can switch ' +
                   'from full color to black and white or to a sepia effect. ' +
                   '<p></p>Try it.'},
     {title:       'Controlling Your Camera &amp; Microphone',
-     description: 'The flashing icons on the lower right corner of your preview window (and on the upper right icon bar) ' +
+     description: 'The flashing icons on the upper right icon bar (and on the lower right corner of your preview window) ' +
                   'turn your webcam and microphone on and off. If you have logged in with Facebook your profile photo will appear when ' +
                   'you turn off your webcam. <p></p>Try it.'},
     {title:       'Sharing Content On The Carousel',
      description: 'The flashing icon on the lower right corner of your screen lets you add one or more whiteboards to the Carousel. ' +
-                  'You can remove a Carousel spot by clicking on the trashcan icon on its upper right corner. <p></p>Try it.'},
+                  '<p></p>Try it.'},
     {title:       'Using the Whiteboard',
      description: 'The flashing tool tray at the bottom of the whiteboard lets you mark and erase on it. Choose a color and a pen size. ' +
                   'Click, hold, and drag your mouse to draw lines. Other people can draw on the whiteboard as well. <p></p>Try it. ' +
