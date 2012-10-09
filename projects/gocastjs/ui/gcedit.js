@@ -19,6 +19,7 @@ GoCastJS.gcEdit = function(spot, info)
   this.jqSpot = $(spot);
   this.info = info;
   this.jqDiv = $(this.DIV).appendTo(this.jqSpot).css("position", "absolute");
+  this.div = this.jqDiv[0];
   this.item = this.jqSpot.data('item');
 
   this.init();
@@ -73,5 +74,7 @@ GoCastJS.gcEdit.prototype.setScale = function(width, height)
   this.scaleH = hScale;
   */
   console.log("gcEdit scale width " + width + " height " + height);
-  this.jqDiv.width(width).height(height);
+  //this.jqDiv.width(width).height(height);
+  this.div.style.width = width;
+  this.div.style.height = height;
 };
