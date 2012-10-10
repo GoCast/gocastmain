@@ -564,6 +564,7 @@
   //==================
 
   // checksum - returns a checksum using the Adler-32 method
+  // todo Adler is not good for short messages, use crc32
   function checksum(text)
   {
     var a = 1, b = 0;
