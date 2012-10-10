@@ -14,6 +14,7 @@ GoCastJS = (null !== GoCastJS) ? GoCastJS : {};
 
 GoCastJS.gcEdit = function(spot, info)
 {
+  this.timeout = 300;
   this.DIV = '<div id="gcEditDiv"><textarea id="gcTextArea"></textarea></div>';
   this.spot = spot;
   this.jqSpot = $(spot);
@@ -38,8 +39,10 @@ GoCastJS.gcEdit.prototype.init = function()
                    {
                      return self.updateFrame(code);
                    }
-                  });
+                  })[0];
   this.jqSpot.data('gcEdit', this);
+  setInterval(this.getTimeoutCallback(), this.timeout);
+  /*
   // override mouseover event, prevent showing zoom, trash icons
   // since zooming editor doesn't work yet
   this.jqSpot.mouseover(function(event)
@@ -47,6 +50,7 @@ GoCastJS.gcEdit.prototype.init = function()
     event.stopPropagation();
     return false;
   });
+  */
 };
 GoCastJS.gcEdit.prototype.updateTextArea = function(html)
 {
@@ -73,8 +77,45 @@ GoCastJS.gcEdit.prototype.setScale = function(width, height)
   this.scaleW = wScale;
   this.scaleH = hScale;
   */
-  console.log("gcEdit scale width " + width + " height " + height);
+  //console.log("gcEdit scale width " + width + " height " + height);
   //this.jqDiv.width(width).height(height);
   this.div.style.width = width;
   this.div.style.height = height;
+};
+///
+/// \brief get method to send edit updates when timer goes off
+///
+GoCastJS.gcEdit.prototype.getTimeoutCallback = function()
+{
+  var self = this; // closure var for timeout callback
+  return function()
+  {
+    // check if there's anything to send
+    //console.log("gcEdit timeout ");
+    if (self.editor.isDirty()) // if editor contents has changed
+    {
+      self.sendEdits();
+    }
+  };
+};
+///
+/// \brief send editor updates
+///
+GoCastJS.gcEdit.prototype.sendEdits = function()
+{
+  var code = this.editor.getCode();
+  console.log("sendEdits ", code);
+  this.editor.clearDirty();
+  Callcast.SetSpot({spottype: "editor", spotnumber: this.info.spotnumber, code: code});
+};
+///
+/// \brief set the editor contents to received info.code
+///
+GoCastJS.gcEdit.prototype.doSpot = function(info)
+{
+  if (info.code)
+  {
+    console.log("gcEdit doSpot ", info);
+    this.editor.setCode(info.code);
+  }
 };

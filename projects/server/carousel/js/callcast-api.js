@@ -797,6 +797,11 @@ function doSpot(spotDiv, info)
         jqDiv.removeClass('unoccupied').addClass('typeContent editor');
         editor = new GoCastJS.gcEdit(spotDiv, info);
       }
+      else
+      {
+        editor = jqDiv.data('gcEdit');
+      }
+      editor.doSpot(info);
     }
     else if (info.spottype === 'url')
     {

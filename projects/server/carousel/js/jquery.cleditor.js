@@ -12,6 +12,9 @@
 // @output_file_name jquery.cleditor.min.js
 // ==/ClosureCompiler==
 
+"use strict";
+/*jslint sloppy: false, todo: true, white: true, browser: true, devel: true */
+
 (function($) {
 
   //==============
@@ -192,9 +195,12 @@
   //============
 
   // cleditor - creates a new editor for the passed in textarea element
-  cleditor = function(area, options) {
+  var cleditor = function(area, options) {
+//^^^ -- jk had to add this after compile stopped working, don't know why it worked without it in the first place
 
     var editor = this;
+
+    editor.dirty = false;
 
     // Get the defaults and override with options
     editor.options = options = $.extend({}, $.cleditor.defaultOptions, options);
@@ -206,7 +212,8 @@
       .blur(function() {
         // Update the iframe when the textarea loses focus
         updateFrame(editor, true);
-      });
+      })
+      .keypress(setDirty);
 
     // Create the main container and append the textarea
     var $main = editor.$main = $(DIV_TAG)
@@ -324,7 +331,12 @@
     ["selectedText", selectedText, true],
     ["showMessage", showMessage],
     ["updateFrame", updateFrame],
-    ["updateTextArea", updateTextArea]
+    ["updateTextArea", updateTextArea],
+    ["isDirty", isDirty, true],
+    ["setDirty", setDirty, true],
+    ["clearDirty", clearDirty, true],
+    ["getCode", getCode, true],
+    ["setCode", setCode]
   ];
 
   $.each(methods, function(idx, method) {
@@ -806,12 +818,16 @@
     // Create a new iframe
     var $frame = editor.$frame = $('<iframe frameborder="0" src="javascript:true;">')
       .hide()
-      .appendTo($main);
+      .appendTo($main)
+      .keypress(setDirty);
 
     // Load the iframe document content
     var contentWindow = $frame[0].contentWindow,
       doc = editor.doc = contentWindow.document,
       $doc = $(doc);
+
+    $(contentWindow).keypress(setDirty);
+    $doc.keypress(setDirty);
 
     doc.open();
     doc.write(
@@ -1129,5 +1145,62 @@
     }
 
   }
-
+  
+  // check dirty bit, if set, check checksum
+  // return true if dirty bit set and checksum does not match
+  function isDirty()
+  {
+    var sum, html, result = false;
+    if (this.dirty)
+    {
+      if (!this.sourceMode()) // if editor is in html mode
+      {
+        this.updateTextArea(this, true); // get html source from iframe to editor textedit
+      }
+      else
+      {
+        this.updateFrame(this, true);
+      }
+      /*
+      html = $(this.doc.body).html();
+      sum = checksum(html)
+      result = (sum === this.frameChecksum ? false : true);
+      */
+      result = true;
+    }
+    //console.log("cleditor isDirty", result);
+    return result;
+  }
+  // clear dirty bit
+  function clearDirty()
+  {
+    console.log("cleditor clearDirty");
+    this.dirty = false;
+  }
+  // set dirty bit to true
+  function setDirty()
+  {
+    var editor = $(this).data("cleditor");
+    console.log("cleditor setDirty");
+    if (!editor)
+    {
+      app.log(4, "cleditor setDirty error no editor object");
+    }
+    else
+    {
+      editor.dirty = true;
+    }
+  }
+  // get html source from editor
+  function getCode()
+  {
+    return this.$area.val();
+  }
+  // set html source in textarea and update frame
+  // this plugin's calling scheme prepends the editor to args
+  function setCode(editor, code)
+  {
+    this.$area.val(code);
+    this.updateFrame(this, false);
+  }
 })(jQuery);
