@@ -24,15 +24,18 @@ if (!settings) {
 if (!settings.roommanager) {
     settings.roommanager = {};
 }
+if (!settings.dynamodb) {
+    settings.dynamodb = {};
+}
 
 var sys = require('util');
 var xmpp = require('node-xmpp');
 var fs = require('fs');
 var ltx = require('ltx');
 var evt = require('events');
-var ddb = require('dynamodb').ddb({ endpoint: 'dynamodb.us-west-1.amazonaws.com',
-                                accessKeyId: 'AKIAJWJEBZBGT6TPH32A',
-                                secretAccessKey: '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' });
+var ddb = require('dynamodb').ddb({ endpoint: settings.dynamodb.endpoint,
+                                    accessKeyId: settings.dynamodb.accessKeyId,
+                                    secretAccessKey: settings.dynamodb.secretAccessKey});
 
 var eventManager = new evt.EventEmitter();
 var argv = process.argv;
@@ -85,8 +88,8 @@ function logDate() {
 function RoomDatabase(notifier) {
     this.roomList = {};
     // Table names on DynamoDB
-    this.ACTIVEROOMS = 'room_active_list';
-    this.ROOMCONTENTS = 'room_contents';
+    this.ACTIVEROOMS = settings.dynamodb.tables.ACTIVEROOMS;
+    this.ROOMCONTENTS = settings.dynamodb.tables.ROOMCONTENTS;
     this.notifier = notifier;
 }
 
@@ -2265,9 +2268,9 @@ function Overseer(user, pw, notifier) {
         option,
         self = this;
 
-    this.CONF_SERVICE = '@gocastconference.video.gocast.it';
-    this.SERVER = 'video.gocast.it';
-    this.OVERSEER_NICKNAME = 'overseer';
+    this.CONF_SERVICE = settings.CONF_SERVICE || '@gocastconference.video.gocast.it';
+    this.SERVER = settings.SERVERNAME || 'video.gocast.it';
+    this.OVERSEER_NICKNAME = settings.overseer.OVERSEER_NICKNAME || 'overseer';
     this.static_roomnames = {};
     this.MucRoomObjects = {};
     this.notifier = notifier;
@@ -2294,7 +2297,8 @@ function Overseer(user, pw, notifier) {
 
                     if ('roommanager' === option) {
                         this.log('OVERSEER: ROOM MANAGER MODE');
-                        user = user + '/' + option;
+                        user = settings.roommanager.username;
+                        pw = settings.roommanager.password;
                         this.log('OVERSEER: JID = ' + user);
 
                         this.roommanager = true;
@@ -2304,7 +2308,8 @@ function Overseer(user, pw, notifier) {
 
                     if ('roommanagertest' === option) {
                         this.log('OVERSEER: ROOM MANAGER MODE --- TEST VERSION');
-                        user = user + '/' + option;
+                        user = settings.roommanager.usernametest;
+                        pw = settings.roommanager.password;
                         this.log('OVERSEER: JID = ' + user);
 
                         this.roommanager = true;
@@ -2344,8 +2349,8 @@ function Overseer(user, pw, notifier) {
     //  this.static_roomnames.newroom = true;
     //  this.static_roomnames.other_newroom = true;
     }
-
-    this.client = new xmpp.Client({ jid: user, password: pw, reconnect: true, host: this.SERVER, port: 5222 });
+//console.log('DEBUG: user: ' + user + ', pw: ' + pw + ', server: ' + this.SERVER + ', port: ' + settings.SERVERPORT);
+    this.client = new xmpp.Client({ jid: user, password: pw, reconnect: true, host: this.SERVER, port: settings.SERVERPORT });
 
     // Very important - because we listen to a single node-xmpp client connection here,
     // we have a lot of potential listeners to an emitter. To avoid the warning about this...
@@ -2418,6 +2423,7 @@ function Overseer(user, pw, notifier) {
     });
 
     this.client.on('error', function(e) {
+        sys.puts(e);
         if (e.getChild('conflict'))
         {
             self.log('Username Conflict. Likely two roommanager logins simultaneously.');
@@ -3205,7 +3211,8 @@ function FeedbackBot(feedback_jid, feedback_pw, notifier) {
     this.notifier = notifier;
     this.jid = feedback_jid;
 
-    client = new xmpp.Client({ jid: feedback_jid, password: feedback_pw, reconnect: true, host: 'video.gocast.it', port: 5222 });
+    client = new xmpp.Client({ jid: feedback_jid, password: feedback_pw, reconnect: true,
+                                host: settings.SERVERNAME, port: settings.SERVERPORT });
 
     client.on('online',
         function() {
@@ -3333,28 +3340,28 @@ console.log('*                                                  *');
 console.log('****************************************************');
 console.log('****************************************************');
 
-var notify = new Notifier({jid: 'overseer@video.gocast.it', password: 'the.overseer.rocks',
-                            server: 'video.gocast.it', port: 5222},
-            ['rwolff@video.gocast.it', 'jim@video.gocast.it']); // , "bob.wolff68@jabber.org" ]);
+var notify = new Notifier({jid: settings.notifier.username, password: settings.notifier.password,
+                            server: settings.SERVERNAME, port: settings.SERVERPORT},
+                            settings.notifier.notify_list);
 
 //
 // Login as Overseer
 //
-overseer = new Overseer('overseer@video.gocast.it', 'the.overseer.rocks', notify);
+overseer = new Overseer(settings.overseer.username, settings.overseer.password, notify);
 
 //
 // Let's dump our settings so it's clear what we're running.
 //
 
 var setmsg = '';
-if (overseer.roommanagertest) {
-    setmsg = 'Roommanager TEST MODE (roommanagertest) - Current Settings: ';
+if (overseer && overseer.roommanagertest) {
+    setmsg = 'Roommanager TEST MODE (roommanagertest) '; // - Current Settings: ';
 }
 else {
-    setmsg = 'Roommanager - Current Settings: ';
+    setmsg = 'Roommanager '; // - Current Settings: ';
 }
 
-setmsg += JSON.stringify(settings);
+//setmsg += JSON.stringify(settings);
 
 console.log(setmsg);
 // Send it to the notifier too but we're probably not logged in quite yet. So delay it. :-)
@@ -3363,13 +3370,9 @@ setTimeout(function() { notify.sendMessage(setmsg); }, 2000);
 //
 // The main serverBot/overseer should login as feedbackbot to receive feedback items. Not the room manager.
 //
-if (!overseer.roommanager) {
+if (overseer && !overseer.roommanager) {
     //
     // Login as test feedback bot.
     //
-    //var fb = new FeedbackBot("feedback_bot_test1@video.gocast.it", "test1", notify);
-    var fb_gocast = new FeedbackBot('feedback_bot_gocast@video.gocast.it', 'feedback.gocast.teambang', notify);
-    var fb_etzchayim = new FeedbackBot('feedback_bot_etzchayim@video.gocast.it', 'feedback.gocast.etzchayim', notify);
-    //var fb_fuse = new FeedbackBot('feedback_bot_fuse@video.gocast.it', 'feedback.gocast.fuse', notify);
-    //var fb_friends = new FeedbackBot('feedback_bot_friends@video.gocast.it', 'feedback.gocast.friends', notify);
+    var fb_gocast = new FeedbackBot(settings.feedbackbot.username, settings.feedbackbot.password, notify);
 }
