@@ -213,7 +213,7 @@
         // Update the iframe when the textarea loses focus
         updateFrame(editor, true);
       })
-      .keypress(setDirty);
+      .keypress(function() {setDirty(editor);});
 
     // Create the main container and append the textarea
     var $main = editor.$main = $(DIV_TAG)
@@ -819,15 +819,15 @@
     var $frame = editor.$frame = $('<iframe frameborder="0" src="javascript:true;">')
       .hide()
       .appendTo($main)
-      .keypress(setDirty);
+      .keypress(function() {setDirty(editor);});
 
     // Load the iframe document content
     var contentWindow = $frame[0].contentWindow,
       doc = editor.doc = contentWindow.document,
       $doc = $(doc);
 
-    $(contentWindow).keypress(setDirty);
-    $doc.keypress(setDirty);
+    $(contentWindow).keypress(function() {setDirty(editor);});
+    $doc.keypress(function() {setDirty(editor);});
 
     doc.open();
     doc.write(
@@ -892,9 +892,14 @@
 
     // Enable the toolbar buttons as the user types or clicks
     $doc.click(hidePopups)
-      .bind("keyup mouseup", function() {
+      .bind("keyup", function() {
         refreshButtons(editor);
-      });
+        setDirty(editor);
+      })
+      .bind("mouseup", function() {
+        refreshButtons(editor);
+      })
+      .keypress(function() {setDirty(editor);});
 
     // Show the textarea for iPhone/iTouch/iPad or
     // the iframe when design mode is supported.
@@ -1178,9 +1183,8 @@
     this.dirty = false;
   }
   // set dirty bit to true
-  function setDirty()
+  function setDirty(editor)
   {
-    var editor = $(this).data("cleditor");
     console.log("cleditor setDirty");
     if (!editor)
     {
