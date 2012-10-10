@@ -14,7 +14,7 @@ GoCastJS = (null !== GoCastJS) ? GoCastJS : {};
 
 GoCastJS.gcEdit = function(spot, info)
 {
-  this.timeout = 300;
+  this.timeout = 1000;
   this.DIV = '<div id="gcEditDiv"><textarea id="gcTextArea"></textarea></div>';
   this.spot = spot;
   this.jqSpot = $(spot);
