@@ -466,7 +466,7 @@ GoCastJS.WhiteBoard.prototype.sendStroke = function(stroke)
 ///
 GoCastJS.WhiteBoard.prototype.doCommands = function(info)
 {
-  var i, cmds, stroke;
+  var i, cmds, stroke, image;
   if (!info) {throw "WhiteBoard.doCommands info is null";}
   if (info.strokes)
   { 
@@ -484,6 +484,16 @@ GoCastJS.WhiteBoard.prototype.doCommands = function(info)
     stroke = JSON.parse(info.stroke);
     //console.log("WhiteBoard.doCommands stroke ", stroke);
     this.doCommand(stroke);
+  }
+  if (info.image)
+  {
+    // load image from data url
+    image = new Image();
+    image.onload = function()
+    {
+      this.wbCtx.drawImage(this, 0, 0);
+    };
+    image.src = info.image;
   }
   this.restoreMouseLocation();
 };
