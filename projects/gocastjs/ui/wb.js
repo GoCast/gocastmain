@@ -619,7 +619,8 @@ GoCastJS.WhiteBoard.prototype.onMouseUp = function(event)
   var wb = $(this).data("wb"),
       point = wb.mouse.offsetEvent(event, wb.jqCanvas),
       x = point.x / wb.scaleW,
-      y = point.y / wb.scaleH;
+      y = point.y / wb.scaleH,
+      img;
   $(window).unbind('mousemove', wb.onMouseMove) // unbind mouse handlers
            .unbind('mouseup', wb.onMouseUp)
            .removeData('wb');
@@ -632,6 +633,8 @@ GoCastJS.WhiteBoard.prototype.onMouseUp = function(event)
     wb.mouse.currentCommand.push({name: 'stroke'});
     wb.mouse.currentCommand.push({name: 'restore'});
     wb.sendStroke(wb.mouse.currentCommand);
+    img = wb.wbCanvas.toDataURL();
+    console.log("wb image length", img.length);
   }
   wb.mouse.currentCommand = [];
   wb.mouse.lineCt = 0;
