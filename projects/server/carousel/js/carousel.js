@@ -80,7 +80,8 @@
       // only show close icon on unoccupied or content spots
       if ($(this).hasClass('unoccupied') || $(this).hasClass('typeContent')) {
         $('.close', this).css('visibility', 'visible');
-        if ($(this).hasClass('typeContent')) {
+        if ($(this).hasClass('typeContent') && 
+           !$(this).hasClass("editor") ) { // disable zoom on editor until it works
           $('.zoom', this).css('visibility', 'visible');
         }
       }
