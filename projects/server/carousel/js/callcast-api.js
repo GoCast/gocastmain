@@ -801,7 +801,10 @@ function doSpot(spotDiv, info)
       {
         editor = jqDiv.data('gcEdit');
       }
-      editor.doSpot(info);
+      if (editor)
+      {
+        editor.doSpot(info);
+      }
     }
     else if (info.spottype === 'url')
     {
