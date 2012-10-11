@@ -4,15 +4,128 @@
 		<title>GoCastPlayer Settings</title>
 		<link rel="stylesheet" type="text/css" href="style/jquery-ui.css" />
 		<link rel="stylesheet" type="text/css" href="style/index.css" />
-		<script type="text/javascript" src="jquery-1.7.2.dev.js"></script>
-		<script type="text/javascript" src="jquery-ui-1.8.22.custom.min.js"></script>
+		<script type="text/javascript" src="jquery-1.8.1.js"></script>
+		<script type="text/javascript" src="jquery-ui.js"></script>
 		<script type="text/javascript" src="peerconnection.js"></script>
 		<script type="text/javascript" src="index.js"></script>
+		<script type="text/javascript">
+			function settingsOptionSelected(ele) {
+				$('#settingspanel > a').removeClass('selected');
+				$('#settingsoptions > .settingsoption').removeClass('selected');
+				$(ele).addClass('selected');
+				$($(ele).attr('optiondiv')).addClass('selected');
+			}
+
+			function testMicDown(ele) {
+				$('span', $(ele)).addClass('selected');
+			}
+
+			function testMicUp(ele) {
+				$('span', $(ele)).removeClass('selected');
+			}
+		</script>
 	</head>
 	<body>
 		<div id="pagecontent">
 			<h1 id="pagetitle"><span id="pageicon">(</span> settings</h1>
 			<div id="views">
+				<ul id="viewlist">
+					<li id="localitem" class="viewitem">
+						<div id="localcontainer" class="view">
+							<object id="local"
+									title="how you see yourself"
+									type="application/x-gocastplayer"
+									width="320"
+									height="240">
+							</object>
+							<div id="settingspanel">
+								<a onmouseover="settingsOptionSelected(this);" href="javascript:void(0);" optiondiv="#camerasettings"
+								   style= "left:0px; top:0px;" class="left icon-picto selected">h</a>
+								<a onmouseover="settingsOptionSelected(this);" href="javascript:void(0);" optiondiv="#effectsettings"
+								   style= "left:75px; top:0px;" class="icon-entypo">F</a>
+								<a onmouseover="settingsOptionSelected(this);" href="javascript:void(0);" optiondiv="#micsettings"
+								   style= "left:150px; top:0px;" class="icon-entypo">O</a>
+								<a onmouseover="settingsOptionSelected(this);" href="javascript:void(0);" optiondiv="#spksettings"
+								   style= "left:225px; top:0px;" class="right icon-picto">2</a>
+							</div>
+							<div id="walkytalky" onmousedown="testMicDown(this);" onmouseup="testMicUp(this);">
+								<span class="icon-entypo">O</span>
+								<span id="desc">TEST</span>
+							</div>
+						</div>
+					</li>
+					<li id="settingsoptions">
+						<div id="camerasettings" class="settingsoption selected">
+							<select id="cameraselect">
+								<option value="">no camera</option>
+							</select>
+							<p>
+								Choose a camera from the list above. You should be able to see yourself
+								in the preview window.
+							</p>
+						</div>
+						<div id="effectsettings" class="settingsoption">
+							<select id="effectselect" disabled="true">
+								<option value="" disabled="disabled" selected="selected">choose an effect</option>
+								<option value="none">no effect</option>
+								<option value="gray">black and white</option>
+								<option value="sepia">sepia</option>
+							</select>
+							<p>
+								Customize your video feed by applying an effect. Some effects like 'gray'
+								and 'sepia' can reduce your bandwidth.
+							</p>
+						</div>
+						<div id="micsettings" class="settingsoption">
+							<select id="micselect">
+								<option value="">no microphone</option>
+							</select>
+							<br/><br/>
+							<div id="micvol" class="slider">
+							</div>
+							<div id="micvolbar" class="volbar">
+								<span class="minus">-</span>
+								<span class="plus">+</span>
+							</div>
+							<br/>
+							<p>
+								Choose a microphone from the list above. Test it by holding down
+								the 'mic-test' button and saying something. Adjust its volume by
+								using the 'volume bar' above.
+							</p>
+						</div>
+						<div id="spksettings" class="settingsoption">
+							<select id="spkselect">
+							</select>
+							<br/><br/>
+							<div id="spkvol" class="slider">
+							</div>
+							<div id="spkvolbar" class="volbar">
+								<span class="minus">-</span>
+								<span class="plus">+</span>
+							</div>
+							<br/>
+							<p>
+								Choose an audio output device from the list above. Adjust its volume by
+								using the 'volume bar' above.
+							</p>
+						</div>
+						<div id="savesettings">
+							<span class="icon-picto">D</span> SAVE&nbsp;&nbsp;AND&nbsp;&nbsp;RETURN&nbsp;&nbsp;TO&nbsp;&nbsp;ROOM
+						</div>
+					</li>
+				</ul>
+			</div>
+			<div id="remotecontainer">
+				<object id="remote"
+					title="how others see you"
+					type="application/x-gocastplayer"
+					width="0"
+					height="0">
+				</object>
+			</div>
+
+			<!--<div id="views">
 				<ul id="viewslist">
 					<li id="localitem" class="viewitem">
 						<div id="localcontainer" class="view">
@@ -150,7 +263,7 @@
 						</li>
 					</ul>
 				</div>
-			</div>
+			</div>-->
 		</div>
 	</body>
 </html>
