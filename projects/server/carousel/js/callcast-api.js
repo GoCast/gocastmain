@@ -749,7 +749,7 @@ function doSpot(spotDiv, info)
   {
     var divIcon, divTitle,
         jqDiv = $(spotDiv),
-        whiteBoard;
+        whiteBoard, editor;
     console.log('doSpot', info);
     console.log('spotDiv', spotDiv);
     if (!spotDiv) {throw "no spotDiv";}
@@ -783,6 +783,27 @@ function doSpot(spotDiv, info)
       {
         console.log("whiteBoardCommand error, can't find wb", info);
         throw "can't find whiteboard for spot " + info.spotnumber;
+      }
+    }
+    else if (info.spottype === 'editor')
+    {
+      if (info.cmdtype === "addspot")
+      {
+        jqDiv.attr('id', app.str2id('editor ' + info.spotnumber));
+        jqDiv.attr('title', 'editor');
+        jqDiv.attr('alt', 'editor');
+        jqDiv.attr('encname', 'editor');
+        jqDiv.attr('spotnumber', info.spotnumber);
+        jqDiv.removeClass('unoccupied').addClass('typeContent editor');
+        editor = new GoCastJS.gcEdit(spotDiv, info);
+      }
+      else
+      {
+        editor = jqDiv.data('gcEdit');
+      }
+      if (editor)
+      {
+        editor.doSpot(info);
       }
     }
     else if (info.spottype === 'url')

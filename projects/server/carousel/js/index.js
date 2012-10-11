@@ -2421,6 +2421,17 @@ function addWhiteBoard() {
   });
 }
 
+function addEditor()
+{
+  Callcast.AddSpot({
+      spottype: "editor",
+      spotreplace: "first-unoc"
+    },
+    function() {
+      console.log("carousel addEditor callback");
+  });
+}
+
 function addItem() {
   Callcast.AddSpot({spottype: "new"}, function() {
     console.log("carousel addItem callback");

@@ -466,7 +466,7 @@ GoCastJS.WhiteBoard.prototype.sendStroke = function(stroke)
 ///
 GoCastJS.WhiteBoard.prototype.doCommands = function(info)
 {
-  var i, cmds, stroke;
+  var i, cmds, stroke, image;
   if (!info) {throw "WhiteBoard.doCommands info is null";}
   if (info.strokes)
   { 
@@ -484,6 +484,16 @@ GoCastJS.WhiteBoard.prototype.doCommands = function(info)
     stroke = JSON.parse(info.stroke);
     //console.log("WhiteBoard.doCommands stroke ", stroke);
     this.doCommand(stroke);
+  }
+  if (info.image)
+  {
+    // load image from data url
+    image = new Image();
+    image.onload = function()
+    {
+      this.wbCtx.drawImage(this, 0, 0);
+    };
+    image.src = info.image;
   }
   this.restoreMouseLocation();
 };
@@ -609,7 +619,8 @@ GoCastJS.WhiteBoard.prototype.onMouseUp = function(event)
   var wb = $(this).data("wb"),
       point = wb.mouse.offsetEvent(event, wb.jqCanvas),
       x = point.x / wb.scaleW,
-      y = point.y / wb.scaleH;
+      y = point.y / wb.scaleH,
+      img;
   $(window).unbind('mousemove', wb.onMouseMove) // unbind mouse handlers
            .unbind('mouseup', wb.onMouseUp)
            .removeData('wb');
@@ -622,6 +633,8 @@ GoCastJS.WhiteBoard.prototype.onMouseUp = function(event)
     wb.mouse.currentCommand.push({name: 'stroke'});
     wb.mouse.currentCommand.push({name: 'restore'});
     wb.sendStroke(wb.mouse.currentCommand);
+    img = wb.wbCanvas.toDataURL();
+    console.log("wb image length", img.length);
   }
   wb.mouse.currentCommand = [];
   wb.mouse.lineCt = 0;
