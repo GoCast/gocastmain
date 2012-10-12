@@ -87,7 +87,8 @@ else {
     };
 
     settings.roommanager = {
-        username: 'overseer@' + settings.SERVERNAME,
+        username: 'roommanager@' + settings.SERVERNAME + '/roommanager',
+        usernametest: 'roommanager@' + settings.SERVERNAME + '/roommanagertest',
         password: 'the.overseer.rocks'
     };
 }
