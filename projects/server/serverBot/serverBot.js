@@ -555,7 +555,7 @@ MucRoom.prototype.SetMaxRoomParticipants = function(max) {
     // Check for validity before going forward.
     if (settings.roommanager.maxparticipants_ceiling && max > settings.roommanager.maxparticipants_ceiling) {
         this.log('ERROR: Cannot set maxParticipants > ' + settings.roommanager.maxparticipants_ceiling + '. Value requested was: ' + max);
-        return;
+        return false;
     }
 
     // Max # users.
@@ -583,6 +583,8 @@ MucRoom.prototype.SetMaxRoomParticipants = function(max) {
     //      for now and the future.
     this.options['muc#roomconfig_maxusers'] = this.maxParticipants.toString();    // Stringify.
     console.log('Setting maxParticipants to: ' + this.options['muc#roomconfig_maxusers']);
+
+    return true;
 };
 
 MucRoom.prototype.reset = function() {
@@ -2691,6 +2693,26 @@ Overseer.prototype.handleMessage = function(msg) {
             this.log(temp);
             this.notifylog(temp);
             break;
+        case 'SETMAXPARTICIPANTS':
+            // cmd[1] is room name
+            // cmd[2] is new maximum
+            if (cmd[1] && cmd[2] && this.MucRoomObjects[cmd[1].toLowerCase()])
+            {
+                // Validate cmd[2] is a number.
+                temp = parseInt(cmd[2], 10);
+                if (temp && temp > 0) {
+                    if (this.MucRoomObjects[cmd[1].toLowerCase()].SetMaxRoomParticipants(temp)) {
+                        this.notifylog('Successfully set new maxparticipants in room: ' + cmd[1] + ' to: ' + cmd[2]);
+                    }
+                    else {
+                        this.notifylog('WARNING: Failed to set new maxparticipants in room: ' + cmd[1] + ' to: ' + cmd[2]);
+                    }
+                }
+            }
+            else {
+                this.notifylog('ERROR: Failed to SETMAXPARTICIPANTS - be sure to use SETMAXPARTICIPANTS;roomname;newmaxvalue');
+            }
+            break;
         case 'LISTROOMS':
             if (this.roommanager) {
                 temp = 'LISTROOMS Request: \n';
@@ -2750,7 +2772,8 @@ Overseer.prototype.handleMessage = function(msg) {
             }
             break;
         case 'HELP':
-            this.notifylog('Commands: LISTROOMS, DEBUGSTANZAS[;ALL|;OVERSEER|;MUCROOMS|;NONE]');
+            this.notifylog('Commands: LISTROOMS, DEBUGSTANZAS[;ALL|;OVERSEER|;MUCROOMS|;NONE],');
+            this.notifylog('          SETMAXPARTICIPANTS;<roomname>;maxParticipants');
             break;
         default:
             this.log('Direct message: Unknown command: ' + msg.getChild('body').getText());
