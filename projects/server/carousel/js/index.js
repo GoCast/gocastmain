@@ -1830,7 +1830,7 @@ function handleRoomSetup() {
   function(iq)
   {
     var errorMsg;
-    if ($(iq).find('roomfull')) 
+    if ($(iq).find('roomfull'))
     {
       errorMsg = "Sorry the room " + room_to_create + " is full you can not enter it.";
     }
@@ -2155,6 +2155,15 @@ $(document).ready(function(
 )
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
+  // DNLE overrides.
+//  Callcast.InitOverride({ CALLCAST_XMPPSERVER: 'dnle.gocast.it', CALLCAST_ROOMS: 'conference.dnle.gocast.it',
+//                        AT_CALLCAST_ROOMS: '@conference.dnle.gocast.it',
+//                        STUNSERVER: 'dnle.gocast.it', STUNSERVERPORT: 19302,
+//                        FEEDBACK_BOT: 'feedback_bot_dnle@dnle.gocast.it',
+//                        ROOMMANAGER: 'roommanager@dnle.gocast.it/roommanager',
+//                        SWITCHBOARD_FB: 'switchboard_dnle@dnle.gocast.it',
+//                        LOGCATCHER: 'logcatcher@dnle.gocast.it/logcatcher'});
+
   openWindow('#waitingToJoin');
   var unmaskTimer = setInterval(function() {
     $('#boxes #waitingToJoin > div#cover').height(
@@ -2432,7 +2441,7 @@ function resizeTour(tourSelector) {
   });
   $(tourSelector + ' > button#sure').css({
     'left' : '5px'
-  });  
+  });
 }
 
 function describeTourObject(tourSelector, objSelector, objDescription, stopFlashing) {
@@ -2442,7 +2451,7 @@ function describeTourObject(tourSelector, objSelector, objDescription, stopFlash
   if (stopFlashing) {
     setTimeout(function(){
       $(objSelector).effect('pulsate', {times: 4}, 8000);
-    }, 1000);    
+    }, 1000);
   } else {
     flashTimer = setInterval(function() {
       opacity = (1.0 === opacity) ? 0.0 : 1.0;
@@ -2510,7 +2519,7 @@ function startTour(tourSelector) {
   $(tourSelector + ' > button#imgood').unbind('click').text('NEXT')
                                       .css({'visibility': 'visible'})
                                       .click(function() {
-    tourIdx++;
+    tourIdx += 1;
 
     if (flashTimer) {
       clearInterval(flashTimer);
@@ -2529,7 +2538,7 @@ function startTour(tourSelector) {
           return 2*width;
         }).height(function(idx, height) {
           return 2*height;
-        });        
+        });
       }
 
       if (5 === tourIdx) {
@@ -2573,7 +2582,7 @@ function startTour(tourSelector) {
                                     .css({'visibility': 'hidden'})
                                     .text('BACK')
                                     .click(function() {
-    tourIdx--;
+    tourIdx -= 1;
 
     if(flashTimer) {
       clearInterval(flashTimer);
@@ -2602,7 +2611,7 @@ function startTour(tourSelector) {
           return 2*width;
         }).height(function(idx, height) {
           return 2*height;
-        });        
+        });
       }
 
       if ((tourObjects.length-1) === tourIdx) {
