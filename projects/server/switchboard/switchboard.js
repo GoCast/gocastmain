@@ -6,6 +6,16 @@
  TODO
 
  */
+/*jslint node: true */
+
+var settings = require('./settings');   // Our GoCast settings JS
+if (!settings) {
+    settings = {};
+}
+if (!settings.logcatcher) {
+    settings.logcatcher = {};
+}
+
 var sys = require('util');
 var xmpp = require('node-xmpp');
 var fs = require('fs');
@@ -73,15 +83,16 @@ useritem.prototype.getJidList = function()
 ///
 
 function switchboard(user, pw, notifier) {
-	this.SERVER = 'video.gocast.it';
+	this.SERVER = settings.SERVERNAME;
 // Gocast with Friends
 //	this.APP_ID = '303607593050243';
 //	this.APP_SECRET = '48b900f452eb251407554283cc7f3d7f';
 
 // GoCast Carousel
-	this.APP_ID = '458515917498757';
-	this.APP_SECRET = 'c3b7a2cc7f462b5e4cee252e93588d45';
-	this.client = new xmpp.Client({ jid: user, password: pw, reconnect: true, host: this.SERVER, port: 5222 });
+	this.APP_ID = settings.switchboard.APP_ID || '458515917498757';
+	this.APP_SECRET = settings.switchboard.APP_SECRET || 'c3b7a2cc7f462b5e4cee252e93588d45';
+
+	this.client = new xmpp.Client({ jid: user, password: pw, reconnect: true, host: this.SERVER, port: settings.SERVERPORT });
 	this.notifier = notifier;
 
 	this.iqnum = 0;
@@ -554,7 +565,10 @@ if (process.argv.length > 2)
 			console.log("* --help - this usage help.");
 			console.log("* --debugcommands - Allow direct chat to switchboard for backend commands.");
 			console.log("*");
+			console.log("* Settings dump: ", settings);
+			console.log("*");
 			console.log("***********");
+			process.exit(1);
 		}
 		else if (arg === '--debugcommands' || arg === '-debugcommands')
 		{
@@ -564,11 +578,12 @@ if (process.argv.length > 2)
 	}
 }
 
-var notify = new notifier({jid: "overseer@video.gocast.it", password: "the.overseer.rocks",
-							server: "video.gocast.it", port: 5222},
-			["rwolff@video.gocast.it"]); // , "bob.wolff68@jabber.org" ]);
+var notify = new notifier({jid: settings.notifier.username, password: settings.notifier.password,
+							server: settings.SERVERNAME, port: settings.SERVERPORT},
+							settings.notifier.notify_list);
 
 //
 // Login as Switchboard operator
 //
-var overseer = new switchboard("switchboard_gocastfriends@video.gocast.it", "the.switchboard.answers", notify);
+var overseer = new switchboard(settings.switchboard.username, settings.switchboard.password, notify);
+
