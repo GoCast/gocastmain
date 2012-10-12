@@ -47,10 +47,10 @@
  * \brief The main application object.
  */
 var app = {
-  GROUP_CHAT: '#lower-left > #msgBoard',
-  GROUP_CHAT_SHOW: '#lower-left > #showChat',
-  GROUP_CHAT_OUT: '#lower-left > #msgBoard > #chatOut',
-  GROUP_CHAT_IN: '#lower-left > #msgBoard > input.chatTo',
+  GROUP_CHAT: 'div#groupChat > #msgBoard',
+  GROUP_CHAT_SHOW: 'div#groupChat > #showChat',
+  GROUP_CHAT_OUT: 'div#groupChat > #msgBoard > #chatOut',
+  GROUP_CHAT_IN: 'div#groupChat > #msgBoard > input.chatTo',
   MAC_DL_URL: 'https://carousel.gocast.it/downloads/GoCastPlayer.pkg',
   WIN_DL_URL: 'https://carousel.gocast.it/downloads/GoCastPlayer.msi', // todo, link in index.html is used, switch to using this value
   LIN_64_DL_URL: 'https://carousel.gocast.it/downloads/GoCastPlayer_x86_64.tar.gz',
@@ -2485,7 +2485,7 @@ function startTour(tourSelector) {
     '#lower-right > input#addWhiteBoard',
     '.whiteBoard > .wbDiv > div#wbTools',
     '.whiteBoard > .zoom, #zoom > .close',
-    '#lower-left > div#msgBoard > input.chatTo',
+    'div#groupChat > div#msgBoard > input.chatTo',
     '#upper-right > input[class*=fb], #upper-right > input[class*=copyData]',
     '#upper-left > div#feedback'
   ], tourDescriptions = [
