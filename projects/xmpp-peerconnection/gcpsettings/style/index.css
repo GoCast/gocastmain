@@ -67,11 +67,14 @@ select {
 }
 
 #pagetitle {
+	position: relative;
+	width: auto;
+	height: 100px;
+	line-height: 100px;
 	color: #C4C4C4;
 	font-family: 'GillSans', verdana;
 	font-weight: normal;
 	letter-spacing: 3px;
-	padding-bottom: 20px;
 }
 
 #views {
@@ -79,13 +82,24 @@ select {
 }
 
 #pageicon {
-	color: white;
-	background-color: red;
-	border-radius: 5px;
-	padding-left: 5px;
-	padding-right: 5px;
-	font-family: 'ModernPictogramsNormal', verdana;
-	font-size: 30px;
+	position: absolute;
+	width: 40px;
+	height: 100px;
+	left: 0px;
+	top: 0px;
+	line-height: 100px;
+	color: seagreen;
+	font-family: 'EntypoRegular', verdana;
+	font-size: 70px;
+}
+
+#pagename {
+	position: absolute;
+	width: 60px;
+	height: 100px;
+	left: 40px;
+	top: 0px;
+	line-height: 100px;
 }
 
 .view {
