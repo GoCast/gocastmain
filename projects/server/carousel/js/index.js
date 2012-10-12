@@ -1790,7 +1790,7 @@ function handleRoomSetup() {
     app.log(2, 'window.location ' + window.location);
     if (room_to_create !== new_name)
     {
-      newUrl = window.location.origin + window.location.pathname + '?roomname=' + new_name;
+      newUrl = window.location.pathname + '?roomname=' + new_name;
       app.log(2, 'replacing state ' + newUrl);
       history.replaceState(null, null, newUrl);
     }
