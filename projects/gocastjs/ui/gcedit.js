@@ -81,8 +81,8 @@ GoCastJS.gcEdit.prototype.setScale = function(width, height)
   */
   console.log("gcEdit scale width " + width + " height " + height);
   //this.jqDiv.width(width).height(height);
-  this.div.style.width = width;
-  this.div.style.height = height;
+  this.div.style.width = width + 'px';
+  this.div.style.height = height + 'px';
 };
 ///
 /// \brief get method to send edit updates when timer goes off
@@ -115,7 +115,7 @@ GoCastJS.gcEdit.prototype.sendEdits = function()
 ///
 GoCastJS.gcEdit.prototype.doSpot = function(info)
 {
-  if (info.code)
+  if (info.code && info.from !== app.user.name)
   {
     console.log("gcEdit doSpot ", info);
     this.editor.setCode(info.code);

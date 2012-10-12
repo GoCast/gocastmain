@@ -351,9 +351,12 @@ input.fbShare {
   background-size: 100% 100%;
 }
 /*<MANJESH>*/
-input#addWhiteBoard,
-input#addEditor {
+input#addWhiteBoard {
   background-image: url('../images/AddWhiteboard.png');
+  background-size: 100% 100%;
+}
+input#addEditor {
+  background-image: url('../images/AddNote.png');
   background-size: 100% 100%;
 }
 input#addItem {
