@@ -3357,7 +3357,7 @@ var setmsg = '';
 if (overseer && overseer.roommanagertest) {
     setmsg = 'Roommanager TEST MODE (roommanagertest) '; // - Current Settings: ';
 }
-else {
+else if (overseer && overseer.roommanager) {
     setmsg = 'Roommanager '; // - Current Settings: ';
 }
 
