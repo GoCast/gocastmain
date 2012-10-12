@@ -114,6 +114,7 @@ function obfuscate() {
   cp $tempdest/js/callcast.js $tempjs/js
   cp $tempdest/js/peerconnection.js $tempjs/js
   cp $tempdest/js/wb.js $tempjs/js
+  cp $tempdest/js/gcedit.js $tempjs/js
   cp $tempdest/js/ibb.js $tempjs/js
 
   cw=`pwd`

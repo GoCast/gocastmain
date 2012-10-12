@@ -295,6 +295,7 @@ GoCastJS.WhiteBoardMouse = function(whiteBoard)
   this.timer = null; // timer for periodic stroke send
   this.lineCt = 0; // count of lines in commands
   this.start = null; // the starting mouse point
+  this.strokeInterrupted = false; // true if received stroke in the middle of a local stroke
 };
 
 ///
@@ -466,9 +467,9 @@ GoCastJS.WhiteBoard.prototype.sendStroke = function(stroke)
 ///
 GoCastJS.WhiteBoard.prototype.doCommands = function(info)
 {
-  var i, cmds, stroke;
+  var i, cmds, stroke, image;
   if (!info) {throw "WhiteBoard.doCommands info is null";}
-  if (info.strokes)
+  if (info.strokes) //todo remove this when server stops sending stroke lists
   { 
     cmds = JSON.parse(info.strokes);
     //console.log("WhiteBoard.doCommands", info, cmds);
@@ -483,7 +484,19 @@ GoCastJS.WhiteBoard.prototype.doCommands = function(info)
   {
     stroke = JSON.parse(info.stroke);
     //console.log("WhiteBoard.doCommands stroke ", stroke);
+    this.finishCurrentStroke();
     this.doCommand(stroke);
+    this.startNewStroke();
+  }
+  if (info.image)
+  {
+    // load image from data url
+    image = new Image();
+    image.onload = function()
+    {
+      this.wbCtx.drawImage(this, 0, 0);
+    };
+    image.src = info.image;
   }
   this.restoreMouseLocation();
 };
@@ -542,6 +555,30 @@ GoCastJS.WhiteBoard.prototype.restoreMouseLocation = function()
   }
 };
 ///
+/// \brief finish in progress local stroke in order to play received stroke
+///        this only affects the local canvas not the stroke to be sent
+///
+GoCastJS.WhiteBoard.prototype.finishCurrentStroke = function()
+{
+  if (this.mouse.lineCt > 0)
+  {
+    this.mouse.strokeInterrupted = true;
+  }
+};
+///
+/// \brief start a new stroke if a local stroke was interrupted by a received stroke
+///        this only affects the local canvas not the stroke to be sent
+///
+GoCastJS.WhiteBoard.prototype.startNewStroke = function()
+{
+  if (this.mouse.strokeInterrupted)
+  {
+    this.settings.apply(this.wbCtx);
+    this.wbCtx.beginPath();
+    this.wbCtx.moveTo(this.mouse.start.x, this.mouse.start.y);
+  }
+};
+///
 /// \brief rezise the canvas, set css dimensions and scale member var
 /// 
 /// \arg width, height the target sizes as integers
@@ -596,6 +633,9 @@ GoCastJS.WhiteBoard.prototype.onMouseDown = function(event)
   wb.mouse.currentCommand.push({name: 'beginPath'});
   wb.mouse.currentCommand.push({name: 'moveTo', x: (x >> 0), y: (y >> 0)});
   wb.mouse.start = {x: x, y: y}; // save starting point for mousemove
+  wb.settings.apply(wb.wbCtx);
+  wb.wbCtx.beginPath();
+  wb.wbCtx.moveTo(wb.mouse.start.x, wb.mouse.start.y);
   return false; // disable text selection
 };
 
@@ -609,7 +649,8 @@ GoCastJS.WhiteBoard.prototype.onMouseUp = function(event)
   var wb = $(this).data("wb"),
       point = wb.mouse.offsetEvent(event, wb.jqCanvas),
       x = point.x / wb.scaleW,
-      y = point.y / wb.scaleH;
+      y = point.y / wb.scaleH,
+      img;
   $(window).unbind('mousemove', wb.onMouseMove) // unbind mouse handlers
            .unbind('mouseup', wb.onMouseUp)
            .removeData('wb');
@@ -622,6 +663,8 @@ GoCastJS.WhiteBoard.prototype.onMouseUp = function(event)
     wb.mouse.currentCommand.push({name: 'stroke'});
     wb.mouse.currentCommand.push({name: 'restore'});
     wb.sendStroke(wb.mouse.currentCommand);
+    img = wb.wbCanvas.toDataURL();
+    console.log("wb image length", img.length);
   }
   wb.mouse.currentCommand = [];
   wb.mouse.lineCt = 0;
@@ -642,13 +685,13 @@ GoCastJS.WhiteBoard.prototype.onMouseMove = function(event)
   event.stopPropagation();
   if (wb.mouse.start)
   {
-    wb.wbCtx.save();
-    wb.settings.apply(wb.wbCtx);
-    wb.wbCtx.beginPath();
-    wb.wbCtx.moveTo(wb.mouse.start.x, wb.mouse.start.y);
+    //wb.wbCtx.save();
+    //wb.settings.apply(wb.wbCtx);
+    //wb.wbCtx.beginPath();
+    // wb.wbCtx.moveTo(wb.mouse.start.x, wb.mouse.start.y);
     wb.wbCtx.lineTo(x, y);
     wb.wbCtx.stroke();
-    wb.wbCtx.restore();
+    //wb.wbCtx.restore();
     wb.mouse.currentCommand.push({name: 'lineTo', x: (x >> 0), y: (y >> 0)});
     ++wb.mouse.lineCt;
     wb.mouse.start = {x: x, y: y};

@@ -814,7 +814,15 @@ function carouselItemZoom(event)
 
   $('body > div#upper-right').css({
     'top': $('#zoom').position().top + 'px',
-    'width': '130px'
+    'background-color': 'rgba(0,0,0,0.6)',
+    'border-radius': '5px',
+    'padding-top': '5px'
+  });
+
+  $('body > div#upper-left').css({
+    'background-color': 'rgba(0,0,0,0.6)',
+    'border-radius': '5px',
+    'padding-top': '5px'
   });
 
    $(spot).appendTo($('#meeting > #zoom')) // move div to zoom area, doesn't work with local, remote video spot
@@ -842,6 +850,7 @@ function carouselItemUnzoom(event)
    $('#meeting > #streams').css('height', '100%'); // zoom carousel
    //$('body > div#upper-right').css({'top': '10px'});
    $('body > div#upper-right').removeAttr('style');
+   $('body > div#upper-left').removeAttr('style');
    app.carousel.resize();
 } // carouselItemUnzoom
 
@@ -1781,7 +1790,7 @@ function handleRoomSetup() {
     app.log(2, 'window.location ' + window.location);
     if (room_to_create !== new_name)
     {
-      newUrl = window.location.origin + window.location.pathname + '?roomname=' + new_name;
+      newUrl = window.location.pathname + '?roomname=' + new_name;
       app.log(2, 'replacing state ' + newUrl);
       history.replaceState(null, null, newUrl);
     }
@@ -2421,6 +2430,17 @@ function addWhiteBoard() {
   });
 }
 
+function addEditor()
+{
+  Callcast.AddSpot({
+      spottype: "editor",
+      spotreplace: "first-unoc"
+    },
+    function() {
+      console.log("carousel addEditor callback");
+  });
+}
+
 function addItem() {
   Callcast.AddSpot({spottype: "new"}, function() {
     console.log("carousel addItem callback");
@@ -2479,37 +2499,37 @@ function startTour(tourSelector) {
     '#upper-left > div#feedback'
   ], tourDescriptions = [
     {title:       'The GoCast Carousel',
-     description: 'Your preview (seen below) shows how others see you on video. ' +
-                  'The other "GO" spots are placeholders for people or shared content. To rotate the Carousel use the left/right arrows ' +
-                  'on your keyboard or the mouse wheel. <p></p>Try it.'},
+     description: 'The "go" spots on the Carousel are placeholders for people and for shared content. ' +
+                  'You can rotate the Carousel with the left/right arrow keys on your keyboard or with your mouse wheel. <p></p>Try it. ' +
+                  '<p></p>Your preview, below, shows how others see you.'},
     {title:       'Choosing Video Effects',
-     description: 'The three flashing icons below your preview apply effects to your video. You can switch ' +
+     description: 'The three flashing icons on your preview apply effects to your video feed. You can switch ' +
                   'from full color to black and white or to a sepia effect. ' +
                   '<p></p>Try it.'},
     {title:       'Controlling Your Camera &amp; Microphone',
-     description: 'The flashing icons on the lower right corner of your preview window (and on the upper right icon bar) ' +
+     description: 'The flashing icons on the upper right of your screen (and on your preview) ' +
                   'turn your webcam and microphone on and off. If you have logged in with Facebook your profile photo will appear when ' +
                   'you turn off your webcam. <p></p>Try it.'},
     {title:       'Sharing Content On The Carousel',
-     description: 'The flashing icon on the lower right corner of your screen lets you add one or more whiteboards to the Carousel. ' +
-                  'You can remove a Carousel spot by clicking on the trashcan icon on its upper right corner. <p></p>Try it.'},
+     description: 'The flashing whiteboard icon, lower right corner, lets you add one or more whiteboards to the Carousel. ' +
+                  '<p></p>Try it.'},
     {title:       'Using the Whiteboard',
-     description: 'The flashing tool tray at the bottom of the whiteboard lets you mark and erase on it. Choose a color and a pen size. ' +
-                  'Click, hold, and drag your mouse to draw lines. Other people can draw on the whiteboard as well. <p></p>Try it. ' +
+     description: 'The flashing tool tray on the whiteboard lets you mark and erase with digital ink. Choose a color and a pen size. ' +
+                  'Click, hold, and drag your mouse to draw. Anyone in your GoCast can mark on the whiteboard as well. <p></p>Try it. ' +
                   'Then click Next to learn about zooming the whiteboard.'},
     {title:       'Zooming the Whiteboard',
-     description: 'Click on the zoom icon in the whiteboard\'s upper left hand corner to make it larger. ' +
-                  'Notice that the Carousel is now flattened above the whiteboard and can still be moved. ' +
-                  'To unzoom the whiteboard click on the shrink icon on its upper left corner.'},
+     description: 'Hover your mouse over the whiteboard and click the flashing zoom icon, upper left hand corner, to expand it. ' +
+                  'Notice that the Carousel, flattened above the whiteboard, can still be moved with your arrow keys. ' +
+                  'To shrink the whiteboard click on the flashing icon, upper left.'},
     {title:       'Posting Comments To The Room',
-     description: 'The flashing comments bar in the lower left hand corner of the screen is the place where you can type a comment to the room. ' +
-                  'Click in the text box to type a comment. Click the Post button or hit the Return key, and your comments will be displayed. ' +
+     description: 'The flashing comments bar in the lower left hand corner of the screen is the place where you can make a comment to the room. ' +
+                  'Click in the text box to type. Click the Post button - or the Return key - and your comments will be displayed. ' +
                   '<p></p>Try it.'},
     {title:       'Inviting Others To The Room',
      description: 'The flashing Facebook and email icons in the upper right hand part of the screen let you invite your Facebook friends ' +
-                  'to the room by posting on your wall, or by sending invites to your friends. You can also invite anybody via email.'},
+                  'to a GoCast by posting on your wall, or by sending alerts to your friends. You can also invite anybody via email.'},
     {title:       'Stay In Touch',
-     description: 'We\'d love to hear about your experience with the GoCast Carousel. ' +
+     description: 'We would love to hear about your experience with the GoCast Carousel. ' +
                   'Click on the flashing feedback icon on the upper left corner of your screen.'}
   ], tourIdx = 0, flashTimer = null;
 
@@ -2570,7 +2590,8 @@ function startTour(tourSelector) {
       });
       $(tourSelector + ' > button#skip').text('DONE');
       $(tourSelector + ' > h3').html('You\'re All Set!');
-      $(tourSelector + ' > p#desc').text('Thanks for taking the test drive. Enjoy!!!');
+      $(tourSelector + ' > p#desc').text('Thanks for taking a test drive. You can always take it ' +
+                                         'again by clicking the "play" icon, above. Enjoy!!!');
     } else {
       flashTimer = describeTourObject(tourSelector, tourObjects[tourIdx],
                                       tourDescriptions[tourIdx],

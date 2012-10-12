@@ -71,11 +71,17 @@
     if (!chatOut[0]) {app.log(4, "Item error can't find chatOut");}
     chatOut.data('util', new GoCastJS.ChatUtil(chatOut));
     // add handlers
-    jqObj.mouseover(function(event) {
+    jqObj.mouseover(function(event) 
+    {
+      if (event.isPropagationStopped())
+      {
+        return;
+      }
       // only show close icon on unoccupied or content spots
       if ($(this).hasClass('unoccupied') || $(this).hasClass('typeContent')) {
         $('.close', this).css('visibility', 'visible');
-        if ($(this).hasClass('typeContent')) {
+        if ($(this).hasClass('typeContent') && 
+           !$(this).hasClass("editor") ) { // disable zoom on editor until it works
           $('.zoom', this).css('visibility', 'visible');
         }
       }
@@ -89,12 +95,16 @@
   ///
   Item.prototype.scale = function(scale)
   {
-    var wbCanvas = $("#wbCanvas", this.object), // todo optimize
-        wb       = wbCanvas.data("wb");
+    var wbCanvas = $("#wbCanvas", this.object),
+        wb       = wbCanvas.data("wb"),
+        editor   = $(this.object).data("gcEdit");
     if (wb)
     {
-      //todo size to parent div, not spot
       wb.setScale(this.plgOrgWidth * scale, this.plgOrgHeight * scale);
+    }
+    if (editor)
+    {
+      editor.setScale(this.plgOrgWidth * scale, this.plgOrgHeight * scale);
     }
   };
   
