@@ -8,6 +8,14 @@
  */
 /*jslint node: true */
 /*global Buffer */
+var settings = require('./settings');   // Our GoCast settings JS
+if (!settings) {
+    settings = {};
+}
+if (!settings.logcatcher) {
+    settings.logcatcher = {};
+}
+
 var sys = require('util');
 var xmpp = require('node-xmpp');
 var fs = require('fs');
@@ -387,9 +395,9 @@ GoCastJS.IBBTransfer.prototype.internalProcessOpen = function(iq) {
 ///
 
 function LogCatcher(user, pw, notifier) {
-    this.SERVER = 'video.gocast.it';
+    this.SERVER = settings.SERVERNAME;
 
-    this.client = new xmpp.Client({ jid: user, password: pw, reconnect: true, host: this.SERVER, port: 5222 });
+    this.client = new xmpp.Client({ jid: user, password: pw, reconnect: true, host: this.SERVER, port: settings.SERVERPORT });
     this.notifier = notifier;
 
     this.iqnum = 0;
@@ -681,7 +689,10 @@ if (process.argv.length > 2)
                 console.log("* --help - this usage help.");
                 console.log("* --debugcommands - Allow direct chat to switchboard for backend commands.");
                 console.log("*");
+                console.log("* Settings received: ", settings);
+                console.log("*");
                 console.log("***********");
+                process.exit(1);
             }
             else if (arg === '--debugcommands' || arg === '-debugcommands')
             {
@@ -694,19 +705,20 @@ if (process.argv.length > 2)
 
 //var notify;
 ///*
-var notify = new Notifier({jid: 'overseer@video.gocast.it', password: 'the.overseer.rocks',
-                            server: 'video.gocast.it', port: 5222},
-            ['rwolff@video.gocast.it', 'jim@video.gocast.it']); // , "bob.wolff68@jabber.org" ]);
+var notify = new Notifier({jid: settings.notifier.username, password: settings.notifier.password,
+                            server: settings.SERVERNAME, port: settings.SERVERPORT},
+                            settings.notifier.notify_list);
 
 //
 // Login as Switchboard operator
 //
-var logcatcher = new LogCatcher("logcatcher@video.gocast.it/logcatcher", "log.catcher.gocast", notify);
+var logcatcher = new LogCatcher(settings.logcatcher.username, settings.logcatcher.password, notify);
 //*/
 
-var ibb = new GoCastJS.IBBTransfer(function (tosend_back) {
+/*var ibb = new GoCastJS.IBBTransfer(function (tosend_back) {
     console.log('Callback: Send-back: ' + tosend_back);
 });
+*/
 
 /* tests for 'open' -- pass followed by fails for 2-5
 
