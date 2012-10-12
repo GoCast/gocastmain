@@ -2165,13 +2165,16 @@ $(document).ready(function(
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
   // DNLE overrides.
-//  Callcast.InitOverride({ CALLCAST_XMPPSERVER: 'dnle.gocast.it', CALLCAST_ROOMS: 'conference.dnle.gocast.it',
-//                        AT_CALLCAST_ROOMS: '@conference.dnle.gocast.it',
-//                        STUNSERVER: 'dnle.gocast.it', STUNSERVERPORT: 19302,
-//                        FEEDBACK_BOT: 'feedback_bot_dnle@dnle.gocast.it',
-//                        ROOMMANAGER: 'roommanager@dnle.gocast.it/roommanager',
-//                        SWITCHBOARD_FB: 'switchboard_dnle@dnle.gocast.it',
-//                        LOGCATCHER: 'logcatcher@dnle.gocast.it/logcatcher'});
+  if (window.location.hostname.toLowerCase() === 'dnle.gocast.it') {
+    Callcast.InitOverride({ CALLCAST_XMPPSERVER: 'dnle.gocast.it',
+                        CALLCAST_ROOMS: 'conference.dnle.gocast.it',
+                        AT_CALLCAST_ROOMS: '@conference.dnle.gocast.it',
+                        STUNSERVER: 'dnle.gocast.it', STUNSERVERPORT: 19302,
+                        FEEDBACK_BOT: 'feedback_bot_dnle@dnle.gocast.it',
+                        ROOMMANAGER: 'roommanager@dnle.gocast.it/roommanager',
+                        SWITCHBOARD_FB: 'switchboard_dnle@dnle.gocast.it',
+                        LOGCATCHER: 'logcatcher@dnle.gocast.it/logcatcher'});
+  }
 
   openWindow('#waitingToJoin');
   var unmaskTimer = setInterval(function() {
