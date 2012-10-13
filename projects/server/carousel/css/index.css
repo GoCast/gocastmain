@@ -376,7 +376,7 @@ input#videoPreview.on:disabled {
 }
 input#video,
 input#videoPreview {
-  background-image: url("../images/videoOff.png");
+  background-image: url("../images/VideoOff.png");
   background-size: 100% 100%;
 }
 input#video.on,
