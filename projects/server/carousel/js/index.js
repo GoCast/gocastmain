@@ -806,6 +806,15 @@ function carouselItemZoom(event)
     item = $(spot).data('item');
    }
 
+  //If spot is editor, save its contents
+  var gcedit = $(spot).data('gcEdit'),
+      editorContent = '';
+
+  if (gcedit) {
+    editorContent = gcedit.editor.getCode();
+    console.log('carouselItemZoom [resize gcedit]: ' + editorContent);
+  }
+
   app.carousel.remove(item.index);
   $('#zoom > .close').css({
     'top': spot[0].style.top,
@@ -829,6 +838,12 @@ function carouselItemZoom(event)
           .css("z-index", "100");
    //$('#meeting > #zoom')[0].appendChild(spot[0]); // move div to zoom area, doesn't work with local, remote video spot
 
+  if (gcedit) {
+    $(spot).html('');
+    gcedit = new GoCastJS.gcEdit(spot, gcedit.info);
+    gcedit.editor.setCode(editorContent);
+  }
+
    app.carousel.resize(); // update carousel
    resizeZoom();
 
@@ -846,8 +861,25 @@ function carouselItemUnzoom(event)
 
    $('#meeting > #zoom').css('display', 'none'); // undisplay zoom div
    var spot = $('#meeting > #zoom > .cloudcarousel');
+
+  var gcedit = $(spot).data('gcEdit'),
+      editorContent = '';
+
+  if (gcedit) {
+    editorContent = gcedit.editor.getCode();
+    console.log('carouselItemUnzoom [resize gcedit]: ' + editorContent);
+  }
+
    app.carousel.insertSpot(spot); // put spot back in carousel
    $('#meeting > #streams').css('height', '100%'); // zoom carousel
+
+  if (gcedit) {
+    $(spot).html('<img id="upper-left" class="zoom control" src="images/fullscreen.png" alt="Zoom" title="Zoom" onclick="carouselItemZoom(event);"/>' +
+                 '<img id="upper-right" class="'+ app.spotUrDefaultClass + '" src="' + app.spotUrDefaultImage +'" alt="Close" title="Close" onclick="onSpotClose(event);"/>');
+    gcedit = new GoCastJS.gcEdit(spot, gcedit.info);
+    gcedit.editor.setCode(editorContent);
+  }
+
    //$('body > div#upper-right').css({'top': '10px'});
    $('body > div#upper-right').removeAttr('style');
    $('body > div#upper-left').removeAttr('style');
@@ -1628,7 +1660,8 @@ function resizeZoom(event)
 {
    var jqDiv = $('#meeting > #zoom > .cloudcarousel'),
        wbCanvas = $("#wbCanvas", jqDiv), // todo better wb access
-       wb       = wbCanvas.data("wb"),
+       wb       = wbCanvas.data('wb'),
+       edit     = jqDiv.data('gcEdit'),
        width, height, item, newWidth, newHeight,
        widthScale, heightScale, scale, left, top;
    if (jqDiv.length > 0)
@@ -1648,6 +1681,8 @@ function resizeZoom(event)
       if (wb) // todo better wb access
       {
         wb.setScale(item.plgOrgWidth, item.plgOrgHeight);
+      } else if (edit) {
+        edit.setScale(item.plgOrgWidth, item.plgOrgHeight);
       }
 
       // center div in zoom div
