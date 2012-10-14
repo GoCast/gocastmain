@@ -91,14 +91,14 @@ a:active
     background-color: #FFBABA;
     /*background-image: url('error.png');*/
 }
-img.close 
+/*img.close 
 {
   width: 12px;
   height: 12px;
   position: absolute;
   right: 3px;
   top: 3px;
-}
+}*/
 html
 {
   height: 100%;
@@ -415,6 +415,8 @@ div#groupChat {
   top: 0px;
   width: 100%;
   height: 100%;
+  border-radius: 6px;
+  background-color: lightgrey;
 }
 /*div#lower-left > input#showChat
 {
@@ -565,8 +567,6 @@ body > div#meeting > div#zoom > img.close
   width: 20px;
   height: 20px;
   position: absolute;
-  right: 3px;
-  top: 3px;
 }
 body > div#meeting > div#zoom > div.cloudcarousel 
 {
@@ -738,6 +738,7 @@ div.cloudcarousel > img#upper-right
   right: 3px;
   top: 3px;
   z-index: 1000;
+  background-color: rgba(0,0,0,0.4);
 }
 div.cloudcarousel.unoccupied > img#upper-right
 {
@@ -752,6 +753,7 @@ div.cloudcarousel > img#upper-left
   margin: 3px;
   position: absolute;
   z-index: 1000;
+  background-color: rgba(0,0,0,0.4);
 }
 div.cloudcarousel.unoccupied > img#upper-left
 {

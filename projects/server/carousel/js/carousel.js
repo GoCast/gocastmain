@@ -70,6 +70,7 @@
     chatOut = $("#msgBoard > #chatOut", jqObj);
     if (!chatOut[0]) {app.log(4, "Item error can't find chatOut");}
     chatOut.data('util', new GoCastJS.ChatUtil(chatOut));
+
     // add handlers
     jqObj.mouseover(function(event) 
     {
@@ -80,10 +81,16 @@
       // only show close icon on unoccupied or content spots
       if ($(this).hasClass('unoccupied') || $(this).hasClass('typeContent')) {
         $('.close', this).css('visibility', 'visible');
-        if ($(this).hasClass('typeContent') /*&& 
-           !$(this).hasClass("editor")*/) { // disable zoom on editor until it works
+        if ($(this).hasClass('typeContent')) {
           $('.zoom', this).css('visibility', 'visible');
         }
+      }
+
+      if ($(this).hasClass('editor')) {
+        $('.zoom', this).css({
+          'left': '1%',
+          'bottom': '1%',
+        });      
       }
     });
     jqObj.mouseout(function(event) {

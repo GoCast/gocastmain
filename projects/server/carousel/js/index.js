@@ -816,10 +816,10 @@ function carouselItemZoom(event)
   }
 
   app.carousel.remove(item.index);
-  $('#zoom > .close').css({
+  /*$('#zoom > .close').css({
     'top': spot[0].style.top,
     'left': parseFloat(spot[0].style.left) + parseFloat(spot[0].style.width) + 10.0 + 'px'
-  });
+  });*/
 
   $('body > div#upper-right').css({
     'top': $('#zoom').position().top + 'px',
@@ -1695,9 +1695,14 @@ function resizeZoom(event)
       $(jqDiv).css('top', top + 'px');
 
       $('#zoom > .close').css({
-        'top': (top + 10.0) + 'px',
         'left': (left + 10.0) + 'px'
       });
+
+      if ($(jqDiv).hasClass('editor')) {
+        $('#zoom > .close').css({'bottom': '10px'});
+      } else {
+        $('#zoom > .close').css({'top': (top + 10.0) + 'px'});
+      }
    }
 }
 
