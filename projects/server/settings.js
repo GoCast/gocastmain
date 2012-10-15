@@ -30,12 +30,35 @@ settings.roommanager = {
 // Allow for having separate devel settings if an environment variable is set.
 //
 if (process.env.SETTINGS_DEVEL === 1 || process.env.SETTINGS_DEVEL === '1') {
+    console.log('/////////////////////////////////');
+    console.log('// **DEV** SETTINGS ACTIVATED. //');
+    console.log('/////////////////////////////////');
+
+    settings.SERVERNAME = 'dev.gocast.it';
+    settings.SERVERPORT = 5222;
+    settings.CONF_SERVICE = '@conference.dev.gocast.it';
+
     settings.roommanager = {
-        devel: true,
         allow_overflow: true,
         allow_maxparticipants_from_client: true,
         maxparticipants_ceiling: 25,
         default_room: 'Lobby'
+    };
+
+    settings.dynamodb = {
+        endpoint: 'dynamodb.us-west-1.amazonaws.com',
+        accessKeyId: 'AKIAJWJEBZBGT6TPH32A',
+        secretAccessKey: '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',
+        tables: {
+            ACTIVEROOMS: 'dev_active_rooms',
+            ROOMCONTENTS: 'dev_room_contents'
+        }
+    };
+
+    settings.overseer = {
+        username: 'overseer@' + settings.SERVERNAME,
+        password: 'the.overseer.rocks',
+        OVERSEER_NICKNAME: 'dev_overseer'
     };
 }
 else {
