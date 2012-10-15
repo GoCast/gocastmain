@@ -147,7 +147,7 @@ if (process.env.STANFORDDNLE === 1 || process.env.STANFORDDNLE === '1') {
     settings.roommanager = {
         allow_overflow: true,
         allow_maxparticipants_from_client: true,
-        maxparticipants_ceiling: 25,
+        maxparticipants_ceiling: 10,
         default_room: 'Lobby',
 
         username: 'roommanager@' + settings.SERVERNAME + '/roommanager',
