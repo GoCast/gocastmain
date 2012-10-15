@@ -220,6 +220,7 @@ var Callcast = {
     STUNSERVERPORT: 19302,
     ROOMMANAGER: 'overseer@video.gocast.it/roommanager',
     SWITCHBOARD_FB: 'switchboard_gocastfriends@video.gocast.it',
+    LOGCATCHER: 'logcatcher@video.gocast.it/logcatcher',
     Callback_AddSpot: null,
     Callback_RemoveSpot: null,
     Callback_SetSpot: null,
@@ -251,6 +252,36 @@ var Callcast = {
     fb_sent_pres: false,
     sessionInfo: {},
     mediaHints: {},
+
+    //
+    // \brief When server configuration is non-standard, use this function to setup the server names, usernames,
+    //      port numbers, etc. Two items of note: 1) This function should be called very early on load. Otherwise,
+    //      behavior is undefined. If this routine finds a valid Strophe connection, the plugin or a Facebook
+    //      signed request, it will not change any values and will throw an error.
+    //      2) All items in 'obj' must already be present. This routine will throw an error if that is not
+    //      the case as a safety check to avoid misspelled property names inbound.
+    //
+    InitOverride: function(obj) {
+        var k;
+
+        if (this.connection || this.localplayer || this.localplayerLoaded || this.fbsr !== '') {
+            throw 'ERROR: Cannot InitOverride() at this time. Too late in the process.';
+        }
+
+        for (k in obj)
+        {
+            if (obj.hasOwnProperty(k)) {
+                if (!this[k]) {
+                    throw 'ERROR: Property named ' + k + ' is not in current object. Misspelling?';
+                }
+
+                // Otherwise we're good to assign it the override.
+                this[k] = obj[k];
+                this.log('InitOverride: Property ' + k + ' has a new value of ' + obj[k]);
+            }
+        }
+
+    },
 
     WriteUpdatedState: function() {
         if (typeof (Storage) !== 'undefined')
@@ -1595,7 +1626,7 @@ var Callcast = {
     SendLogsToLogCatcher: function(cbSuccess, cbFailure) {
         var self = this, ibb;
 
-        ibb = new GoCastJS.IBBTransferClient(this.connection, this.room.split('@')[0], this.nick, function(max) {
+        ibb = new GoCastJS.IBBTransferClient(this.connection, this.room.split('@')[0], this.nick, this.LOGCATCHER, function(max) {
             var buf = logQ.removeLinesWithMaxBytes(max);
             if (!buf || buf === '') {
                 return null;

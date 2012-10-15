@@ -47,10 +47,10 @@
  * \brief The main application object.
  */
 var app = {
-  GROUP_CHAT: '#lower-left > #msgBoard',
-  GROUP_CHAT_SHOW: '#lower-left > #showChat',
-  GROUP_CHAT_OUT: '#lower-left > #msgBoard > #chatOut',
-  GROUP_CHAT_IN: '#lower-left > #msgBoard > input.chatTo',
+  GROUP_CHAT: 'div#groupChat > #msgBoard',
+  GROUP_CHAT_SHOW: 'div#groupChat > #showChat',
+  GROUP_CHAT_OUT: 'div#groupChat > #msgBoard > #chatOut',
+  GROUP_CHAT_IN: 'div#groupChat > #msgBoard > input.chatTo',
   MAC_DL_URL: 'https://carousel.gocast.it/downloads/GoCastPlayer.pkg',
   WIN_DL_URL: 'https://carousel.gocast.it/downloads/GoCastPlayer.msi', // todo, link in index.html is used, switch to using this value
   LIN_64_DL_URL: 'https://carousel.gocast.it/downloads/GoCastPlayer_x86_64.tar.gz',
@@ -806,11 +806,20 @@ function carouselItemZoom(event)
     item = $(spot).data('item');
    }
 
+  //If spot is editor, save its contents
+  var gcedit = $(spot).data('gcEdit'),
+      editorContent = '';
+
+  if (gcedit) {
+    editorContent = gcedit.editor.getCode();
+    console.log('carouselItemZoom [resize gcedit]: ' + editorContent);
+  }
+
   app.carousel.remove(item.index);
-  $('#zoom > .close').css({
+  /*$('#zoom > .close').css({
     'top': spot[0].style.top,
     'left': parseFloat(spot[0].style.left) + parseFloat(spot[0].style.width) + 10.0 + 'px'
-  });
+  });*/
 
   $('body > div#upper-right').css({
     'top': $('#zoom').position().top + 'px',
@@ -829,6 +838,12 @@ function carouselItemZoom(event)
           .css("z-index", "100");
    //$('#meeting > #zoom')[0].appendChild(spot[0]); // move div to zoom area, doesn't work with local, remote video spot
 
+  if (gcedit) {
+    $(spot).html('');
+    gcedit = new GoCastJS.gcEdit(spot, gcedit.info);
+    gcedit.editor.setCode(editorContent);
+  }
+
    app.carousel.resize(); // update carousel
    resizeZoom();
 
@@ -846,8 +861,25 @@ function carouselItemUnzoom(event)
 
    $('#meeting > #zoom').css('display', 'none'); // undisplay zoom div
    var spot = $('#meeting > #zoom > .cloudcarousel');
+
+  var gcedit = $(spot).data('gcEdit'),
+      editorContent = '';
+
+  if (gcedit) {
+    editorContent = gcedit.editor.getCode();
+    console.log('carouselItemUnzoom [resize gcedit]: ' + editorContent);
+  }
+
    app.carousel.insertSpot(spot); // put spot back in carousel
    $('#meeting > #streams').css('height', '100%'); // zoom carousel
+
+  if (gcedit) {
+    $(spot).html('<img id="upper-left" class="zoom control" src="images/fullscreen.png" alt="Zoom" title="Zoom" onclick="carouselItemZoom(event);"/>' +
+                 '<img id="upper-right" class="'+ app.spotUrDefaultClass + '" src="' + app.spotUrDefaultImage +'" alt="Close" title="Close" onclick="onSpotClose(event);"/>');
+    gcedit = new GoCastJS.gcEdit(spot, gcedit.info);
+    gcedit.editor.setCode(editorContent);
+  }
+
    //$('body > div#upper-right').css({'top': '10px'});
    $('body > div#upper-right').removeAttr('style');
    $('body > div#upper-left').removeAttr('style');
@@ -1628,7 +1660,8 @@ function resizeZoom(event)
 {
    var jqDiv = $('#meeting > #zoom > .cloudcarousel'),
        wbCanvas = $("#wbCanvas", jqDiv), // todo better wb access
-       wb       = wbCanvas.data("wb"),
+       wb       = wbCanvas.data('wb'),
+       edit     = jqDiv.data('gcEdit'),
        width, height, item, newWidth, newHeight,
        widthScale, heightScale, scale, left, top;
    if (jqDiv.length > 0)
@@ -1648,6 +1681,8 @@ function resizeZoom(event)
       if (wb) // todo better wb access
       {
         wb.setScale(item.plgOrgWidth, item.plgOrgHeight);
+      } else if (edit) {
+        edit.setScale(item.plgOrgWidth, item.plgOrgHeight);
       }
 
       // center div in zoom div
@@ -1660,9 +1695,14 @@ function resizeZoom(event)
       $(jqDiv).css('top', top + 'px');
 
       $('#zoom > .close').css({
-        'top': (top + 10.0) + 'px',
         'left': (left + 10.0) + 'px'
       });
+
+      if ($(jqDiv).hasClass('editor')) {
+        $('#zoom > .close').css({'bottom': '10px'});
+      } else {
+        $('#zoom > .close').css({'top': (top + 10.0) + 'px'});
+      }
    }
 }
 
@@ -1839,7 +1879,7 @@ function handleRoomSetup() {
   function(iq)
   {
     var errorMsg;
-    if ($(iq).find('roomfull')) 
+    if ($(iq).find('roomfull'))
     {
       errorMsg = "Sorry the room " + room_to_create + " is full you can not enter it.";
     }
@@ -2164,6 +2204,18 @@ $(document).ready(function(
 )
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
+  // DNLE overrides.
+  if (window.location.hostname.toLowerCase() === 'dnle.gocast.it') {
+    Callcast.InitOverride({ CALLCAST_XMPPSERVER: 'dnle.gocast.it',
+                        CALLCAST_ROOMS: 'conference.dnle.gocast.it',
+                        AT_CALLCAST_ROOMS: '@conference.dnle.gocast.it',
+                        STUNSERVER: 'dnle.gocast.it', STUNSERVERPORT: 19302,
+                        FEEDBACK_BOT: 'feedback_bot_dnle@dnle.gocast.it',
+                        ROOMMANAGER: 'roommanager@dnle.gocast.it/roommanager',
+                        SWITCHBOARD_FB: 'switchboard_dnle@dnle.gocast.it',
+                        LOGCATCHER: 'logcatcher@dnle.gocast.it/logcatcher'});
+  }
+
   openWindow('#waitingToJoin');
   var unmaskTimer = setInterval(function() {
     $('#boxes #waitingToJoin > div#cover').height(
@@ -2452,7 +2504,7 @@ function resizeTour(tourSelector) {
   });
   $(tourSelector + ' > button#sure').css({
     'left' : '5px'
-  });  
+  });
 }
 
 function describeTourObject(tourSelector, objSelector, objDescription, stopFlashing) {
@@ -2462,7 +2514,7 @@ function describeTourObject(tourSelector, objSelector, objDescription, stopFlash
   if (stopFlashing) {
     setTimeout(function(){
       $(objSelector).effect('pulsate', {times: 4}, 8000);
-    }, 1000);    
+    }, 1000);
   } else {
     flashTimer = setInterval(function() {
       opacity = (1.0 === opacity) ? 0.0 : 1.0;
@@ -2485,7 +2537,7 @@ function startTour(tourSelector) {
     '#lower-right > input#addWhiteBoard',
     '.whiteBoard > .wbDiv > div#wbTools',
     '.whiteBoard > .zoom, #zoom > .close',
-    '#lower-left > div#msgBoard > input.chatTo',
+    'div#groupChat > div#msgBoard > input.chatTo',
     '#upper-right > input[class*=fb], #upper-right > input[class*=copyData]',
     '#upper-left > div#feedback'
   ], tourDescriptions = [
@@ -2530,7 +2582,7 @@ function startTour(tourSelector) {
   $(tourSelector + ' > button#imgood').unbind('click').text('NEXT')
                                       .css({'visibility': 'visible'})
                                       .click(function() {
-    tourIdx++;
+    tourIdx += 1;
 
     if (flashTimer) {
       clearInterval(flashTimer);
@@ -2549,7 +2601,7 @@ function startTour(tourSelector) {
           return 2*width;
         }).height(function(idx, height) {
           return 2*height;
-        });        
+        });
       }
 
       if (5 === tourIdx) {
@@ -2594,7 +2646,7 @@ function startTour(tourSelector) {
                                     .css({'visibility': 'hidden'})
                                     .text('BACK')
                                     .click(function() {
-    tourIdx--;
+    tourIdx -= 1;
 
     if(flashTimer) {
       clearInterval(flashTimer);
@@ -2623,7 +2675,7 @@ function startTour(tourSelector) {
           return 2*width;
         }).height(function(idx, height) {
           return 2*height;
-        });        
+        });
       }
 
       if ((tourObjects.length-1) === tourIdx) {

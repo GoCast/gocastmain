@@ -31,6 +31,14 @@ case "$1" in
       confirm=0
       sleep 1
       ;;
+  -s)
+# Override server name default
+# Adds ':' to the end of the inbound server name automatically.
+      server=$2:
+      echo ==== Server being reconfigured to: $server
+      sleep 1
+      shift
+      ;;
   -d|--debug|-dev|--devel)
       echo ==== No minimization. No obfuscation. DEV_PUBLISH
       devmode=1

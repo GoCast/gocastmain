@@ -38,7 +38,9 @@ GoCastJS.gcEdit.prototype.init = function()
                    updateFrame:function(code)
                    {
                      return self.updateFrame(code);
-                   }
+                   },
+                   controls:     // controls to add to the toolbar
+                    "| | | | | | bullets numbering | cut copy paste pastetext | link unlink print source"
                   })[0];
   this.jqSpot.data('gcEdit', this);
   setInterval(this.getTimeoutCallback(), this.timeout);
@@ -77,10 +79,10 @@ GoCastJS.gcEdit.prototype.setScale = function(width, height)
   this.scaleW = wScale;
   this.scaleH = hScale;
   */
-  //console.log("gcEdit scale width " + width + " height " + height);
+  console.log("gcEdit scale width " + width + " height " + height);
   //this.jqDiv.width(width).height(height);
-  this.div.style.width = width;
-  this.div.style.height = height;
+  this.div.style.width = width + 'px';
+  this.div.style.height = height + 'px';
 };
 ///
 /// \brief get method to send edit updates when timer goes off
@@ -113,7 +115,7 @@ GoCastJS.gcEdit.prototype.sendEdits = function()
 ///
 GoCastJS.gcEdit.prototype.doSpot = function(info)
 {
-  if (info.code)
+  if (info.code && info.from !== app.user.name)
   {
     console.log("gcEdit doSpot ", info);
     this.editor.setCode(info.code);

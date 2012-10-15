@@ -124,22 +124,20 @@
        <!--<input class="demobtn" type="button" title="Place demo content." onclick="startDemoContent();" />-->
        <input class="gc-icon" id="addItem" type="button" title="Add Spot" onclick="addItem();"/>
        <input class="gc-icon" id="addWhiteBoard" type="button" title="Add White Board" onclick="addWhiteBoard();"/>
-       <!--<input class="gc-icon" id="addEditor" type="button" title="Add Editor" onclick="addEditor();"/>-->
+       <input class="gc-icon" id="addEditor" type="button" title="Add Editor" onclick="addEditor();"/>
     </div>
-    <div id="lower-left">
-      <!--
-       <a href="http://www.gocast.it" target="_blank">
-        <img class="logo" src="images/gologo.png" />
-       </a>
-      -->
+    <!--<div id="lower-left">
         <input class"gc-icon" id="showChat" type="button" title="chat with your group" onclick="showGroupChat(event);"/>
         <div id="msgBoard">
-        <!--<div id="chatOut" class="ui-widget-content"></div>-->
         <div id="chatOut"> </div>
         <input id="groupChatInput" class="chatTo" title="enter a message" placeholder="chat with your group" type="text" onkeydown="keypressGrpChatHandler(event);"/>
         <button id="send" class="send" title="post it" onclick="sendGrpChat(event)">Post</button>
         <input class="close gc-icon" type="button" title="Close Group Chat" onclick="closeGroupChat(event);"/>
        </div>
+    </div>-->
+    <div id="lower-left">
+      <a id="rotateleft" style="left:0px; top:0px;" class="arrow left" href="javascript:void(0);" onclick="app.carousel.rotate(1);">&lt;</a>
+      <a id="rotateRight" style="left:75px; top:0px;" class="arrow right" href="javascript:void(0);" onclick="app.carousel.rotate(-1);">&gt;</a>
     </div>
     <div id="boxes">
       <div id="winEula" class="window resizable">
@@ -275,7 +273,14 @@
               <input id="videoPreview" type="button" title="Video is Disabled" disabled="disabled"/>
             </div>
           </div><!-- mystream -->
-          <div class="cloudcarousel unoccupied" onclick="carouselItemClick(event);">
+          <div class="cloudcarousel" onclick="carouselItemClick(event);">
+            <div id="groupChat">
+              <div id="msgBoard">
+                <div id="chatOut"></div>
+                <input id="groupChatInput" class="chatTo" title="note to group" placeholder="note to group" type="text" onkeydown="keypressGrpChatHandler(event);"/>
+                <button id="send" class="send" title="post it" onclick="sendGrpChat(event)">Post</button>
+               </div>
+            </div>
             <div class="name"></div>
           </div>
           <div class="cloudcarousel unoccupied" onclick="carouselItemClick(event);">

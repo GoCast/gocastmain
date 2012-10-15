@@ -12,17 +12,16 @@
  */
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
-/*@-webkit-keyframes greenPulse {
-from { background-color: #749a02; -webkit-box-shadow: 0 0 9px #333; }
-50% { background-color: #91bd09; -webkit-box-shadow: 0 0 18px #91bd09; }
-to { background-color: #749a02; -webkit-box-shadow: 0 0 9px #333; }
+@font-face {
+    font-family: 'ModernPictogramsNormal';
+    src: url('../gcpsettings/style/fonts/modernpictograms/modernpics-webfont.eot');
+    src: url('../gcpsettings/style/fonts/modernpictograms/modernpics-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../gcpsettings/style/fonts/modernpictograms/modernpics-webfont.woff') format('woff'),
+         url('../gcpsettings/style/fonts/modernpictograms/modernpics-webfont.ttf') format('truetype'),
+         url('../gcpsettings/style/fonts/modernpictograms/modernpics-webfont.svg#ModernPictogramsNormal') format('svg');
+    font-weight: normal;
+    font-style: normal;
 }
-
-@-moz-keyframes greenPulse {
-from { background-color: #749a02; -moz-box-shadow: 0 0 9px #333; }
-50% { background-color: #91bd09; -moz-box-shadow: 0 0 18px #91bd09; }
-to { background-color: #749a02; -moz-box-shadow: 0 0 9px #333; }
-}*/
 
 input {
   outline: none;
@@ -92,14 +91,14 @@ a:active
     background-color: #FFBABA;
     /*background-image: url('error.png');*/
 }
-img.close 
+/*img.close 
 {
   width: 12px;
   height: 12px;
   position: absolute;
   right: 3px;
   top: 3px;
-}
+}*/
 html
 {
   height: 100%;
@@ -352,9 +351,12 @@ input.fbShare {
   background-size: 100% 100%;
 }
 /*<MANJESH>*/
-input#addWhiteBoard,
-input#addEditor {
+input#addWhiteBoard {
   background-image: url('../images/AddWhiteboard.png');
+  background-size: 100% 100%;
+}
+input#addEditor {
+  background-image: url('../images/AddNote.png');
   background-size: 100% 100%;
 }
 input#addItem {
@@ -374,7 +376,7 @@ input#videoPreview.on:disabled {
 }
 input#video,
 input#videoPreview {
-  background-image: url("../images/videoOff.png");
+  background-image: url("../images/VideoOff.png");
   background-size: 100% 100%;
 }
 input#video.on,
@@ -406,16 +408,17 @@ input#audioPreview {
   background-image: url("../images/AudioOn.png");
   background-size: 100% 100%;
 }
-body > div#lower-left {
+div#groupChat {
+  display:inline;
   position: absolute;
-  z-index: 1000;
-  bottom: 10px;
   left: 0px;
-  margin: 0px 10px 0px;
-  line-height: 2em;
-  max-width: 50%
+  top: 0px;
+  width: 100%;
+  height: 100%;
+  border-radius: 6px;
+  background-color: lightgrey;
 }
-div#lower-left > input#showChat
+/*div#lower-left > input#showChat
 {
   display: none;
   background-image: url("../images/talk-white.png");
@@ -427,27 +430,28 @@ div#lower-left > input#showChat
   bottom:0px;
   left:0px;
   cursor: pointer;
-}
-body > div#lower-left > div#msgBoard
+}*/
+div#groupChat > div#msgBoard
 {
   display:inline;
   position: absolute;
   left: 0px;
-  bottom: 0px;
+  top: 0px;
+  width: 100%;
+  height: 80%;
 }
-body > div#lower-left > div#msgBoard > div#chatOut
+div#groupChat > div#msgBoard > div#chatOut
 {
-  /*position: absolute; */
   bottom: 2em;
-  max-height:125px;
-  min-height: 1.1em;
-  height: auto;
-  width:350px;
+  width: 98%;
+  height: 100%;
   overflow-y:auto;
   overflow-x:hidden;
-  font-size:11px;
+  font-size:13px;
   line-height: 1.2em;
   padding: 3px;
+  border-width: 2px;
+  border-color:gray;
   -moz-user-select: text;
   -khtml-user-select: text;
   -webkit-user-select: text;
@@ -455,33 +459,26 @@ body > div#lower-left > div#msgBoard > div#chatOut
   user-select: text;
   background: -webkit-gradient(linear, center bottom, center top, from(rgba(40,40,40,0.6)), to(rgba(40,40,40,0.3)));
   background: -moz-linear-gradient(bottom, rgba(40,40,40,0.6), rgba(40,40,40,0.3));
-  border-radius: 5px;
+  border-radius: 2px;
   -moz-box-shadow: 0px 0px 2px #303030;
   -webkit-box-shadow: 0px 0px 2px #303030;
   box-shadow: 0px 0px 2px #303030;
-
 }
-body > div#lower-left > div#msgBoard > div#chatOut  table
+div#groupChat > div#msgBoard > div#chatOut  table
 {
-  /*width:100%; not working */
   width:100%;
   table-layout: fixed;
-  overflow: hidden; /* for ff */
+  overflow: hidden;
   word-wrap:break-word;
-  /* for ff, doesn't work
-  overflow-x: hidden; 
-  overflow-y: visible;
-  */
 }
-body > div#lower-left > div#msgBoard > div#chatOut  td
+div#groupChat > div#msgBoard > div#chatOut  td
 {
   font-size: 12px;
   padding-top: 5px;
   padding-bottom: 5px;
   text-shadow: 0.1em 0.1em 0.2em black;
-  /*text-shadow: 0 0 10px gray, 0 0 20px gray, 0 0 30px gray, 0 0 40px #FF00DE, 0 0 70px #FF00DE, 0 0 80px #FF00DE, 0 0 100px #FF00DE, 0 0 150px #FF00DE;*/
 }
-body > div#lower-left > div#msgBoard > div#chatOut  span#text-width
+div#groupChat > div#msgBoard > div#chatOut  span#text-width
 {
   font-size: 16px;
   position:absolute;
@@ -489,32 +486,28 @@ body > div#lower-left > div#msgBoard > div#chatOut  span#text-width
   height:auto;
   width:auto;
 }
-body > div#lower-left > div#msgBoard > div#chatOut  td > span.val-span
+div#groupChat > div#msgBoard > div#chatOut  td > span.val-span
 {
   word-wrap:break-word;
 }
-body > div#lower-left > div#msgBoard > div#chatOut  td > span.val-span
+div#groupChat > div#msgBoard > div#chatOut  td > span.val-span
 {
   display:block;
 }
-body > div#lower-left > div#msgBoard > div#chatOut  td > span.val-span.flash
+div#groupChat > div#msgBoard > div#chatOut  td > span.val-span.flash
 {
   color:red;
 }
-body > div#lower-left > div#msgBoard > div#chatOut  td.name
+div#groupChat > div#msgBoard > div#chatOut  td.name
 {
   color: lightgreen;
-  overflow: hidden; /* for chrome */
-  /* for chrome doesn't work
-  overflow-x: hidden;
-  overflow-y: visible;
-  */
+  overflow: hidden;
 }
-body > div#lower-left > div#msgBoard > div#chatOut  td.val
+div#groupChat > div#msgBoard > div#chatOut  td.val
 {
   color: white;
 }
-body> div#lower-left > div#msgBoard > input.chatTo,
+div#groupChat > div#msgBoard > input.chatTo,
 div.cloudcarousel > div#msgBoard > input.chatTo
 {
   opacity: 1.0;
@@ -524,16 +517,16 @@ div.cloudcarousel > div#msgBoard > input.chatTo
   background-color: white;
   color: black;
   font-size:12px;
-  width:250px;
+  width:70%;
 }
-body > div#lower-left > div#msgBoard > button#send {
+div#groupChat > div#msgBoard > button#send {
   opacity: 1.0;
   padding: 0px 10px 1px 10px;
   background-color: black;
   color: white;
   border-radius:15px;
 }
-body > div#lower-left > div#msgBoard > input.close {
+/*body > div#lower-left > div#msgBoard > input.close {
   background-image: url("../images/backArrow.png");
   background-size:100% 100%;
   background-repeat: no-repeat;
@@ -545,17 +538,15 @@ body > div#lower-left > div#msgBoard > input.close {
 }
 body > div#lower-left > div#msgBoard > input.close:hover {
   opacity: 0.6;
-}
-/*<MANJESH>*/
-body> div#lower-left > div#msgBoard > input.chatTo:focus,
+}*/
+div#groupChat > div#msgBoard > input.chatTo:focus,
 div.cloudcarousel > div#msgBoard > input.chatTo:focus {
   opacity: 1.0;
 }
-div#lower-left > div#msgBoard > button#send:hover {
+div#groupChat > div#msgBoard > button#send:hover {
   cursor: pointer;
   opacity: 1.0;
 }
-/*</MANJESH>*/
 body > div#meeting 
 {
   display: none;
@@ -576,8 +567,6 @@ body > div#meeting > div#zoom > img.close
   width: 20px;
   height: 20px;
   position: absolute;
-  right: 3px;
-  top: 3px;
 }
 body > div#meeting > div#zoom > div.cloudcarousel 
 {
@@ -659,7 +648,6 @@ div.cloudcarousel > div#msgBoard > div#chatOut
   -moz-box-shadow: 0px 0px 2px #303030;
   -webkit-box-shadow: 0px 0px 2px #303030;
   box-shadow: 0px 0px 2px #303030;
-
 }
 div.cloudcarousel > div#msgBoard > div#chatOut  table
 {
@@ -750,6 +738,7 @@ div.cloudcarousel > img#upper-right
   right: 3px;
   top: 3px;
   z-index: 1000;
+  background-color: rgba(0,0,0,0.4);
 }
 div.cloudcarousel.unoccupied > img#upper-right
 {
@@ -764,6 +753,7 @@ div.cloudcarousel > img#upper-left
   margin: 3px;
   position: absolute;
   z-index: 1000;
+  background-color: rgba(0,0,0,0.4);
 }
 div.cloudcarousel.unoccupied > img#upper-left
 {
@@ -1320,5 +1310,41 @@ body > #tour > button#skip {
 body > #tour > button#imgood {
   position: absolute;
   bottom: 1%;
+}
+
+#lower-left {
+  position: absolute;
+  width: 150px;
+  height: 40px;
+  left: 10px;
+  bottom: 10px;
+  z-index: 8000;
+}
+
+#lower-left > .arrow {
+  position: absolute;
+  width: 75px;
+  height: 40px;
+  line-height: 40px;
+  text-align: center;
+  text-decoration: none;
+  font-family: 'ModernPictogramsNormal', Verdana;
+  font-size: 40px;
+  color: white;
+  border: 2px white solid;
+}
+
+#lower-left > .arrow:hover {
+  opacity: 0.6;
+}
+
+#lower-left >.arrow.left {
+  border-top-left-radius: 20px;
+  border-bottom-left-radius: 20px;
+}
+
+#lower-left >.arrow.right {
+  border-top-right-radius: 20px;
+  border-bottom-right-radius: 20px;
 }
 /*</MANJESH>*/
