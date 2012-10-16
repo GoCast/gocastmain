@@ -459,14 +459,21 @@ var app = {
 function onSpotClose(event)
 {
   var spot = $(event.currentTarget).parent(),
-      item = spot.data('item');
+      item = spot.data('item'),
+      reallyClose = true;
 
   console.log("onSpotClose", event);
 
-  if (item.spotnumber){
-    Callcast.RemoveSpot({spotnumber: item.spotnumber || item.index});
-  } else {
-    removeSpotCb({spotnumber: item.index});
+  if ($(spot).hasClass('typeContent')) {
+    reallyClose = confirm('All content in this spot will be lost. Are you sure ?');
+  }
+
+  if (true === reallyClose) {
+    if (item.spotnumber){
+        Callcast.RemoveSpot({spotnumber: item.spotnumber || item.index});
+      } else {
+        removeSpotCb({spotnumber: item.index});
+      }
   }
 
   event.stopPropagation();
@@ -2537,13 +2544,15 @@ function startTour(tourSelector) {
     '#lower-right > input#addWhiteBoard',
     '.whiteBoard > .wbDiv > div#wbTools',
     '.whiteBoard > .zoom, #zoom > .close',
+    '#lower-right > input#addEditor',
     'div#groupChat > div#msgBoard > input.chatTo',
     '#upper-right > input[class*=fb], #upper-right > input[class*=copyData]',
     '#upper-left > div#feedback'
   ], tourDescriptions = [
     {title:       'The GoCast Carousel',
      description: 'The "go" spots on the Carousel are placeholders for people and for shared content. ' +
-                  'You can rotate the Carousel with the left/right arrow keys on your keyboard or with your mouse wheel. <p></p>Try it. ' +
+                  'You can rotate the Carousel with the rotate buttons in the lower left hand corner of your screen. ' +
+                  'You can also use the left/right arrow keys on your keyboard or with your mouse wheel. <p></p>Try it. ' +
                   '<p></p>Your preview, below, shows how others see you.'},
     {title:       'Choosing Video Effects',
      description: 'The three flashing icons on your preview apply effects to your video feed. You can switch ' +
@@ -2564,8 +2573,13 @@ function startTour(tourSelector) {
      description: 'Hover your mouse over the whiteboard and click the flashing zoom icon, upper left hand corner, to expand it. ' +
                   'Notice that the Carousel, flattened above the whiteboard, can still be moved with your arrow keys. ' +
                   'To shrink the whiteboard click on the flashing icon, upper left.'},
+    {title:       'Collaborative Editor',
+     description: 'The flashing editor icon on the lower right hand corner of your screen lets you add a basic text editor to the carousel. ' +
+                  'Any changes to the editor\'s content is reflected to everyone in the room.' +
+                  '<p></p>Try it. <p></p>NOTE: As of now, you can edit with other people in the room as long as its done one at a time. ' +
+                  'If two or more people try to edit at the same time, one or more of the attempted changes might be lost.'},
     {title:       'Posting Comments To The Room',
-     description: 'The flashing comments bar in the lower left hand corner of the screen is the place where you can make a comment to the room. ' +
+     description: 'The flashing comments bar is the place where you can make a comment to the room. ' +
                   'Click in the text box to type. Click the Post button - or the Return key - and your comments will be displayed. ' +
                   '<p></p>Try it.'},
     {title:       'Inviting Others To The Room',
