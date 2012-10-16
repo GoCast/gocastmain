@@ -42,7 +42,11 @@ if (process.env.SETTINGS_DEVEL === 1 || process.env.SETTINGS_DEVEL === '1') {
         allow_overflow: true,
         allow_maxparticipants_from_client: true,
         maxparticipants_ceiling: 25,
-        default_room: 'Lobby'
+        default_room: 'Lobby',
+
+        username: 'roommanager@' + settings.SERVERNAME + '/roommanager',
+        usernametest: 'roommanager@' + settings.SERVERNAME + '/roommanagertest',
+        password: 'being.the.doorman.always'
     };
 
     settings.dynamodb = {
@@ -57,9 +61,33 @@ if (process.env.SETTINGS_DEVEL === 1 || process.env.SETTINGS_DEVEL === '1') {
 
     settings.overseer = {
         username: 'overseer@' + settings.SERVERNAME,
-        password: 'the.overseer.rocks',
+        password: 'dev.mode.overseer',
         OVERSEER_NICKNAME: 'dev_overseer'
     };
+
+    settings.switchboard = {
+        username: 'switchboard_dev@' + settings.SERVERNAME,
+        password: 'dev.lookup.users',
+        APP_ID: '458515917498757',
+        APP_SECRET: 'c3b7a2cc7f462b5e4cee252e93588d45'
+    };
+
+    settings.logcatcher = {
+        username: 'logcatcher@' + settings.SERVERNAME + '/logcatcher',
+        password: 'grab.those.dev.bugreports'
+    };
+
+    settings.feedbackbot = {
+        username: 'feedback_bot_dev@' + settings.SERVERNAME,
+        password: 'feedback.is.good.burp'
+    };
+
+    settings.notifier = {
+        username: 'notifier@' + settings.SERVERNAME,
+        password: 'reporting.lots.to.you',
+        notify_list: ['rwolff@dnle.gocast.it']
+    };
+
 }
 else {
     console.log('/////////////////////////////////////////////////');
@@ -170,7 +198,7 @@ if (process.env.STANFORDDNLE === 1 || process.env.STANFORDDNLE === '1') {
     settings.roommanager = {
         allow_overflow: true,
         allow_maxparticipants_from_client: true,
-        maxparticipants_ceiling: 10,
+        maxparticipants_ceiling: 7,
         default_room: 'Lobby',
 
         username: 'roommanager@' + settings.SERVERNAME + '/roommanager',
