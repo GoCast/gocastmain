@@ -778,7 +778,7 @@ function doSpot(spotDiv, info)
       if (whiteBoard) // play any commands in info
       {
         whiteBoard.doCommands(info);
-      } 
+      }
       else // error, couldn't find wb
       {
         console.log("whiteBoardCommand error, can't find wb", info);
@@ -1147,7 +1147,7 @@ function pluginLoaded(
   {
      app.log(2, 'pluginLoaded plugin up to date ');
      GoCastJS.PluginLog(Callcast.localplayer, Callcast.PluginLogCallback);
- 
+
      // set callback for oneffectapplied
      Callcast.setCallbackForCallback_OnEffectApplied(function(effect) {
       onEffectApplied(effect);
@@ -1178,7 +1178,7 @@ function pluginLoaded(
         checkForPluginOptionalUpgrades(); // display upgrade button if there are optional upgrades
 
         // set the speaker volume status callback
-        GoCastJS.SetSpkVolListener(1000, Callcast.localplayer, setLocalSpeakerStatus);
+        GoCastJS.SetSpkVolListener(4000, Callcast.localplayer, setLocalSpeakerStatus);
 
         // <MANJESH>
         // set plugin crash monitor
@@ -1191,7 +1191,7 @@ function pluginLoaded(
         );
 
         // set devices changed listener
-        var firstCall = true;
+/*        var firstCall = true;
         GoCastJS.SetDevicesChangedListener(
           1000, $('#mystream > object.localplayer').get(0),
           function(va, vr, aia, air, aoa, aor) {
@@ -1201,6 +1201,7 @@ function pluginLoaded(
             }
           }
         );
+*/
 
         //Before we handle room setup, prompt first time users
         //to set up their camera and microphone if they not on MacOS.

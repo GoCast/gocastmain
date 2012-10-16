@@ -498,7 +498,7 @@ function MucRoom(client, notifier, bSelfDestruct, success, failure) {
         settings.roommanager.maxparticipants_ceiling = 12;
     }
 
-    this.SetMaxRoomParticipants(12);
+    this.SetMaxRoomParticipants(settings.roommanager.maxparticipants_ceiling);
 
     // Hidden room.
     this.options['muc#roomconfig_publicroom'] = '0';    // Non-listed room.

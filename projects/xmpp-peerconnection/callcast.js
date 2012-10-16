@@ -1114,13 +1114,13 @@ var Callcast = {
                         // NOTE: If re-processing seems to cause a problem, it
                         // can be defeated by simply deleting or commenting out
                         // the for() loop below or setting 'len = 0;'
-                        len = this.candidates.length;
+/*                        len = this.candidates.length;
                         for (i = 0 ; i < len ; i += 1)
                         {
                             Callcast.log('  Re-processing prior candadate # ' + i);
                             this.peer_connection.ProcessIceMessage(this.candidates[i]);
                         }
-
+*/
                         // Now add the current one to the array.
                         this.candidates.push(candidate);
                     }
