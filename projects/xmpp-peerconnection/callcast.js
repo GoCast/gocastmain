@@ -277,7 +277,7 @@ var Callcast = {
 
                 // Otherwise we're good to assign it the override.
                 this[k] = obj[k];
-                this.log('InitOverride: Property ' + k + ' has a new value of ' + obj[k]);
+//                this.log('InitOverride: Property ' + k + ' has a new value of ' + obj[k]);
             }
         }
 
