@@ -89,7 +89,7 @@
       if ($(this).hasClass('editor')) {
         $('.zoom', this).css({
           'left': '1%',
-          'bottom': '1%',
+          'bottom': '1%'
         });      
       }
     });
