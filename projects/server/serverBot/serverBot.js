@@ -36,6 +36,8 @@ var evt = require('events');
 var ddb = require('dynamodb').ddb({ endpoint: settings.dynamodb.endpoint,
                                     accessKeyId: settings.dynamodb.accessKeyId,
                                     secretAccessKey: settings.dynamodb.secretAccessKey});
+var Canvas = require('canvas');
+var nodewb = require('nodeWB');
 
 var eventManager = new evt.EventEmitter();
 var argv = process.argv;
@@ -489,6 +491,7 @@ function MucRoom(client, notifier, bSelfDestruct, success, failure) {
     this.spotList = {};
     this.spotStorage = {};
     this.wbStrokeList = {};
+    this.canvas = {};
     this.maxParticipants = -1;
 
     var self = this;
@@ -618,6 +621,7 @@ MucRoom.prototype.reset = function() {
     this.spotList = {};
     this.spotStorage = {};
     this.wbStrokeList = {};
+    this.canvas = {};
 
     this.client.removeListener('stanza', this.onstanza);
 };
@@ -748,6 +752,12 @@ MucRoom.prototype.handlePresence = function(pres) {
         }
         else {
             this.log('Updated Presence: ' + fromjid + ' as Nickname: ' + fromnick);
+            this.log('DEBUG: Going to save all whiteboards...');
+            this.SaveAllWhiteboards(function() {
+                console.log('WHITEBOARDS SAVED.');
+            }, function() {
+                console.log('WHITEBOARD SAVE FAILED.');
+            });
         }
 
         this.participants[fromnick] = { name: fromjid || fromnick };
@@ -973,16 +983,16 @@ MucRoom.prototype.printParticipants = function() {
 
             parts += k.replace(/\\20/g, ' ');
             if (this.participants[k].video === 'on') {
-                parts += '(Video)';
+                parts += '(V)';
             }
             else if (this.participants[k].video === 'off') {
-                parts += '(No-Video)';
+                parts += '(No-V)';
             }
         }
     }
 
     this.log('Participants list: ' + parts);
-    this.notifylog('Participants: ' + parts);
+    this.notifylog(parts);
 };
 
 //
@@ -1101,6 +1111,76 @@ MucRoom.prototype.SendSpotListTo = function(to) {
 
 };
 
+MucRoom.prototype.SaveAllWhiteboards = function(cbSuccess, cbFailure) {
+    var k, bNumFailed = 0;
+
+    for (k in this.spotList) {
+        if (this.spotList.hasOwnProperty(k)) {
+            if (this.spotList[k].spottype === 'whiteBoard') {
+                // Now -- save this one.
+                this.CreateImageFromFullWhiteboardStrokeList(k, function() {}, function() { bNumFailed += 1; });
+            }
+        }
+    }
+
+    if (bNumFailed && cbFailure) {
+        cbFailure('Whiteboard saving failed in room: ' + this.roomname + ' ' + bNumFailed + ' times.');
+    }
+    else if (cbSuccess) {
+        cbSuccess('All whiteboards saved in room: ' + this.roomname);
+    }
+};
+
+MucRoom.prototype.CreateImageFromFullWhiteboardStrokeList = function(spotnumber, cbSuccess, cbFailure) {
+    var k, fname,
+        attribs_out = {};
+
+    if (!this.spotList[spotnumber]) {
+        this.log('CreateImageFromFullWhiteboardStrokeList: ERROR - unknown spotnumber: ' + spotnumber);
+        if (cbFailure) {
+            cbFailure('CreateImageFromFullWhiteboardStrokeList: ERROR - unknown spotnumber: ' + spotnumber);
+        }
+        return;
+    }
+
+    if (this.spotList[spotnumber].spottype !== 'whiteBoard' || !this.wbStrokeList[spotnumber]) {
+        this.log('CreateImageFromFullWhiteboardStrokeList: ERROR - Not a whiteboard spot: ' + spotnumber);
+        if (cbFailure) {
+            cbFailure('CreateImageFromFullWhiteboardStrokeList: ERROR - Not a whiteboard spot: ' + spotnumber);
+        }
+        return;
+    }
+
+    if (!this.canvas[spotnumber]) {
+        this.log('CreateImageFromFullWhiteboardStrokeList: ERROR - Canvas missing from spot: ' + spotnumber);
+        if (cbFailure) {
+            cbFailure('CreateImageFromFullWhiteboardStrokeList: ERROR - Canvas missing from spot: ' + spotnumber);
+        }
+        return;
+    }
+
+    fname = 'whiteboard_' + this.roomname.split('@')[0] + '_' + spotnumber + '.png';
+    this.log('CreateImageFromFullWhiteboardStrokeList: Creating image for ' + spotnumber + ' calling it file: ' + fname);
+
+    attribs_out.strokes = JSON.stringify(this.wbStrokeList[spotnumber]);
+//    this.log('DEBUG: Full stroke list: ' + attribs_out.strokes);
+
+    // Now process this as a canvas and then save the canvas.
+    this.canvas[spotnumber].doCommands(attribs_out);
+
+    this.canvas[spotnumber].Save(fname, function() {
+            console.log('DEBUG: SUCCESS SAVING ' + fname);
+            if (cbSuccess) {
+                cbSuccess('Success Saving: ' + spotnumber);
+            }
+        }, function(err) {
+            console.log('SAVE FAILED. ERROR: ' + err);
+            if (cbFailure) {
+                cbFailure('SAVE FAILED. ERROR: ' + err);
+            }
+    });
+};
+
 MucRoom.prototype.SendFullWhiteboardStrokeListTo = function(spotnumber, to) {
     var k, msgToSend,
         attribs_out;
@@ -1154,7 +1234,7 @@ MucRoom.prototype.SendGroupCmd = function(cmd, attribs_in) {
         msgToSend = new xmpp.Element('message', {to: this.roomname, type: 'groupchat', xmlns: 'urn:xmpp:callcast'})
                 .c('cmd', attribs_out);
 
-        this.log('Outbound Group Command: ' + msgToSend.root().toString());
+//        this.log('Outbound Group Command: ' + msgToSend.root().toString());
 
         this.client.send(msgToSend);
 };
@@ -1169,7 +1249,7 @@ MucRoom.prototype.SendPrivateCmd = function(to, cmd, attribs_in) {
         msgToSend = new xmpp.Element('message', {'to': to, type: 'chat', xmlns: 'urn:xmpp:callcast'})
                 .c('cmd', attribs_out);
 
-        this.log('Outbound Private Command: ' + msgToSend.root().toString());
+//        this.log('Outbound Private Command: ' + msgToSend.root().toString());
 
         this.client.send(msgToSend);
 };
@@ -1180,7 +1260,7 @@ MucRoom.prototype.SendGroupChat = function(msg) {
         msgToSend = new xmpp.Element('message', {to: this.roomname, type: 'groupchat'})
                 .c('body').t(msg);
 
-        this.log('Outbound Group Chat: ' + msgToSend.root().toString());
+//        this.log('Outbound Group Chat: ' + msgToSend.root().toString());
 
         this.client.send(msgToSend);
 };
@@ -1191,16 +1271,21 @@ MucRoom.prototype.SendPrivateChat = function(to, msg) {
         msgToSend = new xmpp.Element('message', {'to': to, type: 'chat'})
                 .c('body').t(msg);
 
-        this.log('Outbound Private Chat to ' + to + ': ' + msgToSend.root().toString());
+//        this.log('Outbound Private Chat to ' + to + ': ' + msgToSend.root().toString());
 
         this.client.send(msgToSend);
 };
 
 MucRoom.prototype.AddSpotReflection = function(iq) {
     // Need to pull out the 'info' object - which is the attributes to the 'addspot'
-    var info = {}, self = this;
+    var info = {}, self = this,
+        wbWidth = 500, wbHeight = 500;
     if (iq.getChild('addspot')) {
         info = iq.getChild('addspot').attrs;
+    }
+
+    if (iq.getChild('wbWidth')) {
+        wbWidth = iq.getChild('wbWidth');
     }
 
     // Be sure to give a spot number to everyone that's consistent.
@@ -1215,6 +1300,10 @@ MucRoom.prototype.AddSpotReflection = function(iq) {
         // Initialize the stroke list to nothing.
         this.wbStrokeList[info.spotnumber] = {};
         this.wbStrokeList[info.spotnumber].strokes = [];
+
+        this.canvas[info.spotnumber] = new nodewb.NodeWhiteBoard(wbWidth, wbHeight, info);
+//        this.canvas[info.spotnumber] = new nodewb.NodeWhiteBoard(wbWidth, wbHeight, info);
+//        console.log('DEBUG: Whiteboard: ' , this.wbStrokeList[info.spotnumber].wbObject);
     }
 
     this.SendGroupCmd('addspot', info);
@@ -3342,7 +3431,7 @@ Notifier.prototype.sendMessage = function(msg) {
         {
             if (this.informlist.hasOwnProperty(k)) {
                 msg_stanza = new xmpp.Element('message', {to: this.informlist[k], type: 'chat'})
-                    .c('body').t(msg);
+                    .c('body').t(decodeURI(msg));
                 this.client.send(msg_stanza);
             }
         }

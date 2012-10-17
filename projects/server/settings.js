@@ -41,7 +41,7 @@ if (process.env.SETTINGS_DEVEL === 1 || process.env.SETTINGS_DEVEL === '1') {
     settings.roommanager = {
         allow_overflow: true,
         allow_maxparticipants_from_client: true,
-        maxparticipants_ceiling: 25,
+        maxparticipants_ceiling: 50,
         default_room: 'Lobby',
 
         username: 'roommanager@' + settings.SERVERNAME + '/roommanager',
@@ -205,9 +205,6 @@ if (process.env.STANFORDDNLE === 1 || process.env.STANFORDDNLE === '1') {
         usernametest: 'roommanager@' + settings.SERVERNAME + '/roommanagertest',
         password: 'the.gatekeeper.rules'
     };
-}
-else {
-    console.log('ERROR in settings. Not picked up.');
 }
 
 
