@@ -1127,7 +1127,7 @@ MucRoom.prototype.SendFullWhiteboardStrokeListTo = function(spotnumber, to) {
     attribs_out.xmlns = 'urn:xmpp:callcast';
 
     attribs_out.strokes = JSON.stringify(this.wbStrokeList[spotnumber]);
-    this.log('DEBUG: Full stroke list: ' + attribs_out.strokes);
+//    this.log('DEBUG: Full stroke list: ' + attribs_out.strokes);
 
     if (msgToSend) {
         msgToSend.up().c('cmd', attribs_out);
@@ -3256,11 +3256,14 @@ function FeedbackBot(feedback_jid, feedback_pw, notifier) {
                     nick = stanza.attrs.nick || 'no-nick';
                     room = stanza.attrs.room || 'no-room';
 
+                    nick = decodeURI(nick);
+                    room = decodeURI(room);
+
                     ts = logDate() + ' - ';
                     line = ts + 'From: ' + stanza.attrs.from +
                         ', aka: ' + nick +
                         ', Room: ' + room +
-                        ', Body: ' + stanza.getChild('body').getText();
+                        ', Body: ' + decodeURI(stanza.getChild('body').getText());
 
                     sys.puts(line);
                     self.logfile.write(line + '\n');
@@ -3342,7 +3345,7 @@ Notifier.prototype.sendMessage = function(msg) {
         {
             if (this.informlist.hasOwnProperty(k)) {
                 msg_stanza = new xmpp.Element('message', {to: this.informlist[k], type: 'chat'})
-                    .c('body').t(msg);
+                    .c('body').t(decodeURI(msg));
                 this.client.send(msg_stanza);
             }
         }

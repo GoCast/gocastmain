@@ -873,6 +873,9 @@ var Callcast = {
         this.CallState = Callcast.CallStates.NONE;
         this.bAmCaller = null;
 
+        this.callRetries = 0;       // Counter for # times we've tried making a p2p connection.
+        this.callRetryMax = 6;     // Maximum # times a caller will give it a shot.
+
         // Store a list of ICE candidates for batch-processing.
         this.candidates = null;
 
@@ -924,6 +927,11 @@ var Callcast = {
 
                     Callcast.log('Callee: ReadyState===BLOCKED - RESET PEER CONNECTION.');
                     self.ResetPeerConnection();
+
+                    // If we've just given up on the connection, don't go further.
+                    if (!this.peer_connection) {
+                        return;
+                    }
                 }
 
                 if (Callcast.Callback_ReadyState) {
@@ -974,8 +982,20 @@ var Callcast = {
         };
 
         this.ResetPeerConnection = function() {
+            var msg;
+
             try {
                 if (this.peer_connection) {
+                    // Every time we do a reset, we up the counter. This allows us to 'quit trying' at some point.
+                    this.callRetries += 1;
+                    if (this.callRetries > this.callRetryMax) {
+                        msg = 'ResetPeerConnection: P2P-DEFUNCT - Tried connecting to peer too many times.';
+                        Callcast.log(msg);
+                        Callcast.SendLiveLog('@' + Callcast.room.split('@')[0] + ': ' + msg);
+                        this.peer_connection.SetDefunct();
+                        return;
+                    }
+
                     Callcast.log('ResetPeerConnection: Resetting peer connection with: ' + this.jid);
 
                     this.InitPeerConnection();
@@ -1060,6 +1080,11 @@ var Callcast = {
                     {
                         Callcast.log('CompleteCall: Offer received while active. RESET PEER CONNECTION.');
                         this.ResetPeerConnection();
+
+                        // If we've just given up on the connection, don't go further.
+                        if (!this.peer_connection) {
+                            return;
+                        }
                     }
 
                     Callcast.log('Completing call...');
@@ -2556,6 +2581,11 @@ var Callcast = {
 
         if (err === 'item-not-found') {
             Callcast.log('Post-Reconnect conn_callback: BOSH responded with item-not-found. Connection is invalid now.');
+            Callcast.ForgetReconnectInfo();
+            if (Callcast.connection) {
+                Callcast.connection.pause();
+                Callcast.connection = null;
+            }
             Callcast.connect(Callcast.CALLCAST_XMPPSERVER, '');
             return;
         }
@@ -2573,6 +2603,11 @@ var Callcast = {
     conn_callback: function(status, err) {
         if (err === 'item-not-found') {
             Callcast.log('Orig conn_callback: BOSH responded with item-not-found. Connection is invalid now.');
+            Callcast.ForgetReconnectInfo();
+            if (Callcast.connection) {
+                Callcast.connection.pause();
+                Callcast.connection = null;
+            }
             Callcast.connect(Callcast.CALLCAST_XMPPSERVER, '');
             return;
         }
@@ -2718,8 +2753,8 @@ var Callcast = {
 
         if (this.connection)
         {
-            this.disconnect();
-            this.reset();
+            this.connection.pause();
+            this.connection.reset();
             this.connection = null;
         }
 
@@ -2743,7 +2778,7 @@ var Callcast = {
         if (this.connection)
         {
             this.connection.pause();
-            delete this.connection;
+            this.connection = null;
         }
 
         this.connection = new Strophe.Connection(boshconn);
@@ -2815,6 +2850,144 @@ Callcast.connection.rawOutput = function(data) {
 
     }
  };
+
+GoCastJS.SendLogsXMPP = function(room, nick, logcatcher, id, pw, cbSuccess, cbFailure, url) {
+    // Make an XMPP login completely from scratch and then send the logs.
+    this.jid = id;
+    this.pw = pw;
+    this.connection = null;
+    this.boshconn = url || '/xmpp-httpbind';
+
+    this.room = room;
+    this.nick = nick;
+    this.LOGCATCHER = logcatcher;
+
+    this.cbSuccess = cbSuccess;
+    this.cbFailure = cbFailure;
+
+    this.connection = new Strophe.Connection(this.boshconn);
+
+    if (!this.connection) {
+        throw 'ERROR: Strophe connection could not be instantiated.';
+    }
+
+    this.connection.reset();
+
+/*
+    this.connection.rawInput = function(data) {
+                if ($(data).children()[0]) {
+                    console.log("RAW-IN:", $(data).children()[0]);
+                }
+                else {
+                    console.log("RAW-IN:", $(data));
+                }
+        };
+
+    this.connection.rawOutput = function(data) {
+                if ($(data).children()[0]) {
+                    console.log("RAW-OUT:", $(data).children()[0]);
+                }
+                else {
+                    console.log("RAW-OUT:", $(data));
+                }
+        };
+*/
+
+    this.connection.connect(this.jid, this.pw, this.genConnHandler());
+};
+
+GoCastJS.SendLogsXMPP.prototype.genConnHandler = function() {
+    var self = this;
+    return function(status, err) { self.connHandler(status, err); };
+};
+
+GoCastJS.SendLogsXMPP.prototype.connHandler = function(status, err) {
+    var self = this;
+    if (err) {
+        Callcast.log('SendLogsXMPP: Error connecting - status: ' + status + ', Error given was: ' + err);
+    }
+    else {
+//        console.log('SendLogsXMPP: STATUS=' + status);
+
+        switch(status) {
+            case Strophe.Status.CONNECTED:
+                Callcast.log('SendLogsXMPP: Connected. Setting up connection particulars.');
+
+                this.connection.addHandler(this.handle_ping, 'urn:xmpp:ping', 'iq', 'get');
+                this.connection.addHandler(this.onErrorStanza, null, null, 'error');
+
+                this.connection.send($pres());
+                this.connection.flush();
+
+                console.log('Now making call to send logs...');
+
+                this.SendLogsToLogCatcher(function(msg) {
+                    self.connection.disconnect();
+                    Callcast.log('SendLogsXMPP: Successfully sent logs.');
+                    if (self.cbSuccess) {
+                        self.cbSuccess();
+                    }
+                }, function(errmsg) {
+                    self.connection.disconnect();
+                    Callcast.log('SendLogsXMPP: CONNECTED BUT FAILED TO SEND LOGS. Err: ' + errmsg);
+                    if (self.cbFailure) {
+                        self.cbFailure(errmsg);
+                    }
+                });
+                break;
+            case Strophe.Status.DISCONNECTED:
+                this.connection = null;
+                break;
+            case Strophe.Status.AUTHENTICATING:
+            case Strophe.Status.CONNECTING:
+            case Strophe.Status.ATTACHED:
+            case Strophe.Status.DISCONNECTING:
+            case Strophe.Status.CONNFAIL:
+            case Strophe.Status.AUTHFAIL:
+                break;
+            default:
+                Callcast.log('SendLogsXMPP: WARNING: Unknown status: ' + status);
+                break;
+        }
+    }
+};
+
+GoCastJS.SendLogsXMPP.prototype.handle_ping = function(iq) {
+    var pong = $iq({to: $(iq).attr('from'), id: $(iq).attr('id'), type: 'result'});
+    console.log('SendLogsXMPP - ping/pong');
+    this.connection.send(pong);
+    return true;
+};
+
+GoCastJS.SendLogsXMPP.prototype.onErrorStanza = function(err) {
+//    alert('Unknown Error Stanza: ' + $(err).getChild('error').text());
+    console.log($(err));
+    return true;
+};
+
+GoCastJS.SendLogsXMPP.prototype.SendLogsToLogCatcher = function(cbSuccess, cbFailure) {
+    var self = this, ibb;
+
+    ibb = new GoCastJS.IBBTransferClient(this.connection, this.room.split('@')[0], this.nick, this.LOGCATCHER, function(max) {
+        var buf = logQ.removeLinesWithMaxBytes(max);
+        if (!buf || buf === '') {
+            return null;
+        }
+        else {
+            return buf;
+        }
+    }, Callcast.log, function(msg) {
+        Callcast.log('SUCCESSFUL LogCatcher send. msg: ' + msg);
+        if (cbSuccess) {
+            cbSuccess(msg);
+        }
+    }, function(errmsg) {
+        Callcast.log('ERROR: Failed LogCatcher send. msg: ' + msg);
+        if (cbFailure) {
+            cbFailure(msg);
+        }
+    });
+};
 
 //
 //Grab the url arguments and process/parse them into an array.

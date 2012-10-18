@@ -2222,6 +2222,16 @@ $(document).ready(function(
                         SWITCHBOARD_FB: 'switchboard_dnle@dnle.gocast.it',
                         LOGCATCHER: 'logcatcher@dnle.gocast.it/logcatcher'});
   }
+  else if (window.location.hostname.toLowerCase() === 'dev.gocast.it') {
+    Callcast.InitOverride({ CALLCAST_XMPPSERVER: 'dev.gocast.it',
+                        CALLCAST_ROOMS: 'conference.dev.gocast.it',
+                        AT_CALLCAST_ROOMS: '@conference.dev.gocast.it',
+                        STUNSERVER: 'dev.gocast.it', STUNSERVERPORT: 19302,
+                        FEEDBACK_BOT: 'feedback_bot_dev@dev.gocast.it',
+                        ROOMMANAGER: 'roommanager@dev.gocast.it/roommanager',
+                        SWITCHBOARD_FB: 'switchboard_dev@dev.gocast.it',
+                        LOGCATCHER: 'logcatcher@dev.gocast.it/logcatcher'});
+  }
 
   openWindow('#waitingToJoin');
   var unmaskTimer = setInterval(function() {
