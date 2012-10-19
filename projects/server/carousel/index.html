@@ -77,12 +77,14 @@
       <div class="gc-icon"          id="log"      title="Send log file to GoCast." onClick="sendLogPrompt();"></div>
       <div class="gc-icon"          id="taketour" title="Take a tour of GoCast"    onclick="startTour('body > #tour')"></div>
       <div id="send-log-prompt" class="warning">
-        <button id="send" class="send button" onclick="sendLog()">Send</button>
+        <p id="message">Describe the nature of the problem:</p>
+        <textarea id="logdesc"></textarea>
+        <p></p>
+        <button id="send" class="send button" onclick="sendLog()">Send Log To GoCast</button>
         <button id="stop" class="close button" onclick="closeSendLog()">Cancel</button>
-        <p id="message">Send debug info to GoCast?</p><br>
-        <input id="stop-showing" type="checkbox" value="Stop"/>
-        <p id="stop-showing-text">Stop showing this message.</p>
-        <img class="close" src="images/button-close.png" alt="Close" title="Close" onClick="closeSendLog();"/>
+        <!--<input id="stop-showing" type="checkbox" value="Stop"/>
+        <p id="stop-showing-text">Stop showing this message.</p>-->
+        <!--<img class="close" src="images/button-close.png" alt="Close" title="Close" onClick="closeSendLog();"/>-->
       </div>
       <div id="status-prompt" class="warning">
         <p id="message">The speaker volume is too low for you to hear!</p>
@@ -136,8 +138,12 @@
        </div>
     </div>-->
     <div id="lower-left">
-      <a id="rotateleft" style="left:0px; top:0px;" class="arrow left" href="javascript:void(0);" onclick="app.carousel.rotate(1);">&lt;</a>
-      <a id="rotateRight" style="left:75px; top:0px;" class="arrow right" href="javascript:void(0);" onclick="app.carousel.rotate(-1);">&gt;</a>
+      <a id="rotateleft" style="left:0px; top:0px;" class="arrow left"
+         href="javascript:void(0);" onclick="app.carousel.rotate(1);"
+         title="Rotate the carousel clockwise">&nbsp;</a>
+      <a id="rotateRight" style="left:75px; top:0px;" class="arrow right"
+         href="javascript:void(0);" onclick="app.carousel.rotate(-1);"
+         title="Rotate the carousel counterclockwise">&nbsp;</a>
     </div>
     <div id="boxes">
       <div id="winEula" class="window resizable">
@@ -186,6 +192,13 @@
       <div id="errorMsgPlugin" class="window resizable">
         <h1>Error msg title here</h1>
         <p id ="prompt">Error msg here</p>
+        <input id="roomname" type="text" placeholder="Room name (max length: 32)" maxlength="32" style="display: none;"/>
+        <p id="roomnamehint" style="font-size: 10px; visibility: hidden;">
+          Alphanumerics, spaces,
+          <strong>( )</strong> <strong>[ ]</strong>
+          <strong>{ }</strong> <strong>_</strong>
+          <strong>-</strong> <strong>.</strong> are valid
+        </p>
         <button id="sendLog" type="button">Send Log to GoCast</button>
         <button id="reload" type="button" onclick="location.reload()">Reload</button>
       </div>
@@ -230,9 +243,15 @@
       <div id="credentials2" class="window resizable">
         <p class="title welcome">GoCast Login</p>
         <p class="login-error"></p>
-        <input id="name"  type="text" name="name" placeholder="Choose your nickname for the room" />
-        <p></p>
-        <input id="email" type="text" placeholder="Enter your email (optional)" />
+        <input id="name"  type="text" name="name" placeholder="Room nickname (max length: 32)" maxlength="32"/>
+        <p id="nickhint" style="font-size: 10px; visibility: hidden;">
+          Alphanumerics, spaces,
+          <strong>( )</strong> <strong>[ ]</strong>
+          <strong>{ }</strong> <strong>_</strong>
+          <strong>-</strong> <strong>.</strong>
+          <strong>@</strong> are valid
+        </p>
+        <input id="email" type="text" placeholder="Email (optional)" />
         <p></p>
         <a id="btn" type="button" href="javascript:void(0);">GET STARTED</a>
         <!--<div class="divider">-- OR --</div>

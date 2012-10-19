@@ -40,9 +40,15 @@ GoCastJS.gcEdit.prototype.init = function()
                      return self.updateFrame(code);
                    },
                    controls:     // controls to add to the toolbar
-                    "| | | | | | bullets numbering | cut copy paste pastetext | link unlink print source"
+                    "| | | | | | bullets numbering | pastetext | link unlink print source"
                   })[0];
   this.jqSpot.data('gcEdit', this);
+
+  //if there's any initial editor content in info, use it
+  if (this.info.code) {
+    this.editor.setCode(this.info.code);
+  }
+
   setInterval(this.getTimeoutCallback(), this.timeout);
   /*
   // override mouseover event, prevent showing zoom, trash icons

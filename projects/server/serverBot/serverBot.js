@@ -1207,7 +1207,7 @@ MucRoom.prototype.SendFullWhiteboardStrokeListTo = function(spotnumber, to) {
     attribs_out.xmlns = 'urn:xmpp:callcast';
 
     attribs_out.strokes = JSON.stringify(this.wbStrokeList[spotnumber]);
-    this.log('DEBUG: Full stroke list: ' + attribs_out.strokes);
+//    this.log('DEBUG: Full stroke list: ' + attribs_out.strokes);
 
     if (msgToSend) {
         msgToSend.up().c('cmd', attribs_out);
@@ -2515,18 +2515,7 @@ function Overseer(user, pw, notifier) {
 
     this.client.on('error', function(e) {
         sys.puts(e);
-        if (e.getChild('conflict'))
-        {
-            self.log('Username Conflict. Likely two roommanager logins simultaneously.');
-            self.log("Use 'ps ax | grep node' to determine if this is the case.");
-            self.log('Exiting node now. Return code = 1.');
-            process.exit(1);
-        }
-        else
-        {
-            sys.puts(e);
-            self.notifylog('OVERSEER: ERROR-EMIT-RECEIVED: ' + e);
-        }
+        self.notifylog('OVERSEER: ERROR-EMIT-RECEIVED: ' + e);
     });
 
     // Overseer events
@@ -3345,11 +3334,14 @@ function FeedbackBot(feedback_jid, feedback_pw, notifier) {
                     nick = stanza.attrs.nick || 'no-nick';
                     room = stanza.attrs.room || 'no-room';
 
+                    nick = decodeURI(nick);
+                    room = decodeURI(room);
+
                     ts = logDate() + ' - ';
                     line = ts + 'From: ' + stanza.attrs.from +
                         ', aka: ' + nick +
                         ', Room: ' + room +
-                        ', Body: ' + stanza.getChild('body').getText();
+                        ', Body: ' + decodeURI(stanza.getChild('body').getText());
 
                     sys.puts(line);
                     self.logfile.write(line + '\n');

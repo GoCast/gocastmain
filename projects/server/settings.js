@@ -134,12 +134,12 @@ else {
     settings.notifier = {
         username: 'overseer@' + settings.SERVERNAME,
         password: 'the.overseer.rocks',
-        notify_list: ['rwolff@video.gocast.it', 'jim@video.gocast.it']
+        notify_list: ['rwolff@video.gocast.it']
     };
 
     settings.roommanager = {
-        username: 'roommanager@' + settings.SERVERNAME + '/roommanager',
-        usernametest: 'roommanager@' + settings.SERVERNAME + '/roommanagertest',
+        username: 'overseer@' + settings.SERVERNAME + '/roommanager',
+        usernametest: 'overseer@' + settings.SERVERNAME + '/roommanagertest',
         password: 'the.overseer.rocks'
     };
 }

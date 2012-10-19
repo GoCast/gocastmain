@@ -9,6 +9,7 @@
 ~/.bashrc
 ~/bin
 ~/certinfo
+/root/.forward
 #
 # Another gathering/scattering system needed for:
 # /var/www/scripts
