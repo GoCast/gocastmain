@@ -651,10 +651,17 @@ GoCastJS.PeerConnection.prototype.Deinit = function() {
 //!           'CLOSING' | 'CLOSED'];
 //!
 GoCastJS.PeerConnection.prototype.ReadyState = function() {
-    if ('ACTIVE' === this.player.readyState) {
+    var state = this.player.readyState;
+    if ('ACTIVE' === state) {
         return this.connState;
+    } else if ('BLOCKED' === state) {
+        if ('DEFUNCT' === this.connState) {
+            return this.connState;
+        } else {
+            return state;
+        }
     } else {
-        return this.player.readyState;
+        return state;
     }
 };
 
