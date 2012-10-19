@@ -2426,18 +2426,7 @@ function Overseer(user, pw, notifier) {
 
     this.client.on('error', function(e) {
         sys.puts(e);
-        if (e.getChild('conflict'))
-        {
-            self.log('Username Conflict. Likely two roommanager logins simultaneously.');
-            self.log("Use 'ps ax | grep node' to determine if this is the case.");
-            self.log('Exiting node now. Return code = 1.');
-            process.exit(1);
-        }
-        else
-        {
-            sys.puts(e);
-            self.notifylog('OVERSEER: ERROR-EMIT-RECEIVED: ' + e);
-        }
+        self.notifylog('OVERSEER: ERROR-EMIT-RECEIVED: ' + e);
     });
 
     // Overseer events

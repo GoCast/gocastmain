@@ -874,7 +874,7 @@ var Callcast = {
         this.bAmCaller = null;
 
         this.callRetries = 0;       // Counter for # times we've tried making a p2p connection.
-        this.callRetryMax = 6;     // Maximum # times a caller will give it a shot.
+        this.callRetryMax = 16;     // Maximum # times a caller will give it a shot.
 
         // Store a list of ICE candidates for batch-processing.
         this.candidates = null;
@@ -925,7 +925,7 @@ var Callcast = {
                     // a blocked connection was detected by the C++ area.
                     // We need to reset the connection.
 
-                    Callcast.log('Callee: ReadyState===BLOCKED - RESET PEER CONNECTION.');
+                    Callcast.log('Callee: ReadyState===BLOCKED - RESETTING PEER CONNECTION.');
                     self.ResetPeerConnection();
 
                     // If we've just given up on the connection, don't go further.
@@ -996,16 +996,16 @@ var Callcast = {
                         return;
                     }
 
-                    Callcast.log('ResetPeerConnection: Resetting peer connection with: ' + this.jid);
+//                    Callcast.log('ResetPeerConnection: Resetting peer connection with: ' + this.jid);
 
                     this.InitPeerConnection();
 
                     if (this.bAmCaller) {
-                        Callcast.log('  ResetPeerConnection - Re-establishing call to peer.');
+                        Callcast.log('  ResetPeerConnection - Re-establishing call to peer. Retry # ' + this.callRetries);
                         this.InitiateCall();
                     }
                     else {
-                        Callcast.log('  ResetPeerConnection - Waiting on Caller to call me back...');
+                        Callcast.log('  ResetPeerConnection - Waiting on Caller to call me back... Retry # ' + this.callRetries);
                     }
                 }
                 else {
@@ -1630,22 +1630,31 @@ var Callcast = {
     },
 
     SendPublicChat: function(msg) {
-      var chat = $msg({to: this.room, type: 'groupchat'}).c('body').t(msg);
-      this.connection.send(chat);
+        var chat = $msg({to: this.room, type: 'groupchat'}).c('body').t(msg);
+        if (this.connection) {
+            this.connection.send(chat);
+        }
     },
 
     SendPrivateChat: function(msg, to) {
-      var chat = $msg({to: this.room + '/' + to.replace(/ /g, '\\20'), type: 'chat'}).c('body').t(msg);
-      this.connection.send(chat);
+        var chat = $msg({to: this.room + '/' + to.replace(/ /g, '\\20'), type: 'chat'}).c('body').t(msg);
+        if (this.connection) {
+            this.connection.send(chat);
+        }
     },
 
     SendDirectPrivateChat: function(msg, to) {
-      var chat = $msg({to: to, type: 'chat'}).c('body').t(msg);
-      this.connection.send(chat);
+        var chat = $msg({to: to, type: 'chat'}).c('body').t(msg);
+        if (this.connection) {
+            this.connection.send(chat);
+        }
     },
 
     SendLiveLog: function(msg) {
         this.SendDirectPrivateChat('LIVELOG ; ' + this.nick + ' ; ' + msg, this.ROOMMANAGER);
+        if (this.connection) {
+            this.connection.flush();    // This is important to get to the server right away - it's a live log.
+        }
     },
 
     SendLogsToLogCatcher: function(cbSuccess, cbFailure) {
