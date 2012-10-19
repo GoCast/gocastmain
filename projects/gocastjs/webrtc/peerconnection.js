@@ -711,3 +711,8 @@ GoCastJS.PluginLog = function(localplayer, logCallback) {
         });
     }
 };
+
+GoCastJS.PeerConnection.prototype.SetDefunct = function() {
+    this.connState = 'DEFUNCT';
+    this.player.onreadystatechange();
+};
