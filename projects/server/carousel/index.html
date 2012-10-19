@@ -77,12 +77,14 @@
       <div class="gc-icon"          id="log"      title="Send log file to GoCast." onClick="sendLogPrompt();"></div>
       <div class="gc-icon"          id="taketour" title="Take a tour of GoCast"    onclick="startTour('body > #tour')"></div>
       <div id="send-log-prompt" class="warning">
-        <button id="send" class="send button" onclick="sendLog()">Send</button>
+        <p id="message">Describe the nature of the problem:</p>
+        <textarea id="logdesc"></textarea>
+        <p></p>
+        <button id="send" class="send button" onclick="sendLog()">Send Log To GoCast</button>
         <button id="stop" class="close button" onclick="closeSendLog()">Cancel</button>
-        <p id="message">Send debug info to GoCast?</p><br>
-        <input id="stop-showing" type="checkbox" value="Stop"/>
-        <p id="stop-showing-text">Stop showing this message.</p>
-        <img class="close" src="images/button-close.png" alt="Close" title="Close" onClick="closeSendLog();"/>
+        <!--<input id="stop-showing" type="checkbox" value="Stop"/>
+        <p id="stop-showing-text">Stop showing this message.</p>-->
+        <!--<img class="close" src="images/button-close.png" alt="Close" title="Close" onClick="closeSendLog();"/>-->
       </div>
       <div id="status-prompt" class="warning">
         <p id="message">The speaker volume is too low for you to hear!</p>

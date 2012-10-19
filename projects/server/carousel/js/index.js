@@ -2585,18 +2585,26 @@ function sendLog()
     window.localStorage.stopSendLogPrompt = checked; // set localstorage
   }
 
+  app.log(2, 'SENDLOG_USERCOMMENT: ' + $('textarea', app.SENDLOG_PROMPT).val());
+  $('textarea', app.SENDLOG_PROMPT).val('');
+
   jqDlg.css('background-image', 'url(images/waiting-trans.gif)');
-  $('#message', jqDlg).text('Sending log file to server.');
+  $(jqDlg)
+  $('#message', jqDlg).text('Sending log file to GoCast...');
   $('#stop-showing', jqDlg).css('display', 'none');
   $('#stop-showing-text', jqDlg).css('display', 'none');
+  $('img.close', jqDlg).css('display', 'none');
   Callcast.SendLogsToLogCatcher(function()
   {
     // success callback
-    jqDlg.css("display", "none");
+    $('#message', jqDlg).text('Sending log file to GoCast... DONE.');
+    setTimeout(function() {jqDlg.css("display", "none")}, 1000);
     console.log("SendLogsToLogCatcher success", jqDlg);
   },
   function() // fail callback
   {
+    $('#message', jqDlg).text('Sending log file to GoCast... FAILED.');
+    setTimeout(function() {jqDlg.css("display", "none")}, 1000);
     Callcast.SendLiveLog("SendLogsToLogCatcher failed");
   });
 }

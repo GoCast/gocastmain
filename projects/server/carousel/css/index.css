@@ -243,6 +243,12 @@ div#send-log-prompt
   padding:15px 10px 15px 10px;
 }
 
+div#send-log-prompt > textarea {
+  resize: none;
+  outline: none;
+  width: 95%;
+}
+
 /*<MANJESH>*/
 div#settings-prompt {
   display: none;
@@ -267,7 +273,7 @@ div#send-log-prompt > .button
 }
 div#send-log-prompt > p
 {
-  display: inline;
+  display: block;
   font-size: 11px;
 }
 body > div#lower-right
