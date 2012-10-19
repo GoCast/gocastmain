@@ -662,7 +662,9 @@ function activateWindow(
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
   if (winId.match('credentials2')) {
-    $('input#name', winId).on('keydown.s04072012', keypressNameHandler);
+    $('input#name', winId).on('keypress.s04072012', keypressNameHandler);
+    $('input#name', winId).on('blur', blurNameHandler);
+    $('input#name', winId).on('focus', focusNameHandler);
     $('a#btn', winId).on('click.s04072012', onJoinNow);
     if ("undefined" !== Storage)
     {
@@ -678,6 +680,12 @@ function activateWindow(
   else if (winId.match('chatInp')) {
     $('input.chatTo', winId).on('keydown.s04172012g', keypressChatHandler);
     $('input.send', winId).on('click.s04172012g', sendChat);
+  }
+  else if (winId.match('errorMsgPlugin')) {
+    $('input#roomname', winId).on('keydown', keydownRoomnameHandler);
+    $('input#roomname', winId).on('keypress', keypressRoomnameHandler);
+    $('input#roomname', winId).on('blur', blurRoomnameHandler);
+    $('input#roomname', winId).on('focus', focusRoomnameHandler);
   }
   return false;
 } /* activateWindow() */
@@ -1120,6 +1128,88 @@ function promptTour() {
   }
 }
 
+function InvalidNicknameKey(keycode) {
+  return (-1 === [40, 41, 91, 93, 123, 125, 95, 45, 13, 46, 64, 32, 8].indexOf(keycode) &&
+          -1 === [48, 49, 50, 51, 52, 53, 54, 55, 56, 57].indexOf(keycode) &&
+          -1 === [97, 98, 99, 100, 101, 102, 103, 104, 105, 106,
+                 107, 108, 109, 110, 111, 112, 113, 114, 115, 116,
+                 117, 118, 119, 120, 121, 122].indexOf(keycode) &&
+          -1 === [65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75,
+                  76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86,
+                  87, 88, 89, 90].indexOf(keycode));
+}
+
+function InvalidRoomnameKey(keycode) {
+  return (-1 === [40, 41, 91, 93, 123, 125, 95, 45, 13, 46, 13, 32, 8].indexOf(keycode) &&
+          -1 === [48, 49, 50, 51, 52, 53, 54, 55, 56, 57].indexOf(keycode) &&
+          -1 === [97, 98, 99, 100, 101, 102, 103, 104, 105, 106,
+                 107, 108, 109, 110, 111, 112, 113, 114, 115, 116,
+                 117, 118, 119, 120, 121, 122].indexOf(keycode) &&
+          -1 === [65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75,
+                  76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86,
+                  87, 88, 89, 90].indexOf(keycode));
+}
+
+function ComposeRoomLink(roomname) {
+  var roomlink = window.location.pathname;
+
+  if ('' !== roomname) {
+    roomlink += ('?roomname=' + roomname);
+  }
+  history.replaceState(null, null, roomlink);
+}
+
+function keydownRoomnameHandler(event) {
+  var keycode = event.which || event.keyCode,
+      roomname = $(this).val();
+
+  if ('Chrome' === app.browser.name) {
+    if (8 === keycode) {
+      roomname = roomname.substring(0, roomname.length-1);
+      ComposeRoomLink(roomname);
+    } else if (0 <= [37, 38, 39, 40].indexOf(keycode)) {
+      event.preventDefault();
+    }
+  }
+}
+
+function keypressRoomnameHandler(event) {
+  if (event.altKey) {
+    return;
+  }
+
+  if (!event.ctrlKey) {
+    var keycode = event.which || event.keyCode;
+    if (InvalidRoomnameKey(keycode)) {
+      $(this).addClass('invalidkey');
+      event.preventDefault();
+    } else {
+      var roomname = $(this).val();
+      if ('Firefox' === app.browser.name && 8 === keycode) {
+        roomname = roomname.substring(0, roomname.length-1);
+      } else if (13 !== keycode) {
+        roomname = roomname + String.fromCharCode(keycode);
+      }
+      ComposeRoomLink(roomname);
+
+      if ($(this).hasClass('invalidkey')) {
+        $(this).removeClass('invalidkey');
+      }
+    }
+  }
+}
+
+function focusRoomnameHandler() {
+  $('#boxes #errorMsgPlugin > p#roomnamehint').css({'visibility': 'visible'});
+}
+
+function blurRoomnameHandler() {
+  if ($(this).hasClass('invalidkey')) {
+    $(this).removeClass('invalidkey');
+  }
+  $('#boxes #errorMsgPlugin > p#roomnamehint').css({'visibility': 'hidden'});
+}
+
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
  * \brief Keypress for name handler.
@@ -1150,10 +1240,29 @@ function keypressNameHandler(
       onJoinNow();
       break;
     } /* switch (event.which) */
+
+    var keycode = event.which || event.keycode;
+    if (InvalidNicknameKey(keycode)) {
+      $(this).addClass('invalidkey');
+      event.preventDefault();
+    } else {
+      if ($(this).hasClass('invalidkey')) {
+        $(this).removeClass('invalidkey');
+      }
+    }
   }
 } /* keypressNameHandler() */
 
+function focusNameHandler() {
+  $('#boxes #credentials2 > p#nickhint').css({'visibility': 'visible'});
+}
 
+function blurNameHandler() {
+  if ($(this).hasClass('invalidkey')) {
+    $(this).removeClass('invalidkey');
+  }
+  $('#boxes #credentials2 > p#nickhint').css({'visibility': 'hidden'});
+}
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
@@ -1526,7 +1635,9 @@ function deactivateWindow(
     /*
      * Remove any message. */
     $('p.login-error', winId).hide().text('');
-    $('input#name', winId).off('keydown.s04072012', keypressNameHandler);
+    $('input#name', winId).off('keypress.s04072012', keypressNameHandler);
+    $('input#name', winId).off('blur', blurNameHandler);
+    $('input#name', winId).off('focus', focusNameHandler);
     $('a#btn', winId).off('click.s04072012', onJoinNow);
   }
   else if (winId.match('meeting')) {
@@ -1538,6 +1649,12 @@ function deactivateWindow(
   else if (winId.match('chatInp')) {
     $('input.chatTo', winId).off('keydown.s04172012g', keypressChatHandler);
     $('input.send', winId).off('click.s04172012g', sendChat);
+  }
+  else if (winId.match('errorMsgPlugin')) {
+    $('input#roomname', winId).off('keydown', keydownRoomnameHandler);
+    $('input#roomname', winId).off('keypress', keypressRoomnameHandler);
+    $('input#roomname', winId).off('blur', blurRoomnameHandler);
+    $('input#roomname', winId).off('focus', focusRoomnameHandler);
   }
   return false;
 } /* deactivateWindow() */
@@ -2197,6 +2314,24 @@ function uiInit()
   jqChatIn.attr("title", jqChatIn.attr("title") + " " + app.altKeyName + "+C"); // set chat in tooltip key accel
 }
 
+function InvalidRoomname(roomname) {
+  var invalid = false;
+
+  if ('undefined' === typeof(roomname)) {
+    return false;
+  }
+
+  if (null === roomname || '' === roomname || 32 < roomname.length) {
+    return true;
+  }
+
+  roomname.split('').forEach(function(key) {
+    invalid = invalid || InvalidRoomnameKey(key.charCodeAt());
+  });
+
+  return invalid;
+}
+
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
  * \brief The document ready event handler.
@@ -2238,24 +2373,34 @@ $(document).ready(function(
     // Check the browser.
     app.getBrowser();
     if (app.checkBrowser()) {
-      // login callback
-      $(document).bind('checkCredentials', checkCredentials);
+      if (InvalidRoomname(decodeURI($.getUrlVar('roomname')))) {
+        closeWindow();
+        openWindow('#errorMsgPlugin');
+        $('#errorMsgPlugin > button').css({'display': 'none'});
+        $('#errorMsgPlugin > h1').text('Invalid Roomname!');
+        $('#errorMsgPlugin > p#prompt').css({'display': 'none'});
+        $('#errorMsgPlugin > input#roomname').css({'display': 'block'});
+        $('#errorMsgPlugin > button#reload').css({'display': 'block'});
+      } else {
+        // login callback
+        $(document).bind('checkCredentials', checkCredentials);
 
-      uiInit(); // init user interface
-      fbInit(); // init facebook api
+        uiInit(); // init user interface
+        fbInit(); // init facebook api
 
-      // Login to xmpp anonymously
-      Callcast.connect(Callcast.CALLCAST_XMPPSERVER, '');
+        // Login to xmpp anonymously
+        Callcast.connect(Callcast.CALLCAST_XMPPSERVER, '');
 
-      // Write greeting into console.
-      app.log(2, 'Page loaded.');
+        // Write greeting into console.
+        app.log(2, 'Page loaded.');
 
-      Callcast.setCallbackForCallback_OnNicknameInUse(function(nick) {
-        app.nickInUse(nick);
-      });
+        Callcast.setCallbackForCallback_OnNicknameInUse(function(nick) {
+          app.nickInUse(nick);
+        });
 
-      // set the connection status callback
-      Callcast.setCallbackForCallback_ConnectionStatus(connectionStatus);
+        // set the connection status callback
+        Callcast.setCallbackForCallback_ConnectionStatus(connectionStatus);        
+      }
     }
   }, function() {
     closeWindow();

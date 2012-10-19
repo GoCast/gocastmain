@@ -861,7 +861,19 @@ body > div#meeting > div#streams > div#scontrols > input.right {
   height: 150px;
   padding: 0px 7px 7px 7px;
   border: 2px solid red;
-  border-radius: 6px;  
+  border-radius: 6px;
+}
+#boxes #errorMsgPlugin > input#roomname {
+  width: 18em;
+  border: 2px lightgrey solid;
+  padding: 5px;
+  margin-left: 20px;
+}
+#boxes #errorMsgPlugin > input#roomname.invalidkey:focus {
+  border: 2px maroon solid;
+}
+#boxes #errorMsgPlugin > input#roomname:focus {
+  border: 2px darkblue solid;
 }
 #boxes button#reload {
   position: absolute;
@@ -950,6 +962,9 @@ body > div#meeting > div#streams > div#scontrols > input.right {
   /*border-radius: 5px;*/
   /*margin-left: 10px;*/
   padding: 5px;
+}
+#boxes #credentials2 input#name.invalidkey:focus {
+  border: 2px maroon solid;
 }
 #boxes #credentials2 input#name:focus {
   border: 2px darkblue solid;
@@ -1315,7 +1330,6 @@ body > #tour > button#imgood {
   width: 75px;
   height: 40px;
   text-decoration: none;
-  border: 2px white solid;
   background-size: 90% 90%;
   background-repeat: no-repeat;
   background-color: black;
