@@ -2353,11 +2353,12 @@ function loadRooms(filename) {
 
 
 
-function Overseer(user, pw, notifier) {
+function Overseer(user, pw, notifier, bManager, staticRoomList) {
     var roomsxml, par, rooms,
-        starting_arg, i, k,
+        k,
         option,
-        self = this;
+        self = this,
+        roomlen, sroom;
 
     this.CONF_SERVICE = settings.CONF_SERVICE || '@gocastconference.video.gocast.it';
     this.SERVER = settings.SERVERNAME || 'video.gocast.it';
@@ -2367,79 +2368,41 @@ function Overseer(user, pw, notifier) {
     this.notifier = notifier;
     this.iqnum = 0;
     this.iq_callbacks = {};
-    this.roommanager = false;
-    this.roommanagertest = false;
+    this.roommanager = bManager || false;
     this.roomDB = null;
     this.debugmode = null;
 
     this.active_rooms = {};
 
-    if (process.argv.length > 2)
-    {
-        starting_arg = 2;
+    if (staticRoomList) {
+        roomlen = staticRoomList.length;
+        for (sroom = 0 ; sroom < roomlen ; sroom += 1) {
+            this.log('Reading XML File: ' + staticRoomList[sroom]);
 
-        for (i in process.argv)
-        {
-            // Don't start processing args until we get beyond the .js itself.
-            if (process.argv.hasOwnProperty(i) && i >= starting_arg) {
+            roomsxml = loadRooms(staticRoomList[sroom]); // '/var/www/etzchayim/xml/schedules.xml');
+            par = new ltx.parse(roomsxml);
+            rooms = par.getChildren('room');
 
-                if (process.argv[i].charAt(0) === '-') {
-                    option = process.argv[i].substring(1);
-
-                    if ('roommanager' === option) {
-                        this.log('OVERSEER: ROOM MANAGER MODE');
-                        user = settings.roommanager.username;
-                        pw = settings.roommanager.password;
-                        this.log('OVERSEER: JID = ' + user);
-
-                        this.roommanager = true;
-
-                        this.roomDB = new RoomDatabase(notifier);
+            for (k in rooms)
+            {
+                if (rooms.hasOwnProperty(k)) {
+                    if (this.static_roomnames[rooms[k].attrs.jid.split('@')[0]]) {
+                        this.log('  WARNING: Duplicate Room: ' + rooms[k].attrs.jid);
+                    }
+                    else {
+                        this.log('  Monitoring room: ' + rooms[k].attrs.jid);
                     }
 
-                    if ('roommanagertest' === option) {
-                        this.log('OVERSEER: ROOM MANAGER MODE --- TEST VERSION');
-                        user = settings.roommanager.usernametest;
-                        pw = settings.roommanager.password;
-                        this.log('OVERSEER: JID = ' + user);
-
-                        this.roommanager = true;
-                        this.roommanagertest = true;
-
-                        this.roomDB = new RoomDatabase(notifier);
-                    }
-                }
-                else {
-                    this.log('Reading XML File: ' + process.argv[i]);
-
-                    roomsxml = loadRooms(process.argv[i]); // '/var/www/etzchayim/xml/schedules.xml');
-                    par = new ltx.parse(roomsxml);
-                    rooms = par.getChildren('room');
-
-                    for (k in rooms)
-                    {
-                        if (rooms.hasOwnProperty(k)) {
-                            if (this.static_roomnames[rooms[k].attrs.jid.split('@')[0]]) {
-                                this.log('  WARNING: Duplicate Room: ' + rooms[k].attrs.jid);
-                            }
-                            else {
-                                this.log('  Monitoring room: ' + rooms[k].attrs.jid);
-                            }
-
-                            this.static_roomnames[rooms[k].attrs.jid.split('@')[0]] = true;
-                        }
-                    }
+                    this.static_roomnames[rooms[k].attrs.jid.split('@')[0]] = true;
                 }
             }
         }
     }
-    else
-    {
-        this.static_roomnames.offlinetest = true;
-    //  this.static_roomnames.lobby = true;
-    //  this.static_roomnames.newroom = true;
-    //  this.static_roomnames.other_newroom = true;
+
+    if (this.roommanager) {
+        this.roomDB = new RoomDatabase(notifier);
     }
+
 //console.log('DEBUG: user: ' + user + ', pw: ' + pw + ', server: ' + this.SERVER + ', port: ' + settings.SERVERPORT);
     this.client = new xmpp.Client({ jid: user, password: pw, reconnect: true, host: this.SERVER, port: settings.SERVERPORT });
 
@@ -2457,22 +2420,19 @@ function Overseer(user, pw, notifier) {
         el = new xmpp.Element('presence');
         self.client.send(el);
 
-        // RULE: If we're in roommanagertest mode, don't load/reload the database. It causes problems.
-        if (!self.roommanagertest) {
-            // Need to join all rooms in 'rooms'
-            for (k in self.static_roomnames)
-            {
-                if (self.static_roomnames.hasOwnProperty(k)) {
-                    self.MucRoomObjects[k] = new MucRoom(self.client, self.notifier, false);
-                    self.MucRoomObjects[k].finishInit();
+        // Need to join all rooms in 'rooms'
+        for (k in self.static_roomnames)
+        {
+            if (self.static_roomnames.hasOwnProperty(k)) {
+                self.MucRoomObjects[k] = new MucRoom(self.client, self.notifier, false);
+                self.MucRoomObjects[k].finishInit();
 
-                    self.MucRoomObjects[k].join(k + self.CONF_SERVICE, self.OVERSEER_NICKNAME);
-                }
+                self.MucRoomObjects[k].join(k + self.CONF_SERVICE, self.OVERSEER_NICKNAME);
             }
+        }
 
-            if (self.roommanager) {
-                self.LoadActiveRoomsFromDB();
-            }
+        if (self.roommanager) {
+            self.LoadActiveRoomsFromDB();
         }
     });
 
@@ -3435,6 +3395,36 @@ Notifier.prototype.sendMessage = function(msg) {
 //  Main
 //
 //
+var starting_arg, i, option,
+    useRoommanager=false,
+    user = settings.overseer.username,
+    pw = settings.overseer.password;
+
+if (process.argv.length > 2)
+{
+    starting_arg = 2;
+
+    for (i in process.argv)
+    {
+        // Don't start processing args until we get beyond the .js itself.
+        if (process.argv.hasOwnProperty(i) && i >= starting_arg) {
+
+            if (process.argv[i].charAt(0) === '-') {
+                option = process.argv[i].substring(1);
+
+                if ('roommanager' === option) {
+                    this.log('OVERSEER: ROOM MANAGER MODE');
+                    user = settings.roommanager.username;
+                    pw = settings.roommanager.password;
+                    useRoommanager = true;
+
+                }
+
+            }
+        }
+    }
+}
+
 
 console.log('****************************************************');
 console.log('****************************************************');
@@ -3451,18 +3441,15 @@ var notify = new Notifier({jid: settings.notifier.username, password: settings.n
 //
 // Login as Overseer
 //
-overseer = new Overseer(settings.overseer.username, settings.overseer.password, notify);
+overseer = new Overseer(user, pw, notify, useRoommanager);
 
 //
 // Let's dump our settings so it's clear what we're running.
 //
 
 var setmsg = '';
-if (overseer && overseer.roommanagertest) {
-    setmsg = 'Roommanager TEST MODE (roommanagertest) '; // - Current Settings: ';
-}
-else if (overseer && overseer.roommanager) {
-    setmsg = 'Roommanager '; // - Current Settings: ';
+if (overseer && overseer.roommanager) {
+    setmsg = 'Roommanager mode on.'; // - Current Settings: ';
 }
 
 //setmsg += JSON.stringify(settings);
