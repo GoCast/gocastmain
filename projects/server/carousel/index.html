@@ -154,18 +154,18 @@
         </form>
       </div>
       <div id="winWait" class="window resizable">
-        <p class="title">Please run the downloaded file to install the GoCast Player.</p>
+        <p class="title">Please double-click on the downloaded file to install GoCastPlayer.</p>
         <div id="status">
-           <img id="spinner" src="images/waiting-join.gif" alt="Waiting for plugin"/><p id="msg">Waiting for plugin.</p>
+           <img id="spinner" src="images/waiting-join.gif" alt="Checking "/><p id="msg">Checking for install...</p>
         </div>
       </div>
       <div id="chromeRestart" class="window resizable">
-        <h1>Please restart the browser after the install</h1>
-        <p class="title">The browser must be restarted to use the new version of the GoCast Player.</p>
+        <h1>Restart Your Browser</h1>
+        <p class="title">GoCast will use the new version of GoCastPlayer from now on.</p>
       </div>
-      <div id="pageReload" class="window resizable">
-        <h1>Please reload the page after the install</h1>
-        <p class="title">The new GoCast Player will be loaded when the page is reloaded.</p>
+      <div id="pageReload" class="window resizable" style="width: auto; height: 150px;">
+        <h1>Reload GoCast</h1>
+        <p class="title">GoCast will now take you to your room.</p>
         <button id="reload" type="button" onclick="location.reload()">Reload</button>
       </div>
       <div id="copyData" class="window resizable">
@@ -203,11 +203,23 @@
         <button id="reload" type="button" onclick="location.reload()">Reload</button>
       </div>
       <div id="installPlugin" class="window resizable">
-        <h1>Gocast.it plugin was not found</h1>
-        <p id ="prompt">In order to participate you will need the GoCast.it plugin installed.</p>
-        <p>Please click here <a id="dlLink" href="javascript:doDownload();">
-        Gocast.it.plugin</a> to download. <span>Then click on the
-        downloaded file to install.</span></p>
+        <h1>Install GoCastPlayer</h1>
+        <p id ="prompt">
+          GoCastPlayer equips your virtual room with video chat.
+        </p>
+        <p>
+          Please download the installer by clicking on the download button below.
+          Then double-click on the downloaded file to install it.
+        </p>
+        <p>
+          If you're on Chrome, GoCast will detect the installation and take you directly to your room.
+        </p>
+        <p style="padding-bottom: 10px;">
+          If you're on Firefox, please hit the reload button and you're good to go.
+        </p>
+        <p style="text-align: center;">
+          <a id="dlLink" href="javascript:doDownload();">DOWNLOAD GOCASTPLAYER</a>
+        <p>
         <p class="hidden linuxExplanation">
           Then, after downloading the .tar.gz file, follow these steps
           to install:
@@ -221,7 +233,7 @@
         </ol>
         <p class="hidden linuxExplanation">... and You are ready to
         have fun with the GoCast Player.</p>
-        <p>Thanks!  We will be waiting for you.</p>
+        <!--<p>Thanks!  We will be waiting for you.</p>-->
       </div>
       <div id="credentials" class="window resizable">
         <p class="title welcome">Welcome to GoCast!</p>

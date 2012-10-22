@@ -2209,7 +2209,7 @@ function winInstall(event)
 function winPluginPunt()
 {
    $('#winWait > #status > #spinner').attr('src', 'images/red-x.png');
-   $('#winWait > #status > #msg').text('Hmmm... looks like the plugin did not load.  Please restart the browser');
+   $('#winWait > #status > #msg').text('There was a problem with the install check.  Please restart Chrome and you\'re all set.');
 }
 
 ///
@@ -2230,7 +2230,7 @@ function checkForPlugin()
          clearTimeout(app.winTimeout);
          app.log(2, 'checkForPlugin found player ' + name);
          $('#winWait > #status > #spinner').attr('src', 'images/green-tick.png');
-         $('#winWait > #status > #msg').text('The GoCast plugin is installed.');
+         $('#winWait > #status > #msg').text('Checking for install... successful.');
 
          // display error msg after a timeout in case the plugin does not load
          app.winTimeout = setTimeout(winPluginPunt, 10000);

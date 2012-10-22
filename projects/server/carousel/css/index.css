@@ -894,8 +894,8 @@ body > div#meeting > div#streams > div#scontrols > input.right {
 }
 /*</MANJESH>*/
 #boxes #installPlugin {
-  width: 300px; 
-  height: 200px;
+  width: 400px; 
+  height: auto;
   padding: 0px 7px 7px 7px;
   border: 2px solid red;
   border-radius: 6px;  
@@ -1361,5 +1361,28 @@ body > #tour > button#imgood {
 
 .cloudcarousel.editor iframe::-webkit-scrollbar-thumb {
   background: lightgrey;
+}
+
+#installPlugin #dlLink {
+  outline: none;
+  margin-bottom: 10px;
+  font-weight: bold;
+  text-decoration: none;
+  color: white !important;
+  background: -webkit-gradient(linear, center bottom, center top, from(rgb(46,139,87)), to(rgb(60,179,113)));
+  background: -moz-linear-gradient(bottom, rgb(46,139,87), rgb(60,179,113));  
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  border-radius: 2px;
+  border: 1px darkgreen solid;
+  cursor: pointer;
+  width: auto;
+  font-size: 14px;
+}
+#installPlugin #dlLink:hover {
+  background: -webkit-gradient(linear, center bottom, center top, from(rgb(60,179,113)), to(rgb(46,139,87)));
+  background: -moz-linear-gradient(bottom, rgb(60,179,113), rgb(46,139,87));    
 }
 /*</MANJESH>*/
