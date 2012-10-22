@@ -454,12 +454,29 @@ $(document).on('disconnected', function(
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
   Callcast.log('Connection terminated.');
-  app.log(4, "disconnected.");
-  $('#errorMsgPlugin > h1').text('We got disconnected.');
-  $('#errorMsgPlugin > p#prompt').text('Please reload the page.');
-  $('#errorMsgPlugin > #sendLog').css({'display': 'none'});
+  app.log(4, "SENDLOG_DISCONNECTED: disconnected");
+  $('#errorMsgPlugin > h1').text('We got disconnected!');
+  $('#errorMsgPlugin > p#prompt').text('Please click on the send log button, and after its done, reload the page.');
   closeWindow();
   openWindow('#errorMsgPlugin');
+
+  $('#errorMsgPlugin > #sendLog').unbind('click').click(function() {
+    $(this).attr('disabled', 'disabled');
+    $('#errorMsgPlugin > #reload').attr('disabled', 'disabled');
+    $('#errorMsgPlugin > p#prompt').text('Sending log to GoCast...');
+
+    var logger = new GoCastJS.SendLogsXMPP(Callcast.room, Callcast.nick,
+                                           Callcast.LOGCATCHER,
+                                           Callcast.CALLCAST_XMPPSERVER, '',
+                                           function() {
+      $('#errorMsgPlugin > p#prompt').text('Sending log to GoCast... DONE.');
+      $('#errorMsgPlugin > #reload').removeAttr('disabled');
+    }, function() {
+      $('#errorMsgPlugin > p#prompt').text('Sending log to GoCast... FAILED.');
+      $('#errorMsgPlugin > #reload').removeAttr('disabled');
+    });
+  });
+
   return false;
 }); /* disconnected() */
 

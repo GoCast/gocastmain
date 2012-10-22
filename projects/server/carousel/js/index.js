@@ -366,6 +366,7 @@ var app = {
   },
 
   pluginCrashed: function() {
+    app.log(4, 'SENDLOG_PLUGINCRASHED: plugin crashed')
     $('#errorMsgPlugin > h1').text('Oops!!!');
     $('#errorMsgPlugin > p#prompt').text('GoCastPlayer has crashed.');
     closeWindow();
@@ -375,10 +376,10 @@ var app = {
       $('#errorMsgPlugin > #reload').attr('disabled', 'disabled');
       $('#errorMsgPlugin > p#prompt').text('Sending log to GoCast...');
       Callcast.SendLogsToLogCatcher(function(){
-        $('#errorMsgPlugin > p#prompt').text('Sending log to GoCast... done.');
+        $('#errorMsgPlugin > p#prompt').text('Sending log to GoCast... DONE.');
         $('#errorMsgPlugin > #reload').removeAttr('disabled');
       }, function(){
-        $('#errorMsgPlugin > p#prompt').text('Sending log to GoCast... failed.');
+        $('#errorMsgPlugin > p#prompt').text('Sending log to GoCast... FAILED.');
         $('#errorMsgPlugin > #reload').removeAttr('disabled');
       });
     });
@@ -2599,7 +2600,6 @@ function sendLog()
   $('textarea', app.SENDLOG_PROMPT).val('');
 
   jqDlg.css('background-image', 'url(images/waiting-trans.gif)');
-  $(jqDlg)
   $('#message', jqDlg).text('Sending log file to GoCast...');
   $('#stop-showing', jqDlg).css('display', 'none');
   $('#stop-showing-text', jqDlg).css('display', 'none');
