@@ -16,7 +16,7 @@ then send a message to the group saying 'nick' is requesting to come in the room
 
  */
 
-/*jslint node: true */
+/*jslint node: true, nomen: true */
 var settings = require('./settings');   // Our GoCast settings JS
 if (!settings) {
     settings = {};
@@ -250,6 +250,11 @@ RoomDatabase.prototype.AddContentToRoom = function(roomname, spotnumber, obj, cb
     putobj.roomname = roomname;
     putobj.spotnumber = spotnumber;
 
+    // Kill off oddball items we don't need to have in the database taking up space and IO costs.
+    delete putobj.xmlns;
+    delete putobj.cmdtype;
+    delete putobj.spotreplace;
+
     this.log('Adding content to room: ' + roomname + ' in spotnumber: ' + spotnumber);
 //    console.log('DEBUG:Adding content to room: full validated obj: ', putobj);
 
@@ -294,10 +299,18 @@ RoomDatabase.prototype.LoadContentsFromDBForRoom = function(roomname, cbSuccess,
             // Now we have an object in res.items which is an array of objects that contain 'roomname' and 'spotnumber'
             len = res.items.length;
 
+//            console.log('DEBUG: Got QueryCB answer on roomname=' + roomname + ' res=', res);
+
             // If there were no results from the query, then we're all good here. No entries.
             if (!len) {
-                console.log('LoadContentsFromDBForRoom: No Room contents to load in ' + roomname + '. SUCCESS.');
-                cbSuccess();
+                if (buildup.length) {
+                    console.log('LoadContentsFromDBForRoom: SUCCESS. Loaded ' + buildup.length + ' spots for room: ' + roomname);
+                    cbSuccess(buildup);
+                }
+                else {
+                    console.log('LoadContentsFromDBForRoom: No Room contents to load in ' + roomname + '. SUCCESS.');
+                    cbSuccess();
+                }
                 return true;
             }
 
@@ -311,6 +324,7 @@ RoomDatabase.prototype.LoadContentsFromDBForRoom = function(roomname, cbSuccess,
             if (res.lastEvaluatedKey.hash) {
                 options.exclusiveStartKey = res.lastEvaluatedKey;
                 setTimeout(function() {
+//                    console.log('DEBUG: Going for another iteration roomname=' + roomname);
                     ddb.query(self.ROOMCONTENTS, roomname, options, QueryCB);
                 }, batchDelay);
             }
@@ -333,6 +347,7 @@ RoomDatabase.prototype.LoadContentsFromDBForRoom = function(roomname, cbSuccess,
 
     options = { limit: maxPerBatch };
 
+//    console.log('DEBUG: Going for database query on roomname=' + roomname);
     ddb.query(this.ROOMCONTENTS, roomname, options, QueryCB);
 };
 
@@ -462,10 +477,10 @@ RoomDatabase.prototype.RemoveAllContentsFromRoom = function(roomname, cbSuccess,
 //
 //
 
-function MucRoom(client, notifier, bSelfDestruct, success, failure) {
+function MucRoom(client, notifier, opts, success, failure) {
     // -- Handle room create request --
     this.bNewRoom = false;
-    this.bSelfDestruct = bSelfDestruct || false;
+    this.bSelfDestruct = opts.bSelfDestruct || false;
     this.successCallback = success || null;
     this.failureCallback = failure || null;
     this.presenceTimer = null;
@@ -487,6 +502,9 @@ function MucRoom(client, notifier, bSelfDestruct, success, failure) {
     this.pendingDeletion = false;
     this.addSpotCeiling = 1000;     // Value doled-out upon addspot commands being given (and incremented afterwards)
     this.addWhiteboardCeiling = 1;  // Special value in each room for making unique whiteboard names for display.
+    this.wbDir = null;
+    this.wbDirRoot = settings.roommanager.wbstoragelocation || __dirname;
+    this.wbSaveTimer = null;
 
     this.spotList = {};
     this.spotStorage = {};
@@ -553,6 +571,46 @@ function MucRoom(client, notifier, bSelfDestruct, success, failure) {
         return;
     }
 }
+
+MucRoom.prototype.ValidateWBFolder = function() {
+    // Make sure Overseer.wbStorageLocation + '/' + this.roomname
+    var dirloc = this.wbDirRoot + '/' + this.roomname.split('@')[0],
+        stat;
+
+    this.wbDir = null;  // Assume the worst - we'll not be writing whiteboards to disk.
+
+// console.log('DEBUG: root: ' + this.wbDirRoot + ' and dirloc: ' + dirloc);
+
+    if (!this.roomname) {
+        this.log('ValidateWBFolder: No roomname yet. Problem. Should be...');
+        return false;
+    }
+
+    try {
+        stat = fs.statSync(dirloc);
+        // If we fail this check, then something bad has happened - because what should be a directory is a file.
+        // If it doesn't exist at all, we'll wind up in the catch instead.
+        if (stat.isDirectory()) {
+            this.wbDir = dirloc;
+            return true;
+        }
+    }
+    catch (e) {
+        // dirloc doesn't exist. Create it.
+        try {
+            fs.mkdirSync(dirloc);
+            this.wbDir = dirloc;
+            return true;
+        }
+        catch (e2) {
+            // mkdir failed.
+            this.log('ERROR: Could not create wbStorage room directory: ' + dirloc);
+            this.wbDir = null;
+            return false;
+        }
+    }
+
+};
 
 MucRoom.prototype.SetMaxRoomParticipants = function(max) {
     // Check for validity before going forward.
@@ -622,14 +680,35 @@ MucRoom.prototype.reset = function() {
     this.spotStorage = {};
     this.wbStrokeList = {};
     this.canvas = {};
+    this.wbDir = null;
+    if (this.wbSaveTimer) {
+        clearInterval(this.wbSaveTimer);
+    }
+    this.wbSaveTimer = null;
 
     this.client.removeListener('stanza', this.onstanza);
 };
 
 MucRoom.prototype.finishInit = function(success, failure) {
+    var self = this;
+
     this.successCallback = success;
     this.failureCallback = failure;
     this.client.on('stanza', this.onstanza);
+
+    //
+    // Save whiteboards every 10 seconds
+    //
+    if (this.wbSaveTimer) {
+        clearInterval(this.wbSaveTimer);
+    }
+    this.wbSaveTimer = setInterval(function() {
+        self.SaveAllWhiteboards.call(self, function(okmsg) {
+//            self.log('Interval-Whiteboard-Save: Success: ' + okmsg);
+        }, function(errmsg) {
+            self.log('Interval-Whiteboard-Save: ERROR: ' + errmsg);
+        });
+    }, 10000);
 };
 
 MucRoom.prototype.notifylog = function(msg) {
@@ -752,12 +831,6 @@ MucRoom.prototype.handlePresence = function(pres) {
         }
         else {
             this.log('Updated Presence: ' + fromjid + ' as Nickname: ' + fromnick);
-            this.log('DEBUG: Going to save all whiteboards...');
-            this.SaveAllWhiteboards(function() {
-                console.log('WHITEBOARDS SAVED.');
-            }, function() {
-                console.log('WHITEBOARD SAVE FAILED.');
-            });
         }
 
         this.participants[fromnick] = { name: fromjid || fromnick };
@@ -1118,7 +1191,7 @@ MucRoom.prototype.SaveAllWhiteboards = function(cbSuccess, cbFailure) {
         if (this.spotList.hasOwnProperty(k)) {
             if (this.spotList[k].spottype === 'whiteBoard') {
                 // Now -- save this one.
-                this.CreateImageFromFullWhiteboardStrokeList(k, function() {}, function() { bNumFailed += 1; });
+                this.CreateUpdatedImageFromStrokes(k, function() {}, function() { bNumFailed += 1; });
             }
         }
     }
@@ -1131,54 +1204,130 @@ MucRoom.prototype.SaveAllWhiteboards = function(cbSuccess, cbFailure) {
     }
 };
 
-MucRoom.prototype.CreateImageFromFullWhiteboardStrokeList = function(spotnumber, cbSuccess, cbFailure) {
+MucRoom.prototype.LoadAllWhiteboards = function() {
+    var k, bNumFailed = 0;
+
+    if (!this.roomname) {
+        this.log('ERROR: Cannot load whiteboards - no roomname to reference.');
+        return false;
+    }
+
+    for (k in this.spotList) {
+        if (this.spotList.hasOwnProperty(k)) {
+            if (this.spotList[k].spottype === 'whiteBoard') {
+                // Now -- load the whiteboard.
+                this.LoadWhiteboardForSpot(k);
+            }
+        }
+    }
+};
+
+MucRoom.prototype.LoadWhiteboardForSpot = function(spotnumber) {
+    var loc, loadedImage, img;
+
+    if (!spotnumber || !this.wbDir) {
+        this.log('ERROR: Cannot load whiteboard spot - either no wbDir or no spotnumber given.');
+        return false;
+    }
+
+    loc = this.wbDir + '/' + this.wbFname(spotnumber);
+
+    this.log('Loading whiteboard from: ' + loc);
+
+    this.canvas[spotnumber] = new nodewb.NodeWhiteBoard(this.spotList[spotnumber].wbWidth || 500,
+                                                        this.spotList[spotnumber].wbHeight || 500);
+
+    try {
+        loadedImage = fs.readFileSync(loc);
+        img = new Canvas.Image();
+        img.src = loadedImage;
+
+        this.canvas[spotnumber].wb.getContext('2d').drawImage(img, 0, 0);
+    }
+    catch (e) {
+        this.log('WARNING: Could not load whiteboard image: ' + loc + ' Err: ' + e);
+    }
+};
+
+MucRoom.prototype.wbFname = function(spotnumber) {
+    if (!spotnumber) {
+        return null;
+    }
+    else {
+        return 'whiteboard_' + this.roomname.split('@')[0] + '_' + spotnumber + '.png';
+    }
+};
+
+MucRoom.prototype.CreateUpdatedImageFromStrokes = function(spotnumber, cbSuccess, cbFailure) {
     var k, fname,
         attribs_out = {};
 
-    if (!this.spotList[spotnumber]) {
-        this.log('CreateImageFromFullWhiteboardStrokeList: ERROR - unknown spotnumber: ' + spotnumber);
+    if (!this.wbDir) {
+        this.log('CreateUpdatedImageFromStrokes: ERROR - no wbDir for storage.');
         if (cbFailure) {
-            cbFailure('CreateImageFromFullWhiteboardStrokeList: ERROR - unknown spotnumber: ' + spotnumber);
+            cbFailure('CreateUpdatedImageFromStrokes: ERROR - no wbDir for storage.');
         }
         return;
     }
 
-    if (this.spotList[spotnumber].spottype !== 'whiteBoard' || !this.wbStrokeList[spotnumber]) {
-        this.log('CreateImageFromFullWhiteboardStrokeList: ERROR - Not a whiteboard spot: ' + spotnumber);
+    if (!this.spotList[spotnumber]) {
+        this.log('CreateUpdatedImageFromStrokes: ERROR - unknown spotnumber: ' + spotnumber);
         if (cbFailure) {
-            cbFailure('CreateImageFromFullWhiteboardStrokeList: ERROR - Not a whiteboard spot: ' + spotnumber);
+            cbFailure('CreateUpdatedImageFromStrokes: ERROR - unknown spotnumber: ' + spotnumber);
+        }
+        return;
+    }
+
+    if (this.spotList[spotnumber].spottype !== 'whiteBoard') {
+        this.log('CreateUpdatedImageFromStrokes: ERROR - Not a whiteboard spot: ' + spotnumber);
+        if (cbFailure) {
+            cbFailure('CreateUpdatedImageFromStrokes: ERROR - Not a whiteboard spot: ' + spotnumber);
         }
         return;
     }
 
     if (!this.canvas[spotnumber]) {
-        this.log('CreateImageFromFullWhiteboardStrokeList: ERROR - Canvas missing from spot: ' + spotnumber);
+        this.log('CreateUpdatedImageFromStrokes: ERROR - Canvas missing from spot: ' + spotnumber);
         if (cbFailure) {
-            cbFailure('CreateImageFromFullWhiteboardStrokeList: ERROR - Canvas missing from spot: ' + spotnumber);
+            cbFailure('CreateUpdatedImageFromStrokes: ERROR - Canvas missing from spot: ' + spotnumber);
         }
         return;
     }
 
-    fname = 'whiteboard_' + this.roomname.split('@')[0] + '_' + spotnumber + '.png';
-    this.log('CreateImageFromFullWhiteboardStrokeList: Creating image for ' + spotnumber + ' calling it file: ' + fname);
+    //
+    // Only do a real save if there are strokes to save.
+    //
+    if (this.wbStrokeList[spotnumber] && this.wbStrokeList[spotnumber].strokes.length) {
+        fname = this.wbFname(spotnumber);
+        this.log('CreateUpdatedImageFromStrokes: Found ' + this.wbStrokeList[spotnumber].strokes.length + ' strokes. Creating image file: ' + fname);
 
-    attribs_out.strokes = JSON.stringify(this.wbStrokeList[spotnumber]);
-//    this.log('DEBUG: Full stroke list: ' + attribs_out.strokes);
+        attribs_out.strokes = JSON.stringify(this.wbStrokeList[spotnumber]);
+    //    this.log('DEBUG: Full stroke list: ' + attribs_out.strokes);
 
-    // Now process this as a canvas and then save the canvas.
-    this.canvas[spotnumber].doCommands(attribs_out);
+        // Now process this as a canvas and then save the canvas.
+        this.canvas[spotnumber].doCommands(attribs_out);
+        // Now that we've been successful in drawing, erase the strokes in memory.
+        this.wbStrokeList[spotnumber].strokes = [];
 
-    this.canvas[spotnumber].Save(fname, function() {
-            console.log('DEBUG: SUCCESS SAVING ' + fname);
-            if (cbSuccess) {
-                cbSuccess('Success Saving: ' + spotnumber);
-            }
-        }, function(err) {
-            console.log('SAVE FAILED. ERROR: ' + err);
-            if (cbFailure) {
-                cbFailure('SAVE FAILED. ERROR: ' + err);
-            }
-    });
+        this.canvas[spotnumber].Save(this.wbDir + '/' + fname, function() {
+                console.log('DEBUG: SUCCESS SAVING ' + fname);
+                if (cbSuccess) {
+                    cbSuccess('Success Saving: ' + spotnumber);
+                }
+            }, function(err) {
+                console.log('SAVE FAILED for spot: ' + spotnumber + '. ERROR: ' + err);
+                if (cbFailure) {
+                    cbFailure('SAVE FAILED for spot: ' + spotnumber + '. ERROR: ' + err);
+                }
+        });
+    }
+    else {
+        // If there were no strokes in the whiteboard, then let's just call it a success.
+        if (cbSuccess) {
+            cbSuccess('Success (no-strokes) Saving: ' + spotnumber);
+        }
+    }
+
 };
 
 MucRoom.prototype.SendFullWhiteboardStrokeListTo = function(spotnumber, to) {
@@ -1190,7 +1339,7 @@ MucRoom.prototype.SendFullWhiteboardStrokeListTo = function(spotnumber, to) {
         return;
     }
 
-    if (this.spotList[spotnumber].spottype !== 'whiteBoard' || !this.wbStrokeList[spotnumber]) {
+    if (this.spotList[spotnumber].spottype !== 'whiteBoard') {
         this.log('SendFullWhiteboardStrokeListTo: ERROR - Not a whiteboard spot: ' + spotnumber);
         return;
     }
@@ -1206,8 +1355,17 @@ MucRoom.prototype.SendFullWhiteboardStrokeListTo = function(spotnumber, to) {
     attribs_out.cmdtype = 'addspot';
     attribs_out.xmlns = 'urn:xmpp:callcast';
 
+    if (!this.wbStrokeList[spotnumber]) {
+        this.wbStrokeList[spotnumber] = {};
+        this.wbStrokeList[spotnumber].strokes = [];
+    }
     attribs_out.strokes = JSON.stringify(this.wbStrokeList[spotnumber]);
 //    this.log('DEBUG: Full stroke list: ' + attribs_out.strokes);
+
+    if (this.canvas[spotnumber]) {
+        attribs_out.image = this.canvas[spotnumber].wb.toDataURL('image/png');
+        this.log('SendFullWhiteboardStrokeListTo: Pushed canvas image into addspot. Bytesize = ' + attribs_out.image.length);
+    }
 
     if (msgToSend) {
         msgToSend.up().c('cmd', attribs_out);
@@ -1276,44 +1434,25 @@ MucRoom.prototype.SendPrivateChat = function(to, msg) {
         this.client.send(msgToSend);
 };
 
-MucRoom.prototype.AddSpotReflection = function(iq) {
-    // Need to pull out the 'info' object - which is the attributes to the 'addspot'
-    var info = {}, self = this,
-        wbWidth = 500, wbHeight = 500;
-    if (iq.getChild('addspot')) {
-        info = iq.getChild('addspot').attrs;
-    }
-
-    if (iq.getChild('wbWidth')) {
-        wbWidth = iq.getChild('wbWidth');
-    }
+//
+// Place for coping with multitude of special spot types and any special requirements they may have.
+//
+MucRoom.prototype.AddSpotType = function(spottype, info) {
+    var self = this;
 
     // Be sure to give a spot number to everyone that's consistent.
-    info.spotnumber = this.addSpotCeiling;
-    this.addSpotCeiling += 1;
-
-    if (info.spottype === 'whiteBoard') {
-        // Need to generate a unique whiteboard name.
-        info.spotname = 'Whiteboard ' + this.addWhiteboardCeiling;
-        this.addWhiteboardCeiling += 1;
-
-        // Initialize the stroke list to nothing.
-        this.wbStrokeList[info.spotnumber] = {};
-        this.wbStrokeList[info.spotnumber].strokes = [];
-
-        this.canvas[info.spotnumber] = new nodewb.NodeWhiteBoard(wbWidth, wbHeight, info);
-//        this.canvas[info.spotnumber] = new nodewb.NodeWhiteBoard(wbWidth, wbHeight, info);
-//        console.log('DEBUG: Whiteboard: ' , this.wbStrokeList[info.spotnumber].wbObject);
+    // Caller can specify a spotnumber (usually from loading from database)
+    // in which case, we take their number.
+    if (!info.spotnumber) {
+        info.spotnumber = this.addSpotCeiling;
+        this.addSpotCeiling += 1;
     }
 
-    this.SendGroupCmd('addspot', info);
-
-    // Now reply to the IQ message favorably.
-    iq.attrs.to = iq.attrs.from;
-    delete iq.attrs.from;
-    iq.attrs.type = 'result';
-
-    this.client.send(iq);
+    // In the case of database loading, we have to keep the ceiling caught up with the max
+    // spotnumber + 1 at all times.
+    if (info.spotnumber >= this.addSpotCeiling) {
+        this.addSpotCeiling = parseInt(info.spotnumber, 10) + 1;
+    }
 
     // Now track the new spot item for the future
     if (this.spotList[info.spotnumber]) {
@@ -1334,6 +1473,64 @@ MucRoom.prototype.AddSpotReflection = function(iq) {
         }
     }
 
+//
+// Now handle any special items/types.
+//
+    switch(spottype) {
+        case 'whiteBoard':
+    // Treatment for whiteboards are a bit special
+            // Need to generate a unique whiteboard name.
+            // TODO:RMW - BUG - If we always assign a spotname on load, we'll copy over the
+            //          existing spotname making whiteboard naming inconsistent on persistent rooms.
+            //          If we forego naming here, then the ceiling value can be messed up as a prior
+            //          room may create 4 whiteboards and delete 2 of them. This could leave us
+            //          having to 'parse' the name for the max number of the existing whiteboards
+            //          in order to discern the ceiling. Or just use the +1 technique and then you will
+            //          possibly wind up with two 'Whiteboard 3' entries when someone adds another.
+            // SOLUTION: Likely - need a wbNumber property which is used to create the spotname. This
+            //          would get stored in the db and pulled out making the 'max/ceiling' easier to discern.
+            info.spotname = 'Whiteboard ' + this.addWhiteboardCeiling;
+            this.addWhiteboardCeiling += 1;
+
+            // Initialize the stroke list to nothing.
+            this.wbStrokeList[info.spotnumber] = {};
+            this.wbStrokeList[info.spotnumber].strokes = [];
+
+            // Set default canvas width and height if not specified from the client.
+            if (!info.wbWidth) {
+                info.wbWidth = 500;
+            }
+
+            if (!info.wbHeight) {
+                info.wbHeight = 500;
+            }
+
+            this.canvas[info.spotnumber] = new nodewb.NodeWhiteBoard(info.wbWidth, info.wbHeight);
+            break;
+        default:
+            break;
+    }
+};
+
+MucRoom.prototype.AddSpotReflection = function(iq) {
+    // Need to pull out the 'info' object - which is the attributes to the 'addspot'
+    var info = {};
+
+    if (iq.getChild('addspot')) {
+        info = iq.getChild('addspot').attrs;
+    }
+
+    // Add any special items to the memory database.
+    this.AddSpotType(info.spottype, info);
+
+    this.SendGroupCmd('addspot', info);
+
+    // Now reply to the IQ message favorably.
+    iq.attrs.to = iq.attrs.from;
+    delete iq.attrs.from;
+    iq.attrs.type = 'result';
+
+    this.client.send(iq);
 };
 
 MucRoom.prototype.createErrorIQ = function(iq_in, reason_in, err_type_in) {
@@ -1478,7 +1675,8 @@ MucRoom.prototype.RemoveSpotReflection = function(iq) {
 
         if (this.wbStrokeList[info.spotnumber]) {
             // Need to erase our notion of any strokes for this spot since it is a whiteboard.
-            delete this.wbStrokeList[info.spotnumber];
+            this.wbStrokeList[info.spotnumber] = {};
+            this.wbStrokeList[info.spotnumber].strokes = [];
         }
 
         delete this.spotList[info.spotnumber];
@@ -2261,6 +2459,8 @@ MucRoom.prototype.rejoin = function(rmname, nick) {
     this.roomname = rmname;
     this.nick = nick;
 
+    this.ValidateWBFolder();
+
     this.log('Joining: ' + rmname + ' as ' + nick + '. '); // + el.tree());
     this.client.send(el);
 
@@ -2294,7 +2494,7 @@ var MucroomObjectPool = {
 
     get: function() {
         if (0 === this.objPool.length) {
-            this.objPool.push(new MucRoom(this.client, this.notifier, true));
+            this.objPool.push(new MucRoom(this.client, this.notifier, { bSelfDestruct: true }));
         }
 
         return this.objPool.pop();
@@ -2424,7 +2624,7 @@ function Overseer(user, pw, notifier, bManager, staticRoomList) {
         for (k in self.static_roomnames)
         {
             if (self.static_roomnames.hasOwnProperty(k)) {
-                self.MucRoomObjects[k] = new MucRoom(self.client, self.notifier, false);
+                self.MucRoomObjects[k] = new MucRoom(self.client, self.notifier, { bSelfDestruct: false });
                 self.MucRoomObjects[k].finishInit();
 
                 self.MucRoomObjects[k].join(k + self.CONF_SERVICE, self.OVERSEER_NICKNAME);
@@ -2561,6 +2761,7 @@ Overseer.prototype.LoadActiveRoomsFromDB = function() {
                             // Iterate through contents and add them to the memory DB.
                             for (i = 0; i < len; i += 1)
                             {
+                                // Pull out the hash and range from the dynamodb and use that as keys.
                                 temproomname = contents[i].roomname;
                                 tempspotnumber = contents[i].spotnumber;
 
@@ -2568,14 +2769,20 @@ Overseer.prototype.LoadActiveRoomsFromDB = function() {
                                     self.log('ERROR: MucRoomObject for room: ' + temproomname + ' is missing.');
                                 }
                                 else {
-                                    self.MucRoomObjects[temproomname].spotList[tempspotnumber] = contents[i];
-                                    delete self.MucRoomObjects[temproomname].spotList[tempspotnumber].roomname;
+                                    delete contents[i].roomname;        // Dont clutter the internal memory database.
+                                    self.MucRoomObjects[temproomname].AddSpotType(contents[i].spottype, contents[i]);
                                 }
+                            }
+
+                            // Now load any whiteboards and make canvases.
+                            if (self.MucRoomObjects[temproomname]) {
+                                self.MucRoomObjects[temproomname].LoadAllWhiteboards();
                             }
                         }
                     }, function(msg) {
                         self.log('LoadRooms: ERROR: Could not load contents for: ' + k);
                     });
+
                 }
                 else {
                     self.log('ERROR: RoomDB is not initialized for loading room contents.');
@@ -2776,6 +2983,13 @@ Overseer.prototype.handleMessage = function(msg) {
                 }
                 this.log(temp);
                 this.notifylog(temp);
+            }
+            break;
+        case 'RELOADROOMS':
+        case 'REFRESHROOMS':
+            if (this.roommanager) {
+                this.notifylog('Reloading rooms on the fly.');
+                this.LoadActiveRoomsFromDB();
             }
             break;
         case 'DEBUGSTANZAS':
@@ -3390,6 +3604,44 @@ Notifier.prototype.sendMessage = function(msg) {
     }
 };
 
+function testWhiteboardLocation() {
+    var wbStorageLocation, stat;
+
+    // If settings does not specify it, then we do need to 'punch a value' into it for others.
+    if (!settings.roommanager.wbstoragelocation) {
+        settings.roommanager.wbstoragelocation = __dirname;
+    }
+
+    wbStorageLocation = settings.roommanager.wbstoragelocation;
+
+    if (wbStorageLocation.charAt(0) === '~') {
+        wbStorageLocation = wbStorageLocation.replace('~', process.env.HOME);
+
+        // Need to punch this back into settings for others to use without having to do the substitution.
+        settings.roommanager.wbstoragelocation = wbStorageLocation;
+    }
+
+    try {
+        stat = fs.statSync(wbStorageLocation);
+        if (stat.isDirectory()) {
+            // Will need to be a writable location, so let's do a quick test to ensure this.
+            fs.writeFileSync(wbStorageLocation + '/.test.tmp', 'hello there');
+            // If we get here, we're all good. Close and delete.
+            fs.unlinkSync(wbStorageLocation + '/.test.tmp');
+            console.log('INFO: whiteboardstorage location is valid: ' + wbStorageLocation);
+        }
+        else {
+            console.log('ERROR: whiteboardstorage must be a valid directory location: ' + wbStorageLocation);
+            process.exit(-3);
+        }
+    }
+    catch(e) {
+        console.log('ERROR: whiteboardstorage location must be a writable directory:' + wbStorageLocation);
+        process.exit(-2);
+    }
+
+}
+
 //
 //
 //  Main
@@ -3408,16 +3660,22 @@ if (process.argv.length > 2)
     {
         // Don't start processing args until we get beyond the .js itself.
         if (process.argv.hasOwnProperty(i) && i >= starting_arg) {
+            console.log('DEBUG: processing argv[' + i + '] which is: ' + process.argv[i]);
 
             if (process.argv[i].charAt(0) === '-') {
-                option = process.argv[i].substring(1);
+                // Allow for '-' or '--' easily...
+                if (process.argv[i].charAt(1) === '-') {
+                    option = process.argv[i].substring(2);
+                }
+                else {
+                    option = process.argv[i].substring(1);
+                }
 
                 if ('roommanager' === option) {
-                    this.log('OVERSEER: ROOM MANAGER MODE');
+                    console.log('OVERSEER: ROOM MANAGER MODE');
                     user = settings.roommanager.username;
                     pw = settings.roommanager.password;
                     useRoommanager = true;
-
                 }
 
             }
@@ -3425,6 +3683,7 @@ if (process.argv.length > 2)
     }
 }
 
+testWhiteboardLocation();
 
 console.log('****************************************************');
 console.log('****************************************************');

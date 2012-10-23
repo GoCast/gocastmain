@@ -775,6 +775,7 @@ function doSpot(spotDiv, info)
       {
         whiteBoard = $("#wbCanvas", spotDiv).data("wb");
       }
+
       if (whiteBoard) // play any commands in info
       {
         whiteBoard.doCommands(info);
@@ -921,7 +922,7 @@ function addSpotCb(info)
     var spotDiv, // the desired spot to be replaced or added
        item,
        div, divs;
-    console.log('addSpot msg received id ' + info.spotdivid + ' #' + info.spotnumber, info);
+//    console.log('addSpot msg received id ' + info.spotdivid + ' #' + info.spotnumber, info);
     // determine cmd type, add or replace
     if (info.spotreplace) // see if there is a spotReplace prop
     {

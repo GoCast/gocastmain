@@ -54,7 +54,7 @@ GoCastJS.NodeWhiteBoardSettings.prototype.applyJson = function(settings, context
   context.lineWidth   = settings.lineWidth;
 };
 
-GoCastJS.NodeWhiteBoard = function(w, h, info) {
+GoCastJS.NodeWhiteBoard = function(w, h) {
     this.wb = new Canvas(w, h);
     this.ctx = this.wb.getContext('2d');
 
@@ -78,11 +78,12 @@ GoCastJS.NodeWhiteBoard.prototype.doCommands = function(info)
 {
   var i, cmds, stroke, image;
   if (!info) {throw "WhiteBoard.doCommands info is null";}
-  if (info.strokes) //todo remove this when server stops sending stroke lists
+  if (info.strokes)
   {
     cmds = JSON.parse(info.strokes);
 //    console.log("WhiteBoard.doCommands", info, cmds);
-    this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+// We don't clear the canvas anymore due to incremental saving of images.
+//     this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
     for (i = 0; i < cmds.strokes.length; i += 1)
     {
       this.doCommand(cmds.strokes[i]);
@@ -142,7 +143,7 @@ GoCastJS.NodeWhiteBoard.prototype.doCommand = function(cmdArray)
 };
 
 GoCastJS.NodeWhiteBoard.prototype.Save = function(filename, cbSuccess, cbFailure) {
-var out = fs.createWriteStream(__dirname + filename),
+var out = fs.createWriteStream(filename),
     stream = this.wb.createPNGStream();
 
     stream.on('data', function(chunk){

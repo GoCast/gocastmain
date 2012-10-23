@@ -98,7 +98,7 @@ GoCastJS.WhiteBoardTools.prototype.penColorClick = function(event)
       spotPos = wb.jqParent.position(),
       spotH   = wb.jqParent.height(),
       toolsPos = wb.tools.jqTools.position(), // wb tools pos todo height is zero so calcs are off
-      jqContainer = wb.jqParent.parent(), // spot parent 
+      jqContainer = wb.jqParent.parent(), // spot parent
       containerH = jqContainer.height(),
       listH   = wb.tools.jqPenList.height(),
       top = pos.top;
@@ -467,19 +467,46 @@ GoCastJS.WhiteBoard.prototype.sendStroke = function(stroke)
 ///
 GoCastJS.WhiteBoard.prototype.doCommands = function(info)
 {
-  var i, cmds, stroke, image;
+  var i, cmds, stroke, image, numstrokes, self=this;
   if (!info) {throw "WhiteBoard.doCommands info is null";}
-  if (info.strokes) //todo remove this when server stops sending stroke lists
-  { 
+
+  if (info.strokes)
+  {
     cmds = JSON.parse(info.strokes);
-    //console.log("WhiteBoard.doCommands", info, cmds);
-    this.wbCtx.clearRect(0, 0, this.wbCtx.canvas.width, this.wbCtx.canvas.height);
-    for (i = 0; i < cmds.strokes.length; ++i)
+
+    numstrokes = cmds.strokes.length;
+
+    // Was an image sent down at the same time? If so, load/draw it first.
+    if (info.image)
     {
-      this.doCommand(cmds.strokes[i]);
+      // load image from data url
+      image = new Image();
+      image.onload = function()
+      {
+        self.wbCtx.clearRect(0, 0, self.wbCtx.canvas.width, self.wbCtx.canvas.height);
+
+        self.wbCtx.drawImage(image, 0, 0);
+
+        // Now that we have a base image, draw the strokes.
+        for (i = 0; i < numstrokes; i += 1)
+        {
+          self.doCommand(cmds.strokes[i]);
+        }
+      };
+      image.src = info.image;
+    }
+    else {
+    //console.log("WhiteBoard.doCommands", info, cmds);
+
+      this.wbCtx.clearRect(0, 0, this.wbCtx.canvas.width, this.wbCtx.canvas.height);
+      for (i = 0; i < numstrokes; i += 1)
+      {
+        this.doCommand(cmds.strokes[i]);
+      }
     }
   }
-  if (info.stroke && 
+
+  if (info.stroke &&
       info.from !== app.user.name) // don't play stokes that we sent
   {
     stroke = JSON.parse(info.stroke);
@@ -488,16 +515,7 @@ GoCastJS.WhiteBoard.prototype.doCommands = function(info)
     this.doCommand(stroke);
     this.startNewStroke();
   }
-  if (info.image)
-  {
-    // load image from data url
-    image = new Image();
-    image.onload = function()
-    {
-      this.wbCtx.drawImage(this, 0, 0);
-    };
-    image.src = info.image;
-  }
+
   this.restoreMouseLocation();
 };
 ///
@@ -509,7 +527,7 @@ GoCastJS.WhiteBoard.prototype.doCommand = function(cmdArray)
 {
   var i, cmd;
   //console.log("WhiteBoard.doCommand", cmdArray);
-  for (i = 0; i < cmdArray.length; ++i) {
+  for (i = 0; i < cmdArray.length; i += 1) {
     //console.log("cmd", cmdArray[i]);
     switch (cmdArray[i].name) {
       case "save":
@@ -580,7 +598,7 @@ GoCastJS.WhiteBoard.prototype.startNewStroke = function()
 };
 ///
 /// \brief rezise the canvas, set css dimensions and scale member var
-/// 
+///
 /// \arg width, height the target sizes as integers
 ///
 GoCastJS.WhiteBoard.prototype.setScale = function(width, height)
@@ -656,7 +674,7 @@ GoCastJS.WhiteBoard.prototype.onMouseUp = function(event)
            .removeData('wb');
   wb.mouse.start = null;
   //console.log('wb.onMouseUp x' + event.offsetX + '(' + x + ') y ' + event.offsetY + '(' + y + ')' , event);
-  clearInterval(wb.mouse.timer); 
+  clearInterval(wb.mouse.timer);
   event.stopPropagation();
   if (wb.mouse.lineCt > 0)
   {
@@ -693,7 +711,7 @@ GoCastJS.WhiteBoard.prototype.onMouseMove = function(event)
     wb.wbCtx.stroke();
     //wb.wbCtx.restore();
     wb.mouse.currentCommand.push({name: 'lineTo', x: (x >> 0), y: (y >> 0)});
-    ++wb.mouse.lineCt;
+    wb.mouse.lineCt += 1;
     wb.mouse.start = {x: x, y: y};
   }
   else
