@@ -37,7 +37,7 @@ var ddb = require('dynamodb').ddb({ endpoint: settings.dynamodb.endpoint,
                                     accessKeyId: settings.dynamodb.accessKeyId,
                                     secretAccessKey: settings.dynamodb.secretAccessKey});
 var Canvas = require('canvas');
-var nodewb = require('nodeWB');
+var nodewb = require('./nodeWB');
 
 var eventManager = new evt.EventEmitter();
 var argv = process.argv;
@@ -175,7 +175,7 @@ RoomDatabase.prototype.RemoveRoom = function(roomname, cbSuccess, cbFailure) {
     this.log('Removing room: ' + roomname);
 
     // Make sure all contents for this room are removed automatically as well.
-    self.RemoveAllContentsFromRoom(roomname, function() {
+    this.RemoveAllContentsFromRoom(roomname, function() {
         ddb.deleteItem(self.ACTIVEROOMS, roomname, null, {}, function(err, res, cap) {
             if (err)
             {
@@ -255,7 +255,7 @@ RoomDatabase.prototype.AddContentToRoom = function(roomname, spotnumber, obj, cb
     delete putobj.cmdtype;
     delete putobj.spotreplace;
 
-    this.log('Adding content to room: ' + roomname + ' in spotnumber: ' + spotnumber);
+//    this.log('Adding content to room: ' + roomname + ' in spotnumber: ' + spotnumber);
 //    console.log('DEBUG:Adding content to room: full validated obj: ', putobj);
 
     ddb.putItem(this.ROOMCONTENTS, putobj, {}, function(err, res, cap) {
@@ -408,8 +408,8 @@ RoomDatabase.prototype.RemoveAllContentsFromRoom = function(roomname, cbSuccess,
             buildup = [];
 
             // If there were no results from the query, then we're all good here. No entries.
-            if (!len) {
-                console.log('RemoveAllContentsFromRoom: No Room contents to delete. SUCCESS.');
+            if (!len && !buildup.length) {
+//                console.log('RemoveAllContentsFromRoom: No Room contents to delete. SUCCESS.');
                 cbSuccess();
                 return true;
             }
@@ -861,7 +861,6 @@ MucRoom.prototype.handlePresence = function(pres) {
         {
             if (this.bSelfDestruct === true && 0 === size(this.participants)) {
                 this.log('OVERSEER: Room destroyed... not trying to rejoin');
-                this.log('          Number of abandoned participants: ' + size(this.participants));
             } else {
                 this.log('We got kicked out...room destroyed? Or we got disconnected??');
                 this.joined = false;
@@ -1204,8 +1203,91 @@ MucRoom.prototype.SaveAllWhiteboards = function(cbSuccess, cbFailure) {
     }
 };
 
+MucRoom.prototype.DeleteRoom = function() {
+    var parts, k;
+    // If anyone is in the room, report them as abandoned and return failure.
+
+    // Check to see that we have a room by that name and see if anyone is in it.
+    // a) room exists.
+    // b) if more than one person & I'm one of them.
+    // c) if more than zero people and I'm *NOT* one of them (recently got kicked out as oddball case.)
+    if ((size(this.participants) > 1 && this.participants[this.nick])
+                    || (size(this.participants > 0) && !this.participants[this.nick])) {
+        this.notifylog('Being requested to delete room [' + this.roomname.split('@')[0] + "] -- but it's not empty. Skipping deletion.");
+        this.log('Being requested to delete room [' + this.roomname.split('@')[0] + "] -- but it's not empty. Skipping deletion.");
+        parts = '';
+
+        for (k in this.participants)
+        {
+            if (this.participants.hasOwnProperty(k)) {
+                // Add in a ',' if we're not first in line.
+                if (parts !== '') {
+                    parts += ', ';
+                }
+
+                parts += k.replace(/\\20/g, ' ');
+            }
+        }
+
+        this.notifylog('OVERSEER: Would have abandoned the following participants: ' + parts);
+        this.log('OVERSEER: Would have abandoned the following participants: ' + parts);
+        return false;
+    }
+
+    this.DeleteAllWhiteboards();
+
+    return true;
+};
+
+MucRoom.prototype.DeleteAllWhiteboards = function() {
+    var k;
+
+    if (!this.roomname) {
+        this.log('ERROR: Cannot delete whiteboards - no roomname to reference.');
+        return false;
+    }
+
+    for (k in this.spotList) {
+        if (this.spotList.hasOwnProperty(k)) {
+            if (this.spotList[k].spottype === 'whiteBoard') {
+                // Now -- load the whiteboard.
+                this.DeleteWhiteboardForSpot(k);
+            }
+        }
+    }
+
+    // Now remove the parent / room folder above those entries.
+    // This is wbDir.
+    if (this.wbDir) {
+        try {
+            fs.rmdirSync(this.wbDir);  // Dont bother to wait. It happens or it doesn't.
+        }
+        catch (e) {
+            this.log('ERROR: DeleteAllWhiteboards: rmdir failed for ' + this.wbDir + ' - not empty? Err: ' + e);
+        }
+    }
+};
+
+MucRoom.prototype.DeleteWhiteboardForSpot = function(spotnumber) {
+    var loc;
+
+    if (!spotnumber || !this.wbDir) {
+        this.log('ERROR: Cannot load whiteboard spot - either no wbDir or no spotnumber given.');
+        return false;
+    }
+
+    loc = this.wbDir + '/' + this.wbFname(spotnumber);
+
+    try {
+        fs.unlinkSync(loc);
+    }
+    catch (e) {
+        this.log('ERROR: DeleteWhiteboardForSpot: Could not remove: ' + loc + ' Err: ' + e);
+    }
+};
+
 MucRoom.prototype.LoadAllWhiteboards = function() {
-    var k, bNumFailed = 0;
+    var k;
 
     if (!this.roomname) {
         this.log('ERROR: Cannot load whiteboards - no roomname to reference.');
@@ -1299,7 +1381,7 @@ MucRoom.prototype.CreateUpdatedImageFromStrokes = function(spotnumber, cbSuccess
     //
     if (this.wbStrokeList[spotnumber] && this.wbStrokeList[spotnumber].strokes.length) {
         fname = this.wbFname(spotnumber);
-        this.log('CreateUpdatedImageFromStrokes: Found ' + this.wbStrokeList[spotnumber].strokes.length + ' strokes. Creating image file: ' + fname);
+//        this.log('CreateUpdatedImageFromStrokes: Found ' + this.wbStrokeList[spotnumber].strokes.length + ' strokes. Creating image file: ' + fname);
 
         attribs_out.strokes = JSON.stringify(this.wbStrokeList[spotnumber]);
     //    this.log('DEBUG: Full stroke list: ' + attribs_out.strokes);
@@ -1310,7 +1392,7 @@ MucRoom.prototype.CreateUpdatedImageFromStrokes = function(spotnumber, cbSuccess
         this.wbStrokeList[spotnumber].strokes = [];
 
         this.canvas[spotnumber].Save(this.wbDir + '/' + fname, function() {
-                console.log('DEBUG: SUCCESS SAVING ' + fname);
+//                console.log('DEBUG: SUCCESS SAVING ' + fname);
                 if (cbSuccess) {
                     cbSuccess('Success Saving: ' + spotnumber);
                 }
@@ -1651,9 +1733,52 @@ MucRoom.prototype.WhiteboardSingleStrokeReflection = function(iq) {
     this.client.send(iq);
 };
 
+MucRoom.prototype.RemoveSpotNumber = function(spotnumber) {
+    var self = this, info = {};
+
+    if (!spotnumber) {
+        throw 'Error: RemoveSpotNumber: spotnumber missing.';
+    }
+
+    info = this.spotList[spotnumber];
+    if (!info) {
+        throw 'Error: RemoveSpotNumber: Unknown spot ' + spotnumber + '. Cannot find in memory database.';
+    }
+
+    switch(info.spottype) {
+        case 'whiteBoard':
+//            console.log('DEBUG: Found whiteboard for removal. Prepping to delete plus image.');
+            if (this.wbStrokeList[info.spotnumber]) {
+                // Need to erase our notion of any strokes for this spot since it is a whiteboard.
+                this.wbStrokeList[info.spotnumber] = {};
+                this.wbStrokeList[info.spotnumber].strokes = [];
+                this.canvas[info.spotnumber] = null;
+            }
+
+            this.DeleteWhiteboardForSpot(info.spotnumber);
+            break;
+        default:
+            break;
+    }
+
+    // Now do the 'typical' items.
+    delete this.spotList[info.spotnumber];
+
+//        console.log(' spotList in: ' + this.roomname + ' is: ', this.spotList);
+
+    // TODO: RMW - Now database this removal in room_contents.
+    if (overseer.roomDB) {
+        overseer.roomDB.RemoveContentFromRoom(this.roomname.split('@')[0], info.spotnumber, function() {
+            return true;
+        }, function(msg) {
+            self.log('AddSpotReflection: ERROR removing from database: ' + msg);
+        });
+    }
+};
+
 MucRoom.prototype.RemoveSpotReflection = function(iq) {
     // Need to pull out the 'info' object - which is the attributes to the 'removespot'
-    var info = {}, self = this;
+    var info = {};
 
     if (iq.getChild('removespot')) {
         info = iq.getChild('removespot').attrs;
@@ -1671,26 +1796,9 @@ MucRoom.prototype.RemoveSpotReflection = function(iq) {
         console.log('iq error going back is:', iq.root().toString());
     }
     else {
+        this.RemoveSpotNumber(info.spotnumber);
+
         this.SendGroupCmd('removespot', info);
-
-        if (this.wbStrokeList[info.spotnumber]) {
-            // Need to erase our notion of any strokes for this spot since it is a whiteboard.
-            this.wbStrokeList[info.spotnumber] = {};
-            this.wbStrokeList[info.spotnumber].strokes = [];
-        }
-
-        delete this.spotList[info.spotnumber];
-
-//        console.log(' spotList in: ' + this.roomname + ' is: ', this.spotList);
-
-        // TODO: RMW - Now database this removal in room_contents.
-        if (overseer.roomDB) {
-            overseer.roomDB.RemoveContentFromRoom(this.roomname.split('@')[0], info.spotnumber, function() {
-                return true;
-            }, function(msg) {
-                self.log('AddSpotReflection: ERROR removing from database: ' + msg);
-            });
-        }
 
         // Prep to reply to the IQ message.
         iq.attrs.to = iq.attrs.from;
@@ -2685,32 +2793,17 @@ function Overseer(user, pw, notifier, bManager, staticRoomList) {
             var mroom = self.MucRoomObjects[roomname],
                 parts, k;
 
-            // Check to see that we have a room by that name and see if anyone is in it.
-            if (mroom && size(mroom.participants) > 1 && mroom.participants[mroom.nick]) {
-                self.notifylog('OVERSEER: Being requested to delete room [' + roomname + "] -- but it's not empty. Skipping deletion.");
-                console.log('OVERSEER: Being requested to delete room [' + roomname + "] -- but it's not empty. Skipping deletion.");
-                parts = '';
-
-                for (k in mroom.participants)
-                {
-                    if (mroom.participants.hasOwnProperty(k)) {
-                        // Add in a ',' if we're not first in line.
-                        if (parts !== '') {
-                            parts += ', ';
-                        }
-
-                        parts += k.replace(/\\20/g, ' ');
-                    }
+            if (mroom) {
+                if (mroom.DeleteRoom()) {
+                    console.log('OVERSEER: Deleting room [' + roomname + ']');
+                    self.destroyRoom(roomname);
                 }
-
-                self.notifylog('OVERSEER: Would have abandoned the following participants: ' + parts);
-                console.log('OVERSEER: Would have abandoned the following participants: ' + parts);
-                return;
+                else {
+                    console.log('OVERSEER: Did not delete room [' + roomname + ']');
+                }
             }
         }
 
-        console.log('OVERSEER: Deleting room [' + roomname + ']');
-        self.destroyRoom(roomname);
     });
 
     eventManager.on('error', function(e) {
@@ -2811,6 +2904,9 @@ Overseer.prototype.destroyRoom = function(roomname) {
                 self.log('OVERSEER: Successfully deleted [' + roomname + ']... removing MucRoomObject');
 
                 self.RemoveTrackedRoom(roomname, function() {}, function() {});
+            }
+            else {
+                self.log('OVERSEER: Error deleting room [' + roomname + ']...' + iq.toString());
             }
         });
     } else {
@@ -3138,10 +3234,13 @@ Overseer.prototype.RemoveTrackedRoom = function(roomname, cbSuccess, cbFailure) 
         });
     }
 
+    // Pseudo-destructor
+    this.MucRoomObjects[roomname].DeleteRoom();
+
     delete this.active_rooms[roomname];
 
     // Clean up the MucRoomObjects pool.
-    self.MucRoomObjects[roomname].pendingDeletion = false;
+    this.MucRoomObjects[roomname].pendingDeletion = false;
     MucroomObjectPool.put(self.MucRoomObjects[roomname]);
     delete self.MucRoomObjects[roomname];
 
@@ -3660,7 +3759,7 @@ if (process.argv.length > 2)
     {
         // Don't start processing args until we get beyond the .js itself.
         if (process.argv.hasOwnProperty(i) && i >= starting_arg) {
-            console.log('DEBUG: processing argv[' + i + '] which is: ' + process.argv[i]);
+//            console.log('DEBUG: processing argv[' + i + '] which is: ' + process.argv[i]);
 
             if (process.argv[i].charAt(0) === '-') {
                 // Allow for '-' or '--' easily...
