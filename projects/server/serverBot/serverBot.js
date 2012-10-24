@@ -101,10 +101,10 @@ RoomDatabase.prototype.log = function(msg) {
 
 RoomDatabase.prototype.notifylog = function(msg) {
     if (this.notifier) {
-        this.notifier.sendMessage(logDate() + ' RoomDatabase: ' + msg);
+        this.notifier.sendMessage(logDate() + ' RoomDatabase: ' + decodeURI(msg));
     }
     else {
-        console.log(logDate() + ' - NULL-NOTIFIER-MESSAGE: RoomDatabase: ' + msg);
+        console.log(logDate() + ' - NULL-NOTIFIER-MESSAGE: RoomDatabase: ' + decodeURI(msg));
     }
 };
 
@@ -728,10 +728,10 @@ MucRoom.prototype.finishInit = function(success, failure) {
 
 MucRoom.prototype.notifylog = function(msg) {
     if (this.notifier) {
-        this.notifier.sendMessage(logDate() + ' @' + this.roomname.split('@')[0] + ': ' + msg);
+        this.notifier.sendMessage(logDate() + ' @' + this.roomname.split('@')[0] + ': ' + decodeURI(msg));
     }
     else {
-        console.log(logDate() + ' - NULL-NOTIFIER-MESSAGE: @' + this.roomname.split('@')[0] + ': ' + msg);
+        console.log(logDate() + ' - NULL-NOTIFIER-MESSAGE: @' + this.roomname.split('@')[0] + ': ' + decodeURI(msg));
     }
 };
 
@@ -1068,7 +1068,7 @@ MucRoom.prototype.printParticipants = function() {
                 parts += ', ';
             }
 
-            parts += k.replace(/\\20/g, ' ');
+            parts += decodeURI(k.replace(/\\20/g, ' '));
             if (this.participants[k].video === 'on') {
                 parts += '(V)';
             }
@@ -2937,10 +2937,10 @@ Overseer.prototype.destroyRoom = function(roomname) {
 
 Overseer.prototype.notifylog = function(msg) {
     if (this.notifier) {
-        this.notifier.sendMessage(logDate() + ' - Overseer: ' + msg);
+        this.notifier.sendMessage(logDate() + ' - Overseer: ' + decodeURI(msg));
     }
     else {
-        console.log(logDate() + ' - Overseer: NULL-NOTIFIER-MESSAGE: ' + msg);
+        console.log(logDate() + ' - Overseer: NULL-NOTIFIER-MESSAGE: ' + decodeURI(msg));
     }
 };
 
