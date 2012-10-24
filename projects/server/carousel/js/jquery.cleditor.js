@@ -918,12 +918,15 @@
       $toolbar.height(hgt);
 
       // Resize the iframe
-      hgt = (/%/.test("" + options.height) ? $main.height() : parseInt(options.height)) - hgt;
-      $frame.width(wid).height(hgt);
+      //hgt = (/%/.test("" + options.height) ? $main.height() : parseInt(options.height)) - hgt;
+      //$frame.width(wid).height(hgt);
+      $frame.css({'width': '100%', 'height': parseInt(100*(editor.$main.height() - $toolbar.height())/editor.$main.height()) + '%'});
 
       // Resize the textarea. IE6 textareas have a 1px top
       // & bottom margin that cannot be removed using css.
-      editor.$area.width(wid).height(ie6 ? hgt - 2 : hgt);
+      //editor.$area.width(wid).height(ie6 ? hgt - 2 : hgt);
+      editor.$area.css({'width': '100%', 'height': parseInt(100*(editor.$main.height() - $toolbar.height())/editor.$main.height()) + '%'});
+      $main.css({'overflow': 'hidden'});
 
       // Switch the iframe into design mode if enabled
       disable(editor, editor.disabled);

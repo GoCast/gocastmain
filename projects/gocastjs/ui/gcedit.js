@@ -40,9 +40,15 @@ GoCastJS.gcEdit.prototype.init = function()
                      return self.updateFrame(code);
                    },
                    controls:     // controls to add to the toolbar
-                    "| | | | | | bullets numbering | cut copy paste pastetext | link unlink print source"
+                    "| | | | | | bullets numbering | pastetext | link unlink print source"
                   })[0];
   this.jqSpot.data('gcEdit', this);
+
+  //if there's any initial editor content in info, use it
+  if (this.info.code) {
+    this.editor.setCode(this.info.code);
+  }
+
   setInterval(this.getTimeoutCallback(), this.timeout);
   /*
   // override mouseover event, prevent showing zoom, trash icons
@@ -81,8 +87,8 @@ GoCastJS.gcEdit.prototype.setScale = function(width, height)
   */
   console.log("gcEdit scale width " + width + " height " + height);
   //this.jqDiv.width(width).height(height);
-  this.div.style.width = width;
-  this.div.style.height = height;
+  this.div.style.width = width + 'px';
+  this.div.style.height = height + 'px';
 };
 ///
 /// \brief get method to send edit updates when timer goes off
@@ -115,7 +121,7 @@ GoCastJS.gcEdit.prototype.sendEdits = function()
 ///
 GoCastJS.gcEdit.prototype.doSpot = function(info)
 {
-  if (info.code)
+  if (info.code && info.from !== app.user.name)
   {
     console.log("gcEdit doSpot ", info);
     this.editor.setCode(info.code);

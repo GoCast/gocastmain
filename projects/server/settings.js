@@ -2,13 +2,6 @@
 
 var settings = {};
 
-//
-// Setup the bare-bones defaults. All of these can be overridden below in DEVEL or NON_DEVEL areas.
-//
-settings.roommanager = {
-    maxparticipants_ceiling: 12
-};
-
 // Features
 //
 // For settings.roommanager:
@@ -30,13 +23,66 @@ settings.roommanager = {
 // Allow for having separate devel settings if an environment variable is set.
 //
 if (process.env.SETTINGS_DEVEL === 1 || process.env.SETTINGS_DEVEL === '1') {
+    console.log('/////////////////////////////////');
+    console.log('// **DEV** SETTINGS ACTIVATED. //');
+    console.log('/////////////////////////////////');
+
+    settings.SERVERNAME = 'dev.gocast.it';
+    settings.SERVERPORT = 5222;
+    settings.CONF_SERVICE = '@conference.dev.gocast.it';
+
     settings.roommanager = {
-        devel: true,
         allow_overflow: true,
         allow_maxparticipants_from_client: true,
-        maxparticipants_ceiling: 25,
-        default_room: 'Lobby'
+        maxparticipants_ceiling: 50,
+        default_room: 'Lobby',
+
+        username: 'roommanager@' + settings.SERVERNAME + '/roommanager',
+        usernametest: 'roommanager@' + settings.SERVERNAME + '/roommanagertest',
+        password: 'being.the.doorman.always',
+
+        wbstoragelocation: '~/wbstorage'
     };
+
+    settings.dynamodb = {
+        endpoint: 'dynamodb.us-west-1.amazonaws.com',
+        accessKeyId: 'AKIAJWJEBZBGT6TPH32A',
+        secretAccessKey: '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',
+        tables: {
+            ACTIVEROOMS: 'dev_active_rooms',
+            ROOMCONTENTS: 'dev_room_contents'
+        }
+    };
+
+    settings.overseer = {
+        username: 'overseer@' + settings.SERVERNAME,
+        password: 'dev.mode.overseer',
+        OVERSEER_NICKNAME: 'dev_overseer'
+    };
+
+    settings.switchboard = {
+        username: 'switchboard_dev@' + settings.SERVERNAME,
+        password: 'dev.lookup.users',
+        APP_ID: '458515917498757',
+        APP_SECRET: 'c3b7a2cc7f462b5e4cee252e93588d45'
+    };
+
+    settings.logcatcher = {
+        username: 'logcatcher@' + settings.SERVERNAME + '/logcatcher',
+        password: 'grab.those.dev.bugreports'
+    };
+
+    settings.feedbackbot = {
+        username: 'feedback_bot_dev@' + settings.SERVERNAME,
+        password: 'feedback.is.good.burp'
+    };
+
+    settings.notifier = {
+        username: 'notifier@' + settings.SERVERNAME,
+        password: 'reporting.lots.to.you',
+        notify_list: ['rwolff@dnle.gocast.it']
+    };
+
 }
 else {
     console.log('/////////////////////////////////////////////////');
@@ -83,13 +129,15 @@ else {
     settings.notifier = {
         username: 'overseer@' + settings.SERVERNAME,
         password: 'the.overseer.rocks',
-        notify_list: ['rwolff@video.gocast.it', 'jim@video.gocast.it']
+        notify_list: ['rwolff@video.gocast.it']
     };
 
     settings.roommanager = {
-        username: 'roommanager@' + settings.SERVERNAME + '/roommanager',
-        usernametest: 'roommanager@' + settings.SERVERNAME + '/roommanagertest',
-        password: 'the.overseer.rocks'
+        username: 'overseer@' + settings.SERVERNAME + '/roommanager',
+        usernametest: 'overseer@' + settings.SERVERNAME + '/roommanagertest',
+        password: 'the.overseer.rocks',
+
+        wbstoragelocation: '~/wbstorage'
     };
 }
 
@@ -147,16 +195,15 @@ if (process.env.STANFORDDNLE === 1 || process.env.STANFORDDNLE === '1') {
     settings.roommanager = {
         allow_overflow: true,
         allow_maxparticipants_from_client: true,
-        maxparticipants_ceiling: 25,
+        maxparticipants_ceiling: 7,
         default_room: 'Lobby',
 
         username: 'roommanager@' + settings.SERVERNAME + '/roommanager',
         usernametest: 'roommanager@' + settings.SERVERNAME + '/roommanagertest',
-        password: 'the.gatekeeper.rules'
+        password: 'the.gatekeeper.rules',
+
+        wbstoragelocation: '~/wbstorage'
     };
-}
-else {
-    console.log('ERROR in settings. Not picked up.');
 }
 
 

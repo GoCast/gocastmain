@@ -47,10 +47,10 @@
  * \brief The main application object.
  */
 var app = {
-  GROUP_CHAT: '#lower-left > #msgBoard',
-  GROUP_CHAT_SHOW: '#lower-left > #showChat',
-  GROUP_CHAT_OUT: '#lower-left > #msgBoard > #chatOut',
-  GROUP_CHAT_IN: '#lower-left > #msgBoard > input.chatTo',
+  GROUP_CHAT: 'div#groupChat > #msgBoard',
+  GROUP_CHAT_SHOW: 'div#groupChat > #showChat',
+  GROUP_CHAT_OUT: 'div#groupChat > #msgBoard > #chatOut',
+  GROUP_CHAT_IN: 'div#groupChat > #msgBoard > input.chatTo',
   MAC_DL_URL: 'https://carousel.gocast.it/downloads/GoCastPlayer.pkg',
   WIN_DL_URL: 'https://carousel.gocast.it/downloads/GoCastPlayer.msi', // todo, link in index.html is used, switch to using this value
   LIN_64_DL_URL: 'https://carousel.gocast.it/downloads/GoCastPlayer_x86_64.tar.gz',
@@ -459,14 +459,21 @@ var app = {
 function onSpotClose(event)
 {
   var spot = $(event.currentTarget).parent(),
-      item = spot.data('item');
+      item = spot.data('item'),
+      reallyClose = true;
 
   console.log("onSpotClose", event);
 
-  if (item.spotnumber){
-    Callcast.RemoveSpot({spotnumber: item.spotnumber || item.index});
-  } else {
-    removeSpotCb({spotnumber: item.index});
+  if ($(spot).hasClass('typeContent')) {
+    reallyClose = confirm('All content in this spot will be lost. Are you sure ?');
+  }
+
+  if (true === reallyClose) {
+    if (item.spotnumber){
+        Callcast.RemoveSpot({spotnumber: item.spotnumber || item.index});
+      } else {
+        removeSpotCb({spotnumber: item.index});
+      }
   }
 
   event.stopPropagation();
@@ -655,7 +662,9 @@ function activateWindow(
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
   if (winId.match('credentials2')) {
-    $('input#name', winId).on('keydown.s04072012', keypressNameHandler);
+    $('input#name', winId).on('keypress.s04072012', keypressNameHandler);
+    $('input#name', winId).on('blur', blurNameHandler);
+    $('input#name', winId).on('focus', focusNameHandler);
     $('a#btn', winId).on('click.s04072012', onJoinNow);
     if ("undefined" !== Storage)
     {
@@ -671,6 +680,12 @@ function activateWindow(
   else if (winId.match('chatInp')) {
     $('input.chatTo', winId).on('keydown.s04172012g', keypressChatHandler);
     $('input.send', winId).on('click.s04172012g', sendChat);
+  }
+  else if (winId.match('errorMsgPlugin')) {
+    $('input#roomname', winId).on('keydown', keydownRoomnameHandler);
+    $('input#roomname', winId).on('keypress', keypressRoomnameHandler);
+    $('input#roomname', winId).on('blur', blurRoomnameHandler);
+    $('input#roomname', winId).on('focus', focusRoomnameHandler);
   }
   return false;
 } /* activateWindow() */
@@ -799,18 +814,28 @@ function carouselItemZoom(event)
 
    // get item and remove it from carousel
    var spot = $(event.currentTarget).parent(),
-       item = $(spot).data('item');
+       item = $(spot).data('item'),
+       gcedit, editorContent;
 
    if (!item) {
     spot = $(event.target).parent();
     item = $(spot).data('item');
    }
 
+  //If spot is editor, save its contents
+  gcedit = $(spot).data('gcEdit');
+  editorContent = '';
+
+  if (gcedit) {
+    editorContent = gcedit.editor.getCode();
+    console.log('carouselItemZoom [resize gcedit]: ' + editorContent);
+  }
+
   app.carousel.remove(item.index);
-  $('#zoom > .close').css({
+  /*$('#zoom > .close').css({
     'top': spot[0].style.top,
     'left': parseFloat(spot[0].style.left) + parseFloat(spot[0].style.width) + 10.0 + 'px'
-  });
+  });*/
 
   $('body > div#upper-right').css({
     'top': $('#zoom').position().top + 'px',
@@ -829,6 +854,12 @@ function carouselItemZoom(event)
           .css("z-index", "100");
    //$('#meeting > #zoom')[0].appendChild(spot[0]); // move div to zoom area, doesn't work with local, remote video spot
 
+  if (gcedit) {
+    $(spot).html('');
+    gcedit = new GoCastJS.gcEdit(spot, gcedit.info);
+    gcedit.editor.setCode(editorContent);
+  }
+
    app.carousel.resize(); // update carousel
    resizeZoom();
 
@@ -845,9 +876,25 @@ function carouselItemUnzoom(event)
    }
 
    $('#meeting > #zoom').css('display', 'none'); // undisplay zoom div
-   var spot = $('#meeting > #zoom > .cloudcarousel');
+   var spot = $('#meeting > #zoom > .cloudcarousel'),
+       gcedit = $(spot).data('gcEdit'),
+       editorContent = '';
+
+  if (gcedit) {
+    editorContent = gcedit.editor.getCode();
+    console.log('carouselItemUnzoom [resize gcedit]: ' + editorContent);
+  }
+
    app.carousel.insertSpot(spot); // put spot back in carousel
    $('#meeting > #streams').css('height', '100%'); // zoom carousel
+
+  if (gcedit) {
+    $(spot).html('<img id="upper-left" class="zoom control" src="images/fullscreen.png" alt="Zoom" title="Zoom" onclick="carouselItemZoom(event);"/>' +
+                 '<img id="upper-right" class="'+ app.spotUrDefaultClass + '" src="' + app.spotUrDefaultImage +'" alt="Close" title="Close" onclick="onSpotClose(event);"/>');
+    gcedit = new GoCastJS.gcEdit(spot, gcedit.info);
+    gcedit.editor.setCode(editorContent);
+  }
+
    //$('body > div#upper-right').css({'top': '10px'});
    $('body > div#upper-right').removeAttr('style');
    $('body > div#upper-left').removeAttr('style');
@@ -1081,6 +1128,88 @@ function promptTour() {
   }
 }
 
+function InvalidNicknameKey(keycode) {
+  return (-1 === [40, 41, 91, 93, 123, 125, 95, 45, 13, 46, 64, 32, 8].indexOf(keycode) &&
+          -1 === [48, 49, 50, 51, 52, 53, 54, 55, 56, 57].indexOf(keycode) &&
+          -1 === [97, 98, 99, 100, 101, 102, 103, 104, 105, 106,
+                 107, 108, 109, 110, 111, 112, 113, 114, 115, 116,
+                 117, 118, 119, 120, 121, 122].indexOf(keycode) &&
+          -1 === [65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75,
+                  76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86,
+                  87, 88, 89, 90].indexOf(keycode));
+}
+
+function InvalidRoomnameKey(keycode) {
+  return (-1 === [40, 41, 91, 93, 123, 125, 95, 45, 13, 46, 13, 32, 8].indexOf(keycode) &&
+          -1 === [48, 49, 50, 51, 52, 53, 54, 55, 56, 57].indexOf(keycode) &&
+          -1 === [97, 98, 99, 100, 101, 102, 103, 104, 105, 106,
+                 107, 108, 109, 110, 111, 112, 113, 114, 115, 116,
+                 117, 118, 119, 120, 121, 122].indexOf(keycode) &&
+          -1 === [65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75,
+                  76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86,
+                  87, 88, 89, 90].indexOf(keycode));
+}
+
+function ComposeRoomLink(roomname) {
+  var roomlink = window.location.pathname;
+
+  if ('' !== roomname) {
+    roomlink += ('?roomname=' + roomname);
+  }
+  history.replaceState(null, null, roomlink);
+}
+
+function keydownRoomnameHandler(event) {
+  var keycode = event.which || event.keyCode,
+      roomname = $(this).val();
+
+  if ('Chrome' === app.browser.name) {
+    if (8 === keycode) {
+      roomname = roomname.substring(0, roomname.length-1);
+      ComposeRoomLink(roomname);
+    } else if (0 <= [37, 38, 39, 40].indexOf(keycode)) {
+      event.preventDefault();
+    }
+  }
+}
+
+function keypressRoomnameHandler(event) {
+  if (event.altKey) {
+    return;
+  }
+
+  if (!event.ctrlKey) {
+    var keycode = event.which || event.keyCode;
+    if (InvalidRoomnameKey(keycode)) {
+      $(this).addClass('invalidkey');
+      event.preventDefault();
+    } else {
+      var roomname = $(this).val();
+      if ('Firefox' === app.browser.name && 8 === keycode) {
+        roomname = roomname.substring(0, roomname.length-1);
+      } else if (13 !== keycode) {
+        roomname = roomname + String.fromCharCode(keycode);
+      }
+      ComposeRoomLink(roomname);
+
+      if ($(this).hasClass('invalidkey')) {
+        $(this).removeClass('invalidkey');
+      }
+    }
+  }
+}
+
+function focusRoomnameHandler() {
+  $('#boxes #errorMsgPlugin > p#roomnamehint').css({'visibility': 'visible'});
+}
+
+function blurRoomnameHandler() {
+  if ($(this).hasClass('invalidkey')) {
+    $(this).removeClass('invalidkey');
+  }
+  $('#boxes #errorMsgPlugin > p#roomnamehint').css({'visibility': 'hidden'});
+}
+
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
  * \brief Keypress for name handler.
@@ -1111,10 +1240,29 @@ function keypressNameHandler(
       onJoinNow();
       break;
     } /* switch (event.which) */
+
+    var keycode = event.which || event.keycode;
+    if (InvalidNicknameKey(keycode)) {
+      $(this).addClass('invalidkey');
+      event.preventDefault();
+    } else {
+      if ($(this).hasClass('invalidkey')) {
+        $(this).removeClass('invalidkey');
+      }
+    }
   }
 } /* keypressNameHandler() */
 
+function focusNameHandler() {
+  $('#boxes #credentials2 > p#nickhint').css({'visibility': 'visible'});
+}
 
+function blurNameHandler() {
+  if ($(this).hasClass('invalidkey')) {
+    $(this).removeClass('invalidkey');
+  }
+  $('#boxes #credentials2 > p#nickhint').css({'visibility': 'hidden'});
+}
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
@@ -1487,7 +1635,9 @@ function deactivateWindow(
     /*
      * Remove any message. */
     $('p.login-error', winId).hide().text('');
-    $('input#name', winId).off('keydown.s04072012', keypressNameHandler);
+    $('input#name', winId).off('keypress.s04072012', keypressNameHandler);
+    $('input#name', winId).off('blur', blurNameHandler);
+    $('input#name', winId).off('focus', focusNameHandler);
     $('a#btn', winId).off('click.s04072012', onJoinNow);
   }
   else if (winId.match('meeting')) {
@@ -1499,6 +1649,12 @@ function deactivateWindow(
   else if (winId.match('chatInp')) {
     $('input.chatTo', winId).off('keydown.s04172012g', keypressChatHandler);
     $('input.send', winId).off('click.s04172012g', sendChat);
+  }
+  else if (winId.match('errorMsgPlugin')) {
+    $('input#roomname', winId).off('keydown', keydownRoomnameHandler);
+    $('input#roomname', winId).off('keypress', keypressRoomnameHandler);
+    $('input#roomname', winId).off('blur', blurRoomnameHandler);
+    $('input#roomname', winId).off('focus', focusRoomnameHandler);
   }
   return false;
 } /* deactivateWindow() */
@@ -1628,7 +1784,8 @@ function resizeZoom(event)
 {
    var jqDiv = $('#meeting > #zoom > .cloudcarousel'),
        wbCanvas = $("#wbCanvas", jqDiv), // todo better wb access
-       wb       = wbCanvas.data("wb"),
+       wb       = wbCanvas.data('wb'),
+       edit     = jqDiv.data('gcEdit'),
        width, height, item, newWidth, newHeight,
        widthScale, heightScale, scale, left, top;
    if (jqDiv.length > 0)
@@ -1648,6 +1805,8 @@ function resizeZoom(event)
       if (wb) // todo better wb access
       {
         wb.setScale(item.plgOrgWidth, item.plgOrgHeight);
+      } else if (edit) {
+        edit.setScale(item.plgOrgWidth, item.plgOrgHeight);
       }
 
       // center div in zoom div
@@ -1660,9 +1819,14 @@ function resizeZoom(event)
       $(jqDiv).css('top', top + 'px');
 
       $('#zoom > .close').css({
-        'top': (top + 10.0) + 'px',
         'left': (left + 10.0) + 'px'
       });
+
+      if ($(jqDiv).hasClass('editor')) {
+        $('#zoom > .close').css({'bottom': '10px'});
+      } else {
+        $('#zoom > .close').css({'top': (top + 10.0) + 'px'});
+      }
    }
 }
 
@@ -1841,7 +2005,7 @@ function handleRoomSetup() {
     var errorMsg;
     if ($(iq).find('roomfull'))
     {
-      errorMsg = "Sorry the room " + room_to_create + " is full you can not enter it.";
+      errorMsg = "Sorry, the room " + room_to_create + " is full. Please try again later.";
     }
     else
     {
@@ -2150,6 +2314,24 @@ function uiInit()
   jqChatIn.attr("title", jqChatIn.attr("title") + " " + app.altKeyName + "+C"); // set chat in tooltip key accel
 }
 
+function InvalidRoomname(roomname) {
+  var invalid = false;
+
+  if ('undefined' === typeof(roomname)) {
+    return false;
+  }
+
+  if (null === roomname || '' === roomname || 32 < roomname.length) {
+    return true;
+  }
+
+  roomname.split('').forEach(function(key) {
+    invalid = invalid || InvalidRoomnameKey(key.charCodeAt());
+  });
+
+  return invalid;
+}
+
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
  * \brief The document ready event handler.
@@ -2175,6 +2357,16 @@ $(document).ready(function(
                         SWITCHBOARD_FB: 'switchboard_dnle@dnle.gocast.it',
                         LOGCATCHER: 'logcatcher@dnle.gocast.it/logcatcher'});
   }
+  else if (window.location.hostname.toLowerCase() === 'dev.gocast.it') {
+    Callcast.InitOverride({ CALLCAST_XMPPSERVER: 'dev.gocast.it',
+                        CALLCAST_ROOMS: 'conference.dev.gocast.it',
+                        AT_CALLCAST_ROOMS: '@conference.dev.gocast.it',
+                        STUNSERVER: 'dev.gocast.it', STUNSERVERPORT: 19302,
+                        FEEDBACK_BOT: 'feedback_bot_dev@dev.gocast.it',
+                        ROOMMANAGER: 'roommanager@dev.gocast.it/roommanager',
+                        SWITCHBOARD_FB: 'switchboard_dev@dev.gocast.it',
+                        LOGCATCHER: 'logcatcher@dev.gocast.it/logcatcher'});
+  }
 
   openWindow('#waitingToJoin');
   var unmaskTimer = setInterval(function() {
@@ -2191,24 +2383,34 @@ $(document).ready(function(
     // Check the browser.
     app.getBrowser();
     if (app.checkBrowser()) {
-      // login callback
-      $(document).bind('checkCredentials', checkCredentials);
+      if (InvalidRoomname(decodeURI($.getUrlVar('roomname')))) {
+        closeWindow();
+        openWindow('#errorMsgPlugin');
+        $('#errorMsgPlugin > button').css({'display': 'none'});
+        $('#errorMsgPlugin > h1').text('Invalid Roomname!');
+        $('#errorMsgPlugin > p#prompt').css({'display': 'none'});
+        $('#errorMsgPlugin > input#roomname').css({'display': 'block'});
+        $('#errorMsgPlugin > button#reload').css({'display': 'block'});
+      } else {
+        // login callback
+        $(document).bind('checkCredentials', checkCredentials);
 
-      uiInit(); // init user interface
-      fbInit(); // init facebook api
+        uiInit(); // init user interface
+        fbInit(); // init facebook api
 
-      // Login to xmpp anonymously
-      Callcast.connect(Callcast.CALLCAST_XMPPSERVER, '');
+        // Login to xmpp anonymously
+        Callcast.connect(Callcast.CALLCAST_XMPPSERVER, '');
 
-      // Write greeting into console.
-      app.log(2, 'Page loaded.');
+        // Write greeting into console.
+        app.log(2, 'Page loaded.');
 
-      Callcast.setCallbackForCallback_OnNicknameInUse(function(nick) {
-        app.nickInUse(nick);
-      });
+        Callcast.setCallbackForCallback_OnNicknameInUse(function(nick) {
+          app.nickInUse(nick);
+        });
 
-      // set the connection status callback
-      Callcast.setCallbackForCallback_ConnectionStatus(connectionStatus);
+        // set the connection status callback
+        Callcast.setCallbackForCallback_ConnectionStatus(connectionStatus);        
+      }
     }
   }, function() {
     closeWindow();
@@ -2393,18 +2595,26 @@ function sendLog()
     window.localStorage.stopSendLogPrompt = checked; // set localstorage
   }
 
+  app.log(2, 'SENDLOG_USERCOMMENT: ' + $('textarea', app.SENDLOG_PROMPT).val());
+  $('textarea', app.SENDLOG_PROMPT).val('');
+
   jqDlg.css('background-image', 'url(images/waiting-trans.gif)');
-  $('#message', jqDlg).text('Sending log file to server.');
+  $(jqDlg)
+  $('#message', jqDlg).text('Sending log file to GoCast...');
   $('#stop-showing', jqDlg).css('display', 'none');
   $('#stop-showing-text', jqDlg).css('display', 'none');
+  $('img.close', jqDlg).css('display', 'none');
   Callcast.SendLogsToLogCatcher(function()
   {
     // success callback
-    jqDlg.css("display", "none");
+    $('#message', jqDlg).text('Sending log file to GoCast... DONE.');
+    setTimeout(function() {jqDlg.css("display", "none")}, 1000);
     console.log("SendLogsToLogCatcher success", jqDlg);
   },
   function() // fail callback
   {
+    $('#message', jqDlg).text('Sending log file to GoCast... FAILED.');
+    setTimeout(function() {jqDlg.css("display", "none")}, 1000);
     Callcast.SendLiveLog("SendLogsToLogCatcher failed");
   });
 }
@@ -2497,13 +2707,15 @@ function startTour(tourSelector) {
     '#lower-right > input#addWhiteBoard',
     '.whiteBoard > .wbDiv > div#wbTools',
     '.whiteBoard > .zoom, #zoom > .close',
-    '#lower-left > div#msgBoard > input.chatTo',
+    '#lower-right > input#addEditor',
+    'div#groupChat > div#msgBoard > input.chatTo',
     '#upper-right > input[class*=fb], #upper-right > input[class*=copyData]',
     '#upper-left > div#feedback'
   ], tourDescriptions = [
     {title:       'The GoCast Carousel',
      description: 'The "go" spots on the Carousel are placeholders for people and for shared content. ' +
-                  'You can rotate the Carousel with the left/right arrow keys on your keyboard or with your mouse wheel. <p></p>Try it. ' +
+                  'You can rotate the Carousel with the rotate buttons in the lower left hand corner of your screen. ' +
+                  'You can also use the left/right arrow keys on your keyboard or with your mouse wheel. <p></p>Try it. ' +
                   '<p></p>Your preview, below, shows how others see you.'},
     {title:       'Choosing Video Effects',
      description: 'The three flashing icons on your preview apply effects to your video feed. You can switch ' +
@@ -2524,8 +2736,13 @@ function startTour(tourSelector) {
      description: 'Hover your mouse over the whiteboard and click the flashing zoom icon, upper left hand corner, to expand it. ' +
                   'Notice that the Carousel, flattened above the whiteboard, can still be moved with your arrow keys. ' +
                   'To shrink the whiteboard click on the flashing icon, upper left.'},
+    {title:       'Collaborative Editor',
+     description: 'The flashing editor icon on the lower right hand corner of your screen lets you add a basic text editor to the carousel. ' +
+                  'Any changes to the editor\'s content is reflected to everyone in the room.' +
+                  '<p></p>Try it. <p></p>NOTE: As of now, you can edit with other people in the room as long as its done one at a time. ' +
+                  'If two or more people try to edit at the same time, one or more of the attempted changes might be lost.'},
     {title:       'Posting Comments To The Room',
-     description: 'The flashing comments bar in the lower left hand corner of the screen is the place where you can make a comment to the room. ' +
+     description: 'The flashing comments bar is the place where you can make a comment to the room. ' +
                   'Click in the text box to type. Click the Post button - or the Return key - and your comments will be displayed. ' +
                   '<p></p>Try it.'},
     {title:       'Inviting Others To The Room',
