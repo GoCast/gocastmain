@@ -147,7 +147,7 @@ RoomDatabase.prototype.LoadRooms = function(cbSuccess, cbFailure) {
 RoomDatabase.prototype.AddRoom = function(roomname, obj, cbSuccess, cbFailure) {
     var self = this;
 
-    this.log('Adding room: ' + (roomname || obj.roomname));
+//    this.log('Adding room: ' + (roomname || obj.roomname));
 
     if (!obj.roomname && roomname) {
         obj.roomname = roomname;
@@ -304,11 +304,11 @@ RoomDatabase.prototype.LoadContentsFromDBForRoom = function(roomname, cbSuccess,
             // If there were no results from the query, then we're all good here. No entries.
             if (!len) {
                 if (buildup.length) {
-                    console.log('LoadContentsFromDBForRoom: SUCCESS. Loaded ' + buildup.length + ' spots for room: ' + roomname);
+//                    console.log('LoadContentsFromDBForRoom: SUCCESS. Loaded ' + buildup.length + ' spots for room: ' + roomname);
                     cbSuccess(buildup);
                 }
                 else {
-                    console.log('LoadContentsFromDBForRoom: No Room contents to load in ' + roomname + '. SUCCESS.');
+//                    console.log('LoadContentsFromDBForRoom: No Room contents to load in ' + roomname + '. SUCCESS.');
                     cbSuccess();
                 }
                 return true;
@@ -329,9 +329,7 @@ RoomDatabase.prototype.LoadContentsFromDBForRoom = function(roomname, cbSuccess,
                 }, batchDelay);
             }
             else {
-                console.log('LoadContentsFromDBForRoom: SUCCESS. Loaded ' + buildup.length + ' spots for room: ' + roomname);
-//                console.log('LoadContentsFromDBForRoom: Calling back with: ', buildup);
-
+//                console.log('LoadContentsFromDBForRoom: SUCCESS. Loaded ' + buildup.length + ' spots for room: ' + roomname);
                 cbSuccess(buildup);
             }
         }
@@ -353,6 +351,8 @@ RoomDatabase.prototype.LoadContentsFromDBForRoom = function(roomname, cbSuccess,
 
 RoomDatabase.prototype.RemoveContentFromRoom = function(roomname, spotnumber, cbSuccess, cbFailure) {
     var self = this;
+
+    spotnumber = spotnumber.toString();
 
     if (!this.roomList[roomname]) {
         this.log('RemoveContentFromRoom: ERROR: roomname [' + roomname + '] doesnt exist yet. Cannot remove contents.');
@@ -463,7 +463,7 @@ RoomDatabase.prototype.RemoveAllContentsFromRoom = function(roomname, cbSuccess,
         return false;
     }
 
-    this.log('Removing ALL contents from room: ' + roomname);
+//    this.log('Removing ALL contents from room: ' + roomname);
 
     options = { limit: maxPerBatch, attributesToGet: ['roomname', 'spotnumber'] };
 
@@ -480,7 +480,20 @@ RoomDatabase.prototype.RemoveAllContentsFromRoom = function(roomname, cbSuccess,
 function MucRoom(client, notifier, opts, success, failure) {
     // -- Handle room create request --
     this.bNewRoom = false;
-    this.bSelfDestruct = opts.bSelfDestruct || false;
+
+    // opts is only used when 'new MucRoom()' is done manually. If a MucRoom is retrieved
+    // from the heap of objects, then new opts are used. So, this is sorta going away over
+    // time. For now, if opts.* is used, then override other defaults.
+    if (opts.bSelfDestruct === true || opts.bSelfDestruct === false) {
+        this.bSelfDestruct = opts.bSelfDestruct;
+    }
+    else {
+        this.bSelfDestruct = !settings.roommanager.persist;
+    }
+//    console.log('DEBUG: MucRoom() - opts:', opts);
+//    console.log('DEBUG: MucRoom() - settings.roommanager.persist=' + settings.roommanager.persist);
+//    console.log('DEBUG: MucRoom() - bSelfDestruct=' + this.bSelfDestruct);
+
     this.successCallback = success || null;
     this.failureCallback = failure || null;
     this.presenceTimer = null;
@@ -676,6 +689,8 @@ MucRoom.prototype.reset = function() {
     this.iqnum = 0;
     this.pendingDeletion = false;
 
+    this.bSelfDestruct = !settings.roommanager.persist;
+
     this.spotList = {};
     this.spotStorage = {};
     this.wbStrokeList = {};
@@ -736,7 +751,7 @@ MucRoom.prototype.getRoomConfiguration = function(cb) {
     getRoomConf = new xmpp.Element('iq', {to: this.roomname, type: 'get'})
         .c('query', {xmlns: 'http://jabber.org/protocol/muc#owner'});
 
-    this.log('Requesting room configuration... ');
+//    this.log('Requesting room configuration... ');
     // DEBUG
 //    this.log(getRoomConf.tree());
 
@@ -826,11 +841,11 @@ MucRoom.prototype.handlePresence = function(pres) {
 
                 return;
             }
-            this.log('Adding: ' + fromjid + ' as Nickname: ' + fromnick);
+            this.log('Adding: ' + fromjid + ' as Nickname: ' + decodeURI(fromnick));
             this.SendSpotListTo(pres.attrs.from);
         }
         else {
-            this.log('Updated Presence: ' + fromjid + ' as Nickname: ' + fromnick);
+            this.log('Updated Presence: ' + fromjid + ' as Nickname: ' + decodeURI(fromnick));
         }
 
         this.participants[fromnick] = { name: fromjid || fromnick };
@@ -898,7 +913,7 @@ MucRoom.prototype.handlePresence = function(pres) {
             if (this.bSelfDestruct === true)
             {
                 if (1 === size(this.participants) && this.participants[this.nick]) {
-                    this.log('OVERSEER: (A-timer) Everybody else has left room [' + this.roomname.split('@')[0] + ']... wait 60 sec...');
+//                    this.log('OVERSEER: (A-timer) Everybody else has left room [' + this.roomname.split('@')[0] + ']... wait 60 sec...');
 
                     if (this.presenceTimer)
                     {
@@ -908,7 +923,7 @@ MucRoom.prototype.handlePresence = function(pres) {
                     }
 
                     this.presenceTimer = setTimeout(function() {
-                        self.log('OVERSEER: (A-timer) No one in room [' + self.roomname.split('@')[0] + '] after 60 seconds :( ...');
+                        self.log('OVERSEER: (A-timer) No one in room [' + self.roomname.split('@')[0] + '] after 60 seconds ... destroying.');
                         eventManager.emit('destroyroom', self.roomname.split('@')[0]);
                     }, 60000);
                 }
@@ -950,16 +965,16 @@ MucRoom.prototype.handlePresence = function(pres) {
 
                     if (0 === size(this.participants))
                     {
-                        this.log('OVERSEER: (B-timer) Just joined room [' + this.roomname.split('@')[0] + '] - waiting for others...');
+//                        this.log('OVERSEER: (B-timer) Just joined room [' + this.roomname.split('@')[0] + '] - waiting for others...');
 
                         this.presenceTimer = setTimeout(function() {
-                            self.log('OVERSEER: (B-timer) New room [' + self.roomname.split('@')[0] + '] entered - no entrants...No joined new room after 30 seconds :( ...');
+                            self.log('OVERSEER: (B-timer) New room [' + self.roomname.split('@')[0] + '] - No one joined within 30 seconds. Destroying.');
                             eventManager.emit('destroyroom', self.roomname.split('@')[0]);
                         }, 30000);
                     }
-                    else {
-                        this.log('OVERSEER: (B-timer) - Someone already in the room. All good. Moving forward.');
-                    }
+//                    else {
+//                        this.log('OVERSEER: (B-timer) - Someone already in the room. All good. Moving forward.');
+//                    }
                 }
             }
 
@@ -976,7 +991,7 @@ MucRoom.prototype.handlePresence = function(pres) {
                 // Used to call it on recognizing it was a new room but that caused two getRoomConfiguration() calls
                 // which is wasteful to server resources.
                 if (self.bNewRoom) {
-                    self.log('Got room configuration. Going for setup.');
+//                    self.log('Got room configuration. Going for setup.');
                     self.setupRoom(form);
                 }
 
@@ -1241,6 +1256,10 @@ MucRoom.prototype.DeleteRoom = function() {
 
 MucRoom.prototype.DeleteAllWhiteboards = function() {
     var k;
+
+//DEBUG:
+//    try { throw new Error('bogus'); } catch (edbg) { console.log('DeleteAllWhiteboards: Stack: ', edbg.stack); }
+//DEBUG:
 
     if (!this.roomname) {
         this.log('ERROR: Cannot delete whiteboards - no roomname to reference.');
@@ -2029,7 +2048,7 @@ MucRoom.prototype.setupRoom = function(form) {
             // Handle the response to the room setup.
             if (resp.attrs.type === 'result')
             {
-                self.log('Room setup successful.');
+//                self.log('Room setup successful.');
 
                 if (self.successCallback) {
                     self.successCallback();
@@ -2041,7 +2060,7 @@ MucRoom.prototype.setupRoom = function(form) {
 
                 if (self.bSelfDestruct === true)
                 {
-                    self.log('OVERSEER: (C-timer) Room setup - no one else in room [' + self.roomname.split('@')[0] + '] yet. Should be soon. Waiting...');
+//                    self.log('OVERSEER: (C-timer) Room setup - no one else in room [' + self.roomname.split('@')[0] + '] yet. Should be soon. Waiting...');
 
                     if (self.presenceTimer)
                     {
@@ -2051,7 +2070,7 @@ MucRoom.prototype.setupRoom = function(form) {
                     }
 
                     self.presenceTimer = setTimeout(function() {
-                        self.log('OVERSEER: (C-timer) After Init-Room [' + self.roomname.split('@')[0] + '] - No one in room after 30 seconds :( ...');
+                        self.log('OVERSEER: (C-timer) After Init-Room [' + self.roomname.split('@')[0] + '] - No one entered within 30 seconds. Destroying.');
                         eventManager.emit('destroyroom', self.roomname.split('@')[0]);
                     }, 30000);
                 }
@@ -2602,7 +2621,7 @@ var MucroomObjectPool = {
 
     get: function() {
         if (0 === this.objPool.length) {
-            this.objPool.push(new MucRoom(this.client, this.notifier, { bSelfDestruct: true }));
+            this.objPool.push(new MucRoom(this.client, this.notifier, {}));
         }
 
         return this.objPool.pop();
@@ -2787,23 +2806,19 @@ function Overseer(user, pw, notifier, bManager, staticRoomList) {
     });
 
     // Overseer events
-    eventManager.on('destroyroom', function(roomname, force) {
-        if (!force)     // Sanity check no one is present unless 'force' is true.
-        {
-            var mroom = self.MucRoomObjects[roomname],
-                parts, k;
+    eventManager.on('destroyroom', function(roomname) {
+        var mroom = self.MucRoomObjects[roomname],
+            parts, k;
 
-            if (mroom) {
-                if (mroom.DeleteRoom()) {
-                    console.log('OVERSEER: Deleting room [' + roomname + ']');
-                    self.destroyRoom(roomname);
-                }
-                else {
-                    console.log('OVERSEER: Did not delete room [' + roomname + ']');
-                }
+        if (mroom) {
+            if (mroom.DeleteRoom()) {
+                console.log('OVERSEER: Deleting room [' + roomname + ']');
+                self.destroyRoom(roomname);
+            }
+            else {
+                console.log('OVERSEER: Did not delete room [' + roomname + ']');
             }
         }
-
     });
 
     eventManager.on('error', function(e) {
@@ -3160,26 +3175,28 @@ Overseer.prototype.AddTrackedRoom = function(roomname, obj, cbSuccess, cbFailure
     var self = this;
 
     if (this.active_rooms[roomname] && this.MucRoomObjects[roomname]) {
-        this.log('WARNING: Room already present: ' + roomname);
-        cbSuccess('WARNING: Room already present: ' + roomname);
+        this.log('WARNING: AddTrackedRoom - Ignoring - Room already present: ' + roomname);
+        cbSuccess('WARNING: AddTrackedRoom - Ignoring - Room already present: ' + roomname);
         return true;
     }
 
+    this.MucRoomObjects[roomname] = MucroomObjectPool.get();
+
     if (obj) {
- //       this.log('Adding room ' + roomname + ' with object: ', obj);
         this.active_rooms[roomname] = obj;
         delete this.active_rooms[roomname].roomname;
     }
     else {
-        this.active_rooms[roomname] = { persistent: 0 };
+        this.active_rooms[roomname] = { persistent: this.MucRoomObjects[roomname].bSelfDestruct ? 0 : 1 };
     }
 
-    this.MucRoomObjects[roomname] = MucroomObjectPool.get();
-    if (this.active_rooms[roomname].persistent) {
+    if (this.active_rooms[roomname].persistent === 1) {
         this.MucRoomObjects[roomname].bSelfDestruct = false;
+    } else if (this.active_rooms[roomname].persistent === 0) {
+        this.MucRoomObjects[roomname].bSelfDestruct = true;
     }
 
-    console.log('Overseer: Adding room ' + roomname + '. New Roomlist=', this.active_rooms);
+//    console.log('Overseer: Adding room ' + roomname + '. New Roomlist=', this.active_rooms);
 
     if (this.roomDB && !bSkipDBPortion) {
         this.roomDB.AddRoom(roomname, this.active_rooms[roomname], function() {
@@ -3233,9 +3250,6 @@ Overseer.prototype.RemoveTrackedRoom = function(roomname, cbSuccess, cbFailure) 
             cbFailure('ERROR: RemoveRoom failed.');
         });
     }
-
-    // Pseudo-destructor
-    this.MucRoomObjects[roomname].DeleteRoom();
 
     delete this.active_rooms[roomname];
 
@@ -3311,11 +3325,23 @@ Overseer.prototype.CreateRoomRequest = function(iq) {
     var newRoomname, roomname = iq.getChild('room').attr('name'),
         maxParticipantsRequested = iq.getChild('room').attr('maxparticipants'),
         self = this,
-        iqResult;
+        iqResult, bUsingDefaultRoom = false, addRoomOptions = null;
 
+    //
+    // Default rooms have special handling - name and persistence.
+    //
     if (roomname === '' && settings.roommanager.default_room) {
+        bUsingDefaultRoom = true;
         // Case where we always dump people into a particular room.
         roomname = settings.roommanager.default_room.toLowerCase();
+
+//        console.log('DEBUG: Using default room starting with: ' + roomname);
+
+        // Now - in the case of a default room, there is an option for persistence to be 'different'
+        if (settings.roommanager.default_room_persist === true || settings.roommanager.default_room_persist === false) {
+//            console.log('DEBUG: default room persistence override is: ' + settings.roommanager.default_room_persist);
+            addRoomOptions = { persistent: settings.roommanager.default_room_persist === true ? 1 : 0 };
+        }
     }
 
     // If client wants a random room generated, they will send the attribute with a "" value.
@@ -3358,7 +3384,7 @@ Overseer.prototype.CreateRoomRequest = function(iq) {
         // Need to track rooms created, their status (including things like persistence)
         // and eventually database that information too.
         //
-        this.AddTrackedRoom(roomname, null, function() {
+        this.AddTrackedRoom(roomname, addRoomOptions, function() {
                 var iqResult = new xmpp.Element('iq', {to: iq.attrs.from, type: 'result', id: iq.attrs.id})
                                     .c('ok', {xmlns: 'urn:xmpp:callcast', name: roomname});
                 self.client.send(iqResult.root());
@@ -3783,6 +3809,18 @@ if (process.argv.length > 2)
 }
 
 testWhiteboardLocation();
+
+/////////////////////////////
+/////////////////////////////
+// Deal with any default non-specified settings.
+/////////////////////////////
+/////////////////////////////
+
+// If 'persist' is not specified for the room manager, then default to non-persistent
+if (settings.roommanager.persist !== true && settings.roommanager.persist !== false) {
+    console.log('DEBUG: no setting for settings.roommanager.persist - setting to false.');
+    settings.roommanager.persist = false;
+}
 
 console.log('****************************************************');
 console.log('****************************************************');

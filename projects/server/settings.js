@@ -32,10 +32,12 @@ if (process.env.SETTINGS_DEVEL === 1 || process.env.SETTINGS_DEVEL === '1') {
     settings.CONF_SERVICE = '@conference.dev.gocast.it';
 
     settings.roommanager = {
+        persist: true,      // Normally rooms are non-persistent.
         allow_overflow: true,
         allow_maxparticipants_from_client: true,
         maxparticipants_ceiling: 50,
         default_room: 'Lobby',
+        default_room_persist: false,
 
         username: 'roommanager@' + settings.SERVERNAME + '/roommanager',
         usernametest: 'roommanager@' + settings.SERVERNAME + '/roommanagertest',
@@ -193,10 +195,12 @@ if (process.env.STANFORDDNLE === 1 || process.env.STANFORDDNLE === '1') {
     };
 
     settings.roommanager = {
+        persist: true,      // Normally rooms are non-persistent.
         allow_overflow: true,
         allow_maxparticipants_from_client: true,
         maxparticipants_ceiling: 7,
         default_room: 'Lobby',
+        default_room_persist: false,
 
         username: 'roommanager@' + settings.SERVERNAME + '/roommanager',
         usernametest: 'roommanager@' + settings.SERVERNAME + '/roommanagertest',
