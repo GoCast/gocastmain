@@ -2,13 +2,6 @@
 
 var settings = {};
 
-//
-// Setup the bare-bones defaults. All of these can be overridden below in DEVEL or NON_DEVEL areas.
-//
-settings.roommanager = {
-    maxparticipants_ceiling: 12
-};
-
 // Features
 //
 // For settings.roommanager:
@@ -39,14 +32,18 @@ if (process.env.SETTINGS_DEVEL === 1 || process.env.SETTINGS_DEVEL === '1') {
     settings.CONF_SERVICE = '@conference.dev.gocast.it';
 
     settings.roommanager = {
+        persist: true,      // Normally rooms are non-persistent.
         allow_overflow: true,
         allow_maxparticipants_from_client: true,
-        maxparticipants_ceiling: 25,
+        maxparticipants_ceiling: 50,
         default_room: 'Lobby',
+        default_room_persist: false,
 
         username: 'roommanager@' + settings.SERVERNAME + '/roommanager',
         usernametest: 'roommanager@' + settings.SERVERNAME + '/roommanagertest',
-        password: 'being.the.doorman.always'
+        password: 'being.the.doorman.always',
+
+        wbstoragelocation: '~/wbstorage'
     };
 
     settings.dynamodb = {
@@ -140,7 +137,9 @@ else {
     settings.roommanager = {
         username: 'overseer@' + settings.SERVERNAME + '/roommanager',
         usernametest: 'overseer@' + settings.SERVERNAME + '/roommanagertest',
-        password: 'the.overseer.rocks'
+        password: 'the.overseer.rocks',
+
+        wbstoragelocation: '~/wbstorage'
     };
 }
 
@@ -196,18 +195,19 @@ if (process.env.STANFORDDNLE === 1 || process.env.STANFORDDNLE === '1') {
     };
 
     settings.roommanager = {
+        persist: true,      // Normally rooms are non-persistent.
         allow_overflow: true,
         allow_maxparticipants_from_client: true,
         maxparticipants_ceiling: 7,
         default_room: 'Lobby',
+        default_room_persist: false,
 
         username: 'roommanager@' + settings.SERVERNAME + '/roommanager',
         usernametest: 'roommanager@' + settings.SERVERNAME + '/roommanagertest',
-        password: 'the.gatekeeper.rules'
+        password: 'the.gatekeeper.rules',
+
+        wbstoragelocation: '~/wbstorage'
     };
-}
-else {
-    console.log('ERROR in settings. Not picked up.');
 }
 
 

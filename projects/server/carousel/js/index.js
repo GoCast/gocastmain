@@ -817,7 +817,8 @@ function carouselItemZoom(event)
 
    // get item and remove it from carousel
    var spot = $(event.currentTarget).parent(),
-       item = $(spot).data('item');
+       item = $(spot).data('item'),
+       gcedit, editorContent;
 
    if (!item) {
     spot = $(event.target).parent();
@@ -825,8 +826,8 @@ function carouselItemZoom(event)
    }
 
   //If spot is editor, save its contents
-  var gcedit = $(spot).data('gcEdit'),
-      editorContent = '';
+  gcedit = $(spot).data('gcEdit');
+  editorContent = '';
 
   if (gcedit) {
     editorContent = gcedit.editor.getCode();
@@ -878,10 +879,9 @@ function carouselItemUnzoom(event)
    }
 
    $('#meeting > #zoom').css('display', 'none'); // undisplay zoom div
-   var spot = $('#meeting > #zoom > .cloudcarousel');
-
-  var gcedit = $(spot).data('gcEdit'),
-      editorContent = '';
+   var spot = $('#meeting > #zoom > .cloudcarousel'),
+       gcedit = $(spot).data('gcEdit'),
+       editorContent = '';
 
   if (gcedit) {
     editorContent = gcedit.editor.getCode();
@@ -2008,7 +2008,7 @@ function handleRoomSetup() {
     var errorMsg;
     if ($(iq).find('roomfull'))
     {
-      errorMsg = "Sorry the room " + room_to_create + " is full you can not enter it.";
+      errorMsg = "Sorry, the room " + room_to_create + " is full. Please try again later.";
     }
     else
     {

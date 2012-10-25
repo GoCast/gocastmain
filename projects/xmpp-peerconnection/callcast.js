@@ -277,7 +277,7 @@ var Callcast = {
 
                 // Otherwise we're good to assign it the override.
                 this[k] = obj[k];
-                this.log('InitOverride: Property ' + k + ' has a new value of ' + obj[k]);
+//                this.log('InitOverride: Property ' + k + ' has a new value of ' + obj[k]);
             }
         }
 
@@ -1491,7 +1491,7 @@ var Callcast = {
                     });
                 });
 
-                Callcast.log('Processing cmd: ', items[i]);
+//                Callcast.log('Processing cmd: ', items[i]);
 //                Callcast.log('info is: ', info);
                 cmdtype = $(items[i]).attr('cmdtype');
 
@@ -1500,7 +1500,7 @@ var Callcast = {
                 // Now we need to add the current 'items[i]' into the mix as a child.
                 $(newmsg).append(items[i]);
 
-                Callcast.log('Newly constituted message: ', newmsg);
+//                Callcast.log('Newly constituted message: ', newmsg);
 
                 switch (cmdtype)
                 {
@@ -1514,7 +1514,7 @@ var Callcast = {
                     ret = Callcast.on_url_render(newmsg);
                     break;
                 case 'addspot':
-                    Callcast.log('addspot: Received object: ', info);
+//                    Callcast.log('addspot: Received object: ', info);
                     if (Callcast.Callback_AddSpot) {
                         Callcast.Callback_AddSpot(info);
                     }
@@ -1527,7 +1527,7 @@ var Callcast = {
                     ret = true;
                     break;
                 case 'setspot':
-                    Callcast.log('setspot: Received object: ', info);
+//                    Callcast.log('setspot: Received object: ', info);
                     if (Callcast.Callback_SetSpot) {
                         Callcast.Callback_SetSpot(info);
                     }
