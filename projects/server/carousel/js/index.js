@@ -308,11 +308,22 @@ var app = {
     }
   },
 
+  leaveSessionCb: function() {
+    return function() {
+      if ('undefined' !== typeof(Storage)) {
+        if (app.user.fbSkipped) {
+          window.localStorage.gcpReloadNickName = app.user.name;
+          window.location.href = 'gcpsettings';
+        }
+      }      
+    };
+  },
+
 //<MANJESH>
   navToSettings: function() {
     if ('undefined' !== typeof(Storage) && window.localStorage.gcpDontShowSettingsPromptCheck
         && 'checked' === window.localStorage.gcpDontShowSettingsPromptCheck) {
-      Callcast.LeaveSession(function() { window.location.href = 'gcpsettings'; });
+      Callcast.LeaveSession(app.leaveSessionCb());
     } else {
       $('#settings-prompt').css({'display': 'block'});
       $('#settings-message').html('You\'re now leaving the room. Click <strong>SAVE</strong> in settings to re-enter.');
@@ -320,7 +331,7 @@ var app = {
 
       $('#settings-ok').click(function() {
         window.localStorage.gcpDontShowSettingsPromptCheck = $('#settings-stop-showing').attr('checked');
-        Callcast.LeaveSession(function() { window.location.href = 'gcpsettings'; });
+        Callcast.LeaveSession(app.leaveSessionCb());
       });
 
       $('#settings-cancel').css({'display': 'block'});
