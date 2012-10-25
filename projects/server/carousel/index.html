@@ -166,7 +166,7 @@
       <div id="pageReload" class="window resizable" style="width: auto; height: 150px;">
         <h1>Reload GoCast</h1>
         <p class="title">GoCast will now take you to your room.</p>
-        <button id="reload" type="button" onclick="location.reload()">Reload</button>
+        <button id="reload" type="button" onclick="errMsgReloadClick();">Reload</button>
       </div>
       <div id="copyData" class="window resizable">
          <img class="close" src="images/button-close.png" alt="Close" title="Close" />
@@ -200,7 +200,7 @@
           <strong>-</strong> <strong>.</strong> are valid
         </p>
         <button id="sendLog" type="button">Send Log to GoCast</button>
-        <button id="reload" type="button" onclick="location.reload()">Reload</button>
+        <button id="reload" type="button" onclick="errMsgReloadClick();">Reload</button>
       </div>
       <div id="installPlugin" class="window resizable">
         <h1>Install GoCast App</h1>
@@ -238,7 +238,7 @@
           By logging in with Facebook, you can invite your Facebook friends to your GoCast room. You can do this by posting to your wall or sending a Facebook message. When you do this your Facebook name will appear as your GoCast screen name. Also, if you turn your webcam off, your Facebook profile image will replace your video preview.
         </p>
         <div class="divider">-- OR --</div>
-        <a id="noThanks" href="javascript:enterId();">Login Without Facebook</a>
+        <a id="noThanks" href="javascript:void(0);" onclick="enterId();">Login Without Facebook</a>
         <p class="title optiondesc">
           By logging in without Facebook, you can choose a temporary screen name for your GoCast room. You can invite others to join your room by email. However, when you turn your webcam off, a blank silhouette will replace your video preview.
         </p>

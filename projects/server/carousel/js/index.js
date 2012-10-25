@@ -1890,6 +1890,13 @@ function enterId(
     app.log(2, 'enterId');
     closeWindow();
     openWindow('#credentials2');
+    if ('undefined' !== typeof(Storage)) {
+      if (window.localStorage.gcpReloadNickName) {
+        $('#name', '#credentials2').val(window.localStorage.gcpReloadNickName);
+        $('#btn', '#credentials2').click();
+        delete window.localStorage.gcpReloadNickName;
+      }
+    }
 } /* onJoinNow() */
 
 ///
@@ -1915,6 +1922,11 @@ function checkCredentials()
     if (!app.user.fbSkipped && !FB.getAuthResponse())
     {
       openWindow('#credentials');
+      if ('undefined' !== typeof(Storage)) {
+        if (window.localStorage.gcpReloadNickName) {
+          $('#noThanks', '#credentials').click();
+        }
+      }
     }
     else // fb logged in update fb logged in status
     {
@@ -2893,4 +2905,11 @@ function startTour(tourSelector) {
   $(tourSelector + ' > span').css({'display': 'none'});
   flashTimer = describeTourObject(tourSelector, tourObjects[0],
                                   tourDescriptions[0], true);
+}
+
+function errMsgReloadClick() {
+  if ('undefined' !== typeof(Storage) && app.user.fbSkipped) {
+    window.localStorage.gcpReloadNickName = app.user.name;
+  }
+  window.location.reload();
 }
