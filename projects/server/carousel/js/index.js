@@ -72,6 +72,8 @@ var app = {
                           ' type="application/x-gocastplayer" width="0" height="0">' +
                           '<param name="onload" value="pluginLoaded" />' +
                         '</object>',
+  defunctAlertShown: false,
+  defunctAlertShowing: false,
   /**
    * Writes the specified log entry into the console HTML element, if
    * present. The meaning of logLevel is 1: debug, 2: info, 3:
@@ -368,7 +370,7 @@ var app = {
   pluginCrashed: function() {
     app.log(4, 'SENDLOG_PLUGINCRASHED: plugin crashed')
     $('#errorMsgPlugin > h1').text('Oops!!!');
-    $('#errorMsgPlugin > p#prompt').text('GoCastPlayer has crashed.');
+    $('#errorMsgPlugin > p#prompt').text('The GoCast App crashed.');
     closeWindow();
     openWindow('#errorMsgPlugin');
     $('#errorMsgPlugin > #sendLog').click(function() {

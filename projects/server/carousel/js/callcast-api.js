@@ -1081,17 +1081,28 @@ function readyStateCb(state, jid, nick)
       switch(state) {
         case 'NEGOTIATING':
           jqOo.css("background-image", 'url("images/waiting-trans.gif")');
+          $('object', jqOo).css('visibility', 'hidden');
         break;
         case 'CONNECTED':
           participant = Callcast.participants[nick];
           if (!participant) {throw "participant " + nick + " not found";}
           if (!participant.image) {throw "participant image for " + nick + " not found";}
           console.log("participant", participant);
+          $('object', jqOo).css('visibility', 'visible');
           if (!participant.videoOn)
           {
             jqOo.css('background-image', participant.image);
           }
         break;
+        case 'DEFUNCT':
+          jqOo.css("background-image", 'url("images/warning.png")');
+          if (!app.defunctAlertShown && !app.defunctAlertShowing) {
+            app.defunctAlertShowing = true;
+            alert('Unfortunately, we were unable to connect you to one or more participants through video. ' +
+                  'You should see an exclamation mark above their nicknames.');
+            app.defunctAlertShown = true;
+          }
+          break;
       }
     }
 
