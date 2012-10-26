@@ -1385,4 +1385,18 @@ body > #tour > button#imgood {
   background: -webkit-gradient(linear, center bottom, center top, from(rgb(60,179,113)), to(rgb(46,139,87)));
   background: -moz-linear-gradient(bottom, rgb(60,179,113), rgb(46,139,87));    
 }
+
+#boxes #warningMsg {
+  width: 300px; 
+  height: 250px;
+  padding: 0px 7px 7px 7px;
+  border: 2px solid red;
+  border-radius: 6px;
+}
+
+#warningMsg > button#ok {
+  position: absolute;
+  right: 5px;
+  bottom: 5px;
+}
 /*</MANJESH>*/

@@ -174,11 +174,12 @@ function minimize() {
 return 0
 }
 
-function genIndexHtml() {
+function genTimestampedHtml() {
+  echo "Generating timestamped html: $1/$2"
   curtime=`date +%s`
-  index_html=`cat index.html`
-  index_html_ts=${index_html//GOCASTTIMESTAMP/$curtime}
-  echo "$index_html_ts" > $1/index.html
+  html=`cat $2`
+  html_ts=${html//GOCASTTIMESTAMP/$curtime}
+  echo "$html_ts" > $1/$2
 }
 
 if [ $devmode -eq 0 ]
@@ -187,7 +188,8 @@ then
   minimize
 fi
 
-genIndexHtml $tempdest
+genTimestampedHtml $tempdest index.html
+genTimestampedHtml $tempdest index2.html
 
 if [ $confirm -eq 1 ]
 then

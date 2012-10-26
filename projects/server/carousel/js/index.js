@@ -74,6 +74,8 @@ var app = {
                         '</object>',
   defunctAlertShown: false,
   defunctAlertShowing: false,
+  tryPluginInstallAttempts: 0,
+  facebookInited: false,
   /**
    * Writes the specified log entry into the console HTML element, if
    * present. The meaning of logLevel is 1: debug, 2: info, 3:
@@ -1917,6 +1919,7 @@ function checkCredentials()
 {
   var jqActive;
   app.log(2, 'checkCredentials');
+  app.facebookInited = true;
 
   // this method is called on a fb status change
   // so do nothing if we're already logged in
@@ -2062,12 +2065,12 @@ function checkForPluginOptionalUpgrades()
   }
 }
 
-var openMeetingOnce = function() {
+/*var openMeetingOnce = function() {
   if ('Firefox' === app.browser.name) {
     openMeeting();
   }
   openMeetingOnce = null;
-};
+};*/
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
@@ -2083,16 +2086,42 @@ function tryPluginInstall(
   var title, prompt;
 
   app.log(2, 'tryPluginInstall');
+  app.tryPluginInstallAttempts++;
   // check plugin installed.
   // if plugin installed but not loaded wait
   // todo get rid of multiple pluginInstalled calls
 
   if (app.pluginInstalled() && !app.pluginLoaded)
   {
-    if (openMeetingOnce) {
-      openMeetingOnce();
+    if (20 < app.tryPluginInstallAttempts) {
+      // send live log that plugin loading failed.
+      var logTryPluginFailed = '{' +
+        'userAgent: ' + navigator.userAgent.replace(/;/g, '|') + ', ' +
+        'nickname: ' + app.user.name + ', ' +
+        'facebook: ' + !app.user.fbSkipped + 
+      '}';
+
+      app.log(2, 'tryPluginInstall failed: ' + logTryPluginFailed);
+      Callcast.SendLiveLog('tryPluginInstall failed: ' + logTryPluginFailed);
+
+      if (window.location.pathname.match(/index2.html/g)) {
+        // show plugin load warning and take them to the room.
+        showWarning('GoCast App Problem', 'The GoCast App failed to load.');
+      } else {
+        // show plugin load warning and take them to the alternate webpage.
+        showWarning('GoCast App Problem', 'A problem occurred while loading the GoCast App. ' +
+                                          'Click "OK" to try once more.');
+        $('#warningMsg > button#ok').unbind('click').click(function() {
+          if (window.location.href.match(/\/$/)) {
+            window.location.href = window.location.href.replace(/\/$/, '/index2.html');
+          } else if (window.location.href.match(/\/\?/)) {
+            window.location.href = window.location.href.replace(/\/\?/, '/index2.html?');
+          }
+        });
+      }
+    } else {
+      setTimeout(tryPluginInstall, 500);      
     }
-    setTimeout(tryPluginInstall, 500);
   }
   else if (app.pluginInstalled() && app.pluginLoaded && !app.pluginUpgrade) // good to go
   {
@@ -2423,6 +2452,37 @@ $(document).ready(function(
 
         uiInit(); // init user interface
         fbInit(); // init facebook api
+
+        //do something if facebook took too long or errored out
+        setTimeout(function() {
+          if (!app.facebookInited) {
+            closeWindow();
+            openWindow('#errorMsgPlugin');
+            $('#errorMsgPlugin > h1').text('Facebook API Problem');
+            $('#errorMsgPlugin > p#prompt').text('A problem occurred while loading the Facebook API.' +
+                                                 'Please try again by clicking on "reload".');
+
+            $('#errorMsgPlugin > #sendLog').unbind('click').click(function() {
+              $(this).attr('disabled', 'disabled');
+              $('#errorMsgPlugin > #reload').attr('disabled', 'disabled');
+              $('#errorMsgPlugin > p#prompt').text('Sending log to GoCast...');
+
+              var logger = new GoCastJS.SendLogsXMPP(Callcast.room, Callcast.nick,
+                                                     Callcast.LOGCATCHER,
+                                                     Callcast.CALLCAST_XMPPSERVER, '',
+                                                     function() {
+                $('#errorMsgPlugin > p#prompt').text('Sending log to GoCast... DONE.');
+                $('#errorMsgPlugin > #reload').removeAttr('disabled');
+              }, function() {
+                $('#errorMsgPlugin > p#prompt').text('Sending log to GoCast... FAILED.');
+                $('#errorMsgPlugin > #reload').removeAttr('disabled');
+              });
+            });
+
+            app.log(2, 'Facebook API init failed - userAgent: ' + navigator.userAgent);
+            Callcast.SendLiveLog('Facebook API init failed - userAgent: ' + navigator.userAgent.replace(/;/g, '|'));
+          }
+        }, 10000);
 
         // Login to xmpp anonymously
         Callcast.connect(Callcast.CALLCAST_XMPPSERVER, '');
@@ -2761,9 +2821,9 @@ function startTour(tourSelector) {
      description: 'Hover your mouse over the whiteboard and click the flashing zoom icon, upper left hand corner, to expand it. ' +
                   'Notice that the Carousel, flattened above the whiteboard, can still be moved with your arrow keys. ' +
                   'To shrink the whiteboard click on the flashing icon, upper left.'},
-    {title:       'Collaborative Editor',
-     description: 'The flashing editor icon on the lower right hand corner of your screen lets you add a basic text editor to the carousel. ' +
-                  'Any changes to the editor\'s content is reflected to everyone in the room.' +
+    {title:       'Collaborative Notepad',
+     description: 'The flashing notepad icon on the lower right hand corner of your screen lets you add a basic notepad to the carousel. ' +
+                  'Any changes to the notepad\'s content is reflected to everyone in the room.' +
                   '<p></p>Try it. <p></p>NOTE: As of now, you can edit with other people in the room as long as its done one at a time. ' +
                   'If two or more people try to edit at the same time, one or more of the attempted changes might be lost.'},
     {title:       'Posting Comments To The Room',
@@ -2923,4 +2983,12 @@ function errMsgReloadClick() {
     window.localStorage.gcpReloadNickName = app.user.name;
   }
   window.location.reload();
+}
+
+function showWarning(title, message) {
+  var $warningWin = $('#warningMsg');
+  closeWindow();
+  openWindow('#warningMsg');
+  $('h1', $warningWin).text(title);
+  $('p#prompt', $warningWin).text(message);
 }

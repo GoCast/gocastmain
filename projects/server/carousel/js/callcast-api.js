@@ -426,17 +426,8 @@ $(document).on('one-login-complete', function(event, msg) {
   if (app.loggedInAll())
   {
     app.log(2, 'one-login-complete: opening meeting');
-
-    if ('Chrome' === app.browser.name) {
-      openMeeting();
-    }
-
-    // instantiate local plugin
-    // not working on firefox, object is appended but plugin does not load
-
-    // check, install plugin
+    openMeeting();
     tryPluginInstall();
-
   }
 
 });
@@ -1099,8 +1090,11 @@ function readyStateCb(state, jid, nick)
           jqOo.css("background-image", 'url("images/warning.png")');
           if (!app.defunctAlertShown && !app.defunctAlertShowing) {
             app.defunctAlertShowing = true;
-            alert('Unfortunately, we were unable to connect you to one or more participants through video. ' +
-                  'You should see an exclamation mark above their nicknames.');
+            showWarning('Media Connection Problem',
+                        'We were unable to connect you with one or more participants through video. ' +
+                        'You can still chat with everyone in the room, and also use the notepad and the whiteboard. ' +
+                        'The connectivity problem might be due to firewall issues. If you have your firewall turned on, ' +
+                        'you can temporarily disable it and then reload the page to try connecting again. ');
             app.defunctAlertShown = true;
           }
           break;
@@ -1260,5 +1254,6 @@ function pluginLoaded(
      Callcast.SendLiveLog('Plugin upgrade available. Current version: ' + Callcast.GetVersion());
      app.pluginUpgrade = true;
   }
+
   app.pluginLoaded = true;
 } /* pluginLoaded() */
