@@ -96,7 +96,7 @@ function RoomDatabase(notifier) {
 }
 
 RoomDatabase.prototype.log = function(msg) {
-    console.log(logDate() + ' - roomDB: ', msg);
+    console.log(logDate() + ' - roomDB: ', decodeURI(msg));
 };
 
 RoomDatabase.prototype.notifylog = function(msg) {
@@ -736,7 +736,7 @@ MucRoom.prototype.notifylog = function(msg) {
 };
 
 MucRoom.prototype.log = function(msg) {
-    console.log(logDate() + ' - @' + this.roomname.split('@')[0] + ': ' + msg);
+    console.log(logDate() + ' - @' + this.roomname.split('@')[0] + ': ' + decodeURI(msg));
 };
 
 MucRoom.prototype.IsFull = function() {
@@ -1555,28 +1555,9 @@ MucRoom.prototype.AddSpotType = function(spottype, info) {
         this.addSpotCeiling = parseInt(info.spotnumber, 10) + 1;
     }
 
-    // Now track the new spot item for the future
-    if (this.spotList[info.spotnumber]) {
-        this.log('ERROR: Adding a spot that already exists. spotnumber=' + info.spotnumber);
-        return false;
-    }
-    else {
-        this.spotList[info.spotnumber] = info;
-
-//        console.log(' spotList in: ' + this.roomname + ' is: ', this.spotList);
-
-        if (overseer.roomDB) {
-            overseer.roomDB.AddContentToRoom(this.roomname.split('@')[0], info.spotnumber, info, function() {
-                return true;
-            }, function(msg) {
-                self.log('AddSpotReflection: ERROR adding to database: ' + msg);
-            });
-        }
-    }
-
-//
-// Now handle any special items/types.
-//
+    //
+    // Now handle any special items/types.
+    //
     switch(spottype) {
         case 'whiteBoard':
     // Treatment for whiteboards are a bit special
@@ -1611,6 +1592,26 @@ MucRoom.prototype.AddSpotType = function(spottype, info) {
         default:
             break;
     }
+
+    // Now track the new spot item for the future
+    if (this.spotList[info.spotnumber]) {
+        this.log('ERROR: Adding a spot that already exists. spotnumber=' + info.spotnumber);
+        return false;
+    }
+    else {
+        this.spotList[info.spotnumber] = info;
+
+//        console.log(' spotList in: ' + this.roomname + ' is: ', this.spotList);
+
+        if (overseer.roomDB) {
+            overseer.roomDB.AddContentToRoom(this.roomname.split('@')[0], info.spotnumber, info, function() {
+                return true;
+            }, function(msg) {
+                self.log('AddSpotReflection: ERROR adding to database: ' + msg);
+            });
+        }
+    }
+
 };
 
 MucRoom.prototype.AddSpotReflection = function(iq) {
@@ -2945,7 +2946,7 @@ Overseer.prototype.notifylog = function(msg) {
 };
 
 Overseer.prototype.log = function(msg) {
-    console.log(logDate() + ' - Overseer: ' + msg);
+    console.log(logDate() + ' - Overseer: ' + decodeURI(msg));
 };
 
 Overseer.prototype.sendIQ = function(iq, cb) {
