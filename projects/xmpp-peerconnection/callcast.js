@@ -1651,7 +1651,7 @@ var Callcast = {
     },
 
     SendLiveLog: function(msg) {
-        this.SendDirectPrivateChat('LIVELOG ; ' + this.nick + ' ; ' + msg, this.ROOMMANAGER);
+        this.SendDirectPrivateChat('LIVELOG ; ' + this.nick + ' ; ' + decodeURI(msg).replace(';','|'), this.ROOMMANAGER);
         if (this.connection) {
             this.connection.flush();    // This is important to get to the server right away - it's a live log.
         }
