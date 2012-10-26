@@ -315,8 +315,8 @@ var app = {
       if ('undefined' !== typeof(Storage)) {
         if (app.user.fbSkipped) {
           window.localStorage.gcpReloadNickName = app.user.name;
-          window.location.href = 'gcpsettings';
         }
+        window.location.href = 'gcpsettings';
       }      
     };
   },
