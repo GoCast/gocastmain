@@ -30,7 +30,7 @@ function fbMe(response) // facebook response object
                                               url: app.user.fbProfileUrl,
                                           image: app.user.fbProfilePicUrl
                                          });
-            $(document).trigger('checkCredentials');
+            $(document).trigger('deferredCheckCredentials');
       }
    });
 }
@@ -99,7 +99,7 @@ function ourAsyncFBInit()
           //console.log('accessToken', response.authResponse.accessToken);
           if (!response.authResponse)
           {
-             $(document).trigger('checkCredentials');
+             $(document).trigger('deferredCheckCredentials');
           }
           else
           {

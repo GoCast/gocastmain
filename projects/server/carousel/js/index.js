@@ -76,6 +76,8 @@ var app = {
   defunctAlertShowing: false,
   tryPluginInstallAttempts: 0,
   facebookInited: false,
+  fbCheckCredentialsTriggered: false,
+
   /**
    * Writes the specified log entry into the console HTML element, if
    * present. The meaning of logLevel is 1: debug, 2: info, 3:
@@ -1912,6 +1914,10 @@ function enterId(
     }
 } /* onJoinNow() */
 
+function deferredCheckCredentials() {
+  app.fbCheckCredentialsTriggered = true;
+}
+
 ///
 /// \brief check login credential and display login dialog if necessary.
 ///
@@ -2448,6 +2454,9 @@ $(document).ready(function(
       } else {
 
         uiInit(); // init user interface
+        if (app.fbCheckCredentialsTriggered) {
+          $(document).trigger('checkCredentials');
+        }
 
         //do something if facebook took too long or errored out
         setTimeout(function() {

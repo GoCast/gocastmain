@@ -73,6 +73,7 @@
       window.fbAsyncInit = ourAsyncFBInit;
       // login callback
       $(document).bind('checkCredentials', checkCredentials);
+      $(document).bind('deferredCheckCredentials', deferredCheckCredentials);
 
       // Load the SDK's source Asynchronously
       (function(d){
