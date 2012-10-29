@@ -3,7 +3,8 @@
  * \brief initialize facebook api.
  */
 
-/*jslint browser: true */
+/*jslint browser: true, devel: true */
+/*global FB, app */
 
 'use strict';
 
@@ -34,37 +35,45 @@ function fbMe(response) // facebook response object
    });
 }
 
+var fbLog = '';
+function getFBLog() { return fbLog; }
+
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
  * \brief initialize facebook api.
  */
-function fbInit()
+function ourAsyncFBInit()
 {
     // Load the SDK Asynchronously
-    (function(d) {
+/*    (function(d) {
        app.log(2, 'fb load facebook-jssdk');
        var js, id = 'facebook-jssdk'; if (d.getElementById(id)) {return;}
        js = d.createElement('script'); js.id = id; js.async = true;
        js.src = 'http://connect.facebook.net/en_US/all.js';
        d.getElementsByTagName('head')[0].appendChild(js);
      }(document));
+*/
 
-    window.fbAsyncInit = function() {
       app.log(2, 'fbAsyncInit callback');
+      fbLog += 'pre-fb.init()\n';
       FB.init({
         appId: '458515917498757', // App ID
+//          channelUrl : '//' + window.location.hostname + '/channel.html', // Channel File for x-domain communication
+//        channelUrl : '//WWW.YOUR_DOMAIN.COM/channel.html', // Channel File for x-domain communication
         status: true, // check login status trip to fb server
         cookie: true, // enable cookies to allow the server to access the session
         xfbml: true,  // parse XFBML
-        oauth: true,
-        logging: true
+        oauth: true  //,
+//        logging: true
       });
 
+      fbLog += 'post-fb.init() / pre-fb.event.subscribe()\n';
         // listen for and handle auth.authResponseChange events
         FB.Event.subscribe('auth.authResponseChange', function(response) {
           app.log(2, 'authResponseChange callback');
           app.log(2, 'response = ' + JSON.stringify(response));
           console.log('response == ', response);
+          fbLog += 'callback: FB.Event.subscribe() - response: ' + JSON.stringify(response) + '\n';
           if (response.authResponse)
           {
              fbMe(response);
@@ -76,6 +85,7 @@ function fbInit()
           }
         });
 
+      fbLog += 'post-fb.event.subscribe-call() / pre-fb.getLoginStatus()\n';
       // not needed since the status : true arg to FB.init above
       // does the equivalent and fires statusChange
       // but looks like the above stmt is not true, we don't get
@@ -84,6 +94,7 @@ function fbInit()
       // to trip to fb server
       FB.getLoginStatus(function(response) {
         app.log(2, 'fbLoginStatus callback response.authResponse' + response.authResponse);
+          fbLog += 'callback: FB.getLoginStatus() - response: ' + JSON.stringify(response) + '\n';
           //console.log('authResponse-Object', response.authResponse);
           //console.log('accessToken', response.authResponse.accessToken);
           if (!response.authResponse)
@@ -98,9 +109,8 @@ function fbInit()
           }
 
       });
-    };
 
-} // fbInit
+} // ourAsyncFBInit
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**

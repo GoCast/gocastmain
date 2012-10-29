@@ -69,6 +69,20 @@
   <body>
     <img src="images/body-bg.png" alt="background image" id="body-bg" />
     <div id="fb-root"></div> <!-- fb integration required -->
+    <script>
+      window.fbAsyncInit = ourAsyncFBInit;
+      // login callback
+      $(document).bind('checkCredentials', checkCredentials);
+
+      // Load the SDK's source Asynchronously
+      (function(d){
+         var js, id = 'facebook-jssdk', ref = d.getElementsByTagName('script')[0];
+         if (d.getElementById(id)) {return;}
+         js = d.createElement('script'); js.id = id; js.async = true;
+         js.src = "//connect.facebook.net/en_US/all.js";
+         ref.parentNode.insertBefore(js, ref);
+       }(document));
+    </script>
     <div id="upper-left">
       <p>GoCast.it ©2012 Beta</p>
       <div id="volume" title="Speaker Volume"></div>
@@ -211,7 +225,7 @@
       <div id="installPlugin" class="window resizable">
         <h1>Install GoCast App</h1>
         <p id ="prompt">
-          Looks like you need the GoCast App. Click the download button below. Then locate the installer file and double-click to install it. 
+          Looks like you need the GoCast App. Click the download button below. Then locate the installer file and double-click to install it.
         </p>
         <p>
           If you are using Chrome, GoCast will detect the installation and automatically start.
@@ -252,7 +266,7 @@
         <div id="fb-login-button" class="fb-login-button" data-show-faces="false" data-width="200" data-max-rows="1"
              scope="email,user_likes,friends_likes,publish_actions,friends_online_presence,publish_stream,xmpp_login"></div>
         -->
-        
+
       </div>
       <div id="credentials2" class="window resizable">
         <p class="title welcome">GoCast Login</p>
