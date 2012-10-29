@@ -317,7 +317,7 @@ var app = {
           window.localStorage.gcpReloadNickName = app.user.name;
         }
         window.location.href = 'gcpsettings';
-      }      
+      }
     };
   },
 
@@ -381,7 +381,7 @@ var app = {
   },
 
   pluginCrashed: function() {
-    app.log(4, 'SENDLOG_PLUGINCRASHED: plugin crashed')
+    app.log(4, 'SENDLOG_PLUGINCRASHED: plugin crashed');
     $('#errorMsgPlugin > h1').text('Oops!!!');
     $('#errorMsgPlugin > p#prompt').text('The GoCast App crashed.');
     closeWindow();
@@ -2098,7 +2098,7 @@ function tryPluginInstall(
       var logTryPluginFailed = '{' +
         'userAgent: ' + navigator.userAgent.replace(/;/g, '|') + ', ' +
         'nickname: ' + app.user.name + ', ' +
-        'facebook: ' + !app.user.fbSkipped + 
+        'facebook: ' + !app.user.fbSkipped +
       '}';
 
       app.log(2, 'tryPluginInstall failed: ' + logTryPluginFailed);
@@ -2120,7 +2120,7 @@ function tryPluginInstall(
         });
       }
     } else {
-      setTimeout(tryPluginInstall, 500);      
+      setTimeout(tryPluginInstall, 500);
     }
   }
   else if (app.pluginInstalled() && app.pluginLoaded && !app.pluginUpgrade) // good to go
@@ -2446,11 +2446,8 @@ $(document).ready(function(
         $('#errorMsgPlugin > input#roomname').css({'display': 'block'});
         $('#errorMsgPlugin > button#reload').css({'display': 'block'});
       } else {
-        // login callback
-        $(document).bind('checkCredentials', checkCredentials);
 
         uiInit(); // init user interface
-        fbInit(); // init facebook api
 
         //do something if facebook took too long or errored out
         setTimeout(function() {
@@ -2498,7 +2495,7 @@ $(document).ready(function(
         });
 
         // set the connection status callback
-        Callcast.setCallbackForCallback_ConnectionStatus(connectionStatus);        
+        Callcast.setCallbackForCallback_ConnectionStatus(connectionStatus);
       }
     }
   }, function() {
