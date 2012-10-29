@@ -2432,7 +2432,6 @@ $(document).ready(function(
 
   app.checkExclusive(function() {
     clearInterval(unmaskTimer);
-    closeWindow();
     navigator.plugins.refresh(); // reload plugins to get any plugin updates
 
     // Check the browser.
@@ -2457,7 +2456,7 @@ $(document).ready(function(
         setTimeout(function() {
           if (!app.facebookInited) {
             closeWindow();
-            openWindow('#errorMsgPlugin');
+            /*openWindow('#errorMsgPlugin');
             $('#errorMsgPlugin > h1').text('Facebook API Problem');
             $('#errorMsgPlugin > p#prompt').text('A problem occurred while loading the Facebook API.' +
                                                  'Please try again by clicking on "reload".');
@@ -2477,12 +2476,16 @@ $(document).ready(function(
                 $('#errorMsgPlugin > p#prompt').text('Sending log to GoCast... FAILED.');
                 $('#errorMsgPlugin > #reload').removeAttr('disabled');
               });
-            });
+            });*/
 
             app.log(2, 'Facebook API init failed - userAgent: ' + navigator.userAgent);
             Callcast.SendLiveLog('Facebook API init failed - userAgent: ' + navigator.userAgent.replace(/;/g, '|'));
+            Callcast.SendLiveLog('FBLOG: ' + getFBLog());
+            openWindow('#credentials');
+            $('#credentials > .fb-login-button').addClass('hidden');
+            $('#credentials > #fb-disabled').removeClass('hidden');
           }
-        }, 10000);
+        }, 6000);
 
         // Login to xmpp anonymously
         Callcast.connect(Callcast.CALLCAST_XMPPSERVER, '');
