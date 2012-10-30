@@ -3009,7 +3009,7 @@ Overseer.prototype.handleMessage = function(msg) {
     if (msg.getChild('body') && msg.getChild('body').getText() && !msg.getChild('delay'))
     {
         // Now we need to split the message up and trim spaces just in case.
-        cmd = msg.getChild('body').getText().split(';');
+        cmd = decodeURI(msg.getChild('body').getText()).split(';');
         for (k in cmd) {
             if (cmd.hasOwnProperty(k)) {
                 cmd[k] = cmd[k].trim();
