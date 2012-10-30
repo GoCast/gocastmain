@@ -224,8 +224,10 @@ var Callcast = {
     Callback_AddSpot: null,
     Callback_RemoveSpot: null,
     Callback_SetSpot: null,
-    Callback_AddPlugin: null,
-    Callback_RemovePlugin: null,
+    Callback_AddSpotForParticipant: null,
+    Callback_AddPluginToParticipant: null,
+    Callback_RemovePluginFromParticipant: null,
+    Callback_RemoveSpotForParticipant: null,
     Callback_AddCarouselContent: null,
     Callback_RemoveCarouselContent: null,
     Callback_ReadyState: null,
@@ -251,7 +253,8 @@ var Callcast = {
     fbaccesstoken: '',
     fb_sent_pres: false,
     sessionInfo: {},
-    mediaHints: {},
+    mediaHints: {audio: false, video: false},
+    bPluginLoadedSuccessfully: false,
 
     //
     // \brief When server configuration is non-standard, use this function to setup the server names, usernames,
@@ -350,12 +353,20 @@ var Callcast = {
         this.Callback_SetSpot = cb;
     },
 
-    setCallbackForAddPlugin: function(cb) {
-        this.Callback_AddPlugin = cb;
+    setCallbackForAddSpotForParticipant: function(cb) {
+        this.Callback_AddSpotForParticipant = cb;
     },
 
-    setCallbackForRemovePlugin: function(cb) {
-        this.Callback_RemovePlugin = cb;
+    setCallbackForAddPluginToParticipant: function(cb) {
+        this.Callback_AddPluginToParticipant = cb;
+    },
+
+    setCallbackForRemovePluginFromParticipant: function(cb) {
+        this.Callback_RemovePluginFromParticipant = cb;
+    },
+
+    setCallbackForRemoveSpotForParticipant: function(cb) {
+        this.Callback_RemoveSpotForParticipant = cb;
     },
 
     setCallbackForAddCarouselContent: function(cb) {
@@ -728,16 +739,27 @@ var Callcast = {
     },
 
     SendMyPresence: function() {
-        var pres;
-        if (this.bUseVideo === true) {
-            pres = $pres({to: this.roomjid + '/' + this.NoSpaces(this.nick), video: 'on'}).c('x', {xmlns: 'http://jabber.org/protocol/muc'});
+        var pres, presobj = {};
+
+        // Only send presence if we're officially in the room. Not before.
+        if (!this.joined) {
+            return false;
         }
-        else if (this.bUseVideo === false) {
-            pres = $pres({to: this.roomjid + '/' + this.NoSpaces(this.nick), video: 'off'}).c('x', {xmlns: 'http://jabber.org/protocol/muc'});
+
+        presobj.to = this.roomjid + '/' + this.NoSpaces(this.nick);
+
+        if (this.bUseVideo === true || this.bUseVideo === false) {
+            presobj.video = this.bUseVideo ? 'on' : 'off';
         }
-        else {
-            pres = $pres({to: this.roomjid + '/' + this.NoSpaces(this.nick)}).c('x', {xmlns: 'http://jabber.org/protocol/muc'});
+
+        //
+        // Let the other side know we are AV capable.
+        //
+        if (this.bPluginLoadedSuccessfully) {
+            presobj.av = 'y';
         }
+
+        pres = $pres(presobj).c('x', {xmlns: 'http://jabber.org/protocol/muc'});
 
         if (this.presenceBlob) {
             pres.up().c('info', this.presenceBlob);
@@ -767,9 +789,22 @@ var Callcast = {
         this.bUseMicrophone = !bMute;
     },
 
+    IsPluginLoaded: function() {
+        return this.bPluginLoadedSuccessfully;
+    },
+
+    PluginFailedToLoad: function() {
+        this.log('PluginFailedToLoad: FAILED TO LOAD.');
+    },
+
     InitGocastPlayer: function(jqSelector, success, failure) {
         if (!this.localplayer) {
             var settings = JSON.parse(window.localStorage.gcpsettings || '{}');
+
+            // On successful init, we note that the plugin is successfully loaded.
+            this.bPluginLoadedSuccessfully = true;
+            // Now set our presence to 'av'='y'
+            this.SendMyPresence();
 
             if (!settings) {
                 Callcast.SendLiveLog('Callcast.InitGocastPlayer: ' +
@@ -943,6 +978,35 @@ var Callcast = {
             }
         };
 
+        this.SetIAmCaller = function() {
+            this.bAmCaller = true;
+        };
+
+        this.StartConnection = function() {
+            // Only start the connection if:
+            // a) peerconnection doesn't exist yet
+            // b) We have AV available locally.
+
+            //
+            // Only call the plugin callback and init the peer connection if we have a functional AV plugin.
+            //
+            if (!this.peer_connection && Callcast.IsPluginLoaded()) {
+                Callcast.log('Callee: Starting peerconnection and adding plugin to carousel for: ' + nickname);
+                if (Callcast.Callback_AddPluginForParticipant) {
+                    this.AddPluginResult = Callcast.Callback_AddPluginForParticipant(nickname);
+                }
+                else {
+                    Callcast.log('Callee: ERROR: Init failure. No Callback_AddPluginForParticipant callback available.');
+                }
+
+                this.InitPeerConnection();
+
+                if (this.bAmCaller) {
+                    this.InitiateCall();
+                }
+            }
+        };
+
         this.InitPeerConnection = function() {
             this.candidates = [];   // Start fresh with a new array.
 
@@ -1058,7 +1122,7 @@ var Callcast = {
                     }
                 }
                 else {
-                    Callcast.log('Cannot InitiateCall - peer_connection is invalid.');
+                    Callcast.log('Cannot InitiateCall - peer_connection is not initialized.');
                 }
             }
             catch (e) {
@@ -1112,7 +1176,7 @@ var Callcast = {
                     this.CallState = Callcast.CallStates.CONNECTED;
                 }
                 else {
-                    Callcast.log('Could not complete call. Peer_connection is invalid.');
+                    Callcast.log('Could not complete call. Peer_connection is not initialized.');
                 }
             }
             catch (e) {
@@ -1186,7 +1250,7 @@ var Callcast = {
             }
         };
 
-        this.RemovePlugin = function() {
+        this.RemoveSpotAndPlugin = function() {
             // Now remove object from div
             var nick = Strophe.getResourceFromJid(this.jid);
             // Make sure it has no spaces...
@@ -1194,11 +1258,12 @@ var Callcast = {
                 nick = nick.replace(/ /g, '');
             }
 
-            if (Callcast.Callback_RemovePlugin) {
-                Callcast.Callback_RemovePlugin(nick);
+            // This will remove the plugin if present and the spot both.
+            if (Callcast.Callback_RemoveSpotForParticipant) {
+                Callcast.Callback_RemoveSpotForParticipant(nick);
             }
             else {
-                alert('ERROR: RemovePlugin: Callcast.setCallbackForRemovePlugin() has not been called yet.');
+                alert('ERROR: RemoveSpotAndPlugin: Callcast.setCallbackForRemoveSpotForParticipant() has not been called yet.');
             }
         };
 
@@ -1209,16 +1274,9 @@ var Callcast = {
                 this.peer_connection = null;
             }
 
-            this.RemovePlugin();
+            this.RemoveSpotAndPlugin();
         };
 
-        if (Callcast.Callback_AddPlugin) {
-            this.AddPluginResult = Callcast.Callback_AddPlugin(nickname);
-        }
-        else {
-            Callcast.log('Callee: ERROR: Init failure. No AddPlugin callback available.');
-        }
-        this.InitPeerConnection();
     },
 
     escapeit: function(msg) {
@@ -1799,6 +1857,11 @@ var Callcast = {
                         Callcast.participants[nick].videoOn = null;
                     }
 
+                    if ($(presence).attr('av')) {
+                        // Other side has av. Make sure we have a peerconnection with them.
+                        Callcast.participants[nick].StartConnection();  // Will drop out if connection already present.
+                    }
+
                     // Update the presence information.
                     info = {};
                     if ($(presence).children('info')[0])
@@ -1873,7 +1936,12 @@ var Callcast = {
 
                         // Now, if we are new to the session (not fully joined ye) then it's our job to call everyone.
                         if (!Callcast.joined) {
-                            Callcast.participants[nick].InitiateCall();
+                            Callcast.participants[nick].SetIAmCaller();
+                        }
+
+                        if ($(presence).attr('av')) {
+                            // They have AV -- so start up peerconnection and plugin. (so long as we have the plugin too)
+                            Callcast.participants[nick].StartConnection();
                         }
                     }
 
