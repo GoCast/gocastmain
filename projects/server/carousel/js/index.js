@@ -2113,6 +2113,7 @@ function tryPluginInstall(
       if (window.location.pathname.match(/index2.html/g)) {
         // show plugin load warning and take them to the room.
         showWarning('GoCast App Problem', 'The GoCast App failed to load.');
+        Callcast.PluginFailedToLoad();
       } else {
         // show plugin load warning and take them to the alternate webpage.
         showWarning('GoCast App Problem', 'A problem occurred while loading the GoCast App. ' +

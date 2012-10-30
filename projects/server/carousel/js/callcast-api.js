@@ -471,47 +471,34 @@ $(document).on('disconnected', function(
   return false;
 }); /* disconnected() */
 
-///
-/// \brief Function called when other Gocast.it plugin object is created.
-///
-function addPluginToCarousel(nickname)
-{
+function assignSpotForParticipant(nickname) {
   var dispname = decodeURI(nickname),
       id = app.str2id(nickname),
-      w, h,
-      jqOo, oo,
-      item;
-  if (!nickname)
-  {
-    app.log(4, "addPluginToCarousel error nickname undefined");
-    return null;
+      w, h, jqOo, oo, item;
+
+  if (!nickname) {
+    app.log(4, "assignSpotForParticipant: nickname undefined");
+    return;
   }
+
   // check if nickname already in carousel
   jqOo = $('#meeting > #streams > #scarousel div.cloudcarousel#'+ id);
-  if (jqOo.length > 0)
-  {
-    app.log(4, "addPluginToCarousel error nickname " + nickname + "already in carousel");
-    alert("addPluginToCarousel error nickname " + nickname + "already in carousel");
-    return null;
+  if (jqOo.length > 0) {
+    app.log(4, "assignSpotForParticipant: nickname [" + nickname + "] already in carousel");
+    alert("assignSpotForParticipant: nickname [" + nickname + "] already in carousel");
+    return;
   }
+
   // Check next available cloudcarousel
   oo = $('#meeting > #streams > #scarousel div.unoccupied').get(0);
 
-  if (!oo) // if we're out of spots add one
-  {
+  // if we're out of spots add one
+  if (!oo) {
     oo = app.carousel.createSpot();
   }
-  if (oo)
-  {
-    $(oo).attr('id', id)
-         .attr('encname', nickname)
-         .attr('title', dispname);
-    //$('#upper-right', oo).attr('class', 'status'); // clear the upper-right image class to be used for peer connection state
-    /*
-     * Get dimensions oo and scale plugin accordingly. */
-    w = Math.floor($(oo).width() - 4);
-    h = Math.floor((w / Callcast.WIDTH) * Callcast.HEIGHT);
-    $(oo).append('<object id="GocastPlayer' + id + '" type="application/x-gocastplayer" width="' + w + '" height="' + h + '"></object>');
+
+  if (oo) {
+    $(oo).attr('id', id).attr('encname', nickname).attr('title', dispname);    
     $('div.name', oo).text(dispname);
     $(oo).removeClass('unoccupied');
     $("#showChat", oo).css("display", "block"); // display showChat button
@@ -520,17 +507,74 @@ function addPluginToCarousel(nickname)
     item = $(oo).data('item');
     if (!item) {throw "item is not defined";}
     app.carousel.setSpotName(item, nickname);
+    app.carousel.updateAll();
+  } else {
+    app.log(4, 'assignSpotForParticipant: Maximum number of participants reached.');    
+  }
+}
 
+function addPluginForParticipant(nickname) {
+  var id = app.str2id(nickname),
+      oo = $('#meeting > #streams > #scarousel div.cloudcarousel#'+ id).get(0),
+      w, h;
+
+  if (!nickname) {
+    app.log(4, "addPluginForParticipant: nickname undefined");
+    return;
+  }
+
+  if (!oo) {
+    AssignSpotForParticipant(nickname);
+    oo = $('#meeting > #streams > #scarousel div.cloudcarousel#'+ id).get(0);
+  }
+
+  if (oo) {
+    $(oo).append('<object id="GocastPlayer' + id + '" type="application/x-gocastplayer" width="' + w + '" height="' + h + '"></object>');
     app.log(2, 'Added GocastPlayer' + id + ' object.');
     app.carousel.updateAll();
     return $('object#GocastPlayer' + id, oo).get(0);
   }
 
-  app.log(4, 'Maximum number of participants reached.');
+  app.log(4, 'addPluginForParticipant: Spot for participant [' + nickname + '] not found.');
   return null;
-} /* addPluginToCarousel() */
+}
 
+function removePluginForParticipant(nickname) {
+  if (nickname) {
+    try {
+      var id = app.str2id(nickname),
+          oo = $('#meeting > #streams > #scarousel div.cloudcarousel#' + id).get(0), poo;
 
+      if (oo) {
+        poo = $('object#GocastPlayer' + id, oo).get(0);
+        if (poo) {
+          $(poo).remove();
+        }
+      }
+    } catch (e) {
+      app.log(4, 'removePluginForParticipant: ', e);
+    }
+  }
+}
+
+function unassignSpotForParticipant(nickname) {
+  if (nickname) {
+    try {
+      var id = app.str2id(nickname),
+          oo = $('#meeting > #streams > #scarousel div.cloudcarousel#' + id).get(0);
+
+      removePluginForParticipant(nickname);
+      if (oo) {
+        $(oo).addClass('unoccupied');
+        $(oo).removeAttr('title');
+        $(oo).removeAttr('id');
+        $(oo).removeAttr('encname');
+      }
+    } catch (e) {
+      app.log(4, 'unassignSpotForParticipant: ', e);
+    }    
+  }
+}
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 ///
