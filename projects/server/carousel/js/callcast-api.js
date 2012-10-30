@@ -506,12 +506,19 @@ function addPluginToCarousel(nickname)
     $(oo).attr('id', id)
          .attr('encname', nickname)
          .attr('title', dispname);
-    //$('#upper-right', oo).attr('class', 'status'); // clear the upper-right image class to be used for peer connection state
-    /*
-     * Get dimensions oo and scale plugin accordingly. */
-    w = Math.floor($(oo).width() - 4);
-    h = Math.floor((w / Callcast.WIDTH) * Callcast.HEIGHT);
-    $(oo).append('<object id="GocastPlayer' + id + '" type="application/x-gocastplayer" width="' + w + '" height="' + h + '"></object>');
+
+    //
+    // Don't operate the plugin if we don't have audio or video.
+    //
+    if (Callcast.IsVideoDeviceAvailable() || Callcast.IsMicrophoneDeviceAvailable()) {
+      //$('#upper-right', oo).attr('class', 'status'); // clear the upper-right image class to be used for peer connection state
+      /*
+       * Get dimensions oo and scale plugin accordingly. */
+      w = Math.floor($(oo).width() - 4);
+      h = Math.floor((w / Callcast.WIDTH) * Callcast.HEIGHT);
+      $(oo).append('<object id="GocastPlayer' + id + '" type="application/x-gocastplayer" width="' + w + '" height="' + h + '"></object>');
+    }
+
     $('div.name', oo).text(dispname);
     $(oo).removeClass('unoccupied');
     $("#showChat", oo).css("display", "block"); // display showChat button
