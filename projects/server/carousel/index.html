@@ -73,6 +73,7 @@
       window.fbAsyncInit = ourAsyncFBInit;
       // login callback
       $(document).bind('checkCredentials', checkCredentials);
+      $(document).bind('deferredCheckCredentials', deferredCheckCredentials);
 
       // Load the SDK's source Asynchronously
       (function(d){
@@ -254,6 +255,7 @@
       <div id="credentials" class="window resizable">
         <p class="title welcome">Welcome to GoCast!</p>
         <div id="fb-login-button" class="fb-login-button" data-show-faces="false" data-width="200" data-max-rows="1">Login With Facebook</div>
+        <a id="fb-disabled" class="hidden" href="javascript:void(0);">Login With Facebook -- Currently Unavailable</a>
         <p class="title optiondesc">
           By logging in with Facebook, you can invite your Facebook friends to your GoCast room. You can do this by posting to your wall or sending a Facebook message. When you do this your Facebook name will appear as your GoCast screen name. Also, if you turn your webcam off, your Facebook profile image will replace your video preview.
         </p>

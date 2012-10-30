@@ -76,6 +76,8 @@ var app = {
   defunctAlertShowing: false,
   tryPluginInstallAttempts: 0,
   facebookInited: false,
+  fbCheckCredentialsTriggered: false,
+
   /**
    * Writes the specified log entry into the console HTML element, if
    * present. The meaning of logLevel is 1: debug, 2: info, 3:
@@ -1912,6 +1914,10 @@ function enterId(
     }
 } /* onJoinNow() */
 
+function deferredCheckCredentials() {
+  app.fbCheckCredentialsTriggered = true;
+}
+
 ///
 /// \brief check login credential and display login dialog if necessary.
 ///
@@ -2432,7 +2438,6 @@ $(document).ready(function(
 
   app.checkExclusive(function() {
     clearInterval(unmaskTimer);
-    closeWindow();
     navigator.plugins.refresh(); // reload plugins to get any plugin updates
 
     // Check the browser.
@@ -2449,12 +2454,15 @@ $(document).ready(function(
       } else {
 
         uiInit(); // init user interface
+        if (app.fbCheckCredentialsTriggered) {
+          $(document).trigger('checkCredentials');
+        }
 
         //do something if facebook took too long or errored out
         setTimeout(function() {
           if (!app.facebookInited) {
             closeWindow();
-            openWindow('#errorMsgPlugin');
+            /*openWindow('#errorMsgPlugin');
             $('#errorMsgPlugin > h1').text('Facebook API Problem');
             $('#errorMsgPlugin > p#prompt').text('A problem occurred while loading the Facebook API.' +
                                                  'Please try again by clicking on "reload".');
@@ -2474,12 +2482,16 @@ $(document).ready(function(
                 $('#errorMsgPlugin > p#prompt').text('Sending log to GoCast... FAILED.');
                 $('#errorMsgPlugin > #reload').removeAttr('disabled');
               });
-            });
+            });*/
 
             app.log(2, 'Facebook API init failed - userAgent: ' + navigator.userAgent);
             Callcast.SendLiveLog('Facebook API init failed - userAgent: ' + navigator.userAgent.replace(/;/g, '|'));
+            Callcast.SendLiveLog('FBLOG: ' + getFBLog());
+            openWindow('#credentials');
+            $('#credentials > .fb-login-button').addClass('hidden');
+            $('#credentials > #fb-disabled').removeClass('hidden');
           }
-        }, 10000);
+        }, 6000);
 
         // Login to xmpp anonymously
         Callcast.connect(Callcast.CALLCAST_XMPPSERVER, '');
