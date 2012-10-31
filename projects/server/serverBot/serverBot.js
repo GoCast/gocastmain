@@ -2987,6 +2987,10 @@ Overseer.prototype.sendGroupMessage = function(room, msg_body) {
     this.client.send(msg);
 };
 
+function deentitize(instr) {
+    return instr.replace(/&gt;/g, '>').replace(/&lt;/g, '<').replace(/&quot;/g, '"').replace(/&apos;/g, "'").replace(/&amp;/g, '&');
+}
+
 //
 // \brief Need to check the room's banned-list for this person.
 //
@@ -3009,7 +3013,7 @@ Overseer.prototype.handleMessage = function(msg) {
     if (msg.getChild('body') && msg.getChild('body').getText() && !msg.getChild('delay'))
     {
         // Now we need to split the message up and trim spaces just in case.
-        cmd = decodeURI(msg.getChild('body').getText()).split(';');
+        cmd = deentitize(decodeURI(msg.getChild('body').getText())).split(';');
         for (k in cmd) {
             if (cmd.hasOwnProperty(k)) {
                 cmd[k] = cmd[k].trim();
