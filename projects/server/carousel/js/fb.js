@@ -8,20 +8,28 @@
 
 'use strict';
 
+var fbLog = '';
+function getFBLog() { return fbLog; }
+
 function fbMe(response) // facebook response object
 {
    app.log(2, 'FB logged IN or got a new token.');
+   fbLog += 'in fbMe() - FB logged IN or got a new token.\n';
    //
    // NOTE: These two represent the keys to the kingdom. The signed response and the id.
    // the authResponse can be accessed using FB sync api calls
    //
    Callcast.SetFBSignedRequestAndAccessToken(response.authResponse.signedRequest, response.authResponse.accessToken);
 
+   fbLog += 'in fbMe() - pre-FB.api(me)\n';
+
    // user has auth'd your app and is logged into Facebook
    FB.api('/me', function(me)
    {
       if (me && me.name)
       {
+         fbLog += 'fbMe() - callback - GOOD.\n';
+
          app.user.name = encodeURI(me.name);
          app.user.fbProfileUrl = 'https://graph.facebook.com/' + me.id;
          app.user.fbProfilePicUrl = 'https://graph.facebook.com/' + me.id + '/picture?type=large';
@@ -30,13 +38,18 @@ function fbMe(response) // facebook response object
                                               url: app.user.fbProfileUrl,
                                           image: app.user.fbProfilePicUrl
                                          });
+
+         fbLog += 'fbMe() - callback - pre-trigger deferredCheckCredentials\n';
+
             $(document).trigger('deferredCheckCredentials');
       }
+      else {
+        fbLog += 'fbMe() callback - ERROR: me is: ' + JSON.stringify(me) + '\n';
+      }
    });
-}
 
-var fbLog = '';
-function getFBLog() { return fbLog; }
+   fbLog += 'in fbMe() - post-FB.api(me) call.\n';
+}
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
