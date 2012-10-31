@@ -1212,7 +1212,7 @@ function pluginLoaded(
      return; // assume player is already loaded if localPlayer is not null
   }
 
-  app.simPluginLoadFailed = true;
+  //app.simPluginLoadFailed = true;
   if (app.simPluginLoadFailed) {
     app.log(2, 'simulating plugin load failed...');
     return;
