@@ -614,34 +614,32 @@ var Callcast = {
         var nick = info.nick;
         nick = this.WithSpaces(nick);
 
-        if (nick && this.participants[nick] && this.participants[nick].peer_connection)
+        if (nick && this.participants[nick])
         {
+            if (this.participants[nick].peer_connection)
+            {
+                if (info.width >= 0 && info.height >= 0)
+                {
+                    this.participants[nick].peer_connection.Width(info.width);
+                    this.participants[nick].peer_connection.Height(info.height);
+                }
+                else if (info.hasVid === true)
+                {
+                    this.participants[nick].peer_connection.Width(this.WIDTH);
+                    this.participants[nick].peer_connection.Height(this.HEIGHT);
+                }
+                else if (info.hasVid === false)
+                {
+                    this.participants[nick].peer_connection.Width(0);
+                    this.participants[nick].peer_connection.Height(0);
+                }                
+            }
 
-            if (info.width >= 0 && info.height >= 0)
-            {
-                this.participants[nick].peer_connection.Width(info.width);
-                this.participants[nick].peer_connection.Height(info.height);
-            }
-            else if (info.hasVid === true)
-            {
-                this.participants[nick].peer_connection.Width(this.WIDTH);
-                this.participants[nick].peer_connection.Height(this.HEIGHT);
-            }
-            else if (info.hasVid === false)
-            {
-                this.participants[nick].peer_connection.Width(0);
-                this.participants[nick].peer_connection.Height(0);
-            }
         }
         else if (nick !== this.nick) {
             this.log('ShowRemoteVideo: nickname not found: ' + nick);
         }
-
-        // If we're just missing the peer_connection, let's note an error.
-        if (nick && this.participants[nick] && !this.participants[nick].peer_connection) {
-            this.log('ShowRemoteVideo: ERROR - peer_connection is null.');
-        }
-    },
+   },
 
     IsVideoEnabled: function() {
         if (!this.mediaHints.video) {
@@ -914,7 +912,9 @@ var Callcast = {
         // Store a list of ICE candidates for batch-processing.
         this.candidates = null;
 
-        // Need to call InitPeerConnection -- calling it at the bottom of this constructor.
+        if (Callcast.Callback_AddSpotForParticipant) {
+            Callcast.Callback_AddSpotForParticipant(nickname);
+        }
 
         //
         // When a remote peer's stream has been added, I get called here.
@@ -992,11 +992,11 @@ var Callcast = {
             //
             if (!this.peer_connection && Callcast.IsPluginLoaded()) {
                 Callcast.log('Callee: Starting peerconnection and adding plugin to carousel for: ' + nickname);
-                if (Callcast.Callback_AddPluginForParticipant) {
-                    this.AddPluginResult = Callcast.Callback_AddPluginForParticipant(nickname);
+                if (Callcast.Callback_AddPluginToParticipant) {
+                    this.AddPluginResult = Callcast.Callback_AddPluginToParticipant(nickname);
                 }
                 else {
-                    Callcast.log('Callee: ERROR: Init failure. No Callback_AddPluginForParticipant callback available.');
+                    Callcast.log('Callee: ERROR: Init failure. No Callback_AddPluginToParticipant callback available.');
                 }
 
                 this.InitPeerConnection();
@@ -1873,7 +1873,7 @@ var Callcast = {
                     }
 
                     info.nick = nick;
-                    info.hasVid = Callcast.participants[nick].videoOn;
+                    info.hasVid = Callcast.participants[nick].videoOn && Callcast.IsPluginLoaded();
 
                     $(document).trigger('user_updated', info);
                 }
@@ -1982,7 +1982,7 @@ var Callcast = {
                         info.nick = nick;
 
                         if (nick !== Callcast.nick) {
-                            info.hasVid = Callcast.participants[nick].videoOn;
+                            info.hasVid = Callcast.participants[nick].videoOn && Callcast.IsPluginLoaded();
                         }
                         else {
                             info.hasVid = Callcast.bUseVideo;

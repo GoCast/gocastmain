@@ -547,12 +547,14 @@ function removePluginForParticipant(nickname) {
 
       if (oo) {
         poo = $('object#GocastPlayer' + id, oo).get(0);
+        console.log('removePluginForParticipant: Plugin = ', poo);
         if (poo) {
-          $(poo).remove();
+          oo.removeChild(poo);
         }
       }
     } catch (e) {
-      app.log(4, 'removePluginForParticipant: ', e);
+      console.log('removePluginForParticipant: ', e);
+      app.log(4, 'removePluginForParticipant: ' + e);
     }
   }
 }
@@ -569,6 +571,10 @@ function unassignSpotForParticipant(nickname) {
         $(oo).removeAttr('title');
         $(oo).removeAttr('id');
         $(oo).removeAttr('encname');
+        $('div.name', oo).text('');
+        $('#msgBoard', oo).css('display', 'none');
+        $('#showChat', oo).css('display', 'none');
+        $(oo).css('background-image', 'url("images/GoToken.png")');
       }
     } catch (e) {
       app.log(4, 'unassignSpotForParticipant: ', e);
@@ -1199,11 +1205,17 @@ function pluginLoaded(
 )
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
-  app.log(2, 'pluginLoaded Local Plugin Loaded.');
+  //app.log(2, 'pluginLoaded Local Plugin Loaded.');
   if (Callcast.localplayerLoaded)
   {
      app.log(2, 'pluginLoaded Callcast.localplayerLoaded - plugin is already loaded');
      return; // assume player is already loaded if localPlayer is not null
+  }
+
+  app.simPluginLoadFailed = true;
+  if (app.simPluginLoadFailed) {
+    app.log(2, 'simulating plugin load failed...');
+    return;
   }
 
   Callcast.localplayerLoaded = true;
@@ -1229,8 +1241,10 @@ function pluginLoaded(
         app.log(2, 'Local plugin successfully initialized.');
         // Set callback functions to add and remove plugins for other
         // participants and content.
-        Callcast.setCallbackForAddPlugin(addPluginToCarousel);
-        Callcast.setCallbackForRemovePlugin(removePluginFromCarousel);
+        //Callcast.setCallbackForAddPlugin(addPluginToCarousel);
+        //Callcast.setCallbackForRemovePlugin(removePluginFromCarousel);
+        Callcast.setCallbackForAddPluginToParticipant(addPluginForParticipant);
+        Callcast.setCallbackForRemovePluginFromParticipant(removePluginForParticipant);
         Callcast.setCallbackForAddCarouselContent(addContentToCarousel);
         Callcast.setCallbackForRemoveCarouselContent(removeContentFromCarousel);
         Callcast.setCallbackForAddSpot(addSpotCb);

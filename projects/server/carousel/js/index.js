@@ -77,6 +77,7 @@ var app = {
   tryPluginInstallAttempts: 0,
   facebookInited: false,
   fbCheckCredentialsTriggered: false,
+  simPluginLoadFailed: false,
 
   /**
    * Writes the specified log entry into the console HTML element, if
@@ -2112,8 +2113,14 @@ function tryPluginInstall(
 
       if (window.location.pathname.match(/index2.html/g)) {
         // show plugin load warning and take them to the room.
-        showWarning('GoCast App Problem', 'The GoCast App failed to load.');
+        showWarning('GoCast App Problem', 'The GoCast App failed to load. Click "OK" to proceed without video chat.');
         Callcast.PluginFailedToLoad();
+
+        $('#warningMsg > button#ok').unbind('click').click(function() {
+          closeWindow();
+          handleRoomSetup();
+          $(this).unbind('click').click(closeWindow);
+        });
       } else {
         // show plugin load warning and take them to the alternate webpage.
         showWarning('GoCast App Problem', 'A problem occurred while loading the GoCast App. ' +
@@ -2463,28 +2470,6 @@ $(document).ready(function(
         setTimeout(function() {
           if (!app.facebookInited) {
             closeWindow();
-            /*openWindow('#errorMsgPlugin');
-            $('#errorMsgPlugin > h1').text('Facebook API Problem');
-            $('#errorMsgPlugin > p#prompt').text('A problem occurred while loading the Facebook API.' +
-                                                 'Please try again by clicking on "reload".');
-
-            $('#errorMsgPlugin > #sendLog').unbind('click').click(function() {
-              $(this).attr('disabled', 'disabled');
-              $('#errorMsgPlugin > #reload').attr('disabled', 'disabled');
-              $('#errorMsgPlugin > p#prompt').text('Sending log to GoCast...');
-
-              var logger = new GoCastJS.SendLogsXMPP(Callcast.room, Callcast.nick,
-                                                     Callcast.LOGCATCHER,
-                                                     Callcast.CALLCAST_XMPPSERVER, '',
-                                                     function() {
-                $('#errorMsgPlugin > p#prompt').text('Sending log to GoCast... DONE.');
-                $('#errorMsgPlugin > #reload').removeAttr('disabled');
-              }, function() {
-                $('#errorMsgPlugin > p#prompt').text('Sending log to GoCast... FAILED.');
-                $('#errorMsgPlugin > #reload').removeAttr('disabled');
-              });
-            });*/
-
             app.log(2, 'Facebook API init failed - userAgent: ' + navigator.userAgent);
             Callcast.SendLiveLog('Facebook API init failed - userAgent: ' + navigator.userAgent.replace(/;/g, '|'));
             Callcast.SendLiveLog('FBLOG: ' + getFBLog());
@@ -2492,7 +2477,7 @@ $(document).ready(function(
             $('#credentials > .fb-login-button').addClass('hidden');
             $('#credentials > #fb-disabled').removeClass('hidden');
           }
-        }, 6000);
+        }, 10000);
 
         // Login to xmpp anonymously
         Callcast.connect(Callcast.CALLCAST_XMPPSERVER, '');
@@ -2506,6 +2491,10 @@ $(document).ready(function(
 
         // set the connection status callback
         Callcast.setCallbackForCallback_ConnectionStatus(connectionStatus);
+
+        // callbacks for assign/unassign spots for participants
+        Callcast.setCallbackForAddSpotForParticipant(assignSpotForParticipant);
+        Callcast.setCallbackForRemoveSpotForParticipant(unassignSpotForParticipant);
       }
     }
   }, function() {

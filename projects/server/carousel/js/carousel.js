@@ -491,7 +491,6 @@
             }
             else
             {
-                this.adjustChat(item, scale);
                 nick = $(obj).attr('encname');
                 if (nick && Callcast.participants[nick] && Callcast.participants[nick].videoOn)
                 {
@@ -499,11 +498,11 @@
                 }
                 // else do nothing on resize
             }
-
-            $(obj).find('div.name').css('font-size', (item.orgFontSize * scale) + px);
-            // >>0 = Math.foor(). Firefox doesn't like fractional decimals in z-index.
-            obj.style.zIndex = "" + ((scale * 100) >> 0); // jslint wiaver
         }
+
+        this.adjustChat(item, scale);
+        //$(obj).find('div.name').css('font-size', (item.orgFontSize * scale) + px);
+        //obj.style.zIndex = "" + ((scale * 100) >> 0); // jslint waiver
     };
     ///
     /// \brief adjust plugin after spot update
@@ -618,7 +617,6 @@
             item.scale(scale);
 
             $(obj).find('div.name').css('font-size', (item.orgFontSize * scale) + px);
-            // >>0 = Math.foor(). Firefox doesn't like fractional decimals in z-index.
             obj.style.zIndex = '' + (scale * 100) >> 0; // jslint wiaver
         }
         radians += spacing;
