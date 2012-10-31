@@ -77,6 +77,7 @@ var app = {
   tryPluginInstallAttempts: 0,
   facebookInited: false,
   fbCheckCredentialsTriggered: false,
+  fbTimerRunning: null,
   simPluginLoadFailed: false,
 
   /**
@@ -1917,6 +1918,15 @@ function enterId(
 
 function deferredCheckCredentials() {
   app.fbCheckCredentialsTriggered = true;
+
+  // Normally we don't call check credentials, but we MUST call it if document.ready has already
+  // run at this point. We infer this by the fact that the 10 second fb timer is already set which
+  // happens in document.ready. In this case, it's up to us to call checkcredentials.
+  if (app.fbTimerRunning) {
+    clearTimeout(app.fbTimerRunning);
+    app.fbTimerRunning = null;
+    $(document).trigger('checkCredentials');
+  }
 }
 
 ///
@@ -2467,7 +2477,7 @@ $(document).ready(function(
         }
 
         //do something if facebook took too long or errored out
-        setTimeout(function() {
+        app.fbTimerRunning = setTimeout(function() {
           if (!app.facebookInited) {
             closeWindow();
             app.log(2, 'Facebook API init failed - userAgent: ' + navigator.userAgent);
@@ -2692,13 +2702,13 @@ function sendLog()
   {
     // success callback
     $('#message', jqDlg).text('Sending log file to GoCast... DONE.');
-    setTimeout(function() {jqDlg.css("display", "none")}, 1000);
+    setTimeout(function() {jqDlg.css("display", "none");}, 1000);
     console.log("SendLogsToLogCatcher success", jqDlg);
   },
   function() // fail callback
   {
     $('#message', jqDlg).text('Sending log file to GoCast... FAILED.');
-    setTimeout(function() {jqDlg.css("display", "none")}, 1000);
+    setTimeout(function() {jqDlg.css("display", "none");}, 1000);
     Callcast.SendLiveLog("SendLogsToLogCatcher failed");
   });
 }
