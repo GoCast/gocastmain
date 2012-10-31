@@ -632,7 +632,7 @@ var Callcast = {
                 {
                     this.participants[nick].peer_connection.Width(0);
                     this.participants[nick].peer_connection.Height(0);
-                }                
+                }
             }
 
         }
@@ -886,6 +886,20 @@ var Callcast = {
             delete this.localplayer;
             this.localplayer = null;
         }
+    },
+
+    GetParticipantReport: function() {
+        var rpt = '', k, cur;
+
+        rpt = 'Participant Report: nickname, peer_connection, videoOn\n';
+        for (k in Callcast.participants) {
+            if (Callcast.participants.hasOwnProperty(k)) {
+                cur = Callcast.participants[k];
+                rpt += k + ', pc=' + cur.peer_connection ? 'y' : 'n' + ', video=' + cur.videoOn ? 'on' : 'off' + '\n';
+            }
+        }
+
+        return rpt;
     },
 
     Callee: function(nickin, room) {
@@ -1858,8 +1872,12 @@ var Callcast = {
                     }
 
                     if ($(presence).attr('av')) {
+                        Callcast.log('PRES-INFO: Already-known-Nick: ' + nick + ' has AV capability (plugin)');
                         // Other side has av. Make sure we have a peerconnection with them.
                         Callcast.participants[nick].StartConnection();  // Will drop out if connection already present.
+                    }
+                    else {
+                        Callcast.log('PRES-INFO: Already-known-Nick: ' + nick + ' has NO AV capability (NO-plugin)');
                     }
 
                     // Update the presence information.
@@ -1940,8 +1958,12 @@ var Callcast = {
                         }
 
                         if ($(presence).attr('av')) {
+                            Callcast.log('PRES-INFO: New-Nick: ' + nick + ' has AV capability (plugin)');
                             // They have AV -- so start up peerconnection and plugin. (so long as we have the plugin too)
                             Callcast.participants[nick].StartConnection();
+                        }
+                        else {
+                            Callcast.log('PRES-INFO: New-Nick: ' + nick + ' has NO AV capability (NO-plugin)');
                         }
                     }
 
@@ -1996,6 +2018,11 @@ var Callcast = {
                     //
                     if (!Callcast.joined && nick === Callcast.nick)
                     {
+                        Callcast.log('INFO: At time of receiing all participants (joined=true) ...');
+                        Callcast.log('INFO: pluginLoaded=' + Callcast.IsPluginLoaded());
+                        // Dump all room participants to the log in case we run into issues of 'noav' vs 'av' issues.
+                        Callcast.log('INFO: ' + Callcast.GetParticipantReport());
+
                         Callcast.joined = true;
                         Callcast.SendMyPresence();
                         $(Callcast).trigger('my_join_complete', nick);
