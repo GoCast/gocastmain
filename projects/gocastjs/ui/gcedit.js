@@ -62,12 +62,12 @@ GoCastJS.gcEdit.prototype.init = function()
 };
 GoCastJS.gcEdit.prototype.updateTextArea = function(html)
 {
-  console.log("gcEdit.updateTextArea ", html);
+  //console.log("gcEdit.updateTextArea ", html);
   return html;
 };
 GoCastJS.gcEdit.prototype.updateFrame = function(code)
 {
-  console.log("gcEdit.updateFrame ", code);
+  //console.log("gcEdit.updateFrame ", code);
   return code;
 };
 ///
@@ -85,7 +85,7 @@ GoCastJS.gcEdit.prototype.setScale = function(width, height)
   this.scaleW = wScale;
   this.scaleH = hScale;
   */
-  console.log("gcEdit scale width " + width + " height " + height);
+  //console.log("gcEdit scale width " + width + " height " + height);
   //this.jqDiv.width(width).height(height);
   this.div.style.width = width + 'px';
   this.div.style.height = height + 'px';
@@ -112,7 +112,7 @@ GoCastJS.gcEdit.prototype.getTimeoutCallback = function()
 GoCastJS.gcEdit.prototype.sendEdits = function()
 {
   var code = this.editor.getCode();
-  console.log("sendEdits ", code);
+  //console.log("sendEdits ", code);
   this.editor.clearDirty();
   Callcast.SetSpot({spottype: "editor", spotnumber: this.info.spotnumber, code: code});
 };
@@ -123,7 +123,7 @@ GoCastJS.gcEdit.prototype.doSpot = function(info)
 {
   if (info.code && info.from !== app.user.name)
   {
-    console.log("gcEdit doSpot ", info);
+    //console.log("gcEdit doSpot ", info);
     this.editor.setCode(info.code);
   }
 };
