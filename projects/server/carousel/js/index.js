@@ -2123,7 +2123,11 @@ function tryPluginInstall(
 
       if (window.location.pathname.match(/index2.html/g)) {
         // show plugin load warning and take them to the room.
-        showWarning('GoCast App Problem', 'The GoCast App failed to load. Click "OK" to proceed without video chat.');
+        showWarning('GoCast App Problem', 'We are still having audio/video problems. ' +
+                    'Please feel free to use the other features of GoCast with the ' +
+                    'audio/video disabled for the moment. To solve this issue, you might ' +
+                    'want to try quitting your browser completely and starting it again. ' +
+                    'Click "OK" to proceed without video chat.');
         Callcast.PluginFailedToLoad();
 
         $('#warningMsg > button#ok').unbind('click').click(function() {
@@ -2133,7 +2137,7 @@ function tryPluginInstall(
         });
       } else {
         // show plugin load warning and take them to the alternate webpage.
-        showWarning('GoCast App Problem', 'A problem occurred while loading the GoCast App. ' +
+        showWarning('GoCast App Problem', 'We seem to be having trouble with the audio/video components. ' +
                                           'Click "OK" to try once more.');
         $('#warningMsg > button#ok').unbind('click').click(function() {
           if (window.location.href.match(/\/$/)) {
