@@ -2144,6 +2144,8 @@ function tryPluginInstall(
             window.location.href = window.location.href.replace(/\/$/, '/index2.html');
           } else if (window.location.href.match(/\/\?/)) {
             window.location.href = window.location.href.replace(/\/\?/, '/index2.html?');
+          } else if (window.location.href.match(/index.html/)) {
+            window.location.href = window.location.href.replace(/index.html/, 'index2.html');
           }
         });
       }
