@@ -2168,9 +2168,9 @@ function tryPluginInstall(
     {
        Callcast.SendLiveLog('Local plugin is out of date. Current version: ' + Callcast.GetVersion());
        title = $('#installPlugin > h1');
-       title.text('The Gocast.it plugin is out of date');
+       title.text('We have upgraded your GoCast beta');
        prompt = $('#installPlugin > p#prompt');
-       prompt.text('Please download and install the new version of the plugin');
+       prompt.text('Please download and install the new version. Thanks. The GoCast Team.');
     }
     if (!app.pluginInstalled()) {
        Callcast.SendLiveLog('Local plugin is not installed.');
