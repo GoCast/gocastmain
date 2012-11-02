@@ -1,6 +1,5 @@
 #include "../GCPVideoRenderer.h"
 #include "PluginWindowX11.h"
-#include <iostream>
 
 namespace GoCast
 {
@@ -9,36 +8,7 @@ namespace GoCast
         GCPVideoRenderer* pRenderer = reinterpret_cast<GCPVideoRenderer*>(data);
         return pRenderer->OnWindowRefresh();
     }
-    
-    bool GCPVideoRenderer::RenderFrame(const cricket::VideoFrame* pFrame)
-    {
-        static const int stride = m_width*4;
-        static const int frameBufferSize = m_height*stride;
-        boost::mutex::scoped_lock winLock(m_winMutex);
 
-        pFrame->ConvertToRgbBuffer(cricket::FOURCC_ARGB,
-                                   m_pFrameBuffer.get(),
-                                   frameBufferSize,
-                                   stride);
-        
-        //convert to rgba and correct alpha
-        uint8* pBufIter = m_pFrameBuffer.get();
-        uint8* pBufEnd = pBufIter + frameBufferSize;
-        while(pBufIter < pBufEnd)
-        {
-            pBufIter[3] = pBufIter[0];
-            pBufIter[0] = pBufIter[2];
-            pBufIter[2] = pBufIter[3];
-            pBufIter[3] = 0xff;
-            pBufIter += 4;
-        }
-
-        //trigger window refresh event
-        g_idle_add(RedrawWindow, this);
-
-        return true;
-    }
-    
     bool GCPVideoRenderer::OnWindowRefresh(FB::RefreshEvent* pEvt)
     {
         boost::mutex::scoped_lock winLock(m_winMutex);
@@ -58,6 +28,48 @@ namespace GoCast
         );
 
         return false;
+    }
+    
+    void GCPVideoRenderer::ConvertToRGBA()
+    {
+        const int stride = m_width*4;
+        const int frameBufferSize = m_height*stride;
+        uint8* pBufIter = m_pFrameBuffer.get();
+        uint8* pBufEnd = pBufIter + frameBufferSize;
+
+        while(pBufIter < pBufEnd)
+        {
+            pBufIter[3] = pBufIter[0];
+            pBufIter[0] = pBufIter[2];
+            pBufIter[2] = pBufIter[3];
+            pBufIter[3] = 0xff;
+            pBufIter += 4;
+        }
+    }
+    
+    void GCPVideoRenderer::InvalidateWindow()
+    {
+        g_idle_add(RedrawWindow, this);
+    }
+    
+    uint8* GCPVideoRenderer::AllocBuffer(size_t size)
+    {
+        uint8* pBuf = NULL;
+        
+        if(0 < size)
+        {
+            posix_memalign(reinterpret_cast<void**>(&pBuf), 16, size);
+        }
+        
+        return pBuf;
+    }
+    
+    void GCPVideoRenderer::FreeBuffer(uint8 *pBuf)
+    {
+        if(NULL != pBuf)
+        {
+            free(pBuf);
+        }
     }
 }
 
