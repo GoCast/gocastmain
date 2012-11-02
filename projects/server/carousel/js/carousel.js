@@ -35,6 +35,8 @@
     this.plgOrgHeight = (this.plgOrgWidth / Callcast.WIDTH) * Callcast.HEIGHT;
     this.orgChatWidth = this.plgOrgWidth;
     this.orgChatBot = 17;
+    this.nick = null;
+    this.chatName = null;
     this.object = objIn;
     this.options = options;
     this.dummy = dummy;
@@ -63,17 +65,32 @@
     jqObj.append('<img id="upper-left" class="zoom control" src="images/fullscreen.png" alt="Zoom" title="Zoom" onclick="carouselItemZoom(event);"/>');
     jqObj.append('<img id="upper-right" class="'+ app.spotUrDefaultClass + '" src="' + app.spotUrDefaultImage +'" alt="Close" title="Close" onclick="onSpotClose(event);"/>');
     jqObj.append('<input id="showChat" type="button" title="Show Chat" onclick="showPersonalChat(event);"/>');
-    jqObj.append('<div id="msgBoard"><div id="chatOut"></div><input class="chatTo" type="text" placeholder="Enter a message" onkeydown="keypressPersonalChatHandler(event);"/><input class="send" type="button" title="Send message." onclick="sendPersonalChat(event);"/><input class="close" type="button" title="Close" onclick="closePersonalChat(event);"/></div>');
+    jqObj.append('<div id="msgBoard"><div id="chatOut"></div><input class="chatTo" type="text" placeholder="Enter a message" onkeydown="keypressPersonalChatHandler(event);"/><input class="send gc-icon" type="button" title="Send message." onclick="sendPersonalChat(event);"/><input class="close gc-icon" type="button" title="Close" onclick="closePersonalChat(event);"/></div>');
     // add chat util to personal chat out
     chatOut = $("#msgBoard > #chatOut", jqObj);
     if (!chatOut[0]) {app.log(4, "Item error can't find chatOut");}
     chatOut.data('util', new GoCastJS.ChatUtil(chatOut));
+
     // add handlers
-    jqObj.mouseover(function(event) {
+    jqObj.mouseover(function(event) 
+    {
+      if (event.isPropagationStopped())
+      {
+        return;
+      }
       // only show close icon on unoccupied or content spots
       if ($(this).hasClass('unoccupied') || $(this).hasClass('typeContent')) {
-        $('.zoom', this).css('visibility', 'visible');
         $('.close', this).css('visibility', 'visible');
+        if ($(this).hasClass('typeContent')) {
+          $('.zoom', this).css('visibility', 'visible');
+        }
+      }
+
+      if ($(this).hasClass('editor')) {
+        $('.zoom', this).css({
+          'left': '1%',
+          'bottom': '1%'
+        });      
       }
     });
     jqObj.mouseout(function(event) {
@@ -85,12 +102,16 @@
   ///
   Item.prototype.scale = function(scale)
   {
-    var wbCanvas = $("#wbCanvas", this.object), // todo optimize
-        wb       = wbCanvas.data("wb");
+    var wbCanvas = $("#wbCanvas", this.object),
+        wb       = wbCanvas.data("wb"),
+        editor   = $(this.object).data("gcEdit");
     if (wb)
     {
-      //todo size to parent div, not spot
       wb.setScale(this.plgOrgWidth * scale, this.plgOrgHeight * scale);
+    }
+    if (editor)
+    {
+      editor.setScale(this.plgOrgWidth * scale, this.plgOrgHeight * scale);
     }
   };
   
@@ -100,6 +121,7 @@
     this.vals = {}; // assoc array
     this.keys = []; // array of sorted keys
     this.bySpot = []; // array of indexes by spotnumber
+    this.byNick = {}; // array of indexes by nickname
   };
   Items.prototype.set = function(index, item)
   {
@@ -107,6 +129,10 @@
     if (item.spotnumber)     // index by spotnumber
     {
        this.bySpot[item.spotnumber] = item.index;
+    }
+    if (item.nick)
+    {
+      this.byNick[item.nick] = item.index;
     }
     this.updateKeys();       // sort items
   };
@@ -120,7 +146,12 @@
     //todo check that index is numeric
     var spot = parseInt(spotnumber, 10),
         index = this.bySpot[spot];
-    return index ? this.vals[index] : null;
+    return index !== null ? this.vals[index] : null;
+  };
+  Items.prototype.getByNick = function(name)
+  {
+    var index = this.byNick[name];
+    return index !== null ? this.vals[index] : null;
   };
   Items.prototype.remove = function(index)
   {
@@ -187,6 +218,97 @@
     });
   };
   ///
+  /// \brief get the chat name collisions for item's nick name
+  ///
+  /// \arg item the item
+  /// \arg chat name to test for collisions
+  Items.prototype.getNameCollisions = function(item, name)
+  {
+    var collisions = [];
+    this.iterateSorted(function(itemThat)
+    {
+      // exclude item from compare
+      if (itemThat.index !== item.index)
+      {
+        //console.log("getNameCollisions other", itemThat);
+        if (itemThat.chatName && 0 === itemThat.chatName.indexOf(name))
+        {
+          collisions.push(itemThat);
+        }
+      }
+    });
+    return collisions;
+  };
+  ///
+  /// \brief set a unique shorter name for display in chat
+  ///
+  Items.prototype.setChatName = function(item)
+  {
+    var name, names, collisions;
+    if (null === item.nick)
+    {
+      return;
+    }
+    else
+    {
+      name = decodeURI(item.nick);
+      names = name.split(' ');
+      console.log("setChatName", item.nick, name, names);
+      if (1 === names.length) // no first, last name, only nick name so use it
+      {
+        item.chatName = item.nick;
+      }
+      else
+      {
+        // if no collisions set chat name to first name
+        collisions = this.getNameCollisions(item, names[0]);
+        if (0 === collisions.length)
+        {
+          item.chatName = names[0];
+          console.log("setChatName chatName set", item);
+        }
+        else // resolve collisions
+        {
+          console.log("setChatName collisions", collisions);
+          this.resolveChatNameCollisions(item, names);
+        }
+      }
+    }
+
+    $('#msgBoard > input.chatTo', $(item.object)).attr('placeholder', 'chat with ' + item.chatName.toLowerCase());
+  };
+  ///
+  /// \brief genarate a unique chat name given that the current name collides
+  ///
+  Items.prototype.resolveChatNameCollisions = function(item, names)
+  {
+    var suffix, // the str to append to name to make the chat name unique
+        newName,
+        collisions,
+        // try adding the first and second letter of the last name
+        // if that doesn't work use the whole nick
+        trys = [names[0] + " " + names[names.length - 1].substr(0, 1),
+                names[0] + " " + names[names.length - 1].substr(0, 2)],
+        i;
+
+    item.chatName = null;
+    for (i = 0; i < trys.length; ++i)
+    {    
+      newName = trys[i];
+      //console.log("resolveChatNameCollisions newName", newName);
+      collisions = this.getNameCollisions(item, newName);
+      if (0 === collisions.length)
+      {
+        item.chatName = newName;
+        break;
+      }
+    }
+    if (null === item.chatName)
+    {
+      item.chatName = item.nick;
+    }
+  };
+  ///
   /// \brief Controller object. This handles moving all the items and dealing
   /// with mouse events.
   ///
@@ -242,22 +364,6 @@
         return false;
         });
     }
-    // click on addItem
-    $('#addItem', container).click(function(event)
-    {
-       Callcast.AddSpot({spottype: "new"}, function()
-        {
-          console.log("carousel addItem callback");
-        });
-    });
-    // click on addWhiteBoard
-    $('#addWhiteBoard', container).click(function(event)
-    {
-       Callcast.AddSpot({spottype: "whiteBoard", spotreplace: "first-unoc"}, function()
-        {
-          console.log("carousel addWhiteBoard callback");
-        });
-    });
     // mouseover
     /*
     $(container).mouseover(function(event)
@@ -342,11 +448,21 @@
     {
       var msg = $("#msgBoard", item.object).get(0),
           show = $("#showChat", item.object).get(0),
-          px = "px";
+          px = "px",
+          jqChat = $("#chatOut", msg),
+          util   = jqChat.data('util');
       msg.style.width = (item.orgChatWidth * scale) + px;
       msg.style.bottom = (item.orgChatBot * scale) + px;
       show.style.bottom = (item.orgChatBot * scale) + px;
       //console.log("adjustChat", msg.style);
+      if (util)
+      {
+        util.adjust((item.orgChatWidth * scale) + px);
+      }
+      else
+      {
+        app.log(4, "carousel adjustChat can't find util");
+      }
     };
     ///
     /// \ brief adjust plugin in spot on resize or carousel spin
@@ -375,7 +491,6 @@
             }
             else
             {
-                this.adjustChat(item, scale);
                 nick = $(obj).attr('encname');
                 if (nick && Callcast.participants[nick] && Callcast.participants[nick].videoOn)
                 {
@@ -383,11 +498,11 @@
                 }
                 // else do nothing on resize
             }
-
-            $(obj).find('div.name').css('font-size', (item.orgFontSize * scale) + px);
-            // >>0 = Math.foor(). Firefox doesn't like fractional decimals in z-index.
-            obj.style.zIndex = "" + ((scale * 100) >> 0); // jslint wiaver
         }
+
+        this.adjustChat(item, scale);
+        //$(obj).find('div.name').css('font-size', (item.orgFontSize * scale) + px);
+        //obj.style.zIndex = "" + ((scale * 100) >> 0); // jslint waiver
     };
     ///
     /// \brief adjust plugin after spot update
@@ -455,7 +570,7 @@
             change = (this.destRotation - this.rotation),
             absChange = Math.abs(change),
             itemsLen, spacing, radians, isMSIE,
-            style, px, context, obj;
+            style, px, context, obj/*, opacity*/;
 
         this.rotation += change * options.speed;
         if (absChange < 0.001) {
@@ -479,6 +594,7 @@
         {
         sinVal = funcSin(radians);
         scale = ((sinVal + 1) * smallRange) + minScale;
+        //opacity = 0.6 * (scale - minScale)/(1.0 - minScale) + 0.2 * (1.0 - scale)/(1.0 - minScale);
         x = ctx.xCentre + (((funcCos(radians) * ctx.xRadius) - (item.orgWidth * 0.5)) * scale);
         y = ctx.yCentre + (((sinVal * ctx.yRadius)) * scale);
         if (item.objectOK) {
@@ -489,12 +605,18 @@
             obj.style.height = h + px;
             obj.style.left = x + px;
             obj.style.top = y + px;
+
+            /*if ($(obj).hasClass('unoccupied')) {
+              obj.style.opacity = opacity;
+            } else {
+              obj.style.opacity = 1.0;
+            }*/
+
             // Adjust object dimensions.
             ctx.adjPlugin(item, scale);
             item.scale(scale);
 
             $(obj).find('div.name').css('font-size', (item.orgFontSize * scale) + px);
-            // >>0 = Math.foor(). Firefox doesn't like fractional decimals in z-index.
             obj.style.zIndex = '' + (scale * 100) >> 0; // jslint wiaver
         }
         radians += spacing;
@@ -557,6 +679,15 @@
            obj.style.height = item.orgHeight * scale + 'px';
            obj.style.left = x + 'px';
            obj.style.bottom = '0px';
+
+           /*
+           if ($(obj).hasClass('unoccupied')) {
+            obj.style.opacity = 0.4;
+           } else {
+            obj.style.opacity = 1.0;
+           }
+           */
+
            ctx.adjPlugin(item, scale); // Adjust object dimensions.
            item.scale(scale);
            //app.log(2, "updateLinear item " + item.index + " x " + x);
@@ -614,16 +745,28 @@
     {
       return items.getByspotnumber(number);
     };
-    /// \brief set the spot number for an existing spot
+    /// \brief set the spot number for an existing spot and reindex
     this.setSpotNumber = function(item, number)
     {
       item.spotnumber = number;
       items.set(item.index, item);
     };
+    /// \brief set the spot name for an existing spot and reindex
+    this.setSpotName = function(item, name)
+    {
+      item.nick = name;
+      items.set(item.index, item);
+      items.setChatName(item);
+    };
     /// \brief get an item from items by index
     this.getByIndex = function(index)
     {
       return items.get(index);
+    };
+    /// \brief get item by spot number
+    this.getByNick = function(nick)
+    {
+      return items.getByNick(nick);
     };
     /// \brief remove a spot from items
     this.remove = function(index)
@@ -696,6 +839,14 @@
         //app.log(2, "container w " + width + " h " + height);
         // set round property based on height
         this.round = (zoomedSpot.length === 0 && height > 150) ? true : false;
+        if (!this.round)
+        {
+          $('div#scarousel').addClass('linear');
+        }
+        else
+        {
+          $('div#scarousel').removeClass('linear');
+        }
 
         this.item.orgWidth *= scale;
         this.item.orgHeight *= scale;

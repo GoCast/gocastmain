@@ -34,7 +34,7 @@ set(MOZILLA_PLUGINID "gocast.it/GCP")
 # strings
 set(FBSTRING_CompanyName "GoCast")
 set(FBSTRING_FileDescription "GoCast Player")
-set(FBSTRING_PLUGIN_VERSION "1.28.0.0")
+set(FBSTRING_PLUGIN_VERSION "1.31.0.0")
 set(FBSTRING_LegalCopyright "Copyright 2012 GoCast")
 set(FBSTRING_PluginFileName "np${PLUGIN_NAME}.dll")
 set(FBSTRING_ProductName "GoCastPlayer")

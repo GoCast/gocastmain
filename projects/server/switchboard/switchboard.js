@@ -6,6 +6,16 @@
  TODO
 
  */
+/*jslint node: true */
+
+var settings = require('./settings');   // Our GoCast settings JS
+if (!settings) {
+    settings = {};
+}
+if (!settings.logcatcher) {
+    settings.logcatcher = {};
+}
+
 var sys = require('util');
 var xmpp = require('node-xmpp');
 var fs = require('fs');
@@ -38,10 +48,10 @@ function useritem(properties) {
 
 useritem.prototype.numJidsAssociated = function() {
 	var numjids = 0;
-	
+
 	for (k in this.jids)
 		numjids ++;
-	
+
 	return numjids;
 };
 
@@ -73,15 +83,16 @@ useritem.prototype.getJidList = function()
 ///
 
 function switchboard(user, pw, notifier) {
-	this.SERVER = 'video.gocast.it';
+	this.SERVER = settings.SERVERNAME;
 // Gocast with Friends
 //	this.APP_ID = '303607593050243';
 //	this.APP_SECRET = '48b900f452eb251407554283cc7f3d7f';
 
 // GoCast Carousel
-	this.APP_ID = '458515917498757';
-	this.APP_SECRET = 'c3b7a2cc7f462b5e4cee252e93588d45';
-	this.client = new xmpp.Client({ jid: user, password: pw, reconnect: true, host: this.SERVER, port: 5222 });
+	this.APP_ID = settings.switchboard.APP_ID || '458515917498757';
+	this.APP_SECRET = settings.switchboard.APP_SECRET || 'c3b7a2cc7f462b5e4cee252e93588d45';
+
+	this.client = new xmpp.Client({ jid: user, password: pw, reconnect: true, host: this.SERVER, port: settings.SERVERPORT });
 	this.notifier = notifier;
 
 	this.iqnum = 0;
@@ -241,7 +252,7 @@ switchboard.prototype.handleMessage = function(msg) {
 					// Multiple jids?
 					for (m in this.userlist[k].getJidList())
 						the_list += ", jid:" + m;
-					
+
 					the_list += "\n";
 				}
 
@@ -305,7 +316,7 @@ switchboard.prototype.intro_sr = function(from, blob, cb) {
 							// This would happen if a given anonymous jid logged out of facebook and back in as someone else.
 							self.log("ERROR: JID already in database. Clearing jid for FB user - " + self.jidlist[fromjid].name);
 							self.jidlist[fromjid].removeJid(fromjid);
-							
+
 							// Now that we've removed the jid from the useritem, if there are no other jids, then it's abandoned.
 							// So, we can remove the useritem altogether.
 							if (self.jidlist[fromjid].numJidsAssociated() === 0)
@@ -320,7 +331,7 @@ switchboard.prototype.intro_sr = function(from, blob, cb) {
 						{
 							self.jidlist[fromjid] = self.userlist[result.id];
 
-							var wholog = "Online: FBName:" + result.name + ", FBID:" + result.id + ", email:" + result.email + ", jid:" + fromjid;
+							var wholog = "Online: FBName:" + result.name + ":, FBID:" + result.id + ", email:" + result.email + ", jid:" + fromjid;
 							self.log(wholog);
 							self.notifylog(wholog);
 //							console.log("DEBUG: ", result);
@@ -358,17 +369,17 @@ switchboard.prototype.handlePresence = function(pres) {
 			fbuseritem = this.jidlist[from];
 			fbname = fbuseritem.name;
 		}
-		
+
 		if (pres.attrs.type === 'unavailable')
 		{
 			this.log("Got pres (OFFLINE): " + from + (fbname ? (" - Facebook: " + fbname) : ""));
-			
+
 			// Need to remove user and jid from online list.
 			if (fbuseritem)
 			{
 				// Definitely delete the jidlist[] entry.
 				delete this.jidlist[from];
-				
+
 				// If the useritem contains more than 1 jid entry, we can't delete the fb username.
 				if (this.userlist[fbuseritem.id])
 				{
@@ -377,7 +388,7 @@ switchboard.prototype.handlePresence = function(pres) {
 						delete this.userlist[fbuseritem.id];
 				}
 			}
-			
+
 		}
 		else
 		{
@@ -411,6 +422,9 @@ switchboard.prototype.handlePresence = function(pres) {
 						*/
 					});
 				});
+			}
+			else if (pres.attrs.adhocname) {
+				self.log('Online: Ad-hoc-Name:' + pres.attrs.adhocname + ':');
 			}
 		}
 	}
@@ -497,7 +511,7 @@ function notifier(serverinfo, jidlist) {
 //		  	console.log(logDate() + " - Notifier offline.");
 		  	self.isOnline = false;
 		  });
-		  
+
 	this.client.on('error', function(e) {
 		sys.puts(e);
 	});
@@ -551,7 +565,10 @@ if (process.argv.length > 2)
 			console.log("* --help - this usage help.");
 			console.log("* --debugcommands - Allow direct chat to switchboard for backend commands.");
 			console.log("*");
+			console.log("* Settings dump: ", settings);
+			console.log("*");
 			console.log("***********");
+			process.exit(1);
 		}
 		else if (arg === '--debugcommands' || arg === '-debugcommands')
 		{
@@ -561,11 +578,12 @@ if (process.argv.length > 2)
 	}
 }
 
-var notify = new notifier({jid: "overseer@video.gocast.it", password: "the.overseer.rocks",
-							server: "video.gocast.it", port: 5222},
-			["rwolff@video.gocast.it"]); // , "bob.wolff68@jabber.org" ]);
+var notify = new notifier({jid: settings.notifier.username, password: settings.notifier.password,
+							server: settings.SERVERNAME, port: settings.SERVERPORT},
+							settings.notifier.notify_list);
 
 //
 // Login as Switchboard operator
 //
-var overseer = new switchboard("switchboard_gocastfriends@video.gocast.it", "the.switchboard.answers", notify);
+var overseer = new switchboard(settings.switchboard.username, settings.switchboard.password, notify);
+

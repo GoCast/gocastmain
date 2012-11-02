@@ -15,11 +15,19 @@ GoCastJS = (null !== GoCastJS) ? GoCastJS : {};
 ///
 GoCastJS.WhiteBoardTools = function(whiteBoard)
 {
-  var button;
+  var button, visible;
   this.wb = whiteBoard;
   this.DIV = '<div id="wbTools"></div>';
 
-  this.jqTools = $(this.DIV).appendTo(this.wb.jqWb); // todo encapsulate
+  this.jqTools = $(this.DIV).appendTo(this.wb.jqWb);
+
+  // tools may be hidden, get display state
+  visible = this.jqTools.is(":visible");
+
+  if (!visible) // display tools so it's flowed
+  {
+    this.jqTools.css("display", "block");
+  }
 
   // create pen width buttons
   button = $('<div id="wbPenW1"  class="wbButton wbPenW" title="Pen Width 1"  penSize="1"></div>').appendTo(this.jqTools).click(this.penWidthClick).data('wb',this.wb);
@@ -38,9 +46,18 @@ GoCastJS.WhiteBoardTools = function(whiteBoard)
   // create eraser
   this.jqEraser = $('<div id="wbEraser"  class="wbEraser" title="Eraser"></div>').appendTo(this.jqTools).click(this.eraserClick).data('wb',this.wb);
 
+  // display whiteboard name
+  $('<span id="wbName"  class="wbName" title="Name">' + this.wb.name + '</span>').appendTo(this.jqTools);
+  $('.name', this.wb.jqParent).text(this.wb.name); // set spot name
+
   this.initPenColors(this.jqTools);
 
   this.updateTools(); // init toolbar
+
+  if (!visible) // reset display property
+  {
+    this.jqTools.css("display", "");
+  }
 };
 ///
 /// \brief pen width button click handler
@@ -81,7 +98,7 @@ GoCastJS.WhiteBoardTools.prototype.penColorClick = function(event)
       spotPos = wb.jqParent.position(),
       spotH   = wb.jqParent.height(),
       toolsPos = wb.tools.jqTools.position(), // wb tools pos todo height is zero so calcs are off
-      jqContainer = wb.jqParent.parent(), // spot parent 
+      jqContainer = wb.jqParent.parent(), // spot parent
       containerH = jqContainer.height(),
       listH   = wb.tools.jqPenList.height(),
       top = pos.top;
@@ -100,7 +117,7 @@ GoCastJS.WhiteBoardTools.prototype.penColorClick = function(event)
   wb.tools.jqEraser.removeClass('checked');
   wb.tools.updateTools();
   // position and display table, todo align selected color
-  console.log("wbPenColor top ", top, " pos.left ", pos.left);
+  //console.log("wbPenColor top ", top, " pos.left ", pos.left);
   wb.tools.jqPenList.css({ "top": top,
                            "left": pos.left,
                            "width": w,
@@ -273,19 +290,20 @@ GoCastJS.WhiteBoardTools.prototype.updateTools = function()
 ///
 GoCastJS.WhiteBoardMouse = function(whiteBoard)
 {
-  this.DOWN = "down";
-  this.UP   = "up";
-
-  this.state = this.UP;
+  this.timeout = 300; // timeout in ms
   this.currentCommand = []; // the current path see mouse handlers
+  this.timer = null; // timer for periodic stroke send
+  this.lineCt = 0; // count of lines in commands
+  this.start = null; // the starting mouse point
+  this.strokeInterrupted = false; // true if received stroke in the middle of a local stroke
 };
 
 ///
 /// \brief calc mouse x,y relative to target across browser
 ///
-GoCastJS.WhiteBoardMouse.prototype.offsetEvent = function(event)
+GoCastJS.WhiteBoardMouse.prototype.offsetEvent = function(event, jqTarget)
 {
-  var targetOffset = $(event.target).offset(),
+  var targetOffset = jqTarget.offset(),
       offX         = event.pageX - targetOffset.left,
       offY         = event.pageY - targetOffset.top;
   //console.log("event offsetX " + event.offsetX + "offX " + offX);
@@ -299,7 +317,6 @@ GoCastJS.WhiteBoardMouse.prototype.offsetEvent = function(event)
   }
   */
 };
-
 ///
 /// \brief whiteboard settings object
 ///
@@ -342,10 +359,11 @@ GoCastJS.WhiteBoardSettings.prototype.applyJson = function(settings, context)
 ///
 /// \brief white board constuctor
 ///
-GoCastJS.WhiteBoard = function(spot)
+GoCastJS.WhiteBoard = function(spot, info)
 {
-  this.width = 1500; // logicial canvas width
-  this.height = 1500; // logical canvas height
+  this.name = info.spotname;
+  this.width = 500; // logicial canvas width
+  this.height = 500; // logical canvas height
   this.scale = 1.0; // the scale for x, y dimensions for transform from window to logical coord system
   this.scaleW = 1.0;
   this.scaleH = 1.0;
@@ -366,11 +384,36 @@ GoCastJS.WhiteBoard = function(spot)
   this.parent = spot;           // the parent dom object
   this.jqParent = $(this.parent); // the parent jq object
 
-  this.mouseCommands = []; // array of mouse commands
-
   this.init(); // initialize
 }; // whiteboard constructor
-
+///
+/// \brief get method to send a stroke when timer goes off
+///
+GoCastJS.WhiteBoard.prototype.getStrokeTimeout = function()
+{
+  var self = this; // closure var for timeout callback
+  return function()
+  {
+    var lastCmd, stroke;
+    // check if there's anything to send
+    console.log("strokeTimeout lineCt ", self.mouse.lineCt);
+    if (self.mouse.lineCt > 0) // there are lineto's
+    {
+      self.mouse.lineCt = 0;
+      stroke = self.mouse.currentCommand.slice(0);       // copy command
+      self.mouse.currentCommand = [];                    // clear command
+      lastCmd = stroke[stroke.length - 1];               // get last lineTo, must be lineTo since lineCt > 0
+      console.log("strokeTimeout lastCmd ", lastCmd);
+      self.mouse.currentCommand.push({name: 'save', settings: self.settings}); // start new command
+      self.mouse.currentCommand.push({name: 'beginPath'});
+      self.mouse.currentCommand.push({name: 'moveTo', x: (lastCmd.x >> 0), y: (lastCmd.y >> 0)}); // make start point end of last stroke
+      self.wbCtx.moveTo(lastCmd.x, lastCmd.y);
+      stroke.push({name: 'stroke'}); // stroke lines
+      stroke.push({name: 'restore'}); // finish command
+      self.sendStroke(stroke);        // send it
+    }
+  };
+};
 ///
 /// \brief init whiteboard
 ///
@@ -390,29 +433,32 @@ GoCastJS.WhiteBoard.prototype.init = function()
 
   // install handlers
   this.jqCanvas.mousedown(this.onMouseDown);
-  this.jqCanvas.mousemove(this.onMouseMove);
-  this.jqCanvas.mouseup(this.onMouseUp);
-  this.jqCanvas.mouseout(this.onMouseUp); // trigger mouseup on mouseout todo capture mouse and detect mouseup outside of target
 
   // change the zoom icon to black for white background
   $("img#upper-left", this.jqParent).attr("src", "images/fullscreen-black.png");
 
-}; // whiteboard init
+  // load a test image
+  //this.loadTestImage();
 
+}; // whiteboard init
 ///
-/// \brief send mouse command to server
+/// \brief load a test image into whiteboard
+///
+GoCastJS.WhiteBoard.prototype.loadTestImage = function()
+{
+  var jqImg = $("#GoToken");
+  this.wbCtx.drawImage(jqImg[0], 0, 0);
+};
+///
+/// \brief send mouse stroke to server
 ///
 /// \throw
 ///
-GoCastJS.WhiteBoard.prototype.sendSpot = function()
+GoCastJS.WhiteBoard.prototype.sendStroke = function(stroke)
 {
-  var spotnumber = this.jqParent.attr('spotnumber'), // todo refactor spotnumber location
-      cmd        = {spotnumber: spotnumber, // update 
-                    spottype: "whiteBoard", // whiteboard
-                    spotreplace: "first-unoc", // set replace for replayed setspot
-                    whiteboardcommandarray: JSON.stringify(this.mouseCommands)}; // send command array
-  //console.log("WhiteBoard.sendSpot", cmd);
-  Callcast.SetSpot(cmd);
+  var spotnumber = this.jqParent.attr('spotnumber'); // todo refactor spotnumber location
+  console.log("sendStroke ", stroke);
+  Callcast.SendSingleStroke({stroke: JSON.stringify(stroke), spotnumber: spotnumber});
 };
 ///
 /// \brief do received mouse command array
@@ -421,22 +467,56 @@ GoCastJS.WhiteBoard.prototype.sendSpot = function()
 ///
 GoCastJS.WhiteBoard.prototype.doCommands = function(info)
 {
-  var i, cmds;
+  var i, cmds, stroke, image, numstrokes, self=this;
   if (!info) {throw "WhiteBoard.doCommands info is null";}
-  if (!info.whiteboardcommandarray) // no commands, must be a new whiteboard
+
+  if (info.strokes)
   {
-    return;
+    cmds = JSON.parse(info.strokes);
+
+    numstrokes = cmds.strokes.length;
+
+    // Was an image sent down at the same time? If so, load/draw it first.
+    if (info.image)
+    {
+      // load image from data url
+      image = new Image();
+      image.onload = function()
+      {
+        self.wbCtx.clearRect(0, 0, self.wbCtx.canvas.width, self.wbCtx.canvas.height);
+
+        self.wbCtx.drawImage(image, 0, 0);
+
+        // Now that we have a base image, draw the strokes.
+        for (i = 0; i < numstrokes; i += 1)
+        {
+          self.doCommand(cmds.strokes[i]);
+        }
+      };
+      image.src = info.image;
+    }
+    else {
+    //console.log("WhiteBoard.doCommands", info, cmds);
+
+      this.wbCtx.clearRect(0, 0, this.wbCtx.canvas.width, this.wbCtx.canvas.height);
+      for (i = 0; i < numstrokes; i += 1)
+      {
+        this.doCommand(cmds.strokes[i]);
+      }
+    }
   }
-  cmds = JSON.parse(info.whiteboardcommandarray);
-  //console.log("WhiteBoard.doCommands", info, cmds);
-  this.mouseCommands = []; // replace commands
-  this.wbCtx.clearRect(0, 0, this.wbCtx.canvas.width, this.wbCtx.canvas.height);
-  for (i = 0; i < cmds.length; ++i)
+
+  if (info.stroke &&
+      info.from !== app.user.name) // don't play stokes that we sent
   {
-    this.doCommand(cmds[i]);
-    this.mouseCommands.push(cmds[i]); // add command to local list
+    stroke = JSON.parse(info.stroke);
+    //console.log("WhiteBoard.doCommands stroke ", stroke);
+    this.finishCurrentStroke();
+    this.doCommand(stroke);
+    this.startNewStroke();
   }
-  //console.log("WhiteBoard.doCommands cmds ", this.mouseCommands);
+
+  this.restoreMouseLocation();
 };
 ///
 /// \brief do received mouse command
@@ -447,7 +527,7 @@ GoCastJS.WhiteBoard.prototype.doCommand = function(cmdArray)
 {
   var i, cmd;
   //console.log("WhiteBoard.doCommand", cmdArray);
-  for (i = 0; i < cmdArray.length; ++i) {
+  for (i = 0; i < cmdArray.length; i += 1) {
     //console.log("cmd", cmdArray[i]);
     switch (cmdArray[i].name) {
       case "save":
@@ -473,12 +553,52 @@ GoCastJS.WhiteBoard.prototype.doCommand = function(cmdArray)
         this.wbCtx.stroke();
       break;
       default:
-         throw "WhiteBoard.doCommand unknown cmd " + cmdArray[i].name;
+        throw "WhiteBoard.doCommand unknown cmd " + cmdArray[i].name;
     }
   }
 };
+///
+/// \brief moveTo last lineTo in mousecommands after received strokes are applied to canvas
+///
+GoCastJS.WhiteBoard.prototype.restoreMouseLocation = function()
+{
+  var length = this.mouse.currentCommand.length;
+  // if mouse not down or commands empty nothing to do
+  if (this.mouse.currentCommand.length > 0 && // there are mouse moves
+      "lineTo" === this.mouse.currentCommand[length-1].name) // the last command is lineTo
+  {
+    // move the mouse to last position
+    this.wbCtx.moveTo(this.mouse.currentCommand[length-1].x, this.mouse.currentCommand[length-1].y);
+    console.log("restoreMouseLocation ", this.mouse.currentCommand[length-1].x, this.mouse.currentCommand[length-1].y);
+  }
+};
+///
+/// \brief finish in progress local stroke in order to play received stroke
+///        this only affects the local canvas not the stroke to be sent
+///
+GoCastJS.WhiteBoard.prototype.finishCurrentStroke = function()
+{
+  if (this.mouse.lineCt > 0)
+  {
+    this.mouse.strokeInterrupted = true;
+  }
+};
+///
+/// \brief start a new stroke if a local stroke was interrupted by a received stroke
+///        this only affects the local canvas not the stroke to be sent
+///
+GoCastJS.WhiteBoard.prototype.startNewStroke = function()
+{
+  if (this.mouse.strokeInterrupted)
+  {
+    this.settings.apply(this.wbCtx);
+    this.wbCtx.beginPath();
+    this.wbCtx.moveTo(this.mouse.start.x, this.mouse.start.y);
+  }
+};
+///
 /// \brief rezise the canvas, set css dimensions and scale member var
-/// 
+///
 /// \arg width, height the target sizes as integers
 ///
 GoCastJS.WhiteBoard.prototype.setScale = function(width, height)
@@ -502,22 +622,6 @@ GoCastJS.WhiteBoard.prototype.setScale = function(width, height)
   //                           "left": penColorPos.left});
   this.tools.jqPenList.css("visibility", "hidden");
 };
-
-///
-/// \brief rezise the canvas
-/// 
-/// \arg width, height the target sizes
-///
-GoCastJS.WhiteBoard.prototype.resize = function(width, height)
-{
-  /*
-  var wScale = width/this.width,
-      hScale = height/this.height,
-      scale = (wScale + hScale) / 2;
-  console.log("resize width " + width + " height " + height + " wScale" + wScale + " hScale " + hScale + " scale " + scale);
-  */
-};
-
 ///
 /// \brief wb jq canvas mouse down handler
 ///
@@ -525,23 +629,31 @@ GoCastJS.WhiteBoard.prototype.resize = function(width, height)
 ///
 GoCastJS.WhiteBoard.prototype.onMouseDown = function(event)
 {
+  if (1 !== event.which) // left mouse button only
+  {
+    return;
+  }
+
   var wb = $(this).data("wb"),
-      point = wb.mouse.offsetEvent(event),
+      point = wb.mouse.offsetEvent(event, wb.jqCanvas),
       x = point.x / wb.scaleW,
       y = point.y / wb.scaleH;
+  $(window).bind('mousemove', wb.onMouseMove) // bind mouse handlers
+           .bind('mouseup', wb.onMouseUp)
+           .data('wb', wb);
   event.stopPropagation();
   wb.tools.jqPenList.css("visibility", "hidden"); // hide pen color list
 
+  wb.mouse.timer = setInterval(wb.getStrokeTimeout(), wb.mouse.timeout);
   //console.log('wb.onMouseDown x' + event.offsetX + '(' + x + ') y ' + event.offsetY + '(' + y + ')' , event);
-  // todo make sure event is a JQuery event
-  wb.mouse.state = wb.mouse.DOWN;
-  wb.settings.apply(wb.wbCtx);
-  wb.wbCtx.beginPath();
-  wb.wbCtx.moveTo(x, y);
   wb.mouse.currentCommand = []; // new command array to be sent to server
   wb.mouse.currentCommand.push({name: 'save', settings: wb.settings});
   wb.mouse.currentCommand.push({name: 'beginPath'});
   wb.mouse.currentCommand.push({name: 'moveTo', x: (x >> 0), y: (y >> 0)});
+  wb.mouse.start = {x: x, y: y}; // save starting point for mousemove
+  wb.settings.apply(wb.wbCtx);
+  wb.wbCtx.beginPath();
+  wb.wbCtx.moveTo(wb.mouse.start.x, wb.mouse.start.y);
   return false; // disable text selection
 };
 
@@ -553,22 +665,27 @@ GoCastJS.WhiteBoard.prototype.onMouseDown = function(event)
 GoCastJS.WhiteBoard.prototype.onMouseUp = function(event)
 {
   var wb = $(this).data("wb"),
-      point = wb.mouse.offsetEvent(event),
+      point = wb.mouse.offsetEvent(event, wb.jqCanvas),
       x = point.x / wb.scaleW,
-      y = point.y / wb.scaleH;
+      y = point.y / wb.scaleH,
+      img;
+  $(window).unbind('mousemove', wb.onMouseMove) // unbind mouse handlers
+           .unbind('mouseup', wb.onMouseUp)
+           .removeData('wb');
+  wb.mouse.start = null;
   //console.log('wb.onMouseUp x' + event.offsetX + '(' + x + ') y ' + event.offsetY + '(' + y + ')' , event);
-  wb.mouse.offsetEvent(event);
+  clearInterval(wb.mouse.timer);
   event.stopPropagation();
-  // todo make sure event is a JQuery event
-  if (wb.mouse.DOWN === wb.mouse.state) {
-    wb.wbCtx.stroke();
+  if (wb.mouse.lineCt > 0)
+  {
     wb.mouse.currentCommand.push({name: 'stroke'});
     wb.mouse.currentCommand.push({name: 'restore'});
-    wb.mouseCommands.push(wb.mouse.currentCommand);
-    wb.mouse.currentCommand = [];
-    wb.sendSpot();
+    wb.sendStroke(wb.mouse.currentCommand);
+    img = wb.wbCanvas.toDataURL();
+    console.log("wb image length", img.length);
   }
-  wb.mouse.state = wb.mouse.UP;
+  wb.mouse.currentCommand = [];
+  wb.mouse.lineCt = 0;
 };
 
 ///
@@ -579,15 +696,26 @@ GoCastJS.WhiteBoard.prototype.onMouseUp = function(event)
 GoCastJS.WhiteBoard.prototype.onMouseMove = function(event)
 {
   var wb = $(this).data("wb"),
-      point = wb.mouse.offsetEvent(event),
+      point = wb.mouse.offsetEvent(event, wb.jqCanvas),
       x = point.x / wb.scaleW,
       y = point.y / wb.scaleH;
   //console.log('wb.onMouseMove x' + event.offsetX + '(' + x + ') y ' + event.offsetY + '(' + y + ')' , event);
   event.stopPropagation();
-  // todo make sure event is a JQuery event
-  if (wb.mouse.DOWN === wb.mouse.state){
+  if (wb.mouse.start)
+  {
+    //wb.wbCtx.save();
+    //wb.settings.apply(wb.wbCtx);
+    //wb.wbCtx.beginPath();
+    // wb.wbCtx.moveTo(wb.mouse.start.x, wb.mouse.start.y);
     wb.wbCtx.lineTo(x, y);
-    wb.wbCtx.stroke(); // draw stroke but don't push it, stroke is pushed on mouse up at end of cmd
+    wb.wbCtx.stroke();
+    //wb.wbCtx.restore();
     wb.mouse.currentCommand.push({name: 'lineTo', x: (x >> 0), y: (y >> 0)});
+    wb.mouse.lineCt += 1;
+    wb.mouse.start = {x: x, y: y};
+  }
+  else
+  {
+    app.log(4, "wb onMouseMove wb.mouse.start is null");
   }
 };

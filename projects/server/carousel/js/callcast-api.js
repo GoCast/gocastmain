@@ -28,7 +28,9 @@
           checkForPluginOptionalUpgrades,
           handleRoomSetup,
           carouselItemUnzoom,
-          showPersonalChatWithSpot
+          showPersonalChatWithSpot,
+          onEffectApplied,
+          promptTour
 */
 'use strict';
 
@@ -49,8 +51,7 @@ $(document).on('joined_session', function(
    * Enable button activities except join. */
   app.enableButtons(true);
   closeWindow();
-
-  //todo put openmeeting here to load plugin earlier
+  promptTour();
 
   return false;
 }); /* joined_session() */
@@ -135,16 +136,28 @@ $(document).on('public-message', function(
 {
   try
   {
-    var notice = msginfo.notice,
-        delayed = msginfo.delayed,
-        nick_class = msginfo.nick_class,
-        jqChat = $(app.GROUP_CHAT_OUT),
-        util;
+    var jqChat = $(app.GROUP_CHAT_OUT),
+        util,
+        item,
+        name;
     if (!jqChat[0]) {throw "no chat out div";}
     util = jqChat.data('util');
     if (!util) {throw "no chat util";}
-    util.addMsg(decodeURI(msginfo.nick), decodeURI(msginfo.body));
-    app.log(2, 'A public message arrived ' + decodeURI(msginfo.nick) + " " + decodeURI(msginfo.body));
+    item = app.carousel.getByNick(msginfo.nick);
+    if (!item)
+    {
+      name = decodeURI(msginfo.nick);
+    }
+    else
+    {
+      name = item.chatName;
+    }
+    util.addMsg(name, decodeURI(msginfo.body));
+    if ($(app.GROUP_CHAT_SHOW).is(":visible"))
+    {
+      $(app.GROUP_CHAT_SHOW).effect("pulsate", { times:5 }, 5 * 2000);
+    }
+    console.log('A public message arrived ' + decodeURI(msginfo.nick) + " " + decodeURI(msginfo.body));
   }
   catch(err)
   {
@@ -162,7 +175,7 @@ $(document).on('private-message', function(
 {
   try
   {
-    var id, oo, jqChat, atBottom, msgNumber, span, util;
+    var id, oo, jqChat, atBottom, msgNumber, span, util, item;
     app.log(2, 'A private message arrived.');
     id = app.str2id(msginfo.nick);
     oo = $('#meeting > #streams > #scarousel div.cloudcarousel#' + id).get(0);
@@ -174,7 +187,9 @@ $(document).on('private-message', function(
       if (!jqChat[0]) {throw "no chat out div";}
       util = jqChat.data('util');
       if (!util) {throw "no chat util";}
-      util.addMsg(decodeURI(msginfo.nick), decodeURI(msginfo.body));
+      item = app.carousel.getByNick(msginfo.nick);
+      if (!util) {throw "no item by name " + msginfo.nick;}
+      util.addMsg(item.chatName, decodeURI(msginfo.body));
     }
     else // spot not found
     {
@@ -402,20 +417,17 @@ $(document).on('connected', function(
 $(document).on('one-login-complete', function(event, msg) {
 
   if (msg) {
-    console.log('one-login-complete: Msg: ' + msg);
+    app.log(2, 'one-login-complete: Msg: ' + msg);
   }
   else {
-    console.log('one-login-complete: No Msg');
+    app.log(2, 'one-login-complete: No Msg');
   }
 
   if (app.loggedInAll())
   {
-    console.log('one-login-complete: opening meeting');
+    app.log(2, 'one-login-complete: opening meeting');
     openMeeting();
-
-    // check, install plugin
     tryPluginInstall();
-
   }
 
 });
@@ -433,68 +445,142 @@ $(document).on('disconnected', function(
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
   Callcast.log('Connection terminated.');
-  app.log(4, "disconnected.");
-  $('#errorMsgPlugin > h1').text('We got disconnected.');
-  $('#errorMsgPlugin > p#prompt').text('Please reload the page.');
+  app.log(4, "SENDLOG_DISCONNECTED: disconnected");
+  $('#errorMsgPlugin > h1').text('We got disconnected!');
+  $('#errorMsgPlugin > p#prompt').text('Please click on the send log button, and after its done, reload the page.');
   closeWindow();
   openWindow('#errorMsgPlugin');
+
+  $('#errorMsgPlugin > #sendLog').unbind('click').click(function() {
+    $(this).attr('disabled', 'disabled');
+    $('#errorMsgPlugin > #reload').attr('disabled', 'disabled');
+    $('#errorMsgPlugin > p#prompt').text('Sending log to GoCast...');
+
+    var logger = new GoCastJS.SendLogsXMPP(Callcast.room, Callcast.nick,
+                                           Callcast.LOGCATCHER,
+                                           Callcast.CALLCAST_XMPPSERVER, '',
+                                           function() {
+      $('#errorMsgPlugin > p#prompt').text('Sending log to GoCast... DONE.');
+      $('#errorMsgPlugin > #reload').removeAttr('disabled');
+    }, function() {
+      $('#errorMsgPlugin > p#prompt').text('Sending log to GoCast... FAILED.');
+      $('#errorMsgPlugin > #reload').removeAttr('disabled');
+    });
+  });
+
   return false;
 }); /* disconnected() */
 
-///
-/// \brief Function called when other Gocast.it plugin object is created.
-///
-function addPluginToCarousel(nickname)
-{
+function assignSpotForParticipant(nickname) {
   var dispname = decodeURI(nickname),
       id = app.str2id(nickname),
-      w, h,
-      jqOo, oo;
-  if (!nickname)
-  {
-    app.log(4, "addPluginToCarousel error nickname undefined");
-    return null;
+      w, h, jqOo, oo, item;
+
+  if (!nickname) {
+    app.log(4, "assignSpotForParticipant: nickname undefined");
+    return;
   }
+
   // check if nickname already in carousel
   jqOo = $('#meeting > #streams > #scarousel div.cloudcarousel#'+ id);
-  if (jqOo.length > 0)
-  {
-    app.log(4, "addPluginToCarousel error nickname " + nickname + "already in carousel");
-    alert("addPluginToCarousel error nickname " + nickname + "already in carousel");
-    return null;
+  if (jqOo.length > 0) {
+    app.log(4, "assignSpotForParticipant: nickname [" + nickname + "] already in carousel");
+    alert("assignSpotForParticipant: nickname [" + nickname + "] already in carousel");
+    return;
   }
+
   // Check next available cloudcarousel
   oo = $('#meeting > #streams > #scarousel div.unoccupied').get(0);
 
-  if (!oo) // if we're out of spots add one
-  {
+  // if we're out of spots add one
+  if (!oo) {
     oo = app.carousel.createSpot();
   }
-  if (oo)
-  {
-    $(oo).attr('id', id)
-         .attr('encname', nickname)
-         .attr('title', dispname);
-    //$('#upper-right', oo).attr('class', 'status'); // clear the upper-right image class to be used for peer connection state
-    /*
-     * Get dimensions oo and scale plugin accordingly. */
-    w = Math.floor($(oo).width() - 4);
-    h = Math.floor((w / Callcast.WIDTH) * Callcast.HEIGHT);
-    $(oo).append('<object id="GocastPlayer' + id + '" type="application/x-gocastplayer" width="' + w + '" height="' + h + '"></object>');
+
+  if (oo) {
+    $(oo).attr('id', id).attr('encname', nickname).attr('title', dispname);    
     $('div.name', oo).text(dispname);
     $(oo).removeClass('unoccupied');
     $("#showChat", oo).css("display", "block"); // display showChat button
 
+    // set spot item name
+    item = $(oo).data('item');
+    if (!item) {throw "item is not defined";}
+    app.carousel.setSpotName(item, nickname);
+    app.carousel.updateAll();
+  } else {
+    app.log(4, 'assignSpotForParticipant: Maximum number of participants reached.');    
+  }
+}
+
+function addPluginForParticipant(nickname) {
+  var id = app.str2id(nickname),
+      oo = $('#meeting > #streams > #scarousel div.cloudcarousel#'+ id).get(0),
+      w, h;
+
+  if (!nickname) {
+    app.log(4, "addPluginForParticipant: nickname undefined");
+    return;
+  }
+
+  if (!oo) {
+    AssignSpotForParticipant(nickname);
+    oo = $('#meeting > #streams > #scarousel div.cloudcarousel#'+ id).get(0);
+  }
+
+  if (oo) {
+    $(oo).append('<object id="GocastPlayer' + id + '" type="application/x-gocastplayer" width="' + w + '" height="' + h + '"></object>');
     app.log(2, 'Added GocastPlayer' + id + ' object.');
     app.carousel.updateAll();
     return $('object#GocastPlayer' + id, oo).get(0);
   }
 
-  app.log(4, 'Maximum number of participants reached.');
+  app.log(4, 'addPluginForParticipant: Spot for participant [' + nickname + '] not found.');
   return null;
-} /* addPluginToCarousel() */
+}
 
+function removePluginForParticipant(nickname) {
+  if (nickname) {
+    try {
+      var id = app.str2id(nickname),
+          oo = $('#meeting > #streams > #scarousel div.cloudcarousel#' + id).get(0), poo;
 
+      if (oo) {
+        poo = $('object#GocastPlayer' + id, oo).get(0);
+        console.log('removePluginForParticipant: Plugin = ', poo);
+        if (poo) {
+          oo.removeChild(poo);
+        }
+      }
+    } catch (e) {
+      console.log('removePluginForParticipant: ', e);
+      app.log(4, 'removePluginForParticipant: ' + e);
+    }
+  }
+}
+
+function unassignSpotForParticipant(nickname) {
+  if (nickname) {
+    try {
+      var id = app.str2id(nickname),
+          oo = $('#meeting > #streams > #scarousel div.cloudcarousel#' + id).get(0);
+
+      removePluginForParticipant(nickname);
+      if (oo) {
+        $(oo).addClass('unoccupied');
+        $(oo).removeAttr('title');
+        $(oo).removeAttr('id');
+        $(oo).removeAttr('encname');
+        $('div.name', oo).text('');
+        $('#msgBoard', oo).css('display', 'none');
+        $('#showChat', oo).css('display', 'none');
+        $(oo).css('background-image', 'url("images/GoToken.png")');
+      }
+    } catch (e) {
+      app.log(4, 'unassignSpotForParticipant: ', e);
+    }    
+  }
+}
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 ///
@@ -532,7 +618,7 @@ function removePluginFromCarousel(nickname)
       jqOo.empty();
       // put back things that should not have been removed
       jqOo.append('<div class="name"></div>');
-      jqOo.css('background-image', 'url("images/gologo.png")'); // reset background image
+      jqOo.css('background-image', 'url("images/GoToken.png")'); // reset background image
       item.addControls();
     }
     catch (err)
@@ -700,7 +786,8 @@ function removeContentFromCarousel(
   jqOo.removeAttr('alt');
   jqOo.removeAttr('url');
   jqOo.removeAttr('encname');
-  jqOo.css('background-image', 'url("images/gologo.png")');
+  jqOo.css('background-image', 'url("images/GoToken.png")');
+  app.log(2, 'Removing content from spot [' + infoId + ', ' + id + ']');
   return false;
 } /* removeContentFromCarousel() */
 
@@ -720,7 +807,7 @@ function doSpot(spotDiv, info)
   {
     var divIcon, divTitle,
         jqDiv = $(spotDiv),
-        whiteBoard;
+        whiteBoard, editor;
     console.log('doSpot', info);
     console.log('spotDiv', spotDiv);
     if (!spotDiv) {throw "no spotDiv";}
@@ -739,21 +826,43 @@ function doSpot(spotDiv, info)
         jqDiv.attr('alt', 'whiteBoard');
         jqDiv.attr('encname', 'whiteBoard');
         jqDiv.attr('spotnumber', info.spotnumber);
-        jqDiv.removeClass('unoccupied').addClass('typeContent');
-        whiteBoard = new GoCastJS.WhiteBoard(spotDiv);
+        jqDiv.removeClass('unoccupied').addClass('typeContent whiteBoard');
+        whiteBoard = new GoCastJS.WhiteBoard(spotDiv, info);
       }
       else // get existing whiteboard
       {
         whiteBoard = $("#wbCanvas", spotDiv).data("wb");
       }
+
       if (whiteBoard) // play any commands in info
       {
         whiteBoard.doCommands(info);
-      } 
+      }
       else // error, couldn't find wb
       {
         console.log("whiteBoardCommand error, can't find wb", info);
         throw "can't find whiteboard for spot " + info.spotnumber;
+      }
+    }
+    else if (info.spottype === 'editor')
+    {
+      if (info.cmdtype === "addspot")
+      {
+        jqDiv.attr('id', app.str2id('editor ' + info.spotnumber));
+        jqDiv.attr('title', 'editor');
+        jqDiv.attr('alt', 'editor');
+        jqDiv.attr('encname', 'editor');
+        jqDiv.attr('spotnumber', info.spotnumber);
+        jqDiv.removeClass('unoccupied').addClass('typeContent editor');
+        editor = new GoCastJS.gcEdit(spotDiv, info);
+      }
+      else
+      {
+        editor = jqDiv.data('gcEdit');
+      }
+      if (editor)
+      {
+        editor.doSpot(info);
       }
     }
     else if (info.spottype === 'url')
@@ -871,7 +980,7 @@ function addSpotCb(info)
     var spotDiv, // the desired spot to be replaced or added
        item,
        div, divs;
-    console.log('addSpot msg received id ' + info.spotdivid + ' #' + info.spotnumber, info);
+//    console.log('addSpot msg received id ' + info.spotdivid + ' #' + info.spotnumber, info);
     // determine cmd type, add or replace
     if (info.spotreplace) // see if there is a spotReplace prop
     {
@@ -965,12 +1074,12 @@ function removeSpotCb(info)
           carouselItemUnzoom();
         }
       }
-      else // get by index
-      {
-         item = app.carousel.getByIndex(spot);
-      }
     }
 
+    if (!item) // get by index
+    {
+      item = app.carousel.getByIndex(spot);
+    }
     if (item)
     {
       $(item.object).remove();
@@ -991,8 +1100,8 @@ function removeSpotCb(info)
 ///
 function connectionStatus(statusStr)
 {
-  console.log('connectionStatus', statusStr);
-  $("body > #upper-right > #connection-status").text(statusStr);
+  app.log(2, 'connectionStatus' + statusStr);
+  $("#connection-status").text(statusStr);
 }
 
 ///
@@ -1014,17 +1123,31 @@ function readyStateCb(state, jid, nick)
       switch(state) {
         case 'NEGOTIATING':
           jqOo.css("background-image", 'url("images/waiting-trans.gif")');
+          $('object', jqOo).css('visibility', 'hidden');
         break;
         case 'CONNECTED':
           participant = Callcast.participants[nick];
           if (!participant) {throw "participant " + nick + " not found";}
           if (!participant.image) {throw "participant image for " + nick + " not found";}
           console.log("participant", participant);
+          $('object', jqOo).css('visibility', 'visible');
           if (!participant.videoOn)
           {
             jqOo.css('background-image', participant.image);
           }
         break;
+        case 'DEFUNCT':
+          jqOo.css("background-image", 'url("images/warning.png")');
+          if (!app.defunctAlertShown && !app.defunctAlertShowing) {
+            app.defunctAlertShowing = true;
+            showWarning('Media Connection Problem',
+                        'We were unable to connect you with one or more participants through video. ' +
+                        'You can still chat with everyone in the room, and also use the notepad and the whiteboard. ' +
+                        'The connectivity problem might be due to firewall issues. If you have your firewall turned on, ' +
+                        'you can temporarily disable it and then reload the page to try connecting again. ');
+            app.defunctAlertShown = true;
+          }
+          break;
       }
     }
 
@@ -1039,7 +1162,7 @@ function readyStateCb(state, jid, nick)
 function setLocalSpeakerStatus(vol)
 {
   // set image based on volume
-  var img, div = $("body > #upper-right > div#volume");
+  var img, div = $("div#volume");
   console.log("speaker volume " + vol);
   if (vol <= 0) // mute, if vol == -1 display mute symbol since sound's probably not getting out or in
   {
@@ -1060,6 +1183,7 @@ function setLocalSpeakerStatus(vol)
   div.css("background-image", img);
 
   // display volume warning
+  /* turn off volume prompt
   if (app.volWarningDisplayed === false)             // check volume only on first callback
   {
     if(("undefined" === typeof(Storage) || window.localStorage.stopVolumeStatus !== "checked") && // and if user has not disabled the check
@@ -1069,6 +1193,7 @@ function setLocalSpeakerStatus(vol)
     }
     app.volWarningDisplayed = true;
   }
+  */
 }
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
@@ -1080,11 +1205,17 @@ function pluginLoaded(
 )
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
-  app.log(2, 'pluginLoaded Local Plugin Loaded.');
+  //app.log(2, 'pluginLoaded Local Plugin Loaded.');
   if (Callcast.localplayerLoaded)
   {
      app.log(2, 'pluginLoaded Callcast.localplayerLoaded - plugin is already loaded');
      return; // assume player is already loaded if localPlayer is not null
+  }
+
+  //app.simPluginLoadFailed = true;
+  if (app.simPluginLoadFailed) {
+    app.log(2, 'simulating plugin load failed...');
+    return;
   }
 
   Callcast.localplayerLoaded = true;
@@ -1095,7 +1226,12 @@ function pluginLoaded(
   {
      app.log(2, 'pluginLoaded plugin up to date ');
      GoCastJS.PluginLog(Callcast.localplayer, Callcast.PluginLogCallback);
- 
+
+     // set callback for oneffectapplied
+     Callcast.setCallbackForCallback_OnEffectApplied(function(effect) {
+      onEffectApplied(effect);
+     });
+
      // set localPlayer to null since Init... checks for it to be null
      // before it will proceed
      Callcast.localplayer = null;
@@ -1105,8 +1241,10 @@ function pluginLoaded(
         app.log(2, 'Local plugin successfully initialized.');
         // Set callback functions to add and remove plugins for other
         // participants and content.
-        Callcast.setCallbackForAddPlugin(addPluginToCarousel);
-        Callcast.setCallbackForRemovePlugin(removePluginFromCarousel);
+        //Callcast.setCallbackForAddPlugin(addPluginToCarousel);
+        //Callcast.setCallbackForRemovePlugin(removePluginFromCarousel);
+        Callcast.setCallbackForAddPluginToParticipant(addPluginForParticipant);
+        Callcast.setCallbackForRemovePluginFromParticipant(removePluginForParticipant);
         Callcast.setCallbackForAddCarouselContent(addContentToCarousel);
         Callcast.setCallbackForRemoveCarouselContent(removeContentFromCarousel);
         Callcast.setCallbackForAddSpot(addSpotCb);
@@ -1121,11 +1259,20 @@ function pluginLoaded(
         checkForPluginOptionalUpgrades(); // display upgrade button if there are optional upgrades
 
         // set the speaker volume status callback
-        GoCastJS.SetSpkVolListener(1000, Callcast.localplayer, setLocalSpeakerStatus);
+        GoCastJS.SetSpkVolListener(4000, Callcast.localplayer, setLocalSpeakerStatus);
 
         // <MANJESH>
+        // set plugin crash monitor
+        var crashCheck = GoCastJS.SetPluginCrashMonitor(
+          1000, $('#mystream > object.localplayer').get(0),
+          function() {
+            clearInterval(crashCheck);
+            app.pluginCrashed();
+          }
+        );
+
         // set devices changed listener
-        var firstCall = true;
+/*        var firstCall = true;
         GoCastJS.SetDevicesChangedListener(
           1000, $('#mystream > object.localplayer').get(0),
           function(va, vr, aia, air, aoa, aor) {
@@ -1135,6 +1282,7 @@ function pluginLoaded(
             }
           }
         );
+*/
 
         //Before we handle room setup, prompt first time users
         //to set up their camera and microphone if they not on MacOS.
@@ -1164,5 +1312,6 @@ function pluginLoaded(
      Callcast.SendLiveLog('Plugin upgrade available. Current version: ' + Callcast.GetVersion());
      app.pluginUpgrade = true;
   }
+
   app.pluginLoaded = true;
 } /* pluginLoaded() */

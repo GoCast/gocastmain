@@ -33,7 +33,10 @@
   checkForPlugin,
   connectionStatus,
   videoButtonPress,
-  audioButtonPress
+  audioButtonPress,
+  openWindow,
+  carouselItemUnzoom,
+  startTour
 */
 'use strict';
 
@@ -44,23 +47,39 @@
  * \brief The main application object.
  */
 var app = {
-  GROUP_CHAT_OUT: '#lower-left > #msgBoard > #chatOut',
-  GROUP_CHAT_IN: '#lower-left > #msgBoard > input.chatTo',
+  GROUP_CHAT: 'div#groupChat > #msgBoard',
+  GROUP_CHAT_SHOW: 'div#groupChat > #showChat',
+  GROUP_CHAT_OUT: 'div#groupChat > #msgBoard > #chatOut',
+  GROUP_CHAT_IN: 'div#groupChat > #msgBoard > input.chatTo',
   MAC_DL_URL: 'https://carousel.gocast.it/downloads/GoCastPlayer.pkg',
   WIN_DL_URL: 'https://carousel.gocast.it/downloads/GoCastPlayer.msi', // todo, link in index.html is used, switch to using this value
   LIN_64_DL_URL: 'https://carousel.gocast.it/downloads/GoCastPlayer_x86_64.tar.gz',
   LIN_32_DL_URL: 'https://carousel.gocast.it/downloads/GoCastPlayer_i686.tar.gz',
   MAC_PL_NAME: 'GCP.plugin',
   WIN_PL_NAME: 'npGCP.dll',
-  SENDLOG_PROMPT: "#upper-right > #send-log-prompt", 
-  SENDLOG_PROMPT_STOP: "#upper-right > #send-log-prompt > #stop-showing", 
+  SENDLOG_PROMPT: "#upper-left > #send-log-prompt",
+  SENDLOG_PROMPT_STOP: "#upper-left > #send-log-prompt > #stop-showing",
   STATUS_PROMPT: "#upper-right > #status-prompt",
   STATUS_PROMPT_STOP: "#upper-right > #status-prompt > #stop-showing",
+  STATUS_PROMPT_LEFT: "#upper-left > #status-prompt",
+  STATUS_PROMPT_LEFT_STOP: "#upper-left > #status-prompt > #stop-showing",
   spotUrDefaultClass: "control close", // the class for #upper-right image for unoccupied spot
   spotUrDefaultImage: "images/trash.png",
-  VID_BUTTON: '#lower-right > #video',
-  AUD_BUTTON: '#lower-right > #audio',
+  VID_BUTTON: '#upper-right > #video',
+  AUD_BUTTON: '#upper-right > #audio',
   LOCAL_PLUGIN: '#mystream',
+  LOCAL_PLUGIN_OBJECT: '<object class="localplayer" id="GocastPlayerLocal"' +
+                          ' type="application/x-gocastplayer" width="0" height="0">' +
+                          '<param name="onload" value="pluginLoaded" />' +
+                        '</object>',
+  defunctAlertShown: false,
+  defunctAlertShowing: false,
+  tryPluginInstallAttempts: 0,
+  facebookInited: false,
+  fbCheckCredentialsTriggered: false,
+  fbTimerRunning: null,
+  simPluginLoadFailed: false,
+
   /**
    * Writes the specified log entry into the console HTML element, if
    * present. The meaning of logLevel is 1: debug, 2: info, 3:
@@ -81,6 +100,13 @@ var app = {
       alert(msg);
       app.logFatalReported = true;
     }
+
+    // <MANJESH>
+    if ('undefined' !== typeof(Callcast) &&
+        'undefined' !== typeof(Callcast.log)) {
+      Callcast.log(' ' + labels[logLevel] + ': ' + logMsg);
+    }
+    // </MANJESH>
   }, /* app.log() */
   /**
    * Flag to remember if a fatal error was reported through a pop-up
@@ -114,23 +140,23 @@ var app = {
    * Check correct browser version. */
   checkBrowser: function() {
     var expl = 'Because this application uses advanced HTML5 features ' + 'it may not work correctly with this browser.',
-        recom = 'Recommended browsers are Firefox 6+, Chrome 12+, and ' + 'Mobile Safari 525+.',
+        recom = 'Recommended browsers are Firefox 12+ and Chrome 20+.',
         msg;
     switch (app.browser.name) {
     case 'Chrome':
       if (app.browser.version < 20) {
-        msg = 'You appear to be using a Chrome version before 20. ' +
+        msg = 'You appear to be using a Chrome version < 20. ' +
           expl + ' ' + recom;
       }
       break;
     case 'Firefox':
       if (app.browser.version < 12) {
-        msg = 'You appear to be using a Firefox version befor 12. ' +
+        msg = 'You appear to be using a Firefox version < 12. ' +
           expl + ' ' + recom;
       }
       break;
     case 'Safari':
-      msg = "Sorry we don't support the Safari browser right now.\nPlease use Chrome or Firefox for now.";
+      msg = "Sorry we don't support the Safari browser right now.\nPlease use Chrome 20+ or Firefox 12+ for now.";
       /*
       if (app.browser.version < 525) {
         msg = 'You appear to be using an older Safari version. ' +
@@ -140,18 +166,24 @@ var app = {
       break;
     case 'Mobile Safari':
     case 'AppleWebKit':
-      if (app.browser.version < 525) {
-        msg = 'You appear to be using an older Mobile Safari version. ' +
+      //if (app.browser.version < 525) {
+        msg = 'Sorry we don\'t support the Mobile Safari browser right now. ' +
           expl + ' ' + recom;
-      }
+      //}
       break;
     default:
       msg = "We don't recognize your browser. " + expl + ' ' + recom;
       break;
     } /* switch (app.browser.name) */
     if (msg) {
-      alert(msg);
+      $('#errorMsgPlugin > h1').text('Uh Oh!!!');
+      $('#errorMsgPlugin > p#prompt').text(msg);
+      $('#errorMsgPlugin > button').css({'display': 'none'});
+      closeWindow();
+      openWindow('#errorMsgPlugin');
+      return false;
     }
+    return true;
   }, /* app.checkBrowser() */
   /**
    * The OS platform. */
@@ -242,19 +274,24 @@ var app = {
         $('#meeting > #streams > #scontrols > input').removeAttr('disabled');
         if (Callcast.IsVideoDeviceAvailable())
         {
-          $('#lower-right > #video').removeAttr('disabled');
+          $(app.VID_BUTTON).removeAttr('disabled');
+          $('#videoPreview').removeAttr('disabled');
+          $('#effectsPanel').css({'display': 'block'});
         }
         if (Callcast.IsMicrophoneDeviceAvailable())
         {
-          $('#lower-right > #audio').removeAttr('disabled');
+          $(app.AUD_BUTTON).removeAttr('disabled');
+          $('#audioPreview').removeAttr('disabled');
         }
         $(app.GROUP_CHAT_OUT).removeAttr('disabled');
      }
      else
      {
         $('#meeting > #streams > #scontrols > input').attr('disabled', 'disabled');
-        $('#lower-right > input.video').attr('disabled', 'disabled');
-        $('#lower-right > input.audio').attr('disabled', 'disabled');
+        $(app.VID_BUTTON).attr('disabled', 'disabled');
+        $('#videoPreview').attr('disabled', 'disabled');
+        $(app.AUD_BUTTON).attr('disabled', 'disabled');
+        $('#audioPreview').attr('disabled', 'disabled');
         $(app.GROUP_CHAT_OUT).attr('disabled', 'disabled');
      }
   },
@@ -277,19 +314,30 @@ var app = {
     }
   },
 
+  leaveSessionCb: function() {
+    return function() {
+      if ('undefined' !== typeof(Storage)) {
+        if (app.user.fbSkipped) {
+          window.localStorage.gcpReloadNickName = app.user.name;
+        }
+        window.location.href = 'gcpsettings';
+      }
+    };
+  },
+
 //<MANJESH>
   navToSettings: function() {
     if ('undefined' !== typeof(Storage) && window.localStorage.gcpDontShowSettingsPromptCheck
         && 'checked' === window.localStorage.gcpDontShowSettingsPromptCheck) {
-      Callcast.LeaveSession(function() { window.location.href = 'gcpsettings'; });
+      Callcast.LeaveSession(app.leaveSessionCb());
     } else {
       $('#settings-prompt').css({'display': 'block'});
       $('#settings-message').html('You\'re now leaving the room. Click <strong>SAVE</strong> in settings to re-enter.');
       $('#settings-prompt > span').css({'display': 'inline'});
-      
+
       $('#settings-ok').click(function() {
         window.localStorage.gcpDontShowSettingsPromptCheck = $('#settings-stop-showing').attr('checked');
-        Callcast.LeaveSession(function() { window.location.href = 'gcpsettings'; });
+        Callcast.LeaveSession(app.leaveSessionCb());
       });
 
       $('#settings-cancel').css({'display': 'block'});
@@ -298,12 +346,12 @@ var app = {
   },
 
   promptDevicesChanged: function(added, firstCall) {
-    var message = 'Click on the <strong>GEAR ICON</strong> to change/test devices.<br/>';
-    var ctDwnMsg = '<span style="font-size:9px; float:right;">[Closing in ' +
-                   '<span id="secondsToClose" style="font-weight:bold;">10</span>]</span><br/><br/>';
-    var opacity = 0.4;
-    var closeCountDown = setInterval(function() {
-      var seconds = parseInt($('#secondsToClose').html());
+    var message = 'Click on the <strong>GEAR ICON</strong> to change/test devices.<br/>',
+        ctDwnMsg = '<span style="font-size:9px; float:right;">[Closing in ' +
+                   '<span id="secondsToClose" style="font-weight:bold;">10</span>]</span><br/><br/>',
+        opacity = 0.4,
+        closeCountDown = setInterval(function() {
+      var seconds = parseInt($('#secondsToClose').html(),10);
       $('#secondsToClose').html((seconds-1).toString());
       $('#settings').fadeTo(1000, opacity);
       opacity = (0.4 === opacity) ? 1.0 : 0.4;
@@ -317,30 +365,112 @@ var app = {
         window.localStorage.gcpDontShowSettingsPromptCheck &&
         'checked' === window.localStorage.gcpDontShowSettingsPromptCheck) {
       clearInterval(closeCountDown);
-      $('#settings').fadeTo(1000, 1.0);
     } else {
       setTimeout(function() {
         clearInterval(closeCountDown);
-        $('#settings').fadeTo(1000, 1.0);
+        $('#settings').removeAttr('style');
         $('#settings-prompt').css({'display': 'none'});
       }, 10000);
 
       $('#settings-prompt').css({'display': 'block'});
       $('#settings-message').html(ctDwnMsg + message);
-      $('#settings-prompt > span').css({'display': 'none'});
       $('#settings-cancel').css({'display': 'none'});
       $('#settings-ok').click(function() {
         clearInterval(closeCountDown);
-        $('#settings').fadeTo(1000, 1.0);
+        $('#settings').removeAttr('style');
         $('#settings-prompt').css({'display': 'none'});
-      });      
+        window.localStorage.gcpDontShowSettingsPromptCheck = $('#settings-stop-showing').attr('checked');
+      });
+    }
+  },
+
+  pluginCrashed: function() {
+    app.log(4, 'SENDLOG_PLUGINCRASHED: plugin crashed');
+    $('#errorMsgPlugin > h1').text('Oops!!!');
+    $('#errorMsgPlugin > p#prompt').text('The GoCast App crashed.');
+    closeWindow();
+    openWindow('#errorMsgPlugin');
+    $('#errorMsgPlugin > #sendLog').click(function() {
+      $(this).attr('disabled', 'disabled');
+      $('#errorMsgPlugin > #reload').attr('disabled', 'disabled');
+      $('#errorMsgPlugin > p#prompt').text('Sending log to GoCast...');
+      Callcast.SendLogsToLogCatcher(function(){
+        $('#errorMsgPlugin > p#prompt').text('Sending log to GoCast... DONE.');
+        $('#errorMsgPlugin > #reload').removeAttr('disabled');
+      }, function(){
+        $('#errorMsgPlugin > p#prompt').text('Sending log to GoCast... FAILED.');
+        $('#errorMsgPlugin > #reload').removeAttr('disabled');
+      });
+    });
+  },
+
+  nickInUse: function(nick) {
+    $('#errorMsgPlugin > h1').text('Uh Oh!!!');
+    if (this.user.fbSkipped) {
+      $('#errorMsgPlugin > p#prompt').text('Nickname [' + nick + '] already in use.' );
+      Callcast.SendLiveLog('Nickname Conflict [no-facebook]: [room = ' +
+                           $.getUrlVar('roomname') + ', nick = ' + nick + ']');
+    } else {
+      $('#errorMsgPlugin > p#prompt').text('You seem to have already logged in to this room through Facebook.');
+      Callcast.SendLiveLog('Nickname Conflict [facebook]: [room = ' +
+                           $.getUrlVar('roomname') + ', nick = ' + nick + ']');
+    }
+
+    closeWindow();
+    openWindow('#errorMsgPlugin');
+    $('#errorMsgPlugin > #sendLog').click(function() {
+      $(this).attr('disabled', 'disabled');
+      $('#errorMsgPlugin > #reload').attr('disabled', 'disabled');
+      $('#errorMsgPlugin > p#prompt').text('Sending log to GoCast...');
+      Callcast.SendLogsToLogCatcher(function(){
+        $('#errorMsgPlugin > p#prompt').text('Sending log to GoCast... done.');
+        $('#errorMsgPlugin > #reload').removeAttr('disabled');
+      }, function(){
+        $('#errorMsgPlugin > p#prompt').text('Sending log to GoCast... failed.');
+        $('#errorMsgPlugin > #reload').removeAttr('disabled');
+      });
+    });
+  },
+
+  periodicStamp: function(interval) {
+    if ('undefined' !== typeof(Storage)) {
+      window.localStorage.gcpAppInstanceStamp = new Date().toString();
+      setInterval(function(){
+        window.localStorage.gcpAppInstanceStamp = new Date().toString();
+      }, interval||2000);
+    }
+  },
+
+  removeAppStamp: function() {
+    if ('undefined' !== typeof(Storage)) {
+      delete window.localStorage.gcpAppInstanceStamp;
+    }
+  },
+
+  checkExclusive: function(onexclusive, onnotexclusive) {
+    if ('undefined' !== typeof(Storage)) {
+      var self = this;
+      setTimeout(function() {
+        if (!window.localStorage.gcpAppInstanceStamp) {
+          self.periodicStamp(2000);
+          onexclusive();
+        } else {
+          var appTS = new Date(window.localStorage.gcpAppInstanceStamp),
+          date = new Date(),
+          diff = date.getTime() - appTS.getTime();
+          if (diff > 5000) {
+            self.periodicStamp(2000);
+            onexclusive();
+          } else {
+            onnotexclusive();
+          }
+        }
+      }, 5000);
+    } else {
+      onexclusive();
     }
   }
 //</MANJESH>
-
-  // video enabled state todo this must be initially in sync with video button class and Callcast
-  //       make either this var or button class the state variable
-  //videoEnabled: true
 }; /* app */
 
 ///
@@ -349,14 +479,21 @@ var app = {
 function onSpotClose(event)
 {
   var spot = $(event.currentTarget).parent(),
-      item = spot.data('item');
+      item = spot.data('item'),
+      reallyClose = true;
 
   console.log("onSpotClose", event);
 
-  if (item.spotnumber){
-    Callcast.RemoveSpot({spotnumber: item.spotnumber || item.index});
-  } else {
-    removeSpotCb({spotnumber: item.index});
+  if ($(spot).hasClass('typeContent')) {
+    reallyClose = confirm('All content in this spot will be lost. Are you sure ?');
+  }
+
+  if (true === reallyClose) {
+    if (item.spotnumber){
+        Callcast.RemoveSpot({spotnumber: item.spotnumber || item.index});
+      } else {
+        removeSpotCb({spotnumber: item.index});
+      }
   }
 
   event.stopPropagation();
@@ -382,7 +519,6 @@ function showPersonalChat(event)
   showPersonalChatWithSpot(spot.get(0));
   $("#msgBoard > input.chatTo", spot).focus();
 }
-
 ///
 /// \brief global handler for close personal chat
 ///
@@ -395,6 +531,28 @@ function closePersonalChat(event)
   console.log("closePersonalChat", event);
   $("#showChat", item.object).css("display", "block"); // hide showChat button
   $("#msgBoard", item.object).css("display", "none"); // show chat ui
+  event.stopPropagation();
+}
+///
+/// \brief handler for global chat showChat button press
+///
+function showGroupChat(event)
+{
+  $(app.GROUP_CHAT_SHOW).stop(true);
+  $(app.GROUP_CHAT_SHOW).hide();
+  $(app.GROUP_CHAT_SHOW).css("opacity", "1");
+  $(app.GROUP_CHAT).css({"visibility": "visible", "left":  "0px"});
+  $(app.GROUP_CHAT_IN).focus();
+}
+///
+/// \brief global handler for close personal chat
+///
+function closeGroupChat(event)
+{
+  var width = $(app.GROUP_CHAT).width;
+  console.log("app.GROUP_CHAT width", width);
+  $(app.GROUP_CHAT_SHOW).show();
+  $(app.GROUP_CHAT).css({"visibility": "hidden", "left": -width + "px"});
   event.stopPropagation();
 }
 
@@ -524,20 +682,30 @@ function activateWindow(
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
   if (winId.match('credentials2')) {
-    $('input#name', winId).on('keydown.s04072012', keypressNameHandler);
-    $('input#btn', winId).on('click.s04072012', onJoinNow);
+    $('input#name', winId).on('keypress.s04072012', keypressNameHandler);
+    $('input#name', winId).on('blur', blurNameHandler);
+    $('input#name', winId).on('focus', focusNameHandler);
+    $('a#btn', winId).on('click.s04072012', onJoinNow);
     if ("undefined" !== Storage)
     {
       $('input#name', winId).val(sessionStorage.uiGoCastNick);
     }
   }
   else if (winId.match('meeting')) {
-    $('#lower-right > #video').on('click.s04172012a', videoButtonPress);
-    $('#lower-right > #audio').on('click.s04172012b', audioButtonPress);
+    $(app.VID_BUTTON).on('click.s04172012a', videoButtonPress);
+    $(app.AUD_BUTTON).on('click.s04172012b', audioButtonPress);
+    $('#videoPreview').on('click.s04172012a', videoButtonPress);
+    $('#audioPreview').on('click.s04172012b', audioButtonPress);
   }
   else if (winId.match('chatInp')) {
     $('input.chatTo', winId).on('keydown.s04172012g', keypressChatHandler);
     $('input.send', winId).on('click.s04172012g', sendChat);
+  }
+  else if (winId.match('errorMsgPlugin')) {
+    $('input#roomname', winId).on('keydown', keydownRoomnameHandler);
+    $('input#roomname', winId).on('keypress', keypressRoomnameHandler);
+    $('input#roomname', winId).on('blur', blurRoomnameHandler);
+    $('input#roomname', winId).on('focus', focusRoomnameHandler);
   }
   return false;
 } /* activateWindow() */
@@ -632,6 +800,19 @@ function carouselItemClick(event)
   */
 } // carouselItemClick
 
+// <MANJESH>
+function applyEffect(effect) {
+  if (Callcast && Callcast.SetVideoFilter) {
+    Callcast.SetVideoFilter(effect);
+  }
+}
+
+function onEffectApplied(effect) {
+  $('#effectsPanel > div.selected').removeClass('selected');
+  $('#effectsPanel > #effect-' + effect).addClass('selected');
+}
+// </MANJESH>
+
 ///
 /// \brief handle click on zoom button, zoom out spot
 ///
@@ -642,10 +823,10 @@ function carouselItemZoom(event)
       event.stopPropagation();
    }
 
-   // do nothing if there's a zoomed spot
+   // replace zoomed spot
    if ($('#meeting > #zoom > .cloudcarousel').length > 0)
    {
-      return;
+      carouselItemUnzoom(event);
    }
 
    $('#meeting > #zoom').css('display', 'block'); // display zoom div
@@ -653,11 +834,51 @@ function carouselItemZoom(event)
 
    // get item and remove it from carousel
    var spot = $(event.currentTarget).parent(),
-       item = $(spot).data('item');
-   app.carousel.remove(item.index);
+       item = $(spot).data('item'),
+       gcedit, editorContent;
 
-   $(spot).appendTo($('#meeting > #zoom')); // move div to zoom area, doesn't work with local, remote video spot
+   if (!item) {
+    spot = $(event.target).parent();
+    item = $(spot).data('item');
+   }
+
+  //If spot is editor, save its contents
+  gcedit = $(spot).data('gcEdit');
+  editorContent = '';
+
+  if (gcedit) {
+    editorContent = gcedit.editor.getCode();
+    console.log('carouselItemZoom [resize gcedit]: ' + editorContent);
+  }
+
+  app.carousel.remove(item.index);
+  /*$('#zoom > .close').css({
+    'top': spot[0].style.top,
+    'left': parseFloat(spot[0].style.left) + parseFloat(spot[0].style.width) + 10.0 + 'px'
+  });*/
+
+  $('body > div#upper-right').css({
+    'top': $('#zoom').position().top + 'px',
+    'background-color': 'rgba(0,0,0,0.6)',
+    'border-radius': '5px',
+    'padding-top': '5px'
+  });
+
+  $('body > div#upper-left').css({
+    'background-color': 'rgba(0,0,0,0.6)',
+    'border-radius': '5px',
+    'padding-top': '5px'
+  });
+
+   $(spot).appendTo($('#meeting > #zoom')) // move div to zoom area, doesn't work with local, remote video spot
+          .css("z-index", "100");
    //$('#meeting > #zoom')[0].appendChild(spot[0]); // move div to zoom area, doesn't work with local, remote video spot
+
+  if (gcedit) {
+    $(spot).html('');
+    gcedit = new GoCastJS.gcEdit(spot, gcedit.info);
+    gcedit.editor.setCode(editorContent);
+  }
 
    app.carousel.resize(); // update carousel
    resizeZoom();
@@ -675,9 +896,28 @@ function carouselItemUnzoom(event)
    }
 
    $('#meeting > #zoom').css('display', 'none'); // undisplay zoom div
-   var spot = $('#meeting > #zoom > .cloudcarousel');
+   var spot = $('#meeting > #zoom > .cloudcarousel'),
+       gcedit = $(spot).data('gcEdit'),
+       editorContent = '';
+
+  if (gcedit) {
+    editorContent = gcedit.editor.getCode();
+    console.log('carouselItemUnzoom [resize gcedit]: ' + editorContent);
+  }
+
    app.carousel.insertSpot(spot); // put spot back in carousel
    $('#meeting > #streams').css('height', '100%'); // zoom carousel
+
+  if (gcedit) {
+    $(spot).html('<img id="upper-left" class="zoom control" src="images/fullscreen.png" alt="Zoom" title="Zoom" onclick="carouselItemZoom(event);"/>' +
+                 '<img id="upper-right" class="'+ app.spotUrDefaultClass + '" src="' + app.spotUrDefaultImage +'" alt="Close" title="Close" onclick="onSpotClose(event);"/>');
+    gcedit = new GoCastJS.gcEdit(spot, gcedit.info);
+    gcedit.editor.setCode(editorContent);
+  }
+
+   //$('body > div#upper-right').css({'top': '10px'});
+   $('body > div#upper-right').removeAttr('style');
+   $('body > div#upper-left').removeAttr('style');
    app.carousel.resize();
 } // carouselItemUnzoom
 
@@ -699,7 +939,7 @@ function openCopyData(event)
       cX, cY, winW, winH, wcW, wcH,
       marginRight, marginBottom;
 
-  $(name).text('Carousel room ' + $.getUrlVar('roomname'));
+  //$(name).text('Carousel room ' + $.getUrlVar('roomname'));
   $(name).attr('href', window.location.href);
 
   // position the dialog
@@ -738,6 +978,7 @@ function openCopyData(event)
   }
 
   // display dlg
+  jqWin.width(400).height(200);
   jqWin.fadeIn(700);
   jqWin.addClass('active');
 
@@ -847,6 +1088,7 @@ function openMeeting(
    * Initialize Gocast events. */
   $(window).on('beforeunload', function() {
     app.log(2, 'On before unload.');
+    app.removeAppStamp();
     Callcast.LeaveSession();
   });
   /*/
@@ -877,7 +1119,116 @@ function openMeeting(
   return false;
 } /* openMeeting() */
 
+function promptTour() {
+  if ('undefined' !== typeof(Storage) && !window.localStorage.gcpDontShowTourCheck) {
+    $('body > #tour').css({
+      'display': 'block',
+      'left'   : Math.floor(($(window).width() - $('body > #tour').width() - 60)/2) + 'px',
+      'top'    : '50px'//Math.floor(($(window).height() - $('body > #tour').height() - 60)/2) + 'px'
+    });
+    $('body > #tour > button#skip').css({
+      'left'      : Math.floor(($('body > #tour').width() - $('body > #tour > button#skip').width())/2) + 'px',
+      'visibility': 'hidden'
+    });
 
+    $('body > #tour > h3 > span#nick').text(app.user.name.replace(/%20/g, ' ') + '!');
+    $('body > #tour > button#imgood').css({
+      'left' : '5px'
+    }).click(function() {
+      $('body > #tour').css({'display': 'none'});
+      if ('checked' === $('body > #tour > input#dontShowAgain').attr('checked')) {
+        window.localStorage.gcpDontShowTourCheck = 'true';
+      }
+    });
+    $('body > #tour > button#sure').css({
+      'left' : ($('body > #tour').width() - $('body > #tour > button#sure').width() - 5) + 'px'
+    }).click(function() {
+      startTour('body > #tour');
+    });
+  }
+}
+
+function InvalidNicknameKey(keycode) {
+  return (-1 === [40, 41, 91, 93, 123, 125, 95, 45, 13, 46, 64, 32, 8].indexOf(keycode) &&
+          -1 === [48, 49, 50, 51, 52, 53, 54, 55, 56, 57].indexOf(keycode) &&
+          -1 === [97, 98, 99, 100, 101, 102, 103, 104, 105, 106,
+                 107, 108, 109, 110, 111, 112, 113, 114, 115, 116,
+                 117, 118, 119, 120, 121, 122].indexOf(keycode) &&
+          -1 === [65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75,
+                  76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86,
+                  87, 88, 89, 90].indexOf(keycode));
+}
+
+function InvalidRoomnameKey(keycode) {
+  return (-1 === [40, 41, 91, 93, 123, 125, 95, 45, 13, 46, 13, 32, 8].indexOf(keycode) &&
+          -1 === [48, 49, 50, 51, 52, 53, 54, 55, 56, 57].indexOf(keycode) &&
+          -1 === [97, 98, 99, 100, 101, 102, 103, 104, 105, 106,
+                 107, 108, 109, 110, 111, 112, 113, 114, 115, 116,
+                 117, 118, 119, 120, 121, 122].indexOf(keycode) &&
+          -1 === [65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75,
+                  76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86,
+                  87, 88, 89, 90].indexOf(keycode));
+}
+
+function ComposeRoomLink(roomname) {
+  var roomlink = window.location.pathname;
+
+  if ('' !== roomname) {
+    roomlink += ('?roomname=' + roomname);
+  }
+  history.replaceState(null, null, roomlink);
+}
+
+function keydownRoomnameHandler(event) {
+  var keycode = event.which || event.keyCode,
+      roomname = $(this).val();
+
+  if ('Chrome' === app.browser.name) {
+    if (8 === keycode) {
+      roomname = roomname.substring(0, roomname.length-1);
+      ComposeRoomLink(roomname);
+    } else if (0 <= [37, 38, 39, 40].indexOf(keycode)) {
+      event.preventDefault();
+    }
+  }
+}
+
+function keypressRoomnameHandler(event) {
+  if (event.altKey) {
+    return;
+  }
+
+  if (!event.ctrlKey) {
+    var keycode = event.which || event.keyCode;
+    if (InvalidRoomnameKey(keycode)) {
+      $(this).addClass('invalidkey');
+      event.preventDefault();
+    } else {
+      var roomname = $(this).val();
+      if ('Firefox' === app.browser.name && 8 === keycode) {
+        roomname = roomname.substring(0, roomname.length-1);
+      } else if (13 !== keycode) {
+        roomname = roomname + String.fromCharCode(keycode);
+      }
+      ComposeRoomLink(roomname);
+
+      if ($(this).hasClass('invalidkey')) {
+        $(this).removeClass('invalidkey');
+      }
+    }
+  }
+}
+
+function focusRoomnameHandler() {
+  $('#boxes #errorMsgPlugin > p#roomnamehint').css({'visibility': 'visible'});
+}
+
+function blurRoomnameHandler() {
+  if ($(this).hasClass('invalidkey')) {
+    $(this).removeClass('invalidkey');
+  }
+  $('#boxes #errorMsgPlugin > p#roomnamehint').css({'visibility': 'hidden'});
+}
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
@@ -909,10 +1260,29 @@ function keypressNameHandler(
       onJoinNow();
       break;
     } /* switch (event.which) */
+
+    var keycode = event.which || event.keycode;
+    if (InvalidNicknameKey(keycode)) {
+      $(this).addClass('invalidkey');
+      event.preventDefault();
+    } else {
+      if ($(this).hasClass('invalidkey')) {
+        $(this).removeClass('invalidkey');
+      }
+    }
   }
 } /* keypressNameHandler() */
 
+function focusNameHandler() {
+  $('#boxes #credentials2 > p#nickhint').css({'visibility': 'visible'});
+}
 
+function blurNameHandler() {
+  if ($(this).hasClass('invalidkey')) {
+    $(this).removeClass('invalidkey');
+  }
+  $('#boxes #credentials2 > p#nickhint').css({'visibility': 'hidden'});
+}
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
@@ -1139,6 +1509,13 @@ function closeStatus(event)
   $(app.STATUS_PROMPT).css("display", "none");
 }
 ///
+/// \brief upper left status div close handler
+///
+function closeStatusLeft(event)
+{
+  $(app.STATUS_PROMPT_LEFT).css("display", "none");
+}
+///
 /// \brief video button handler
 ///
 function videoButtonPress(event)
@@ -1151,10 +1528,11 @@ function videoButtonPress(event)
 function changeVideo(enableVideo)
 {
   var jqObj = $(app.VID_BUTTON),
+      jqObj1 = $('#videoPreview'),
       jqOo = $(app.LOCAL_PLUGIN),
       enable,
       w, h;
-  if (!jqObj[0])
+  if (!jqObj[0] || !jqObj1[0])
   {
      app.log(4, "changeVideo couldn't find video button");
   }
@@ -1177,8 +1555,11 @@ function changeVideo(enableVideo)
   }
   if (enable)
   {
+    $('#effectsPanel > div').css({'display': 'block'});
     jqObj.addClass('on') // change button
-         .attr('title', 'Turn Video Off');
+         .attr('title', 'Turn Video Off ' + app.videoKeyAccel);
+    jqObj1.addClass('on') // change button
+         .attr('title', 'Turn Video Off ' + app.videoKeyAccel);
     // Check object dimensions.
     w = jqOo.width() - 4;
     h = Callcast.HEIGHT * (w / Callcast.WIDTH);
@@ -1190,10 +1571,13 @@ function changeVideo(enableVideo)
       jqOo.css('background-image', '');
     }
   }
-  else 
+  else
   {
+    $('#effectsPanel > div').css({'display': 'none'});
     jqObj.removeClass('on') // change button
-         .attr('title', 'Turn Video On');
+         .attr('title', 'Turn Video On ' + app.videoKeyAccel);
+    jqObj1.removeClass('on') // change button
+         .attr('title', 'Turn Video On ' + app.videoKeyAccel);
     Callcast.SendLocalVideoToPeers(enable);
     // show background image if fb image url exists
     // if not the default is used and does not show around the plugin
@@ -1218,6 +1602,7 @@ function audioButtonPress()
 function changeAudio(enableAudio)
 {
   var jqObj = $(app.AUD_BUTTON),
+      jqObj1 = $('#audioPreview'),
       bMuteAudio;
   if (!jqObj[0])
   {
@@ -1232,17 +1617,21 @@ function changeAudio(enableAudio)
     bMuteAudio = !enableAudio;
   }
   Callcast.MuteLocalAudioCapture(bMuteAudio);
-  if (bMuteAudio) 
+  if (bMuteAudio)
   {
     app.log(2, 'Audio muted.');
     jqObj.addClass("off");
-    jqObj.attr('title', 'Unmute Audio');
+    jqObj.attr('title', 'Unmute Audio ' + app.audioKeyAccel);
+    jqObj1.addClass("off");
+    jqObj1.attr('title', 'Unmute Audio ' + app.audioKeyAccel);
   }
   else
   {
     app.log(2, 'Audio unmuted.');
     jqObj.removeClass("off");
-    jqObj.attr('title', 'Mute Audio');
+    jqObj.attr('title', 'Mute Audio ' + app.audioKeyAccel);
+    jqObj1.removeClass("off");
+    jqObj1.attr('title', 'Mute Audio ' + app.audioKeyAccel);
   }
   return false;
 } // changeAudio()
@@ -1266,17 +1655,26 @@ function deactivateWindow(
     /*
      * Remove any message. */
     $('p.login-error', winId).hide().text('');
-    $('input#name', winId).off('keydown.s04072012', keypressNameHandler);
-    $('input#btn', winId).off('click.s04072012', onJoinNow);
+    $('input#name', winId).off('keypress.s04072012', keypressNameHandler);
+    $('input#name', winId).off('blur', blurNameHandler);
+    $('input#name', winId).off('focus', focusNameHandler);
+    $('a#btn', winId).off('click.s04072012', onJoinNow);
   }
   else if (winId.match('meeting')) {
-    $('#lower-right > #video').off('click.s04172012a', changeVideo);
-    $('#lower-right > #audio').off('click.s04172012b', changeAudio);
-
+    $(app.VID_BUTTON).off('click.s04172012a', changeVideo);
+    $(app.AUD_BUTTON).off('click.s04172012b', changeAudio);
+    $('#videoPreview').off('click.s04172012a', changeVideo);
+    $('#audioPreview').off('click.s04172012b', changeAudio);
   }
   else if (winId.match('chatInp')) {
     $('input.chatTo', winId).off('keydown.s04172012g', keypressChatHandler);
     $('input.send', winId).off('click.s04172012g', sendChat);
+  }
+  else if (winId.match('errorMsgPlugin')) {
+    $('input#roomname', winId).off('keydown', keydownRoomnameHandler);
+    $('input#roomname', winId).off('keypress', keypressRoomnameHandler);
+    $('input#roomname', winId).off('blur', blurRoomnameHandler);
+    $('input#roomname', winId).off('focus', focusRoomnameHandler);
   }
   return false;
 } /* deactivateWindow() */
@@ -1406,7 +1804,8 @@ function resizeZoom(event)
 {
    var jqDiv = $('#meeting > #zoom > .cloudcarousel'),
        wbCanvas = $("#wbCanvas", jqDiv), // todo better wb access
-       wb       = wbCanvas.data("wb"),
+       wb       = wbCanvas.data('wb'),
+       edit     = jqDiv.data('gcEdit'),
        width, height, item, newWidth, newHeight,
        widthScale, heightScale, scale, left, top;
    if (jqDiv.length > 0)
@@ -1426,6 +1825,8 @@ function resizeZoom(event)
       if (wb) // todo better wb access
       {
         wb.setScale(item.plgOrgWidth, item.plgOrgHeight);
+      } else if (edit) {
+        edit.setScale(item.plgOrgWidth, item.plgOrgHeight);
       }
 
       // center div in zoom div
@@ -1436,6 +1837,16 @@ function resizeZoom(event)
       $(jqDiv).css('height', item.orgHeight + 'px');
       $(jqDiv).css('left', left + 'px');
       $(jqDiv).css('top', top + 'px');
+
+      $('#zoom > .close').css({
+        'left': (left + 10.0) + 'px'
+      });
+
+      if ($(jqDiv).hasClass('editor')) {
+        $('#zoom > .close').css({'bottom': '10px'});
+      } else {
+        $('#zoom > .close').css({'top': (top + 10.0) + 'px'});
+      }
    }
 }
 
@@ -1451,6 +1862,7 @@ function onJoinNow(
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
     app.log(2, 'onJoinNow');
+    app.user.fbSkipped = true;
 
     // get the nick name, return back to dialog if not defined
     var usrNm = $('#credentials2 > input#name').val();
@@ -1495,7 +1907,27 @@ function enterId(
     app.log(2, 'enterId');
     closeWindow();
     openWindow('#credentials2');
+    if ('undefined' !== typeof(Storage)) {
+      if (window.localStorage.gcpReloadNickName) {
+        $('#name', '#credentials2').val(window.localStorage.gcpReloadNickName);
+        $('#btn', '#credentials2').click();
+        delete window.localStorage.gcpReloadNickName;
+      }
+    }
 } /* onJoinNow() */
+
+function deferredCheckCredentials() {
+  app.fbCheckCredentialsTriggered = true;
+
+  // Normally we don't call check credentials, but we MUST call it if document.ready has already
+  // run at this point. We infer this by the fact that the 10 second fb timer is already set which
+  // happens in document.ready. In this case, it's up to us to call checkcredentials.
+  if (app.fbTimerRunning) {
+    clearTimeout(app.fbTimerRunning);
+    app.fbTimerRunning = null;
+    $(document).trigger('checkCredentials');
+  }
+}
 
 ///
 /// \brief check login credential and display login dialog if necessary.
@@ -1504,6 +1936,7 @@ function checkCredentials()
 {
   var jqActive;
   app.log(2, 'checkCredentials');
+  app.facebookInited = true;
 
   // this method is called on a fb status change
   // so do nothing if we're already logged in
@@ -1520,6 +1953,11 @@ function checkCredentials()
     if (!app.user.fbSkipped && !FB.getAuthResponse())
     {
       openWindow('#credentials');
+      if ('undefined' !== typeof(Storage)) {
+        if (window.localStorage.gcpReloadNickName) {
+          $('#noThanks', '#credentials').click();
+        }
+      }
     }
     else // fb logged in update fb logged in status
     {
@@ -1538,12 +1976,14 @@ function checkCredentials()
 //
 function handleRoomSetup() {
   app.log(2, 'handleRoomSetup entered');
-  var room_to_create = $.getUrlVar('roomname') || '';
+  var room_to_create = $.getUrlVar('roomname') || '',
+      item;
 
   room_to_create = room_to_create.replace(/ /g, '');
     app.log(2, 'room_to_create ' + room_to_create);
 
   Callcast.CreateUnlistedAndJoin(room_to_create, function(new_name) {
+    var jqDlg, newUrl;
     // We successfully created the room.
     // Joining is in process now.
     // trigger of joined_room will happen upon join complete.
@@ -1552,13 +1992,28 @@ function handleRoomSetup() {
     app.user.scheduleJid = new_name + Callcast.AT_CALLCAST_ROOMS;
     app.user.scheduleTitle = 'Open room';
 
+    // set local spot nick todo find a better place for this
+    item = app.carousel.getItem(0);
+    app.carousel.setSpotName(item, app.user.name);
+
     app.log(2, "Room named '" + new_name + "' has been created. Joining now.");
     app.log(2, 'window.location ' + window.location);
-    if (room_to_create.length < 1)
+    if (room_to_create !== new_name)
     {
-       var newUrl = window.location + '?roomname=' + new_name;
-       app.log(2, 'replacing state ' + newUrl);
-       history.replaceState(null, null, newUrl);
+      newUrl = window.location.pathname + '?roomname=' + new_name;
+      app.log(2, 'replacing state ' + newUrl);
+      history.replaceState(null, null, newUrl);
+    }
+
+    // warn user if room name changed (overflow)
+    if (room_to_create.length > 0 && room_to_create !== new_name)
+    {
+      // display warning
+      jqDlg = $(app.STATUS_PROMPT_LEFT).css({"display": "block",
+                                             "background-image": 'url(images/warning.png)'});
+      $('#message', jqDlg).text('Room ' + room_to_create + ' overflowed.  You are now in room ' + new_name);
+      $('#stop-showing', jqDlg).css('display', 'none');
+      $('#stop-showing-text', jqDlg).css('display', 'none');
     }
 
     // initialize video, audio state here since this method
@@ -1574,12 +2029,41 @@ function handleRoomSetup() {
     }
     else // video available
     {
-      changeVideo(true); // do this unconditionally so ui gets updated
+      if (typeof (Storage) !== 'undefined' && sessionStorage.bUseVideo === 'false') {
+          changeVideo(false);
+      }
+      else {
+        changeVideo(true); // do this unconditionally so ui gets updated
+      }
     }
     if (Callcast.IsMicrophoneDeviceAvailable())
     {
-      changeAudio(true); // do this unconditionally so ui gets updated
+      if (typeof (Storage) !== 'undefined' && sessionStorage.bUseMicrophone === 'false') {
+          changeAudio(false);
+      }
+      else {
+        changeAudio(true); // do this unconditionally so ui gets updated
+      }
     }
+  },
+  function(iq)
+  {
+    var errorMsg;
+    if ($(iq).find('roomfull'))
+    {
+      errorMsg = "Sorry, the room " + room_to_create + " is full. Please try again later.";
+    }
+    else
+    {
+      errorMsg = 'There was a problem entering the room ' + room_to_create;
+    }
+
+    // display error
+    app.log(4, "handleRoomSetup Error " + iq.toString());
+    $('#errorMsgPlugin > h1').text('Oops!!!');
+    $('#errorMsgPlugin > p#prompt').text(errorMsg);
+    closeWindow();
+    openWindow('#errorMsgPlugin');
   });
 }
 
@@ -1597,6 +2081,14 @@ function checkForPluginOptionalUpgrades()
     $("#lower-right > #dlbtn").css("display", "block");
   }
 }
+
+/*var openMeetingOnce = function() {
+  if ('Firefox' === app.browser.name) {
+    openMeeting();
+  }
+  openMeetingOnce = null;
+};*/
+
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
  * \brief check if plugin installed and prompt user if not
@@ -1609,13 +2101,57 @@ function tryPluginInstall(
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
   var title, prompt;
+
   app.log(2, 'tryPluginInstall');
+  app.tryPluginInstallAttempts++;
   // check plugin installed.
   // if plugin installed but not loaded wait
   // todo get rid of multiple pluginInstalled calls
+
   if (app.pluginInstalled() && !app.pluginLoaded)
   {
-     setTimeout(tryPluginInstall, 500);
+    if (20 < app.tryPluginInstallAttempts) {
+      // send live log that plugin loading failed.
+      var logTryPluginFailed = '{' +
+        'userAgent: ' + navigator.userAgent.replace(/;/g, '|') + ', ' +
+        'nickname: ' + app.user.name + ', ' +
+        'facebook: ' + !app.user.fbSkipped +
+      '}';
+
+      app.log(2, 'tryPluginInstall failed: ' + logTryPluginFailed);
+      Callcast.SendLiveLog('tryPluginInstall failed: ' + logTryPluginFailed);
+
+      if (window.location.pathname.match(/index2.html/g)) {
+        // show plugin load warning and take them to the room.
+        showWarning('GoCast App Problem', 'GoCast Beta is unable to work with ' +
+          'your audio/video at this time. Try quitting your browser completely and ' +
+          'starting it again. If that does not work you can click "OK" to proceed ' +
+          'to your room without video chat.  Thanks for your patience. We are ' +
+          'working hard to solve this issue.');
+        Callcast.PluginFailedToLoad();
+
+        $('#warningMsg > button#ok').unbind('click').click(function() {
+          closeWindow();
+          handleRoomSetup();
+          $(this).unbind('click').click(closeWindow);
+        });
+      } else {
+        // show plugin load warning and take them to the alternate webpage.
+        showWarning('GoCast App Problem', 'Apologies. GoCast Beta is having trouble with your audio/video. ' +
+                                          'Click "OK" to try once more.');
+        $('#warningMsg > button#ok').unbind('click').click(function() {
+          if (window.location.href.match(/\/$/)) {
+            window.location.href = window.location.href.replace(/\/$/, '/index2.html');
+          } else if (window.location.href.match(/\/\?/)) {
+            window.location.href = window.location.href.replace(/\/\?/, '/index2.html?');
+          } else if (window.location.href.match(/index.html/)) {
+            window.location.href = window.location.href.replace(/index.html/, 'index2.html');
+          }
+        });
+      }
+    } else {
+      setTimeout(tryPluginInstall, 500);
+    }
   }
   else if (app.pluginInstalled() && app.pluginLoaded && !app.pluginUpgrade) // good to go
   {
@@ -1623,7 +2159,6 @@ function tryPluginInstall(
     $('.window .close').on('click', closeWindow);
     // Resize window.
     $(window).resize(resizeWindows);
-
   }
   else { // plugin not loaded or out of date
     // prompt user to install plugin
@@ -1633,9 +2168,9 @@ function tryPluginInstall(
     {
        Callcast.SendLiveLog('Local plugin is out of date. Current version: ' + Callcast.GetVersion());
        title = $('#installPlugin > h1');
-       title.text('The Gocast.it plugin is out of date');
+       title.text('We have upgraded your GoCast beta');
        prompt = $('#installPlugin > p#prompt');
-       prompt.text('Please download and install the new version of the plugin');
+       prompt.text('Please download and install the new version. Thanks. The GoCast Team.');
     }
     if (!app.pluginInstalled()) {
        Callcast.SendLiveLog('Local plugin is not installed.');
@@ -1758,7 +2293,7 @@ function winInstall(event)
 function winPluginPunt()
 {
    $('#winWait > #status > #spinner').attr('src', 'images/red-x.png');
-   $('#winWait > #status > #msg').text('Hmmm... looks like the plugin did not load.  Please restart the browser');
+   $('#winWait > #status > #msg').text('There was a problem with the install check.  Please restart Chrome and you\'re all set.');
 }
 
 ///
@@ -1779,7 +2314,7 @@ function checkForPlugin()
          clearTimeout(app.winTimeout);
          app.log(2, 'checkForPlugin found player ' + name);
          $('#winWait > #status > #spinner').attr('src', 'images/green-tick.png');
-         $('#winWait > #status > #msg').text('The GoCast plugin is installed.');
+         $('#winWait > #status > #msg').text('Checking for install... successful.');
 
          // display error msg after a timeout in case the plugin does not load
          app.winTimeout = setTimeout(winPluginPunt, 10000);
@@ -1815,7 +2350,8 @@ function docKey(event)
           changeAudio();
        }
        break;
-     case 86: // alt-v, toggle video
+     //case 86: // alt-v, toggle video, problem on windows ff, displays main menu
+     case 90: // alt-z, toggle video
        if (event.altKey)
        {
           changeVideo();
@@ -1850,12 +2386,35 @@ function docKey(event)
 function uiInit()
 {
    // add chat util to global chat out
-  var chatOut = $(app.GROUP_CHAT_OUT),
+  var jqChatOut = $(app.GROUP_CHAT_OUT),
+      jqChatIn  = $(app.GROUP_CHAT_IN),
       util = new GoCastJS.ChatUtil($(app.GROUP_CHAT_OUT).get(0));
 
-  chatOut.data('util', util);  // install global chat util
+  jqChatOut.data('util', util);  // install global chat util
   $(document).keydown(docKey); // global key handler
 
+  app.altKeyName = app.osPlatform.isMac ? "Opt" : "Alt";
+  app.audioKeyAccel = app.altKeyName + "+A";
+  app.videoKeyAccel = app.altKeyName + "+Z";
+  jqChatIn.attr("title", jqChatIn.attr("title") + " " + app.altKeyName + "+C"); // set chat in tooltip key accel
+}
+
+function InvalidRoomname(roomname) {
+  var invalid = false;
+
+  if ('undefined' === typeof(roomname)) {
+    return false;
+  }
+
+  if (null === roomname || '' === roomname || 32 < roomname.length) {
+    return true;
+  }
+
+  roomname.split('').forEach(function(key) {
+    invalid = invalid || InvalidRoomnameKey(key.charCodeAt());
+  });
+
+  return invalid;
 }
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
@@ -1872,49 +2431,96 @@ $(document).ready(function(
 )
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
-  /*appCacheResult.callbacks.downloading = function() {
-    var opacity = 0.4;
+  // DNLE overrides.
+  if (window.location.hostname.toLowerCase() === 'dnle.gocast.it') {
+    Callcast.InitOverride({ CALLCAST_XMPPSERVER: 'dnle.gocast.it',
+                        CALLCAST_ROOMS: 'conference.dnle.gocast.it',
+                        AT_CALLCAST_ROOMS: '@conference.dnle.gocast.it',
+                        STUNSERVER: 'dnle.gocast.it', STUNSERVERPORT: 19302,
+                        FEEDBACK_BOT: 'feedback_bot_dnle@dnle.gocast.it',
+                        ROOMMANAGER: 'roommanager@dnle.gocast.it/roommanager',
+                        SWITCHBOARD_FB: 'switchboard_dnle@dnle.gocast.it',
+                        LOGCATCHER: 'logcatcher@dnle.gocast.it/logcatcher'});
+  }
+  else if (window.location.hostname.toLowerCase() === 'dev.gocast.it') {
+    Callcast.InitOverride({ CALLCAST_XMPPSERVER: 'dev.gocast.it',
+                        CALLCAST_ROOMS: 'conference.dev.gocast.it',
+                        AT_CALLCAST_ROOMS: '@conference.dev.gocast.it',
+                        STUNSERVER: 'dev.gocast.it', STUNSERVERPORT: 19302,
+                        FEEDBACK_BOT: 'feedback_bot_dev@dev.gocast.it',
+                        ROOMMANAGER: 'roommanager@dev.gocast.it/roommanager',
+                        SWITCHBOARD_FB: 'switchboard_dev@dev.gocast.it',
+                        LOGCATCHER: 'logcatcher@dev.gocast.it/logcatcher'});
+  }
 
-    openWindow('#waitingForUpdates');
-    setInterval(function() {
-      $('#boxes #waitingForUpdates > img').fadeTo(1000, opacity);
-      opacity = (0.4 === opacity) ? 0.8 : 0.4;
-    }, 1000);
-  };
+  openWindow('#waitingToJoin');
+  var unmaskTimer = setInterval(function() {
+    $('#boxes #waitingToJoin > div#cover').height(
+      $('#boxes #waitingToJoin > div#cover').height() - 50
+    );
+  }, 1000);
 
-  appCacheResult.callbacks.progress = function(percentDone) {
-    $('#boxes #waitingForUpdates > progress').val(percentDone);
-  };
-
-  appCacheResult.poll(
-    1000,
-    function(){*/
+  app.checkExclusive(function() {
+    clearInterval(unmaskTimer);
     navigator.plugins.refresh(); // reload plugins to get any plugin updates
 
     // Check the browser.
     app.getBrowser();
-    app.checkBrowser();
+    if (app.checkBrowser()) {
+      if (InvalidRoomname(decodeURI($.getUrlVar('roomname')))) {
+        closeWindow();
+        openWindow('#errorMsgPlugin');
+        $('#errorMsgPlugin > button').css({'display': 'none'});
+        $('#errorMsgPlugin > h1').text('Invalid Roomname!');
+        $('#errorMsgPlugin > p#prompt').css({'display': 'none'});
+        $('#errorMsgPlugin > input#roomname').css({'display': 'block'});
+        $('#errorMsgPlugin > button#reload').css({'display': 'block'});
+      } else {
 
-    // login callback
-    $(document).bind('checkCredentials', checkCredentials);
+        uiInit(); // init user interface
+        if (app.fbCheckCredentialsTriggered) {
+          $(document).trigger('checkCredentials');
+        }
 
-    uiInit(); // init user interface
-    fbInit(); // init facebook api
+        //do something if facebook took too long or errored out
+        app.fbTimerRunning = setTimeout(function() {
+          if (!app.facebookInited) {
+            closeWindow();
+            app.log(2, 'Facebook API init failed - userAgent: ' + navigator.userAgent);
+            Callcast.SendLiveLog('Facebook API init failed - userAgent: ' + navigator.userAgent.replace(/;/g, '|'));
+            Callcast.SendLiveLog('FBLOG: ' + getFBLog());
+            openWindow('#credentials');
+            $('#credentials > .fb-login-button').addClass('hidden');
+            $('#credentials > #fb-disabled').removeClass('hidden');
+          }
+        }, 10000);
 
-    // Login to xmpp anonymously
-    Callcast.connect(Callcast.CALLCAST_XMPPSERVER, '');
+        // Login to xmpp anonymously
+        Callcast.connect(Callcast.CALLCAST_XMPPSERVER, '');
 
-    // Write greeting into console.
-    app.log(2, 'Page loaded.');
+        // Write greeting into console.
+        app.log(2, 'Page loaded.');
 
-    // set the connection status callback
-    Callcast.setCallbackForCallback_ConnectionStatus(connectionStatus);
-    /*},
-    function(){
-      closeWindow();
-      window.location.reload();
+        Callcast.setCallbackForCallback_OnNicknameInUse(function(nick) {
+          app.nickInUse(nick);
+        });
+
+        // set the connection status callback
+        Callcast.setCallbackForCallback_ConnectionStatus(connectionStatus);
+
+        // callbacks for assign/unassign spots for participants
+        Callcast.setCallbackForAddSpotForParticipant(assignSpotForParticipant);
+        Callcast.setCallbackForRemoveSpotForParticipant(unassignSpotForParticipant);
+      }
     }
-  );*/
+  }, function() {
+    closeWindow();
+    openWindow('#errorMsgPlugin');
+    $('#errorMsgPlugin > button').css({'display': 'none'});
+    $('#errorMsgPlugin > h1').text('App Already Running!!!');
+    $('#errorMsgPlugin > p#prompt').text('You seem to already have the app running ' +
+                                         'in a separate window or tab.');
+  });
 }); // $(document).ready(function())
 
 $.extend({
@@ -2081,27 +2687,34 @@ function closeSendLog()
 ///
 function sendLog()
 {
-  var jqDlg = $(app.STATUS_PROMPT).css("display", "block"),  // display warning
+  var jqDlg = $(app.STATUS_PROMPT_LEFT).css("display", "block"),  // display warning
       checked = $(app.SENDLOG_PROMPT_STOP).attr("checked");
   closeSendLog();
 
   if ("undefined" !== typeof(Storage))
   {
-    window.localStorage.stopSendLogPrompt = checked; // set localstorage 
+    window.localStorage.stopSendLogPrompt = checked; // set localstorage
   }
 
+  app.log(2, 'SENDLOG_USERCOMMENT: ' + $('textarea', app.SENDLOG_PROMPT).val());
+  $('textarea', app.SENDLOG_PROMPT).val('');
+
   jqDlg.css('background-image', 'url(images/waiting-trans.gif)');
-  $('#message', jqDlg).text('Sending log file to server.');
+  $('#message', jqDlg).text('Sending log file to GoCast...');
   $('#stop-showing', jqDlg).css('display', 'none');
   $('#stop-showing-text', jqDlg).css('display', 'none');
+  $('img.close', jqDlg).css('display', 'none');
   Callcast.SendLogsToLogCatcher(function()
   {
     // success callback
-    jqDlg.css("display", "none");
+    $('#message', jqDlg).text('Sending log file to GoCast... DONE.');
+    setTimeout(function() {jqDlg.css("display", "none");}, 1000);
     console.log("SendLogsToLogCatcher success", jqDlg);
   },
   function() // fail callback
   {
+    $('#message', jqDlg).text('Sending log file to GoCast... FAILED.');
+    setTimeout(function() {jqDlg.css("display", "none");}, 1000);
     Callcast.SendLiveLog("SendLogsToLogCatcher failed");
   });
 }
@@ -2111,11 +2724,286 @@ function sendLog()
 function sendLogPrompt()
 {
   if ("undefined" === typeof(Storage) || "checked" !== window.localStorage.stopSendLogPrompt)
-  {  
+  {
     $(app.SENDLOG_PROMPT).css("display", "block");
   }
   else
   {
     sendLog();
   }
+}
+
+function addWhiteBoard() {
+  Callcast.AddSpot({
+      spottype: "whiteBoard",
+      spotreplace: "first-unoc"
+    },
+    function() {
+      console.log("carousel addWhiteBoard callback");
+  });
+}
+
+function addEditor()
+{
+  Callcast.AddSpot({
+      spottype: "editor",
+      spotreplace: "first-unoc"
+    },
+    function() {
+      console.log("carousel addEditor callback");
+  });
+}
+
+function addItem() {
+  Callcast.AddSpot({spottype: "new"}, function() {
+    console.log("carousel addItem callback");
+  });
+}
+
+function resizeTour(tourSelector) {
+  $(tourSelector).css({
+    'display': 'block',
+    'left'   : Math.floor(($(window).width() - $(tourSelector).width() - 60)/2) + 'px',
+    'top'    : '50px'//Math.floor(($(window).height() - $(tourSelector).height() - 60)/2) + 'px'
+  });
+  $(tourSelector + ' > button#skip').css({
+    'left'      : Math.floor(($(tourSelector).width() - $(tourSelector + ' > button#skip').width())/2) + 'px'
+  });
+  $(tourSelector + ' > button#imgood').css({
+    'left' : ($('body > #tour').width() - $('body > #tour > button#imgood').width() - 5) + 'px'
+  });
+  $(tourSelector + ' > button#sure').css({
+    'left' : '5px'
+  });
+}
+
+function describeTourObject(tourSelector, objSelector, objDescription, stopFlashing) {
+  var flashTimer = null,
+      opacity = 1.0;
+
+  if (stopFlashing) {
+    setTimeout(function(){
+      $(objSelector).effect('pulsate', {times: 4}, 8000);
+    }, 1000);
+  } else {
+    flashTimer = setInterval(function() {
+      opacity = (1.0 === opacity) ? 0.0 : 1.0;
+      $(objSelector).fadeTo(1000, opacity);
+    }, 1000);
+  }
+
+  $(tourSelector + ' > h3').html(objDescription.title);
+  $(tourSelector + ' > p#desc').html(objDescription.description);
+  resizeTour(tourSelector);
+
+  return flashTimer;
+}
+
+function startTour(tourSelector) {
+  var tourObjects = [
+    'body > #meeting > #streams > #scarousel',
+    '#effectsPanel > div',
+    'input[id*=video], input[id*=audio]',
+    '#lower-right > input#addWhiteBoard',
+    '.whiteBoard > .wbDiv > div#wbTools',
+    '.whiteBoard > .zoom, #zoom > .close',
+    '#lower-right > input#addEditor',
+    'div#groupChat > div#msgBoard > input.chatTo',
+    '#upper-right > input[class*=fb], #upper-right > input[class*=copyData]',
+    '#upper-left > div#feedback'
+  ], tourDescriptions = [
+    {title:       'The GoCast Carousel',
+     description: 'The "go" spots on the Carousel are placeholders for people and for shared content. ' +
+                  'You can rotate the Carousel with the rotate buttons in the lower left hand corner of your screen. ' +
+                  'You can also use the left/right arrow keys on your keyboard or with your mouse wheel. <p></p>Try it. ' +
+                  '<p></p>Your preview, below, shows how others see you.'},
+    {title:       'Choosing Video Effects',
+     description: 'The three flashing icons on your preview apply effects to your video feed. You can switch ' +
+                  'from full color to black and white or to a sepia effect. ' +
+                  '<p></p>Try it.'},
+    {title:       'Controlling Your Camera &amp; Microphone',
+     description: 'The flashing icons on the upper right of your screen (and on your preview) ' +
+                  'turn your webcam and microphone on and off. If you have logged in with Facebook your profile photo will appear when ' +
+                  'you turn off your webcam. <p></p>Try it.'},
+    {title:       'Sharing Content On The Carousel',
+     description: 'The flashing whiteboard icon, lower right corner, lets you add one or more whiteboards to the Carousel. ' +
+                  '<p></p>Try it.'},
+    {title:       'Using the Whiteboard',
+     description: 'The flashing tool tray on the whiteboard lets you mark and erase with digital ink. Choose a color and a pen size. ' +
+                  'Click, hold, and drag your mouse to draw. Anyone in your GoCast can mark on the whiteboard as well. <p></p>Try it. ' +
+                  'Then click Next to learn about zooming the whiteboard.'},
+    {title:       'Zooming the Whiteboard',
+     description: 'Hover your mouse over the whiteboard and click the flashing zoom icon, upper left hand corner, to expand it. ' +
+                  'Notice that the Carousel, flattened above the whiteboard, can still be moved with your arrow keys. ' +
+                  'To shrink the whiteboard click on the flashing icon, upper left.'},
+    {title:       'Collaborative Notepad',
+     description: 'The flashing notepad icon on the lower right hand corner of your screen lets you add a basic notepad to the carousel. ' +
+                  'Any changes to the notepad\'s content is reflected to everyone in the room.' +
+                  '<p></p>Try it. <p></p>NOTE: As of now, you can edit with other people in the room as long as its done one at a time. ' +
+                  'If two or more people try to edit at the same time, one or more of the attempted changes might be lost.'},
+    {title:       'Posting Comments To The Room',
+     description: 'The flashing comments bar is the place where you can make a comment to the room. ' +
+                  'Click in the text box to type. Click the Post button - or the Return key - and your comments will be displayed. ' +
+                  '<p></p>Try it.'},
+    {title:       'Inviting Others To The Room',
+     description: 'The flashing Facebook and email icons in the upper right hand part of the screen let you invite your Facebook friends ' +
+                  'to a GoCast by posting on your wall, or by sending alerts to your friends. You can also invite anybody via email.'},
+    {title:       'Stay In Touch',
+     description: 'We would love to hear about your experience with the GoCast Carousel. ' +
+                  'Click on the flashing feedback icon on the upper left corner of your screen.'}
+  ], tourIdx = 0, flashTimer = null;
+
+  $(tourSelector).css({'display': 'block'});
+
+  $(tourSelector + ' > button#skip').text('SKIP');
+  $(tourSelector + ' > button#imgood').unbind('click').text('NEXT')
+                                      .css({'visibility': 'visible'})
+                                      .click(function() {
+    tourIdx += 1;
+
+    if (flashTimer) {
+      clearInterval(flashTimer);
+    }
+
+    $(tourObjects[tourIdx-1]).stop(true, true);
+
+    if (1 <= tourIdx) {
+
+      if (4 === tourIdx) {
+        if (0 === $('.whiteBoard').length) {
+          $(tourObjects[3]).click();
+        }
+      } else {
+        $(tourObjects[tourIdx]).width(function(idx, width) {
+          return 2*width;
+        }).height(function(idx, height) {
+          return 2*height;
+        });
+      }
+
+      if (5 === tourIdx) {
+        setTimeout(function(){
+          $('.whiteBoard > .zoom').click();
+          setTimeout(function() {
+            $('#zoom > .close').click();
+          }, 5000);
+        }, 5000);
+      }
+
+      if (1 === tourIdx) {
+        $(tourObjects[tourIdx-1]).css({
+          'visibility': 'visible',
+          'opacity': '1.0'
+        });
+        $(tourSelector + ' > button#sure').css({'visibility': 'visible'});
+      } else {
+        $(tourObjects[tourIdx-1]).removeAttr('style');
+      }
+    }
+
+    if(tourIdx >= tourObjects.length) {
+      $(this).css({'visibility': 'hidden'});
+      $(tourSelector + ' > button#sure').unbind('click').text('REPEAT')
+                                        .css({'visibility': 'visible'})
+                                        .click(function() {
+        startTour(tourSelector);
+      });
+      $(tourSelector + ' > button#skip').text('DONE');
+      $(tourSelector + ' > h3').html('You\'re All Set!');
+      $(tourSelector + ' > p#desc').text('Thanks for taking a test drive. You can always take it ' +
+                                         'again by clicking the "play" icon, above. Enjoy!!!');
+    } else {
+      flashTimer = describeTourObject(tourSelector, tourObjects[tourIdx],
+                                      tourDescriptions[tourIdx],
+                                      (0 === tourIdx));
+    }
+  });
+
+  $(tourSelector + ' > button#sure').unbind('click')
+                                    .css({'visibility': 'hidden'})
+                                    .text('BACK')
+                                    .click(function() {
+    tourIdx -= 1;
+
+    if(flashTimer) {
+      clearInterval(flashTimer);
+    }
+
+    $(tourObjects[tourIdx+1]).stop(true, true);
+    $(tourObjects[tourIdx+1]).removeAttr('style');
+
+    if (5 === tourIdx) {
+      if (0 === $('.whiteBoard').length) {
+        $(tourObjects[3]).click();
+      }
+      setTimeout(function(){
+        $('.whiteBoard > .zoom').click();
+        setTimeout(function() {
+          $('#zoom > .close').click();
+        }, 5000);
+      }, 5000);
+    }
+
+    if (0 === tourIdx) {
+      $(this).css({'visibility': 'hidden'});
+    } else {
+      if (4 !== tourIdx) {
+        $(tourObjects[tourIdx]).width(function(idx, width) {
+          return 2*width;
+        }).height(function(idx, height) {
+          return 2*height;
+        });
+      }
+
+      if ((tourObjects.length-1) === tourIdx) {
+        $(tourSelector + ' > button#imgood').css({'visibility': 'visible'});
+      }
+    }
+
+    flashTimer = describeTourObject(tourSelector, tourObjects[tourIdx],
+                                    tourDescriptions[tourIdx],
+                                    (0 === tourIdx));
+  });
+
+
+  $(tourSelector + ' > button#skip').css({'visibility': 'visible'})
+                                    .click(function() {
+    $(tourObjects[0]).stop(true, true);
+    $(tourObjects[tourIdx]).stop(true, true);
+
+    if (flashTimer) {
+      clearInterval(flashTimer);
+    }
+
+    $(tourObjects[0]).css({
+      'visibility': 'visible',
+      'opacity': '1.0'
+    });
+
+    if (1 <= tourIdx) {
+      $(tourObjects[tourIdx]).removeAttr('style');
+    }
+
+    $(tourSelector).css({'display': 'none'});
+  });
+
+  $(tourSelector + ' > input#dontShowAgain').css({'display': 'none'});
+  $(tourSelector + ' > span').css({'display': 'none'});
+  flashTimer = describeTourObject(tourSelector, tourObjects[0],
+                                  tourDescriptions[0], true);
+}
+
+function errMsgReloadClick() {
+  if ('undefined' !== typeof(Storage) && app.user.fbSkipped) {
+    window.localStorage.gcpReloadNickName = app.user.name;
+  }
+  window.location.reload();
+}
+
+function showWarning(title, message) {
+  var $warningWin = $('#warningMsg');
+  closeWindow();
+  openWindow('#warningMsg');
+  $('h1', $warningWin).text(title);
+  $('p#prompt', $warningWin).text(message);
 }

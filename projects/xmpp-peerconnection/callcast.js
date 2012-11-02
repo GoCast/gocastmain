@@ -203,10 +203,10 @@ var logQ = new GoCastJS.BQueue(1024*1024);
 var Callcast = {
     PLUGIN_VERSION_CURRENT: 0.0,
     PLUGIN_VERSION_REQUIRED: 0.0,
-    PLUGIN_VERSION_CURRENT_MAC: 1.28,
-    PLUGIN_VERSION_REQUIRED_MAC: 1.28,
-    PLUGIN_VERSION_CURRENT_WIN: 1.28,
-    PLUGIN_VERSION_REQUIRED_WIN: 1.28,
+    PLUGIN_VERSION_CURRENT_MAC: 1.30,
+    PLUGIN_VERSION_REQUIRED_MAC: 1.30,
+    PLUGIN_VERSION_CURRENT_WIN: 1.30,
+    PLUGIN_VERSION_REQUIRED_WIN: 1.30,
     PLUGIN_VERSION_CURRENT_LINUX: 1.21,
     PLUGIN_VERSION_REQUIRED_LINUX: 1.21,
     NOANSWER_TIMEOUT_MS: 6000,
@@ -216,19 +216,24 @@ var Callcast = {
     NS_CALLCAST: 'urn:xmpp:callcast',
 //    STUNSERVER: 'stun.l.google.com',
     STUNSERVER: 'video.gocast.it',
-    FEEDBACK_BOT: 'feedback_bot_etzchayim@video.gocast.it',
+    FEEDBACK_BOT: 'feedback_bot_gocast@video.gocast.it',
     STUNSERVERPORT: 19302,
     ROOMMANAGER: 'overseer@video.gocast.it/roommanager',
     SWITCHBOARD_FB: 'switchboard_gocastfriends@video.gocast.it',
+    LOGCATCHER: 'logcatcher@video.gocast.it/logcatcher',
     Callback_AddSpot: null,
     Callback_RemoveSpot: null,
     Callback_SetSpot: null,
-    Callback_AddPlugin: null,
-    Callback_RemovePlugin: null,
+    Callback_AddSpotForParticipant: null,
+    Callback_AddPluginToParticipant: null,
+    Callback_RemovePluginFromParticipant: null,
+    Callback_RemoveSpotForParticipant: null,
     Callback_AddCarouselContent: null,
     Callback_RemoveCarouselContent: null,
     Callback_ReadyState: null,
     Callback_ConnectionStatus: null,
+    Callback_OnEffectApplied: null,
+    Callback_OnNicknameInUse: null,
     connection: null,
     localplayer: null,
     localplayerLoaded: false,
@@ -239,6 +244,7 @@ var Callcast = {
     nick: '',
     joined: false,
     bUseVideo: true,
+    bUseMicrophone: true,
     WIDTH: 256,
     HEIGHT: 192,
     overseer: null,
@@ -247,11 +253,44 @@ var Callcast = {
     fbaccesstoken: '',
     fb_sent_pres: false,
     sessionInfo: {},
-    mediaHints: {},
+    mediaHints: {audio: false, video: false},
+    bPluginLoadedSuccessfully: false,
+
+    //
+    // \brief When server configuration is non-standard, use this function to setup the server names, usernames,
+    //      port numbers, etc. Two items of note: 1) This function should be called very early on load. Otherwise,
+    //      behavior is undefined. If this routine finds a valid Strophe connection, the plugin or a Facebook
+    //      signed request, it will not change any values and will throw an error.
+    //      2) All items in 'obj' must already be present. This routine will throw an error if that is not
+    //      the case as a safety check to avoid misspelled property names inbound.
+    //
+    InitOverride: function(obj) {
+        var k;
+
+        if (this.connection || this.localplayer || this.localplayerLoaded || this.fbsr !== '') {
+            throw 'ERROR: Cannot InitOverride() at this time. Too late in the process.';
+        }
+
+        for (k in obj)
+        {
+            if (obj.hasOwnProperty(k)) {
+                if (!this[k]) {
+                    throw 'ERROR: Property named ' + k + ' is not in current object. Misspelling?';
+                }
+
+                // Otherwise we're good to assign it the override.
+                this[k] = obj[k];
+//                this.log('InitOverride: Property ' + k + ' has a new value of ' + obj[k]);
+            }
+        }
+
+    },
 
     WriteUpdatedState: function() {
         if (typeof (Storage) !== 'undefined')
         {
+            this.RememberCurrentJid();
+
             // If the connection is alive, store info.
             // If it's not alive, then there's nothing to do here.
             //
@@ -266,11 +305,12 @@ var Callcast = {
                 sessionStorage.setItem('room', this.room);
                 sessionStorage.setItem('nick', this.nick);
                 sessionStorage.setItem('bUseVideo', this.bUseVideo);
+                sessionStorage.setItem('bUseMicrophone', this.bUseMicrophone);
             }
             else
             {
                 // Zero it out. The conneciton is not valid.
-                sessionStorage.clear();
+                this.SessionStorageClear();
             }
         }
         else
@@ -313,12 +353,20 @@ var Callcast = {
         this.Callback_SetSpot = cb;
     },
 
-    setCallbackForAddPlugin: function(cb) {
-        this.Callback_AddPlugin = cb;
+    setCallbackForAddSpotForParticipant: function(cb) {
+        this.Callback_AddSpotForParticipant = cb;
     },
 
-    setCallbackForRemovePlugin: function(cb) {
-        this.Callback_RemovePlugin = cb;
+    setCallbackForAddPluginToParticipant: function(cb) {
+        this.Callback_AddPluginToParticipant = cb;
+    },
+
+    setCallbackForRemovePluginFromParticipant: function(cb) {
+        this.Callback_RemovePluginFromParticipant = cb;
+    },
+
+    setCallbackForRemoveSpotForParticipant: function(cb) {
+        this.Callback_RemoveSpotForParticipant = cb;
     },
 
     setCallbackForAddCarouselContent: function(cb) {
@@ -333,6 +381,13 @@ var Callcast = {
         this.Callback_ConnectionStatus = cb;
     },
 
+    setCallbackForCallback_OnEffectApplied: function(cb) {
+        this.Callback_OnEffectApplied = cb;
+    },
+
+    setCallbackForCallback_OnNicknameInUse: function(cb) {
+        this.Callback_OnNicknameInUse = cb;
+    },
     //
     // \brief The supplied callback will be called whenever the peer connection readystate changes.
     //      The problem to wrestle with is that each participant has a readystate so there can be
@@ -388,8 +443,7 @@ var Callcast = {
         }
         else if ($(err).find('conflict').length > 0)
         {
-            alert("The nickname '" + nick + "' is already in use.\nPlease choose a different nickname.");
-            Callcast.disconnect();
+            Callcast.HandleNicknameConflict(Strophe.getBareJidFromJid(from), nick);
         }
         else if ($(err).find('service-unavailable').length > 0)
         {
@@ -412,11 +466,46 @@ var Callcast = {
         }
         else
         {
-            alert('Unknown Error Stanza: ' + $(err).children('error').text());
+            alert('Unknown Error Stanza: ' + $(err).getChild('error').text());
             Callcast.log($(err));
         }
 
         return true;
+    },
+
+    //
+    // \brief This is the handler for when we are told by the server that our nickname is
+    //          already being used. This is typically found when a network connection gets
+    //          dropped and the rid/sid/jid are invalidated locally but the server still
+    //          sees a 'ghost' user in the room. This can occur for a full minute and causes
+    //          a bad user experience. To rectivy this, we will attempt to tell the server that
+    //          we are really that ghost user and to kick that ghost out of the room so we can
+    //          get back in.
+    //
+    HandleNicknameConflict: function(room, nick) {
+        var self = this;
+
+        // Need to prepare a 'subjidfornickname' command and wait for response.
+        if (!this.GetOldJids()) {
+            Callcast.LeaveSession();
+            if (Callcast.Callback_OnNicknameInUse) {
+                Callcast.Callback_OnNicknameInUse(nick.replace(/%20/g, ' '));
+            }
+        }
+        else {
+            this.RequestNickSubstitution(room, nick, function() {
+                self.log('Nickname substitution succeeded.');
+            }, function(err) {
+                self.log('Nickname substitution failed. Err: ' + err);
+                self.log('    Now we erase all prior jids and try to join once more.');
+
+                self.ClearOldJids();
+
+                // Now re-join. If we fail again, this time the error will 'stick' as we have no old jids.
+                // Note: At this stage, 'room' is a full roomname with domain. Gotta prune it down for the call.
+                self.JoinSession(room.split('@')[0], room);
+            });
+        }
     },
 
     DropAllParticipants: function() {
@@ -483,6 +572,10 @@ var Callcast = {
     //
     SetNickname: function(mynick) {
         Callcast.nick = mynick;
+
+        if (!this.fbsr || this.fbsr === '') {
+            this.SendAdHocPres();
+        }
     },
 
     SetUseVideo: function(v_use) {
@@ -501,6 +594,9 @@ var Callcast = {
 
         if (typeof(filter) === 'string' && this.localplayer && this.localstream) {
             this.localstream.videoTracks[0].effect = filter;
+            if (this.Callback_OnEffectApplied) {
+                this.Callback_OnEffectApplied(filter);
+            }
             return true;
         }
         else {
@@ -518,34 +614,32 @@ var Callcast = {
         var nick = info.nick;
         nick = this.WithSpaces(nick);
 
-        if (nick && this.participants[nick] && this.participants[nick].peer_connection)
+        if (nick && this.participants[nick])
         {
+            if (this.participants[nick].peer_connection)
+            {
+                if (info.width >= 0 && info.height >= 0)
+                {
+                    this.participants[nick].peer_connection.Width(info.width);
+                    this.participants[nick].peer_connection.Height(info.height);
+                }
+                else if (info.hasVid === true)
+                {
+                    this.participants[nick].peer_connection.Width(this.WIDTH);
+                    this.participants[nick].peer_connection.Height(this.HEIGHT);
+                }
+                else if (info.hasVid === false)
+                {
+                    this.participants[nick].peer_connection.Width(0);
+                    this.participants[nick].peer_connection.Height(0);
+                }
+            }
 
-            if (info.width >= 0 && info.height >= 0)
-            {
-                this.participants[nick].peer_connection.Width(info.width);
-                this.participants[nick].peer_connection.Height(info.height);
-            }
-            else if (info.hasVid === true)
-            {
-                this.participants[nick].peer_connection.Width(this.WIDTH);
-                this.participants[nick].peer_connection.Height(this.HEIGHT);
-            }
-            else if (info.hasVid === false)
-            {
-                this.participants[nick].peer_connection.Width(0);
-                this.participants[nick].peer_connection.Height(0);
-            }
         }
         else if (nick !== this.nick) {
             this.log('ShowRemoteVideo: nickname not found: ' + nick);
         }
-
-        // If we're just missing the peer_connection, let's note an error.
-        if (nick && this.participants[nick] && !this.participants[nick].peer_connection) {
-            this.log('ShowRemoteVideo: ERROR - peer_connection is null.');
-        }
-    },
+   },
 
     IsVideoEnabled: function() {
         if (!this.mediaHints.video) {
@@ -643,16 +737,27 @@ var Callcast = {
     },
 
     SendMyPresence: function() {
-        var pres;
-        if (this.bUseVideo === true) {
-            pres = $pres({to: this.roomjid + '/' + this.NoSpaces(this.nick), video: 'on'}).c('x', {xmlns: 'http://jabber.org/protocol/muc'});
+        var pres, presobj = {};
+
+        // Only send presence if we're officially in the room. Not before.
+        if (!this.joined) {
+            return false;
         }
-        else if (this.bUseVideo === false) {
-            pres = $pres({to: this.roomjid + '/' + this.NoSpaces(this.nick), video: 'off'}).c('x', {xmlns: 'http://jabber.org/protocol/muc'});
+
+        presobj.to = this.roomjid + '/' + this.NoSpaces(this.nick);
+
+        if (this.bUseVideo === true || this.bUseVideo === false) {
+            presobj.video = this.bUseVideo ? 'on' : 'off';
         }
-        else {
-            pres = $pres({to: this.roomjid + '/' + this.NoSpaces(this.nick)}).c('x', {xmlns: 'http://jabber.org/protocol/muc'});
+
+        //
+        // Let the other side know we are AV capable.
+        //
+        if (this.bPluginLoadedSuccessfully) {
+            presobj.av = 'y';
         }
+
+        pres = $pres(presobj).c('x', {xmlns: 'http://jabber.org/protocol/muc'});
 
         if (this.presenceBlob) {
             pres.up().c('info', this.presenceBlob);
@@ -678,11 +783,26 @@ var Callcast = {
         if (this.localstream && this.localstream.audioTracks.length) {
             this.localstream.audioTracks[0].enabled = (typeof (bMute) !== 'undefined') ? !bMute : false;
         }
+
+        this.bUseMicrophone = !bMute;
+    },
+
+    IsPluginLoaded: function() {
+        return this.bPluginLoadedSuccessfully;
+    },
+
+    PluginFailedToLoad: function() {
+        this.log('PluginFailedToLoad: FAILED TO LOAD.');
     },
 
     InitGocastPlayer: function(jqSelector, success, failure) {
         if (!this.localplayer) {
             var settings = JSON.parse(window.localStorage.gcpsettings || '{}');
+
+            // On successful init, we note that the plugin is successfully loaded.
+            this.bPluginLoadedSuccessfully = true;
+            // Now set our presence to 'av'='y'
+            this.SendMyPresence();
 
             if (!settings) {
                 Callcast.SendLiveLog('Callcast.InitGocastPlayer: ' +
@@ -731,7 +851,7 @@ var Callcast = {
                         Callcast.localplayer = $(jqSelector).get(0);
 
                         if (0 < Callcast.localstream.videoTracks.length) {
-                            Callcast.localstream.videoTracks[0].effect = settings.effect || 'none';
+                            Callcast.SetVideoFilter(settings.effect || 'none');
                         }
 
                         if (!Callcast.localplayer && !Callcast.localplayer.version) {
@@ -768,6 +888,20 @@ var Callcast = {
         }
     },
 
+    GetParticipantReport: function() {
+        var rpt = '', k, cur;
+
+        rpt = 'Participant Report: nickname, peer_connection, videoOn\n';
+        for (k in Callcast.participants) {
+            if (Callcast.participants.hasOwnProperty(k)) {
+                cur = Callcast.participants[k];
+                rpt += k + ', pc=' + cur.peer_connection ? 'y' : 'n' + ', video=' + cur.videoOn ? 'on' : 'off' + '\n';
+            }
+        }
+
+        return rpt;
+    },
+
     Callee: function(nickin, room) {
         // Ojbect for participants in the call or being called (in progress)
         var nickname = nickin,
@@ -786,10 +920,15 @@ var Callcast = {
         this.CallState = Callcast.CallStates.NONE;
         this.bAmCaller = null;
 
+        this.callRetries = 0;       // Counter for # times we've tried making a p2p connection.
+        this.callRetryMax = 16;     // Maximum # times a caller will give it a shot.
+
         // Store a list of ICE candidates for batch-processing.
         this.candidates = null;
 
-        // Need to call InitPeerConnection -- calling it at the bottom of this constructor.
+        if (Callcast.Callback_AddSpotForParticipant) {
+            Callcast.Callback_AddSpotForParticipant(nickname);
+        }
 
         //
         // When a remote peer's stream has been added, I get called here.
@@ -835,8 +974,13 @@ var Callcast = {
                     // a blocked connection was detected by the C++ area.
                     // We need to reset the connection.
 
-                    Callcast.log('Callee: ReadyState===BLOCKED - RESET PEER CONNECTION.');
+                    Callcast.log('Callee: ReadyState===BLOCKED - RESETTING PEER CONNECTION.');
                     self.ResetPeerConnection();
+
+                    // If we've just given up on the connection, don't go further.
+                    if (!this.peer_connection) {
+                        return;
+                    }
                 }
 
                 if (Callcast.Callback_ReadyState) {
@@ -845,6 +989,35 @@ var Callcast = {
             }
             catch (e) {
                 Callcast.log('EXCEPTION: ', e.toString(), e);
+            }
+        };
+
+        this.SetIAmCaller = function() {
+            this.bAmCaller = true;
+        };
+
+        this.StartConnection = function() {
+            // Only start the connection if:
+            // a) peerconnection doesn't exist yet
+            // b) We have AV available locally.
+
+            //
+            // Only call the plugin callback and init the peer connection if we have a functional AV plugin.
+            //
+            if (!this.peer_connection && Callcast.IsPluginLoaded()) {
+                Callcast.log('Callee: Starting peerconnection and adding plugin to carousel for: ' + nickname);
+                if (Callcast.Callback_AddPluginToParticipant) {
+                    this.AddPluginResult = Callcast.Callback_AddPluginToParticipant(nickname);
+                }
+                else {
+                    Callcast.log('Callee: ERROR: Init failure. No Callback_AddPluginToParticipant callback available.');
+                }
+
+                this.InitPeerConnection();
+
+                if (this.bAmCaller) {
+                    this.InitiateCall();
+                }
             }
         };
 
@@ -887,18 +1060,30 @@ var Callcast = {
         };
 
         this.ResetPeerConnection = function() {
+            var msg;
+
             try {
                 if (this.peer_connection) {
-                    Callcast.log('ResetPeerConnection: Resetting peer connection with: ' + this.jid);
+                    // Every time we do a reset, we up the counter. This allows us to 'quit trying' at some point.
+                    this.callRetries += 1;
+                    if (this.callRetries > this.callRetryMax) {
+                        msg = 'ResetPeerConnection: P2P-DEFUNCT - Tried connecting to peer too many times.';
+                        Callcast.log(msg);
+                        Callcast.SendLiveLog('@' + Callcast.room.split('@')[0] + ': ' + msg);
+                        this.peer_connection.SetDefunct();
+                        return;
+                    }
+
+//                    Callcast.log('ResetPeerConnection: Resetting peer connection with: ' + this.jid);
 
                     this.InitPeerConnection();
 
                     if (this.bAmCaller) {
-                        Callcast.log('  ResetPeerConnection - Re-establishing call to peer.');
+                        Callcast.log('  ResetPeerConnection - Re-establishing call to peer. Retry # ' + this.callRetries);
                         this.InitiateCall();
                     }
                     else {
-                        Callcast.log('  ResetPeerConnection - Waiting on Caller to call me back...');
+                        Callcast.log('  ResetPeerConnection - Waiting on Caller to call me back... Retry # ' + this.callRetries);
                     }
                 }
                 else {
@@ -951,7 +1136,7 @@ var Callcast = {
                     }
                 }
                 else {
-                    Callcast.log('Cannot InitiateCall - peer_connection is invalid.');
+                    Callcast.log('Cannot InitiateCall - peer_connection is not initialized.');
                 }
             }
             catch (e) {
@@ -973,6 +1158,11 @@ var Callcast = {
                     {
                         Callcast.log('CompleteCall: Offer received while active. RESET PEER CONNECTION.');
                         this.ResetPeerConnection();
+
+                        // If we've just given up on the connection, don't go further.
+                        if (!this.peer_connection) {
+                            return;
+                        }
                     }
 
                     Callcast.log('Completing call...');
@@ -1000,7 +1190,7 @@ var Callcast = {
                     this.CallState = Callcast.CallStates.CONNECTED;
                 }
                 else {
-                    Callcast.log('Could not complete call. Peer_connection is invalid.');
+                    Callcast.log('Could not complete call. Peer_connection is not initialized.');
                 }
             }
             catch (e) {
@@ -1027,13 +1217,13 @@ var Callcast = {
                         // NOTE: If re-processing seems to cause a problem, it
                         // can be defeated by simply deleting or commenting out
                         // the for() loop below or setting 'len = 0;'
-                        len = this.candidates.length;
+/*                        len = this.candidates.length;
                         for (i = 0 ; i < len ; i += 1)
                         {
                             Callcast.log('  Re-processing prior candadate # ' + i);
                             this.peer_connection.ProcessIceMessage(this.candidates[i]);
                         }
-
+*/
                         // Now add the current one to the array.
                         this.candidates.push(candidate);
                     }
@@ -1074,7 +1264,7 @@ var Callcast = {
             }
         };
 
-        this.RemovePlugin = function() {
+        this.RemoveSpotAndPlugin = function() {
             // Now remove object from div
             var nick = Strophe.getResourceFromJid(this.jid);
             // Make sure it has no spaces...
@@ -1082,11 +1272,12 @@ var Callcast = {
                 nick = nick.replace(/ /g, '');
             }
 
-            if (Callcast.Callback_RemovePlugin) {
-                Callcast.Callback_RemovePlugin(nick);
+            // This will remove the plugin if present and the spot both.
+            if (Callcast.Callback_RemoveSpotForParticipant) {
+                Callcast.Callback_RemoveSpotForParticipant(nick);
             }
             else {
-                alert('ERROR: RemovePlugin: Callcast.setCallbackForRemovePlugin() has not been called yet.');
+                alert('ERROR: RemoveSpotAndPlugin: Callcast.setCallbackForRemoveSpotForParticipant() has not been called yet.');
             }
         };
 
@@ -1097,16 +1288,9 @@ var Callcast = {
                 this.peer_connection = null;
             }
 
-            this.RemovePlugin();
+            this.RemoveSpotAndPlugin();
         };
 
-        if (Callcast.Callback_AddPlugin) {
-            this.AddPluginResult = Callcast.Callback_AddPlugin(nickname);
-        }
-        else {
-            Callcast.log('Callee: ERROR: Init failure. No AddPlugin callback available.');
-        }
-        this.InitPeerConnection();
     },
 
     escapeit: function(msg) {
@@ -1322,16 +1506,33 @@ var Callcast = {
     },
 
     SendFBPres: function() {
-        var pres = $pres({to: this.SWITCHBOARD_FB, intro_sr: this.fbsr, intro_at: this.fbaccesstoken})
-            .c('x', {xmlns: 'http://jabber.org/protocol/muc'});
+        var pres;
 
         // Now that we're connected, let's send our presence info to the switchboard and FB info.
         // Note - we're going to send our INTRO_SR buried in our presence.
         //        This way, the switchboard will know who we are on facebook when our presence is seen.
 
+        // Only send this if there is a fbsr -- they logged in as a facebook user.
+        if (this.fbsr !== '' && this.connection && this.connection.connected && this.connection.authenticated)
+        {
+            pres = $pres({to: this.SWITCHBOARD_FB, intro_sr: this.fbsr, intro_at: this.fbaccesstoken})
+                .c('x', {xmlns: 'http://jabber.org/protocol/muc'});
+
+            this.fb_sent_pres = true;
+            this.connection.send(pres);
+        }
+    },
+
+    SendAdHocPres: function() {
+        var pres;
+
+        // Now that we're connected, let's send our presence info to the switchboard
+
         if (this.connection && this.connection.connected && this.connection.authenticated)
         {
-            this.fb_sent_pres = true;
+            pres = $pres({to: this.SWITCHBOARD_FB, adhocname: this.nick})
+                .c('x', {xmlns: 'http://jabber.org/protocol/muc'});
+
             this.connection.send(pres);
         }
     },
@@ -1362,7 +1563,7 @@ var Callcast = {
                     });
                 });
 
-                Callcast.log('Processing cmd: ', items[i]);
+//                Callcast.log('Processing cmd: ', items[i]);
 //                Callcast.log('info is: ', info);
                 cmdtype = $(items[i]).attr('cmdtype');
 
@@ -1371,7 +1572,7 @@ var Callcast = {
                 // Now we need to add the current 'items[i]' into the mix as a child.
                 $(newmsg).append(items[i]);
 
-                Callcast.log('Newly constituted message: ', newmsg);
+//                Callcast.log('Newly constituted message: ', newmsg);
 
                 switch (cmdtype)
                 {
@@ -1385,7 +1586,7 @@ var Callcast = {
                     ret = Callcast.on_url_render(newmsg);
                     break;
                 case 'addspot':
-                    Callcast.log('addspot: Received object: ', info);
+//                    Callcast.log('addspot: Received object: ', info);
                     if (Callcast.Callback_AddSpot) {
                         Callcast.Callback_AddSpot(info);
                     }
@@ -1398,7 +1599,7 @@ var Callcast = {
                     ret = true;
                     break;
                 case 'setspot':
-                    Callcast.log('setspot: Received object: ', info);
+//                    Callcast.log('setspot: Received object: ', info);
                     if (Callcast.Callback_SetSpot) {
                         Callcast.Callback_SetSpot(info);
                     }
@@ -1501,28 +1702,37 @@ var Callcast = {
     },
 
     SendPublicChat: function(msg) {
-      var chat = $msg({to: this.room, type: 'groupchat'}).c('body').t(msg);
-      this.connection.send(chat);
+        var chat = $msg({to: this.room, type: 'groupchat'}).c('body').t(msg);
+        if (this.connection) {
+            this.connection.send(chat);
+        }
     },
 
     SendPrivateChat: function(msg, to) {
-      var chat = $msg({to: this.room + '/' + to.replace(/ /g, '\\20'), type: 'chat'}).c('body').t(msg);
-      this.connection.send(chat);
+        var chat = $msg({to: this.room + '/' + to.replace(/ /g, '\\20'), type: 'chat'}).c('body').t(msg);
+        if (this.connection) {
+            this.connection.send(chat);
+        }
     },
 
     SendDirectPrivateChat: function(msg, to) {
-      var chat = $msg({to: to, type: 'chat'}).c('body').t(msg);
-      this.connection.send(chat);
+        var chat = $msg({to: to, type: 'chat'}).c('body').t(msg);
+        if (this.connection) {
+            this.connection.send(chat);
+        }
     },
 
     SendLiveLog: function(msg) {
-        this.SendDirectPrivateChat('LIVELOG ; ' + this.nick + ' ; ' + msg, this.ROOMMANAGER);
+        this.SendDirectPrivateChat('LIVELOG ; ' + this.nick + ' ; ' + decodeURI(msg).replace(';','|'), this.ROOMMANAGER);
+        if (this.connection) {
+            this.connection.flush();    // This is important to get to the server right away - it's a live log.
+        }
     },
 
     SendLogsToLogCatcher: function(cbSuccess, cbFailure) {
         var self = this, ibb;
 
-        ibb = new GoCastJS.IBBTransferClient(this.connection, this.room.split('@')[0], this.nick, function(max) {
+        ibb = new GoCastJS.IBBTransferClient(this.connection, this.room.split('@')[0], this.nick, this.LOGCATCHER, function(max) {
             var buf = logQ.removeLinesWithMaxBytes(max);
             if (!buf || buf === '') {
                 return null;
@@ -1661,6 +1871,15 @@ var Callcast = {
                         Callcast.participants[nick].videoOn = null;
                     }
 
+                    if ($(presence).attr('av')) {
+                        Callcast.log('PRES-INFO: Already-known-Nick: ' + nick + ' has AV capability (plugin)');
+                        // Other side has av. Make sure we have a peerconnection with them.
+                        Callcast.participants[nick].StartConnection();  // Will drop out if connection already present.
+                    }
+                    else {
+                        Callcast.log('PRES-INFO: Already-known-Nick: ' + nick + ' has NO AV capability (NO-plugin)');
+                    }
+
                     // Update the presence information.
                     info = {};
                     if ($(presence).children('info')[0])
@@ -1672,7 +1891,7 @@ var Callcast = {
                     }
 
                     info.nick = nick;
-                    info.hasVid = Callcast.participants[nick].videoOn;
+                    info.hasVid = Callcast.participants[nick].videoOn && Callcast.IsPluginLoaded();
 
                     $(document).trigger('user_updated', info);
                 }
@@ -1698,6 +1917,10 @@ var Callcast = {
                     // error joining room; reset app
                     if ($(presence).find('not-allowed').length > 0) {
                         $(document).trigger('room-creation-not-allowed', Strophe.getNodeFromJid(room));
+                    }
+                    else if ($(presence).find('conflict').length > 0) {
+                        Callcast.HandleNicknameConflict(room, nick);  // Likely 2nd time through here and a failure.
+                        return false;   // Kill handler.
                     }
                     else {
                         Callcast.log('PresHandler: Error joining room. Disconnecting.');
@@ -1731,7 +1954,16 @@ var Callcast = {
 
                         // Now, if we are new to the session (not fully joined ye) then it's our job to call everyone.
                         if (!Callcast.joined) {
-                            Callcast.participants[nick].InitiateCall();
+                            Callcast.participants[nick].SetIAmCaller();
+                        }
+
+                        if ($(presence).attr('av')) {
+                            Callcast.log('PRES-INFO: New-Nick: ' + nick + ' has AV capability (plugin)');
+                            // They have AV -- so start up peerconnection and plugin. (so long as we have the plugin too)
+                            Callcast.participants[nick].StartConnection();
+                        }
+                        else {
+                            Callcast.log('PRES-INFO: New-Nick: ' + nick + ' has NO AV capability (NO-plugin)');
                         }
                     }
 
@@ -1772,7 +2004,7 @@ var Callcast = {
                         info.nick = nick;
 
                         if (nick !== Callcast.nick) {
-                            info.hasVid = Callcast.participants[nick].videoOn;
+                            info.hasVid = Callcast.participants[nick].videoOn && Callcast.IsPluginLoaded();
                         }
                         else {
                             info.hasVid = Callcast.bUseVideo;
@@ -1786,6 +2018,11 @@ var Callcast = {
                     //
                     if (!Callcast.joined && nick === Callcast.nick)
                     {
+                        Callcast.log('INFO: At time of receiing all participants (joined=true) ...');
+                        Callcast.log('INFO: pluginLoaded=' + Callcast.IsPluginLoaded());
+                        // Dump all room participants to the log in case we run into issues of 'noav' vs 'av' issues.
+                        Callcast.log('INFO: ' + Callcast.GetParticipantReport());
+
                         Callcast.joined = true;
                         Callcast.SendMyPresence();
                         $(Callcast).trigger('my_join_complete', nick);
@@ -1820,6 +2057,61 @@ var Callcast = {
 
             return true;
         },
+
+    //
+    // \brief Rather than sending all strokes to make the complete whiteboard each time, with this feature
+    //      we send single strokes to the server which then echos those out to the group.
+    //
+    // \param obj A JSON object which must have at least two properties:
+    //      a) obj.stroke - This is the item which will be echoed by the server to other participants.
+    //      b) obj.spotnumber - This is required to know which spot we are referring to.
+    //
+    // \param cb A callback which is called upon success with a null/empty argument cb();. On failure, this
+    //      callback is called with an error string such as cb("Error sending stroke");
+    //
+    SendSingleStroke: function(obj, cb) {
+        var myOverseer = this.overseer,
+            self = this,
+            tosend = obj;
+
+        if (!obj.stroke || !obj.spotnumber) {
+            if (cb) {
+                cb('SendSingleStroke: ERROR. Bad object passed.');
+            }
+
+            this.log('SendSingleStroke: ERROR. Bad object passed.');
+            return false;
+        }
+
+        tosend.spottype = 'whiteBoard';
+        tosend.xmlns = this.NS_CALLCAST;
+        tosend.from = this.nick;
+
+        //
+        this.connection.sendIQ($iq({
+            to: myOverseer,
+            id: 'sendstroke1',
+            type: 'set'
+          }).c('wb_stroke', tosend),
+
+        // Successful callback...
+          function(iq) {
+              if (cb) {
+                cb();
+              }
+
+              return true;
+          },
+
+        // Failure callback
+          function(iq) {
+              self.log('Error sending stroke', iq);
+              if (cb) {
+                cb('Error sending stroke');
+              }
+          }
+        );
+    },
 
     //
     // \brief Function allows clients to request a new spot be added to everyone's carousel.
@@ -1983,40 +2275,131 @@ var Callcast = {
 // room name and when the 'ok' comes back, there will be an attribute of 'name' which
 // will be the newly created random/unique room name.
 //
-    CreateUnlistedAndJoin: function(roomname, cb) {
+    CreateUnlistedAndJoin: function(roomname, cb, cbError) {
         var roommanager = this.ROOMMANAGER,
-            self = this;
+            self = this, attrs;
+
+        attrs = {
+            xmlns: this.NS_CALLCAST,
+            name: roomname.toLowerCase()
+        };
+
+        // If the user has specified a maximum number of participants on the URL/command-line
+        // then we need to put it in the formulation to be sent up.
+        if ($.getUrlVar('maxparticipants')) {
+            attrs.maxparticipants = $.getUrlVar('maxparticipants');
+        }
 
         //
         this.connection.sendIQ($iq({
             to: roommanager,
             id: 'roomcreate1',
-            type: 'set'
-          }).c('room', {xmlns: this.NS_CALLCAST, name: roomname.toLowerCase()}),
+            type: 'set' }).c('room', attrs),
 
         // Successful callback...
-          function(iq) {
-              if ($(iq).find('ok')) {
-                  if (roomname === '') {
-                    // Asked to create a random room - must retrieve name...
-                    roomname = $(iq).find('ok').attr('name');
-                  }
+            function(iq) {
+                if ($(iq).find('ok')) {
+                    // Change of protocol here - we will ALWAYS listen to what name is given
+                    // by the server as our request for a room may turn out to be a room
+                    // which is 'full' and so we get an overflow name instead which is
+                    // the room we're supposed to join.
 
+                    console.log('DEBUG: roomcreate1 success. Local roomname: ' + roomname);
+                    console.log('DEBUG:    and IQ is: ', iq);
+
+                    if (roomname === '') {
+                        // Asked to create a random room - must retrieve name...
+                        roomname = $(iq).find('ok').attr('name');
+                    }
+                    else {
+                        // We check to see if we've been given a different room name. (overflow)
+                        if (roomname !== $(iq).find('ok').attr('name')) {
+                            // Overflow - we know which to join. All good.
+                            //     But we should change the URL in the address bar.
+                            // As it turns out, the caller of this (handleRoomSetup) will
+                            // wind up doing all the right things if we simply set the actual
+                            // given roomname now. Hurray!
+
+                            roomname = $(iq).find('ok').attr('name');
+                        }
+                    }
+
+                    self.JoinSession(roomname, roomname + self.AT_CALLCAST_ROOMS);
+
+                    if (cb) {
+                        cb(roomname);
+                    }
+                }
+
+                return true;
+            },
+
+            // Failure callback
+            function(iq) {
+                Callcast.log('Error creating room', iq);
+
+                if (cbError) {
+                    cbError(iq);
+                }
+            });
+    },
+
+    //
+    // \brief Grabs any old jids in the current sessionObject and passes them to the roommanager
+    //          along with the room in question and the nickname desired via IQ.
+    //          If the server knows of any of the 'old jids', it will kick out the nickname from
+    //          the specified room.
+    // \param roomname - bare room name - without @domain
+    // \param nick - nickname with no spaces
+    //
+    RequestNickSubstitution: function(in_roomname, in_nick, cbSuccess, cbFailure) {
+        var roommanager = this.ROOMMANAGER,
+            self = this,
+            oldjids, ojo,
+            roomname, nick;
+
+        roomname = in_roomname.split('@')[0].toLowerCase();
+        nick = this.NoSpaces(in_nick);
+
+        ojo = this.GetOldJids();
+        if (!ojo) {
+            // There are no old jids. This is a failure case.
+            if (cbFailure) {
+                cbFailure('No old jids available. Cannot ask for substitution.');
+                return;
+            }
+        }
+        else {
+            oldjids = JSON.stringify(ojo);
+
+            //
+            this.connection.sendIQ($iq({
+                to: roommanager,
+                id: 'substitution1',
+                type: 'set'
+              }).c('subjidfornickname', {xmlns: this.NS_CALLCAST, room: roomname,
+                                    nick: nick, oldjids: oldjids}),
+
+            // Successful callback...
+              function(iq) {
                   self.JoinSession(roomname, roomname + self.AT_CALLCAST_ROOMS);
 
-                  if (cb) {
-                    cb(roomname);
+                  if (cbSuccess) {
+                    cbSuccess();
+                  }
+
+                  return true;
+              },
+
+            // Failure callback
+              function(iq) {
+                  Callcast.log('Error substituting new jid for nickname:' + nick, iq);
+                  if (cbFailure) {
+                    cbFailure('Error substituting at server side.');
                   }
               }
-
-              return true;
-          },
-
-        // Failure callback
-          function(iq) {
-              Callcast.log('Error creating room', iq);
-          }
-        );
+            , 3000);    // 3 seconds for the server to respond...
+        }
     },
 
     //
@@ -2183,6 +2566,93 @@ var Callcast = {
         return true;
     },
 
+    SessionStorageClear: function() {
+        var pers;
+
+        if (typeof (Storage) !== 'undefined') {
+            pers = sessionStorage.getItem('persist');  // Save all things here and below...
+
+            sessionStorage.clear();
+
+            sessionStorage.setItem('persist', pers);  // And put it all back.
+        }
+    },
+
+    ForgetReconnectInfo: function() {
+        if (typeof (Storage) !== 'undefined') {
+            delete sessionStorage.jid;
+            delete sessionStorage.rid;
+            delete sessionStorage.sid;
+        }
+    },
+
+    ClearOldJids: function() {
+        var persist;
+
+        if (typeof (Storage) !== 'undefined') {
+            persist = localStorage.getItem('persist');
+
+            if (persist) {
+                persist = JSON.parse(persist);  // Turn it into an object.
+
+                // Now clear the old jids object.
+                delete persist.oldjids;
+
+                // Then re-stringify and store it.
+                localStorage.setItem('persist', JSON.stringify(persist));
+            }
+        }
+    },
+
+    RememberCurrentJid: function() {
+        var ojids,
+            newlen, persist;
+
+        if (!this.connection) {
+            this.log('RememberCurrentJid: No Connection.');
+        }
+        else if (!this.connection.jid || !this.connection.jid.split('@')[1]) {
+            this.log('RememberCurrentJid: No valid jid.');
+        }
+
+        if (this.connection && this.connection.jid && typeof (Storage) !== 'undefined') {
+            persist = localStorage.getItem('persist');
+
+            if (persist) {
+                persist = JSON.parse(persist);  // Turn it into an object.
+                ojids = persist.oldjids || [];
+            }
+            else {
+                persist = {};
+                ojids = [];
+            }
+
+            if (ojids.length === 0 || ojids[0] !== this.connection.jid) {
+                // We have a different jid than is at the top [0] of the array.
+                newlen = ojids.unshift(this.connection.jid);
+
+                // Store a max of 5 entries
+                if (newlen > 5) {
+                    ojids.pop();   // remove the oldest one.
+                }
+            }
+
+            // Now re-write out the final array regardless of change or initialization.
+            persist.oldjids = ojids;
+            localStorage.setItem('persist', JSON.stringify(persist));
+        }
+    },
+
+    GetOldJids: function() {
+        var oj;
+        if (typeof (Storage) !== 'undefined') {
+            oj = localStorage.getItem('persist');
+            return oj ? JSON.parse(oj).oldjids : null;
+        }
+
+        return null;
+    },
+
     disconnect: function() {
 
         this.DropAllParticipants();
@@ -2192,7 +2662,7 @@ var Callcast = {
 
         // Zero it out. The conneciton is no longer valid.
         if (typeof (Storage) !== 'undefined') {
-            sessionStorage.clear();
+            this.SessionStorageClear();
         }
 
         if (this.connection)
@@ -2215,6 +2685,11 @@ var Callcast = {
 
         if (err === 'item-not-found') {
             Callcast.log('Post-Reconnect conn_callback: BOSH responded with item-not-found. Connection is invalid now.');
+            Callcast.ForgetReconnectInfo();
+            if (Callcast.connection) {
+                Callcast.connection.pause();
+                Callcast.connection = null;
+            }
             Callcast.connect(Callcast.CALLCAST_XMPPSERVER, '');
             return;
         }
@@ -2232,6 +2707,11 @@ var Callcast = {
     conn_callback: function(status, err) {
         if (err === 'item-not-found') {
             Callcast.log('Orig conn_callback: BOSH responded with item-not-found. Connection is invalid now.');
+            Callcast.ForgetReconnectInfo();
+            if (Callcast.connection) {
+                Callcast.connection.pause();
+                Callcast.connection = null;
+            }
             Callcast.connect(Callcast.CALLCAST_XMPPSERVER, '');
             return;
         }
@@ -2271,9 +2751,19 @@ var Callcast = {
             if (typeof (Storage) !== 'undefined' && sessionStorage.room)
             {
                 // We need to force a LeaveSession and setup video state too.
-                Callcast.room = sessionStorage.room;
-                Callcast.nick = sessionStorage.nick;
-                Callcast.bUseVideo = sessionStorage.bUseVideo;
+                if (typeof (Storage) !== 'undefined') {
+                    Callcast.room = sessionStorage.room;
+                    Callcast.nick = sessionStorage.nick;
+
+                    if (sessionStorage.bUseVideo === 'true' || sessionStorage.bUseVideo === 'false') {
+                        Callcast.bUseVideo = sessionStorage.bUseVideo;
+                    }
+
+                    if (sessionStorage.bUseMicrophone === 'true' || sessionStorage.bUseMicrophone === 'false') {
+                        Callcast.bUseMicrophone = sessionStorage.bUseMicrophone;
+                    }
+                }
+
                 Callcast.LeaveSession();
             }
 
@@ -2295,12 +2785,15 @@ var Callcast = {
              }
          } else if (status === Strophe.Status.DISCONNECTING) {
              Callcast.log('XMPP/Strophe is Dis-Connecting...should we try to re-attach here? TODO:RMW');
+             Callcast.RememberCurrentJid();
              if (Callcast.Callback_ConnectionStatus) {
                 Callcast.Callback_ConnectionStatus('Disconnecting');
              }
          } else if (status === Strophe.Status.CONNFAIL) {
              Callcast.log('XMPP/Strophe reported connection failure...attempt to re-attach...');
              Callcast.log('-- Not actually doing anything here yet. TODO: RMW');
+             Callcast.RememberCurrentJid();
+
              if (Callcast.Callback_ConnectionStatus) {
                 Callcast.Callback_ConnectionStatus('Connection failed');
              }
@@ -2314,6 +2807,7 @@ var Callcast = {
 
 //           alert("NOTICE -- attempted to auto-re-attach after connection failure. Did we succeed?");
          } else if (status === Strophe.Status.AUTHFAIL) {
+             Callcast.RememberCurrentJid();
              Callcast.disconnect();
              $(document).trigger('disconnected');
              if (Callcast.Callback_ConnectionStatus) {
@@ -2363,8 +2857,8 @@ var Callcast = {
 
         if (this.connection)
         {
-            this.disconnect();
-            this.reset();
+            this.connection.pause();
+            this.connection.reset();
             this.connection = null;
         }
 
@@ -2388,7 +2882,7 @@ var Callcast = {
         if (this.connection)
         {
             this.connection.pause();
-            delete this.connection;
+            this.connection = null;
         }
 
         this.connection = new Strophe.Connection(boshconn);
@@ -2405,7 +2899,9 @@ var Callcast = {
 
     finalizeConnect: function() {
         this.connection.send($pres());
-        this.SendFBPres();
+        if (this.fbsr && this.fbsr !== '') {
+            this.SendFBPres();
+        }
 
 /*
  Callcast.connection.rawInput = function(data) {
@@ -2458,6 +2954,144 @@ Callcast.connection.rawOutput = function(data) {
 
     }
  };
+
+GoCastJS.SendLogsXMPP = function(room, nick, logcatcher, id, pw, cbSuccess, cbFailure, url) {
+    // Make an XMPP login completely from scratch and then send the logs.
+    this.jid = id;
+    this.pw = pw;
+    this.connection = null;
+    this.boshconn = url || '/xmpp-httpbind';
+
+    this.room = room;
+    this.nick = nick;
+    this.LOGCATCHER = logcatcher;
+
+    this.cbSuccess = cbSuccess;
+    this.cbFailure = cbFailure;
+
+    this.connection = new Strophe.Connection(this.boshconn);
+
+    if (!this.connection) {
+        throw 'ERROR: Strophe connection could not be instantiated.';
+    }
+
+    this.connection.reset();
+
+/*
+    this.connection.rawInput = function(data) {
+                if ($(data).children()[0]) {
+                    console.log("RAW-IN:", $(data).children()[0]);
+                }
+                else {
+                    console.log("RAW-IN:", $(data));
+                }
+        };
+
+    this.connection.rawOutput = function(data) {
+                if ($(data).children()[0]) {
+                    console.log("RAW-OUT:", $(data).children()[0]);
+                }
+                else {
+                    console.log("RAW-OUT:", $(data));
+                }
+        };
+*/
+
+    this.connection.connect(this.jid, this.pw, this.genConnHandler());
+};
+
+GoCastJS.SendLogsXMPP.prototype.genConnHandler = function() {
+    var self = this;
+    return function(status, err) { self.connHandler(status, err); };
+};
+
+GoCastJS.SendLogsXMPP.prototype.connHandler = function(status, err) {
+    var self = this;
+    if (err) {
+        Callcast.log('SendLogsXMPP: Error connecting - status: ' + status + ', Error given was: ' + err);
+    }
+    else {
+//        console.log('SendLogsXMPP: STATUS=' + status);
+
+        switch(status) {
+            case Strophe.Status.CONNECTED:
+                Callcast.log('SendLogsXMPP: Connected. Setting up connection particulars.');
+
+                this.connection.addHandler(this.handle_ping, 'urn:xmpp:ping', 'iq', 'get');
+                this.connection.addHandler(this.onErrorStanza, null, null, 'error');
+
+                this.connection.send($pres());
+                this.connection.flush();
+
+                console.log('Now making call to send logs...');
+
+                this.SendLogsToLogCatcher(function(msg) {
+                    self.connection.disconnect();
+                    Callcast.log('SendLogsXMPP: Successfully sent logs.');
+                    if (self.cbSuccess) {
+                        self.cbSuccess();
+                    }
+                }, function(errmsg) {
+                    self.connection.disconnect();
+                    Callcast.log('SendLogsXMPP: CONNECTED BUT FAILED TO SEND LOGS. Err: ' + errmsg);
+                    if (self.cbFailure) {
+                        self.cbFailure(errmsg);
+                    }
+                });
+                break;
+            case Strophe.Status.DISCONNECTED:
+                this.connection = null;
+                break;
+            case Strophe.Status.AUTHENTICATING:
+            case Strophe.Status.CONNECTING:
+            case Strophe.Status.ATTACHED:
+            case Strophe.Status.DISCONNECTING:
+            case Strophe.Status.CONNFAIL:
+            case Strophe.Status.AUTHFAIL:
+                break;
+            default:
+                Callcast.log('SendLogsXMPP: WARNING: Unknown status: ' + status);
+                break;
+        }
+    }
+};
+
+GoCastJS.SendLogsXMPP.prototype.handle_ping = function(iq) {
+    var pong = $iq({to: $(iq).attr('from'), id: $(iq).attr('id'), type: 'result'});
+    console.log('SendLogsXMPP - ping/pong');
+    this.connection.send(pong);
+    return true;
+};
+
+GoCastJS.SendLogsXMPP.prototype.onErrorStanza = function(err) {
+//    alert('Unknown Error Stanza: ' + $(err).getChild('error').text());
+    console.log($(err));
+    return true;
+};
+
+GoCastJS.SendLogsXMPP.prototype.SendLogsToLogCatcher = function(cbSuccess, cbFailure) {
+    var self = this, ibb;
+
+    ibb = new GoCastJS.IBBTransferClient(this.connection, this.room.split('@')[0], this.nick, this.LOGCATCHER, function(max) {
+        var buf = logQ.removeLinesWithMaxBytes(max);
+        if (!buf || buf === '') {
+            return null;
+        }
+        else {
+            return buf;
+        }
+    }, Callcast.log, function(msg) {
+        Callcast.log('SUCCESSFUL LogCatcher send. msg: ' + msg);
+        if (cbSuccess) {
+            cbSuccess(msg);
+        }
+    }, function(errmsg) {
+        Callcast.log('ERROR: Failed LogCatcher send. msg: ' + msg);
+        if (cbFailure) {
+            cbFailure(msg);
+        }
+    });
+};
 
 //
 //Grab the url arguments and process/parse them into an array.

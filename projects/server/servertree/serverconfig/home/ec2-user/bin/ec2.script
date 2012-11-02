@@ -1,0 +1,16 @@
+LOCAL CREATESF sfipaddress="-i ~/.ssh/xvd-demo.pem ec2-user@50.18.56.238" sfid=6000 sfname=CloudFileSource
+SF WAITFORSFREADY sfid=6000 timeout=15000
+SF ADDSESSION sfid=6000 sessid=1001
+SF WAITFORSESSREADY sfid=6000 sessid=1001 timeout=19000
+SF ADDENTITY sfid=6000 sessid=1001 entid=999 enttype=FILESOURCE entname=Up resx=1280 resy=720
+LOCAL CREATESOURCE sfid=6000 sessid=1001 entid=999 sourcename=Up
+SF ADDENTITY sfid=6000 sessid=1001 entid=999 enttype=FILESOURCE entname=Joe resx=720 resy=480
+LOCAL CREATESOURCE sfid=6000 sessid=1001 entid=1500 sourcename=Joe
+SF ADDENTITY sfid=6000 sessid=1001 entid=999 enttype=FILESOURCE entname=TalkingHead1 resx=640 resy=360
+LOCAL CREATESOURCE sfid=6000 sessid=1001 entid=1450 sourcename=TalkingHead1
+SF ADDENTITY sfid=6000 sessid=1001 entid=999 enttype=FILESOURCE entname=TalkingHead2 resx=640 resy=360
+LOCAL CREATESOURCE sfid=6000 sessid=1001 entid=1400 sourcename=TalkingHead2
+SF ADDENTITY sfid=6000 sessid=1001 entid=999 enttype=FILESOURCE entname=TalkingHead3 resx=640 resy=360
+LOCAL CREATESOURCE sfid=6000 sessid=1001 entid=1350 sourcename=TalkingHead3
+SF TREFRESH
+#

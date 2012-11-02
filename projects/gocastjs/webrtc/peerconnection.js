@@ -262,7 +262,19 @@ GoCastJS.SetMicVolListener = function(checkInterval,
             onMicVolChanged(GoCastJS.Audio.micVol);
         }
     }, checkInterval);
-}
+};
+
+GoCastJS.SetPluginCrashMonitor = function(checkInterval,
+                                          localplayer,
+                                          onCrashed) {
+    return setInterval(function() {
+        if (localplayer && onCrashed && ('undefined' === typeof(localplayer.volume))) {
+            localplayer.width = 0;
+            localplayer.height = 0;
+            onCrashed();
+        }
+    }, checkInterval);
+};
 
 //!
 //! function: GoCastJS.SetDevicesChangedListener(checkInterval,
@@ -639,10 +651,17 @@ GoCastJS.PeerConnection.prototype.Deinit = function() {
 //!           'CLOSING' | 'CLOSED'];
 //!
 GoCastJS.PeerConnection.prototype.ReadyState = function() {
-    if ('ACTIVE' === this.player.readyState) {
+    var state = this.player.readyState;
+    if ('ACTIVE' === state) {
         return this.connState;
+    } else if ('BLOCKED' === state) {
+        if ('DEFUNCT' === this.connState) {
+            return this.connState;
+        } else {
+            return state;
+        }
     } else {
-        return this.player.readyState;
+        return state;
     }
 };
 
@@ -698,4 +717,9 @@ GoCastJS.PluginLog = function(localplayer, logCallback) {
             }
         });
     }
+};
+
+GoCastJS.PeerConnection.prototype.SetDefunct = function() {
+    this.connState = 'DEFUNCT';
+    this.player.onreadystatechange();
 };

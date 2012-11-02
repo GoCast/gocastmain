@@ -1,5 +1,6 @@
 #include "common_video/libyuv/include/libyuv.h"
 #include "GCPVideoRenderer.h"
+#include "GCPMediaStream.h"
 
 namespace GoCast
 {
@@ -30,6 +31,7 @@ namespace GoCast
     bool GCPVideoRenderer::RenderFrame(const cricket::VideoFrame* pFrame)
     {
         boost::mutex::scoped_lock winLock(m_winMutex);
+        static bool bRenderLogged = false;
         
         if(NULL == m_pFrameBuffer.get())
         {
@@ -65,6 +67,12 @@ namespace GoCast
         
         //convert to rgba and correct alpha
         ConvertToRGBA();
+        
+        if(false == bRenderLogged)
+        {
+            FBLOG_INFO_CUSTOM("GCPVideoRenderer::RenderFrame", "First frame rendered");
+            bRenderLogged = true;
+        }
         
         //trigger window refresh event
         InvalidateWindow();

@@ -1,0 +1,6 @@
+#/bin/sh
+cd /home/ec2-user/punjab/twonds-punjab-223f1cf
+# non-daemon, log to stdout version
+# twistd -n -l - -y punjab.tac 
+sudo twistd -n -l - -y punjab.tac 
+

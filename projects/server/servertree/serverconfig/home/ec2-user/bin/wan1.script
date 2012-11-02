@@ -1,0 +1,8 @@
+LOCAL CREATESF sfid=6000 sfipaddress=207.145.121.125 username=rwolff@ sfname=FactorySTUN
+SF WAITFORSFREADY sfid=6000 timeout=15000
+SF ADDSESSION sfid=6000 sessid=1001
+SF WAITFORSESSREADY sfid=6000 sessid=1001 timeout=10000
+SF ADDENTITY sfid=6000 sessid=1001 entid=999 enttype=FILESOURCE entname=Up resx=1280 resy=720
+LOCAL CREATESOURCE sfid=6000 sessid=1001 entid=999 sourcename=Up
+SF TREFRESH
+

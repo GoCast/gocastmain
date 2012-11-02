@@ -712,9 +712,19 @@ namespace GoCast
                                                 const talk_base::scoped_refptr
                                                 <webrtc::VideoRendererWrapperInterface>& pRenderer)
     {
-        if(0 < m_remoteStreams[pluginId]->video_tracks()->count())
+        if(m_remoteStreams.end() != m_remoteStreams.find(pluginId))
         {
-            m_remoteStreams[pluginId]->video_tracks()->at(0)->SetRenderer(pRenderer);
+            if(0 < m_remoteStreams[pluginId]->video_tracks()->count())
+            {
+                m_remoteStreams[pluginId]->video_tracks()->at(0)->SetRenderer(pRenderer);
+            }            
+        }
+        else
+        {
+            std::stringstream sstrm;
+            sstrm << "[" << pluginId << " / REMOTESTREAM-NOT-FOUND]: ";
+            sstrm << "Remote stream not found -- possible late onaddstream() call...";
+            FBLOG_ERROR_CUSTOM("RtcCenter::SetRemoteVideoTrackRenderer", "")
         }
     }
     
@@ -729,7 +739,15 @@ namespace GoCast
     {
         if(m_remoteStreams.end() != m_remoteStreams.find(pluginId))
         {
+            m_remoteStreams[pluginId] = NULL;
             m_remoteStreams.erase(pluginId);
+        }
+        else
+        {
+            std::stringstream sstrm;
+            sstrm << "[" << pluginId << " / REMOTESTREAM-NOT-FOUND]: ";
+            sstrm << "Remote stream not found -- possible spurious DeletePeerConnection() call...";
+            FBLOG_ERROR_CUSTOM("RtcCenter::SetRemoteVideoTrackRenderer", "")
         }
     }
 

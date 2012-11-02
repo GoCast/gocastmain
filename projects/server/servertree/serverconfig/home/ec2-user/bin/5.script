@@ -1,0 +1,16 @@
+# Add Joe as a file source but dont connect to it yet.
+SF ADDENTITY sfid=6000 sessid=1001 entid=1000 enttype=FILESOURCE entname=Joe resx=720 resy=480
+LOCAL CREATESOURCE sfid=6000 sessid=1001 entid=1000 sourcename=Joe
+SF TREFRESH
+# Add an RP on sith
+# Using the hijack of ./bin/sf again for making .73 act as a pseudo-endpoint
+# LOCAL CREATESF sfipaddress=192.168.46.73 sfid=8000 sfname=FinalRelayProxy
+SF WAITFORSFREADY sfid=11556 timeout=15000
+SF WAITFORSESSREADY sfid=11556 sessid=1001 timeout=25000
+SF ADDENTITY sfid=11556 sessid=1001 entid=1001 enttype=RP entname=JoeRPTop srcentid=1000
+local sleep ms=3000
+SF ADDENTITY sfid=11555 sessid=1001 entid=1002 enttype=RP entname=JoeRPAppliance srcentid=1001
+#SF CHANGECONNECTION sfid=11555 sessid=1001 entid=32770 srcentid=997
+#local sleep ms=3000
+#SF CHANGECONNECTION sfid=11556 sessid=1001 entid=32771 srcentid=997
+
