@@ -797,12 +797,25 @@ var Callcast = {
 
     InitGocastPlayer: function(jqSelector, success, failure) {
         if (!this.localplayer) {
-            var settings = JSON.parse(window.localStorage.gcpsettings || '{}');
+            var k, settings = JSON.parse(window.localStorage.gcpsettings || '{}');
 
             // On successful init, we note that the plugin is successfully loaded.
             this.bPluginLoadedSuccessfully = true;
             // Now set our presence to 'av'='y'
             this.SendMyPresence();
+
+            //
+            // It is possible that we have already discovered other participants who are AV capable
+            // and yet we have not initiated any call with them yet because our plugin got instantiated
+            // late. If this happens, depending on who joined last in the room, a call would never
+            // get created. To resolve this, we need to make a LateStartConnection() call for each
+            // participant in the list.
+            //
+            for (k in this.participants) {
+                if (this.participants.hasOwnProperty(k)) {
+                    this.participants[k].LateStartConnection();
+                }
+            }
 
             if (!settings) {
                 Callcast.SendLiveLog('Callcast.InitGocastPlayer: ' +
@@ -889,13 +902,14 @@ var Callcast = {
     },
 
     GetParticipantReport: function() {
-        var rpt = '', k, cur;
+        var rpt = '', k, cur, line;
 
         rpt = 'Participant Report: nickname, peer_connection, videoOn\n';
         for (k in Callcast.participants) {
             if (Callcast.participants.hasOwnProperty(k)) {
                 cur = Callcast.participants[k];
-                rpt += k + ', pc=' + cur.peer_connection ? 'y' : 'n' + ', video=' + cur.videoOn ? 'on' : 'off' + '\n';
+                line = k + ', pc=' + (cur.peer_connection ? 'y' : 'n') + ', video=' + (cur.videoOn ? 'on' : 'off') + '\n';
+                rpt += line;
             }
         }
 
@@ -925,17 +939,28 @@ var Callcast = {
 
         // Store a list of ICE candidates for batch-processing.
         this.candidates = null;
+        this.AddPluginResult = null;
+        this.bHasAV = false;
 
         if (Callcast.Callback_AddSpotForParticipant) {
             Callcast.Callback_AddSpotForParticipant(nickname);
         }
+
+        this.GetID = function() {
+            if (this.AddPluginResult) {
+                return this.AddPluginResult.id;
+            }
+            else {
+                return -1;
+            }
+        };
 
         //
         // When a remote peer's stream has been added, I get called here.
         //
         this.onaddstream = function(stream) {
             if ('undefined' !== typeof(stream) && null !== stream) {
-                Callcast.log('onaddstream: added remote stream [' +
+                Callcast.log('Callee:' + self.GetID() + ' onaddstream: added remote stream [' +
                             stream.label + ']');
                 self.stream = stream;
             }
@@ -946,7 +971,7 @@ var Callcast = {
         //
         this.onremovestream = function(stream) {
             if ('undefined' !== typeof(stream) && null !== stream) {
-                Callcast.log('onremovestream: removed remote stream [' +
+                Callcast.log('Callee:' + self.GetID() + ' onremovestream: removed remote stream [' +
                             stream.label + ']');
                 self.stream = null;
             }
@@ -955,7 +980,7 @@ var Callcast = {
         this.onicecandidate = function(candidate, moreComing) {
             if (true === moreComing) {
                 if ('string' === typeof(candidate) && null !== candidate) {
-                    Callcast.log('onicemessage: ', candidate);
+                    Callcast.log('Callee:' + self.GetID() + ' onicemessage: ', candidate);
                     // Send ICE message to the other peer.
                     var ice = $msg({to: self.jid, type: 'chat'})
                             .c('signaling', {xmlns: Callcast.NS_CALLCAST}).t(candidate);
@@ -968,7 +993,7 @@ var Callcast = {
             try {
                 var state = self.peer_connection.ReadyState();
 
-                Callcast.log('OnReadyState: For ' + self.jid + ', Current=' + state);
+                Callcast.log('Callee:' + self.GetID() + ' OnReadyState: For ' + self.jid + ', Current=' + state);
 
                 if (state === 'BLOCKED') {
                     // a blocked connection was detected by the C++ area.
@@ -988,18 +1013,32 @@ var Callcast = {
                 }
             }
             catch (e) {
-                Callcast.log('EXCEPTION: ', e.toString(), e);
+                Callcast.log('Callee:' + self.GetID() + ' EXCEPTION: ', e.toString(), e);
             }
         };
 
         this.SetIAmCaller = function() {
             this.bAmCaller = true;
+            Callcast.log('Callee:' + self.GetID() + ' I am the Caller.');
+        };
+
+        //
+        // \brief If our plugin loads late - after discovering that others have AV capability, we need
+        //          a way to get the connection started. This will only start a connection if the other
+        //          side has been marked as AV capable (via having called StartConnection in the past)
+        //
+        this.LateStartConnection = function() {
+            if (this.bHasAV && !this.peer_connection) {
+                Callcast.log('Callee:' + self.GetID() + ' LATE START CONNECTION.');
+                this.StartConnection();
+            }
         };
 
         this.StartConnection = function() {
             // Only start the connection if:
             // a) peerconnection doesn't exist yet
             // b) We have AV available locally.
+            this.bHasAV = true;
 
             //
             // Only call the plugin callback and init the peer connection if we have a functional AV plugin.
@@ -1043,7 +1082,7 @@ var Callcast = {
                             this.AddPluginResult));
 
                 if (!this.peer_connection) {
-                    alert("Gocast Remote Player object for name:'" + nickname + "' not found in DOM. Plugin problem?");
+                    alert('Callee:' + self.GetID() + " Gocast Remote Player object for name:'" + nickname + "' not found in DOM. Plugin problem?");
                 }
                 else
                 {
@@ -1055,7 +1094,7 @@ var Callcast = {
                     }
                 }
             } catch (e) {
-                Callcast.log('EXCEPTION: ', e.toString(), e);
+                Callcast.log('Callee:' + self.GetID() + ' EXCEPTION: ', e.toString(), e);
             }
         };
 
@@ -1067,7 +1106,7 @@ var Callcast = {
                     // Every time we do a reset, we up the counter. This allows us to 'quit trying' at some point.
                     this.callRetries += 1;
                     if (this.callRetries > this.callRetryMax) {
-                        msg = 'ResetPeerConnection: P2P-DEFUNCT - Tried connecting to peer too many times.';
+                        msg = 'Callee:' + self.GetID() + ' ResetPeerConnection: P2P-DEFUNCT - Tried connecting to peer too many times.';
                         Callcast.log(msg);
                         Callcast.SendLiveLog('@' + Callcast.room.split('@')[0] + ': ' + msg);
                         this.peer_connection.SetDefunct();
@@ -1079,18 +1118,18 @@ var Callcast = {
                     this.InitPeerConnection();
 
                     if (this.bAmCaller) {
-                        Callcast.log('  ResetPeerConnection - Re-establishing call to peer. Retry # ' + this.callRetries);
+                        Callcast.log('Callee:' + self.GetID() + '  ResetPeerConnection - Re-establishing call to peer. Retry # ' + this.callRetries);
                         this.InitiateCall();
                     }
                     else {
-                        Callcast.log('  ResetPeerConnection - Waiting on Caller to call me back... Retry # ' + this.callRetries);
+                        Callcast.log('Callee:' + self.GetID() + '  ResetPeerConnection - Waiting on Caller to call me back... Retry # ' + this.callRetries);
                     }
                 }
                 else {
-                    Callcast.log('ResetPeerConnection: ERROR - peer_connection is already null.');
+                    Callcast.log('Callee:' + self.GetID() + ' ResetPeerConnection: ERROR - peer_connection is already null.');
                 }
             } catch (e) {
-                Callcast.log('EXCEPTION: ', e.toString(), e);
+                Callcast.log('Callee:' + self.GetID() + ' EXCEPTION: ', e.toString(), e);
             }
         };
 
@@ -1113,12 +1152,11 @@ var Callcast = {
                         calltype = ' - Audio+Video.';
                     }
 
-                    Callcast.log('Commencing to call ' + this.jid + calltype);
+                    Callcast.log('Callee:' + self.GetID() + ' Commencing to call ' + this.jid + calltype);
 
                     // Create with audio and video tracks in case they want to be used later.
                     sdp = this.peer_connection.CreateOffer({audio: true, video: true});
 
-                    Callcast.log('  InitiateCall: Setting SetLocalDescription as OFFER');
                     this.peer_connection.SetLocalDescription('OFFER', sdp, function() {
                         var offer = $msg({to: self.jid, type: 'chat'})
                                 .c('offer', {xmlns: Callcast.NS_CALLCAST}).t(sdp);
@@ -1126,7 +1164,7 @@ var Callcast = {
                         // Now send our SDP/offer.
                         Callcast.connection.send(offer);
                     }, function(msg) {
-                        Callcast.log('InitiateCall: SetLocalDescription: FAIL: ' + msg);
+                        Callcast.log('Callee:' + self.GetID() + ' InitiateCall: SetLocalDescription: FAIL: ' + msg);
                     });
 
                     // Oddball case where peer connection will wind up sending our video
@@ -1136,11 +1174,11 @@ var Callcast = {
                     }
                 }
                 else {
-                    Callcast.log('Cannot InitiateCall - peer_connection is not initialized.');
+                    Callcast.log('Callee:' + self.GetID() + ' Cannot InitiateCall - peer_connection is not initialized.');
                 }
             }
             catch (e) {
-                Callcast.log('EXCEPTION: ', e.toString(), e);
+                Callcast.log('Callee:' + self.GetID() + ' EXCEPTION: ', e.toString(), e);
             }
         };
 
@@ -1150,13 +1188,24 @@ var Callcast = {
             this.bAmCaller = false;
 
             try {
+                //
+                // With the late-plugin-loaded scenarios, it is now possible that we receive a call offer
+                // from the other side before we know if they are AV capable or not via their presence info.
+                // The mere fact that they are calling us, however, implies that they have AV and they know
+                // that we have AV also. So...if the peer connection is null here, initiate it and receive
+                // the call.
+                //
+                if (!this.peer_connection) {
+                    this.StartConnection();
+                }
+
                 if (this.peer_connection)
                 {
                     rs = this.peer_connection.ReadyState();
 
                     if (rs === 'ACTIVE' || rs === 'CONNECTING'|| rs === 'CONNECTED')
                     {
-                        Callcast.log('CompleteCall: Offer received while active. RESET PEER CONNECTION.');
+                        Callcast.log('Callee:' + self.GetID() + ' CompleteCall: Offer received while active. RESET PEER CONNECTION.');
                         this.ResetPeerConnection();
 
                         // If we've just given up on the connection, don't go further.
@@ -1165,17 +1214,15 @@ var Callcast = {
                         }
                     }
 
-                    Callcast.log('Completing call...');
+                    Callcast.log('Callee:' + self.GetID() + ' Completing call...');
     //                Callcast.log('CompleteCall: Offer-SDP=' + offer);
 
-                    Callcast.log('  CompleteCall: Setting SetRemoteDescription as OFFER');
                     this.peer_connection.SetRemoteDescription('OFFER', offer);
 
                     sdp = this.peer_connection.CreateAnswer(offer, {audio: true, video: true});
 //                  Callcast.log('CompleteCall: Answer-SDP=' + sdp);
-                    Callcast.log('  CompleteCall: Setting SetLocalDescription as ANSWER');
                     this.peer_connection.SetLocalDescription('ANSWER', sdp, function() {
-                        Callcast.log('CompleteCall: Success - setting local and starting ICE machine.');
+                        Callcast.log('Callee:' + self.GetID() + ' CompleteCall: Success - setting local and starting ICE machine.');
                         self.peer_connection.StartIce();
                         self.bIceStarted = true;
                         var answer = $msg({to: self.jid, type: 'chat'})
@@ -1184,17 +1231,17 @@ var Callcast = {
                         // Now send our SDP/answer.
                         Callcast.connection.send(answer);
                     }, function(msg) {
-                        Callcast.log('CompleteCall: SetLocalDescription: FAIL: ' + msg);
+                        Callcast.log('Callee:' + self.GetID() + ' CompleteCall: SetLocalDescription: FAIL: ' + msg);
                     });
 
                     this.CallState = Callcast.CallStates.CONNECTED;
                 }
                 else {
-                    Callcast.log('Could not complete call. Peer_connection is not initialized.');
+                    Callcast.log('Callee:' + self.GetID() + ' Could not complete call. Peer_connection is not initialized.');
                 }
             }
             catch (e) {
-                Callcast.log('EXCEPTION: ', e.toString(), e);
+                Callcast.log('Callee:' + self.GetID() + ' EXCEPTION: ', e.toString(), e);
             }
         };
 
@@ -1207,7 +1254,7 @@ var Callcast = {
                 if (this.peer_connection && (rs === 'ACTIVE' || rs === 'CONNECTING' || rs === 'CONNECTED'))
                 {
                     if (this.bIceStarted) {
-                        Callcast.log('InboundIce: Got Candidate - ' + candidate);
+                        Callcast.log('Callee:' + self.GetID() + ' InboundIce: Got Candidate - ' + candidate);
 
                         // Process change: process the most recent candidate,
                         // and then iterate through the .candidates array
@@ -1228,21 +1275,21 @@ var Callcast = {
                         this.candidates.push(candidate);
                     }
                     else {
-                        Callcast.log('WARNING: Ice machine not started yet but received an inbound Ice Candidate.');
+                        Callcast.log('Callee:' + self.GetID() + ' WARNING: Ice machine not started yet but received an inbound Ice Candidate.');
                     }
                 }
                 else {
                     if (!this.peer_connection) {
-                        Callcast.log('Could not process ICE message. Peer_connection is invalid.');
+                        Callcast.log('Callee:' + self.GetID() + ' Could not process ICE message. Peer_connection is invalid.');
                     }
                     else {
-                        Callcast.log('Could not process ICE message. Peer_connection state not ACTIVE. Currently === ' +
+                        Callcast.log('Callee:' + self.GetID() + ' Could not process ICE message. Peer_connection state not ACTIVE. Currently === ' +
                                 this.peer_connection.ReadyState());
                     }
                 }
             }
             catch (e) {
-                Callcast.log('EXCEPTION: ', e.toString(), e);
+                Callcast.log('Callee:' + self.GetID() + ' EXCEPTION: ', e.toString(), e);
             }
         };
 
@@ -1250,17 +1297,17 @@ var Callcast = {
             try {
                 if (this.peer_connection)
                 {
-                    Callcast.log('  InboundAnswer: Setting SetRemoteDescription as ANSWER');
+                    Callcast.log('Callee:' + self.GetID() + '  InboundAnswer: Setting SetRemoteDescription as ANSWER');
                     this.peer_connection.SetRemoteDescription('ANSWER', sdp);
                     self.peer_connection.StartIce();
                     self.bIceStarted = true;
                 }
                 else {
-                    Callcast.log('Could not process answer message. Peer_connection is invalid.');
+                    Callcast.log('Callee:' + self.GetID() + ' Could not process answer message. Peer_connection is invalid.');
                 }
             }
             catch (e) {
-                Callcast.log('EXCEPTION: ', e.toString(), e);
+                Callcast.log('Callee:' + self.GetID() + ' EXCEPTION: ', e.toString(), e);
             }
         };
 
@@ -1277,14 +1324,14 @@ var Callcast = {
                 Callcast.Callback_RemoveSpotForParticipant(nick);
             }
             else {
-                alert('ERROR: RemoveSpotAndPlugin: Callcast.setCallbackForRemoveSpotForParticipant() has not been called yet.');
+                alert('Callee:' + self.GetID() + ' ERROR: RemoveSpotAndPlugin: Callcast.setCallbackForRemoveSpotForParticipant() has not been called yet.');
             }
         };
 
         this.DropCall = function() {
             if (this.peer_connection)
             {
-                Callcast.log('Dropping call for ' + this.jid);
+                Callcast.log('Callee:' + self.GetID() + ' Dropping call for ' + this.jid);
                 this.peer_connection = null;
             }
 
@@ -2018,10 +2065,10 @@ var Callcast = {
                     //
                     if (!Callcast.joined && nick === Callcast.nick)
                     {
-                        Callcast.log('INFO: At time of receiing all participants (joined=true) ...');
-                        Callcast.log('INFO: pluginLoaded=' + Callcast.IsPluginLoaded());
+                        Callcast.log('INFO: At time of receiving all participants (joined=true) ...');
+                        Callcast.log('  INFO: pluginLoaded=' + Callcast.IsPluginLoaded());
                         // Dump all room participants to the log in case we run into issues of 'noav' vs 'av' issues.
-                        Callcast.log('INFO: ' + Callcast.GetParticipantReport());
+                        Callcast.log('  INFO: ' + Callcast.GetParticipantReport());
 
                         Callcast.joined = true;
                         Callcast.SendMyPresence();
