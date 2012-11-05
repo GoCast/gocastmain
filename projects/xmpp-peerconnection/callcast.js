@@ -904,11 +904,11 @@ var Callcast = {
     GetParticipantReport: function() {
         var rpt = '', k, cur, line;
 
-        rpt = 'Participant Report: nickname, peer_connection, videoOn\n';
+        rpt = 'Participant Report: nickname, peer_connection, videoOn, retries/max\n';
         for (k in Callcast.participants) {
             if (Callcast.participants.hasOwnProperty(k)) {
                 cur = Callcast.participants[k];
-                line = k + ', pc=' + (cur.peer_connection ? 'y' : 'n') + ', video=' + (cur.videoOn ? 'on' : 'off') + '\n';
+                line = k + ', pc=' + (cur.peer_connection ? 'y' : 'n') + ', video=' + (cur.videoOn ? 'on' : 'off') + cur.callRetries + '/' + cur.callRetryMax + '\n';
                 rpt += line;
             }
         }
@@ -1332,6 +1332,7 @@ var Callcast = {
             if (this.peer_connection)
             {
                 Callcast.log('Callee:' + self.GetID() + ' Dropping call for ' + this.jid);
+                this.peer_connection.Deinit();
                 this.peer_connection = null;
             }
 
