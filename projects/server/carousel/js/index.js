@@ -2442,6 +2442,16 @@ $(document).ready(function(
                         SWITCHBOARD_FB: 'switchboard_dnle@dnle.gocast.it',
                         LOGCATCHER: 'logcatcher@dnle.gocast.it/logcatcher'});
   }
+  else if (window.location.hostname.toLowerCase() === 'creativity.gocast.it') {
+    Callcast.InitOverride({ CALLCAST_XMPPSERVER: 'dnle.gocast.it',
+                        CALLCAST_ROOMS: 'ccc-conference.dnle.gocast.it',
+                        AT_CALLCAST_ROOMS: '@ccc-conference.dnle.gocast.it',
+                        STUNSERVER: 'dnle.gocast.it', STUNSERVERPORT: 19302,
+                        FEEDBACK_BOT: 'feedback_bot_ccc@dnle.gocast.it',
+                        ROOMMANAGER: 'ccc_roommanager@dnle.gocast.it/roommanager',
+                        SWITCHBOARD_FB: 'switchboard_ccc@dnle.gocast.it',
+                        LOGCATCHER: 'ccc_logcatcher@dnle.gocast.it/logcatcher'});
+  }
   else if (window.location.hostname.toLowerCase() === 'dev.gocast.it') {
     Callcast.InitOverride({ CALLCAST_XMPPSERVER: 'dev.gocast.it',
                         CALLCAST_ROOMS: 'conference.dev.gocast.it',
