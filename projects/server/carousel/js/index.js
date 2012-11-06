@@ -2006,7 +2006,7 @@ function handleRoomSetup() {
     }
 
     // warn user if room name changed (overflow)
-    if (room_to_create.length > 0 && room_to_create !== new_name)
+    if (room_to_create.length > 0 && room_to_create.toLowerCase() !== new_name.toLowerCase())
     {
       // display warning
       jqDlg = $(app.STATUS_PROMPT_LEFT).css({"display": "block",
