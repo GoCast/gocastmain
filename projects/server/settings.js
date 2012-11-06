@@ -209,6 +209,69 @@ if (process.env.STANFORDDNLE === 1 || process.env.STANFORDDNLE === '1') {
         wbstoragelocation: '~/wbstorage'
     };
 }
+else if (process.env.STANFORDCCC === 1 || process.env.STANFORDCCC === '1') {
+    console.log('/////////////////////////////////////////////');
+    console.log('// STANFORD CREATIVITY SETTINGS ACTIVATED. //');
+    console.log('/////////////////////////////////////////////');
+
+    settings.SERVERNAME = 'dnle.gocast.it';
+    settings.SERVERPORT = 5222;
+    settings.CONF_SERVICE = '@ccc-conference.dnle.gocast.it';
+
+    settings.dynamodb = {
+        endpoint: 'dynamodb.us-west-1.amazonaws.com',
+        accessKeyId: 'AKIAJWJEBZBGT6TPH32A',
+        secretAccessKey: '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',
+        tables: {
+            ACTIVEROOMS: 'creativity_active_rooms',
+            ROOMCONTENTS: 'creativity_room_contents'
+        }
+    };
+
+    settings.overseer = {
+        username: 'ccc_overseer@' + settings.SERVERNAME,
+        password: 'creativity.expands.the.universe',
+        OVERSEER_NICKNAME: 'overseer'
+    };
+
+    settings.switchboard = {
+        username: 'switchboard_ccc@' + settings.SERVERNAME,
+        password: 'ccc.switching.users',
+        APP_ID: '458515917498757',
+        APP_SECRET: 'c3b7a2cc7f462b5e4cee252e93588d45'
+    };
+
+    settings.logcatcher = {
+        username: 'ccc_logcatcher@' + settings.SERVERNAME + '/logcatcher',
+        password: 'ccc.catcher.ofbugs'
+    };
+
+    settings.feedbackbot = {
+        username: 'feedback_bot_ccc@' + settings.SERVERNAME,
+        password: 'feedback.is.good.ccc'
+    };
+
+    settings.notifier = {
+        username: 'ccc_notifier@' + settings.SERVERNAME,
+        password: 'notification.bot.ccc',
+        notify_list: ['rwolff@dnle.gocast.it']
+    };
+
+    settings.roommanager = {
+        persist: true,      // Normally rooms are non-persistent.
+        allow_overflow: true,
+        allow_maxparticipants_from_client: true,
+        maxparticipants_ceiling: 7,
+        default_room: 'Lounge',
+        default_room_persist: false,
+
+        username: 'ccc_roommanager@' + settings.SERVERNAME + '/roommanager',
+        usernametest: 'ccc_roommanager@' + settings.SERVERNAME + '/roommanagertest',
+        password: 'the.gatekeeper.rules.ccc',
+
+        wbstoragelocation: '~/wbstorage_creativity'
+    };
+}
 
 
 module.exports = settings;
