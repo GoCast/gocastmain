@@ -1,7 +1,7 @@
-#!/bin/sh
+#!/bin/bash
 echo "remove GoCast people make new log"
-grep -v -i -E "Gannes|masa|sandra|manjesh|mmalavalli|jk|koning|wolff|Vadasz|Novotny|Watanabe|Mirapuri|Leuschel|bobtest|bob-windows" $1 | grep '^[0-9]' | grep "Name" > sml.log
-cat sml.log | cut -d ' ' -f 1 -f6 | cut -d ':' -f1 -f2 | sed -e 's/:/ /' > sml2.log
+grep -v -i -E "Gannes|masa|sandra|manjesh|mmalavalli|jk|koning|wolff|Vadasz|Novotny|Watanabe|Mirapuri|Leuschel|bobtest|bob-windows" switchboard.log | grep '^[0-9]' | grep "Name" > sml.log
+cat sml.log | cut -d ' ' -f "1,6" | cut -d ':' -f "1,2" | sed -e 's/:/ /' > sml2.log
 sort -u sml2.log > sml2.unique
 exit
 echo
@@ -31,26 +31,26 @@ grep Ad-hoc sml.log | cut -d ':' -f 6
 ############# Exit ########
 exit 
 echo
-echo Facebook unique userlist contains `grep FBName $1 | cut -d ':' -f 6 | sort -u | wc -l` users.
+echo Facebook unique userlist contains `grep FBName switchboard.log | cut -d ':' -f 6 | sort -u | wc -l` users.
 echo
 echo Facebook unique userlist
 echo
-grep FBName $1 | cut -d ':' -f 6 | sort -u
+grep FBName switchboard.log | cut -d ':' -f 6 | sort -u
 echo
-echo Facebook running userlist contains `grep FBName $1 | cut -d ':' -f 6 | wc -l` users.
+echo Facebook running userlist contains `grep FBName switchboard.log | cut -d ':' -f 6 | wc -l` users.
 echo
 echo Facebook running userlist
 echo
-grep FBName $1 | cut -d ':' -f 6
+grep FBName switchboard.log | cut -d ':' -f 6
 echo
-echo Ad-Hoc unique userlist contains `grep Ad-hoc $1 | cut -d ':' -f 6 | sort -u | wc -l` users.
+echo Ad-Hoc unique userlist contains `grep Ad-hoc switchboard.log | cut -d ':' -f 6 | sort -u | wc -l` users.
 echo
 echo Ad-Hoc unique userlist
 echo
-grep Ad-hoc $1 | cut -d ':' -f 6 | sort -u
+grep Ad-hoc switchboard.log | cut -d ':' -f 6 | sort -u
 echo
-echo Ad-Hoc running userlist contains `grep Ad-hoc $1 | cut -d ':' -f 6 | wc -l` users.
+echo Ad-Hoc running userlist contains `grep Ad-hoc switchboard.log | cut -d ':' -f 6 | wc -l` users.
 echo
 echo Ad-Hoc running userlist
 echo
-grep Ad-hoc $1 | cut -d ':' -f 6
+grep Ad-hoc switchboard.log | cut -d ':' -f 6

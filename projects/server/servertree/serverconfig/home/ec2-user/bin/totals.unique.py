@@ -10,7 +10,7 @@
 #args = parser.parse_args()
 #print args.inputfile
 #infile=args.inputfile
-infile='sml2.log'
+infile='sml2.unique'
 
 # print "input file: ", infile  
 fb="FBName"
