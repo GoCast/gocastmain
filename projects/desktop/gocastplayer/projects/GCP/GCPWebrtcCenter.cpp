@@ -724,7 +724,7 @@ namespace GoCast
             std::stringstream sstrm;
             sstrm << "[" << pluginId << " / REMOTESTREAM-NOT-FOUND]: ";
             sstrm << "Remote stream not found -- possible late onaddstream() call...";
-            FBLOG_ERROR_CUSTOM("RtcCenter::SetRemoteVideoTrackRenderer", "")
+            FBLOG_ERROR_CUSTOM("RtcCenter::SetRemoteVideoTrackRenderer", sstrm.str());
         }
     }
     
@@ -746,8 +746,8 @@ namespace GoCast
         {
             std::stringstream sstrm;
             sstrm << "[" << pluginId << " / REMOTESTREAM-NOT-FOUND]: ";
-            sstrm << "Remote stream not found -- possible spurious DeletePeerConnection() call...";
-            FBLOG_ERROR_CUSTOM("RtcCenter::SetRemoteVideoTrackRenderer", "")
+            sstrm << "Remote stream not found -- possible spurious RemoveRemoteStream() call...";
+            FBLOG_ERROR_CUSTOM("RtcCenter::SetRemoteVideoTrackRenderer", sstrm.str());
         }
     }
 
@@ -1341,18 +1341,23 @@ namespace GoCast
         }
         else
         {
-            if(NULL != m_remoteStreams[pluginId].get())
+            if(m_remoteStreams.end() != m_remoteStreams.find(pluginId))
             {
-                if(0 < m_remoteStreams[pluginId]->video_tracks()->count())
+                if(NULL != m_remoteStreams[pluginId].get())
                 {
-                    m_remoteStreams[pluginId]->video_tracks()->at(0)->SetRenderer(NULL);
+                    if(0 < m_remoteStreams[pluginId]->video_tracks()->count())
+                    {
+                        m_remoteStreams[pluginId]->video_tracks()->at(0)->SetRenderer(NULL);
+                    }
                 }
+                
+                RemoveRemoteStream(pluginId);
             }
-            RemoveRemoteStream(pluginId);
         }
         
         FBLOG_INFO_CUSTOM("RtcCenter::DeletePeerConnection_w",
                           (pluginId + ": Deleting peerconnection..."));
+        
         m_pPeerConns[pluginId] = NULL;
         m_pPeerConns.erase(pluginId);
         return true;
