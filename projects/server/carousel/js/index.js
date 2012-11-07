@@ -875,7 +875,7 @@ function carouselItemZoom(event)
    //$('#meeting > #zoom')[0].appendChild(spot[0]); // move div to zoom area, doesn't work with local, remote video spot
 
   if (gcedit) {
-    $(spot).html('');
+    spot.get(0).removeChild(spot.get(0).lastChild);
     gcedit = new GoCastJS.gcEdit(spot, gcedit.info);
     gcedit.editor.setCode(editorContent);
   }
@@ -909,8 +909,7 @@ function carouselItemUnzoom(event)
    $('#meeting > #streams').css('height', '100%'); // zoom carousel
 
   if (gcedit) {
-    $(spot).html('<img id="upper-left" class="zoom control" src="images/fullscreen.png" alt="Zoom" title="Zoom" onclick="carouselItemZoom(event);"/>' +
-                 '<img id="upper-right" class="'+ app.spotUrDefaultClass + '" src="' + app.spotUrDefaultImage +'" alt="Close" title="Close" onclick="onSpotClose(event);"/>');
+    spot.get(0).removeChild(spot.get(0).lastChild);
     gcedit = new GoCastJS.gcEdit(spot, gcedit.info);
     gcedit.editor.setCode(editorContent);
   }
