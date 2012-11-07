@@ -2005,7 +2005,7 @@ function handleRoomSetup() {
     }
 
     // warn user if room name changed (overflow)
-    if (room_to_create.length > 0 && room_to_create !== new_name)
+    if (room_to_create.length > 0 && room_to_create.toLowerCase() !== new_name.toLowerCase())
     {
       // display warning
       jqDlg = $(app.STATUS_PROMPT_LEFT).css({"display": "block",
@@ -2440,6 +2440,16 @@ $(document).ready(function(
                         ROOMMANAGER: 'roommanager@dnle.gocast.it/roommanager',
                         SWITCHBOARD_FB: 'switchboard_dnle@dnle.gocast.it',
                         LOGCATCHER: 'logcatcher@dnle.gocast.it/logcatcher'});
+  }
+  else if (window.location.hostname.toLowerCase() === 'creativity.gocast.it') {
+    Callcast.InitOverride({ CALLCAST_XMPPSERVER: 'dnle.gocast.it',
+                        CALLCAST_ROOMS: 'ccc-conference.dnle.gocast.it',
+                        AT_CALLCAST_ROOMS: '@ccc-conference.dnle.gocast.it',
+                        STUNSERVER: 'dnle.gocast.it', STUNSERVERPORT: 19302,
+                        FEEDBACK_BOT: 'feedback_bot_ccc@dnle.gocast.it',
+                        ROOMMANAGER: 'ccc_roommanager@dnle.gocast.it/roommanager',
+                        SWITCHBOARD_FB: 'switchboard_ccc@dnle.gocast.it',
+                        LOGCATCHER: 'ccc_logcatcher@dnle.gocast.it/logcatcher'});
   }
   else if (window.location.hostname.toLowerCase() === 'dev.gocast.it') {
     Callcast.InitOverride({ CALLCAST_XMPPSERVER: 'dev.gocast.it',

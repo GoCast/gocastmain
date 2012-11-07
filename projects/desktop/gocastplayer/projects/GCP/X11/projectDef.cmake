@@ -29,7 +29,7 @@ set (SOURCES
 add_x11_plugin(${PROJECT_NAME} SOURCES)
 
 # add library dependencies here; leave ${PLUGIN_INTERNAL_DEPS} there unless you know what you're doing!
-find_library(LIBWEBRTC libwebrtc_Release.a ../../deps/webrtc/trunk/out/Release)
+find_library(LIBWEBRTC libwebrtc.a ../../deps/webrtc/trunk/out/Debug)
 target_link_libraries(${PROJECT_NAME}
     ${PLUGIN_INTERNAL_DEPS}
     ${LIBWEBRTC}

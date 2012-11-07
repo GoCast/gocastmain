@@ -45,9 +45,9 @@
       <testBeforeUse>true</testBeforeUse>  
       <testAfterUse>true</testAfterUse>  
       <minConnections>5</minConnections>  
-      <maxConnections>25</maxConnections>  
+      <maxConnections>100</maxConnections>  
       <connectionTimeout>1.0</connectionTimeout> 
     </defaultProvider> 
   </database>  
-  <setup>true</setup> 
+  <setup>true</setup>
 </jive>

@@ -1,29 +1,16 @@
 #include "../GCPVideoRenderer.h"
 #include "PluginWindowX11.h"
-#include <iostream>
+#include "common_video/libyuv/include/libyuv.h"
 
 namespace GoCast
 {
-    gboolean RedrawWindow(gpointer data)
+    void ConvertToRGBA(uint8* pFrameBuffer, int width, int height)
     {
-        GCPVideoRenderer* pRenderer = reinterpret_cast<GCPVideoRenderer*>(data);
-        return pRenderer->OnWindowRefresh();
-    }
-    
-    bool GCPVideoRenderer::RenderFrame(const cricket::VideoFrame* pFrame)
-    {
-        static const int stride = m_width*4;
-        static const int frameBufferSize = m_height*stride;
-        boost::mutex::scoped_lock winLock(m_winMutex);
-
-        pFrame->ConvertToRgbBuffer(cricket::FOURCC_ARGB,
-                                   m_pFrameBuffer.get(),
-                                   frameBufferSize,
-                                   stride);
-        
-        //convert to rgba and correct alpha
-        uint8* pBufIter = m_pFrameBuffer.get();
+        const int stride = width*4;
+        const int frameBufferSize = height*stride;
+        uint8* pBufIter = pFrameBuffer;
         uint8* pBufEnd = pBufIter + frameBufferSize;
+
         while(pBufIter < pBufEnd)
         {
             pBufIter[3] = pBufIter[0];
@@ -32,18 +19,26 @@ namespace GoCast
             pBufIter[3] = 0xff;
             pBufIter += 4;
         }
-
-        //trigger window refresh event
-        g_idle_add(RedrawWindow, this);
-
-        return true;
     }
     
+    gboolean RedrawWindow(gpointer data)
+    {
+        GCPVideoRenderer* pRenderer = reinterpret_cast<GCPVideoRenderer*>(data);
+        return pRenderer->OnWindowRefresh();
+    }
+
     bool GCPVideoRenderer::OnWindowRefresh(FB::RefreshEvent* pEvt)
     {
+        static uint8* pScaleBuf = AllocBuffer(m_width*m_height*32);
         boost::mutex::scoped_lock winLock(m_winMutex);
         FB::PluginWindowX11* pWinX11 = reinterpret_cast<FB::PluginWindowX11*>(m_pWin);
         GtkWidget* pRenderArea = pWinX11->getWidget();
+                
+        webrtc::ARGBScale(m_pFrameBuffer.get(), m_width*4, m_width, m_height,
+                          pScaleBuf, m_pWin->getWindowWidth()*4,
+                          m_pWin->getWindowWidth(), m_pWin->getWindowHeight(),0);
+                          
+        GoCast::ConvertToRGBA(pScaleBuf, m_pWin->getWindowWidth(), m_pWin->getWindowHeight());
 
         gdk_draw_rgb_32_image(
             pRenderArea->window,
@@ -53,11 +48,40 @@ namespace GoCast
             m_pWin->getWindowWidth(),
             m_pWin->getWindowHeight(),
             GDK_RGB_DITHER_MAX,
-            m_pFrameBuffer.get(),
-            m_width*4
+            pScaleBuf,
+            m_pWin->getWindowWidth()*4
         );
 
         return false;
+    }
+    
+    void GCPVideoRenderer::ConvertToRGBA()
+    {
+    }
+    
+    void GCPVideoRenderer::InvalidateWindow()
+    {
+        g_idle_add(RedrawWindow, this);
+    }
+    
+    uint8* GCPVideoRenderer::AllocBuffer(size_t size)
+    {
+        uint8* pBuf = NULL;
+        
+        if(0 < size)
+        {
+            posix_memalign(reinterpret_cast<void**>(&pBuf), 16, size);
+        }
+        
+        return pBuf;
+    }
+    
+    void GCPVideoRenderer::FreeBuffer(uint8 *pBuf)
+    {
+        if(NULL != pBuf)
+        {
+            free(pBuf);
+        }
     }
 }
 

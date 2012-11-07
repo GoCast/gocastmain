@@ -16,7 +16,7 @@ Index: src/common_video/libyuv/include/libyuv.h
 ===================================================================
 --- src/common_video/libyuv/include/libyuv.h	(revision 2407)
 +++ src/common_video/libyuv/include/libyuv.h	(working copy)
-@@ -183,6 +183,18 @@
+@@ -183,6 +183,24 @@
                                   int src_width,
                                   int src_height,
                                   VideoType src_video_type);
@@ -31,6 +31,12 @@ Index: src/common_video/libyuv/include/libyuv.h
 +                  int dst_stride_argb,
 +                  int dst_x, int dst_y,
 +                  int width, int height);
++                  
++    int ARGBScale(const uint8_t* src_argb, int src_stride_argb,
++                  int src_width, int src_height,
++                  uint8_t* dst_argb, int dst_stride_argb,
++                  int dst_width, int dst_height,
++                  int filtering);
 +    // </GOCAST>
  
  // Compute PSNR for an I420 frame (all planes).
@@ -39,7 +45,7 @@ Index: src/common_video/libyuv/libyuv.cc
 ===================================================================
 --- src/common_video/libyuv/libyuv.cc	(revision 2407)
 +++ src/common_video/libyuv/libyuv.cc	(working copy)
-@@ -412,6 +412,24 @@
+@@ -412,6 +412,36 @@
                            src_width, -src_height);
  }
  
@@ -58,6 +64,18 @@ Index: src/common_video/libyuv/libyuv.cc
 +                  int width, int height)
 +    {
 +        return libyuv::ARGBSepia(dst_argb, dst_stride_argb, dst_x, dst_y, width, height);
++    }
++    
++    int ARGBScale(const uint8_t* src_argb, int src_stride_argb,
++                  int src_width, int src_height,
++                  uint8_t* dst_argb, int dst_stride_argb,
++                  int dst_width, int dst_height,
++                  int filtering)
++    {
++        return libyuv::ARGBScale(src_argb, src_stride_argb,
++                                 src_width, src_height,
++                                 dst_argb, dst_stride_argb,
++                                 dst_width, dst_height, (libyuv::FilterMode)filtering);
 +    }
 +    // </GOCAST>
 +    
