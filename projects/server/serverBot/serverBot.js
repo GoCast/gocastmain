@@ -130,9 +130,9 @@ RoomDatabase.prototype.LoadRooms = function(cbSuccess, cbFailure) {
 
             for (i = 0; i < len; i += 1)
             {
-                self.roomList[res.items[i].roomname] = res.items[i];
+                self.roomList[res.items[i].roomname.toLowerCase()] = res.items[i];
                 // Roomname in the object is redundant. Remove it.
-                delete self.roomList[res.items[i].roomname].roomname;
+                delete self.roomList[res.items[i].roomname.toLowerCase()].roomname;
             }
 
 //            self.log(self.roomList);
@@ -148,6 +148,10 @@ RoomDatabase.prototype.AddRoom = function(roomname, obj, cbSuccess, cbFailure) {
     var self = this;
 
 //    this.log('Adding room: ' + (roomname || obj.roomname));
+    if (roomname !== roomname.toLowerCase()) {
+        self.log('WARNING: AddRoom: UpperCase roomname given. Squashing case before storing for: ' + roomname);
+        roomname = roomname.toLowerCase();
+    }
 
     if (!obj.roomname && roomname) {
         obj.roomname = roomname;
@@ -173,6 +177,10 @@ RoomDatabase.prototype.RemoveRoom = function(roomname, cbSuccess, cbFailure) {
     var self = this;
 
     this.log('Removing room: ' + roomname);
+    if (roomname !== roomname.toLowerCase()) {
+        self.log('WARNING: RemoveRoom: UpperCase roomname given. Squashing case before removing for: ' + roomname);
+        roomname = roomname.toLowerCase();
+    }
 
     // Make sure all contents for this room are removed automatically as well.
     this.RemoveAllContentsFromRoom(roomname, function() {
@@ -556,7 +564,7 @@ function MucRoom(client, notifier, opts, success, failure) {
 
         // Only handling our own stanzas.
 //      if (!stanza.attrs.from || (stanza.attrs.from && stanza.attrs.from.split('/')[0] != self.roomname))
-        if (stanza.attrs.from && stanza.attrs.from.split('/')[0] !== self.roomname) {
+        if (stanza.attrs.from && stanza.attrs.from.split('/')[0].toLowerCase() !== self.roomname.toLowerCase()) {
             return;
         }
 
@@ -2853,7 +2861,11 @@ Overseer.prototype.LoadActiveRoomsFromDB = function() {
         // Note: We use bSkipDBPortion on AddTrackedRoom() call here to avoid DB hits.
         for (k in rooms_in) {
             if (rooms_in.hasOwnProperty(k)) {
-                self.AddTrackedRoom(k, rooms_in[k], function() {
+                if (k !== k.toLowerCase()) {
+                    self.log('WARNING: LoadRooms: Upper-Case Roomname found in Database: ' + k);
+                }
+
+                self.AddTrackedRoom(k.toLowerCase(), rooms_in[k], function() {
                     self.log('Added from DB: ' + k);
                 }, function(msg) {
                     self.log('LoadRooms: ERROR: Failed ' + k + ' with msg: ' + msg);
@@ -2861,7 +2873,7 @@ Overseer.prototype.LoadActiveRoomsFromDB = function() {
 
                 // Now load/add the contents of said room.
                 if (self.roomDB) {
-                    self.roomDB.LoadContentsFromDBForRoom(k, function(contents) {
+                    self.roomDB.LoadContentsFromDBForRoom(k.toLowerCase(), function(contents) {
                         var temproomname, tempspotnumber;
 
                         if (contents) {
@@ -2871,7 +2883,7 @@ Overseer.prototype.LoadActiveRoomsFromDB = function() {
                             for (i = 0; i < len; i += 1)
                             {
                                 // Pull out the hash and range from the dynamodb and use that as keys.
-                                temproomname = contents[i].roomname;
+                                temproomname = contents[i].roomname.toLowerCase();
                                 tempspotnumber = contents[i].spotnumber;
 
                                 if (!self.MucRoomObjects[temproomname]) {
