@@ -36,7 +36,7 @@ namespace GoCast
                 
         webrtc::ARGBScale(m_pFrameBuffer.get(), m_width*4, m_width, m_height,
                           pScaleBuf, m_pWin->getWindowWidth()*4,
-                          m_pWin->getWindowWidth(), m_pWin->getWindowHeight(),0);
+                          m_pWin->getWindowWidth(), m_pWin->getWindowHeight(), 1);
                           
         GoCast::ConvertToRGBA(pScaleBuf, m_pWin->getWindowWidth(), m_pWin->getWindowHeight());
 
