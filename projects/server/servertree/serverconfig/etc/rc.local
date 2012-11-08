@@ -5,4 +5,4 @@
 # want to do the full Sys V style init stuff.
 
 touch /var/lock/subsys/local
-su -l ec2-user /home/ec2-user/bin/startAllProcs.sh
+# su -l ec2-user /home/ec2-user/bin/startAllProcs.sh

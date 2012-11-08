@@ -1,7 +1,7 @@
-#!/bin/sh
-echo "remove GoCast people amke new log"
+#!/bin/bash
+echo "remove GoCast people make new log"
 grep -v -i -E "Gannes|masa|sandra|manjesh|mmalavalli|jk|koning|wolff|Vadasz|Novotny|Watanabe|Mirapuri|Leuschel|bobtest|bob-windows" switchboard.log | grep '^[0-9]' | grep "Name" > sml.log
-cat sml.log | cut -d ' ' -f 1 -f6 | cut -d ':' -f1 -f2 | sed -e 's/:/ /' > sml2.log
+cat sml.log | cut -d ' ' -f "1,6" | cut -d ':' -f "1,2" | sed -e 's/:/ /' > sml2.log
 sort -u sml2.log > sml2.unique
 exit
 echo
