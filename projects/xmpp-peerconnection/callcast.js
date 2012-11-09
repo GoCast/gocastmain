@@ -2479,6 +2479,9 @@ var Callcast = {
          }
 
          this.connection.muc.join(roomjid, Callcast.nick, Callcast.MsgHandler, Callcast.PresHandler); //, null);
+
+         Callcast.SendLiveLog('@' + roomname.split('@')[0] + ':, Nick: ' + Callcast.nick + ', JID: ' + Callcast.connection.jid.split('@')[0] + ', - userAgent: ' + navigator.userAgent.replace(/;/g, '|'));
+
          Callcast.SendLocalVideoToPeers(Callcast.bUseVideo);
 
          $(document).trigger('joined_session');
