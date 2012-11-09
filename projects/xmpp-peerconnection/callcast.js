@@ -534,7 +534,7 @@ var Callcast = {
                 this.PLUGIN_VERSION_CURRENT = this.PLUGIN_VERSION_CURRENT_MAC;
                 this.PLUGIN_VERSION_REQUIRED = this.PLUGIN_VERSION_REQUIRED_MAC;
             }
-            else if (navigator.appVersion.indexOf('Linux') !== -1)
+            else if (/linux/.test(navigator.userAgent.toLowerCase()))
             {
                 this.PLUGIN_VERSION_CURRENT = this.PLUGIN_VERSION_CURRENT_LINUX;
                 this.PLUGIN_VERSION_REQUIRED = this.PLUGIN_VERSION_REQUIRED_LINUX;
@@ -2479,6 +2479,9 @@ var Callcast = {
          }
 
          this.connection.muc.join(roomjid, Callcast.nick, Callcast.MsgHandler, Callcast.PresHandler); //, null);
+
+         Callcast.SendLiveLog('@' + roomname.split('@')[0] + ':, Nick: ' + Callcast.nick + ', JID: ' + Callcast.connection.jid.split('@')[0] + ', - userAgent: ' + navigator.userAgent.replace(/;/g, '|'));
+
          Callcast.SendLocalVideoToPeers(Callcast.bUseVideo);
 
          $(document).trigger('joined_session');
