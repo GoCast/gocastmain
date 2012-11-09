@@ -172,7 +172,7 @@ var app = {
       //}
       break;
     default:
-      msg = "We don't recognize your browser. " + expl + ' ' + recom;
+      msg = "GoCast Beta does not currently support your browser. " + expl + ' ' + recom;
       break;
     } /* switch (app.browser.name) */
     if (msg) {
