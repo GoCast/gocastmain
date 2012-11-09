@@ -534,7 +534,7 @@ var Callcast = {
                 this.PLUGIN_VERSION_CURRENT = this.PLUGIN_VERSION_CURRENT_MAC;
                 this.PLUGIN_VERSION_REQUIRED = this.PLUGIN_VERSION_REQUIRED_MAC;
             }
-            else if (navigator.appVersion.indexOf('Linux') !== -1)
+            else if (/linux/.test(navigator.userAgent.toLowerCase()))
             {
                 this.PLUGIN_VERSION_CURRENT = this.PLUGIN_VERSION_CURRENT_LINUX;
                 this.PLUGIN_VERSION_REQUIRED = this.PLUGIN_VERSION_REQUIRED_LINUX;
