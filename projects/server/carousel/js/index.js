@@ -2179,6 +2179,7 @@ function tryPluginInstall(
       $('#installPlugin').css('height', 300);
       $('#installPlugin > p > a#dlLink').parent().find('span').addClass('hidden');
       $('#installPlugin > .linuxExplanation').removeClass('hidden');
+      $('#installPlugin > .winmac').addClass('hidden');
     }
     else if (app.osPlatform.isWin || app.osPlatform.isMac)
     {

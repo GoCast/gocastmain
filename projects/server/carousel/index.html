@@ -192,7 +192,7 @@
          <div id="copyContent">
             <h3>You're Invited To GoCast!</h3>
             I am using <strong>GoCast</strong>, a new kind of "room" on the Web where people can meet and share on live video.
-            Get started by downloading the GoCast plug-in (currently for Firefox or Chrome only), and join me in my room.
+            Get started by downloading the GoCast App (currently for Firefox or Chrome only), and join me in my room.
             To get started, click <a id="copyName">here</a>. See you soon!
             <p></p>
             <img id="copyLogo" alt="Room Link" title="Room Link" src="images/GoToken.png" />
@@ -229,30 +229,30 @@
       <div id="installPlugin" class="window resizable">
         <h1>Install GoCast App</h1>
         <p id ="prompt">
-          Looks like you need the GoCast App to enable video chat. Click the download button below. Then locate the installer file and double-click to install it.
+          Looks like you need the GoCast App to enable video chat. Click the download button below.
         </p>
-        <p>
+        <p class="winmac">
+          Then locate the installer file and double-click to install it.
+        </p>
+        <p class="winmac">
           If you are using Chrome, GoCast will detect the installation and automatically start.
         </p>
-        <p style="padding-bottom: 10px;">
+        <p class="winmac" style="padding-bottom: 10px;">
           If you are using Firefox, please reload the browser page to start GoCast.
         </p>
-        <p style="text-align: center;">
-          <a id="dlLink" href="javascript:doDownload();">DOWNLOAD GOCAST</a>
-        <p>
         <p class="hidden linuxExplanation">
-          Then, after downloading the .tar.gz file, follow these steps
-          to install:
+          Then, please follow these steps to install:
         </p>
-        <ol class="hidden linuxExplanation">
+        <ol class="hidden linuxExplanation" style="padding-bottom: 20px;">
           <li>Extract the files with <b>tar xzvf
           GoCastPlayer_XXX.tar.gz</b></li>
           <li>Go to the directory created by <b>cd GoCastPlayer</b></li>
           <li>Execute the install script <b>./install.sh</b></li>
-          <li>Restart your browser.</li>
+          <li>Restart your browser, reopen GoCast, and you're in!.</li>
         </ol>
-        <p class="hidden linuxExplanation">... and You are ready to
-        have fun with the GoCast Player.</p>
+        <p style="text-align: center;">
+          <a id="dlLink" href="javascript:doDownload();">DOWNLOAD GOCAST</a>
+        <p>
         <!--<p>Thanks!  We will be waiting for you.</p>-->
       </div>
       <div id="credentials" class="window resizable">
