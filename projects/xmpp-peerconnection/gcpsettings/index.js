@@ -45,6 +45,14 @@ var SettingsUI = {
 			'border': '1px #2E8B57 solid',
 			'background-color': '#2E8B57'
 		});
+
+		if (/linux/.test(navigator.userAgent.toLowerCase())) {
+			this.$walkytalky.css({
+				'bottom': '235px',
+				'left'  : '243px'
+			});
+			$('#settingspanel').css('bottom', '0px');
+		}
 	},
 
 	enableEffectsSelect: function(enable) {
@@ -200,6 +208,11 @@ var SettingsApp = {
 		   		}
 		   	}
 		);
+
+		if (/linux/.test(navigator.userAgent.toLowerCase())) {
+			this.$localplayer.get(0).width = 240;
+			this.$localplayer.get(0).height = 190;
+		}
 	},
 
 	spkVol: function(level) {
@@ -350,8 +363,15 @@ var SettingsApp = {
 			var hints = {video: false, audio: false};
 			if (0 < self.localStream.videoTracks.length) {
 				hints.video = true;
-				self.$localplayer.get(0).width = 320;
-				self.$localplayer.get(0).height = 240;
+
+				if (/linux/.test(navigator.userAgent.toLowerCase())) {
+					self.$localplayer.get(0).width = 240;
+					self.$localplayer.get(0).height = 190;
+				} else {
+					self.$localplayer.get(0).width = 320;
+					self.$localplayer.get(0).height = 240;					
+				}
+
 				SettingsUI.enableEffectsSelect(true);
 			} else {
 				self.$localplayer.get(0).width = 0;
