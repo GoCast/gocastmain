@@ -4,7 +4,7 @@ cd build
 
 mkdir -p GoCastPlayer
 cp bin/GCP/npGCP.so GoCastPlayer/npGCP_`uname -m`.so
-cp README_linux GoCastPlayer/README_linux
+cp ../README_linux GoCastPlayer/README_linux
 
 # create install.sh
 echo "Generating GoCastPlayer/install.sh"
