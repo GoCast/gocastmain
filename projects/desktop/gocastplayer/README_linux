@@ -1,0 +1,16 @@
+GoCast Beta README - LINUX SUPPORT
+
+Nov 8, 2012
+
+Today marks the beginning of our selective support for Linux. Woohoo! There are some caveats, so please read on...
+
+Platforms: Ubuntu 10.04 thru 12.04 are expected to work well 'out of the box'. Our testing is only cursory. So, if you run into issues, please let us know! And if you'd like to give it a shot on another distro, please let us know your results. We built this as a pretty static .so and so its external requirements are fairly minimal other than gtk.
+
+Known issues:
+1. On all versions of Chrome we have tried and some versions of Firefox, we run into a problem with the video 'overlapping' in the carousel on other items nearby. This is a so-called z-ordering problem. Why it works in some browsers and not in others is a bit of a mystery at the moment. What to do? a) Cope with the ugliness and overlap (not pleasant) b) Have everyone turn off their video (not very feature-rich this way) or c) You can create a whiteboard or notepad and put it in 'zoom mode' which will make all of the videos go into the top of the screen linearly so there is no overlap. lastly - you could try another version of Firefox and possibly get it working on your setup as we did by chance.
+2. Flickering - Depending on graphics support, the video will flicker quite a bit when the carousel is spinning.
+
+Again - please let us know your experiences positive and negative. We hope you enjoy using GoCast on Linux as much as we do!
+
+Thanks,
+The GoCast Team - info@gocast.it
