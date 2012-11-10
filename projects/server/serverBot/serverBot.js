@@ -527,6 +527,10 @@ function MucRoom(client, notifier, opts, success, failure) {
     this.wbDirRoot = settings.roommanager.wbstoragelocation || __dirname;
     this.wbSaveTimer = null;
 
+    this.currentNumParticipants = 0;
+    this.maxParticipantsSeen = 0;
+    this.meetingStart = null;
+
     this.spotList = {};
     this.spotStorage = {};
     this.wbStrokeList = {};
@@ -697,6 +701,10 @@ MucRoom.prototype.reset = function() {
     this.iqnum = 0;
     this.pendingDeletion = false;
 
+    this.currentNumParticipants = 0;
+    this.maxParticipantsSeen = 0;
+    this.meetingStart = null;
+
     this.bSelfDestruct = !settings.roommanager.persist;
 
     this.spotList = {};
@@ -772,6 +780,53 @@ MucRoom.prototype.getRoomConfiguration = function(cb) {
     });
 };
 
+MucRoom.prototype.StartMeeting = function() {
+    if (this.meetingStart) {
+        this.log('StartMeeting: WARNING: Meeting seems to be already started. Calling for end meeting.');
+        this.EndMeeting();
+    }
+
+    this.meetingStart = new Date();
+};
+
+MucRoom.prototype.EndMeeting = function() {
+    var duration = 0,
+        origDuration = 0,
+        outStr = '',
+        hr = 1000 * 60 * 60,
+        min = 1000 * 60,
+        sec = 1000;
+
+    if (!this.meetingStart) {
+        this.log('EndMeeting: WARNING: No currently running meeting.');
+    }
+    else {
+        duration = new Date() - this.meetingStart;
+        origDuration = duration;
+
+        this.meetingStart = null;
+    }
+
+    if (duration > hr) {
+        outStr += Math.floor(duration/hr) + 'hr, ';
+        duration = duration - (Math.floor(duration/hr) * hr);
+    }
+
+    if (duration > min) {
+        outStr += Math.floor(duration/min) + 'min, ';
+        duration = duration - (Math.floor(duration/min) * min);
+    }
+
+    if (duration > sec) {
+        outStr += Math.floor(duration/sec) + 'sec ';
+        duration = duration - (Math.floor(duration/sec) * sec);
+    }
+
+    outStr += '[' + Math.floor(origDuration/sec) + ' seconds]';
+
+    this.log('Meeting Duration: ' + outStr);
+};
+
 MucRoom.prototype.handlePresence = function(pres) {
     var fromnick = pres.attrs.from.split('/')[1],
         fromjid = null,
@@ -833,7 +888,24 @@ MucRoom.prototype.handlePresence = function(pres) {
     //
     if (pres.attrs.type !== 'unavailable')
     {
+        //
+        // New person we don't know and it's not ourselves.
+        //
         if (!this.participants[fromnick] && fromnick !== this.nick) {
+            //
+            // Bump up our participant count and possibly the 'max' seen too.
+            //
+            if (this.currentNumParticipants === 0) {
+                this.log('ROOM-First-Entrant - Meeting start.');
+                this.StartMeeting();
+            }
+            this.currentNumParticipants += 1;
+            this.log('Someone came in: # participants is: ' + this.currentNumParticipants);
+            if (this.currentNumParticipants > this.maxParticipantsSeen) {
+                this.maxParticipantsSeen = this.currentNumParticipants;
+                this.log('New maxParticipantsSeen = ' + this.maxParticipantsSeen);
+            }
+
             if (size(this.participants) >= this.maxParticipants) {
                 // We are already at our 'stated' capacity. What to do?
                 // TODO:RMW - Kick out new person. This was not legal.
@@ -883,10 +955,12 @@ MucRoom.prototype.handlePresence = function(pres) {
         if (fromnick === self.nick)
         {
             if (this.bSelfDestruct === true && 0 === size(this.participants)) {
-                this.log('OVERSEER: Room destroyed... not trying to rejoin');
+                this.log('Room destroyed... not trying to rejoin');
             } else {
                 this.log('We got kicked out...room destroyed? Or we got disconnected??');
                 this.joined = false;
+                this.currentNumParticipants = 0;
+
                 for (k in this.participants)
                 {
                     if (this.participants.hasOwnProperty(k)) {
@@ -898,7 +972,7 @@ MucRoom.prototype.handlePresence = function(pres) {
                 // Need to make sure that the self-destruct timer is cleared if it's ticking...
                 if (this.presenceTimer)
                 {
-                    this.log('OVERSEER: presenceTimer being cleared prior to re-join.');
+                    this.log('presenceTimer being cleared prior to re-join.');
                     clearTimeout(this.presenceTimer);
                     this.presenceTimer = null;
                 }
@@ -918,21 +992,40 @@ MucRoom.prototype.handlePresence = function(pres) {
         }
         else
         {
-            if (this.bSelfDestruct === true)
-            {
-                if (1 === size(this.participants) && this.participants[this.nick]) {
+            //
+            // Someone left and it wasn't ourselves.
+            //
+            this.currentNumParticipants -= 1;
+            this.log('Someone left: # participants is: ' + this.currentNumParticipants);
+            if (this.currentNumParticipants < 0) {
+                this.log('ERROR: currentNumParticipants is negative: ' + this.currentNumParticipants + '. Our accounting has an error.');
+            }
+
+            if (1 === size(this.participants) && this.participants[this.nick]) {
 //                    this.log('OVERSEER: (A-timer) Everybody else has left room [' + this.roomname.split('@')[0] + ']... wait 60 sec...');
 
-                    if (this.presenceTimer)
-                    {
-                        this.log('OVERSEER: (A-timer) presenceTimer was already set. Clearing first.');
-                        clearTimeout(this.presenceTimer);
-                        this.presenceTimer = null;
-                    }
+                if (this.presenceTimer)
+                {
+                    this.log('(A-timer) presenceTimer was already set. Clearing first.');
+                    clearTimeout(this.presenceTimer);
+                    this.presenceTimer = null;
+                }
 
+                if (this.bSelfDestruct === true) {
                     this.presenceTimer = setTimeout(function() {
-                        self.log('OVERSEER: (A-timer) No one in room [' + self.roomname.split('@')[0] + '] after 60 seconds ... destroying.');
+                        self.log('(A-timer) No one in room after 60 seconds ... destroying.');
+                        self.log('ROOM-EMPTY - end meeting. maxParticipantsSeen was: ' + self.maxParticipantsSeen);
+                        self.EndMeeting();
                         eventManager.emit('destroyroom', self.roomname.split('@')[0]);
+                        self.presenceTimer = null;
+                    }, 60000);
+                }
+                else {
+                    // If not a self-destruct room, still need to end the meeting if no one comes back in.
+                    this.presenceTimer = setTimeout(function() {
+                        self.log('ROOM-EMPTY - end meeting. maxParticipantsSeen was: ' + self.maxParticipantsSeen);
+                        self.EndMeeting();
+                        self.presenceTimer = null;
                     }, 60000);
                 }
             }
@@ -953,6 +1046,15 @@ MucRoom.prototype.handlePresence = function(pres) {
         if (!this.joined)
         {
             this.joined = true;
+            //
+            // Upon joining, use the participants list as our initial water mark of # of participants.
+            //
+            this.currentNumParticipants = size(this.participants) - 1;  // minus ourselves as we're already in the array.
+            this.log('On Join: # participants is: ' + this.currentNumParticipants);
+            if (this.currentNumParticipants > this.maxParticipantsSeen) {
+                this.maxParticipantsSeen = this.currentNumParticipants;
+                this.log('New maxParticipantsSeen = ' + this.maxParticipantsSeen);
+            }
 
             if (false === this.bNewRoom)
             {
@@ -966,22 +1068,22 @@ MucRoom.prototype.handlePresence = function(pres) {
                 {
                     if (this.presenceTimer)
                     {
-                        this.log('OVERSEER: (B-timer) Clearing presenceTimer which was already set. New room entered.');
+                        this.log('(B-timer) Clearing presenceTimer which was already set. New room entered.');
                         clearTimeout(this.presenceTimer);
                         this.presenceTimer = null;
                     }
 
                     if (0 === size(this.participants))
                     {
-//                        this.log('OVERSEER: (B-timer) Just joined room [' + this.roomname.split('@')[0] + '] - waiting for others...');
+//                        this.log('(B-timer) Just joined room [' + this.roomname.split('@')[0] + '] - waiting for others...');
 
                         this.presenceTimer = setTimeout(function() {
-                            self.log('OVERSEER: (B-timer) New room [' + self.roomname.split('@')[0] + '] - No one joined within 30 seconds. Destroying.');
+                            self.log('(B-timer) New room - No one joined within 30 seconds. Destroying.');
                             eventManager.emit('destroyroom', self.roomname.split('@')[0]);
                         }, 30000);
                     }
 //                    else {
-//                        this.log('OVERSEER: (B-timer) - Someone already in the room. All good. Moving forward.');
+//                        this.log('(B-timer) - Someone already in the room. All good. Moving forward.');
 //                    }
                 }
             }
@@ -1070,7 +1172,8 @@ MucRoom.prototype.printParticipants = function() {
 
     for (k in this.participants)
     {
-        if (this.participants.hasOwnProperty(k)) {
+        // Don't print our own nickname in the room (overseer)
+        if (this.participants.hasOwnProperty(k) && k !== this.nick) {
             // Add in a ',' if we're not first in line.
             if (parts !== '') {
                 parts += ', ';
@@ -1086,8 +1189,10 @@ MucRoom.prototype.printParticipants = function() {
         }
     }
 
-    this.log('Participants list: ' + parts);
-    this.notifylog(parts);
+    if (parts) {
+        this.log('Participants list: ' + parts);
+        this.notifylog(parts);
+    }
 };
 
 //
@@ -1166,7 +1271,7 @@ MucRoom.prototype.SendSpotListTo = function(to) {
 
     msgToSend = null;
 
-    this.log('SendSpotListTo: sending full spot catch-up to: ' + to);
+//    this.log('SendSpotListTo: sending full spot catch-up to: ' + to);
 
     for (k in this.spotList)
     {
@@ -3714,7 +3819,7 @@ function Notifier(serverinfo, jidlist) {
 
     this.client.on('online',
           function() {
-            console.log(logDate() + ' - Notifier online.');
+//            console.log(logDate() + ' - Notifier online.');
             self.isOnline = true;
 //          self.sendMessage("Notifier online.");
           });
