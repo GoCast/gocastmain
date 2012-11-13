@@ -33,6 +33,9 @@
 						$(wikiframe.contentWindow).load(function() {
 							var body = $('iframe').contents().find('body');
 
+							// Adjust font size
+							body.css({'margin': '20px', 'font-size': '12px'});
+
 							// Hide enlarge image buttons
 							$('a.internal[title="Enlarge"]', body).css('display', 'none');
 
@@ -44,13 +47,14 @@
 							// All non-image wiki links are modified to open in the iframe
 							$('a[href^="/wiki/"]:not(.image)', body).each(function() {
 								var searchterm = $(this).attr('href').split('/')[2];
-								$(this).attr('onclick', 'window.top.queryWiki("' + searchterm + '");');
+								$(this).attr('onclick', 'window.top.queryWiki("' + decodeURI(searchterm) + '");');
 								$(this).attr('href', 'javascript:void(0);');
 							});
 
+							// For bookmark links, on firefox, use an alternative to location.hash
 							$('a[href^="#"]', body).each(function() {
 								var tag = $(this).attr('href');
-								$(this).attr('onclick', 'showBookmark(\'' + tag + '\', ' + !$.browser.mozilla + ');');
+								$(this).attr('onclick', 'showBookmark(\'' + decodeURI(tag) + '\', ' + !$.browser.mozilla + ');');
 								$(this).attr('href', 'javascript:void(0);');
 							});
 
@@ -59,9 +63,6 @@
 
 							// Hide the 'edit' links for the article
 							$('span.editsection', body).css('display', 'none');
-
-							// Adjust font size
-							body.css({'margin': '20px', 'font-size': '12px'});
 						});
 
 						var bookmarkScript = '<script type="text/javascript">\n' +
