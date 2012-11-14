@@ -9,7 +9,195 @@
 'use strict';
 
 var fbLog = '';
+var globalFB = {};
+
 function getFBLog() { return fbLog; }
+var GoCastJS = GoCastJS || {};
+
+GoCastJS.FB = function() {
+  this.ClearPermissions();
+};
+
+//
+// \brief - If a permission item is not yet granted, ask the user for it via Facebook login/auth.
+// \param permsToRequest - an array of strings which are permission names (like: create_event).
+//            Can also be a string of comma-separated (no spaces) permissions like 'xmpp_login,create_event'
+//
+// \note WARNING - only send a SINGLE permission to request at this time.
+GoCastJS.FB.prototype.RequestAdditionalPermissions = function(permsToRequest, cbSuccess, cbFailure) {
+  var appid = 458515917498757,
+      self = this;
+
+    console.log('FB: RequestAdditionalPermissions: permsToRequest: ', permsToRequest);
+    FB.login(function(response) {
+      self.GetPermissions(function() {
+        // Now that we have a full set of permissions, let's iterate over the requested ones.
+        var arrperms = permsToRequest.split(','),
+            i, len = arrperms.length;
+
+        // iterate through all inbound requested permissions and see that they ALL were granted.
+        for (i = 0; i < len; i += 1) {
+          if (self.perms[arrperms[i]] !== 1) {
+            cbFailure();
+            return;   // Bail out at the first failed permission.
+          }
+        }
+
+        cbSuccess();
+      });
+//      console.log('REQUEST RESPONSE: ', response);
+
+    }, { scope: permsToRequest.toString() });
+};
+
+//
+// \brief Figure out if we have permission for a particular item.
+//        Callback 'cb' with a true or false.
+//        Will go GetPermissions() if there are none in memory yet.
+//
+GoCastJS.FB.prototype.HasPermissionFor = function(single_perm, cb) {
+  if (!this.perms) {
+    this.GetPermissions(function(result) {
+      cb(this.perms[single_perm] === 1);
+    });
+  }
+  else {
+    cb(this.perms[single_perm] === 1);
+  }
+};
+
+GoCastJS.FB.prototype.ClearPermissions = function() {
+  this.perms = {};
+};
+
+//
+// \brief - Used in order to keep track of what permissions the user has actually
+//          given to our app since some of them are optional.
+//          This should be called upon initial login and anytime authorization tokens
+//          are changed as this could indicate a change in those permissions.
+//
+GoCastJS.FB.prototype.GetPermissions = function(cbSuccess, cbFailure) {
+  var self = this;
+
+   FB.api('/me/permissions', function(response) {
+      var permsArray = response.data[0];
+
+      console.log('DEBUG: permissions: ', permsArray);
+
+      self.perms = permsArray;
+
+      if (cbSuccess) {
+        cbSuccess(permsArray);
+      }
+/*      var permsToPrompt = [];
+      for (var i in permsNeeded) {
+        if (permsArray[permsNeeded[i]] == null) {
+          permsToPrompt.push(permsNeeded[i]);
+        }
+      }
+
+      if (permsToPrompt.length > 0) {
+        alert('Need to re-prompt user for permissions: ' +
+          permsToPrompt.join(','));
+        promptForPerms(permsToPrompt);
+      } else {
+        alert('No need to prompt for any permissions');
+      } */
+   });
+};
+//
+// \brief Use FB.api to create an event. start_time and options.end_time can be in ISO format already
+//      or they can be of type Date() and will be converted for you.
+// \param options - object for fb.api - fields: description, location, privacy_type/privacy (SECRET, FRIENDS, OPEN)
+// \note This does not allow inviting invitees. You'll need to use cbSuccess and the ID to invite attendees via InviteToEvent()
+//
+GoCastJS.FB.prototype.CreateEvent = function(eventName, start_time, options, cbSuccess, cbFailure) {
+  var evopts = options || {},
+      self = this;
+
+  evopts.name = eventName;
+
+  if (evopts.privacy) {
+    evopts.privacy_type = evopts.privacy;
+  }
+  else if (evopts.privacy_type) {
+    evopts.privacy = evopts.privacy_type;
+  }
+
+  if (start_time instanceof Date) {
+    evopts.start_time = start_time.toISOString();
+  }
+
+  if (evopts.end_time instanceof Date) {
+    evopts.end_time = evopts.end_time.toISOString();
+  }
+
+  evopts.description = evopts.description || ('Join me at GoCast in room: ' + $.getUrlVar('roomname'));
+
+  evopts.location = evopts.location || window.location.href;
+
+  // If one is not set...set one...
+  evopts.picture = evopts.picture || 'http://www.gocast.it/images/gologo.png';
+
+  FB.api('/me/events', 'POST', evopts, function(evreturn) {
+    if (evreturn.error) {
+/*      if (evreturn.error.code === 290) {
+        self.RequestAdditionalPermissions('create_event');
+        return;
+      }
+*/
+
+      if (cbFailure) {
+        cbFailure(evreturn.error);
+      }
+      else {
+        console.log('ERROR: CreateEvent: ' + JSON.stringify(evreturn.error));
+      }
+    }
+    else {
+      if (cbSuccess) {
+        cbSuccess(evreturn);
+      }
+      else {
+        console.log('SUCCESS: CreateEvent: ' + JSON.stringify(evreturn));
+      }
+    }
+  });
+};
+
+//
+// \brief InviteToEvent - uses an existing event id (id) to invite a list (array) of
+//        invitees (invitees).
+// \param id - string or integer given back from FB for event ID.
+// \param invitees - array of string or integer facebook IDs -- **NOT** names.
+//
+GoCastJS.FB.prototype.InviteToEvent = function(id, invitees, cbSuccess, cbFailure) {
+  if (!id || !invitees) {
+    if (cbFailure) {
+      cbFailure('Must provide id and invitees.');
+    }
+    return false;
+  }
+
+  FB.api('/' + id + '/invited?users=' + invitees.toString(), 'POST', function(invreturn) {
+    if (invreturn.error) {
+      if (cbFailure) {
+        cbFailure(invreturn.error);
+      }
+      else {
+        console.log('ERROR: InviteToEvent: ' + JSON.stringify(invreturn.error));
+      }
+    }
+    else {
+      if (cbSuccess) {
+        cbSuccess(invreturn);
+      }
+      else {
+        console.log('SUCCESS: InviteToEvent: ' + JSON.stringify(invreturn));
+      }
+    }
+  });
+};
 
 function fbMe(response) // facebook response object
 {
@@ -28,6 +216,8 @@ function fbMe(response) // facebook response object
    {
       if (me && me.name)
       {
+         globalFB.GetPermissions();   // Async activity, but won't need results right away to move forward.
+
          fbLog += 'fbMe() - callback - GOOD.\n';
 
          app.user.name = encodeURI(me.name);
@@ -69,6 +259,8 @@ function ourAsyncFBInit()
 
       app.log(2, 'fbAsyncInit callback');
       fbLog += 'pre-fb.init()\n';
+      globalFB = new GoCastJS.FB();
+
       FB.init({
         appId: '458515917498757', // App ID
 //          channelUrl : '//' + window.location.hostname + '/channel.html', // Channel File for x-domain communication
@@ -94,6 +286,7 @@ function ourAsyncFBInit()
           else
           {
             app.log(2, 'FB logged out or token went bad?');
+            globalFB.ClearPermissions();
             Callcast.SetFBSignedRequestAndAccessToken(null, null);
           }
         });
@@ -106,7 +299,7 @@ function ourAsyncFBInit()
       // so call this on page load, we may need a true 2nd arg
       // to trip to fb server
       FB.getLoginStatus(function(response) {
-        app.log(2, 'fbLoginStatus callback response.authResponse' + response.authResponse);
+        app.log(2, 'fbLoginStatus callback response.authResponse: ' + response.authResponse);
           fbLog += 'callback: FB.getLoginStatus() - response: ' + JSON.stringify(response) + '\n';
           //console.log('authResponse-Object', response.authResponse);
           //console.log('accessToken', response.authResponse.accessToken);
