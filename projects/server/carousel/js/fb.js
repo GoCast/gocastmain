@@ -23,7 +23,6 @@ GoCastJS.FB = function() {
 // \param permsToRequest - an array of strings which are permission names (like: create_event).
 //            Can also be a string of comma-separated (no spaces) permissions like 'xmpp_login,create_event'
 //
-// \note WARNING - only send a SINGLE permission to request at this time.
 GoCastJS.FB.prototype.RequestAdditionalPermissions = function(permsToRequest, cbSuccess, cbFailure) {
   var appid = 458515917498757,
       self = this;
@@ -54,15 +53,31 @@ GoCastJS.FB.prototype.RequestAdditionalPermissions = function(permsToRequest, cb
 // \brief Figure out if we have permission for a particular item.
 //        Callback 'cb' with a true or false.
 //        Will go GetPermissions() if there are none in memory yet.
+// \param permslist - string of a single permission or comma-separated list of permissions to request.
 //
-GoCastJS.FB.prototype.HasPermissionFor = function(single_perm, cb) {
+GoCastJS.FB.prototype.HasPermissionFor = function(permslist, cb) {
+  var arrperms = permslist.split(','),
+      self = this;
+
+  function iter() {
+    var i, len=arrperms.length;
+
+    for (i = 0; i < len; i += 1) {
+      if (self.perms[arrperms[i]] !== 1) {
+        return false;   // Bail out if we find a single failure.
+      }
+    }
+
+    return true;
+  }
+
   if (!this.perms) {
     this.GetPermissions(function(result) {
-      cb(this.perms[single_perm] === 1);
+      return iter();
     });
   }
   else {
-    cb(this.perms[single_perm] === 1);
+      return iter();
   }
 };
 
@@ -77,16 +92,26 @@ GoCastJS.FB.prototype.ClearPermissions = function() {
 //          are changed as this could indicate a change in those permissions.
 //
 GoCastJS.FB.prototype.GetPermissions = function(cbSuccess, cbFailure) {
-  var self = this;
+  var self = this,
+      failTimer,
+      bWeFailed = false;
+
+   failTimer = setTimeout(function() {
+      if (cbFailure) {
+        bWeFailed = true;
+        cbFailure();
+      }
+   }, 10000);
 
    FB.api('/me/permissions', function(response) {
       var permsArray = response.data[0];
 
-      console.log('DEBUG: permissions: ', permsArray);
+//      console.log('DEBUG: permissions: ', permsArray);
 
       self.perms = permsArray;
+      clearTimeout(failTimer);
 
-      if (cbSuccess) {
+      if (cbSuccess && !bWeFailed) {
         cbSuccess(permsArray);
       }
 /*      var permsToPrompt = [];
