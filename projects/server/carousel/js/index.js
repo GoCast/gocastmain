@@ -686,9 +686,9 @@ function activateWindow(
     $('input#name', winId).on('blur', blurNameHandler);
     $('input#name', winId).on('focus', focusNameHandler);
     $('a#btn', winId).on('click.s04072012', onJoinNow);
-    if ("undefined" !== Storage)
+    if ("undefined" !== Storage && sessionStorage.uiGoCastNick)
     {
-      $('input#name', winId).val(sessionStorage.uiGoCastNick);
+      $('input#name', winId).val(decodeURI(sessionStorage.uiGoCastNick));
     }
   }
   else if (winId.match('meeting')) {
@@ -1083,6 +1083,15 @@ function openMeeting(
   // set the controller instance
   app.carousel = $('#scarousel').data('cloudcarousel');
   app.carousel.init();
+
+  // Disable carousel mousewheel when mouse hovers over chat
+  $('#msgBoard').hover(function() {
+      app.carousel.disableMousewheel();
+    },
+    function() {
+      app.carousel.enableMousewheel();
+  });
+
   /*
    * Initialize Gocast events. */
   $(window).on('beforeunload', function() {
@@ -2393,6 +2402,14 @@ function uiInit()
   jqChatOut.data('util', util);  // install global chat util
   $(document).keydown(docKey); // global key handler
 
+  $('#chatInp > .chatTo').focus(function() {
+    $(document).unbind('keydown');
+  });
+
+  $('#chatInp > .chatTo').blur(function() {
+    $(document).keydown(docKey);
+  });
+
   app.altKeyName = app.osPlatform.isMac ? "Opt" : "Alt";
   app.audioKeyAccel = app.altKeyName + "+A";
   app.videoKeyAccel = app.altKeyName + "+Z";
@@ -3005,7 +3022,7 @@ function startTour(tourSelector) {
 
 function errMsgReloadClick() {
   if ('undefined' !== typeof(Storage) && app.user.fbSkipped) {
-    window.localStorage.gcpReloadNickName = app.user.name;
+    window.localStorage.gcpReloadNickName = decodeURI(app.user.name);
   }
   window.location.reload();
 }

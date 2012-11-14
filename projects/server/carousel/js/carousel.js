@@ -355,14 +355,31 @@
         event.data.rotate(-1);
         return false;
     });
+
+    this.mousewheelCb = function() {
+      return function(event, delta) {
+        event.data.rotate(delta);
+        return false;
+      };
+    };
+
+    this.enableMousewheel = function() {
+      $(container).on('mousewheel', this, this.mousewheelCb());
+    };
+
+    this.disableMousewheel = function() {
+      $(container).unbind('mousewheel');
+    };
+
     /*
      * For mousewheel, there is dependency with jquery mousewheel
      * plugin: http://plugins.jquery.com/project/mousewheel. */
     if (options.mouseWheel) {
-        $(container).on('mousewheel', this, function(event, delta) {
+        /*$(container).on('mousewheel', this, function(event, delta) {
         event.data.rotate(delta);
         return false;
-        });
+        });*/
+        this.enableMousewheel();
     }
     // mouseover
     /*

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Wiki Api Trial</title>
+		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.js"></script>
+		<script type="text/javascript">
+			function queryWiki(searchstring) {
+				$.ajax({
+					url     : 'http://en.wikipedia.org/w/api.php?callback=?',
+					data    : {
+						format: 'json',
+						action: 'parse',
+						page  : searchstring,
+						prop  : 'text|headhtml'
+					},
+					dataType: 'jsonp',
+					cache   : true,
+					success : function(response) {
+						var frames = document.getElementsByTagName('iframe');
+						var wikiframe = document.createElement('iframe');
+
+						console.log('Response: ', response);
+						wikiframe.width = 800;
+						wikiframe.height = 600;
+
+						if (frames.length) {
+							document.getElementsByTagName('body')[0].removeChild(frames[0]);
+						}
+
+						document.getElementsByTagName('body')[0].appendChild(wikiframe);
+						wikiframe.contentWindow.document.open();
+
+						$(wikiframe.contentWindow).load(function() {
+							var body = $('iframe').contents().find('body');
+
+							// Adjust font size
+							body.css({'margin': '20px', 'font-size': '12px'});
+
+							// Hide enlarge image buttons
+							$('a.internal[title="Enlarge"]', body).css('display', 'none');
+
+							// Change image hyperlink to point to the actual image
+							$('a.image[href^="/wiki/"]', body).each(function() {
+								$(this).attr('href', $('img', this).attr('src'));
+							});
+
+							// All non-image wiki links are modified to open in the iframe
+							$('a[href^="/wiki/"]:not(.image)', body).each(function() {
+								var searchterm = $(this).attr('href').split('/')[2];
+								$(this).attr('onclick', 'window.top.queryWiki("' + decodeURI(searchterm) + '");');
+								$(this).attr('href', 'javascript:void(0);');
+							});
+
+							// For bookmark links, on firefox, use an alternative to location.hash
+							$('a[href^="#"]', body).each(function() {
+								var tag = $(this).attr('href');
+								$(this).attr('onclick', 'showBookmark(\'' + decodeURI(tag) + '\', ' + !$.browser.mozilla + ');');
+								$(this).attr('href', 'javascript:void(0);');
+							});
+
+							// Change target for external links to new tab
+							$('a.external', body).attr('target', '_blank');
+
+							// Hide the 'edit' links for the article
+							$('span.editsection', body).css('display', 'none');
+						});
+
+						var bookmarkScript = '<script type="text/javascript">\n' +
+											 	'function showNode (oNode) {\n' +
+													'var nLeft = 0, nTop = 0;\n' +
+													'for (var oItNode = oNode; oItNode;\n' + 
+													 	 'nLeft += oItNode.offsetLeft,\n' + 
+													 	 'nTop += oItNode.offsetTop, oItNode = oItNode.offsetParent);\n' +
+													'document.documentElement.scrollTop = nTop;\n' +
+													'document.documentElement.scrollLeft = nLeft;\n' +
+												'}\n' +
+												'function showBookmark (sBookmark, bUseHash) {\n' +
+			  										'if (arguments.length === 1 || bUseHash) { window.location.hash = sBookmark; return; }\n' +
+			  										'var oBookmark = document.querySelector(sBookmark);\n' +
+			  										'if (oBookmark) { showNode(oBookmark); } else { console.log(\'No bookmark found [\' + sBookmark + \']\'); }\n' +
+												'}\n' + '<\/script>';
+
+						wikiframe.contentWindow.document.write(response.parse.headhtml['*'] + response.parse.text['*'] +
+															   bookmarkScript + '</div></body></html>');
+						wikiframe.contentWindow.document.close();
+					}
+				});
+			}
+
+			$(document).ready(function() {
+				$('#search').click(function() {
+					queryWiki($('#wikisearch').val());
+				});
+			});
+		</script>
+	</head>
+	<body>
+		<input id="wikisearch" type="text" />
+		<button id="search">SEARCH WIKI</button><p></p>
+	</body>
+</html>
