@@ -825,6 +825,7 @@ MucRoom.prototype.EndMeeting = function() {
     outStr += '[' + Math.floor(origDuration/sec) + ' seconds]';
 
     this.log('Meeting Duration: ' + outStr);
+    this.notifylog('Meeting Duration: ' + outStr);
 };
 
 MucRoom.prototype.handlePresence = function(pres) {
@@ -924,9 +925,9 @@ MucRoom.prototype.handlePresence = function(pres) {
             this.log('Adding: ' + fromjid + ' as Nickname: ' + decodeURI(fromnick));
             this.SendSpotListTo(pres.attrs.from);
         }
-        else {
-            this.log('Updated Presence: ' + fromjid + ' as Nickname: ' + decodeURI(fromnick));
-        }
+//        else {
+//            this.log('Updated Presence: ' + fromjid + ' as Nickname: ' + decodeURI(fromnick));
+//        }
 
         this.participants[fromnick] = { name: fromjid || fromnick };
 
@@ -1013,8 +1014,11 @@ MucRoom.prototype.handlePresence = function(pres) {
 
                 if (this.bSelfDestruct === true) {
                     this.presenceTimer = setTimeout(function() {
+                        var msg;
                         self.log('(A-timer) No one in room after 60 seconds ... destroying.');
-                        self.log('ROOM-EMPTY - end meeting. maxParticipantsSeen was: ' + self.maxParticipantsSeen);
+                        msg = 'ROOM-EMPTY - end meeting. maxParticipantsSeen was: ' + self.maxParticipantsSeen;
+                        self.log(msg);
+                        self.notifylog(msg);
                         self.EndMeeting();
                         eventManager.emit('destroyroom', self.roomname.split('@')[0]);
                         self.presenceTimer = null;
@@ -1023,7 +1027,10 @@ MucRoom.prototype.handlePresence = function(pres) {
                 else {
                     // If not a self-destruct room, still need to end the meeting if no one comes back in.
                     this.presenceTimer = setTimeout(function() {
-                        self.log('ROOM-EMPTY - end meeting. maxParticipantsSeen was: ' + self.maxParticipantsSeen);
+                        var msg;
+                        msg = 'ROOM-EMPTY - end meeting. maxParticipantsSeen was: ' + self.maxParticipantsSeen;
+                        self.log(msg);
+                        self.notifylog(msg);
                         self.EndMeeting();
                         self.presenceTimer = null;
                     }, 60000);
