@@ -7,18 +7,83 @@ GoCastJS.WikiBrowser = function(containerid) {
 	$('<div id="wikibrowser"><div id="toolbar">' +
 	  '<input id="searchkey" placeholder="enter search topic" />' +
 	  '<a id="search" title="search wikipedia" class="toolbutton icon-picto" href="javascript:void(0);">s</a>' +
-	  '</div><div id="window"></div></div>').appendTo(this.$container);
+	  '<a id="back" title="previous page" class="toolbutton-disabled icon-picto" href="javascript:void(0);">&lt;</a>' +
+	  '<a id="fwd" title="next page" class="toolbutton-disabled icon-picto" href="javascript:void(0);">&gt;</a>' +
+	  '</div><div id="window"></div><div id="wait">}</div></div>').appendTo(this.$container);
+
+	this.history = {
+		searchrsps: [],
+		index: -1,
+		add: function(rsp) { this.searchrsps[++(this.index)] = rsp; },
+		back: function() { return this.searchrsps[--(this.index)]; },
+		fwd: function() { return this.searchrsps[++(this.index)]; },
+		atEnd: function() { return (this.searchrsps.length-1 === this.index); },
+		atStart: function() { return (0 === this.index); },
+		splice: function() { this.searchrsps.splice(this.index+1); }
+	};
 
 	this.View = {
 		browser: null,
 		init: function(browser) {
 			this.browser = browser;
-			$('#wikibrowser > #toolbar > #search', browser.$container).click(function() {
-				browser.onsearchclick($('#wikibrowser > #toolbar > #searchkey',
-										browser.$container).val());
+			$('#wikibrowser > #toolbar > #searchkey', browser.$container).focus(function() { 
+				$(this).get(0).select();
+				if (!$.browser.mozilla) {
+					$(this).mouseup(function() {
+						$(this).unbind('mouseup');
+						return false;
+					});
+				} 
 			});
+			$('#wikibrowser > #toolbar > #search', browser.$container).click(this.searchclickCallback());
+			$('#wikibrowser > #toolbar > #back', browser.$container).click(this.backclickCallback());
+			$('#wikibrowser > #toolbar > #fwd', browser.$container).click(this.fwdclickCallback());
 		},
-		showSearchResult: function(response) {
+		searchclickCallback: function() {
+			var self = this;
+			return function() {
+				self.browser.onsearchclick($('#wikibrowser > #toolbar > #searchkey',
+										   self.browser.$container).val());
+			};
+		},
+		backclickCallback: function() {
+			var self = this;
+			return function() {
+				if (!self.browser.history.atStart()) {
+					self.showLoadingSign();
+					self.showSearchResult(self.browser.history.back());
+				}
+			};
+		},
+		fwdclickCallback: function() {
+			var self = this;
+			return function() {
+				if (!self.browser.history.atEnd()) {
+					self.showLoadingSign();
+					self.showSearchResult(self.browser.history.fwd());
+				}
+			};
+		},
+		updatenavbuttons: function() {
+			if (this.browser.history.atStart()) {
+				$('#wikibrowser > #toolbar > #back', this.browser.$container).removeClass('toolbutton').addClass('toolbutton-disabled');	
+			} else {
+				$('#wikibrowser > #toolbar > #back', this.browser.$container).removeClass('toolbutton-disabled').addClass('toolbutton');
+			}
+			if (this.browser.history.atEnd()) {
+				$('#wikibrowser > #toolbar > #fwd', this.browser.$container).removeClass('toolbutton').addClass('toolbutton-disabled');	
+			} else {
+				$('#wikibrowser > #toolbar > #fwd', this.browser.$container).removeClass('toolbutton-disabled').addClass('toolbutton');
+			}			
+		},
+		showLoadingSign: function() {
+			var $wait = $('#wikibrowser > #wait', this.browser.$container);
+			$wait.addClass('show').css('line-height', $wait.height() + 'px');
+		},
+		hideLoadingSign: function() {
+			$('#wikibrowser > #wait', this.browser.$container).removeClass('show');
+		},
+		showSearchResult: function(response, newsearch) {
 			var iframe = document.querySelector('#' + this.browser.$container.attr('id') +
 												' > #wikibrowser > #window > iframe');
 			var browserWin = document.querySelector('#' + this.browser.$container.attr('id') +
@@ -63,6 +128,8 @@ GoCastJS.WikiBrowser = function(containerid) {
 				$('a.external', body).attr('target', '_blank');
 				// Hide the 'edit' links for the article
 				$('span.editsection', body).css('display', 'none');
+
+				self.hideLoadingSign();
 			});
 
 			var bookmarkScript = '<script type="text/javascript">\n' +
@@ -87,6 +154,11 @@ GoCastJS.WikiBrowser = function(containerid) {
 												bookmarkScript) : (errHead + errHtml)) + '</div></body></html>');
 			iframe.contentWindow.document.close();
 			$('#wikibrowser > #toolbar > #searchkey', this.browser.$container).val(response.parse ? response.parse.title : '');
+			if (response.parse && newsearch) {
+				this.browser.history.splice();
+				this.browser.history.add(response);
+			}
+			this.updatenavbuttons();
 		}
 	};
 
@@ -108,7 +180,7 @@ GoCastJS.WikiBrowser = function(containerid) {
 				dataType: 'jsonp',
 				cache   : true,
 				success : function(response) {
-					self.browser.onsearchresult(response);
+					self.browser.onsearchresult(response, true);
 				}
 			});
 		}
@@ -125,11 +197,12 @@ GoCastJS.WikiBrowser.prototype.init = function() {
 };
 
 GoCastJS.WikiBrowser.prototype.onsearchclick = function(searchkey) {
+	this.View.showLoadingSign();
 	this.Network.beginSearch(searchkey);
 };
 
-GoCastJS.WikiBrowser.prototype.onsearchresult = function(response) {
-	this.View.showSearchResult(response);
+GoCastJS.WikiBrowser.prototype.onsearchresult = function(response, newsearch) {
+	this.View.showSearchResult(response, newsearch);
 }
 
 $(document).ready(function() {
