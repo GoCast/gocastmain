@@ -355,8 +355,11 @@ input#addEditor {
   background-size: 100% 100%;
 }
 input#addWiki {
+  background-color: white;
   background-image: url('../images/wiki.png');
   background-size: 100% 100%;
+  border: 2px black solid;
+  border-radius: 4px;
 }
 input#addItem {
   background-image: url('../images/plus.png');

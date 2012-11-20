@@ -89,3 +89,12 @@
 #wikibrowser > #wait.show {
 	display: block;
 }
+
+#wikibrowser > #window > iframe::-webkit-scrollbar {
+  width: 10px;
+}
+
+#wikibrowser > #window > iframe::-webkit-scrollbar-thumb {
+  background: rgba(128,128,128,0.5);
+  border-radius: 10px;
+}

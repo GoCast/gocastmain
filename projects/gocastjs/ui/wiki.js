@@ -16,10 +16,10 @@ GoCastJS.WikiBrowser = function(spotdiv, info) {
 	this.history = {
 		searchrsps: [],
 		index: -1,
-		getPrev: function() {  return this.searchrsps[this.index-1]; },
-		getNext: function() {  return this.searchrsps[this.index+1]; },
+		getback: function() {  return this.searchrsps[this.index-1]; },
+		getfwd: function() {  return this.searchrsps[this.index+1]; },
 		get: function() { return this.searchrsps[this.index]; },
-		add: function(rsp) { this.searchrsps[++(this.index)] = rsp; },
+		add: function(rsp) { this.searchrsps.splice(++(this.index), 0 , rsp); },
 		back: function() { return this.searchrsps[--(this.index)]; },
 		fwd: function() { return this.searchrsps[++(this.index)]; },
 		atEnd: function() { return (this.searchrsps.length-1 === this.index); },
@@ -70,7 +70,7 @@ GoCastJS.WikiBrowser = function(spotdiv, info) {
 						spottype: 'wiki',
 						spotnumber: self.browser.info.spotnumber,
 						history: 'back',
-						title: self.browser.history.getPrev().parse.title
+						title: self.browser.history.getback().parse.title
 					});
 				}
 			};
@@ -84,7 +84,7 @@ GoCastJS.WikiBrowser = function(spotdiv, info) {
 						spottype: 'wiki',
 						spotnumber: self.browser.info.spotnumber,
 						history: 'fwd',
-						title: self.browser.history.getNext().parse.title
+						title: self.browser.history.getfwd().parse.title
 					});
 				}
 			};
@@ -113,6 +113,10 @@ GoCastJS.WikiBrowser = function(spotdiv, info) {
 			var iframe = document.querySelector(containerSelector + ' > #wikibrowser > #window > iframe');
 			var browserWin = document.querySelector(containerSelector + ' > #wikibrowser > #window');
 			var self = this;
+
+			if (!newsearch) {
+				self.showLoadingSign();
+			}
 
 			if (iframe) {
 				browserWin.removeChild(iframe);
@@ -196,7 +200,6 @@ GoCastJS.WikiBrowser = function(spotdiv, info) {
 			iframe.contentWindow.document.close();
 			$('#wikibrowser > #toolbar > #searchkey', this.browser.$container).val(response.parse ? response.parse.title : '');
 			if (response.parse && newsearch) {
-				this.browser.history.splice();
 				this.browser.history.add(response);
 			}
 			this.updatenavbuttons();
@@ -245,9 +248,17 @@ GoCastJS.WikiBrowser.prototype.refresh = function() {
 	this.View.showSearchResult(this.history.get());
 };
 
-GoCastJS.WikiBrowser.prototype.navhistory = function(dir) {
+GoCastJS.WikiBrowser.prototype.navhistory = function(dir, title) {
 	this.View.showLoadingSign();
-	this.View.showSearchResult(this.history[dir]());
+
+	if (this.history['get' + dir]()) {
+		this.View.showSearchResult(this.history[dir]());
+	} else {
+		if (dir === 'back') {
+			this.history.back();	
+		}
+		this.onsearchclick(title);
+	}
 };
 
 GoCastJS.WikiBrowser.prototype.onsearchclick = function(searchkey) {
@@ -264,9 +275,9 @@ GoCastJS.WikiBrowser.prototype.doSpot = function(info) {
 		this.onsearchclick(info.search);
 	} else if (info.history) {
 		if (info.cmdtype === 'setspot') {
-			this.navhistory(info.history);
+			this.navhistory(info.history, info.title);
 		} else if (info.cmdtype === 'addspot' && info.title) {
-			this.onsearchclick(info.title)
+			this.onsearchclick(info.title);
 		}
 	}
 };

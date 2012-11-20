@@ -484,7 +484,7 @@ function onSpotClose(event)
 
   console.log("onSpotClose", event);
 
-  if ($(spot).hasClass('typeContent')) {
+  if ($(spot).hasClass('typeContent') && !$(spot).hasClass('wiki')) {
     reallyClose = confirm('All content in this spot will be lost. Are you sure ?');
   }
 
@@ -923,7 +923,7 @@ function carouselItemUnzoom(event)
   if (wiki) {
     wiki.refresh();
   }
-  
+
    //$('body > div#upper-right').css({'top': '10px'});
    $('body > div#upper-right').removeAttr('style');
    $('body > div#upper-left').removeAttr('style');
