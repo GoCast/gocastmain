@@ -1,5 +1,6 @@
 #!/bin/sh
 server="dnle.gocast.it"
+scp backupPrune.js ec2-user@$server:ccc_scripts/
 scp settings.js ec2-user@$server:ccc_scripts/
 scp serverBot/serverBot.js ec2-user@$server:ccc_scripts/
 scp serverBot/nodeWB.js ec2-user@$server:ccc_scripts/
