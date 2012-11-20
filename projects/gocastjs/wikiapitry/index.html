@@ -6,7 +6,7 @@
 		<script type="text/javascript">
 			function queryWiki(searchstring) {
 				$.ajax({
-					url     : 'http://en.wikipedia.org/w/api.php?callback=?',
+					url     : 'http://en.wikipedia.org/w/api.php?callback=?&redirects',
 					data    : {
 						format: 'json',
 						action: 'parse',
@@ -41,7 +41,7 @@
 
 							// Change image hyperlink to point to the actual image
 							$('a.image[href^="/wiki/"]', body).each(function() {
-								$(this).attr('href', $('img', this).attr('src'));
+								$(this).attr('href', decodeURI($('img', this).attr('src')));
 							});
 
 							// All non-image wiki links are modified to open in the iframe
@@ -83,6 +83,7 @@
 						wikiframe.contentWindow.document.write(response.parse.headhtml['*'] + response.parse.text['*'] +
 															   bookmarkScript + '</div></body></html>');
 						wikiframe.contentWindow.document.close();
+						$('#wikisearch').val(response.parse ? response.parse.title : '');
 					}
 				});
 			}

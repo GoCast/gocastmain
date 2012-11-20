@@ -484,7 +484,7 @@ function onSpotClose(event)
 
   console.log("onSpotClose", event);
 
-  if ($(spot).hasClass('typeContent')) {
+  if ($(spot).hasClass('typeContent') && !$(spot).hasClass('wiki')) {
     reallyClose = confirm('All content in this spot will be lost. Are you sure ?');
   }
 
@@ -880,6 +880,11 @@ function carouselItemZoom(event)
     gcedit.editor.setCode(editorContent);
   }
 
+  var wiki = $(spot).data('wiki');
+  if (wiki) {
+    wiki.refresh();
+  }
+
    app.carousel.resize(); // update carousel
    resizeZoom();
 
@@ -912,6 +917,11 @@ function carouselItemUnzoom(event)
     spot.get(0).removeChild(spot.get(0).lastChild);
     gcedit = new GoCastJS.gcEdit(spot, gcedit.info);
     gcedit.editor.setCode(editorContent);
+  }
+
+  var wiki = $(spot).data('wiki');
+  if (wiki) {
+    wiki.refresh();
   }
 
    //$('body > div#upper-right').css({'top': '10px'});
@@ -2778,6 +2788,54 @@ function addEditor()
     },
     function() {
       console.log("carousel addEditor callback");
+  });
+}
+
+function showWikiSearch(goclickCallback) {
+  var addWikiPos = $('#lower-right').position(),
+      searchWikiWidth = $('#searchwiki').width(),
+      searchWikiHeight = $('#searchwiki').height();
+
+  $('#searchwiki').addClass('show').css({
+    'left': (addWikiPos.left - (searchWikiWidth/2)) + 'px',
+    'top': (addWikiPos.top - searchWikiHeight) + 'px'
+  });
+
+  $('#searchwiki > #searchpanel > #searchbutton').unbind('click').click(goclickCallback);
+  $('#searchwiki > #searchpanel > #searchkey')
+  .unbind('focus').focus(function() {
+    $(this).get(0).select();
+    if (!$.browser.mozilla) {
+      $(this).mouseup(function() {
+        $(this).unbind('mouseup');
+        return false;
+      });
+    } 
+  }).unbind('keypress').keypress(function(event) {
+    var keycode = event.which || event.keyCode;
+    if (keycode === 13) {
+      goclickCallback();
+    }
+  }).focus();
+}
+
+function closeWikiSearch() {
+  $('#searchwiki').removeClass('show');
+}
+
+function addWiki() {
+  showWikiSearch(function() {
+    var searchkey = $('#searchwiki > #searchpanel > #searchkey').val();
+    if (searchkey) {
+      Callcast.AddSpot({
+        spottype: 'wiki',
+        spotreplace: 'first-unoc',
+        search: searchkey
+      },function() {
+        console.log('carousel addWiki callback');
+      });
+      closeWikiSearch();
+    }
   });
 }
 

@@ -35,6 +35,7 @@
     <!-- DEV JS/CSS FILES: ATTACH ?[CURTIME] TO SCRIPT/HREF LINKS -->
 
     <link rel="stylesheet" href="css/wb.css?GOCASTTIMESTAMP" type="text/css" />
+    <link rel="stylesheet" href="css/wiki.css?GOCASTTIMESTAMP" type="text/css" />
     <link rel="stylesheet" href="css/index.css?GOCASTTIMESTAMP" type="text/css" />
     <link rel="stylesheet" href="css/jquery-ui.css?GOCASTTIMESTAMP" type="text/css" />
     <link rel="stylesheet" href="css/jquery.cleditor.css?GOCASTTIMESTAMP" type="text/css" />
@@ -63,6 +64,7 @@
     <script type="text/javascript" src="js/uiutil.js?GOCASTTIMESTAMP"></script>
     <script type="text/javascript" src="js/wb.js?GOCASTTIMESTAMP"></script>
     <script type="text/javascript" src="js/gcedit.js?GOCASTTIMESTAMP"></script>
+    <script type="text/javascript" src="js/wiki.js?GOCASTTIMESTAMP"></script>
     <script type="text/javascript" src="js/index.js?GOCASTTIMESTAMP"></script>
 
     <!-- ---------------------------------------------------------- -->
@@ -147,6 +149,7 @@
        <input class="gc-icon" id="addItem" type="button" title="Add Spot" onclick="addItem();"/>
        <input class="gc-icon" id="addWhiteBoard" type="button" title="Add White Board" onclick="addWhiteBoard();"/>
        <input class="gc-icon" id="addEditor" type="button" title="Add Notepad" onclick="addEditor();"/>
+       <input class="gc-icon" id="addWiki" type="button" title="Add Wikipedia Browser" onclick="addWiki();"/>
     </div>
     <!--<div id="lower-left">
         <input class"gc-icon" id="showChat" type="button" title="chat with your group" onclick="showGroupChat(event);"/>
@@ -378,6 +381,13 @@
       <button id="sure">SURE</button>
       <button id="skip">SKIP TOUR</button>
       <button id="imgood">I'M GOOD</button>
+    </div>
+    <div id="searchwiki">
+      <a id="close" href="javascript:void(0);" onclick="closeWikiSearch();">X</a>
+      <div id="searchpanel">
+        <input id="searchkey" type="text" placeholder="enter search topic"/>
+        <button id="searchbutton">GO</button>
+      </div>
     </div>
   </body>
 </html>

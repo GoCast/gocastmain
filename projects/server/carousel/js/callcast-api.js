@@ -807,7 +807,7 @@ function doSpot(spotDiv, info)
   {
     var divIcon, divTitle,
         jqDiv = $(spotDiv),
-        whiteBoard, editor;
+        whiteBoard, editor, wiki;
     console.log('doSpot', info);
     console.log('spotDiv', spotDiv);
     if (!spotDiv) {throw "no spotDiv";}
@@ -863,6 +863,23 @@ function doSpot(spotDiv, info)
       if (editor)
       {
         editor.doSpot(info);
+      }
+    }
+    else if (info.spottype === 'wiki') {
+      if (info.cmdtype === 'addspot') {
+        jqDiv.attr('id', app.str2id('wiki ' + info.spotnumber));
+        jqDiv.attr('title', 'Wikipedia');
+        jqDiv.attr('alt', 'Wikipedia');
+        jqDiv.attr('encname', 'wiki');
+        jqDiv.attr('spotnumber', info.spotnumber);
+        jqDiv.removeClass('unoccupied').addClass('typeContent wiki');
+        wiki = new GoCastJS.WikiBrowser(spotDiv, info);
+      } else {
+        wiki = jqDiv.data('wiki');
+      }
+
+      if (wiki) {
+        wiki.doSpot(info);
       }
     }
     else if (info.spottype === 'url')
