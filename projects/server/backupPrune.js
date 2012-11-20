@@ -23,8 +23,22 @@
   4 0 1 * * /usr/local/bin/node /Users/rwolff/dev/gocastmain/projects/server/backupPrune.js
             -a -d /Users/rwolff/backups/month -s /Users/rwolff/Pictures/Export -k 12 >>/var/log/cronroot.log
 
-*/
+  # actual crontab on ec2 server
+  0,10,20,30,40,50 * * * * export NODE_PATH=/usr/local/lib/node_modules:$NODE_PATH ; /usr/local/bin/node /home/ec2-user/scripts/backupPrune.js -a -d /home/ec2-user/backups/min -s /home/ec2-user/wbstorage -k 6 >>/var/log/cronroot.log 2>&1
+  1 * * * * export NODE_PATH=/usr/local/lib/node_modules:$NODE_PATH ; /usr/local/bin/node /home/ec2-user/scripts/backupPrune.js -a -d /home/ec2-user/backups/hour -s /home/ec2-user/wbstorage -k 24 >>/var/log/cronroot.log 2>&1
+  2 0 * * * export NODE_PATH=/usr/local/lib/node_modules:$NODE_PATH ; /usr/local/bin/node /home/ec2-user/scripts/backupPrune.js -a -d /home/ec2-user/backups/day -s /home/ec2-user/wbstorage -k 7 >>/var/log/cronroot.log 2>&1
+  3 0 * * Sun export NODE_PATH=/usr/local/lib/node_modules:$NODE_PATH ; /usr/local/bin/node /home/ec2-user/scripts/backupPrune.js -a -d /home/ec2-user/backups/week -s /home/ec2-user/wbstorage -k 4 >>/var/log/cronroot.log 2>&1
+  4 0 1 * * export NODE_PATH=/usr/local/lib/node_modules:$NODE_PATH ; /usr/local/bin/node /home/ec2-user/scripts/backupPrune.js -a -d /home/ec2-user/backups/month -s /home/ec2-user/wbstorage -k 12 >>/var/log/cronroot.log 2>&1
 
+  requires:
+  =========
+  npm install -g shelljs optimist
+  mkdir -p ~/backup/min ~/backup/hour ~/backup/day ~/backup/week ~/backup/month
+  # optionally prime the pump by instantly making backups of day week and month now.
+  node ~/scripts/backupPrune.js -a -s ~/wbstorage -d ~/backup/day
+  node ~/scripts/backupPrune.js -a -s ~/wbstorage -d ~/backup/week
+  node ~/scripts/backupPrune.js -a -s ~/wbstorage -d ~/backup/month
+*/
 
 /*jslint node: true, nomen: true, white: true */
 /*global test, cd, exec, pwd, rm */
