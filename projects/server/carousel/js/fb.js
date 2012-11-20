@@ -3,7 +3,7 @@
  * \brief initialize facebook api.
  */
 
-/*jslint browser: true, devel: true */
+/*jslint sloppy: false, todo: true, browser: true, devel: true */
 /*global FB, app */
 
 'use strict';
@@ -15,7 +15,7 @@ function getFBLog() { return fbLog; }
 var GoCastJS = GoCastJS || {};
 
 GoCastJS.FB = function() {
-  this.ClearPermissions();
+    this.ClearPermissions();
 };
 
 //
@@ -24,26 +24,27 @@ GoCastJS.FB = function() {
 //            Can also be a string of comma-separated (no spaces) permissions like 'xmpp_login,create_event'
 //
 GoCastJS.FB.prototype.RequestAdditionalPermissions = function(permsToRequest, cbSuccess, cbFailure) {
-  var appid = 458515917498757,
-      self = this;
+    var appid = 458515917498757,
+        self = this;
 
     console.log('FB: RequestAdditionalPermissions: permsToRequest: ', permsToRequest);
     FB.login(function(response) {
-      self.GetPermissions(function() {
-        // Now that we have a full set of permissions, let's iterate over the requested ones.
-        var arrperms = permsToRequest.split(','),
-            i, len = arrperms.length;
+        self.GetPermissions(function() {
+            // Now that we have a full set of permissions, let's iterate over the requested ones.
+            var arrperms = permsToRequest.split(','),
+                i,
+                len = arrperms.length;
 
-        // iterate through all inbound requested permissions and see that they ALL were granted.
-        for (i = 0; i < len; i += 1) {
-          if (self.perms[arrperms[i]] !== 1) {
-            cbFailure();
-            return;   // Bail out at the first failed permission.
-          }
-        }
+            // iterate through all inbound requested permissions and see that they ALL were granted.
+            for (i = 0; i < len; i += 1) {
+                if (self.perms[arrperms[i]] !== 1) {
+                    cbFailure();
+                    return;   // Bail out at the first failed permission.
+                }
+            }
 
-        cbSuccess();
-      });
+            cbSuccess();
+        });
 //      console.log('REQUEST RESPONSE: ', response);
 
     }, { scope: permsToRequest.toString() });
@@ -56,33 +57,33 @@ GoCastJS.FB.prototype.RequestAdditionalPermissions = function(permsToRequest, cb
 // \param permslist - string of a single permission or comma-separated list of permissions to request.
 //
 GoCastJS.FB.prototype.HasPermissionFor = function(permslist, cb) {
-  var arrperms = permslist.split(','),
-      self = this;
+    var arrperms = permslist.split(','),
+        self = this;
 
-  function iter() {
-    var i, len=arrperms.length;
+    function iter() {
+        var i,
+            len = arrperms.length;
 
-    for (i = 0; i < len; i += 1) {
-      if (self.perms[arrperms[i]] !== 1) {
-        return false;   // Bail out if we find a single failure.
-      }
+        for (i = 0; i < len; i += 1) {
+            if (self.perms[arrperms[i]] !== 1) {
+                return false;   // Bail out if we find a single failure.
+            }
+        }
+
+        return true;
     }
 
-    return true;
-  }
-
-  if (!this.perms) {
-    this.GetPermissions(function(result) {
-      return iter();
-    });
-  }
-  else {
-      return iter();
-  }
+    if (!this.perms) {
+        this.GetPermissions(function(result) {
+            return iter();
+        });
+    } else {
+        return iter();
+    }
 };
 
 GoCastJS.FB.prototype.ClearPermissions = function() {
-  this.perms = {};
+    this.perms = {};
 };
 
 //
@@ -92,28 +93,28 @@ GoCastJS.FB.prototype.ClearPermissions = function() {
 //          are changed as this could indicate a change in those permissions.
 //
 GoCastJS.FB.prototype.GetPermissions = function(cbSuccess, cbFailure) {
-  var self = this,
-      failTimer,
-      bWeFailed = false;
+    var self = this,
+        failTimer,
+        bWeFailed = false;
 
-   failTimer = setTimeout(function() {
-      if (cbFailure) {
-        bWeFailed = true;
-        cbFailure();
-      }
-   }, 10000);
+    failTimer = setTimeout(function() {
+        if (cbFailure) {
+            bWeFailed = true;
+            cbFailure();
+        }
+    }, 10000);
 
-   FB.api('/me/permissions', function(response) {
-      var permsArray = response.data[0];
+    FB.api('/me/permissions', function(response) {
+        var permsArray = response.data[0];
 
 //      console.log('DEBUG: permissions: ', permsArray);
 
-      self.perms = permsArray;
-      clearTimeout(failTimer);
+        self.perms = permsArray;
+        clearTimeout(failTimer);
 
-      if (cbSuccess && !bWeFailed) {
-        cbSuccess(permsArray);
-      }
+        if (cbSuccess && !bWeFailed) {
+            cbSuccess(permsArray);
+        }
 /*      var permsToPrompt = [];
       for (var i in permsNeeded) {
         if (permsArray[permsNeeded[i]] == null) {
@@ -128,7 +129,7 @@ GoCastJS.FB.prototype.GetPermissions = function(cbSuccess, cbFailure) {
       } else {
         alert('No need to prompt for any permissions');
       } */
-   });
+    });
 };
 //
 // \brief Use FB.api to create an event. start_time and options.end_time can be in ISO format already
@@ -137,57 +138,57 @@ GoCastJS.FB.prototype.GetPermissions = function(cbSuccess, cbFailure) {
 // \note This does not allow inviting invitees. You'll need to use cbSuccess and the ID to invite attendees via InviteToEvent()
 //
 GoCastJS.FB.prototype.CreateEvent = function(eventName, start_time, options, cbSuccess, cbFailure) {
-  var evopts = options || {},
-      self = this;
+    var evopts = options || {},
+        self = this;
 
-  evopts.name = eventName;
+    evopts.name = eventName;
 
-  if (evopts.privacy) {
-    evopts.privacy_type = evopts.privacy;
-  }
-  else if (evopts.privacy_type) {
-    evopts.privacy = evopts.privacy_type;
-  }
+    if (evopts.privacy) {
+        evopts.privacy_type = evopts.privacy;
+    }
+    else if (evopts.privacy_type) {
+        evopts.privacy = evopts.privacy_type;
+    }
 
-  if (start_time instanceof Date) {
-    evopts.start_time = start_time.toISOString();
-  }
+    if (start_time instanceof Date) {
+        evopts.start_time = start_time.toISOString();
+    }
 
-  if (evopts.end_time instanceof Date) {
-    evopts.end_time = evopts.end_time.toISOString();
-  }
+    if (evopts.end_time instanceof Date) {
+        evopts.end_time = evopts.end_time.toISOString();
+    }
 
-  evopts.description = evopts.description || ('Join me at GoCast in room: ' + $.getUrlVar('roomname'));
+    evopts.description = evopts.description || ('Join me at GoCast in room: ' + $.getUrlVar('roomname'));
 
-  evopts.location = evopts.location || window.location.href;
+    evopts.location = evopts.location || window.location.href;
 
-  // If one is not set...set one...
-  evopts.picture = evopts.picture || 'http://www.gocast.it/images/gologo.png';
+    // If one is not set...set one...
+    evopts.picture = evopts.picture || 'http://www.gocast.it/images/gologo.png';
 
-  FB.api('/me/events', 'POST', evopts, function(evreturn) {
-    if (evreturn.error) {
+    FB.api('/me/events', 'POST', evopts, function(evreturn) {
+        if (evreturn.error) {
 /*      if (evreturn.error.code === 290) {
         self.RequestAdditionalPermissions('create_event');
         return;
       }
 */
 
-      if (cbFailure) {
-        cbFailure(evreturn.error);
-      }
-      else {
-        console.log('ERROR: CreateEvent: ' + JSON.stringify(evreturn.error));
-      }
-    }
-    else {
-      if (cbSuccess) {
-        cbSuccess(evreturn);
-      }
-      else {
-        console.log('SUCCESS: CreateEvent: ' + JSON.stringify(evreturn));
-      }
-    }
-  });
+            if (cbFailure) {
+                cbFailure(evreturn.error);
+            }
+            else {
+                console.log('ERROR: CreateEvent: ' + JSON.stringify(evreturn.error));
+            }
+        }
+        else {
+            if (cbSuccess) {
+                cbSuccess(evreturn);
+            }
+            else {
+                console.log('SUCCESS: CreateEvent: ' + JSON.stringify(evreturn));
+            }
+        }
+    });
 };
 
 //
