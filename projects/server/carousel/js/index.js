@@ -880,6 +880,11 @@ function carouselItemZoom(event)
     gcedit.editor.setCode(editorContent);
   }
 
+  var wiki = $(spot).data('wiki');
+  if (wiki) {
+    wiki.refresh();
+  }
+
    app.carousel.resize(); // update carousel
    resizeZoom();
 
@@ -914,6 +919,11 @@ function carouselItemUnzoom(event)
     gcedit.editor.setCode(editorContent);
   }
 
+  var wiki = $(spot).data('wiki');
+  if (wiki) {
+    wiki.refresh();
+  }
+  
    //$('body > div#upper-right').css({'top': '10px'});
    $('body > div#upper-right').removeAttr('style');
    $('body > div#upper-left').removeAttr('style');
@@ -2779,6 +2789,20 @@ function addEditor()
     function() {
       console.log("carousel addEditor callback");
   });
+}
+
+function addWiki() {
+  var searchkey = prompt('Search Topic:', '');
+
+  if (searchkey) {
+    Callcast.AddSpot({
+      spottype: 'wiki',
+      spotreplace: 'first-unoc',
+      search: searchkey
+    },function() {
+      console.log('carousel addWiki callback');
+    });    
+  }
 }
 
 function addItem() {

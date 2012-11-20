@@ -354,6 +354,10 @@ input#addEditor {
   background-image: url('../images/AddNote.png');
   background-size: 100% 100%;
 }
+input#addWiki {
+  background-image: url('../images/wiki.png');
+  background-size: 100% 100%;
+}
 input#addItem {
   background-image: url('../images/plus.png');
   background-size: 100%;
