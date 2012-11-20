@@ -2791,18 +2791,52 @@ function addEditor()
   });
 }
 
-function addWiki() {
-  var searchkey = prompt('Search Topic:', '');
+function showWikiSearch(goclickCallback) {
+  var addWikiPos = $('#lower-right').position(),
+      searchWikiWidth = $('#searchwiki').width(),
+      searchWikiHeight = $('#searchwiki').height();
 
-  if (searchkey) {
-    Callcast.AddSpot({
-      spottype: 'wiki',
-      spotreplace: 'first-unoc',
-      search: searchkey
-    },function() {
-      console.log('carousel addWiki callback');
-    });    
-  }
+  $('#searchwiki').addClass('show').css({
+    'left': (addWikiPos.left - (searchWikiWidth/2)) + 'px',
+    'top': (addWikiPos.top - searchWikiHeight) + 'px'
+  });
+
+  $('#searchwiki > #searchpanel > #searchbutton').unbind('click').click(goclickCallback);
+  $('#searchwiki > #searchpanel > #searchkey')
+  .unbind('focus').focus(function() {
+    $(this).get(0).select();
+    if (!$.browser.mozilla) {
+      $(this).mouseup(function() {
+        $(this).unbind('mouseup');
+        return false;
+      });
+    } 
+  }).unbind('keypress').keypress(function(event) {
+    var keycode = event.which || event.keyCode;
+    if (keycode === 13) {
+      goclickCallback();
+    }
+  }).focus();
+}
+
+function closeWikiSearch() {
+  $('#searchwiki').removeClass('show');
+}
+
+function addWiki() {
+  showWikiSearch(function() {
+    var searchkey = $('#searchwiki > #searchpanel > #searchkey').val();
+    if (searchkey) {
+      Callcast.AddSpot({
+        spottype: 'wiki',
+        spotreplace: 'first-unoc',
+        search: searchkey
+      },function() {
+        console.log('carousel addWiki callback');
+      });
+      closeWikiSearch();
+    }
+  });
 }
 
 function addItem() {

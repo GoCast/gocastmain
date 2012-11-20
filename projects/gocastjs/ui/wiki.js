@@ -40,6 +40,7 @@ GoCastJS.WikiBrowser = function(spotdiv, info) {
 					});
 				} 
 			});
+			$('#wikibrowser > #toolbar > #searchkey', this.browser.$container).keypress(this.searchkeykeypressCallback());
 			$('#wikibrowser > #toolbar > #search', browser.$container).click(this.searchclickCallback());
 			$('#wikibrowser > #toolbar > #back', browser.$container).click(this.backclickCallback());
 			$('#wikibrowser > #toolbar > #fwd', browser.$container).click(this.fwdclickCallback());
@@ -47,6 +48,15 @@ GoCastJS.WikiBrowser = function(spotdiv, info) {
 		searchclick: function(searchkey) {
 			$('#wikibrowser > #toolbar > #searchkey', this.browser.$container).val(searchkey);
 			$('#wikibrowser > #toolbar > #search', this.browser.$container).click();
+		},
+		searchkeykeypressCallback: function() {
+			var self = this;
+			return function(event) {
+				var keycode = event.which || event.keyCode;
+				if (keycode === 13) {
+					self.searchclickCallback()();
+				}
+			};
 		},
 		searchclickCallback: function() {
 			var self = this;
@@ -167,9 +177,9 @@ GoCastJS.WikiBrowser = function(spotdiv, info) {
 						}
 					}
 					// For bookmark links, on firefox, use an alternative to location.hash
-					if ($(this).attr('href').match(/^#/)) {
+					if ($(this).attr('href').match(/^#/) && $.browser.mozilla) {
 						var tag = $(this).attr('href');
-						$(this).attr('onclick', 'showBookmark(\'' + decodeURI(tag) + '\', ' + !$.browser.mozilla + ');');
+						$(this).attr('onclick', 'showBookmark(\'' + decodeURI(tag) + '\');');
 						$(this).attr('href', 'javascript:void(0);');						
 					}
 				});
@@ -186,15 +196,15 @@ GoCastJS.WikiBrowser = function(spotdiv, info) {
 										'document.documentElement.scrollTop = nTop;\n' +
 										'document.documentElement.scrollLeft = nLeft;\n' +
 									'}\n' +
-									'function showBookmark (sBookmark, bUseHash) {\n' +
-			  							'if (arguments.length === 1 || bUseHash) { window.location.hash = sBookmark; return; }\n' +
+									'function showBookmark (sBookmark) {\n' +
 			  							'var oBookmark = document.getElementById(sBookmark.split(\'#\')[1]);\n' +
 			  							'if (oBookmark) { showNode(oBookmark); } else { console.log(\'No bookmark found [\' + sBookmark + \']\'); }\n' +
-									'}\n' + '<\/script>';
-			var errHead = '<!DOCTYPE html><html><head></head><body><div>',
+									'}\n' + '<\/script>',
+				errHead = '<!DOCTYPE html><html><head></head><body><div>',
 				errHtml = '<h1>Error!</h1><p></p><p><h3>Nothing available for "' +
 						  $('#wikibrowser > #toolbar > #searchkey', this.browser.$container).val() + '".</h3></p>';
 
+			bookmarkScript = $.browser.mozilla ? bookmarkScript : '';
 			iframe.contentWindow.document.write((response.parse ? (response.parse.headhtml['*'] + response.parse.text['*'] +
 												bookmarkScript) : (errHead + errHtml)) + '</div></body></html>');
 			iframe.contentWindow.document.close();
