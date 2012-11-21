@@ -142,17 +142,12 @@ GoCastJS.WikiBrowser = function(spotdiv, info) {
 			$(iframe.contentWindow).load(function() {
 				var $body = $(iframe).contents().find('body');
 
-				// Adjust font size and prevent horizontal scroll
-				$body.css({'font-size': '12px', 'overflow-x': 'hidden',
-						   'margin-left': '20px', 'margin-right': '20px'});
-
 				// Convert edit links into table of content links
 				$('span.editsection a', $body).each(function() {
 					$(this).html('Table of Contents');
 					$(this).attr('href', '#toc');
 					$(this).attr('title', 'go to table of contents');
 				});
-
 
 				$('a', $body).each(function() {
 					// Change target for external links to new tab
@@ -205,6 +200,12 @@ GoCastJS.WikiBrowser = function(spotdiv, info) {
 						  $('#wikibrowser > #toolbar > #searchkey', this.browser.$container).val() + '".</h3></p>';
 
 			bookmarkScript = $.browser.mozilla ? bookmarkScript : '';
+			if (response.parse) {
+				response.parse.headhtml['*'] = response.parse.headhtml['*']
+											   .replace(/<body/, '<body style="font-size: 12px; ' +
+															  	 'overflow-x: hidden; margin-left: 20px; ' +
+															  	 'margin-right: 20px;"');
+			}
 			iframe.contentWindow.document.write((response.parse ? (response.parse.headhtml['*'] + response.parse.text['*'] +
 												bookmarkScript) : (errHead + errHtml)) + '</div></body></html>');
 			iframe.contentWindow.document.close();
