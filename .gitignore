@@ -1,2 +1,4 @@
 #gocast global ignores
 *.DS_Store
+projects/ios/apps/carousel/code/project/mac
+projects/ios/apps/carousel/code/build

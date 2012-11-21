@@ -1,0 +1,11 @@
+How to build:
+
+Mac version (theoretical):
+
+1. Make sure "gyp" is installed: http://code.google.com/p/gyp/
+2. Open terminal, and cd to: /gocastmain/projects/ios/apps/carousel/code/project/common
+3. Run ./regyp-mac.sh
+4. Open /gocastmain/projects/ios/apps/carousel/code/project/mac/All.xcodeproj
+5. Build, and the output will be in: /gocastmain/projects/ios/apps/carousel/code/build/mac/debug
+6. Can be run from the debugger, command line, or finder.
+
