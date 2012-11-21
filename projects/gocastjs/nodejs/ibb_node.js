@@ -54,7 +54,7 @@ GoCastJS.IBBTransfer.prototype.SendError = function(iq, type, subtype, reason) {
 
 GoCastJS.IBBTransfer.prototype.SendResult = function(iq) {
     this.client.send(new ltx.Element('iq', {to: iq.attrs.from, type: 'result', id: iq.attrs.id}).root());
-    console.log('SendResult: History: ' + this.DumpHistory());
+//    console.log('SendResult: History: ' + this.DumpHistory());
 };
 
 GoCastJS.IBBTransfer.prototype.SendClose = function(iq, sid, error) {
@@ -164,7 +164,7 @@ GoCastJS.IBBTransfer.prototype.internalCloseTransfer = function(keyname, error) 
     var out = 'Closing: ' + keyname,
         theTransfer = this.transfers[keyname];
 
-    console.log('internalCloseTransfer: History: ' + this.DumpHistory());
+//    console.log('internalCloseTransfer: History: ' + this.DumpHistory());
     if (theTransfer) {
         out += ' Transferred ' + theTransfer.bytesTransferred + ' bytes.';
     }
@@ -196,9 +196,9 @@ GoCastJS.IBBTransfer.prototype.internalProcessClose = function(iq) {
     var child = iq.getChildByAttr('xmlns', 'http://jabber.org/protocol/ibb'),
         sid_inbound, genname, theTransfer;
 
-    console.log('internalProcessClose: History: ' + this.DumpHistory());
-    console.log('CLOSE: iq: ', iq);
-    console.log('CLOSE: child: ', child);
+//    console.log('internalProcessClose: History: ' + this.DumpHistory());
+//    console.log('CLOSE: iq: ', iq);
+//    console.log('CLOSE: child: ', child);
 
     sid_inbound = child.attrs.sid;
     genname = this.GenName(iq);
@@ -225,8 +225,8 @@ GoCastJS.IBBTransfer.prototype.internalProcessData = function(iq) {
         size_inbound, seq_inbound, sid_inbound, genname, theTransfer, dataBlock,
         self = this, msg;
 
-    console.log('DATA: iq: ', iq);
-    console.log('DATA: child: ', child);
+//    console.log('DATA: iq: ', iq);
+//    console.log('DATA: child: ', child);
 
     seq_inbound = parseInt(child.attrs.seq, 10);
     sid_inbound = child.attrs.sid;
