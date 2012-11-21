@@ -204,7 +204,8 @@ GoCastJS.WikiBrowser = function(spotdiv, info) {
 				response.parse.headhtml['*'] = response.parse.headhtml['*']
 											   .replace(/<body/, '<body style="font-size: 12px; ' +
 															  	 'overflow-x: hidden; margin-left: 20px; ' +
-															  	 'margin-right: 20px;"');
+															  	 'margin-right: 20px;" title="Wikipedia: ' +
+															  	 response.parse.title + '"');
 			}
 			iframe.contentWindow.document.write((response.parse ? (response.parse.headhtml['*'] + response.parse.text['*'] +
 												bookmarkScript) : (errHead + errHtml)) + '</div></body></html>');
