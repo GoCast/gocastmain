@@ -28,7 +28,7 @@
 }
 
 #wikibrowser > #window {
-	height: 89%; /* because 1% extra for margin-top for search textbox*/
+	height: 89%; /* because 1% extra for margin-top for search textbox */
 	background-color: white;
 	border: 2px lightgrey solid;
 	border-style: inset;
@@ -36,13 +36,17 @@
 }
 
 #wikibrowser > #toolbar > #searchkey {
-	width: 60%;
+	width: 50%;
 	height: 40%;
 	margin-top: 1%;
 	padding-top: 2px;
 	padding-bottom: 2px;
-	padding-left: 5px;
+	padding-left: 6%;
 	padding-right: 5px;
+	background: url("../images/wiki.png") no-repeat;
+	background-color: white;
+	background-size: 6% 100%;
+	border: 1px grey solid;
 }
 
 #wikibrowser > #toolbar > .toolbutton,

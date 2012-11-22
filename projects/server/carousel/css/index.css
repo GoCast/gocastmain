@@ -1436,6 +1436,7 @@ body > #tour > button#imgood {
   border-radius: 3px;
   border: 3px solid #812034;
   background-color: white;
+  z-index: 8000;
 }
 
 #searchwiki > #searchpanel {
@@ -1461,7 +1462,7 @@ body > #tour > button#imgood {
   position: absolute;
   top: -8px;
   right: 0px;
-  z-index: 100;
+  z-index: 8100;
   text-decoration: none;
   color: #812034;
   font-size: 25px;
