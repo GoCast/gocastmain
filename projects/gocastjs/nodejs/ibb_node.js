@@ -1,17 +1,17 @@
 /*jslint node: true, white: true */
-/*global Buffer */
+/*global Buffer, test, cd */
 
 var sys = require('util');
 var xmpp = require('node-xmpp');
 var fs = require('fs');
 var ltx = require('ltx');
-var gcutil = require('./gcutil_node');
+var shelljs = require('shelljs/global');
 
-var argv = process.argv;
+var EventEmitter = require('events').EventEmitter;
 
 'use strict';
 
-var GoCastJS = GoCastJS || {};
+var GoCastJS = require('./gcall_node');
 
 GoCastJS.IBBTransfer = function(client, notifier) {
     var self = this;
@@ -21,13 +21,25 @@ GoCastJS.IBBTransfer = function(client, notifier) {
     this.transfers = {};    // List of ongoing transfers
     this.history = [];      // Array of transfer history for logging/query purposes.
 
-    this.internalHistory('Starting LogCatcher @ ' + Date());
-    if (this.notifier) {
-        setTimeout(function() {
-            self.notifier.sendMessage('Starting LogCatcher @ ' + Date());
-        }, 2000);
+    setTimeout(function() {
+        self.internalHistory('Starting IBB Agent @ ' + Date());
+        self.notifier.sendMessage('Starting IBB Agent @ ' + Date());
+    }, 2000);
+
+};
+sys.inherits(GoCastJS.IBBTransfer, EventEmitter);
+
+GoCastJS.IBBTransfer.prototype.log = function(msg) {
+    console.log(GoCastJS.logDate() + ' - IBBTransfer: ' + msg);
+};
+
+GoCastJS.IBBTransfer.prototype.chdir = function(newdir) {
+    if (!test('-d', newdir)) {
+        throw 'IBBTransfer::chdir - newdir not a directory: ' + newdir;
     }
 
+    this.log('INFO: Received files shall be placed in: ' + newdir);
+    cd(newdir);
 };
 
 //
@@ -97,10 +109,11 @@ GoCastJS.IBBTransfer.prototype.ProcessIQ = function(iq) {
 //
 // \brief Generically, make the key-name from the sid.
 //   But if we have 'room' and 'nick', then use room/nick/sid instead.
+//   If an attribute 'fname' is presented, then use this as the filename directly.
 //
 GoCastJS.IBBTransfer.prototype.GenName = function(iq) {
     var child = iq.getChildByAttr('xmlns', 'http://jabber.org/protocol/ibb'),
-        room, nick, sid;
+        room, nick, sid, givenName;
 
     if (!child) {
         return 'ERROR';
@@ -110,8 +123,13 @@ GoCastJS.IBBTransfer.prototype.GenName = function(iq) {
     nick = child.attrs.nick;
     sid = child.attrs.sid;
 
+    givenName = child.attrs.fname;  // New feature
+
     if (room && nick) {
         return room + '_' + nick + '_' + sid;
+    }
+    else if (givenName) {
+        return givenName;
     }
     else {
         return iq.attrs.from.split('@')[0] + '_' + sid;
@@ -152,7 +170,7 @@ GoCastJS.IBBTransfer.prototype.DumpHistory = function() {
 };
 
 GoCastJS.IBBTransfer.prototype.internalHistory = function(entry) {
-    this.history.push(gcutil.logDate() + ' ' + entry);
+    this.history.push(GoCastJS.logDate() + ' ' + entry);
 
     // Only keep a max number of entries in the history list.
     if (this.history.length > 100) {
@@ -183,6 +201,7 @@ GoCastJS.IBBTransfer.prototype.internalCloseTransfer = function(keyname, error) 
         }
         this.internalHistory(out + ' Success. ');
         console.log(out + ' Success. ');
+        this.emit('received', theTransfer.filename);
     }
 
     // Now let's close it.
@@ -321,7 +340,7 @@ GoCastJS.IBBTransfer.prototype.internalProcessOpen = function(iq) {
     theTransfer = this.transfers[genname];
 
     // Now open a file for this transfer.
-    theTransfer.filename = genname.replace(/@/g, '_at_') + '_' + gcutil.fileDate();
+    theTransfer.filename = genname.replace(/@/g, '_at_') + '_' + GoCastJS.fileDate();
     theTransfer.fsfile = fs.openSync(theTransfer.filename, 'w');
 
     if (!theTransfer.fsfile) {

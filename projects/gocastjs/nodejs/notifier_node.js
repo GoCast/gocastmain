@@ -6,7 +6,7 @@
  TODO
 
  */
-/*jslint node: true */
+/*jslint node: true, white: true */
 var settings = require('./settings');   // Our GoCast settings JS
 if (!settings) {
     settings = {};
@@ -22,10 +22,11 @@ var ltx = require('ltx');
 
 'use strict';
 
-var GoCastJS = GoCastJS || {};
+var GoCastJS = require('./gcall_node');
 
-function Notifier(serverinfo, jidlist) {
-    var users, k, self = this;
+GoCastJS.Notifier = function(serverinfo, jidlist) {
+    var users, k, self = this, startMsg,
+        bOnlineEver = false;
 
     this.server = serverinfo.server || "video.gocast.it";
     this.port = serverinfo.port || 5222;
@@ -35,7 +36,9 @@ function Notifier(serverinfo, jidlist) {
     this.informlist = jidlist;
     this.isOnline = false;
 
-    console.log(GoCastJS.logDate() + " - Notifier started:");
+    startMsg = GoCastJS.logDate() + " - Notifier started:";
+    console.log(startMsg);
+
     users = "  Users to notify: ";
 
     for (k in this.informlist)
@@ -54,15 +57,20 @@ function Notifier(serverinfo, jidlist) {
 
     this.client.on('online',
           function() {
-//          if (!self.isOnline)
-//              console.log(GoCastJS.logDate() + " - Notifier online.");
             self.isOnline = true;
-//          self.sendMessage("Notifier online.");
+
+            if (!bOnlineEver) {
+                bOnlineEver = true;
+
+                // Send these messages out only once.
+                self.sendMessage(startMsg);
+                self.sendMessage(users);
+            }
+
           });
 
     this.client.on('offline',
           function() {
-//          console.log(GoCastJS.logDate() + " - Notifier offline.");
             self.isOnline = false;
           });
 
@@ -70,9 +78,9 @@ function Notifier(serverinfo, jidlist) {
         sys.puts(e);
     });
 
-}
+};
 
-Notifier.prototype.sendMessage = function(msg) {
+GoCastJS.Notifier.prototype.sendMessage = function(msg) {
     var i, len, msg_stanza;
 
     if (this.client && this.isOnline)
@@ -82,10 +90,13 @@ Notifier.prototype.sendMessage = function(msg) {
         for (i = 0; i < len; i += 1)
         {
             msg_stanza = new xmpp.Element('message', {to: this.informlist[i], type: 'chat'})
-                .c('body').t(msg);
+                .c('body').t(GoCastJS.logDate() + ' - Notfier: ' + msg);
             this.client.send(msg_stanza);
         }
     }
+    else {
+        console.log('Notifier: Error: Offline message lost: ' + msg);
+    }
 };
 
-module.exports = Notifier;
+module.exports = GoCastJS;

@@ -62,7 +62,7 @@
  *
  */
 
-/*jslint sloppy: false, todo: true, browser: true, devel: true */
+/*jslint sloppy: false, white: true, todo: true, browser: true, devel: true */
 /*global Buffer */
 'use strict';
 
@@ -1778,9 +1778,9 @@ var Callcast = {
     },
 
     SendLogsToLogCatcher: function(cbSuccess, cbFailure) {
-        var self = this, ibb;
+        var self = this, ibb, datagetfn;
 
-        ibb = new GoCastJS.IBBTransferClient(this.connection, this.room.split('@')[0], this.nick, this.LOGCATCHER, function(max) {
+        datagetfn = function(max) {
             var buf = logQ.removeLinesWithMaxBytes(max);
             if (!buf || buf === '') {
                 return null;
@@ -1788,7 +1788,15 @@ var Callcast = {
             else {
                 return buf;
             }
-        }, Callcast.log, function(msg) {
+        };
+
+        ibb = new GoCastJS.IBBTransferClient({ connection: this.connection,
+                                               room: this.room.split('@')[0],
+                                               nick: this.nick,
+                                               receiver: this.LOGCATCHER,
+                                               cbDataGet: datagetfn,
+                                               cbLog: Callcast.log },
+        function(msg) {
             self.log('SUCCESSFUL LogCatcher send. msg: ' + msg);
             if (cbSuccess) {
                 cbSuccess(msg);
@@ -3121,9 +3129,10 @@ GoCastJS.SendLogsXMPP.prototype.onErrorStanza = function(err) {
 };
 
 GoCastJS.SendLogsXMPP.prototype.SendLogsToLogCatcher = function(cbSuccess, cbFailure) {
-    var self = this, ibb;
+    var self = this, ibb,
+        datagetfn;
 
-    ibb = new GoCastJS.IBBTransferClient(this.connection, this.room.split('@')[0], this.nick, this.LOGCATCHER, function(max) {
+    datagetfn = function(max) {
         var buf = logQ.removeLinesWithMaxBytes(max);
         if (!buf || buf === '') {
             return null;
@@ -3131,13 +3140,74 @@ GoCastJS.SendLogsXMPP.prototype.SendLogsToLogCatcher = function(cbSuccess, cbFai
         else {
             return buf;
         }
-    }, Callcast.log, function(msg) {
+    };
+
+    ibb = new GoCastJS.IBBTransferClient({connection: this.connection,
+                                          room: this.room.split('@')[0],
+                                          nick: this.nick,
+                                          receiver: this.LOGCATCHER,
+                                          cbDataGet: datagetfn,
+                                          cbLog: Callcast.log },
+       function(msg) {
         Callcast.log('SUCCESSFUL LogCatcher send. msg: ' + msg);
         if (cbSuccess) {
             cbSuccess(msg);
         }
     }, function(errmsg) {
         Callcast.log('ERROR: Failed LogCatcher send. msg: ' + msg);
+        if (cbFailure) {
+            cbFailure(msg);
+        }
+    });
+};
+
+GoCastJS.SendFileToFileCatcher = function(connection, room, filecatcher, cbSuccess, cbFailure, url) {
+    this.connection = connection;
+
+    this.room = room;
+    this.FILECATCHER = filecatcher;
+
+    this.cbSuccess = cbSuccess;
+    this.cbFailure = cbFailure;
+};
+
+GoCastJS.SendFileToFileCatcher.prototype.SendFile = function(file, data, cbSuccess, cbFailure) {
+    var self = this, ibb,
+        datagetfn,
+        offset = 0,
+        totalLen = data.length;
+
+    //
+    // data - this is where the binary data for the file is located.
+    //        Dole it out in slices not to exceed 'max'
+    //
+    datagetfn = function(max) {
+        var remaining = totalLen - offset,
+            toSendLen = remaining >= max ? max : remaining;
+
+        if (toSendLen) {
+            // Need to return a buffer here for sending a 'chunk'
+            offset += toSendLen;
+            return data.slice(offset, toSendLen);
+        }
+        else {
+            return null;
+        }
+    };
+
+    ibb = new GoCastJS.IBBTransferClient({connection: this.connection,
+                                          room: this.room.split('@')[0],
+                                          filename: file,
+                                          receiver: this.LOGCATCHER,
+                                          cbDataGet: datagetfn,
+                                          cbLog: Callcast.log },
+       function(msg) {
+        Callcast.log('SUCCESSFUL FileCatcher send. msg: ' + msg);
+        if (cbSuccess) {
+            cbSuccess(msg);
+        }
+    }, function(errmsg) {
+        Callcast.log('ERROR: Failed FileCatcher send. msg: ' + msg);
         if (cbFailure) {
             cbFailure(msg);
         }

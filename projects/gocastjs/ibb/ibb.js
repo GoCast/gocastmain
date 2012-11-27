@@ -46,14 +46,19 @@ GoCastJS.fileDate = function() {
 //      Upon a successful transfer, cbSuccess is called with a message about the transfer.
 //      On failure of any kind a cbFailure(message) is called.
 //
-GoCastJS.IBBTransferClient = function(connection, room, nick, recvr, cbDataGet, cbLog, cbSuccess, cbFailure) {
-    this.RECEIVER = recvr;
+GoCastJS.IBBTransferClient = function(options, cbSuccess, cbFailure) {
+    this.RECEIVER = options.receiver;
     this.BLOCKSIZE = 5500;
-    this.connection = connection;
-    this.cbDataGet = cbDataGet;
-    this.cbLog = cbLog;
-    this.room = room;
-    this.nick = nick;
+    this.connection = options.connection;
+    this.cbDataGet = options.cbDataGet;
+    this.cbLog = options.cbLog;
+    this.room = options.room;
+
+    // For failure logs - send nickname to server.
+    this.nick = options.nick;
+    // In the case of sending a regular file, this option is used instead of 'nick'
+    this.filename = options.filename;
+
     this.cbSuccess = cbSuccess;
     this.cbFailure = cbFailure;
 

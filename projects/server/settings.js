@@ -1,4 +1,4 @@
-/*jslint node: true */
+/*jslint node: true, white: true */
 
 var settings = {};
 
@@ -74,6 +74,13 @@ if (process.env.SETTINGS_DEVEL === 1 || process.env.SETTINGS_DEVEL === '1') {
         password: 'grab.those.dev.bugreports'
     };
 
+    settings.filecatcher = {
+        username: 'filecatcher@' + settings.SERVERNAME + '/filecatcher',
+        password: 'receving.and.sharing.files',
+        dest: '/home/ec2-user/fileshare',
+        link: '/var/www/dev/fileshare'
+    };
+
     settings.feedbackbot = {
         username: 'feedback_bot_dev@' + settings.SERVERNAME,
         password: 'feedback.is.good.burp'
@@ -82,7 +89,7 @@ if (process.env.SETTINGS_DEVEL === 1 || process.env.SETTINGS_DEVEL === '1') {
     settings.notifier = {
         username: 'notifier@' + settings.SERVERNAME,
         password: 'reporting.lots.to.you',
-        notify_list: ['rwolff@dnle.gocast.it']
+        notify_list: ['rwolff@dnle.gocast.it', 'rwolff@dev.gocast.it']
     };
 
 }
