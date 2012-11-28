@@ -2893,6 +2893,7 @@ function startTour(tourSelector) {
     '.whiteBoard > .wbDiv > div#wbTools',
     '.whiteBoard > .zoom, #zoom > .close',
     '#lower-right > input#addEditor',
+    '#lower-right > input#addWiki',
     'div#groupChat > div#msgBoard > input.chatTo',
     '#upper-right > input[class*=fb], #upper-right > input[class*=copyData]',
     '#upper-left > div#feedback'
@@ -2926,6 +2927,9 @@ function startTour(tourSelector) {
                   'Any changes to the notepad\'s content is reflected to everyone in the room.' +
                   '<p></p>Try it. <p></p>NOTE: As of now, you can edit with other people in the room as long as its done one at a time. ' +
                   'If two or more people try to edit at the same time, one or more of the attempted changes might be lost.'},
+    {title:       'Collaborative Wikipedia',
+     description: 'The flashing Wiki icon on the lower right hand corner of your screen lets you add a collaborative Wikipedia browser ' +
+                  'to the carousel. With this, you can open and share any Wiki document with everyone in the meeting.'},
     {title:       'Posting Comments To The Room',
      description: 'The flashing comments bar is the place where you can make a comment to the room. ' +
                   'Click in the text box to type. Click the Post button - or the Return key - and your comments will be displayed. ' +

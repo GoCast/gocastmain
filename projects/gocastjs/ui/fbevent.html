@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<style type="text/css">
+			html {
+				width: 100%;
+			}
+
+			.fbdialog {
+				position: absolute;
+				left: 100px;
+				top: 50px;
+				width: 400px;
+				height: 400px;
+				border: 1px #3B5998 solid;
+				font-family: 'lucida grande', tahoma, verdana, arial, sans-serif;
+			}
+
+			.fbdialog > .header {
+				position: absolute;
+				left: 0px;
+				top: 0px;
+				width: 395px;
+				height: 50px;
+				line-height: 50px;
+				color: white;
+				padding-left: 5px;
+				background-color: #6D84B4;
+				font-weight: bold;
+			}
+
+			.fbdialog > .infopanel {
+				position: absolute;
+				left: 0px;
+				top: 50px;
+				width: 390px;
+				height: 300px;
+				padding-left: 5px;
+				padding-right: 5px;
+			}
+
+			.fbdialog > .infopanel > table {
+				width: 100%;
+				height: 100%;
+				border: none;
+				font-size: 14px;
+				margin-top: 7px;
+			}
+
+			.fbdialog > .infopanel > table th {
+				text-align: left;
+				padding-left: 10px;
+			}
+
+			.fbdialog > .infopanel > table .field {
+				outline: none;
+				text-decoration: none;
+				border: 1px darkgrey solid;
+				box-shadow: inset 0px 0px 1px grey;
+				-webkit-box-shadow: inset 0px 0px 1px grey;
+				-moz-box-shadow: inset 0px 0px 1px grey;
+				color: grey;
+				width: 90%;
+				height: 30px;
+				padding-left: 10px;
+				resize: none;
+				font-size: 12px;
+				font-family: 'lucida grande', tahoma, verdana, arial, sans-serif;
+			}
+
+			.fbdialog > .infopanel > table .field:focus {
+				color: black;
+				border: 1px black solid;
+				box-shadow: 1px 1px 1px black;
+				-webkit-box-shadow: 1px 1px 1px black;
+				-moz-box-shadow: 1px 1px 1px black;
+			}
+
+			.fbdialog > .infopanel > table #details {
+				height: 100px;
+				padding-top: 5px;
+				padding-bottom: 5px;
+			}
+
+			.fbdialog > .actionpanel {
+				position: absolute;
+				left: 0px;
+				top: 350px;
+				width: 390px;
+				height: 49px;
+				padding-left: 5px;
+				padding-right: 5px;
+				border-top: 1px #888 solid;
+				background-color: #F2F2F2;
+			}
+
+			.fbdialog > .actionpanel > .button {
+				outline: none;
+				text-decoration: none;
+				float: right;
+				padding-left: 10px;
+				padding-right: 10px;
+				padding-top: 5px;
+				padding-bottom: 5px;
+				margin-top: 10px;
+				margin-left: 10px;
+				border-radius: 2px;
+			}
+
+			.fbdialog > .actionpanel > .button.positive {
+				color: white;
+				background: -webkit-gradient(linear, center bottom, center top, from(#3B5998), to(#6D84B4));
+				background: -moz-linear-gradient(bottom, #3B5998, #6D84B4);
+				border: 1px #3B5998 solid;
+			}
+
+			.fbdialog > .actionpanel > .button.negative {
+				color: black;
+				background: -webkit-gradient(linear, center bottom, center top, from(rgb(200,200,200)), to(rgb(255,255,255)));
+				background: -moz-linear-gradient(bottom, rgb(200,200,200), rgb(255,255,255));
+				border: 1px #888 solid;
+			}			
+		</style>
+		<script type="text/javascript">
+		</script>
+	</head>
+	<body>
+		<div id="fbevent" class="fbdialog">
+			<div id="title" class="header">
+				Schedule Meeting on Facebook
+			</div>
+			<div id="infopanel" class="infopanel">
+				<table>
+					<tr valign="top">
+						<th>
+							<label>Topic</label>
+						</th>
+						<td>
+							<input id="topic" type="text" class="field" placeholder="ex: Planning Session"/>
+						</td>
+					</tr>
+					<tr valign="top">
+						<th>
+							<label>Details</label>
+						</th>
+						<td>
+							<textarea id="details" class="field" placeholder="ex: We will be discussing a plan to surprise Jim on his birthday"></textarea>
+						</td>
+					</tr>
+					<tr valign="top">
+						<th>
+							<label>Where</label>
+						</th>
+						<td>
+							<input id="where" type="text" class="field"/>
+						</td>
+					</tr>
+					<tr valign="top">
+						<th>
+							<label>When</label>
+						</th>
+						<td>
+							<input id="when" type="text" class="field" placeholder="ex: 10/10/2012"/>
+						</td>
+					</tr>
+				</table>
+			</div>
+			<div id="actionpanel" class="actionpanel">
+				<a id="cancel" class="button negative" href="javascript:void(0);">Cancel</a>
+				<a id="create" class="button positive" href="javascript:void(0);">Create</a>
+			</div>
+		</div>
+	</body>
+</html>
