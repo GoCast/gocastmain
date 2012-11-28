@@ -133,6 +133,7 @@
       <!--<input class="twitter gc-icon" type="button" title="Send message to Twitter." onclick="sendTwitter();"/>-->
       <input class="fbSend gc-icon"  type="button" title="Send facebook message." onclick="fbSendDialog();"/>
       <input class="fbShare gc-icon" type="button" title="Share on wall." onclick="fbShare();"/>
+      <input class="fbShare gc-icon" type="button" title="Create meeting event." onclick="fbEvent();"/>
 
       <div id="status-prompt" class="warning">
         <p id="message">The speaker volume is too low for you to hear!</p>
@@ -382,6 +383,64 @@
       <div id="searchpanel">
         <input id="searchkey" type="text" placeholder="enter search topic"/>
         <button id="searchbutton">GO</button>
+      </div>
+    </div>
+    <div id="fbevent" class="fbdialog">
+      <div id="title" class="header">
+        Create Meeting Event
+      </div>
+      <div id="infopanel" class="infopanel">
+        <table>
+          <tr valign="top">
+            <th>
+              <label>Topic</label>
+            </th>
+            <td>
+              <input id="topic" type="text" class="field" placeholder="ex: Planning Session"/>
+            </td>
+          </tr>
+          <tr valign="top">
+            <th>
+              <label>Details</label>
+            </th>
+            <td>
+              <textarea id="details" class="field" placeholder="ex: We will be discussing a plan to surprise Jim on his birthday"></textarea>
+            </td>
+          </tr>
+          <tr valign="top">
+            <th>
+              <label>Where</label>
+            </th>
+            <td>
+              <div id="roomlink" class="field"></div>
+            </td>
+          </tr>
+          <tr valign="top">
+            <th>
+              <label>When</label>
+            </th>
+            <td>
+              <input id="whendate" style="width: 35%;" type="text" class="field" placeholder="Date (mm/dd/yyyy)"/>
+              <input id="whentime" style="width: 35.3%;" type="text" class="field" placeholder="Time (hh:mm AM|PM)"/>
+            </td>
+          </tr>
+          <tr valign="top">
+            <th>
+              <label>Privacy</label>
+            </th>
+            <td>
+              <select id="privacy" class="field" style="width: 78%;"/>
+                <option value="OPEN">Public</option>
+                <option value="FRIENDS">Friends</option>
+                <option value="SECRET">Invite Only</option>
+              </select>
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div id="actionpanel" class="actionpanel">
+        <a id="cancel" class="button negative" href="javascript:void(0);">Cancel</a>
+        <a id="create" class="button positive" href="javascript:void(0);">Create</a>
       </div>
     </div>
   </body>

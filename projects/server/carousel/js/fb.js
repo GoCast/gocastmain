@@ -75,10 +75,10 @@ GoCastJS.FB.prototype.HasPermissionFor = function(permslist, cb) {
 
     if (!this.perms) {
         this.GetPermissions(function(result) {
-            return iter();
+            cb(iter());
         });
     } else {
-        return iter();
+        cb(iter());
     }
 };
 
@@ -432,6 +432,35 @@ function fbSendDialog()
     }
   });
 }
+
+GoCastJS.FacebookEvent = {
+  opendialog: function(dlgSelector, maskSelector) {
+    var winW = $(window).width(),
+      winH = $(window).height(),
+      self = this;
+
+    $(maskSelector).css({
+      'width': winW + 'px',
+      'height': winH + 'px'
+    }).fadeIn('slow', function() {
+      var $dlg = $(dlgSelector);
+      $dlg.css({
+        'left': (winW - $dlg.width())/2 + 'px',
+        'top': (winH - $dlg.height())/2 + 'px',
+        'z-index': $(this).css('z-index') + 1
+      }).addClass('show');
+      $('#roomlink', $dlg).text(window.location.href);
+      $('#cancel', $dlg).unbind('click').click(self.cancelclickCb($dlg, $(this)));
+    });
+  },
+  cancelclickCb: function($dlg, $mask) {
+    return function() {
+      $dlg.removeClass('show');
+      $mask.fadeOut('slow');
+    };
+  },
+  createclickCb: function($dlg, $mask) {} 
+};
 
 /* version using stream.share
 function fbSendDialog()
