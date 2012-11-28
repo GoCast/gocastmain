@@ -240,7 +240,6 @@ GoCastJS.FileCatcher.prototype.handleIq = function(iq) {
     else if (iq.attrs.type === 'set' && iq.getChildByAttr('xmlns', 'http://jabber.org/protocol/ibb')) {
         // We have an inbound IBB log request.
         if (this.IBB) {
-            this.log('Inbound IBB transfer - processing.');
             this.IBB.ProcessIQ(iq);
         }
         else {

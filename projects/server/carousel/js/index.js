@@ -2467,7 +2467,8 @@ $(document).ready(function(
                         FEEDBACK_BOT: 'feedback_bot_dnle@dnle.gocast.it',
                         ROOMMANAGER: 'roommanager@dnle.gocast.it/roommanager',
                         SWITCHBOARD_FB: 'switchboard_dnle@dnle.gocast.it',
-                        LOGCATCHER: 'logcatcher@dnle.gocast.it/logcatcher'});
+                        LOGCATCHER: 'logcatcher@dnle.gocast.it/logcatcher',
+                        FILECATCHER: 'filecatcher@dnle.gocast.it/filecatcher'});
   }
   else if (window.location.hostname.toLowerCase() === 'creativity.gocast.it') {
     Callcast.InitOverride({ CALLCAST_XMPPSERVER: 'dnle.gocast.it',
@@ -2477,7 +2478,8 @@ $(document).ready(function(
                         FEEDBACK_BOT: 'feedback_bot_ccc@dnle.gocast.it',
                         ROOMMANAGER: 'ccc_roommanager@dnle.gocast.it/roommanager',
                         SWITCHBOARD_FB: 'switchboard_ccc@dnle.gocast.it',
-                        LOGCATCHER: 'ccc_logcatcher@dnle.gocast.it/logcatcher'});
+                        LOGCATCHER: 'ccc_logcatcher@dnle.gocast.it/logcatcher',
+                        FILECATCHER: 'ccc_filecatcher@video.gocast.it/filecatcher'});
   }
   else if (window.location.hostname.toLowerCase() === 'dev.gocast.it') {
     Callcast.InitOverride({ CALLCAST_XMPPSERVER: 'dev.gocast.it',
@@ -2487,7 +2489,8 @@ $(document).ready(function(
                         FEEDBACK_BOT: 'feedback_bot_dev@dev.gocast.it',
                         ROOMMANAGER: 'roommanager@dev.gocast.it/roommanager',
                         SWITCHBOARD_FB: 'switchboard_dev@dev.gocast.it',
-                        LOGCATCHER: 'logcatcher@dev.gocast.it/logcatcher'});
+                        LOGCATCHER: 'logcatcher@dev.gocast.it/logcatcher',
+                        FILECATCHER: 'filecatcher@dev.gocast.it/filecatcher'});
   }
 
   openWindow('#waitingToJoin');
@@ -2810,7 +2813,7 @@ function showWikiSearch(goclickCallback) {
         $(this).unbind('mouseup');
         return false;
       });
-    } 
+    }
   }).unbind('keypress').keypress(function(event) {
     var keycode = event.which || event.keyCode;
     if (keycode === 13) {

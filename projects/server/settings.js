@@ -77,8 +77,7 @@ if (process.env.SETTINGS_DEVEL === 1 || process.env.SETTINGS_DEVEL === '1') {
     settings.filecatcher = {
         username: 'filecatcher@' + settings.SERVERNAME + '/filecatcher',
         password: 'receving.and.sharing.files',
-        dest: '/home/ec2-user/fileshare',
-        link: '/var/www/dev/fileshare'
+        dest: '/home/ec2-user/fileshare'
     };
 
     settings.feedbackbot = {

@@ -67,14 +67,26 @@ GoCastJS.IBBTransferClient = function(options, cbSuccess, cbFailure) {
     this.bytesSent = 0;
     this.seq = 0;
 
-    var self = this, msg;
+    var self = this, msg, attrs;
 
     this.log('Opening up an IBB transfer request.');
 
     // Open up the connection
+    if (this.nick) {
+        // Let the server create the file name from room, nick, and sid.
+        console.log('IBB: Sending log with room, nick, sid.');
+        attrs = {xmlns: this.XMLNS, room: this.room, nick: this.nick,
+                        sid: this.sid, 'block-size': this.BLOCKSIZE, stanza: 'iq'};
+    }
+    else {
+        // Use fname attribute to designate the file name on the server side.
+        console.log('IBB: Sending a file with fname and room.');
+        attrs = {xmlns: this.XMLNS, room: this.room, fname: this.filename,
+                        sid: this.sid, 'block-size': this.BLOCKSIZE, stanza: 'iq'};
+    }
+
     this.connection.sendIQ($iq({to: this.RECEIVER, type: 'set'})
-                    .c('open', {xmlns: this.XMLNS, room: this.room, nick: this.nick,
-                                sid: this.sid, 'block-size': this.BLOCKSIZE, stanza: 'iq'}),
+                    .c('open', attrs),
     // Successful callback...
     function(iq) {
         // Start sending data in blocks.
@@ -99,10 +111,17 @@ GoCastJS.IBBTransferClient.prototype.log = function(msg) {
 };
 
 GoCastJS.IBBTransferClient.prototype.SendClose = function() {
-    var self = this, msg;
+    var self = this, msg, attrs;
+
+    if (this.nick) {
+        attrs = {xmlns: this.XMLNS, room: this.room, nick: this.nick, sid: this.sid};
+    }
+    else {
+        attrs = {xmlns: this.XMLNS, room: this.room, fname: this.filename, sid: this.sid};
+    }
 
     this.connection.sendIQ($iq({to: this.RECEIVER, type: 'set'})
-                    .c('close', {xmlns: this.XMLNS, room: this.room, nick: this.nick, sid: this.sid}),
+                    .c('close', attrs),
     // Successful callback...
     function(iq) {
         // We're complete-complete.
@@ -123,7 +142,7 @@ GoCastJS.IBBTransferClient.prototype.SendClose = function() {
 GoCastJS.IBBTransferClient.prototype.SendData = function() {
     var data, encodedData,
         self = this,
-        msg, iqData;
+        msg, iqData, attrs;
 
     // Must ask for less data than we said would be our max due to base64 encoding
     // being a 3bytes-in gets 4bytes-out formula.
@@ -139,10 +158,15 @@ GoCastJS.IBBTransferClient.prototype.SendData = function() {
     encodedData = $.base64.encode(data);
 //    this.log('IBB.SendData: encoded length: ' + encodedData.length);
 
+    if (this.nick) {
+        attrs = {xmlns: this.XMLNS, room: this.room, nick: this.nick, sid: this.sid, seq: this.seq };
+    }
+    else {
+        attrs = {xmlns: this.XMLNS, room: this.room, fname: this.filename, sid: this.sid, seq: this.seq};
+    }
+
     iqData = $iq({to: this.RECEIVER, type: 'set'})
-                    .c('data', {xmlns: this.XMLNS, room: this.room, nick: this.nick,
-                                sid: this.sid, seq: this.seq})
-                    .t(encodedData);
+                    .c('data', attrs).t(encodedData);
 //    this.log('IBB.SendData: iq length is: ' + iqData.length + ' iqData is: ' + iqData.toString());
 
     // Keep sending data blocks until we get a failure or until we're out of data.

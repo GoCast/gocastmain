@@ -221,6 +221,7 @@ var Callcast = {
     ROOMMANAGER: 'overseer@video.gocast.it/roommanager',
     SWITCHBOARD_FB: 'switchboard_gocastfriends@video.gocast.it',
     LOGCATCHER: 'logcatcher@video.gocast.it/logcatcher',
+    FILECATCHER: 'filecatcher@video.gocast.it/filecatcher',
     Callback_AddSpot: null,
     Callback_RemoveSpot: null,
     Callback_SetSpot: null,
@@ -3161,14 +3162,11 @@ GoCastJS.SendLogsXMPP.prototype.SendLogsToLogCatcher = function(cbSuccess, cbFai
     });
 };
 
-GoCastJS.SendFileToFileCatcher = function(connection, room, filecatcher, cbSuccess, cbFailure, url) {
+GoCastJS.SendFileToFileCatcher = function(connection, room, filecatcher) {
     this.connection = connection;
 
-    this.room = room;
+    this.room = room.split('@')[0];
     this.FILECATCHER = filecatcher;
-
-    this.cbSuccess = cbSuccess;
-    this.cbFailure = cbFailure;
 };
 
 GoCastJS.SendFileToFileCatcher.prototype.SendFile = function(file, data, cbSuccess, cbFailure) {
@@ -3183,12 +3181,14 @@ GoCastJS.SendFileToFileCatcher.prototype.SendFile = function(file, data, cbSucce
     //
     datagetfn = function(max) {
         var remaining = totalLen - offset,
-            toSendLen = remaining >= max ? max : remaining;
+            toSendLen = remaining >= max ? max : remaining,
+            toRet;
 
         if (toSendLen) {
             // Need to return a buffer here for sending a 'chunk'
+            toRet = data.slice(offset, offset + toSendLen);
             offset += toSendLen;
-            return data.slice(offset, toSendLen);
+            return toRet;
         }
         else {
             return null;
@@ -3198,7 +3198,7 @@ GoCastJS.SendFileToFileCatcher.prototype.SendFile = function(file, data, cbSucce
     ibb = new GoCastJS.IBBTransferClient({connection: this.connection,
                                           room: this.room.split('@')[0],
                                           filename: file,
-                                          receiver: this.LOGCATCHER,
+                                          receiver: this.FILECATCHER,
                                           cbDataGet: datagetfn,
                                           cbLog: Callcast.log },
        function(msg) {

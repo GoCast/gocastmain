@@ -70,8 +70,4 @@ var filecatcher = new GoCastJS.FileCatcher();
 filecatcher.on('received', function(received) {
     console.log('FILECATCHER: RECEIVED FILE: ' + received);
 });
-filecatcher.on('tick', function(time) {
-    console.log('TICK: ' + time);
-});
-
 

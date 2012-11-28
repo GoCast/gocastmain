@@ -1,5 +1,5 @@
 /*jslint node: true, white: true */
-/*global Buffer, test, cd */
+/*global Buffer, test, cd, mkdir, exec */
 
 var sys = require('util');
 var xmpp = require('node-xmpp');
@@ -64,8 +64,27 @@ GoCastJS.IBBTransfer.prototype.SendError = function(iq, type, subtype, reason) {
     return;
 };
 
+//
+// If this was a filename for sharing, iq.child.fname will be set. Send back the result with the hash-name
+// for the soft link as part of the result.
+//
+// for now, hashname can be simple room_fname_sid since 'sid' is per client unique and so hard to guess filenames
+// by hackers. Later may need a real hash if it becomes a problem.
+//
 GoCastJS.IBBTransfer.prototype.SendResult = function(iq) {
-    this.client.send(new ltx.Element('iq', {to: iq.attrs.from, type: 'result', id: iq.attrs.id}).root());
+    var child = iq.getChildByAttr('xmlns', 'http://jabber.org/protocol/ibb');
+
+    if (!child.attrs.fname) {
+        this.client.send(new ltx.Element('iq',
+            {to: iq.attrs.from, type: 'result', id: iq.attrs.id }).root());
+    }
+    else if (child.attrs.room && child.attrs.sid) {
+        this.client.send(new ltx.Element('iq',
+            {to: iq.attrs.from, type: 'result', id: iq.attrs.id, hashname: this.GenHashName(iq)}).root());
+    }
+    else {
+        this.log('RESULT: ERROR: Errant child information: ', child.toString());
+    }
 //    console.log('SendResult: History: ' + this.DumpHistory());
 };
 
@@ -87,6 +106,8 @@ GoCastJS.IBBTransfer.prototype.ProcessIQ = function(iq) {
 
     // Process the various iq's in the IBB protocol.
     child = iq.getChildByAttr('xmlns', 'http://jabber.org/protocol/ibb');
+
+//    this.log('Inbound IQ received: ' + child.toString());
 
     // First - if we get 'open', it's a new request.
     command = child.getName();
@@ -134,6 +155,26 @@ GoCastJS.IBBTransfer.prototype.GenName = function(iq) {
     else {
         return iq.attrs.from.split('@')[0] + '_' + sid;
     }
+};
+
+GoCastJS.IBBTransfer.prototype.GenHashName = function(iq) {
+    var child = iq.getChildByAttr('xmlns', 'http://jabber.org/protocol/ibb'),
+        sid, givenName;
+
+    if (!child) {
+        return 'ERROR-no-child';
+    }
+
+    sid = child.attrs.sid;
+    givenName = child.attrs.fname;  // New feature
+
+    if (givenName && sid) {
+        // Note, by having givenName last, we automatically get the link name having the same extension as the given name.
+        return sid + '_' + givenName;
+    }
+
+    console.log('GenHashName: ERROR: fname(' + givenName + '), or sid(' + sid + ') missing.');
+    return 'ERROR-no-room-and-fname';
 };
 
 GoCastJS.IBBTransfer.prototype.DumpActiveTransfers = function() {
@@ -195,7 +236,7 @@ GoCastJS.IBBTransfer.prototype.internalCloseTransfer = function(keyname, error) 
     }
     else {
         if (this.notifier) {
-            this.notifier.sendMessage('LogCatcher: IBB - Successfully received log from room_nick_sid: ' + theTransfer.genname
+            this.notifier.sendMessage('LogCatcher: IBB - Successfully received file/log: ' + theTransfer.genname
                 + ', bytes: ' + theTransfer.bytesTransferred
                 + ', filename: ' + theTransfer.filename);
         }
@@ -213,7 +254,8 @@ GoCastJS.IBBTransfer.prototype.internalCloseTransfer = function(keyname, error) 
 
 GoCastJS.IBBTransfer.prototype.internalProcessClose = function(iq) {
     var child = iq.getChildByAttr('xmlns', 'http://jabber.org/protocol/ibb'),
-        sid_inbound, genname, theTransfer;
+        sid_inbound, genname, theTransfer,
+        toRun, hashname, room, self = this;
 
 //    console.log('internalProcessClose: History: ' + this.DumpHistory());
 //    console.log('CLOSE: iq: ', iq);
@@ -229,6 +271,7 @@ GoCastJS.IBBTransfer.prototype.internalProcessClose = function(iq) {
     }
 
     if (!theTransfer) {
+        this.log('ERROR: Transfer name/sid not found: ' + sid_inbound + ', name: ' + genname);
         this.SendError(iq, 'cancel', 'item-not-found',
                         'A transfer of this sid name is not open/active: ' + sid_inbound);
         this.SendClose(iq, sid_inbound, ' Close: Cannot find sid: ' + sid_inbound);
@@ -236,6 +279,32 @@ GoCastJS.IBBTransfer.prototype.internalProcessClose = function(iq) {
     }
 
     this.internalCloseTransfer(genname);
+
+    // Already closed - need to soft-link the file received now.
+    room = child.attrs.room;
+
+    // Now for the hash and soft link...
+    if (!test('-d', 'hashes')) {
+        mkdir('hashes');
+    }
+
+    // Now ensure that hashes/room exists
+    if (!test('-d', 'hashes/' + room)) {
+        mkdir('hashes/' + room);
+    }
+
+    hashname = this.GenHashName(iq);
+
+    this.log('internalProcessClose: Fileshare name: ' + theTransfer.filename + ', hashname: ' + hashname);
+    // Now link the hashed name in hashes/room/hashname to room/filename
+    toRun = 'ln -f -s ../../' + theTransfer.filename + ' hashes/' + room + '/' + hashname;
+//    this.log('internalCloseTransfer: Linking: ' + toRun);
+    exec(toRun, function(code, output) {
+        if (code !== 0) {
+            self.log('internalProcessClose: ERROR running "ln":' + toRun + ', output:' + output);
+        }
+    });
+
     this.SendResult(iq);
 };
 
@@ -285,7 +354,7 @@ GoCastJS.IBBTransfer.prototype.internalProcessData = function(iq) {
     // Make a buffer of base64 and return binary from it. Then pass that into a binary buffer.
     // That final binary buffer gets passed into .write()
     dataBlock = new Buffer(new Buffer(child.getText(), 'base64').toString('binary'), 'binary');
-    console.log('DATA: INFO: Received: ', dataBlock);
+//    console.log('DATA: INFO: Received: ', dataBlock);
 
 // Synchronous method.
 //    console.log('Wrote ' + fs.writeSync(theTransfer.fsfile, dataBlock, 0, dataBlock.length, null) + ' bytes.');
@@ -307,7 +376,7 @@ GoCastJS.IBBTransfer.prototype.internalProcessData = function(iq) {
 
 GoCastJS.IBBTransfer.prototype.internalProcessOpen = function(iq) {
     var child = iq.getChildByAttr('xmlns', 'http://jabber.org/protocol/ibb'),
-        genname, theTransfer;
+        genname, room, theTransfer;
 
     genname = this.GenName(iq);
 
@@ -338,9 +407,29 @@ GoCastJS.IBBTransfer.prototype.internalProcessOpen = function(iq) {
                                                     bytesTransferred: 0};
 
     theTransfer = this.transfers[genname];
+    room = child.attrs.room;
 
     // Now open a file for this transfer.
-    theTransfer.filename = genname.replace(/@/g, '_at_') + '_' + GoCastJS.fileDate();
+    // If we have 'nick' attribute, it's a log file. If we have 'fname' then it's a file share.
+    if (!child.attrs.fname) {
+        theTransfer.filename = genname.replace(/@/g, '_at_') + '_' + GoCastJS.fileDate();
+    }
+    else if (room && child.attrs.fname) {
+        // We need to open this file in 'room/genname' and also make a soft link for the website.
+        // However, linking will not occur until the transfer is successful. Then the file exists.
+        theTransfer.filename = room + '/' + genname.replace(/@/g, '_at_');
+
+        if (!test('-d', room)) {
+            mkdir(room);
+        }
+
+        this.log('OPEN: Fileshare name: ' + theTransfer.filename);
+    }
+    else {
+        console.log('OPEN: ERROR: attributes inconsistent: ', child.attrs.toString());
+        theTransfer.filename = 'error';
+    }
+
     theTransfer.fsfile = fs.openSync(theTransfer.filename, 'w');
 
     if (!theTransfer.fsfile) {
