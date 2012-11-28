@@ -1,4 +1,4 @@
-/*jslint sloppy: false, todo: true, browser: true, devel: true */
+/*jslint sloppy: false, todo: true, browser: true, devel: true, white: true */
 'use strict';
 
 var GoCastJS = GoCastJS || {};
@@ -48,7 +48,7 @@ GoCastJS.fileDate = function() {
 //
 GoCastJS.IBBTransferClient = function(connection, room, nick, recvr, cbDataGet, cbLog, cbSuccess, cbFailure) {
     this.RECEIVER = recvr;
-    this.BLOCKSIZE = 4096;
+    this.BLOCKSIZE = 5500;
     this.connection = connection;
     this.cbDataGet = cbDataGet;
     this.cbLog = cbLog;
@@ -116,22 +116,32 @@ GoCastJS.IBBTransferClient.prototype.SendClose = function() {
 };
 
 GoCastJS.IBBTransferClient.prototype.SendData = function() {
-    var data, self = this, msg;
+    var data, encodedData,
+        self = this,
+        msg, iqData;
 
-    data = this.cbDataGet(this.BLOCKSIZE);  // Raw data in string form.
+    // Must ask for less data than we said would be our max due to base64 encoding
+    // being a 3bytes-in gets 4bytes-out formula.
+    data = this.cbDataGet(Math.floor((this.BLOCKSIZE * 3) / 4));  // Raw data in string form.
     if (!data || data === '') {
         this.log('No more data. Sending close message.');
         this.SendClose();
         return;
     }
 
-//    this.log('Data-block to send: ' + data);
+//    this.log('IBB.SendData: Asked for: ' + Math.floor((this.BLOCKSIZE * 3) / 4) ' bytes. Got ' + data.length + ' bytes to send.');
 
-    // Keep sending data blocks until we get a failure or until we're out of data.
-    this.connection.sendIQ($iq({to: this.RECEIVER, type: 'set'})
+    encodedData = $.base64.encode(data);
+//    this.log('IBB.SendData: encoded length: ' + encodedData.length);
+
+    iqData = $iq({to: this.RECEIVER, type: 'set'})
                     .c('data', {xmlns: this.XMLNS, room: this.room, nick: this.nick,
                                 sid: this.sid, seq: this.seq})
-                    .t($.base64.encode(data)),
+                    .t(encodedData);
+//    this.log('IBB.SendData: iq length is: ' + iqData.length + ' iqData is: ' + iqData.toString());
+
+    // Keep sending data blocks until we get a failure or until we're out of data.
+    this.connection.sendIQ(iqData,
     // Successful callback...
     function(iq) {
         // Sent one. Update and prep for another.
