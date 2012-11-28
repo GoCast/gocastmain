@@ -3,8 +3,8 @@
  * \brief initialize facebook api.
  */
 
-/*jslint sloppy: false, todo: true, browser: true, devel: true */
-/*global FB, app */
+/*jslint sloppy: false, todo: true, browser: true, devel: true, white: true */
+/*global FB, app, Callcast */
 
 'use strict';
 
@@ -152,6 +152,9 @@ GoCastJS.FB.prototype.CreateEvent = function(eventName, start_time, options, cbS
 
     if (start_time instanceof Date) {
         evopts.start_time = start_time.toISOString();
+    }
+    else {
+        evopts.start_time = start_time;
     }
 
     if (evopts.end_time instanceof Date) {
