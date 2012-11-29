@@ -451,7 +451,24 @@ GoCastJS.FacebookEvent = {
       }).addClass('show');
       $('#roomlink', $dlg).text(window.location.href);
       $('#cancel', $dlg).unbind('click').click(self.cancelclickCb($dlg, $(this)));
+      $('#invite', $dlg).unbind('click').click(self.inviteclickCb($dlg));
     });
+  },
+  inviteclickCb: function($dlg) {
+    return function() {
+      $('#friends', $dlg).addClass('show').css({
+        'left': '0px',
+        'bottom': '0px'
+      }).jfmfs({
+        labels: {
+          filter_default: 'Type here to narrow down',
+          filter_title: 'Search Friends: '
+        },
+        close_window: function() {
+          $('#friends', $dlg).removeClass('show');
+        }
+      });
+    };
   },
   cancelclickCb: function($dlg, $mask) {
     return function() {

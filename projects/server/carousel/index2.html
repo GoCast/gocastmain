@@ -39,6 +39,8 @@
     <link rel="stylesheet" href="css/index.css?GOCASTTIMESTAMP" type="text/css" />
     <link rel="stylesheet" href="css/jquery-ui.css?GOCASTTIMESTAMP" type="text/css" />
     <link rel="stylesheet" href="css/jquery.cleditor.css?GOCASTTIMESTAMP" type="text/css" />
+    <link rel="stylesheet" href="css/kalendae.css?GOCASTTIMESTAMP" type="text/css" charset="utf-8" />
+    <link rel="stylesheet" href="css/jquery.facebook.multifriend.select-list.css?GOCASTTIMESTAMP" type="text/css" />
 
     <script type="text/javascript">
       if (!window.console) {
@@ -66,6 +68,8 @@
     <script type="text/javascript" src="js/gcedit.js?GOCASTTIMESTAMP"></script>
     <script type="text/javascript" src="js/wiki.js?GOCASTTIMESTAMP"></script>
     <script type="text/javascript" src="js/index.js?GOCASTTIMESTAMP"></script>
+    <script type="text/javascript" src="js/kalendae.js?GOCASTTIMESTAMP" charset="utf-8"></script>
+    <script type="text/javascript" src="js/jquery.facebook.multifriend.select.js?GOCASTTIMESTAMP"></script>
 
     <!-- ---------------------------------------------------------- -->
 
@@ -420,8 +424,10 @@
               <label>When</label>
             </th>
             <td>
-              <input id="whendate" style="width: 35%;" type="text" class="field" placeholder="Date (mm/dd/yyyy)"/>
-              <input id="whentime" style="width: 35.3%;" type="text" class="field" placeholder="Time (hh:mm AM|PM)"/>
+              <input id="whendate" style="width: 35%;" type="text" class="field auto-kal"
+                     placeholder="Date (mm/dd/yyyy)" data-kal="months: 1, direction: 'future'"/>
+              <input id="whentime" style="width: 35.3%;" type="text" class="field"
+                     placeholder="Time (hh:mm AM|PM)"/>
             </td>
           </tr>
           <tr valign="top">
@@ -439,6 +445,8 @@
         </table>
       </div>
       <div id="actionpanel" class="actionpanel">
+        <div id="friends"></div>
+        <a id="invite" class="button" href="javascript:void(0);">Invite Friends</a>
         <a id="cancel" class="button negative" href="javascript:void(0);">Cancel</a>
         <a id="create" class="button positive" href="javascript:void(0);">Create</a>
       </div>

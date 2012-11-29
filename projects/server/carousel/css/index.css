@@ -1552,7 +1552,7 @@ body > #tour > button#imgood {
 }
 
 .fbdialog > .infopanel > table #details {
-  height: 100px;
+  height: 60px;
   padding-top: 5px;
   padding-bottom: 5px;
 }
@@ -1579,7 +1579,14 @@ body > #tour > button#imgood {
   padding-bottom: 5px;
   margin-top: 10px;
   margin-left: 10px;
+  margin-right: 10px;
   border-radius: 2px;
+}
+
+.fbdialog > .actionpanel > #invite {
+  float: left;
+  padding-left: 0px;
+  text-decoration: underline;
 }
 
 .fbdialog > .actionpanel > .button.positive {
@@ -1594,6 +1601,18 @@ body > #tour > button#imgood {
   background: -webkit-gradient(linear, center bottom, center top, from(rgb(200,200,200)), to(rgb(255,255,255)));
   background: -moz-linear-gradient(bottom, rgb(200,200,200), rgb(255,255,255));
   border: 1px #888 solid;
-}     
+}
 
+.fbdialog > .actionpanel > #friends {
+  display: none;
+  position: absolute;
+  width: 100%;
+  height: auto;
+  background-color: white;
+  border: 1px black solid;
+}
+
+.fbdialog > .actionpanel > #friends.show {
+  display: block;
+}
 /*</MANJESH>*/
