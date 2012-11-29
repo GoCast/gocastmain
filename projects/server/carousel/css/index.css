@@ -1518,6 +1518,7 @@ body > #tour > button#imgood {
 .fbdialog > .infopanel > table th {
   text-align: left;
   padding-left: 10px;
+  padding-right: 5px;
 }
 
 .fbdialog > .infopanel > table .field {

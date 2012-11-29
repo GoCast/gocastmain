@@ -434,9 +434,21 @@ function fbSendDialog()
 }
 
 GoCastJS.FacebookEvent = {
+  convertToAMPM: function(date) {
+    if (12 < date.getHours()) {
+      return (date.getHours()-12) + ':' + date.getMinutes() + ' PM';
+    } else {
+      if (0 === date.getHours()) {
+        return '12:' + date.getMinutes() + ' AM';
+      } else {
+        return date.getHours() + ':' + date.getMinutes() + ' AM';
+      }
+    }
+  },
   opendialog: function(dlgSelector, maskSelector) {
     var winW = $(window).width(),
       winH = $(window).height(),
+      date = new Date(),
       self = this;
 
     $(maskSelector).css({
@@ -449,8 +461,11 @@ GoCastJS.FacebookEvent = {
         'top': (winH - $dlg.height())/2 + 'px',
         'z-index': $(this).css('z-index') + 1
       }).addClass('show');
+      $('#whendate', $dlg).val(date.getMonth() + '/' + date.getDate() + '/' + date.getFullYear());
+      $('#whentime', $dlg).val(self.convertToAMPM(date));
       $('#roomlink', $dlg).text(window.location.href);
       $('#cancel', $dlg).unbind('click').click(self.cancelclickCb($dlg, $(this)));
+      $('#create', $dlg).unbind('click').click(self.createclickCb($dlg, $(this)));
       $('#invite', $dlg).unbind('click').click(self.inviteclickCb($dlg));
     });
   },
@@ -476,7 +491,19 @@ GoCastJS.FacebookEvent = {
       $mask.fadeOut('slow');
     };
   },
-  createclickCb: function($dlg, $mask) {} 
+  createclickCb: function($dlg, $mask) {
+    return function() {
+      var options = {
+        name: $('#topic', $dlg).val(),
+        start_time: new Date($('#whendate', $dlg).val() + ' ' + $('#whentime', $dlg).val()),
+        description: $('#details', $dlg).val(),
+        location: $('#roomlink', $dlg).text(),
+        privacy_type: $('#privacy', $dlg).val()
+      };
+
+      console.log('CreateEvent: ', options);
+    };
+  } 
 };
 
 /* version using stream.share
