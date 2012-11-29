@@ -1,0 +1,47 @@
+<html>
+  <head>
+    <title>test</title>
+    
+    <link rel='stylesheet' href='http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.0/themes/cupertino/jquery-ui.css'>
+    <script src='http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.js'></script>
+    <script src='http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/jquery-ui.js'></script>
+    <script src='../../../../../../../server/fuse/scripts2/strophe.js'></script>
+    <script src='../../../../../../../server/fuse/scripts2/strophe.roster.js'></script>
+    <script src='../../../../../../../server/fuse/scripts2/strophe.disco.js'></script>
+    <script src='../../../../../../../server/fuse/scripts2/strophe.muc.js'></script>
+    <script src='../../../../../../../server/fuse/scripts2/strophe.jingle.js'></script>
+
+    <link rel='stylesheet' href='../../../../../../../xmpp-peerconnection/testjinglertc.css'>
+    <script src='../../../../../../../xmpp-peerconnection/callcast.js'></script>
+  </head>
+<body bgcolor=#336633>
+
+Test
+
+<script>
+Callcast.InitOverride({ CALLCAST_XMPPSERVER: 'dev.gocast.it',
+                        CALLCAST_ROOMS: 'conference.dev.gocast.it',
+                        AT_CALLCAST_ROOMS: '@conference.dev.gocast.it',
+                        STUNSERVER: 'dev.gocast.it', STUNSERVERPORT: 19302,
+                        FEEDBACK_BOT: 'feedback_bot_dev@dev.gocast.it',
+                        ROOMMANAGER: 'roommanager@dev.gocast.it/roommanager',
+                        SWITCHBOARD_FB: 'switchboard_dev@dev.gocast.it',
+                        LOGCATCHER: 'logcatcher@dev.gocast.it/logcatcher'});
+
+var logQ = new GoCastJS.BQueue(1024*1024);
+logQ.log("tjg test message");
+
+//alert(Callcast.LOGCATCHER);
+
+var logger = new GoCastJS.SendLogsXMPP('TJTestRoom', 'TJGRANT',
+                                           Callcast.LOGCATCHER,
+                                           Callcast.CALLCAST_XMPPSERVER, '',
+                                           function() {
+                                               console.log('success callback');
+    }, function() {
+        console.log('failure callback');
+    }, 'http://study.gocast.it/xmpp-httpbind');
+
+</script>
+</body>
+</html>
