@@ -434,14 +434,20 @@ function fbSendDialog()
 }
 
 GoCastJS.FacebookEvent = {
-  convertToAMPM: function(date) {
+  convertToAMPMAddHour: function(date) {
+    function minstring(minutes) {
+      var digits = {false: '', true: '0'};
+      return digits[minutes<10] + minutes;
+    }
+
+    date.setHours(date.getHours() + 1);
     if (12 < date.getHours()) {
-      return (date.getHours()-12) + ':' + date.getMinutes() + ' PM';
+      return (date.getHours()-12) + ':' + minstring(date.getMinutes()) + ' PM';
     } else {
       if (0 === date.getHours()) {
-        return '12:' + date.getMinutes() + ' AM';
+        return '12:' + minstring(date.getMinutes()) + ' AM';
       } else {
-        return date.getHours() + ':' + date.getMinutes() + ' AM';
+        return date.getHours() + ':' + minstring(date.getMinutes()) + ((date.getHours() < 12) ? ' AM' : ' PM');
       }
     }
   },
@@ -461,13 +467,32 @@ GoCastJS.FacebookEvent = {
         'top': (winH - $dlg.height())/2 + 'px',
         'z-index': $(this).css('z-index') + 1
       }).addClass('show');
-      $('#whendate', $dlg).val(date.getMonth() + '/' + date.getDate() + '/' + date.getFullYear());
-      $('#whentime', $dlg).val(self.convertToAMPM(date));
+      $('#whendate', $dlg).unbind('blur').unbind('keydown')
+                          .keydown(function(evt) {evt.preventDefault();})
+                          .blur(self.whendateblurCb($dlg)).blur();
+      $('#whentime', $dlg).val(self.convertToAMPMAddHour(date)).unbind('blur').blur(self.whentimeblurCb($dlg)).blur();
+      $('#masker', $dlg).css('z-index', $(this).css('z-index') + 2);
+      $('#status', $dlg).css('z-index', $(this).css('z-index') + 3);
       $('#roomlink', $dlg).text(window.location.href);
       $('#cancel', $dlg).unbind('click').click(self.cancelclickCb($dlg, $(this)));
       $('#create', $dlg).unbind('click').click(self.createclickCb($dlg, $(this)));
       $('#invite', $dlg).unbind('click').click(self.inviteclickCb($dlg));
+      $('#topic', $dlg).focus();
     });
+  },
+  whendateblurCb: function($dlg) {
+    var $whendate = $('#whendate', $dlg);
+    return function() {
+      var date = new Date();
+      $whendate.val($whendate.val() || ((date.getMonth()+1) + '/' + date.getDate() + '/' + date.getFullYear()));          
+    };
+  },
+  whentimeblurCb: function($dlg) {
+    var $whentime = $('#whentime', $dlg),
+        self = this;
+    return function() {
+      $whentime.val($whentime.val() || self.convertToAMPMAddHour(new Date()));
+    };
   },
   inviteclickCb: function($dlg) {
     return function() {
@@ -493,15 +518,40 @@ GoCastJS.FacebookEvent = {
   },
   createclickCb: function($dlg, $mask) {
     return function() {
-      var options = {
-        name: $('#topic', $dlg).val(),
-        start_time: new Date($('#whendate', $dlg).val() + ' ' + $('#whentime', $dlg).val()),
-        description: $('#details', $dlg).val(),
-        location: $('#roomlink', $dlg).text(),
-        privacy_type: $('#privacy', $dlg).val()
-      };
+      var name = $('#topic', $dlg).val(),
+          starttime = new Date($('#whendate', $dlg).val() + ' ' + $('#whentime', $dlg).val()),
+          options = {
+            description: $('#details', $dlg).val(),
+            location: $('#roomlink', $dlg).text(),
+            privacy_type: $('#privacy', $dlg).val()
+          };
 
-      console.log('CreateEvent: ', options);
+      if (name && 'invalid date' !== starttime.toString().toLowerCase()) {
+        console.log('CreateEvent: ', {name: name, starttime: starttime, options: options});
+        $('#masker', $dlg).addClass('show');
+        $('#status', $dlg).addClass('show').text('Creating Event');
+        globalFB.CreateEvent(name, starttime, options, function(response) {
+          console.log('CreateEventSuccess: ', response);
+
+        }, function(response) {
+          console.log('CreateEventError: ', response);
+          $('#status', $dlg).text('Failed');
+          setTimeout(function() {
+            $('#status', $dlg).removeClass('show');
+            $('#masker', $dlg).removeClass('show');
+            $('#cancel', $dlg).click();
+          }, 2000);
+        });
+      } else {
+        if (!name) {
+          $('#topic', $dlg).focus();
+        } else {
+          var timeph = $('#whentime', $dlg).val('').attr('placeholder');
+          $('#whentime', $dlg).unbind('focus').focus(function() {
+            $(this).unbind('focus').attr('placeholder', timeph);
+          }).attr('placeholder', 'Invalid time'); 
+        }
+      }
     };
   } 
 };
