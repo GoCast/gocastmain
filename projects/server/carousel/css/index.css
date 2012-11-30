@@ -345,6 +345,11 @@ input.fbShare {
   background-image: url("../images/ShareToFB.png");
   background-size: 100% 100%;
 }
+
+input.fbShare.fbevent {
+  background-image: url("../images/fbevent.png");
+  background-size: 100% 100%;
+}
 /*<MANJESH>*/
 input#addWhiteBoard {
   background-image: url('../images/AddWhiteboard.png');
