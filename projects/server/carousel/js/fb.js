@@ -163,7 +163,10 @@ GoCastJS.FB.prototype.CreateEvent = function(eventName, start_time, options, cbS
     evopts.location = evopts.location || window.location.href;
 
     // If one is not set...set one...
-    evopts.picture = evopts.picture || 'http://www.gocast.it/images/gologo.png';
+    evopts.picture = evopts.picture || (window.location.protocol +
+                                        window.location.hostname +
+                                        window.location.pathname +
+                                        'images/GoToken.png');
 
     FB.api('/me/events', 'POST', evopts, function(evreturn) {
         if (evreturn.error) {
@@ -434,6 +437,7 @@ function fbSendDialog()
 }
 
 GoCastJS.FacebookEvent = {
+  invitelist: [],
   convertToAMPMAddHour: function(date) {
     function minstring(minutes) {
       var digits = {false: '', true: '0'};
@@ -495,6 +499,7 @@ GoCastJS.FacebookEvent = {
     };
   },
   inviteclickCb: function($dlg) {
+    var self = this;
     return function() {
       $('#friends', $dlg).addClass('show').css({
         'left': '0px',
@@ -507,32 +512,66 @@ GoCastJS.FacebookEvent = {
         close_window: function() {
           $('#friends', $dlg).removeClass('show');
         }
-      });
+      }).unbind('jfmfs.selection.changed').bind('jfmfs.selection.changed', self.friendselectCb($dlg));
+    };
+  },
+  friendselectCb: function($dlg) {
+    var jfmfs = $('#friends', $dlg).data('jfmfs');
+        self = this;
+    return function() {
+      var invitetext = 'Invite Friends';
+      self.invitelist = jfmfs.getSelectedIds();
+      if (0 < self.invitelist.length) {
+        invitetext = invitetext + ' (' + self.invitelist.length + ')';
+      }
+      $('#invite', $dlg).text(invitetext);
     };
   },
   cancelclickCb: function($dlg, $mask) {
+    var self = this;
     return function() {
+      self.invitelist = [];
+      $('#friends', $dlg).data('jfmfs').clearSelected();
+      $('#invite', $dlg).text('Invite Friends');
       $dlg.removeClass('show');
       $mask.fadeOut('slow');
     };
   },
   createclickCb: function($dlg, $mask) {
+    var self = this;
     return function() {
       var name = $('#topic', $dlg).val(),
           starttime = new Date($('#whendate', $dlg).val() + ' ' + $('#whentime', $dlg).val()),
           options = {
             description: $('#details', $dlg).val(),
             location: $('#roomlink', $dlg).text(),
-            privacy_type: $('#privacy', $dlg).val()
+            privacy_type: 'SECRET'
           };
 
-      if (name && 'invalid date' !== starttime.toString().toLowerCase()) {
+      if (name && 'invalid date' !== starttime.toString().toLowerCase() && self.invitelist.length) {
         console.log('CreateEvent: ', {name: name, starttime: starttime, options: options});
         $('#masker', $dlg).addClass('show');
         $('#status', $dlg).addClass('show').text('Creating Event');
         globalFB.CreateEvent(name, starttime, options, function(response) {
           console.log('CreateEventSuccess: ', response);
-
+          $('#status', $dlg).text('Sending Invites');
+          globalFB.InviteToEvent(response.id, self.invitelist, function(response) {
+            console.log('InviteSuccess: ', response);
+            $('#status', $dlg).text('Done');
+            setTimeout(function() {
+              $('#status', $dlg).removeClass('show');
+              $('#masker', $dlg).removeClass('show');
+              $('#cancel', $dlg).click();
+            }, 2000);
+          }, function(response) {
+            console.log('InviteFailure: ', response);
+            $('#status', $dlg).text('Failed');
+            setTimeout(function() {
+              $('#status', $dlg).removeClass('show');
+              $('#masker', $dlg).removeClass('show');
+              $('#cancel', $dlg).click();
+            }, 2000);            
+          });
         }, function(response) {
           console.log('CreateEventError: ', response);
           $('#status', $dlg).text('Failed');
@@ -545,6 +584,8 @@ GoCastJS.FacebookEvent = {
       } else {
         if (!name) {
           $('#topic', $dlg).focus();
+        } else if (!self.invitelist.length) {
+          $('#invite', $dlg).effect('pulsate', {times: 5}, 1000);
         } else {
           var timeph = $('#whentime', $dlg).val('').attr('placeholder');
           $('#whentime', $dlg).unbind('focus').focus(function() {
