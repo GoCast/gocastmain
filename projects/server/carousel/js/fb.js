@@ -530,11 +530,16 @@ GoCastJS.FacebookEvent = {
   cancelclickCb: function($dlg, $mask) {
     var self = this;
     return function() {
-      self.invitelist = [];
-      $('#friends', $dlg).data('jfmfs').clearSelected();
+      var jfmfs = $('#friends', $dlg).data('jfmfs');
       $('#invite', $dlg).text('Invite Friends');
+      $('#details', $dlg).val('');
+      $('#topic', $dlg).val('');
       $dlg.removeClass('show');
       $mask.fadeOut('slow');
+      self.invitelist = [];
+      if(jfmfs) {
+        jfmfs.clearSelected(); 
+      }
     };
   },
   createclickCb: function($dlg, $mask) {
