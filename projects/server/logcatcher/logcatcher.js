@@ -215,6 +215,9 @@ LogCatcher.prototype.handleIq = function(iq) {
         delete iq.attrs.from;
         iq.attrs.type = 'result';
 
+        if (iq.getChild('ping')) {
+            iq.remove('ping');
+        }
 //          console.log("Sending pong/result: " + iq);
         this.client.send(iq);
     }

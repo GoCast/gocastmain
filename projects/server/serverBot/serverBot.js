@@ -16,7 +16,7 @@ then send a message to the group saying 'nick' is requesting to come in the room
 
  */
 
-/*jslint node: true, nomen: true */
+/*jslint node: true, nomen: true, white: true */
 var settings = require('./settings');   // Our GoCast settings JS
 if (!settings) {
     settings = {};
@@ -45,6 +45,7 @@ var argv = process.argv;
 'use strict';
 
 var overseer;   // Utilized much later. Defined now.
+var gSkipJoining = false;   // Debug item - RMW
 
 //if (argv.length != 4) {
 //    sys.puts('Usage: node echo_bot.js <my-jid> <my-password>');
@@ -826,6 +827,10 @@ MucRoom.prototype.EndMeeting = function() {
 
     this.log('Meeting Duration: ' + outStr);
     this.notifylog('Meeting Duration: ' + outStr);
+
+    // Reset max participants seen after ending a meeting regardless of whether the room
+    // itself gets destroyed or not.
+    this.maxParticipantsSeen = 0;
 };
 
 MucRoom.prototype.handlePresence = function(pres) {
@@ -2694,6 +2699,11 @@ MucRoom.prototype.rejoin = function(rmname, nick) {
         self = this,
         el;
 
+    if (gSkipJoining) {
+        this.log('SKIPPING JOIN of: ' + rmname);
+        return;
+    }
+
     // If no nick is specified, then just join. This must be a signal that we are coming in
     // to kick out an imposter to the original overseer nickname.
     if (nick) {
@@ -3178,6 +3188,19 @@ Overseer.prototype.handleMessage = function(msg) {
             this.log(temp);
             this.notifylog(temp);
             break;
+        case 'SKIPJOIN':
+        case 'SKIPJOINING':
+            if (!cmd[1] || cmd[1].toLowerCase() === 'on') {
+                gSkipJoining = true;
+                temp = 'Skipping joining of all rooms enabled.';
+            }
+            else {
+                temp = 'Skipping joining of all rooms disabled. Back to normal.';
+                gSkipJoining = false;
+            }
+            this.log(temp);
+            this.notifylog(temp);
+            break;
         case 'SETMAXPARTICIPANTS':
             // cmd[1] is room name
             // cmd[2] is new maximum
@@ -3264,8 +3287,13 @@ Overseer.prototype.handleMessage = function(msg) {
             }
             break;
         case 'HELP':
-            this.notifylog('Commands: LISTROOMS, DEBUGSTANZAS[;ALL|;OVERSEER|;MUCROOMS|;NONE],');
-            this.notifylog('          SETMAXPARTICIPANTS;<roomname>;maxParticipants');
+            this.notifylog('Commands: LISTROOMS');
+            this.notifylog('          DEBUGSTANZAS ; [ALL | OVERSEER | MUCROOMS | NONE]');
+            this.notifylog('          SETMAXPARTICIPANTS; <roomname> ; maxParticipants');
+//            this.notifylog('          KNOCK');
+            this.notifylog('          LIVELOG ; <from-name> ; <message>');
+            this.notifylog('          SKIPJOIN ; [ON | OFF]');
+            this.notifylog('          RELOADROOMS');
             break;
         default:
             this.log('Direct message: Unknown command: ' + msg.getChild('body').getText());
@@ -3306,6 +3334,12 @@ Overseer.prototype.AddTrackedRoom = function(roomname, obj, cbSuccess, cbFailure
     if (this.active_rooms[roomname] && this.MucRoomObjects[roomname]) {
         this.log('WARNING: AddTrackedRoom - Ignoring - Room already present: ' + roomname);
         cbSuccess('WARNING: AddTrackedRoom - Ignoring - Room already present: ' + roomname);
+
+        // Ensure we are actually in each room at this stage though -- are we?
+        if (!this.MucRoomObjects[roomname].participants[this.OVERSEER_NICKNAME]) {
+            this.log('WARN: Room Manager is *NOT* in the room requested. Joining room: ' + roomname);
+            this.MucRoomObjects[roomname].join(roomname + this.CONF_SERVICE, this.OVERSEER_NICKNAME);
+        }
         return true;
     }
 
@@ -3541,7 +3575,7 @@ Overseer.prototype.CreateRoomRequest = function(iq) {
         );
 
     }
-    else        // Room already exists -- just let 'em know all is ok.
+    else        // Room already exists -- just let 'em know all is ok. And ensure that we're actually IN the room.
     {
         if (this.MucRoomObjects[roomname].pendingDeletion)
         {
@@ -3572,6 +3606,12 @@ Overseer.prototype.CreateRoomRequest = function(iq) {
                     self.log('(D-Timer) - Pre-existing room - No one in room after 60 seconds :( ...');
                     eventManager.emit('destroyRoom', roomname);
                 }, 60000);
+            }
+
+            // If we're not actually in the room, join it quickly before the client does so we can answer to requests.
+            if (!this.MucRoomObjects[roomname].participants[this.OVERSEER_NICKNAME]) {
+                this.log('WARN: Room Manager is *NOT* in the room requested. Joining room: ' + roomname);
+                this.MucRoomObjects[roomname].join(roomname + this.CONF_SERVICE, this.OVERSEER_NICKNAME);
             }
         }
     }
@@ -3706,6 +3746,9 @@ Overseer.prototype.handleIq = function(iq) {
         delete iq.attrs.from;
         iq.attrs.type = 'result';
 
+        if (iq.getChild('ping')) {
+            iq.remove('ping');
+        }
 //          console.log("Sending pong/result: " + iq);
         this.client.send(iq);
     }

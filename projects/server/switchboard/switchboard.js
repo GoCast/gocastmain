@@ -6,7 +6,7 @@
  TODO
 
  */
-/*jslint node: true */
+/*jslint node: true, white: true */
 
 var settings = require('./settings');   // Our GoCast settings JS
 if (!settings) {
@@ -44,7 +44,7 @@ function useritem(properties) {
 	}
 
 	this.jids = {};
-};
+}
 
 useritem.prototype.numJidsAssociated = function() {
 	var numjids = 0;
@@ -450,6 +450,9 @@ switchboard.prototype.handleIq = function(iq) {
 		delete iq.attrs.from;
 		iq.attrs.type = 'result';
 
+		if (iq.getChild('ping')) {
+			iq.remove('ping');
+		}
 //			console.log("Sending pong/result: " + iq);
 		this.client.send(iq);
 	}
