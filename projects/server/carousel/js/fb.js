@@ -461,6 +461,11 @@ GoCastJS.FacebookEvent = {
       date = new Date(),
       self = this;
 
+    $(document).unbind('keydown');
+    if ('Firefox' === app.browser.name) {
+      $('#meeting').css('visibility', 'hidden');
+    }
+
     $(maskSelector).css({
       'width': winW + 'px',
       'height': winH + 'px'
@@ -468,7 +473,7 @@ GoCastJS.FacebookEvent = {
       var $dlg = $(dlgSelector);
       $dlg.css({
         'left': (winW - $dlg.width())/2 + 'px',
-        'top': (winH - $dlg.height())/2 + 'px',
+        'top': (winH - $dlg.height())/4 + 'px',
         'z-index': $(this).css('z-index') + 1
       }).addClass('show');
       $('#whendate', $dlg).unbind('blur').unbind('keydown')
@@ -506,8 +511,11 @@ GoCastJS.FacebookEvent = {
         'bottom': '0px'
       }).jfmfs({
         labels: {
+          all: 'All',
+          selected: 'Selected',
+          filter_title: 'Search Friends: ',
           filter_default: 'Type here to narrow down',
-          filter_title: 'Search Friends: '
+          max_selected_message: '{0} of {1} selected'
         },
         close_window: function() {
           $('#friends', $dlg).removeClass('show');
@@ -539,6 +547,11 @@ GoCastJS.FacebookEvent = {
       self.invitelist = [];
       if(jfmfs) {
         jfmfs.clearSelected(); 
+      }
+
+      $(document).keydown(docKey);
+      if ('Firefox' === app.browser.name) {
+        $('#meeting').css('visibility', 'visible');
       }
     };
   },
