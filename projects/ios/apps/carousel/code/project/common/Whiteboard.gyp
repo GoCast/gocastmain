@@ -14,6 +14,29 @@
 						'../../source/Whiteboard/Whiteboard.cpp',
 						'../../source/Whiteboard/Whiteboard.h',
 
+						'../../source/Whiteboard/package.h',
+						'../../source/Whiteboard/tFile.h',
+						'../../source/Whiteboard/tFile.mm',
+						'../../source/Whiteboard/tInputManager.h',
+						'../../source/Whiteboard/tMouseEvent.h',
+						'../../source/Whiteboard/tObserver.h',
+						'../../source/Whiteboard/tPixelFormat.h',
+						'../../source/Whiteboard/tPixelFormat.cpp',
+						'../../source/Whiteboard/tProgram.cpp',
+						'../../source/Whiteboard/tProgram.h',
+						'../../source/Whiteboard/tRect.h',
+						'../../source/Whiteboard/tSGView.cpp',
+						'../../source/Whiteboard/tSGView.h',
+						'../../source/Whiteboard/tShader.cpp',
+						'../../source/Whiteboard/tShader.h',
+						'../../source/Whiteboard/tSingleton.h',
+						'../../source/Whiteboard/tSurface.cpp',
+						'../../source/Whiteboard/tSurface.h',
+						'../../source/Whiteboard/tSurfacePeer.mm',
+						'../../source/Whiteboard/tTexture.cpp',
+						'../../source/Whiteboard/tTexture.h',
+						'../../source/Whiteboard/tTouchEvent.h',
+
 						'../../source/Bootstrap/mac/MacOpenGLView.mm',
 						'../../source/Bootstrap/mac/MacOpenGLView.h',
 						'../../source/Bootstrap/mac/main.mm',
@@ -28,7 +51,7 @@
 
 						'../../rsrc/mac/English.lproj/InfoPlist.strings',
 						'../../rsrc/mac/Credits.rtf',
-						'../../rsrc/mac/MainMenu.xib',
+						'../../rsrc/mac/iPhoneStyle.xib',
 					],	# mac_bundle_resources
 
 					'link_settings': {

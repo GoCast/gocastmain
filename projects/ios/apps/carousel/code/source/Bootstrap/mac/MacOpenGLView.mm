@@ -2,14 +2,17 @@
 
 #import "MacOpenGLView.h"
 
+#include "package.h"
+
 @implementation MacOpenGLView
 
 static CVReturn MyDisplayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeStamp* now, const CVTimeStamp* outputTime, CVOptionFlags flagsIn, CVOptionFlags* flagsOut, void* displayLinkContext)
 {
 #pragma unused(displayLink, now, outputTime, flagsIn, flagsOut)
-
-    [(MacOpenGLView*)displayLinkContext setNeedsDisplay:TRUE];
-    
+@autoreleasepool
+    {
+        [(MacOpenGLView*)displayLinkContext setNeedsDisplay:TRUE];
+    }
     return kCVReturnSuccess;
 }
 
@@ -25,8 +28,6 @@ static CVReturn MyDisplayLinkCallback(CVDisplayLinkRef displayLink, const CVTime
 - (void) prepareOpenGL                         //initView
 {
     mIsPrepared = false;
-
-//    tSGView::getInstance()->notify(tSGViewEvent(tSGViewEvent::createView));
 
     NSOpenGLPixelFormatAttribute attributes [] = {
         //        NSOpenGLPFAWindow,
@@ -58,14 +59,14 @@ static CVReturn MyDisplayLinkCallback(CVDisplayLinkRef displayLink, const CVTime
 
     srand((unsigned int)time(NULL));
 
-//    tSGView::getInstance()->notify(tSGViewEvent(tSGViewEvent::initView));
+    tSGView::getInstance()->notify(tSGViewEvent(tSGViewEvent::kInitView));
     mIsPrepared = true;
 }
 
 - (void) reshape                              //resizeStage
 {
-//    NSSize size = [ [ [self window] contentView ] frame ].size;
-//    tSGView::getInstance()->notify(tSGViewEvent(tSGViewEvent::resizeView, tDimension2f((tFloat32)size.width, (tFloat32)size.height)));
+    NSSize size = [ [ [self window] contentView ] frame ].size;
+    tSGView::getInstance()->notify(tSGViewEvent(tSGViewEvent::kResizeView, tDimension2f((float)size.width, (float)size.height)));
 
     [super reshape];
 }
@@ -74,15 +75,15 @@ static CVReturn MyDisplayLinkCallback(CVDisplayLinkRef displayLink, const CVTime
 {
     if (mIsPrepared)
     {
-//        tSGView::getInstance()->notify(tSGViewEvent(tSGViewEvent::redrawView, tTimer::getTimeMS()));
+        tSGView::getInstance()->notify(tSGViewEvent(tSGViewEvent::kRedrawView, 0));
         [super drawRect:dirtyRect];
     }
 }
 
 - (void) update                                //resizeStage / drawStage (move or resize)
 {
-//    NSSize size = [ [ [self window] contentView ] frame ].size;
-//    tSGView::getInstance()->notify(tSGViewEvent(tSGViewEvent::resizeView, tDimension2f((tFloat32)size.width, (tFloat32)size.height)));
+    NSSize size = [ [ [self window] contentView ] frame ].size;
+    tSGView::getInstance()->notify(tSGViewEvent(tSGViewEvent::kResizeView, tDimension2f((float)size.width, (float)size.height)));
 
     [super update];
 }
