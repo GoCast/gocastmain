@@ -3,3 +3,4 @@ serverBot.sh
 switchboard.sh
 roommanager.sh
 logcatcher.sh
+filecatcher.sh
