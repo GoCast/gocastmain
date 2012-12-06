@@ -18,7 +18,10 @@ GoCastJS.gcFileShare = function(spot, info)
   this.timeout = 1000;
   this.spot = spot;
   this.jqSpot = $(spot);
-  this.DIV = '<div id="gcFileShareDiv"><input id="uploadFile" type="file" name="myFile" onchange="loadAFile(' + this.jqSpot.attr('id') + ');" /><div id="links"></div></div>';
+  this.DIV = '<div id="gcFileShareDiv">' +
+             '<input id="uploadFile" type="file" name="myFile" onchange="loadAFile(' + this.jqSpot.attr('id') + ');" />' +
+             '<div id="dnd-zone" style="height: 50px; border: 1px black solid;"></div>' +
+             '<div id="links"></div></div>';
   this.info = info;
   this.jqDiv = $(this.DIV).appendTo(this.jqSpot).css("position", "absolute");
   this.div = this.jqDiv[0];
@@ -29,6 +32,21 @@ GoCastJS.gcFileShare = function(spot, info)
   this.up = new GoCastJS.SendFileToFileCatcher(Callcast.connection, Callcast.room, 'filecatcher@dev.gocast.it/filecatcher');
 
   this.maxFileSize = 5 * 1024 * 1024; // 5MB max.
+
+  this.dndZone = $('#dnd-zone', this.jqSpot).get(0);
+
+  this.dndZone.ondragover = function () {
+    return false;
+    // Manjesh - this.className = 'hover'; return false; };
+  };
+  this.dndZone.ondragend = function () {
+    return false; // Manjesh - this.className = ''; return false; };
+  };
+  this.dndZone.ondrop = function (e) {
+    // Manjesh - this.className = '';
+    e.preventDefault(); // Manjesh - not sure about this. Seems this is required by some browsers like Safari maybe? Lets talk.
+    self.UploadFile(e.dataTransfer.files);
+  };
 
   this.uploadReader.onload = function (oFREvent) {
     self.up.SendFile(self.uploadName, oFREvent.target.result,
@@ -131,14 +149,21 @@ GoCastJS.gcFileShare.prototype.doSpot = function(info)
   }
 };
 
-GoCastJS.gcFileShare.prototype.UploadFile = function() {
+GoCastJS.gcFileShare.prototype.UploadFile = function(DragDropFiles) {
   var us = $('#uploadFile', this.jqSpot).get(0),
       oFile;
 
-  if (us.files.length === 0) { return; }
-  oFile = us.files[0];
+  // In the case of Drag-N-Drop, we have to get the file info from the calling parameter
+  if (!DragDropFiles) {
+    if (us.files.length === 0) { return; }
+    oFile = us.files[0];
+  }
+  else {
+    // In drag-n-drop, we are given the files array directly.
+    if (DragDropFiles.length === 0) { return; }
+    oFile = DragDropFiles[0];
+  }
 
-  // TODO: RMW - check .size for maximums.
   if (oFile.size > this.maxFileSize) {
     alert('File size is too big. Max file size allowed is: ' + this.maxFileSize);
   }
