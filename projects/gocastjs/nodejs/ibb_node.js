@@ -49,7 +49,8 @@ GoCastJS.IBBTransfer.prototype.chdir = function(newdir) {
 //
 GoCastJS.IBBTransfer.prototype.SendError = function(iq, type, subtype, reason) {
     var iqNew = new ltx.Element('iq', {to: iq.attrs.from, type: 'error', id: iq.attrs.id})
-            .c('error', {type: type}).c(subtype, {xmlns: 'urn:ietf:params:xml:ns:xmpp-stanas'});
+            .c('error', {type: type}).c(subtype, {xmlns: 'urn:ietf:params:xml:ns:xmpp-stanas'}),
+        outErr;
 
     if (reason) {
         iqNew.up().c('reason').t(reason);
@@ -59,8 +60,12 @@ GoCastJS.IBBTransfer.prototype.SendError = function(iq, type, subtype, reason) {
         iqNew.root().attrs.xmlns = iq.attrs.xmlns;
     }
 
-    this.internalHistory('ERROR: name: ' + this.GenName(iq) + ', ' + type + '/' + subtype + ', reason: ' + (reason || 'none'));
+    outErr = 'ERROR: name: ' + this.GenName(iq) + ', ' + type + '/' + subtype + ', reason: ' + (reason || 'none');
+    this.internalHistory(outErr);
+    this.log(outErr);
+
     this.client.send(iqNew.root());
+    this.log(iqNew.root());
     return;
 };
 
@@ -72,7 +77,8 @@ GoCastJS.IBBTransfer.prototype.SendError = function(iq, type, subtype, reason) {
 // by hackers. Later may need a real hash if it becomes a problem.
 //
 GoCastJS.IBBTransfer.prototype.SendResult = function(iq) {
-    var child = iq.getChildByAttr('xmlns', 'http://jabber.org/protocol/ibb');
+    var child = iq.getChildByAttr('xmlns', 'http://jabber.org/protocol/ibb'),
+        hashname = this.GenHashName(iq);
 
     if (!child.attrs.fname) {
         this.client.send(new ltx.Element('iq',
@@ -80,7 +86,8 @@ GoCastJS.IBBTransfer.prototype.SendResult = function(iq) {
     }
     else if (child.attrs.room && child.attrs.sid) {
         this.client.send(new ltx.Element('iq',
-            {to: iq.attrs.from, type: 'result', id: iq.attrs.id, hashname: this.GenHashName(iq)}).root());
+            {to: iq.attrs.from, type: 'result', id: iq.attrs.id,
+                link: '/fileshare/' + child.attrs.room + '/' + hashname, hashname: hashname}).root());
     }
     else {
         this.log('RESULT: ERROR: Errant child information: ', child.toString());
@@ -89,7 +96,11 @@ GoCastJS.IBBTransfer.prototype.SendResult = function(iq) {
 };
 
 GoCastJS.IBBTransfer.prototype.SendClose = function(iq, sid, error) {
-    this.client.send(new ltx.Element('iq', {to: iq.attrs.from, type: 'set', id: 'closeid'})
+    var child = iq.getChildByAttr('xmlns', 'http://jabber.org/protocol/ibb'),
+        hashname = this.GenHashName(iq);
+
+    this.client.send(new ltx.Element('iq', {to: iq.attrs.from, type: 'set', id: 'closeid',
+                        link: '/fileshare/' + child.attrs.room + '/' + hashname, hashname: hashname})
             .c('close', {xmlns: 'http://jabber.org/protocol/ibb', sid: sid}).root());
 
     this.internalCloseTransfer(this.GenName(iq), error);
@@ -297,7 +308,7 @@ GoCastJS.IBBTransfer.prototype.internalProcessClose = function(iq) {
 
     this.log('internalProcessClose: Fileshare name: ' + theTransfer.filename + ', hashname: ' + hashname);
     // Now link the hashed name in hashes/room/hashname to room/filename
-    toRun = 'ln -f -s ../../' + theTransfer.filename + ' hashes/' + room + '/' + hashname;
+    toRun = 'ln -f -s "../../' + theTransfer.filename + '" "hashes/' + room + '/' + hashname + '"';
 //    this.log('internalCloseTransfer: Linking: ' + toRun);
     exec(toRun, function(code, output) {
         if (code !== 0) {

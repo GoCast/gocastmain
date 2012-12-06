@@ -46,7 +46,7 @@ GoCastJS.fileDate = function() {
 //      Upon a successful transfer, cbSuccess is called with a message about the transfer.
 //      On failure of any kind a cbFailure(message) is called.
 //
-GoCastJS.IBBTransferClient = function(options, cbSuccess, cbFailure) {
+GoCastJS.IBBTransferClient = function(options, cbSuccess, cbFailure, cbProgress) {
     this.RECEIVER = options.receiver;
     this.BLOCKSIZE = 5500;
     this.connection = options.connection;
@@ -61,10 +61,12 @@ GoCastJS.IBBTransferClient = function(options, cbSuccess, cbFailure) {
 
     this.cbSuccess = cbSuccess;
     this.cbFailure = cbFailure;
+    this.cbProgress = cbProgress;
 
     this.sid = this.connection.getUniqueId();
     this.XMLNS = 'http://jabber.org/protocol/ibb';
     this.bytesSent = 0;
+    this.fileSize = options.fileSize;
     this.seq = 0;
 
     var self = this, msg, attrs;
@@ -97,7 +99,7 @@ GoCastJS.IBBTransferClient = function(options, cbSuccess, cbFailure) {
         msg = 'Error requesting IBB transfer with ' + self.RECEIVER;
 
         if (iq) {
-          msg += ' ' + iq.tree();
+          msg += ' ' + iq;
         }
         self.log(msg);
         self.cbFailure(msg);
@@ -125,14 +127,14 @@ GoCastJS.IBBTransferClient.prototype.SendClose = function() {
     // Successful callback...
     function(iq) {
         // We're complete-complete.
-        self.cbSuccess('Completed transfer of ' + self.bytesSent + ' bytes to ' + self.RECEIVER);
+        self.cbSuccess('Completed transfer of ' + self.bytesSent + ' bytes to ' + self.RECEIVER, iq);
     },
     // Failure callback
     function(iq) {
         msg = 'Error closing IBB transfer with ' + self.RECEIVER;
 
         if (iq) {
-          msg += ' ' + iq.tree();
+          msg += ' ' + iq;
         }
         self.log(msg);
         self.cbFailure(msg);
@@ -149,6 +151,9 @@ GoCastJS.IBBTransferClient.prototype.SendData = function() {
     data = this.cbDataGet(Math.floor((this.BLOCKSIZE * 3) / 4));  // Raw data in string form.
     if (!data || data === '') {
         this.log('No more data. Sending close message.');
+        if (this.cbProgress) {
+            this.cbProgress(this.filename, this.bytesSent, this.fileSize);
+        }
         this.SendClose();
         return;
     }
@@ -177,13 +182,17 @@ GoCastJS.IBBTransferClient.prototype.SendData = function() {
         self.seq += 1;
         self.bytesSent += data.length;
         self.SendData();
+
+        if (self.cbProgress) {
+            self.cbProgress(self.filename, self.bytesSent, self.fileSize);
+        }
     },
     // Failure callback
     function(iq) {
         msg = 'Error sending data packet in IBB transfer with ' + self.RECEIVER;
 
         if (iq) {
-          msg += ' ' + iq.tree();
+          msg += ' ' + iq;
         }
         self.log(msg);
         self.cbFailure(msg);

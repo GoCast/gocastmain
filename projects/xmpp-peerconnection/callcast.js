@@ -196,6 +196,10 @@ GoCastJS.BQueue.prototype.removeLinesWithMaxBytes = function(max) {
     return out;
 };
 
+GoCastJS.BQueue.prototype.getSize = function() {
+    return this.length;
+};
+
 
 // Create a 1-MB queue buffer for consolidated logging.
 var logQ = new GoCastJS.BQueue(1024*1024);
@@ -1778,7 +1782,7 @@ var Callcast = {
         }
     },
 
-    SendLogsToLogCatcher: function(cbSuccess, cbFailure) {
+    SendLogsToLogCatcher: function(cbSuccess, cbFailure, cbProgress) {
         var self = this, ibb, datagetfn;
 
         datagetfn = function(max) {
@@ -1795,6 +1799,7 @@ var Callcast = {
                                                room: this.room.split('@')[0],
                                                nick: this.nick,
                                                receiver: this.LOGCATCHER,
+                                               fileSize: logQ.getSize(),
                                                cbDataGet: datagetfn,
                                                cbLog: Callcast.log },
         function(msg) {
@@ -1806,6 +1811,10 @@ var Callcast = {
             self.log('ERROR: Failed LogCatcher send. msg: ' + msg);
             if (cbFailure) {
                 cbFailure(msg);
+            }
+        }, function(name, sent, total) {
+            if (cbProgress) {
+                cbProgress(name, sent, total);
             }
         });
     },
@@ -3129,7 +3138,7 @@ GoCastJS.SendLogsXMPP.prototype.onErrorStanza = function(err) {
     return true;
 };
 
-GoCastJS.SendLogsXMPP.prototype.SendLogsToLogCatcher = function(cbSuccess, cbFailure) {
+GoCastJS.SendLogsXMPP.prototype.SendLogsToLogCatcher = function(cbSuccess, cbFailure, cbProgress) {
     var self = this, ibb,
         datagetfn;
 
@@ -3147,6 +3156,7 @@ GoCastJS.SendLogsXMPP.prototype.SendLogsToLogCatcher = function(cbSuccess, cbFai
                                           room: this.room.split('@')[0],
                                           nick: this.nick,
                                           receiver: this.LOGCATCHER,
+                                          fileSize: logQ.getSize(),
                                           cbDataGet: datagetfn,
                                           cbLog: Callcast.log },
        function(msg) {
@@ -3159,6 +3169,10 @@ GoCastJS.SendLogsXMPP.prototype.SendLogsToLogCatcher = function(cbSuccess, cbFai
         if (cbFailure) {
             cbFailure(msg);
         }
+    }, function(name, sent, total) {
+        if (cbProgress) {
+            cbProgress(name, sent, total);
+        }
     });
 };
 
@@ -3169,7 +3183,7 @@ GoCastJS.SendFileToFileCatcher = function(connection, room, filecatcher) {
     this.FILECATCHER = filecatcher;
 };
 
-GoCastJS.SendFileToFileCatcher.prototype.SendFile = function(file, data, cbSuccess, cbFailure) {
+GoCastJS.SendFileToFileCatcher.prototype.SendFile = function(file, data, cbSuccess, cbFailure, cbProgress) {
     var self = this, ibb,
         datagetfn,
         offset = 0,
@@ -3198,18 +3212,23 @@ GoCastJS.SendFileToFileCatcher.prototype.SendFile = function(file, data, cbSucce
     ibb = new GoCastJS.IBBTransferClient({connection: this.connection,
                                           room: this.room.split('@')[0],
                                           filename: file,
+                                          fileSize: totalLen,
                                           receiver: this.FILECATCHER,
                                           cbDataGet: datagetfn,
                                           cbLog: Callcast.log },
-       function(msg) {
+       function(msg, iq) {
         Callcast.log('SUCCESSFUL FileCatcher send. msg: ' + msg);
         if (cbSuccess) {
-            cbSuccess(msg);
+            cbSuccess(msg, iq);
         }
     }, function(errmsg) {
         Callcast.log('ERROR: Failed FileCatcher send. msg: ' + msg);
         if (cbFailure) {
             cbFailure(msg);
+        }
+    }, function(name, sent, total) {
+        if (cbProgress) {
+            cbProgress(name, sent, total);
         }
     });
 };

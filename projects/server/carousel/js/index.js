@@ -2479,7 +2479,7 @@ $(document).ready(function(
                         ROOMMANAGER: 'ccc_roommanager@dnle.gocast.it/roommanager',
                         SWITCHBOARD_FB: 'switchboard_ccc@dnle.gocast.it',
                         LOGCATCHER: 'ccc_logcatcher@dnle.gocast.it/logcatcher',
-                        FILECATCHER: 'ccc_filecatcher@video.gocast.it/filecatcher'});
+                        FILECATCHER: 'ccc_filecatcher@dnle.gocast.it/filecatcher'});
   }
   else if (window.location.hostname.toLowerCase() === 'dev.gocast.it') {
     Callcast.InitOverride({ CALLCAST_XMPPSERVER: 'dev.gocast.it',
@@ -2824,6 +2824,15 @@ function showWikiSearch(goclickCallback) {
 
 function closeWikiSearch() {
   $('#searchwiki').removeClass('show');
+}
+
+function addFileShare() {
+      Callcast.AddSpot({
+        spottype: 'fileshare',
+        spotreplace: 'first-unoc',
+      },function() {
+        console.log('carousel addFileShare callback');
+      });
 }
 
 function addWiki() {

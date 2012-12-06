@@ -498,7 +498,7 @@ function assignSpotForParticipant(nickname) {
   }
 
   if (oo) {
-    $(oo).attr('id', id).attr('encname', nickname).attr('title', dispname);    
+    $(oo).attr('id', id).attr('encname', nickname).attr('title', dispname);
     $('div.name', oo).text(dispname);
     $(oo).removeClass('unoccupied');
     $("#showChat", oo).css("display", "block"); // display showChat button
@@ -509,7 +509,7 @@ function assignSpotForParticipant(nickname) {
     app.carousel.setSpotName(item, nickname);
     app.carousel.updateAll();
   } else {
-    app.log(4, 'assignSpotForParticipant: Maximum number of participants reached.');    
+    app.log(4, 'assignSpotForParticipant: Maximum number of participants reached.');
   }
 }
 
@@ -578,7 +578,7 @@ function unassignSpotForParticipant(nickname) {
       }
     } catch (e) {
       app.log(4, 'unassignSpotForParticipant: ', e);
-    }    
+    }
   }
 }
 
@@ -807,7 +807,7 @@ function doSpot(spotDiv, info)
   {
     var divIcon, divTitle,
         jqDiv = $(spotDiv),
-        whiteBoard, editor, wiki;
+        whiteBoard, editor, wiki, fshare;
     console.log('doSpot', info);
     console.log('spotDiv', spotDiv);
     if (!spotDiv) {throw "no spotDiv";}
@@ -863,6 +863,23 @@ function doSpot(spotDiv, info)
       if (editor)
       {
         editor.doSpot(info);
+      }
+    }
+    else if (info.spottype === 'fileshare') {
+      if (info.cmdtype === 'addspot') {
+        jqDiv.attr('id', app.str2id('fileshare ' + info.spotnumber));
+        jqDiv.attr('title', 'FileShare');
+        jqDiv.attr('alt', 'FileShare');
+        jqDiv.attr('encname', 'fileshare');
+        jqDiv.attr('spotnumber', info.spotnumber);
+        jqDiv.removeClass('unoccupied').addClass('typeContent fileshare');
+        fshare = new GoCastJS.gcFileShare(spotDiv, info);
+      } else {
+        fshare = jqDiv.data('gcFileShare');
+      }
+
+      if (fshare) {
+        fshare.doSpot(info);
       }
     }
     else if (info.spottype === 'wiki') {

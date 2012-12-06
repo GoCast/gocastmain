@@ -129,6 +129,12 @@ else {
         password: 'log.catcher.gocast'
     };
 
+    settings.filecatcher = {
+        username: 'filecatcher@' + settings.SERVERNAME + '/filecatcher',
+        password: 'receving.files.in.xmpp',
+        dest: '/home/ec2-user/fileshare'
+    };
+
     settings.feedbackbot = {
         username: 'feedback_bot_gocast@' + settings.SERVERNAME,
         password: 'feedback.gocast.teambang'
@@ -187,6 +193,12 @@ if (process.env.STANFORDDNLE === 1 || process.env.STANFORDDNLE === '1') {
     settings.logcatcher = {
         username: 'logcatcher@' + settings.SERVERNAME + '/logcatcher',
         password: 'dnle.catcher.ofbugs'
+    };
+
+    settings.filecatcher = {
+        username: 'filecatcher@' + settings.SERVERNAME + '/filecatcher',
+        password: 'sharing.files.for.dnle',
+        dest: '/home/ec2-user/fileshare'
     };
 
     settings.feedbackbot = {
@@ -250,6 +262,12 @@ else if (process.env.STANFORDCCC === 1 || process.env.STANFORDCCC === '1') {
     settings.logcatcher = {
         username: 'ccc_logcatcher@' + settings.SERVERNAME + '/logcatcher',
         password: 'ccc.catcher.ofbugs'
+    };
+
+    settings.filecatcher = {
+        username: 'ccc_filecatcher@' + settings.SERVERNAME + '/filecatcher',
+        password: 'ccc.sharing.files',
+        dest: '/home/ec2-user/ccc_fileshare'
     };
 
     settings.feedbackbot = {

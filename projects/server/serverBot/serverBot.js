@@ -17,6 +17,8 @@ then send a message to the group saying 'nick' is requesting to come in the room
  */
 
 /*jslint node: true, nomen: true, white: true */
+/*global test, exec */
+
 var settings = require('./settings');   // Our GoCast settings JS
 if (!settings) {
     settings = {};
@@ -38,6 +40,7 @@ var ddb = require('dynamodb').ddb({ endpoint: settings.dynamodb.endpoint,
                                     secretAccessKey: settings.dynamodb.secretAccessKey});
 var Canvas = require('canvas');
 var nodewb = require('./nodeWB');
+var shelljs = require('shelljs/global');
 
 var eventManager = new evt.EventEmitter();
 var argv = process.argv;
@@ -1375,8 +1378,116 @@ MucRoom.prototype.DeleteRoom = function() {
     }
 
     this.DeleteAllWhiteboards();
+    this.DeleteAllFileShares();
 
     return true;
+};
+
+MucRoom.prototype.DeleteAllFileShares = function() {
+    var self = this,
+        locFiles, locLinks;
+
+    // Need to basically:
+    // a) rm -Rf <dest>/room/
+    // b) rm -Rf <dest>/hashes/room/
+
+    // First ensure that the roomname makes sense. Otherwise we'll wind up wiping out a high level directory.
+    if (this.roomname) {
+        locFiles = settings.filecatcher.dest + '/' + this.roomname.split('@')[0];
+        locLinks = settings.filecatcher.dest + '/hashes/' + this.roomname.split('@')[0];
+
+        if (test('-d', locFiles) && test('-d', locLinks)) {
+            exec('rm -Rf "' + locFiles + '"', function(err, out) {
+                if (err) {
+                    self.log('DeleteAllFileShares: ERROR: Removing Files directory: ' + locFiles + ' failed. Output: ' + out);
+                }
+            });
+
+            exec('rm -Rf "' + locLinks + '"', function(err, out) {
+                if (err) {
+                    self.log('DeleteAllFileShares: ERROR: Removing Links directory: ' + locLinks + ' failed. Output: ' + out);
+                }
+            });
+        }
+        else {
+            this.log('DeleteAllFileShares: ERROR: Links-dir / Files-dir not a directory.\n' +
+                '    Files-dir: ' + locFiles + ', Links-dir: ' + locLinks);
+        }
+    }
+    else {
+        this.log('DeleteAllFileShares: ERROR: Roomname not present.');
+    }
+};
+
+MucRoom.prototype.DeleteFileShareForSpot = function(spotnumber) {
+    var loc, k, l, skipFile, theLinks, otherLinks;
+
+    if (!spotnumber || !this.wbDir) {
+        this.log('ERROR: Cannot load whiteboard spot - either no wbDir or no spotnumber given.');
+        return false;
+    }
+
+    theLinks = JSON.parse(this.spotList[spotnumber].links);
+
+    for (l in theLinks) {
+        if (theLinks.hasOwnProperty(l)) {
+            // First things first. Remove the soft link as this is unique.
+            this.log('Dest: ' + settings.filecatcher.dest);
+            this.log('theLinks[l]: ' + theLinks[l]);
+
+            //
+            // Note: Forumlation is odd here. theLinks[] is in reference to the website and so each of those
+            //       are /fileshare/<roomname>/linkname
+            //       But we need this to be <settings-dest>/hashes/<roomname>/linkname
+            //       The simple way is to replace 'fileshare' with 'hashes' and don't put the '/' after <settings-dest>
+            //
+            loc = settings.filecatcher.dest + theLinks[l].replace('fileshare', 'hashes');
+            try {
+                this.log('INFO: DeleteFileShareForSpot: removing soft-link file: ' + loc);
+                fs.unlinkSync(loc);
+            }
+            catch (e1) {
+                this.log('ERROR: DeleteFileShareForSpot: Could not remove soft link: ' + loc + ' Err: ' + e1);
+            }
+
+            // Now we need to go through all of the spots and find:
+            // a) If the spot is a fileshare... AND
+            // b) It's not *THIS* spot ... AND
+            // c) If it has a filename identical to the one we're iterating on, THEN
+            // ... we do *NOT* want to delete the actual file yet.
+
+            skipFile = false;
+
+            for (k in this.spotList)
+            {
+                if (this.spotList.hasOwnProperty(k) && k !== spotnumber && this.spotList[k].spottype === 'fileshare') {
+
+                    otherLinks = JSON.parse(this.spotList[k].links);
+
+                    // Do we have our current file mentioned in this other spot?
+                    if (otherLinks && otherLinks[l]) {
+                        // Found a duplicate file reference in another spot
+                        this.log('DeleteFileShareForSpot: INFO: Skipping deletion. Found another reference to: ' + l + ' in spot: ' + k);
+                        skipFile = true;
+
+                        // Would be nice if we could break out of this 'for k' ... but not a big deal.
+                    }
+                }
+            }
+
+            if (!skipFile) {
+                loc = settings.filecatcher.dest + '/' + this.roomname.split('@')[0] + '/' + l;
+                try {
+                    this.log('INFO: DeleteFileShareForSpot: removing file: ' + loc);
+                    fs.unlinkSync(loc);
+                }
+                catch (e2) {
+                    this.log('ERROR: DeleteFileShareForSpot: Could not remove file: ' + loc + ' Err: ' + e2);
+                }
+            }
+        }
+    }
+
 };
 
 MucRoom.prototype.DeleteAllWhiteboards = function() {
@@ -1901,6 +2012,14 @@ MucRoom.prototype.RemoveSpotNumber = function(spotnumber) {
             }
 
             this.DeleteWhiteboardForSpot(info.spotnumber);
+            break;
+        case 'fileshare':
+            // We have to remove all files associated with the fileshare spot.
+            // The only tricky item is if there are multiple fileshare spots, they could possibly be pointing
+            // to the same filename. If so, we'll want to NOT delete that particular file until it's the last
+            // filespot - hence no other fileshare spots referencing that file.
+            // NOTE: In this situation, however, the soft-link should be deleted regardless.
+            this.DeleteFileShareForSpot(info.spotnumber);
             break;
         default:
             break;
@@ -3129,7 +3248,7 @@ function deentitize(instr) {
 // \brief Need to check the room's banned-list for this person.
 //
 Overseer.prototype.handleMessage = function(msg) {
-    var cmd, k, l, temp,
+    var cmd, k, l, temp, curState,
         fromjid, fromnick, toroom, plea, mroom;
     // Listen to pure chat messages to the overseer.
 
@@ -3221,6 +3340,43 @@ Overseer.prototype.handleMessage = function(msg) {
                 this.notifylog('ERROR: Failed to SETMAXPARTICIPANTS - be sure to use SETMAXPARTICIPANTS;roomname;newmaxvalue');
             }
             break;
+        case 'SETPERSISTENT':
+        case 'SETPERSISTANT':
+            // cmd[1] is room name
+            // cmd[2] is on or off
+            if (cmd[1] && cmd[2] && this.MucRoomObjects[cmd[1].toLowerCase()])
+            {
+                // Validate cmd[2] is a number.
+                temp = cmd[2].toLowerCase();
+                curState = this.MucRoomObjects[cmd[1].toLowerCase()].bSelfDestruct;   // current self-destruct setting.
+
+                if (temp) {
+                    if (temp === 'off') {
+                        // Turning persistence OFF is the same as turning self-destruct ON
+                        if (curState === true) {
+                            this.notifylog('Persist is already off in room: ' + cmd[1]);
+                        }
+                        else {
+                            this.notifylog('Changing Persist - Turning persistence OFF in room: ' + cmd[1]);
+                        }
+                        this.MucRoomObjects[cmd[1].toLowerCase()].bSelfDestruct = true;
+                    }
+                    else {
+                        // Turning persistence ON is the same as turning self-destruct OFF
+                        if (curState === false) {
+                            this.notifylog('Persist is already on in room: ' + cmd[1]);
+                        }
+                        else {
+                            this.notifylog('Changing Persist - Turning persistence ON in room: ' + cmd[1]);
+                        }
+                        this.MucRoomObjects[cmd[1].toLowerCase()].bSelfDestruct = false;
+                    }
+                }
+            }
+            else {
+                this.notifylog('ERROR: Failed to SETPERSISTENT - be sure to use SETPERSISTENT;roomname;[ON|OFF]');
+            }
+            break;
         case 'LISTROOMS':
             if (this.roommanager) {
                 temp = 'LISTROOMS Request: \n';
@@ -3289,7 +3445,8 @@ Overseer.prototype.handleMessage = function(msg) {
         case 'HELP':
             this.notifylog('Commands: LISTROOMS');
             this.notifylog('          DEBUGSTANZAS ; [ALL | OVERSEER | MUCROOMS | NONE]');
-            this.notifylog('          SETMAXPARTICIPANTS; <roomname> ; maxParticipants');
+            this.notifylog('          SETMAXPARTICIPANTS ; <roomname> ; maxParticipants');
+            this.notifylog('          SETPERSISTENT ; <roomname> ; [ON | OFF]');
 //            this.notifylog('          KNOCK');
             this.notifylog('          LIVELOG ; <from-name> ; <message>');
             this.notifylog('          SKIPJOIN ; [ON | OFF]');
