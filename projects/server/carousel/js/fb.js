@@ -75,10 +75,10 @@ GoCastJS.FB.prototype.HasPermissionFor = function(permslist, cb) {
 
     if (!this.perms) {
         this.GetPermissions(function(result) {
-            return iter();
+            cb(iter());
         });
     } else {
-        return iter();
+        cb(iter());
     }
 };
 
@@ -166,7 +166,10 @@ GoCastJS.FB.prototype.CreateEvent = function(eventName, start_time, options, cbS
     evopts.location = evopts.location || window.location.href;
 
     // If one is not set...set one...
-    evopts.picture = evopts.picture || 'http://www.gocast.it/images/gologo.png';
+    evopts.picture = evopts.picture || (window.location.protocol +
+                                        window.location.hostname +
+                                        window.location.pathname +
+                                        'images/GoToken.png');
 
     FB.api('/me/events', 'POST', evopts, function(evreturn) {
         if (evreturn.error) {
@@ -435,6 +438,185 @@ function fbSendDialog()
     }
   });
 }
+
+GoCastJS.FacebookEvent = {
+  invitelist: [],
+  convertToAMPMAddHour: function(date) {
+    function minstring(minutes) {
+      var digits = {false: '', true: '0'};
+      return digits[minutes<10] + minutes;
+    }
+
+    date.setHours(date.getHours() + 1);
+    if (12 < date.getHours()) {
+      return (date.getHours()-12) + ':' + minstring(date.getMinutes()) + ' PM';
+    } else {
+      if (0 === date.getHours()) {
+        return '12:' + minstring(date.getMinutes()) + ' AM';
+      } else {
+        return date.getHours() + ':' + minstring(date.getMinutes()) + ((date.getHours() < 12) ? ' AM' : ' PM');
+      }
+    }
+  },
+  opendialog: function(dlgSelector, maskSelector) {
+    var winW = $(window).width(),
+      winH = $(window).height(),
+      date = new Date(),
+      self = this;
+
+    $(document).unbind('keydown');
+    if ('Firefox' === app.browser.name) {
+      $('#meeting').css('visibility', 'hidden');
+    }
+
+    $(maskSelector).css({
+      'width': winW + 'px',
+      'height': winH + 'px'
+    }).fadeIn('slow', function() {
+      var $dlg = $(dlgSelector);
+      $dlg.css({
+        'left': (winW - $dlg.width())/2 + 'px',
+        'top': (winH - $dlg.height())/4 + 'px',
+        'z-index': $(this).css('z-index') + 1
+      }).addClass('show');
+      $('#whendate', $dlg).unbind('blur').unbind('keydown')
+                          .keydown(function(evt) {evt.preventDefault();})
+                          .blur(self.whendateblurCb($dlg)).blur();
+      $('#whentime', $dlg).val(self.convertToAMPMAddHour(date)).unbind('blur').blur(self.whentimeblurCb($dlg)).blur();
+      $('#masker', $dlg).css('z-index', $(this).css('z-index') + 2);
+      $('#status', $dlg).css('z-index', $(this).css('z-index') + 3);
+      $('#roomlink', $dlg).text(window.location.href);
+      $('#cancel', $dlg).unbind('click').click(self.cancelclickCb($dlg, $(this)));
+      $('#create', $dlg).unbind('click').click(self.createclickCb($dlg, $(this)));
+      $('#invite', $dlg).unbind('click').click(self.inviteclickCb($dlg));
+      $('#topic', $dlg).focus();
+    });
+  },
+  whendateblurCb: function($dlg) {
+    var $whendate = $('#whendate', $dlg);
+    return function() {
+      var date = new Date();
+      $whendate.val($whendate.val() || ((date.getMonth()+1) + '/' + date.getDate() + '/' + date.getFullYear()));          
+    };
+  },
+  whentimeblurCb: function($dlg) {
+    var $whentime = $('#whentime', $dlg),
+        self = this;
+    return function() {
+      $whentime.val($whentime.val() || self.convertToAMPMAddHour(new Date()));
+    };
+  },
+  inviteclickCb: function($dlg) {
+    var self = this;
+    return function() {
+      $('#friends', $dlg).addClass('show').css({
+        'left': '0px',
+        'bottom': '0px'
+      }).jfmfs({
+        labels: {
+          all: 'All',
+          selected: 'Selected',
+          filter_title: 'Search Friends: ',
+          filter_default: 'Type here to narrow down',
+          max_selected_message: '{0} of {1} selected'
+        },
+        close_window: function() {
+          $('#friends', $dlg).removeClass('show');
+        }
+      }).unbind('jfmfs.selection.changed').bind('jfmfs.selection.changed', self.friendselectCb($dlg));
+    };
+  },
+  friendselectCb: function($dlg) {
+    var jfmfs = $('#friends', $dlg).data('jfmfs');
+        self = this;
+    return function() {
+      var invitetext = 'Invite Friends';
+      self.invitelist = jfmfs.getSelectedIds();
+      if (0 < self.invitelist.length) {
+        invitetext = invitetext + ' (' + self.invitelist.length + ')';
+      }
+      $('#invite', $dlg).text(invitetext);
+    };
+  },
+  cancelclickCb: function($dlg, $mask) {
+    var self = this;
+    return function() {
+      var jfmfs = $('#friends', $dlg).data('jfmfs');
+      $('#invite', $dlg).text('Invite Friends');
+      $('#details', $dlg).val('');
+      $('#topic', $dlg).val('');
+      $dlg.removeClass('show');
+      $mask.fadeOut('slow');
+      self.invitelist = [];
+      if(jfmfs) {
+        jfmfs.clearSelected(); 
+      }
+
+      $(document).keydown(docKey);
+      if ('Firefox' === app.browser.name) {
+        $('#meeting').css('visibility', 'visible');
+      }
+    };
+  },
+  createclickCb: function($dlg, $mask) {
+    var self = this;
+    return function() {
+      var name = $('#topic', $dlg).val(),
+          starttime = new Date($('#whendate', $dlg).val() + ' ' + $('#whentime', $dlg).val()),
+          options = {
+            description: $('#details', $dlg).val(),
+            location: $('#roomlink', $dlg).text(),
+            privacy_type: 'SECRET'
+          };
+
+      if (name && 'invalid date' !== starttime.toString().toLowerCase() && self.invitelist.length) {
+        console.log('CreateEvent: ', {name: name, starttime: starttime, options: options});
+        $('#masker', $dlg).addClass('show');
+        $('#status', $dlg).addClass('show').text('Creating Event');
+        globalFB.CreateEvent(name, starttime, options, function(response) {
+          console.log('CreateEventSuccess: ', response);
+          $('#status', $dlg).text('Sending Invites');
+          globalFB.InviteToEvent(response.id, self.invitelist, function(response) {
+            console.log('InviteSuccess: ', response);
+            $('#status', $dlg).text('Done');
+            setTimeout(function() {
+              $('#status', $dlg).removeClass('show');
+              $('#masker', $dlg).removeClass('show');
+              $('#cancel', $dlg).click();
+            }, 2000);
+          }, function(response) {
+            console.log('InviteFailure: ', response);
+            $('#status', $dlg).text('Failed');
+            setTimeout(function() {
+              $('#status', $dlg).removeClass('show');
+              $('#masker', $dlg).removeClass('show');
+              $('#cancel', $dlg).click();
+            }, 2000);            
+          });
+        }, function(response) {
+          console.log('CreateEventError: ', response);
+          $('#status', $dlg).text('Failed');
+          setTimeout(function() {
+            $('#status', $dlg).removeClass('show');
+            $('#masker', $dlg).removeClass('show');
+            $('#cancel', $dlg).click();
+          }, 2000);
+        });
+      } else {
+        if (!name) {
+          $('#topic', $dlg).focus();
+        } else if (!self.invitelist.length) {
+          $('#invite', $dlg).effect('pulsate', {times: 5}, 1000);
+        } else {
+          var timeph = $('#whentime', $dlg).val('').attr('placeholder');
+          $('#whentime', $dlg).unbind('focus').focus(function() {
+            $(this).unbind('focus').attr('placeholder', timeph);
+          }).attr('placeholder', 'Invalid time'); 
+        }
+      }
+    };
+  } 
+};
 
 /* version using stream.share
 function fbSendDialog()

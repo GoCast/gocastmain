@@ -3108,3 +3108,17 @@ function showWarning(title, message) {
   $('h1', $warningWin).text(title);
   $('p#prompt', $warningWin).text(message);
 }
+
+function fbEvent() {
+  globalFB.HasPermissionFor('create_event', function(permitted) {
+    if (permitted) {
+      GoCastJS.FacebookEvent.opendialog('#fbevent', '#mask');
+    } else {
+      globalFB.RequestAdditionalPermissions('create_event', function() {
+        GoCastJS.FacebookEvent.opendialog('#fbevent', '#mask');
+      }, function() {
+        app.log(2, 'fbEvent: Faceebook events not permitted.');
+      });
+    }
+  });
+}

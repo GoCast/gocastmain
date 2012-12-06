@@ -45,6 +45,7 @@
 				border: none;
 				font-size: 14px;
 				margin-top: 7px;
+				padding-bottom: 7px;
 			}
 
 			.fbdialog > .infopanel > table th {
@@ -127,7 +128,7 @@
 	<body>
 		<div id="fbevent" class="fbdialog">
 			<div id="title" class="header">
-				Schedule Meeting on Facebook
+				Create Meeting Event
 			</div>
 			<div id="infopanel" class="infopanel">
 				<table>
@@ -161,7 +162,19 @@
 						</th>
 						<td>
 							<input id="whendate" style="width: 43%;" type="text" class="field" placeholder="Date (mm/dd/yyyy)"/>
-							<input id="whentime" style="width: 42%;" type="text" class="field" placeholder="Time (hh:mm [A|P]M)"/>
+							<input id="whentime" style="width: 42%;" type="text" class="field" placeholder="Time (hh:mm AM|PM)"/>
+						</td>
+					</tr>
+					<tr valign="top">
+						<th>
+							<label>Privacy</label>
+						</th>
+						<td>
+							<select id="privacy" class="field" style="width: 95%;"/>
+								<option value="OPEN">Public</option>
+								<option value="FRIENDS">Friends</option>
+								<option value="SECRET">Invite Only</option>
+							</select>
 						</td>
 					</tr>
 				</table>
