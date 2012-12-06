@@ -1,6 +1,6 @@
 #include "package.h"
 
-void tProgram::SetActiveImpl()
+void tProgram::setActive()
 {
     glUseProgram(mProgramID);
 }

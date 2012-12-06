@@ -14,8 +14,6 @@ protected:
 
 protected:
     void createResources();
-    void createNodes();
-    void linkNodes();
     void configureNodes();
 
 public:

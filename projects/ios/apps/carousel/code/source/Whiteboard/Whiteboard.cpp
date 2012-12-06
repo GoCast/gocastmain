@@ -1,6 +1,34 @@
 #include "package.h"
 #include "Whiteboard.h"
 
+class tMatrix4x4f
+{
+public:
+    float mArray[4][4];
+
+public:
+    tMatrix4x4f(const float& d)
+    {
+        mArray[0][0] = d; mArray[0][1] = 0; mArray[0][2] = 0; mArray[0][3] = 0;
+        mArray[1][0] = 0; mArray[1][1] = d; mArray[1][2] = 0; mArray[1][3] = 0;
+        mArray[2][0] = 0; mArray[2][1] = 0; mArray[2][2] = d; mArray[2][3] = 0;
+        mArray[3][0] = 0; mArray[3][1] = 0; mArray[3][2] = 0; mArray[3][3] = d;
+    }
+};
+
+static tMatrix4x4f ortho(const float &left, const float &right, const float &bottom, const float &top)
+{
+    tMatrix4x4f Result(1);
+
+    Result.mArray[0][0] = float(2) / (right - left);
+    Result.mArray[1][1] = float(2) / (top - bottom);
+    Result.mArray[2][2] = - float(1);
+    Result.mArray[3][0] = - (right + left) / (right - left);
+    Result.mArray[3][1] = - (top + bottom) / (top - bottom);
+
+    return Result;
+}
+
 const tDimension2f kScreenSize(320,480);
 
 Whiteboard gApp;
@@ -38,50 +66,50 @@ void Whiteboard::createResources()
 }
 
 //Create Nodes
-void Whiteboard::createNodes()
-{
-    tSG_CREATE("os.root.tag", new tSGNode);
-
-    //os.init.tag
-    tSG_CREATE("os.init.tag",                   new tSGNode);
-    tSG_CREATE("os.init.setFrameBufferState",   new tSGSetFrameBufferStateNode);
-    tSG_CREATE("os.init.clearBuffers",          new tSGClearBuffersNode(tSGClearBuffersNode::kColorBufferBit | tSGClearBuffersNode::kDepthBufferBit));
-    tSG_CREATE("os.init.setBlendState",         new tSGSetBlendStateNode);
-    tSG_CREATE("os.init.setDepthState",         new tSGSetDepthStateNode);
-    tSG_CREATE("os.init.setRasterState",        new tSGSetRasterizerStateNode);
-
-    //os.draw.tag
-    tSG_CREATE("os.draw.tag",                       new tSGNode);
-    tSG_CREATE("os.draw.setViewportState",          new tSGSetViewportStateNode);
-    tSG_CREATE("os.draw.setProgram",                new tSGSetProgramNode);
-    tSG_CREATE("os.draw.setProjection",             new tSGSetUniformNode("mProjection"));
-    tSG_CREATE("os.draw.draw",                      new tSGDrawSorted2DNode);
-    tSG_CREATE("os.draw.flush",                     new tSGFlushNode);
-}
+//void Whiteboard::createNodes()
+//{
+//    tSG_CREATE("os.root.tag", new tSGNode);
+//
+//    //os.init.tag
+//    tSG_CREATE("os.init.tag",                   new tSGNode);
+//    tSG_CREATE("os.init.setFrameBufferState",   new tSGSetFrameBufferStateNode);
+//    tSG_CREATE("os.init.clearBuffers",          new tSGClearBuffersNode(tSGClearBuffersNode::kColorBufferBit | tSGClearBuffersNode::kDepthBufferBit));
+//    tSG_CREATE("os.init.setBlendState",         new tSGSetBlendStateNode);
+//    tSG_CREATE("os.init.setDepthState",         new tSGSetDepthStateNode);
+//    tSG_CREATE("os.init.setRasterState",        new tSGSetRasterizerStateNode);
+//
+//    //os.draw.tag
+//    tSG_CREATE("os.draw.tag",                       new tSGNode);
+//    tSG_CREATE("os.draw.setViewportState",          new tSGSetViewportStateNode);
+//    tSG_CREATE("os.draw.setProgram",                new tSGSetProgramNode);
+//    tSG_CREATE("os.draw.setProjection",             new tSGSetUniformNode("mProjection"));
+//    tSG_CREATE("os.draw.draw",                      new tSGDrawSorted2DNode);
+//    tSG_CREATE("os.draw.flush",                     new tSGFlushNode);
+//}
 
 //Link Nodes
-void Whiteboard::linkNodes()
-{
-//    tSGView::getInstance()->setRootNode(tSG_RETRIEVE("os.root.tag", tSGNode));
-
-    //os.root.tag
-    tSG_LINK("os.root.tag", "os.init.tag");
-    tSG_LINK("os.root.tag", "os.draw.tag");
-
-    //os.init.tag
-    tSG_LINK("os.init.tag",                 "os.init.setFrameBufferState");
-    tSG_LINK("os.init.setFrameBufferState", "os.init.clearBuffers");
-    tSG_LINK("os.init.clearBuffers",        "os.init.setBlendState");
-    tSG_LINK("os.init.setBlendState",       "os.init.setDepthState");
-    tSG_LINK("os.init.setDepthState",       "os.init.setRasterState");
-
-    //os.draw.tag
-    tSG_LINK("os.draw.tag",                 "os.draw.setViewportState");
-    tSG_LINK("os.draw.setViewportState",    "os.draw.setProgram");
-    tSG_LINK("os.draw.setProgram",          "os.draw.setProjection");
-    tSG_LINK("os.draw.setProgram",          "os.draw.draw");
-    tSG_LINK("os.draw.draw",                "os.draw.flush");
-}
+//void Whiteboard::linkNodes()
+//{
+////    tSGView::getInstance()->setRootNode(tSG_RETRIEVE("os.root.tag", tSGNode));
+//
+//    //os.root.tag
+//    tSG_LINK("os.root.tag", "os.init.tag");
+//    tSG_LINK("os.root.tag", "os.draw.tag");
+//
+//    //os.init.tag
+//    tSG_LINK("os.init.tag",                 "os.init.setFrameBufferState");
+//    tSG_LINK("os.init.setFrameBufferState", "os.init.clearBuffers");
+//    tSG_LINK("os.init.clearBuffers",        "os.init.setBlendState");
+//    tSG_LINK("os.init.setBlendState",       "os.init.setDepthState");
+//    tSG_LINK("os.init.setDepthState",       "os.init.setRasterState");
+//
+//    //os.draw.tag
+//    tSG_LINK("os.draw.tag",                 "os.draw.setViewportState");
+//    tSG_LINK("os.draw.setViewportState",    "os.draw.setProgram");
+//    tSG_LINK("os.draw.setProgram",          "os.draw.setProjection");
+//    tSG_LINK("os.draw.setProgram",          "os.draw.draw");
+//    tSG_LINK("os.draw.draw",                "os.draw.flush");
+//}
 
 //Configure Nodes
 void Whiteboard::configureNodes()
@@ -102,11 +130,6 @@ void Whiteboard::onInitView()
     //Resources
     createResources();
 
-    //Create Nodes
-    createNodes();
-    //Link Nodes
-    linkNodes();
-
     //Configure Nodes
     configureNodes();
 }
@@ -121,6 +144,47 @@ static tPoint2f lastMousePt = tPoint2f(0,0);
 void Whiteboard::onRedrawView(float time)
 {
 #pragma unused(time)
+
+    //os.root.tag
+    //os.init.tag
+    //os.init.setFrameBufferState
+    glClearColor(0,0,0,1);
+    glClearDepth(1);
+    glClearStencil(0);
+
+    //os.init.clearBuffers
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    //os.init.setBlendState
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    //os.init.setDepthState
+    glDisable(GL_DEPTH_TEST);
+
+    //os.init.setRasterState
+    glDisable(GL_CULL_FACE);
+
+    //os.draw.tag
+    //os.draw.setViewportState
+    glDepthRange(0, 1);
+    glViewport(0, 0, (int32_t)kScreenSize.width, (int32_t)kScreenSize.height);
+
+    //os.draw.setProgram
+    mSpriteProgram->setActive();
+    //os.draw.setProjection
+    {
+        GLint location;
+
+        location = glGetUniformLocation(mSpriteProgram->mProgramID, "mProjection");
+        assert(location != -1);
+
+        tMatrix4x4f orthoProj = ortho(0, 0, kScreenSize.width, kScreenSize.height);
+        glUniformMatrix4fv(location, 1, false, &orthoProj.mArray[0][0]);
+    }
+    //os.draw.draw
+    //os.draw.flush
+    glFlush();
 
 //    tSGDrawSorted2DNode* ssNode = tSG_RETRIEVE("os.draw.draw", tSGDrawSorted2DNode);
 //

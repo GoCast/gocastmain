@@ -9,9 +9,6 @@ protected:
     GLuint mProgramID;
 
 protected:
-    void SetActiveImpl();
-
-protected:
 	void AddAttrib(GLuint index);
 	void EnableAttribs();
 	void DisableAttribs();
@@ -24,10 +21,13 @@ public:
     bool linkStatus() const;
     bool validate() const;
     
+    void setActive();
+
     std::string getInfoLog() const;
 
     friend class tSGSetUniformNode;
     friend class tSGSetAttributeNode;
 	friend class tSGSetProgramNode;
+    friend class Whiteboard;
 };
 
