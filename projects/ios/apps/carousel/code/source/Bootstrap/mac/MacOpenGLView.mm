@@ -2,7 +2,9 @@
 
 #import "MacOpenGLView.h"
 
-#include "package.h"
+#include "Base/package.h"
+#include "Math/package.h"
+#include "OpenGL/package.h"
 
 @implementation MacOpenGLView
 

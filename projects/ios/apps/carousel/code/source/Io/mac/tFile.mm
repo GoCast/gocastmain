@@ -6,7 +6,8 @@
 #import <Foundation/Foundation.h>
 #endif
 
-#include "package.h"
+#include "Base/package.h"
+#include "Io/package.h"
 
 std::string tFile::fileToString(const std::string& newFileName)
 {

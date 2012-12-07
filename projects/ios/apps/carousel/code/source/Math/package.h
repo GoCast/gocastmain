@@ -1,17 +1,5 @@
 #pragma once
 
-#include <OpenGL/gl.h>
-#include <OpenGL/glext.h>
-#include <OpenGL/glu.h>
-
-#include <vector>
-#include <string>
-#include <math.h>
-#include <assert.h>
-
-#include "tObserver.h"
-#include "tSingleton.h"
-
 class tDimension2f
 {
 public:
@@ -57,22 +45,4 @@ public:
 };
 
 #include "tRect.h"
-
-#include "tFile.h"
-
-#include "tMouseEvent.h"
-#include "tTouchEvent.h"
-#include "tInputManager.h"
-
-#include "tPixelFormat.h"
-#include "tSurface.h"
-#include "tTexture.h"
-#include "tShader.h"
-#include "tProgram.h"
-
-#include "tSGView.h"
-
-#define tSG_CREATE( NAME, NODE )    (void)0
-#define tSG_LINK( PARENT, CHILD )   (void)0
-#define tSG_RETRIEVE( NAME, TYPE )  (void*)0
 

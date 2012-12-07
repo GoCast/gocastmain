@@ -1,4 +1,8 @@
-#include "package.h"
+#include "Base/package.h"
+#include "Math/package.h"
+#include "Input/package.h"
+#include "Io/package.h"
+#include "OpenGL/package.h"
 #include "Whiteboard.h"
 
 class tMatrix4x4f

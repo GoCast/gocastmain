@@ -3,7 +3,9 @@
 #import <Foundation/Foundation.h>
 #endif
 
-#include "package.h"
+#include "Base/package.h"
+#include "Math/package.h"
+#include "OpenGL/package.h"
 
 tSurface::tSurface(const std::string& filename)
 : mSize(0,0), mType(tPixelFormat::kInvalid), mPtr(NULL)

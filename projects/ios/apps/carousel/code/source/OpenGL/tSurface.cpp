@@ -1,4 +1,6 @@
-#include "package.h"
+#include "Base/package.h"
+#include "Math/package.h"
+#include "OpenGL/package.h"
 
 void tSurface::MakeSurfaceCopyUpsideDown(tSurface& dst, const tSurface& src)
 {

@@ -1,4 +1,6 @@
-#include "package.h"
+#include "Base/package.h"
+#include "Math/package.h"
+#include "OpenGL/package.h"
 
 tPixelFormat::tPixelFormat(const tPixelFormat::Type& newType)
 {

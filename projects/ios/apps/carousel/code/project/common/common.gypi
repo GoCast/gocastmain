@@ -2,7 +2,6 @@
 	# This is set globally for "project" level, which is required for "actions", rather than target level
 	'xcode_settings': {
 		'SYMROOT': '../../build/mac',
-#		'COMBINE_HIDPI_IMAGES': 'YES',
 	}, # xcode_settings
 
 	'target_defaults': {
@@ -16,7 +15,6 @@
 				], #defines
 
 				'xcode_settings': {
-					'COMBINE_HIDPI_IMAGES': 'YES',
 					'ONLY_ACTIVE_ARCH': 'YES',
 					'DEAD_CODE_STRIPPING': 'NO',
 					'GCC_DYNAMIC_NO_PIC': 'NO',
@@ -37,7 +35,6 @@
 				], #defines
 
 				'xcode_settings': {
-					'COMBINE_HIDPI_IMAGES': 'YES',
 					'ONLY_ACTIVE_ARCH': 'NO',
 					'DEAD_CODE_STRIPPING': 'YES',
 					'GCC_DYNAMIC_NO_PIC': 'YES',
@@ -60,8 +57,6 @@
 		'conditions': [
 			['OS=="mac"', {
 				'xcode_settings': {
-					'COMBINE_HIDPI_IMAGES': 'YES',
-
 					'LLVM_LTO': 'NO',
 					'ALWAYS_SEARCH_USER_PATHS': 'NO',
 					'ARCHS': '$(ARCHS_STANDARD_32_64_BIT)',
