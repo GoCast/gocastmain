@@ -107,105 +107,25 @@ void Whiteboard::createResources()
     mWhiteBoardTexCoords    = sixPoints(tPoint2f(0,0), tPoint2f(kScreenSize.width / mWhiteboardTexture->getSize().width, kScreenSize.height / mWhiteboardTexture->getSize().height));
 }
 
-//Create Nodes
-//void Whiteboard::createNodes()
-//{
-//    tSG_CREATE("os.root.tag", new tSGNode);
-//
-//    //os.init.tag
-//    tSG_CREATE("os.init.tag",                   new tSGNode);
-//    tSG_CREATE("os.init.setFrameBufferState",   new tSGSetFrameBufferStateNode);
-//    tSG_CREATE("os.init.clearBuffers",          new tSGClearBuffersNode(tSGClearBuffersNode::kColorBufferBit | tSGClearBuffersNode::kDepthBufferBit));
-//    tSG_CREATE("os.init.setBlendState",         new tSGSetBlendStateNode);
-//    tSG_CREATE("os.init.setDepthState",         new tSGSetDepthStateNode);
-//    tSG_CREATE("os.init.setRasterState",        new tSGSetRasterizerStateNode);
-//
-//    //os.draw.tag
-//    tSG_CREATE("os.draw.tag",                       new tSGNode);
-//    tSG_CREATE("os.draw.setViewportState",          new tSGSetViewportStateNode);
-//    tSG_CREATE("os.draw.setProgram",                new tSGSetProgramNode);
-//    tSG_CREATE("os.draw.setProjection",             new tSGSetUniformNode("mProjection"));
-//    tSG_CREATE("os.draw.draw",                      new tSGDrawSorted2DNode);
-//    tSG_CREATE("os.draw.flush",                     new tSGFlushNode);
-//}
-
-//Link Nodes
-//void Whiteboard::linkNodes()
-//{
-////    tSGView::getInstance()->setRootNode(tSG_RETRIEVE("os.root.tag", tSGNode));
-//
-//    //os.root.tag
-//    tSG_LINK("os.root.tag", "os.init.tag");
-//    tSG_LINK("os.root.tag", "os.draw.tag");
-//
-//    //os.init.tag
-//    tSG_LINK("os.init.tag",                 "os.init.setFrameBufferState");
-//    tSG_LINK("os.init.setFrameBufferState", "os.init.clearBuffers");
-//    tSG_LINK("os.init.clearBuffers",        "os.init.setBlendState");
-//    tSG_LINK("os.init.setBlendState",       "os.init.setDepthState");
-//    tSG_LINK("os.init.setDepthState",       "os.init.setRasterState");
-//
-//    //os.draw.tag
-//    tSG_LINK("os.draw.tag",                 "os.draw.setViewportState");
-//    tSG_LINK("os.draw.setViewportState",    "os.draw.setProgram");
-//    tSG_LINK("os.draw.setProgram",          "os.draw.setProjection");
-//    tSG_LINK("os.draw.setProgram",          "os.draw.draw");
-//    tSG_LINK("os.draw.draw",                "os.draw.flush");
-//}
-
 //Configure Nodes
 void Whiteboard::configureNodes()
 {
-//    tSG_RETRIEVE("os.init.setFrameBufferState", tSGSetFrameBufferStateNode)->setClearColor(tColor4f(0,0,0,1));
-//    tSG_RETRIEVE("os.init.setBlendState", tSGSetBlendStateNode)->setBlendEnabled(true);
-//    tSG_RETRIEVE("os.init.setBlendState", tSGSetBlendStateNode)->setBlendFunc(tSGSetBlendStateNode::kSourceAlpha, tSGSetBlendStateNode::kOneMinusSourceAlpha);
-//    tSG_RETRIEVE("os.init.setDepthState", tSGSetDepthStateNode)->setDepthTestEnabled(false);
-//    tSG_RETRIEVE("os.init.setRasterState", tSGSetRasterizerStateNode)->setCullFaceEnabled(false);
-//
-//    tSG_RETRIEVE("os.draw.setViewportState", tSGSetViewportStateNode)->setViewport(tRect<tSInt32>(0,0,(tSInt32)kScreenSize.width,(tSInt32)kScreenSize.height));
-//    tSG_RETRIEVE("os.draw.setProgram", tSGSetProgramNode)->setProgramPtr(tProgramCache::getInstance()->retrieve("spritesheet.prog"));
-//    tSG_RETRIEVE("os.draw.setProjection", tSGSetUniformNode)->setUniform(tMatrix4x4f::ortho(0,kScreenSize.width,kScreenSize.height, 0));
-}
-
-void Whiteboard::onInitView()
-{
-    //Resources
-    createResources();
-
-    //Configure Nodes
-//    configureNodes();
-}
-
-void Whiteboard::onResizeView(const tDimension2f& newSize)
-{
-#pragma unused(newSize)
-}
-
-static tPoint2f lastMousePt = tPoint2f(0,0);
-
-void Whiteboard::onRedrawView(float time)
-{
-#pragma unused(time)
-
     //os.root.tag
     //os.init.tag
     //os.init.setFrameBufferState
     glClearColor(0,0,0,1);
-
-    //os.init.clearBuffers
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+    
     //os.init.setBlendState
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
+    
     //os.init.setDepthState
     glDisable(GL_DEPTH_TEST);
-
+    
     //os.init.setRasterState
     glFrontFace(GL_CCW);
     glDisable(GL_CULL_FACE);
-
+    
     //os.draw.tag
     //os.draw.setViewportState
     glViewport(0, 0, (int32_t)kScreenSize.width, (int32_t)kScreenSize.height);
@@ -213,25 +133,17 @@ void Whiteboard::onRedrawView(float time)
     //os.draw.setProgram
     mSpriteProgram->setActive();
 
-    //os.draw.setTexture
-    mWhiteboardTexture->MakeCurrent();
-    //os.draw.setTextureParameterState
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
     //os.draw.setProjection
     {
         GLint location;
-
+        
         location = glGetUniformLocation(mSpriteProgram->mProgramID, "mProjection");
         assert(location != -1);
-
+        
         static tMatrix4x4f orthoProj = ortho(0,kScreenSize.width,kScreenSize.height, 0);
         glUniformMatrix4fv(location, 1, false, &orthoProj.mArray[0][0]);
     }
-    
+
     //os.draw.setToPoint
     {
         GLint location;
@@ -265,17 +177,45 @@ void Whiteboard::onRedrawView(float time)
         glVertexAttribPointer(location, 2, GL_FLOAT, GL_TRUE, 0, &mWhiteBoardTexCoords[0]);
     }
     
+}
+
+void Whiteboard::onInitView()
+{
+    //Resources
+    createResources();
+
+    //Configure Nodes
+    configureNodes();
+}
+
+void Whiteboard::onResizeView(const tDimension2f& newSize)
+{
+#pragma unused(newSize)
+}
+
+static tPoint2f lastMousePt = tPoint2f(0,0);
+
+void Whiteboard::onRedrawView(float time)
+{
+#pragma unused(time)
+
+    //os.init.clearBuffers
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    //os.draw.setTexture
+    mWhiteboardTexture->MakeCurrent();
+
+    //os.draw.setTextureParameterState
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
     //os.draw.draw
     glDrawArrays(GL_TRIANGLES, 0, (int32_t)mWhiteBoardVerts.size());
 
     //os.draw.flush
     glFlush();
-
-//    tSGDrawSorted2DNode* ssNode = tSG_RETRIEVE("os.draw.draw", tSGDrawSorted2DNode);
-//
-//    tSG_RETRIEVE("os.draw.draw", tSGDrawSorted2DNode)->add(tSGSpriteSheet(tRectf(0,0,kScreenSize.width,kScreenSize.height), kScreenSize).generateSprite(tTextureCache::getInstance()->retrieve("mWhiteboardSurface")->getSize(), 0), tPoint2f(0,0), tTextureCache::getInstance()->retrieve("mWhiteboardSurface"), 0);
-//
-//    ssNode->add(tSGSpriteSheet(tRectf(0,0,32,32), tDimension2f(32,32)).generateSprite(tTextureCache::getInstance()->retrieve("mouse")->getSize(), 0), lastMousePt, tTextureCache::getInstance()->retrieve("mouse"), 255);
 }
 
 void Whiteboard::update(const tSGViewEvent& msg)
