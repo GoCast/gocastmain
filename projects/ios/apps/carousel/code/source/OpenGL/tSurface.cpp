@@ -86,25 +86,25 @@ tSurface::tSurface(const tPixelFormat::Type& newType, const tSurface& origSurfac
     }
 }
 
-tSurface::tSurface(const tTexture& newTexture)
-: mSize(newTexture.getSize()), mType(tPixelFormat::kR8G8B8A8)
-{
-    mBytesPerRow = uint16_t(tPixelFormat(mType).mBytesPerPixel * mSize.width);
-    if ((mBytesPerRow & 0x3) != 0)
-    {
-        mBytesPerRow = (mBytesPerRow & ~0x3) + 4;
-    }
-
-    mPtr = new uint8_t[(int32_t)(mSize.height * mBytesPerRow)];
-
-    assert(mPtr);
-
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, newTexture.textureID);
-    glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, mPtr);   //TODO: Not OpenGL ES 2.0 compatible
-
-    MakeSurfaceCopyUpsideDown(*this, tSurface(*this));
-}
+//tSurface::tSurface(const tTexture& newTexture)
+//: mSize(newTexture.getSize()), mType(tPixelFormat::kR8G8B8A8)
+//{
+//    mBytesPerRow = uint16_t(tPixelFormat(mType).mBytesPerPixel * mSize.width);
+//    if ((mBytesPerRow & 0x3) != 0)
+//    {
+//        mBytesPerRow = (mBytesPerRow & ~0x3) + 4;
+//    }
+//
+//    mPtr = new uint8_t[(int32_t)(mSize.height * mBytesPerRow)];
+//
+//    assert(mPtr);
+//
+//    glActiveTexture(GL_TEXTURE0);
+//    glBindTexture(GL_TEXTURE_2D, newTexture.textureID);
+//    glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, mPtr);   //TODO: Not OpenGL ES 2.0 compatible
+//
+//    MakeSurfaceCopyUpsideDown(*this, tSurface(*this));
+//}
 
 tSurface::tSurface(const tSurface& origSurface)
 : mSize(origSurface.mSize), mType(origSurface.mType), mBytesPerRow(origSurface.mBytesPerRow)
