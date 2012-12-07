@@ -22,6 +22,9 @@ public:
     tPoint2f operator +(const tPoint2f& b) const { return tPoint2f(x + b.x, y + b.y); }
     tPoint2f operator -(const tPoint2f& b) const { return tPoint2f(x - b.x, y - b.y); }
 
+    tPoint2f& operator +=(const tPoint2f& b) { *this = *this + b; return *this; }
+    tPoint2f& operator -=(const tPoint2f& b) { *this = *this - b; return *this; }
+
     tPoint2f(const float& nx = 0, const float& ny = 0)
     : x(nx), y(ny) { }
 };

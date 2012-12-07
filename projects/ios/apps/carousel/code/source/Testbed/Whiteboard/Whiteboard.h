@@ -7,11 +7,16 @@ class Whiteboard
     tObserver<const tMouseEvent&>
 {
 protected:
-    tSurface mWhiteboardSurface;
-    tTexture* mWhiteboardTexture;
-    tTexture* mMouseTexture;
-    tProgram* mSpriteProgram;
+    std::vector<tPoint2f>   mWhiteBoardVerts;
+    std::vector<tPoint2f>   mWhiteBoardTexCoords;
+    std::vector<tPoint2f>   mMouseVerts;
+    std::vector<tPoint2f>   mMouseTexCoords;
 
+    tSurface                mWhiteboardSurface;
+    tTexture*               mWhiteboardTexture;
+    tTexture*               mMouseTexture;
+    tProgram*               mSpriteProgram;
+    
 protected:
     void createResources();
     void configureNodes();

@@ -19,5 +19,6 @@ public:
     friend class tSGSetTextureNode;
     friend class tFrameBuffer;
     friend class tSurface;
+    friend class Whiteboard;
 };
 

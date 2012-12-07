@@ -5,18 +5,39 @@
 #include "OpenGL/package.h"
 #include "Whiteboard.h"
 
+class tVector4f
+{
+public:
+    union
+    {
+        float mArray[4];
+        struct { float x, y, z, w; };
+    };
+
+    //Array subscript operator
+	float& operator [](const size_t i) { assert(i < 4); return mArray[i]; }
+	const float& operator [](const size_t i) const { assert(i < 4); return mArray[i]; }
+
+public:
+    tVector4f(const float& nx = 0, const float& ny = 0, const float& nz = 0, const float& nw = 0)
+    : x(nx), y(ny), z(nz), w(nw) { }
+};
+
 class tMatrix4x4f
 {
 public:
-    float mArray[4][4];
+    tVector4f mArray[4];
+
+	tVector4f& operator [](const size_t i) { assert(i < 4); return mArray[i]; }
+	const tVector4f& operator [](const size_t i) const { assert(i < 4); return mArray[i]; }
 
 public:
-    tMatrix4x4f(const float& d)
+    tMatrix4x4f(const float& n)
     {
-        mArray[0][0] = d; mArray[0][1] = 0; mArray[0][2] = 0; mArray[0][3] = 0;
-        mArray[1][0] = 0; mArray[1][1] = d; mArray[1][2] = 0; mArray[1][3] = 0;
-        mArray[2][0] = 0; mArray[2][1] = 0; mArray[2][2] = d; mArray[2][3] = 0;
-        mArray[3][0] = 0; mArray[3][1] = 0; mArray[3][2] = 0; mArray[3][3] = d;
+        mArray[0] = tVector4f(n, 0, 0, 0);
+        mArray[1] = tVector4f(0, n, 0, 0);
+        mArray[2] = tVector4f(0, 0, n, 0);
+        mArray[3] = tVector4f(0, 0, 0, n);
     }
 };
 
@@ -24,13 +45,27 @@ static tMatrix4x4f ortho(const float &left, const float &right, const float &bot
 {
     tMatrix4x4f Result(1);
 
-    Result.mArray[0][0] = float(2) / (right - left);
-    Result.mArray[1][1] = float(2) / (top - bottom);
-    Result.mArray[2][2] = - float(1);
-    Result.mArray[3][0] = - (right + left) / (right - left);
-    Result.mArray[3][1] = - (top + bottom) / (top - bottom);
+    Result[0][0] = float(2) / (right - left);
+    Result[1][1] = float(2) / (top - bottom);
+    Result[2][2] = - float(1);
+    Result[3][0] = - (right + left) / (right - left);
+    Result[3][1] = - (top + bottom) / (top - bottom);
 
     return Result;
+}
+
+static std::vector<tPoint2f> sixPoints(const tPoint2f& toPtA, const tPoint2f& toPtB)
+{
+    std::vector<tPoint2f> result;
+    
+    result.push_back(toPtA);
+    result.push_back(tPoint2f(toPtA.x, toPtB.y));
+    result.push_back(toPtB);
+    result.push_back(toPtB);
+    result.push_back(tPoint2f(toPtB.x, toPtA.y));
+    result.push_back(toPtA);
+    
+    return result;
 }
 
 const tDimension2f kScreenSize(320,480);
@@ -67,6 +102,9 @@ void Whiteboard::createResources()
 
     mMouseTexture = new tTexture(mouse);
     mWhiteboardTexture = new tTexture(mWhiteboardSurface);
+    
+    mWhiteBoardVerts        = sixPoints(tPoint2f(0,0), tPoint2f(kScreenSize.width, kScreenSize.height));
+    mWhiteBoardTexCoords    = sixPoints(tPoint2f(0,0), tPoint2f(kScreenSize.width / mWhiteboardTexture->getSize().width, kScreenSize.height / mWhiteboardTexture->getSize().height));
 }
 
 //Create Nodes
@@ -135,7 +173,7 @@ void Whiteboard::onInitView()
     createResources();
 
     //Configure Nodes
-    configureNodes();
+//    configureNodes();
 }
 
 void Whiteboard::onResizeView(const tDimension2f& newSize)
@@ -153,8 +191,6 @@ void Whiteboard::onRedrawView(float time)
     //os.init.tag
     //os.init.setFrameBufferState
     glClearColor(0,0,0,1);
-    glClearDepth(1);
-    glClearStencil(0);
 
     //os.init.clearBuffers
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -167,15 +203,24 @@ void Whiteboard::onRedrawView(float time)
     glDisable(GL_DEPTH_TEST);
 
     //os.init.setRasterState
+    glFrontFace(GL_CCW);
     glDisable(GL_CULL_FACE);
 
     //os.draw.tag
     //os.draw.setViewportState
-    glDepthRange(0, 1);
     glViewport(0, 0, (int32_t)kScreenSize.width, (int32_t)kScreenSize.height);
 
     //os.draw.setProgram
     mSpriteProgram->setActive();
+
+    //os.draw.setTexture
+    mWhiteboardTexture->MakeCurrent();
+    //os.draw.setTextureParameterState
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
     //os.draw.setProjection
     {
         GLint location;
@@ -183,10 +228,46 @@ void Whiteboard::onRedrawView(float time)
         location = glGetUniformLocation(mSpriteProgram->mProgramID, "mProjection");
         assert(location != -1);
 
-        tMatrix4x4f orthoProj = ortho(0, 0, kScreenSize.width, kScreenSize.height);
+        static tMatrix4x4f orthoProj = ortho(0,kScreenSize.width,kScreenSize.height, 0);
         glUniformMatrix4fv(location, 1, false, &orthoProj.mArray[0][0]);
     }
+    
+    //os.draw.setToPoint
+    {
+        GLint location;
+        
+        location = glGetUniformLocation(mSpriteProgram->mProgramID, "mToPoint");
+        assert(location != -1);
+        
+        static tPoint2f origin(0,0);
+        glUniform2fv(location, 1, &origin.x);
+    }
+
+    //os.draw.setVertices
+    {
+        GLuint location = (GLuint)glGetAttribLocation(mSpriteProgram->mProgramID, "mVerts");
+        assert((GLint)location != -1);
+        
+        glEnableVertexAttribArray(location);
+		mSpriteProgram->AddAttrib(location);	// Remember that we added this
+        
+        glVertexAttribPointer(location, 2, GL_FLOAT, GL_TRUE, 0, &mWhiteBoardVerts[0]);
+    }
+
+    //os.draw.setTexCoords
+    {
+        GLuint location = (GLuint)glGetAttribLocation(mSpriteProgram->mProgramID, "mTexCoords");
+        assert((GLint)location != -1);
+        
+        glEnableVertexAttribArray(location);
+		mSpriteProgram->AddAttrib(location);	// Remember that we added this
+        
+        glVertexAttribPointer(location, 2, GL_FLOAT, GL_TRUE, 0, &mWhiteBoardTexCoords[0]);
+    }
+    
     //os.draw.draw
+    glDrawArrays(GL_TRIANGLES, 0, (int32_t)mWhiteBoardVerts.size());
+
     //os.draw.flush
     glFlush();
 

@@ -12,6 +12,6 @@ void main()
 {
 	gl_Position = mProjection * vec4(mVerts + mToPoint, 0.0, 1.0);
 
-    texCoords = mTexCoords;
+    texCoords = vec2(mTexCoords.x, 1.0f - mTexCoords.y);
 }
 

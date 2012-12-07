@@ -4,6 +4,7 @@
 
 #include "Base/package.h"
 #include "Math/package.h"
+#include "Input/package.h"
 #include "OpenGL/package.h"
 
 @implementation MacOpenGLView
@@ -89,6 +90,66 @@ static CVReturn MyDisplayLinkCallback(CVDisplayLinkRef displayLink, const CVTime
 
     [super update];
 }
+
+#pragma mark --MouseEvent hooks
+- (void)mouseEvent:(NSEvent *)theEvent withEvent:(tMouseEvent::EventType)evt withID:(tMouseEvent::ButtonID)bID
+{
+    NSPoint  loc    = [self convertPoint:[theEvent locationInWindow] fromView:self];
+    
+    tPoint2f calculatedLoc((float)loc.x, float([self bounds].size.height - loc.y));
+    tRectf viewPort = tRectf(0,0,320,480);
+    tDimension2f original = tDimension2f(320,480);
+    
+    calculatedLoc -= viewPort.location;
+    calculatedLoc.x = calculatedLoc.x / viewPort.size.width * original.width; calculatedLoc.y = calculatedLoc.y / viewPort.size.height * original.height;
+    
+    tInputManager::getInstance()->tSubject<const tMouseEvent&>::notify(tMouseEvent(evt, tInputManager::getInstance(), calculatedLoc, bID));
+}
+
+- (void)mouseDown:(NSEvent *)theEvent { [self mouseEvent:theEvent withEvent:tMouseEvent::kMouseDown withID:tMouseEvent::kLeft]; }
+- (void)otherMouseDown:(NSEvent *)theEvent { [self mouseEvent:theEvent withEvent:tMouseEvent::kMouseDown withID:tMouseEvent::kMiddle]; }
+- (void)rightMouseDown:(NSEvent *)theEvent { [self mouseEvent:theEvent withEvent:tMouseEvent::kMouseDown withID:tMouseEvent::kRight]; }
+
+- (void)mouseDragged:(NSEvent *)theEvent { [self mouseEvent:theEvent withEvent:tMouseEvent::kMouseDrag withID:tMouseEvent::kLeft]; }
+- (void)otherMouseDragged:(NSEvent *)theEvent { [self mouseEvent:theEvent withEvent:tMouseEvent::kMouseDrag withID:tMouseEvent::kMiddle]; }
+- (void)rightMouseDragged:(NSEvent *)theEvent { [self mouseEvent:theEvent withEvent:tMouseEvent::kMouseDrag withID:tMouseEvent::kRight]; }
+
+- (void)mouseMoved:(NSEvent *)theEvent
+{
+    NSPoint pt = [self convertPoint:[theEvent locationInWindow] fromView:nil];
+    NSRect windowSize = [self bounds];
+    if ((pt.x >= 0.0f && pt.y >= 0) &&
+        (pt.x <= windowSize.size.width && pt.y <= windowSize.size.height))
+    {
+        [self mouseEvent:theEvent withEvent:tMouseEvent::kMouseMove withID:tMouseEvent::kLeft];
+    }
+}
+
+- (void)mouseUp:(NSEvent *)theEvent { [self mouseEvent:theEvent withEvent:tMouseEvent::kMouseUp withID:tMouseEvent::kLeft]; }
+- (void)otherMouseUp:(NSEvent *)theEvent { [self mouseEvent:theEvent withEvent:tMouseEvent::kMouseUp withID:tMouseEvent::kMiddle]; }
+- (void)rightMouseUp:(NSEvent *)theEvent { [self mouseEvent:theEvent withEvent:tMouseEvent::kMouseUp withID:tMouseEvent::kRight]; }
+
+//TODO: figure out what range we want to use for mouse wheel, and test it, it's untested
+- (void)scrollWheel:(NSEvent *)theEvent
+{
+#pragma unused(theEvent)
+    //    NSPoint  loc    = [self convertPoint:[theEvent locationInWindow] fromView:nil];
+    //    unsigned flags  = [theEvent modifierFlags];
+    //    
+    //    Stage::getInstance()->tSubject<const MouseEvent&>::notify(
+    //          MouseEvent(
+    //                     MouseEvent::mouseWheel,
+    //                     tPoint2f(loc.x, loc.y),
+    //                     MouseEvent::left,
+    //                     [theEvent deltaX],
+    //                     [theEvent deltaY],
+    //                     [theEvent deltaZ],
+    //                     (flags & NSAlternateKeyMask),
+    //                     (flags & NSCommandKeyMask),
+    //                     (flags & NSControlKeyMask),
+    //                     (flags & NSShiftKeyMask)));
+}
+
 
 @end
 
