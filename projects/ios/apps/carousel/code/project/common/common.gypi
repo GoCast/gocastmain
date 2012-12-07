@@ -1,8 +1,16 @@
 {
 	# This is set globally for "project" level, which is required for "actions", rather than target level
 	'xcode_settings': {
-		'SYMROOT': '../../build/mac',
+		'SYMROOT': '../../build/<@(OS)',
 	}, # xcode_settings
+
+	'conditions': [
+		['OS=="ios"', {
+			'xcode_settings': {
+				'SDKROOT': 'iphoneos',
+			}, # xcode_settings
+		}],  # OS=="ios"
+	],  # conditions
 
 	'target_defaults': {
 

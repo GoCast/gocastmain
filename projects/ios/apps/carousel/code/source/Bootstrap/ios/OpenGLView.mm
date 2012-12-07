@@ -2,6 +2,7 @@
 
 #include "Base/package.h"
 #include "Math/package.h"
+#include "Input/package.h"
 #include "OpenGL/package.h"
 
 @implementation OpenGLView
@@ -85,6 +86,29 @@
     [_context release];
     _context = nil;
     [super dealloc];
+}
+
+- (void)mouseEvent:(NSSet *)touches withEvent:(tMouseEvent::EventType)evt withID:(tMouseEvent::ButtonID)bID
+{
+    UITouch *touch = [touches anyObject];
+    CGPoint touchPoint = [touch locationInView:self];
+
+    tInputManager::getInstance()->tSubject<const tMouseEvent&>::notify(tMouseEvent(evt, tInputManager::getInstance(), tPoint2f(touchPoint.x, touchPoint.y), bID));
+}
+
+- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    [self mouseEvent:touches withEvent:tMouseEvent::kMouseDown withID:tMouseEvent::kLeft];
+}
+
+- (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    [self mouseEvent:touches withEvent:tMouseEvent::kMouseDrag withID:tMouseEvent::kLeft];
+}
+
+- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    [self mouseEvent:touches withEvent:tMouseEvent::kMouseUp withID:tMouseEvent::kLeft];
 }
 
 @end
