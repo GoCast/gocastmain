@@ -98,6 +98,7 @@ void Whiteboard::createResources()
     tSurface mouse(tPixelFormat::kR8G8B8A8, tDimension2f(32,32));
 
     mWhiteboardSurface.fillRect(tRectf(0,0,mWhiteboardSurface.getSize()), tColor4b(255,255,255,255));
+    mWhiteboardSurface.drawLine(tPoint2f(0,0), tPoint2f(kScreenSize.width, kScreenSize.height), tColor4b(255,0,0,255));
     mouse.fillRect(tRectf(0,0,mouse.getSize()), tColor4b(0,0,255,255));
 
     mMouseTexture = new tTexture(mouse);
@@ -113,7 +114,7 @@ void Whiteboard::configureNodes()
     //os.root.tag
     //os.init.tag
     //os.init.setFrameBufferState
-    glClearColor(0,0,0,1);
+    glClearColor(1,0,0,1);
     
     //os.init.setBlendState
     glEnable(GL_BLEND);

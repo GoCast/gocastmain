@@ -44,8 +44,8 @@
 					],	# sources
 
 					'mac_bundle_resources': [
-						'../../rsrc/common/spritesheet.frag',
-						'../../rsrc/common/spritesheet.vert',
+						'../../rsrc/<@(OS)/spritesheet.frag',
+						'../../rsrc/<@(OS)/spritesheet.vert',
 					],	# mac_bundle_resources
 
 					'xcode_settings': {
@@ -85,6 +85,8 @@
 							], #defines
 							
 							'sources': [
+								'../../source/Bootstrap/<@(OS)/OpenGLView.mm',
+								'../../source/Bootstrap/<@(OS)/OpenGLView.h',
 								'../../source/Bootstrap/<@(OS)/AppDelegate.h',
 								'../../source/Bootstrap/<@(OS)/AppDelegate.mm',
 								'../../source/Bootstrap/<@(OS)/main.mm',
@@ -94,8 +96,7 @@
 	
 							'mac_bundle_resources': [
 								'../../rsrc/<@(OS)/en.lproj/InfoPlist.strings',
-								'../../rsrc/<@(OS)/en.lproj/ViewController_iPhone.xib',
-								'../../rsrc/<@(OS)/en.lproj/ViewController_iPad.xib',
+								'../../rsrc/<@(OS)/en.lproj/MainWindow.xib',
 							],	# mac_bundle_resources
 	
 							'link_settings': {

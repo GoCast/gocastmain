@@ -1,12 +1,11 @@
-
 #import <UIKit/UIKit.h>
+#import "OpenGLView.h"
 
-@class ViewController;
+@interface AppDelegate : NSObject <UIApplicationDelegate> {
+    OpenGLView* _glView;
+}
 
-@interface AppDelegate : UIResponder <UIApplicationDelegate>
-
-@property (strong, nonatomic) UIWindow *window;
-
-@property (strong, nonatomic) ViewController *viewController;
+@property (nonatomic, retain) IBOutlet UIWindow *window;
+@property (nonatomic, retain) IBOutlet OpenGLView *glView;
 
 @end
