@@ -1409,8 +1409,8 @@ MucRoom.prototype.DeleteAllFileShares = function() {
                 }
             });
         }
-        else {
-            this.log('DeleteAllFileShares: ERROR: Links-dir / Files-dir not a directory.\n' +
+        else if (test('-e', locFiles) && test('-e', locLinks)) {
+            this.log('DeleteAllFileShares: ERROR: Links-dir and/or Files-dir exists but is not a directory.\n' +
                 '    Files-dir: ' + locFiles + ', Links-dir: ' + locLinks);
         }
     }
