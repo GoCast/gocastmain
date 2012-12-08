@@ -804,7 +804,7 @@ div.cloudcarousel.typeContent > div.spotUrlTitle
 body > div#meeting > div#streams > div#scarousel div.cloudcarousel > object {
   margin: 2px;
 }
-body > div#meeting > div#streams > div#scarousel div.cloudcarousel > div.name {
+/*body > div#meeting > div#streams > div#scarousel*/ div.cloudcarousel > div.name {
   position: absolute;
   bottom: 0px;
   text-align: center;
@@ -1668,4 +1668,133 @@ body > #tour > button#imgood {
   background: rgba(128,128,128,0.5);
   border-radius: 10px;
 }
+
+.fileshare {
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  margin-left: 2px;
+  margin-top: 2px;
+  border-radius: 2px;
+  background-color: white;
+  font-family: verdana;
+  font-size: 14px;
+}
+
+.fileshare > .hide {
+  display: none;
+}
+
+.fileshare > #status {
+  display: none;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 2px;
+  color: white;
+  background-color: rgba(0,0,0,0.8);
+  text-align: center;
+}
+
+.fileshare > #status.show {
+  display: block;
+}
+
+.fileshare > #links {
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  border-left: 1px black solid;
+  border-top: 1px black solid;
+  border-right: 1px black solid;
+  overflow-x: hidden; 
+  overflow-y: scroll;
+  font-size: 12px;
+}
+
+.fileshare > #links::-webkit-scrollbar {
+    width: 10px;
+    border-left: 1px lightgrey solid;
+    box-shadow: inset 0px 0px 3px lightgrey;
+}
+
+.fileshare > #links::-webkit-scrollbar-thumb {
+    background: rgba(128,128,128,0.5);
+    border-radius: 6px;
+}
+
+.fileshare > #links > ul {
+  margin: 5px;
+  padding: 0px;
+}
+
+.fileshare > #links > ul > .linkitem {
+  display: block;
+  margin-top: 5px;
+  padding-left: 15px;
+  padding-right: 10px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  border-radius: 2px;
+  border: 1px lightgrey solid;
+  background-color: rgb(240,240,240);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fileshare > #links > ul > .linkitem > .link {
+  outline: none;
+  white-space: nowrap;
+  font-style: italic;
+  text-decoration: none;
+  color: grey;
+}
+
+.fileshare > #links > ul > .linkitem > .link:hover {
+  text-decoration: underline;
+  color: seagreen;
+}
+
+.fileshare > #links > ul > .linkitem > .removelink {
+  float: right;
+  outline: none;
+  text-decoration: none;
+  color: grey;
+  padding: 1px 5px 2px 5px;
+  border-radius: 10px;
+}
+
+.fileshare > #links > ul > .linkitem > .removelink:hover {
+  color: white;
+  background-color: maroon;
+}
+
+.fileshare > #fileinput {
+  position: absolute;
+  left: 0px;
+  text-align: center;
+  color: white;
+  cursor: pointer;
+  border-radius: 2px;
+  border: 1px darkgreen solid;
+  font-size: 16px;
+  font-weight: bold;
+  background: -webkit-gradient(linear, center bottom, center top, from(rgb(46,139,87)), to(rgb(60,179,113)));
+  background: -moz-linear-gradient(bottom, rgb(46,139,87), rgb(60,179,113));  
+}
+
+.fileshare > #fileinput > input {
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.cloudcarousel.fileshare.enter {
+  border: 3px white dashed;
+}
+
 /*</MANJESH>*/
