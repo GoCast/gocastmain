@@ -108,6 +108,12 @@ GoCastJS.gcFileShare.prototype.init = function()
     function() {
       app.carousel.enableMousewheel();
   });
+
+  if (!sessionStorage.gcpFileShareHelpShown) {
+    this.showStatus('Drag and drop here');
+    setTimeout(function() { self.hideStatus(); }, 4000)
+    sessionStorage.gcpFileShareHelpShown = 'shown';    
+  }
 };
 
 GoCastJS.gcFileShare.removeLink = function(spotnum, links, remlinkkey) {
