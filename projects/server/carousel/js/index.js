@@ -2835,6 +2835,16 @@ function addFileShare() {
       });
 }
 
+function addSlideShare() {
+      Callcast.AddSpot({
+        spottype: 'slideshare',
+        spotreplace: 'first-unoc',
+        author: Callcast.nick,      // Will need to know later on if we are the author or not.
+      },function() {
+        console.log('carousel addSlideShare callback');
+      });
+}
+
 function addWiki() {
   showWikiSearch(function() {
     var searchkey = $('#searchwiki > #searchpanel > #searchkey').val();
