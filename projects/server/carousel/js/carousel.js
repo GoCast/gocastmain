@@ -104,7 +104,8 @@
   {
     var wbCanvas = $("#wbCanvas", this.object),
         wb       = wbCanvas.data("wb"),
-        editor   = $(this.object).data("gcEdit");
+        editor   = $(this.object).data("gcEdit"),
+        fs       = $(this.object).data('gcFileShare');
     if (wb)
     {
       wb.setScale(this.plgOrgWidth * scale, this.plgOrgHeight * scale);
@@ -112,6 +113,9 @@
     if (editor)
     {
       editor.setScale(this.plgOrgWidth * scale, this.plgOrgHeight * scale);
+    }
+    if (fs) {
+      fs.setScale(this.plgOrgWidth * scale, this.plgOrgHeight * scale);
     }
   };
   

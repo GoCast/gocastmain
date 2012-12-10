@@ -1824,6 +1824,7 @@ function resizeZoom(event)
        wbCanvas = $("#wbCanvas", jqDiv), // todo better wb access
        wb       = wbCanvas.data('wb'),
        edit     = jqDiv.data('gcEdit'),
+       fs       = jqDiv.data('gcFileShare'),
        width, height, item, newWidth, newHeight,
        widthScale, heightScale, scale, left, top;
    if (jqDiv.length > 0)
@@ -1845,6 +1846,8 @@ function resizeZoom(event)
         wb.setScale(item.plgOrgWidth, item.plgOrgHeight);
       } else if (edit) {
         edit.setScale(item.plgOrgWidth, item.plgOrgHeight);
+      } else if (fs) {
+        fs.setScale(item.plgOrgWidth, item.plgOrgHeight);
       }
 
       // center div in zoom div
@@ -1860,7 +1863,7 @@ function resizeZoom(event)
         'left': (left + 10.0) + 'px'
       });
 
-      if ($(jqDiv).hasClass('editor')) {
+      if ($(jqDiv).hasClass('editor') || $(jqDiv).hasClass('fileshare')) {
         $('#zoom > .close').css({'bottom': '10px'});
       } else {
         $('#zoom > .close').css({'top': (top + 10.0) + 'px'});
@@ -2830,6 +2833,7 @@ function addFileShare() {
       Callcast.AddSpot({
         spottype: 'fileshare',
         spotreplace: 'first-unoc',
+        links: JSON.stringify({})
       },function() {
         console.log('carousel addFileShare callback');
       });
