@@ -101,11 +101,12 @@ GoCastJS.FileViewer = {
 		$('#header > #fname', $view).text(fname);
 
 		if (this.isimage(fname)) {
-			$filecontent.css('overflow', 'auto').html('<image id="imagefile" src="' + flink + '" onload="GoCastJS.FileViewer.placeImage(this);"/>');
+			$filecontent.html('<image id="imagefile" src="' + flink + '" onload="GoCastJS.FileViewer.placeImage(this);" ' +
+							  'style="visibility: hidden;" />');
 		} else if(this.isdocument(fname)) {
-			$filecontent.css('overflow', 'hidden').html('<iframe id="docfile" src="http://docs.google.com/viewer?' +
-							  							'url=http%3A%2F%2Fvideo.gocast.it%2F' + flink.replace(/\//g, '%2F') +
-							  							'&embedded=true" style="border: none; width: 100%; height: 100%;"></iframe>');
+			$filecontent.html('<iframe id="docfile" src="http://docs.google.com/viewer?' +
+							  'url=http%3A%2F%2F' + window.location.hostname + '%2F' + flink.replace(/\//g, '%2F') +
+							  '&embedded=true" style="border: none; width: 100%; height: 100%;"></iframe>');
 		}
 	},
 	placeImage: function(imgele) {
@@ -114,14 +115,26 @@ GoCastJS.FileViewer = {
 			iwidth = $image.width(),
 			iheight = $image.height(),
 			fwidth = $filecontent.width(),
-			fheight = $filecontent.height();
+			fheight = $filecontent.height(),
+			iaspect = iwidth/iheight;
 
-		if (iheight < fheight && iwidth < fwidth) {
-			$image.css({
-				'margin-left': (fwidth - iwidth)/2 + 'px',
-				'margin-top': (fheight - iheight)/2 + 'px'
-			});
+		if (iwidth > fwidth) {
+			iwidth = fwidth;
+			iheight = Math.floor(iwidth/iaspect);
 		}
+
+		if (iheight > fheight) {
+			iheight = fheight;
+			iwidth = Math.floor(iheight*iaspect);
+		}
+
+		$image.css({
+			'margin-left': (fwidth - iwidth)/2 + 'px',
+			'margin-top': (fheight - iheight)/2 + 'px',
+			'width': iwidth,
+			'height': iheight,
+			'visibility': 'visible'
+		});
 	},
 	closeclickCb: function($view, $mask) {
 		return function() {

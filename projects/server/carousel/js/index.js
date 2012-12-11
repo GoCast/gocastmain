@@ -2497,6 +2497,12 @@ $(document).ready(function(
                         FILECATCHER: 'filecatcher@dev.gocast.it/filecatcher'});
   }
 
+  //Disable file drag/drop everywhere except fileshare spots
+  $('body').bind('dragover drop', function(e) {
+    e.preventDefault();
+    return false;
+  });
+
   openWindow('#waitingToJoin');
   var unmaskTimer = setInterval(function() {
     $('#boxes #waitingToJoin > div#cover').height(

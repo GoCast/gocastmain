@@ -155,17 +155,17 @@ GoCastJS.gcFileShare.prototype.setLinks = function(linksStr) {
 
       if (GoCastJS.FileViewer.isformatsupported(k)) {
         mods += ('<li class="linkitem"><a href="javascript:void(0);" doclink="' + links[k] +
-                 '" class="link viewable" title="Open: ' + k + '">' + k + '</a><a href="javascript:void(0);" class="removelink" onclick="' +
-                 onclick + '" title="Remove: ' + k + '">x</a></li>');
+                 '" class="link viewable" title="Open in FileViewer: ' + k + '">' + k + '</a>' +
+                 '<a href="javascript:void(0);" class="linkaction remove" onclick="' +
+                 onclick + '" title="Remove: ' + k + '">x</a><a target="_blank" href="' + links[k] +
+                 '" class="linkaction download" title="Download: ' + k + '">&darr;</a></li>');
 
-        /*mods += ('<li class="linkitem"><a href="javascript:void(0);" onclick="GoCastJS.FileViewer.open($(\'#fileviewer\'), $(\'#mask\'), \'' +
-                 k + '\', \'' + links[k] + '\');" class="link viewable" title="Open: ' + k + '">' + k + '</a>' +
-                 '<a href="javascript:void(0);" class="removelink" onclick="' + onclick + '" title="Remove: ' + k + '">x</a></li>');*/
         this.fileviewerlist.files.push(k);
         this.fileviewerlist.links.push(links[k]);      
       } else {
-        mods += ('<li class="linkitem"><a target="_blank" href="' + links[k] + '" class="link" title="Open: ' + k + '">' +
-                 k + '</a><a href="javascript:void(0);" class="removelink" onclick="' + onclick + '" title="Remove: ' + k + '">x</a></li>');
+        mods += ('<li class="linkitem"><a target="_blank" href="' + links[k] + '" class="link" title="Download: ' + k + '">' +
+                 k + '</a><a href="javascript:void(0);" class="linkaction remove" onclick="' +
+                 onclick + '" title="Remove: ' + k + '">x</a></li>');
       }
     }
   }

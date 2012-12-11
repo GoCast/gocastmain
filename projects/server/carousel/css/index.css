@@ -1543,7 +1543,7 @@ body > #tour > button#imgood {
   -webkit-box-shadow: inset 0px 0px 1px grey;
   -moz-box-shadow: inset 0px 0px 1px grey;
   color: grey;
-  width: 57%;
+  width: 75%;
   height: 30px;
   padding-left: 10px;
   resize: none;
@@ -1764,7 +1764,7 @@ body > #tour > button#imgood {
   color: seagreen;
 }
 
-.fileshare > #links > ul > .linkitem > .removelink {
+.fileshare > #links > ul > .linkitem > .linkaction {
   float: right;
   outline: none;
   text-decoration: none;
@@ -1773,9 +1773,14 @@ body > #tour > button#imgood {
   border-radius: 10px;
 }
 
-.fileshare > #links > ul > .linkitem > .removelink:hover {
+.fileshare > #links > ul > .linkitem > .linkaction.remove:hover {
   color: white;
   background-color: maroon;
+}
+
+.fileshare > #links > ul > .linkitem > .linkaction.download:hover {
+  color: white;
+  background-color: darkgreen;
 }
 
 .fileshare > #fileinput {
