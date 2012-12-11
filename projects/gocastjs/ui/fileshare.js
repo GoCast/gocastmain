@@ -110,11 +110,7 @@ GoCastJS.gcFileShare.prototype.init = function()
       app.carousel.enableMousewheel();
   });
 
-  if (!sessionStorage.gcpFileShareHelpShown) {
-    this.showStatus('Drag and drop here');
-    setTimeout(function() { self.hideStatus(); }, 4000)
-    sessionStorage.gcpFileShareHelpShown = 'shown';    
-  }
+  this.showStatus('Drop files here...');
 };
 
 GoCastJS.gcFileShare.removeLink = function(spotnum, links, remlinkkey) {
@@ -145,6 +141,7 @@ GoCastJS.gcFileShare.prototype.setLinks = function(linksStr) {
   this.fileviewerlist = {files: [], links: []};
   mods = '';
 
+  this.showStatus('Drop files here...');
   for (k in links) {
     if (links.hasOwnProperty(k)) {
       var onclick = 'GoCastJS.gcFileShare.removeLink(' +
@@ -153,6 +150,7 @@ GoCastJS.gcFileShare.prototype.setLinks = function(linksStr) {
                       k +
                     '\')';
 
+      this.hideStatus();
       if (GoCastJS.FileViewer.isformatsupported(k)) {
         mods += ('<li class="linkitem"><a href="javascript:void(0);" doclink="' + links[k] +
                  '" class="link viewable" title="Open in FileViewer: ' + k + '">' + k + '</a>' +
