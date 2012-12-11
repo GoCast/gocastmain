@@ -41,6 +41,7 @@
     <link rel="stylesheet" href="css/jquery.cleditor.css?GOCASTTIMESTAMP" type="text/css" />
     <link rel="stylesheet" href="css/kalendae.css?GOCASTTIMESTAMP" type="text/css" charset="utf-8" />
     <link rel="stylesheet" href="css/jquery.facebook.multifriend.select-list.css?GOCASTTIMESTAMP" type="text/css" />
+    <link rel="stylesheet" href="css/fileviewer.css?GOCASTTIMESTAMP" type="text/css" />
 
     <script type="text/javascript">
       if (!window.console) {
@@ -70,6 +71,7 @@
     <script type="text/javascript" src="js/index.js?GOCASTTIMESTAMP"></script>
     <script type="text/javascript" src="js/kalendae.js?GOCASTTIMESTAMP" charset="utf-8"></script>
     <script type="text/javascript" src="js/jquery.facebook.multifriend.select.js?GOCASTTIMESTAMP"></script>
+    <script type="text/javascript" src="js/fileviewer.js?GOCASTTIMESTAMP"></script>
 
     <!-- ---------------------------------------------------------- -->
 
@@ -289,7 +291,7 @@
       <div id="credentials2" class="window resizable">
         <p class="title welcome">GoCast Login</p>
         <p class="login-error"></p>
-        <input id="name"  type="text" name="name" placeholder="Room nickname (max length: 32)" maxlength="32"/>
+        <input id="name"  type="text" name="name" placeholder="Your name" maxlength="32"/>
         <p id="nickhint" style="font-size: 10px; visibility: hidden;">
           Alphanumerics, spaces,
           <strong>( )</strong> <strong>[ ]</strong>
@@ -452,6 +454,11 @@
         <a id="cancel" class="button negative" href="javascript:void(0);">Cancel</a>
         <a id="create" class="button positive" href="javascript:void(0);">Create</a>
       </div>
+    </div>
+    <div id="fileviewer">
+      <img class="close" src="images/button-close.png" title="Exit FileViewer" />
+      <h3 id="header">FileViewer: <span id="fname"></span></h3>
+      <div id="filecontent"></div>
     </div>
   </body>
 </html>

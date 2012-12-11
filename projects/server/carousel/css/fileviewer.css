@@ -1,0 +1,58 @@
+#fileviewer {
+	display: none;
+	position: absolute;
+	left: 100px;
+	top: 50px;
+	width: 800px;
+	height: 600px;
+	background-color: black;
+	border: 5px lightgrey solid;
+	font-family: verdana;
+}
+
+#fileviewer.show {
+	display: block;
+}
+
+#fileviewer > img.close {
+	position: absolute;
+	width: 20px;
+	height: 20px;
+	right: -20px;
+	top: -20px;
+	background-color: lightgrey;
+	padding: 8px;
+	cursor: pointer;
+	border-radius: 30px;
+	border: 5px black solid;
+}
+
+#fileviewer > #header {
+	position: absolute;
+	left: 0px;
+	top: -15px;
+	height: 50px;
+	line-height: 50px;
+	background-color: lightgrey;
+	color: black;
+	text-align: center;
+}
+
+#fileviewer > #filecontent {
+	position: absolute;
+	left: 0px;
+	top: 50px;
+	background-color: white;
+}
+
+#fileviewer > #filecontent::-webkit-scrollbar {
+    width: 10px;
+    border-left: 1px lightgrey solid;
+    box-shadow: inset 0px 0px 3px lightgrey;
+}
+
+#fileviewer > #filecontent::-webkit-scrollbar-thumb {
+    background: rgba(128,128,128,0.5);
+    border: 1px darkgrey solid;
+    border-radius: 0px;
+}

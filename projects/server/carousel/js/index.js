@@ -1812,6 +1812,7 @@ function resizeWindows(
      app.carousel.resize();
   }
   resizeZoom();
+  GoCastJS.FileViewer.resize($('#fileviewer'));
   return false;
 } /* resizeWindows() */
 

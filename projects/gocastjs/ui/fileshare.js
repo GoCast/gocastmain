@@ -150,8 +150,19 @@ GoCastJS.gcFileShare.prototype.setLinks = function(linksStr) {
                       linksStr.replace(/\"/g, '\\\'') + '\', \'' +
                       k +
                     '\')';
-      mods += ('<li class="linkitem"><a target="_blank" href="' + links[k] + '" class="link" title="Open: ' + k + '">' + k + '</a>' +
+      var imageclass = '';
+
+
+      /*if (k.toLowerCase().match(/.png$/) || k.toLowerCase().match(/.jpg$/) ||
+          k.toLowerCase().match(/.gif$/) || k.toLowerCase().match(/.tiff$/) ||
+          k.toLowerCase().match(/.bmp$/)) {
+        imageclass = ' image';
+      }*/
+      mods += ('<li class="linkitem"><a href="javascript:void(0);" onclick="GoCastJS.FileViewer.open($(\'#fileviewer\'), $(\'#mask\'), \'' +
+               k + '\', \'' + links[k] + '\');" class="link" title="Open: ' + k + '">' + k + '</a>' +
                '<a href="javascript:void(0);" class="removelink" onclick="' + onclick + '" title="Remove: ' + k + '">x</a></li>');
+      /*mods += ('<li class="linkitem"><a target="_blank" href="' + links[k] + '" class="link' + imageclass + '" title="Open: ' + k + '">' + k + '</a>' +
+               '<a href="javascript:void(0);" class="removelink" onclick="' + onclick + '" title="Remove: ' + k + '">x</a></li>');*/
     }
   }
 
@@ -192,7 +203,7 @@ GoCastJS.gcFileShare.prototype.setScale = function(width, height)
   });
   $('#fileinput', this.jqDiv).css({
     'top': (0.9*height) + 'px',
-    'width': /*(0.125**/width/*)*/ + 'px',
+    'width': width + 'px',
     'height': (0.1*height) + 'px',
     'line-height': (0.1*height) + 'px'
   });

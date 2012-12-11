@@ -1313,7 +1313,7 @@ body > div#meeting > div#streams > div#scontrols > input.right {
   background-color: #eee;
   border-radius: 20px;
   cursor: pointer;
-  z-index: 10000;
+  z-index: 8999;
 }
 body > #tour {
   display: none;
