@@ -79,7 +79,7 @@ function gcpublish() {
 
   out=$1".min.js"
   $gc $gcopts --js $1 --js_output_file $out
-  cp $out $tempdest/$2
+  cp -p $out $tempdest/$2
   rm -f $out
 
   return 0
@@ -99,11 +99,11 @@ fi
 # copy base files to a temporary location prior to obfuscation/minimization
 #
 
-cp -r * $tempdest
-cp ../../xmpp-peerconnection/callcast.js $tempdest/js
-cp ../../gocastjs/webrtc/peerconnection.js $tempdest/js
-cp ../../gocastjs/ui/*.js $tempdest/js
-cp ../../gocastjs/ibb/ibb.js $tempdest/js
+cp -p -r * $tempdest
+cp -p ../../xmpp-peerconnection/callcast.js $tempdest/js
+cp -p ../../gocastjs/webrtc/peerconnection.js $tempdest/js
+cp -p ../../gocastjs/ui/*.js $tempdest/js
+cp -p ../../gocastjs/ibb/ibb.js $tempdest/js
 
 function obfuscate() {
 # Now obfuscate and minimize files that need it.
@@ -209,7 +209,8 @@ echo ==== Copying finalized contents to the server at $finaldest
 #
 # And finally scp the final output to the server.
 #
-scp -r $tempdest/* $finaldest
+#scp -r $tempdest/* $finaldest
+rsync -ave ssh $tempdest/* $finaldest/
 
 # Now get rid of the temp location
 rm -rf $tempdest
