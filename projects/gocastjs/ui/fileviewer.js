@@ -32,6 +32,7 @@ GoCastJS.FileViewer = {
 			self.showfile($view, fname, flink);
 		});
 
+		$(document).unbind('keydown').keydown(this.keydownCb($view));
 		$view.unbind('hover').hover(function() {
 			if (curIdx > 0) {
 				$('a#prev', $view).addClass('show');
@@ -48,14 +49,16 @@ GoCastJS.FileViewer = {
 				curIdx--;
 				if (0 === curIdx) {
 					$(this).removeClass('show');
-				} else if (!$('a#next', $view).hasClass('show')) {
+				}
+				if (!$('a#next', $view).hasClass('show')) {
 					$('a#next', $view).addClass('show');
 				}
 			} else {
 				curIdx++;
 				if ((filelist.links.length-1) === curIdx) {
 					$(this).removeClass('show');
-				} else if (!$('a#prev', $view).hasClass('show')) {
+				}
+				if (!$('a#prev', $view).hasClass('show')) {
 					$('a#prev', $view).addClass('show');
 				}
 			}
@@ -71,9 +74,9 @@ GoCastJS.FileViewer = {
 
 		if ($view.hasClass('show')) {
 			$view.css({
-				'left': (0.2*winW) + 'px',
+				'left': (0.1*winW) + 'px',
 				'top': (0.1*winH) + 'px',
-				'width': (0.6*winW) + 'px',
+				'width': (0.8*winW) + 'px',
 				'height': (0.8*winH) + 'px',
 			});
 
@@ -121,9 +124,19 @@ GoCastJS.FileViewer = {
 	},
 	closeclickCb: function($view, $mask) {
 		return function() {
+			$(document).unbind('keydown').keydown(docKey);
 			$('a.pagination', $view).removeClass('show');
 			$view.removeClass('show');
 			$mask.fadeOut('slow');
+		};
+	},
+	keydownCb: function($view) {
+		return function(evt) {
+			switch(evt.which || evt.keyCode) {
+				case 27:
+					$('img.close', $view).click();
+					break;
+			}
 		};
 	}
 };
