@@ -37,11 +37,24 @@
 	margin: 0px;
 	left: 0px;
 	top: 0px;
-	height: 50px;
-	line-height: 50px;
+	height: 30px;
+	line-height: 30px;
 	background-color: lightgrey;
 	color: black;
 	text-align: center;
+}
+
+#fileviewer > #note {
+	position: absolute;
+	margin: 0px;
+	left: 0px;
+	top: 30px;
+	height: 20px;
+	line-height: 20px;
+	background-color: lightgrey;
+	color: black;
+	text-align: center;
+	font-size: 12px;
 }
 
 #fileviewer > #filecontent {

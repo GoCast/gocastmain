@@ -81,9 +81,10 @@ GoCastJS.FileViewer = {
 			});
 
 			$('#header', $view).css('width', $view.width() + 1);
+			$('#note', $view).css('width', $view.width() + 1);
 			$('#filecontent', $view).css({
 				'width': $view.width() + 1,
-				'height': ($view.height() - $('#header', $view).height())
+				'height': ($view.height() - $('#header', $view).height() - $('#note', $view).height())
 			});
 
 			$('#filecontent > #imagefile', $view).each(function() {
