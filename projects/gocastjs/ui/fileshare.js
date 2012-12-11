@@ -29,6 +29,7 @@ GoCastJS.gcFileShare = function(spot, info)
   this.div = this.jqDiv[0];
   this.item = this.jqSpot.data('item');
   this.links = $('#gcFileShareDiv > #links > ul', this.jqSpot);
+  this.fileviewerlist = {files: [], links: []};
   this.uploadReader = new FileReader();
   this.uploadName = '';
   this.up = new GoCastJS.SendFileToFileCatcher(Callcast.connection, Callcast.room, Callcast.FILECATCHER);
@@ -130,7 +131,7 @@ GoCastJS.gcFileShare.removeLink = function(spotnum, links, remlinkkey) {
 
 GoCastJS.gcFileShare.prototype.setLinks = function(linksStr) {
   var links = JSON.parse(linksStr),
-      k, mods;
+      k, mods, self = this;
 
   if (!linksStr || linksStr === '') {
     return;
@@ -141,6 +142,7 @@ GoCastJS.gcFileShare.prototype.setLinks = function(linksStr) {
 
   // Now iterate through them and put them in the div.
   this.links.empty();
+  this.fileviewerlist = {files: [], links: []};
   mods = '';
 
   for (k in links) {
@@ -150,23 +152,29 @@ GoCastJS.gcFileShare.prototype.setLinks = function(linksStr) {
                       linksStr.replace(/\"/g, '\\\'') + '\', \'' +
                       k +
                     '\')';
-      var imageclass = '';
 
+      if (GoCastJS.FileViewer.isformatsupported(k)) {
+        mods += ('<li class="linkitem"><a href="javascript:void(0);" doclink="' + links[k] +
+                 '" class="link viewable" title="Open: ' + k + '">' + k + '</a><a href="javascript:void(0);" class="removelink" onclick="' +
+                 onclick + '" title="Remove: ' + k + '">x</a></li>');
 
-      /*if (k.toLowerCase().match(/.png$/) || k.toLowerCase().match(/.jpg$/) ||
-          k.toLowerCase().match(/.gif$/) || k.toLowerCase().match(/.tiff$/) ||
-          k.toLowerCase().match(/.bmp$/)) {
-        imageclass = ' image';
-      }*/
-      mods += ('<li class="linkitem"><a href="javascript:void(0);" onclick="GoCastJS.FileViewer.open($(\'#fileviewer\'), $(\'#mask\'), \'' +
-               k + '\', \'' + links[k] + '\');" class="link" title="Open: ' + k + '">' + k + '</a>' +
-               '<a href="javascript:void(0);" class="removelink" onclick="' + onclick + '" title="Remove: ' + k + '">x</a></li>');
-      /*mods += ('<li class="linkitem"><a target="_blank" href="' + links[k] + '" class="link' + imageclass + '" title="Open: ' + k + '">' + k + '</a>' +
-               '<a href="javascript:void(0);" class="removelink" onclick="' + onclick + '" title="Remove: ' + k + '">x</a></li>');*/
+        /*mods += ('<li class="linkitem"><a href="javascript:void(0);" onclick="GoCastJS.FileViewer.open($(\'#fileviewer\'), $(\'#mask\'), \'' +
+                 k + '\', \'' + links[k] + '\');" class="link viewable" title="Open: ' + k + '">' + k + '</a>' +
+                 '<a href="javascript:void(0);" class="removelink" onclick="' + onclick + '" title="Remove: ' + k + '">x</a></li>');*/
+        this.fileviewerlist.files.push(k);
+        this.fileviewerlist.links.push(links[k]);      
+      } else {
+        mods += ('<li class="linkitem"><a target="_blank" href="' + links[k] + '" class="link" title="Open: ' + k + '">' +
+                 k + '</a><a href="javascript:void(0);" class="removelink" onclick="' + onclick + '" title="Remove: ' + k + '">x</a></li>');
+      }
     }
   }
 
   this.links.append(mods);
+  $('.link.viewable', $(this.links)).click(function() {
+    GoCastJS.FileViewer.open($('#fileviewer'), $('#mask'), $(this).text(),
+                             $(this).attr('doclink'), self.fileviewerlist);
+  });
 };
 
 GoCastJS.gcFileShare.prototype.showStatus = function(msg) {
