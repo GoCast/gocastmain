@@ -443,8 +443,8 @@ GoCastJS.FacebookEvent = {
   invitelist: [],
   convertToAMPMAddHour: function(date) {
     function minstring(minutes) {
-      var digits = {false: '', true: '0'};
-      return digits[minutes<10] + minutes;
+      var digits = {'false': '', 'true': '0'};
+      return digits[(minutes<10).toString()] + minutes;
     }
 
     date.setHours(date.getHours() + 1);

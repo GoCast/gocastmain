@@ -117,6 +117,8 @@ function obfuscate() {
   cp $tempdest/js/gcedit.js $tempjs/js
   cp $tempdest/js/wiki.js $tempjs/js
   cp $tempdest/js/ibb.js $tempjs/js
+  cp $tempdest/js/fileshare.js $tempjs/js
+  cp $tempdest/js/fileviewer.js $tempjs/js
 
   cw=`pwd`
   cd $tempjs
