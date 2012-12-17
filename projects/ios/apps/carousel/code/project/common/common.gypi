@@ -133,7 +133,7 @@
 				},
 
 				'include_dirs': [
-					'../../source/Bootstrap/mac',
+					'../../source/Bootstrap/<@(OS)',
 				], # include_dirs
 			}], # OS=="mac"
 		],   # conditions
