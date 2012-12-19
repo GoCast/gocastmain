@@ -376,13 +376,10 @@ body > div#lower-right > input#addFileShare {
   border-radius: 4px;
 }
 body > div#lower-right > input#addIRelate {
-  margin-top: 2px;
   width: 21px;
   height: 21px;
   background-image: url('../images/iRelate.png');
   background-size: 100% 100%;
-  border: 2px white solid;
-  border-radius: 4px;
 }
 input#addItem {
   background-image: url('../images/plus.png');

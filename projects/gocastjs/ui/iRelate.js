@@ -16,11 +16,13 @@ GoCastJS.iRelate = function (spot, info) {
     this.timeout = 1000;
     this.spot = spot;
     this.jqSpot = $(spot);
-    this.DIV = '<div id="miRelateContainer' + info.spotnumber + '" style="position:absolute;">' +
+    this.DIV = '<div id="miRelateContainer' + info.spotnumber + '" style="position:absolute; border-radius: 15px 15px 15px 15px; background-color:#444444; overflow:hidden;">' +
                 '<iframe "miRelateIFrame' + info.spotnumber + '" src="' + this.iRelateURL + '" style="position:absolute; left:0px; top:0px; width:100%; height:100%;"/>' +
                 '</div>';
     this.info = info;
     this.jqDiv = $(this.DIV).appendTo(this.jqSpot).css("position", "absolute");
+    $("#miRelateContainer" + this.info.spotnumber).parent().css("background-color", "transparent");
+    $("#miRelateContainer" + this.info.spotnumber).parent().css("border-color", "transparent");
     this.div = this.jqDiv[0];
     this.jqSpot.data('gcIRelate', this);
 };
@@ -31,15 +33,15 @@ GoCastJS.iRelate = function (spot, info) {
 /// \arg width, height the target sizes as integers
 ///
 GoCastJS.iRelate.prototype.setScale = function (contWidth, contHeight) {
-    var scaleFactor = contWidth / 880;
-    $("#miRelateContainer" + this.info.spotnumber).css("-webkit-transform", "scale(" + scaleFactor + ")");
     if (contWidth < 880) {
+        var scaleFactor = (contWidth / 880);
+        $("#miRelateContainer" + this.info.spotnumber).css("-webkit-transform", "scale(" + scaleFactor + ")");
         var scaleUpFactor = 880 / contWidth * 100;
         $("#miRelateContainer" + this.info.spotnumber).css("width", scaleUpFactor + "%");
         $("#miRelateContainer" + this.info.spotnumber).css("height", scaleUpFactor + "%");
         var leftOffset = Math.round((880 - contWidth) / 2);
         $("#miRelateContainer" + this.info.spotnumber).css("left", "-" + leftOffset + "px");
-        var topOffset = Math.round(((contHeight * (scaleUpFactor / 100) - contHeight) / 2));
+        var topOffset = Math.round(((contHeight * (scaleUpFactor / 100) - contHeight) / 2)) + 18;
         $("#miRelateContainer" + this.info.spotnumber).css("top", "-" + topOffset + "px");
     }
     else {
@@ -54,9 +56,5 @@ GoCastJS.iRelate.prototype.setScale = function (contWidth, contHeight) {
 ///
 /// \brief set the shared contents to info.links
 ///
-GoCastJS.iRelate.prototype.doSpot = function (info)
-{
+GoCastJS.iRelate.prototype.doSpot = function (info) {
 };
-
-
-
