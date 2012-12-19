@@ -7,12 +7,13 @@
     <script src='http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/jquery-ui.js'></script>
     <script src='jquery.base64.js'></script>
     <script src='strophejs-1.0.2/strophe.js'></script>
+    <script src='strophejs-1.0.2/strophe.muc.js'></script>
     <script src='ibb.js'></script>
     <script src='callcast.js'></script>
   </head>
-<body bgcolor=#336633>
+<body bgcolor=#cccccc>
 
-Test
+Login
 
 <script>
 var app = {
@@ -68,22 +69,34 @@ function onNicknameInUse(nick)
 	app.nickInUse(nick);
 }
 
+function assignSpotForParticipant(nick)
+{
+	alert("assignSpotForParticipant(" + nick + ")");
+}
+
+function unassignSpotForParticipant(nick)
+{
+	alert("unassignSpotForParticipant(" + nick + ")");
+}
+
 function tjgsend()
 {
-Callcast.InitOverride({ CALLCAST_XMPPSERVER: 'dev.gocast.it',
+    Callcast.InitOverride({ CALLCAST_XMPPSERVER: 'dev.gocast.it',
                         CALLCAST_ROOMS: 'conference.dev.gocast.it',
                         AT_CALLCAST_ROOMS: '@conference.dev.gocast.it',
                         STUNSERVER: 'dev.gocast.it', STUNSERVERPORT: 19302,
                         FEEDBACK_BOT: 'feedback_bot_dev@dev.gocast.it',
                         ROOMMANAGER: 'roommanager@dev.gocast.it/roommanager',
                         SWITCHBOARD_FB: 'switchboard_dev@dev.gocast.it',
-                        LOGCATCHER: 'logcatcher@dev.gocast.it/logcatcher'});
-
-Callcast.setCallbackForCallback_ConnectionStatus(onConnectionStatus);
-Callcast.setCallbackForCallback_OnNicknameInUse(onNicknameInUse);
+                        LOGCATCHER: 'logcatcher@dev.gocast.it/logcatcher',
+                        FILECATCHER: 'filecatcher@dev.gocast.it/filecatcher'});
 
 Callcast.connect(Callcast.CALLCAST_XMPPSERVER, '');
 
+Callcast.setCallbackForCallback_ConnectionStatus(onConnectionStatus);
+Callcast.setCallbackForCallback_OnNicknameInUse(onNicknameInUse);
+Callcast.setCallbackForAddSpotForParticipant(assignSpotForParticipant);
+Callcast.setCallbackForRemoveSpotForParticipant(unassignSpotForParticipant);
 
 
 // Callcast.log("This is a test message.");
