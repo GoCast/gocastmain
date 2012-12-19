@@ -19,7 +19,7 @@ a:link
 {
   color: #0000ff;
 }
-a:visited 
+a:visited
 {
   color: #800080;
 }
@@ -48,7 +48,7 @@ a:active
   -webkit-border-radius: 1ex;
   -webkit-box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.75);
 }
-::-webkit-scrollbar-corner 
+::-webkit-scrollbar-corner
 {
   background: transparent;
 }
@@ -80,7 +80,7 @@ a:active
     background-color: #FFBABA;
     /*background-image: url('error.png');*/
 }
-/*img.close 
+/*img.close
 {
   width: 12px;
   height: 12px;
@@ -97,12 +97,12 @@ html
 
 body {
   margin: 0;
-  padding: 0;  
+  padding: 0;
   position: absolute;
   width: 100%;
   height: 100%;
   -moz-user-select: -moz-none;
-  -webkit-user-select: none;  
+  -webkit-user-select: none;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 13px;
   overflow: hidden;
@@ -129,7 +129,7 @@ body input[type="button"] {
   vertical-align: middle;
   opacity: 1.0;
 }
-.gc-icon:hover 
+.gc-icon:hover
 {
   cursor: pointer;
   opacity: 0.6;
@@ -373,7 +373,16 @@ body > div#lower-right > input#addFileShare {
   background-image: url('../images/fileshare.png');
   background-size: 100% 100%;
   border: 2px white solid;
-  border-radius: 4px; 
+  border-radius: 4px;
+}
+body > div#lower-right > input#addIRelate {
+  margin-top: 2px;
+  width: 21px;
+  height: 21px;
+  background-image: url('../images/iRelate.png');
+  background-size: 100% 100%;
+  border: 2px white solid;
+  border-radius: 4px;
 }
 input#addItem {
   background-image: url('../images/plus.png');
@@ -563,7 +572,7 @@ div#groupChat > div#msgBoard > button#send:hover {
   cursor: pointer;
   opacity: 1.0;
 }
-body > div#meeting 
+body > div#meeting
 {
   display: none;
   position: absolute;
@@ -578,13 +587,13 @@ body > div#meeting > div#zoom {
   width: 98%;
   height: 80%;
 }
-body > div#meeting > div#zoom > img.close 
+body > div#meeting > div#zoom > img.close
 {
   width: 20px;
   height: 20px;
   position: absolute;
 }
-body > div#meeting > div#zoom > div.cloudcarousel 
+body > div#meeting > div#zoom > div.cloudcarousel
 {
   position: absolute;
   background-position: center center;
@@ -668,7 +677,7 @@ div.cloudcarousel > div#msgBoard > div#chatOut
 div.cloudcarousel > div#msgBoard > div#chatOut  table
 {
   /*
-  width:100%; not working 
+  width:100%; not working
   width:300px;
   */
   width: 100%;
@@ -788,7 +797,7 @@ div.cloudcarousel.typeContent {
 }
 div.cloudcarousel.typeContent > div.spotUrlIcon
 {
-  position:relative; 
+  position:relative;
   clear: left;
   background-color: transparent;
   background-size: 98%;
@@ -801,14 +810,14 @@ div.cloudcarousel.typeContent > div.spotUrlIcon
 }
 div.cloudcarousel.typeContent > div.spotUrlTitle
 {
-  position:relative; 
+  position:relative;
   clear: left;
   background-color: white;
   width: 70%;
   height:auto;
   margin-left:auto;
   margin-right:auto;
-  border-radius: 5px;  
+  border-radius: 5px;
 }
 body > div#meeting > div#streams > div#scarousel div.cloudcarousel > object {
   margin: 2px;
@@ -818,9 +827,9 @@ body > div#meeting > div#streams > div#scarousel div.cloudcarousel > object {
   bottom: 0px;
   text-align: center;
   font-weight: bold;
-  white-space: nowrap; 
-  width: 98%; 
-  overflow: hidden; 
+  white-space: nowrap;
+  width: 98%;
+  overflow: hidden;
   text-overflow: ellipsis;
   color: white;
 }
@@ -830,7 +839,7 @@ body > div#meeting div.unoccupied {
   background-color: transparent;
 }
 body > div#meeting > div#streams > div#scarousel div#mystream {
-  background-image: url("../images/person.png");  
+  background-image: url("../images/person.png");
 }
 body > div#meeting > div#streams > div#scontrols {
   width: 100px;
@@ -866,7 +875,7 @@ body > div#meeting > div#streams > div#scontrols > input.right {
   z-index: 9999;
   background-color: #eeeeee;
   border: 4px solid #812034;
-  border-radius: 16px;  
+  border-radius: 16px;
 }
 #boxes .window > h1 {
   margin: 20px 10px;
@@ -877,14 +886,14 @@ body > div#meeting > div#streams > div#scontrols > input.right {
 }
 /* todo make some style common */
 #boxes #chromeRestart {
-  width: 400px; 
+  width: 400px;
   height: 200px;
   padding: 0px 7px 7px 7px;
   border: 4px solid #812034;
-  border-radius: 16px;  
+  border-radius: 16px;
 }
 #boxes #errorMsgPlugin {
-  width: 300px; 
+  width: 300px;
   height: 150px;
   padding: 0px 7px 7px 7px;
   border: 2px solid red;
@@ -915,14 +924,14 @@ body > div#meeting > div#streams > div#scontrols > input.right {
 }
 /*</MANJESH>*/
 #boxes #installPlugin {
-  width: 400px; 
+  width: 400px;
   height: auto;
   padding: 0px 7px 7px 7px;
   border: 2px solid red;
-  border-radius: 6px;  
+  border-radius: 6px;
 }
 #boxes #installPlugin .hidden {
-  display: none;  
+  display: none;
 }
 #boxes p.title.welcome {
   text-align: center;
@@ -934,11 +943,11 @@ body > div#meeting > div#streams > div#scontrols > input.right {
   text-align: justify;
 }
 #boxes #credentials {
-  width: 600px; 
+  width: 600px;
   height: auto;
   padding: 0px 7px 7px 7px;
   border: 4px solid #812034;
-  border-radius: 5px;  
+  border-radius: 5px;
 }
 #boxes #credentials > p.title {
   margin: 30px 5px 20px 5px;
@@ -962,7 +971,7 @@ body > div#meeting > div#streams > div#scontrols > input.right {
   border-radius: 2px;
   text-decoration: none;
   cursor: default;
-  color: lightgrey;  
+  color: lightgrey;
   font-size: 11px;
   font-weight: bold;
   background: -webkit-gradient(linear, center bottom, center top, from(rgb(100,100,100)), to(rgb(120,120,120)));
@@ -990,10 +999,10 @@ body > div#meeting > div#streams > div#scontrols > input.right {
 }
 #boxes #credentials #noThanks:hover {
   background: -webkit-gradient(linear, center bottom, center top, from(rgb(166,42,42)), to(rgb(139,35,35)));
-  background: -moz-linear-gradient(bottom, rgb(166,42,42), rgb(139,35,35));  
+  background: -moz-linear-gradient(bottom, rgb(166,42,42), rgb(139,35,35));
 }
 #boxes #credentials2 {
-  width: 300px; 
+  width: 300px;
   height: auto;
   padding: 0px 7px 7px 7px;
   border: 4px solid #812034;
@@ -1043,7 +1052,7 @@ body > div#meeting > div#streams > div#scontrols > input.right {
   text-decoration: none;
   color: white !important;
   background: -webkit-gradient(linear, center bottom, center top, from(rgb(46,139,87)), to(rgb(60,179,113)));
-  background: -moz-linear-gradient(bottom, rgb(46,139,87), rgb(60,179,113));  
+  background: -moz-linear-gradient(bottom, rgb(46,139,87), rgb(60,179,113));
   /*background-color: #91BD09;*/
   /*padding: 8px 19px 9px;*/
   padding-left: 10px;
@@ -1070,7 +1079,7 @@ body > div#meeting > div#streams > div#scontrols > input.right {
 }
 #boxes #credentials2 a#btn:hover {
   background: -webkit-gradient(linear, center bottom, center top, from(rgb(60,179,113)), to(rgb(46,139,87)));
-  background: -moz-linear-gradient(bottom, rgb(60,179,113), rgb(46,139,87));    
+  background: -moz-linear-gradient(bottom, rgb(60,179,113), rgb(46,139,87));
 }
 #boxes #credentials2 div.fb-login-button {
   width: 20em;
@@ -1092,12 +1101,12 @@ body > div#meeting > div#streams > div#scontrols > input.right {
   width: 600px;
   height: 52px;
   border: 4px solid #812034;
-  border-radius: 16px;  
+  border-radius: 16px;
 }
 #boxes #chatInp > img.close {
   float: right;
   border: 2px solid gray;
-  border-radius: 5px;  
+  border-radius: 5px;
   margin: 5px;
   cursor: pointer;
 }
@@ -1113,7 +1122,7 @@ body > div#meeting > div#streams > div#scontrols > input.right {
 }
 #boxes #chatInp > input.chatTo {
   width: 30em;
-  border-radius: 5px;  
+  border-radius: 5px;
 }
 #boxes #chatInp > input.send {
   background-image: url("../images/btn-send.png");
@@ -1127,7 +1136,7 @@ body > div#meeting > div#streams > div#scontrols > input.right {
   height: 536px;
   background: white;
   border: 4px solid lightgreen;
-  border-radius: 16px;  
+  border-radius: 16px;
 }
 #boxes #helpPage > h1 {
   color: darkgreen;
@@ -1141,7 +1150,7 @@ body > div#meeting > div#streams > div#scontrols > input.right {
 #boxes #helpPage > img.close {
   float: right;
   border: 2px solid gray;
-  border-radius: 5px;  
+  border-radius: 5px;
   margin: 5px;
   cursor: pointer;
 }
@@ -1164,7 +1173,7 @@ body > div#meeting > div#streams > div#scontrols > input.right {
   height: 80%;
   background: white;
   border: 4px solid lightgreen;
-  border-radius: 16px;  
+  border-radius: 16px;
 }
 #boxes #winEula > iframe {
   width: 98%;
@@ -1190,7 +1199,7 @@ body > div#meeting > div#streams > div#scontrols > input.right {
   margin-right: 5px;
 }
 #boxes #winWait {
-  width: 300px; 
+  width: 300px;
   height: auto;
   padding: 0px 7px 7px 7px;
   background-color: white;
@@ -1201,10 +1210,10 @@ body > div#meeting > div#streams > div#scontrols > input.right {
 {
   line-height: 2em;
 }
-#boxes #winWait img#spinner 
+#boxes #winWait img#spinner
 {
   float: left;
-  width: 25px; 
+  width: 25px;
   height: 25px;
 }
 #boxes #copyData
@@ -1246,7 +1255,7 @@ body > div#meeting > div#streams > div#scontrols > input.right {
    margin-right: 3px;
    float:right;
 }
-#boxes #copyData img.close 
+#boxes #copyData img.close
 {
   float: right;
   width: 10px;
@@ -1390,7 +1399,7 @@ body > #tour > button#imgood {
 #lower-left >.arrow.left {
   border-top-left-radius: 20px;
   border-bottom-left-radius: 20px;
-  background-image: url('../images/carouselarrowleft.png');  
+  background-image: url('../images/carouselarrowleft.png');
   background-position: 10% 10%;
 }
 
@@ -1412,7 +1421,7 @@ body > #tour > button#imgood {
   text-decoration: none;
   color: white !important;
   background: -webkit-gradient(linear, center bottom, center top, from(rgb(46,139,87)), to(rgb(60,179,113)));
-  background: -moz-linear-gradient(bottom, rgb(46,139,87), rgb(60,179,113));  
+  background: -moz-linear-gradient(bottom, rgb(46,139,87), rgb(60,179,113));
   padding-left: 10px;
   padding-right: 10px;
   padding-top: 5px;
@@ -1425,11 +1434,11 @@ body > #tour > button#imgood {
 }
 #installPlugin #dlLink:hover {
   background: -webkit-gradient(linear, center bottom, center top, from(rgb(60,179,113)), to(rgb(46,139,87)));
-  background: -moz-linear-gradient(bottom, rgb(60,179,113), rgb(46,139,87));    
+  background: -moz-linear-gradient(bottom, rgb(60,179,113), rgb(46,139,87));
 }
 
 #boxes #warningMsg {
-  width: 300px; 
+  width: 300px;
   height: 250px;
   padding: 0px 7px 7px 7px;
   border: 2px solid red;
@@ -1716,7 +1725,7 @@ body > #tour > button#imgood {
   border-left: 1px black solid;
   border-top: 1px black solid;
   border-right: 1px black solid;
-  overflow-x: hidden; 
+  overflow-x: hidden;
   overflow-y: scroll;
   font-size: 12px;
 }
@@ -1794,7 +1803,7 @@ body > #tour > button#imgood {
   font-size: 16px;
   font-weight: bold;
   background: -webkit-gradient(linear, center bottom, center top, from(rgb(46,139,87)), to(rgb(60,179,113)));
-  background: -moz-linear-gradient(bottom, rgb(46,139,87), rgb(60,179,113));  
+  background: -moz-linear-gradient(bottom, rgb(46,139,87), rgb(60,179,113));
 }
 
 .fileshare > #fileinput > input {

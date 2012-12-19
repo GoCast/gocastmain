@@ -807,7 +807,7 @@ function doSpot(spotDiv, info)
   {
     var divIcon, divTitle,
         jqDiv = $(spotDiv),
-        whiteBoard, editor, wiki, fshare;
+        whiteBoard, editor, wiki, fshare, ir;
     console.log('doSpot', info);
     console.log('spotDiv', spotDiv);
     if (!spotDiv) {throw "no spotDiv";}
@@ -880,6 +880,23 @@ function doSpot(spotDiv, info)
 
       if (fshare) {
         fshare.doSpot(info);
+      }
+    }
+    else if (info.spottype === 'irelate') {
+      if (info.cmdtype === 'addspot') {
+        jqDiv.attr('id', app.str2id('irelate ' + info.spotnumber));
+        jqDiv.attr('title', 'iRelate');
+        jqDiv.attr('alt', 'iRelate');
+        jqDiv.attr('encname', 'irelate');
+        jqDiv.attr('spotnumber', info.spotnumber);
+        jqDiv.removeClass('unoccupied').addClass('typeContent irelate');
+        ir = new GoCastJS.iRelate(spotDiv, info);
+      } else {
+        ir = jqDiv.data('gcIRelate');
+      }
+
+      if (ir) {
+        ir.doSpot(info);
       }
     }
     else if (info.spottype === 'wiki') {

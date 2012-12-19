@@ -1826,6 +1826,8 @@ function resizeZoom(event)
        wb       = wbCanvas.data('wb'),
        edit     = jqDiv.data('gcEdit'),
        fs       = jqDiv.data('gcFileShare'),
+       ss       = jqDiv.data('gcSlideShare'),
+       ir       = jqDiv.data('gcIRelate'),
        width, height, item, newWidth, newHeight,
        widthScale, heightScale, scale, left, top;
    if (jqDiv.length > 0)
@@ -1849,6 +1851,10 @@ function resizeZoom(event)
         edit.setScale(item.plgOrgWidth, item.plgOrgHeight);
       } else if (fs) {
         fs.setScale(item.plgOrgWidth, item.plgOrgHeight);
+      } else if (ir) {
+        ir.setScale(item.plgOrgWidth, item.plgOrgHeight);
+      } else if (ss) {
+        ss.setScale(item.plgOrgWidth, item.plgOrgHeight);
       }
 
       // center div in zoom div
@@ -2843,6 +2849,16 @@ function addFileShare() {
         links: JSON.stringify({})
       },function() {
         console.log('carousel addFileShare callback');
+      });
+}
+
+function addIRelate() {
+      Callcast.AddSpot({
+        spottype: 'irelate',
+        spotreplace: 'first-unoc',
+        roomname: Callcast.room.split('@')[0]
+      },function() {
+        console.log('carousel addIRelate callback');
       });
 }
 

@@ -159,7 +159,7 @@ GoCastJS.gcFileShare.prototype.setLinks = function(linksStr) {
                  '" class="linkaction download" title="Download: ' + k + '">&darr;</a></li>');
 
         this.fileviewerlist.files.push(k);
-        this.fileviewerlist.links.push(links[k]);      
+        this.fileviewerlist.links.push(links[k]);
       } else {
         mods += ('<li class="linkitem"><a target="_blank" href="' + links[k] + '" class="link" title="Download: ' + k + '">' +
                  k + '</a><a href="javascript:void(0);" class="linkaction remove" onclick="' +

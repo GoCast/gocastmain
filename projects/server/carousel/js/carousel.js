@@ -17,7 +17,7 @@
  */
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
-/*jslint browser: true, debug: true devel: true*/
+/*jslint browser: true, debug: true devel: true, white: true*/
 /*global Callcast, app, jQuery, getUrlInfo */
 'use strict'; // jslint waiver
 
@@ -72,7 +72,7 @@
     chatOut.data('util', new GoCastJS.ChatUtil(chatOut));
 
     // add handlers
-    jqObj.mouseover(function(event) 
+    jqObj.mouseover(function(event)
     {
       if (event.isPropagationStopped())
       {
@@ -90,7 +90,7 @@
         $('.zoom', this).css({
           'left': '1%',
           'bottom': '1%'
-        });      
+        });
       }
     });
     jqObj.mouseout(function(event) {
@@ -105,7 +105,10 @@
     var wbCanvas = $("#wbCanvas", this.object),
         wb       = wbCanvas.data("wb"),
         editor   = $(this.object).data("gcEdit"),
-        fs       = $(this.object).data('gcFileShare');
+        fs       = $(this.object).data('gcFileShare'),
+        ss       = $(this.object).data('gcSlideShare'),
+        ir       = $(this.object).data('gcIRelate');
+
     if (wb)
     {
       wb.setScale(this.plgOrgWidth * scale, this.plgOrgHeight * scale);
@@ -117,8 +120,14 @@
     if (fs) {
       fs.setScale(this.plgOrgWidth * scale, this.plgOrgHeight * scale);
     }
+    if (ss) {
+      ss.setScale(this.plgOrgWidth * scale, this.plgOrgHeight * scale);
+    }
+    if (ir) {
+      ir.setScale(this.plgOrgWidth * scale, this.plgOrgHeight * scale);
+    }
   };
-  
+
   /// \brief a numerically ordered collection of Item with insert an delete
   var Items = function() // jslint waiver
   {
@@ -297,7 +306,7 @@
 
     item.chatName = null;
     for (i = 0; i < trys.length; ++i)
-    {    
+    {
       newName = trys[i];
       //console.log("resolveChatNameCollisions newName", newName);
       collisions = this.getNameCollisions(item, newName);
