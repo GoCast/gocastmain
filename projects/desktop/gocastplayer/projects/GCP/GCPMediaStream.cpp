@@ -103,14 +103,14 @@ namespace GoCast
                                                         &LocalMediaStreamTrack::set_enabled));
     }
     
-    LocalVideoTrack::VideoDeviceList LocalVideoTrack::videoDevices;
+    //LocalVideoTrack::VideoDeviceList LocalVideoTrack::videoDevices;
     
     FB::JSAPIPtr LocalVideoTrack::Create(talk_base::scoped_refptr<webrtc::LocalVideoTrackInterface>& pTrack)
     {
         return boost::make_shared<LocalVideoTrack>(pTrack);
     }
     
-    FB::VariantMap LocalVideoTrack::GetVideoDevices()
+    /*FB::VariantMap LocalVideoTrack::GetVideoDevices()
     {
         static int deviceCount = 0;
         const size_t kMaxDeviceNameLength = 128;
@@ -199,13 +199,13 @@ namespace GoCast
         }
         
         return NULL;
-    }
+    }*/
     
     LocalVideoTrack::LocalVideoTrack(const talk_base::scoped_refptr<webrtc::LocalVideoTrackInterface>& pTrack)
     : LocalMediaStreamTrack(pTrack->kind(), pTrack->label(), pTrack->enabled())
     {
-        registerProperty("effect", make_property(this, &LocalVideoTrack::get_effect,
-                                                       &LocalVideoTrack::set_effect));
+        /*registerProperty("effect", make_property(this, &LocalVideoTrack::get_effect,
+                                                       &LocalVideoTrack::set_effect));*/
     }
         
     FB::JSAPIPtr LocalAudioTrack::Create(talk_base::scoped_refptr<webrtc::LocalAudioTrackInterface>& pTrack)

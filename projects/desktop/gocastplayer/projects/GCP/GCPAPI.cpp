@@ -15,6 +15,8 @@
 
 GCPAPI::~GCPAPI()
 {
+    delete m_pSetSDPObserver;
+    delete m_pCreateSDPObserver;
     DeletePeerConnection();
     if("localPlayer" == m_htmlId.convert_cast<std::string>())
     {
@@ -44,17 +46,17 @@ std::string GCPAPI::get_version()
     return FBSTRING_PLUGIN_VERSION;
 }
 
-std::string GCPAPI::get_readyState()
+/*std::string GCPAPI::get_readyState()
 {
     return m_readyState;
-}
+}*/
 
 FB::JSAPIPtr GCPAPI::get_source()
 {
     return m_srcStream;
 }
 
-FB::variant GCPAPI::get_volume()
+/*FB::variant GCPAPI::get_volume()
 {
     int level;
     GoCast::RtcCenter* pCtr = GoCast::RtcCenter::Instance();
@@ -160,14 +162,14 @@ FB::VariantList GCPAPI::get_audiooutopts()
     }
     
     return m_audioOutDevices;    
-}
+}*/
 
 FB::VariantList GCPAPI::get_logentries()
 {
     return GoCast::JSLogger::Instance()->LogEntries();
 }
 
-void GCPAPI::set_onaddstream(const FB::JSObjectPtr &onaddstream)
+/*void GCPAPI::set_onaddstream(const FB::JSObjectPtr &onaddstream)
 {
     m_onaddstreamCb = onaddstream;
 }
@@ -180,7 +182,7 @@ void GCPAPI::set_onremovestream(const FB::JSObjectPtr &onremovestream)
 void GCPAPI::set_onreadystatechange(const FB::JSObjectPtr &onreadystatechange)
 {
     m_onreadystatechangeCb = onreadystatechange;
-}
+}*/
 
 void GCPAPI::set_source(const FB::JSAPIPtr& stream)
 {
@@ -193,27 +195,27 @@ void GCPAPI::set_source(const FB::JSAPIPtr& stream)
 
         if("localPlayer" == m_htmlId.convert_cast<std::string>())
         {            
-			if(NULL != getPlugin()->Renderer().get())
+			if(NULL != getPlugin()->Renderer()/*.get()*/)
 			{
-				GoCast::GCPVideoRenderer* pRenderer = 
+				/*GoCast::GCPVideoRenderer* pRenderer = 
                     dynamic_cast<GoCast::GCPVideoRenderer*>(getPlugin()->Renderer()->renderer());
 				if(NULL != pRenderer)
 				{
 					pRenderer->SetPreviewMode(true);
-				}
+				}*/
 
 				(GoCast::RtcCenter::Instance())->SetLocalVideoTrackRenderer(getPlugin()->Renderer());
 			}
         }
-        else
+        /*else
         {
             (GoCast::RtcCenter::Instance())->SetRemoteVideoTrackRenderer(m_htmlId.convert_cast<std::string>(),
 		                                                                 getPlugin()->Renderer());
-		}
+		}*/
     }
 }
 
-void GCPAPI::set_volume(FB::variant volume)
+/*void GCPAPI::set_volume(FB::variant volume)
 {
     int level = volume.convert_cast<int>();
     GoCast::RtcCenter* pCtr = GoCast::RtcCenter::Instance();
@@ -237,7 +239,7 @@ void GCPAPI::set_micvolume(FB::variant volume)
     {
         pCtr->SetMicVol(level); 
     }
-}
+}*/
 
 void GCPAPI::GetUserMedia(const FB::JSObjectPtr& mediaHints,
                           const FB::JSObjectPtr& succCb,
@@ -268,7 +270,7 @@ FB::variant GCPAPI::Init(const FB::variant& htmlId,
 {
     GoCast::RtcCenter* pCtr = GoCast::RtcCenter::Instance();
     m_htmlId = htmlId;
-    m_iceCb = iceCallback;
+    //m_iceCb = iceCallback;
     
     if(false == pCtr->Inited())
     {
@@ -282,11 +284,11 @@ FB::variant GCPAPI::Init(const FB::variant& htmlId,
                                         iceConfig.convert_cast<std::string>(),
                                         this))
     {
-        m_readyState = "INVALID";
+        //m_readyState = "INVALID";
         return false;
     }
     
-    m_readyState = pCtr->ReadyState(m_htmlId.convert_cast<std::string>());
+    //m_readyState = pCtr->ReadyState(m_htmlId.convert_cast<std::string>());
     return true;
 }
 
@@ -306,7 +308,7 @@ FB::variant GCPAPI::AddStream(const FB::JSAPIPtr& stream)
                            stream->GetProperty("label").convert_cast<std::string>());
 }
 
-FB::variant GCPAPI::RemoveStream(const FB::JSAPIPtr& stream)
+/*FB::variant GCPAPI::RemoveStream(const FB::JSAPIPtr& stream)
 {
     GoCast::RtcCenter* pCtr = GoCast::RtcCenter::Instance();
     
@@ -320,12 +322,13 @@ FB::variant GCPAPI::RemoveStream(const FB::JSAPIPtr& stream)
     
     return pCtr->RemoveStream(m_htmlId.convert_cast<std::string>(),
                               stream->GetProperty("label").convert_cast<std::string>());
-}
+}*/
 
-FB::variant GCPAPI::CreateOffer(const FB::JSObjectPtr& mediaHints)
+void GCPAPI::CreateOffer(const FB::JSObjectPtr& succCb,
+                         const FB::JSObjectPtr& failCb)
 {
-    bool bVideo = false;
-    bool bAudio = false;
+    m_oncreatesdpsuccessCb = succCb;
+    m_oncreatesdpfailureCb = failCb;
     GoCast::RtcCenter* pCtr = GoCast::RtcCenter::Instance();
     
     if(false == pCtr->Inited())
@@ -333,24 +336,12 @@ FB::variant GCPAPI::CreateOffer(const FB::JSObjectPtr& mediaHints)
         std::string msg = m_htmlId.convert_cast<std::string>();
         msg += ": Failed to init RtcCenter singleton";
         FBLOG_ERROR_CUSTOM("GCPAPI::CreateOffer", msg);
-        return "";
+        return;
     }
-    
-    if(true == mediaHints->GetProperty("video").convert_cast<bool>())
-    {
-        bVideo = true; 
-    }
-    
-    if(true == mediaHints->GetProperty("audio").convert_cast<bool>())
-    {
-        bAudio = true;
-    }
-    
-    return pCtr->CreateOffer(m_htmlId.convert_cast<std::string>(),
-                             webrtc::MediaHints(bAudio, bVideo));
+    pCtr->CreateOffer(m_htmlId.convert_cast<std::string>(), m_pCreateSDPObserver);
 }
 
-FB::variant GCPAPI::CreateAnswer(const FB::variant& offer, const FB::JSObjectPtr& mediaHints)
+/*FB::variant GCPAPI::CreateAnswer(const FB::variant& offer, const FB::JSObjectPtr& mediaHints)
 {
     bool bVideo = false;
     bool bAudio = false;
@@ -384,7 +375,7 @@ FB::variant GCPAPI::CreateAnswer(const FB::variant& offer, const FB::JSObjectPtr
     return pCtr->CreateAnswer(m_htmlId.convert_cast<std::string>(),
                               webrtc::MediaHints(bAudio, bVideo),
                               offer.convert_cast<std::string>());
-}
+}*/
 
 void GCPAPI::SetLocalDescription(const FB::variant& action,
                                  const FB::variant& sdp,
@@ -392,9 +383,8 @@ void GCPAPI::SetLocalDescription(const FB::variant& action,
                                  const FB::JSObjectPtr& failCb)
 {
     GoCast::RtcCenter* pCtr = GoCast::RtcCenter::Instance();
-    webrtc::JsepInterface::Action _action = ("OFFER" == action.convert_cast<std::string>())? 
-                                            webrtc::JsepInterface::kOffer:
-                                            webrtc::JsepInterface::kAnswer;
+    m_onsetsdpsuccessCb = succCb;
+    m_onsetsdpfailureCb = failCb;
     
     if(false == pCtr->Inited())
     {
@@ -410,14 +400,12 @@ void GCPAPI::SetLocalDescription(const FB::variant& action,
     }
     
     pCtr->SetLocalDescription(m_htmlId.convert_cast<std::string>(),
-                              _action,
-                              sdp.convert_cast<std::string>(),
-                              succCb,
-                              failCb,
-                              false);
+                              m_pSetSDPObserver,
+                              action.convert_cast<std::string>(),
+                              sdp.convert_cast<std::string>());
 }
 
-FB::variant GCPAPI::SetRemoteDescription(const FB::variant& action, const FB::variant& sdp)
+/*FB::variant GCPAPI::SetRemoteDescription(const FB::variant& action, const FB::variant& sdp)
 {
     GoCast::RtcCenter* pCtr = GoCast::RtcCenter::Instance();
     webrtc::JsepInterface::Action _action = ("OFFER" == action.convert_cast<std::string>())? 
@@ -486,7 +474,7 @@ FB::variant GCPAPI::StartIce()
     }
     
     return pCtr->StartIce(m_htmlId.convert_cast<std::string>());    
-}
+}*/
 
 FB::variant GCPAPI::DeletePeerConnection()
 {
@@ -508,7 +496,7 @@ void GCPAPI::LogFunction(const FB::JSObjectPtr& func)
     GoCast::JSLogger::Instance()->LogFunction(func);
 }
 
-void GCPAPI::OnStateChange(StateType state_changed)
+/*void GCPAPI::OnStateChange(StateType state_changed)
 {
     GoCast::RtcCenter* pCtr = GoCast::RtcCenter::Instance();
     
@@ -637,4 +625,86 @@ void GCPAPI::OnIceComplete()
     {
         m_iceCb->InvokeAsync("", FB::variant_list_of("")(false));
     }
+}*/
+
+void GCPAPI::InvokeSetSDPSuccessCallback()
+{
+    if(NULL != m_onsetsdpsuccessCb.get())
+    {
+        m_onsetsdpsuccessCb->InvokeAsync("", FB::variant_list_of());
+    }
+}
+
+void GCPAPI::InvokeSetSDPFailureCallback(const std::string& error)
+{
+    if(NULL != m_onsetsdpfailureCb.get())
+    {
+        m_onsetsdpfailureCb->InvokeAsync("", FB::variant_list_of(error));
+    }
+}
+
+void GCPAPI::InvokeCreateSDPSuccessCallback(webrtc::SessionDescriptionInterface* desc)
+{
+    std::string sdp("");
+    
+    if(NULL != m_oncreatesdpsuccessCb.get())
+    {
+        if(false == desc->ToString(&sdp))
+        {
+            FBLOG_ERROR_CUSTOM("GCPAPI::InvokeCreateSDPSuccessCallback", "Failed to serialize SDP");
+            return;
+        }
+        m_oncreatesdpsuccessCb->InvokeAsync("", FB::variant_list_of(sdp));
+    }
+}
+
+void GCPAPI::InvokeCreateSDPFailureCallback(const std::string& error)
+{
+    if(NULL != m_oncreatesdpfailureCb.get())
+    {
+        m_oncreatesdpfailureCb->InvokeAsync("", FB::variant_list_of(error));
+    }
+}
+
+
+SetSDPObserver::SetSDPObserver(GCPAPI* pJsapi)
+: m_pJsapi(pJsapi)
+{
+    
+}
+
+SetSDPObserver::~SetSDPObserver()
+{
+    
+}
+
+void SetSDPObserver::OnSuccess()
+{
+    m_pJsapi->InvokeSetSDPSuccessCallback();
+}
+
+void SetSDPObserver::OnFailure(const std::string& error)
+{
+    m_pJsapi->InvokeSetSDPFailureCallback(error);
+}
+
+CreateSDPObserver::CreateSDPObserver(GCPAPI* pJsapi)
+: m_pJsapi(pJsapi)
+{
+    
+}
+
+CreateSDPObserver::~CreateSDPObserver()
+{
+    
+}
+
+void CreateSDPObserver::OnSuccess(webrtc::SessionDescriptionInterface* desc)
+{
+    m_pJsapi->InvokeCreateSDPSuccessCallback(desc);
+}
+
+void CreateSDPObserver::OnFailure(const std::string& error)
+{
+    m_pJsapi->InvokeCreateSDPFailureCallback(error);
 }

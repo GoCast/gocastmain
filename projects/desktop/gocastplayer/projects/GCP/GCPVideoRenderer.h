@@ -2,9 +2,10 @@
 #define Firebreath_GCPVideoRenderer_h
 
 //-------------- WebRTC headers ----------------------
-#include "talk/session/phone/videorenderer.h"
-#include "talk/session/phone/videoframe.h"
-#include "talk/session/phone/videocommon.h"
+#include "talk/app/webrtc/mediastreaminterface.h"
+//#include "talk/media/base/videorenderer.h"
+#include "talk/media/base/videoframe.h"
+#include "talk/media/base/videocommon.h"
 #include "talk/base/scoped_ptr.h"
 
 //-------------- Firebreath Headers -------------------
@@ -14,37 +15,37 @@
 
 namespace GoCast
 {
-    class GCPVideoRenderer: public cricket::VideoRenderer
+    class GCPVideoRenderer: public webrtc::VideoRendererInterface
     {
     public:
         explicit GCPVideoRenderer(FB::PluginWindow* pWin);
         virtual ~GCPVideoRenderer();
         
         // cricket::VideoFrame overrides
-        virtual bool SetSize(int width, int height, int reserved);
-        virtual bool RenderFrame(const cricket::VideoFrame* pFrame);
+        virtual void SetSize(int width, int height);
+        virtual void RenderFrame(const cricket::VideoFrame* pFrame);
         
         // Refresh event handler
         virtual bool OnWindowRefresh(FB::RefreshEvent* pEvt = NULL);
         
     public:
-        void SetPreviewMode(bool bPreview) { m_bPreview = bPreview; }
+        //void SetPreviewMode(bool bPreview) { m_bPreview = bPreview; }
 
     protected:
-        bool MirrorIfPreview(const cricket::VideoFrame* pFrame);
+        //bool MirrorIfPreview(const cricket::VideoFrame* pFrame);
         void ConvertToRGBA();
         void InvalidateWindow();
-		uint8* AllocBuffer(size_t size);
-		void FreeBuffer(uint8* pBuf);
+		//uint8* AllocBuffer(size_t size);
+		//void FreeBuffer(uint8* pBuf);
         
     protected:
         talk_base::scoped_array<uint8> m_pFrameBuffer;
-		uint8* m_pMirrorBuffers[2];
+		//uint8* m_pMirrorBuffers[2];
         FB::PluginWindow* m_pWin;
         boost::mutex m_winMutex;
         int m_width;
         int m_height;
-        bool m_bPreview;
+        //bool m_bPreview;
     };
 }
 

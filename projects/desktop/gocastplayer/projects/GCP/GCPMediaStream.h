@@ -11,7 +11,7 @@
 
 #include <map>
 
-#include "modules/video_capture/main/interface/video_capture_factory.h"
+//#include "modules/video_capture/main/interface/video_capture_factory.h"
 #include "talk/app/webrtc/mediastreaminterface.h"
 #include "talk/base/scoped_ptr.h"
 #include "JSAPIAuto.h"
@@ -97,31 +97,31 @@ namespace GoCast
     class LocalVideoTrack : public LocalMediaStreamTrack
     {
     public:
-        typedef std::map< std::string,
-                          talk_base::scoped_refptr<webrtc::VideoCaptureModule> > VideoDeviceList;
+        /*typedef std::map< std::string,
+                          talk_base::scoped_refptr<webrtc::VideoCaptureModule> > VideoDeviceList;*/
         
     public:
         static FB::JSAPIPtr Create(talk_base::scoped_refptr<webrtc::LocalVideoTrackInterface>& pTrack);
-        static FB::VariantMap GetVideoDevices();
-        static talk_base::scoped_refptr<webrtc::VideoCaptureModule>
-            GetCaptureDevice(const std::string& uniqueId);
+        //static FB::VariantMap GetVideoDevices();
+        /*static talk_base::scoped_refptr<webrtc::VideoCaptureModule>
+            GetCaptureDevice(const std::string& uniqueId);*/
         explicit LocalVideoTrack(const talk_base::scoped_refptr<webrtc::LocalVideoTrackInterface>& pTrack);
         ~LocalVideoTrack() { }
         
         //Javascript get property methods
-        FB::variant get_effect() const;
+        //FB::variant get_effect() const;
         
         //Javascript set property methods
-        void set_effect(FB::variant effect);
+        //void set_effect(FB::variant effect);
         
-    protected:
-        static VideoDeviceList videoDevices;
+    /*protected:
+        static VideoDeviceList videoDevices;*/
     };
     
     class LocalAudioTrack : public LocalMediaStreamTrack
     {
-    public:
-        typedef std::map<std::string, std::string> AudioDeviceList;
+    /*public:
+        typedef std::map<std::string, std::string> AudioDeviceList;*/
         
     public:
         static FB::JSAPIPtr Create(talk_base::scoped_refptr<webrtc::LocalAudioTrackInterface>& pTrack);

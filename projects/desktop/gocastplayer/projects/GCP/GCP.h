@@ -20,8 +20,8 @@
 #include <boost/thread.hpp>
 #include <boost/thread/condition.hpp>
 
-#include "talk/app/webrtc/mediastreaminterface.h"
-#include "talk/base/scoped_ref_ptr.h"
+//#include "talk/app/webrtc/mediastreaminterface.h"
+//#include "talk/base/scoped_ref_ptr.h"
 #include "GCPVideoRenderer.h"
 
 FB_FORWARD_PTR(GCP)
@@ -34,7 +34,7 @@ public:
 public:
     GCP();
     virtual ~GCP();    
-    talk_base::scoped_refptr<webrtc::VideoRendererWrapperInterface> Renderer() { return m_pRenderer; }
+    webrtc::VideoRendererInterface* Renderer() { return m_pRenderer; }
     
 public:
     void onPluginReady();
@@ -68,7 +68,7 @@ public:
     /** END EVENTDEF -- DON'T CHANGE THIS LINE **/
     
 private:
-    talk_base::scoped_refptr<webrtc::VideoRendererWrapperInterface> m_pRenderer;
+    GoCast::GCPVideoRenderer* m_pRenderer;
 };
 
 #endif

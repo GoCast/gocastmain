@@ -36,7 +36,7 @@ add_mac_plugin(${PROJECT_NAME} ${PLIST} ${STRINGS} ${LOCALIZED} SOURCES)
 
 # add library dependencies here; leave ${PLUGIN_INTERNAL_DEPS} there unless you know what you're doing!
 
-find_library(LIBWEBRTC libwebrtc.a ../../deps/webrtc/trunk/xcodebuild/Release)
+find_library(LIBWEBRTC libwebrtc.a ../../deps/libjingle/trunk/xcodebuild/${LIBWEBRTC_BUILD_CONFIG})
 find_library(FWCORESERVICES CoreServices)
 find_library(FWCOREAUDIO CoreAudio)
 find_library(FWCOREVIDEO CoreVideo)
@@ -61,4 +61,6 @@ target_link_libraries(${PROJECT_NAME}
     ${FWFOUNDATION}
     ${FWAPPKIT}
     ${FWSECURITY}
+    -lcrypto
+    -lssl
 )

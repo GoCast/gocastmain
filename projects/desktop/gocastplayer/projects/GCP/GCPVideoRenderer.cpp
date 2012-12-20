@@ -1,6 +1,6 @@
-#include "common_video/libyuv/include/libyuv.h"
 #include "GCPVideoRenderer.h"
 #include "GCPMediaStream.h"
+//#include "third_party/webrtc/common_video/libyuv/include/webrtc_libyuv.h"
 
 namespace GoCast
 {
@@ -8,27 +8,26 @@ namespace GoCast
     : m_pWin(pWin)
     , m_width(0)
     , m_height(0)
-    , m_bPreview(false)
+//    , m_bPreview(false)
     {
         m_pFrameBuffer.reset();
-        m_pMirrorBuffers[0] = NULL;
-        m_pMirrorBuffers[1] = NULL;
+//        m_pMirrorBuffers[0] = NULL;
+//        m_pMirrorBuffers[1] = NULL;
     }
     
     GCPVideoRenderer::~GCPVideoRenderer()
     {
-		FreeBuffer(m_pMirrorBuffers[0]);
-		FreeBuffer(m_pMirrorBuffers[1]);
+//		FreeBuffer(m_pMirrorBuffers[0]);
+//		FreeBuffer(m_pMirrorBuffers[1]);
         m_pFrameBuffer.reset(NULL);
     }
     
-    bool GCPVideoRenderer::SetSize(int width, int height, int reserved)
+    void GCPVideoRenderer::SetSize(int width, int height)
     {
         //resize not implemented yet
-        return true;
     }
     
-    bool GCPVideoRenderer::RenderFrame(const cricket::VideoFrame* pFrame)
+    void GCPVideoRenderer::RenderFrame(const cricket::VideoFrame* pFrame)
     {
         boost::mutex::scoped_lock winLock(m_winMutex);
         static bool bRenderLogged = false;
@@ -40,7 +39,7 @@ namespace GoCast
             m_pFrameBuffer.reset(new uint8[m_width*m_height*4]);
         }
         
-        if(false == MirrorIfPreview(pFrame))
+        /*if(false == MirrorIfPreview(pFrame))
         {
             return false;
         }
@@ -56,14 +55,14 @@ namespace GoCast
             }
         }
         else
-        {
+        {*/
             const int stride = m_width*4;
             const int frameBufferSize = m_height*stride;
             pFrame->ConvertToRgbBuffer(cricket::FOURCC_ARGB,
                                        m_pFrameBuffer.get(),
                                        frameBufferSize,
                                        stride);
-        }
+        /*}*/
         
         //convert to rgba and correct alpha
         ConvertToRGBA();
@@ -75,12 +74,10 @@ namespace GoCast
         }
         
         //trigger window refresh event
-        InvalidateWindow();
-        
-        return true;
+        InvalidateWindow();        
     }
 
-    bool GCPVideoRenderer::MirrorIfPreview(const cricket::VideoFrame* pFrame)
+    /*bool GCPVideoRenderer::MirrorIfPreview(const cricket::VideoFrame* pFrame)
     {
         if(NULL == pFrame)
         {
@@ -118,5 +115,5 @@ namespace GoCast
         }
         
         return true;
-    }
+    }*/
 }

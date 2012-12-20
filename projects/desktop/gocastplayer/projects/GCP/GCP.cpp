@@ -127,17 +127,16 @@ bool GCP::onWindowAttached(FB::AttachedEvent *evt, FB::PluginWindow *pWin)
     // The window is attached; act appropriately
     if(NULL != pWin)
     {        
-        if(NULL == m_pRenderer.get())
+        if(NULL == m_pRenderer)
         {
-			GoCast::GCPVideoRenderer* pRenderer = new GoCast::GCPVideoRenderer(pWin);
+			m_pRenderer = new GoCast::GCPVideoRenderer(pWin);
 			GCPAPI* pJsapi = dynamic_cast<GCPAPI*>(getRootJSAPI().get());            
-            m_pRenderer = webrtc::CreateVideoRenderer(pRenderer);
 
 			if(NULL != pJsapi)
 			{
 				if("localPlayer" == pJsapi->HtmlId())
 				{
-					pRenderer->SetPreviewMode(true);
+					//pRenderer->SetPreviewMode(true);
 					(GoCast::RtcCenter::Instance())->SetLocalVideoTrackRenderer(m_pRenderer);
 				}
 			}            
@@ -149,6 +148,10 @@ bool GCP::onWindowAttached(FB::AttachedEvent *evt, FB::PluginWindow *pWin)
 
 bool GCP::onWindowDetached(FB::DetachedEvent *evt, FB::PluginWindow *)
 {
+    if (NULL != m_pRenderer)
+    {
+        delete m_pRenderer;
+    }
     return true;
 }
 
@@ -156,9 +159,9 @@ bool GCP::onWindowRefresh(FB::RefreshEvent *evt, FB::PluginWindow *pWin)
 {
     if(NULL != evt && NULL != pWin)
     {
-        if(NULL != m_pRenderer.get())
+        if(NULL != m_pRenderer)
         {
-            static_cast<GoCast::GCPVideoRenderer*>(m_pRenderer->renderer())->OnWindowRefresh(evt);
+            static_cast<GoCast::GCPVideoRenderer*>(m_pRenderer)->OnWindowRefresh(evt);
         }
     }
     

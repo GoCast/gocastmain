@@ -1,0 +1,27 @@
+Index: libjingle/trunk/talk/media/webrtc/webrtcvideocapturer.cc
+===================================================================
+--- libjingle/trunk/talk/media/webrtc/webrtcvideocapturer.cc	(revision 253)
++++ libjingle/trunk/talk/media/webrtc/webrtcvideocapturer.cc	(working copy)
+@@ -190,8 +190,8 @@
+   }
+   factory_->DestroyDeviceInfo(info);
+   if (supported.empty()) {
+-    LOG(LS_ERROR) << "Failed to find usable formats for id: " << device.id;
+-    return false;
++    LOG(LS_WARNING) << "Failed to find usable formats for id: " << device.id;
++    //return false;
+   }
+ 
+   module_ = factory_->Create(0, vcm_id);
+@@ -203,7 +203,10 @@
+   // It is safe to change member attributes now.
+   module_->AddRef();
+   SetId(device.id);
+-  SetSupportedFormats(supported);
++    
++  if (!supported.empty()) {
++    SetSupportedFormats(supported);        
++  }
+   return true;
+ }
+ 
