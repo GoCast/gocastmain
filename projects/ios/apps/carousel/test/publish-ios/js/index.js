@@ -1883,7 +1883,7 @@ function onJoinNow(
     app.user.fbSkipped = true;
 
     // get the nick name, return back to dialog if not defined
-    var usrNm = $('#credentials2 > input#name').val();
+    var usrNm = 'publish-ios'; //$('#credentials2 > input#name').val();
 
     // user must enter fb or nick name if both not entered
     // display error
@@ -2521,15 +2521,7 @@ $(document).ready(function(
 
         //do something if facebook took too long or errored out
         app.fbTimerRunning = setTimeout(function() {
-          if (!app.facebookInited) {
-            closeWindow();
-            app.log(2, 'Facebook API init failed - userAgent: ' + navigator.userAgent);
-            Callcast.SendLiveLog('Facebook API init failed - userAgent: ' + navigator.userAgent.replace(/;/g, '|'));
-            Callcast.SendLiveLog('FBLOG: ' + getFBLog());
-            openWindow('#credentials');
-            $('#credentials > .fb-login-button').addClass('hidden');
-            $('#credentials > #fb-disabled').removeClass('hidden');
-          }
+			onJoinNow();
         }, 10000);
 
         // Login to xmpp anonymously
