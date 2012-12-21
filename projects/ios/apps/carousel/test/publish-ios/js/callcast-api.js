@@ -51,7 +51,7 @@ $(document).on('joined_session', function(
    * Enable button activities except join. */
   app.enableButtons(true);
   closeWindow();
-  promptTour();
+//  promptTour();
 
   return false;
 }); /* joined_session() */
