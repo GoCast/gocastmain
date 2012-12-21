@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<!--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
+<!--
+ ! File: index.html
+ !
+ ! Brief: Gocast.it plug-in
+ !
+ ! Author: Net-Scale Technologies, Inc., www.net-scale.com
+ !         Created April 5  , 2012 (paula.muller@net-scale.com)
+ !
+ ! Copyright (c) 2012 XVD. All rights reserved.
+ -->
+<!--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
+
+<html lang="en"><!--manifest="cache-manifest.appcache">-->
+  <head>
+    <meta content="text/html; charset=UTF-8" http-equiv="content-type" />
+    <meta http-equiv="Cache-Control" content="no-store" />
+    <meta http-equiv="Cache-Control" content="max-age = 0" />
+    <meta http-equiv="Expires" content="-1" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta name="viewport" content="height = device-height, width = device-width, initial-scale = 1.0, user-scalable = no" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta names="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta property="og:type" content="website" />
+    <meta property="fb:admins" content="1219010428" />
+    <meta property="og:title" content="GoCast Carousel." />
+    <meta property="og:description" content="A place to be that's better than being there." />
+    <meta property="og:image" content="http://carousel.gocast.it/images/gologo200.png" />
+    <link rel="apple-touch-icon" href="images/apple-touch-icon.png" />
+    <link rel="apple-touch-icon" sizes="72x72" href="images/apple-touch-icon-ipad.png" />
+    <link rel="apple-touch-icon" sizes="114x114" href="images/apple-touch-icon-iphone4.png" />
+    <link rel="apple-touch-startup-image" href="images/startup.png">
+
+    <!-- DEV JS/CSS FILES: ATTACH ?[CURTIME] TO SCRIPT/HREF LINKS -->
+
+    <link rel="stylesheet" href="css/wb.css?1356065285" type="text/css" />
+    <link rel="stylesheet" href="css/wiki.css?1356065285" type="text/css" />
+    <link rel="stylesheet" href="css/index.css?1356065285" type="text/css" />
+    <link rel="stylesheet" href="css/jquery-ui.css?1356065285" type="text/css" />
+    <link rel="stylesheet" href="css/jquery.cleditor.css?1356065285" type="text/css" />
+
+    <script type="text/javascript">
+      if (!window.console) {
+        console = { log: function() {} };
+      }
+    </script>
+    <script type="text/javascript" src="js/jquery-1.8.1.js?1356065285"></script>
+    <script type="text/javascript" src="js/jquery.mousewheel.js?1356065285"></script>
+    <script type="text/javascript" src="js/jquery-ui.js?1356065285"></script>
+    <script type="text/javascript" src="js/jquery.cleditor.js?1356065285"></script>
+    <script type="text/javascript" src="http://dev.gocast.it/scripts/strophe.js?1356065285"></script>
+    <script type="text/javascript" src="http://dev.gocast.it/scripts/strophe.roster.js?1356065285"></script>
+    <script type="text/javascript" src="http://dev.gocast.it/scripts/strophe.disco.js?1356065285"></script>
+    <script type="text/javascript" src="http://dev.gocast.it/scripts/strophe.muc.js?1356065285"></script>
+    <script type="text/javascript" src="http://dev.gocast.it/scripts/strophe.jingle.js?1356065285"></script>
+    <script type="text/javascript" src="http://dev.gocast.it/scripts/jquery.base64.min.js?1356065285"></script>
+    <script type="text/javascript" src="js/callcast.js?1356065285"></script>
+    <script type="text/javascript" src="js/ibb.js?1356065285"></script>
+    <script type="text/javascript" src="js/peerconnection.js?1356065285"></script>
+    <script type="text/javascript" src="js/callcast-api.js?1356065285"></script>
+    <script type="text/javascript" src="js/carousel.js?1356065285"></script>
+    <script type="text/javascript" src="js/fb.js?1356065285"></script>
+    <script type="text/javascript" src="js/uiutil.js?1356065285"></script>
+    <script type="text/javascript" src="js/wb.js?1356065285"></script>
+    <script type="text/javascript" src="js/gcedit.js?1356065285"></script>
+    <script type="text/javascript" src="js/wiki.js?1356065285"></script>
+    <script type="text/javascript" src="js/index.js?1356065285"></script>
+
+    <!-- ---------------------------------------------------------- -->
+
+    <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon" />
+    <title>Gocast.it</title>
+  </head>
+
+  <body>
+    <img src="images/body-bg.png" alt="background image" id="body-bg" />
+    <div id="fb-root"></div> <!-- fb integration required -->
+    <script>
+      window.fbAsyncInit = ourAsyncFBInit;
+      // login callback
+      $(document).bind('checkCredentials', checkCredentials);
+      $(document).bind('deferredCheckCredentials', deferredCheckCredentials);
+
+      // Load the SDK's source Asynchronously
+      (function(d){
+         var js, id = 'facebook-jssdk', ref = d.getElementsByTagName('script')[0];
+         if (d.getElementById(id)) {return;}
+         js = d.createElement('script'); js.id = id; js.async = true;
+         js.src = "//connect.facebook.net/en_US/all.js";
+         ref.parentNode.insertBefore(js, ref);
+       }(document));
+    </script>
+    <div id="upper-left">
+      <p>GoCast.it ©2012 Beta</p>
+      <div id="volume" title="Speaker Volume"></div>
+      <p id="connection-status" title="Connection Status">Connection Status</p>
+      <div class="feedback gc-icon" id="feedback" title="Send us your feedback."   onclick="openChat(event);"></div>
+      <div class="gc-icon"          id="log"      title="Send log file to GoCast." onClick="sendLogPrompt();"></div>
+      <div class="gc-icon"          id="taketour" title="Take a tour of GoCast"    onclick="startTour('body > #tour')"></div>
+      <div id="send-log-prompt" class="warning">
+        <p id="message">Describe the nature of the problem:</p>
+        <textarea id="logdesc"></textarea>
+        <p></p>
+        <button id="send" class="send button" onclick="sendLog()">Send Log To GoCast</button>
+        <button id="stop" class="close button" onclick="closeSendLog()">Cancel</button>
+        <!--<input id="stop-showing" type="checkbox" value="Stop"/>
+        <p id="stop-showing-text">Stop showing this message.</p>-->
+        <!--<img class="close" src="images/button-close.png" alt="Close" title="Close" onClick="closeSendLog();"/>-->
+      </div>
+      <div id="status-prompt" class="warning">
+        <p id="message">The speaker volume is too low for you to hear!</p>
+        <input id="stop-showing" type="checkbox" value="Stop"onclick="stopStatusClicked(event);"/>
+        <p id="stop-showing-text">Stop showing this message.</p>
+        <img class="close" src="images/button-close.png" alt="Close" title="Close" onClick="closeStatusLeft(event);"/>
+      </div>
+    </div>
+    <div id="upper-right">
+      <div class="gc-icon" id="settings" title="Settings" onClick="app.navToSettings()"></div>
+
+      <!-- <MANJESH> -->
+      <div id="settings-prompt" class="info">
+        <p id="settings-message"></p>
+        <span><input id="settings-stop-showing" type="checkbox" />&nbsp;&nbsp;Don't show again.</span>
+        <button id="settings-cancel" class="button" style="float:right;">&nbsp;&nbsp;Cancel&nbsp;&nbsp;</button>
+        <button id="settings-ok" class="button" style="float:right;">&nbsp;&nbsp;OK&nbsp;&nbsp;</button>
+      </div>
+      <!-- </MANJESH> -->
+
+      <input class="gc-icon" id="audio" type="button" class="off" title="Audio is Disabled" disabled="disabled"/>
+      <input class="gc-icon" id="video" type="button" title="Video is Disabled" disabled="disabled"/>
+      <input class="copyData gc-icon" type="button" title="Email link to room." onclick="openCopyData(event);"/>
+      <!--<input class="twitter gc-icon" type="button" title="Send message to Twitter." onclick="sendTwitter();"/>-->
+      <input class="fbSend gc-icon"  type="button" title="Send facebook message." onclick="fbSendDialog();"/>
+      <input class="fbShare gc-icon" type="button" title="Share on wall." onclick="fbShare();"/>
+
+      <div id="status-prompt" class="warning">
+        <p id="message">The speaker volume is too low for you to hear!</p>
+        <input id="stop-showing" type="checkbox" value="Stop"onclick="stopStatusClicked(event);"/>
+        <p id="stop-showing-text">Stop showing this message.</p>
+        <img class="close" src="images/button-close.png" alt="Close" title="Close" onClick="closeStatus(event);"/>
+      </div>
+    </div>
+    <div id="lower-right">
+       <input id="dlbtn" type="button" title="Get Updated Plugin." onclick="doDownload();" />
+       <!--<input class="vidbtn" type="button" title="Place video content." onclick="startVideoContent();" />-->
+       <!--<input class="vidbtn" type="button" title="Place room content." onclick="startPeopleContent();" />-->
+       <!--<input class="demobtn" type="button" title="Place demo content." onclick="startDemoContent();" />-->
+       <input class="gc-icon" id="addItem" type="button" title="Add Spot" onclick="addItem();"/>
+       <input class="gc-icon" id="addWhiteBoard" type="button" title="Add White Board" onclick="addWhiteBoard();"/>
+       <input class="gc-icon" id="addEditor" type="button" title="Add Notepad" onclick="addEditor();"/>
+       <input class="gc-icon" id="addWiki" type="button" title="Add Wikipedia Browser" onclick="addWiki();"/>
+    </div>
+    <!--<div id="lower-left">
+        <input class"gc-icon" id="showChat" type="button" title="chat with your group" onclick="showGroupChat(event);"/>
+        <div id="msgBoard">
+        <div id="chatOut"> </div>
+        <input id="groupChatInput" class="chatTo" title="enter a message" placeholder="chat with your group" type="text" onkeydown="keypressGrpChatHandler(event);"/>
+        <button id="send" class="send" title="post it" onclick="sendGrpChat(event)">Post</button>
+        <input class="close gc-icon" type="button" title="Close Group Chat" onclick="closeGroupChat(event);"/>
+       </div>
+    </div>-->
+    <div id="lower-left">
+      <a id="rotateleft" style="left:0px; top:0px;" class="arrow left"
+         href="javascript:void(0);" onclick="app.carousel.rotate(1);"
+         title="Rotate the carousel clockwise">&nbsp;</a>
+      <a id="rotateRight" style="left:75px; top:0px;" class="arrow right"
+         href="javascript:void(0);" onclick="app.carousel.rotate(-1);"
+         title="Rotate the carousel counterclockwise">&nbsp;</a>
+    </div>
+    <div id="boxes">
+      <div id="winEula" class="window resizable">
+        <iframe src="eula.html">
+        </iframe>
+        <form action="https://carousel.gocast.it/downloads/GoCastPlayer.msi" method="post">
+          <input type="submit" value="Accept" onclick="winInstall();"/>
+        </form>
+      </div>
+      <div id="winWait" class="window resizable">
+        <p class="title">Please double-click on the downloaded file to install the GoCast App.</p>
+        <div id="status">
+           <img id="spinner" src="images/waiting-join.gif" alt="Checking "/><p id="msg">Checking for install...</p>
+        </div>
+      </div>
+      <div id="chromeRestart" class="window resizable">
+        <h1>You're not quite done yet...</h1>
+        <p class="title">
+          1. Double-click to install the GoCast App you just downloaded. If you're using Firefox, you may have to locate the 'Downloads' window via the Tools menu. <br></br>2. After installing the app, quit your browser and start it again.
+        </p>
+      </div>
+      <div id="pageReload" class="window resizable" style="width: auto; height: 150px;">
+        <h1>Reload GoCast</h1>
+        <p class="title">GoCast will now take you to your room.</p>
+        <button id="reload" type="button" onclick="errMsgReloadClick();">Reload</button>
+      </div>
+      <div id="copyData" class="window resizable">
+         <img class="close" src="images/button-close.png" alt="Close" title="Close" />
+         <p>Copy this and paste this into an email.</p>
+         <div id="copyContent">
+            <h3>You're Invited To GoCast!</h3>
+            I am using <strong>GoCast</strong>, a new kind of "room" on the Web where people can meet and share on live video.
+            Get started by downloading the GoCast App (currently for Firefox or Chrome only), and join me in my room.
+            To get started, click <a id="copyName">here</a>. See you soon!
+            <p></p>
+            <img id="copyLogo" alt="Room Link" title="Room Link" src="images/GoToken.png" />
+         </div>
+      </div>
+      <div id="waitingToJoin" class="window resizable">
+        <img id="GoToken" src="images/GoToken.png" alt="Waiting To Join"/>
+        <div id="cover"></div>
+      </div>
+      <div id="helpPage" class="window resizable">
+        <img class="close" src="images/button-close.png" alt="Close Help" title="Close Help" />
+        <h1>Help</h1>
+        <img src="images/helpPage.png" alt="Help" class="helpContent" />
+      </div>
+      <div id="errorMsgPlugin" class="window resizable">
+        <h1>Error msg title here</h1>
+        <p id ="prompt">Error msg here</p>
+        <input id="roomname" type="text" placeholder="Room name (max length: 32)" maxlength="32" style="display: none;"/>
+        <p id="roomnamehint" style="font-size: 10px; visibility: hidden;">
+          Alphanumerics, spaces,
+          <strong>( )</strong> <strong>[ ]</strong>
+          <strong>{ }</strong> <strong>_</strong>
+          <strong>-</strong> <strong>.</strong> are valid
+        </p>
+        <button id="sendLog" type="button">Send Log to GoCast</button>
+        <button id="reload" type="button" onclick="errMsgReloadClick();">Reload</button>
+      </div>
+      <div id="warningMsg" class="window resizable">
+        <h1>Warning msg title here</h1>
+        <p id ="prompt">Warning msg here</p>
+        <!--<button id="sendLog" type="button">Send Log to GoCast</button>-->
+        <button id="ok" type="button" onclick="closeWindow();">OK</button>
+      </div>
+      <div id="installPlugin" class="window resizable">
+        <h1>Install GoCast App</h1>
+        <p id ="prompt">
+          Looks like you need the GoCast App to enable video chat. Click the download button below.
+        </p>
+        <p class="winmac">
+          Then locate the installer file and double-click to install it.
+        </p>
+        <p class="winmac">
+          If you are using Chrome, GoCast will detect the installation and automatically start.
+        </p>
+        <p class="winmac" style="padding-bottom: 10px;">
+          If you are using Firefox, please reload the browser page to start GoCast.
+        </p>
+        <p class="hidden linuxExplanation">
+          Then, please follow these steps to install:
+        </p>
+        <ol class="hidden linuxExplanation" style="padding-bottom: 20px;">
+          <li>Extract the files with <b>tar xzvf
+          GoCastPlayer_XXX.tar.gz</b></li>
+          <li>Go to the directory created by <b>cd GoCastPlayer</b></li>
+          <li>Execute the install script <b>./install.sh</b></li>
+          <li>Restart your browser, reopen GoCast, and you're in!.</li>
+        </ol>
+        <p style="text-align: center;">
+          <a id="dlLink" href="javascript:doDownload();">DOWNLOAD GOCAST</a>
+        <p>
+        <!--<p>Thanks!  We will be waiting for you.</p>-->
+      </div>
+      <div id="credentials" class="window resizable">
+        <p class="title welcome">Welcome to GoCast!</p>
+        <div id="fb-login-button" class="fb-login-button" data-show-faces="false" data-width="200" data-max-rows="1"
+            scope="email,user_likes,friends_likes,publish_actions,friends_online_presence,publish_stream,xmpp_login,create_event">Login With Facebook</div>
+        <a id="fb-disabled" class="hidden" href="javascript:void(0);">Login With Facebook -- Currently Unavailable</a>
+        <p class="title optiondesc">
+          By logging in with Facebook, you can invite your Facebook friends to your GoCast room. You can do this by posting to your wall or sending a Facebook message. When you do this your Facebook name will appear as your GoCast screen name. Also, if you turn your webcam off, your Facebook profile image will replace your video preview.
+        </p>
+        <div class="divider">-- OR --</div>
+        <a id="noThanks" href="javascript:void(0);" onclick="enterId();">Login Without Facebook</a>
+        <p class="title optiondesc">
+          By logging in without Facebook, you can choose a temporary screen name for your GoCast room. You can invite others to join your room by email. However, when you turn your webcam off, a blank silhouette will replace your video preview.
+        </p>
+        <!--
+        <div id="fb-login-button" class="fb-login-button" data-show-faces="false" data-width="200" data-max-rows="1"
+             scope="email,user_likes,friends_likes,publish_actions,friends_online_presence,publish_stream,xmpp_login"></div>
+        -->
+
+      </div>
+      <div id="credentials2" class="window resizable">
+        <p class="title welcome">GoCast Login</p>
+        <p class="login-error"></p>
+        <input id="name"  type="text" name="name" placeholder="Room nickname (max length: 32)" maxlength="32"/>
+        <p id="nickhint" style="font-size: 10px; visibility: hidden;">
+          Alphanumerics, spaces,
+          <strong>( )</strong> <strong>[ ]</strong>
+          <strong>{ }</strong> <strong>_</strong>
+          <strong>-</strong> <strong>.</strong>
+          <strong>@</strong> are valid
+        </p>
+        <input id="email" type="text" placeholder="Email (optional)" />
+        <p></p>
+        <a id="btn" type="button" href="javascript:void(0);">GET STARTED</a>
+        <!--<div class="divider">-- OR --</div>
+        <div id="fb-login-button2" class="fb-login-button" data-show-faces="false" data-width="200" data-max-rows="1">login with facebook</div>
+        <p class="title">Login with facebook to show profile pictures in spots and post or send invites to this room.</p>-->
+      </div>
+      <div id="chatInp" class="window">
+        <span class="recipient"></span>
+        <img class="close" src="images/button-close.png" alt="Close window" title="Close window" />
+        <input class="chatTo" type="text"/>
+        <input class="send" type="button" title="Send chat."/>
+      </div>
+      <!-- Mask to cover the whole screen -->
+      <div id="mask"></div>
+      <div id="copy-this" class="window">
+         <a href="http://www.gocast.it" target="_blank">
+          <img class="logo" alt="logo" src="images/gologo.png" />
+         </a>
+      </div>
+    </div>
+    <div id="meeting">
+      <div id="streams">
+        <div id="scarousel">
+          <div class="cloudcarousel" id="mystream">
+            <script type="text/javascript">
+              app.getBrowser();
+              if (app.pluginInstalled() || 'Chrome' === app.browser.name) {
+                document.getElementById('mystream').innerHTML = '<object class="localplayer" id="GocastPlayerLocal" ' +
+                                                                'type="application/x-gocastplayer" width="0" height="0"> ' +
+                                                                '<param name="onload" value="pluginLoaded" /> </object>';
+              }
+            </script>
+            <div id="effectsPanel">
+              <div id="effect-none" effect="none" title="no effect" onclick="applyEffect('none');"></div>
+              <div id="effect-gray" effect="gray" title="black and white" onclick="applyEffect('gray');"></div>
+              <div id="effect-sepia" effect="sepia" title="sepia" onclick="applyEffect('sepia');"></div>
+              <input id="audioPreview" type="button" class="off" title="Audio is Disabled" disabled="disabled"/>
+              <input id="videoPreview" type="button" title="Video is Disabled" disabled="disabled"/>
+            </div>
+          </div><!-- mystream -->
+          <div class="cloudcarousel" onclick="carouselItemClick(event);">
+            <div id="groupChat">
+              <div id="msgBoard">
+                <div id="chatOut"></div>
+                <input id="groupChatInput" class="chatTo" title="note to group" placeholder="note to group" type="text" onkeydown="keypressGrpChatHandler(event);"/>
+                <button id="send" class="send" title="post it" onclick="sendGrpChat(event)">Post</button>
+               </div>
+            </div>
+            <div class="name"></div>
+          </div>
+          <div class="cloudcarousel unoccupied" onclick="carouselItemClick(event);">
+            <div class="name"></div>
+          </div>
+          <div class="cloudcarousel unoccupied" onclick="carouselItemClick(event);">
+            <div class="name"></div>
+          </div>
+          <div class="cloudcarousel unoccupied" onclick="carouselItemClick(event);">
+            <div class="name"></div>
+          </div>
+          <div class="cloudcarousel unoccupied" onclick="carouselItemClick(event);">
+            <div class="name"></div>
+          </div>
+          <div class="cloudcarousel unoccupied" onclick="carouselItemClick(event);">
+            <div class="name"></div>
+          </div>
+          <div class="cloudcarousel unoccupied" onclick="carouselItemClick(event);">
+            <div class="name"></div>
+          </div>
+        </div><!-- scarousel -->
+        <div id="scontrols">
+          <!--
+          <input type="button" class="left"  title="To the left.  [Left Arrow]"  disabled="disabled" />
+          <input type="button" class="right" title="To the right. [Right Arrow]" disabled="disabled" />
+          -->
+        </div><!-- scontrols -->
+      </div><!-- streams -->
+      <div id="zoom">
+        <img class="close" src="images/button-close.png" alt="Close window" title="Exit zoom mode" onclick="carouselItemUnzoom(event);" />
+      </div>
+    </div><!-- meeting -->
+    <div id="scratch"></div>
+    <div id="tour">
+      <h3>Hi, <span id="nick"></span></h3>
+      <p id="desc">Take a quick test drive of GoCast features.</p>
+      <input id="dontShowAgain" type="checkbox" /><span style="color: grey;">Don't show this again.</span><p></p>
+      <button id="sure">SURE</button>
+      <button id="skip">SKIP TOUR</button>
+      <button id="imgood">I'M GOOD</button>
+    </div>
+    <div id="searchwiki">
+      <a id="close" href="javascript:void(0);" onclick="closeWikiSearch();">X</a>
+      <div id="searchpanel">
+        <input id="searchkey" type="text" placeholder="enter search topic"/>
+        <button id="searchbutton">GO</button>
+      </div>
+    </div>
+  </body>
+</html>
