@@ -529,7 +529,8 @@ function addPluginForParticipant(nickname) {
   }
 
   if (oo) {
-    $(oo).append('<object id="GocastPlayer' + id + '" type="application/x-gocastplayer" width="' + w + '" height="' + h + '"></object>');
+//    $(oo).append('<object id="GocastPlayer' + id + '" type="application/x-gocastplayer" width="' + w + '" height="' + h + '"></object>');
+    $(oo).append('&lt;object id="GocastPlayer' + id + '" type="application/x-gocastplayer" width="' + w + '" height="' + h + '"&gt;&lt;/object&gt;');
     app.log(2, 'Added GocastPlayer' + id + ' object.');
     app.carousel.updateAll();
     return $('object#GocastPlayer' + id, oo).get(0);
