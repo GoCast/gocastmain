@@ -79,6 +79,16 @@ function unassignSpotForParticipant(nick)
 	alert("unassignSpotForParticipant(" + nick + ")");
 }
 
+function onAddSpot(data)
+{
+	alert("onAddSpot(" + data + ")");
+}
+
+function onRemoveSpot(data)
+{
+	alert("onRemoveSpot(" + data + ")");
+}
+
 function tjgsend()
 {
     Callcast.InitOverride({ CALLCAST_XMPPSERVER: 'dev.gocast.it',
@@ -97,7 +107,8 @@ Callcast.setCallbackForCallback_ConnectionStatus(onConnectionStatus);
 Callcast.setCallbackForCallback_OnNicknameInUse(onNicknameInUse);
 Callcast.setCallbackForAddSpotForParticipant(assignSpotForParticipant);
 Callcast.setCallbackForRemoveSpotForParticipant(unassignSpotForParticipant);
-
+Callcast.setCallbackForAddSpot(onAddSpot);
+Callcast.setCallbackForRemoveSpot(onRemoveSpot);
 
 // Callcast.log("This is a test message.");
 // 
