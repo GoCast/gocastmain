@@ -2879,7 +2879,7 @@ var Callcast = {
     ///
     connect: function(id, pw, url) {
         var self = this,
-            boshconn = '/xmpp-httpbind';
+            boshconn = 'http://dev.gocast.it/xmpp-httpbind';
         if (url) {
             boshconn = url;
         }
@@ -2919,7 +2919,7 @@ var Callcast = {
     },
 
     reattach: function(jid, sid, rid, cb, url) {
-        var boshconn = '/xmpp-httpbind';
+        var boshconn = 'http://dev.gocast.it/xmpp-httpbind';
         if (url) {
             boshconn = url;
         }
@@ -3011,7 +3011,7 @@ GoCastJS.SendLogsXMPP = function(room, nick, logcatcher, id, pw, cbSuccess, cbFa
     this.jid = id;
     this.pw = pw;
     this.connection = null;
-    this.boshconn = url || '/xmpp-httpbind';
+    this.boshconn = url || 'http://dev.gocast.it/xmpp-httpbind';
 
     this.room = room;
     this.nick = nick;
