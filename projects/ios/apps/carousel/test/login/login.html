@@ -59,7 +59,7 @@ function onConnectionStatus(statusStr)
 {
 	console.log("onConnectionStatus(" + statusStr + ")");
 
-    if (statusStr.toLowerCase() === 'connected') {
+    if (statusStr.toLowerCase() === 'connected' || statusStr.toLowerCase() === 're-attached') {
         Callcast.SetNickname('iotest-client');
 
         Callcast.CreateUnlistedAndJoin('iostest', function(new_name) {
@@ -135,6 +135,13 @@ function onRemoveSpot(data)
 
 $(document).ready(function()
 {
+    /*
+    * Initialize Gocast events. */
+    $(window).bind('beforeunload', function() {
+        console.log('On before unload.');
+        Callcast.LeaveSession();
+    });
+
     Callcast.InitOverride({ CALLCAST_XMPPSERVER: 'dev.gocast.it',
                         CALLCAST_ROOMS: 'conference.dev.gocast.it',
                         AT_CALLCAST_ROOMS: '@conference.dev.gocast.it',
