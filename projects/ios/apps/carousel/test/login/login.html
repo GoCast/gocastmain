@@ -1,15 +1,15 @@
 <html>
   <head>
-    <title>test</title>
-    
+    <title>test-rwolff</title>
+
     <link rel='stylesheet' href='http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.0/themes/cupertino/jquery-ui.css'>
     <script src='http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.js'></script>
     <script src='http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/jquery-ui.js'></script>
-    <script src='jquery.base64.js'></script>
-    <script src='strophejs-1.0.2/strophe.js'></script>
-    <script src='strophejs-1.0.2/strophe.muc.js'></script>
-    <script src='ibb.js'></script>
-    <script src='callcast.js'></script>
+    <script src='/scripts/jquery.base64.min.js'></script>
+    <script src='/scripts/strophe.js'></script>
+    <script src='/scripts/strophe.muc.js'></script>
+    <script src='js/ibb.js'></script>
+    <script src='js/callcast.js'></script>
   </head>
 <body bgcolor=#cccccc>
 
@@ -57,39 +57,83 @@ var app = {
 
 function onConnectionStatus(statusStr)
 {
-	alert("onConnectionStatus(" + statusStr + ")");
-	app.log(2, 'connectionStatus' + statusStr);
+	console.log("onConnectionStatus(" + statusStr + ")");
 
-Callcast.SetNickname('iOSClient');
+    if (statusStr.toLowerCase() === 'connected') {
+        Callcast.SetNickname('iotest-client');
+
+        Callcast.CreateUnlistedAndJoin('iostest', function(new_name) {
+            console.log('Joined room successfully. Next?');
+        }, function() {
+            alert('failed to join room.');
+        });
+    }
+
 }
 
 function onNicknameInUse(nick)
 {
-	alert("onNicknameInUse(" + nick + ")");
+	console.log("onNicknameInUse(" + nick + ")");
 	app.nickInUse(nick);
 }
 
 function assignSpotForParticipant(nick)
 {
-	alert("assignSpotForParticipant(" + nick + ")");
+	console.log("assignSpotForParticipant(" + nick + ")");
 }
 
 function unassignSpotForParticipant(nick)
 {
-	alert("unassignSpotForParticipant(" + nick + ")");
+	console.log("unassignSpotForParticipant(" + nick + ")");
+}
+
+function doSpot(info) {
+    var cmds, numstrokes, stroke;
+
+    if (info.spottype === 'whiteBoard') {
+        if (info.image) {
+            console.log('Image Given. Must create canvas/image as starting point.');
+        }
+
+        if (info.strokes) {
+            cmds = JSON.parse(info.strokes);
+
+            numstrokes = cmds.strokes.length;
+            if (numstrokes) {
+                console.log(numstrokes + ' strokes to apply:', cmds.strokes);
+            }
+        }
+
+        if (info.stroke) {
+            stroke = JSON.parse(info.stroke);
+
+            console.log('Single stroke to apply:', stroke);
+        }
+    }
 }
 
 function onAddSpot(data)
 {
-	alert("onAddSpot(" + data + ")");
+    console.log("onAddSpot ", data);
+    if (data.spottype === 'whiteBoard') {
+        doSpot(data);
+    }
+}
+
+function onSetSpot(data)
+{
+    console.log("onSetSpot ", data);
+    if (data.spottype === 'whiteBoard') {
+        doSpot(data);
+    }
 }
 
 function onRemoveSpot(data)
 {
-	alert("onRemoveSpot(" + data + ")");
+	console.log("onRemoveSpot ", data);
 }
 
-function tjgsend()
+$(document).ready(function()
 {
     Callcast.InitOverride({ CALLCAST_XMPPSERVER: 'dev.gocast.it',
                         CALLCAST_ROOMS: 'conference.dev.gocast.it',
@@ -99,26 +143,27 @@ function tjgsend()
                         ROOMMANAGER: 'roommanager@dev.gocast.it/roommanager',
                         SWITCHBOARD_FB: 'switchboard_dev@dev.gocast.it',
                         LOGCATCHER: 'logcatcher@dev.gocast.it/logcatcher',
-                        FILECATCHER: 'filecatcher@dev.gocast.it/filecatcher'});
+                        });
 
-Callcast.connect(Callcast.CALLCAST_XMPPSERVER, '');
+    Callcast.setCallbackForCallback_ConnectionStatus(onConnectionStatus);
+    Callcast.setCallbackForCallback_OnNicknameInUse(onNicknameInUse);
+    Callcast.setCallbackForAddSpotForParticipant(assignSpotForParticipant);
+    Callcast.setCallbackForRemoveSpotForParticipant(unassignSpotForParticipant);
+    Callcast.setCallbackForAddSpot(onAddSpot);
+    Callcast.setCallbackForRemoveSpot(onRemoveSpot);
+    Callcast.setCallbackForSetSpot(onSetSpot);
 
-Callcast.setCallbackForCallback_ConnectionStatus(onConnectionStatus);
-Callcast.setCallbackForCallback_OnNicknameInUse(onNicknameInUse);
-Callcast.setCallbackForAddSpotForParticipant(assignSpotForParticipant);
-Callcast.setCallbackForRemoveSpotForParticipant(unassignSpotForParticipant);
-Callcast.setCallbackForAddSpot(onAddSpot);
-Callcast.setCallbackForRemoveSpot(onRemoveSpot);
+    Callcast.connect(Callcast.CALLCAST_XMPPSERVER, '');
 
 // Callcast.log("This is a test message.");
-// 
+//
 // // var logQ = new GoCastJS.BQueue(1024*1024);
 // // logQ.log("tjg test message");
-// 
+//
 // //alert(Callcast.LOGCATCHER);
-// 
+//
 // //GoCastJS.SendLogsXMPP = function(room, nick, logcatcher, id, pw, cbSuccess, cbFailure, url) {
-// 
+//
 //     var logger = new GoCastJS.SendLogsXMPP('tjg1', 'tjg2',
 // 											Callcast.LOGCATCHER,
 // 											Callcast.CALLCAST_XMPPSERVER, '',
@@ -127,9 +172,8 @@ Callcast.setCallbackForRemoveSpot(onRemoveSpot);
 // 											}, function() {
 // 												console.log('failure callback');
 // 											}, 'http://dev.gocast.it/xmpp-httpbind');
-}
+});
 
-setTimeout(function() { tjgsend() }, 2000);
 </script>
 </body>
 </html>
