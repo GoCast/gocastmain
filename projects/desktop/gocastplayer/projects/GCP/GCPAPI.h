@@ -40,6 +40,19 @@ private:
     GCPAPI* m_pJsapi;
 };
 
+class MediaConstraints : public webrtc::MediaConstraintsInterface
+{
+public:
+    MediaConstraints(const FB::JSObjectPtr& constraints);
+    ~MediaConstraints();
+    virtual const webrtc::MediaConstraintsInterface::Constraints& GetMandatory();
+    virtual const webrtc::MediaConstraintsInterface::Constraints& GetOptional();
+    
+private:
+    webrtc::MediaConstraintsInterface::Constraints m_mandatory;
+    webrtc::MediaConstraintsInterface::Constraints m_optional;
+};
+
 class GCPAPI : public FB::JSAPIAuto, public webrtc::PeerConnectionObserver
 {
 public:
@@ -59,8 +72,10 @@ public:
     : m_plugin(plugin)
     , m_host(host)
     , m_htmlId("")
-    , m_pSetSDPObserver(new talk_base::RefCountedObject<SetSDPObserver>(this))
-    , m_pCreateSDPObserver(new talk_base::RefCountedObject<CreateSDPObserver>(this))
+    , m_pSetLocalSDPObserver(new talk_base::RefCountedObject<SetSDPObserver>(this))
+    , m_pCreateOfferSDPObserver(new talk_base::RefCountedObject<CreateSDPObserver>(this))
+    , m_pSetRemoteSDPObserver(new talk_base::RefCountedObject<SetSDPObserver>(this))
+    , m_pCreateAnswerSDPObserver(new talk_base::RefCountedObject<CreateSDPObserver>(this))
     {
         // API for getting local media (if used, corresponding plugin instance
         // shouldn't call any of the peerconnection APIS)
@@ -69,13 +84,12 @@ public:
         // PeerConnection APIs
         registerMethod("init", make_method(this, &GCPAPI::Init));
         registerMethod("addStream", make_method(this, &GCPAPI::AddStream));
-        //registerMethod("removeStream", make_method(this, &GCPAPI::RemoveStream));
+        registerMethod("removeStream", make_method(this, &GCPAPI::RemoveStream));
         registerMethod("createOffer", make_method(this, &GCPAPI::CreateOffer));
-        //registerMethod("createAnswer", make_method(this, &GCPAPI::CreateAnswer));
+        registerMethod("createAnswer", make_method(this, &GCPAPI::CreateAnswer));
         registerMethod("setLocalDescription", make_method(this, &GCPAPI::SetLocalDescription));
-        //registerMethod("setRemoteDescription", make_method(this, &GCPAPI::SetRemoteDescription));
-        //registerMethod("processIceMessage", make_method(this, &GCPAPI::ProcessIceMessage));
-        //registerMethod("startIce", make_method(this, &GCPAPI::StartIce));
+        registerMethod("setRemoteDescription", make_method(this, &GCPAPI::SetRemoteDescription));
+        registerMethod("addIceCandidate", make_method(this, &GCPAPI::AddIceCandidate));
         registerMethod("deinit", make_method(this, &GCPAPI::DeletePeerConnection));
         
         // Config plugin js log function
@@ -84,10 +98,10 @@ public:
         // Properties
         registerProperty("version", make_property(this, &GCPAPI::get_version));
         //registerProperty("readyState", make_property(this, &GCPAPI::get_readyState));
-        //registerProperty("onaddstream", make_property(this, &GCPAPI::get_onaddstream,
-        //                                                    &GCPAPI::set_onaddstream));
-        //registerProperty("onremovestream", make_property(this, &GCPAPI::get_onremovestream,
-        //                                                       &GCPAPI::set_onremovestream));
+        registerProperty("onaddstream", make_property(this, &GCPAPI::get_onaddstream,
+                                                            &GCPAPI::set_onaddstream));
+        registerProperty("onremovestream", make_property(this, &GCPAPI::get_onremovestream,
+                                                               &GCPAPI::set_onremovestream));
         //registerProperty("onreadystatechange", make_property(this, &GCPAPI::get_onreadystatechange,
         //                                                           &GCPAPI::set_onreadystatechange));
         registerProperty("source", make_property(this, &GCPAPI::get_source, &GCPAPI::set_source));
@@ -113,8 +127,8 @@ public:
     // Property get methods
     std::string get_version();
     //std::string get_readyState();
-    //FB::JSObjectPtr get_onaddstream();
-    //FB::JSObjectPtr get_onremovestream();
+    FB::JSObjectPtr get_onaddstream();
+    FB::JSObjectPtr get_onremovestream();
     //FB::JSObjectPtr get_onreadystatechange();
     FB::JSAPIPtr get_source();
     //FB::variant get_volume();
@@ -125,8 +139,8 @@ public:
     FB::VariantList get_logentries();
     
     // Property set methods
-    //void set_onaddstream(const FB::JSObjectPtr& onaddstream);
-    //void set_onremovestream(const FB::JSObjectPtr& onremovestream);
+    void set_onaddstream(const FB::JSObjectPtr& onaddstream);
+    void set_onremovestream(const FB::JSObjectPtr& onremovestream);
     //void set_onreadystatechange(const FB::JSObjectPtr& onreadystatechange);
     void set_source(const FB::JSAPIPtr& stream);
     //void set_volume(FB::variant volume);
@@ -145,16 +159,20 @@ public:
                      const FB::variant& iceConfig,
                      const FB::JSObjectPtr& iceCallback);
     FB::variant AddStream(const FB::JSAPIPtr& stream);
-    //FB::variant RemoveStream(const FB::JSAPIPtr& stream);
+    FB::variant RemoveStream(const FB::JSAPIPtr& stream);
     void CreateOffer(const FB::JSObjectPtr& succCb, const FB::JSObjectPtr& failCb);
-    //FB::variant CreateAnswer(const FB::variant& offer, const FB::JSObjectPtr& mediaHints);
+    void CreateAnswer(const FB::JSObjectPtr& succCb, const FB::JSObjectPtr& failCb);
     void SetLocalDescription(const FB::variant& action,
                              const FB::variant& sdp,
                              const FB::JSObjectPtr& succCb,
                              const FB::JSObjectPtr& failCb);
-    //FB::variant SetRemoteDescription(const FB::variant& action, const FB::variant& sdp);
-    //FB::variant ProcessIceMessage(const FB::variant& sdp);
-    //FB::variant StartIce();
+    void SetRemoteDescription(const FB::variant& action,
+                              const FB::variant& sdp,
+                              const FB::JSObjectPtr& succCb,
+                              const FB::JSObjectPtr& failCb);
+    FB::variant AddIceCandidate(const FB::variant& sdpMid,
+                                const FB::variant& sdpMlineIndex,
+                                const FB::variant& sdp);
     FB::variant DeletePeerConnection();
     
     //---------------------- JS Log Config Method -------------------------
@@ -172,16 +190,16 @@ private:
     //virtual void OnMessage(const std::string& msg) {};
     //virtual void OnSignalingMessage(const std::string& msg) {};    
     virtual void OnStateChange(StateType state_changed) {};
-    virtual void OnAddStream(webrtc::MediaStreamInterface* pRemoteStream) {};
-    virtual void OnRemoveStream(webrtc::MediaStreamInterface* pRemoteStream) {};
-    virtual void OnIceCandidate(const webrtc::IceCandidateInterface* pCandidate) {};
-    virtual void OnIceComplete() {};
+    virtual void OnAddStream(webrtc::MediaStreamInterface* pRemoteStream);
+    virtual void OnRemoveStream(webrtc::MediaStreamInterface* pRemoteStream);
+    virtual void OnIceCandidate(const webrtc::IceCandidateInterface* pCandidate);
+    //virtual void OnIceComplete() {};
     
 private:
     //std::string m_readyState;
-    //FB::JSObjectPtr m_iceCb;
-    //FB::JSObjectPtr m_onaddstreamCb;
-    //FB::JSObjectPtr m_onremovestreamCb;
+    FB::JSObjectPtr m_iceCb;
+    FB::JSObjectPtr m_onaddstreamCb;
+    FB::JSObjectPtr m_onremovestreamCb;
     //FB::JSObjectPtr m_onreadystatechangeCb;
     FB::JSObjectPtr m_oncreatesdpsuccessCb;
     FB::JSObjectPtr m_oncreatesdpfailureCb;
@@ -193,8 +211,10 @@ private:
     FB::BrowserHostPtr m_host;
     FB::JSAPIPtr m_srcStream;
     FB::variant m_htmlId;
-    SetSDPObserver* m_pSetSDPObserver;
-    CreateSDPObserver* m_pCreateSDPObserver;
+    SetSDPObserver* m_pSetLocalSDPObserver;
+    CreateSDPObserver* m_pCreateOfferSDPObserver;
+    SetSDPObserver* m_pSetRemoteSDPObserver;
+    CreateSDPObserver* m_pCreateAnswerSDPObserver;
     
     //FB::VariantMap m_videoDevices;
     //FB::VariantList m_audioInDevices;
