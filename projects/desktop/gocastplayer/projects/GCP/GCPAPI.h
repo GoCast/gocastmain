@@ -94,7 +94,7 @@ public:
         registerProperty("source", make_property(this, &GCPAPI::get_source, &GCPAPI::set_source));
         //registerProperty("volume", make_property(this, &GCPAPI::get_volume, &GCPAPI::set_volume));
         //registerProperty("micvolume", make_property(this, &GCPAPI::get_micvolume, &GCPAPI::set_micvolume));
-        //registerProperty("videoinopts", make_property(this, &GCPAPI::get_videoinopts));
+        registerProperty("videoinopts", make_property(this, &GCPAPI::get_videoinopts));
         //registerProperty("audioinopts", make_property(this, &GCPAPI::get_audioinopts));
         //registerProperty("audiooutopts", make_property(this, &GCPAPI::get_audiooutopts));
         registerProperty("logentries", make_property(this, &GCPAPI::get_logentries)); 
@@ -120,7 +120,7 @@ public:
     FB::JSAPIPtr get_source();
     //FB::variant get_volume();
     //FB::variant get_micvolume();
-    //FB::VariantMap get_videoinopts();
+    FB::VariantMap get_videoinopts();
     //FB::VariantList get_audioinopts();
     //FB::VariantList get_audiooutopts();
     FB::VariantList get_logentries();
@@ -203,7 +203,7 @@ private:
     SetSDPObserver* m_pSetRemoteSDPObserver;
     CreateSDPObserver* m_pCreateAnswerSDPObserver;
     
-    //FB::VariantMap m_videoDevices;
+    FB::VariantMap m_videoDevices;
     //FB::VariantList m_audioInDevices;
     //FB::VariantList m_audioOutDevices;
 };

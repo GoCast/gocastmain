@@ -47,6 +47,7 @@
 						video: true,
 						audio: true,
 						videoconstraints: {
+							videoin: '0xfa13000003f08e07',
 							webrtc: {
 								mandatory: {
 									minWidth: '640',
@@ -60,6 +61,7 @@
 						}
 					};
 
+				console.log('VideoDevices: ', plugin.videoinopts);
 				plugin.getUserMedia(constraints, function(stream) {
 					console.log('Success: ', stream);
 					plugin.init('localPlayer','',null);

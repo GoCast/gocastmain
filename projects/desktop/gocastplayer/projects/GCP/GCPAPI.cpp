@@ -107,7 +107,7 @@ FB::JSObjectPtr GCPAPI::get_onremovestream()
 /*FB::JSObjectPtr GCPAPI::get_onreadystatechange()
 {
     return m_onreadystatechangeCb;
-}
+}*/
 
 FB::VariantMap GCPAPI::get_videoinopts()
 {
@@ -128,7 +128,7 @@ FB::VariantMap GCPAPI::get_videoinopts()
     return m_videoDevices;
 }
 
-FB::VariantList GCPAPI::get_audioinopts()
+/*FB::VariantList GCPAPI::get_audioinopts()
 {
     GoCast::RtcCenter* pCtr = GoCast::RtcCenter::Instance();
     

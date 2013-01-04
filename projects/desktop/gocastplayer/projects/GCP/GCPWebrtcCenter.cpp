@@ -391,12 +391,12 @@ namespace GoCast
         return pInst;
     }
     
-    /*void RtcCenter::QueryVideoDevices(FB::VariantMap& devices)
+    void RtcCenter::QueryVideoDevices(FB::VariantMap& devices)
     {
         devices = LocalVideoTrack::GetVideoDevices();
     }
     
-    void RtcCenter::QueryAudioDevices(FB::VariantList& devices, bool bInput)
+    /*void RtcCenter::QueryAudioDevices(FB::VariantList& devices, bool bInput)
     {
         std::vector<std::string> deviceNames;
         
@@ -840,36 +840,6 @@ namespace GoCast
         }
     }
     
-    cricket::VideoCapturer* OpenVideoCaptureDevice()
-    {
-        talk_base::scoped_ptr<cricket::DeviceManagerInterface> dev_manager(cricket::DeviceManagerFactory::Create());
-        if (!dev_manager->Init())
-        {
-            FBLOG_ERROR_CUSTOM("OpenVideoCaptureDevice", "Can't init device manager");
-            return NULL;
-        }
-        
-        std::vector<cricket::Device> devs;
-        if (!dev_manager->GetVideoCaptureDevices(&devs))
-        {
-            FBLOG_ERROR_CUSTOM("OpenVideoCaptureDevice", "Can't enumerate devices");
-            return NULL;
-        }
-        
-        std::vector<cricket::Device>::iterator dev_it = devs.begin();
-        cricket::VideoCapturer* capturer = NULL;
-        for (; dev_it != devs.end(); ++dev_it)
-        {
-            FBLOG_INFO_CUSTOM("OpenVideoCaptureDevice", (*dev_it).name);
-            capturer = dev_manager->CreateVideoCapturer(*dev_it);
-            if (capturer != NULL) {
-                FBLOG_INFO_CUSTOM("OpenVideoCaptureDevice", "FOUND!!!");
-                break;
-            }
-        }
-        return capturer;
-    }    
-    
     void RtcCenter::GetUserMedia_w(FB::JSObjectPtr mediaHints,
                                    FB::JSObjectPtr succCb,
                                    FB::JSObjectPtr failCb)
@@ -896,15 +866,15 @@ namespace GoCast
             FB::JSObjectPtr constraints = mediaHints->GetProperty("videoconstraints").convert_cast<FB::JSObjectPtr>();
             MediaConstraints mediaconstraints(constraints);
             
-            /*std::string videoInUniqueId = mediaHints->GetProperty("videoin").convert_cast<std::string>();
-            talk_base::scoped_refptr<webrtc::VideoCaptureModule> pCapture = 
-                LocalVideoTrack::GetCaptureDevice(videoInUniqueId);
+            //Get video device
+            std::string videoInUniqueId = constraints->GetProperty("videoin").convert_cast<std::string>();
+            cricket::VideoCapturer* pCap = LocalVideoTrack::GetCaptureDevice(videoInUniqueId);
             
             std::string msg = "Creating local video track interface object [camId: ";
             msg += (videoInUniqueId + "]...");
             FBLOG_INFO_CUSTOM("RtcCenter::GetUserMedia_w", msg);
             
-            if(NULL == pCapture.get())
+            if(NULL == pCap)
             {
                 FBLOG_ERROR_CUSTOM("RtcCenter::GetUserMedia", "Failed to detect/open camera...");
                 if(NULL != failCb.get())
@@ -912,18 +882,12 @@ namespace GoCast
                     failCb->InvokeAsync("", FB::variant_list_of("Failed to detect/open camera"));
                 }
                 return;
-            }*/
+            }
             
-            FBLOG_INFO_CUSTOM("RtcCenter::GetUserMedia_w", "Opening capture device...");
-            std::string videoTrackLabel = "camera_";
-            
-            cricket::VideoCapturer* pCap = OpenVideoCaptureDevice();
+            std::string videoTrackLabel = "camera_";            
+            videoTrackLabel += videoInUniqueId;
             FBLOG_INFO_CUSTOM("RtcCenter::GetUserMedia_w", "Creating video source...");
             talk_base::scoped_refptr<webrtc::VideoSourceInterface> pSrc(m_pConnFactory->CreateVideoSource(pCap, &mediaconstraints));
-            //videoTrackLabel += videoInUniqueId;
-            std::stringstream sstrm;
-            sstrm << "SOURCE STATE: " << pSrc->state();
-            FBLOG_INFO_CUSTOM("RtcCenter::GetUserMedia_w", sstrm.str());
             
             FBLOG_INFO_CUSTOM("RtcCenter::GetUserMedia_w", "Creating local video track...");
             m_pLocalStream->AddTrack(m_pConnFactory->CreateVideoTrack(videoTrackLabel, pSrc));
