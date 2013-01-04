@@ -118,11 +118,9 @@ namespace GoCast
     
     class LocalAudioTrack : public LocalMediaStreamTrack
     {
-    /*public:
-        typedef std::map<std::string, std::string> AudioDeviceList;*/
-        
     public:
         static FB::JSAPIPtr Create(talk_base::scoped_refptr<webrtc::LocalAudioTrackInterface>& pTrack);
+        static void GetAudioDevices(FB::VariantList& devices, bool bInput);
         explicit LocalAudioTrack(const talk_base::scoped_refptr<webrtc::LocalAudioTrackInterface>& pTrack);
         ~LocalAudioTrack() { }
     };

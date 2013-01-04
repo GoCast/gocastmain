@@ -128,7 +128,7 @@ FB::VariantMap GCPAPI::get_videoinopts()
     return m_videoDevices;
 }
 
-/*FB::VariantList GCPAPI::get_audioinopts()
+FB::VariantList GCPAPI::get_audioinopts()
 {
     GoCast::RtcCenter* pCtr = GoCast::RtcCenter::Instance();
     
@@ -164,7 +164,7 @@ FB::VariantList GCPAPI::get_audiooutopts()
     }
     
     return m_audioOutDevices;    
-}*/
+}
 
 FB::VariantList GCPAPI::get_logentries()
 {

@@ -70,7 +70,7 @@ namespace GoCast
     {
         m_logCb.reset();
     }
-    
+        
     FB::JSAPIPtr MediaStreamTrack::Create(const std::string& kind,
                                           const std::string label)
     {
@@ -218,6 +218,37 @@ namespace GoCast
     FB::JSAPIPtr LocalAudioTrack::Create(talk_base::scoped_refptr<webrtc::LocalAudioTrackInterface>& pTrack)
     {
         return boost::make_shared<LocalAudioTrack>(pTrack);
+    }
+    
+    void LocalAudioTrack::GetAudioDevices(FB::VariantList& devices, bool bInput)
+    {
+        std::vector<cricket::Device> devicelist;
+        static bool initTried = false;
+        static talk_base::scoped_ptr<cricket::DeviceManagerInterface> devmgr(cricket::DeviceManagerFactory::Create());
+
+        if(false == initTried)
+        {
+            if(false == devmgr->Init())
+            {
+                FBLOG_ERROR_CUSTOM("LocalAudioTrack::GetAudioDevices", "Can't init device manager");
+                return;
+            }
+            initTried = true;
+        }
+
+        if(true == bInput)
+        {
+            devmgr->GetAudioInputDevices(&devicelist);
+        }
+        else
+        {
+            devmgr->GetAudioOutputDevices(&devicelist);
+        }
+        
+        for(int16_t i=1; i<devicelist.size(); i++)
+        {
+            devices.push_back(FB::variant(devicelist[i].name));            
+        }
     }
     
     LocalAudioTrack::LocalAudioTrack(const talk_base::scoped_refptr<webrtc::LocalAudioTrackInterface>& pTrack)

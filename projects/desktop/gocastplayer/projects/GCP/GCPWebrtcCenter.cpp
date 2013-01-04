@@ -396,24 +396,10 @@ namespace GoCast
         devices = LocalVideoTrack::GetVideoDevices();
     }
     
-    /*void RtcCenter::QueryAudioDevices(FB::VariantList& devices, bool bInput)
+    void RtcCenter::QueryAudioDevices(FB::VariantList& devices, bool bInput)
     {
-        std::vector<std::string> deviceNames;
-        
-        if(true == bInput)
-        {
-            m_pConnFactory->channel_manager()->GetAudioInputDevices(&deviceNames);
-        }
-        else
-        {
-            m_pConnFactory->channel_manager()->GetAudioOutputDevices(&deviceNames);
-        }
-        
-        for(int16_t i=1; i<deviceNames.size(); i++)
-        {
-            devices.push_back(FB::variant(deviceNames[i]));            
-        }
-    }*/
+        LocalAudioTrack::GetAudioDevices(devices, bInput);
+    }
     
     void RtcCenter::GetUserMedia(FB::JSObjectPtr mediaHints,
                                  FB::JSObjectPtr succCb,

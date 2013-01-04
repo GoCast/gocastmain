@@ -65,7 +65,7 @@ namespace GoCast
         
         // Query media devices
         void QueryVideoDevices(FB::VariantMap& devices);
-        //void QueryAudioDevices(FB::VariantList& devices, bool bInput = true);
+        void QueryAudioDevices(FB::VariantList& devices, bool bInput = true);
         
         //Thread-safe methods        
         void GetUserMedia(FB::JSObjectPtr mediaHints,
