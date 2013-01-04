@@ -42,8 +42,25 @@
 				});
 			}
 			function onpluginload() {
-				var plugin = document.getElementById('localPlayer');
-				plugin.getUserMedia({video: true, audio: true}, function(stream) {
+				var plugin = document.getElementById('localPlayer'),
+					constraints = {
+						video: true,
+						audio: true,
+						videoconstraints: {
+							webrtc: {
+								mandatory: {
+									minWidth: '640',
+									maxWidth: '640',
+									minHeight: '480',
+									maxHeight: '480',
+									minFrameRate: '14',
+									maxFrameRate: '14'
+								}
+							}
+						}
+					};
+
+				plugin.getUserMedia(constraints, function(stream) {
 					console.log('Success: ', stream);
 					plugin.init('localPlayer','',null);
 					plugin.addStream(stream);
@@ -52,6 +69,8 @@
 						plugin.setLocalDescription('offer', desc, function() {
 							console.log('SetLocalDescription: Success');
 							plugin.source = stream;
+							//plugin.width = constraints.videoconstraints.webrtc.mandatory.maxWidth;
+							//plugin.height = constraints.videoconstraints.webrtc.mandatory.maxHeight;
 							ongetusermediasuccess(stream);
 						}, function(error) {
 							console.log('SetLocalDescription: ', error);
@@ -64,9 +83,9 @@
 		</script>
 	</head>
 	<body>
-		<object id="localPlayer" type="application/x-gocastplayer" width="320" height="240">
+		<object id="localPlayer" type="application/x-gocastplayer" width="640" height="480">
 		</object>
-		<object id="remotePlayer" type="application/x-gocastplayer" width="320" height="240">
+		<object id="remotePlayer" type="application/x-gocastplayer" width="640" height="480">
 			<param name="onload" value="onpluginload"></param>
 		</object>
 	</body>

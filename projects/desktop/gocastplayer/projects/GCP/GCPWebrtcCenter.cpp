@@ -8,6 +8,7 @@
 
 #include "GCPMediaStream.h"
 #include "GCPWebrtcCenter.h"
+#include "GCPMediaConstraints.h"
 #include "variant_list.h"
 
 namespace GoCast
@@ -892,7 +893,8 @@ namespace GoCast
            true == mediaHints->GetProperty("video").convert_cast<bool>())
         {
             //Get the videoconstraints object
-            
+            FB::JSObjectPtr constraints = mediaHints->GetProperty("videoconstraints").convert_cast<FB::JSObjectPtr>();
+            MediaConstraints mediaconstraints(constraints);
             
             /*std::string videoInUniqueId = mediaHints->GetProperty("videoin").convert_cast<std::string>();
             talk_base::scoped_refptr<webrtc::VideoCaptureModule> pCapture = 
@@ -917,7 +919,7 @@ namespace GoCast
             
             cricket::VideoCapturer* pCap = OpenVideoCaptureDevice();
             FBLOG_INFO_CUSTOM("RtcCenter::GetUserMedia_w", "Creating video source...");
-            talk_base::scoped_refptr<webrtc::VideoSourceInterface> pSrc(m_pConnFactory->CreateVideoSource(pCap, NULL));
+            talk_base::scoped_refptr<webrtc::VideoSourceInterface> pSrc(m_pConnFactory->CreateVideoSource(pCap, &mediaconstraints));
             //videoTrackLabel += videoInUniqueId;
             std::stringstream sstrm;
             sstrm << "SOURCE STATE: " << pSrc->state();

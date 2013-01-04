@@ -40,19 +40,6 @@ private:
     GCPAPI* m_pJsapi;
 };
 
-class MediaConstraints : public webrtc::MediaConstraintsInterface
-{
-public:
-    MediaConstraints(const FB::JSObjectPtr& constraints);
-    ~MediaConstraints();
-    virtual const webrtc::MediaConstraintsInterface::Constraints& GetMandatory();
-    virtual const webrtc::MediaConstraintsInterface::Constraints& GetOptional();
-    
-private:
-    webrtc::MediaConstraintsInterface::Constraints m_mandatory;
-    webrtc::MediaConstraintsInterface::Constraints m_optional;
-};
-
 class GCPAPI : public FB::JSAPIAuto, public webrtc::PeerConnectionObserver
 {
 public:
