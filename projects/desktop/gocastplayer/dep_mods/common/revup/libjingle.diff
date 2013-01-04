@@ -1,3 +1,25 @@
+Index: libjingle/trunk/talk/media/webrtc/webrtcvoiceengine.cc
+===================================================================
+--- libjingle/trunk/talk/media/webrtc/webrtcvoiceengine.cc	(revision 253)
++++ libjingle/trunk/talk/media/webrtc/webrtcvoiceengine.cc	(working copy)
+@@ -2244,13 +2244,12 @@
+ }
+ 
+ bool WebRtcVoiceMediaChannel::MuteStream(uint32 ssrc, bool muted) {
+-  if (send_ssrc_ != ssrc && ssrc != 0) {
++  /*if (send_ssrc_ != ssrc && ssrc != 0) {
+     LOG(LS_WARNING) << "The specified ssrc " << ssrc << " is not in use.";
+     return false;
+-  }
+-  if (engine()->voe()->volume()->SetInputMute(voe_channel(),
+-      muted) == -1) {
+-    LOG_RTCERR2(SetInputMute, voe_channel(), muted);
++  }*/
++  if (engine()->voe()->volume()->SetSystemInputMute(muted) == -1) {
++    LOG_RTCERR1(SetSystemInputMute, muted);
+     return false;
+   }
+   return true;
 Index: libjingle/trunk/talk/media/webrtc/webrtcvideocapturer.cc
 ===================================================================
 --- libjingle/trunk/talk/media/webrtc/webrtcvideocapturer.cc	(revision 253)
@@ -55,3 +77,21 @@ Index: libjingle/trunk/talk/app/webrtc/localvideosource.cc
  };
  
  MediaSourceInterface::SourceState
+Index: libjingle/trunk/talk/app/webrtc/webrtcsession.cc
+===================================================================
+--- libjingle/trunk/talk/app/webrtc/webrtcsession.cc	(revision 253)
++++ libjingle/trunk/talk/app/webrtc/webrtcsession.cc	(working copy)
+@@ -723,11 +723,11 @@
+     return;
+   }
+   uint32 ssrc = 0;
+-  if (!VERIFY(GetAudioSsrcByName(BaseSession::local_description(),
++  /*if (!VERIFY(GetAudioSsrcByName(BaseSession::local_description(),
+                                  name, &ssrc))) {
+     LOG(LS_ERROR) << "SetAudioSend: SSRC does not exist.";
+     return;
+-  }
++  }*/
+   voice_channel_->MuteStream(ssrc, !enable);
+ }
+ 

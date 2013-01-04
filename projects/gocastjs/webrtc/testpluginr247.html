@@ -3,6 +3,7 @@
 	<head>
 		<title>Plugin Demo (libjingle rev: 247)</title>
 		<script type="text/javascript">
+			var locstream = null;
 			function onice(candidate) {
 				if ('' !== candidate) {
 					var c = JSON.parse(candidate.replace(/\r\n/, '')),
@@ -64,6 +65,7 @@
 				console.log('VideoDevices: ', plugin.videoinopts);
 				plugin.getUserMedia(constraints, function(stream) {
 					console.log('Success: ', stream);
+					locstream = stream;
 					plugin.init('localPlayer','',null);
 					plugin.addStream(stream);
 					plugin.createOffer(function(desc) {
