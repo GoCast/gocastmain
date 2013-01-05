@@ -136,7 +136,7 @@ bool GCP::onWindowAttached(FB::AttachedEvent *evt, FB::PluginWindow *pWin)
 			{
 				if("localPlayer" == pJsapi->HtmlId())
 				{
-					//pRenderer->SetPreviewMode(true);
+					m_pRenderer->SetPreviewMode(true);
 					(GoCast::RtcCenter::Instance())->SetLocalVideoTrackRenderer(m_pRenderer);
 				}
 			}            

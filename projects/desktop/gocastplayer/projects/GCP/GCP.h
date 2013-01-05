@@ -34,7 +34,7 @@ public:
 public:
     GCP();
     virtual ~GCP();    
-    webrtc::VideoRendererInterface* Renderer() { return m_pRenderer; }
+    GoCast::GCPVideoRenderer* Renderer() { return m_pRenderer; }
     
 public:
     void onPluginReady();

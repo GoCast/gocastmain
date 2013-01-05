@@ -199,6 +199,7 @@ void GCPAPI::set_source(const FB::JSAPIPtr& stream)
         {            
 			if(NULL != getPlugin()->Renderer())
 			{
+                getPlugin()->Renderer()->SetPreviewMode(true);
 				(GoCast::RtcCenter::Instance())->SetLocalVideoTrackRenderer(getPlugin()->Renderer());
 			}
         }
