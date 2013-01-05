@@ -583,22 +583,22 @@ namespace GoCast
         return false;
     }
     
-    /*bool RtcCenter::GetSpkVol(int* pLevel) const
+    bool RtcCenter::GetSpkVol(int* pLevel) const
     {
         return m_pConnFactory->channel_manager()->GetOutputVolume(pLevel);
     }
     
-    bool RtcCenter::GetSpkMute(bool* pbEnabled) const
+    /*bool RtcCenter::GetSpkMute(bool* pbEnabled) const
     {
         return m_pConnFactory->channel_manager()->GetOutputMute(pbEnabled);
-    }
+    }*/
     
-    bool RtcCenter::GetMicVol(int* pLevel) const
+    /*bool RtcCenter::GetMicVol(int* pLevel) const
     {
         return m_pConnFactory->channel_manager()->GetInputVolume(pLevel);
-    }
+    }*/
     
-    std::string RtcCenter::GetLocalVideoTrackEffect() const
+    /*std::string RtcCenter::GetLocalVideoTrackEffect() const
     {
         if(0 < m_pLocalStream->video_tracks()->count())
         {
@@ -633,12 +633,12 @@ namespace GoCast
         }
     }
     
-    /*bool RtcCenter::SetSpkVol(int level)
+    bool RtcCenter::SetSpkVol(int level)
     {
         return m_pConnFactory->channel_manager()->SetOutputVolume(level);
     }
     
-    bool RtcCenter::SetMicVol(int level)
+    /*bool RtcCenter::SetMicVol(int level)
     {
         return m_pConnFactory->channel_manager()->SetInputVolume(level);
     }*/
@@ -881,41 +881,44 @@ namespace GoCast
         }
         
         //If mediaHints.audio == true, add audio track
-        if(true == mediaHints->GetProperty("audio").convert_cast<bool>())
+        if(true == mediaHints->HasProperty("audio") &&
+           true == mediaHints->GetProperty("audio").convert_cast<bool>())
         {
-            /*std::string audioIn;
-            std::string audioOut;
             int opts;
+            std::string audioIn;
+            std::string audioOut;
+            FB::JSObjectPtr constraints = mediaHints->GetProperty("audioconstraints").convert_cast<FB::JSObjectPtr>();
             
             m_pConnFactory->channel_manager()->GetAudioOptions(&audioIn, &audioOut, &opts);
-            audioIn = mediaHints->GetProperty("audioin").convert_cast<std::string>();
-            audioOut = mediaHints->GetProperty("audioout").convert_cast<std::string>();
+            audioIn = constraints->GetProperty("audioin").convert_cast<std::string>();
+            audioOut = constraints->GetProperty("audioout").convert_cast<std::string>();
 
             std::string msg = "Creating local audio track interface object [audioIn: ";
             msg += (audioIn + ", audioOut: ");
             msg += (audioOut + "]...");
-            FBLOG_INFO_CUSTOM("RtcCenter::GetUserMedia_w", msg);*/
+            FBLOG_INFO_CUSTOM("RtcCenter::GetUserMedia_w", msg);
 
             FBLOG_INFO_CUSTOM("RtcCenter::GetUserMedia_w", "Creating local audio track...");
             std::string audioTrackLabel = "microphone_";
-            /*audioTrackLabel += audioIn;
-            m_pConnFactory->channel_manager()->SetAudioOptions(audioIn, audioOut, opts);*/
+            audioTrackLabel += audioIn;
+            m_pConnFactory->channel_manager()->SetAudioOptions(audioIn, audioOut, opts);
             m_pLocalStream->AddTrack(m_pConnFactory->CreateAudioTrack(audioTrackLabel, NULL));
         }
-        /*else
+        else
         {
+            int opts;
             std::string audioIn;
             std::string audioOut;
             std::string msg = "Using speakers: [";
-            int opts;
+            FB::JSObjectPtr constraints = mediaHints->GetProperty("audioconstraints").convert_cast<FB::JSObjectPtr>();
             
             m_pConnFactory->channel_manager()->GetAudioOptions(&audioIn, &audioOut, &opts);
-            audioOut = mediaHints->GetProperty("audioout").convert_cast<std::string>();
+            audioOut = constraints->GetProperty("audioout").convert_cast<std::string>();
             m_pConnFactory->channel_manager()->SetAudioOptions(audioIn, audioOut, opts);
             
             msg += (audioOut + "]...");
             FBLOG_INFO_CUSTOM("RtcCenter::GetUserMedia_w", msg);
-        }*/
+        }
         
         if(NULL == succCb.get())
         {

@@ -59,10 +59,16 @@
 									maxFrameRate: '14'
 								}
 							}
+						},
+						audioconstraints: {
+							audioin: plugin.audioinopts[0],
+							audioout: plugin.audiooutopts[0]
 						}
 					};
 
 				console.log('VideoDevices: ', plugin.videoinopts);
+				console.log('AudioInputDevices: ', plugin.audioinopts);
+				console.log('AudioOutputDevices: ', plugin.audiooutopts);
 				plugin.getUserMedia(constraints, function(stream) {
 					console.log('Success: ', stream);
 					locstream = stream;

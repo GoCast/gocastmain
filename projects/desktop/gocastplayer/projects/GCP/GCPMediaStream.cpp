@@ -245,7 +245,7 @@ namespace GoCast
             devmgr->GetAudioOutputDevices(&devicelist);
         }
         
-        for(int16_t i=1; i<devicelist.size(); i++)
+        for(int16_t i=0; i<devicelist.size(); i++)
         {
             devices.push_back(FB::variant(devicelist[i].name));            
         }

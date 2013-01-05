@@ -58,7 +58,7 @@ FB::JSAPIPtr GCPAPI::get_source()
     return m_srcStream;
 }
 
-/*FB::variant GCPAPI::get_volume()
+FB::variant GCPAPI::get_volume()
 {
     int level;
     GoCast::RtcCenter* pCtr = GoCast::RtcCenter::Instance();
@@ -69,19 +69,19 @@ FB::JSAPIPtr GCPAPI::get_source()
         level = -1;
     }
     
-    if(false == pCtr->GetSpkMute(&bSpkMuted))
+    /*if(false == pCtr->GetSpkMute(&bSpkMuted))
     {
         level = -1;
     }
     else if(true == bSpkMuted)
     {
         level = 0;
-    }
+    }*/
     
     return level;
 }
 
-FB::variant GCPAPI::get_micvolume()
+/*FB::variant GCPAPI::get_micvolume()
 {
     int level;
     GoCast::RtcCenter* pCtr = GoCast::RtcCenter::Instance();
@@ -213,7 +213,7 @@ void GCPAPI::set_source(const FB::JSAPIPtr& stream)
     }
 }
 
-/*void GCPAPI::set_volume(FB::variant volume)
+void GCPAPI::set_volume(FB::variant volume)
 {
     int level = volume.convert_cast<int>();
     GoCast::RtcCenter* pCtr = GoCast::RtcCenter::Instance();
@@ -226,7 +226,7 @@ void GCPAPI::set_source(const FB::JSAPIPtr& stream)
     }
 }
 
-void GCPAPI::set_micvolume(FB::variant volume)
+/*void GCPAPI::set_micvolume(FB::variant volume)
 {
     int level = volume.convert_cast<int>();
     GoCast::RtcCenter* pCtr = GoCast::RtcCenter::Instance();
