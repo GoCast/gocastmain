@@ -588,15 +588,15 @@ namespace GoCast
         return m_pConnFactory->channel_manager()->GetOutputVolume(pLevel);
     }
     
-    /*bool RtcCenter::GetSpkMute(bool* pbEnabled) const
+    bool RtcCenter::GetSpkMute(bool* pbEnabled) const
     {
         return m_pConnFactory->channel_manager()->GetOutputMute(pbEnabled);
-    }*/
+    }
     
-    /*bool RtcCenter::GetMicVol(int* pLevel) const
+    bool RtcCenter::GetMicVol(int* pLevel) const
     {
         return m_pConnFactory->channel_manager()->GetInputVolume(pLevel);
-    }*/
+    }
     
     /*std::string RtcCenter::GetLocalVideoTrackEffect() const
     {
@@ -638,10 +638,10 @@ namespace GoCast
         return m_pConnFactory->channel_manager()->SetOutputVolume(level);
     }
     
-    /*bool RtcCenter::SetMicVol(int level)
+    bool RtcCenter::SetMicVol(int level)
     {
         return m_pConnFactory->channel_manager()->SetInputVolume(level);
-    }*/
+    }
     
     void RtcCenter::SetLocalVideoTrackRenderer(webrtc::VideoRendererInterface* pRenderer)
     {

@@ -113,13 +113,13 @@ namespace GoCast
         bool GetLocalVideoTrackEnabled() const;        
         bool GetLocalAudioTrackEnabled() const;
         bool GetSpkVol(int* pLevel) const;
-        //bool GetSpkMute(bool* pbEnabled) const;
-        //bool GetMicVol(int* pLevel) const;
+        bool GetSpkMute(bool* pbEnabled) const;
+        bool GetMicVol(int* pLevel) const;
         //std::string GetLocalVideoTrackEffect() const;
         void SetLocalVideoTrackEnabled(bool bEnable);
         void SetLocalAudioTrackEnabled(bool bEnable);
         bool SetSpkVol(int level);
-        //bool SetMicVol(int level);
+        bool SetMicVol(int level);
         void SetLocalVideoTrackRenderer(webrtc::VideoRendererInterface* pRenderer);
         /*void SetLocalVideoTrackEffect(const std::string& effect);*/
         void SetRemoteVideoTrackRenderer(const std::string& pluginId,

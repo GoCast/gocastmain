@@ -93,7 +93,7 @@ public:
         //                                                           &GCPAPI::set_onreadystatechange));
         registerProperty("source", make_property(this, &GCPAPI::get_source, &GCPAPI::set_source));
         registerProperty("volume", make_property(this, &GCPAPI::get_volume, &GCPAPI::set_volume));
-        //registerProperty("micvolume", make_property(this, &GCPAPI::get_micvolume, &GCPAPI::set_micvolume));
+        registerProperty("micvolume", make_property(this, &GCPAPI::get_micvolume, &GCPAPI::set_micvolume));
         registerProperty("videoinopts", make_property(this, &GCPAPI::get_videoinopts));
         registerProperty("audioinopts", make_property(this, &GCPAPI::get_audioinopts));
         registerProperty("audiooutopts", make_property(this, &GCPAPI::get_audiooutopts));
@@ -119,7 +119,7 @@ public:
     //FB::JSObjectPtr get_onreadystatechange();
     FB::JSAPIPtr get_source();
     FB::variant get_volume();
-    //FB::variant get_micvolume();
+    FB::variant get_micvolume();
     FB::VariantMap get_videoinopts();
     FB::VariantList get_audioinopts();
     FB::VariantList get_audiooutopts();
@@ -131,7 +131,7 @@ public:
     //void set_onreadystatechange(const FB::JSObjectPtr& onreadystatechange);
     void set_source(const FB::JSAPIPtr& stream);
     void set_volume(FB::variant volume);
-    //void set_micvolume(FB::variant volume);
+    void set_micvolume(FB::variant volume);
     
     // C++ member get methods
     std::string HtmlId() const { return m_htmlId.convert_cast<std::string>(); }

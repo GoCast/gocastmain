@@ -69,19 +69,19 @@ FB::variant GCPAPI::get_volume()
         level = -1;
     }
     
-    /*if(false == pCtr->GetSpkMute(&bSpkMuted))
+    if(false == pCtr->GetSpkMute(&bSpkMuted))
     {
         level = -1;
     }
     else if(true == bSpkMuted)
     {
         level = 0;
-    }*/
+    }
     
     return level;
 }
 
-/*FB::variant GCPAPI::get_micvolume()
+FB::variant GCPAPI::get_micvolume()
 {
     int level;
     GoCast::RtcCenter* pCtr = GoCast::RtcCenter::Instance();
@@ -92,7 +92,7 @@ FB::variant GCPAPI::get_volume()
     }
     
     return level;
-}*/
+}
 
 FB::JSObjectPtr GCPAPI::get_onaddstream()
 {
@@ -226,7 +226,7 @@ void GCPAPI::set_volume(FB::variant volume)
     }
 }
 
-/*void GCPAPI::set_micvolume(FB::variant volume)
+void GCPAPI::set_micvolume(FB::variant volume)
 {
     int level = volume.convert_cast<int>();
     GoCast::RtcCenter* pCtr = GoCast::RtcCenter::Instance();
@@ -237,7 +237,7 @@ void GCPAPI::set_volume(FB::variant volume)
     {
         pCtr->SetMicVol(level); 
     }
-}*/
+}
 
 void GCPAPI::GetUserMedia(const FB::JSObjectPtr& mediaHints,
                           const FB::JSObjectPtr& succCb,
