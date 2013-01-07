@@ -17,56 +17,53 @@ Login
 
 <script>
 var app = {
-  /**
-   * Writes the specified log entry into the console HTML element, if
-   * present. The meaning of logLevel is 1: debug, 2: info, 3:
-   * warning, 4: error, 5: fatal. */
-  log: function(logLevel, logMsg) {
-    var labels = ['', 'DEBUG', 'INFO', 'WARNING', 'ERROR', 'FATAL'],
+    /* 1: debug, 2: info, 3: warning, 4: error, 5: fatal. */
+
+log: function(logLevel, logMsg)
+    {
+        var labels = ['', 'DEBUG', 'INFO', 'WARNING', 'ERROR', 'FATAL'],
         now = new Date(),
         logText = now.toTimeString().split(' ')[0] + ' ' + labels[logLevel] + ' ' + logMsg,
         msg;
-    if (window.console) {
-      console[['', 'log', 'info', 'warn', 'error', 'error'][logLevel]](logText);
-    }
-    /*
-     * For fatal errors pop-up an alert in addition to the console log
-     * entry but do it only once, to avoid flooding the user with alerts. */
-    if (logLevel >= 5 && !app.logFatalReported) {
-      msg = 'FATAL ERROR\n\n' + logMsg;
-      alert(msg);
-      app.logFatalReported = true;
-    }
+        if (window.console)
+        {
+            console[['', 'log', 'info', 'warn', 'error', 'error'][logLevel]](logText);
+        }
 
-    // <MANJESH>
-    if ('undefined' !== typeof(Callcast) &&
-        'undefined' !== typeof(Callcast.log)) {
-      Callcast.log(' ' + labels[logLevel] + ': ' + logMsg);
-    }
-    // </MANJESH>
-  }, /* app.log() */
-  /**
-   * Flag to remember if a fatal error was reported through a pop-up
-   * alert previously so we can avoid pop-up flooding. */
-  logFatalReported: false,
+        /* For fatal errors pop-up an alert */
 
-  nickInUse: function(nick) {
+        if (logLevel >= 5)
+        {
+            msg = 'FATAL ERROR\n\n' + logMsg;
+            alert(msg);
+        }
+
+        if ('undefined' !== typeof(Callcast) &&
+            'undefined' !== typeof(Callcast.log)) {
+            Callcast.log(' ' + labels[logLevel] + ': ' + logMsg);
+        }
+    }, /* app.log() */
+
+nickInUse: function(nick)
+{
   	log(2, "Nick in use.");
-  },
+},
+
 }; /* app */
 
 function onConnectionStatus(statusStr)
 {
 	console.log("onConnectionStatus(" + statusStr + ")");
 
-    if (statusStr.toLowerCase() === 'connected' || statusStr.toLowerCase() === 're-attached') {
+    if (statusStr.toLowerCase() === 'connected' || statusStr.toLowerCase() === 're-attached')
+    {
         Callcast.SetNickname('iotest-client');
 
         Callcast.CreateUnlistedAndJoin('iostest', function(new_name) {
-            console.log('Joined room successfully. Next?');
-        }, function() {
-            alert('failed to join room.');
-        });
+                                       console.log('Joined room successfully. Next?');
+                                       }, function() {
+                                       alert('failed to join room.');
+                                       });
     }
 
 }
@@ -87,15 +84,19 @@ function unassignSpotForParticipant(nick)
 	console.log("unassignSpotForParticipant(" + nick + ")");
 }
 
-function doSpot(info) {
+function doSpot(info)
+{
     var cmds, numstrokes, stroke;
 
-    if (info.spottype === 'whiteBoard') {
-        if (info.image) {
+    if (info.spottype === 'whiteBoard')
+    {
+        if (info.image)
+        {
             console.log('Image Given. Must create canvas/image as starting point.');
         }
 
-        if (info.strokes) {
+        if (info.strokes)
+        {
             cmds = JSON.parse(info.strokes);
 
             numstrokes = cmds.strokes.length;
@@ -104,9 +105,11 @@ function doSpot(info) {
             }
         }
 
-        if (info.stroke) {
+        if (info.stroke)
+        {
             stroke = JSON.parse(info.stroke);
 
+			document.writeln('Single stroke to apply:', stroke, '<BR>');
             console.log('Single stroke to apply:', stroke);
         }
     }
@@ -134,52 +137,32 @@ function onRemoveSpot(data)
 }
 
 $(document).ready(function()
-{
-    /*
-    * Initialize Gocast events. */
-    $(window).bind('beforeunload', function() {
-        console.log('On before unload.');
-        Callcast.LeaveSession();
-    });
+                  {
+                  $(window).bind('beforeunload', function() {
+                                 console.log('On before unload.');
+                                 Callcast.LeaveSession();
+                                 });
 
-    Callcast.InitOverride({ CALLCAST_XMPPSERVER: 'dev.gocast.it',
-                        CALLCAST_ROOMS: 'conference.dev.gocast.it',
-                        AT_CALLCAST_ROOMS: '@conference.dev.gocast.it',
-                        STUNSERVER: 'dev.gocast.it', STUNSERVERPORT: 19302,
-                        FEEDBACK_BOT: 'feedback_bot_dev@dev.gocast.it',
-                        ROOMMANAGER: 'roommanager@dev.gocast.it/roommanager',
-                        SWITCHBOARD_FB: 'switchboard_dev@dev.gocast.it',
-                        LOGCATCHER: 'logcatcher@dev.gocast.it/logcatcher',
-                        });
-
-    Callcast.setCallbackForCallback_ConnectionStatus(onConnectionStatus);
-    Callcast.setCallbackForCallback_OnNicknameInUse(onNicknameInUse);
-    Callcast.setCallbackForAddSpotForParticipant(assignSpotForParticipant);
-    Callcast.setCallbackForRemoveSpotForParticipant(unassignSpotForParticipant);
-    Callcast.setCallbackForAddSpot(onAddSpot);
-    Callcast.setCallbackForRemoveSpot(onRemoveSpot);
-    Callcast.setCallbackForSetSpot(onSetSpot);
-
-    Callcast.connect(Callcast.CALLCAST_XMPPSERVER, '');
-
-// Callcast.log("This is a test message.");
-//
-// // var logQ = new GoCastJS.BQueue(1024*1024);
-// // logQ.log("tjg test message");
-//
-// //alert(Callcast.LOGCATCHER);
-//
-// //GoCastJS.SendLogsXMPP = function(room, nick, logcatcher, id, pw, cbSuccess, cbFailure, url) {
-//
-//     var logger = new GoCastJS.SendLogsXMPP('tjg1', 'tjg2',
-// 											Callcast.LOGCATCHER,
-// 											Callcast.CALLCAST_XMPPSERVER, '',
-// 											function() {
-// 												console.log('success callback');
-// 											}, function() {
-// 												console.log('failure callback');
-// 											}, 'http://dev.gocast.it/xmpp-httpbind');
-});
+                  Callcast.InitOverride({ CALLCAST_XMPPSERVER: 'dev.gocast.it',
+                                        CALLCAST_ROOMS: 'conference.dev.gocast.it',
+                                        AT_CALLCAST_ROOMS: '@conference.dev.gocast.it',
+                                        STUNSERVER: 'dev.gocast.it', STUNSERVERPORT: 19302,
+                                        FEEDBACK_BOT: 'feedback_bot_dev@dev.gocast.it',
+                                        ROOMMANAGER: 'roommanager@dev.gocast.it/roommanager',
+                                        SWITCHBOARD_FB: 'switchboard_dev@dev.gocast.it',
+                                        LOGCATCHER: 'logcatcher@dev.gocast.it/logcatcher',
+                                        });
+                  
+                  Callcast.setCallbackForCallback_ConnectionStatus(onConnectionStatus);
+                  Callcast.setCallbackForCallback_OnNicknameInUse(onNicknameInUse);
+                  Callcast.setCallbackForAddSpotForParticipant(assignSpotForParticipant);
+                  Callcast.setCallbackForRemoveSpotForParticipant(unassignSpotForParticipant);
+                  Callcast.setCallbackForAddSpot(onAddSpot);
+                  Callcast.setCallbackForRemoveSpot(onRemoveSpot);
+                  Callcast.setCallbackForSetSpot(onSetSpot);
+                  
+                  Callcast.connect(Callcast.CALLCAST_XMPPSERVER, '');
+                  });
 
 </script>
 </body>
