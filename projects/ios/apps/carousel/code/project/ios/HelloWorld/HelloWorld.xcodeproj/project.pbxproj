@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		00D21AAA169AF9E900D4C8A9 /* GCIWhiteboard.m in Sources */ = {isa = PBXBuildFile; fileRef = 00D21AA9169AF9E900D4C8A9 /* GCIWhiteboard.m */; };
 		1D3623260D0F684500981E51 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 1D3623250D0F684500981E51 /* AppDelegate.m */; };
 		1D60589B0D05DD56006BFB54 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; };
 		1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
@@ -63,6 +64,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		00D21AA8169AF9E900D4C8A9 /* GCIWhiteboard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GCIWhiteboard.h; sourceTree = "<group>"; };
+		00D21AA9169AF9E900D4C8A9 /* GCIWhiteboard.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GCIWhiteboard.m; sourceTree = "<group>"; };
 		1D30AB110D05D00D00671497 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		1D3623240D0F684500981E51 /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		1D3623250D0F684500981E51 /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -135,6 +138,8 @@
 		080E96DDFE201D6D7F000001 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				00D21AA8169AF9E900D4C8A9 /* GCIWhiteboard.h */,
+				00D21AA9169AF9E900D4C8A9 /* GCIWhiteboard.m */,
 				302D95EE14D2391D003F00A1 /* MainViewController.h */,
 				302D95EF14D2391D003F00A1 /* MainViewController.m */,
 				302D95F014D2391D003F00A1 /* MainViewController.xib */,
@@ -410,6 +415,7 @@
 				1D60589B0D05DD56006BFB54 /* main.m in Sources */,
 				1D3623260D0F684500981E51 /* AppDelegate.m in Sources */,
 				302D95F114D2391D003F00A1 /* MainViewController.m in Sources */,
+				00D21AAA169AF9E900D4C8A9 /* GCIWhiteboard.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
