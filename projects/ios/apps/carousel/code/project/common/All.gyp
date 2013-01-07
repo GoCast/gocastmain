@@ -9,6 +9,7 @@
     				'type': 'none',
     				'dependencies': [
     					'Whiteboard.gyp:*',
+    					'HelloWorld.gyp:*',
     				], # dependencies
     			},	# All
 
