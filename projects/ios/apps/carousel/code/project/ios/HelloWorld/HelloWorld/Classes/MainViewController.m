@@ -132,6 +132,8 @@
     // Black base color for background matches the native apps
     theWebView.backgroundColor = [UIColor blackColor];
 
+    [theWebView stringByEvaluatingJavaScriptFromString:@"alert('hello');"];
+
     return [super webViewDidFinishLoad:theWebView];
 }
 
