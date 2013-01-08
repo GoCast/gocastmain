@@ -13,6 +13,7 @@
 tSurface::tSurface(const std::string& filename)
 : mSize(0,0), mType(tPixelFormat::kInvalid), mPtr(NULL)
 {
+#pragma unused(filename)
 //    @autoreleasepool
 //    {
 //        //from http://blog.darklightstudio.com/?p=19

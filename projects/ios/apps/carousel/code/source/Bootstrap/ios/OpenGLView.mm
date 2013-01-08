@@ -41,7 +41,7 @@
 - (void)setupDepthBuffer {
     glGenRenderbuffers(1, &_depthRenderBuffer);
     glBindRenderbuffer(GL_RENDERBUFFER, _depthRenderBuffer);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, self.frame.size.width, self.frame.size.height);    
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, (GLsizei)self.frame.size.width, (GLsizei)self.frame.size.height);
 }
 
 - (void)setupFrameBuffer {    
@@ -54,6 +54,7 @@
 
 - (void)render:(CADisplayLink*)displayLink
 {
+#pragma unused(displayLink)
     tSGView::getInstance()->notify(tSGViewEvent(tSGViewEvent::kRedrawView, 0));
     
     [_context presentRenderbuffer:GL_RENDERBUFFER];
@@ -98,16 +99,19 @@
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
+#pragma unused(event)
     [self mouseEvent:touches withEvent:tMouseEvent::kMouseDown withID:tMouseEvent::kLeft];
 }
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
 {
+#pragma unused(event)
     [self mouseEvent:touches withEvent:tMouseEvent::kMouseDrag withID:tMouseEvent::kLeft];
 }
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
 {
+#pragma unused(event)
     [self mouseEvent:touches withEvent:tMouseEvent::kMouseUp withID:tMouseEvent::kLeft];
 }
 

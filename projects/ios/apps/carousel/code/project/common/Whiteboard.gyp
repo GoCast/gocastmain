@@ -3,7 +3,7 @@
 		'common.gypi',
 	], # includes
     'targets': [
-#Basic2D
+#Whiteboard
 				{
 					'target_name': 'Whiteboard',
 					'product_name': 'Whiteboard',
@@ -53,32 +53,6 @@
 					},	# xcode_settings
 
 					'conditions': [
-						['OS=="mac"', {
-							'sources': [
-								'../../source/Bootstrap/<@(OS)/MacOpenGLView.mm',
-								'../../source/Bootstrap/<@(OS)/MacOpenGLView.h',
-								'../../source/Bootstrap/<@(OS)/main.mm',
-								'../../source/Bootstrap/<@(OS)/MacWindow.mm',
-								'../../source/Bootstrap/<@(OS)/MacWindow.h',
-								'../../source/Bootstrap/<@(OS)/MacApplication.mm',
-								'../../source/Bootstrap/<@(OS)/MacApplication.h',
-							],	# sources
-	
-							'mac_bundle_resources': [
-								'../../rsrc/<@(OS)/English.lproj/InfoPlist.strings',
-								'../../rsrc/<@(OS)/Credits.rtf',
-								'../../rsrc/<@(OS)/iPhoneStyle.xib',
-							],	# mac_bundle_resources
-	
-							'link_settings': {
-								'libraries': [
-									'$(SDKROOT)/System/Library/Frameworks/Cocoa.framework',
-									'$(SDKROOT)/System/Library/Frameworks/CoreVideo.framework',
-									'$(SDKROOT)/System/Library/Frameworks/OpenGL.framework',
-								],	# libraries
-							},	# link_settings
-						}],  # OS=="mac"
-
 						['OS=="ios"', {
 							'defines': [
 								'PLATFORM_IOS=1',
