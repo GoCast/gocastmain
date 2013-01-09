@@ -34,7 +34,11 @@ var express = require('express');
 var app = express();
 
 app.get('/', function(req, res){
-  res.send('Hello World');
+  res.send('Hello World: ' + req.query['email']);
+});
+
+app.get('/new', function(req, res) {
+    res.send('new only.');
 });
 
 app.listen(settings.accounts.serviceport || 8083);
