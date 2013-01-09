@@ -34,9 +34,10 @@ var app = {
     // function, we must explicity call 'app.receivedEvent(...);'
     onDeviceReady: function() {
         app.receivedEvent('deviceready');
-        cordova.exec(function(winParam) {}, function(error) {}, "GCIWhiteboard",
-                     "echo", ["firstArgument", "secondArgument", 42,
-                                false]);
+//        cordova.exec(function(winParam) {}, function(error) {}, "GCIWhiteboard",
+//                     "echo", ["firstArgument", "secondArgument", 42,
+//                                false]);
+        document.location.href='http://dev.gocast.it/tj2/login.html';
     },
     // Update DOM on a Received Event
     receivedEvent: function(id) {
