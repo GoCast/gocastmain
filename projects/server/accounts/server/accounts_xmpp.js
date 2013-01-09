@@ -247,51 +247,8 @@ function xmppChangePassword(accountName, newPassword, cbSuccess, cbFailure) {
     }
 }
 
-function xmppPrivateTest() {
-    console.log('Hello World.');
-
-    console.log('1. Testing to see if rwolff is available.');
-    xmppAccountAvailable('rwolff', function() {
-        console.log('Available.');
-    }, function() {
-        console.log('Not available.');
-
-        console.log('2. Testing to see if testaccount is available.');
-        xmppAccountAvailable('testaccount', function() {
-            console.log('Available.');
-
-            console.log('3. Testing to see if rwolff@gocast.it is available.');
-            xmppAccountAvailable('rwolff@gocast.it', function() {
-                console.log('Available.');
-
-                console.log('4. Adding abc@def.com.');
-                xmppAddAccount('abc@def.com', 'abcPasswordHere', 'ABC DEF', function() {
-                    console.log('Added.');
-
-                    console.log('5. Testing to see if abc@def.com is available.');
-                    xmppAccountAvailable('abc@def.com', function() {
-                        console.log('Available.');
-                    }, function() {
-                        console.log('Not available.');
-                    });
-                }, function(err) {
-                    console.log('Error adding: ' + err);
-                });
-
-            }, function() {
-                console.log('Not available.');
-            });
-        }, function() {
-            console.log('Not available.');
-        });
-
-    });
-
-}
-
-xmppPrivateTest();
-
 exports.AccountAvailable = xmppAccountAvailable;
 exports.AddAccount = xmppAddAccount;
+exports.EnableAccount = xmppEnableAccount;
 exports.DeleteAccount = xmppDeleteAccount;
 exports.ChangePassword = xmppChangePassword;
