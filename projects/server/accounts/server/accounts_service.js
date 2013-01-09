@@ -41,12 +41,12 @@ app.use(express.bodyParser());
 
 app.post('/register', function(req, res) {
     console.log('REGISTER: ', req.body);
-    res.send('REGISTER: ' + JSON.stringify(req.body));
+    res.send('{"result": "success"}');
 });
 
 app.post('/activate', function(req, res) {
     console.log('ACTIVATE: ', req.body);
-    res.send('ACTIVATE: ' + JSON.stringify(req.body));
+    res.send('{"result": "success"}');
 });
 
 app.listen(settings.accounts.serviceport || 8083);

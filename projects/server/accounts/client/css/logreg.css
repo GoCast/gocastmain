@@ -1,11 +1,22 @@
 body > .container > .row > .span6 > [cssrule="form"] {
+	display: none;
+	margin-top: 200px;
 	padding-left: 10px;
 	padding-right: 10px;
 	border-radius: 3px;
 	border: 1px lightgrey solid;
 }
 
-body > .container > .row > .span6 > [cssrule="form"] button {
+body > .container > .row > .span6 > [cssrule="form"].show {
+	display: block;
+}
+
+body > .container > .row > .span6 > [cssrule="form"] .btn.right {
 	float: right;
 	margin-left: 5px;
+}
+
+body > .container > .row > .span6 > [cssrule="form"] .btn.left {
+	float: left;
+	margin-right: 5px;
 }
