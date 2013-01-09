@@ -1,0 +1,593 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 45;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0611E422A297CBE356405C7D /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 41457BA618A6B6E8FCBB620F /* main.mm */; };
+		0A7E7C5BC2CE68DFA26E1DB6 /* tTexture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 09FA150B7647EA6DADF9AAF9 /* tTexture.cpp */; };
+		14F6AD42F340A7764C7C8973 /* tShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A3B52E3EA721B2C116CB4BDF /* tShader.cpp */; };
+		1DC8577FE9838110C3DA9C1C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E96BF3286BB78EAAADC0A57A /* Foundation.framework */; };
+		2B8D8B0915061E8D1849DEF2 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 527886977B9E5089544AE192 /* QuartzCore.framework */; };
+		455E5981031B329430B41FD8 /* MainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0A52F92AC7725610B6935BF5 /* MainWindow.xib */; };
+		4A5D8E880C3DB0ED244D2F71 /* Whiteboard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A41E9CFDC0AAABFB976FBF80 /* Whiteboard.cpp */; };
+		4CA8A8EE70B45C5A68BC3387 /* tSurface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5CC4B70BEEC99963F5664C49 /* tSurface.cpp */; };
+		622F968A0671E5628039CF16 /* tProgram.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CFF5BBC4DAF71060AA586293 /* tProgram.cpp */; };
+		73FEB9F8A1B3C15D65883D0D /* tSurfacePeer.mm in Sources */ = {isa = PBXBuildFile; fileRef = A3F93D338886817C741D112E /* tSurfacePeer.mm */; };
+		803B3ADF2B85B2063D3F2F30 /* spritesheet.frag in Resources */ = {isa = PBXBuildFile; fileRef = 719929FE4CB470A6AD62DF0F /* spritesheet.frag */; };
+		819DCE59198A93977F747EB8 /* ViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 54F13C3695EF1AFD28251AA1 /* ViewController.mm */; };
+		8996E76B95CE776DBBDAE65F /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 411E6E215ABA730DE4EFC537 /* CoreGraphics.framework */; };
+		8BEEE2921AB7D8B01F837181 /* OpenGLView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 83102A9266B2BB0C3F20849B /* OpenGLView.mm */; };
+		94B63512E36CE2AD9FB94704 /* tSGView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E76DF83DF7F2CB9EC0070067 /* tSGView.cpp */; };
+		A679839EE33BEBE71698B6DB /* spritesheet.vert in Resources */ = {isa = PBXBuildFile; fileRef = C139DA84CC3CF2A2CD32F273 /* spritesheet.vert */; };
+		B6BD73E8AF3F1692D8DF4494 /* tFile.mm in Sources */ = {isa = PBXBuildFile; fileRef = B4A1C41114DCC0B1EBECB2F1 /* tFile.mm */; };
+		C27C728238687D1000B5AE1C /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = F7C98D8853AB3806EE7996DC /* AppDelegate.mm */; };
+		C38C4781C320E00F08332173 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D21DC43692508DB38C23866C /* UIKit.framework */; };
+		CF8CA14E3E3C2DC7D1F57958 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 45AD10DD26EE99758E0D4670 /* OpenGLES.framework */; };
+		E655586CDB4CC096945A156C /* tPixelFormat.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A886F88044A01E0874CF0E90 /* tPixelFormat.cpp */; };
+		F3EB3ADBB7DF397BD4C8E424 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 9C18CE4BB4E9C8DF93918E29 /* InfoPlist.strings */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		0429BE46EE8659F09B60117D /* tProgram.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tProgram.h; sourceTree = "<group>"; };
+		09FA150B7647EA6DADF9AAF9 /* tTexture.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = tTexture.cpp; sourceTree = "<group>"; };
+		1577E9F807E0CE719F9BC9EF /* package.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = package.h; sourceTree = "<group>"; };
+		163EC79BB530657307FA85C0 /* tPixelFormat.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tPixelFormat.h; sourceTree = "<group>"; };
+		18706E684443CA2FE1BC4B6F /* Whiteboard.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Whiteboard.h; sourceTree = "<group>"; };
+		1973A9A42F49A5099790D0EF /* tFile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tFile.h; sourceTree = "<group>"; };
+		30060B4CDC358A711E95F89F /* tSingleton.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tSingleton.h; sourceTree = "<group>"; };
+		34C0D4F7099ED6BF3D33FA3B /* Whiteboard.gyp */ = {isa = PBXFileReference; lastKnownFileType = text; path = Whiteboard.gyp; sourceTree = "<group>"; };
+		411E6E215ABA730DE4EFC537 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		41457BA618A6B6E8FCBB620F /* main.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = main.mm; sourceTree = "<group>"; };
+		45AD10DD26EE99758E0D4670 /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
+		4E04FFB30970A2024C54F732 /* package.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = package.h; sourceTree = "<group>"; };
+		527886977B9E5089544AE192 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		54F13C3695EF1AFD28251AA1 /* ViewController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ViewController.mm; sourceTree = "<group>"; };
+		5CC4B70BEEC99963F5664C49 /* tSurface.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = tSurface.cpp; sourceTree = "<group>"; };
+		6685E894D5550CC4BF98F9AA /* tObserver.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tObserver.h; sourceTree = "<group>"; };
+		6E8702E0A9DA06D164F7B222 /* package.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = package.h; sourceTree = "<group>"; };
+		6ED41AECA7228AC2DAE0544D /* Whiteboard.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Whiteboard.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		6FB4AF36FFF22EBC087E5300 /* tSGView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tSGView.h; sourceTree = "<group>"; };
+		719929FE4CB470A6AD62DF0F /* spritesheet.frag */ = {isa = PBXFileReference; lastKnownFileType = text; path = spritesheet.frag; sourceTree = "<group>"; };
+		798C2F236D3430DEA91BF7E8 /* package.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = package.h; sourceTree = "<group>"; };
+		83102A9266B2BB0C3F20849B /* OpenGLView.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = OpenGLView.mm; sourceTree = "<group>"; };
+		8E14DE79388DB788006202E1 /* package.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = package.h; sourceTree = "<group>"; };
+		91ED334047D6952BD18C6F02 /* common.gypi */ = {isa = PBXFileReference; lastKnownFileType = text; path = common.gypi; sourceTree = "<group>"; };
+		958E5799A1690D9865ED35E3 /* OpenGLView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OpenGLView.h; sourceTree = "<group>"; };
+		A3B52E3EA721B2C116CB4BDF /* tShader.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = tShader.cpp; sourceTree = "<group>"; };
+		A3F93D338886817C741D112E /* tSurfacePeer.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = tSurfacePeer.mm; sourceTree = "<group>"; };
+		A41E9CFDC0AAABFB976FBF80 /* Whiteboard.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Whiteboard.cpp; sourceTree = "<group>"; };
+		A886F88044A01E0874CF0E90 /* tPixelFormat.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = tPixelFormat.cpp; sourceTree = "<group>"; };
+		AD5C7E76A38BAEB35D1918BD /* tInputManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tInputManager.h; sourceTree = "<group>"; };
+		B4A1C41114DCC0B1EBECB2F1 /* tFile.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = tFile.mm; sourceTree = "<group>"; };
+		BD93EAF6357AA13C5AB576C6 /* tShader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tShader.h; sourceTree = "<group>"; };
+		C139DA84CC3CF2A2CD32F273 /* spritesheet.vert */ = {isa = PBXFileReference; lastKnownFileType = text; path = spritesheet.vert; sourceTree = "<group>"; };
+		C1D41AD2FC7F4C2A868E0AD9 /* tTouchEvent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tTouchEvent.h; sourceTree = "<group>"; };
+		CCEF333632CC882A1C51723D /* tSurface.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tSurface.h; sourceTree = "<group>"; };
+		CFF5BBC4DAF71060AA586293 /* tProgram.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = tProgram.cpp; sourceTree = "<group>"; };
+		D21DC43692508DB38C23866C /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		E2C6A77649394EDC73D6F79A /* tMouseEvent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tMouseEvent.h; sourceTree = "<group>"; };
+		E5C8BA65286D17F0A1409AF2 /* tRect.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tRect.h; sourceTree = "<group>"; };
+		E76DF83DF7F2CB9EC0070067 /* tSGView.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = tSGView.cpp; sourceTree = "<group>"; };
+		E96BF3286BB78EAAADC0A57A /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		EB08A3480B47BB3F94165A7E /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		EB1E3D7822671F1C635CB8EC /* tTexture.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tTexture.h; sourceTree = "<group>"; };
+		F22E1B898E321323B65CC832 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		F7C98D8853AB3806EE7996DC /* AppDelegate.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = AppDelegate.mm; sourceTree = "<group>"; };
+		F88FEF74F07F0C9540EA785F /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainWindow.xib; sourceTree = "<group>"; };
+		FC35A86CC58356684DE84BB6 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		8396E7F361BCE491C4C90B1F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C38C4781C320E00F08332173 /* UIKit.framework in Frameworks */,
+				1DC8577FE9838110C3DA9C1C /* Foundation.framework in Frameworks */,
+				8996E76B95CE776DBBDAE65F /* CoreGraphics.framework in Frameworks */,
+				2B8D8B0915061E8D1849DEF2 /* QuartzCore.framework in Frameworks */,
+				CF8CA14E3E3C2DC7D1F57958 /* OpenGLES.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		0456162378FBD0D1E5D4D6A8 = {
+			isa = PBXGroup;
+			children = (
+				458C9696B73F60EDF7061631 /* Source */,
+				931B4715EBA5EF8D14751C6E /* Frameworks */,
+				9E8C6BA8EAF2B93AB6CCEE95 /* Products */,
+				591CE5712EF39658DE06ED3F /* Build */,
+			);
+			sourceTree = "<group>";
+		};
+		4365B0A1D9BD6AAAF27800A3 /* Bootstrap/ios */ = {
+			isa = PBXGroup;
+			children = (
+				F22E1B898E321323B65CC832 /* AppDelegate.h */,
+				F7C98D8853AB3806EE7996DC /* AppDelegate.mm */,
+				958E5799A1690D9865ED35E3 /* OpenGLView.h */,
+				83102A9266B2BB0C3F20849B /* OpenGLView.mm */,
+				FC35A86CC58356684DE84BB6 /* ViewController.h */,
+				54F13C3695EF1AFD28251AA1 /* ViewController.mm */,
+				41457BA618A6B6E8FCBB620F /* main.mm */,
+			);
+			path = Bootstrap/ios;
+			sourceTree = "<group>";
+		};
+		44FEB78EB99BA6758DA411FC /* Base */ = {
+			isa = PBXGroup;
+			children = (
+				8E14DE79388DB788006202E1 /* package.h */,
+				6685E894D5550CC4BF98F9AA /* tObserver.h */,
+				30060B4CDC358A711E95F89F /* tSingleton.h */,
+			);
+			path = Base;
+			sourceTree = "<group>";
+		};
+		458C9696B73F60EDF7061631 /* Source */ = {
+			isa = PBXGroup;
+			children = (
+				AB215DFEF21596118549EEF8 /* rsrc/ios */,
+				CE3F2E0D4AEF97F316C4725B /* source */,
+			);
+			name = Source;
+			path = ../..;
+			sourceTree = "<group>";
+		};
+		591CE5712EF39658DE06ED3F /* Build */ = {
+			isa = PBXGroup;
+			children = (
+				34C0D4F7099ED6BF3D33FA3B /* Whiteboard.gyp */,
+				91ED334047D6952BD18C6F02 /* common.gypi */,
+			);
+			name = Build;
+			sourceTree = "<group>";
+		};
+		5B5CF35D83D253D7A1B819A0 /* Input */ = {
+			isa = PBXGroup;
+			children = (
+				4E04FFB30970A2024C54F732 /* package.h */,
+				AD5C7E76A38BAEB35D1918BD /* tInputManager.h */,
+				E2C6A77649394EDC73D6F79A /* tMouseEvent.h */,
+				C1D41AD2FC7F4C2A868E0AD9 /* tTouchEvent.h */,
+			);
+			path = Input;
+			sourceTree = "<group>";
+		};
+		931B4715EBA5EF8D14751C6E /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				411E6E215ABA730DE4EFC537 /* CoreGraphics.framework */,
+				E96BF3286BB78EAAADC0A57A /* Foundation.framework */,
+				45AD10DD26EE99758E0D4670 /* OpenGLES.framework */,
+				527886977B9E5089544AE192 /* QuartzCore.framework */,
+				D21DC43692508DB38C23866C /* UIKit.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		9E8C6BA8EAF2B93AB6CCEE95 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				6ED41AECA7228AC2DAE0544D /* Whiteboard.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		AB215DFEF21596118549EEF8 /* rsrc/ios */ = {
+			isa = PBXGroup;
+			children = (
+				9C18CE4BB4E9C8DF93918E29 /* InfoPlist.strings */,
+				0A52F92AC7725610B6935BF5 /* MainWindow.xib */,
+				719929FE4CB470A6AD62DF0F /* spritesheet.frag */,
+				C139DA84CC3CF2A2CD32F273 /* spritesheet.vert */,
+			);
+			path = rsrc/ios;
+			sourceTree = "<group>";
+		};
+		B0BE676F653BDDF6021A3760 /* ios */ = {
+			isa = PBXGroup;
+			children = (
+				B4A1C41114DCC0B1EBECB2F1 /* tFile.mm */,
+			);
+			path = ios;
+			sourceTree = "<group>";
+		};
+		B725B79358BFD482911D6690 /* Io */ = {
+			isa = PBXGroup;
+			children = (
+				B0BE676F653BDDF6021A3760 /* ios */,
+				6E8702E0A9DA06D164F7B222 /* package.h */,
+				1973A9A42F49A5099790D0EF /* tFile.h */,
+			);
+			path = Io;
+			sourceTree = "<group>";
+		};
+		CD1732A175D168FAB36BB309 /* OpenGL */ = {
+			isa = PBXGroup;
+			children = (
+				E2A526ED07BF7CAF0FA786F8 /* ios */,
+				798C2F236D3430DEA91BF7E8 /* package.h */,
+				A886F88044A01E0874CF0E90 /* tPixelFormat.cpp */,
+				163EC79BB530657307FA85C0 /* tPixelFormat.h */,
+				CFF5BBC4DAF71060AA586293 /* tProgram.cpp */,
+				0429BE46EE8659F09B60117D /* tProgram.h */,
+				E76DF83DF7F2CB9EC0070067 /* tSGView.cpp */,
+				6FB4AF36FFF22EBC087E5300 /* tSGView.h */,
+				A3B52E3EA721B2C116CB4BDF /* tShader.cpp */,
+				BD93EAF6357AA13C5AB576C6 /* tShader.h */,
+				5CC4B70BEEC99963F5664C49 /* tSurface.cpp */,
+				CCEF333632CC882A1C51723D /* tSurface.h */,
+				09FA150B7647EA6DADF9AAF9 /* tTexture.cpp */,
+				EB1E3D7822671F1C635CB8EC /* tTexture.h */,
+			);
+			path = OpenGL;
+			sourceTree = "<group>";
+		};
+		CE07BAF81151430DF47221F6 /* Testbed/Whiteboard */ = {
+			isa = PBXGroup;
+			children = (
+				A41E9CFDC0AAABFB976FBF80 /* Whiteboard.cpp */,
+				18706E684443CA2FE1BC4B6F /* Whiteboard.h */,
+			);
+			path = Testbed/Whiteboard;
+			sourceTree = "<group>";
+		};
+		CE3F2E0D4AEF97F316C4725B /* source */ = {
+			isa = PBXGroup;
+			children = (
+				44FEB78EB99BA6758DA411FC /* Base */,
+				4365B0A1D9BD6AAAF27800A3 /* Bootstrap/ios */,
+				5B5CF35D83D253D7A1B819A0 /* Input */,
+				B725B79358BFD482911D6690 /* Io */,
+				D8A89EC23F5F025598003924 /* Math */,
+				CD1732A175D168FAB36BB309 /* OpenGL */,
+				CE07BAF81151430DF47221F6 /* Testbed/Whiteboard */,
+			);
+			path = source;
+			sourceTree = "<group>";
+		};
+		D8A89EC23F5F025598003924 /* Math */ = {
+			isa = PBXGroup;
+			children = (
+				1577E9F807E0CE719F9BC9EF /* package.h */,
+				E5C8BA65286D17F0A1409AF2 /* tRect.h */,
+			);
+			path = Math;
+			sourceTree = "<group>";
+		};
+		E2A526ED07BF7CAF0FA786F8 /* ios */ = {
+			isa = PBXGroup;
+			children = (
+				A3F93D338886817C741D112E /* tSurfacePeer.mm */,
+			);
+			path = ios;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		63B60E9CAA0F1218D90A5858 /* Whiteboard */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 612D4392BFE03C2B188F8564 /* Build configuration list for PBXNativeTarget "Whiteboard" */;
+			buildPhases = (
+				E9F6981539C4D066BE77E917 /* Resources */,
+				3B903E3429FE2BEAAD7EFB1C /* Sources */,
+				8396E7F361BCE491C4C90B1F /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Whiteboard;
+			productName = Whiteboard;
+			productReference = 6ED41AECA7228AC2DAE0544D /* Whiteboard.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		67A2558140FC620D84B8A31D /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+			};
+			buildConfigurationList = 61B74A76653AB34E196D8845 /* Build configuration list for PBXProject "Whiteboard" */;
+			compatibilityVersion = "Xcode 3.2";
+			hasScannedForEncodings = 1;
+			mainGroup = 0456162378FBD0D1E5D4D6A8;
+			projectDirPath = ../common;
+			projectRoot = "";
+			targets = (
+				63B60E9CAA0F1218D90A5858 /* Whiteboard */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		E9F6981539C4D066BE77E917 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				803B3ADF2B85B2063D3F2F30 /* spritesheet.frag in Resources */,
+				A679839EE33BEBE71698B6DB /* spritesheet.vert in Resources */,
+				F3EB3ADBB7DF397BD4C8E424 /* InfoPlist.strings in Resources */,
+				455E5981031B329430B41FD8 /* MainWindow.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		3B903E3429FE2BEAAD7EFB1C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4A5D8E880C3DB0ED244D2F71 /* Whiteboard.cpp in Sources */,
+				B6BD73E8AF3F1692D8DF4494 /* tFile.mm in Sources */,
+				E655586CDB4CC096945A156C /* tPixelFormat.cpp in Sources */,
+				622F968A0671E5628039CF16 /* tProgram.cpp in Sources */,
+				94B63512E36CE2AD9FB94704 /* tSGView.cpp in Sources */,
+				14F6AD42F340A7764C7C8973 /* tShader.cpp in Sources */,
+				4CA8A8EE70B45C5A68BC3387 /* tSurface.cpp in Sources */,
+				73FEB9F8A1B3C15D65883D0D /* tSurfacePeer.mm in Sources */,
+				0A7E7C5BC2CE68DFA26E1DB6 /* tTexture.cpp in Sources */,
+				8BEEE2921AB7D8B01F837181 /* OpenGLView.mm in Sources */,
+				C27C728238687D1000B5AE1C /* AppDelegate.mm in Sources */,
+				0611E422A297CBE356405C7D /* main.mm in Sources */,
+				819DCE59198A93977F747EB8 /* ViewController.mm in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		0A52F92AC7725610B6935BF5 /* MainWindow.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				F88FEF74F07F0C9540EA785F /* en */,
+			);
+			name = MainWindow.xib;
+			sourceTree = "<group>";
+		};
+		9C18CE4BB4E9C8DF93918E29 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				EB08A3480B47BB3F94165A7E /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		2F67D0B96E3FEB8CA325F953 /* debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_IMPLICIT_SIGN_CONVERSION = YES;
+				CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION = YES;
+				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_CPP_EXCEPTIONS = NO;
+				GCC_ENABLE_CPP_RTTI = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_FAST_MATH = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"\"PLATFORM_IOS=1\"",
+					"\"DEBUG=1\"",
+				);
+				GCC_STRICT_ALIASING = NO;
+				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
+				GCC_TREAT_IMPLICIT_FUNCTION_DECLARATIONS_AS_ERRORS = YES;
+				GCC_TREAT_INCOMPATIBLE_POINTER_TYPE_WARNINGS_AS_ERRORS = YES;
+				GCC_UNROLL_LOOPS = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_MISSING_FIELD_INITIALIZERS = YES;
+				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_FOUR_CHARACTER_CONSTANTS = YES;
+				GCC_WARN_INITIALIZER_NOT_FULLY_BRACKETED = YES;
+				GCC_WARN_SHADOW = YES;
+				GCC_WARN_SIGN_COMPARE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNKNOWN_PRAGMAS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_LABEL = YES;
+				GCC_WARN_UNUSED_PARAMETER = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					../../source,
+					../../source/Bootstrap/ios,
+				);
+				INFOPLIST_FILE = ../../rsrc/ios/Whiteboard.plist;
+				LD_NO_PIE = NO;
+				LIBRARY_SEARCH_PATHS = "$(SDKROOT)/System/Library/Frameworks";
+				LLVM_LTO = NO;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = Whiteboard;
+				RUN_CLANG_STATIC_ANALYZER = YES;
+				VALIDATE_PRODUCT = YES;
+				WARNING_CFLAGS = (
+					"-Wall",
+					"-Werror",
+					"-Wextra",
+					"-Wbad-function-cast",
+					"-Wdeclaration-after-statement",
+					"-Wmissing-format-attribute",
+					"-Wnested-externs",
+					"-Wnewline-eof",
+					"-Wold-style-definition",
+					"-Wredundant-decls",
+					"-Wsequence-point",
+					"-Wstrict-prototypes",
+					"-Wswitch-default",
+					"-Wwrite-strings",
+					"-Winit-self",
+					"-Wcast-align",
+					"-Wcast-qual",
+					"-Wold-style-cast",
+					"-Wpointer-arith",
+					"-Wstrict-aliasing",
+					"-Wformat=2",
+					"-Wuninitialized",
+					"-Wmissing-declarations",
+					"-Woverloaded-virtual",
+					"-Wnon-virtual-dtor",
+					"-Wctor-dtor-privacy",
+				);
+				WRAPPER_PREFIX = "";
+			};
+			name = debug;
+		};
+		48AF317B6B1BFC96A9B3F97E /* debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INTERMEDIATE_DIR = "$(PROJECT_DERIVED_FILE_DIR)/$(CONFIGURATION)";
+				SDKROOT = iphoneos;
+				SHARED_INTERMEDIATE_DIR = "$(SYMROOT)/DerivedSources/$(CONFIGURATION)";
+				SYMROOT = ../../build/ios;
+			};
+			name = debug;
+		};
+		9DAFA0BE8FFCE54838E37D0F /* release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INTERMEDIATE_DIR = "$(PROJECT_DERIVED_FILE_DIR)/$(CONFIGURATION)";
+				SDKROOT = iphoneos;
+				SHARED_INTERMEDIATE_DIR = "$(SYMROOT)/DerivedSources/$(CONFIGURATION)";
+				SYMROOT = ../../build/ios;
+			};
+			name = release;
+		};
+		CBB6FBFC6F0603264B7DD03C /* release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_IMPLICIT_SIGN_CONVERSION = YES;
+				CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION = YES;
+				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = YES;
+				GCC_ENABLE_CPP_EXCEPTIONS = NO;
+				GCC_ENABLE_CPP_RTTI = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_FAST_MATH = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_OPTIMIZATION_LEVEL = 3;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"\"PLATFORM_IOS=1\"",
+					"\"DEBUG=0\"",
+				);
+				GCC_STRICT_ALIASING = YES;
+				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
+				GCC_TREAT_IMPLICIT_FUNCTION_DECLARATIONS_AS_ERRORS = YES;
+				GCC_TREAT_INCOMPATIBLE_POINTER_TYPE_WARNINGS_AS_ERRORS = YES;
+				GCC_UNROLL_LOOPS = YES;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_MISSING_FIELD_INITIALIZERS = YES;
+				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_FOUR_CHARACTER_CONSTANTS = YES;
+				GCC_WARN_INITIALIZER_NOT_FULLY_BRACKETED = YES;
+				GCC_WARN_SHADOW = YES;
+				GCC_WARN_SIGN_COMPARE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNKNOWN_PRAGMAS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_LABEL = YES;
+				GCC_WARN_UNUSED_PARAMETER = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					../../source,
+					../../source/Bootstrap/ios,
+				);
+				INFOPLIST_FILE = ../../rsrc/ios/Whiteboard.plist;
+				LD_NO_PIE = YES;
+				LIBRARY_SEARCH_PATHS = "$(SDKROOT)/System/Library/Frameworks";
+				LLVM_LTO = NO;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				ONLY_ACTIVE_ARCH = NO;
+				PRODUCT_NAME = Whiteboard;
+				RUN_CLANG_STATIC_ANALYZER = YES;
+				VALIDATE_PRODUCT = YES;
+				WARNING_CFLAGS = (
+					"-Wall",
+					"-Werror",
+					"-Wextra",
+					"-Wbad-function-cast",
+					"-Wdeclaration-after-statement",
+					"-Wmissing-format-attribute",
+					"-Wnested-externs",
+					"-Wnewline-eof",
+					"-Wold-style-definition",
+					"-Wredundant-decls",
+					"-Wsequence-point",
+					"-Wstrict-prototypes",
+					"-Wswitch-default",
+					"-Wwrite-strings",
+					"-Winit-self",
+					"-Wcast-align",
+					"-Wcast-qual",
+					"-Wold-style-cast",
+					"-Wpointer-arith",
+					"-Wstrict-aliasing",
+					"-Wformat=2",
+					"-Wuninitialized",
+					"-Wmissing-declarations",
+					"-Woverloaded-virtual",
+					"-Wnon-virtual-dtor",
+					"-Wctor-dtor-privacy",
+				);
+				WRAPPER_PREFIX = "";
+			};
+			name = release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		612D4392BFE03C2B188F8564 /* Build configuration list for PBXNativeTarget "Whiteboard" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2F67D0B96E3FEB8CA325F953 /* debug */,
+				CBB6FBFC6F0603264B7DD03C /* release */,
+			);
+			defaultConfigurationIsVisible = 1;
+			defaultConfigurationName = debug;
+		};
+		61B74A76653AB34E196D8845 /* Build configuration list for PBXProject "Whiteboard" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				48AF317B6B1BFC96A9B3F97E /* debug */,
+				9DAFA0BE8FFCE54838E37D0F /* release */,
+			);
+			defaultConfigurationIsVisible = 1;
+			defaultConfigurationName = debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 67A2558140FC620D84B8A31D /* Project object */;
+}
