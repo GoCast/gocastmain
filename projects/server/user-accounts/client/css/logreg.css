@@ -1,0 +1,11 @@
+body > .container > .row > .span6 > [cssrule="form"] {
+	padding-left: 10px;
+	padding-right: 10px;
+	border-radius: 3px;
+	border: 1px lightgrey solid;
+}
+
+body > .container > .row > .span6 > [cssrule="form"] button {
+	float: right;
+	margin-left: 5px;
+}

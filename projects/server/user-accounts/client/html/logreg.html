@@ -4,8 +4,70 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<title> Welcome to GoCast! </title>
+		<link rel="stylesheet" type="text/css" href="css/bootstrap.css?GOCASTTIMESTAMP">
+		<link rel="stylesheet" type="text/css" href="css/logreg.css?GOCASTTIMESTAMP">
 	</head>
 	<body>
-		<div 
+		<div class="container">
+		<div class="row">
+			<div class="span6 offset3">
+			<form id="login-form" class="form-horizontal" cssrule="form">
+				<h3> Sign In </h3>
+				<div class="control-group">
+					<label class="control-label" for="input-email"> Email </label>
+					<div class="controls">
+						<input id="input-email" type="email" name="email" placeholder="name@example.com">
+					</div>
+				</div>
+				<div class="control-group">
+					<label class="control-label" for="input-password"> Password </label>
+					<div class="controls">
+						<input id="input-password" type="password" name="password">
+					</div>
+				</div>
+				<div class="control-group">
+					<button type="submit" class="btn btn-primary"> Sign In </button>
+				</div>
+			</form>
+			<form id="register-form" class="form-horizontal" cssrule="form">
+				<h3> Sign Up </h3>
+				<div class="control-group">
+					<label class="control-label" for="input-email"> Email </label>
+					<div class="controls">
+						<input id="input-email" type="email" name="email" placeholder="name@example.com">
+					</div>
+				</div>
+				<div class="control-group">
+					<label class="control-label" for="input-password"> Password </label>
+					<div class="controls">
+						<input id="input-password" type="password" name="password">
+					</div>
+				</div>
+				<div class="control-group">
+					<label class="control-label" for="input-confirm-password"> Confirm Password </label>
+					<div class="controls">
+						<input id="input-confirm-password" type="password" name="confirm_password">
+					</div>
+				</div>
+				<div class="control-group">
+					<button type="submit" class="btn btn-primary"> Sign Up </button>
+					<button type="button" class="btn btn-danger"> Cancel </button>
+				</div>
+			</form>
+			<form id="activate-form" class="form-horizontal" cssrule="form">
+				<h3> Activate </h3>
+				<div class="control-group">
+					<label class="control-label" for="input-activation-code"> Activation Code </label>
+					<div class="controls">
+						<input id="input-activation-code" type="password" name="activation_code">
+					</div>
+				</div>
+				<div class="control-group">
+					<button type="submit" class="btn btn-primary"> Activate </button>
+				</div>
+			</form>
+			</div>
+		</div>
+		</div>
 	</body>
 </html>
