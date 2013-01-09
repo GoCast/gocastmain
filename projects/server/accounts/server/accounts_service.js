@@ -33,12 +33,20 @@ var api = require('./accounts_api');
 var express = require('express');
 var app = express();
 
-app.get('/', function(req, res){
-  res.send('Hello World: ' + req.query['email']);
+// -------------- INCLUDED EXPRESS LIBRARIES -----------------
+
+app.use(express.bodyParser());
+
+// -------------- ACCT SERVICE REQUEST HANDLERS --------------
+
+app.post('/register', function(req, res) {
+    console.log('REGISTER: ', req.body);
+    res.send('REGISTER: ' + JSON.stringify(req.body));
 });
 
-app.get('/new', function(req, res) {
-    res.send('new only.');
+app.post('/activate', function(req, res) {
+    console.log('ACTIVATE: ', req.body);
+    res.send('ACTIVATE: ' + JSON.stringify(req.body));
 });
 
 app.listen(settings.accounts.serviceport || 8083);
