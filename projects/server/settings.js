@@ -56,6 +56,12 @@ if (process.env.SETTINGS_DEVEL === 1 || process.env.SETTINGS_DEVEL === '1') {
         }
     };
 
+    settings.accounts = {
+        servicePort: 8083,
+        xmppAccountServerSecret: 'dev.GoCast.Secret',
+        xmppAccountServerBase: 'http://' + settings.SERVERNAME + ':9090/plugins/userService/userservice?'
+    };
+
     settings.overseer = {
         username: 'overseer@' + settings.SERVERNAME,
         password: 'dev.mode.overseer',

@@ -12,8 +12,8 @@ var settings = require('./settings');   // Our GoCast settings JS
 if (!settings) {
     settings = {};
 }
-if (!settings.roommanager) {
-    settings.roommanager = {};
+if (!settings.accounts) {
+    settings.accounts = {};
 }
 
 var sys = require('util');
@@ -22,5 +22,30 @@ var evt = require('events');
 var eventManager = new evt.EventEmitter();
 var argv = process.argv;
 
+var mail = require('node-mailgun');
+
+var xmpp = require('./accounts_xmpp');
+var db = require('./accounts_db');
+
 'use strict';
 
+function apiNewAccount() {
+
+}
+
+function apiValidateAccount() {
+
+}
+
+function apiDeleteAccount() {
+
+}
+
+function apiChangePassword() {
+
+}
+
+exports.NewAccount = apiNewAccount;
+exports.ValidateAccount = apiValidateAccount;
+exports.DeleteAccount = apiDeleteAccount;
+exports.ChangePassword = apiChangePassword;
