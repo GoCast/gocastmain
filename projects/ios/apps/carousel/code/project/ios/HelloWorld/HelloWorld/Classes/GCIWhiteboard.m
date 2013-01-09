@@ -5,18 +5,33 @@
 
 @implementation GCIWhiteboard
 
-- (void)echo:(CDVInvokedUrlCommand*)command
+- (void)save:(CDVInvokedUrlCommand*)command
 {
-    CDVPluginResult* pluginResult = nil;
-    NSString* echo = [command.arguments objectAtIndex:0];
-
-    if (echo != nil && [echo length] > 0) {
-        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:echo];
-    } else {
-        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR];
-    }
-
-    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    printf("*** GCIWhiteboard::save\n");
+}
+- (void)restore:(CDVInvokedUrlCommand*)command
+{
+    printf("*** GCIWhiteboard::restore\n");
+}
+- (void)beginPath:(CDVInvokedUrlCommand*)command
+{
+    printf("*** GCIWhiteboard::beginPath\n");
+}
+- (void)closePath:(CDVInvokedUrlCommand*)command
+{
+    printf("*** GCIWhiteboard::closePath\n");
+}
+- (void)moveTo:(CDVInvokedUrlCommand*)command
+{
+    printf("*** GCIWhiteboard::moveTo(%d, %d)\n", atoi([[command.arguments objectAtIndex:0] UTF8String]), atoi([[command.arguments objectAtIndex:1] UTF8String]));
+}
+- (void)lineTo:(CDVInvokedUrlCommand*)command
+{
+    printf("*** GCIWhiteboard::lineTo(%d, %d)\n", atoi([[command.arguments objectAtIndex:0] UTF8String]), atoi([[command.arguments objectAtIndex:1] UTF8String]));
+}
+- (void)stroke:(CDVInvokedUrlCommand*)command
+{
+    printf("*** GCIWhiteboard::stroke\n");
 }
 
 @end

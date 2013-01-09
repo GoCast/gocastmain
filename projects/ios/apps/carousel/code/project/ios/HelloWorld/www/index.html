@@ -113,9 +113,50 @@
 
                     if (info.stroke)
                     {
+                        var i, cmd;
+
                         stroke = JSON.parse(info.stroke);
 
-                        document.writeln('Single stroke to apply:', stroke, '<BR>');
+                        for (i = 0; i < stroke.length; i += 1)
+                        {
+                            switch (stroke[i].name)
+                            {
+                                case "save":
+//                                    this.wbCtx.save();
+//                                    this.settings.applyJson(cmdArray[i].settings, this.wbCtx);
+                                    cordova.exec(function(winParam) {}, function(error) {}, "GCIWhiteboard",
+                                                 "store", [ "" ]);
+                                break;
+                                case "restore":
+                                    cordova.exec(function(winParam) {}, function(error) {}, "GCIWhiteboard",
+                                                 "restore", [ "" ]);
+                                break;
+                                case "beginPath":
+                                    cordova.exec(function(winParam) {}, function(error) {}, "GCIWhiteboard",
+                                                 "beginPath", [ "" ]);
+                                break;
+                                case "closePath":
+                                    cordova.exec(function(winParam) {}, function(error) {}, "GCIWhiteboard",
+                                                 "closePath", [ "" ]);
+                                break;
+                                case "moveTo":
+                                    cordova.exec(function(winParam) {}, function(error) {}, "GCIWhiteboard",
+                                                 "moveTo", [ stroke[i].x.toString(), stroke[i].y.toString() ]);
+                                break;
+                                case "lineTo":
+                                    cordova.exec(function(winParam) {}, function(error) {}, "GCIWhiteboard",
+                                                 "lineTo", [ stroke[i].x.toString(), stroke[i].y.toString() ]);
+                                break;
+                                case "stroke":
+                                    cordova.exec(function(winParam) {}, function(error) {}, "GCIWhiteboard",
+                                                 "stroke", [ "" ]);
+                                break;
+                                default:
+                                    throw "WhiteBoard.doCommand unknown cmd " + cmdArray[i].name;
+                            }
+                        }
+
+//                        document.writeln('Single stroke to apply:', stroke, '<BR>');
                         console.log('Single stroke to apply:', stroke);
                     }
                 }
