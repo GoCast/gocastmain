@@ -125,7 +125,7 @@
 //                                    this.wbCtx.save();
 //                                    this.settings.applyJson(cmdArray[i].settings, this.wbCtx);
                                     cordova.exec(function(winParam) {}, function(error) {}, "GCIWhiteboard",
-                                                 "store", [ "" ]);
+                                                 "save", [ "" ]);
                                 break;
                                 case "restore":
                                     cordova.exec(function(winParam) {}, function(error) {}, "GCIWhiteboard",
