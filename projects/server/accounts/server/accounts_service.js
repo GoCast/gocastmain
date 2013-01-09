@@ -16,8 +16,8 @@ var settings = require('./settings');   // Our GoCast settings JS
 if (!settings) {
     settings = {};
 }
-if (!settings.roommanager) {
-    settings.roommanager = {};
+if (!settings.accounts) {
+    settings.accounts = {};
 }
 
 var sys = require('util');
@@ -26,4 +26,15 @@ var evt = require('events');
 var eventManager = new evt.EventEmitter();
 var argv = process.argv;
 
+var api = require('./accounts_api');
+
 'use strict';
+
+var express = require('express');
+var app = express();
+
+app.get('/', function(req, res){
+  res.send('Hello World');
+});
+
+app.listen(settings.accounts.serviceport || 8083);
