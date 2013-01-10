@@ -80,6 +80,7 @@ Whiteboard::Whiteboard()
 {
     tSGView::getInstance()->attach(this);
     tInputManager::getInstance()->tSubject<const tMouseEvent&>::attach(this);
+    WhiteboardManager::getInstance()->attach(this);
 }
 
 Whiteboard::~Whiteboard()
@@ -219,6 +220,28 @@ void Whiteboard::onRedrawView(float time)
     glFlush();
 }
 
+void Whiteboard::onMoveTo(const tPoint2f& pt)
+{
+    mCurDrawPoint = pt;
+}
+
+void Whiteboard::onLineTo(const tPoint2f& pt)
+{
+    mWhiteboardSurface.drawLine(mCurDrawPoint, pt, tColor4b(0,0,255,255));
+    mWhiteboardSurface.drawLine(mCurDrawPoint - tPoint2f(0,1), pt - tPoint2f(0,1), tColor4b(0,0,255,255));
+    mWhiteboardSurface.drawLine(mCurDrawPoint + tPoint2f(0,1), pt + tPoint2f(0,1), tColor4b(0,0,255,255));
+    mWhiteboardSurface.drawLine(mCurDrawPoint - tPoint2f(1,1), pt - tPoint2f(1,1), tColor4b(0,0,255,255));
+    mWhiteboardSurface.drawLine(mCurDrawPoint + tPoint2f(1,1), pt + tPoint2f(1,1), tColor4b(0,0,255,255));
+    mCurDrawPoint = pt;
+}
+
+void Whiteboard::onStroke()
+{
+    delete mWhiteboardTexture;
+    mWhiteboardTexture = new tTexture(mWhiteboardSurface);
+}
+
+
 void Whiteboard::update(const tSGViewEvent& msg)
 {
     switch (msg.event)
@@ -251,3 +274,16 @@ void Whiteboard::update(const tMouseEvent& msg)
             break;
     }
 }
+
+void Whiteboard::update(const WhiteboardEvent& msg)
+{
+    switch (msg.mEvent)
+    {
+        case WhiteboardEvent::kMoveTo: onMoveTo(msg.mPoint); break;
+        case WhiteboardEvent::kLineTo: onLineTo(msg.mPoint); break;
+        case WhiteboardEvent::kStroke: onStroke(); break;
+
+        default: break;
+    }
+}
+
