@@ -11,6 +11,17 @@
 		00D21BEA169E01FB00D4C8A9 /* GCIWhiteboard.mm in Sources */ = {isa = PBXBuildFile; fileRef = 00D21BE9169E01FB00D4C8A9 /* GCIWhiteboard.mm */; };
 		00D21C12169E027500D4C8A9 /* www in Resources */ = {isa = PBXBuildFile; fileRef = 00D21C11169E027500D4C8A9 /* www */; };
 		00D21C14169E02C100D4C8A9 /* Cordova.plist in Resources */ = {isa = PBXBuildFile; fileRef = 00D21C13169E02C100D4C8A9 /* Cordova.plist */; };
+		00D21C17169ED7E800D4C8A9 /* MainViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 00D21C15169ED7E800D4C8A9 /* MainViewController.xib */; };
+		00D21C1B169EDEDF00D4C8A9 /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 00D21C19169EDEDF00D4C8A9 /* AddressBook.framework */; };
+		00D21C1C169EDEDF00D4C8A9 /* AddressBookUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 00D21C1A169EDEDF00D4C8A9 /* AddressBookUI.framework */; };
+		00D21C1E169EDEEE00D4C8A9 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 00D21C1D169EDEEE00D4C8A9 /* AudioToolbox.framework */; };
+		00D21C20169EDEF700D4C8A9 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 00D21C1F169EDEF700D4C8A9 /* AVFoundation.framework */; };
+		00D21C22169EDEFF00D4C8A9 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 00D21C21169EDEFF00D4C8A9 /* CFNetwork.framework */; };
+		00D21C24169EDF0500D4C8A9 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 00D21C23169EDF0500D4C8A9 /* CoreLocation.framework */; };
+		00D21C26169EDF0B00D4C8A9 /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 00D21C25169EDF0B00D4C8A9 /* MediaPlayer.framework */; };
+		00D21C28169EDF1700D4C8A9 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 00D21C27169EDF1700D4C8A9 /* SystemConfiguration.framework */; };
+		00D21C2A169EDF1D00D4C8A9 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 00D21C29169EDF1D00D4C8A9 /* MobileCoreServices.framework */; };
+		00D21C2C169EDF2400D4C8A9 /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 00D21C2B169EDF2400D4C8A9 /* CoreMedia.framework */; };
 		0611E422A297CBE356405C7D /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 41457BA618A6B6E8FCBB620F /* main.mm */; };
 		0A7E7C5BC2CE68DFA26E1DB6 /* tTexture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 09FA150B7647EA6DADF9AAF9 /* tTexture.cpp */; };
 		14F6AD42F340A7764C7C8973 /* tShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A3B52E3EA721B2C116CB4BDF /* tShader.cpp */; };
@@ -58,6 +69,17 @@
 		00D21BE9169E01FB00D4C8A9 /* GCIWhiteboard.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = GCIWhiteboard.mm; sourceTree = "<group>"; };
 		00D21C11169E027500D4C8A9 /* www */ = {isa = PBXFileReference; lastKnownFileType = folder; name = www; path = ../ios/HelloWorld/www; sourceTree = "<group>"; };
 		00D21C13169E02C100D4C8A9 /* Cordova.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = Cordova.plist; path = ../ios/HelloWorld/HelloWorld/Cordova.plist; sourceTree = "<group>"; };
+		00D21C16169ED7E800D4C8A9 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainViewController.xib; sourceTree = "<group>"; };
+		00D21C19169EDEDF00D4C8A9 /* AddressBook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBook.framework; path = System/Library/Frameworks/AddressBook.framework; sourceTree = SDKROOT; };
+		00D21C1A169EDEDF00D4C8A9 /* AddressBookUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBookUI.framework; path = System/Library/Frameworks/AddressBookUI.framework; sourceTree = SDKROOT; };
+		00D21C1D169EDEEE00D4C8A9 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
+		00D21C1F169EDEF700D4C8A9 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+		00D21C21169EDEFF00D4C8A9 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
+		00D21C23169EDF0500D4C8A9 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
+		00D21C25169EDF0B00D4C8A9 /* MediaPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MediaPlayer.framework; path = System/Library/Frameworks/MediaPlayer.framework; sourceTree = SDKROOT; };
+		00D21C27169EDF1700D4C8A9 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
+		00D21C29169EDF1D00D4C8A9 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
+		00D21C2B169EDF2400D4C8A9 /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
 		0429BE46EE8659F09B60117D /* tProgram.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tProgram.h; sourceTree = "<group>"; };
 		09FA150B7647EA6DADF9AAF9 /* tTexture.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = tTexture.cpp; sourceTree = "<group>"; };
 		1577E9F807E0CE719F9BC9EF /* package.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = package.h; sourceTree = "<group>"; };
@@ -112,10 +134,20 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				00D21C2C169EDF2400D4C8A9 /* CoreMedia.framework in Frameworks */,
+				00D21C2A169EDF1D00D4C8A9 /* MobileCoreServices.framework in Frameworks */,
+				00D21C28169EDF1700D4C8A9 /* SystemConfiguration.framework in Frameworks */,
+				00D21C26169EDF0B00D4C8A9 /* MediaPlayer.framework in Frameworks */,
+				00D21C24169EDF0500D4C8A9 /* CoreLocation.framework in Frameworks */,
+				00D21C22169EDEFF00D4C8A9 /* CFNetwork.framework in Frameworks */,
+				00D21C20169EDEF700D4C8A9 /* AVFoundation.framework in Frameworks */,
+				00D21C1E169EDEEE00D4C8A9 /* AudioToolbox.framework in Frameworks */,
 				00D21BE2169E012D00D4C8A9 /* libCordova.a in Frameworks */,
-				C38C4781C320E00F08332173 /* UIKit.framework in Frameworks */,
 				1DC8577FE9838110C3DA9C1C /* Foundation.framework in Frameworks */,
+				C38C4781C320E00F08332173 /* UIKit.framework in Frameworks */,
 				8996E76B95CE776DBBDAE65F /* CoreGraphics.framework in Frameworks */,
+				00D21C1B169EDEDF00D4C8A9 /* AddressBook.framework in Frameworks */,
+				00D21C1C169EDEDF00D4C8A9 /* AddressBookUI.framework in Frameworks */,
 				2B8D8B0915061E8D1849DEF2 /* QuartzCore.framework in Frameworks */,
 				CF8CA14E3E3C2DC7D1F57958 /* OpenGLES.framework in Frameworks */,
 			);
@@ -135,6 +167,16 @@
 		0456162378FBD0D1E5D4D6A8 = {
 			isa = PBXGroup;
 			children = (
+				00D21C2B169EDF2400D4C8A9 /* CoreMedia.framework */,
+				00D21C29169EDF1D00D4C8A9 /* MobileCoreServices.framework */,
+				00D21C27169EDF1700D4C8A9 /* SystemConfiguration.framework */,
+				00D21C25169EDF0B00D4C8A9 /* MediaPlayer.framework */,
+				00D21C23169EDF0500D4C8A9 /* CoreLocation.framework */,
+				00D21C21169EDEFF00D4C8A9 /* CFNetwork.framework */,
+				00D21C1F169EDEF700D4C8A9 /* AVFoundation.framework */,
+				00D21C1D169EDEEE00D4C8A9 /* AudioToolbox.framework */,
+				00D21C19169EDEDF00D4C8A9 /* AddressBook.framework */,
+				00D21C1A169EDEDF00D4C8A9 /* AddressBookUI.framework */,
 				00D21C13169E02C100D4C8A9 /* Cordova.plist */,
 				00D21C11169E027500D4C8A9 /* www */,
 				00D21BCF169E00FA00D4C8A9 /* CordovaLib.xcodeproj */,
@@ -224,6 +266,7 @@
 			children = (
 				9C18CE4BB4E9C8DF93918E29 /* InfoPlist.strings */,
 				0A52F92AC7725610B6935BF5 /* MainWindow.xib */,
+				00D21C15169ED7E800D4C8A9 /* MainViewController.xib */,
 				719929FE4CB470A6AD62DF0F /* spritesheet.frag */,
 				C139DA84CC3CF2A2CD32F273 /* spritesheet.vert */,
 			);
@@ -383,6 +426,7 @@
 				A679839EE33BEBE71698B6DB /* spritesheet.vert in Resources */,
 				F3EB3ADBB7DF397BD4C8E424 /* InfoPlist.strings in Resources */,
 				455E5981031B329430B41FD8 /* MainWindow.xib in Resources */,
+				00D21C17169ED7E800D4C8A9 /* MainViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -421,6 +465,14 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
+		00D21C15169ED7E800D4C8A9 /* MainViewController.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				00D21C16169ED7E800D4C8A9 /* en */,
+			);
+			name = MainViewController.xib;
+			sourceTree = "<group>";
+		};
 		0A52F92AC7725610B6935BF5 /* MainWindow.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -499,6 +551,19 @@
 				LLVM_LTO = NO;
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				ONLY_ACTIVE_ARCH = YES;
+				OTHER_LDFLAGS = (
+					"-weak_framework",
+					CoreFoundation,
+					"-weak_framework",
+					UIKit,
+					"-weak_framework",
+					AVFoundation,
+					"-weak_framework",
+					CoreMedia,
+					"-weak-lSystem",
+					"-all_load",
+					"-Obj-C",
+				);
 				PRODUCT_NAME = Whiteboard;
 				RUN_CLANG_STATIC_ANALYZER = YES;
 				VALIDATE_PRODUCT = YES;
@@ -612,6 +677,19 @@
 				LLVM_LTO = NO;
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				ONLY_ACTIVE_ARCH = NO;
+				OTHER_LDFLAGS = (
+					"-weak_framework",
+					CoreFoundation,
+					"-weak_framework",
+					UIKit,
+					"-weak_framework",
+					AVFoundation,
+					"-weak_framework",
+					CoreMedia,
+					"-weak-lSystem",
+					"-all_load",
+					"-Obj-C",
+				);
 				PRODUCT_NAME = Whiteboard;
 				RUN_CLANG_STATIC_ANALYZER = YES;
 				VALIDATE_PRODUCT = YES;

@@ -3,6 +3,6 @@
 
 #import <Cordova/CDVViewController.h>
 
-@interface ViewController : CDVViewController
+@interface MainViewController : CDVViewController
 
 @end
