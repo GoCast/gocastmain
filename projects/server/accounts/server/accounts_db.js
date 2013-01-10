@@ -109,7 +109,7 @@ function dbAddEntry(accountName, validationCode, cbSuccess, cbFailure) {
     var cur = new Date();
 
     ddb.client.putItem({TableName: theTable,
-                        Item: {email: { S: accountName},
+                        Item: {email: { S: accountName.toLowerCase()},
                                 entryDate: { N: cur.getTime().toString()},
                                 validationCode: { S: validationCode}}}, function(err, data) {
                             if (err) {
@@ -133,7 +133,7 @@ function dbAddEntry(accountName, validationCode, cbSuccess, cbFailure) {
 //         data.Item.validationCode.S
 //
 function dbGetEntryByAccountName(accountName, cbSuccess, cbFailure) {
-    ddb.client.getItem({TableName: theTable, Key: { HashKeyElement: { S: accountName } }}, function(err, data) {
+    ddb.client.getItem({TableName: theTable, Key: { HashKeyElement: { S: accountName.toLowerCase() } }}, function(err, data) {
         if (err) {
             errOut(err);
             cbFailure(err);
@@ -153,7 +153,7 @@ function dbGetEntryByAccountName(accountName, cbSuccess, cbFailure) {
 }
 
 function dbDeleteEntry(accountName, cbSuccess, cbFailure) {
-    ddb.client.deleteItem({TableName: theTable, Key: {HashKeyElement: { S: accountName}}}, function(err, data) {
+    ddb.client.deleteItem({TableName: theTable, Key: {HashKeyElement: { S: accountName.toLowerCase() }}}, function(err, data) {
         if (err) {
             errOut(err);
             cbFailure(err);
