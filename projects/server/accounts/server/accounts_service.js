@@ -47,13 +47,24 @@ app.use(express.bodyParser());
 // -------------- ACCT SERVICE REQUEST HANDLERS --------------
 
 app.post('/register', function(req, res) {
-    console.log('REGISTER: ', req.body);
-    res.send('{"result": "success", "email": "' + req.body.email + '"}');
+    api.apiNewAccount(req.body.baseurl, req.body.email, req.body.password, req.body.name, function() {
+        res.send('{"result": "success"}');
+    }, function(err) {
+        console.log('accounts_service: ', err);
+        if ('apiNewAccount: Failed - account already in use.' === err) {
+            res.send('{"result": "inuse"}');
+        } else {
+            res.send('{"result": "error"}');
+        }
+    });
 });
 
 app.post('/activate', function(req, res) {
-    console.log('ACTIVATE: ', req.body);
-    res.send('{"result": "success"}');
+    api.apiValidateAccount('rwolff@gocast.it', '85e25a1fea7b001911f791f13180f252', function() {
+        res.send('{"result": "success"}');
+    }, function(err) {
+        console.log('TEST-Validate: FAILED: ' + err);
+    });
 });
 
 app.listen(settings.accounts.serviceport || 8083);
