@@ -12,7 +12,14 @@
 /*jslint node: true, nomen: true, white: true */
 /*global test, exec */
 
-var settings = require('./settings');   // Our GoCast settings JS
+var settings;
+
+try {
+    settings = require('./settings');   // Our GoCast settings JS
+} catch(e) {
+    settings = require('../../settings');   // Look relative ... for developers on desktops.
+}
+
 if (!settings) {
     settings = {};
 }
