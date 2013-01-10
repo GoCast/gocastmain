@@ -50,6 +50,7 @@ body > .container > .row > .span4 > form.show {
 
 body > .container > .row > .span4 > form .alert {
     display: none;
+    padding-right: 14px;
 }
 
 body > .container > .row > .span4 > form .alert.show {

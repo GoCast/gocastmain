@@ -26,7 +26,7 @@ var LogregView = {
     },
     displayalert: function(formid, type, message) {
         var $alert = $('.alert-' + type, this.$forms[formid]).addClass('show');
-        $('span', $alert).text(' ' + message);
+        $('p', $alert).html(message);
     },
     changeformCallback: function() {
         var self = this;
@@ -45,13 +45,19 @@ var LogregApp = {
                 return function(response) {
                     if ('success' === response.result) {
                         LogregView.displayform('activate-form');
-                        LogregView.displayalert('activate-form', 'success', 'Activation email sent.');
+                        LogregView.displayalert('activate-form', 'success', 'Your account has been created. ' +
+                                                'An activation email has been sent to the address you just provided. ' +
+                                                'Follow the instructions in the email to activate your account.');
+                    } else if ('inuse' === response.result) {
+                        LogregView.displayalert('register-form', 'error', 'An account for the email address you\'ve provided' +
+                                                'already exists. Choose a different email address.');
+                        $('#input-email', $LogregApp.$forms['register-form']).focus();
                     }
                 };
             },
             failure: function() {
                 return function(error) {
-                    LogregView.displayalert('register-form', 'error', 'Problem signing up.');
+                    LogregView.displayalert('register-form', 'error', 'There was a problem signing up for your new account.');
                 };
             }
         },
@@ -60,13 +66,14 @@ var LogregApp = {
                 return function(response) {
                     if ('success' === response.result) {
                         LogregView.displayform('login-form');
-                        LogregView.displayalert('login-form', 'success', 'Account activated, please sign in.');
+                        LogregView.displayalert('login-form', 'success', 'Your account has been activated. ' +
+                                                'Now, you can login with your new account.');
                     }
                 };
             },
             failure: function() {
                 return function(error) {
-                    LogregView.displayalert('activate-form', 'error', 'Problem activating your account.');
+                    LogregView.displayalert('activate-form', 'error', 'There was a problem activating your account.');
                 };
             }
         },
@@ -92,7 +99,9 @@ var LogregApp = {
                 options.beforeSubmit = function(arr, $form, options) {
                     if ($('#input-password', $form).val() !==
                         $('#input-confirm-password', $form).val()) {
-                        LogregView.displayalert('register-form', 'error', 'Password fields don\'t match.');
+                        LogregView.displayalert('register-form', 'error', 'The password fields don\'t match. Make sure ' +
+                                                'you\'ve entered the same password in both fields.');
+                        $('#input-password', $form).focus();
                         return false;
                     }
                 };
