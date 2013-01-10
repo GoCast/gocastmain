@@ -54,7 +54,9 @@ function privateGenEmail(baseURL, email, actcode, bInAppReg) {
     body += '\n\nAlternatively, you can click on the link below.';
 
     body += 'Your activation code is: ' + actcode.slice(-6).toUpperCase();
-    body += '\n\nOr your activation link is: ' + baseURL + '?defaultaction=activate&code=' + actcode.toUpperCase();
+    body += '\n\nOr your activation link is: ' + baseURL + 
+            '?defaultaction=activate&code=' + actcode.toUpperCase() +
+            '&email=' + email.toLowerCase();
 
     body += '\n\n';
     body += 'Thanks for signing up with GoCast - we hope you enjoy the service.\n\n';
