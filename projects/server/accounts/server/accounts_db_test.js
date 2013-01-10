@@ -26,10 +26,8 @@ function dbPrivateTest1() {
 
         console.log('2. Find an unknown entry.');
         db.GetEntryByAccountName('UnknownAccountName', function(data) {
-            if (data.Item) {
                 console.log('Found - that is a problem.');
-            }
-            else {
+            }, function(err) {
                 console.log('Not found. Good - that was expected.');
 
                 console.log('3. Retrieve our prior created entry of: ' + account);
@@ -58,9 +56,6 @@ function dbPrivateTest1() {
                 }, function(err) {
                     console.log('Could not find our prior creation of: ' + account + ':', err);
                 });
-            }
-        }, function(err) {
-            console.log('Error trying to find unknown entry.');
         });
     }, function(err) {
         console.log('Create failed: ', err);

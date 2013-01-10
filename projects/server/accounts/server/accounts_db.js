@@ -102,6 +102,9 @@ function errOut(err) {
     });
 }());
 
+//
+// @brief Add an entry to the table.
+//
 function dbAddEntry(accountName, validationCode, cbSuccess, cbFailure) {
     var cur = new Date();
 
@@ -122,6 +125,13 @@ function dbAddEntry(accountName, validationCode, cbSuccess, cbFailure) {
 
 }
 
+//
+// @brief Lookup an entry and return its row if successful.
+//        If accountName is not found, an error is given as err.code==='NoEntryFound'
+// @return data.Item will have properties:
+//         data.Item.email.S
+//         data.Item.validationCode.S
+//
 function dbGetEntryByAccountName(accountName, cbSuccess, cbFailure) {
     ddb.client.getItem({TableName: theTable, Key: { HashKeyElement: { S: accountName } }}, function(err, data) {
         if (err) {
@@ -129,14 +139,15 @@ function dbGetEntryByAccountName(accountName, cbSuccess, cbFailure) {
             cbFailure(err);
         }
         else {
-/*            if (data.Item) {
-                console.log('Got Item: ', data.Item);
+            if (data.Item) {
+//                console.log('Got Item: ', data.Item);
+                cbSuccess(data);
             }
             else {
-                console.log('Didnt find item.');
+//                console.log('Didnt find item.');
+                cbFailure({code: 'NoEntryFound', message: 'Requested Entry was not found in the table.'});
             }
-*/
-            cbSuccess(data);
+
         }
     });
 }
