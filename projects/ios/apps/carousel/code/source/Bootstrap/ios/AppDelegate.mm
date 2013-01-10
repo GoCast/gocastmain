@@ -13,6 +13,39 @@
 
 @synthesize window=_window;
 
+- (id)init
+{
+    /** If you need to do any extra app-specific initialization, you can do it here
+     *  -jm
+     **/
+    NSHTTPCookieStorage* cookieStorage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
+
+    [cookieStorage setCookieAcceptPolicy:NSHTTPCookieAcceptPolicyAlways];
+
+    self = [super init];
+    return self;
+}
+
+//// this happens while we are running ( in the background, or from within our own app )
+//// only valid if HelloWorld-Info.plist specifies a protocol to handle
+//- (BOOL)application:(UIApplication*)application handleOpenURL:(NSURL*)url
+//{
+//#pragma unused(application)
+//
+//    if (!url) {
+//        return NO;
+//    }
+//
+//    // calls into javascript global function 'handleOpenURL'
+//    NSString* jsString = [NSString stringWithFormat:@"handleOpenURL(\"%@\");", url];
+//    [self.viewController.webView stringByEvaluatingJavaScriptFromString:jsString];
+//
+//    // all plugins will get the notification, and their handlers will be called
+//    [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:CDVPluginHandleOpenURLNotification object:url]];
+//
+//    return YES;
+//}
+
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
 #pragma unused(application, launchOptions)
