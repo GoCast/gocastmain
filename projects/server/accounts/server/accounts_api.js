@@ -148,28 +148,34 @@ function apiValidateAccount(email, actcode, success, failure) {
     // Check if account with this email exists
     xmpp.AccountAvailable(email, function() {
         // Account doesn't exist, so bad actcode
-        failure('apiValidateAccount: Bad activation code');
+        failure('apiValidateAccount: Bad activation code. No account found for: ' + email);
     }, function() {
+        var entry;
         // Account exists, so match actcode with its corresponding db entry
-        var entry = db.GetEntryByAccountName(email);
-        if (entry) {
-            if (true === privateMatchActivationCodes(entry.actcode, actcode)) {
-                // Correct activation code, so enable account
-                xmpp.EnableAccount(email, function() {
-                    // Enable successful, delete db entry for email
-                    db.dbDeleteEntry(email);
-                    success();
-                }, failure);
+        db.GetEntryByAccountName(email, function(data) {
+            if (data.Item) {
+                entry = data.Item;
+                if (true === privateMatchActivationCodes(entry.activationCode.S, actcode)) {
+                    // Correct activation code, so enable account
+                    xmpp.EnableAccount(email, function() {
+                        // Enable successful, delete db entry for email
+                        db.dbDeleteEntry(email);
+                        success();
+                    }, failure);
+                } else {
+                    // Incorrect activation code
+                    failure('apiValidateAccount: Incorrect activation code for ' + email);
+                }
             } else {
-                // Incorrect activation code
-                failure('apiValidateAccount: Incorrect activation code');
+                // No such entry, bad/expired code, delete xmpp account
+                xmpp.xmppDeleteAccount(email, function() {
+                    failure('apiValidateAccout: Bad/expired activation code for ' + email);
+                }, failure);
             }
-        } else {
-            // No such entry, bad/expired code, delete xmpp account
-            xmpp.xmppDeleteAccount(email, function() {
-                failure('apiValidateAccout: Bad/expired activation code');
-            }, failure);
-        }
+        }, function(err) {
+            // Failure of getting database entry for account.
+            failure('apiValidateAccout: Failed to get database entry for validation.');
+        });
     });
 }
 
