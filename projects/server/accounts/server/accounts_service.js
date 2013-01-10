@@ -41,7 +41,7 @@ app.use(express.bodyParser());
 
 app.post('/register', function(req, res) {
     console.log('REGISTER: ', req.body);
-    res.send('{"result": "success"}');
+    res.send('{"result": "success", "email": "' + req.body.email + '"}');
 });
 
 app.post('/activate', function(req, res) {
