@@ -45,7 +45,7 @@ function xmppPrivateEscapeEmail(input) {
         return null;
     }
     else {
-        return encodeURI(input.replace('@', '~'));
+        return encodeURI(input.toLowerCase().replace('@', '~'));
     }
 }
 
