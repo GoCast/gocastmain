@@ -107,6 +107,11 @@
         [[UIApplication sharedApplication] setStatusBarOrientation:newOrient];
     }
 
+
+    screenBounds = [[UIScreen mainScreen] bounds];
+    self.glView = [[[OpenGLView alloc] initWithFrame:screenBounds] autorelease];
+    [self.viewController.view addSubview:_glView];
+
     self.window.rootViewController = self.viewController;
     [self.window makeKeyAndVisible];
 

@@ -29,6 +29,8 @@
 
 #import <Cordova/CDVViewController.h>
 
+#import "OpenGLView.h"
+
 @interface AppDelegate : NSObject <UIApplicationDelegate>{}
 
 // invoke string is passed to your app on launch, this is only valid if you
@@ -38,5 +40,6 @@
 
 @property (nonatomic, strong) IBOutlet UIWindow* window;
 @property (nonatomic, strong) IBOutlet CDVViewController* viewController;
+@property (nonatomic, strong) IBOutlet OpenGLView* glView;
 
 @end
