@@ -167,16 +167,6 @@
 		0456162378FBD0D1E5D4D6A8 = {
 			isa = PBXGroup;
 			children = (
-				00D21C2B169EDF2400D4C8A9 /* CoreMedia.framework */,
-				00D21C29169EDF1D00D4C8A9 /* MobileCoreServices.framework */,
-				00D21C27169EDF1700D4C8A9 /* SystemConfiguration.framework */,
-				00D21C25169EDF0B00D4C8A9 /* MediaPlayer.framework */,
-				00D21C23169EDF0500D4C8A9 /* CoreLocation.framework */,
-				00D21C21169EDEFF00D4C8A9 /* CFNetwork.framework */,
-				00D21C1F169EDEF700D4C8A9 /* AVFoundation.framework */,
-				00D21C1D169EDEEE00D4C8A9 /* AudioToolbox.framework */,
-				00D21C19169EDEDF00D4C8A9 /* AddressBook.framework */,
-				00D21C1A169EDEDF00D4C8A9 /* AddressBookUI.framework */,
 				00D21C13169E02C100D4C8A9 /* Cordova.plist */,
 				00D21C11169E027500D4C8A9 /* www */,
 				00D21BCF169E00FA00D4C8A9 /* CordovaLib.xcodeproj */,
@@ -244,6 +234,16 @@
 		931B4715EBA5EF8D14751C6E /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				00D21C2B169EDF2400D4C8A9 /* CoreMedia.framework */,
+				00D21C29169EDF1D00D4C8A9 /* MobileCoreServices.framework */,
+				00D21C27169EDF1700D4C8A9 /* SystemConfiguration.framework */,
+				00D21C25169EDF0B00D4C8A9 /* MediaPlayer.framework */,
+				00D21C23169EDF0500D4C8A9 /* CoreLocation.framework */,
+				00D21C21169EDEFF00D4C8A9 /* CFNetwork.framework */,
+				00D21C1F169EDEF700D4C8A9 /* AVFoundation.framework */,
+				00D21C1D169EDEEE00D4C8A9 /* AudioToolbox.framework */,
+				00D21C19169EDEDF00D4C8A9 /* AddressBook.framework */,
+				00D21C1A169EDEDF00D4C8A9 /* AddressBookUI.framework */,
 				411E6E215ABA730DE4EFC537 /* CoreGraphics.framework */,
 				E96BF3286BB78EAAADC0A57A /* Foundation.framework */,
 				45AD10DD26EE99758E0D4670 /* OpenGLES.framework */,
