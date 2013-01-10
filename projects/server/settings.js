@@ -48,6 +48,7 @@ if (process.env.SETTINGS_DEVEL === 1 || process.env.SETTINGS_DEVEL === '1') {
 
     settings.dynamodb = {
         endpoint: 'dynamodb.us-west-1.amazonaws.com',
+        awsRegion: 'us-west-1',     // aws-sdk requires short-hand region name.
         accessKeyId: 'AKIAJWJEBZBGT6TPH32A',
         secretAccessKey: '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',
         tables: {
@@ -59,7 +60,8 @@ if (process.env.SETTINGS_DEVEL === 1 || process.env.SETTINGS_DEVEL === '1') {
     settings.accounts = {
         servicePort: 8083,
         xmppAccountServerSecret: 'dev.GoCast.SecretWU78zz',
-        xmppAccountServerBase: 'http://localhost:9090/plugins/userService/userservice?'
+        xmppAccountServerBase: 'http://localhost:9090/plugins/userService/userservice?',
+        dbActivationTable: 'dev_Activation'
     };
 
     settings.overseer = {
