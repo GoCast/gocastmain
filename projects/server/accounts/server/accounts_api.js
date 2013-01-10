@@ -40,8 +40,6 @@ var db = require('./accounts_db');
 
 function privateGenEmail(baseURL, email, actcode, bInAppReg) {
     var body;
-    console.log('privateGenEmail: Generating activation email [email = ' +
-                email + ', actcode = ' + actcode + ']');
 
     body = 'Welcome to the GoCast network.\n\n';
 
@@ -90,6 +88,19 @@ function privateCalcActivationCode(email) {
     return crypto.createHash('md5').update('GoCast' + email).digest('hex');
 }
 
+function privateMatchActivationCodes(longCode, longOrShortCode) {
+    if (longCode.length < 32) {
+        throw 'privateMatchActivationCodes: ERROR: Bad longCode: ' + longCode;
+    }
+
+    if (longCode.toUpperCase() === longOrShortCode.toUpperCase()
+        || longCode.slice(-6).toUpperCase() === longOrShortCode.toUpperCase()) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
 function apiNewAccount(baseURL, email, password, name, success, failure, bInAppReg) {
     // Check if account with this email exists
     xmpp.AccountAvailable(email, function() {
@@ -144,6 +155,14 @@ function apiNewAccount(baseURL, email, password, name, success, failure, bInAppR
     });
 }
 
+//
+// @brief Figure out if this email address and activation code are 'good'.
+//   This can happen a number of ways - some straight forward and others not so direct.
+//   1. Find the email account, then match the code (long or short) with it. GOOD. Enable account.
+//   2. Find the email account, then dont find the activation database entry - hmm...
+//      Calculate the activation from the email - if it matches, then let the user know this
+//      account has already been activated.
+//
 function apiValidateAccount(email, actcode, success, failure) {
     // Check if account with this email exists
     xmpp.AccountAvailable(email, function() {
@@ -155,26 +174,59 @@ function apiValidateAccount(email, actcode, success, failure) {
         db.GetEntryByAccountName(email, function(data) {
             if (data.Item) {
                 entry = data.Item;
-                if (true === privateMatchActivationCodes(entry.activationCode.S, actcode)) {
+                if (entry.validationCode && true === privateMatchActivationCodes(entry.validationCode.S, actcode)) {
                     // Correct activation code, so enable account
                     xmpp.EnableAccount(email, function() {
                         // Enable successful, delete db entry for email
-                        db.dbDeleteEntry(email);
-                        success();
+                        db.DeleteEntry(email, function() {
+                            success();
+                        }, function(err) {
+                            console.log('apiValidateAccount: WARNING - Could not delete validation entry for ' + email);
+                            success();
+                        });
                     }, failure);
                 } else {
                     // Incorrect activation code
                     failure('apiValidateAccount: Incorrect activation code for ' + email);
                 }
-            } else {
-                // No such entry, bad/expired code, delete xmpp account
-                xmpp.xmppDeleteAccount(email, function() {
-                    failure('apiValidateAccout: Bad/expired activation code for ' + email);
-                }, failure);
+            }
+            else {
+                // This is deemed an outright failure as we're in the success callback but dont have an 'Item'
+                failure('apiValidateAccount: Error: Did not find the validation entry for ' + email);
             }
         }, function(err) {
             // Failure of getting database entry for account.
-            failure('apiValidateAccout: Failed to get database entry for validation.');
+            // No such entry implies either an older code that has been retired
+            // or an activation code which was already used or
+            // it is a bad code altogether - return an error (dont delete the account that is a bad idea)
+            var tempCode = privateCalcActivationCode(email);
+
+            if (true === privateMatchActivationCodes(tempCode, actcode)) {
+                // Correct activation code, let use know this is an already used or expired activation code.
+                // We're going to go ahead and (re)-enable the account to err on the side of
+                // safety for the consumer here. If for some reason, we culled the activation codes
+                // but we didn't cull the corresponding xmpp accounts, we would have disabled accounts
+                // in the xmpp database without activation codes for them. This would make it impossible
+                // for a user to even re-register as their email address would already show as 'in use'
+                // and not available. The only other action would be to delete the account and we dont
+                // want to do that as this would allow anyone to remotely delete people's valid accounts
+                // simply by figuring out how to pass us a good short activation code for that email address.
+                //
+                // The only added confusion here would be if the account were in the disabled state
+                // and the user found the old activation email - and we had culled the activation out
+                // but left the xmpp user in...then they would be effectively activating without a
+                // real activation entry in the database. But that shouldn't happen anyway. So, we're
+                // just playing very conservatively here.
+                xmpp.EnableAccount(email, function() {
+                    failure('apiValidateAccount: Activation already used or expired.');
+                }, function() {
+                    // Possibly should decide to error differently here since enable failed?
+                    failure('apiValidateAccount: Activation already used or expired - and enable failed.');
+                });
+            } else {
+                // Incorrect activation code
+                failure('apiValidateAccount: Incorrect activation code for ' + email);
+            }
         });
     });
 }
@@ -194,11 +246,18 @@ function apiChangePassword(email, newpassword, success, failure) {
     xmpp.xmppChangePassword(email, newpassword, success, failure);
 }
 
-/* Manjesh -- This worked for me...No validation yet but got through this part.
+/* Manjesh -- These both work (separately of course)
 apiNewAccount('http://dev.gocast.it/baseURL.html', 'rwolff@gocast.it', 'rwolff', 'Bob Wolff', function() {
     console.log('TEST: SUCCESS');
 }, function(err) {
     console.log('TEST: FAILURE: ', err);
+});
+*/
+/*
+apiValidateAccount('rwolff@gocast.it', '85e25a1fea7b001911f791f13180f252', function() {
+    console.log('TEST-Validate: SUCCESS.');
+}, function(err) {
+    console.log('TEST-Validate: FAILED: ' + err);
 });
 */
 
