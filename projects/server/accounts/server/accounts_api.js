@@ -22,7 +22,9 @@ var evt = require('events');
 var eventManager = new evt.EventEmitter();
 var argv = process.argv;
 
-var mail = require('node-mailgun');
+var Mailgun = require('mailgun').Mailgun;
+var mg = new Mailgun(settings.accounts.mailgunKey);
+
 var crypto = require('crypto');
 var xmpp = require('./accounts_xmpp');
 var db = require('./accounts_db');
@@ -39,19 +41,42 @@ function privateMatchActivationCodes(actcode1, actcode2) {
 	return true;
 }
 
+function apiPrivateSendEmail(toName, toEmail, body, cbSuccess, cbFailure) {
+    mg.sendText('The GoCast Team <rwolff@gocast.it>', [toName + ' <' + toEmail + '>'],
+      'Please validate your new GoCast account',
+      body,
+      'rwolff@gocast.it', {},
+      function(err) {
+        if (err) {
+            console.log('Mail failed: ' + err);
+            cbFailure(err);
+        }
+        else {
+            console.log('Success');
+            cbSuccess();
+        }
+    });
+}
+
 function apiNewAccount(email, password, name, success, failure) {
 	// Check if account with this email exists
 	xmpp.xmppAccountAvailable(email, function() {
 		// Doesn't exist, so add account
 		xmpp.xmppAddAccount(email, password, name, function() {
 			// Added account, now generate activation code
-			var actcode = crypto.createHash('md5').update('GoCast' + email).digest('hex');
+			var actcode = crypto.createHash('md5').update('GoCast' + email).digest('hex'),
 			// Now, generate activation email
-			var actemail = privateGenEmail(email, actcode);
+			    actemail = privateGenEmail(email, actcode);
+
+            //Now, add pending-activation-db entry for this email
+            db.dbAddEntry(email, actcode);
 			//Now, send activation email
-			mail.send(actemail);
-			//Now, add pending-activation-db entry for this email
-			db.dbAddEntry(email, actcode);
+			apiPrivateSendEmail(name, email, actemail, function() {
+                console.log('Success. Hurray. Another user signed up!');
+            }, function(err) {
+                console.log('Email failed to send. Error: ' + err);
+                db.DeleteEntry(email);
+            });
 		}, failure);
 	}, function() {
 		failure('apiNewAccount: Failed');
@@ -81,7 +106,7 @@ function apiValidateAccount(email, actcode, success, failure) {
 		} else {
 			// No such entry, bad/expired code, delete xmpp account
 			xmpp.xmppDeleteAccount(email, function() {
-				failure('apiValidateAccout: Bad/expired activation code');				
+				failure('apiValidateAccout: Bad/expired activation code');
 			}, failure);
 		}
 	});
