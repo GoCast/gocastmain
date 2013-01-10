@@ -11,6 +11,7 @@ scp -r css/* $dest/css/
 scp deps/twitter-bootstrap/css/bootstrap.css $dest/css/
 scp deps/font-awesome/css/font-awesome.css $dest/css/
 scp -r deps/font-awesome/font/* $dest/css/font/
+scp -r ../../../xmpp-peerconnection/gcpsettings/style/fonts/gillsans/* $dest/css/font/
 
 # Copy images
 scp -r deps/twitter-bootstrap/img/* $dest/img/

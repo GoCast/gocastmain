@@ -9,88 +9,112 @@
         <link rel="stylesheet" type="text/css" href="css/logreg.css?GOCASTTIMESTAMP">
     </head>
     <body>
+        <div class="navbar navbar-fixed-top navbar-inverse">
+            <div class="navbar-inner">
+                <div class="container">
+                    <a class="brand" href="http://www.gocast.it" target="_blank"> gocast.it </a>
+                </div>
+            </div>
+        </div>
         <div class="container">
             <div class="row">
-                <div class="span6 offset3">
+                <div class="span4 offset4">
                     <form id="login-form" class="form-horizontal">
-                        <h3> Sign In </h3>
-                        <div class="control-group">
-                            <label class="control-label" for="input-email"> Email </label>
-                            <div class="controls">
-                                <input id="input-email" type="email" name="email" placeholder="name@example.com" required>
+                        <fieldset>
+                            <div class="control-group">
+                                <div class="controls">
+                                    <div class="input-prepend pull-right">
+                                        <span class="add-on">&nbsp;<i class="icon-envelope"></i>&nbsp;</span>
+                                        <input id="input-email" type="email" name="email" placeholder=" Email" required class="span4">
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="control-group">
-                            <label class="control-label" for="input-password"> Password </label>
-                            <div class="controls">
-                                <input id="input-password" type="password" name="password" required>
+                            <div class="control-group">
+                                <div class="controls">
+                                    <div class="input-prepend pull-right">
+                                        <span class="add-on">&nbsp;<i class="icon-key"></i>&nbsp;</span>
+                                        <input id="input-password" type="password" name="password" placeholder=" Password" required class="span4">
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="control-group">
-                            <button type="submit" class="btn btn-primary right"> Sign In </button>
-                            <button type="button" class="btn btn-link left" targetform="register-form"> Sign Up </button>
-                        </div>
-                        <div class="alert alert-error">
-            	           <i class="icon-warning-sign"></i><span style="float: right;"></span>
-                        </div>
-                        <div class="alert alert-success">
-            	           <i class="icon-ok-sign"></i><span style="float: right;"></span>
-                        </div>
+                            <div class="alert alert-error">
+                               <i class="icon-warning-sign"></i><span style="float: right;"></span>
+                            </div>
+                            <div class="alert alert-success">
+                               <i class="icon-ok-sign"></i><span style="float: right;"></span>
+                            </div>
+                            <div class="control-group">
+                                <button type="submit" class="btn btn-primary pull-right"> Login </button>
+                                <button type="button" class="btn btn-link pull-right" targetform="register-form"> Register </button>
+                            </div>
+                        </fieldset>
                     </form>
                     <form id="register-form" class="form-horizontal" action="/acct/register/" method="post">
-                        <h3> Sign Up </h3>
-                        <div class="control-group">
-                            <label class="control-label" for="input-name"> Name </label>
-                            <div class="controls">
-                                <input id="input-name" type="text" name="name" placeholder="Ex: John Doe" required>
+                        <fieldset>
+                            <div class="control-group">
+                                <div class="controls">
+                                    <div class="input-prepend pull-right">
+                                        <span class="add-on">&nbsp;<i class="icon-user"></i>&nbsp;</span>
+                                        <input id="input-name" type="text" name="name" placeholder=" Name" required class="span4">
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="control-group">
-                            <label class="control-label" for="input-email"> Email </label>
-                            <div class="controls">
-                                <input id="input-email" type="email" name="email" placeholder="name@example.com" required>
+                            <div class="control-group">
+                                <div class="controls">
+                                    <div class="input-prepend pull-right">
+                                        <span class="add-on">&nbsp;<i class="icon-envelope"></i>&nbsp;</span>
+                                        <input id="input-email" type="email" name="email" placeholder=" Email" required class="span4">
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="control-group">
-                            <label class="control-label" for="input-password"> Password </label>
-                            <div class="controls">
-                                <input id="input-password" type="password" name="password" required>
+                            <div class="control-group">
+                                <div class="controls">
+                                    <div class="input-prepend pull-right">
+                                        <span class="add-on">&nbsp;<i class="icon-key"></i>&nbsp;</span>
+                                        <input id="input-password" type="password" name="password" placeholder=" Password" required class="span4">
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="control-group">
-                            <label class="control-label" for="input-confirm-password"> Confirm Password </label>
-                            <div class="controls">
-                                <input id="input-confirm-password" type="password" name="confirm_password" required>
+                            <div class="control-group">
+                                <div class="controls">
+                                    <div class="input-prepend pull-right">
+                                        <span class="add-on">&nbsp;<i class="icon-key"></i>&nbsp;</span>
+                                        <input id="input-confirm-password" type="password" name="confirm_password" placeholder=" Confirm password" required class="span4">
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="control-group">
-                            <button type="submit" class="btn btn-primary right"> Sign Up </button>
-                            <button type="button" class="btn btn-link left" targetform="login-form"> Sign In </button>
-                        </div>
-                        <div class="alert alert-error">
-            	           <i class="icon-warning-sign"></i><span style="float: right;"></span>
-                        </div>
-                        <div class="alert alert-success">
-            	           <i class="icon-ok-sign"></i><span style="float: right;"></span>
-                        </div>
+                            <div class="alert alert-error">
+                               <i class="icon-warning-sign"></i><span style="float: right;"></span>
+                            </div>
+                            <div class="alert alert-success">
+                               <i class="icon-ok-sign"></i><span style="float: right;"></span>
+                            </div>
+                            <div class="control-group">
+                                <button type="submit" class="btn btn-primary pull-right"> Register </button>
+                                <button type="button" class="btn btn-link pull-right" targetform="login-form"> Login </button>
+                            </div>
+                        </fieldset>
                     </form>
                     <form id="activate-form" class="form-horizontal" action="/acct/activate/" method="post">
-                        <h3> Activate </h3>
-                        <div class="control-group">
-                            <label class="control-label" for="input-activation-code"> Activation Code </label>
-                            <div class="controls">
-                                <input id="input-activation-code" type="text" name="activation_code" required>
+                        <fieldset>
+                            <div class="control-group">
+                                <div class="controls">
+                                    <div class="input-prepend pull-right">
+                                        <span class="add-on">&nbsp;<i class="icon-cogs"></i>&nbsp;</span>
+                                        <input id="input-activation-code" type="text" name="activation_code" placeholder=" Activation code" required class="span4">
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="control-group">
-                            <button type="submit" class="btn btn-primary right"> Activate </button>
-                        </div>
-                        <div class="alert alert-error">
-            	           <i class="icon-warning-sign"></i><span style="float: right;"></span>
-                        </div>
-                        <div class="alert alert-success">
-            	           <i class="icon-ok-sign"></i><span style="float: right;"></span>
-                        </div>
+                            <div class="alert alert-error">
+                               <i class="icon-warning-sign"></i><span style="float: right;"></span>
+                            </div>
+                            <div class="alert alert-success">
+                               <i class="icon-ok-sign"></i><span style="float: right;"></span>
+                            </div>
+                            <div class="control-group">
+                                <button type="submit" class="btn btn-primary pull-right"> Activate </button>
+                            </div>
+                        </fieldset>
                     </form>
                 </div>
             </div>

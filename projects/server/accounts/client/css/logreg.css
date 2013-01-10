@@ -1,30 +1,57 @@
-body > .container > .row > .span6 > form {
+@font-face {
+    font-family: 'GillSans';
+    src: url('font/gillsans.eot');
+    src: url('font/gillsans.eot#iefix') format('embedded-opentype'),
+         url('font/gillsans.woff') format('woff'),
+         url('font/gillsans.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+html {
+    height: 100%;
+}
+
+body {
+    background-repeat: no-repeat;
+    background: #e9f6fd;
+    background: -moz-radial-gradient(center, ellipse cover,  #e9f6fd 0%, #d3eefb 100%);
+    background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%,#e9f6fd), color-stop(100%,#d3eefb));
+    background: -webkit-radial-gradient(center, ellipse cover,  #e9f6fd 0%,#d3eefb 100%);
+    background: -o-radial-gradient(center, ellipse cover,  #e9f6fd 0%,#d3eefb 100%);
+    background: -ms-radial-gradient(center, ellipse cover,  #e9f6fd 0%,#d3eefb 100%);
+    background: radial-gradient(ellipse at center,  #e9f6fd 0%,#d3eefb 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#e9f6fd', endColorstr='#d3eefb',GradientType=1 );
+}
+
+body > .navbar .brand {
+    font-family: 'GillSans';
+    font-size: 1.75em;
+    color: lightgreen;
+    letter-spacing: 3px;
+}
+
+body > .container > .row > .span4 > form {
     display: none;
-    margin-top: 200px;
-    padding-left: 10px;
-    padding-right: 10px;
-    border-radius: 3px;
-    border: 1px lightgrey solid;
+    margin-top: 150px;
 }
 
-body > .container > .row > .span6 > form.show {
-    display: block;
-}
-
-body > .container > .row > .span6 > form .btn.right {
-    float: right;
+body > .container > .row > .span4 > form .btn {
     margin-left: 5px;
 }
 
-body > .container > .row > .span6 > form .btn.left {
-    float: left;
-    margin-right: 5px;
+body > .container > .row > .span4 > form .controls {
+    margin-left: 0px;
 }
 
-body > .container > .row > .span6 > form .alert {
+body > .container > .row > .span4 > form.show {
+    display: block;
+}
+
+body > .container > .row > .span4 > form .alert {
     display: none;
 }
 
-body > .container > .row > .span6 > form .alert.show {
+body > .container > .row > .span4 > form .alert.show {
     display: block;
 }

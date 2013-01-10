@@ -10,6 +10,7 @@ var LogregView = {
     displayform: function(id) {
         for (i in this.$forms) {
             this.$forms[i].removeClass('show');
+            $('.alert', this.$forms[i]).removeClass('show');
         }
         this.$forms[id].addClass('show');
     },
@@ -44,7 +45,7 @@ var LogregApp = {
                 return function(response) {
                     if ('success' === response.result) {
                         LogregView.displayform('activate-form');
-                        LogregView.displayalert('activate-form', 'success', 'Account created and activation email sent to ' + response.email);
+                        LogregView.displayalert('activate-form', 'success', 'Activation email sent.');
                     }
                 };
             },
@@ -75,17 +76,26 @@ var LogregApp = {
         }
     },
     init: function() {
-        var urlvars = this.urlvars();
+        var urlvars = this.urlvars(),
+            self = this;
 
         for (var i=0; i<document.forms.length; i++) {
             var options = {
                 dataType: 'json',
+                resetForm: true,
                 success: this.formSubmitResultCallbacks[document.forms[i].id].success(),
                 error: this.formSubmitResultCallbacks[document.forms[i].id].failure()        
             };
 
             if ('register-form' === document.forms[i].id) {
                 options.data = {baseurl: urlvars.baseurl};
+                options.beforeSubmit = function(arr, $form, options) {
+                    if ($('#input-password', $form).val() !==
+                        $('#input-confirm-password', $form).val()) {
+                        LogregView.displayalert('register-form', 'error', 'Password fields don\'t match.');
+                        return false;
+                    }
+                };
             }
             this.$forms[document.forms[i].id] = $(document.forms[i]);
             this.$forms[document.forms[i].id].ajaxForm(options);
