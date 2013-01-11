@@ -42,11 +42,14 @@ function privateGenEmail(baseURL, email, name, actcode, bInAppReg) {
     var body;
 
     if (name && name !== '') {
-        body = 'Welcome, ' + name + ', to the GoCast network.\n\n';
+        body = 'Welcome, ' + name + ',';
     }
     else {
-        body = 'Welcome to the GoCast network.\n\n';
+        body = 'Welcome';
     }
+
+    body += ' to GoCast. In order to complete your registration, ' +
+            'we need your help in activating your new account.\n\n';
 
     // If we registered from inside the GoCast ... the message is a little different.
     if (bInAppReg) {
@@ -56,15 +59,19 @@ function privateGenEmail(baseURL, email, name, actcode, bInAppReg) {
         body += 'Please activate your new account by going back to the GoCast registration web page and entering the activation code found below.';
     }
 
-    body += '\n\nAlternatively, you can click on the link below.';
+    body += ' Alternatively, you can click on the link below.';
 
-    body += 'Your activation code is: ' + actcode.slice(-6).toUpperCase();
-    body += '\n\nOr your activation link is: ' + baseURL + 
+    body += '\n\nYour activation code is: ' + actcode.slice(-6).toUpperCase();
+    body += '\n\nYour activation link is: ' + baseURL + 
             '?defaultaction=activate&code=' + actcode.toUpperCase() +
             '&email=' + email.toLowerCase();
 
     body += '\n\n';
     body += 'Thanks for signing up with GoCast - we hope you enjoy the service.\n\n';
+
+    body += 'If you have changed your mind, you can unsubscribe below at any time.\n';
+
+    body += 'Thanks!\nThe GoCast Team.\n';
 
     return body;
 }
