@@ -38,10 +38,15 @@ var db = require('./accounts_db');
 
 'use strict';
 
-function privateGenEmail(baseURL, email, actcode, bInAppReg) {
+function privateGenEmail(baseURL, email, name, actcode, bInAppReg) {
     var body;
 
-    body = 'Welcome to the GoCast network.\n\n';
+    if (name && name !== '') {
+        body = 'Welcome, ' + name + ', to the GoCast network.\n\n';
+    }
+    else {
+        body = 'Welcome to the GoCast network.\n\n';
+    }
 
     // If we registered from inside the GoCast ... the message is a little different.
     if (bInAppReg) {
@@ -114,7 +119,7 @@ function apiNewAccount(baseURL, email, password, name, success, failure, bInAppR
                 emailBody;
 
             // Now, generate activation email
-            emailBody = privateGenEmail(baseURL, email, actcode, bInAppReg);
+            emailBody = privateGenEmail(baseURL, email, name, actcode, bInAppReg);
 
             //Now, add pending-activation-db entry for this email
             db.AddEntry(email, actcode, function() {
