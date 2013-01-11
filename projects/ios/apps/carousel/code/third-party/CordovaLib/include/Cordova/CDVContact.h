@@ -30,7 +30,7 @@ enum CDVContactError {
     NOT_SUPPORTED_ERROR = 5,
     PERMISSION_DENIED_ERROR = 20
 };
-typedef NSUInteger CDVContactError;
+//typedef NSUInteger CDVContactError;
 
 @interface CDVContact : NSObject {
     ABRecordRef record;         // the ABRecord associated with this contact

@@ -34,13 +34,13 @@ enum CDVFileError {
     TYPE_MISMATCH_ERR = 11,
     PATH_EXISTS_ERR = 12
 };
-typedef int CDVFileError;
+//typedef int CDVFileError;
 
 enum CDVFileSystemType {
     TEMPORARY = 0,
     PERSISTENT = 1
 };
-typedef int CDVFileSystemType;
+//typedef int CDVFileSystemType;
 
 @interface CDVFile : CDVPlugin {
     NSString* appDocsPath;

@@ -27,14 +27,14 @@ enum CDVHeadingStatus {
     HEADINGRUNNING,
     HEADINGERROR
 };
-typedef NSUInteger CDVHeadingStatus;
+//typedef NSUInteger CDVHeadingStatus;
 
 enum CDVLocationStatus {
     PERMISSIONDENIED = 1,
     POSITIONUNAVAILABLE,
     TIMEOUT
 };
-typedef NSUInteger CDVLocationStatus;
+//typedef NSUInteger CDVLocationStatus;
 
 // simple object to keep track of heading information
 @interface CDVHeadingData : NSObject {}

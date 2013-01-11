@@ -26,13 +26,13 @@ enum CDVFileTransferError {
     CONNECTION_ERR = 3,
     CONNECTION_ABORTED = 4
 };
-typedef int CDVFileTransferError;
+//typedef int CDVFileTransferError;
 
 enum CDVFileTransferDirection {
     CDV_TRANSFER_UPLOAD = 1,
     CDV_TRANSFER_DOWNLOAD = 2,
 };
-typedef int CDVFileTransferDirection;
+//typedef int CDVFileTransferDirection;
 
 // Magic value within the options dict used to set a cookie.
 extern NSString* const kOptionsKeyCookie;

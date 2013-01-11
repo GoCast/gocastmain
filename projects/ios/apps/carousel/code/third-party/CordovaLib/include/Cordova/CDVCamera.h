@@ -24,20 +24,20 @@ enum CDVDestinationType {
     DestinationTypeDataUrl = 0,
     DestinationTypeFileUri
 };
-typedef NSUInteger CDVDestinationType;
+//typedef NSUInteger CDVDestinationType;
 
 enum CDVEncodingType {
     EncodingTypeJPEG = 0,
     EncodingTypePNG
 };
-typedef NSUInteger CDVEncodingType;
+//typedef NSUInteger CDVEncodingType;
 
 enum CDVMediaType {
     MediaTypePicture = 0,
     MediaTypeVideo,
     MediaTypeAll
 };
-typedef NSUInteger CDVMediaType;
+//typedef NSUInteger CDVMediaType;
 
 @interface CDVCameraPicker : UIImagePickerController
 {}

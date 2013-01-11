@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		00D21BE2169E012D00D4C8A9 /* libCordova.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00D21BD4169E00FA00D4C8A9 /* libCordova.a */; };
+		005089EE16A052D5005C1105 /* libCordova.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 005089ED16A052D5005C1105 /* libCordova.a */; };
 		00D21BEA169E01FB00D4C8A9 /* GCIWhiteboard.mm in Sources */ = {isa = PBXBuildFile; fileRef = 00D21BE9169E01FB00D4C8A9 /* GCIWhiteboard.mm */; };
 		00D21C12169E027500D4C8A9 /* www in Resources */ = {isa = PBXBuildFile; fileRef = 00D21C11169E027500D4C8A9 /* www */; };
 		00D21C14169E02C100D4C8A9 /* Cordova.plist in Resources */ = {isa = PBXBuildFile; fileRef = 00D21C13169E02C100D4C8A9 /* Cordova.plist */; };
@@ -46,25 +46,8 @@
 		F3EB3ADBB7DF397BD4C8E424 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 9C18CE4BB4E9C8DF93918E29 /* InfoPlist.strings */; };
 /* End PBXBuildFile section */
 
-/* Begin PBXContainerItemProxy section */
-		00D21BD3169E00FA00D4C8A9 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 00D21BCF169E00FA00D4C8A9 /* CordovaLib.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 68A32D7114102E1C006B237C;
-			remoteInfo = CordovaLib;
-		};
-		00D21BE0169E012600D4C8A9 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 00D21BCF169E00FA00D4C8A9 /* CordovaLib.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = D2AAC07D0554694100DB518D;
-			remoteInfo = CordovaLib;
-		};
-/* End PBXContainerItemProxy section */
-
 /* Begin PBXFileReference section */
-		00D21BCF169E00FA00D4C8A9 /* CordovaLib.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = CordovaLib.xcodeproj; path = ../ios/HelloWorld/CordovaLib/CordovaLib.xcodeproj; sourceTree = "<group>"; };
+		005089ED16A052D5005C1105 /* libCordova.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libCordova.a; path = "../../third-party/CordovaLib/lib/simulator/debug/libCordova.a"; sourceTree = "<group>"; };
 		00D21BE8169E01FB00D4C8A9 /* GCIWhiteboard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GCIWhiteboard.h; sourceTree = "<group>"; };
 		00D21BE9169E01FB00D4C8A9 /* GCIWhiteboard.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = GCIWhiteboard.mm; sourceTree = "<group>"; };
 		00D21C11169E027500D4C8A9 /* www */ = {isa = PBXFileReference; lastKnownFileType = folder; name = www; path = ../ios/HelloWorld/www; sourceTree = "<group>"; };
@@ -134,6 +117,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				005089EE16A052D5005C1105 /* libCordova.a in Frameworks */,
 				00D21C2C169EDF2400D4C8A9 /* CoreMedia.framework in Frameworks */,
 				00D21C2A169EDF1D00D4C8A9 /* MobileCoreServices.framework in Frameworks */,
 				00D21C28169EDF1700D4C8A9 /* SystemConfiguration.framework in Frameworks */,
@@ -142,7 +126,6 @@
 				00D21C22169EDEFF00D4C8A9 /* CFNetwork.framework in Frameworks */,
 				00D21C20169EDEF700D4C8A9 /* AVFoundation.framework in Frameworks */,
 				00D21C1E169EDEEE00D4C8A9 /* AudioToolbox.framework in Frameworks */,
-				00D21BE2169E012D00D4C8A9 /* libCordova.a in Frameworks */,
 				1DC8577FE9838110C3DA9C1C /* Foundation.framework in Frameworks */,
 				C38C4781C320E00F08332173 /* UIKit.framework in Frameworks */,
 				8996E76B95CE776DBBDAE65F /* CoreGraphics.framework in Frameworks */,
@@ -156,20 +139,12 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		00D21BD0169E00FA00D4C8A9 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				00D21BD4169E00FA00D4C8A9 /* libCordova.a */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
 		0456162378FBD0D1E5D4D6A8 = {
 			isa = PBXGroup;
 			children = (
+				005089ED16A052D5005C1105 /* libCordova.a */,
 				00D21C13169E02C100D4C8A9 /* Cordova.plist */,
 				00D21C11169E027500D4C8A9 /* www */,
-				00D21BCF169E00FA00D4C8A9 /* CordovaLib.xcodeproj */,
 				458C9696B73F60EDF7061631 /* Source */,
 				931B4715EBA5EF8D14751C6E /* Frameworks */,
 				9E8C6BA8EAF2B93AB6CCEE95 /* Products */,
@@ -368,7 +343,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				00D21BE1169E012600D4C8A9 /* PBXTargetDependency */,
 			);
 			name = Whiteboard;
 			productName = Whiteboard;
@@ -392,28 +366,12 @@
 			);
 			mainGroup = 0456162378FBD0D1E5D4D6A8;
 			projectDirPath = ../common;
-			projectReferences = (
-				{
-					ProductGroup = 00D21BD0169E00FA00D4C8A9 /* Products */;
-					ProjectRef = 00D21BCF169E00FA00D4C8A9 /* CordovaLib.xcodeproj */;
-				},
-			);
 			projectRoot = "";
 			targets = (
 				63B60E9CAA0F1218D90A5858 /* Whiteboard */,
 			);
 		};
 /* End PBXProject section */
-
-/* Begin PBXReferenceProxy section */
-		00D21BD4169E00FA00D4C8A9 /* libCordova.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libCordova.a;
-			remoteRef = 00D21BD3169E00FA00D4C8A9 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		E9F6981539C4D066BE77E917 /* Resources */ = {
@@ -455,14 +413,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		00D21BE1169E012600D4C8A9 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = CordovaLib;
-			targetProxy = 00D21BE0169E012600D4C8A9 /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		00D21C15169ED7E800D4C8A9 /* MainViewController.xib */ = {
@@ -540,15 +490,15 @@
 				HEADER_SEARCH_PATHS = (
 					../../source,
 					../../source/Bootstrap/ios,
-					"\"/Volumes/GoCastIt/gocastmain/projects/ios/apps/carousel/code/project/ios/HelloWorld/CordovaLib/build/usr/local/lib/include\"",
-					"\"$(OBJROOT)/UninstalledProducts/include\"",
-					"\"$(BUILT_PRODUCTS_DIR)\"",
-					"/Volumes/GoCastIt/gocastmain/projects/ios/apps/carousel/code/project/ios/HelloWorld/CordovaLib/build/Debug-iphonesimulator/include",
+					"../../third-party/CordovaLib/include",
 				);
 				INFOPLIST_FILE = ../../rsrc/ios/Whiteboard.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				LD_NO_PIE = NO;
-				LIBRARY_SEARCH_PATHS = "$(SDKROOT)/System/Library/Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(SDKROOT)/System/Library/Frameworks",
+					"\"$(SRCROOT)/../../third-party/CordovaLib/lib/simulator/debug\"",
+				);
 				LLVM_LTO = NO;
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				ONLY_ACTIVE_ARCH = YES;
@@ -676,7 +626,10 @@
 				INFOPLIST_FILE = ../../rsrc/ios/Whiteboard.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				LD_NO_PIE = YES;
-				LIBRARY_SEARCH_PATHS = "$(SDKROOT)/System/Library/Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(SDKROOT)/System/Library/Frameworks",
+					"\"$(SRCROOT)/../../third-party/CordovaLib/lib/simulator/debug\"",
+				);
 				LLVM_LTO = NO;
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				ONLY_ACTIVE_ARCH = NO;

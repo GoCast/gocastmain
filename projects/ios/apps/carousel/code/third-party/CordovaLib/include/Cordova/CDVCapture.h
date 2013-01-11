@@ -30,7 +30,7 @@ enum CDVCaptureError {
     CAPTURE_NO_MEDIA_FILES = 3,
     CAPTURE_NOT_SUPPORTED = 20
 };
-typedef NSUInteger CDVCaptureError;
+//typedef NSUInteger CDVCaptureError;
 
 @interface CDVImagePicker : UIImagePickerController
 {
