@@ -14,6 +14,9 @@
 						'../../source/Testbed/Whiteboard/Whiteboard.cpp',
 						'../../source/Testbed/Whiteboard/Whiteboard.h',
 
+						'../../source/Testbed/Whiteboard/GCIWhiteboard.mm',
+						'../../source/Testbed/Whiteboard/GCIWhiteboard.h',
+
 						'../../source/Base/package.h',
 						'../../source/Base/tObserver.h',
 						'../../source/Base/tSingleton.h',
@@ -43,9 +46,15 @@
 
 					],	# sources
 
+					'include_dirs': [
+						'../../third-party/CordovaLib/include',
+					], # include_dirs
+
 					'mac_bundle_resources': [
 						'../../rsrc/<@(OS)/spritesheet.frag',
 						'../../rsrc/<@(OS)/spritesheet.vert',
+						'../../rsrc/<@(OS)/Cordova.plist',
+						'../../rsrc/www',
 					],	# mac_bundle_resources
 
 					'xcode_settings': {
@@ -70,16 +79,28 @@
 	
 							'mac_bundle_resources': [
 								'../../rsrc/<@(OS)/en.lproj/InfoPlist.strings',
-								'../../rsrc/<@(OS)/en.lproj/MainWindow.xib',
+								'../../rsrc/<@(OS)/en.lproj/MainViewController.xib',
 							],	# mac_bundle_resources
 	
 							'link_settings': {
 								'libraries': [
+									'../../third-party/CordovaLib/lib/simulator/debug/libCordova.a',
 									'$(SDKROOT)/System/Library/Frameworks/UIKit.framework',
 									'$(SDKROOT)/System/Library/Frameworks/Foundation.framework',
 									'$(SDKROOT)/System/Library/Frameworks/CoreGraphics.framework',
 									'$(SDKROOT)/System/Library/Frameworks/QuartzCore.framework',
 									'$(SDKROOT)/System/Library/Frameworks/OpenGLES.framework',
+
+									'$(SDKROOT)/System/Library/Frameworks/AddressBook.framework',
+									'$(SDKROOT)/System/Library/Frameworks/AddressBookUI.framework',
+									'$(SDKROOT)/System/Library/Frameworks/AudioToolbox.framework',
+									'$(SDKROOT)/System/Library/Frameworks/AVFoundation.framework',
+									'$(SDKROOT)/System/Library/Frameworks/CFNetwork.framework',
+									'$(SDKROOT)/System/Library/Frameworks/CoreLocation.framework',
+									'$(SDKROOT)/System/Library/Frameworks/MediaPlayer.framework',
+									'$(SDKROOT)/System/Library/Frameworks/SystemConfiguration.framework',
+									'$(SDKROOT)/System/Library/Frameworks/MobileCoreServices.framework',
+									'$(SDKROOT)/System/Library/Frameworks/CoreMedia.framework',
 								],	# libraries
 							},	# link_settings
 						}],  # OS=="ios"

@@ -92,6 +92,16 @@
 			'GCC_WARN_UNUSED_LABEL': 'YES',
 			'GCC_WARN_UNUSED_PARAMETER': 'YES',
 
+			'OTHER_LDFLAGS': [
+				'-weak_framework CoreFoundation',
+				'-weak_framework UIKit',
+				'-weak_framework AVFoundation',
+				'-weak_framework CoreMedia',
+				'-weak-lSystem',
+				'-all_load',
+				'-Obj-C',
+			],
+
 			'WARNING_CFLAGS': [
 				'-Wall',
 				'-Werror',
