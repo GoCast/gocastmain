@@ -227,7 +227,8 @@ function apiValidateAccount(email, actcode, success, failure) {
                 // real activation entry in the database. But that shouldn't happen anyway. So, we're
                 // just playing very conservatively here.
                 xmpp.EnableAccount(email, function() {
-                    failure('apiValidateAccount: Activation already used or expired.');
+                    console.log('Hurray! Activation complete for ' + email);
+                    success('apiValidateAccount: Activation already used or expired but we are calling it activated again.');
                 }, function() {
                     // Possibly should decide to error differently here since enable failed?
                     failure('apiValidateAccount: Activation already used or expired - and enable failed.');
