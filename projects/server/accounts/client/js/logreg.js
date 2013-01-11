@@ -25,7 +25,10 @@ var LogregView = {
         }
     },
     displayalert: function(formid, type, message) {
-        var $alert = $('.alert-' + type, this.$forms[formid]).addClass('show');
+        var $alert = null;
+
+        $('.alert', this.$forms[formid]).removeClass('show');
+        $alert = $('.alert-' + type, this.$forms[formid]).addClass('show');
         $('p', $alert).html(message);
     },
     changeformCallback: function() {
@@ -49,9 +52,9 @@ var LogregApp = {
                                                 'An activation email has been sent to the address you just provided. ' +
                                                 'Follow the instructions in the email to activate your account.');
                     } else if ('inuse' === response.result) {
-                        LogregView.displayalert('register-form', 'error', 'An account for the email address you\'ve provided' +
+                        LogregView.displayalert('register-form', 'error', 'An account for the email address you\'ve provided ' +
                                                 'already exists. Choose a different email address.');
-                        $('#input-email', $LogregApp.$forms['register-form']).focus();
+                        $('#input-email', LogregApp.$forms['register-form']).focus();
                     } else {
                         LogregView.displayalert('register-form', 'error', 'There was a problem signing up for your new account.');
                     }
@@ -71,7 +74,7 @@ var LogregApp = {
                         LogregView.displayalert('login-form', 'success', 'Your account has been activated. ' +
                                                 'Now, you can login with your new account.');
                     } else if ('incorrect' === response.result) {
-                        LogregView.displayalert('activate-form', 'error', 'The activation code you\'ve provided is wrong.' +
+                        LogregView.displayalert('activate-form', 'error', 'The activation code you\'ve provided is wrong. ' +
                                                 'Please provide the correct activation code.');
                         $('#input-activation-code', $LogregApp.$forms['activate-form']).val('').focus();
                     } else if ('noaccount' === response.result) {
@@ -79,7 +82,7 @@ var LogregApp = {
                                                 'There is no account for the email address you\'ve provided.');
                         $('#input-email', $LogregApp.$forms['activate-form']).focus();
                     } else if ('usedorexpired' === response.result) {
-                        LogregView.displayalert('activate-form', 'error', 'The activation code you\'ve has expired ' +
+                        LogregView.displayalert('activate-form', 'error', 'The activation code you\'ve provided has expired ' +
                                                 'or has already been used to activate your account.');
                         $('#input-email', $LogregApp.$forms['activate-form']).focus();
                     } else {
