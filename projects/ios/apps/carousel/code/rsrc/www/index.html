@@ -1,31 +1,217 @@
-<!DOCTYPE html>
-<!--
-    Licensed to the Apache Software Foundation (ASF) under one
-    or more contributor license agreements.  See the NOTICE file
-    distributed with this work for additional information
-    regarding copyright ownership.  The ASF licenses this file
-    to you under the Apache License, Version 2.0 (the
-    "License"); you may not use this file except in compliance
-    with the License.  You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing,
-    software distributed under the License is distributed on an
-    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-     KIND, either express or implied.  See the License for the
-    specific language governing permissions and limitations
-    under the License.
--->
 <html>
     <head>
+        <title>test-rwolff</title>
+
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="format-detection" content="telephone=no" />
         <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
         <link rel="stylesheet" type="text/css" href="css/index.css" />
-        <title>Hello World</title>
+        <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.0/themes/cupertino/jquery-ui.css" />
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.js"></script>
+        <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/jquery-ui.js"></script>
+        <script src="http://dev.gocast.it/scripts/jquery.base64.min.js"></script>
+        <script src="http://dev.gocast.it/scripts/strophe.js"></script>
+        <script src="http://dev.gocast.it/scripts/strophe.muc.js"></script>
+        <script src="js/ibb.js"></script>
+        <script src="js/callcast.js"></script>
+        <script type="text/javascript" src="cordova-2.2.0.js"></script>
+        <script type="text/javascript" src="js/index.js"></script>
     </head>
-    <body>
+    <body bgcolor=#cccccc>
+
+        Login
+
+        <script>
+            var app1 = {
+                /* 1: debug, 2: info, 3: warning, 4: error, 5: fatal. */
+
+                log: function(logLevel, logMsg)
+                {
+                    var labels = ['', 'DEBUG', 'INFO', 'WARNING', 'ERROR', 'FATAL'],
+                    now = new Date(),
+                    logText = now.toTimeString().split(' ')[0] + ' ' + labels[logLevel] + ' ' + logMsg,
+                    msg;
+                    if (window.console)
+                    {
+                        console[['', 'log', 'info', 'warn', 'error', 'error'][logLevel]](logText);
+                    }
+
+                    /* For fatal errors pop-up an alert */
+
+                    if (logLevel >= 5)
+                    {
+                        msg = 'FATAL ERROR\n\n' + logMsg;
+                        alert(msg);
+                    }
+
+                    if ('undefined' !== typeof(Callcast) &&
+                        'undefined' !== typeof(Callcast.log)) {
+                        Callcast.log(' ' + labels[logLevel] + ': ' + logMsg);
+                    }
+                }, /* app1.log() */
+
+                nickInUse: function(nick)
+                {
+                    log(2, "Nick in use.");
+                },
+
+            }; /* app1 */
+
+            function onConnectionStatus(statusStr)
+            {
+                console.log("onConnectionStatus(" + statusStr + ")");
+
+                if (statusStr.toLowerCase() === 'connected' || statusStr.toLowerCase() === 're-attached')
+                {
+                    Callcast.SetNickname('iotest-client');
+
+                    Callcast.CreateUnlistedAndJoin('iostest', function(new_name) {
+                                                   console.log('Joined room successfully. Next?');
+                                                   }, function() {
+                                                   alert('failed to join room.');
+                                                   });
+                }
+
+            }
+
+            function onNicknameInUse(nick)
+            {
+                console.log("onNicknameInUse(" + nick + ")");
+                app1.nickInUse(nick);
+            }
+
+            function assignSpotForParticipant(nick)
+            {
+                console.log("assignSpotForParticipant(" + nick + ")");
+            }
+
+            function unassignSpotForParticipant(nick)
+            {
+                console.log("unassignSpotForParticipant(" + nick + ")");
+            }
+
+            function doSpot(info)
+            {
+                var cmds, numstrokes, stroke;
+
+                if (info.spottype === 'whiteBoard')
+                {
+                    if (info.image)
+                    {
+                        console.log('Image Given. Must create canvas/image as starting point.');
+                    }
+
+                    if (info.strokes)
+                    {
+                        cmds = JSON.parse(info.strokes);
+
+                        numstrokes = cmds.strokes.length;
+                        if (numstrokes) {
+                            console.log(numstrokes + ' strokes to apply:', cmds.strokes);
+                        }
+                    }
+
+                    if (info.stroke)
+                    {
+                        var i, cmd;
+
+                        stroke = JSON.parse(info.stroke);
+
+                        for (i = 0; i < stroke.length; i += 1)
+                        {
+                            switch (stroke[i].name)
+                            {
+                                case "save":
+//                                    this.wbCtx.save();
+//                                    this.settings.applyJson(cmdArray[i].settings, this.wbCtx);
+                                    cordova.exec(function(winParam) {}, function(error) {}, "GCIWhiteboard",
+                                                 "save", [ "" ]);
+                                break;
+                                case "restore":
+                                    cordova.exec(function(winParam) {}, function(error) {}, "GCIWhiteboard",
+                                                 "restore", [ "" ]);
+                                break;
+                                case "beginPath":
+                                    cordova.exec(function(winParam) {}, function(error) {}, "GCIWhiteboard",
+                                                 "beginPath", [ "" ]);
+                                break;
+                                case "closePath":
+                                    cordova.exec(function(winParam) {}, function(error) {}, "GCIWhiteboard",
+                                                 "closePath", [ "" ]);
+                                break;
+                                case "moveTo":
+                                    cordova.exec(function(winParam) {}, function(error) {}, "GCIWhiteboard",
+                                                 "moveTo", [ stroke[i].x.toString(), stroke[i].y.toString() ]);
+                                break;
+                                case "lineTo":
+                                    cordova.exec(function(winParam) {}, function(error) {}, "GCIWhiteboard",
+                                                 "lineTo", [ stroke[i].x.toString(), stroke[i].y.toString() ]);
+                                break;
+                                case "stroke":
+                                    cordova.exec(function(winParam) {}, function(error) {}, "GCIWhiteboard",
+                                                 "stroke", [ "" ]);
+                                break;
+                                default:
+                                    throw "WhiteBoard.doCommand unknown cmd " + cmdArray[i].name;
+                            }
+                        }
+
+//                        document.writeln('Single stroke to apply:', stroke, '<BR>');
+                        console.log('Single stroke to apply:', stroke);
+                    }
+                }
+            }
+
+            function onAddSpot(data)
+            {
+                console.log("onAddSpot ", data);
+                if (data.spottype === 'whiteBoard') {
+                    doSpot(data);
+                }
+            }
+
+            function onSetSpot(data)
+            {
+                console.log("onSetSpot ", data);
+                if (data.spottype === 'whiteBoard') {
+                    doSpot(data);
+                }
+            }
+
+            function onRemoveSpot(data)
+            {
+                console.log("onRemoveSpot ", data);
+            }
+
+            function startApp1()
+            {
+                  $(window).bind('beforeunload', function() {
+                                 console.log('On before unload.');
+                                 Callcast.LeaveSession();
+                                 });
+
+                  Callcast.InitOverride({ CALLCAST_XMPPSERVER: 'dev.gocast.it',
+                                        CALLCAST_ROOMS: 'conference.dev.gocast.it',
+                                        AT_CALLCAST_ROOMS: '@conference.dev.gocast.it',
+                                        STUNSERVER: 'dev.gocast.it', STUNSERVERPORT: 19302,
+                                        FEEDBACK_BOT: 'feedback_bot_dev@dev.gocast.it',
+                                        ROOMMANAGER: 'roommanager@dev.gocast.it/roommanager',
+                                        SWITCHBOARD_FB: 'switchboard_dev@dev.gocast.it',
+                                        LOGCATCHER: 'logcatcher@dev.gocast.it/logcatcher',
+                                        });
+
+                  Callcast.setCallbackForCallback_ConnectionStatus(onConnectionStatus);
+                  Callcast.setCallbackForCallback_OnNicknameInUse(onNicknameInUse);
+                  Callcast.setCallbackForAddSpotForParticipant(assignSpotForParticipant);
+                  Callcast.setCallbackForRemoveSpotForParticipant(unassignSpotForParticipant);
+                  Callcast.setCallbackForAddSpot(onAddSpot);
+                  Callcast.setCallbackForRemoveSpot(onRemoveSpot);
+                  Callcast.setCallbackForSetSpot(onSetSpot);
+                  
+                  Callcast.connect(Callcast.CALLCAST_XMPPSERVER, '');
+            }
+
+            </script>
         <div class="app">
             <h1>Apache Cordova</h1>
             <div id="deviceready" class="blink">
@@ -33,10 +219,10 @@
                 <p class="event received">Device is Ready</p>
             </div>
         </div>
-        <script type="text/javascript" src="cordova-2.2.0.js"></script>
-        <script type="text/javascript" src="js/index.js"></script>
         <script type="text/javascript">
-            app.initialize();
+            app2.initialize();
+            $(document).ready(startApp1());
         </script>
     </body>
 </html>
+

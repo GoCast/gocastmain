@@ -50,8 +50,8 @@
 		005089ED16A052D5005C1105 /* libCordova.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libCordova.a; path = "../../third-party/CordovaLib/lib/simulator/debug/libCordova.a"; sourceTree = "<group>"; };
 		00D21BE8169E01FB00D4C8A9 /* GCIWhiteboard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GCIWhiteboard.h; sourceTree = "<group>"; };
 		00D21BE9169E01FB00D4C8A9 /* GCIWhiteboard.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = GCIWhiteboard.mm; sourceTree = "<group>"; };
-		00D21C11169E027500D4C8A9 /* www */ = {isa = PBXFileReference; lastKnownFileType = folder; name = www; path = ../ios/HelloWorld/www; sourceTree = "<group>"; };
-		00D21C13169E02C100D4C8A9 /* Cordova.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = Cordova.plist; path = ../ios/HelloWorld/HelloWorld/Cordova.plist; sourceTree = "<group>"; };
+		00D21C11169E027500D4C8A9 /* www */ = {isa = PBXFileReference; lastKnownFileType = folder; name = www; path = ../../rsrc/www; sourceTree = "<group>"; };
+		00D21C13169E02C100D4C8A9 /* Cordova.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = Cordova.plist; path = ../../rsrc/ios/Cordova.plist; sourceTree = "<group>"; };
 		00D21C16169ED7E800D4C8A9 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainViewController.xib; sourceTree = "<group>"; };
 		00D21C19169EDEDF00D4C8A9 /* AddressBook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBook.framework; path = System/Library/Frameworks/AddressBook.framework; sourceTree = SDKROOT; };
 		00D21C1A169EDEDF00D4C8A9 /* AddressBookUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBookUI.framework; path = System/Library/Frameworks/AddressBookUI.framework; sourceTree = SDKROOT; };
