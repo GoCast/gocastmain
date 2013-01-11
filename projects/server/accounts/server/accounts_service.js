@@ -47,11 +47,11 @@ app.use(express.bodyParser());
 // -------------- ACCT SERVICE REQUEST HANDLERS --------------
 
 app.post('/register', function(req, res) {
-    console.log('accounts_service [/register]: FormData = ', req.body);
+    console.log('accounts_service [/register][info]: FormData = ', req.body);
     api.apiNewAccount(req.body.baseurl, req.body.email, req.body.password, req.body.name, function() {
         res.send('{"result": "success"}');
     }, function(err) {
-        console.log('accounts_service [/register]: ', err);
+        console.log('accounts_service [/register][error]: ', err);
         if ('apiNewAccount: Failed - account already in use.' === err) {
             res.send('{"result": "inuse"}');
         } else {
@@ -61,11 +61,11 @@ app.post('/register', function(req, res) {
 });
 
 app.post('/activate', function(req, res) {
-    console.log('accounts_service [/activate]: FormData = ', req.body);
+    console.log('accounts_service [/activate][info]: FormData = ', req.body);
     api.apiValidateAccount(req.body.email, req.body.activation_code, function() {
         res.send('{"result": "success"}');
     }, function(err) {
-        console.log('accounts_service [/activate]: ', err);
+        console.log('accounts_service [/activate][error]: ', err);
         if (('apiValidateAccount: Incorrect activation code for ' + req.body.email) === err) {
             res.send('{"result": "incorrect"}');
         } else if (('apiValidateAccount: Bad activation code. No account found for: ' + req.body.email) === err) {
