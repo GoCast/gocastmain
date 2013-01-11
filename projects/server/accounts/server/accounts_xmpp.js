@@ -146,7 +146,7 @@ function xmppAddAccount(accountName, password, name, cbSuccess, cbFailure) {
     // If it succeeds, then we know the account is already used. Unavailable.
     try {
         xmppPrivateSendCommand('type=add&username=' + em + '&password=' + encodeURI(password) + '&name=' + encodeURI(name), function() {
-            console.log('xmppAddAccount: Bare-Add Complete: ' + em);
+//            console.log('xmppAddAccount: Bare-Add Complete: ' + em);
             xmppPrivateSendCommand('type=disable&username=' + em, function() {
 //                console.log('xmppAddAccount: Account-Disable Successful for: ' + em);
                 cbSuccess();
