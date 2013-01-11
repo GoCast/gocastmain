@@ -114,10 +114,10 @@ function xmppAccountAvailable(accountName, cbSuccess, cbFailure) {
     // If it succeeds, then we know the account is already used. Unavailable.
     try {
         xmppPrivateSendCommand('type=update&username=' + em, function() {
-            console.log('xmppAccountAvailable: Not Available: Already in use for: ' + em);
+//            console.log('xmppAccountAvailable: Not Available: Already in use for: ' + em);
             cbFailure();
         }, function(err) {
-            console.log('xmppAccountAvailable: Account available: ' + em);
+//            console.log('xmppAccountAvailable: Account available: ' + em);
             cbSuccess();
         });
     } catch(e) {
@@ -148,10 +148,10 @@ function xmppAddAccount(accountName, password, name, cbSuccess, cbFailure) {
         xmppPrivateSendCommand('type=add&username=' + em + '&password=' + encodeURI(password) + '&name=' + encodeURI(name), function() {
             console.log('xmppAddAccount: Bare-Add Complete: ' + em);
             xmppPrivateSendCommand('type=disable&username=' + em, function() {
-                console.log('xmppAddAccount: Account-Disable Successful for: ' + em);
+//                console.log('xmppAddAccount: Account-Disable Successful for: ' + em);
                 cbSuccess();
             }, function(err) {
-                console.log('xmppAddAccount: Failed to disable. Calling it a failure and asking for a deletion.');
+//                console.log('xmppAddAccount: Failed to disable. Calling it a failure and asking for a deletion.');
                 xmppPrivateSendCommand('type=delete&username=' + em, function() {
                     // Either way it's a failure due to the odd non-disable situation.
                     cbFailure(err);
@@ -161,7 +161,7 @@ function xmppAddAccount(accountName, password, name, cbSuccess, cbFailure) {
                 });
             });
         }, function(err) {
-            console.log('xmppAddAccount: Failed for: ' + em + ' with error: ' + err);
+//            console.log('xmppAddAccount: Failed for: ' + em + ' with error: ' + err);
             cbFailure(err);
         });
     } catch(e) {
@@ -184,10 +184,10 @@ function xmppEnableAccount(accountName, cbSuccess, cbFailure) {
     // If it succeeds, then we know the account is already used. Unavailable.
     try {
         xmppPrivateSendCommand('type=enable&username=' + em, function() {
-            console.log('xmppEnableAccount: Complete: ' + em);
+//            console.log('xmppEnableAccount: Complete: ' + em);
             cbSuccess();
         }, function(err) {
-            console.log('xmppEnableAccount: Failed for: ' + em + ' with error: ' + err);
+//            console.log('xmppEnableAccount: Failed for: ' + em + ' with error: ' + err);
             cbFailure(err);
         });
     } catch(e) {
@@ -210,10 +210,10 @@ function xmppDeleteAccount(accountName, cbSuccess, cbFailure) {
     // If it succeeds, then we know the account is already used. Unavailable.
     try {
         xmppPrivateSendCommand('type=delete&username=' + em, function() {
-            console.log('xmppDeleteAccount: Complete: ' + em);
+//            console.log('xmppDeleteAccount: Complete: ' + em);
             cbSuccess();
         }, function(err) {
-            console.log('xmppDeleteAccount: Failed for: ' + em + ' with error: ' + err);
+//            console.log('xmppDeleteAccount: Failed for: ' + em + ' with error: ' + err);
             cbFailure(err);
         });
     } catch(e) {
@@ -236,10 +236,10 @@ function xmppChangePassword(accountName, newPassword, cbSuccess, cbFailure) {
     // If it succeeds, then we know the account is already used. Unavailable.
     try {
         xmppPrivateSendCommand('type=update&username=' + em + '&password=' + encodeURI(newPassword), function() {
-            console.log('xmppChangePassword: Complete: ' + em);
+//            console.log('xmppChangePassword: Complete: ' + em);
             cbSuccess();
         }, function(err) {
-            console.log('xmppChangePassword: Failed for: ' + em + ' with error: ' + err);
+//            console.log('xmppChangePassword: Failed for: ' + em + ' with error: ' + err);
             cbFailure(err);
         });
     } catch(e) {
