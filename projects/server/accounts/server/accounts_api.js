@@ -186,9 +186,11 @@ function apiValidateAccount(email, actcode, success, failure) {
                     xmpp.EnableAccount(email, function() {
                         // Enable successful, delete db entry for email
                         db.DeleteEntry(email, function() {
+                            console.log('Hurray! Activation complete for ' + email);
                             success();
                         }, function(err) {
                             console.log('apiValidateAccount: WARNING - Could not delete validation entry for ' + email);
+                            console.log('Hurray! Activation complete for ' + email);
                             success();
                         });
                     }, failure);

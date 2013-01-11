@@ -48,7 +48,7 @@ app.use(express.bodyParser());
 
 app.post('/register', function(req, res) {
     console.log('accounts_service [/register][info]: FormData = ', req.body);
-    api.apiNewAccount(req.body.baseurl, req.body.email, req.body.password, req.body.name, function() {
+    api.NewAccount(req.body.baseurl, req.body.email, req.body.password, req.body.name, function() {
         res.send('{"result": "success"}');
     }, function(err) {
         console.log('accounts_service [/register][error]: ', err);
@@ -62,7 +62,7 @@ app.post('/register', function(req, res) {
 
 app.post('/activate', function(req, res) {
     console.log('accounts_service [/activate][info]: FormData = ', req.body);
-    api.apiValidateAccount(req.body.email, req.body.activation_code, function() {
+    api.ValidateAccount(req.body.email, req.body.activation_code, function() {
         res.send('{"result": "success"}');
     }, function(err) {
         console.log('accounts_service [/activate][error]: ', err);
