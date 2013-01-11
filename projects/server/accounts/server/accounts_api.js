@@ -235,17 +235,17 @@ function apiValidateAccount(email, actcode, success, failure) {
 
 function apiDeleteAccount(email, success, failure) {
     // Check if account with this email exists
-    xmpp.xmppAccountAvailable(email, function() {
+    xmpp.AccountAvailable(email, function() {
         // Account doesn't exist, so fail
         failure('apiDeleteAccount: Account doesn\'t exist');
     }, function() {
         // Account exists, so delete it
-        xmpp.xmppDeleteAccount(email, success, failure);
+        xmpp.DeleteAccount(email, success, failure);
     });
 }
 
 function apiChangePassword(email, newpassword, success, failure) {
-    xmpp.xmppChangePassword(email, newpassword, success, failure);
+    xmpp.ChangePassword(email, newpassword, success, failure);
 }
 
 /* Manjesh -- These both work (separately of course)
