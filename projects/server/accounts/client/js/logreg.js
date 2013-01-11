@@ -52,6 +52,8 @@ var LogregApp = {
                         LogregView.displayalert('register-form', 'error', 'An account for the email address you\'ve provided' +
                                                 'already exists. Choose a different email address.');
                         $('#input-email', $LogregApp.$forms['register-form']).focus();
+                    } else {
+                        LogregView.displayalert('register-form', 'error', 'There was a problem signing up for your new account.');
                     }
                 };
             },
@@ -68,6 +70,20 @@ var LogregApp = {
                         LogregView.displayform('login-form');
                         LogregView.displayalert('login-form', 'success', 'Your account has been activated. ' +
                                                 'Now, you can login with your new account.');
+                    } else if ('incorrect' === response.result) {
+                        LogregView.displayalert('activate-form', 'error', 'The activation code you\'ve provided is wrong.' +
+                                                'Please provide the correct activation code.');
+                        $('#input-activation-code', $LogregApp.$forms['activate-form']).val('').focus();
+                    } else if ('noaccount' === response.result) {
+                        LogregView.displayalert('activate-form', 'error', 'The activation code you\'ve provided is bad. ' +
+                                                'There is no account for the email address you\'ve provided.');
+                        $('#input-email', $LogregApp.$forms['activate-form']).focus();
+                    } else if ('usedorexpired' === response.result) {
+                        LogregView.displayalert('activate-form', 'error', 'The activation code you\'ve has expired ' +
+                                                'or has already been used to activate your account.');
+                        $('#input-email', $LogregApp.$forms['activate-form']).focus();
+                    } else {
+                        LogregView.displayalert('activate-form', 'error', 'There was a problem activating your account.');
                     }
                 };
             },
@@ -97,8 +113,8 @@ var LogregApp = {
             if ('register-form' === document.forms[i].id) {
                 options.data = {baseurl: urlvars.baseurl};
                 options.beforeSubmit = function(arr, $form, options) {
-                    if ($('#input-password', $form).val() !==
-                        $('#input-confirm-password', $form).val()) {
+                    $('#input-email', self.$forms['activate-form']).val($('#input-email', $form).val());
+                    if ($('#input-password', $form).val() !==$('#input-confirm-password', $form).val()) {
                         LogregView.displayalert('register-form', 'error', 'The password fields don\'t match. Make sure ' +
                                                 'you\'ve entered the same password in both fields.');
                         $('#input-password', $form).focus();
@@ -110,7 +126,8 @@ var LogregApp = {
             this.$forms[document.forms[i].id].ajaxForm(options);
         }
 
-        if ('activate' === urlvars.defaultaction && urlvars.code) {
+        if ('activate' === urlvars.defaultaction && urlvars.code && urlvars.email) {
+            $('#input-email', this.$forms['activate-form']).val(urlvars.email);
             $('#input-activation-code', this.$forms['activate-form']).val(urlvars.code);
             $('[type="submit"].btn', this.$forms['activate-form']).click();
         }

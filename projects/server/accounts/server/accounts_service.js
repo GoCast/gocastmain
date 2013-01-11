@@ -47,10 +47,11 @@ app.use(express.bodyParser());
 // -------------- ACCT SERVICE REQUEST HANDLERS --------------
 
 app.post('/register', function(req, res) {
+    console.log('accounts_service [/register]: FormData = ', req.body);
     api.apiNewAccount(req.body.baseurl, req.body.email, req.body.password, req.body.name, function() {
         res.send('{"result": "success"}');
     }, function(err) {
-        console.log('accounts_service: ', err);
+        console.log('accounts_service [/register]: ', err);
         if ('apiNewAccount: Failed - account already in use.' === err) {
             res.send('{"result": "inuse"}');
         } else {
@@ -60,10 +61,21 @@ app.post('/register', function(req, res) {
 });
 
 app.post('/activate', function(req, res) {
-    api.apiValidateAccount('rwolff@gocast.it', '85e25a1fea7b001911f791f13180f252', function() {
+    console.log('accounts_service [/activate]: FormData = ', req.body);
+    api.apiValidateAccount(req.body.email, req.body.activation_code, function() {
         res.send('{"result": "success"}');
     }, function(err) {
-        console.log('TEST-Validate: FAILED: ' + err);
+        console.log('accounts_service [/activate]: ', err);
+        if (('apiValidateAccount: Incorrect activation code for ' + req.body.email) === err) {
+            res.send('{"result": "incorrect"}');
+        } else if (('apiValidateAccount: Bad activation code. No account found for: ' + req.body.email) === err) {
+            res.send('{"result": "noaccount"}');
+        } else if ('apiValidateAccount: Activation already used or expired.' === err ||
+                   'apiValidateAccount: Activation already used or expired - and enable failed.' === err) {
+            res.send('{"result": "usedorexpired"}');
+        } else {
+            res.send('{"result": "error"}');
+        }
     });
 });
 
