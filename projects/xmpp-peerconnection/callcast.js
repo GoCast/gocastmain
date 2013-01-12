@@ -236,7 +236,7 @@ var Callcast = {
     Callback_AddCarouselContent: null,
     Callback_RemoveCarouselContent: null,
     Callback_ReadyState: null,
-    Callback_ConnectionStatus: null,
+    Callback_ConnectionStatus: function() {},
     Callback_OnEffectApplied: null,
     Callback_OnNicknameInUse: null,
     connection: null,
@@ -303,9 +303,8 @@ var Callcast = {
             //
             if (this.connection && this.connection.authenticated && this.connection.connected && this.connection.jid.split('@')[1])
             {
-                sessionStorage.setItem('jid', this.connection.jid);
-                sessionStorage.setItem('rid', this.connection.rid);
-                sessionStorage.setItem('sid', this.connection.sid);
+                // Save rid/jid/sid inside the connection.
+                this.connection.saveLoginInfo();
 
                 sessionStorage.setItem('room', this.room);
                 sessionStorage.setItem('nick', this.nick);
@@ -2737,8 +2736,6 @@ var Callcast = {
             this.connection.disconnect();
         }
 
-        // remove dead connection object
-        this.connection = null;
         this.joined = false;
         this.room = '';
         this.nick = '';
@@ -2757,40 +2754,19 @@ var Callcast = {
             boshconn = url;
         }
 
-        // Determine if we're in a 'refresh' situation and if so, then re-attach.
-        if (typeof (Storage) !== 'undefined')
+        if (!this.connection)
         {
-            // Found an odd bug where jid could have been stored as 'video.gocast.it' (non-authenticated state)
-            // This would be invalid for reattaching - so don't do it.
-            if (sessionStorage.jid && sessionStorage.jid.split('@')[1] && sessionStorage.sid && sessionStorage.rid)
-            {
-                this.log('.connect() - we found prior stored info - attempting to re-attach.');
-
-                // We have previous data.
-// RMW: In theory we are supposed to advance RID by one, but Chrome fails it while Firefox is ok. Sigh. No advancing...
-//              this.reattach(sessionStorage.jid, sessionStorage.sid, new Number(sessionStorage.rid) + 1, this.conn_callback, boshconn);
-                this.reattach(sessionStorage.jid, sessionStorage.sid, sessionStorage.rid, this.conn_callback, boshconn);
-
-                // RMW:TODO - Should we be calling SetNickname() here with a prior-stored nickname?
-                //   and how does this integrate into facebook - just let it flow? If we were using non-facebook before,
-                //   then we should probably presume the same nickname and bypass getting credentials.
-
-                return;
-            }
+            // TODO:RMW - rather than pause/reset/nullify and then re-new a new Strophe connection
+            //            we should just reset the connection and re-login with connect.
+            this.connection = new GoCastJS.StropheConnection(boshconn, this.finalizeConnect, this.connStatusHandler);
         }
 
-        if (this.connection)
-        {
-            this.connection.pause();
-            this.connection.reset();
-            this.connection = null;
+        if (this.connection.hasSavedLoginInfo()) {
+            rememberedJid = this.connection.autoConnect();
         }
-
-        // TODO:RMW - rather than pause/reset/nullify and then re-new a new Strophe connection
-        //            we should just reset the connection and re-login with connect.
-        this.connection = new GoCastJS.StropheConnection(boshconn, this.finalizeConnect);
-
-        this.connection.connect(id, pw);
+        else {
+            this.connection.connect(id, pw);
+        }
     },
 
     connStatusHandler: function(status) {
@@ -2809,6 +2785,89 @@ var Callcast = {
             default:
                 break;
         }
+
+        // TODO:RMW Clean up big time
+        Callcast.conn_callback_guts(status);
+    },
+
+    conn_callback_guts: function(status) {
+        this.log('conn_callback(' + this.numConnects + '): RID: ' + this.connection.rid + ' SID: ' + this.connection.sid);
+
+         if (status === Strophe.Status.CONNECTED) {
+             this.log('XMPP/Strophe Finalizing connection and then triggering connected...');
+             Callcast.finalizeConnect();
+             Callcast.Callback_ConnectionStatus('Connected');
+             $(document).trigger('connected');
+         } else if (status === Strophe.Status.AUTHENTICATING) {
+             this.log('XMPP/Strophe Authenticating...');
+             Callcast.Callback_ConnectionStatus('Authenticating');
+         } else if (status === Strophe.Status.CONNECTING) {
+             this.log('XMPP/Strophe Connecting...');
+             Callcast.Callback_ConnectionStatus('Connecting');
+         } else if (status === Strophe.Status.ATTACHED) {
+             this.log('XMPP/Strophe Re-Attach of connection successful. Triggering re-attached...');
+            // Determine if we're in a 'refresh' situation and if so, then re-attach.
+            if (typeof (Storage) !== 'undefined' && sessionStorage.room)
+            {
+                // We need to force a LeaveSession and setup video state too.
+                if (typeof (Storage) !== 'undefined') {
+                    Callcast.room = sessionStorage.room;
+                    Callcast.nick = sessionStorage.nick;
+
+                    if (sessionStorage.bUseVideo === 'true' || sessionStorage.bUseVideo === 'false') {
+                        Callcast.bUseVideo = sessionStorage.bUseVideo;
+                    }
+
+                    if (sessionStorage.bUseMicrophone === 'true' || sessionStorage.bUseMicrophone === 'false') {
+                        Callcast.bUseMicrophone = sessionStorage.bUseMicrophone;
+                    }
+                }
+
+                Callcast.LeaveSession();
+            }
+
+             setTimeout(function() {
+                 Callcast.finalizeConnect();
+                 $(document).trigger('re-attached');
+                 $(document).trigger('connected');
+                 Callcast.Callback_ConnectionStatus('Re-Attached');
+
+             }, 500);
+         } else if (status === Strophe.Status.DISCONNECTED) {
+             this.log('XMPP/Strophe Disconnected.');
+             Callcast.disconnect();
+             $(document).trigger('disconnected');
+             Callcast.Callback_ConnectionStatus('Disconnected');
+         } else if (status === Strophe.Status.DISCONNECTING) {
+             this.log('XMPP/Strophe is Dis-Connecting...should we try to re-attach here? TODO:RMW');
+             Callcast.RememberCurrentJid();
+             Callcast.Callback_ConnectionStatus('Disconnecting');
+         } else if (status === Strophe.Status.CONNFAIL) {
+             this.log('XMPP/Strophe reported connection failure...attempt to re-attach...');
+             this.log('-- Not actually doing anything here yet. TODO: RMW');
+             Callcast.RememberCurrentJid();
+
+             Callcast.Callback_ConnectionStatus('Connection failed');
+    // RMW: In theory we are supposed to advance RID by one, but Chrome fails it while Firefox is ok. Sigh. No advancing...
+    //               Callcast.reattach(Callcast.connection.jid, Callcast.connection.sid, new Number(Callcast.connection.rid) + 1, Callcast.conn_callback);
+
+    // RMW: SPECIFICALLY SKIPPING RE-ATTACH on CONNFAIL right now. Think it's causing issues.
+            this.log('Attempting a reattach() here. Starting doing this again on Aug 2 2012.');
+            Callcast.reattach(Callcast.connection.jid, Callcast.connection.sid, Callcast.connection.rid, Callcast.conn_callback);
+
+
+    //           alert("NOTICE -- attempted to auto-re-attach after connection failure. Did we succeed?");
+         } else if (status === Strophe.Status.AUTHFAIL) {
+             Callcast.RememberCurrentJid();
+             Callcast.disconnect();
+             $(document).trigger('disconnected');
+             Callcast.Callback_ConnectionStatus('Disconnected');
+             alert('XMPP/Strophe Authentication failed. Bad password or username.');
+         }
+         else {
+            this.log('XMPP/Strophe connection callback - unhandled status = ' + status);
+             Callcast.Callback_ConnectionStatus('Unknown status');
+         }
     },
 
     finalizeConnect: function() {
