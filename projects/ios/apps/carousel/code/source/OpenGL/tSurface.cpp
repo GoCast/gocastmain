@@ -220,11 +220,12 @@ void tSurface::drawLineWithPen(const tPoint2f& ptA, const tPoint2f& ptB, const t
 {
     int halfPen = (int)(newPenSize / 2.0f);
 
-    for(int i = 0; i < halfPen; i++)
+    for(int i = 0; i < newPenSize; i++)
     {
-        for(int j = 0; j < halfPen; j++)
+        for(int j = 0; j < newPenSize; j++)
         {
-            drawLine(ptA + tPoint2f(i, j), ptB + tPoint2f(i, j), newColor);
+            tPoint2f offset = tPoint2f(i, j) - halfPen;
+            drawLine(ptA + offset, ptB + offset, newColor);
         }
     }
 }

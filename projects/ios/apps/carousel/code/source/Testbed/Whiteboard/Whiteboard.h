@@ -42,6 +42,7 @@ public:
     void onResizeView(const tDimension2f& newSize);
     void onRedrawView(float time);
 
+    void onSave(const tColor4b& nc, const float& np);
     void onMoveTo(const tPoint2f& pt);
     void onLineTo(const tPoint2f& pt);
     void onStroke();

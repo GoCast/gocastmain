@@ -237,6 +237,12 @@ void Whiteboard::onRedrawView(float time)
     glFlush();
 }
 
+void Whiteboard::onSave(const tColor4b& nc, const float& np)
+{
+    mReceivePenColor    = nc;
+    mReceivePenSize     = np;
+}
+
 void Whiteboard::onMoveTo(const tPoint2f& pt)
 {
     mCurDrawPoint = pt;
@@ -295,6 +301,7 @@ void Whiteboard::update(const CallcastEvent& msg)
     {
         switch (msg.mEvent)
         {
+            case CallcastEvent::kSave:   onSave(msg.mColor, msg.mPenSize); break;
             case CallcastEvent::kMoveTo: onMoveTo(msg.mPoint); break;
             case CallcastEvent::kLineTo: onLineTo(msg.mPoint); break;
             case CallcastEvent::kStroke: onStroke(); break;

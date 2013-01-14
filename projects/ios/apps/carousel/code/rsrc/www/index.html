@@ -130,7 +130,7 @@
                                 case "save":
 //                                    this.wbCtx.save();
 //                                    this.settings.applyJson(cmdArray[i].settings, this.wbCtx);
-                                                    cordova.exec(function(winParam) {}, function(error) {}, "GCICallcast", "save", [ "" ]); break;
+                                                    cordova.exec(function(winParam) {}, function(error) {}, "GCICallcast", "save", [ stroke[i].settings.strokeStyle, stroke[i].settings.lineWidth.toString() ]); break;
                                 case "restore":     cordova.exec(function(winParam) {}, function(error) {}, "GCICallcast", "restore", [ "" ]); break;
                                 case "beginPath":   cordova.exec(function(winParam) {}, function(error) {}, "GCICallcast", "beginPath", [ "" ]); break;
                                 case "closePath":   cordova.exec(function(winParam) {}, function(error) {}, "GCICallcast", "closePath", [ "" ]); break;
