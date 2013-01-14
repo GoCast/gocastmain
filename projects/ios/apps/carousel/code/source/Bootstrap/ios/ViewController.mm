@@ -25,6 +25,7 @@
 //  Copyright ___ORGANIZATIONNAME___ ___YEAR___. All rights reserved.
 //
 
+#import "LoginView.h"
 #import "ViewController.h"
 
 @implementation MainViewController

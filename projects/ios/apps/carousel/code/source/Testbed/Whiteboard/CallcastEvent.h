@@ -5,6 +5,12 @@ class CallcastEvent
 public:
     enum EventType
     {
+        //Login
+        kWebViewLoaded,
+        kSubmitLogin,
+        kLoggedIn,
+
+        //Whiteboard events below
         kSave,
         kRestore,
         kBeginPath,

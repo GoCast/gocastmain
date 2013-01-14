@@ -80,7 +80,8 @@ Whiteboard::Whiteboard()
 :   mWhiteboardSurface(tPixelFormat::kR8G8B8A8, kSurfaceSize),
     mWhiteboardTexture(NULL),
     mMouseTexture(NULL),
-    mSpriteProgram(NULL)
+    mSpriteProgram(NULL),
+    mInitialized(false)
 {
     tSGView::getInstance()->attach(this);
     tInputManager::getInstance()->tSubject<const tMouseEvent&>::attach(this);
@@ -281,13 +282,16 @@ void Whiteboard::update(const tMouseEvent& msg)
 
 void Whiteboard::update(const CallcastEvent& msg)
 {
-    switch (msg.mEvent)
+    if (mInitialized)
     {
-        case CallcastEvent::kMoveTo: onMoveTo(msg.mPoint); break;
-        case CallcastEvent::kLineTo: onLineTo(msg.mPoint); break;
-        case CallcastEvent::kStroke: onStroke(); break;
+        switch (msg.mEvent)
+        {
+            case CallcastEvent::kMoveTo: onMoveTo(msg.mPoint); break;
+            case CallcastEvent::kLineTo: onLineTo(msg.mPoint); break;
+            case CallcastEvent::kStroke: onStroke(); break;
 
-        default: break;
+            default: break;
+        }
     }
 }
 

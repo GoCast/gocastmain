@@ -10,7 +10,22 @@
 					'type': 'executable',
 					'mac_bundle': 1,
 					
+					'actions': [
+						{
+							'action_name': 'AppFlow.tgf',
+							'inputs': [ '../../tgf/Testbed/Whiteboard/AppFlow.tgf', ], # inputs
+							'outputs': [ '../../source/Testbed/Whiteboard/AppFlow.h', ], # outputs
+							'action': [ '/Volumes/Lab/tools/graphcode', '<@(_inputs)', '--machine', 'AppFlow', '--include-exit', '--update', '--debug', '--basic-stf', '--libtate', '-o', '<@(_outputs)', ], # action
+						},
+					],	# actions
+
 					'sources': [
+						'../../source/Testbed/Whiteboard/AppFlow.mm',
+						'../../source/Testbed/Whiteboard/AppFlow.h',
+
+						'../../source/Testbed/Whiteboard/LoginView.mm',
+						'../../source/Testbed/Whiteboard/LoginView.h',
+
 						'../../source/Testbed/Whiteboard/Whiteboard.cpp',
 						'../../source/Testbed/Whiteboard/Whiteboard.h',
 
@@ -83,6 +98,7 @@
 							'mac_bundle_resources': [
 								'../../rsrc/<@(OS)/en.lproj/InfoPlist.strings',
 								'../../rsrc/<@(OS)/en.lproj/MainViewController.xib',
+								'../../rsrc/<@(OS)/en.lproj/LoginView.xib',
 							],	# mac_bundle_resources
 	
 							'link_settings': {

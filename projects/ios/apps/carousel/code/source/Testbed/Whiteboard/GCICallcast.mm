@@ -16,6 +16,12 @@
 
 @implementation GCICallcast
 
+- (void)webViewLoaded:(CDVInvokedUrlCommand*)command
+{
+#pragma unused(command)
+    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kWebViewLoaded));
+}
+
 - (void)save:(CDVInvokedUrlCommand*)command
 {
 #pragma unused(command)

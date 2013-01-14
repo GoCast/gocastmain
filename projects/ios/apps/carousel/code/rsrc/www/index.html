@@ -22,6 +22,9 @@
         Login
 
         <script>
+            var chosenNick = 'iostest-client';
+            var chosenRoom = 'iostest';
+
             var app1 = {
                 /* 1: debug, 2: info, 3: warning, 4: error, 5: fatal. */
 
@@ -63,9 +66,9 @@
 
                 if (statusStr.toLowerCase() === 'connected' || statusStr.toLowerCase() === 're-attached')
                 {
-                    Callcast.SetNickname('iotest-client');
+                    Callcast.SetNickname(chosenNick);
 
-                    Callcast.CreateUnlistedAndJoin('iostest', function(new_name) {
+                    Callcast.CreateUnlistedAndJoin(chosenRoom, function(new_name) {
                                                    console.log('Joined room successfully. Next?');
                                                    }, function() {
                                                    alert('failed to join room.');
@@ -136,7 +139,7 @@
                         }
 
 //                        document.writeln('Single stroke to apply:', stroke, '<BR>');
-                        console.log('Single stroke to apply:', stroke);
+//                        console.log('Single stroke to apply:', stroke);
                     }
                 }
             }
@@ -162,7 +165,17 @@
                 console.log("onRemoveSpot ", data);
             }
 
-            function startApp1()
+            function setChosenNick(newNick)
+            {
+                chosenNick = newNick;
+            }
+
+            function setChosenRoom(newRoom)
+            {
+                chosenRoom = newRoom;
+            }
+
+            function startCallcast()
             {
                   $(window).bind('beforeunload', function() {
                                  console.log('On before unload.');
@@ -200,7 +213,7 @@
         </div>
         <script type="text/javascript">
             app2.initialize();
-            $(document).ready(startApp1());
+//            $(document).ready(startCallcast());
         </script>
     </body>
 </html>

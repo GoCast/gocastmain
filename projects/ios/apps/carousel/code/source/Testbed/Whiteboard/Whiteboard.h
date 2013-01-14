@@ -22,6 +22,8 @@ protected:
 
     tPoint2f                mCurDrawPoint;
 
+    bool                    mInitialized;
+
 protected:
     void createResources();
     void configureNodes();

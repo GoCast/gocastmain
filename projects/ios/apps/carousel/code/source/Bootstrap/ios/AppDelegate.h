@@ -42,4 +42,12 @@
 @property (nonatomic, strong) IBOutlet CDVViewController* viewController;
 @property (nonatomic, strong) IBOutlet OpenGLView* glView;
 
+-(void)loadLoginScreen;
+-(void)loadLoadingScreen;
+-(void)loadWhiteboardScreen;
+
+-(void)unloadLoginScreen;
+-(void)unloadLoadingScreen;
+-(void)unloadWhiteboardScreen;
+
 @end

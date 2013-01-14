@@ -34,6 +34,9 @@ var app2 = {
     // function, we must explicity call 'app.receivedEvent(...);'
     onDeviceReady: function() {
         app2.receivedEvent('deviceready');
+
+        cordova.exec(function(winParam) {}, function(error) {}, "GCICallcast", "webViewLoaded", [ "" ]);
+
 //        cordova.exec(function(winParam) {}, function(error) {}, "GCIWhiteboard",
 //                     "echo", ["firstArgument", "secondArgument", 42,
 //                                false]);

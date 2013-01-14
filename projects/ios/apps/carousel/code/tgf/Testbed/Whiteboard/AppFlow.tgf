@@ -1,0 +1,15 @@
+1 start
+2 Load Login Screen
+3 Show Whiteboard
+4 end
+5 Show Waiting for Login
+6 Wait for WebViewLoaded
+#
+2 5 loginPressed
+5 3 loginSuccess
+3 4 quit
+5 4 quit
+2 4 quit
+6 2 webViewLoaded
+6 4 quit
+1 6

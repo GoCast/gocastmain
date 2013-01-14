@@ -26,9 +26,15 @@
 //
 
 #import "AppDelegate.h"
+#import "LoginView.h"
 #import "ViewController.h"
 
+#import "LoginView.h"
+
+
 #import <Cordova/CDVPlugin.h>
+
+AppDelegate* gAppDelegateInstance = NULL;
 
 @implementation AppDelegate
 
@@ -44,6 +50,9 @@
     [cookieStorage setCookieAcceptPolicy:NSHTTPCookieAcceptPolicyAlways];
 
     self = [super init];
+
+    gAppDelegateInstance = self;
+
     return self;
 }
 
@@ -65,7 +74,6 @@
     }
 
     CGRect screenBounds = [[UIScreen mainScreen] bounds];
-    CGRect glBounds = CGRectMake(10, 10, 300, 300);
     self.window = [[[UIWindow alloc] initWithFrame:screenBounds] autorelease];
     self.window.autoresizesSubviews = YES;
 
@@ -108,8 +116,10 @@
         [[UIApplication sharedApplication] setStatusBarOrientation:newOrient];
     }
 
-    self.glView = [[[OpenGLView alloc] initWithFrame:glBounds] autorelease];
-    [self.viewController.view addSubview:_glView];
+    //*** Don't load OpenGLView at start -- TJG
+//    CGRect glBounds = CGRectMake(10, 10, 300, 300);
+//    self.glView = [[[OpenGLView alloc] initWithFrame:glBounds] autorelease];
+//    [self.viewController.view addSubview:_glView];
 
     self.window.rootViewController = self.viewController;
     [self.window makeKeyAndVisible];
@@ -145,6 +155,40 @@
     NSUInteger supportedInterfaceOrientations = (1 << UIInterfaceOrientationPortrait) | (1 << UIInterfaceOrientationLandscapeLeft) | (1 << UIInterfaceOrientationLandscapeRight) | (1 << UIInterfaceOrientationPortraitUpsideDown);
     
     return supportedInterfaceOrientations;
+}
+
+-(void)loadLoginScreen
+{
+//    LoginView *myView = [[[LoginView alloc] initWithFrame:self.viewController.view.bounds] autorelease];
+//    [self.viewController.view addSubview:myView];
+//    [myView release];
+}
+
+-(void)loadLoadingScreen
+{
+
+}
+
+-(void)loadWhiteboardScreen
+{
+    CGRect glBounds = CGRectMake(10, 10, 300, 300);
+    self.glView = [[[OpenGLView alloc] initWithFrame:glBounds] autorelease];
+    [self.viewController.view addSubview:_glView];
+}
+
+-(void)unloadLoginScreen
+{
+
+}
+
+-(void)unloadLoadingScreen
+{
+
+}
+
+-(void)unloadWhiteboardScreen
+{
+
 }
 
 @end
