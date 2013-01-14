@@ -1,3 +1,5 @@
+#import <UIKit/UIKit.h>
+
 #include "Base/package.h"
 #include "Math/package.h"
 #include "Input/package.h"
@@ -7,6 +9,8 @@
 
 #include "CallcastEvent.h"
 #include "CallcastManager.h"
+
+extern UIWebView*   gWebViewInstance;
 
 class tVector4f
 {
@@ -290,7 +294,9 @@ void Whiteboard::update(const tMouseEvent& msg)
         case tMouseEvent::kMouseUp:
             mEndTouch   = lastMousePt;
 
-            mWhiteboardSurface.drawLineWithPen(mStartTouch, mEndTouch, mSendPenColor, mSendPenSize);
+            [gWebViewInstance stringByEvaluatingJavaScriptFromString:@"fakeDrawLine();"];
+
+//            mWhiteboardSurface.drawLineWithPen(mStartTouch, mEndTouch, mSendPenColor, mSendPenSize);
 
             delete mWhiteboardTexture;
             mWhiteboardTexture = new tTexture(mWhiteboardSurface);
