@@ -17,6 +17,7 @@
 		39352D225AC67D257B691EB7 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E96BF3286BB78EAAADC0A57A /* Foundation.framework */; };
 		396C5F55E07DE574E484F9BB /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 411E6E215ABA730DE4EFC537 /* CoreGraphics.framework */; };
 		3F3C09E0AA2E282E0316B180 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C838069FCF6EACE9304AE10C /* CFNetwork.framework */; };
+		409CF818EDBDAF0190FF55D1 /* libCordova.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C62FC56C15FB86F8E24A55CA /* libCordova.a */; };
 		424D412D985449097C8DC6C5 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F36CE187C31FC8D8E7850881 /* CoreLocation.framework */; };
 		48DE91066B35C6075CB62C56 /* tProgram.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CFF5BBC4DAF71060AA586293 /* tProgram.cpp */; };
 		4D11AA21F0C6BD08E4DBDF4B /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ACBD77BC320339AFCEBD05E2 /* CoreMedia.framework */; };
@@ -26,7 +27,6 @@
 		7D16CBAD06DF4F1A967DF631 /* AddressBookUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36569ED15C81D2B6924E0A43 /* AddressBookUI.framework */; };
 		86001511C0C7AF6D34004EB5 /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0DD38E8E271D3344A9BDC4D6 /* AddressBook.framework */; };
 		8913F2CA806F26838BC984FD /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DCFFB3193E4FDBEDD0C2656F /* SystemConfiguration.framework */; };
-		8AFABD457D2D7E324A2F75B1 /* libCordova.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB4347958C644F64C538D547 /* libCordova.a */; };
 		8F76F8A83A1068014EFE939F /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 67BEF084A2C1D3D8243B9D50 /* MediaPlayer.framework */; };
 		90E4F8DA876982687ADFD200 /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = F7C98D8853AB3806EE7996DC /* AppDelegate.mm */; };
 		A27C286AEC9AD2362D515901 /* tSurface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5CC4B70BEEC99963F5664C49 /* tSurface.cpp */; };
@@ -87,10 +87,10 @@
 		ACBD77BC320339AFCEBD05E2 /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
 		AD5C7E76A38BAEB35D1918BD /* tInputManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tInputManager.h; sourceTree = "<group>"; };
 		B4A1C41114DCC0B1EBECB2F1 /* tFile.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = tFile.mm; sourceTree = "<group>"; };
-		BB4347958C644F64C538D547 /* libCordova.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libCordova.a; path = "../../third-party/CordovaLib/lib/simulator/debug/libCordova.a"; sourceTree = "<group>"; };
 		BD93EAF6357AA13C5AB576C6 /* tShader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tShader.h; sourceTree = "<group>"; };
 		C139DA84CC3CF2A2CD32F273 /* spritesheet.vert */ = {isa = PBXFileReference; lastKnownFileType = text; path = spritesheet.vert; sourceTree = "<group>"; };
 		C1D41AD2FC7F4C2A868E0AD9 /* tTouchEvent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tTouchEvent.h; sourceTree = "<group>"; };
+		C62FC56C15FB86F8E24A55CA /* libCordova.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libCordova.a; path = "../../third-party/CordovaLib/lib/$(CURRENT_ARCH)/debug/libCordova.a"; sourceTree = "<group>"; };
 		C838069FCF6EACE9304AE10C /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
 		C9890DFA3B3AC133E3BECABB /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainViewController.xib; sourceTree = "<group>"; };
 		CCEF333632CC882A1C51723D /* tSurface.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tSurface.h; sourceTree = "<group>"; };
@@ -115,7 +115,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8AFABD457D2D7E324A2F75B1 /* libCordova.a in Frameworks */,
+				409CF818EDBDAF0190FF55D1 /* libCordova.a in Frameworks */,
 				6CC80D77E21DC31ADDFADC15 /* UIKit.framework in Frameworks */,
 				39352D225AC67D257B691EB7 /* Foundation.framework in Frameworks */,
 				396C5F55E07DE574E484F9BB /* CoreGraphics.framework in Frameworks */,
@@ -256,7 +256,7 @@
 				527886977B9E5089544AE192 /* QuartzCore.framework */,
 				DCFFB3193E4FDBEDD0C2656F /* SystemConfiguration.framework */,
 				D21DC43692508DB38C23866C /* UIKit.framework */,
-				BB4347958C644F64C538D547 /* libCordova.a */,
+				C62FC56C15FB86F8E24A55CA /* libCordova.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -442,6 +442,7 @@
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_IMPLICIT_SIGN_CONVERSION = YES;
 				CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				DEAD_CODE_STRIPPING = NO;
@@ -484,9 +485,10 @@
 					"../../third-party/CordovaLib/include",
 				);
 				INFOPLIST_FILE = ../../rsrc/ios/Whiteboard.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				LD_NO_PIE = NO;
 				LIBRARY_SEARCH_PATHS = (
-					"../../third-party/CordovaLib/lib/simulator/debug",
+					"../../third-party/CordovaLib/lib/$(CURRENT_ARCH)/debug",
 					"$(SDKROOT)/System/Library/Frameworks",
 				);
 				LLVM_LTO = NO;
@@ -564,6 +566,7 @@
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_IMPLICIT_SIGN_CONVERSION = YES;
 				CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				DEAD_CODE_STRIPPING = YES;
@@ -606,9 +609,10 @@
 					"../../third-party/CordovaLib/include",
 				);
 				INFOPLIST_FILE = ../../rsrc/ios/Whiteboard.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				LD_NO_PIE = YES;
 				LIBRARY_SEARCH_PATHS = (
-					"../../third-party/CordovaLib/lib/simulator/debug",
+					"../../third-party/CordovaLib/lib/$(CURRENT_ARCH)/debug",
 					"$(SDKROOT)/System/Library/Frameworks",
 				);
 				LLVM_LTO = NO;

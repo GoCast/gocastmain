@@ -57,6 +57,9 @@
 		], # include_dirs
 
 		'xcode_settings': {
+#			'TARGETED_DEVICE_FAMILY': '1,2',
+			'CODE_SIGN_IDENTITY': 'iPhone Developer',
+			'IPHONEOS_DEPLOYMENT_TARGET': '5.0',
 			'LLVM_LTO': 'NO',
 			'ALWAYS_SEARCH_USER_PATHS': 'NO',
 			'ARCHS': '$(ARCHS_STANDARD_32_64_BIT)',

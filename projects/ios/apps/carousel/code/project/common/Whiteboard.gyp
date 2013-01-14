@@ -84,7 +84,7 @@
 	
 							'link_settings': {
 								'libraries': [
-									'../../third-party/CordovaLib/lib/simulator/debug/libCordova.a',
+									'../../third-party/CordovaLib/lib/$(CURRENT_ARCH)/debug/libCordova.a',
 									'$(SDKROOT)/System/Library/Frameworks/UIKit.framework',
 									'$(SDKROOT)/System/Library/Frameworks/Foundation.framework',
 									'$(SDKROOT)/System/Library/Frameworks/CoreGraphics.framework',
