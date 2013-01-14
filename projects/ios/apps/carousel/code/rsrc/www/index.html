@@ -24,6 +24,7 @@
         <script>
             var chosenNick = 'iostest-client';
             var chosenRoom = 'iostest';
+            var whiteBoardSpotNumber = -1;
 
             var app1 = {
                 /* 1: debug, 2: info, 3: warning, 4: error, 5: fatal. */
@@ -150,7 +151,10 @@
             function onAddSpot(data)
             {
                 console.log("onAddSpot ", data);
-                if (data.spottype === 'whiteBoard') {
+                if (data.spottype === 'whiteBoard')
+                {
+                    whiteBoardSpotNumber = data.spotnumber;
+                    console.log("*** data.spotnumber = " + data.spotnumber.toString());
                     doSpot(data);
                 }
             }
