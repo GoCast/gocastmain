@@ -22,6 +22,9 @@ protected:
 
     tPoint2f                mCurDrawPoint;
 
+    tPoint2f                mStartTouch;
+    tPoint2f                mEndTouch;
+
     tColor4b                mReceivePenColor;
     float                   mReceivePenSize;
 

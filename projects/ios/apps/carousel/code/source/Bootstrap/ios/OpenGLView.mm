@@ -94,7 +94,8 @@
     UITouch *touch = [touches anyObject];
     CGPoint touchPoint = [touch locationInView:self];
 
-    tInputManager::getInstance()->tSubject<const tMouseEvent&>::notify(tMouseEvent(evt, tInputManager::getInstance(), tPoint2f(touchPoint.x, touchPoint.y), bID));
+    tInputManager::getInstance()->tSubject<const tMouseEvent&>::notify(tMouseEvent(evt, tInputManager::getInstance(),
+                                                                                   tPoint2f(touchPoint.x / 300.0f * 500.0f, touchPoint.y / 300.0f * 500.0f), bID));
 }
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event

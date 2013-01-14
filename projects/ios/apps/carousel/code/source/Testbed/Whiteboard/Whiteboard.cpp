@@ -281,11 +281,17 @@ void Whiteboard::update(const tMouseEvent& msg)
     switch (msg.event)
     {
         case tMouseEvent::kMouseDown:
+            mStartTouch = lastMousePt;
+            break;
         case tMouseEvent::kMouseDrag:
-            mWhiteboardSurface.fillRect(tRectf(lastMousePt - tPoint2f(2,2), tDimension2f(4,4)), tColor4b(0,0,255,255));
+//            mWhiteboardSurface.fillRect(tRectf(lastMousePt - tPoint2f(2,2), tDimension2f(4,4)), tColor4b(0,0,255,255));
             break;
 
         case tMouseEvent::kMouseUp:
+            mEndTouch   = lastMousePt;
+
+            mWhiteboardSurface.drawLineWithPen(mStartTouch, mEndTouch, mSendPenColor, mSendPenSize);
+
             delete mWhiteboardTexture;
             mWhiteboardTexture = new tTexture(mWhiteboardSurface);
             break;
