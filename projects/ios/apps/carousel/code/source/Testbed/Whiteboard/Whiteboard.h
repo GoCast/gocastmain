@@ -2,12 +2,12 @@
 
 class tSGViewEvent;
 
-class WhiteboardEvent;
+class CallcastEvent;
 
 class Whiteboard
 :   tObserver<const tSGViewEvent&>,
     tObserver<const tMouseEvent&>,
-    tObserver<const WhiteboardEvent&>
+    tObserver<const CallcastEvent&>
 {
 protected:
     std::vector<tPoint2f>   mWhiteBoardVerts;
@@ -40,39 +40,6 @@ public:
 
     void update(const tSGViewEvent& msg);
     void update(const tMouseEvent& msg);
-    void update(const WhiteboardEvent& msg);
-};
-
-class WhiteboardManager
-:   public tSingleton<WhiteboardManager>,
-    public tSubject<const WhiteboardEvent&>
-{
-public:
-    WhiteboardManager() { }
-};
-
-class WhiteboardEvent
-{
-public:
-    enum EventType
-    {
-        kSave,
-        kRestore,
-        kBeginPath,
-        kClosePath,
-        kMoveTo,
-        kLineTo,
-        kStroke,
-    };
-
-public:
-    EventType       mEvent;
-    tPoint2f        mPoint;
-
-public:
-    WhiteboardEvent(EventType evt, const tPoint2f& np)
-    : mEvent(evt), mPoint(np) { }
-    WhiteboardEvent(EventType evt)
-    : mEvent(evt) { }
+    void update(const CallcastEvent& msg);
 };
 

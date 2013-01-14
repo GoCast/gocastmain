@@ -32,8 +32,8 @@
 	</array>
 	<key>Plugins</key>
 	<dict>
-		<key>GCIWhiteboard</key>
-		<string>GCIWhiteboard</string>
+		<key>GCICallcast</key>
+		<string>GCICallcast</string>
 		<key>Device</key>
 		<string>CDVDevice</string>
 		<key>Logger</key>

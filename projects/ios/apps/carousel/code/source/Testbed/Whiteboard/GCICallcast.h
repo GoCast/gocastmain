@@ -2,7 +2,7 @@
 
 #import <Cordova/CDV.h>
 
-@interface GCIWhiteboard : CDVPlugin
+@interface GCICallcast : CDVPlugin
 
 - (void)save:(CDVInvokedUrlCommand*)command;
 - (void)restore:(CDVInvokedUrlCommand*)command;

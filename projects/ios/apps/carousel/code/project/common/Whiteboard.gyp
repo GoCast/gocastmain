@@ -14,8 +14,11 @@
 						'../../source/Testbed/Whiteboard/Whiteboard.cpp',
 						'../../source/Testbed/Whiteboard/Whiteboard.h',
 
-						'../../source/Testbed/Whiteboard/GCIWhiteboard.mm',
-						'../../source/Testbed/Whiteboard/GCIWhiteboard.h',
+						'../../source/Testbed/Whiteboard/CallcastEvent.h',
+						'../../source/Testbed/Whiteboard/CallcastManager.h',
+
+						'../../source/Testbed/Whiteboard/GCICallcast.mm',
+						'../../source/Testbed/Whiteboard/GCICallcast.h',
 
 						'../../source/Base/package.h',
 						'../../source/Base/tObserver.h',

@@ -12,7 +12,6 @@
 		16CF3C06892FA0159F56BA42 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 272118C382ADB0788DD475C9 /* AudioToolbox.framework */; };
 		1C25AF314FD2834DFB94DA5A /* Cordova.plist in Resources */ = {isa = PBXBuildFile; fileRef = D7194E88971AA4E5865F3427 /* Cordova.plist */; };
 		22B61A9B79E536018FF04CF3 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 9C18CE4BB4E9C8DF93918E29 /* InfoPlist.strings */; };
-		22F268C07C2699530B69C352 /* Whiteboard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A41E9CFDC0AAABFB976FBF80 /* Whiteboard.cpp */; };
 		3139B97033B4599D30EED105 /* OpenGLView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 83102A9266B2BB0C3F20849B /* OpenGLView.mm */; };
 		39352D225AC67D257B691EB7 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E96BF3286BB78EAAADC0A57A /* Foundation.framework */; };
 		396C5F55E07DE574E484F9BB /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 411E6E215ABA730DE4EFC537 /* CoreGraphics.framework */; };
@@ -21,6 +20,7 @@
 		424D412D985449097C8DC6C5 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F36CE187C31FC8D8E7850881 /* CoreLocation.framework */; };
 		48DE91066B35C6075CB62C56 /* tProgram.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CFF5BBC4DAF71060AA586293 /* tProgram.cpp */; };
 		4D11AA21F0C6BD08E4DBDF4B /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ACBD77BC320339AFCEBD05E2 /* CoreMedia.framework */; };
+		5BE4E4A62684190EA9C037D7 /* GCICallcast.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8A8261567DAEB3F988BB2131 /* GCICallcast.mm */; };
 		6B0C53D440EF4BEDD7AFA02E /* tSGView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E76DF83DF7F2CB9EC0070067 /* tSGView.cpp */; };
 		6CC80D77E21DC31ADDFADC15 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D21DC43692508DB38C23866C /* UIKit.framework */; };
 		708293EA325395C555B447EF /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6ED41382B83EB60BAABE37AF /* MobileCoreServices.framework */; };
@@ -38,11 +38,11 @@
 		D6E7DF06529FF24B6769C457 /* tShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A3B52E3EA721B2C116CB4BDF /* tShader.cpp */; };
 		DE318249CDF7AA5BB3B1A04E /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 45AD10DD26EE99758E0D4670 /* OpenGLES.framework */; };
 		E042693CC40DEF662DB58EAD /* ViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 54F13C3695EF1AFD28251AA1 /* ViewController.mm */; };
+		EA81A4C8BFFA476820F74EE5 /* Whiteboard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A41E9CFDC0AAABFB976FBF80 /* Whiteboard.cpp */; };
 		EB01870F35C8C711B9DC91BA /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 41457BA618A6B6E8FCBB620F /* main.mm */; };
 		EBC3A21EA35893BA4CF7A81D /* tTexture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 09FA150B7647EA6DADF9AAF9 /* tTexture.cpp */; };
 		EFC3D4A78AC709AE5064DCEB /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 527886977B9E5089544AE192 /* QuartzCore.framework */; };
 		F6648C7F88752CC536711943 /* spritesheet.frag in Resources */ = {isa = PBXBuildFile; fileRef = 719929FE4CB470A6AD62DF0F /* spritesheet.frag */; };
-		FCFF0544D86CB804CAFF1678 /* GCIWhiteboard.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2FBD25C044F3AAA78BA6D411 /* GCIWhiteboard.mm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -54,7 +54,6 @@
 		18706E684443CA2FE1BC4B6F /* Whiteboard.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Whiteboard.h; sourceTree = "<group>"; };
 		1973A9A42F49A5099790D0EF /* tFile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tFile.h; sourceTree = "<group>"; };
 		272118C382ADB0788DD475C9 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
-		2FBD25C044F3AAA78BA6D411 /* GCIWhiteboard.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = GCIWhiteboard.mm; sourceTree = "<group>"; };
 		30060B4CDC358A711E95F89F /* tSingleton.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tSingleton.h; sourceTree = "<group>"; };
 		34C0D4F7099ED6BF3D33FA3B /* Whiteboard.gyp */ = {isa = PBXFileReference; lastKnownFileType = text; path = Whiteboard.gyp; sourceTree = "<group>"; };
 		36569ED15C81D2B6924E0A43 /* AddressBookUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBookUI.framework; path = System/Library/Frameworks/AddressBookUI.framework; sourceTree = SDKROOT; };
@@ -76,13 +75,16 @@
 		75E6EA81F45BFF94EFDA772A /* www */ = {isa = PBXFileReference; lastKnownFileType = text; path = www; sourceTree = "<group>"; };
 		798C2F236D3430DEA91BF7E8 /* package.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = package.h; sourceTree = "<group>"; };
 		83102A9266B2BB0C3F20849B /* OpenGLView.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = OpenGLView.mm; sourceTree = "<group>"; };
+		8A8261567DAEB3F988BB2131 /* GCICallcast.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = GCICallcast.mm; sourceTree = "<group>"; };
 		8E14DE79388DB788006202E1 /* package.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = package.h; sourceTree = "<group>"; };
 		91ED334047D6952BD18C6F02 /* common.gypi */ = {isa = PBXFileReference; lastKnownFileType = text; path = common.gypi; sourceTree = "<group>"; };
 		958E5799A1690D9865ED35E3 /* OpenGLView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OpenGLView.h; sourceTree = "<group>"; };
-		9ADEF43E20570138F6FE460C /* GCIWhiteboard.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GCIWhiteboard.h; sourceTree = "<group>"; };
+		95ED5BBA83A915FFE39E7910 /* GCICallcast.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GCICallcast.h; sourceTree = "<group>"; };
+		A0B09A4813FF124C1769DFB6 /* CallcastManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CallcastManager.h; sourceTree = "<group>"; };
 		A3B52E3EA721B2C116CB4BDF /* tShader.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = tShader.cpp; sourceTree = "<group>"; };
 		A3F93D338886817C741D112E /* tSurfacePeer.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = tSurfacePeer.mm; sourceTree = "<group>"; };
 		A41E9CFDC0AAABFB976FBF80 /* Whiteboard.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Whiteboard.cpp; sourceTree = "<group>"; };
+		A79C1004A56BA9D1E9F59BEA /* CallcastEvent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CallcastEvent.h; sourceTree = "<group>"; };
 		A886F88044A01E0874CF0E90 /* tPixelFormat.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = tPixelFormat.cpp; sourceTree = "<group>"; };
 		ACBD77BC320339AFCEBD05E2 /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
 		AD5C7E76A38BAEB35D1918BD /* tInputManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tInputManager.h; sourceTree = "<group>"; };
@@ -169,17 +171,6 @@
 				30060B4CDC358A711E95F89F /* tSingleton.h */,
 			);
 			path = Base;
-			sourceTree = "<group>";
-		};
-		5896AE4F77409B30296CAC94 /* Testbed/Whiteboard */ = {
-			isa = PBXGroup;
-			children = (
-				9ADEF43E20570138F6FE460C /* GCIWhiteboard.h */,
-				2FBD25C044F3AAA78BA6D411 /* GCIWhiteboard.mm */,
-				A41E9CFDC0AAABFB976FBF80 /* Whiteboard.cpp */,
-				18706E684443CA2FE1BC4B6F /* Whiteboard.h */,
-			);
-			path = Testbed/Whiteboard;
 			sourceTree = "<group>";
 		};
 		591CE5712EF39658DE06ED3F /* Build */ = {
@@ -270,6 +261,19 @@
 			path = rsrc;
 			sourceTree = "<group>";
 		};
+		CBD32B632FBBE634A68C9B69 /* Testbed/Whiteboard */ = {
+			isa = PBXGroup;
+			children = (
+				A79C1004A56BA9D1E9F59BEA /* CallcastEvent.h */,
+				A0B09A4813FF124C1769DFB6 /* CallcastManager.h */,
+				95ED5BBA83A915FFE39E7910 /* GCICallcast.h */,
+				8A8261567DAEB3F988BB2131 /* GCICallcast.mm */,
+				A41E9CFDC0AAABFB976FBF80 /* Whiteboard.cpp */,
+				18706E684443CA2FE1BC4B6F /* Whiteboard.h */,
+			);
+			path = Testbed/Whiteboard;
+			sourceTree = "<group>";
+		};
 		CD1732A175D168FAB36BB309 /* OpenGL */ = {
 			isa = PBXGroup;
 			children = (
@@ -300,7 +304,7 @@
 				B725B79358BFD482911D6690 /* Io */,
 				D8A89EC23F5F025598003924 /* Math */,
 				CD1732A175D168FAB36BB309 /* OpenGL */,
-				5896AE4F77409B30296CAC94 /* Testbed/Whiteboard */,
+				CBD32B632FBBE634A68C9B69 /* Testbed/Whiteboard */,
 			);
 			path = source;
 			sourceTree = "<group>";
@@ -395,8 +399,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				22F268C07C2699530B69C352 /* Whiteboard.cpp in Sources */,
-				FCFF0544D86CB804CAFF1678 /* GCIWhiteboard.mm in Sources */,
+				EA81A4C8BFFA476820F74EE5 /* Whiteboard.cpp in Sources */,
+				5BE4E4A62684190EA9C037D7 /* GCICallcast.mm in Sources */,
 				BC1C2936C653223E998255E6 /* tFile.mm in Sources */,
 				BD575720FAA4CD99450BDA0B /* tPixelFormat.cpp in Sources */,
 				48DE91066B35C6075CB62C56 /* tProgram.cpp in Sources */,

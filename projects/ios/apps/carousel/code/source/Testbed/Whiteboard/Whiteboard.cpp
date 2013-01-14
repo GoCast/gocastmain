@@ -5,6 +5,9 @@
 #include "OpenGL/package.h"
 #include "Whiteboard.h"
 
+#include "CallcastEvent.h"
+#include "CallcastManager.h"
+
 class tVector4f
 {
 public:
@@ -81,7 +84,7 @@ Whiteboard::Whiteboard()
 {
     tSGView::getInstance()->attach(this);
     tInputManager::getInstance()->tSubject<const tMouseEvent&>::attach(this);
-    WhiteboardManager::getInstance()->attach(this);
+    CallcastManager::getInstance()->attach(this);
 }
 
 Whiteboard::~Whiteboard()
@@ -276,13 +279,13 @@ void Whiteboard::update(const tMouseEvent& msg)
     }
 }
 
-void Whiteboard::update(const WhiteboardEvent& msg)
+void Whiteboard::update(const CallcastEvent& msg)
 {
     switch (msg.mEvent)
     {
-        case WhiteboardEvent::kMoveTo: onMoveTo(msg.mPoint); break;
-        case WhiteboardEvent::kLineTo: onLineTo(msg.mPoint); break;
-        case WhiteboardEvent::kStroke: onStroke(); break;
+        case CallcastEvent::kMoveTo: onMoveTo(msg.mPoint); break;
+        case CallcastEvent::kLineTo: onLineTo(msg.mPoint); break;
+        case CallcastEvent::kStroke: onStroke(); break;
 
         default: break;
     }
