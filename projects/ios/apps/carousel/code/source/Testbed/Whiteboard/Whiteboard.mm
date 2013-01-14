@@ -84,6 +84,28 @@ const tColor4b      kBlue   (0,0,255,255);
 const tColor4b      kOrange (255,165,0,255);
 const tColor4b      kWhite  (255,255,255,255);
 
+static std::string colorToString(const tColor4b& newColor)
+{
+    if (newColor == kRed)
+    {
+        return "#F00";
+    }
+    else if (newColor == kBlue)
+    {
+        return "#00F";
+    }
+    else if (newColor == kOrange)
+    {
+        return "rgb(253, 103, 3)";
+    }
+    else if (newColor == kWhite)
+    {
+        return "#FFF";
+    }
+
+    return "#000";
+}
+
 Whiteboard gApp;
 
 Whiteboard::Whiteboard()
@@ -295,7 +317,9 @@ void Whiteboard::update(const tMouseEvent& msg)
         {
             mEndTouch   = lastMousePt;
 
-            [gWebViewInstance stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"realDrawLine(%d, %d, %d, %d);",
+            [gWebViewInstance stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"realDrawLine('%s', %d, %d, %d, %d, %d);",
+                                                                      colorToString(mSendPenColor).c_str(),
+                                                                      (int)mSendPenSize,
                                                                       (int)mStartTouch.x, (int)mStartTouch.y, (int)mEndTouch.x, (int)mEndTouch.y]];
         }
             break;

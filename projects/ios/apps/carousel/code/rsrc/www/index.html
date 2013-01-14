@@ -216,7 +216,7 @@
                 Callcast.SendSingleStroke({stroke: JSON.stringify(stroke), spotnumber: whiteBoardSpotNumber});
             }
 
-            function realDrawLine(stx, sty, enx, eny)
+            function realDrawLine(newColor, pensize, stx, sty, enx, eny)
             {
                 var stroke;
 
@@ -224,11 +224,11 @@
 
                 stroke = [];
 
-                stroke.push({name: 'save', settings: { colorName: 'red', lineWidth: 5, strokeStyle: '#F00', lineJoin: 'round' } });
+                stroke.push({name: 'save', settings: { colorName: 'dontcare', lineWidth: pensize.toString(), strokeStyle: newColor, lineJoin: 'round' } });
                 stroke.push({name: 'beginPath'});
 
-                stroke.push({name: 'moveTo', x: stx.toString(), y: sty.toString()}); // make start point end of last stroke
-                stroke.push({name: 'lineTo', x: enx.toString(), y: eny.toString()}); // make start point end of last stroke
+                stroke.push({name: 'moveTo', x: stx, y: sty }); // make start point end of last stroke
+                stroke.push({name: 'lineTo', x: enx, y: eny }); // make start point end of last stroke
 
                 stroke.push({name: 'stroke'}); // stroke lines
                 stroke.push({name: 'restore'}); // finish command

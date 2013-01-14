@@ -34,6 +34,9 @@ class tColor4b
 public:
     uint8_t r, g, b, a;
 
+    bool operator ==(const tColor4b& o) const { return (r == o.r) && (g == o.g) && (b == o.b) && (a == o.a); }
+    bool operator !=(const tColor4b& o) const { return !(*this == o); }
+
     tColor4b(const uint8_t& nr = 0, const uint8_t& ng = 0, const uint8_t& nb = 0, const uint8_t& na = 0)
     : r(nr), g(ng), b(nb), a(na) { }
 };
