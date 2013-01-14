@@ -10,6 +10,7 @@
 
 AppFlow gAppFlow;
 extern AppDelegate* gAppDelegateInstance;
+extern UIWebView*   gWebViewInstance;
 
 void AppFlow::startEntry()
 {
@@ -33,12 +34,15 @@ void AppFlow::loadLoginScreenEntry()
 void AppFlow::loadLoginScreenExit()
 {
     [gAppDelegateInstance unloadLoginScreen];
+
+    [gWebViewInstance stringByEvaluatingJavaScriptFromString:@"startCallcast()"];
+
 }
 
 void AppFlow::showWaitingForLoginEntry()
 {
     [gAppDelegateInstance loadLoadingScreen];
-    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kLoggedIn));
+//    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kLoggedIn));
 }
 
 void AppFlow::showWaitingForLoginExit()

@@ -28,6 +28,8 @@
 #import "LoginView.h"
 #import "ViewController.h"
 
+UIWebView* gWebViewInstance = NULL;
+
 @implementation MainViewController
 
 - (id)initWithNibName:(NSString*)nibNameOrNil bundle:(NSBundle*)nibBundleOrNil
@@ -128,6 +130,7 @@
 
 - (void)webViewDidFinishLoad:(UIWebView*)theWebView
 {
+    gWebViewInstance = theWebView;
     // only valid if ___PROJECTNAME__-Info.plist specifies a protocol to handle
 //    if (self.invokeString) {
 //        // this is passed before the deviceready event is fired, so you can access it in js when you receive deviceready

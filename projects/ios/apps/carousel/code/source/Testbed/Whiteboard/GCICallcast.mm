@@ -22,6 +22,12 @@
     CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kWebViewLoaded));
 }
 
+- (void)loggedIn:(CDVInvokedUrlCommand*)command
+{
+#pragma unused(command)
+    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kLoggedIn));
+}
+
 - (void)save:(CDVInvokedUrlCommand*)command
 {
 #pragma unused(command)

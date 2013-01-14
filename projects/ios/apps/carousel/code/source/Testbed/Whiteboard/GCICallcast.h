@@ -5,6 +5,7 @@
 @interface GCICallcast : CDVPlugin
 
 - (void)webViewLoaded:(CDVInvokedUrlCommand*)command;
+- (void)loggedIn:(CDVInvokedUrlCommand*)command;
 
 - (void)save:(CDVInvokedUrlCommand*)command;
 - (void)restore:(CDVInvokedUrlCommand*)command;

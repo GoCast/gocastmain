@@ -193,6 +193,8 @@ void Whiteboard::onInitView()
 
     //Configure Nodes
     configureNodes();
+
+    mInitialized = true;
 }
 
 void Whiteboard::onResizeView(const tDimension2f& newSize)

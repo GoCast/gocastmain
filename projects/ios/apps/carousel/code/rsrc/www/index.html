@@ -70,6 +70,9 @@
 
                     Callcast.CreateUnlistedAndJoin(chosenRoom, function(new_name) {
                                                    console.log('Joined room successfully. Next?');
+
+                                                   cordova.exec(function(winParam) {}, function(error) {}, "GCICallcast", "loggedIn", [ "" ]);
+
                                                    }, function() {
                                                    alert('failed to join room.');
                                                    });
@@ -139,7 +142,7 @@
                         }
 
 //                        document.writeln('Single stroke to apply:', stroke, '<BR>');
-//                        console.log('Single stroke to apply:', stroke);
+                        console.log('Single stroke to apply:', stroke);
                     }
                 }
             }
