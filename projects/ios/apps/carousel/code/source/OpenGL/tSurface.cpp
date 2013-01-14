@@ -216,6 +216,19 @@ void tSurface::drawLine(const tPoint2f& ptA, const tPoint2f& ptB, const tColor4b
     }
 }
 
+void tSurface::drawLineWithPen(const tPoint2f& ptA, const tPoint2f& ptB, const tColor4b& newColor, const float newPenSize)
+{
+    int halfPen = (int)(newPenSize / 2.0f);
+
+    for(int i = 0; i < halfPen; i++)
+    {
+        for(int j = 0; j < halfPen; j++)
+        {
+            drawLine(ptA + tPoint2f(i, j), ptB + tPoint2f(i, j), newColor);
+        }
+    }
+}
+
 void tSurface::drawRect(const tRectf& newRect, const tColor4b& newColor)
 {
     if (newRect.size.width > 0 && newRect.size.height > 0)

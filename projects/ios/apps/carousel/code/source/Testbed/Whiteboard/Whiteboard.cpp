@@ -71,8 +71,14 @@ static std::vector<tPoint2f> sixPoints(const tPoint2f& toPtA, const tPoint2f& to
     return result;
 }
 
-const tDimension2f kSurfaceSize(500,500);
-const tDimension2f kSpotSize(300,300);
+const tDimension2f  kSurfaceSize(500,500);
+const tDimension2f  kSpotSize(300,300);
+
+const tColor4b      kBlack  (0,0,0,255);
+const tColor4b      kRed    (255,0,0,255);
+const tColor4b      kBlue   (0,0,255,255);
+const tColor4b      kOrange (255,165,0,255);
+const tColor4b      kWhite  (255,255,255,255);
 
 Whiteboard gApp;
 
@@ -81,6 +87,10 @@ Whiteboard::Whiteboard()
     mWhiteboardTexture(NULL),
     mMouseTexture(NULL),
     mSpriteProgram(NULL),
+    mReceivePenColor(kBlue),
+    mReceivePenSize(5),
+    mSendPenColor(kBlue),
+    mSendPenSize(5),
     mInitialized(false)
 {
     tSGView::getInstance()->attach(this);
@@ -234,11 +244,8 @@ void Whiteboard::onMoveTo(const tPoint2f& pt)
 
 void Whiteboard::onLineTo(const tPoint2f& pt)
 {
-    mWhiteboardSurface.drawLine(mCurDrawPoint, pt, tColor4b(0,0,255,255));
-    mWhiteboardSurface.drawLine(mCurDrawPoint - tPoint2f(0,1), pt - tPoint2f(0,1), tColor4b(0,0,255,255));
-    mWhiteboardSurface.drawLine(mCurDrawPoint + tPoint2f(0,1), pt + tPoint2f(0,1), tColor4b(0,0,255,255));
-    mWhiteboardSurface.drawLine(mCurDrawPoint - tPoint2f(1,1), pt - tPoint2f(1,1), tColor4b(0,0,255,255));
-    mWhiteboardSurface.drawLine(mCurDrawPoint + tPoint2f(1,1), pt + tPoint2f(1,1), tColor4b(0,0,255,255));
+    mWhiteboardSurface.drawLineWithPen(mCurDrawPoint, pt, mReceivePenColor, mReceivePenSize);
+
     mCurDrawPoint = pt;
 }
 

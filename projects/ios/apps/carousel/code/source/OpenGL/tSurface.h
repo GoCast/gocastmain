@@ -30,6 +30,7 @@ public:
     void            setPixel(const tPoint2f& location, const tColor4b& newColor);
 
     void            drawLine(const tPoint2f& ptA, const tPoint2f& ptB, const tColor4b& newColor);
+    void            drawLineWithPen(const tPoint2f& ptA, const tPoint2f& ptB, const tColor4b& newColor, const float newPenSize);
     void            drawRect(const tRectf& newRect, const tColor4b& newColor);
 
     void            fillRect(const tRectf& newRect, const tColor4b& newColor);

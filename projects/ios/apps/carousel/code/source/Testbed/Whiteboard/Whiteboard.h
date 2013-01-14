@@ -22,6 +22,12 @@ protected:
 
     tPoint2f                mCurDrawPoint;
 
+    tColor4b                mReceivePenColor;
+    float                   mReceivePenSize;
+
+    tColor4b                mSendPenColor;
+    float                   mSendPenSize;
+
     bool                    mInitialized;
 
 protected:
