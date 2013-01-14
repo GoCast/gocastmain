@@ -216,51 +216,25 @@
                 Callcast.SendSingleStroke({stroke: JSON.stringify(stroke), spotnumber: whiteBoardSpotNumber});
             }
 
-            function fakeDrawLine()
+            function realDrawLine(stx, sty, enx, eny)
             {
                 var stroke;
 
-                console.log("*** Beginning of fakeDrawLine!");
+                console.log("*** Beginning of realDrawLine!");
 
                 stroke = [];
-                console.log("0");
 
                 stroke.push({name: 'save', settings: { colorName: 'red', lineWidth: 5, strokeStyle: '#F00', lineJoin: 'round' } });
-                console.log("1");
                 stroke.push({name: 'beginPath'});
-                console.log("2");
 
-                stroke.push({name: 'moveTo', x: 5, y: 5}); // make start point end of last stroke
-                console.log("3");
-                stroke.push({name: 'lineTo', x: 10, y: 20}); // make start point end of last stroke
-                console.log("4");
+                stroke.push({name: 'moveTo', x: stx.toString(), y: sty.toString()}); // make start point end of last stroke
+                stroke.push({name: 'lineTo', x: enx.toString(), y: eny.toString()}); // make start point end of last stroke
 
                 stroke.push({name: 'stroke'}); // stroke lines
-                console.log("5");
                 stroke.push({name: 'restore'}); // finish command
-                console.log("6");
                 self.sendStroke(stroke);        // send it
-                console.log("7");
 
-                console.log("*** Reached end of fakeDrawLine!");
-//                var lastCmd, stroke;
-//                // check if there's anything to send
-//                console.log("strokeTimeout lineCt ", self.mouse.lineCt);
-//                if (self.mouse.lineCt > 0) // there are lineto's
-//                {
-//                    self.mouse.lineCt = 0;
-//                    stroke = self.mouse.currentCommand.slice(0);       // copy command
-//                    self.mouse.currentCommand = [];                    // clear command
-//                    lastCmd = stroke[stroke.length - 1];               // get last lineTo, must be lineTo since lineCt > 0
-//                    console.log("strokeTimeout lastCmd ", lastCmd);
-//                    self.mouse.currentCommand.push({name: 'save', settings: self.settings}); // start new command
-//                    self.mouse.currentCommand.push({name: 'beginPath'});
-//                    self.mouse.currentCommand.push({name: 'moveTo', x: (lastCmd.x >> 0), y: (lastCmd.y >> 0)}); // make start point end of last stroke
-//                    self.wbCtx.moveTo(lastCmd.x, lastCmd.y);
-//                    stroke.push({name: 'stroke'}); // stroke lines
-//                    stroke.push({name: 'restore'}); // finish command
-//                    self.sendStroke(stroke);        // send it
-//                }
+                console.log("*** Reached end of realDrawLine!");
             }
 
             </script>

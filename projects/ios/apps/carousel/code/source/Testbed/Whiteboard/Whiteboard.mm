@@ -292,14 +292,12 @@ void Whiteboard::update(const tMouseEvent& msg)
             break;
 
         case tMouseEvent::kMouseUp:
+        {
             mEndTouch   = lastMousePt;
 
-            [gWebViewInstance stringByEvaluatingJavaScriptFromString:@"fakeDrawLine();"];
-
-//            mWhiteboardSurface.drawLineWithPen(mStartTouch, mEndTouch, mSendPenColor, mSendPenSize);
-
-            delete mWhiteboardTexture;
-            mWhiteboardTexture = new tTexture(mWhiteboardSurface);
+            [gWebViewInstance stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"realDrawLine(%d, %d, %d, %d);",
+                                                                      (int)mStartTouch.x, (int)mStartTouch.y, (int)mEndTouch.x, (int)mEndTouch.y]];
+        }
             break;
 
         default:
