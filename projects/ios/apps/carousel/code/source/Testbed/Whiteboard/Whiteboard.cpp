@@ -68,12 +68,13 @@ static std::vector<tPoint2f> sixPoints(const tPoint2f& toPtA, const tPoint2f& to
     return result;
 }
 
-const tDimension2f kScreenSize(320,480);
+const tDimension2f kSurfaceSize(500,500);
+const tDimension2f kSpotSize(300,300);
 
 Whiteboard gApp;
 
 Whiteboard::Whiteboard()
-:   mWhiteboardSurface(tPixelFormat::kR8G8B8A8, kScreenSize),
+:   mWhiteboardSurface(tPixelFormat::kR8G8B8A8, kSurfaceSize),
     mWhiteboardTexture(NULL),
     mMouseTexture(NULL),
     mSpriteProgram(NULL)
@@ -99,14 +100,14 @@ void Whiteboard::createResources()
     tSurface mouse(tPixelFormat::kR8G8B8A8, tDimension2f(32,32));
 
     mWhiteboardSurface.fillRect(tRectf(0,0,mWhiteboardSurface.getSize()), tColor4b(255,255,255,255));
-    mWhiteboardSurface.drawLine(tPoint2f(0,0), tPoint2f(kScreenSize.width, kScreenSize.height), tColor4b(255,0,0,255));
+    mWhiteboardSurface.drawLine(tPoint2f(0,0), tPoint2f(kSurfaceSize.width, kSurfaceSize.height), tColor4b(255,0,0,255));
     mouse.fillRect(tRectf(0,0,mouse.getSize()), tColor4b(0,0,255,255));
 
     mMouseTexture = new tTexture(mouse);
     mWhiteboardTexture = new tTexture(mWhiteboardSurface);
     
-    mWhiteBoardVerts        = sixPoints(tPoint2f(0,0), tPoint2f(kScreenSize.width, kScreenSize.height));
-    mWhiteBoardTexCoords    = sixPoints(tPoint2f(0,0), tPoint2f(kScreenSize.width / mWhiteboardTexture->getSize().width, kScreenSize.height / mWhiteboardTexture->getSize().height));
+    mWhiteBoardVerts        = sixPoints(tPoint2f(0,0), tPoint2f(kSurfaceSize.width, kSurfaceSize.height));
+    mWhiteBoardTexCoords    = sixPoints(tPoint2f(0,0), tPoint2f(kSurfaceSize.width / mWhiteboardTexture->getSize().width, kSurfaceSize.height / mWhiteboardTexture->getSize().height));
 }
 
 //Configure Nodes
@@ -130,7 +131,7 @@ void Whiteboard::configureNodes()
     
     //os.draw.tag
     //os.draw.setViewportState
-    glViewport(0, 0, (int32_t)kScreenSize.width, (int32_t)kScreenSize.height);
+    glViewport(0, 0, (int32_t)300, (int32_t)300);
 
     //os.draw.setProgram
     mSpriteProgram->setActive();
@@ -142,7 +143,7 @@ void Whiteboard::configureNodes()
         location = glGetUniformLocation(mSpriteProgram->mProgramID, "mProjection");
         assert(location != -1);
         
-        static tMatrix4x4f orthoProj = ortho(0,kScreenSize.width,kScreenSize.height, 0);
+        static tMatrix4x4f orthoProj = ortho(0,kSurfaceSize.width, kSurfaceSize.height, 0);
         glUniformMatrix4fv(location, 1, false, &orthoProj.mArray[0][0]);
     }
 

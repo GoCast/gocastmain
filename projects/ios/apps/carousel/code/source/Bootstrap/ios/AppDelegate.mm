@@ -65,6 +65,7 @@
     }
 
     CGRect screenBounds = [[UIScreen mainScreen] bounds];
+    CGRect glBounds = CGRectMake(10, 10, 300, 300);
     self.window = [[[UIWindow alloc] initWithFrame:screenBounds] autorelease];
     self.window.autoresizesSubviews = YES;
 
@@ -107,9 +108,7 @@
         [[UIApplication sharedApplication] setStatusBarOrientation:newOrient];
     }
 
-
-    screenBounds = [[UIScreen mainScreen] bounds];
-    self.glView = [[[OpenGLView alloc] initWithFrame:screenBounds] autorelease];
+    self.glView = [[[OpenGLView alloc] initWithFrame:glBounds] autorelease];
     [self.viewController.view addSubview:_glView];
 
     self.window.rootViewController = self.viewController;
