@@ -119,6 +119,12 @@
 
 #pragma mark UIWebDelegate implementation
 
+- (void)webViewDidStartLoad:(UIWebView *)webView
+{
+    CGRect newFrame = CGRectMake(-10, -10, 5, 5);
+    [webView setFrame:newFrame];
+}
+
 - (void)webViewDidFinishLoad:(UIWebView*)theWebView
 {
     // only valid if ___PROJECTNAME__-Info.plist specifies a protocol to handle
