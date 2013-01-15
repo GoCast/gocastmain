@@ -60,6 +60,9 @@ GoCastJS.StropheConnection = function(opts) {
     // We don't have a Strophe Connection at all yet.
     this.connection = new Strophe.Connection(this.boshurl);
 
+    // Custom status item.
+    Strophe.Status.TERMINATED = 99;
+
     Strophe.log = function(level, msg) {
         if (level > 0) {
             console.log('STROPHE-LOG: level:' + level + ', msg: ' + msg);
@@ -225,7 +228,8 @@ GoCastJS.StropheConnection.prototype = {
         }
         else if (this.pw === '' || this.pw === null) {
             this.log('StropheConnection: connect: WARN: Must be on a failed re-attach. No password for user ' + this.id);
-            // Should we do anything here or just let it play out to AUTHFAIL or DISCONNECTED.
+            this.statusCallback(Strophe.Status.TERMINATED);
+            return;
         }
 
         this.numConnects += 1;
@@ -254,8 +258,13 @@ GoCastJS.StropheConnection.prototype = {
             this.autoConnect(); // Attempt to re-connect.
         }
 
+        if (this.causeTerminating) {
+            this.statusCallback(Strophe.Status.TERMINATED);
+        }
+
         this.causeAuthfail = false;
         this.causeConnfail = false;
+        this.causeTerminating = false;
     },
 
     conn_callback: function(status, err) {
@@ -294,8 +303,11 @@ GoCastJS.StropheConnection.prototype = {
                 break;
             case Strophe.Status.DISCONNECTED:
                 this.log('GoCastJS.StropheConnection: DISCONNECTED');
+                // Calling the status early to keep things in order.
+                this.statusCallback(status);
                 this.handleDisconnect();
-                break;
+                // Artificial early return.
+                return;
             case Strophe.Status.AUTHENTICATING:
                 this.log('GoCastJS.StropheConnection: AUTHENTICATING');
                 break;
@@ -465,6 +477,7 @@ GoCastJS.StropheConnection.prototype = {
         if (this.connection) {
             try {
                 this.connection.disconnect(reason);
+                this.causeTerminating = true;
             }
             catch(e) {
                 console.log('CATCH: ERROR on disconnect() attempt: ' + e);
