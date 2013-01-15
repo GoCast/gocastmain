@@ -3,7 +3,6 @@ var LogregView = {
     init: function() {
         for (var i=0; i<document.forms.length; i++) {
             this.$forms[document.forms[i].id] = $(document.forms[i]);
-            $('[targetform].btn', this.$forms[document.forms[i].id]).click(this.changeformCallback());
         }
         this.displaydefaultform(LogregApp.urlvars().defaultaction);
     },
@@ -15,11 +14,11 @@ var LogregView = {
         this.$forms[id].addClass('show');
     },
     displaydefaultform: function(action) {
-        var actions = ['login', 'register', 'activate'];
-        var formids = {login: 'login-form', register: 'register-form', activate: 'activate-form'};
+        var actions = ['register', 'activate'];
+        var formids = {register: 'register-form', activate: 'activate-form'};
 
         if (!action || -1 === actions.indexOf(action)) {
-            this.displayform('login-form');
+            this.displayform('register-form');
         } else {
             this.displayform(formids[action]);
         }
@@ -30,13 +29,6 @@ var LogregView = {
         $('.alert', this.$forms[formid]).removeClass('show');
         $alert = $('.alert-' + type, this.$forms[formid]).addClass('show');
         $('p', $alert).html(message);
-    },
-    changeformCallback: function() {
-        var self = this;
-
-        return function() {
-            self.displayform($(this).attr('targetform'));
-        };
     }
 };
 
@@ -70,9 +62,10 @@ var LogregApp = {
             success: function() {
                 return function(response) {
                     if ('success' === response.result) {
-                        LogregView.displayform('login-form');
-                        LogregView.displayalert('login-form', 'success', 'Your account has been activated. ' +
-                                                'Now, you can login with your new account.');
+                        window.location.href = LogregApp.urlvars()
+                                                .baseurl
+                                                .replace(/logreg\.html/, 'dashboard.html')
+                                                + '?justactivated=true';
                     } else if ('incorrect' === response.result) {
                         LogregView.displayalert('activate-form', 'error', 'The activation code you\'ve provided is wrong. ' +
                                                 'Please provide the correct activation code.');
@@ -95,10 +88,6 @@ var LogregApp = {
                     LogregView.displayalert('activate-form', 'error', 'There was a problem activating your account.');
                 };
             }
-        },
-        'login-form': {
-            success: function() { return function(response) {}; },
-            failure: function() { return function(error) {}; }
         }
     },
     init: function() {

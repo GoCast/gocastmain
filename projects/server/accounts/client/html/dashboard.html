@@ -3,10 +3,10 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title> Register for GoCast! </title>
+        <title> Welcome to GoCast! </title>
         <link rel="stylesheet" type="text/css" href="css/bootstrap.css?GOCASTTIMESTAMP">
         <link rel="stylesheet" type="text/css" href="css/font-awesome.css?GOCASTTIMESTAMP">
-        <link rel="stylesheet" type="text/css" href="css/logreg.css?GOCASTTIMESTAMP">
+        <link rel="stylesheet" type="text/css" href="css/dashboard.css?GOCASTTIMESTAMP">
     </head>
     <body>
         <div class="navbar navbar-fixed-top navbar-inverse">
@@ -15,22 +15,30 @@
                     <a class="brand" href="http://www.gocast.it" target="_blank">
                         <img src="img/gocastheaderlogo.png"></img>
                     </a>
+                    <ul class="nav pull-right">
+                        <li class="dropdown" style="padding-top: 20px; margin-left: 5px;">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">My Account <b class="caret"></b></a>
+                            <ul class="dropdown-menu">
+                                <li><a class="formlink" href="#changepwd-form">Change Password</a></li>
+                                <li><a href="#">Delete Account</a></li>
+                            </ul>
+                        </li>
+                        <li class="dropdown" style="padding-top: 20px; margin-left: 5px;">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">My Meetings <b class="caret"></b></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="#">Schedule Meeting</a></li>
+                                <li><a class="formlink" href="#startmeeting-form">Start Meeting</a></li>
+                            </ul>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>
         <div class="container">
             <div class="row">
                 <div class="span4 offset4">
-                    <form id="register-form" class="form-horizontal" action="/acct/register/" method="post">
+                    <form id="login-form" class="form-horizontal">
                         <fieldset>
-                            <div class="control-group">
-                                <div class="controls">
-                                    <div class="input-prepend pull-right">
-                                        <span class="add-on">&nbsp;<i class="icon-user"></i>&nbsp;</span>
-                                        <input id="input-name" type="text" name="name" placeholder=" Name" required class="span4">
-                                    </div>
-                                </div>
-                            </div>
                             <div class="control-group">
                                 <div class="controls">
                                     <div class="input-prepend pull-right">
@@ -47,26 +55,18 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="control-group">
-                                <div class="controls">
-                                    <div class="input-prepend pull-right">
-                                        <span class="add-on">&nbsp;<i class="icon-key"></i>&nbsp;</span>
-                                        <input id="input-confirm-password" type="password" name="confirm_password" placeholder=" Confirm password" required class="span4">
-                                    </div>
-                                </div>
-                            </div>
                             <div class="alert alert-error">
-                               <h4><i class="icon-warning-sign"></h4></i><p style="padding-left: 25px;"></p>
+                                <h4><i class="icon-warning-sign"></i></h4><p style="padding-left: 25px;"></p>
                             </div>
                             <div class="alert alert-success">
                                <h4><i class="icon-ok-sign"></i></h4><p style="padding-left: 25px;"></p>
                             </div>
                             <div class="control-group">
-                                <button type="submit" class="btn btn-primary pull-right"> Register </button>
+                                <button type="submit" class="btn btn-primary pull-right"> Login </button>
                             </div>
                         </fieldset>
                     </form>
-                    <form id="activate-form" class="form-horizontal" action="/acct/activate/" method="post">
+                    <form id="changepwd-form" class="form-horizontal">
                         <fieldset>
                             <div class="control-group">
                                 <div class="controls">
@@ -79,19 +79,48 @@
                             <div class="control-group">
                                 <div class="controls">
                                     <div class="input-prepend pull-right">
-                                        <span class="add-on">&nbsp;<i class="icon-cogs"></i>&nbsp;</span>
-                                        <input id="input-activation-code" type="text" name="activation_code" placeholder=" Activation code" required class="span4">
+                                        <span class="add-on">&nbsp;<i class="icon-key"></i>&nbsp;</span>
+                                        <input id="input-password" type="password" name="cur_password" placeholder=" Current Password" required class="span4">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <div class="controls">
+                                    <div class="input-prepend pull-right">
+                                        <span class="add-on">&nbsp;<i class="icon-key"></i>&nbsp;</span>
+                                        <input id="input-password" type="password" name="new_password" placeholder=" New Password" required class="span4">
                                     </div>
                                 </div>
                             </div>
                             <div class="alert alert-error">
-                               <h4><i class="icon-warning-sign"></i></h4><p style="padding-left: 25px;"></p>
+                                <h4><i class="icon-warning-sign"></i></h4><p style="padding-left: 25px;"></p>
                             </div>
                             <div class="alert alert-success">
                                <h4><i class="icon-ok-sign"></i></h4><p style="padding-left: 25px;"></p>
                             </div>
                             <div class="control-group">
-                                <button type="submit" class="btn btn-primary pull-right"> Activate </button>
+                                <button type="submit" class="btn btn-primary pull-right"> Change Password </button>
+                            </div>
+                        </fieldset>
+                    </form>
+                    <form id="startmeeting-form" class="form-horizontal">
+                        <fieldset>
+                            <div class="control-group">
+                                <div class="controls">
+                                    <div class="input-prepend pull-right">
+                                        <span class="add-on">&nbsp;<i class="icon-play"></i>&nbsp;</span>
+                                        <input id="input-roomname" type="text" name="room_name" placeholder=" Choose the name of your room" required class="span4">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="alert alert-error">
+                                <h4><i class="icon-warning-sign"></i></h4><p style="padding-left: 25px;"></p>
+                            </div>
+                            <div class="alert alert-success">
+                               <h4><i class="icon-ok-sign"></i></h4><p style="padding-left: 25px;"></p>
+                            </div>
+                            <div class="control-group">
+                                <button type="submit" class="btn btn-primary pull-right"> Start Meeting </button>
                             </div>
                         </fieldset>
                     </form>
@@ -101,6 +130,6 @@
         <script type="text/javascript" src="js/jquery-1.8.1.js?GOCASTTIMESTAMP"></script>
         <script type="text/javascript" src="js/jquery.form.js?GOCASTTIMESTAMP"></script>
         <script type="text/javascript" src="js/bootstrap.js?GOCASTTIMESTAMP"></script>
-        <script type="text/javascript" src="js/logreg.js?GOCASTTIMESTAMP"></script>
+        <script type="text/javascript" src="js/dashboard.js?GOCASTTIMESTAMP"></script>
     </body>
 </html>
