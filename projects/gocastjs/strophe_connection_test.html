@@ -18,6 +18,15 @@
 
           var con = new GoCastJS.StropheConnection('/xmpp-httpbind', function(status) {
             console.log('CALLBACK: ' + status);
+            switch (status) {
+              case Strophe.Status.CONNECTED:
+                con.connection.send($pres());
+                break;
+              case Strophe.Status.ATTACHED:
+                con.connection.send($pres());
+                break;
+            }
+
           });
 
           if (con.hasSavedLoginInfo()) {

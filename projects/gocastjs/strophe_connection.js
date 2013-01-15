@@ -4,6 +4,20 @@
 
    */
 
+//
+// @brief GoCastJS.StropheConnection is a stand-alone connection to XMPP servers. It wraps
+//        Strophe with the following features:
+//        1. Has its own over-ride .log function
+//        2. Automatically responds to 'ping' requests from the server.
+//        3. Wraps critical Strophe functions in try/catch blocks to avoid
+//           prior issues with Strophe.
+//        4. Hooks into Strophe's log function to output STROPHE-LOG: entries to better
+//           keep track of what's going on down in the Strophe library.
+//        5. debugXML() function will allow enabling full blown xml logs.
+//        6. Automatically saves and re-loads rid/jid/sid information and attempts to keep
+//           errant connections alive as best possible.
+//
+
 /*jslint sloppy: false, white: true, todo: true, browser: true, devel: true */
 /*global Buffer */
 'use strict';
@@ -13,8 +27,7 @@ var GoCastJS = GoCastJS || {};
 GoCastJS.StropheConnection = function(boshconn, statusCallback, logFn) {
     var self = this;
 
-    console.log('New GoCastJS.StropheConnection.');
-    this.log('Using internal log mechanism.');
+    this.log('New GoCastJS.StropheConnection.');
 
     if (!boshconn || !statusCallback) {
         throw 'StropheConnection: ERROR: Bad invocation - must provide all required parameters.';
@@ -365,6 +378,62 @@ GoCastJS.StropheConnection.prototype = {
             else {
                 this.connection.sync = true;
             }
+        }
+    },
+
+    send: function(msg) {
+        if (this.connection) {
+            try {
+                this.connection.send(msg);
+            }
+            catch(e) {
+                console.log('CATCH: ERROR on send() attempt: ' + e);
+            }
+        }
+        else {
+            this.log('StropheConnection: ERROR: Cannot send() - no connection.');
+        }
+    },
+
+    addHandler: function(handler, ns, name, type, id, from, options) {
+        if (this.connection) {
+            try {
+                this.connection.addHandler(handler, ns, name, type, id, from, options);
+            }
+            catch(e) {
+                console.log('CATCH: ERROR on addHandler() attempt: ' + e);
+            }
+        }
+        else {
+            this.log('StropheConnection: ERROR: Cannot addHandler() - no connection.');
+        }
+    },
+
+    disconnect: function(reason) {
+        if (this.connection) {
+            try {
+                this.connection.disconnect(reason);
+            }
+            catch(e) {
+                console.log('CATCH: ERROR on disconnect() attempt: ' + e);
+            }
+        }
+        else {
+            this.log('StropheConnection: ERROR: Cannot disconnect() - no connection.');
+        }
+    },
+
+    sendIQ: function(elem, callback, errback, timeout) {
+        if (this.connection) {
+            try {
+                this.connection.sendIQ(elem, callback, errback, timeout);
+            }
+            catch(e) {
+                console.log('CATCH: ERROR on sendIQ() attempt: ' + e);
+            }
+        }
+        else {
+            this.log('StropheConnection: ERROR: Cannot sendIQ() - no connection.');
         }
     }
 };

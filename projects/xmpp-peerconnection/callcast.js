@@ -301,7 +301,7 @@ var Callcast = {
             //
             // Due to odd bug found, we'll also check to ensure the jid is a full jid with something before/after the '@' sign.
             //
-            if (this.connection && this.connection.authenticated && this.connection.connected && this.connection.jid.split('@')[1])
+            if (this.connection && this.connection.jid.split('@')[1])
             {
                 // Save rid/jid/sid inside the connection.
                 this.connection.saveLoginInfo();
@@ -1565,7 +1565,7 @@ var Callcast = {
         //        This way, the switchboard will know who we are on facebook when our presence is seen.
 
         // Only send this if there is a fbsr -- they logged in as a facebook user.
-        if (this.fbsr !== '' && this.connection && this.connection.connected && this.connection.authenticated)
+        if (this.fbsr !== '' && this.connection)
         {
             pres = $pres({to: this.SWITCHBOARD_FB, intro_sr: this.fbsr, intro_at: this.fbaccesstoken})
                 .c('x', {xmlns: 'http://jabber.org/protocol/muc'});
@@ -1580,7 +1580,7 @@ var Callcast = {
 
         // Now that we're connected, let's send our presence info to the switchboard
 
-        if (this.connection && this.connection.connected && this.connection.authenticated)
+        if (this.connection)
         {
             pres = $pres({to: this.SWITCHBOARD_FB, adhocname: this.nick})
                 .c('x', {xmlns: 'http://jabber.org/protocol/muc'});
@@ -2925,25 +2925,9 @@ GoCastJS.SendLogsXMPP = function(room, nick, logcatcher, id, pw, cbSuccess, cbFa
 
     this.connection.reset();
 
-/*
-    this.connection.rawInput = function(data) {
-                if ($(data).children()[0]) {
-                    console.log("RAW-IN:", $(data).children()[0]);
-                }
-                else {
-                    console.log("RAW-IN:", $(data));
-                }
-        };
-
-    this.connection.rawOutput = function(data) {
-                if ($(data).children()[0]) {
-                    console.log("RAW-OUT:", $(data).children()[0]);
-                }
-                else {
-                    console.log("RAW-OUT:", $(data));
-                }
-        };
-*/
+    /* Want to enable debugging of XML?
+    this.connection.debugXML();
+    */
 
     this.connection.connect(this.jid, this.pw, this.genConnHandler());
 };
