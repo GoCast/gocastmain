@@ -16,7 +16,9 @@
         var who;
           console.log('Getting started...');
 
-          var con = new GoCastJS.StropheConnection('/xmpp-httpbind', function(status) {
+          var con = new GoCastJS.StropheConnection({ boshurl: '/xmpp-httpbind',
+                                                     xmppserver: 'dev.gocast.it',
+                                                     statusCallback: function(status) {
             console.log('CALLBACK: ' + status);
             switch (status) {
               case Strophe.Status.CONNECTED:
@@ -27,7 +29,7 @@
                 break;
             }
 
-          });
+          }});
 
           if (con.hasSavedLoginInfo()) {
             who = con.autoConnect();
@@ -37,7 +39,10 @@
           }
           else {
             console.log('REGULAR LOGIN - not automatic this time. No saved login info available.');
-            con.connect('bobtest@dev.gocast.it', '1234');
+            // Test login with simple username
+            con.connect({username: 'bobtest', password: '1234'});
+            // Test login anonymously.
+//            con.connect();
           }
       });
     </script>

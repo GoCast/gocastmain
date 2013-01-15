@@ -16,6 +16,14 @@
 //        5. debugXML() function will allow enabling full blown xml logs.
 //        6. Automatically saves and re-loads rid/jid/sid information and attempts to keep
 //           errant connections alive as best possible.
+//        7. Handles on-before-unload for the window and saves the rid/jid/sid if still valid.
+//
+// opts object MUST contain:
+//   boshurl: absolute or relative path to the bosh server '/xmpp-httpbind' is normal.
+//   xmppserver: the server name for the xmpp server 'video.gocast.it' is normal.
+//   statusCallback: function(status) to be called as connection changes over time.
+// opts MAY contain:
+//   logFn: substitute function for logging errors, etc.
 //
 
 /*jslint sloppy: false, white: true, todo: true, browser: true, devel: true */
@@ -24,12 +32,12 @@
 
 var GoCastJS = GoCastJS || {};
 
-GoCastJS.StropheConnection = function(boshconn, statusCallback, logFn) {
+GoCastJS.StropheConnection = function(opts) {
     var self = this;
 
     this.log('New GoCastJS.StropheConnection.');
 
-    if (!boshconn || !statusCallback) {
+    if (!opts.boshurl || !opts.statusCallback || !opts.xmppserver) {
         throw 'StropheConnection: ERROR: Bad invocation - must provide all required parameters.';
     }
 
@@ -41,15 +49,16 @@ GoCastJS.StropheConnection = function(boshconn, statusCallback, logFn) {
     this.causeAuthfail = false;
     this.causeConnfail = false;
 
-    this.boshconn = boshconn;
-    this.statusCallback = statusCallback;
+    this.boshurl = opts.boshurl;
+    this.statusCallback = opts.statusCallback;
+    this.xmppserver = opts.xmppserver;
 
-    if (logFn) {
-        this.log = logFn;
+    if (opts.logFn) {
+        this.log = opts.logFn;
     }
 
     // We don't have a Strophe Connection at all yet.
-    this.connection = new Strophe.Connection(this.boshconn);
+    this.connection = new Strophe.Connection(this.boshurl);
 
     Strophe.log = function(level, msg) {
         if (level > 0) {
@@ -65,9 +74,17 @@ GoCastJS.StropheConnection = function(boshconn, statusCallback, logFn) {
         }
     });
 
+    if (Strophe.muc) {
+        this.log('StropheConnection: Plugin found: muc');
+        this.muc = Strophe.muc;
+    }
 };
 
 GoCastJS.StropheConnection.prototype = {
+    usernameTransform: function(email) {
+        return email.toLowerCase().replace('@', '~');
+    },
+
     isAnonymous: function() {
         return this.bAnonymous;
     },
@@ -125,7 +142,8 @@ GoCastJS.StropheConnection.prototype = {
     //
     // @brief If we have stored login information, then use it to reattach.
     // @return Failure - null - no stored rid/jid/sid login information.
-    //         Success - The jid used to re-attach.
+    //         Success - The jid used to re-attach if it's a valid registered user.
+    //         Success - 'anonymous' if its an anonymous login.
     //
     autoConnect: function() {
         this.log('StropheConnection: Auto-Connecting.');
@@ -140,25 +158,55 @@ GoCastJS.StropheConnection.prototype = {
             return localStorage.jid;
         }
         else if (this.id !== null && this.id !== '' && this.pw !== null && this.pw !== '') {
+            this.bAnonymous = false;
+
             // In this case, we actually have a username and a password for login. Use it.
-            this.connect(this.id, this.pw);
+            this.connect({ jid: this.id, pw: this.pw });
 
             return this.id;
+        }
+        else if (this.id.charAt(0) === '@' && (this.pw === '' || this.pw === null)) {
+            // We've discovered this was an anonymous login in the beginning - so do it again.
+
+            this.bAnonymous = true;
+
+            this.connect(); // Anonymous connection.
+
+            return 'anonymous';
         }
 
         return null;
     },
 
-    connect: function(id, pw) {
-        this.id = id;
-        this.pw = pw;
+    connect: function(opts) {
+        if (opts) {
+            this.pw = opts.password;
 
-        if (id === null && pw === null) {
-            this.log('StropheConnection: connect: null arguments. Throwing exception.');
-            throw 'StropheConnection: connect: null arguments. Throwing exception.';
+            // We were handed a full-blown jid.
+            if (opts.jid) {
+                this.id = opts.jid;
+            }
+            else if (opts.username) {
+                // Handed an email address. Translate it.
+                if (opts.username.match(/@/)) {
+                    this.id = this.usernameTransform(opts.username) + '@' + this.xmppserver;
+                }
+                else {
+                    this.id = opts.username + '@' + this.xmppserver;
+                }
+            }
+            else {
+                this.log('StropheConnection: connect: ERROR: No username or jid given.');
+                throw 'StropheConnection: connect: ERROR: No username or jid given.';
+            }
+        }
+        else {
+            // Anonymous for null or undefined opts
+            this.id = '@' + this.xmppserver;
+            this.pw = '';
         }
 
-        this.log('StropheConnection: connect: id=' + id);
+        this.log('StropheConnection: connect: computed id=' + this.id);
 
         if (this.connection) {
             // Thinking we should really NOT null-out the connection but instead reset it.
@@ -167,21 +215,21 @@ GoCastJS.StropheConnection.prototype = {
         else {
             this.log('WARN: connection was null and should not be.');
             // We don't have a Strophe Connection at all yet.
-            this.connection = new Strophe.Connection(this.boshconn);
+            this.connection = new Strophe.Connection(this.boshurl);
         }
 
         // Anonymous XMPP connections are characterized by no password and a username which is
         // only @hostname.domain
-        if (this.pw === '' && this.id.charAt(0) === '@') {
+        if ((this.pw === '' || this.pw === null) && this.id.charAt(0) === '@') {
             this.bAnonymous = true;
         }
-        else if (pw === '' || pw === null) {
+        else if (this.pw === '' || this.pw === null) {
             this.log('StropheConnection: connect: WARN: Must be on a failed re-attach. No password for user ' + this.id);
             // Should we do anything here or just let it play out to AUTHFAIL or DISCONNECTED.
         }
 
         this.numConnects += 1;
-        this.log('Connecting(' + this.numConnects + ') ...');
+        this.log('Connecting(#' + this.numConnects + ') ...');
 
         try {
             this.connection.connect(this.id, this.pw, this.conn_callback.bind(this));
@@ -214,6 +262,7 @@ GoCastJS.StropheConnection.prototype = {
         if (err === 'item-not-found') {
             this.log('conn_callback: BOSH responded with item-not-found. Connection is invalid now.');
             this.forgetReconnectInfo();
+
             if (this.connection) {
                 this.connection.reset();
             }
@@ -224,6 +273,7 @@ GoCastJS.StropheConnection.prototype = {
                 // We need to inform someone that we're in a bad situation.
                 this.log('WARN: BOSH error + no login info -- calling status hopefully to resolve.');
                 this.statusCallback(status);
+                return;
             }
         }
 
@@ -319,7 +369,7 @@ GoCastJS.StropheConnection.prototype = {
         else {
             this.log('WARN: connection was null and should not be.');
             // We don't have a Strophe Connection at all yet.
-            this.connection = new Strophe.Connection(this.boshconn);
+            this.connection = new Strophe.Connection(this.boshurl);
         }
 
         this.numConnects += 1;
@@ -398,14 +448,16 @@ GoCastJS.StropheConnection.prototype = {
     addHandler: function(handler, ns, name, type, id, from, options) {
         if (this.connection) {
             try {
-                this.connection.addHandler(handler, ns, name, type, id, from, options);
+                return this.connection.addHandler(handler, ns, name, type, id, from, options);
             }
             catch(e) {
                 console.log('CATCH: ERROR on addHandler() attempt: ' + e);
+                return null;
             }
         }
         else {
             this.log('StropheConnection: ERROR: Cannot addHandler() - no connection.');
+            return null;
         }
     },
 
@@ -423,17 +475,53 @@ GoCastJS.StropheConnection.prototype = {
         }
     },
 
+    flush: function() {
+        if (this.connection) {
+            try {
+                this.connection.flush();
+            }
+            catch(e) {
+                console.log('CATCH: ERROR on flush() attempt: ' + e);
+            }
+        }
+        else {
+            this.log('StropheConnection: ERROR: Cannot flush() - no connection.');
+        }
+    },
+
+    getUniqueId: function(suffix) {
+        if (this.connection) {
+            return this.connection.getUniqueId(suffix);
+        }
+        else {
+            this.log('StropheConnection: ERROR: Cannot getUniqueId() - no connection.');
+            return null;
+        }
+    },
+
+    getJid: function() {
+        if (this.connection) {
+            return this.connection.jid;
+        }
+        else {
+            this.log('StropheConnection: ERROR: Cannot getJid() - no connection.');
+            return null;
+        }
+    },
+
     sendIQ: function(elem, callback, errback, timeout) {
         if (this.connection) {
             try {
-                this.connection.sendIQ(elem, callback, errback, timeout);
+                return this.connection.sendIQ(elem, callback, errback, timeout);
             }
             catch(e) {
                 console.log('CATCH: ERROR on sendIQ() attempt: ' + e);
+                return null;
             }
         }
         else {
             this.log('StropheConnection: ERROR: Cannot sendIQ() - no connection.');
+            return null;
         }
     }
 };
