@@ -1,4 +1,4 @@
-@font-face {
+/*@font-face {
     font-family: 'GillSans';
     src: url('font/gillsans.eot');
     src: url('font/gillsans.eot#iefix') format('embedded-opentype'),
@@ -6,7 +6,7 @@
          url('font/gillsans.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
-}
+}*/
 
 html {
     height: 100%;
@@ -24,11 +24,10 @@ body {
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#e9f6fd', endColorstr='#d3eefb',GradientType=1 );
 }
 
-body > .navbar .brand {
-    font-family: 'GillSans';
-    font-size: 1.75em;
-    color: lightgreen;
-    letter-spacing: 3px;
+body > .navbar {
+    box-shadow: 0px 0px 20px black;
+    -webkit-box-shadow: 0px 0px 20px black;
+    -moz-box-shadow: 0px 0px 20px black;
 }
 
 body > .container > .row > .span4 > form {
