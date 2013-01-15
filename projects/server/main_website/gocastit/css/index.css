@@ -1,0 +1,22 @@
+.html {
+    width: 100%;
+}
+
+body {
+    margin-top: 81px;
+    background: url('../img/bg.jpg');
+}
+
+.navbar {
+	box-shadow: 0px 0px 20px black;
+	-webkit-box-shadow: 0px 0px 20px black;
+	-moz-box-shadow: 0px 0px 20px black;
+}
+
+.sp-content .span4 {
+	padding-top: 30px;
+}
+
+.sp-content .span8 {
+	padding-top: 200px;
+}
