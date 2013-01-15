@@ -53,7 +53,9 @@
 		B0FBDCF52D219D5081778C33 /* OpenGLView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 83102A9266B2BB0C3F20849B /* OpenGLView.mm */; };
 		B1A24D4B4B5F7BA13770ACCD /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6108D4974A4F608C82695D7E /* AVFoundation.framework */; };
 		B8BE5531CCF911C5C0C7071B /* tSurfacePeer.mm in Sources */ = {isa = PBXBuildFile; fileRef = A3F93D338886817C741D112E /* tSurfacePeer.mm */; };
+		BAE7393A97C01052CA3B366B /* tTimer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16ACDD539B2DE6068F7C460F /* tTimer.cpp */; };
 		BDAFD7E6592AF0F56CFF3E53 /* Whiteboard.mm in Sources */ = {isa = PBXBuildFile; fileRef = F0A74EBFC5BBEEB301BE0385 /* Whiteboard.mm */; };
+		C24DBB7353A4D7718C4F6E9C /* tTimerPeer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0CA36C5DBD6E5C8407C77041 /* tTimerPeer.mm */; };
 		D52A7064A583CE69F61FD0A0 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 9C18CE4BB4E9C8DF93918E29 /* InfoPlist.strings */; };
 		D7A5AA1FE8C63E3766AF4062 /* LoginView.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB7B1641F15746F6CCA6A169 /* LoginView.xib */; };
 		DE318249CDF7AA5BB3B1A04E /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 45AD10DD26EE99758E0D4670 /* OpenGLES.framework */; };
@@ -75,9 +77,12 @@
 /* Begin PBXFileReference section */
 		0429BE46EE8659F09B60117D /* tProgram.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tProgram.h; sourceTree = "<group>"; };
 		09FA150B7647EA6DADF9AAF9 /* tTexture.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = tTexture.cpp; sourceTree = "<group>"; };
+		0CA36C5DBD6E5C8407C77041 /* tTimerPeer.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = tTimerPeer.mm; sourceTree = "<group>"; };
 		0DD38E8E271D3344A9BDC4D6 /* AddressBook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBook.framework; path = System/Library/Frameworks/AddressBook.framework; sourceTree = SDKROOT; };
 		1577E9F807E0CE719F9BC9EF /* package.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = package.h; sourceTree = "<group>"; };
+		162161BA2B1E8D921DD37F73 /* tTimerPeer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tTimerPeer.h; sourceTree = "<group>"; };
 		163EC79BB530657307FA85C0 /* tPixelFormat.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tPixelFormat.h; sourceTree = "<group>"; };
+		16ACDD539B2DE6068F7C460F /* tTimer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = tTimer.cpp; sourceTree = "<group>"; };
 		18706E684443CA2FE1BC4B6F /* Whiteboard.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Whiteboard.h; sourceTree = "<group>"; };
 		1973A9A42F49A5099790D0EF /* tFile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tFile.h; sourceTree = "<group>"; };
 		272118C382ADB0788DD475C9 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
@@ -112,6 +117,7 @@
 		A0B09A4813FF124C1769DFB6 /* CallcastManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CallcastManager.h; sourceTree = "<group>"; };
 		A3B52E3EA721B2C116CB4BDF /* tShader.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = tShader.cpp; sourceTree = "<group>"; };
 		A3F93D338886817C741D112E /* tSurfacePeer.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = tSurfacePeer.mm; sourceTree = "<group>"; };
+		A63636BF3A27670FC32856BD /* tTimer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tTimer.h; sourceTree = "<group>"; };
 		A79C1004A56BA9D1E9F59BEA /* CallcastEvent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CallcastEvent.h; sourceTree = "<group>"; };
 		A886F88044A01E0874CF0E90 /* tPixelFormat.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = tPixelFormat.cpp; sourceTree = "<group>"; };
 		A972318042313B22BC557297 /* LoginView.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = LoginView.mm; sourceTree = "<group>"; };
@@ -182,6 +188,28 @@
 			);
 			sourceTree = "<group>";
 		};
+		07C28267F6D2C676389324AE /* ios */ = {
+			isa = PBXGroup;
+			children = (
+				162161BA2B1E8D921DD37F73 /* tTimerPeer.h */,
+				0CA36C5DBD6E5C8407C77041 /* tTimerPeer.mm */,
+			);
+			path = ios;
+			sourceTree = "<group>";
+		};
+		2A0876C2C14BAE99E2AB2EE2 /* Base */ = {
+			isa = PBXGroup;
+			children = (
+				07C28267F6D2C676389324AE /* ios */,
+				8E14DE79388DB788006202E1 /* package.h */,
+				6685E894D5550CC4BF98F9AA /* tObserver.h */,
+				30060B4CDC358A711E95F89F /* tSingleton.h */,
+				16ACDD539B2DE6068F7C460F /* tTimer.cpp */,
+				A63636BF3A27670FC32856BD /* tTimer.h */,
+			);
+			path = Base;
+			sourceTree = "<group>";
+		};
 		4365B0A1D9BD6AAAF27800A3 /* Bootstrap/ios */ = {
 			isa = PBXGroup;
 			children = (
@@ -194,16 +222,6 @@
 				41457BA618A6B6E8FCBB620F /* main.mm */,
 			);
 			path = Bootstrap/ios;
-			sourceTree = "<group>";
-		};
-		44FEB78EB99BA6758DA411FC /* Base */ = {
-			isa = PBXGroup;
-			children = (
-				8E14DE79388DB788006202E1 /* package.h */,
-				6685E894D5550CC4BF98F9AA /* tObserver.h */,
-				30060B4CDC358A711E95F89F /* tSingleton.h */,
-			);
-			path = Base;
 			sourceTree = "<group>";
 		};
 		591CE5712EF39658DE06ED3F /* Build */ = {
@@ -357,7 +375,7 @@
 		CE3F2E0D4AEF97F316C4725B /* source */ = {
 			isa = PBXGroup;
 			children = (
-				44FEB78EB99BA6758DA411FC /* Base */,
+				2A0876C2C14BAE99E2AB2EE2 /* Base */,
 				4365B0A1D9BD6AAAF27800A3 /* Bootstrap/ios */,
 				5B5CF35D83D253D7A1B819A0 /* Input */,
 				B725B79358BFD482911D6690 /* Io */,
@@ -473,6 +491,8 @@
 				48A5FDC8303E0CCFF05C6501 /* LoginView.mm in Sources */,
 				BDAFD7E6592AF0F56CFF3E53 /* Whiteboard.mm in Sources */,
 				00E671627FC87D55009500F2 /* GCICallcast.mm in Sources */,
+				BAE7393A97C01052CA3B366B /* tTimer.cpp in Sources */,
+				C24DBB7353A4D7718C4F6E9C /* tTimerPeer.mm in Sources */,
 				4A0AEDAAF950A39FC7583DAA /* tFile.mm in Sources */,
 				FB5FA224983BAEAC5A8A15C7 /* tPixelFormat.cpp in Sources */,
 				232A49082F5C6A2625EFDE22 /* tProgram.cpp in Sources */,

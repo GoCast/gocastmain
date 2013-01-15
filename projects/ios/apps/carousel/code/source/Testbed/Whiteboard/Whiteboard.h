@@ -7,6 +7,7 @@ class CallcastEvent;
 class Whiteboard
 :   tObserver<const tSGViewEvent&>,
     tObserver<const tMouseEvent&>,
+    tObserver<const tTimerEvent&>,
     tObserver<const CallcastEvent&>
 {
 protected:
@@ -14,6 +15,9 @@ protected:
     std::vector<tPoint2f>   mWhiteBoardTexCoords;
     std::vector<tPoint2f>   mMouseVerts;
     std::vector<tPoint2f>   mMouseTexCoords;
+
+    tTimer*                 mDrawingTimer;
+    tPoint2f                mLastPolledPt;
 
     tSurface                mWhiteboardSurface;
     tTexture*               mWhiteboardTexture;
@@ -32,6 +36,7 @@ protected:
     float                   mSendPenSize;
 
     bool                    mInitialized;
+    bool                    mShouldCapture;
 
 protected:
     void createResources();
@@ -52,6 +57,7 @@ public:
 
     void update(const tSGViewEvent& msg);
     void update(const tMouseEvent& msg);
+    void update(const tTimerEvent& msg);
     void update(const CallcastEvent& msg);
 };
 

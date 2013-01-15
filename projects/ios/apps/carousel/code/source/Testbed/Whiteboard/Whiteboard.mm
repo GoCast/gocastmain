@@ -117,15 +117,21 @@ Whiteboard::Whiteboard()
     mReceivePenSize(5),
     mSendPenColor(kBlue),
     mSendPenSize(5),
-    mInitialized(false)
+    mInitialized(false),
+    mShouldCapture(false)
 {
     tSGView::getInstance()->attach(this);
     tInputManager::getInstance()->tSubject<const tMouseEvent&>::attach(this);
     CallcastManager::getInstance()->attach(this);
+
+    mDrawingTimer = new tTimer(100);
+    mDrawingTimer->attach(this);
+    mDrawingTimer->start();
 }
 
 Whiteboard::~Whiteboard()
 {
+    if (mDrawingTimer) delete mDrawingTimer;
     if (mSpriteProgram) delete mSpriteProgram;
     if (mMouseTexture) delete mMouseTexture;
     if (mWhiteboardTexture) delete mWhiteboardTexture;
@@ -307,10 +313,12 @@ void Whiteboard::update(const tMouseEvent& msg)
     switch (msg.event)
     {
         case tMouseEvent::kMouseDown:
-            mStartTouch = lastMousePt;
+            mShouldCapture = true;
+            mStartTouch     = lastMousePt;
+            mLastPolledPt   = lastMousePt;
             break;
         case tMouseEvent::kMouseDrag:
-//            mWhiteboardSurface.fillRect(tRectf(lastMousePt - tPoint2f(2,2), tDimension2f(4,4)), tColor4b(0,0,255,255));
+            mLastPolledPt = lastMousePt;
             break;
 
         case tMouseEvent::kMouseUp:
@@ -321,11 +329,37 @@ void Whiteboard::update(const tMouseEvent& msg)
                                                                       colorToString(mSendPenColor).c_str(),
                                                                       (int)mSendPenSize,
                                                                       (int)mStartTouch.x, (int)mStartTouch.y, (int)mEndTouch.x, (int)mEndTouch.y]];
+            mShouldCapture = false;
         }
             break;
 
         default:
             break;
+    }
+}
+
+void Whiteboard::update(const tTimerEvent& msg)
+{
+    if (mShouldCapture)
+    {
+        switch (msg.mEvent)
+        {
+            case tTimer::kTimerTick:
+                if (mLastPolledPt != mStartTouch)
+                {
+                    printf("*** drawing (%d, %d) - (%d, %d)\n",
+                    (int)mStartTouch.x, (int)mStartTouch.y, (int)mLastPolledPt.x, (int)mLastPolledPt.y);
+
+                    [gWebViewInstance stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"realDrawLine('%s', %d, %d, %d, %d, %d);",
+                                                                              colorToString(mSendPenColor).c_str(),
+                                                                              (int)mSendPenSize,
+                                                                              (int)mStartTouch.x, (int)mStartTouch.y, (int)mLastPolledPt.x, (int)mLastPolledPt.y]];
+                    mStartTouch = mLastPolledPt;
+                }
+                break;
+
+            default: break;
+        }
     }
 }
 

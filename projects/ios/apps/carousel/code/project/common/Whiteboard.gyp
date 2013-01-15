@@ -38,6 +38,11 @@
 						'../../source/Base/package.h',
 						'../../source/Base/tObserver.h',
 						'../../source/Base/tSingleton.h',
+						'../../source/Base/tTimer.cpp',
+						'../../source/Base/tTimer.h',
+						'../../source/Base/<@(OS)/tTimerPeer.mm',
+						'../../source/Base/<@(OS)/tTimerPeer.h',
+
 						'../../source/Input/package.h',
 						'../../source/Input/tInputManager.h',
 						'../../source/Input/tMouseEvent.h',
