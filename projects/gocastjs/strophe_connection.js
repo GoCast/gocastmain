@@ -1,10 +1,21 @@
+/* Requires:
+   Strophe
+   JQuery
+
+   */
+
 /*jslint sloppy: false, white: true, todo: true, browser: true, devel: true */
 /*global Buffer */
 'use strict';
 
-var GoCast = GoCast || {};
+var GoCastJS = GoCastJS || {};
 
-GoCast.StropheConnection = function(boshconn, statusCallback, logFn) {
+GoCastJS.StropheConnection = function(boshconn, statusCallback, logFn) {
+    var self = this;
+
+    console.log('New GoCastJS.StropheConnection.');
+    this.log('Using internal log mechanism.');
+
     if (!boshconn || !statusCallback) {
         throw 'StropheConnection: ERROR: Bad invocation - must provide all required parameters.';
     }
@@ -26,9 +37,24 @@ GoCast.StropheConnection = function(boshconn, statusCallback, logFn) {
 
     // We don't have a Strophe Connection at all yet.
     this.connection = new Strophe.Connection(this.boshconn);
+
+    Strophe.log = function(level, msg) {
+        if (level > 0) {
+            console.log('STROPHE-LOG: level:' + level + ', msg: ' + msg);
+        }
+    };
+
+    $(window).on('beforeunload', function() {
+        self.log('StropheConnection: Before Unload.');
+        if (self.connection && self.connection.connected && self.connection.authenticated) {
+            self.log('Storing rid/jid/sid for later.');
+            self.saveLoginInfo();
+        }
+    });
+
 };
 
-GoCast.StropheConnection.prototype = {
+GoCastJS.StropheConnection.prototype = {
     isAnonymous: function() {
         return this.bAnonymous;
     },
@@ -54,6 +80,7 @@ GoCast.StropheConnection.prototype = {
     saveLoginInfo: function() {
         if (typeof (Storage) !== 'undefined') {
             if (this.connection && this.connection.authenticated && this.connection.connected) {
+                this.log('Saving Login Info: RID: ' + this.connection.rid + ', jid: ' + this.connection.jid + ', sid: ' + this.connection.sid);
                 localStorage.jid = this.connection.jid;
                 localStorage.rid = this.connection.rid;
                 localStorage.sid = this.connection.sid;
@@ -88,7 +115,9 @@ GoCast.StropheConnection.prototype = {
     //         Success - The jid used to re-attach.
     //
     autoConnect: function() {
-        if (this.hasLoginStored()) {
+        this.log('StropheConnection: Auto-Connecting.');
+
+        if (this.hasSavedLoginInfo()) {
             this.bAnonymous = localStorage.bAnonymous;
 
     // RMW: In theory we are supposed to advance RID by one, but Chrome fails it while Firefox is ok. Sigh. No advancing...
@@ -97,14 +126,26 @@ GoCast.StropheConnection.prototype = {
 
             return localStorage.jid;
         }
-        else {
-            return null;
+        else if (this.id !== null && this.id !== '' && this.pw !== null && this.pw !== '') {
+            // In this case, we actually have a username and a password for login. Use it.
+            this.connect(this.id, this.pw);
+
+            return this.id;
         }
+
+        return null;
     },
 
     connect: function(id, pw) {
         this.id = id;
         this.pw = pw;
+
+        if (id === null && pw === null) {
+            this.log('StropheConnection: connect: null arguments. Throwing exception.');
+            throw 'StropheConnection: connect: null arguments. Throwing exception.';
+        }
+
+        this.log('StropheConnection: connect: id=' + id);
 
         if (this.connection) {
             // Thinking we should really NOT null-out the connection but instead reset it.
@@ -116,14 +157,25 @@ GoCast.StropheConnection.prototype = {
             this.connection = new Strophe.Connection(this.boshconn);
         }
 
-        if (this.pw === '') {
+        // Anonymous XMPP connections are characterized by no password and a username which is
+        // only @hostname.domain
+        if (this.pw === '' && this.id.charAt(0) === '@') {
             this.bAnonymous = true;
+        }
+        else if (pw === '' || pw === null) {
+            this.log('StropheConnection: connect: WARN: Must be on a failed re-attach. No password for user ' + this.id);
+            // Should we do anything here or just let it play out to AUTHFAIL or DISCONNECTED.
         }
 
         this.numConnects += 1;
         this.log('Connecting(' + this.numConnects + ') ...');
 
-        this.connection.connect(this.id, this.pw, this.conn_callback);
+        try {
+            this.connection.connect(this.id, this.pw, this.conn_callback.bind(this));
+        }
+        catch(e) {
+            console.log('CATCH: ERROR on connect() attempt: ' + e);
+        }
     },
 
     //
@@ -133,7 +185,9 @@ GoCast.StropheConnection.prototype = {
     //
     handleDisconnect: function() {
 
-        this.log('ERROR: INCOMPLETE. FIX ME.');
+        this.log('StropheConnection: handleDisconnect: processing.');
+
+        this.log('WARN: INCOMPLETE. FIX ME.');
         if (this.causeConnfail) {
             this.log('INFO: CONNFAIL led us to DISCONNECTED.');
             this.autoConnect(); // Attempt to re-connect.
@@ -145,24 +199,19 @@ GoCast.StropheConnection.prototype = {
 
     conn_callback: function(status, err) {
         if (err === 'item-not-found') {
-            this.log('Orig conn_callback: BOSH responded with item-not-found. Connection is invalid now.');
+            this.log('conn_callback: BOSH responded with item-not-found. Connection is invalid now.');
             this.forgetReconnectInfo();
             if (this.connection) {
                 this.connection.reset();
             }
 
-            // If we have a password (must be valid login) -- or we're anonymous (no jid node in id)
-            // then we should just login again. Go.
-            if (this.pw !== '' || this.id.split('@')[0].length === 0) {
-                this.connect(this.id, this.pw);
-            }
-            else {
+            // Attempt to auto-connect (via stored info or given id/pw)
+            // If that's not successful, then we're in a world of hurt.
+            if (!this.autoConnect()) {
                 // We need to inform someone that we're in a bad situation.
                 this.log('WARN: BOSH error + no login info -- calling status hopefully to resolve.');
                 this.statusCallback(status);
             }
-
-            return;
         }
 
         if (err) {
@@ -178,6 +227,7 @@ GoCast.StropheConnection.prototype = {
             case Strophe.Status.CONNECTED:
                 this.log('GoCastJS.StropheConnection: CONNECTED');
                 this.saveLoginInfo();
+                this.connection.addHandler(this.privateSetupPingHandler.bind(this), 'urn:xmpp:ping', 'iq', 'get');
                 break;
             case Strophe.Status.DISCONNECTED:
                 this.log('GoCastJS.StropheConnection: DISCONNECTED');
@@ -191,16 +241,19 @@ GoCast.StropheConnection.prototype = {
                 break;
             case Strophe.Status.ATTACHED:
                 this.log('GoCastJS.StropheConnection: ATTACHED');
+                this.saveLoginInfo();
+                this.connection.addHandler(this.privateSetupPingHandler.bind(this), 'urn:xmpp:ping', 'iq', 'get');
                 break;
             case Strophe.Status.DISCONNECTING:
                 this.log('GoCastJS.StropheConnection: DISCONNECTING');
                 // Save off our rid/jid/sid here - as we aren't disconnected yet. Last chance?
                 // or might this just give us more bogus saved login info?
-                // this.saveLoginInfo();
+                this.saveLoginInfo();
                 break;
             case Strophe.Status.CONNFAIL:
-                this.causeConnfail = true;
                 this.log('GoCastJS.StropheConnection: CONNFAIL');
+                this.causeConnfail = true;
+                this.saveLoginInfo();
                 break;
             case Strophe.Status.AUTHFAIL:
                 this.causeAuthfail = true;
@@ -214,12 +267,37 @@ GoCast.StropheConnection.prototype = {
         this.statusCallback(status);
     },
 
-    privateReattach: function(jid, sid, rid) {
-        if (!jid || !sid || !rid || !jid.split('@')[1])
+    privateSetupPingHandler: function(iq) {
+        var pong = $iq({to: $(iq).attr('from'), id: $(iq).attr('id'), type: 'result'});
+//        this.log('StropheConnection: Received PING - Sending pong...');
+        if (this.connection) {
+            this.connection.send(pong);
+
+            // Periodically we get pinged (usually at a frequency of 30 seconds)
+            // When we are pinged, the rid changes...so store it in case we have a failure
+            // that doesn't manage to trigger the on-unload which also saves login info.
+            this.saveLoginInfo();
+        }
+
+        return true;
+    },
+
+    //
+    // @brief Utilizes the rid/jid/sid to re-login to an existing session.
+    //
+    privateReattach: function(jid, sid, inRid) {
+        var rid;
+
+        if (!jid || !sid || !inRid || !jid.split('@')[1])
         {
-            this.log('Re-attach ERROR: RID/SID/JID is null. RID=' + rid + ', SID=' + sid + ', JID=' + jid);
+            this.log('Re-attach ERROR: RID/SID/JID is null. RID=' + inRid + ', SID=' + sid + ', JID=' + jid);
             return;
         }
+
+        // Auto-advance the rid.
+        // NOTE: Seems auto-advance causes problems. Skipping for now.
+        rid = parseInt(inRid, 10);
+        // rid = parseInt(inRid, 10) + 1;
 
         if (this.connection)
         {
@@ -232,7 +310,7 @@ GoCast.StropheConnection.prototype = {
         }
 
         this.numConnects += 1;
-        this.log('Re-attaching(' + this.numConnects + ') -- jid=' + jid + ', sid=' + sid + ', rid=' + rid);
+        this.log('StropheConnection: Re-attaching(' + this.numConnects + ') -- jid=' + jid + ', sid=' + sid + ', rid=' + rid);
 
         // Once we are primed for re-attaching, we should forget this info. If it does wind
         // up being good, we'll get a new rid/jid/sid upon ATTACHED or CONNECTED to save.
@@ -240,7 +318,15 @@ GoCast.StropheConnection.prototype = {
         // anyway.
         this.forgetReconnectInfo();
 
-        this.connection.attach(jid, sid, rid, this.conn_callback);
+        this.id = jid;
+        this.pw = '';
+
+        try {
+            this.connection.attach(jid, sid, rid, this.conn_callback.bind(this));
+        }
+        catch(e) {
+            console.log('CATCH: ERROR on attach() attempt: ' + e);
+        }
     },
 
     debugXML: function(bEnable) {
@@ -270,6 +356,8 @@ GoCast.StropheConnection.prototype = {
     },
 
     setSync: function(bEnable) {
+        this.log('StropheConnection: setSync(' + bEnable + ')');
+
         if (this.connection) {
             if (bEnable === false) {
                 this.connection.sync = false;
