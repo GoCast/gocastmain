@@ -88,6 +88,15 @@ GoCastJS.StropheConnection.prototype = {
         return email.toLowerCase().replace('@', '~');
     },
 
+    getEmailFromJid: function() {
+        if (this.id) {
+            return Strophe.getNodeFromJid(this.id).toLowerCase().replace('~', '@');
+        }
+        else {
+            return null;
+        }
+    },
+
     isAnonymous: function() {
         return this.bAnonymous;
     },
