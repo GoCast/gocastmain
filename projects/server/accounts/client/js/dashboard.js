@@ -13,6 +13,10 @@ var DashView = {
             $('.alert', this.$forms[i]).removeClass('show');
         }
         this.$forms[id].addClass('show');
+
+        if ('changepwd-form' === id) {
+            $('#input-email', this.$forms[id]).val(DashApp.boshconn.getEmailFromJid());
+        }
     },
     displayalert: function(formid, type, message) {
         var $alert = null;
@@ -87,7 +91,7 @@ var DashApp = {
             beforesubmit: function() {
                 return function(arr, $form, options) {
                 };
-            }
+            },
         },
         'startmeeting-form': {
             success: function() {
