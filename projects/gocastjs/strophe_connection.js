@@ -76,11 +76,6 @@ GoCastJS.StropheConnection = function(opts) {
             self.saveLoginInfo();
         }
     });
-
-    if (Strophe.muc) {
-        this.log('StropheConnection: Plugin found: muc');
-        this.muc = Strophe.muc;
-    }
 };
 
 GoCastJS.StropheConnection.prototype = {

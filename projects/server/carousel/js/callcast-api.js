@@ -386,21 +386,7 @@ $(document).on('connected', function(
   /* debug
   // Inside $(document).bind('connected'), function() { ....
 
-  Callcast.connection.xmlInput = function(data) {
-    if ($(data).children()[0]) {
-      console.log("XML-IN:", $(data).children()[0]);
-    } else {
-      console.log("XML-IN:", $(data));
-    }
-  };
-
-  Callcast.connection.xmlOutput = function(data) {
-    if ($(data).children()[0]) {
-      console.log("XML-OUT:", $(data).children()[0]);
-    } else {
-      console.log("XML-OUT:", $(data));
-    }
-  };
+  Callcast.connection.debugXML();
 
    */
 
