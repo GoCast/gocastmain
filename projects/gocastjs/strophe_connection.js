@@ -168,7 +168,7 @@ GoCastJS.StropheConnection.prototype = {
 
             return this.id;
         }
-        else if (this.id.charAt(0) === '@' && (this.pw === '' || this.pw === null)) {
+        else if (!this.id.match(/@/) && (this.pw === '' || this.pw === null)) {
             // We've discovered this was an anonymous login in the beginning - so do it again.
 
             this.bAnonymous = true;
@@ -205,7 +205,7 @@ GoCastJS.StropheConnection.prototype = {
         }
         else {
             // Anonymous for null or undefined opts
-            this.id = '@' + this.xmppserver;
+            this.id = this.xmppserver;
             this.pw = '';
         }
 
@@ -222,8 +222,8 @@ GoCastJS.StropheConnection.prototype = {
         }
 
         // Anonymous XMPP connections are characterized by no password and a username which is
-        // only @hostname.domain
-        if ((this.pw === '' || this.pw === null) && this.id.charAt(0) === '@') {
+        // only hostname.domainname
+        if ((this.pw === '' || this.pw === null) && !this.id.match(/@/)) {
             this.bAnonymous = true;
         }
         else if (this.pw === '' || this.pw === null) {
