@@ -1383,15 +1383,20 @@ var Callcast = {
     /// Then trigger 'roomlist_updated' for the UI portion to react.
     ///
     RefreshRooms: function() {
-         Callcast.connection.muc.listRooms(Callcast.CALLCAST_ROOMS, function(thelist) {
-             Callcast.roomlist = {};    // Remove all entries from the rooms list.
+        if (Callcast.connection && Callcast.connection.connection) {
+            Callcast.connection.connection.muc.listRooms(Callcast.CALLCAST_ROOMS, function(thelist) {
+                Callcast.roomlist = {};    // Remove all entries from the rooms list.
 
-             $(thelist).find('item').each(function() {
-                 Callcast.roomlist[$(this).attr('jid')] = $(this).attr('name');
-             });
+                $(thelist).find('item').each(function() {
+                    Callcast.roomlist[$(this).attr('jid')] = $(this).attr('name');
+                });
 
-             $(document).trigger('roomlist_updated');
-         });
+                $(document).trigger('roomlist_updated');
+            });
+        }
+        else {
+            Callcast.log('ERROR: No connection/connection/muc for listRooms()');
+        }
     },
 
     CallMsgHandler: function(msg) {
@@ -2496,7 +2501,12 @@ var Callcast = {
              return false;
          }
 
-         this.connection.muc.join(roomjid, Callcast.nick, Callcast.MsgHandler, Callcast.PresHandler); //, null);
+        if (this.connection && this.connection.connection) {
+            this.connection.connection.muc.join(roomjid, Callcast.nick, Callcast.MsgHandler, Callcast.PresHandler);
+        }
+        else {
+            Callcast.log('ERROR: No connection/connection/muc for join()');
+        }
 
          Callcast.SendLiveLog('@' + roomname.split('@')[0] + ':, Login-Complete-Joining JID: ' + Callcast.connection.getJid().split('@')[0] + ', - userAgent: ' + navigator.userAgent.replace(/;/g, '|'));
 
@@ -2518,11 +2528,16 @@ var Callcast = {
         }
 
         this.WriteUpdatedState();
-        this.connection.muc.leave(Callcast.room, Callcast.nick, function() {
-            if (cb) {
-                cb();
-            }
-        });
+        if (this.connection && this.connection.connection) {
+            this.connection.connection.muc.leave(Callcast.room, Callcast.nick, function() {
+                if (cb) {
+                    cb();
+                }
+            });
+        }
+        else {
+            Callcast.log('ERROR: No connection/connection/muc for leave()');
+        }
 
         // Due to Chrome async/ajax issues, we flush on all 'leave' requests.
         this.connection.flush();
@@ -2763,7 +2778,7 @@ var Callcast = {
             this.connection.autoConnect();
         }
         else {
-            this.connection.connect(id, pw);
+            this.connection.connect({jid: id, password: pw});
         }
     },
 
@@ -2793,7 +2808,7 @@ var Callcast = {
                 Callcast.Callback_ConnectionStatus('Connecting');
                 break;
             case Strophe.Status.ATTACHED:
-                this.log('XMPP/Strophe Re-Attach of connection successful. Triggering re-attached...');
+                this.log('XMPP/Strophe Re-Attach of connection successful.');
                 // Determine if we're in a 'refresh' situation and if so, then re-attach.
                 if (typeof (Storage) !== 'undefined' && sessionStorage.room)
                 {
@@ -2809,16 +2824,18 @@ var Callcast = {
                         Callcast.bUseMicrophone = sessionStorage.bUseMicrophone;
                     }
 
-                    Callcast.LeaveSession();
+                    // Leave the current room and re-join
+                    Callcast.LeaveSession(function() {
+                        Callcast.finalizeConnect();
+                        $(document).trigger('connected');
+                        Callcast.Callback_ConnectionStatus('Re-Attached');
+                    });
                 }
-
-                setTimeout(function() {
+                else {
                     Callcast.finalizeConnect();
-                    $(document).trigger('re-attached');
                     $(document).trigger('connected');
                     Callcast.Callback_ConnectionStatus('Re-Attached');
-
-                }, 500);
+                }
                 break;
             case Strophe.Status.DISCONNECTING:
                 this.log('XMPP/Strophe is Dis-Connecting...should we try to re-attach here? TODO:RMW');
@@ -2841,9 +2858,6 @@ var Callcast = {
                 Callcast.Callback_ConnectionStatus('Unknown status');
                 break;
         }
-
-        // TODO:RMW Clean up big time
-        Callcast.conn_callback_guts(status);
     },
 
     finalizeConnect: function() {

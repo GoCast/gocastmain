@@ -102,6 +102,7 @@ fi
 cp -p -r * $tempdest
 cp -p ../../xmpp-peerconnection/callcast.js $tempdest/js
 cp -p ../../gocastjs/webrtc/peerconnection.js $tempdest/js
+cp -p ../../gocastjs/*.js $tempdest/js
 cp -p ../../gocastjs/ui/*.js $tempdest/js
 cp -p ../../gocastjs/ibb/ibb.js $tempdest/js
 
@@ -119,6 +120,7 @@ function obfuscate() {
   cp $tempdest/js/ibb.js $tempjs/js
   cp $tempdest/js/fileshare.js $tempjs/js
   cp $tempdest/js/fileviewer.js $tempjs/js
+  cp $tempdest/js/strophe_connection.js $tempjs/js
 
   cw=`pwd`
   cd $tempjs
