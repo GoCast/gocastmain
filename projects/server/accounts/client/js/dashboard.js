@@ -104,6 +104,12 @@ var DashApp = {
             },
             beforesubmit: function() {
                 return function(arr, $form, options) {
+                    var rcode = $.roomcode.cipher(DashApp.boshconn.getEmailFromJid().replace(/@/, '~'),
+                                                  $('#input-roomname', $form).val());
+
+                    DashView.displayalert('startmeeting-form', 'success', 'Room Code: ' +
+                                          rcode + '<br>Room Id: ' + $.roomcode.decipher(rcode));
+                    return false;
                 };
             }
         }

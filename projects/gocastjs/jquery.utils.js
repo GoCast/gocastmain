@@ -8,7 +8,7 @@
 	};
 
 	$.extend({
-		clientos: clientosinfo;
+		clientos: clientosinfo
 	});
 })(jQuery);
 
@@ -28,15 +28,19 @@
     }
 
     $.extend({
-		urlvars: urlvarsobj;
+		urlvars: urlvarsobj
 	});
 })(jQuery);
 
 (function($) {
-	var plugins = navigator.plugins;
+    var plugins, verstring, ver;
+
+    navigator.plugins.refresh(false);
+	plugins = navigator.plugins;
 	for (var i=0; i<plugins.length; i++) {
 		if ('GoCastPlayer' === plugins[i].name) {
-			var ver = parseFloat(plugins[i].version||plugins[i].description);
+            verstring = plugins[i].version||plugins[i].description;
+			ver = parseFloat(verstring.split(' ')[1]);
 			$.extend({
 				gocastplayer: {
 					version: isNaN(ver) ? 0.0 : ver
@@ -45,4 +49,25 @@
 			return;
 		}
 	}
+})(jQuery);
+
+(function($) {
+    var salt = 'Room',
+        saltdelim = ':',
+        userdelim = '#',
+        roomcodeobj = {
+            cipher: function(username, roomname) {
+                return $.base64.encode(salt + saltdelim + username + userdelim + roomname);
+            },
+            decipher: function(rcode) {
+                var roomname = $.base64.decode(rcode),
+                    roomsalt = roomname.split(saltdelim)[0];
+
+                return (salt === roomsalt) ? roomname.split(saltdelim)[1] : ''; 
+            }
+        };
+
+        $.extend({
+            roomcode: roomcodeobj
+        });
 })(jQuery);
