@@ -21,6 +21,14 @@ body > .navbar {
     -moz-box-shadow: 0px 0px 20px black;
 }
 
+body > .navbar .nav {
+    display: none;
+}
+
+body > .navbar .nav.show {
+    display: block;
+}
+
 body > .container > .row > .span4 > form {
     display: none;
     margin-top: 150px;

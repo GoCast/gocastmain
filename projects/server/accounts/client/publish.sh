@@ -20,6 +20,7 @@ scp -r js/* $dest/js/
 scp -r deps/jquery-plugins/* $dest/js/
 scp deps/twitter-bootstrap/js/bootstrap.js $dest/js/
 scp ../../carousel/js/jquery-1.8.1.js $dest/js/
+scp ../../../gocastjs/strophe_connection.js $dest/js/
 
 # Copy images
 scp -r ../../main_website/gocastit/img/gocastheaderlogo.png $dest/img/
