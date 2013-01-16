@@ -60,6 +60,9 @@ GoCastJS.StropheConnection = function(opts) {
     // We don't have a Strophe Connection at all yet.
     this.connection = new Strophe.Connection(this.boshurl);
 
+    // Custom status item.
+    Strophe.Status.TERMINATED = 99;
+
     Strophe.log = function(level, msg) {
         if (level > 0) {
             console.log('STROPHE-LOG: level:' + level + ', msg: ' + msg);
@@ -83,6 +86,15 @@ GoCastJS.StropheConnection = function(opts) {
 GoCastJS.StropheConnection.prototype = {
     usernameTransform: function(email) {
         return email.toLowerCase().replace('@', '~');
+    },
+
+    getEmailFromJid: function() {
+        if (this.id) {
+            return Strophe.getNodeFromJid(this.id).toLowerCase().replace('~', '@');
+        }
+        else {
+            return null;
+        }
     },
 
     isAnonymous: function() {
@@ -165,7 +177,7 @@ GoCastJS.StropheConnection.prototype = {
 
             return this.id;
         }
-        else if (this.id.charAt(0) === '@' && (this.pw === '' || this.pw === null)) {
+        else if (!this.id.match(/@/) && (this.pw === '' || this.pw === null)) {
             // We've discovered this was an anonymous login in the beginning - so do it again.
 
             this.bAnonymous = true;
@@ -202,7 +214,7 @@ GoCastJS.StropheConnection.prototype = {
         }
         else {
             // Anonymous for null or undefined opts
-            this.id = '@' + this.xmppserver;
+            this.id = this.xmppserver;
             this.pw = '';
         }
 
@@ -219,13 +231,14 @@ GoCastJS.StropheConnection.prototype = {
         }
 
         // Anonymous XMPP connections are characterized by no password and a username which is
-        // only @hostname.domain
-        if ((this.pw === '' || this.pw === null) && this.id.charAt(0) === '@') {
+        // only hostname.domainname
+        if ((this.pw === '' || this.pw === null) && !this.id.match(/@/)) {
             this.bAnonymous = true;
         }
         else if (this.pw === '' || this.pw === null) {
             this.log('StropheConnection: connect: WARN: Must be on a failed re-attach. No password for user ' + this.id);
-            // Should we do anything here or just let it play out to AUTHFAIL or DISCONNECTED.
+            this.statusCallback(Strophe.Status.TERMINATED);
+            return;
         }
 
         this.numConnects += 1;
@@ -254,8 +267,13 @@ GoCastJS.StropheConnection.prototype = {
             this.autoConnect(); // Attempt to re-connect.
         }
 
+        if (this.causeTerminating) {
+            this.statusCallback(Strophe.Status.TERMINATED);
+        }
+
         this.causeAuthfail = false;
         this.causeConnfail = false;
+        this.causeTerminating = false;
     },
 
     conn_callback: function(status, err) {
@@ -294,8 +312,11 @@ GoCastJS.StropheConnection.prototype = {
                 break;
             case Strophe.Status.DISCONNECTED:
                 this.log('GoCastJS.StropheConnection: DISCONNECTED');
+                // Calling the status early to keep things in order.
+                this.statusCallback(status);
                 this.handleDisconnect();
-                break;
+                // Artificial early return.
+                return;
             case Strophe.Status.AUTHENTICATING:
                 this.log('GoCastJS.StropheConnection: AUTHENTICATING');
                 break;
@@ -465,6 +486,7 @@ GoCastJS.StropheConnection.prototype = {
         if (this.connection) {
             try {
                 this.connection.disconnect(reason);
+                this.causeTerminating = true;
             }
             catch(e) {
                 console.log('CATCH: ERROR on disconnect() attempt: ' + e);
