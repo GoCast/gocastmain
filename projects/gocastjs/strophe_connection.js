@@ -147,7 +147,7 @@ GoCastJS.StropheConnection.prototype = {
     },
 
     hasSavedRegisteredLoginInfo: function() {
-        if (this.hasSavedLoginInfo() && !localStorage.bAnonymous) {
+        if (this.hasSavedLoginInfo() && localStorage.bAnonymous === 'false') {
             return true;
         }
 
