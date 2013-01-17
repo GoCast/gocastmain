@@ -2462,40 +2462,7 @@ $(document).ready(function(
 )
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
-  // DNLE overrides.
-  if (window.location.hostname.toLowerCase() === 'dnle.gocast.it') {
-    Callcast.InitOverride({ CALLCAST_XMPPSERVER: 'dnle.gocast.it',
-                        CALLCAST_ROOMS: 'conference.dnle.gocast.it',
-                        AT_CALLCAST_ROOMS: '@conference.dnle.gocast.it',
-                        STUNSERVER: 'dnle.gocast.it', STUNSERVERPORT: 19302,
-                        FEEDBACK_BOT: 'feedback_bot_dnle@dnle.gocast.it',
-                        ROOMMANAGER: 'roommanager@dnle.gocast.it/roommanager',
-                        SWITCHBOARD_FB: 'switchboard_dnle@dnle.gocast.it',
-                        LOGCATCHER: 'logcatcher@dnle.gocast.it/logcatcher',
-                        FILECATCHER: 'filecatcher@dnle.gocast.it/filecatcher'});
-  }
-  else if (window.location.hostname.toLowerCase() === 'creativity.gocast.it') {
-    Callcast.InitOverride({ CALLCAST_XMPPSERVER: 'dnle.gocast.it',
-                        CALLCAST_ROOMS: 'ccc-conference.dnle.gocast.it',
-                        AT_CALLCAST_ROOMS: '@ccc-conference.dnle.gocast.it',
-                        STUNSERVER: 'dnle.gocast.it', STUNSERVERPORT: 19302,
-                        FEEDBACK_BOT: 'feedback_bot_ccc@dnle.gocast.it',
-                        ROOMMANAGER: 'ccc_roommanager@dnle.gocast.it/roommanager',
-                        SWITCHBOARD_FB: 'switchboard_ccc@dnle.gocast.it',
-                        LOGCATCHER: 'ccc_logcatcher@dnle.gocast.it/logcatcher',
-                        FILECATCHER: 'ccc_filecatcher@dnle.gocast.it/filecatcher'});
-  }
-  else if (window.location.hostname.toLowerCase() === 'dev.gocast.it') {
-    Callcast.InitOverride({ CALLCAST_XMPPSERVER: 'dev.gocast.it',
-                        CALLCAST_ROOMS: 'conference.dev.gocast.it',
-                        AT_CALLCAST_ROOMS: '@conference.dev.gocast.it',
-                        STUNSERVER: 'dev.gocast.it', STUNSERVERPORT: 19302,
-                        FEEDBACK_BOT: 'feedback_bot_dev@dev.gocast.it',
-                        ROOMMANAGER: 'roommanager@dev.gocast.it/roommanager',
-                        SWITCHBOARD_FB: 'switchboard_dev@dev.gocast.it',
-                        LOGCATCHER: 'logcatcher@dev.gocast.it/logcatcher',
-                        FILECATCHER: 'filecatcher@dev.gocast.it/filecatcher'});
-  }
+  Callcast.init();
 
   //Disable file drag/drop everywhere except fileshare spots
   $('body').bind('dragover drop', function(e) {

@@ -214,18 +214,7 @@ var Callcast = {
     PLUGIN_VERSION_CURRENT_LINUX: 1.34,
     PLUGIN_VERSION_REQUIRED_LINUX: 1.34,
     NOANSWER_TIMEOUT_MS: 6000,
-    CALLCAST_XMPPSERVER: 'video.gocast.it',
-    CALLCAST_ROOMS: 'gocastconference.video.gocast.it',
-    AT_CALLCAST_ROOMS: '@gocastconference.video.gocast.it',
     NS_CALLCAST: 'urn:xmpp:callcast',
-//    STUNSERVER: 'stun.l.google.com',
-    STUNSERVER: 'video.gocast.it',
-    FEEDBACK_BOT: 'feedback_bot_gocast@video.gocast.it',
-    STUNSERVERPORT: 19302,
-    ROOMMANAGER: 'overseer@video.gocast.it/roommanager',
-    SWITCHBOARD_FB: 'switchboard_gocastfriends@video.gocast.it',
-    LOGCATCHER: 'logcatcher@video.gocast.it/logcatcher',
-    FILECATCHER: 'filecatcher@video.gocast.it/filecatcher',
     Callback_AddSpot: null,
     Callback_RemoveSpot: null,
     Callback_SetSpot: null,
@@ -261,33 +250,39 @@ var Callcast = {
     mediaHints: {audio: false, video: false},
     bPluginLoadedSuccessfully: false,
 
-    //
-    // \brief When server configuration is non-standard, use this function to setup the server names, usernames,
-    //      port numbers, etc. Two items of note: 1) This function should be called very early on load. Otherwise,
-    //      behavior is undefined. If this routine finds a valid Strophe connection, the plugin or a Facebook
-    //      signed request, it will not change any values and will throw an error.
-    //      2) All items in 'obj' must already be present. This routine will throw an error if that is not
-    //      the case as a safety check to avoid misspelled property names inbound.
-    //
-    InitOverride: function(obj) {
-        var k;
+    // Block of variables which are now being handled by the CallcastSettings
+    // object at init() time. Must call Callcast.init() before proceeding.
+    CALLCAST_XMPPSERVER: null,
+    CALLCAST_ROOMS: null,
+    AT_CALLCAST_ROOMS: null,
+//    STUNSERVER: 'stun.l.google.com',
+    STUNSERVER: null,
+    FEEDBACK_BOT: null,
+    STUNSERVERPORT: null,
+    ROOMMANAGER: null,
+    SWITCHBOARD_FB: null,
+    LOGCATCHER: null,
+    FILECATCHER: null,
 
-        if (this.connection || this.localplayer || this.localplayerLoaded || this.fbsr !== '') {
-            throw 'ERROR: Cannot InitOverride() at this time. Too late in the process.';
+    init: function(inServer, url) {
+        var boshurl = url || '/xmpp-httpbind',
+            server = inServer || window.location.hostname;
+
+        if (this.connection) {
+            throw 'init: StropheConnection already exists. Calling init again? Not legal.';
         }
 
-        for (k in obj)
-        {
-            if (obj.hasOwnProperty(k)) {
-                if (!this[k]) {
-                    throw 'ERROR: Property named ' + k + ' is not in current object. Misspelling?';
-                }
-
-                // Otherwise we're good to assign it the override.
-                this[k] = obj[k];
-//                this.log('InitOverride: Property ' + k + ' has a new value of ' + obj[k]);
-            }
+        if (this.settings) {
+            throw 'init: settings already exists. Calling init again? Not legal.';
         }
+
+        this.settings = new GoCastJS.CallcastSettings(server);
+        this.settings.transferValues(this); // Set all the values in Callcast.* from settings
+
+        this.connection = new GoCastJS.StropheConnection({ boshurl: boshurl,
+                                                           xmppserver: this.CALLCAST_XMPPSERVER,
+                                                           statusCallback: this.connStatusHandler,
+                                                           logFn: this.log});
 
     },
 
@@ -2556,6 +2551,7 @@ var Callcast = {
         if (this.connection && this.connection.connection) {
             leaveTimer = setTimeout(function() {
                 if (!isDone) {
+                    Callcast.log('LeaveSession: Using TIMEOUT to finishUp and callback.');
                     isDone = true;
 
                     finishUp();
@@ -2571,6 +2567,7 @@ var Callcast = {
                 clearTimeout(leaveTimer);
 
                 if (!isDone) {
+                    Callcast.log('LeaveSession: Using muc.leave callback to finishUp and callback.');
                     isDone = true;
 
                     finishUp();
