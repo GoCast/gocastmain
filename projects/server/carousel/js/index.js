@@ -1998,7 +1998,7 @@ function checkCredentials()
 //
 function handleRoomSetup() {
   app.log(2, 'handleRoomSetup entered');
-  var room_to_create = $.getUrlVar('roomname') || '',
+  var room_to_create = $.roomcode.decipher($.urlvars.roomname) || '',
       item;
 
   room_to_create = room_to_create.replace(/ /g, '');
@@ -2486,12 +2486,12 @@ $(document).ready(function(
 
   app.checkExclusive(function() {
     clearInterval(unmaskTimer);
-    navigator.plugins.refresh(); // reload plugins to get any plugin updates
+    navigator.plugins.refresh(false); // reload plugins to get any plugin updates
 
     // Check the browser.
     app.getBrowser();
     if (app.checkBrowser()) {
-      if (InvalidRoomname(decodeURI($.getUrlVar('roomname')))) {
+      /*if (InvalidRoomname(decodeURI($.getUrlVar('roomname')))) {
         closeWindow();
         openWindow('#errorMsgPlugin');
         $('#errorMsgPlugin > button').css({'display': 'none'});
@@ -2499,44 +2499,44 @@ $(document).ready(function(
         $('#errorMsgPlugin > p#prompt').css({'display': 'none'});
         $('#errorMsgPlugin > input#roomname').css({'display': 'block'});
         $('#errorMsgPlugin > button#reload').css({'display': 'block'});
-      } else {
+      } else {*/
 
-        uiInit(); // init user interface
-        if (app.fbCheckCredentialsTriggered) {
-          $(document).trigger('checkCredentials');
-        }
-
-        //do something if facebook took too long or errored out
-        app.fbTimerRunning = setTimeout(function() {
-          if (!app.facebookInited) {
-            closeWindow();
-            app.log(2, 'Facebook API init failed - userAgent: ' + navigator.userAgent);
-            Callcast.SendLiveLog('Facebook API init failed - userAgent: ' + navigator.userAgent.replace(/;/g, '|'));
-            Callcast.SendLiveLog('FBLOG: ' + getFBLog());
-            openWindow('#credentials');
-            $('#credentials > .fb-login-button').addClass('hidden');
-            $('#credentials > #fb-disabled').removeClass('hidden');
-          }
-        }, 10000);
-
-        // Login to xmpp anonymously
-        Callcast.connect();
-
-        // Write greeting into console.
-        app.log(2, 'Page loaded.');
-
-        Callcast.setCallbackForCallback_OnNicknameInUse(function(nick) {
-          app.nickInUse(nick);
-        });
-
-        // set the connection status callback
-        Callcast.setCallbackForCallback_ConnectionStatus(connectionStatus);
-
-        // callbacks for assign/unassign spots for participants
-        Callcast.setCallbackForAddSpotForParticipant(assignSpotForParticipant);
-        Callcast.setCallbackForRemoveSpotForParticipant(unassignSpotForParticipant);
+      uiInit(); // init user interface
+      if (app.fbCheckCredentialsTriggered) {
+        $(document).trigger('checkCredentials');
       }
+
+      //do something if facebook took too long or errored out
+      app.fbTimerRunning = setTimeout(function() {
+        if (!app.facebookInited) {
+          closeWindow();
+          app.log(2, 'Facebook API init failed - userAgent: ' + navigator.userAgent);
+          Callcast.SendLiveLog('Facebook API init failed - userAgent: ' + navigator.userAgent.replace(/;/g, '|'));
+          Callcast.SendLiveLog('FBLOG: ' + getFBLog());
+          openWindow('#credentials');
+          $('#credentials > .fb-login-button').addClass('hidden');
+          $('#credentials > #fb-disabled').removeClass('hidden');
+        }
+      }, 10000);
+
+      // Login to xmpp anonymously
+      Callcast.connect();
+
+      // Write greeting into console.
+      app.log(2, 'Page loaded.');
+
+      Callcast.setCallbackForCallback_OnNicknameInUse(function(nick) {
+        app.nickInUse(nick);
+      });
+
+      // set the connection status callback
+      Callcast.setCallbackForCallback_ConnectionStatus(connectionStatus);
+
+      // callbacks for assign/unassign spots for participants
+      Callcast.setCallbackForAddSpotForParticipant(assignSpotForParticipant);
+      Callcast.setCallbackForRemoveSpotForParticipant(unassignSpotForParticipant);
     }
+    //}
   }, function() {
     closeWindow();
     openWindow('#errorMsgPlugin');

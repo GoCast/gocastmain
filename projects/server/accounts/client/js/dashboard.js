@@ -106,9 +106,7 @@ var DashApp = {
                 return function(arr, $form, options) {
                     var rcode = $.roomcode.cipher(DashApp.boshconn.getEmailFromJid().replace(/@/, '~'),
                                                   $('#input-roomname', $form).val());
-
-                    DashView.displayalert('startmeeting-form', 'success', 'Room Code: ' +
-                                          rcode + '<br>Room Id: ' + $.roomcode.decipher(rcode));
+                    window.location.href = window.location.pathname.replace(/dashboard.html*$/, '') + '?roomname=' + rcode;
                     return false;
                 };
             }
