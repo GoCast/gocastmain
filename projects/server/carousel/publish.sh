@@ -106,6 +106,26 @@ cp -p ../../gocastjs/*.js $tempdest/js
 cp -p ../../gocastjs/ui/*.js $tempdest/js
 cp -p ../../gocastjs/ibb/ibb.js $tempdest/js
 
+# copy accounts html
+cp -p ../accounts/client/html/* $tempdest
+
+# copy accounts js
+cp -p ../accounts/client/js/* $tempdest/js
+cp -p ../accounts/client/deps/jquery-plugins/jquery.form.js $tempdest/js
+cp -p ../accounts/client/deps/twitter-bootstrap/js/bootstrap.js $tempdest/js
+
+# copy accounts css and fonts
+mkdir -p $tempdest/css/font
+cp -p -r ../accounts/client/css/* $tempdest/css
+cp -p ../accounts/client/deps/twitter-bootstrap/css/bootstrap.css $tempdest/css
+cp -p ../accounts/client/deps/font-awesome/css/font-awesome.css $tempdest/css
+cp -p ../accounts/client/deps/font-awesome/font/* $tempdest/css/font
+
+# copy accounts images
+cp -p ../accounts/client/deps/twitter-bootstrap/img/* $tempdest/images
+cp -p ../main_website/gocastit/img/gocastheaderlogo.png $tempdest/images
+
+
 function obfuscate() {
 # Now obfuscate and minimize files that need it.
   tempjs=$tempdest/jscramble_staging
@@ -121,6 +141,7 @@ function obfuscate() {
   cp $tempdest/js/fileshare.js $tempjs/js
   cp $tempdest/js/fileviewer.js $tempjs/js
   cp $tempdest/js/strophe_connection.js $tempjs/js
+  cp $tempdest/js/jquery.utils.js $tempjs/js
 
   cw=`pwd`
   cd $tempjs
@@ -176,13 +197,15 @@ function minimize() {
   gcpublish "js/index.js" "js/index.js"
   gcpublish "js/callcast-api.js" "js/callcast-api.js"
   gcpublish "js/fb.js" "js/fb.js"
+  gcpublish "$tempdest/js/register.js" "js/logreg.js"
+  gcpublish "$tempdest/js/dashboard.js" "js/dashboard.js"
 return 0
 }
 
 function genTimestampedHtml() {
   echo "Generating timestamped html: $1/$2"
   curtime=`date +%s`
-  html=`cat $2`
+  html=`cat $3/$2`
   html_ts=${html//GOCASTTIMESTAMP/$curtime}
   echo "$html_ts" > $1/$2
 }
@@ -193,8 +216,10 @@ then
   minimize
 fi
 
-genTimestampedHtml $tempdest index.html
-genTimestampedHtml $tempdest index2.html
+genTimestampedHtml $tempdest index.html .
+genTimestampedHtml $tempdest index2.html .
+genTimestampedHtml $tempdest register.html $tempdest
+genTimestampedHtml $tempdest dashboard.html $tempdest
 
 if [ $confirm -eq 1 ]
 then
