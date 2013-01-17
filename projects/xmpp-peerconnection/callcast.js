@@ -2526,36 +2526,70 @@ var Callcast = {
     },
 
     LeaveSession: function(cb) {
+        var finishUp, isDone = false,
+            leaveTimer = null,
+            self = this;
+
         if (Callcast.room === null || Callcast.room === '')
         {
 //          alert("Not currently in a session.");
             return;
         }
 
+        finishUp = function() {
+            // Due to Chrome async/ajax issues, we flush on all 'leave' requests.
+            self.connection.flush();
+            self.DropAllParticipants();
+
+            Callcast.joined = false;
+            Callcast.room = '';
+            Callcast.roomjid = '';
+
+    //TODO:RMW - BUG - this sending of video to peers is silly after a muc.leave() above unless we're really quick.
+            self.SendLocalVideoToPeers(self.bUseVideo);
+
+            Callcast.log('LeaveSession: triggering left_session.');
+            $(document).trigger('left_session');
+        };
+
         this.WriteUpdatedState();
         if (this.connection && this.connection.connection) {
+            leaveTimer = setTimeout(function() {
+                if (!isDone) {
+                    isDone = true;
+
+                    finishUp();
+
+                    if (cb) {
+                        cb();
+                    }
+                }
+            }, 750);
+
             this.connection.connection.muc.leave(Callcast.room, Callcast.nick, function() {
-                if (cb) {
-                    cb();
+                // Cancel the timer above.
+                clearTimeout(leaveTimer);
+
+                if (!isDone) {
+                    isDone = true;
+
+                    finishUp();
+
+                    if (cb) {
+                        cb();
+                    }
                 }
             });
         }
         else {
+            finishUp();
+
+            if (cb) {
+                cb();
+            }
+
             Callcast.log('ERROR: No connection/connection/muc for leave()');
         }
-
-        // Due to Chrome async/ajax issues, we flush on all 'leave' requests.
-        this.connection.flush();
-        this.DropAllParticipants();
-
-        Callcast.joined = false;
-        Callcast.room = '';
-        Callcast.roomjid = '';
-
-//TODO:RMW - BUG - this sending of video to peers is silly after a muc.leave() above unless we're really quick.
-        this.SendLocalVideoToPeers(this.bUseVideo);
-
-        $(document).trigger('left_session');
     },
 
     MakeCall: function(to_whom, room, reason)
