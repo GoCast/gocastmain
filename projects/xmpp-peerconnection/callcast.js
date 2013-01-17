@@ -291,7 +291,7 @@ var Callcast = {
         {
             this.RememberCurrentJid();
 
-            if (this.connection)
+            if (this.connection.connection)
             {
                 // Save rid/jid/sid inside the connection.
                 this.connection.saveLoginInfo();
@@ -1565,7 +1565,7 @@ var Callcast = {
         //        This way, the switchboard will know who we are on facebook when our presence is seen.
 
         // Only send this if there is a fbsr -- they logged in as a facebook user.
-        if (this.fbsr !== '' && this.connection)
+        if (this.fbsr !== '')
         {
             pres = $pres({to: this.SWITCHBOARD_FB, intro_sr: this.fbsr, intro_at: this.fbaccesstoken})
                 .c('x', {xmlns: 'http://jabber.org/protocol/muc'});
@@ -1579,14 +1579,10 @@ var Callcast = {
         var pres;
 
         // Now that we're connected, let's send our presence info to the switchboard
+        pres = $pres({to: this.SWITCHBOARD_FB, adhocname: this.nick})
+            .c('x', {xmlns: 'http://jabber.org/protocol/muc'});
 
-        if (this.connection)
-        {
-            pres = $pres({to: this.SWITCHBOARD_FB, adhocname: this.nick})
-                .c('x', {xmlns: 'http://jabber.org/protocol/muc'});
-
-            this.connection.send(pres);
-        }
+        this.connection.send(pres);
     },
 
     //
@@ -1755,36 +1751,28 @@ var Callcast = {
 
     SendPublicChat: function(msg) {
         var chat = $msg({to: this.room, type: 'groupchat'}).c('body').t(msg);
-        if (this.connection) {
-            this.connection.send(chat);
-        }
+        this.connection.send(chat);
     },
 
     SendPrivateChat: function(msg, to) {
         var chat = $msg({to: this.room + '/' + to.replace(/ /g, '\\20'), type: 'chat'}).c('body').t(msg);
-        if (this.connection) {
-            this.connection.send(chat);
-        }
+        this.connection.send(chat);
     },
 
     SendDirectPrivateChat: function(msg, to) {
         var chat = $msg({to: to, type: 'chat'}).c('body').t(msg);
-        if (this.connection) {
-            this.connection.send(chat);
-        }
+        this.connection.send(chat);
     },
 
     SendLiveLog: function(msg) {
         this.SendDirectPrivateChat('LIVELOG ; ' + this.nick + ' ; ' + decodeURI(msg).replace(';','|'), this.ROOMMANAGER);
-        if (this.connection) {
-            this.connection.flush();    // This is important to get to the server right away - it's a live log.
-        }
+        this.connection.flush();    // This is important to get to the server right away - it's a live log.
     },
 
     SendLogsToLogCatcher: function(cbSuccess, cbFailure, cbProgress) {
         var self = this, ibb, datagetfn;
 
-        if (!this.connection || !this.connection.connection) {
+        if (!this.connection.connection) {
             Callcast.log('Cannot send logs. Connection is not valid currently.');
             cbFailure('Cannot send logs. Connection is not valid currently.');
             return;
@@ -1825,9 +1813,7 @@ var Callcast = {
     },
 
     SendFeedback: function(msg) {
-        if (this.connection) {
-            this.connection.send($msg({to: this.FEEDBACK_BOT, nick: this.nick, room: this.room.split('@')[0]}).c('body').t(msg));
-        }
+        this.connection.send($msg({to: this.FEEDBACK_BOT, nick: this.nick, room: this.room.split('@')[0]}).c('body').t(msg));
     },
 
     on_public_message: function(message) {
@@ -2501,7 +2487,7 @@ var Callcast = {
              return false;
          }
 
-        if (this.connection && this.connection.connection) {
+        if (this.connection.connection) {
             this.connection.connection.muc.join(roomjid, Callcast.nick, Callcast.MsgHandler, Callcast.PresHandler);
         }
         else {
@@ -2548,7 +2534,7 @@ var Callcast = {
         };
 
         this.WriteUpdatedState();
-        if (this.connection && this.connection.connection) {
+        if (this.connection.connection) {
             leaveTimer = setTimeout(function() {
                 if (!isDone) {
                     Callcast.log('LeaveSession: Using TIMEOUT to finishUp and callback.');
@@ -2713,14 +2699,11 @@ var Callcast = {
         var ojids,
             newlen, persist;
 
-        if (!this.connection) {
-            this.log('RememberCurrentJid: No Connection.');
-        }
-        else if (!this.connection.getJid() || !this.connection.getJid().split('@')[1]) {
+        if (!this.connection.getJid() || !this.connection.getJid().split('@')[1]) {
             this.log('RememberCurrentJid: No valid jid.');
         }
 
-        if (this.connection && this.connection.getJid() && typeof (Storage) !== 'undefined') {
+        if (this.connection.getJid() && typeof (Storage) !== 'undefined') {
             persist = localStorage.getItem('persist');
 
             if (persist) {
@@ -2775,13 +2758,10 @@ var Callcast = {
             this.SessionStorageClear();
         }
 
-        if (this.connection)
-        {
-            this.connection.setSync();
-            this.connection.flush();
-            this.connection.disconnect(sendReason);   // This will eventually trigger TERMINATED.
-            this.connection.flush();
-        }
+        this.connection.setSync();
+        this.connection.flush();
+        this.connection.disconnect(sendReason);   // This will eventually trigger TERMINATED.
+        this.connection.flush();
 
         this.joined = false;
         this.room = '';
