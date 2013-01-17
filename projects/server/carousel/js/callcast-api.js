@@ -1037,7 +1037,7 @@ function addSpotCb(info)
 ///
 function setSpotCb(info)
 {
-  console.log('setSpot msg received', info);
+//  console.log('setSpot msg received', info);
   var spotDiv, // the desired spot to be replaced or added
       item = app.carousel.getByspotnumber(info.spotnumber); // the item at spotnumber
 
@@ -1120,7 +1120,7 @@ function removeSpotCb(info)
 ///
 function connectionStatus(statusStr)
 {
-  app.log(2, 'connectionStatus' + statusStr);
+  app.log(2, 'connectionStatus: ' + statusStr);
   $("#connection-status").text(statusStr);
 }
 

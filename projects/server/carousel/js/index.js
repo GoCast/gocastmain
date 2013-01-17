@@ -2546,7 +2546,7 @@ $(document).ready(function(
         }, 10000);
 
         // Login to xmpp anonymously
-        Callcast.connect(Callcast.CALLCAST_XMPPSERVER, '');
+        Callcast.connect();
 
         // Write greeting into console.
         app.log(2, 'Page loaded.');

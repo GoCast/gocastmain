@@ -117,7 +117,7 @@ GoCastJS.StropheConnection.prototype = {
     saveLoginInfo: function() {
         if (typeof (Storage) !== 'undefined') {
             if (this.connection && this.connection.authenticated && this.connection.connected) {
-                this.log('Saving Login Info: RID: ' + this.connection.rid + ', jid: ' + this.connection.jid + ', sid: ' + this.connection.sid);
+                this.log('Saving Login Info: RID: ' + this.connection.rid + ', jid: ' + this.connection.jid);
                 localStorage.jid = this.connection.jid;
                 localStorage.rid = this.connection.rid;
                 localStorage.sid = this.connection.sid;
@@ -156,6 +156,7 @@ GoCastJS.StropheConnection.prototype = {
         this.log('StropheConnection: Auto-Connecting.');
 
         if (this.hasSavedLoginInfo()) {
+            this.log('autoConnect: Saved user info found.');
             this.bAnonymous = localStorage.bAnonymous;
 
     // RMW: In theory we are supposed to advance RID by one, but Chrome fails it while Firefox is ok. Sigh. No advancing...
@@ -164,7 +165,8 @@ GoCastJS.StropheConnection.prototype = {
 
             return localStorage.jid;
         }
-        else if (this.id !== null && this.id !== '' && this.pw !== null && this.pw !== '') {
+        else if (this.id && this.pw) {
+            this.log('autoConnect: Non-anonymous.');
             this.bAnonymous = false;
 
             // In this case, we actually have a username and a password for login. Use it.
@@ -172,16 +174,16 @@ GoCastJS.StropheConnection.prototype = {
 
             return this.id;
         }
-        else if (!this.id.match(/@/) && (this.pw === '' || this.pw === null)) {
+//        else if (!/@/.test(this.id) && !this.pw) {
+        else if (this.bAnonymous) {
             // We've discovered this was an anonymous login in the beginning - so do it again.
-
-            this.bAnonymous = true;
-
+            this.log('autoConnect: Got anonymous detected.');
             this.connect(); // Anonymous connection.
 
             return 'anonymous';
         }
 
+        this.log('autoConnect: Dropping out. id: ' + this.id + ', pw: ' + this.pw);
         return null;
     },
 
@@ -191,9 +193,12 @@ GoCastJS.StropheConnection.prototype = {
 
             // We were handed a full-blown jid.
             if (opts.jid) {
+                this.bAnonymous = false;
                 this.id = opts.jid;
             }
             else if (opts.username) {
+                this.bAnonymous = false;
+
                 // Handed an email address. Translate it.
                 if (opts.username.match(/@/)) {
                     this.id = this.usernameTransform(opts.username) + '@' + this.xmppserver;
@@ -211,13 +216,14 @@ GoCastJS.StropheConnection.prototype = {
             // Anonymous for null or undefined opts
             this.id = this.xmppserver;
             this.pw = '';
+            this.bAnonymous = true;
         }
 
         this.log('StropheConnection: connect: computed id=' + this.id);
 
         if (this.connection) {
             // Thinking we should really NOT null-out the connection but instead reset it.
-            this.connection.reset();
+            this.reset('connect-reset');
         }
         else {
             this.log('WARN: connection was null and should not be.');
@@ -227,11 +233,11 @@ GoCastJS.StropheConnection.prototype = {
 
         // Anonymous XMPP connections are characterized by no password and a username which is
         // only hostname.domainname
-        if ((this.pw === '' || this.pw === null) && !this.id.match(/@/)) {
-            this.bAnonymous = true;
-        }
-        else if (this.pw === '' || this.pw === null) {
+        // TODO:RMW potential BUG - not sure we should do this at all.
+        if (!this.bAnonymous && !this.pw) {
             this.log('StropheConnection: connect: WARN: Must be on a failed re-attach. No password for user ' + this.id);
+            this.forgetReconnectInfo();
+            this.reset('connect-failed-reattach-reset');
             this.statusCallback(Strophe.Status.TERMINATED);
             return;
         }
@@ -263,6 +269,7 @@ GoCastJS.StropheConnection.prototype = {
         }
 
         if (this.causeTerminating) {
+            this.forgetReconnectInfo();
             this.statusCallback(Strophe.Status.TERMINATED);
         }
 
@@ -276,10 +283,11 @@ GoCastJS.StropheConnection.prototype = {
             this.log('conn_callback: BOSH responded with item-not-found. Connection is invalid now.');
             this.forgetReconnectInfo();
 
+/* This may cause statful issues resetting during a state transition.
             if (this.connection) {
-                this.connection.reset();
+                this.reset('conn_callback-item-not-found-reset');
             }
-
+*/
             // Attempt to auto-connect (via stored info or given id/pw)
             // If that's not successful, then we're in a world of hurt.
             if (!this.autoConnect()) {
@@ -380,7 +388,7 @@ GoCastJS.StropheConnection.prototype = {
 
         if (this.connection)
         {
-            this.connection.reset();
+            this.reset('reattach-reset');
         }
         else {
             this.log('WARN: connection was null and should not be.');
@@ -396,9 +404,6 @@ GoCastJS.StropheConnection.prototype = {
         // And if we don't get that far due to other failures, then we shouldn't re-try this rid/jid/sid
         // anyway.
         this.forgetReconnectInfo();
-
-        this.id = jid;
-        this.pw = '';
 
         try {
             this.connection.attach(jid, sid, rid, this.conn_callback.bind(this));
@@ -538,6 +543,24 @@ GoCastJS.StropheConnection.prototype = {
         }
         else {
             this.log('StropheConnection: ERROR: Cannot sendIQ() - no connection.');
+            return null;
+        }
+    },
+
+    reset: function(reason) {
+        this.log('**** reset: Reason: ' + reason + ' ****');
+
+        if (this.connection) {
+            try {
+                return this.connection.reset();
+            }
+            catch(e) {
+                console.log('CATCH: ERROR on reset() attempt: ' + e);
+                return null;
+            }
+        }
+        else {
+            this.log('StropheConnection: ERROR: Cannot reset() - no connection.');
             return null;
         }
     }

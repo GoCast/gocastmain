@@ -591,7 +591,7 @@ var Callcast = {
     //
     SetVideoFilter: function(filter) {
 
-        if (typeof(filter) === 'string' && this.localplayer && this.localstream) {
+        if (typeof(filter) === 'string' && this.localplayer && this.localstream && this.localstream.videoTracks) {
             this.localstream.videoTracks[0].effect = filter;
             if (this.Callback_OnEffectApplied) {
                 this.Callback_OnEffectApplied(filter);
@@ -663,7 +663,12 @@ var Callcast = {
             return false;
         }
         else {
-            return this.localstream.audioTracks[0].enabled;
+            if (this.localstream && this.localstream.audioTracks) {
+                return this.localstream.audioTracks[0].enabled;
+            }
+            else {
+                return false;
+            }
         }
     },
 
@@ -767,19 +772,19 @@ var Callcast = {
     },
 
     ToggleLocalVideoCapture: function() {
-        if (this.localstream && this.localstream.videoTracks.length) {
+        if (this.localstream && this.localstream.videoTracks && this.localstream.videoTracks.length) {
             this.localstream.videoTracks[0].enabled = !(this.localstream.videoTracks[0].enabled);
         }
     },
 
     MuteLocalVideoCapture: function(bMute) {
-        if (this.localstream && this.localstream.videoTracks.length) {
+        if (this.localstream && this.localstream.videoTracks && this.localstream.videoTracks.length) {
             this.localstream.videoTracks[0].enabled = (typeof (bMute) !== 'undefined') ? !bMute : false;
         }
     },
 
     MuteLocalAudioCapture: function(bMute) {
-        if (this.localstream && this.localstream.audioTracks.length) {
+        if (this.localstream && this.localstream.audioTracks && this.localstream.audioTracks.length) {
             this.localstream.audioTracks[0].enabled = (typeof (bMute) !== 'undefined') ? !bMute : false;
         }
 
@@ -862,7 +867,7 @@ var Callcast = {
                         Callcast.localstream = stream;
                         Callcast.localplayer = $(jqSelector).get(0);
 
-                        if (0 < Callcast.localstream.videoTracks.length) {
+                        if (Callcast.localstream.videoTracks && 0 < Callcast.localstream.videoTracks.length) {
                             Callcast.SetVideoFilter(settings.effect || 'none');
                         }
 
@@ -1997,7 +2002,7 @@ var Callcast = {
                         Callcast.log('PresHandler: Error joining room. Disconnecting.');
                     }
 
-                    Callcast.disconnect();
+                    Callcast.disconnect('presence-error');
                 }
                 else if (nick === Callcast.nick && $(presence).attr('type') === 'unavailable')
                 {
@@ -2722,7 +2727,8 @@ var Callcast = {
         return null;
     },
 
-    disconnect: function() {
+    disconnect: function(reason) {
+        var sendReason = reason || 'In diconnect() no reason.';
 
         this.DropAllParticipants();
         this.MuteLocalAudioCapture(false);
@@ -2742,7 +2748,7 @@ var Callcast = {
         {
             this.connection.setSync();
             this.connection.flush();
-            this.connection.disconnect();   // This will eventually trigger TERMINATED.
+            this.connection.disconnect(sendReason);   // This will eventually trigger TERMINATED.
             this.connection.flush();
         }
 
@@ -2757,12 +2763,13 @@ var Callcast = {
     ///
     /// connect using this JID and password -- and optionally use this URL for the BOSH connection.
     ///
-    connect: function(id, pw, url) {
+    /// opts { jid: , password: }
+    ///   OR { username: , password: }
+    ///   OR null/{} for anonymous
+    ///
+    connect: function(opts, url) {
         var self = this,
-            boshurl = '/xmpp-httpbind';
-        if (url) {
-            boshurl = url;
-        }
+            boshurl = url || '/xmpp-httpbind';
 
         if (!this.connection)
         {
@@ -2778,7 +2785,7 @@ var Callcast = {
             this.connection.autoConnect();
         }
         else {
-            this.connection.connect({jid: id, password: pw});
+            this.connection.connect(opts);
         }
     },
 
@@ -2795,7 +2802,7 @@ var Callcast = {
                 Callcast.Callback_ConnectionStatus('Disconnected');
                 break;
             case Strophe.Status.TERMINATED:
-                this.log('XMPP/Strophe Disconnected.');
+                this.log('XMPP/Strophe Terminated.');
                 $(document).trigger('disconnected');
                 Callcast.Callback_ConnectionStatus('Terminated');
                 break;
@@ -2824,21 +2831,24 @@ var Callcast = {
                         Callcast.bUseMicrophone = sessionStorage.bUseMicrophone;
                     }
 
+                    Callcast.log('ATTACHED - Leaving Session.');
                     // Leave the current room and re-join
                     Callcast.LeaveSession(function() {
+                        Callcast.log('ATTACHED - LeaveSession is complete. Re-join now.');
                         Callcast.finalizeConnect();
                         $(document).trigger('connected');
                         Callcast.Callback_ConnectionStatus('Re-Attached');
                     });
                 }
                 else {
+                    Callcast.log('ATTACHED - NO Storage or No sessionStorage.room - joining?');
                     Callcast.finalizeConnect();
                     $(document).trigger('connected');
                     Callcast.Callback_ConnectionStatus('Re-Attached');
                 }
                 break;
             case Strophe.Status.DISCONNECTING:
-                this.log('XMPP/Strophe is Dis-Connecting...should we try to re-attach here? TODO:RMW');
+                this.log('XMPP/Strophe is Dis-Connecting...');
                 Callcast.RememberCurrentJid();
                 Callcast.Callback_ConnectionStatus('Disconnecting');
                 break;
@@ -2849,7 +2859,7 @@ var Callcast = {
                 break;
             case Strophe.Status.AUTHFAIL:
                 Callcast.RememberCurrentJid();
-                Callcast.disconnect();
+                Callcast.disconnect('AuthFail');
                 Callcast.Callback_ConnectionStatus('Bad username or password');
                 alert('XMPP/Strophe Authentication failed. Bad password or username.');
                 break;
