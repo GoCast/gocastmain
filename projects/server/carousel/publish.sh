@@ -101,6 +101,7 @@ fi
 
 cp -p -r * $tempdest
 cp -p ../../xmpp-peerconnection/callcast.js $tempdest/js
+cp -p ../../xmpp-peerconnection/callcast_settings.js $tempdest/js
 cp -p ../../gocastjs/webrtc/peerconnection.js $tempdest/js
 cp -p ../../gocastjs/*.js $tempdest/js
 cp -p ../../gocastjs/ui/*.js $tempdest/js
@@ -188,6 +189,7 @@ function obfuscate() {
   # finally we can remove the temporary jscrambler area before copying
   rm -rf $tempjs
 
+  echo ==== JScrambler done.
 return 0
 }
 
@@ -199,6 +201,7 @@ function minimize() {
   gcpublish "js/fb.js" "js/fb.js"
   gcpublish "$tempdest/js/register.js" "js/logreg.js"
   gcpublish "$tempdest/js/dashboard.js" "js/dashboard.js"
+  gcpublish "$tempdest/js/callcast_settings.js" "js/callcast_settings.js"
 return 0
 }
 
