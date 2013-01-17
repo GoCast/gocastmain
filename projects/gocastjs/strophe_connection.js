@@ -146,6 +146,14 @@ GoCastJS.StropheConnection.prototype = {
         return false;
     },
 
+    hasSavedRegisteredLoginInfo: function() {
+        if (this.hasSavedLoginInfo() && !localStorage.bAnonymous) {
+            return true;
+        }
+
+        return false;
+    },
+
     //
     // @brief If we have stored login information, then use it to reattach.
     // @return Failure - null - no stored rid/jid/sid login information.
