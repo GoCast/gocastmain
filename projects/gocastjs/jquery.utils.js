@@ -33,19 +33,32 @@
 })(jQuery);
 
 (function($) {
-    var plugins, verstring, ver;
+    var plugins, verstring, ver,
+        playerhtml = '<div id="gcpversioncheck"><object id="player" type="application/x-gocastplayer" ' + 
+                     'width="0" height="0"></object></div>';
 
     navigator.plugins.refresh(false);
 	plugins = navigator.plugins;
+
 	for (var i=0; i<plugins.length; i++) {
 		if ('GoCastPlayer' === plugins[i].name) {
             verstring = plugins[i].version||plugins[i].description;
-			ver = parseFloat(verstring.split(' ')[1]);
-			$.extend({
-				gocastplayer: {
-					version: isNaN(ver) ? 0.0 : ver
-				}
-			});
+
+            if ('GCP' === verstring.split(' ')[0]) {
+                ver = verstring.split(' ')[1];
+            } else {
+                $('body').append(playerhtml);
+                setTimeout(function() {
+                    var player = document.getElementById('player')
+                    ver = player.version;
+                }, 100);
+            }
+
+            $.extend({
+                gocastplayer: {
+                    version: ver
+                }
+            });
 			return;
 		}
 	}
