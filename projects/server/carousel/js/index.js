@@ -2461,7 +2461,14 @@ $(document).ready(function(
   event
 )
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+
 {
+  if (!$.urlvars.roomname ||
+      $.urlvars.roomname.length%4 ||
+      !$.roomcode.decipher($.urlvars.roomname)) {
+    window.location.href = 'dashboard.html';
+  }
+
   // DNLE overrides.
   if (window.location.hostname.toLowerCase() === 'dnle.gocast.it') {
     Callcast.InitOverride({ CALLCAST_XMPPSERVER: 'dnle.gocast.it',

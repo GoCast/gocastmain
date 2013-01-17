@@ -144,7 +144,7 @@ var DashApp = {
                                   'You can now login with your new account.')
         }
 
-        if (this.boshconn.hasSavedLoginInfo()) {
+        if (this.boshconn.hasSavedRegisteredLoginInfo()) {
             this.boshconn.autoConnect();
             DashView.showloginloader();
         }

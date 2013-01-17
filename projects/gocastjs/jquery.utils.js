@@ -22,7 +22,8 @@
     if (urlsplit[1]) {
         nvpairs = urlsplit[1].split('&');
         for (i in nvpairs) {
-        	nvpair = nvpairs[i].split('=');
+        	nvpair = [nvpairs[i].slice(0, nvpairs[i].indexOf('=')),
+                      nvpairs[i].slice(nvpairs[i].indexOf('=') + 1)];
             urlvarsobj[decodeURI(nvpair[0])] = decodeURI(nvpair[1]);
         }
     }
