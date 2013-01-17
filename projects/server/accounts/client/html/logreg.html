@@ -3,7 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title> Welcome to GoCast! </title>
+        <title> Register for GoCast! </title>
         <link rel="stylesheet" type="text/css" href="css/bootstrap.css?GOCASTTIMESTAMP">
         <link rel="stylesheet" type="text/css" href="css/font-awesome.css?GOCASTTIMESTAMP">
         <link rel="stylesheet" type="text/css" href="css/logreg.css?GOCASTTIMESTAMP">
@@ -21,36 +21,6 @@
         <div class="container">
             <div class="row">
                 <div class="span4 offset4">
-                    <form id="login-form" class="form-horizontal">
-                        <fieldset>
-                            <div class="control-group">
-                                <div class="controls">
-                                    <div class="input-prepend pull-right">
-                                        <span class="add-on">&nbsp;<i class="icon-envelope"></i>&nbsp;</span>
-                                        <input id="input-email" type="email" name="email" placeholder=" Email" required class="span4">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="control-group">
-                                <div class="controls">
-                                    <div class="input-prepend pull-right">
-                                        <span class="add-on">&nbsp;<i class="icon-key"></i>&nbsp;</span>
-                                        <input id="input-password" type="password" name="password" placeholder=" Password" required class="span4">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="alert alert-error">
-                                <h4><i class="icon-warning-sign"></i></h4><p style="padding-left: 25px;"></p>
-                            </div>
-                            <div class="alert alert-success">
-                               <h4><i class="icon-ok-sign"></i></h4><p style="padding-left: 25px;"></p>
-                            </div>
-                            <div class="control-group">
-                                <button type="submit" class="btn btn-primary pull-right"> Login </button>
-                                <button type="button" class="btn btn-link pull-right" targetform="register-form"> Register </button>
-                            </div>
-                        </fieldset>
-                    </form>
                     <form id="register-form" class="form-horizontal" action="/acct/register/" method="post">
                         <fieldset>
                             <div class="control-group">
@@ -93,7 +63,6 @@
                             </div>
                             <div class="control-group">
                                 <button type="submit" class="btn btn-primary pull-right"> Register </button>
-                                <button type="button" class="btn btn-link pull-right" targetform="login-form"> Login </button>
                             </div>
                         </fieldset>
                     </form>

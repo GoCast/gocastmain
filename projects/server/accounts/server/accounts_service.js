@@ -79,4 +79,14 @@ app.post('/activate', function(req, res) {
     });
 });
 
+app.post('/changepwd', function(req, res) {
+    console.log('accounts_service [/changepwd][info]: FormData = ', req.body);
+    api.ChangePassword(req.body.email, req.body.new_password, function() {
+        res.send('{"result": "success"}');
+    }, function(err) {
+        console.log('accounts_service [/changepwd][error]: ', err);
+        res.send('{"result": "error"}');
+    });    
+});
+
 app.listen(settings.accounts.serviceport || 8083);

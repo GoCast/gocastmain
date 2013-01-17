@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title> Welcome to GoCast! </title>
+        <link rel="stylesheet" type="text/css" href="css/bootstrap.css?GOCASTTIMESTAMP">
+        <link rel="stylesheet" type="text/css" href="css/font-awesome.css?GOCASTTIMESTAMP">
+        <link rel="stylesheet" type="text/css" href="css/dashboard.css?GOCASTTIMESTAMP">
+    </head>
+    <body>
+        <div class="navbar navbar-fixed-top navbar-inverse">
+            <div class="navbar-inner">
+                <div class="container">
+                    <a class="brand" href="http://www.gocast.it" target="_blank">
+                        <img src="img/gocastheaderlogo.png"></img>
+                    </a>
+                    <ul class="nav pull-right">
+                        <li class="dropdown" style="padding-top: 20px; margin-left: 5px;">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">My Account <b class="caret"></b></a>
+                            <ul class="dropdown-menu">
+                                <li><a class="formlink" href="#changepwd-form">Change Password</a></li>
+                                <li><a href="#">Delete Account</a></li>
+                            </ul>
+                        </li>
+                        <li class="dropdown" style="padding-top: 20px; margin-left: 5px;">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">My Meetings <b class="caret"></b></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="#">Schedule Meeting</a></li>
+                                <li><a class="formlink" href="#startmeeting-form">Start Meeting</a></li>
+                            </ul>
+                        </li>
+                        <li style="padding-top: 20px; margin-left: 5px;">
+                            <a class="logoutlink" href="#">Log Out</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="span4 offset4">
+                    <form id="login-form" class="form-horizontal">
+                        <fieldset>
+                            <div class="control-group">
+                                <div class="controls">
+                                    <div class="input-prepend pull-right">
+                                        <span class="add-on">&nbsp;<i class="icon-envelope"></i>&nbsp;</span>
+                                        <input id="input-email" type="email" name="email" placeholder=" Email" required class="span4">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <div class="controls">
+                                    <div class="input-prepend pull-right">
+                                        <span class="add-on">&nbsp;<i class="icon-key"></i>&nbsp;</span>
+                                        <input id="input-password" type="password" name="password" placeholder=" Password" required class="span4">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="alert alert-error">
+                                <h4><i class="icon-warning-sign"></i></h4><p style="padding-left: 25px;"></p>
+                            </div>
+                            <div class="alert alert-success">
+                               <h4><i class="icon-ok-sign"></i></h4><p style="padding-left: 25px;"></p>
+                            </div>
+                            <div class="control-group">
+                                <button type="submit" class="btn btn-primary pull-right"> Login </button>
+                            </div>
+                        </fieldset>
+                    </form>
+                    <form id="changepwd-form" class="form-horizontal" action="/acct/changepwd/" method="post">
+                        <fieldset>
+                            <div class="control-group">
+                                <div class="controls">
+                                    <div class="input-prepend pull-right">
+                                        <span class="add-on">&nbsp;<i class="icon-envelope"></i>&nbsp;</span>
+                                        <input id="input-email" type="email" name="email" placeholder=" Email" required class="span4">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <div class="controls">
+                                    <div class="input-prepend pull-right">
+                                        <span class="add-on">&nbsp;<i class="icon-key"></i>&nbsp;</span>
+                                        <input id="input-password" type="password" name="new_password" placeholder=" New Password" required class="span4">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="alert alert-error">
+                                <h4><i class="icon-warning-sign"></i></h4><p style="padding-left: 25px;"></p>
+                            </div>
+                            <div class="alert alert-success">
+                               <h4><i class="icon-ok-sign"></i></h4><p style="padding-left: 25px;"></p>
+                            </div>
+                            <div class="control-group">
+                                <button type="submit" class="btn btn-primary pull-right"> Change Password </button>
+                            </div>
+                        </fieldset>
+                    </form>
+                    <form id="startmeeting-form" class="form-horizontal">
+                        <fieldset>
+                            <div class="control-group">
+                                <div class="controls">
+                                    <div class="input-prepend pull-right">
+                                        <span class="add-on">&nbsp;<i class="icon-play"></i>&nbsp;</span>
+                                        <input id="input-roomname" type="text" name="room_name" placeholder=" Enter your room name" required class="span4">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="alert alert-error">
+                                <h4><i class="icon-warning-sign"></i></h4><p style="padding-left: 25px;"></p>
+                            </div>
+                            <div class="alert alert-success">
+                               <h4><i class="icon-ok-sign"></i></h4><p style="padding-left: 25px;"></p>
+                            </div>
+                            <div class="control-group">
+                                <button type="submit" class="btn btn-primary pull-right"> Start Meeting </button>
+                            </div>
+                        </fieldset>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <script type="text/javascript" src="js/jquery-1.8.1.js?GOCASTTIMESTAMP"></script>
+        <script type="text/javascript" src="/scripts/jquery.base64.min.js?GOCASTTIMESTAMP"></script>
+        <script type="text/javascript" src="js/jquery.form.js?GOCASTTIMESTAMP"></script>
+        <script type="text/javascript" src="js/bootstrap.js?GOCASTTIMESTAMP"></script>
+        <script type="text/javascript" src="/scripts/strophe.js?GOCASTTIMESTAMP"></script>
+        <script type="text/javascript" src="js/strophe_connection.js?GOCASTTIMESTAMP"></script>
+        <script type="text/javascript" src="js/jquery.utils.js?GOCASTTIMESTAMP"></script>
+        <script type="text/javascript" src="js/dashboard.js?GOCASTTIMESTAMP"></script>
+    </body>
+</html>
