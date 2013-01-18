@@ -2020,12 +2020,6 @@ function handleRoomSetup() {
 
     app.log(2, "Room named '" + new_name + "' has been created. Joining now.");
     app.log(2, 'window.location ' + window.location);
-    if (room_to_create !== new_name)
-    {
-      newUrl = window.location.pathname + '?roomname=' + new_name;
-      app.log(2, 'replacing state ' + newUrl);
-      history.replaceState(null, null, newUrl);
-    }
 
     // warn user if room name changed (overflow)
     if (room_to_create.length > 0 && room_to_create.toLowerCase() !== new_name.toLowerCase())
@@ -2036,6 +2030,9 @@ function handleRoomSetup() {
       $('#message', jqDlg).text('Room ' + room_to_create + ' overflowed.  You are now in room ' + new_name);
       $('#stop-showing', jqDlg).css('display', 'none');
       $('#stop-showing-text', jqDlg).css('display', 'none');
+      newUrl = window.location.pathname + '?roomname=' + new_name;
+      app.log(2, 'replacing state ' + newUrl);
+      history.replaceState(null, null, newUrl);
     }
 
     // initialize video, audio state here since this method
