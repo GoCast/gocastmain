@@ -412,8 +412,9 @@ $(document).on('one-login-complete', function(event, msg) {
   if (app.loggedInAll())
   {
     app.log(2, 'one-login-complete: opening meeting');
-    openMeeting();
-    tryPluginInstall();
+    handleRoomSetup();
+    //openMeeting();
+    //tryPluginInstall();
   }
 
 });
@@ -1316,7 +1317,7 @@ function pluginLoaded(
         }
         // </MANJESH>
 
-        handleRoomSetup();
+        //handleRoomSetup();
      }, function(message) {
         // Failure to initialize.
         app.log(4, 'Local plugin failed to initialize [' + message + ']');
@@ -1329,7 +1330,8 @@ function pluginLoaded(
   }
   else // pluginLoaded but out of date
   {
-     Callcast.SendLiveLog('Plugin upgrade available. Current version: ' + Callcast.GetVersion());
+     //Callcast.SendLiveLog('Plugin upgrade available. Current version: ' + Callcast.GetVersion());
+     app.log(2, 'Plugin upgrade available. Current version: ' + Callcast.GetVersion());
      app.pluginUpgrade = true;
   }
 

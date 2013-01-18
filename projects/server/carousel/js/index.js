@@ -76,7 +76,7 @@ var app = {
   defunctAlertShowing: false,
   tryPluginInstallAttempts: 0,
   facebookInited: false,
-  fbCheckCredentialsTriggered: false,
+  fbCheckCheckPluginTriggered: false,
   fbTimerRunning: null,
   simPluginLoadFailed: false,
 
@@ -1926,6 +1926,9 @@ function enterId(
 )
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
+    //Assume for now that clicking on nothanks means visitor login
+    Callcast.connect();
+
     app.log(2, 'enterId');
     closeWindow();
     openWindow('#credentials2');
@@ -1938,17 +1941,25 @@ function enterId(
     }
 } /* onJoinNow() */
 
-function deferredCheckCredentials() {
-  app.fbCheckCredentialsTriggered = true;
+function deferredCheckPlugin() {
+  app.fbCheckPluginTriggered = true;
 
-  // Normally we don't call check credentials, but we MUST call it if document.ready has already
+  // Normally we don't call checkplugin, but we MUST call it if document.ready has already
   // run at this point. We infer this by the fact that the 10 second fb timer is already set which
-  // happens in document.ready. In this case, it's up to us to call checkcredentials.
+  // happens in document.ready. In this case, it's up to us to call checkplugin.
   if (app.fbTimerRunning) {
     clearTimeout(app.fbTimerRunning);
     app.fbTimerRunning = null;
-    $(document).trigger('checkCredentials');
+    $(document).trigger('checkPlugin');
   }
+}
+
+function checkPlugin() {
+  app.log(2, 'Checking for GOCAST PLAYER...');
+  app.facebookInited = true;
+  closeWindow();
+  openMeeting();
+  tryPluginInstall();
 }
 
 ///
@@ -1958,7 +1969,7 @@ function checkCredentials()
 {
   var jqActive;
   app.log(2, 'checkCredentials');
-  app.facebookInited = true;
+  //app.facebookInited = true;
 
   // this method is called on a fb status change
   // so do nothing if we're already logged in
@@ -2131,14 +2142,14 @@ function tryPluginInstall(
   {
     if (20 < app.tryPluginInstallAttempts) {
       // send live log that plugin loading failed.
-      var logTryPluginFailed = '{' +
+      /*var logTryPluginFailed = '{' +
         'userAgent: ' + navigator.userAgent.replace(/;/g, '|') + ', ' +
         'nickname: ' + app.user.name + ', ' +
         'facebook: ' + !app.user.fbSkipped +
-      '}';
+      '}';*/
 
-      app.log(2, 'tryPluginInstall failed: ' + logTryPluginFailed);
-      Callcast.SendLiveLog('tryPluginInstall failed: ' + logTryPluginFailed);
+      app.log(2, 'tryPluginInstall failed.');
+      //Callcast.SendLiveLog('tryPluginInstall failed: ' + logTryPluginFailed);
 
       if (window.location.pathname.match(/index2.html/g)) {
         // show plugin load warning and take them to the room.
@@ -2151,7 +2162,8 @@ function tryPluginInstall(
 
         $('#warningMsg > button#ok').unbind('click').click(function() {
           closeWindow();
-          handleRoomSetup();
+          //handleRoomSetup();
+          $(document).trigger('checkCredentials');
           $(this).unbind('click').click(closeWindow);
         });
       } else {
@@ -2177,6 +2189,7 @@ function tryPluginInstall(
     // Close buttons.
     $('.window .close').on('click', closeWindow);
     // Resize window.
+    $(document).trigger('checkCredentials');
     $(window).resize(resizeWindows);
   }
   else { // plugin not loaded or out of date
@@ -2185,14 +2198,15 @@ function tryPluginInstall(
     // if so change prompt
     if (app.pluginInstalled() && Callcast.pluginUpdateRequired())
     {
-       Callcast.SendLiveLog('Local plugin is out of date. Current version: ' + Callcast.GetVersion());
+       //Callcast.SendLiveLog('Local plugin is out of date. Current version: ' + Callcast.GetVersion());
        title = $('#installPlugin > h1');
        title.text('We have upgraded your GoCast beta');
        prompt = $('#installPlugin > p#prompt');
        prompt.text('Please download and install the new version. Thanks. The GoCast Team.');
     }
     if (!app.pluginInstalled()) {
-       Callcast.SendLiveLog('Local plugin is not installed.');
+       //Callcast.SendLiveLog('Local plugin is not installed.');
+       app.log(2, 'Local plugin not installed.')
     }
     if (app.osPlatform.isLinux64 || app.osPlatform.isLinux32)
     {
@@ -2499,8 +2513,8 @@ $(document).ready(function(
       } else {*/
 
       uiInit(); // init user interface
-      if (app.fbCheckCredentialsTriggered) {
-        $(document).trigger('checkCredentials');
+      if (app.fbCheckPluginTriggered) {
+        $(document).trigger('checkPlugin');
       }
 
       //do something if facebook took too long or errored out
@@ -2508,16 +2522,17 @@ $(document).ready(function(
         if (!app.facebookInited) {
           closeWindow();
           app.log(2, 'Facebook API init failed - userAgent: ' + navigator.userAgent);
-          Callcast.SendLiveLog('Facebook API init failed - userAgent: ' + navigator.userAgent.replace(/;/g, '|'));
-          Callcast.SendLiveLog('FBLOG: ' + getFBLog());
-          openWindow('#credentials');
-          $('#credentials > .fb-login-button').addClass('hidden');
-          $('#credentials > #fb-disabled').removeClass('hidden');
+          //Callcast.SendLiveLog('Facebook API init failed - userAgent: ' + navigator.userAgent.replace(/;/g, '|'));
+          //Callcast.SendLiveLog('FBLOG: ' + getFBLog());
+          //openWindow('#credentials');
+          //$('#credentials > .fb-login-button').addClass('hidden');
+          //$('#credentials > #fb-disabled').removeClass('hidden');
+          $(document).trigger('checkPlugin');
         }
       }, 10000);
 
       // Login to xmpp anonymously
-      Callcast.connect();
+      //Callcast.connect();
 
       // Write greeting into console.
       app.log(2, 'Page loaded.');
