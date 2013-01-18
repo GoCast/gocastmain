@@ -165,7 +165,7 @@ GoCastJS.StropheConnection.prototype = {
 
         if (this.hasSavedLoginInfo()) {
             this.log('autoConnect: Saved user info found.');
-            this.bAnonymous = localStorage.bAnonymous;
+            this.bAnonymous = localStorage.bAnonymous === 'true';
 
             if (this.bAnonymous) {
                 this.id = this.xmppserver;
@@ -429,22 +429,24 @@ GoCastJS.StropheConnection.prototype = {
     },
 
     debugXML: function(bEnable) {
+        var self = this;
+
         if (bEnable === true || bEnable === null || bEnable === undefined) {
             this.connection.rawInput = function(data) {
                 if ($(data).children()[0]) {
-                    this.log("RAW-IN:", $(data).children()[0]);
+                    self.log("RAW-IN:", $(data).children()[0]);
                 }
                 else {
-                    this.log("RAW-IN:", $(data));
+                    self.log("RAW-IN:", $(data));
                 }
             };
 
             this.connection.rawOutput = function(data) {
                 if ($(data).children()[0]) {
-                    this.log("RAW-OUT:", $(data).children()[0]);
+                    self.log("RAW-OUT:", $(data).children()[0]);
                 }
                 else {
-                    this.log("RAW-OUT:", $(data));
+                    self.log("RAW-OUT:", $(data));
                 }
             };
         }
