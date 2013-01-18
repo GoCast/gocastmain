@@ -2792,7 +2792,7 @@ var Callcast = {
                                                                logFn: Callcast.log});
         }
 
-        if (this.connection.hasSavedLoginInfo()) {
+        if (!opts && this.connection.hasSavedLoginInfo()) {
             this.connection.autoConnect();
         }
         else {
