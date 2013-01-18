@@ -167,6 +167,13 @@ GoCastJS.StropheConnection.prototype = {
             this.log('autoConnect: Saved user info found.');
             this.bAnonymous = localStorage.bAnonymous;
 
+            if (this.bAnonymous) {
+                this.id = this.xmppserver;
+            }
+            else {
+                this.id = localStorage.jid;
+            }
+
     // RMW: In theory we are supposed to advance RID by one, but Chrome fails it while Firefox is ok. Sigh. No advancing...
     //               Callcast.reattach(Callcast.connection.jid, Callcast.connection.sid, new Number(Callcast.connection.rid) + 1, Callcast.conn_callback);
             this.privateReattach(localStorage.jid, localStorage.sid, localStorage.rid);
