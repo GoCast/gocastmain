@@ -392,10 +392,10 @@ $(document).on('connected', function(
 
   /*
    * Open waiting room in case it takes too long to join. */
-  openWindow('#waitingToJoin');
+  //openWindow('#waitingToJoin');
 
   app.xmppLoggedIn = true;
-
+  checkCredentials2();
   $(document).trigger('one-login-complete', 'XMPP GO.');    // One more login action complete.
   return false;
 }); /* connected() */
@@ -1123,6 +1123,12 @@ function connectionStatus(statusStr)
 {
   app.log(2, 'connectionStatus: ' + statusStr);
   $("#connection-status").text(statusStr);
+
+  if (/Bad/.test(statusStr)) {
+    // auth fail
+  } else if (/failed/.test(statusStr)) {
+    // conn fail
+  }
 }
 
 ///

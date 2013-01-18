@@ -1922,19 +1922,20 @@ function onJoinNow(
 function enterId(options)
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
-    //Assume for now that clicking on nothanks means visitor login
-    Callcast.connect(options);
-
     app.log(2, 'enterId');
+    Callcast.connect(options);
+}
+
+function checkCredentials2() {
     closeWindow();
     openWindow('#credentials2');
-    if ('undefined' !== typeof(Storage)) {
-      if (window.localStorage.gcpReloadNickName) {
+    /*if ('undefined' !== typeof(Storage)) {
+      if (Callcast.connection.bAnonymous && window.localStorage.gcpReloadNickName) {
         $('#name', '#credentials2').val(window.localStorage.gcpReloadNickName);
         $('#btn', '#credentials2').click();
         delete window.localStorage.gcpReloadNickName;
       }
-    }
+    }*/
 } /* onJoinNow() */
 
 function deferredCheckPlugin() {
@@ -1982,11 +1983,11 @@ function checkCredentials()
     if (!app.user.fbSkipped && !FB.getAuthResponse())
     {
       openWindow('#credentials');
-      if ('undefined' !== typeof(Storage)) {
-        if (window.localStorage.gcpReloadNickName) {
+      /*if ('undefined' !== typeof(Storage)) {
+        if (Callcast.connection.bAnonymous && window.localStorage.gcpReloadNickName) {
           $('#noThanks', '#credentials').click();
         }
-      }
+      }*/
     }
     else // fb logged in update fb logged in status
     {
@@ -2159,6 +2160,11 @@ function tryPluginInstall(
         $('#warningMsg > button#ok').unbind('click').click(function() {
           closeWindow();
           //handleRoomSetup();
+
+          if (Callcast.connection.hasSavedLoginInfo()) {
+            Callcast.connect();
+          }
+
           $(document).trigger('checkCredentials');
           $(this).unbind('click').click(closeWindow);
         });
@@ -2185,6 +2191,11 @@ function tryPluginInstall(
     // Close buttons.
     $('.window .close').on('click', closeWindow);
     // Resize window.
+
+    if (Callcast.connection.hasSavedLoginInfo()) {
+      Callcast.connect();
+    }
+
     $(document).trigger('checkCredentials');
     $(window).resize(resizeWindows);
   }
