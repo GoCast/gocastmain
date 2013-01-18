@@ -76,7 +76,7 @@ var app = {
   defunctAlertShowing: false,
   tryPluginInstallAttempts: 0,
   facebookInited: false,
-  fbCheckCredentialsTriggered: false,
+  fbCheckCheckPluginTriggered: false,
   fbTimerRunning: null,
   simPluginLoadFailed: false,
 
@@ -1926,6 +1926,9 @@ function enterId(
 )
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
+    //Assume for now that clicking on nothanks means visitor login
+    Callcast.connect();
+
     app.log(2, 'enterId');
     closeWindow();
     openWindow('#credentials2');
@@ -1938,17 +1941,25 @@ function enterId(
     }
 } /* onJoinNow() */
 
-function deferredCheckCredentials() {
-  app.fbCheckCredentialsTriggered = true;
+function deferredCheckPlugin() {
+  app.fbCheckPluginTriggered = true;
 
-  // Normally we don't call check credentials, but we MUST call it if document.ready has already
+  // Normally we don't call checkplugin, but we MUST call it if document.ready has already
   // run at this point. We infer this by the fact that the 10 second fb timer is already set which
-  // happens in document.ready. In this case, it's up to us to call checkcredentials.
+  // happens in document.ready. In this case, it's up to us to call checkplugin.
   if (app.fbTimerRunning) {
     clearTimeout(app.fbTimerRunning);
     app.fbTimerRunning = null;
-    $(document).trigger('checkCredentials');
+    $(document).trigger('checkPlugin');
   }
+}
+
+function checkPlugin() {
+  app.log(2, 'Checking for GOCAST PLAYER...');
+  app.facebookInited = true;
+  closeWindow();
+  openMeeting();
+  tryPluginInstall();
 }
 
 ///
@@ -1958,7 +1969,7 @@ function checkCredentials()
 {
   var jqActive;
   app.log(2, 'checkCredentials');
-  app.facebookInited = true;
+  //app.facebookInited = true;
 
   // this method is called on a fb status change
   // so do nothing if we're already logged in
@@ -1998,7 +2009,7 @@ function checkCredentials()
 //
 function handleRoomSetup() {
   app.log(2, 'handleRoomSetup entered');
-  var room_to_create = $.getUrlVar('roomname') || '',
+  var room_to_create = $.roomcode.decipher($.urlvars.roomname) || '',
       item;
 
   room_to_create = room_to_create.replace(/ /g, '');
@@ -2020,12 +2031,6 @@ function handleRoomSetup() {
 
     app.log(2, "Room named '" + new_name + "' has been created. Joining now.");
     app.log(2, 'window.location ' + window.location);
-    if (room_to_create !== new_name)
-    {
-      newUrl = window.location.pathname + '?roomname=' + new_name;
-      app.log(2, 'replacing state ' + newUrl);
-      history.replaceState(null, null, newUrl);
-    }
 
     // warn user if room name changed (overflow)
     if (room_to_create.length > 0 && room_to_create.toLowerCase() !== new_name.toLowerCase())
@@ -2036,6 +2041,9 @@ function handleRoomSetup() {
       $('#message', jqDlg).text('Room ' + room_to_create + ' overflowed.  You are now in room ' + new_name);
       $('#stop-showing', jqDlg).css('display', 'none');
       $('#stop-showing-text', jqDlg).css('display', 'none');
+      newUrl = window.location.pathname + '?roomname=' + new_name;
+      app.log(2, 'replacing state ' + newUrl);
+      history.replaceState(null, null, newUrl);
     }
 
     // initialize video, audio state here since this method
@@ -2134,14 +2142,14 @@ function tryPluginInstall(
   {
     if (20 < app.tryPluginInstallAttempts) {
       // send live log that plugin loading failed.
-      var logTryPluginFailed = '{' +
+      /*var logTryPluginFailed = '{' +
         'userAgent: ' + navigator.userAgent.replace(/;/g, '|') + ', ' +
         'nickname: ' + app.user.name + ', ' +
         'facebook: ' + !app.user.fbSkipped +
-      '}';
+      '}';*/
 
-      app.log(2, 'tryPluginInstall failed: ' + logTryPluginFailed);
-      Callcast.SendLiveLog('tryPluginInstall failed: ' + logTryPluginFailed);
+      app.log(2, 'tryPluginInstall failed.');
+      //Callcast.SendLiveLog('tryPluginInstall failed: ' + logTryPluginFailed);
 
       if (window.location.pathname.match(/index2.html/g)) {
         // show plugin load warning and take them to the room.
@@ -2154,7 +2162,8 @@ function tryPluginInstall(
 
         $('#warningMsg > button#ok').unbind('click').click(function() {
           closeWindow();
-          handleRoomSetup();
+          //handleRoomSetup();
+          $(document).trigger('checkCredentials');
           $(this).unbind('click').click(closeWindow);
         });
       } else {
@@ -2180,6 +2189,7 @@ function tryPluginInstall(
     // Close buttons.
     $('.window .close').on('click', closeWindow);
     // Resize window.
+    $(document).trigger('checkCredentials');
     $(window).resize(resizeWindows);
   }
   else { // plugin not loaded or out of date
@@ -2188,14 +2198,15 @@ function tryPluginInstall(
     // if so change prompt
     if (app.pluginInstalled() && Callcast.pluginUpdateRequired())
     {
-       Callcast.SendLiveLog('Local plugin is out of date. Current version: ' + Callcast.GetVersion());
+       //Callcast.SendLiveLog('Local plugin is out of date. Current version: ' + Callcast.GetVersion());
        title = $('#installPlugin > h1');
        title.text('We have upgraded your GoCast beta');
        prompt = $('#installPlugin > p#prompt');
        prompt.text('Please download and install the new version. Thanks. The GoCast Team.');
     }
     if (!app.pluginInstalled()) {
-       Callcast.SendLiveLog('Local plugin is not installed.');
+       //Callcast.SendLiveLog('Local plugin is not installed.');
+       app.log(2, 'Local plugin not installed.')
     }
     if (app.osPlatform.isLinux64 || app.osPlatform.isLinux32)
     {
@@ -2461,7 +2472,14 @@ $(document).ready(function(
   event
 )
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+
 {
+  if (!$.urlvars.roomname ||
+      $.urlvars.roomname.length%4 ||
+      !$.roomcode.decipher($.urlvars.roomname)) {
+    window.location.href = 'dashboard.html';
+  }
+
   Callcast.init();
 
   //Disable file drag/drop everywhere except fileshare spots
@@ -2479,12 +2497,12 @@ $(document).ready(function(
 
   app.checkExclusive(function() {
     clearInterval(unmaskTimer);
-    navigator.plugins.refresh(); // reload plugins to get any plugin updates
+    navigator.plugins.refresh(false); // reload plugins to get any plugin updates
 
     // Check the browser.
     app.getBrowser();
     if (app.checkBrowser()) {
-      if (InvalidRoomname(decodeURI($.getUrlVar('roomname')))) {
+      /*if (InvalidRoomname(decodeURI($.getUrlVar('roomname')))) {
         closeWindow();
         openWindow('#errorMsgPlugin');
         $('#errorMsgPlugin > button').css({'display': 'none'});
@@ -2492,44 +2510,45 @@ $(document).ready(function(
         $('#errorMsgPlugin > p#prompt').css({'display': 'none'});
         $('#errorMsgPlugin > input#roomname').css({'display': 'block'});
         $('#errorMsgPlugin > button#reload').css({'display': 'block'});
-      } else {
+      } else {*/
 
-        uiInit(); // init user interface
-        if (app.fbCheckCredentialsTriggered) {
-          $(document).trigger('checkCredentials');
-        }
-
-        //do something if facebook took too long or errored out
-        app.fbTimerRunning = setTimeout(function() {
-          if (!app.facebookInited) {
-            closeWindow();
-            app.log(2, 'Facebook API init failed - userAgent: ' + navigator.userAgent);
-            Callcast.SendLiveLog('Facebook API init failed - userAgent: ' + navigator.userAgent.replace(/;/g, '|'));
-            Callcast.SendLiveLog('FBLOG: ' + getFBLog());
-            openWindow('#credentials');
-            $('#credentials > .fb-login-button').addClass('hidden');
-            $('#credentials > #fb-disabled').removeClass('hidden');
-          }
-        }, 10000);
-
-        // Login to xmpp anonymously
-        Callcast.connect();
-
-        // Write greeting into console.
-        app.log(2, 'Page loaded.');
-
-        Callcast.setCallbackForCallback_OnNicknameInUse(function(nick) {
-          app.nickInUse(nick);
-        });
-
-        // set the connection status callback
-        Callcast.setCallbackForCallback_ConnectionStatus(connectionStatus);
-
-        // callbacks for assign/unassign spots for participants
-        Callcast.setCallbackForAddSpotForParticipant(assignSpotForParticipant);
-        Callcast.setCallbackForRemoveSpotForParticipant(unassignSpotForParticipant);
+      uiInit(); // init user interface
+      if (app.fbCheckPluginTriggered) {
+        $(document).trigger('checkPlugin');
       }
+
+      //do something if facebook took too long or errored out
+      app.fbTimerRunning = setTimeout(function() {
+        if (!app.facebookInited) {
+          closeWindow();
+          app.log(2, 'Facebook API init failed - userAgent: ' + navigator.userAgent);
+          //Callcast.SendLiveLog('Facebook API init failed - userAgent: ' + navigator.userAgent.replace(/;/g, '|'));
+          //Callcast.SendLiveLog('FBLOG: ' + getFBLog());
+          //openWindow('#credentials');
+          //$('#credentials > .fb-login-button').addClass('hidden');
+          //$('#credentials > #fb-disabled').removeClass('hidden');
+          $(document).trigger('checkPlugin');
+        }
+      }, 10000);
+
+      // Login to xmpp anonymously
+      //Callcast.connect();
+
+      // Write greeting into console.
+      app.log(2, 'Page loaded.');
+
+      Callcast.setCallbackForCallback_OnNicknameInUse(function(nick) {
+        app.nickInUse(nick);
+      });
+
+      // set the connection status callback
+      Callcast.setCallbackForCallback_ConnectionStatus(connectionStatus);
+
+      // callbacks for assign/unassign spots for participants
+      Callcast.setCallbackForAddSpotForParticipant(assignSpotForParticipant);
+      Callcast.setCallbackForRemoveSpotForParticipant(unassignSpotForParticipant);
     }
+    //}
   }, function() {
     closeWindow();
     openWindow('#errorMsgPlugin');

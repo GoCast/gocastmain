@@ -261,9 +261,9 @@ function fbMe(response) // facebook response object
                                           image: app.user.fbProfilePicUrl
                                          });
 
-         fbLog += 'fbMe() - callback - pre-trigger deferredCheckCredentials\n';
+         fbLog += 'fbMe() - callback - pre-trigger deferredCheckPlugin\n';
 
-            $(document).trigger('deferredCheckCredentials');
+            $(document).trigger('deferredCheckPlugin');
       }
       else {
         fbLog += 'fbMe() callback - ERROR: me is: ' + JSON.stringify(me) + '\n';
@@ -337,7 +337,7 @@ function ourAsyncFBInit()
           //console.log('accessToken', response.authResponse.accessToken);
           if (!response.authResponse)
           {
-             $(document).trigger('deferredCheckCredentials');
+             $(document).trigger('deferredCheckPlugin');
           }
           else
           {
