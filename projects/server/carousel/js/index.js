@@ -1980,21 +1980,22 @@ function checkCredentials()
   if (jqActive.length === 0)
   {
     // check fb login status and prompt if not skipped and not logged in
-    if (!app.user.fbSkipped && !FB.getAuthResponse())
-    {
+ // RMW - Skipping facebook altogether Jan 18, 2013   if (!app.user.fbSkipped && !FB.getAuthResponse())
+//    {
       openWindow('#credentials');
       /*if ('undefined' !== typeof(Storage)) {
         if (Callcast.connection.bAnonymous && window.localStorage.gcpReloadNickName) {
           $('#noThanks', '#credentials').click();
         }
       }*/
-    }
-    else // fb logged in update fb logged in status
+//    }
+/*    else // fb logged in update fb logged in status
     {
       closeWindow();
       app.userLoggedIn = true;
       $(document).trigger('one-login-complete', 'checkCredentials - FB Login');
     }
+    */
   }
 } /* checkCredentials() */
 
