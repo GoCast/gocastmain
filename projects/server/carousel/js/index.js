@@ -1919,15 +1919,11 @@ function onJoinNow(
 /**
  * \brief callback for fb skip button press
  */
-function enterId(
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-    /**
-     * No argument. */
-)
+function enterId(options)
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
     //Assume for now that clicking on nothanks means visitor login
-    Callcast.connect();
+    Callcast.connect(options);
 
     app.log(2, 'enterId');
     closeWindow();

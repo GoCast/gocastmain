@@ -971,7 +971,8 @@ body > div#meeting > div#streams > div#scontrols > input.right {
 #boxes #credentials a#fb-disabled.hidden {
   display: none;
 }
-#boxes #credentials #noThanks
+#boxes #credentials #noThanks,
+#boxes #credentials #gclogin
 {
   /*float: right;*/
   margin-left: 10px;
@@ -988,9 +989,17 @@ body > div#meeting > div#streams > div#scontrols > input.right {
   background: -webkit-gradient(linear, center bottom, center top, from(rgb(139,35,35)), to(rgb(166,42,42)));
   background: -moz-linear-gradient(bottom, rgb(139,35,35), rgb(166,42,42));
 }
+#boxes #credentials #gclogin {
+  background: -webkit-gradient(linear, center bottom, center top, from(rgb(46,139,87)), to(rgb(60,179,113)));
+  background: -moz-linear-gradient(bottom, rgb(46,139,87), rgb(60,179,113));
+}
 #boxes #credentials #noThanks:hover {
   background: -webkit-gradient(linear, center bottom, center top, from(rgb(166,42,42)), to(rgb(139,35,35)));
   background: -moz-linear-gradient(bottom, rgb(166,42,42), rgb(139,35,35));  
+}
+#boxes #credentials #gclogin:hover {
+  background: -webkit-gradient(linear, center bottom, center top, from(rgb(60,179,113)), to(rgb(46,139,87)));
+  background: -moz-linear-gradient(bottom, rgb(60,179,113), rgb(46,139,87));    
 }
 #boxes #credentials2 {
   width: 300px; 
