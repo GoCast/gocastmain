@@ -971,6 +971,14 @@ body > div#meeting > div#streams > div#scontrols > input.right {
 #boxes #credentials a#fb-disabled.hidden {
   display: none;
 }
+#boxes #credentials input {
+  width: 18em;
+  border: 2px lightgrey solid;
+  padding: 5px;
+}
+#boxes #credentials input:focus {
+  border: 2px darkblue solid;
+}
 #boxes #credentials #noThanks,
 #boxes #credentials #gclogin
 {
@@ -990,6 +998,7 @@ body > div#meeting > div#streams > div#scontrols > input.right {
   background: -moz-linear-gradient(bottom, rgb(139,35,35), rgb(166,42,42));
 }
 #boxes #credentials #gclogin {
+  border: 1px darkgreen solid;
   background: -webkit-gradient(linear, center bottom, center top, from(rgb(46,139,87)), to(rgb(60,179,113)));
   background: -moz-linear-gradient(bottom, rgb(46,139,87), rgb(60,179,113));
 }
