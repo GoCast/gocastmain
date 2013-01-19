@@ -117,7 +117,7 @@ GoCastJS.StropheConnection.prototype = {
     saveLoginInfo: function() {
         if (typeof (Storage) !== 'undefined') {
             if (this.connection && this.connection.authenticated && this.connection.connected) {
-                this.log('Saving Login Info: RID: ' + this.connection.rid + ', jid: ' + this.connection.jid);
+//                this.log('Saving Login Info: RID: ' + this.connection.rid + ', jid: ' + this.connection.jid);
                 localStorage.jid = this.connection.jid;
                 localStorage.rid = this.connection.rid;
                 localStorage.sid = this.connection.sid;
