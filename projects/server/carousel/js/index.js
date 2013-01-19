@@ -3136,3 +3136,13 @@ function fbEvent() {
     }
   });
 }
+
+function leaveGoCast() {
+  Callcast.LeaveSession(function() {
+    if (Callcast.connection.bAnonymous) {
+      window.location.href = 'register.html';
+    } else {
+      window.location.href = 'dashboard.html';
+    }
+  });
+}

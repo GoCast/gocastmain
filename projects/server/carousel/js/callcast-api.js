@@ -1124,9 +1124,9 @@ function connectionStatus(statusStr)
   app.log(2, 'connectionStatus: ' + statusStr);
   $("#connection-status").text(statusStr);
 
-  if (/Bad/.test(statusStr)) {
+  if (/bad/.test(statusStr.toLowerCase())) {
     // auth fail
-  } else if (/failed/.test(statusStr)) {
+  } else if (/failed/.test(statusStr.toLowerCase())) {
     // conn fail
   }
 }
