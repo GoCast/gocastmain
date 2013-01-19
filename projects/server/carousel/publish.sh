@@ -208,9 +208,7 @@ return 0
 function genTimestampedHtml() {
   echo "Generating timestamped html: $1/$2"
   curtime=`date +%s`
-  html=`cat $3/$2`
-  html_ts=${html//GOCASTTIMESTAMP/$curtime}
-  echo "$html_ts" > $1/$2
+  sed s/GOCASTTIMESTAMP/$curtime/ $3/$2 >$1/$2
 }
 
 if [ $devmode -eq 0 ]
