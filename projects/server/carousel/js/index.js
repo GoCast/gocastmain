@@ -1982,7 +1982,8 @@ function checkCredentials()
     // check fb login status and prompt if not skipped and not logged in
  // RMW - Skipping facebook altogether Jan 18, 2013   if (!app.user.fbSkipped && !FB.getAuthResponse())
 //    {
-      openWindow('#credentials');
+    closeWindow();
+    openWindow('#credentials');
       /*if ('undefined' !== typeof(Storage)) {
         if (Callcast.connection.bAnonymous && window.localStorage.gcpReloadNickName) {
           $('#noThanks', '#credentials').click();
@@ -2161,13 +2162,12 @@ function tryPluginInstall(
         $('#warningMsg > button#ok').unbind('click').click(function() {
           closeWindow();
           //handleRoomSetup();
+          $(document).trigger('checkCredentials');
+          $(this).unbind('click').click(closeWindow);
 
           if (Callcast.connection.hasSavedLoginInfo()) {
             Callcast.connect();
           }
-
-          $(document).trigger('checkCredentials');
-          $(this).unbind('click').click(closeWindow);
         });
       } else {
         // show plugin load warning and take them to the alternate webpage.
@@ -2192,13 +2192,12 @@ function tryPluginInstall(
     // Close buttons.
     $('.window .close').on('click', closeWindow);
     // Resize window.
+    $(document).trigger('checkCredentials');
+    $(window).resize(resizeWindows);
 
     if (Callcast.connection.hasSavedLoginInfo()) {
       Callcast.connect();
     }
-
-    $(document).trigger('checkCredentials');
-    $(window).resize(resizeWindows);
   }
   else { // plugin not loaded or out of date
     // prompt user to install plugin
