@@ -270,11 +270,49 @@ function dbRoomTest3() {
 
 }
 
+function dbVisitorTest1() {
+    var name, account;
+
+    console.log('DynamoDB Visitor table test.');
+
+    account = 'visitor1@gmail.com';
+    name = 'nick1';
+
+    console.log('1. New visitor ' + account );
+    db.VisitorSeen(account, name, function(data) {
+        console.log('PASS: Visitor-data: ', data);
+
+        account = 'anothervisitor@gocast.it';
+        name = 'whatever';
+
+        console.log('2. Another new entry ' + account);
+        db.VisitorSeen(account, name, function(data) {
+            console.log('PASS: Visitor-data: ', data);
+
+            account = 'visitor1@gmail.com';
+            name = 'second-nickname';
+
+            console.log('3. Seen twice ' + account);
+            db.VisitorSeen(account, name, function(data) {
+                console.log('PASS: Visitor-data: ', data);
+
+            }, function(err) {
+                console.log('FAIL: List failed: ', err);
+            });
+        }, function(err) {
+            console.log('Seen failed: ', err);
+        });
+
+    }, function(err) {
+        console.log('Seen failed: ', err);
+    });
+
+}
 
 //db2Test1();
 //db2Test2();
 //db2Test3();
 //dbRoomTest1();
 //dbRoomTest2();
-dbRoomTest3();
-
+//dbRoomTest3();
+dbVisitorTest1();

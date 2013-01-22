@@ -40,6 +40,7 @@ var argv = process.argv;
 var ddb = new AWS.DynamoDB();
 var theUserTable = settings.accounts.dbUserTable;
 var theUserRoomTable = settings.accounts.dbUserRoomTable;
+var theVisitorTable = settings.accounts.dbVisitorTable;
 
 'use strict';
 
@@ -130,6 +131,33 @@ function errOut(err) {
 //            console.log('UserRoom - Table-result: ', data.Table);
         }
     });
+
+    ddb.client.describeTable({TableName: theVisitorTable}, function(err, data) {
+        if (err) {
+            // If it doesn't exist, then we should create it.
+            if (err.code === 'ResourceNotFoundException') {
+                // Create the table.
+                ddb.client.createTable({TableName: theVisitorTable,
+                                        KeySchema: {HashKeyElement: {AttributeName: 'email', AttributeType: 'S'}},
+                                        ProvisionedThroughput: {ReadCapacityUnits: 5, WriteCapacityUnits: 5}}, function(err, data) {
+                    if (err) {
+                        errOut(err);
+                    }
+                    else {
+                        console.log('accounts_db: Successfully inititalized New Visitor Table: ' + theVisitorTable);
+                    }
+                });
+            }
+            else {
+                errOut(err);
+            }
+        }
+        else {
+            console.log('accounts_db: User table found and ready.');
+//            console.log('Table-result: ', data.Table);
+        }
+    });
+
 }());
 
 function dbAwsObjectRead(awsObj) {
@@ -452,6 +480,104 @@ function dbCreateRoom(accountName, roomName, cbSuccess, cbFailure) {
 
 }
 
+function dbVisitorEntryGetColumn(accountName, columnName, cbSuccess, cbFailure) {
+    ddb.client.getItem({TableName: theVisitorTable,
+                        Key: { HashKeyElement: { S: accountName.toLowerCase() } },
+                        AttributesToGet: [columnName]}, function(err, data) {
+        var outObj;
+
+        if (err) {
+            errOut(err);
+            cbFailure(err);
+        }
+        else {
+            if (data.Item && data.Item[columnName]) {
+                outObj = dbAwsObjectRead(data.Item);
+//                console.log('dbVisitorEntryGetColumn: Success: Passing back: ' + JSON.stringify(outObj));
+                cbSuccess(outObj);
+            }
+            else {
+                cbFailure({code: 'EntryNotValidated', message: 'Requested Entry was not found or was not validated.'});
+            }
+
+        }
+    });
+}
+
+function dbVisitorSeenAgain(accountName, nickName, cbSuccess, cbFailure) {
+    var cur = new Date(),
+        Item, obj, numVisits;
+
+    // First must get the # visits so far.
+    dbVisitorEntryGetColumn(accountName, 'numVisits', function(data) {
+//        console.log('Got column: ', data);
+        numVisits = data.numVisits + 1;
+//        console.log('After numVisits++ is: ' + numVisits);
+
+        // Prep the item to be stored
+        Item = {};
+        obj = {numVisits: numVisits,
+               lastNickname: nickName,
+               lastSeenDate: new Date().getTime()};
+
+        dbAwsUpdateObjectPrep(Item, obj);
+
+        // AttributeUpdates { itemname: { Value: { S|N : '' }, Action: 'PUT' } }, itemName2: { Value: , Action }}
+        ddb.client.updateItem({TableName: theVisitorTable,
+                            Key: { HashKeyElement: { S: accountName.toLowerCase() }},
+                            AttributeUpdates: Item}, function(err, data) {
+                                if (err) {
+                                    errOut(err);
+                                    cbFailure(err);
+                                }
+                                else {
+    //                                console.log('Added Item: ', data.Attributes);
+//                                    console.log('Visitor-Update-RAW: ', data);
+                                    cbSuccess(data);
+                                }
+                            });
+    }, function(err) {
+        console.log('dbVisitorSeenAgain: dbVisitorEntryGetColumn failed: ', err);
+        cbFailure('dbVisitorSeenAgain: dbVisitorEntryGetColumn failed: ' + err);
+    });
+
+}
+
+function dbVisitorSeen(accountName, nickName, cbSuccess, cbFailure) {
+    var cur = new Date(),
+        Item = {}, obj;
+
+    // Prep the item to be stored
+    obj = { email: accountName.toLowerCase(),
+            lastNickname: nickName,
+            numVisits: 1,
+            creationDate: cur.getTime(),
+            creationDateString: cur.toString()
+           };
+
+    dbAwsObjectPrep(Item, obj);
+
+    //
+    // Try creating a new entry. If the entry already exists, then we'll
+    // have to update the existing entry instead.
+    //
+    ddb.client.putItem({TableName: theVisitorTable,
+                        Item: Item,
+                        Expected: {email: {Exists: false} }}, function(err, data) {
+                            if (err) {
+                                errOut(err);
+//                                cbFailure(err);
+                                dbVisitorSeenAgain(accountName, nickName, cbSuccess, cbFailure);
+                            }
+                            else {
+//                                console.log('Added Item: ', data.Attributes);
+//                                console.log('Add-RAW: ', data);
+                                cbSuccess(data);
+                            }
+                        });
+
+}
+
 exports.AddEntry = dbAddEntry;
 exports.UpdateEntry = dbUpdateEntry;
 exports.GetEntryByAccountName = dbGetEntryByAccountName;
@@ -462,3 +588,4 @@ exports.ActivateEntry = dbActivateEntry;
 exports.CreateRoom = dbCreateRoom;
 exports.DeleteRoom = dbDeleteRoom;
 exports.ListRooms = dbListRooms;
+exports.VisitorSeen = dbVisitorSeen;

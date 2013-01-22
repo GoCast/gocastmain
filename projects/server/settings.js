@@ -63,6 +63,7 @@ if (process.env.SETTINGS_DEVEL === 1 || process.env.SETTINGS_DEVEL === '1') {
         xmppAccountServerBase: 'http://localhost:9090/plugins/userService/userservice?',
         dbUserTable: 'dev_UserTable',
         dbUserRoomTable: 'dev_UserRoomTable',
+        dbVisitorTable: 'dev_VisitorTable',
         mailgunKey: 'key-65ism99rlme7svrn93qc-cormdknx-42',      // Bob Wolff - rwolff@gocast.it key -- the free one.
         inviteFromAddress: 'support@gocast.it',
         inviteFromName: 'GoCast Support',
