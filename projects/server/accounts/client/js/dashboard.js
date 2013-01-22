@@ -119,7 +119,7 @@ var DashApp = {
                     DashView.displayalert('startmeeting-form', 'success', 'Congratulations! You\'re room has been ' +
                                           'created. Simply click on this url <a href="' + roomlinkrel + '">' +
                                           atag.href + '</a> to enter the room. You can also ' +
-                                          'share this link with your friends to invite them to your room.');
+                                          'share this link with your friends and invite them to your room.');
                     return false;
                 };
             }
