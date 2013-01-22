@@ -13,9 +13,15 @@ var DashView = {
             $('.alert', this.$forms[i]).removeClass('show');
         }
         this.$forms[id].addClass('show');
+        this.$forms[id].clearForm();
 
         if ('changepwd-form' === id) {
             $('#input-email', this.$forms[id]).val(DashApp.boshconn.getEmailFromJid());
+        }
+
+        if ('login-form' === id && $.urlvars.ecode) {
+            var email = $.roomcode.decipheruname($.urlvars.ecode);
+            $('#input-email', this.$forms[id]).val(email);
         }
     },
     displayalert: function(formid, type, message) {
@@ -77,14 +83,14 @@ var DashApp = {
                         DashView.displayalert('startmeeting-form', 'success', 'Your password has been changed. Use your' +
                                               'new password to login from now on.');
                     } else {
-                        DashView.displayalert('startmeeting-form', 'error', 'There was an error changing the password for ' +
+                        DashView.displayalert('changepwd-form', 'error', 'There was an error changing the password for ' +
                                               'your account.');
                     }
                 };
             },
             failure: function() {
                 return function(error) {
-                    DashView.displayalert('startmeeting-form', 'error', 'There was an error changing the password for ' +
+                    DashView.displayalert('changepwd-form', 'error', 'There was an error changing the password for ' +
                                           'your account.');
                 };
             },
@@ -105,8 +111,15 @@ var DashApp = {
             beforesubmit: function() {
                 return function(arr, $form, options) {
                     var rcode = $.roomcode.cipher(DashApp.boshconn.getEmailFromJid().replace(/@/, '~'),
-                                                  $('#input-roomname', $form).val());
-                    window.location.href = window.location.pathname.replace(/dashboard.html*$/, '') + '?roomname=' + rcode;
+                                                  $('#input-roomname', $form).val()),
+                        roomlinkrel = window.location.pathname.replace(/dashboard.html*$/, '') + '?roomname=' + rcode,
+                        atag = document.createElement('a');
+
+                    atag.href = roomlinkrel;
+                    DashView.displayalert('startmeeting-form', 'success', 'Congratulations! You\'re room has been ' +
+                                          'created. Simply click on this url <a href="' + roomlinkrel + '">' +
+                                          atag.href + '</a> to enter the room. You can also ' +
+                                          'share this link with your friends and invite them to your room.');
                     return false;
                 };
             }

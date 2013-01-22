@@ -12,6 +12,7 @@ var RegisterView = {
             $('.alert', this.$forms[i]).removeClass('show');
         }
         this.$forms[id].addClass('show');
+        this.$forms[id].clearForm();
     },
     displaydefaultform: function(action) {
         var actions = ['register', 'activate'];
@@ -63,8 +64,9 @@ var RegisterApp = {
                 return function(response) {
                     if ('success' === response.result) {
                         window.location.href = $.urlvars.baseurl
-                                                .replace(/register\.html/, 'dashboard.html')
-                                                + '?justactivated=true';
+                                                .replace(/register\.html/, 'dashboard.html') + '?justactivated=true&ecode=' +
+                                                $.roomcode.cipher($('#input-email', RegisterApp.$forms['activate-form']).val(),
+                                                                  'gcst');
                     } else if ('incorrect' === response.result) {
                         RegisterView.displayalert('activate-form', 'error', 'The activation code you\'ve provided is wrong. ' +
                                                 'Please provide the correct activation code.');
@@ -96,7 +98,6 @@ var RegisterApp = {
         for (var i=0; i<document.forms.length; i++) {
             var options = {
                 dataType: 'json',
-                resetForm: true,
                 success: this.formSubmitResultCallbacks[document.forms[i].id].success(),
                 error: this.formSubmitResultCallbacks[document.forms[i].id].failure()        
             };

@@ -54,3 +54,10 @@ body > .container > .row > .span4 > form .alert {
 body > .container > .row > .span4 > form .alert.show {
     display: block;
 }
+
+body > .container > .row > .span4 > form .alert  a {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
+    width: 260px;
+}

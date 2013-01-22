@@ -78,6 +78,12 @@
                     roomsalt = roomname.split(saltdelim)[0];
 
                 return (salt === roomsalt) ? roomname.split(saltdelim)[1] : ''; 
+            },
+            decipheruname: function(rcode) {
+                return this.decipher(rcode).split(userdelim)[0];
+            },
+            decipherroomname: function(rcode) {
+                return this.decipher(rcode).split(userdelim)[1];
             }
         };
 
