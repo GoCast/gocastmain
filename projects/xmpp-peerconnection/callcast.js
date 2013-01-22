@@ -2767,7 +2767,7 @@ var Callcast = {
         this.room = '';
         this.nick = '';
 
-        $(document).trigger('disconnected');
+        //$(document).trigger('disconnected');
     },
 
 

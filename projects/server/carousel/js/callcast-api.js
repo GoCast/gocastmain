@@ -433,10 +433,15 @@ $(document).on('disconnected', function(
 {
   Callcast.log('Connection terminated.');
   app.log(4, "SENDLOG_DISCONNECTED: disconnected");
+  app.userLoggedIn = false;
   $('#errorMsgPlugin > h1').text('We got disconnected!');
-  $('#errorMsgPlugin > p#prompt').text('Please click on the send log button, and after its done, reload the page.');
+  $('#errorMsgPlugin > p#prompt').text('Please click on the send log button, and after its done, reenter the room.');
   closeWindow();
   openWindow('#errorMsgPlugin');
+  $('#errorMsgPlugin > #reload').text('Reenter room').removeAttr('onclick').unbind('click').click(function() {
+    $(this).text('Reload').unbind('click').click(errMsgReloadClick);
+    checkCredentials();
+  });
 
   $('#errorMsgPlugin > #sendLog').unbind('click').click(function() {
     $(this).attr('disabled', 'disabled');

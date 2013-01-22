@@ -1108,6 +1108,7 @@ function openMeeting(
     app.log(2, 'On before unload.');
     app.removeAppStamp();
     Callcast.LeaveSession();
+    forgetXmppConnection();
   });
   /*/
   // test for leave session on page unload
@@ -1976,9 +1977,9 @@ function checkCredentials()
   }
 
   // check if there's an error being displayed
-  jqActive = $('.window.active#errorMsgPlugin');
-  if (jqActive.length === 0)
-  {
+  //jqActive = $('.window.active#errorMsgPlugin');
+  //if (jqActive.length === 0)
+  //{
     // check fb login status and prompt if not skipped and not logged in
  // RMW - Skipping facebook altogether Jan 18, 2013   if (!app.user.fbSkipped && !FB.getAuthResponse())
 //    {
@@ -1997,7 +1998,7 @@ function checkCredentials()
       $(document).trigger('one-login-complete', 'checkCredentials - FB Login');
     }
     */
-  }
+  //}
 } /* checkCredentials() */
 
 //
@@ -3109,9 +3110,9 @@ function startTour(tourSelector) {
 }
 
 function errMsgReloadClick() {
-  if ('undefined' !== typeof(Storage) && app.user.fbSkipped) {
+  /*if ('undefined' !== typeof(Storage) && app.user.fbSkipped) {
     window.localStorage.gcpReloadNickName = decodeURI(app.user.name);
-  }
+  }*/
   window.location.reload();
 }
 
@@ -3140,9 +3141,12 @@ function fbEvent() {
 function leaveGoCast() {
   Callcast.LeaveSession(function() {
     if (Callcast.connection.bAnonymous) {
+      forgetXmppConnection = function() { Callcast.connection.forgetReconnectInfo(); };
       window.location.href = 'register.html';
     } else {
       window.location.href = 'dashboard.html';
     }
   });
 }
+
+var forgetXmppConnection = function() {};

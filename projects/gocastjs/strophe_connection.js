@@ -198,6 +198,7 @@ GoCastJS.StropheConnection.prototype = {
             return 'anonymous';
         }
 
+        this.causeTerminating = true;
         this.log('autoConnect: Dropping out. id: ' + this.id + ', pw: ' + this.pw);
         return null;
     },
