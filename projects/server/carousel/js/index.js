@@ -1906,7 +1906,7 @@ function onJoinNow(
 
     //Send visitor info to accounts service
     $.ajax({
-      url: '/accounts/visitorseen/',
+      url: '/acct/visitorseen/',
       type: 'POST',
       data: {email: usrEmail, nickname: usrNm},
       dataType: 'json',
