@@ -1108,6 +1108,7 @@ function openMeeting(
     app.log(2, 'On before unload.');
     app.removeAppStamp();
     Callcast.LeaveSession();
+    forgetXmppConnection();
   });
   /*/
   // test for leave session on page unload
@@ -1922,19 +1923,20 @@ function onJoinNow(
 function enterId(options)
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
-    //Assume for now that clicking on nothanks means visitor login
-    Callcast.connect(options);
-
     app.log(2, 'enterId');
+    Callcast.connect(options);
+}
+
+function checkCredentials2() {
     closeWindow();
     openWindow('#credentials2');
-    if ('undefined' !== typeof(Storage)) {
-      if (window.localStorage.gcpReloadNickName) {
+    /*if ('undefined' !== typeof(Storage)) {
+      if (Callcast.connection.bAnonymous && window.localStorage.gcpReloadNickName) {
         $('#name', '#credentials2').val(window.localStorage.gcpReloadNickName);
         $('#btn', '#credentials2').click();
         delete window.localStorage.gcpReloadNickName;
       }
-    }
+    }*/
 } /* onJoinNow() */
 
 function deferredCheckPlugin() {
@@ -1975,18 +1977,19 @@ function checkCredentials()
   }
 
   // check if there's an error being displayed
-  jqActive = $('.window.active#errorMsgPlugin');
-  if (jqActive.length === 0)
-  {
+  //jqActive = $('.window.active#errorMsgPlugin');
+  //if (jqActive.length === 0)
+  //{
     // check fb login status and prompt if not skipped and not logged in
  // RMW - Skipping facebook altogether Jan 18, 2013   if (!app.user.fbSkipped && !FB.getAuthResponse())
 //    {
-      openWindow('#credentials');
-      if ('undefined' !== typeof(Storage)) {
-        if (window.localStorage.gcpReloadNickName) {
+    closeWindow();
+    openWindow('#credentials');
+      /*if ('undefined' !== typeof(Storage)) {
+        if (Callcast.connection.bAnonymous && window.localStorage.gcpReloadNickName) {
           $('#noThanks', '#credentials').click();
         }
-      }
+      }*/
 //    }
 /*    else // fb logged in update fb logged in status
     {
@@ -1995,7 +1998,7 @@ function checkCredentials()
       $(document).trigger('one-login-complete', 'checkCredentials - FB Login');
     }
     */
-  }
+  //}
 } /* checkCredentials() */
 
 //
@@ -2162,6 +2165,10 @@ function tryPluginInstall(
           //handleRoomSetup();
           $(document).trigger('checkCredentials');
           $(this).unbind('click').click(closeWindow);
+
+          if (Callcast.connection.hasSavedLoginInfo()) {
+            Callcast.connect();
+          }
         });
       } else {
         // show plugin load warning and take them to the alternate webpage.
@@ -2188,6 +2195,10 @@ function tryPluginInstall(
     // Resize window.
     $(document).trigger('checkCredentials');
     $(window).resize(resizeWindows);
+
+    if (Callcast.connection.hasSavedLoginInfo()) {
+      Callcast.connect();
+    }
   }
   else { // plugin not loaded or out of date
     // prompt user to install plugin
@@ -3099,9 +3110,9 @@ function startTour(tourSelector) {
 }
 
 function errMsgReloadClick() {
-  if ('undefined' !== typeof(Storage) && app.user.fbSkipped) {
+  /*if ('undefined' !== typeof(Storage) && app.user.fbSkipped) {
     window.localStorage.gcpReloadNickName = decodeURI(app.user.name);
-  }
+  }*/
   window.location.reload();
 }
 
@@ -3126,3 +3137,16 @@ function fbEvent() {
     }
   });
 }
+
+function leaveGoCast() {
+  Callcast.LeaveSession(function() {
+    if (Callcast.connection.bAnonymous) {
+      forgetXmppConnection = function() { Callcast.connection.forgetReconnectInfo(); };
+      window.location.href = 'register.html';
+    } else {
+      window.location.href = 'dashboard.html';
+    }
+  });
+}
+
+var forgetXmppConnection = function() {};

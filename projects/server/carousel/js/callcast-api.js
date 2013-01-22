@@ -75,7 +75,9 @@ $(document).on('left_session', function(
    * Remove all the objects in carousel. */
   $('#meeting > #streams > #scarousel div.cloudcarousel:not(.unoccupied)').each(function(i, e) {
     if ($(e).hasClass('typeContent')) {
-      removeContentFromCarousel($(e).attr('encname'));
+      //removeContentFromCarousel($(e).attr('id'));
+      removeSpotCb({spotnumber: $(e).attr('spotnumber')});
+      app.carousel.createSpot();
     }
     else {
       removePluginFromCarousel($(e).attr('encname'));
@@ -392,10 +394,10 @@ $(document).on('connected', function(
 
   /*
    * Open waiting room in case it takes too long to join. */
-  openWindow('#waitingToJoin');
+  //openWindow('#waitingToJoin');
 
   app.xmppLoggedIn = true;
-
+  checkCredentials2();
   $(document).trigger('one-login-complete', 'XMPP GO.');    // One more login action complete.
   return false;
 }); /* connected() */
@@ -433,10 +435,15 @@ $(document).on('disconnected', function(
 {
   Callcast.log('Connection terminated.');
   app.log(4, "SENDLOG_DISCONNECTED: disconnected");
+  app.userLoggedIn = false;
   $('#errorMsgPlugin > h1').text('We got disconnected!');
-  $('#errorMsgPlugin > p#prompt').text('Please click on the send log button, and after its done, reload the page.');
+  $('#errorMsgPlugin > p#prompt').text('Please click on the send log button, and after its done, reenter the room.');
   closeWindow();
   openWindow('#errorMsgPlugin');
+  $('#errorMsgPlugin > #reload').text('Reenter room').removeAttr('onclick').unbind('click').click(function() {
+    $(this).text('Reload').unbind('click').click(errMsgReloadClick);
+    checkCredentials();
+  });
 
   $('#errorMsgPlugin > #sendLog').unbind('click').click(function() {
     $(this).attr('disabled', 'disabled');
@@ -765,7 +772,7 @@ function removeContentFromCarousel(
 {
   /*
    * Get parent object and modify accordingly. */
-  var id = app.str2id(infoId),
+  var id = infoId,
       jqOo = $('#meeting > #streams > #scarousel div.cloudcarousel#' + id);
   jqOo.addClass('unoccupied').removeClass('typeContent');
   jqOo.removeAttr('id');
@@ -774,7 +781,7 @@ function removeContentFromCarousel(
   jqOo.removeAttr('url');
   jqOo.removeAttr('encname');
   jqOo.css('background-image', 'url("images/GoToken.png")');
-  app.log(2, 'Removing content from spot [' + infoId + ', ' + id + ']');
+  app.log(2, 'Removing content from spot [' + infoId + ', ' + jqOo.attr('spotnumber') + ']');
   return false;
 } /* removeContentFromCarousel() */
 
@@ -1123,6 +1130,12 @@ function connectionStatus(statusStr)
 {
   app.log(2, 'connectionStatus: ' + statusStr);
   $("#connection-status").text(statusStr);
+
+  if (/bad/.test(statusStr.toLowerCase())) {
+    // auth fail
+  } else if (/failed/.test(statusStr.toLowerCase())) {
+    // conn fail
+  }
 }
 
 ///

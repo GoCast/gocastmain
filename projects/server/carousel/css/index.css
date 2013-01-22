@@ -980,7 +980,8 @@ body > div#meeting > div#streams > div#scontrols > input.right {
   border: 2px darkblue solid;
 }
 #boxes #credentials #noThanks,
-#boxes #credentials #gclogin
+#boxes #credentials #gclogin,
+#upper-right #leavegocast
 {
   /*float: right;*/
   margin-left: 10px;
@@ -1002,7 +1003,8 @@ body > div#meeting > div#streams > div#scontrols > input.right {
   background: -webkit-gradient(linear, center bottom, center top, from(rgb(46,139,87)), to(rgb(60,179,113)));
   background: -moz-linear-gradient(bottom, rgb(46,139,87), rgb(60,179,113));
 }
-#boxes #credentials #noThanks:hover {
+#boxes #credentials #noThanks:hover,
+#upper-right #leavegocast:hover {
   background: -webkit-gradient(linear, center bottom, center top, from(rgb(166,42,42)), to(rgb(139,35,35)));
   background: -moz-linear-gradient(bottom, rgb(166,42,42), rgb(139,35,35));  
 }
