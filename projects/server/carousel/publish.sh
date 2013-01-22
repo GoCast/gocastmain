@@ -143,6 +143,10 @@ function obfuscate() {
   cp $tempdest/js/fileviewer.js $tempjs/js
   cp $tempdest/js/strophe_connection.js $tempjs/js
   cp $tempdest/js/jquery.utils.js $tempjs/js
+  cp "$tempdest/js/register.js" "$tempjs/js"
+  cp "$tempdest/js/dashboard.js" "$tempjs/js"
+  cp "$tempdest/js/index.js" "$tempjs/js"
+  cp "$tempdest/js/callcast_settings.js" "$tempjs/js"
 
   cw=`pwd`
   cd $tempjs
@@ -196,12 +200,9 @@ return 0
 function minimize() {
 # minimize first using google closure compiler
   gcpublish "js/carousel.js" "js/carousel.js"
-  gcpublish "js/index.js" "js/index.js"
   gcpublish "js/callcast-api.js" "js/callcast-api.js"
   gcpublish "js/fb.js" "js/fb.js"
-  gcpublish "$tempdest/js/register.js" "js/logreg.js"
-  gcpublish "$tempdest/js/dashboard.js" "js/dashboard.js"
-  gcpublish "$tempdest/js/callcast_settings.js" "js/callcast_settings.js"
+  gcpublish "$tempdest/js/uiutil.js" "js/uiutil.js"
 return 0
 }
 
