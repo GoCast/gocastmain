@@ -256,6 +256,10 @@ function apiListRooms(email, success, failure) {
     db.ListRooms(email, success, failure);
 }
 
+function apiVisitorSeen(email, nickName, success, failure) {
+    db.VisitorSeen(email, nickName, success, failure);
+}
+
 /* Manjesh -- These both work (separately of course)
 apiNewAccount('http://dev.gocast.it/baseURL.html', 'rwolff@gocast.it', 'rwolff', 'Bob Wolff', function() {
     console.log('TEST: SUCCESS');
@@ -277,3 +281,4 @@ exports.DeleteAccount = apiDeleteAccount;
 exports.ChangePassword = apiChangePassword;
 exports.NewRoom = apiNewRoom;
 exports.ListRooms = apiListRooms;
+exports.VisitorSeen = apiVisitorSeen;
