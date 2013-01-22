@@ -55,7 +55,8 @@ body > .container > .row > .span4 > form .alert.show {
     display: block;
 }
 
-body > .container > .row > .span4 > form .alert  a {
+body > .container > .row > .span4 > form .alert  a,
+body > .container > .row > .span4 > form .alert  span {
     overflow: hidden;
     text-overflow: ellipsis;
     display: inline-block;

@@ -145,7 +145,7 @@
       <input class="fbSend gc-icon"  type="button" title="Send facebook message." onclick="fbSendDialog();"/>
       <input class="fbShare gc-icon" type="button" title="Share on wall." onclick="fbShare();"/>
       <input class="fbShare fbevent gc-icon" type="button" title="Create meeting event." onclick="fbEvent();"/>
-      <a id="leavegocast" href="javascript:leaveGoCast();">Close Your GoCast</a>
+      <a id="leavegocast" href="javascript:leaveGoCast();">Exit GoCast</a>
 
       <div id="status-prompt" class="warning">
         <p id="message">The speaker volume is too low for you to hear!</p>
@@ -302,9 +302,9 @@
         -->
       </div>
       <div id="credentials2" class="window resizable">
-        <p class="title welcome">GoCast Login</p>
+        <p class="title welcome">Choose Your Nickname</p>
         <p class="login-error"></p>
-        <input id="name"  type="text" name="name" placeholder="Your name" maxlength="32"/>
+        <input id="name"  type="text" name="name" placeholder="Choose your nickname" maxlength="32"/>
         <p id="nickhint" style="font-size: 10px; visibility: hidden;">
           Alphanumerics, spaces,
           <strong>( )</strong> <strong>[ ]</strong>
@@ -312,6 +312,7 @@
           <strong>-</strong> <strong>.</strong>
           <strong>@</strong> are valid
         </p>
+        <input id="email" type="email" placeholder="Enter a valid email"/>
         <p></p>
         <a id="btn" type="button" href="javascript:void(0);">GET STARTED</a>
         <!--<div class="divider">-- OR --</div>

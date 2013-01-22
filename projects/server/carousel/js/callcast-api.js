@@ -433,6 +433,12 @@ $(document).on('disconnected', function(
 )
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
+  if (app.authfail) {
+    app.authfail = false;
+    checkCredentials();
+    return;
+  }
+
   Callcast.log('Connection terminated.');
   app.log(4, "SENDLOG_DISCONNECTED: disconnected");
   app.userLoggedIn = false;
@@ -440,7 +446,7 @@ $(document).on('disconnected', function(
   $('#errorMsgPlugin > p#prompt').text('Please click on the send log button, and after its done, reenter the room.');
   closeWindow();
   openWindow('#errorMsgPlugin');
-  $('#errorMsgPlugin > #reload').text('Reenter room').removeAttr('onclick').unbind('click').click(function() {
+  $('#errorMsgPlugin > #reload').text('Re-enter room').removeAttr('onclick').unbind('click').click(function() {
     $(this).text('Reload').unbind('click').click(errMsgReloadClick);
     checkCredentials();
   });
@@ -1132,7 +1138,7 @@ function connectionStatus(statusStr)
   $("#connection-status").text(statusStr);
 
   if (/bad/.test(statusStr.toLowerCase())) {
-    // auth fail
+    app.authfail = true;
   } else if (/failed/.test(statusStr.toLowerCase())) {
     // conn fail
   }

@@ -79,6 +79,7 @@ var app = {
   fbCheckCheckPluginTriggered: false,
   fbTimerRunning: null,
   simPluginLoadFailed: false,
+  authfail: false,
 
   /**
    * Writes the specified log entry into the console HTML element, if
@@ -1888,12 +1889,17 @@ function onJoinNow(
     app.user.fbSkipped = true;
 
     // get the nick name, return back to dialog if not defined
-    var usrNm = $('#credentials2 > input#name').val();
+    var usrNm = $('#credentials2 > input#name').val(),
+        usrEmail = $('#credentials2 > input#email').val();
 
     // user must enter fb or nick name if both not entered
     // display error
     if (usrNm.length < 1) {
-      $('#credentials2 > p.login-error').text('Please enter a name to continue.').
+      $('#credentials2 > p.login-error').text('Please choose a nickname').
+        fadeIn('fast');
+      return false;
+    } else if(!usrEmail.length || -1 === usrEmail.indexOf('@')) {
+      $('#credentials2 > p.login-error').text('Please enter a valid email').
         fadeIn('fast');
       return false;
     }
@@ -1965,7 +1971,22 @@ function checkPlugin() {
 ///
 function checkCredentials()
 {
-  var jqActive;
+  var keyHandler = function(event) {
+    if (event.altKey) {
+        return;
+    }
+    if (!event.ctrlKey) {
+      switch (event.which || event.keyCode) {
+        case 13:
+          app.log(2, 'Enter key pressed');
+          event.preventDefault();
+          enterId({username: document.getElementById('gcemail').value,
+                  password: document.getElementById('gcpassword').value});
+          break;
+      }
+    }
+  };
+
   app.log(2, 'checkCredentials');
   //app.facebookInited = true;
 
@@ -1973,7 +1994,7 @@ function checkCredentials()
   // so do nothing if we're already logged in
   if (app.userLoggedIn)
   {
-     return;
+    return;
   }
 
   // check if there's an error being displayed
@@ -1985,6 +2006,8 @@ function checkCredentials()
 //    {
     closeWindow();
     openWindow('#credentials');
+    $('#credentials > input').unbind('keypress').keypress(keyHandler);
+    $('#credentials > #gcemail').focus();
       /*if ('undefined' !== typeof(Storage)) {
         if (Callcast.connection.bAnonymous && window.localStorage.gcpReloadNickName) {
           $('#noThanks', '#credentials').click();

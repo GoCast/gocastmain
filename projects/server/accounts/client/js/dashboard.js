@@ -102,46 +102,59 @@ var DashApp = {
         'startmeeting-form': {
             success: function() {
                 return function(response) {
+                    if('success' === response.result) {
+                        var rcode = $.roomcode.cipher(DashApp.boshconn.getEmailFromJid().replace(/@/, '~'),
+                                                      $('#input-roomname', DashApp.$forms['startmeeting-form']).val()),
+                            roomlinkrel = window.location.pathname.replace(/dashboard.html*$/, '') + '?roomname=' + rcode,
+                            atag = document.createElement('a');
+
+                        atag.href = roomlinkrel;
+                        DashView.displayalert('startmeeting-form', 'success', 'You\'re room has been ' +
+                                              'created. The unique URL for this room is: <span><strong>' + atag.href +
+                                              '</strong></span> You can invite others to your room by ' +
+                                              'emailing this URL to them. To enter the room, click here <a href="' +
+                                              roomlinkrel + '">' + atag.href + '</a>');
+                    } else {
+                        DashView.displayalert('startmeeting-form', 'error', 'There was an error while creating your ' +
+                                              'desired room.');
+                    }
                 };
             },
             failure: function() {
                 return function(error) {
+                    DashView.displayalert('startmeeting-form', 'error', 'There was an error while creating your desired room.');
                 };
             },
             beforesubmit: function() {
                 return function(arr, $form, options) {
-                    var rcode = $.roomcode.cipher(DashApp.boshconn.getEmailFromJid().replace(/@/, '~'),
-                                                  $('#input-roomname', $form).val()),
-                        roomlinkrel = window.location.pathname.replace(/dashboard.html*$/, '') + '?roomname=' + rcode,
-                        atag = document.createElement('a');
-
-                    atag.href = roomlinkrel;
-                    DashView.displayalert('startmeeting-form', 'success', 'Congratulations! You\'re room has been ' +
-                                          'created. Simply click on this url <a href="' + roomlinkrel + '">' +
-                                          atag.href + '</a> to enter the room. You can also ' +
-                                          'share this link with your friends and invite them to your room.');
-                    return false;
                 };
-            }
+            },
+            data: function() { return {email: DashApp.boshconn.getEmailFromJid()}; }
         }
+    },
+    setupForm: function(id) {
+        var options = {
+            dataType: 'json',
+            resetForm: true,
+            beforeSubmit: this.formCallbacks[id].beforesubmit(),
+            success: this.formCallbacks[id].success(),
+            error: this.formCallbacks[id].failure()        
+        };
+
+        if ( this.formCallbacks[id].data) {
+            options.data = this.formCallbacks[id].data();
+        }
+        this.$forms[id].ajaxForm(options);
     },
     init: function() {
         var urlvars = this.urlvars(),
             self = this;
 
         for (var i=0; i<document.forms.length; i++) {
-            var options = {
-                dataType: 'json',
-                resetForm: true,
-                beforeSubmit: this.formCallbacks[document.forms[i].id].beforesubmit(),
-                success: this.formCallbacks[document.forms[i].id].success(),
-                error: this.formCallbacks[document.forms[i].id].failure()        
-            };
-
             this.$forms[document.forms[i].id] = $(document.forms[i]);
-            this.$forms[document.forms[i].id].ajaxForm(options);
         }
 
+        this.setupForm('login-form');
         this.boshconn = new GoCastJS.StropheConnection({
             boshurl: '/xmpp-httpbind',
             xmppserver: 'dev.gocast.it',
@@ -179,9 +192,12 @@ var DashApp = {
         return function(status) {
             if (Strophe.Status.CONNECTED === status ||
                 Strophe.Status.ATTACHED === status) {
+                self.setupForm('startmeeting-form');
+                self.setupForm('changepwd-form');
                 DashView.displayform('startmeeting-form');
                 $('body > .navbar .nav').addClass('show');
-            } else if (Strophe.Status.DISCONNECTED === status) {
+            } else if (Strophe.Status.DISCONNECTED === status ||
+                       Strophe.Status.TERMINATED === status) {
                 DashView.cancelloginloader();
                 DashView.displayform('login-form');
                 $('body > .navbar .nav').removeClass('show');

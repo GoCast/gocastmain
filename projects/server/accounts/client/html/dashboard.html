@@ -66,7 +66,7 @@
                             </div>
                             <div class="control-group">
                                 <button type="submit" class="btn btn-primary pull-right"> Login </button>
-                                <a href="register.html" class="btn btn-link pull-right"> Register </a>
+                                <a href="register.html" class="btn btn-link pull-right"> Don't have an account? Register </a>
                             </div>
                         </fieldset>
                     </form>
@@ -99,13 +99,13 @@
                             </div>
                         </fieldset>
                     </form>
-                    <form id="startmeeting-form" class="form-horizontal">
+                    <form id="startmeeting-form" class="form-horizontal" action="/acct/createroom/" method="post">
                         <fieldset>
                             <div class="control-group">
                                 <div class="controls">
                                     <div class="input-prepend pull-right">
                                         <span class="add-on">&nbsp;<i class="icon-play"></i>&nbsp;</span>
-                                        <input id="input-roomname" type="text" name="room_name" placeholder=" Enter your room name" required class="span4">
+                                        <input id="input-roomname" type="text" name="desired_roomname" placeholder=" Enter your room name" required class="span4">
                                     </div>
                                 </div>
                             </div>
@@ -116,7 +116,7 @@
                                <h4><i class="icon-ok-sign"></i></h4><p style="padding-left: 25px;"></p>
                             </div>
                             <div class="control-group">
-                                <button type="submit" class="btn btn-primary pull-right"> Start Meeting </button>
+                                <button type="submit" class="btn btn-primary pull-right"> Create Room </button>
                             </div>
                         </fieldset>
                     </form>
