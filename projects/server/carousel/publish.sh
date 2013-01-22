@@ -221,6 +221,7 @@ genTimestampedHtml $tempdest index.html .
 genTimestampedHtml $tempdest index2.html .
 genTimestampedHtml $tempdest register.html ../accounts/client/html
 genTimestampedHtml $tempdest dashboard.html ../accounts/client/html
+genTimestampedHtml $tempdest myroom.html ../accounts/client/html
 
 if [ $confirm -eq 1 ]
 then
