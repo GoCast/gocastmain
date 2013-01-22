@@ -293,6 +293,7 @@ GoCastJS.StropheConnection.prototype = {
 
         if (this.causeTerminating || this.causeAuthfail) {
             this.forgetReconnectInfo();
+            this.reset('Full disconnection - heading for TERMINATED.');
             this.statusCallback(Strophe.Status.TERMINATED);
         }
 
