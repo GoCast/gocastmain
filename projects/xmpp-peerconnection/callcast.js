@@ -2800,13 +2800,43 @@ var Callcast = {
         }
     },
 
+    leaveIfReEntry: function(cb) {
+        // Determine if we're in a 'refresh' situation and if so, then re-attach.
+        if (typeof (Storage) !== 'undefined' && sessionStorage.room)
+        {
+            // We need to force a LeaveSession and setup video state too.
+            Callcast.room = sessionStorage.room;
+            Callcast.nick = sessionStorage.nick;
+
+            if (sessionStorage.bUseVideo === 'true' || sessionStorage.bUseVideo === 'false') {
+                Callcast.bUseVideo = sessionStorage.bUseVideo;
+            }
+
+            if (sessionStorage.bUseMicrophone === 'true' || sessionStorage.bUseMicrophone === 'false') {
+                Callcast.bUseMicrophone = sessionStorage.bUseMicrophone;
+            }
+
+            Callcast.log('ATTACHED/CONNECTED - Leaving Session.');
+            // Leave the current room and re-join
+            Callcast.LeaveSession(cb);
+        }
+        else {
+            Callcast.log('ATTACHED/CONNECTED - NO Storage or No sessionStorage.room - joining?');
+            if (cb) {
+                cb();
+            }
+        }
+    },
+
     connStatusHandler: function(status) {
         switch(status) {
             case Strophe.Status.CONNECTED:
                 this.log('XMPP/Strophe Finalizing connection and then triggering connected...');
-                Callcast.finalizeConnect();
-                Callcast.Callback_ConnectionStatus('Connected');
-                $(document).trigger('connected');
+                this.leaveIfReEntry(function() {
+                    Callcast.finalizeConnect();
+                    Callcast.Callback_ConnectionStatus('Connected');
+                    $(document).trigger('connected');
+                });
                 break;
             case Strophe.Status.DISCONNECTED:
                 this.log('XMPP/Strophe Disconnected. Likely re-trying though.');
@@ -2827,36 +2857,12 @@ var Callcast = {
                 break;
             case Strophe.Status.ATTACHED:
                 this.log('XMPP/Strophe Re-Attach of connection successful.');
-                // Determine if we're in a 'refresh' situation and if so, then re-attach.
-                if (typeof (Storage) !== 'undefined' && sessionStorage.room)
-                {
-                    // We need to force a LeaveSession and setup video state too.
-                    Callcast.room = sessionStorage.room;
-                    Callcast.nick = sessionStorage.nick;
-
-                    if (sessionStorage.bUseVideo === 'true' || sessionStorage.bUseVideo === 'false') {
-                        Callcast.bUseVideo = sessionStorage.bUseVideo;
-                    }
-
-                    if (sessionStorage.bUseMicrophone === 'true' || sessionStorage.bUseMicrophone === 'false') {
-                        Callcast.bUseMicrophone = sessionStorage.bUseMicrophone;
-                    }
-
-                    Callcast.log('ATTACHED - Leaving Session.');
-                    // Leave the current room and re-join
-                    Callcast.LeaveSession(function() {
-                        Callcast.log('ATTACHED - LeaveSession is complete. Re-join now.');
-                        Callcast.finalizeConnect();
-                        $(document).trigger('connected');
-                        Callcast.Callback_ConnectionStatus('Re-Attached');
-                    });
-                }
-                else {
-                    Callcast.log('ATTACHED - NO Storage or No sessionStorage.room - joining?');
+                this.leaveIfReEntry(function() {
+                    Callcast.log('ATTACHED - LeaveSession is complete. Re-join now.');
                     Callcast.finalizeConnect();
                     $(document).trigger('connected');
                     Callcast.Callback_ConnectionStatus('Re-Attached');
-                }
+                });
                 break;
             case Strophe.Status.DISCONNECTING:
                 this.log('XMPP/Strophe is Dis-Connecting...');
