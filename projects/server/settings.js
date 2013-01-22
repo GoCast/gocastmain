@@ -61,7 +61,8 @@ if (process.env.SETTINGS_DEVEL === 1 || process.env.SETTINGS_DEVEL === '1') {
         servicePort: 8083,
         xmppAccountServerSecret: 'dev.GoCast.SecretWU78zz',
         xmppAccountServerBase: 'http://localhost:9090/plugins/userService/userservice?',
-        dbActivationTable: 'dev_Activation',
+        dbUserTable: 'dev_UserTable',
+        dbUserRoomTable: 'dev_UserRoomTable',
         mailgunKey: 'key-65ism99rlme7svrn93qc-cormdknx-42',      // Bob Wolff - rwolff@gocast.it key -- the free one.
         inviteFromAddress: 'support@gocast.it',
         inviteFromName: 'GoCast Support',

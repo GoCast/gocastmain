@@ -281,7 +281,7 @@ var Callcast = {
 
         this.connection = new GoCastJS.StropheConnection({ boshurl: boshurl,
                                                            xmppserver: this.CALLCAST_XMPPSERVER,
-                                                           statusCallback: this.connStatusHandler,
+                                                           statusCallback: this.connStatusHandler.bind(this),
                                                            logFn: this.log});
 
     },
@@ -1990,7 +1990,7 @@ var Callcast = {
                     // We got kicked out
                     // So leave and come back?
                     Callcast.LeaveSession();
-                    alert('We got kicked out of the session for some reason.');
+//                    alert('We got kicked out of the session for some reason.');
                 }
                 else if (!Callcast.participants[nick] && $(presence).attr('type') !== 'unavailable') {
                     // add to participant list
@@ -2878,7 +2878,6 @@ var Callcast = {
                 Callcast.RememberCurrentJid();
                 Callcast.disconnect('AuthFail');
                 Callcast.Callback_ConnectionStatus('Bad username or password');
-                alert('XMPP/Strophe Authentication failed. Bad password or username.');
                 break;
             default:
                 this.log('XMPP/Strophe connection callback - unhandled status = ' + status);

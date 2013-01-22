@@ -47,8 +47,10 @@ app.use(express.bodyParser());
 // -------------- ACCT SERVICE REQUEST HANDLERS --------------
 
 app.post('/register', function(req, res) {
+    var firstRoomName = req.body.desired_roomname;
+
     console.log('accounts_service [/register][info]: FormData = ', req.body);
-    api.NewAccount(req.body.baseurl, req.body.email, req.body.password, req.body.name, function() {
+    api.NewAccount(req.body.baseurl, req.body.email, req.body.password, req.body.name, firstRoomName, function() {
         res.send('{"result": "success"}');
     }, function(err) {
         console.log('accounts_service [/register][error]: ', err);
@@ -57,6 +59,28 @@ app.post('/register', function(req, res) {
         } else {
             res.send('{"result": "error"}');
         }
+    });
+});
+
+app.post('/createroom', function(req, res) {
+    var roomName = req.body.desired_roomname;
+
+    console.log('accounts_service [/createroom][info]: FormData = ', req.body);
+    api.NewRoom(req.body.email, roomName, function() {
+        res.send('{"result": "success"}');
+    }, function(err) {
+        console.log('accounts_service [/createroom][error]: ', err);
+        res.send('{"result": "error"}');
+    });
+});
+
+app.post('/listrooms', function(req, res) {
+    console.log('accounts_service [/listrooms][info]: FormData = ', req.body);
+    api.ListRooms(req.body.email, function(data) {
+        res.send('{"result": "success", "data": ' + JSON.stringify(data) + '}');
+    }, function(err) {
+        console.log('accounts_service [/listrooms][error]: ', err);
+        res.send('{"result": "error"}');
     });
 });
 
@@ -86,7 +110,7 @@ app.post('/changepwd', function(req, res) {
     }, function(err) {
         console.log('accounts_service [/changepwd][error]: ', err);
         res.send('{"result": "error"}');
-    });    
+    });
 });
 
 app.listen(settings.accounts.serviceport || 8083);

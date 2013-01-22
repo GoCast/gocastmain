@@ -53,6 +53,8 @@ GoCastJS.StropheConnection = function(opts) {
     this.statusCallback = opts.statusCallback;
     this.xmppserver = opts.xmppserver;
 
+    this.disconnectTimer = null;
+
     if (opts.logFn) {
         this.log = opts.logFn;
     }
@@ -185,7 +187,7 @@ GoCastJS.StropheConnection.prototype = {
             this.bAnonymous = false;
 
             // In this case, we actually have a username and a password for login. Use it.
-            this.connect({ jid: this.id, pw: this.pw });
+            this.connect({ jid: this.id, password: this.pw });
 
             return this.id;
         }
@@ -205,6 +207,10 @@ GoCastJS.StropheConnection.prototype = {
 
     connect: function(opts) {
         if (opts) {
+            if (typeof(opts) !== 'object') {
+                throw 'connect: ERROR: opts must be an object if given.';
+            }
+
             this.pw = opts.password;
 
             // We were handed a full-blown jid.
@@ -276,15 +282,16 @@ GoCastJS.StropheConnection.prototype = {
     //
     handleDisconnect: function() {
 
+        // This is called when we are DISCONNECTED
+
         this.log('StropheConnection: handleDisconnect: processing.');
 
-        this.log('WARN: INCOMPLETE. FIX ME.');
         if (this.causeConnfail) {
             this.log('INFO: CONNFAIL led us to DISCONNECTED.');
             this.autoConnect(); // Attempt to re-connect.
         }
 
-        if (this.causeTerminating) {
+        if (this.causeTerminating || this.causeAuthfail) {
             this.forgetReconnectInfo();
             this.statusCallback(Strophe.Status.TERMINATED);
         }
@@ -295,23 +302,11 @@ GoCastJS.StropheConnection.prototype = {
     },
 
     conn_callback: function(status, err) {
+        var self = this;
+
         if (err === 'item-not-found') {
             this.log('conn_callback: BOSH responded with item-not-found. Connection is invalid now.');
             this.forgetReconnectInfo();
-
-/* This may cause statful issues resetting during a state transition.
-            if (this.connection) {
-                this.reset('conn_callback-item-not-found-reset');
-            }
-*/
-            // Attempt to auto-connect (via stored info or given id/pw)
-            // If that's not successful, then we're in a world of hurt.
-            if (!this.autoConnect()) {
-                // We need to inform someone that we're in a bad situation.
-                this.log('WARN: BOSH error + no login info -- calling status hopefully to resolve.');
-                this.statusCallback(status);
-                return;
-            }
         }
 
         if (err) {
@@ -331,9 +326,17 @@ GoCastJS.StropheConnection.prototype = {
                 break;
             case Strophe.Status.DISCONNECTED:
                 this.log('GoCastJS.StropheConnection: DISCONNECTED');
+
+                // If we arrive here, we should kill the disconnection timer.
+                if (this.disconnectTimer) {
+                    clearTimeout(this.disconnectTimer);
+                    this.disconnectTimer = null;
+                }
+
                 // Calling the status early to keep things in order.
                 this.statusCallback(status);
                 this.handleDisconnect();
+
                 // Artificial early return.
                 return;
             case Strophe.Status.AUTHENTICATING:
@@ -349,14 +352,35 @@ GoCastJS.StropheConnection.prototype = {
                 break;
             case Strophe.Status.DISCONNECTING:
                 this.log('GoCastJS.StropheConnection: DISCONNECTING');
-                // Save off our rid/jid/sid here - as we aren't disconnected yet. Last chance?
-                // or might this just give us more bogus saved login info?
-                this.saveLoginInfo();
+
+                if (this.disconnectTimer) {
+                    this.log('GoCastJS.StropheConnection: WARN: While DISCONNECTING, disconnectTimer already set. Clearing.');
+                    clearTimeout(this.disconnectTimer);
+                }
+
+                this.disconnectTimer = setTimeout(function() {
+                    // If we get here, then DISCONNECTING was not followed in a timely manner
+                    // by DISCONNECTED. So, we need to make a judgement call and call this 'bad'.
+                    // As such, we will trigger a TERMINATED upwards and forget login info.
+                    self.disconnectTimer = null;
+                    self.forgetReconnectInfo();
+
+                    // One more shot at getting back on the horse wihtout incident...
+                    // If we have an .id and .pw both, then connect()
+                    if (self.id && self.pw) {
+                        self.log('Disconnect_Timer: Re-connecting with prior given user/password');
+                        self.connect({ jid: self.id, password: self.pw });
+                    }
+                    else {
+                        self.reset('DISCONNECTING_TIMEOUT - Never reached DISCONNECTED.');
+                        self.statusCallback(Strophe.Status.TERMINATED);
+                    }
+                }, 1000);
+
                 break;
             case Strophe.Status.CONNFAIL:
                 this.log('GoCastJS.StropheConnection: CONNFAIL');
                 this.causeConnfail = true;
-                this.saveLoginInfo();
                 break;
             case Strophe.Status.AUTHFAIL:
                 this.causeAuthfail = true;

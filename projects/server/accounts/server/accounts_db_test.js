@@ -63,6 +63,218 @@ function dbPrivateTest1() {
 
 }
 
-dbPrivateTest1();
+//dbPrivateTest1();
 
+
+function db2Test1() {
+    console.log('DynamoDB Activation table test.');
+
+    account = 'bobtestaccount@gmail.com';
+
+    console.log('1. Create an entry for ' + account);
+    db.AddEntry(account, {validated: '0', firstRoomToCreate: 'roomName1'}, function(data) {
+        console.log('Created: ', data);
+    }, function(err) {
+        console.log('Create failed: ', err);
+    });
+
+}
+
+function db2Test2() {
+    console.log('DynamoDB Activation table test.');
+
+    account = 'bobtestaccount@gmail.com';
+
+    console.log('1. Update an entry for ' + account);
+    db.UpdateEntry(account, {validated: new Date().toString(), columnAddition: 'Stuff Goes Here'}, function(data) {
+        console.log('Updated: ', data);
+    }, function(err) {
+        console.log('Update failed: ', err);
+    });
+
+}
+
+function db2Test3() {
+    console.log('DynamoDB Activation table test.');
+
+    account = 'bobtestaccount@gmail.com';
+
+    console.log('1. Read entry for ' + account);
+    db.GetEntryByAccountName(account, function(data) {
+        console.log('Read: ', data);
+
+        console.log('2. Check validation of entry ' + account);
+        db.IsEntryValidated(account, function() {
+            console.log('PASS: Is Validated: ' + account);
+
+            account = 'nonvalidated@gmail.com';
+            console.log('3. Validated entry for ' + account);
+            db.IsEntryValidated(account, function() {
+                console.log('FAIL: Is Validated: ' + account);
+            }, function() {
+                console.log('PASS: Was not validated: ' + account);
+
+                account = 'invalidaccount@gmail.com';
+                console.log('4. Validated entry for ' + account);
+                db.IsEntryValidated(account, function() {
+                    console.log('FAIL: Is Validated: ' + account);
+                }, function() {
+                    console.log('PASS: Was not validated: ' + account);
+
+                    account = 'invalidaccount@gmail.com';
+                    console.log('5. Account exists? for ' + account);
+                    db.EntryExists(account, function() {
+                        console.log('FAIL: Exists: ' + account);
+                    }, function() {
+                        console.log('PASS: Does not exist: ' + account);
+
+                        account = 'nonvalidated@gmail.com';
+                        console.log('6. Account exists? for ' + account);
+                        db.EntryExists(account, function() {
+                            console.log('PASS: Exists: ' + account);
+                        }, function() {
+                            console.log('FAIL: Does not exist: ' + account);
+                        });
+                    });
+                });
+            });
+        }, function() {
+            console.log('Was not validated: ' + account);
+        });
+    }, function(err) {
+        console.log('Read failed: ', err);
+    });
+
+}
+
+function dbRoomTest1() {
+    var room, account;
+
+    console.log('DynamoDB Room table test.');
+
+    account = 'bobtestaccount@gmail.com';
+    room = 'room1';
+
+    console.log('1. Create a room entry for ' + account + ' of name: ' + room);
+    db.CreateRoom(account, room, function(data) {
+        console.log('PASS: Created-data: ', data);
+
+        room = 'room2';
+        console.log('2. Create a room entry for ' + account + ' of name: ' + room);
+        db.CreateRoom(account, room, function(data) {
+            console.log('PASS: Created-data: ', data);
+
+            account = 'abc@def.com';
+            room = 'room2';
+            console.log('3. Create a room entry for ' + account + ' of name: ' + room);
+            db.CreateRoom(account, room, function(data) {
+                console.log('PASS: Created-data: ', data);
+
+                account = 'bobtestaccount@gmail.com';
+                console.log('4. List rooms for ' + account);
+                db.ListRooms(account, function(obj, data) {
+                    console.log('PASS: List-data: ', data);
+                    console.log('PASS: List-obj: ', obj);
+                }, function(err) {
+                    console.log('Create failed: ', err);
+                });
+            }, function(err) {
+                console.log('Create failed: ', err);
+            });
+        }, function(err) {
+            console.log('Create failed: ', err);
+        });
+
+    }, function(err) {
+        console.log('Create failed: ', err);
+    });
+
+}
+
+function dbRoomTest2() {
+    var room, account;
+
+    console.log('DynamoDB Room table test.');
+
+    account = 'in_n_out@gmail.com';
+    room = 'room1';
+
+    console.log('1. Create a room entry for ' + account + ' of name: ' + room);
+    db.CreateRoom(account, room, function(data) {
+        console.log('PASS: Created-data: ', data);
+
+        console.log('2. Delete a room entry for ' + account + ' of name: ' + room);
+        db.DeleteRoom(account, room, function(data) {
+            console.log('PASS: Delete-data: ', data);
+
+            room = 'junk';
+            console.log('3. Delete a non-existent room entry for ' + account + ' of name: ' + room);
+            db.DeleteRoom(account, room, function(data) {
+                console.log('FAIL: Created-data: ', data);
+
+            }, function(err) {
+                console.log('PASS: Delete failed: ', err);
+
+                room = null;
+                console.log('4. Delete all room entries? for ' + account);
+                db.DeleteRoom(account, room, function(data) {
+                    console.log('FAIL: Created-data: ', data);
+
+                }, function(err) {
+                    console.log('PASS: Delete failed: ', err);
+                });
+            });
+        }, function(err) {
+            console.log('Delete failed: ', err);
+        });
+
+    }, function(err) {
+        console.log('Create failed: ', err);
+    });
+
+}
+
+function dbRoomTest3() {
+    var room, account;
+
+    console.log('DynamoDB Room table test.');
+
+    account = 'bobtestaccount@gmail.com';
+    room = '';
+
+    console.log('1. List rooms entry for ' + account );
+    db.ListRooms(account, function(data) {
+        console.log('PASS: List-data: ', data);
+
+        account = 'abc@def.com';
+
+        console.log('2. List rooms for ' + account);
+        db.ListRooms(account, function(data) {
+            console.log('PASS: List-data: ', data);
+
+            account = 'junk@wonderland.com';
+            console.log('3. List rooms for ' + account);
+            db.ListRooms(account, function(data) {
+                console.log('FAIL: List-data: ', data);
+
+            }, function(err) {
+                console.log('PASS: List failed: ', err);
+            });
+        }, function(err) {
+            console.log('List failed: ', err);
+        });
+
+    }, function(err) {
+        console.log('List failed: ', err);
+    });
+
+}
+
+
+//db2Test1();
+//db2Test2();
+//db2Test3();
+//dbRoomTest1();
+//dbRoomTest2();
+dbRoomTest3();
 
