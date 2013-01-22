@@ -113,4 +113,14 @@ app.post('/changepwd', function(req, res) {
     });
 });
 
+app.post('/visitorseen', function(req, res) {
+    console.log('accounts_service [/visitorseen][info]: FormData = ', req.body);
+    api.VisitorSeen(req.body.email, req.body.nickname, function() {
+        res.send('{"result": "success"}');
+    }, function(err) {
+        console.log('accounts_service [/visitorseen][error]: ', err);
+        res.send('{"result": "error"}');
+    });    
+});
+
 app.listen(settings.accounts.serviceport || 8083);

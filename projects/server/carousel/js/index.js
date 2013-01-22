@@ -1904,6 +1904,24 @@ function onJoinNow(
       return false;
     }
 
+    //Send visitor info to accounts service
+    $.ajax({
+      url: '/accounts/visitorseen/',
+      type: 'POST',
+      data: {email: usrEmail, nickname: usrNm},
+      dataType: 'json',
+      success: function(response) {
+        if ('success' === response.result) {
+          app.log(2, "OnJoinNow(): Visitor info sent.");
+        } else {
+          app.log(2, "OnJoinNow(): Visitor info send failed.");
+        }
+      },
+      failure: function() {
+        app.log(2, "OnJoinNow(): Visitor info send failed.");
+      }
+    });
+
     // store non fb user name
     if("undefined" !== typeof(Storage))
     {
