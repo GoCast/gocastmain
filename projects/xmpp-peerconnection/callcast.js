@@ -281,7 +281,7 @@ var Callcast = {
 
         this.connection = new GoCastJS.StropheConnection({ boshurl: boshurl,
                                                            xmppserver: this.CALLCAST_XMPPSERVER,
-                                                           statusCallback: this.connStatusHandler,
+                                                           statusCallback: this.connStatusHandler.bind(this),
                                                            logFn: this.log});
 
     },

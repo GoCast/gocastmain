@@ -62,7 +62,7 @@ function privateGenEmail(baseURL, email, name, actcode, bInAppReg) {
     body += ' Alternatively, you can click on the link below.';
 
     body += '\n\nYour activation code is: ' + actcode.slice(-6).toUpperCase();
-    body += '\n\nYour activation link is: ' + baseURL + 
+    body += '\n\nYour activation link is: ' + baseURL +
             '?defaultaction=activate&code=' + actcode.toUpperCase() +
             '&email=' + email.toLowerCase();
 
@@ -115,21 +115,31 @@ function privateMatchActivationCodes(longCode, longOrShortCode) {
         return false;
     }
 }
-function apiNewAccount(baseURL, email, password, name, success, failure, bInAppReg) {
+
+function apiNewAccount(baseURL, email, password, name, firstRoomName, success, failure, bInAppReg) {
     // Check if account with this email exists
-    xmpp.AccountAvailable(email, function() {
+    db.EntryExists(email, function() {
+        failure('apiNewAccount: Failed - account already in use.');
+    }, function() {
         // Doesn't exist, so add account
         xmpp.AddAccount(email, password, name, function() {
             // Added account, now generate activation code
             // Note - account is disabled upon creation until activation is complete.
             var actcode = privateCalcActivationCode(email),
-                emailBody;
+                emailBody, obj;
 
             // Now, generate activation email
             emailBody = privateGenEmail(baseURL, email, name, actcode, bInAppReg);
 
+            obj = { validationCode: actcode,
+// Dont put validated column in until validation happens                    validated: false,
+                    password: password };
+            if (firstRoomName) {
+                obj.firstRoomName = firstRoomName;
+            }
+
             //Now, add pending-activation-db entry for this email
-            db.AddEntry(email, actcode, function() {
+            db.AddEntry(email, obj, function() {
                 //Now, send activation email
                 privateSendEmail(name, email, emailBody, function() {
                     console.log('Hurray. Another user signed up! I hope ' + email + ' comes back to activate their account.');
@@ -164,8 +174,6 @@ function apiNewAccount(baseURL, email, password, name, success, failure, bInAppR
         }, function() {
             failure('apiNewAccount: Failed to add account to xmpp server.');
         });
-    }, function() {
-        failure('apiNewAccount: Failed - account already in use.');
     });
 }
 
@@ -178,73 +186,35 @@ function apiNewAccount(baseURL, email, password, name, success, failure, bInAppR
 //      account has already been activated.
 //
 function apiValidateAccount(email, actcode, success, failure) {
-    // Check if account with this email exists
-    xmpp.AccountAvailable(email, function() {
-        // Account doesn't exist, so bad actcode
-        failure('apiValidateAccount: Bad activation code. No account found for: ' + email);
-    }, function() {
-        var entry;
-        // Account exists, so match actcode with its corresponding db entry
-        db.GetEntryByAccountName(email, function(data) {
-            if (data.Item) {
-                entry = data.Item;
-                if (entry.validationCode && true === privateMatchActivationCodes(entry.validationCode.S, actcode)) {
-                    // Correct activation code, so enable account
-                    xmpp.EnableAccount(email, function() {
-                        // Enable successful, delete db entry for email
-                        db.DeleteEntry(email, function() {
-                            console.log('Hurray! Activation complete for ' + email);
-                            success();
-                        }, function(err) {
-                            console.log('apiValidateAccount: WARNING - Could not delete validation entry for ' + email);
-                            console.log('Hurray! Activation complete for ' + email);
-                            success();
-                        });
-                    }, failure);
-                } else {
-                    // Incorrect activation code
-                    failure('apiValidateAccount: Incorrect activation code for ' + email);
-                }
-            }
-            else {
-                // This is deemed an outright failure as we're in the success callback but dont have an 'Item'
-                failure('apiValidateAccount: Error: Did not find the validation entry for ' + email);
-            }
-        }, function(err) {
-            // Failure of getting database entry for account.
-            // No such entry implies either an older code that has been retired
-            // or an activation code which was already used or
-            // it is a bad code altogether - return an error (dont delete the account that is a bad idea)
-            var tempCode = privateCalcActivationCode(email);
-
-            if (true === privateMatchActivationCodes(tempCode, actcode)) {
-                // Correct activation code, let use know this is an already used or expired activation code.
-                // We're going to go ahead and (re)-enable the account to err on the side of
-                // safety for the consumer here. If for some reason, we culled the activation codes
-                // but we didn't cull the corresponding xmpp accounts, we would have disabled accounts
-                // in the xmpp database without activation codes for them. This would make it impossible
-                // for a user to even re-register as their email address would already show as 'in use'
-                // and not available. The only other action would be to delete the account and we dont
-                // want to do that as this would allow anyone to remotely delete people's valid accounts
-                // simply by figuring out how to pass us a good short activation code for that email address.
-                //
-                // The only added confusion here would be if the account were in the disabled state
-                // and the user found the old activation email - and we had culled the activation out
-                // but left the xmpp user in...then they would be effectively activating without a
-                // real activation entry in the database. But that shouldn't happen anyway. So, we're
-                // just playing very conservatively here.
-                xmpp.EnableAccount(email, function() {
+    // If Account exists, match actcode with its corresponding db entry
+    db.GetEntryByAccountName(email, function(entry) {
+        // If entry comes back, it could be validated already.
+        // Or it's ready to be validated.
+        if (entry.validated) {
+            // If we're already validated, then give a success but it's really a warning of sorts
+            console.log('apiValidateAccount: Activation already complete for ' + email);
+            success('apiValidateAccount: Activation already completed.');
+        }
+        else if (entry.validationCode && true === privateMatchActivationCodes(entry.validationCode, actcode)) {
+            // Correct activation code, so enable account
+            xmpp.EnableAccount(email, function() {
+                // Enable successful, delete db entry for email
+                db.ActivateEntry(email, function() {
                     console.log('Hurray! Activation complete for ' + email);
-                    success('apiValidateAccount: Activation already used or expired but we are calling it activated again.');
-                }, function() {
-                    // Possibly should decide to error differently here since enable failed?
-                    failure('apiValidateAccount: Activation already used or expired - and enable failed.');
+                    success();
+                }, function(err) {
+                    console.log('apiValidateAccount: WARNING - Could not activate entry for ' + email);
+                    console.log('Hurray! Activation complete for ' + email);
+                    success();
                 });
-            } else {
-                // Incorrect activation code
-                failure('apiValidateAccount: Incorrect activation code for ' + email);
-            }
-        });
+            }, failure);
+        } else {
+            // Incorrect activation code
+            failure('apiValidateAccount: Incorrect activation code for ' + email);
+        }
+    }, function(err) {
+        // Failure of getting database entry for account.
+        failure('apiValidateAccount: Incorrect activation code for ' + email + ', account does not exist.');
     });
 }
 
@@ -255,12 +225,35 @@ function apiDeleteAccount(email, success, failure) {
         failure('apiDeleteAccount: Account doesn\'t exist');
     }, function() {
         // Account exists, so delete it
-        xmpp.DeleteAccount(email, success, failure);
+        xmpp.DeleteAccount(email, function() {
+            db.DeleteEntry(email, success, failure);
+        }, function() {
+            // If the xmpp account deletion failed, try to delete on the db side.
+            // But note - regardless of db deletion success, this is still a
+            // failure, so both success and failure call the failure callback.
+            db.DeleteEntry(email, failure, failure);
+        });
     });
+
 }
 
 function apiChangePassword(email, newpassword, success, failure) {
-    xmpp.ChangePassword(email, newpassword, success, failure);
+    xmpp.ChangePassword(email, newpassword, function() {
+        db.UpdateEntry(email, {password: newpassword}, success, failure);
+    }, function() {
+        // If the xmpp change failed, try to change on the db side.
+        // But note - regardless of db change success, this is still a
+        // failure, so both success and failure call the failure callback.
+        db.UpdateEntry(email, {password: newpassword}, success, failure);
+    });
+}
+
+function apiNewRoom(email, roomName, success, failure) {
+    db.CreateRoom(email, roomName, success, failure);
+}
+
+function apiListRooms(email, success, failure) {
+    db.ListRooms(email, success, failure);
 }
 
 /* Manjesh -- These both work (separately of course)
@@ -282,3 +275,5 @@ exports.NewAccount = apiNewAccount;
 exports.ValidateAccount = apiValidateAccount;
 exports.DeleteAccount = apiDeleteAccount;
 exports.ChangePassword = apiChangePassword;
+exports.NewRoom = apiNewRoom;
+exports.ListRooms = apiListRooms;
