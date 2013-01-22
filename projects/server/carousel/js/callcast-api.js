@@ -75,7 +75,9 @@ $(document).on('left_session', function(
    * Remove all the objects in carousel. */
   $('#meeting > #streams > #scarousel div.cloudcarousel:not(.unoccupied)').each(function(i, e) {
     if ($(e).hasClass('typeContent')) {
-      removeContentFromCarousel($(e).attr('encname'));
+      //removeContentFromCarousel($(e).attr('id'));
+      removeSpotCb({spotnumber: $(e).attr('spotnumber')});
+      app.carousel.createSpot();
     }
     else {
       removePluginFromCarousel($(e).attr('encname'));
@@ -770,7 +772,7 @@ function removeContentFromCarousel(
 {
   /*
    * Get parent object and modify accordingly. */
-  var id = app.str2id(infoId),
+  var id = infoId,
       jqOo = $('#meeting > #streams > #scarousel div.cloudcarousel#' + id);
   jqOo.addClass('unoccupied').removeClass('typeContent');
   jqOo.removeAttr('id');
@@ -779,7 +781,7 @@ function removeContentFromCarousel(
   jqOo.removeAttr('url');
   jqOo.removeAttr('encname');
   jqOo.css('background-image', 'url("images/GoToken.png")');
-  app.log(2, 'Removing content from spot [' + infoId + ', ' + id + ']');
+  app.log(2, 'Removing content from spot [' + infoId + ', ' + jqOo.attr('spotnumber') + ']');
   return false;
 } /* removeContentFromCarousel() */
 
