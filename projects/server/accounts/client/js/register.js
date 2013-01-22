@@ -12,7 +12,6 @@ var RegisterView = {
             $('.alert', this.$forms[i]).removeClass('show');
         }
         this.$forms[id].addClass('show');
-        this.$forms[id].clearForm();
     },
     displaydefaultform: function(action) {
         var actions = ['register', 'activate'];
@@ -64,7 +63,7 @@ var RegisterApp = {
                 return function(response) {
                     if ('success' === response.result) {
                         window.location.href = $.urlvars.baseurl
-                                                .replace(/register\.html/, 'dashboard.html') + '?justactivated=true&ecode=' +
+                                                .replace(/(register|myroom)\.html/, 'dashboard.html') + '?justactivated=true&ecode=' +
                                                 $.roomcode.cipher($('#input-email', RegisterApp.$forms['activate-form']).val(),
                                                                   'gcst');
                     } else if ('incorrect' === response.result) {
