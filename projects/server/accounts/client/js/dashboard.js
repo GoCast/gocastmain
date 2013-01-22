@@ -23,6 +23,13 @@ var DashView = {
             var email = $.roomcode.decipheruname($.urlvars.ecode);
             $('#input-email', this.$forms[id]).val(email);
         }
+
+        if ('startmeeting-form' === id && 'undefined' !== typeof(Storage)) {
+            if (localStorage.gcpDesiredRoomname) {
+                $('#input-roomname', this.$forms[id]).val(decodeURI(localStorage.gcpDesiredRoomname));
+                delete localStorage.gcpDesiredRoomname;
+            }
+        }
     },
     displayalert: function(formid, type, message) {
         var $alert = null;

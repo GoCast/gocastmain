@@ -39,6 +39,12 @@ var RegisterApp = {
             success: function() {
                 return function(response) {
                     if ('success' === response.result) {
+                        var $desiredroomname = $('#input-desiredroomname', RegisterApp.$forms['register-form']);
+
+                        if ($desiredroomname.length && 'undefined' !== typeof(Storage)) {
+                            localStorage.gcpDesiredRoomname = $desiredroomname.val();
+                        }
+                        
                         RegisterView.displayform('activate-form');
                         RegisterView.displayalert('activate-form', 'success', 'Your account has been created. ' +
                                                 'An activation email has been sent to the address you just provided. ' +
