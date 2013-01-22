@@ -689,7 +689,8 @@ function activateWindow(
     $('a#btn', winId).on('click.s04072012', onJoinNow);
     if ("undefined" !== Storage && sessionStorage.uiGoCastNick)
     {
-      $('input#name', winId).val(decodeURI(sessionStorage.uiGoCastNick));
+      $('input#name', winId).val(decodeURI(sessionStorage.uiGoCastNick || ''));
+      $('input#email', winId).val(decodeURI(sessionStorage.uiGoCastEmail || ''));
     }
   }
   else if (winId.match('meeting')) {
@@ -1926,6 +1927,7 @@ function onJoinNow(
     if("undefined" !== typeof(Storage))
     {
       sessionStorage.uiGoCastNick = usrNm;
+      sessionStorage.uiGoCastEmail = usrEmail;
     }
     // set app name from dialog text field
     app.user.name = encodeURI(usrNm);
