@@ -1,13 +1,15 @@
 var DashView = {
     $forms: {},
     init: function() {
-        for (var i=0; i<document.forms.length; i++) {
+        var i;
+        for (i = 0; i < document.forms.length; i += 1) {
             this.$forms[document.forms[i].id] = $(document.forms[i]);
         }
         this.displayform('login-form');
         $('body > .navbar .formlink').click(this.changeformCallback());
     },
     displayform: function(id) {
+        var i;
         for (i in this.$forms) {
             this.$forms[i].removeClass('show');
             $('.alert', this.$forms[i]).removeClass('show');
@@ -145,7 +147,7 @@ var DashApp = {
             resetForm: true,
             beforeSubmit: this.formCallbacks[id].beforesubmit(),
             success: this.formCallbacks[id].success(),
-            error: this.formCallbacks[id].failure()        
+            error: this.formCallbacks[id].failure()
         };
 
         if ( this.formCallbacks[id].data) {
@@ -161,10 +163,12 @@ var DashApp = {
             this.$forms[document.forms[i].id] = $(document.forms[i]);
         }
 
+        this.settings = new GoCastJS.CallcastSettings(window.location.hostname);
+
         this.setupForm('login-form');
         this.boshconn = new GoCastJS.StropheConnection({
             boshurl: '/xmpp-httpbind',
-            xmppserver: 'dev.gocast.it',
+            xmppserver: this.settings.get('CALLCAST_XMPPSERVER'),
             statusCallback: this.boshconnstatusCallback()
         });
 
