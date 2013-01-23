@@ -77,7 +77,7 @@
                 var roomname = $.base64.decode(rcode),
                     roomsalt = roomname.slice(0, roomname.indexOf(saltdelim));
 
-                return (salt === roomsalt) ? roomname.slice(indexOf(saltdelim)+1) : ''; 
+                return (salt === roomsalt) ? roomname.slice(roomname.indexOf(saltdelim)+1) : ''; 
             },
             decipheruname: function(rcode) {
                 var roomname = this.decipher(rcode);
