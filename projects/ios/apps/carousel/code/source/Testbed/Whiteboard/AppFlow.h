@@ -9,10 +9,12 @@ class AppFlow
     public tObserver<const CallcastEvent&>
 {
 protected:
+    std::string mNickname;
+    std::string mRoomname;
 
 public:
-    AppFlow()  { ConstructMachine(); }
-    ~AppFlow() { DestructMachine(); }
+    AppFlow();
+    ~AppFlow();
 
 protected:
     void endEntry();

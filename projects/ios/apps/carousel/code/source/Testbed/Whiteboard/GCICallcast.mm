@@ -98,4 +98,84 @@ const tColor4b      kWhite  (255,255,255,255);
     CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kStroke));
 }
 
+#pragma mark -
+
+- (void) addSpot:(CDVInvokedUrlCommand*)command
+{
+#pragma unused(command)
+    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kAddSpot));
+}
+
+- (void) removeSpot:(CDVInvokedUrlCommand*)command
+{
+#pragma unused(command)
+    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kRemoveSpot));
+}
+
+- (void) setSpot:(CDVInvokedUrlCommand*)command
+{
+#pragma unused(command)
+    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kSetSpot));
+}
+
+- (void) addSpotForParticipant:(CDVInvokedUrlCommand*)command
+{
+#pragma unused(command)
+    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kAddSpotForParticipant));
+}
+
+- (void) addPluginForParticipant:(CDVInvokedUrlCommand*)command
+{
+#pragma unused(command)
+    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kAddPluginForParticipant));
+}
+
+- (void) removePluginToParticipant:(CDVInvokedUrlCommand*)command
+{
+#pragma unused(command)
+    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kRemovePluginToParticipant));
+}
+
+- (void) removeSpotToParticipant:(CDVInvokedUrlCommand*)command
+{
+#pragma unused(command)
+    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kRemoveSpotToParticipant));
+}
+
+- (void) addCarouselContent:(CDVInvokedUrlCommand*)command
+{
+#pragma unused(command)
+    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kAddCarouselContent));
+}
+
+- (void) removeCarouselContent:(CDVInvokedUrlCommand*)command
+{
+#pragma unused(command)
+    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kRemoveCarouselContent));
+}
+
+- (void) connectionStatus:(CDVInvokedUrlCommand*)command
+{
+#pragma unused(command)
+    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kConnectionStatus));
+}
+
+- (void) onEffectApplied:(CDVInvokedUrlCommand*)command
+{
+#pragma unused(command)
+    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kOnEffectApplied));
+}
+
+- (void) onNicknameInUse:(CDVInvokedUrlCommand*)command
+{
+#pragma unused(command)
+    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kOnNicknameInUse));
+}
+
+- (void) readyState:(CDVInvokedUrlCommand*)command
+{
+#pragma unused(command)
+    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kReadyState));
+}
+
 @end

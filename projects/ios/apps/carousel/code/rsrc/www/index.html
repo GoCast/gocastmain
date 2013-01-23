@@ -89,11 +89,13 @@
 
             function assignSpotForParticipant(nick)
             {
+                cordova.exec(function(winParam) {}, function(error) {}, "GCICallcast", "addSpotForParticipant", [ "" ]);
                 console.log("assignSpotForParticipant(" + nick + ")");
             }
 
             function unassignSpotForParticipant(nick)
             {
+                cordova.exec(function(winParam) {}, function(error) {}, "GCICallcast", "removeSpotToParticipant", [ "" ]);
                 console.log("unassignSpotForParticipant(" + nick + ")");
             }
 
@@ -151,6 +153,7 @@
             function onAddSpot(data)
             {
                 console.log("onAddSpot ", data);
+                cordova.exec(function(winParam) {}, function(error) {}, "GCICallcast", "addSpot", [ "" ]);
                 if (data.spottype === 'whiteBoard')
                 {
                     whiteBoardSpotNumber = data.spotnumber;
@@ -161,6 +164,7 @@
 
             function onSetSpot(data)
             {
+                cordova.exec(function(winParam) {}, function(error) {}, "GCICallcast", "setSpot", [ "" ]);
                 console.log("onSetSpot ", data);
                 if (data.spottype === 'whiteBoard') {
                     doSpot(data);
@@ -169,6 +173,7 @@
 
             function onRemoveSpot(data)
             {
+                cordova.exec(function(winParam) {}, function(error) {}, "GCICallcast", "removeSpot", [ "" ]);
                 console.log("onRemoveSpot ", data);
             }
 
@@ -182,32 +187,35 @@
                 chosenRoom = newRoom;
             }
 
-            function startCallcast()
+            function startCallcast(newNick, newRoom)
             {
-                  $(window).bind('beforeunload', function() {
-                                 console.log('On before unload.');
-                                 Callcast.LeaveSession();
-                                 });
+                setChosenNick(newNick);
+                setChosenRoom(newRoom);
 
-                  Callcast.InitOverride({ CALLCAST_XMPPSERVER: 'dev.gocast.it',
-                                        CALLCAST_ROOMS: 'conference.dev.gocast.it',
-                                        AT_CALLCAST_ROOMS: '@conference.dev.gocast.it',
-                                        STUNSERVER: 'dev.gocast.it', STUNSERVERPORT: 19302,
-                                        FEEDBACK_BOT: 'feedback_bot_dev@dev.gocast.it',
-                                        ROOMMANAGER: 'roommanager@dev.gocast.it/roommanager',
-                                        SWITCHBOARD_FB: 'switchboard_dev@dev.gocast.it',
-                                        LOGCATCHER: 'logcatcher@dev.gocast.it/logcatcher',
-                                        });
+                $(window).bind('beforeunload', function() {
+                               console.log('On before unload.');
+                               Callcast.LeaveSession();
+                               });
 
-                  Callcast.setCallbackForCallback_ConnectionStatus(onConnectionStatus);
-                  Callcast.setCallbackForCallback_OnNicknameInUse(onNicknameInUse);
-                  Callcast.setCallbackForAddSpotForParticipant(assignSpotForParticipant);
-                  Callcast.setCallbackForRemoveSpotForParticipant(unassignSpotForParticipant);
-                  Callcast.setCallbackForAddSpot(onAddSpot);
-                  Callcast.setCallbackForRemoveSpot(onRemoveSpot);
-                  Callcast.setCallbackForSetSpot(onSetSpot);
-                  
-                  Callcast.connect(Callcast.CALLCAST_XMPPSERVER, '');
+                Callcast.InitOverride({ CALLCAST_XMPPSERVER: 'dev.gocast.it',
+                                      CALLCAST_ROOMS: 'conference.dev.gocast.it',
+                                      AT_CALLCAST_ROOMS: '@conference.dev.gocast.it',
+                                      STUNSERVER: 'dev.gocast.it', STUNSERVERPORT: 19302,
+                                      FEEDBACK_BOT: 'feedback_bot_dev@dev.gocast.it',
+                                      ROOMMANAGER: 'roommanager@dev.gocast.it/roommanager',
+                                      SWITCHBOARD_FB: 'switchboard_dev@dev.gocast.it',
+                                      LOGCATCHER: 'logcatcher@dev.gocast.it/logcatcher',
+                                      });
+
+                Callcast.setCallbackForCallback_ConnectionStatus(onConnectionStatus);
+                Callcast.setCallbackForCallback_OnNicknameInUse(onNicknameInUse);
+                Callcast.setCallbackForAddSpotForParticipant(assignSpotForParticipant);
+                Callcast.setCallbackForRemoveSpotForParticipant(unassignSpotForParticipant);
+                Callcast.setCallbackForAddSpot(onAddSpot);
+                Callcast.setCallbackForRemoveSpot(onRemoveSpot);
+                Callcast.setCallbackForSetSpot(onSetSpot);
+
+                Callcast.connect(Callcast.CALLCAST_XMPPSERVER, '');
             }
 
             function sendStroke(stroke)

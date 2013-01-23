@@ -12,6 +12,17 @@ AppFlow gAppFlow;
 extern AppDelegate* gAppDelegateInstance;
 extern UIWebView*   gWebViewInstance;
 
+AppFlow::AppFlow()
+:   mNickname("nick"),
+    mRoomname("room")
+{
+    ConstructMachine();
+}
+AppFlow::~AppFlow()
+{
+    DestructMachine();
+}
+
 void AppFlow::startEntry()
 {
     CallcastManager::getInstance()->attach(this);
@@ -28,15 +39,14 @@ void AppFlow::waitForWebViewLoadedExit() { }
 void AppFlow::loadLoginScreenEntry()
 {
     [gAppDelegateInstance loadLoginScreen];
-    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kSubmitLogin));
+//    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kSubmitLogin));
 }
 
 void AppFlow::loadLoginScreenExit()
 {
     [gAppDelegateInstance unloadLoginScreen];
 
-    [gWebViewInstance stringByEvaluatingJavaScriptFromString:@"startCallcast()"];
-
+    [gWebViewInstance stringByEvaluatingJavaScriptFromString: [NSString stringWithFormat:@"startCallcast('%s','%s')", mNickname.c_str(), mRoomname.c_str()]];
 }
 
 void AppFlow::showWaitingForLoginEntry()
@@ -70,7 +80,11 @@ void AppFlow::update(const CallcastEvent& msg)
     switch (msg.mEvent)
     {
         case CallcastEvent::kWebViewLoaded: process(AppFlow::kWebViewLoaded); break;
-        case CallcastEvent::kSubmitLogin:   process(AppFlow::kLoginPressed); break;
+        case CallcastEvent::kSubmitLogin:
+            mNickname = msg.mNickname;
+            mRoomname = msg.mRoomname;
+            process(AppFlow::kLoginPressed);
+            break;
         case CallcastEvent::kLoggedIn:      process(AppFlow::kLoginSuccess); break;
         default: break;
     }

@@ -159,6 +159,7 @@ AppDelegate* gAppDelegateInstance = NULL;
 
 -(void)loadLoginScreen
 {
+    [self.viewController.mLoginView setHidden:NO];
 //    LoginView *myView = [[[LoginView alloc] initWithFrame:self.viewController.view.bounds] autorelease];
 //    [self.viewController.view addSubview:myView];
 //    [myView release];
@@ -166,7 +167,7 @@ AppDelegate* gAppDelegateInstance = NULL;
 
 -(void)loadLoadingScreen
 {
-
+    [self.viewController.mLoginView setHidden:YES];
 }
 
 -(void)loadWhiteboardScreen
