@@ -2081,7 +2081,7 @@ function checkCredentials(evt, msg)
 //
 function handleRoomSetup() {
   app.log(2, 'handleRoomSetup entered');
-  var room_to_create = $.roomcode.decipher($.urlvars.roomname) || '',
+  var room_to_create = $.roomcode.decipherURIEncoded($.urlvars.roomname) || '',
       item;
 
   room_to_create = room_to_create.replace(/ /g, '');
