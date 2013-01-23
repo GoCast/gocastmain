@@ -1961,11 +1961,28 @@ function enterId(options)
 }
 
 function checkCredentials2() {
+  var keyHandler = function(event) {
+    if (event.altKey) {
+        return;
+    }
+    if (!event.ctrlKey) {
+      switch (event.which || event.keyCode) {
+        case 13:
+          app.log(2, 'Enter key pressed');
+          event.preventDefault();
+          onJoinNow();
+          break;
+      }
+    }
+  };
+
     closeWindow();
     openWindow('#credentials2');
     $('#credentials2 #email').removeAttr('style');
     if (!Callcast.connection.bAnonymous) {
       $('#credentials2 #email').css({'display': 'none'});
+    } else {
+      $('#credentials2 #email').unbind('keypress').keypress(keyHandler);
     }
     /*if ('undefined' !== typeof(Storage)) {
       if (Callcast.connection.bAnonymous && window.localStorage.gcpReloadNickName) {
