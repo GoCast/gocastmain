@@ -48,7 +48,7 @@ function privateGenEmail(baseURL, email, name, actcode, bInAppReg) {
         body = 'Welcome';
     }
 
-    body += ' to GoCast. In order to complete your registration, ' +
+    body += ' to GoCast. Thanks for signing up. In order to complete your registration, ' +
             'we need your help in activating your new account.\n\n';
 
     // If we registered from inside the GoCast ... the message is a little different.
@@ -66,6 +66,8 @@ function privateGenEmail(baseURL, email, name, actcode, bInAppReg) {
             '?defaultaction=activate&code=' + actcode.toUpperCase() +
             '&email=' + email.toLowerCase();
 
+    body += '\n\n';
+    body += 'Once you are validated, you can always come to your dashboard at: ' + baseURL.substring(0, baseURL.lastIndexOf('/'));
     body += '\n\n';
     body += 'Thanks for signing up with GoCast - we hope you enjoy the service.\n\n';
 
