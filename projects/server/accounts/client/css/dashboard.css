@@ -62,3 +62,7 @@ body > .container > .row > .span4 > form .alert  span {
     display: inline-block;
     width: 260px;
 }
+
+body > .container > .row > .span4 > form .alert  a {
+    margin-left: 0px;
+}

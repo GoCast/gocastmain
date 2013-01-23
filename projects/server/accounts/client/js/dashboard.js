@@ -111,18 +111,17 @@ var DashApp = {
         'startmeeting-form': {
             success: function() {
                 return function(response) {
+                    var roomname = $('#input-roomname', DashApp.$forms['startmeeting-form']).val();
                     if('success' === response.result) {
-                        var rcode = $.roomcode.cipher(DashApp.boshconn.getEmailFromJid().replace(/@/, '~'),
-                                                      $('#input-roomname', DashApp.$forms['startmeeting-form']).val()),
+                        var rcode = $.roomcode.cipher(DashApp.boshconn.getEmailFromJid().replace(/@/, '~'), roomname),
                             roomlinkrel = window.location.pathname.replace(/dashboard.html*$/, '') + '?roomname=' + rcode,
                             atag = document.createElement('a');
 
                         atag.href = roomlinkrel;
                         DashView.displayalert('startmeeting-form', 'success', 'You\'re room has been ' +
-                                              'created. The unique URL for this room is: <span><strong>' + atag.href +
-                                              '</strong></span> You can invite others to your room by ' +
-                                              'emailing this URL to them. To enter the room, click here <a href="' +
-                                              roomlinkrel + '">' + atag.href + '</a>');
+                                              'created. You can invite others by emailing them this link ' +
+                                              '<span><strong>' + atag.href + '</strong></span><br><br><a href="' +
+                                              roomlinkrel + '" class="btn btn-block btn-success">Go to ' + roomname + '</a>');
                     } else {
                         DashView.displayalert('startmeeting-form', 'error', 'There was an error while creating your ' +
                                               'desired room.');
