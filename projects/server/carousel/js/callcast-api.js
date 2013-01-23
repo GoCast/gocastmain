@@ -435,7 +435,7 @@ $(document).on('disconnected', function(
 {
   if (app.authfail) {
     app.authfail = false;
-    checkCredentials();
+    checkCredentials(null, 'Bad email or password.');
     return;
   }
 

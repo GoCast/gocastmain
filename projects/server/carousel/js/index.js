@@ -1899,35 +1899,42 @@ function onJoinNow(
       $('#credentials2 > p.login-error').text('Please choose a nickname').
         fadeIn('fast');
       return false;
-    } else if(!usrEmail.length || -1 === usrEmail.indexOf('@')) {
-      $('#credentials2 > p.login-error').text('Please enter a valid email').
-        fadeIn('fast');
-      return false;
     }
 
-    //Send visitor info to accounts service
-    $.ajax({
-      url: '/acct/visitorseen/',
-      type: 'POST',
-      data: {email: usrEmail, nickname: usrNm},
-      dataType: 'json',
-      success: function(response) {
-        if ('success' === response.result) {
-          app.log(2, "OnJoinNow(): Visitor info sent.");
-        } else {
+    if (Callcast.connection.bAnonymous) {
+      if(!usrEmail.length || -1 === usrEmail.indexOf('@')) {
+        $('#credentials2 > p.login-error').text('Please enter a valid email').
+          fadeIn('fast');
+        return false;
+      }
+
+      //Send visitor info to accounts service
+      $.ajax({
+        url: '/acct/visitorseen/',
+        type: 'POST',
+        data: {email: usrEmail, nickname: usrNm},
+        dataType: 'json',
+        success: function(response) {
+          if ('success' === response.result) {
+            app.log(2, "OnJoinNow(): Visitor info sent.");
+          } else {
+            app.log(2, "OnJoinNow(): Visitor info send failed.");
+          }
+        },
+        failure: function() {
           app.log(2, "OnJoinNow(): Visitor info send failed.");
         }
-      },
-      failure: function() {
-        app.log(2, "OnJoinNow(): Visitor info send failed.");
+      });
+
+      if("undefined" !== typeof(Storage)) {
+        sessionStorage.uiGoCastEmail = usrEmail;
       }
-    });
+    }
 
     // store non fb user name
     if("undefined" !== typeof(Storage))
     {
       sessionStorage.uiGoCastNick = usrNm;
-      sessionStorage.uiGoCastEmail = usrEmail;
     }
     // set app name from dialog text field
     app.user.name = encodeURI(usrNm);
@@ -1956,6 +1963,10 @@ function enterId(options)
 function checkCredentials2() {
     closeWindow();
     openWindow('#credentials2');
+    $('#credentials2 #email').removeAttr('style');
+    if (!Callcast.connection.bAnonymous) {
+      $('#credentials2 #email').css({'display': 'none'});
+    }
     /*if ('undefined' !== typeof(Storage)) {
       if (Callcast.connection.bAnonymous && window.localStorage.gcpReloadNickName) {
         $('#name', '#credentials2').val(window.localStorage.gcpReloadNickName);
@@ -1989,7 +2000,7 @@ function checkPlugin() {
 ///
 /// \brief check login credential and display login dialog if necessary.
 ///
-function checkCredentials()
+function checkCredentials(evt, msg)
 {
   var keyHandler = function(event) {
     if (event.altKey) {
@@ -2028,6 +2039,7 @@ function checkCredentials()
     openWindow('#credentials');
     $('#credentials > input').unbind('keypress').keypress(keyHandler);
     $('#credentials > #gcemail').focus();
+    $('#credentials > #msg').text(msg||'');
       /*if ('undefined' !== typeof(Storage)) {
         if (Callcast.connection.bAnonymous && window.localStorage.gcpReloadNickName) {
           $('#noThanks', '#credentials').click();
