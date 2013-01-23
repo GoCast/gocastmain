@@ -75,15 +75,17 @@
             },
             decipher: function(rcode) {
                 var roomname = $.base64.decode(rcode),
-                    roomsalt = roomname.split(saltdelim)[0];
+                    roomsalt = roomname.slice(0, roomname.indexOf(saltdelim));
 
-                return (salt === roomsalt) ? roomname.split(saltdelim)[1] : ''; 
+                return (salt === roomsalt) ? roomname.slice(indexOf(saltdelim)+1) : ''; 
             },
             decipheruname: function(rcode) {
-                return this.decipher(rcode).split(userdelim)[0];
+                var roomname = this.decipher(rcode);
+                return roomname.slice(0, roomname.indexOf(userdelim));
             },
             decipherroomname: function(rcode) {
-                return this.decipher(rcode).split(userdelim)[1];
+                var roomname = this.decipher(rcode);
+                return roomname.slice(roomname.indexOf(userdelim)+1);
             }
         };
 

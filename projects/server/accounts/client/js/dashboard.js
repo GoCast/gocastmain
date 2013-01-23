@@ -144,7 +144,6 @@ var DashApp = {
     setupForm: function(id) {
         var options = {
             dataType: 'json',
-            resetForm: true,
             beforeSubmit: this.formCallbacks[id].beforesubmit(),
             success: this.formCallbacks[id].success(),
             error: this.formCallbacks[id].failure()
