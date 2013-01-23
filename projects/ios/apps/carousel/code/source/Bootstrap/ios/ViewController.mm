@@ -181,4 +181,40 @@ UIWebView* gWebViewInstance = NULL;
     [self.view endEditing:YES];
 }
 
+-(IBAction)pressed1px:(id)sender
+{
+#pragma unused(sender)
+    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kChangePenSize, tColor4b(0,0,0,0), 1));
+}
+-(IBAction)pressed3px:(id)sender
+{
+#pragma unused(sender)
+    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kChangePenSize, tColor4b(0,0,0,0), 3));
+}
+
+-(IBAction)pressed5px:(id)sender
+{
+#pragma unused(sender)
+    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kChangePenSize, tColor4b(0,0,0,0), 5));
+}
+
+-(IBAction)pressed10px:(id)sender
+{
+#pragma unused(sender)
+    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kChangePenSize, tColor4b(0,0,0,0), 10));
+}
+
+-(IBAction)pressedColor:(id)sender
+{
+#pragma unused(sender)
+    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kChangePenColor));
+}
+
+-(IBAction)pressedErase:(id)sender
+{
+#pragma unused(sender)
+    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kChangePenErase));
+}
+
+
 @end

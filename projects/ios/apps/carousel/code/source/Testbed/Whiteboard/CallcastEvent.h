@@ -19,6 +19,10 @@ public:
         kLineTo,
         kStroke,
 
+        //Just hacks
+        kChangePenSize,
+        kChangePenColor,
+        kChangePenErase,
 
         //Callcast-specific events
         kAddSpot,
