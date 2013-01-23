@@ -69,8 +69,14 @@ app.post('/createroom', function(req, res) {
     api.NewRoom(req.body.email, roomName, function() {
         res.send('{"result": "success"}');
     }, function(err) {
-        console.log('accounts_service [/createroom][error]: ', err);
-        res.send('{"result": "error"}');
+        if (err && err.code === 'ConditionalCheckFailedException') {
+            // This is just a 'room name already exists' error. Let it go.
+            res.send('{"result": "success"}');
+        }
+        else {
+            console.log('accounts_service [/createroom][error]: ', err);
+            res.send('{"result": "error"}');
+        }
     });
 });
 
@@ -120,7 +126,7 @@ app.post('/visitorseen', function(req, res) {
     }, function(err) {
         console.log('accounts_service [/visitorseen][error]: ', err);
         res.send('{"result": "error"}');
-    });    
+    });
 });
 
 app.listen(settings.accounts.serviceport || 8083);

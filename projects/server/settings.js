@@ -117,12 +117,26 @@ else {
 
     settings.dynamodb = {
         endpoint: 'dynamodb.us-west-1.amazonaws.com',
+        awsRegion: 'us-west-1',     // aws-sdk requires short-hand region name.
         accessKeyId: 'AKIAJWJEBZBGT6TPH32A',
         secretAccessKey: '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',
         tables: {
             ACTIVEROOMS: 'room_active_list',
             ROOMCONTENTS: 'room_contents'
         }
+    };
+
+    settings.accounts = {
+        servicePort: 8083,
+        xmppAccountServerSecret: 'video.GoCast.oXCXC877',
+        xmppAccountServerBase: 'http://localhost:9090/plugins/userService/userservice?',
+        dbUserTable: 'main_UserTable',
+        dbUserRoomTable: 'main_UserRoomTable',
+        dbVisitorTable: 'main_VisitorTable',
+        mailgunKey: 'key-65ism99rlme7svrn93qc-cormdknx-42',      // Bob Wolff - rwolff@gocast.it key -- the free one.
+        inviteFromAddress: 'support@gocast.it',
+        inviteFromName: 'GoCast Support',
+        inviteSubject: 'Welcome! Please validate your new GoCast account.'
     };
 
     settings.overseer = {
@@ -183,6 +197,7 @@ if (process.env.STANFORDDNLE === 1 || process.env.STANFORDDNLE === '1') {
 
     settings.dynamodb = {
         endpoint: 'dynamodb.us-west-1.amazonaws.com',
+        awsRegion: 'us-west-1',     // aws-sdk requires short-hand region name.
         accessKeyId: 'AKIAJWJEBZBGT6TPH32A',
         secretAccessKey: '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',
         tables: {
@@ -252,6 +267,7 @@ else if (process.env.STANFORDCCC === 1 || process.env.STANFORDCCC === '1') {
 
     settings.dynamodb = {
         endpoint: 'dynamodb.us-west-1.amazonaws.com',
+        awsRegion: 'us-west-1',     // aws-sdk requires short-hand region name.
         accessKeyId: 'AKIAJWJEBZBGT6TPH32A',
         secretAccessKey: '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',
         tables: {
