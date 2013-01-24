@@ -44,7 +44,7 @@ GoCastJS.gcFileShare = function(spot, info)
   this.dndZone.ondragleave = function() {
     this.classList.remove('enter');
     return false;
-  }
+  };
 
   this.dndZone.ondragend = function () {
     this.classList.remove('enter');
@@ -127,7 +127,7 @@ GoCastJS.gcFileShare.removeLink = function(spotnum, links, remlinkkey) {
 
 GoCastJS.gcFileShare.prototype.setLinks = function(linksStr) {
   var links = JSON.parse(linksStr),
-      k, mods, self = this;
+      k, mods, onclick, self = this;
 
   if (!linksStr || linksStr === '') {
     return;
@@ -144,7 +144,7 @@ GoCastJS.gcFileShare.prototype.setLinks = function(linksStr) {
   this.showStatus('Drop files here...');
   for (k in links) {
     if (links.hasOwnProperty(k)) {
-      var onclick = 'GoCastJS.gcFileShare.removeLink(' +
+      onclick = 'GoCastJS.gcFileShare.removeLink(' +
                       this.info.spotnumber.toString() + ', \'' +
                       linksStr.replace(/\"/g, '\\\'') + '\', \'' +
                       k +
@@ -152,14 +152,14 @@ GoCastJS.gcFileShare.prototype.setLinks = function(linksStr) {
 
       this.hideStatus();
       if (GoCastJS.FileViewer.isformatsupported(k)) {
-        mods += ('<li class="linkitem"><a href="javascript:void(0);" doclink="' + links[k] +
+        mods += ('<li class="linkitem"><a href="javascript:void(0);" doclink="' + encodeURI(links[k]) +
                  '" class="link viewable" title="Open in FileViewer: ' + k + '">' + k + '</a>' +
                  '<a href="javascript:void(0);" class="linkaction remove" onclick="' +
-                 onclick + '" title="Remove: ' + k + '">x</a><a target="_blank" href="' + links[k] +
+                 onclick + '" title="Remove: ' + k + '">x</a><a target="_blank" href="' + encodeURI(links[k]) +
                  '" class="linkaction download" title="Download: ' + k + '">&darr;</a></li>');
 
         this.fileviewerlist.files.push(k);
-        this.fileviewerlist.links.push(links[k]);      
+        this.fileviewerlist.links.push(links[k]);
       } else {
         mods += ('<li class="linkitem"><a target="_blank" href="' + links[k] + '" class="link" title="Download: ' + k + '">' +
                  k + '</a><a href="javascript:void(0);" class="linkaction remove" onclick="' +

@@ -35,7 +35,7 @@
 
 (function($) {
     var plugins, verstring, ver,
-        playerhtml = '<div id="gcpversioncheck"><object id="player" type="application/x-gocastplayer" ' + 
+        playerhtml = '<div id="gcpversioncheck"><object id="player" type="application/x-gocastplayer" ' +
                      'width="0" height="0"></object></div>';
 
     navigator.plugins.refresh(false);
@@ -71,13 +71,19 @@
         userdelim = '#',
         roomcodeobj = {
             cipher: function(username, roomname) {
-                return $.base64.encode(salt + saltdelim + username + userdelim + roomname);
+                return $.base64.encode(salt + saltdelim + encodeURIComponent(username + userdelim + roomname));
             },
             decipher: function(rcode) {
                 var roomname = $.base64.decode(rcode),
                     roomsalt = roomname.slice(0, roomname.indexOf(saltdelim));
 
-                return (salt === roomsalt) ? roomname.slice(roomname.indexOf(saltdelim)+1) : ''; 
+                return (salt === roomsalt) ? decodeURIComponent(roomname.slice(roomname.indexOf(saltdelim)+1)) : '';
+            },
+            decipherURIEncoded: function(rcode) {
+                var roomname = $.base64.decode(rcode),
+                    roomsalt = roomname.slice(0, roomname.indexOf(saltdelim));
+
+                return (salt === roomsalt) ? roomname.slice(roomname.indexOf(saltdelim)+1) : '';
             },
             decipheruname: function(rcode) {
                 var roomname = this.decipher(rcode);
@@ -85,7 +91,7 @@
             },
             decipherroomname: function(rcode) {
                 var roomname = this.decipher(rcode);
-                return roomname.slice(roomname.indexOf(userdelim)+1);
+                return decodeURIComponent(roomname.slice(roomname.indexOf(userdelim)+1));
             }
         };
 

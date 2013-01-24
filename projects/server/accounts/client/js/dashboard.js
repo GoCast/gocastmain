@@ -1,3 +1,6 @@
+/*jslint sloppy: false, white: true, todo: true, browser: true, devel: true */
+/*global document, window, DashApp */
+'use strict';
 var DashView = {
     $forms: {},
     init: function() {
@@ -9,7 +12,7 @@ var DashView = {
         $('body > .navbar .formlink').click(this.changeformCallback());
     },
     displayform: function(id) {
-        var i;
+        var i, email;
         for (i in this.$forms) {
             this.$forms[i].removeClass('show');
             $('.alert', this.$forms[i]).removeClass('show');
@@ -22,7 +25,7 @@ var DashView = {
         }
 
         if ('login-form' === id && $.urlvars.ecode) {
-            var email = $.roomcode.decipheruname($.urlvars.ecode);
+            email = $.roomcode.decipheruname($.urlvars.ecode);
             $('#input-email', this.$forms[id]).val(email);
         }
 
@@ -106,16 +109,17 @@ var DashApp = {
             beforesubmit: function() {
                 return function(arr, $form, options) {
                 };
-            },
+            }
         },
         'startmeeting-form': {
             success: function() {
                 return function(response) {
-                    var roomname = $('#input-roomname', DashApp.$forms['startmeeting-form']).val();
+                    var roomlinkrel, atag, rcode,
+                        roomname = $('#input-roomname', DashApp.$forms['startmeeting-form']).val();
                     if('success' === response.result) {
-                        var rcode = $.roomcode.cipher(DashApp.boshconn.getEmailFromJid().replace(/@/, '~'), roomname),
-                            roomlinkrel = window.location.pathname.replace(/dashboard.html*$/, '') + '?roomname=' + rcode,
-                            atag = document.createElement('a');
+                        rcode = $.roomcode.cipher(DashApp.boshconn.getEmailFromJid().replace(/@/, '~'), roomname);
+                        roomlinkrel = window.location.pathname.replace(/dashboard\.html*$/, '') + '?roomname=' + rcode;
+                        atag = document.createElement('a');
 
                         atag.href = roomlinkrel;
                         DashView.displayalert('startmeeting-form', 'success', 'You\'re room has been ' +
@@ -155,9 +159,9 @@ var DashApp = {
     },
     init: function() {
         var urlvars = this.urlvars(),
-            self = this;
+            self = this, i;
 
-        for (var i=0; i<document.forms.length; i++) {
+        for (i=0; i<document.forms.length; i += 1) {
             this.$forms[document.forms[i].id] = $(document.forms[i]);
         }
 
@@ -174,7 +178,7 @@ var DashApp = {
 
         if ('true' === urlvars.justactivated) {
             DashView.displayalert('login-form', 'success', 'Your account has been activated. ' +
-                                  'You can now login with your new account.')
+                                  'You can now login with your new account.');
         }
 
         if (this.boshconn.hasSavedRegisteredLoginInfo()) {
@@ -184,11 +188,12 @@ var DashApp = {
     },
     urlvars: function() {
         var urlvarsobj = {},
-        varstring = window.location.href.split('?')[1];
+        varstring = window.location.href.split('?')[1],
+        nvpairs, i;
 
-        urlvarsobj['baseurl'] = window.location.href.split('?')[0];
+        urlvarsobj.baseurl = window.location.href.split('?')[0];
         if (varstring) {
-            var nvpairs = varstring.split('&');
+            nvpairs = varstring.split('&');
             for (i in nvpairs) {
                 urlvarsobj[decodeURI(nvpairs[i].split('=')[0])] = decodeURI(nvpairs[i].split('=')[1]);
             }

@@ -67,7 +67,7 @@ function privateGenEmail(baseURL, email, name, actcode, bInAppReg) {
             '&email=' + email.toLowerCase();
 
     body += '\n\n';
-    body += 'Once you are validated, you can always come to your dashboard at: ' + baseURL.substring(0, baseURL.lastIndexOf('/'));
+    body += 'Once you are validated, you can always come to your dashboard at: ' + baseURL.substring(0, baseURL.lastIndexOf('/') + 1);
     body += '\n\n';
     body += 'Thanks for signing up with GoCast - we hope you enjoy the service.\n\n';
 
