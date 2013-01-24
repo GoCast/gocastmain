@@ -179,6 +179,7 @@ else {
         usernametest: 'overseer@' + settings.SERVERNAME + '/roommanagertest',
         password: 'the.overseer.rocks',
 
+        persist: true,      // Normally rooms are non-persistent.
         wbstoragelocation: '~/wbstorage'
     };
 }
