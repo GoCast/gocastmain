@@ -49,11 +49,24 @@ app.use(express.bodyParser());
 // -------------- ACCT SERVICE REQUEST HANDLERS --------------
 
 app.post('/register', function(req, res) {
-    var firstRoomName = req.body.desired_roomname;
+    var firstRoomName = req.body.desired_roomname,
+        extras = null;
 
     if (req.body && req.body.baseurl && req.body.email && req.body.password && req.body.name) {
 //        gcutil.log('accounts_service [/register][info]: FormData = ', req.body);
-        api.NewAccount(req.body.baseurl, req.body.email, req.body.password, req.body.name, firstRoomName, function() {
+        if (req.body.extra_fields) {
+            // Looking for a stringified JSON object.
+            try {
+                extras = JSON.parse(req.body.extra_fields);
+            }
+            catch(e) {
+                // Badly formed extras. Print out what came to us for our records. Then pretend it never happened.
+                gcutil.log('accounts_service [/register][warn]: Badly formed extra_fields: ', req.body.extra_fields);
+                extras = null;
+            }
+        }
+
+        api.NewAccount(req.body.baseurl, req.body.email, req.body.password, req.body.name, firstRoomName, extras, function() {
             res.send('{"result": "success"}');
         }, function(err) {
             gcutil.log('accounts_service [/register][error]: ', err);

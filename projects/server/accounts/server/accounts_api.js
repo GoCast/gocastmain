@@ -120,7 +120,7 @@ function privateMatchActivationCodes(longCode, longOrShortCode) {
     }
 }
 
-function apiNewAccount(baseURL, email, password, name, firstRoomName, success, failure, bInAppReg) {
+function apiNewAccount(baseURL, email, password, name, firstRoomName, extras, success, failure, bInAppReg) {
     // Check if account with this email exists
     db.EntryExists(email, function() {
         failure('apiNewAccount: Failed - account already in use.');
@@ -135,9 +135,16 @@ function apiNewAccount(baseURL, email, password, name, firstRoomName, success, f
             // Now, generate activation email
             emailBody = privateGenEmail(baseURL, email, name, actcode, bInAppReg);
 
-            obj = { validationCode: actcode,
-// Dont put validated column in until validation happens                    validated: false,
-                    password: password };
+            if (extras) {
+                obj = extras;   // Starting point.
+            }
+            else {
+                obj = {};
+            }
+
+            obj.validationCode = actcode;
+            obj.password = password;
+
             if (firstRoomName) {
                 obj.firstRoomName = firstRoomName;
             }

@@ -303,7 +303,7 @@ function dbUpdateEntry(accountName, obj, cbSuccess, cbFailure) {
 
 function dbActivateEntry(accountName, cbSuccess, cbFailure) {
     // Basically just update the table entry with a 'validated' column.
-    dbUpdateEntry(accountName, {validated: new Date().toString()}, cbSuccess, cbFailure);
+    dbUpdateEntry(accountName, {validated: new Date().toString(), validationCode: 'Completed'}, cbSuccess, cbFailure);
 }
 
 //
