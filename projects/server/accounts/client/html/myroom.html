@@ -6,7 +6,7 @@
         <title> Create My Room on GoCast </title>
         <link rel="stylesheet" type="text/css" href="css/bootstrap.css?GOCASTTIMESTAMP">
         <link rel="stylesheet" type="text/css" href="css/font-awesome.css?GOCASTTIMESTAMP">
-        <link rel="stylesheet" type="text/css" href="css/logreg.css?GOCASTTIMESTAMP">
+        <link rel="stylesheet" type="text/css" href="css/myroom.css?GOCASTTIMESTAMP">
     </head>
     <body>
         <div class="navbar navbar-fixed-top navbar-inverse">
@@ -20,73 +20,39 @@
         </div>
 		<br><br>	
         <div class="container" align="center">
-            <div class="row" align="center">
-                <font size="5"><b>Study, teach and meet in your own private room</b></font>
-            </div>
-            <div class="row" align="right">
-                <div class="span6">
-                    <br><br>
-                    <img src="images/gocast_demo.jpg">
-                    <br><br>
-                </div>
-                <div class="span6" align="left">
-                    <font size="4">
-                        <br><br>
-                        1. Invite others via a simple link<br><br><br>
-                        2. Video chat with up to 7 people<br><br><br>
-                        3. Use shared notepad to collaborate<br><br><br>
-                    </font>
+            <div class="row">
+                <div class="span12">
+                    <img src="images/molanding_banner.png">
                 </div>
             </div>
-            <div class="row" align="center" style="padding-top: 10px;">
-                <font size="5" color="darkgray"><b>Create your <font color="red">FREE</font> room in 3 easy steps</b></font>
-            </div>
-            <!--<div class="row" align="center">
-            </div>-->
         </div>
         <div class="container">
             <div class="row">
-                <div class="span4 offset4">
-                    <form id="register-form" class="form-horizontal" action="/acct/register/" method="post" style="margin-top: 15px">
+                <div class="span6" align="center">
+                    <font size="5"><b>Create your room in<br>3 easy steps</b></font>
+                </div>
+                <div class="span5">
+                    <form id="register-form" class="form-horizontal" action="/acct/register/" method="post">
                         <fieldset>
+                            <legend>&nbsp;Get started</legend>
                             <div class="control-group">
-                                <div class="controls">
-                                    <div class="input-prepend pull-right">
-                                        <span class="add-on">&nbsp;<i class="icon-user"></i>&nbsp;</span>
-                                        <input id="input-name" type="text" name="name" placeholder=" Name" required class="span4">
-                                    </div>
+                                <div class="controls" align="center">
+                                    <input id="input-name" type="text" name="name" placeholder=" Name" required class="span4">
                                 </div>
                             </div>
                             <div class="control-group">
-                                <div class="controls">
-                                    <div class="input-prepend pull-right">
-                                        <span class="add-on">&nbsp;<i class="icon-envelope"></i>&nbsp;</span>
-                                        <input id="input-email" type="email" name="email" placeholder=" Email" required class="span4">
-                                    </div>
+                                <div class="controls" align="center">
+                                    <input id="input-email" type="email" name="email" placeholder=" Email" required class="span4">
                                 </div>
                             </div>
                             <div class="control-group">
-                                <div class="controls">
-                                    <div class="input-prepend pull-right">
-                                        <span class="add-on">&nbsp;<i class="icon-play"></i>&nbsp;</span>
-                                        <input id="input-desiredroomname" type="text" name="desired_roomname" placeholder=" Desired room name" class="span4">
-                                    </div>
+                                <div class="controls" align="center">
+                                    <input id="input-desiredroomname" type="text" name="desired_roomname" placeholder=" Room name" class="span4">
                                 </div>
                             </div>
                             <div class="control-group">
-                                <div class="controls">
-                                    <div class="input-prepend pull-right">
-                                        <span class="add-on">&nbsp;<i class="icon-key"></i>&nbsp;</span>
-                                        <input id="input-password" type="password" name="password" placeholder=" Password" required class="span4">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="control-group">
-                                <div class="controls">
-                                    <div class="input-prepend pull-right">
-                                        <span class="add-on">&nbsp;<i class="icon-key"></i>&nbsp;</span>
-                                        <input id="input-confirm-password" type="password" name="confirm_password" placeholder=" Confirm password" required class="span4">
-                                    </div>
+                                <div class="controls" align="center">
+                                    <input id="input-password" type="password" name="password" placeholder=" Password" required class="span4">
                                 </div>
                             </div>
                             <div class="alert alert-error">
@@ -96,27 +62,24 @@
                                <h4><i class="icon-ok-sign"></i></h4><p style="padding-left: 25px;"></p>
                             </div>
                             <div class="control-group">
-                                <button type="submit" class="btn btn-primary pull-right"> Register </button>
-                                <a href="dashboard.html" class="btn btn-link pull-right"> Already have an account? Login </a>
+                                <div class="controls" align="center">
+                                    <button type="submit" class="btn btn-primary pull-right"> Create my room </button>
+                                    <a href="dashboard.html" class="btn btn-link pull-left"> I already have an account </a>
+                                </div>
                             </div>
                         </fieldset>
                     </form>
-                    <form id="activate-form" class="form-horizontal" action="/acct/activate/" method="post" style="margin-top: 15px">
+                    <form id="activate-form" class="form-horizontal" action="/acct/activate/" method="post">
                         <fieldset>
+                            <legend>&nbsp;Create account</legend>
                             <div class="control-group">
-                                <div class="controls">
-                                    <div class="input-prepend pull-right">
-                                        <span class="add-on">&nbsp;<i class="icon-envelope"></i>&nbsp;</span>
-                                        <input id="input-email" type="email" name="email" placeholder=" Email" required class="span4">
-                                    </div>
+                                <div class="controls" align="center">
+                                    <input id="input-email" type="email" name="email" placeholder=" Email" required class="span4">
                                 </div>
                             </div>
                             <div class="control-group">
-                                <div class="controls">
-                                    <div class="input-prepend pull-right">
-                                        <span class="add-on">&nbsp;<i class="icon-cogs"></i>&nbsp;</span>
-                                        <input id="input-activation-code" type="text" name="activation_code" placeholder=" Activation code" required class="span4">
-                                    </div>
+                                <div class="controls" align="center">
+                                    <input id="input-activation-code" type="text" name="activation_code" placeholder=" Activation code" required class="span4">
                                 </div>
                             </div>
                             <div class="alert alert-error">
@@ -126,7 +89,9 @@
                                <h4><i class="icon-ok-sign"></i></h4><p style="padding-left: 25px;"></p>
                             </div>
                             <div class="control-group">
-                                <button type="submit" class="btn btn-primary pull-right"> Activate </button>
+                                <div class="controls" align="center">
+                                    <button type="submit" class="btn btn-primary pull-right"> Create my account </button>
+                                </div>
                             </div>
                         </fieldset>
                     </form>

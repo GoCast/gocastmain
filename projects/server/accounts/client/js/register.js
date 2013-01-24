@@ -44,7 +44,7 @@ var RegisterApp = {
                         if ($desiredroomname.length && 'undefined' !== typeof(Storage)) {
                             localStorage.gcpDesiredRoomname = $desiredroomname.val();
                         }
-                        
+
                         RegisterView.displayform('activate-form');
                         RegisterView.displayalert('activate-form', 'success', 'Your account has been created. ' +
                                                 'An activation email has been sent to the address you just provided. ' +
@@ -109,7 +109,7 @@ var RegisterApp = {
 
             if ('register-form' === document.forms[i].id) {
                 options.data = {baseurl: urlvars.baseurl};
-                options.beforeSubmit = function(arr, $form, options) {
+                /*options.beforeSubmit = function(arr, $form, options) {
                     $('#input-email', self.$forms['activate-form']).val($('#input-email', $form).val());
                     if ($('#input-password', $form).val() !== $('#input-confirm-password', $form).val()) {
                         RegisterView.displayalert('register-form', 'error', 'The password fields don\'t match. Make sure ' +
@@ -117,7 +117,7 @@ var RegisterApp = {
                         $('#input-password', $form).focus();
                         return false;
                     }
-                };
+                };*/
             }
             this.$forms[document.forms[i].id] = $(document.forms[i]);
             this.$forms[document.forms[i].id].ajaxForm(options);
