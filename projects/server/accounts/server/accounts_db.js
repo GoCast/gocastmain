@@ -31,6 +31,8 @@ var sys = require('util');
 var AWS = require('aws-sdk');
 var _ = require('underscore');
 
+var gcutil = require('./gcutil_node');
+
 AWS.config.update({accessKeyId: settings.dynamodb.accessKeyId,
                     secretAccessKey: settings.dynamodb.secretAccessKey,
                     region: settings.dynamodb.awsRegion});
@@ -45,7 +47,7 @@ var theVisitorTable = settings.accounts.dbVisitorTable;
 'use strict';
 
 function errOut(err) {
-    console.log('DynamoDB: Error: code: ' + err.code + ', message: ' + err.message);
+    gcutil.log('DynamoDB: Error: code: ' + err.code + ', message: ' + err.message);
 }
 
 (function() {
@@ -55,12 +57,12 @@ function errOut(err) {
             errOut(err);
         }
         else {
-            console.log('List-Results: ', data.TableNames);
+            gcutil.log('List-Results: ', data.TableNames);
         }
     });
 */
     if (!ddb) {
-        console.log('ERROR: AWS.DynamoDB did not initialize properly. Exiting.');
+        gcutil.log('ERROR: AWS.DynamoDB did not initialize properly. Exiting.');
         process.exit(-1);
     }
 
@@ -76,7 +78,7 @@ function errOut(err) {
                         errOut(err);
                     }
                     else {
-                        console.log('accounts_db: Successfully inititalized New User Table: ' + theUserTable);
+                        gcutil.log('accounts_db: Successfully inititalized New User Table: ' + theUserTable);
                     }
                 });
             }
@@ -85,7 +87,7 @@ function errOut(err) {
             }
         }
         else {
-            console.log('accounts_db: User table found and ready.');
+            gcutil.log('accounts_db: User table found and ready.');
 
 /*            ddb.client.scan({TableName: theUserTable,
                              ScanFilter: { creationDate:
@@ -95,12 +97,12 @@ function errOut(err) {
                                         errOut(err);
                                     }
                                     else {
-                                        console.log('SCANNED and got Items: ', data.Items || data.Item);
-                                        console.log('SCANNED-RAW: ', data);
+                                        gcutil.log('SCANNED and got Items: ', data.Items || data.Item);
+                                        gcutil.log('SCANNED-RAW: ', data);
                                     }
                                 });
 */
-//            console.log('Table-result: ', data.Table);
+//            gcutil.log('Table-result: ', data.Table);
         }
     });
 
@@ -117,7 +119,7 @@ function errOut(err) {
                         errOut(err);
                     }
                     else {
-                        console.log('accounts_db: Successfully inititalized New UserRoom Table: ' + theUserRoomTable);
+                        gcutil.log('accounts_db: Successfully inititalized New UserRoom Table: ' + theUserRoomTable);
                     }
                 });
             }
@@ -126,9 +128,9 @@ function errOut(err) {
             }
         }
         else {
-            console.log('accounts_db: UserRoom table found and ready.');
+            gcutil.log('accounts_db: UserRoom table found and ready.');
 
-//            console.log('UserRoom - Table-result: ', data.Table);
+//            gcutil.log('UserRoom - Table-result: ', data.Table);
         }
     });
 
@@ -144,7 +146,7 @@ function errOut(err) {
                         errOut(err);
                     }
                     else {
-                        console.log('accounts_db: Successfully inititalized New Visitor Table: ' + theVisitorTable);
+                        gcutil.log('accounts_db: Successfully inititalized New Visitor Table: ' + theVisitorTable);
                     }
                 });
             }
@@ -153,8 +155,8 @@ function errOut(err) {
             }
         }
         else {
-            console.log('accounts_db: User table found and ready.');
-//            console.log('Table-result: ', data.Table);
+            gcutil.log('accounts_db: User table found and ready.');
+//            gcutil.log('Table-result: ', data.Table);
         }
     });
 
@@ -164,7 +166,7 @@ function dbAwsObjectRead(awsObj) {
     var outObj = {};
 
     _.each(awsObj, function(val, iter) {
-//        console.log('iter: ' , iter, ', val: ', val);
+//        gcutil.log('iter: ' , iter, ', val: ', val);
         if (val.S) {
             outObj[iter] = val.S;
         }
@@ -177,11 +179,11 @@ function dbAwsObjectRead(awsObj) {
             }
         }
         else {
-            console.log('dbAwsObjectRead: ERROR - illegal value being skipped: name: ' + iter + ', value is: ' + JSON.stringify(val));
+            gcutil.log('dbAwsObjectRead: ERROR - illegal value being skipped: name: ' + iter + ', value is: ' + JSON.stringify(val));
         }
     });
 
-//    console.log('dbAwsObjectRead: Final object out: ' + JSON.stringify(outObj));
+//    gcutil.log('dbAwsObjectRead: Final object out: ' + JSON.stringify(outObj));
     return outObj;
 }
 
@@ -191,7 +193,7 @@ function dbAwsObjectPrep(outputObj, inputObj) {
     }
 
     _.each(inputObj, function(val, iter) {
-//        console.log('iter: ' , iter, ', val: ', val);
+//        gcutil.log('iter: ' , iter, ', val: ', val);
         switch(typeof(val)) {
             case 'string':
                 outputObj[iter] = { S: val };
@@ -203,7 +205,7 @@ function dbAwsObjectPrep(outputObj, inputObj) {
                 outputObj['bool_' + iter] = { N: (val ? '1' : '0')};
                 break;
             default:
-                console.log('dbAwsObjectPrep: ERROR - illegal value being skipped: name: ' + iter + ', value is type: ' + typeof(val));
+                gcutil.log('dbAwsObjectPrep: ERROR - illegal value being skipped: name: ' + iter + ', value is type: ' + typeof(val));
                 break;
         }
     });
@@ -215,7 +217,7 @@ function dbAwsUpdateObjectPrep(outputObj, inputObj) {
     }
 
     _.each(inputObj, function(val, iter) {
-        console.log('iter: ' , iter, ', val: ', val);
+//        gcutil.log('iter: ' , iter, ', val: ', val);
         switch(typeof(val)) {
             case 'string':
                 outputObj[iter] = { Value: { S: val }, Action: 'PUT' };
@@ -227,21 +229,21 @@ function dbAwsUpdateObjectPrep(outputObj, inputObj) {
                 outputObj['bool_' + iter] = { Value: { N: (val ? '1' : '0')}, Action: 'PUT' };
                 break;
             default:
-                console.log('dbAwsUpdateObjectPrep: ERROR - illegal value being skipped: name: ' + iter + ', value is type: ' + typeof(val));
+                gcutil.log('dbAwsUpdateObjectPrep: ERROR - illegal value being skipped: name: ' + iter + ', value is type: ' + typeof(val));
                 break;
         }
     });
 
-//    console.log('dbAwsUpdateObjectPrep: output obj: ', JSON.stringify(outputObj));
+//    gcutil.log('dbAwsUpdateObjectPrep: output obj: ', JSON.stringify(outputObj));
 }
 /*
 var it = {};
 dbAwsObjectPrep(it, {name: 'bob', num: 1234, bIsTrue: true, bIsFalse: false});
-console.log('Prepout: ' + JSON.stringify(it));
+gcutil.log('Prepout: ' + JSON.stringify(it));
 
 it = { inName: { S: 'bobname' }, inNum: { N: '5678' }, bool_bInTrue: { N: '1' }, bool_bInFalse: { N: '0' }};
 var out = dbAwsObjectRead(it);
-console.log('Readout: ' + JSON.stringify(out));
+gcutil.log('Readout: ' + JSON.stringify(out));
 */
 
 //
@@ -265,8 +267,8 @@ function dbAddEntry(accountName, obj, cbSuccess, cbFailure) {
                                 cbFailure(err);
                             }
                             else {
-//                                console.log('Added Item: ', data.Attributes);
-//                                console.log('Add-RAW: ', data);
+//                                gcutil.log('Added Item: ', data.Attributes);
+//                                gcutil.log('Add-RAW: ', data);
                                 cbSuccess(data);
                             }
                         });
@@ -291,8 +293,8 @@ function dbUpdateEntry(accountName, obj, cbSuccess, cbFailure) {
                                 cbFailure(err);
                             }
                             else {
-//                                console.log('Added Item: ', data.Attributes);
-                                console.log('Update-RAW: ', data);
+//                                gcutil.log('Added Item: ', data.Attributes);
+//                                gcutil.log('Update-RAW: ', data);
                                 cbSuccess(data);
                             }
                         });
@@ -319,13 +321,13 @@ function dbGetEntryByAccountName(accountName, cbSuccess, cbFailure) {
         }
         else {
             if (data.Item) {
-//                console.log('Got Item: ', JSON.stringify(data.Item));
+//                gcutil.log('Got Item: ', JSON.stringify(data.Item));
                 outObj = dbAwsObjectRead(data.Item);
-//                console.log('Translated object: ', JSON.stringify(outObj));
+//                gcutil.log('Translated object: ', JSON.stringify(outObj));
                 cbSuccess(outObj);
             }
             else {
-//                console.log('Didnt find item.');
+//                gcutil.log('Didnt find item.');
                 cbFailure({code: 'NoEntryFound', message: 'Requested Entry was not found in the table.'});
             }
 
@@ -366,7 +368,7 @@ function dbEntryGetColumn(accountName, columnName, cbSuccess, cbFailure) {
         else {
             if (data.Item && data.Item[columnName]) {
                 outObj = dbAwsObjectRead(data.Item);
-                console.log('dbEntryHasColumn: Success: Passing back: ' + JSON.stringify(outObj));
+                gcutil.log('dbEntryHasColumn: Success: Passing back: ' + JSON.stringify(outObj));
                 cbSuccess(outObj);
             }
             else {
@@ -388,11 +390,27 @@ function dbDeleteEntry(accountName, cbSuccess, cbFailure) {
             cbFailure(err);
         }
         else {
-//            console.log('Deleted Item: ', data.Attributes);
-//            console.log('Deleted-RAW: ', data);
+//            gcutil.log('Deleted Item: ', data.Attributes);
+//            gcutil.log('Deleted-RAW: ', data);
             cbSuccess(data);
         }
     });
+}
+
+//
+// @param since - Date() object for when the report should be started - null means no filter
+//
+function dbValidationReport(since) {
+    var startDate = new Date(since);
+
+    if (!since) {
+        startDate = new Date(1);    // From 1970
+    }
+
+//    ddb.client.scan({TableName: theUserTable,
+//                     AttributesToGet: ['email', 'creationDate', 'validated', 'firstRoomName'],
+//                     }, function())
+
 }
 
 function dbDeleteRoom(accountName, roomName, cbSuccess, cbFailure) {
@@ -404,8 +422,8 @@ function dbDeleteRoom(accountName, roomName, cbSuccess, cbFailure) {
             cbFailure(err);
         }
         else {
-//            console.log('Deleted Item: ', data.Attributes);
-//            console.log('Deleted-RAW: ', data);
+//            gcutil.log('Deleted Item: ', data.Attributes);
+//            gcutil.log('Deleted-RAW: ', data);
             cbSuccess(data);
         }
     });
@@ -423,8 +441,8 @@ function dbListRooms(accountName, cbSuccess, cbFailure) {
             cbFailure(err);
         }
         else {
-//            console.log('Deleted Item: ', data.Attributes);
-//            console.log('Deleted-RAW: ', data);
+//            gcutil.log('Deleted Item: ', data.Attributes);
+//            gcutil.log('Deleted-RAW: ', data);
             outObj = [];
 
             _.each(data.Items, function(val, iter) {
@@ -437,10 +455,10 @@ function dbListRooms(accountName, cbSuccess, cbFailure) {
             });
 
             if (data.LastEvaluatedKey) {
-                console.log('dbListRooms: ERROR: Incomplete query -- LastEvaluatedKey given: ' + data.LastEvaluatedKey);
+                gcutil.log('dbListRooms: ERROR: Incomplete query -- LastEvaluatedKey given: ' + data.LastEvaluatedKey);
                 cbFailure('dbListRooms: ERROR: Incomplete query -- LastEvaluatedKey given: ' + data.LastEvaluatedKey);
             }
-//            console.log('dbListRooms: outObj is: ' + JSON.stringify(outObj));
+//            gcutil.log('dbListRooms: outObj is: ' + JSON.stringify(outObj));
             if (outObj.length) {
                 cbSuccess(outObj, data);
             }
@@ -468,12 +486,12 @@ function dbCreateRoom(accountName, roomName, cbSuccess, cbFailure) {
                         Item: Item,
                         Expected: {email: {Exists: false} }}, function(err, data) {
                             if (err) {
-                                errOut(err);
+//                                errOut(err);
                                 cbFailure(err);
                             }
                             else {
-//                                console.log('Added Item: ', data.Attributes);
-//                                console.log('Add-RAW: ', data);
+//                                gcutil.log('Added Item: ', data.Attributes);
+//                                gcutil.log('Add-RAW: ', data);
                                 cbSuccess(data);
                             }
                         });
@@ -493,7 +511,7 @@ function dbVisitorEntryGetColumn(accountName, columnName, cbSuccess, cbFailure) 
         else {
             if (data.Item && data.Item[columnName]) {
                 outObj = dbAwsObjectRead(data.Item);
-//                console.log('dbVisitorEntryGetColumn: Success: Passing back: ' + JSON.stringify(outObj));
+//                gcutil.log('dbVisitorEntryGetColumn: Success: Passing back: ' + JSON.stringify(outObj));
                 cbSuccess(outObj);
             }
             else {
@@ -510,9 +528,9 @@ function dbVisitorSeenAgain(accountName, nickName, cbSuccess, cbFailure) {
 
     // First must get the # visits so far.
     dbVisitorEntryGetColumn(accountName, 'numVisits', function(data) {
-//        console.log('Got column: ', data);
+//        gcutil.log('Got column: ', data);
         numVisits = data.numVisits + 1;
-//        console.log('After numVisits++ is: ' + numVisits);
+//        gcutil.log('After numVisits++ is: ' + numVisits);
 
         // Prep the item to be stored
         Item = {};
@@ -531,13 +549,13 @@ function dbVisitorSeenAgain(accountName, nickName, cbSuccess, cbFailure) {
                                     cbFailure(err);
                                 }
                                 else {
-    //                                console.log('Added Item: ', data.Attributes);
-//                                    console.log('Visitor-Update-RAW: ', data);
+    //                                gcutil.log('Added Item: ', data.Attributes);
+//                                    gcutil.log('Visitor-Update-RAW: ', data);
                                     cbSuccess(data);
                                 }
                             });
     }, function(err) {
-        console.log('dbVisitorSeenAgain: dbVisitorEntryGetColumn failed: ', err);
+        gcutil.log('dbVisitorSeenAgain: dbVisitorEntryGetColumn failed: ', err);
         cbFailure('dbVisitorSeenAgain: dbVisitorEntryGetColumn failed: ' + err);
     });
 
@@ -570,8 +588,8 @@ function dbVisitorSeen(accountName, nickName, cbSuccess, cbFailure) {
                                 dbVisitorSeenAgain(accountName, nickName, cbSuccess, cbFailure);
                             }
                             else {
-//                                console.log('Added Item: ', data.Attributes);
-//                                console.log('Add-RAW: ', data);
+//                                gcutil.log('Added Item: ', data.Attributes);
+//                                gcutil.log('Add-RAW: ', data);
                                 cbSuccess(data);
                             }
                         });

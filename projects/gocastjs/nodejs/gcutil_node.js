@@ -40,4 +40,11 @@ GoCastJS.fileDate = function() {
             GoCastJS.pad2(d.getHours()) + GoCastJS.pad2(d.getMinutes()) + GoCastJS.pad2(d.getSeconds());
 };
 
+GoCastJS.log = function() {
+    // Need to prepend the date to the first argument.
+    arguments[0] = GoCastJS.logDate() + ' ' + arguments[0];
+
+    console.log.apply(console, arguments);
+};
+
 module.exports = GoCastJS;

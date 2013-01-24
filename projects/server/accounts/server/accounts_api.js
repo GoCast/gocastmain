@@ -26,6 +26,8 @@ if (!settings.accounts) {
 var sys = require('util');
 var evt = require('events');
 
+var gcutil = require('./gcutil_node');
+
 var eventManager = new evt.EventEmitter();
 var argv = process.argv;
 
@@ -90,11 +92,11 @@ function privateSendEmail(toName, toEmail, body, cbSuccess, cbFailure) {
       settings.accounts.inviteFromAddress, {},
       function(err) {
         if (err) {
-            console.log('Mail failed: ' + err);
+            gcutil.log('Mail failed: ' + err);
             cbFailure(err);
         }
         else {
-            console.log('Success');
+            gcutil.log('Success');
             cbSuccess();
         }
     });
@@ -144,10 +146,10 @@ function apiNewAccount(baseURL, email, password, name, firstRoomName, success, f
             db.AddEntry(email, obj, function() {
                 //Now, send activation email
                 privateSendEmail(name, email, emailBody, function() {
-                    console.log('Hurray. Another user signed up! I hope ' + email + ' comes back to activate their account.');
+                    gcutil.log('Hurray. Another user signed up! I hope ' + email + ' comes back to activate their account.');
                     success();
                 }, function(err) {
-                    console.log('apiNewAccount: Failed sending email to ' + email + '. Backing out activation entry and pending account. Error: ' + err);
+                    gcutil.log('apiNewAccount: Failed sending email to ' + email + '. Backing out activation entry and pending account. Error: ' + err);
                     db.DeleteEntry(email, function() {
                         // After deleting entry, still need to delete the xmpp account too.
                         xmpp.DeleteAccount(email, function() {
@@ -166,7 +168,7 @@ function apiNewAccount(baseURL, email, password, name, firstRoomName, success, f
                     });
                 });
             }, function() {
-                console.log('apiNewAccount: Failed to Add validation entry in database. Removing pending account.');
+                gcutil.log('apiNewAccount: Failed to Add validation entry in database. Removing pending account.');
                 xmpp.DeleteAccount(email, function() {
                     failure('apiNewAccount: Failed to Add validation entry in database. Removed pending account.');
                 }, function() {
@@ -194,7 +196,7 @@ function apiValidateAccount(email, actcode, success, failure) {
         // Or it's ready to be validated.
         if (entry.validated) {
             // If we're already validated, then give a success but it's really a warning of sorts
-            console.log('apiValidateAccount: Activation already complete for ' + email);
+            gcutil.log('apiValidateAccount: Activation already complete for ' + email);
             success('apiValidateAccount: Activation already completed.');
         }
         else if (entry.validationCode && true === privateMatchActivationCodes(entry.validationCode, actcode)) {
@@ -202,11 +204,11 @@ function apiValidateAccount(email, actcode, success, failure) {
             xmpp.EnableAccount(email, function() {
                 // Enable successful, delete db entry for email
                 db.ActivateEntry(email, function() {
-                    console.log('Hurray! Activation complete for ' + email);
+                    gcutil.log('Hurray! Activation complete for ' + email);
                     success();
                 }, function(err) {
-                    console.log('apiValidateAccount: WARNING - Could not activate entry for ' + email);
-                    console.log('Hurray! Activation complete for ' + email);
+                    gcutil.log('apiValidateAccount: WARNING - Could not activate entry for ' + email);
+                    gcutil.log('Hurray! Activation complete for ' + email);
                     success();
                 });
             }, failure);
@@ -264,16 +266,16 @@ function apiVisitorSeen(email, nickName, success, failure) {
 
 /* Manjesh -- These both work (separately of course)
 apiNewAccount('http://dev.gocast.it/baseURL.html', 'rwolff@gocast.it', 'rwolff', 'Bob Wolff', function() {
-    console.log('TEST: SUCCESS');
+    gcutil.log('TEST: SUCCESS');
 }, function(err) {
-    console.log('TEST: FAILURE: ', err);
+    gcutil.log('TEST: FAILURE: ', err);
 });
 */
 /*
 apiValidateAccount('rwolff@gocast.it', '85e25a1fea7b001911f791f13180f252', function() {
-    console.log('TEST-Validate: SUCCESS.');
+    gcutil.log('TEST-Validate: SUCCESS.');
 }, function(err) {
-    console.log('TEST-Validate: FAILED: ' + err);
+    gcutil.log('TEST-Validate: FAILED: ' + err);
 });
 */
 
