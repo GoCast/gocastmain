@@ -2153,15 +2153,15 @@ function handleRoomSetup() {
     var errorMsg;
     if ($(iq).find('roomfull'))
     {
-      errorMsg = "Sorry, the room " + room_to_create + " is full. Please try again later.";
+      errorMsg = "Sorry, the room is full or we had a connection problem. Please re-try/re-load.";
     }
     else
     {
-      errorMsg = 'There was a problem entering the room ' + room_to_create;
+      errorMsg = 'There was a problem entering the room. Please re-try/re-load.';
     }
 
     // display error
-    app.log(4, "handleRoomSetup Error " + iq.toString());
+    app.log(4, "handleRoomSetup Error " + (iq ? iq.toString() : 'timeout'));
     $('#errorMsgPlugin > h1').text('Oops!!!');
     $('#errorMsgPlugin > p#prompt').text(errorMsg);
     closeWindow();

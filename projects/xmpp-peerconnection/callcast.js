@@ -2398,7 +2398,7 @@ var Callcast = {
                 if (cbError) {
                     cbError(iq);
                 }
-            });
+            }, 2000);
     },
 
     //

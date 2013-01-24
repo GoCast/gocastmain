@@ -119,7 +119,7 @@ GoCastJS.StropheConnection.prototype = {
     saveLoginInfo: function() {
         if (typeof (Storage) !== 'undefined') {
             if (this.connection && this.connection.authenticated && this.connection.connected) {
-//                this.log('Saving Login Info: RID: ' + this.connection.rid + ', jid: ' + this.connection.jid);
+                this.log('Saving Login Info: RID: ' + this.connection.rid + ', jid: ' + this.connection.jid);
                 localStorage.jid = this.connection.jid;
                 localStorage.rid = this.connection.rid;
                 localStorage.sid = this.connection.sid;
@@ -349,6 +349,7 @@ GoCastJS.StropheConnection.prototype = {
             case Strophe.Status.ATTACHED:
                 this.log('GoCastJS.StropheConnection: ATTACHED');
                 this.saveLoginInfo();
+                this.privatePingServer();
                 this.connection.addHandler(this.privateSetupPingHandler.bind(this), 'urn:xmpp:ping', 'iq', 'get');
                 break;
             case Strophe.Status.DISCONNECTING:
@@ -395,9 +396,15 @@ GoCastJS.StropheConnection.prototype = {
         this.statusCallback(status);
     },
 
+    privatePingServer: function() {
+        var ping = $iq({to: this.xmppserver, type: 'get'}).c('ping', {xmlns: 'urn:xmpp:ping'});
+        this.log('StropheConnection: Pinging Server as a health-check.');
+        this.send(ping);
+    },
+
     privateSetupPingHandler: function(iq) {
         var pong = $iq({to: $(iq).attr('from'), id: $(iq).attr('id'), type: 'result'});
-//        this.log('StropheConnection: Received PING - Sending pong...');
+        this.log('StropheConnection: Received PING - Sending pong...');
         if (this.connection) {
             this.connection.send(pong);
 

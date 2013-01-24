@@ -3707,6 +3707,7 @@ Overseer.prototype.CreateRoomRequest = function(iq) {
         this.AddTrackedRoom(roomname, addRoomOptions, function() {
                 var iqResult = new xmpp.Element('iq', {to: iq.attrs.from, type: 'result', id: iq.attrs.id})
                                     .c('ok', {xmlns: 'urn:xmpp:callcast', name: roomname});
+                self.log('AddTrackedRoom: INFO: result from room creation is: ' + iqResult.root().toString());
                 self.client.send(iqResult.root());
 
                 // Now set the max participants if settings allows it.
@@ -3739,12 +3740,14 @@ Overseer.prototype.CreateRoomRequest = function(iq) {
             self.log('WARNING: Room requested:' + roomname + ' is currently pending deletion. Cannot fulfill request.');
             iqResult = new xmpp.Element('iq', {to: iq.attrs.from, type: 'error', id: iq.attrs.id})
                             .c('pendingdeletion', {xmlns: 'urn:xmpp:callcast'});
+            self.log('AddTrackedRoom: INFO: result from room creation is: ' + iqResult.root().toString());
             self.client.send(iqResult.root());
         }
         else
         {
             iqResult = new xmpp.Element('iq', {to: iq.attrs.from, type: 'result', id: iq.attrs.id})
                             .c('ok', {xmlns: 'urn:xmpp:callcast', name: roomname});
+            self.log('AddTrackedRoom: INFO: result from room creation is: ' + iqResult.root().toString());
             self.client.send(iqResult.root());
 
             if (this.MucRoomObjects[roomname].bSelfDestruct === true &&
