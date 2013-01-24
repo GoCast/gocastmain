@@ -1,0 +1,40 @@
+html {
+    height: 100%;
+}
+
+body {
+    margin-top: 85px;
+    background: #E9F6FD;
+}
+
+body > .navbar {
+    box-shadow: 0px 0px 20px black;
+    -webkit-box-shadow: 0px 0px 20px black;
+    -moz-box-shadow: 0px 0px 20px black;
+}
+
+body > .container > .row > .span4 > form {
+    display: none;
+    margin-top: 150px;
+}
+
+body > .container > .row > .span4 > form .btn {
+    margin-left: 5px;
+}
+
+body > .container > .row > .span4 > form .controls {
+    margin-left: 0px;
+}
+
+body > .container > .row > .span4 > form.show {
+    display: block;
+}
+
+body > .container > .row > .span4 > form .alert {
+    display: none;
+    padding-right: 14px;
+}
+
+body > .container > .row > .span4 > form .alert.show {
+    display: block;
+}
