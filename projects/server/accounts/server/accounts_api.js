@@ -70,14 +70,14 @@ function privateGenEmail(baseURL, email, name, actcode, extras, bInAppReg) {
 
     // Throw in the Google Analytics if we were given any.
     if (extras) {
-        if (extras.campaign_source) {
-            body += '&campaign_source=' + encodeURI(extras.campaign_source);
+        if (extras.utm_source) {
+            body += '&utm_source=' + encodeURI(extras.utm_source);
         }
-        if (extras.campaign_medium) {
-            body += '&campaign_medium=' + encodeURI(extras.campaign_medium);
+        if (extras.utm_medium) {
+            body += '&utm_medium=' + encodeURI(extras.utm_medium);
         }
-        if (extras.campaign_name) {
-            body += '&campaign_name=' + encodeURI(extras.campaign_name);
+        if (extras.utm_campaign) {
+            body += '&utm_campaign=' + encodeURI(extras.utm_campaign);
         }
     }
 

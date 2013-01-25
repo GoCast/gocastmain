@@ -1,7 +1,10 @@
+/*jslint sloppy: false, todo: true, white: true, browser: true, devel: true */
+/*global document */
 var RegisterView = {
     $forms: {},
     init: function() {
-        for (var i=0; i<document.forms.length; i++) {
+        var i;
+        for (i=0; i<document.forms.length; i++) {
             this.$forms[document.forms[i].id] = $(document.forms[i]);
         }
         this.displaydefaultform($.urlvars.defaultaction);
@@ -74,8 +77,8 @@ var RegisterApp = {
                                   '?justactivated=true&ecode=' + $.roomcode.cipher($('#input-email',
                                                                                    RegisterApp.$forms['activate-form']).val(),
                                                                                    'gcst');
-                        window.location.href = ('adwords' === $.urlvars.campaign_source) ?
-                                               (desturl + '&usebeacon=1') : desturl;
+                        window.location.href = ('adwords' === $.urlvars.utm_source.toLowerCase()) ?
+                                               (desturl + '&sendconversion=1') : desturl;
                     } else if ('incorrect' === response.result) {
                         RegisterView.displayalert('activate-form', 'error', 'The activation code you\'ve provided is wrong. ' +
                                                 'Please provide the correct activation code.');
@@ -108,7 +111,7 @@ var RegisterApp = {
             var options = {
                 dataType: 'json',
                 success: this.formSubmitResultCallbacks[document.forms[i].id].success(),
-                error: this.formSubmitResultCallbacks[document.forms[i].id].failure()        
+                error: this.formSubmitResultCallbacks[document.forms[i].id].failure()
             }, campaign = {}, campaignstr = '';
 
             if ('register-form' === document.forms[i].id) {
@@ -116,14 +119,14 @@ var RegisterApp = {
                     baseurl: urlvars.baseurl
                 };
 
-                if ($.urlvars.campaign_source) {
-                    campaign.campaign_source = $.urlvars.campaign_source;
+                if ($.urlvars.utm_source) {
+                    campaign.utm_source = $.urlvars.utm_source;
                 }
-                if ($.urlvars.campaign_name) {
-                    campaign.campaign_name = $.urlvars.campaign_name;
+                if ($.urlvars.utm_campaign) {
+                    campaign.utm_campaign = $.urlvars.utm_campaign;
                 }
-                if ($.urlvars.campaign_medium) {
-                    campaign.campaign_source = $.urlvars.campaign_medium;
+                if ($.urlvars.utm_medium) {
+                    campaign.utm_medium = $.urlvars.utm_medium;
                 }
                 campaignstr = JSON.stringify(campaign);
                 if ('{}' !== campaignstr) {

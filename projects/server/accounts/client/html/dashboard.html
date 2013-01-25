@@ -143,18 +143,13 @@
             var google_conversion_label = "DX30CLmurAQQz4jZ1wM";
             var google_conversion_value = 0;
             /* ]]> */
-        </script>
-        <script type="text/javascript" src="https://www.googleadservices.com/pagead/conversion.js"></script>
-        <noscript>
-            <div style="display:inline;">
-            </div>
-        </noscript>
-        <script type="text/javascript">
-            if ($.urlvars.usebeacon) {
-                $('noscript > div').html('<img height="1" width="1" style="border-style:none;" alt="" ' +
-                                         'src="https://www.googleadservices.com/pagead/conversion/989217871/?value=0&amp;label=DX30CLmurAQQz4jZ1wM&amp;guid=ON&amp;script=0"/>');
+
+            if (!$.urlvars.sendconversion) {
+                google_conversion_id = -1;
+                google_conversion_label = "";
             }
         </script>
+        <script type="text/javascript" src="https://www.googleadservices.com/pagead/conversion.js"></script>
         <!-- End Google Code for Create a room Conversion Page -->
         <!-- Google Analytics -->
         <script type="text/javascript">
