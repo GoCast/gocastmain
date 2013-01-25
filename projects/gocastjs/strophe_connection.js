@@ -59,6 +59,20 @@ GoCastJS.StropheConnection = function(opts) {
         this.log = opts.logFn;
     }
 
+    // Initialize local remembered rid/jid/sid
+    this.forgetReconnectInfo();
+
+    if (typeof (Storage) !== 'undefined') {
+        this.rememberedJid = localStorage.jid;
+        this.rememberedRid = localStorage.rid;
+        this.rememberedSid = localStorage.sid;
+        // Convert to boolean in-bound from localStorage
+        this.rememberedAnonymous = localStorage.bAnonymous === 'true';
+
+        // Now remove from local storage any memory of this until we 'unload'
+        this.forgetReconnectInfoInLocalStorage();
+    }
+
     // We don't have a Strophe Connection at all yet.
     this.connection = new Strophe.Connection(this.boshurl);
 
@@ -75,7 +89,7 @@ GoCastJS.StropheConnection = function(opts) {
         self.log('StropheConnection: Before Unload.');
         if (self.connection && self.connection.connected && self.connection.authenticated) {
             self.log('Storing rid/jid/sid for later.');
-            self.saveLoginInfo();
+            self.saveLoginInfoToLocalStorage();
         }
     });
 };
@@ -99,6 +113,22 @@ GoCastJS.StropheConnection.prototype = {
     },
 
     forgetReconnectInfo: function() {
+        this.rememberedJid = null;
+        this.rememberedRid = null;
+        this.rememberedSid = null;
+        this.rememberedAnonymous = null;
+    },
+
+    saveLoginInfo: function() {
+        if (this.connection && this.connection.authenticated && this.connection.connected) {
+            this.rememberedJid = this.connection.jid;
+            this.rememberedRid = this.connection.rid;
+            this.rememberedSid = this.connection.sid;
+            this.rememberedAnonymous = this.bAnonymous;
+        }
+    },
+
+    forgetReconnectInfoInLocalStorage: function() {
         if (typeof (Storage) !== 'undefined') {
             delete localStorage.jid;
             delete localStorage.rid;
@@ -116,10 +146,10 @@ GoCastJS.StropheConnection.prototype = {
     //        if we have network connection issues and need to re-login without asking for
     //        username/password information again.
     //
-    saveLoginInfo: function() {
+    saveLoginInfoToLocalStorage: function() {
         if (typeof (Storage) !== 'undefined') {
             if (this.connection && this.connection.authenticated && this.connection.connected) {
-                this.log('Saving Login Info: RID: ' + this.connection.rid + ', jid: ' + this.connection.jid);
+                this.log('Saving Login Info: RID: ' + this.connection.rid + ', jid: ' + this.connection.jid + ', sid: ' + this.connection.sid);
                 localStorage.jid = this.connection.jid;
                 localStorage.rid = this.connection.rid;
                 localStorage.sid = this.connection.sid;
@@ -132,24 +162,15 @@ GoCastJS.StropheConnection.prototype = {
     },
 
     hasSavedLoginInfo: function() {
-        var rid, jid, sid;
-
-        if (typeof (Storage) !== 'undefined') {
-            rid = localStorage.rid;
-            jid = localStorage.jid;
-            sid = localStorage.sid;
-
-            // Now validate the data before returning.
-            if (jid && jid.split('@')[1] && sid && rid) {
-                return true;
-            }
+        if (this.rememberedJid && this.rememberedJid.split('@')[1] && this.rememberedRid && this.rememberedSid) {
+            return true;
         }
 
         return false;
     },
 
     hasSavedRegisteredLoginInfo: function() {
-        if (this.hasSavedLoginInfo() && localStorage.bAnonymous === 'false') {
+        if (this.hasSavedLoginInfo() && this.rememberedAnonymous === false) {
             return true;
         }
 
@@ -167,20 +188,20 @@ GoCastJS.StropheConnection.prototype = {
 
         if (this.hasSavedLoginInfo()) {
             this.log('autoConnect: Saved user info found.');
-            this.bAnonymous = localStorage.bAnonymous === 'true';
+            this.bAnonymous = this.rememberedAnonymous;
 
             if (this.bAnonymous) {
                 this.id = this.xmppserver;
             }
             else {
-                this.id = localStorage.jid;
+                this.id = this.rememberedJid;
             }
 
     // RMW: In theory we are supposed to advance RID by one, but Chrome fails it while Firefox is ok. Sigh. No advancing...
     //               Callcast.reattach(Callcast.connection.jid, Callcast.connection.sid, new Number(Callcast.connection.rid) + 1, Callcast.conn_callback);
-            this.privateReattach(localStorage.jid, localStorage.sid, localStorage.rid);
+            this.privateReattach(this.rememberedJid, this.rememberedSid, this.rememberedRid);
 
-            return localStorage.jid;
+            return this.rememberedJid;
         }
         else if (this.id && this.pw) {
             this.log('autoConnect: Non-anonymous.');
