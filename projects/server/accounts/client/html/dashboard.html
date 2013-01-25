@@ -67,7 +67,7 @@
                             </div>
                             <div class="control-group">
                                 <button type="submit" class="btn btn-primary pull-right"> Login </button>
-                                <a href="register.html" class="btn btn-link pull-right"> Don't have an account? Register </a>
+                                <a href="register.html" class="btn btn-link pull-right"> I want to sign up </a>
                             </div>
                         </fieldset>
                     </form>
@@ -147,9 +147,32 @@
         <script type="text/javascript" src="https://www.googleadservices.com/pagead/conversion.js"></script>
         <noscript>
             <div style="display:inline;">
-                <img height="1" width="1" style="border-style:none;" alt="" src="https://www.googleadservices.com/pagead/conversion/989217871/?value=0&amp;label=DX30CLmurAQQz4jZ1wM&amp;guid=ON&amp;script=0"/>
             </div>
         </noscript>
+        <script type="text/javascript">
+            if ($.urlvars.usebeacon) {
+                $('noscript > div').html('<img height="1" width="1" style="border-style:none;" alt="" ' +
+                                         'src="https://www.googleadservices.com/pagead/conversion/989217871/?value=0&amp;label=DX30CLmurAQQz4jZ1wM&amp;guid=ON&amp;script=0"/>');
+            }
+        </script>
         <!-- End Google Code for Create a room Conversion Page -->
+        <!-- Google Analytics -->
+        <script type="text/javascript">
+            var _gaq = _gaq || [];
+            _gaq.push(['_setAccount', 'UA-37964802-1']);
+            _gaq.push(['_trackPageview']);
+
+            (function() {
+                var ga = document.createElement('script'),
+                    s = document.getElementsByTagName('script')[0];
+
+                ga.type = 'text/javascript';
+                ga.async = true;
+                ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') +
+                         '.google-analytics.com/ga.js';
+                s.parentNode.insertBefore(ga, s);
+          })();
+        </script>
+        <!-- End Google Analytics -->
     </body>
 </html>

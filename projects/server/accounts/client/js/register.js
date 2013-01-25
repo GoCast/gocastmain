@@ -67,11 +67,15 @@ var RegisterApp = {
         'activate-form': {
             success: function() {
                 return function(response) {
+                    var desturl;
+
                     if ('success' === response.result) {
-                        window.location.href = $.urlvars.baseurl
-                                                .replace(/(register|myroom)\.html/, 'dashboard.html') + '?justactivated=true&ecode=' +
-                                                $.roomcode.cipher($('#input-email', RegisterApp.$forms['activate-form']).val(),
-                                                                  'gcst');
+                        desturl = $.urlvars.baseurl.replace(/(register|myroom)\.html/, 'dashboard.html') +
+                                  '?justactivated=true&ecode=' + $.roomcode.cipher($('#input-email',
+                                                                                   RegisterApp.$forms['activate-form']).val(),
+                                                                                   'gcst');
+                        window.location.href = ('adwords' === $.urlvars.campaign_source) ?
+                                               (desturl + '&usebeacon=1') : desturl;
                     } else if ('incorrect' === response.result) {
                         RegisterView.displayalert('activate-form', 'error', 'The activation code you\'ve provided is wrong. ' +
                                                 'Please provide the correct activation code.');
@@ -105,18 +109,29 @@ var RegisterApp = {
                 dataType: 'json',
                 success: this.formSubmitResultCallbacks[document.forms[i].id].success(),
                 error: this.formSubmitResultCallbacks[document.forms[i].id].failure()        
-            };
+            }, campaign = {}, campaignstr = '';
 
             if ('register-form' === document.forms[i].id) {
-                options.data = {baseurl: urlvars.baseurl};
+                options.data = {
+                    baseurl: urlvars.baseurl
+                };
+
+                if ($.urlvars.campaign_source) {
+                    campaign.campaign_source = $.urlvars.campaign_source;
+                }
+                if ($.urlvars.campaign_name) {
+                    campaign.campaign_name = $.urlvars.campaign_name;
+                }
+                if ($.urlvars.campaign_medium) {
+                    campaign.campaign_source = $.urlvars.campaign_medium;
+                }
+                campaignstr = JSON.stringify(campaign);
+                if ('{}' !== campaignstr) {
+                    options.data.extra_fields = campaignstr;
+                }
+
                 options.beforeSubmit = function(arr, $form, options) {
                     $('#input-email', self.$forms['activate-form']).val($('#input-email', $form).val());
-                    /*if ($('#input-password', $form).val() !== $('#input-confirm-password', $form).val()) {
-                        RegisterView.displayalert('register-form', 'error', 'The password fields don\'t match. Make sure ' +
-                                                'you\'ve entered the same password in both fields.');
-                        $('#input-password', $form).focus();
-                        return false;
-                    }*/
                 };
             }
             this.$forms[document.forms[i].id] = $(document.forms[i]);
