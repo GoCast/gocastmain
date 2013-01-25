@@ -40,7 +40,7 @@ var db = require('./accounts_db');
 
 'use strict';
 
-function privateGenEmail(baseURL, email, name, actcode, bInAppReg) {
+function privateGenEmail(baseURL, email, name, actcode, extras, bInAppReg) {
     var body;
 
     if (name && name !== '') {
@@ -67,6 +67,19 @@ function privateGenEmail(baseURL, email, name, actcode, bInAppReg) {
     body += '\n\nYour activation link is: ' + baseURL +
             '?defaultaction=activate&code=' + actcode.toUpperCase() +
             '&email=' + email.toLowerCase();
+
+    // Throw in the Google Analytics if we were given any.
+    if (extras) {
+        if (extras.campaign_source) {
+            body += '&campaign_source=' + encodeURI(extras.campaign_source);
+        }
+        if (extras.campaign_medium) {
+            body += '&campaign_medium=' + encodeURI(extras.campaign_medium);
+        }
+        if (extras.campaign_name) {
+            body += '&campaign_name=' + encodeURI(extras.campaign_name);
+        }
+    }
 
     body += '\n\n';
     body += 'Once you are validated, you can always come to your dashboard at: ' + baseURL.substring(0, baseURL.lastIndexOf('/') + 1);
@@ -133,7 +146,7 @@ function apiNewAccount(baseURL, email, password, name, firstRoomName, extras, su
                 emailBody, obj;
 
             // Now, generate activation email
-            emailBody = privateGenEmail(baseURL, email, name, actcode, bInAppReg);
+            emailBody = privateGenEmail(baseURL, email, name, actcode, extras, bInAppReg);
 
             if (extras) {
                 obj = extras;   // Starting point.
