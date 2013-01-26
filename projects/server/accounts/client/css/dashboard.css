@@ -4,15 +4,7 @@ html {
 
 body {
     margin-top: 85px;
-    background-repeat: no-repeat;
-    background: #e9f6fd;
-    background: -moz-radial-gradient(center, ellipse cover,  #e9f6fd 0%, #d3eefb 100%);
-    background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%,#e9f6fd), color-stop(100%,#d3eefb));
-    background: -webkit-radial-gradient(center, ellipse cover,  #e9f6fd 0%,#d3eefb 100%);
-    background: -o-radial-gradient(center, ellipse cover,  #e9f6fd 0%,#d3eefb 100%);
-    background: -ms-radial-gradient(center, ellipse cover,  #e9f6fd 0%,#d3eefb 100%);
-    background: radial-gradient(ellipse at center,  #e9f6fd 0%,#d3eefb 100%);
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#e9f6fd', endColorstr='#d3eefb',GradientType=1 );
+    background: #E9F6FD;
 }
 
 body > .navbar {
@@ -29,40 +21,79 @@ body > .navbar .nav.show {
     display: block;
 }
 
-body > .container > .row > .span4 > form {
+body > .container > .row > .span5 > form {
     display: none;
     margin-top: 150px;
+    border: 1px darkgrey solid;
+    border-radius: 3px;
+    background-color: white;
+    padding: 0px 5px 0px 5px;
+
+    /* box shadow effect */
+    position: relative;
+    -webkit-box-shadow:0 1px 4px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.1) inset;
+    -moz-box-shadow:0 1px 4px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.1) inset;
+    box-shadow:0 1px 4px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.1) inset;
 }
 
-body > .container > .row > .span4 > form .btn {
-    margin-left: 5px;
+body > .container > .row > .span5 > form:before,
+body > .container > .row > .span5 > form:after {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    top: 0px;
+    bottom: 0px;
+    left: 10px;
+    right: 10px;
+    border-radius: 100px / 10px;
+    -webkit-box-shadow: 0 0 10px rgba(0,0,0,0.8);
+    -moz-box-shadow: 0 0 10px rgba(0,0,0,0.8);
+    box-shadow: 0 0 10px rgba(0,0,0,0.8);
 }
 
-body > .container > .row > .span4 > form .controls {
+body > .container > .row > .span5 > form:after {
+    right: 10px;
+    left: auto;
+    -webkit-transform: skew(8deg) rotate(3deg);
+    -moz-transform: skew(8deg) rotate(3deg);
+}
+
+body > .container > .row > .span5 > form button {
+    margin-right: 15px;
+}
+
+body > .container > .row > .span5 > form .control-group:last-child,
+body > .container > .row > .span5 > form#startmeeting-form .control-group:nth-of-type(3) {
+    margin-top: 35px;
+    padding-top: 20px;
+    border-top: 1px #E5E5E5 solid;
+}
+
+body > .container > .row > .span5 > form .controls {
     margin-left: 0px;
 }
 
-body > .container > .row > .span4 > form.show {
+body > .container > .row > .span5 > form.show {
     display: block;
 }
 
-body > .container > .row > .span4 > form .alert {
+body > .container > .row > .span5 > form .alert {
     display: none;
     padding-right: 14px;
 }
 
-body > .container > .row > .span4 > form .alert.show {
+body > .container > .row > .span5 > form .alert.show {
     display: block;
 }
 
-body > .container > .row > .span4 > form .alert  a,
-body > .container > .row > .span4 > form .alert  span {
+body > .container > .row > .span5 > form .alert  a,
+body > .container > .row > .span5 > form .alert  span {
     overflow: hidden;
     text-overflow: ellipsis;
     display: inline-block;
     width: 260px;
 }
 
-body > .container > .row > .span4 > form .alert  a {
+body > .container > .row > .span5 > form .alert  a {
     margin-left: 0px;
 }

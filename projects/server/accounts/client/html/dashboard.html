@@ -40,23 +40,18 @@
         </div>
         <div class="container">
             <div class="row">
-                <div class="span4 offset4">
+                <div class="span5 offset4">
                     <form id="login-form" class="form-horizontal">
                         <fieldset>
+                            <legend>&nbsp;Login to GoCast</legend>
                             <div class="control-group">
-                                <div class="controls">
-                                    <div class="input-prepend pull-right">
-                                        <span class="add-on">&nbsp;<i class="icon-envelope"></i>&nbsp;</span>
-                                        <input id="input-email" type="email" name="email" placeholder=" Email" required class="span4">
-                                    </div>
+                                <div class="controls" align="center">
+                                    <input id="input-email" type="email" name="email" placeholder=" Email" required class="span4">
                                 </div>
                             </div>
                             <div class="control-group">
-                                <div class="controls">
-                                    <div class="input-prepend pull-right">
-                                        <span class="add-on">&nbsp;<i class="icon-key"></i>&nbsp;</span>
-                                        <input id="input-password" type="password" name="password" placeholder=" Password" required class="span4">
-                                    </div>
+                                <div class="controls" align="center">
+                                    <input id="input-password" type="password" name="password" placeholder=" Password" required class="span4">
                                 </div>
                             </div>
                             <div class="alert alert-error">
@@ -66,27 +61,24 @@
                                <h4><i class="icon-ok-sign"></i></h4><p style="padding-left: 25px;"></p>
                             </div>
                             <div class="control-group">
-                                <button type="submit" class="btn btn-primary pull-right"> Login </button>
-                                <a href="register.html" class="btn btn-link pull-right"> I want to sign up </a>
+                                <div class="controls" align="center">
+                                    <button type="submit" class="btn btn-primary pull-right"> Log me in </button>
+                                    <a href="register.html" class="btn btn-link pull-left"> I want to sign up </a>
+                                </div>
                             </div>
                         </fieldset>
                     </form>
                     <form id="changepwd-form" class="form-horizontal" action="/acct/changepwd/" method="post">
                         <fieldset>
+                            <legend>&nbsp;Change your password</legend>
                             <div class="control-group">
-                                <div class="controls">
-                                    <div class="input-prepend pull-right">
-                                        <span class="add-on">&nbsp;<i class="icon-envelope"></i>&nbsp;</span>
-                                        <input id="input-email" type="email" name="email" placeholder=" Email" required class="span4">
-                                    </div>
+                                <div class="controls" align="center">
+                                    <input id="input-email" type="email" name="email" placeholder=" Email" required class="span4">
                                 </div>
                             </div>
                             <div class="control-group">
-                                <div class="controls">
-                                    <div class="input-prepend pull-right">
-                                        <span class="add-on">&nbsp;<i class="icon-key"></i>&nbsp;</span>
-                                        <input id="input-password" type="password" name="new_password" placeholder=" New Password" required class="span4">
-                                    </div>
+                                <div class="controls" align="center">
+                                    <input id="input-password" type="password" name="new_password" placeholder=" New Password" required class="span4">
                                 </div>
                             </div>
                             <div class="alert alert-error">
@@ -96,25 +88,27 @@
                                <h4><i class="icon-ok-sign"></i></h4><p style="padding-left: 25px;"></p>
                             </div>
                             <div class="control-group">
-                                <button type="submit" class="btn btn-primary pull-right"> Change Password </button>
+                                <div class="controls" align="center">
+                                    <button type="submit" class="btn btn-primary pull-right"> Change my password </button>
+                                </di>
                             </div>
                         </fieldset>
                     </form>
                     <form id="startmeeting-form" class="form-horizontal" action="/acct/createroom/" method="post">
                         <fieldset>
+                            <legend>&nbsp;Start your meeting</legend>
                             <div class="control-group">
-                                <div class="controls">
-                                    <div class="input-prepend pull-right">
-                                        <span class="add-on">&nbsp;<i class="icon-play"></i>&nbsp;</span>
-                                        <input id="input-roomname" type="text" name="desired_roomname" placeholder=" Enter your room name" required class="span4">
-                                    </div>
+                                <div class="controls" align="center">
+                                    <input id="input-roomname" type="text" name="desired_roomname" placeholder=" Enter your room name" required class="span4">
                                 </div>
                             </div>
                             <div class="alert alert-error">
                                 <h4><i class="icon-warning-sign"></i></h4><p style="padding-left: 25px;"></p>
                             </div>
                             <div class="control-group">
-                                <button type="submit" class="btn btn-primary pull-right"> Create Room </button>
+                                <div id="controls" align="center">
+                                    <button type="submit" class="btn btn-primary pull-right"> Create my room </button>
+                                </div>
                             </div>
                             <div class="alert alert-success">
                                <h4><i class="icon-ok-sign"></i></h4><p style="padding-left: 25px;"></p>
