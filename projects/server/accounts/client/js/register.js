@@ -77,7 +77,7 @@ var RegisterApp = {
                                   '?justactivated=true&ecode=' + $.roomcode.cipher($('#input-email',
                                                                                    RegisterApp.$forms['activate-form']).val(),
                                                                                    'gcst');
-                        window.location.href = ('adwords' === $.urlvars.utm_source.toLowerCase()) ?
+                        window.location.href = ($.urlvars.utm_source && 'adwords' === $.urlvars.utm_source.toLowerCase()) ?
                                                (desturl + '&sendconversion=1') : desturl;
                     } else if ('incorrect' === response.result) {
                         RegisterView.displayalert('activate-form', 'error', 'The activation code you\'ve provided is wrong. ' +
