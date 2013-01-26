@@ -14,7 +14,7 @@ body > .navbar {
 }
 
 body > .container > .row > .span5 > form,
-body > .container > .row > .span6 > form#courses-form {
+body > .container > .row > .span7 > form#courses-form {
     display: none;
     border: 1px darkgrey solid;
     border-radius: 3px;
@@ -28,14 +28,19 @@ body > .container > .row > .span6 > form#courses-form {
     box-shadow:0 1px 4px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.1) inset;
 }
 
-body > .container > .row > .span6 > form#courses-form {
-    display: block;
+body > .container > .row > .span7 > form#courses-form {
+    background-color: #EFEFEF;
+}
+
+body > .container > .row > .span7 > form#courses-form .btn {
+    margin-left: 10px;
+    margin-bottom: 10px;
 }
 
 body > .container > .row > .span5 > form:before,
 body > .container > .row > .span5 > form:after,
-body > .container > .row > .span6 > form#courses-form:before,
-body > .container > .row > .span6 > form#courses-form:after {
+body > .container > .row > .span7 > form#courses-form:before,
+body > .container > .row > .span7 > form#courses-form:after {
     content: '';
     position: absolute;
     z-index: -1;
@@ -50,7 +55,7 @@ body > .container > .row > .span6 > form#courses-form:after {
 }
 
 body > .container > .row > .span5 > form:after,
-body > .container > .row > .span6 > form#courses-form:after {
+body > .container > .row > .span7 > form#courses-form:after {
     right: 10px;
     left: auto;
     -webkit-transform: skew(8deg) rotate(3deg);
@@ -71,7 +76,8 @@ body > .container > .row > .span5 > form .controls {
     margin-left: 0px;
 }
 
-body > .container > .row > .span5 > form.show {
+body > .container > .row > .span5 > form.show,
+body > .container > .row > .span7 > form#courses-form.show {
     display: block;
 }
 
