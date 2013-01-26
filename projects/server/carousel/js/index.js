@@ -3214,7 +3214,11 @@ function leaveGoCast() {
   Callcast.LeaveSession(function() {
     if (Callcast.connection.bAnonymous) {
       forgetXmppConnection = function() { Callcast.connection.forgetReconnectInfo(); };
-      window.location.href = 'register.html';
+      if (document.referrer && /myroom\.html/.test(document.referrer)) {
+        window.location.href = document.referrer;
+      } else {
+        window.location.href = 'register.html';
+      }
     } else {
       window.location.href = 'dashboard.html';
     }
