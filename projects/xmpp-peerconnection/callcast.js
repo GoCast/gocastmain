@@ -442,7 +442,7 @@ var Callcast = {
         else if ($(err).find('service-unavailable').length > 0)
         {
             alert('Could not enter room. Likely maximum # of users\nreached in this room or roommanager is unavailable.');
-            Callcast.LeaveSession();
+            Callcast.LeaveSession(null, 'service-unavailable');
         }
 //        else if ($(err).find('not-allowed').length > 0)
 //        {
@@ -451,12 +451,12 @@ var Callcast = {
         else if ($(err).find('registration-required').length > 0)
         {
             alert('Room is currently locked. You may attempt to KNOCK to request entry.');
-            Callcast.LeaveSession();
+            Callcast.LeaveSession(null, 'registration-required');
         }
         else if ($(err).find('forbidden').length > 0)
         {
             alert('Someone in the room has blocked your admission.\nKnocking is being ignored as well.');
-            Callcast.LeaveSession();
+            Callcast.LeaveSession(null, 'forbidden');
         }
         else
         {
@@ -481,7 +481,7 @@ var Callcast = {
 
         // Need to prepare a 'subjidfornickname' command and wait for response.
         if (!this.GetOldJids()) {
-            Callcast.LeaveSession();
+            Callcast.LeaveSession(null, 'Nickname conflict');
             if (Callcast.Callback_OnNicknameInUse) {
                 Callcast.Callback_OnNicknameInUse(nick.replace(/%20/g, ' '));
             }
@@ -1898,7 +1898,7 @@ var Callcast = {
     PresHandler: function(presence) {
             var from = $(presence).attr('from'),
                 room = Strophe.getBareJidFromJid(from),
-                info, nick, user_jid;
+                info, nick, user_jid, tmproom;
 
             if ($(presence).attr('usertype') === 'silent')    // Overseer/serverBot
             {
@@ -1907,9 +1907,8 @@ var Callcast = {
                 return true;
             }
 
-            Callcast.log(presence);
             Callcast.log('From-NICK: ' + $(presence).attr('from'));
-//          return true;
+
             // make sure this presence is for the right room
             if (room === Callcast.room) {
                 nick = Strophe.getResourceFromJid(from);
@@ -1989,7 +1988,8 @@ var Callcast = {
                 {
                     // We got kicked out
                     // So leave and come back?
-                    Callcast.LeaveSession();
+        // RMW: This was never really the right thing - we're already by definition 'gone'            Callcast.LeaveSession(null, 'Found-myself-unavailable');
+                    $(document).trigger('left_session');
 //                    alert('We got kicked out of the session for some reason.');
                 }
                 else if (!Callcast.participants[nick] && $(presence).attr('type') !== 'unavailable') {
@@ -2075,6 +2075,20 @@ var Callcast = {
                     //
                     if (!Callcast.joined && nick === Callcast.nick)
                     {
+                        if (!Callcast.overseer) {
+                            // If we don't know the overseer yet, then we have tripped back into
+                            // this room on a re-attach where the xmpp server didn't notice that we
+                            // were gone. But we were...so we need all the participants to identify
+                            // themselves again. The only way to be clean here is to Leave and re-join.
+                            Callcast.log('WARNING: Quick-re-attach bug. Must EXIT and RE-JOIN.');
+                            tmproom = Callcast.room;
+                            Callcast.LeaveSession(function() {
+                                Callcast.log('WARNING: Quick-re-attach bug. RE-JOINING now to: ' + tmproom);
+                                Callcast.JoinSession(tmproom.split('@')[0], tmproom);
+                            }, 'Quick-re-attach bug');
+                            return true;  // TODO:RMW - may want to return false here to kill the handler if someone else is going to take care of re-adding.
+                        }
+
                         Callcast.log('INFO: At time of receiving all participants (joined=true) ...');
                         Callcast.log('  INFO: pluginLoaded=' + Callcast.IsPluginLoaded());
                         // Dump all room participants to the log in case we run into issues of 'noav' vs 'av' issues.
@@ -2144,6 +2158,9 @@ var Callcast = {
         tosend.xmlns = this.NS_CALLCAST;
         tosend.from = this.nick;
 
+        if (!myOverseer) {
+            console.error('ERROR: No overseer.');
+        }
         //
         this.connection.sendIQ($iq({
             to: myOverseer,
@@ -2194,6 +2211,9 @@ var Callcast = {
         tosend.xmlns = this.NS_CALLCAST;
         tosend.from = this.nick;
 
+        if (!myOverseer) {
+            console.error('ERROR: No overseer.');
+        }
         //
         this.connection.sendIQ($iq({
             to: myOverseer,
@@ -2243,6 +2263,9 @@ var Callcast = {
         tosend.xmlns = this.NS_CALLCAST;
         tosend.from = this.nick;
 
+        if (!myOverseer) {
+            console.error('ERROR: No overseer.');
+        }
         //
         this.connection.sendIQ($iq({
             to: myOverseer,
@@ -2300,6 +2323,9 @@ var Callcast = {
             return false;
         }
 
+        if (!myOverseer) {
+            console.error('ERROR: No overseer.');
+        }
         //
         this.connection.sendIQ($iq({
             to: myOverseer,
@@ -2506,10 +2532,12 @@ var Callcast = {
         return true;
     },
 
-    LeaveSession: function(cb) {
+    LeaveSession: function(cb, reason) {
         var finishUp, isDone = false,
             leaveTimer = null,
             self = this;
+
+        Callcast.log('LeaveSession: REASON: ', reason);
 
         if (Callcast.room === null || Callcast.room === '')
         {
@@ -2527,9 +2555,9 @@ var Callcast = {
             Callcast.roomjid = '';
 
     //TODO:RMW - BUG - this sending of video to peers is silly after a muc.leave() above unless we're really quick.
-            self.SendLocalVideoToPeers(self.bUseVideo);
+//            self.SendLocalVideoToPeers(self.bUseVideo);
 
-            Callcast.log('LeaveSession: triggering left_session.');
+            Callcast.log('LeaveSession: triggering left_session. Reason: ', reason);
             $(document).trigger('left_session');
         };
 
@@ -2537,7 +2565,7 @@ var Callcast = {
         if (this.connection.connection) {
             leaveTimer = setTimeout(function() {
                 if (!isDone) {
-                    Callcast.log('LeaveSession: Using TIMEOUT to finishUp and callback.');
+                    Callcast.log('LeaveSession: Using TIMEOUT to finishUp and callback. Reason: ', reason);
                     isDone = true;
 
                     finishUp();
@@ -2553,7 +2581,7 @@ var Callcast = {
                 clearTimeout(leaveTimer);
 
                 if (!isDone) {
-                    Callcast.log('LeaveSession: Using muc.leave callback to finishUp and callback.');
+                    Callcast.log('LeaveSession: Using muc.leave callback to finishUp and callback. Reason: ', reason);
                     isDone = true;
 
                     finishUp();
@@ -2571,7 +2599,7 @@ var Callcast = {
                 cb();
             }
 
-            Callcast.log('ERROR: No connection/connection/muc for leave()');
+            Callcast.log('ERROR: No connection/connection/muc for leave(). Reason: ', reason);
         }
     },
 
@@ -2747,7 +2775,7 @@ var Callcast = {
         this.DropAllParticipants();
         this.MuteLocalAudioCapture(false);
 
-        this.LeaveSession();
+        this.LeaveSession(null, 'disconnect()');
 
         //
         //TODO:RMW - maybe there is a parameter to disconnect - where item-not-found drives forgetting
@@ -2800,7 +2828,7 @@ var Callcast = {
         }
     },
 
-    leaveIfReEntry: function(cb) {
+    leaveIfReEntry: function(cb, reason) {
         // Determine if we're in a 'refresh' situation and if so, then re-attach.
         if (typeof (Storage) !== 'undefined' && sessionStorage.room)
         {
@@ -2818,7 +2846,7 @@ var Callcast = {
 
             Callcast.log('ATTACHED/CONNECTED - Leaving Session.');
             // Leave the current room and re-join
-            Callcast.LeaveSession(cb);
+            Callcast.LeaveSession(cb, reason);
         }
         else {
             Callcast.log('ATTACHED/CONNECTED - NO Storage or No sessionStorage.room - joining?');
@@ -2836,7 +2864,7 @@ var Callcast = {
                     Callcast.finalizeConnect();
                     Callcast.Callback_ConnectionStatus('Connected');
                     $(document).trigger('connected');
-                });
+                }, 'connected');
                 break;
             case Strophe.Status.DISCONNECTED:
                 this.log('XMPP/Strophe Disconnected. Likely re-trying though.');
@@ -2862,7 +2890,7 @@ var Callcast = {
                     Callcast.finalizeConnect();
                     $(document).trigger('connected');
                     Callcast.Callback_ConnectionStatus('Re-Attached');
-                });
+                }, 'attached');
                 break;
             case Strophe.Status.DISCONNECTING:
                 this.log('XMPP/Strophe is Dis-Connecting...');
@@ -2964,8 +2992,8 @@ GoCastJS.SendLogsXMPP.prototype.connHandler = function(status, err) {
             case Strophe.Status.CONNECTED:
                 Callcast.log('SendLogsXMPP: Connected. Setting up connection particulars.');
 
-                this.connection.addHandler(this.handle_ping, 'urn:xmpp:ping', 'iq', 'get');
-                this.connection.addHandler(this.onErrorStanza, null, null, 'error');
+                this.connection.addHandler(this.handle_ping.bind(this), 'urn:xmpp:ping', 'iq', 'get');
+                this.connection.addHandler(this.onErrorStanza.bind(this), null, null, 'error');
 
                 this.connection.send($pres());
                 this.connection.flush();
