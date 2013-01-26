@@ -76,6 +76,8 @@ GoCastJS.StropheConnection = function(opts) {
     // We don't have a Strophe Connection at all yet.
     this.connection = new Strophe.Connection(this.boshurl);
 
+//    this.debugXML();
+
     // Custom status item.
     Strophe.Status.TERMINATED = 99;
 
@@ -485,23 +487,18 @@ GoCastJS.StropheConnection.prototype = {
     debugXML: function(bEnable) {
         var self = this;
 
+        if (!this.connection) {
+            this.log('debugXML: ERROR - no connection presently. Cannot set debug mode.');
+            return false;
+        }
+
         if (bEnable === true || bEnable === null || bEnable === undefined) {
             this.connection.rawInput = function(data) {
-                if ($(data).children()[0]) {
-                    self.log("RAW-IN:", $(data).children()[0]);
-                }
-                else {
-                    self.log("RAW-IN:", $(data));
-                }
+                self.log('RAW-IN: ', $(data).get(0));
             };
 
             this.connection.rawOutput = function(data) {
-                if ($(data).children()[0]) {
-                    self.log("RAW-OUT:", $(data).children()[0]);
-                }
-                else {
-                    self.log("RAW-OUT:", $(data));
-                }
+                self.log('RAW-OUT: ', $(data).get(0));
             };
         }
         else {
