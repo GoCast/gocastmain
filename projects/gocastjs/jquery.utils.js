@@ -69,9 +69,12 @@
     var salt = 'Room',
         saltdelim = ':',
         userdelim = '#',
+        encRoomName = function(inRoom) {
+            return inRoom.replace(/'/g, '%27');
+        },
         roomcodeobj = {
             cipher: function(username, roomname) {
-                return $.base64.encode(salt + saltdelim + encodeURIComponent(username + userdelim + roomname));
+                return $.base64.encode(salt + saltdelim + encRoomName(encodeURIComponent(username + userdelim + roomname)));
             },
             decipher: function(rcode) {
                 var roomname = $.base64.decode(rcode),
