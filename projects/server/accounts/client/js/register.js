@@ -49,16 +49,18 @@ var RegisterApp = {
             success: function() {
                 return function(response) {
                     if ('success' === response.result) {
-                        var $desiredroomname = $('#input-desiredroomname', RegisterApp.$forms['register-form']);
+                        var $desiredroomname = $('#input-desiredroomname', RegisterApp.$forms['register-form']),
+                            $name = $('#input-name', RegisterApp.$forms['register-form']),
+                            msg = 'Thanks for signing up, ' + $name.val() + '!<br>Your account has been created. ' +
+                                  'Look in your inbox for an activation email from GoCast Support, and ' +
+                                  'follow the instructions in it.';
 
                         if ($desiredroomname.length && 'undefined' !== typeof(Storage)) {
                             localStorage.gcpDesiredRoomname = $desiredroomname.val();
                         }
 
                         RegisterView.displayform('activate-form');
-                        RegisterView.displayalert('activate-form', 'success', 'Your account has been created. ' +
-                                                'An activation email has been sent to the address you just provided. ' +
-                                                'Follow the instructions in the email to activate your account.');
+                        RegisterView.displayalert('activate-form', 'success', msg);
                     } else if ('inuse' === response.result) {
                         RegisterView.displayalert('register-form', 'error', 'An account for the email address you\'ve provided ' +
                                                 'already exists. Choose a different email address.');

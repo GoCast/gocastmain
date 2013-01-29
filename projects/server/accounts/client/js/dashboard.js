@@ -12,11 +12,21 @@ var DashView = {
         $('body > .navbar .formlink').click(this.changeformCallback());
     },
     displayform: function(id) {
-        var i, email;
+        var i, email,
+            formtips = {
+                'login-form': 'Log in with your GoCast account and create your own meeting room on the web!',
+                'changepwd-form': 'Submit your new password. Then, use it the next time you log in to GoCast.',
+                'startmeeting-form': 'Enter the name of the room which you want to create or go into. You will ' +
+                                     'then be provided with a unique link for that room. You can invite others ' +
+                                     'by emailing that link to them.<br>Click on the \'Take me to my room\' button ' +
+                                     'to enter the room.'
+            };
+
         for (i in this.$forms) {
             this.$forms[i].removeClass('show');
             $('.alert', this.$forms[i]).removeClass('show');
         }
+
         this.$forms[id].addClass('show');
         this.$forms[id].clearForm();
 
@@ -35,6 +45,8 @@ var DashView = {
                 delete localStorage.gcpDesiredRoomname;
             }
         }
+
+        this.displayformtip(formtips[id]);
     },
     displayalert: function(formid, type, message) {
         var $alert = null;
@@ -43,13 +55,21 @@ var DashView = {
         $alert = $('.alert-' + type, this.$forms[formid]).addClass('show');
         $('p', $alert).html(message);
     },
-    showloginloader: function() {
-        $('.btn[type="submit"]', this.$forms['login-form']).addClass('disabled')
-                                                           .html('<i class="icon-spinner icon-spin icon-2x"></i>');
+    displayformtip: function(message) {
+        $('.alert-info p').html(message);
     },
-    cancelloginloader: function() {
-        $('.btn[type="submit"]', this.$forms['login-form']).removeClass('disabled')
-                                                          .html('Login');
+    showloader: function(formid) {
+        $('.btn[type="submit"]', this.$forms[formid]).addClass('disabled')
+                                                     .html('<i class="icon-spinner icon-spin icon-2x"></i>');
+    },
+    cancelloader: function(formid) {
+        var submittexts = {
+            'login-form': 'Log me in',
+            'changepwd-form': 'Change my password',
+            'startmeeting-form': 'Create my room'
+        };
+        $('.btn[type="submit"]', this.$forms[formid]).removeClass('disabled')
+                                                          .html(submittexts[formid]);
 
     },
     changeformCallback: function() {
@@ -82,7 +102,7 @@ var DashApp = {
                         username: $('#input-email', $form).val(),
                         password: $('#input-password', $form).val()
                     });
-                    DashView.showloginloader();
+                    DashView.showloader('login-form');
                     return false;
                 };
             }
@@ -91,8 +111,9 @@ var DashApp = {
             success: function() {
                 return function(response) {
                     if ('success' === response.result) {
+                        DashView.cancelloader('changepwd-form');
                         DashView.displayform('startmeeting-form');
-                        DashView.displayalert('startmeeting-form', 'success', 'Your password has been changed. Use your' +
+                        DashView.displayalert('startmeeting-form', 'success', 'Your password has been changed. Use your ' +
                                               'new password to login from now on.');
                     } else {
                         DashView.displayalert('changepwd-form', 'error', 'There was an error changing the password for ' +
@@ -102,12 +123,14 @@ var DashApp = {
             },
             failure: function() {
                 return function(error) {
+                    DashView.cancelloader('changepwd-form');
                     DashView.displayalert('changepwd-form', 'error', 'There was an error changing the password for ' +
                                           'your account.');
                 };
             },
             beforesubmit: function() {
                 return function(arr, $form, options) {
+                    DashView.showloader('changepwd-form');
                 };
             }
         },
@@ -117,15 +140,17 @@ var DashApp = {
                     var roomlinkrel, atag, rcode,
                         roomname = $('#input-roomname', DashApp.$forms['startmeeting-form']).val();
                     if('success' === response.result) {
+                        DashView.cancelloader('startmeeting-form');
                         rcode = $.roomcode.cipher(DashApp.boshconn.getEmailFromJid().replace(/@/, '~'), roomname);
                         roomlinkrel = window.location.pathname.replace(/dashboard\.html*$/, '') + '?roomname=' + rcode;
                         atag = document.createElement('a');
 
                         atag.href = roomlinkrel;
                         DashView.displayalert('startmeeting-form', 'success', 'You\'re room has been ' +
-                                              'created. You can invite others by emailing them this link ' +
-                                              '<span><strong>' + atag.href + '</strong></span><br><br><a href="' +
-                                              roomlinkrel + '" class="btn btn-block btn-success">Go to ' + roomname + '</a>');
+                                              'created. The unique link for this room is:<br><br>' +
+                                              '<input class="input-block-level" type="text" value="' + atag.href + '">' +
+                                              '<br><br><a href="' + roomlinkrel + '" class="btn btn-block btn-success">' +
+                                              'Take me to my room</a>');
                     } else {
                         DashView.displayalert('startmeeting-form', 'error', 'There was an error while creating your ' +
                                               'desired room.');
@@ -134,11 +159,13 @@ var DashApp = {
             },
             failure: function() {
                 return function(error) {
+                    DashView.cancelloader('startmeeting-form');
                     DashView.displayalert('startmeeting-form', 'error', 'There was an error while creating your desired room.');
                 };
             },
             beforesubmit: function() {
                 return function(arr, $form, options) {
+                    DashView.showloader('startmeeting-form');
                 };
             },
             data: function() { return {email: DashApp.boshconn.getEmailFromJid()}; }
@@ -183,7 +210,7 @@ var DashApp = {
 
         if (this.boshconn.hasSavedRegisteredLoginInfo()) {
             this.boshconn.autoConnect();
-            DashView.showloginloader();
+            DashView.showloader('login-form');
         }
     },
     urlvars: function() {
@@ -212,16 +239,16 @@ var DashApp = {
                 $('body > .navbar .nav').addClass('show');
             } else if (Strophe.Status.DISCONNECTED === status ||
                        Strophe.Status.TERMINATED === status) {
-                DashView.cancelloginloader();
+                DashView.cancelloader('login-form');
                 DashView.displayform('login-form');
                 $('body > .navbar .nav').removeClass('show');
             } else if (Strophe.Status.AUTHFAIL === status) {
-                DashView.cancelloginloader();
+                DashView.cancelloader('login-form');
                 DashView.displayform('login-form');
                 DashView.displayalert('login-form', 'error', 'Login failed. The email and/or password that you provided ' +
                                       'is invalid.');
             } else if (Strophe.Status.CONNFAIL === status) {
-                DashView.cancelloginloader();
+                DashView.cancelloader('login-form');
                 DashView.displayform('login-form');
                 DashView.displayalert('login-form', 'error', 'There was a problem logging in to your account.');
             }

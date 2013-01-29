@@ -3,7 +3,7 @@ html {
 }
 
 body {
-    margin-top: 85px;
+    margin-top: 90px;
     background: #E9F6FD;
 }
 
@@ -21,9 +21,12 @@ body > .navbar .nav.show {
     display: block;
 }
 
+body > .container {
+    margin-top: 150px;
+}
+
 body > .container > .row > .span5 > form {
     display: none;
-    margin-top: 150px;
     border: 1px darkgrey solid;
     border-radius: 3px;
     background-color: white;
@@ -86,13 +89,13 @@ body > .container > .row > .span5 > form .alert.show {
     display: block;
 }
 
-body > .container > .row > .span5 > form .alert  a,
+/*body > .container > .row > .span5 > form .alert  a,
 body > .container > .row > .span5 > form .alert  span {
     overflow: hidden;
     text-overflow: ellipsis;
     display: inline-block;
     width: 260px;
-}
+}*/
 
 body > .container > .row > .span5 > form .alert  a {
     margin-left: 0px;
