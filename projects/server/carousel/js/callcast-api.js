@@ -1017,28 +1017,26 @@ function addSpotCb(info)
        div, divs;
 //    console.log('addSpot msg received id ' + info.spotdivid + ' #' + info.spotnumber, info);
     // determine cmd type, add or replace
-    if (info.spotreplace) // see if there is a spotReplace prop
+
+    // RMW: Change behavior - always assume first-unoc if none given.
+    info.spotreplace = info.spotreplace || 'first-unoc';
+
+    // if there is a nodup prop == 1 and spot with spotId exists
+    // don't replace
+    if (info.spotnodup && info.spotnodup === 1 && info.spotdivid)
     {
-      // if there is a nodup prop == 1 and spot with spotId exists
-      // don't replace
-      if (info.spotnodup && info.spotnodup === 1 && info.spotdivid)
-      {
-         div = $('#meeting > #streams > #scarousel #' + info.spotdivid);
-         if (div.length > 0)
-         {
-            return; // spot with id exists so we're done
-         }
-      }
-      spotDiv = getSpotForAdd(info);
-      if (!spotDiv) {throw "couldn't get spot for addSpot";}
-      item = $(spotDiv).data('item');
-      if (!item) {throw "couldn't get item for addSpot";}
-      app.carousel.setSpotNumber(item, info.spotnumber);
+       div = $('#meeting > #streams > #scarousel #' + info.spotdivid);
+       if (div.length > 0)
+       {
+          return; // spot with id exists so we're done
+       }
     }
-    else // add a new spot
-    {
-      spotDiv = app.carousel.createSpot(info);
-    }
+    spotDiv = getSpotForAdd(info);
+    if (!spotDiv) {throw "couldn't get spot for addSpot";}
+    item = $(spotDiv).data('item');
+    if (!item) {throw "couldn't get item for addSpot";}
+    app.carousel.setSpotNumber(item, info.spotnumber);
+
     // set the item spot number to info.spotnumber
     doSpot(spotDiv, info);
     app.carousel.updateAll(); // redraw carousel
