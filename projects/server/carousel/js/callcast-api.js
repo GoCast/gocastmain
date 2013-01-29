@@ -47,6 +47,7 @@ $(document).on('joined_session', function(
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
   app.log(2, 'User has successfully joined the session.');
+  $('#upper-left > #roomname > h3').html('Welcome to ' + $.roomcode.decipherroomname($.urlvars.roomname) + '!');
   /*
    * Enable button activities except join. */
   app.enableButtons(true);
