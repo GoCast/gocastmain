@@ -151,6 +151,26 @@ app.post('/listrooms', function(req, res) {
     }
 });
 
+app.post('/getprofile', function(req, res) {
+
+    if (req.body && req.body.email) {
+        gcutil.log('accounts_service [/getprofile][info]: FormData = ', req.body);
+        api.GetAccount(req.body.email, function(entry) {
+            var toReturn = {};
+            toReturn.name = entry.name;
+
+            res.send('{"result": "success", "data": ' + JSON.stringify(toReturn) + '}');
+        }, function(err) {
+            gcutil.log('accounts_service [/getprofile][error]: ', err);
+            res.send('{"result": "error"}');
+        });
+    }
+    else {
+        gcutil.log('accounts_service [/getprofile][error]: FormData problem in req.body: ', req.body);
+        res.send('{"result": "error"}');
+    }
+});
+
 app.post('/activate', function(req, res) {
     if (req.body && req.body.email && req.body.activation_code) {
 //        gcutil.log('accounts_service [/activate][info]: FormData = ', req.body);
