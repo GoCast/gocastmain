@@ -157,6 +157,9 @@ function apiNewAccount(baseURL, email, password, name, firstRoomName, extras, su
 
             obj.validationCode = actcode;
             obj.password = password;
+            if (name) {
+                obj.name = name;
+            }
 
             if (firstRoomName) {
                 obj.firstRoomName = firstRoomName;
@@ -242,6 +245,16 @@ function apiValidateAccount(email, actcode, success, failure) {
     });
 }
 
+function apiGetAccount(email, success, failure) {
+    // If Account exists, return db entry.
+    db.GetEntryByAccountName(email, function(entry) {
+        success(entry);
+    }, function(err) {
+        // Failure of getting database entry for account.
+        failure('apiGetAccount: account ' + email + ' does not exist.');
+    });
+}
+
 function apiDeleteAccount(email, success, failure) {
     // Check if account with this email exists
     xmpp.AccountAvailable(email, function() {
@@ -300,6 +313,7 @@ apiValidateAccount('rwolff@gocast.it', '85e25a1fea7b001911f791f13180f252', funct
 */
 
 exports.NewAccount = apiNewAccount;
+exports.GetAccount = apiGetAccount;
 exports.ValidateAccount = apiValidateAccount;
 exports.DeleteAccount = apiDeleteAccount;
 exports.ChangePassword = apiChangePassword;
