@@ -226,7 +226,7 @@ GoCastJS.WikiBrowser = function(spotdiv, info) {
 		beginSearch: function(searchkey) {
 			var self = this;
 			$.ajax({
-				url     : 'http://en.wikipedia.org/w/api.php?callback=?&redirects',
+				url     : window.location.protocol + '//en.wikipedia.org/w/api.php?callback=?&redirects',
 				data    : {
 					format: 'json',
 					action: 'parse',

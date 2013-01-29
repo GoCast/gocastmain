@@ -8,6 +8,13 @@ var RegisterView = {
             this.$forms[document.forms[i].id] = $(document.forms[i]);
         }
         this.displaydefaultform($.urlvars.defaultaction);
+
+        if ($.urlvars.utm_source && 'coursera' === $.urlvars.utm_source.toLowerCase()) {
+            $('.span12 img').attr('src','images/molanding_banner_coursera.png');
+            this.$forms['courses-form'].addClass('show');
+        } else {
+            $('.span12 img').attr('src','images/molanding_banner.png');
+        }
     },
     displayform: function(id) {
         for (i in this.$forms) {
@@ -101,6 +108,10 @@ var RegisterApp = {
                     RegisterView.displayalert('activate-form', 'error', 'There was a problem activating your account.');
                 };
             }
+        },
+        'courses-form': {
+            success: function() { return function(response) {}; },
+            failure: function() { return function(error) {}; }
         }
     },
     init: function() {
