@@ -1,12 +1,5 @@
 #!/bin/sh
 server="video.gocast.it"
 dest=ec2-user@$server:scripts/
-scp settings.js $dest
-scp backupPrune.js $dest
-scp serverBot/serverBot.js $dest
-scp serverBot/nodeWB.js $dest
-scp switchboard/switchboard.js $dest
-scp logcatcher/*.js $dest
-scp ../gocastjs/nodejs/* $dest
-scp accounts/server/* $dest
+scp settings.js backupPrune.js serverBot/serverBot.js serverBot/nodeWB.js switchboard/switchboard.js logcatcher/*.js ../gocastjs/nodejs/* accounts/server/* $dest
 
