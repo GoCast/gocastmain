@@ -266,7 +266,7 @@ GoCastJS.IBBTransfer.prototype.internalCloseTransfer = function(keyname, error) 
 GoCastJS.IBBTransfer.prototype.internalProcessClose = function(iq) {
     var child = iq.getChildByAttr('xmlns', 'http://jabber.org/protocol/ibb'),
         sid_inbound, genname, theTransfer,
-        toRun, hashname, room, self = this;
+        toRun, toRunDecoded, hashname, room, self = this;
 
 //    console.log('internalProcessClose: History: ' + this.DumpHistory());
 //    console.log('CLOSE: iq: ', iq);
@@ -302,6 +302,24 @@ GoCastJS.IBBTransfer.prototype.internalProcessClose = function(iq) {
     // Now ensure that hashes/room exists
     if (!test('-d', 'hashes/' + room)) {
         mkdir('hashes/' + room);
+    }
+
+    //
+    // This extra 'decoded' link is being created because the google document viewer actually takes our
+    // link and does a decodeURIComponent() on it without our consent... and so to avoid a large surgery
+    // we decided to create another soft link on the server to satisfy the viewer instead.
+    //
+    // Now ensure that hashes/room exists
+    if (!test('-L', 'hashes/' + decodeURIComponent(room))) {
+// Not making a dir - making a link to a dir        mkdir('hashes/' + decodeURIComponent(room));
+        toRunDecoded = 'ln -f -s "' + room + '" "hashes/' + decodeURIComponent(room) + '"';
+    //    this.log('internalCloseTransfer: Linking: ' + toRun);
+        exec(toRunDecoded, function(code, output) {
+            if (code !== 0) {
+                self.log('internalProcessClose: ERROR running "ln":' + toRunDecoded + ', output:' + output);
+            }
+        });
+
     }
 
     hashname = this.GenHashName(iq);
