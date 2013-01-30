@@ -930,6 +930,7 @@ MucRoom.prototype.handlePresence = function(pres) {
 
                 return;
             }
+            this.SendGroupChat('' + fromnick + ' has entered the room.');
             this.log('Adding: ' + fromjid + ' as Nickname: ' + decodeURI(fromnick));
             this.SendSpotListTo(pres.attrs.from);
         }
@@ -1001,6 +1002,7 @@ MucRoom.prototype.handlePresence = function(pres) {
         }
         else
         {
+            this.SendGroupChat('' + fromnick + ' left the room.');
             //
             // Someone left and it wasn't ourselves.
             //
