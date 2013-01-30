@@ -109,6 +109,7 @@
       <div class="feedback gc-icon" id="feedback" title="Send us your feedback."   onclick="openChat(event);"></div>
       <div class="gc-icon"          id="log"      title="Send log file to GoCast." onClick="sendLogPrompt();"></div>
       <div class="gc-icon"          id="taketour" title="Take a tour of GoCast"    onclick="startTour('body > #tour')"></div>
+      <span id="roomname" style="color: white;"><h3></h3></span>
       <div id="send-log-prompt" class="warning">
         <p id="message">Describe the nature of the problem:</p>
         <textarea id="logdesc"></textarea>
@@ -372,7 +373,7 @@
           <div class="cloudcarousel unoccupied" onclick="carouselItemClick(event);">
             <div class="name"></div>
           </div>
-          <div class="cloudcarousel unoccupied" onclick="carouselItemClick(event);">
+          <!--<div class="cloudcarousel unoccupied" onclick="carouselItemClick(event);">
             <div class="name"></div>
           </div>
           <div class="cloudcarousel unoccupied" onclick="carouselItemClick(event);">
@@ -380,7 +381,7 @@
           </div>
           <div class="cloudcarousel unoccupied" onclick="carouselItemClick(event);">
             <div class="name"></div>
-          </div>
+          </div>-->
         </div><!-- scarousel -->
         <div id="scontrols">
           <!--

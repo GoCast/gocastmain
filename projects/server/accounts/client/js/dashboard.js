@@ -185,7 +185,7 @@ var DashApp = {
         this.$forms[id].ajaxForm(options);
     },
     init: function() {
-        var urlvars = this.urlvars(),
+        var urlvars = $.urlvars,
             self = this, i;
 
         for (i=0; i<document.forms.length; i += 1) {
@@ -213,19 +213,21 @@ var DashApp = {
             DashView.showloader('login-form');
         }
     },
-    urlvars: function() {
-        var urlvarsobj = {},
-        varstring = window.location.href.split('?')[1],
-        nvpairs, i;
+    queryName: function(gotName) {
+        var succCb = gotName || function(name) {},
+            _email = this.boshconn.getEmailFromJid();
 
-        urlvarsobj.baseurl = window.location.href.split('?')[0];
-        if (varstring) {
-            nvpairs = varstring.split('&');
-            for (i in nvpairs) {
-                urlvarsobj[decodeURI(nvpairs[i].split('=')[0])] = decodeURI(nvpairs[i].split('=')[1]);
-            }
-        }
-        return urlvarsobj;
+        $.ajax({
+            url: '/acct/getprofile/',
+            type: 'POST',
+            dataType: 'json',
+            data: { email: _email },
+            success: function(response) {
+                if ('success' === response.result) {
+                    succCb(response.data.name || _email);
+                }
+            },
+        });
     },
     boshconnstatusCallback: function() {
         var self = this;
@@ -237,6 +239,9 @@ var DashApp = {
                 self.setupForm('changepwd-form');
                 DashView.displayform('startmeeting-form');
                 $('body > .navbar .nav').addClass('show');
+                self.queryName(function(name) {
+                    $('body > .navbar .label').html('Hi ' + name + '!');
+                });
             } else if (Strophe.Status.DISCONNECTED === status ||
                        Strophe.Status.TERMINATED === status) {
                 DashView.cancelloader('login-form');

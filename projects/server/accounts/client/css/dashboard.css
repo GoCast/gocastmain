@@ -17,6 +17,10 @@ body > .navbar .nav {
     display: none;
 }
 
+body > .navbar .label {
+    padding: 10px 15px 10px 15px;
+}
+
 body > .navbar .nav.show {
     display: block;
 }
