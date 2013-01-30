@@ -1385,7 +1385,7 @@ MucRoom.prototype.DeleteRoom = function() {
 
 MucRoom.prototype.DeleteAllFileShares = function() {
     var self = this,
-        locFiles, locLinks;
+        locFiles, locLinks, locLinksDecoded;
 
     // Need to basically:
     // a) rm -Rf <dest>/room/
@@ -1395,6 +1395,7 @@ MucRoom.prototype.DeleteAllFileShares = function() {
     if (this.roomname) {
         locFiles = settings.filecatcher.dest + '/' + this.roomname.split('@')[0];
         locLinks = settings.filecatcher.dest + '/hashes/' + this.roomname.split('@')[0];
+        locLinksDecoded = settings.filecatcher.dest + '/hashes/' + decodeURIComponent(this.roomname.split('@')[0]);
 
         if (test('-d', locFiles) && test('-d', locLinks)) {
             exec('rm -Rf "' + locFiles + '"', function(err, out) {
@@ -1406,6 +1407,17 @@ MucRoom.prototype.DeleteAllFileShares = function() {
             exec('rm -Rf "' + locLinks + '"', function(err, out) {
                 if (err) {
                     self.log('DeleteAllFileShares: ERROR: Removing Links directory: ' + locLinks + ' failed. Output: ' + out);
+                }
+            });
+
+            //
+            // This extra 'decoded' link is being removed because the google document viewer actually takes our
+            // link and does a decodeURIComponent() on it without our consent... and so to avoid a large surgery
+            // we decided to create/delete another soft link on the server to satisfy the viewer instead.
+            //
+            exec('rm -Rf "' + locLinksDecoded + '"', function(err, out) {
+                if (err) {
+                    self.log('DeleteAllFileShares: ERROR: Removing Links directory: ' + locLinksDecoded + ' failed. Output: ' + out);
                 }
             });
         }
@@ -1427,7 +1439,7 @@ MucRoom.prototype.DeleteFileShareForSpot = function(spotnumber) {
         return false;
     }
 
-    theLinks = JSON.parse(this.spotList[spotnumber].links);
+    theLinks = JSON.parse(this.spotList[spotnumber].links || '{}');
 
     for (l in theLinks) {
         if (theLinks.hasOwnProperty(l)) {
@@ -1769,6 +1781,33 @@ MucRoom.prototype.SendPrivateChat = function(to, msg) {
 //        this.log('Outbound Private Chat to ' + to + ': ' + msgToSend.root().toString());
 
         this.client.send(msgToSend);
+};
+
+MucRoom.prototype.WelcomeChat = function() {
+    var welcome = 'Welcome to your new GoCast room. This is the public chat area. Please feel free' +
+                  ' to chat with others in the room at any time. You can also have private chats with' +
+                  ' others by clicking on the "balloon" which is on their video window.';
+    // Send out a chat message to the room saying 'Welcome'
+    this.SendGroupChat(welcome);
+};
+
+MucRoom.prototype.AddDefaultSpots = function() {
+    var i, len,
+        spots = [{spottype: 'whiteBoard'},
+                 {spottype: 'editor', code: 'Welcome to your new GoCast. Feel free to edit, remove,' +
+                            ' or add new spots using the tool buttons at the bottom right. And please' +
+                            ' send us feedback (upper left) to let us know your experiences using the service.'},
+                 {spottype: 'wiki', search: 'distance learning'},
+                 {spottype: 'fileshare'}];
+
+    len = spots.length;
+
+    for (i = 0; i < len; i += 1) {
+        // Add any special items to the memory database.
+        this.AddSpotType(spots[i].spottype, spots[i]);
+
+        this.SendGroupCmd('addspot', spots[i]);
+    }
 };
 
 //
@@ -3709,6 +3748,9 @@ Overseer.prototype.CreateRoomRequest = function(iq) {
                                     .c('ok', {xmlns: 'urn:xmpp:callcast', name: roomname});
                 self.log('AddTrackedRoom: INFO: result from room creation is: ' + iqResult.root().toString());
                 self.client.send(iqResult.root());
+
+                self.MucRoomObjects[roomname].AddDefaultSpots();
+                self.MucRoomObjects[roomname].WelcomeChat();
 
                 // Now set the max participants if settings allows it.
                 // Notice that clients setting max participants can only happen when a room is CREATED.

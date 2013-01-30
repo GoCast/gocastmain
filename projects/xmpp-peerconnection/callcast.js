@@ -1849,6 +1849,11 @@ var Callcast = {
 //                $('#room-topic').text(subject);
 //            }
 
+            // Always give the room manager a sane name.
+            if (nick === Strophe.getResourceFromJid(this.overseer)) {
+                nick = 'Room Manager';
+            }
+
             msginfo = { nick: nick, nick_class: nick_class, body: body, delayed: delayed, notice: notice };
 
             // Don't send out an update for a non-existent body message.
@@ -2926,19 +2931,19 @@ var Callcast = {
         //Callcast.connection.addHandler(Callcast.handle_webrtc_message, null, "message", "webrtc-message");
 
         // handle all INVITATIONS to join a session which are sent directly to the jid and not within the MUC
-        this.connection.addHandler(Callcast.CallMsgHandler, Callcast.NS_CALLCAST, 'message', 'chat');
+        this.connection.addHandler(this.CallMsgHandler.bind(this), Callcast.NS_CALLCAST, 'message', 'chat');
 
         // handle all SYNC_LINKS and custom commands within the MUC
-        this.connection.addHandler(Callcast.on_callcast_groupchat_command, Callcast.NS_CALLCAST, 'message', 'groupchat');
+        this.connection.addHandler(this.on_callcast_groupchat_command.bind(this), Callcast.NS_CALLCAST, 'message', 'groupchat');
 
         // handle all GROUP CHATS within the MUC
-        this.connection.addHandler(Callcast.on_public_message, null, 'message', 'groupchat');
+        this.connection.addHandler(this.on_public_message.bind(this), null, 'message', 'groupchat');
 
         // handle all PRIVATE CHATS within the MUC
-        this.connection.addHandler(Callcast.on_private_message, null, 'message', 'chat');
+        this.connection.addHandler(this.on_private_message.bind(this), null, 'message', 'chat');
 
         // handle any inbound error stanzas (for now) via an alert message.
-        this.connection.addHandler(Callcast.onErrorStanza, null, null, 'error');
+        this.connection.addHandler(this.onErrorStanza.bind(this), null, null, 'error');
 
         // Kick things off by refreshing the rooms list.
         this.RefreshRooms();
