@@ -454,7 +454,8 @@ GoCastJS.StropheConnection.prototype = {
 
         // Auto-advance the rid.
         // NOTE: Seems auto-advance causes problems. Skipping for now.
-        rid = parseInt(inRid, 10);
+        rid = parseInt(inRid, 10) - 1;
+//        rid = parseInt(inRid, 10);
         // rid = parseInt(inRid, 10) + 1;
 
         if (this.connection)
