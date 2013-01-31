@@ -309,10 +309,34 @@ function dbVisitorTest1() {
 
 }
 
+function reportTest1() {
+    var today = new Date(), yesterday;
+
+    console.log('DynamoDB Activation report test.');
+
+    console.log('Today is: ', today.toString(), ', #ms: ', today.getTime());
+    yesterday = new Date();
+    yesterday.setDate(today.getDate() - 1);
+    yesterday.setHours(0, 0, 0);    // Rewind to the beginning to the day local time.
+    console.log('Today is: ', yesterday.toString(), ', #ms: ', yesterday.getTime());
+
+//    account = 'bobtestaccount@gmail.com';
+
+    console.log('2. Scan');
+    db.ValidationReport(yesterday.getTime(), function(data) {
+        console.log('Results: ', data);
+    }, function(err) {
+        console.log('Scan failed: ', err);
+    });
+
+}
+
+
 //db2Test1();
 //db2Test2();
 //db2Test3();
 //dbRoomTest1();
 //dbRoomTest2();
 //dbRoomTest3();
-dbVisitorTest1();
+//dbVisitorTest1();
+reportTest1();
