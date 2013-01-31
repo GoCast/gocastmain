@@ -1,23 +1,52 @@
 #!/bin/bash
 
+function genTimestampedHtml() {
+  echo "Generating timestamped html: $1/$2"
+  curtime=`date +%s`
+  sed s/GOCASTTIMESTAMP/$curtime/ $3/$2 >$1/$2
+}
+
 dest=$1
-echo "Publishing in dev mode to $dest"
+mode=$2
+folder=$3
+
+echo "Creating folder: $folder"
+
+mkdir -p $folder
+mkdir -p $folder/img
+mkdir -p $folder/js
+mkdir -p $folder/css
+mkdir -p $folder/css/font
+
+echo "Copying contents to folder: $folder"
 
 # Copy html
-scp -r html/* $dest/
+cp html/* $folder/
 
 # Copy images
-scp -r img/* $dest/img/
-scp -r ../../accounts/client/deps/twitter-bootstrap/img/* $dest/img/
+cp img/* $folder/img/
+cp ../../carousel/images/favicon.ico $folder/img/
+cp ../../accounts/client/deps/twitter-bootstrap/img/* $folder/img/
 
 # Copy css
-scp -r css/* $dest/css/
-scp ../../accounts/client/deps/twitter-bootstrap/css/bootstrap.css $dest/css/
-scp ../../accounts/client/deps/font-awesome/css/font-awesome.css $dest/css/
-scp -r ../../accounts/client/deps/font-awesome/font/* $dest/css/font/
+cp css/* $folder/css/
+cp ../../accounts/client/deps/twitter-bootstrap/css/bootstrap.css $folder/css/
+cp ../../accounts/client/deps/font-awesome/css/font-awesome.css $folder/css/
+cp ../../accounts/client/deps/font-awesome/font/* $folder/css/font/
 
 # Copy js
-scp -r js/* $dest/js/
-scp ../../accounts/client/deps/twitter-bootstrap/js/bootstrap.js $dest/js/
-scp ../../carousel/js/jquery-1.8.1.js $dest/js/
+cp js/* $folder/js/
+cp ../../accounts/client/deps/twitter-bootstrap/js/bootstrap.js $folder/js/
+cp ../../carousel/js/jquery-1.8.1.js $folder/js/
 
+echo "Generating timestamped html"
+
+# Generate timestamped html
+genTimestampedHtml $folder index.html html
+
+if [ $mode = "publish" ]; then
+    echo "Publish started to destination: $dest"
+    scp -r $folder $dest/
+    rm -rf $folder
+    echo "Publish done"
+fi
