@@ -76,3 +76,7 @@ body > .container > .row > .span5 > form .alert {
 body > .container > .row > .span5 > form .alert.show {
     display: block;
 }
+
+body > .container > .row > .span5 > form .alert  a {
+    margin-left: 0px;
+}

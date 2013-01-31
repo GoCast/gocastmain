@@ -39,7 +39,19 @@ var RegisterView = {
         $('.alert', this.$forms[formid]).removeClass('show');
         $alert = $('.alert-' + type, this.$forms[formid]).addClass('show');
         $('p', $alert).html(message);
-    }
+    },
+    showloader: function(formid, $button) {
+        var $btn = $button || $('.btn[type="submit"]', this.$forms[formid]);
+        $btn.addClass('disabled').html('<i class="icon-spinner icon-spin icon-2x"></i>');
+    },
+    cancelloader: function(formid, $button, text) {
+        var submittexts = {
+                'register-form': 'Sign me up'
+            },
+            $btn = $button || $('.btn[type="submit"]', this.$forms[formid]),
+            btntext = text || submittexts[formid];
+        $btn.removeClass('disabled').html(btntext);
+    },
 };
 
 var RegisterApp = {
@@ -48,23 +60,41 @@ var RegisterApp = {
         'register-form': {
             success: function() {
                 return function(response) {
-                    if ('success' === response.result) {
-                        var $desiredroomname = $('#input-desiredroomname', RegisterApp.$forms['register-form']),
-                            $name = $('#input-name', RegisterApp.$forms['register-form']),
-                            msg = 'Thanks for signing up, ' + $name.val() + '!<br>Your account has been created. ' +
-                                  'Look in your inbox for an activation email from GoCast Support, and ' +
-                                  'follow the instructions in it.';
+                    var $desiredroomname = $('#input-desiredroomname', RegisterApp.$forms['register-form']),
+                        $email = $('#input-email', RegisterApp.$forms['register-form']),
+                        $name = $('#input-name', RegisterApp.$forms['register-form']),
+                        $passwd = $('#input-password', RegisterApp.$forms['register-form']),
+                        msg = 'Thanks for signing up, ' + $name.val() + '!<br>Your account has been created. ' +
+                              'Look in your inbox for an activation email from GoCast Support, and ' +
+                              'follow the instructions in it.';
 
+                    RegisterView.cancelloader('register-form');
+                    if ('success' === response.result) {
                         if ($desiredroomname.length && 'undefined' !== typeof(Storage)) {
                             localStorage.gcpDesiredRoomname = $desiredroomname.val();
                         }
-
                         RegisterView.displayform('activate-form');
                         RegisterView.displayalert('activate-form', 'success', msg);
                     } else if ('inuse' === response.result) {
-                        RegisterView.displayalert('register-form', 'error', 'An account for the email address you\'ve provided ' +
-                                                'already exists. Choose a different email address.');
-                        $('#input-email', RegisterApp.$forms['register-form']).focus();
+                        RegisterView.displayalert('register-form', 'error', 'An account for the email address ' +
+                                                  'you\'ve provided already exists. Choose a different email address.');
+                        $email.focus();
+                    } else if ('registered' === response.result) {
+                        RegisterView.displayalert('register-form', 'error', 'There is already an account present for ' +
+                                                  $email.val() + '. It has not been activated yet. If you have not ' +
+                                                  'received an activation email yet, please click below.<br><br>' +
+                                                  '<button class="btn btn-block btn-danger" onclick=' +
+                                                  '"RegisterApp.sendactemail(event, \'' + $email.val() + '\', this);">' +
+                                                  'Send me an activation email</button>');
+                    } else if ('no email' === response.result) {
+                        RegisterView.displayalert('register-form', 'error', 'Please enter a valid email address.');
+                        $email.focus();
+                    } else if ('no name' === response.result) {
+                        RegisterView.displayalert('register-form', 'error', 'Please enter your name.');
+                        $name.focus();
+                    } else if ('no password' === response.result) {
+                        RegisterView.displayalert('register-form', 'error', 'Please choose a password.');
+                        $passwd.focus();
                     } else {
                         RegisterView.displayalert('register-form', 'error', 'There was a problem signing up for your new account.');
                     }
@@ -72,6 +102,7 @@ var RegisterApp = {
             },
             failure: function() {
                 return function(error) {
+                    RegisterView.cancelloader('register-form');
                     RegisterView.displayalert('register-form', 'error', 'There was a problem signing up for your new account.');
                 };
             }
@@ -148,6 +179,7 @@ var RegisterApp = {
 
                 options.beforeSubmit = function(arr, $form, options) {
                     $('#input-email', self.$forms['activate-form']).val($('#input-email', $form).val());
+                    RegisterView.showloader('register-form');
                 };
             }
             this.$forms[document.forms[i].id] = $(document.forms[i]);
@@ -159,6 +191,34 @@ var RegisterApp = {
             $('#input-activation-code', this.$forms['activate-form']).val(urlvars.code);
             $('[type="submit"].btn', this.$forms['activate-form']).click();
         }
+    },
+    sendactemail: function(evt, email, sendbtn) {
+        var $sendbtn = $(sendbtn),
+            _email = email,
+            self = this;
+
+        evt.preventDefault();
+        RegisterView.showloader('register-form', $sendbtn);
+        $.ajax({
+            url: '/acct/sendemailagain/',
+            type: 'POST',
+            dataType: 'json',
+            data: {
+                email: _email,
+                baseurl: $.urlvars.baseurl
+            },
+            success: function(response) {
+                RegisterView.cancelloader('register-form', $sendbtn, 'Send me an activation email');
+                RegisterView.displayform('activate-form');
+                RegisterView.displayalert('activate-form', 'success', 'Look in your inbox for an activation email ' +
+                                          'from GoCast Support, and follow the instructions in it.');
+                $('#input-email', self.$forms['activate-form']).val(_email);
+            },
+            failure: function() {
+                RegisterView.cancelloader('register-form', $sendbtn, 'Send me an activation email');
+                RegisterView.displayalert('register-form', 'error', 'There was a problem sending the activation email.');
+            }
+        });
     }
 };
 
