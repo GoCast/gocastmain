@@ -90,7 +90,16 @@ var app = {
         now = new Date(),
         logText = now.toTimeString().split(' ')[0] + ' ' + labels[logLevel] + ' ' + logMsg,
         msg;
-    if (window.console) {
+
+    //RMW - Only log with Callcast.log if it's available. Don't log to both.
+    if ('undefined' !== typeof(Callcast) &&
+        'undefined' !== typeof(Callcast.log)) {
+      Callcast.log(' ' + labels[logLevel] + ': ' + logMsg);
+      //RMW - however, on ERROR messages, go ahead and duplicate for stack trace value.
+      if (logLevel === 4 && window.console) {
+        console.error(logText);
+      }
+    } else if (window.console) {
       console[['', 'log', 'info', 'warn', 'error', 'error'][logLevel]](logText);
     }
     /*
@@ -101,13 +110,6 @@ var app = {
       alert(msg);
       app.logFatalReported = true;
     }
-
-    // <MANJESH>
-    if ('undefined' !== typeof(Callcast) &&
-        'undefined' !== typeof(Callcast.log)) {
-      Callcast.log(' ' + labels[logLevel] + ': ' + logMsg);
-    }
-    // </MANJESH>
   }, /* app.log() */
   /**
    * Flag to remember if a fatal error was reported through a pop-up

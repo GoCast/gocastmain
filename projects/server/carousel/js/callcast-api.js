@@ -160,7 +160,7 @@ $(document).on('public-message', function(
     {
       $(app.GROUP_CHAT_SHOW).effect("pulsate", { times:5 }, 5 * 2000);
     }
-    console.log('A public message arrived ' + decodeURI(msginfo.nick) + " " + decodeURI(msginfo.body));
+//    console.log('A public message arrived ' + decodeURI(msginfo.nick) + " " + decodeURI(msginfo.body));
   }
   catch(err)
   {
@@ -809,8 +809,8 @@ function doSpot(spotDiv, info)
     var divIcon, divTitle,
         jqDiv = $(spotDiv),
         whiteBoard, editor, wiki, fshare;
-    console.log('doSpot', info);
-    console.log('spotDiv', spotDiv);
+//    console.log('doSpot', info);
+//    console.log('spotDiv', spotDiv);
     if (!spotDiv) {throw "no spotDiv";}
     if (!info || !info.spottype) {throw "spottype not defined";}
     if (info.spottype === 'youtube')

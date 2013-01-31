@@ -77,6 +77,9 @@ GoCastJS.StropheConnection = function(opts) {
     this.connection = new Strophe.Connection(this.boshurl);
 
 //    this.debugXML();
+    if (typeof (Storage) !== 'undefined' && (localStorage.debugXML || localStorage.debugxml)) {
+        this.debugXML();
+    }
 
     // Custom status item.
     Strophe.Status.TERMINATED = 99;
@@ -423,6 +426,7 @@ GoCastJS.StropheConnection.prototype = {
         var ping = $iq({to: this.xmppserver, type: 'get'}).c('ping', {xmlns: 'urn:xmpp:ping'});
         this.log('StropheConnection: Pinging Server as a health-check.');
         this.send(ping);
+        this.flush();
     },
 
     privateSetupPingHandler: function(iq) {
@@ -495,11 +499,11 @@ GoCastJS.StropheConnection.prototype = {
 
         if (bEnable === true || bEnable === null || bEnable === undefined) {
             this.connection.rawInput = function(data) {
-                self.log('RAW-IN: ', $(data).get(0));
+                $.each($(data), function(iter, val) { self.log('RAW-IN: ', val); });
             };
 
             this.connection.rawOutput = function(data) {
-                self.log('RAW-OUT: ', $(data).get(0));
+                $.each($(data), function(iter, val) { self.log('RAW-OUT: ', val); });
             };
         }
         else {
@@ -601,9 +605,12 @@ GoCastJS.StropheConnection.prototype = {
     },
 
     sendIQ: function(elem, callback, errback, timeout) {
+        var ret;
         if (this.connection) {
             try {
-                return this.connection.sendIQ(elem, callback, errback, timeout);
+                ret = this.connection.sendIQ(elem, callback, errback, timeout);
+                this.connection.flush();    // With IQs, we want them sent immediately.
+                return ret;
             }
             catch(e) {
                 console.log('CATCH: ERROR on sendIQ() attempt: ' + e);

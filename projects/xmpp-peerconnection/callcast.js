@@ -2367,6 +2367,11 @@ var Callcast = {
         var roommanager = this.ROOMMANAGER,
             self = this, attrs;
 
+        Callcast.log('CreateUnlistedAndJoin: Creating name: ' + roomname);
+        if (!this.connection) {
+            Callcast.log('CreateUnlistedAndJoin: ERROR - no connection found.');
+        }
+
         attrs = {
             xmlns: this.NS_CALLCAST,
             name: roomname.toLowerCase()
