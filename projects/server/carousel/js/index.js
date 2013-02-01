@@ -2102,6 +2102,7 @@ function handleRoomSetup() {
     // set local spot nick todo find a better place for this
     item = app.carousel.getItem(0);
     app.carousel.setSpotName(item, app.user.name);
+    $('#mystream > .name').text(decodeURI(app.user.name) + ' (me)');
 
     app.log(2, "Room named '" + new_name + "' has been created. Joining now.");
     app.log(2, 'window.location ' + window.location);
