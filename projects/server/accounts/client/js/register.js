@@ -3,8 +3,7 @@
 var RegisterView = {
     $forms: {},
     init: function() {
-        var i, $textfields, $pwdfields, $pwdfield,
-            $placeholders, $placeholder;
+        var i;
 
         for (i=0; i<document.forms.length; i++) {
             this.$forms[document.forms[i].id] = $(document.forms[i]);
@@ -17,11 +16,15 @@ var RegisterView = {
         } else {
             $('.span12 img').attr('src','images/molanding_banner.png');
         }
+    },
+    setupPlaceholders: function(id) {
+        var $textfields, $pwdfields, $pwdfield,
+            $placeholders, $placeholder, $loginform;
 
         if ($.browser.msie && 10.0 > parseFloat($.browser.version)) {
-            $textfields = $('form input[type="text"][name], form input[type="email"][name]');
-            $pwdfields = $('form input[type="password"][name]');
-            $placeholders = $('form input.ie-pwd-placeholder');
+            $textfields = $('form#' + id + ' input[type="text"][name], form input[type="email"][name]');
+            $pwdfields = $('form#' + id + ' input[type="password"][name]');
+            $placeholders = $('form#' + id + ' input.ie-pwd-placeholder');
 
             $textfields.focus(function() {
                 if ($(this).attr('placeholder') === $(this).val()) {
@@ -37,18 +40,18 @@ var RegisterView = {
 
             $pwdfields.blur(function() {
                 if (!$(this).val()) {
-                    $placeholder = $('#' + $(this).attr('formid') + ' #' + $(this).attr('id') + '_placeholder');
+                    $placeholder = $('form#' + id + ' #' + $(this).attr('id') + '_placeholder');
                     $(this).addClass('hide');
                     $placeholder.addClass('show').val($(this).attr('placeholder'));                    
                 }
             }).each(function() {
-                $placeholder = $('#' + $(this).attr('formid') + ' #' + $(this).attr('id') + '_placeholder');
+                $placeholder = $('#' + id + ' #' + $(this).attr('id') + '_placeholder');
                 $(this).addClass('hide');
                 $placeholder.addClass('show').val($(this).attr('placeholder'));
             });
 
             $placeholders.focus(function() {
-                $pwdfield = $('#' + $(this).attr('formid') + ' #' + $(this).attr('id').split('_')[0]);
+                $pwdfield = $('#' + id + ' #' + $(this).attr('id').split('_')[0]);
                 $(this).removeClass('show');
                 $pwdfield.removeClass('hide');
                 $pwdfield.focus();
@@ -61,6 +64,8 @@ var RegisterView = {
             $('.alert', this.$forms[i]).removeClass('show');
         }
         this.$forms[id].addClass('show');
+        this.$forms[id].clearForm();
+        this.setupPlaceholders(id);
     },
     displaydefaultform: function(action) {
         var actions = ['register', 'activate'];
@@ -114,6 +119,8 @@ var RegisterApp = {
                         }
                         RegisterView.displayform('activate-form');
                         RegisterView.displayalert('activate-form', 'success', msg);
+                        $('#input-email', RegisterApp.$forms['activate-form'])
+                            .val($('#input-email', RegisterApp.$forms['register-form']).val());
                     } else if ('inuse' === response.result) {
                         RegisterView.displayalert('register-form', 'error', 'An account for the email address ' +
                                                   'you\'ve provided already exists. Choose a different email address.');
@@ -222,7 +229,6 @@ var RegisterApp = {
                         $('#input-password', $form).focus();
                         return false;
                     }
-                    $('#input-email', self.$forms['activate-form']).val($('#input-email', $form).val());
                     RegisterView.showloader('register-form');
                 };
             }

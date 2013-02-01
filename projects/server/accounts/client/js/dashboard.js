@@ -13,14 +13,14 @@ var DashView = {
         this.displayform('login-form');
         $('body > .navbar .formlink').click(this.changeformCallback());
     },
-    setupPlaceholders: function() {
+    setupPlaceholders: function(id) {
         var $textfields, $pwdfields, $pwdfield,
             $placeholders, $placeholder, $loginform;
 
         if ($.browser.msie && 10.0 > parseFloat($.browser.version)) {
-            $textfields = $('form input[type="text"][name], form input[type="email"][name]');
-            $pwdfields = $('form input[type="password"][name]');
-            $placeholders = $('form input.ie-pwd-placeholder');
+            $textfields = $('form#' + id + ' input[type="text"][name], form input[type="email"][name]');
+            $pwdfields = $('form#' + id + ' input[type="password"][name]');
+            $placeholders = $('form#' + id + ' input.ie-pwd-placeholder');
 
             $textfields.focus(function() {
                 if ($(this).attr('placeholder') === $(this).val()) {
@@ -36,18 +36,18 @@ var DashView = {
 
             $pwdfields.blur(function() {
                 if (!$(this).val()) {
-                    $placeholder = $('#' + $(this).attr('formid') + ' #' + $(this).attr('id') + '_placeholder');
+                    $placeholder = $('form#' + id + ' #' + $(this).attr('id') + '_placeholder');
                     $(this).addClass('hide');
                     $placeholder.addClass('show').val($(this).attr('placeholder'));                    
                 }
             }).each(function() {
-                $placeholder = $('#' + $(this).attr('formid') + ' #' + $(this).attr('id') + '_placeholder');
+                $placeholder = $('#' + id + ' #' + $(this).attr('id') + '_placeholder');
                 $(this).addClass('hide');
                 $placeholder.addClass('show').val($(this).attr('placeholder'));
             });
 
             $placeholders.focus(function() {
-                $pwdfield = $('#' + $(this).attr('formid') + ' #' + $(this).attr('id').split('_')[0]);
+                $pwdfield = $('#' + id + ' #' + $(this).attr('id').split('_')[0]);
                 $(this).removeClass('show');
                 $pwdfield.removeClass('hide');
                 $pwdfield.focus();
@@ -72,7 +72,7 @@ var DashView = {
 
         this.$forms[id].addClass('show');
         this.$forms[id].clearForm();
-        this.setupPlaceholders();
+        this.setupPlaceholders(id);
 
         if ('changepwd-form' === id) {
             $('#input-email', this.$forms[id]).val(DashApp.boshconn.getEmailFromJid());
