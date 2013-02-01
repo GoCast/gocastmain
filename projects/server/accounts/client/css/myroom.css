@@ -89,3 +89,15 @@ body > .container > .row > .span5 > form .alert {
 body > .container > .row > .span5 > form .alert.show {
     display: block;
 }
+
+form .ie-pwd-placeholder {
+    display: none;
+}
+
+form .ie-pwd-placeholder.show {
+    display: block;
+}
+
+form input[type="password"].hide {
+    display: none;
+}
