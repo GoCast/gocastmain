@@ -135,15 +135,23 @@ GoCastJS.StropheConnection.prototype = {
 
     forgetReconnectInfoInLocalStorage: function() {
         if (typeof (Storage) !== 'undefined') {
-            delete localStorage.jid;
-            delete localStorage.rid;
-            delete localStorage.sid;
-            delete localStorage.bAnonymous;
+            if (localStorage.jid) {
+                delete localStorage.jid;
+            }
+            if (localStorage.rid) {
+                delete localStorage.rid;
+            }
+            if (localStorage.sid) {
+                delete localStorage.sid;
+            }
+            if (localStorage.bAnonymous) {
+                delete localStorage.bAnonymous;
+            }
         }
     },
 
-    log: function() {
-        console.log.apply(console, arguments);
+    log: function(arg0, arg1) {
+        console.log(arg0, arg1);
     },
 
     //
