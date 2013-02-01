@@ -72,6 +72,9 @@ app.post('/register', function(req, res) {
             gcutil.log('accounts_service [/register][error]: ', err);
             if ('apiNewAccount: Failed - account already in use.' === err) {
                 res.send('{"result": "inuse"}');
+            }
+            else if ('apiNewAccount: Failed - account registered but not activated.' === err) {
+                res.send('{"result": "registered"}');
             } else {
                 res.send('{"result": "error"}');
             }
@@ -230,6 +233,68 @@ app.post('/changepwd', function(req, res) {
     }
 });
 
+app.post('/resetpasswordrequest', function(req, res) {
+    if (req.body && req.body.email) {
+        gcutil.log('accounts_service [/resetpasswordrequest][info]: FormData = ', req.body);
+        api.GenerateResetPassword(req.body.email, function() {
+            res.send('{"result": "success"}');
+        }, function(err) {
+            gcutil.log('accounts_service [/resetpasswordrequest][error]: ', err);
+            res.send('{"result": "error"}');
+        });
+    }
+    else {
+        gcutil.log('accounts_service [/resetpasswordrequest][error]: FormData problem in req.body: ', req.body);
+
+        if (!req.body.email) {
+            res.send('{"result": "no email"}');
+        }
+        else {
+            res.send('{"result": "error"}');
+        }
+    }
+});
+
+app.post('/resetpasswordlink', function(req, res) {
+    if (req.body && req.body.email && req.body.password && req.body.resetcode) {
+        gcutil.log('accounts_service [/resetpasswordlink][info]: FormData = ', req.body);
+        api.ResetPasswordViaLink(req.body.email, req.body.password, req.body.resetcode, function() {
+            res.send('{"result": "success"}');
+        }, function(err) {
+            gcutil.log('accounts_service [/resetpasswordlink][error]: ', err);
+
+            if ('apiResetPasswordViaLink: Bad reset code.' === err) {
+                res.send('{"result": "bad resetcode"}');
+            }
+            else if ('apiResetPasswordViaLink: Not Activated yet.' === err) {
+                res.send('{"result": "not activated"}');
+            }
+            else if (('apiResetPasswordViaLink: account does not exist: ' + req.body.email) === err) {
+                res.send('{"result": "no account"}');
+            }
+            else {
+                res.send('{"result": "error"}');
+            }
+        });
+    }
+    else {
+        gcutil.log('accounts_service [/resetpasswordlink][error]: FormData problem in req.body: ', req.body);
+
+        if (!req.body.email) {
+            res.send('{"result": "no email"}');
+        }
+        else if (!req.body.resetcode) {
+            res.send('{"result": "no resetcode"}');
+        }
+        else if (!req.body.password) {
+            res.send('{"result": "no password"}');
+        }
+        else {
+            res.send('{"result": "error"}');
+        }
+    }
+});
+
 app.post('/visitorseen', function(req, res) {
     if (req.body && req.body.email) {
         gcutil.log('accounts_service [/visitorseen][info]: FormData = ', req.body);
@@ -242,6 +307,28 @@ app.post('/visitorseen', function(req, res) {
     }
     else {
         gcutil.log('accounts_service [/createroom][error]: FormData problem in req.body: ', req.body);
+
+        if (!req.body.email) {
+            res.send('{"result": "no email"}');
+        }
+        else {
+            res.send('{"result": "error"}');
+        }
+    }
+});
+
+app.post('/sendemailagain', function(req, res) {
+    if (req.body && req.body.baseurl && req.body.email) {
+//        gcutil.log('accounts_service [/sendemailagain][info]: FormData = ', req.body);
+        api.SendEmailAgain(req.body.email, req.body.baseurl, function() {
+            res.send('{"result": "success"}');
+        }, function(err) {
+            gcutil.log('accounts_service [/sendemailagain][error]: ', err);
+            res.send('{"result": "error"}');
+        });
+    }
+    else {
+        gcutil.log('accounts_service [/sendemailagain][error]: FormData problem in req.body: ', req.body);
 
         if (!req.body.email) {
             res.send('{"result": "no email"}');

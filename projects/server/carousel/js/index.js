@@ -2164,6 +2164,10 @@ function handleRoomSetup() {
 
     // display error
     app.log(4, "handleRoomSetup Error " + (iq ? iq.toString() : 'timeout'));
+
+    // TODO: RMW remove this when it is clear the iq-bug is solved - 1/31/2013
+    Callcast.SendLiveLog('Error creating room IQ_BUG for: ' + room_to_create);
+
     $('#errorMsgPlugin > h1').text('Oops!!!');
     $('#errorMsgPlugin > p#prompt').text(errorMsg);
     closeWindow();
@@ -2207,7 +2211,7 @@ function tryPluginInstall(
   var title, prompt;
 
   app.log(2, 'tryPluginInstall');
-  app.tryPluginInstallAttempts++;
+  app.tryPluginInstallAttempts += 1;
   // check plugin installed.
   // if plugin installed but not loaded wait
   // todo get rid of multiple pluginInstalled calls
@@ -2288,7 +2292,7 @@ function tryPluginInstall(
     }
     if (!app.pluginInstalled()) {
        //Callcast.SendLiveLog('Local plugin is not installed.');
-       app.log(2, 'Local plugin not installed.')
+       app.log(2, 'Local plugin not installed.');
     }
     if (app.osPlatform.isLinux64 || app.osPlatform.isLinux32)
     {

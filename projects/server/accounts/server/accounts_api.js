@@ -40,6 +40,39 @@ var db = require('./accounts_db');
 
 'use strict';
 
+function privateGenPasswordResetEmail(baseURL, email, name, resetcode) {
+    var body;
+
+    if (name && name !== '') {
+        body = 'Hello, ' + name + ',';
+    }
+    else {
+        body = 'Hello.';
+    }
+
+    body += '\nWe are sending you this email in response to a request for a password reset ' +
+            'of your account.\n\n';
+
+    body += 'If you did not request a password reset for your GoCast account, please ignore this email entirely.';
+
+    body += 'If you do need to reset your password on GoCast, please click on the link below.';
+
+    body += '\n\nThe password reset link is: ' + baseURL + '?action=resetpassword' +
+            '&resetcode=' + resetcode +
+            '&email=' + email.toLowerCase();
+
+    body += '\n\n';
+    body += 'Once you have reset your password, you can always come to your dashboard at: ' + baseURL.substring(0, baseURL.lastIndexOf('/') + 1);
+    body += '\n\n';
+    body += 'Thanks for using GoCast - we hope you enjoy the service.\n\n';
+
+    body += 'This email was generated in direct response from a password reset request. But you can unsubscribe from any and all further emails at any time.\n';
+
+    body += 'Thanks!\nThe GoCast Team.\n';
+
+    return body;
+}
+
 function privateGenEmail(baseURL, email, name, actcode, extras, bInAppReg) {
     var body;
 
@@ -93,14 +126,10 @@ function privateGenEmail(baseURL, email, name, actcode, extras, bInAppReg) {
     return body;
 }
 
-function privateMatchActivationCodes(actcode1, actcode2) {
-    return true;
-}
-
-function privateSendEmail(toName, toEmail, body, cbSuccess, cbFailure) {
+function privateSendEmail(toName, toEmail, subject, body, cbSuccess, cbFailure) {
     mg.sendText(settings.accounts.inviteFromName + ' <' + settings.accounts.inviteFromAddress + '>',
         [toName + ' <' + toEmail + '>'],
-      settings.accounts.inviteSubject,
+      subject,
       body,
       settings.accounts.inviteFromAddress, {},
       function(err) {
@@ -115,13 +144,51 @@ function privateSendEmail(toName, toEmail, body, cbSuccess, cbFailure) {
     });
 }
 
+//
+// @brief date must be a Date object.
+//
+function privateCalcResetPasswordCode(date, email) {
+    var doy = date.getMonth().toString() + date.getDate() + date.getFullYear();
+//    console.log(doy);
+    return crypto.createHash('md5').update('gcSalt' + doy + email.toLowerCase()).digest('hex');
+}
+
+function privateMatchResetPasswordCode(email, inboundCode) {
+    var doy, dateCheck, calcCode;
+
+    if (inboundCode.length < 32) {
+        gcutil.log('privateMatchResetPasswordCode: ERROR: Bad Code: ' + inboundCode);
+        return false;
+    }
+
+    // First try with today's date...
+    dateCheck = new Date();
+//    console.log('Checking against: ', dateCheck);
+    calcCode = privateCalcResetPasswordCode(dateCheck, email);
+    if (calcCode === inboundCode) {
+        return true;
+    }
+
+    // Now try with yesterday's date...
+    dateCheck = new Date(dateCheck.setDate(dateCheck.getDate() - 1));
+//    console.log('Checking (again) against: ', dateCheck);
+
+    calcCode = privateCalcResetPasswordCode(dateCheck, email);
+    if (calcCode === inboundCode) {
+        return true;
+    }
+
+    return false;
+}
+
 function privateCalcActivationCode(email) {
     return crypto.createHash('md5').update('GoCast' + email).digest('hex');
 }
 
 function privateMatchActivationCodes(longCode, longOrShortCode) {
     if (longCode.length < 32) {
-        throw 'privateMatchActivationCodes: ERROR: Bad longCode: ' + longCode;
+        gcutil.log('privateMatchActivationCodes: ERROR: Bad longCode: ' + longCode);
+        return false;
     }
 
     if (longCode.toUpperCase() === longOrShortCode.toUpperCase()
@@ -135,8 +202,13 @@ function privateMatchActivationCodes(longCode, longOrShortCode) {
 
 function apiNewAccount(baseURL, email, password, name, firstRoomName, extras, success, failure, bInAppReg) {
     // Check if account with this email exists
-    db.EntryExists(email, function() {
-        failure('apiNewAccount: Failed - account already in use.');
+    db.EntryExists(email, function(obj) {
+        if (obj.validated) {
+            failure('apiNewAccount: Failed - account already in use.');
+        }
+        else {
+            failure('apiNewAccount: Failed - account registered but not activated.');
+        }
     }, function() {
         // Doesn't exist, so add account
         xmpp.AddAccount(email, password, name, function() {
@@ -168,7 +240,7 @@ function apiNewAccount(baseURL, email, password, name, firstRoomName, extras, su
             //Now, add pending-activation-db entry for this email
             db.AddEntry(email, obj, function() {
                 //Now, send activation email
-                privateSendEmail(name, email, emailBody, function() {
+                privateSendEmail(name, email, settings.accounts.inviteSubject, emailBody, function() {
                     gcutil.log('Hurray. Another user signed up! I hope ' + email + ' comes back to activate their account.');
                     success();
                 }, function(err) {
@@ -245,6 +317,101 @@ function apiValidateAccount(email, actcode, success, failure) {
     });
 }
 
+function apiSendEmailAgain(email, baseURL, success, failure) {
+    var emailBody;
+
+    // If Account exists, return db entry.
+    db.GetEntryByAccountName(email, function(entry) {
+        if (entry.validated) {
+            // If we're already validated, then give a success but it's really a warning of sorts
+            gcutil.log('apiSendEmailAgain: Activation already complete for ' + email);
+            failure('apiSendEmailAgain: Activation already completed.');
+        }
+        else {
+            // Now, generate activation email
+            emailBody = privateGenEmail(baseURL, email, entry.name, entry.validationCode);
+            privateSendEmail(entry.name, email, settings.accounts.inviteSubject, emailBody, function() {
+                gcutil.log('Re-Sent Registration. Another user signed up! I hope ' + email + ' comes back to activate their account.');
+                success();
+            }, function(err) {
+                failure('apiSendEmailAgain: Email send failure.');
+            });
+        }
+    }, function(err) {
+        // Failure of getting database entry for account.
+        failure('apiSendEmailAgain: account does not exist: ' + email);
+    });
+}
+
+function apiGenerateResetPassword(email, baseURL, success, failure) {
+    var emailBody, resetcode;
+
+    // If Account exists, return db entry.
+    db.GetEntryByAccountName(email, function(entry) {
+        if (!entry.validated) {
+            // If we're not validated, then let them know they just need to finish activating.
+            gcutil.log('apiGenerateResetPassword: Not Activated yet for ' + email);
+            failure('apiGenerateResetPassword: Not Activated yet.');
+        }
+        else {
+            // Now, generate password reset email
+            resetcode = privateCalcResetPasswordCode(new Date(), email);
+            emailBody = privateGenPasswordResetEmail(baseURL, email, entry.name, resetcode);
+
+            privateSendEmail(entry.name, email, 'Reset your GoCast account password', emailBody, function() {
+                gcutil.log('Sent Password-Reset email to ' + email);
+                success();
+            }, function(err) {
+                failure('apiGenerateResetPassword: Email send failure.');
+            });
+        }
+    }, function(err) {
+        // Failure of getting database entry for account.
+        failure('apiGenerateResetPassword: account does not exist: ' + email);
+    });
+}
+
+function apiChangePassword(email, newpassword, success, failure) {
+    xmpp.ChangePassword(email, newpassword, function() {
+        db.UpdateEntry(email, {password: newpassword}, success, failure);
+    }, function() {
+        // If the xmpp change failed, try to change on the db side.
+        // But note - regardless of db change success, this is still a
+        // failure, so both success and failure call the failure callback.
+        db.UpdateEntry(email, {password: newpassword}, success, failure);
+    });
+}
+
+function apiResetPasswordViaLink(email, password, resetcode, success, failure) {
+
+    // If Account exists, return db entry.
+    db.GetEntryByAccountName(email, function(entry) {
+        if (!entry.validated) {
+            // If we're not validated, then let them know they just need to finish activating.
+            gcutil.log('apiResetPasswordViaLink: Not Activated yet for ' + email);
+            failure('apiResetPasswordViaLink: Not Activated yet.');
+        }
+        else {
+            // Now figure out if the reset code is good. If so, then make the change.
+            if (privateMatchResetPasswordCode(email, resetcode)) {
+                apiChangePassword(email, password, function() {
+                    gcutil.log('Password-Reset complete for email: ' + email);
+                    success();
+                }, function(err) {
+                    failure('apiResetPasswordViaLink: password change/reset failure.');
+                });
+            }
+            else {
+                gcutil.log('apiResetPasswordViaLink: Bad reset code given by ' + email);
+                failure('apiResetPasswordViaLink: Bad reset code.');
+            }
+        }
+    }, function(err) {
+        // Failure of getting database entry for account.
+        failure('apiResetPasswordViaLink: account does not exist: ' + email);
+    });
+}
+
 function apiGetAccount(email, success, failure) {
     // If Account exists, return db entry.
     db.GetEntryByAccountName(email, function(entry) {
@@ -272,17 +439,6 @@ function apiDeleteAccount(email, success, failure) {
         });
     });
 
-}
-
-function apiChangePassword(email, newpassword, success, failure) {
-    xmpp.ChangePassword(email, newpassword, function() {
-        db.UpdateEntry(email, {password: newpassword}, success, failure);
-    }, function() {
-        // If the xmpp change failed, try to change on the db side.
-        // But note - regardless of db change success, this is still a
-        // failure, so both success and failure call the failure callback.
-        db.UpdateEntry(email, {password: newpassword}, success, failure);
-    });
 }
 
 function apiNewRoom(email, roomName, success, failure) {
@@ -320,3 +476,6 @@ exports.ChangePassword = apiChangePassword;
 exports.NewRoom = apiNewRoom;
 exports.ListRooms = apiListRooms;
 exports.VisitorSeen = apiVisitorSeen;
+exports.SendEmailAgain = apiSendEmailAgain;
+exports.GenerateResetPassword = apiGenerateResetPassword;
+exports.ResetPasswordViaLink = apiResetPasswordViaLink;

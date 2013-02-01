@@ -31,7 +31,12 @@ var sys = require('util');
 var AWS = require('aws-sdk');
 var _ = require('underscore');
 
-var gcutil = require('./gcutil_node');
+var gcutil;
+try {
+    gcutil = require('./gcutil_node');
+} catch(e) {
+    gcutil = require('../../../gocastjs/nodejs/gcutil_node');
+}
 
 AWS.config.update({accessKeyId: settings.dynamodb.accessKeyId,
                     secretAccessKey: settings.dynamodb.secretAccessKey,
@@ -163,7 +168,20 @@ function errOut(err) {
 }());
 
 function dbAwsObjectRead(awsObj) {
-    var outObj = {};
+    var outObj = {}, outArr;
+
+    if (awsObj instanceof Array) {
+        outArr = [];
+
+//        gcutil.log('Iterating the array and building a return object/array.');
+        _.each(awsObj, function(val, iter) {
+//            gcutil.log('array-iter: iter: ', iter, ', val: ', val);
+            outArr.push(dbAwsObjectRead(val));
+        });
+
+//        gcutil.log('array-iter result: ', outArr);
+        return outArr;
+    }
 
     _.each(awsObj, function(val, iter) {
 //        gcutil.log('iter: ' , iter, ', val: ', val);
@@ -338,14 +356,14 @@ function dbGetEntryByAccountName(accountName, cbSuccess, cbFailure) {
 function dbEntryExists(accountName, cbSuccess, cbFailure) {
     ddb.client.getItem({TableName: theUserTable,
                         Key: { HashKeyElement: { S: accountName.toLowerCase() } },
-                        AttributesToGet: ['bogus']}, function(err, data) {
+                        AttributesToGet: ['validated']}, function(err, data) {
         if (err) {
             errOut(err);
             cbFailure(err);
         }
         else {
             if (data.Item) {
-                cbSuccess();
+                cbSuccess(dbAwsObjectRead(data.Item));
             }
             else {
                 cbFailure({code: 'EntryNotFound', message: 'Requested Entry was not found.'});
@@ -400,16 +418,44 @@ function dbDeleteEntry(accountName, cbSuccess, cbFailure) {
 //
 // @param since - Date() object for when the report should be started - null means no filter
 //
-function dbValidationReport(since) {
-    var startDate = new Date(since);
+function dbValidationReport(since, cbSuccess, cbFailure) {
+    var startDate = new Date(since),
+        outItems = [],
+        scanHandler, scanObj;
 
     if (!since) {
         startDate = new Date(1);    // From 1970
     }
 
-//    ddb.client.scan({TableName: theUserTable,
-//                     AttributesToGet: ['email', 'creationDate', 'validated', 'firstRoomName'],
-//                     }, function())
+    scanObj = {TableName: theUserTable,
+                 AttributesToGet: ['email', 'creationDate', 'validated', 'firstRoomName', 'utm_source', 'utm_campaign'],
+                 Limit: 8,
+                 ScanFilter: { creationDate: {AttributeValueList: [{N: since.toString()}], ComparisonOperator: 'GE'}}
+                 };
+
+    scanHandler = function(err, data) {
+        if (err) {
+            gcutil.log('dbValidationReport: ERROR: ', err);
+            cbFailure(err);
+        }
+        else {
+            if (data.LastEvaluatedKey) {
+                gcutil.log('Received: ' + data.Count + ' items. Continuing scan - next iteration...');
+                outItems.push.apply(outItems, dbAwsObjectRead(data.Items));
+
+                scanObj.ExclusiveStartKey = data.LastEvaluatedKey;
+                ddb.client.scan(scanObj, scanHandler);
+            }
+            else {
+                outItems.push.apply(outItems, dbAwsObjectRead(data.Items));
+
+                gcutil.log('Scan complete. Found a total of: ' + outItems.length + ' items.');
+                cbSuccess(outItems);
+            }
+        }
+     };
+
+    ddb.client.scan(scanObj, scanHandler);
 
 }
 
@@ -607,3 +653,4 @@ exports.CreateRoom = dbCreateRoom;
 exports.DeleteRoom = dbDeleteRoom;
 exports.ListRooms = dbListRooms;
 exports.VisitorSeen = dbVisitorSeen;
+exports.ValidationReport = dbValidationReport;

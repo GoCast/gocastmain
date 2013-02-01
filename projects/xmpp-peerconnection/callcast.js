@@ -2925,7 +2925,13 @@ var Callcast = {
     },
 
     finalizeConnect: function() {
+        // RMW odd error where room creation iq is seen by the server but unable to be sent back.
+        // Could be because our presence is not 'felt' yet. This can be related to the re-attach.
         this.connection.send($pres());
+        this.connection.flush();
+        this.connection.send($pres());
+        this.connection.flush();
+
         if (this.fbsr && this.fbsr !== '') {
             this.SendFBPres();
         }
