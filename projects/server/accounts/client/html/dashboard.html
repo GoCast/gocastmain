@@ -74,6 +74,7 @@
                                 <div class="controls" align="center">
                                     <button type="submit" class="btn btn-primary pull-right"> Log me in </button>
                                     <a href="register.html" class="btn btn-link pull-left"> I want to sign up </a>
+                                    <a href="javascript:DashView.displayform('reqresetpwd-form')" class="btn btn-link pull-left"> Forgot password </a>
                                 </div>
                             </div>
                         </fieldset>
@@ -88,7 +89,7 @@
                             </div>
                             <div class="control-group">
                                 <div class="controls" align="center">
-                                    <input id="input-password" type="password" name="new_password" placeholder=" New Password" required class="span4">
+                                    <input id="input-password" type="password" name="new_password" placeholder=" New password" required class="span4">
                                     <input id="input-password_placeholder" class="ie-pwd-placeholder span4" type="text">
                                 </div>
                             </div>
@@ -129,6 +130,60 @@
                             </div>
                             <div class="alert alert-success">
                                <h4><i class="icon-ok-sign"></i></h4><p style="padding-left: 25px;"></p>
+                            </div>
+                        </fieldset>
+                    </form>
+                    <form id="reqresetpwd-form" class="form-horizontal" action="/acct/resetpasswordrequest/" method="post">
+                        <fieldset>
+                            <legend>&nbsp;Request password reset</legend>
+                            <div class="control-group">
+                                <div class="controls" align="center">
+                                    <input id="input-email" type="email" name="email" placeholder=" Email associated with your account" required class="span4">
+                                </div>
+                            </div>
+                            <div class="alert alert-error">
+                                <h4><i class="icon-warning-sign"></i></h4><p style="padding-left: 25px;"></p>
+                            </div>
+                            <div class="alert alert-success">
+                               <h4><i class="icon-ok-sign"></i></h4><p style="padding-left: 25px;"></p>
+                            </div>
+                            <div class="control-group">
+                                <div id="controls" align="center">
+                                    <button type="submit" class="btn btn-primary pull-right"> Send me a password reset email </button>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </form>
+                    <form id="resetpwd-form" class="form-horizontal" action="/acct/resetpasswordlink/" method="post">
+                        <fieldset>
+                            <legend>&nbsp;Reset password</legend>
+                            <div class="control-group">
+                                <div class="controls" align="center">
+                                    <input id="input-email" type="email" name="email" placeholder=" Email associated with your account" required class="span4">
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <div class="controls" align="center">
+                                    <input id="input-password" type="password" name="password" placeholder=" New password" required class="span4">
+                                    <input id="input-password_placeholder" class="ie-pwd-placeholder span4" type="text">
+                                </div>
+                            </div>
+                            <div class="control-group" align="center">
+                                <div class="controls">
+                                    <input id="input-confirmpassword" type="password" name="confirm_password" placeholder=" Confirm new password" required class="span4">
+                                    <input id="input-confirmpassword_placeholder" class="ie-pwd-placeholder span4" type="text">
+                                </div>
+                            </div>
+                            <div class="alert alert-error">
+                                <h4><i class="icon-warning-sign"></i></h4><p style="padding-left: 25px;"></p>
+                            </div>
+                            <div class="alert alert-success">
+                               <h4><i class="icon-ok-sign"></i></h4><p style="padding-left: 25px;"></p>
+                            </div>
+                            <div class="control-group">
+                                <div id="controls" align="center">
+                                    <button type="submit" class="btn btn-primary pull-right"> Reset my password </button>
+                                </div>
                             </div>
                         </fieldset>
                     </form>

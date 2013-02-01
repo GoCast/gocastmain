@@ -118,7 +118,7 @@ var RegisterApp = {
                         msg = 'Thanks for signing up, ' + $name.val() + '!<br>Your account has been created. ' +
                               'Look in your inbox for an activation email from GoCast Support, and ' +
                               'follow the instructions in it.<br><br><span class="label label-info">' +
-                              'If the email is\'nt in your inbox, check your spam folder.</span>';
+                              'If the email isn\'t in your inbox, check your spam folder.</span>';
 
                     RegisterView.cancelloader('register-form');
                     if ('success' === response.result) {
@@ -286,7 +286,7 @@ var RegisterApp = {
                 RegisterView.displayform('activate-form');
                 RegisterView.displayalert('activate-form', 'success', 'Look in your inbox for an activation email ' +
                                           'from GoCast Support, and follow the instructions in it.<br><br>' +
-                                          '<span class="label label-info">If the email is\'nt in your '+
+                                          '<span class="label label-info">If the email isn\'t in your '+
                                           'inbox, check your spam folder.</span>');
                 $('#input-email', self.$forms['activate-form']).val(_email);
             },

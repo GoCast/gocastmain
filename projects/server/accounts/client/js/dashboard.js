@@ -17,7 +17,12 @@ var DashView = {
             this.$forms[document.forms[i].id] = $(document.forms[i]);
         }
 
-        this.displayform('login-form');
+        if ($.urlvars.action && 'resetpassword' === $.urlvars.action) {
+            this.displayform('resetpwd-form');
+        } else {
+            this.displayform('login-form');
+        }
+
         $('body > .navbar .formlink').click(this.changeformCallback());
     },
     setupPlaceholders: function(id) {
@@ -69,7 +74,10 @@ var DashView = {
                 'startmeeting-form': 'Enter the name of the room which you want to create or go into. You will ' +
                                      'then be provided with a unique link for that room. You can invite others ' +
                                      'by emailing that link to them.<br>Click on the \'Take me to my room\' button ' +
-                                     'to enter the room.'
+                                     'to enter the room.',
+                'reqresetpwd-form': 'An email will be sent to the address associated with your account. Follow the ' +
+                                    'instructions in it to reset the password for your account.',
+                'resetpwd-form': 'Submit your new password and use it to log in to GoCast from now on.'
             };
 
         for (i in this.$forms) {
@@ -83,20 +91,23 @@ var DashView = {
 
         if ('changepwd-form' === id) {
             $('#input-email', this.$forms[id]).val(DashApp.boshconn.getEmailFromJid());
-        }
-
-        if ('login-form' === id && $.urlvars.ecode) {
+        } else if ('login-form' === id && $.urlvars.ecode) {
             email = $.roomcode.decipheruname($.urlvars.ecode);
             $('#input-email', this.$forms[id]).val(email);
-        }
-
-        if ('startmeeting-form' === id && 'undefined' !== typeof(Storage)) {
+        } else if ('startmeeting-form' === id) {
             if ($.browser.msie) {
                 $('#input-roomname', this.$forms[id]).blur();
             }
-            if (localStorage.gcpDesiredRoomname) {
+            if ('undefined' !== typeof(Storage) && localStorage.gcpDesiredRoomname) {
                 $('#input-roomname', this.$forms[id]).val(decodeURI(localStorage.gcpDesiredRoomname));
                 delete localStorage.gcpDesiredRoomname;
+            }
+        } else if ('reqresetpwd-form' === id && !$.browser.msie) {
+            $('#input-email', this.$forms[id]).focus();
+        } else if ('resetpwd-form' === id) {
+            $('#input-email', this.$forms[id]).val($.urlvars.email||'');
+            if (!$.browser.msie) {
+                $('#input-password', this.$forms[id]).focus();
             }
         }
 
@@ -120,7 +131,9 @@ var DashView = {
         var submittexts = {
             'login-form': 'Log me in',
             'changepwd-form': 'Change my password',
-            'startmeeting-form': 'Create my room'
+            'startmeeting-form': 'Create my room',
+            'reqresetpwd-form': 'Send me a password reset email',
+            'resetpwd-form': 'Reset my password'
         };
         $('.btn[type="submit"]', this.$forms[formid]).removeClass('disabled')
                                                           .html(submittexts[formid]);
@@ -179,8 +192,8 @@ var DashApp = {
         'changepwd-form': {
             success: function() {
                 return function(response) {
+                    DashView.cancelloader('changepwd-form');
                     if ('success' === response.result) {
-                        DashView.cancelloader('changepwd-form');
                         DashView.displayform('startmeeting-form');
                         DashView.displayalert('startmeeting-form', 'success', 'Your password has been changed. Use your ' +
                                               'new password to login from now on.');
@@ -213,8 +226,9 @@ var DashApp = {
                 return function(response) {
                     var roomlinkrel, atag, rcode,
                         roomname = $('#input-roomname', DashApp.$forms['startmeeting-form']).val();
+
+                    DashView.cancelloader('startmeeting-form');
                     if('success' === response.result) {
-                        DashView.cancelloader('startmeeting-form');
                         rcode = $.roomcode.cipher(DashApp.boshconn.getEmailFromJid().replace(/@/, '~'), roomname);
                         roomlinkrel = window.location.pathname.replace(/dashboard\.html*$/, '') + '?roomname=' + rcode;
                         atag = document.createElement('a');
@@ -243,6 +257,85 @@ var DashApp = {
                 };
             },
             data: function() { return {email: DashApp.boshconn.getEmailFromJid()}; }
+        },
+        'reqresetpwd-form': {
+            success: function() {
+                return function(response) {
+                    DashView.cancelloader('reqresetpwd-form');
+                    if ('success' === response.result) {
+                        DashView.displayform('login-form');
+                        DashView.displayalert('login-form', 'success', 'An email has been sent to the address you ' +
+                                              'provided. Follow the instructions in it to reset your password. ' +
+                                              '<br><br><span class="label label-info">If the email isn\'t in your ' +
+                                              'inbox, check your spam folder.</span>');
+                    } else {
+                        DashView.displayalert('reqresetpwd-form', 'error', 'There was a problem requesting your password ' +
+                                              'reset.');
+                    }
+                };
+            },
+            failure: function() {
+                return function(error) {
+                    DashView.cancelloader('reqresetpwd-form');
+                    DashView.displayalert('reqresetpwd-form', 'error', 'There was a problem requesting your password ' +
+                                          'reset.');
+                };
+            },
+            beforesubmit: function() {
+                return function(arr, $form, options) {
+                    var email = $('#input-email', $form).val().trim();
+
+                    $('#input-email', $form).val(email);
+                    if (1 < email.split(' ').length || -1 === email.indexOf('@')) {
+                        RegisterView.displayalert('reqresetpwd-form', 'error', 'Please enter a valid email address.');
+                        $('#input-email', $form).focus();
+                        return false;
+                    }
+                    DashView.showloader('reqresetpwd-form');
+                };
+            },
+            data: function() { return {baseurl: $.urlvars.baseurl}; }
+        },
+        'resetpwd-form': {
+            success: function() {
+                return function(response) {
+                    DashView.cancelloader('resetpwd-form');
+                    if ('success' === response.result) {
+                        DashView.displayform('login-form');
+                        $('#input-email', DashApp.$forms['login-form']).val($.urlvars.email||'');
+                        DashView.displayalert('login-form', 'success', 'You have successfully reset your password. ' +
+                                              'You can now use your new password to log in.');
+                    } else if ('bad resetcode' === response.result) {
+                        DashView.displayalert('resetpwd-form', 'error', 'Password reset failed. The reset code you\'ve ' +
+                                              'provided is invalid.');
+                    } else if ('not activated' === response.result) {
+                        DashView.displayalert('resetpwd-form', 'error', 'Password reset failed. The account asssociated ' +
+                                              'with the email address has not been activated yet.');
+                    } else if ('no account' === response.result) {
+                        DashView.displayalert('resetpwd-form', 'error', 'Password reset failed. There is no account ' +
+                                              'associated with this email address.');
+                    } else {
+                        DashView.displayalert('resetpwd-form', 'error', 'There was a problem resetting your password.');
+                    }
+                };
+            },
+            failure: function() {
+                return function(error) {
+                    DashView.cancelloader('resetpwd-form');
+                    DashView.displayalert('resetpwd-form', 'error', 'There was a problem resetting your password.');
+                };
+            },
+            beforesubmit: function() {
+                return function(arr, $form, options) {
+                    if ($('#input-password', $form).val() !== $('#input-confirmpassword', $form).val()) {
+                        DashView.displayalert('resetpwd-form', 'error', 'The password fields don\'t match.');
+                        $('#input-password', $form).focus();
+                        return false;
+                    }
+                    DashView.showloader('resetpwd-form');
+                };
+            },
+            data: function() { return {resetcode: $.urlvars.resetcode||''}; }
         }
     },
     setupForm: function(id) {
@@ -253,7 +346,7 @@ var DashApp = {
             error: this.formCallbacks[id].failure()
         };
 
-        if ( this.formCallbacks[id].data) {
+        if (this.formCallbacks[id].data) {
             options.data = this.formCallbacks[id].data();
         }
         this.$forms[id].ajaxForm(options);
@@ -269,6 +362,8 @@ var DashApp = {
         this.settings = new GoCastJS.CallcastSettings(window.location.hostname);
 
         this.setupForm('login-form');
+        this.setupForm('reqresetpwd-form');
+        this.setupForm('resetpwd-form');
         this.boshconn = new GoCastJS.StropheConnection({
             boshurl: '/xmpp-httpbind',
             xmppserver: this.settings.get('CALLCAST_XMPPSERVER'),
@@ -282,7 +377,7 @@ var DashApp = {
                                   'You can now login with your new account.');
         }
 
-        if (this.boshconn.hasSavedRegisteredLoginInfo()) {
+        if ('resetpassword' !== $.urlvars.action && this.boshconn.hasSavedRegisteredLoginInfo()) {
             this.boshconn.autoConnect();
             DashView.showloader('login-form');
         }

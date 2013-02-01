@@ -236,7 +236,7 @@ app.post('/changepwd', function(req, res) {
 app.post('/resetpasswordrequest', function(req, res) {
     if (req.body && req.body.email) {
         gcutil.log('accounts_service [/resetpasswordrequest][info]: FormData = ', req.body);
-        api.GenerateResetPassword(req.body.email, function() {
+        api.GenerateResetPassword(req.body.email, req.body.baseurl, function() {
             res.send('{"result": "success"}');
         }, function(err) {
             gcutil.log('accounts_service [/resetpasswordrequest][error]: ', err);
