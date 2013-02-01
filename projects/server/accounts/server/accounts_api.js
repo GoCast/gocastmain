@@ -53,11 +53,11 @@ function privateGenPasswordResetEmail(baseURL, email, name, resetcode) {
     body += '\nWe are sending you this email in response to a request for a password reset ' +
             'of your account.\n\n';
 
-    body += 'If you did not request a password reset for your GoCast account, please ignore this email entirely.';
+    body += 'If you did not request a password reset for your GoCast account, please ignore this email entirely. ';
 
-    body += 'If you do need to reset your password on GoCast, please click on the link below.';
+    body += 'To reset your GoCast account password, please click on the link below.';
 
-    body += '\n\nThe password reset link is: ' + baseURL + '?action=resetpassword' +
+    body += '\n\nYour password reset link is: ' + baseURL + '?action=resetpassword' +
             '&resetcode=' + resetcode +
             '&email=' + email.toLowerCase();
 
@@ -66,9 +66,8 @@ function privateGenPasswordResetEmail(baseURL, email, name, resetcode) {
     body += '\n\n';
     body += 'Thanks for using GoCast - we hope you enjoy the service.\n\n';
 
-    body += 'This email was generated in direct response from a password reset request. But you can unsubscribe from any and all further emails at any time.\n';
-
-    body += 'Thanks!\nThe GoCast Team.\n';
+    body += 'The GoCast Team.\n\n';
+    body += 'This email was generated in direct response to a password reset request on the GoCast site. But you can unsubscribe from any and all further emails at any time.\n';
 
     return body;
 }
