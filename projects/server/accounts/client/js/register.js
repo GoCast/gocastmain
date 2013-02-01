@@ -1,5 +1,12 @@
 /*jslint sloppy: false, todo: true, white: true, browser: true, devel: true */
 /*global document */
+
+(function() { if(typeof String.prototype.trim !== 'function') {
+  String.prototype.trim = function() {
+    return this.replace(/^\s+|\s+$/g, '');
+  };
+} }());
+
 var RegisterView = {
     $forms: {},
     init: function() {
@@ -42,7 +49,7 @@ var RegisterView = {
                 if (!$(this).val()) {
                     $placeholder = $('form#' + id + ' #' + $(this).attr('id') + '_placeholder');
                     $(this).addClass('hide');
-                    $placeholder.addClass('show').val($(this).attr('placeholder'));                    
+                    $placeholder.addClass('show').val($(this).attr('placeholder'));
                 }
             }).each(function() {
                 $placeholder = $('#' + id + ' #' + $(this).attr('id') + '_placeholder');

@@ -1,6 +1,13 @@
 /*jslint sloppy: false, white: true, todo: true, browser: true, devel: true */
 /*global document, window, DashApp */
 'use strict';
+
+(function() { if(typeof String.prototype.trim !== 'function') {
+  String.prototype.trim = function() {
+    return this.replace(/^\s+|\s+$/g, '');
+  };
+} }());
+
 var DashView = {
     $forms: {},
     init: function() {
@@ -38,7 +45,7 @@ var DashView = {
                 if (!$(this).val()) {
                     $placeholder = $('form#' + id + ' #' + $(this).attr('id') + '_placeholder');
                     $(this).addClass('hide');
-                    $placeholder.addClass('show').val($(this).attr('placeholder'));                    
+                    $placeholder.addClass('show').val($(this).attr('placeholder'));
                 }
             }).each(function() {
                 $placeholder = $('#' + id + ' #' + $(this).attr('id') + '_placeholder');
@@ -125,7 +132,7 @@ var DashView = {
         return function(e) {
             var evt = e || window.event;
             self.displayform($(this).attr('href').replace(/^#/, ''));
-            
+
             if (evt.preventDefault) {
                 evt.preventDefault();
             } else {
@@ -293,7 +300,7 @@ var DashApp = {
                 if ('success' === response.result) {
                     succCb(response.data.name || _email);
                 }
-            },
+            }
         });
     },
     boshconnstatusCallback: function() {
