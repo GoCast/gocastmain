@@ -3,7 +3,9 @@
 var RegisterView = {
     $forms: {},
     init: function() {
-        var i;
+        var i, $textfields, $pwdfields, $pwdfield,
+            $placeholders, $placeholder;
+
         for (i=0; i<document.forms.length; i++) {
             this.$forms[document.forms[i].id] = $(document.forms[i]);
         }
@@ -14,6 +16,43 @@ var RegisterView = {
             this.$forms['courses-form'].addClass('show');
         } else {
             $('.span12 img').attr('src','images/molanding_banner.png');
+        }
+
+        if ($.browser.msie && 10.0 > parseFloat($.browser.version)) {
+            $textfields = $('form input[type="text"][name], form input[type="email"][name]');
+            $pwdfields = $('form input[type="password"][name]');
+            $placeholders = $('form input.ie-pwd-placeholder');
+
+            $textfields.focus(function() {
+                if ($(this).attr('placeholder') === $(this).val()) {
+                    $(this).val('');
+                }
+            }).blur(function() {
+                if (!$(this).val()) {
+                    $(this).val($(this).attr('placeholder'));
+                }
+            }).each(function() {
+                $(this).val($(this).attr('placeholder'));
+            });
+
+            $pwdfields.blur(function() {
+                if (!$(this).val()) {
+                    $placeholder = $('#' + $(this).attr('formid') + ' #' + $(this).attr('id') + '_placeholder');
+                    $(this).addClass('hide');
+                    $placeholder.addClass('show').val($(this).attr('placeholder'));                    
+                }
+            }).each(function() {
+                $placeholder = $('#' + $(this).attr('formid') + ' #' + $(this).attr('id') + '_placeholder');
+                $(this).addClass('hide');
+                $placeholder.addClass('show').val($(this).attr('placeholder'));
+            });
+
+            $placeholders.focus(function() {
+                $pwdfield = $('#' + $(this).attr('formid') + ' #' + $(this).attr('id').split('_')[0]);
+                $(this).removeClass('show');
+                $pwdfield.removeClass('hide');
+                $pwdfield.focus();
+            });
         }
     },
     displayform: function(id) {
@@ -178,6 +217,11 @@ var RegisterApp = {
                 }
 
                 options.beforeSubmit = function(arr, $form, options) {
+                    if ($('#input-password', $form).val() !== $('#input-confirmpassword', $form).val()) {
+                        RegisterView.displayalert('register-form', 'error', 'The password fields don\'t match.');
+                        $('#input-password', $form).focus();
+                        return false;
+                    }
                     $('#input-email', self.$forms['activate-form']).val($('#input-email', $form).val());
                     RegisterView.showloader('register-form');
                 };

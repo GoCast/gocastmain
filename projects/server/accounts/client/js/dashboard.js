@@ -5,11 +5,54 @@ var DashView = {
     $forms: {},
     init: function() {
         var i;
+
         for (i = 0; i < document.forms.length; i += 1) {
             this.$forms[document.forms[i].id] = $(document.forms[i]);
         }
+
         this.displayform('login-form');
         $('body > .navbar .formlink').click(this.changeformCallback());
+    },
+    setupPlaceholders: function() {
+        var $textfields, $pwdfields, $pwdfield,
+            $placeholders, $placeholder, $loginform;
+
+        if ($.browser.msie && 10.0 > parseFloat($.browser.version)) {
+            $textfields = $('form input[type="text"][name], form input[type="email"][name]');
+            $pwdfields = $('form input[type="password"][name]');
+            $placeholders = $('form input.ie-pwd-placeholder');
+
+            $textfields.focus(function() {
+                if ($(this).attr('placeholder') === $(this).val()) {
+                    $(this).val('');
+                }
+            }).blur(function() {
+                if (!$(this).val()) {
+                    $(this).val($(this).attr('placeholder'));
+                }
+            }).each(function() {
+                $(this).val($(this).attr('placeholder'));
+            });
+
+            $pwdfields.blur(function() {
+                if (!$(this).val()) {
+                    $placeholder = $('#' + $(this).attr('formid') + ' #' + $(this).attr('id') + '_placeholder');
+                    $(this).addClass('hide');
+                    $placeholder.addClass('show').val($(this).attr('placeholder'));                    
+                }
+            }).each(function() {
+                $placeholder = $('#' + $(this).attr('formid') + ' #' + $(this).attr('id') + '_placeholder');
+                $(this).addClass('hide');
+                $placeholder.addClass('show').val($(this).attr('placeholder'));
+            });
+
+            $placeholders.focus(function() {
+                $pwdfield = $('#' + $(this).attr('formid') + ' #' + $(this).attr('id').split('_')[0]);
+                $(this).removeClass('show');
+                $pwdfield.removeClass('hide');
+                $pwdfield.focus();
+            });
+        }
     },
     displayform: function(id) {
         var i, email,
@@ -29,6 +72,7 @@ var DashView = {
 
         this.$forms[id].addClass('show');
         this.$forms[id].clearForm();
+        this.setupPlaceholders();
 
         if ('changepwd-form' === id) {
             $('#input-email', this.$forms[id]).val(DashApp.boshconn.getEmailFromJid());
@@ -40,6 +84,9 @@ var DashView = {
         }
 
         if ('startmeeting-form' === id && 'undefined' !== typeof(Storage)) {
+            if ($.browser.msie) {
+                $('#input-roomname', this.$forms[id]).blur();
+            }
             if (localStorage.gcpDesiredRoomname) {
                 $('#input-roomname', this.$forms[id]).val(decodeURI(localStorage.gcpDesiredRoomname));
                 delete localStorage.gcpDesiredRoomname;
@@ -76,8 +123,9 @@ var DashView = {
         var self = this;
 
         return function(e) {
+            var evt = e || window.event;
             self.displayform($(this).attr('href').replace(/^#/, ''));
-            e.preventDefault();
+            evt.preventDefault();
         };
     }
 };
@@ -130,6 +178,11 @@ var DashApp = {
             },
             beforesubmit: function() {
                 return function(arr, $form, options) {
+                    if ($('#input-password', $form).val() !== $('#input-confirmpassword', $form).val()) {
+                        DashView.displayalert('changepwd-form', 'error', 'The password fields don\'t match.');
+                        $('#input-password', $form).focus();
+                        return false;
+                    }
                     DashView.showloader('changepwd-form');
                 };
             }
@@ -263,8 +316,9 @@ var DashApp = {
         var self = this;
 
         return function(e) {
+            var evt = e || window.event;
             self.boshconn.disconnect();
-            e.preventDefault();
+            evt.preventDefault();
         };
     }
 };

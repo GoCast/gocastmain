@@ -80,3 +80,15 @@ body > .container > .row > .span5 > form .alert.show {
 body > .container > .row > .span5 > form .alert  a {
     margin-left: 0px;
 }
+
+form .ie-pwd-placeholder {
+    display: none;
+}
+
+form .ie-pwd-placeholder.show {
+    display: block;
+}
+
+form input[type="password"].hide {
+    display: none;
+}

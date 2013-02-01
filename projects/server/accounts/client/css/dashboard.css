@@ -96,3 +96,24 @@ body > .container > .row > .span5 > form .alert.show {
 body > .container > .row > .span5 > form .alert  a {
     margin-left: 0px;
 }
+
+form .ie-pwd-placeholder {
+    display: none;
+}
+
+form .ie-pwd-placeholder.show {
+    display: block;
+}
+
+form input[type="password"].hide {
+    display: none;
+}
+
+/*form#login-form button[type="submit"].hide,
+form#login-form button#ie-login-button {
+    display: none;
+}
+
+form#login-form button#ie-login-button.show {
+    display: block;
+}*/
