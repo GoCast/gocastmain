@@ -240,7 +240,15 @@ app.post('/resetpasswordrequest', function(req, res) {
             res.send('{"result": "success"}');
         }, function(err) {
             gcutil.log('accounts_service [/resetpasswordrequest][error]: ', err);
-            res.send('{"result": "error"}');
+            if ('apiGenerateResetPassword: Not Activated yet.' === err) {
+                res.send('{"result": "not activated"}');
+            }
+            else if (('apiGenerateResetPassword: account does not exist: ' + req.body.email) === err) {
+                res.send('{"result": "no account"}');
+            }
+            else {
+                res.send('{"result": "error"}');
+            }
         });
     }
     else {
