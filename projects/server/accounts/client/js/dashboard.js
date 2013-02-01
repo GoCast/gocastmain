@@ -146,11 +146,20 @@ var DashApp = {
             },
             beforesubmit: function() {
                 return function(arr, $form, options) {
-                    DashApp.boshconn.connect({
-                        username: $('#input-email', $form).val(),
-                        password: $('#input-password', $form).val()
-                    });
-                    DashView.showloader('login-form');
+                    var email = $('#input-email', $form).val().trim();
+
+                    $('#input-email', $form).val(email);
+                    if (1 < email.split(' ').length || -1 === email.indexOf('@')) {
+                        RegisterView.displayalert('register-form', 'error', 'Please enter a valid email address.');
+                        $('#input-email', $form).focus();
+                    } else {
+                        DashApp.boshconn.connect({
+                            username: $('#input-email', $form).val(),
+                            password: $('#input-password', $form).val()
+                        });
+                        DashView.showloader('login-form');
+                    }
+
                     return false;
                 };
             }

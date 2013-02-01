@@ -110,7 +110,8 @@ var RegisterApp = {
                         $passwd = $('#input-password', RegisterApp.$forms['register-form']),
                         msg = 'Thanks for signing up, ' + $name.val() + '!<br>Your account has been created. ' +
                               'Look in your inbox for an activation email from GoCast Support, and ' +
-                              'follow the instructions in it.';
+                              'follow the instructions in it.<br><br><span class="label label-info">' +
+                              'If the email is\'nt in your inbox, check your spam folder.</span>';
 
                     RegisterView.cancelloader('register-form');
                     if ('success' === response.result) {
@@ -224,11 +225,22 @@ var RegisterApp = {
                 }
 
                 options.beforeSubmit = function(arr, $form, options) {
+                    var email;
+
                     if ($('#input-password', $form).val() !== $('#input-confirmpassword', $form).val()) {
                         RegisterView.displayalert('register-form', 'error', 'The password fields don\'t match.');
                         $('#input-password', $form).focus();
                         return false;
                     }
+
+                    email = $('#input-email', $form).val().trim();
+                    $('#input-email', $form).val(email);
+                    if (1 < email.split(' ').length || -1 === email.indexOf('@')) {
+                        RegisterView.displayalert('register-form', 'error', 'Please enter a valid email address.');
+                        $('#input-email', $form).focus();
+                        return false;
+                    }
+
                     RegisterView.showloader('register-form');
                 };
             }
@@ -261,7 +273,9 @@ var RegisterApp = {
                 RegisterView.cancelloader('register-form', $sendbtn, 'Send me an activation email');
                 RegisterView.displayform('activate-form');
                 RegisterView.displayalert('activate-form', 'success', 'Look in your inbox for an activation email ' +
-                                          'from GoCast Support, and follow the instructions in it.');
+                                          'from GoCast Support, and follow the instructions in it.<br><br>' +
+                                          '<span class="label label-info">If the email is\'nt in your '+
+                                          'inbox, check your spam folder.</span>');
                 $('#input-email', self.$forms['activate-form']).val(_email);
             },
             failure: function() {
