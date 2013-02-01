@@ -30,9 +30,9 @@ var DashView = {
             $placeholders, $placeholder, $loginform;
 
         if ($.browser.msie && 10.0 > parseFloat($.browser.version)) {
-            $textfields = $('form#' + id + ' input[type="text"][name], form input[type="email"][name]');
-            $pwdfields = $('form#' + id + ' input[type="password"][name]');
-            $placeholders = $('form#' + id + ' input.ie-pwd-placeholder');
+            $textfields = $('input[type="text"][name], input[type="email"][name]', this.$forms[id]);
+            $pwdfields = $('input[type="password"][name]', this.$forms[id]);
+            $placeholders = $('input.ie-pwd-placeholder', this.$forms[id]);
 
             $textfields.focus(function() {
                 if ($(this).attr('placeholder') === $(this).val()) {
@@ -81,8 +81,10 @@ var DashView = {
             };
 
         for (i in this.$forms) {
-            this.$forms[i].removeClass('show');
-            $('.alert', this.$forms[i]).removeClass('show');
+            if (this.$forms.hasOwnProperty(i)) {
+                this.$forms[i].removeClass('show');
+                $('.alert', this.$forms[i]).removeClass('show');
+            }
         }
 
         this.$forms[id].addClass('show');
@@ -268,6 +270,12 @@ var DashApp = {
                                               'provided. Follow the instructions in it to reset your password. ' +
                                               '<br><br><span class="label label-info">If the email isn\'t in your ' +
                                               'inbox, check your spam folder.</span>');
+                    } else if ('not activated' === response.result) {
+                        DashView.displayalert('reqresetpwd-form', 'error', 'The account asssociated ' +
+                                              'with the email address has not been activated yet.');
+                    } else if ('no account' === response.result) {
+                        DashView.displayalert('reqresetpwd-form', 'error', 'There is no account ' +
+                                              'associated with this email address.');
                     } else {
                         DashView.displayalert('reqresetpwd-form', 'error', 'There was a problem requesting your password ' +
                                               'reset.');

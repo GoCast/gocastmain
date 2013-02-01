@@ -29,9 +29,9 @@ var RegisterView = {
             $placeholders, $placeholder, $loginform;
 
         if ($.browser.msie && 10.0 > parseFloat($.browser.version)) {
-            $textfields = $('form#' + id + ' input[type="text"][name], form input[type="email"][name]');
-            $pwdfields = $('form#' + id + ' input[type="password"][name]');
-            $placeholders = $('form#' + id + ' input.ie-pwd-placeholder');
+            $textfields = $('input[type="text"][name], input[type="email"][name]', this.$forms[id]);
+            $pwdfields = $('input[type="password"][name]', this.$forms[id]);
+            $placeholders = $('input.ie-pwd-placeholder', this.$forms[id]);
 
             $textfields.focus(function() {
                 if ($(this).attr('placeholder') === $(this).val()) {
@@ -67,8 +67,10 @@ var RegisterView = {
     },
     displayform: function(id) {
         for (i in this.$forms) {
-            this.$forms[i].removeClass('show');
-            $('.alert', this.$forms[i]).removeClass('show');
+            if (this.$forms.hasOwnProperty(i)) {
+                this.$forms[i].removeClass('show');
+                $('.alert', this.$forms[i]).removeClass('show');
+            }
         }
         this.$forms[id].addClass('show');
         this.$forms[id].clearForm();
