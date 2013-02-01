@@ -169,15 +169,15 @@ var RegisterApp = {
                     } else if ('incorrect' === response.result) {
                         RegisterView.displayalert('activate-form', 'error', 'The activation code you\'ve provided is wrong. ' +
                                                 'Please provide the correct activation code.');
-                        $('#input-activation-code', $RegisterApp.$forms['activate-form']).val('').focus();
+                        $('#input-activation-code', RegisterApp.$forms['activate-form']).val('').focus();
                     } else if ('noaccount' === response.result) {
                         RegisterView.displayalert('activate-form', 'error', 'The activation code you\'ve provided is bad. ' +
                                                 'There is no account for the email address you\'ve provided.');
-                        $('#input-email', $RegisterApp.$forms['activate-form']).focus();
+                        $('#input-email', RegisterApp.$forms['activate-form']).focus();
                     } else if ('usedorexpired' === response.result) {
                         RegisterView.displayalert('activate-form', 'error', 'The activation code you\'ve provided has expired ' +
                                                 'or has already been used to activate your account.');
-                        $('#input-email', $RegisterApp.$forms['activate-form']).focus();
+                        $('#input-email', RegisterApp.$forms['activate-form']).focus();
                     } else {
                         RegisterView.displayalert('activate-form', 'error', 'There was a problem activating your account.');
                     }
@@ -259,7 +259,12 @@ var RegisterApp = {
             _email = email,
             self = this;
 
-        evt.preventDefault();
+        if (evt.preventDefault) {
+            evt.preventDefault();
+        } else {
+            evt.returnValue = false;
+        }
+
         RegisterView.showloader('register-form', $sendbtn);
         $.ajax({
             url: '/acct/sendemailagain/',

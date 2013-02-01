@@ -125,7 +125,12 @@ var DashView = {
         return function(e) {
             var evt = e || window.event;
             self.displayform($(this).attr('href').replace(/^#/, ''));
-            evt.preventDefault();
+            
+            if (evt.preventDefault) {
+                evt.preventDefault();
+            } else {
+                evt.returnValue = false;
+            }
         };
     }
 };
@@ -327,7 +332,12 @@ var DashApp = {
         return function(e) {
             var evt = e || window.event;
             self.boshconn.disconnect();
-            evt.preventDefault();
+
+            if (evt.preventDefault) {
+                evt.preventDefault();
+            } else {
+                evt.returnValue = false;
+            }
         };
     }
 };
