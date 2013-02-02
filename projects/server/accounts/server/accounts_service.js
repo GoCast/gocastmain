@@ -210,7 +210,7 @@ app.post('/activate', function(req, res) {
 
 app.post('/changepwd', function(req, res) {
     if (req.body && req.body.email && req.body.new_password) {
-        gcutil.log('accounts_service [/changepwd][info]: FormData = ', req.body);
+//        gcutil.log('accounts_service [/changepwd][info]: FormData = ', req.body);
         api.ChangePassword(req.body.email, req.body.new_password, function() {
             res.send('{"result": "success"}');
         }, function(err) {
@@ -265,7 +265,7 @@ app.post('/resetpasswordrequest', function(req, res) {
 
 app.post('/resetpasswordlink', function(req, res) {
     if (req.body && req.body.email && req.body.password && req.body.resetcode) {
-        gcutil.log('accounts_service [/resetpasswordlink][info]: FormData = ', req.body);
+//        gcutil.log('accounts_service [/resetpasswordlink][info]: FormData = ', req.body);
         api.ResetPasswordViaLink(req.body.email, req.body.password, req.body.resetcode, function() {
             res.send('{"result": "success"}');
         }, function(err) {
@@ -340,6 +340,65 @@ app.post('/sendemailagain', function(req, res) {
 
         if (!req.body.email) {
             res.send('{"result": "no email"}');
+        }
+        else {
+            res.send('{"result": "error"}');
+        }
+    }
+});
+
+//
+// @brief post-location for sending an email to invite others to join you in a GoCast.
+//   Requires:
+//     .link which is the full link URL to the room
+//     .fromemail the email address of the sender
+//     .toemailarray A json stringified array of email addresses. A max of 25 entries will be used.
+//   Optional:
+//     .when A Javascript Date() object stringified - new Date().toString()
+//     .note An additional note to be included in the email from the user.
+//
+app.post('/inviteviaemail', function(req, res) {
+    var arg;
+
+    if (req.body && req.body.link && req.body.fromemail && req.body.toemailarray) {
+        gcutil.log('accounts_service [/inviteviaemail][info]: FormData = ', req.body);
+        arg = { fromemail: req.body.fromemail,
+                toemailarray: req.body.toemailarray,
+                link: req.body.link };
+
+        if (req.body.when) {
+            arg.when = req.body.when;
+        }
+        if (req.body.note) {
+            arg.note = req.body.note;
+        }
+
+        api.SendRoomInviteEmail(arg, function() {
+            res.send('{"result": "success"}');
+        }, function(err) {
+            gcutil.log('accounts_service [/inviteviaemail][error]: ', err);
+            if ('apiSendRoomInviteEmail: Account not activated.' === err) {
+                res.send('{"result": "not activated"}');
+            }
+            else if (('apiSendRoomInviteEmail: account does not exist: ' + req.body.fromemail) === err) {
+                res.send('{"result": "no account"}');
+            }
+            else {
+                res.send('{"result": "error"}');
+            }
+        });
+    }
+    else {
+        gcutil.log('accounts_service [/inviteviaemail][error]: FormData problem in req.body: ', req.body);
+
+        if (!req.body.fromemail) {
+            res.send('{"result": "no fromemail"}');
+        }
+        else if (!req.body.link) {
+            res.send('{"result": "no link"}');
+        }
+        else if (!req.body.toemailarray) {
+            res.send('{"result": "no toemailarray"}');
         }
         else {
             res.send('{"result": "error"}');

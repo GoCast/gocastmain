@@ -40,6 +40,33 @@ var db = require('./accounts_db');
 
 'use strict';
 
+function privateGenInviteEmail(nameemail, link, note, when) {
+    var body;
+
+    body = 'Hello.\n';
+
+    body += nameemail + ' has invited you to join them in a collaborative conference online at GoCast.\n\n';
+
+    if (note) {
+        body += 'Personal note from ' + nameemail + ': ' + note + '\n\n';
+    }
+
+    if (when) {
+        body += 'Your meeting will take place at: ' + when + '\n\n';
+    }
+
+    body += 'The custom link for your meeting is: ' + link + '\n\n';
+
+    body += 'If you have not participated in a GoCast meeting before, you will want to visit your meeting room' +
+            ' link a few minutes before the start of the meeting to get your browser and camera setup and prepared.\n\n';
+
+    body += 'The GoCast Team.\n\n';
+    body += 'This email was generated in direct response to the named person above inviting you to their upcoming meeting.' +
+            ' But you can unsubscribe from any and all further emails at any time.\n';
+
+    return body;
+}
+
 function privateGenPasswordResetEmail(baseURL, email, name, resetcode) {
     var body;
 
@@ -130,6 +157,22 @@ function privateSendEmail(toName, toEmail, subject, body, cbSuccess, cbFailure) 
         [toName + ' <' + toEmail + '>'],
       subject,
       body,
+      settings.accounts.inviteFromAddress, {},
+      function(err) {
+        if (err) {
+            gcutil.log('Mail failed: ' + err);
+            cbFailure(err);
+        }
+        else {
+            gcutil.log('Success');
+            cbSuccess();
+        }
+    });
+}
+
+function privateSendEmailList(toEmailArray, subject, body, cbSuccess, cbFailure) {
+    mg.sendText(settings.accounts.inviteFromName + ' <' + settings.accounts.inviteFromAddress + '>',
+      toEmailArray, subject, body,
       settings.accounts.inviteFromAddress, {},
       function(err) {
         if (err) {
@@ -342,6 +385,48 @@ function apiSendEmailAgain(email, baseURL, success, failure) {
     });
 }
 
+//   Requires in opts object:
+//     .link which is the full link URL to the room
+//     .fromemail the email address of the sender
+//     .toemailarray A json stringified array of email addresses. Limits sending to 25 people max.
+//   Optional:
+//     .when A Javascript Date() object stringified - new Date().toString()
+//     .note An additional note to be included in the email from the user.
+//
+function apiSendRoomInviteEmail(opts, success, failure) {
+    var emailBody, emailName, maxToSend = 25;
+
+    // If Account exists, return db entry.
+    db.dbGetEntryByAccountName(opts.fromemail, function(entry) {
+        if (!entry.validated) {
+            // Non-validated accounts cannot send invites.
+            gcutil.log('apiSendRoomInviteEmail: Account not activated - ' + email);
+            failure('apiSendRoomInviteEmail: Account not activated.');
+        }
+        else {
+            // Now, generate the invitation
+            if (entry.name) {
+                emailName = entry.name + ' <' + opts.fromemail + '>';
+            }
+            else {
+                emailName = opts.fromemail;
+            }
+
+            emailBody = privateGenInviteEmail(emailname, opts.link, opts.note, opts.when);
+            privateSendEmailList(opts.toemailarray.slice(0, maxToSend),
+                                 'Your invitation to meet on GoCast with ' + opts.fromemail, emailBody, function() {
+                gcutil.log('Sent an invitation from ' + opts.fromemail + ' with ' + opts.toemailarray.length + ' others.');
+                success();
+            }, function(err) {
+                failure('apiSendRoomInviteEmail: Email send failure.');
+            });
+        }
+    }, function(err) {
+        // Failure of getting database entry for account.
+        failure('apiSendRoomInviteEmail: account does not exist: ' + email);
+    });
+}
+
 function apiGenerateResetPassword(email, baseURL, success, failure) {
     var emailBody, resetcode;
 
@@ -478,3 +563,4 @@ exports.VisitorSeen = apiVisitorSeen;
 exports.SendEmailAgain = apiSendEmailAgain;
 exports.GenerateResetPassword = apiGenerateResetPassword;
 exports.ResetPasswordViaLink = apiResetPasswordViaLink;
+exports.SendRoomInviteEmail = apiSendRoomInviteEmail;
