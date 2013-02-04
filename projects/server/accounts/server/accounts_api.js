@@ -89,7 +89,8 @@ function privateGenPasswordResetEmail(baseURL, email, name, resetcode) {
             '&email=' + email.toLowerCase();
 
     body += '\n\n';
-    body += 'Once you have reset your password, you can always come to your dashboard at: ' + baseURL.substring(0, baseURL.lastIndexOf('/') + 1);
+    body += 'Once you have reset your password, you can always come to your dashboard at: ' +
+                baseURL.substring(0, baseURL.lastIndexOf('/') + 1);
     body += '\n\n';
     body += 'Thanks for using GoCast - we hope you enjoy the service.\n\n';
 
@@ -400,7 +401,7 @@ function apiSendRoomInviteEmail(opts, success, failure) {
     db.dbGetEntryByAccountName(opts.fromemail, function(entry) {
         if (!entry.validated) {
             // Non-validated accounts cannot send invites.
-            gcutil.log('apiSendRoomInviteEmail: Account not activated - ' + email);
+            gcutil.log('apiSendRoomInviteEmail: Account not activated - ' + opts.fromemail);
             failure('apiSendRoomInviteEmail: Account not activated.');
         }
         else {
@@ -412,7 +413,7 @@ function apiSendRoomInviteEmail(opts, success, failure) {
                 emailName = opts.fromemail;
             }
 
-            emailBody = privateGenInviteEmail(emailname, opts.link, opts.note, opts.when);
+            emailBody = privateGenInviteEmail(emailName, opts.link, opts.note, opts.when);
             privateSendEmailList(opts.toemailarray.slice(0, maxToSend),
                                  'Your invitation to meet on GoCast with ' + opts.fromemail, emailBody, function() {
                 gcutil.log('Sent an invitation from ' + opts.fromemail + ' with ' + opts.toemailarray.length + ' others.');
@@ -423,12 +424,32 @@ function apiSendRoomInviteEmail(opts, success, failure) {
         }
     }, function(err) {
         // Failure of getting database entry for account.
-        failure('apiSendRoomInviteEmail: account does not exist: ' + email);
+        failure('apiSendRoomInviteEmail: account does not exist: ' + opts.fromemail);
     });
 }
 
 function apiGenerateResetPassword(email, baseURL, success, failure) {
-    var emailBody, resetcode;
+    var emailBody, resetcode, result;
+
+    if (!email || !baseURL || typeof(email) !== 'string' || typeof(baseURL) !== 'string') {
+        result = 'Details: ';
+        if (!email) {
+            result += 'email not present ; ';
+        }
+        if (!baseURL) {
+            result += 'baseURL not present ; ';
+        }
+        if (typeof(email) !== 'string') {
+            result += 'email was of type: ' + typeof(email) + ' ; ';
+        }
+        if (typeof(baseURL) !== 'string') {
+            result += 'baseURL was of type: ' + typeof(email) + ' ; ';
+        }
+
+        gcutil.log('apiGenerateResetPassword: ERROR: Bad parameters. ' + result);
+        failure('apiGenerateResetPassword: Bad Parameters.' + result);
+        return;
+    }
 
     // If Account exists, return db entry.
     db.GetEntryByAccountName(email, function(entry) {

@@ -181,7 +181,7 @@ app.post('/activate', function(req, res) {
             res.send('{"result": "success"}');
         }, function(err) {
             gcutil.log('accounts_service [/activate][error]: ', err);
-            if (('apiValidateAccount: Incorrect activation code for ' + req.body.email) === err) {
+            if (('apiValidateAccount: Incorrect activation code [' + req.body.activation_code + ']for ' + req.body.email) === err) {
                 res.send('{"result": "incorrect"}');
             } else if (('apiValidateAccount: Bad activation code. No account found for: ' + req.body.email) === err) {
                 res.send('{"result": "noaccount"}');
