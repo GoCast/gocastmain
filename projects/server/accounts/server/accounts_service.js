@@ -362,9 +362,15 @@ app.post('/inviteviaemail', function(req, res) {
 
     if (req.body && req.body.link && req.body.fromemail && req.body.toemailarray) {
         gcutil.log('accounts_service [/inviteviaemail][info]: FormData = ', req.body);
-        arg = { fromemail: req.body.fromemail,
-                toemailarray: req.body.toemailarray,
-                link: req.body.link };
+
+        try {
+            arg = { fromemail: req.body.fromemail,
+                    toemailarray: JSON.parse(req.body.toemailarray),
+                    link: req.body.link };
+        } catch(e) {
+            res.send('{"result": "error"}');
+            return;
+        }
 
         if (req.body.when) {
             arg.when = req.body.when;

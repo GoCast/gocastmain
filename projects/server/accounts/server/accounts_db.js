@@ -319,11 +319,6 @@ function dbUpdateEntry(accountName, obj, cbSuccess, cbFailure) {
 
 }
 
-function dbActivateEntry(accountName, cbSuccess, cbFailure) {
-    // Basically just update the table entry with a 'validated' column.
-    dbUpdateEntry(accountName, {validated: new Date().toString(), validationCode: 'Completed'}, cbSuccess, cbFailure);
-}
-
 //
 // @brief Lookup an entry and return its row if successful.
 //        If accountName is not found, an error is given as err.code==='NoEntryFound'
@@ -370,6 +365,20 @@ function dbEntryExists(accountName, cbSuccess, cbFailure) {
             }
 
         }
+    });
+}
+
+function dbActivateEntry(accountName, cbSuccess, cbFailure) {
+    dbEntryExists(accountName, function(entry) {
+        if (entry.validated) {
+            cbSuccess('dbActivateEntry: Already activated.');
+        }
+        else {
+            // Basically just update the table entry with a 'validated' column.
+            dbUpdateEntry(accountName, {validated: new Date().toString(), validationCode: 'Completed'}, cbSuccess, cbFailure);
+        }
+    }, function(err) {
+        cbFailure(err);
     });
 }
 
