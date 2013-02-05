@@ -8,6 +8,7 @@
         <link rel="stylesheet" type="text/css" href="css/bootstrap.css?GOCASTTIMESTAMP">
         <link rel="stylesheet" type="text/css" href="css/font-awesome.css?GOCASTTIMESTAMP">
         <link rel="stylesheet" type="text/css" href="css/dashboard.css?GOCASTTIMESTAMP">
+        <link rel="stylesheet" type="text/css" href="css/kalendae.css?GOCASTTIMESTAMP">
     </head>
     <body>
         <div class="navbar navbar-fixed-top navbar-inverse">
@@ -27,7 +28,7 @@
                         <li class="dropdown" style="padding-top: 20px; margin-left: 5px;">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">My Meetings <b class="caret"></b></a>
                             <ul class="dropdown-menu">
-                                <li><a href="#">Schedule Meeting</a></li>
+                                <li><a class="formlink" href="#schedulemeeting-form">Schedule Meeting</a></li>
                                 <li><a class="formlink" href="#startmeeting-form">Start Meeting</a></li>
                             </ul>
                         </li>
@@ -122,7 +123,7 @@
                                 </div>
                             </div>
                             <div class="control-group">
-                                <div id="roomlist" class="controls" align="center">
+                                <div id="roomlist" class="controls well" align="center">
                                 </div>
                             </div>
                             <div class="alert alert-error">
@@ -136,6 +137,51 @@
                             </div>
                             <div class="alert alert-success">
                                <h4><i class="icon-ok-sign"></i></h4><p style="padding-left: 25px;"></p>
+                            </div>
+                        </fieldset>
+                    </form>
+                    <form id="schedulemeeting-form" class="form-horizontal" action="/acct/inviteviaemail/" method="post">
+                        <fieldset>
+                            <legend>&nbsp; Schedule your meeting</legend>
+                            <div class="control-group">
+                                <div class="controls" align="center">
+                                    <input id="input-roomname" type="text" name="roomname" placeholder=" Room where you want to have your meeting" required class="span4">
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <div id="roomlist" class="controls well" align="center">
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <div class="controls" align="center">
+                                    <input id="input-date" type="text" name="date" placeholder=" Date" class="span2 auto-kal" data-kal="months: 1, direction: 'today-future'">
+                                    <input id="input-time" type="text" name="time" placeholder=" Time (Ex: 5:45)" class="span1" style="margin-left: 15px;">
+                                    <select id="ampm" class="span1" style="margin-left: 15px;">
+                                        <option value="AM" selected>AM</option>
+                                        <option value="PM">PM</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <div class="controls" align="center">
+                                    <textarea id="input-note" name="note" placeholder="Optional note to invitees" class="span4" rows="3" style="resize: none;"></textarea>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <div class="controls" align="center">
+                                    <textarea id="input-emails" name="emails" placeholder="Email addresses of people you want to invite (Ex: a@b.com,c@d.com,...)" class="span4" rows="3" style="resize: none;" required></textarea>
+                                </div>
+                            </div>
+                            <div class="alert alert-error">
+                                <h4><i class="icon-warning-sign"></i></h4><p style="padding-left: 25px;"></p>
+                            </div>
+                            <div class="alert alert-success">
+                               <h4><i class="icon-ok-sign"></i></h4><p style="padding-left: 25px;"></p>
+                            </div>
+                            <div class="control-group">
+                                <div id="controls" align="center">
+                                    <button type="submit" class="btn btn-primary pull-right"> Send invites </button>
+                                </div>
                             </div>
                         </fieldset>
                     </form>
@@ -204,6 +250,7 @@
         <script type="text/javascript" src="js/strophe_connection.js?GOCASTTIMESTAMP"></script>
         <script type="text/javascript" src="js/jquery.utils.js?GOCASTTIMESTAMP"></script>
         <script type="text/javascript" src="js/callcast_settings.js?GOCASTTIMESTAMP"></script>
+        <script type="text/javascript" src="js/kalendae.js?GOCASTTIMESTAMP"></script>
         <script type="text/javascript" src="js/dashboard.js?GOCASTTIMESTAMP"></script>
         <!-- Google Code for Create a room Conversion Page -->
         <script type="text/javascript">

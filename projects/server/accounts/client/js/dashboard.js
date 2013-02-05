@@ -27,10 +27,11 @@ var DashView = {
     },
     setupPlaceholders: function(id) {
         var $textfields, $pwdfields, $pwdfield,
-            $placeholders, $placeholder, $loginform;
+            $placeholders, $placeholder, $loginform,
+            self = this;
 
         if ($.browser.msie && 10.0 > parseFloat($.browser.version)) {
-            $textfields = $('input[type="text"][name], input[type="email"][name]', this.$forms[id]);
+            $textfields = $('input[type="text"][name], input[type="email"][name], textarea', this.$forms[id]);
             $pwdfields = $('input[type="password"][name]', this.$forms[id]);
             $placeholders = $('input.ie-pwd-placeholder', this.$forms[id]);
 
@@ -48,18 +49,18 @@ var DashView = {
 
             $pwdfields.blur(function() {
                 if (!$(this).val()) {
-                    $placeholder = $('form#' + id + ' #' + $(this).attr('id') + '_placeholder');
+                    $placeholder = $('#' + $(this).attr('id') + '_placeholder', self.$forms[id]);
                     $(this).addClass('hide');
                     $placeholder.addClass('show').val($(this).attr('placeholder'));
                 }
             }).each(function() {
-                $placeholder = $('#' + id + ' #' + $(this).attr('id') + '_placeholder');
+                $placeholder = $('#' + $(this).attr('id') + '_placeholder', self.$forms[id]);
                 $(this).addClass('hide');
                 $placeholder.addClass('show').val($(this).attr('placeholder'));
             });
 
             $placeholders.focus(function() {
-                $pwdfield = $('#' + id + ' #' + $(this).attr('id').split('_')[0]);
+                $pwdfield = $('#' + $(this).attr('id').split('_')[0], self.$forms[id]);
                 $(this).removeClass('show');
                 $pwdfield.removeClass('hide');
                 $pwdfield.focus();
@@ -67,7 +68,7 @@ var DashView = {
         }
     },
     displayform: function(id, defaults) {
-        var i, email,
+        var i, email, defs = defaults || {}, date, hours, ampm,
             formtips = {
                 'login-form': 'Log in with your GoCast account and create your own meeting room on the web!',
                 'changepwd-form': 'Submit your new password. Then, use it the next time you log in to GoCast.',
@@ -76,7 +77,8 @@ var DashView = {
                                      'by emailing that link to them.',
                 'reqresetpwd-form': 'An email will be sent to the address associated with your account. Follow the ' +
                                     'instructions in it to reset the password for your account.',
-                'resetpwd-form': 'Submit your new password and use it to log in to GoCast from now on.'
+                'resetpwd-form': 'Submit your new password and use it to log in to GoCast from now on.',
+                'schedulemeeting-form': 'Schedule a meeting by inviting others via email. Specify a date and time.'
             };
 
         for (i in this.$forms) {
@@ -111,13 +113,37 @@ var DashView = {
             if (!$.browser.msie) {
                 $('#input-password', this.$forms[id]).focus();
             }
+        } else if ('schedulemeeting-form' === id) {
+            date = new Date();
+            if (!defs.hasOwnProperty('input-date')) {
+                defs['input-date'] = (date.getMonth() + 1) + '/' +
+                                     date.getDate() + '/' +
+                                     date.getFullYear();
+            }
+            if (!defs.hasOwnProperty('input-time')) {
+                hours = date.getHours();
+                if (!hours) { 
+                    hours = 12;
+                    ampm = 'AM';
+                } else {
+                    if (hours < 12) {
+                        ampm = 'AM';
+                    } else {
+                        ampm = 'PM';
+                        if (hours > 12) {
+                            hours = hours - 12;
+                        }
+                    }
+                }
+                defs['input-time'] = hours + ':' + ((date.getMinutes() < 10) ? '0' : '') +
+                                     date.getMinutes();
+                defs['ampm'] = ampm;
+            }
         }
 
-        if (defaults) {
-            for (i in defaults) {
-                if (defaults.hasOwnProperty(i)) {
-                    $('#'+i, this.$forms[id]).val(defaults[i]);
-                }
+        for (i in defs) {
+            if (defs.hasOwnProperty(i)) {
+                $('#'+i, this.$forms[id]).val(defs[i]);
             }
         }
         this.displayformtip(formtips[id]);
@@ -142,7 +168,8 @@ var DashView = {
             'changepwd-form': 'Change my password',
             'startmeeting-form': 'Take me to my room',
             'reqresetpwd-form': 'Send me a password reset email',
-            'resetpwd-form': 'Reset my password'
+            'resetpwd-form': 'Reset my password',
+            'schedulemeeting-form': 'Send invites'
         };
         $('.btn[type="submit"]', this.$forms[formid]).removeClass('disabled')
                                                           .html(submittexts[formid]);
@@ -245,13 +272,13 @@ var DashApp = {
         'startmeeting-form': {
             success: function() {
                 return function(response) {
-                    var roomlinkrel, rcode,
+                    var roomlinkrel, rcode, pathname = window.location.pathname,
                         roomname = $('#input-roomname', DashApp.$forms['startmeeting-form']).val();
 
                     DashView.cancelloader('startmeeting-form');
                     if('success' === response.result) {
                         rcode = $.roomcode.cipher(DashApp.boshconn.getEmailFromJid().replace(/@/, '~'), roomname);
-                        roomlinkrel = window.location.pathname.replace(/dashboard\.html*$/, '') + '?roomname=' + rcode;
+                        roomlinkrel = pathname.substring(0, pathname.lastIndexOf('/') + 1) + '?roomname=' + rcode;
                         window.location.href = roomlinkrel;
                     } else {
                         DashView.displayalert('startmeeting-form', 'error', 'There was an error while creating your ' +
@@ -356,9 +383,70 @@ var DashApp = {
                 };
             },
             data: function() { return {resetcode: $.urlvars.resetcode||''}; }
+        },
+        'schedulemeeting-form': {
+            success: function() {
+                return function(response) {
+                    DashView.cancelloader('schedulemeeting-form');
+                    if ('success' === response.result) {
+                        DashView.displayform('startmeeting-form');
+                        DashView.displayalert('startmeeting-form', 'success', 'The invites have been sent. You can now ' +
+                                              'come here to start your meeting at the scheduled date/time.');
+                    } else if ('no account' === response.result) {
+                        DashView.displayalert('schedulemeeting-form', 'error', 'Sending invites failed. There is no account ' +
+                                              'associated with your email address.');
+                    } else if ('not activated' === response.result) {
+                        DashView.displayalert('schedulemeeting-form', 'error', 'Sending invites failed. Your account ' +
+                                              'hasn\'t been activated yet. Please activate your account first.');
+                    } else if ('no toemailarray') {
+                        DashView.displayalert('schedulemeeting-form', 'error', 'Sending invites failed. Please ' +
+                                              'specify a list of valid email addresses to send your invites.');
+                    } else if ('no link') {
+                        DashView.displayalert('schedulemeeting-form', 'error', 'Sending invites failed. Please ' +
+                                              'choose one of your rooms for the meeting.');
+                    } else {
+                        DashView.cancelloader('schedulemeeting-form');
+                        DashView.displayalert('schedulemeeting-form', 'error', 'There was a problem sending the invites.');
+                    }
+                };
+            },
+            failure: function() {
+                return function(error) {
+                    DashView.cancelloader('schedulemeeting-form');
+                    DashView.displayalert('schedulemeeting-form', 'error', 'There was a problem sending the invites.');
+                };
+            },
+            beforesubmit: function() {
+                return function(arr, $form, options) {
+                    DashView.showloader('schedulemeeting-form');
+                };
+            },
+            data: function() {
+                var href = window.location.href,
+                    emails = $('#input-emails', DashApp.$forms['schedulemeeting-form']).val(),
+                    roomname = $('#input-roomname', DashApp.$forms['schedulemeeting-form']).val(),
+                    extradata = {
+                        when: (new Date($('#input-date', DashApp.$forms['schedulemeeting-form']).val() + ' ' +
+                                        $('#input-time', DashApp.$forms['schedulemeeting-form']).val() + ' ' +
+                                        $('#ampm', DashApp.$forms['schedulemeeting-form']).val())).toString(),
+                        fromemail: DashApp.boshconn.getEmailFromJid(),
+                        note: $('#input-note', DashApp.$forms['schedulemeeting-form']).val()
+                    };
+
+                if (emails) {
+                    extradata.toemailarray = JSON.stringify(emails.replace(/[\s\n\t]+/g, '')
+                                                                  .split(','));
+                }
+                if (roomname) {
+                    extradata.link = href.substring(0, href.lastIndexOf('/') + 1) + '?roomname=' +
+                                     $.roomcode.cipher(DashApp.boshconn.getEmailFromJid(), roomname);
+                }
+
+                return extradata;
+            }
         }
     },
-    setupForm: function(id) {
+    setupOptions: function(id) {
         var options = {
             dataType: 'json',
             beforeSubmit: this.formCallbacks[id].beforesubmit(),
@@ -369,7 +457,20 @@ var DashApp = {
         if (this.formCallbacks[id].data) {
             options.data = this.formCallbacks[id].data();
         }
-        this.$forms[id].ajaxForm(options);
+
+        return options;
+    },
+    setupForm: function(id, useAjaxSubmit) {
+        var self = this;
+
+        if(useAjaxSubmit) {
+            this.$forms[id].submit(function() {
+                $(this).ajaxSubmit(self.setupOptions(id));
+                return false;
+            });
+        } else {
+            this.$forms[id].ajaxForm(this.setupOptions(id));
+        }
     },
     init: function() {
         var urlvars = $.urlvars,
@@ -442,6 +543,7 @@ var DashApp = {
                 Strophe.Status.ATTACHED === status) {
                 self.setupForm('startmeeting-form');
                 self.setupForm('changepwd-form');
+                self.setupForm('schedulemeeting-form', true);
                 DashView.displayform('startmeeting-form');
                 $('body > .navbar .nav').addClass('show');
                 self.queryName(function(name) {
@@ -449,6 +551,7 @@ var DashApp = {
                 });
                 self.queryRoomList(function(roomlist) {
                     DashView.displayRoomList('startmeeting-form', roomlist);
+                    DashView.displayRoomList('schedulemeeting-form', roomlist);
                 });
             } else if (Strophe.Status.DISCONNECTED === status ||
                        Strophe.Status.TERMINATED === status) {
