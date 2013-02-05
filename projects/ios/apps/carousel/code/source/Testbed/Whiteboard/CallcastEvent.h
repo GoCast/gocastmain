@@ -24,6 +24,9 @@ public:
         kChangePenColor,
         kChangePenErase,
 
+        kPrevSpot,
+        kNextSpot,
+
         //Callcast-specific events
         kAddSpot,
         kRemoveSpot,

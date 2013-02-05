@@ -216,5 +216,17 @@ UIWebView* gWebViewInstance = NULL;
     CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kChangePenErase));
 }
 
+-(IBAction)pressedPrev:(id)sender
+{
+#pragma unused(sender)
+    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kPrevSpot));
+}
+
+-(IBAction)pressedNext:(id)sender
+{
+#pragma unused(sender)
+    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kNextSpot));
+}
+
 
 @end

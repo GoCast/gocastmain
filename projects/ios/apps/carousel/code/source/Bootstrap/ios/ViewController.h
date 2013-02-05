@@ -20,4 +20,7 @@
 -(IBAction)pressedColor:(id)sender;
 -(IBAction)pressedErase:(id)sender;
 
+-(IBAction)pressedPrev:(id)sender;
+-(IBAction)pressedNext:(id)sender;
+
 @end
