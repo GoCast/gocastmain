@@ -71,10 +71,9 @@ var DashView = {
             formtips = {
                 'login-form': 'Log in with your GoCast account and create your own meeting room on the web!',
                 'changepwd-form': 'Submit your new password. Then, use it the next time you log in to GoCast.',
-                'startmeeting-form': 'Enter the name of the room which you want to create or go into. You will ' +
+                'startmeeting-form': 'Create a new room, or choose one of your existing rooms for your meeting. You will ' +
                                      'then be provided with a unique link for that room. You can invite others ' +
-                                     'by emailing that link to them.<br>Click on the \'Take me to my room\' button ' +
-                                     'to enter the room.',
+                                     'by emailing that link to them.',
                 'reqresetpwd-form': 'An email will be sent to the address associated with your account. Follow the ' +
                                     'instructions in it to reset the password for your account.',
                 'resetpwd-form': 'Submit your new password and use it to log in to GoCast from now on.'
@@ -104,6 +103,7 @@ var DashView = {
                 $('#input-roomname', this.$forms[id]).val(decodeURI(localStorage.gcpDesiredRoomname));
                 delete localStorage.gcpDesiredRoomname;
             }
+            $('select', this.$forms[id]).val('');
         } else if ('reqresetpwd-form' === id && !$.browser.msie) {
             $('#input-email', this.$forms[id]).focus();
         } else if ('resetpwd-form' === id) {
@@ -133,7 +133,7 @@ var DashView = {
         var submittexts = {
             'login-form': 'Log me in',
             'changepwd-form': 'Change my password',
-            'startmeeting-form': 'Create my room',
+            'startmeeting-form': 'Take me to my room',
             'reqresetpwd-form': 'Send me a password reset email',
             'resetpwd-form': 'Reset my password'
         };
@@ -226,21 +226,22 @@ var DashApp = {
         'startmeeting-form': {
             success: function() {
                 return function(response) {
-                    var roomlinkrel, atag, rcode,
+                    var roomlinkrel, rcode,
                         roomname = $('#input-roomname', DashApp.$forms['startmeeting-form']).val();
 
                     DashView.cancelloader('startmeeting-form');
                     if('success' === response.result) {
                         rcode = $.roomcode.cipher(DashApp.boshconn.getEmailFromJid().replace(/@/, '~'), roomname);
                         roomlinkrel = window.location.pathname.replace(/dashboard\.html*$/, '') + '?roomname=' + rcode;
-                        atag = document.createElement('a');
+                        window.location.href = roomlinkrel;
+                        /*atag = document.createElement('a');
 
                         atag.href = roomlinkrel;
                         DashView.displayalert('startmeeting-form', 'success', 'You\'re room has been ' +
                                               'created. The unique link for this room is:<br><br>' +
                                               '<input class="input-block-level" type="text" value="' + atag.href + '">' +
                                               '<br><br><a href="' + roomlinkrel + '" class="btn btn-block btn-success">' +
-                                              'Take me to my room</a>');
+                                              'Take me to my room</a>');*/
                     } else {
                         DashView.displayalert('startmeeting-form', 'error', 'There was an error while creating your ' +
                                               'desired room.');
@@ -406,6 +407,22 @@ var DashApp = {
             }
         });
     },
+    queryRoomList: function(gotList) {
+        var succCb = gotList || function(roomlist) {},
+        _email = this.boshconn.getEmailFromJid();
+
+        $.ajax({
+            url: '/acct/listrooms/',
+            type: 'POST',
+            dataType: 'json',
+            data: {email: _email},
+            success: function(response) {
+                if ('success' === response.result) {
+                    succCb(response.data || []);
+                }
+            }
+        });
+    },
     boshconnstatusCallback: function() {
         var self = this;
 
@@ -418,6 +435,16 @@ var DashApp = {
                 $('body > .navbar .nav').addClass('show');
                 self.queryName(function(name) {
                     $('body > .navbar .label').html('Hi ' + name + '!');
+                });
+                self.queryRoomList(function(roomlist) {
+                    var i, $roomselect = $('select', self.$forms['startmeeting-form']),
+                        options = '<option value="" selected> Choose one of your existing rooms </option>';
+                    for (i=0; i<roomlist.length; i++) {
+                        options = options + ('<option value="' + roomlist[i] + '">' + roomlist[i] + '</option>');
+                    }
+                    $roomselect.html(options).unbind('change').on('change', function() {
+                        $('#input-roomname', self.$forms['startmeeting-form']).val($(this).val());
+                    });
                 });
             } else if (Strophe.Status.DISCONNECTED === status ||
                        Strophe.Status.TERMINATED === status) {

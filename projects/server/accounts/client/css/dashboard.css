@@ -70,7 +70,7 @@ body > .container > .row > .span5 > form button {
 }
 
 body > .container > .row > .span5 > form .control-group:last-child,
-body > .container > .row > .span5 > form#startmeeting-form .control-group:nth-of-type(3) {
+body > .container > .row > .span5 > form#startmeeting-form .control-group:nth-of-type(4) {
     margin-top: 35px;
     padding-top: 20px;
     border-top: 1px #E5E5E5 solid;

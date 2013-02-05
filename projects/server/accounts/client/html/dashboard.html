@@ -108,7 +108,7 @@
                             <div class="control-group">
                                 <div class="controls" align="center">
                                     <button type="submit" class="btn btn-primary pull-right"> Change my password </button>
-                                </di>
+                                </div>
                             </div>
                         </fieldset>
                     </form>
@@ -117,7 +117,15 @@
                             <legend>&nbsp;Start your meeting</legend>
                             <div class="control-group">
                                 <div class="controls" align="center">
-                                    <input id="input-roomname" type="text" name="desired_roomname" placeholder=" Enter your room name" required class="span4">
+                                    <input id="input-roomname" type="text" name="desired_roomname" placeholder=" Enter the name of your new room" required class="span4">
+                                    <br><br>OR
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <div class="controls" align="center">
+                                    <select id="select-roomname" class="span4">
+                                        <option value="" selected> Choose one of your existing rooms </option>
+                                    </select>
                                 </div>
                             </div>
                             <div class="alert alert-error">
@@ -125,7 +133,8 @@
                             </div>
                             <div class="control-group">
                                 <div id="controls" align="center">
-                                    <button type="submit" class="btn btn-primary pull-right"> Create my room </button>
+                                    <button type="submit" class="btn btn-primary pull-right"> Take me to my room </button>
+                                    <a href="javascript:void(0);" class="btn btn-link pull-left"> Invite others </a>
                                 </div>
                             </div>
                             <div class="alert alert-success">
