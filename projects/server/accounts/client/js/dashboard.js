@@ -66,7 +66,7 @@ var DashView = {
             });
         }
     },
-    displayform: function(id) {
+    displayform: function(id, defaults) {
         var i, email,
             formtips = {
                 'login-form': 'Log in with your GoCast account and create your own meeting room on the web!',
@@ -113,6 +113,13 @@ var DashView = {
             }
         }
 
+        if (defaults) {
+            for (i in defaults) {
+                if (defaults.hasOwnProperty(i)) {
+                    $('#'+i, this.$forms[id]).val(defaults[i]);
+                }
+            }
+        }
         this.displayformtip(formtips[id]);
     },
     displayalert: function(formid, type, message) {
@@ -140,6 +147,18 @@ var DashView = {
         $('.btn[type="submit"]', this.$forms[formid]).removeClass('disabled')
                                                           .html(submittexts[formid]);
 
+    },
+    displayRoomList: function(formid, roomlist) {
+        var template = '<table class="table table-bordered">' +
+                       '<thead><tr><th>Choose one of your existing rooms</th></tr></thead>' +
+                       '<tbody>', i, self = this;
+
+        for (i=0; i<roomlist.length; i++) {
+            template = template + ('<tr><td><a href="javascript:void(0);">' + roomlist[i] + '</a></td></tr>');
+        }
+        template = template + ('</tbody></table>');
+        $('#roomlist', this.$forms[formid]).html(template);
+        $('#roomlist a').click(function() { $('#input-roomname', self.$forms[formid]).val($(this).text()); });
     },
     changeformCallback: function() {
         var self = this;
@@ -234,14 +253,6 @@ var DashApp = {
                         rcode = $.roomcode.cipher(DashApp.boshconn.getEmailFromJid().replace(/@/, '~'), roomname);
                         roomlinkrel = window.location.pathname.replace(/dashboard\.html*$/, '') + '?roomname=' + rcode;
                         window.location.href = roomlinkrel;
-                        /*atag = document.createElement('a');
-
-                        atag.href = roomlinkrel;
-                        DashView.displayalert('startmeeting-form', 'success', 'You\'re room has been ' +
-                                              'created. The unique link for this room is:<br><br>' +
-                                              '<input class="input-block-level" type="text" value="' + atag.href + '">' +
-                                              '<br><br><a href="' + roomlinkrel + '" class="btn btn-block btn-success">' +
-                                              'Take me to my room</a>');*/
                     } else {
                         DashView.displayalert('startmeeting-form', 'error', 'There was an error while creating your ' +
                                               'desired room.');
@@ -437,14 +448,7 @@ var DashApp = {
                     $('body > .navbar .label').html('Hi ' + name + '!');
                 });
                 self.queryRoomList(function(roomlist) {
-                    var i, $roomselect = $('select', self.$forms['startmeeting-form']),
-                        options = '<option value="" selected> Choose one of your existing rooms </option>';
-                    for (i=0; i<roomlist.length; i++) {
-                        options = options + ('<option value="' + roomlist[i] + '">' + roomlist[i] + '</option>');
-                    }
-                    $roomselect.html(options).unbind('change').on('change', function() {
-                        $('#input-roomname', self.$forms['startmeeting-form']).val($(this).val());
-                    });
+                    DashView.displayRoomList('startmeeting-form', roomlist);
                 });
             } else if (Strophe.Status.DISCONNECTED === status ||
                        Strophe.Status.TERMINATED === status) {

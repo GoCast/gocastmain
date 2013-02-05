@@ -109,11 +109,12 @@ form input[type="password"].hide {
     display: none;
 }
 
-/*form#login-form button[type="submit"].hide,
-form#login-form button#ie-login-button {
-    display: none;
+form #roomlist {
+    max-height: 200px;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
-form#login-form button#ie-login-button.show {
-    display: block;
-}*/
+form #roomlist > table {
+    margin: 0px;
+}
