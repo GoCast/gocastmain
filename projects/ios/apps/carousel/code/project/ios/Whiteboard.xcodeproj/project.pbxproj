@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 45;
+	objectVersion = 46;
 	objects = {
 
 /* Begin PBXAggregateTarget section */
@@ -21,6 +21,7 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		0060F9BE16C2073B00E9A9A9 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 0060F9BD16C2073B00E9A9A9 /* Default-568h@2x.png */; };
 		00E671627FC87D55009500F2 /* GCICallcast.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8A8261567DAEB3F988BB2131 /* GCICallcast.mm */; };
 		0132B78EF001AED4C1A55FB3 /* ViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 54F13C3695EF1AFD28251AA1 /* ViewController.mm */; };
 		0B630901D6007B10E74C04C4 /* MainViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3AA6537E0CC26EF4A781B899 /* MainViewController.xib */; };
@@ -75,6 +76,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		0060F9BD16C2073B00E9A9A9 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		0429BE46EE8659F09B60117D /* tProgram.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tProgram.h; sourceTree = "<group>"; };
 		09FA150B7647EA6DADF9AAF9 /* tTexture.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = tTexture.cpp; sourceTree = "<group>"; };
 		0CA36C5DBD6E5C8407C77041 /* tTimerPeer.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = tTimerPeer.mm; sourceTree = "<group>"; };
@@ -181,6 +183,7 @@
 		0456162378FBD0D1E5D4D6A8 = {
 			isa = PBXGroup;
 			children = (
+				0060F9BD16C2073B00E9A9A9 /* Default-568h@2x.png */,
 				9C591780E65AB8AD6C296443 /* Source */,
 				B9BFB966E790BCF160C31701 /* Frameworks */,
 				9E8C6BA8EAF2B93AB6CCEE95 /* Products */,
@@ -434,7 +437,11 @@
 			};
 			buildConfigurationList = 61B74A76653AB34E196D8845 /* Build configuration list for PBXProject "Whiteboard" */;
 			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
 			hasScannedForEncodings = 1;
+			knownRegions = (
+				en,
+			);
 			mainGroup = 0456162378FBD0D1E5D4D6A8;
 			projectDirPath = ../common;
 			projectRoot = "";
@@ -457,6 +464,7 @@
 				D52A7064A583CE69F61FD0A0 /* InfoPlist.strings in Resources */,
 				0B630901D6007B10E74C04C4 /* MainViewController.xib in Resources */,
 				D7A5AA1FE8C63E3766AF4062 /* LoginView.xib in Resources */,
+				0060F9BE16C2073B00E9A9A9 /* Default-568h@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -607,10 +615,14 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (
-					"-weak_framework CoreFoundation",
-					"-weak_framework UIKit",
-					"-weak_framework AVFoundation",
-					"-weak_framework CoreMedia",
+					"-weak_framework",
+					CoreFoundation,
+					"-weak_framework",
+					UIKit,
+					"-weak_framework",
+					AVFoundation,
+					"-weak_framework",
+					CoreMedia,
 					"-weak-lSystem",
 					"-all_load",
 					"-Obj-C",
@@ -739,10 +751,14 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
-					"-weak_framework CoreFoundation",
-					"-weak_framework UIKit",
-					"-weak_framework AVFoundation",
-					"-weak_framework CoreMedia",
+					"-weak_framework",
+					CoreFoundation,
+					"-weak_framework",
+					UIKit,
+					"-weak_framework",
+					AVFoundation,
+					"-weak_framework",
+					CoreMedia,
 					"-weak-lSystem",
 					"-all_load",
 					"-Obj-C",
