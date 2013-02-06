@@ -85,6 +85,9 @@ var DashView = {
             if (this.$forms.hasOwnProperty(i)) {
                 this.$forms[i].removeClass('show');
                 $('.alert', this.$forms[i]).removeClass('show');
+                if ('startmeeting-form' === i) {
+                    $('a.btn-inverse', this.$forms[i]).removeClass('show');
+                }
             }
         }
 
@@ -204,6 +207,12 @@ var DashView = {
             } else if ('schedulemeeting-form' === formid) {
                 template = template + 'Create a room first, by going to "Start Meeting" in the "My Meetings" menu.</p>';
             }
+        } else if ($('#roomlist', this.$forms[formid]).hasClass('well')) {
+            $('#roomlist', this.$forms[formid]).removeClass('well');
+        }
+
+        if (template && !$('#roomlist', this.$forms[formid]).hasClass('well')) {
+            $('#roomlist', this.$forms[formid]).addClass('well');   
         }
 
         $('#roomlist', this.$forms[formid]).html(template);
