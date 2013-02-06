@@ -15,13 +15,13 @@
 - (void) lineTo:(CDVInvokedUrlCommand*)command;
 - (void) stroke:(CDVInvokedUrlCommand*)command;
 
-- (void) addSpot:(CDVInvokedUrlCommand*)command;    //added
-- (void) removeSpot:(CDVInvokedUrlCommand*)command; //added
-- (void) setSpot:(CDVInvokedUrlCommand*)command;    //added
-- (void) addSpotForParticipant:(CDVInvokedUrlCommand*)command;      //added
-- (void) addPluginForParticipant:(CDVInvokedUrlCommand*)command;
-- (void) removePluginToParticipant:(CDVInvokedUrlCommand*)command;
-- (void) removeSpotToParticipant:(CDVInvokedUrlCommand*)command;    //added
+- (void) addSpot:(CDVInvokedUrlCommand*)command;
+- (void) removeSpot:(CDVInvokedUrlCommand*)command;
+- (void) setSpot:(CDVInvokedUrlCommand*)command;
+- (void) addSpotForParticipant:(CDVInvokedUrlCommand*)command;
+- (void) addPluginToParticipant:(CDVInvokedUrlCommand*)command;
+- (void) removePluginFromParticipant:(CDVInvokedUrlCommand*)command;
+- (void) removeSpotForParticipant:(CDVInvokedUrlCommand*)command;
 - (void) addCarouselContent:(CDVInvokedUrlCommand*)command;
 - (void) removeCarouselContent:(CDVInvokedUrlCommand*)command;
 - (void) connectionStatus:(CDVInvokedUrlCommand*)command;

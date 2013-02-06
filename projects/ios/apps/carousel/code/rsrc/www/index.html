@@ -83,6 +83,7 @@
 
             function onNicknameInUse(nick)
             {
+                cordova.exec(function(winParam) {}, function(error) {}, "GCICallcast", "onNicknameInUse", [ "" ]);
                 console.log("onNicknameInUse(" + nick + ")");
                 app1.nickInUse(nick);
             }
@@ -95,7 +96,7 @@
 
             function unassignSpotForParticipant(nick)
             {
-                cordova.exec(function(winParam) {}, function(error) {}, "GCICallcast", "removeSpotToParticipant", [ "" ]);
+                cordova.exec(function(winParam) {}, function(error) {}, "GCICallcast", "removeSpotForParticipant", [ "" ]);
                 console.log("unassignSpotForParticipant(" + nick + ")");
             }
 
@@ -206,14 +207,30 @@
                                       SWITCHBOARD_FB: 'switchboard_dev@dev.gocast.it',
                                       LOGCATCHER: 'logcatcher@dev.gocast.it/logcatcher',
                                       });
-
-                Callcast.setCallbackForCallback_ConnectionStatus(onConnectionStatus);
-                Callcast.setCallbackForCallback_OnNicknameInUse(onNicknameInUse);
-                Callcast.setCallbackForAddSpotForParticipant(assignSpotForParticipant);
-                Callcast.setCallbackForRemoveSpotForParticipant(unassignSpotForParticipant);
+/*
+ setCallbackForAddSpot
+ setCallbackForRemoveSpot
+ setCallbackForSetSpot
+ setCallbackForAddSpotForParticipant
+ setCallbackForAddPluginToParticipant
+ setCallbackForRemovePluginFromParticipant
+ setCallbackForRemoveSpotForParticipant
+ setCallbackForAddCarouselContent
+ setCallbackForRemoveCarouselContent
+ setCallbackForCallback_ConnectionStatus
+ setCallbackForCallback_OnEffectApplied
+ setCallbackForCallback_OnNicknameInUse
+ setCallbackForReadyState
+ */
                 Callcast.setCallbackForAddSpot(onAddSpot);
                 Callcast.setCallbackForRemoveSpot(onRemoveSpot);
                 Callcast.setCallbackForSetSpot(onSetSpot);
+
+                Callcast.setCallbackForAddSpotForParticipant(assignSpotForParticipant);
+                Callcast.setCallbackForRemoveSpotForParticipant(unassignSpotForParticipant);
+
+                Callcast.setCallbackForCallback_ConnectionStatus(onConnectionStatus);
+                Callcast.setCallbackForCallback_OnNicknameInUse(onNicknameInUse);
 
                 Callcast.connect(Callcast.CALLCAST_XMPPSERVER, '');
             }
