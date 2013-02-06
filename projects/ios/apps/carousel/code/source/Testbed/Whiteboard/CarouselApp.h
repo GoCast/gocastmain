@@ -1,6 +1,7 @@
 #pragma once
 
 #include <queue>
+#include <list>
 
 class CarouselAppMessage;
 
@@ -9,17 +10,23 @@ class CarouselApp
     public tObserver<const CallcastEvent&>
 {
 protected:
-    std::string mNickname;
-    std::string mRoomname;
+    std::string         mNickname;
+    std::string         mRoomname;
+    std::list<int32_t>  mSpots;
+    uint32_t            mSpotFinger;
 
 public:
     CarouselApp();
     ~CarouselApp();
 
+    void onAddSpot(const std::string& newType, const int32_t& newID);
+    void onRemoveSpot(const int32_t& newID);
+    void onPrevButton();
+    void onNextButton();
+
 protected:
     void endEntry();
     void showBlankSpotEntry();
-    void showChatSpotEntry();
     void showLoggingInViewEntry();
     void showLoginViewEntry();
     void showNicknameInUseEntry();
@@ -29,7 +36,6 @@ protected:
 
     void endExit();
     void showBlankSpotExit();
-    void showChatSpotExit();
     void showLoggingInViewExit();
     void showLoginViewExit();
     void showNicknameInUseExit();
@@ -51,7 +57,6 @@ public:
 		kOkay,
 		kQuit,
 		kShowBlank,
-		kShowChat,
 		kShowWhiteboard,
 		kWebViewLoaded,
 	};
@@ -61,7 +66,6 @@ public:
 		kInvalidState = 0,
 		kEnd,
 		kShowBlankSpot,
-		kShowChatSpot,
 		kShowLoggingInView,
 		kShowLoginView,
 		kShowNicknameInUse,
@@ -85,7 +89,6 @@ public:
 			"okay",
 			"quit",
 			"showBlank",
-			"showChat",
 			"showWhiteboard",
 			"webViewLoaded",
 		};
@@ -99,7 +102,6 @@ public:
 			"**invalidState**",
 			"end",
 			"showBlankSpot",
-			"showChatSpot",
 			"showLoggingInView",
 			"showLoginView",
 			"showNicknameInUse",
@@ -121,7 +123,6 @@ protected:
 			&CarouselApp::invalidStateEntry,
 			&CarouselApp::endEntry,
 			&CarouselApp::showBlankSpotEntry,
-			&CarouselApp::showChatSpotEntry,
 			&CarouselApp::showLoggingInViewEntry,
 			&CarouselApp::showLoginViewEntry,
 			&CarouselApp::showNicknameInUseEntry,
@@ -139,7 +140,6 @@ protected:
 			&CarouselApp::invalidStateExit,
 			&CarouselApp::endExit,
 			&CarouselApp::showBlankSpotExit,
-			&CarouselApp::showChatSpotExit,
 			&CarouselApp::showLoggingInViewExit,
 			&CarouselApp::showLoginViewExit,
 			&CarouselApp::showNicknameInUseExit,
@@ -155,12 +155,8 @@ protected:
 	{
 		if ((mState == kShowBlankSpot) && (evt == kNickInUse)) return kShowNicknameInUse;
 		if ((mState == kShowBlankSpot) && (evt == kQuit)) return kEnd;
-		if ((mState == kShowBlankSpot) && (evt == kShowChat)) return kShowChatSpot;
+		if ((mState == kShowBlankSpot) && (evt == kShowBlank)) return kShowBlankSpot;
 		if ((mState == kShowBlankSpot) && (evt == kShowWhiteboard)) return kShowWhiteboardSpot;
-		if ((mState == kShowChatSpot) && (evt == kNickInUse)) return kShowNicknameInUse;
-		if ((mState == kShowChatSpot) && (evt == kQuit)) return kEnd;
-		if ((mState == kShowChatSpot) && (evt == kShowBlank)) return kShowBlankSpot;
-		if ((mState == kShowChatSpot) && (evt == kShowWhiteboard)) return kShowWhiteboardSpot;
 		if ((mState == kShowLoggingInView) && (evt == kLoginSuccess)) return kShowBlankSpot;
 		if ((mState == kShowLoggingInView) && (evt == kNickInUse)) return kShowNicknameInUse;
 		if ((mState == kShowLoggingInView) && (evt == kQuit)) return kEnd;
@@ -173,7 +169,7 @@ protected:
 		if ((mState == kShowWhiteboardSpot) && (evt == kNickInUse)) return kShowNicknameInUse;
 		if ((mState == kShowWhiteboardSpot) && (evt == kQuit)) return kEnd;
 		if ((mState == kShowWhiteboardSpot) && (evt == kShowBlank)) return kShowBlankSpot;
-		if ((mState == kShowWhiteboardSpot) && (evt == kShowChat)) return kShowChatSpot;
+		if ((mState == kShowWhiteboardSpot) && (evt == kShowWhiteboard)) return kShowWhiteboardSpot;
 		if ((mState == kStart) && (evt == kNext)) return kShowWebLoadingView;
 
 		assert("Event is invalid for this state" && 0);

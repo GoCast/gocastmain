@@ -55,9 +55,6 @@
 -(void)showBlankSpot;
 -(void)hideBlankSpot;
 
--(void)showChatSpot;
--(void)hideChatSpot;
-
 -(void)showWhiteboardSpot;
 -(void)hideWhiteboardSpot;
 

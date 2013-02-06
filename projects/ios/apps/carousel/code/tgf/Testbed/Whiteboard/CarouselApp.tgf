@@ -6,7 +6,6 @@
 6 Show Web Loading View
 7 Show Nickname in Use
 8 Show Blank Spot
-9 Show Chat Spot
 #
 2 5 loginPressed
 5 8 loginSuccess
@@ -18,15 +17,11 @@
 1 6
 5 7 nickInUse
 7 2 okay
-8 9 showChat
 8 3 showWhiteboard
-3 9 showChat
-9 3 showWhiteboard
-9 8 showBlank
 3 8 showBlank
-9 4 quit
 8 4 quit
 7 4 quit
 8 7 nickInUse
-9 7 nickInUse
 3 7 nickInUse
+3 3 showWhiteboard
+8 8 showBlank

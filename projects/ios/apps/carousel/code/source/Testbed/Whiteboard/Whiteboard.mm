@@ -324,7 +324,9 @@ void Whiteboard::update(const tMouseEvent& msg)
         {
             mEndTouch   = lastMousePt;
 
-            [gWebViewInstance stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"realDrawLine('%s', %d, %d, %d, %d, %d);",
+            //TODO: Spot number needs to go here
+            [gWebViewInstance stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"realDrawLine(%d, '%s', %d, %d, %d, %d, %d);",
+                                                                      -1,
                                                                       colorToString(mSendPenColor).c_str(),
                                                                       (mSendPenColor == kWhite) ? 20 : (int)mSendPenSize,
                                                                       (int)mStartTouch.x, (int)mStartTouch.y, (int)mEndTouch.x, (int)mEndTouch.y]];

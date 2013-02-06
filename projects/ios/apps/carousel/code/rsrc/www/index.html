@@ -24,7 +24,7 @@
         <script>
             var chosenNick = 'iostest-client';
             var chosenRoom = 'iostest';
-            var whiteBoardSpotNumber = -1;
+//            var whiteBoardSpotNumber = -1;
 
             var app1 = {
                 /* 1: debug, 2: info, 3: warning, 4: error, 5: fatal. */
@@ -154,11 +154,11 @@
             function onAddSpot(data)
             {
                 console.log("onAddSpot ", data);
-                cordova.exec(function(winParam) {}, function(error) {}, "GCICallcast", "addSpot", [ "" ]);
+                cordova.exec(function(winParam) {}, function(error) {}, "GCICallcast", "addSpot", [ data.spottype.toString(), data.spotnumber.toString() ]);
                 if (data.spottype === 'whiteBoard')
                 {
-                    whiteBoardSpotNumber = data.spotnumber;
-                    console.log("*** data.spotnumber = " + data.spotnumber.toString());
+//                    whiteBoardSpotNumber = data.spotnumber;
+//                    console.log("*** data.spotnumber = " + data.spotnumber.toString());
                     doSpot(data);
                 }
             }
@@ -174,7 +174,7 @@
 
             function onRemoveSpot(data)
             {
-                cordova.exec(function(winParam) {}, function(error) {}, "GCICallcast", "removeSpot", [ "" ]);
+                cordova.exec(function(winParam) {}, function(error) {}, "GCICallcast", "removeSpot", [ data.spotnumber.toString() ]);
                 console.log("onRemoveSpot ", data);
             }
 
@@ -235,13 +235,13 @@
                 Callcast.connect(Callcast.CALLCAST_XMPPSERVER, '');
             }
 
-            function sendStroke(stroke)
+            function sendStroke(stroke, theSpotNumber)
             {
                 console.log("sendStroke ", stroke);
-                Callcast.SendSingleStroke({stroke: JSON.stringify(stroke), spotnumber: whiteBoardSpotNumber});
+                Callcast.SendSingleStroke({stroke: JSON.stringify(stroke), spotnumber: theSpotNumber});
             }
 
-            function realDrawLine(newColor, pensize, stx, sty, enx, eny)
+            function realDrawLine(theSpotNumber, newColor, pensize, stx, sty, enx, eny)
             {
                 var stroke;
 
@@ -257,7 +257,7 @@
 
                 stroke.push({name: 'stroke'}); // stroke lines
                 stroke.push({name: 'restore'}); // finish command
-                self.sendStroke(stroke);        // send it
+                self.sendStroke(stroke, theSpotNumber);        // send it
 
                 console.log("*** Reached end of realDrawLine!");
             }

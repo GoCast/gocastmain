@@ -113,14 +113,17 @@ const tColor4b      kWhite  (255,255,255,255);
 {
 #pragma unused(command)
     printf("%s", "*** kAddSpot\n");
-    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kAddSpot));
+    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kAddSpot,
+                                                         [[command.arguments objectAtIndex:0] UTF8String],
+                                                         atoi([[command.arguments objectAtIndex:1] UTF8String])));
 }
 
 - (void) removeSpot:(CDVInvokedUrlCommand*)command
 {
 #pragma unused(command)
     printf("%s", "*** kRemoveSpot\n");
-    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kRemoveSpot));
+    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kRemoveSpot,
+                                                         atoi([[command.arguments objectAtIndex:0] UTF8String])));
 }
 
 - (void) setSpot:(CDVInvokedUrlCommand*)command

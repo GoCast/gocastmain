@@ -199,16 +199,6 @@ AppDelegate* gAppDelegateInstance = NULL;
     [self.viewController.mBlankSpotView setHidden:YES];
 }
 
--(void)showChatSpot
-{
-    [self.viewController.mChatSpotView setHidden:NO];
-}
-
--(void)hideChatSpot
-{
-    [self.viewController.mChatSpotView setHidden:YES];
-}
-
 -(void)showWhiteboardSpot
 {
     [self.viewController.mWhiteboardSpotView setHidden:NO];

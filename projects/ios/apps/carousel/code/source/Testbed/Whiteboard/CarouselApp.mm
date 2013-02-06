@@ -14,7 +14,8 @@ extern UIWebView*   gWebViewInstance;
 
 CarouselApp::CarouselApp()
 :   mNickname("nick"),
-    mRoomname("room")
+    mRoomname("room"),
+    mSpotFinger(0)
 {
     ConstructMachine();
 }
@@ -22,6 +23,55 @@ CarouselApp::~CarouselApp()
 {
     DestructMachine();
 }
+
+#pragma mark -
+
+void CarouselApp::onAddSpot(const std::string& newType, const int32_t& newID)
+{
+    if (newType.compare("whiteBoard") == 0)
+    {
+        bool wasEmpty = mSpots.empty();
+
+        mSpots.push_back(newID);
+
+        if (wasEmpty)
+        {
+            process(kShowWhiteboard);
+        }
+    }
+}
+
+void CarouselApp::onRemoveSpot(const int32_t& newID)
+{
+    std::list<int32_t>::iterator iter = mSpots.begin();
+    uint32_t count = 0;
+
+    while(iter != mSpots.end())
+    {
+        if (*iter == newID) break;
+        count++;
+        iter++;
+    }
+
+    if (iter != mSpots.end())
+    {
+        mSpots.erase(iter);
+    }
+
+    if (mSpots.empty())
+    {
+        process(kShowBlank);
+    }
+    else if (mSpotFinger == count)
+    {
+        process(kShowWhiteboard);
+    }
+}
+
+void onPrevButton();
+void onNextButton();
+
+#pragma mark -
 
 void CarouselApp::startEntry()
 {
@@ -64,16 +114,6 @@ void CarouselApp::showBlankSpotExit()
     [gAppDelegateInstance hideBlankSpot];
 }
 
-void CarouselApp::showChatSpotEntry()
-{
-    [gAppDelegateInstance showChatSpot];
-}
-
-void CarouselApp::showChatSpotExit()
-{
-    [gAppDelegateInstance hideChatSpot];
-}
-
 void CarouselApp::showNicknameInUseEntry()
 {
     [gAppDelegateInstance showNicknameInUse];
@@ -113,6 +153,9 @@ void CarouselApp::update(const CallcastEvent& msg)
 {
     switch (msg.mEvent)
     {
+        case CallcastEvent::kAddSpot: onAddSpot(msg.mSpotType, msg.mSpotID); break;
+        case CallcastEvent::kRemoveSpot: onRemoveSpot(msg.mSpotID); break;
+
         case CallcastEvent::kWebViewLoaded:     process(CarouselApp::kWebViewLoaded); break;
         case CallcastEvent::kSubmitLogin:
             mNickname = msg.mNickname;

@@ -11,7 +11,6 @@
 @property (nonatomic, strong) IBOutlet UIView* mLoggingInView;
 @property (nonatomic, strong) IBOutlet UIView* mNicknameInUseView;
 @property (nonatomic, strong) IBOutlet UIView* mBlankSpotView;
-@property (nonatomic, strong) IBOutlet UIView* mChatSpotView;
 @property (nonatomic, strong) IBOutlet UIView* mWhiteboardSpotView;
 
 @property (nonatomic, strong) IBOutlet UIView* mWBView;
