@@ -43,12 +43,25 @@
 @property (nonatomic, strong) IBOutlet MainViewController* viewController;
 @property (nonatomic, strong) IBOutlet OpenGLView* glView;
 
--(void)loadLoginScreen;
--(void)loadLoadingScreen;
--(void)loadWhiteboardScreen;
+-(void)showWebLoadingView;
+-(void)hideWebLoadingView;
 
--(void)unloadLoginScreen;
--(void)unloadLoadingScreen;
--(void)unloadWhiteboardScreen;
+-(void)showLoginView;
+-(void)hideLoginView;
+
+-(void)showLoggingInView;
+-(void)hideLoggingInView;
+
+-(void)showBlankSpot;
+-(void)hideBlankSpot;
+
+-(void)showChatSpot;
+-(void)hideChatSpot;
+
+-(void)showWhiteboardSpot;
+-(void)hideWhiteboardSpot;
+
+-(void)showNicknameInUse;
+-(void)hideNicknameInUse;
 
 @end

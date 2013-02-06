@@ -11,6 +11,7 @@
 #include "CallcastManager.h"
 
 extern UIWebView*   gWebViewInstance;
+//Whiteboard gApp;
 
 class tVector4f
 {
@@ -105,8 +106,6 @@ static std::string colorToString(const tColor4b& newColor)
 
     return "#000";
 }
-
-Whiteboard gApp;
 
 Whiteboard::Whiteboard()
 :   mWhiteboardSurface(tPixelFormat::kR8G8B8A8, kSurfaceSize),

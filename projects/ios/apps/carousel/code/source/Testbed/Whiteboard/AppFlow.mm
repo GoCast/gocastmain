@@ -33,41 +33,75 @@ void AppFlow::startExit() { }
 void AppFlow::endEntry() { }
 void AppFlow::endExit() { }
 
-void AppFlow::waitForWebViewLoadedEntry() { }
-void AppFlow::waitForWebViewLoadedExit() { }
-
-void AppFlow::loadLoginScreenEntry()
+void AppFlow::showWebLoadingViewEntry()
 {
-    [gAppDelegateInstance loadLoginScreen];
-//    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kSubmitLogin));
+    [gAppDelegateInstance showWebLoadingView];
+}
+void AppFlow::showWebLoadingViewExit()
+{
+    [gAppDelegateInstance hideWebLoadingView];
 }
 
-void AppFlow::loadLoginScreenExit()
+void AppFlow::showLoginViewEntry()
 {
-    [gAppDelegateInstance unloadLoginScreen];
+    [gAppDelegateInstance showLoginView];
+}
+
+void AppFlow::showLoginViewExit()
+{
+    [gAppDelegateInstance hideLoginView];
 
     [gWebViewInstance stringByEvaluatingJavaScriptFromString: [NSString stringWithFormat:@"startCallcast('%s','%s')", mNickname.c_str(), mRoomname.c_str()]];
 }
 
-void AppFlow::showWaitingForLoginEntry()
+void AppFlow::showBlankSpotEntry()
 {
-    [gAppDelegateInstance loadLoadingScreen];
-//    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kLoggedIn));
+    [gAppDelegateInstance showBlankSpot];
 }
 
-void AppFlow::showWaitingForLoginExit()
+void AppFlow::showBlankSpotExit()
 {
-    [gAppDelegateInstance unloadLoadingScreen];
+    [gAppDelegateInstance hideBlankSpot];
 }
 
-void AppFlow::showWhiteboardEntry()
+void AppFlow::showChatSpotEntry()
 {
-    [gAppDelegateInstance loadWhiteboardScreen];
+    [gAppDelegateInstance showChatSpot];
 }
 
-void AppFlow::showWhiteboardExit()
+void AppFlow::showChatSpotExit()
 {
-    [gAppDelegateInstance unloadWhiteboardScreen];
+    [gAppDelegateInstance hideChatSpot];
+}
+
+void AppFlow::showNicknameInUseEntry()
+{
+    [gAppDelegateInstance showNicknameInUse];
+}
+
+void AppFlow::showNicknameInUseExit()
+{
+    [gAppDelegateInstance hideNicknameInUse];
+}
+
+void AppFlow::showLoggingInViewEntry()
+{
+    [gAppDelegateInstance showLoggingInView];
+}
+
+void AppFlow::showLoggingInViewExit()
+{
+    [gAppDelegateInstance hideLoggingInView];
+}
+
+void AppFlow::showWhiteboardSpotEntry()
+{
+    [gAppDelegateInstance showWhiteboardSpot];
+}
+
+void AppFlow::showWhiteboardSpotExit()
+{
+    [gAppDelegateInstance hideWhiteboardSpot];
 }
 
 void AppFlow::update(const AppFlowMessage& msg)
@@ -79,13 +113,15 @@ void AppFlow::update(const CallcastEvent& msg)
 {
     switch (msg.mEvent)
     {
-        case CallcastEvent::kWebViewLoaded: process(AppFlow::kWebViewLoaded); break;
+        case CallcastEvent::kWebViewLoaded:     process(AppFlow::kWebViewLoaded); break;
         case CallcastEvent::kSubmitLogin:
             mNickname = msg.mNickname;
             mRoomname = msg.mRoomname;
             process(AppFlow::kLoginPressed);
             break;
-        case CallcastEvent::kLoggedIn:      process(AppFlow::kLoginSuccess); break;
+        case CallcastEvent::kLoggedIn:          process(AppFlow::kLoginSuccess); break;
+        case CallcastEvent::kOnNicknameInUse:   process(AppFlow::kNickInUse); break;
+        case CallcastEvent::kOkayButton:        process(AppFlow::kOkay); break;
         default: break;
     }
 }

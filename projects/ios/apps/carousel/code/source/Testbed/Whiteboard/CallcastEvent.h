@@ -9,6 +9,7 @@ public:
         kWebViewLoaded,
         kSubmitLogin,
         kLoggedIn,
+        kOkayButton,
 
         //Whiteboard events below
         kSave,

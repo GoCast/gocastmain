@@ -176,9 +176,14 @@ UIWebView* gWebViewInstance = NULL;
 -(IBAction)loginPressed:(id)sender
 {
 #pragma unused(sender)
-    printf("*** ViewController::loginPressed\n");
     CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kSubmitLogin, [self.mNickname.text UTF8String], [self.mRoomname.text UTF8String]));
     [self.view endEditing:YES];
+}
+
+-(IBAction)okayPressed:(id)sender
+{
+#pragma unused(sender)
+    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kOkayButton));
 }
 
 -(IBAction)pressed1px:(id)sender

@@ -18,18 +18,24 @@ public:
 
 protected:
     void endEntry();
-    void loadLoginScreenEntry();
-    void showWaitingForLoginEntry();
-    void showWhiteboardEntry();
+    void showBlankSpotEntry();
+    void showChatSpotEntry();
+    void showLoggingInViewEntry();
+    void showLoginViewEntry();
+    void showNicknameInUseEntry();
+    void showWebLoadingViewEntry();
+    void showWhiteboardSpotEntry();
     void startEntry();
-    void waitForWebViewLoadedEntry();
 
     void endExit();
-    void loadLoginScreenExit();
-    void showWaitingForLoginExit();
-    void showWhiteboardExit();
+    void showBlankSpotExit();
+    void showChatSpotExit();
+    void showLoggingInViewExit();
+    void showLoginViewExit();
+    void showNicknameInUseExit();
+    void showWebLoadingViewExit();
+    void showWhiteboardSpotExit();
     void startExit();
-    void waitForWebViewLoadedExit();
 
     void invalidStateEntry() { assert("Attempted to enter an invalid state." && 0); }
     void invalidStateExit()  { assert("Attempted to exit an invalid state." && 0); }
@@ -41,7 +47,12 @@ public:
 		kLoginPressed,
 		kLoginSuccess,
 		kNext,
+		kNickInUse,
+		kOkay,
 		kQuit,
+		kShowBlank,
+		kShowChat,
+		kShowWhiteboard,
 		kWebViewLoaded,
 	};
 
@@ -49,11 +60,14 @@ public:
 	{
 		kInvalidState = 0,
 		kEnd,
-		kLoadLoginScreen,
-		kShowWaitingForLogin,
-		kShowWhiteboard,
+		kShowBlankSpot,
+		kShowChatSpot,
+		kShowLoggingInView,
+		kShowLoginView,
+		kShowNicknameInUse,
+		kShowWebLoadingView,
+		kShowWhiteboardSpot,
 		kStart,
-		kWaitForWebViewLoaded,
 	};
 
 	static const StateType kInitialState = kStart;
@@ -67,7 +81,12 @@ public:
 			"loginPressed",
 			"loginSuccess",
 			"next",
+			"nickInUse",
+			"okay",
 			"quit",
+			"showBlank",
+			"showChat",
+			"showWhiteboard",
 			"webViewLoaded",
 		};
 		return names[(evt < 0) ? kInvalidEvent : (evt > (sizeof(names) / sizeof(const char*))) ? kInvalidEvent : evt];
@@ -79,11 +98,14 @@ public:
 		{
 			"**invalidState**",
 			"end",
-			"loadLoginScreen",
-			"showWaitingForLogin",
-			"showWhiteboard",
+			"showBlankSpot",
+			"showChatSpot",
+			"showLoggingInView",
+			"showLoginView",
+			"showNicknameInUse",
+			"showWebLoadingView",
+			"showWhiteboardSpot",
 			"start",
-			"waitForWebViewLoaded",
 		};
 		return names[(node < 0) ? kInvalidState : (node > (sizeof(names) / sizeof(const char*))) ? kInvalidState : node];
 	};
@@ -98,11 +120,14 @@ protected:
 		{
 			&AppFlow::invalidStateEntry,
 			&AppFlow::endEntry,
-			&AppFlow::loadLoginScreenEntry,
-			&AppFlow::showWaitingForLoginEntry,
-			&AppFlow::showWhiteboardEntry,
+			&AppFlow::showBlankSpotEntry,
+			&AppFlow::showChatSpotEntry,
+			&AppFlow::showLoggingInViewEntry,
+			&AppFlow::showLoginViewEntry,
+			&AppFlow::showNicknameInUseEntry,
+			&AppFlow::showWebLoadingViewEntry,
+			&AppFlow::showWhiteboardSpotEntry,
 			&AppFlow::startEntry,
-			&AppFlow::waitForWebViewLoadedEntry,
 		};
 
 		(this->*fns[(mState < 0) ? kInvalidState : (mState > (sizeof(fns) / sizeof(callfn))) ? kInvalidState : mState])();
@@ -113,11 +138,14 @@ protected:
 		{
 			&AppFlow::invalidStateExit,
 			&AppFlow::endExit,
-			&AppFlow::loadLoginScreenExit,
-			&AppFlow::showWaitingForLoginExit,
-			&AppFlow::showWhiteboardExit,
+			&AppFlow::showBlankSpotExit,
+			&AppFlow::showChatSpotExit,
+			&AppFlow::showLoggingInViewExit,
+			&AppFlow::showLoginViewExit,
+			&AppFlow::showNicknameInUseExit,
+			&AppFlow::showWebLoadingViewExit,
+			&AppFlow::showWhiteboardSpotExit,
 			&AppFlow::startExit,
-			&AppFlow::waitForWebViewLoadedExit,
 		};
 
 		(this->*fns[(mState < 0) ? kInvalidState : (mState > (sizeof(fns) / sizeof(callfn))) ? kInvalidState : mState])();
@@ -125,14 +153,28 @@ protected:
 
 	StateType StateTransitionFunction(const EventType evt) const
 	{
-		if ((mState == kLoadLoginScreen) && (evt == kLoginPressed)) return kShowWaitingForLogin;
-		if ((mState == kLoadLoginScreen) && (evt == kQuit)) return kEnd;
-		if ((mState == kShowWaitingForLogin) && (evt == kLoginSuccess)) return kShowWhiteboard;
-		if ((mState == kShowWaitingForLogin) && (evt == kQuit)) return kEnd;
-		if ((mState == kShowWhiteboard) && (evt == kQuit)) return kEnd;
-		if ((mState == kStart) && (evt == kNext)) return kWaitForWebViewLoaded;
-		if ((mState == kWaitForWebViewLoaded) && (evt == kQuit)) return kEnd;
-		if ((mState == kWaitForWebViewLoaded) && (evt == kWebViewLoaded)) return kLoadLoginScreen;
+		if ((mState == kShowBlankSpot) && (evt == kNickInUse)) return kShowNicknameInUse;
+		if ((mState == kShowBlankSpot) && (evt == kQuit)) return kEnd;
+		if ((mState == kShowBlankSpot) && (evt == kShowChat)) return kShowChatSpot;
+		if ((mState == kShowBlankSpot) && (evt == kShowWhiteboard)) return kShowWhiteboardSpot;
+		if ((mState == kShowChatSpot) && (evt == kNickInUse)) return kShowNicknameInUse;
+		if ((mState == kShowChatSpot) && (evt == kQuit)) return kEnd;
+		if ((mState == kShowChatSpot) && (evt == kShowBlank)) return kShowBlankSpot;
+		if ((mState == kShowChatSpot) && (evt == kShowWhiteboard)) return kShowWhiteboardSpot;
+		if ((mState == kShowLoggingInView) && (evt == kLoginSuccess)) return kShowBlankSpot;
+		if ((mState == kShowLoggingInView) && (evt == kNickInUse)) return kShowNicknameInUse;
+		if ((mState == kShowLoggingInView) && (evt == kQuit)) return kEnd;
+		if ((mState == kShowLoginView) && (evt == kLoginPressed)) return kShowLoggingInView;
+		if ((mState == kShowLoginView) && (evt == kQuit)) return kEnd;
+		if ((mState == kShowNicknameInUse) && (evt == kOkay)) return kShowLoginView;
+		if ((mState == kShowNicknameInUse) && (evt == kQuit)) return kEnd;
+		if ((mState == kShowWebLoadingView) && (evt == kQuit)) return kEnd;
+		if ((mState == kShowWebLoadingView) && (evt == kWebViewLoaded)) return kShowLoginView;
+		if ((mState == kShowWhiteboardSpot) && (evt == kNickInUse)) return kShowNicknameInUse;
+		if ((mState == kShowWhiteboardSpot) && (evt == kQuit)) return kEnd;
+		if ((mState == kShowWhiteboardSpot) && (evt == kShowBlank)) return kShowBlankSpot;
+		if ((mState == kShowWhiteboardSpot) && (evt == kShowChat)) return kShowChatSpot;
+		if ((mState == kStart) && (evt == kNext)) return kShowWebLoadingView;
 
 		assert("Event is invalid for this state" && 0);
 

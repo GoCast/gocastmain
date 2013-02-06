@@ -157,41 +157,100 @@ AppDelegate* gAppDelegateInstance = NULL;
     return supportedInterfaceOrientations;
 }
 
--(void)loadLoginScreen
+#pragma mark -
+
+-(void)showWebLoadingView
 {
-    [self.viewController.mWBView setHidden:YES];
-    [self.viewController.mLoginView setHidden:NO];
-//    LoginView *myView = [[[LoginView alloc] initWithFrame:self.viewController.view.bounds] autorelease];
-//    [self.viewController.view addSubview:myView];
-//    [myView release];
+    [self.viewController.mWebLoadingView setHidden:NO];
 }
 
--(void)loadLoadingScreen
+-(void)hideWebLoadingView
+{
+    [self.viewController.mWebLoadingView setHidden:YES];
+}
+
+-(void)showLoginView
+{
+    [self.viewController.mLoginView setHidden:NO];
+}
+
+-(void)hideLoginView
 {
     [self.viewController.mLoginView setHidden:YES];
-    [self.viewController.mWBView setHidden:NO];
 }
 
--(void)loadWhiteboardScreen
+-(void)showLoggingInView
 {
-    CGRect glBounds = CGRectMake(10, 10, 300, 300);
-    self.glView = [[[OpenGLView alloc] initWithFrame:glBounds] autorelease];
-    [self.viewController.view addSubview:_glView];
+    [self.viewController.mLoggingInView setHidden:NO];
 }
 
--(void)unloadLoginScreen
+-(void)hideLoggingInView
 {
-
+    [self.viewController.mLoggingInView setHidden:YES];
 }
 
--(void)unloadLoadingScreen
+-(void)showBlankSpot
 {
-
+    [self.viewController.mBlankSpotView setHidden:NO];
 }
 
--(void)unloadWhiteboardScreen
+-(void)hideBlankSpot
 {
-
+    [self.viewController.mBlankSpotView setHidden:YES];
 }
+
+-(void)showChatSpot
+{
+    [self.viewController.mChatSpotView setHidden:NO];
+}
+
+-(void)hideChatSpot
+{
+    [self.viewController.mChatSpotView setHidden:YES];
+}
+
+-(void)showWhiteboardSpot
+{
+    [self.viewController.mWhiteboardSpotView setHidden:NO];
+}
+
+-(void)hideWhiteboardSpot
+{
+    [self.viewController.mWhiteboardSpotView setHidden:YES];
+}
+
+-(void)showNicknameInUse
+{
+    [self.viewController.mNicknameInUseView setHidden:NO];
+}
+
+-(void)hideNicknameInUse
+{
+    [self.viewController.mNicknameInUseView setHidden:YES];
+}
+
+#pragma mark -
+
+//-(void)loadLoginScreen
+//{
+//    [self.viewController.mWBView setHidden:YES];
+//    [self.viewController.mLoginView setHidden:NO];
+////    LoginView *myView = [[[LoginView alloc] initWithFrame:self.viewController.view.bounds] autorelease];
+////    [self.viewController.view addSubview:myView];
+////    [myView release];
+//}
+//
+//-(void)loadLoadingScreen
+//{
+//    [self.viewController.mLoginView setHidden:YES];
+//    [self.viewController.mWBView setHidden:NO];
+//}
+//
+//-(void)loadWhiteboardScreen
+//{
+//    CGRect glBounds = CGRectMake(10, 10, 300, 300);
+//    self.glView = [[[OpenGLView alloc] initWithFrame:glBounds] autorelease];
+//    [self.viewController.view addSubview:_glView];
+//}
 
 @end
