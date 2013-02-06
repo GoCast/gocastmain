@@ -43,16 +43,14 @@ var db = require('./accounts_db');
 function privateGenInviteEmail(nameemail, link, note, when) {
     var body;
 
-    body = 'Hello.\n';
-
-    body += nameemail + ' has invited you to join them in a collaborative conference online at GoCast.\n\n';
+    body = nameemail + ' has invited you to join them in a collaborative conference online at GoCast.\n\n';
 
     if (note) {
         body += 'Personal note from ' + nameemail + ': ' + note + '\n\n';
     }
 
     if (when) {
-        body += 'Your meeting will take place at: ' + when + '\n\n';
+        body += 'Your meeting will take place: ' + when + '\n\n';
     }
 
     body += 'The custom link for your meeting is: ' + link + '\n\n';
@@ -398,7 +396,7 @@ function apiSendRoomInviteEmail(opts, success, failure) {
     var emailBody, emailName, maxToSend = 25;
 
     // If Account exists, return db entry.
-    db.dbGetEntryByAccountName(opts.fromemail, function(entry) {
+    db.GetEntryByAccountName(opts.fromemail, function(entry) {
         if (!entry.validated) {
             // Non-validated accounts cannot send invites.
             gcutil.log('apiSendRoomInviteEmail: Account not activated - ' + opts.fromemail);
@@ -415,7 +413,7 @@ function apiSendRoomInviteEmail(opts, success, failure) {
 
             emailBody = privateGenInviteEmail(emailName, opts.link, opts.note, opts.when);
             privateSendEmailList(opts.toemailarray.slice(0, maxToSend),
-                                 'Your invitation to meet on GoCast with ' + opts.fromemail, emailBody, function() {
+                                 'Your invitation to meet on GoCast with ' + emailName, emailBody, function() {
                 gcutil.log('Sent an invitation from ' + opts.fromemail + ' with ' + opts.toemailarray.length + ' others.');
                 success();
             }, function(err) {
