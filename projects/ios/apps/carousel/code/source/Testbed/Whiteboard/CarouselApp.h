@@ -21,6 +21,7 @@ public:
 
     void onAddSpot(const std::string& newType, const int32_t& newID);
     void onRemoveSpot(const int32_t& newID);
+    void onOkayButton();
     void onPrevButton();
     void onNextButton();
 

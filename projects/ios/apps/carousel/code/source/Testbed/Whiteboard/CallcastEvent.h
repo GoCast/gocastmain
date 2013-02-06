@@ -9,7 +9,6 @@ public:
         kWebViewLoaded,
         kSubmitLogin,
         kLoggedIn,
-        kOkayButton,
 
         //Whiteboard events below
         kSave,
@@ -24,9 +23,6 @@ public:
         kChangePenSize,
         kChangePenColor,
         kChangePenErase,
-
-        kPrevSpot,
-        kNextSpot,
 
         //Callcast-specific events
         kAddSpot,

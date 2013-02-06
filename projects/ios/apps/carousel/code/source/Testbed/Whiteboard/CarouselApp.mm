@@ -68,8 +68,28 @@ void CarouselApp::onRemoveSpot(const int32_t& newID)
     }
 }
 
-void onPrevButton();
-void onNextButton();
+void CarouselApp::onOkayButton()
+{
+    process(kOkay);
+}
+
+void CarouselApp::onPrevButton()
+{
+    if (mSpotFinger != 0)
+    {
+        mSpotFinger--;
+        process(kShowWhiteboard);
+    }
+}
+
+void CarouselApp::onNextButton()
+{
+    if (mSpotFinger != mSpots.size() - 1)
+    {
+        mSpotFinger++;
+        process(kShowWhiteboard);
+    }
+}
 
 #pragma mark -
 
@@ -164,7 +184,6 @@ void CarouselApp::update(const CallcastEvent& msg)
             break;
         case CallcastEvent::kLoggedIn:          process(CarouselApp::kLoginSuccess); break;
         case CallcastEvent::kOnNicknameInUse:   process(CarouselApp::kNickInUse); break;
-        case CallcastEvent::kOkayButton:        process(CarouselApp::kOkay); break;
         default: break;
     }
 }

@@ -33,6 +33,9 @@
 #include "CallcastEvent.h"
 #include "CallcastManager.h"
 
+#include "CarouselApp.h"
+
+extern CarouselApp gCarouselApp;
 
 UIWebView* gWebViewInstance = NULL;
 
@@ -183,7 +186,7 @@ UIWebView* gWebViewInstance = NULL;
 -(IBAction)okayPressed:(id)sender
 {
 #pragma unused(sender)
-    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kOkayButton));
+    gCarouselApp.onOkayButton();
 }
 
 -(IBAction)pressed1px:(id)sender
@@ -224,13 +227,13 @@ UIWebView* gWebViewInstance = NULL;
 -(IBAction)pressedPrev:(id)sender
 {
 #pragma unused(sender)
-    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kPrevSpot));
+    gCarouselApp.onPrevButton();
 }
 
 -(IBAction)pressedNext:(id)sender
 {
 #pragma unused(sender)
-    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kNextSpot));
+    gCarouselApp.onNextButton();
 }
 
 
