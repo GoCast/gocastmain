@@ -45,7 +45,7 @@
 							<object class="IBUIButton" id="245917252">
 								<reference key="NSNextResponder" ref="693730267"/>
 								<int key="NSvFlags">292</int>
-								<string key="NSFrame">{{20, 397}, {33, 44}}</string>
+								<string key="NSFrame">{{87, 396}, {59, 44}}</string>
 								<reference key="NSSuperview" ref="693730267"/>
 								<reference key="NSWindow"/>
 								<reference key="NSNextKeyView" ref="30622383"/>
@@ -54,7 +54,6 @@
 								<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
 								<int key="IBUIContentHorizontalAlignment">0</int>
 								<int key="IBUIContentVerticalAlignment">0</int>
-								<int key="IBUIButtonType">1</int>
 								<string key="IBUINormalTitle">&lt;</string>
 								<object class="NSColor" key="IBUIHighlightedTitleColor" id="482415889">
 									<int key="NSColorSpace">3</int>
@@ -67,6 +66,10 @@
 								<object class="NSColor" key="IBUINormalTitleShadowColor" id="636075935">
 									<int key="NSColorSpace">3</int>
 									<bytes key="NSWhite">MC41AA</bytes>
+								</object>
+								<object class="NSCustomResource" key="IBUINormalImage">
+									<string key="NSClassName">NSImage</string>
+									<string key="NSResourceName">carouselarrowright.png</string>
 								</object>
 								<object class="IBUIFontDescription" key="IBUIFontDescription" id="325356496">
 									<int key="type">2</int>
@@ -81,7 +84,7 @@
 							<object class="IBUIButton" id="30622383">
 								<reference key="NSNextResponder" ref="693730267"/>
 								<int key="NSvFlags">292</int>
-								<string key="NSFrame">{{267, 397}, {33, 44}}</string>
+								<string key="NSFrame">{{20, 396}, {59, 44}}</string>
 								<reference key="NSSuperview" ref="693730267"/>
 								<reference key="NSWindow"/>
 								<string key="NSReuseIdentifierKey">_NS:9</string>
@@ -89,7 +92,6 @@
 								<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
 								<int key="IBUIContentHorizontalAlignment">0</int>
 								<int key="IBUIContentVerticalAlignment">0</int>
-								<int key="IBUIButtonType">1</int>
 								<string key="IBUINormalTitle">&gt;</string>
 								<reference key="IBUIHighlightedTitleColor" ref="482415889"/>
 								<object class="NSColor" key="IBUINormalTitleColor">
@@ -97,6 +99,10 @@
 									<bytes key="NSRGB">MC4xOTYwNzg0MzQ2IDAuMzA5ODAzOTMyOSAwLjUyMTU2ODY1NgA</bytes>
 								</object>
 								<reference key="IBUINormalTitleShadowColor" ref="636075935"/>
+								<object class="NSCustomResource" key="IBUINormalImage">
+									<string key="NSClassName">NSImage</string>
+									<string key="NSResourceName">carouselarrowleft.png</string>
+								</object>
 								<reference key="IBUIFontDescription" ref="325356496"/>
 								<reference key="IBUIFont" ref="925864691"/>
 							</object>
@@ -122,10 +128,7 @@
 						<reference key="NSNextKeyView" ref="199688700"/>
 						<object class="NSColor" key="IBUIBackgroundColor">
 							<int key="NSColorSpace">3</int>
-							<bytes key="NSWhite">MQA</bytes>
-							<object class="NSColorSpace" key="NSCustomColorSpace" id="851499553">
-								<int key="NSID">2</int>
-							</object>
+							<bytes key="NSWhite">MAA</bytes>
 						</object>
 						<int key="IBUITag">1000</int>
 						<object class="IBUISimulatedStatusBarMetrics" key="IBUISimulatedStatusBarMetrics"/>
@@ -238,7 +241,9 @@
 						<object class="NSColor" key="IBUIBackgroundColor">
 							<int key="NSColorSpace">3</int>
 							<bytes key="NSWhite">MQA</bytes>
-							<reference key="NSCustomColorSpace" ref="851499553"/>
+							<object class="NSColorSpace" key="NSCustomColorSpace" id="851499553">
+								<int key="NSID">2</int>
+							</object>
 						</object>
 						<int key="IBUITag">1000</int>
 						<object class="IBUISimulatedStatusBarMetrics" key="IBUISimulatedStatusBarMetrics"/>
@@ -1324,17 +1329,12 @@
 						<int key="objectID">118</int>
 						<reference key="object" ref="693730267"/>
 						<array class="NSMutableArray" key="children">
-							<reference ref="199688700"/>
 							<reference ref="30622383"/>
 							<reference ref="245917252"/>
+							<reference ref="199688700"/>
 						</array>
 						<reference key="parent" ref="191373211"/>
 						<string key="objectName">Blank Spot</string>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">142</int>
-						<reference key="object" ref="199688700"/>
-						<reference key="parent" ref="693730267"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">123</int>
@@ -1344,6 +1344,11 @@
 					<object class="IBObjectRecord">
 						<int key="objectID">122</int>
 						<reference key="object" ref="245917252"/>
+						<reference key="parent" ref="693730267"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">142</int>
+						<reference key="object" ref="199688700"/>
 						<reference key="parent" ref="693730267"/>
 					</object>
 				</array>
@@ -1366,6 +1371,7 @@
 				<string key="118.CustomClassName">LoginView</string>
 				<string key="118.IBPluginDependency">com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 				<string key="122.IBPluginDependency">com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
+				<real value="0.0" key="122.IBUIButtonInspectorSelectedEdgeInsetMetadataKey"/>
 				<string key="123.IBPluginDependency">com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 				<string key="125.CustomClassName">LoginView</string>
 				<string key="125.IBPluginDependency">com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
@@ -1564,10 +1570,11 @@
 		<string key="IBDocument.TargetRuntimeIdentifier">IBCocoaTouchFramework</string>
 		<bool key="IBDocument.PluginDeclaredDependenciesTrackSystemTargetVersion">YES</bool>
 		<int key="IBDocument.defaultPropertyAccessControl">3</int>
-		<object class="NSMutableDictionary" key="IBDocument.LastKnownImageSizes">
-			<string key="NS.key.0">GoToken.png</string>
-			<string key="NS.object.0">{200, 200}</string>
-		</object>
+		<dictionary class="NSMutableDictionary" key="IBDocument.LastKnownImageSizes">
+			<string key="GoToken.png">{200, 200}</string>
+			<string key="carouselarrowleft.png">{127, 93}</string>
+			<string key="carouselarrowright.png">{122, 95}</string>
+		</dictionary>
 		<string key="IBCocoaTouchPluginVersion">2083</string>
 	</data>
 </archive>
