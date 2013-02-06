@@ -74,6 +74,8 @@
 					], # include_dirs
 
 					'mac_bundle_resources': [
+						'../../rsrc/<@(OS)/Default-568h@2x.png',
+						'../../rsrc/<@(OS)/GoToken.png',
 						'../../rsrc/<@(OS)/spritesheet.frag',
 						'../../rsrc/<@(OS)/spritesheet.vert',
 						'../../rsrc/<@(OS)/Cordova.plist',
