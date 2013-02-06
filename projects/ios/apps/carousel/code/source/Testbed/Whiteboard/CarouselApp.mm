@@ -4,124 +4,124 @@
 #include "CallcastEvent.h"
 #include "CallcastManager.h"
 
-#include "AppFlow.h"
+#include "CarouselApp.h"
 
 #include "AppDelegate.h"
 
-AppFlow gAppFlow;
+CarouselApp gCarouselApp;
 extern AppDelegate* gAppDelegateInstance;
 extern UIWebView*   gWebViewInstance;
 
-AppFlow::AppFlow()
+CarouselApp::CarouselApp()
 :   mNickname("nick"),
     mRoomname("room")
 {
     ConstructMachine();
 }
-AppFlow::~AppFlow()
+CarouselApp::~CarouselApp()
 {
     DestructMachine();
 }
 
-void AppFlow::startEntry()
+void CarouselApp::startEntry()
 {
     CallcastManager::getInstance()->attach(this);
 }
 
-void AppFlow::startExit() { }
+void CarouselApp::startExit() { }
 
-void AppFlow::endEntry() { }
-void AppFlow::endExit() { }
+void CarouselApp::endEntry() { }
+void CarouselApp::endExit() { }
 
-void AppFlow::showWebLoadingViewEntry()
+void CarouselApp::showWebLoadingViewEntry()
 {
     [gAppDelegateInstance showWebLoadingView];
 }
-void AppFlow::showWebLoadingViewExit()
+void CarouselApp::showWebLoadingViewExit()
 {
     [gAppDelegateInstance hideWebLoadingView];
 }
 
-void AppFlow::showLoginViewEntry()
+void CarouselApp::showLoginViewEntry()
 {
     [gAppDelegateInstance showLoginView];
 }
 
-void AppFlow::showLoginViewExit()
+void CarouselApp::showLoginViewExit()
 {
     [gAppDelegateInstance hideLoginView];
 
     [gWebViewInstance stringByEvaluatingJavaScriptFromString: [NSString stringWithFormat:@"startCallcast('%s','%s')", mNickname.c_str(), mRoomname.c_str()]];
 }
 
-void AppFlow::showBlankSpotEntry()
+void CarouselApp::showBlankSpotEntry()
 {
     [gAppDelegateInstance showBlankSpot];
 }
 
-void AppFlow::showBlankSpotExit()
+void CarouselApp::showBlankSpotExit()
 {
     [gAppDelegateInstance hideBlankSpot];
 }
 
-void AppFlow::showChatSpotEntry()
+void CarouselApp::showChatSpotEntry()
 {
     [gAppDelegateInstance showChatSpot];
 }
 
-void AppFlow::showChatSpotExit()
+void CarouselApp::showChatSpotExit()
 {
     [gAppDelegateInstance hideChatSpot];
 }
 
-void AppFlow::showNicknameInUseEntry()
+void CarouselApp::showNicknameInUseEntry()
 {
     [gAppDelegateInstance showNicknameInUse];
 }
 
-void AppFlow::showNicknameInUseExit()
+void CarouselApp::showNicknameInUseExit()
 {
     [gAppDelegateInstance hideNicknameInUse];
 }
 
-void AppFlow::showLoggingInViewEntry()
+void CarouselApp::showLoggingInViewEntry()
 {
     [gAppDelegateInstance showLoggingInView];
 }
 
-void AppFlow::showLoggingInViewExit()
+void CarouselApp::showLoggingInViewExit()
 {
     [gAppDelegateInstance hideLoggingInView];
 }
 
-void AppFlow::showWhiteboardSpotEntry()
+void CarouselApp::showWhiteboardSpotEntry()
 {
     [gAppDelegateInstance showWhiteboardSpot];
 }
 
-void AppFlow::showWhiteboardSpotExit()
+void CarouselApp::showWhiteboardSpotExit()
 {
     [gAppDelegateInstance hideWhiteboardSpot];
 }
 
-void AppFlow::update(const AppFlowMessage& msg)
+void CarouselApp::update(const CarouselAppMessage& msg)
 {
     process(msg.event);
 }
 
-void AppFlow::update(const CallcastEvent& msg)
+void CarouselApp::update(const CallcastEvent& msg)
 {
     switch (msg.mEvent)
     {
-        case CallcastEvent::kWebViewLoaded:     process(AppFlow::kWebViewLoaded); break;
+        case CallcastEvent::kWebViewLoaded:     process(CarouselApp::kWebViewLoaded); break;
         case CallcastEvent::kSubmitLogin:
             mNickname = msg.mNickname;
             mRoomname = msg.mRoomname;
-            process(AppFlow::kLoginPressed);
+            process(CarouselApp::kLoginPressed);
             break;
-        case CallcastEvent::kLoggedIn:          process(AppFlow::kLoginSuccess); break;
-        case CallcastEvent::kOnNicknameInUse:   process(AppFlow::kNickInUse); break;
-        case CallcastEvent::kOkayButton:        process(AppFlow::kOkay); break;
+        case CallcastEvent::kLoggedIn:          process(CarouselApp::kLoginSuccess); break;
+        case CallcastEvent::kOnNicknameInUse:   process(CarouselApp::kNickInUse); break;
+        case CallcastEvent::kOkayButton:        process(CarouselApp::kOkay); break;
         default: break;
     }
 }

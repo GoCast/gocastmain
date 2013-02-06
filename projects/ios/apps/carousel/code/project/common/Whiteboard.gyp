@@ -12,16 +12,16 @@
 					
 					'actions': [
 						{
-							'action_name': 'AppFlow.tgf',
-							'inputs': [ '../../tgf/Testbed/Whiteboard/AppFlow.tgf', ], # inputs
-							'outputs': [ '../../source/Testbed/Whiteboard/AppFlow.h', ], # outputs
-							'action': [ '/Volumes/Lab/tools/graphcode', '<@(_inputs)', '--machine', 'AppFlow', '--include-exit', '--update', '--debug', '--basic-stf', '--libtate', '-o', '<@(_outputs)', ], # action
+							'action_name': 'CarouselApp.tgf',
+							'inputs': [ '../../tgf/Testbed/Whiteboard/CarouselApp.tgf', ], # inputs
+							'outputs': [ '../../source/Testbed/Whiteboard/CarouselApp.h', ], # outputs
+							'action': [ '/Volumes/Lab/tools/graphcode', '<@(_inputs)', '--machine', 'CarouselApp', '--include-exit', '--update', '--debug', '--basic-stf', '--libtate', '-o', '<@(_outputs)', ], # action
 						},
 					],	# actions
 
 					'sources': [
-						'../../source/Testbed/Whiteboard/AppFlow.mm',
-						'../../source/Testbed/Whiteboard/AppFlow.h',
+						'../../source/Testbed/Whiteboard/CarouselApp.mm',
+						'../../source/Testbed/Whiteboard/CarouselApp.h',
 
 						'../../source/Testbed/Whiteboard/LoginView.mm',
 						'../../source/Testbed/Whiteboard/LoginView.h',

@@ -2,10 +2,10 @@
 
 #include <queue>
 
-class AppFlowMessage;
+class CarouselAppMessage;
 
-class AppFlow
-:   public tObserver<const AppFlowMessage&>,
+class CarouselApp
+:   public tObserver<const CarouselAppMessage&>,
     public tObserver<const CallcastEvent&>
 {
 protected:
@@ -13,8 +13,8 @@ protected:
     std::string mRoomname;
 
 public:
-    AppFlow();
-    ~AppFlow();
+    CarouselApp();
+    ~CarouselApp();
 
 protected:
     void endEntry();
@@ -112,22 +112,22 @@ public:
 #endif
 
 protected:
-	typedef void (AppFlow::*callfn) ();
+	typedef void (CarouselApp::*callfn) ();
 
 	void CallEntry()
 	{
 		static const callfn fns[] =
 		{
-			&AppFlow::invalidStateEntry,
-			&AppFlow::endEntry,
-			&AppFlow::showBlankSpotEntry,
-			&AppFlow::showChatSpotEntry,
-			&AppFlow::showLoggingInViewEntry,
-			&AppFlow::showLoginViewEntry,
-			&AppFlow::showNicknameInUseEntry,
-			&AppFlow::showWebLoadingViewEntry,
-			&AppFlow::showWhiteboardSpotEntry,
-			&AppFlow::startEntry,
+			&CarouselApp::invalidStateEntry,
+			&CarouselApp::endEntry,
+			&CarouselApp::showBlankSpotEntry,
+			&CarouselApp::showChatSpotEntry,
+			&CarouselApp::showLoggingInViewEntry,
+			&CarouselApp::showLoginViewEntry,
+			&CarouselApp::showNicknameInUseEntry,
+			&CarouselApp::showWebLoadingViewEntry,
+			&CarouselApp::showWhiteboardSpotEntry,
+			&CarouselApp::startEntry,
 		};
 
 		(this->*fns[(mState < 0) ? kInvalidState : (mState > (sizeof(fns) / sizeof(callfn))) ? kInvalidState : mState])();
@@ -136,16 +136,16 @@ protected:
 	{
 		static const callfn fns[] =
 		{
-			&AppFlow::invalidStateExit,
-			&AppFlow::endExit,
-			&AppFlow::showBlankSpotExit,
-			&AppFlow::showChatSpotExit,
-			&AppFlow::showLoggingInViewExit,
-			&AppFlow::showLoginViewExit,
-			&AppFlow::showNicknameInUseExit,
-			&AppFlow::showWebLoadingViewExit,
-			&AppFlow::showWhiteboardSpotExit,
-			&AppFlow::startExit,
+			&CarouselApp::invalidStateExit,
+			&CarouselApp::endExit,
+			&CarouselApp::showBlankSpotExit,
+			&CarouselApp::showChatSpotExit,
+			&CarouselApp::showLoggingInViewExit,
+			&CarouselApp::showLoginViewExit,
+			&CarouselApp::showNicknameInUseExit,
+			&CarouselApp::showWebLoadingViewExit,
+			&CarouselApp::showWhiteboardSpotExit,
+			&CarouselApp::startExit,
 		};
 
 		(this->*fns[(mState < 0) ? kInvalidState : (mState > (sizeof(fns) / sizeof(callfn))) ? kInvalidState : mState])();
@@ -203,7 +203,7 @@ protected:
 protected:
     void ConstructMachine()
     {
-        mState = AppFlow::kInitialState;
+        mState = CarouselApp::kInitialState;
         mHasImmediateEvent = false;
         mMachineDestroyedPtr = NULL;
 
@@ -211,7 +211,7 @@ protected:
 
         if (HasEdgeNamedNext())
         {
-            RunEvent(AppFlow::kNext);
+            RunEvent(CarouselApp::kNext);
         }
     }
 
@@ -223,7 +223,7 @@ protected:
         }
         else
         {
-            process(AppFlow::kQuit);
+            process(CarouselApp::kQuit);
         }
     }
 
@@ -243,7 +243,7 @@ protected:
             if (machineDestroyed) { return true; }
 #if DEBUG && 1
             StateType newState = StateTransitionFunction(mImmediateEvent);
-            printf("%s[%p]: %s X %s -> %s\n", "AppFlow", this, AppFlow::NameForState(mState), AppFlow::NameForEvent(mImmediateEvent), AppFlow::NameForState(newState));
+            printf("%s[%p]: %s X %s -> %s\n", "CarouselApp", this, CarouselApp::NameForState(mState), CarouselApp::NameForEvent(mImmediateEvent), CarouselApp::NameForState(newState));
             mState = newState;
 #else
             mState = StateTransitionFunction(mImmediateEvent);
@@ -292,22 +292,22 @@ public:
         }
     }
 
-    void update(const AppFlowMessage& msg);
+    void update(const CarouselAppMessage& msg);
     void update(const CallcastEvent& msg);
 
-//void AppFlow::update(const AppFlowMessage& msg)
+//void CarouselApp::update(const CarouselAppMessage& msg)
 //{
 //    process(msg.event);
 //}
 };
 
-class AppFlowMessage
+class CarouselAppMessage
 {
 public:
-    AppFlow::EventType                event;
-    tSubject<const AppFlowMessage&>*   source;
+    CarouselApp::EventType                event;
+    tSubject<const CarouselAppMessage&>*   source;
 
 public:
-    AppFlowMessage(AppFlow::EventType evt, tSubject<const AppFlowMessage&>* src = NULL) : event(evt), source(src) { }
+    CarouselAppMessage(CarouselApp::EventType evt, tSubject<const CarouselAppMessage&>* src = NULL) : event(evt), source(src) { }
 };
 

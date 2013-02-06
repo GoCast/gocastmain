@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 46;
+	objectVersion = 45;
 	objects = {
 
 /* Begin PBXAggregateTarget section */
@@ -11,7 +11,7 @@
 			isa = PBXAggregateTarget;
 			buildConfigurationList = 7D7CA389C980295E6A417B9D /* Build configuration list for PBXAggregateTarget "Whiteboard Support" */;
 			buildPhases = (
-				0A8E0DCD8720BFDF6B395EBC /* Action "AppFlow.tgf" */,
+				E5ADC2BF460A62CCF425E9D9 /* Action "CarouselApp.tgf" */,
 			);
 			dependencies = (
 			);
@@ -21,7 +21,6 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
-		00E671627FC87D55009500F2 /* GCICallcast.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8A8261567DAEB3F988BB2131 /* GCICallcast.mm */; };
 		0132B78EF001AED4C1A55FB3 /* ViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 54F13C3695EF1AFD28251AA1 /* ViewController.mm */; };
 		0D44EEFBC2E22C706C4C33BE /* www in Resources */ = {isa = PBXBuildFile; fileRef = 75E6EA81F45BFF94EFDA772A /* www */; };
 		1370EC95C500FCB189CB1E0F /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = F7C98D8853AB3806EE7996DC /* AppDelegate.mm */; };
@@ -37,7 +36,6 @@
 		3F3C09E0AA2E282E0316B180 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C838069FCF6EACE9304AE10C /* CFNetwork.framework */; };
 		409CF818EDBDAF0190FF55D1 /* libCordova.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C62FC56C15FB86F8E24A55CA /* libCordova.a */; };
 		424D412D985449097C8DC6C5 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F36CE187C31FC8D8E7850881 /* CoreLocation.framework */; };
-		48A5FDC8303E0CCFF05C6501 /* LoginView.mm in Sources */ = {isa = PBXBuildFile; fileRef = A972318042313B22BC557297 /* LoginView.mm */; };
 		4A0AEDAAF950A39FC7583DAA /* tFile.mm in Sources */ = {isa = PBXBuildFile; fileRef = B4A1C41114DCC0B1EBECB2F1 /* tFile.mm */; };
 		4D11AA21F0C6BD08E4DBDF4B /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ACBD77BC320339AFCEBD05E2 /* CoreMedia.framework */; };
 		6CC80D77E21DC31ADDFADC15 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D21DC43692508DB38C23866C /* UIKit.framework */; };
@@ -46,10 +44,10 @@
 		76324F8F0BF13362CD002537 /* carouselarrowleft.png in Resources */ = {isa = PBXBuildFile; fileRef = 87A73BD700335C69E968F0CF /* carouselarrowleft.png */; };
 		7D16CBAD06DF4F1A967DF631 /* AddressBookUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36569ED15C81D2B6924E0A43 /* AddressBookUI.framework */; };
 		86001511C0C7AF6D34004EB5 /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0DD38E8E271D3344A9BDC4D6 /* AddressBook.framework */; };
-		86D32EB4891AB4DD0E21D54E /* AppFlow.mm in Sources */ = {isa = PBXBuildFile; fileRef = 603C9E71B91A9016A51D1E71 /* AppFlow.mm */; };
 		8913F2CA806F26838BC984FD /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DCFFB3193E4FDBEDD0C2656F /* SystemConfiguration.framework */; };
 		8F76F8A83A1068014EFE939F /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 67BEF084A2C1D3D8243B9D50 /* MediaPlayer.framework */; };
 		9252AEC258C1DEC360EE996F /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 9C18CE4BB4E9C8DF93918E29 /* InfoPlist.strings */; };
+		9B0655E98A4697188F368DFD /* GCICallcast.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8A8261567DAEB3F988BB2131 /* GCICallcast.mm */; };
 		A7D404C2CB16B378028BE3AC /* tTexture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 09FA150B7647EA6DADF9AAF9 /* tTexture.cpp */; };
 		B0FBDCF52D219D5081778C33 /* OpenGLView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 83102A9266B2BB0C3F20849B /* OpenGLView.mm */; };
 		B1A24D4B4B5F7BA13770ACCD /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6108D4974A4F608C82695D7E /* AVFoundation.framework */; };
@@ -57,12 +55,14 @@
 		B20C863D1210D8CAD92FDE7A /* spritesheet.frag in Resources */ = {isa = PBXBuildFile; fileRef = 719929FE4CB470A6AD62DF0F /* spritesheet.frag */; };
 		B8BE5531CCF911C5C0C7071B /* tSurfacePeer.mm in Sources */ = {isa = PBXBuildFile; fileRef = A3F93D338886817C741D112E /* tSurfacePeer.mm */; };
 		BAE7393A97C01052CA3B366B /* tTimer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16ACDD539B2DE6068F7C460F /* tTimer.cpp */; };
-		BDAFD7E6592AF0F56CFF3E53 /* Whiteboard.mm in Sources */ = {isa = PBXBuildFile; fileRef = F0A74EBFC5BBEEB301BE0385 /* Whiteboard.mm */; };
+		C031AF83E441F5DAE5F319AC /* LoginView.mm in Sources */ = {isa = PBXBuildFile; fileRef = A972318042313B22BC557297 /* LoginView.mm */; };
 		C24DBB7353A4D7718C4F6E9C /* tTimerPeer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0CA36C5DBD6E5C8407C77041 /* tTimerPeer.mm */; };
+		C2A77144FEFDDAC1FC0EE9AC /* CarouselApp.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1499F1FECDF8358B7F293AB9 /* CarouselApp.mm */; };
 		DE318249CDF7AA5BB3B1A04E /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 45AD10DD26EE99758E0D4670 /* OpenGLES.framework */; };
 		E3F8E6F08B409DAA1967D559 /* spritesheet.vert in Resources */ = {isa = PBXBuildFile; fileRef = C139DA84CC3CF2A2CD32F273 /* spritesheet.vert */; };
 		E5A65A712068D2E571523762 /* tShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A3B52E3EA721B2C116CB4BDF /* tShader.cpp */; };
 		E98E4352601B35232DE16299 /* carouselarrowright.png in Resources */ = {isa = PBXBuildFile; fileRef = 6AA49A825C4C652602FD5D20 /* carouselarrowright.png */; };
+		ED0ACF835902795222FFF319 /* Whiteboard.mm in Sources */ = {isa = PBXBuildFile; fileRef = F0A74EBFC5BBEEB301BE0385 /* Whiteboard.mm */; };
 		EEA1D70660B27A70CEA1E907 /* GoToken.png in Resources */ = {isa = PBXBuildFile; fileRef = B223B800A90B3F0B86B7773C /* GoToken.png */; };
 		EFC3D4A78AC709AE5064DCEB /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 527886977B9E5089544AE192 /* QuartzCore.framework */; };
 		FB5FA224983BAEAC5A8A15C7 /* tPixelFormat.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A886F88044A01E0874CF0E90 /* tPixelFormat.cpp */; };
@@ -83,6 +83,7 @@
 		09FA150B7647EA6DADF9AAF9 /* tTexture.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = tTexture.cpp; sourceTree = "<group>"; };
 		0CA36C5DBD6E5C8407C77041 /* tTimerPeer.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = tTimerPeer.mm; sourceTree = "<group>"; };
 		0DD38E8E271D3344A9BDC4D6 /* AddressBook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBook.framework; path = System/Library/Frameworks/AddressBook.framework; sourceTree = SDKROOT; };
+		1499F1FECDF8358B7F293AB9 /* CarouselApp.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = CarouselApp.mm; sourceTree = "<group>"; };
 		1577E9F807E0CE719F9BC9EF /* package.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = package.h; sourceTree = "<group>"; };
 		162161BA2B1E8D921DD37F73 /* tTimerPeer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tTimerPeer.h; sourceTree = "<group>"; };
 		163EC79BB530657307FA85C0 /* tPixelFormat.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tPixelFormat.h; sourceTree = "<group>"; };
@@ -100,7 +101,6 @@
 		527886977B9E5089544AE192 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		54F13C3695EF1AFD28251AA1 /* ViewController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ViewController.mm; sourceTree = "<group>"; };
 		5CC4B70BEEC99963F5664C49 /* tSurface.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = tSurface.cpp; sourceTree = "<group>"; };
-		603C9E71B91A9016A51D1E71 /* AppFlow.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = AppFlow.mm; sourceTree = "<group>"; };
 		6108D4974A4F608C82695D7E /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		660D15570C361C4FA223B2F4 /* LoginView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LoginView.h; sourceTree = "<group>"; };
 		6685E894D5550CC4BF98F9AA /* tObserver.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tObserver.h; sourceTree = "<group>"; };
@@ -115,6 +115,7 @@
 		798C2F236D3430DEA91BF7E8 /* package.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = package.h; sourceTree = "<group>"; };
 		83102A9266B2BB0C3F20849B /* OpenGLView.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = OpenGLView.mm; sourceTree = "<group>"; };
 		87A73BD700335C69E968F0CF /* carouselarrowleft.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = carouselarrowleft.png; sourceTree = "<group>"; };
+		8920B147AFD619DD4FC9177B /* CarouselApp.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CarouselApp.h; sourceTree = "<group>"; };
 		8A8261567DAEB3F988BB2131 /* GCICallcast.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = GCICallcast.mm; sourceTree = "<group>"; };
 		8E14DE79388DB788006202E1 /* package.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = package.h; sourceTree = "<group>"; };
 		91ED334047D6952BD18C6F02 /* common.gypi */ = {isa = PBXFileReference; lastKnownFileType = text; path = common.gypi; sourceTree = "<group>"; };
@@ -131,15 +132,14 @@
 		AD5C7E76A38BAEB35D1918BD /* tInputManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tInputManager.h; sourceTree = "<group>"; };
 		B223B800A90B3F0B86B7773C /* GoToken.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GoToken.png; sourceTree = "<group>"; };
 		B4A1C41114DCC0B1EBECB2F1 /* tFile.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = tFile.mm; sourceTree = "<group>"; };
-		BB0EB80998DFA7694A110275 /* AppFlow.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppFlow.h; sourceTree = "<group>"; };
 		BD93EAF6357AA13C5AB576C6 /* tShader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tShader.h; sourceTree = "<group>"; };
 		C139DA84CC3CF2A2CD32F273 /* spritesheet.vert */ = {isa = PBXFileReference; lastKnownFileType = text; path = spritesheet.vert; sourceTree = "<group>"; };
 		C1D41AD2FC7F4C2A868E0AD9 /* tTouchEvent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tTouchEvent.h; sourceTree = "<group>"; };
-		C3F0A3BABBF2DF03643E0EFF /* AppFlow.tgf */ = {isa = PBXFileReference; lastKnownFileType = text; path = AppFlow.tgf; sourceTree = "<group>"; };
 		C62FC56C15FB86F8E24A55CA /* libCordova.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libCordova.a; path = "../../third-party/CordovaLib/lib/$(CURRENT_ARCH)/debug/libCordova.a"; sourceTree = "<group>"; };
 		C838069FCF6EACE9304AE10C /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
 		C9890DFA3B3AC133E3BECABB /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainViewController.xib; sourceTree = "<group>"; };
 		CCEF333632CC882A1C51723D /* tSurface.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tSurface.h; sourceTree = "<group>"; };
+		CD6B85CE093549E7C24B5F90 /* CarouselApp.tgf */ = {isa = PBXFileReference; lastKnownFileType = text; path = CarouselApp.tgf; sourceTree = "<group>"; };
 		CFF5BBC4DAF71060AA586293 /* tProgram.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = tProgram.cpp; sourceTree = "<group>"; };
 		D21DC43692508DB38C23866C /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		D7194E88971AA4E5865F3427 /* Cordova.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Cordova.plist; sourceTree = "<group>"; };
@@ -235,6 +235,14 @@
 			path = Base;
 			sourceTree = "<group>";
 		};
+		33F79FE13FD889EC8229351B /* tgf/Testbed/Whiteboard */ = {
+			isa = PBXGroup;
+			children = (
+				CD6B85CE093549E7C24B5F90 /* CarouselApp.tgf */,
+			);
+			path = tgf/Testbed/Whiteboard;
+			sourceTree = "<group>";
+		};
 		4365B0A1D9BD6AAAF27800A3 /* Bootstrap/ios */ = {
 			isa = PBXGroup;
 			children = (
@@ -269,20 +277,12 @@
 			path = Input;
 			sourceTree = "<group>";
 		};
-		6381099333F5B2976BCE4350 /* tgf/Testbed/Whiteboard */ = {
-			isa = PBXGroup;
-			children = (
-				C3F0A3BABBF2DF03643E0EFF /* AppFlow.tgf */,
-			);
-			path = tgf/Testbed/Whiteboard;
-			sourceTree = "<group>";
-		};
 		9C591780E65AB8AD6C296443 /* Source */ = {
 			isa = PBXGroup;
 			children = (
 				C2C0057F6E15439AFBEB8CB4 /* rsrc */,
 				CE3F2E0D4AEF97F316C4725B /* source */,
-				6381099333F5B2976BCE4350 /* tgf/Testbed/Whiteboard */,
+				33F79FE13FD889EC8229351B /* tgf/Testbed/Whiteboard */,
 			);
 			name = Source;
 			path = ../..;
@@ -337,23 +337,6 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		C13269C2F9824393A4C48914 /* Testbed/Whiteboard */ = {
-			isa = PBXGroup;
-			children = (
-				BB0EB80998DFA7694A110275 /* AppFlow.h */,
-				603C9E71B91A9016A51D1E71 /* AppFlow.mm */,
-				A79C1004A56BA9D1E9F59BEA /* CallcastEvent.h */,
-				A0B09A4813FF124C1769DFB6 /* CallcastManager.h */,
-				95ED5BBA83A915FFE39E7910 /* GCICallcast.h */,
-				8A8261567DAEB3F988BB2131 /* GCICallcast.mm */,
-				660D15570C361C4FA223B2F4 /* LoginView.h */,
-				A972318042313B22BC557297 /* LoginView.mm */,
-				18706E684443CA2FE1BC4B6F /* Whiteboard.h */,
-				F0A74EBFC5BBEEB301BE0385 /* Whiteboard.mm */,
-			);
-			path = Testbed/Whiteboard;
-			sourceTree = "<group>";
-		};
 		C2C0057F6E15439AFBEB8CB4 /* rsrc */ = {
 			isa = PBXGroup;
 			children = (
@@ -393,7 +376,7 @@
 				B725B79358BFD482911D6690 /* Io */,
 				D8A89EC23F5F025598003924 /* Math */,
 				CD1732A175D168FAB36BB309 /* OpenGL */,
-				C13269C2F9824393A4C48914 /* Testbed/Whiteboard */,
+				E1C989056175B58404B052CF /* Testbed/Whiteboard */,
 			);
 			path = source;
 			sourceTree = "<group>";
@@ -405,6 +388,23 @@
 				E5C8BA65286D17F0A1409AF2 /* tRect.h */,
 			);
 			path = Math;
+			sourceTree = "<group>";
+		};
+		E1C989056175B58404B052CF /* Testbed/Whiteboard */ = {
+			isa = PBXGroup;
+			children = (
+				A79C1004A56BA9D1E9F59BEA /* CallcastEvent.h */,
+				A0B09A4813FF124C1769DFB6 /* CallcastManager.h */,
+				8920B147AFD619DD4FC9177B /* CarouselApp.h */,
+				1499F1FECDF8358B7F293AB9 /* CarouselApp.mm */,
+				95ED5BBA83A915FFE39E7910 /* GCICallcast.h */,
+				8A8261567DAEB3F988BB2131 /* GCICallcast.mm */,
+				660D15570C361C4FA223B2F4 /* LoginView.h */,
+				A972318042313B22BC557297 /* LoginView.mm */,
+				18706E684443CA2FE1BC4B6F /* Whiteboard.h */,
+				F0A74EBFC5BBEEB301BE0385 /* Whiteboard.mm */,
+			);
+			path = Testbed/Whiteboard;
 			sourceTree = "<group>";
 		};
 		E2A526ED07BF7CAF0FA786F8 /* ios */ = {
@@ -446,11 +446,7 @@
 			};
 			buildConfigurationList = 61B74A76653AB34E196D8845 /* Build configuration list for PBXProject "Whiteboard" */;
 			compatibilityVersion = "Xcode 3.2";
-			developmentRegion = English;
 			hasScannedForEncodings = 1;
-			knownRegions = (
-				en,
-			);
 			mainGroup = 0456162378FBD0D1E5D4D6A8;
 			projectDirPath = ../common;
 			projectRoot = "";
@@ -483,21 +479,21 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		0A8E0DCD8720BFDF6B395EBC /* Action "AppFlow.tgf" */ = {
+		E5ADC2BF460A62CCF425E9D9 /* Action "CarouselApp.tgf" */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
-				../../tgf/Testbed/Whiteboard/AppFlow.tgf,
+				../../tgf/Testbed/Whiteboard/CarouselApp.tgf,
 			);
-			name = "Action \"AppFlow.tgf\"";
+			name = "Action \"CarouselApp.tgf\"";
 			outputPaths = (
-				../../source/Testbed/Whiteboard/AppFlow.h,
+				../../source/Testbed/Whiteboard/CarouselApp.h,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "exec /Volumes/Lab/tools/graphcode ../../tgf/Testbed/Whiteboard/AppFlow.tgf --machine AppFlow --include-exit --update --debug --basic-stf --libtate -o ../../source/Testbed/Whiteboard/AppFlow.h\nexit 1\n";
+			shellScript = "exec /Volumes/Lab/tools/graphcode ../../tgf/Testbed/Whiteboard/CarouselApp.tgf --machine CarouselApp --include-exit --update --debug --basic-stf --libtate -o ../../source/Testbed/Whiteboard/CarouselApp.h\nexit 1\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -507,10 +503,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				86D32EB4891AB4DD0E21D54E /* AppFlow.mm in Sources */,
-				48A5FDC8303E0CCFF05C6501 /* LoginView.mm in Sources */,
-				BDAFD7E6592AF0F56CFF3E53 /* Whiteboard.mm in Sources */,
-				00E671627FC87D55009500F2 /* GCICallcast.mm in Sources */,
+				C2A77144FEFDDAC1FC0EE9AC /* CarouselApp.mm in Sources */,
+				C031AF83E441F5DAE5F319AC /* LoginView.mm in Sources */,
+				ED0ACF835902795222FFF319 /* Whiteboard.mm in Sources */,
+				9B0655E98A4697188F368DFD /* GCICallcast.mm in Sources */,
 				BAE7393A97C01052CA3B366B /* tTimer.cpp in Sources */,
 				C24DBB7353A4D7718C4F6E9C /* tTimerPeer.mm in Sources */,
 				4A0AEDAAF950A39FC7583DAA /* tFile.mm in Sources */,
@@ -627,14 +623,10 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (
-					"-weak_framework",
-					CoreFoundation,
-					"-weak_framework",
-					UIKit,
-					"-weak_framework",
-					AVFoundation,
-					"-weak_framework",
-					CoreMedia,
+					"-weak_framework CoreFoundation",
+					"-weak_framework UIKit",
+					"-weak_framework AVFoundation",
+					"-weak_framework CoreMedia",
 					"-weak-lSystem",
 					"-all_load",
 					"-Obj-C",
@@ -763,14 +755,10 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
-					"-weak_framework",
-					CoreFoundation,
-					"-weak_framework",
-					UIKit,
-					"-weak_framework",
-					AVFoundation,
-					"-weak_framework",
-					CoreMedia,
+					"-weak_framework CoreFoundation",
+					"-weak_framework UIKit",
+					"-weak_framework AVFoundation",
+					"-weak_framework CoreMedia",
 					"-weak-lSystem",
 					"-all_load",
 					"-Obj-C",
