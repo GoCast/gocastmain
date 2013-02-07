@@ -69,8 +69,7 @@ body > .container > .row > .span5 > form button {
     margin-right: 15px;
 }
 
-body > .container > .row > .span5 > form .control-group:last-child/*,
-body > .container > .row > .span5 > form#startmeeting-form .control-group:nth-of-type(4)*/ {
+body > .container > .row > .span5 > form .control-group:last-child {
     margin-top: 35px;
     padding-top: 20px;
     border-top: 1px solid #E5E5E5;
