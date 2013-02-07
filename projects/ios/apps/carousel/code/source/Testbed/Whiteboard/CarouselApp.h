@@ -1,7 +1,7 @@
 #pragma once
 
 #include <queue>
-#include <list>
+#include <vector>
 #include <map>
 
 class CarouselAppMessage;
@@ -20,7 +20,7 @@ protected:
 
     std::string                     mNickname;
     std::string                     mRoomname;
-    std::list<int32_t>              mSpots;
+    std::vector<int32_t>              mSpots;
     std::map<int32_t, tSurface*>    mSurfaces;
     uint32_t                        mSpotFinger;
 
@@ -48,10 +48,10 @@ public:
     void onPrevButton();
     void onNextButton();
 
-    void onSave(const tColor4b& nc, const float& np);
-    void onMoveTo(const tPoint2f& pt);
-    void onLineTo(const tPoint2f& pt);
-    void onStroke();
+    void onSave(const int32_t& newID, const tColor4b& nc, const float& np);
+    void onMoveTo(const int32_t& newID, const tPoint2f& pt);
+    void onLineTo(const int32_t& newID, const tPoint2f& pt);
+    void onStroke(const int32_t& newID);
 
 protected:
     void endEntry();

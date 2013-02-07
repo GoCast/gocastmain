@@ -39,7 +39,7 @@ const tColor4b      kWhite  (255,255,255,255);
 {
 #pragma unused(command)
     printf("%s", "*** kSave\n");
-    std::string rawColor = [[command.arguments objectAtIndex:0] UTF8String];
+    std::string rawColor = [[command.arguments objectAtIndex:1] UTF8String];
     tColor4b useColor = kBlue;
 
     if (rawColor == "#000")
@@ -67,7 +67,10 @@ const tColor4b      kWhite  (255,255,255,255);
         printf("*** Unknown color: %s\n", rawColor.c_str());
     }
 
-    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kSave, useColor, atoi([[command.arguments objectAtIndex:1] UTF8String])));
+    // TODO: fix SpotID
+    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kSave,
+                                                         atoi([[command.arguments objectAtIndex:0] UTF8String]),
+                                                         useColor, atoi([[command.arguments objectAtIndex:2] UTF8String])));
 }
 
 - (void)restore:(CDVInvokedUrlCommand*)command
@@ -92,19 +95,24 @@ const tColor4b      kWhite  (255,255,255,255);
 {
     printf("%s", "*** kMoveTo\n");
     CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kMoveTo,
-                                                             tPoint2f(atoi([[command.arguments objectAtIndex:0] UTF8String]), atoi([[command.arguments objectAtIndex:1] UTF8String]))));
+                                                            atoi([[command.arguments objectAtIndex:0] UTF8String]),
+                                                             tPoint2f(atoi([[command.arguments objectAtIndex:1] UTF8String]),
+                                                                      atoi([[command.arguments objectAtIndex:2] UTF8String]))));
 }
 - (void)lineTo:(CDVInvokedUrlCommand*)command
 {
     printf("%s", "*** kLineTo\n");
     CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kLineTo,
-                                                             tPoint2f(atoi([[command.arguments objectAtIndex:0] UTF8String]), atoi([[command.arguments objectAtIndex:1] UTF8String]))));
+                                                         atoi([[command.arguments objectAtIndex:0] UTF8String]),
+                                                             tPoint2f(atoi([[command.arguments objectAtIndex:1] UTF8String]),
+                                                                      atoi([[command.arguments objectAtIndex:2] UTF8String]))));
 }
 - (void)stroke:(CDVInvokedUrlCommand*)command
 {
 #pragma unused(command)
     printf("%s", "*** kStroke\n");
-    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kStroke));
+    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kStroke,
+                                                         atoi([[command.arguments objectAtIndex:0] UTF8String])));
 }
 
 #pragma mark -

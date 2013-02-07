@@ -213,12 +213,6 @@ void CarouselApp::onAddSpot(const std::string& newType, const int32_t& newID)
 
         if (wasEmpty)
         {
-            if (mInitialized)
-            {
-                delete mWhiteboardTexture;
-                mWhiteboardTexture = new tTexture(*(*mSurfaces.begin()).second);
-            }
-
             process(kShowWhiteboard);
         }
     }
@@ -226,7 +220,7 @@ void CarouselApp::onAddSpot(const std::string& newType, const int32_t& newID)
 
 void CarouselApp::onRemoveSpot(const int32_t& newID)
 {
-    std::list<int32_t>::iterator iter = mSpots.begin();
+    std::vector<int32_t>::iterator iter = mSpots.begin();
     uint32_t count = 0;
 
     while(iter != mSpots.end())
@@ -249,6 +243,11 @@ void CarouselApp::onRemoveSpot(const int32_t& newID)
     }
     else if (mSpotFinger == count)
     {
+        if (mSpotFinger > 0)
+        {
+            mSpotFinger--;
+        }
+
         process(kShowWhiteboard);
     }
 }
@@ -260,51 +259,70 @@ void CarouselApp::onOkayButton()
 
 void CarouselApp::onPrevButton()
 {
-    if (mSpotFinger != 0)
+    if (!mSpots.empty())
     {
-        mSpotFinger--;
+        if (mSpotFinger != 0)
+        {
+            mSpotFinger--;
+        }
+        else
+        {
+            mSpotFinger = mSpots.size() - 1;
+        }
         process(kShowWhiteboard);
     }
 }
 
 void CarouselApp::onNextButton()
 {
-    if (mSpotFinger != mSpots.size() - 1)
+    if (!mSpots.empty())
     {
-        mSpotFinger++;
+        if (mSpotFinger != mSpots.size() - 1)
+        {
+            mSpotFinger++;
+        }
+        else
+        {
+            mSpotFinger = 0;
+        }
         process(kShowWhiteboard);
     }
 }
 
 #pragma mark -
 
-void CarouselApp::onSave(const tColor4b& nc, const float& np)
+void CarouselApp::onSave(const int32_t& newID, const tColor4b& nc, const float& np)
 {
+#pragma unused(newID)
     mReceivePenColor    = nc;
     mReceivePenSize     = np;
 }
 
-void CarouselApp::onMoveTo(const tPoint2f& pt)
+void CarouselApp::onMoveTo(const int32_t& newID, const tPoint2f& pt)
 {
+#pragma unused(newID)
     mCurDrawPoint = pt;
 }
 
-void CarouselApp::onLineTo(const tPoint2f& pt)
+void CarouselApp::onLineTo(const int32_t& newID, const tPoint2f& pt)
 {
     if (!mSurfaces.empty())
     {
-        (*mSurfaces.begin()).second->drawLineWithPen(mCurDrawPoint, pt, mReceivePenColor, mReceivePenSize);
+        mSurfaces[newID]->drawLineWithPen(mCurDrawPoint, pt, mReceivePenColor, mReceivePenSize);
     }
 
     mCurDrawPoint = pt;
 }
 
-void CarouselApp::onStroke()
+void CarouselApp::onStroke(const int32_t& newID)
 {
     if (!mSurfaces.empty())
     {
-        delete mWhiteboardTexture;
-        mWhiteboardTexture = new tTexture(*(*mSurfaces.begin()).second);
+        if (mSpots[mSpotFinger] == newID)
+        {
+            delete mWhiteboardTexture;
+            mWhiteboardTexture = new tTexture(*mSurfaces[mSpots[mSpotFinger]]);
+        }
     }
 }
 
@@ -374,6 +392,11 @@ void CarouselApp::showLoggingInViewExit()
 
 void CarouselApp::showWhiteboardSpotEntry()
 {
+    if (mInitialized)
+    {
+        delete mWhiteboardTexture;
+        mWhiteboardTexture = new tTexture(*mSurfaces[mSpots[mSpotFinger]]);
+    }
     [gAppDelegateInstance showWhiteboardSpot];
 }
 
@@ -391,10 +414,10 @@ void CarouselApp::update(const CallcastEvent& msg)
 {
     switch (msg.mEvent)
     {
-        case CallcastEvent::kSave:   onSave(msg.mColor, msg.mPenSize); break;
-        case CallcastEvent::kMoveTo: onMoveTo(msg.mPoint); break;
-        case CallcastEvent::kLineTo: onLineTo(msg.mPoint); break;
-        case CallcastEvent::kStroke: onStroke(); break;
+        case CallcastEvent::kSave:   onSave(msg.mSpotID, msg.mColor, msg.mPenSize); break;
+        case CallcastEvent::kMoveTo: onMoveTo(msg.mSpotID, msg.mPoint); break;
+        case CallcastEvent::kLineTo: onLineTo(msg.mSpotID, msg.mPoint); break;
+        case CallcastEvent::kStroke: onStroke(msg.mSpotID); break;
 
         case CallcastEvent::kAddSpot: onAddSpot(msg.mSpotType, msg.mSpotID); break;
         case CallcastEvent::kRemoveSpot: onRemoveSpot(msg.mSpotID); break;

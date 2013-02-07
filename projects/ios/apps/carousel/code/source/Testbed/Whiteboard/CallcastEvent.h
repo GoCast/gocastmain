@@ -42,12 +42,12 @@ public:
 
 public:
     EventType       mEvent;
+    std::string     mSpotType;
+    int32_t         mSpotID;
     std::string     mNickname;
     std::string     mRoomname;
-    std::string     mSpotType;
     tColor4b        mColor;
     tPoint2f        mPoint;
-    int32_t         mSpotID;
     float           mPenSize;
 
 public:
@@ -57,10 +57,10 @@ public:
     : mEvent(evt), mSpotType(newSpotType), mSpotID(newSpotID) { }
     CallcastEvent(EventType evt, const int32_t& newSpotID)
     : mEvent(evt), mSpotID(newSpotID) { }
-    CallcastEvent(EventType evt, const tPoint2f& np)
-    : mEvent(evt), mPoint(np) { }
-    CallcastEvent(EventType evt, const tColor4b& nc, const float& np)
-    : mEvent(evt), mColor(nc), mPenSize(np) { }
+    CallcastEvent(EventType evt, const int32_t& newSpotID, const tPoint2f& np)
+    : mEvent(evt), mSpotID(newSpotID), mPoint(np) { }
+    CallcastEvent(EventType evt, const int32_t& newSpotID, const tColor4b& nc, const float& np)
+    : mEvent(evt), mSpotID(newSpotID), mColor(nc), mPenSize(np) { }
     CallcastEvent(EventType evt)
     : mEvent(evt) { }
 };

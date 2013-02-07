@@ -134,13 +134,13 @@
                                 case "save":
 //                                    this.wbCtx.save();
 //                                    this.settings.applyJson(cmdArray[i].settings, this.wbCtx);
-                                                    cordova.exec(function(winParam) {}, function(error) {}, "GCICallcast", "save", [ stroke[i].settings.strokeStyle, stroke[i].settings.lineWidth.toString() ]); break;
+                                                    cordova.exec(function(winParam) {}, function(error) {}, "GCICallcast", "save", [ info.spotnumber.toString(), stroke[i].settings.strokeStyle, stroke[i].settings.lineWidth.toString() ]); break;
                                 case "restore":     cordova.exec(function(winParam) {}, function(error) {}, "GCICallcast", "restore", [ "" ]); break;
                                 case "beginPath":   cordova.exec(function(winParam) {}, function(error) {}, "GCICallcast", "beginPath", [ "" ]); break;
                                 case "closePath":   cordova.exec(function(winParam) {}, function(error) {}, "GCICallcast", "closePath", [ "" ]); break;
-                                case "moveTo":      cordova.exec(function(winParam) {}, function(error) {}, "GCICallcast", "moveTo", [ stroke[i].x.toString(), stroke[i].y.toString() ]); break;
-                                case "lineTo":      cordova.exec(function(winParam) {}, function(error) {}, "GCICallcast", "lineTo", [ stroke[i].x.toString(), stroke[i].y.toString() ]); break;
-                                case "stroke":      cordova.exec(function(winParam) {}, function(error) {}, "GCICallcast", "stroke", [ "" ]); break;
+                                case "moveTo":      cordova.exec(function(winParam) {}, function(error) {}, "GCICallcast", "moveTo", [ info.spotnumber.toString(), stroke[i].x.toString(), stroke[i].y.toString() ]); break;
+                                case "lineTo":      cordova.exec(function(winParam) {}, function(error) {}, "GCICallcast", "lineTo", [ info.spotnumber.toString(), stroke[i].x.toString(), stroke[i].y.toString() ]); break;
+                                case "stroke":      cordova.exec(function(winParam) {}, function(error) {}, "GCICallcast", "stroke", [ info.spotnumber.toString() ]); break;
                                 default: throw "WhiteBoard.doCommand unknown cmd " + cmdArray[i].name; break;
                             }
                         }

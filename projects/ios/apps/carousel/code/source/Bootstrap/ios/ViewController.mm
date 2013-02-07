@@ -196,24 +196,28 @@ UIWebView* gWebViewInstance = NULL;
 -(IBAction)pressed1px:(id)sender
 {
 #pragma unused(sender)
-    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kChangePenSize, tColor4b(0,0,0,0), 1));
+    // TODO: fix SpotID
+    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kChangePenSize, -1, tColor4b(0,0,0,0), 1));
 }
 -(IBAction)pressed3px:(id)sender
 {
 #pragma unused(sender)
-    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kChangePenSize, tColor4b(0,0,0,0), 3));
+    // TODO: fix SpotID
+    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kChangePenSize, -1, tColor4b(0,0,0,0), 3));
 }
 
 -(IBAction)pressed5px:(id)sender
 {
 #pragma unused(sender)
-    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kChangePenSize, tColor4b(0,0,0,0), 5));
+    // TODO: fix SpotID
+    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kChangePenSize, -1, tColor4b(0,0,0,0), 5));
 }
 
 -(IBAction)pressed10px:(id)sender
 {
 #pragma unused(sender)
-    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kChangePenSize, tColor4b(0,0,0,0), 10));
+    // TODO: fix SpotID
+    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kChangePenSize, -1, tColor4b(0,0,0,0), 10));
 }
 
 -(IBAction)pressedColor:(id)sender
