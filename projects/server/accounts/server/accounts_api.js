@@ -393,7 +393,7 @@ function apiSendEmailAgain(email, baseURL, success, failure) {
 //     .note An additional note to be included in the email from the user.
 //
 function apiSendRoomInviteEmail(opts, success, failure) {
-    var emailBody, emailName, maxToSend = 25;
+    var emailBody, emailName, maxToSend = 26;   // 25 + 1 for the sender.
 
     // If Account exists, return db entry.
     db.GetEntryByAccountName(opts.fromemail, function(entry) {
@@ -411,6 +411,7 @@ function apiSendRoomInviteEmail(opts, success, failure) {
                 emailName = opts.fromemail;
             }
 
+            opts.toemailarray.unshift(opts.fromemail);
             emailBody = privateGenInviteEmail(emailName, opts.link, opts.note, opts.when);
             privateSendEmailList(opts.toemailarray.slice(0, maxToSend),
                                  'Your invitation to meet on GoCast with ' + emailName, emailBody, function() {
