@@ -15,6 +15,8 @@
 - (void) lineTo:(CDVInvokedUrlCommand*)command;
 - (void) stroke:(CDVInvokedUrlCommand*)command;
 
+- (void) loadImageURL:(CDVInvokedUrlCommand*)command;
+
 - (void) addSpot:(CDVInvokedUrlCommand*)command;
 - (void) removeSpot:(CDVInvokedUrlCommand*)command;
 - (void) setSpot:(CDVInvokedUrlCommand*)command;

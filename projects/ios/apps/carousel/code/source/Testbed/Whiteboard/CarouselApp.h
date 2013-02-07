@@ -66,6 +66,8 @@ public:
     void onLineTo(const int32_t& newID, const tPoint2f& pt);
     void onStroke(const int32_t& newID);
 
+    void onLoadImageURL(const int32_t& newID, const std::string& newURL);
+
 protected:
     void endEntry();
     void showBlankSpotEntry();

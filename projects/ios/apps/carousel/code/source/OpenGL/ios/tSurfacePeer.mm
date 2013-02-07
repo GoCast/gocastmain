@@ -1,87 +1,65 @@
-#if !defined(PLATFORM_IOS)
-#import <Cocoa/Cocoa.h>
-#endif
-
 #ifdef __OBJC__
 #import <Foundation/Foundation.h>
+#import <UIKit/UIImage.h>
 #endif
+
+#include <string>
 
 #include "Base/package.h"
 #include "Math/package.h"
 #include "OpenGL/package.h"
 
-tSurface::tSurface(const std::string& filename)
+//NSURL *url = [NSURL URLWithString:path];
+//NSData *data = [NSData dataWithContentsOfURL:url];
+//UIImage *img = [[UIImage alloc] initWithData:data cache:NO];
+//CGSize size = img.size;
+
+tSurface::tSurface(const std::string& path)
 : mSize(0,0), mType(tPixelFormat::kInvalid), mPtr(NULL)
 {
-#pragma unused(filename)
-//    @autoreleasepool
-//    {
-//        //from http://blog.darklightstudio.com/?p=19
-//        
-//        //-- First we load an NSImage resource that’s bundled with the app.
-//        
-//        NSImage *baseImage = [NSImage imageNamed:[NSString stringWithCString:filename.c_str() encoding:NSUTF8StringEncoding]];
-//
-//        assert(baseImage);
-//
-//        //	We have to recreate the image flipped right-side up (bleh)
-//        
-//        NSImage *image = [[NSImage alloc] initWithSize:[baseImage size]];
-//        NSRect r = NSZeroRect;
-//        r.size = [baseImage size];
-//
-//        //Save the size for later use in libtate!
-//        mSize.width   = (float)r.size.width;
-//        mSize.height  = (float)r.size.height;
-//        
-//        [image lockFocus];
-//        NSAffineTransform *t = [NSAffineTransform transform];
-//        [t translateXBy:0 yBy:r.size.height];
-//        [t scaleXBy:1 yBy:-1];
-//        [t concat];
-//        [baseImage drawAtPoint:NSZeroPoint fromRect:r operation:NSCompositeCopy fraction:1];
-//        [image unlockFocus];
-//
-//        //-- Then we grab the raw bitmap data from the NSBitmapImageRep that is the ‘source’ of an NSImage
-//        
-//        NSBitmapImageRep *bitmap=[[NSBitmapImageRep alloc] initWithData:[image TIFFRepresentation]];
-//        
-//        [image release];
-//        
-//        GLubyte	 *sourcePic;
-//        
-//        //	Check if it has alpha (transparency)
-//        // We have to know how many numbers for each pixel.
-//        // A pixel can have just a white value (grayscale) or red,green,and blue values (color). It has a 4th value if it’s transparent like a png.
-//        if ([bitmap hasAlpha] == YES)
-//        {
-//            mType = tPixelFormat::kR8G8B8A8;
-//        }
-//        else
-//        {
-//            mType = tPixelFormat::kR8G8B8;
-//        }
-//
-//        //	NOW we actually get the data
-//        NSSize imageSize = [bitmap size];
-//        mBytesPerRow = (uint16_t)[bitmap bytesPerRow];
-//        
-//        //	This SHOULD be enough but nope
-//        sourcePic = (GLubyte*) [bitmap bitmapData];
-//        
-//        //	We have to copy that raw data one row at a time….yay
-//        mPtr = new uint8_t[(int32_t)(imageSize.height * mBytesPerRow)];
-//        GLuint	i;
-//        for (i = 0; i < imageSize.height; i++)
-//        {
-//            memcpy ( &mPtr[i * mBytesPerRow], &sourcePic[(int32_t)(imageSize.height - i - 1) * mBytesPerRow], mBytesPerRow);
-//        }
-//        
-//        [bitmap release];
-//    }
-//
-//    
-//    
-//    assert((mSize.width != 0) && (mSize.height != 0) && (mType != tPixelFormat::kInvalid) && (mPtr));
+    @autoreleasepool
+    {
+        //From: http://www.david-amador.com/2011/03/loading-images-into-opengl-in-iphone/
+
+        NSURL *url = [NSURL URLWithString:[NSString stringWithCString:path.c_str() encoding:NSUTF8StringEncoding]];
+        NSData *data = [NSData dataWithContentsOfURL:url];
+        UIImage *baseImage = [[[UIImage alloc] initWithData:data] autorelease];
+//        UIImage* baseImage = [UIImage imageNamed:[NSString stringWithCString:filename.c_str() encoding:NSUTF8StringEncoding]];
+
+        assert(baseImage);
+
+        // Get Image size
+        mSize.width     = CGImageGetWidth(baseImage.CGImage);
+        mSize.height    = CGImageGetHeight(baseImage.CGImage);
+        mType           = tPixelFormat::kR8G8B8A8;
+        mBytesPerRow    = uint16_t(4 * mSize.width);
+
+        CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+        CGRect rect = CGRectMake( 0, 0, mSize.width, mSize.height );
+        // Allocate memory for image
+        uint8_t* imageData = (uint8_t*)malloc( size_t(mSize.height * mBytesPerRow) );
+        CGContextRef imgcontext = CGBitmapContextCreate( imageData, (size_t)mSize.width, (size_t)mSize.height, 8, mBytesPerRow, colorSpace, kCGImageAlphaPremultipliedLast | kCGBitmapByteOrder32Big );
+        CGColorSpaceRelease( colorSpace );
+        CGContextClearRect( imgcontext, rect );
+        CGContextTranslateCTM( imgcontext, 0, 0 );
+        CGFloat white[] = { 1, 1, 1, 1 };
+        CGColorRef whiteColor = CGColorCreate(colorSpace, white);
+        CGContextSetFillColorWithColor( imgcontext, whiteColor);
+        CGContextFillRect( imgcontext, rect );
+        CGColorRelease(whiteColor);
+        CGContextDrawImage( imgcontext, rect, baseImage.CGImage );
+
+        //	We have to copy that raw data one row at a time….yay
+        mPtr = new uint8_t[(int32_t)(mSize.height * mBytesPerRow)];
+
+        memcpy(mPtr, imageData, size_t(mSize.height * mBytesPerRow));
+
+        // Release context
+        CGContextRelease(imgcontext);
+        // Free Stuff
+        free(imageData);
+    }
+
+    assert((mSize.width != 0) && (mSize.height != 0) && (mType != tPixelFormat::kInvalid) && (mPtr));
 }
 

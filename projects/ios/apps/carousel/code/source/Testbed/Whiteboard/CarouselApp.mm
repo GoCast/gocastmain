@@ -394,6 +394,21 @@ void CarouselApp::onStroke(const int32_t& newID)
     }
 }
 
+void CarouselApp::onLoadImageURL(const int32_t& newID, const std::string& newURL)
+{
+    if (!mSurfaces.empty())
+    {
+        delete mSurfaces[newID];
+        mSurfaces[newID] = new tSurface(newURL);
+
+        if (mSpots[mSpotFinger] == newID)
+        {
+            delete mWhiteboardTexture;
+            mWhiteboardTexture = new tTexture(*mSurfaces[mSpots[mSpotFinger]]);
+        }
+    }
+}
+
 #pragma mark -
 
 void CarouselApp::startEntry()
@@ -498,6 +513,8 @@ void CarouselApp::update(const CallcastEvent& msg)
         case CallcastEvent::kMoveTo: onMoveTo(msg.mSpotID, msg.mPoint); break;
         case CallcastEvent::kLineTo: onLineTo(msg.mSpotID, msg.mPoint); break;
         case CallcastEvent::kStroke: onStroke(msg.mSpotID); break;
+
+        case CallcastEvent::kLoadImageURL: onLoadImageURL(msg.mSpotID, msg.mURL); break;
 
         case CallcastEvent::kAddSpot: onAddSpot(msg.mSpotType, msg.mSpotID); break;
         case CallcastEvent::kRemoveSpot: onRemoveSpot(msg.mSpotID); break;

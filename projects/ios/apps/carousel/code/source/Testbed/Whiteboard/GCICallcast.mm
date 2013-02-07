@@ -117,6 +117,15 @@ const tColor4b      kWhite  (255,255,255,255);
 
 #pragma mark -
 
+- (void) loadImageURL:(CDVInvokedUrlCommand*)command
+{
+    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kLoadImageURL,
+                                                         atoi([[command.arguments objectAtIndex:0] UTF8String]),
+                                                         [[command.arguments objectAtIndex:1] UTF8String]));
+}
+
+#pragma mark -
+
 - (void) addSpot:(CDVInvokedUrlCommand*)command
 {
 #pragma unused(command)

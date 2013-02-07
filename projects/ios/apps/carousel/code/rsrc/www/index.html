@@ -109,6 +109,7 @@
                     if (info.image)
                     {
                         console.log('Image Given. Must create canvas/image as starting point.');
+                        cordova.exec(function(winParam) {}, function(error) {}, "GCICallcast", "loadImageURL", [ info.spotnumber.toString(), info.image.toString() ]);
                     }
 
                     if (info.strokes)
