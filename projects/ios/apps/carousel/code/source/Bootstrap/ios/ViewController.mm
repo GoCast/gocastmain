@@ -196,40 +196,37 @@ UIWebView* gWebViewInstance = NULL;
 -(IBAction)pressed1px:(id)sender
 {
 #pragma unused(sender)
-    // TODO: fix SpotID
-    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kChangePenSize, -1, tColor4b(0,0,0,0), 1));
+    gCarouselApp.onPenSizeChange(1);
 }
 -(IBAction)pressed3px:(id)sender
 {
 #pragma unused(sender)
-    // TODO: fix SpotID
-    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kChangePenSize, -1, tColor4b(0,0,0,0), 3));
+    gCarouselApp.onPenSizeChange(3);
 }
 
 -(IBAction)pressed5px:(id)sender
 {
 #pragma unused(sender)
-    // TODO: fix SpotID
-    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kChangePenSize, -1, tColor4b(0,0,0,0), 5));
+    gCarouselApp.onPenSizeChange(5);
 }
 
 -(IBAction)pressed10px:(id)sender
 {
 #pragma unused(sender)
     // TODO: fix SpotID
-    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kChangePenSize, -1, tColor4b(0,0,0,0), 10));
+    gCarouselApp.onPenSizeChange(10);
 }
 
 -(IBAction)pressedColor:(id)sender
 {
 #pragma unused(sender)
-    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kChangePenColor));
+    gCarouselApp.onPenColorChange();
 }
 
 -(IBAction)pressedErase:(id)sender
 {
 #pragma unused(sender)
-    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kChangePenErase));
+    gCarouselApp.onEraseButton();
 }
 
 -(IBAction)pressedPrev:(id)sender

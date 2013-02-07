@@ -339,35 +339,35 @@ void Whiteboard::update(const CallcastEvent& msg)
             case CallcastEvent::kLineTo: onLineTo(msg.mPoint); break;
             case CallcastEvent::kStroke: onStroke(); break;
 
-            case CallcastEvent::kChangePenSize:
-                mSendPenSize = msg.mPenSize;
-                break;
-            case CallcastEvent::kChangePenErase:
-                mSendPenColor = kWhite;
-                break;
-            case CallcastEvent::kChangePenColor:
-                if (mSendPenColor == kBlack)
-                {
-                    mSendPenColor = kRed;
-                }
-                else if (mSendPenColor == kRed)
-                {
-                    mSendPenColor = kBlue;
-                }
-                else if (mSendPenColor == kBlue)
-                {
-                    mSendPenColor = kOrange;
-                }
-                else if (mSendPenColor == kOrange)
-                {
-                    mSendPenColor = kBlack;
-                }
-                else
-                {
-                    mSendPenColor = kBlue;
-                }
-
-                break;
+//            case CallcastEvent::kChangePenSize:
+//                mSendPenSize = msg.mPenSize;
+//                break;
+//            case CallcastEvent::kChangePenErase:
+//                mSendPenColor = kWhite;
+//                break;
+//            case CallcastEvent::kChangePenColor:
+//                if (mSendPenColor == kBlack)
+//                {
+//                    mSendPenColor = kRed;
+//                }
+//                else if (mSendPenColor == kRed)
+//                {
+//                    mSendPenColor = kBlue;
+//                }
+//                else if (mSendPenColor == kBlue)
+//                {
+//                    mSendPenColor = kOrange;
+//                }
+//                else if (mSendPenColor == kOrange)
+//                {
+//                    mSendPenColor = kBlack;
+//                }
+//                else
+//                {
+//                    mSendPenColor = kBlue;
+//                }
+//
+//                break;
 
             default: break;
         }

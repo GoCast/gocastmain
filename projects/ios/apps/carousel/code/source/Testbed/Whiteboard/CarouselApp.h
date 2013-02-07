@@ -57,6 +57,9 @@ public:
     void onOkayButton();
     void onPrevButton();
     void onNextButton();
+    void onPenSizeChange(const float& newSize);
+    void onPenColorChange();
+    void onEraseButton();
 
     void onSave(const int32_t& newID, const tColor4b& nc, const float& np);
     void onMoveTo(const int32_t& newID, const tPoint2f& pt);

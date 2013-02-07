@@ -323,6 +323,40 @@ void CarouselApp::onNextButton()
     }
 }
 
+void CarouselApp::onPenSizeChange(const float& newSize)
+{
+    mSendPenSize = newSize;
+}
+
+void CarouselApp::onPenColorChange()
+{
+    if (mSendPenColor == kBlack)
+    {
+        mSendPenColor = kRed;
+    }
+    else if (mSendPenColor == kRed)
+    {
+        mSendPenColor = kBlue;
+    }
+    else if (mSendPenColor == kBlue)
+    {
+        mSendPenColor = kOrange;
+    }
+    else if (mSendPenColor == kOrange)
+    {
+        mSendPenColor = kBlack;
+    }
+    else
+    {
+        mSendPenColor = kBlue;
+    }
+}
+
+void CarouselApp::onEraseButton()
+{
+    mSendPenColor = kWhite;
+}
+
 #pragma mark -
 
 void CarouselApp::onSave(const int32_t& newID, const tColor4b& nc, const float& np)
@@ -437,8 +471,11 @@ void CarouselApp::showWhiteboardSpotEntry()
 {
     if (mInitialized)
     {
-        delete mWhiteboardTexture;
-        mWhiteboardTexture = new tTexture(*mSurfaces[mSpots[mSpotFinger]]);
+        if (!mSurfaces.empty())
+        {
+            delete mWhiteboardTexture;
+            mWhiteboardTexture = new tTexture(*mSurfaces[mSpots[mSpotFinger]]);
+        }
     }
     [gAppDelegateInstance showWhiteboardSpot];
 }
@@ -504,7 +541,7 @@ void CarouselApp::update(const tTimerEvent& msg)
                     [gWebViewInstance stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"realDrawLine(%d, '%s', %d, %d, %d, %d, %d);",
                                                                               mSpots[mSpotFinger],
                                                                               colorToString(mSendPenColor).c_str(),
-                                                                              (mSendPenColor == kWhite) ? 20 : (int)mSendPenSize,
+                                                                              (mSendPenColor == kWhite) ? 30 : (int)mSendPenSize,
                                                                               (int)mStartTouch.x, (int)mStartTouch.y, (int)mLastPolledPt.x, (int)mLastPolledPt.y]];
                     mStartTouch = mLastPolledPt;
                 }
@@ -538,7 +575,7 @@ void CarouselApp::update(const tMouseEvent& msg)
             [gWebViewInstance stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"realDrawLine(%d, '%s', %d, %d, %d, %d, %d);",
                                                                       mSpots[mSpotFinger],
                                                                       colorToString(mSendPenColor).c_str(),
-                                                                      (mSendPenColor == kWhite) ? 20 : (int)mSendPenSize,
+                                                                      (mSendPenColor == kWhite) ? 30 : (int)mSendPenSize,
                                                                       (int)mStartTouch.x, (int)mStartTouch.y, (int)mEndTouch.x, (int)mEndTouch.y]];
             mShouldCapture = false;
         }
