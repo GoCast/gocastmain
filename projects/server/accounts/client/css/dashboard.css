@@ -73,7 +73,7 @@ body > .container > .row > .span5 > form .control-group:last-child/*,
 body > .container > .row > .span5 > form#startmeeting-form .control-group:nth-of-type(4)*/ {
     margin-top: 35px;
     padding-top: 20px;
-    border-top: 1px #E5E5E5 solid;
+    border-top: 1px solid #E5E5E5;
 }
 
 body > .container > .row > .span5 > form .controls {
@@ -120,4 +120,36 @@ form #roomlist {
 
 form #roomlist > table {
     margin: 0px;
+}
+
+.control-group[header] {
+    position: relative;
+    border-radius: 3px;
+    border: 1px solid #E5E5E5;
+    padding-top: 15px;
+    padding-bottom: 15px;
+}
+
+.control-group[header]:before {
+    position: absolute;
+    content: attr(header);
+    background-color: white;
+    padding: 0 5px;
+    color: #777777;
+    left: 10px;
+    top: -7px;
+    height: 15px;
+    line-height: 15px;
+}
+
+.popover {
+    width: auto;
+}
+
+a.roomname {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -o-text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 300px;
 }

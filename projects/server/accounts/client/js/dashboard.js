@@ -179,14 +179,15 @@ var DashView = {
             'startmeeting-form': 'Take me to my room',
             'reqresetpwd-form': 'Send me a password reset email',
             'resetpwd-form': 'Reset my password',
-            'schedulemeeting-form': 'Send invites'
+            'schedulemeeting-form': 'Send invitation'
         };
         $('.btn[type="submit"]', this.$forms[formid]).removeClass('disabled')
                                                           .html(submittexts[formid]);
 
     },
     displayRoomList: function(formid, roomlist, dontShowMessage) {
-        var template = '', i, self = this;
+        var template = '', i, self = this,
+            linkpopoverhtml, roomlink;
 
         $('.or', this.$forms[formid]).text('');
         if (roomlist && roomlist.length) {
@@ -194,7 +195,10 @@ var DashView = {
                                    '<thead><tr><th>Choose one of your existing rooms</th></tr></thead>' +
                                    '<tbody>');
             for (i=0; i<roomlist.length; i++) {
-                template = template + ('<tr><td><a href="javascript:void(0);">' + roomlist[i] + '</a></td></tr>');
+                template = template + ('<tr><td><a class="roomname" href="javascript:void(0);">' + roomlist[i] + '</a>' +
+                           '<a class="roomlink btn btn-mini pull-right" href="#" roomname="' +
+                           roomlist[i] + '"><i class="icon-link"></i></a>' +
+                           '</td></tr>');
             }
             template = template + ('</tbody></table>');
             $('.or', this.$forms[formid]).text('OR');
@@ -216,11 +220,35 @@ var DashView = {
         }
 
         $('#roomlist', this.$forms[formid]).html(template);
-        $('#roomlist a').click(function() {
+        $('#roomlist a.roomname', this.$forms[formid]).click(function() {
             $('#input-roomname', self.$forms[formid]).val($(this).text()); 
             if ('startmeeting-form' === formid && !$('a.btn-link', self.$forms[formid]).hasClass('show')) {
                 $('a.btn-inverse', self.$forms[formid]).addClass('show');
             }
+        });
+
+        linkpopoverhtml = '<textarea style="resize: none; font-size: 10px; width: {{width}}px;">' +
+                          '{{link}}</textarea>';
+        roomlink = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1) + '?roomname={{rcode}}';
+        $('#roomlist a.roomlink', this.$forms[formid]).click(function(e) {
+            var evt = e || window.event, popped = $(this).attr('popped');
+
+            evt.preventDefault();
+            $('#roomlist a.roomlink[popped]', self.$forms[formid]).popover('hide').button('toggle').removeAttr('popped');
+            if (!popped) {
+                $(this).popover('show').button('toggle').attr('popped', 'popped');
+            }
+        }).each(function() {
+            var rcode = $.roomcode.cipher(DashApp.boshconn.getEmailFromJid(), $(this).attr('roomname')),
+                _title = 'Link for ' + $(this).attr('roomname');
+            $(this).popover({
+                title: _title,
+                content: linkpopoverhtml.replace(/\{\{link\}\}/, roomlink.replace(/\{\{rcode\}\}/, rcode))
+                                        .replace(/\{\{width\}\}/, (rcode.length*6).toString()),
+                placement: 'left',
+                html: true,
+                trigger: 'manual'
+            })
         });
     },
     changeformCallback: function() {
@@ -506,12 +534,24 @@ var DashApp = {
                                         $('#input-time', DashApp.$forms['schedulemeeting-form']).val() + ' ' +
                                         $('#ampm', DashApp.$forms['schedulemeeting-form']).val())).toString(),
                         fromemail: DashApp.boshconn.getEmailFromJid(),
-                        note: $('#input-note', DashApp.$forms['schedulemeeting-form']).val()
+                    }, genEmailArray = function (str, cb) { 
+                        var arr = [];
+                        str.split(',').forEach(function(commas) { 
+                            commas.trim().split(';').forEach(function(semis) { 
+                                semis.trim().split(' ').forEach(function(spaces) {
+                                    if (spaces.trim()) {
+                                        arr.push(spaces.trim()); 
+                                    }
+                                }); 
+                            }); 
+                        }); 
+                        cb(arr);
                     };
 
                 if (emails) {
-                    extradata.toemailarray = JSON.stringify(emails.replace(/[\s\n\t]+/g, '')
-                                                                  .split(','));
+                    genEmailArray(emails.replace(/[\n\t]+/g, ','), function(arr) {
+                        extradata.toemailarray = JSON.stringify(arr);
+                    });
                 }
                 if (roomname) {
                     extradata.link = href.substring(0, href.lastIndexOf('/') + 1) + '?roomname=' +

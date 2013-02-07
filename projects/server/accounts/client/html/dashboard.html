@@ -146,15 +146,15 @@
                         <fieldset>
                             <legend>&nbsp; Schedule your meeting</legend>
                             <div class="control-group">
-                                <div class="controls" align="center">
-                                    <input id="input-roomname" type="text" name="roomname" placeholder=" Room where you want to have your meeting" required class="span4">
-                                </div>
-                            </div>
-                            <div class="control-group">
                                 <div id="roomlist" class="controls well" align="center">
                                 </div>
                             </div>
-                            <div class="control-group">
+                            <div class="control-group" header="Where">
+                                <div class="controls" align="center">
+                                    <input id="input-roomname" type="text" name="roomname" placeholder=" Room where you want to have your meeting" required class="span4" disabled>
+                                </div>
+                            </div>
+                            <div class="control-group" header="When">
                                 <div class="controls" align="center">
                                     <input id="input-date" type="text" name="date" placeholder=" Date" class="span2 auto-kal" data-kal="months: 1, direction: 'today-future'">
                                     <input id="input-time" type="text" name="time" placeholder=" Time (Ex: 5:45)" class="span1" style="margin-left: 15px;">
@@ -164,14 +164,14 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="control-group">
+                            <div class="control-group" header="Invitees">
                                 <div class="controls" align="center">
-                                    <textarea id="input-note" name="note" placeholder="Optional note to invitees" class="span4" rows="3" style="resize: none;"></textarea>
+                                    <textarea id="input-emails" name="emails" placeholder="Comma separated list of email addresses of people you want to invite (Ex: abc@def.com, ghi@jkl.com,...)" class="span4" rows="3" style="resize: none;" required></textarea>
                                 </div>
                             </div>
-                            <div class="control-group">
+                            <div class="control-group" header="Address your invitees">
                                 <div class="controls" align="center">
-                                    <textarea id="input-emails" name="emails" placeholder="Email addresses of people you want to invite (Ex: a@b.com,c@d.com,...)" class="span4" rows="3" style="resize: none;" required></textarea>
+                                    <textarea id="input-note" name="note" placeholder="Optional note to invitees" class="span4" rows="3" style="resize: none;"></textarea>
                                 </div>
                             </div>
                             <div class="alert alert-error">
@@ -182,7 +182,7 @@
                             </div>
                             <div class="control-group">
                                 <div id="controls" align="center">
-                                    <button type="submit" class="btn btn-primary pull-right"> Send invites </button>
+                                    <button type="submit" class="btn btn-primary pull-right"> Send invitation </button>
                                     <a href="javascript:void(0);" class="btn btn-link pull-left"> Cancel </a>
                                 </div>
                             </div>

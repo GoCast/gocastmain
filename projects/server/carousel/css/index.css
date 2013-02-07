@@ -1283,6 +1283,7 @@ body > div#meeting > div#streams > div#scontrols > input.right {
   bottom: 3%;
   width: 100%;
   height: 6%;
+  z-index: 10000;
 }
 #effectsPanel > div {
   width: 5%;
