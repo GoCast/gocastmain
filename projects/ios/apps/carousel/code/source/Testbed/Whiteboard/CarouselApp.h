@@ -2,6 +2,7 @@
 
 #include <queue>
 #include <list>
+#include <map>
 
 class CarouselAppMessage;
 class tSGViewEvent;
@@ -14,14 +15,18 @@ class CarouselApp
 protected:
     std::vector<tPoint2f>   mWhiteBoardVerts;
     std::vector<tPoint2f>   mWhiteBoardTexCoords;
-    tSurface                mWhiteboardSurface;
     tProgram*               mSpriteProgram;
     tTexture*               mWhiteboardTexture;
 
-    std::string         mNickname;
-    std::string         mRoomname;
-    std::list<int32_t>  mSpots;
-    uint32_t            mSpotFinger;
+    std::string                     mNickname;
+    std::string                     mRoomname;
+    std::list<int32_t>              mSpots;
+    std::map<int32_t, tSurface*>    mSurfaces;
+    uint32_t                        mSpotFinger;
+
+    tPoint2f                mCurDrawPoint;
+    tColor4b                mReceivePenColor;
+    float                   mReceivePenSize;
 
     bool                    mInitialized;
 
@@ -42,6 +47,11 @@ public:
     void onOkayButton();
     void onPrevButton();
     void onNextButton();
+
+    void onSave(const tColor4b& nc, const float& np);
+    void onMoveTo(const tPoint2f& pt);
+    void onLineTo(const tPoint2f& pt);
+    void onStroke();
 
 protected:
     void endEntry();

@@ -53,10 +53,11 @@ void CarouselApp::createResources()
 
     tSurface mouse(tPixelFormat::kR8G8B8A8, tDimension2f(32,32));
 
-    mWhiteboardSurface.fillRect(tRectf(0,0,mWhiteboardSurface.getSize()), tColor4b(255,255,255,255));
-    mWhiteboardSurface.drawLine(tPoint2f(0,0), tPoint2f(kSurfaceSize.width, kSurfaceSize.height), tColor4b(255,0,0,255));
+    tSurface surface(tPixelFormat::kR8G8B8A8, kSurfaceSize);
+    surface.fillRect(tRectf(0,0,surface.getSize()), tColor4b(255,255,255,255));
+    surface.drawLine(tPoint2f(0,0), tPoint2f(kSurfaceSize.width, kSurfaceSize.height), tColor4b(255,0,0,255));
 
-    mWhiteboardTexture = new tTexture(mWhiteboardSurface);
+    mWhiteboardTexture = new tTexture(surface);
 
     mWhiteBoardVerts        = sixPoints(tPoint2f(0,0), tPoint2f(kSurfaceSize.width, kSurfaceSize.height));
     mWhiteBoardTexCoords    = sixPoints(tPoint2f(0,0), tPoint2f(kSurfaceSize.width / mWhiteboardTexture->getSize().width, kSurfaceSize.height / mWhiteboardTexture->getSize().height));
@@ -135,7 +136,7 @@ void CarouselApp::configureNodes()
 }
 
 CarouselApp::CarouselApp()
-:   mWhiteboardSurface(tPixelFormat::kR8G8B8A8, kSurfaceSize),
+:   //mWhiteboardSurface(tPixelFormat::kR8G8B8A8, kSurfaceSize),
     mSpriteProgram(NULL),
     mWhiteboardTexture(NULL),
     mNickname("nick"),
@@ -204,8 +205,20 @@ void CarouselApp::onAddSpot(const std::string& newType, const int32_t& newID)
 
         mSpots.push_back(newID);
 
+        tSurface* surface = new tSurface(tPixelFormat::kR8G8B8A8, kSurfaceSize);
+        surface->fillRect(tRectf(0,0,surface->getSize()), tColor4b(255,255,255,255));
+        surface->drawLine(tPoint2f(0,0), tPoint2f(kSurfaceSize.width, kSurfaceSize.height), tColor4b(255,0,0,255));
+
+        mSurfaces[newID] = surface;
+
         if (wasEmpty)
         {
+            if (mInitialized)
+            {
+                delete mWhiteboardTexture;
+                mWhiteboardTexture = new tTexture(*(*mSurfaces.begin()).second);
+            }
+
             process(kShowWhiteboard);
         }
     }
@@ -225,6 +238,8 @@ void CarouselApp::onRemoveSpot(const int32_t& newID)
 
     if (iter != mSpots.end())
     {
+        delete mSurfaces[newID];
+        mSurfaces.erase(newID);
         mSpots.erase(iter);
     }
 
@@ -258,6 +273,38 @@ void CarouselApp::onNextButton()
     {
         mSpotFinger++;
         process(kShowWhiteboard);
+    }
+}
+
+#pragma mark -
+
+void CarouselApp::onSave(const tColor4b& nc, const float& np)
+{
+    mReceivePenColor    = nc;
+    mReceivePenSize     = np;
+}
+
+void CarouselApp::onMoveTo(const tPoint2f& pt)
+{
+    mCurDrawPoint = pt;
+}
+
+void CarouselApp::onLineTo(const tPoint2f& pt)
+{
+    if (!mSurfaces.empty())
+    {
+        (*mSurfaces.begin()).second->drawLineWithPen(mCurDrawPoint, pt, mReceivePenColor, mReceivePenSize);
+    }
+
+    mCurDrawPoint = pt;
+}
+
+void CarouselApp::onStroke()
+{
+    if (!mSurfaces.empty())
+    {
+        delete mWhiteboardTexture;
+        mWhiteboardTexture = new tTexture(*(*mSurfaces.begin()).second);
     }
 }
 
@@ -344,6 +391,11 @@ void CarouselApp::update(const CallcastEvent& msg)
 {
     switch (msg.mEvent)
     {
+        case CallcastEvent::kSave:   onSave(msg.mColor, msg.mPenSize); break;
+        case CallcastEvent::kMoveTo: onMoveTo(msg.mPoint); break;
+        case CallcastEvent::kLineTo: onLineTo(msg.mPoint); break;
+        case CallcastEvent::kStroke: onStroke(); break;
+
         case CallcastEvent::kAddSpot: onAddSpot(msg.mSpotType, msg.mSpotID); break;
         case CallcastEvent::kRemoveSpot: onRemoveSpot(msg.mSpotID); break;
 
