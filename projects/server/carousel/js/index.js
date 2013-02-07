@@ -2103,6 +2103,7 @@ function handleRoomSetup() {
     item = app.carousel.getItem(0);
     app.carousel.setSpotName(item, app.user.name);
     $('#mystream > .name').text(decodeURI(app.user.name) + ' (me)');
+    app.carousel.rotate(1);
 
     app.log(2, "Room named '" + new_name + "' has been created. Joining now.");
     app.log(2, 'window.location ' + window.location);

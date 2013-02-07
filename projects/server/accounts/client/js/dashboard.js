@@ -85,6 +85,9 @@ var DashView = {
             if (this.$forms.hasOwnProperty(i)) {
                 this.$forms[i].removeClass('show');
                 $('.alert', this.$forms[i]).removeClass('show');
+                if ('startmeeting-form' === i) {
+                    $('a.btn-inverse', this.$forms[i]).removeClass('show');
+                }
             }
         }
 
@@ -103,9 +106,15 @@ var DashView = {
             }
             if ('undefined' !== typeof(Storage) && localStorage.gcpDesiredRoomname) {
                 $('#input-roomname', this.$forms[id]).val(decodeURI(localStorage.gcpDesiredRoomname));
+                $('a.btn-inverse', this.$forms[id]).addClass('show');
                 delete localStorage.gcpDesiredRoomname;
             }
-            $('select', this.$forms[id]).val('');
+            if (defs['input-roomname']) {
+                $('a.btn-inverse', this.$forms[id]).addClass('show');
+            }
+
+            $('#input-roomname', this.$forms[id]).unbind('keydown').keydown(this.strtmtgRoomnameValChngCallback());
+            $('a.btn-inverse', this.$forms[id]).unbind('click').click(this.strtmtgInviteOthersClickCallback());
         } else if ('reqresetpwd-form' === id && !$.browser.msie) {
             $('#input-email', this.$forms[id]).focus();
         } else if ('resetpwd-form' === id) {
@@ -139,6 +148,7 @@ var DashView = {
                                      date.getMinutes();
                 defs['ampm'] = ampm;
             }
+            $('a.btn-link', this.$forms[id]).unbind('click').click(this.schedmtgCancelClickCallback());
         }
 
         for (i in defs) {
@@ -169,36 +179,152 @@ var DashView = {
             'startmeeting-form': 'Take me to my room',
             'reqresetpwd-form': 'Send me a password reset email',
             'resetpwd-form': 'Reset my password',
-            'schedulemeeting-form': 'Send invites'
+            'schedulemeeting-form': 'Send invitation'
         };
         $('.btn[type="submit"]', this.$forms[formid]).removeClass('disabled')
                                                           .html(submittexts[formid]);
 
     },
-    displayRoomList: function(formid, roomlist) {
-        var template = '<table class="table table-bordered">' +
-                       '<thead><tr><th>Choose one of your existing rooms</th></tr></thead>' +
-                       '<tbody>', i, self = this;
+    displayRoomList: function(formid, roomlist, dontShowMessage) {
+        var template = '', i, self = this,
+            linkpopoverhtml, roomlink;
 
-        for (i=0; i<roomlist.length; i++) {
-            template = template + ('<tr><td><a href="javascript:void(0);">' + roomlist[i] + '</a></td></tr>');
+        $('.or', this.$forms[formid]).text('');
+        if (roomlist && roomlist.length) {
+            template = template + ('<table class="table table-bordered">' +
+                                   '<thead><tr><th>Choose one of your existing rooms</th></tr></thead>' +
+                                   '<tbody>');
+            for (i=0; i<roomlist.length; i++) {
+                template = template + ('<tr><td><a class="roomname" href="javascript:void(0);">' + roomlist[i] + '</a>' +
+                           '<a class="deleteroom btn btn-danger btn-mini pull-right" href="#" roomname="' + roomlist[i] +
+                           '" title="Destroy room"><i class="icon-trash"></i></a>' +
+                           '<a class="roomlink btn btn-mini pull-right" href="#" roomname="' + roomlist[i] +
+                           '"><i class="icon-link"></i></a><div class="areyousure"></div></td></tr>');
+            }
+            template = template + ('</tbody></table>');
+            $('.or', this.$forms[formid]).text('OR');
+        } else if (!dontShowMessage) {
+            template = '<p align="left">You have not created any rooms yet. ';
+            if ('startmeeting-form' === formid) {
+                template = template + 'To create a room, simply enter the name you want for it in the above text box, and ' +
+                           'then, click on "Take me to my room". And, that\'s it. You\'re in!<br><br>You can also invite ' +
+                           'others to your room via email by clicking on "Invite others" after you have chosen a room.</p>';
+            } else if ('schedulemeeting-form' === formid) {
+                template = template + 'Create a room first, by going to "Start Meeting" in the "My Meetings" menu.</p>';
+            }
+        } else if ($('#roomlist', this.$forms[formid]).hasClass('well')) {
+            $('#roomlist', this.$forms[formid]).removeClass('well');
         }
-        template = template + ('</tbody></table>');
+
+        if (template && !$('#roomlist', this.$forms[formid]).hasClass('well')) {
+            $('#roomlist', this.$forms[formid]).addClass('well');   
+        }
+
         $('#roomlist', this.$forms[formid]).html(template);
-        $('#roomlist a').click(function() { $('#input-roomname', self.$forms[formid]).val($(this).text()); });
+        $('#roomlist a.roomname', this.$forms[formid]).click(function() {
+            $('#input-roomname', self.$forms[formid]).val($(this).text()); 
+            if ('startmeeting-form' === formid && !$('a.btn-link', self.$forms[formid]).hasClass('show')) {
+                $('a.btn-inverse', self.$forms[formid]).addClass('show');
+            }
+        });
+
+        linkpopoverhtml = '<textarea style="resize: none; font-size: 10px; width: {{width}}px;">' +
+                          '{{link}}</textarea>';
+        roomlink = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1) + '?roomname={{rcode}}';
+        $('#roomlist a.roomlink', this.$forms[formid]).click(function(e) {
+            var evt = e || window.event, popped = $(this).attr('popped');
+
+            evt.preventDefault();
+            $('#roomlist a.roomlink[popped]', self.$forms[formid]).popover('hide').button('toggle').removeAttr('popped');
+            if (!popped) {
+                $(this).popover('show').button('toggle').attr('popped', 'popped');
+            }
+        }).each(function() {
+            var rcode = $.roomcode.cipher(DashApp.boshconn.getEmailFromJid(), $(this).attr('roomname')),
+                _title = 'Link for ' + $(this).attr('roomname');
+            $(this).popover({
+                title: _title,
+                content: linkpopoverhtml.replace(/\{\{link\}\}/, roomlink.replace(/\{\{rcode\}\}/, rcode))
+                                        .replace(/\{\{width\}\}/, (rcode.length*6).toString()),
+                placement: 'left',
+                html: true,
+                trigger: 'manual'
+            })
+        });
+
+        $('#roomlist a.deleteroom', this.$forms[formid]).click(function(e) {
+            var evt = e || window.event;
+
+            evt.preventDefault();
+            $('.areyousure', $(this).parent()).html('<div class="alert alert-warning show"><button type="button" ' +
+                                                    'class="close" data-dismiss="alert">&times;</button>' +
+                                                    'All room content will be lost. Are you sure?<br><br>&nbsp;' +
+                                                    '<button type="button" class="btn btn-danger btn-mini pull-right">' +
+                                                    'I\'m sure</button><button type="button" ' +
+                                                    'class="btn btn-success btn-mini pull-right">Cancel</button></div>');
+
+            $('.areyousure .btn-danger', $(this).parent()).click(function(e) {
+                var evt = e || window.event;
+                evt.preventDefault();
+                $('.close', $(this).parent()).click();
+            });
+
+            $('.areyousure .btn-success', $(this).parent()).click(function(e) {
+                var evt = e || window.event;
+                evt.preventDefault();
+                $('.close', $(this).parent()).click();
+            });
+        }).tooltip({placement: 'top'});
     },
     changeformCallback: function() {
         var self = this;
 
         return function(e) {
-            var evt = e || window.event;
-            self.displayform($(this).attr('href').replace(/^#/, ''));
+            var evt = e || window.event, formid = $(this).attr('href').replace(/^#/, '');
 
+            self.displayform(formid);
+
+            if (0 <= ['startmeeting-form', 'schedulemeeting-form'].indexOf(formid)) {
+                self.displayRoomList(formid, DashApp.roomlist);
+            }
             if (evt.preventDefault) {
                 evt.preventDefault();
             } else {
                 evt.returnValue = false;
             }
+        };
+    },
+    strtmtgRoomnameValChngCallback: function() {
+        var self = this, id = 'startmeeting-form';
+
+        return function() {
+            var _self = this;
+            setTimeout(function() {
+                if ($(_self).val() && !$('a.btn-inverse', self.$forms[id]).hasClass('show')) {
+                    $('a.btn-inverse', self.$forms[id]).addClass('show');
+                } else if (!$(_self).val() && $('a.btn-inverse', self.$forms[id]).hasClass('show')) {
+                    $('a.btn-inverse', self.$forms[id]).removeClass('show');
+                }
+            }, 500);
+        };
+    },
+    strtmtgInviteOthersClickCallback: function() {
+        var self = this;
+
+        return function() {
+            self.displayform('schedulemeeting-form', {
+                'input-roomname': $('#input-roomname', self.$forms['startmeeting-form']).val()
+            });
+            self.displayRoomList('schedulemeeting-form', [], true);
+        };
+    },
+    schedmtgCancelClickCallback: function() {
+        var self = this;
+
+        return function() {
+            self.displayform('startmeeting-form', {
+                'input-roomname': $('#input-roomname', self.$forms['schedulemeeting-form']).val()
+            });
         };
     }
 };
@@ -207,6 +333,7 @@ var DashApp = {
     email: null,
     boshconn: null,
     $forms: {},
+    roomlist: [],
     formCallbacks: {
         'login-form': {
             success: function() {
@@ -389,7 +516,9 @@ var DashApp = {
                 return function(response) {
                     DashView.cancelloader('schedulemeeting-form');
                     if ('success' === response.result) {
-                        DashView.displayform('startmeeting-form');
+                        DashView.displayform('startmeeting-form', {
+                            'input-roomname': $('#input-roomname', DashApp.$forms['schedulemeeting-form']).val()
+                        });
                         DashView.displayalert('startmeeting-form', 'success', 'The invites have been sent. You can now ' +
                                               'come here to start your meeting at the scheduled date/time.');
                     } else if ('no account' === response.result) {
@@ -430,12 +559,24 @@ var DashApp = {
                                         $('#input-time', DashApp.$forms['schedulemeeting-form']).val() + ' ' +
                                         $('#ampm', DashApp.$forms['schedulemeeting-form']).val())).toString(),
                         fromemail: DashApp.boshconn.getEmailFromJid(),
-                        note: $('#input-note', DashApp.$forms['schedulemeeting-form']).val()
+                    }, genEmailArray = function (str, cb) { 
+                        var arr = [];
+                        str.split(',').forEach(function(commas) { 
+                            commas.trim().split(';').forEach(function(semis) { 
+                                semis.trim().split(' ').forEach(function(spaces) {
+                                    if (spaces.trim()) {
+                                        arr.push(spaces.trim()); 
+                                    }
+                                }); 
+                            }); 
+                        }); 
+                        cb(arr);
                     };
 
                 if (emails) {
-                    extradata.toemailarray = JSON.stringify(emails.replace(/[\s\n\t]+/g, '')
-                                                                  .split(','));
+                    genEmailArray(emails.replace(/[\n\t]+/g, ','), function(arr) {
+                        extradata.toemailarray = JSON.stringify(arr);
+                    });
                 }
                 if (roomname) {
                     extradata.link = href.substring(0, href.lastIndexOf('/') + 1) + '?roomname=' +
@@ -550,8 +691,8 @@ var DashApp = {
                     $('body > .navbar .label').html('Hi ' + name + '!');
                 });
                 self.queryRoomList(function(roomlist) {
-                    DashView.displayRoomList('startmeeting-form', roomlist);
-                    DashView.displayRoomList('schedulemeeting-form', roomlist);
+                    self.roomlist = roomlist;
+                    DashView.displayRoomList('startmeeting-form', self.roomlist);
                 });
             } else if (Strophe.Status.DISCONNECTED === status ||
                        Strophe.Status.TERMINATED === status) {

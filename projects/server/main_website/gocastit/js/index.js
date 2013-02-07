@@ -12,7 +12,8 @@ function autoSlide($slideshow, interval) {
 $(document).ready(function () {
     autoSlide($('.sp-slideshow'));
     $('.thumbnails a[rel="popover"]').popover({ html: true }).click(function(e) {
-        e.preventDefault();
+        var evt = e || window.event;
+        evt.preventDefault();
     }).hover(function() {
         $(this).popover('show');
     }, function() {
