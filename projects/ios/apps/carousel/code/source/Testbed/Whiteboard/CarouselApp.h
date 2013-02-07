@@ -10,7 +10,9 @@ class tSGViewEvent;
 class CarouselApp
 :   public tObserver<const CarouselAppMessage&>,
     public tObserver<const CallcastEvent&>,
-    public tObserver<const tSGViewEvent&>
+    public tObserver<const tSGViewEvent&>,
+    public tObserver<const tTimerEvent&>,
+    public tObserver<const tMouseEvent&>
 {
 protected:
     std::vector<tPoint2f>   mWhiteBoardVerts;
@@ -24,11 +26,19 @@ protected:
     std::map<int32_t, tSurface*>    mSurfaces;
     uint32_t                        mSpotFinger;
 
+    tTimer*                 mDrawingTimer;
     tPoint2f                mCurDrawPoint;
     tColor4b                mReceivePenColor;
     float                   mReceivePenSize;
 
+    tPoint2f                mStartTouch;
+    tPoint2f                mEndTouch;
+    tPoint2f                mLastPolledPt;
+    tColor4b                mSendPenColor;
+    float                   mSendPenSize;
+
     bool                    mInitialized;
+    bool                    mShouldCapture;
 
 protected:
     void createResources();
@@ -320,6 +330,8 @@ public:
     void update(const CarouselAppMessage& msg);
     void update(const CallcastEvent& msg);
     void update(const tSGViewEvent& msg);
+    void update(const tTimerEvent& msg);
+    void update(const tMouseEvent& msg);
 
 //void CarouselApp::update(const CarouselAppMessage& msg)
 //{

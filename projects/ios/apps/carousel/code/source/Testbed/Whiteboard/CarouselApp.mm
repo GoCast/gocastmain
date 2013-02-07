@@ -14,6 +14,34 @@
 const tDimension2f  kSurfaceSize(500,500);
 const tDimension2f  kSpotSize(300,300);
 
+const tColor4b      kBlack  (0,0,0,255);
+const tColor4b      kRed    (255,0,0,255);
+const tColor4b      kBlue   (0,0,255,255);
+const tColor4b      kOrange (255,165,0,255);
+const tColor4b      kWhite  (255,255,255,255);
+
+static std::string colorToString(const tColor4b& newColor)
+{
+    if (newColor == kRed)
+    {
+        return "#F00";
+    }
+    else if (newColor == kBlue)
+    {
+        return "#00F";
+    }
+    else if (newColor == kOrange)
+    {
+        return "rgb(253, 103, 3)";
+    }
+    else if (newColor == kWhite)
+    {
+        return "#FFF";
+    }
+
+    return "#000";
+}
+
 CarouselApp gCarouselApp;
 extern AppDelegate* gAppDelegateInstance;
 extern UIWebView*   gWebViewInstance;
@@ -142,7 +170,13 @@ CarouselApp::CarouselApp()
     mNickname("nick"),
     mRoomname("room"),
     mSpotFinger(0),
-    mInitialized(false)
+    mDrawingTimer(NULL),
+    mReceivePenColor(kBlue),
+    mReceivePenSize(5),
+    mSendPenColor(kBlue),
+    mSendPenSize(5),
+    mInitialized(false),
+    mShouldCapture(false)
 {
     ConstructMachine();
 }
@@ -331,12 +365,21 @@ void CarouselApp::onStroke(const int32_t& newID)
 void CarouselApp::startEntry()
 {
     tSGView::getInstance()->attach(this);
+    tInputManager::getInstance()->tSubject<const tMouseEvent&>::attach(this);
     CallcastManager::getInstance()->attach(this);
+
+    mDrawingTimer = new tTimer(100);
+    mDrawingTimer->attach(this);
+    mDrawingTimer->start();
 }
 
 void CarouselApp::startExit() { }
 
-void CarouselApp::endEntry() { }
+void CarouselApp::endEntry()
+{
+    if (mDrawingTimer) delete mDrawingTimer;
+    if (mSpriteProgram) delete mSpriteProgram;
+}
 void CarouselApp::endExit() { }
 
 void CarouselApp::showWebLoadingViewEntry()
@@ -443,6 +486,66 @@ void CarouselApp::update(const tSGViewEvent& msg)
         case tSGViewEvent::kRedrawView:  onRedrawView(msg.drawTime); break;
 
         default: break;
+    }
+}
+
+void CarouselApp::update(const tTimerEvent& msg)
+{
+    if (mShouldCapture)
+    {
+        switch (msg.mEvent)
+        {
+            case tTimer::kTimerTick:
+                if (mLastPolledPt != mStartTouch)
+                {
+                    printf("*** drawing (%d, %d) - (%d, %d)\n",
+                           (int)mStartTouch.x, (int)mStartTouch.y, (int)mLastPolledPt.x, (int)mLastPolledPt.y);
+
+                    [gWebViewInstance stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"realDrawLine(%d, '%s', %d, %d, %d, %d, %d);",
+                                                                              mSpots[mSpotFinger],
+                                                                              colorToString(mSendPenColor).c_str(),
+                                                                              (mSendPenColor == kWhite) ? 20 : (int)mSendPenSize,
+                                                                              (int)mStartTouch.x, (int)mStartTouch.y, (int)mLastPolledPt.x, (int)mLastPolledPt.y]];
+                    mStartTouch = mLastPolledPt;
+                }
+                break;
+
+            default: break;
+        }
+    }
+}
+
+void CarouselApp::update(const tMouseEvent& msg)
+{
+    lastMousePt = tPoint2f(float(int32_t(msg.location.x)), float(int32_t(msg.location.y)));
+
+    switch (msg.event)
+    {
+        case tMouseEvent::kMouseDown:
+            mShouldCapture = true;
+            mStartTouch     = lastMousePt;
+            mLastPolledPt   = lastMousePt;
+            break;
+        case tMouseEvent::kMouseDrag:
+            mLastPolledPt = lastMousePt;
+            break;
+
+        case tMouseEvent::kMouseUp:
+        {
+            mEndTouch   = lastMousePt;
+
+            //TODO: Spot number needs to go here
+            [gWebViewInstance stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"realDrawLine(%d, '%s', %d, %d, %d, %d, %d);",
+                                                                      mSpots[mSpotFinger],
+                                                                      colorToString(mSendPenColor).c_str(),
+                                                                      (mSendPenColor == kWhite) ? 20 : (int)mSendPenSize,
+                                                                      (int)mStartTouch.x, (int)mStartTouch.y, (int)mEndTouch.x, (int)mEndTouch.y]];
+            mShouldCapture = false;
+        }
+            break;
+
+        default:
+            break;
     }
 }
 
