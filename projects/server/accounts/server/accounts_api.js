@@ -43,7 +43,7 @@ var db = require('./accounts_db');
 function privateGenInviteEmail(nameemail, link, note, when) {
     var body;
 
-    body = nameemail + ' has invited you to join them in a collaborative conference online at GoCast.\n\n';
+    body = nameemail + ' has invited you to join in a collaborative conference online at GoCast.\n\n';
 
     if (note) {
         body += 'Personal note from ' + nameemail + ': ' + note + '\n\n';
@@ -169,8 +169,8 @@ function privateSendEmail(toName, toEmail, subject, body, cbSuccess, cbFailure) 
     });
 }
 
-function privateSendEmailList(toEmailArray, subject, body, cbSuccess, cbFailure) {
-    mg.sendText(settings.accounts.inviteFromName + ' <' + settings.accounts.inviteFromAddress + '>',
+function privateSendEmailList(fromName, toEmailArray, subject, body, cbSuccess, cbFailure) {
+    mg.sendText(fromName + ' <' + settings.accounts.inviteFromAddress + '>',
       toEmailArray, subject, body,
       settings.accounts.inviteFromAddress, {},
       function(err) {
@@ -393,7 +393,7 @@ function apiSendEmailAgain(email, baseURL, success, failure) {
 //     .note An additional note to be included in the email from the user.
 //
 function apiSendRoomInviteEmail(opts, success, failure) {
-    var emailBody, emailName, maxToSend = 26;   // 25 + 1 for the sender.
+    var emailBody, emailName, specialFromName, maxToSend = 26;   // 25 + 1 for the sender.
 
     // If Account exists, return db entry.
     db.GetEntryByAccountName(opts.fromemail, function(entry) {
@@ -406,16 +406,18 @@ function apiSendRoomInviteEmail(opts, success, failure) {
             // Now, generate the invitation
             if (entry.name) {
                 emailName = entry.name + ' <' + opts.fromemail + '>';
+                specialFromName = entry.name + ' via GoCast';
             }
             else {
                 emailName = opts.fromemail;
+                specialFromName = opts.fromemail.split('@')[0] + ' via GoCast';
             }
 
             opts.toemailarray.unshift(opts.fromemail);
             emailBody = privateGenInviteEmail(emailName, opts.link, opts.note, opts.when);
-            privateSendEmailList(opts.toemailarray.slice(0, maxToSend),
+            privateSendEmailList(specialFromName, opts.toemailarray.slice(0, maxToSend),
                                  'Your invitation to meet on GoCast with ' + emailName, emailBody, function() {
-                gcutil.log('Sent an invitation from ' + opts.fromemail + ' with ' + opts.toemailarray.length + ' others.');
+                gcutil.log('Sent an invitation from ' + opts.fromemail + ' with ' + (opts.toemailarray.length - 1) + ' others.');
                 success();
             }, function(err) {
                 failure('apiSendRoomInviteEmail: Email send failure.');
@@ -425,6 +427,11 @@ function apiSendRoomInviteEmail(opts, success, failure) {
         // Failure of getting database entry for account.
         failure('apiSendRoomInviteEmail: account does not exist: ' + opts.fromemail);
     });
+}
+
+function apiDeleteUserRoom(email, room, success, failure) {
+    //  delete room
+    db.DeleteRoom(email, room, success, failure);
 }
 
 function apiGenerateResetPassword(email, baseURL, success, failure) {
@@ -578,6 +585,7 @@ exports.ValidateAccount = apiValidateAccount;
 exports.DeleteAccount = apiDeleteAccount;
 exports.ChangePassword = apiChangePassword;
 exports.NewRoom = apiNewRoom;
+exports.DeleteUserRoom = apiDeleteUserRoom;
 exports.ListRooms = apiListRooms;
 exports.VisitorSeen = apiVisitorSeen;
 exports.SendEmailAgain = apiSendEmailAgain;

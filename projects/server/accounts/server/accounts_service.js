@@ -131,6 +131,33 @@ app.post('/createroom', function(req, res) {
     }
 });
 
+app.post('/deleteroom', function(req, res) {
+    var roomName = req.body.roomname;
+
+    if (req.body && req.body.email && roomName) {
+        gcutil.log('accounts_service [/deleteroom][info]: FormData = ', req.body);
+        api.DeleteUserRoom(req.body.email, roomName, function() {
+            res.send('{"result": "success"}');
+        }, function(err) {
+            gcutil.log('accounts_service [/deleteroom][error]: ', err);
+            res.send('{"result": "error"}');
+        });
+    }
+    else {
+        gcutil.log('accounts_service [/deleteroom][error]: FormData problem in req.body: ', req.body);
+
+        if (!req.body.email) {
+            res.send('{"result": "no email"}');
+        }
+        else if (!req.body.roomname) {
+            res.send('{"result": "no roomname"}');
+        }
+        else {
+            res.send('{"result": "error"}');
+        }
+    }
+});
+
 app.post('/listrooms', function(req, res) {
 
     if (req.body && req.body.email) {
