@@ -48,6 +48,7 @@ var ddb = new AWS.DynamoDB();
 var theUserTable = settings.accounts.dbUserTable;
 var theUserRoomTable = settings.accounts.dbUserRoomTable;
 var theVisitorTable = settings.accounts.dbVisitorTable;
+var thePublicRoomTable = settings.accounts.dbPublicRoomTable;
 
 'use strict';
 
@@ -160,7 +161,38 @@ function errOut(err) {
             }
         }
         else {
-            gcutil.log('accounts_db: User table found and ready.');
+            gcutil.log('accounts_db: Visitor table found and ready.');
+//            gcutil.log('Table-result: ', data.Table);
+        }
+    });
+
+//
+// P U B L I C   R O O M   T A B L E
+//
+// Expected schema - hash: room, dateCreated, description
+//
+    ddb.client.describeTable({TableName: thePublicRoomTable}, function(err, data) {
+        if (err) {
+            // If it doesn't exist, then we should create it.
+            if (err.code === 'ResourceNotFoundException') {
+                // Create the table.
+                ddb.client.createTable({TableName: thePublicRoomTable,
+                                        KeySchema: {HashKeyElement: {AttributeName: 'room', AttributeType: 'S'}},
+                                        ProvisionedThroughput: {ReadCapacityUnits: 3, WriteCapacityUnits: 5}}, function(err, data) {
+                    if (err) {
+                        errOut(err);
+                    }
+                    else {
+                        gcutil.log('accounts_db: Successfully inititalized New Public Room Table: ' + thePublicRoomTable);
+                    }
+                });
+            }
+            else {
+                errOut(err);
+            }
+        }
+        else {
+            gcutil.log('accounts_db: Public Room table found and ready.');
 //            gcutil.log('Table-result: ', data.Table);
         }
     });
@@ -651,6 +683,44 @@ function dbVisitorSeen(accountName, nickName, cbSuccess, cbFailure) {
 
 }
 
+//
+// Full table scan giving back an array of objects which are the rooms
+//
+function dbGetPublicRooms(cbSuccess, cbFailure) {
+    var outItems = [],
+        scanHandler, scanObj;
+
+    scanObj = {TableName: thePublicRoomTable,
+//                 AttributesToGet: ['email', 'creationDate', 'validated', 'firstRoomName', 'utm_source', 'utm_campaign'],
+                 Limit: 8
+                 };
+
+    scanHandler = function(err, data) {
+        if (err) {
+            gcutil.log('dbGetPublicRooms: ERROR: ', err);
+            cbFailure(err);
+        }
+        else {
+            if (data.LastEvaluatedKey) {
+                gcutil.log('dbGetPublicRooms: Received: ' + data.Count + ' items. Continuing scan - next iteration...');
+                outItems.push.apply(outItems, dbAwsObjectRead(data.Items));
+
+                scanObj.ExclusiveStartKey = data.LastEvaluatedKey;
+                ddb.client.scan(scanObj, scanHandler);
+            }
+            else {
+                outItems.push.apply(outItems, dbAwsObjectRead(data.Items));
+
+                gcutil.log('dbGetPublicRooms: Scan complete. Found a total of: ' + outItems.length + ' items.');
+                cbSuccess(outItems);
+            }
+        }
+     };
+
+    ddb.client.scan(scanObj, scanHandler);
+
+}
+
 exports.AddEntry = dbAddEntry;
 exports.UpdateEntry = dbUpdateEntry;
 exports.GetEntryByAccountName = dbGetEntryByAccountName;
@@ -663,3 +733,5 @@ exports.DeleteRoom = dbDeleteRoom;
 exports.ListRooms = dbListRooms;
 exports.VisitorSeen = dbVisitorSeen;
 exports.ValidationReport = dbValidationReport;
+exports.GetPublicRooms = dbGetPublicRooms;
+

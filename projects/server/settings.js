@@ -36,6 +36,7 @@ if (process.env.SETTINGS_DEVEL === 1 || process.env.SETTINGS_DEVEL === '1') {
         allow_overflow: true,
         allow_maxparticipants_from_client: true,
         maxparticipants_ceiling: 50,
+        maxspotsallowed: 20,
         default_room: 'Lobby',
         default_room_persist: false,
 
@@ -64,6 +65,7 @@ if (process.env.SETTINGS_DEVEL === 1 || process.env.SETTINGS_DEVEL === '1') {
         dbUserTable: 'dev_UserTable',
         dbUserRoomTable: 'dev_UserRoomTable',
         dbVisitorTable: 'dev_VisitorTable',
+        dbPublicRoomTable: 'dev_PublicRoomTable',
         mailgunKey: 'key-65ism99rlme7svrn93qc-cormdknx-42',      // Bob Wolff - rwolff@gocast.it key -- the free one.
         inviteFromAddress: 'support@gocast.it',
         inviteFromName: 'GoCast Support',
@@ -133,6 +135,7 @@ else {
         dbUserTable: 'main_UserTable',
         dbUserRoomTable: 'main_UserRoomTable',
         dbVisitorTable: 'main_VisitorTable',
+        dbPublicRoomTable: 'main_PublicRoomTable',
         mailgunKey: 'key-65ism99rlme7svrn93qc-cormdknx-42',      // Bob Wolff - rwolff@gocast.it key -- the free one.
         inviteFromAddress: 'support@gocast.it',
         inviteFromName: 'GoCast Support',
@@ -178,6 +181,7 @@ else {
         username: 'overseer@' + settings.SERVERNAME + '/roommanager',
         usernametest: 'overseer@' + settings.SERVERNAME + '/roommanagertest',
         password: 'the.overseer.rocks',
+        maxspotsallowed: 20,
 
         persist: true,      // Normally rooms are non-persistent.
         wbstoragelocation: '~/wbstorage'
@@ -247,6 +251,7 @@ if (process.env.STANFORDDNLE === 1 || process.env.STANFORDDNLE === '1') {
         allow_overflow: true,
         allow_maxparticipants_from_client: true,
         maxparticipants_ceiling: 7,
+        maxspotsallowed: 20,
         default_room: 'Lobby',
         default_room_persist: false,
 
@@ -317,6 +322,7 @@ else if (process.env.STANFORDCCC === 1 || process.env.STANFORDCCC === '1') {
         allow_overflow: true,
         allow_maxparticipants_from_client: true,
         maxparticipants_ceiling: 7,
+        maxspotsallowed: 20,
         default_room: 'Lounge',
         default_room_persist: false,
 
