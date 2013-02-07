@@ -153,3 +153,22 @@ a.roomname {
     white-space: nowrap;
     max-width: 300px;
 }
+
+a.roomlink, a.deleteroom {
+    margin-left: 5px;
+}
+
+.areyousure .close {
+    display: none;
+}
+
+body > .container > .row > .span5 > form .areyousure > .alert {
+    margin-top: 10px;
+    padding-left: 10px;
+    padding-right: 5px;
+}
+
+body > .container > .row > .span5 > form .areyousure > .alert .btn {
+    margin-right: 0px;
+    margin-left: 5px;
+}

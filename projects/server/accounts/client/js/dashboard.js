@@ -196,9 +196,10 @@ var DashView = {
                                    '<tbody>');
             for (i=0; i<roomlist.length; i++) {
                 template = template + ('<tr><td><a class="roomname" href="javascript:void(0);">' + roomlist[i] + '</a>' +
-                           '<a class="roomlink btn btn-mini pull-right" href="#" roomname="' +
-                           roomlist[i] + '"><i class="icon-link"></i></a>' +
-                           '</td></tr>');
+                           '<a class="deleteroom btn btn-danger btn-mini pull-right" href="#" roomname="' + roomlist[i] +
+                           '" title="Destroy room"><i class="icon-trash"></i></a>' +
+                           '<a class="roomlink btn btn-mini pull-right" href="#" roomname="' + roomlist[i] +
+                           '"><i class="icon-link"></i></a><div class="areyousure"></div></td></tr>');
             }
             template = template + ('</tbody></table>');
             $('.or', this.$forms[formid]).text('OR');
@@ -250,6 +251,30 @@ var DashView = {
                 trigger: 'manual'
             })
         });
+
+        $('#roomlist a.deleteroom', this.$forms[formid]).click(function(e) {
+            var evt = e || window.event;
+
+            evt.preventDefault();
+            $('.areyousure', $(this).parent()).html('<div class="alert alert-warning show"><button type="button" ' +
+                                                    'class="close" data-dismiss="alert">&times;</button>' +
+                                                    'All room content will be lost. Are you sure?<br><br>&nbsp;' +
+                                                    '<button type="button" class="btn btn-danger btn-mini pull-right">' +
+                                                    'I\'m sure</button><button type="button" ' +
+                                                    'class="btn btn-success btn-mini pull-right">Cancel</button></div>');
+
+            $('.areyousure .btn-danger', $(this).parent()).click(function(e) {
+                var evt = e || window.event;
+                evt.preventDefault();
+                $('.close', $(this).parent()).click();
+            });
+
+            $('.areyousure .btn-success', $(this).parent()).click(function(e) {
+                var evt = e || window.event;
+                evt.preventDefault();
+                $('.close', $(this).parent()).click();
+            });
+        }).tooltip({placement: 'top'});
     },
     changeformCallback: function() {
         var self = this;
