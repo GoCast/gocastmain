@@ -13,42 +13,6 @@
 extern UIWebView*   gWebViewInstance;
 //Whiteboard gApp;
 
-class tVector4f
-{
-public:
-    union
-    {
-        float mArray[4];
-        struct { float x, y, z, w; };
-    };
-
-    //Array subscript operator
-	float& operator [](const size_t i) { assert(i < 4); return mArray[i]; }
-	const float& operator [](const size_t i) const { assert(i < 4); return mArray[i]; }
-
-public:
-    tVector4f(const float& nx = 0, const float& ny = 0, const float& nz = 0, const float& nw = 0)
-    : x(nx), y(ny), z(nz), w(nw) { }
-};
-
-class tMatrix4x4f
-{
-public:
-    tVector4f mArray[4];
-
-	tVector4f& operator [](const size_t i) { assert(i < 4); return mArray[i]; }
-	const tVector4f& operator [](const size_t i) const { assert(i < 4); return mArray[i]; }
-
-public:
-    tMatrix4x4f(const float& n)
-    {
-        mArray[0] = tVector4f(n, 0, 0, 0);
-        mArray[1] = tVector4f(0, n, 0, 0);
-        mArray[2] = tVector4f(0, 0, n, 0);
-        mArray[3] = tVector4f(0, 0, 0, n);
-    }
-};
-
 static tMatrix4x4f ortho(const float &left, const float &right, const float &bottom, const float &top)
 {
     tMatrix4x4f Result(1);

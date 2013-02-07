@@ -4,20 +4,38 @@
 #include <list>
 
 class CarouselAppMessage;
+class tSGViewEvent;
 
 class CarouselApp
 :   public tObserver<const CarouselAppMessage&>,
-    public tObserver<const CallcastEvent&>
+    public tObserver<const CallcastEvent&>,
+    public tObserver<const tSGViewEvent&>
 {
 protected:
+    std::vector<tPoint2f>   mWhiteBoardVerts;
+    std::vector<tPoint2f>   mWhiteBoardTexCoords;
+    tSurface                mWhiteboardSurface;
+    tProgram*               mSpriteProgram;
+    tTexture*               mWhiteboardTexture;
+
     std::string         mNickname;
     std::string         mRoomname;
     std::list<int32_t>  mSpots;
     uint32_t            mSpotFinger;
 
+    bool                    mInitialized;
+
+protected:
+    void createResources();
+    void configureNodes();
+
 public:
     CarouselApp();
     ~CarouselApp();
+
+    void onInitView();
+    void onResizeView(const tDimension2f& newSize);
+    void onRedrawView(float time);
 
     void onAddSpot(const std::string& newType, const int32_t& newID);
     void onRemoveSpot(const int32_t& newID);
@@ -291,6 +309,7 @@ public:
 
     void update(const CarouselAppMessage& msg);
     void update(const CallcastEvent& msg);
+    void update(const tSGViewEvent& msg);
 
 //void CarouselApp::update(const CarouselAppMessage& msg)
 //{

@@ -116,11 +116,6 @@ AppDelegate* gAppDelegateInstance = NULL;
         [[UIApplication sharedApplication] setStatusBarOrientation:newOrient];
     }
 
-    //*** Don't load OpenGLView at start -- TJG
-//    CGRect glBounds = CGRectMake(10, 10, 300, 300);
-//    self.glView = [[[OpenGLView alloc] initWithFrame:glBounds] autorelease];
-//    [self.viewController.view addSubview:_glView];
-
     self.window.rootViewController = self.viewController;
     [self.window makeKeyAndVisible];
 
@@ -199,8 +194,18 @@ AppDelegate* gAppDelegateInstance = NULL;
     [self.viewController.mBlankSpotView setHidden:YES];
 }
 
+static bool firstTime = true;
 -(void)showWhiteboardSpot
 {
+    if (firstTime)
+    {
+        firstTime = false;
+
+        //*** TJG: Load OpenGL View once, attach it to whiteboard screen, re-use for each spot as needed
+        CGRect glBounds = CGRectMake(10, 10, 300, 300);
+        self.glView = [[[OpenGLView alloc] initWithFrame:glBounds] autorelease];
+        [self.viewController.mWhiteboardSpotView addSubview:_glView];
+    }
     [self.viewController.mWhiteboardSpotView setHidden:NO];
 }
 

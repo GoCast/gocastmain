@@ -20,5 +20,6 @@ public:
     friend class tFrameBuffer;
     friend class tSurface;
     friend class Whiteboard;
+    friend class CarouselApp;
 };
 

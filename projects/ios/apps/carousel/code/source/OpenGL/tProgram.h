@@ -29,5 +29,6 @@ public:
     friend class tSGSetAttributeNode;
 	friend class tSGSetProgramNode;
     friend class Whiteboard;
+    friend class CarouselApp;
 };
 
