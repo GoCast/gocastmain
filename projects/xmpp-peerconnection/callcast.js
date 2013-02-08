@@ -1068,7 +1068,12 @@ var Callcast = {
                 //
 
                 if (this.peer_connection) {
-                    this.peer_connection.Deinit();
+                    try {
+                        this.peer_connection.Deinit();
+                    }
+                    catch(e2) {
+                        Callcast.log('Deinit exception: ' + e2);
+                    }
                     this.peer_connection = null;
                 }
 
@@ -1089,7 +1094,12 @@ var Callcast = {
                     //
                     // Note: If we do not have a mic and we do not have video, then don't call AddStream!
                     if (Callcast.IsVideoDeviceAvailable() || Callcast.IsMicrophoneDeviceAvailable()) {
-                        this.peer_connection.AddStream(Callcast.localstream);
+                        try {
+                            this.peer_connection.AddStream(Callcast.localstream);
+                        }
+                        catch(e3) {
+                            Callcast.log('AddStream exception: ' + e3);
+                        }
                     }
                 }
             } catch (e) {
@@ -1154,7 +1164,12 @@ var Callcast = {
                     Callcast.log('Callee:' + self.GetID() + ' Commencing to call ' + this.jid + calltype);
 
                     // Create with audio and video tracks in case they want to be used later.
-                    sdp = this.peer_connection.CreateOffer({audio: true, video: true});
+                    try {
+                        sdp = this.peer_connection.CreateOffer({audio: true, video: true});
+                    }
+                    catch(e2) {
+                        Callcast.log('CreateOffer exception: ' + e2);
+                    }
 
                     this.peer_connection.SetLocalDescription('OFFER', sdp, function() {
                         var offer = $msg({to: self.jid, type: 'chat'})
@@ -1216,13 +1231,28 @@ var Callcast = {
                     Callcast.log('Callee:' + self.GetID() + ' Completing call...');
     //                Callcast.log('CompleteCall: Offer-SDP=' + offer);
 
-                    this.peer_connection.SetRemoteDescription('OFFER', offer);
+                    try {
+                        this.peer_connection.SetRemoteDescription('OFFER', offer);
+                    }
+                    catch(e2) {
+                        Callcast.log('SetRemoteDescription exception: ' + e2);
+                    }
 
-                    sdp = this.peer_connection.CreateAnswer(offer, {audio: true, video: true});
+                    try {
+                        sdp = this.peer_connection.CreateAnswer(offer, {audio: true, video: true});
+                    }
+                    catch(e3) {
+                        Callcast.log('CreateAnswer exception: ' + e3);
+                    }
 //                  Callcast.log('CompleteCall: Answer-SDP=' + sdp);
                     this.peer_connection.SetLocalDescription('ANSWER', sdp, function() {
                         Callcast.log('Callee:' + self.GetID() + ' CompleteCall: Success - setting local and starting ICE machine.');
-                        self.peer_connection.StartIce();
+                        try {
+                            self.peer_connection.StartIce();
+                        }
+                        catch(e4) {
+                            Callcast.log('StartIce exception: ' + e4);
+                        }
                         self.bIceStarted = true;
                         var answer = $msg({to: self.jid, type: 'chat'})
                                 .c('answer', {xmlns: Callcast.NS_CALLCAST}).t(sdp);
@@ -1331,7 +1361,12 @@ var Callcast = {
             if (this.peer_connection)
             {
                 Callcast.log('Callee:' + self.GetID() + ' Dropping call for ' + this.jid);
-                this.peer_connection.Deinit();
+                try {
+                    this.peer_connection.Deinit();
+                }
+                catch(e) {
+                    Callcast.log('Deinit threw an exception: ' + e);
+                }
                 this.peer_connection = null;
             }
 

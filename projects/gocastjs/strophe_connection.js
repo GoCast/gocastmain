@@ -85,7 +85,10 @@ GoCastJS.StropheConnection = function(opts) {
     Strophe.Status.TERMINATED = 99;
 
     Strophe.log = function(level, msg) {
-        if (level > 0) {
+        if (level > 3) {
+            console.error('STROPHE-LOG: level:' + level + ', msg: ' + msg);
+        }
+        else if (level > 0) {
             console.log('STROPHE-LOG: level:' + level + ', msg: ' + msg);
         }
     };
@@ -439,7 +442,7 @@ GoCastJS.StropheConnection.prototype = {
 
     privateSetupPingHandler: function(iq) {
         var pong = $iq({to: $(iq).attr('from'), id: $(iq).attr('id'), type: 'result'});
-        this.log('StropheConnection: Received PING - Sending pong...');
+//        this.log('StropheConnection: Received PING - Sending pong...');
         if (this.connection) {
             this.connection.send(pong);
 
