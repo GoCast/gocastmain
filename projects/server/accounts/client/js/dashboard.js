@@ -259,14 +259,46 @@ var DashView = {
             $('.areyousure', $(this).parent()).html('<div class="alert alert-warning show"><button type="button" ' +
                                                     'class="close" data-dismiss="alert">&times;</button>' +
                                                     'All room content will be lost. Are you sure?<br><br>&nbsp;' +
-                                                    '<button type="button" class="btn btn-danger btn-mini pull-right">' +
-                                                    'I\'m sure</button><button type="button" ' +
-                                                    'class="btn btn-success btn-mini pull-right">Cancel</button></div>');
+                                                    '<button type="button" class="btn btn-danger btn-mini pull-right" ' +
+                                                    'roomname="' + $(this).attr('roomname') + '">I\'m sure</button>'+
+                                                    '<button type="button" class="btn btn-success btn-mini pull-right">' +
+                                                    'Cancel</button></div>');
 
             $('.areyousure .btn-danger', $(this).parent()).click(function(e) {
-                var evt = e || window.event;
+                var evt = e || window.event, _roomname = $(this).attr('roomname'),
+                _self = this, _email = DashApp.boshconn.getEmailFromJid();
+
                 evt.preventDefault();
-                $('.close', $(this).parent()).click();
+                $.ajax({
+                    url: '/acct/deleteroom/',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {email: _email, roomname: _roomname},
+                    success: function(response) {
+                        if('success' === response.result) {
+                            DashApp.roomlist.splice(DashApp.roomlist.indexOf(_roomname), 1);
+                            self.displayRoomList(formid, DashApp.roomlist);
+                            self.displayalert(formid, 'success', 'Your room "' + _roomname + '" has been destroyed.');
+                            if (_roomname === $('#input-roomname', self.$forms[formid]).val()) {
+                                $('#input-roomname', self.$forms[formid]).val('');
+                                $('.btn-inverse', self.$forms[formid]).removeClass('show');
+                            }
+                        } else {
+                            if ('no email' === response.result) {
+                                self.displayalert(formid, 'error', 'No account exists for ' + _email + '.');
+                            } else if ('no roomname' === response.result) {
+                                self.displayalert(formid, 'error', 'You have not selected any room to be destroyed.');
+                            } else {
+                                self.displayalert(formid, 'error', 'There was a problem destroying your room.');
+                            }
+                            $('.close', $(_self).parent()).click();
+                        }
+                    },
+                    failure: function(error) {
+                        self.displayalert(formid, 'error', 'There was a problem destroying your room.');
+                        $('.close', $(_self).parent()).click();
+                    }
+                });
             });
 
             $('.areyousure .btn-success', $(this).parent()).click(function(e) {
@@ -274,7 +306,7 @@ var DashView = {
                 evt.preventDefault();
                 $('.close', $(this).parent()).click();
             });
-        }).tooltip({placement: 'top'});
+        });
     },
     changeformCallback: function() {
         var self = this;
