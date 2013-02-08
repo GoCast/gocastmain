@@ -131,7 +131,7 @@ var DashView = {
             }
             if (!defs.hasOwnProperty('input-time')) {
                 hours = date.getHours();
-                if (!hours) { 
+                if (!hours) {
                     hours = 12;
                     ampm = 'AM';
                 } else {
@@ -217,12 +217,12 @@ var DashView = {
         }
 
         if (template && !$('#roomlist', this.$forms[formid]).hasClass('well')) {
-            $('#roomlist', this.$forms[formid]).addClass('well');   
+            $('#roomlist', this.$forms[formid]).addClass('well');
         }
 
         $('#roomlist', this.$forms[formid]).html(template);
         $('#roomlist a.roomname', this.$forms[formid]).click(function() {
-            $('#input-roomname', self.$forms[formid]).val($(this).text()); 
+            $('#input-roomname', self.$forms[formid]).val($(this).text());
             if ('startmeeting-form' === formid && !$('a.btn-link', self.$forms[formid]).hasClass('show')) {
                 $('a.btn-inverse', self.$forms[formid]).addClass('show');
             }
@@ -404,7 +404,7 @@ var DashApp = {
 
                     DashView.cancelloader('startmeeting-form');
                     if('success' === response.result) {
-                        rcode = $.roomcode.cipher(DashApp.boshconn.getEmailFromJid().replace(/@/, '~'), roomname);
+                        rcode = $.roomcode.cipher(DashApp.boshconn.getEmailFromJid(), roomname);
                         roomlinkrel = pathname.substring(0, pathname.lastIndexOf('/') + 1) + '?roomname=' + rcode;
                         window.location.href = roomlinkrel;
                     } else {
@@ -559,17 +559,17 @@ var DashApp = {
                                         $('#input-time', DashApp.$forms['schedulemeeting-form']).val() + ' ' +
                                         $('#ampm', DashApp.$forms['schedulemeeting-form']).val())).toString(),
                         fromemail: DashApp.boshconn.getEmailFromJid(),
-                    }, genEmailArray = function (str, cb) { 
+                    }, genEmailArray = function (str, cb) {
                         var arr = [];
-                        str.split(',').forEach(function(commas) { 
-                            commas.trim().split(';').forEach(function(semis) { 
+                        str.split(',').forEach(function(commas) {
+                            commas.trim().split(';').forEach(function(semis) {
                                 semis.trim().split(' ').forEach(function(spaces) {
                                     if (spaces.trim()) {
-                                        arr.push(spaces.trim()); 
+                                        arr.push(spaces.trim());
                                     }
-                                }); 
-                            }); 
-                        }); 
+                                });
+                            });
+                        });
                         cb(arr);
                     };
 

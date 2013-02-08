@@ -76,7 +76,7 @@
         },
         roomcodeobj = {
             cipher: function(username, roomname) {
-                return $.base64.encode(salt + saltdelim + encRoomName(encodeURIComponent(username + userdelim + roomname)));
+                return $.base64.encode(salt + saltdelim + encRoomName(encodeURIComponent(username.replace(/@/, '~') + userdelim + roomname)));
             },
             decipher: function(rcode) {
                 var roomname = $.base64.decode(rcode),
