@@ -92,7 +92,7 @@
             },
             decipheruname: function(rcode) {
                 var roomname = this.decipher(rcode);
-                return roomname.slice(0, roomname.indexOf(userdelim));
+                return roomname.slice(0, roomname.indexOf(userdelim)).replace(/~/, '@');
             },
             decipherroomname: function(rcode) {
                 var roomname = this.decipher(rcode);
