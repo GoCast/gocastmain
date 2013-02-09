@@ -356,8 +356,9 @@ var DashView = {
             rcode = $.roomcode.cipher(publicrooms[i].room.split('#')[0], publicrooms[i].room.split('#')[1]);
             link = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1) + '?roomname=' + rcode;
             title = (publicrooms[i].owner ? publicrooms[i].owner + '\'s ' : '') + publicrooms[i].room.split('#')[1];
-            $roomitem = $('.accordion-group[roomname="' + rcode.replace(/=/g, '_eq') + '"]', $container);
-            roomids.push(rcode.replace(/=/g, '_eq'));
+            $roomitem = $('.accordion-group[roomname="' + rcode.replace(/=/g, '_eq').replace(/\+/g, '_plus') +
+                        '"]', $container);
+            roomids.push(rcode.replace(/=/g, '_eq').replace(/\+/g, '_plus'));
 
             if ($roomitem.length) {
                 $roomitem.attr('participants', partsAttrVal);
@@ -370,7 +371,8 @@ var DashView = {
                 }
             } else {
                 roomshtml  = roomshtml + (roomtemplate.replace(/\{\{index\}\}/g, i.toString())
-                                                      .replace(/\{\{room\}\}/g, rcode.replace(/=/g, '_eq'))
+                                                      .replace(/\{\{room\}\}/g, rcode.replace(/=/g, '_eq')
+                                                                                     .replace(/\+/g, '_plus'))
                                                       .replace(/\{\{name\}\}/g, title)
                                                       .replace(/\{\{description\}\}/g, publicrooms[i].description)
                                                       .replace(/\{\{link\}\}/g, link)
