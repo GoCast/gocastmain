@@ -323,7 +323,7 @@ var DashView = {
                            '<div id="{{room}}" class="accordion-body collapse"><div class="accordion-inner">' +
                            '{{description}}<br><br><a class="btn btn-success pull-right" href="{{link}}" target="_blank">' +
                            'Take me to this room</a><br>&nbsp;</div></div></div>', i, roomshtml = '',
-            publicrooms = pubrooms, participantsAttribute, partsAttrVal, $roomitem, rcode, link, title;
+            publicrooms = pubrooms, participantsAttribute, partsAttrVal, $roomitem, rcode, link, title, roomids = [];
 
         if (!$container.html()) {
             $container.html(formtemplate);
@@ -357,6 +357,7 @@ var DashView = {
             link = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1) + '?roomname=' + rcode;
             title = (publicrooms[i].owner ? publicrooms[i].owner + '\'s ' : '') + publicrooms[i].room.split('#')[1];
             $roomitem = $('.accordion-group[roomname="' + rcode.replace(/=/g, '_eq') + '"]', $container);
+            roomids.push(rcode.replace(/=/g, '_eq'));
 
             if ($roomitem.length) {
                 $roomitem.attr('participants', partsAttrVal);
@@ -379,7 +380,13 @@ var DashView = {
             }
 
         }
+
         $('form > fieldset > .accordion', $container).append(roomshtml);
+        $('.accordion-group[roomname]', $container).each(function() {
+            if (-1 === roomids.indexOf($(this).attr('roomname'))) {
+                $(this).remove();
+            }
+        });
     },
     changeformCallback: function() {
         var self = this;
