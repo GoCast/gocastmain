@@ -100,7 +100,27 @@
             }
         };
 
-        $.extend({
-            roomcode: roomcodeobj
+    $.extend({
+        roomcode: roomcodeobj
+    });
+})(jQuery);
+
+(function($) {
+    var genEmailArray = function (str, cb) {
+        var arr = [];
+        str.split(',').forEach(function(commas) {
+            commas.trim().split(';').forEach(function(semis) {
+                semis.trim().split(' ').forEach(function(spaces) {
+                    if (spaces.trim()) {
+                        arr.push(spaces.trim());
+                    }
+                });
+            });
         });
+        cb(arr);
+    };
+
+    $.extend({
+        genemaillist: genEmailArray
+    });
 })(jQuery);

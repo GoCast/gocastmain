@@ -140,7 +140,7 @@
 
       <input class="gc-icon" id="audio" type="button" class="off" title="Audio is Disabled" disabled="disabled"/>
       <input class="gc-icon" id="video" type="button" title="Video is Disabled" disabled="disabled"/>
-      <input class="copyData gc-icon" type="button" title="Email link to room." onclick="openCopyData(event);"/>
+      <input class="copyData gc-icon" type="button" title="Invite others by email." onclick="emailInviteDialog(event);"/>
       <!--<input class="twitter gc-icon" type="button" title="Send message to Twitter." onclick="sendTwitter();"/>-->
       <input class="fbSend gc-icon"  type="button" title="Send facebook message." onclick="fbSendDialog();"/>
       <input class="fbShare gc-icon" type="button" title="Share on wall." onclick="fbShare();"/>
@@ -209,14 +209,10 @@
       </div>
       <div id="copyData" class="window resizable">
          <img class="close" src="images/button-close.png" alt="Close" title="Close" />
-         <p>Copy this and paste this into an email.</p>
          <div id="copyContent">
             <h3>You're Invited To GoCast!</h3>
-            I am using <strong>GoCast</strong>, a new kind of "room" on the Web where people can meet and share on live video.
-            Get started by downloading the GoCast App (currently for Firefox or Chrome only), and join me in my room.
-            To get started, click <a id="copyName">here</a>. See you soon!
             <p></p>
-            <img id="copyLogo" alt="Room Link" title="Room Link" src="images/GoToken.png" />
+            <button type="button">Sign up for a GoCast account</button>
          </div>
       </div>
       <div id="waitingToJoin" class="window resizable">
@@ -442,29 +438,67 @@
               <label>When</label>
             </th>
             <td>
-              <input id="whendate" style="width: 35%;" type="text" class="field auto-kal"
+              <input id="whendate" style="width: 42%;" type="text" class="field auto-kal"
                      placeholder="Date (mm/dd/yyyy)" data-kal="months: 1, direction: 'today-future'"/>
-              <input id="whentime" style="width: 35.3%;" type="text" class="field"
+              <input id="whentime" style="width: 42%;" type="text" class="field"
                      placeholder="Time (hh:mm AM|PM)"/>
             </td>
           </tr>
-          <!--<tr valign="top">
-            <th>
-              <label>Privacy</label>
-            </th>
-            <td>
-              <select id="privacy" class="field" style="width: 78%;"/>
-                <option value="OPEN">Public</option>
-                <option value="FRIENDS">Friends</option>
-                <option value="SECRET">Invite Only</option>
-              </select>
-            </td>
-          </tr>-->
         </table>
       </div>
       <div id="actionpanel" class="actionpanel">
         <div id="friends"></div>
         <a id="invite" class="button" href="javascript:void(0);">Invite Friends</a>
+        <a id="cancel" class="button negative" href="javascript:void(0);">Cancel</a>
+        <a id="create" class="button positive" href="javascript:void(0);">Create</a>
+      </div>
+    </div>
+    <div id="emailinvite" class="emaildialog">
+      <div id="masker" class="mask"></div>
+      <div id="status" class="status"></div>
+      <div id="title" class="header">
+        Invite Others By Email
+      </div>
+      <div id="infopanel" class="infopanel">
+        <table>
+          <tr valign="top">
+            <th>
+              <label>Emails</label>
+            </th>
+            <td>
+              <textarea id="emails" class="field" placeholder="ex: abc@def.com, ghi@jkl.com, ..."></textarea>
+            </td>
+          </tr>
+          <tr valign="top">
+            <th>
+              <label>Note to invitees</label>
+            </th>
+            <td>
+              <textarea id="details" class="field" placeholder="ex: Please come to my room."></textarea>
+            </td>
+          </tr>
+          <tr valign="top">
+            <th>
+              <label>Where</label>
+            </th>
+            <td>
+               <div id="roomlink" class="field"></div>
+            </td>
+          </tr>
+          <tr valign="top">
+            <th>
+              <label>When</label>
+            </th>
+            <td>
+              <input id="whendate" style="width: 42%;" type="text" class="field auto-kal"
+                     placeholder="Date (mm/dd/yyyy)" data-kal="months: 1, direction: 'today-future'"/>
+              <input id="whentime" style="width: 42%;" type="text" class="field"
+                     placeholder="Time (hh:mm AM|PM)"/>
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div id="actionpanel" class="actionpanel">
         <a id="cancel" class="button negative" href="javascript:void(0);">Cancel</a>
         <a id="create" class="button positive" href="javascript:void(0);">Create</a>
       </div>

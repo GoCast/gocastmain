@@ -203,6 +203,7 @@ var DashView = {
             }
             template = template + ('</tbody></table>');
             $('.or', this.$forms[formid]).text('OR');
+            $('#roomlist', this.$forms[formid]).addClass('well');
         } else if (!dontShowMessage) {
             template = '<p align="left">You have not created any rooms yet. ';
             if ('startmeeting-form' === formid) {
@@ -212,12 +213,9 @@ var DashView = {
             } else if ('schedulemeeting-form' === formid) {
                 template = template + 'Create a room first, by going to "Start Meeting" in the "My Meetings" menu.</p>';
             }
+            $('#roomlist', this.$forms[formid]).addClass('well');
         } else if ($('#roomlist', this.$forms[formid]).hasClass('well')) {
             $('#roomlist', this.$forms[formid]).removeClass('well');
-        }
-
-        if (template && !$('#roomlist', this.$forms[formid]).hasClass('well')) {
-            $('#roomlist', this.$forms[formid]).addClass('well');
         }
 
         $('#roomlist', this.$forms[formid]).html(template);
@@ -641,10 +639,10 @@ var DashApp = {
                     } else if ('not activated' === response.result) {
                         DashView.displayalert('schedulemeeting-form', 'error', 'Sending invites failed. Your account ' +
                                               'hasn\'t been activated yet. Please activate your account first.');
-                    } else if ('no toemailarray') {
+                    } else if ('no toemailarray' === response.result) {
                         DashView.displayalert('schedulemeeting-form', 'error', 'Sending invites failed. Please ' +
                                               'specify a list of valid email addresses to send your invites.');
-                    } else if ('no link') {
+                    } else if ('no link' === response.result) {
                         DashView.displayalert('schedulemeeting-form', 'error', 'Sending invites failed. Please ' +
                                               'choose one of your rooms for the meeting.');
                     } else {
@@ -775,8 +773,8 @@ var DashApp = {
         });
     },
     queryRoomList: function(gotList) {
-        var succCb = gotList || function(roomlist) {},
-        _email = this.boshconn.getEmailFromJid();
+        var cb = gotList || function(roomlist) {},
+            _email = this.boshconn.getEmailFromJid();
 
         $.ajax({
             url: '/acct/listrooms/',
@@ -784,9 +782,10 @@ var DashApp = {
             dataType: 'json',
             data: {email: _email},
             success: function(response) {
-                if ('success' === response.result) {
-                    succCb(response.data || []);
-                }
+                cb(response.data || []);
+            },
+            failure: function(error) {
+                cb(response.data || []);
             }
         });
     },

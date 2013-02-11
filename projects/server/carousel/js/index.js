@@ -938,7 +938,7 @@ function carouselItemUnzoom(event)
 /**
  * \brief Open dialog with room description so user can copy to clipboard
  */
-function openCopyData(event)
+function openCopyData(event, header, message, promptregister)
 {
   if (!event)
   {
@@ -948,17 +948,31 @@ function openCopyData(event)
   // get the dialog
   var jqWin = $('#boxes > div#copyData'),
   // set the room name
-      name = $('div#copyContent > #copyName', jqWin),
+      /*name = $('div#copyContent > #copyName', jqWin),*/
       cX, cY, winW, winH, wcW, wcH,
       marginRight, marginBottom;
 
   //$(name).text('Carousel room ' + $.getUrlVar('roomname'));
-  $(name).attr('href', window.location.href);
+  /*$(name).attr('href', window.location.href);*/
+
+  $('#copyContent > h3', jqWin).text(header);
+  $('#copyContent > p', jqWin).text(message);
+  $('#copyContent > button', jqWin).css('display', 'block');
+
+  if (!promptregister) {
+    $('#copyContent > button', jqWin).css('display', 'none');
+  } else {
+    $('#copyContent > button', jqWin).unbind('click').click(function() {
+      window.location.href = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1) +
+                             'register.html';
+    });
+  }
 
   // position the dialog
   cX = event.clientX;
   cY = event.clientY;
 
+  jqWin.width(400).height(150);
   winW = $(window).width();
   winH = $(window).height();
   wcW = jqWin.outerWidth();
@@ -991,7 +1005,6 @@ function openCopyData(event)
   }
 
   // display dlg
-  jqWin.width(400).height(200);
   jqWin.fadeIn(700);
   jqWin.addClass('active');
 
@@ -3234,3 +3247,162 @@ function leaveGoCast() {
 }
 
 var forgetXmppConnection = function() {};
+
+function emailInviteDialog(e) {
+  if (Callcast.connection.bAnonymous) {
+    openCopyData(e, 'Feature not available', 'You have to be a registered GoCast user to use this feature.', true);
+  } else if ($.roomcode.decipheruname($.urlvars.roomname) !== Callcast.connection.getEmailFromJid()) {
+    openCopyData(e, 'Feature not available', 'Unfortunately, you can\'t invite others to this room as ' +
+                                             'you are not its owner.');
+  } else {
+    GoCastJS.EmailInvite.opendialog('#emailinvite', '#mask');
+  }
+}
+
+GoCastJS.EmailInvite = {
+  invitelist: [],
+  convertToAMPMAddHour: function(date) {
+    function minstring(minutes) {
+      var digits = {'false': '', 'true': '0'};
+      return digits[(minutes<10).toString()] + minutes;
+    }
+
+    date.setHours(date.getHours() + 1);
+    if (12 < date.getHours()) {
+      return (date.getHours()-12) + ':' + minstring(date.getMinutes()) + ' PM';
+    } else {
+      if (0 === date.getHours()) {
+        return '12:' + minstring(date.getMinutes()) + ' AM';
+      } else {
+        return date.getHours() + ':' + minstring(date.getMinutes()) + ((date.getHours() < 12) ? ' AM' : ' PM');
+      }
+    }
+  },
+  opendialog: function(dlgSelector, maskSelector) {
+    var winW = $(window).width(),
+      winH = $(window).height(),
+      date = new Date(),
+      self = this;
+
+    $(document).unbind('keydown');
+    if ('Firefox' === app.browser.name) {
+      $('#meeting').css('visibility', 'hidden');
+    }
+
+    $(maskSelector).css({
+      'width': winW + 'px',
+      'height': winH + 'px'
+    }).fadeIn('slow', function() {
+      var $dlg = $(dlgSelector);
+      $dlg.css({
+        'left': (winW - $dlg.width())/2 + 'px',
+        'top': (winH - $dlg.height())/4 + 'px',
+        'z-index': $(this).css('z-index') + 1
+      }).addClass('show');
+      $('#invite', $dlg).remove();
+      $('#whendate', $dlg).unbind('blur').unbind('keydown')
+                          .keydown(function(evt) {evt.preventDefault();})
+                          .blur(self.whendateblurCb($dlg)).blur();
+      $('#whentime', $dlg).val(self.convertToAMPMAddHour(date)).unbind('blur').blur(self.whentimeblurCb($dlg)).blur();
+      $('#masker', $dlg).css('z-index', $(this).css('z-index') + 2);
+      $('#status', $dlg).css('z-index', $(this).css('z-index') + 3);
+      $('#roomlink', $dlg).text(window.location.href);
+      $('#cancel', $dlg).unbind('click').click(self.cancelclickCb($dlg, $(this)));
+      $('#create', $dlg).unbind('click').click(self.createclickCb($dlg, $(this)));
+      $('#topic', $dlg).focus();
+    });
+  },
+  whendateblurCb: function($dlg) {
+    var $whendate = $('#whendate', $dlg);
+    return function() {
+      var date = new Date();
+      $whendate.val($whendate.val() || ((date.getMonth()+1) + '/' + date.getDate() + '/' + date.getFullYear()));
+    };
+  },
+  whentimeblurCb: function($dlg) {
+    var $whentime = $('#whentime', $dlg),
+        self = this;
+    return function() {
+      $whentime.val($whentime.val() || self.convertToAMPMAddHour(new Date()));
+    };
+  },
+  cancelclickCb: function($dlg, $mask) {
+    var self = this, docKey;
+    return function() {
+      $('#details', $dlg).val('');
+      $('#topic', $dlg).val('');
+      $dlg.removeClass('show');
+      $mask.fadeOut('slow');
+      self.invitelist = [];
+      $(document).keydown(docKey);
+
+      if ('Firefox' === app.browser.name) {
+        $('#meeting').css('visibility', 'visible');
+      }
+    };
+  },
+  createclickCb: function($dlg, $mask) {
+    var self = this;
+    return function() {
+      var timeph, emails = $('#emails', $dlg).val(),
+          starttime = new Date($('#whendate', $dlg).val() + ' ' + $('#whentime', $dlg).val()),
+          data, errmsg;
+
+      $.genemaillist(emails, function(arr) { self.invitelist = arr; });
+      if (emails && self.invitelist.length) {
+        data = {
+            note: $('#details', $dlg).val(),
+            link: $('#roomlink', $dlg).text(),
+            when: starttime,
+            toemailarray: JSON.stringify(self.invitelist),
+            fromemail: Callcast.connection.getEmailFromJid()
+        };
+
+        if ($('#details', $dlg).val()) {
+          data.note = $('#details', $dlg).val();
+        }
+
+        if ('invalid date' !== starttime.toString().toLowerCase()) {
+          data.when = starttime.toString();
+        }
+
+        console.log('EmailInvite: ', data);
+        $('#masker', $dlg).addClass('show');
+        $('#status', $dlg).addClass('show').text('Sending invitation');
+        $.ajax({
+          url: '/acct/inviteviaemail/',
+          type: 'POST',
+          dataType: 'json',
+          data: data,
+          success: function(response) {
+            if ('success' === response.result) {
+              $('#status', $dlg).text('Done');
+              setTimeout(function() {
+                $('#status', $dlg).removeClass('show');
+                $('#masker', $dlg).removeClass('show');
+                $('#cancel', $dlg).click();
+              }, 2000);
+            } else {
+              $('#status', $dlg).text('Failed');
+              setTimeout(function() {
+                $('#status', $dlg).removeClass('show');
+                $('#masker', $dlg).removeClass('show');
+                $('#cancel', $dlg).click();
+              }, 2000);
+            }
+          },
+          failure: function(error) {
+            $('#status', $dlg).text('Failed');
+            setTimeout(function() {
+              $('#status', $dlg).removeClass('show');
+              $('#masker', $dlg).removeClass('show');
+              $('#cancel', $dlg).click();
+            }, 2000);
+          }
+        });
+      } else {
+        $('#topic', $dlg).focus();
+      }
+    };
+  }
+};

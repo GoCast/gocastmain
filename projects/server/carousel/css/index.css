@@ -1246,6 +1246,7 @@ body > div#meeting > div#streams > div#scontrols > input.right {
 #boxes #copyData #copyContent
 {
    overflow: hidden;
+   width: 97.5%;
    background-color: white;
    padding-left: 5px;
    padding-right: 5px;
@@ -1258,6 +1259,13 @@ body > div#meeting > div#streams > div#scontrols > input.right {
    margin-left: 10px;
    margin-right: 10px;
 }
+
+#boxes #copyData #copyContent button
+{
+   width: 100%;
+   height: 2em;
+}
+
 #boxes #copyData #copyContent #copyLogo
 {
    width: 30px;
@@ -1504,7 +1512,7 @@ body > #tour > button#imgood {
   font-family: 'ModernPictogramsNormal';
 }
 
-.fbdialog {
+.fbdialog, .emaildialog {
   display: none;
   position: absolute;
   width: 400px;
@@ -1513,11 +1521,11 @@ body > #tour > button#imgood {
   font-family: 'lucida grande', tahoma, verdana, arial, sans-serif;
 }
 
-.fbdialog.show {
+.fbdialog.show, .emaildialog.show {
   display: block;
 }
 
-.fbdialog > .header {
+.fbdialog > .header, .emaildialog > .header {
   position: absolute;
   left: 0px;
   top: 0px;
@@ -1530,7 +1538,7 @@ body > #tour > button#imgood {
   font-weight: bold;
 }
 
-.fbdialog > .infopanel {
+.fbdialog > .infopanel, .emaildialog > .infopanel {
   position: absolute;
   background-color: white;
   left: 0px;
@@ -1541,22 +1549,31 @@ body > #tour > button#imgood {
   padding-right: 5px;
 }
 
-.fbdialog > .infopanel > table {
+.fbdialog > .infopanel > table,
+.emaildialog > .infopanel > table {
   width: 100%;
   height: 100%;
+  table-layout: fixed;
   border: none;
   font-size: 14px;
   margin-top: 7px;
   padding-bottom: 7px;
 }
 
-.fbdialog > .infopanel > table th {
+.fbdialog > .infopanel > table th,
+.emaildialog > .infopanel > table th {
   text-align: left;
   padding-left: 10px;
   padding-right: 5px;
 }
 
-.fbdialog > .infopanel > table .field {
+.fbdialog > .infopanel > table td,
+.emaildialog > .infopanel > table td {
+  width: 80%;
+}
+
+.fbdialog > .infopanel > table .field,
+.emaildialog > .infopanel > table .field {
   outline: none;
   text-decoration: none;
   border: 1px darkgrey solid;
@@ -1564,7 +1581,7 @@ body > #tour > button#imgood {
   -webkit-box-shadow: inset 0px 0px 1px grey;
   -moz-box-shadow: inset 0px 0px 1px grey;
   color: grey;
-  width: 75%;
+  width: 90%;
   height: 30px;
   padding-left: 10px;
   resize: none;
@@ -1572,14 +1589,16 @@ body > #tour > button#imgood {
   font-family: 'lucida grande', tahoma, verdana, arial, sans-serif;
 }
 
-.fbdialog > .infopanel > table #roomlink {
+.fbdialog > .infopanel > table #roomlink,
+.emaildialog > .infopanel > table #roomlink {
   padding-top: 5px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.fbdialog > .infopanel > table .field:focus {
+.fbdialog > .infopanel > table .field:focus,
+.emaildialog > .infopanel > table .field:focus {
   color: black;
   border: 1px black solid;
   box-shadow: 1px 1px 1px black;
@@ -1587,13 +1606,14 @@ body > #tour > button#imgood {
   -moz-box-shadow: 1px 1px 1px black;
 }
 
-.fbdialog > .infopanel > table #details {
+.fbdialog > .infopanel > table textarea,
+.emaildialog > .infopanel > table textarea {
   height: 60px;
   padding-top: 5px;
   padding-bottom: 5px;
 }
 
-.fbdialog > .actionpanel {
+.fbdialog > .actionpanel, .emaildialog > .actionpanel {
   position: absolute;
   left: 0px;
   top: 350px;
@@ -1605,7 +1625,8 @@ body > #tour > button#imgood {
   background-color: #F2F2F2;
 }
 
-.fbdialog > .actionpanel > .button {
+.fbdialog > .actionpanel > .button,
+.emaildialog > .actionpanel > .button {
   outline: none;
   text-decoration: none;
   float: right;
@@ -1625,14 +1646,16 @@ body > #tour > button#imgood {
   text-decoration: underline;
 }
 
-.fbdialog > .actionpanel > .button.positive {
+.fbdialog > .actionpanel > .button.positive,
+.emaildialog > .actionpanel > .button.positive {
   color: white;
   background: -webkit-gradient(linear, center bottom, center top, from(#3B5998), to(#6D84B4));
   background: -moz-linear-gradient(bottom, #3B5998, #6D84B4);
   border: 1px #3B5998 solid;
 }
 
-.fbdialog > .actionpanel > .button.negative {
+.fbdialog > .actionpanel > .button.negative,
+.emaildialog > .actionpanel > .button.negative {
   color: black;
   background: -webkit-gradient(linear, center bottom, center top, from(rgb(200,200,200)), to(rgb(255,255,255)));
   background: -moz-linear-gradient(bottom, rgb(200,200,200), rgb(255,255,255));
@@ -1652,7 +1675,7 @@ body > #tour > button#imgood {
   display: block;
 }
 
-.fbdialog > .mask {
+.fbdialog > .mask, .emaildialog > .mask {
   display: none;
   position: absolute;
   left: 0px;
@@ -1662,11 +1685,12 @@ body > #tour > button#imgood {
   background-color: rgba(0, 0, 0, 0.6);
 }
 
-.fbdialog > .mask.show {
+.fbdialog > .mask.show, .emaildialog > .mask.show {
   display: block;
 }
 
-.fbdialog > .status {
+.fbdialog > .status,
+.emaildialog > .status {
   display: none;
   position: absolute;
   left: 100px;
@@ -1686,7 +1710,7 @@ body > #tour > button#imgood {
   font-weight: bold;
 }
 
-.fbdialog > .status.show {
+.fbdialog > .status.show, .emaildialog > .status.show {
   display: block;
 }
 
