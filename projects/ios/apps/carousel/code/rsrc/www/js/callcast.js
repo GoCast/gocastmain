@@ -1674,7 +1674,7 @@ var Callcast = {
     on_callcast_groupchat_command: function(message) {
         var ret;
 
-        Callcast.log('Groupchat command received: ', message);
+//        Callcast.log('Groupchat command received: ', message);
 
         ret = Callcast.process_multi_command(message);
         if (!ret) {

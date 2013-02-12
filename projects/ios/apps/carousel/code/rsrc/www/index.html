@@ -63,14 +63,14 @@
 
             function onConnectionStatus(statusStr)
             {
-                console.log("onConnectionStatus(" + statusStr + ")");
+//                console.log("onConnectionStatus(" + statusStr + ")");
 
                 if (statusStr.toLowerCase() === 'connected' || statusStr.toLowerCase() === 're-attached')
                 {
                     Callcast.SetNickname(chosenNick);
 
                     Callcast.CreateUnlistedAndJoin(chosenRoom, function(new_name) {
-                                                   console.log('Joined room successfully. Next?');
+//                                                   console.log('Joined room successfully. Next?');
 
                                                    cordova.exec(function(winParam) {}, function(error) {}, "GCICallcast", "loggedIn", [ "" ]);
 
@@ -84,20 +84,20 @@
             function onNicknameInUse(nick)
             {
                 cordova.exec(function(winParam) {}, function(error) {}, "GCICallcast", "onNicknameInUse", [ "" ]);
-                console.log("onNicknameInUse(" + nick + ")");
+//                console.log("onNicknameInUse(" + nick + ")");
                 app1.nickInUse(nick);
             }
 
             function assignSpotForParticipant(nick)
             {
                 cordova.exec(function(winParam) {}, function(error) {}, "GCICallcast", "addSpotForParticipant", [ "" ]);
-                console.log("assignSpotForParticipant(" + nick + ")");
+//                console.log("assignSpotForParticipant(" + nick + ")");
             }
 
             function unassignSpotForParticipant(nick)
             {
                 cordova.exec(function(winParam) {}, function(error) {}, "GCICallcast", "removeSpotForParticipant", [ "" ]);
-                console.log("unassignSpotForParticipant(" + nick + ")");
+//                console.log("unassignSpotForParticipant(" + nick + ")");
             }
 
             function doSpot(info)
@@ -108,7 +108,7 @@
                 {
                     if (info.image)
                     {
-                        console.log('Image Given. Must create canvas/image as starting point.');
+//                        console.log('Image Given. Must create canvas/image as starting point.');
                         cordova.exec(function(winParam) {}, function(error) {}, "GCICallcast", "loadImageURL", [ info.spotnumber.toString(), info.image.toString() ]);
                     }
 
@@ -118,7 +118,7 @@
 
                         numstrokes = cmds.strokes.length;
                         if (numstrokes) {
-                            console.log(numstrokes + ' strokes to apply:', cmds.strokes);
+//                            console.log(numstrokes + ' strokes to apply:', cmds.strokes);
                         }
                     }
 
@@ -147,14 +147,14 @@
                         }
 
 //                        document.writeln('Single stroke to apply:', stroke, '<BR>');
-                        console.log('Single stroke to apply:', stroke);
+//                        console.log('Single stroke to apply:', stroke);
                     }
                 }
             }
 
             function onAddSpot(data)
             {
-                console.log("onAddSpot ", data);
+//                console.log("onAddSpot ", data);
                 cordova.exec(function(winParam) {}, function(error) {}, "GCICallcast", "addSpot", [ data.spottype.toString(), data.spotnumber.toString() ]);
                 if (data.spottype === 'whiteBoard')
                 {
@@ -167,7 +167,7 @@
             function onSetSpot(data)
             {
                 cordova.exec(function(winParam) {}, function(error) {}, "GCICallcast", "setSpot", [ "" ]);
-                console.log("onSetSpot ", data);
+//                console.log("onSetSpot ", data);
                 if (data.spottype === 'whiteBoard') {
                     doSpot(data);
                 }
@@ -176,7 +176,7 @@
             function onRemoveSpot(data)
             {
                 cordova.exec(function(winParam) {}, function(error) {}, "GCICallcast", "removeSpot", [ data.spotnumber.toString() ]);
-                console.log("onRemoveSpot ", data);
+//                console.log("onRemoveSpot ", data);
             }
 
             function setChosenNick(newNick)
@@ -195,7 +195,7 @@
                 setChosenRoom(newRoom);
 
                 $(window).bind('beforeunload', function() {
-                               console.log('On before unload.');
+//                               console.log('On before unload.');
                                Callcast.LeaveSession();
                                });
 
@@ -238,7 +238,7 @@
 
             function sendStroke(stroke, theSpotNumber)
             {
-                console.log("sendStroke ", stroke);
+//                console.log("sendStroke ", stroke);
                 Callcast.SendSingleStroke({stroke: JSON.stringify(stroke), spotnumber: theSpotNumber});
             }
 
@@ -246,7 +246,7 @@
             {
                 var stroke;
 
-                console.log("*** Beginning of realDrawLine!");
+//                console.log("*** Beginning of realDrawLine!");
 
                 stroke = [];
 
@@ -260,7 +260,7 @@
                 stroke.push({name: 'restore'}); // finish command
                 self.sendStroke(stroke, theSpotNumber);        // send it
 
-                console.log("*** Reached end of realDrawLine!");
+//                console.log("*** Reached end of realDrawLine!");
             }
 
             </script>
