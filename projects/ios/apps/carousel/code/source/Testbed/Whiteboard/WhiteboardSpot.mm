@@ -15,6 +15,7 @@
 
 const tDimension2f  kSurfaceSize(500,500);
 const tDimension2f  kSpotSize(300,300);
+const float         kFactor(1.0f);
 
 const tColor4b      kBlack  (0,0,0,255);
 const tColor4b      kRed    (255,0,0,255);
@@ -75,7 +76,10 @@ void WhiteboardSpot::onMoveTo(const tPoint2f& pt)
 
 void WhiteboardSpot::onLineTo(const tPoint2f& pt)
 {
-    mSurface->drawLineWithPen(mCurDrawPoint, pt, mReceivePenColor, mReceivePenSize);
+    tPoint2f A(int(mCurDrawPoint.x * kFactor), int(mCurDrawPoint.y * kFactor));
+    tPoint2f B(int(pt.x * kFactor), int(pt.y * kFactor));
+
+    mSurface->drawLineWithPen(A, B, mReceivePenColor, mReceivePenSize);
 
     mCurDrawPoint = pt;
 }

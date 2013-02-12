@@ -15,6 +15,7 @@
 
 const tDimension2f  kSurfaceSize(500,500);
 const tDimension2f  kSpotSize(300,300);
+const float         kFactor(1.0f);
 
 const tColor4b      kBlack  (0,0,0,255);
 const tColor4b      kRed    (255,0,0,255);
@@ -126,7 +127,7 @@ void CarouselApp::configureNodes()
         location = glGetUniformLocation(mSpriteProgram->mProgramID, "mProjection");
         assert(location != -1);
 
-        static tMatrix4x4f orthoProj = ortho(0,kSurfaceSize.width, kSurfaceSize.height, 0);
+        static tMatrix4x4f orthoProj = ortho(0,kSurfaceSize.width * kFactor, kSurfaceSize.height * kFactor, 0);
         glUniformMatrix4fv(location, 1, false, &orthoProj.mArray[0][0]);
     }
 
