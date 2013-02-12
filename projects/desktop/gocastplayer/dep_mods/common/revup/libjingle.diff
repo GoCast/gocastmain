@@ -1,8 +1,8 @@
 Index: libjingle/trunk/talk/media/webrtc/webrtcvoiceengine.cc
 ===================================================================
---- libjingle/trunk/talk/media/webrtc/webrtcvoiceengine.cc	(revision 253)
+--- libjingle/trunk/talk/media/webrtc/webrtcvoiceengine.cc	(revision 279)
 +++ libjingle/trunk/talk/media/webrtc/webrtcvoiceengine.cc	(working copy)
-@@ -828,6 +828,26 @@
+@@ -867,6 +867,35 @@
    return true;
  }
  
@@ -17,35 +17,28 @@ Index: libjingle/trunk/talk/media/webrtc/webrtcvoiceengine.cc
 +}
 +
 +bool WebRtcVoiceEngine::GetInputVolume(int* level) {
-+    unsigned int ulevel;
-+    if (voe_wrapper_->volume()->GetMicVolume(ulevel) == -1) {
-+        LOG_RTCERR1(GetMicVolume, level);
-+        return false;
-+    }
-+    *level = ulevel;
-+    return true;
++  unsigned int ulevel;
++  if (voe_wrapper_->volume()->GetMicVolume(ulevel) == -1) {
++    LOG_RTCERR1(GetMicVolume, level);
++    return false;
++  }
++  *level = ulevel;
++  return true;
++}
++
++bool WebRtcVoiceEngine::SetInputVolume(int level) {
++  ASSERT(level >= 0 && level <= 255);
++  if (voe_wrapper_->volume()->SetMicVolume(level) == -1) {
++    LOG_RTCERR1(SetMicVolume, level);
++    return false;
++  }
++  return true;
 +}
 +
  bool WebRtcVoiceEngine::SetOutputVolume(int level) {
    ASSERT(level >= 0 && level <= 255);
    if (voe_wrapper_->volume()->SetSpeakerVolume(level) == -1) {
-@@ -837,6 +857,15 @@
-   return true;
- }
- 
-+bool WebRtcVoiceEngine::SetInputVolume(int level) {
-+    ASSERT(level >= 0 && level <= 255);
-+    if (voe_wrapper_->volume()->SetMicVolume(level) == -1) {
-+        LOG_RTCERR1(SetMicVolume, level);
-+        return false;
-+    }
-+    return true;
-+}
-+
- int WebRtcVoiceEngine::GetInputLevel() {
-   unsigned int ulevel;
-   return (voe_wrapper_->volume()->GetSpeechInputLevel(ulevel) != -1) ?
-@@ -2244,13 +2273,12 @@
+@@ -2303,13 +2332,12 @@
  }
  
  bool WebRtcVoiceMediaChannel::MuteStream(uint32 ssrc, bool muted) {
@@ -65,7 +58,7 @@ Index: libjingle/trunk/talk/media/webrtc/webrtcvoiceengine.cc
    return true;
 Index: libjingle/trunk/talk/media/webrtc/webrtcvoiceengine.h
 ===================================================================
---- libjingle/trunk/talk/media/webrtc/webrtcvoiceengine.h	(revision 253)
+--- libjingle/trunk/talk/media/webrtc/webrtcvoiceengine.h	(revision 279)
 +++ libjingle/trunk/talk/media/webrtc/webrtcvoiceengine.h	(working copy)
 @@ -145,7 +145,10 @@
    bool SetDelayOffset(int offset);
@@ -80,7 +73,7 @@ Index: libjingle/trunk/talk/media/webrtc/webrtcvoiceengine.h
  
 Index: libjingle/trunk/talk/media/webrtc/webrtcvideocapturer.cc
 ===================================================================
---- libjingle/trunk/talk/media/webrtc/webrtcvideocapturer.cc	(revision 253)
+--- libjingle/trunk/talk/media/webrtc/webrtcvideocapturer.cc	(revision 279)
 +++ libjingle/trunk/talk/media/webrtc/webrtcvideocapturer.cc	(working copy)
 @@ -190,8 +190,8 @@
    }
@@ -93,61 +86,55 @@ Index: libjingle/trunk/talk/media/webrtc/webrtcvideocapturer.cc
    }
  
    module_ = factory_->Create(0, vcm_id);
-@@ -203,7 +203,10 @@
+@@ -203,7 +203,9 @@
    // It is safe to change member attributes now.
    module_->AddRef();
    SetId(device.id);
 -  SetSupportedFormats(supported);
-+    
 +  if (!supported.empty()) {
-+    SetSupportedFormats(supported);        
++    SetSupportedFormats(supported);   
 +  }
    return true;
  }
  
 Index: libjingle/trunk/talk/media/base/mediaengine.h
 ===================================================================
---- libjingle/trunk/talk/media/base/mediaengine.h	(revision 253)
+--- libjingle/trunk/talk/media/base/mediaengine.h	(revision 279)
 +++ libjingle/trunk/talk/media/base/mediaengine.h	(working copy)
-@@ -131,8 +131,14 @@
+@@ -129,6 +129,12 @@
    // Device configuration
    // Gets the current speaker volume, as a value between 0 and 255.
    virtual bool GetOutputVolume(int* level) = 0;
 +  // Gets the current speaker mute status.
 +  virtual bool GetOutputMute(int* level) = 0;
-   // Sets the current speaker volume, as a value between 0 and 255.
-   virtual bool SetOutputVolume(int level) = 0;
 +  // Gets the current mic volume, as a value between 0 and 255.
 +  virtual bool GetInputVolume(int* level) = 0;
 +  // Sets the current mic volume, as a value between 0 and 255.
 +  virtual bool SetInputVolume(int level) = 0;
+   // Sets the current speaker volume, as a value between 0 and 255.
+   virtual bool SetOutputVolume(int level) = 0;
  
-   // Local monitoring
-   // Gets the current microphone level, as a value between 0 and 10.
-@@ -238,9 +244,18 @@
+@@ -236,6 +242,15 @@
    virtual bool GetOutputVolume(int* level) {
      return voice_.GetOutputVolume(level);
    }
 +  virtual bool GetOutputMute(int* level) {
 +    return voice_.GetOutputMute(level);
 +  }
-   virtual bool SetOutputVolume(int level) {
-     return voice_.SetOutputVolume(level);
-   }
 +  virtual bool GetInputVolume(int* level) {
 +    return voice_.GetInputVolume(level);
 +  }
 +  virtual bool SetInputVolume(int level) {
 +    return voice_.SetInputVolume(level);
 +  }
- 
-   virtual int GetInputLevel() {
-     return voice_.GetInputLevel();
+   virtual bool SetOutputVolume(int level) {
+     return voice_.SetOutputVolume(level);
+   }
 Index: libjingle/trunk/talk/app/webrtc/peerconnectioninterface.h
 ===================================================================
---- libjingle/trunk/talk/app/webrtc/peerconnectioninterface.h	(revision 253)
+--- libjingle/trunk/talk/app/webrtc/peerconnectioninterface.h	(revision 279)
 +++ libjingle/trunk/talk/app/webrtc/peerconnectioninterface.h	(working copy)
-@@ -83,6 +83,7 @@
+@@ -84,6 +84,7 @@
  
  namespace cricket {
  class PortAllocator;
@@ -155,7 +142,7 @@ Index: libjingle/trunk/talk/app/webrtc/peerconnectioninterface.h
  }
  
  namespace webrtc {
-@@ -301,6 +302,9 @@
+@@ -356,6 +357,9 @@
    virtual talk_base::scoped_refptr<LocalAudioTrackInterface>
        CreateLocalAudioTrack(const std::string& label,
                              AudioDeviceModule* audio_device) = 0;
@@ -167,15 +154,15 @@ Index: libjingle/trunk/talk/app/webrtc/peerconnectioninterface.h
    // Dtor and ctor protected as objects shouldn't be created or deleted via
 Index: libjingle/trunk/talk/app/webrtc/localvideosource.cc
 ===================================================================
---- libjingle/trunk/talk/app/webrtc/localvideosource.cc	(revision 253)
+--- libjingle/trunk/talk/app/webrtc/localvideosource.cc	(revision 279)
 +++ libjingle/trunk/talk/app/webrtc/localvideosource.cc	(working copy)
-@@ -63,16 +63,18 @@
+@@ -67,16 +67,18 @@
  // Default resolution. If no constraint is specified, this is the resolution we
  // will use.
  static const cricket::VideoFormatPod kDefaultResolution =
 -    {640, 480, FPS_TO_INTERVAL(30), cricket::FOURCC_ANY};
-+    //{640, 480, FPS_TO_INTERVAL(30), cricket::FOURCC_ANY};
 +    {160, 120, FPS_TO_INTERVAL(14), cricket::FOURCC_ANY};
++    //{640, 480, FPS_TO_INTERVAL(30), cricket::FOURCC_ANY};
  
  // List of formats used if the camera don't support capability enumeration.
  static const cricket::VideoFormatPod kVideoFormats[] = {
@@ -197,9 +184,9 @@ Index: libjingle/trunk/talk/app/webrtc/localvideosource.cc
  MediaSourceInterface::SourceState
 Index: libjingle/trunk/talk/app/webrtc/webrtcsession.cc
 ===================================================================
---- libjingle/trunk/talk/app/webrtc/webrtcsession.cc	(revision 253)
+--- libjingle/trunk/talk/app/webrtc/webrtcsession.cc	(revision 279)
 +++ libjingle/trunk/talk/app/webrtc/webrtcsession.cc	(working copy)
-@@ -723,11 +723,11 @@
+@@ -769,11 +769,11 @@
      return;
    }
    uint32 ssrc = 0;
@@ -211,11 +198,11 @@ Index: libjingle/trunk/talk/app/webrtc/webrtcsession.cc
 -  }
 +  }*/
    voice_channel_->MuteStream(ssrc, !enable);
- }
- 
+   if (enable)
+     voice_channel_->SetChannelOptions(options);
 Index: libjingle/trunk/talk/session/media/channelmanager.cc
 ===================================================================
---- libjingle/trunk/talk/session/media/channelmanager.cc	(revision 253)
+--- libjingle/trunk/talk/session/media/channelmanager.cc	(revision 279)
 +++ libjingle/trunk/talk/session/media/channelmanager.cc	(working copy)
 @@ -79,6 +79,9 @@
    MSG_ADDVIDEORENDERER = 31,
@@ -236,7 +223,7 @@ Index: libjingle/trunk/talk/session/media/channelmanager.cc
 +  if (!Send(MSG_GETOUTPUTMUTE, &volume) || !volume.result) {
 +    return false;
 +  }
-+    
++
 +  *enabled = (bool)(volume.level == 0);
 +  return true;        
 +}
@@ -250,7 +237,7 @@ Index: libjingle/trunk/talk/session/media/channelmanager.cc
 +  *level = volume.level;
 +  return true;        
 +}
-+    
++
  bool ChannelManager::GetOutputVolume_w(int* level) {
    ASSERT(worker_thread_ == talk_base::Thread::Current());
    ASSERT(initialized_);
@@ -268,7 +255,7 @@ Index: libjingle/trunk/talk/session/media/channelmanager.cc
 +  ASSERT(initialized_);
 +  return media_engine_->GetInputVolume(level);
 +}
-+    
++
  bool ChannelManager::SetOutputVolume(int level) {
    bool ret = level >= 0 && level <= 255;
    if (initialized_) {
@@ -297,9 +284,9 @@ Index: libjingle/trunk/talk/session/media/channelmanager.cc
  }
  
 +bool ChannelManager::SetInputVolume_w(int level) {
-+    ASSERT(worker_thread_ == talk_base::Thread::Current());
-+    ASSERT(initialized_);
-+    return media_engine_->SetInputVolume(level);
++  ASSERT(worker_thread_ == talk_base::Thread::Current());
++  ASSERT(initialized_);
++  return media_engine_->SetInputVolume(level);
 +}
 +
  bool ChannelManager::IsSameCapturer(const std::string& capturer_name,
@@ -334,7 +321,7 @@ Index: libjingle/trunk/talk/session/media/channelmanager.cc
        p->result = SetLocalMonitor_w(p->enable);
 Index: libjingle/trunk/talk/session/media/channelmanager.h
 ===================================================================
---- libjingle/trunk/talk/session/media/channelmanager.h	(revision 253)
+--- libjingle/trunk/talk/session/media/channelmanager.h	(revision 279)
 +++ libjingle/trunk/talk/session/media/channelmanager.h	(working copy)
 @@ -136,6 +136,9 @@
                         const std::string& wave_out_device, int opts);
@@ -346,7 +333,7 @@ Index: libjingle/trunk/talk/session/media/channelmanager.h
    bool IsSameCapturer(const std::string& capturer_name,
                        VideoCapturer* capturer);
    bool GetVideoOptions(std::string* cam_device);
-@@ -238,6 +241,9 @@
+@@ -241,6 +244,9 @@
                           const Device* out_dev);
    bool GetOutputVolume_w(int* level);
    bool SetOutputVolume_w(int level);
@@ -356,7 +343,7 @@ Index: libjingle/trunk/talk/session/media/channelmanager.h
    bool SetLocalMonitor_w(bool enable);
    bool SetVideoOptions_w(const Device* cam_device);
    bool SetDefaultVideoEncoderConfig_w(const VideoEncoderConfig& config);
-@@ -290,6 +296,7 @@
+@@ -293,6 +299,7 @@
    int audio_options_;
    int audio_delay_offset_;
    int audio_output_volume_;

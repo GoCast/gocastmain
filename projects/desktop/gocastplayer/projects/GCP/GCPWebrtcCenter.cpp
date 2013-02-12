@@ -870,8 +870,7 @@ namespace GoCast
                 return;
             }
             
-            std::string videoTrackLabel = "camera_";            
-            videoTrackLabel += videoInUniqueId;
+            std::string videoTrackLabel = "camera";            
             FBLOG_INFO_CUSTOM("RtcCenter::GetUserMedia_w", "Creating video source...");
             talk_base::scoped_refptr<webrtc::VideoSourceInterface> pSrc(m_pConnFactory->CreateVideoSource(pCap, &mediaconstraints));
             
@@ -899,8 +898,7 @@ namespace GoCast
             FBLOG_INFO_CUSTOM("RtcCenter::GetUserMedia_w", msg);
 
             FBLOG_INFO_CUSTOM("RtcCenter::GetUserMedia_w", "Creating local audio track...");
-            std::string audioTrackLabel = "microphone_";
-            audioTrackLabel += audioIn;
+            std::string audioTrackLabel = "microphone";
             m_pConnFactory->channel_manager()->SetAudioOptions(audioIn, audioOut, opts);
             m_pLocalStream->AddTrack(m_pConnFactory->CreateAudioTrack(audioTrackLabel, NULL));
         }
@@ -1102,13 +1100,14 @@ namespace GoCast
         msg += action;
         FBLOG_INFO_CUSTOM("RtcCenter::SetLocalDescription_w", (msg + "..."));
         
-        webrtc::SessionDescriptionInterface* pSdp = webrtc::CreateSessionDescription(action, sdp);
+        webrtc::SdpParseError err;
+        webrtc::SessionDescriptionInterface* pSdp = webrtc::CreateSessionDescription(action, sdp, &err);
         if(NULL == pSdp)
         {
             std::string msg = pluginId;
-            msg += ": Failed to create sdp object...";
+            msg += (": Failed to create sdp object [" + err.line + ", " + err.description + "]");
             FBLOG_ERROR_CUSTOM("RtcCenter::SetLocalDescription_w", msg);
-            pObserver->OnFailure("Failed to create sdp object...");
+            pObserver->OnFailure(msg);
             return;
         }
         m_pPeerConns[pluginId]->SetLocalDescription(pObserver, pSdp);
@@ -1133,13 +1132,14 @@ namespace GoCast
         msg += action;
         FBLOG_INFO_CUSTOM("RtcCenter::SetRemoteDescription_w", (msg + "..."));
         
-        webrtc::SessionDescriptionInterface* pSdp = webrtc::CreateSessionDescription(action, sdp);
+        webrtc::SdpParseError err;
+        webrtc::SessionDescriptionInterface* pSdp = webrtc::CreateSessionDescription(action, sdp, &err);
         if(NULL == pSdp)
         {
             std::string msg = pluginId;
-            msg += ": Failed to create sdp object...";
+            msg += (": Failed to create sdp object [" + err.line + ", " + err.description + "]");
             FBLOG_ERROR_CUSTOM("RtcCenter::SetRemoteDescription_w", msg);
-            pObserver->OnFailure("Failed to create sdp object...");
+            pObserver->OnFailure(msg);
             return;
         }
         m_pPeerConns[pluginId]->SetRemoteDescription(pObserver, pSdp);

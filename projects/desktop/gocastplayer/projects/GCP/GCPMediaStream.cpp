@@ -209,7 +209,7 @@ namespace GoCast
     }
     
     LocalVideoTrack::LocalVideoTrack(const talk_base::scoped_refptr<webrtc::LocalVideoTrackInterface>& pTrack)
-    : LocalMediaStreamTrack(pTrack->kind(), pTrack->label(), pTrack->enabled())
+    : LocalMediaStreamTrack(pTrack->kind(), pTrack->id(), pTrack->enabled())
     {
         /*registerProperty("effect", make_property(this, &LocalVideoTrack::get_effect,
                                                        &LocalVideoTrack::set_effect));*/
@@ -252,7 +252,7 @@ namespace GoCast
     }
     
     LocalAudioTrack::LocalAudioTrack(const talk_base::scoped_refptr<webrtc::LocalAudioTrackInterface>& pTrack)
-    : LocalMediaStreamTrack(pTrack->kind(), pTrack->label(), pTrack->enabled())
+    : LocalMediaStreamTrack(pTrack->kind(), pTrack->id(), pTrack->enabled())
     {
         
     }
@@ -263,7 +263,7 @@ namespace GoCast
     }
     
     RemoteVideoTrack::RemoteVideoTrack(const talk_base::scoped_refptr<webrtc::VideoTrackInterface>& pTrack)
-    : MediaStreamTrack(pTrack->kind(), pTrack->label())
+    : MediaStreamTrack(pTrack->kind(), pTrack->id())
     {
         
     }
@@ -274,7 +274,7 @@ namespace GoCast
     }
     
     RemoteAudioTrack::RemoteAudioTrack(const talk_base::scoped_refptr<webrtc::AudioTrackInterface>& pTrack)
-    : MediaStreamTrack(pTrack->kind(), pTrack->label())
+    : MediaStreamTrack(pTrack->kind(), pTrack->id())
     {
         
     }

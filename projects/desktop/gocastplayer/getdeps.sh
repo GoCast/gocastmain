@@ -4,7 +4,7 @@
 # libjingle #
 #############
 
-LIBJINGLE_REV=253
+LIBJINGLE_REV=279
 mkdir -p deps
 cd deps
 
