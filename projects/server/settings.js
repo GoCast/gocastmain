@@ -66,7 +66,7 @@ if (process.env.SETTINGS_DEVEL === 1 || process.env.SETTINGS_DEVEL === '1') {
         dbUserRoomTable: 'dev_UserRoomTable',
         dbVisitorTable: 'dev_VisitorTable',
         dbPublicRoomTable: 'dev_PublicRoomTable',
-        mailgunKey: 'key-65ism99rlme7svrn93qc-cormdknx-42',      // Bob Wolff - rwolff@gocast.it key -- the free one.
+        mailgunKey: 'key-65ism99rlme7svrn93qc-cormdknx-42',      // Bob Wolff - rwolff@gocast.it key -- standard account now.
         inviteFromAddress: 'support@gocast.it',
         inviteFromName: 'GoCast Support',
         inviteSubject: 'Welcome! Please validate your new GoCast account.'
@@ -136,7 +136,7 @@ else {
         dbUserRoomTable: 'main_UserRoomTable',
         dbVisitorTable: 'main_VisitorTable',
         dbPublicRoomTable: 'main_PublicRoomTable',
-        mailgunKey: 'key-65ism99rlme7svrn93qc-cormdknx-42',      // Bob Wolff - rwolff@gocast.it key -- the free one.
+        mailgunKey: 'key-65ism99rlme7svrn93qc-cormdknx-42',      // Bob Wolff - rwolff@gocast.it key
         inviteFromAddress: 'support@gocast.it',
         inviteFromName: 'GoCast Support',
         inviteSubject: 'Welcome! Please validate your new GoCast account.'
