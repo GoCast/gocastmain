@@ -91,7 +91,7 @@ void WhiteboardSpot::onStroke()
 
 void WhiteboardSpot::onLoadImageURL(const std::string& newURL)
 {
-    tSurface urlSurface(newURL);
+    tSurface urlSurface(newURL, kSurfaceSize);
     mSurface->fillWhiteAlpha();
     mSurface->copyRect(urlSurface, tRectf(0,0, urlSurface.getSize()), tPoint2f(0,0));
 //    replaceSurface(new tSurface(newURL));

@@ -17,7 +17,7 @@ public:
     tSurface& operator=(const tSurface& origSurface);
 
 public:
-    tSurface(const std::string& path);
+    tSurface(const std::string& path, const tDimension2f& newSize);
     tSurface(const tPixelFormat::Type& newType, const tDimension2f& newSize);
     tSurface(const tPixelFormat::Type& newType, const tSurface& origSurface);
     tSurface(const tSurface& origSurface);

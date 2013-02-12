@@ -14,7 +14,7 @@
 //UIImage *img = [[UIImage alloc] initWithData:data cache:NO];
 //CGSize size = img.size;
 
-tSurface::tSurface(const std::string& path)
+tSurface::tSurface(const std::string& path, const tDimension2f& newSize)
 : mSize(0,0), mType(tPixelFormat::kInvalid), mPtr(NULL)
 {
     @autoreleasepool
@@ -29,8 +29,9 @@ tSurface::tSurface(const std::string& path)
         assert(baseImage);
 
         // Get Image size
-        mSize.width     = CGImageGetWidth(baseImage.CGImage);
-        mSize.height    = CGImageGetHeight(baseImage.CGImage);
+        mSize = newSize;
+//        mSize.width     = CGImageGetWidth(baseImage.CGImage);
+//        mSize.height    = CGImageGetHeight(baseImage.CGImage);
         mType           = tPixelFormat::kR8G8B8A8;
         mBytesPerRow    = uint16_t(4 * mSize.width);
 
