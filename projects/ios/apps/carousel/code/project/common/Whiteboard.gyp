@@ -23,6 +23,12 @@
 						'../../source/Testbed/Whiteboard/CarouselApp.mm',
 						'../../source/Testbed/Whiteboard/CarouselApp.h',
 
+						'../../source/Testbed/Whiteboard/Spot.mm',
+						'../../source/Testbed/Whiteboard/Spot.h',
+
+						'../../source/Testbed/Whiteboard/WhiteboardSpot.mm',
+						'../../source/Testbed/Whiteboard/WhiteboardSpot.h',
+
 						'../../source/Testbed/Whiteboard/LoginView.mm',
 						'../../source/Testbed/Whiteboard/LoginView.h',
 
