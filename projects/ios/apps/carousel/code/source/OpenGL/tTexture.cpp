@@ -53,6 +53,40 @@ void tTexture::MakeSurfaceCopyUpsideDown(tSurface& dst, const tSurface& src)
     }
 }
 
+
+void tTexture::MakeSurfaceCopy(tSurface& dst, const tSurface& src)
+{
+    printf("*** MakeSurfaceCopy\n");
+    if ((dst.mBytesPerRow == src.mBytesPerRow) &&
+        (dst.mSize == src.mSize) &&
+        (dst.mType == src.mType))
+    {
+        memcpy(dst.mPtr, src.mPtr, dst.mBytesPerRow * (uint32_t)dst.mSize.height);
+    }
+    else if (dst.mBytesPerRow >= src.mBytesPerRow)
+    {
+        uint32_t minHeight = std::min((uint32_t)src.mSize.height, (uint32_t)dst.mSize.height);
+        uint32_t minBytesPerRow = std::min((uint32_t)src.mBytesPerRow, (uint32_t)dst.mBytesPerRow);
+
+        for(uint32_t y = 0; y < minHeight; y++)
+        {
+            memcpy(&dst.mPtr[y * dst.mBytesPerRow], &src.mPtr[y * src.mBytesPerRow], minBytesPerRow);
+        }
+    }
+    else
+    {
+        tPoint2f index;
+
+        for(index.y = 0; index.y < src.getSize().height; index.y++)
+        {
+            for (index.x = 0; index.x < src.getSize().width; index.x++)
+            {
+                dst.setPixel(tPoint2f(index.x, index.y), src.getPixel(index));
+            }
+        }
+    }
+}
+
 void tTexture::CreateFromSurface(const tSurface& newSurface)
 {
     float pow2Width     = roundPow2(newSurface.getSize().width);
@@ -64,8 +98,10 @@ void tTexture::CreateFromSurface(const tSurface& newSurface)
     {
         tSurface s1(tPixelFormat::kR8G8B8A8, tDimension2f(roundPow2(newSurface.getSize().width), roundPow2(newSurface.getSize().height)));
 
-        s1.fillRect(tRectf(tPoint2f(0,0), s1.getSize()), tColor4b(0,0,0,0));
-        MakeSurfaceCopyUpsideDown(s1, newSurface);
+//        s1.fillRect(tRectf(tPoint2f(0,0), s1.getSize()), tColor4b(0,0,0,0));
+        MakeSurfaceCopy(s1, newSurface);
+//        MakeSurfaceCopyUpsideDown(s1, newSurface);
+
 //        s1.copyRect(newSurface, tRectf(tPoint2f(0,0), newSurface.getSize()), tPoint2f(0,0));
 
         CreateFromSurface(s1);
