@@ -14,33 +14,33 @@
 }
 
 - (void)setupLayer {
-    _eaglLayer = (CAEAGLLayer*) self.layer;
-    _eaglLayer.opaque = YES;
+    mEaglLayer = (CAEAGLLayer*) self.layer;
+    mEaglLayer.opaque = YES;
 }
 
 - (void)setupContext {   
     EAGLRenderingAPI api = kEAGLRenderingAPIOpenGLES2;
-    _context = [[EAGLContext alloc] initWithAPI:api];
-    if (!_context) {
+    mContext = [[EAGLContext alloc] initWithAPI:api];
+    if (!mContext) {
         NSLog(@"Failed to initialize OpenGLES 2.0 context");
         exit(1);
     }
     
-    if (![EAGLContext setCurrentContext:_context]) {
+    if (![EAGLContext setCurrentContext:mContext]) {
         NSLog(@"Failed to set current OpenGL context");
         exit(1);
     }
 }
 
 - (void)setupRenderBuffer {
-    glGenRenderbuffers(1, &_colorRenderBuffer);
-    glBindRenderbuffer(GL_RENDERBUFFER, _colorRenderBuffer);        
-    [_context renderbufferStorage:GL_RENDERBUFFER fromDrawable:_eaglLayer];    
+    glGenRenderbuffers(1, &mColorRenderBuffer);
+    glBindRenderbuffer(GL_RENDERBUFFER, mColorRenderBuffer);
+    [mContext renderbufferStorage:GL_RENDERBUFFER fromDrawable:mEaglLayer];
 }
 
 - (void)setupDepthBuffer {
-    glGenRenderbuffers(1, &_depthRenderBuffer);
-    glBindRenderbuffer(GL_RENDERBUFFER, _depthRenderBuffer);
+    glGenRenderbuffers(1, &mDepthRenderBuffer);
+    glBindRenderbuffer(GL_RENDERBUFFER, mDepthRenderBuffer);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, (GLsizei)self.frame.size.width, (GLsizei)self.frame.size.height);
 }
 
@@ -48,8 +48,8 @@
     GLuint framebuffer;
     glGenFramebuffers(1, &framebuffer);
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);   
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, _colorRenderBuffer);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, _depthRenderBuffer);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, mColorRenderBuffer);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, mDepthRenderBuffer);
 }
 
 - (void)render:(CADisplayLink*)displayLink
@@ -57,7 +57,7 @@
 #pragma unused(displayLink)
     tSGView::getInstance()->notify(tSGViewEvent(tSGViewEvent::kRedrawView, 0));
     
-    [_context presentRenderbuffer:GL_RENDERBUFFER];
+    [mContext presentRenderbuffer:GL_RENDERBUFFER];
 }
 
 - (void)setupDisplayLink {
@@ -84,8 +84,8 @@
 
 - (void)dealloc
 {
-    [_context release];
-    _context = nil;
+    [mContext release];
+    mContext = nil;
     [super dealloc];
 }
 
