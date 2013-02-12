@@ -10,6 +10,8 @@ protected:
     void MakeCurrent();
     void MakeSurfaceCopyUpsideDown(tSurface& dst, const tSurface& src);
 
+    void CreateFromSurface(const tSurface& newSurface);
+
 public:
     tTexture(const tSurface& newSurface);
     ~tTexture();

@@ -25,52 +25,85 @@ void tTexture::MakeCurrent()
 
 void tTexture::MakeSurfaceCopyUpsideDown(tSurface& dst, const tSurface& src)
 {
-    tPoint2f index;
-
-    for(index.y = 0; index.y < src.getSize().height; index.y++)
+//    printf("dst: %d, %d, %d, %d\nsrc:%d, %d, %d, %d\n",
+//           dst.mBytesPerRow, (int)dst.mSize.width, (int)dst.mSize.height, dst.mType,
+//           src.mBytesPerRow, (int)src.mSize.width, (int)src.mSize.height, src.mType
+//           );
+    if (dst.mBytesPerRow >= src.mBytesPerRow)
     {
-        for (index.x = 0; index.x < src.getSize().width; index.x++)
+        uint32_t minHeight = std::min((uint32_t)src.mSize.height, (uint32_t)dst.mSize.height);
+        uint32_t minBytesPerRow = std::min((uint32_t)src.mBytesPerRow, (uint32_t)dst.mBytesPerRow);
+
+        for(uint32_t y = 0; y < minHeight; y++)
         {
-            dst.setPixel(tPoint2f(index.x, dst.getSize().height - (1 + index.y)), src.getPixel(index));
+            memcpy(&dst.mPtr[y * dst.mBytesPerRow], &src.mPtr[(minHeight - y) * src.mBytesPerRow], minBytesPerRow);
         }
+    }
+    else
+    {
+        tPoint2f index;
+
+        for(index.y = 0; index.y < src.getSize().height; index.y++)
+        {
+            for (index.x = 0; index.x < src.getSize().width; index.x++)
+            {
+                dst.setPixel(tPoint2f(index.x, dst.getSize().height - (1 + index.y)), src.getPixel(index));
+            }
+        }
+    }
+}
+
+void tTexture::CreateFromSurface(const tSurface& newSurface)
+{
+    float pow2Width     = roundPow2(newSurface.getSize().width);
+    float pow2Height    = roundPow2(newSurface.getSize().height);
+    bool isPow2         =   (newSurface.getSize().width     == pow2Width) &&
+                            (newSurface.getSize().height    == pow2Height);
+
+    if (!isPow2)
+    {
+        tSurface s1(tPixelFormat::kR8G8B8A8, tDimension2f(roundPow2(newSurface.getSize().width), roundPow2(newSurface.getSize().height)));
+
+        s1.fillRect(tRectf(tPoint2f(0,0), s1.getSize()), tColor4b(0,0,0,0));
+        MakeSurfaceCopyUpsideDown(s1, newSurface);
+//        s1.copyRect(newSurface, tRectf(tPoint2f(0,0), newSurface.getSize()), tPoint2f(0,0));
+
+        CreateFromSurface(s1);
+    }
+    else
+    {
+        mTextureSize = newSurface.mSize;
+
+        glGenTextures(1, &textureID);
+
+        assert(textureID != 0);
+
+        glBindTexture (GL_TEXTURE_2D, textureID);
+        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+
+        switch (newSurface.mType)
+        {
+            case tPixelFormat::kR8G8B8A8:   glTexImage2D(GL_TEXTURE_2D, 0, (GLint)GL_RGBA, (GLsizei)newSurface.mSize.width, (GLsizei)newSurface.mSize.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, newSurface.mPtr); break;
+            case tPixelFormat::kR8G8B8:     glTexImage2D(GL_TEXTURE_2D, 0, (GLint)GL_RGB, (GLsizei)newSurface.mSize.width, (GLsizei)newSurface.mSize.height, 0, GL_RGB, GL_UNSIGNED_BYTE, newSurface.mPtr); break;
+
+            default:
+                tSurface compatibleSurface(tPixelFormat::kR8G8B8A8, newSurface);
+                glTexImage2D(GL_TEXTURE_2D, 0, (GLint)GL_RGBA,
+                             (GLsizei)compatibleSurface.mSize.width, (GLsizei)compatibleSurface.mSize.height,
+                             0, GL_RGBA, GL_UNSIGNED_BYTE, compatibleSurface.mPtr);
+                break;
+        }
+        
+        glBindTexture(GL_TEXTURE_2D, 0);
     }
 }
 
 tTexture::tTexture(const tSurface& newSurface)
 {
-    //TODO: optimize this-- we're potentially doing a copy operation we don't need to do in most cases.
-    tSurface s1(tPixelFormat::kR8G8B8A8, tDimension2f(roundPow2(newSurface.getSize().width), roundPow2(newSurface.getSize().height)));
-
-    s1.fillRect(tRectf(tPoint2f(0,0), s1.getSize()), tColor4b(0,0,0,0));
-    MakeSurfaceCopyUpsideDown(s1, newSurface);
-//    s1.copyRect(newSurface, tRectf(tPoint2f(0,0), newSurface.getSize()), tPoint2f(0,0));
-
-    mTextureSize = s1.mSize;
-
-    glGenTextures(1, &textureID);
-
-    assert(textureID != 0);
-
-    glBindTexture (GL_TEXTURE_2D, textureID);
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
-    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
-
-    switch (s1.mType)
-    {
-        case tPixelFormat::kR8G8B8A8:   glTexImage2D(GL_TEXTURE_2D, 0, (GLint)GL_RGBA, (GLsizei)s1.mSize.width, (GLsizei)s1.mSize.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, s1.mPtr); break;
-        case tPixelFormat::kR8G8B8:     glTexImage2D(GL_TEXTURE_2D, 0, (GLint)GL_RGB, (GLsizei)s1.mSize.width, (GLsizei)s1.mSize.height, 0, GL_RGB, GL_UNSIGNED_BYTE, s1.mPtr); break;
-
-        default:
-            tSurface compatibleSurface(tPixelFormat::kR8G8B8A8, s1);
-            glTexImage2D(GL_TEXTURE_2D, 0, (GLint)GL_RGBA,
-                         (GLsizei)compatibleSurface.mSize.width, (GLsizei)compatibleSurface.mSize.height,
-                         0, GL_RGBA, GL_UNSIGNED_BYTE, compatibleSurface.mPtr);
-            break;
-    }
-
-    glBindTexture(GL_TEXTURE_2D, 0);
+    CreateFromSurface(newSurface);
 }
 
 tTexture::~tTexture()

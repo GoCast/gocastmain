@@ -11,7 +11,7 @@ protected:
     uint8_t*            mPtr;
 
 protected:
-    void MakeSurfaceCopyUpsideDown(tSurface& dst, const tSurface& src);
+//    void MakeSurfaceCopyUpsideDown(tSurface& dst, const tSurface& src);
 
 public:
     tSurface& operator=(const tSurface& origSurface);

@@ -2,18 +2,18 @@
 #include "Math/package.h"
 #include "OpenGL/package.h"
 
-void tSurface::MakeSurfaceCopyUpsideDown(tSurface& dst, const tSurface& src)
-{
-    tPoint2f index;
-
-    for(index.y = 0; index.y < src.getSize().height; index.y++)
-    {
-        for (index.x = 0; index.x < src.getSize().width; index.x++)
-        {
-            dst.setPixel(tPoint2f(index.x, dst.getSize().height - (1 + index.y)), src.getPixel(index));
-        }
-    }
-}
+//void tSurface::MakeSurfaceCopyUpsideDown(tSurface& dst, const tSurface& src)
+//{
+//    tPoint2f index;
+//
+//    for(index.y = 0; index.y < src.getSize().height; index.y++)
+//    {
+//        for (index.x = 0; index.x < src.getSize().width; index.x++)
+//        {
+//            dst.setPixel(tPoint2f(index.x, dst.getSize().height - (1 + index.y)), src.getPixel(index));
+//        }
+//    }
+//}
 
 tSurface& tSurface::operator=(const tSurface& origSurface)
 {
