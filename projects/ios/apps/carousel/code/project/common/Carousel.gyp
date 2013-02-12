@@ -5,41 +5,41 @@
     'targets': [
 #Whiteboard
 				{
-					'target_name': 'Whiteboard',
-					'product_name': 'Whiteboard',
+					'target_name': 'Carousel',
+					'product_name': 'Carousel',
 					'type': 'executable',
 					'mac_bundle': 1,
 					
 # 					'actions': [
 # 						{
 # 							'action_name': 'CarouselApp.tgf',
-# 							'inputs': [ '../../tgf/Testbed/Whiteboard/CarouselApp.tgf', ], # inputs
-# 							'outputs': [ '../../source/Testbed/Whiteboard/CarouselApp.h', ], # outputs
+# 							'inputs': [ '../../tgf/Testbed/Carousel/CarouselApp.tgf', ], # inputs
+# 							'outputs': [ '../../source/Testbed/Carousel/CarouselApp.h', ], # outputs
 # 							'action': [ '/Volumes/Lab/tools/graphcode', '<@(_inputs)', '--machine', 'CarouselApp', '--include-exit', '--update', '--debug', '--basic-stf', '--libtate', '-o', '<@(_outputs)', ], # action
 # 						},
 # 					],	# actions
 
 					'sources': [
-						'../../source/Testbed/Whiteboard/CarouselApp.mm',
-						'../../source/Testbed/Whiteboard/CarouselApp.h',
+						'../../source/Testbed/Carousel/CarouselApp.mm',
+						'../../source/Testbed/Carousel/CarouselApp.h',
 
-						'../../source/Testbed/Whiteboard/Spot.mm',
-						'../../source/Testbed/Whiteboard/Spot.h',
+						'../../source/Testbed/Carousel/Spot.mm',
+						'../../source/Testbed/Carousel/Spot.h',
 
-						'../../source/Testbed/Whiteboard/WhiteboardSpot.mm',
-						'../../source/Testbed/Whiteboard/WhiteboardSpot.h',
+						'../../source/Testbed/Carousel/WhiteboardSpot.mm',
+						'../../source/Testbed/Carousel/WhiteboardSpot.h',
 
-						'../../source/Testbed/Whiteboard/CallcastEvent.h',
-						'../../source/Testbed/Whiteboard/WhiteboardEvent.h',
-						'../../source/Testbed/Whiteboard/CallcastManager.h',
+						'../../source/Testbed/Carousel/CallcastEvent.h',
+						'../../source/Testbed/Carousel/WhiteboardEvent.h',
+						'../../source/Testbed/Carousel/CallcastManager.h',
 
-						'../../source/Testbed/Whiteboard/GCICallcast.mm',
-						'../../source/Testbed/Whiteboard/GCICallcast.h',
+						'../../source/Testbed/Carousel/GCICallcast.mm',
+						'../../source/Testbed/Carousel/GCICallcast.h',
 
-						'../../source/Testbed/Whiteboard/<@(OS)/AppDelegate.h',
-						'../../source/Testbed/Whiteboard/<@(OS)/AppDelegate.mm',
-						'../../source/Testbed/Whiteboard/<@(OS)/ViewController.h',
-						'../../source/Testbed/Whiteboard/<@(OS)/ViewController.mm',
+						'../../source/Testbed/Carousel/<@(OS)/AppDelegate.h',
+						'../../source/Testbed/Carousel/<@(OS)/AppDelegate.mm',
+						'../../source/Testbed/Carousel/<@(OS)/ViewController.h',
+						'../../source/Testbed/Carousel/<@(OS)/ViewController.mm',
 
 						'../../source/Base/package.h',
 						'../../source/Base/tObserver.h',
@@ -101,7 +101,7 @@
 					],	# mac_bundle_resources
 
 					'xcode_settings': {
-						'INFOPLIST_FILE': '../../rsrc/<@(OS)/Whiteboard.plist',
+						'INFOPLIST_FILE': '../../rsrc/<@(OS)/Carousel.plist',
 					},	# xcode_settings
 
 					'conditions': [
