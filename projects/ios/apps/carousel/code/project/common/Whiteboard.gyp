@@ -56,7 +56,6 @@
 						'../../source/Io/tFile.h',
 						'../../source/Io/<@(OS)/tFile.mm',
 						'../../source/Math/package.h',
-						'../../source/Math/tRect.h',
 						'../../source/OpenGL/package.h',
 						'../../source/OpenGL/tPixelFormat.h',
 						'../../source/OpenGL/tPixelFormat.cpp',
@@ -116,7 +115,6 @@
 							'mac_bundle_resources': [
 								'../../rsrc/<@(OS)/en.lproj/InfoPlist.strings',
 								'../../rsrc/<@(OS)/en.lproj/MainViewController.xib',
-								'../../rsrc/<@(OS)/en.lproj/LoginView.xib',
 							],	# mac_bundle_resources
 	
 							'link_settings': {
