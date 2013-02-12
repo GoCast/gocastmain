@@ -154,14 +154,14 @@ void tSurface::setPixel(const tPoint2f& location, const tColor4b& newColor)
 
 void tSurface::drawLineWithWidth(const tPoint2f& ptA, const tPoint2f& ptB, const tColor4b& newColor, const float newPenSize)
 {
-    float dx = fabsf(ptB.x - ptA.x);
-    float dy = fabsf(ptB.y - ptA.y);
+    int dx = abs((int)ptB.x - (int)ptA.x);
+    int dy = abs((int)ptB.y - (int)ptA.y);
 
-    float sx = (ptA.x < ptB.x) ? 1 : -1;
-    float sy = (ptA.y < ptB.y) ? 1 : -1;
+    int sx = (ptA.x < ptB.x) ? 1 : -1;
+    int sy = (ptA.y < ptB.y) ? 1 : -1;
 
-    float err = dx - dy;
-    float e2;
+    int err = dx - dy;
+    int e2;
 
     tPoint2f iterPt = ptA;
     bool done = false;
