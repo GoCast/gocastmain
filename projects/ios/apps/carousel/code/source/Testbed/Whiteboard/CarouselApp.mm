@@ -371,23 +371,31 @@ void CarouselApp::onEraseButton()
 
 void CarouselApp::queueLine(const int32_t& newID, const tColor4b& newColor, const int32_t& newPenSize, const tPoint2f& newSt, const tPoint2f& newEn)
 {
-#pragma unused(newID)
-    char buf[512];
-    sprintf(buf, "[{\"name\":\"save\",\"settings\":{\"colorName\":\"dontcare\",\"lineWidth\":\"%d\",\"strokeStyle\":\"%s\",\"lineJoin\":\"round\"}},{\"name\":\"beginPath\"},{\"name\":\"moveTo\",\"x\":%d,\"y\":%d},{\"name\":\"lineTo\",\"x\":%d,\"y\":%d},{\"name\":\"stroke\"},{\"name\":\"restore\"}]",
-            newPenSize,
-            colorToString(newColor).c_str(),
-            (int)newSt.x, (int)newSt.y, (int)newEn.x, (int)newEn.y);
+#pragma unused(newID, newColor, newPenSize)
+    char buf[128];
 
-    mJSONStrings.push(std::string(buf));
+    if (mJSONStrings.empty())
+    {
+        sprintf(buf, "{\"name\":\"moveTo\",\"x\":%d,\"y\":%d},", (int)newSt.x, (int)newSt.y);
+        mJSONStrings.append(std::string(buf));
+    }
+
+    sprintf(buf, "{\"name\":\"lineTo\",\"x\":%d,\"y\":%d},", (int)newEn.x, (int)newEn.y);
+    mJSONStrings.append(std::string(buf));
 }
 
 void CarouselApp::sendStrings()
 {
-    //"Callcast.SendSingleStroke({stroke: '%s', spotnumber: %d});"
+    char preamble[256];
+    sprintf(preamble, "[{\"name\":\"save\",\"settings\":{\"colorName\":\"dontcare\",\"lineWidth\":\"%d\",\"strokeStyle\":\"%s\",\"lineJoin\":\"round\"}},{\"name\":\"beginPath\"},",
+            (mSendPenColor == kWhite) ? 30 : (int)mSendPenSize,
+            colorToString(mSendPenColor).c_str());
+    const char* post = "{\"name\":\"stroke\"},{\"name\":\"restore\"}]";
 
     [gWebViewInstance stringByEvaluatingJavaScriptFromString:[NSString
-                                                              stringWithFormat:@"Callcast.SendSingleStroke({stroke: '%s', spotnumber: %d});",
-                                                              mJSONStrings.front().c_str(), mSpots[mSpotFinger]->getID()]];
+                                                              stringWithFormat:@"Callcast.SendSingleStroke({stroke: '%s%s%s', spotnumber: %d});",
+                                                              preamble, mJSONStrings.c_str(), post, mSpots[mSpotFinger]->getID()]];
+    mJSONStrings.clear();
 }
 
 #pragma mark -
@@ -412,6 +420,8 @@ void CarouselApp::onMouseUp(const tPoint2f& newPt)
 
     queueLine(mSpots[mSpotFinger]->getID(), mSendPenColor, (mSendPenColor == kWhite) ? 30 : (int)mSendPenSize, mStartTouch, mLastPolledPt);
 
+    sendStrings();
+
     mShouldCapture = false;
 }
 
@@ -430,11 +440,9 @@ void CarouselApp::onTimerTick(const tTimer* newTimer)
     }
     else if (newTimer == mJSONTimer)
     {
-        while(!mJSONStrings.empty())
+        if (!mJSONStrings.empty())
         {
             sendStrings();
-
-            mJSONStrings.pop();
         }
     }
 }
@@ -447,11 +455,11 @@ void CarouselApp::startEntry()
     tInputManager::getInstance()->tSubject<const tMouseEvent&>::attach(this);
     CallcastManager::getInstance()->tSubject<const CallcastEvent&>::attach(this);
 
-    mInputTimer = new tTimerPeer(100);
+    mInputTimer = new tTimerPeer(60);
     mInputTimer->attach(this);
     mInputTimer->start();
 
-    mJSONTimer = new tTimerPeer(500);
+    mJSONTimer = new tTimerPeer(600);
     mJSONTimer->attach(this);
     mJSONTimer->start();
 }

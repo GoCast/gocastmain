@@ -22,7 +22,7 @@ class CarouselApp
 {
 protected:
 
-    std::queue<std::string> mJSONStrings;
+    std::string             mJSONStrings;
 
     std::vector<tPoint2f>   mWhiteBoardVerts;
     std::vector<tPoint2f>   mWhiteBoardTexCoords;
