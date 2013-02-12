@@ -33,6 +33,7 @@ public:
     void            drawLineWithPen(const tPoint2f& ptA, const tPoint2f& ptB, const tColor4b& newColor, const float newPenSize);
     void            drawRect(const tRectf& newRect, const tColor4b& newColor);
 
+    void            fillWhiteAlpha();
     void            fillRect(const tRectf& newRect, const tColor4b& newColor);
     void            copyRect(const tSurface& srcSurface, const tRectf& srcRect, const tPoint2f& dstPt);
 

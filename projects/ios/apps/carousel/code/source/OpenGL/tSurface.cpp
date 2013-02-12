@@ -272,6 +272,11 @@ void tSurface::drawRect(const tRectf& newRect, const tColor4b& newColor)
     }
 }
 
+void tSurface::fillWhiteAlpha()
+{
+    memset(mPtr, 0xff, mBytesPerRow * (uint32_t)mSize.height);
+}
+
 void tSurface::fillRect(const tRectf& newRect, const tColor4b& newColor)
 {
     if (newRect.size.width > 0 && newRect.size.height > 0)
