@@ -28,21 +28,21 @@
 		1370EC95C500FCB189CB1E0F /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = F7C98D8853AB3806EE7996DC /* AppDelegate.mm */; };
 		16CF3C06892FA0159F56BA42 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 272118C382ADB0788DD475C9 /* AudioToolbox.framework */; };
 		1DB9E07CCD0C4DDCB199D895 /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 41457BA618A6B6E8FCBB620F /* main.mm */; };
-		232A49082F5C6A2625EFDE22 /* tProgram.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CFF5BBC4DAF71060AA586293 /* tProgram.cpp */; };
-		2702F28D754BAC52E636A90D /* tSGView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E76DF83DF7F2CB9EC0070067 /* tSGView.cpp */; };
 		309DF2FE40EDBA15C6E8A6DC /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = E4A399B89C6D8B4A74FDF8F2 /* Default-568h@2x.png */; };
 		32AF3D32911463833717E587 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 9C18CE4BB4E9C8DF93918E29 /* InfoPlist.strings */; };
-		36C56EB94AAD72B3092F5EC6 /* tSurface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5CC4B70BEEC99963F5664C49 /* tSurface.cpp */; };
 		39352D225AC67D257B691EB7 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E96BF3286BB78EAAADC0A57A /* Foundation.framework */; };
 		396C5F55E07DE574E484F9BB /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 411E6E215ABA730DE4EFC537 /* CoreGraphics.framework */; };
+		3A779BB614C1F588E60FABE9 /* tSurface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5CC4B70BEEC99963F5664C49 /* tSurface.cpp */; };
 		3CCADAB1C396830894216F94 /* Cordova.plist in Resources */ = {isa = PBXBuildFile; fileRef = D7194E88971AA4E5865F3427 /* Cordova.plist */; };
 		3F3C09E0AA2E282E0316B180 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C838069FCF6EACE9304AE10C /* CFNetwork.framework */; };
 		409CF818EDBDAF0190FF55D1 /* libCordova.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C62FC56C15FB86F8E24A55CA /* libCordova.a */; };
 		416414E8C125E8D992DD9CE1 /* 3px.png in Resources */ = {isa = PBXBuildFile; fileRef = C9E3D2F66F2589F9C5DF5325 /* 3px.png */; };
 		424D412D985449097C8DC6C5 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F36CE187C31FC8D8E7850881 /* CoreLocation.framework */; };
+		46F0AA7B58D425F91DBC19B0 /* tProgram.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CFF5BBC4DAF71060AA586293 /* tProgram.cpp */; };
 		49B01AB8C33F9C0F78F4964C /* MainViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3AA6537E0CC26EF4A781B899 /* MainViewController.xib */; };
 		4A0AEDAAF950A39FC7583DAA /* tFile.mm in Sources */ = {isa = PBXBuildFile; fileRef = B4A1C41114DCC0B1EBECB2F1 /* tFile.mm */; };
 		4D11AA21F0C6BD08E4DBDF4B /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ACBD77BC320339AFCEBD05E2 /* CoreMedia.framework */; };
+		4FF069B0B540426ED79AF826 /* tPixelFormat.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A886F88044A01E0874CF0E90 /* tPixelFormat.cpp */; };
 		605878F11A92248994097CB1 /* GoToken.png in Resources */ = {isa = PBXBuildFile; fileRef = B223B800A90B3F0B86B7773C /* GoToken.png */; };
 		6C14B6F0ED70B40387BA3DAB /* LoginView.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB7B1641F15746F6CCA6A169 /* LoginView.xib */; };
 		6CC80D77E21DC31ADDFADC15 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D21DC43692508DB38C23866C /* UIKit.framework */; };
@@ -55,27 +55,26 @@
 		85089309232316FE84514E6D /* spritesheet.vert in Resources */ = {isa = PBXBuildFile; fileRef = C139DA84CC3CF2A2CD32F273 /* spritesheet.vert */; };
 		86001511C0C7AF6D34004EB5 /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0DD38E8E271D3344A9BDC4D6 /* AddressBook.framework */; };
 		8913F2CA806F26838BC984FD /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DCFFB3193E4FDBEDD0C2656F /* SystemConfiguration.framework */; };
+		8EC5DC598CE75CEDC3A9A6AD /* tShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A3B52E3EA721B2C116CB4BDF /* tShader.cpp */; };
+		8F26C166A0131D59A9651928 /* tSurfacePeer.mm in Sources */ = {isa = PBXBuildFile; fileRef = A3F93D338886817C741D112E /* tSurfacePeer.mm */; };
 		8F76F8A83A1068014EFE939F /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 67BEF084A2C1D3D8243B9D50 /* MediaPlayer.framework */; };
 		91E07E13A7377DC7E3578984 /* colorblack.png in Resources */ = {isa = PBXBuildFile; fileRef = 6526BB3C6B48959381093D23 /* colorblack.png */; };
 		9A4AF2AF74567428A271F500 /* LoginView.mm in Sources */ = {isa = PBXBuildFile; fileRef = A972318042313B22BC557297 /* LoginView.mm */; };
 		A63ADB63C66B40C4D8BF6ABB /* GCICallcast.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8A8261567DAEB3F988BB2131 /* GCICallcast.mm */; };
-		A7D404C2CB16B378028BE3AC /* tTexture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 09FA150B7647EA6DADF9AAF9 /* tTexture.cpp */; };
 		ACB0B8821DAFABA4C1053678 /* WhiteboardSpot.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0B45BCE4E0435177B1908E62 /* WhiteboardSpot.mm */; };
 		B0FBDCF52D219D5081778C33 /* OpenGLView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 83102A9266B2BB0C3F20849B /* OpenGLView.mm */; };
 		B1A24D4B4B5F7BA13770ACCD /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6108D4974A4F608C82695D7E /* AVFoundation.framework */; };
-		B8BE5531CCF911C5C0C7071B /* tSurfacePeer.mm in Sources */ = {isa = PBXBuildFile; fileRef = A3F93D338886817C741D112E /* tSurfacePeer.mm */; };
 		BAE7393A97C01052CA3B366B /* tTimer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16ACDD539B2DE6068F7C460F /* tTimer.cpp */; };
 		BAF9EA6EC45D99DBC3AE5277 /* colorred.png in Resources */ = {isa = PBXBuildFile; fileRef = 852028F6424142E9EFA47DC0 /* colorred.png */; };
 		C238407F0C3499F8DE69567C /* 1px.png in Resources */ = {isa = PBXBuildFile; fileRef = 17DC51022D213B3BE40B4D2F /* 1px.png */; };
 		C24DBB7353A4D7718C4F6E9C /* tTimerPeer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0CA36C5DBD6E5C8407C77041 /* tTimerPeer.mm */; };
+		D7549C5EB625FDEF9E05522C /* tTexture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 09FA150B7647EA6DADF9AAF9 /* tTexture.cpp */; };
 		DE318249CDF7AA5BB3B1A04E /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 45AD10DD26EE99758E0D4670 /* OpenGLES.framework */; };
 		E135E870052775754E819FD3 /* colororange.png in Resources */ = {isa = PBXBuildFile; fileRef = 083B0BBF22E636898FB76966 /* colororange.png */; };
 		E1CF2B4BCAECFE764C689226 /* Spot.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0AEE66ACD6CDF62F6366154F /* Spot.mm */; };
-		E5A65A712068D2E571523762 /* tShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A3B52E3EA721B2C116CB4BDF /* tShader.cpp */; };
 		E7719233871D105A4AB140EF /* colorblue.png in Resources */ = {isa = PBXBuildFile; fileRef = 3A6FA51B6A4AD187B7BDF9F4 /* colorblue.png */; };
 		EE74E99BC7A1467FB9914350 /* spritesheet.frag in Resources */ = {isa = PBXBuildFile; fileRef = 719929FE4CB470A6AD62DF0F /* spritesheet.frag */; };
 		EFC3D4A78AC709AE5064DCEB /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 527886977B9E5089544AE192 /* QuartzCore.framework */; };
-		FB5FA224983BAEAC5A8A15C7 /* tPixelFormat.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A886F88044A01E0874CF0E90 /* tPixelFormat.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -167,7 +166,6 @@
 		DCFFB3193E4FDBEDD0C2656F /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		E4A399B89C6D8B4A74FDF8F2 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		E5C8BA65286D17F0A1409AF2 /* tRect.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tRect.h; sourceTree = "<group>"; };
-		E76DF83DF7F2CB9EC0070067 /* tSGView.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = tSGView.cpp; sourceTree = "<group>"; };
 		E96BF3286BB78EAAADC0A57A /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		EB08A3480B47BB3F94165A7E /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		EB1E3D7822671F1C635CB8EC /* tTexture.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tTexture.h; sourceTree = "<group>"; };
@@ -224,6 +222,26 @@
 				0CA36C5DBD6E5C8407C77041 /* tTimerPeer.mm */,
 			);
 			path = ios;
+			sourceTree = "<group>";
+		};
+		1A12E80050FB3450FAE6F89B /* OpenGL */ = {
+			isa = PBXGroup;
+			children = (
+				E2A526ED07BF7CAF0FA786F8 /* ios */,
+				798C2F236D3430DEA91BF7E8 /* package.h */,
+				A886F88044A01E0874CF0E90 /* tPixelFormat.cpp */,
+				163EC79BB530657307FA85C0 /* tPixelFormat.h */,
+				CFF5BBC4DAF71060AA586293 /* tProgram.cpp */,
+				0429BE46EE8659F09B60117D /* tProgram.h */,
+				6FB4AF36FFF22EBC087E5300 /* tSGView.h */,
+				A3B52E3EA721B2C116CB4BDF /* tShader.cpp */,
+				BD93EAF6357AA13C5AB576C6 /* tShader.h */,
+				5CC4B70BEEC99963F5664C49 /* tSurface.cpp */,
+				CCEF333632CC882A1C51723D /* tSurface.h */,
+				09FA150B7647EA6DADF9AAF9 /* tTexture.cpp */,
+				EB1E3D7822671F1C635CB8EC /* tTexture.h */,
+			);
+			path = OpenGL;
 			sourceTree = "<group>";
 		};
 		2A0876C2C14BAE99E2AB2EE2 /* Base */ = {
@@ -395,27 +413,6 @@
 			path = Input;
 			sourceTree = "<group>";
 		};
-		CD1732A175D168FAB36BB309 /* OpenGL */ = {
-			isa = PBXGroup;
-			children = (
-				E2A526ED07BF7CAF0FA786F8 /* ios */,
-				798C2F236D3430DEA91BF7E8 /* package.h */,
-				A886F88044A01E0874CF0E90 /* tPixelFormat.cpp */,
-				163EC79BB530657307FA85C0 /* tPixelFormat.h */,
-				CFF5BBC4DAF71060AA586293 /* tProgram.cpp */,
-				0429BE46EE8659F09B60117D /* tProgram.h */,
-				E76DF83DF7F2CB9EC0070067 /* tSGView.cpp */,
-				6FB4AF36FFF22EBC087E5300 /* tSGView.h */,
-				A3B52E3EA721B2C116CB4BDF /* tShader.cpp */,
-				BD93EAF6357AA13C5AB576C6 /* tShader.h */,
-				5CC4B70BEEC99963F5664C49 /* tSurface.cpp */,
-				CCEF333632CC882A1C51723D /* tSurface.h */,
-				09FA150B7647EA6DADF9AAF9 /* tTexture.cpp */,
-				EB1E3D7822671F1C635CB8EC /* tTexture.h */,
-			);
-			path = OpenGL;
-			sourceTree = "<group>";
-		};
 		CE3F2E0D4AEF97F316C4725B /* source */ = {
 			isa = PBXGroup;
 			children = (
@@ -424,7 +421,7 @@
 				C3A82579273F3EE847BAE1A6 /* Input */,
 				B725B79358BFD482911D6690 /* Io */,
 				D8A89EC23F5F025598003924 /* Math */,
-				CD1732A175D168FAB36BB309 /* OpenGL */,
+				1A12E80050FB3450FAE6F89B /* OpenGL */,
 				3175348F58CC4155985D16C0 /* Testbed/Whiteboard */,
 			);
 			path = source;
@@ -552,13 +549,12 @@
 				BAE7393A97C01052CA3B366B /* tTimer.cpp in Sources */,
 				C24DBB7353A4D7718C4F6E9C /* tTimerPeer.mm in Sources */,
 				4A0AEDAAF950A39FC7583DAA /* tFile.mm in Sources */,
-				FB5FA224983BAEAC5A8A15C7 /* tPixelFormat.cpp in Sources */,
-				232A49082F5C6A2625EFDE22 /* tProgram.cpp in Sources */,
-				2702F28D754BAC52E636A90D /* tSGView.cpp in Sources */,
-				E5A65A712068D2E571523762 /* tShader.cpp in Sources */,
-				36C56EB94AAD72B3092F5EC6 /* tSurface.cpp in Sources */,
-				B8BE5531CCF911C5C0C7071B /* tSurfacePeer.mm in Sources */,
-				A7D404C2CB16B378028BE3AC /* tTexture.cpp in Sources */,
+				4FF069B0B540426ED79AF826 /* tPixelFormat.cpp in Sources */,
+				46F0AA7B58D425F91DBC19B0 /* tProgram.cpp in Sources */,
+				8EC5DC598CE75CEDC3A9A6AD /* tShader.cpp in Sources */,
+				3A779BB614C1F588E60FABE9 /* tSurface.cpp in Sources */,
+				8F26C166A0131D59A9651928 /* tSurfacePeer.mm in Sources */,
+				D7549C5EB625FDEF9E05522C /* tTexture.cpp in Sources */,
 				B0FBDCF52D219D5081778C33 /* OpenGLView.mm in Sources */,
 				1370EC95C500FCB189CB1E0F /* AppDelegate.mm in Sources */,
 				1DB9E07CCD0C4DDCB199D895 /* main.mm in Sources */,

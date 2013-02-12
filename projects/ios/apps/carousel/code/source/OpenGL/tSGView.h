@@ -7,7 +7,7 @@ class tSGView
     public tSubject<const tSGViewEvent&>
 {
 public:
-    tSGView();
+     tSGView() { }
     ~tSGView() { }
 
 //--

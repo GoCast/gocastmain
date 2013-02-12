@@ -60,7 +60,6 @@
 						'../../source/OpenGL/tPixelFormat.cpp',
 						'../../source/OpenGL/tProgram.cpp',
 						'../../source/OpenGL/tProgram.h',
-						'../../source/OpenGL/tSGView.cpp',
 						'../../source/OpenGL/tSGView.h',
 						'../../source/OpenGL/tShader.cpp',
 						'../../source/OpenGL/tShader.h',
