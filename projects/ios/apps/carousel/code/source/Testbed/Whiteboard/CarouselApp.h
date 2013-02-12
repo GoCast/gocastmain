@@ -70,6 +70,9 @@ public:
     void onPenColorChange();
     void onEraseButton();
 
+    void queueLine(const int32_t& newID, const tColor4b& newColor, const int32_t& newPenSize, const tPoint2f& newSt, const tPoint2f& newEn);
+    void sendStrings();
+
     void onMouseDown(const tPoint2f& newPt);
     void onMouseDrag(const tPoint2f& newPt);
     void onMouseUp(const tPoint2f& newPt);

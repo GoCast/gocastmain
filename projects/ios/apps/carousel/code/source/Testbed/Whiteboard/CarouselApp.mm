@@ -369,6 +369,25 @@ void CarouselApp::onEraseButton()
 
 #pragma mark -
 
+void CarouselApp::queueLine(const int32_t& newID, const tColor4b& newColor, const int32_t& newPenSize, const tPoint2f& newSt, const tPoint2f& newEn)
+{
+    char buf[255];
+    sprintf(buf, "realDrawLine(%d, '%s', %d, %d, %d, %d, %d);",
+            newID,
+            colorToString(newColor).c_str(),
+            newPenSize,
+            (int)newSt.x, (int)newSt.y, (int)newEn.x, (int)newEn.y);
+
+    mJSONStrings.push(std::string(buf));
+}
+
+void CarouselApp::sendStrings()
+{
+    [gWebViewInstance stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"%s", mJSONStrings.front().c_str()]];
+}
+
+#pragma mark -
+
 void CarouselApp::onMouseDown(const tPoint2f& newPt)
 {
     tPoint2f lastMousePt = tPoint2f(float(int32_t(newPt.x)), float(int32_t(newPt.y)));
@@ -387,14 +406,7 @@ void CarouselApp::onMouseUp(const tPoint2f& newPt)
 {
     mEndTouch   = tPoint2f(float(int32_t(newPt.x)), float(int32_t(newPt.y)));
 
-    char buf[255];
-    sprintf(buf, "realDrawLine(%d, '%s', %d, %d, %d, %d, %d);",
-            mSpots[mSpotFinger]->getID(),
-            colorToString(mSendPenColor).c_str(),
-            (mSendPenColor == kWhite) ? 30 : (int)mSendPenSize,
-            (int)mStartTouch.x, (int)mStartTouch.y, (int)mLastPolledPt.x, (int)mLastPolledPt.y);
-
-    mJSONStrings.push(std::string(buf));
+    queueLine(mSpots[mSpotFinger]->getID(), mSendPenColor, (mSendPenColor == kWhite) ? 30 : (int)mSendPenSize, mStartTouch, mLastPolledPt);
 
     mShouldCapture = false;
 }
@@ -407,14 +419,7 @@ void CarouselApp::onTimerTick(const tTimer* newTimer)
     {
         if (mLastPolledPt != mStartTouch)
         {
-            char buf[255];
-            sprintf(buf, "realDrawLine(%d, '%s', %d, %d, %d, %d, %d);",
-                    mSpots[mSpotFinger]->getID(),
-                    colorToString(mSendPenColor).c_str(),
-                    (mSendPenColor == kWhite) ? 30 : (int)mSendPenSize,
-                    (int)mStartTouch.x, (int)mStartTouch.y, (int)mLastPolledPt.x, (int)mLastPolledPt.y);
-
-            mJSONStrings.push(std::string(buf));
+            queueLine(mSpots[mSpotFinger]->getID(), mSendPenColor, (mSendPenColor == kWhite) ? 30 : (int)mSendPenSize, mStartTouch, mLastPolledPt);
 
             mStartTouch = mLastPolledPt;
         }
@@ -423,7 +428,7 @@ void CarouselApp::onTimerTick(const tTimer* newTimer)
     {
         while(!mJSONStrings.empty())
         {
-            [gWebViewInstance stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"%s", mJSONStrings.front().c_str()]];
+            sendStrings();
 
             mJSONStrings.pop();
         }
