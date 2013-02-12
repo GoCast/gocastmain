@@ -297,6 +297,7 @@ void CarouselApp::onOkayButton()
 
 void CarouselApp::onPrevButton()
 {
+    sendStrings();
     if (!mSpots.empty())
     {
         if (mSpotFinger != 0)
@@ -313,6 +314,7 @@ void CarouselApp::onPrevButton()
 
 void CarouselApp::onNextButton()
 {
+    sendStrings();
     if (!mSpots.empty())
     {
         if (mSpotFinger != mSpots.size() - 1)
@@ -329,11 +331,13 @@ void CarouselApp::onNextButton()
 
 void CarouselApp::onPenSizeChange(const float& newSize)
 {
+    sendStrings();
     mSendPenSize = newSize;
 }
 
 void CarouselApp::onPenColorChange()
 {
+    sendStrings();
     if (mSendPenColor == kBlack)
     {
         mSendPenColor = kRed;
@@ -358,6 +362,7 @@ void CarouselApp::onPenColorChange()
 
 void CarouselApp::onEraseButton()
 {
+    sendStrings();
     mSendPenColor = kWhite;
 }
 
@@ -386,16 +391,19 @@ void CarouselApp::queueLine(const int32_t& newID, const tColor4b& newColor, cons
 
 void CarouselApp::sendStrings()
 {
-    char preamble[256];
-    sprintf(preamble, "[{\"name\":\"save\",\"settings\":{\"colorName\":\"dontcare\",\"lineWidth\":\"%d\",\"strokeStyle\":\"%s\",\"lineJoin\":\"round\"}},{\"name\":\"beginPath\"},",
-            (mSendPenColor == kWhite) ? 30 : (int)mSendPenSize,
-            colorToString(mSendPenColor).c_str());
-    const char* post = "{\"name\":\"stroke\"},{\"name\":\"restore\"}]";
+    if (!mJSONStrings.empty())
+    {
+        char preamble[256];
+        sprintf(preamble, "[{\"name\":\"save\",\"settings\":{\"colorName\":\"dontcare\",\"lineWidth\":\"%d\",\"strokeStyle\":\"%s\",\"lineJoin\":\"round\"}},{\"name\":\"beginPath\"},",
+                (mSendPenColor == kWhite) ? 30 : (int)mSendPenSize,
+                colorToString(mSendPenColor).c_str());
+        const char* post = "{\"name\":\"stroke\"},{\"name\":\"restore\"}]";
 
-    [gWebViewInstance stringByEvaluatingJavaScriptFromString:[NSString
-                                                              stringWithFormat:@"Callcast.SendSingleStroke({stroke: '%s%s%s', spotnumber: %d});",
-                                                              preamble, mJSONStrings.c_str(), post, mSpots[mSpotFinger]->getID()]];
-    mJSONStrings.clear();
+        [gWebViewInstance stringByEvaluatingJavaScriptFromString:[NSString
+                                                                  stringWithFormat:@"Callcast.SendSingleStroke({stroke: '%s%s%s', spotnumber: %d});",
+                                                                  preamble, mJSONStrings.c_str(), post, mSpots[mSpotFinger]->getID()]];
+        mJSONStrings.clear();
+    }
 }
 
 #pragma mark -
