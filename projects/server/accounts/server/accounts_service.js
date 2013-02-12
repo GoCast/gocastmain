@@ -395,7 +395,7 @@ app.post('/inviteviaemail', function(req, res) {
                     toemailarray: JSON.parse(req.body.toemailarray),
                     link: req.body.link };
         } catch(e) {
-            res.send('{"result": "error"}');
+            res.send('{"result": "parse error"}');
             return;
         }
 
