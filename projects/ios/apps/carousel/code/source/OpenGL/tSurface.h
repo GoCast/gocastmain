@@ -20,7 +20,6 @@ public:
     tSurface(const std::string& path);
     tSurface(const tPixelFormat::Type& newType, const tDimension2f& newSize);
     tSurface(const tPixelFormat::Type& newType, const tSurface& origSurface);
-    tSurface(const tTexture& newTexture);
     tSurface(const tSurface& origSurface);
     ~tSurface();
 
