@@ -31,7 +31,7 @@
 
 						'../../source/Testbed/Carousel/CallcastEvent.h',
 						'../../source/Testbed/Carousel/WhiteboardEvent.h',
-						'../../source/Testbed/Carousel/CallcastManager.h',
+						'../../source/Testbed/Carousel/CarouselEventManager.h',
 
 						'../../source/Testbed/Carousel/GCICallcast.mm',
 						'../../source/Testbed/Carousel/GCICallcast.h',

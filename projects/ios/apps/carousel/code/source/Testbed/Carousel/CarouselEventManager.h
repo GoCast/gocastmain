@@ -3,12 +3,12 @@
 class CallcastEvent;
 class WhiteboardEvent;
 
-class CallcastManager
-:   public tSingleton<CallcastManager>,
+class CarouselEventManager
+:   public tSingleton<CarouselEventManager>,
     public tSubject<const CallcastEvent&>,
     public tSubject<const WhiteboardEvent&>
 {
 public:
-    CallcastManager() { }
+    CarouselEventManager() { }
 };
 

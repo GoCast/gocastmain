@@ -34,7 +34,7 @@
 #include "OpenGL/package.h"
 
 #include "CallcastEvent.h"
-#include "CallcastManager.h"
+#include "CarouselEventManager.h"
 
 #include "CarouselApp.h"
 
@@ -182,7 +182,9 @@ UIWebView* gWebViewInstance = NULL;
 -(IBAction)loginPressed:(id)sender
 {
 #pragma unused(sender)
-    CallcastManager::getInstance()->tSubject<const CallcastEvent&>::notify(CallcastEvent(CallcastEvent::kSubmitLogin, [self.mNickname.text UTF8String], [self.mRoomname.text UTF8String]));
+    CarouselEventManager::getInstance()->tSubject<const CallcastEvent&>::notify(CallcastEvent(CallcastEvent::kSubmitLogin,
+                                                                                              [self.mNickname.text UTF8String],
+                                                                                              [self.mRoomname.text UTF8String]));
     [self.view endEditing:YES];
 }
 

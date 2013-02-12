@@ -5,7 +5,7 @@
 #include "OpenGL/package.h"
 
 #include "CallcastEvent.h"
-#include "CallcastManager.h"
+#include "CarouselEventManager.h"
 
 #include "Spot.h"
 #include "WhiteboardSpot.h"
@@ -86,7 +86,7 @@ void CarouselApp::createResources()
 
     tSurface surface(tPixelFormat::kR8G8B8A8, kSurfaceSize);
     surface.fillWhiteAlpha();
-    surface.drawLine(tPoint2f(0,0), tPoint2f(kSurfaceSize.width, kSurfaceSize.height), tColor4b(255,0,0,255));
+//    surface.drawLine(tPoint2f(0,0), tPoint2f(kSurfaceSize.width, kSurfaceSize.height), tColor4b(255,0,0,255));
 
     mWhiteboardTexture = new tTexture(surface);
 
@@ -459,7 +459,7 @@ void CarouselApp::startEntry()
 {
     tSGView::getInstance()->attach(this);
     tInputManager::getInstance()->tSubject<const tTouchEvent&>::attach(this);
-    CallcastManager::getInstance()->tSubject<const CallcastEvent&>::attach(this);
+    CarouselEventManager::getInstance()->tSubject<const CallcastEvent&>::attach(this);
 
     mInputTimer = new tTimerPeer(60);
     mInputTimer->attach(this);

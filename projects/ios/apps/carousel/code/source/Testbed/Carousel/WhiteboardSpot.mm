@@ -5,7 +5,7 @@
 #include "OpenGL/package.h"
 
 #include "WhiteboardEvent.h"
-#include "CallcastManager.h"
+#include "CarouselEventManager.h"
 
 #include "Spot.h"
 #include "WhiteboardSpot.h"
@@ -37,7 +37,7 @@ WhiteboardSpot::WhiteboardSpot(const int32_t& newID)
 
     mSurface = surface;
 
-    CallcastManager::getInstance()->tSubject<const WhiteboardEvent&>::attach(this);
+    CarouselEventManager::getInstance()->tSubject<const WhiteboardEvent&>::attach(this);
 }
 
 WhiteboardSpot::~WhiteboardSpot()
