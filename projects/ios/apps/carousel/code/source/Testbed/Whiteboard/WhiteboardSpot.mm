@@ -13,7 +13,7 @@
 
 #include "AppDelegate.h"
 
-const tDimension2f  kSurfaceSize(500,500);
+const tDimension2f  kSurfaceSize(512,512);
 const tDimension2f  kSpotSize(300,300);
 const float         kFactor(1.0f);
 
@@ -32,8 +32,8 @@ WhiteboardSpot::WhiteboardSpot(const int32_t& newID)
     mReceivePenSize(5)
 {
     tSurface* surface = new tSurface(tPixelFormat::kR8G8B8A8, kSurfaceSize);
-    surface->fillRect(tRectf(0,0,surface->getSize()), tColor4b(255,255,255,255));
-    surface->drawLine(tPoint2f(0,0), tPoint2f(kSurfaceSize.width, kSurfaceSize.height), tColor4b(255,0,0,255));
+    surface->fillWhiteAlpha();
+//    surface->drawLine(tPoint2f(0,0), tPoint2f(kSurfaceSize.width, kSurfaceSize.height), tColor4b(255,0,0,255));
 
     mSurface = surface;
 
@@ -91,7 +91,10 @@ void WhiteboardSpot::onStroke()
 
 void WhiteboardSpot::onLoadImageURL(const std::string& newURL)
 {
-    replaceSurface(new tSurface(newURL));
+    tSurface urlSurface(newURL);
+    mSurface->fillWhiteAlpha();
+    mSurface->copyRect(urlSurface, tRectf(0,0, urlSurface.getSize()), tPoint2f(0,0));
+//    replaceSurface(new tSurface(newURL));
 
     gCarouselApp.refresh(mID);
 }

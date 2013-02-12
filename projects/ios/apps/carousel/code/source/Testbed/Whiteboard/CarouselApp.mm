@@ -13,9 +13,8 @@
 
 #include "AppDelegate.h"
 
-const tDimension2f  kSurfaceSize(500,500);
+const tDimension2f  kSurfaceSize(512,512);
 const tDimension2f  kSpotSize(300,300);
-const float         kFactor(1.0f);
 
 const tColor4b      kBlack  (0,0,0,255);
 const tColor4b      kRed    (255,0,0,255);
@@ -85,7 +84,7 @@ void CarouselApp::createResources()
     tSurface mouse(tPixelFormat::kR8G8B8A8, tDimension2f(32,32));
 
     tSurface surface(tPixelFormat::kR8G8B8A8, kSurfaceSize);
-    surface.fillRect(tRectf(0,0,surface.getSize()), tColor4b(255,255,255,255));
+    surface.fillWhiteAlpha();
     surface.drawLine(tPoint2f(0,0), tPoint2f(kSurfaceSize.width, kSurfaceSize.height), tColor4b(255,0,0,255));
 
     mWhiteboardTexture = new tTexture(surface);
@@ -127,7 +126,8 @@ void CarouselApp::configureNodes()
         location = glGetUniformLocation(mSpriteProgram->mProgramID, "mProjection");
         assert(location != -1);
 
-        static tMatrix4x4f orthoProj = ortho(0,kSurfaceSize.width * kFactor, kSurfaceSize.height * kFactor, 0);
+        static tMatrix4x4f orthoProj = ortho(0,kSurfaceSize.width, 0, kSurfaceSize.height);
+//        static tMatrix4x4f orthoProj = ortho(0,kSurfaceSize.width, kSurfaceSize.height, 0);
         glUniformMatrix4fv(location, 1, false, &orthoProj.mArray[0][0]);
     }
 
@@ -167,8 +167,7 @@ void CarouselApp::configureNodes()
 }
 
 CarouselApp::CarouselApp()
-:   //mWhiteboardSurface(tPixelFormat::kR8G8B8A8, kSurfaceSize),
-    mSpriteProgram(NULL),
+:   mSpriteProgram(NULL),
     mWhiteboardTexture(NULL),
     mNickname("nick"),
     mRoomname("room"),
