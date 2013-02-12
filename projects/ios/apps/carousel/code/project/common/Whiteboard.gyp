@@ -77,6 +77,8 @@
 					], # include_dirs
 
 					'mac_bundle_resources': [
+						'../../rsrc/<@(OS)/Default.png',
+						'../../rsrc/<@(OS)/Default@2x.png',
 						'../../rsrc/<@(OS)/Default-568h@2x.png',
 						'../../rsrc/<@(OS)/GoToken-114.png',
 						'../../rsrc/<@(OS)/GoToken-57.png',
