@@ -10,9 +10,6 @@ protected:
     uint16_t            mBytesPerRow;
     uint8_t*            mPtr;
 
-protected:
-//    void MakeSurfaceCopyUpsideDown(tSurface& dst, const tSurface& src);
-
 public:
     tSurface& operator=(const tSurface& origSurface);
 
@@ -28,13 +25,10 @@ public:
     tColor4b        getPixel(const tPoint2f& location) const;
     void            setPixel(const tPoint2f& location, const tColor4b& newColor);
 
-    void            drawLine(const tPoint2f& ptA, const tPoint2f& ptB, const tColor4b& newColor);
     void            drawLineWithWidth(const tPoint2f& ptA, const tPoint2f& ptB, const tColor4b& newColor, const float newPenSize);
     void            drawLineWithPen(const tPoint2f& ptA, const tPoint2f& ptB, const tColor4b& newColor, const float newPenSize);
-    void            drawRect(const tRectf& newRect, const tColor4b& newColor);
 
     void            fillWhiteAlpha();
-    void            fillRect(const tRectf& newRect, const tColor4b& newColor);
     void            copyRect(const tSurface& srcSurface, const tRectf& srcRect, const tPoint2f& dstPt);
 
     friend class tTexture;

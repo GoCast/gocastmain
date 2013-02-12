@@ -2,19 +2,6 @@
 #include "Math/package.h"
 #include "OpenGL/package.h"
 
-//void tSurface::MakeSurfaceCopyUpsideDown(tSurface& dst, const tSurface& src)
-//{
-//    tPoint2f index;
-//
-//    for(index.y = 0; index.y < src.getSize().height; index.y++)
-//    {
-//        for (index.x = 0; index.x < src.getSize().width; index.x++)
-//        {
-//            dst.setPixel(tPoint2f(index.x, dst.getSize().height - (1 + index.y)), src.getPixel(index));
-//        }
-//    }
-//}
-
 tSurface& tSurface::operator=(const tSurface& origSurface)
 {
     if (this != &origSurface)
@@ -85,26 +72,6 @@ tSurface::tSurface(const tPixelFormat::Type& newType, const tSurface& origSurfac
         }
     }
 }
-
-//tSurface::tSurface(const tTexture& newTexture)
-//: mSize(newTexture.getSize()), mType(tPixelFormat::kR8G8B8A8)
-//{
-//    mBytesPerRow = uint16_t(tPixelFormat(mType).mBytesPerPixel * mSize.width);
-//    if ((mBytesPerRow & 0x3) != 0)
-//    {
-//        mBytesPerRow = (mBytesPerRow & ~0x3) + 4;
-//    }
-//
-//    mPtr = new uint8_t[(int32_t)(mSize.height * mBytesPerRow)];
-//
-//    assert(mPtr);
-//
-//    glActiveTexture(GL_TEXTURE0);
-//    glBindTexture(GL_TEXTURE_2D, newTexture.textureID);
-//    glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, mPtr);   //TODO: Not OpenGL ES 2.0 compatible
-//
-//    MakeSurfaceCopyUpsideDown(*this, tSurface(*this));
-//}
 
 tSurface::tSurface(const tSurface& origSurface)
 : mSize(origSurface.mSize), mType(origSurface.mType), mBytesPerRow(origSurface.mBytesPerRow)
@@ -185,36 +152,6 @@ void tSurface::setPixel(const tPoint2f& location, const tColor4b& newColor)
     }
 }
 
-void tSurface::drawLine(const tPoint2f& ptA, const tPoint2f& ptB, const tColor4b& newColor)
-{
-    float dx = fabsf(ptB.x - ptA.x);
-    float dy = fabsf(ptB.y - ptA.y);
-
-    float sx = (ptA.x < ptB.x) ? 1 : -1;
-    float sy = (ptA.y < ptB.y) ? 1 : -1;
-
-    float err = dx - dy;
-    float e2;
-
-    tPoint2f iterPt = ptA;
-    bool done = false;
-    while(!done)
-    {
-        setPixel(iterPt, newColor);
-        done = (iterPt == ptB);
-        e2 = 2 * err;
-        if (e2 > -dy)
-        {
-            err -= dy;
-            iterPt.x += sx;
-        }
-        if (e2 < dx)
-        {
-            err += dx;
-            iterPt.y += sy;
-        }
-    }
-}
 void tSurface::drawLineWithWidth(const tPoint2f& ptA, const tPoint2f& ptB, const tColor4b& newColor, const float newPenSize)
 {
     float dx = fabsf(ptB.x - ptA.x);
@@ -258,39 +195,9 @@ void tSurface::drawLineWithPen(const tPoint2f& ptA, const tPoint2f& ptB, const t
     }
 }
 
-void tSurface::drawRect(const tRectf& newRect, const tColor4b& newColor)
-{
-    if (newRect.size.width > 0 && newRect.size.height > 0)
-    {
-        tPoint2f w(newRect.size.width - 1, 0), h(0, newRect.size.height - 1);
-        tPoint2f wh(w + h);
-
-        drawLine(newRect.location,      newRect.location + w,   newColor);
-        drawLine(newRect.location,      newRect.location + h,   newColor);
-        drawLine(newRect.location + w,  newRect.location + wh,  newColor);
-        drawLine(newRect.location + h,  newRect.location + wh,  newColor);
-    }
-}
-
 void tSurface::fillWhiteAlpha()
 {
     memset(mPtr, 0xff, mBytesPerRow * (uint32_t)mSize.height);
-}
-
-void tSurface::fillRect(const tRectf& newRect, const tColor4b& newColor)
-{
-    if (newRect.size.width > 0 && newRect.size.height > 0)
-    {
-        tPoint2f ptA(newRect.location);
-
-        for(ptA.y = newRect.location.y; ptA.y < newRect.location.y + newRect.size.height; ptA.y++)
-        {
-            for(ptA.x = newRect.location.x; ptA.x < newRect.location.x + newRect.size.width; ptA.x++)
-            {
-                setPixel(ptA, newColor);
-            }
-        }
-    }
 }
 
 void tSurface::copyRect(const tSurface& srcSurface, const tRectf& srcRect, const tPoint2f& dstPt)

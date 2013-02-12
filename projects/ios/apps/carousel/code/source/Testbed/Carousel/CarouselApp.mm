@@ -86,7 +86,7 @@ void CarouselApp::createResources()
 
     tSurface surface(tPixelFormat::kR8G8B8A8, kSurfaceSize);
     surface.fillWhiteAlpha();
-//    surface.drawLine(tPoint2f(0,0), tPoint2f(kSurfaceSize.width, kSurfaceSize.height), tColor4b(255,0,0,255));
+//    surface.drawLineWithWidth(tPoint2f(0,0), tPoint2f(kSurfaceSize.width, kSurfaceSize.height), tColor4b(255,0,0,255), 1);
 
     mWhiteboardTexture = new tTexture(surface);
 
