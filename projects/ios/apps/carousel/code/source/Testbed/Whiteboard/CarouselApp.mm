@@ -498,8 +498,8 @@ void CarouselApp::update(const tTimerEvent& msg)
             case tTimer::kTimerTick:
                 if (mLastPolledPt != mStartTouch)
                 {
-                    printf("*** drawing (%d, %d) - (%d, %d)\n",
-                           (int)mStartTouch.x, (int)mStartTouch.y, (int)mLastPolledPt.x, (int)mLastPolledPt.y);
+//                    printf("*** drawing (%d, %d) - (%d, %d)\n",
+//                           (int)mStartTouch.x, (int)mStartTouch.y, (int)mLastPolledPt.x, (int)mLastPolledPt.y);
 
                     [gWebViewInstance stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"realDrawLine(%d, '%s', %d, %d, %d, %d, %d);",
                                                                               mSpots[mSpotFinger]->getID(),
