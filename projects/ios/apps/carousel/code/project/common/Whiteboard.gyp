@@ -10,14 +10,14 @@
 					'type': 'executable',
 					'mac_bundle': 1,
 					
-					'actions': [
-						{
-							'action_name': 'CarouselApp.tgf',
-							'inputs': [ '../../tgf/Testbed/Whiteboard/CarouselApp.tgf', ], # inputs
-							'outputs': [ '../../source/Testbed/Whiteboard/CarouselApp.h', ], # outputs
-							'action': [ '/Volumes/Lab/tools/graphcode', '<@(_inputs)', '--machine', 'CarouselApp', '--include-exit', '--update', '--debug', '--basic-stf', '--libtate', '-o', '<@(_outputs)', ], # action
-						},
-					],	# actions
+# 					'actions': [
+# 						{
+# 							'action_name': 'CarouselApp.tgf',
+# 							'inputs': [ '../../tgf/Testbed/Whiteboard/CarouselApp.tgf', ], # inputs
+# 							'outputs': [ '../../source/Testbed/Whiteboard/CarouselApp.h', ], # outputs
+# 							'action': [ '/Volumes/Lab/tools/graphcode', '<@(_inputs)', '--machine', 'CarouselApp', '--include-exit', '--update', '--debug', '--basic-stf', '--libtate', '-o', '<@(_outputs)', ], # action
+# 						},
+# 					],	# actions
 
 					'sources': [
 						'../../source/Testbed/Whiteboard/CarouselApp.mm',
