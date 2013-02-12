@@ -33,6 +33,7 @@
 						'../../source/Testbed/Whiteboard/LoginView.h',
 
 						'../../source/Testbed/Whiteboard/CallcastEvent.h',
+						'../../source/Testbed/Whiteboard/WhiteboardEvent.h',
 						'../../source/Testbed/Whiteboard/CallcastManager.h',
 
 						'../../source/Testbed/Whiteboard/GCICallcast.mm',

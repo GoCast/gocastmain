@@ -10,6 +10,8 @@
 #include "OpenGL/package.h"
 
 #include "CallcastEvent.h"
+#include "WhiteboardEvent.h"
+
 #include "CallcastManager.h"
 
 const tColor4b      kBlack  (0,0,0,255);
@@ -24,14 +26,14 @@ const tColor4b      kWhite  (255,255,255,255);
 {
 #pragma unused(command)
     printf("%s", "*** kWebViewLoaded\n");
-    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kWebViewLoaded));
+    CallcastManager::getInstance()->tSubject<const CallcastEvent&>::notify(CallcastEvent(CallcastEvent::kWebViewLoaded));
 }
 
 - (void)loggedIn:(CDVInvokedUrlCommand*)command
 {
 #pragma unused(command)
     printf("%s", "*** kLoggedIn\n");
-    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kLoggedIn));
+    CallcastManager::getInstance()->tSubject<const CallcastEvent&>::notify(CallcastEvent(CallcastEvent::kLoggedIn));
 }
 
 - (void)save:(CDVInvokedUrlCommand*)command
@@ -67,7 +69,7 @@ const tColor4b      kWhite  (255,255,255,255);
     }
 
     // TODO: fix SpotID
-    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kSave,
+    CallcastManager::getInstance()->tSubject<const WhiteboardEvent&>::notify(WhiteboardEvent(WhiteboardEvent::kSave,
                                                          atoi([[command.arguments objectAtIndex:0] UTF8String]),
                                                          useColor, atoi([[command.arguments objectAtIndex:2] UTF8String])));
 }
@@ -76,24 +78,24 @@ const tColor4b      kWhite  (255,255,255,255);
 {
 #pragma unused(command)
     printf("%s", "*** kRestore\n");
-    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kRestore));
+    CallcastManager::getInstance()->tSubject<const WhiteboardEvent&>::notify(WhiteboardEvent(WhiteboardEvent::kRestore));
 }
 - (void)beginPath:(CDVInvokedUrlCommand*)command
 {
 #pragma unused(command)
     printf("%s", "*** kBeginPath\n");
-    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kBeginPath));
+    CallcastManager::getInstance()->tSubject<const WhiteboardEvent&>::notify(WhiteboardEvent(WhiteboardEvent::kBeginPath));
 }
 - (void)closePath:(CDVInvokedUrlCommand*)command
 {
 #pragma unused(command)
     printf("%s", "*** kClosePath\n");
-    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kClosePath));
+    CallcastManager::getInstance()->tSubject<const WhiteboardEvent&>::notify(WhiteboardEvent(WhiteboardEvent::kClosePath));
 }
 - (void)moveTo:(CDVInvokedUrlCommand*)command
 {
     printf("%s", "*** kMoveTo\n");
-    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kMoveTo,
+    CallcastManager::getInstance()->tSubject<const WhiteboardEvent&>::notify(WhiteboardEvent(WhiteboardEvent::kMoveTo,
                                                             atoi([[command.arguments objectAtIndex:0] UTF8String]),
                                                              tPoint2f(atoi([[command.arguments objectAtIndex:1] UTF8String]),
                                                                       atoi([[command.arguments objectAtIndex:2] UTF8String]))));
@@ -101,7 +103,7 @@ const tColor4b      kWhite  (255,255,255,255);
 - (void)lineTo:(CDVInvokedUrlCommand*)command
 {
     printf("%s", "*** kLineTo\n");
-    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kLineTo,
+    CallcastManager::getInstance()->tSubject<const WhiteboardEvent&>::notify(WhiteboardEvent(WhiteboardEvent::kLineTo,
                                                          atoi([[command.arguments objectAtIndex:0] UTF8String]),
                                                              tPoint2f(atoi([[command.arguments objectAtIndex:1] UTF8String]),
                                                                       atoi([[command.arguments objectAtIndex:2] UTF8String]))));
@@ -110,7 +112,7 @@ const tColor4b      kWhite  (255,255,255,255);
 {
 #pragma unused(command)
     printf("%s", "*** kStroke\n");
-    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kStroke,
+    CallcastManager::getInstance()->tSubject<const WhiteboardEvent&>::notify(WhiteboardEvent(WhiteboardEvent::kStroke,
                                                          atoi([[command.arguments objectAtIndex:0] UTF8String])));
 }
 
@@ -118,7 +120,7 @@ const tColor4b      kWhite  (255,255,255,255);
 
 - (void) loadImageURL:(CDVInvokedUrlCommand*)command
 {
-    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kLoadImageURL,
+    CallcastManager::getInstance()->tSubject<const WhiteboardEvent&>::notify(WhiteboardEvent(WhiteboardEvent::kLoadImageURL,
                                                          atoi([[command.arguments objectAtIndex:0] UTF8String]),
                                                          [[command.arguments objectAtIndex:1] UTF8String]));
 }
@@ -129,7 +131,7 @@ const tColor4b      kWhite  (255,255,255,255);
 {
 #pragma unused(command)
     printf("%s", "*** kAddSpot\n");
-    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kAddSpot,
+    CallcastManager::getInstance()->tSubject<const CallcastEvent&>::notify(CallcastEvent(CallcastEvent::kAddSpot,
                                                          [[command.arguments objectAtIndex:0] UTF8String],
                                                          atoi([[command.arguments objectAtIndex:1] UTF8String])));
 }
@@ -138,7 +140,7 @@ const tColor4b      kWhite  (255,255,255,255);
 {
 #pragma unused(command)
     printf("%s", "*** kRemoveSpot\n");
-    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kRemoveSpot,
+    CallcastManager::getInstance()->tSubject<const CallcastEvent&>::notify(CallcastEvent(CallcastEvent::kRemoveSpot,
                                                          atoi([[command.arguments objectAtIndex:0] UTF8String])));
 }
 
@@ -146,77 +148,77 @@ const tColor4b      kWhite  (255,255,255,255);
 {
 #pragma unused(command)
     printf("%s", "*** kSetSpot\n");
-    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kSetSpot));
+    CallcastManager::getInstance()->tSubject<const CallcastEvent&>::notify(CallcastEvent(CallcastEvent::kSetSpot));
 }
 
 - (void) addSpotForParticipant:(CDVInvokedUrlCommand*)command
 {
 #pragma unused(command)
     printf("%s", "*** kAddSpotForParticipant\n");
-    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kAddSpotForParticipant));
+    CallcastManager::getInstance()->tSubject<const CallcastEvent&>::notify(CallcastEvent(CallcastEvent::kAddSpotForParticipant));
 }
 
 - (void) addPluginToParticipant:(CDVInvokedUrlCommand*)command
 {
 #pragma unused(command)
     printf("%s", "*** kAddPluginToParticipant\n");
-    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kAddPluginToParticipant));
+    CallcastManager::getInstance()->tSubject<const CallcastEvent&>::notify(CallcastEvent(CallcastEvent::kAddPluginToParticipant));
 }
 
 - (void) removePluginFromParticipant:(CDVInvokedUrlCommand*)command
 {
 #pragma unused(command)
     printf("%s", "*** kRemovePluginFromParticipant\n");
-    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kRemovePluginFromParticipant));
+    CallcastManager::getInstance()->tSubject<const CallcastEvent&>::notify(CallcastEvent(CallcastEvent::kRemovePluginFromParticipant));
 }
 
 - (void) removeSpotForParticipant:(CDVInvokedUrlCommand*)command
 {
 #pragma unused(command)
     printf("%s", "*** kRemoveSpotForParticipant\n");
-    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kRemoveSpotForParticipant));
+    CallcastManager::getInstance()->tSubject<const CallcastEvent&>::notify(CallcastEvent(CallcastEvent::kRemoveSpotForParticipant));
 }
 
 - (void) addCarouselContent:(CDVInvokedUrlCommand*)command
 {
 #pragma unused(command)
     printf("%s", "*** kAddCarouselContent\n");
-    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kAddCarouselContent));
+    CallcastManager::getInstance()->tSubject<const CallcastEvent&>::notify(CallcastEvent(CallcastEvent::kAddCarouselContent));
 }
 
 - (void) removeCarouselContent:(CDVInvokedUrlCommand*)command
 {
 #pragma unused(command)
     printf("%s", "*** kRemoveCarouselContent\n");
-    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kRemoveCarouselContent));
+    CallcastManager::getInstance()->tSubject<const CallcastEvent&>::notify(CallcastEvent(CallcastEvent::kRemoveCarouselContent));
 }
 
 - (void) connectionStatus:(CDVInvokedUrlCommand*)command
 {
 #pragma unused(command)
     printf("%s", "*** kConnectionStatus\n");
-    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kConnectionStatus));
+    CallcastManager::getInstance()->tSubject<const CallcastEvent&>::notify(CallcastEvent(CallcastEvent::kConnectionStatus));
 }
 
 - (void) onEffectApplied:(CDVInvokedUrlCommand*)command
 {
 #pragma unused(command)
     printf("%s", "*** kOnEffectApplied\n");
-    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kOnEffectApplied));
+    CallcastManager::getInstance()->tSubject<const CallcastEvent&>::notify(CallcastEvent(CallcastEvent::kOnEffectApplied));
 }
 
 - (void) onNicknameInUse:(CDVInvokedUrlCommand*)command
 {
 #pragma unused(command)
     printf("%s", "*** kOnNicknameInUse\n");
-    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kOnNicknameInUse));
+    CallcastManager::getInstance()->tSubject<const CallcastEvent&>::notify(CallcastEvent(CallcastEvent::kOnNicknameInUse));
 }
 
 - (void) readyState:(CDVInvokedUrlCommand*)command
 {
 #pragma unused(command)
     printf("%s", "*** kReadyState\n");
-    CallcastManager::getInstance()->notify(CallcastEvent(CallcastEvent::kReadyState));
+    CallcastManager::getInstance()->tSubject<const CallcastEvent&>::notify(CallcastEvent(CallcastEvent::kReadyState));
 }
 
 @end

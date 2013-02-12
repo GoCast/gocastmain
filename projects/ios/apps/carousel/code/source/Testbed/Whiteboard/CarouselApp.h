@@ -29,9 +29,6 @@ protected:
     uint32_t                            mSpotFinger;
 
     tTimer*                 mDrawingTimer;
-    tPoint2f                mCurDrawPoint;
-    tColor4b                mReceivePenColor;
-    float                   mReceivePenSize;
 
     tPoint2f                mStartTouch;
     tPoint2f                mEndTouch;
@@ -54,6 +51,8 @@ public:
     void onResizeView(const tDimension2f& newSize);
     void onRedrawView(float time);
 
+    void refresh(const int32_t& newID);
+
     void onAddSpot(const std::string& newType, const int32_t& newID);
     void onRemoveSpot(const int32_t& newID);
     void onOkayButton();
@@ -62,13 +61,6 @@ public:
     void onPenSizeChange(const float& newSize);
     void onPenColorChange();
     void onEraseButton();
-
-    void onSave(const int32_t& newID, const tColor4b& nc, const float& np);
-    void onMoveTo(const int32_t& newID, const tPoint2f& pt);
-    void onLineTo(const int32_t& newID, const tPoint2f& pt);
-    void onStroke(const int32_t& newID);
-
-    void onLoadImageURL(const int32_t& newID, const std::string& newURL);
 
 protected:
     void endEntry();

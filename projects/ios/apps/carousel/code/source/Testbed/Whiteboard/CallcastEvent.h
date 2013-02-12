@@ -10,17 +10,6 @@ public:
         kSubmitLogin,
         kLoggedIn,
 
-        //Whiteboard events below
-        kSave,
-        kRestore,
-        kBeginPath,
-        kClosePath,
-        kMoveTo,
-        kLineTo,
-        kStroke,
-
-        kLoadImageURL,
-
         //Callcast-specific events
         kAddSpot,
         kRemoveSpot,

@@ -173,8 +173,6 @@ CarouselApp::CarouselApp()
     mRoomname("room"),
     mSpotFinger(0),
     mDrawingTimer(NULL),
-    mReceivePenColor(kBlue),
-    mReceivePenSize(5),
     mSendPenColor(kBlue),
     mSendPenSize(5),
     mInitialized(false),
@@ -230,6 +228,16 @@ void CarouselApp::onRedrawView(float time)
     glFlush();
 }
 
+#pragma mark -
+
+void CarouselApp::refresh(const int32_t& newID)
+{
+    if (mSpots[mSpotFinger]->getID() == newID)
+    {
+        delete mWhiteboardTexture;
+        mWhiteboardTexture = new tTexture(*mMapping[mSpots[mSpotFinger]->getID()]->getSurface());
+    }
+}
 
 #pragma mark -
 
@@ -355,62 +363,11 @@ void CarouselApp::onEraseButton()
 
 #pragma mark -
 
-void CarouselApp::onSave(const int32_t& newID, const tColor4b& nc, const float& np)
-{
-#pragma unused(newID)
-    mReceivePenColor    = nc;
-    mReceivePenSize     = np;
-}
-
-void CarouselApp::onMoveTo(const int32_t& newID, const tPoint2f& pt)
-{
-#pragma unused(newID)
-    mCurDrawPoint = pt;
-}
-
-void CarouselApp::onLineTo(const int32_t& newID, const tPoint2f& pt)
-{
-    if (!mMapping.empty())
-    {
-        mMapping[newID]->getSurface()->drawLineWithPen(mCurDrawPoint, pt, mReceivePenColor, mReceivePenSize);
-    }
-
-    mCurDrawPoint = pt;
-}
-
-void CarouselApp::onStroke(const int32_t& newID)
-{
-    if (!mMapping.empty())
-    {
-        if (mSpots[mSpotFinger]->getID() == newID)
-        {
-            delete mWhiteboardTexture;
-            mWhiteboardTexture = new tTexture(*mMapping[mSpots[mSpotFinger]->getID()]->getSurface());
-        }
-    }
-}
-
-void CarouselApp::onLoadImageURL(const int32_t& newID, const std::string& newURL)
-{
-    if (!mMapping.empty())
-    {
-        mMapping[newID]->replaceSurface(new tSurface(newURL));
-
-        if (mSpots[mSpotFinger]->getID() == newID)
-        {
-            delete mWhiteboardTexture;
-            mWhiteboardTexture = new tTexture(*mMapping[mSpots[mSpotFinger]->getID()]->getSurface());
-        }
-    }
-}
-
-#pragma mark -
-
 void CarouselApp::startEntry()
 {
     tSGView::getInstance()->attach(this);
     tInputManager::getInstance()->tSubject<const tMouseEvent&>::attach(this);
-    CallcastManager::getInstance()->attach(this);
+    CallcastManager::getInstance()->tSubject<const CallcastEvent&>::attach(this);
 
     mDrawingTimer = new tTimer(100);
     mDrawingTimer->attach(this);
@@ -504,13 +461,6 @@ void CarouselApp::update(const CallcastEvent& msg)
 {
     switch (msg.mEvent)
     {
-        case CallcastEvent::kSave:   onSave(msg.mSpotID, msg.mColor, msg.mPenSize); break;
-        case CallcastEvent::kMoveTo: onMoveTo(msg.mSpotID, msg.mPoint); break;
-        case CallcastEvent::kLineTo: onLineTo(msg.mSpotID, msg.mPoint); break;
-        case CallcastEvent::kStroke: onStroke(msg.mSpotID); break;
-
-        case CallcastEvent::kLoadImageURL: onLoadImageURL(msg.mSpotID, msg.mURL); break;
-
         case CallcastEvent::kAddSpot: onAddSpot(msg.mSpotType, msg.mSpotID); break;
         case CallcastEvent::kRemoveSpot: onRemoveSpot(msg.mSpotID); break;
 
