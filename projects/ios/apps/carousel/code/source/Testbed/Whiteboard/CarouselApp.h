@@ -18,7 +18,7 @@ class CarouselApp
     public tObserver<const CallcastEvent&>,
     public tObserver<const tSGViewEvent&>,
     public tObserver<const tTimerEvent&>,
-    public tObserver<const tMouseEvent&>
+    public tObserver<const tTouchEvent&>
 {
 protected:
 
@@ -347,7 +347,7 @@ public:
     void update(const CallcastEvent& msg);
     void update(const tSGViewEvent& msg);
     void update(const tTimerEvent& msg);
-    void update(const tMouseEvent& msg);
+    void update(const tTouchEvent& msg);
 
 //void CarouselApp::update(const CarouselAppMessage& msg)
 //{

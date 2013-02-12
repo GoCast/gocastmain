@@ -89,31 +89,33 @@
     [super dealloc];
 }
 
-- (void)mouseEvent:(NSSet *)touches withEvent:(tMouseEvent::EventType)evt withID:(tMouseEvent::ButtonID)bID
+- (void)mouseEvent:(NSSet *)touches withEvent:(tTouchEvent::EventType)evt
 {
     UITouch *touch = [touches anyObject];
     CGPoint touchPoint = [touch locationInView:self];
 
-    tInputManager::getInstance()->tSubject<const tMouseEvent&>::notify(tMouseEvent(evt, tInputManager::getInstance(),
-                                                                                   tPoint2f(touchPoint.x / 300.0f * 500.0f, touchPoint.y / 300.0f * 500.0f), bID));
+    tInputManager::getInstance()->tSubject<const tTouchEvent&>::notify(tTouchEvent(evt,
+                                                                                   tInputManager::getInstance(),
+                                                                                   tPoint2f(touchPoint.x / 300.0f * 500.0f,
+                                                                                            touchPoint.y / 300.0f * 500.0f)));
 }
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
 #pragma unused(event)
-    [self mouseEvent:touches withEvent:tMouseEvent::kMouseDown withID:tMouseEvent::kLeft];
+    [self mouseEvent:touches withEvent:tTouchEvent::kTouchBegin];
 }
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
 {
 #pragma unused(event)
-    [self mouseEvent:touches withEvent:tMouseEvent::kMouseDrag withID:tMouseEvent::kLeft];
+    [self mouseEvent:touches withEvent:tTouchEvent::kTouchDrag];
 }
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
 {
 #pragma unused(event)
-    [self mouseEvent:touches withEvent:tMouseEvent::kMouseUp withID:tMouseEvent::kLeft];
+    [self mouseEvent:touches withEvent:tTouchEvent::kTouchEnd];
 }
 
 @end

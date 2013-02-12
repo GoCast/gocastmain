@@ -7,17 +7,16 @@ public:
     {
         kTouchBegin,
         kTouchEnd,
-        kTouchMove,
-        kTouchTap,
+        kTouchDrag,
     };
-    
-public:
-    EventType       event;
-    tPoint2f        location;
-    uint32_t    touchID;
 
 public:
-    tTouchEvent(EventType evt, const tPoint2f& np,
-               uint32_t ntID = 0)
-    : event(evt), location(np), touchID(ntID) { }
+    EventType       event;
+    tSubject<const tTouchEvent&>* source;
+    tPoint2f        location;
+
+public:
+    tTouchEvent(EventType evt, tSubject<const tTouchEvent&>* newSource, const tPoint2f& np)
+    : event(evt), source(newSource), location(np) { }
 };
+

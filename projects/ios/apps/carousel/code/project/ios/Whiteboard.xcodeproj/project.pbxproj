@@ -165,7 +165,6 @@
 		D21DC43692508DB38C23866C /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		D7194E88971AA4E5865F3427 /* Cordova.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Cordova.plist; sourceTree = "<group>"; };
 		DCFFB3193E4FDBEDD0C2656F /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
-		E2C6A77649394EDC73D6F79A /* tMouseEvent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tMouseEvent.h; sourceTree = "<group>"; };
 		E4A399B89C6D8B4A74FDF8F2 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		E5C8BA65286D17F0A1409AF2 /* tRect.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tRect.h; sourceTree = "<group>"; };
 		E76DF83DF7F2CB9EC0070067 /* tSGView.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = tSGView.cpp; sourceTree = "<group>"; };
@@ -291,17 +290,6 @@
 			name = Build;
 			sourceTree = "<group>";
 		};
-		5B5CF35D83D253D7A1B819A0 /* Input */ = {
-			isa = PBXGroup;
-			children = (
-				4E04FFB30970A2024C54F732 /* package.h */,
-				AD5C7E76A38BAEB35D1918BD /* tInputManager.h */,
-				E2C6A77649394EDC73D6F79A /* tMouseEvent.h */,
-				C1D41AD2FC7F4C2A868E0AD9 /* tTouchEvent.h */,
-			);
-			path = Input;
-			sourceTree = "<group>";
-		};
 		627B5128BDA4D66B2AD50C56 /* ios */ = {
 			isa = PBXGroup;
 			children = (
@@ -397,6 +385,16 @@
 			path = rsrc;
 			sourceTree = "<group>";
 		};
+		C3A82579273F3EE847BAE1A6 /* Input */ = {
+			isa = PBXGroup;
+			children = (
+				4E04FFB30970A2024C54F732 /* package.h */,
+				AD5C7E76A38BAEB35D1918BD /* tInputManager.h */,
+				C1D41AD2FC7F4C2A868E0AD9 /* tTouchEvent.h */,
+			);
+			path = Input;
+			sourceTree = "<group>";
+		};
 		CD1732A175D168FAB36BB309 /* OpenGL */ = {
 			isa = PBXGroup;
 			children = (
@@ -423,7 +421,7 @@
 			children = (
 				2A0876C2C14BAE99E2AB2EE2 /* Base */,
 				4365B0A1D9BD6AAAF27800A3 /* Bootstrap/ios */,
-				5B5CF35D83D253D7A1B819A0 /* Input */,
+				C3A82579273F3EE847BAE1A6 /* Input */,
 				B725B79358BFD482911D6690 /* Io */,
 				D8A89EC23F5F025598003924 /* Math */,
 				CD1732A175D168FAB36BB309 /* OpenGL */,

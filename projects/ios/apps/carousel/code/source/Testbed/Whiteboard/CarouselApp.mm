@@ -216,8 +216,8 @@ void CarouselApp::onRedrawView(float time)
     mWhiteboardTexture->MakeCurrent();
 
     //os.draw.setTextureParameterState
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
@@ -460,7 +460,7 @@ void CarouselApp::onTimerTick(const tTimer* newTimer)
 void CarouselApp::startEntry()
 {
     tSGView::getInstance()->attach(this);
-    tInputManager::getInstance()->tSubject<const tMouseEvent&>::attach(this);
+    tInputManager::getInstance()->tSubject<const tTouchEvent&>::attach(this);
     CallcastManager::getInstance()->tSubject<const CallcastEvent&>::attach(this);
 
     mInputTimer = new tTimerPeer(60);
@@ -597,13 +597,13 @@ void CarouselApp::update(const tTimerEvent& msg)
     }
 }
 
-void CarouselApp::update(const tMouseEvent& msg)
+void CarouselApp::update(const tTouchEvent& msg)
 {
     switch (msg.event)
     {
-        case tMouseEvent::kMouseDown:   onMouseDown(msg.location); break;
-        case tMouseEvent::kMouseDrag:   onMouseDrag(msg.location); break;
-        case tMouseEvent::kMouseUp:     onMouseUp(msg.location); break;
+        case tTouchEvent::kTouchBegin:  onMouseDown(msg.location); break;
+        case tTouchEvent::kTouchDrag:   onMouseDrag(msg.location); break;
+        case tTouchEvent::kTouchEnd:    onMouseUp(msg.location); break;
 
         default:
             break;

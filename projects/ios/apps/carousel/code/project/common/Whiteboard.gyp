@@ -49,7 +49,6 @@
 
 						'../../source/Input/package.h',
 						'../../source/Input/tInputManager.h',
-						'../../source/Input/tMouseEvent.h',
 						'../../source/Input/tTouchEvent.h',
 						'../../source/Io/package.h',
 						'../../source/Io/tFile.h',
