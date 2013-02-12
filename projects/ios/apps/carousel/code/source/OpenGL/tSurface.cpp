@@ -215,18 +215,46 @@ void tSurface::drawLine(const tPoint2f& ptA, const tPoint2f& ptB, const tColor4b
         }
     }
 }
+void tSurface::drawLineWithWidth(const tPoint2f& ptA, const tPoint2f& ptB, const tColor4b& newColor, const float newPenSize)
+{
+    float dx = fabsf(ptB.x - ptA.x);
+    float dy = fabsf(ptB.y - ptA.y);
+
+    float sx = (ptA.x < ptB.x) ? 1 : -1;
+    float sy = (ptA.y < ptB.y) ? 1 : -1;
+
+    float err = dx - dy;
+    float e2;
+
+    tPoint2f iterPt = ptA;
+    bool done = false;
+    while(!done)
+    {
+        for (int i = 0; i < newPenSize; i++)
+        {
+            setPixel(tPoint2f(iterPt.x + i, iterPt.y), newColor);
+        }
+        done = (iterPt == ptB);
+        e2 = 2 * err;
+        if (e2 > -dy)
+        {
+            err -= dy;
+            iterPt.x += sx;
+        }
+        if (e2 < dx)
+        {
+            err += dx;
+            iterPt.y += sy;
+        }
+    }
+}
 
 void tSurface::drawLineWithPen(const tPoint2f& ptA, const tPoint2f& ptB, const tColor4b& newColor, const float newPenSize)
 {
-    int halfPen = (int)(newPenSize / 2.0f);
-
-    for(int i = 0; i < newPenSize; i++)
+    for(int j = 0; j < newPenSize; j++)
     {
-        for(int j = 0; j < newPenSize; j++)
-        {
-            tPoint2f offset = tPoint2f(i, j) - halfPen;
-            drawLine(ptA + offset, ptB + offset, newColor);
-        }
+        tPoint2f offset = tPoint2f(0, j - (int)(newPenSize / 2.0f));
+        drawLineWithWidth(ptA + offset, ptB + offset, newColor, newPenSize);
     }
 }
 
