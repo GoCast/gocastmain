@@ -149,7 +149,6 @@ void CarouselApp::configureNodes()
         assert((GLint)location != -1);
 
         glEnableVertexAttribArray(location);
-		mSpriteProgram->AddAttrib(location);	// Remember that we added this
 
         glVertexAttribPointer(location, 2, GL_FLOAT, GL_TRUE, 0, &mWhiteBoardVerts[0]);
     }
@@ -160,7 +159,6 @@ void CarouselApp::configureNodes()
         assert((GLint)location != -1);
 
         glEnableVertexAttribArray(location);
-		mSpriteProgram->AddAttrib(location);	// Remember that we added this
 
         glVertexAttribPointer(location, 2, GL_FLOAT, GL_TRUE, 0, &mWhiteBoardTexCoords[0]);
     }
@@ -216,8 +214,8 @@ void CarouselApp::onRedrawView(float time)
     mWhiteboardTexture->MakeCurrent();
 
     //os.draw.setTextureParameterState
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 

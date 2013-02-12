@@ -7,36 +7,6 @@ void tProgram::setActive()
     glUseProgram(mProgramID);
 }
 
-void tProgram::AddAttrib(GLuint index)
-{
-	mActiveAttribs.insert(index);
-}
-
-void tProgram::EnableAttribs()
-{
-	std::set<GLuint>::iterator iter;
-	
-	for(iter = mActiveAttribs.begin(); iter != mActiveAttribs.end(); iter++)
-	{
-		glEnableVertexAttribArray(*iter);
-	}
-}
-
-void tProgram::DisableAttribs()
-{
-	std::set<GLuint>::iterator iter;
-	
-	for(iter = mActiveAttribs.begin(); iter != mActiveAttribs.end(); iter++)
-	{
-		glDisableVertexAttribArray(*iter);
-	}
-}
-
-void tProgram::ClearAttribs()
-{
-	mActiveAttribs.clear();
-}
-
 tProgram::tProgram(const tShader& newVertShader, const tShader& newFragShader)
 : mProgramID(0)
 {

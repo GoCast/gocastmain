@@ -5,14 +5,7 @@
 class tProgram
 {
 protected:
-	std::set<GLuint> mActiveAttribs;
     GLuint mProgramID;
-
-protected:
-	void AddAttrib(GLuint index);
-	void EnableAttribs();
-	void DisableAttribs();
-	void ClearAttribs();
 
 public:
     tProgram(const tShader& newVertShader, const tShader& newFragShader);

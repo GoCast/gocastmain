@@ -8,10 +8,6 @@ class tSGView
 {
 public:
      tSGView() { }
-    ~tSGView() { }
-
-//--
-    void update(const tSGViewEvent& msg);
 };
 
 class tSGViewEvent
