@@ -21,6 +21,9 @@ class CarouselApp
     public tObserver<const tMouseEvent&>
 {
 protected:
+
+    std::queue<std::string> mJSONStrings;
+
     std::vector<tPoint2f>   mWhiteBoardVerts;
     std::vector<tPoint2f>   mWhiteBoardTexCoords;
     tProgram*               mSpriteProgram;
@@ -32,7 +35,8 @@ protected:
     std::map<int32_t, WhiteboardSpot*>  mMapping;
     uint32_t                            mSpotFinger;
 
-    tTimer*                 mDrawingTimer;
+    tTimer*                 mInputTimer;
+    tTimer*                 mJSONTimer;
 
     tPoint2f                mStartTouch;
     tPoint2f                mEndTouch;

@@ -179,7 +179,8 @@ CarouselApp::CarouselApp()
     mNickname("nick"),
     mRoomname("room"),
     mSpotFinger(0),
-    mDrawingTimer(NULL),
+    mInputTimer(NULL),
+    mJSONTimer(NULL),
     mSendPenColor(kBlue),
     mSendPenSize(5),
     mInitialized(false),
@@ -386,12 +387,15 @@ void CarouselApp::onMouseUp(const tPoint2f& newPt)
 {
     mEndTouch   = tPoint2f(float(int32_t(newPt.x)), float(int32_t(newPt.y)));
 
-    //TODO: Spot number needs to go here
-    [gWebViewInstance stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"realDrawLine(%d, '%s', %d, %d, %d, %d, %d);",
-                                                              mSpots[mSpotFinger]->getID(),
-                                                              colorToString(mSendPenColor).c_str(),
-                                                              (mSendPenColor == kWhite) ? 30 : (int)mSendPenSize,
-                                                              (int)mStartTouch.x, (int)mStartTouch.y, (int)mEndTouch.x, (int)mEndTouch.y]];
+    char buf[255];
+    sprintf(buf, "realDrawLine(%d, '%s', %d, %d, %d, %d, %d);",
+            mSpots[mSpotFinger]->getID(),
+            colorToString(mSendPenColor).c_str(),
+            (mSendPenColor == kWhite) ? 30 : (int)mSendPenSize,
+            (int)mStartTouch.x, (int)mStartTouch.y, (int)mLastPolledPt.x, (int)mLastPolledPt.y);
+
+    mJSONStrings.push(std::string(buf));
+
     mShouldCapture = false;
 }
 
@@ -399,17 +403,30 @@ void CarouselApp::onTimerTick(const tTimer* newTimer)
 {
 #pragma unused(newTimer)
 
-    if (mLastPolledPt != mStartTouch)
+    if (newTimer == mInputTimer && mShouldCapture)
     {
-        //                    printf("*** drawing (%d, %d) - (%d, %d)\n",
-        //                           (int)mStartTouch.x, (int)mStartTouch.y, (int)mLastPolledPt.x, (int)mLastPolledPt.y);
+        if (mLastPolledPt != mStartTouch)
+        {
+            char buf[255];
+            sprintf(buf, "realDrawLine(%d, '%s', %d, %d, %d, %d, %d);",
+                    mSpots[mSpotFinger]->getID(),
+                    colorToString(mSendPenColor).c_str(),
+                    (mSendPenColor == kWhite) ? 30 : (int)mSendPenSize,
+                    (int)mStartTouch.x, (int)mStartTouch.y, (int)mLastPolledPt.x, (int)mLastPolledPt.y);
 
-        [gWebViewInstance stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"realDrawLine(%d, '%s', %d, %d, %d, %d, %d);",
-                                                                  mSpots[mSpotFinger]->getID(),
-                                                                  colorToString(mSendPenColor).c_str(),
-                                                                  (mSendPenColor == kWhite) ? 30 : (int)mSendPenSize,
-                                                                  (int)mStartTouch.x, (int)mStartTouch.y, (int)mLastPolledPt.x, (int)mLastPolledPt.y]];
-        mStartTouch = mLastPolledPt;
+            mJSONStrings.push(std::string(buf));
+
+            mStartTouch = mLastPolledPt;
+        }
+    }
+    else if (newTimer == mJSONTimer)
+    {
+        while(!mJSONStrings.empty())
+        {
+            [gWebViewInstance stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"%s", mJSONStrings.front().c_str()]];
+
+            mJSONStrings.pop();
+        }
     }
 }
 
@@ -421,16 +438,21 @@ void CarouselApp::startEntry()
     tInputManager::getInstance()->tSubject<const tMouseEvent&>::attach(this);
     CallcastManager::getInstance()->tSubject<const CallcastEvent&>::attach(this);
 
-    mDrawingTimer = new tTimerPeer(100);
-    mDrawingTimer->attach(this);
-    mDrawingTimer->start();
+    mInputTimer = new tTimerPeer(100);
+    mInputTimer->attach(this);
+    mInputTimer->start();
+
+    mJSONTimer = new tTimerPeer(500);
+    mJSONTimer->attach(this);
+    mJSONTimer->start();
 }
 
 void CarouselApp::startExit() { }
 
 void CarouselApp::endEntry()
 {
-    if (mDrawingTimer) delete mDrawingTimer;
+    if (mJSONTimer) delete mJSONTimer;
+    if (mInputTimer) delete mInputTimer;
     if (mSpriteProgram) delete mSpriteProgram;
 }
 void CarouselApp::endExit() { }
@@ -542,14 +564,11 @@ void CarouselApp::update(const tSGViewEvent& msg)
 
 void CarouselApp::update(const tTimerEvent& msg)
 {
-    if (mShouldCapture)
+    switch (msg.mEvent)
     {
-        switch (msg.mEvent)
-        {
-            case tTimer::kTimerTick: onTimerTick(msg.mTimer); break;
+        case tTimer::kTimerTick: onTimerTick(msg.mTimer); break;
 
-            default: break;
-        }
+        default: break;
     }
 }
 
