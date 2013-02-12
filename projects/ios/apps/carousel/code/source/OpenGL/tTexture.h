@@ -8,7 +8,6 @@ protected:
 
 protected:
     void MakeCurrent();
-    void MakeSurfaceCopyUpsideDown(tSurface& dst, const tSurface& src);
     void MakeSurfaceCopy(tSurface& dst, const tSurface& src);
 
     void CreateFromSurface(const tSurface& newSurface);
