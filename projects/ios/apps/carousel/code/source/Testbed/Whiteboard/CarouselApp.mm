@@ -14,6 +14,7 @@
 #include "AppDelegate.h"
 
 const tDimension2f  kSurfaceSize(512,512);
+const tDimension2f  kVisibleSize(500,500);
 const tDimension2f  kSpotSize(300,300);
 
 const tColor4b      kBlack  (0,0,0,255);
@@ -89,7 +90,7 @@ void CarouselApp::createResources()
 
     mWhiteboardTexture = new tTexture(surface);
 
-    mWhiteBoardVerts        = sixPoints(tPoint2f(0,0), tPoint2f(kSurfaceSize.width, kSurfaceSize.height));
+    mWhiteBoardVerts        = sixPoints(tPoint2f(0,0), tPoint2f(kVisibleSize.width, kVisibleSize.height));
     mWhiteBoardTexCoords    = sixPoints(tPoint2f(0,0), tPoint2f(kSurfaceSize.width / mWhiteboardTexture->getSize().width, kSurfaceSize.height / mWhiteboardTexture->getSize().height));
 }
 
@@ -126,7 +127,7 @@ void CarouselApp::configureNodes()
         location = glGetUniformLocation(mSpriteProgram->mProgramID, "mProjection");
         assert(location != -1);
 
-        static tMatrix4x4f orthoProj = ortho(0,kSurfaceSize.width, 0, kSurfaceSize.height);
+        static tMatrix4x4f orthoProj = ortho(0,kVisibleSize.width, 0, kVisibleSize.height);
 //        static tMatrix4x4f orthoProj = ortho(0,kSurfaceSize.width, kSurfaceSize.height, 0);
         glUniformMatrix4fv(location, 1, false, &orthoProj.mArray[0][0]);
     }

@@ -15,7 +15,7 @@
 
 const tDimension2f  kSurfaceSize(512,512);
 const tDimension2f  kSpotSize(300,300);
-const float         kFactor(1.0f);
+const float         kFactor(512.0f / 500.0f);
 
 const tColor4b      kBlack  (0,0,0,255);
 const tColor4b      kRed    (255,0,0,255);
