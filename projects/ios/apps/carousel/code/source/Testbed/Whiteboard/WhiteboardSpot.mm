@@ -13,9 +13,9 @@
 
 #include "AppDelegate.h"
 
-const tDimension2f  kSurfaceSize(512,512);
+const tDimension2f  kSurfaceSize(256,256);
 const tDimension2f  kSpotSize(300,300);
-const float         kFactor(512.0f / 500.0f);
+const float         kFactor(256.0f / 500.0f);
 
 const tColor4b      kBlack  (0,0,0,255);
 const tColor4b      kRed    (255,0,0,255);
@@ -79,7 +79,7 @@ void WhiteboardSpot::onLineTo(const tPoint2f& pt)
     tPoint2f A(int(mCurDrawPoint.x * kFactor), int(mCurDrawPoint.y * kFactor));
     tPoint2f B(int(pt.x * kFactor), int(pt.y * kFactor));
 
-    mSurface->drawLineWithPen(A, B, mReceivePenColor, mReceivePenSize);
+    mSurface->drawLineWithPen(A, B, mReceivePenColor, mReceivePenSize * kFactor);
 
     mCurDrawPoint = pt;
 }

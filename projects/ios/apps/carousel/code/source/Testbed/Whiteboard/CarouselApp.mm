@@ -13,7 +13,13 @@
 
 #include "AppDelegate.h"
 
-const tDimension2f  kSurfaceSize(512,512);
+/*
+ Sample raw JSON we send for strokes:
+
+[{"name":"save","settings":{"colorName":"dontcare","lineWidth":"5","strokeStyle":"#00F","lineJoin":"round"}},{"name":"beginPath"},{"name":"moveTo","x":295,"y":133},{"name":"lineTo","x":295,"y":173},{"name":"stroke"},{"name":"restore"}]
+ */
+
+const tDimension2f  kSurfaceSize(256,256);
 const tDimension2f  kVisibleSize(500,500);
 const tDimension2f  kSpotSize(300,300);
 
