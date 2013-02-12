@@ -1,11 +1,11 @@
 How to build:
 
-Mac version (theoretical):
+iOS version:
 
 1. Make sure "gyp" is installed: http://code.google.com/p/gyp/
 2. Open terminal, and cd to: /gocastmain/projects/ios/apps/carousel/code/project/common
-3. Run ./regyp-mac.sh
-4. Open /gocastmain/projects/ios/apps/carousel/code/project/mac/All.xcodeproj
+3. Run ./regyp-ios.sh
+4. Open /gocastmain/projects/ios/apps/carousel/code/project/mac/Whiteboard.xcodeproj
 5. Build, and the output will be in: /gocastmain/projects/ios/apps/carousel/code/build/mac/debug
-6. Can be run from the debugger, command line, or finder.
-
+6. Can be run in the simulator or on a device.
+7. I suggest to change the scheme to "release" instead of debug for demo / app submission purposes, as it's much faster.
