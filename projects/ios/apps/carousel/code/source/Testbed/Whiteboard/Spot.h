@@ -2,8 +2,13 @@
 
 class Spot
 {
+protected:
+    int32_t mID;
+
 public:
-    Spot();
+    Spot(const int32_t& newID);
     virtual ~Spot();
+
+    int32_t getID();
 };
 

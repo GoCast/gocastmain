@@ -7,6 +7,8 @@
 #include "CallcastEvent.h"
 #include "CallcastManager.h"
 
+#include "Spot.h"
+#include "WhiteboardSpot.h"
 #include "CarouselApp.h"
 
 #include "AppDelegate.h"
@@ -235,15 +237,11 @@ void CarouselApp::onAddSpot(const std::string& newType, const int32_t& newID)
 {
     if (newType.compare("whiteBoard") == 0)
     {
+        WhiteboardSpot* newSpot = new WhiteboardSpot(newID);
         bool wasEmpty = mSpots.empty();
 
-        mSpots.push_back(newID);
-
-        tSurface* surface = new tSurface(tPixelFormat::kR8G8B8A8, kSurfaceSize);
-        surface->fillRect(tRectf(0,0,surface->getSize()), tColor4b(255,255,255,255));
-        surface->drawLine(tPoint2f(0,0), tPoint2f(kSurfaceSize.width, kSurfaceSize.height), tColor4b(255,0,0,255));
-
-        mSurfaces[newID] = surface;
+        mSpots.push_back(newSpot);
+        mMapping[newID] = newSpot;
 
         if (wasEmpty)
         {
@@ -254,20 +252,18 @@ void CarouselApp::onAddSpot(const std::string& newType, const int32_t& newID)
 
 void CarouselApp::onRemoveSpot(const int32_t& newID)
 {
-    std::vector<int32_t>::iterator iter = mSpots.begin();
+    std::vector<Spot*>::iterator iter = mSpots.begin();
     uint32_t count = 0;
 
     while(iter != mSpots.end())
     {
-        if (*iter == newID) break;
+        if ((*iter)->getID() == newID) break;
         count++;
         iter++;
     }
 
     if (iter != mSpots.end())
     {
-        delete mSurfaces[newID];
-        mSurfaces.erase(newID);
         mSpots.erase(iter);
     }
 
@@ -374,9 +370,9 @@ void CarouselApp::onMoveTo(const int32_t& newID, const tPoint2f& pt)
 
 void CarouselApp::onLineTo(const int32_t& newID, const tPoint2f& pt)
 {
-    if (!mSurfaces.empty())
+    if (!mMapping.empty())
     {
-        mSurfaces[newID]->drawLineWithPen(mCurDrawPoint, pt, mReceivePenColor, mReceivePenSize);
+        mMapping[newID]->getSurface()->drawLineWithPen(mCurDrawPoint, pt, mReceivePenColor, mReceivePenSize);
     }
 
     mCurDrawPoint = pt;
@@ -384,27 +380,26 @@ void CarouselApp::onLineTo(const int32_t& newID, const tPoint2f& pt)
 
 void CarouselApp::onStroke(const int32_t& newID)
 {
-    if (!mSurfaces.empty())
+    if (!mMapping.empty())
     {
-        if (mSpots[mSpotFinger] == newID)
+        if (mSpots[mSpotFinger]->getID() == newID)
         {
             delete mWhiteboardTexture;
-            mWhiteboardTexture = new tTexture(*mSurfaces[mSpots[mSpotFinger]]);
+            mWhiteboardTexture = new tTexture(*mMapping[mSpots[mSpotFinger]->getID()]->getSurface());
         }
     }
 }
 
 void CarouselApp::onLoadImageURL(const int32_t& newID, const std::string& newURL)
 {
-    if (!mSurfaces.empty())
+    if (!mMapping.empty())
     {
-        delete mSurfaces[newID];
-        mSurfaces[newID] = new tSurface(newURL);
+        mMapping[newID]->replaceSurface(new tSurface(newURL));
 
-        if (mSpots[mSpotFinger] == newID)
+        if (mSpots[mSpotFinger]->getID() == newID)
         {
             delete mWhiteboardTexture;
-            mWhiteboardTexture = new tTexture(*mSurfaces[mSpots[mSpotFinger]]);
+            mWhiteboardTexture = new tTexture(*mMapping[mSpots[mSpotFinger]->getID()]->getSurface());
         }
     }
 }
@@ -486,10 +481,10 @@ void CarouselApp::showWhiteboardSpotEntry()
 {
     if (mInitialized)
     {
-        if (!mSurfaces.empty())
+        if (!mMapping.empty())
         {
             delete mWhiteboardTexture;
-            mWhiteboardTexture = new tTexture(*mSurfaces[mSpots[mSpotFinger]]);
+            mWhiteboardTexture = new tTexture(*mMapping[mSpots[mSpotFinger]->getID()]->getSurface());
         }
     }
     [gAppDelegateInstance showWhiteboardSpot];
@@ -556,7 +551,7 @@ void CarouselApp::update(const tTimerEvent& msg)
                            (int)mStartTouch.x, (int)mStartTouch.y, (int)mLastPolledPt.x, (int)mLastPolledPt.y);
 
                     [gWebViewInstance stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"realDrawLine(%d, '%s', %d, %d, %d, %d, %d);",
-                                                                              mSpots[mSpotFinger],
+                                                                              mSpots[mSpotFinger]->getID(),
                                                                               colorToString(mSendPenColor).c_str(),
                                                                               (mSendPenColor == kWhite) ? 30 : (int)mSendPenSize,
                                                                               (int)mStartTouch.x, (int)mStartTouch.y, (int)mLastPolledPt.x, (int)mLastPolledPt.y]];
@@ -590,7 +585,7 @@ void CarouselApp::update(const tMouseEvent& msg)
 
             //TODO: Spot number needs to go here
             [gWebViewInstance stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"realDrawLine(%d, '%s', %d, %d, %d, %d, %d);",
-                                                                      mSpots[mSpotFinger],
+                                                                      mSpots[mSpotFinger]->getID(),
                                                                       colorToString(mSendPenColor).c_str(),
                                                                       (mSendPenColor == kWhite) ? 30 : (int)mSendPenSize,
                                                                       (int)mStartTouch.x, (int)mStartTouch.y, (int)mEndTouch.x, (int)mEndTouch.y]];

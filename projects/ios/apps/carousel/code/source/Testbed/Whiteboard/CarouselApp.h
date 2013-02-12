@@ -6,6 +6,8 @@
 
 class CarouselAppMessage;
 class tSGViewEvent;
+class Spot;
+class WhiteboardSpot;
 
 class CarouselApp
 :   public tObserver<const CarouselAppMessage&>,
@@ -20,11 +22,11 @@ protected:
     tProgram*               mSpriteProgram;
     tTexture*               mWhiteboardTexture;
 
-    std::string                     mNickname;
-    std::string                     mRoomname;
-    std::vector<int32_t>              mSpots;
-    std::map<int32_t, tSurface*>    mSurfaces;
-    uint32_t                        mSpotFinger;
+    std::string                         mNickname;
+    std::string                         mRoomname;
+    std::vector<Spot*>                  mSpots;
+    std::map<int32_t, WhiteboardSpot*>  mMapping;
+    uint32_t                            mSpotFinger;
 
     tTimer*                 mDrawingTimer;
     tPoint2f                mCurDrawPoint;
