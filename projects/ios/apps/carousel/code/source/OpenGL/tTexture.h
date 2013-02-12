@@ -19,10 +19,7 @@ public:
 
     tDimension2f getSize() const;
 
-    friend class tSGSetTextureNode;
-    friend class tFrameBuffer;
     friend class tSurface;
-    friend class Whiteboard;
     friend class CarouselApp;
 };
 

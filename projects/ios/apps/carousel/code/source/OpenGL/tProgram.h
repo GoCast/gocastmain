@@ -25,10 +25,6 @@ public:
 
     std::string getInfoLog() const;
 
-    friend class tSGSetUniformNode;
-    friend class tSGSetAttributeNode;
-	friend class tSGSetProgramNode;
-    friend class Whiteboard;
     friend class CarouselApp;
 };
 

@@ -3,14 +3,11 @@
 class tPixelFormat
 {
 public:
-    enum Type           //Based on Hints from DirectX's DXGI_FORMAT enum
+    enum Type
     {
         kInvalid = 0,
         kR8G8B8A8,
         kR8G8B8,
-        kR5G6B5,
-        kR5G5B5A1,
-        kR4G4B4A4,
     };
 
 public:
