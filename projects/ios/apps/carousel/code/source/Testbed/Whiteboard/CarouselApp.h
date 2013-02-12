@@ -4,6 +4,10 @@
 #include <vector>
 #include <map>
 
+#ifdef tTimer
+#undef tTimer
+#endif
+
 class CarouselAppMessage;
 class tSGViewEvent;
 class Spot;
@@ -61,6 +65,12 @@ public:
     void onPenSizeChange(const float& newSize);
     void onPenColorChange();
     void onEraseButton();
+
+    void onMouseDown(const tPoint2f& newPt);
+    void onMouseDrag(const tPoint2f& newPt);
+    void onMouseUp(const tPoint2f& newPt);
+
+    void onTimerTick(const tTimer* newTimer);
 
 protected:
     void endEntry();

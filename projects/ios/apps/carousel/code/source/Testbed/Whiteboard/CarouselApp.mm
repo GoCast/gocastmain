@@ -210,8 +210,6 @@ void CarouselApp::onResizeView(const tDimension2f& newSize)
 #pragma unused(newSize)
 }
 
-static tPoint2f lastMousePt = tPoint2f(0,0);
-
 void CarouselApp::onRedrawView(float time)
 {
 #pragma unused(time)
@@ -370,13 +368,60 @@ void CarouselApp::onEraseButton()
 
 #pragma mark -
 
+void CarouselApp::onMouseDown(const tPoint2f& newPt)
+{
+    tPoint2f lastMousePt = tPoint2f(float(int32_t(newPt.x)), float(int32_t(newPt.y)));
+
+    mShouldCapture = true;
+    mStartTouch     = lastMousePt;
+    mLastPolledPt   = lastMousePt;
+}
+
+void CarouselApp::onMouseDrag(const tPoint2f& newPt)
+{
+    mLastPolledPt = tPoint2f(float(int32_t(newPt.x)), float(int32_t(newPt.y)));
+}
+
+void CarouselApp::onMouseUp(const tPoint2f& newPt)
+{
+    mEndTouch   = tPoint2f(float(int32_t(newPt.x)), float(int32_t(newPt.y)));
+
+    //TODO: Spot number needs to go here
+    [gWebViewInstance stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"realDrawLine(%d, '%s', %d, %d, %d, %d, %d);",
+                                                              mSpots[mSpotFinger]->getID(),
+                                                              colorToString(mSendPenColor).c_str(),
+                                                              (mSendPenColor == kWhite) ? 30 : (int)mSendPenSize,
+                                                              (int)mStartTouch.x, (int)mStartTouch.y, (int)mEndTouch.x, (int)mEndTouch.y]];
+    mShouldCapture = false;
+}
+
+void CarouselApp::onTimerTick(const tTimer* newTimer)
+{
+#pragma unused(newTimer)
+
+    if (mLastPolledPt != mStartTouch)
+    {
+        //                    printf("*** drawing (%d, %d) - (%d, %d)\n",
+        //                           (int)mStartTouch.x, (int)mStartTouch.y, (int)mLastPolledPt.x, (int)mLastPolledPt.y);
+
+        [gWebViewInstance stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"realDrawLine(%d, '%s', %d, %d, %d, %d, %d);",
+                                                                  mSpots[mSpotFinger]->getID(),
+                                                                  colorToString(mSendPenColor).c_str(),
+                                                                  (mSendPenColor == kWhite) ? 30 : (int)mSendPenSize,
+                                                                  (int)mStartTouch.x, (int)mStartTouch.y, (int)mLastPolledPt.x, (int)mLastPolledPt.y]];
+        mStartTouch = mLastPolledPt;
+    }
+}
+
+#pragma mark -
+
 void CarouselApp::startEntry()
 {
     tSGView::getInstance()->attach(this);
     tInputManager::getInstance()->tSubject<const tMouseEvent&>::attach(this);
     CallcastManager::getInstance()->tSubject<const CallcastEvent&>::attach(this);
 
-    mDrawingTimer = new tTimer(100);
+    mDrawingTimer = new tTimerPeer(100);
     mDrawingTimer->attach(this);
     mDrawingTimer->start();
 }
@@ -501,20 +546,7 @@ void CarouselApp::update(const tTimerEvent& msg)
     {
         switch (msg.mEvent)
         {
-            case tTimer::kTimerTick:
-                if (mLastPolledPt != mStartTouch)
-                {
-//                    printf("*** drawing (%d, %d) - (%d, %d)\n",
-//                           (int)mStartTouch.x, (int)mStartTouch.y, (int)mLastPolledPt.x, (int)mLastPolledPt.y);
-
-                    [gWebViewInstance stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"realDrawLine(%d, '%s', %d, %d, %d, %d, %d);",
-                                                                              mSpots[mSpotFinger]->getID(),
-                                                                              colorToString(mSendPenColor).c_str(),
-                                                                              (mSendPenColor == kWhite) ? 30 : (int)mSendPenSize,
-                                                                              (int)mStartTouch.x, (int)mStartTouch.y, (int)mLastPolledPt.x, (int)mLastPolledPt.y]];
-                    mStartTouch = mLastPolledPt;
-                }
-                break;
+            case tTimer::kTimerTick: onTimerTick(msg.mTimer); break;
 
             default: break;
         }
@@ -523,32 +555,11 @@ void CarouselApp::update(const tTimerEvent& msg)
 
 void CarouselApp::update(const tMouseEvent& msg)
 {
-    lastMousePt = tPoint2f(float(int32_t(msg.location.x)), float(int32_t(msg.location.y)));
-
     switch (msg.event)
     {
-        case tMouseEvent::kMouseDown:
-            mShouldCapture = true;
-            mStartTouch     = lastMousePt;
-            mLastPolledPt   = lastMousePt;
-            break;
-        case tMouseEvent::kMouseDrag:
-            mLastPolledPt = lastMousePt;
-            break;
-
-        case tMouseEvent::kMouseUp:
-        {
-            mEndTouch   = lastMousePt;
-
-            //TODO: Spot number needs to go here
-            [gWebViewInstance stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"realDrawLine(%d, '%s', %d, %d, %d, %d, %d);",
-                                                                      mSpots[mSpotFinger]->getID(),
-                                                                      colorToString(mSendPenColor).c_str(),
-                                                                      (mSendPenColor == kWhite) ? 30 : (int)mSendPenSize,
-                                                                      (int)mStartTouch.x, (int)mStartTouch.y, (int)mEndTouch.x, (int)mEndTouch.y]];
-            mShouldCapture = false;
-        }
-            break;
+        case tMouseEvent::kMouseDown:   onMouseDown(msg.location); break;
+        case tMouseEvent::kMouseDrag:   onMouseDrag(msg.location); break;
+        case tMouseEvent::kMouseUp:     onMouseUp(msg.location); break;
 
         default:
             break;
