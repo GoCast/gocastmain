@@ -89,7 +89,7 @@
     [super dealloc];
 }
 
-- (void)mouseEvent:(NSSet *)touches withEvent:(tTouchEvent::EventType)evt
+- (void)touchEvent:(NSSet *)touches withEvent:(tTouchEvent::EventType)evt
 {
     UITouch *touch = [touches anyObject];
     CGPoint touchPoint = [touch locationInView:self];
@@ -103,19 +103,19 @@
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
 #pragma unused(event)
-    [self mouseEvent:touches withEvent:tTouchEvent::kTouchBegin];
+    [self touchEvent:touches withEvent:tTouchEvent::kTouchBegin];
 }
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
 {
 #pragma unused(event)
-    [self mouseEvent:touches withEvent:tTouchEvent::kTouchDrag];
+    [self touchEvent:touches withEvent:tTouchEvent::kTouchDrag];
 }
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
 {
 #pragma unused(event)
-    [self mouseEvent:touches withEvent:tTouchEvent::kTouchEnd];
+    [self touchEvent:touches withEvent:tTouchEvent::kTouchEnd];
 }
 
 @end
