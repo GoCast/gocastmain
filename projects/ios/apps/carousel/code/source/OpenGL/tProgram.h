@@ -1,7 +1,5 @@
 #pragma once
 
-#include <set>
-
 class tProgram
 {
 protected:
