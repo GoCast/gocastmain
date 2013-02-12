@@ -3,65 +3,69 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 45;
+	objectVersion = 46;
 	objects = {
 
 /* Begin PBXBuildFile section */
-		055C4C922B8F982836CF665B /* 1px.png in Resources */ = {isa = PBXBuildFile; fileRef = 17DC51022D213B3BE40B4D2F /* 1px.png */; };
+		04243134890185B64FC7AC2B /* carouselarrowright.png in Resources */ = {isa = PBXBuildFile; fileRef = 6AA49A825C4C652602FD5D20 /* carouselarrowright.png */; };
+		080F33DF635CA8451C2BF51B /* carouselarrowleft.png in Resources */ = {isa = PBXBuildFile; fileRef = 87A73BD700335C69E968F0CF /* carouselarrowleft.png */; };
 		0D1131B7AB0AF5D3D94803EC /* www in Resources */ = {isa = PBXBuildFile; fileRef = 75E6EA81F45BFF94EFDA772A /* www */; };
 		0D99B9B1E0AF72CEE14FBC84 /* tShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A3B52E3EA721B2C116CB4BDF /* tShader.cpp */; };
 		16CF3C06892FA0159F56BA42 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 272118C382ADB0788DD475C9 /* AudioToolbox.framework */; };
 		19D362F20E4AAAC907DFC2D2 /* tTimerPeer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0CA36C5DBD6E5C8407C77041 /* tTimerPeer.mm */; };
+		22A6D75CAC697B2DC0CA02AA /* colorblue.png in Resources */ = {isa = PBXBuildFile; fileRef = 3A6FA51B6A4AD187B7BDF9F4 /* colorblue.png */; };
 		2DF5AE0A22A42DCE8D7E5E88 /* OpenGLView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 83102A9266B2BB0C3F20849B /* OpenGLView.mm */; };
 		39075184D38FB60E5999BEFB /* tTimer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16ACDD539B2DE6068F7C460F /* tTimer.cpp */; };
 		39352D225AC67D257B691EB7 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E96BF3286BB78EAAADC0A57A /* Foundation.framework */; };
 		396C5F55E07DE574E484F9BB /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 411E6E215ABA730DE4EFC537 /* CoreGraphics.framework */; };
-		3CD7AE6CC02EB8E7F3DEE649 /* spritesheet.vert in Resources */ = {isa = PBXBuildFile; fileRef = C139DA84CC3CF2A2CD32F273 /* spritesheet.vert */; };
 		3F3C09E0AA2E282E0316B180 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C838069FCF6EACE9304AE10C /* CFNetwork.framework */; };
 		409CF818EDBDAF0190FF55D1 /* libCordova.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C62FC56C15FB86F8E24A55CA /* libCordova.a */; };
 		424D412D985449097C8DC6C5 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F36CE187C31FC8D8E7850881 /* CoreLocation.framework */; };
 		4409A9ED94E96AB4CAC2C159 /* tSurfacePeer.mm in Sources */ = {isa = PBXBuildFile; fileRef = A3F93D338886817C741D112E /* tSurfacePeer.mm */; };
-		445B34E9AB9573EA460D544F /* eraser.png in Resources */ = {isa = PBXBuildFile; fileRef = 8B2D389B7ED5AC4EAFA1ED80 /* eraser.png */; };
-		45C66EE966E0A17E05FF9D28 /* colororange.png in Resources */ = {isa = PBXBuildFile; fileRef = 083B0BBF22E636898FB76966 /* colororange.png */; };
+		491D643A7747F55B5D1722CB /* 5px.png in Resources */ = {isa = PBXBuildFile; fileRef = 072904CD1C3E6122F02A6B25 /* 5px.png */; };
+		4BA12B0091457BAAF9ACFF96 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 9C18CE4BB4E9C8DF93918E29 /* InfoPlist.strings */; };
 		4D11AA21F0C6BD08E4DBDF4B /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ACBD77BC320339AFCEBD05E2 /* CoreMedia.framework */; };
-		4D9233F39E22C27C40F841C3 /* MainViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3AA6537E0CC26EF4A781B899 /* MainViewController.xib */; };
+		5B4645FA55469F168111E1AC /* eraser.png in Resources */ = {isa = PBXBuildFile; fileRef = 8B2D389B7ED5AC4EAFA1ED80 /* eraser.png */; };
 		624EAD02015D57C52B8E69AA /* tProgram.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CFF5BBC4DAF71060AA586293 /* tProgram.cpp */; };
-		6434AACA8BFDB4E54B34BAAD /* colorblue.png in Resources */ = {isa = PBXBuildFile; fileRef = 3A6FA51B6A4AD187B7BDF9F4 /* colorblue.png */; };
-		64A07376C112BE4A0083C8F9 /* colorblack.png in Resources */ = {isa = PBXBuildFile; fileRef = 6526BB3C6B48959381093D23 /* colorblack.png */; };
-		6AEB8CB545646CAA46F5CD2F /* carouselarrowleft.png in Resources */ = {isa = PBXBuildFile; fileRef = 87A73BD700335C69E968F0CF /* carouselarrowleft.png */; };
 		6CC80D77E21DC31ADDFADC15 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D21DC43692508DB38C23866C /* UIKit.framework */; };
+		6F428446312CCFF4FE4B86BD /* spritesheet.frag in Resources */ = {isa = PBXBuildFile; fileRef = 719929FE4CB470A6AD62DF0F /* spritesheet.frag */; };
 		708293EA325395C555B447EF /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6ED41382B83EB60BAABE37AF /* MobileCoreServices.framework */; };
-		70D328AA1CA9709CBAC14ED5 /* Cordova.plist in Resources */ = {isa = PBXBuildFile; fileRef = D7194E88971AA4E5865F3427 /* Cordova.plist */; };
 		718556432804CE46574B2636 /* Spot.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0AEE66ACD6CDF62F6366154F /* Spot.mm */; };
+		7195F97C4D462F28D1E9B2DD /* 1px.png in Resources */ = {isa = PBXBuildFile; fileRef = 17DC51022D213B3BE40B4D2F /* 1px.png */; };
 		74616480557379693E555FC6 /* CarouselApp.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1499F1FECDF8358B7F293AB9 /* CarouselApp.mm */; };
 		7D16CBAD06DF4F1A967DF631 /* AddressBookUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36569ED15C81D2B6924E0A43 /* AddressBookUI.framework */; };
+		8206220F77F2A6EB11CC167A /* 3px.png in Resources */ = {isa = PBXBuildFile; fileRef = C9E3D2F66F2589F9C5DF5325 /* 3px.png */; };
 		8276AB57CCA170AB1800EF8F /* WhiteboardSpot.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0B45BCE4E0435177B1908E62 /* WhiteboardSpot.mm */; };
 		86001511C0C7AF6D34004EB5 /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0DD38E8E271D3344A9BDC4D6 /* AddressBook.framework */; };
 		87D0C344623DB773CFAEB996 /* GCICallcast.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8A8261567DAEB3F988BB2131 /* GCICallcast.mm */; };
 		8913F2CA806F26838BC984FD /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DCFFB3193E4FDBEDD0C2656F /* SystemConfiguration.framework */; };
 		8F76F8A83A1068014EFE939F /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 67BEF084A2C1D3D8243B9D50 /* MediaPlayer.framework */; };
-		AC58E7884008832B11384D0D /* spritesheet.frag in Resources */ = {isa = PBXBuildFile; fileRef = 719929FE4CB470A6AD62DF0F /* spritesheet.frag */; };
+		9FE5BA5BB0DD82AFEB72B50A /* 10px.png in Resources */ = {isa = PBXBuildFile; fileRef = 48DEC97D1C4E1BDE085D99A7 /* 10px.png */; };
+		A50E45B6BFA9A338A118CF2F /* GoToken.png in Resources */ = {isa = PBXBuildFile; fileRef = B223B800A90B3F0B86B7773C /* GoToken.png */; };
+		A5B60851943F4E51546B4EC9 /* colorblack.png in Resources */ = {isa = PBXBuildFile; fileRef = 6526BB3C6B48959381093D23 /* colorblack.png */; };
+		A99E2EBCDFB94D76954AD88F /* GoToken-114.png in Resources */ = {isa = PBXBuildFile; fileRef = 03357586EC466D16C8BEF8A2 /* GoToken-114.png */; };
 		AC7F7E0EFCF659D9DE2C481A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = ABF2A4EF252357C6A2767092 /* AppDelegate.mm */; };
 		B1A24D4B4B5F7BA13770ACCD /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6108D4974A4F608C82695D7E /* AVFoundation.framework */; };
-		B1F5CB1C19FADBEDB8F5163C /* carouselarrowright.png in Resources */ = {isa = PBXBuildFile; fileRef = 6AA49A825C4C652602FD5D20 /* carouselarrowright.png */; };
+		B70129E86EE181916E70C262 /* Cordova.plist in Resources */ = {isa = PBXBuildFile; fileRef = D7194E88971AA4E5865F3427 /* Cordova.plist */; };
 		BC1C2936C653223E998255E6 /* tFile.mm in Sources */ = {isa = PBXBuildFile; fileRef = B4A1C41114DCC0B1EBECB2F1 /* tFile.mm */; };
+		BC47317A7457B542BF2E64B3 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = E4A399B89C6D8B4A74FDF8F2 /* Default-568h@2x.png */; };
 		BE7808795AC5AD78026151D1 /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 41457BA618A6B6E8FCBB620F /* main.mm */; };
-		C39B993E8F26E8A6E569CF72 /* 10px.png in Resources */ = {isa = PBXBuildFile; fileRef = 48DEC97D1C4E1BDE085D99A7 /* 10px.png */; };
+		BF8EB98F8423DE109920F56F /* colororange.png in Resources */ = {isa = PBXBuildFile; fileRef = 083B0BBF22E636898FB76966 /* colororange.png */; };
+		C33BA53C36D2683663C2ED8B /* colorred.png in Resources */ = {isa = PBXBuildFile; fileRef = 852028F6424142E9EFA47DC0 /* colorred.png */; };
+		CA63F93EB810434104172E58 /* spritesheet.vert in Resources */ = {isa = PBXBuildFile; fileRef = C139DA84CC3CF2A2CD32F273 /* spritesheet.vert */; };
 		CA7D725AD2805F1908B5BFBE /* tTexture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 09FA150B7647EA6DADF9AAF9 /* tTexture.cpp */; };
-		CC96C18753E57B6E0CCAFB5F /* 3px.png in Resources */ = {isa = PBXBuildFile; fileRef = C9E3D2F66F2589F9C5DF5325 /* 3px.png */; };
-		D52988A2E4ACCCC96D9A5A33 /* 5px.png in Resources */ = {isa = PBXBuildFile; fileRef = 072904CD1C3E6122F02A6B25 /* 5px.png */; };
 		D5D8EB5C54B095F73C304C5D /* tSurface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5CC4B70BEEC99963F5664C49 /* tSurface.cpp */; };
 		DA7B520E6C5609CFB9BB3329 /* ViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 86D21A995A6AF862F239927D /* ViewController.mm */; };
 		DE318249CDF7AA5BB3B1A04E /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 45AD10DD26EE99758E0D4670 /* OpenGLES.framework */; };
-		DEF7FE96B1BA7AAF4E10D1CF /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 9C18CE4BB4E9C8DF93918E29 /* InfoPlist.strings */; };
-		DF35F6E1CB19B2B3AD9B6BC9 /* GoToken.png in Resources */ = {isa = PBXBuildFile; fileRef = B223B800A90B3F0B86B7773C /* GoToken.png */; };
-		E09A27477E09BF0AEA853F84 /* colorred.png in Resources */ = {isa = PBXBuildFile; fileRef = 852028F6424142E9EFA47DC0 /* colorred.png */; };
-		E15333BBA1BB9AF2D68DA37B /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = E4A399B89C6D8B4A74FDF8F2 /* Default-568h@2x.png */; };
+		E7E61970AFF4E87CE129AF7B /* GoToken-57.png in Resources */ = {isa = PBXBuildFile; fileRef = 040544E51B850A78F123A3C0 /* GoToken-57.png */; };
+		EACB4233BDDCEFE2A6646881 /* MainViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3AA6537E0CC26EF4A781B899 /* MainViewController.xib */; };
 		EFC3D4A78AC709AE5064DCEB /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 527886977B9E5089544AE192 /* QuartzCore.framework */; };
 		FC67C0339BCE14B0412CF50E /* tPixelFormat.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A886F88044A01E0874CF0E90 /* tPixelFormat.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		03357586EC466D16C8BEF8A2 /* GoToken-114.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "GoToken-114.png"; sourceTree = "<group>"; };
+		040544E51B850A78F123A3C0 /* GoToken-57.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "GoToken-57.png"; sourceTree = "<group>"; };
 		0429BE46EE8659F09B60117D /* tProgram.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tProgram.h; sourceTree = "<group>"; };
 		072904CD1C3E6122F02A6B25 /* 5px.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 5px.png; sourceTree = "<group>"; };
 		083B0BBF22E636898FB76966 /* colororange.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = colororange.png; sourceTree = "<group>"; };
@@ -237,6 +241,33 @@
 			path = Base;
 			sourceTree = "<group>";
 		};
+		2C5B8C2969F5AFEB9385FD23 /* ios */ = {
+			isa = PBXGroup;
+			children = (
+				48DEC97D1C4E1BDE085D99A7 /* 10px.png */,
+				17DC51022D213B3BE40B4D2F /* 1px.png */,
+				C9E3D2F66F2589F9C5DF5325 /* 3px.png */,
+				072904CD1C3E6122F02A6B25 /* 5px.png */,
+				D7194E88971AA4E5865F3427 /* Cordova.plist */,
+				E4A399B89C6D8B4A74FDF8F2 /* Default-568h@2x.png */,
+				03357586EC466D16C8BEF8A2 /* GoToken-114.png */,
+				040544E51B850A78F123A3C0 /* GoToken-57.png */,
+				B223B800A90B3F0B86B7773C /* GoToken.png */,
+				9C18CE4BB4E9C8DF93918E29 /* InfoPlist.strings */,
+				3AA6537E0CC26EF4A781B899 /* MainViewController.xib */,
+				87A73BD700335C69E968F0CF /* carouselarrowleft.png */,
+				6AA49A825C4C652602FD5D20 /* carouselarrowright.png */,
+				6526BB3C6B48959381093D23 /* colorblack.png */,
+				3A6FA51B6A4AD187B7BDF9F4 /* colorblue.png */,
+				083B0BBF22E636898FB76966 /* colororange.png */,
+				852028F6424142E9EFA47DC0 /* colorred.png */,
+				8B2D389B7ED5AC4EAFA1ED80 /* eraser.png */,
+				719929FE4CB470A6AD62DF0F /* spritesheet.frag */,
+				C139DA84CC3CF2A2CD32F273 /* spritesheet.vert */,
+			);
+			path = ios;
+			sourceTree = "<group>";
+		};
 		591CE5712EF39658DE06ED3F /* Build */ = {
 			isa = PBXGroup;
 			children = (
@@ -283,31 +314,6 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		ABF2DD70AD0EB0E419299F10 /* ios */ = {
-			isa = PBXGroup;
-			children = (
-				48DEC97D1C4E1BDE085D99A7 /* 10px.png */,
-				17DC51022D213B3BE40B4D2F /* 1px.png */,
-				C9E3D2F66F2589F9C5DF5325 /* 3px.png */,
-				072904CD1C3E6122F02A6B25 /* 5px.png */,
-				D7194E88971AA4E5865F3427 /* Cordova.plist */,
-				E4A399B89C6D8B4A74FDF8F2 /* Default-568h@2x.png */,
-				B223B800A90B3F0B86B7773C /* GoToken.png */,
-				9C18CE4BB4E9C8DF93918E29 /* InfoPlist.strings */,
-				3AA6537E0CC26EF4A781B899 /* MainViewController.xib */,
-				87A73BD700335C69E968F0CF /* carouselarrowleft.png */,
-				6AA49A825C4C652602FD5D20 /* carouselarrowright.png */,
-				6526BB3C6B48959381093D23 /* colorblack.png */,
-				3A6FA51B6A4AD187B7BDF9F4 /* colorblue.png */,
-				083B0BBF22E636898FB76966 /* colororange.png */,
-				852028F6424142E9EFA47DC0 /* colorred.png */,
-				8B2D389B7ED5AC4EAFA1ED80 /* eraser.png */,
-				719929FE4CB470A6AD62DF0F /* spritesheet.frag */,
-				C139DA84CC3CF2A2CD32F273 /* spritesheet.vert */,
-			);
-			path = ios;
-			sourceTree = "<group>";
-		};
 		B0BE676F653BDDF6021A3760 /* ios */ = {
 			isa = PBXGroup;
 			children = (
@@ -352,7 +358,7 @@
 		C2C0057F6E15439AFBEB8CB4 /* rsrc */ = {
 			isa = PBXGroup;
 			children = (
-				ABF2DD70AD0EB0E419299F10 /* ios */,
+				2C5B8C2969F5AFEB9385FD23 /* ios */,
 				75E6EA81F45BFF94EFDA772A /* www */,
 			);
 			path = rsrc;
@@ -438,7 +444,11 @@
 			};
 			buildConfigurationList = 61B74A76653AB34E196D8845 /* Build configuration list for PBXProject "Whiteboard" */;
 			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
 			hasScannedForEncodings = 1;
+			knownRegions = (
+				en,
+			);
 			mainGroup = 0456162378FBD0D1E5D4D6A8;
 			projectDirPath = ../common;
 			projectRoot = "";
@@ -453,25 +463,27 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E15333BBA1BB9AF2D68DA37B /* Default-568h@2x.png in Resources */,
-				DF35F6E1CB19B2B3AD9B6BC9 /* GoToken.png in Resources */,
-				6AEB8CB545646CAA46F5CD2F /* carouselarrowleft.png in Resources */,
-				B1F5CB1C19FADBEDB8F5163C /* carouselarrowright.png in Resources */,
-				C39B993E8F26E8A6E569CF72 /* 10px.png in Resources */,
-				055C4C922B8F982836CF665B /* 1px.png in Resources */,
-				CC96C18753E57B6E0CCAFB5F /* 3px.png in Resources */,
-				D52988A2E4ACCCC96D9A5A33 /* 5px.png in Resources */,
-				64A07376C112BE4A0083C8F9 /* colorblack.png in Resources */,
-				6434AACA8BFDB4E54B34BAAD /* colorblue.png in Resources */,
-				45C66EE966E0A17E05FF9D28 /* colororange.png in Resources */,
-				E09A27477E09BF0AEA853F84 /* colorred.png in Resources */,
-				445B34E9AB9573EA460D544F /* eraser.png in Resources */,
-				AC58E7884008832B11384D0D /* spritesheet.frag in Resources */,
-				3CD7AE6CC02EB8E7F3DEE649 /* spritesheet.vert in Resources */,
-				70D328AA1CA9709CBAC14ED5 /* Cordova.plist in Resources */,
+				BC47317A7457B542BF2E64B3 /* Default-568h@2x.png in Resources */,
+				A99E2EBCDFB94D76954AD88F /* GoToken-114.png in Resources */,
+				E7E61970AFF4E87CE129AF7B /* GoToken-57.png in Resources */,
+				A50E45B6BFA9A338A118CF2F /* GoToken.png in Resources */,
+				080F33DF635CA8451C2BF51B /* carouselarrowleft.png in Resources */,
+				04243134890185B64FC7AC2B /* carouselarrowright.png in Resources */,
+				9FE5BA5BB0DD82AFEB72B50A /* 10px.png in Resources */,
+				7195F97C4D462F28D1E9B2DD /* 1px.png in Resources */,
+				8206220F77F2A6EB11CC167A /* 3px.png in Resources */,
+				491D643A7747F55B5D1722CB /* 5px.png in Resources */,
+				A5B60851943F4E51546B4EC9 /* colorblack.png in Resources */,
+				22A6D75CAC697B2DC0CA02AA /* colorblue.png in Resources */,
+				BF8EB98F8423DE109920F56F /* colororange.png in Resources */,
+				C33BA53C36D2683663C2ED8B /* colorred.png in Resources */,
+				5B4645FA55469F168111E1AC /* eraser.png in Resources */,
+				6F428446312CCFF4FE4B86BD /* spritesheet.frag in Resources */,
+				CA63F93EB810434104172E58 /* spritesheet.vert in Resources */,
+				B70129E86EE181916E70C262 /* Cordova.plist in Resources */,
 				0D1131B7AB0AF5D3D94803EC /* www in Resources */,
-				DEF7FE96B1BA7AAF4E10D1CF /* InfoPlist.strings in Resources */,
-				4D9233F39E22C27C40F841C3 /* MainViewController.xib in Resources */,
+				4BA12B0091457BAAF9ACFF96 /* InfoPlist.strings in Resources */,
+				EACB4233BDDCEFE2A6646881 /* MainViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -585,10 +597,14 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (
-					"-weak_framework CoreFoundation",
-					"-weak_framework UIKit",
-					"-weak_framework AVFoundation",
-					"-weak_framework CoreMedia",
+					"-weak_framework",
+					CoreFoundation,
+					"-weak_framework",
+					UIKit,
+					"-weak_framework",
+					AVFoundation,
+					"-weak_framework",
+					CoreMedia,
 					"-weak-lSystem",
 					"-all_load",
 					"-Obj-C",
@@ -709,10 +725,14 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
-					"-weak_framework CoreFoundation",
-					"-weak_framework UIKit",
-					"-weak_framework AVFoundation",
-					"-weak_framework CoreMedia",
+					"-weak_framework",
+					CoreFoundation,
+					"-weak_framework",
+					UIKit,
+					"-weak_framework",
+					AVFoundation,
+					"-weak_framework",
+					CoreMedia,
 					"-weak-lSystem",
 					"-all_load",
 					"-Obj-C",
