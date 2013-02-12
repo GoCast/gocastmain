@@ -29,15 +29,17 @@
 						'../../source/Testbed/Whiteboard/WhiteboardSpot.mm',
 						'../../source/Testbed/Whiteboard/WhiteboardSpot.h',
 
-						'../../source/Testbed/Whiteboard/LoginView.mm',
-						'../../source/Testbed/Whiteboard/LoginView.h',
-
 						'../../source/Testbed/Whiteboard/CallcastEvent.h',
 						'../../source/Testbed/Whiteboard/WhiteboardEvent.h',
 						'../../source/Testbed/Whiteboard/CallcastManager.h',
 
 						'../../source/Testbed/Whiteboard/GCICallcast.mm',
 						'../../source/Testbed/Whiteboard/GCICallcast.h',
+
+						'../../source/Testbed/Whiteboard/<@(OS)/AppDelegate.h',
+						'../../source/Testbed/Whiteboard/<@(OS)/AppDelegate.mm',
+						'../../source/Testbed/Whiteboard/<@(OS)/ViewController.h',
+						'../../source/Testbed/Whiteboard/<@(OS)/ViewController.mm',
 
 						'../../source/Base/package.h',
 						'../../source/Base/tObserver.h',
@@ -108,11 +110,7 @@
 							'sources': [
 								'../../source/Bootstrap/<@(OS)/OpenGLView.mm',
 								'../../source/Bootstrap/<@(OS)/OpenGLView.h',
-								'../../source/Bootstrap/<@(OS)/AppDelegate.h',
-								'../../source/Bootstrap/<@(OS)/AppDelegate.mm',
 								'../../source/Bootstrap/<@(OS)/main.mm',
-								'../../source/Bootstrap/<@(OS)/ViewController.h',
-								'../../source/Bootstrap/<@(OS)/ViewController.mm',
 							],	# sources
 	
 							'mac_bundle_resources': [

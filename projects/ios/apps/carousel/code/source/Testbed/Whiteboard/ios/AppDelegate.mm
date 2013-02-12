@@ -26,11 +26,7 @@
 //
 
 #import "AppDelegate.h"
-#import "LoginView.h"
 #import "ViewController.h"
-
-#import "LoginView.h"
-
 
 #import <Cordova/CDVPlugin.h>
 
