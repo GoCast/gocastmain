@@ -44,6 +44,7 @@
 		4A0AEDAAF950A39FC7583DAA /* tFile.mm in Sources */ = {isa = PBXBuildFile; fileRef = B4A1C41114DCC0B1EBECB2F1 /* tFile.mm */; };
 		4D11AA21F0C6BD08E4DBDF4B /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ACBD77BC320339AFCEBD05E2 /* CoreMedia.framework */; };
 		605878F11A92248994097CB1 /* GoToken.png in Resources */ = {isa = PBXBuildFile; fileRef = B223B800A90B3F0B86B7773C /* GoToken.png */; };
+		61E061383825CBDC3309BEA9 /* LoginView.mm in Sources */ = {isa = PBXBuildFile; fileRef = A972318042313B22BC557297 /* LoginView.mm */; };
 		6C14B6F0ED70B40387BA3DAB /* LoginView.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB7B1641F15746F6CCA6A169 /* LoginView.xib */; };
 		6CC80D77E21DC31ADDFADC15 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D21DC43692508DB38C23866C /* UIKit.framework */; };
 		708293EA325395C555B447EF /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6ED41382B83EB60BAABE37AF /* MobileCoreServices.framework */; };
@@ -56,22 +57,20 @@
 		8913F2CA806F26838BC984FD /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DCFFB3193E4FDBEDD0C2656F /* SystemConfiguration.framework */; };
 		8F76F8A83A1068014EFE939F /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 67BEF084A2C1D3D8243B9D50 /* MediaPlayer.framework */; };
 		91E07E13A7377DC7E3578984 /* colorblack.png in Resources */ = {isa = PBXBuildFile; fileRef = 6526BB3C6B48959381093D23 /* colorblack.png */; };
-		9B0655E98A4697188F368DFD /* GCICallcast.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8A8261567DAEB3F988BB2131 /* GCICallcast.mm */; };
 		A7D404C2CB16B378028BE3AC /* tTexture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 09FA150B7647EA6DADF9AAF9 /* tTexture.cpp */; };
 		B0FBDCF52D219D5081778C33 /* OpenGLView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 83102A9266B2BB0C3F20849B /* OpenGLView.mm */; };
 		B1A24D4B4B5F7BA13770ACCD /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6108D4974A4F608C82695D7E /* AVFoundation.framework */; };
 		B8BE5531CCF911C5C0C7071B /* tSurfacePeer.mm in Sources */ = {isa = PBXBuildFile; fileRef = A3F93D338886817C741D112E /* tSurfacePeer.mm */; };
 		BAE7393A97C01052CA3B366B /* tTimer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16ACDD539B2DE6068F7C460F /* tTimer.cpp */; };
 		BAF9EA6EC45D99DBC3AE5277 /* colorred.png in Resources */ = {isa = PBXBuildFile; fileRef = 852028F6424142E9EFA47DC0 /* colorred.png */; };
-		C031AF83E441F5DAE5F319AC /* LoginView.mm in Sources */ = {isa = PBXBuildFile; fileRef = A972318042313B22BC557297 /* LoginView.mm */; };
+		BF4B24BFECF9F04FE6828138 /* CarouselApp.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1499F1FECDF8358B7F293AB9 /* CarouselApp.mm */; };
 		C238407F0C3499F8DE69567C /* 1px.png in Resources */ = {isa = PBXBuildFile; fileRef = 17DC51022D213B3BE40B4D2F /* 1px.png */; };
 		C24DBB7353A4D7718C4F6E9C /* tTimerPeer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0CA36C5DBD6E5C8407C77041 /* tTimerPeer.mm */; };
-		C2A77144FEFDDAC1FC0EE9AC /* CarouselApp.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1499F1FECDF8358B7F293AB9 /* CarouselApp.mm */; };
+		C800AA09A16D9BE911DF2BF4 /* GCICallcast.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8A8261567DAEB3F988BB2131 /* GCICallcast.mm */; };
 		DE318249CDF7AA5BB3B1A04E /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 45AD10DD26EE99758E0D4670 /* OpenGLES.framework */; };
 		E135E870052775754E819FD3 /* colororange.png in Resources */ = {isa = PBXBuildFile; fileRef = 083B0BBF22E636898FB76966 /* colororange.png */; };
 		E5A65A712068D2E571523762 /* tShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A3B52E3EA721B2C116CB4BDF /* tShader.cpp */; };
 		E7719233871D105A4AB140EF /* colorblue.png in Resources */ = {isa = PBXBuildFile; fileRef = 3A6FA51B6A4AD187B7BDF9F4 /* colorblue.png */; };
-		ED0ACF835902795222FFF319 /* Whiteboard.mm in Sources */ = {isa = PBXBuildFile; fileRef = F0A74EBFC5BBEEB301BE0385 /* Whiteboard.mm */; };
 		EE74E99BC7A1467FB9914350 /* spritesheet.frag in Resources */ = {isa = PBXBuildFile; fileRef = 719929FE4CB470A6AD62DF0F /* spritesheet.frag */; };
 		EFC3D4A78AC709AE5064DCEB /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 527886977B9E5089544AE192 /* QuartzCore.framework */; };
 		FB5FA224983BAEAC5A8A15C7 /* tPixelFormat.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A886F88044A01E0874CF0E90 /* tPixelFormat.cpp */; };
@@ -100,7 +99,6 @@
 		163EC79BB530657307FA85C0 /* tPixelFormat.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tPixelFormat.h; sourceTree = "<group>"; };
 		16ACDD539B2DE6068F7C460F /* tTimer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = tTimer.cpp; sourceTree = "<group>"; };
 		17DC51022D213B3BE40B4D2F /* 1px.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 1px.png; sourceTree = "<group>"; };
-		18706E684443CA2FE1BC4B6F /* Whiteboard.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Whiteboard.h; sourceTree = "<group>"; };
 		1973A9A42F49A5099790D0EF /* tFile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tFile.h; sourceTree = "<group>"; };
 		272118C382ADB0788DD475C9 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		30060B4CDC358A711E95F89F /* tSingleton.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tSingleton.h; sourceTree = "<group>"; };
@@ -170,7 +168,6 @@
 		EB08A3480B47BB3F94165A7E /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		EB1E3D7822671F1C635CB8EC /* tTexture.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tTexture.h; sourceTree = "<group>"; };
 		EDA9BE0D90319E141D72EDF3 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/LoginView.xib; sourceTree = "<group>"; };
-		F0A74EBFC5BBEEB301BE0385 /* Whiteboard.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = Whiteboard.mm; sourceTree = "<group>"; };
 		F22E1B898E321323B65CC832 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		F36CE187C31FC8D8E7850881 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
 		F7C98D8853AB3806EE7996DC /* AppDelegate.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = AppDelegate.mm; sourceTree = "<group>"; };
@@ -331,6 +328,21 @@
 			path = ios;
 			sourceTree = "<group>";
 		};
+		B508FFD97644ADA19631701D /* Testbed/Whiteboard */ = {
+			isa = PBXGroup;
+			children = (
+				A79C1004A56BA9D1E9F59BEA /* CallcastEvent.h */,
+				A0B09A4813FF124C1769DFB6 /* CallcastManager.h */,
+				8920B147AFD619DD4FC9177B /* CarouselApp.h */,
+				1499F1FECDF8358B7F293AB9 /* CarouselApp.mm */,
+				95ED5BBA83A915FFE39E7910 /* GCICallcast.h */,
+				8A8261567DAEB3F988BB2131 /* GCICallcast.mm */,
+				660D15570C361C4FA223B2F4 /* LoginView.h */,
+				A972318042313B22BC557297 /* LoginView.mm */,
+			);
+			path = Testbed/Whiteboard;
+			sourceTree = "<group>";
+		};
 		B725B79358BFD482911D6690 /* Io */ = {
 			isa = PBXGroup;
 			children = (
@@ -403,7 +415,7 @@
 				B725B79358BFD482911D6690 /* Io */,
 				D8A89EC23F5F025598003924 /* Math */,
 				CD1732A175D168FAB36BB309 /* OpenGL */,
-				E1C989056175B58404B052CF /* Testbed/Whiteboard */,
+				B508FFD97644ADA19631701D /* Testbed/Whiteboard */,
 			);
 			path = source;
 			sourceTree = "<group>";
@@ -415,23 +427,6 @@
 				E5C8BA65286D17F0A1409AF2 /* tRect.h */,
 			);
 			path = Math;
-			sourceTree = "<group>";
-		};
-		E1C989056175B58404B052CF /* Testbed/Whiteboard */ = {
-			isa = PBXGroup;
-			children = (
-				A79C1004A56BA9D1E9F59BEA /* CallcastEvent.h */,
-				A0B09A4813FF124C1769DFB6 /* CallcastManager.h */,
-				8920B147AFD619DD4FC9177B /* CarouselApp.h */,
-				1499F1FECDF8358B7F293AB9 /* CarouselApp.mm */,
-				95ED5BBA83A915FFE39E7910 /* GCICallcast.h */,
-				8A8261567DAEB3F988BB2131 /* GCICallcast.mm */,
-				660D15570C361C4FA223B2F4 /* LoginView.h */,
-				A972318042313B22BC557297 /* LoginView.mm */,
-				18706E684443CA2FE1BC4B6F /* Whiteboard.h */,
-				F0A74EBFC5BBEEB301BE0385 /* Whiteboard.mm */,
-			);
-			path = Testbed/Whiteboard;
 			sourceTree = "<group>";
 		};
 		E2A526ED07BF7CAF0FA786F8 /* ios */ = {
@@ -539,10 +534,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C2A77144FEFDDAC1FC0EE9AC /* CarouselApp.mm in Sources */,
-				C031AF83E441F5DAE5F319AC /* LoginView.mm in Sources */,
-				ED0ACF835902795222FFF319 /* Whiteboard.mm in Sources */,
-				9B0655E98A4697188F368DFD /* GCICallcast.mm in Sources */,
+				BF4B24BFECF9F04FE6828138 /* CarouselApp.mm in Sources */,
+				61E061383825CBDC3309BEA9 /* LoginView.mm in Sources */,
+				C800AA09A16D9BE911DF2BF4 /* GCICallcast.mm in Sources */,
 				BAE7393A97C01052CA3B366B /* tTimer.cpp in Sources */,
 				C24DBB7353A4D7718C4F6E9C /* tTimerPeer.mm in Sources */,
 				4A0AEDAAF950A39FC7583DAA /* tFile.mm in Sources */,

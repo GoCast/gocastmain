@@ -26,9 +26,6 @@
 						'../../source/Testbed/Whiteboard/LoginView.mm',
 						'../../source/Testbed/Whiteboard/LoginView.h',
 
-						'../../source/Testbed/Whiteboard/Whiteboard.mm',
-						'../../source/Testbed/Whiteboard/Whiteboard.h',
-
 						'../../source/Testbed/Whiteboard/CallcastEvent.h',
 						'../../source/Testbed/Whiteboard/CallcastManager.h',
 
