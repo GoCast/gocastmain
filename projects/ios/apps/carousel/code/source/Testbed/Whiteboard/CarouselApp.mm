@@ -13,12 +13,6 @@
 
 #include "AppDelegate.h"
 
-/*
- Sample raw JSON we send for strokes:
-
-[{"name":"save","settings":{"colorName":"dontcare","lineWidth":"5","strokeStyle":"#00F","lineJoin":"round"}},{"name":"beginPath"},{"name":"moveTo","x":295,"y":133},{"name":"lineTo","x":295,"y":173},{"name":"stroke"},{"name":"restore"}]
- */
-
 const tDimension2f  kSurfaceSize(256,256);
 const tDimension2f  kVisibleSize(500,500);
 const tDimension2f  kSpotSize(300,300);
@@ -369,13 +363,19 @@ void CarouselApp::onEraseButton()
 
 #pragma mark -
 
+/*
+ Sample raw JSON we send for strokes:
+
+ [{\"name\":\"save\",\"settings\":{\"colorName\":\"dontcare\",\"lineWidth\":\"%d\",\"strokeStyle\":\"%s\",\"lineJoin\":\"round\"}},{\"name\":\"beginPath\"},{\"name\":\"moveTo\",\"x\":%d,\"y\":%d},{\"name\":\"lineTo\",\"x\":%d,\"y\":%d},{\"name\":\"stroke\"},{\"name\":\"restore\"}]
+ */
+
 void CarouselApp::queueLine(const int32_t& newID, const tColor4b& newColor, const int32_t& newPenSize, const tPoint2f& newSt, const tPoint2f& newEn)
 {
-    char buf[255];
-    sprintf(buf, "realDrawLine(%d, '%s', %d, %d, %d, %d, %d);",
-            newID,
-            colorToString(newColor).c_str(),
+#pragma unused(newID)
+    char buf[512];
+    sprintf(buf, "[{\"name\":\"save\",\"settings\":{\"colorName\":\"dontcare\",\"lineWidth\":\"%d\",\"strokeStyle\":\"%s\",\"lineJoin\":\"round\"}},{\"name\":\"beginPath\"},{\"name\":\"moveTo\",\"x\":%d,\"y\":%d},{\"name\":\"lineTo\",\"x\":%d,\"y\":%d},{\"name\":\"stroke\"},{\"name\":\"restore\"}]",
             newPenSize,
+            colorToString(newColor).c_str(),
             (int)newSt.x, (int)newSt.y, (int)newEn.x, (int)newEn.y);
 
     mJSONStrings.push(std::string(buf));
@@ -383,7 +383,11 @@ void CarouselApp::queueLine(const int32_t& newID, const tColor4b& newColor, cons
 
 void CarouselApp::sendStrings()
 {
-    [gWebViewInstance stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"%s", mJSONStrings.front().c_str()]];
+    //"Callcast.SendSingleStroke({stroke: '%s', spotnumber: %d});"
+
+    [gWebViewInstance stringByEvaluatingJavaScriptFromString:[NSString
+                                                              stringWithFormat:@"Callcast.SendSingleStroke({stroke: '%s', spotnumber: %d});",
+                                                              mJSONStrings.front().c_str(), mSpots[mSpotFinger]->getID()]];
 }
 
 #pragma mark -
