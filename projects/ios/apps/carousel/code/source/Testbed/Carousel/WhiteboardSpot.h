@@ -15,7 +15,6 @@ public:
     virtual ~WhiteboardSpot();
 
     tSurface*   getSurface();
-    void        replaceSurface(tSurface* newSurface);
 
     void onSave(const tColor4b& nc, const float& np);
     void onMoveTo(const tPoint2f& pt);

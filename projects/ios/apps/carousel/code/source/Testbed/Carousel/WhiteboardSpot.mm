@@ -53,16 +53,6 @@ tSurface* WhiteboardSpot::getSurface()
     return mSurface;
 }
 
-void WhiteboardSpot::replaceSurface(tSurface* newSurface)
-{
-    if (mSurface)
-    {
-        delete mSurface;
-    }
-
-    mSurface = newSurface;
-}
-
 void WhiteboardSpot::onSave(const tColor4b& nc, const float& np)
 {
     mReceivePenColor    = nc;
@@ -94,7 +84,6 @@ void WhiteboardSpot::onLoadImageURL(const std::string& newURL)
     tSurface urlSurface(newURL, kSurfaceSize);
     mSurface->fillWhiteAlpha();
     mSurface->copyRect(urlSurface, tRectf(0,0, urlSurface.getSize()), tPoint2f(0,0));
-//    replaceSurface(new tSurface(newURL));
 
     gCarouselApp.refresh(mID);
 }
