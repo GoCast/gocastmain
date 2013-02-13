@@ -55,8 +55,9 @@ public:
     /// @see FB::JSAPIAuto::registerEvent
     ////////////////////////////////////////////////////////////////////////////
     GCPAPI(const GCPPtr& plugin, const FB::BrowserHostPtr& host)
-//    : m_readyState("PRENEW")
-    : m_plugin(plugin)
+    : m_signalingState("preinit")
+    , m_iceState("preinit")
+    , m_plugin(plugin)
     , m_host(host)
     , m_htmlId("")
     , m_pSetLocalSDPObserver(new talk_base::RefCountedObject<SetSDPObserver>(this))
@@ -84,13 +85,14 @@ public:
         
         // Properties
         registerProperty("version", make_property(this, &GCPAPI::get_version));
-        //registerProperty("readyState", make_property(this, &GCPAPI::get_readyState));
+        registerProperty("signalingstate", make_property(this, &GCPAPI::get_signalingState));
+        registerProperty("icestate", make_property(this, &GCPAPI::get_iceState));
         registerProperty("onaddstream", make_property(this, &GCPAPI::get_onaddstream,
                                                             &GCPAPI::set_onaddstream));
         registerProperty("onremovestream", make_property(this, &GCPAPI::get_onremovestream,
                                                                &GCPAPI::set_onremovestream));
-        //registerProperty("onreadystatechange", make_property(this, &GCPAPI::get_onreadystatechange,
-        //                                                           &GCPAPI::set_onreadystatechange));
+        registerProperty("onstatechange", make_property(this, &GCPAPI::get_onstatechange,
+                                                              &GCPAPI::set_onstatechange));
         registerProperty("source", make_property(this, &GCPAPI::get_source, &GCPAPI::set_source));
         registerProperty("volume", make_property(this, &GCPAPI::get_volume, &GCPAPI::set_volume));
         registerProperty("micvolume", make_property(this, &GCPAPI::get_micvolume, &GCPAPI::set_micvolume));
@@ -113,10 +115,11 @@ public:
 
     // Property get methods
     std::string get_version();
-    //std::string get_readyState();
+    std::string get_signalingState();
+    std::string get_iceState();
     FB::JSObjectPtr get_onaddstream();
     FB::JSObjectPtr get_onremovestream();
-    //FB::JSObjectPtr get_onreadystatechange();
+    FB::JSObjectPtr get_onstatechange();
     FB::JSAPIPtr get_source();
     FB::variant get_volume();
     FB::variant get_micvolume();
@@ -128,7 +131,7 @@ public:
     // Property set methods
     void set_onaddstream(const FB::JSObjectPtr& onaddstream);
     void set_onremovestream(const FB::JSObjectPtr& onremovestream);
-    //void set_onreadystatechange(const FB::JSObjectPtr& onreadystatechange);
+    void set_onstatechange(const FB::JSObjectPtr& onstatechange);
     void set_source(const FB::JSAPIPtr& stream);
     void set_volume(FB::variant volume);
     void set_micvolume(FB::variant volume);
@@ -174,20 +177,18 @@ public:
 private:
     // --------------------- PeerConnectionObserver Methods -----------------
     virtual void OnError() {};
-    //virtual void OnMessage(const std::string& msg) {};
-    //virtual void OnSignalingMessage(const std::string& msg) {};    
-    virtual void OnStateChange(StateType state_changed) {};
+    virtual void OnStateChange(StateType state_changed);
     virtual void OnAddStream(webrtc::MediaStreamInterface* pRemoteStream);
     virtual void OnRemoveStream(webrtc::MediaStreamInterface* pRemoteStream);
     virtual void OnIceCandidate(const webrtc::IceCandidateInterface* pCandidate);
-    //virtual void OnIceComplete() {};
     
 private:
-    //std::string m_readyState;
+    std::string m_signalingState;
+    std::string m_iceState;
     FB::JSObjectPtr m_iceCb;
     FB::JSObjectPtr m_onaddstreamCb;
     FB::JSObjectPtr m_onremovestreamCb;
-    //FB::JSObjectPtr m_onreadystatechangeCb;
+    FB::JSObjectPtr m_onstatechangeCb;
     FB::JSObjectPtr m_oncreatesdpsuccessCb;
     FB::JSObjectPtr m_oncreatesdpfailureCb;
     FB::JSObjectPtr m_onsetsdpsuccessCb;

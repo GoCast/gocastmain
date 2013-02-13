@@ -24,6 +24,13 @@
 				plugin1.onremovestream = function(stream) {
 					console.log('Rmved Stream: ', stream.label)
 				};
+				plugin1.onstatechange = function(type) {
+					if ('signaling-state' === type) {
+						console.log('Signaling State: ', plugin1.signalingstate);
+					} else if ('ice-state' === type) {
+						console.log('Ice State: ', plugin1.icestate);
+					}
+				}
 				plugin1.init('remotePlayer', '', onice);
 				plugin1.addStream(stream);
 				plugin1.createOffer(function(desc) {
@@ -51,10 +58,10 @@
 							videoin: plugin.videoinopts['default'],
 							webrtc: {
 								mandatory: {
-									minWidth: '640',
-									maxWidth: '640',
-									minHeight: '480',
-									maxHeight: '480',
+									minWidth: '160',
+									maxWidth: '160',
+									minHeight: '120',
+									maxHeight: '120',
 									minFrameRate: '14',
 									maxFrameRate: '14'
 								}
@@ -79,8 +86,6 @@
 						plugin.setLocalDescription('offer', desc, function() {
 							console.log('SetLocalDescription: Success');
 							plugin.source = stream;
-							//plugin.width = constraints.videoconstraints.webrtc.mandatory.maxWidth;
-							//plugin.height = constraints.videoconstraints.webrtc.mandatory.maxHeight;
 							ongetusermediasuccess(stream);
 						}, function(error) {
 							console.log('SetLocalDescription: ', error);
@@ -93,9 +98,9 @@
 		</script>
 	</head>
 	<body>
-		<object id="localPlayer" type="application/x-gocastplayer" width="640" height="480">
+		<object id="localPlayer" type="application/x-gocastplayer" width="320" height="240">
 		</object>
-		<object id="remotePlayer" type="application/x-gocastplayer" width="640" height="480">
+		<object id="remotePlayer" type="application/x-gocastplayer" width="320" height="240">
 			<param name="onload" value="onpluginload"></param>
 		</object>
 	</body>

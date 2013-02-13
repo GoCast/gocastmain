@@ -48,10 +48,31 @@ std::string GCPAPI::get_version()
     return FBSTRING_PLUGIN_VERSION;
 }
 
-/*std::string GCPAPI::get_readyState()
+std::string GCPAPI::get_signalingState()
 {
-    return m_readyState;
-}*/
+    GoCast::RtcCenter* pCtr = GoCast::RtcCenter::Instance();
+    
+    if(true == pCtr->Inited())
+    {
+        m_signalingState = pCtr->SignalingState(m_htmlId.convert_cast<std::string>());
+        return m_signalingState;
+    }
+    
+    return "invalid";
+}
+
+std::string GCPAPI::get_iceState()
+{
+    GoCast::RtcCenter* pCtr = GoCast::RtcCenter::Instance();
+    
+    if(true == pCtr->Inited())
+    {
+        m_iceState = pCtr->IceState(m_htmlId.convert_cast<std::string>());
+        return m_iceState;
+    }
+    
+    return "invalid";
+}
 
 FB::JSAPIPtr GCPAPI::get_source()
 {
@@ -104,10 +125,10 @@ FB::JSObjectPtr GCPAPI::get_onremovestream()
     return m_onremovestreamCb;
 }
 
-/*FB::JSObjectPtr GCPAPI::get_onreadystatechange()
+FB::JSObjectPtr GCPAPI::get_onstatechange()
 {
-    return m_onreadystatechangeCb;
-}*/
+    return m_onstatechangeCb;
+}
 
 FB::VariantMap GCPAPI::get_videoinopts()
 {
@@ -181,10 +202,10 @@ void GCPAPI::set_onremovestream(const FB::JSObjectPtr &onremovestream)
     m_onremovestreamCb = onremovestream;
 }
 
-/*void GCPAPI::set_onreadystatechange(const FB::JSObjectPtr &onreadystatechange)
+void GCPAPI::set_onstatechange(const FB::JSObjectPtr &onstatechange)
 {
-    m_onreadystatechangeCb = onreadystatechange;
-}*/
+    m_onstatechangeCb = onstatechange;
+}
 
 void GCPAPI::set_source(const FB::JSAPIPtr& stream)
 {
@@ -283,11 +304,13 @@ FB::variant GCPAPI::Init(const FB::variant& htmlId,
                                         iceConfig.convert_cast<std::string>(),
                                         this))
     {
-        //m_readyState = "INVALID";
+        m_signalingState = "invalid";
+        m_iceState = "invalid";
         return false;
     }
     
-    //m_readyState = pCtr->ReadyState(m_htmlId.convert_cast<std::string>());
+    m_signalingState = pCtr->SignalingState(m_htmlId.convert_cast<std::string>());
+    m_iceState = pCtr->IceState(m_htmlId.convert_cast<std::string>());
     return true;
 }
 
@@ -460,7 +483,7 @@ void GCPAPI::LogFunction(const FB::JSObjectPtr& func)
     GoCast::JSLogger::Instance()->LogFunction(func);
 }
 
-/*void GCPAPI::OnStateChange(StateType state_changed)
+void GCPAPI::OnStateChange(StateType state_changed)
 {
     GoCast::RtcCenter* pCtr = GoCast::RtcCenter::Instance();
     
@@ -474,21 +497,34 @@ void GCPAPI::LogFunction(const FB::JSObjectPtr& func)
 
     switch(state_changed)
     {
-        case webrtc::PeerConnectionObserver::kReadyState:
+        case webrtc::PeerConnectionObserver::kSignalingState:
         {
-            m_readyState = pCtr->ReadyState(m_htmlId.convert_cast<std::string>());
-            if(NULL != m_onreadystatechangeCb.get())
+            m_signalingState = pCtr->SignalingState(m_htmlId.convert_cast<std::string>());
+            if(NULL != m_onstatechangeCb.get())
             {
-                m_onreadystatechangeCb->InvokeAsync("", FB::variant_list_of());
+                m_onstatechangeCb->InvokeAsync("", FB::variant_list_of("signaling-state"));
             }
             
             std::string msg = m_htmlId.convert_cast<std::string>();
-            msg += ": ReadyState = ";
-            msg += m_readyState;
+            msg += ": SignalingState = ";
+            msg += m_signalingState;
             FBLOG_INFO_CUSTOM("GCPAPI::OnStateChange", msg);
             break;
         }
+        case webrtc::PeerConnectionObserver::kIceState:
+        {
+            m_iceState = pCtr->IceState(m_htmlId.convert_cast<std::string>());
+            if(NULL != m_onstatechangeCb.get())
+            {
+                m_onstatechangeCb->InvokeAsync("", FB::variant_list_of("ice-state"));
+            }
             
+            std::string msg = m_htmlId.convert_cast<std::string>();
+            msg += ": IceState = ";
+            msg += m_iceState;
+            FBLOG_INFO_CUSTOM("GCPAPI::OnStateChange", msg);
+            break;
+        }            
         default:
         {
             std::string msg = m_htmlId.convert_cast<std::string>();
@@ -497,7 +533,7 @@ void GCPAPI::LogFunction(const FB::JSObjectPtr& func)
             break;
         }
     }
-}*/
+}
 
 void GCPAPI::OnAddStream(webrtc::MediaStreamInterface* pRemoteStream)
 {

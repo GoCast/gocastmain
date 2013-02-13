@@ -107,8 +107,9 @@ namespace GoCast
                                   bool bSyncCall = true);
         
     public:
-        //std::string ReadyState(const std::string& pluginId);
-                
+        std::string SignalingState(const std::string& pluginId);
+        std::string IceState(const std::string& pluginId);
+        
         bool Inited() const;
         bool GetLocalVideoTrackEnabled() const;        
         bool GetLocalAudioTrackEnabled() const;

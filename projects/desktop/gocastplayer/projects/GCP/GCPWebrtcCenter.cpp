@@ -83,20 +83,37 @@ namespace GoCast
     void LocalVideoTrack::set_effect(FB::variant effect)
     {
         (RtcCenter::Instance())->SetLocalVideoTrackEffect(effect.convert_cast<std::string>());
-    }
+    }*/
     
-    std::string GetReadyStateString(webrtc::PeerConnectionInterface::ReadyState state)
+    std::string GetSigStateString(webrtc::PeerConnectionInterface::SignalingState state)
     {
         switch(state)
         {
-            case webrtc::PeerConnectionInterface::kNew: return "NEW";
-            case webrtc::PeerConnectionInterface::kNegotiating: return "NEGOTIATING";
-            case webrtc::PeerConnectionInterface::kActive: return "ACTIVE";
-            case webrtc::PeerConnectionInterface::kClosing: return "CLOSING";
-            case webrtc::PeerConnectionInterface::kClosed: return "CLOSED";
-            default: return "UNKNOWN";
+            case webrtc::PeerConnectionInterface::kStable: return "stable";
+            case webrtc::PeerConnectionInterface::kHaveLocalOffer: return "have-local-offer";
+            case webrtc::PeerConnectionInterface::kHaveRemoteOffer: return "have-remote-offer";
+            case webrtc::PeerConnectionInterface::kHaveLocalPrAnswer: return "have-local-answer";
+            case webrtc::PeerConnectionInterface::kHaveRemotePrAnswer: return "have-remote-answer";
+            case webrtc::PeerConnectionInterface::kClosed: return "closed";
+            default: return "unknown";
         }
-    }*/
+    }
+    
+    std::string GetIceStateString(webrtc::PeerConnectionInterface::IceState state)
+    {
+        switch(state)
+        {
+            case webrtc::PeerConnectionInterface::kIceNew: return "new";
+            case webrtc::PeerConnectionInterface::kIceWaiting: return "waiting";
+            case webrtc::PeerConnectionInterface::kIceGathering: return "gathering";
+            case webrtc::PeerConnectionInterface::kIceFailed: return "failed";
+            case webrtc::PeerConnectionInterface::kIceConnected: return "connected";
+            case webrtc::PeerConnectionInterface::kIceCompleted: return "completed";
+            case webrtc::PeerConnectionInterface::kIceClosed: return "closed";
+            case webrtc::PeerConnectionInterface::kIceChecking: return "checking";
+            default: return "unknown";
+        }
+    }
     
     struct GetUserMediaParams : public talk_base::MessageData
     {
@@ -553,11 +570,16 @@ namespace GoCast
         return DeletePeerConnection_w(pluginId);
     }
     
-    /*std::string RtcCenter::ReadyState(const std::string& pluginId)
+    std::string RtcCenter::SignalingState(const std::string& pluginId)
     {
-        return GetReadyStateString(m_pPeerConns[pluginId]->ready_state());        
-    }*/
-    
+        return GetSigStateString(m_pPeerConns[pluginId]->signaling_state());        
+    }
+
+    std::string RtcCenter::IceState(const std::string& pluginId)
+    {
+        return GetIceStateString(m_pPeerConns[pluginId]->ice_state());        
+    }
+
     bool RtcCenter::Inited() const
     {
         return static_cast<bool>(NULL != m_pConnFactory.get());
@@ -958,8 +980,10 @@ namespace GoCast
         msg += "]...";
         FBLOG_INFO_CUSTOM("RtcCenter::NewPeerConnection_w", msg);
         
-        m_pPeerConns[pluginId] = m_pConnFactory->CreatePeerConnection(webrtc::JsepInterface::IceServers(),
-                                                                      NULL, pObserver);
+        webrtc::JsepInterface::IceServers servers;
+        webrtc::JsepInterface::IceServer server = {"stun.l.google.com:19302", ""};
+        servers.push_back(server);
+        m_pPeerConns[pluginId] = m_pConnFactory->CreatePeerConnection(servers, NULL, pObserver);
         if(NULL == m_pPeerConns[pluginId].get())
         {
             std::string msg = pluginId;
