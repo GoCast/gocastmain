@@ -13,7 +13,6 @@
 @property (nonatomic, strong) IBOutlet UIView* mBlankSpotView;
 @property (nonatomic, strong) IBOutlet UIView* mWhiteboardSpotView;
 
-@property (nonatomic, strong) IBOutlet UIView* mWBView;
 @property (nonatomic, strong) IBOutlet UITextField* mNickname;
 @property (nonatomic, strong) IBOutlet UITextField* mRoomname;
 
@@ -28,7 +27,6 @@
 -(IBAction)pressed5px:(id)sender;
 -(IBAction)pressed10px:(id)sender;
 -(IBAction)pressedColor:(id)sender;
--(IBAction)pressedErase:(id)sender;
 
 - (void)colorWasSelected:(NSNumber *)selectedIndex element:(id)element;
 - (void)actionPickerCancelled:(id)sender;

@@ -242,12 +242,6 @@ UIWebView* gWebViewInstance = NULL;
                                           origin:sender];
 }
 
--(IBAction)pressedErase:(id)sender
-{
-#pragma unused(sender)
-//    gCarouselApp.onEraseButton();
-}
-
 - (void)colorWasSelected:(NSNumber *)selectedIndex element:(id)element
 {
 #pragma unused(element)
