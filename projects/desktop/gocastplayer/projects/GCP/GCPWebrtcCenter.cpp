@@ -572,11 +572,19 @@ namespace GoCast
     
     std::string RtcCenter::SignalingState(const std::string& pluginId)
     {
+        if(m_pPeerConns.end() == m_pPeerConns.find(pluginId))
+        {
+            return "preinit";
+        }
         return GetSigStateString(m_pPeerConns[pluginId]->signaling_state());        
     }
 
     std::string RtcCenter::IceState(const std::string& pluginId)
     {
+        if(m_pPeerConns.end() == m_pPeerConns.find(pluginId))
+        {
+            return "preinit";
+        }
         return GetIceStateString(m_pPeerConns[pluginId]->ice_state());        
     }
 

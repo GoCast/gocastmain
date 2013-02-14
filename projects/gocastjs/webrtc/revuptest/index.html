@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script type="text/javascript" src="js/jquery-1.8.1.js?GOCASTTIMESTAMP"></script>
+        <script type="text/javascript" src="js/jquery.utils.js?GOCASTTIMESTAMP"></script>
+        <script type="text/javascript" src="/scripts/strophe.js?GOCASTTIMESTAMP"></script>
+        <script type="text/javascript" src="js/strophe_connection.js?GOCASTTIMESTAMP"></script>
+        <script type="text/javascript">
+            var pluginmap = {};
+            var pendingcandidates = {};
+            var localstream = null;
+            var conn = null;
+            var onlocalplayerloaded = function() {
+                var plugin = document.getElementById('localPlayer'),
+                    constraints = {
+                        video: true,
+                        audio: true,
+                        videoconstraints: {
+                            videoin: plugin.videoinopts['default'],
+                            webrtc: {
+                                mandatory: {
+                                    minWidth: '160',
+                                    maxWidth: '160',
+                                    minHeight: '120',
+                                    maxHeight: '120',
+                                    minFrameRate: '14',
+                                    maxFrameRate: '14'
+                                }
+                            }
+                        },
+                        audioconstraints: {
+                            audioin: plugin.audioinopts[0],
+                            audioout: plugin.audiooutopts[0]
+                        }
+                    };
+
+                plugin.getUserMedia(constraints, function(stream) {
+                    console.log('Success: ', stream);
+                    localstream = stream;
+                    plugin.init('localPlayer','',null);
+                    plugin.addStream(stream);
+                    plugin.createOffer(function(desc) {
+                        console.log('CreateOffer: ', desc);
+                        plugin.setLocalDescription('offer', desc, function() {
+                            console.log('SetLocalDescription: Success');
+                            plugin.source = stream;
+                        }, function(error) {
+                            console.log('SetLocalDescription: ', error);
+                        });
+                    }, function(error) {
+                        console.log('CreateOffer: ', error);
+                    });
+                }, function(msg) {alert(msg);});
+            }
+
+            var initpeerconnection = function(fulljid) {
+                var peerconnection = null;
+
+                if (!pluginmap['peer0']) {
+                    peerconnection = document.getElementById('peer0');
+                    pluginmap['peer0'] = fulljid;
+                } else if (!pluginmap['peer1']) {
+                    peerconnection = document.getElementById('peer1');
+                    pluginmap['peer1'] = fulljid;
+                }
+
+                peerconnection.onaddstream = function(stream) {
+                    console.log('Peer [' + fulljid + ']: Added remote stream ' + stream.label);
+                    peerconnection.width = 320;
+                    peerconnection.height = 240;
+                    peerconnection.source = stream;
+                };
+
+                peerconnection.onstatechange = function(type) {
+                    if ('signaling-state' === type) {
+                        console.log('Peer [' + fulljid + ']: sigstate = ' +
+                                    peerconnection.signalingstate);
+                        if (pendingcandidates[fulljid]) {
+                            for (i=0; i<pendingcandidates[fulljid].length; i++) {
+                                c = pendingcandidates[fulljid][i];
+                                console.log(peerconnection.addIceCandidate(c.sdp_mid,
+                                                                           c.sdp_mline_index,
+                                                                           c.sdp));
+                            }
+                            delete pendingcandidates[fulljid];
+                        }
+                    } else if ('ice-state' === type) {
+                        console.log('Peer [' + fulljid + ']: icestate = ' +
+                                    peerconnection.icestate);
+                    }
+                };
+
+                peerconnection.init(peerconnection.id, '', function(sdp) {
+                    if ('' !== sdp) {
+                        console.log('Peer [' + fulljid + ']: onice: ' + sdp.replace(/\r\n/, ''));
+                        conn.send($msg({to: fulljid, type: 'chat'}).c('candidate')
+                                  .t(sdp.replace(/\r\n/, '')));
+                    } else {
+                        console.log('Peer [' + fulljid + ']: Candidate gathering done');
+                    }
+                });
+
+                peerconnection.addStream(localstream);
+                return peerconnection;
+            };
+
+            var callpeer = function(fulljid) {
+                var peerconnection = initpeerconnection(fulljid);
+                peerconnection.createOffer(function(sdp) {
+                    console.log('Peer [' + fulljid + ']: createoffer: ' + sdp);
+                    peerconnection.setLocalDescription('offer', sdp, function() {
+                        console.log('Peer [' + fulljid + ']: setLocalDescription success, ' +
+                                    'sending offer...');
+                        conn.send($msg({to: fulljid, type: 'chat'}).c('offer').t(sdp));
+                    }, function(error) {
+                        console.log('Peer [' + fulljid + ']: setLocalDescription error: ' + error);
+                    });
+                }, function(error) {
+                    console.log('Peer [' + fulljid + ']: createOffer error: ' + error);
+                });
+            };
+
+            var acceptanswerfrompeer = function(fulljid, sdp) {
+                var id = pluginmap['peer0'] === fulljid ? 'peer0' : 'peer1',
+                    peerconnection = document.getElementById(id), i, c;
+
+                console.log('Peer [' + fulljid + ']: answer: ' + sdp);
+                peerconnection.setRemoteDescription('answer', sdp, function() {
+                    console.log('Peer [' + fulljid + ']: setRemoteDescription success, ' +
+                                'offer/answer done...');
+                }, function(error) {
+                    console.log('Peer [' + fulljid + ']: setRemoteDescription error: ' + error);
+                });
+            };
+
+            var acceptofferfrompeer = function(fulljid, sdp) {
+                var peerconnection = initpeerconnection(fulljid), i, c;
+                peerconnection.setRemoteDescription('offer', sdp, function() {
+                    console.log('Peer [' + fulljid + ']: setRemoteDescription success, ' +
+                                'creating answer...');
+                    peerconnection.createAnswer(function(sdp) {
+                        console.log('Peer [' + fulljid + ']: createanswer: ' + sdp);
+                        peerconnection.setLocalDescription('answer', sdp, function() {
+                            console.log('Peer [' + fulljid + ']: setLocalDescription success, ' +
+                                        'sending answer (offer/answer done)...');
+                            conn.send($msg({to: fulljid, type: 'chat'}).c('answer').t(sdp));
+                        }, function(error) {
+                            console.log('Peer [' + fulljid + ']: setLocalDescription error: '
+                                        + error);
+                        });
+                    }, function(error) {
+                        console.log('Peer [' + fulljid + ']: createAnswer error: ' + error);
+                    });
+                }, function(error) {
+                    console.log('Peer [' + fulljid + ']: setRemoteDescription error: ' + error);
+                });
+            };
+
+            var addcandidateforpeer = function(fulljid, sdp) {
+                var id = pluginmap['peer0'] === fulljid ? 'peer0' : 'peer1',
+                    peerconnection = document.getElementById(id), i, c = JSON.parse(sdp);
+
+                if ('stable' === peerconnection.signalingstate) {
+                    console.log(peerconnection.addIceCandidate(c.sdp_mid, c.sdp_mline_index, c.sdp));
+                } else {
+                    if (!pendingcandidates[fulljid]) {
+                        pendingcandidates[fulljid] = [];
+                    }
+                    pendingcandidates[fulljid].push(c);
+                    console.log('PendingCandidates: ', pendingcandidates);
+                }
+            };
+
+            var addStanzaHandlers = function() {
+                conn.addHandler(function(pres) {
+                    if (!$(pres).attr('type')) {
+                        console.log('Calling: ', $(pres).attr('from'));
+                        callpeer($(pres).attr('from'));
+                    }
+                    return true;
+                }, null, 'presence');
+
+                conn.addHandler(function(msg) {
+                    if ($(msg).find('offer').length) {
+                        acceptofferfrompeer($(msg).attr('from'),
+                                            $(msg).children('offer').text()
+                                                  .replace(/&quot;/g, '"'));
+                    } else if ($(msg).find('answer').length) {
+                        acceptanswerfrompeer($(msg).attr('from'),
+                                             $(msg).children('answer').text()
+                                                   .replace(/&quot;/g, '"'));
+                    } else if ($(msg).find('candidate').length) {
+                        addcandidateforpeer($(msg).attr('from'),
+                                            $(msg).children('candidate').text());
+                    }
+                }, null, 'message', 'chat');
+            };
+
+            $(document).on('online', function() {
+                var i, j = parseInt($.urlvars.u), others = [], other;
+
+                addStanzaHandlers = addStanzaHandlers || function() {
+                    console.log('Empty addStanzaHandlers()');
+                };
+
+                addStanzaHandlers();
+                addStanzaHandlers = null;
+                conn.send($pres());
+                for (i=1; i<4; i++) {
+                    if (j != i) {
+                        other = 'test' + i + '@dev.gocast.it';
+                        others.push(other);
+                        conn.send($pres({to: other}));
+                    }
+                }
+                console.log('Online: ', conn.getJid());
+                console.log('Others: ', others);
+            });
+
+            $(document).on('offline', function() {
+                if (conn.hasSavedRegisteredLoginInfo()) {
+                    conn.autoConnect();
+                } else {
+                    conn.connect({
+                        username: 'test' + $.urlvars.u,
+                        password: 'test' + $.urlvars.u + 'password'
+                    });
+                }
+            });
+
+            $(document).ready(function() {
+                conn = new GoCastJS.StropheConnection({
+                    boshurl: '/xmpp-httpbind',
+                    xmppserver: 'dev.gocast.it',
+                    statusCallback: function(status) {
+                        if (Strophe.Status.CONNECTED === status) {
+                            $(document).trigger('online', conn);
+                        } else if (Strophe.Status.ATTACHED === status) {
+                            conn.forgetReconnectInfo();
+                            conn.disconnect();
+                        } else if (Strophe.Status.TERMINATED === status) {
+                            //$(document).trigger('offline', conn);
+                        }
+                    }
+                });
+
+                $(document).trigger('offline');
+            });
+        </script>
+    </head>
+    <body>
+        <object id="peer0" type="application/x-gocastplayer" width="0" height="0">
+        </object>
+        <object id="peer1" type="application/x-gocastplayer" width="0" height="0">
+        </object>
+        <object id="localPlayer" type="application/x-gocastplayer" width="320" height="240">
+            <param name="onload" value="onlocalplayerloaded"></param>
+        </object>
+    </body>
+</html>

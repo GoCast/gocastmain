@@ -30,7 +30,8 @@
 					} else if ('ice-state' === type) {
 						console.log('Ice State: ', plugin1.icestate);
 					}
-				}
+				};
+				
 				plugin1.init('remotePlayer', '', onice);
 				plugin1.addStream(stream);
 				plugin1.createOffer(function(desc) {
