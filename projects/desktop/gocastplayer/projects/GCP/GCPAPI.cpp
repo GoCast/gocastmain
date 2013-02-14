@@ -281,7 +281,7 @@ void GCPAPI::GetUserMedia(const FB::JSObjectPtr& mediaHints,
 }
 
 FB::variant GCPAPI::Init(const FB::variant& htmlId,
-                         const FB::variant& iceConfig,
+                         const FB::VariantList& iceServers,
                          const FB::JSObjectPtr& iceCallback)
 {
     GoCast::RtcCenter* pCtr = GoCast::RtcCenter::Instance();
@@ -296,9 +296,7 @@ FB::variant GCPAPI::Init(const FB::variant& htmlId,
         return false;
     }
     
-    if(false == pCtr->NewPeerConnection(m_htmlId.convert_cast<std::string>(),
-                                        iceConfig.convert_cast<std::string>(),
-                                        this))
+    if(false == pCtr->NewPeerConnection(m_htmlId.convert_cast<std::string>(), iceServers, this))
     {
         m_signalingState = "invalid";
         m_iceState = "invalid";

@@ -115,6 +115,36 @@ namespace GoCast
         }
     }
     
+    void BuildIceServersList(FB::VariantList jsIceServers,
+                             webrtc::JsepInterface::IceServers& servers)
+    {
+        for(FB::VariantList::iterator it = jsIceServers.begin();
+            it != jsIceServers.end(); it++)
+        {
+            webrtc::JsepInterface::IceServer server;
+            FB::JSObjectPtr jsServer = (*it).convert_cast<FB::JSObjectPtr>();
+            
+            if(jsServer->HasProperty("uri"))
+            {
+                server.uri = jsServer->GetProperty("uri").convert_cast<std::string>();
+                if(jsServer->HasProperty("password"))
+                {
+                    server.password = jsServer->GetProperty("password").convert_cast<std::string>();
+                }
+            
+                std::stringstream sstrm;
+                sstrm << "IceServer: {" << server.uri;
+                if (!server.password.empty())
+                {
+                    sstrm << ", " + server.password;
+                }
+                sstrm << "}" << std::endl;
+                FBLOG_INFO_CUSTOM("BuildIceServerList", sstrm.str());
+                servers.push_back(server);
+            }
+        }
+    }
+    
     struct GetUserMediaParams : public talk_base::MessageData
     {
         GetUserMediaParams(FB::JSObjectPtr mediaHints,
@@ -135,11 +165,11 @@ namespace GoCast
     struct NewPeerConnectionParams : public talk_base::MessageData
     {
         NewPeerConnectionParams(const std::string& pluginId,
-                                const std::string& iceConfig,
+                                FB::VariantList iceServers,
                                 webrtc::PeerConnectionObserver* pObserver)
         : m_bResult(false)
         , m_pluginId(pluginId)
-        , m_iceConfig(iceConfig)
+        , m_iceServers(iceServers)
         , m_pObserver(pObserver)
         {
             
@@ -147,7 +177,7 @@ namespace GoCast
         
         bool m_bResult;
         std::string m_pluginId;
-        std::string m_iceConfig;
+        FB::VariantList m_iceServers;
         webrtc::PeerConnectionObserver* m_pObserver;
     };
     
@@ -435,19 +465,19 @@ namespace GoCast
     }
     
     bool RtcCenter::NewPeerConnection(const std::string& pluginId,
-                                      const std::string& iceConfig,
+                                      FB::VariantList iceServers,
                                       webrtc::PeerConnectionObserver* pObserver,
                                       bool bSyncCall)
     {
         if(false == bSyncCall)
         {
-            NewPeerConnectionParams params(pluginId, iceConfig, pObserver);
+            NewPeerConnectionParams params(pluginId, iceServers, pObserver);
             m_msgq.Send(MSG_NEW_PEERCONNECTION, &params, true);
             return params.m_bResult;
         }
         else
         {
-            return NewPeerConnection_w(pluginId, iceConfig, pObserver);
+            return NewPeerConnection_w(pluginId, iceServers, pObserver);
         }
     }
     
@@ -776,7 +806,7 @@ namespace GoCast
             {
                 NewPeerConnectionParams* pParams = static_cast<NewPeerConnectionParams*>(msg->pdata);
                 pParams->m_bResult = NewPeerConnection_w(pParams->m_pluginId,
-                                                         pParams->m_iceConfig,
+                                                         pParams->m_iceServers,
                                                          pParams->m_pObserver);
                 break;
             }
@@ -963,7 +993,7 @@ namespace GoCast
     }
     
     bool RtcCenter::NewPeerConnection_w(const std::string& pluginId,
-                                        const std::string& iceConfig,
+                                        FB::VariantList iceServers,
                                         webrtc::PeerConnectionObserver* pObserver)
     {
         if(NULL == m_pConnFactory.get())
@@ -983,14 +1013,11 @@ namespace GoCast
         }
         
         std::string msg = pluginId;
-        msg += ": Creating new PeerConnection with ICEConfig [";
-        msg += iceConfig;
-        msg += "]...";
+        msg += ": Creating new PeerConnection...";
         FBLOG_INFO_CUSTOM("RtcCenter::NewPeerConnection_w", msg);
         
         webrtc::JsepInterface::IceServers servers;
-        webrtc::JsepInterface::IceServer server = {"stun.l.google.com:19302", ""};
-        servers.push_back(server);
+        BuildIceServersList(iceServers, servers);
         m_pPeerConns[pluginId] = m_pConnFactory->CreatePeerConnection(servers, NULL, pObserver);
         if(NULL == m_pPeerConns[pluginId].get())
         {

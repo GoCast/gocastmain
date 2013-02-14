@@ -146,7 +146,7 @@ public:
     
     //---------------------- PeerConnection Methods ---------------------
     FB::variant Init(const FB::variant& htmlId,
-                     const FB::variant& iceConfig,
+                     const FB::VariantList& iceServers,
                      const FB::JSObjectPtr& iceCallback);
     FB::variant AddStream(const FB::JSAPIPtr& stream);
     FB::variant RemoveStream(const FB::JSAPIPtr& stream);

@@ -73,7 +73,7 @@ namespace GoCast
                           FB::JSObjectPtr failCb,
                           bool bSyncCall = true);
         bool NewPeerConnection(const std::string& pluginId,
-                               const std::string& iceConfig,
+                               FB::VariantList iceServers,
                                webrtc::PeerConnectionObserver* pObserver,
                                bool bSyncCall = true);
         bool AddStream(const std::string& pluginId,
@@ -141,7 +141,7 @@ namespace GoCast
                             FB::JSObjectPtr succCb,
                             FB::JSObjectPtr failCb);
         bool NewPeerConnection_w(const std::string& pluginId,
-                                 const std::string& iceConfig,
+                                 FB::VariantList iceServers,
                                  webrtc::PeerConnectionObserver* pObserver);
         bool AddStream_w(const std::string& pluginId,
                          const std::string& label);

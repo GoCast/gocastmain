@@ -39,7 +39,7 @@
 
                     console.log('Success: ', stream);
                     localstream = stream;
-                    plugin.init('localPlayer','',null);
+                    plugin.init('localPlayer', [], null);
                     plugin.addStream(stream);
                     plugin.createOffer(function(desc) {
                         console.log('CreateOffer: ', desc);
@@ -103,7 +103,8 @@
                     }
                 };
 
-                peerconnection.init(fulljid, '', function(sdp) {
+                peerconnection.init(fulljid, [{uri: 'stun:stun.l.google.com:19302'}],
+                                    function(sdp) {
                     if ('' !== sdp) {
                         console.log('Peer [' + fulljid + ']: onice: ' + sdp.replace(/\r\n/, ''));
                         conn.send($msg({to: fulljid, type: 'chat'}).c('candidate')
@@ -259,7 +260,7 @@
                             conn.forgetReconnectInfo();
                             conn.disconnect();
                         } else if (Strophe.Status.TERMINATED === status) {
-                            //$(document).trigger('offline', conn);
+                            $(document).trigger('offline', conn);
                         }
                     }
                 });
