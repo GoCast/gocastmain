@@ -678,6 +678,7 @@ namespace GoCast
         if(0 < m_pLocalStream->video_tracks()->count())
         {
             m_pLocalStream->video_tracks()->at(0)->AddRenderer(pRenderer);
+            m_pRenderer = pRenderer;
         }
     }
     
@@ -704,6 +705,7 @@ namespace GoCast
             if(0 < m_remoteStreams[pluginId]->video_tracks()->count())
             {
                 m_remoteStreams[pluginId]->video_tracks()->at(0)->AddRenderer(pRenderer);
+                m_pRenderer = pRenderer;
             }            
         }
         else
@@ -742,6 +744,7 @@ namespace GoCast
     : m_msgq(this)
     , m_pConnFactory(webrtc::CreatePeerConnectionFactory())
     , m_pLocalStream(NULL)
+    , m_pRenderer(NULL)
     {
         if(NULL == m_pConnFactory.get())
         {
@@ -1239,7 +1242,7 @@ namespace GoCast
 
 			if(0 < m_pLocalStream->video_tracks()->count())
 			{
-                //m_pLocalStream->video_tracks()->at(0)->SetRenderer(NULL);
+                m_pLocalStream->video_tracks()->at(0)->RemoveRenderer(m_pRenderer);
 				m_pLocalStream->video_tracks()->at(0)->set_enabled(false);
 			}
         }
@@ -1247,13 +1250,13 @@ namespace GoCast
         {
             if(m_remoteStreams.end() != m_remoteStreams.find(pluginId))
             {
-                /*if(NULL != m_remoteStreams[pluginId].get())
+                if(NULL != m_remoteStreams[pluginId].get())
                 {
                     if(0 < m_remoteStreams[pluginId]->video_tracks()->count())
                     {
-                        m_remoteStreams[pluginId]->video_tracks()->at(0)->SetRenderer(NULL);
+                        m_remoteStreams[pluginId]->video_tracks()->at(0)->RemoveRenderer(m_pRenderer);
                     }
-                }*/
+                }
                 RemoveRemoteStream(pluginId);
             }
         }

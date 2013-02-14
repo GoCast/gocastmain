@@ -35,6 +35,8 @@
                     };
 
                 plugin.getUserMedia(constraints, function(stream) {
+                    var i, j = parseInt($.urlvars.u), other;
+
                     console.log('Success: ', stream);
                     localstream = stream;
                     plugin.init('localPlayer','',null);
@@ -44,6 +46,14 @@
                         plugin.setLocalDescription('offer', desc, function() {
                             console.log('SetLocalDescription: Success');
                             plugin.source = stream;
+                            conn.send($pres());
+                            for (i=1; i<4; i++) {
+                                if (j != i) {
+                                    other = 'test' + i + '@dev.gocast.it';
+                                    conn.send($pres({to: other}));
+                                }
+                            }
+                            console.log('Online: ', conn.getJid());
                         }, function(error) {
                             console.log('SetLocalDescription: ', error);
                         });
@@ -56,11 +66,14 @@
             var initpeerconnection = function(fulljid) {
                 var peerconnection = null;
 
+                hangupOnPeer(fulljid);
                 if (!pluginmap['peer0']) {
-                    peerconnection = document.getElementById('peer0');
+                    $('#peer0').html('<object class="peerconn" type="application/x-gocastplayer" width="0" height="0"></object>');
+                    peerconnection = $('body > #peer0 > .peerconn').get(0);
                     pluginmap['peer0'] = fulljid;
                 } else if (!pluginmap['peer1']) {
-                    peerconnection = document.getElementById('peer1');
+                    $('#peer1').html('<object class="peerconn" type="application/x-gocastplayer" width="0" height="0"></object>');
+                    peerconnection = $('body > #peer1 > .peerconn').get(0);
                     pluginmap['peer1'] = fulljid;
                 }
 
@@ -121,16 +134,18 @@
             };
 
             var acceptanswerfrompeer = function(fulljid, sdp) {
-                var id = pluginmap['peer0'] === fulljid ? 'peer0' : 'peer1',
-                    peerconnection = document.getElementById(id), i, c;
+                var id = pluginmap['peer0'] === fulljid ? 'peer0' : (pluginmap['peer1'] === fulljid ? 'peer1' : 'dummy'),
+                    peerconnection = $('body > #' + id + ' > .peerconn').get(0), i, c;
 
-                console.log('Peer [' + fulljid + ']: answer: ' + sdp);
-                peerconnection.setRemoteDescription('answer', sdp, function() {
-                    console.log('Peer [' + fulljid + ']: setRemoteDescription success, ' +
-                                'offer/answer done...');
-                }, function(error) {
-                    console.log('Peer [' + fulljid + ']: setRemoteDescription error: ' + error);
-                });
+                if (peerconnection) {
+                    console.log('Peer [' + fulljid + ']: answer: ' + sdp);
+                    peerconnection.setRemoteDescription('answer', sdp, function() {
+                        console.log('Peer [' + fulljid + ']: setRemoteDescription success, ' +
+                                    'offer/answer done...');
+                    }, function(error) {
+                        console.log('Peer [' + fulljid + ']: setRemoteDescription error: ' + error);
+                    });
+                }
             };
 
             var acceptofferfrompeer = function(fulljid, sdp) {
@@ -157,25 +172,38 @@
             };
 
             var addcandidateforpeer = function(fulljid, sdp) {
-                var id = pluginmap['peer0'] === fulljid ? 'peer0' : 'peer1',
-                    peerconnection = document.getElementById(id), i, c = JSON.parse(sdp);
+                var id = pluginmap['peer0'] === fulljid ? 'peer0' : (pluginmap['peer1'] === fulljid ? 'peer1' : 'dummy'),
+                    peerconnection = $('body > #' + id + ' > .peerconn').get(0), c = JSON.parse(sdp);
 
-                if ('stable' === peerconnection.signalingstate) {
-                    console.log(peerconnection.addIceCandidate(c.sdp_mid, c.sdp_mline_index, c.sdp));
-                } else {
-                    if (!pendingcandidates[fulljid]) {
-                        pendingcandidates[fulljid] = [];
+                if (peerconnection) {
+                    console.log('Peer [' + fulljid + ']: addcandidate: ' + sdp);
+                    if ('stable' === peerconnection.signalingstate) {
+                        console.log(peerconnection.addIceCandidate(c.sdp_mid, c.sdp_mline_index, c.sdp));
+                    } else {
+                        if (!pendingcandidates[fulljid]) {
+                            pendingcandidates[fulljid] = [];
+                        }
+                        pendingcandidates[fulljid].push(c);
+                        console.log('PendingCandidates: ', pendingcandidates);
                     }
-                    pendingcandidates[fulljid].push(c);
-                    console.log('PendingCandidates: ', pendingcandidates);
                 }
             };
+
+            var hangupOnPeer = function(fulljid) {
+                var id = pluginmap['peer0'] === fulljid ? 'peer0' : (pluginmap['peer1'] === fulljid ? 'peer1' : 'dummy');
+
+                $('body > #' + id).html('');
+                delete pluginmap[id];
+            }
 
             var addStanzaHandlers = function() {
                 conn.addHandler(function(pres) {
                     if (!$(pres).attr('type')) {
                         console.log('Calling: ', $(pres).attr('from'));
                         callpeer($(pres).attr('from'));
+                    } else if ('unavailable' === $(pres).attr('type')) {
+                        console.log('Hanging up on: ', $(pres).attr('from'));
+                        hangupOnPeer($(pres).attr('from'));
                     }
                     return true;
                 }, null, 'presence');
@@ -183,38 +211,28 @@
                 conn.addHandler(function(msg) {
                     if ($(msg).find('offer').length) {
                         acceptofferfrompeer($(msg).attr('from'),
-                                            $(msg).children('offer').text()
-                                                  .replace(/&quot;/g, '"'));
+                                            $(msg).children('offer').text());
                     } else if ($(msg).find('answer').length) {
                         acceptanswerfrompeer($(msg).attr('from'),
-                                             $(msg).children('answer').text()
-                                                   .replace(/&quot;/g, '"'));
+                                             $(msg).children('answer').text());
                     } else if ($(msg).find('candidate').length) {
                         addcandidateforpeer($(msg).attr('from'),
-                                            $(msg).children('candidate').text());
+                                            $(msg).children('candidate').text()
+                                                  .replace(/&quot;/g, '"'));
                     }
+                    return true;
                 }, null, 'message', 'chat');
             };
 
             $(document).on('online', function() {
-                var i, j = parseInt($.urlvars.u), others = [], other;
-
                 addStanzaHandlers = addStanzaHandlers || function() {
                     console.log('Empty addStanzaHandlers()');
                 };
 
                 addStanzaHandlers();
                 addStanzaHandlers = null;
-                conn.send($pres());
-                for (i=1; i<4; i++) {
-                    if (j != i) {
-                        other = 'test' + i + '@dev.gocast.it';
-                        others.push(other);
-                        conn.send($pres({to: other}));
-                    }
-                }
-                console.log('Online: ', conn.getJid());
-                console.log('Others: ', others);
+                $('body > #preview').append('<object id="localPlayer" type="application/x-gocastplayer" width="320" height="240">' +
+                                            '<param name="onload" value="onlocalplayerloaded"></param></object>');
             });
 
             $(document).on('offline', function() {
@@ -249,12 +267,8 @@
         </script>
     </head>
     <body>
-        <object id="peer0" type="application/x-gocastplayer" width="0" height="0">
-        </object>
-        <object id="peer1" type="application/x-gocastplayer" width="0" height="0">
-        </object>
-        <object id="localPlayer" type="application/x-gocastplayer" width="320" height="240">
-            <param name="onload" value="onlocalplayerloaded"></param>
-        </object>
+        <div id="preview"></div>
+        <div id="peer0"></div>
+        <div id="peer1"></div>
     </body>
 </html>
