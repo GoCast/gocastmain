@@ -103,7 +103,7 @@
                     }
                 };
 
-                peerconnection.init(peerconnection.id, '', function(sdp) {
+                peerconnection.init(fulljid, '', function(sdp) {
                     if ('' !== sdp) {
                         console.log('Peer [' + fulljid + ']: onice: ' + sdp.replace(/\r\n/, ''));
                         conn.send($msg({to: fulljid, type: 'chat'}).c('candidate')
@@ -190,9 +190,11 @@
             };
 
             var hangupOnPeer = function(fulljid) {
-                var id = pluginmap['peer0'] === fulljid ? 'peer0' : (pluginmap['peer1'] === fulljid ? 'peer1' : 'dummy');
+                var id = pluginmap['peer0'] === fulljid ? 'peer0' : (pluginmap['peer1'] === fulljid ? 'peer1' : 'dummy'), container = $('body > #' + id).get(0);
 
-                $('body > #' + id).html('');
+                if (container) {
+                    container.removeChild(container.lastChild);
+                }
                 delete pluginmap[id];
             }
 

@@ -199,10 +199,10 @@ private:
     FB::BrowserHostPtr m_host;
     FB::JSAPIPtr m_srcStream;
     FB::variant m_htmlId;
-    SetSDPObserver* m_pSetLocalSDPObserver;
-    CreateSDPObserver* m_pCreateOfferSDPObserver;
-    SetSDPObserver* m_pSetRemoteSDPObserver;
-    CreateSDPObserver* m_pCreateAnswerSDPObserver;
+    talk_base::scoped_refptr<SetSDPObserver> m_pSetLocalSDPObserver;
+    talk_base::scoped_refptr<CreateSDPObserver> m_pCreateOfferSDPObserver;
+    talk_base::scoped_refptr<SetSDPObserver> m_pSetRemoteSDPObserver;
+    talk_base::scoped_refptr<CreateSDPObserver> m_pCreateAnswerSDPObserver;
     
 private:
     FB::VariantMap m_videoDevices;

@@ -15,10 +15,6 @@
 
 GCPAPI::~GCPAPI()
 {
-    delete m_pSetLocalSDPObserver;
-    delete m_pCreateOfferSDPObserver;
-    delete m_pSetRemoteSDPObserver;
-    delete m_pCreateAnswerSDPObserver;
     DeletePeerConnection();
     if("localPlayer" == m_htmlId.convert_cast<std::string>())
     {
@@ -474,7 +470,7 @@ FB::variant GCPAPI::DeletePeerConnection()
         FBLOG_ERROR_CUSTOM("GCPAPI::DeletePeerConnection", msg);
         return false;
     }
-        
+    
     return pCtr->DeletePeerConnection(m_htmlId.convert_cast<std::string>());
 }
 
