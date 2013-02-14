@@ -61,6 +61,29 @@
 
             }; /* app1 */
 
+            function addWhiteBoard()
+            {
+                Callcast.AddSpot({
+                                 spottype: "whiteBoard",
+                                 spotreplace: "first-unoc"
+                                 },
+                                 function()
+                                 {
+//                                    console.log("carousel addWhiteBoard callback");
+                                 });
+            }
+
+            function removeWhiteBoard(spotnumber)
+            {
+                Callcast.RemoveSpot({
+                                    spotnumber: spotnumber
+                                    },
+                                    function()
+                                    {
+//                                        console.log("carousel removeWhiteBoard callback");
+                                    });
+            }
+
             function onConnectionStatus(statusStr)
             {
 //                console.log("onConnectionStatus(" + statusStr + ")");

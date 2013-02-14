@@ -340,6 +340,19 @@ void CarouselApp::onPenColorChange(const tColor4b& newColor)
     mSendPenColor = newColor;
 }
 
+void CarouselApp::onNewButton()
+{
+    [gWebViewInstance stringByEvaluatingJavaScriptFromString: [NSString stringWithFormat:@"%s", "addWhiteBoard()"]];
+}
+
+void CarouselApp::onDeleteButton()
+{
+    if (!mSpots.empty())
+    {
+        [gWebViewInstance stringByEvaluatingJavaScriptFromString: [NSString stringWithFormat:@"removeWhiteBoard('%d')", mSpots[mSpotFinger]->getID()]];
+    }
+}
+
 #pragma mark -
 
 /*

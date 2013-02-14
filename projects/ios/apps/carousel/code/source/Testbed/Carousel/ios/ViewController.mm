@@ -215,6 +215,18 @@ UIWebView* gWebViewInstance = NULL;
                                           origin:sender];
 }
 
+-(IBAction)pressedNew:(id)sender
+{
+#pragma unused(sender)
+    gCarouselApp.onNewButton();
+}
+
+-(IBAction)pressedDelete:(id)sender
+{
+#pragma unused(sender)
+    gCarouselApp.onDeleteButton();
+}
+
 - (void)colorWasSelected:(NSNumber *)selectedIndex element:(id)element
 {
 #pragma unused(element)

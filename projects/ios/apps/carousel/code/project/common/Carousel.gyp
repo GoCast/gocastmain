@@ -87,21 +87,27 @@
 						'../../rsrc/<@(OS)/Default-568h@2x.png',
 						'../../rsrc/<@(OS)/GoToken-114.png',
 						'../../rsrc/<@(OS)/GoToken-57.png',
-						'../../rsrc/<@(OS)/GoToken.png',
-						'../../rsrc/<@(OS)/carouselarrowleft.png',
-						'../../rsrc/<@(OS)/carouselarrowright.png',
+
+						'../../rsrc/<@(OS)/Cordova.plist',
+
+						'../../rsrc/<@(OS)/spritesheet.frag',
+						'../../rsrc/<@(OS)/spritesheet.vert',
+
 						'../../rsrc/<@(OS)/10px.png',
 						'../../rsrc/<@(OS)/1px.png',
 						'../../rsrc/<@(OS)/3px.png',
 						'../../rsrc/<@(OS)/5px.png',
+						'../../rsrc/<@(OS)/AddWhiteboard.png',
+						'../../rsrc/<@(OS)/carouselarrowleft.png',
+						'../../rsrc/<@(OS)/carouselarrowright.png',
 						'../../rsrc/<@(OS)/colorblack.png',
 						'../../rsrc/<@(OS)/colorblue.png',
 						'../../rsrc/<@(OS)/colororange.png',
 						'../../rsrc/<@(OS)/colorred.png',
 						'../../rsrc/<@(OS)/eraser.png',
-						'../../rsrc/<@(OS)/spritesheet.frag',
-						'../../rsrc/<@(OS)/spritesheet.vert',
-						'../../rsrc/<@(OS)/Cordova.plist',
+						'../../rsrc/<@(OS)/GoToken.png',
+						'../../rsrc/<@(OS)/trash.png',
+
 						'../../rsrc/www',
 					],	# mac_bundle_resources
 

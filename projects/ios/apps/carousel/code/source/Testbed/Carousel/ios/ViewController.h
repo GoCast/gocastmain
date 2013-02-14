@@ -28,6 +28,9 @@
 -(IBAction)pressed10px:(id)sender;
 -(IBAction)pressedColor:(id)sender;
 
+-(IBAction)pressedNew:(id)sender;
+-(IBAction)pressedDelete:(id)sender;
+
 - (void)colorWasSelected:(NSNumber *)selectedIndex element:(id)element;
 - (void)actionPickerCancelled:(id)sender;
 
