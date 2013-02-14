@@ -333,35 +333,10 @@ void CarouselApp::onPenSizeChange(const float& newSize)
     mSendPenSize = newSize;
 }
 
-void CarouselApp::onPenColorChange()
+void CarouselApp::onPenColorChange(const tColor4b& newColor)
 {
     sendStrings();
-    if (mSendPenColor == kBlack)
-    {
-        mSendPenColor = kRed;
-    }
-    else if (mSendPenColor == kRed)
-    {
-        mSendPenColor = kBlue;
-    }
-    else if (mSendPenColor == kBlue)
-    {
-        mSendPenColor = kOrange;
-    }
-    else if (mSendPenColor == kOrange)
-    {
-        mSendPenColor = kBlack;
-    }
-    else
-    {
-        mSendPenColor = kBlue;
-    }
-}
-
-void CarouselApp::onEraseButton()
-{
-    sendStrings();
-    mSendPenColor = kWhite;
+    mSendPenColor = newColor;
 }
 
 #pragma mark -

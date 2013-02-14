@@ -10,7 +10,6 @@
 		053ACC0B9AF93FE618B338DE /* tSurface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0CC3E156EE25E95E293F95D7 /* tSurface.cpp */; };
 		0696DA8AFE2E9583589FA40B /* CarouselApp.mm in Sources */ = {isa = PBXBuildFile; fileRef = F7B020F2A9F4165F16A768DA /* CarouselApp.mm */; };
 		0E951170AD1B9B5EAF460872 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E02332AA60F58AAB6B97DC12 /* MobileCoreServices.framework */; };
-		19AD4929B5D835B635214563 /* ViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 48FCE3F3B24CF4E016427BEF /* ViewController.mm */; };
 		1FC763828CE41F3495799DDA /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B9BB59098BFBAEBAAF0D4F /* CoreLocation.framework */; };
 		211802F971FFC424CA0492A9 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = F21B7D51AA0AA14F9E1D3A44 /* InfoPlist.strings */; };
 		23563FECFBE83940BD1CC6D9 /* tTimer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D9B0A6D8A72ADF3549326861 /* tTimer.cpp */; };
@@ -20,7 +19,6 @@
 		3365F7C90D9FD5D226E9E790 /* eraser.png in Resources */ = {isa = PBXBuildFile; fileRef = 332C24A952E9CEB25A248506 /* eraser.png */; };
 		3611586D568D70AAA2545D88 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 13E1A600EFE89EB38952FF6A /* CFNetwork.framework */; };
 		3DDB576316C75C81653458C7 /* tFile.mm in Sources */ = {isa = PBXBuildFile; fileRef = A0D5F599AE16E9F133784B44 /* tFile.mm */; };
-		3E87B6C47071193234919446 /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8C1227C47EECDD052FCA81A3 /* AppDelegate.mm */; };
 		4934F04117FAAB36FF741153 /* tShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5BBD9CAC67E564067E0BF48E /* tShader.cpp */; };
 		4E6DF2FBC6CB44ACC399F525 /* 3px.png in Resources */ = {isa = PBXBuildFile; fileRef = 26DDCB681437B061CC738085 /* 3px.png */; };
 		52EB5E4E549290291D634150 /* carouselarrowright.png in Resources */ = {isa = PBXBuildFile; fileRef = 65CB0F52721DC64654E7C11F /* carouselarrowright.png */; };
@@ -28,6 +26,7 @@
 		53D77591234D2EEC65FFC854 /* colorblue.png in Resources */ = {isa = PBXBuildFile; fileRef = 0118141FAC902E17292576F2 /* colorblue.png */; };
 		5F6541C8D51635AC9237710C /* libCordova.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36C27AEF64708CAD6E226A73 /* libCordova.a */; };
 		63DC7A8040D9308B4B0182F5 /* tPixelFormat.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 751E5849B1D2F45943D9AA41 /* tPixelFormat.cpp */; };
+		66BFE7B0CC4E4C799A8F015E /* ActionSheetStringPicker.m in Sources */ = {isa = PBXBuildFile; fileRef = A54E18BD006DADD51C86D0DA /* ActionSheetStringPicker.m */; };
 		685692D4D81F5B687E483548 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 23220E27307FB5D1A6DF5408 /* AVFoundation.framework */; };
 		6D1F0E3F6B85EE9A50C5170D /* OpenGLView.mm in Sources */ = {isa = PBXBuildFile; fileRef = CD0D36C6C8902282D777D6AD /* OpenGLView.mm */; };
 		6EFF1DB9802810DB57C8C2F9 /* AddressBookUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DE51930D45C7F7A2B526FB44 /* AddressBookUI.framework */; };
@@ -36,6 +35,7 @@
 		805A304F188D00A98CD4EC10 /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C10205A2E5136180F5785AD0 /* MediaPlayer.framework */; };
 		870883FE1795E7FBF828FC44 /* tTexture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E9423167F2DEAC4A6A8D2506 /* tTexture.cpp */; };
 		901A8FF29A093803B855D83A /* spritesheet.vert in Resources */ = {isa = PBXBuildFile; fileRef = 69EBC921CA0D9C8A7C8E0295 /* spritesheet.vert */; };
+		907685D87916662CFF92274B /* AbstractActionSheetPicker.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C11204B048839C8491149F7 /* AbstractActionSheetPicker.m */; };
 		91A4E97FC8C9536D06A3ECE8 /* MainViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7E9B8B24CC16CC0972827DE3 /* MainViewController.xib */; };
 		96B87EAB025E0F13B296D752 /* 5px.png in Resources */ = {isa = PBXBuildFile; fileRef = 3E226F3C0B3681BCED2CAE34 /* 5px.png */; };
 		970F38114EA87317C4D14CBF /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = 6997A9EFF90543E0BC776C03 /* Default.png */; };
@@ -54,6 +54,8 @@
 		CC838BA0048D0236AA288157 /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BE1C0F69260A7EEDC852877 /* main.mm */; };
 		CD9C178F7553D147F76933E0 /* Spot.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4ECD7B6C765FB5DF6FB0CD88 /* Spot.mm */; };
 		CF4BCD182F089D1126A7722C /* 1px.png in Resources */ = {isa = PBXBuildFile; fileRef = 4990E99D9957285C2D5C340E /* 1px.png */; };
+		D4E1C43818321561E81EA0C7 /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8C1227C47EECDD052FCA81A3 /* AppDelegate.mm */; };
+		D4E816E6FF9BC2119D5CC5CA /* ViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 48FCE3F3B24CF4E016427BEF /* ViewController.mm */; };
 		D72502C6E61F14BD236D26F7 /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 115707312888D9C2956F7016 /* CoreMedia.framework */; };
 		DC010E920BDB29C8A77E68D9 /* GoToken.png in Resources */ = {isa = PBXBuildFile; fileRef = DA272714B13F51196D62056E /* GoToken.png */; };
 		E4DA3E6AA3E08035948461A5 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A4A0D62AC2A544D852D3B390 /* UIKit.framework */; };
@@ -104,6 +106,7 @@
 		550BF9B436405D132651601F /* CallcastEvent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CallcastEvent.h; sourceTree = "<group>"; };
 		5AA2B0CA9C6F2A0AC505DF5F /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		5BBD9CAC67E564067E0BF48E /* tShader.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = tShader.cpp; sourceTree = "<group>"; };
+		5C11204B048839C8491149F7 /* AbstractActionSheetPicker.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AbstractActionSheetPicker.m; sourceTree = "<group>"; };
 		5C319FC64CA65D3CC431D8F2 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		60F637D090BA98AD306435AE /* tTexture.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tTexture.h; sourceTree = "<group>"; };
 		640106BD5F9FC83D37EC0DA2 /* CarouselApp.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CarouselApp.h; sourceTree = "<group>"; };
@@ -114,6 +117,7 @@
 		7002561CA20BE1C43EA3D583 /* tProgram.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = tProgram.cpp; sourceTree = "<group>"; };
 		751E5849B1D2F45943D9AA41 /* tPixelFormat.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = tPixelFormat.cpp; sourceTree = "<group>"; };
 		7909122DB4B04A7E116D98B9 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
+		7AFA4BC5698C4AF70021CCC3 /* AbstractActionSheetPicker.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AbstractActionSheetPicker.h; sourceTree = "<group>"; };
 		8114DD2B8868576CF1B2BC94 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		821AC1D41753F433B55CCBF3 /* Carousel.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Carousel.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8404188F18B0D9D6F5EABDF5 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
@@ -127,8 +131,10 @@
 		9F7493C34824611F503DF16A /* tObserver.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tObserver.h; sourceTree = "<group>"; };
 		A0D5F599AE16E9F133784B44 /* tFile.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = tFile.mm; sourceTree = "<group>"; };
 		A4A0D62AC2A544D852D3B390 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		A54E18BD006DADD51C86D0DA /* ActionSheetStringPicker.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ActionSheetStringPicker.m; sourceTree = "<group>"; };
 		A923820425C58F41FA82F11C /* WhiteboardSpot.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WhiteboardSpot.h; sourceTree = "<group>"; };
 		AEB6D511FAEDB0434E3C8E30 /* WhiteboardSpot.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = WhiteboardSpot.mm; sourceTree = "<group>"; };
+		B0ACA430F49F75FDC685FB26 /* ActionSheetStringPicker.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ActionSheetStringPicker.h; sourceTree = "<group>"; };
 		BBB2FE6D2E7D2012C0415EE4 /* CarouselEventManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CarouselEventManager.h; sourceTree = "<group>"; };
 		BBB5B4C648D19737618479A2 /* OpenGLView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OpenGLView.h; sourceTree = "<group>"; };
 		BF891AF35827612911CA1DC5 /* tPixelFormat.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tPixelFormat.h; sourceTree = "<group>"; };
@@ -182,9 +188,13 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		0232058D7D9D2AE68467B211 /* ios */ = {
+		0A29F7DD5AFF058F0A152178 /* ios */ = {
 			isa = PBXGroup;
 			children = (
+				7AFA4BC5698C4AF70021CCC3 /* AbstractActionSheetPicker.h */,
+				5C11204B048839C8491149F7 /* AbstractActionSheetPicker.m */,
+				B0ACA430F49F75FDC685FB26 /* ActionSheetStringPicker.h */,
+				A54E18BD006DADD51C86D0DA /* ActionSheetStringPicker.m */,
 				E6033214A6CAC9D4260DDC81 /* AppDelegate.h */,
 				8C1227C47EECDD052FCA81A3 /* AppDelegate.mm */,
 				7909122DB4B04A7E116D98B9 /* ViewController.h */,
@@ -280,7 +290,7 @@
 		45375EBD45E1E6ADB43C3BD4 /* Testbed/Carousel */ = {
 			isa = PBXGroup;
 			children = (
-				0232058D7D9D2AE68467B211 /* ios */,
+				0A29F7DD5AFF058F0A152178 /* ios */,
 				550BF9B436405D132651601F /* CallcastEvent.h */,
 				640106BD5F9FC83D37EC0DA2 /* CarouselApp.h */,
 				F7B020F2A9F4165F16A768DA /* CarouselApp.mm */,
@@ -502,8 +512,10 @@
 				CD9C178F7553D147F76933E0 /* Spot.mm in Sources */,
 				F746E74AD435693462062677 /* WhiteboardSpot.mm in Sources */,
 				A8BC67394886865FFCD9B15F /* GCICallcast.mm in Sources */,
-				3E87B6C47071193234919446 /* AppDelegate.mm in Sources */,
-				19AD4929B5D835B635214563 /* ViewController.mm in Sources */,
+				D4E1C43818321561E81EA0C7 /* AppDelegate.mm in Sources */,
+				D4E816E6FF9BC2119D5CC5CA /* ViewController.mm in Sources */,
+				907685D87916662CFF92274B /* AbstractActionSheetPicker.m in Sources */,
+				66BFE7B0CC4E4C799A8F015E /* ActionSheetStringPicker.m in Sources */,
 				23563FECFBE83940BD1CC6D9 /* tTimer.cpp in Sources */,
 				2C9C70414D65B81FC648DD4B /* tTimerPeer.mm in Sources */,
 				3DDB576316C75C81653458C7 /* tFile.mm in Sources */,

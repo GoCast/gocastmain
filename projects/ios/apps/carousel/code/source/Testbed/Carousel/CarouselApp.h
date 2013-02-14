@@ -67,8 +67,7 @@ public:
     void onPrevButton();
     void onNextButton();
     void onPenSizeChange(const float& newSize);
-    void onPenColorChange();
-    void onEraseButton();
+    void onPenColorChange(const tColor4b& newColor);
 
     void queueLine(const int32_t& newID, const tColor4b& newColor, const int32_t& newPenSize, const tPoint2f& newSt, const tPoint2f& newEn);
     void sendStrings();

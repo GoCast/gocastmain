@@ -17,6 +17,9 @@
 @property (nonatomic, strong) IBOutlet UITextField* mNickname;
 @property (nonatomic, strong) IBOutlet UITextField* mRoomname;
 
+@property (nonatomic, retain) NSArray *mColors;
+@property (nonatomic, assign) NSInteger mSelectedColorIndex;
+
 -(IBAction)loginPressed:(id)sender;
 -(IBAction)okayPressed:(id)sender;
 
@@ -26,6 +29,9 @@
 -(IBAction)pressed10px:(id)sender;
 -(IBAction)pressedColor:(id)sender;
 -(IBAction)pressedErase:(id)sender;
+
+- (void)colorWasSelected:(NSNumber *)selectedIndex element:(id)element;
+- (void)actionPickerCancelled:(id)sender;
 
 -(IBAction)pressedPrev:(id)sender;
 -(IBAction)pressedNext:(id)sender;

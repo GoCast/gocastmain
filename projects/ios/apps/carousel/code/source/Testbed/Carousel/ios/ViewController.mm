@@ -26,6 +26,7 @@
 //
 
 #import "ViewController.h"
+#import "ActionSheetStringPicker.h"
 
 #include "Base/package.h"
 #include "Math/package.h"
@@ -38,11 +39,20 @@
 
 #include "CarouselApp.h"
 
+const tColor4b      kBlack  (0,0,0,255);
+const tColor4b      kRed    (255,0,0,255);
+const tColor4b      kBlue   (0,0,255,255);
+const tColor4b      kOrange (255,165,0,255);
+const tColor4b      kWhite  (255,255,255,255);
+
 extern CarouselApp gCarouselApp;
 
 UIWebView* gWebViewInstance = NULL;
 
 @implementation MainViewController
+
+@synthesize mColors             = _colors;
+@synthesize mSelectedColorIndex = _selectedColorIndex;
 
 - (id)initWithNibName:(NSString*)nibNameOrNil bundle:(NSBundle*)nibBundleOrNil
 {
@@ -82,6 +92,8 @@ UIWebView* gWebViewInstance = NULL;
 {
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
+
+    self.mColors = [NSArray arrayWithObjects:@"Blue", @"Orange", @"Black", @"Red", @"Eraser", nil];
 }
 
 - (void)viewDidUnload
@@ -221,13 +233,42 @@ UIWebView* gWebViewInstance = NULL;
 -(IBAction)pressedColor:(id)sender
 {
 #pragma unused(sender)
-    gCarouselApp.onPenColorChange();
+    [ActionSheetStringPicker showPickerWithTitle:@"Select Color"
+                                            rows:self.mColors
+                                initialSelection:self.mSelectedColorIndex
+                                          target:self
+                                   successAction:@selector(colorWasSelected:element:)
+                                    cancelAction:@selector(actionPickerCancelled:)
+                                          origin:sender];
 }
 
 -(IBAction)pressedErase:(id)sender
 {
 #pragma unused(sender)
-    gCarouselApp.onEraseButton();
+//    gCarouselApp.onEraseButton();
+}
+
+- (void)colorWasSelected:(NSNumber *)selectedIndex element:(id)element
+{
+#pragma unused(element)
+    self.mSelectedColorIndex = [selectedIndex intValue];
+
+    switch (self.mSelectedColorIndex)
+    {
+        case 0: gCarouselApp.onPenColorChange(kBlue); break;
+        case 1: gCarouselApp.onPenColorChange(kOrange); break;
+        case 2: gCarouselApp.onPenColorChange(kBlack); break;
+        case 3: gCarouselApp.onPenColorChange(kRed); break;
+        case 4: gCarouselApp.onPenColorChange(kWhite); break;
+
+        default: break;
+    }
+}
+
+- (void)actionPickerCancelled:(id)sender
+{
+#pragma unused(sender)
+
 }
 
 -(IBAction)pressedPrev:(id)sender

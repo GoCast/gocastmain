@@ -41,6 +41,11 @@
 						'../../source/Testbed/Carousel/<@(OS)/ViewController.h',
 						'../../source/Testbed/Carousel/<@(OS)/ViewController.mm',
 
+						'../../source/Testbed/Carousel/<@(OS)/AbstractActionSheetPicker.h',
+						'../../source/Testbed/Carousel/<@(OS)/AbstractActionSheetPicker.m',
+						'../../source/Testbed/Carousel/<@(OS)/ActionSheetStringPicker.h',
+						'../../source/Testbed/Carousel/<@(OS)/ActionSheetStringPicker.m',
+
 						'../../source/Base/package.h',
 						'../../source/Base/tObserver.h',
 						'../../source/Base/tSingleton.h',
