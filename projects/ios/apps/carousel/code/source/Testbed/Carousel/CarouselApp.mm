@@ -5,6 +5,7 @@
 #include "OpenGL/package.h"
 
 #include "CallcastEvent.h"
+#include "WhiteboardEvent.h"
 #include "CarouselEventManager.h"
 
 #include "Spot.h"
@@ -360,6 +361,14 @@ void CarouselApp::queueLine(const int32_t& newID, const tColor4b& newColor, cons
 
     sprintf(buf, "{\"name\":\"lineTo\",\"x\":%d,\"y\":%d},", (int)newEn.x, (int)newEn.y);
     mJSONStrings.append(std::string(buf));
+
+    //Local draw
+    CarouselEventManager::getInstance()->tSubject<const WhiteboardEvent&>::notify(WhiteboardEvent(WhiteboardEvent::kSave, mSpots[mSpotFinger]->getID(),
+                                                                                                  mSendPenColor,
+                                                                                                  (mSendPenColor == kWhite) ? 30 : mSendPenSize));
+    CarouselEventManager::getInstance()->tSubject<const WhiteboardEvent&>::notify(WhiteboardEvent(WhiteboardEvent::kMoveTo, mSpots[mSpotFinger]->getID(), newSt));
+    CarouselEventManager::getInstance()->tSubject<const WhiteboardEvent&>::notify(WhiteboardEvent(WhiteboardEvent::kLineTo, mSpots[mSpotFinger]->getID(), newEn));
+    CarouselEventManager::getInstance()->tSubject<const WhiteboardEvent&>::notify(WhiteboardEvent(WhiteboardEvent::kStroke, mSpots[mSpotFinger]->getID()));
 }
 
 void CarouselApp::sendStrings()

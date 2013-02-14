@@ -65,7 +65,6 @@ const tColor4b      kWhite  (255,255,255,255);
         printf("*** Unknown color: %s\n", rawColor.c_str());
     }
 
-    // TODO: fix SpotID
     CarouselEventManager::getInstance()->tSubject<const WhiteboardEvent&>::notify(WhiteboardEvent(WhiteboardEvent::kSave,
                                                                                                   atoi([[command.arguments objectAtIndex:0] UTF8String]),
                                                                                                   useColor, atoi([[command.arguments objectAtIndex:2] UTF8String])));
