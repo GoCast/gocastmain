@@ -32,6 +32,8 @@
 #import "OpenGLView.h"
 #import "ViewController.h"
 
+#include <string>
+
 @interface AppDelegate : NSObject <UIApplicationDelegate>{}
 
 // invoke string is passed to your app on launch, this is only valid if you
@@ -60,5 +62,7 @@
 
 -(void)showNicknameInUse;
 -(void)hideNicknameInUse;
+
+-(void)setSpotLabel:(const std::string&)newStr;
 
 @end

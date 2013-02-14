@@ -254,6 +254,10 @@ void CarouselApp::onAddSpot(const std::string& newType, const int32_t& newID)
         {
             process(kShowWhiteboard);
         }
+
+        char buf[80];
+        sprintf(buf, "Spot %d of %d", mSpotFinger + 1, (int)mSpots.size());
+        [gAppDelegateInstance setSpotLabel:std::string(buf)];
     }
 }
 
@@ -287,6 +291,10 @@ void CarouselApp::onRemoveSpot(const int32_t& newID)
 
         process(kShowWhiteboard);
     }
+
+    char buf[80];
+    sprintf(buf, "Spot %d of %d", mSpotFinger + 1, (int)mSpots.size());
+    [gAppDelegateInstance setSpotLabel:std::string(buf)];
 }
 
 void CarouselApp::onOkayButton()
@@ -530,6 +538,10 @@ void CarouselApp::showLoggingInViewExit()
 
 void CarouselApp::showWhiteboardSpotEntry()
 {
+    char buf[80];
+    sprintf(buf, "Spot %d of %d", mSpotFinger + 1, (int)mSpots.size());
+    [gAppDelegateInstance setSpotLabel:std::string(buf)];
+
     if (mInitialized)
     {
         if (!mMapping.empty())

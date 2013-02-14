@@ -193,6 +193,11 @@ static bool firstTime = true;
     [self.viewController.mNicknameInUseView setHidden:YES];
 }
 
+-(void)setSpotLabel:(const std::string&)newStr
+{
+    self.viewController.mWhiteboardSpotLabel.text = [NSString stringWithCString:newStr.c_str() encoding:NSUTF8StringEncoding];
+}
+
 #pragma mark -
 
 //-(void)loadLoginScreen

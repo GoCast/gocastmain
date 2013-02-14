@@ -16,6 +16,8 @@
 @property (nonatomic, strong) IBOutlet UITextField* mNickname;
 @property (nonatomic, strong) IBOutlet UITextField* mRoomname;
 
+@property (nonatomic, strong) IBOutlet UILabel* mWhiteboardSpotLabel;
+
 @property (nonatomic, retain) NSArray *mColors;
 @property (nonatomic, assign) NSInteger mSelectedColorIndex;
 
