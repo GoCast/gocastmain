@@ -71,6 +71,10 @@ public:
     void onPenSizeChange(const float& newSize);
     void onPenColorChange(const tColor4b& newColor);
 
+    void onAnimationLeft();
+    void onAnimationRight();
+//    void onAnimationEnd();
+
     void onNewButton();
     void onDeleteButton();
 
@@ -92,6 +96,8 @@ protected:
     void showWebLoadingViewEntry();
     void showWhiteboardSpotEntry();
     void startEntry();
+    void waitAnimThenShowBlankEntry();
+    void waitAnimThenShowWBEntry();
 
     void endExit();
     void showBlankSpotExit();
@@ -101,6 +107,8 @@ protected:
     void showWebLoadingViewExit();
     void showWhiteboardSpotExit();
     void startExit();
+    void waitAnimThenShowBlankExit();
+    void waitAnimThenShowWBExit();
 
     void invalidStateEntry() { assert("Attempted to enter an invalid state." && 0); }
     void invalidStateExit()  { assert("Attempted to exit an invalid state." && 0); }
@@ -109,6 +117,7 @@ public:
 	enum EventType
 	{
 		kInvalidEvent = 0,
+		kEndAnimation,
 		kLoginPressed,
 		kLoginSuccess,
 		kNext,
@@ -117,6 +126,7 @@ public:
 		kQuit,
 		kShowBlank,
 		kShowWhiteboard,
+		kStartAnimation,
 		kWebViewLoaded,
 	};
 
@@ -131,6 +141,8 @@ public:
 		kShowWebLoadingView,
 		kShowWhiteboardSpot,
 		kStart,
+		kWaitAnimThenShowBlank,
+		kWaitAnimThenShowWB,
 	};
 
 	static const StateType kInitialState = kStart;
@@ -141,6 +153,7 @@ public:
 		static const char* names[] =
 		{
 			"**invalidEvent**",
+			"endAnimation",
 			"loginPressed",
 			"loginSuccess",
 			"next",
@@ -149,6 +162,7 @@ public:
 			"quit",
 			"showBlank",
 			"showWhiteboard",
+			"startAnimation",
 			"webViewLoaded",
 		};
 		return names[(evt < 0) ? kInvalidEvent : (evt > (sizeof(names) / sizeof(const char*))) ? kInvalidEvent : evt];
@@ -167,6 +181,8 @@ public:
 			"showWebLoadingView",
 			"showWhiteboardSpot",
 			"start",
+			"waitAnimThenShowBlank",
+			"waitAnimThenShowWB",
 		};
 		return names[(node < 0) ? kInvalidState : (node > (sizeof(names) / sizeof(const char*))) ? kInvalidState : node];
 	};
@@ -188,6 +204,8 @@ protected:
 			&CarouselApp::showWebLoadingViewEntry,
 			&CarouselApp::showWhiteboardSpotEntry,
 			&CarouselApp::startEntry,
+			&CarouselApp::waitAnimThenShowBlankEntry,
+			&CarouselApp::waitAnimThenShowWBEntry,
 		};
 
 		(this->*fns[(mState < 0) ? kInvalidState : (mState > (sizeof(fns) / sizeof(callfn))) ? kInvalidState : mState])();
@@ -205,6 +223,8 @@ protected:
 			&CarouselApp::showWebLoadingViewExit,
 			&CarouselApp::showWhiteboardSpotExit,
 			&CarouselApp::startExit,
+			&CarouselApp::waitAnimThenShowBlankExit,
+			&CarouselApp::waitAnimThenShowWBExit,
 		};
 
 		(this->*fns[(mState < 0) ? kInvalidState : (mState > (sizeof(fns) / sizeof(callfn))) ? kInvalidState : mState])();
@@ -216,6 +236,7 @@ protected:
 		if ((mState == kShowBlankSpot) && (evt == kQuit)) return kEnd;
 		if ((mState == kShowBlankSpot) && (evt == kShowBlank)) return kShowBlankSpot;
 		if ((mState == kShowBlankSpot) && (evt == kShowWhiteboard)) return kShowWhiteboardSpot;
+		if ((mState == kShowBlankSpot) && (evt == kStartAnimation)) return kWaitAnimThenShowBlank;
 		if ((mState == kShowLoggingInView) && (evt == kLoginSuccess)) return kShowBlankSpot;
 		if ((mState == kShowLoggingInView) && (evt == kNickInUse)) return kShowNicknameInUse;
 		if ((mState == kShowLoggingInView) && (evt == kQuit)) return kEnd;
@@ -229,7 +250,18 @@ protected:
 		if ((mState == kShowWhiteboardSpot) && (evt == kQuit)) return kEnd;
 		if ((mState == kShowWhiteboardSpot) && (evt == kShowBlank)) return kShowBlankSpot;
 		if ((mState == kShowWhiteboardSpot) && (evt == kShowWhiteboard)) return kShowWhiteboardSpot;
+		if ((mState == kShowWhiteboardSpot) && (evt == kStartAnimation)) return kWaitAnimThenShowWB;
 		if ((mState == kStart) && (evt == kNext)) return kShowWebLoadingView;
+		if ((mState == kWaitAnimThenShowBlank) && (evt == kEndAnimation)) return kShowBlankSpot;
+		if ((mState == kWaitAnimThenShowBlank) && (evt == kQuit)) return kEnd;
+		if ((mState == kWaitAnimThenShowBlank) && (evt == kShowBlank)) return kWaitAnimThenShowBlank;
+		if ((mState == kWaitAnimThenShowBlank) && (evt == kShowWhiteboard)) return kWaitAnimThenShowWB;
+		if ((mState == kWaitAnimThenShowBlank) && (evt == kStartAnimation)) return kWaitAnimThenShowBlank;
+		if ((mState == kWaitAnimThenShowWB) && (evt == kEndAnimation)) return kShowWhiteboardSpot;
+		if ((mState == kWaitAnimThenShowWB) && (evt == kQuit)) return kEnd;
+		if ((mState == kWaitAnimThenShowWB) && (evt == kShowBlank)) return kWaitAnimThenShowBlank;
+		if ((mState == kWaitAnimThenShowWB) && (evt == kShowWhiteboard)) return kWaitAnimThenShowWB;
+		if ((mState == kWaitAnimThenShowWB) && (evt == kStartAnimation)) return kWaitAnimThenShowWB;
 
 		assert("Event is invalid for this state" && 0);
 

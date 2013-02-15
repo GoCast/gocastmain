@@ -335,6 +335,8 @@ void CarouselApp::onPrevButton()
         {
             sendStrings();
 
+            onAnimationRight();
+
             mSpotFinger--;
 
             process(kShowWhiteboard);
@@ -349,6 +351,8 @@ void CarouselApp::onNextButton()
         if (mSpotFinger != mSpots.size() - 1)
         {
             sendStrings();
+
+            onAnimationLeft();
 
             mSpotFinger++;
 
@@ -368,6 +372,34 @@ void CarouselApp::onPenColorChange(const tColor4b& newColor)
     sendStrings();
     mSendPenColor = newColor;
 }
+
+void CarouselApp::onAnimationLeft()
+{
+    UpdateLeftRightSpots();
+    printf("*** mSpotFinger: %d, mSpots.size(): %d\n", mSpotFinger, (int)mSpots.size());
+    if (!mSpots.empty() && mSpotFinger == (mSpots.size() - 2))
+    {
+        [gAppDelegateInstance hideRightSpot];
+    }
+    [gAppDelegateInstance animateLeft];
+    process(CarouselApp::kStartAnimation);
+}
+
+void CarouselApp::onAnimationRight()
+{
+    UpdateLeftRightSpots();
+    if (mSpotFinger == 1)
+    {
+        [gAppDelegateInstance hideLeftSpot];
+    }
+    [gAppDelegateInstance animateRight];
+    process(CarouselApp::kStartAnimation);
+}
+
+//void CarouselApp::onAnimationEnd()
+//{
+//    process(CarouselApp::kEndAnimation);
+//}
 
 void CarouselApp::onNewButton()
 {
@@ -506,6 +538,26 @@ void CarouselApp::endEntry()
 }
 void CarouselApp::endExit() { }
 
+void CarouselApp::waitAnimThenShowBlankEntry()
+{
+    [gAppDelegateInstance showWhiteboardSpot];
+}
+
+void CarouselApp::waitAnimThenShowBlankExit()
+{
+    [gAppDelegateInstance hideWhiteboardSpot];
+}
+
+void CarouselApp::waitAnimThenShowWBEntry()
+{
+    [gAppDelegateInstance showWhiteboardSpot];
+}
+
+void CarouselApp::waitAnimThenShowWBExit()
+{
+    [gAppDelegateInstance showWhiteboardSpot];
+}
+
 void CarouselApp::showWebLoadingViewEntry()
 {
     [gAppDelegateInstance showWebLoadingView];
@@ -578,8 +630,6 @@ void CarouselApp::showWhiteboardSpotEntry()
 
 void CarouselApp::showWhiteboardSpotExit()
 {
-    UpdateLeftRightSpots();
-
     [gAppDelegateInstance hideWhiteboardSpot];
 }
 
@@ -592,6 +642,8 @@ void CarouselApp::update(const CallcastEvent& msg)
 {
     switch (msg.mEvent)
     {
+        case CallcastEvent::kAnimationFinished: process(CarouselApp::kEndAnimation); break;
+
         case CallcastEvent::kAddSpot: onAddSpot(msg.mSpotType, msg.mSpotID); break;
         case CallcastEvent::kRemoveSpot: onRemoveSpot(msg.mSpotID); break;
 

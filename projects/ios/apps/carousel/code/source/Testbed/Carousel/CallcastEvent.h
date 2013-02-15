@@ -10,6 +10,9 @@ public:
         kSubmitLogin,
         kLoggedIn,
 
+        //UI Events
+        kAnimationFinished,
+
         //Callcast-specific events
         kAddSpot,
         kRemoveSpot,

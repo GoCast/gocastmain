@@ -71,4 +71,7 @@
 -(void)showRightSpot;
 -(void)hideRightSpot;
 
+-(void)animateLeft;
+-(void)animateRight;
+
 @end

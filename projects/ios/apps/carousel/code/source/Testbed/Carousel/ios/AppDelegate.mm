@@ -1,3 +1,13 @@
+#include "Base/package.h"
+#include "Math/package.h"
+#include "Input/package.h"
+#include "Io/package.h"
+#include "OpenGL/package.h"
+
+#include "CallcastEvent.h"
+#include "WhiteboardEvent.h"
+#include "CarouselEventManager.h"
+
 #import "AppDelegate.h"
 #import "ViewController.h"
 
@@ -216,6 +226,55 @@ static bool firstTime = true;
 -(void)hideRightSpot
 {
     [self.viewController.mRightSpot setHidden:YES];
+}
+
+-(void)animateLeft
+{
+    self.viewController.mAnimateOutSpot.frame = self.glView.frame;
+    self.viewController.mAnimateInSpot.frame = self.viewController.mRightSpot.frame;
+
+    [self.glView setHidden:YES];
+    [self.viewController.mAnimateInSpot setHidden:NO];
+    [self.viewController.mAnimateOutSpot setHidden:NO];
+
+    [UIView animateWithDuration:0.5f
+                          delay:0.0f
+                        options: UIViewAnimationCurveEaseInOut
+                     animations:^{
+                         self.viewController.mAnimateOutSpot.frame = self.viewController.mLeftSpot.frame;
+                         self.viewController.mAnimateInSpot.frame = self.glView.frame;
+                     }
+                     completion:^(BOOL finished){
+                        #pragma unused(finished)
+                         [self.glView setHidden:NO];
+                         [self.viewController.mAnimateInSpot setHidden:YES];
+                         [self.viewController.mAnimateOutSpot setHidden:YES];
+                         CarouselEventManager::getInstance()->tSubject<const CallcastEvent&>::notify(CallcastEvent::kAnimationFinished);
+                     }];
+}
+-(void)animateRight
+{
+    self.viewController.mAnimateOutSpot.frame = self.glView.frame;
+    self.viewController.mAnimateInSpot.frame = self.viewController.mLeftSpot.frame;
+
+    [self.glView setHidden:YES];
+    [self.viewController.mAnimateInSpot setHidden:NO];
+    [self.viewController.mAnimateOutSpot setHidden:NO];
+
+    [UIView animateWithDuration:0.5f
+                          delay:0.0f
+                        options: UIViewAnimationCurveEaseInOut
+                     animations:^{
+                         self.viewController.mAnimateOutSpot.frame = self.viewController.mRightSpot.frame;
+                         self.viewController.mAnimateInSpot.frame = self.glView.frame;
+                     }
+                     completion:^(BOOL finished){
+#pragma unused(finished)
+                         [self.glView setHidden:NO];
+                         [self.viewController.mAnimateInSpot setHidden:YES];
+                         [self.viewController.mAnimateOutSpot setHidden:YES];
+                         CarouselEventManager::getInstance()->tSubject<const CallcastEvent&>::notify(CallcastEvent::kAnimationFinished);
+                     }];
 }
 
 #pragma mark -

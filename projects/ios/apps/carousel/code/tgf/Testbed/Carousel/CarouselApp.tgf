@@ -6,6 +6,8 @@
 6 Show Web Loading View
 7 Show Nickname in Use
 8 Show Blank Spot
+9 Wait Anim then Show WB
+10 Wait Anim then Show Blank
 #
 2 5 loginPressed
 5 8 loginSuccess
@@ -25,3 +27,13 @@
 3 7 nickInUse
 3 3 showWhiteboard
 8 8 showBlank
+3 9 startAnimation
+9 3 endAnimation
+9 10 showBlank
+9 9 showWhiteboard, startAnimation
+9 4 quit
+10 4 quit
+10 9 showWhiteboard
+10 10 showBlank, startAnimation
+10 8 endAnimation
+8 10 startAnimation

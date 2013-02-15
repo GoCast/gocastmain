@@ -105,6 +105,9 @@ UIWebView* gWebViewInstance = NULL;
 
     [self.mWhiteboardSpotView addGestureRecognizer:swipeLeftGestureRecognizer];
     [self.mWhiteboardSpotView addGestureRecognizer:swipeRightGestureRecognizer];
+
+    [self.mAnimateInSpot setHidden:YES];
+    [self.mAnimateOutSpot setHidden:YES];
 }
 
 - (void)viewDidUnload
