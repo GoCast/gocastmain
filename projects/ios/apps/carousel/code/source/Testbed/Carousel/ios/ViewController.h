@@ -3,7 +3,7 @@
 
 #import <Cordova/CDVViewController.h>
 
-@interface MainViewController : CDVViewController
+@interface MainViewController : CDVViewController <UIGestureRecognizerDelegate>
 {
 }
 @property (nonatomic, strong) IBOutlet UIView* mWebLoadingView;
@@ -25,6 +25,11 @@
 
 @property (nonatomic, retain) NSArray *mColors;
 @property (nonatomic, assign) NSInteger mSelectedColorIndex;
+
+@property (nonatomic, retain) UISwipeGestureRecognizer* mSwipeLeftGesture;
+@property (nonatomic, retain) UISwipeGestureRecognizer* mSwipeRightGesture;
+
+- (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer;
 
 - (void)handleSwipeLeft:(UIGestureRecognizer*)recognizer;
 - (void)handleSwipeRight:(UIGestureRecognizer*)recognizer;
