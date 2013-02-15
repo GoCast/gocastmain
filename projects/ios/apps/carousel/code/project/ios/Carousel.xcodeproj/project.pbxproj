@@ -7,65 +7,63 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		024CA2805D68DD1CD06F0507 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = F21B7D51AA0AA14F9E1D3A44 /* InfoPlist.strings */; };
+		04D0A53287095A6E7EF73628 /* 5px.png in Resources */ = {isa = PBXBuildFile; fileRef = 3E226F3C0B3681BCED2CAE34 /* 5px.png */; };
 		053ACC0B9AF93FE618B338DE /* tSurface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0CC3E156EE25E95E293F95D7 /* tSurface.cpp */; };
 		0696DA8AFE2E9583589FA40B /* CarouselApp.mm in Sources */ = {isa = PBXBuildFile; fileRef = F7B020F2A9F4165F16A768DA /* CarouselApp.mm */; };
 		0E951170AD1B9B5EAF460872 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E02332AA60F58AAB6B97DC12 /* MobileCoreServices.framework */; };
-		1668280A84362F0F4536EB8D /* 3px.png in Resources */ = {isa = PBXBuildFile; fileRef = 26DDCB681437B061CC738085 /* 3px.png */; };
+		0EAD4BE7EB17DCB9CB8B7A9A /* eraser.png in Resources */ = {isa = PBXBuildFile; fileRef = 332C24A952E9CEB25A248506 /* eraser.png */; };
+		1A8F74F6359829D85E642710 /* colorblue.png in Resources */ = {isa = PBXBuildFile; fileRef = 0118141FAC902E17292576F2 /* colorblue.png */; };
+		1D22A294BC14DF543BAE7231 /* 1px.png in Resources */ = {isa = PBXBuildFile; fileRef = 4990E99D9957285C2D5C340E /* 1px.png */; };
+		1F31EA61E0B3273AA8906797 /* AddWhiteboard.png in Resources */ = {isa = PBXBuildFile; fileRef = 8015A700CE8DB2E0D6435C30 /* AddWhiteboard.png */; };
 		1FC763828CE41F3495799DDA /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B9BB59098BFBAEBAAF0D4F /* CoreLocation.framework */; };
-		21C0CE70FA94F2180FC6E089 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 4F71A32943E24D83BEFA7EBF /* Default-568h@2x.png */; };
 		23563FECFBE83940BD1CC6D9 /* tTimer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D9B0A6D8A72ADF3549326861 /* tTimer.cpp */; };
 		28F0FECF3D546568D37347C4 /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C7EBE166A7BA31065E473BE /* AddressBook.framework */; };
 		2C9C70414D65B81FC648DD4B /* tTimerPeer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4D9FA1E6EB10178AA38280BB /* tTimerPeer.mm */; };
-		35FE3A8379287F601418C6F6 /* colororange.png in Resources */ = {isa = PBXBuildFile; fileRef = D497811BCE323EC976273F46 /* colororange.png */; };
 		3611586D568D70AAA2545D88 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 13E1A600EFE89EB38952FF6A /* CFNetwork.framework */; };
 		3DDB576316C75C81653458C7 /* tFile.mm in Sources */ = {isa = PBXBuildFile; fileRef = A0D5F599AE16E9F133784B44 /* tFile.mm */; };
-		47E2B3651A3C93A183285B78 /* eraser.png in Resources */ = {isa = PBXBuildFile; fileRef = 332C24A952E9CEB25A248506 /* eraser.png */; };
 		4934F04117FAAB36FF741153 /* tShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5BBD9CAC67E564067E0BF48E /* tShader.cpp */; };
-		51D26DA02801A898D3A3FCAF /* spritesheet.frag in Resources */ = {isa = PBXBuildFile; fileRef = 44DC6FEE6667EBB686994F2E /* spritesheet.frag */; };
-		5767D4C263C8D5547285E06F /* colorblack.png in Resources */ = {isa = PBXBuildFile; fileRef = DBE2ABE2FAABA06ADC720193 /* colorblack.png */; };
-		5A5DA4A409A336F1B78B807F /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = 6997A9EFF90543E0BC776C03 /* Default.png */; };
+		5BBD65E228BAD00F2A45EC07 /* MainViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7E9B8B24CC16CC0972827DE3 /* MainViewController.xib */; };
+		5D95F31A8BB01B5FE699A478 /* GoToken-114.png in Resources */ = {isa = PBXBuildFile; fileRef = 10A56C3FFAE6B193FC34E5A7 /* GoToken-114.png */; };
 		5F6541C8D51635AC9237710C /* libCordova.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36C27AEF64708CAD6E226A73 /* libCordova.a */; };
+		632DA3E5EB1BAD2DB4760299 /* trash.png in Resources */ = {isa = PBXBuildFile; fileRef = B5788613E3DB7D0A78F85E6A /* trash.png */; };
 		63DC7A8040D9308B4B0182F5 /* tPixelFormat.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 751E5849B1D2F45943D9AA41 /* tPixelFormat.cpp */; };
 		66BFE7B0CC4E4C799A8F015E /* ActionSheetStringPicker.m in Sources */ = {isa = PBXBuildFile; fileRef = A54E18BD006DADD51C86D0DA /* ActionSheetStringPicker.m */; };
 		685692D4D81F5B687E483548 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 23220E27307FB5D1A6DF5408 /* AVFoundation.framework */; };
+		696A793225F9331EEE7A9417 /* colorred.png in Resources */ = {isa = PBXBuildFile; fileRef = 356C009D292B2077E6FA7A8D /* colorred.png */; };
 		6D1F0E3F6B85EE9A50C5170D /* OpenGLView.mm in Sources */ = {isa = PBXBuildFile; fileRef = CD0D36C6C8902282D777D6AD /* OpenGLView.mm */; };
 		6EFF1DB9802810DB57C8C2F9 /* AddressBookUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DE51930D45C7F7A2B526FB44 /* AddressBookUI.framework */; };
 		7764828D4A2BC4A611D8E6DB /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 47AAFC765076834D2975AB48 /* OpenGLES.framework */; };
-		78E90D01709984A28E8D0F90 /* trash.png in Resources */ = {isa = PBXBuildFile; fileRef = B5788613E3DB7D0A78F85E6A /* trash.png */; };
 		805A304F188D00A98CD4EC10 /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C10205A2E5136180F5785AD0 /* MediaPlayer.framework */; };
-		845601A6B2E0A4FC1AC9BC08 /* spritesheet.vert in Resources */ = {isa = PBXBuildFile; fileRef = 69EBC921CA0D9C8A7C8E0295 /* spritesheet.vert */; };
+		80BA2A47D9DD2CC76A9809BE /* GoToken.png in Resources */ = {isa = PBXBuildFile; fileRef = DA272714B13F51196D62056E /* GoToken.png */; };
 		870883FE1795E7FBF828FC44 /* tTexture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E9423167F2DEAC4A6A8D2506 /* tTexture.cpp */; };
-		8CAE1205024F1B999AFBCAEE /* 5px.png in Resources */ = {isa = PBXBuildFile; fileRef = 3E226F3C0B3681BCED2CAE34 /* 5px.png */; };
-		8E26EC27430AA842D56926D6 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = F21B7D51AA0AA14F9E1D3A44 /* InfoPlist.strings */; };
+		8FE8521803D45C9EB5763EEB /* spritesheet.vert in Resources */ = {isa = PBXBuildFile; fileRef = 69EBC921CA0D9C8A7C8E0295 /* spritesheet.vert */; };
 		907685D87916662CFF92274B /* AbstractActionSheetPicker.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C11204B048839C8491149F7 /* AbstractActionSheetPicker.m */; };
-		A588C9889299CF38F5BEBACB /* GoToken.png in Resources */ = {isa = PBXBuildFile; fileRef = DA272714B13F51196D62056E /* GoToken.png */; };
+		972651B7755EC478ECF30FE8 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 4F71A32943E24D83BEFA7EBF /* Default-568h@2x.png */; };
 		A8BC67394886865FFCD9B15F /* GCICallcast.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2C4F3C5A60393426A1C2219A /* GCICallcast.mm */; };
-		AD9D1AD38622C16CD330E71C /* 1px.png in Resources */ = {isa = PBXBuildFile; fileRef = 4990E99D9957285C2D5C340E /* 1px.png */; };
-		ADDEDF0E69D07C2BD59D6451 /* GoToken-114.png in Resources */ = {isa = PBXBuildFile; fileRef = 10A56C3FFAE6B193FC34E5A7 /* GoToken-114.png */; };
 		AE9ACC78D33BEFD8E9864C46 /* www in Resources */ = {isa = PBXBuildFile; fileRef = 97C9FE707DD80D7A97954D07 /* www */; };
-		B3D20BF9081AA66F81E70A80 /* AddWhiteboard.png in Resources */ = {isa = PBXBuildFile; fileRef = 8015A700CE8DB2E0D6435C30 /* AddWhiteboard.png */; };
-		B942AC9EB918EDDAB27C9F30 /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 98BAB634E3A0DED1936DAA0C /* Default@2x.png */; };
-		B97DA98F2045A09D40F8DD96 /* colorred.png in Resources */ = {isa = PBXBuildFile; fileRef = 356C009D292B2077E6FA7A8D /* colorred.png */; };
 		BF52FC3FCC3CC9F659FB6D1C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5C319FC64CA65D3CC431D8F2 /* Foundation.framework */; };
+		C0FD906291364E599CF4B7DD /* spritesheet.frag in Resources */ = {isa = PBXBuildFile; fileRef = 44DC6FEE6667EBB686994F2E /* spritesheet.frag */; };
 		C39B7833B6DF6FDE122BCFBC /* tProgram.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7002561CA20BE1C43EA3D583 /* tProgram.cpp */; };
 		C5D00BBE131314AC60AC1AD1 /* tSurfacePeer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0891C4707C2B8B12D8502671 /* tSurfacePeer.mm */; };
 		C6FF622EFAF235D66419D852 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5AA2B0CA9C6F2A0AC505DF5F /* SystemConfiguration.framework */; };
-		C7B6E72FC7C68CB4429E29A3 /* carouselarrowright.png in Resources */ = {isa = PBXBuildFile; fileRef = 65CB0F52721DC64654E7C11F /* carouselarrowright.png */; };
-		C92AE675C74F93D49BB92ECC /* GoToken-57.png in Resources */ = {isa = PBXBuildFile; fileRef = 4A73EE27124A45ED7D808100 /* GoToken-57.png */; };
+		C97109C966CC0D36976DEABE /* colororange.png in Resources */ = {isa = PBXBuildFile; fileRef = D497811BCE323EC976273F46 /* colororange.png */; };
 		CC838BA0048D0236AA288157 /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BE1C0F69260A7EEDC852877 /* main.mm */; };
 		CD9C178F7553D147F76933E0 /* Spot.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4ECD7B6C765FB5DF6FB0CD88 /* Spot.mm */; };
-		D00EE6CD966A0DC75B3D0C62 /* colorblue.png in Resources */ = {isa = PBXBuildFile; fileRef = 0118141FAC902E17292576F2 /* colorblue.png */; };
-		D0E5413C07DDB7254DD159A7 /* carouselarrowleft.png in Resources */ = {isa = PBXBuildFile; fileRef = 34CD9D9FAC83CD31668B263B /* carouselarrowleft.png */; };
 		D4E1C43818321561E81EA0C7 /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8C1227C47EECDD052FCA81A3 /* AppDelegate.mm */; };
 		D4E816E6FF9BC2119D5CC5CA /* ViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 48FCE3F3B24CF4E016427BEF /* ViewController.mm */; };
 		D72502C6E61F14BD236D26F7 /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 115707312888D9C2956F7016 /* CoreMedia.framework */; };
+		D80A3F8CFE900CC618E50C90 /* colorblack.png in Resources */ = {isa = PBXBuildFile; fileRef = DBE2ABE2FAABA06ADC720193 /* colorblack.png */; };
+		DE512776A1C50042D6A8A58B /* Cordova.plist in Resources */ = {isa = PBXBuildFile; fileRef = EABD61932C3384ABA83C8994 /* Cordova.plist */; };
+		DFB956377EC0C59BF27A11EF /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = 6997A9EFF90543E0BC776C03 /* Default.png */; };
 		E4DA3E6AA3E08035948461A5 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A4A0D62AC2A544D852D3B390 /* UIKit.framework */; };
+		E50159DF952CF92FF9697484 /* GoToken-57.png in Resources */ = {isa = PBXBuildFile; fileRef = 4A73EE27124A45ED7D808100 /* GoToken-57.png */; };
 		EBE291694997E7749114EB1A /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E589DD1A9136326254525265 /* AudioToolbox.framework */; };
-		F5A10B6C6516398EA00205D7 /* 10px.png in Resources */ = {isa = PBXBuildFile; fileRef = 8F49BFEEBAE847CBC37DDE3D /* 10px.png */; };
-		F6DF6E35AD9A94E4D9070845 /* MainViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7E9B8B24CC16CC0972827DE3 /* MainViewController.xib */; };
+		F03F520A3FBF5647CAA570FB /* 10px.png in Resources */ = {isa = PBXBuildFile; fileRef = 8F49BFEEBAE847CBC37DDE3D /* 10px.png */; };
+		F5148DC65911ADA1109C97DC /* 3px.png in Resources */ = {isa = PBXBuildFile; fileRef = 26DDCB681437B061CC738085 /* 3px.png */; };
 		F746E74AD435693462062677 /* WhiteboardSpot.mm in Sources */ = {isa = PBXBuildFile; fileRef = AEB6D511FAEDB0434E3C8E30 /* WhiteboardSpot.mm */; };
+		F7590A07EF955FF5435D913E /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 98BAB634E3A0DED1936DAA0C /* Default@2x.png */; };
 		F8B50F166B1AC5C4A33A4234 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8404188F18B0D9D6F5EABDF5 /* QuartzCore.framework */; };
-		FC0345202E2208FF11042105 /* Cordova.plist in Resources */ = {isa = PBXBuildFile; fileRef = EABD61932C3384ABA83C8994 /* Cordova.plist */; };
 		FC970A7A3A353509247A4F5E /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6AE8E48BA87416A9973D1805 /* CoreGraphics.framework */; };
 /* End PBXBuildFile section */
 
@@ -88,7 +86,6 @@
 		2FA731572E05D05601D4C3F6 /* package.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = package.h; sourceTree = "<group>"; };
 		32DEAEB10DFF001670EA1320 /* tTouchEvent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tTouchEvent.h; sourceTree = "<group>"; };
 		332C24A952E9CEB25A248506 /* eraser.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = eraser.png; sourceTree = "<group>"; };
-		34CD9D9FAC83CD31668B263B /* carouselarrowleft.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = carouselarrowleft.png; sourceTree = "<group>"; };
 		356C009D292B2077E6FA7A8D /* colorred.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = colorred.png; sourceTree = "<group>"; };
 		36B9BB59098BFBAEBAAF0D4F /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
 		36C27AEF64708CAD6E226A73 /* libCordova.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libCordova.a; path = "../../third-party/CordovaLib/lib/$(CURRENT_ARCH)/debug/libCordova.a"; sourceTree = "<group>"; };
@@ -112,7 +109,6 @@
 		5C319FC64CA65D3CC431D8F2 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		60F637D090BA98AD306435AE /* tTexture.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tTexture.h; sourceTree = "<group>"; };
 		640106BD5F9FC83D37EC0DA2 /* CarouselApp.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CarouselApp.h; sourceTree = "<group>"; };
-		65CB0F52721DC64654E7C11F /* carouselarrowright.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = carouselarrowright.png; sourceTree = "<group>"; };
 		6997A9EFF90543E0BC776C03 /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Default.png; sourceTree = "<group>"; };
 		69EBC921CA0D9C8A7C8E0295 /* spritesheet.vert */ = {isa = PBXFileReference; lastKnownFileType = text; path = spritesheet.vert; sourceTree = "<group>"; };
 		6AE8E48BA87416A9973D1805 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -337,7 +333,17 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		7A167816D4CD26F4DEA0046C /* ios */ = {
+		7E96348E6EABFADBEC4A2D09 /* Io */ = {
+			isa = PBXGroup;
+			children = (
+				450DDA7A4038248880001AFF /* ios */,
+				EDE2BCB43E41B1E5C3C4D893 /* package.h */,
+				0C6397884E7524698B270C44 /* tFile.h */,
+			);
+			path = Io;
+			sourceTree = "<group>";
+		};
+		8698A20B1AF987442C365497 /* ios */ = {
 			isa = PBXGroup;
 			children = (
 				8F49BFEEBAE847CBC37DDE3D /* 10px.png */,
@@ -354,8 +360,6 @@
 				DA272714B13F51196D62056E /* GoToken.png */,
 				F21B7D51AA0AA14F9E1D3A44 /* InfoPlist.strings */,
 				7E9B8B24CC16CC0972827DE3 /* MainViewController.xib */,
-				34CD9D9FAC83CD31668B263B /* carouselarrowleft.png */,
-				65CB0F52721DC64654E7C11F /* carouselarrowright.png */,
 				DBE2ABE2FAABA06ADC720193 /* colorblack.png */,
 				0118141FAC902E17292576F2 /* colorblue.png */,
 				D497811BCE323EC976273F46 /* colororange.png */,
@@ -366,16 +370,6 @@
 				B5788613E3DB7D0A78F85E6A /* trash.png */,
 			);
 			path = ios;
-			sourceTree = "<group>";
-		};
-		7E96348E6EABFADBEC4A2D09 /* Io */ = {
-			isa = PBXGroup;
-			children = (
-				450DDA7A4038248880001AFF /* ios */,
-				EDE2BCB43E41B1E5C3C4D893 /* package.h */,
-				0C6397884E7524698B270C44 /* tFile.h */,
-			);
-			path = Io;
 			sourceTree = "<group>";
 		};
 		908502AFF3EC2F6719B0D33B /* Source */ = {
@@ -408,7 +402,7 @@
 		D456037F389C8FB5E7E4FA3E /* rsrc */ = {
 			isa = PBXGroup;
 			children = (
-				7A167816D4CD26F4DEA0046C /* ios */,
+				8698A20B1AF987442C365497 /* ios */,
 				97C9FE707DD80D7A97954D07 /* www */,
 			);
 			path = rsrc;
@@ -481,31 +475,29 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5A5DA4A409A336F1B78B807F /* Default.png in Resources */,
-				B942AC9EB918EDDAB27C9F30 /* Default@2x.png in Resources */,
-				21C0CE70FA94F2180FC6E089 /* Default-568h@2x.png in Resources */,
-				ADDEDF0E69D07C2BD59D6451 /* GoToken-114.png in Resources */,
-				C92AE675C74F93D49BB92ECC /* GoToken-57.png in Resources */,
-				FC0345202E2208FF11042105 /* Cordova.plist in Resources */,
-				51D26DA02801A898D3A3FCAF /* spritesheet.frag in Resources */,
-				845601A6B2E0A4FC1AC9BC08 /* spritesheet.vert in Resources */,
-				F5A10B6C6516398EA00205D7 /* 10px.png in Resources */,
-				AD9D1AD38622C16CD330E71C /* 1px.png in Resources */,
-				1668280A84362F0F4536EB8D /* 3px.png in Resources */,
-				8CAE1205024F1B999AFBCAEE /* 5px.png in Resources */,
-				B3D20BF9081AA66F81E70A80 /* AddWhiteboard.png in Resources */,
-				D0E5413C07DDB7254DD159A7 /* carouselarrowleft.png in Resources */,
-				C7B6E72FC7C68CB4429E29A3 /* carouselarrowright.png in Resources */,
-				5767D4C263C8D5547285E06F /* colorblack.png in Resources */,
-				D00EE6CD966A0DC75B3D0C62 /* colorblue.png in Resources */,
-				35FE3A8379287F601418C6F6 /* colororange.png in Resources */,
-				B97DA98F2045A09D40F8DD96 /* colorred.png in Resources */,
-				47E2B3651A3C93A183285B78 /* eraser.png in Resources */,
-				A588C9889299CF38F5BEBACB /* GoToken.png in Resources */,
-				78E90D01709984A28E8D0F90 /* trash.png in Resources */,
+				DFB956377EC0C59BF27A11EF /* Default.png in Resources */,
+				F7590A07EF955FF5435D913E /* Default@2x.png in Resources */,
+				972651B7755EC478ECF30FE8 /* Default-568h@2x.png in Resources */,
+				5D95F31A8BB01B5FE699A478 /* GoToken-114.png in Resources */,
+				E50159DF952CF92FF9697484 /* GoToken-57.png in Resources */,
+				DE512776A1C50042D6A8A58B /* Cordova.plist in Resources */,
+				C0FD906291364E599CF4B7DD /* spritesheet.frag in Resources */,
+				8FE8521803D45C9EB5763EEB /* spritesheet.vert in Resources */,
+				F03F520A3FBF5647CAA570FB /* 10px.png in Resources */,
+				1D22A294BC14DF543BAE7231 /* 1px.png in Resources */,
+				F5148DC65911ADA1109C97DC /* 3px.png in Resources */,
+				04D0A53287095A6E7EF73628 /* 5px.png in Resources */,
+				1F31EA61E0B3273AA8906797 /* AddWhiteboard.png in Resources */,
+				D80A3F8CFE900CC618E50C90 /* colorblack.png in Resources */,
+				1A8F74F6359829D85E642710 /* colorblue.png in Resources */,
+				C97109C966CC0D36976DEABE /* colororange.png in Resources */,
+				696A793225F9331EEE7A9417 /* colorred.png in Resources */,
+				0EAD4BE7EB17DCB9CB8B7A9A /* eraser.png in Resources */,
+				80BA2A47D9DD2CC76A9809BE /* GoToken.png in Resources */,
+				632DA3E5EB1BAD2DB4760299 /* trash.png in Resources */,
 				AE9ACC78D33BEFD8E9864C46 /* www in Resources */,
-				8E26EC27430AA842D56926D6 /* InfoPlist.strings in Resources */,
-				F6DF6E35AD9A94E4D9070845 /* MainViewController.xib in Resources */,
+				024CA2805D68DD1CD06F0507 /* InfoPlist.strings in Resources */,
+				5BBD65E228BAD00F2A45EC07 /* MainViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -98,8 +98,6 @@
 						'../../rsrc/<@(OS)/3px.png',
 						'../../rsrc/<@(OS)/5px.png',
 						'../../rsrc/<@(OS)/AddWhiteboard.png',
-						'../../rsrc/<@(OS)/carouselarrowleft.png',
-						'../../rsrc/<@(OS)/carouselarrowright.png',
 						'../../rsrc/<@(OS)/colorblack.png',
 						'../../rsrc/<@(OS)/colorblue.png',
 						'../../rsrc/<@(OS)/colororange.png',
