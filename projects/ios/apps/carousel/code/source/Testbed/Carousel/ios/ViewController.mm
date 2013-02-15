@@ -1,3 +1,4 @@
+#import "AppDelegate.h"
 #import "ViewController.h"
 #import "ActionSheetStringPicker.h"
 
@@ -36,6 +37,30 @@ UIWebView* gWebViewInstance = NULL;
     return self;
 }
 
+- (void) handleSwipeLeft:(UIGestureRecognizer *) recognizer
+{
+    // Get the position of the point tapped in the window co-ordinate system
+    CGPoint tapPoint = [recognizer locationInView:self.view];
+
+    // If there are no buttons beneath this tap then move to the next page if near the page edge
+    if (![[self.view hitTest:tapPoint withEvent:nil] isKindOfClass:[OpenGLView class]])
+    {
+        [self pressedNext:nil];
+    }
+}
+
+- (void)handleSwipeRight:(UIGestureRecognizer*)recognizer
+{
+    // Get the position of the point tapped in the window co-ordinate system
+    CGPoint tapPoint = [recognizer locationInView:self.view];
+
+    // If there are no buttons beneath this tap then move to the next page if near the page edge
+    if (![[self.view hitTest:tapPoint withEvent:nil] isKindOfClass:[OpenGLView class]])
+    {
+        [self pressedNext:nil];
+    }
+}
+
 - (void)didReceiveMemoryWarning
 {
     // Releases the view if it doesn't have a superview.
@@ -67,6 +92,19 @@ UIWebView* gWebViewInstance = NULL;
     // Do any additional setup after loading the view from its nib.
 
     self.mColors = [NSArray arrayWithObjects:@"Blue", @"Orange", @"Black", @"Red", @"Eraser", nil];
+
+    UISwipeGestureRecognizer* swipeLeftGestureRecognizer = [[UISwipeGestureRecognizer alloc]
+                                                            initWithTarget:self
+                                                            action:@selector(handleSwipeLeft:)];
+    swipeLeftGestureRecognizer.direction = UISwipeGestureRecognizerDirectionLeft;
+
+    UISwipeGestureRecognizer* swipeRightGestureRecognizer = [[UISwipeGestureRecognizer alloc]
+                                                             initWithTarget:self
+                                                             action:@selector(handleSwipeRight:)];
+    swipeRightGestureRecognizer.direction = UISwipeGestureRecognizerDirectionRight;
+
+    [self.mWhiteboardSpotView addGestureRecognizer:swipeLeftGestureRecognizer];
+    [self.mWhiteboardSpotView addGestureRecognizer:swipeRightGestureRecognizer];
 }
 
 - (void)viewDidUnload

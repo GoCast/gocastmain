@@ -21,6 +21,9 @@
 @property (nonatomic, retain) NSArray *mColors;
 @property (nonatomic, assign) NSInteger mSelectedColorIndex;
 
+- (void)handleSwipeLeft:(UIGestureRecognizer*)recognizer;
+- (void)handleSwipeRight:(UIGestureRecognizer*)recognizer;
+
 -(IBAction)loginPressed:(id)sender;
 -(IBAction)okayPressed:(id)sender;
 

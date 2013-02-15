@@ -304,9 +304,10 @@ void CarouselApp::onOkayButton()
 
 void CarouselApp::onPrevButton()
 {
-    sendStrings();
-    if (!mSpots.empty())
+    if (mSpots.size() > 1)
     {
+        sendStrings();
+
         if (mSpotFinger != 0)
         {
             mSpotFinger--;
@@ -321,9 +322,10 @@ void CarouselApp::onPrevButton()
 
 void CarouselApp::onNextButton()
 {
-    sendStrings();
-    if (!mSpots.empty())
+    if (mSpots.size() > 1)
     {
+        sendStrings();
+
         if (mSpotFinger != mSpots.size() - 1)
         {
             mSpotFinger++;

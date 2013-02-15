@@ -104,18 +104,21 @@
 {
 #pragma unused(event)
     [self touchEvent:touches withEvent:tTouchEvent::kTouchBegin];
+    [super touchesBegan:touches withEvent:event];
 }
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
 {
 #pragma unused(event)
     [self touchEvent:touches withEvent:tTouchEvent::kTouchDrag];
+    [super touchesMoved:touches withEvent:event];
 }
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
 {
 #pragma unused(event)
     [self touchEvent:touches withEvent:tTouchEvent::kTouchEnd];
+    [super touchesEnded:touches withEvent:event];
 }
 
 @end
