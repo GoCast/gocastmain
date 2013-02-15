@@ -437,12 +437,7 @@ void CarouselApp::queueLine(const int32_t& newID, const tColor4b& newColor, cons
     mJSONStrings.append(std::string(buf));
 
     //Local draw
-    CarouselEventManager::getInstance()->tSubject<const WhiteboardEvent&>::notify(WhiteboardEvent(WhiteboardEvent::kSave, mSpots[mSpotFinger]->getID(),
-                                                                                                  mSendPenColor,
-                                                                                                  (mSendPenColor == kWhite) ? 30 : mSendPenSize));
-    CarouselEventManager::getInstance()->tSubject<const WhiteboardEvent&>::notify(WhiteboardEvent(WhiteboardEvent::kMoveTo, mSpots[mSpotFinger]->getID(), newSt));
-    CarouselEventManager::getInstance()->tSubject<const WhiteboardEvent&>::notify(WhiteboardEvent(WhiteboardEvent::kLineTo, mSpots[mSpotFinger]->getID(), newEn));
-    CarouselEventManager::getInstance()->tSubject<const WhiteboardEvent&>::notify(WhiteboardEvent(WhiteboardEvent::kStroke, mSpots[mSpotFinger]->getID()));
+    CarouselEventManager::getInstance()->tSubject<const WhiteboardEvent&>::notify(WhiteboardEvent(WhiteboardEvent::kLocalDraw, newID, newColor,(newColor == kWhite) ? 30 : mSendPenSize, newSt, newEn));
 }
 
 void CarouselApp::sendStrings()

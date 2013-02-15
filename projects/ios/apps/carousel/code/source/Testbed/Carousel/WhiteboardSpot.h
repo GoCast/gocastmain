@@ -21,7 +21,9 @@ public:
     void onLineTo(const tPoint2f& pt);
     void onStroke();
     void onLoadImageURL(const std::string& newURL);
-    
+
+    void onLocalDraw(const tColor4b& newColor, const int32_t& newPenSize, const tPoint2f& newSt, const tPoint2f& newEn);
+
 public:
     void update(const WhiteboardEvent& msg);
 };

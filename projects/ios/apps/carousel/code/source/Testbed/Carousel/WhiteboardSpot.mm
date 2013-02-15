@@ -88,6 +88,16 @@ void WhiteboardSpot::onLoadImageURL(const std::string& newURL)
     gCarouselApp.refresh(mID);
 }
 
+void WhiteboardSpot::onLocalDraw(const tColor4b& newColor, const int32_t& newPenSize, const tPoint2f& newSt, const tPoint2f& newEn)
+{
+    tPoint2f A(int(newSt.x * kFactor), int(newSt.y * kFactor));
+    tPoint2f B(int(newEn.x * kFactor), int(newEn.y * kFactor));
+    mSurface->drawLineWithPen(A, B, newColor, newPenSize * kFactor);
+
+    gCarouselApp.refresh(mID);
+}
+
+
 void WhiteboardSpot::update(const WhiteboardEvent& msg)
 {
     if (msg.mSpotID == mID)
@@ -100,6 +110,8 @@ void WhiteboardSpot::update(const WhiteboardEvent& msg)
             case WhiteboardEvent::kStroke:  onStroke(); break;
 
             case WhiteboardEvent::kLoadImageURL: onLoadImageURL(msg.mURL); break;
+
+            case WhiteboardEvent::kLocalDraw: onLocalDraw(msg.mColor, (int)msg.mPenSize, msg.mPoint, msg.mEndPoint);
 
             default: break;
         }
