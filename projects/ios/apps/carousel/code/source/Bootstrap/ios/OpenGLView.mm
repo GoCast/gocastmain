@@ -96,8 +96,8 @@
 
     tInputManager::getInstance()->tSubject<const tTouchEvent&>::notify(tTouchEvent(evt,
                                                                                    tInputManager::getInstance(),
-                                                                                   tPoint2f(touchPoint.x / 300.0f * 500.0f,
-                                                                                            touchPoint.y / 300.0f * 500.0f)));
+                                                                                   tPoint2f(touchPoint.x / 256.0f * 500.0f,
+                                                                                            touchPoint.y / 256.0f * 500.0f)));
 }
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event

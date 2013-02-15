@@ -16,7 +16,7 @@
 
 const tDimension2f  kSurfaceSize(256,256);
 const tDimension2f  kVisibleSize(500,500);
-const tDimension2f  kSpotSize(300,300);
+const tDimension2f  kSpotSize(256,256);
 
 const tColor4b      kBlack  (0,0,0,255);
 const tColor4b      kRed    (255,0,0,255);
@@ -116,7 +116,7 @@ void CarouselApp::configureNodes()
 
     //os.draw.tag
     //os.draw.setViewportState
-    glViewport(0, 0, (int32_t)300, (int32_t)300);
+    glViewport(0, 0, (int32_t)256, (int32_t)256);
 
     //os.draw.setProgram
     mSpriteProgram->setActive();
@@ -164,6 +164,27 @@ void CarouselApp::configureNodes()
         glVertexAttribPointer(location, 2, GL_FLOAT, GL_TRUE, 0, &mWhiteBoardTexCoords[0]);
     }
     
+}
+
+void CarouselApp::UpdateLeftRightSpots()
+{
+    if (mSpotFinger == 0)
+    {
+        [gAppDelegateInstance hideLeftSpot];
+    }
+    else
+    {
+        [gAppDelegateInstance showLeftSpot];
+    }
+
+    if (mSpots.empty() || mSpotFinger == mSpots.size() - 1)
+    {
+        [gAppDelegateInstance hideRightSpot];
+    }
+    else
+    {
+        [gAppDelegateInstance showRightSpot];
+    }
 }
 
 CarouselApp::CarouselApp()
@@ -231,6 +252,8 @@ void CarouselApp::onRedrawView(float time)
 
 void CarouselApp::refresh(const int32_t& newID)
 {
+    UpdateLeftRightSpots();
+
     if (mSpots[mSpotFinger]->getID() == newID)
     {
         delete mWhiteboardTexture;
@@ -258,6 +281,8 @@ void CarouselApp::onAddSpot(const std::string& newType, const int32_t& newID)
         char buf[80];
         sprintf(buf, "Spot %d of %d", mSpotFinger + 1, (int)mSpots.size());
         [gAppDelegateInstance setSpotLabel:std::string(buf)];
+
+        UpdateLeftRightSpots();
     }
 }
 
@@ -306,17 +331,14 @@ void CarouselApp::onPrevButton()
 {
     if (mSpots.size() > 1)
     {
-        sendStrings();
-
         if (mSpotFinger != 0)
         {
+            sendStrings();
+
             mSpotFinger--;
+
+            process(kShowWhiteboard);
         }
-        else
-        {
-            mSpotFinger = mSpots.size() - 1;
-        }
-        process(kShowWhiteboard);
     }
 }
 
@@ -324,17 +346,14 @@ void CarouselApp::onNextButton()
 {
     if (mSpots.size() > 1)
     {
-        sendStrings();
-
         if (mSpotFinger != mSpots.size() - 1)
         {
+            sendStrings();
+
             mSpotFinger++;
+
+            process(kShowWhiteboard);
         }
-        else
-        {
-            mSpotFinger = 0;
-        }
-        process(kShowWhiteboard);
     }
 }
 
@@ -540,6 +559,8 @@ void CarouselApp::showLoggingInViewExit()
 
 void CarouselApp::showWhiteboardSpotEntry()
 {
+    UpdateLeftRightSpots();
+
     char buf[80];
     sprintf(buf, "Spot %d of %d", mSpotFinger + 1, (int)mSpots.size());
     [gAppDelegateInstance setSpotLabel:std::string(buf)];
@@ -557,6 +578,8 @@ void CarouselApp::showWhiteboardSpotEntry()
 
 void CarouselApp::showWhiteboardSpotExit()
 {
+    UpdateLeftRightSpots();
+
     [gAppDelegateInstance hideWhiteboardSpot];
 }
 

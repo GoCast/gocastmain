@@ -171,7 +171,7 @@ static bool firstTime = true;
         firstTime = false;
 
         //*** TJG: Load OpenGL View once, attach it to whiteboard screen, re-use for each spot as needed
-        CGRect glBounds = CGRectMake(10, 10, 300, 300);
+        CGRect glBounds = CGRectMake(32, 32, 256, 256);
         self.glView = [[[OpenGLView alloc] initWithFrame:glBounds] autorelease];
         [self.viewController.mWhiteboardSpotView addSubview:_glView];
     }
@@ -196,6 +196,26 @@ static bool firstTime = true;
 -(void)setSpotLabel:(const std::string&)newStr
 {
     self.viewController.mWhiteboardSpotLabel.text = [NSString stringWithCString:newStr.c_str() encoding:NSUTF8StringEncoding];
+}
+
+-(void)showLeftSpot
+{
+    [self.viewController.mLeftSpot setHidden:NO];
+}
+
+-(void)hideLeftSpot
+{
+    [self.viewController.mLeftSpot setHidden:YES];
+}
+
+-(void)showRightSpot
+{
+    [self.viewController.mRightSpot setHidden:NO];
+}
+
+-(void)hideRightSpot
+{
+    [self.viewController.mRightSpot setHidden:YES];
 }
 
 #pragma mark -

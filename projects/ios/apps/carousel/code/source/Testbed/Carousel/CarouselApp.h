@@ -51,6 +51,8 @@ protected:
     void createResources();
     void configureNodes();
 
+    void UpdateLeftRightSpots();
+
 public:
     CarouselApp();
     ~CarouselApp();

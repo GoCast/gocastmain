@@ -57,7 +57,7 @@ UIWebView* gWebViewInstance = NULL;
     // If there are no buttons beneath this tap then move to the next page if near the page edge
     if (![[self.view hitTest:tapPoint withEvent:nil] isKindOfClass:[OpenGLView class]])
     {
-        [self pressedNext:nil];
+        [self pressedPrev:nil];
     }
 }
 

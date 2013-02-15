@@ -104,6 +104,7 @@
 						'../../rsrc/<@(OS)/colorred.png',
 						'../../rsrc/<@(OS)/eraser.png',
 						'../../rsrc/<@(OS)/GoToken.png',
+						'../../rsrc/<@(OS)/other-whiteboard.png',
 						'../../rsrc/<@(OS)/trash.png',
 
 						'../../rsrc/www',

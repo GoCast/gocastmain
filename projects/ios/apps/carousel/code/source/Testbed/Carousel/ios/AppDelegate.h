@@ -65,4 +65,10 @@
 
 -(void)setSpotLabel:(const std::string&)newStr;
 
+-(void)showLeftSpot;
+-(void)hideLeftSpot;
+
+-(void)showRightSpot;
+-(void)hideRightSpot;
+
 @end
