@@ -275,7 +275,7 @@ void CarouselApp::onAddSpot(const std::string& newType, const int32_t& newID)
 
         if (wasEmpty)
         {
-            process(kShowWhiteboard);
+            update(kShowWhiteboard);
         }
 
         char buf[80];
@@ -305,7 +305,7 @@ void CarouselApp::onRemoveSpot(const int32_t& newID)
 
     if (mSpots.empty())
     {
-        process(kShowBlank);
+        update(kShowBlank);
     }
     else if (mSpotFinger == count)
     {
@@ -314,7 +314,7 @@ void CarouselApp::onRemoveSpot(const int32_t& newID)
             mSpotFinger--;
         }
 
-        process(kShowWhiteboard);
+        update(kShowWhiteboard);
     }
 
     char buf[80];
@@ -324,7 +324,7 @@ void CarouselApp::onRemoveSpot(const int32_t& newID)
 
 void CarouselApp::onOkayButton()
 {
-    process(kOkay);
+    update(kOkay);
 }
 
 void CarouselApp::onPrevButton()
@@ -339,7 +339,7 @@ void CarouselApp::onPrevButton()
 
             mSpotFinger--;
 
-            process(kShowWhiteboard);
+            update(kShowWhiteboard);
         }
     }
 }
@@ -356,7 +356,7 @@ void CarouselApp::onNextButton()
 
             mSpotFinger++;
 
-            process(kShowWhiteboard);
+            update(kShowWhiteboard);
         }
     }
 }
@@ -376,13 +376,13 @@ void CarouselApp::onPenColorChange(const tColor4b& newColor)
 void CarouselApp::onAnimationLeft()
 {
     UpdateLeftRightSpots();
-    printf("*** mSpotFinger: %d, mSpots.size(): %d\n", mSpotFinger, (int)mSpots.size());
+
     if (!mSpots.empty() && mSpotFinger == (mSpots.size() - 2))
     {
         [gAppDelegateInstance hideRightSpot];
     }
     [gAppDelegateInstance animateLeft];
-    process(CarouselApp::kStartAnimation);
+    update(CarouselApp::kStartAnimation);
 }
 
 void CarouselApp::onAnimationRight()
@@ -393,12 +393,12 @@ void CarouselApp::onAnimationRight()
         [gAppDelegateInstance hideLeftSpot];
     }
     [gAppDelegateInstance animateRight];
-    process(CarouselApp::kStartAnimation);
+    update(CarouselApp::kStartAnimation);
 }
 
 //void CarouselApp::onAnimationEnd()
 //{
-//    process(CarouselApp::kEndAnimation);
+//    update(CarouselApp::kEndAnimation);
 //}
 
 void CarouselApp::onNewButton()
@@ -532,6 +532,8 @@ void CarouselApp::startExit() { }
 
 void CarouselApp::endEntry()
 {
+    [gWebViewInstance stringByEvaluatingJavaScriptFromString: [NSString stringWithFormat:@"%s", "Callcast.LeaveSession()"]];
+    sleep(1);
     if (mJSONTimer) delete mJSONTimer;
     if (mInputTimer) delete mInputTimer;
     if (mSpriteProgram) delete mSpriteProgram;
@@ -599,6 +601,16 @@ void CarouselApp::showNicknameInUseExit()
     [gAppDelegateInstance hideNicknameInUse];
 }
 
+void CarouselApp::showNetworkErrorEntry()
+{
+    [gAppDelegateInstance showNetworkError];
+}
+
+void CarouselApp::showNetworkErrorExit()
+{
+    [gAppDelegateInstance hideNetworkError];
+}
+
 void CarouselApp::showLoggingInViewEntry()
 {
     [gAppDelegateInstance showLoggingInView];
@@ -635,26 +647,49 @@ void CarouselApp::showWhiteboardSpotExit()
 
 void CarouselApp::update(const CarouselAppMessage& msg)
 {
-    process(msg.event);
+    if (mState == kShowNetworkError && msg.event == kQuit)
+    {
+        //Only accept quit messages in this state.
+        process(kQuit);
+    }
+    else
+    {
+        //Everything's normal, carry on.
+        process(msg.event);
+    }
 }
 
 void CarouselApp::update(const CallcastEvent& msg)
 {
     switch (msg.mEvent)
     {
-        case CallcastEvent::kAnimationFinished: process(CarouselApp::kEndAnimation); break;
+        case CallcastEvent::kAnimationFinished:
+            if (mState == kWaitAnimThenShowWB || mState == kWaitAnimThenShowBlank)
+            {
+                update(CarouselApp::kEndAnimation);
+            }
+            break;
 
         case CallcastEvent::kAddSpot: onAddSpot(msg.mSpotType, msg.mSpotID); break;
         case CallcastEvent::kRemoveSpot: onRemoveSpot(msg.mSpotID); break;
 
-        case CallcastEvent::kWebViewLoaded:     process(CarouselApp::kWebViewLoaded); break;
+        case CallcastEvent::kWebViewLoaded:     update(CarouselApp::kWebViewLoaded); break;
         case CallcastEvent::kSubmitLogin:
             mNickname = msg.mNickname;
             mRoomname = msg.mRoomname;
-            process(CarouselApp::kLoginPressed);
+            update(CarouselApp::kLoginPressed);
             break;
-        case CallcastEvent::kLoggedIn:          process(CarouselApp::kLoginSuccess); break;
-        case CallcastEvent::kOnNicknameInUse:   process(CarouselApp::kNickInUse); break;
+        case CallcastEvent::kLoggedIn:
+            if (mState == kShowLoggingInView)
+            {
+                update(CarouselApp::kLoginSuccess);
+            }
+            else if (mState != kShowNetworkError)
+            {
+                update(CarouselApp::kNetworkError);
+            }
+            break;
+        case CallcastEvent::kOnNicknameInUse:   update(CarouselApp::kNickInUse); break;
         default: break;
     }
 }

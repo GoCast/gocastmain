@@ -92,6 +92,7 @@ protected:
     void showBlankSpotEntry();
     void showLoggingInViewEntry();
     void showLoginViewEntry();
+    void showNetworkErrorEntry();
     void showNicknameInUseEntry();
     void showWebLoadingViewEntry();
     void showWhiteboardSpotEntry();
@@ -103,6 +104,7 @@ protected:
     void showBlankSpotExit();
     void showLoggingInViewExit();
     void showLoginViewExit();
+    void showNetworkErrorExit();
     void showNicknameInUseExit();
     void showWebLoadingViewExit();
     void showWhiteboardSpotExit();
@@ -120,6 +122,7 @@ public:
 		kEndAnimation,
 		kLoginPressed,
 		kLoginSuccess,
+		kNetworkError,
 		kNext,
 		kNickInUse,
 		kOkay,
@@ -137,6 +140,7 @@ public:
 		kShowBlankSpot,
 		kShowLoggingInView,
 		kShowLoginView,
+		kShowNetworkError,
 		kShowNicknameInUse,
 		kShowWebLoadingView,
 		kShowWhiteboardSpot,
@@ -156,6 +160,7 @@ public:
 			"endAnimation",
 			"loginPressed",
 			"loginSuccess",
+			"networkError",
 			"next",
 			"nickInUse",
 			"okay",
@@ -177,6 +182,7 @@ public:
 			"showBlankSpot",
 			"showLoggingInView",
 			"showLoginView",
+			"showNetworkError",
 			"showNicknameInUse",
 			"showWebLoadingView",
 			"showWhiteboardSpot",
@@ -200,6 +206,7 @@ protected:
 			&CarouselApp::showBlankSpotEntry,
 			&CarouselApp::showLoggingInViewEntry,
 			&CarouselApp::showLoginViewEntry,
+			&CarouselApp::showNetworkErrorEntry,
 			&CarouselApp::showNicknameInUseEntry,
 			&CarouselApp::showWebLoadingViewEntry,
 			&CarouselApp::showWhiteboardSpotEntry,
@@ -219,6 +226,7 @@ protected:
 			&CarouselApp::showBlankSpotExit,
 			&CarouselApp::showLoggingInViewExit,
 			&CarouselApp::showLoginViewExit,
+			&CarouselApp::showNetworkErrorExit,
 			&CarouselApp::showNicknameInUseExit,
 			&CarouselApp::showWebLoadingViewExit,
 			&CarouselApp::showWhiteboardSpotExit,
@@ -232,20 +240,27 @@ protected:
 
 	StateType StateTransitionFunction(const EventType evt) const
 	{
+		if ((mState == kShowBlankSpot) && (evt == kNetworkError)) return kShowNetworkError;
 		if ((mState == kShowBlankSpot) && (evt == kNickInUse)) return kShowNicknameInUse;
 		if ((mState == kShowBlankSpot) && (evt == kQuit)) return kEnd;
 		if ((mState == kShowBlankSpot) && (evt == kShowBlank)) return kShowBlankSpot;
 		if ((mState == kShowBlankSpot) && (evt == kShowWhiteboard)) return kShowWhiteboardSpot;
 		if ((mState == kShowBlankSpot) && (evt == kStartAnimation)) return kWaitAnimThenShowBlank;
 		if ((mState == kShowLoggingInView) && (evt == kLoginSuccess)) return kShowBlankSpot;
+		if ((mState == kShowLoggingInView) && (evt == kNetworkError)) return kShowNetworkError;
 		if ((mState == kShowLoggingInView) && (evt == kNickInUse)) return kShowNicknameInUse;
 		if ((mState == kShowLoggingInView) && (evt == kQuit)) return kEnd;
 		if ((mState == kShowLoginView) && (evt == kLoginPressed)) return kShowLoggingInView;
+		if ((mState == kShowLoginView) && (evt == kNetworkError)) return kShowNetworkError;
 		if ((mState == kShowLoginView) && (evt == kQuit)) return kEnd;
+		if ((mState == kShowNetworkError) && (evt == kQuit)) return kEnd;
+		if ((mState == kShowNicknameInUse) && (evt == kNetworkError)) return kShowNetworkError;
 		if ((mState == kShowNicknameInUse) && (evt == kOkay)) return kShowLoginView;
 		if ((mState == kShowNicknameInUse) && (evt == kQuit)) return kEnd;
+		if ((mState == kShowWebLoadingView) && (evt == kNetworkError)) return kShowNetworkError;
 		if ((mState == kShowWebLoadingView) && (evt == kQuit)) return kEnd;
 		if ((mState == kShowWebLoadingView) && (evt == kWebViewLoaded)) return kShowLoginView;
+		if ((mState == kShowWhiteboardSpot) && (evt == kNetworkError)) return kShowNetworkError;
 		if ((mState == kShowWhiteboardSpot) && (evt == kNickInUse)) return kShowNicknameInUse;
 		if ((mState == kShowWhiteboardSpot) && (evt == kQuit)) return kEnd;
 		if ((mState == kShowWhiteboardSpot) && (evt == kShowBlank)) return kShowBlankSpot;
@@ -253,11 +268,13 @@ protected:
 		if ((mState == kShowWhiteboardSpot) && (evt == kStartAnimation)) return kWaitAnimThenShowWB;
 		if ((mState == kStart) && (evt == kNext)) return kShowWebLoadingView;
 		if ((mState == kWaitAnimThenShowBlank) && (evt == kEndAnimation)) return kShowBlankSpot;
+		if ((mState == kWaitAnimThenShowBlank) && (evt == kNetworkError)) return kShowNetworkError;
 		if ((mState == kWaitAnimThenShowBlank) && (evt == kQuit)) return kEnd;
 		if ((mState == kWaitAnimThenShowBlank) && (evt == kShowBlank)) return kWaitAnimThenShowBlank;
 		if ((mState == kWaitAnimThenShowBlank) && (evt == kShowWhiteboard)) return kWaitAnimThenShowWB;
 		if ((mState == kWaitAnimThenShowBlank) && (evt == kStartAnimation)) return kWaitAnimThenShowBlank;
 		if ((mState == kWaitAnimThenShowWB) && (evt == kEndAnimation)) return kShowWhiteboardSpot;
+		if ((mState == kWaitAnimThenShowWB) && (evt == kNetworkError)) return kShowNetworkError;
 		if ((mState == kWaitAnimThenShowWB) && (evt == kQuit)) return kEnd;
 		if ((mState == kWaitAnimThenShowWB) && (evt == kShowBlank)) return kWaitAnimThenShowBlank;
 		if ((mState == kWaitAnimThenShowWB) && (evt == kShowWhiteboard)) return kWaitAnimThenShowWB;

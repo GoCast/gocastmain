@@ -203,6 +203,15 @@ static bool firstTime = true;
     [self.viewController.mNicknameInUseView setHidden:YES];
 }
 
+-(void)showNetworkError
+{
+    [self.viewController.mNetworkErrorView setHidden:NO];
+}
+-(void)hideNetworkError
+{
+    [self.viewController.mNetworkErrorView setHidden:YES];
+}
+
 -(void)setSpotLabel:(const std::string&)newStr
 {
     self.viewController.mWhiteboardSpotLabel.text = [NSString stringWithCString:newStr.c_str() encoding:NSUTF8StringEncoding];

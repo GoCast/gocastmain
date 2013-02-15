@@ -8,6 +8,7 @@
 8 Show Blank Spot
 9 Wait Anim then Show WB
 10 Wait Anim then Show Blank
+11 Show Network Error
 #
 2 5 loginPressed
 5 8 loginSuccess
@@ -37,3 +38,12 @@
 10 10 showBlank, startAnimation
 10 8 endAnimation
 8 10 startAnimation
+7 11 networkError
+10 11 networkError
+9 11 networkError
+3 11 networkError
+8 11 networkError
+5 11 networkError
+2 11 networkError
+6 11 networkError
+11 4 quit

@@ -12,6 +12,7 @@
 @property (nonatomic, strong) IBOutlet UIView* mNicknameInUseView;
 @property (nonatomic, strong) IBOutlet UIView* mBlankSpotView;
 @property (nonatomic, strong) IBOutlet UIView* mWhiteboardSpotView;
+@property (nonatomic, strong) IBOutlet UIView* mNetworkErrorView;
 
 @property (nonatomic, strong) IBOutlet UITextField* mNickname;
 @property (nonatomic, strong) IBOutlet UITextField* mRoomname;
@@ -30,6 +31,7 @@
 
 -(IBAction)loginPressed:(id)sender;
 -(IBAction)okayPressed:(id)sender;
+-(IBAction)quitPressed:(id)sender;
 
 -(IBAction)pressed1px:(id)sender;
 -(IBAction)pressed3px:(id)sender;

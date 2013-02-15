@@ -63,6 +63,9 @@
 -(void)showNicknameInUse;
 -(void)hideNicknameInUse;
 
+-(void)showNetworkError;
+-(void)hideNetworkError;
+
 -(void)setSpotLabel:(const std::string&)newStr;
 
 -(void)showLeftSpot;

@@ -102,6 +102,15 @@
                                                    });
                 }
 
+                if (statusStr.toLowerCase() === 'disconnected' ||
+                    statusStr.toLowerCase() === 'disconnecting' ||
+                    statusStr.toLowerCase() === 'connection failed')
+                {
+                    //Doing this (loggedIn twice) will bring up the "network connection failed" in iOS
+                    cordova.exec(function(winParam) {}, function(error) {}, "GCICallcast", "loggedIn", [ "" ]);
+                    cordova.exec(function(winParam) {}, function(error) {}, "GCICallcast", "loggedIn", [ "" ]);
+                }
+
             }
 
             function onNicknameInUse(nick)

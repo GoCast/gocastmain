@@ -205,6 +205,12 @@ UIWebView* gWebViewInstance = NULL;
  }
  */
 
+-(IBAction)quitPressed:(id)sender
+{
+#pragma unused(sender)
+    exit(0);
+}
+
 -(IBAction)loginPressed:(id)sender
 {
 #pragma unused(sender)
