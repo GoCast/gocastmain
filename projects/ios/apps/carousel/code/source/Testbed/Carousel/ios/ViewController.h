@@ -22,6 +22,7 @@
 @property (nonatomic, strong) IBOutlet UIImageView* mRightSpot;
 @property (nonatomic, strong) IBOutlet UIImageView* mAnimateInSpot;
 @property (nonatomic, strong) IBOutlet UIImageView* mAnimateOutSpot;
+@property (nonatomic, strong) IBOutlet UIButton* mColorButton;
 
 @property (nonatomic, retain) NSArray *mColors;
 @property (nonatomic, assign) NSInteger mSelectedColorIndex;

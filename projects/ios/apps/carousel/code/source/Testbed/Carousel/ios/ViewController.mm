@@ -1,3 +1,5 @@
+#import <UIKit/UIKit.h>
+
 #import "AppDelegate.h"
 #import "ViewController.h"
 #import "ActionSheetStringPicker.h"
@@ -296,11 +298,21 @@ UIWebView* gWebViewInstance = NULL;
 
     switch (self.mSelectedColorIndex)
     {
-        case 0: gCarouselApp.onPenColorChange(kBlue); break;
-        case 1: gCarouselApp.onPenColorChange(kOrange); break;
-        case 2: gCarouselApp.onPenColorChange(kBlack); break;
-        case 3: gCarouselApp.onPenColorChange(kRed); break;
-        case 4: gCarouselApp.onPenColorChange(kWhite); break;
+        case 0:
+            [self.mColorButton setBackgroundImage:[UIImage imageNamed:@"colorblue.png"] forState:UIControlStateNormal];
+            gCarouselApp.onPenColorChange(kBlue); break;
+        case 1:
+            [self.mColorButton setBackgroundImage:[UIImage imageNamed:@"colororange.png"] forState:UIControlStateNormal];
+            gCarouselApp.onPenColorChange(kOrange); break;
+        case 2:
+            [self.mColorButton setBackgroundImage:[UIImage imageNamed:@"colorblack.png"] forState:UIControlStateNormal];
+            gCarouselApp.onPenColorChange(kBlack); break;
+        case 3:
+            [self.mColorButton setBackgroundImage:[UIImage imageNamed:@"colorred.png"] forState:UIControlStateNormal];
+            gCarouselApp.onPenColorChange(kRed); break;
+        case 4:
+            [self.mColorButton setBackgroundImage:[UIImage imageNamed:@"colorwhite.png"] forState:UIControlStateNormal];
+            gCarouselApp.onPenColorChange(kWhite); break;
 
         default: break;
     }

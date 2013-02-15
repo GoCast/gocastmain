@@ -187,12 +187,12 @@
 								<int key="IBUIContentHorizontalAlignment">0</int>
 								<int key="IBUIContentVerticalAlignment">0</int>
 								<int key="IBUIButtonType">1</int>
-								<string key="IBUINormalTitle">Black</string>
+								<string key="IBUINormalTitle">Color</string>
 								<reference key="IBUIHighlightedTitleColor" ref="482415889"/>
 								<reference key="IBUINormalTitleShadowColor" ref="636075935"/>
 								<object class="NSCustomResource" key="IBUINormalBackgroundImage">
 									<string key="NSClassName">NSImage</string>
-									<string key="NSResourceName">colorblack.png</string>
+									<string key="NSResourceName">colorblue.png</string>
 								</object>
 								<reference key="IBUIFontDescription" ref="325356496"/>
 								<reference key="IBUIFont" ref="624290858"/>
@@ -811,7 +811,6 @@
 								<string key="NSFrame">{{40, 219}, {241, 21}}</string>
 								<reference key="NSSuperview" ref="757860005"/>
 								<reference key="NSWindow"/>
-								<reference key="NSNextKeyView"/>
 								<string key="NSReuseIdentifierKey">_NS:9</string>
 								<bool key="IBUIOpaque">NO</bool>
 								<bool key="IBUIClipsSubviews">YES</bool>
@@ -973,6 +972,14 @@
 						<reference key="destination" ref="288658015"/>
 					</object>
 					<int key="connectionID">170</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBCocoaTouchOutletConnection" key="connection">
+						<string key="label">mColorButton</string>
+						<reference key="source" ref="372490531"/>
+						<reference key="destination" ref="584844293"/>
+					</object>
+					<int key="connectionID">188</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBCocoaTouchEventConnection" key="connection">
@@ -1419,18 +1426,10 @@
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">187</int>
+			<int key="maxID">188</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
-				<object class="IBPartialClassDescription">
-					<string key="className">CDVCordovaView</string>
-					<string key="superclassName">UIWebView</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">./Classes/CDVCordovaView.h</string>
-					</object>
-				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">CDVViewController</string>
 					<string key="superclassName">UIViewController</string>
@@ -1524,6 +1523,7 @@
 						<string key="mAnimateInSpot">UIImageView</string>
 						<string key="mAnimateOutSpot">UIImageView</string>
 						<string key="mBlankSpotView">UIView</string>
+						<string key="mColorButton">UIButton</string>
 						<string key="mLeftSpot">UIImageView</string>
 						<string key="mLoggingInView">UIView</string>
 						<string key="mLoginView">UIView</string>
@@ -1548,6 +1548,10 @@
 						<object class="IBToOneOutletInfo" key="mBlankSpotView">
 							<string key="name">mBlankSpotView</string>
 							<string key="candidateClassName">UIView</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="mColorButton">
+							<string key="name">mColorButton</string>
+							<string key="candidateClassName">UIButton</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="mLeftSpot">
 							<string key="name">mLeftSpot</string>
@@ -1612,7 +1616,7 @@
 			<string key="5px.png">{22, 22}</string>
 			<string key="AddWhiteboard.png">{40, 40}</string>
 			<string key="GoToken.png">{200, 200}</string>
-			<string key="colorblack.png">{57, 22}</string>
+			<string key="colorblue.png">{57, 22}</string>
 			<string key="other-whiteboard.png">{192, 192}</string>
 			<string key="trash.png">{48, 48}</string>
 		</dictionary>

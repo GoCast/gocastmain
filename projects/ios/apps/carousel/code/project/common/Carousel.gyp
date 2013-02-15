@@ -102,6 +102,7 @@
 						'../../rsrc/<@(OS)/colorblue.png',
 						'../../rsrc/<@(OS)/colororange.png',
 						'../../rsrc/<@(OS)/colorred.png',
+						'../../rsrc/<@(OS)/colorwhite.png',
 						'../../rsrc/<@(OS)/eraser.png',
 						'../../rsrc/<@(OS)/GoToken.png',
 						'../../rsrc/<@(OS)/other-whiteboard.png',

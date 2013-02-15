@@ -7,62 +7,63 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		04B8CB62D96B2473B330FCA8 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 4F71A32943E24D83BEFA7EBF /* Default-568h@2x.png */; };
 		053ACC0B9AF93FE618B338DE /* tSurface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0CC3E156EE25E95E293F95D7 /* tSurface.cpp */; };
 		0696DA8AFE2E9583589FA40B /* CarouselApp.mm in Sources */ = {isa = PBXBuildFile; fileRef = F7B020F2A9F4165F16A768DA /* CarouselApp.mm */; };
-		092E8119EB46C98114F741C9 /* 5px.png in Resources */ = {isa = PBXBuildFile; fileRef = 3E226F3C0B3681BCED2CAE34 /* 5px.png */; };
-		09D05B53030FB251DAA52A83 /* 10px.png in Resources */ = {isa = PBXBuildFile; fileRef = 8F49BFEEBAE847CBC37DDE3D /* 10px.png */; };
-		0B482ACD82C3F3F1B8F5F58C /* colorblue.png in Resources */ = {isa = PBXBuildFile; fileRef = 0118141FAC902E17292576F2 /* colorblue.png */; };
+		0E8665E5D43EEEF6ACBC5B28 /* 10px.png in Resources */ = {isa = PBXBuildFile; fileRef = 8F49BFEEBAE847CBC37DDE3D /* 10px.png */; };
 		0E951170AD1B9B5EAF460872 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E02332AA60F58AAB6B97DC12 /* MobileCoreServices.framework */; };
-		137614851B722C844EBAE53B /* 1px.png in Resources */ = {isa = PBXBuildFile; fileRef = 4990E99D9957285C2D5C340E /* 1px.png */; };
-		1EBE6202094094EAFA1308D1 /* GoToken-57.png in Resources */ = {isa = PBXBuildFile; fileRef = 4A73EE27124A45ED7D808100 /* GoToken-57.png */; };
+		15DFFE919B579507748627E7 /* GoToken.png in Resources */ = {isa = PBXBuildFile; fileRef = DA272714B13F51196D62056E /* GoToken.png */; };
 		1FC763828CE41F3495799DDA /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B9BB59098BFBAEBAAF0D4F /* CoreLocation.framework */; };
+		214A293132F0658A6BF3932A /* eraser.png in Resources */ = {isa = PBXBuildFile; fileRef = 332C24A952E9CEB25A248506 /* eraser.png */; };
+		215893FD75A69EDA87F7910B /* colorred.png in Resources */ = {isa = PBXBuildFile; fileRef = 356C009D292B2077E6FA7A8D /* colorred.png */; };
 		23563FECFBE83940BD1CC6D9 /* tTimer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D9B0A6D8A72ADF3549326861 /* tTimer.cpp */; };
-		28D55AC2800CEFCA24A9A5EF /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = F21B7D51AA0AA14F9E1D3A44 /* InfoPlist.strings */; };
+		25138650D16AF6699159E3AD /* Cordova.plist in Resources */ = {isa = PBXBuildFile; fileRef = EABD61932C3384ABA83C8994 /* Cordova.plist */; };
 		28F0FECF3D546568D37347C4 /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C7EBE166A7BA31065E473BE /* AddressBook.framework */; };
-		2B02C456F9FCFE6D55257B66 /* GoToken-114.png in Resources */ = {isa = PBXBuildFile; fileRef = 10A56C3FFAE6B193FC34E5A7 /* GoToken-114.png */; };
+		2B38BE74507B33712BB05630 /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 98BAB634E3A0DED1936DAA0C /* Default@2x.png */; };
 		2C9C70414D65B81FC648DD4B /* tTimerPeer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4D9FA1E6EB10178AA38280BB /* tTimerPeer.mm */; };
 		3611586D568D70AAA2545D88 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 13E1A600EFE89EB38952FF6A /* CFNetwork.framework */; };
+		3ABDD83DF027DFB5CFB0F102 /* 5px.png in Resources */ = {isa = PBXBuildFile; fileRef = 3E226F3C0B3681BCED2CAE34 /* 5px.png */; };
 		3DDB576316C75C81653458C7 /* tFile.mm in Sources */ = {isa = PBXBuildFile; fileRef = A0D5F599AE16E9F133784B44 /* tFile.mm */; };
-		460AF049626558B29A0F7FF3 /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 98BAB634E3A0DED1936DAA0C /* Default@2x.png */; };
 		4934F04117FAAB36FF741153 /* tShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5BBD9CAC67E564067E0BF48E /* tShader.cpp */; };
-		4D0DC708CB332EBC8B084137 /* trash.png in Resources */ = {isa = PBXBuildFile; fileRef = B5788613E3DB7D0A78F85E6A /* trash.png */; };
+		4F5EEFB139D7E6C0E93ECF83 /* 1px.png in Resources */ = {isa = PBXBuildFile; fileRef = 4990E99D9957285C2D5C340E /* 1px.png */; };
+		50CA6973EA9946B1602BBF15 /* GoToken-114.png in Resources */ = {isa = PBXBuildFile; fileRef = 10A56C3FFAE6B193FC34E5A7 /* GoToken-114.png */; };
+		5859CFF5489609A3BA0C3493 /* colorwhite.png in Resources */ = {isa = PBXBuildFile; fileRef = 7640C2661E582258402B9271 /* colorwhite.png */; };
 		5F6541C8D51635AC9237710C /* libCordova.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36C27AEF64708CAD6E226A73 /* libCordova.a */; };
-		610C79DD322F9FDFA5B961D9 /* 3px.png in Resources */ = {isa = PBXBuildFile; fileRef = 26DDCB681437B061CC738085 /* 3px.png */; };
+		6298C5EB7835004C72AD56AA /* colorblack.png in Resources */ = {isa = PBXBuildFile; fileRef = DBE2ABE2FAABA06ADC720193 /* colorblack.png */; };
 		63DC7A8040D9308B4B0182F5 /* tPixelFormat.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 751E5849B1D2F45943D9AA41 /* tPixelFormat.cpp */; };
 		66BFE7B0CC4E4C799A8F015E /* ActionSheetStringPicker.m in Sources */ = {isa = PBXBuildFile; fileRef = A54E18BD006DADD51C86D0DA /* ActionSheetStringPicker.m */; };
 		685692D4D81F5B687E483548 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 23220E27307FB5D1A6DF5408 /* AVFoundation.framework */; };
+		68D688BA764B839A88247BF2 /* MainViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7E9B8B24CC16CC0972827DE3 /* MainViewController.xib */; };
 		6D1F0E3F6B85EE9A50C5170D /* OpenGLView.mm in Sources */ = {isa = PBXBuildFile; fileRef = CD0D36C6C8902282D777D6AD /* OpenGLView.mm */; };
 		6EFF1DB9802810DB57C8C2F9 /* AddressBookUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DE51930D45C7F7A2B526FB44 /* AddressBookUI.framework */; };
+		70CDDCED3D914D29ADCA376C /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = F21B7D51AA0AA14F9E1D3A44 /* InfoPlist.strings */; };
+		70EBD69CCAA2B5262006628B /* colororange.png in Resources */ = {isa = PBXBuildFile; fileRef = D497811BCE323EC976273F46 /* colororange.png */; };
 		7764828D4A2BC4A611D8E6DB /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 47AAFC765076834D2975AB48 /* OpenGLES.framework */; };
-		7FDAF6214444C0E8C46EFAF4 /* spritesheet.frag in Resources */ = {isa = PBXBuildFile; fileRef = 44DC6FEE6667EBB686994F2E /* spritesheet.frag */; };
+		7CECC8CAE88CB2C3D06B3563 /* AddWhiteboard.png in Resources */ = {isa = PBXBuildFile; fileRef = 8015A700CE8DB2E0D6435C30 /* AddWhiteboard.png */; };
 		805A304F188D00A98CD4EC10 /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C10205A2E5136180F5785AD0 /* MediaPlayer.framework */; };
 		870883FE1795E7FBF828FC44 /* tTexture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E9423167F2DEAC4A6A8D2506 /* tTexture.cpp */; };
+		904DBFB67C0FF2E9068C8105 /* colorblue.png in Resources */ = {isa = PBXBuildFile; fileRef = 0118141FAC902E17292576F2 /* colorblue.png */; };
 		907685D87916662CFF92274B /* AbstractActionSheetPicker.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C11204B048839C8491149F7 /* AbstractActionSheetPicker.m */; };
-		94706D43E274D31A2A4E2A61 /* spritesheet.vert in Resources */ = {isa = PBXBuildFile; fileRef = 69EBC921CA0D9C8A7C8E0295 /* spritesheet.vert */; };
 		A8BC67394886865FFCD9B15F /* GCICallcast.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2C4F3C5A60393426A1C2219A /* GCICallcast.mm */; };
-		AB8172B8DB46DD8625F3DE94 /* MainViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7E9B8B24CC16CC0972827DE3 /* MainViewController.xib */; };
-		AD803139766662D629647170 /* colorblack.png in Resources */ = {isa = PBXBuildFile; fileRef = DBE2ABE2FAABA06ADC720193 /* colorblack.png */; };
 		AE9ACC78D33BEFD8E9864C46 /* www in Resources */ = {isa = PBXBuildFile; fileRef = 97C9FE707DD80D7A97954D07 /* www */; };
-		BDCADE09D1AF9FCC62EF0AFE /* colorred.png in Resources */ = {isa = PBXBuildFile; fileRef = 356C009D292B2077E6FA7A8D /* colorred.png */; };
+		BE1682A05FBA081C1E2427E3 /* trash.png in Resources */ = {isa = PBXBuildFile; fileRef = B5788613E3DB7D0A78F85E6A /* trash.png */; };
 		BF52FC3FCC3CC9F659FB6D1C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5C319FC64CA65D3CC431D8F2 /* Foundation.framework */; };
-		C1B56D4905D350EED54C89A4 /* Cordova.plist in Resources */ = {isa = PBXBuildFile; fileRef = EABD61932C3384ABA83C8994 /* Cordova.plist */; };
 		C39B7833B6DF6FDE122BCFBC /* tProgram.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7002561CA20BE1C43EA3D583 /* tProgram.cpp */; };
-		C427144161565235E06683B5 /* other-whiteboard.png in Resources */ = {isa = PBXBuildFile; fileRef = 8D2B49F9F9F4D30DD275DBCB /* other-whiteboard.png */; };
 		C5D00BBE131314AC60AC1AD1 /* tSurfacePeer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0891C4707C2B8B12D8502671 /* tSurfacePeer.mm */; };
 		C6FF622EFAF235D66419D852 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5AA2B0CA9C6F2A0AC505DF5F /* SystemConfiguration.framework */; };
-		CC21EC699EA0CEBB45862F16 /* GoToken.png in Resources */ = {isa = PBXBuildFile; fileRef = DA272714B13F51196D62056E /* GoToken.png */; };
 		CC838BA0048D0236AA288157 /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BE1C0F69260A7EEDC852877 /* main.mm */; };
 		CD9C178F7553D147F76933E0 /* Spot.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4ECD7B6C765FB5DF6FB0CD88 /* Spot.mm */; };
-		CF107DE39F6136D1CA0421B9 /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = 6997A9EFF90543E0BC776C03 /* Default.png */; };
-		D356425740A2E02D354D2452 /* AddWhiteboard.png in Resources */ = {isa = PBXBuildFile; fileRef = 8015A700CE8DB2E0D6435C30 /* AddWhiteboard.png */; };
+		D1C84155F11A08C5302594A6 /* spritesheet.vert in Resources */ = {isa = PBXBuildFile; fileRef = 69EBC921CA0D9C8A7C8E0295 /* spritesheet.vert */; };
+		D31CF02977C06A1FD58E40B5 /* spritesheet.frag in Resources */ = {isa = PBXBuildFile; fileRef = 44DC6FEE6667EBB686994F2E /* spritesheet.frag */; };
 		D4E1C43818321561E81EA0C7 /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8C1227C47EECDD052FCA81A3 /* AppDelegate.mm */; };
 		D4E816E6FF9BC2119D5CC5CA /* ViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 48FCE3F3B24CF4E016427BEF /* ViewController.mm */; };
 		D72502C6E61F14BD236D26F7 /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 115707312888D9C2956F7016 /* CoreMedia.framework */; };
-		E3A9B5DE7C5DDCB16603F3D5 /* colororange.png in Resources */ = {isa = PBXBuildFile; fileRef = D497811BCE323EC976273F46 /* colororange.png */; };
+		E04CEF243EC5367FEC09985F /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = 6997A9EFF90543E0BC776C03 /* Default.png */; };
 		E4DA3E6AA3E08035948461A5 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A4A0D62AC2A544D852D3B390 /* UIKit.framework */; };
-		EB98931DFD83BDF4D1737E40 /* eraser.png in Resources */ = {isa = PBXBuildFile; fileRef = 332C24A952E9CEB25A248506 /* eraser.png */; };
+		E59094117234EF22D2D5D0E5 /* GoToken-57.png in Resources */ = {isa = PBXBuildFile; fileRef = 4A73EE27124A45ED7D808100 /* GoToken-57.png */; };
 		EBE291694997E7749114EB1A /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E589DD1A9136326254525265 /* AudioToolbox.framework */; };
-		ED2E5BA0B7D5707CBD4E1F6C /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 4F71A32943E24D83BEFA7EBF /* Default-568h@2x.png */; };
+		F09E074970D5386D094A4A2D /* other-whiteboard.png in Resources */ = {isa = PBXBuildFile; fileRef = 8D2B49F9F9F4D30DD275DBCB /* other-whiteboard.png */; };
+		F29B20EC15597E3BFA74F54E /* 3px.png in Resources */ = {isa = PBXBuildFile; fileRef = 26DDCB681437B061CC738085 /* 3px.png */; };
 		F746E74AD435693462062677 /* WhiteboardSpot.mm in Sources */ = {isa = PBXBuildFile; fileRef = AEB6D511FAEDB0434E3C8E30 /* WhiteboardSpot.mm */; };
 		F8B50F166B1AC5C4A33A4234 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8404188F18B0D9D6F5EABDF5 /* QuartzCore.framework */; };
 		FC970A7A3A353509247A4F5E /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6AE8E48BA87416A9973D1805 /* CoreGraphics.framework */; };
@@ -115,6 +116,7 @@
 		6AE8E48BA87416A9973D1805 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		7002561CA20BE1C43EA3D583 /* tProgram.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = tProgram.cpp; sourceTree = "<group>"; };
 		751E5849B1D2F45943D9AA41 /* tPixelFormat.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = tPixelFormat.cpp; sourceTree = "<group>"; };
+		7640C2661E582258402B9271 /* colorwhite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = colorwhite.png; sourceTree = "<group>"; };
 		7909122DB4B04A7E116D98B9 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
 		7AFA4BC5698C4AF70021CCC3 /* AbstractActionSheetPicker.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AbstractActionSheetPicker.h; sourceTree = "<group>"; };
 		8015A700CE8DB2E0D6435C30 /* AddWhiteboard.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = AddWhiteboard.png; sourceTree = "<group>"; };
@@ -223,6 +225,37 @@
 				60F637D090BA98AD306435AE /* tTexture.h */,
 			);
 			path = OpenGL;
+			sourceTree = "<group>";
+		};
+		272A2FC7B57BF180FFF84950 /* ios */ = {
+			isa = PBXGroup;
+			children = (
+				8F49BFEEBAE847CBC37DDE3D /* 10px.png */,
+				4990E99D9957285C2D5C340E /* 1px.png */,
+				26DDCB681437B061CC738085 /* 3px.png */,
+				3E226F3C0B3681BCED2CAE34 /* 5px.png */,
+				8015A700CE8DB2E0D6435C30 /* AddWhiteboard.png */,
+				EABD61932C3384ABA83C8994 /* Cordova.plist */,
+				4F71A32943E24D83BEFA7EBF /* Default-568h@2x.png */,
+				6997A9EFF90543E0BC776C03 /* Default.png */,
+				98BAB634E3A0DED1936DAA0C /* Default@2x.png */,
+				10A56C3FFAE6B193FC34E5A7 /* GoToken-114.png */,
+				4A73EE27124A45ED7D808100 /* GoToken-57.png */,
+				DA272714B13F51196D62056E /* GoToken.png */,
+				F21B7D51AA0AA14F9E1D3A44 /* InfoPlist.strings */,
+				7E9B8B24CC16CC0972827DE3 /* MainViewController.xib */,
+				DBE2ABE2FAABA06ADC720193 /* colorblack.png */,
+				0118141FAC902E17292576F2 /* colorblue.png */,
+				D497811BCE323EC976273F46 /* colororange.png */,
+				356C009D292B2077E6FA7A8D /* colorred.png */,
+				7640C2661E582258402B9271 /* colorwhite.png */,
+				332C24A952E9CEB25A248506 /* eraser.png */,
+				8D2B49F9F9F4D30DD275DBCB /* other-whiteboard.png */,
+				44DC6FEE6667EBB686994F2E /* spritesheet.frag */,
+				69EBC921CA0D9C8A7C8E0295 /* spritesheet.vert */,
+				B5788613E3DB7D0A78F85E6A /* trash.png */,
+			);
+			path = ios;
 			sourceTree = "<group>";
 		};
 		2EC5938BC3ACC479AD0C804C /* Math */ = {
@@ -375,7 +408,7 @@
 		D456037F389C8FB5E7E4FA3E /* rsrc */ = {
 			isa = PBXGroup;
 			children = (
-				FECD84CBDBE4DAA1EF5732CD /* ios */,
+				272A2FC7B57BF180FFF84950 /* ios */,
 				97C9FE707DD80D7A97954D07 /* www */,
 			);
 			path = rsrc;
@@ -401,36 +434,6 @@
 				45375EBD45E1E6ADB43C3BD4 /* Testbed/Carousel */,
 			);
 			path = source;
-			sourceTree = "<group>";
-		};
-		FECD84CBDBE4DAA1EF5732CD /* ios */ = {
-			isa = PBXGroup;
-			children = (
-				8F49BFEEBAE847CBC37DDE3D /* 10px.png */,
-				4990E99D9957285C2D5C340E /* 1px.png */,
-				26DDCB681437B061CC738085 /* 3px.png */,
-				3E226F3C0B3681BCED2CAE34 /* 5px.png */,
-				8015A700CE8DB2E0D6435C30 /* AddWhiteboard.png */,
-				EABD61932C3384ABA83C8994 /* Cordova.plist */,
-				4F71A32943E24D83BEFA7EBF /* Default-568h@2x.png */,
-				6997A9EFF90543E0BC776C03 /* Default.png */,
-				98BAB634E3A0DED1936DAA0C /* Default@2x.png */,
-				10A56C3FFAE6B193FC34E5A7 /* GoToken-114.png */,
-				4A73EE27124A45ED7D808100 /* GoToken-57.png */,
-				DA272714B13F51196D62056E /* GoToken.png */,
-				F21B7D51AA0AA14F9E1D3A44 /* InfoPlist.strings */,
-				7E9B8B24CC16CC0972827DE3 /* MainViewController.xib */,
-				DBE2ABE2FAABA06ADC720193 /* colorblack.png */,
-				0118141FAC902E17292576F2 /* colorblue.png */,
-				D497811BCE323EC976273F46 /* colororange.png */,
-				356C009D292B2077E6FA7A8D /* colorred.png */,
-				332C24A952E9CEB25A248506 /* eraser.png */,
-				8D2B49F9F9F4D30DD275DBCB /* other-whiteboard.png */,
-				44DC6FEE6667EBB686994F2E /* spritesheet.frag */,
-				69EBC921CA0D9C8A7C8E0295 /* spritesheet.vert */,
-				B5788613E3DB7D0A78F85E6A /* trash.png */,
-			);
-			path = ios;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -478,30 +481,31 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CF107DE39F6136D1CA0421B9 /* Default.png in Resources */,
-				460AF049626558B29A0F7FF3 /* Default@2x.png in Resources */,
-				ED2E5BA0B7D5707CBD4E1F6C /* Default-568h@2x.png in Resources */,
-				2B02C456F9FCFE6D55257B66 /* GoToken-114.png in Resources */,
-				1EBE6202094094EAFA1308D1 /* GoToken-57.png in Resources */,
-				C1B56D4905D350EED54C89A4 /* Cordova.plist in Resources */,
-				7FDAF6214444C0E8C46EFAF4 /* spritesheet.frag in Resources */,
-				94706D43E274D31A2A4E2A61 /* spritesheet.vert in Resources */,
-				09D05B53030FB251DAA52A83 /* 10px.png in Resources */,
-				137614851B722C844EBAE53B /* 1px.png in Resources */,
-				610C79DD322F9FDFA5B961D9 /* 3px.png in Resources */,
-				092E8119EB46C98114F741C9 /* 5px.png in Resources */,
-				D356425740A2E02D354D2452 /* AddWhiteboard.png in Resources */,
-				AD803139766662D629647170 /* colorblack.png in Resources */,
-				0B482ACD82C3F3F1B8F5F58C /* colorblue.png in Resources */,
-				E3A9B5DE7C5DDCB16603F3D5 /* colororange.png in Resources */,
-				BDCADE09D1AF9FCC62EF0AFE /* colorred.png in Resources */,
-				EB98931DFD83BDF4D1737E40 /* eraser.png in Resources */,
-				CC21EC699EA0CEBB45862F16 /* GoToken.png in Resources */,
-				C427144161565235E06683B5 /* other-whiteboard.png in Resources */,
-				4D0DC708CB332EBC8B084137 /* trash.png in Resources */,
+				E04CEF243EC5367FEC09985F /* Default.png in Resources */,
+				2B38BE74507B33712BB05630 /* Default@2x.png in Resources */,
+				04B8CB62D96B2473B330FCA8 /* Default-568h@2x.png in Resources */,
+				50CA6973EA9946B1602BBF15 /* GoToken-114.png in Resources */,
+				E59094117234EF22D2D5D0E5 /* GoToken-57.png in Resources */,
+				25138650D16AF6699159E3AD /* Cordova.plist in Resources */,
+				D31CF02977C06A1FD58E40B5 /* spritesheet.frag in Resources */,
+				D1C84155F11A08C5302594A6 /* spritesheet.vert in Resources */,
+				0E8665E5D43EEEF6ACBC5B28 /* 10px.png in Resources */,
+				4F5EEFB139D7E6C0E93ECF83 /* 1px.png in Resources */,
+				F29B20EC15597E3BFA74F54E /* 3px.png in Resources */,
+				3ABDD83DF027DFB5CFB0F102 /* 5px.png in Resources */,
+				7CECC8CAE88CB2C3D06B3563 /* AddWhiteboard.png in Resources */,
+				6298C5EB7835004C72AD56AA /* colorblack.png in Resources */,
+				904DBFB67C0FF2E9068C8105 /* colorblue.png in Resources */,
+				70EBD69CCAA2B5262006628B /* colororange.png in Resources */,
+				215893FD75A69EDA87F7910B /* colorred.png in Resources */,
+				5859CFF5489609A3BA0C3493 /* colorwhite.png in Resources */,
+				214A293132F0658A6BF3932A /* eraser.png in Resources */,
+				15DFFE919B579507748627E7 /* GoToken.png in Resources */,
+				F09E074970D5386D094A4A2D /* other-whiteboard.png in Resources */,
+				BE1682A05FBA081C1E2427E3 /* trash.png in Resources */,
 				AE9ACC78D33BEFD8E9864C46 /* www in Resources */,
-				28D55AC2800CEFCA24A9A5EF /* InfoPlist.strings in Resources */,
-				AB8172B8DB46DD8625F3DE94 /* MainViewController.xib in Resources */,
+				70CDDCED3D914D29ADCA376C /* InfoPlist.strings in Resources */,
+				68D688BA764B839A88247BF2 /* MainViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
