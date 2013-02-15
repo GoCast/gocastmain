@@ -75,7 +75,7 @@ GoCastJS.CheckBrowserSupport = function() {
 //!
 GoCastJS.CheckGoCastPlayer = function() {
     for (i in navigator.plugins) {
-        if ('GoCastPlayer' === navigator.plugins[i].name) {
+        if (navigator.plugins.hasOwnProperty(i) && 'GoCastPlayer' === navigator.plugins[i].name) {
             return true;
         }
     }
@@ -83,18 +83,34 @@ GoCastJS.CheckGoCastPlayer = function() {
 };
 
 //!
-//! constructor: GoCastJS.UserMediaOptions(mediaHints, player)
+//! constructor: GoCastJS.UserMediaOptions(constraints, player)
 //!
 //! arguments/members:
-//!     mediaHints  <obj>        : {audio: <bool>, video: <bool>,
-//!                                 [videoin: <string>]}
+//!     constraints  <obj>        : {audio: <bool>, video: <bool>
+//!                                 [, videoconstraints: object]
+//!                                 [, audioconstraints: object]}
 //!     player      <HtmlObject> : plugin instance used for local preview
-//!     videoin     <string>     : guid of the camera you want to use
 //!
-//! NOTE: if 'videoin' is not given the 'default' camera is used.
-//!
-GoCastJS.UserMediaOptions = function(mediaHints, player) {
-    this.mediaHints = mediaHints;
+GoCastJS.UserMediaOptions = function(constraints, player) {
+    var defaultwebrtcvideoconstraints = {
+        mandatory: {
+            minWidth: '160', maxWidth: '160',
+            minHeight: '120', maxHeight: '120',
+            minFrameRate: '14', maxFrameRate: '14'
+        }
+    };
+
+    if (constraints.video) {
+        constraints.videoconstraints = constraints.videoconstraints || {};
+        constraints.videoconstraints.webrtc = constraints.videoconstraints.webrtc ||
+                                              defaultwebrtcvideoconstraints;
+    }
+
+    if (constraints.audio) {
+        constraints.audioconstraints = constraints.audioconstraints || {};
+    }
+
+    this.constraints = constraints;
     this.player = player;
 };
 
@@ -107,6 +123,8 @@ GoCastJS.UserMediaOptions = function(mediaHints, player) {
 //!     failure <function(message)>         : failure callback with message
 //!
 GoCastJS.getUserMedia = function(options, success, failure) {
+    var player = options.player;
+
     GoCastJS.Video.captureDevice = '';
     GoCastJS.Audio.inputDevice = '';
     GoCastJS.Audio.outputDevice = '';
@@ -121,68 +139,64 @@ GoCastJS.getUserMedia = function(options, success, failure) {
             failure('GoCastJS.getUserMedia(): GoCastPlayer not detected.');
         }
     } else {
-        var player = options.player;
-
-        if (true === options.mediaHints.video) {
-            if ('undefined' === typeof(options.mediaHints.videoin) ||
-                null === options.mediaHints.videoin) {
+        if (true === options.constraints.video) {
+            if ('undefined' === typeof(options.constraints.videoconstraints.videoin) ||
+                null === options.constraints.videoconstraints.videoin) {
                 if ('undefined' === typeof(player.videoinopts['default'])) {
                     failure('GoCastJS.getUserMedia(): ' +
                             'No video devices detected');
                     return;
                 } else {
-                    options.mediaHints.videoin = player.videoinopts['default'];
+                    options.constraints.videoconstraints.videoin = player.videoinopts['default'];
                 }
             }
 
             console.log('GoCastJS.getUserMedia(): Choosing video: ' +
-                        player.videoinopts[options.mediaHints.videoin]);
-            GoCastJS.Video.captureDevice = options.mediaHints.videoin;
+                        player.videoinopts[options.constraints.videoconstraints.videoin]);
+            GoCastJS.Video.captureDevice = options.constraints.videoconstraints.videoin;
         }
 
-        if (true === options.mediaHints.audio) {
-            if ('undefined' === typeof(options.mediaHints.audioin) ||
-                null === options.mediaHints.audioin) {
+        if (true === options.constraints.audio) {
+            if ('undefined' === typeof(options.constraints.audioconstraints.audioin) ||
+                null === options.constraints.audioconstraints.audioin) {
                 if (0 >= player.audioinopts.length) {
                     failure('GoCastJS.getUserMedia(): ' +
                             'No audio input devices detected');
                     return;
                 } else {
-                    options.mediaHints.audioin = player.audioinopts[0];
+                    options.constraints.audioconstraints.audioin = player.audioinopts[0];
                 }
             }
 
-            if ('undefined' === typeof(options.mediaHints.audioout) ||
-                null === options.mediaHints.audioout) {
+            if ('undefined' === typeof(options.constraints.audioconstraints.audioout) ||
+                null === options.constraints.audioconstraints.audioout) {
                 if (0 >= player.audiooutopts.length) {
                     failure('GoCastJS.getUserMedia(): ' +
                             'No audio output devices detected');
                     return;
                 } else {
-                    options.mediaHints.audioout = player.audiooutopts[0];
+                    options.constraints.audioconstraints.audioout = player.audiooutopts[0];
                 }
             }
 
             console.log('GoCastJS.getUserMedia(): Choosing audio input: ' +
-                        options.mediaHints.audioin);
-            GoCastJS.Audio.inputDevice = options.mediaHints.audioin;
+                        options.constraints.audioconstraints.audioin);
+            GoCastJS.Audio.inputDevice = options.constraints.audioconstraints.audioin;
 
             console.log('GoCastJS.getUserMedia(): Choosing audio output: ' +
-                        options.mediaHints.audioout);
-            GoCastJS.Audio.outputDevice = options.mediaHints.audioout;
+                        options.constraints.audioconstraints.audioout);
+            GoCastJS.Audio.outputDevice = options.constraints.audioconstraints.audioout;
         }
 
         player.getUserMedia(
-            options.mediaHints,
+            options.constraints,
             function(stream) {
                 var hints = {
-                    video: options.mediaHints.video,
-                    audio: options.mediaHints.audio
+                    video: options.constraints.video,
+                    audio: options.constraints.audio
                 };
 
-                if (false === player.init('localPlayer',
-                                          'STUN video.gocast.it:19302',
-                                          null)) {
+                if (false === player.init('localPlayer', [], null)) {
                     throw new GoCastJS.Exception(player.id, 'init() failed.');
                 }
 
@@ -193,25 +207,28 @@ GoCastJS.getUserMedia = function(options, success, failure) {
                     }                    
                 }
 
-                player.setLocalDescription(
-                    'OFFER',
-                    player.createOffer({audio: true, video: true}),
-                    function() {
+                player.createOffer(function(sdp) {
+                    player.setLocalDescription('offer', sdp, function() {
                         player.source = stream;
-                        if ('undefined' !== typeof(success) &&
-                            null !== success) {
+                        if ('undefined' !== typeof(success) && null !== success) {
                             success(stream);
                         }
-                    },
-                    function(message) {
-                        console.log('localPlayer.setLocalDescription(): ',
-                                    message);
+                    }, function(error) {
+                        console.log('localPlayer.setLocalDescription(): ', error);
+                        if ('undefined' !== typeof(failure) && null !== failure) {
+                            failure(error);
+                        }
+                    });
+                }, function(error) {
+                    console.log('localPlayer.createOffer(): ', error);
+                    if ('undefined' !== typeof(failure) && null !== failure) {
+                        failure(error);
                     }
-                );
+                });
             },
-            function(message) {
+            function(error) {
                 if ('undefined' !== typeof(failure) && null !== success) {
-                    failure(message);
+                    failure(error);
                 }
             }
         );
@@ -320,38 +337,41 @@ GoCastJS.SetDevicesChangedListener = function(checkInterval,
 
         // Check for newly deleted devices
         for (i in GoCastJS.Video.devices) {
-            if ('undefined' === typeof(vInOpts[GoCastJS.Video.devices[i]])) {
+            if (GoCastJS.Video.devices.hasOwnProperty(i) &&
+                'undefined' === typeof(vInOpts[GoCastJS.Video.devices[i]])) {
                 videoDevicesDeleted.push(GoCastJS.Video.devices[i]);
             }
         }
 
         for (i in GoCastJS.Audio.inputDevices) {
-            if (-1 === aInOpts.indexOf(GoCastJS.Audio.inputDevices[i])) {
+            if (GoCastJS.Audio.inputDevices.hasOwnProperty(i) &&
+                -1 === aInOpts.indexOf(GoCastJS.Audio.inputDevices[i])) {
                 audioInDevicesDeleted.push(GoCastJS.Audio.inputDevices[i]);
             }
         }
 
         for (i in GoCastJS.Audio.outputDevices) {
-            if (-1 === aOutOpts.indexOf(GoCastJS.Audio.outputDevices[i])) {
+            if (GoCastJS.Audio.outputDevices.hasOwnProperty(i) &&
+                -1 === aOutOpts.indexOf(GoCastJS.Audio.outputDevices[i])) {
                 audioOutDevicesDeleted.push(GoCastJS.Audio.outputDevices[i]);
             }
         }
 
         // Check for newly added devices
         for (j in vInOpts) {
-            if (-1 === GoCastJS.Video.devices.indexOf(j)) {
+            if (vInOpts.hasOwnProperty(j) && -1 === GoCastJS.Video.devices.indexOf(j)) {
                 videoDevicesAdded.push(j);
             }
         }
 
         for (j in aInOpts) {
-            if (-1 === GoCastJS.Audio.inputDevices.indexOf(aInOpts[j])) {
+            if (aInOpts.hasOwnProperty(j) && -1 === GoCastJS.Audio.inputDevices.indexOf(aInOpts[j])) {
                 audioInDevicesAdded.push(aInOpts[j]);
             }
         }
 
         for (j in aOutOpts) {
-            if (-1 === GoCastJS.Audio.outputDevices.indexOf(aOutOpts[j])) {
+            if (aOutOpts.hasOwnProperty(j) && -1 === GoCastJS.Audio.outputDevices.indexOf(aOutOpts[j])) {
                 audioOutDevicesAdded.push(aOutOpts[j]);
             }
         }
@@ -360,7 +380,9 @@ GoCastJS.SetDevicesChangedListener = function(checkInterval,
         if (0 < videoDevicesAdded.length || 0 < videoDevicesDeleted.length) {
             GoCastJS.Video.devices = [];
             for (i in vInOpts) {
-                GoCastJS.Video.devices.push(i);
+                if (vInOpts.hasOwnProperty(i)) {
+                    GoCastJS.Video.devices.push(i);
+                }
             }
         }
 
@@ -368,7 +390,9 @@ GoCastJS.SetDevicesChangedListener = function(checkInterval,
             0 < audioInDevicesDeleted.length) {
             GoCastJS.Audio.inputDevices = [];
             for (i in aInOpts) {
-                GoCastJS.Audio.inputDevices.push(aInOpts[i]);
+                if (aInOpts.hasOwnProperty(i)) {
+                    GoCastJS.Audio.inputDevices.push(aInOpts[i]);
+                }
             }
         }
 
@@ -376,7 +400,9 @@ GoCastJS.SetDevicesChangedListener = function(checkInterval,
             0 < audioOutDevicesDeleted.length) {
             GoCastJS.Audio.outputDevices = [];
             for (i in aOutOpts) {
-                GoCastJS.Audio.outputDevices.push(aOutOpts[i]);
+                if (aOutOpts.hasOwnProperty(i)) {
+                    GoCastJS.Audio.outputDevices.push(aOutOpts[i]);
+                }
             }
         }
 
@@ -402,20 +428,20 @@ GoCastJS.SetDevicesChangedListener = function(checkInterval,
 //!                                             player)
 //!
 //! arguments/members:
-//!     iceConfig   <string>     : 'STUN <ip>:<port>'
+//!     iceServers  <string>     : [{uri: 'stun:video.gocast.it:19302'}, {uri: <addr>, password: <pwd>}]
 //!     player      <HtmlObject> : width of plugin window
-//!     onIceMessage       <function(sdp, moreComing)> : new ice candidate
+//!     onIceMessage       <function(candidate, moreComing)> : new ice candidate
 //!     onAddStream        <function(stream)>          : new remote stream
 //!     onRemoveStream     <function(stream)>          : remote stream removed
-//!     onReadyStateChange <function()>                : ready state changed
+//!     onReadyStateChange <function()>                : signaling state changed
 //!
-GoCastJS.PeerConnectionOptions = function(iceConfig,
+GoCastJS.PeerConnectionOptions = function(iceServers,
                                           onIceMessage,
                                           onAddStream,
                                           onRemoveStream,
                                           onReadyStateChange,
                                           player) {
-    this.iceConfig = iceConfig;
+    this.iceServers = iceServers;
     this.onIceMessage = onIceMessage;
     this.onAddStream = onAddStream;
     this.onRemoveStream = onRemoveStream;
@@ -460,44 +486,46 @@ GoCastJS.PeerConnection = function(options) {
             }
         };
 
-        this.player.onreadystatechange = function() {
-            if ('CONNECTING' === self.ReadyState() &&
-                null === self.connTimer) {
-                self.connTimer = setTimeout(function() {
-                    self.connState = 'CONNECTED';
-                    playerRef.onreadystatechange();
-                }, 2000);
-            }
+        this.player.onstatechange = function(stateType) {
+            if ('signaling-state' === stateType) {
+                if ('CONNECTING' === self.ReadyState() &&
+                    null === self.connTimer) {
+                    self.connTimer = setTimeout(function() {
+                        self.connState = 'CONNECTED';
+                        playerRef.onstatechange('signaling-state');
+                    }, 2000);
+                }
 
-            if ('undefined' !== typeof(options.onReadyStateChange) &&
-                null !== options.onReadyStateChange) {
-                options.onReadyStateChange();
+                if ('undefined' !== typeof(options.onReadyStateChange) &&
+                    null !== options.onReadyStateChange) {
+                    options.onReadyStateChange();
+                }
             }
         };
 
-        var iceCallback = function(candidate, moreComing) {
+        var iceCallback = function(candidate) {
             var prevState = self.connState;
             self.connState = 'CONNECTING';
 
             if (prevState !== self.connState) {
                 self.connTimer = null;
-                playerRef.onreadystatechange();
+                playerRef.onstatechange('signaling-state');
             } else {
                 clearTimeout(self.connTimer);
                 self.connTimer = setTimeout(function() {
                     self.connState = 'CONNECTED';
-                    playerRef.onreadystatechange();
+                    playerRef.onstatechange('signaling-state');
                 }, 2000);                    
             }
 
             if ('undefined' !== typeof(options.onIceMessage) &&
                null !== options.onIceMessage) {
-                options.onIceMessage(candidate, moreComing);
+                options.onIceMessage(candidate.replace(/\r\n/, ''), '' !== candidate);
             }
         };
 
         if (false === this.player.init(this.player.id,
-                                       options.iceConfig,
+                                       options.iceServers,
                                        iceCallback)) {
             throw new GoCastJS.Exception(this.player.id, 'init() failed.');
         }
@@ -531,36 +559,29 @@ GoCastJS.PeerConnection.prototype.RemoveStream = function(stream) {
 };
 
 //!
-//! function: GoCastJS.PeerConnection.CreateOffer(mediaHints)
+//! function: GoCastJS.PeerConnection.CreateOffer(success, failure)
 //!
 //! arguments:
-//!     mediaHints <obj> : see GoCastJS.GetUserMedia()
+//!     success : function(sdp)
+//!     failure : function(error)
 //!
-//! returns: sdp <string>
-//!
-GoCastJS.PeerConnection.prototype.CreateOffer = function(mediaHints) {
-    var offer = this.player.createOffer(mediaHints);
-    if ('' === offer) {
-        throw new GoCastJS.Exception(this.player.id, 'createOffer() failed.');
-    }
-    return offer;
+GoCastJS.PeerConnection.prototype.CreateOffer = function(success, failure) {
+    success = success || function(sdp) {};
+    failure = failure || function(error) {};
+    this.player.createOffer(success, failure);
 };
 
 //!
-//! function: GoCastJS.PeerConnection.CreateAnswer(offer, mediaHints)
+//! function: GoCastJS.PeerConnection.CreateAnswer(success, failure)
 //!
 //! arguments:
-//!     offer      <string> : sdp offer of remote peer
-//!     mediaHints <obj>    : see GoCastJS.GetUserMedia()
+//!     success : function(sdp)
+//!     failure : function(error)
 //!
-//! returns: sdp <string>
-//!
-GoCastJS.PeerConnection.prototype.CreateAnswer = function(offer, mediaHints) {
-    var answer = this.player.createAnswer(offer, mediaHints);
-    if ('' === answer) {
-        throw new GoCastJS.Exception(this.player.id, 'createAnswer() failed.');
-    }
-    return answer;
+GoCastJS.PeerConnection.prototype.CreateAnswer = function(success, failure) {
+    success = success || function(sdp) {};
+    failure = failure || function(error) {};
+    this.player.createAnswer(success, failure);
 };
 
 //!
@@ -570,7 +591,7 @@ GoCastJS.PeerConnection.prototype.CreateAnswer = function(offer, mediaHints) {
 //!                                                       failure)
 //!
 //! arguments:
-//!     action <string> : 'OFFER' (if offer) or 'ANSWER' (if Ôanswer)
+//!     action <string> : 'offer' (if offer) or 'answer' (if Ôanswer)
 //!     sdp    <string> : sdp to be used as local peer's description
 //!     success <function()>        : success callback
 //!     failure <function(message)> : failure callback with message
@@ -579,34 +600,30 @@ GoCastJS.PeerConnection.prototype.SetLocalDescription = function(action,
                                                                  sdp,
                                                                  success,
                                                                  failure) {
-    this.player.setLocalDescription(
-        action,
-        sdp,
-        function() {
-            if ('undefined' !== typeof(success) && null !== success) {
-                success();
-            }
-        },
-        function(message) {
-            if ('undefined' !== typeof(failure) && null !== failure) {
-                failure(message);
-            }
-        }
-    );
+    success = success || function(sdp) {};
+    failure = failure || function(error) {};
+    this.player.setLocalDescription(action, sdp, success, failure);
 };
 
 //!
-//! function: GoCastJS.PeerConnection.SetRemoteDescription(action, sdp)
+//! function: GoCastJS.PeerConnection.SetRemoteDescription(action,
+//!                                                        sdp,
+//!                                                        success,
+//!                                                        failure)
 //!
 //! arguments:
-//!     action <string> : 'OFFER' (if offer) or 'ANSWER' (if answer)
+//!     action <string> : 'offer' (if offer) or 'answer' (if answer)
 //!     sdp    <string> : sdp to be used as remote peer's description
+//!     success <function()>        : success callback
+//!     failure <function(message)> : failure callback with message
 //!
 GoCastJS.PeerConnection.prototype.SetRemoteDescription = function(action,
-                                                                  sdp) {
-    if (false === this.player.setRemoteDescription(action, sdp)) {
-        throw new GoCastJS.Exception(this.player.id, 'setRemoteSdp() failed.');
-    }
+                                                                  sdp,
+                                                                  success,
+                                                                  failure) {
+    success = success || function(sdp) {};
+    failure = failure || function(error) {};
+    this.player.setRemoteDescription(action, sdp, success, failure);
 };
 
 //!
@@ -616,19 +633,8 @@ GoCastJS.PeerConnection.prototype.SetRemoteDescription = function(action,
 //!     sdp <string> : sdp of remote peer's ice candidate
 //!
 GoCastJS.PeerConnection.prototype.ProcessIceMessage = function(sdp) {
-    if (false === this.player.processIceMessage(sdp)) {
+    if (false === this.player.addIceCandidate(JSON.parse(sdp)) {
         throw new GoCastJS.Exception(this.player.id, 'procIceMsg() failed.');
-    }
-};
-
-//!
-//! function: GoCastJS.PeerConnection.StartIce()
-//!
-//! NOTE: should be called after GoCastJS.PeerConnection.SetLocalDescription()
-//!
-GoCastJS.PeerConnection.prototype.StartIce = function() {
-    if (false === this.player.startIce()) {
-        throw new GoCastJS.Exception(this.player.id, 'startIce() failed.');
     }
 };
 
@@ -651,7 +657,17 @@ GoCastJS.PeerConnection.prototype.Deinit = function() {
 //!           'CLOSING' | 'CLOSED'];
 //!
 GoCastJS.PeerConnection.prototype.ReadyState = function() {
-    var state = this.player.readyState;
+    var stateMap = {
+        'preinit': 'PRENEW',
+        'new': 'NEW',
+        'have-local-offer': 'NEGOTIATING',
+        'have-remote-offer': 'NEGOTIATING',
+        'have-local-answer': 'NEGOTIATING',
+        'have-remote-answer': 'NEGOTIATING',
+        'stable': 'ACTIVE',
+        'blocked': 'BLOCKED'
+    }, state = stateMap[this.player.signalingState];
+
     if ('ACTIVE' === state) {
         return this.connState;
     } else if ('BLOCKED' === state) {
@@ -721,5 +737,5 @@ GoCastJS.PluginLog = function(localplayer, logCallback) {
 
 GoCastJS.PeerConnection.prototype.SetDefunct = function() {
     this.connState = 'DEFUNCT';
-    this.player.onreadystatechange();
+    this.player.onstatechange('signaling-state');
 };
