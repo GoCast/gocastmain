@@ -64,7 +64,7 @@
             }
 
             var initpeerconnection = function(fulljid) {
-                var peerconnection = null;
+                var peerconnection = null, iceservers = [];
 
                 hangupOnPeer(fulljid);
                 if (!pluginmap['peer0']) {
@@ -103,8 +103,14 @@
                     }
                 };
 
-                peerconnection.init(fulljid, [{uri: 'stun:stun.l.google.com:19302'}],
-                                    function(sdp) {
+                if ($.urlvars.turn) {
+                    iceservers.push({uri: 'turn:manjeshtest2@dev.gocast.it:3478', password: 'manjeshpass2'});
+                } else {
+                    iceservers.push({uri: 'stun:stun.l.google.com:19302'});
+                }
+                console.log('ICESERVERS: ' + JSON.stringify(iceservers));
+
+                peerconnection.init(fulljid, iceservers, function(sdp) {
                     if ('' !== sdp) {
                         console.log('Peer [' + fulljid + ']: onice: ' + sdp.replace(/\r\n/, ''));
                         conn.send($msg({to: fulljid, type: 'chat'}).c('candidate')
