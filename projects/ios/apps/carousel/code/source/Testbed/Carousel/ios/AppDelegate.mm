@@ -56,7 +56,16 @@ AppDelegate* gAppDelegateInstance = NULL;
     self.window = [[[UIWindow alloc] initWithFrame:screenBounds] autorelease];
     self.window.autoresizesSubviews = YES;
 
-    self.viewController = [[[MainViewController alloc] init] autorelease];
+
+    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
+    {
+        self.viewController = [[[MainViewController alloc] initWithNibName:@"MainViewController" bundle:nil] autorelease];
+    }
+    else
+    {
+        self.viewController = [[[MainViewController alloc] initWithNibName:@"MainViewController-iPad" bundle:nil] autorelease];
+    }
+
     self.viewController.useSplashScreen = YES;
     self.viewController.wwwFolderName = @"www";
     self.viewController.startPage = @"index.html";
@@ -181,7 +190,17 @@ static bool firstTime = true;
         firstTime = false;
 
         //*** TJG: Load OpenGL View once, attach it to whiteboard screen, re-use for each spot as needed
-        CGRect glBounds = CGRectMake(32, 32, 256, 256);
+        CGRect glBounds;
+
+        if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
+        {
+            glBounds = CGRectMake(32, 32, 256, 256);
+        }
+        else
+        {
+            glBounds = CGRectMake(256, 64, 512, 512);
+        }
+
         self.glView = [[[OpenGLView alloc] initWithFrame:glBounds] autorelease];
         [self.viewController.mWhiteboardSpotView addSubview:_glView];
     }

@@ -94,10 +94,20 @@
     UITouch *touch = [touches anyObject];
     CGPoint touchPoint = [touch locationInView:self];
 
-    tInputManager::getInstance()->tSubject<const tTouchEvent&>::notify(tTouchEvent(evt,
-                                                                                   tInputManager::getInstance(),
-                                                                                   tPoint2f(touchPoint.x / 256.0f * 500.0f,
-                                                                                            touchPoint.y / 256.0f * 500.0f)));
+    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
+    {
+        tInputManager::getInstance()->tSubject<const tTouchEvent&>::notify(tTouchEvent(evt,
+                                                                                       tInputManager::getInstance(),
+                                                                                       tPoint2f(touchPoint.x / 256.0f * 500.0f,
+                                                                                                touchPoint.y / 256.0f * 500.0f)));
+    }
+    else
+    {
+        tInputManager::getInstance()->tSubject<const tTouchEvent&>::notify(tTouchEvent(evt,
+                                                                                       tInputManager::getInstance(),
+                                                                                       tPoint2f(touchPoint.x / 512.0f * 500.0f,
+                                                                                                touchPoint.y / 512.0f * 500.0f)));
+    }
 }
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event

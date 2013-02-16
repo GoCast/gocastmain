@@ -15,6 +15,8 @@
 
 const tDimension2f  kSurfaceSize(256,256);
 const tDimension2f  kSpotSize(256,256);
+const tDimension2f  kSpotSizeiPad(512,512);
+
 const float         kFactor(256.0f / 500.0f);
 
 const tColor4b      kBlack  (0,0,0,255);

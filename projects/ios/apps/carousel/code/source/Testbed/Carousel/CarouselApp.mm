@@ -17,6 +17,7 @@
 const tDimension2f  kSurfaceSize(256,256);
 const tDimension2f  kVisibleSize(500,500);
 const tDimension2f  kSpotSize(256,256);
+const tDimension2f  kSpotSizeiPad(256,256);
 
 const tColor4b      kBlack  (0,0,0,255);
 const tColor4b      kRed    (255,0,0,255);
@@ -116,7 +117,14 @@ void CarouselApp::configureNodes()
 
     //os.draw.tag
     //os.draw.setViewportState
-    glViewport(0, 0, (int32_t)256, (int32_t)256);
+    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
+    {
+        glViewport(0, 0, (int32_t)256, (int32_t)256);
+    }
+    else
+    {
+        glViewport(0, 0, (int32_t)512, (int32_t)512);
+    }
 
     //os.draw.setProgram
     mSpriteProgram->setActive();

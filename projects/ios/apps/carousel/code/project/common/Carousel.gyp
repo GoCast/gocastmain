@@ -130,6 +130,7 @@
 							'mac_bundle_resources': [
 								'../../rsrc/<@(OS)/en.lproj/InfoPlist.strings',
 								'../../rsrc/<@(OS)/en.lproj/MainViewController.xib',
+								'../../rsrc/<@(OS)/en.lproj/MainViewController-iPad.xib',
 							],	# mac_bundle_resources
 	
 							'link_settings': {
