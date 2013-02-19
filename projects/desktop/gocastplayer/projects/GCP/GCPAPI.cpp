@@ -530,63 +530,6 @@ void GCPAPI::OnRenegotiationNeeded()
     }
 }
 
-/*void GCPAPI::OnIceChange()
-{
-    OnStateChange(webrtc::PeerConnectionObserver::kIceState);
-}
-
-void GCPAPI::OnStateChange(StateType state_changed)
-{
-    GoCast::RtcCenter* pCtr = GoCast::RtcCenter::Instance();
-    
-    if(false == pCtr->Inited())
-    {
-        std::string msg = m_htmlId.convert_cast<std::string>();
-        msg += ": Failed to init RtcCenter singleton";
-        FBLOG_ERROR_CUSTOM("GCPAPI::OnStateChange", msg);
-        return;
-    }
-
-    switch(state_changed)
-    {
-        case webrtc::PeerConnectionObserver::kSignalingState:
-        {
-            m_signalingState = pCtr->SignalingState(m_htmlId.convert_cast<std::string>());
-            if(NULL != m_onstatechangeCb.get())
-            {
-                m_onstatechangeCb->InvokeAsync("", FB::variant_list_of("signaling-state"));
-            }
-            
-            std::string msg = m_htmlId.convert_cast<std::string>();
-            msg += ": SignalingState = ";
-            msg += m_signalingState;
-            FBLOG_INFO_CUSTOM("GCPAPI::OnStateChange", msg);
-            break;
-        }
-        case webrtc::PeerConnectionObserver::kIceState:
-        {
-            m_iceState = pCtr->IceState(m_htmlId.convert_cast<std::string>());
-            if(NULL != m_onstatechangeCb.get())
-            {
-                m_onstatechangeCb->InvokeAsync("", FB::variant_list_of("ice-state"));
-            }
-            
-            std::string msg = m_htmlId.convert_cast<std::string>();
-            msg += ": IceState = ";
-            msg += m_iceState;
-            FBLOG_INFO_CUSTOM("GCPAPI::OnStateChange", msg);
-            break;
-        }            
-        default:
-        {
-            std::string msg = m_htmlId.convert_cast<std::string>();
-            msg += ": Unhandled state change";
-            FBLOG_INFO_CUSTOM("GCPAPI::OnStateChange", msg);
-            break;
-        }
-    }
-}*/
-
 void GCPAPI::OnAddStream(webrtc::MediaStreamInterface* pRemoteStream)
 {
     talk_base::scoped_refptr<webrtc::MediaStreamInterface> pStream(pRemoteStream);
@@ -627,34 +570,12 @@ void GCPAPI::OnRemoveStream(webrtc::MediaStreamInterface* pRemoteStream)
 void GCPAPI::OnIceCandidate(const webrtc::IceCandidateInterface* pCandidate)
 {
     std::string candidateSdp("");
-    //bool bMoreComing = true;
-    
-    /*if("BLOCKED" == m_readyState)
-    {
-        return;
-    }*/
-    
-    if(NULL != pCandidate && false == pCandidate->ToString(&candidateSdp))
+
+    if(false == pCandidate->ToString(&candidateSdp))
     {
         FBLOG_ERROR_CUSTOM("GCPAPI::OnIceCandidate", "Unable to serialize SDP");
         return;
     }
-    
-    /*if(std::string::npos != candidateSdp.find(" tcp "))
-    {
-        m_readyState = "BLOCKED";
-        
-        std::string msg = m_htmlId.convert_cast<std::string>();
-        msg += ": ReadyState = BLOCKED...";
-        FBLOG_INFO_CUSTOM("GCPAPI::OnIceCandidate", msg);
-        
-        if(NULL != m_onreadystatechangeCb.get())
-        {
-            m_onreadystatechangeCb->InvokeAsync("", FB::variant_list_of());
-        }
-        
-        return;
-    }*/
     
     if(NULL != m_iceCb.get())
     {

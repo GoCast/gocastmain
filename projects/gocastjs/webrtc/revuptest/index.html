@@ -61,9 +61,50 @@
                         console.log('CreateOffer: ', error);
                     });
                 }, function(msg) {alert(msg);});
-            }
+            };
 
-            var initpeerconnection = function(fulljid, negotiationCallback) {
+            var callernegotiationcallback = function(fulljid, peerconnection) {
+                return function() {
+                    peerconnection.createOffer(function(sdp) {
+                        console.log('Peer [' + fulljid + ']: createoffer: ' + sdp);
+                        peerconnection.setLocalDescription('offer', sdp, function() {
+                            console.log('Peer [' + fulljid + ']: setLocalDescription success, ' +
+                                        'sending offer...');
+                            conn.send($msg({to: fulljid, type: 'chat'}).c('offer').t(sdp));
+                        }, function(error) {
+                            console.log('Peer [' + fulljid + ']: setLocalDescription error: ' + error);
+                        });
+                    }, function(error) {
+                        console.log('Peer [' + fulljid + ']: createOffer error: ' + error);
+                    });
+                };
+            };
+
+            var calleenegotiationcallback = function(fulljid, peerconnection, sdp) {
+                return function() {
+                    peerconnection.setRemoteDescription('offer', sdp, function() {
+                        console.log('Peer [' + fulljid + ']: setRemoteDescription success, ' +
+                                    'creating answer...');
+                        peerconnection.createAnswer(function(sdp) {
+                            console.log('Peer [' + fulljid + ']: createanswer: ' + sdp);
+                            peerconnection.setLocalDescription('answer', sdp, function() {
+                                console.log('Peer [' + fulljid + ']: setLocalDescription success, ' +
+                                            'sending answer (offer/answer done)...');
+                                conn.send($msg({to: fulljid, type: 'chat'}).c('answer').t(sdp));
+                            }, function(error) {
+                                console.log('Peer [' + fulljid + ']: setLocalDescription error: '
+                                            + error);
+                            });
+                        }, function(error) {
+                            console.log('Peer [' + fulljid + ']: createAnswer error: ' + error);
+                        });
+                    }, function(error) {
+                        console.log('Peer [' + fulljid + ']: setRemoteDescription error: ' + error);
+                    });
+                };
+            };
+
+            var initpeerconnection = function(fulljid, negotiationCallback, sdp) {
                 var peerconnection = null, iceservers = [];
 
                 hangupOnPeer(fulljid);
@@ -85,7 +126,7 @@
                 };
 
                 if (negotiationCallback) {
-                     peerconnection.onnegotiationneeded = negotiationCallback(peerconnection);
+                     peerconnection.onnegotiationneeded = negotiationCallback(fulljid, peerconnection, sdp);
                 }
 
                 peerconnection.onstatechange = function(state) {
@@ -130,22 +171,7 @@
             };
 
             var callpeer = function(fulljid) {
-                initpeerconnection(fulljid, function(peerconnection) {
-                    return function() {
-                        peerconnection.createOffer(function(sdp) {
-                            console.log('Peer [' + fulljid + ']: createoffer: ' + sdp);
-                            peerconnection.setLocalDescription('offer', sdp, function() {
-                                console.log('Peer [' + fulljid + ']: setLocalDescription success, ' +
-                                            'sending offer...');
-                                conn.send($msg({to: fulljid, type: 'chat'}).c('offer').t(sdp));
-                            }, function(error) {
-                                console.log('Peer [' + fulljid + ']: setLocalDescription error: ' + error);
-                            });
-                        }, function(error) {
-                            console.log('Peer [' + fulljid + ']: createOffer error: ' + error);
-                        });
-                    };
-                });
+                initpeerconnection(fulljid, callernegotiationcallback);
             };
 
             var acceptanswerfrompeer = function(fulljid, sdp) {
@@ -164,29 +190,7 @@
             };
 
             var acceptofferfrompeer = function(fulljid, sdp) {
-                initpeerconnection(fulljid, function(peerconnection) {
-                    return function() {
-                        peerconnection.setRemoteDescription('offer', sdp, function() {
-                            console.log('Peer [' + fulljid + ']: setRemoteDescription success, ' +
-                                        'creating answer...');
-                            peerconnection.createAnswer(function(sdp) {
-                                console.log('Peer [' + fulljid + ']: createanswer: ' + sdp);
-                                peerconnection.setLocalDescription('answer', sdp, function() {
-                                    console.log('Peer [' + fulljid + ']: setLocalDescription success, ' +
-                                                'sending answer (offer/answer done)...');
-                                    conn.send($msg({to: fulljid, type: 'chat'}).c('answer').t(sdp));
-                                }, function(error) {
-                                    console.log('Peer [' + fulljid + ']: setLocalDescription error: '
-                                                + error);
-                                });
-                            }, function(error) {
-                                console.log('Peer [' + fulljid + ']: createAnswer error: ' + error);
-                            });
-                        }, function(error) {
-                            console.log('Peer [' + fulljid + ']: setRemoteDescription error: ' + error);
-                        });
-                    };
-                });
+                initpeerconnection(fulljid, calleenegotiationcallback, sdp);
             };
 
             var addcandidateforpeer = function(fulljid, sdp) {
@@ -220,7 +224,10 @@
                 conn.addHandler(function(pres) {
                     if (!$(pres).attr('type')) {
                         console.log('Calling: ', $(pres).attr('from'));
-                        callpeer($(pres).attr('from'));
+                        if (Strophe.getBareJidFromJid(conn.getJid()) !== 
+                            Strophe.getBareJidFromJid($(pres).attr('from'))) {
+                            callpeer($(pres).attr('from'));
+                        }
                     } else if ('unavailable' === $(pres).attr('type')) {
                         console.log('Hanging up on: ', $(pres).attr('from'));
                         hangupOnPeer($(pres).attr('from'));
