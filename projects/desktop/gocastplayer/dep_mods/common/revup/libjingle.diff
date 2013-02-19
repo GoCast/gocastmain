@@ -1,8 +1,8 @@
 Index: libjingle/trunk/talk/media/webrtc/webrtcvoiceengine.cc
 ===================================================================
---- libjingle/trunk/talk/media/webrtc/webrtcvoiceengine.cc	(revision 279)
+--- libjingle/trunk/talk/media/webrtc/webrtcvoiceengine.cc	(revision 284)
 +++ libjingle/trunk/talk/media/webrtc/webrtcvoiceengine.cc	(working copy)
-@@ -867,6 +867,35 @@
+@@ -869,6 +869,35 @@
    return true;
  }
  
@@ -38,27 +38,27 @@ Index: libjingle/trunk/talk/media/webrtc/webrtcvoiceengine.cc
  bool WebRtcVoiceEngine::SetOutputVolume(int level) {
    ASSERT(level >= 0 && level <= 255);
    if (voe_wrapper_->volume()->SetSpeakerVolume(level) == -1) {
-@@ -2303,13 +2332,12 @@
+@@ -2305,15 +2334,10 @@
  }
  
  bool WebRtcVoiceMediaChannel::MuteStream(uint32 ssrc, bool muted) {
 -  if (send_ssrc_ != ssrc && ssrc != 0) {
-+  /*if (send_ssrc_ != ssrc && ssrc != 0) {
-     LOG(LS_WARNING) << "The specified ssrc " << ssrc << " is not in use.";
-     return false;
--  }
--  if (engine()->voe()->volume()->SetInputMute(voe_channel(),
--      muted) == -1) {
--    LOG_RTCERR2(SetInputMute, voe_channel(), muted);
-+  }*/
+-    LOG(LS_WARNING) << "The specified ssrc " << ssrc << " is not in use.";
 +  if (engine()->voe()->volume()->SetSystemInputMute(muted) == -1) {
 +    LOG_RTCERR1(SetSystemInputMute, muted);
      return false;
    }
+-  if (engine()->voe()->volume()->SetInputMute(voe_channel(),
+-      muted) == -1) {
+-    LOG_RTCERR2(SetInputMute, voe_channel(), muted);
+-    return false;
+-  }
    return true;
+ }
+ 
 Index: libjingle/trunk/talk/media/webrtc/webrtcvoiceengine.h
 ===================================================================
---- libjingle/trunk/talk/media/webrtc/webrtcvoiceengine.h	(revision 279)
+--- libjingle/trunk/talk/media/webrtc/webrtcvoiceengine.h	(revision 284)
 +++ libjingle/trunk/talk/media/webrtc/webrtcvoiceengine.h	(working copy)
 @@ -145,7 +145,10 @@
    bool SetDelayOffset(int offset);
@@ -73,33 +73,32 @@ Index: libjingle/trunk/talk/media/webrtc/webrtcvoiceengine.h
  
 Index: libjingle/trunk/talk/media/webrtc/webrtcvideocapturer.cc
 ===================================================================
---- libjingle/trunk/talk/media/webrtc/webrtcvideocapturer.cc	(revision 279)
+--- libjingle/trunk/talk/media/webrtc/webrtcvideocapturer.cc	(revision 284)
 +++ libjingle/trunk/talk/media/webrtc/webrtcvideocapturer.cc	(working copy)
-@@ -190,8 +190,8 @@
+@@ -190,8 +190,7 @@
    }
    factory_->DestroyDeviceInfo(info);
    if (supported.empty()) {
 -    LOG(LS_ERROR) << "Failed to find usable formats for id: " << device.id;
 -    return false;
 +    LOG(LS_WARNING) << "Failed to find usable formats for id: " << device.id;
-+    //return false;
    }
  
    module_ = factory_->Create(0, vcm_id);
-@@ -203,7 +203,9 @@
+@@ -203,7 +202,9 @@
    // It is safe to change member attributes now.
    module_->AddRef();
    SetId(device.id);
 -  SetSupportedFormats(supported);
 +  if (!supported.empty()) {
-+    SetSupportedFormats(supported);   
++    SetSupportedFormats(supported);
 +  }
    return true;
  }
  
 Index: libjingle/trunk/talk/media/base/mediaengine.h
 ===================================================================
---- libjingle/trunk/talk/media/base/mediaengine.h	(revision 279)
+--- libjingle/trunk/talk/media/base/mediaengine.h	(revision 284)
 +++ libjingle/trunk/talk/media/base/mediaengine.h	(working copy)
 @@ -129,6 +129,12 @@
    // Device configuration
@@ -132,7 +131,7 @@ Index: libjingle/trunk/talk/media/base/mediaengine.h
    }
 Index: libjingle/trunk/talk/app/webrtc/peerconnectioninterface.h
 ===================================================================
---- libjingle/trunk/talk/app/webrtc/peerconnectioninterface.h	(revision 279)
+--- libjingle/trunk/talk/app/webrtc/peerconnectioninterface.h	(revision 284)
 +++ libjingle/trunk/talk/app/webrtc/peerconnectioninterface.h	(working copy)
 @@ -84,6 +84,7 @@
  
@@ -142,7 +141,7 @@ Index: libjingle/trunk/talk/app/webrtc/peerconnectioninterface.h
  }
  
  namespace webrtc {
-@@ -356,6 +357,9 @@
+@@ -387,6 +388,9 @@
    virtual talk_base::scoped_refptr<LocalAudioTrackInterface>
        CreateLocalAudioTrack(const std::string& label,
                              AudioDeviceModule* audio_device) = 0;
@@ -154,15 +153,14 @@ Index: libjingle/trunk/talk/app/webrtc/peerconnectioninterface.h
    // Dtor and ctor protected as objects shouldn't be created or deleted via
 Index: libjingle/trunk/talk/app/webrtc/localvideosource.cc
 ===================================================================
---- libjingle/trunk/talk/app/webrtc/localvideosource.cc	(revision 279)
+--- libjingle/trunk/talk/app/webrtc/localvideosource.cc	(revision 284)
 +++ libjingle/trunk/talk/app/webrtc/localvideosource.cc	(working copy)
-@@ -67,16 +67,18 @@
+@@ -67,16 +67,17 @@
  // Default resolution. If no constraint is specified, this is the resolution we
  // will use.
  static const cricket::VideoFormatPod kDefaultResolution =
 -    {640, 480, FPS_TO_INTERVAL(30), cricket::FOURCC_ANY};
 +    {160, 120, FPS_TO_INTERVAL(14), cricket::FOURCC_ANY};
-+    //{640, 480, FPS_TO_INTERVAL(30), cricket::FOURCC_ANY};
  
  // List of formats used if the camera don't support capability enumeration.
  static const cricket::VideoFormatPod kVideoFormats[] = {
@@ -184,25 +182,23 @@ Index: libjingle/trunk/talk/app/webrtc/localvideosource.cc
  MediaSourceInterface::SourceState
 Index: libjingle/trunk/talk/app/webrtc/webrtcsession.cc
 ===================================================================
---- libjingle/trunk/talk/app/webrtc/webrtcsession.cc	(revision 279)
+--- libjingle/trunk/talk/app/webrtc/webrtcsession.cc	(revision 284)
 +++ libjingle/trunk/talk/app/webrtc/webrtcsession.cc	(working copy)
-@@ -769,11 +769,11 @@
+@@ -839,11 +839,6 @@
      return;
    }
    uint32 ssrc = 0;
 -  if (!VERIFY(GetAudioSsrcByName(BaseSession::local_description(),
-+  /*if (!VERIFY(GetAudioSsrcByName(BaseSession::local_description(),
-                                  name, &ssrc))) {
-     LOG(LS_ERROR) << "SetAudioSend: SSRC does not exist.";
-     return;
+-                                 name, &ssrc))) {
+-    LOG(LS_ERROR) << "SetAudioSend: SSRC does not exist.";
+-    return;
 -  }
-+  }*/
    voice_channel_->MuteStream(ssrc, !enable);
    if (enable)
      voice_channel_->SetChannelOptions(options);
 Index: libjingle/trunk/talk/session/media/channelmanager.cc
 ===================================================================
---- libjingle/trunk/talk/session/media/channelmanager.cc	(revision 279)
+--- libjingle/trunk/talk/session/media/channelmanager.cc	(revision 284)
 +++ libjingle/trunk/talk/session/media/channelmanager.cc	(working copy)
 @@ -79,6 +79,9 @@
    MSG_ADDVIDEORENDERER = 31,
@@ -233,7 +229,7 @@ Index: libjingle/trunk/talk/session/media/channelmanager.cc
 +  if (!Send(MSG_GETINPUTVOLUME, &volume) || !volume.result) {
 +    return false;
 +  }
-+    
++
 +  *level = volume.level;
 +  return true;        
 +}
@@ -273,7 +269,7 @@ Index: libjingle/trunk/talk/session/media/channelmanager.cc
 +  if (ret) {
 +    audio_input_volume_ = level;
 +  }
-+    
++
 +  return ret;
 +}
 +
@@ -321,7 +317,7 @@ Index: libjingle/trunk/talk/session/media/channelmanager.cc
        p->result = SetLocalMonitor_w(p->enable);
 Index: libjingle/trunk/talk/session/media/channelmanager.h
 ===================================================================
---- libjingle/trunk/talk/session/media/channelmanager.h	(revision 279)
+--- libjingle/trunk/talk/session/media/channelmanager.h	(revision 284)
 +++ libjingle/trunk/talk/session/media/channelmanager.h	(working copy)
 @@ -136,6 +136,9 @@
                         const std::string& wave_out_device, int opts);

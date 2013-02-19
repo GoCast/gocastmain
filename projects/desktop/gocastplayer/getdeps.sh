@@ -4,7 +4,7 @@
 # libjingle #
 #############
 
-LIBJINGLE_REV=279
+LIBJINGLE_REV=284
 mkdir -p deps
 cd deps
 
@@ -22,11 +22,11 @@ if [[ $1 = "libjingle" || $* = "" ]]; then
     gclient sync -r "$LIBJINGLE_REV" --force
     cd ..
 
-    echo "Patching webrtc source..."
-    patch -p0 -i ../dep_mods/common/revup/webrtc.diff
+#    echo "Patching webrtc source..."
+#    patch -p0 -i ../dep_mods/common/revup/webrtc.diff
 
-    echo "Patching libjingle source..."
-    patch -p0 -i ../dep_mods/common/revup/libjingle.diff
+#    echo "Patching libjingle source..."
+#    patch -p0 -i ../dep_mods/common/revup/libjingle.diff
 fi
 
 ##############

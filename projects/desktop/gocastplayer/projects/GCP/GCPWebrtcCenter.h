@@ -23,6 +23,10 @@
 
 namespace GoCast
 {
+    std::string GetSigStateString(webrtc::PeerConnectionInterface::SignalingState state);
+    std::string GetIceConnStateString(webrtc::PeerConnectionInterface::IceConnectionState state);
+    std::string GetIceGathStateString(webrtc::PeerConnectionInterface::IceGatheringState state);
+    
     class MessageHandler
     {
     public:
@@ -108,7 +112,8 @@ namespace GoCast
         
     public:
         std::string SignalingState(const std::string& pluginId);
-        std::string IceState(const std::string& pluginId);
+        std::string IceConnectionState(const std::string& pluginId);
+        std::string IceGatheringState(const std::string& pluginId);
         
         bool Inited() const;
         bool GetLocalVideoTrackEnabled() const;        

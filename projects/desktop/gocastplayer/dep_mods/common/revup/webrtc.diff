@@ -1,6 +1,6 @@
 Index: libjingle/trunk/third_party/webrtc/build/merge_libs.gyp
 ===================================================================
---- libjingle/trunk/third_party/webrtc/build/merge_libs.gyp	(revision 3255)
+--- libjingle/trunk/third_party/webrtc/build/merge_libs.gyp	(revision 3501)
 +++ libjingle/trunk/third_party/webrtc/build/merge_libs.gyp	(working copy)
 @@ -10,7 +10,8 @@
    'includes': ['common.gypi',],
@@ -14,7 +14,7 @@ Index: libjingle/trunk/third_party/webrtc/build/merge_libs.gyp
    'targets': [
 Index: libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_recursive_lock.mm
 ===================================================================
---- libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_recursive_lock.mm	(revision 3255)
+--- libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_recursive_lock.mm	(revision 3501)
 +++ libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_recursive_lock.mm	(working copy)
 @@ -5,7 +5,7 @@
  
@@ -27,7 +27,7 @@ Index: libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_
  
 Index: libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_qtkit_info_objc.h
 ===================================================================
---- libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_qtkit_info_objc.h	(revision 3255)
+--- libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_qtkit_info_objc.h	(revision 3501)
 +++ libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_qtkit_info_objc.h	(working copy)
 @@ -21,7 +21,7 @@
  #include "video_capture_qtkit_utility.h"
@@ -40,7 +40,7 @@ Index: libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_
      NSAutoreleasePool*                    _poolInfo;
 Index: libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_qtkit_info_objc.mm
 ===================================================================
---- libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_qtkit_info_objc.mm	(revision 3255)
+--- libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_qtkit_info_objc.mm	(revision 3501)
 +++ libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_qtkit_info_objc.mm	(working copy)
 @@ -18,7 +18,7 @@
  
@@ -53,7 +53,7 @@ Index: libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_
  #pragma mark **** over-written OS methods
 Index: libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_qtkit_info.h
 ===================================================================
---- libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_qtkit_info.h	(revision 3255)
+--- libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_qtkit_info.h	(revision 3501)
 +++ libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_qtkit_info.h	(working copy)
 @@ -18,7 +18,7 @@
  #include "map_wrapper.h"
@@ -75,7 +75,7 @@ Index: libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_
  }  // namespace webrtc
 Index: libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_qtkit_objc.h
 ===================================================================
---- libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_qtkit_objc.h	(revision 3255)
+--- libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_qtkit_objc.h	(revision 3501)
 +++ libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_qtkit_objc.h	(working copy)
 @@ -27,7 +27,7 @@
  
@@ -97,7 +97,7 @@ Index: libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_
      QTCaptureSession*                    _captureSession;
 Index: libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_qtkit_info.mm
 ===================================================================
---- libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_qtkit_info.mm	(revision 3255)
+--- libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_qtkit_info.mm	(revision 3501)
 +++ libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_qtkit_info.mm	(working copy)
 @@ -22,7 +22,7 @@
  VideoCaptureMacQTKitInfo::VideoCaptureMacQTKitInfo(const WebRtc_Word32 id) :
@@ -110,7 +110,7 @@ Index: libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_
  VideoCaptureMacQTKitInfo::~VideoCaptureMacQTKitInfo()
 Index: libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_qtkit_objc.mm
 ===================================================================
---- libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_qtkit_objc.mm	(revision 3255)
+--- libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_qtkit_objc.mm	(revision 3501)
 +++ libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_qtkit_objc.mm	(working copy)
 @@ -22,7 +22,7 @@
  using namespace webrtc;
@@ -132,7 +132,7 @@ Index: libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_
                                          init];
 Index: libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_qtkit.h
 ===================================================================
---- libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_qtkit.h	(revision 3255)
+--- libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_qtkit.h	(revision 3501)
 +++ libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_qtkit.h	(working copy)
 @@ -21,8 +21,8 @@
  
@@ -158,7 +158,7 @@ Index: libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_
      WebRtc_Word32            _captureWidth;
 Index: libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_qtkit.mm
 ===================================================================
---- libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_qtkit.mm	(revision 3255)
+--- libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_qtkit.mm	(revision 3501)
 +++ libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_qtkit.mm	(working copy)
 @@ -70,12 +70,12 @@
      _deviceUniqueId = new char[nameLength+1];
@@ -191,7 +191,7 @@ Index: libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_
  
 Index: libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_recursive_lock.h
 ===================================================================
---- libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_recursive_lock.h	(revision 3255)
+--- libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_recursive_lock.h	(revision 3501)
 +++ libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_recursive_lock.h	(working copy)
 @@ -18,7 +18,7 @@
  

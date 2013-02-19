@@ -56,7 +56,8 @@ public:
     ////////////////////////////////////////////////////////////////////////////
     GCPAPI(const GCPPtr& plugin, const FB::BrowserHostPtr& host)
     : m_signalingState("preinit")
-    , m_iceState("preinit")
+    , m_iceConnectionState("preinit")
+    , m_iceGatheringState("preinit")
     , m_plugin(plugin)
     , m_host(host)
     , m_htmlId("")
@@ -85,14 +86,21 @@ public:
         
         // Properties
         registerProperty("version", make_property(this, &GCPAPI::get_version));
-        registerProperty("signalingstate", make_property(this, &GCPAPI::get_signalingState));
-        registerProperty("icestate", make_property(this, &GCPAPI::get_iceState));
+        registerProperty("signalingState", make_property(this, &GCPAPI::get_signalingState));
+        registerProperty("iceConnectionState", make_property(this, &GCPAPI::get_iceConnectionState));
+        registerProperty("iceGatheringState", make_property(this, &GCPAPI::get_iceGatheringState));
         registerProperty("onaddstream", make_property(this, &GCPAPI::get_onaddstream,
-                                                            &GCPAPI::set_onaddstream));
+                                                      &GCPAPI::set_onaddstream));
         registerProperty("onremovestream", make_property(this, &GCPAPI::get_onremovestream,
-                                                               &GCPAPI::set_onremovestream));
+                                                         &GCPAPI::set_onremovestream));
         registerProperty("onstatechange", make_property(this, &GCPAPI::get_onstatechange,
-                                                              &GCPAPI::set_onstatechange));
+                                                        &GCPAPI::set_onstatechange));
+        registerProperty("onicechange", make_property(this, &GCPAPI::get_onicechange,
+                                                      &GCPAPI::set_onicechange));
+        registerProperty("ongatheringchange", make_property(this, &GCPAPI::get_ongatheringchange,
+                                                            &GCPAPI::set_ongatheringchange));
+        registerProperty("onnegotiationneeded", make_property(this, &GCPAPI::get_onnegotiationneeded,
+                                                              &GCPAPI::set_onnegotiationneeded));
         registerProperty("source", make_property(this, &GCPAPI::get_source, &GCPAPI::set_source));
         registerProperty("volume", make_property(this, &GCPAPI::get_volume, &GCPAPI::set_volume));
         registerProperty("micvolume", make_property(this, &GCPAPI::get_micvolume, &GCPAPI::set_micvolume));
@@ -116,10 +124,14 @@ public:
     // Property get methods
     std::string get_version();
     std::string get_signalingState();
-    std::string get_iceState();
+    std::string get_iceConnectionState();
+    std::string get_iceGatheringState();
     FB::JSObjectPtr get_onaddstream();
     FB::JSObjectPtr get_onremovestream();
     FB::JSObjectPtr get_onstatechange();
+    FB::JSObjectPtr get_onicechange();
+    FB::JSObjectPtr get_ongatheringchange();
+    FB::JSObjectPtr get_onnegotiationneeded();
     FB::JSAPIPtr get_source();
     FB::variant get_volume();
     FB::variant get_micvolume();
@@ -132,6 +144,9 @@ public:
     void set_onaddstream(const FB::JSObjectPtr& onaddstream);
     void set_onremovestream(const FB::JSObjectPtr& onremovestream);
     void set_onstatechange(const FB::JSObjectPtr& onstatechange);
+    void set_onicechange(const FB::JSObjectPtr& onicechange);
+    void set_ongatheringchange(const FB::JSObjectPtr& ongatheringchange);
+    void set_onnegotiationneeded(const FB::JSObjectPtr& onnegotiationneeded);
     void set_source(const FB::JSAPIPtr& stream);
     void set_volume(FB::variant volume);
     void set_micvolume(FB::variant volume);
@@ -177,18 +192,25 @@ public:
 private:
     // --------------------- PeerConnectionObserver Methods -----------------
     virtual void OnError() {};
-    virtual void OnStateChange(StateType state_changed);
+    virtual void OnSignalingChange(webrtc::PeerConnectionInterface::SignalingState newState);
+    virtual void OnIceConnectionChange(webrtc::PeerConnectionInterface::IceConnectionState newState);    
+    virtual void OnIceGatheringChange(webrtc::PeerConnectionInterface::IceGatheringState newSstate);
+    virtual void OnRenegotiationNeeded();
     virtual void OnAddStream(webrtc::MediaStreamInterface* pRemoteStream);
     virtual void OnRemoveStream(webrtc::MediaStreamInterface* pRemoteStream);
     virtual void OnIceCandidate(const webrtc::IceCandidateInterface* pCandidate);
     
 private:
     std::string m_signalingState;
-    std::string m_iceState;
+    std::string m_iceConnectionState;
+    std::string m_iceGatheringState;
     FB::JSObjectPtr m_iceCb;
     FB::JSObjectPtr m_onaddstreamCb;
     FB::JSObjectPtr m_onremovestreamCb;
     FB::JSObjectPtr m_onstatechangeCb;
+    FB::JSObjectPtr m_onicechangeCb;
+    FB::JSObjectPtr m_ongatheringchangeCb;
+    FB::JSObjectPtr m_onnegotiationneededCb;
     FB::JSObjectPtr m_oncreatesdpsuccessCb;
     FB::JSObjectPtr m_oncreatesdpfailureCb;
     FB::JSObjectPtr m_onsetsdpsuccessCb;

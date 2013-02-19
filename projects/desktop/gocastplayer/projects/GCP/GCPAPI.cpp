@@ -46,28 +46,17 @@ std::string GCPAPI::get_version()
 
 std::string GCPAPI::get_signalingState()
 {
-    GoCast::RtcCenter* pCtr = GoCast::RtcCenter::Instance();
-    
-    if(true == pCtr->Inited())
-    {
-        m_signalingState = pCtr->SignalingState(m_htmlId.convert_cast<std::string>());
-        return m_signalingState;
-    }
-    
-    return "invalid";
+    return m_signalingState;
 }
 
-std::string GCPAPI::get_iceState()
+std::string GCPAPI::get_iceConnectionState()
 {
-    GoCast::RtcCenter* pCtr = GoCast::RtcCenter::Instance();
-    
-    if(true == pCtr->Inited())
-    {
-        m_iceState = pCtr->IceState(m_htmlId.convert_cast<std::string>());
-        return m_iceState;
-    }
-    
-    return "invalid";
+    return m_iceConnectionState;
+}
+
+std::string GCPAPI::get_iceGatheringState()
+{
+    return m_iceGatheringState;
 }
 
 FB::JSAPIPtr GCPAPI::get_source()
@@ -124,6 +113,21 @@ FB::JSObjectPtr GCPAPI::get_onremovestream()
 FB::JSObjectPtr GCPAPI::get_onstatechange()
 {
     return m_onstatechangeCb;
+}
+
+FB::JSObjectPtr GCPAPI::get_onicechange()
+{
+    return m_onicechangeCb;
+}
+
+FB::JSObjectPtr GCPAPI::get_ongatheringchange()
+{
+    return m_ongatheringchangeCb;
+}
+
+FB::JSObjectPtr GCPAPI::get_onnegotiationneeded()
+{
+    return m_onnegotiationneededCb;
 }
 
 FB::VariantMap GCPAPI::get_videoinopts()
@@ -201,6 +205,21 @@ void GCPAPI::set_onremovestream(const FB::JSObjectPtr &onremovestream)
 void GCPAPI::set_onstatechange(const FB::JSObjectPtr &onstatechange)
 {
     m_onstatechangeCb = onstatechange;
+}
+
+void GCPAPI::set_onicechange(const FB::JSObjectPtr& onicechange)
+{
+    m_onicechangeCb = onicechange;
+}
+
+void GCPAPI::set_ongatheringchange(const FB::JSObjectPtr& ongatheringchange)
+{
+    m_ongatheringchangeCb = ongatheringchange;
+}
+
+void GCPAPI::set_onnegotiationneeded(const FB::JSObjectPtr& onnegotiationneeded)
+{
+    m_onnegotiationneededCb = onnegotiationneeded;
 }
 
 void GCPAPI::set_source(const FB::JSAPIPtr& stream)
@@ -299,12 +318,14 @@ FB::variant GCPAPI::Init(const FB::variant& htmlId,
     if(false == pCtr->NewPeerConnection(m_htmlId.convert_cast<std::string>(), iceServers, this))
     {
         m_signalingState = "invalid";
-        m_iceState = "invalid";
+        m_iceConnectionState = "invalid";
+        m_iceGatheringState = "invalid";
         return false;
     }
     
     m_signalingState = pCtr->SignalingState(m_htmlId.convert_cast<std::string>());
-    m_iceState = pCtr->IceState(m_htmlId.convert_cast<std::string>());
+    m_iceConnectionState = pCtr->IceConnectionState(m_htmlId.convert_cast<std::string>());
+    m_iceGatheringState = pCtr->IceGatheringState(m_htmlId.convert_cast<std::string>());
     return true;
 }
 
@@ -477,6 +498,43 @@ void GCPAPI::LogFunction(const FB::JSObjectPtr& func)
     GoCast::JSLogger::Instance()->LogFunction(func);
 }
 
+void GCPAPI::OnSignalingChange(webrtc::PeerConnectionInterface::SignalingState newState)
+{
+    if(m_onstatechangeCb.get())
+    {
+        m_onstatechangeCb->InvokeAsync("", FB::variant_list_of(GoCast::GetSigStateString(newState)));
+    }
+}
+
+void GCPAPI::OnIceConnectionChange(webrtc::PeerConnectionInterface::IceConnectionState newState)
+{
+    if(m_onicechangeCb.get())
+    {
+        m_onicechangeCb->InvokeAsync("", FB::variant_list_of(GoCast::GetIceConnStateString(newState)));
+    }
+}
+
+void GCPAPI::OnIceGatheringChange(webrtc::PeerConnectionInterface::IceGatheringState newState)
+{
+    if(m_ongatheringchangeCb.get())
+    {
+        m_ongatheringchangeCb->InvokeAsync("", FB::variant_list_of(GoCast::GetIceGathStateString(newState)));
+    }
+}
+
+void GCPAPI::OnRenegotiationNeeded()
+{
+    if(m_onnegotiationneededCb.get())
+    {
+        m_onnegotiationneededCb->InvokeAsync("", FB::variant_list_of());
+    }
+}
+
+/*void GCPAPI::OnIceChange()
+{
+    OnStateChange(webrtc::PeerConnectionObserver::kIceState);
+}
+
 void GCPAPI::OnStateChange(StateType state_changed)
 {
     GoCast::RtcCenter* pCtr = GoCast::RtcCenter::Instance();
@@ -527,7 +585,7 @@ void GCPAPI::OnStateChange(StateType state_changed)
             break;
         }
     }
-}
+}*/
 
 void GCPAPI::OnAddStream(webrtc::MediaStreamInterface* pRemoteStream)
 {
@@ -614,18 +672,6 @@ void GCPAPI::OnIceCandidate(const webrtc::IceCandidateInterface* pCandidate)
         m_iceCb->InvokeAsync("", FB::variant_list_of(sstrm.str()));
     }
 }
-
-/*void GCPAPI::OnIceComplete()
-{
-    std::string msg = m_htmlId.convert_cast<std::string>();
-    msg += ": ICE process complete...";
-    FBLOG_INFO_CUSTOM("GCPAPI::OnIceComplete", msg);
-
-    if(NULL != m_iceCb.get())
-    {
-        m_iceCb->InvokeAsync("", FB::variant_list_of("")(false));
-    }
-}*/
 
 void GCPAPI::InvokeSetSDPSuccessCallback()
 {

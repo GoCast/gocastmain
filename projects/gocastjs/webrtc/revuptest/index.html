@@ -63,7 +63,7 @@
                 }, function(msg) {alert(msg);});
             }
 
-            var initpeerconnection = function(fulljid) {
+            var initpeerconnection = function(fulljid, negotiationCallback) {
                 var peerconnection = null, iceservers = [];
 
                 hangupOnPeer(fulljid);
@@ -84,23 +84,29 @@
                     peerconnection.source = stream;
                 };
 
-                peerconnection.onstatechange = function(type) {
-                    if ('signaling-state' === type) {
-                        console.log('Peer [' + fulljid + ']: sigstate = ' +
-                                    peerconnection.signalingstate);
-                        if (pendingcandidates[fulljid]) {
-                            for (i=0; i<pendingcandidates[fulljid].length; i++) {
-                                c = pendingcandidates[fulljid][i];
-                                console.log(peerconnection.addIceCandidate(c.sdp_mid,
-                                                                           c.sdp_mline_index,
-                                                                           c.sdp));
-                            }
-                            delete pendingcandidates[fulljid];
+                if (negotiationCallback) {
+                     peerconnection.onnegotiationneeded = negotiationCallback(peerconnection);
+                }
+
+                peerconnection.onstatechange = function(state) {
+                    console.log('Peer [' + fulljid + ']: sigstate = ' + state);
+                    if (pendingcandidates[fulljid] && 'stable' === state) {
+                        for (i=0; i<pendingcandidates[fulljid].length; i++) {
+                            c = pendingcandidates[fulljid][i];
+                            console.log(peerconnection.addIceCandidate(c.sdp_mid,
+                                                                       c.sdp_mline_index,
+                                                                       c.sdp));
                         }
-                    } else if ('ice-state' === type) {
-                        console.log('Peer [' + fulljid + ']: icestate = ' +
-                                    peerconnection.icestate);
+                        delete pendingcandidates[fulljid];
                     }
+                };
+
+                peerconnection.onicechange = function(state) {
+                    console.log('Peer [' + fulljid + ']: icestate = ' + state);
+                };
+
+                peerconnection.ongatheringchange = function(state) {
+                    console.log('Peer [' + fulljid + ']: icegatheringstate = ' + state);
                 };
 
                 if ($.urlvars.turn) {
@@ -121,22 +127,24 @@
                 });
 
                 peerconnection.addStream(localstream);
-                return peerconnection;
             };
 
             var callpeer = function(fulljid) {
-                var peerconnection = initpeerconnection(fulljid);
-                peerconnection.createOffer(function(sdp) {
-                    console.log('Peer [' + fulljid + ']: createoffer: ' + sdp);
-                    peerconnection.setLocalDescription('offer', sdp, function() {
-                        console.log('Peer [' + fulljid + ']: setLocalDescription success, ' +
-                                    'sending offer...');
-                        conn.send($msg({to: fulljid, type: 'chat'}).c('offer').t(sdp));
-                    }, function(error) {
-                        console.log('Peer [' + fulljid + ']: setLocalDescription error: ' + error);
-                    });
-                }, function(error) {
-                    console.log('Peer [' + fulljid + ']: createOffer error: ' + error);
+                initpeerconnection(fulljid, function(peerconnection) {
+                    return function() {
+                        peerconnection.createOffer(function(sdp) {
+                            console.log('Peer [' + fulljid + ']: createoffer: ' + sdp);
+                            peerconnection.setLocalDescription('offer', sdp, function() {
+                                console.log('Peer [' + fulljid + ']: setLocalDescription success, ' +
+                                            'sending offer...');
+                                conn.send($msg({to: fulljid, type: 'chat'}).c('offer').t(sdp));
+                            }, function(error) {
+                                console.log('Peer [' + fulljid + ']: setLocalDescription error: ' + error);
+                            });
+                        }, function(error) {
+                            console.log('Peer [' + fulljid + ']: createOffer error: ' + error);
+                        });
+                    };
                 });
             };
 
@@ -156,25 +164,28 @@
             };
 
             var acceptofferfrompeer = function(fulljid, sdp) {
-                var peerconnection = initpeerconnection(fulljid), i, c;
-                peerconnection.setRemoteDescription('offer', sdp, function() {
-                    console.log('Peer [' + fulljid + ']: setRemoteDescription success, ' +
-                                'creating answer...');
-                    peerconnection.createAnswer(function(sdp) {
-                        console.log('Peer [' + fulljid + ']: createanswer: ' + sdp);
-                        peerconnection.setLocalDescription('answer', sdp, function() {
-                            console.log('Peer [' + fulljid + ']: setLocalDescription success, ' +
-                                        'sending answer (offer/answer done)...');
-                            conn.send($msg({to: fulljid, type: 'chat'}).c('answer').t(sdp));
+                initpeerconnection(fulljid, function(peerconnection) {
+                    return function() {
+                        peerconnection.setRemoteDescription('offer', sdp, function() {
+                            console.log('Peer [' + fulljid + ']: setRemoteDescription success, ' +
+                                        'creating answer...');
+                            peerconnection.createAnswer(function(sdp) {
+                                console.log('Peer [' + fulljid + ']: createanswer: ' + sdp);
+                                peerconnection.setLocalDescription('answer', sdp, function() {
+                                    console.log('Peer [' + fulljid + ']: setLocalDescription success, ' +
+                                                'sending answer (offer/answer done)...');
+                                    conn.send($msg({to: fulljid, type: 'chat'}).c('answer').t(sdp));
+                                }, function(error) {
+                                    console.log('Peer [' + fulljid + ']: setLocalDescription error: '
+                                                + error);
+                                });
+                            }, function(error) {
+                                console.log('Peer [' + fulljid + ']: createAnswer error: ' + error);
+                            });
                         }, function(error) {
-                            console.log('Peer [' + fulljid + ']: setLocalDescription error: '
-                                        + error);
+                            console.log('Peer [' + fulljid + ']: setRemoteDescription error: ' + error);
                         });
-                    }, function(error) {
-                        console.log('Peer [' + fulljid + ']: createAnswer error: ' + error);
-                    });
-                }, function(error) {
-                    console.log('Peer [' + fulljid + ']: setRemoteDescription error: ' + error);
+                    };
                 });
             };
 
@@ -184,7 +195,7 @@
 
                 if (peerconnection) {
                     console.log('Peer [' + fulljid + ']: addcandidate: ' + sdp);
-                    if ('stable' === peerconnection.signalingstate) {
+                    if ('stable' === peerconnection.signalingState) {
                         console.log(peerconnection.addIceCandidate(c.sdp_mid, c.sdp_mline_index, c.sdp));
                     } else {
                         if (!pendingcandidates[fulljid]) {

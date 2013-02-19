@@ -99,18 +99,28 @@ namespace GoCast
         }
     }
     
-    std::string GetIceStateString(webrtc::PeerConnectionInterface::IceState state)
+    std::string GetIceConnStateString(webrtc::PeerConnectionInterface::IceConnectionState state)
     {
         switch(state)
         {
-            case webrtc::PeerConnectionInterface::kIceNew: return "new";
-            case webrtc::PeerConnectionInterface::kIceWaiting: return "waiting";
-            case webrtc::PeerConnectionInterface::kIceGathering: return "gathering";
-            case webrtc::PeerConnectionInterface::kIceFailed: return "failed";
-            case webrtc::PeerConnectionInterface::kIceConnected: return "connected";
-            case webrtc::PeerConnectionInterface::kIceCompleted: return "completed";
-            case webrtc::PeerConnectionInterface::kIceClosed: return "closed";
-            case webrtc::PeerConnectionInterface::kIceChecking: return "checking";
+            case webrtc::PeerConnectionInterface::kIceConnectionNew: return "new";
+            case webrtc::PeerConnectionInterface::kIceConnectionFailed: return "failed";
+            case webrtc::PeerConnectionInterface::kIceConnectionConnected: return "connected";
+            case webrtc::PeerConnectionInterface::kIceConnectionCompleted: return "completed";
+            case webrtc::PeerConnectionInterface::kIceConnectionClosed: return "closed";
+            case webrtc::PeerConnectionInterface::kIceConnectionChecking: return "checking";
+            case webrtc::PeerConnectionInterface::kIceConnectionDisconnected: return "disconnected";
+            default: return "unknown";
+        }
+    }
+    
+    std::string GetIceGathStateString(webrtc::PeerConnectionInterface::IceGatheringState state)
+    {
+        switch(state)
+        {
+            case webrtc::PeerConnectionInterface::kIceGatheringNew: return "new";
+            case webrtc::PeerConnectionInterface::kIceGatheringGathering: return "gathering";
+            case webrtc::PeerConnectionInterface::kIceGatheringComplete: return "complete";
             default: return "unknown";
         }
     }
@@ -609,13 +619,22 @@ namespace GoCast
         return GetSigStateString(m_pPeerConns[pluginId]->signaling_state());        
     }
 
-    std::string RtcCenter::IceState(const std::string& pluginId)
+    std::string RtcCenter::IceConnectionState(const std::string& pluginId)
     {
         if(m_pPeerConns.end() == m_pPeerConns.find(pluginId))
         {
             return "preinit";
         }
-        return GetIceStateString(m_pPeerConns[pluginId]->ice_state());        
+        return GetIceConnStateString(m_pPeerConns[pluginId]->ice_connection_state());        
+    }
+
+    std::string RtcCenter::IceGatheringState(const std::string& pluginId)
+    {
+        if(m_pPeerConns.end() == m_pPeerConns.find(pluginId))
+        {
+            return "preinit";
+        }
+        return GetIceGathStateString(m_pPeerConns[pluginId]->ice_gathering_state());        
     }
 
     bool RtcCenter::Inited() const
