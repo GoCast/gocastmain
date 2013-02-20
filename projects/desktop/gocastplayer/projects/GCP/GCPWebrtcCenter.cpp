@@ -226,29 +226,35 @@ namespace GoCast
     struct CreateOfferParams : public talk_base::MessageData
     {
         CreateOfferParams(const std::string& pluginId,
-                          webrtc::CreateSessionDescriptionObserver* pObserver)
+                          webrtc::CreateSessionDescriptionObserver* pObserver,
+                          FB::JSObjectPtr constraints)
         : m_pluginId(pluginId)
         , m_pObserver(pObserver)
+        , m_constraints(constraints)
         {
             
         }
         
         std::string m_pluginId;
         webrtc::CreateSessionDescriptionObserver* m_pObserver;
+        FB::JSObjectPtr m_constraints;
     };
     
     struct CreateAnswerParams : public talk_base::MessageData
     {
         CreateAnswerParams(const std::string& pluginId,
-                           webrtc::CreateSessionDescriptionObserver* pObserver)
+                           webrtc::CreateSessionDescriptionObserver* pObserver,
+                           FB::JSObjectPtr constraints)
         : m_pluginId(pluginId)
         , m_pObserver(pObserver)
+        , m_constraints(constraints)
         {
             
         }
         
         std::string m_pluginId;
         webrtc::CreateSessionDescriptionObserver* m_pObserver;
+        FB::JSObjectPtr m_constraints;
     };
 
     struct SetLocalSdpParams : public talk_base::MessageData
@@ -521,30 +527,32 @@ namespace GoCast
 
     void RtcCenter::CreateOffer(const std::string& pluginId,
                                 webrtc::CreateSessionDescriptionObserver* pObserver,
+                                FB::JSObjectPtr constraints,
                                 bool bSyncCall)
     {
         if(false == bSyncCall)
         {
-            CreateOfferParams params(pluginId, pObserver);
+            CreateOfferParams params(pluginId, pObserver, constraints);
             m_msgq.Send(MSG_CREATE_OFFER, &params, true);
             return;
         }
 
-        return CreateOffer_w(pluginId, pObserver);
+        return CreateOffer_w(pluginId, pObserver, constraints);
     }
     
     void RtcCenter::CreateAnswer(const std::string& pluginId,
                                  webrtc::CreateSessionDescriptionObserver* pObserver,
+                                 FB::JSObjectPtr constraints,
                                  bool bSyncCall)
     {
         if(false == bSyncCall)
         {
-            CreateAnswerParams params(pluginId, pObserver);
+            CreateAnswerParams params(pluginId, pObserver, constraints);
             m_msgq.Send(MSG_CREATE_ANSWER, &params, true);
             return;
         }
         
-        return CreateAnswer_w(pluginId, pObserver);
+        return CreateAnswer_w(pluginId, pObserver, constraints);
     }
     
     void RtcCenter::SetLocalDescription(const std::string& pluginId,
@@ -847,14 +855,18 @@ namespace GoCast
             case MSG_CREATE_OFFER:
             {
                 CreateOfferParams* pParams = static_cast<CreateOfferParams*>(msg->pdata);
-                CreateOffer_w(pParams->m_pluginId, pParams->m_pObserver);
+                CreateOffer_w(pParams->m_pluginId,
+                              pParams->m_pObserver,
+                              pParams->m_constraints);
                 break;
             }
             
             case MSG_CREATE_ANSWER:
             {
                 CreateAnswerParams* pParams = static_cast<CreateAnswerParams*>(msg->pdata);
-                CreateAnswer_w(pParams->m_pluginId, pParams->m_pObserver);
+                CreateAnswer_w(pParams->m_pluginId,
+                               pParams->m_pObserver,
+                               pParams->m_constraints);
                 break;
             }
                 
@@ -1132,8 +1144,11 @@ namespace GoCast
     }
     
     void RtcCenter::CreateOffer_w(const std::string& pluginId,
-                                  webrtc::CreateSessionDescriptionObserver* pObserver)
+                                  webrtc::CreateSessionDescriptionObserver* pObserver,
+                                  FB::JSObjectPtr constraints)
     {
+        MediaConstraints sdpconstraints(constraints);
+
         if(m_pPeerConns.end() == m_pPeerConns.find(pluginId))
         {
             std::string msg = pluginId;
@@ -1141,13 +1156,15 @@ namespace GoCast
             FBLOG_ERROR_CUSTOM("RtcCenter::CreateOffer_w", msg);
             return;
         }
-        
-        m_pPeerConns[pluginId]->CreateOffer(pObserver, NULL);
+        m_pPeerConns[pluginId]->CreateOffer(pObserver, &sdpconstraints);
     }
 
     void RtcCenter::CreateAnswer_w(const std::string& pluginId,
-                                   webrtc::CreateSessionDescriptionObserver* pObserver)
+                                   webrtc::CreateSessionDescriptionObserver* pObserver,
+                                   FB::JSObjectPtr constraints)
     {
+        MediaConstraints sdpconstraints(constraints);
+        
         if(m_pPeerConns.end() == m_pPeerConns.find(pluginId))
         {
             std::string msg = pluginId;
@@ -1155,8 +1172,7 @@ namespace GoCast
             FBLOG_ERROR_CUSTOM("RtcCenter::CreateAnswer_w", msg);
             return;
         }
-        
-        m_pPeerConns[pluginId]->CreateOffer(pObserver, NULL);
+        m_pPeerConns[pluginId]->CreateOffer(pObserver, &sdpconstraints);
     }
 
     void RtcCenter::SetLocalDescription_w(const std::string& pluginId,

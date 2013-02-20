@@ -88,9 +88,11 @@ namespace GoCast
                           bool bSyncCall = true);
         void CreateOffer(const std::string& pluginId,
                          webrtc::CreateSessionDescriptionObserver* pObserver,
+                         FB::JSObjectPtr constraints,
                          bool bSyncCall = true);
         void CreateAnswer(const std::string& pluginId,
                           webrtc::CreateSessionDescriptionObserver* pObserver,
+                          FB::JSObjectPtr constraints,
                           bool bSyncCall = true);
         void SetLocalDescription(const std::string& pluginId,
                                  webrtc::SetSessionDescriptionObserver* pObserver,
@@ -153,9 +155,11 @@ namespace GoCast
         bool RemoveStream_w(const std::string& pluginId,
                             const std::string& label);
         void CreateOffer_w(const std::string& pluginId,
-                           webrtc::CreateSessionDescriptionObserver* pObserver);
+                           webrtc::CreateSessionDescriptionObserver* pObserver,
+                           FB::JSObjectPtr constraints);
         void CreateAnswer_w(const std::string& pluginId,
-                            webrtc::CreateSessionDescriptionObserver* pObserver);
+                            webrtc::CreateSessionDescriptionObserver* pObserver,
+                            FB::JSObjectPtr constraints);
         void SetLocalDescription_w(const std::string& pluginId,
                                    webrtc::SetSessionDescriptionObserver* pObserver,
                                    const std::string& action,

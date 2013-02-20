@@ -5,16 +5,21 @@
         <script type="text/javascript" src="js/jquery.utils.js?GOCASTTIMESTAMP"></script>
         <script type="text/javascript" src="/scripts/strophe.js?GOCASTTIMESTAMP"></script>
         <script type="text/javascript" src="js/strophe_connection.js?GOCASTTIMESTAMP"></script>
+        <script type="text/javascript" src="js/peerconnection.js?GOCASTTIMESTAMP"></script>
         <script type="text/javascript">
-            var pluginmap = {};
-            var pendingcandidates = {};
-            var localstream = null;
-            var conn = null;
-            var onlocalplayerloaded = function() {
+            var pluginmap = {},
+                localstream = null,
+                conn = null,
+                iceservers = {
+                    stun: [{uri: 'stun:stun.l.google.com:19302'}],
+                    turn: [{uri: 'turn:manjeshtest2@dev.gocast.it:3478', password: 'manjeshpass2'}]
+                },
+                peerconnections = {};
+                remoteplayertmpl = '<object class="peerconn" type="application/x-gocastplayer" width="0" height="0"></object>',
+                onlocalplayerloaded = function() {
                 var plugin = document.getElementById('localPlayer'),
-                    constraints = {
-                        video: true,
-                        audio: true,
+                    options = new GoCastJS.UserMediaOptions({
+                        video: false, audio: true,
                         videoconstraints: {
                             videoin: plugin.videoinopts['default'],
                             webrtc: {
@@ -32,192 +37,160 @@
                             audioin: plugin.audioinopts[0],
                             audioout: plugin.audiooutopts[0]
                         }
-                    };
+                    }, plugin);
 
-                plugin.getUserMedia(constraints, function(stream) {
+                GoCastJS.getUserMedia(options, function(stream) {
                     var i, j = parseInt($.urlvars.u), other;
 
-                    console.log('Success: ', stream);
                     localstream = stream;
-                    plugin.init('localPlayer', [], null);
-                    plugin.addStream(stream);
-                    plugin.createOffer(function(desc) {
-                        console.log('CreateOffer: ', desc);
-                        plugin.setLocalDescription('offer', desc, function() {
-                            console.log('SetLocalDescription: Success');
-                            plugin.source = stream;
-                            conn.send($pres());
-                            for (i=1; i<4; i++) {
-                                if (j != i) {
-                                    other = 'test' + i + '@dev.gocast.it';
-                                    conn.send($pres({to: other}));
-                                }
-                            }
-                            console.log('Online: ', conn.getJid());
-                        }, function(error) {
-                            console.log('SetLocalDescription: ', error);
-                        });
-                    }, function(error) {
-                        console.log('CreateOffer: ', error);
-                    });
-                }, function(msg) {alert(msg);});
+                    conn.send($pres());
+                    for (i=1; i<4; i++) {
+                        if (j != i) {
+                            other = 'test' + i + '@dev.gocast.it';
+                            conn.send($pres({to: other}));
+                        }
+                    }
+                    console.log('Online: ', conn.getJid());
+                }, function(error) { 
+                    alert(error);
+                });
             };
 
-            var callernegotiationcallback = function(fulljid, peerconnection) {
+            var callernegotiationcallback = function(peerconnection) {
                 return function() {
-                    peerconnection.createOffer(function(sdp) {
-                        console.log('Peer [' + fulljid + ']: createoffer: ' + sdp);
-                        peerconnection.setLocalDescription('offer', sdp, function() {
-                            console.log('Peer [' + fulljid + ']: setLocalDescription success, ' +
+                    peerconnection.CreateOffer(function(sdp) {
+                        console.log('Peer [' + peerconnection.pcid + ']: Createoffer: ' + sdp);
+                        peerconnection.SetLocalDescription('offer', sdp, function() {
+                            console.log('Peer [' + peerconnection.pcid + ']: SetLocalDescription success, ' +
                                         'sending offer...');
-                            conn.send($msg({to: fulljid, type: 'chat'}).c('offer').t(sdp));
+                            conn.send($msg({to: peerconnection.pcid, type: 'chat'}).c('offer').t(sdp));
                         }, function(error) {
-                            console.log('Peer [' + fulljid + ']: setLocalDescription error: ' + error);
+                            console.log('Peer [' + peerconnection.pcid + ']: SetLocalDescription error: ' + error);
                         });
                     }, function(error) {
-                        console.log('Peer [' + fulljid + ']: createOffer error: ' + error);
+                        console.log('Peer [' + peerconnection.pcid + ']: CreateOffer error: ' + error);
+                    }, { 
+                        sdpconstraints: {
+                            mandatory: {
+                                OfferToReceiveAudio: 'true',
+                                OfferToReceiveVideo: 'true'
+                            }
+                        }
                     });
                 };
             };
 
-            var calleenegotiationcallback = function(fulljid, peerconnection, sdp) {
+            var calleenegotiationcallback = function(peerconnection, sdp) {
                 return function() {
-                    peerconnection.setRemoteDescription('offer', sdp, function() {
-                        console.log('Peer [' + fulljid + ']: setRemoteDescription success, ' +
+                    peerconnection.SetRemoteDescription('offer', sdp, function() {
+                        console.log('Peer [' + peerconnection.pcid + ']: SetRemoteDescription success, ' +
                                     'creating answer...');
-                        peerconnection.createAnswer(function(sdp) {
-                            console.log('Peer [' + fulljid + ']: createanswer: ' + sdp);
-                            peerconnection.setLocalDescription('answer', sdp, function() {
-                                console.log('Peer [' + fulljid + ']: setLocalDescription success, ' +
+                        peerconnection.CreateAnswer(function(sdp) {
+                            console.log('Peer [' + peerconnection.pcid + ']: CreateAnswer: ' + sdp);
+                            peerconnection.SetLocalDescription('answer', sdp, function() {
+                                console.log('Peer [' + peerconnection.pcid + ']: SetLocalDescription success, ' +
                                             'sending answer (offer/answer done)...');
-                                conn.send($msg({to: fulljid, type: 'chat'}).c('answer').t(sdp));
+                                conn.send($msg({to: peerconnection.pcid, type: 'chat'}).c('answer').t(sdp));
                             }, function(error) {
-                                console.log('Peer [' + fulljid + ']: setLocalDescription error: '
+                                console.log('Peer [' + peerconnection.pcid + ']: SetLocalDescription error: '
                                             + error);
                             });
                         }, function(error) {
-                            console.log('Peer [' + fulljid + ']: createAnswer error: ' + error);
+                            console.log('Peer [' + peerconnection.pcid + ']: CreateAnswer error: ' + error);
+                        }, { 
+                            sdpconstraints: {
+                                mandatory: {
+                                    OfferToReceiveAudio: 'true',
+                                    OfferToReceiveVideo: 'true'
+                                }
+                            }
                         });
                     }, function(error) {
-                        console.log('Peer [' + fulljid + ']: setRemoteDescription error: ' + error);
+                        console.log('Peer [' + peerconnection.pcid + ']: SetRemoteDescription error: ' + error);
                     });
                 };
             };
 
             var initpeerconnection = function(fulljid, negotiationCallback, sdp) {
-                var peerconnection = null, iceservers = [];
+                var peerconnection = null, player = null, options;
 
                 hangupOnPeer(fulljid);
                 if (!pluginmap['peer0']) {
-                    $('#peer0').html('<object class="peerconn" type="application/x-gocastplayer" width="0" height="0"></object>');
-                    peerconnection = $('body > #peer0 > .peerconn').get(0);
+                    $('#peer0').html(remoteplayertmpl);
+                    player = $('body > #peer0 > .peerconn').get(0);
                     pluginmap['peer0'] = fulljid;
                 } else if (!pluginmap['peer1']) {
-                    $('#peer1').html('<object class="peerconn" type="application/x-gocastplayer" width="0" height="0"></object>');
-                    peerconnection = $('body > #peer1 > .peerconn').get(0);
+                    $('#peer1').html(remoteplayertmpl);
+                    player = $('body > #peer1 > .peerconn').get(0);
                     pluginmap['peer1'] = fulljid;
                 }
 
-                peerconnection.onaddstream = function(stream) {
-                    console.log('Peer [' + fulljid + ']: Added remote stream ' + stream.label);
-                    peerconnection.width = 320;
-                    peerconnection.height = 240;
-                    peerconnection.source = stream;
-                };
-
-                if (negotiationCallback) {
-                     peerconnection.onnegotiationneeded = negotiationCallback(fulljid, peerconnection, sdp);
-                }
-
-                peerconnection.onstatechange = function(state) {
-                    console.log('Peer [' + fulljid + ']: sigstate = ' + state);
-                    if (pendingcandidates[fulljid] && 'stable' === state) {
-                        for (i=0; i<pendingcandidates[fulljid].length; i++) {
-                            c = pendingcandidates[fulljid][i];
-                            console.log(peerconnection.addIceCandidate(c.sdp_mid,
-                                                                       c.sdp_mline_index,
-                                                                       c.sdp));
-                        }
-                        delete pendingcandidates[fulljid];
+                console.log('ICESERVERS: ' + JSON.stringify(iceservers[$.urlvars.turn || 'stun']));
+                options = new GoCastJS.PeerConnectionOptions(
+                    player, fulljid, iceservers[$.urlvars.turn || 'stun'],
+                    function(sdp) {
+                        console.log('Peer [' + fulljid + ']: onice: ' + sdp);
+                        conn.send($msg({to: fulljid, type: 'chat'}).c('candidate').t(sdp));
+                    },
+                    function(stream) {
+                        console.log('Peer [' + fulljid + ']: Added remote stream ' + stream.label);
+                        peerconnection.Width(320);
+                        peerconnection.Height(240);
+                    },
+                    function(stream) {
+                        console.log('Peer [' + fulljid + ']: Removed remote stream ' + stream.label);
+                        peerconnection.Width(0);
+                        peerconnection.Height(0);
+                    },
+                    function(state) {
+                        console.log('Peer [' + fulljid + ']: sigstate = ' + state);
+                    },
+                    function(state) {
+                        console.log('Peer [' + fulljid + ']: icestate = ' + state);
                     }
-                };
+                );
 
-                peerconnection.onicechange = function(state) {
-                    console.log('Peer [' + fulljid + ']: icestate = ' + state);
-                };
-
-                peerconnection.ongatheringchange = function(state) {
-                    console.log('Peer [' + fulljid + ']: icegatheringstate = ' + state);
-                };
-
-                if ($.urlvars.turn) {
-                    iceservers.push({uri: 'turn:manjeshtest2@dev.gocast.it:3478', password: 'manjeshpass2'});
-                } else {
-                    iceservers.push({uri: 'stun:stun.l.google.com:19302'});
-                }
-                console.log('ICESERVERS: ' + JSON.stringify(iceservers));
-
-                peerconnection.init(fulljid, iceservers, function(sdp) {
-                    if ('' !== sdp) {
-                        console.log('Peer [' + fulljid + ']: onice: ' + sdp.replace(/\r\n/, ''));
-                        conn.send($msg({to: fulljid, type: 'chat'}).c('candidate')
-                                  .t(sdp.replace(/\r\n/, '')));
-                    } else {
-                        console.log('Peer [' + fulljid + ']: Candidate gathering done');
-                    }
-                });
-
-                peerconnection.addStream(localstream);
+                peerconnection = new GoCastJS.PeerConnection(options);
+                peerconnection.AddStream(localstream, negotiationCallback(peerconnection, sdp));
+                return peerconnection;
             };
 
             var callpeer = function(fulljid) {
-                initpeerconnection(fulljid, callernegotiationcallback);
+                peerconnections[fulljid] = initpeerconnection(fulljid, callernegotiationcallback);
             };
 
             var acceptanswerfrompeer = function(fulljid, sdp) {
-                var id = pluginmap['peer0'] === fulljid ? 'peer0' : (pluginmap['peer1'] === fulljid ? 'peer1' : 'dummy'),
-                    peerconnection = $('body > #' + id + ' > .peerconn').get(0), i, c;
-
-                if (peerconnection) {
+                if (peerconnections[fulljid]) {
                     console.log('Peer [' + fulljid + ']: answer: ' + sdp);
-                    peerconnection.setRemoteDescription('answer', sdp, function() {
-                        console.log('Peer [' + fulljid + ']: setRemoteDescription success, ' +
+                    peerconnections[fulljid].SetRemoteDescription('answer', sdp, function() {
+                        console.log('Peer [' + fulljid + ']: SetRemoteDescription success, ' +
                                     'offer/answer done...');
                     }, function(error) {
-                        console.log('Peer [' + fulljid + ']: setRemoteDescription error: ' + error);
+                        console.log('Peer [' + fulljid + ']: SetRemoteDescription error: ' + error);
                     });
                 }
             };
 
             var acceptofferfrompeer = function(fulljid, sdp) {
-                initpeerconnection(fulljid, calleenegotiationcallback, sdp);
+                peerconnections[fulljid] = initpeerconnection(fulljid, calleenegotiationcallback, sdp);
             };
 
             var addcandidateforpeer = function(fulljid, sdp) {
-                var id = pluginmap['peer0'] === fulljid ? 'peer0' : (pluginmap['peer1'] === fulljid ? 'peer1' : 'dummy'),
-                    peerconnection = $('body > #' + id + ' > .peerconn').get(0), c = JSON.parse(sdp);
-
-                if (peerconnection) {
+                if (peerconnections[fulljid]) {
                     console.log('Peer [' + fulljid + ']: addcandidate: ' + sdp);
-                    if ('stable' === peerconnection.signalingState) {
-                        console.log(peerconnection.addIceCandidate(c.sdp_mid, c.sdp_mline_index, c.sdp));
-                    } else {
-                        if (!pendingcandidates[fulljid]) {
-                            pendingcandidates[fulljid] = [];
-                        }
-                        pendingcandidates[fulljid].push(c);
-                        console.log('PendingCandidates: ', pendingcandidates);
-                    }
+                    peerconnections[fulljid].AddIceCandidate(sdp);
                 }
             };
 
             var hangupOnPeer = function(fulljid) {
-                var id = pluginmap['peer0'] === fulljid ? 'peer0' : (pluginmap['peer1'] === fulljid ? 'peer1' : 'dummy'), container = $('body > #' + id).get(0);
+                var id = pluginmap['peer0'] === fulljid ? 'peer0' : (pluginmap['peer1'] === fulljid ? 'peer1' : 'dummy'),
+                    container = $('body > #' + id).get(0);
 
                 if (container) {
                     container.removeChild(container.lastChild);
                 }
                 delete pluginmap[id];
+                delete peerconnections[fulljid];
             }
 
             var addStanzaHandlers = function() {

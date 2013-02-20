@@ -196,35 +196,37 @@ GoCastJS.getUserMedia = function(options, success, failure) {
                     audio: options.constraints.audio
                 };
 
+                player.onnegotiationneeded = function() {
+                    player.createOffer(function(sdp) {
+                        player.setLocalDescription('offer', sdp, function() {
+                            player.source = stream;
+                            if ('undefined' !== typeof(success) && null !== success) {
+                                success(stream);
+                            }
+                        }, function(error) {
+                            console.log('localPlayer.setLocalDescription(): ', error);
+                            if ('undefined' !== typeof(failure) && null !== failure) {
+                                failure(error);
+                            }
+                        });
+                    }, function(error) {
+                        console.log('localPlayer.createOffer(): ', error);
+                        if ('undefined' !== typeof(failure) && null !== failure) {
+                            failure(error);
+                        }
+                    }, null);
+                };
+
                 if (false === player.init('localPlayer', [], null)) {
-                    throw new GoCastJS.Exception(player.id, 'init() failed.');
+                    throw new GoCastJS.Exception('localPlayer', 'init() failed.');
                 }
 
                 if (hints.audio || hints.video) {
                     if (false === player.addStream(stream)) {
-                        throw new GoCastJS.Exception(player.id,
+                        throw new GoCastJS.Exception('localPlayer',
                                                      'addStream() failed.');
                     }                    
                 }
-
-                player.createOffer(function(sdp) {
-                    player.setLocalDescription('offer', sdp, function() {
-                        player.source = stream;
-                        if ('undefined' !== typeof(success) && null !== success) {
-                            success(stream);
-                        }
-                    }, function(error) {
-                        console.log('localPlayer.setLocalDescription(): ', error);
-                        if ('undefined' !== typeof(failure) && null !== failure) {
-                            failure(error);
-                        }
-                    });
-                }, function(error) {
-                    console.log('localPlayer.createOffer(): ', error);
-                    if ('undefined' !== typeof(failure) && null !== failure) {
-                        failure(error);
-                    }
-                });
             },
             function(error) {
                 if ('undefined' !== typeof(failure) && null !== success) {
@@ -430,23 +432,27 @@ GoCastJS.SetDevicesChangedListener = function(checkInterval,
 //! arguments/members:
 //!     iceServers  <string>     : [{uri: 'stun:video.gocast.it:19302'}, {uri: <addr>, password: <pwd>}]
 //!     player      <HtmlObject> : width of plugin window
-//!     onIceMessage       <function(candidate, moreComing)> : new ice candidate
-//!     onAddStream        <function(stream)>          : new remote stream
-//!     onRemoveStream     <function(stream)>          : remote stream removed
-//!     onReadyStateChange <function()>                : signaling state changed
+//!     onIceMessage       <function(candidate)>    : new ice candidate
+//!     onAddStream        <function(stream)>       : new remote stream
+//!     onRemoveStream     <function(stream)>       : remote stream removed
+//!     onSignalingStateChange <function(newState)> : signaling state changed
+//!     onConnStateChange <function(newState)>      : connection state changed
 //!
-GoCastJS.PeerConnectionOptions = function(iceServers,
+GoCastJS.PeerConnectionOptions = function(player, pcid,
+                                          iceServers,
                                           onIceMessage,
                                           onAddStream,
                                           onRemoveStream,
-                                          onReadyStateChange,
-                                          player) {
+                                          onSignalingStateChange,
+                                          onConnStateChange) {
     this.iceServers = iceServers;
     this.onIceMessage = onIceMessage;
     this.onAddStream = onAddStream;
     this.onRemoveStream = onRemoveStream;
-    this.onReadyStateChange = onReadyStateChange;
+    this.onSignalingStateChange = onSignalingStateChange;
+    this.onConnStateChange = onConnStateChange;
     this.player = player;
+    this.pcid = pcid;
 };
 
 //!
@@ -461,13 +467,15 @@ GoCastJS.PeerConnectionOptions = function(iceServers,
 //!
 GoCastJS.PeerConnection = function(options) {
     if (false === GoCastJS.CheckBrowserSupport()) {
-        throw new GoCastJS.Exception(this.peerConn.id, 'Browser unsupported.');
+        throw new GoCastJS.Exception(options.pcid, 'Browser unsupported.');
     } else if (false === GoCastJS.CheckGoCastPlayer()) {
-        throw new GoCastJS.Exception(this.peerConn.id, 'Plugin undetected.');
+        throw new GoCastJS.Exception(options.pcid, 'Plugin undetected.');
     } else {
         this.player = options.player;
-        this.connState = 'CONNECTING';
-        this.connTimer = null;
+        this.pcid = options.pcid;
+        this.sigState = 'preinit';
+        this.connState = 'preinit';
+        this.pendingCandidates = [];
 
         var self = this;
         var playerRef = this.player;
@@ -486,49 +494,45 @@ GoCastJS.PeerConnection = function(options) {
             }
         };
 
-        this.player.onstatechange = function(stateType) {
-            if ('signaling-state' === stateType) {
-                if ('CONNECTING' === self.ReadyState() &&
-                    null === self.connTimer) {
-                    self.connTimer = setTimeout(function() {
-                        self.connState = 'CONNECTED';
-                        playerRef.onstatechange('signaling-state');
-                    }, 2000);
-                }
+        this.player.onstatechange = function(newState) {
+            var i;
 
-                if ('undefined' !== typeof(options.onReadyStateChange) &&
-                    null !== options.onReadyStateChange) {
-                    options.onReadyStateChange();
+            self.sigState = newState;
+            if ('stable' === newState) {
+                for (i=0; i<self.pendingCandidates.length; i++) {
+                    self.AddIceCandidate(self.pendingCandidates[i]);
                 }
+                self.pendingCandidates = [];
+            }
+            if ('undefined' !== typeof(options.onSignalingStateChange) &&
+                null !== options.onSignalingStateChange) {
+                options.onSignalingStateChange(newState);
             }
         };
+
+        this.player.onicechange = function(newState) {
+            self.connState = newState;
+            if ('undefined' !== typeof(options.onConnStateChange) &&
+                null !== options.onConnStateChange) {
+                options.onConnStateChange(newState);
+            }
+        }
 
         var iceCallback = function(candidate) {
-            var prevState = self.connState;
-            self.connState = 'CONNECTING';
-
-            if (prevState !== self.connState) {
-                self.connTimer = null;
-                playerRef.onstatechange('signaling-state');
-            } else {
-                clearTimeout(self.connTimer);
-                self.connTimer = setTimeout(function() {
-                    self.connState = 'CONNECTED';
-                    playerRef.onstatechange('signaling-state');
-                }, 2000);                    
-            }
-
             if ('undefined' !== typeof(options.onIceMessage) &&
                null !== options.onIceMessage) {
-                options.onIceMessage(candidate.replace(/\r\n/, ''), '' !== candidate);
+                options.onIceMessage(candidate.replace(/\r\n/, ''));
             }
         };
 
-        if (false === this.player.init(this.player.id,
+        if (false === this.player.init(options.pcid,
                                        options.iceServers,
                                        iceCallback)) {
-            throw new GoCastJS.Exception(this.player.id, 'init() failed.');
+            throw new GoCastJS.Exception(options.pcid, 'init() failed.');
         }
+
+        this.sigState = 'new';
+        this.connState = 'new';
     }
 };
 
@@ -536,12 +540,14 @@ GoCastJS.PeerConnection = function(options) {
 //! function: GoCastJS.PeerConnection.AddStream(stream)
 //!
 //! arguments:
-//!     stream <obj> : stream to be added (given by GetUserMedia's
-//!                    success callback)
+//!     stream <obj>        : stream to be added (given by GetUserMedia's
+//!                           success callback)
+//!     negotiationCallback : offer/answer negotiation function
 //!
-GoCastJS.PeerConnection.prototype.AddStream = function(stream) {
+GoCastJS.PeerConnection.prototype.AddStream = function(stream, negotiationCallback) {
+    this.player.onnegotiationneeded = negotiationCallback || function() {};
     if (false === this.player.addStream(stream)) {
-        throw new GoCastJS.Exception(this.player.id, 'addStream() failed.');
+        throw new GoCastJS.Exception(this.pcid, 'addStream() failed.');
     }
 };
 
@@ -549,12 +555,13 @@ GoCastJS.PeerConnection.prototype.AddStream = function(stream) {
 //! function: GoCastJS.PeerConnection.RemoveStream(stream)
 //!
 //! arguments:
-//!     stream <obj> : stream to be removed (given by GetUserMedia's
-//!                    success callback)
+//!     stream <obj>        : stream to be removed
+//!     negotiationCallback : offer/answer negotiation function
 //!
-GoCastJS.PeerConnection.prototype.RemoveStream = function(stream) {
+GoCastJS.PeerConnection.prototype.RemoveStream = function(stream, negotiationCallback) {
+    this.player.onnegotiationneeded = negotiationCallback || function() {};
     if (false === this.player.removeStream(stream)) {
-        throw new GoCastJS.Exception(this.player.id, 'removeStream() failed.');
+        throw new GoCastJS.Exception(this.pcid, 'removeStream() failed.');
     }
 };
 
@@ -565,10 +572,10 @@ GoCastJS.PeerConnection.prototype.RemoveStream = function(stream) {
 //!     success : function(sdp)
 //!     failure : function(error)
 //!
-GoCastJS.PeerConnection.prototype.CreateOffer = function(success, failure) {
+GoCastJS.PeerConnection.prototype.CreateOffer = function(success, failure, constraints) {
     success = success || function(sdp) {};
     failure = failure || function(error) {};
-    this.player.createOffer(success, failure);
+    this.player.createOffer(success, failure, constraints || {});
 };
 
 //!
@@ -578,10 +585,10 @@ GoCastJS.PeerConnection.prototype.CreateOffer = function(success, failure) {
 //!     success : function(sdp)
 //!     failure : function(error)
 //!
-GoCastJS.PeerConnection.prototype.CreateAnswer = function(success, failure) {
+GoCastJS.PeerConnection.prototype.CreateAnswer = function(success, failure, constraints) {
     success = success || function(sdp) {};
     failure = failure || function(error) {};
-    this.player.createAnswer(success, failure);
+    this.player.createAnswer(success, failure, constraints || {});
 };
 
 //!
@@ -627,14 +634,22 @@ GoCastJS.PeerConnection.prototype.SetRemoteDescription = function(action,
 };
 
 //!
-//! function: GoCastJS.PeerConnection.ProcessIceMessage(sdp)
+//! function: GoCastJS.PeerConnection.AddIceCandidate(sdp)
 //!
 //! arguments:
 //!     sdp <string> : sdp of remote peer's ice candidate
 //!
-GoCastJS.PeerConnection.prototype.ProcessIceMessage = function(sdp) {
-    if (false === this.player.addIceCandidate(JSON.parse(sdp)) {
-        throw new GoCastJS.Exception(this.player.id, 'procIceMsg() failed.');
+GoCastJS.PeerConnection.prototype.AddIceCandidate = function(sdp) {
+    var candidate = JSON.parse(sdp);
+
+    if ('stable' === this.sigState) {
+        if (false === this.player.addIceCandidate(candidate.sdp_mid,
+                                                  candidate.sdp_mline_index,
+                                                  candidate.sdp)) {
+            throw new GoCastJS.Exception(this.pcid, 'procIceMsg() failed.');
+        }
+    } else {
+        this.pendingCandidates.push(sdp);
     }
 };
 
@@ -645,39 +660,7 @@ GoCastJS.PeerConnection.prototype.ProcessIceMessage = function(sdp) {
 //!
 GoCastJS.PeerConnection.prototype.Deinit = function() {
     if (false === this.player.deinit()) {
-        throw new GoCastJS.Exception(this.player.id, 'deinit() failed.');
-    }
-};
-
-//!
-//! function: GoCastJS.PeerConnection.ReadyState()
-//!
-//! returns: ['INVALID' | 'PRENEW' | 'NEW' | 'NEGOTIATING' |
-//!           'ACTIVE' | 'CONNECTING' | 'CONNECTED' | 'BLOCKED' |
-//!           'CLOSING' | 'CLOSED'];
-//!
-GoCastJS.PeerConnection.prototype.ReadyState = function() {
-    var stateMap = {
-        'preinit': 'PRENEW',
-        'new': 'NEW',
-        'have-local-offer': 'NEGOTIATING',
-        'have-remote-offer': 'NEGOTIATING',
-        'have-local-answer': 'NEGOTIATING',
-        'have-remote-answer': 'NEGOTIATING',
-        'stable': 'ACTIVE',
-        'blocked': 'BLOCKED'
-    }, state = stateMap[this.player.signalingState];
-
-    if ('ACTIVE' === state) {
-        return this.connState;
-    } else if ('BLOCKED' === state) {
-        if ('DEFUNCT' === this.connState) {
-            return this.connState;
-        } else {
-            return state;
-        }
-    } else {
-        return state;
+        throw new GoCastJS.Exception(this.pcid, 'deinit() failed.');
     }
 };
 
@@ -733,9 +716,4 @@ GoCastJS.PluginLog = function(localplayer, logCallback) {
             }
         });
     }
-};
-
-GoCastJS.PeerConnection.prototype.SetDefunct = function() {
-    this.connState = 'DEFUNCT';
-    this.player.onstatechange('signaling-state');
 };

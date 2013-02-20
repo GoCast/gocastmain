@@ -362,7 +362,8 @@ FB::variant GCPAPI::RemoveStream(const FB::JSAPIPtr& stream)
 }
 
 void GCPAPI::CreateOffer(const FB::JSObjectPtr& succCb,
-                         const FB::JSObjectPtr& failCb)
+                         const FB::JSObjectPtr& failCb,
+                         const FB::JSObjectPtr& constraints)
 {
     m_oncreatesdpsuccessCb = succCb;
     m_oncreatesdpfailureCb = failCb;
@@ -375,11 +376,14 @@ void GCPAPI::CreateOffer(const FB::JSObjectPtr& succCb,
         FBLOG_ERROR_CUSTOM("GCPAPI::CreateOffer", msg);
         return;
     }
-    pCtr->CreateOffer(m_htmlId.convert_cast<std::string>(), m_pCreateOfferSDPObserver);
+    pCtr->CreateOffer(m_htmlId.convert_cast<std::string>(),
+                      m_pCreateOfferSDPObserver,
+                      constraints);
 }
 
 void GCPAPI::CreateAnswer(const FB::JSObjectPtr& succCb,
-                          const FB::JSObjectPtr& failCb)
+                          const FB::JSObjectPtr& failCb,
+                          const FB::JSObjectPtr& constraints)
 {
     m_oncreatesdpsuccessCb = succCb;
     m_oncreatesdpfailureCb = failCb;
@@ -392,7 +396,9 @@ void GCPAPI::CreateAnswer(const FB::JSObjectPtr& succCb,
         FBLOG_ERROR_CUSTOM("GCPAPI::CreateAnswer", msg);
         return;
     }
-    pCtr->CreateAnswer(m_htmlId.convert_cast<std::string>(), m_pCreateAnswerSDPObserver);
+    pCtr->CreateAnswer(m_htmlId.convert_cast<std::string>(),
+                       m_pCreateAnswerSDPObserver,
+                       constraints);
 }
 
 void GCPAPI::SetLocalDescription(const FB::variant& action,

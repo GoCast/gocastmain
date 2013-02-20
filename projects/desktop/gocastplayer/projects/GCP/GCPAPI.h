@@ -165,8 +165,12 @@ public:
                      const FB::JSObjectPtr& iceCallback);
     FB::variant AddStream(const FB::JSAPIPtr& stream);
     FB::variant RemoveStream(const FB::JSAPIPtr& stream);
-    void CreateOffer(const FB::JSObjectPtr& succCb, const FB::JSObjectPtr& failCb);
-    void CreateAnswer(const FB::JSObjectPtr& succCb, const FB::JSObjectPtr& failCb);
+    void CreateOffer(const FB::JSObjectPtr& succCb,
+                     const FB::JSObjectPtr& failCb,
+                     const FB::JSObjectPtr& constraints);
+    void CreateAnswer(const FB::JSObjectPtr& succCb,
+                      const FB::JSObjectPtr& failCb,
+                      const FB::JSObjectPtr& constraints);
     void SetLocalDescription(const FB::variant& action,
                              const FB::variant& sdp,
                              const FB::JSObjectPtr& succCb,

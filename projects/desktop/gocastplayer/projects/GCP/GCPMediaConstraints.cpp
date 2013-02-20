@@ -5,7 +5,7 @@ namespace GoCast
 {
     MediaConstraints::MediaConstraints(const FB::JSObjectPtr& constraints)
     {
-        if(true == constraints->HasProperty("webrtc"))
+        if(constraints.get() && true == constraints->HasProperty("webrtc"))
         {
             FB::JSObjectPtr webrtcconstraints = constraints->GetProperty("webrtc").convert_cast<FB::JSObjectPtr>();
             if(NULL != webrtcconstraints.get())
@@ -30,6 +30,33 @@ namespace GoCast
                         }
                     }
                 }
+            }
+        }
+        else if(constraints.get() && true == constraints->HasProperty("sdpconstraints"))
+        {
+            FB::JSObjectPtr sdpconstraints = constraints->GetProperty("sdpconstraints").convert_cast<FB::JSObjectPtr>();
+            if(sdpconstraints.get())
+            {
+                if(true == sdpconstraints->HasProperty("mandatory"))
+                {
+                    FB::JSObjectPtr mandatory = sdpconstraints->GetProperty("mandatory").convert_cast<FB::JSObjectPtr>();
+                    if(mandatory.get())
+                    {
+                        std::vector<std::string> constraintNames;
+                        mandatory->getMemberNames(constraintNames);
+                        
+                        for(std::vector<std::string>::iterator it = constraintNames.begin();
+                            it != constraintNames.end(); it++)
+                        {
+                            std::stringstream sstrm;
+                            sstrm << "Mandatory Constraint: [" << *it << ", " << mandatory->GetProperty(*it).convert_cast<std::string>() << "]";
+                            FBLOG_INFO_CUSTOM("MediaConstraints", sstrm.str());
+                            m_mandatory.push_back(webrtc::MediaConstraintsInterface::Constraint(*it,
+                                                  mandatory->GetProperty(*it).convert_cast<std::string>()));
+                        }
+                    }
+                }
+                
             }
         }
     }

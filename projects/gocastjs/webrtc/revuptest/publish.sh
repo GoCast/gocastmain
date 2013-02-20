@@ -22,6 +22,7 @@ cp *.html $folder/
 
 # Copy js
 cp ../../../server/carousel/js/jquery-1.8.1.js $folder/js/
+cp ../peerconnection.js $folder/js/
 
 echo "Generating timestamped html"
 
