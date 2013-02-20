@@ -430,7 +430,8 @@ GoCastJS.SetDevicesChangedListener = function(checkInterval,
 //!                                             player)
 //!
 //! arguments/members:
-//!     iceServers  <string>     : [{uri: 'stun:video.gocast.it:19302'}, {uri: <addr>, password: <pwd>}]
+//!     iceServers  <Object>     : [{uri: 'stun:video.gocast.it:19302'},
+//!                                 {uri: <addr>, password: <pwd>}]
 //!     player      <HtmlObject> : width of plugin window
 //!     onIceMessage       <function(candidate)>    : new ice candidate
 //!     onAddStream        <function(stream)>       : new remote stream
@@ -566,11 +567,13 @@ GoCastJS.PeerConnection.prototype.RemoveStream = function(stream, negotiationCal
 };
 
 //!
-//! function: GoCastJS.PeerConnection.CreateOffer(success, failure)
+//! function: GoCastJS.PeerConnection.CreateOffer(success, failure, constraints)
 //!
 //! arguments:
-//!     success : function(sdp)
-//!     failure : function(error)
+//!     success    : function(sdp)
+//!     failure    : function(error)
+//!     constraints: {sdpconstraints: {mandatory: {OfferToReceiveAudio: 'true/false',
+//!                                                OfferToReceiveVideo: 'true/false'}}}
 //!
 GoCastJS.PeerConnection.prototype.CreateOffer = function(success, failure, constraints) {
     success = success || function(sdp) {};
@@ -579,11 +582,13 @@ GoCastJS.PeerConnection.prototype.CreateOffer = function(success, failure, const
 };
 
 //!
-//! function: GoCastJS.PeerConnection.CreateAnswer(success, failure)
+//! function: GoCastJS.PeerConnection.CreateAnswer(success, failure, constraints)
 //!
 //! arguments:
-//!     success : function(sdp)
-//!     failure : function(error)
+//!     success    : function(sdp)
+//!     failure    : function(error)
+//!     constraints: {sdpconstraints: {mandatory: {OfferToReceiveAudio: 'true/false',
+//!                                                OfferToReceiveVideo: 'true/false'}}}
 //!
 GoCastJS.PeerConnection.prototype.CreateAnswer = function(success, failure, constraints) {
     success = success || function(sdp) {};
