@@ -19,7 +19,8 @@
                 onlocalplayerloaded = function() {
                 var plugin = document.getElementById('localPlayer'),
                     options = new GoCastJS.UserMediaOptions({
-                        video: false, audio: true,
+                        video: $.urlvars.video || false,
+                        audio: $.urlvars.audio || false,
                         videoconstraints: {
                             videoin: plugin.videoinopts['default'],
                             webrtc: {
@@ -151,12 +152,18 @@
                 );
 
                 peerconnection = new GoCastJS.PeerConnection(options);
-                peerconnection.AddStream(localstream, negotiationCallback(peerconnection, sdp));
+                if ($.urlvars.audio || $.urlvars.video) {
+                    peerconnection.AddStream(localstream, negotiationCallback(peerconnection, sdp));
+                } else {
+                    negotiationCallback(peerconnection, sdp)();
+                }
+
                 return peerconnection;
             };
 
             var callpeer = function(fulljid) {
                 peerconnections[fulljid] = initpeerconnection(fulljid, callernegotiationcallback);
+                
             };
 
             var acceptanswerfrompeer = function(fulljid, sdp) {

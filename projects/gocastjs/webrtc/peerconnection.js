@@ -226,6 +226,8 @@ GoCastJS.getUserMedia = function(options, success, failure) {
                         throw new GoCastJS.Exception('localPlayer',
                                                      'addStream() failed.');
                     }                    
+                } else {
+                    player.onnegotiationneeded();
                 }
             },
             function(error) {
