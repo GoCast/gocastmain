@@ -23,10 +23,10 @@ if [[ $1 = "libjingle" || $* = "" ]]; then
     cd ..
 
     echo "Patching webrtc source..."
-    patch -p0 -i ../dep_mods/common/revup/webrtc.diff
+    patch -p0 -i ../dep_mods/common/webrtc.diff
 
     echo "Patching libjingle source..."
-    patch -p0 -i ../dep_mods/common/revup/libjingle.diff
+    patch -p0 -i ../dep_mods/common/libjingle.diff
 fi
 
 ##############

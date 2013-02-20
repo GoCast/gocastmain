@@ -203,9 +203,9 @@
             var addStanzaHandlers = function() {
                 conn.addHandler(function(pres) {
                     if (!$(pres).attr('type')) {
-                        console.log('Calling: ', $(pres).attr('from'));
                         if (Strophe.getBareJidFromJid(conn.getJid()) !== 
                             Strophe.getBareJidFromJid($(pres).attr('from'))) {
+                            console.log('Calling: ', $(pres).attr('from'));
                             callpeer($(pres).attr('from'));
                         }
                     } else if ('unavailable' === $(pres).attr('type')) {
