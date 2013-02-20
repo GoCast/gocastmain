@@ -9,6 +9,7 @@
 #include "GCPMediaStream.h"
 #include "DOM/Window.h"
 #include "variant_list.h"
+#include "talk/media/devices/devicemanager.h"
 
 namespace GoCast
 {
@@ -69,7 +70,7 @@ namespace GoCast
     {
         m_logCb.reset();
     }
-    
+        
     FB::JSAPIPtr MediaStreamTrack::Create(const std::string& kind,
                                           const std::string label)
     {
@@ -112,35 +113,43 @@ namespace GoCast
     
     FB::VariantMap LocalVideoTrack::GetVideoDevices()
     {
-        static int deviceCount = 0;
-        const size_t kMaxDeviceNameLength = 128;
-        const size_t kMaxUniqueIdLength = 256;
-        char deviceName[kMaxDeviceNameLength];
-        char deviceUniqueId[kMaxUniqueIdLength];
-        webrtc::VideoCaptureModule::DeviceInfo* pDevInfo;
         FB::VariantMap devices;
         std::string key;
         std::string val;
+        static bool initTried = false;
+        static talk_base::scoped_ptr<cricket::DeviceManagerInterface> devmgr(cricket::DeviceManagerFactory::Create());
         
-        pDevInfo = webrtc::VideoCaptureFactory::CreateDeviceInfo(0);
-        for(size_t i=0; i<pDevInfo->NumberOfDevices(); i++)
+        if(false == initTried)
         {
-            pDevInfo->GetDeviceName(i, deviceName, kMaxDeviceNameLength,
-                                    deviceUniqueId, kMaxUniqueIdLength);
-            key = deviceUniqueId;
-            val = deviceName;
+            if(false == devmgr->Init())
+            {
+                FBLOG_ERROR_CUSTOM("LocalVideoTrack::GetVideoDevices", "Can't init device manager");
+                return devices;
+            }
+            initTried = true;
+        }
+
+        std::vector<cricket::Device> devs;
+        if (false == devmgr->GetVideoCaptureDevices(&devs))
+        {
+            FBLOG_ERROR_CUSTOM("LocalVideoTrack::GetVideoDevices", "Can't enumerate devices");
+            return devices;
+        }
+        
+        for (std::vector<cricket::Device>::iterator idev = devs.begin(); idev != devs.end(); ++idev)
+        {
+            key = (*idev).id;
+            val = (*idev).name;
             devices[key] = val;
             
             if(videoDevices.end() == videoDevices.find(key))
             {
-                videoDevices[key] = webrtc::VideoCaptureFactory::Create(deviceCount++, deviceUniqueId);
-                
-                std::string msg("Capture device [");
-                std::stringstream devIdxStr;
-                msg += deviceUniqueId;
-                msg += "][idx = ";
-                devIdxStr << (deviceCount-1);
-                msg += (devIdxStr.str() + "]");
+                videoDevices[key] = devmgr->CreateVideoCapturer(*idev);
+
+                std::string msg("Capture device [id = ");
+                msg += key;
+                msg += ", name = ";
+                msg += (val + "]");
                 
                 if(NULL == videoDevices[key])
                 {
@@ -155,12 +164,12 @@ namespace GoCast
                     FBLOG_INFO_CUSTOM("LocalVideoTrack::GetVideoDevices", msg);
                 }
             }
-            
-            if((0 == i) && (videoDevices.end() != videoDevices.find(key)))
+
+            if((devs.begin() == idev) && (videoDevices.end() != videoDevices.find(key)))
             {
                 devices["default"] = key;
             }
-        }        
+        }
         
         std::stringstream offlineDevices;
         for(VideoDeviceList::iterator it = videoDevices.begin();
@@ -186,12 +195,10 @@ namespace GoCast
             }
         }
         
-        delete pDevInfo;
         return devices;
     }
     
-    talk_base::scoped_refptr<webrtc::VideoCaptureModule>
-        LocalVideoTrack::GetCaptureDevice(const std::string& uniqueId)
+    cricket::VideoCapturer* LocalVideoTrack::GetCaptureDevice(const std::string& uniqueId)
     {
         if(videoDevices.end() != videoDevices.find(uniqueId))
         {
@@ -202,10 +209,10 @@ namespace GoCast
     }
     
     LocalVideoTrack::LocalVideoTrack(const talk_base::scoped_refptr<webrtc::LocalVideoTrackInterface>& pTrack)
-    : LocalMediaStreamTrack(pTrack->kind(), pTrack->label(), pTrack->enabled())
+    : LocalMediaStreamTrack(pTrack->kind(), pTrack->id(), pTrack->enabled())
     {
-        registerProperty("effect", make_property(this, &LocalVideoTrack::get_effect,
-                                                       &LocalVideoTrack::set_effect));
+        /*registerProperty("effect", make_property(this, &LocalVideoTrack::get_effect,
+                                                       &LocalVideoTrack::set_effect));*/
     }
         
     FB::JSAPIPtr LocalAudioTrack::Create(talk_base::scoped_refptr<webrtc::LocalAudioTrackInterface>& pTrack)
@@ -213,8 +220,39 @@ namespace GoCast
         return boost::make_shared<LocalAudioTrack>(pTrack);
     }
     
+    void LocalAudioTrack::GetAudioDevices(FB::VariantList& devices, bool bInput)
+    {
+        std::vector<cricket::Device> devicelist;
+        static bool initTried = false;
+        static talk_base::scoped_ptr<cricket::DeviceManagerInterface> devmgr(cricket::DeviceManagerFactory::Create());
+
+        if(false == initTried)
+        {
+            if(false == devmgr->Init())
+            {
+                FBLOG_ERROR_CUSTOM("LocalAudioTrack::GetAudioDevices", "Can't init device manager");
+                return;
+            }
+            initTried = true;
+        }
+
+        if(true == bInput)
+        {
+            devmgr->GetAudioInputDevices(&devicelist);
+        }
+        else
+        {
+            devmgr->GetAudioOutputDevices(&devicelist);
+        }
+        
+        for(int16_t i=0; i<devicelist.size(); i++)
+        {
+            devices.push_back(FB::variant(devicelist[i].name));            
+        }
+    }
+    
     LocalAudioTrack::LocalAudioTrack(const talk_base::scoped_refptr<webrtc::LocalAudioTrackInterface>& pTrack)
-    : LocalMediaStreamTrack(pTrack->kind(), pTrack->label(), pTrack->enabled())
+    : LocalMediaStreamTrack(pTrack->kind(), pTrack->id(), pTrack->enabled())
     {
         
     }
@@ -225,7 +263,7 @@ namespace GoCast
     }
     
     RemoteVideoTrack::RemoteVideoTrack(const talk_base::scoped_refptr<webrtc::VideoTrackInterface>& pTrack)
-    : MediaStreamTrack(pTrack->kind(), pTrack->label())
+    : MediaStreamTrack(pTrack->kind(), pTrack->id())
     {
         
     }
@@ -236,7 +274,7 @@ namespace GoCast
     }
     
     RemoteAudioTrack::RemoteAudioTrack(const talk_base::scoped_refptr<webrtc::AudioTrackInterface>& pTrack)
-    : MediaStreamTrack(pTrack->kind(), pTrack->label())
+    : MediaStreamTrack(pTrack->kind(), pTrack->id())
     {
         
     }

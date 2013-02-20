@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Plugin Demo (libjingle rev: 247)</title>
+		<script type="text/javascript">
+			var locstream = null;
+			function onice(candidate) {
+				if ('' !== candidate) {
+					var c = JSON.parse(candidate.replace(/\r\n/, '')),
+						plugin1 = document.getElementById('remotePlayer');
+					console.log('Candidate: ', candidate);
+					console.log('Candidate Obj: ', c);
+					console.log('Result: ', plugin1.addIceCandidate(c.sdp_mid, c.sdp_mline_index, c.sdp));
+				} else {
+					console.log('Candidate: GATHERING DONE');
+				}
+			}
+			function ongetusermediasuccess(stream) {
+				var plugin1 = document.getElementById('remotePlayer');
+				plugin1.onaddstream = function(stream) {
+					console.log('Added Stream: ', stream.label)
+					plugin1.source = stream;
+				};
+				plugin1.onremovestream = function(stream) {
+					console.log('Rmved Stream: ', stream.label)
+				};
+				plugin1.onstatechange = function(type) {
+					if ('signaling-state' === type) {
+						console.log('Signaling State: ', plugin1.signalingstate);
+					} else if ('ice-state' === type) {
+						console.log('Ice State: ', plugin1.icestate);
+					}
+				};
+				
+				plugin1.init('remotePlayer', '', onice);
+				plugin1.addStream(stream);
+				plugin1.createOffer(function(desc) {
+					console.log('CreateOffer: ', desc);
+					plugin1.setLocalDescription('offer', desc, function() {
+						console.log('SetLocalDescription Success');
+						plugin1.setRemoteDescription('answer', desc, function() {
+							console.log('SetRemoteDescription Success');
+						}, function(error) {
+							console.log('SetRemoteDescription: ', error);
+						});
+					}, function(error) {
+						console.log('SetLocalDescription: ', error);
+					});
+				}, function(error) {
+					console.log('CreateOffer: ', error);
+				});
+			}
+			function onpluginload() {
+				var plugin = document.getElementById('localPlayer'),
+					constraints = {
+						video: true,
+						audio: true,
+						videoconstraints: {
+							videoin: plugin.videoinopts['default'],
+							webrtc: {
+								mandatory: {
+									minWidth: '160',
+									maxWidth: '160',
+									minHeight: '120',
+									maxHeight: '120',
+									minFrameRate: '14',
+									maxFrameRate: '14'
+								}
+							}
+						},
+						audioconstraints: {
+							audioin: plugin.audioinopts[0],
+							audioout: plugin.audiooutopts[0]
+						}
+					};
+
+				console.log('VideoDevices: ', plugin.videoinopts);
+				console.log('AudioInputDevices: ', plugin.audioinopts);
+				console.log('AudioOutputDevices: ', plugin.audiooutopts);
+				plugin.getUserMedia(constraints, function(stream) {
+					console.log('Success: ', stream);
+					locstream = stream;
+					plugin.init('localPlayer','',null);
+					plugin.addStream(stream);
+					plugin.createOffer(function(desc) {
+						console.log('CreateOffer: ', desc);
+						plugin.setLocalDescription('offer', desc, function() {
+							console.log('SetLocalDescription: Success');
+							plugin.source = stream;
+							ongetusermediasuccess(stream);
+						}, function(error) {
+							console.log('SetLocalDescription: ', error);
+						});
+					}, function(error) {
+						console.log('CreateOffer: ', error);
+					});
+				}, function(msg) {alert(msg);});
+			}
+		</script>
+	</head>
+	<body>
+		<object id="localPlayer" type="application/x-gocastplayer" width="320" height="240">
+		</object>
+		<object id="remotePlayer" type="application/x-gocastplayer" width="320" height="240">
+			<param name="onload" value="onpluginload"></param>
+		</object>
+	</body>
+</html>

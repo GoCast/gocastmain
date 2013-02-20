@@ -1,64 +1,32 @@
 #!/bin/bash
 
-##########
-# webrtc #
-##########
-
-WEBRTC_TAG="trunk"
-WEBRTC_REV="2407"
-
-mkdir -p deps
-cd deps
-
-if [[ $1 = "webrtc" || $* = "" ]]; then 
-    echo "Checking for directory [webrtc]..."
-    mkdir -p webrtc
-    cd webrtc
-
-    if [ ! -f .gclient ]; then
-        echo "Running gclient config with target url [http://webrtc.googlecode.com/svn/$WEBRTC_TAG/]"
-        gclient config http://webrtc.googlecode.com/svn/"$WEBRTC_TAG"/
-    fi
-
-    if [ $WEBRTC_TAG != "trunk" ]; then
-        if [ ! -L trunk ]; then
-            echo "Creating a soft link [trunk] to the directory [stable]"
-            ln -s stable trunk
-        fi
-    fi
-
-    echo "Running [gclient sync -r $WEBRTC_REV --force] to obtain webrtc source..."
-    gclient sync -r "$WEBRTC_REV" --force
-    cd ..
-fi
-
 #############
 # libjingle #
 #############
 
-if [[ $1 = "libjingle" || $* = "" ]]; then
-    echo "Downloading [libjingle] and its dependencies..."
-    cd webrtc/trunk
+LIBJINGLE_REV=284
+mkdir -p deps
+cd deps
 
-    echo "Patching webrtc_trunk.diff..."
-    patch -p0 -i ../../../dep_mods/common/webrtc_trunk.diff
-    cd chromium_deps
+if [[ $1 = "libjingle" || $* = "" ]]; then 
+    echo "Checking for directory [libjingle]..."
+    mkdir -p libjingle
+    cd libjingle
 
-    echo "Patching chromium_deps.diff..."
-    patch -p0 -i ../../../../dep_mods/common/chromium_deps.diff
-    cd ../../
+    if [ ! -f .gclient ]; then
+        echo "Running gclient config with target url [http://libjingle.googlecode.com/svn/trunk/]"
+        gclient config http://libjingle.googlecode.com/svn/trunk/
+    fi
 
-    echo "Running [gclient sync -r $WEBRTC_REV --force] to obtain webrtc source..."
-    gclient sync -r "$WEBRTC_REV" --force
-    cd trunk/third_party/libjingle
-    
-    echo "Patching libjingle.diff..."
-    patch -p0 -i ../../../../../dep_mods/common/libjingle.diff
-    cd source
+    echo "Running [gclient sync -r $LIBJINGLE_REV --force] to obtain webrtc source..."
+    gclient sync -r "$LIBJINGLE_REV" --force
+    cd ..
 
-    echo "Patching libjingle_source.diff..."
-    patch -p0 -i ../../../../../../dep_mods/common/libjingle_source.diff
-    cd ../../../../..
+    echo "Patching webrtc source..."
+    patch -p0 -i ../dep_mods/common/revup/webrtc.diff
+
+    echo "Patching libjingle source..."
+    patch -p0 -i ../dep_mods/common/revup/libjingle.diff
 fi
 
 ##############
@@ -71,4 +39,6 @@ if [[ $1 = "firebreath" || $* = "" ]]; then
         git clone git://github.com/firebreath/FireBreath.git -b firebreath-1.6 firebreath
     fi
 fi
+
+cd ..
 

@@ -31,7 +31,7 @@ namespace GoCast
             }
         }
         
-        if(NULL == pContext || NULL == m_pFrameBuffer.get())
+        if(NULL == pContext || NULL == m_pFrameBuffer)
         {
             return false;
         }
@@ -48,7 +48,7 @@ namespace GoCast
         CGImageRef cgImage = CGImageCreate(m_width, m_height, 8, 32, stride, colorSpace, 
                                            kCGImageAlphaNoneSkipLast,
                                            CGDataProviderCreateWithData(NULL,
-                                                                        m_pFrameBuffer.get(),
+                                                                        m_pFrameBuffer,
                                                                         frameBufferSize,
                                                                         NULL),
                                            NULL, false, kCGRenderingIntentDefault);
@@ -75,7 +75,7 @@ namespace GoCast
     {
         const int stride = m_width*4;
         const int frameBufferSize = m_height*stride;
-        uint8* pBufIter = m_pFrameBuffer.get();
+        uint8* pBufIter = m_pFrameBuffer;
         uint8* pBufEnd = pBufIter + frameBufferSize;
 
         while(pBufIter < pBufEnd)

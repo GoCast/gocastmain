@@ -14,6 +14,7 @@
 
 #include <boost/thread.hpp>
 #include <boost/thread/condition.hpp>
+#include "talk/app/webrtc/videosourceinterface.h"
 #include "talk/app/webrtc/peerconnection.h"
 #include "talk/base/physicalsocketserver.h"
 #include "talk/base/scoped_ptr.h"
@@ -22,6 +23,10 @@
 
 namespace GoCast
 {
+    std::string GetSigStateString(webrtc::PeerConnectionInterface::SignalingState state);
+    std::string GetIceConnStateString(webrtc::PeerConnectionInterface::IceConnectionState state);
+    std::string GetIceGathStateString(webrtc::PeerConnectionInterface::IceGatheringState state);
+    
     class MessageHandler
     {
     public:
@@ -72,7 +77,7 @@ namespace GoCast
                           FB::JSObjectPtr failCb,
                           bool bSyncCall = true);
         bool NewPeerConnection(const std::string& pluginId,
-                               const std::string& iceConfig,
+                               FB::VariantList iceServers,
                                webrtc::PeerConnectionObserver* pObserver,
                                bool bSyncCall = true);
         bool AddStream(const std::string& pluginId,
@@ -81,51 +86,52 @@ namespace GoCast
         bool RemoveStream(const std::string& pluginId,
                           const std::string& label,
                           bool bSyncCall = true);
-        std::string CreateOffer(const std::string& pluginId,
-                                const webrtc::MediaHints& mediaHints,
-                                bool bSyncCall = true);
-        std::string CreateAnswer(const std::string& pluginId,
-                                 const webrtc::MediaHints& mediaHints,
-                                 const std::string& offerSdp,
-                                 bool bSyncCall = true);
+        void CreateOffer(const std::string& pluginId,
+                         webrtc::CreateSessionDescriptionObserver* pObserver,
+                         FB::JSObjectPtr constraints,
+                         bool bSyncCall = true);
+        void CreateAnswer(const std::string& pluginId,
+                          webrtc::CreateSessionDescriptionObserver* pObserver,
+                          FB::JSObjectPtr constraints,
+                          bool bSyncCall = true);
         void SetLocalDescription(const std::string& pluginId,
-                                 const webrtc::JsepInterface::Action& action,
+                                 webrtc::SetSessionDescriptionObserver* pObserver,
+                                 const std::string& action,
                                  const std::string& sdp,
-                                 const FB::JSObjectPtr& succCb,
-                                 const FB::JSObjectPtr& failCb,
                                  bool bSyncCall = true);
-        bool SetRemoteDescription(const std::string& pluginId,
-                                  const webrtc::JsepInterface::Action& action,
+        void SetRemoteDescription(const std::string& pluginId,
+                                  webrtc::SetSessionDescriptionObserver* pObserver,
+                                  const std::string& action,
                                   const std::string& sdp,
                                   bool bSyncCall = true);
-        bool ProcessIceMessage(const std::string& pluginId,
-                               const std::string& candidateSdp,
-                               bool bSyncCall = true);
-        bool StartIce(const std::string& pluginId,
-                      bool bSyncCall = true);
+        bool AddIceCandidate(const std::string& pluginId,
+                             const std::string& sdpMid,
+                             const int sdpMlineIndex,
+                             const std::string& candidateSdp,
+                             bool bSyncCall = true);
         bool DeletePeerConnection(const std::string& pluginId,
                                   bool bSyncCall = true);
         
     public:
-        std::string ReadyState(const std::string& pluginId);
-                
+        std::string SignalingState(const std::string& pluginId);
+        std::string IceConnectionState(const std::string& pluginId);
+        std::string IceGatheringState(const std::string& pluginId);
+        
         bool Inited() const;
         bool GetLocalVideoTrackEnabled() const;        
         bool GetLocalAudioTrackEnabled() const;
         bool GetSpkVol(int* pLevel) const;
         bool GetSpkMute(bool* pbEnabled) const;
         bool GetMicVol(int* pLevel) const;
-        std::string GetLocalVideoTrackEffect() const;
+        //std::string GetLocalVideoTrackEffect() const;
         void SetLocalVideoTrackEnabled(bool bEnable);
         void SetLocalAudioTrackEnabled(bool bEnable);
         bool SetSpkVol(int level);
         bool SetMicVol(int level);
-        void SetLocalVideoTrackRenderer(const talk_base::scoped_refptr
-                                        <webrtc::VideoRendererWrapperInterface>& pRenderer);
-        void SetLocalVideoTrackEffect(const std::string& effect);
+        void SetLocalVideoTrackRenderer(webrtc::VideoRendererInterface* pRenderer);
+        /*void SetLocalVideoTrackEffect(const std::string& effect);*/
         void SetRemoteVideoTrackRenderer(const std::string& pluginId,
-                                         const talk_base::scoped_refptr
-                                         <webrtc::VideoRendererWrapperInterface>& pRenderer);
+                                         webrtc::VideoRendererInterface* pRenderer);
         void AddRemoteStream(const std::string& pluginId,
                              const talk_base::scoped_refptr<webrtc::MediaStreamInterface>& pStream);
         void RemoveRemoteStream(const std::string& pluginId);
@@ -142,28 +148,30 @@ namespace GoCast
                             FB::JSObjectPtr succCb,
                             FB::JSObjectPtr failCb);
         bool NewPeerConnection_w(const std::string& pluginId,
-                                 const std::string& iceConfig,
+                                 FB::VariantList iceServers,
                                  webrtc::PeerConnectionObserver* pObserver);
         bool AddStream_w(const std::string& pluginId,
                          const std::string& label);
         bool RemoveStream_w(const std::string& pluginId,
                             const std::string& label);
-        std::string CreateOffer_w(const std::string& pluginId,
-                                  const webrtc::MediaHints& mediaHints);
-        std::string CreateAnswer_w(const std::string& pluginId,
-                                   const webrtc::MediaHints& mediaHints,
-                                   const std::string& offerSdp);
+        void CreateOffer_w(const std::string& pluginId,
+                           webrtc::CreateSessionDescriptionObserver* pObserver,
+                           FB::JSObjectPtr constraints);
+        void CreateAnswer_w(const std::string& pluginId,
+                            webrtc::CreateSessionDescriptionObserver* pObserver,
+                            FB::JSObjectPtr constraints);
         void SetLocalDescription_w(const std::string& pluginId,
-                                   const webrtc::JsepInterface::Action& action,
-                                   const std::string& sdp,
-                                   const FB::JSObjectPtr& succCb,
-                                   const FB::JSObjectPtr& failCb);
-        bool SetRemoteDescription_w(const std::string& pluginId,
-                                    const webrtc::JsepInterface::Action& action,
+                                   webrtc::SetSessionDescriptionObserver* pObserver,
+                                   const std::string& action,
+                                   const std::string& sdp);
+        void SetRemoteDescription_w(const std::string& pluginId,
+                                    webrtc::SetSessionDescriptionObserver* pObserver,
+                                    const std::string& action,
                                     const std::string& sdp);
-        bool ProcessIceMessage_w(const std::string& pluginId,
-                                 const std::string& candidateSdp);
-        bool StartIce_w(const std::string& pluginId);
+        bool AddIceCandidate_w(const std::string& pluginId,
+                               const std::string& sdpMid,
+                               const int sdpMlineIndex,
+                               const std::string& candidateSdp);
         bool DeletePeerConnection_w(const std::string& pluginId);
         
     private:
@@ -173,7 +181,7 @@ namespace GoCast
         std::map< std::string,
                   talk_base::scoped_refptr<webrtc::MediaStreamInterface> > m_remoteStreams;
         talk_base::scoped_refptr<webrtc::PeerConnectionFactoryInterface> m_pConnFactory;
-        talk_base::scoped_refptr<webrtc::LocalMediaStreamInterface> m_pLocalStream;        
+        talk_base::scoped_refptr<webrtc::LocalMediaStreamInterface> m_pLocalStream;
     };
 }
 
