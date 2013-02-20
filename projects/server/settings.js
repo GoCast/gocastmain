@@ -36,6 +36,7 @@ if (process.env.SETTINGS_DEVEL === 1 || process.env.SETTINGS_DEVEL === '1') {
         allow_overflow: true,
         allow_maxparticipants_from_client: true,
         maxparticipants_ceiling: 50,
+        maxspotsallowed: 20,
         default_room: 'Lobby',
         default_room_persist: false,
 
@@ -48,12 +49,27 @@ if (process.env.SETTINGS_DEVEL === 1 || process.env.SETTINGS_DEVEL === '1') {
 
     settings.dynamodb = {
         endpoint: 'dynamodb.us-west-1.amazonaws.com',
+        awsRegion: 'us-west-1',     // aws-sdk requires short-hand region name.
         accessKeyId: 'AKIAJWJEBZBGT6TPH32A',
         secretAccessKey: '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',
         tables: {
             ACTIVEROOMS: 'dev_active_rooms',
             ROOMCONTENTS: 'dev_room_contents'
         }
+    };
+
+    settings.accounts = {
+        servicePort: 8083,
+        xmppAccountServerSecret: 'dev.GoCast.SecretWU78zz',
+        xmppAccountServerBase: 'http://localhost:9090/plugins/userService/userservice?',
+        dbUserTable: 'dev_UserTable',
+        dbUserRoomTable: 'dev_UserRoomTable',
+        dbVisitorTable: 'dev_VisitorTable',
+        dbPublicRoomTable: 'dev_PublicRoomTable',
+        mailgunKey: 'key-65ism99rlme7svrn93qc-cormdknx-42',      // Bob Wolff - rwolff@gocast.it key -- the free one.
+        inviteFromAddress: 'support@gocast.it',
+        inviteFromName: 'GoCast Support',
+        inviteSubject: 'Welcome! Please validate your new GoCast account.'
     };
 
     settings.overseer = {
@@ -103,12 +119,27 @@ else {
 
     settings.dynamodb = {
         endpoint: 'dynamodb.us-west-1.amazonaws.com',
+        awsRegion: 'us-west-1',     // aws-sdk requires short-hand region name.
         accessKeyId: 'AKIAJWJEBZBGT6TPH32A',
         secretAccessKey: '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',
         tables: {
             ACTIVEROOMS: 'room_active_list',
             ROOMCONTENTS: 'room_contents'
         }
+    };
+
+    settings.accounts = {
+        servicePort: 8083,
+        xmppAccountServerSecret: 'video.GoCast.oXCXC877',
+        xmppAccountServerBase: 'http://localhost:9090/plugins/userService/userservice?',
+        dbUserTable: 'main_UserTable',
+        dbUserRoomTable: 'main_UserRoomTable',
+        dbVisitorTable: 'main_VisitorTable',
+        dbPublicRoomTable: 'main_PublicRoomTable',
+        mailgunKey: 'key-65ism99rlme7svrn93qc-cormdknx-42',      // Bob Wolff - rwolff@gocast.it key -- the free one.
+        inviteFromAddress: 'support@gocast.it',
+        inviteFromName: 'GoCast Support',
+        inviteSubject: 'Welcome! Please validate your new GoCast account.'
     };
 
     settings.overseer = {
@@ -150,7 +181,9 @@ else {
         username: 'overseer@' + settings.SERVERNAME + '/roommanager',
         usernametest: 'overseer@' + settings.SERVERNAME + '/roommanagertest',
         password: 'the.overseer.rocks',
+        maxspotsallowed: 20,
 
+        persist: true,      // Normally rooms are non-persistent.
         wbstoragelocation: '~/wbstorage'
     };
 }
@@ -169,6 +202,7 @@ if (process.env.STANFORDDNLE === 1 || process.env.STANFORDDNLE === '1') {
 
     settings.dynamodb = {
         endpoint: 'dynamodb.us-west-1.amazonaws.com',
+        awsRegion: 'us-west-1',     // aws-sdk requires short-hand region name.
         accessKeyId: 'AKIAJWJEBZBGT6TPH32A',
         secretAccessKey: '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',
         tables: {
@@ -217,6 +251,7 @@ if (process.env.STANFORDDNLE === 1 || process.env.STANFORDDNLE === '1') {
         allow_overflow: true,
         allow_maxparticipants_from_client: true,
         maxparticipants_ceiling: 7,
+        maxspotsallowed: 20,
         default_room: 'Lobby',
         default_room_persist: false,
 
@@ -238,6 +273,7 @@ else if (process.env.STANFORDCCC === 1 || process.env.STANFORDCCC === '1') {
 
     settings.dynamodb = {
         endpoint: 'dynamodb.us-west-1.amazonaws.com',
+        awsRegion: 'us-west-1',     // aws-sdk requires short-hand region name.
         accessKeyId: 'AKIAJWJEBZBGT6TPH32A',
         secretAccessKey: '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',
         tables: {
@@ -286,6 +322,7 @@ else if (process.env.STANFORDCCC === 1 || process.env.STANFORDCCC === '1') {
         allow_overflow: true,
         allow_maxparticipants_from_client: true,
         maxparticipants_ceiling: 7,
+        maxspotsallowed: 20,
         default_room: 'Lounge',
         default_room_persist: false,
 

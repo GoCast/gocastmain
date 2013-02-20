@@ -40,10 +40,13 @@ GoCastJS.WikiBrowser = function(spotdiv, info) {
 					});
 				} 
 			});
-			$('#wikibrowser > #toolbar > #searchkey', this.browser.$container).keypress(this.searchkeykeypressCallback());
+			$('#wikibrowser > #toolbar > #searchkey', browser.$container).keypress(this.searchkeykeypressCallback());
 			$('#wikibrowser > #toolbar > #search', browser.$container).click(this.searchclickCallback());
 			$('#wikibrowser > #toolbar > #back', browser.$container).click(this.backclickCallback());
 			$('#wikibrowser > #toolbar > #fwd', browser.$container).click(this.fwdclickCallback());
+		},
+		setsearchkey: function(key) {
+			$('#wikibrowser > #toolbar > #searchkey', this.browser.$container).val(key);
 		},
 		searchclick: function(searchkey) {
 			$('#wikibrowser > #toolbar > #searchkey', this.browser.$container).val(searchkey);
@@ -210,7 +213,7 @@ GoCastJS.WikiBrowser = function(spotdiv, info) {
 			iframe.contentWindow.document.write((response.parse ? (response.parse.headhtml['*'] + response.parse.text['*'] +
 												bookmarkScript) : (errHead + errHtml)) + '</div></body></html>');
 			iframe.contentWindow.document.close();
-			$('#wikibrowser > #toolbar > #searchkey', this.browser.$container).val(response.parse ? response.parse.title : '');
+			this.setsearchkey(response.parse ? response.parse.title : '');
 			if (response.parse && newsearch) {
 				this.browser.history.add(response);
 			}
@@ -226,7 +229,7 @@ GoCastJS.WikiBrowser = function(spotdiv, info) {
 		beginSearch: function(searchkey) {
 			var self = this;
 			$.ajax({
-				url     : 'http://en.wikipedia.org/w/api.php?callback=?&redirects',
+				url     : window.location.protocol + '//en.wikipedia.org/w/api.php?callback=?&redirects',
 				data    : {
 					format: 'json',
 					action: 'parse',
@@ -275,6 +278,7 @@ GoCastJS.WikiBrowser.prototype.navhistory = function(dir, title) {
 
 GoCastJS.WikiBrowser.prototype.onsearchclick = function(searchkey) {
 	this.View.showLoadingSign();
+	this.View.setsearchkey(searchkey);
 	this.Network.beginSearch(searchkey);
 };
 

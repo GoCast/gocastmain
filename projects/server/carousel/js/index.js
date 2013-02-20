@@ -76,9 +76,10 @@ var app = {
   defunctAlertShowing: false,
   tryPluginInstallAttempts: 0,
   facebookInited: false,
-  fbCheckCredentialsTriggered: false,
+  fbCheckCheckPluginTriggered: false,
   fbTimerRunning: null,
   simPluginLoadFailed: false,
+  authfail: false,
 
   /**
    * Writes the specified log entry into the console HTML element, if
@@ -89,7 +90,16 @@ var app = {
         now = new Date(),
         logText = now.toTimeString().split(' ')[0] + ' ' + labels[logLevel] + ' ' + logMsg,
         msg;
-    if (window.console) {
+
+    //RMW - Only log with Callcast.log if it's available. Don't log to both.
+    if ('undefined' !== typeof(Callcast) &&
+        'undefined' !== typeof(Callcast.log)) {
+      Callcast.log(' ' + labels[logLevel] + ': ' + logMsg);
+      //RMW - however, on ERROR messages, go ahead and duplicate for stack trace value.
+      if (logLevel === 4 && window.console) {
+        console.error(logText);
+      }
+    } else if (window.console) {
       console[['', 'log', 'info', 'warn', 'error', 'error'][logLevel]](logText);
     }
     /*
@@ -100,13 +110,6 @@ var app = {
       alert(msg);
       app.logFatalReported = true;
     }
-
-    // <MANJESH>
-    if ('undefined' !== typeof(Callcast) &&
-        'undefined' !== typeof(Callcast.log)) {
-      Callcast.log(' ' + labels[logLevel] + ': ' + logMsg);
-    }
-    // </MANJESH>
   }, /* app.log() */
   /**
    * Flag to remember if a fatal error was reported through a pop-up
@@ -688,7 +691,8 @@ function activateWindow(
     $('a#btn', winId).on('click.s04072012', onJoinNow);
     if ("undefined" !== Storage && sessionStorage.uiGoCastNick)
     {
-      $('input#name', winId).val(decodeURI(sessionStorage.uiGoCastNick));
+      $('input#name', winId).val(decodeURI(sessionStorage.uiGoCastNick || ''));
+      $('input#email', winId).val(decodeURI(sessionStorage.uiGoCastEmail || ''));
     }
   }
   else if (winId.match('meeting')) {
@@ -934,7 +938,7 @@ function carouselItemUnzoom(event)
 /**
  * \brief Open dialog with room description so user can copy to clipboard
  */
-function openCopyData(event)
+function openCopyData(event, header, message, promptregister)
 {
   if (!event)
   {
@@ -944,17 +948,31 @@ function openCopyData(event)
   // get the dialog
   var jqWin = $('#boxes > div#copyData'),
   // set the room name
-      name = $('div#copyContent > #copyName', jqWin),
+      /*name = $('div#copyContent > #copyName', jqWin),*/
       cX, cY, winW, winH, wcW, wcH,
       marginRight, marginBottom;
 
   //$(name).text('Carousel room ' + $.getUrlVar('roomname'));
-  $(name).attr('href', window.location.href);
+  /*$(name).attr('href', window.location.href);*/
+
+  $('#copyContent > h3', jqWin).text(header);
+  $('#copyContent > p', jqWin).text(message);
+  $('#copyContent > button', jqWin).css('display', 'block');
+
+  if (!promptregister) {
+    $('#copyContent > button', jqWin).css('display', 'none');
+  } else {
+    $('#copyContent > button', jqWin).unbind('click').click(function() {
+      window.location.href = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1) +
+                             'register.html';
+    });
+  }
 
   // position the dialog
   cX = event.clientX;
   cY = event.clientY;
 
+  jqWin.width(400).height(150);
   winW = $(window).width();
   winH = $(window).height();
   wcW = jqWin.outerWidth();
@@ -987,7 +1005,6 @@ function openCopyData(event)
   }
 
   // display dlg
-  jqWin.width(400).height(200);
   jqWin.fadeIn(700);
   jqWin.addClass('active');
 
@@ -1108,6 +1125,7 @@ function openMeeting(
     app.log(2, 'On before unload.');
     app.removeAppStamp();
     Callcast.LeaveSession();
+    forgetXmppConnection();
   });
   /*/
   // test for leave session on page unload
@@ -1887,14 +1905,45 @@ function onJoinNow(
     app.user.fbSkipped = true;
 
     // get the nick name, return back to dialog if not defined
-    var usrNm = $('#credentials2 > input#name').val();
+    var usrNm = $('#credentials2 > input#name').val(),
+        usrEmail = $('#credentials2 > input#email').val();
 
     // user must enter fb or nick name if both not entered
     // display error
     if (usrNm.length < 1) {
-      $('#credentials2 > p.login-error').text('Please enter a name to continue.').
+      $('#credentials2 > p.login-error').text('Please choose a nickname').
         fadeIn('fast');
       return false;
+    }
+
+    if (Callcast.connection.bAnonymous) {
+      if(!usrEmail.length || -1 === usrEmail.indexOf('@')) {
+        $('#credentials2 > p.login-error').text('Please enter a valid email').
+          fadeIn('fast');
+        return false;
+      }
+
+      //Send visitor info to accounts service
+      $.ajax({
+        url: '/acct/visitorseen/',
+        type: 'POST',
+        data: {email: usrEmail, nickname: usrNm},
+        dataType: 'json',
+        success: function(response) {
+          if ('success' === response.result) {
+            app.log(2, "OnJoinNow(): Visitor info sent.");
+          } else {
+            app.log(2, "OnJoinNow(): Visitor info send failed.");
+          }
+        },
+        failure: function() {
+          app.log(2, "OnJoinNow(): Visitor info send failed.");
+        }
+      });
+
+      if("undefined" !== typeof(Storage)) {
+        sessionStorage.uiGoCastEmail = usrEmail;
+      }
     }
 
     // store non fb user name
@@ -1919,75 +1968,124 @@ function onJoinNow(
 /**
  * \brief callback for fb skip button press
  */
-function enterId(
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-    /**
-     * No argument. */
-)
+function enterId(options)
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
     app.log(2, 'enterId');
+    Callcast.connect(options);
+}
+
+function checkCredentials2() {
+  var keyHandler = function(event) {
+    if (event.altKey) {
+        return;
+    }
+    if (!event.ctrlKey) {
+      switch (event.which || event.keyCode) {
+        case 13:
+          app.log(2, 'Enter key pressed');
+          event.preventDefault();
+          onJoinNow();
+          break;
+      }
+    }
+  };
+
     closeWindow();
     openWindow('#credentials2');
-    if ('undefined' !== typeof(Storage)) {
-      if (window.localStorage.gcpReloadNickName) {
+    $('#credentials2 #email').removeAttr('style');
+    if (!Callcast.connection.bAnonymous) {
+      $('#credentials2 #email').css({'display': 'none'});
+    } else {
+      $('#credentials2 #email').unbind('keypress').keypress(keyHandler);
+    }
+    /*if ('undefined' !== typeof(Storage)) {
+      if (Callcast.connection.bAnonymous && window.localStorage.gcpReloadNickName) {
         $('#name', '#credentials2').val(window.localStorage.gcpReloadNickName);
         $('#btn', '#credentials2').click();
         delete window.localStorage.gcpReloadNickName;
       }
-    }
+    }*/
 } /* onJoinNow() */
 
-function deferredCheckCredentials() {
-  app.fbCheckCredentialsTriggered = true;
+function deferredCheckPlugin() {
+  app.fbCheckPluginTriggered = true;
 
-  // Normally we don't call check credentials, but we MUST call it if document.ready has already
+  // Normally we don't call checkplugin, but we MUST call it if document.ready has already
   // run at this point. We infer this by the fact that the 10 second fb timer is already set which
-  // happens in document.ready. In this case, it's up to us to call checkcredentials.
+  // happens in document.ready. In this case, it's up to us to call checkplugin.
   if (app.fbTimerRunning) {
     clearTimeout(app.fbTimerRunning);
     app.fbTimerRunning = null;
-    $(document).trigger('checkCredentials');
+    $(document).trigger('checkPlugin');
   }
+}
+
+function checkPlugin() {
+  app.log(2, 'Checking for GOCAST PLAYER...');
+  app.facebookInited = true;
+  closeWindow();
+  openMeeting();
+  tryPluginInstall();
 }
 
 ///
 /// \brief check login credential and display login dialog if necessary.
 ///
-function checkCredentials()
+function checkCredentials(evt, msg)
 {
-  var jqActive;
+  var keyHandler = function(event) {
+    if (event.altKey) {
+        return;
+    }
+    if (!event.ctrlKey) {
+      switch (event.which || event.keyCode) {
+        case 13:
+          app.log(2, 'Enter key pressed');
+          event.preventDefault();
+          enterId({username: document.getElementById('gcemail').value,
+                  password: document.getElementById('gcpassword').value});
+          break;
+      }
+    }
+  };
+
   app.log(2, 'checkCredentials');
-  app.facebookInited = true;
+  //app.facebookInited = true;
 
   // this method is called on a fb status change
   // so do nothing if we're already logged in
   if (app.userLoggedIn)
   {
-     return;
+    return;
   }
 
   // check if there's an error being displayed
-  jqActive = $('.window.active#errorMsgPlugin');
-  if (jqActive.length === 0)
-  {
+  //jqActive = $('.window.active#errorMsgPlugin');
+  //if (jqActive.length === 0)
+  //{
     // check fb login status and prompt if not skipped and not logged in
-    if (!app.user.fbSkipped && !FB.getAuthResponse())
-    {
-      openWindow('#credentials');
-      if ('undefined' !== typeof(Storage)) {
-        if (window.localStorage.gcpReloadNickName) {
+ // RMW - Skipping facebook altogether Jan 18, 2013   if (!app.user.fbSkipped && !FB.getAuthResponse())
+//    {
+    closeWindow();
+    openWindow('#credentials');
+    $('#credentials > input').unbind('keypress').keypress(keyHandler);
+    $('#credentials > #gcemail').focus();
+    $('#credentials > #msg').text(msg||'');
+      /*if ('undefined' !== typeof(Storage)) {
+        if (Callcast.connection.bAnonymous && window.localStorage.gcpReloadNickName) {
           $('#noThanks', '#credentials').click();
         }
-      }
-    }
-    else // fb logged in update fb logged in status
+      }*/
+//    }
+/*    else // fb logged in update fb logged in status
     {
       closeWindow();
       app.userLoggedIn = true;
       $(document).trigger('one-login-complete', 'checkCredentials - FB Login');
     }
-  }
+    */
+  //}
 } /* checkCredentials() */
 
 //
@@ -1998,7 +2096,7 @@ function checkCredentials()
 //
 function handleRoomSetup() {
   app.log(2, 'handleRoomSetup entered');
-  var room_to_create = $.getUrlVar('roomname') || '',
+  var room_to_create = $.roomcode.decipherURIEncoded($.urlvars.roomname) || '',
       item;
 
   room_to_create = room_to_create.replace(/ /g, '');
@@ -2017,15 +2115,11 @@ function handleRoomSetup() {
     // set local spot nick todo find a better place for this
     item = app.carousel.getItem(0);
     app.carousel.setSpotName(item, app.user.name);
+    $('#mystream > .name').text(decodeURI(app.user.name) + ' (me)');
+    app.carousel.rotate(5);
 
     app.log(2, "Room named '" + new_name + "' has been created. Joining now.");
     app.log(2, 'window.location ' + window.location);
-    if (room_to_create !== new_name)
-    {
-      newUrl = window.location.pathname + '?roomname=' + new_name;
-      app.log(2, 'replacing state ' + newUrl);
-      history.replaceState(null, null, newUrl);
-    }
 
     // warn user if room name changed (overflow)
     if (room_to_create.length > 0 && room_to_create.toLowerCase() !== new_name.toLowerCase())
@@ -2036,6 +2130,9 @@ function handleRoomSetup() {
       $('#message', jqDlg).text('Room ' + room_to_create + ' overflowed.  You are now in room ' + new_name);
       $('#stop-showing', jqDlg).css('display', 'none');
       $('#stop-showing-text', jqDlg).css('display', 'none');
+      newUrl = window.location.pathname + '?roomname=' + new_name;
+      app.log(2, 'replacing state ' + newUrl);
+      history.replaceState(null, null, newUrl);
     }
 
     // initialize video, audio state here since this method
@@ -2073,15 +2170,19 @@ function handleRoomSetup() {
     var errorMsg;
     if ($(iq).find('roomfull'))
     {
-      errorMsg = "Sorry, the room " + room_to_create + " is full. Please try again later.";
+      errorMsg = "Sorry, the room is full or we had a connection problem. Please re-try/re-load.";
     }
     else
     {
-      errorMsg = 'There was a problem entering the room ' + room_to_create;
+      errorMsg = 'There was a problem entering the room. Please re-try/re-load.';
     }
 
     // display error
-    app.log(4, "handleRoomSetup Error " + iq.toString());
+    app.log(4, "handleRoomSetup Error " + (iq ? iq.toString() : 'timeout'));
+
+    // TODO: RMW remove this when it is clear the iq-bug is solved - 1/31/2013
+    Callcast.SendLiveLog('Error creating room IQ_BUG for: ' + room_to_create);
+
     $('#errorMsgPlugin > h1').text('Oops!!!');
     $('#errorMsgPlugin > p#prompt').text(errorMsg);
     closeWindow();
@@ -2125,7 +2226,7 @@ function tryPluginInstall(
   var title, prompt;
 
   app.log(2, 'tryPluginInstall');
-  app.tryPluginInstallAttempts++;
+  app.tryPluginInstallAttempts += 1;
   // check plugin installed.
   // if plugin installed but not loaded wait
   // todo get rid of multiple pluginInstalled calls
@@ -2134,14 +2235,14 @@ function tryPluginInstall(
   {
     if (20 < app.tryPluginInstallAttempts) {
       // send live log that plugin loading failed.
-      var logTryPluginFailed = '{' +
+      /*var logTryPluginFailed = '{' +
         'userAgent: ' + navigator.userAgent.replace(/;/g, '|') + ', ' +
         'nickname: ' + app.user.name + ', ' +
         'facebook: ' + !app.user.fbSkipped +
-      '}';
+      '}';*/
 
-      app.log(2, 'tryPluginInstall failed: ' + logTryPluginFailed);
-      Callcast.SendLiveLog('tryPluginInstall failed: ' + logTryPluginFailed);
+      app.log(2, 'tryPluginInstall failed.');
+      //Callcast.SendLiveLog('tryPluginInstall failed: ' + logTryPluginFailed);
 
       if (window.location.pathname.match(/index2.html/g)) {
         // show plugin load warning and take them to the room.
@@ -2154,8 +2255,13 @@ function tryPluginInstall(
 
         $('#warningMsg > button#ok').unbind('click').click(function() {
           closeWindow();
-          handleRoomSetup();
+          //handleRoomSetup();
+          $(document).trigger('checkCredentials');
           $(this).unbind('click').click(closeWindow);
+
+          if (Callcast.connection.hasSavedLoginInfo()) {
+            Callcast.connect();
+          }
         });
       } else {
         // show plugin load warning and take them to the alternate webpage.
@@ -2180,7 +2286,12 @@ function tryPluginInstall(
     // Close buttons.
     $('.window .close').on('click', closeWindow);
     // Resize window.
+    $(document).trigger('checkCredentials');
     $(window).resize(resizeWindows);
+
+    if (Callcast.connection.hasSavedLoginInfo()) {
+      Callcast.connect();
+    }
   }
   else { // plugin not loaded or out of date
     // prompt user to install plugin
@@ -2188,14 +2299,15 @@ function tryPluginInstall(
     // if so change prompt
     if (app.pluginInstalled() && Callcast.pluginUpdateRequired())
     {
-       Callcast.SendLiveLog('Local plugin is out of date. Current version: ' + Callcast.GetVersion());
+       //Callcast.SendLiveLog('Local plugin is out of date. Current version: ' + Callcast.GetVersion());
        title = $('#installPlugin > h1');
        title.text('We have upgraded your GoCast beta');
        prompt = $('#installPlugin > p#prompt');
        prompt.text('Please download and install the new version. Thanks. The GoCast Team.');
     }
     if (!app.pluginInstalled()) {
-       Callcast.SendLiveLog('Local plugin is not installed.');
+       //Callcast.SendLiveLog('Local plugin is not installed.');
+       app.log(2, 'Local plugin not installed.');
     }
     if (app.osPlatform.isLinux64 || app.osPlatform.isLinux32)
     {
@@ -2461,41 +2573,15 @@ $(document).ready(function(
   event
 )
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+
 {
-  // DNLE overrides.
-  if (window.location.hostname.toLowerCase() === 'dnle.gocast.it') {
-    Callcast.InitOverride({ CALLCAST_XMPPSERVER: 'dnle.gocast.it',
-                        CALLCAST_ROOMS: 'conference.dnle.gocast.it',
-                        AT_CALLCAST_ROOMS: '@conference.dnle.gocast.it',
-                        STUNSERVER: 'dnle.gocast.it', STUNSERVERPORT: 19302,
-                        FEEDBACK_BOT: 'feedback_bot_dnle@dnle.gocast.it',
-                        ROOMMANAGER: 'roommanager@dnle.gocast.it/roommanager',
-                        SWITCHBOARD_FB: 'switchboard_dnle@dnle.gocast.it',
-                        LOGCATCHER: 'logcatcher@dnle.gocast.it/logcatcher',
-                        FILECATCHER: 'filecatcher@dnle.gocast.it/filecatcher'});
+  if (!$.urlvars.roomname ||
+      $.urlvars.roomname.length%4 ||
+      !$.roomcode.decipher($.urlvars.roomname)) {
+    window.location.href = 'dashboard.html';
   }
-  else if (window.location.hostname.toLowerCase() === 'creativity.gocast.it') {
-    Callcast.InitOverride({ CALLCAST_XMPPSERVER: 'dnle.gocast.it',
-                        CALLCAST_ROOMS: 'ccc-conference.dnle.gocast.it',
-                        AT_CALLCAST_ROOMS: '@ccc-conference.dnle.gocast.it',
-                        STUNSERVER: 'dnle.gocast.it', STUNSERVERPORT: 19302,
-                        FEEDBACK_BOT: 'feedback_bot_ccc@dnle.gocast.it',
-                        ROOMMANAGER: 'ccc_roommanager@dnle.gocast.it/roommanager',
-                        SWITCHBOARD_FB: 'switchboard_ccc@dnle.gocast.it',
-                        LOGCATCHER: 'ccc_logcatcher@dnle.gocast.it/logcatcher',
-                        FILECATCHER: 'ccc_filecatcher@dnle.gocast.it/filecatcher'});
-  }
-  else if (window.location.hostname.toLowerCase() === 'dev.gocast.it') {
-    Callcast.InitOverride({ CALLCAST_XMPPSERVER: 'dev.gocast.it',
-                        CALLCAST_ROOMS: 'conference.dev.gocast.it',
-                        AT_CALLCAST_ROOMS: '@conference.dev.gocast.it',
-                        STUNSERVER: 'dev.gocast.it', STUNSERVERPORT: 19302,
-                        FEEDBACK_BOT: 'feedback_bot_dev@dev.gocast.it',
-                        ROOMMANAGER: 'roommanager@dev.gocast.it/roommanager',
-                        SWITCHBOARD_FB: 'switchboard_dev@dev.gocast.it',
-                        LOGCATCHER: 'logcatcher@dev.gocast.it/logcatcher',
-                        FILECATCHER: 'filecatcher@dev.gocast.it/filecatcher'});
-  }
+
+  Callcast.init();
 
   //Disable file drag/drop everywhere except fileshare spots
   $('body').bind('dragover drop', function(e) {
@@ -2512,12 +2598,12 @@ $(document).ready(function(
 
   app.checkExclusive(function() {
     clearInterval(unmaskTimer);
-    navigator.plugins.refresh(); // reload plugins to get any plugin updates
+    navigator.plugins.refresh(false); // reload plugins to get any plugin updates
 
     // Check the browser.
     app.getBrowser();
     if (app.checkBrowser()) {
-      if (InvalidRoomname(decodeURI($.getUrlVar('roomname')))) {
+      /*if (InvalidRoomname(decodeURI($.getUrlVar('roomname')))) {
         closeWindow();
         openWindow('#errorMsgPlugin');
         $('#errorMsgPlugin > button').css({'display': 'none'});
@@ -2525,44 +2611,45 @@ $(document).ready(function(
         $('#errorMsgPlugin > p#prompt').css({'display': 'none'});
         $('#errorMsgPlugin > input#roomname').css({'display': 'block'});
         $('#errorMsgPlugin > button#reload').css({'display': 'block'});
-      } else {
+      } else {*/
 
-        uiInit(); // init user interface
-        if (app.fbCheckCredentialsTriggered) {
-          $(document).trigger('checkCredentials');
-        }
-
-        //do something if facebook took too long or errored out
-        app.fbTimerRunning = setTimeout(function() {
-          if (!app.facebookInited) {
-            closeWindow();
-            app.log(2, 'Facebook API init failed - userAgent: ' + navigator.userAgent);
-            Callcast.SendLiveLog('Facebook API init failed - userAgent: ' + navigator.userAgent.replace(/;/g, '|'));
-            Callcast.SendLiveLog('FBLOG: ' + getFBLog());
-            openWindow('#credentials');
-            $('#credentials > .fb-login-button').addClass('hidden');
-            $('#credentials > #fb-disabled').removeClass('hidden');
-          }
-        }, 10000);
-
-        // Login to xmpp anonymously
-        Callcast.connect(Callcast.CALLCAST_XMPPSERVER, '');
-
-        // Write greeting into console.
-        app.log(2, 'Page loaded.');
-
-        Callcast.setCallbackForCallback_OnNicknameInUse(function(nick) {
-          app.nickInUse(nick);
-        });
-
-        // set the connection status callback
-        Callcast.setCallbackForCallback_ConnectionStatus(connectionStatus);
-
-        // callbacks for assign/unassign spots for participants
-        Callcast.setCallbackForAddSpotForParticipant(assignSpotForParticipant);
-        Callcast.setCallbackForRemoveSpotForParticipant(unassignSpotForParticipant);
+      uiInit(); // init user interface
+      if (app.fbCheckPluginTriggered) {
+        $(document).trigger('checkPlugin');
       }
+
+      //do something if facebook took too long or errored out
+      app.fbTimerRunning = setTimeout(function() {
+        if (!app.facebookInited) {
+          closeWindow();
+          app.log(2, 'Facebook API init failed - userAgent: ' + navigator.userAgent);
+          //Callcast.SendLiveLog('Facebook API init failed - userAgent: ' + navigator.userAgent.replace(/;/g, '|'));
+          //Callcast.SendLiveLog('FBLOG: ' + getFBLog());
+          //openWindow('#credentials');
+          //$('#credentials > .fb-login-button').addClass('hidden');
+          //$('#credentials > #fb-disabled').removeClass('hidden');
+          $(document).trigger('checkPlugin');
+        }
+      }, 10000);
+
+      // Login to xmpp anonymously
+      //Callcast.connect();
+
+      // Write greeting into console.
+      app.log(2, 'Page loaded.');
+
+      Callcast.setCallbackForCallback_OnNicknameInUse(function(nick) {
+        app.nickInUse(nick);
+      });
+
+      // set the connection status callback
+      Callcast.setCallbackForCallback_ConnectionStatus(connectionStatus);
+
+      // callbacks for assign/unassign spots for participants
+      Callcast.setCallbackForAddSpotForParticipant(assignSpotForParticipant);
+      Callcast.setCallbackForRemoveSpotForParticipant(unassignSpotForParticipant);
     }
+    //}
   }, function() {
     closeWindow();
     openWindow('#errorMsgPlugin');
@@ -3116,9 +3203,9 @@ function startTour(tourSelector) {
 }
 
 function errMsgReloadClick() {
-  if ('undefined' !== typeof(Storage) && app.user.fbSkipped) {
+  /*if ('undefined' !== typeof(Storage) && app.user.fbSkipped) {
     window.localStorage.gcpReloadNickName = decodeURI(app.user.name);
-  }
+  }*/
   window.location.reload();
 }
 
@@ -3143,3 +3230,179 @@ function fbEvent() {
     }
   });
 }
+
+function leaveGoCast() {
+  Callcast.LeaveSession(function() {
+    if (Callcast.connection.bAnonymous) {
+      forgetXmppConnection = function() { Callcast.connection.forgetReconnectInfo(); };
+      if (document.referrer && /myroom\.html/.test(document.referrer)) {
+        window.location.href = document.referrer;
+      } else {
+        window.location.href = 'register.html';
+      }
+    } else {
+      window.location.href = 'dashboard.html';
+    }
+  });
+}
+
+var forgetXmppConnection = function() {};
+
+function emailInviteDialog(e) {
+  if (Callcast.connection.bAnonymous) {
+    openCopyData(e, 'Feature not available', 'You have to be a registered GoCast user to use this feature.', true);
+  } else if ($.roomcode.decipheruname($.urlvars.roomname) !== Callcast.connection.getEmailFromJid()) {
+    openCopyData(e, 'Feature not available', 'Unfortunately, you can\'t invite others to this room as ' +
+                                             'you are not its owner.');
+  } else {
+    GoCastJS.EmailInvite.opendialog('#emailinvite', '#mask');
+  }
+}
+
+GoCastJS.EmailInvite = {
+  invitelist: [],
+  convertToAMPMAddHour: function(date) {
+    function minstring(minutes) {
+      var digits = {'false': '', 'true': '0'};
+      return digits[(minutes<10).toString()] + minutes;
+    }
+
+    date.setHours(date.getHours() + 1);
+    if (12 < date.getHours()) {
+      return (date.getHours()-12) + ':' + minstring(date.getMinutes()) + ' PM';
+    } else {
+      if (0 === date.getHours()) {
+        return '12:' + minstring(date.getMinutes()) + ' AM';
+      } else {
+        return date.getHours() + ':' + minstring(date.getMinutes()) + ((date.getHours() < 12) ? ' AM' : ' PM');
+      }
+    }
+  },
+  opendialog: function(dlgSelector, maskSelector) {
+    var winW = $(window).width(),
+      winH = $(window).height(),
+      date = new Date(),
+      self = this;
+
+    $(document).unbind('keydown');
+    if ('Firefox' === app.browser.name) {
+      $('#meeting').css('visibility', 'hidden');
+    }
+
+    $(maskSelector).css({
+      'width': winW + 'px',
+      'height': winH + 'px'
+    }).fadeIn('slow', function() {
+      var $dlg = $(dlgSelector);
+      $dlg.css({
+        'left': (winW - $dlg.width())/2 + 'px',
+        'top': (winH - $dlg.height())/4 + 'px',
+        'z-index': $(this).css('z-index') + 1
+      }).addClass('show');
+      $('#invite', $dlg).remove();
+      $('#whendate', $dlg).unbind('blur').unbind('keydown')
+                          .keydown(function(evt) {evt.preventDefault();})
+                          .blur(self.whendateblurCb($dlg)).blur();
+      $('#whentime', $dlg).val(self.convertToAMPMAddHour(date)).unbind('blur').blur(self.whentimeblurCb($dlg)).blur();
+      $('#masker', $dlg).css('z-index', $(this).css('z-index') + 2);
+      $('#status', $dlg).css('z-index', $(this).css('z-index') + 3);
+      $('#roomlink', $dlg).text(window.location.href);
+      $('#cancel', $dlg).unbind('click').click(self.cancelclickCb($dlg, $(this)));
+      $('#create', $dlg).unbind('click').click(self.createclickCb($dlg, $(this)));
+      $('#topic', $dlg).focus();
+    });
+  },
+  whendateblurCb: function($dlg) {
+    var $whendate = $('#whendate', $dlg);
+    return function() {
+      var date = new Date();
+      $whendate.val($whendate.val() || ((date.getMonth()+1) + '/' + date.getDate() + '/' + date.getFullYear()));
+    };
+  },
+  whentimeblurCb: function($dlg) {
+    var $whentime = $('#whentime', $dlg),
+        self = this;
+    return function() {
+      $whentime.val($whentime.val() || self.convertToAMPMAddHour(new Date()));
+    };
+  },
+  cancelclickCb: function($dlg, $mask) {
+    var self = this, docKey;
+    return function() {
+      $('#details', $dlg).val('');
+      $('#topic', $dlg).val('');
+      $dlg.removeClass('show');
+      $mask.fadeOut('slow');
+      self.invitelist = [];
+      $(document).keydown(docKey);
+
+      if ('Firefox' === app.browser.name) {
+        $('#meeting').css('visibility', 'visible');
+      }
+    };
+  },
+  createclickCb: function($dlg, $mask) {
+    var self = this;
+    return function() {
+      var timeph, emails = $('#emails', $dlg).val(),
+          starttime = new Date($('#whendate', $dlg).val() + ' ' + $('#whentime', $dlg).val()),
+          data, errmsg;
+
+      $.genemaillist(emails, function(arr) { self.invitelist = arr; });
+      if (emails && self.invitelist.length) {
+        data = {
+            note: $('#details', $dlg).val(),
+            link: $('#roomlink', $dlg).text(),
+            when: starttime,
+            toemailarray: JSON.stringify(self.invitelist),
+            fromemail: Callcast.connection.getEmailFromJid()
+        };
+
+        if ($('#details', $dlg).val()) {
+          data.note = $('#details', $dlg).val();
+        }
+
+        if ('invalid date' !== starttime.toString().toLowerCase()) {
+          data.when = starttime.toString();
+        }
+
+        console.log('EmailInvite: ', data);
+        $('#masker', $dlg).addClass('show');
+        $('#status', $dlg).addClass('show').text('Sending invitation');
+        $.ajax({
+          url: '/acct/inviteviaemail/',
+          type: 'POST',
+          dataType: 'json',
+          data: data,
+          success: function(response) {
+            if ('success' === response.result) {
+              $('#status', $dlg).text('Done');
+              setTimeout(function() {
+                $('#status', $dlg).removeClass('show');
+                $('#masker', $dlg).removeClass('show');
+                $('#cancel', $dlg).click();
+              }, 2000);
+            } else {
+              $('#status', $dlg).text('Failed');
+              setTimeout(function() {
+                $('#status', $dlg).removeClass('show');
+                $('#masker', $dlg).removeClass('show');
+                $('#cancel', $dlg).click();
+              }, 2000);
+            }
+          },
+          failure: function(error) {
+            $('#status', $dlg).text('Failed');
+            setTimeout(function() {
+              $('#status', $dlg).removeClass('show');
+              $('#masker', $dlg).removeClass('show');
+              $('#cancel', $dlg).click();
+            }, 2000);
+          }
+        });
+      } else {
+        $('#topic', $dlg).focus();
+      }
+    };
+  }
+};

@@ -1,4 +1,4 @@
 #!/bin/sh
 
-sh ./publish.sh html/mmalavalli/carousel-testbed -y -d
+sh ./publish.sh carousel/mmalavalli -y -d
 

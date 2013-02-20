@@ -47,6 +47,7 @@ $(document).on('joined_session', function(
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
   app.log(2, 'User has successfully joined the session.');
+  $('#upper-left > #roomname > h3').html('Welcome to ' + $.roomcode.decipherroomname($.urlvars.roomname) + '!');
   /*
    * Enable button activities except join. */
   app.enableButtons(true);
@@ -75,7 +76,9 @@ $(document).on('left_session', function(
    * Remove all the objects in carousel. */
   $('#meeting > #streams > #scarousel div.cloudcarousel:not(.unoccupied)').each(function(i, e) {
     if ($(e).hasClass('typeContent')) {
-      removeContentFromCarousel($(e).attr('encname'));
+      //removeContentFromCarousel($(e).attr('id'));
+      removeSpotCb({spotnumber: $(e).attr('spotnumber')});
+      app.carousel.createSpot();
     }
     else {
       removePluginFromCarousel($(e).attr('encname'));
@@ -157,7 +160,7 @@ $(document).on('public-message', function(
     {
       $(app.GROUP_CHAT_SHOW).effect("pulsate", { times:5 }, 5 * 2000);
     }
-    console.log('A public message arrived ' + decodeURI(msginfo.nick) + " " + decodeURI(msginfo.body));
+//    console.log('A public message arrived ' + decodeURI(msginfo.nick) + " " + decodeURI(msginfo.body));
   }
   catch(err)
   {
@@ -386,30 +389,16 @@ $(document).on('connected', function(
   /* debug
   // Inside $(document).bind('connected'), function() { ....
 
-  Callcast.connection.xmlInput = function(data) {
-    if ($(data).children()[0]) {
-      console.log("XML-IN:", $(data).children()[0]);
-    } else {
-      console.log("XML-IN:", $(data));
-    }
-  };
-
-  Callcast.connection.xmlOutput = function(data) {
-    if ($(data).children()[0]) {
-      console.log("XML-OUT:", $(data).children()[0]);
-    } else {
-      console.log("XML-OUT:", $(data));
-    }
-  };
+  Callcast.connection.debugXML();
 
    */
 
   /*
    * Open waiting room in case it takes too long to join. */
-  openWindow('#waitingToJoin');
+  //openWindow('#waitingToJoin');
 
   app.xmppLoggedIn = true;
-
+  checkCredentials2();
   $(document).trigger('one-login-complete', 'XMPP GO.');    // One more login action complete.
   return false;
 }); /* connected() */
@@ -426,8 +415,9 @@ $(document).on('one-login-complete', function(event, msg) {
   if (app.loggedInAll())
   {
     app.log(2, 'one-login-complete: opening meeting');
-    openMeeting();
-    tryPluginInstall();
+    handleRoomSetup();
+    //openMeeting();
+    //tryPluginInstall();
   }
 
 });
@@ -444,12 +434,23 @@ $(document).on('disconnected', function(
 )
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
+  if (app.authfail) {
+    app.authfail = false;
+    checkCredentials(null, 'Bad email or password.');
+    return;
+  }
+
   Callcast.log('Connection terminated.');
   app.log(4, "SENDLOG_DISCONNECTED: disconnected");
+  app.userLoggedIn = false;
   $('#errorMsgPlugin > h1').text('We got disconnected!');
-  $('#errorMsgPlugin > p#prompt').text('Please click on the send log button, and after its done, reload the page.');
+  $('#errorMsgPlugin > p#prompt').text('Please click on the send log button, and after its done, reenter the room.');
   closeWindow();
   openWindow('#errorMsgPlugin');
+  $('#errorMsgPlugin > #reload').text('Re-enter room').removeAttr('onclick').unbind('click').click(function() {
+    $(this).text('Reload').unbind('click').click(errMsgReloadClick);
+    checkCredentials();
+  });
 
   $('#errorMsgPlugin > #sendLog').unbind('click').click(function() {
     $(this).attr('disabled', 'disabled');
@@ -778,7 +779,7 @@ function removeContentFromCarousel(
 {
   /*
    * Get parent object and modify accordingly. */
-  var id = app.str2id(infoId),
+  var id = infoId,
       jqOo = $('#meeting > #streams > #scarousel div.cloudcarousel#' + id);
   jqOo.addClass('unoccupied').removeClass('typeContent');
   jqOo.removeAttr('id');
@@ -787,7 +788,7 @@ function removeContentFromCarousel(
   jqOo.removeAttr('url');
   jqOo.removeAttr('encname');
   jqOo.css('background-image', 'url("images/GoToken.png")');
-  app.log(2, 'Removing content from spot [' + infoId + ', ' + id + ']');
+  app.log(2, 'Removing content from spot [' + infoId + ', ' + jqOo.attr('spotnumber') + ']');
   return false;
 } /* removeContentFromCarousel() */
 
@@ -808,8 +809,8 @@ function doSpot(spotDiv, info)
     var divIcon, divTitle,
         jqDiv = $(spotDiv),
         whiteBoard, editor, wiki, fshare;
-    console.log('doSpot', info);
-    console.log('spotDiv', spotDiv);
+//    console.log('doSpot', info);
+//    console.log('spotDiv', spotDiv);
     if (!spotDiv) {throw "no spotDiv";}
     if (!info || !info.spottype) {throw "spottype not defined";}
     if (info.spottype === 'youtube')
@@ -1016,28 +1017,26 @@ function addSpotCb(info)
        div, divs;
 //    console.log('addSpot msg received id ' + info.spotdivid + ' #' + info.spotnumber, info);
     // determine cmd type, add or replace
-    if (info.spotreplace) // see if there is a spotReplace prop
+
+    // RMW: Change behavior - always assume first-unoc if none given.
+    info.spotreplace = info.spotreplace || 'first-unoc';
+
+    // if there is a nodup prop == 1 and spot with spotId exists
+    // don't replace
+    if (info.spotnodup && info.spotnodup === 1 && info.spotdivid)
     {
-      // if there is a nodup prop == 1 and spot with spotId exists
-      // don't replace
-      if (info.spotnodup && info.spotnodup === 1 && info.spotdivid)
-      {
-         div = $('#meeting > #streams > #scarousel #' + info.spotdivid);
-         if (div.length > 0)
-         {
-            return; // spot with id exists so we're done
-         }
-      }
-      spotDiv = getSpotForAdd(info);
-      if (!spotDiv) {throw "couldn't get spot for addSpot";}
-      item = $(spotDiv).data('item');
-      if (!item) {throw "couldn't get item for addSpot";}
-      app.carousel.setSpotNumber(item, info.spotnumber);
+       div = $('#meeting > #streams > #scarousel #' + info.spotdivid);
+       if (div.length > 0)
+       {
+          return; // spot with id exists so we're done
+       }
     }
-    else // add a new spot
-    {
-      spotDiv = app.carousel.createSpot(info);
-    }
+    spotDiv = getSpotForAdd(info);
+    if (!spotDiv) {throw "couldn't get spot for addSpot";}
+    item = $(spotDiv).data('item');
+    if (!item) {throw "couldn't get item for addSpot";}
+    app.carousel.setSpotNumber(item, info.spotnumber);
+
     // set the item spot number to info.spotnumber
     doSpot(spotDiv, info);
     app.carousel.updateAll(); // redraw carousel
@@ -1051,7 +1050,7 @@ function addSpotCb(info)
 ///
 function setSpotCb(info)
 {
-  console.log('setSpot msg received', info);
+//  console.log('setSpot msg received', info);
   var spotDiv, // the desired spot to be replaced or added
       item = app.carousel.getByspotnumber(info.spotnumber); // the item at spotnumber
 
@@ -1134,8 +1133,14 @@ function removeSpotCb(info)
 ///
 function connectionStatus(statusStr)
 {
-  app.log(2, 'connectionStatus' + statusStr);
+  app.log(2, 'connectionStatus: ' + statusStr);
   $("#connection-status").text(statusStr);
+
+  if (/bad/.test(statusStr.toLowerCase())) {
+    app.authfail = true;
+  } else if (/failed/.test(statusStr.toLowerCase())) {
+    // conn fail
+  }
 }
 
 ///
@@ -1330,7 +1335,7 @@ function pluginLoaded(
         }
         // </MANJESH>
 
-        handleRoomSetup();
+        //handleRoomSetup();
      }, function(message) {
         // Failure to initialize.
         app.log(4, 'Local plugin failed to initialize [' + message + ']');
@@ -1343,7 +1348,8 @@ function pluginLoaded(
   }
   else // pluginLoaded but out of date
   {
-     Callcast.SendLiveLog('Plugin upgrade available. Current version: ' + Callcast.GetVersion());
+     //Callcast.SendLiveLog('Plugin upgrade available. Current version: ' + Callcast.GetVersion());
+     app.log(2, 'Plugin upgrade available. Current version: ' + Callcast.GetVersion());
      app.pluginUpgrade = true;
   }
 

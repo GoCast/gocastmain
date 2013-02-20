@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title> Welcome to GoCast! </title>
+        <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon">
+        <link rel="stylesheet" type="text/css" href="css/bootstrap.css?GOCASTTIMESTAMP">
+        <link rel="stylesheet" type="text/css" href="css/font-awesome.css?GOCASTTIMESTAMP">
+        <link rel="stylesheet" type="text/css" href="css/dashboard.css?GOCASTTIMESTAMP">
+        <link rel="stylesheet" type="text/css" href="css/kalendae.css?GOCASTTIMESTAMP">
+    </head>
+    <body>
+        <div class="navbar navbar-fixed-top navbar-inverse">
+            <div class="navbar-inner">
+                <div class="container">
+                    <a class="brand" href="http://www.gocast.it" target="_blank">
+                        <img src="images/gocastheaderlogo.png"></img>
+                    </a>
+                    <ul class="nav pull-right">
+                        <li class="dropdown" style="padding-top: 20px; margin-left: 5px;">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">My Account <b class="caret"></b></a>
+                            <ul class="dropdown-menu">
+                                <li><a class="formlink" href="#changepwd-form">Change Password</a></li>
+                                <li><a href="#">Delete Account</a></li>
+                            </ul>
+                        </li>
+                        <li class="dropdown" style="padding-top: 20px; margin-left: 5px;">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">My Meetings <b class="caret"></b></a>
+                            <ul class="dropdown-menu">
+                                <li><a class="formlink" href="#schedulemeeting-form">Schedule Meeting</a></li>
+                                <li><a class="formlink" href="#startmeeting-form">Start Meeting</a></li>
+                            </ul>
+                        </li>
+                        <li style="padding-top: 20px; margin-left: 5px;">
+                            <a class="logoutlink" href="#">Log Out</a>
+                        </li>
+                        <li style="padding-top: 20px; margin-left: 5px;">
+                            <span class="label label-success lead"></span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="span5 offset1">
+                    <div class="alert alert-info">
+                        <h4><i class="icon-info-sign"></i></h4>
+                        <p style="padding-left: 25px;"></p>
+                    </div>
+                    <div id="publicrooms"></div>
+                </div>
+                <div class="span5">
+                    <form id="login-form" class="form-horizontal">
+                        <fieldset>
+                            <legend>&nbsp;Login to GoCast</legend>
+                            <div class="control-group">
+                                <div class="controls" align="center">
+                                    <input id="input-email" type="email" name="email" placeholder=" Email" required class="span4">
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <div class="controls" align="center">
+                                    <input id="input-password" type="password" name="password" placeholder=" Password" required class="span4">
+                                    <input id="input-password_placeholder" class="ie-pwd-placeholder span4" type="text">
+                                </div>
+                            </div>
+                            <div class="alert alert-error">
+                                <h4><i class="icon-warning-sign"></i></h4><p style="padding-left: 25px;"></p>
+                            </div>
+                            <div class="alert alert-success">
+                               <h4><i class="icon-ok-sign"></i></h4><p style="padding-left: 25px;"></p>
+                            </div>
+                            <div class="control-group">
+                                <div class="controls" align="center">
+                                    <button type="submit" class="btn btn-primary pull-right"> Log me in </button>
+                                    <a href="register.html" class="btn btn-link pull-left"> I want to sign up </a>
+                                    <a href="javascript:DashView.displayform('reqresetpwd-form')" class="btn btn-link pull-left"> Forgot password </a>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </form>
+                    <form id="changepwd-form" class="form-horizontal" action="/acct/changepwd/" method="post">
+                        <fieldset>
+                            <legend>&nbsp;Change your password</legend>
+                            <div class="control-group">
+                                <div class="controls" align="center">
+                                    <input id="input-email" type="email" name="email" placeholder=" Email" required class="span4">
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <div class="controls" align="center">
+                                    <input id="input-password" type="password" name="new_password" placeholder=" New password" required class="span4">
+                                    <input id="input-password_placeholder" class="ie-pwd-placeholder span4" type="text">
+                                </div>
+                            </div>
+                            <div class="control-group" align="center">
+                                <div class="controls">
+                                    <input id="input-confirmpassword" type="password" name="confirm_password" placeholder=" Confirm new password" required class="span4">
+                                    <input id="input-confirmpassword_placeholder" class="ie-pwd-placeholder span4" type="text">
+                                </div>
+                            </div>
+                            <div class="alert alert-error">
+                                <h4><i class="icon-warning-sign"></i></h4><p style="padding-left: 25px;"></p>
+                            </div>
+                            <div class="alert alert-success">
+                               <h4><i class="icon-ok-sign"></i></h4><p style="padding-left: 25px;"></p>
+                            </div>
+                            <div class="control-group">
+                                <div class="controls" align="center">
+                                    <button type="submit" class="btn btn-primary pull-right"> Change my password </button>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </form>
+                    <form id="startmeeting-form" class="form-horizontal" action="/acct/createroom/" method="post">
+                        <fieldset>
+                            <legend>&nbsp;Start your meeting</legend>
+                            <div class="control-group">
+                                <div class="controls" align="center">
+                                    <input id="input-roomname" type="text" name="desired_roomname" placeholder=" Enter the name of your new room" required class="span4">
+                                    <br><br><span class="or"></span>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <div id="roomlist" class="controls" align="center">
+                                </div>
+                            </div>
+                            <div class="alert alert-error">
+                                <h4><i class="icon-warning-sign"></i></h4><p style="padding-left: 25px;"></p>
+                            </div>
+                            <div class="alert alert-success">
+                               <h4><i class="icon-ok-sign"></i></h4><p style="padding-left: 25px;"></p>
+                            </div>
+                            <div class="control-group">
+                                <div id="controls" align="center">
+                                    <button type="submit" class="btn btn-primary pull-right"> Take me to my room </button>
+                                    <a href="javascript:void(0);" class="btn btn-inverse pull-right">
+                                        Invite others&nbsp;&nbsp;<i class="icon-envelope"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </form>
+                    <form id="schedulemeeting-form" class="form-horizontal" action="/acct/inviteviaemail/" method="post">
+                        <fieldset>
+                            <legend>&nbsp; Schedule your meeting</legend>
+                            <div class="control-group">
+                                <div id="roomlist" class="controls well" align="center">
+                                </div>
+                            </div>
+                            <div class="control-group" header="Where">
+                                <div class="controls" align="center">
+                                    <input id="input-roomname" type="text" name="roomname" placeholder=" Room where you want to have your meeting" required class="span4" disabled>
+                                </div>
+                            </div>
+                            <div class="control-group" header="When">
+                                <div class="controls" align="center">
+                                    <input id="input-date" type="text" name="date" placeholder=" Date" class="span2 auto-kal" data-kal="months: 1, direction: 'today-future'">
+                                    <input id="input-time" type="text" name="time" placeholder=" Time (Ex: 5:45)" class="span1" style="margin-left: 15px;">
+                                    <select id="ampm" class="span1" style="margin-left: 15px;">
+                                        <option value="AM" selected>AM</option>
+                                        <option value="PM">PM</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="control-group" header="Invitees">
+                                <div class="controls" align="center">
+                                    <textarea id="input-emails" name="emails" placeholder="Comma separated list of email addresses of people you want to invite (Ex: abc@def.com, ghi@jkl.com,...)" class="span4" rows="3" style="resize: none;" required></textarea>
+                                </div>
+                            </div>
+                            <div class="control-group" header="Address your invitees">
+                                <div class="controls" align="center">
+                                    <textarea id="input-note" name="note" placeholder="Optional note to invitees" class="span4" rows="3" style="resize: none;"></textarea>
+                                </div>
+                            </div>
+                            <div class="alert alert-error">
+                                <h4><i class="icon-warning-sign"></i></h4><p style="padding-left: 25px;"></p>
+                            </div>
+                            <div class="alert alert-success">
+                               <h4><i class="icon-ok-sign"></i></h4><p style="padding-left: 25px;"></p>
+                            </div>
+                            <div class="control-group">
+                                <div id="controls" align="center">
+                                    <button type="submit" class="btn btn-primary pull-right"> Send invitation </button>
+                                    <a href="javascript:void(0);" class="btn btn-link pull-left"> Cancel </a>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </form>
+                    <form id="reqresetpwd-form" class="form-horizontal" action="/acct/resetpasswordrequest/" method="post">
+                        <fieldset>
+                            <legend>&nbsp;Request password reset</legend>
+                            <div class="control-group">
+                                <div class="controls" align="center">
+                                    <input id="input-email" type="email" name="email" placeholder=" Email associated with your account" required class="span4">
+                                </div>
+                            </div>
+                            <div class="alert alert-error">
+                                <h4><i class="icon-warning-sign"></i></h4><p style="padding-left: 25px;"></p>
+                            </div>
+                            <div class="alert alert-success">
+                               <h4><i class="icon-ok-sign"></i></h4><p style="padding-left: 25px;"></p>
+                            </div>
+                            <div class="control-group">
+                                <div id="controls" align="center">
+                                    <button type="submit" class="btn btn-primary pull-right"> Send me a password reset email </button>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </form>
+                    <form id="resetpwd-form" class="form-horizontal" action="/acct/resetpasswordlink/" method="post">
+                        <fieldset>
+                            <legend>&nbsp;Reset password</legend>
+                            <div class="control-group">
+                                <div class="controls" align="center">
+                                    <input id="input-email" type="email" name="email" placeholder=" Email associated with your account" required class="span4">
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <div class="controls" align="center">
+                                    <input id="input-password" type="password" name="password" placeholder=" New password" required class="span4">
+                                    <input id="input-password_placeholder" class="ie-pwd-placeholder span4" type="text">
+                                </div>
+                            </div>
+                            <div class="control-group" align="center">
+                                <div class="controls">
+                                    <input id="input-confirmpassword" type="password" name="confirm_password" placeholder=" Confirm new password" required class="span4">
+                                    <input id="input-confirmpassword_placeholder" class="ie-pwd-placeholder span4" type="text">
+                                </div>
+                            </div>
+                            <div class="alert alert-error">
+                                <h4><i class="icon-warning-sign"></i></h4><p style="padding-left: 25px;"></p>
+                            </div>
+                            <div class="alert alert-success">
+                               <h4><i class="icon-ok-sign"></i></h4><p style="padding-left: 25px;"></p>
+                            </div>
+                            <div class="control-group">
+                                <div id="controls" align="center">
+                                    <button type="submit" class="btn btn-primary pull-right"> Reset my password </button>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <script type="text/javascript" src="js/jquery-1.8.1.js?GOCASTTIMESTAMP"></script>
+        <script type="text/javascript" src="/scripts/jquery.base64.min.js?GOCASTTIMESTAMP"></script>
+        <script type="text/javascript" src="js/jquery.form.js?GOCASTTIMESTAMP"></script>
+        <script type="text/javascript" src="js/bootstrap.js?GOCASTTIMESTAMP"></script>
+        <script type="text/javascript" src="/scripts/strophe.js?GOCASTTIMESTAMP"></script>
+        <script type="text/javascript" src="js/strophe_connection.js?GOCASTTIMESTAMP"></script>
+        <script type="text/javascript" src="js/jquery.utils.js?GOCASTTIMESTAMP"></script>
+        <script type="text/javascript" src="js/callcast_settings.js?GOCASTTIMESTAMP"></script>
+        <script type="text/javascript" src="js/kalendae.js?GOCASTTIMESTAMP"></script>
+        <script type="text/javascript" src="js/dashboard.js?GOCASTTIMESTAMP"></script>
+        <!-- Google Code for Create a room Conversion Page -->
+        <script type="text/javascript">
+            /* <![CDATA[ */
+            var google_conversion_id = 989217871;
+            var google_conversion_language = "en";
+            var google_conversion_format = "2";
+            var google_conversion_color = "ffffff";
+            var google_conversion_label = "DX30CLmurAQQz4jZ1wM";
+            var google_conversion_value = 0;
+            /* ]]> */
+
+            if (!$.urlvars.sendconversion) {
+                google_conversion_id = -1;
+                google_conversion_label = "";
+            }
+        </script>
+        <script type="text/javascript" src="//www.googleadservices.com/pagead/conversion.js"></script>
+        <!-- End Google Code for Create a room Conversion Page -->
+        <!-- Google Code for Remarketing tag -->
+        <!-- Remarketing tags may not be associated with personally identifiable information or placed on pages related to sensitive categories. For instructions on adding this tag and more information on the above requirements, read the setup guide: google.com/ads/remarketingsetup -->
+        <script type="text/javascript">
+            /* <![CDATA[ */
+            var google_conversion_id = 989217871;
+            var google_conversion_label = "JwUyCMnOswQQz4jZ1wM";
+            var google_custom_params = window.google_tag_params;
+            var google_remarketing_only = true;
+            /* ]]> */
+        </script>
+        <script type="text/javascript" src="//www.googleadservices.com/pagead/conversion.js"></script>
+        <!-- Google Analytics -->
+        <script type="text/javascript">
+            var _gaq = _gaq || [];
+            _gaq.push(['_setAccount', 'UA-37964802-1']);
+            _gaq.push(['_trackPageview']);
+
+            if (window.location.hostname !== 'dev.gocast.it') {
+                    (function() {
+                        var ga = document.createElement('script'),
+                            s = document.getElementsByTagName('script')[0];
+
+                        ga.type = 'text/javascript';
+                        ga.async = true;
+                        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') +
+                                 '.google-analytics.com/ga.js';
+                        s.parentNode.insertBefore(ga, s);
+                  })();
+            }
+            else {
+              console.log('Skipped Google Analytics - dev.');
+            }
+        </script>
+        <!-- End Google Analytics -->
+    </body>
+</html>

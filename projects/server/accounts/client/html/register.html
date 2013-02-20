@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title> Get started with GoCast! </title>
+        <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon">
+        <link rel="stylesheet" type="text/css" href="css/bootstrap.css?GOCASTTIMESTAMP">
+        <link rel="stylesheet" type="text/css" href="css/font-awesome.css?GOCASTTIMESTAMP">
+        <link rel="stylesheet" type="text/css" href="css/register.css?GOCASTTIMESTAMP">
+    </head>
+    <body>
+        <div class="navbar navbar-fixed-top navbar-inverse">
+            <div class="navbar-inner">
+                <div class="container">
+                    <a class="brand" href="http://www.gocast.it" target="_blank">
+                        <img src="images/gocastheaderlogo.png"></img>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="span5 offset4">
+                    <form id="register-form" class="form-horizontal" action="/acct/register/" method="post">
+                        <fieldset>
+                            <legend>&nbsp;Get started</legend>
+                            <div class="control-group">
+                                <div class="controls" align="center">
+                                    <input id="input-name" type="text" name="name" placeholder=" Your name" required class="span4">
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <div class="controls" align="center">
+                                    <input id="input-roomname" type="text" name="desired_roomname" placeholder=" Name of your first room" class="span4">
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <div class="controls" align="center">
+                                    <input id="input-email" type="email" name="email" placeholder=" Your email (this will be your username)" required class="span4">
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <div class="controls" align="center">
+                                    <input id="input-password" type="password" name="password" placeholder=" Choose your account password" required class="span4">
+                                    <input id="input-password_placeholder" class="ie-pwd-placeholder span4" type="text">
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <div class="controls" align="center">
+                                    <input id="input-confirmpassword" type="password" name="confirm_password" placeholder=" Confirm your password" required class="span4">
+                                    <input id="input-confirmpassword_placeholder" class="ie-pwd-placeholder span4" type="text">
+                                </div>
+                            </div>
+                            <div class="alert alert-error">
+                               <h4><i class="icon-warning-sign"></i></h4><p style="padding-left: 25px;"></p>
+                            </div>
+                            <div class="alert alert-success">
+                               <h4><i class="icon-ok-sign"></i></h4><p style="padding-left: 25px;"></p>
+                            </div>
+                            <div class="control-group">
+                                <div class="controls" align="center">
+                                    <button type="submit" class="btn btn-primary pull-right"> Sign me up </button>
+                                    <a href="dashboard.html" class="btn btn-link pull-left"> I already have an account </a>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </form>
+                    <form id="activate-form" class="form-horizontal" action="/acct/activate/" method="post">
+                        <fieldset>
+                            <legend>&nbsp;Activate your account</legend>
+                            <div class="control-group">
+                                <div class="controls" align="center">
+                                    <input id="input-email" type="email" name="email" placeholder=" Email" required class="span4">
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <div class="controls" align="center">
+                                    <input id="input-activation-code" type="text" name="activation_code" placeholder=" Activation code" required class="span4">
+                                </div>
+                            </div>
+                            <div class="alert alert-error">
+                               <h4><i class="icon-warning-sign"></i></h4><p style="padding-left: 25px;"></p>
+                            </div>
+                            <div class="alert alert-success">
+                               <h4><i class="icon-ok-sign"></i></h4><p style="padding-left: 25px;"></p>
+                            </div>
+                            <div class="control-group">
+                                <div class="controls" align="center">
+                                    <button type="submit" class="btn btn-primary pull-right"> Activate </button>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <script type="text/javascript" src="js/jquery-1.8.1.js?GOCASTTIMESTAMP"></script>
+        <script type="text/javascript" src="/scripts/jquery.base64.min.js?GOCASTTIMESTAMP"></script>
+        <script type="text/javascript" src="js/jquery.form.js?GOCASTTIMESTAMP"></script>
+        <script type="text/javascript" src="js/bootstrap.js?GOCASTTIMESTAMP"></script>
+        <script type="text/javascript" src="js/jquery.utils.js?GOCASTTIMESTAMP"></script>
+        <script type="text/javascript" src="js/register.js?GOCASTTIMESTAMP"></script>
+        <!-- Google Code for Remarketing tag -->
+        <!-- Remarketing tags may not be associated with personally identifiable information or placed on pages related to sensitive categories. For instructions on adding this tag and more information on the above requirements, read the setup guide: google.com/ads/remarketingsetup -->
+        <script type="text/javascript">
+            /* <![CDATA[ */
+            var google_conversion_id = 989217871;
+            var google_conversion_label = "JwUyCMnOswQQz4jZ1wM";
+            var google_custom_params = window.google_tag_params;
+            var google_remarketing_only = true;
+            /* ]]> */
+        </script>
+        <script type="text/javascript" src="//www.googleadservices.com/pagead/conversion.js"></script>
+        <!-- Google Analytics -->
+        <script type="text/javascript">
+            var _gaq = _gaq || [];
+            _gaq.push(['_setAccount', 'UA-37964802-1']);
+            _gaq.push(['_trackPageview']);
+
+            if (window.location.hostname !== 'dev.gocast.it') {
+                (function() {
+                    var ga = document.createElement('script'),
+                        s = document.getElementsByTagName('script')[0];
+
+                    ga.type = 'text/javascript';
+                    ga.async = true;
+                    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') +
+                             '.google-analytics.com/ga.js';
+                    s.parentNode.insertBefore(ga, s);
+              })();
+            }
+            else {
+              console.log('Skipped Google Analytics - dev.');
+            }
+        </script>
+        <!-- End Google Analytics -->
+    </body>
+</html>

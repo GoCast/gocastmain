@@ -261,9 +261,9 @@ function fbMe(response) // facebook response object
                                           image: app.user.fbProfilePicUrl
                                          });
 
-         fbLog += 'fbMe() - callback - pre-trigger deferredCheckCredentials\n';
+         fbLog += 'fbMe() - callback - pre-trigger deferredCheckPlugin\n';
 
-            $(document).trigger('deferredCheckCredentials');
+            $(document).trigger('deferredCheckPlugin');
       }
       else {
         fbLog += 'fbMe() callback - ERROR: me is: ' + JSON.stringify(me) + '\n';
@@ -306,6 +306,7 @@ function ourAsyncFBInit()
 
       fbLog += 'post-fb.init() / pre-fb.event.subscribe()\n';
         // listen for and handle auth.authResponseChange events
+/* Disable facebook auto-login for now. RMW - Jan 18, 2013
         FB.Event.subscribe('auth.authResponseChange', function(response) {
           app.log(2, 'authResponseChange callback');
           app.log(2, 'response = ' + JSON.stringify(response));
@@ -322,7 +323,7 @@ function ourAsyncFBInit()
             Callcast.SetFBSignedRequestAndAccessToken(null, null);
           }
         });
-
+*/
       fbLog += 'post-fb.event.subscribe-call() / pre-fb.getLoginStatus()\n';
       // not needed since the status : true arg to FB.init above
       // does the equivalent and fires statusChange
@@ -330,6 +331,7 @@ function ourAsyncFBInit()
       // statusChange event on FB.init if we're not logged into fb
       // so call this on page load, we may need a true 2nd arg
       // to trip to fb server
+/* Disable facebook auto-login for now. RMW - Jan 18, 2013
       FB.getLoginStatus(function(response) {
         app.log(2, 'fbLoginStatus callback response.authResponse: ' + response.authResponse);
           fbLog += 'callback: FB.getLoginStatus() - response: ' + JSON.stringify(response) + '\n';
@@ -337,7 +339,7 @@ function ourAsyncFBInit()
           //console.log('accessToken', response.authResponse.accessToken);
           if (!response.authResponse)
           {
-             $(document).trigger('deferredCheckCredentials');
+             $(document).trigger('deferredCheckPlugin');
           }
           else
           {
@@ -347,6 +349,11 @@ function ourAsyncFBInit()
           }
 
       });
+*/
+// Must trigger the following in order to not 'stall' on facebook login waiting.
+        app.user.fbSkipped = true;
+        $(document).trigger('deferredCheckPlugin');
+
 
 } // ourAsyncFBInit
 
@@ -496,7 +503,7 @@ GoCastJS.FacebookEvent = {
     var $whendate = $('#whendate', $dlg);
     return function() {
       var date = new Date();
-      $whendate.val($whendate.val() || ((date.getMonth()+1) + '/' + date.getDate() + '/' + date.getFullYear()));          
+      $whendate.val($whendate.val() || ((date.getMonth()+1) + '/' + date.getDate() + '/' + date.getFullYear()));
     };
   },
   whentimeblurCb: function($dlg) {
@@ -527,7 +534,7 @@ GoCastJS.FacebookEvent = {
     };
   },
   friendselectCb: function($dlg) {
-    var jfmfs = $('#friends', $dlg).data('jfmfs');
+    var jfmfs = $('#friends', $dlg).data('jfmfs'),
         self = this;
     return function() {
       var invitetext = 'Invite Friends';
@@ -539,7 +546,7 @@ GoCastJS.FacebookEvent = {
     };
   },
   cancelclickCb: function($dlg, $mask) {
-    var self = this;
+    var self = this, docKey;
     return function() {
       var jfmfs = $('#friends', $dlg).data('jfmfs');
       $('#invite', $dlg).text('Invite Friends');
@@ -549,7 +556,7 @@ GoCastJS.FacebookEvent = {
       $mask.fadeOut('slow');
       self.invitelist = [];
       if(jfmfs) {
-        jfmfs.clearSelected(); 
+        jfmfs.clearSelected();
       }
 
       $(document).keydown(docKey);
@@ -561,7 +568,7 @@ GoCastJS.FacebookEvent = {
   createclickCb: function($dlg, $mask) {
     var self = this;
     return function() {
-      var name = $('#topic', $dlg).val(),
+      var timeph, name = $('#topic', $dlg).val(),
           starttime = new Date($('#whendate', $dlg).val() + ' ' + $('#whentime', $dlg).val()),
           options = {
             description: $('#details', $dlg).val(),
@@ -591,7 +598,7 @@ GoCastJS.FacebookEvent = {
               $('#status', $dlg).removeClass('show');
               $('#masker', $dlg).removeClass('show');
               $('#cancel', $dlg).click();
-            }, 2000);            
+            }, 2000);
           });
         }, function(response) {
           console.log('CreateEventError: ', response);
@@ -608,14 +615,14 @@ GoCastJS.FacebookEvent = {
         } else if (!self.invitelist.length) {
           $('#invite', $dlg).effect('pulsate', {times: 5}, 1000);
         } else {
-          var timeph = $('#whentime', $dlg).val('').attr('placeholder');
+          timeph = $('#whentime', $dlg).val('').attr('placeholder');
           $('#whentime', $dlg).unbind('focus').focus(function() {
             $(this).unbind('focus').attr('placeholder', timeph);
-          }).attr('placeholder', 'Invalid time'); 
+          }).attr('placeholder', 'Invalid time');
         }
       }
     };
-  } 
+  }
 };
 
 /* version using stream.share

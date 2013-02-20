@@ -892,7 +892,7 @@
         */
         this.xCentre = (width / 2) * 0.9 * 1.1;
         this.yCentre = (height / 2) * 0.6 * 0.8;
-        this.xRadius = (width / 2) * 0.9;
+        this.xRadius = ((width - newWidth/2) / 2) * 0.9;
         this.yRadius = (height / 2) * 0.6;
 
         //app.log(2, "carousel sizes xCentre " + this.xCentre + " yCentre " + this.yCentre +

@@ -58,7 +58,9 @@
     <script type="text/javascript" src="/scripts/strophe.muc.js?GOCASTTIMESTAMP"></script>
     <script type="text/javascript" src="/scripts/strophe.jingle.js?GOCASTTIMESTAMP"></script>
     <script type="text/javascript" src="/scripts/jquery.base64.min.js?GOCASTTIMESTAMP"></script>
+    <script type="text/javascript" src="js/callcast_settings.js?GOCASTTIMESTAMP"></script>
     <script type="text/javascript" src="js/callcast.js?GOCASTTIMESTAMP"></script>
+    <script type="text/javascript" src="js/strophe_connection.js?GOCASTTIMESTAMP"></script>
     <script type="text/javascript" src="js/ibb.js?GOCASTTIMESTAMP"></script>
     <script type="text/javascript" src="js/peerconnection.js?GOCASTTIMESTAMP"></script>
     <script type="text/javascript" src="js/callcast-api.js?GOCASTTIMESTAMP"></script>
@@ -68,6 +70,7 @@
     <script type="text/javascript" src="js/wb.js?GOCASTTIMESTAMP"></script>
     <script type="text/javascript" src="js/gcedit.js?GOCASTTIMESTAMP"></script>
     <script type="text/javascript" src="js/wiki.js?GOCASTTIMESTAMP"></script>
+    <script type="text/javascript" src="js/fileshare.js?GOCASTTIMESTAMP"></script>
     <script type="text/javascript" src="js/index.js?GOCASTTIMESTAMP"></script>
     <script type="text/javascript" src="js/kalendae.js?GOCASTTIMESTAMP" charset="utf-8"></script>
     <script type="text/javascript" src="js/jquery.facebook.multifriend.select.js?GOCASTTIMESTAMP"></script>
@@ -86,7 +89,8 @@
       window.fbAsyncInit = ourAsyncFBInit;
       // login callback
       $(document).bind('checkCredentials', checkCredentials);
-      $(document).bind('deferredCheckCredentials', deferredCheckCredentials);
+      $(document).bind('deferredCheckPlugin', deferredCheckPlugin);
+      $(document).bind('checkPlugin', checkPlugin);
 
       // Load the SDK's source Asynchronously
       (function(d){
@@ -104,6 +108,7 @@
       <div class="feedback gc-icon" id="feedback" title="Send us your feedback."   onclick="openChat(event);"></div>
       <div class="gc-icon"          id="log"      title="Send log file to GoCast." onClick="sendLogPrompt();"></div>
       <div class="gc-icon"          id="taketour" title="Take a tour of GoCast"    onclick="startTour('body > #tour')"></div>
+      <span id="roomname" style="color: white;"><h3></h3></span>
       <div id="send-log-prompt" class="warning">
         <p id="message">Describe the nature of the problem:</p>
         <textarea id="logdesc"></textarea>
@@ -135,11 +140,12 @@
 
       <input class="gc-icon" id="audio" type="button" class="off" title="Audio is Disabled" disabled="disabled"/>
       <input class="gc-icon" id="video" type="button" title="Video is Disabled" disabled="disabled"/>
-      <input class="copyData gc-icon" type="button" title="Email link to room." onclick="openCopyData(event);"/>
+      <input class="copyData gc-icon" type="button" title="Invite others by email." onclick="emailInviteDialog(event);"/>
       <!--<input class="twitter gc-icon" type="button" title="Send message to Twitter." onclick="sendTwitter();"/>-->
       <input class="fbSend gc-icon"  type="button" title="Send facebook message." onclick="fbSendDialog();"/>
       <input class="fbShare gc-icon" type="button" title="Share on wall." onclick="fbShare();"/>
       <input class="fbShare fbevent gc-icon" type="button" title="Create meeting event." onclick="fbEvent();"/>
+      <a id="leavegocast" href="javascript:leaveGoCast();">Exit GoCast</a>
 
       <div id="status-prompt" class="warning">
         <p id="message">The speaker volume is too low for you to hear!</p>
@@ -203,14 +209,10 @@
       </div>
       <div id="copyData" class="window resizable">
          <img class="close" src="images/button-close.png" alt="Close" title="Close" />
-         <p>Copy this and paste this into an email.</p>
          <div id="copyContent">
             <h3>You're Invited To GoCast!</h3>
-            I am using <strong>GoCast</strong>, a new kind of "room" on the Web where people can meet and share on live video.
-            Get started by downloading the GoCast App (currently for Firefox or Chrome only), and join me in my room.
-            To get started, click <a id="copyName">here</a>. See you soon!
             <p></p>
-            <img id="copyLogo" alt="Room Link" title="Room Link" src="images/GoToken.png" />
+            <button type="button">Sign up for a GoCast account</button>
          </div>
       </div>
       <div id="waitingToJoin" class="window resizable">
@@ -270,29 +272,35 @@
         <p>
         <!--<p>Thanks!  We will be waiting for you.</p>-->
       </div>
-      <div id="credentials" class="window resizable">
+      <div id="credentials" class="window resizable" style="text-align: center;">
         <p class="title welcome">Welcome to GoCast!</p>
-        <div id="fb-login-button" class="fb-login-button" data-show-faces="false" data-width="200" data-max-rows="1"
+        <!--<div id="fb-login-button" class="fb-login-button" data-show-faces="false" data-width="200" data-max-rows="1"
             scope="email,user_likes,friends_likes,publish_actions,friends_online_presence,publish_stream,xmpp_login,create_event">Login With Facebook</div>
-        <a id="fb-disabled" class="hidden" href="javascript:void(0);">Login With Facebook -- Currently Unavailable</a>
-        <p class="title optiondesc">
+        <a id="fb-disabled" class="hidden" href="javascript:void(0);">Login With Facebook -- Currently Unavailable</a>-->
+        <input id="gcemail" type="email" placeholder="Email"><br>
+        <input id="gcpassword" type="password" placeholder="Password">
+        <!--<p class="title optiondesc">
           By logging in with Facebook, you can invite your Facebook friends to your GoCast room. You can do this by posting to your wall or sending a Facebook message. When you do this your Facebook name will appear as your GoCast screen name. Also, if you turn your webcam off, your Facebook profile image will replace your video preview.
-        </p>
+        </p>-->
+        <p id="msg" style="color: maroon"></p>
+        <a id="gclogin" href="javascript:void(0);" onclick="enterId({username: document.getElementById('gcemail').value, password: document.getElementById('gcpassword').value});">Login With Your GoCast Account</a>
+        <p></p>
         <div class="divider">-- OR --</div>
-        <a id="noThanks" href="javascript:void(0);" onclick="enterId();">Login Without Facebook</a>
-        <p class="title optiondesc">
+        <p></p>
+        <a id="noThanks" href="javascript:void(0);" onclick="enterId();">Continue As Visitor</a>
+        <p></p>
+        <!--<p class="title optiondesc">
           By logging in without Facebook, you can choose a temporary screen name for your GoCast room. You can invite others to join your room by email. However, when you turn your webcam off, a blank silhouette will replace your video preview.
-        </p>
+        </p>-->
         <!--
         <div id="fb-login-button" class="fb-login-button" data-show-faces="false" data-width="200" data-max-rows="1"
              scope="email,user_likes,friends_likes,publish_actions,friends_online_presence,publish_stream,xmpp_login"></div>
         -->
-
       </div>
       <div id="credentials2" class="window resizable">
-        <p class="title welcome">GoCast Login</p>
+        <p class="title welcome">Choose Your Nickname</p>
         <p class="login-error"></p>
-        <input id="name"  type="text" name="name" placeholder="Your name" maxlength="32"/>
+        <input id="name"  type="text" name="name" placeholder="Nickname (how others will see you)" maxlength="32"/>
         <p id="nickhint" style="font-size: 10px; visibility: hidden;">
           Alphanumerics, spaces,
           <strong>( )</strong> <strong>[ ]</strong>
@@ -300,7 +308,7 @@
           <strong>-</strong> <strong>.</strong>
           <strong>@</strong> are valid
         </p>
-        <input id="email" type="text" placeholder="Email (optional)" />
+        <input id="email" type="email" placeholder="Enter a valid email"/>
         <p></p>
         <a id="btn" type="button" href="javascript:void(0);">GET STARTED</a>
         <!--<div class="divider">-- OR --</div>
@@ -335,6 +343,7 @@
               <input id="audioPreview" type="button" class="off" title="Audio is Disabled" disabled="disabled"/>
               <input id="videoPreview" type="button" title="Video is Disabled" disabled="disabled"/>
             </div>
+            <div class="name"></div>
           </div><!-- mystream -->
           <div class="cloudcarousel" onclick="carouselItemClick(event);">
             <div id="groupChat">
@@ -355,7 +364,7 @@
           <div class="cloudcarousel unoccupied" onclick="carouselItemClick(event);">
             <div class="name"></div>
           </div>
-          <div class="cloudcarousel unoccupied" onclick="carouselItemClick(event);">
+          <!--<div class="cloudcarousel unoccupied" onclick="carouselItemClick(event);">
             <div class="name"></div>
           </div>
           <div class="cloudcarousel unoccupied" onclick="carouselItemClick(event);">
@@ -363,7 +372,7 @@
           </div>
           <div class="cloudcarousel unoccupied" onclick="carouselItemClick(event);">
             <div class="name"></div>
-          </div>
+          </div>-->
         </div><!-- scarousel -->
         <div id="scontrols">
           <!--
@@ -429,29 +438,67 @@
               <label>When</label>
             </th>
             <td>
-              <input id="whendate" style="width: 35%;" type="text" class="field auto-kal"
+              <input id="whendate" style="width: 42%;" type="text" class="field auto-kal"
                      placeholder="Date (mm/dd/yyyy)" data-kal="months: 1, direction: 'today-future'"/>
-              <input id="whentime" style="width: 35.3%;" type="text" class="field"
+              <input id="whentime" style="width: 42%;" type="text" class="field"
                      placeholder="Time (hh:mm AM|PM)"/>
             </td>
           </tr>
-          <!--<tr valign="top">
-            <th>
-              <label>Privacy</label>
-            </th>
-            <td>
-              <select id="privacy" class="field" style="width: 78%;"/>
-                <option value="OPEN">Public</option>
-                <option value="FRIENDS">Friends</option>
-                <option value="SECRET">Invite Only</option>
-              </select>
-            </td>
-          </tr>-->
         </table>
       </div>
       <div id="actionpanel" class="actionpanel">
         <div id="friends"></div>
         <a id="invite" class="button" href="javascript:void(0);">Invite Friends</a>
+        <a id="cancel" class="button negative" href="javascript:void(0);">Cancel</a>
+        <a id="create" class="button positive" href="javascript:void(0);">Create</a>
+      </div>
+    </div>
+    <div id="emailinvite" class="emaildialog">
+      <div id="masker" class="mask"></div>
+      <div id="status" class="status"></div>
+      <div id="title" class="header">
+        Invite Others By Email
+      </div>
+      <div id="infopanel" class="infopanel">
+        <table>
+          <tr valign="top">
+            <th>
+              <label>Emails</label>
+            </th>
+            <td>
+              <textarea id="emails" class="field" placeholder="ex: abc@def.com, ghi@jkl.com, ..."></textarea>
+            </td>
+          </tr>
+          <tr valign="top">
+            <th>
+              <label>Note to invitees</label>
+            </th>
+            <td>
+              <textarea id="details" class="field" placeholder="ex: Please come to my room."></textarea>
+            </td>
+          </tr>
+          <tr valign="top">
+            <th>
+              <label>Where</label>
+            </th>
+            <td>
+               <div id="roomlink" class="field"></div>
+            </td>
+          </tr>
+          <tr valign="top">
+            <th>
+              <label>When</label>
+            </th>
+            <td>
+              <input id="whendate" style="width: 42%;" type="text" class="field auto-kal"
+                     placeholder="Date (mm/dd/yyyy)" data-kal="months: 1, direction: 'today-future'"/>
+              <input id="whentime" style="width: 42%;" type="text" class="field"
+                     placeholder="Time (hh:mm AM|PM)"/>
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div id="actionpanel" class="actionpanel">
         <a id="cancel" class="button negative" href="javascript:void(0);">Cancel</a>
         <a id="create" class="button positive" href="javascript:void(0);">Create</a>
       </div>
@@ -464,5 +511,40 @@
       <div id="note">(This is your local view. You are not sharing this view with anyone else.)</div>
       <div id="filecontent"></div>
     </div>
+    <script type="text/javascript" src="js/jquery.utils.js?GOCASTTIMESTAMP"></script>
+    <!-- Google Code for Remarketing tag -->
+    <!-- Remarketing tags may not be associated with personally identifiable information or placed on pages related to sensitive categories. For instructions on adding this tag and more information on the above requirements, read the setup guide: google.com/ads/remarketingsetup -->
+    <script type="text/javascript">
+      /* <![CDATA[ */
+      var google_conversion_id = 989217871;
+      var google_conversion_label = "JwUyCMnOswQQz4jZ1wM";
+      var google_custom_params = window.google_tag_params;
+      var google_remarketing_only = true;
+      /* ]]> */
+    </script>
+    <script type="text/javascript" src="//www.googleadservices.com/pagead/conversion.js"></script>
+    <!-- Google Analytics -->
+    <script type="text/javascript">
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-37964802-1']);
+        _gaq.push(['_trackPageview']);
+
+        if (window.location.hostname !== 'dev.gocast.it') {
+            (function() {
+                var ga = document.createElement('script'),
+                    s = document.getElementsByTagName('script')[0];
+
+                ga.type = 'text/javascript';
+                ga.async = true;
+                ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') +
+                         '.google-analytics.com/ga.js';
+                s.parentNode.insertBefore(ga, s);
+          })();
+        }
+        else {
+          console.log('Skipped Google Analytics - dev.');
+        }
+    </script>
+    <!-- End Google Analytics -->
   </body>
 </html>
