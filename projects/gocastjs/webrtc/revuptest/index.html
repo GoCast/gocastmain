@@ -126,9 +126,9 @@
                     pluginmap['peer1'] = fulljid;
                 }
 
-                console.log('ICESERVERS: ' + JSON.stringify(iceservers[$.urlvars.turn || 'stun']));
+                console.log('ICESERVERS: ' + JSON.stringify(iceservers[$.urlvars.turn ? 'turn' : 'stun']));
                 options = new GoCastJS.PeerConnectionOptions(
-                    player, fulljid, iceservers[$.urlvars.turn || 'stun'],
+                    player, fulljid, iceservers[$.urlvars.turn ? 'turn' : 'stun'],
                     function(sdp) {
                         console.log('Peer [' + fulljid + ']: onice: ' + sdp);
                         conn.send($msg({to: fulljid, type: 'chat'}).c('candidate').t(sdp));

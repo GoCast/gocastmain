@@ -51,6 +51,16 @@ Index: libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_
  
  // ****************** over-written OS methods ***********************
  #pragma mark **** over-written OS methods
+@@ -41,6 +41,9 @@
+ /// ***** Objective-C. Similar to C++ destructor
+ /// ***** Returns nothing
+ - (void)dealloc {
++    if(_captureDevicesInfo) {
++        [_captureDevicesInfo release];
++    }
+     [super dealloc];
+ }
+ 
 Index: libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_qtkit_info.h
 ===================================================================
 --- libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_qtkit_info.h	(revision 3501)
@@ -95,6 +105,25 @@ Index: libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_
      
      // QTKit variables
      QTCaptureSession*                    _captureSession;
+@@ -50,7 +50,6 @@
+     NSArray*                            _captureDevices;
+     int                                    _captureDeviceCount;
+     int                                    _captureDeviceIndex;
+-    NSString*                            _captureDeviceName;
+     char                                _captureDeviceNameUTF8[1024];
+     char                                _captureDeviceNameUniqueID[1024];
+     char                                _captureDeviceNameProductID[1024];
+@@ -58,10 +57,6 @@
+     NSNumber*                            _val;
+     NSDictionary*                        _videoSettings;
+     NSString*                            _captureQuality;
+-    
+-    // other
+-    NSAutoreleasePool*                    _pool;
+-
+ }
+ /**************************************************************************
+  *
 Index: libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_qtkit_info.mm
 ===================================================================
 --- libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_qtkit_info.mm	(revision 3501)
@@ -121,15 +150,82 @@ Index: libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_
  
  #pragma mark **** over-written OS methods
  
-@@ -292,7 +292,7 @@
+@@ -49,8 +49,37 @@
+     if(_captureSession)
+     {
+         [_captureSession stopRunning];
++    }
++    
++    if(_captureDecompressedVideoOutput)
++    {
++        [_captureDecompressedVideoOutput release];
++    }
++    
++    if(_captureVideoDeviceInput)
++    {
++        if([[_captureVideoDeviceInput device] isOpen])
++        {
++            [[_captureVideoDeviceInput device] close];
++        }
++        [_captureVideoDeviceInput release];
++    }
++    
++    if(_captureSession)
++    {
+         [_captureSession release];
+     }
++
++    if(_captureDevices)
++    {
++        [_captureDevices release];
++    }
++
++    if(_rLock)
++    {
++        [_rLock release];
++    }
++    
+     [super dealloc];
+ }
+ 
+@@ -279,8 +308,6 @@
+         return [NSNumber numberWithInt:0];
+     }
+ 
+-    _pool = [[NSAutoreleasePool alloc]init];
+-
+     memset(_captureDeviceNameUTF8, 0, 1024);
+     _counter = 0;
+     _framesDelivered = 0;
+@@ -291,8 +318,7 @@
+     _frameRate = DEFAULT_FRAME_RATE;
      _frameWidth = DEFAULT_FRAME_WIDTH;
      _frameHeight = DEFAULT_FRAME_HEIGHT;
-     _captureDeviceName = [[NSString alloc] initWithFormat:@""];
+-    _captureDeviceName = [[NSString alloc] initWithFormat:@""];
 -    _rLock = [[VideoCaptureRecursiveLock alloc] init];
 +    _rLock = [[VideoCaptureRecursiveLock1 alloc] init];
      _captureSession = [[QTCaptureSession alloc] init];
      _captureDecompressedVideoOutput = [[QTCaptureDecompressedVideoOutput alloc]
                                          init];
+@@ -359,18 +385,9 @@
+         return [NSNumber numberWithInt:-1];
+     }
+ 
+-    QTCaptureDevice* videoDevice =
+-        (QTCaptureDevice*)[_captureDevices objectAtIndex:0];
+-
+     bool success = NO;
+     NSError*    error;
+ 
+-    success = [videoDevice open:&error];
+-    if(!success)
+-    {
+-        return [NSNumber numberWithInt:-1];
+-    }
+-
+     [_captureDecompressedVideoOutput setPixelBufferAttributes:
+         [NSDictionary dictionaryWithObjectsAndKeys:
+             [NSNumber numberWithDouble:_frameWidth], (id)kCVPixelBufferWidthKey,
 Index: libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_qtkit.h
 ===================================================================
 --- libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_qtkit.h	(revision 3501)

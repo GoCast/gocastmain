@@ -18,6 +18,7 @@ GCPAPI::~GCPAPI()
     DeletePeerConnection();
     if("localPlayer" == m_htmlId.convert_cast<std::string>())
     {
+        GoCast::RtcCenter::Instance(true);
         GoCast::JSLogger::Instance()->ClearLogFunction();
     }
 }
