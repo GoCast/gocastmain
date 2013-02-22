@@ -571,6 +571,7 @@ var Callcast = {
             this.bUseVideo = true;
         }
         else if (v_use === false) {
+//            console.error('SetUseVideo: Setting bUseVideo to FALSE.');
             this.bUseVideo = false;
         }
     },
@@ -637,7 +638,6 @@ var Callcast = {
 
     IsVideoEnabled: function() {
         if (!this.mediaHints.video) {
-            this.bUseVideo = false;
             return false;
         }
         else {
@@ -646,10 +646,6 @@ var Callcast = {
     },
 
     IsVideoDeviceAvailable: function() {
-        if (!this.mediaHints.video) {
-            this.bUseVideo = false;
-        }
-
         return this.mediaHints.video;
     },
 
@@ -685,6 +681,7 @@ var Callcast = {
 
         // Backwards compatibility allows true/false as an input and also a JSON object {width: w, height: h}
         if (send_it === true || send_it === false) {
+//            console.error('SendLocalVideoToPeers: Setting bUseVideo to: ', send_it);
             this.bUseVideo = send_it;
         }
 
