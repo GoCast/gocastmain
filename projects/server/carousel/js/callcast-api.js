@@ -517,7 +517,7 @@ function assignSpotForParticipant(nickname) {
 function addPluginForParticipant(nickname) {
   var id = app.str2id(nickname),
       oo = $('#meeting > #streams > #scarousel div.cloudcarousel#'+ id).get(0),
-      w, h;
+      w=0, h=0;
 
   if (!nickname) {
     app.log(4, "addPluginForParticipant: nickname undefined");
@@ -1159,34 +1159,18 @@ function readyStateCb(state, jid, nick)
     console.log("readyStateCb", state, jid, nick);
 
     if (jqOo.length > 0) {
-      switch(state) {
-        case 'NEGOTIATING':
-          jqOo.css("background-image", 'url("images/waiting-trans.gif")');
-          $('object', jqOo).css('visibility', 'hidden');
-        break;
-        case 'CONNECTED':
+      if (state === 'connected') {
           participant = Callcast.participants[nick];
           if (!participant) {throw "participant " + nick + " not found";}
           if (!participant.image) {throw "participant image for " + nick + " not found";}
           console.log("participant", participant);
           $('object', jqOo).css('visibility', 'visible');
-          if (!participant.videoOn)
-          {
-            jqOo.css('background-image', participant.image);
-          }
-        break;
-        case 'DEFUNCT':
-          jqOo.css("background-image", 'url("images/warning.png")');
-          if (!app.defunctAlertShown && !app.defunctAlertShowing) {
-            app.defunctAlertShowing = true;
-            showWarning('Media Connection Problem',
-                        'We were unable to connect you with one or more participants through video. ' +
-                        'You can still chat with everyone in the room, and also use the notepad and the whiteboard. ' +
-                        'The connectivity problem might be due to firewall issues. If you have your firewall turned on, ' +
-                        'you can temporarily disable it and then reload the page to try connecting again. ');
-            app.defunctAlertShown = true;
-          }
-          break;
+          // Make the background image always your image or 'chess piece'.
+          jqOo.css('background-image', participant.image);
+      }
+      else {
+          jqOo.css("background-image", 'url("images/waiting-trans.gif")');
+          $('object', jqOo).css('visibility', 'hidden');
       }
     }
 
