@@ -24,9 +24,9 @@ void GCP::StaticInitialize()
     // Place one-time initialization stuff here; As of FireBreath 1.4 this should only
     // be called once per process
     
-    FBLOG_INFO_CUSTOM("GCP::StaticInitalize", "Initing RtcCenter singleton...");
+    /*FBLOG_INFO_CUSTOM("GCP::StaticInitalize", "Initing RtcCenter singleton...");
     GoCast::RtcCenter::Instance();
-    FBLOG_INFO_CUSTOM("GCP::StaticInitalize", "Initing RtcCenter singleton DONE...");
+    FBLOG_INFO_CUSTOM("GCP::StaticInitalize", "Initing RtcCenter singleton DONE...");*/
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -41,9 +41,9 @@ void GCP::StaticDeinitialize()
     // Place one-time deinitialization stuff here. As of FireBreath 1.4 this should
     // always be called just before the plugin library is unloaded
     
-    FBLOG_INFO_CUSTOM("GCP::StaticDeinitalize", "Destroying RtcCenter singleton...");
+    /*FBLOG_INFO_CUSTOM("GCP::StaticDeinitalize", "Destroying RtcCenter singleton...");
     GoCast::RtcCenter::Instance(true);
-    FBLOG_INFO_CUSTOM("GCP::StaticDeinitalize", "Destroying RtcCenter singleton DONE...");
+    FBLOG_INFO_CUSTOM("GCP::StaticDeinitalize", "Destroying RtcCenter singleton DONE...");*/
     GoCast::JSLogger::Instance(true);
 }
 

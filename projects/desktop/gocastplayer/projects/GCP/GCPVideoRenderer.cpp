@@ -11,6 +11,7 @@ namespace GoCast
     , m_width(0)
     , m_height(0)
     , m_bPreview(false)
+    , m_bRenderLogged(false)
     {
 
     }
@@ -23,13 +24,14 @@ namespace GoCast
     
     void GCPVideoRenderer::SetSize(int width, int height)
     {
-        //resize not implemented yet
+        boost::mutex::scoped_lock winLock(m_winMutex);
+        m_width = width;
+        m_height = height;
     }
     
     void GCPVideoRenderer::RenderFrame(const cricket::VideoFrame* pFrame)
     {
         boost::mutex::scoped_lock winLock(m_winMutex);
-        static bool bRenderLogged = false;
         
         if(NULL == m_pFrameBuffer)
         {
@@ -54,10 +56,10 @@ namespace GoCast
         //convert to rgba and correct alpha
         ConvertToRGBA();
         
-        if(false == bRenderLogged)
+        if(false == m_bRenderLogged)
         {
             FBLOG_INFO_CUSTOM("GCPVideoRenderer::RenderFrame", "First frame rendered");
-            bRenderLogged = true;
+            m_bRenderLogged = true;
         }
         
         //trigger window refresh event
