@@ -25,10 +25,10 @@
                             videoin: plugin.videoinopts['default'],
                             webrtc: {
                                 mandatory: {
-                                    minWidth: '160',
-                                    maxWidth: '160',
-                                    minHeight: '120',
-                                    maxHeight: '120',
+                                    minWidth: '640',
+                                    maxWidth: '640',
+                                    minHeight: '480',
+                                    maxHeight: '480',
                                     minFrameRate: '14',
                                     maxFrameRate: '14'
                                 }
@@ -112,57 +112,60 @@
                 };
             };
 
-            var initpeerconnection = function(fulljid, negotiationCallback, sdp) {
-                var peerconnection = null, player = null, options;
+            var initpeerconnection = function(fulljid, onpc, negotiationCallback, sdp) {
+                var peerconnection = null, player = null, container, options;
 
                 hangupOnPeer(fulljid);
                 if (!pluginmap['peer0']) {
-                    $('#peer0').html(remoteplayertmpl);
-                    player = $('body > #peer0 > .peerconn').get(0);
-                    pluginmap['peer0'] = fulljid;
+                    container = 'peer0';
                 } else if (!pluginmap['peer1']) {
-                    $('#peer1').html(remoteplayertmpl);
-                    player = $('body > #peer1 > .peerconn').get(0);
-                    pluginmap['peer1'] = fulljid;
+                    container = 'peer1';
                 }
 
-                console.log('ICESERVERS: ' + JSON.stringify(iceservers[$.urlvars.turn ? 'turn' : 'stun']));
-                options = new GoCastJS.PeerConnectionOptions(
-                    player, fulljid, iceservers[$.urlvars.turn ? 'turn' : 'stun'],
-                    function(sdp) {
-                        console.log('Peer [' + fulljid + ']: onice: ' + sdp);
-                        conn.send($msg({to: fulljid, type: 'chat'}).c('candidate').t(sdp));
-                    },
-                    function(stream) {
-                        console.log('Peer [' + fulljid + ']: Added remote stream ' + stream.label);
-                        peerconnection.Width(320);
-                        peerconnection.Height(240);
-                    },
-                    function(stream) {
-                        console.log('Peer [' + fulljid + ']: Removed remote stream ' + stream.label);
-                        peerconnection.Width(0);
-                        peerconnection.Height(0);
-                    },
-                    function(state) {
-                        console.log('Peer [' + fulljid + ']: sigstate = ' + state);
-                    },
-                    function(state) {
-                        console.log('Peer [' + fulljid + ']: icestate = ' + state);
+                $('#' + container).html(remoteplayertmpl);
+                pluginmap[container] = fulljid;
+
+                setTimeout(function() {
+                    player = $('#' + container + ' > .peerconn').get(0);
+                    console.log('ICESERVERS: ' + JSON.stringify(iceservers[$.urlvars.turn ? 'turn' : 'stun']));
+                    options = new GoCastJS.PeerConnectionOptions(
+                        player, fulljid, iceservers[$.urlvars.turn ? 'turn' : 'stun'],
+                        function(sdp) {
+                            console.log('Peer [' + fulljid + ']: onice: ' + sdp);
+                            conn.send($msg({to: fulljid, type: 'chat'}).c('candidate').t(sdp));
+                        },
+                        function(stream) {
+                            console.log('Peer [' + fulljid + ']: Added remote stream ' + stream.label);
+                            peerconnection.Width(640);
+                            peerconnection.Height(480);
+                        },
+                        function(stream) {
+                            console.log('Peer [' + fulljid + ']: Removed remote stream ' + stream.label);
+                            peerconnection.Width(0);
+                            peerconnection.Height(0);
+                        },
+                        function(state) {
+                            console.log('Peer [' + fulljid + ']: sigstate = ' + state);
+                        },
+                        function(state) {
+                            console.log('Peer [' + fulljid + ']: icestate = ' + state);
+                        }
+                    );
+
+                    onpc = onpc || function(pc) {};
+                    peerconnection = new GoCastJS.PeerConnection(options);
+                    onpc(peerconnection);
+                    if ($.urlvars.audio || $.urlvars.video) {
+                        peerconnection.AddStream(localstream, negotiationCallback(peerconnection, sdp));
+                    } else {
+                        negotiationCallback(peerconnection, sdp)();
                     }
-                );
-
-                peerconnection = new GoCastJS.PeerConnection(options);
-                if ($.urlvars.audio || $.urlvars.video) {
-                    peerconnection.AddStream(localstream, negotiationCallback(peerconnection, sdp));
-                } else {
-                    negotiationCallback(peerconnection, sdp)();
-                }
-
-                return peerconnection;
+                }, 1000);
             };
 
             var callpeer = function(fulljid) {
-                peerconnections[fulljid] = initpeerconnection(fulljid, callernegotiationcallback);
+                var onpc = function(pc) { peerconnections[fulljid] = pc; };
+                initpeerconnection(fulljid, onpc, callernegotiationcallback);
                 
             };
 
@@ -179,7 +182,8 @@
             };
 
             var acceptofferfrompeer = function(fulljid, sdp) {
-                peerconnections[fulljid] = initpeerconnection(fulljid, calleenegotiationcallback, sdp);
+                var onpc = function(pc) { peerconnections[fulljid] = pc; };
+                initpeerconnection(fulljid, onpc, calleenegotiationcallback, sdp);
             };
 
             var addcandidateforpeer = function(fulljid, sdp) {
@@ -238,8 +242,9 @@
 
                 addStanzaHandlers();
                 addStanzaHandlers = null;
-                $('body > #preview').append('<object id="localPlayer" type="application/x-gocastplayer" width="320" height="240">' +
-                                            '<param name="onload" value="onlocalplayerloaded"></param></object>');
+                $('body > #preview').append('<object id="localPlayer" type="application/x-gocastplayer" ' +
+                                            'width="640" height="480"><param name="onload" value="onlocalplayerloaded">' +
+                                            '</param></object>');
             });
 
             $(document).on('offline', function() {

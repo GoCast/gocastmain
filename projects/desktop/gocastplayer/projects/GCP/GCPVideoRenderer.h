@@ -45,6 +45,7 @@ namespace GoCast
         int m_width;
         int m_height;
         bool m_bPreview;
+        bool m_bRenderLogged;
     };
 }
 
