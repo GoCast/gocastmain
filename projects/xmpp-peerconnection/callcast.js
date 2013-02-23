@@ -794,7 +794,7 @@ var Callcast = {
 
     InitGocastPlayer: function(jqSelector, success, failure) {
         if (!this.localplayer) {
-            var k, settings;
+            var k, settings, capwidth, capheight, capfps;
 
             // On successful init, we note that the plugin is successfully loaded.
             this.bPluginLoadedSuccessfully = true;
@@ -811,15 +811,20 @@ var Callcast = {
 
             this.mediaHints = {audio: true, video: true};
 
+            // localStorage is always a string - so it's perfect for this. No conversions or checks reqd.
+            capwidth = window.localStorage.capwidth || '320';
+            capheight = window.localStorage.capheight || '240';
+            capfps = window.localStorage.capfps || '14';
+
             this.mediaHints.videoconstraints = { videoin: settings.videoin || '',
                                                  webrtc: {
                                                     mandatory: {
-                                                        minWidth: '160',
-                                                        maxWidth: '160',
-                                                        minHeight: '120',
-                                                        maxHeight: '120',
-                                                        minFrameRate: '14',
-                                                        maxFrameRate: '14'
+                                                        minWidth: capwidth,
+                                                        maxWidth: capwidth,
+                                                        minHeight: capheight,
+                                                        maxHeight: capheight,
+                                                        minFrameRate: capfps,
+                                                        maxFrameRate: capfps
                                                     }
                                                  }
                                                 };
