@@ -155,28 +155,36 @@ Index: libjingle/trunk/talk/app/webrtc/localvideosource.cc
 ===================================================================
 --- libjingle/trunk/talk/app/webrtc/localvideosource.cc	(revision 284)
 +++ libjingle/trunk/talk/app/webrtc/localvideosource.cc	(working copy)
-@@ -67,16 +67,17 @@
+@@ -67,7 +67,7 @@
  // Default resolution. If no constraint is specified, this is the resolution we
  // will use.
  static const cricket::VideoFormatPod kDefaultResolution =
 -    {640, 480, FPS_TO_INTERVAL(30), cricket::FOURCC_ANY};
-+    {160, 120, FPS_TO_INTERVAL(14), cricket::FOURCC_ANY};
++    {160, 120, FPS_TO_INTERVAL(15), cricket::FOURCC_ANY};
  
  // List of formats used if the camera don't support capability enumeration.
  static const cricket::VideoFormatPod kVideoFormats[] = {
--  {1280, 720, FPS_TO_INTERVAL(30), cricket::FOURCC_ANY},
--  {960, 720, FPS_TO_INTERVAL(30), cricket::FOURCC_ANY},
--  {640, 360, FPS_TO_INTERVAL(30), cricket::FOURCC_ANY},
--  {640, 480, FPS_TO_INTERVAL(30), cricket::FOURCC_ANY},
--  {320, 240, FPS_TO_INTERVAL(30), cricket::FOURCC_ANY},
+@@ -76,7 +76,22 @@
+   {640, 360, FPS_TO_INTERVAL(30), cricket::FOURCC_ANY},
+   {640, 480, FPS_TO_INTERVAL(30), cricket::FOURCC_ANY},
+   {320, 240, FPS_TO_INTERVAL(30), cricket::FOURCC_ANY},
 -  {320, 180, FPS_TO_INTERVAL(30), cricket::FOURCC_ANY}
-+  {1280, 720, FPS_TO_INTERVAL(14), cricket::FOURCC_ANY},
-+  {960, 720, FPS_TO_INTERVAL(14), cricket::FOURCC_ANY},
-+  {640, 360, FPS_TO_INTERVAL(14), cricket::FOURCC_ANY},
-+  {640, 480, FPS_TO_INTERVAL(14), cricket::FOURCC_ANY},
-+  {320, 240, FPS_TO_INTERVAL(14), cricket::FOURCC_ANY},
-+  {320, 180, FPS_TO_INTERVAL(14), cricket::FOURCC_ANY},
-+  {160, 120, FPS_TO_INTERVAL(14), cricket::FOURCC_ANY}
++  {320, 180, FPS_TO_INTERVAL(30), cricket::FOURCC_ANY},
++  {160, 120, FPS_TO_INTERVAL(30), cricket::FOURCC_ANY},
++  {1280, 720, FPS_TO_INTERVAL(24), cricket::FOURCC_ANY},
++  {960, 720, FPS_TO_INTERVAL(24), cricket::FOURCC_ANY},
++  {640, 360, FPS_TO_INTERVAL(24), cricket::FOURCC_ANY},
++  {640, 480, FPS_TO_INTERVAL(24), cricket::FOURCC_ANY},
++  {320, 240, FPS_TO_INTERVAL(24), cricket::FOURCC_ANY},
++  {320, 180, FPS_TO_INTERVAL(24), cricket::FOURCC_ANY},
++  {160, 120, FPS_TO_INTERVAL(24), cricket::FOURCC_ANY},
++  {1280, 720, FPS_TO_INTERVAL(15), cricket::FOURCC_ANY},
++  {960, 720, FPS_TO_INTERVAL(15), cricket::FOURCC_ANY},
++  {640, 360, FPS_TO_INTERVAL(15), cricket::FOURCC_ANY},
++  {640, 480, FPS_TO_INTERVAL(15), cricket::FOURCC_ANY},
++  {320, 240, FPS_TO_INTERVAL(15), cricket::FOURCC_ANY},
++  {320, 180, FPS_TO_INTERVAL(15), cricket::FOURCC_ANY},
++  {160, 120, FPS_TO_INTERVAL(15), cricket::FOURCC_ANY}
  };
  
  MediaSourceInterface::SourceState
