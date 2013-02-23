@@ -15,7 +15,7 @@
                     turn: [{uri: 'turn:manjeshtest2@dev.gocast.it:3478', password: 'manjeshpass2'}]
                 },
                 peerconnections = {};
-                remoteplayertmpl = '<object class="peerconn" type="application/x-gocastplayer" width="0" height="0"></object>',
+                remoteplayertmpl = '<object class="peerconn" type="application/x-gocastplayer" width="1" height="1"></object>',
                 onlocalplayerloaded = function() {
                 var plugin = document.getElementById('localPlayer'),
                     options = new GoCastJS.UserMediaOptions({
@@ -141,8 +141,8 @@
                         },
                         function(stream) {
                             console.log('Peer [' + fulljid + ']: Removed remote stream ' + stream.label);
-                            peerconnection.Width(0);
-                            peerconnection.Height(0);
+                            peerconnection.Width(1);
+                            peerconnection.Height(1);
                         },
                         function(state) {
                             console.log('Peer [' + fulljid + ']: sigstate = ' + state);
