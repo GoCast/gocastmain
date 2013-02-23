@@ -814,7 +814,7 @@ var Callcast = {
             // localStorage is always a string - so it's perfect for this. No conversions or checks reqd.
             capwidth = window.localStorage.capwidth || '320';
             capheight = window.localStorage.capheight || '240';
-            capfps = window.localStorage.capfps || '14';
+            capfps = window.localStorage.capfps || '15';
 
             this.mediaHints.videoconstraints = { videoin: settings.videoin || '',
                                                  webrtc: {
@@ -964,7 +964,6 @@ var Callcast = {
             if ('undefined' !== typeof(stream) && null !== stream) {
                 Callcast.log('Callee:' + self.GetID() + ' onaddstream: added remote stream [' +
                             stream.label + ']');
-                self.stream = stream;
             }
         };
 
@@ -1077,7 +1076,8 @@ var Callcast = {
                 this.peer_connection = new GoCastJS.PeerConnection(
                         new GoCastJS.PeerConnectionOptions(
                             this.AddPluginResult, this.jid,
-                            [ {uri: 'turn:manjeshtest2@dev.gocast.it:3478', password: 'manjeshpass2'}],
+                            [ {uri: 'turn:manjeshtest2@dev.gocast.it:3478', password: 'manjeshpass2'},
+                              {uri: 'stun:stun.l.google.com:19302'}],
                             this.onicecandidate, this.onaddstream, this.onremovestream,
                             this.onsignalingstatechange, this.onconnectionstatechange
                             ));
@@ -1249,6 +1249,7 @@ var Callcast = {
     //                Callcast.log('CompleteCall: Offer-SDP=' + this.offer);
 
                     try {
+
                         this.peer_connection.SetRemoteDescription('offer', this.offer, function() {
                             try {
                                 self.peer_connection.CreateAnswer(function(sdp) {

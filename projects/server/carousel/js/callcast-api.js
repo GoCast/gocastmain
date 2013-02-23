@@ -517,7 +517,7 @@ function assignSpotForParticipant(nickname) {
 function addPluginForParticipant(nickname) {
   var id = app.str2id(nickname),
       oo = $('#meeting > #streams > #scarousel div.cloudcarousel#'+ id).get(0),
-      w=0, h=0;
+      w=1, h=1;
 
   if (!nickname) {
     app.log(4, "addPluginForParticipant: nickname undefined");
