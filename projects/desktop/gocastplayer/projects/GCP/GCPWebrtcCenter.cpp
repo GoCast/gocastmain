@@ -1317,6 +1317,17 @@ namespace GoCast
         
         m_pPeerConns[pluginId] = NULL;
         m_pPeerConns.erase(pluginId);
+        
+        if("localPlayer" == pluginId)
+        {
+            while(!m_pPeerConns.empty())
+            {
+                RemoveRemoteStream(m_pPeerConns.begin()->first);
+                m_pPeerConns.begin()->second = NULL;
+                m_pPeerConns.erase(m_pPeerConns.begin());
+            }
+        }
+        
         return true;
     }
 }
