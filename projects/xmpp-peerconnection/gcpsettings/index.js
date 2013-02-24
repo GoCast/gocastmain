@@ -142,9 +142,23 @@ var SettingsUI = {
 				SettingsApp.testSettings({
 					video: ('' !== vin),
 					audio: ('' !== ain),
-					videoin: vin,
-					audioin: ain,
-					audioout: aout
+					videoconstraints: {
+						videoin: vin,
+						webrtc: {
+							mandatory: {
+								minWidth: '320',
+								maxWidth: '320',
+								minHeight: '240',
+								maxHeight: '240',
+								minFrameRate: '15',
+								maxFrameRate: '30'
+							}
+						}
+					},
+					audioconstraints: {
+						audioin: ain,
+						audioout: aout
+					}
 				});
 
 				self.timer = null;
@@ -189,6 +203,14 @@ var SettingsApp = {
 	remoteStream: null,
 	peerConnection: null,
 	deviceChecker: null,
+	createsdpconstraints: {
+		sdpconstraints: {
+			mandatory: {
+				OfferToReceiveAudio: 'true',
+                OfferToReceiveVideo: 'true'
+            }
+        }
+    },
 
 	init: function() {	 		 
 		this.$localplayer = $(document.getElementById('local'));
@@ -246,8 +268,7 @@ var SettingsApp = {
 
 		var options = new GoCastJS.UserMediaOptions(mediaHints,
 													this.$localplayer.get(0));
-		GoCastJS.getUserMedia(options,
-							  this.getUserMediaSuccessCallback(),
+		GoCastJS.getUserMedia(options, this.getUserMediaSuccessCallback(),
 							  this.getUserMediaFailureCallback());
 	},
 
@@ -374,8 +395,8 @@ var SettingsApp = {
 
 				SettingsUI.enableEffectsSelect(true);
 			} else {
-				self.$localplayer.get(0).width = 0;
-				self.$localplayer.get(0).width = 0;				
+				self.$localplayer.get(0).width = 1;
+				self.$localplayer.get(0).width = 1;				
 			}
 
 			if (0 < self.localStream.audioTracks.length) {
@@ -384,32 +405,21 @@ var SettingsApp = {
 			}
 
 			var options = new GoCastJS.PeerConnectionOptions(
-				'STUN video.gocast.it:19302',
+				self.$remoteplayer.get(0),
+				'remoteVideo', [],
 				self.iceCallback(),
 				self.addStreamCallback(),
 				self.removeStreamCallback(),
-				self.readyStateChangedCallback(),
-				self.$remoteplayer.get(0)
+				self.sigStateChangedCallback(),
+				self.connStateChangedCallback()
 			);
 
 			self.peerConnection = new GoCastJS.PeerConnection(options);
 
 			if (hints.audio || hints.video) {
-				self.peerConnection.AddStream(self.localStream);
+				self.peerConnection.AddStream(self.localStream,
+											  self.negotiationCallback(self.peerConnection));
 			}
-
-			var offer = self.peerConnection.CreateOffer({audio: true, video: true});
-			self.peerConnection.SetLocalDescription(
-				'OFFER',
-				offer,
-				function() {
-					self.peerConnection.SetRemoteDescription('ANSWER', offer);
-					self.peerConnection.StartIce();
-				},
-				function(msg) {
-					console.log('PeerConnection: ' + msg);
-				}
-			);
 		};
 	},
 
@@ -425,10 +435,8 @@ var SettingsApp = {
 	iceCallback: function() {
 		var self = this;
 
-		return function(candidate, moreComing) {
-			if (true === moreComing) {
-				self.peerConnection.ProcessIceMessage(candidate);
-			}
+		return function(candidate) {
+			self.peerConnection.AddIceCandidate(candidate);
 		};
 	},
 
@@ -448,12 +456,39 @@ var SettingsApp = {
 		};
 	},
 
-	readyStateChangedCallback: function() {
+	sigStateChangedCallback: function() {
+		var self = this;
+
+		return function(state) {
+			console.log('PeerConnection: SigState = ' + state);
+		};
+	},
+
+	connStateChangedCallback: function() {
+		var self = this;
+
+		return function(state) {
+			console.log('PeerConnection: ConnState = ' + state);
+		};
+	},
+
+	negotiationCallback: function(pc) {
 		var self = this;
 
 		return function() {
-			console.log('PeerConnection: ReadyState = ' +
-						self.peerConnection.ReadyState());
+			pc.CreateOffer(function(sdp) {
+				pc.SetLocalDescription('offer', sdp, function() {
+					pc.SetRemoteDescription('answer', sdp, function() {
+						console.log('Offer/Answer negotiation complete');
+					}, function(err) {
+						console.log('SetRemoteDescription: ' + err);
+					});
+				}, function(err) {
+					console.log('SetLocalDescription: ' + err);
+				});
+			}, function(err) {
+				console.log('CreateOffer: ' + err);
+			}, self.createsdpconstraints);
 		};
 	}
 };
