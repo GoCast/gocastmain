@@ -2,6 +2,17 @@ Index: libjingle/trunk/talk/media/webrtc/webrtcvoiceengine.cc
 ===================================================================
 --- libjingle/trunk/talk/media/webrtc/webrtcvoiceengine.cc	(revision 284)
 +++ libjingle/trunk/talk/media/webrtc/webrtcvoiceengine.cc	(working copy)
+@@ -65,9 +65,9 @@
+ };
+ 
+ static const CodecPref kCodecPrefs[] = {
++  { "OPUS",   48000,  2, 111, true },
+   { "ISAC",   16000,  1, 103, true },
+   { "ISAC",   32000,  1, 104, true },
+-  { "OPUS",   48000,  2, 111, true },
+   { "CELT",   32000,  1, 109, true },
+   { "CELT",   32000,  2, 110, true },
+   { "G722",   16000,  1, 9,   false },
 @@ -869,6 +869,35 @@
    return true;
  }
@@ -204,6 +215,24 @@ Index: libjingle/trunk/talk/app/webrtc/webrtcsession.cc
    voice_channel_->MuteStream(ssrc, !enable);
    if (enable)
      voice_channel_->SetChannelOptions(options);
+Index: libjingle/trunk/talk/app/webrtc/mediastreamsignaling.cc
+===================================================================
+--- libjingle/trunk/talk/app/webrtc/mediastreamsignaling.cc	(revision 284)
++++ libjingle/trunk/talk/app/webrtc/mediastreamsignaling.cc	(working copy)
+@@ -93,6 +93,13 @@
+   std::string value;
+   size_t mandatory_constraints_satisfied = 0;
+ 
++  if(FindConstraint(constraints,
++                    "AudioCodec",
++                    &value,
++                    &mandatory_constraints_satisfied)) {
++      options->preffered_acodec_name = value;
++  }
++    
+   if (FindConstraint(constraints,
+                      MediaConstraintsInterface::kOfferToReceiveAudio,
+                      &value, &mandatory_constraints_satisfied)) {
 Index: libjingle/trunk/talk/session/media/channelmanager.cc
 ===================================================================
 --- libjingle/trunk/talk/session/media/channelmanager.cc	(revision 284)
@@ -355,3 +384,92 @@ Index: libjingle/trunk/talk/session/media/channelmanager.h
    std::string camera_device_;
    VideoEncoderConfig default_video_encoder_config_;
    VideoRenderer* local_renderer_;
+Index: libjingle/trunk/talk/session/media/mediasession.cc
+===================================================================
+--- libjingle/trunk/talk/session/media/mediasession.cc	(revision 284)
++++ libjingle/trunk/talk/session/media/mediasession.cc	(working copy)
+@@ -619,6 +619,7 @@
+     bool add_legacy_stream,
+     StreamParamsVec* current_streams,
+     MediaContentDescriptionImpl<C>* offer) {
++    
+   offer->AddCodecs(codecs);
+   offer->SortCodecs();
+ 
+@@ -836,7 +837,7 @@
+   VideoCodecs video_codecs;
+   DataCodecs data_codecs;
+   GetCodecsToOffer(current_description, &audio_codecs, &video_codecs,
+-                   &data_codecs);
++                   &data_codecs, options);
+ 
+   // Handle m=audio.
+   if (options.has_audio) {
+@@ -1146,7 +1147,8 @@
+     const SessionDescription* current_description,
+     AudioCodecs* audio_codecs,
+     VideoCodecs* video_codecs,
+-    DataCodecs* data_codecs) const {
++    DataCodecs* data_codecs,
++    const MediaSessionOptions& options) const {
+   UsedPayloadTypes used_pltypes;
+   audio_codecs->clear();
+   video_codecs->clear();
+@@ -1182,6 +1184,25 @@
+   FindCodecsToOffer<AudioCodec>(audio_codecs_, audio_codecs, &used_pltypes);
+   FindCodecsToOffer<VideoCodec>(video_codecs_, video_codecs, &used_pltypes);
+   FindCodecsToOffer<DataCodec>(data_codecs_, data_codecs, &used_pltypes);
++    
++  //If a preferred audio codec is specified, remove every other codec
++  //from the list except that
++  if(!options.preffered_acodec_name.empty()) {
++    std::vector<AudioCodec> acodecs;
++    for(int i=0; i<audio_codecs->size(); i++) {
++      if(options.preffered_acodec_name == audio_codecs->at(i).name) {
++        acodecs.push_back(audio_codecs->at(i));
++      }
++    }
++    
++    if(!acodecs.empty()) {
++      audio_codecs->clear();
++      while(!acodecs.empty()) {
++        audio_codecs->push_back(acodecs.back());
++        acodecs.pop_back();
++      }
++    }
++  }
+ }
+ 
+ bool MediaSessionDescriptionFactory::AddTransportOffer(
+Index: libjingle/trunk/talk/session/media/mediasession.h
+===================================================================
+--- libjingle/trunk/talk/session/media/mediasession.h	(revision 284)
++++ libjingle/trunk/talk/session/media/mediasession.h	(working copy)
+@@ -86,7 +86,8 @@
+       rtcp_mux_enabled(true),
+       bundle_enabled(false),
+       video_bandwidth(kAutoBandwidth),
+-      data_bandwidth(kDataMaxBandwidth) {
++      data_bandwidth(kDataMaxBandwidth),
++      preffered_acodec_name("") {
+   }
+ 
+   // Add a stream with MediaType type and id name.
+@@ -106,6 +107,7 @@
+   // bps. -1 == auto.
+   int video_bandwidth;
+   int data_bandwidth;
++  std::string preffered_acodec_name;
+   TransportOptions transport_options;
+ 
+   struct Stream {
+@@ -370,7 +372,8 @@
+   void GetCodecsToOffer(const SessionDescription* current_description,
+                         AudioCodecs* audio_codecs,
+                         VideoCodecs* video_codecs,
+-                        DataCodecs* data_codecs) const;
++                        DataCodecs* data_codecs,
++                        const MediaSessionOptions& options) const;
+   bool AddTransportOffer(
+       const std::string& content_name,
+       const TransportOptions& transport_options,

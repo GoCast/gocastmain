@@ -74,7 +74,8 @@
                         sdpconstraints: {
                             mandatory: {
                                 OfferToReceiveAudio: 'true',
-                                OfferToReceiveVideo: 'true'
+                                OfferToReceiveVideo: 'true',
+                                AudioCodec: $.urlvars.acodec || 'ISAC'
                             }
                         }
                     });
@@ -102,7 +103,8 @@
                             sdpconstraints: {
                                 mandatory: {
                                     OfferToReceiveAudio: 'true',
-                                    OfferToReceiveVideo: 'true'
+                                    OfferToReceiveVideo: 'true',
+                                    AudioCodec: $.urlvars.acodec || 'ISAC'
                                 }
                             }
                         });
