@@ -14,10 +14,11 @@
                     stun: [{uri: 'stun:stun.l.google.com:19302'}],
                     turn: [{uri: 'turn:manjeshtest2@dev.gocast.it:3478', password: 'manjeshpass2'}]
                 },
-                peerconnections = {};
+                peerconnections = {},
+                videodims = {width: parseInt($.urlvars.w || '320'), height: parseInt($.urlvars.h || '240')},
                 remoteplayertmpl = '<object class="peerconn" type="application/x-gocastplayer" width="1" height="1"></object>',
                 onlocalplayerloaded = function() {
-                var plugin = document.getElementById('localPlayer'),
+                    var plugin = document.getElementById('localPlayer'),
                     options = new GoCastJS.UserMediaOptions({
                         video: $.urlvars.video || false,
                         audio: $.urlvars.audio || false,
@@ -25,12 +26,12 @@
                             videoin: plugin.videoinopts['default'],
                             webrtc: {
                                 mandatory: {
-                                    minWidth: '640',
-                                    maxWidth: '640',
-                                    minHeight: '480',
-                                    maxHeight: '480',
-                                    minFrameRate: '14',
-                                    maxFrameRate: '14'
+                                    minWidth: videodims.width.toString(),
+                                    maxWidth: videodims.width.toString(),
+                                    minHeight: videodims.height.toString(),
+                                    maxHeight: videodims.height.toString(),
+                                    minFrameRate: '15',
+                                    maxFrameRate: '15'
                                 }
                             }
                         },
@@ -40,65 +41,37 @@
                         }
                     }, plugin);
 
-                GoCastJS.getUserMedia(options, function(stream) {
-                    var i, j = parseInt($.urlvars.u), other;
+                    GoCastJS.getUserMedia(options, function(stream) {
+                        var i, j = parseInt($.urlvars.u), other;
 
-                    localstream = stream;
-                    conn.send($pres());
-                    for (i=1; i<4; i++) {
-                        if (j != i) {
-                            other = 'test' + i + '@dev.gocast.it';
-                            conn.send($pres({to: other}));
-                        }
-                    }
-                    console.log('Online: ', conn.getJid());
-                }, function(error) { 
-                    alert(error);
-                });
-            };
-
-            var callernegotiationcallback = function(peerconnection) {
-                return function() {
-                    peerconnection.CreateOffer(function(sdp) {
-                        console.log('Peer [' + peerconnection.pcid + ']: Createoffer: ' + sdp);
-                        peerconnection.SetLocalDescription('offer', sdp, function() {
-                            console.log('Peer [' + peerconnection.pcid + ']: SetLocalDescription success, ' +
-                                        'sending offer...');
-                            conn.send($msg({to: peerconnection.pcid, type: 'chat'}).c('offer').t(sdp));
-                        }, function(error) {
-                            console.log('Peer [' + peerconnection.pcid + ']: SetLocalDescription error: ' + error);
-                        });
-                    }, function(error) {
-                        console.log('Peer [' + peerconnection.pcid + ']: CreateOffer error: ' + error);
-                    }, { 
-                        sdpconstraints: {
-                            mandatory: {
-                                OfferToReceiveAudio: 'true',
-                                OfferToReceiveVideo: 'true',
-                                AudioCodec: $.urlvars.acodec || 'ISAC'
+                        localstream = stream;
+                        plugin.width = videodims.width;
+                        plugin.height = videodims.height;
+                        conn.send($pres());
+                        for (i=1; i<4; i++) {
+                            if (j != i) {
+                                other = 'test' + i + '@dev.gocast.it';
+                                conn.send($pres({to: other}));
                             }
                         }
+                        console.log('Online: ', conn.getJid());
+                    }, function(error) { 
+                        alert(error);
                     });
-                };
-            };
-
-            var calleenegotiationcallback = function(peerconnection, sdp) {
-                return function() {
-                    peerconnection.SetRemoteDescription('offer', sdp, function() {
-                        console.log('Peer [' + peerconnection.pcid + ']: SetRemoteDescription success, ' +
-                                    'creating answer...');
-                        peerconnection.CreateAnswer(function(sdp) {
-                            console.log('Peer [' + peerconnection.pcid + ']: CreateAnswer: ' + sdp);
-                            peerconnection.SetLocalDescription('answer', sdp, function() {
+                },
+                callernegotiationcallback = function(peerconnection) {
+                    return function() {
+                        peerconnection.CreateOffer(function(sdp) {
+                            console.log('Peer [' + peerconnection.pcid + ']: Createoffer: ' + sdp);
+                            peerconnection.SetLocalDescription('offer', sdp, function() {
                                 console.log('Peer [' + peerconnection.pcid + ']: SetLocalDescription success, ' +
-                                            'sending answer (offer/answer done)...');
-                                conn.send($msg({to: peerconnection.pcid, type: 'chat'}).c('answer').t(sdp));
+                                            'sending offer...');
+                                conn.send($msg({to: peerconnection.pcid, type: 'chat'}).c('offer').t(sdp));
                             }, function(error) {
-                                console.log('Peer [' + peerconnection.pcid + ']: SetLocalDescription error: '
-                                            + error);
+                                console.log('Peer [' + peerconnection.pcid + ']: SetLocalDescription error: ' + error);
                             });
                         }, function(error) {
-                            console.log('Peer [' + peerconnection.pcid + ']: CreateAnswer error: ' + error);
+                            console.log('Peer [' + peerconnection.pcid + ']: CreateOffer error: ' + error);
                         }, { 
                             sdpconstraints: {
                                 mandatory: {
@@ -108,28 +81,54 @@
                                 }
                             }
                         });
-                    }, function(error) {
-                        console.log('Peer [' + peerconnection.pcid + ']: SetRemoteDescription error: ' + error);
-                    });
-                };
-            };
+                    };
+                },
+                calleenegotiationcallback = function(peerconnection, sdp) {
+                    return function() {
+                        peerconnection.SetRemoteDescription('offer', sdp, function() {
+                            console.log('Peer [' + peerconnection.pcid + ']: SetRemoteDescription success, ' +
+                                        'creating answer...');
+                            peerconnection.CreateAnswer(function(sdp) {
+                                console.log('Peer [' + peerconnection.pcid + ']: CreateAnswer: ' + sdp);
+                                peerconnection.SetLocalDescription('answer', sdp, function() {
+                                    console.log('Peer [' + peerconnection.pcid + ']: SetLocalDescription success, ' +
+                                                'sending answer (offer/answer done)...');
+                                    conn.send($msg({to: peerconnection.pcid, type: 'chat'}).c('answer').t(sdp));
+                                }, function(error) {
+                                    console.log('Peer [' + peerconnection.pcid + ']: SetLocalDescription error: '
+                                                + error);
+                                });
+                            }, function(error) {
+                                console.log('Peer [' + peerconnection.pcid + ']: CreateAnswer error: ' + error);
+                            }, { 
+                                sdpconstraints: {
+                                    mandatory: {
+                                        OfferToReceiveAudio: 'true',
+                                        OfferToReceiveVideo: 'true',
+                                        AudioCodec: $.urlvars.acodec || 'ISAC'
+                                    }
+                                }
+                            });
+                        }, function(error) {
+                            console.log('Peer [' + peerconnection.pcid + ']: SetRemoteDescription error: ' + error);
+                        });
+                    };
+                },
+                initpeerconnection = function(fulljid, negotiationCallback, sdp) {
+                    var peerconnection = null, player = null, container, options;
 
-            var initpeerconnection = function(fulljid, onpc, negotiationCallback, sdp) {
-                var peerconnection = null, player = null, container, options;
+                    hangupOnPeer(fulljid);
+                    if (!pluginmap['peer0']) {
+                        container = 'peer0';
+                    } else if (!pluginmap['peer1']) {
+                        container = 'peer1';
+                    }
 
-                hangupOnPeer(fulljid);
-                if (!pluginmap['peer0']) {
-                    container = 'peer0';
-                } else if (!pluginmap['peer1']) {
-                    container = 'peer1';
-                }
-
-                $('#' + container).html(remoteplayertmpl);
-                pluginmap[container] = fulljid;
-
-                setTimeout(function() {
+                    $('#' + container).html(remoteplayertmpl);
+                    pluginmap[container] = fulljid;
                     player = $('#' + container + ' > .peerconn').get(0);
                     console.log('ICESERVERS: ' + JSON.stringify(iceservers[$.urlvars.turn ? 'turn' : 'stun']));
+
                     options = new GoCastJS.PeerConnectionOptions(
                         player, fulljid, iceservers[$.urlvars.turn ? 'turn' : 'stun'],
                         function(sdp) {
@@ -138,8 +137,8 @@
                         },
                         function(stream) {
                             console.log('Peer [' + fulljid + ']: Added remote stream ' + stream.label);
-                            peerconnection.Width(640);
-                            peerconnection.Height(480);
+                            peerconnection.Width(videodims.width);
+                            peerconnection.Height(videodims.height);
                         },
                         function(stream) {
                             console.log('Peer [' + fulljid + ']: Removed remote stream ' + stream.label);
@@ -154,88 +153,78 @@
                         }
                     );
 
-                    onpc = onpc || function(pc) {};
                     peerconnection = new GoCastJS.PeerConnection(options);
-                    onpc(peerconnection);
                     if ($.urlvars.audio || $.urlvars.video) {
                         peerconnection.AddStream(localstream, negotiationCallback(peerconnection, sdp));
                     } else {
                         negotiationCallback(peerconnection, sdp)();
                     }
-                }, 1000);
-            };
 
-            var callpeer = function(fulljid) {
-                var onpc = function(pc) { peerconnections[fulljid] = pc; };
-                initpeerconnection(fulljid, onpc, callernegotiationcallback);
-                
-            };
+                    return peerconnection;
+                },
+                callpeer = function(fulljid) {
+                    peerconnections[fulljid] = initpeerconnection(fulljid, callernegotiationcallback);
+                },
+                acceptanswerfrompeer = function(fulljid, sdp) {
+                    if (peerconnections[fulljid]) {
+                        console.log('Peer [' + fulljid + ']: answer: ' + sdp);
+                        peerconnections[fulljid].SetRemoteDescription('answer', sdp, function() {
+                            console.log('Peer [' + fulljid + ']: SetRemoteDescription success, ' +
+                                        'offer/answer done...');
+                        }, function(error) {
+                            console.log('Peer [' + fulljid + ']: SetRemoteDescription error: ' + error);
+                        });
+                    }
+                },
+                acceptofferfrompeer = function(fulljid, sdp) {
+                    peerconnections[fulljid] = initpeerconnection(fulljid, calleenegotiationcallback, sdp);
+                },
+                addcandidateforpeer = function(fulljid, sdp) {
+                    if (peerconnections[fulljid]) {
+                        console.log('Peer [' + fulljid + ']: addcandidate: ' + sdp);
+                        peerconnections[fulljid].AddIceCandidate(sdp);
+                    }
+                },
+                hangupOnPeer = function(fulljid) {
+                    var id = pluginmap['peer0'] === fulljid ? 'peer0' : (pluginmap['peer1'] === fulljid ? 'peer1' : 'dummy'),
+                        container = $('body > #' + id).get(0);
 
-            var acceptanswerfrompeer = function(fulljid, sdp) {
-                if (peerconnections[fulljid]) {
-                    console.log('Peer [' + fulljid + ']: answer: ' + sdp);
-                    peerconnections[fulljid].SetRemoteDescription('answer', sdp, function() {
-                        console.log('Peer [' + fulljid + ']: SetRemoteDescription success, ' +
-                                    'offer/answer done...');
-                    }, function(error) {
-                        console.log('Peer [' + fulljid + ']: SetRemoteDescription error: ' + error);
-                    });
-                }
-            };
-
-            var acceptofferfrompeer = function(fulljid, sdp) {
-                var onpc = function(pc) { peerconnections[fulljid] = pc; };
-                initpeerconnection(fulljid, onpc, calleenegotiationcallback, sdp);
-            };
-
-            var addcandidateforpeer = function(fulljid, sdp) {
-                if (peerconnections[fulljid]) {
-                    console.log('Peer [' + fulljid + ']: addcandidate: ' + sdp);
-                    peerconnections[fulljid].AddIceCandidate(sdp);
-                }
-            };
-
-            var hangupOnPeer = function(fulljid) {
-                var id = pluginmap['peer0'] === fulljid ? 'peer0' : (pluginmap['peer1'] === fulljid ? 'peer1' : 'dummy'),
-                    container = $('body > #' + id).get(0);
-
-                if (container) {
-                    container.removeChild(container.lastChild);
-                }
-                delete pluginmap[id];
-                delete peerconnections[fulljid];
-            }
-
-            var addStanzaHandlers = function() {
-                conn.addHandler(function(pres) {
-                    if (!$(pres).attr('type')) {
-                        if (Strophe.getBareJidFromJid(conn.getJid()) !== 
-                            Strophe.getBareJidFromJid($(pres).attr('from'))) {
-                            console.log('Calling: ', $(pres).attr('from'));
-                            callpeer($(pres).attr('from'));
+                    if (container) {
+                        container.removeChild(container.lastChild);
+                    }
+                    delete pluginmap[id];
+                    delete peerconnections[fulljid];
+                },
+                addStanzaHandlers = function() {
+                    conn.addHandler(function(pres) {
+                        if (!$(pres).attr('type')) {
+                            if (Strophe.getBareJidFromJid(conn.getJid()) !== 
+                                Strophe.getBareJidFromJid($(pres).attr('from'))) {
+                                console.log('Calling: ', $(pres).attr('from'));
+                                callpeer($(pres).attr('from'));
+                            }
+                        } else if ('unavailable' === $(pres).attr('type')) {
+                            console.log('Hanging up on: ', $(pres).attr('from'));
+                            hangupOnPeer($(pres).attr('from'));
                         }
-                    } else if ('unavailable' === $(pres).attr('type')) {
-                        console.log('Hanging up on: ', $(pres).attr('from'));
-                        hangupOnPeer($(pres).attr('from'));
-                    }
-                    return true;
-                }, null, 'presence');
+                        return true;
+                    }, null, 'presence');
 
-                conn.addHandler(function(msg) {
-                    if ($(msg).find('offer').length) {
-                        acceptofferfrompeer($(msg).attr('from'),
-                                            $(msg).children('offer').text());
-                    } else if ($(msg).find('answer').length) {
-                        acceptanswerfrompeer($(msg).attr('from'),
-                                             $(msg).children('answer').text());
-                    } else if ($(msg).find('candidate').length) {
-                        addcandidateforpeer($(msg).attr('from'),
-                                            $(msg).children('candidate').text()
-                                                  .replace(/&quot;/g, '"'));
-                    }
-                    return true;
-                }, null, 'message', 'chat');
-            };
+                    conn.addHandler(function(msg) {
+                        if ($(msg).find('offer').length) {
+                            acceptofferfrompeer($(msg).attr('from'),
+                                                $(msg).children('offer').text());
+                        } else if ($(msg).find('answer').length) {
+                            acceptanswerfrompeer($(msg).attr('from'),
+                                                 $(msg).children('answer').text());
+                        } else if ($(msg).find('candidate').length) {
+                            addcandidateforpeer($(msg).attr('from'),
+                                                $(msg).children('candidate').text()
+                                                      .replace(/&quot;/g, '"'));
+                        }
+                        return true;
+                    }, null, 'message', 'chat');
+                };
 
             $(document).on('online', function() {
                 addStanzaHandlers = addStanzaHandlers || function() {
@@ -245,7 +234,7 @@
                 addStanzaHandlers();
                 addStanzaHandlers = null;
                 $('body > #preview').append('<object id="localPlayer" type="application/x-gocastplayer" ' +
-                                            'width="640" height="480"><param name="onload" value="onlocalplayerloaded">' +
+                                            'width="1" height="1"><param name="onload" value="onlocalplayerloaded">' +
                                             '</param></object>');
             });
 
