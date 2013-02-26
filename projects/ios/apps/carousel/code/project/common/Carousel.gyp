@@ -87,6 +87,7 @@
 						'../../rsrc/<@(OS)/Default-568h@2x.png',
 						'../../rsrc/<@(OS)/GoToken-114.png',
 						'../../rsrc/<@(OS)/GoToken-57.png',
+						'../../rsrc/<@(OS)/GoToken-72.png',
 
 						'../../rsrc/<@(OS)/Cordova.plist',
 
