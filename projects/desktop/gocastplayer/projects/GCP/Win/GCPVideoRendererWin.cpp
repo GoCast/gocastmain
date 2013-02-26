@@ -21,12 +21,12 @@ namespace GoCast
 		bitmapInfo.bmiHeader.biHeight = m_height;
 
 		FB::PluginWindowlessWin* pWinlessWindowsWin = dynamic_cast<FB::PluginWindowlessWin*>(m_pWin);
-		if(NULL != pWinlessWindowsWin && NULL != m_pFrameBuffer.get())
+		if(NULL != pWinlessWindowsWin && NULL != m_pFrameBuffer)
 		{
 			FB::Rect winRect = m_pWin->getWindowPosition();
 			hdc = pWinlessWindowsWin->getHDC();
 			SetStretchBltMode(hdc, HALFTONE);
-			StretchDIBits(hdc, winRect.left, winRect.bottom-1, width, -height, 0, 0, m_width, m_height, m_pFrameBuffer.get(), &bitmapInfo, DIB_RGB_COLORS, SRCCOPY);
+			StretchDIBits(hdc, winRect.left, winRect.bottom-1, width, -height, 0, 0, m_width, m_height, m_pFrameBuffer, &bitmapInfo, DIB_RGB_COLORS, SRCCOPY);
 		}
 
         return true;
