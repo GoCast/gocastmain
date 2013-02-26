@@ -1166,18 +1166,15 @@ body > div#meeting > div#streams > div#scontrols > input.right {
   cursor: pointer;
 }
 #boxes #waitingToJoin {
-  width: 200px;
-  height: 200px;
+  width: 100%;
+  height: 100%;
   border: none;
   background: none;
 }
-#boxes #waitingToJoin > div#cover {
-  position: absolute;
-  left: 0px;
-  bottom: 0px;
-  width: 200px;
-  height: 200px;
-  background-color: black;
+#boxes #waitingToJoin > #GoToken {
+  width: 100%;
+  height: 100%;
+  opacity: 0;
 }
 #boxes #winEula {
   width: 660px;

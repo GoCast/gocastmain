@@ -2575,6 +2575,8 @@ $(document).ready(function(
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
 {
+  var opacity = 0, winw = $(window).width(), winh = $(window).height();
+
   if (!$.urlvars.roomname ||
       $.urlvars.roomname.length%4 ||
       !$.roomcode.decipher($.urlvars.roomname)) {
@@ -2589,11 +2591,11 @@ $(document).ready(function(
     return false;
   });
 
+  $('#boxes #waitingToJoin').width(0.9*winw).height(0.8*winh);
   openWindow('#waitingToJoin');
   var unmaskTimer = setInterval(function() {
-    $('#boxes #waitingToJoin > div#cover').height(
-      $('#boxes #waitingToJoin > div#cover').height() - 50
-    );
+    opacity = opacity + 0.2;
+    $('#boxes #waitingToJoin > #GoToken').css('opacity', opacity.toString());
   }, 1000);
 
   app.checkExclusive(function() {
