@@ -38,6 +38,7 @@ var evt = require('events');
 var ddb = require('dynamodb').ddb({ endpoint: settings.dynamodb.endpoint,
                                     accessKeyId: settings.dynamodb.accessKeyId,
                                     secretAccessKey: settings.dynamodb.secretAccessKey});
+var accounts_db = require('./accounts_db');
 var Canvas = require('canvas');
 var nodewb = require('./nodeWB');
 var shelljs = require('shelljs/global');
@@ -747,8 +748,19 @@ MucRoom.prototype.finishInit = function(success, failure) {
 };
 
 MucRoom.prototype.notifylog = function(msg) {
+    var fullRoomName = this.roomname.split('@')[0],
+        roomOnly, userOnly;
+
     if (this.notifier) {
-        this.notifier.sendMessage(logDate() + ' @' + this.roomname.split('@')[0] + ': ' + decodeURI(msg));
+        if (fullRoomName.match(/~/) && fullRoomName.match(/%23/)) {
+            // We have a formulated room name (new-style)
+            roomOnly = fullRoomName.split('%23')[1];
+            userOnly = fullRoomName.split('%23')[0].replace('~', '@');
+            this.notifier.sendMessage(logDate() + ' @' + userOnly + '#' + roomOnly + ': ' + decodeURI(msg));
+        }
+        else {
+            this.notifier.sendMessage(logDate() + ' @' + fullRoomName + ': ' + decodeURI(msg));
+        }
     }
     else {
         console.log(logDate() + ' - NULL-NOTIFIER-MESSAGE: @' + this.roomname.split('@')[0] + ': ' + decodeURI(msg));
@@ -837,7 +849,7 @@ MucRoom.prototype.EndMeeting = function() {
 };
 
 MucRoom.prototype.handlePresence = function(pres) {
-    var fromnick = pres.attrs.from.split('/')[1],
+    var fromnick = pres.attrs.from.split('/')[1] || '',
         fromjid = null,
         self = this,
         k;
@@ -930,7 +942,7 @@ MucRoom.prototype.handlePresence = function(pres) {
 
                 return;
             }
-            this.SendGroupChat('' + fromnick + ' has entered the room.');
+            this.SendGroupChat(fromnick + ' has entered the room.');
             this.log('Adding: ' + fromjid + ' as Nickname: ' + decodeURI(fromnick));
             this.SendSpotListTo(pres.attrs.from);
         }
@@ -1002,7 +1014,7 @@ MucRoom.prototype.handlePresence = function(pres) {
         }
         else
         {
-            this.SendGroupChat('' + fromnick + ' left the room.');
+            this.SendGroupChat(fromnick + ' left the room.');
             //
             // Someone left and it wasn't ourselves.
             //
@@ -1020,6 +1032,7 @@ MucRoom.prototype.handlePresence = function(pres) {
                     this.log('(A-timer) presenceTimer was already set. Clearing first.');
                     clearTimeout(this.presenceTimer);
                     this.presenceTimer = null;
+                    this.EndMeeting();
                 }
 
                 if (this.bSelfDestruct === true) {
@@ -1038,7 +1051,7 @@ MucRoom.prototype.handlePresence = function(pres) {
                     // If not a self-destruct room, still need to end the meeting if no one comes back in.
                     this.presenceTimer = setTimeout(function() {
                         var msg;
-                        msg = 'ROOM-EMPTY - end meeting. maxParticipantsSeen was: ' + self.maxParticipantsSeen;
+                        msg = 'Persistent-ROOM-EMPTY - end meeting. maxParticipantsSeen was: ' + self.maxParticipantsSeen;
                         self.log(msg);
                         self.notifylog(msg);
                         self.EndMeeting();
@@ -1253,6 +1266,7 @@ MucRoom.prototype.handleIQ = function(iq) {
 //            this.log("Received IQ 'set' -- "); // + iq.root().toString());
 
             if (iq.getChild('addspot')) {
+ // TODO:RMW - if # spots > max, don't addspotreflection               this.spotList
                 this.AddSpotReflection(iq);
             }
             else if (iq.getChild('removespot')) {
@@ -1930,7 +1944,7 @@ MucRoom.prototype.createErrorIQ = function(iq_in, reason_in, err_type_in) {
 };
 
 MucRoom.prototype.SetSpotReflection = function(iq) {
-    // Need to pull out the 'info' object - which is the attributes to the 'addspot'
+    // Need to pull out the 'info' object - which is the attributes to the 'setspot'
     var info = {}, self = this;
 
     // Prep to reply to the IQ message.
@@ -2989,6 +3003,8 @@ function Overseer(user, pw, notifier, bManager, staticRoomList) {
     this.roommanager = bManager || false;
     this.roomDB = null;
     this.debugmode = null;
+    this.publicRooms = [];
+    this.PublicRoomPublisherTimer = null;
 
     this.active_rooms = {};
 
@@ -3051,6 +3067,18 @@ function Overseer(user, pw, notifier, bManager, staticRoomList) {
 
         if (self.roommanager) {
             self.LoadActiveRoomsFromDB();
+
+            if (self.publicRooms.length === 0) {
+                self.LoadPublicRoomsFromDB(function() {
+                    self.SetupPublicRoomPublisher();
+                });
+
+                setInterval(function() {
+                    self.LoadPublicRoomsFromDB(function() {
+                        self.SetupPublicRoomPublisher();
+                    });
+                }, 60*1000);
+            }
         }
     });
 
@@ -3083,7 +3111,7 @@ function Overseer(user, pw, notifier, bManager, staticRoomList) {
         else if (stanza.is('presence')) {
             self.handlePresence(stanza);
         }
-        else if (stanza.is('iq') && stanza.attrs.type !== 'error') {
+        else if (stanza.is('iq')) {
             self.handleIq(stanza);
         }
         else {
@@ -3117,6 +3145,114 @@ function Overseer(user, pw, notifier, bManager, staticRoomList) {
         self.notifylog('OVERSEER-eventManager: ERROR-EMIT-RECEIVED: ' + e);
     });
 }
+
+Overseer.prototype.encodeRoomname = function(room) {
+    return encodeURIComponent(room).replace(/'/g, '%27').toLowerCase();
+};
+
+Overseer.prototype.SetupPublicRoomPublisher = function() {
+    var create,
+        self = this;
+
+    if (this.PublicRoomPublisherTimer) {
+        clearInterval(this.PublicRoomPublisherTimer);
+    }
+
+    // Need to create and configure a node.
+    create = new xmpp.Element('iq', {to: 'pubsub.' + this.SERVER, type: 'set'})
+                    .c('pubsub', {xmlns: 'http://jabber.org/protocol/pubsub'})
+                    .c('create', {node: settings.roommanager.public_room_node})
+                    .up().c('configure', {node: settings.roommanager.public_room_node})
+                    .c('x', {xmlns: 'jabber:x:data', type: 'submit'})
+                    .c('field', {'var': 'FORM_TYPE'})
+                        .c('value').t('http://jabber.org/protocol/pubsub#node_config')
+                    .up().up().c('field', {'var': 'pubsub#max_items'})
+                        .c('value').t('1')
+                    .up().up().c('field', {'var': 'pubsub#subscribe'})
+                        .c('value').t('1')
+                    .up().up().c('field', {'var': 'pubsub#access_model'})
+                        .c('value').t('open');
+
+//    this.log('DEBUG: SetupPublicRoomPublisher: create: ' + create.root());
+
+    this.sendIQ(create, function(resp) {
+/*        if (resp.attrs.type === 'result') {
+            self.log('SetupPublicRoomPublisher: Node creation successful. Ready to publish.');
+        }
+        else {
+            self.log('SetupPublicRoomPublisher: ERROR: Creation of node failed:' + resp);
+        }
+*/
+        // Regardless of the error (presuming the error is 'node already exists')
+        // We need to publish...
+        self.PublicRoomPublisherTimer = setInterval(function() {
+            var nonHidden = 0,
+                pub = new xmpp.Element('iq', {to: 'pubsub.' + self.SERVER, type: 'set'})
+                    .c('pubsub', {xmlns: 'http://jabber.org/protocol/pubsub'})
+                    .c('publish', {node: settings.roommanager.public_room_node})
+                    .c('item').c('pubrooms');
+
+//            self.log('DEBUG: SetupPublicRoomPublisher: pre-room-pub: ' + pub.root());
+
+            self.publicRooms.forEach(function(val) {
+                var num;
+
+                if (val && !val.hidden && self.MucRoomObjects[self.encodeRoomname(val.room)]) {
+                    num = size(self.MucRoomObjects[self.encodeRoomname(val.room)].participants);
+
+                    // The room manager is one participant (assuming the room manager isn't out of the room)
+                    pub.c('pubroom', {room: val.room, numparticipants: num-1, description: val.description || '',
+                                      owner: val.owner || ''}).up();
+                    nonHidden += 1;
+                }
+//                else {
+//                    self.log('DEBUG: SetupPublicRoomPublisher: WARNING: Unknown public room: ' + val.room);
+//                }
+            });
+
+            // DEBUG
+/*            if (nonHidden === 0) {
+                pub.c('pubroom', {room: 'rwolff@gocast.it#another room', owner: 'Bob Wolff', decription: 'Another description', numparticipants: Math.floor(Math.random() * 10)}).up();
+                pub.c('pubroom', {room: '#public public room', description: 'non-empty description', numparticipants: Math.floor(Math.random() * 10)}).up();
+
+                console.error('Dump of publicRooms: ', JSON.stringify(self.publicRooms));
+            }
+*/
+//            self.log('DEBUG: SetupPublicRoomPublisher: pub: ' + pub.root());
+
+            // Now publish.
+            self.sendIQ(pub, function(pubresp) {
+                if (pubresp.attrs.type !== 'result') {
+                    self.log('ERROR: Publish failed ' + pubresp);
+                }
+//                else {
+//                    self.log('Publish complete for ' + nonHidden + ' public rooms.');
+//                }
+            });
+        }, 10 * 1000);
+    });
+};
+
+Overseer.prototype.LoadPublicRoomsFromDB = function(cb) {
+    var self = this;
+
+//    this.log('LoadPublicRoomsFromDB: Loading public rooms from the database.');
+    accounts_db.GetPublicRooms(function(roomslist) {
+        self.publicRooms = roomslist;
+        if (self.publicRooms.length === 0) {
+            self.log('LoadPublicRoomsFromDB: # Public rooms is: ', self.publicRooms.length);
+        }
+//        self.log('LoadPublicRoomsFromDB: Public rooms are: ', JSON.stringify(self.publicRooms));
+
+        if (cb) {
+            cb();
+        }
+    }, function(errmsg) {
+        self.publicRooms = [];
+        self.log('ERROR: LoadPublicRoomsFromDB: ' + (errmsg || ''));
+    });
+
+};
 
 Overseer.prototype.LoadActiveRoomsFromDB = function() {
     var self = this;
@@ -3239,8 +3375,8 @@ Overseer.prototype.notifylog = function(msg) {
     }
 };
 
-Overseer.prototype.log = function(msg) {
-    console.log(logDate() + ' - Overseer: ' + decodeURI(msg));
+Overseer.prototype.log = function(msg, arg2, arg3) {
+    console.log(logDate() + ' - Overseer: ' + decodeURI(msg), arg2 || '', arg3 || '');
 };
 
 Overseer.prototype.sendIQ = function(iq, cb) {
@@ -3450,6 +3586,7 @@ Overseer.prototype.handleMessage = function(msg) {
             if (this.roommanager) {
                 this.notifylog('Reloading rooms on the fly.');
                 this.LoadActiveRoomsFromDB();
+                this.LoadPublicRoomsFromDB();
             }
             break;
         case 'DEBUGSTANZAS':
@@ -3932,7 +4069,7 @@ Overseer.prototype.handleIq = function(iq) {
     }
 
     // Handle all pings and all queries for #info
-    if (iq.attrs.type === 'result' && iq.attrs.id && this.iq_callbacks[iq.attrs.id])
+    if ((iq.attrs.type === 'result' || iq.attrs.type === 'error') && iq.attrs.id && this.iq_callbacks[iq.attrs.id])
     {
         iqid = iq.attrs.id;
         callback = this.iq_callbacks[iqid];

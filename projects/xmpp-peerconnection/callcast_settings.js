@@ -14,6 +14,8 @@ GoCastJS.CallcastSettings = function(server) {
         case 'carousel.gocast.it':
         case 'video.gocast.it':
             this.privPopulate({CALLCAST_XMPPSERVER: 'video.gocast.it',
+                            ANON_USERNAME: 'anon_gocastconference@dev.gocast.it',
+                            ANON_PASSWORD: 'gocast.video.anon',
                             CALLCAST_ROOMS: 'gocastconference.video.gocast.it',
                             AT_CALLCAST_ROOMS: '@gocastconference.video.gocast.it',
                             STUNSERVER: 'video.gocast.it', STUNSERVERPORT: 19302,
@@ -26,6 +28,8 @@ GoCastJS.CallcastSettings = function(server) {
             break;
         case 'dev.gocast.it':
             this.privPopulate({CALLCAST_XMPPSERVER: 'dev.gocast.it',
+                            ANON_USERNAME: 'anon_conference@dev.gocast.it',
+                            ANON_PASSWORD: 'gocast.anon.user',
                             CALLCAST_ROOMS: 'conference.dev.gocast.it',
                             AT_CALLCAST_ROOMS: '@conference.dev.gocast.it',
                             STUNSERVER: 'dev.gocast.it', STUNSERVERPORT: 19302,
@@ -38,6 +42,8 @@ GoCastJS.CallcastSettings = function(server) {
             break;
         case 'dnle.gocast.it':
             this.privPopulate({ CALLCAST_XMPPSERVER: 'dnle.gocast.it',
+                            ANON_USERNAME: 'anon_conference@dev.gocast.it',
+                            ANON_PASSWORD: 'dnle.anon.user',
                             CALLCAST_ROOMS: 'conference.dnle.gocast.it',
                             AT_CALLCAST_ROOMS: '@conference.dnle.gocast.it',
                             STUNSERVER: 'dnle.gocast.it', STUNSERVERPORT: 19302,
@@ -50,6 +56,8 @@ GoCastJS.CallcastSettings = function(server) {
             break;
         case 'creativity.gocast.it':
             this.privPopulate({ CALLCAST_XMPPSERVER: 'dnle.gocast.it',
+                            ANON_USERNAME: 'anon_ccc-conference@dev.gocast.it',
+                            ANON_PASSWORD: 'ccc.anon.user',
                             CALLCAST_ROOMS: 'ccc-conference.dnle.gocast.it',
                             AT_CALLCAST_ROOMS: '@ccc-conference.dnle.gocast.it',
                             STUNSERVER: 'dnle.gocast.it', STUNSERVERPORT: 19302,
@@ -63,7 +71,7 @@ GoCastJS.CallcastSettings = function(server) {
         default:
             throw 'Error - unknown servername for init(): ' + server;
     }
-}
+};
 
 GoCastJS.CallcastSettings.prototype = {
     privPopulate: function(obj) {

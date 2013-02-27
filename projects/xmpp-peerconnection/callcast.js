@@ -281,6 +281,9 @@ var Callcast = {
 
         this.connection = new GoCastJS.StropheConnection({ boshurl: boshurl,
                                                            xmppserver: this.CALLCAST_XMPPSERVER,
+                                                           anon_username: this.ANON_USERNAME,
+                                                           anon_password: this.ANON_PASSWORD,
+                                                           public_room_node: this.CALLCAST_ROOMS + '/public',
                                                            statusCallback: this.connStatusHandler.bind(this),
                                                            logFn: this.log});
 
@@ -2861,6 +2864,9 @@ var Callcast = {
             //            we should just reset the connection and re-login with connect.
             this.connection = new GoCastJS.StropheConnection({ boshurl: boshurl,
                                                                xmppserver: Callcast.CALLCAST_XMPPSERVER,
+                                                               anon_username: this.ANON_USERNAME,
+                                                               anon_password: this.ANON_PASSWORD,
+                                                               public_room_node: this.CALLCAST_ROOMS + '/public',
                                                                statusCallback: this.connStatusHandler,
                                                                logFn: Callcast.log});
         }

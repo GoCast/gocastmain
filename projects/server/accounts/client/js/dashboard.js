@@ -326,43 +326,22 @@ var DashView = {
         if (!$container.html()) {
             $container.html(formtemplate);
         }
-        if (publicrooms.length === 0) {
-            publicrooms = [
-                {
-                    room: 'manjesh@gocast.it#It\'s happenin\' here',
-                    description: 'This is the description for the room.',
-                    owner: 'Manjesh Malavalli',
-                    numparticipants: Math.floor(Math.random()*11)
-                },
-                {
-                    room: 'rwolff@gocast.it#Land Rover Fans Club',
-                    description: 'This is the description for the room.',
-                    owner: 'Robert Wolff',
-                    numparticipants: Math.floor(Math.random()*11)
-                },
-                {
-                    room: '#Public Room',
-                    description: 'This is the description for the room.',
-                    numparticipants: Math.floor(Math.random()*11)
-                }
-            ];
-        }
 
         for (i=0; i<publicrooms.length; i++) {
-            partsAttrVal = publicrooms[i].numparticipants.toString();
-            participantsAttribute = publicrooms[i].numparticipants ? ('participants="' + partsAttrVal + '"') : '';
-            rcode = $.roomcode.cipher(publicrooms[i].room.split('#')[0], publicrooms[i].room.split('#')[1]);
+            partsAttrVal = $(publicrooms[i]).attr('numparticipants').toString();
+            participantsAttribute = $(publicrooms[i]).attr('numparticipants') ? ('participants="' + partsAttrVal + '"') : '';
+            rcode = $.roomcode.cipher($(publicrooms[i]).attr('room').split('#')[0], $(publicrooms[i]).attr('room').split('#')[1]);
             link = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1) + '?roomname=' + rcode;
-            title = (publicrooms[i].owner ? publicrooms[i].owner + '\'s ' : '') + publicrooms[i].room.split('#')[1];
+            title = ($(publicrooms[i]).attr('owner') ? $(publicrooms[i]).attr('owner') + '\'s ' : '') + $(publicrooms[i]).attr('room').split('#')[1];
             $roomitem = $('.accordion-group[roomname="' + rcode.replace(/=/g, '_eq').replace(/\+/g, '_plus') +
                         '"]', $container);
             roomids.push(rcode.replace(/=/g, '_eq').replace(/\+/g, '_plus'));
 
             if ($roomitem.length) {
                 $roomitem.attr('participants', partsAttrVal);
-                if (!publicrooms[i].numparticipants) {
+                if (!$(publicrooms[i]).attr('numparticipants')) {
                     $roomitem.removeAttr('participants');
-                } else if (10 > publicrooms[i].numparticipants) {
+                } else if (10 > $(publicrooms[i]).attr('numparticipants')) {
                     $roomitem.addClass('singledigit');
                 } else {
                     $roomitem.removeClass('singledigit');
@@ -372,10 +351,10 @@ var DashView = {
                                                       .replace(/\{\{room\}\}/g, rcode.replace(/=/g, '_eq')
                                                                                      .replace(/\+/g, '_plus'))
                                                       .replace(/\{\{name\}\}/g, title)
-                                                      .replace(/\{\{description\}\}/g, publicrooms[i].description)
+                                                      .replace(/\{\{description\}\}/g, $(publicrooms[i]).attr('description'))
                                                       .replace(/\{\{link\}\}/g, link)
                                                       .replace(/\{\{partsAttr\}\}/g, participantsAttribute)
-                                                      .replace(/\{\{sd\}\}/, (10 > publicrooms[i].numparticipants) ?
+                                                      .replace(/\{\{sd\}\}/, (10 > $(publicrooms[i]).attr('numparticipants')) ?
                                                                ' singledigit' : ''));
             }
 
@@ -741,7 +720,19 @@ var DashApp = {
         this.boshconn = new GoCastJS.StropheConnection({
             boshurl: '/xmpp-httpbind',
             xmppserver: this.settings.get('CALLCAST_XMPPSERVER'),
+            anon_username: this.settings.get('ANON_USERNAME'),
+            anon_password: this.settings.get('ANON_PASSWORD'),
+            public_room_node: this.settings.get('CALLCAST_ROOMS') + '/public',
             statusCallback: this.boshconnstatusCallback()
+        });
+
+        this.boshconn.subscribePublicRooms(function(data) {
+/*            console.log('Subscribe-Callback-Dashboard: data length: ' + data.length);
+            for (i = 0 ; i < data.length ; i += 1) {
+                console.log('Subscribe-Callback-Dashboard item room: ' + ($(data[i]).attr('room') || '') + ', owner: ' + ($(data[i]).attr('owner') || '') + ', numparticipants: ' + ($(data[i]).attr('numparticipants') || ''));
+            }
+            */
+            DashView.displayPublicRooms(data, $('#publicrooms'));
         });
 
         $('body > .navbar .logoutlink').click(this.logoutCallback());
@@ -845,8 +836,8 @@ $(document).ready(function() {
     DashApp.init();
 
     // Simulate live room participants refresh
-    DashView.displayPublicRooms([], $('#publicrooms'));
-    setInterval(function() {
-        DashView.displayPublicRooms([], $('#publicrooms'));
-    }, 2000);
+//    DashView.displayPublicRooms([], $('#publicrooms'));
+//    setInterval(function() {
+//        DashView.displayPublicRooms([], $('#publicrooms'));
+//    }, 2000);
 });

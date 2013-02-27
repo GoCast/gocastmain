@@ -702,7 +702,7 @@ function dbGetPublicRooms(cbSuccess, cbFailure) {
         }
         else {
             if (data.LastEvaluatedKey) {
-                gcutil.log('dbGetPublicRooms: Received: ' + data.Count + ' items. Continuing scan - next iteration...');
+//                gcutil.log('dbGetPublicRooms: Received: ' + data.Count + ' items. Continuing scan - next iteration...');
                 outItems.push.apply(outItems, dbAwsObjectRead(data.Items));
 
                 scanObj.ExclusiveStartKey = data.LastEvaluatedKey;
@@ -711,7 +711,7 @@ function dbGetPublicRooms(cbSuccess, cbFailure) {
             else {
                 outItems.push.apply(outItems, dbAwsObjectRead(data.Items));
 
-                gcutil.log('dbGetPublicRooms: Scan complete. Found a total of: ' + outItems.length + ' items.');
+//                gcutil.log('dbGetPublicRooms: Scan complete. Found a total of: ' + outItems.length + ' items.');
                 cbSuccess(outItems);
             }
         }

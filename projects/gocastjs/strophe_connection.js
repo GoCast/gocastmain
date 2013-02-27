@@ -37,13 +37,23 @@ GoCastJS.StropheConnection = function(opts) {
 
     this.log('New GoCastJS.StropheConnection.');
 
-    if (!opts.boshurl || !opts.statusCallback || !opts.xmppserver) {
+    if (!opts || !opts.boshurl || !opts.statusCallback || !opts.xmppserver) {
         throw 'StropheConnection: ERROR: Bad invocation - must provide all required parameters.';
     }
+
+    this.isConnected = false;
 
     this.id = null;
     this.pw = null;
     this.bAnonymous = true;
+
+    // If we are using an actual user account for anonymous logins, this is how it is passed.
+    this.anon_username = opts.anon_username;
+    this.anon_password = opts.anon_password;
+
+    this.public_room_node = opts.public_room_node;
+    this.isSubscribed = false;
+    this.subCallback = null;
 
     this.numConnects = 0;
     this.causeAuthfail = false;
@@ -88,7 +98,7 @@ GoCastJS.StropheConnection = function(opts) {
         if (level > 3) {
             console.error('STROPHE-LOG: level:' + level + ', msg: ' + msg);
         }
-        else if (level > 0) {
+        else if (level > 1) {
             console.log('STROPHE-LOG: level:' + level + ', msg: ' + msg);
         }
     };
@@ -153,8 +163,8 @@ GoCastJS.StropheConnection.prototype = {
         }
     },
 
-    log: function(arg0, arg1) {
-        console.log(arg0, arg1);
+    log: function(arg0, arg1, arg2) {
+        console.log('StropheConnection: ', arg0, arg1 || null, arg2 || null);
     },
 
     //
@@ -207,7 +217,15 @@ GoCastJS.StropheConnection.prototype = {
             this.bAnonymous = this.rememberedAnonymous;
 
             if (this.bAnonymous) {
-                this.id = this.xmppserver;
+                // If we're using a real account for anonymous logins...
+                if (this.anon_username) {
+                    this.id = this.anon_username;
+                    this.pw = this.anon_password;
+                }
+                else {
+                    this.id = this.xmppserver;
+                    this.pw = '';
+                }
             }
             else {
                 this.id = this.rememberedJid;
@@ -219,7 +237,7 @@ GoCastJS.StropheConnection.prototype = {
 
             return this.rememberedJid;
         }
-        else if (this.id && this.pw) {
+        else if (this.id && this.pw && !this.bAnonymous) {
             this.log('autoConnect: Non-anonymous.');
             this.bAnonymous = false;
 
@@ -273,8 +291,14 @@ GoCastJS.StropheConnection.prototype = {
         }
         else {
             // Anonymous for null or undefined opts
-            this.id = this.xmppserver;
-            this.pw = '';
+            if (this.anon_username) {
+                this.id = this.anon_username;
+                this.pw = this.anon_password;
+            }
+            else {
+                this.id = this.xmppserver;
+                this.pw = '';
+            }
             this.bAnonymous = true;
         }
 
@@ -297,6 +321,7 @@ GoCastJS.StropheConnection.prototype = {
             this.log('StropheConnection: connect: WARN: Must be on a failed re-attach. No password for user ' + this.id);
             this.forgetReconnectInfo();
             this.reset('connect-failed-reattach-reset');
+            this.isConnected = false;
             this.statusCallback(Strophe.Status.TERMINATED);
             return;
         }
@@ -330,6 +355,7 @@ GoCastJS.StropheConnection.prototype = {
 
         if (this.causeTerminating || this.causeAuthfail) {
             this.forgetReconnectInfo();
+            this.isConnected = false;
             this.reset('Full disconnection - heading for TERMINATED.');
             this.statusCallback(Strophe.Status.TERMINATED);
         }
@@ -359,11 +385,14 @@ GoCastJS.StropheConnection.prototype = {
         switch(status) {
             case Strophe.Status.CONNECTED:
                 this.log('GoCastJS.StropheConnection: CONNECTED');
+                this.isConnected = true;
+                this.privateDoSubscribe();
                 this.saveLoginInfo();
                 this.connection.addHandler(this.privateSetupPingHandler.bind(this), 'urn:xmpp:ping', 'iq', 'get');
                 break;
             case Strophe.Status.DISCONNECTED:
                 this.log('GoCastJS.StropheConnection: DISCONNECTED');
+                this.isConnected = false;
 
                 // If we arrive here, we should kill the disconnection timer.
                 if (this.disconnectTimer) {
@@ -378,19 +407,24 @@ GoCastJS.StropheConnection.prototype = {
                 // Artificial early return.
                 return;
             case Strophe.Status.AUTHENTICATING:
+                this.isConnected = false;
                 this.log('GoCastJS.StropheConnection: AUTHENTICATING');
                 break;
             case Strophe.Status.CONNECTING:
+                this.isConnected = false;
                 this.log('GoCastJS.StropheConnection: CONNECTING');
                 break;
             case Strophe.Status.ATTACHED:
                 this.log('GoCastJS.StropheConnection: ATTACHED');
+                this.isConnected = true;
+                this.privateDoSubscribe();
                 this.saveLoginInfo();
                 this.privatePingServer();
                 this.connection.addHandler(this.privateSetupPingHandler.bind(this), 'urn:xmpp:ping', 'iq', 'get');
                 break;
             case Strophe.Status.DISCONNECTING:
                 this.log('GoCastJS.StropheConnection: DISCONNECTING');
+                this.isConnected = false;
 
                 if (this.disconnectTimer) {
                     this.log('GoCastJS.StropheConnection: WARN: While DISCONNECTING, disconnectTimer already set. Clearing.');
@@ -419,10 +453,12 @@ GoCastJS.StropheConnection.prototype = {
                 break;
             case Strophe.Status.CONNFAIL:
                 this.log('GoCastJS.StropheConnection: CONNFAIL');
+                this.isConnected = false;
                 this.causeConnfail = true;
                 break;
             case Strophe.Status.AUTHFAIL:
                 this.causeAuthfail = true;
+                this.isConnected = false;
                 this.log('GoCastJS.StropheConnection: AUTHFAIL');
                 break;
             default:
@@ -650,5 +686,100 @@ GoCastJS.StropheConnection.prototype = {
             this.log('StropheConnection: ERROR: Cannot reset() - no connection.');
             return null;
         }
+    },
+
+    privateOnEvent: function(event) {
+        var data;
+
+        data = $(event).children('event')
+            .children('items').children('item')
+            .children('pubrooms').children('pubroom'); //.text();
+
+        if (data.length) {
+            // Should have an array of public room entries
+            // <pubroom name="blah" num="3"/><pubroom name="foo" num="5"/>
+//            this.log('privateOnEvent: length: ' + data.length);
+//            this.log('privateOnEvent: data: ', $(data));
+            if (this.subCallback) {
+                try {
+                    this.subCallback(data);
+                }
+                catch(e) {
+                    this.log('privateOnEvent: Exception-Catch-Callback error: ' + e + ', handler: ' + this.subCallback);
+                }
+            }
+        }
+
+        return true;
+    },
+
+    privateOnSubscribe: function(sub) {
+        this.isSubscribed = true;
+        this.log('Subscribed to public room node.');
+        return true;
+    },
+
+    privateDoSubscribe: function() {
+        var self = this;
+
+        if (this.isSubscribed) {
+            // Unsubscribe first.
+            this.connection.pubsub.unsubscribe(
+                this.public_room_node,
+                Strophe.getBareJidFromJid(this.connection.jid), null,
+                function() {}, console.error);
+        }
+
+        if (!this.isConnected) {
+            throw 'privateDoSubscribe: Must be connected first.';
+        }
+
+        if (this.public_room_node) {
+            this.log('Subscribing to: ' + this.public_room_node);
+            this.connection.pubsub.subscribe(
+                this.public_room_node,
+                null,
+                this.privateOnEvent.bind(this),
+                this.privateOnSubscribe.bind(this),
+                function(err) {
+                    var code, type, errsub;
+                    code = $(err).children('error').attr('code');
+                    type = $(err).children('error').attr('type');
+                    errsub = $(err).children('error').children();
+
+                    if (errsub[0].localName === 'item-not-found') {
+                        // This node doesn't exist yet...
+                        self.log('ERROR: Subscribe-Node: ' + self.public_room_node + ' does not exist yet.');
+                    }
+                    else if ($(err).children('error')) {
+                        self.log('ERROR: Subscribe-Node: Code: ' + code + ', Type: ' + type + ', sub-name: ' + errsub[0].localName);
+                    }
+                    else {
+                        self.log('ERROR: Subscribe-Node: Unknown error stanza came back.');
+                    }
+                }
+            );
+        }
+
+    },
+
+    subscribePublicRooms: function(cbSuccess) {
+        // TODO - need to deal with
+        //  what if we're not connected yet? bDesireSubscribe?
+        //  If no .muc plugin
+        //  If already subscribed
+
+        this.subCallback = cbSuccess;
+
+        // If we are already connected, then do the subscribe now.
+        // Otherwise, we'll defer this subscription to when we get connected.
+        if (this.isConnected) {
+            this.privateDoSubscribe();
+        }
+        else {
+            this.log('subscribePublicRooms: INFO: Subscription deferred until connected.');
+        }
+
     }
+
 };
