@@ -37,11 +37,17 @@ Strophe.addConnectionPlugin('muc', {
     (String) password - The optional password to use. (password protected
     rooms only)
     */
-    join: function(room, nick, msg_handler_cb, pres_handler_cb, optpres, password) {
+    join: function(room, nick, msg_handler_cb, pres_handler_cb, optpres, optmaxsecs, password) {
         var room_nick = this.test_append_nick(room, nick);
         var msg = optpres || $pres({from: this._connection.jid,
                          to: room_nick})
             .c("x",{xmlns: Strophe.NS.MUC});
+
+        if (optmaxsecs) {
+            var maxelement = Strophe.xmlElement('history', { seconds: optmaxsecs });
+            msg.cnode(maxelement).up();     // Leave it at <x> level for password if it is used.
+        }
+
         if (password)
         {
             var password_elem = Strophe.xmlElement("password",

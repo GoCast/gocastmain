@@ -2544,7 +2544,7 @@ var Callcast = {
         if (this.connection.connection) {
             this.connection.connection.muc.join(roomjid, Callcast.nick,
                                                 Callcast.MsgHandler, Callcast.PresHandler,
-                                                this.PrepMyPresence());
+                                                this.PrepMyPresence(), this.MAX_PUBCHAT_SECONDS);
         }
         else {
             Callcast.log('ERROR: No connection/connection/muc for join()');

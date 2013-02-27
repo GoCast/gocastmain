@@ -23,7 +23,8 @@ GoCastJS.CallcastSettings = function(server) {
                             ROOMMANAGER: 'overseer@video.gocast.it/roommanager',
                             SWITCHBOARD_FB: 'switchboard_gocastfriends@video.gocast.it',
                             LOGCATCHER: 'logcatcher@video.gocast.it/logcatcher',
-                            FILECATCHER: 'filecatcher@video.gocast.it/filecatcher'
+                            FILECATCHER: 'filecatcher@video.gocast.it/filecatcher',
+                            MAX_PUBCHAT_SECONDS: 300
                             });
             break;
         case 'dev.gocast.it':
@@ -37,7 +38,8 @@ GoCastJS.CallcastSettings = function(server) {
                             ROOMMANAGER: 'roommanager@dev.gocast.it/roommanager',
                             SWITCHBOARD_FB: 'switchboard_dev@dev.gocast.it',
                             LOGCATCHER: 'logcatcher@dev.gocast.it/logcatcher',
-                            FILECATCHER: 'filecatcher@dev.gocast.it/filecatcher'
+                            FILECATCHER: 'filecatcher@dev.gocast.it/filecatcher',
+                            MAX_PUBCHAT_SECONDS: 300
                             });
             break;
         case 'dnle.gocast.it':
@@ -51,7 +53,8 @@ GoCastJS.CallcastSettings = function(server) {
                             ROOMMANAGER: 'roommanager@dnle.gocast.it/roommanager',
                             SWITCHBOARD_FB: 'switchboard_dnle@dnle.gocast.it',
                             LOGCATCHER: 'logcatcher@dnle.gocast.it/logcatcher',
-                            FILECATCHER: 'filecatcher@dnle.gocast.it/filecatcher'
+                            FILECATCHER: 'filecatcher@dnle.gocast.it/filecatcher',
+                            MAX_PUBCHAT_SECONDS: 300
                             });
             break;
         case 'creativity.gocast.it':
@@ -65,7 +68,8 @@ GoCastJS.CallcastSettings = function(server) {
                             ROOMMANAGER: 'ccc_roommanager@dnle.gocast.it/roommanager',
                             SWITCHBOARD_FB: 'switchboard_ccc@dnle.gocast.it',
                             LOGCATCHER: 'ccc_logcatcher@dnle.gocast.it/logcatcher',
-                            FILECATCHER: 'ccc_filecatcher@dnle.gocast.it/filecatcher'
+                            FILECATCHER: 'ccc_filecatcher@dnle.gocast.it/filecatcher',
+                            MAX_PUBCHAT_SECONDS: 300
                             });
             break;
         default:
