@@ -44,6 +44,8 @@ if (process.env.SETTINGS_DEVEL === 1 || process.env.SETTINGS_DEVEL === '1') {
         usernametest: 'roommanager@' + settings.SERVERNAME + '/roommanagertest',
         password: 'being.the.doorman.always',
 
+        public_room_node: settings.CONF_SERVICE.replace(/@/,'') + '/public',
+
         wbstoragelocation: '~/wbstorage'
     };
 
@@ -66,7 +68,7 @@ if (process.env.SETTINGS_DEVEL === 1 || process.env.SETTINGS_DEVEL === '1') {
         dbUserRoomTable: 'dev_UserRoomTable',
         dbVisitorTable: 'dev_VisitorTable',
         dbPublicRoomTable: 'dev_PublicRoomTable',
-        mailgunKey: 'key-65ism99rlme7svrn93qc-cormdknx-42',      // Bob Wolff - rwolff@gocast.it key -- the free one.
+        mailgunKey: 'key-65ism99rlme7svrn93qc-cormdknx-42',      // Bob Wolff - rwolff@gocast.it key -- standard account now.
         inviteFromAddress: 'support@gocast.it',
         inviteFromName: 'GoCast Support',
         inviteSubject: 'Welcome! Please validate your new GoCast account.'
@@ -136,7 +138,7 @@ else {
         dbUserRoomTable: 'main_UserRoomTable',
         dbVisitorTable: 'main_VisitorTable',
         dbPublicRoomTable: 'main_PublicRoomTable',
-        mailgunKey: 'key-65ism99rlme7svrn93qc-cormdknx-42',      // Bob Wolff - rwolff@gocast.it key -- the free one.
+        mailgunKey: 'key-65ism99rlme7svrn93qc-cormdknx-42',      // Bob Wolff - rwolff@gocast.it key
         inviteFromAddress: 'support@gocast.it',
         inviteFromName: 'GoCast Support',
         inviteSubject: 'Welcome! Please validate your new GoCast account.'
@@ -182,6 +184,8 @@ else {
         usernametest: 'overseer@' + settings.SERVERNAME + '/roommanagertest',
         password: 'the.overseer.rocks',
         maxspotsallowed: 20,
+
+        public_room_node: settings.CONF_SERVICE.replace(/@/,'') + '/public',
 
         persist: true,      // Normally rooms are non-persistent.
         wbstoragelocation: '~/wbstorage'
@@ -259,6 +263,8 @@ if (process.env.STANFORDDNLE === 1 || process.env.STANFORDDNLE === '1') {
         usernametest: 'roommanager@' + settings.SERVERNAME + '/roommanagertest',
         password: 'the.gatekeeper.rules',
 
+        public_room_node: settings.CONF_SERVICE.replace(/@/,'') + '/public',
+
         wbstoragelocation: '~/wbstorage'
     };
 }
@@ -329,6 +335,8 @@ else if (process.env.STANFORDCCC === 1 || process.env.STANFORDCCC === '1') {
         username: 'ccc_roommanager@' + settings.SERVERNAME + '/roommanager',
         usernametest: 'ccc_roommanager@' + settings.SERVERNAME + '/roommanagertest',
         password: 'the.gatekeeper.rules.ccc',
+
+        public_room_node: settings.CONF_SERVICE.replace(/@/,'') + '/public',
 
         wbstoragelocation: '~/wbstorage_creativity'
     };

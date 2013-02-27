@@ -282,7 +282,7 @@ function apiNewAccount(baseURL, email, password, name, firstRoomName, extras, su
             db.AddEntry(email, obj, function() {
                 //Now, send activation email
                 privateSendEmail(name, email, settings.accounts.inviteSubject, emailBody, function() {
-                    gcutil.log('Hurray. Another user signed up! I hope ' + email + ' comes back to activate their account.');
+                    gcutil.log('Hurray. Another user signed up! Email: ' + email);
                     success();
                 }, function(err) {
                     gcutil.log('apiNewAccount: Failed sending email to ' + email + '. Backing out activation entry and pending account. Error: ' + err);

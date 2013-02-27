@@ -8,6 +8,8 @@ devmode=0
 
 # set dest dir
 dir="carousel"
+scriptsdir="/var/www/scripts"
+
 # username@servername:  (dont forget the : at the end)
 server="ec2-user@video.gocast.it:"
 
@@ -52,6 +54,7 @@ shift;
 done
 
 finaldest=$server$dir
+scriptsfinaldest=$server$scriptsdir
 
 # Temporary staging location locally prior to copying to the server.
 tempdest=`mktemp -d /tmp/publish.XXXXXXXXXX`
@@ -243,6 +246,7 @@ echo ==== Copying finalized contents to the server at $finaldest
 #
 #scp -r $tempdest/* $finaldest
 rsync -ave ssh $tempdest/* $finaldest/
+rsync -ave ssh ../scripts/* $scriptsfinaldest/
 
 # Now get rid of the temp location
 rm -rf $tempdest
