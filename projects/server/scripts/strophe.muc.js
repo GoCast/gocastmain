@@ -5,7 +5,7 @@ Plugin to implement the MUC extension. http://xmpp.org/extensions/xep-0045.html
 /* global document, window, setTimeout, clearTimeout, console,
     XMLHttpRequest, ActiveXObject,
     Base64, MD5,
-    Strophe, $build, $msg, $iq, $pres 
+    Strophe, $build, $msg, $iq, $pres
 */
 
 Strophe.addConnectionPlugin('muc', {
@@ -17,9 +17,9 @@ Strophe.addConnectionPlugin('muc', {
     */
     init: function(conn) {
         this._connection = conn;
-        /* extend name space 
+        /* extend name space
          *  NS.MUC - XMPP Multi-user chat namespace
-         *              from XEP 45.  
+         *              from XEP 45.
          *
          */
         Strophe.addNamespace('MUC_OWNER', Strophe.NS.MUC+"#owner");
@@ -37,14 +37,14 @@ Strophe.addConnectionPlugin('muc', {
     (String) password - The optional password to use. (password protected
     rooms only)
     */
-    join: function(room, nick, msg_handler_cb, pres_handler_cb, password) {
-        var room_nick = this.test_append_nick(room, nick);        
-        var msg = $pres({from: this._connection.jid,
+    join: function(room, nick, msg_handler_cb, pres_handler_cb, optpres, password) {
+        var room_nick = this.test_append_nick(room, nick);
+        var msg = optpres || $pres({from: this._connection.jid,
                          to: room_nick})
             .c("x",{xmlns: Strophe.NS.MUC});
         if (password)
         {
-            var password_elem = Strophe.xmlElement("password", 
+            var password_elem = Strophe.xmlElement("password",
                                                    [],
                                                    password);
             msg.cnode(password_elem);
@@ -80,14 +80,14 @@ Strophe.addConnectionPlugin('muc', {
                     for (var i = 0; i < xquery.length; i++)
                     {
                         var xmlns = xquery[i].getAttribute("xmlns");
-                        
+
                         if (xmlns && xmlns.match(Strophe.NS.MUC))
                         {
                             return pres_handler_cb(stanza);
                         }
                     }
                 }
-                return true;                
+                return true;
             },
                                         null,
                                         "presence",
@@ -107,7 +107,7 @@ Strophe.addConnectionPlugin('muc', {
     iqid - The unique id for the room leave.
     */
     leave: function(room, nick, handler_cb) {
-        var room_nick = this.test_append_nick(room, nick);        
+        var room_nick = this.test_append_nick(room, nick);
         var presenceid = this._connection.getUniqueId();
         var presence = $pres({type: "unavailable",
                               id: presenceid,
@@ -134,7 +134,7 @@ Strophe.addConnectionPlugin('muc', {
     msgiq - the unique id used to send the message
     */
     message: function(room, nick, message, html_message, type) {
-        var room_nick = this.test_append_nick(room, nick);        
+        var room_nick = this.test_append_nick(room, nick);
         type = type || "groupchat";
         var msgid = this._connection.getUniqueId();
         var msg = $msg({to: room_nick,
@@ -216,7 +216,7 @@ Strophe.addConnectionPlugin('muc', {
         var stanza = config.tree();
         return this._connection.sendIQ(stanza,
                                        function(){},
-                                       function(){});        
+                                       function(){});
     },
     /***Function
     Parameters:
@@ -305,14 +305,14 @@ Strophe.addConnectionPlugin('muc', {
         var iq = $iq({to: server,
                       from: this._connection.jid,
                       type: "get"})
-            .c("query",{xmlns: Strophe.NS.DISCO_ITEMS});        
-        this._connection.sendIQ(iq, handle_cb, function(){});        
+            .c("query",{xmlns: Strophe.NS.DISCO_ITEMS});
+        this._connection.sendIQ(iq, handle_cb, function(){});
     },
     test_append_nick: function(room, nick) {
         var room_nick = room;
-        if (nick) 
+        if (nick)
         {
-            room_nick += "/" + Strophe.escapeNode(nick); 
+            room_nick += "/" + Strophe.escapeNode(nick);
         }
         return room_nick;
     }
