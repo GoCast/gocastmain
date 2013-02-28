@@ -207,10 +207,10 @@ var logQ = new GoCastJS.BQueue(1024*1024);
 var Callcast = {
     PLUGIN_VERSION_CURRENT: 0.0,
     PLUGIN_VERSION_REQUIRED: 0.0,
-    PLUGIN_VERSION_CURRENT_MAC: 1.33,
-    PLUGIN_VERSION_REQUIRED_MAC: 1.33,
-    PLUGIN_VERSION_CURRENT_WIN: 1.33,
-    PLUGIN_VERSION_REQUIRED_WIN: 1.33,
+    PLUGIN_VERSION_CURRENT_MAC: 2.00,
+    PLUGIN_VERSION_REQUIRED_MAC: 2.00,
+    PLUGIN_VERSION_CURRENT_WIN: 2.00,
+    PLUGIN_VERSION_REQUIRED_WIN: 2.00,
     PLUGIN_VERSION_CURRENT_LINUX: 1.34,
     PLUGIN_VERSION_REQUIRED_LINUX: 1.34,
     NOANSWER_TIMEOUT_MS: 6000,
@@ -1876,7 +1876,7 @@ var Callcast = {
 
             // Always give the room manager a sane name.
             if (nick === Strophe.getResourceFromJid(this.overseer)) {
-                nick = 'Room Manager';
+                nick = 'Custodian';
             }
 
             msginfo = { nick: nick, nick_class: nick_class, body: body, delayed: delayed, notice: notice };

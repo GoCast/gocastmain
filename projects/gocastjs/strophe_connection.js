@@ -164,7 +164,7 @@ GoCastJS.StropheConnection.prototype = {
     },
 
     log: function(arg0, arg1, arg2) {
-        console.log('StropheConnection: ', arg0, arg1 || null, arg2 || null);
+        console.log('StropheConnection: ', arg0, arg1 || '', arg2 || '');
     },
 
     //

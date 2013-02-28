@@ -24,6 +24,10 @@ GoCastJS.CallcastSettings = function(server) {
                             SWITCHBOARD_FB: 'switchboard_gocastfriends@video.gocast.it',
                             LOGCATCHER: 'logcatcher@video.gocast.it/logcatcher',
                             FILECATCHER: 'filecatcher@video.gocast.it/filecatcher',
+                            MAC_DL_URL: 'https://carousel.gocast.it/downloads/GoCastPlayer.pkg',
+                            WIN_DL_URL: 'https://carousel.gocast.it/downloads/GoCastPlayer.msi', // todo, link in index.html is used, switch to using this value
+                            LIN_64_DL_URL: 'https://carousel.gocast.it/downloads/GoCastPlayer_x86_64.tar.gz',
+                            LIN_32_DL_URL: 'https://carousel.gocast.it/downloads/GoCastPlayer_i686.tar.gz',
                             MAX_PUBCHAT_SECONDS: 300
                             });
             break;
@@ -39,6 +43,10 @@ GoCastJS.CallcastSettings = function(server) {
                             SWITCHBOARD_FB: 'switchboard_dev@dev.gocast.it',
                             LOGCATCHER: 'logcatcher@dev.gocast.it/logcatcher',
                             FILECATCHER: 'filecatcher@dev.gocast.it/filecatcher',
+                            MAC_DL_URL: 'https://dev.gocast.it/downloads/GoCastPlayer.pkg',
+                            WIN_DL_URL: 'https://dev.gocast.it/downloads/GoCastPlayer.msi', // todo, link in index.html is used, switch to using this value
+                            LIN_64_DL_URL: 'https://dev.gocast.it/downloads/GoCastPlayer_x86_64.tar.gz',
+                            LIN_32_DL_URL: 'https://dev.gocast.it/downloads/GoCastPlayer_i686.tar.gz',
                             MAX_PUBCHAT_SECONDS: 300
                             });
             break;
@@ -54,6 +62,10 @@ GoCastJS.CallcastSettings = function(server) {
                             SWITCHBOARD_FB: 'switchboard_dnle@dnle.gocast.it',
                             LOGCATCHER: 'logcatcher@dnle.gocast.it/logcatcher',
                             FILECATCHER: 'filecatcher@dnle.gocast.it/filecatcher',
+                            MAC_DL_URL: 'https://carousel.gocast.it/downloads/GoCastPlayer.pkg',
+                            WIN_DL_URL: 'https://carousel.gocast.it/downloads/GoCastPlayer.msi', // todo, link in index.html is used, switch to using this value
+                            LIN_64_DL_URL: 'https://carousel.gocast.it/downloads/GoCastPlayer_x86_64.tar.gz',
+                            LIN_32_DL_URL: 'https://carousel.gocast.it/downloads/GoCastPlayer_i686.tar.gz',
                             MAX_PUBCHAT_SECONDS: 300
                             });
             break;
@@ -69,6 +81,10 @@ GoCastJS.CallcastSettings = function(server) {
                             SWITCHBOARD_FB: 'switchboard_ccc@dnle.gocast.it',
                             LOGCATCHER: 'ccc_logcatcher@dnle.gocast.it/logcatcher',
                             FILECATCHER: 'ccc_filecatcher@dnle.gocast.it/filecatcher',
+                            MAC_DL_URL: 'https://carousel.gocast.it/downloads/GoCastPlayer.pkg',
+                            WIN_DL_URL: 'https://carousel.gocast.it/downloads/GoCastPlayer.msi', // todo, link in index.html is used, switch to using this value
+                            LIN_64_DL_URL: 'https://carousel.gocast.it/downloads/GoCastPlayer_x86_64.tar.gz',
+                            LIN_32_DL_URL: 'https://carousel.gocast.it/downloads/GoCastPlayer_i686.tar.gz',
                             MAX_PUBCHAT_SECONDS: 300
                             });
             break;

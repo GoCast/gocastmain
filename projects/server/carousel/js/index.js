@@ -2358,15 +2358,15 @@ function doDownload()
   }
   else if (app.osPlatform.isMac)
   {
-    downloadURL(app.MAC_DL_URL);
+    downloadURL(Callcast.MAC_DL_URL || app.MAC_DL_URL);
   }
   else if (app.osPlatform.isLinux64)
   {
-    downloadURL(app.LIN_64_DL_URL);
+    downloadURL(Callcast.LIN_64_DL_URL || app.LIN_64_DL_URL);
   }
   else if (app.osPlatform.isLinux32)
   {
-    downloadURL(app.LIN_32_DL_URL);
+    downloadURL(Callcast.LIN_32_DL_URL || app.LIN_32_DL_URL);
   }
 
   // prompt user for next step
