@@ -811,7 +811,7 @@ div.cloudcarousel.typeContent > div.spotUrlTitle
   border-radius: 5px;
 }
 body > div#meeting > div#streams > div#scarousel div.cloudcarousel > object {
-  background-color: white;
+  background-color: black;
   margin: 2px;
 }
 /*body > div#meeting > div#streams > div#scarousel*/ div.cloudcarousel > div.name {
