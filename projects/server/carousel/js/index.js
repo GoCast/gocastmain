@@ -2070,7 +2070,13 @@ function checkCredentials(evt, msg)
     closeWindow();
     openWindow('#credentials');
     $('#credentials > input').unbind('keypress').keypress(keyHandler);
-    $('#credentials > #gcemail').focus();
+    if (typeof (Storage) !== 'undefined' && localStorage.gocastusername) {
+      $('#credentials > #gcemail').val(localStorage.gocastusername);
+      $('#credentials > #gcpassword').focus();
+    }
+    else {
+      $('#credentials > #gcemail').focus();
+    }
     $('#credentials > #msg').text(msg||'');
       /*if ('undefined' !== typeof(Storage)) {
         if (Callcast.connection.bAnonymous && window.localStorage.gcpReloadNickName) {

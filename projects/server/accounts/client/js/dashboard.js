@@ -97,9 +97,21 @@ var DashView = {
 
         if ('changepwd-form' === id) {
             $('#input-email', this.$forms[id]).val(DashApp.boshconn.getEmailFromJid());
-        } else if ('login-form' === id && $.urlvars.ecode) {
-            email = $.roomcode.decipheruname($.urlvars.ecode);
-            $('#input-email', this.$forms[id]).val(email);
+        } else if ('login-form' === id) {
+            if ($.urlvars.ecode) {
+                email = $.roomcode.decipheruname($.urlvars.ecode);
+            }
+            else if (typeof (Storage) !== 'undefined' && localStorage.gocastusername) {
+                email = localStorage.gocastusername;
+            }
+
+            if (email) {
+                $('#input-email', this.$forms[id]).val(email);
+                $('#input-password', this.$forms[id]).focus();
+            }
+            else {
+                $('#input-email', this.$forms[id]).focus();
+            }
         } else if ('startmeeting-form' === id) {
             if ($.browser.msie) {
                 $('#input-roomname', this.$forms[id]).blur();
@@ -747,6 +759,7 @@ var DashApp = {
             DashView.showloader('login-form');
         }
     },
+    //RMW use queryName in index.js for finding the user's name to auto-populate nickname.
     queryName: function(gotName) {
         var succCb = gotName || function(name) {},
             _email = this.boshconn.getEmailFromJid();
@@ -786,6 +799,9 @@ var DashApp = {
         return function(status) {
             if (Strophe.Status.CONNECTED === status ||
                 Strophe.Status.ATTACHED === status) {
+                if (typeof (Storage) !== 'undefined' && !DashApp.boshconn.isAnonymous()) {
+                    localStorage.gocastusername = DashApp.boshconn.getEmailFromJid();
+                }
                 self.setupForm('startmeeting-form');
                 self.setupForm('changepwd-form');
                 self.setupForm('schedulemeeting-form', true);
