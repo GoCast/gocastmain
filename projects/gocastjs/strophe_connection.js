@@ -118,7 +118,7 @@ GoCastJS.StropheConnection.prototype = {
     },
 
     getEmailFromJid: function() {
-        if (this.id) {
+        if (this.id && !this.bAnonymous) {
             return Strophe.getNodeFromJid(this.id).toLowerCase().replace('~', '@');
         }
         else {
