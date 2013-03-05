@@ -319,7 +319,7 @@ var DashView = {
                            '<a class="accordion-toggle" data-toggle="collapse" data-parent="#rooms" href="#{{room}}">' +
                            '{{name}} <small class="pull-right">&gt;&gt;</small></a></div>' +
                            '<div id="{{room}}" class="accordion-body collapse"><div class="accordion-inner">' +
-                           '{{description}}<br><br><a class="btn btn-success pull-right" href="{{link}}" target="_blank">' +
+                           '{{description}}<br><br><a class="btn btn-success pull-right" href="{{link}}">' +
                            'Take me to this room</a><br>&nbsp;</div></div></div>', i, roomshtml = '',
             publicrooms = pubrooms, participantsAttribute, partsAttrVal, $roomitem, rcode, link, title, roomids = [];
 
