@@ -1434,7 +1434,7 @@ function keypressGrpChatHandler(
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
   event.stopPropagation();
-  app.log(2, 'keypressGrpChatHandler');
+//  app.log(2, 'keypressGrpChatHandler');
   /*
    * We have no action for key press combinations with the Alt key. */
   if (event.altKey) {
