@@ -246,7 +246,7 @@ namespace GoCast
             devmgr->GetAudioOutputDevices(&devicelist);
         }
         
-        for(int16_t i=0; i<devicelist.size(); i++)
+        for(size_t i=0; i<devicelist.size(); i++)
         {
             devices.push_back(FB::variant(devicelist[i].name));            
         }
@@ -300,7 +300,7 @@ namespace GoCast
         registerProperty("videoTracks", make_property(this,&LocalMediaStream::get_videoTracks));
         registerProperty("audioTracks", make_property(this, &LocalMediaStream::get_audioTracks));
         
-        for(int i=0; i<pStream->video_tracks()->count(); i++)
+        for(size_t i=0; i<pStream->video_tracks()->count(); i++)
         {
             talk_base::scoped_refptr<webrtc::VideoTrackInterface> pTrack(pStream->video_tracks()->at(i));
             talk_base::scoped_refptr<webrtc::LocalVideoTrackInterface> pTrack_(
@@ -310,7 +310,7 @@ namespace GoCast
             AddTrack(LocalVideoTrack::Create(pTrack_));
         }
         
-        for(int i=0; i<pStream->audio_tracks()->count(); i++)
+        for(size_t i=0; i<pStream->audio_tracks()->count(); i++)
         {
             talk_base::scoped_refptr<webrtc::AudioTrackInterface> pTrack(pStream->audio_tracks()->at(i));
             talk_base::scoped_refptr<webrtc::LocalAudioTrackInterface> pTrack_(
@@ -348,13 +348,13 @@ namespace GoCast
         registerProperty("videoTracks", make_property(this,&RemoteMediaStream::get_videoTracks));
         registerProperty("audioTracks", make_property(this, &RemoteMediaStream::get_audioTracks));
         
-        for(int i=0; i<pStream->video_tracks()->count(); i++)
+        for(size_t i=0; i<pStream->video_tracks()->count(); i++)
         {
             talk_base::scoped_refptr<webrtc::VideoTrackInterface> pTrack(pStream->video_tracks()->at(i));
             AddTrack(RemoteVideoTrack::Create(pTrack));
         }
         
-        for(int i=0; i<pStream->audio_tracks()->count(); i++)
+        for(size_t i=0; i<pStream->audio_tracks()->count(); i++)
         {
             talk_base::scoped_refptr<webrtc::AudioTrackInterface> pTrack(pStream->audio_tracks()->at(i));
             AddTrack(RemoteAudioTrack::Create(pTrack));
