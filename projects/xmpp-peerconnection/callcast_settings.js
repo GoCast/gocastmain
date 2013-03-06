@@ -14,7 +14,7 @@ GoCastJS.CallcastSettings = function(server) {
         case 'carousel.gocast.it':
         case 'video.gocast.it':
             this.privPopulate({CALLCAST_XMPPSERVER: 'video.gocast.it',
-                            ANON_USERNAME: 'anon_gocastconference@dev.gocast.it',
+                            ANON_USERNAME: 'anon_gocastconference@video.gocast.it',
                             ANON_PASSWORD: 'gocast.video.anon',
                             CALLCAST_ROOMS: 'gocastconference.video.gocast.it',
                             AT_CALLCAST_ROOMS: '@gocastconference.video.gocast.it',
