@@ -1,6 +1,8 @@
 /*jslint sloppy: false, todo: true, white: true, browser: true, devel: true */
 /*global document */
 
+'use strict';
+
 (function() { if(typeof String.prototype.trim !== 'function') {
   String.prototype.trim = function() {
     return this.replace(/^\s+|\s+$/g, '');
@@ -66,6 +68,7 @@ var RegisterView = {
         }
     },
     displayform: function(id) {
+        var i;
         for (i in this.$forms) {
             if (this.$forms.hasOwnProperty(i)) {
                 this.$forms[i].removeClass('show');
@@ -77,14 +80,75 @@ var RegisterView = {
         this.setupPlaceholders(id);
     },
     displaydefaultform: function(action) {
-        var actions = ['register', 'activate'];
-        var formids = {register: 'register-form', activate: 'activate-form'};
+        var actions = ['register', 'activate'],
+            formids = {register: 'register-form', activate: 'activate-form'};
 
         if (!action || -1 === actions.indexOf(action)) {
             this.displayform('register-form');
         } else {
             this.displayform(formids[action]);
         }
+    },
+    displayPublicRooms: function(pubrooms, $container) {
+        var formtemplate = '<form id="publicrooms-form" class="show"><fieldset>' +
+                           '<legend>&nbsp;Public Rooms</legend>' +
+                           '<div class="alert alert-success"><a class="close" href="#" data-dismiss="alert">&times;</a>' +
+                           '<strong>Note</strong><br><p style="text-align:justify;">This is a list of public rooms ' +
+                           'showing the number of people currently in each one. If you\'re a new user and/or ' +
+                           'you don\'t own any rooms, feel free to try one of these rooms out!</p></div>' +
+                           '<div class="accordion" id="rooms"></div></fieldset></form>',
+            roomtemplate = '<div class="accordion-group{{sd}}" roomname="{{room}}" {{partsAttr}}>' +
+                           '<div class="accordion-heading">' +
+                           '<a class="accordion-toggle" data-toggle="collapse" data-parent="#rooms" href="#{{room}}">' +
+                           '{{name}} <small class="pull-right">&gt;&gt;</small></a></div>' +
+                           '<div id="{{room}}" class="accordion-body collapse"><div class="accordion-inner">' +
+                           '{{description}}<br><br><a class="btn btn-success pull-right" href="{{link}}">' +
+                           'Take me to this room</a><br>&nbsp;</div></div></div>', i, roomshtml = '',
+            publicrooms = pubrooms, participantsAttribute, partsAttrVal, $roomitem, rcode, link, title, roomids = [];
+
+        if (!$container.html()) {
+            $container.html(formtemplate);
+        }
+
+        for (i=0; i<publicrooms.length; i++) {
+            partsAttrVal = $(publicrooms[i]).attr('numparticipants').toString();
+            participantsAttribute = $(publicrooms[i]).attr('numparticipants') ? ('participants="' + partsAttrVal + '"') : '';
+            rcode = $.roomcode.cipher($(publicrooms[i]).attr('room').split('#')[0], $(publicrooms[i]).attr('room').split('#')[1]);
+            link = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1) + '?roomname=' + rcode;
+            title = ($(publicrooms[i]).attr('owner') ? $(publicrooms[i]).attr('owner') + '\'s ' : '') + $(publicrooms[i]).attr('room').split('#')[1];
+            $roomitem = $('.accordion-group[roomname="' + rcode.replace(/\=/g, '_eq').replace(/\+/g, '_plus') +
+                        '"]', $container);
+            roomids.push(rcode.replace(/\=/g, '_eq').replace(/\+/g, '_plus'));
+
+            if ($roomitem.length) {
+                $roomitem.attr('participants', partsAttrVal);
+                if (!$(publicrooms[i]).attr('numparticipants')) {
+                    $roomitem.removeAttr('participants');
+                } else if (10 > $(publicrooms[i]).attr('numparticipants')) {
+                    $roomitem.addClass('singledigit');
+                } else {
+                    $roomitem.removeClass('singledigit');
+                }
+            } else {
+                roomshtml  = roomshtml + (roomtemplate.replace(/\{\{index\}\}/g, i.toString())
+                                                      .replace(/\{\{room\}\}/g, rcode.replace(/\=/g, '_eq')
+                                                                                     .replace(/\+/g, '_plus'))
+                                                      .replace(/\{\{name\}\}/g, title)
+                                                      .replace(/\{\{description\}\}/g, $(publicrooms[i]).attr('description'))
+                                                      .replace(/\{\{link\}\}/g, link)
+                                                      .replace(/\{\{partsAttr\}\}/g, participantsAttribute)
+                                                      .replace(/\{\{sd\}\}/, (10 > $(publicrooms[i]).attr('numparticipants')) ?
+                                                               ' singledigit' : ''));
+            }
+
+        }
+
+        $('form > fieldset > .accordion', $container).append(roomshtml);
+        $('.accordion-group[roomname]', $container).each(function() {
+            if (-1 === roomids.indexOf($(this).attr('roomname'))) {
+                $(this).remove();
+            }
+        });
     },
     displayalert: function(formid, type, message) {
         var $alert = null;
@@ -104,7 +168,7 @@ var RegisterView = {
             $btn = $button || $('.btn[type="submit"]', this.$forms[formid]),
             btntext = text || submittexts[formid];
         $btn.removeClass('disabled').html(btntext);
-    },
+    }
 };
 
 var RegisterApp = {
@@ -205,14 +269,56 @@ var RegisterApp = {
     },
     init: function() {
         var urlvars = $.urlvars,
-            self = this;
+            self = this, i, options, campaign, campaignstr;
 
-        for (var i=0; i<document.forms.length; i++) {
-            var options = {
+        this.settings = new GoCastJS.CallcastSettings(window.location.hostname);
+
+        this.boshconn = new GoCastJS.StropheConnection({
+            boshurl: '/xmpp-httpbind',
+            xmppserver: this.settings.get('CALLCAST_XMPPSERVER'),
+            anon_username: this.settings.get('ANON_USERNAME'),
+            anon_password: this.settings.get('ANON_PASSWORD'),
+            public_room_node: this.settings.get('CALLCAST_ROOMS') + '/public',
+            statusCallback: this.boshconnstatusCallback()
+        });
+
+        //
+        // Because we're potentially using anonymous connections for subscriptions, make sure we kill the connection
+        // upon unload if it's anonymous.
+        //
+        $(window).on('beforeunload', function() {
+            if (self.boshconn && self.boshconn.isAnonymous()) {
+                self.boshconn.forgetReconnectInfo();
+                self.boshconn.forgetReconnectInfoInLocalStorage();
+                self.boshconn.disconnect();
+            }
+        });
+
+        // We only do the public rooms list when coursera is inactive in the same region.
+        if (!$.urlvars.utm_source || 'coursera' !== $.urlvars.utm_source.toLowerCase()) {
+            $('#courseraclassesdiv').css('display', 'none');
+            this.boshconn.subscribePublicRooms(function(data) {
+    /*            console.log('Subscribe-Callback-Dashboard: data length: ' + data.length);
+                for (i = 0 ; i < data.length ; i += 1) {
+                    console.log('Subscribe-Callback-Dashboard item room: ' + ($(data[i]).attr('room') || '') + ', owner: ' + ($(data[i]).attr('owner') || '') + ', numparticipants: ' + ($(data[i]).attr('numparticipants') || ''));
+                }
+                */
+                $('#publicroomsdiv publicrooms-form').addClass('show');
+                RegisterView.displayPublicRooms(data, $('#publicrooms'));
+            });
+        }
+
+        // Regardless of remembered or anonymous - we need a strophe connection for subscriptions to public rooms.
+        this.boshconn.autoConnect();
+
+        for (i=0; i<document.forms.length; i++) {
+            options = {
                 dataType: 'json',
                 success: this.formSubmitResultCallbacks[document.forms[i].id].success(),
                 error: this.formSubmitResultCallbacks[document.forms[i].id].failure()
-            }, campaign = {}, campaignstr = '';
+            };
+            campaign = {};
+            campaignstr = '';
 
             if ('register-form' === document.forms[i].id) {
                 options.data = {
@@ -262,6 +368,11 @@ var RegisterApp = {
             $('#input-activation-code', this.$forms['activate-form']).val(urlvars.code);
             $('[type="submit"].btn', this.$forms['activate-form']).click();
         }
+    },
+    boshconnstatusCallback: function() {
+        return function(status) {
+            return;
+        };
     },
     sendactemail: function(evt, email, sendbtn) {
         var $sendbtn = $(sendbtn),

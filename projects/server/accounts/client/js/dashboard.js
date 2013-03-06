@@ -97,9 +97,21 @@ var DashView = {
 
         if ('changepwd-form' === id) {
             $('#input-email', this.$forms[id]).val(DashApp.boshconn.getEmailFromJid());
-        } else if ('login-form' === id && $.urlvars.ecode) {
-            email = $.roomcode.decipheruname($.urlvars.ecode);
-            $('#input-email', this.$forms[id]).val(email);
+        } else if ('login-form' === id) {
+            if ($.urlvars.ecode) {
+                email = $.roomcode.decipheruname($.urlvars.ecode);
+            }
+            else if (typeof (Storage) !== 'undefined' && localStorage.gocastusername) {
+                email = localStorage.gocastusername;
+            }
+
+            if (email) {
+                $('#input-email', this.$forms[id]).val(email);
+                $('#input-password', this.$forms[id]).focus();
+            }
+            else {
+                $('#input-email', this.$forms[id]).focus();
+            }
         } else if ('startmeeting-form' === id) {
             if ($.browser.msie) {
                 $('#input-roomname', this.$forms[id]).blur();
@@ -146,7 +158,7 @@ var DashView = {
                 }
                 defs['input-time'] = hours + ':' + ((date.getMinutes() < 10) ? '0' : '') +
                                      date.getMinutes();
-                defs['ampm'] = ampm;
+                defs.ampm = ampm;
             }
             $('a.btn-link', this.$forms[id]).unbind('click').click(this.schedmtgCancelClickCallback());
         }
@@ -247,7 +259,7 @@ var DashView = {
                 placement: 'left',
                 html: true,
                 trigger: 'manual'
-            })
+            });
         });
 
         $('#roomlist a.deleteroom', this.$forms[formid]).click(function(e) {
@@ -319,7 +331,7 @@ var DashView = {
                            '<a class="accordion-toggle" data-toggle="collapse" data-parent="#rooms" href="#{{room}}">' +
                            '{{name}} <small class="pull-right">&gt;&gt;</small></a></div>' +
                            '<div id="{{room}}" class="accordion-body collapse"><div class="accordion-inner">' +
-                           '{{description}}<br><br><a class="btn btn-success pull-right" href="{{link}}" target="_blank">' +
+                           '{{description}}<br><br><a class="btn btn-success pull-right" href="{{link}}">' +
                            'Take me to this room</a><br>&nbsp;</div></div></div>', i, roomshtml = '',
             publicrooms = pubrooms, participantsAttribute, partsAttrVal, $roomitem, rcode, link, title, roomids = [];
 
@@ -333,9 +345,9 @@ var DashView = {
             rcode = $.roomcode.cipher($(publicrooms[i]).attr('room').split('#')[0], $(publicrooms[i]).attr('room').split('#')[1]);
             link = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1) + '?roomname=' + rcode;
             title = ($(publicrooms[i]).attr('owner') ? $(publicrooms[i]).attr('owner') + '\'s ' : '') + $(publicrooms[i]).attr('room').split('#')[1];
-            $roomitem = $('.accordion-group[roomname="' + rcode.replace(/=/g, '_eq').replace(/\+/g, '_plus') +
+            $roomitem = $('.accordion-group[roomname="' + rcode.replace(/\=/g, '_eq').replace(/\+/g, '_plus') +
                         '"]', $container);
-            roomids.push(rcode.replace(/=/g, '_eq').replace(/\+/g, '_plus'));
+            roomids.push(rcode.replace(/\=/g, '_eq').replace(/\+/g, '_plus'));
 
             if ($roomitem.length) {
                 $roomitem.attr('participants', partsAttrVal);
@@ -348,7 +360,7 @@ var DashView = {
                 }
             } else {
                 roomshtml  = roomshtml + (roomtemplate.replace(/\{\{index\}\}/g, i.toString())
-                                                      .replace(/\{\{room\}\}/g, rcode.replace(/=/g, '_eq')
+                                                      .replace(/\{\{room\}\}/g, rcode.replace(/\=/g, '_eq')
                                                                                      .replace(/\+/g, '_plus'))
                                                       .replace(/\{\{name\}\}/g, title)
                                                       .replace(/\{\{description\}\}/g, $(publicrooms[i]).attr('description'))
@@ -441,7 +453,7 @@ var DashApp = {
 
                     $('#input-email', $form).val(email);
                     if (1 < email.split(' ').length || -1 === email.indexOf('@')) {
-                        RegisterView.displayalert('register-form', 'error', 'Please enter a valid email address.');
+                        DashView.displayalert('login-form', 'error', 'Please enter a valid email address.');
                         $('#input-email', $form).focus();
                     } else {
                         DashApp.boshconn.connect({
@@ -552,7 +564,7 @@ var DashApp = {
 
                     $('#input-email', $form).val(email);
                     if (1 < email.split(' ').length || -1 === email.indexOf('@')) {
-                        RegisterView.displayalert('reqresetpwd-form', 'error', 'Please enter a valid email address.');
+                        DashView.displayalert('reqresetpwd-form', 'error', 'Please enter a valid email address.');
                         $('#input-email', $form).focus();
                         return false;
                     }
@@ -649,7 +661,7 @@ var DashApp = {
                         when: (new Date($('#input-date', DashApp.$forms['schedulemeeting-form']).val() + ' ' +
                                         $('#input-time', DashApp.$forms['schedulemeeting-form']).val() + ' ' +
                                         $('#ampm', DashApp.$forms['schedulemeeting-form']).val())).toString(),
-                        fromemail: DashApp.boshconn.getEmailFromJid(),
+                        fromemail: DashApp.boshconn.getEmailFromJid()
                     }, genEmailArray = function (str, cb) {
                         var arr = [];
                         str.split(',').forEach(function(commas) {
@@ -747,6 +759,7 @@ var DashApp = {
             DashView.showloader('login-form');
         }
     },
+    //RMW use queryName in index.js for finding the user's name to auto-populate nickname.
     queryName: function(gotName) {
         var succCb = gotName || function(name) {},
             _email = this.boshconn.getEmailFromJid();
@@ -776,7 +789,7 @@ var DashApp = {
                 cb(response.data || []);
             },
             failure: function(error) {
-                cb(response.data || []);
+                cb(error.data || []);
             }
         });
     },
@@ -786,6 +799,9 @@ var DashApp = {
         return function(status) {
             if (Strophe.Status.CONNECTED === status ||
                 Strophe.Status.ATTACHED === status) {
+                if (typeof (Storage) !== 'undefined' && !DashApp.boshconn.isAnonymous()) {
+                    localStorage.gocastusername = DashApp.boshconn.getEmailFromJid();
+                }
                 self.setupForm('startmeeting-form');
                 self.setupForm('changepwd-form');
                 self.setupForm('schedulemeeting-form', true);

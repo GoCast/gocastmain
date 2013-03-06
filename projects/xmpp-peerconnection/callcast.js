@@ -2893,6 +2893,9 @@ var Callcast = {
         switch(status) {
             case Strophe.Status.CONNECTED:
                 this.log('XMPP/Strophe Finalizing connection and then triggering connected...');
+                if (typeof (Storage) !== 'undefined' && !Callcast.connection.isAnonymous()) {
+                    localStorage.gocastusername = Callcast.connection.getEmailFromJid();
+                }
                 Callcast.leaveIfReEntry(function() {
                     Callcast.finalizeConnect();
                     Callcast.Callback_ConnectionStatus('Connected');
@@ -2918,6 +2921,9 @@ var Callcast = {
                 break;
             case Strophe.Status.ATTACHED:
                 this.log('XMPP/Strophe Re-Attach of connection successful.');
+                if (typeof (Storage) !== 'undefined' && !Callcast.connection.isAnonymous()) {
+                    localStorage.gocastusername = Callcast.connection.getEmailFromJid();
+                }
                 Callcast.leaveIfReEntry(function() {
                     Callcast.log('ATTACHED - LeaveSession is complete. Re-join now.');
                     Callcast.finalizeConnect();

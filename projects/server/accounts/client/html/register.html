@@ -21,7 +21,10 @@
         </div>
         <div class="container">
             <div class="row">
-                <div class="span5 offset4">
+                <div id="publicroomsdiv" class="span5 offset1">
+                    <div id="publicrooms"></div>
+                </div>
+                <div class="span5">
                     <form id="register-form" class="form-horizontal" action="/acct/register/" method="post">
                         <fieldset>
                             <legend>&nbsp;Get started</legend>
@@ -99,7 +102,11 @@
         <script type="text/javascript" src="/scripts/jquery.base64.min.js?GOCASTTIMESTAMP"></script>
         <script type="text/javascript" src="js/jquery.form.js?GOCASTTIMESTAMP"></script>
         <script type="text/javascript" src="js/bootstrap.js?GOCASTTIMESTAMP"></script>
+        <script type="text/javascript" src="/scripts/strophe.min.js?GOCASTTIMESTAMP"></script>
+        <script type="text/javascript" src="/scripts/strophe.pubsub.js?GOCASTTIMESTAMP"></script>
+        <script type="text/javascript" src="js/strophe_connection.js?GOCASTTIMESTAMP"></script>
         <script type="text/javascript" src="js/jquery.utils.js?GOCASTTIMESTAMP"></script>
+        <script type="text/javascript" src="js/callcast_settings.js?GOCASTTIMESTAMP"></script>
         <script type="text/javascript" src="js/register.js?GOCASTTIMESTAMP"></script>
         <!-- Google Code for Remarketing tag -->
         <!-- Remarketing tags may not be associated with personally identifiable information or placed on pages related to sensitive categories. For instructions on adding this tag and more information on the above requirements, read the setup guide: google.com/ads/remarketingsetup -->
@@ -135,5 +142,23 @@
             }
         </script>
         <!-- End Google Analytics -->
+        <!-- Facebook ad tracking for conversion - 3/4/2013 -->
+        <script type="text/javascript">
+            var fb_param = {};
+            fb_param.pixel_id = '6005566649879';
+            fb_param.value = '0.00';
+            (function(){
+              var fpw = document.createElement('script');
+              if (window.location.hostname !== 'dev.gocast.it') {
+                  fpw.async = true;
+                  fpw.src = '//connect.facebook.net/en_US/fp.js';
+                  var ref = document.getElementsByTagName('script')[0];
+                  ref.parentNode.insertBefore(fpw, ref);
+              }
+              else {
+                console.log('Skipped Facebook conversion - dev.');
+              }
+            })();
+        </script>
     </body>
 </html>

@@ -13,9 +13,9 @@ body > .navbar {
     -moz-box-shadow: 0px 0px 20px black;
 }
 
-body > .container > .row > .span5 > form {
+body > .container > .row > .span5 form {
     display: none;
-    margin-top: 150px;
+    margin-top: 50px;
     border: 1px darkgrey solid;
     border-radius: 3px;
     background-color: white;
@@ -28,8 +28,8 @@ body > .container > .row > .span5 > form {
     box-shadow:0 1px 4px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.1) inset;
 }
 
-body > .container > .row > .span5 > form:before,
-body > .container > .row > .span5 > form:after {
+body > .container > .row > .span5 form:before,
+body > .container > .row > .span5 form:after {
     content: '';
     position: absolute;
     z-index: -1;
@@ -43,14 +43,14 @@ body > .container > .row > .span5 > form:after {
     box-shadow: 0 0 10px rgba(0,0,0,0.8);
 }
 
-body > .container > .row > .span5 > form:after {
+body > .container > .row > .span5 form:after {
     right: 10px;
     left: auto;
     -webkit-transform: skew(8deg) rotate(3deg);
     -moz-transform: skew(8deg) rotate(3deg);
 }
 
-body > .container > .row > .span5 > form button {
+body > .container > .row > .span5 form button {
     margin-right: 15px;
 }
 
@@ -64,7 +64,7 @@ body > .container > .row > .span5 > form .controls {
     margin-left: 0px;
 }
 
-body > .container > .row > .span5 > form.show {
+body > .container > .row > .span5 form.show {
     display: block;
 }
 
@@ -91,4 +91,37 @@ form .ie-pwd-placeholder.show {
 
 form input[type="password"].hide {
     display: none;
+}
+
+form#publicrooms-form .accordion-group[participants] {
+    position: relative;
+}
+
+form#publicrooms-form .accordion-group[participants]:before {
+    content: '\f007';
+    position: absolute;
+    font-family: 'FontAwesome';
+    right: 0px;
+    top: -10px;
+    background: seagreen;
+    color: white;
+    padding: 1px 10px;
+    border-radius: 10px;
+}
+
+form#publicrooms-form .accordion-group[participants]:after {
+    content: attr(participants);
+    position: absolute;
+    font-size: 0.8em;
+    right: -15px;
+    top: -20px;
+    background: #52D017;
+    color: black;
+    padding: 1px 5px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+form#publicrooms-form .accordion-group[participants].singledigit:after {
+    padding: 1px 8px;
 }
