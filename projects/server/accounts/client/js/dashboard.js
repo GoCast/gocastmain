@@ -158,7 +158,7 @@ var DashView = {
                 }
                 defs['input-time'] = hours + ':' + ((date.getMinutes() < 10) ? '0' : '') +
                                      date.getMinutes();
-                defs['ampm'] = ampm;
+                defs.ampm = ampm;
             }
             $('a.btn-link', this.$forms[id]).unbind('click').click(this.schedmtgCancelClickCallback());
         }
@@ -259,7 +259,7 @@ var DashView = {
                 placement: 'left',
                 html: true,
                 trigger: 'manual'
-            })
+            });
         });
 
         $('#roomlist a.deleteroom', this.$forms[formid]).click(function(e) {
@@ -345,9 +345,9 @@ var DashView = {
             rcode = $.roomcode.cipher($(publicrooms[i]).attr('room').split('#')[0], $(publicrooms[i]).attr('room').split('#')[1]);
             link = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1) + '?roomname=' + rcode;
             title = ($(publicrooms[i]).attr('owner') ? $(publicrooms[i]).attr('owner') + '\'s ' : '') + $(publicrooms[i]).attr('room').split('#')[1];
-            $roomitem = $('.accordion-group[roomname="' + rcode.replace(/=/g, '_eq').replace(/\+/g, '_plus') +
+            $roomitem = $('.accordion-group[roomname="' + rcode.replace(/\=/g, '_eq').replace(/\+/g, '_plus') +
                         '"]', $container);
-            roomids.push(rcode.replace(/=/g, '_eq').replace(/\+/g, '_plus'));
+            roomids.push(rcode.replace(/\=/g, '_eq').replace(/\+/g, '_plus'));
 
             if ($roomitem.length) {
                 $roomitem.attr('participants', partsAttrVal);
@@ -360,7 +360,7 @@ var DashView = {
                 }
             } else {
                 roomshtml  = roomshtml + (roomtemplate.replace(/\{\{index\}\}/g, i.toString())
-                                                      .replace(/\{\{room\}\}/g, rcode.replace(/=/g, '_eq')
+                                                      .replace(/\{\{room\}\}/g, rcode.replace(/\=/g, '_eq')
                                                                                      .replace(/\+/g, '_plus'))
                                                       .replace(/\{\{name\}\}/g, title)
                                                       .replace(/\{\{description\}\}/g, $(publicrooms[i]).attr('description'))
@@ -453,7 +453,7 @@ var DashApp = {
 
                     $('#input-email', $form).val(email);
                     if (1 < email.split(' ').length || -1 === email.indexOf('@')) {
-                        RegisterView.displayalert('register-form', 'error', 'Please enter a valid email address.');
+                        DashView.displayalert('login-form', 'error', 'Please enter a valid email address.');
                         $('#input-email', $form).focus();
                     } else {
                         DashApp.boshconn.connect({
@@ -564,7 +564,7 @@ var DashApp = {
 
                     $('#input-email', $form).val(email);
                     if (1 < email.split(' ').length || -1 === email.indexOf('@')) {
-                        RegisterView.displayalert('reqresetpwd-form', 'error', 'Please enter a valid email address.');
+                        DashView.displayalert('reqresetpwd-form', 'error', 'Please enter a valid email address.');
                         $('#input-email', $form).focus();
                         return false;
                     }
@@ -661,7 +661,7 @@ var DashApp = {
                         when: (new Date($('#input-date', DashApp.$forms['schedulemeeting-form']).val() + ' ' +
                                         $('#input-time', DashApp.$forms['schedulemeeting-form']).val() + ' ' +
                                         $('#ampm', DashApp.$forms['schedulemeeting-form']).val())).toString(),
-                        fromemail: DashApp.boshconn.getEmailFromJid(),
+                        fromemail: DashApp.boshconn.getEmailFromJid()
                     }, genEmailArray = function (str, cb) {
                         var arr = [];
                         str.split(',').forEach(function(commas) {
@@ -789,7 +789,7 @@ var DashApp = {
                 cb(response.data || []);
             },
             failure: function(error) {
-                cb(response.data || []);
+                cb(error.data || []);
             }
         });
     },
