@@ -85,6 +85,58 @@ namespace GoCast
         (RtcCenter::Instance())->SetLocalVideoTrackEffect(effect.convert_cast<std::string>());
     }*/
     
+    void LocalAudioTrack::set_onvoicesigCb(const FB::JSObjectPtr& onvoicesigCb)
+    {
+        m_pProc->SetVoiceSignalCallback(onvoicesigCb);
+    }
+    
+    GCPVoiceProcessor::GCPVoiceProcessor(cricket::ChannelManager* pChanMgr)
+    : m_pChanMgr(pChanMgr)
+    {
+        m_pChanMgr->RegisterVoiceProcessor(0, this, cricket::MPD_RX_AND_TX);
+    }
+    
+    GCPVoiceProcessor::~GCPVoiceProcessor()
+    {
+        if(m_pChanMgr)
+        {
+            m_pChanMgr->UnregisterVoiceProcessor(0, this, cricket::MPD_RX_AND_TX);
+        }
+    }
+    
+    void GCPVoiceProcessor::OnFrame(uint32 ssrc, cricket::MediaProcessorDirection dir,
+                                    cricket::AudioFrame *pFrame)
+    {
+        static int16 samplesCount = 0;
+        static int16 avgLevel = 0;
+        
+        if(cricket::MPD_RX_AND_TX == dir)
+        {
+            avgLevel += pFrame->Level();
+            samplesCount++;
+            
+            if(16 == samplesCount)
+            {
+                avgLevel >>= 4;
+                samplesCount = 0;
+                {
+                    boost::mutex::scoped_lock lock_(m_mutex);
+                    if(m_onvoicesigCb.get())
+                    {
+                        m_onvoicesigCb->InvokeAsync("", FB::variant_list_of(avgLevel));
+                    }
+                }
+                avgLevel = 0;
+            }            
+        }
+    }
+    
+    void GCPVoiceProcessor::SetVoiceSignalCallback(const FB::JSObjectPtr& onvoicesigCb)
+    {
+        boost::mutex::scoped_lock lock_(m_mutex);
+        m_onvoicesigCb = onvoicesigCb;
+    }
+    
     std::string GetSigStateString(webrtc::PeerConnectionInterface::SignalingState state)
     {
         switch(state)
@@ -1019,7 +1071,8 @@ namespace GoCast
             return;
         }
         
-        succCb->InvokeAsync("", FB::variant_list_of(LocalMediaStream::Create(m_pLocalStream)));
+        GCPVoiceProcessor* pVoiceProc = new GCPVoiceProcessor(m_pConnFactory->channel_manager());
+        succCb->InvokeAsync("", FB::variant_list_of(LocalMediaStream::Create(m_pLocalStream, pVoiceProc)));
         FBLOG_INFO_CUSTOM("RtcCenter::GetUserMedia_w", "GetUserMedia DONE");
     }
     
