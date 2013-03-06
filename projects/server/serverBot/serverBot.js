@@ -3205,9 +3205,9 @@ Overseer.prototype.SetupPublicRoomPublisher = function() {
                                       owner: val.owner || ''}).up();
                     nonHidden += 1;
                 }
-//                else {
-//                    self.log('DEBUG: SetupPublicRoomPublisher: WARNING: Unknown public room: ' + val.room);
-//                }
+                else {
+                    self.log('DEBUG: SetupPublicRoomPublisher: WARNING: Unknown public room: ' + val.room);
+                }
             });
 
             // DEBUG
@@ -3229,7 +3229,7 @@ Overseer.prototype.SetupPublicRoomPublisher = function() {
 //                    self.log('Publish complete for ' + nonHidden + ' public rooms.');
 //                }
             });
-        }, 10 * 1000);
+        }, 5 * 1000);
     });
 };
 
