@@ -35,9 +35,9 @@ var SettingsUI = {
 			slide: function(evt, ui) { SettingsApp.micVol(ui.value); }
 		});
 
-		this.$walkytalky = $('#walkytalky');
+		/*this.$walkytalky = $('#walkytalky');
 		this.$walkytalky.mousedown(function() { SettingsApp.setMicMute(false); });
-		this.$walkytalky.mouseup(function() { SettingsApp.setMicMute(true); });
+		this.$walkytalky.mouseup(function() { SettingsApp.setMicMute(true); });*/
 
 		this.$savesettings = $('#savesettings');
 		this.$savesettings.click(this.savesettingsClickedCallback());
@@ -171,6 +171,15 @@ var SettingsUI = {
 
 		return function() {
 			SettingsApp.applyEffect(self.$effects.val());
+		};
+	},
+
+	micLevelCallback: function() {
+		return function(level) {
+			$('.miclevelunit').removeClass('filled');
+			for (i=0; i<=level; i++) {
+				$('#miclevel > #' + i.toString()).addClass('filled');
+			}
 		};
 	},
 
@@ -376,7 +385,7 @@ var SettingsApp = {
 	},
 
 	getUserMediaSuccessCallback: function() {
-		var self = this;
+		var self = this, i;
 
 		return function(stream) {
 			self.localStream = stream;
@@ -401,7 +410,8 @@ var SettingsApp = {
 
 			if (0 < self.localStream.audioTracks.length) {
 				hints.audio = true;
-				self.setMicMute(true);
+				self.localStream.audioTracks[0].onvoicesignal = SettingsUI.micLevelCallback();
+				self.spkVol(5);
 			}
 
 			var options = new GoCastJS.PeerConnectionOptions(
