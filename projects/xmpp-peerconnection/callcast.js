@@ -1187,6 +1187,7 @@ var Callcast = {
                                         .c('offer', {xmlns: Callcast.NS_CALLCAST}).t(sdp);
 
                                 Callcast.log('InitiateCall: SetLocalDescription complete.');
+                                Callcast.log('InitiateCall: Offer is: ' + sdp);
                                 // Now send our SDP/offer.
                                 Callcast.connection.send(offer);
                             }, function(msg) {
@@ -1220,6 +1221,8 @@ var Callcast = {
                 Callcast.log('CompleteCall: No offer yet -- this should not happen.');
                 console.error('CompleteCall: No offer yet -- this should not happen.');
             }
+
+            Callcast.log('CompleteCall: Offer is: ' + this.offer);
 
             try {
                 //
@@ -1261,6 +1264,7 @@ var Callcast = {
                 //                  Callcast.log('CompleteCall: Answer-SDP=' + sdp);
                                     self.peer_connection.SetLocalDescription('answer', sdp, function() {
                                         Callcast.log('Callee:' + self.GetID() + ' CompleteCall: Success - setting local and starting ICE machine.');
+                                        Callcast.log('CompleteCall: Answer is: ' + sdp);
 
                                         var answer = $msg({to: self.jid, type: 'chat'})
                                                 .c('answer', {xmlns: Callcast.NS_CALLCAST}).t(sdp);
@@ -1317,6 +1321,8 @@ var Callcast = {
                 if (this.peer_connection)
                 {
                     Callcast.log('Callee:' + self.GetID() + '  InboundAnswer: Setting SetRemoteDescription as ANSWER');
+                    Callcast.log('InboundAnswer: Answer is: ' + sdp);
+
                     this.peer_connection.SetRemoteDescription('answer', sdp, function() {
                         Callcast.log('InboundAnswer: Success SetRemoteDescription-answer.');
                     }, function(msg) {
