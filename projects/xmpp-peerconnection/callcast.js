@@ -236,6 +236,7 @@ var Callcast = {
     roomjid: '',
     roomlist: {},
     nick: '',
+    databaseNickname: null,
     joined: false,
     bUseVideo: true,
     bUseMicrophone: true,
@@ -562,7 +563,7 @@ var Callcast = {
     //       call. It will not CHANGE your nickname in a live sessions/MUC room.
     //
     SetNickname: function(mynick) {
-        Callcast.nick = mynick;
+        Callcast.nick = mynick;     //RMW set to resource+delim+mynick
 
         if (!this.fbsr || this.fbsr === '') {
             this.SendAdHocPres();
@@ -924,7 +925,7 @@ var Callcast = {
 
     Callee: function(nickin, room) {
         // Ojbect for participants in the call or being called (in progress)
-        var nickname = nickin,
+        var nickname = nickin,      //RMW remove delim from nickin
             self = this;
 
         this.peer_connection = null;
@@ -1195,6 +1196,7 @@ var Callcast = {
                         }, function(msg) {
                             Callcast.log('InitiateCall: FAILURE of CreateOffer msg: ' + msg);
                         }, {sdpconstraints: {mandatory: {OfferToReceiveAudio: 'true',
+                                                         AudioCodec: 'opus',
                                                          OfferToReceiveVideo: 'true'}}});
                     }
                     catch(e2) {
@@ -1271,6 +1273,7 @@ var Callcast = {
                                 }, function(msg) {
                                     Callcast.log('CompleteCall: FAILURE of CreateAnswer msg: ' + msg);
                                 }, {sdpconstraints: {mandatory: {OfferToReceiveAudio: 'true',
+                                                                 AudioCodec: 'opus',
                                                                  OfferToReceiveVideo: 'true'}}});
                             }
                             catch(e3) {
@@ -1861,6 +1864,7 @@ var Callcast = {
             nick_class = 'nick';
             if (nick === Callcast.nick) {
                 nick_class += ' self';
+                // RMW possibly rename 'nick = '(me)'' here
             }
 
             body = $(message).children('body').text();
@@ -1879,6 +1883,7 @@ var Callcast = {
                 nick = 'Custodian';
             }
 
+//RMW patch up delimited name to non-delimited name here.
             msginfo = { nick: nick, nick_class: nick_class, body: body, delayed: delayed, notice: notice };
 
             // Don't send out an update for a non-existent body message.
@@ -1911,6 +1916,7 @@ var Callcast = {
                 return true;    // Empty body - likely a signalling message.
             }
 
+//RMW patch up delimited name to non-delimited name here.
             msginfo = { nick: nick, body: body };
 
             $(document).trigger('private-message', msginfo);
@@ -2859,6 +2865,13 @@ var Callcast = {
         else {
             this.connection.connect(opts);
         }
+
+        // This is the earliest place we can ask the database for a nickname so that we have
+        // an answer back by the time connection is complete. That's the hope anyway.
+//        this.queryDatabaseName(function(name) {
+//            self.databaseNickname = name;
+//        });
+
     },
 
     leaveIfReEntry: function(cb, reason) {
@@ -2888,14 +2901,45 @@ var Callcast = {
             }
         }
     },
+    getDatabaseNickname: function() {
+        return this.databaseNickname;
+    },
+    queryDatabaseName: function(gotName) {
+        var succCb = gotName || function(name) {},
+            email;
 
+        if (!this.connection) {
+            Callcast.log('queryDatabaseName: WARNING: No BOSH connection.');
+        }
+
+        // Make sure we've got a connection and a valid email to query.
+        if (this.connection && this.connection.getEmailFromJid()) {
+            email = this.connection.getEmailFromJid();
+            $.ajax({
+                url: '/acct/getprofile/',
+                type: 'POST',
+                dataType: 'json',
+                data: { email: email },
+                success: function(response) {
+                    if ('success' === response.result) {
+                        Callcast.log('DEBUG: queryDatabaseName: Got name of: ' + response.data.name);
+                        succCb(response.data.name);     // This will make a null arg if no nickname is found.
+                    }
+                    else {
+                        Callcast.log('DEBUG: queryDatabaseName: ERROR.');
+                        succCb(''); // No nickname.
+                    }
+                }
+            });
+        }
+        else {
+            succCb('');   // No valid email or no connection - so no valid nickname.
+        }
+    },
     connStatusHandler: function(status) {
         switch(status) {
             case Strophe.Status.CONNECTED:
                 this.log('XMPP/Strophe Finalizing connection and then triggering connected...');
-                if (typeof (Storage) !== 'undefined' && !Callcast.connection.isAnonymous()) {
-                    localStorage.gocastusername = Callcast.connection.getEmailFromJid();
-                }
                 Callcast.leaveIfReEntry(function() {
                     Callcast.finalizeConnect();
                     Callcast.Callback_ConnectionStatus('Connected');
@@ -2921,9 +2965,6 @@ var Callcast = {
                 break;
             case Strophe.Status.ATTACHED:
                 this.log('XMPP/Strophe Re-Attach of connection successful.');
-                if (typeof (Storage) !== 'undefined' && !Callcast.connection.isAnonymous()) {
-                    localStorage.gocastusername = Callcast.connection.getEmailFromJid();
-                }
                 Callcast.leaveIfReEntry(function() {
                     Callcast.log('ATTACHED - LeaveSession is complete. Re-join now.');
                     Callcast.finalizeConnect();
@@ -2963,6 +3004,15 @@ var Callcast = {
 
         if (this.fbsr && this.fbsr !== '') {
             this.SendFBPres();
+        }
+
+        if (this.databaseNickname === null) {
+            Callcast.log('finalizeConnect: WARNING: databaseNickname has not returned yet and we are connected already');
+        }
+
+        // Remember the email address that was used for subsequent logins. (If we're non-anonymous)
+        if (typeof (Storage) !== 'undefined' && !Callcast.connection.isAnonymous()) {
+            localStorage.gocastusername = Callcast.connection.getEmailFromJid();
         }
 
         /* this.connection.debugXML(true); */
