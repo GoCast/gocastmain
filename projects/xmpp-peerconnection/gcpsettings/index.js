@@ -258,8 +258,8 @@ var SettingsApp = {
 			this.clearPlayers();
 		} else {
 			this.clearPlayers = function() {
-				this.$localplayer.get(0).deinit();
 				this.peerConnection.Deinit();
+				this.$localplayer.get(0).deinit();
 				this.peerConnection = null;
 				this.localStream = null;
 				SettingsUI.enableEffectsSelect(false);

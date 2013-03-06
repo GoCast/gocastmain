@@ -11,8 +11,8 @@
 
 #include <map>
 
-//#include "modules/video_capture/main/interface/video_capture_factory.h"
 #include "talk/app/webrtc/mediastreaminterface.h"
+#include "talk/media/base/voiceprocessor.h"
 #include "talk/base/scoped_ptr.h"
 #include "JSAPIAuto.h"
 
@@ -34,6 +34,11 @@ FBLOG_ERROR(func, msg);\
 LOG_TO_JS(func, msg, false);\
 }
 
+namespace cricket
+{
+    class ChannelManager;
+}
+
 namespace GoCast
 {
     class JSLogger
@@ -53,6 +58,21 @@ namespace GoCast
         boost::mutex m_mutex;
         FB::JSObjectPtr m_logCb;
         FB::VariantList m_logEntries;
+    };
+    
+    class GCPVoiceProcessor : public cricket::VoiceProcessor
+    {
+    public:
+        GCPVoiceProcessor(cricket::ChannelManager* pChanMgr);
+        virtual ~GCPVoiceProcessor();
+        virtual void OnFrame(uint32 ssrc, cricket::MediaProcessorDirection dir,
+                             cricket::AudioFrame* pFrame);
+        void SetVoiceSignalCallback(const FB::JSObjectPtr& onvoicesigCb);
+    
+    private:
+        boost::mutex m_mutex;
+        FB::JSObjectPtr m_onvoicesigCb;
+        cricket::ChannelManager* m_pChanMgr;
     };
     
     class MediaStreamTrack : public FB::JSAPIAuto
@@ -119,10 +139,22 @@ namespace GoCast
     class LocalAudioTrack : public LocalMediaStreamTrack
     {
     public:
-        static FB::JSAPIPtr Create(talk_base::scoped_refptr<webrtc::LocalAudioTrackInterface>& pTrack);
+        static FB::JSAPIPtr Create(talk_base::scoped_refptr<webrtc::LocalAudioTrackInterface>& pTrack,
+                                   GCPVoiceProcessor* pProc = NULL);
         static void GetAudioDevices(FB::VariantList& devices, bool bInput);
-        explicit LocalAudioTrack(const talk_base::scoped_refptr<webrtc::LocalAudioTrackInterface>& pTrack);
-        ~LocalAudioTrack() { }
+        explicit LocalAudioTrack(const talk_base::scoped_refptr<webrtc::LocalAudioTrackInterface>& pTrack,
+                                 GCPVoiceProcessor* pProc = NULL);
+        ~LocalAudioTrack() { delete m_pProc; }
+        
+        //Javascript get property methods
+        FB::JSObjectPtr get_onvoicesigCb() const { return m_onvoicesigCb; }
+        
+        //Javascript set property methods
+        void set_onvoicesigCb(const FB::JSObjectPtr& onvoicesigCb);
+        
+    private:
+        GCPVoiceProcessor* m_pProc;
+        FB::JSObjectPtr m_onvoicesigCb;
     };
     
     class RemoteVideoTrack : public MediaStreamTrack
@@ -144,8 +176,10 @@ namespace GoCast
     class LocalMediaStream : public FB::JSAPIAuto
     {
     public:
-        static FB::JSAPIPtr Create(talk_base::scoped_refptr<webrtc::LocalMediaStreamInterface>& pStream);
-        explicit LocalMediaStream(const talk_base::scoped_refptr<webrtc::LocalMediaStreamInterface>& pStream);
+        static FB::JSAPIPtr Create(talk_base::scoped_refptr<webrtc::LocalMediaStreamInterface>& pStream,
+                                   GCPVoiceProcessor* pVoiceProc = NULL);
+        explicit LocalMediaStream(const talk_base::scoped_refptr<webrtc::LocalMediaStreamInterface>& pStream,
+                                  GCPVoiceProcessor* pVoiceProc = NULL);
         ~LocalMediaStream() { }
         
         //Javascript get property methods

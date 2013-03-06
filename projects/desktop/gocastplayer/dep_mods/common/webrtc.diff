@@ -1,3 +1,31 @@
+Index: libjingle/trunk/third_party/webrtc/voice_engine/transmit_mixer.cc
+===================================================================
+--- libjingle/trunk/third_party/webrtc/voice_engine/transmit_mixer.cc	(revision 3501)
++++ libjingle/trunk/third_party/webrtc/voice_engine/transmit_mixer.cc	(working copy)
+@@ -366,7 +366,8 @@
+                                        _audioFrame.data_,
+                                        _audioFrame.samples_per_channel_,
+                                        _audioFrame.sample_rate_hz_,
+-                                       _audioFrame.num_channels_ == 2);
++                                       _audioFrame.num_channels_ == 2,
++                                       _audioLevel.Level());
+       }
+     }
+ 
+Index: libjingle/trunk/third_party/webrtc/voice_engine/include/voe_external_media.h
+===================================================================
+--- libjingle/trunk/third_party/webrtc/voice_engine/include/voe_external_media.h	(revision 3501)
++++ libjingle/trunk/third_party/webrtc/voice_engine/include/voe_external_media.h	(working copy)
+@@ -53,7 +53,8 @@
+     // samples in interleaved stereo format (L0,R0,L1,R1,...).
+     virtual void Process(const int channel, const ProcessingTypes type,
+                          WebRtc_Word16 audio10ms[], const int length,
+-                         const int samplingFreq, const bool isStereo) = 0;
++                         const int samplingFreq, const bool isStereo,
++                         const int level = 0) = 0;
+ 
+ protected:
+     virtual ~VoEMediaProcess() {}
 Index: libjingle/trunk/third_party/webrtc/build/merge_libs.gyp
 ===================================================================
 --- libjingle/trunk/third_party/webrtc/build/merge_libs.gyp	(revision 3501)
