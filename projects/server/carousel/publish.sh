@@ -102,6 +102,10 @@ fi
 # copy base files to a temporary location prior to obfuscation/minimization
 #
 
+mkdir -p $tempdest/gcpsettings
+cp -p -r ../../xmpp-peerconnection/gcpsettings/* $tempdest/gcpsettings
+cp -p ../../gocastjs/webrtc/peerconnection.js $tempdest/gcpsettings
+
 cp -p -r * $tempdest
 cp -p ../../xmpp-peerconnection/callcast.js $tempdest/js
 cp -p ../../xmpp-peerconnection/callcast_settings.js $tempdest/js
@@ -134,8 +138,11 @@ function obfuscate() {
 # Now obfuscate and minimize files that need it.
   tempjs=$tempdest/jscramble_staging
   mkdir $tempjs
+
   # make a temp spot for all the files that will live in js/ in the finaldest
   mkdir $tempjs/js
+  mkdir $tempjs/gcpsettings
+
   cp $tempdest/js/callcast.js $tempjs/js
   cp $tempdest/js/peerconnection.js $tempjs/js
   cp $tempdest/js/wb.js $tempjs/js
@@ -150,6 +157,9 @@ function obfuscate() {
   cp "$tempdest/js/dashboard.js" "$tempjs/js"
   cp "$tempdest/js/index.js" "$tempjs/js"
   cp "$tempdest/js/callcast_settings.js" "$tempjs/js"
+
+  cp "$tempdest/gcpsettings/peerconnection.js" "$tempjs/gcpsettings"
+  cp "$tempdest/gcpsettings/index.js" "$tempjs/gcpsettings"
 
   cw=`pwd`
   cd $tempjs
@@ -206,9 +216,15 @@ function minimize() {
   gcpublish "js/callcast-api.js" "js/callcast-api.js"
   gcpublish "js/fb.js" "js/fb.js"
   gcpublish "$tempdest/js/uiutil.js" "js/uiutil.js"
+
 return 0
 }
 
+#
+# $1 destination folder
+# $2 filename (original will match final)
+# $3 source folder
+#
 function genTimestampedHtml() {
   echo "Generating timestamped html: $1/$2"
   curtime=`date +%s`
@@ -226,6 +242,7 @@ genTimestampedHtml $tempdest index2.html .
 genTimestampedHtml $tempdest register.html ../accounts/client/html
 genTimestampedHtml $tempdest dashboard.html ../accounts/client/html
 genTimestampedHtml $tempdest myroom.html ../accounts/client/html
+genTimestampedHtml $tempdest/gcpsettings index.html ../../xmpp-peerconnection/gcpsettings
 
 if [ $confirm -eq 1 ]
 then
