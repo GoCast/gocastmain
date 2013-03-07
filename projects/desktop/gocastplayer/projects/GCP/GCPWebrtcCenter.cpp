@@ -1430,6 +1430,9 @@ namespace GoCast
 
 			if(0 < m_pLocalStream->video_tracks()->count())
 			{
+#ifdef GOCAST_WINDOWS
+				m_pVideoProc->Unregister();
+#endif
 				m_pLocalStream->video_tracks()->at(0)->set_enabled(false);
 			}
         }
