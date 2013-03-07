@@ -10,6 +10,7 @@
 #include "GCPWebrtcCenter.h"
 #include "GCPMediaConstraints.h"
 #include "variant_list.h"
+#include "libyuv.h"
 
 namespace GoCast
 {    
@@ -75,15 +76,22 @@ namespace GoCast
         m_enabled = newVal;
     }
     
-    /*FB::variant LocalVideoTrack::get_effect() const
+    FB::variant LocalVideoTrack::get_effect() const
     {
-        return (RtcCenter::Instance())->GetLocalVideoTrackEffect();
+        if(m_pProc)
+        {
+            return m_pProc->GetEffect();
+        }
+        return "none";
     }
     
     void LocalVideoTrack::set_effect(FB::variant effect)
     {
-        (RtcCenter::Instance())->SetLocalVideoTrackEffect(effect.convert_cast<std::string>());
-    }*/
+        if(m_pProc)
+        {
+            m_pProc->SetEffect(effect.convert_cast<std::string>());
+        }
+    }
     
     void LocalAudioTrack::set_onvoicesigCb(const FB::JSObjectPtr& onvoicesigCb)
     {
@@ -93,7 +101,10 @@ namespace GoCast
     GCPVoiceProcessor::GCPVoiceProcessor(cricket::ChannelManager* pChanMgr)
     : m_pChanMgr(pChanMgr)
     {
-        m_pChanMgr->RegisterVoiceProcessor(0, this, cricket::MPD_RX_AND_TX);
+        if(m_pChanMgr)
+        {
+            m_pChanMgr->RegisterVoiceProcessor(0, this, cricket::MPD_RX_AND_TX);
+        }
     }
     
     GCPVoiceProcessor::~GCPVoiceProcessor()
@@ -135,6 +146,87 @@ namespace GoCast
     {
         boost::mutex::scoped_lock lock_(m_mutex);
         m_onvoicesigCb = onvoicesigCb;
+    }
+    
+    GCPVideoProcessor::GCPVideoProcessor(cricket::ChannelManager* pChanMgr,
+                                         cricket::VideoCapturer* pCap)
+    : m_effect("none")
+    , m_pChanMgr(pChanMgr)
+    , m_pCap(pCap)
+    {
+        if(m_pChanMgr)
+        {
+            m_bRegistered = m_pChanMgr->RegisterVideoProcessor(pCap, this);
+        }
+    }
+    
+    GCPVideoProcessor::~GCPVideoProcessor()
+    {
+        if(m_pChanMgr)
+        {
+            m_pChanMgr->UnregisterVideoProcessor(m_pCap, this);
+        }
+    }
+    
+    void GCPVideoProcessor::OnFrame(uint32 ssrc, cricket::VideoFrame* pFrame, bool* pbDrop)
+    {
+        if(!(*pbDrop))
+        {
+            std::string effect("none");
+            
+            {
+                boost::mutex::scoped_lock lock_(m_mutex);
+                effect = m_effect;
+            }
+            
+            if("none" == effect)
+            {
+                return;
+            }
+            else
+            {
+                int width = pFrame->GetWidth();
+                int height = pFrame->GetHeight();
+                int stride = width << 2;
+                                
+                if(!m_pBuf.get())
+                {
+                    m_pBuf.reset(new uint8[stride*height]);
+                }
+
+                pFrame->ConvertToRgbBuffer(cricket::FOURCC_ARGB, m_pBuf.get(), stride*height, stride);
+                if("gray" == effect)
+                {
+                    libyuv::ARGBGray(m_pBuf.get(), stride, 0, 0, width, height);
+                }
+                else if("sepia" == effect)
+                {
+                    libyuv::ARGBSepia(m_pBuf.get(), stride, 0, 0, width, height);
+                }
+                libyuv::ARGBToI420(m_pBuf.get(), stride, pFrame->GetYPlane(),
+                                   pFrame->GetYPitch(), pFrame->GetUPlane(),
+                                   pFrame->GetUPitch(), pFrame->GetVPlane(),
+                                   pFrame->GetVPitch(), width, height);
+            }
+        }
+    }
+    
+    void GCPVideoProcessor::SetEffect(const std::string& effect)
+    {
+        if (!m_bRegistered)
+        {
+            m_bRegistered = m_pChanMgr->RegisterVideoProcessor(m_pCap, this);
+        }
+        if(m_bRegistered && ("none" == effect || "gray" == effect || "sepia" == effect))
+        {
+            boost::mutex::scoped_lock lock_(m_mutex);
+            m_effect = effect;
+        }
+    }
+    
+    std::string GCPVideoProcessor::GetEffect() const
+    {
+        return m_effect;
     }
     
     std::string GetSigStateString(webrtc::PeerConnectionInterface::SignalingState state)
@@ -737,25 +829,6 @@ namespace GoCast
         return m_pConnFactory->channel_manager()->GetInputVolume(pLevel);
     }
     
-    /*std::string RtcCenter::GetLocalVideoTrackEffect() const
-    {
-        if(0 < m_pLocalStream->video_tracks()->count())
-        {
-            talk_base::scoped_refptr<webrtc::LocalVideoTrackInterface> pTrack(
-                static_cast<webrtc::LocalVideoTrackInterface*>(m_pLocalStream->video_tracks()->at(0))
-            );
-            
-            if(NULL == pTrack.get())
-            {
-                return "none";
-            }
-            
-            return pTrack->GetVideoCapture()->GetEffect();
-        }
-        
-        return "none";
-    }*/
-    
     void RtcCenter::SetLocalVideoTrackEnabled(bool bEnable)
     {
         if(0 < m_pLocalStream->video_tracks()->count())
@@ -789,21 +862,6 @@ namespace GoCast
             m_pLocalStream->video_tracks()->at(0)->AddRenderer(pRenderer);
         }
     }
-    
-    /*void RtcCenter::SetLocalVideoTrackEffect(const std::string& effect)
-    {
-        if(0 < m_pLocalStream->video_tracks()->count())
-        {
-            talk_base::scoped_refptr<webrtc::LocalVideoTrackInterface> pTrack(
-                static_cast<webrtc::LocalVideoTrackInterface*>(m_pLocalStream->video_tracks()->at(0))
-            );
-            
-            if(NULL != pTrack.get())
-            {
-                pTrack->GetVideoCapture()->SetEffect(effect);
-            }
-        }            
-    }*/
     
     void RtcCenter::SetRemoteVideoTrackRenderer(const std::string& pluginId,
                                                 webrtc::VideoRendererInterface* pRenderer)
@@ -973,6 +1031,8 @@ namespace GoCast
                                    FB::JSObjectPtr succCb,
                                    FB::JSObjectPtr failCb)
     {
+        GCPVideoProcessor* pVideoProc = NULL;
+        
         if(NULL == m_pConnFactory.get())
         {
             FBLOG_ERROR_CUSTOM("RtcCenter::GetUserMedia_w", "Peerconnection factory is NULL...");
@@ -1015,6 +1075,7 @@ namespace GoCast
             
             std::string videoTrackLabel = "camera";            
             FBLOG_INFO_CUSTOM("RtcCenter::GetUserMedia_w", "Creating video source...");
+            pVideoProc = new GCPVideoProcessor(m_pConnFactory->channel_manager(), pCap);
             talk_base::scoped_refptr<webrtc::VideoSourceInterface> pSrc(m_pConnFactory->CreateVideoSource(pCap, &mediaconstraints));
             
             FBLOG_INFO_CUSTOM("RtcCenter::GetUserMedia_w", "Creating local video track...");
@@ -1072,7 +1133,9 @@ namespace GoCast
         }
         
         GCPVoiceProcessor* pVoiceProc = new GCPVoiceProcessor(m_pConnFactory->channel_manager());
-        succCb->InvokeAsync("", FB::variant_list_of(LocalMediaStream::Create(m_pLocalStream, pVoiceProc)));
+        succCb->InvokeAsync("", FB::variant_list_of(LocalMediaStream::Create(m_pLocalStream,
+                                                                             pVoiceProc,
+                                                                             pVideoProc)));
         FBLOG_INFO_CUSTOM("RtcCenter::GetUserMedia_w", "GetUserMedia DONE");
     }
     
