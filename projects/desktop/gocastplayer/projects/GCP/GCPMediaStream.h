@@ -85,6 +85,9 @@ namespace GoCast
         virtual void OnFrame(uint32 ssrc, cricket::VideoFrame* pFrame, bool* pbDrop);
         void SetEffect(const std::string& effect);
         std::string GetEffect() const;
+
+    private:
+        bool Unregister();
         
     private:
         boost::mutex m_mutex;

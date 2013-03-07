@@ -154,17 +154,14 @@ namespace GoCast
     , m_pChanMgr(pChanMgr)
     , m_pCap(pCap)
     {
-        if(m_pChanMgr)
-        {
-            m_bRegistered = m_pChanMgr->RegisterVideoProcessor(pCap, this);
-        }
+
     }
     
     GCPVideoProcessor::~GCPVideoProcessor()
     {
-        if(m_pChanMgr)
+        if(m_pChanMgr && m_bRegistered)
         {
-            m_pChanMgr->UnregisterVideoProcessor(m_pCap, this);
+            m_bRegistered = !m_pChanMgr->UnregisterVideoProcessor(m_pCap, this);
         }
     }
     
@@ -179,7 +176,7 @@ namespace GoCast
                 effect = m_effect;
             }
             
-            if("none" == effect)
+            if(!("gray" == effect || "sepia" == effect))
             {
                 return;
             }
@@ -213,11 +210,16 @@ namespace GoCast
     
     void GCPVideoProcessor::SetEffect(const std::string& effect)
     {
-        if (!m_bRegistered)
+        if (!m_bRegistered && ("gray" == effect || "sepia" == effect))
         {
             m_bRegistered = m_pChanMgr->RegisterVideoProcessor(m_pCap, this);
         }
-        if(m_bRegistered && ("none" == effect || "gray" == effect || "sepia" == effect))
+        else if(m_bRegistered && ("none" == effect))
+        {
+            m_bRegistered = !Unregister();
+        }
+        
+        if(m_bRegistered)
         {
             boost::mutex::scoped_lock lock_(m_mutex);
             m_effect = effect;
@@ -227,6 +229,15 @@ namespace GoCast
     std::string GCPVideoProcessor::GetEffect() const
     {
         return m_effect;
+    }
+    
+    bool GCPVideoProcessor::Unregister()
+    {
+        if(m_pChanMgr)
+        {
+            return m_pChanMgr->UnregisterVideoProcessor(m_pCap, this);
+        }
+        return false;
     }
     
     std::string GetSigStateString(webrtc::PeerConnectionInterface::SignalingState state)
@@ -907,6 +918,7 @@ namespace GoCast
 
     RtcCenter::RtcCenter()
     : m_msgq(this)
+    , m_pVideoProc(NULL)
     , m_pConnFactory(webrtc::CreatePeerConnectionFactory())
     , m_pLocalStream(NULL)
     {
@@ -922,7 +934,10 @@ namespace GoCast
     
     RtcCenter::~RtcCenter()
     {
-        
+        if(m_pVideoProc)
+        {
+            delete m_pVideoProc;
+        }
     }
     
     void RtcCenter::OnMessage(talk_base::Message* msg)
@@ -1031,8 +1046,6 @@ namespace GoCast
                                    FB::JSObjectPtr succCb,
                                    FB::JSObjectPtr failCb)
     {
-        GCPVideoProcessor* pVideoProc = NULL;
-        
         if(NULL == m_pConnFactory.get())
         {
             FBLOG_ERROR_CUSTOM("RtcCenter::GetUserMedia_w", "Peerconnection factory is NULL...");
@@ -1075,7 +1088,7 @@ namespace GoCast
             
             std::string videoTrackLabel = "camera";            
             FBLOG_INFO_CUSTOM("RtcCenter::GetUserMedia_w", "Creating video source...");
-            pVideoProc = new GCPVideoProcessor(m_pConnFactory->channel_manager(), pCap);
+            m_pVideoProc = new GCPVideoProcessor(m_pConnFactory->channel_manager(), pCap);
             talk_base::scoped_refptr<webrtc::VideoSourceInterface> pSrc(m_pConnFactory->CreateVideoSource(pCap, &mediaconstraints));
             
             FBLOG_INFO_CUSTOM("RtcCenter::GetUserMedia_w", "Creating local video track...");
@@ -1135,7 +1148,7 @@ namespace GoCast
         GCPVoiceProcessor* pVoiceProc = new GCPVoiceProcessor(m_pConnFactory->channel_manager());
         succCb->InvokeAsync("", FB::variant_list_of(LocalMediaStream::Create(m_pLocalStream,
                                                                              pVoiceProc,
-                                                                             pVideoProc)));
+                                                                             m_pVideoProc)));
         FBLOG_INFO_CUSTOM("RtcCenter::GetUserMedia_w", "GetUserMedia DONE");
     }
     

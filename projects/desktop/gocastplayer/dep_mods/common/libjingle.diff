@@ -260,18 +260,6 @@ Index: libjingle/trunk/talk/media/base/mediaengine.h
    virtual bool SetOutputVolume(int level) {
      return voice_.SetOutputVolume(level);
    }
-Index: libjingle/trunk/talk/media/base/videocapturer.cc
-===================================================================
---- libjingle/trunk/talk/media/base/videocapturer.cc	(revision 284)
-+++ libjingle/trunk/talk/media/base/videocapturer.cc	(working copy)
-@@ -168,6 +168,7 @@
-   talk_base::CritScope cs(&crit_);
-   ASSERT(std::find(video_processors_.begin(), video_processors_.end(),
-                    video_processor) == video_processors_.end());
-+  video_processors_.clear();
-   video_processors_.push_back(video_processor);
- }
- 
 Index: libjingle/trunk/talk/media/base/audioframe.h
 ===================================================================
 --- libjingle/trunk/talk/media/base/audioframe.h	(revision 284)
