@@ -193,7 +193,7 @@ var SettingsUI = {
 				videoin: self.$camselect.val() || '',
 				audioin: self.$micselect.val() || '',
 				audioout: self.$spkselect.val() || '',
-				effect: (('' !== self.$effects.val()) ? 
+				effect: (('' !== self.$effects.val()) ?
 						 self.$effects.val() : 'none')
 			};
 			var targetUrl = ('' !== document.referrer)?
@@ -214,6 +214,7 @@ var SettingsApp = {
 	remoteStream: null,
 	peerConnection: null,
 	deviceChecker: null,
+	oldVolume: 0,
 	createsdpconstraints: {
 		sdpconstraints: {
 			mandatory: {
@@ -223,7 +224,7 @@ var SettingsApp = {
         }
     },
 
-	init: function() {	 		 
+	init: function() {
 		this.$localplayer = $(document.getElementById('local'));
 		this.$remoteplayer = $(document.getElementById('remote'));
 		GoCastJS.SetDevicesChangedListener(1000, this.$localplayer.get(0),
@@ -391,6 +392,8 @@ var SettingsApp = {
 
 		return function(stream) {
 			self.localStream = stream;
+			// Initially clear the UI elements in case this Mic is dead.
+			SettingsUI.micLevelCallback()(-1);
 
 			var hints = {video: false, audio: false};
 			if (0 < self.localStream.videoTracks.length) {
@@ -401,18 +404,19 @@ var SettingsApp = {
 					self.$localplayer.get(0).height = 190;
 				} else {
 					self.$localplayer.get(0).width = 320;
-					self.$localplayer.get(0).height = 240;					
+					self.$localplayer.get(0).height = 240;
 				}
 
 				SettingsUI.enableEffectsSelect(true);
 			} else {
 				self.$localplayer.get(0).width = 1;
-				self.$localplayer.get(0).width = 1;				
+				self.$localplayer.get(0).width = 1;
 			}
 
 			if (0 < self.localStream.audioTracks.length) {
 				hints.audio = true;
 				self.localStream.audioTracks[0].onvoicesignal = SettingsUI.micLevelCallback();
+				self.oldVolume = self.spkVol();
 				self.spkVol(5);
 			}
 
@@ -508,4 +512,8 @@ var SettingsApp = {
 $(document).ready(function() {
 	SettingsApp.init();
 	SettingsUI.init();
+});
+
+$(window).on('beforeunload', function() {
+    SettingsApp.spkVol(SettingsApp.oldVolume);
 });
