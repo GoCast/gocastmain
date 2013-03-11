@@ -290,7 +290,7 @@ select {
 }
 
 #miclevel > .miclevelunit {
-	width: 24px;
+	width: 15px;
 	height: 5px;
 	display: inline-block;
 	border: 1px solid darkgreen;

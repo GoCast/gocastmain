@@ -23,6 +23,7 @@
 
 namespace GoCast
 {
+    class GCPVideoProcessor;
     std::string GetSigStateString(webrtc::PeerConnectionInterface::SignalingState state);
     std::string GetIceConnStateString(webrtc::PeerConnectionInterface::IceConnectionState state);
     std::string GetIceGathStateString(webrtc::PeerConnectionInterface::IceGatheringState state);
@@ -123,13 +124,11 @@ namespace GoCast
         bool GetSpkVol(int* pLevel) const;
         bool GetSpkMute(bool* pbEnabled) const;
         bool GetMicVol(int* pLevel) const;
-        //std::string GetLocalVideoTrackEffect() const;
         void SetLocalVideoTrackEnabled(bool bEnable);
         void SetLocalAudioTrackEnabled(bool bEnable);
         bool SetSpkVol(int level);
         bool SetMicVol(int level);
         void SetLocalVideoTrackRenderer(webrtc::VideoRendererInterface* pRenderer);
-        /*void SetLocalVideoTrackEffect(const std::string& effect);*/
         void SetRemoteVideoTrackRenderer(const std::string& pluginId,
                                          webrtc::VideoRendererInterface* pRenderer);
         void AddRemoteStream(const std::string& pluginId,
@@ -176,6 +175,7 @@ namespace GoCast
         
     private:
         MessageQueue m_msgq;
+        GCPVideoProcessor* m_pVideoProc;
         std::map< std::string,
                   talk_base::scoped_refptr<webrtc::PeerConnectionInterface> > m_pPeerConns;
         std::map< std::string,

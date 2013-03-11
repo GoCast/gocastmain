@@ -176,8 +176,10 @@ var SettingsUI = {
 
 	micLevelCallback: function() {
 		return function(level) {
+			var i;
+
 			$('.miclevelunit').removeClass('filled');
-			for (i=0; i<=level; i++) {
+			for (i=1; i<=level; i++) {
 				$('#miclevel > #' + i.toString()).addClass('filled');
 			}
 		};

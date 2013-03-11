@@ -13,6 +13,7 @@
 
 #include "talk/app/webrtc/mediastreaminterface.h"
 #include "talk/media/base/voiceprocessor.h"
+#include "talk/media/base/videoprocessor.h"
 #include "talk/base/scoped_ptr.h"
 #include "JSAPIAuto.h"
 
@@ -75,6 +76,26 @@ namespace GoCast
         cricket::ChannelManager* m_pChanMgr;
     };
     
+    class GCPVideoProcessor : public cricket::VideoProcessor
+    {
+    public:
+        GCPVideoProcessor(cricket::ChannelManager* pChanMgr,
+                          cricket::VideoCapturer* pCap);
+        virtual ~GCPVideoProcessor();
+        virtual void OnFrame(uint32 ssrc, cricket::VideoFrame* pFrame, bool* pbDrop);
+        void SetEffect(const std::string& effect);
+        std::string GetEffect() const;
+        bool Unregister();
+        
+    private:
+        boost::mutex m_mutex;
+        std::string m_effect;
+        cricket::ChannelManager* m_pChanMgr;
+        cricket::VideoCapturer* m_pCap;
+        talk_base::scoped_ptr<uint8> m_pBuf;
+        bool m_bRegistered;
+    };
+    
     class MediaStreamTrack : public FB::JSAPIAuto
     {
     public:
@@ -120,20 +141,25 @@ namespace GoCast
         typedef std::map<std::string, cricket::VideoCapturer*> VideoDeviceList;
         
     public:
-        static FB::JSAPIPtr Create(talk_base::scoped_refptr<webrtc::LocalVideoTrackInterface>& pTrack);
+        static FB::JSAPIPtr Create(talk_base::scoped_refptr<webrtc::LocalVideoTrackInterface>& pTrack,
+                                   GCPVideoProcessor* pProc = NULL);
         static FB::VariantMap GetVideoDevices();
         static cricket::VideoCapturer* GetCaptureDevice(const std::string& uniqueId);
-        explicit LocalVideoTrack(const talk_base::scoped_refptr<webrtc::LocalVideoTrackInterface>& pTrack);
-        ~LocalVideoTrack() { }
+        explicit LocalVideoTrack(const talk_base::scoped_refptr<webrtc::LocalVideoTrackInterface>& pTrack,
+                                 GCPVideoProcessor* pProc = NULL);
+        ~LocalVideoTrack() { delete m_pProc; }
         
         //Javascript get property methods
-        //FB::variant get_effect() const;
+        FB::variant get_effect() const;
         
         //Javascript set property methods
-        //void set_effect(FB::variant effect);
+        void set_effect(FB::variant effect);
         
     protected:
         static VideoDeviceList videoDevices;
+        
+    private:
+        GCPVideoProcessor* m_pProc;
     };
     
     class LocalAudioTrack : public LocalMediaStreamTrack
@@ -177,9 +203,11 @@ namespace GoCast
     {
     public:
         static FB::JSAPIPtr Create(talk_base::scoped_refptr<webrtc::LocalMediaStreamInterface>& pStream,
-                                   GCPVoiceProcessor* pVoiceProc = NULL);
+                                   GCPVoiceProcessor* pVoiceProc = NULL,
+                                   GCPVideoProcessor* pVideoProc = NULL);
         explicit LocalMediaStream(const talk_base::scoped_refptr<webrtc::LocalMediaStreamInterface>& pStream,
-                                  GCPVoiceProcessor* pVoiceProc = NULL);
+                                  GCPVoiceProcessor* pVoiceProc = NULL,
+                                  GCPVideoProcessor* pVideoProc = NULL);
         ~LocalMediaStream() { }
         
         //Javascript get property methods

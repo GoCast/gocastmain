@@ -106,9 +106,10 @@ namespace GoCast
     
     LocalVideoTrack::VideoDeviceList LocalVideoTrack::videoDevices;
     
-    FB::JSAPIPtr LocalVideoTrack::Create(talk_base::scoped_refptr<webrtc::LocalVideoTrackInterface>& pTrack)
+    FB::JSAPIPtr LocalVideoTrack::Create(talk_base::scoped_refptr<webrtc::LocalVideoTrackInterface>& pTrack,
+                                         GCPVideoProcessor* pProc)
     {
-        return boost::make_shared<LocalVideoTrack>(pTrack);
+        return boost::make_shared<LocalVideoTrack>(pTrack, pProc);
     }
     
     FB::VariantMap LocalVideoTrack::GetVideoDevices()
@@ -208,11 +209,13 @@ namespace GoCast
         return NULL;
     }
     
-    LocalVideoTrack::LocalVideoTrack(const talk_base::scoped_refptr<webrtc::LocalVideoTrackInterface>& pTrack)
+    LocalVideoTrack::LocalVideoTrack(const talk_base::scoped_refptr<webrtc::LocalVideoTrackInterface>& pTrack,
+                                     GCPVideoProcessor* pProc)
     : LocalMediaStreamTrack(pTrack->kind(), pTrack->id(), pTrack->enabled())
+    , m_pProc(pProc)
     {
-        /*registerProperty("effect", make_property(this, &LocalVideoTrack::get_effect,
-                                                       &LocalVideoTrack::set_effect));*/
+        registerProperty("effect", make_property(this, &LocalVideoTrack::get_effect,
+                                                 &LocalVideoTrack::set_effect));
     }
         
     FB::JSAPIPtr LocalAudioTrack::Create(talk_base::scoped_refptr<webrtc::LocalAudioTrackInterface>& pTrack,
@@ -284,13 +287,15 @@ namespace GoCast
     }
 
     FB::JSAPIPtr LocalMediaStream::Create(talk_base::scoped_refptr<webrtc::LocalMediaStreamInterface>& pStream,
-                                          GCPVoiceProcessor* pVoiceProc)
+                                          GCPVoiceProcessor* pVoiceProc,
+                                          GCPVideoProcessor* pVideoProc)
     {
-        return boost::make_shared<LocalMediaStream>(pStream, pVoiceProc);
+        return boost::make_shared<LocalMediaStream>(pStream, pVoiceProc, pVideoProc);
     }
     
     LocalMediaStream::LocalMediaStream(const talk_base::scoped_refptr<webrtc::LocalMediaStreamInterface>& pStream,
-                                       GCPVoiceProcessor* pVoiceProc)
+                                       GCPVoiceProcessor* pVoiceProc,
+                                       GCPVideoProcessor* pVideoProc)
     : FB::JSAPIAuto("MediaStream")
     , m_label(pStream->label())
     , m_videoTracks(FB::variant_list_of())
@@ -307,7 +312,7 @@ namespace GoCast
                 static_cast<webrtc::LocalVideoTrackInterface*>(pTrack.get())
             );
             
-            AddTrack(LocalVideoTrack::Create(pTrack_));
+            AddTrack(LocalVideoTrack::Create(pTrack_, pVideoProc));
         }
         
         for(size_t i=0; i<pStream->audio_tracks()->count(); i++)
