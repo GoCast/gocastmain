@@ -1,8 +1,3 @@
-<!DOCTYPE html>
-<html>
-    <head>
-    </head>
-    <body style="padding: 100px;">
         <div id="gcenvelope" style="font-family: arial; text-align: justify;">
             <div id="gcheader" style="background-color: black; padding: 5px 10px;">
                 <a href="http://www.gocast.it" target="_blank">
@@ -33,17 +28,3 @@
                 </p>
             </div>
         </div>
-        <script type="text/javascript">
-            var domGcContent = document.getElementById('gccontent'),
-                contentTmpl = domGcContent.innerHTML;
-
-            domGcContent.innerHTML = contentTmpl.replace(/\{\{nameemail\}\}/g, 'Manjesh Malavalli (manjesh@gocast.it)')
-                                                .replace(/\{\{note\}\}/g, 'Hi team, Lets meet together on the date and time ' +
-                                                                          'mentioned below to discuss about our priorities ' +
-                                                                          'for the next couple of months. We should aim to ' +
-                                                                          'get a lot of things done. See you guys at the ' +
-                                                                          'meeting!')
-                                                .replace(/\{\{when\}\}/g, 'Monday, June 17th, 2013 at 5:45 PM (PST)');
-        </script>
-    </body>
-</html>
