@@ -25,6 +25,7 @@ if (!settings.accounts) {
 
 var sys = require('util');
 var evt = require('events');
+var fs = require('fs');     // Need for readFile
 
 var gcutil = require('./gcutil_node');
 
@@ -34,11 +35,93 @@ var argv = process.argv;
 var Mailgun = require('mailgun').Mailgun;
 var mg = new Mailgun(settings.accounts.mailgunKey);
 
+var nodemailer = require('nodemailer');
+
+// Prep the one-time transport for mailing HTML based emails.
+var transport = nodemailer.createTransport('SMTP', {
+        service: 'mailgun',
+        auth: {
+                user: settings.accounts.mailgunUser,
+                pass: settings.accounts.mailgunPass
+        }
+});
+
 var crypto = require('crypto');
 var xmpp = require('./accounts_xmpp');
 var db = require('./accounts_db');
 
+var bodyFromDisk = null;
+
 'use strict';
+
+function privateGenGCalHTML(nameemail, link, note, when) {
+    var html, start, end, minsToAdd = 60;
+
+//    '<a href="http://www.google.com/calendar/event?action=TEMPLATE&text=GoCast%20Meeting&dates=20130310T213000Z/20130310T223000Z&details=Meeting%20description%20here.&location=https%3A%2F%2Fstudy.gocast.it%3A%2F%3Froomname%3Dblah&trp=true&sprop=&sprop=name:" target="_blank"><img src="//www.google.com/calendar/images/ext/gc_button6.gif" border=0></a>'
+
+    html = 'http://www.google.com/calendar/event?action=TEMPLATE&text=';
+    html += encodeURI('GoCast online with ' + nameemail);
+
+    if (when) {
+        start = new Date(when);
+        end = new Date(when);
+        end.setTime(start.getTime() + (minsToAdd*60*1000));   // Add an hour for an end-time.
+
+        html += '&dates=';
+        // Zulu format for Google does *NOT* allow for '-' or ':' and we remove the .mmm from the milliseconds portion too.
+        html += start.toISOString().replace(/[\-:]/g,'').replace(/\.\d+Z/,'Z') + '/' + end.toISOString().replace(/[\-:]/g,'').replace(/\.\d+Z/,'Z');
+    }
+
+    if (note) {
+        html += '&details=' + encodeURI(note);
+    }
+
+    html += '&location=' + encodeURI(link);
+
+    html += '&trp=true&sprop=&sprop=name:';
+    return html;
+}
+
+function privateGenHTMLInviteEmail(nameemail, link, note, when) {
+    var body, fn;
+
+    if (!bodyFromDisk) {
+        try {
+            fn = process.argv[1].slice(0, process.argv[1].lastIndexOf('/')+1);
+            bodyFromDisk = fs.readFileSync(fn + 'inviteemail.tmpl.html', 'utf8');
+        }
+        catch(e) {
+            console.log('ERROR: Could not find file ' + fn + 'inviteemail.tmpl.html');
+            return null;
+        }
+    }
+
+    body = bodyFromDisk;
+
+    body = body.replace(/\{\{note\}\}/g, note || '');
+
+    body = body.replace(/\{\{when\}\}/g, when || '');
+
+    body = body.replace(/\{\{nameemail\}\}/g, nameemail);
+
+    body = body.replace(/\{\{gcallink\}\}/g, privateGenGCalHTML(nameemail, link, note, when) || '');
+
+    body = body.replace(/\{\{roomlink\}\}/g, link || '');
+
+    if (settings.SERVERNAME === 'video.gocast.it') {
+        body = body.replace(/\{\{reglink\}\}/g, 'https://study.gocast.it/register.html');
+    }
+    else if (settings.SERVERNAME === 'dev.gocast.it') {
+        body = body.replace(/\{\{reglink\}\}/g, 'https://dev.gocast.it/register.html');
+    }
+    else if (settings.SERVERNAME === 'dnle.gocast.it') {
+    // TODO:RMW - Fix this link with proper matching 'site link' based on what site we're associated with.
+    // SERVERNAME of dnle corresponds to both creativity. and dnle.
+        body = body.replace(/\{\{reglink\}\}/g, 'https://dnle.gocast.it/register.html');
+    }
+
+    return body;
+}
 
 function privateGenInviteEmail(nameemail, link, note, when) {
     var body;
@@ -151,6 +234,32 @@ function privateGenEmail(baseURL, email, name, actcode, extras, bInAppReg) {
     return body;
 }
 
+function privateSendHTMLEmail(toName, toEmail, subject, body, cbSuccess, cbFailure) {
+var mailOptions = {
+        from: settings.accounts.inviteFromName + ' <' + settings.accounts.inviteFromAddress + '>',
+        to: toName + ' <' + toEmail + '>',
+        subject: subject,
+        generateTextFromHTML: true,
+        html: body
+    };
+
+    if (!transport) {
+        cbFailure('ERROR: FAILURE: No Transport.');
+        return null;
+    }
+
+    transport.sendMail(mailOptions, function(error, response) {
+            if (error) {
+                gcutil.log('Mail failed: ' + error);
+                cbFailure(error);
+            }
+            else {
+                gcutil.log('Email Success: ', response.message);
+                cbSuccess();
+            }
+    });
+}
+
 function privateSendEmail(toName, toEmail, subject, body, cbSuccess, cbFailure) {
     mg.sendText(settings.accounts.inviteFromName + ' <' + settings.accounts.inviteFromAddress + '>',
         [toName + ' <' + toEmail + '>'],
@@ -166,6 +275,32 @@ function privateSendEmail(toName, toEmail, subject, body, cbSuccess, cbFailure) 
             gcutil.log('Success');
             cbSuccess();
         }
+    });
+}
+
+function privateSendHTMLEmailList(fromName, toEmailArray, subject, body, cbSuccess, cbFailure) {
+var mailOptions = {
+        from: fromName + ' <' + settings.accounts.inviteFromAddress + '>',
+        to: toEmailArray,
+        subject: subject,
+        generateTextFromHTML: true,
+        html: body
+    };
+
+    if (!transport) {
+        cbFailure('ERROR: FAILURE: No Transport.');
+        return null;
+    }
+
+    transport.sendMail(mailOptions, function(error, response) {
+            if (error) {
+                gcutil.log('Mail failed: ' + error);
+                cbFailure(error);
+            }
+            else {
+                gcutil.log('Email Success: ', response.message);
+                cbSuccess();
+            }
     });
 }
 
@@ -414,8 +549,8 @@ function apiSendRoomInviteEmail(opts, success, failure) {
             }
 
             opts.toemailarray.unshift(opts.fromemail);
-            emailBody = privateGenInviteEmail(emailName, opts.link, opts.note, opts.when);
-            privateSendEmailList(specialFromName, opts.toemailarray.slice(0, maxToSend),
+            emailBody = privateGenHTMLInviteEmail(emailName, opts.link, opts.note, opts.when);
+            privateSendHTMLEmailList(specialFromName, opts.toemailarray.slice(0, maxToSend),
                                  'Your invitation to meet on GoCast with ' + emailName, emailBody, function() {
                 gcutil.log('Sent an invitation from ' + opts.fromemail + ' with ' + (opts.toemailarray.length - 1) + ' others.');
                 success();
