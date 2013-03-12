@@ -192,7 +192,7 @@ $(document).on('private-message', function(
       if (!util) {throw "no chat util";}
       item = app.carousel.getByNick(msginfo.nick);
       if (!util) {throw "no item by name " + msginfo.nick;}
-      util.addMsg(item.chatName, decodeURI(msginfo.body));
+      util.addMsg(item.chatName.split('/')[0], decodeURI(msginfo.body));
     }
     else // spot not found
     {
@@ -472,8 +472,8 @@ $(document).on('disconnected', function(
   return false;
 }); /* disconnected() */
 
-function assignSpotForParticipant(nickname) {
-  var dispname = decodeURI(nickname),
+function assignSpotForParticipant(nickname, shownNickname) {
+  var dispname = decodeURI(shownNickname),
       id = app.str2id(nickname),
       w, h, jqOo, oo, item;
 
@@ -514,7 +514,7 @@ function assignSpotForParticipant(nickname) {
   }
 }
 
-function addPluginForParticipant(nickname) {
+function addPluginForParticipant(nickname, shownNickname) {
   var id = app.str2id(nickname),
       oo = $('#meeting > #streams > #scarousel div.cloudcarousel#'+ id).get(0),
       w=1, h=1;
@@ -525,7 +525,7 @@ function addPluginForParticipant(nickname) {
   }
 
   if (!oo) {
-    AssignSpotForParticipant(nickname);
+    AssignSpotForParticipant(nickname, shownNickname);
     oo = $('#meeting > #streams > #scarousel div.cloudcarousel#'+ id).get(0);
   }
 
@@ -1018,7 +1018,7 @@ function addSpotCb(info)
 //    console.log('addSpot msg received id ' + info.spotdivid + ' #' + info.spotnumber, info);
     // determine cmd type, add or replace
 
-    // RMW: Change behavior - always assume first-unoc if none given.
+    // Changed behavior - always assume first-unoc if none given.
     info.spotreplace = info.spotreplace || 'first-unoc';
 
     // if there is a nodup prop == 1 and spot with spotId exists

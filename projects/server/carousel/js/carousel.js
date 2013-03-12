@@ -72,7 +72,7 @@
     chatOut.data('util', new GoCastJS.ChatUtil(chatOut));
 
     // add handlers
-    jqObj.mouseover(function(event) 
+    jqObj.mouseover(function(event)
     {
       if (event.isPropagationStopped())
       {
@@ -90,7 +90,7 @@
         $('.zoom', this).css({
           'left': '1%',
           'bottom': '1%'
-        });      
+        });
       }
     });
     jqObj.mouseout(function(event) {
@@ -118,7 +118,7 @@
       fs.setScale(this.plgOrgWidth * scale, this.plgOrgHeight * scale);
     }
   };
-  
+
   /// \brief a numerically ordered collection of Item with insert an delete
   var Items = function() // jslint waiver
   {
@@ -255,12 +255,12 @@
     }
     else
     {
-      name = decodeURI(item.nick);
+      name = decodeURI(item.nick.split('/')[0]);
       names = name.split(' ');
       console.log("setChatName", item.nick, name, names);
       if (1 === names.length) // no first, last name, only nick name so use it
       {
-        item.chatName = item.nick;
+        item.chatName = item.nick.split('/')[0];
       }
       else
       {
@@ -297,7 +297,7 @@
 
     item.chatName = null;
     for (i = 0; i < trys.length; ++i)
-    {    
+    {
       newName = trys[i];
       //console.log("resolveChatNameCollisions newName", newName);
       collisions = this.getNameCollisions(item, newName);

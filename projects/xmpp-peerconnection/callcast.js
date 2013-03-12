@@ -563,7 +563,7 @@ var Callcast = {
     //       call. It will not CHANGE your nickname in a live sessions/MUC room.
     //
     SetNickname: function(mynick) {
-        Callcast.nick = mynick;     //RMW set to resource+delim+mynick
+        Callcast.nick = mynick + '/' + Strophe.getResourceFromJid(Callcast.connection.getJid());
 
         if (!this.fbsr || this.fbsr === '') {
             this.SendAdHocPres();
@@ -925,7 +925,7 @@ var Callcast = {
 
     Callee: function(nickin, room) {
         // Ojbect for participants in the call or being called (in progress)
-        var nickname = nickin,      //RMW remove delim from nickin
+        var nickname = nickin.split('/')[0],      //remove delim from nickin and take up front portion. nick/resource
             self = this;
 
         this.peer_connection = null;
@@ -949,7 +949,7 @@ var Callcast = {
         this.bHasAV = false;
 
         if (Callcast.Callback_AddSpotForParticipant) {
-            Callcast.Callback_AddSpotForParticipant(nickname);
+            Callcast.Callback_AddSpotForParticipant(nickin.replace(/ /g, ''), nickname);
         }
 
         this.GetID = function() {
@@ -1021,7 +1021,8 @@ var Callcast = {
                 }
 */
                 if (Callcast.Callback_ReadyState) {
-                    Callcast.Callback_ReadyState(state, self.jid, self.jid.split('/')[1]);
+                    console.log('DEBUG: Calling ReadyState jid is: ' + self.jid);
+                    Callcast.Callback_ReadyState(state, self.jid, self.jid);
                 }
             }
             catch (e) {
@@ -1048,7 +1049,7 @@ var Callcast = {
 
                 Callcast.log('Callee: Starting peerconnection and adding plugin to carousel for: ' + nickname);
                 if (Callcast.Callback_AddPluginToParticipant) {
-                    this.AddPluginResult = Callcast.Callback_AddPluginToParticipant(nickname);
+                    this.AddPluginResult = Callcast.Callback_AddPluginToParticipant(nickin.replace(/ /g, ''), nickname);
                 }
                 else {
                     Callcast.log('Callee: ERROR: Init failure. No Callback_AddPluginToParticipant callback available.');
@@ -1870,7 +1871,7 @@ var Callcast = {
             nick_class = 'nick';
             if (nick === Callcast.nick) {
                 nick_class += ' self';
-                // RMW possibly rename 'nick = '(me)'' here
+                nick = 'me';            // Refer to ourselves as 'me'
             }
 
             body = $(message).children('body').text();
@@ -1889,8 +1890,7 @@ var Callcast = {
                 nick = 'Custodian';
             }
 
-//RMW patch up delimited name to non-delimited name here.
-            msginfo = { nick: nick, nick_class: nick_class, body: body, delayed: delayed, notice: notice };
+            msginfo = { nick: nick.split('/')[0], nick_class: nick_class, body: body, delayed: delayed, notice: notice };
 
             // Don't send out an update for a non-existent body message.
             // This is what will happen when a signaling/spotinfo message comes in.
@@ -1922,7 +1922,6 @@ var Callcast = {
                 return true;    // Empty body - likely a signalling message.
             }
 
-//RMW patch up delimited name to non-delimited name here.
             msginfo = { nick: nick, body: body };
 
             $(document).trigger('private-message', msginfo);
