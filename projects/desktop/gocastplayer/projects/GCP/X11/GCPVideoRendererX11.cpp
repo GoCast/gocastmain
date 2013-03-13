@@ -1,6 +1,6 @@
 #include "../GCPVideoRenderer.h"
 #include "PluginWindowX11.h"
-#include "common_video/libyuv/include/libyuv.h"
+#include "libyuv.h"
 
 namespace GoCast
 {
@@ -34,9 +34,9 @@ namespace GoCast
         FB::PluginWindowX11* pWinX11 = reinterpret_cast<FB::PluginWindowX11*>(m_pWin);
         GtkWidget* pRenderArea = pWinX11->getWidget();
                 
-        webrtc::ARGBScale(m_pFrameBuffer.get(), m_width*4, m_width, m_height,
+        libyuv::ARGBScale(m_pFrameBuffer, m_width*4, m_width, m_height,
                           pScaleBuf, m_pWin->getWindowWidth()*4,
-                          m_pWin->getWindowWidth(), m_pWin->getWindowHeight(), 1);
+                          m_pWin->getWindowWidth(), m_pWin->getWindowHeight(), libyuv::kFilterBilinear);
                           
         GoCast::ConvertToRGBA(pScaleBuf, m_pWin->getWindowWidth(), m_pWin->getWindowHeight());
 
