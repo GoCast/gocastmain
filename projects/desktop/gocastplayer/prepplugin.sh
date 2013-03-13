@@ -6,6 +6,6 @@ if [ `uname` = "Darwin" ]; then
 else
     if [ `uname` = "Linux" ]; then
         echo "Generating the GoCastPlayer plugin project (firebreath 1.6)..."
-        deps/firebreath/prepmake.sh projects build
+        deps/firebreath/prepmake.sh projects build -D LIBWEBRTC_BUILD_CONFIG=$1
     fi
 fi
