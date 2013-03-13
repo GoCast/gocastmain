@@ -232,6 +232,8 @@ var DashView = {
 
         $('#roomlist', this.$forms[formid]).html(template);
         $('#roomlist a.roomname', this.$forms[formid]).click(function() {
+            $('#roomlist table td', self.$forms[formid]).removeClass('selected');
+            $(this).parent().addClass('selected');
             $('#input-roomname', self.$forms[formid]).val($(this).text());
             if ('startmeeting-form' === formid && !$('a.btn-link', self.$forms[formid]).hasClass('show')) {
                 $('a.btn-inverse', self.$forms[formid]).addClass('show');
