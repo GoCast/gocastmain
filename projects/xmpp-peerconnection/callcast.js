@@ -2873,9 +2873,9 @@ var Callcast = {
 
         // This is the earliest place we can ask the database for a nickname so that we have
         // an answer back by the time connection is complete. That's the hope anyway.
-//        this.queryDatabaseName(function(name) {
-//            self.databaseNickname = name;
-//        });
+        this.queryDatabaseName(function(name) {
+            self.databaseNickname = name;
+        });
 
     },
 
@@ -2927,7 +2927,7 @@ var Callcast = {
                 data: { email: email },
                 success: function(response) {
                     if ('success' === response.result) {
-                        Callcast.log('DEBUG: queryDatabaseName: Got name of: ' + response.data.name);
+//                        Callcast.log('DEBUG: queryDatabaseName: Got name of: ' + response.data.name);
                         succCb(response.data.name);     // This will make a null arg if no nickname is found.
                     }
                     else {
@@ -2946,9 +2946,10 @@ var Callcast = {
             case Strophe.Status.CONNECTED:
                 this.log('XMPP/Strophe Finalizing connection and then triggering connected...');
                 Callcast.leaveIfReEntry(function() {
-                    Callcast.finalizeConnect();
-                    Callcast.Callback_ConnectionStatus('Connected');
-                    $(document).trigger('connected');
+                    Callcast.finalizeConnect(function() {
+                        Callcast.Callback_ConnectionStatus('Connected');
+                        $(document).trigger('connected');
+                    });
                 }, 'connected');
                 break;
             case Strophe.Status.DISCONNECTED:
@@ -2972,9 +2973,10 @@ var Callcast = {
                 this.log('XMPP/Strophe Re-Attach of connection successful.');
                 Callcast.leaveIfReEntry(function() {
                     Callcast.log('ATTACHED - LeaveSession is complete. Re-join now.');
-                    Callcast.finalizeConnect();
-                    $(document).trigger('connected');
-                    Callcast.Callback_ConnectionStatus('Re-Attached');
+                    Callcast.finalizeConnect(function() {
+                        $(document).trigger('connected');
+                        Callcast.Callback_ConnectionStatus('Re-Attached');
+                    });
                 }, 'attached');
                 break;
             case Strophe.Status.DISCONNECTING:
@@ -2999,7 +3001,9 @@ var Callcast = {
         }
     },
 
-    finalizeConnect: function() {
+    finalizeConnect: function(cb) {
+        var intervalT, finalT, self = this;
+
         // RMW odd error where room creation iq is seen by the server but unable to be sent back.
         // Could be because our presence is not 'felt' yet. This can be related to the re-attach.
         this.connection.send($pres());
@@ -3009,10 +3013,6 @@ var Callcast = {
 
         if (this.fbsr && this.fbsr !== '') {
             this.SendFBPres();
-        }
-
-        if (this.databaseNickname === null) {
-            Callcast.log('finalizeConnect: WARNING: databaseNickname has not returned yet and we are connected already');
         }
 
         // Remember the email address that was used for subsequent logins. (If we're non-anonymous)
@@ -3042,6 +3042,28 @@ var Callcast = {
 
         // Kick things off by refreshing the rooms list.
         this.RefreshRooms();
+
+        if (this.databaseNickname === null) {
+            Callcast.log('finalizeConnect: WARNING: databaseNickname has not returned yet and we are connected already');
+
+            finalT = setTimeout(function() {
+                clearInterval(intervalT);
+                cb();   // Call the callback if we never hear back.
+            }, 3000);
+
+            intervalT = setInterval(function() {
+                if (self.databaseNickname) {
+                    Callcast.log('finalizeConnect: Got databaseNickname of: ' + self.databaseNickname);
+                    clearInterval(intervalT);
+                    clearTimeout(finalT);
+                    cb();
+                }
+            }, 200);
+        }
+        else {
+            cb();
+        }
+
 
     }
  };

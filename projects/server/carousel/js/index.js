@@ -1992,7 +1992,19 @@ function checkCredentials2() {
   };
 
     closeWindow();
-    openWindow('#credentials2');
+
+    // If we already have gotten the nickname from the database, then there is no
+    // need to open this dialog box. It's already pre-populated and ready to grab from onJoinNow()
+    if (!Callcast.getDatabaseNickname()) {
+      openWindow('#credentials2');
+    }
+    else {
+      // Populate the item so it'll be picked up automatically.
+      $('#credentials2 > input#name').val(Callcast.getDatabaseNickname());
+      // Then artificially make like the dialog was closed by the user...
+      onJoinNow();
+    }
+
     $('#credentials2 #email').removeAttr('style');
     if (!Callcast.connection.bAnonymous) {
       $('#credentials2 #email').css({'display': 'none'});
