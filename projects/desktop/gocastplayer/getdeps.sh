@@ -27,6 +27,9 @@ if [[ $1 = "libjingle" || $* = "" ]]; then
 
     echo "Patching libjingle source..."
     patch -p0 -i ../dep_mods/common/libjingle.diff
+
+    echo "Patching libjingle build..."
+    patch -p0 -i ../dep_mods/common/libjingle_build.diff
 fi
 
 ##############
