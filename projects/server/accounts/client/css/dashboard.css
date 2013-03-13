@@ -145,6 +145,11 @@ form #roomlist > table {
     width: auto;
 }
 
+form#startmeeting-form #roomlist table td.selected,
+form#schedulemeeting-form #roomlist table td.selected {
+    background-color: #BFFFFF;
+}
+
 a.roomname {
     overflow: hidden;
     text-overflow: ellipsis;
