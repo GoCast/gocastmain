@@ -35,10 +35,6 @@ var SettingsUI = {
 			slide: function(evt, ui) { SettingsApp.micVol(ui.value); }
 		});
 
-		/*this.$walkytalky = $('#walkytalky');
-		this.$walkytalky.mousedown(function() { SettingsApp.setMicMute(false); });
-		this.$walkytalky.mouseup(function() { SettingsApp.setMicMute(true); });*/
-
 		this.$savesettings = $('#savesettings');
 		this.$savesettings.click(this.savesettingsClickedCallback());
 		$('.ui-slider-handle').css({
@@ -47,10 +43,6 @@ var SettingsUI = {
 		});
 
 		if (/linux/.test(navigator.userAgent.toLowerCase())) {
-			this.$walkytalky.css({
-				'bottom': '235px',
-				'left'  : '243px'
-			});
 			$('#settingspanel').css('bottom', '0px');
 		}
 	},
@@ -244,6 +236,7 @@ var SettingsApp = {
 		);
 
 		if (/linux/.test(navigator.userAgent.toLowerCase())) {
+			this.$localplayer.get(0).style.marginLeft = '40px';
 			this.$localplayer.get(0).width = 240;
 			this.$localplayer.get(0).height = 190;
 		}
