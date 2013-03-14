@@ -177,11 +177,11 @@ body > .container > .row > .span5 > form .areyousure > .alert .btn {
     margin-left: 5px;
 }
 
-form#publicrooms-form .accordion-group[participants] {
+form#rooms-form .accordion-group[participants] {
     position: relative;
 }
 
-form#publicrooms-form .accordion-group[participants]:before {
+form#rooms-form .accordion-group[participants]:before {
     content: '\f007';
     position: absolute;
     font-family: 'FontAwesome';
@@ -193,7 +193,7 @@ form#publicrooms-form .accordion-group[participants]:before {
     border-radius: 10px;
 }
 
-form#publicrooms-form .accordion-group[participants]:after {
+form#rooms-form .accordion-group[participants]:after {
     content: attr(participants);
     position: absolute;
     font-size: 0.8em;
@@ -206,6 +206,6 @@ form#publicrooms-form .accordion-group[participants]:after {
     text-align: center;
 }
 
-form#publicrooms-form .accordion-group[participants].singledigit:after {
+form#rooms-form .accordion-group[participants].singledigit:after {
     padding: 1px 8px;
 }

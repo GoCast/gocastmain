@@ -320,14 +320,9 @@ var DashView = {
             });
         });
     },
-    displayPublicRooms: function(pubrooms, $container) {
-        var formtemplate = '<form id="publicrooms-form" class="show"><fieldset>' +
-                           '<legend>&nbsp;Public Rooms</legend>' +
-                           '<div class="alert alert-success"><a class="close" href="#" data-dismiss="alert">&times;</a>' +
-                           '<strong>Note</strong><br><p style="text-align:justify;">This is a list of public rooms ' +
-                           'showing the number of people currently in each one. If you\'re a new user and/or ' +
-                           'you don\'t own any rooms, feel free to try one of these rooms out!</p></div>' +
-                           '<div class="accordion" id="rooms"></div></fieldset></form>',
+    displayRoomsAccordion: function(rooms, options) {
+        var formtemplate = '<form id="rooms-form" class="show"><fieldset>' +
+                           '<legend>&nbsp;' + (options.title || 'Rooms') + '</legend>',
             roomtemplate = '<div class="accordion-group{{sd}}" roomname="{{room}}" {{partsAttr}}>' +
                            '<div class="accordion-heading">' +
                            '<a class="accordion-toggle" data-toggle="collapse" data-parent="#rooms" href="#{{room}}">' +
@@ -335,40 +330,47 @@ var DashView = {
                            '<div id="{{room}}" class="accordion-body collapse"><div class="accordion-inner">' +
                            '{{description}}<br><br><a class="btn btn-success pull-right" href="{{link}}">' +
                            'Take me to this room</a><br>&nbsp;</div></div></div>', i, roomshtml = '',
-            publicrooms = pubrooms, participantsAttribute, partsAttrVal, $roomitem, rcode, link, title, roomids = [];
+            participantsAttribute, partsAttrVal, $roomitem, rcode, link, title, roomids = [],
+            $container = options.container || $('body');
+
+        if (options.note) {
+            formtemplate = formtemplate + '<div class="alert alert-success"><a class="close" href="#" data-dismiss="alert">&times;</a>' +
+                           '<strong>Note</strong><br><p style="text-align:justify;">' + options.note + '</p></div>';
+        }
+        formtemplate = formtemplate + '<div class="accordion" id="rooms"></div></fieldset></form>';
 
         if (!$container.html()) {
             $container.html(formtemplate);
         }
 
-        for (i=0; i<publicrooms.length; i++) {
-            partsAttrVal = $(publicrooms[i]).attr('numparticipants').toString();
-            participantsAttribute = $(publicrooms[i]).attr('numparticipants') ? ('participants="' + partsAttrVal + '"') : '';
-            rcode = $.roomcode.cipher($(publicrooms[i]).attr('room').split('#')[0], $(publicrooms[i]).attr('room').split('#')[1]);
+        for (i=0; i<rooms.length; i++) {
+            partsAttrVal = parseInt($(rooms[i]).attr('numparticipants'));
+            participantsAttribute = partsAttrVal ? ('participants="' + partsAttrVal.toString() + '"') : '';
+            rcode = $.roomcode.cipher($(rooms[i]).attr('room').split('#')[0], $(rooms[i]).attr('room').split('#')[1]);
             link = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1) + '?roomname=' + rcode;
-            title = ($(publicrooms[i]).attr('owner') ? $(publicrooms[i]).attr('owner') + '\'s ' : '') + $(publicrooms[i]).attr('room').split('#')[1];
-            $roomitem = $('.accordion-group[roomname="' + rcode.replace(/\=/g, '_eq').replace(/\+/g, '_plus') +
+            title = ($(rooms[i]).attr('owner') ? $(rooms[i]).attr('owner') + '\'s ' : '') + $(rooms[i]).attr('room').split('#')[1];
+            $roomitem = $('.accordion-group[roomname="' + $container.attr('id') + rcode.replace(/\=/g, '_eq').replace(/\+/g, '_plus') +
                         '"]', $container);
-            roomids.push(rcode.replace(/\=/g, '_eq').replace(/\+/g, '_plus'));
+            roomids.push($container.attr('id') + rcode.replace(/\=/g, '_eq').replace(/\+/g, '_plus'));
 
             if ($roomitem.length) {
-                $roomitem.attr('participants', partsAttrVal);
-                if (!$(publicrooms[i]).attr('numparticipants')) {
+                if (!partsAttrVal) {
                     $roomitem.removeAttr('participants');
-                } else if (10 > $(publicrooms[i]).attr('numparticipants')) {
-                    $roomitem.addClass('singledigit');
+                } else if (10 > $(rooms[i]).attr('numparticipants')) {
+                    $roomitem.addClass('singledigit').attr('participants', partsAttrVal.toString());
                 } else {
-                    $roomitem.removeClass('singledigit');
+                    $roomitem.removeClass('singledigit').attr('participants', partsAttrVal.toString());;
                 }
             } else {
                 roomshtml  = roomshtml + (roomtemplate.replace(/\{\{index\}\}/g, i.toString())
-                                                      .replace(/\{\{room\}\}/g, rcode.replace(/\=/g, '_eq')
+                                                      .replace(/\{\{room\}\}/g, $container.attr('id') +
+                                                                                rcode.replace(/\=/g, '_eq')
                                                                                      .replace(/\+/g, '_plus'))
                                                       .replace(/\{\{name\}\}/g, title)
-                                                      .replace(/\{\{description\}\}/g, $(publicrooms[i]).attr('description'))
+                                                      .replace(/\{\{description\}\}/g, $(rooms[i]).attr('description'))
                                                       .replace(/\{\{link\}\}/g, link)
                                                       .replace(/\{\{partsAttr\}\}/g, participantsAttribute)
-                                                      .replace(/\{\{sd\}\}/, (10 > $(publicrooms[i]).attr('numparticipants')) ?
+                                                      .replace(/\{\{sd\}\}/, (10 > $(rooms[i]).attr('numparticipants')) ?
                                                                ' singledigit' : ''));
             }
 
@@ -746,7 +748,17 @@ var DashApp = {
                 console.log('Subscribe-Callback-Dashboard item room: ' + ($(data[i]).attr('room') || '') + ', owner: ' + ($(data[i]).attr('owner') || '') + ', numparticipants: ' + ($(data[i]).attr('numparticipants') || ''));
             }
             */
-            DashView.displayPublicRooms(data, $('#publicrooms'));
+            DashView.displayRoomsAccordion(data, {
+                title: 'Public Rooms',
+                container: $('#publicrooms'),
+                note: 'This is a list of public rooms showing the number of people currently in each one. ' +
+                      'If you\'re a new user and/or you don\'t own any rooms, feel free to try one of these rooms out!'
+            });
+            /*DashView.displayRoomsAccordion(data, {
+                title: 'Recently Visited Rooms',
+                container: $('#visitedrooms'),
+                note: (optional) 'This is a list of rooms you recently visited.'
+            });*/
         });
 
         $('body > .navbar .logoutlink').click(this.logoutCallback());
@@ -852,10 +864,4 @@ var DashApp = {
 $(document).ready(function() {
     DashView.init();
     DashApp.init();
-
-    // Simulate live room participants refresh
-//    DashView.displayPublicRooms([], $('#publicrooms'));
-//    setInterval(function() {
-//        DashView.displayPublicRooms([], $('#publicrooms'));
-//    }, 2000);
 });
