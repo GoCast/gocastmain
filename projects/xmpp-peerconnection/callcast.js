@@ -1198,7 +1198,7 @@ var Callcast = {
                         }, function(msg) {
                             Callcast.log('InitiateCall: FAILURE of CreateOffer msg: ' + msg);
                         }, {sdpconstraints: {mandatory: {OfferToReceiveAudio: 'true',
-                                                         AudioCodec: 'opus',
+                                                         AudioCodec: 'ISAC',
                                                          OfferToReceiveVideo: 'true'}}});
                     }
                     catch(e2) {
@@ -1278,7 +1278,7 @@ var Callcast = {
                                 }, function(msg) {
                                     Callcast.log('CompleteCall: FAILURE of CreateAnswer msg: ' + msg);
                                 }, {sdpconstraints: {mandatory: {OfferToReceiveAudio: 'true',
-                                                                 AudioCodec: 'opus',
+                                                                 AudioCodec: 'ISAC',
                                                                  OfferToReceiveVideo: 'true'}}});
                             }
                             catch(e3) {
