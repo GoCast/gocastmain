@@ -210,7 +210,7 @@ $(document).on('private-message', function(
 ///
 function setSpotInfo(info)
 {
-    if (info && info.nick && info.nick !== app.user.name)
+    if (info && info.nick && info.nick !== Callcast.nick)
     {
        var spot = Callcast.participants[info.nick];
        if (spot)
@@ -269,7 +269,7 @@ function setCarouselItemState(info)
           app.log(2, 'setCarouselItemState video off user ' + info.nick + ' image ' + info.image);
        }
     }
-    else if (info.nick === app.user.name) {
+    else if (info.nick === Callcast.nick) {
       console.log('setCarouselItemState video changed for local user ', info);
       app.carousel.updateAll();
     }
@@ -399,7 +399,11 @@ $(document).on('connected', function(
 
   app.xmppLoggedIn = true;
   checkCredentials2();
-  $(document).trigger('one-login-complete', 'XMPP GO.');    // One more login action complete.
+
+  if (!app.loggedInAll()) {
+    $(document).trigger('one-login-complete', 'XMPP GO.');    // One more login action complete.
+  }
+
   return false;
 }); /* connected() */
 
