@@ -479,6 +479,8 @@ GoCastJS.PeerConnection = function(options) {
         this.sigState = 'preinit';
         this.connState = 'preinit';
         this.pendingCandidates = [];
+        this.connTimer = null;
+        this.connTimeout = 5000;
 
         var self = this;
         var playerRef = this.player;
@@ -515,8 +517,25 @@ GoCastJS.PeerConnection = function(options) {
 
         this.player.onicechange = function(newState) {
             self.connState = newState;
+
+            if ('checking' === newState) {
+                self.connTimer = setTimeout(function() {
+                    self.connTimer = null;
+                    self.connState = 'defunct';
+                    self.connTimeout = 10000;
+
+                    if (options.onConnStateChange) {
+                        options.onConnStateChange(self.connState);
+                    }
+                }, self.connTimeout);
+            }
+            if ('connected' === newState && self.connTimer) {
+                clearTimeout(self.connTimer);
+                self.connTimer = null;
+            }
             if ('undefined' !== typeof(options.onConnStateChange) &&
-                null !== options.onConnStateChange) {
+                null !== options.onConnStateChange && 
+                'defunct' !== self.connState) {
                 options.onConnStateChange(newState);
             }
         }
