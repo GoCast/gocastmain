@@ -111,23 +111,23 @@ var RegisterView = {
         }
 
         for (i=0; i<publicrooms.length; i++) {
-            partsAttrVal = $(publicrooms[i]).attr('numparticipants').toString();
-            participantsAttribute = $(publicrooms[i]).attr('numparticipants') ? ('participants="' + partsAttrVal + '"') : '';
+            partsAttrVal = parseInt($(publicrooms[i]).attr('numparticipants'));
+            participantsAttribute = partsAttrVal ? ('participants="' + partsAttrVal.toString() + '"') : '';
             rcode = $.roomcode.cipher($(publicrooms[i]).attr('room').split('#')[0], $(publicrooms[i]).attr('room').split('#')[1]);
-            link = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1) + '?roomname=' + rcode;
+            link = $.roomcode.roomurl($(publicrooms[i]).attr('room').split('#')[0],
+                                     $(publicrooms[i]).attr('owner'), $(publicrooms[i]).attr('room').split('#')[1]);
             title = ($(publicrooms[i]).attr('owner') ? $(publicrooms[i]).attr('owner') + '\'s ' : '') + $(publicrooms[i]).attr('room').split('#')[1];
             $roomitem = $('.accordion-group[roomname="' + rcode.replace(/\=/g, '_eq').replace(/\+/g, '_plus') +
                         '"]', $container);
             roomids.push(rcode.replace(/\=/g, '_eq').replace(/\+/g, '_plus'));
 
             if ($roomitem.length) {
-                $roomitem.attr('participants', partsAttrVal);
-                if (!$(publicrooms[i]).attr('numparticipants')) {
+                if (!partsAttrVal) {
                     $roomitem.removeAttr('participants');
                 } else if (10 > $(publicrooms[i]).attr('numparticipants')) {
-                    $roomitem.addClass('singledigit');
+                    $roomitem.addClass('singledigit').attr('participants', partsAttrVal.toString());
                 } else {
-                    $roomitem.removeClass('singledigit');
+                    $roomitem.removeClass('singledigit').attr('participants', partsAttrVal.toString());
                 }
             } else {
                 roomshtml  = roomshtml + (roomtemplate.replace(/\{\{index\}\}/g, i.toString())
