@@ -1007,6 +1007,10 @@ var Callcast = {
                 if (state === 'connected' && self.videoinfo) {
                     Callcast.ShowRemoteVideo(self.videoinfo);
                 }
+                else if (state === 'timedout') {
+                    // checking never made it to connected so we'll reset and give another go at it.
+                    self.ResetPeerConnection();
+                }
 /*                if (state === 'BLOCKED') {
                     // a blocked connection was detected by the C++ area.
                     // We need to reset the connection.
@@ -1130,7 +1134,11 @@ var Callcast = {
                         msg = 'Callee:' + self.GetID() + ' ResetPeerConnection: P2P-DEFUNCT - Tried connecting to peer too many times.';
                         Callcast.log(msg);
                         Callcast.SendLiveLog('@' + Callcast.room.split('@')[0] + ': ' + msg);
-                        this.peer_connection.SetDefunct();
+
+                        this.peer_connection.connState = 'defunct';
+                        if (Callcast.Callback_ReadyState) {
+                            Callcast.Callback_ReadyState('defunct', self.jid, self.jid);
+                        }
                         return;
                     }
 
@@ -1216,7 +1224,7 @@ var Callcast = {
         };
 
         this.CompleteCall = function() {
-            var self = this;
+            var self = this, rs;
 
             if (!this.offer) {
                 Callcast.log('CompleteCall: No offer yet -- this should not happen.');
@@ -1239,10 +1247,10 @@ var Callcast = {
                 }
                 else if (this.peer_connection)
                 {
-/* Only for resets
-                    rs = this.peer_connection.ReadyState();
 
-                    if (rs === 'ACTIVE' || rs === 'CONNECTING'|| rs === 'CONNECTED')
+                    rs = this.peer_connection.connState;
+
+                    if (rs === 'checking'|| rs === 'connected')
                     {
                         Callcast.log('Callee:' + self.GetID() + ' CompleteCall: Offer received while active. RESET PEER CONNECTION.');
                         this.ResetPeerConnection();
@@ -1252,7 +1260,6 @@ var Callcast = {
                             return;
                         }
                     }
-*/
 
                     Callcast.log('Callee:' + self.GetID() + ' Completing call...');
     //                Callcast.log('CompleteCall: Offer-SDP=' + this.offer);
@@ -2012,6 +2019,10 @@ var Callcast = {
                     }
                     else {
                         Callcast.log('PresHandler: Error joining room. Disconnecting.');
+                        Callcast.SendLiveLog('@' + Callcast.room.split('@')[0] + ': ' + 'PresHandler: Error joining room. Disconnecting.');
+                        if ($(presence).find('recipient-unavailable').length > 0) {
+                            Callcast.SendLiveLog('@' + Callcast.room.split('@')[0] + ': ' + 'recipient-unavailable bug - RESET XMPP SERVER PLEASE??');
+                        }
                     }
 
                     Callcast.disconnect('presence-error');
