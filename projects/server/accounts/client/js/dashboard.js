@@ -207,7 +207,8 @@ var DashView = {
                                    '<thead><tr><th>Choose one of your existing rooms</th></tr></thead>' +
                                    '<tbody>');
             for (i=0; i<roomlist.length; i++) {
-                template = template + ('<tr><td><a class="roomname" href="javascript:void(0);">' + roomlist[i] + '</a>' +
+                template = template + ('<tr><td roomname="' + roomlist[i] +
+                           '""><a class="roomname" href="javascript:void(0);">' + roomlist[i] + '</a>' +
                            '<a class="deleteroom btn btn-danger btn-mini pull-right" href="#" roomname="' + roomlist[i] +
                            '" title="Destroy room"><i class="icon-trash"></i></a>' +
                            '<a class="roomlink btn btn-mini pull-right" href="#" roomname="' + roomlist[i] +
@@ -240,9 +241,7 @@ var DashView = {
             }
         });
 
-        linkpopoverhtml = '<textarea style="resize: none; font-size: 10px; width: {{width}}px;">' +
-                          '{{link}}</textarea>';
-        roomlink = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1) + '?roomname={{rcode}}';
+        linkpopoverhtml = '<textarea style="resize: none; font-size: 10px; width: {{width}}px;">{{link}}</textarea>';
         $('#roomlist a.roomlink', this.$forms[formid]).click(function(e) {
             var evt = e || window.event, popped = $(this).attr('popped');
 
@@ -256,7 +255,8 @@ var DashView = {
                 _title = 'Link for ' + $(this).attr('roomname');
             $(this).popover({
                 title: _title,
-                content: linkpopoverhtml.replace(/\{\{link\}\}/, roomlink.replace(/\{\{rcode\}\}/, rcode))
+                content: linkpopoverhtml.replace(/\{\{link\}\}/, $.roomcode.roomurl(DashApp.boshconn.getEmailFromJid(),
+                                                                                    DashApp.fullname, $(this).attr('roomname')))
                                         .replace(/\{\{width\}\}/, (rcode.length*6).toString()),
                 placement: 'left',
                 html: true,
@@ -347,7 +347,8 @@ var DashView = {
             partsAttrVal = parseInt($(rooms[i]).attr('numparticipants'));
             participantsAttribute = partsAttrVal ? ('participants="' + partsAttrVal.toString() + '"') : '';
             rcode = $.roomcode.cipher($(rooms[i]).attr('room').split('#')[0], $(rooms[i]).attr('room').split('#')[1]);
-            link = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1) + '?roomname=' + rcode;
+            link = $.roomcode.roomurl($(rooms[i]).attr('room').split('#')[0],
+                                      $(rooms[i]).attr('owner'), $(rooms[i]).attr('room').split('#')[1]);
             title = ($(rooms[i]).attr('owner') ? $(rooms[i]).attr('owner') + '\'s ' : '') + $(rooms[i]).attr('room').split('#')[1];
             $roomitem = $('.accordion-group[roomname="' + $container.attr('id') + rcode.replace(/\=/g, '_eq').replace(/\+/g, '_plus') +
                         '"]', $container);
@@ -404,9 +405,12 @@ var DashView = {
     strtmtgRoomnameValChngCallback: function() {
         var self = this, id = 'startmeeting-form';
 
-        return function() {
+        return function(e) {
             var _self = this;
+
             setTimeout(function() {
+                $('#roomlist table td', self.$forms[id]).removeClass('selected');
+                $('#roomlist table td[roomname="' + $(_self).val() + '"]', self.$forms[id]).addClass('selected');
                 if ($(_self).val() && !$('a.btn-inverse', self.$forms[id]).hasClass('show')) {
                     $('a.btn-inverse', self.$forms[id]).addClass('show');
                 } else if (!$(_self).val() && $('a.btn-inverse', self.$forms[id]).hasClass('show')) {
@@ -438,6 +442,7 @@ var DashView = {
 
 var DashApp = {
     email: null,
+    fullname: null,
     boshconn: null,
     $forms: {},
     roomlist: [],
@@ -506,14 +511,13 @@ var DashApp = {
         'startmeeting-form': {
             success: function() {
                 return function(response) {
-                    var roomlinkrel, rcode, pathname = window.location.pathname,
+                    var roomlinkrel, rcode,
                         roomname = $('#input-roomname', DashApp.$forms['startmeeting-form']).val();
 
                     DashView.cancelloader('startmeeting-form');
                     if('success' === response.result) {
-                        rcode = $.roomcode.cipher(DashApp.boshconn.getEmailFromJid(), roomname);
-                        roomlinkrel = pathname.substring(0, pathname.lastIndexOf('/') + 1) + '?roomname=' + rcode;
-                        window.location.href = roomlinkrel;
+                        window.location.href = $.roomcode.roomurl(DashApp.boshconn.getEmailFromJid(),
+                                                                  DashApp.fullname, roomname);
                     } else {
                         DashView.displayalert('startmeeting-form', 'error', 'There was an error while creating your ' +
                                               'desired room.');
@@ -658,8 +662,7 @@ var DashApp = {
                 };
             },
             data: function() {
-                var href = window.location.href,
-                    emails = $('#input-emails', DashApp.$forms['schedulemeeting-form']).val(),
+                var emails = $('#input-emails', DashApp.$forms['schedulemeeting-form']).val(),
                     roomname = $('#input-roomname', DashApp.$forms['schedulemeeting-form']).val(),
                     extradata = {
                         when: (new Date($('#input-date', DashApp.$forms['schedulemeeting-form']).val() + ' ' +
@@ -686,8 +689,8 @@ var DashApp = {
                     });
                 }
                 if (roomname) {
-                    extradata.link = href.substring(0, href.lastIndexOf('/') + 1) + '?roomname=' +
-                                     $.roomcode.cipher(DashApp.boshconn.getEmailFromJid(), roomname);
+                    extradata.link = $.roomcode.roomurl(DashApp.boshconn.getEmailFromJid(),
+                                                        DashApp.fullname, roomname);
                 }
 
                 return extradata;
@@ -776,7 +779,8 @@ var DashApp = {
     //RMW use queryName in index.js for finding the user's name to auto-populate nickname.
     queryName: function(gotName) {
         var succCb = gotName || function(name) {},
-            _email = this.boshconn.getEmailFromJid();
+            _email = this.boshconn.getEmailFromJid(),
+            self = this;
 
         $.ajax({
             url: '/acct/getprofile/',
@@ -785,6 +789,7 @@ var DashApp = {
             data: { email: _email },
             success: function(response) {
                 if ('success' === response.result) {
+                    self.fullname = response.data.name || _email;
                     succCb(response.data.name || _email);
                 }
             }

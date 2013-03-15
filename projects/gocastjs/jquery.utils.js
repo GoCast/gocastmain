@@ -78,6 +78,11 @@
             cipher: function(username, roomname) {
                 return $.base64.encode(salt + saltdelim + encRoomName(encodeURIComponent(username.replace(/@/, '~') + userdelim + roomname)));
             },
+            roomurl: function(username, fullname, roomname) {
+                return window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1) +
+                       '?room=' + ((fullname ? (fullname + '\'s ') : '') + roomname).replace(/\s/g, '_') +
+                       '&g=' + this.cipher(username, roomname);
+            },
             decipher: function(rcode) {
                 var roomname = $.base64.decode(rcode),
                     roomsalt = roomname.slice(0, roomname.indexOf(saltdelim));

@@ -2114,7 +2114,7 @@ function checkCredentials(evt, msg)
 //
 function handleRoomSetup() {
   app.log(2, 'handleRoomSetup entered');
-  var room_to_create = $.roomcode.decipherURIEncoded($.urlvars.roomname) || '',
+  var room_to_create = $.roomcode.decipherURIEncoded($.urlvars.g || $.urlvars.roomname) || '',
       item;
 
   room_to_create = room_to_create.replace(/ /g, '');
@@ -2593,11 +2593,10 @@ $(document).ready(function(
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
 {
-  var opacity = 0, winw = $(window).width(), winh = $(window).height();
+  var opacity = 0, winw = $(window).width(), winh = $(window).height(),
+      rcode = $.urlvars.g || $.urlvars.roomname;
 
-  if (!$.urlvars.roomname ||
-      $.urlvars.roomname.length%4 ||
-      !$.roomcode.decipher($.urlvars.roomname)) {
+  if (!rcode || rcode.length%4 || !$.roomcode.decipher(rcode)) {
     window.location.href = 'dashboard.html';
   }
 
@@ -3271,7 +3270,7 @@ var forgetXmppConnection = function() {};
 function emailInviteDialog(e) {
   if (Callcast.connection.bAnonymous) {
     openCopyData(e, 'Feature not available', 'You have to be a registered GoCast user to use this feature.', true);
-  } else if ($.roomcode.decipheruname($.urlvars.roomname) !== Callcast.connection.getEmailFromJid()) {
+  } else if ($.roomcode.decipheruname($.urlvars.g || $.urlvars.roomname) !== Callcast.connection.getEmailFromJid()) {
     openCopyData(e, 'Feature not available', 'Unfortunately, you can\'t invite others to this room as ' +
                                              'you are not its owner.');
   } else {
