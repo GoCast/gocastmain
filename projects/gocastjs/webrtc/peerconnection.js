@@ -225,7 +225,7 @@ GoCastJS.getUserMedia = function(options, success, failure) {
                     if (false === player.addStream(stream)) {
                         throw new GoCastJS.Exception('localPlayer',
                                                      'addStream() failed.');
-                    }                    
+                    }
                 } else {
                     player.onnegotiationneeded();
                 }
@@ -521,7 +521,7 @@ GoCastJS.PeerConnection = function(options) {
             if ('checking' === newState) {
                 self.connTimer = setTimeout(function() {
                     self.connTimer = null;
-                    self.connState = 'defunct';
+                    self.connState = 'timedout';
                     self.connTimeout = 10000;
 
                     if (options.onConnStateChange) {
@@ -534,7 +534,7 @@ GoCastJS.PeerConnection = function(options) {
                 self.connTimer = null;
             }
             if ('undefined' !== typeof(options.onConnStateChange) &&
-                null !== options.onConnStateChange && 
+                null !== options.onConnStateChange &&
                 'defunct' !== self.connState) {
                 options.onConnStateChange(newState);
             }
