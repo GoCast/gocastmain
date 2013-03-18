@@ -76,7 +76,7 @@ function privateGenGCalHTML(nameemail, link, note, when) {
         html += '&details=' + encodeURI(note);
     }
 
-    html += '&location=' + encodeURI(link);
+    html += '&location=' + encodeURI(link).replace(/\+/g, '%2b');
 
     html += '&trp=true&sprop=&sprop=name:';
     return html;

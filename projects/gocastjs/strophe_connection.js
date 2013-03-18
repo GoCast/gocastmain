@@ -417,6 +417,8 @@ GoCastJS.StropheConnection.prototype = {
             case Strophe.Status.ATTACHED:
                 this.log('GoCastJS.StropheConnection: ATTACHED');
                 this.isConnected = true;
+                // RMW: BUG FIX - do not re-subscribe on re-attach. pubsub plugin has a bug (basically) or an expectation. :)
+                // Only allow the subscribe if the pubsub plugin has been patched for status === Strophe.Status.ATTACHED
                 this.privateDoSubscribe();
                 this.saveLoginInfo();
                 this.privatePingServer();
@@ -426,11 +428,10 @@ GoCastJS.StropheConnection.prototype = {
                 this.log('GoCastJS.StropheConnection: DISCONNECTING');
                 this.isConnected = false;
 
+                // If we have a timer already running (likely from CONNFAIL), clear it and restart.
                 if (this.disconnectTimer) {
-                    this.log('GoCastJS.StropheConnection: WARN: While DISCONNECTING, disconnectTimer already set. Clearing.');
                     clearTimeout(this.disconnectTimer);
                 }
-
                 this.disconnectTimer = setTimeout(function() {
                     // If we get here, then DISCONNECTING was not followed in a timely manner
                     // by DISCONNECTED. So, we need to make a judgement call and call this 'bad'.
@@ -455,6 +456,24 @@ GoCastJS.StropheConnection.prototype = {
                 this.log('GoCastJS.StropheConnection: CONNFAIL');
                 this.isConnected = false;
                 this.causeConnfail = true;
+                this.disconnectTimer = setTimeout(function() {
+                    // If we get here, then DISCONNECTING was not followed in a timely manner
+                    // by DISCONNECTED. So, we need to make a judgement call and call this 'bad'.
+                    // As such, we will trigger a TERMINATED upwards and forget login info.
+                    self.disconnectTimer = null;
+                    self.forgetReconnectInfo();
+
+                    // One more shot at getting back on the horse wihtout incident...
+                    // If we have an .id and .pw both, then connect()
+                    if (self.id && self.pw) {
+                        self.log('Disconnect_Timer_CONNFAIL: Re-connecting with prior given user/password');
+                        self.connect({ jid: self.id, password: self.pw });
+                    }
+                    else {
+                        self.reset('DISCONNECTING_TIMEOUT_CONNFAIL - Never reached DISCONNECTED.');
+                        self.statusCallback(Strophe.Status.TERMINATED);
+                    }
+                }, 1000);
                 break;
             case Strophe.Status.AUTHFAIL:
                 this.causeAuthfail = true;
@@ -691,9 +710,9 @@ GoCastJS.StropheConnection.prototype = {
     privateOnEvent: function(event) {
         var data;
 
-        data = $(event).children('event')
-            .children('items').children('item')
-            .children('pubrooms').children('pubroom'); //.text();
+        data = $(event).find('pubroom'); //.text();
+
+        console.error('privateOnEvent: We have a subscribe event.');
 
         if (data.length) {
             // Should have an array of public room entries
@@ -720,45 +739,63 @@ GoCastJS.StropheConnection.prototype = {
     },
 
     privateDoSubscribe: function() {
-        var self = this;
+        var self = this, dosubscribe, unsubTimer = null;
 
-        if (this.isSubscribed) {
-            // Unsubscribe first.
-            this.connection.pubsub.unsubscribe(
-                this.public_room_node,
-                Strophe.getBareJidFromJid(this.connection.jid), null,
-                function() {}, console.error);
-        }
+        dosubscribe = function() {
+            if (unsubTimer) {
+                clearTimeout(unsubTimer);
+                unsubTimer = null;
+            }
+
+            if (self.public_room_node && (self.subCallback || localStorage.forceSubscribe)) {
+                console.error('Subscribing to: ' + self.public_room_node);
+                self.connection.pubsub.subscribe(
+                    self.public_room_node,
+                    { 'pubsub#max_items': '1' },
+                    self.privateOnEvent.bind(self),
+                    self.privateOnSubscribe.bind(self),
+                    function(err) {
+                        var code, type, errsub;
+                        code = $(err).children('error').attr('code');
+                        type = $(err).children('error').attr('type');
+                        errsub = $(err).children('error').children();
+
+                        if (errsub[0].localName === 'item-not-found') {
+                            // This node doesn't exist yet...
+                            self.log('ERROR: Subscribe-Node: ' + self.public_room_node + ' does not exist yet.');
+                        }
+                        else if ($(err).children('error')) {
+                            self.log('ERROR: Subscribe-Node: Code: ' + code + ', Type: ' + type + ', sub-name: ' + errsub[0].localName);
+                        }
+                        else {
+                            self.log('ERROR: Subscribe-Node: Unknown error stanza came back.');
+                        }
+                    }
+                );
+            }
+        };
+
+        unsubTimer = setTimeout(function() {
+            console.log('**WARNING** - Unsubscribe never returned success nor failure. Subscribing based on timeout.');
+            dosubscribe();
+        }, 5000);
+
+        this.connection.pubsub.unsubscribe(
+            this.public_room_node,
+//            Strophe.getBareJidFromJid(this.connection.jid),
+            this.connection.jid,
+            null,
+            function() {
+                console.error('ALL GOOD');
+                dosubscribe();
+            },
+            function(err) {
+                console.error(err);
+                dosubscribe();
+            });
 
         if (!this.isConnected) {
             throw 'privateDoSubscribe: Must be connected first.';
-        }
-
-        if (this.public_room_node) {
-            this.log('Subscribing to: ' + this.public_room_node);
-            this.connection.pubsub.subscribe(
-                this.public_room_node,
-                null,
-                this.privateOnEvent.bind(this),
-                this.privateOnSubscribe.bind(this),
-                function(err) {
-                    var code, type, errsub;
-                    code = $(err).children('error').attr('code');
-                    type = $(err).children('error').attr('type');
-                    errsub = $(err).children('error').children();
-
-                    if (errsub[0].localName === 'item-not-found') {
-                        // This node doesn't exist yet...
-                        self.log('ERROR: Subscribe-Node: ' + self.public_room_node + ' does not exist yet.');
-                    }
-                    else if ($(err).children('error')) {
-                        self.log('ERROR: Subscribe-Node: Code: ' + code + ', Type: ' + type + ', sub-name: ' + errsub[0].localName);
-                    }
-                    else {
-                        self.log('ERROR: Subscribe-Node: Unknown error stanza came back.');
-                    }
-                }
-            );
         }
 
     },

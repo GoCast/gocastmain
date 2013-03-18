@@ -152,7 +152,7 @@ GoCastJS.IBBTransfer.prototype.GenName = function(iq) {
     }
 
     room = child.attrs.room;
-    nick = child.attrs.nick;
+    nick = child.attrs.nick.replace(/\//g, '-');
     sid = child.attrs.sid;
 
     givenName = child.attrs.fname;  // New feature
