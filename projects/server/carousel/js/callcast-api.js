@@ -1164,17 +1164,29 @@ function readyStateCb(state, jid, nick)
 
     if (jqOo.length > 0) {
       if (state === 'connected') {
-          participant = Callcast.participants[nick];
-          if (!participant) {throw "participant " + nick + " not found";}
-          if (!participant.image) {throw "participant image for " + nick + " not found";}
-          console.log("participant", participant);
-          $('object', jqOo).css('visibility', 'visible');
-          // Make the background image always your image or 'chess piece'.
-          jqOo.css('background-image', participant.image);
+        participant = Callcast.participants[nick];
+        if (!participant) {throw "participant " + nick + " not found";}
+        if (!participant.image) {throw "participant image for " + nick + " not found";}
+        console.log("participant", participant);
+        $('object', jqOo).css('visibility', 'visible');
+        // Make the background image always your image or 'chess piece'.
+        jqOo.css('background-image', participant.image);
+      }
+      else if (state === 'defunct') {
+        jqOo.css("background-image", 'url("images/warning.png")');
+        if (!app.defunctAlertShown && !app.defunctAlertShowing) {
+          app.defunctAlertShowing = true;
+          showWarning('Media Connection Problem',
+                      'We were unable to connect you with one or more participants through video. ' +
+                      'You can still chat with everyone in the room, and also use the notepad and the whiteboard. ' +
+                      'The connectivity problem might be due to firewall issues. If you have your firewall turned on, ' +
+                      'you can temporarily disable it and then reload the page to try connecting again. ');
+          app.defunctAlertShown = true;
+        }
       }
       else {
-          jqOo.css("background-image", 'url("images/waiting-trans.gif")');
-          $('object', jqOo).css('visibility', 'hidden');
+        jqOo.css("background-image", 'url("images/waiting-trans.gif")');
+        $('object', jqOo).css('visibility', 'hidden');
       }
     }
 
