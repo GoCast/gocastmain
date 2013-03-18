@@ -334,7 +334,7 @@
     <div id="meeting">
       <div id="streams">
         <div id="scarousel">
-          <div class="cloudcarousel" id="mystream">
+          <div class="cloudcarousel" id="mystream" spotnumber="0">
             <script type="text/javascript">
               app.getBrowser();
               if (app.pluginInstalled() || 'Chrome' === app.browser.name) {
@@ -352,7 +352,7 @@
             </div>
             <div class="name"></div>
           </div><!-- mystream -->
-          <div class="cloudcarousel" onclick="carouselItemClick(event);">
+          <div class="cloudcarousel" onclick="carouselItemClick(event);" spotnumber="1">
             <div id="groupChat">
               <div id="msgBoard">
                 <div id="chatOut"></div>

@@ -66,10 +66,25 @@
     jqObj.append('<img id="upper-right" class="'+ app.spotUrDefaultClass + '" src="' + app.spotUrDefaultImage +'" alt="Close" title="Close" onclick="onSpotClose(event);"/>');
     jqObj.append('<input id="showChat" type="button" title="Show Chat" onclick="showPersonalChat(event);"/>');
     jqObj.append('<div id="msgBoard"><div id="chatOut"></div><input class="chatTo" type="text" placeholder="Enter a message" onkeydown="keypressPersonalChatHandler(event);"/><input class="send gc-icon" type="button" title="Send message." onclick="sendPersonalChat(event);"/><input class="close gc-icon" type="button" title="Close" onclick="closePersonalChat(event);"/></div>');
+    jqObj.append('<div class="bringtofront"></div>')
     // add chat util to personal chat out
     chatOut = $("#msgBoard > #chatOut", jqObj);
     if (!chatOut[0]) {app.log(4, "Item error can't find chatOut");}
     chatOut.data('util', new GoCastJS.ChatUtil(chatOut));
+
+    $('div.bringtofront', jqObj).click(function(e) {
+      var jqCurSelected = $('div.cloudcarousel.selected', jqObj.parent()),
+          curSelectedZidx = jqCurSelected.attr('zindex'),
+          zindex = parseInt(jqObj.css('z-index'));
+
+      if (jqObj.attr('spotnumber') !== jqCurSelected.attr('spotnumber')) {
+        jqCurSelected.removeClass('selected').css({'z-index': curSelectedZidx});
+        $('div.bringtofront.front', jqCurSelected).removeClass('front');
+        jqObj.addClass('selected').attr('zindex', zindex.toString())
+             .css({'z-index': ('' + (100) + zindex)});
+        $(this).addClass('front');
+      }
+    });
 
     // add handlers
     jqObj.mouseover(function(event)
@@ -441,6 +456,9 @@
         if (this.controlTimer !== 0) { return; }
         var context = this;
         this.controlTimer = setTimeout(function() {
+        $('div.cloudcarousel.selected', container).removeClass('selected')
+                                                  .find('.bringtofront.front')
+                                                  .removeClass('front');
         context.updateAll();
         }, this.timeDelay);
     }; /* go() */
@@ -639,6 +657,7 @@
 
             $(obj).find('div.name').css('font-size', (item.orgFontSize * scale) + px);
             obj.style.zIndex = '' + (scale * 100) >> 0; // jslint wiaver
+            obj.style.border = 'none';
         }
         radians += spacing;
         }); /* end loop. */

@@ -518,20 +518,24 @@ GoCastJS.PeerConnection = function(options) {
         this.player.onicechange = function(newState) {
             self.connState = newState;
 
-            if ('checking' === newState) {
-                self.connTimer = setTimeout(function() {
-                    self.connTimer = null;
-                    self.connState = 'timedout';
-                    self.connTimeout = 10000;
+            if ('checking' === newState || 'disconnected' === newState) {
+                if (!self.connTimer) {
+                    self.connTimer = setTimeout(function() {
+                        self.connTimer = null;
+                        self.connState = 'timedout';
+                        self.connTimeout = 10000;
 
-                    if (options.onConnStateChange) {
-                        options.onConnStateChange(self.connState);
-                    }
-                }, self.connTimeout);
+                        if (options.onConnStateChange) {
+                            options.onConnStateChange(self.connState);
+                        }
+                    }, self.connTimeout);
+                }
             }
             if ('connected' === newState && self.connTimer) {
-                clearTimeout(self.connTimer);
-                self.connTimer = null;
+                if (self.connTimer) {
+                    clearTimeout(self.connTimer);
+                    self.connTimer = null;                    
+                }
             }
             if ('undefined' !== typeof(options.onConnStateChange) &&
                 null !== options.onConnStateChange &&
