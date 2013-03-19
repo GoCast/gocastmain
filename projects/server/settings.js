@@ -68,6 +68,7 @@ if (process.env.SETTINGS_DEVEL === 1 || process.env.SETTINGS_DEVEL === '1') {
         dbUserRoomTable: 'dev_UserRoomTable',
         dbVisitorTable: 'dev_VisitorTable',
         dbPublicRoomTable: 'dev_PublicRoomTable',
+        dbAssociatedRoomTable: 'dev_AssociatedRoomTable',
         mailgunKey: 'key-65ism99rlme7svrn93qc-cormdknx-42',      // Bob Wolff - rwolff@gocast.it key -- standard account now.
         mailgunUser: 'postmaster@carouselmail.gocast.it',
         mailgunPass: '7s2ssv2l5pe3',
@@ -140,6 +141,7 @@ else {
         dbUserRoomTable: 'main_UserRoomTable',
         dbVisitorTable: 'main_VisitorTable',
         dbPublicRoomTable: 'main_PublicRoomTable',
+        dbAssociatedRoomTable: 'main_AssociatedRoomTable',
         mailgunKey: 'key-65ism99rlme7svrn93qc-cormdknx-42',      // Bob Wolff - rwolff@gocast.it key
         mailgunUser: 'postmaster@carouselmail.gocast.it',
         mailgunPass: '7s2ssv2l5pe3',
@@ -187,6 +189,7 @@ else {
         username: 'overseer@' + settings.SERVERNAME + '/roommanager',
         usernametest: 'overseer@' + settings.SERVERNAME + '/roommanagertest',
         password: 'the.overseer.rocks',
+        maxparticipants_ceiling: 8,
         maxspotsallowed: 20,
 
         public_room_node: settings.CONF_SERVICE.replace(/@/,'') + '/public',
