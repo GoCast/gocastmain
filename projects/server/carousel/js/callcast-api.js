@@ -534,7 +534,8 @@ function addPluginForParticipant(nickname, shownNickname) {
   }
 
   if (oo) {
-    $(oo).append('<object id="GocastPlayer' + id + '" type="application/x-gocastplayer" width="' + w + '" height="' + h + '"></object>');
+    $(oo).attr('spotnumber', id)
+         .append('<object id="GocastPlayer' + id + '" type="application/x-gocastplayer" width="' + w + '" height="' + h + '"></object>');
     app.log(2, 'Added GocastPlayer' + id + ' object.');
     app.carousel.updateAll();
     return $('object#GocastPlayer' + id, oo).get(0);

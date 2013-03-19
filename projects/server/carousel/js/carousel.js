@@ -656,7 +656,7 @@
             item.scale(scale);
 
             $(obj).find('div.name').css('font-size', (item.orgFontSize * scale) + px);
-            obj.style.zIndex = '' + (scale * 100) >> 0; // jslint wiaver
+            obj.style.zIndex = '' + (obj.classList.contains('selected') ? 100 : 0) + (scale * 100) >> 0; // jslint wiaver
             obj.style.border = 'none';
         }
         radians += spacing;

@@ -1011,19 +1011,7 @@ var Callcast = {
                     // checking never made it to connected so we'll reset and give another go at it.
                     self.ResetPeerConnection();
                 }
-/*                if (state === 'BLOCKED') {
-                    // a blocked connection was detected by the C++ area.
-                    // We need to reset the connection.
 
-                    Callcast.log('Callee: ConnectionState===BLOCKED - RESETTING PEER CONNECTION.');
-                    self.ResetPeerConnection();
-
-                    // If we've just given up on the connection, don't go further.
-                    if (!this.peer_connection) {
-                        return;
-                    }
-                }
-*/
                 if (Callcast.Callback_ReadyState) {
                     console.log('DEBUG: Calling ReadyState jid is: ' + self.jid);
                     Callcast.Callback_ReadyState(state, self.jid, self.jid);
@@ -1048,17 +1036,18 @@ var Callcast = {
             //
             // Only call the plugin callback and init the peer connection if we have a functional AV plugin.
             //
-            if (!this.peer_connection && Callcast.IsPluginLoaded()) {
+            if (Callcast.IsPluginLoaded()) {
                 this.offer = offer;     // If we are sent an offer, grab a copy of it for later.
 
-                Callcast.log('Callee: Starting peerconnection and adding plugin to carousel for: ' + nickname);
-                if (Callcast.Callback_AddPluginToParticipant) {
-                    this.AddPluginResult = Callcast.Callback_AddPluginToParticipant(nickin.replace(/ /g, ''), nickname);
+                if (!this.AddPluginResult) {
+                    Callcast.log('Callee: Starting peerconnection and adding plugin to carousel for: ' + nickname);
+                    if (Callcast.Callback_AddPluginToParticipant) {
+                        this.AddPluginResult = Callcast.Callback_AddPluginToParticipant(nickin.replace(/ /g, ''), nickname);
+                    }
+                    else {
+                        Callcast.log('Callee: ERROR: Init failure. No Callback_AddPluginToParticipant callback available.');
+                    }
                 }
-                else {
-                    Callcast.log('Callee: ERROR: Init failure. No Callback_AddPluginToParticipant callback available.');
-                }
-
                 this.InitPeerConnection();
             }
         };
@@ -1148,7 +1137,7 @@ var Callcast = {
 
                     if (this.bAmCaller) {
                         Callcast.log('Callee:' + self.GetID() + '  ResetPeerConnection - Re-establishing call to peer. Retry # ' + this.callRetries);
-                        this.InitiateCall();
+                        this.StartCall();
                     }
                     else {
                         Callcast.log('Callee:' + self.GetID() + '  ResetPeerConnection - Waiting on Caller to call me back... Retry # ' + this.callRetries);
@@ -1224,7 +1213,7 @@ var Callcast = {
         };
 
         this.CompleteCall = function() {
-            var self = this, rs;
+            var self = this;
 
             if (!this.offer) {
                 Callcast.log('CompleteCall: No offer yet -- this should not happen.');
@@ -1247,29 +1236,12 @@ var Callcast = {
                 }
                 else if (this.peer_connection)
                 {
-
-                    rs = this.peer_connection.connState;
-
-                    if (rs === 'checking'|| rs === 'connected')
-                    {
-                        Callcast.log('Callee:' + self.GetID() + ' CompleteCall: Offer received while active. RESET PEER CONNECTION.');
-                        this.ResetPeerConnection();
-
-                        // If we've just given up on the connection, don't go further.
-                        if (!this.peer_connection) {
-                            return;
-                        }
-                    }
-
                     Callcast.log('Callee:' + self.GetID() + ' Completing call...');
-    //                Callcast.log('CompleteCall: Offer-SDP=' + this.offer);
-
                     try {
 
                         this.peer_connection.SetRemoteDescription('offer', this.offer, function() {
                             try {
                                 self.peer_connection.CreateAnswer(function(sdp) {
-                //                  Callcast.log('CompleteCall: Answer-SDP=' + sdp);
                                     self.peer_connection.SetLocalDescription('answer', sdp, function() {
                                         Callcast.log('Callee:' + self.GetID() + ' CompleteCall: Success - setting local and starting ICE machine.');
                                         Callcast.log('CompleteCall: Answer is: ' + sdp);
