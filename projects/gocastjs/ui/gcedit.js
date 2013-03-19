@@ -121,7 +121,7 @@ GoCastJS.gcEdit.prototype.sendEdits = function()
 ///
 GoCastJS.gcEdit.prototype.doSpot = function(info)
 {
-  if (info.code && info.from !== app.user.name)
+  if (info.code && info.from !== Callcast.nick)
   {
     //console.log("gcEdit doSpot ", info);
     this.editor.setCode(info.code);

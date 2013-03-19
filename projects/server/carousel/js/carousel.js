@@ -77,12 +77,22 @@
           curSelectedZidx = jqCurSelected.attr('zindex'),
           zindex = parseInt(jqObj.css('z-index'));
 
-      if (jqObj.attr('spotnumber') !== jqCurSelected.attr('spotnumber')) {
-        jqCurSelected.removeClass('selected').css({'z-index': curSelectedZidx});
-        $('div.bringtofront.front', jqCurSelected).removeClass('front');
-        jqObj.addClass('selected').attr('zindex', zindex.toString())
-             .css({'z-index': ('' + (100) + zindex)});
-        $(this).addClass('front');
+      if (!jqObj.hasClass('unoccupied')) {
+        if (jqObj.attr('spotnumber') !== jqCurSelected.attr('spotnumber')) {
+          jqCurSelected.removeClass('selected').css({'z-index': curSelectedZidx});
+          $('div.bringtofront.front', jqCurSelected).removeClass('front');
+          jqObj.addClass('selected').attr('zindex', zindex.toString())
+               .css({'z-index': ('' + (100) + zindex)});
+          $(this).addClass('front');
+        }
+
+        if(jqObj.hasClass('wiki')) {
+          $('input#searchkey', jqObj).focus();
+        } else if(jqObj.hasClass('editor')) {
+          $('iframe', jqObj).focus();
+        } else if('1' === jqObj.attr('spotnumber')) {
+          $('input.chatTo', jqObj).focus();
+        }
       }
     });
 

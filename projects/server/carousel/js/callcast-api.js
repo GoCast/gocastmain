@@ -573,6 +573,7 @@ function unassignSpotForParticipant(nickname) {
 
       removePluginForParticipant(nickname);
       if (oo) {
+        $(oo).removeClass('selected').find('div.bringtofront.front').removeClass('front');
         $(oo).addClass('unoccupied');
         $(oo).removeAttr('title');
         $(oo).removeAttr('id');
