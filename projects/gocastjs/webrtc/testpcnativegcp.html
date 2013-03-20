@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>PeerConnection API Test (JSEP)</title>
+	</head>
+	<body>
+		<div id="container"></div>
+		<script type="text/javascript" src="peerconnection.js"></script>
+		<script type="text/javascript">
+			var playerTemplates = {
+				'native': '<video id="localVideo" autoplay width="640" height="480"></video>',
+				'gcp': '<object id="localVideo" type="application/x-gocastplayer" width="640"' +
+					   'height="480"><param name="onload" value="onloaded"></param></object>'
+			}, constraints = {
+				audio: true,
+				video: true,
+				videoconstraints: {
+					webrtc: {
+						mandatory: {
+							minWidth: '320',
+							maxWidth: '320',
+							minHeight: '240',
+							maxHeight: '240',
+							minFrameRate: '15',
+							maxFrameRate: '15'
+						}
+					}
+				}
+			}, domContainer = document.querySelector('body > #container'), apitype = 'native',
+			onloaded = function() {
+				GoCastJS.getUserMedia(new GoCastJS.UserMediaOptions(constraints,
+																	document.getElementById('localVideo'),
+																	apitype));
+			};
+
+			if (/\?gcp/.test(window.location.href)) {
+				apitype = 'gcp';
+			}
+
+			domContainer.innerHTML = playerTemplates[apitype];
+			if ('native' === apitype) {
+				onloaded();
+			}
+		</script>
+	</body>
+</html>
