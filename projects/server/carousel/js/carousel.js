@@ -530,7 +530,7 @@
     {
         var w, h, nick, px = 'px',
             obj = item.object,
-            plgin = $(obj).find('object')[0];
+            plgin = $(obj).find('object')[0] || $(obj).find('video')[0];
         //console.log('adjPlugin ' + $(obj).attr('encname'));
         if (plgin)
         {

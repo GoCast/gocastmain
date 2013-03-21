@@ -578,6 +578,9 @@ GoCastJS.PeerConnection = function(options) {
             null !== options.onSignalingStateChange) {
             options.onSignalingStateChange(newState);
         }
+        if ('stable' === newState) {
+            onicechange('connected');
+        }
     };
 
     if ('native' === apitype) {
@@ -806,17 +809,36 @@ GoCastJS.PeerConnection.prototype.SetRemoteDescription = function(action,
 //!     sdp <string> : sdp of remote peer's ice candidate
 //!
 GoCastJS.PeerConnection.prototype.AddIceCandidate = function(sdp) {
-    var candidate = JSON.parse(sdp);
+    var candidate = JSON.parse(sdp), candidate1 = {};
 
     if ('stable' === this.sigState || 'active' === this.sigState) {
         if ('gcp' === this.apitype) {
-            if (false === this.player.addIceCandidate(candidate.sdp_mid,
-                                                      candidate.sdp_mline_index,
-                                                      candidate.sdp)) {
+            if (candidate.candidate) {
+                candidate1 = {
+                    sdp_mid: candidate.sdpMid,
+                    sdp_mline_index: candidate.sdpMLineIndex,
+                    sdp: candidate.candidate
+                };
+            } else {
+                candidate1 = candidate;
+            }
+
+            if (false === this.player.addIceCandidate(candidate1.sdp_mid,
+                                                      candidate1.sdp_mline_index,
+                                                      candidate1.sdp)) {
                     throw new GoCastJS.Exception(this.pcid, 'procIceMsg() failed.');
             }
         } else if ('native' === this.apitype) {
-            this.peerconn.addIceCandidate(new RTCIceCandidate(candidate));
+            if (candidate.sdp) {
+                candidate1 = {
+                    sdpMid: candidate.sdp_mid,
+                    sdpMLineIndex: candidate.sdp_mline_index,
+                    candidate: candidate.sdp
+                };
+            } else {
+                candidate1 = candidate;
+            }
+            this.peerconn.addIceCandidate(new RTCIceCandidate(candidate1));
         }
     } else {
         this.pendingCandidates.push(sdp);

@@ -798,12 +798,12 @@ var Callcast = {
 
     InitGocastPlayer: function(jqSelector, success, failure) {
         if (!this.localplayer) {
-            var k, settings, capwidth, capheight, capfps;
+            var k, settings = {}, capwidth, capheight, capfps;
 
             // On successful init, we note that the plugin is successfully loaded.
             this.bPluginLoadedSuccessfully = true;
 
-            if (!window.localStorage.gcpsettings) {
+            if (!window.localStorage.gcpsettings && !$.urlvars.wrtcable) {
                 // No stored settings exist.
                 settings = { videoin: $(jqSelector).get(0).videoinopts['default'] || '',
                              audioin: $(jqSelector).get(0).audioinopts[0] || '',
@@ -835,7 +835,7 @@ var Callcast = {
             this.mediaHints.audioconstraints = { audioin: settings.audioin || '',
                                                  audioout: settings.audioout || ''};
 
-            if (true === this.mediaHints.video) {
+            if (true === this.mediaHints.video && !$.urlvars.wrtcable) {
                 if (!($(jqSelector).get(0).videoinopts[this.mediaHints.videoconstraints.videoin])) {
                     if (this.mediaHints.videoconstraints.videoin !== '') {
                         this.mediaHints.videoconstraints.videoin = $(jqSelector).get(0).videoinopts['default'] || '';
@@ -845,7 +845,7 @@ var Callcast = {
                 // If we discover that we really don't have a video input device, then turn it off entirely.
                 this.mediaHints.video = this.mediaHints.videoconstraints.videoin !== '';
             }
-            if (true === this.mediaHints.audio) {
+            if (true === this.mediaHints.audio && !$.urlvars.wrtcable) {
                 if (-1 === $(jqSelector).get(0).audioinopts.indexOf(this.mediaHints.audioconstraints.audioin)) {
                     if (this.mediaHints.audioconstraints.audioin !== '') {
                         this.mediaHints.audioconstraints.audioin = $(jqSelector).get(0).audioinopts[0] || '';
@@ -863,7 +863,8 @@ var Callcast = {
             GoCastJS.getUserMedia(
                     new GoCastJS.UserMediaOptions(
                         this.mediaHints,
-                        $(jqSelector).get(0)
+                        $(jqSelector).get(0),
+                        $.urlvars.wrtcable ? 'native' : 'gcp'
                     ),
                     function(stream) {
                         Callcast.log('getUserMediaSuccess: ', stream.toString());
@@ -1077,8 +1078,9 @@ var Callcast = {
                             [ {uri: 'turn:manjeshtest2@dev.gocast.it:3478', password: 'manjeshpass2'},
                               {uri: 'stun:stun.l.google.com:19302'}],
                             this.onicecandidate, this.onaddstream, this.onremovestream,
-                            this.onsignalingstatechange, this.onconnectionstatechange
-                            ));
+                            this.onsignalingstatechange, this.onconnectionstatechange,
+                            $.urlvars.wrtcable ? 'native' : 'gcp'
+                        ));
 
                 if (!this.peer_connection) {
                     alert('Callee:' + self.GetID() + " Gocast Remote Player object for name:'" + nickname + "' not found in DOM. Plugin problem?");
@@ -1195,7 +1197,7 @@ var Callcast = {
                         }, function(msg) {
                             Callcast.log('InitiateCall: FAILURE of CreateOffer msg: ' + msg);
                         }, {sdpconstraints: {mandatory: {OfferToReceiveAudio: 'true',
-                                                         AudioCodec: 'ISAC',
+                                                         //AudioCodec: 'ISAC',
                                                          OfferToReceiveVideo: 'true'}}});
                     }
                     catch(e2) {
@@ -1257,7 +1259,7 @@ var Callcast = {
                                 }, function(msg) {
                                     Callcast.log('CompleteCall: FAILURE of CreateAnswer msg: ' + msg);
                                 }, {sdpconstraints: {mandatory: {OfferToReceiveAudio: 'true',
-                                                                 AudioCodec: 'ISAC',
+                                                                 //AudioCodec: 'ISAC',
                                                                  OfferToReceiveVideo: 'true'}}});
                             }
                             catch(e3) {
