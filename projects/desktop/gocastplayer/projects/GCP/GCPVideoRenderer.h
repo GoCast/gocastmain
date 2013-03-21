@@ -12,6 +12,19 @@
 #include "PluginEvents/DrawingEvents.h"
 #include "PluginWindow.h"
 
+#define SWAP_VALUES(x, y, t, tval) {\
+    t = x;\
+    x = y;\
+    y = t;\
+    t = tval;\
+}
+
+#define SWAP_BUFFER_POINTERS(x, y) {\
+    uint8* t = x;\
+    x = y;\
+    y = t;\
+}
+
 namespace GoCast
 {
     class GCPVideoRenderer: public webrtc::VideoRendererInterface

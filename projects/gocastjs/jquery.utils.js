@@ -19,6 +19,10 @@
     	urlsplit = window.location.href.split('?');
 
     urlvarsobj['baseurl'] = urlsplit[0];
+    if ($.browser.chrome && 24 <= parseInt($.browser.version)) {
+        urlvarsobj['wrtcable'] = 'true';
+    }
+
     if (urlsplit[1]) {
         nvpairs = urlsplit[1].split('&');
         for (i in nvpairs) {

@@ -72,6 +72,16 @@
     if (!chatOut[0]) {app.log(4, "Item error can't find chatOut");}
     chatOut.data('util', new GoCastJS.ChatUtil(chatOut));
 
+    $('div.bringtofront', jqObj).hover(function() {
+      if (!jqObj.hasClass('unoccupied')) {
+        $(this).addClass('hovered');
+      }
+    }, function() {
+      if (!jqObj.hasClass('unoccupied')) {
+        $(this).removeClass('hovered');
+      }
+    });
+
     $('div.bringtofront', jqObj).click(function(e) {
       var jqCurSelected = $('div.cloudcarousel.selected', jqObj.parent()),
           curSelectedZidx = jqCurSelected.attr('zindex'),
@@ -520,7 +530,7 @@
     {
         var w, h, nick, px = 'px',
             obj = item.object,
-            plgin = $(obj).find('object')[0];
+            plgin = $(obj).find('object')[0] || $(obj).find('video')[0];
         //console.log('adjPlugin ' + $(obj).attr('encname'));
         if (plgin)
         {

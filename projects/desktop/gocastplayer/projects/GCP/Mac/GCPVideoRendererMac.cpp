@@ -73,18 +73,18 @@ namespace GoCast
     
     void GCPVideoRenderer::ConvertToRGBA()
     {
-        const int stride = m_width*4;
+        const int stride = m_width << 2;
         const int frameBufferSize = m_height*stride;
         uint8* pBufIter = m_pFrameBuffer;
         uint8* pBufEnd = pBufIter + frameBufferSize;
 
         while(pBufIter < pBufEnd)
         {
-            pBufIter[3] = pBufIter[0];
-            pBufIter[0] = pBufIter[2];
-            pBufIter[2] = pBufIter[3];
-            pBufIter[3] = 0xff;
-            pBufIter += 4;
+            SWAP_VALUES(pBufIter[0], pBufIter[2], pBufIter[3], 0xff);
+            SWAP_VALUES(pBufIter[4], pBufIter[6], pBufIter[7], 0xff);
+            SWAP_VALUES(pBufIter[8], pBufIter[10], pBufIter[11], 0xff);
+            SWAP_VALUES(pBufIter[12], pBufIter[14], pBufIter[15], 0xff);
+            pBufIter += 16;
         }
     }
     

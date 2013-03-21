@@ -222,6 +222,11 @@ var app = {
   pluginInstalled: function() {
     var rtnFlag = false,
         object;
+
+    if ($.urlvars.wrtcable) {
+      return true;
+    }
+
     if ($.browser.msie)
     {
        try
@@ -2038,7 +2043,12 @@ function checkPlugin() {
   app.facebookInited = true;
   closeWindow();
   openMeeting();
-  tryPluginInstall();
+
+  if ($.urlvars.wrtcable) {
+    pluginLoaded();
+  } else {
+    tryPluginInstall();
+  }
 }
 
 ///

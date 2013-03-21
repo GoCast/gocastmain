@@ -219,7 +219,7 @@ namespace GoCast
             m_bRegistered = !Unregister();
         }
         
-        if(m_bRegistered)
+        if("gray" == effect || "sepia" == effect || "none" == effect)
         {
             boost::mutex::scoped_lock lock_(m_mutex);
             m_effect = effect;

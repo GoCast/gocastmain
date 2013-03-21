@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>PeerConnection API Test (JSEP)</title>
+	</head>
+	<body>
+		<div id="container"></div>
+		<div id="remotecontainer"></div>
+		<script type="text/javascript" src="peerconnection.js"></script>
+		<script type="text/javascript">
+			var playerTemplates = {
+				'native': '<video id="localVideo" autoplay width="640" height="480"></video>',
+				'gcp': '<object id="localVideo" type="application/x-gocastplayer" width="640"' +
+					   'height="480"><param name="onload" value="onloaded"></param></object>'
+			}, remotePlayerTemplates = {
+				'native': '<video id="{{id}}" autoplay width="640" height="480"></video>',
+				'gcp': '<object id="{{id}}" type="application/x-gocastplayer" width="640"' +
+					   'height="480"></object>'
+			}, constraints = {
+				audio: true,
+				video: true,
+				videoconstraints: {
+					webrtc: {
+						mandatory: {
+							minWidth: '320',
+							maxWidth: '320',
+							minHeight: '240',
+							maxHeight: '240',
+							minFrameRate: '15',
+							maxFrameRate: '15'
+						}
+					}
+				}
+			}, domContainer = document.querySelector('body > #container'), apitype = 'native',
+			peerconnection = null, onloaded = function() {
+				GoCastJS.getUserMedia(
+					new GoCastJS.UserMediaOptions(constraints, document.getElementById('localVideo'), apitype),
+					function(stream) {
+						var domRemContainer = document.getElementById('remotecontainer'),
+							apitype = (/\?gcp/.test(window.location.href)) ? 'gcp' : 'native';
+
+						domRemContainer.innerHTML = remotePlayerTemplates[apitype].replace(/\{\{id\}\}/g, 'remoteVideo');
+						peerconnection = new GoCastJS.PeerConnection(new GoCastJS.PeerConnectionOptions(
+							document.getElementById('remoteVideo'), 'remoteVideo',
+							[{uri: 'turn:manjesh2@dev.gocast.it:3478', password: 'manjeshpass2'}],
+							function(candidate) { 
+								console.log('Candidate: ' + candidate);
+								peerconnection.AddIceCandidate(candidate); 
+							},
+							function(stream) { console.log('Added remote stream: ', stream); },
+							function(stream) { console.log('Remed remote stream: ', stream); },
+							function(state) { console.log('Signaling state: ' + state); },
+							function(state) { console.log('Connection state: ' + state); },
+							apitype
+						));
+
+						peerconnection.AddStream(stream, function() {
+							peerconnection.CreateOffer(function(sdp) {
+								console.log('Offer sdp: ' + sdp);
+								peerconnection.SetLocalDescription('offer', sdp, function() {
+									console.log('Setting answer...');
+									peerconnection.SetRemoteDescription('answer', sdp, function() {
+										console.log('Offer/answer done.');
+									}, function(err) {
+										console.log(err);
+									});
+								}, function(err) {
+									console.log(err);
+								});
+							}, function(err) {
+								console.log(err);
+							}, {
+								sdpconstraints: {
+									mandatory: {
+										OfferToReceiveAudio: 'true',
+                                        OfferToReceiveVideo: 'true'
+                                    }
+                                }
+                            });
+						});
+					}, function(error) { console.log(error); }
+				);
+			};
+
+			if (/\?gcp/.test(window.location.href)) {
+				apitype = 'gcp';
+			}
+
+			domContainer.innerHTML = playerTemplates[apitype];
+			if ('native' === apitype) {
+				onloaded();
+			}
+		</script>
+	</body>
+</html>

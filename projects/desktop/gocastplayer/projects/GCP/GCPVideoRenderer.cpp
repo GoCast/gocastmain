@@ -82,10 +82,7 @@ namespace GoCast
         }
         else
         {
-            if(0 > libyuv::ARGBCopy(m_pMirrorBuffer, stride, m_pFrameBuffer, stride, m_width, m_height))
-            {
-                return false;
-            }            
+            SWAP_BUFFER_POINTERS(m_pMirrorBuffer, m_pFrameBuffer);
         }
         
         return true;

@@ -521,7 +521,12 @@ function assignSpotForParticipant(nickname, shownNickname) {
 function addPluginForParticipant(nickname, shownNickname) {
   var id = app.str2id(nickname),
       oo = $('#meeting > #streams > #scarousel div.cloudcarousel#'+ id).get(0),
-      w=1, h=1;
+      w=1, h=1, playerhtml = '<object id="GocastPlayer' + id + '" type="application/x-gocastplayer" width="' + w +
+                             '" height="' + h + '"></object>';
+
+  if ($.urlvars.wrtcable) {
+    playerhtml = '<video id="GocastPlayer' + id + '" width="' + w + '" height="' + h + '" autoplay></video>';
+  }
 
   if (!nickname) {
     app.log(4, "addPluginForParticipant: nickname undefined");
@@ -535,10 +540,10 @@ function addPluginForParticipant(nickname, shownNickname) {
 
   if (oo) {
     $(oo).attr('spotnumber', id)
-         .append('<object id="GocastPlayer' + id + '" type="application/x-gocastplayer" width="' + w + '" height="' + h + '"></object>');
+         .append(playerhtml);
     app.log(2, 'Added GocastPlayer' + id + ' object.');
     app.carousel.updateAll();
-    return $('object#GocastPlayer' + id, oo).get(0);
+    return $(($.urlvars.wrtcable ? 'video' : 'object') + '#GocastPlayer' + id, oo).get(0);
   }
 
   app.log(4, 'addPluginForParticipant: Spot for participant [' + nickname + '] not found.');
@@ -552,7 +557,7 @@ function removePluginForParticipant(nickname) {
           oo = $('#meeting > #streams > #scarousel div.cloudcarousel#' + id).get(0), poo;
 
       if (oo) {
-        poo = $('object#GocastPlayer' + id, oo).get(0);
+        poo = $(($.urlvars.wrtcable ? 'video' : 'object') + '#GocastPlayer' + id, oo).get(0);
         console.log('removePluginForParticipant: Plugin = ', poo);
         if (poo) {
           oo.removeChild(poo);
@@ -1246,6 +1251,7 @@ function pluginLoaded(
 )
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
+  var lplayersel = '#mystream > ' + ($.urlvars.wrtcable ? 'video' : 'object') + '.localplayer';
   //app.log(2, 'pluginLoaded Local Plugin Loaded.');
   if (Callcast.localplayerLoaded)
   {
@@ -1260,7 +1266,7 @@ function pluginLoaded(
   }
 
   Callcast.localplayerLoaded = true;
-  Callcast.localplayer = $('#mystream > object.localplayer').get(0);
+  Callcast.localplayer = $(lplayersel).get(0);
 
   app.log(2, 'pluginLoaded checking plugin update required');
   if (!Callcast.pluginUpdateRequired()) // do not access plugin api if it needs to be upgraded
@@ -1276,7 +1282,7 @@ function pluginLoaded(
      // set localPlayer to null since Init... checks for it to be null
      // before it will proceed
      Callcast.localplayer = null;
-     Callcast.InitGocastPlayer('#mystream > object.localplayer', function(message)
+     Callcast.InitGocastPlayer(lplayersel, function(message)
      {
         //Initialization successful.
         app.log(2, 'Local plugin successfully initialized.');
@@ -1336,7 +1342,12 @@ function pluginLoaded(
           }
         }
         // </MANJESH>
-
+        if ($.urlvars.wrtcable) {
+          $(document).trigger('checkCredentials');
+          if (Callcast.connection.hasSavedLoginInfo()) {
+            Callcast.connect();
+          }
+        }
         //handleRoomSetup();
      }, function(message) {
         // Failure to initialize.
