@@ -91,27 +91,33 @@ GoCastJS.CheckGoCastPlayer = function() {
 //!                                 [, audioconstraints: object]}
 //!     player      <HtmlObject> : plugin instance used for local preview
 //!
-GoCastJS.UserMediaOptions = function(constraints, player) {
+GoCastJS.UserMediaOptions = function(constraints, player, apitype) {
     var defaultwebrtcvideoconstraints = {
         mandatory: {
             minWidth: '160', maxWidth: '160',
             minHeight: '120', maxHeight: '120',
             minFrameRate: '14', maxFrameRate: '14'
         }
-    };
+    }, nativeConstraints = {};
 
-    if (constraints.video) {
-        constraints.videoconstraints = constraints.videoconstraints || {};
-        constraints.videoconstraints.webrtc = constraints.videoconstraints.webrtc ||
-                                              defaultwebrtcvideoconstraints;
-    }
-
-    if (constraints.audio) {
-        constraints.audioconstraints = constraints.audioconstraints || {};
+    if (!apitype || 'gcp' === apitype) {
+        if (constraints.video) {
+            constraints.videoconstraints = constraints.videoconstraints || {};
+            constraints.videoconstraints.webrtc = constraints.videoconstraints.webrtc ||
+                                                  defaultwebrtcvideoconstraints;
+        }
+        if (constraints.audio) {
+            constraints.audioconstraints = constraints.audioconstraints || {};
+        }
+    } else {
+        nativeConstraints.audio = constraints.audio;
+        nativeConstraints.video = constraints.video ? constraints.videoconstraints.webrtc :
+                                  constraints.video;
     }
 
     this.constraints = constraints;
     this.player = player;
+    this.apitype = apitype || 'gcp';
 };
 
 //!
@@ -123,22 +129,14 @@ GoCastJS.UserMediaOptions = function(constraints, player) {
 //!     failure <function(message)>         : failure callback with message
 //!
 GoCastJS.getUserMedia = function(options, success, failure) {
-    var player = options.player;
+    var player = options.player,
+        apitype = options.apitype;
 
     GoCastJS.Video.captureDevice = '';
     GoCastJS.Audio.inputDevice = '';
     GoCastJS.Audio.outputDevice = '';
 
-    if (false === this.CheckBrowserSupport()) {
-        if ('undefined' !== typeof(failure) && null !== failure) {
-            failure('GoCastJS.getUserMedia(): ' +
-                    'This browser not supported yet.');
-        }
-    } else if (false === this.CheckGoCastPlayer()) {
-        if ('undefined' !== typeof(failure) && null !== failure) {
-            failure('GoCastJS.getUserMedia(): GoCastPlayer not detected.');
-        }
-    } else {
+    if ('gcp' === apitype) {
         if (true === options.constraints.video) {
             if ('undefined' === typeof(options.constraints.videoconstraints.videoin) ||
                 null === options.constraints.videoconstraints.videoin) {
@@ -236,6 +234,22 @@ GoCastJS.getUserMedia = function(options, success, failure) {
                 }
             }
         );
+    } else {
+        navigator.webkitGetUserMedia(
+            options.constraints,
+            function(stream) {
+                var s = success || function(stream) {};
+                player.autoplay = 'true';
+                player.src = webkitURL.createObjectURL(stream);
+                player.style.transform = 'rotateY(180deg)';
+                player.style.webkitTransform = 'rotateY(180deg)';
+                s(stream);
+            },
+            function() {
+                var f = failure || function(error) {};
+                f('GoCastJS.getUserMedia: failed');
+            }
+        );
     }
 };
 
@@ -253,13 +267,19 @@ GoCastJS.getUserMedia = function(options, success, failure) {
 //!
 GoCastJS.SetSpkVolListener = function(checkInterval,
                                       localplayer,
-                                      onSpkVolChanged) {
-    return setInterval(function() {
-        if (GoCastJS.Audio.spkVol !== localplayer.volume) {
-            GoCastJS.Audio.spkVol = localplayer.volume;
-            onSpkVolChanged(GoCastJS.Audio.spkVol);
-        }
-    }, checkInterval);
+                                      onSpkVolChanged,
+                                      apitype) {
+    apitype = apitype || 'gcp';
+    if ('gcp' === apitype) {
+        return setInterval(function() {
+            if (GoCastJS.Audio.spkVol !== localplayer.volume) {
+                GoCastJS.Audio.spkVol = localplayer.volume;
+                onSpkVolChanged(GoCastJS.Audio.spkVol);
+            }
+        }, checkInterval);
+    }
+
+    return null;
 };
 
 //!
@@ -276,25 +296,37 @@ GoCastJS.SetSpkVolListener = function(checkInterval,
 //!
 GoCastJS.SetMicVolListener = function(checkInterval,
                                       localplayer,
-                                      onMicVolChanged) {
-    return setInterval(function() {
-        if (GoCastJS.Audio.micVol !== localplayer.micvolume) {
-            GoCastJS.Audio.micVol = localplayer.micvolume;
-            onMicVolChanged(GoCastJS.Audio.micVol);
-        }
-    }, checkInterval);
+                                      onMicVolChanged,
+                                      apitype) {
+    apitype = apitype || 'gcp';
+    if ('gcp' === apitype) {
+        return setInterval(function() {
+            if (GoCastJS.Audio.micVol !== localplayer.micvolume) {
+                GoCastJS.Audio.micVol = localplayer.micvolume;
+                onMicVolChanged(GoCastJS.Audio.micVol);
+            }
+        }, checkInterval);
+    }
+
+    return null;
 };
 
 GoCastJS.SetPluginCrashMonitor = function(checkInterval,
                                           localplayer,
-                                          onCrashed) {
-    return setInterval(function() {
-        if (localplayer && onCrashed && ('undefined' === typeof(localplayer.volume))) {
-            localplayer.width = 0;
-            localplayer.height = 0;
-            onCrashed();
-        }
-    }, checkInterval);
+                                          onCrashed,
+                                          apitype) {
+    apitype = apitype || 'gcp';
+    if ('gcp' === apitype) {
+        return setInterval(function() {
+            if (localplayer && onCrashed && ('undefined' === typeof(localplayer.volume))) {
+                localplayer.width = 0;
+                localplayer.height = 0;
+                onCrashed();
+            }
+        }, checkInterval);
+    }
+
+    return null;
 };
 
 //!
@@ -319,109 +351,115 @@ GoCastJS.SetPluginCrashMonitor = function(checkInterval,
 //!
 GoCastJS.SetDevicesChangedListener = function(checkInterval,
                                               localplayer,
-                                              onChanged) {
-    var videoInOpts = localplayer.videoinopts;
-    var audioInOpts = localplayer.audioinopts;
-    var audioOutOpts = localplayer.audiooutopts;
+                                              onChanged,
+                                              apitype) {
+    var videoInOpts = (!apitype || 'gcp' === apitype) ? localplayer.videoinopts : '';
+    var audioInOpts = (!apitype || 'gcp' === apitype) ? localplayer.audioinopts : '';
+    var audioOutOpts = (!apitype || 'gcp' === apitype) ? localplayer.audiooutopts : '';
 
     GoCastJS.Video.devices = [];
     GoCastJS.Audio.inputDevices = [];
     GoCastJS.Audio.outputDevices = [];
 
-    return setInterval(function() {
-        var videoDevicesDeleted = [];
-        var videoDevicesAdded = [];
-        var audioInDevicesDeleted = [];
-        var audioInDevicesAdded = [];
-        var audioOutDevicesDeleted = [];
-        var audioOutDevicesAdded = [];
-        var vInOpts = localplayer.videoinopts;
-        var aInOpts = localplayer.audioinopts;
-        var aOutOpts = localplayer.audiooutopts;
+    apitype = apitype || 'gcp';
+    if ('gcp' === apitype) {
+        return setInterval(function() {
+            var videoDevicesDeleted = [];
+            var videoDevicesAdded = [];
+            var audioInDevicesDeleted = [];
+            var audioInDevicesAdded = [];
+            var audioOutDevicesDeleted = [];
+            var audioOutDevicesAdded = [];
+            var vInOpts = localplayer.videoinopts;
+            var aInOpts = localplayer.audioinopts;
+            var aOutOpts = localplayer.audiooutopts;
 
-        // Check for newly deleted devices
-        for (i in GoCastJS.Video.devices) {
-            if (GoCastJS.Video.devices.hasOwnProperty(i) &&
-                'undefined' === typeof(vInOpts[GoCastJS.Video.devices[i]])) {
-                videoDevicesDeleted.push(GoCastJS.Video.devices[i]);
-            }
-        }
-
-        for (i in GoCastJS.Audio.inputDevices) {
-            if (GoCastJS.Audio.inputDevices.hasOwnProperty(i) &&
-                -1 === aInOpts.indexOf(GoCastJS.Audio.inputDevices[i])) {
-                audioInDevicesDeleted.push(GoCastJS.Audio.inputDevices[i]);
-            }
-        }
-
-        for (i in GoCastJS.Audio.outputDevices) {
-            if (GoCastJS.Audio.outputDevices.hasOwnProperty(i) &&
-                -1 === aOutOpts.indexOf(GoCastJS.Audio.outputDevices[i])) {
-                audioOutDevicesDeleted.push(GoCastJS.Audio.outputDevices[i]);
-            }
-        }
-
-        // Check for newly added devices
-        for (j in vInOpts) {
-            if (vInOpts.hasOwnProperty(j) && -1 === GoCastJS.Video.devices.indexOf(j)) {
-                videoDevicesAdded.push(j);
-            }
-        }
-
-        for (j in aInOpts) {
-            if (aInOpts.hasOwnProperty(j) && -1 === GoCastJS.Audio.inputDevices.indexOf(aInOpts[j])) {
-                audioInDevicesAdded.push(aInOpts[j]);
-            }
-        }
-
-        for (j in aOutOpts) {
-            if (aOutOpts.hasOwnProperty(j) && -1 === GoCastJS.Audio.outputDevices.indexOf(aOutOpts[j])) {
-                audioOutDevicesAdded.push(aOutOpts[j]);
-            }
-        }
-
-        // Refresh the current devices list
-        if (0 < videoDevicesAdded.length || 0 < videoDevicesDeleted.length) {
-            GoCastJS.Video.devices = [];
-            for (i in vInOpts) {
-                if (vInOpts.hasOwnProperty(i)) {
-                    GoCastJS.Video.devices.push(i);
+            // Check for newly deleted devices
+            for (i in GoCastJS.Video.devices) {
+                if (GoCastJS.Video.devices.hasOwnProperty(i) &&
+                    'undefined' === typeof(vInOpts[GoCastJS.Video.devices[i]])) {
+                    videoDevicesDeleted.push(GoCastJS.Video.devices[i]);
                 }
             }
-        }
 
-        if (0 < audioInDevicesAdded.length ||
-            0 < audioInDevicesDeleted.length) {
-            GoCastJS.Audio.inputDevices = [];
-            for (i in aInOpts) {
-                if (aInOpts.hasOwnProperty(i)) {
-                    GoCastJS.Audio.inputDevices.push(aInOpts[i]);
+            for (i in GoCastJS.Audio.inputDevices) {
+                if (GoCastJS.Audio.inputDevices.hasOwnProperty(i) &&
+                    -1 === aInOpts.indexOf(GoCastJS.Audio.inputDevices[i])) {
+                    audioInDevicesDeleted.push(GoCastJS.Audio.inputDevices[i]);
                 }
             }
-        }
 
-        if (0 < audioOutDevicesAdded.length ||
-            0 < audioOutDevicesDeleted.length) {
-            GoCastJS.Audio.outputDevices = [];
-            for (i in aOutOpts) {
-                if (aOutOpts.hasOwnProperty(i)) {
-                    GoCastJS.Audio.outputDevices.push(aOutOpts[i]);
+            for (i in GoCastJS.Audio.outputDevices) {
+                if (GoCastJS.Audio.outputDevices.hasOwnProperty(i) &&
+                    -1 === aOutOpts.indexOf(GoCastJS.Audio.outputDevices[i])) {
+                    audioOutDevicesDeleted.push(GoCastJS.Audio.outputDevices[i]);
                 }
             }
-        }
 
-        // Call callback if device list has changed
-        if (0 < videoDevicesAdded.length ||
-            0 < videoDevicesDeleted.length ||
-            0 < audioInDevicesAdded.length ||
-            0 < audioInDevicesDeleted.length ||
-            0 < audioOutDevicesAdded.length ||
-            0 < audioOutDevicesDeleted.length) {
-            onChanged(videoDevicesAdded, videoDevicesDeleted,
-                      audioInDevicesAdded, audioInDevicesDeleted,
-                      audioOutDevicesAdded, audioOutDevicesDeleted);
-        }
-    }, checkInterval);
+            // Check for newly added devices
+            for (j in vInOpts) {
+                if (vInOpts.hasOwnProperty(j) && -1 === GoCastJS.Video.devices.indexOf(j)) {
+                    videoDevicesAdded.push(j);
+                }
+            }
+
+            for (j in aInOpts) {
+                if (aInOpts.hasOwnProperty(j) && -1 === GoCastJS.Audio.inputDevices.indexOf(aInOpts[j])) {
+                    audioInDevicesAdded.push(aInOpts[j]);
+                }
+            }
+
+            for (j in aOutOpts) {
+                if (aOutOpts.hasOwnProperty(j) && -1 === GoCastJS.Audio.outputDevices.indexOf(aOutOpts[j])) {
+                    audioOutDevicesAdded.push(aOutOpts[j]);
+                }
+            }
+
+            // Refresh the current devices list
+            if (0 < videoDevicesAdded.length || 0 < videoDevicesDeleted.length) {
+                GoCastJS.Video.devices = [];
+                for (i in vInOpts) {
+                    if (vInOpts.hasOwnProperty(i)) {
+                        GoCastJS.Video.devices.push(i);
+                    }
+                }
+            }
+
+            if (0 < audioInDevicesAdded.length ||
+                0 < audioInDevicesDeleted.length) {
+                GoCastJS.Audio.inputDevices = [];
+                for (i in aInOpts) {
+                    if (aInOpts.hasOwnProperty(i)) {
+                        GoCastJS.Audio.inputDevices.push(aInOpts[i]);
+                    }
+                }
+            }
+
+            if (0 < audioOutDevicesAdded.length ||
+                0 < audioOutDevicesDeleted.length) {
+                GoCastJS.Audio.outputDevices = [];
+                for (i in aOutOpts) {
+                    if (aOutOpts.hasOwnProperty(i)) {
+                        GoCastJS.Audio.outputDevices.push(aOutOpts[i]);
+                    }
+                }
+            }
+
+            // Call callback if device list has changed
+            if (0 < videoDevicesAdded.length ||
+                0 < videoDevicesDeleted.length ||
+                0 < audioInDevicesAdded.length ||
+                0 < audioInDevicesDeleted.length ||
+                0 < audioOutDevicesAdded.length ||
+                0 < audioOutDevicesDeleted.length) {
+                onChanged(videoDevicesAdded, videoDevicesDeleted,
+                          audioInDevicesAdded, audioInDevicesDeleted,
+                          audioOutDevicesAdded, audioOutDevicesDeleted);
+            }
+        }, checkInterval);
+    }
+
+    return null;
 };
 
 //!
@@ -441,13 +479,14 @@ GoCastJS.SetDevicesChangedListener = function(checkInterval,
 //!     onSignalingStateChange <function(newState)> : signaling state changed
 //!     onConnStateChange <function(newState)>      : connection state changed
 //!
-GoCastJS.PeerConnectionOptions = function(player, pcid,
-                                          iceServers,
+GoCastJS.PeerConnectionOptions = function(player,
+                                          pcid, iceServers,
                                           onIceMessage,
                                           onAddStream,
                                           onRemoveStream,
                                           onSignalingStateChange,
-                                          onConnStateChange) {
+                                          onConnStateChange,
+                                          apitype) {
     this.iceServers = iceServers;
     this.onIceMessage = onIceMessage;
     this.onAddStream = onAddStream;
@@ -456,6 +495,7 @@ GoCastJS.PeerConnectionOptions = function(player, pcid,
     this.onConnStateChange = onConnStateChange;
     this.player = player;
     this.pcid = pcid;
+    this.apitype = apitype || 'gcp';
 };
 
 //!
@@ -469,97 +509,145 @@ GoCastJS.PeerConnectionOptions = function(player, pcid,
 //!     player <HtmlObject> : 'GoCastPlayer' instance for this peerconnection
 //!
 GoCastJS.PeerConnection = function(options) {
-    if (false === GoCastJS.CheckBrowserSupport()) {
-        throw new GoCastJS.Exception(options.pcid, 'Browser unsupported.');
-    } else if (false === GoCastJS.CheckGoCastPlayer()) {
-        throw new GoCastJS.Exception(options.pcid, 'Plugin undetected.');
-    } else {
-        this.player = options.player;
-        this.pcid = options.pcid;
-        this.sigState = 'preinit';
-        this.connState = 'preinit';
-        this.pendingCandidates = [];
-        this.connTimer = null;
-        this.connTimeout = 5000;
+    var self = this, apitype = options.apitype, server,
+        player = options.player, onstatechange, i,
+        onicechange, onicecandidate, iceservers = [];
 
-        var self = this;
-        var playerRef = this.player;
+    this.apitype = options.apitype;
+    this.player = options.player;
+    this.pcid = options.pcid;
+    this.sigState = 'preinit';
+    this.connState = 'preinit';
+    this.pendingCandidates = [];
+    this.connTimer = null;
+    this.connTimeout = 5000;
+    this.peerconn = null;
+
+    if ('native' === apitype) {
+        for (i=0; i<options.iceServers.length; i++) {
+            server = {url: options.iceServers[i].uri};
+            if (options.iceServers[i].password) {
+                server.password = options.iceServers[i].password;
+            }
+            iceservers.push(server);
+        }
+
+        this.peerconn = new webkitRTCPeerConnection({iceServers: iceservers});
+        this.peerconn.onaddstream = function(e) {
+            player.src = webkitURL.createObjectURL(e.stream);
+            if (options.onAddStream) {
+                options.onAddStream(e.stream);
+            }
+        }
+    } else if ('gcp' === apitype) {
         this.player.onaddstream = function(stream) {
-            playerRef.source = stream;
+            player.source = stream;
             if ('undefined' !== typeof(options.onAddStream) &&
                 null !== options.onAddStream) {
                 options.onAddStream(stream);
             }
         };
+    }
 
+    if ('native' === apitype) {
+        this.peerconn.onremovestream = function(e) {
+            if (options.onRemoveStream) {
+                options.onRemoveStream(e.stream);
+            }
+        }
+    } else if ('gcp' === apitype) {
         this.player.onremovestream = function(stream) {
             if ('undefined' !== typeof(options.onRemoveStream) &&
                 null !== options.onRemoveStream) {
                 options.onRemoveStream(stream);
             }
         };
+    }
 
-        this.player.onstatechange = function(newState) {
-            var i;
+    onstatechange = function(newState) {
+        var i;
 
-            self.sigState = newState;
-            if ('stable' === newState) {
-                for (i=0; i<self.pendingCandidates.length; i++) {
-                    self.AddIceCandidate(self.pendingCandidates[i]);
-                }
-                self.pendingCandidates = [];
+        self.sigState = newState;
+        if ('stable' === newState || 'active' === newState) {
+            for (i=0; i<self.pendingCandidates.length; i++) {
+                self.AddIceCandidate(self.pendingCandidates[i]);
             }
-            if ('undefined' !== typeof(options.onSignalingStateChange) &&
-                null !== options.onSignalingStateChange) {
-                options.onSignalingStateChange(newState);
-            }
+            self.pendingCandidates = [];
+        }
+        if ('undefined' !== typeof(options.onSignalingStateChange) &&
+            null !== options.onSignalingStateChange) {
+            options.onSignalingStateChange(newState);
+        }
+    };
+
+    if ('native' === apitype) {
+        this.peerconn.onstatechange = function() { 
+            onstatechange(self.peerconn.readyState);
         };
+    } else if ('gcp' === apitype) {
+        this.player.onstatechange = onstatechange;
+    }
 
-        this.player.onicechange = function(newState) {
-            self.connState = newState;
+    onicechange = function(newState) {
+        self.connState = newState;
 
-            if ('checking' === newState || 'disconnected' === newState) {
-                if (!self.connTimer) {
-                    self.connTimer = setTimeout(function() {
-                        self.connTimer = null;
-                        self.connState = 'timedout';
-                        self.connTimeout = 10000;
+        if ('checking' === newState || 'disconnected' === newState) {
+            if (!self.connTimer) {
+                self.connTimer = setTimeout(function() {
+                    self.connTimer = null;
+                    self.connState = 'timedout';
+                    self.connTimeout = 10000;
 
-                        if (options.onConnStateChange) {
-                            options.onConnStateChange(self.connState);
-                        }
-                    }, self.connTimeout);
-                }
-            }
-            if ('connected' === newState && self.connTimer) {
-                if (self.connTimer) {
-                    clearTimeout(self.connTimer);
-                    self.connTimer = null;                    
-                }
-            }
-            if ('undefined' !== typeof(options.onConnStateChange) &&
-                null !== options.onConnStateChange &&
-                'defunct' !== self.connState) {
-                options.onConnStateChange(newState);
+                    if (options.onConnStateChange) {
+                        options.onConnStateChange(self.connState);
+                    }
+                }, self.connTimeout);
             }
         }
+        if ('connected' === newState && self.connTimer) {
+            if (self.connTimer) {
+                clearTimeout(self.connTimer);
+                self.connTimer = null;                    
+            }
+        }
+        if ('undefined' !== typeof(options.onConnStateChange) &&
+            null !== options.onConnStateChange &&
+            'defunct' !== self.connState) {
+            options.onConnStateChange(newState);
+        }
+    };
 
-        var iceCallback = function(candidate) {
-            if ('undefined' !== typeof(options.onIceMessage) &&
-               null !== options.onIceMessage) {
-                options.onIceMessage(candidate.replace(/\r\n/, ''));
+    if ('native' === apitype) {
+        this.peerconn.onicechange = function() {
+            onicechange(self.peerconn.iceState);
+        };
+    } else if ('gcp' === apitype) {
+        this.player.onicechange = onicechange;
+    }
+
+    onicecandidate = function(candidate) {
+        if ('undefined' !== typeof(options.onIceMessage) &&
+           null !== options.onIceMessage) {
+            options.onIceMessage(candidate.replace(/\r\n/, ''));
+        }
+    };
+
+    if ('native' === apitype) {
+        this.peerconn.onicecandidate = function(e) {
+            if (e.candidate) {
+                onicecandidate(JSON.stringify(e.candidate));
             }
         };
-
+    } else if ('gcp' === apitype) {
         if (false === this.player.init(options.pcid,
                                        options.iceServers,
-                                       iceCallback)) {
+                                       onicecandidate)) {
             throw new GoCastJS.Exception(options.pcid, 'init() failed.');
         }
-
-        this.sigState = 'new';
-        this.connState = 'new';
     }
+
+    this.sigState = 'new';
+    this.connState = 'starting';
 };
 
 //!
@@ -571,9 +659,14 @@ GoCastJS.PeerConnection = function(options) {
 //!     negotiationCallback : offer/answer negotiation function
 //!
 GoCastJS.PeerConnection.prototype.AddStream = function(stream, negotiationCallback) {
-    this.player.onnegotiationneeded = negotiationCallback || function() {};
-    if (false === this.player.addStream(stream)) {
-        throw new GoCastJS.Exception(this.pcid, 'addStream() failed.');
+    if ('gcp' === this.apitype) {
+        this.player.onnegotiationneeded = negotiationCallback || function() {};
+        if (false === this.player.addStream(stream)) {
+            throw new GoCastJS.Exception(this.pcid, 'addStream() failed.');
+        }
+    } else if ('native' === this.apitype) {
+        this.peerconn.onnegotiationneeded = negotiationCallback || function() {};
+        this.peerconn.addStream(stream);
     }
 };
 
@@ -585,9 +678,14 @@ GoCastJS.PeerConnection.prototype.AddStream = function(stream, negotiationCallba
 //!     negotiationCallback : offer/answer negotiation function
 //!
 GoCastJS.PeerConnection.prototype.RemoveStream = function(stream, negotiationCallback) {
-    this.player.onnegotiationneeded = negotiationCallback || function() {};
-    if (false === this.player.removeStream(stream)) {
-        throw new GoCastJS.Exception(this.pcid, 'removeStream() failed.');
+    if ('gcp' === this.apitype) {
+        this.player.onnegotiationneeded = negotiationCallback || function() {};
+        if (false === this.player.removeStream(stream)) {
+            throw new GoCastJS.Exception(this.pcid, 'removeStream() failed.');
+        }
+    } else if ('native' === this.apitype) {
+        this.peerconn.onnegotiationneeded = negotiationCallback || function() {};
+        this.peerconn.removeStream(stream);
     }
 };
 
@@ -603,7 +701,16 @@ GoCastJS.PeerConnection.prototype.RemoveStream = function(stream, negotiationCal
 GoCastJS.PeerConnection.prototype.CreateOffer = function(success, failure, constraints) {
     success = success || function(sdp) {};
     failure = failure || function(error) {};
-    this.player.createOffer(success, failure, constraints || {});
+
+    if ('gcp' === this.apitype) {
+        this.player.createOffer(success, failure, constraints || {});
+    } else if ('native' === this.apitype) {
+        this.peerconn.createOffer(function(sdp) {
+            success(sdp.sdp);
+        }, function() {
+            failure('setLocalDescription failed.');
+        }, constraints.sdpconstraints);
+    }
 };
 
 //!
@@ -618,7 +725,16 @@ GoCastJS.PeerConnection.prototype.CreateOffer = function(success, failure, const
 GoCastJS.PeerConnection.prototype.CreateAnswer = function(success, failure, constraints) {
     success = success || function(sdp) {};
     failure = failure || function(error) {};
-    this.player.createAnswer(success, failure, constraints || {});
+
+    if ('gcp' === this.apitype) {
+        this.player.createAnswer(success, failure, constraints || {});
+    } else if ('native' === this.apitype) {
+        this.peerconn.createAnswer(function(sdp) {
+            success(sdp.sdp);
+        }, function() {
+            failure('setLocalDescription failed.');
+        }, constraints.sdpconstraints);
+    }
 };
 
 //!
@@ -637,9 +753,19 @@ GoCastJS.PeerConnection.prototype.SetLocalDescription = function(action,
                                                                  sdp,
                                                                  success,
                                                                  failure) {
-    success = success || function(sdp) {};
+    success = success || function() {};
     failure = failure || function(error) {};
-    this.player.setLocalDescription(action, sdp, success, failure);
+
+    if ('gcp' === this.apitype) {
+        this.player.setLocalDescription(action, sdp, success, failure);
+    } else if ('native' === this.apitype) {
+        this.peerconn.setLocalDescription(
+            new RTCSessionDescription({sdp: sdp, type: action}),
+            success, function() {
+                failure('setLocalDescription failed.');
+            }
+        );
+    }
 };
 
 //!
@@ -658,9 +784,19 @@ GoCastJS.PeerConnection.prototype.SetRemoteDescription = function(action,
                                                                   sdp,
                                                                   success,
                                                                   failure) {
-    success = success || function(sdp) {};
+    success = success || function() {};
     failure = failure || function(error) {};
-    this.player.setRemoteDescription(action, sdp, success, failure);
+
+    if ('gcp' === this.apitype) {
+        this.player.setRemoteDescription(action, sdp, success, failure);
+    } else if ('native' === this.apitype) {
+        this.peerconn.setRemoteDescription(
+            new RTCSessionDescription({sdp: sdp, type: action}),
+            success, function() {
+                failure('setRemoteDescription failed.');
+            }
+        );
+    }
 };
 
 //!
@@ -672,11 +808,15 @@ GoCastJS.PeerConnection.prototype.SetRemoteDescription = function(action,
 GoCastJS.PeerConnection.prototype.AddIceCandidate = function(sdp) {
     var candidate = JSON.parse(sdp);
 
-    if ('stable' === this.sigState) {
-        if (false === this.player.addIceCandidate(candidate.sdp_mid,
-                                                  candidate.sdp_mline_index,
-                                                  candidate.sdp)) {
-            throw new GoCastJS.Exception(this.pcid, 'procIceMsg() failed.');
+    if ('stable' === this.sigState || 'active' === this.sigState) {
+        if ('gcp' === this.apitype) {
+            if (false === this.player.addIceCandidate(candidate.sdp_mid,
+                                                      candidate.sdp_mline_index,
+                                                      candidate.sdp)) {
+                    throw new GoCastJS.Exception(this.pcid, 'procIceMsg() failed.');
+            }
+        } else if ('native' === this.apitype) {
+            this.peerconn.addIceCandidate(new RTCIceCandidate(candidate));
         }
     } else {
         this.pendingCandidates.push(sdp);
@@ -689,8 +829,13 @@ GoCastJS.PeerConnection.prototype.AddIceCandidate = function(sdp) {
 //! NOTE: preferably should be called on an init-ed player instance
 //!
 GoCastJS.PeerConnection.prototype.Deinit = function() {
-    if (false === this.player.deinit()) {
-        throw new GoCastJS.Exception(this.pcid, 'deinit() failed.');
+    if ('gcp' === this.apitype) {
+        if (false === this.player.deinit()) {
+            throw new GoCastJS.Exception(this.pcid, 'deinit() failed.');
+        }
+    } else if ('native' === this.apitype) {
+        this.peerconn.close();
+        this.peerconn = null;
     }
 };
 
@@ -733,17 +878,19 @@ GoCastJS.PeerConnection.prototype.Height = function(height) {
 //!     localplayer <HtmlObject>        : plugin instance for local preview
 //!     logCallback <function(entries)> : callback with array of log entries
 //!
-GoCastJS.PluginLog = function(localplayer, logCallback) {
-    if ('undefined' === localplayer || null === localplayer) {
-        return;
-    } else if ('undefined' === logCallback || null === logCallback) {
-        localplayer.logFunction(null);
-    } else {
-        localplayer.logFunction(function() {
-            var entries = localplayer.logentries;
-            if(0 < entries.length) {
-                logCallback(entries);
-            }
-        });
+GoCastJS.PluginLog = function(localplayer, logCallback, apitype) {
+    if ('gcp' === apitype) {
+        if ('undefined' === localplayer || null === localplayer) {
+            return;
+        } else if ('undefined' === logCallback || null === logCallback) {
+            localplayer.logFunction(null);
+        } else {
+            localplayer.logFunction(function() {
+                var entries = localplayer.logentries;
+                if(0 < entries.length) {
+                    logCallback(entries);
+                }
+            });
+        }
     }
 };
