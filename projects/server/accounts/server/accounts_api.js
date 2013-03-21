@@ -695,6 +695,27 @@ function apiListRooms(email, success, failure) {
     db.ListRooms(email, success, failure);
 }
 
+function apiListRecentRooms(email, success, failure) {
+    db.GetAssociatedRooms(email, function(objs) {
+        // We will receive an array of objects here with:
+        // { room: 'roomname', roomtype: 'recent' }
+        //
+        var i, rooms = [], email, roomname;
+
+        for (i = 0 ; i < objs.length ; i += 1) {
+            email = decodeURIComponent(objs[i].room).split('#')[0].replace(/~/g, '@');
+            // roomname ... should always have a #, but if it doesn't, we'll not use the split()[1] so we don't wind up null.
+            roomname = decodeURIComponent(objs[i].room).replace(/%27/g, '\'');
+
+            rooms.push({room: roomname, numparticipants: 0,
+                        description: '', owner: objs[i].owner || email });
+        }
+
+        console.log('DEBUG: apiListRecentRooms: output: ', rooms);
+        success(rooms);
+    }, failure);
+}
+
 function apiVisitorSeen(email, nickName, success, failure) {
     db.VisitorSeen(email, nickName, success, failure);
 }
@@ -722,6 +743,7 @@ exports.ChangePassword = apiChangePassword;
 exports.NewRoom = apiNewRoom;
 exports.DeleteUserRoom = apiDeleteUserRoom;
 exports.ListRooms = apiListRooms;
+exports.ListRecentRooms = apiListRecentRooms;
 exports.VisitorSeen = apiVisitorSeen;
 exports.SendEmailAgain = apiSendEmailAgain;
 exports.GenerateResetPassword = apiGenerateResetPassword;

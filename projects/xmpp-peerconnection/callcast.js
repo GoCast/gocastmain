@@ -2386,7 +2386,7 @@ var Callcast = {
 
         attrs = {
             xmlns: this.NS_CALLCAST,
-            name: roomname.toLowerCase()
+            name: roomname
         };
 
         // If the user has specified a maximum number of participants on the URL/command-line

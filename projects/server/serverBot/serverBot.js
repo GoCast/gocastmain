@@ -3841,7 +3841,7 @@ var k, mobs, curRoom, breakUp, curDigits, curBase,
 };
 
 Overseer.prototype.CreateRoomRequest = function(iq) {
-    var newRoomname, roomname = iq.getChild('room').attr('name'),
+    var newRoomname, orig_roomname = iq.getChild('room').attr('name'), roomname = orig_roomname.toLowerCase(),
         maxParticipantsRequested = iq.getChild('room').attr('maxparticipants'),
         self = this, roomOk,
         iqResult, bUsingDefaultRoom = false, addRoomOptions = null;
@@ -3894,13 +3894,27 @@ Overseer.prototype.CreateRoomRequest = function(iq) {
 
     this.log('Overseer.handleIq: Room Name of [' + roomname + '] requested by: ' + iq.attrs.from);
 
+//TODO:RMW - once we begin validating that a room exists before creating it here, we need to
+//   keep track of 'owner' and 'description' of the room if it's public and pass that along to addAssociated()
     roomOk = function() {
-        var iqResult = new xmpp.Element('iq', {to: iq.attrs.from, type: 'result', id: iq.attrs.id})
+        var email, iqResult = new xmpp.Element('iq', {to: iq.attrs.from, type: 'result', id: iq.attrs.id})
                             .c('ok', {xmlns: 'urn:xmpp:callcast', name: roomname});
         self.log('AddTrackedRoom: INFO: result from room creation is: ' + iqResult.root().toString());
         self.client.send(iqResult.root());
 
         // TODO:RMW - Lookup username (iq.attrs.from) in db and add this room to their recently visited table list.
+        email = iq.attrs.from.split('@')[0];
+        email = email.replace(/~/g, '@');
+
+        if (/@/.test(email)) {
+            // We have a valid email address...assume we have a valid account.
+            accounts_db.AddAssociatedRecentRoom(email, orig_roomname, function() {
+                console.log('DEBUG: recentRoom: Added room: ' + roomname + ', for email: ' + email);
+                return;
+            }, function(err) {
+                console.log('DEBUG: ERROR recentRoom: ', err);
+            });
+        }
     };
 
     //

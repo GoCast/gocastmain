@@ -49,6 +49,7 @@ var theUserTable = settings.accounts.dbUserTable;
 var theUserRoomTable = settings.accounts.dbUserRoomTable;
 var theVisitorTable = settings.accounts.dbVisitorTable;
 var thePublicRoomTable = settings.accounts.dbPublicRoomTable;
+var theAssociatedRoomTable = settings.accounts.dbAssociatedRoomTable;
 
 'use strict';
 
@@ -135,6 +136,37 @@ function errOut(err) {
         }
         else {
             gcutil.log('accounts_db: UserRoom table found and ready.');
+
+//            gcutil.log('UserRoom - Table-result: ', data.Table);
+        }
+    });
+
+//
+// ASSOCIATED ROOM TABLE - for recently visited and scheduled rooms for a user.
+//
+    ddb.client.describeTable({TableName: theAssociatedRoomTable}, function(err, data) {
+        if (err) {
+            // If it doesn't exist, then we should create it.
+            if (err.code === 'ResourceNotFoundException') {
+                // Create the table.
+                ddb.client.createTable({TableName: theAssociatedRoomTable,
+                                        KeySchema: {HashKeyElement: {AttributeName: 'email', AttributeType: 'S'},
+                                                    RangeKeyElement: {AttributeName: 'room', AttributeType: 'S'}},
+                                        ProvisionedThroughput: {ReadCapacityUnits: 5, WriteCapacityUnits: 5}}, function(err, data) {
+                    if (err) {
+                        errOut(err);
+                    }
+                    else {
+                        gcutil.log('accounts_db: Successfully inititalized New AssociatedRoom Table: ' + theAssociatedRoomTable);
+                    }
+                });
+            }
+            else {
+                errOut(err);
+            }
+        }
+        else {
+            gcutil.log('accounts_db: AssociatedRoom table found and ready.');
 
 //            gcutil.log('UserRoom - Table-result: ', data.Table);
         }
@@ -701,16 +733,14 @@ function dbGetPublicRooms(cbSuccess, cbFailure) {
             cbFailure(err);
         }
         else {
+            outItems.push.apply(outItems, dbAwsObjectRead(data.Items));
+
             if (data.LastEvaluatedKey) {
 //                gcutil.log('dbGetPublicRooms: Received: ' + data.Count + ' items. Continuing scan - next iteration...');
-                outItems.push.apply(outItems, dbAwsObjectRead(data.Items));
-
                 scanObj.ExclusiveStartKey = data.LastEvaluatedKey;
                 ddb.client.scan(scanObj, scanHandler);
             }
             else {
-                outItems.push.apply(outItems, dbAwsObjectRead(data.Items));
-
 //                gcutil.log('dbGetPublicRooms: Scan complete. Found a total of: ' + outItems.length + ' items.');
                 cbSuccess(outItems);
             }
@@ -720,6 +750,92 @@ function dbGetPublicRooms(cbSuccess, cbFailure) {
     ddb.client.scan(scanObj, scanHandler);
 
 }
+
+function dbGetAssociatedRooms(accountName, cbSuccess, cbFailure) {
+    var outItems = [],
+        queryHandler, queryObj;
+
+
+    queryObj = {TableName: theAssociatedRoomTable,
+                  Limit: 3,
+                  HashKeyValue: { S: accountName.toLowerCase() },
+                  AttributesToGet: ['room', 'roomtype']};
+
+    queryHandler = function(err, data) {
+        if (err) {
+            errOut(err);
+            cbFailure(err);
+        }
+        else {
+
+            outItems.push.apply(outItems, dbAwsObjectRead(data.Items));
+
+            if (data.LastEvaluatedKey) {
+                gcutil.log('dbGetAssociatedRooms: Received: ' + data.Count + ' items. Continuing scan - next iteration...');
+                queryObj.ExclusiveStartKey = data.LastEvaluatedKey;
+                ddb.client.query(queryObj, queryHandler);
+            }
+            else {
+                gcutil.log('dbGetAssociatedRooms: Scan complete. Found a total of: ' + outItems.length + ' items.');
+                cbSuccess(outItems);
+            }
+        }
+    };
+
+    ddb.client.query(queryObj, queryHandler);
+
+}
+
+function dbAddAssociatedRoom(accountName, room, roomtype, cbSuccess, cbFailure) {
+    var cur = new Date(),
+        Item, obj;
+
+    // First must get the # visits so far.
+        // Prep the item to be stored
+        Item = {};
+        obj = {roomtype: roomtype,
+               lastEntry: new Date().toString()};
+
+        dbAwsUpdateObjectPrep(Item, obj);
+
+        // AttributeUpdates { itemname: { Value: { S|N : '' }, Action: 'PUT' } }, itemName2: { Value: , Action }}
+        ddb.client.updateItem({TableName: theAssociatedRoomTable,
+                            Key: { HashKeyElement: { S: accountName.toLowerCase() },
+                                    RangeKeyElement: { S: room }},
+                            AttributeUpdates: Item}, function(err, data) {
+                                if (err) {
+                                    errOut(err);
+                                    cbFailure(err);
+                                }
+                                else {
+    //                                gcutil.log('Added Item: ', data.Attributes);
+//                                    gcutil.log('Visitor-Update-RAW: ', data);
+                                    cbSuccess(data);
+                                }
+                            });
+
+}
+
+function dbAddAssociatedRecentRoom(accountName, room, cbSuccess, cbFailure) {
+    return dbAddAssociatedRoom(accountName, room, 'recent', cbSuccess, cbFailure);
+}
+
+function dbDeleteAssociatedRoom(accountName, roomName, cbSuccess, cbFailure) {
+    ddb.client.deleteItem({TableName: theAssociatedRoomTable,
+                           Key: {HashKeyElement: { S: accountName.toLowerCase() },
+                                 RangeKeyElement: { S: roomName }}}, function(err, data) {
+        if (err) {
+            errOut(err);
+            cbFailure(err);
+        }
+        else {
+//            gcutil.log('Deleted Item: ', data.Attributes);
+//            gcutil.log('Deleted-RAW: ', data);
+            cbSuccess(data);
+        }
+    });
+}
+
 
 exports.AddEntry = dbAddEntry;
 exports.UpdateEntry = dbUpdateEntry;
@@ -734,4 +850,7 @@ exports.ListRooms = dbListRooms;
 exports.VisitorSeen = dbVisitorSeen;
 exports.ValidationReport = dbValidationReport;
 exports.GetPublicRooms = dbGetPublicRooms;
-
+exports.GetAssociatedRooms = dbGetAssociatedRooms;
+exports.AddAssociatedRoom = dbAddAssociatedRoom;
+exports.AddAssociatedRecentRoom = dbAddAssociatedRecentRoom;
+exports.DeleteAssociatedRoom = dbDeleteAssociatedRoom;

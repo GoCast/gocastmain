@@ -181,6 +181,30 @@ app.post('/listrooms', function(req, res) {
     }
 });
 
+app.post('/listrecentrooms', function(req, res) {
+
+    if (req.body && req.body.email) {
+        gcutil.log('accounts_service [/listrecentrooms][info]: FormData = ', req.body);
+        api.ListRecentRooms(req.body.email, function(data) {
+            console.log('strinigify: ', JSON.stringify(data));
+            res.send('{"result": "success", "data": ' + JSON.stringify(data) + '}');
+        }, function(err) {
+            gcutil.log('accounts_service [/listrecentrooms][error]: ', err);
+            res.send('{"result": "error"}');
+        });
+    }
+    else {
+        gcutil.log('accounts_service [/listrecentrooms][error]: FormData problem in req.body: ', req.body);
+
+        if (!req.body.email) {
+            res.send('{"result": "no email"}');
+        }
+        else {
+            res.send('{"result": "error"}');
+        }
+    }
+});
+
 app.post('/getprofile', function(req, res) {
 
     if (req.body && req.body.email) {
