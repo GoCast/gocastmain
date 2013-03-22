@@ -757,11 +757,6 @@ var DashApp = {
                 note: 'This is a list of public rooms showing the number of people currently in each one. ' +
                       'If you\'re a new user and/or you don\'t own any rooms, feel free to try one of these rooms out!'
             });
-            /*DashView.displayRoomsAccordion(data, {
-                title: 'Recently Visited Rooms',
-                container: $('#visitedrooms'),
-                note: (optional) 'This is a list of rooms you recently visited.'
-            });*/
         });
 
         $('body > .navbar .logoutlink').click(this.logoutCallback());
@@ -812,6 +807,23 @@ var DashApp = {
             }
         });
     },
+    queryRecentRoomList: function(gotList) {
+        var cb = gotList || function(roomlist) {},
+            _email = this.boshconn.getEmailFromJid();
+
+        $.ajax({
+            url: '/acct/listrecentrooms/',
+            type: 'POST',
+            dataType: 'json',
+            data: {email: _email},
+            success: function(response) {
+                cb(response.data || []);
+            },
+            failure: function(error) {
+                cb(error.data || []);
+            }
+        });
+    },
     boshconnstatusCallback: function() {
         var self = this;
 
@@ -833,10 +845,26 @@ var DashApp = {
                     self.roomlist = roomlist;
                     DashView.displayRoomList('startmeeting-form', self.roomlist);
                 });
+
+                // Need to ask the server for a list of recently entered rooms.
+                self.queryRecentRoomList(function(roomlist) {
+                    self.roomlist = roomlist;
+                    DashView.displayRoomsAccordion(roomlist, {
+                        title: 'Recently Visited Rooms',
+                        container: $('#visitedrooms'),
+                        note: 'This is a list of rooms you recently visited.'
+                    });
+                });
+
             } else if (Strophe.Status.DISCONNECTED === status ||
                        Strophe.Status.TERMINATED === status) {
                 DashView.cancelloader('login-form');
                 DashView.displayform('login-form');
+                DashView.displayRoomsAccordion([], {
+                    title: 'Recently Visited Rooms',
+                    container: $('#visitedrooms'),
+                    note: 'When you login, this list will show you where you have visited lately.'
+                });
                 $('body > .navbar .nav').removeClass('show');
             } else if (Strophe.Status.AUTHFAIL === status) {
                 DashView.cancelloader('login-form');

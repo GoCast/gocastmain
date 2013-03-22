@@ -36,7 +36,7 @@ if (process.env.SETTINGS_DEVEL === 1 || process.env.SETTINGS_DEVEL === '1') {
         allow_overflow: true,
         allow_maxparticipants_from_client: true,
         maxparticipants_ceiling: 50,
-        maxspotsallowed: 20,
+        maxspotsallowed: 6,
         default_room: 'Lobby',
         default_room_persist: false,
 
@@ -189,8 +189,8 @@ else {
         username: 'overseer@' + settings.SERVERNAME + '/roommanager',
         usernametest: 'overseer@' + settings.SERVERNAME + '/roommanagertest',
         password: 'the.overseer.rocks',
-        maxparticipants_ceiling: 8,
-        maxspotsallowed: 20,
+        maxparticipants_ceiling: 5,
+        maxspotsallowed: 6,
 
         public_room_node: settings.CONF_SERVICE.replace(/@/,'') + '/public',
 

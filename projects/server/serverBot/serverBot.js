@@ -3171,44 +3171,64 @@ Overseer.prototype.SetupPublicRoomPublisher = function() {
                     .up().up().c('field', {'var': 'pubsub#subscribe'})
                         .c('value').t('1')
                     .up().up().c('field', {'var': 'pubsub#access_model'})
-                        .c('value').t('open');
+                        .c('value').t('open')
+                    .up().up().c('field', {'var': 'pubsub#send_last_published_item'})
+                        .c('value').t('on_sub_and_presence');
 
 //    this.log('DEBUG: SetupPublicRoomPublisher: create: ' + create.root());
 
     this.sendIQ(create, function(resp) {
-/*        if (resp.attrs.type === 'result') {
-            self.log('SetupPublicRoomPublisher: Node creation successful. Ready to publish.');
-        }
-        else {
-            self.log('SetupPublicRoomPublisher: ERROR: Creation of node failed:' + resp);
-        }
-*/
-        // Regardless of the error (presuming the error is 'node already exists')
-        // We need to publish...
-        self.PublicRoomPublisherTimer = setInterval(function() {
-            var nonHidden = 0,
-                pub = new xmpp.Element('iq', {to: 'pubsub.' + self.SERVER, type: 'set'})
-                    .c('pubsub', {xmlns: 'http://jabber.org/protocol/pubsub'})
-                    .c('publish', {node: settings.roommanager.public_room_node})
-                    .c('item').c('pubrooms');
+        var config;
 
-//            self.log('DEBUG: SetupPublicRoomPublisher: pre-room-pub: ' + pub.root());
+        config = new xmpp.Element('iq', {to: 'pubsub.' + this.SERVER, type: 'set'})
+                    .c('pubsub', {xmlns: 'http://jabber.org/protocol/pubsub#owner'})
+                    .c('configure', {node: settings.roommanager.public_room_node})
+                    .c('x', {xmlns: 'jabber:x:data', type: 'submit'})
+                    .c('field', {'var': 'FORM_TYPE'})
+                        .c('value').t('http://jabber.org/protocol/pubsub#node_config')
+                    .up().up().c('field', {'var': 'pubsub#max_items'})
+                        .c('value').t('1')
+                    .up().up().c('field', {'var': 'pubsub#subscribe'})
+                        .c('value').t('1')
+                    .up().up().c('field', {'var': 'pubsub#access_model'})
+                        .c('value').t('open')
+                    .up().up().c('field', {'var': 'pubsub#send_last_published_item'})
+                        .c('value').t('on_sub_and_presence');
 
-            self.publicRooms.forEach(function(val) {
-                var num;
+        self.sendIQ(config, function(resp) {
+            if (resp.attrs.type === 'result') {
+                self.log('SetupPublicRoomPublisher: Node config successful. Ready to publish.');
+            }
+            else {
+                self.log('SetupPublicRoomPublisher: ERROR: config of node failed:' + resp);
+            }
 
-                if (val && !val.hidden && self.MucRoomObjects[self.encodeRoomname(val.room)]) {
-                    num = size(self.MucRoomObjects[self.encodeRoomname(val.room)].participants);
+            // Regardless of the error (presuming the error is 'node already exists')
+            // We need to publish...
+            self.PublicRoomPublisherTimer = setInterval(function() {
+                var nonHidden = 0,
+                    pub = new xmpp.Element('iq', {to: 'pubsub.' + self.SERVER, type: 'set'})
+                        .c('pubsub', {xmlns: 'http://jabber.org/protocol/pubsub'})
+                        .c('publish', {node: settings.roommanager.public_room_node})
+                        .c('item').c('pubrooms');
 
-                    // The room manager is one participant (assuming the room manager isn't out of the room)
-                    pub.c('pubroom', {room: val.room, numparticipants: num-1, description: val.description || '',
-                                      owner: val.owner || ''}).up();
-                    nonHidden += 1;
-                }
-                else {
-                    self.log('DEBUG: SetupPublicRoomPublisher: WARNING: Unknown public room: ' + val.room);
-                }
-            });
+    //            self.log('DEBUG: SetupPublicRoomPublisher: pre-room-pub: ' + pub.root());
+
+                self.publicRooms.forEach(function(val) {
+                    var num;
+
+                    if (val && !val.hidden && self.MucRoomObjects[self.encodeRoomname(val.room)]) {
+                        num = size(self.MucRoomObjects[self.encodeRoomname(val.room)].participants);
+
+                        // The room manager is one participant (assuming the room manager isn't out of the room)
+                        pub.c('pubroom', {room: val.room, numparticipants: num-1, description: val.description || '',
+                                          owner: val.owner || ''}).up();
+                        nonHidden += 1;
+                    }
+                    else {
+                        self.log('DEBUG: SetupPublicRoomPublisher: WARNING: Unknown public room: ' + val.room);
+                    }
+                });
 
             // DEBUG
 /*            if (nonHidden === 0) {
@@ -3220,16 +3240,17 @@ Overseer.prototype.SetupPublicRoomPublisher = function() {
 */
 //            self.log('DEBUG: SetupPublicRoomPublisher: pub: ' + pub.root());
 
-            // Now publish.
-            self.sendIQ(pub, function(pubresp) {
-                if (pubresp.attrs.type !== 'result') {
-                    self.log('ERROR: Publish failed ' + pubresp);
-                }
-//                else {
-//                    self.log('Publish complete for ' + nonHidden + ' public rooms.');
-//                }
-            });
-        }, 5 * 1000);
+                // Now publish.
+                self.sendIQ(pub, function(pubresp) {
+                    if (pubresp.attrs.type !== 'result') {
+                        self.log('ERROR: Publish failed ' + pubresp);
+                    }
+    //                else {
+    //                    self.log('Publish complete for ' + nonHidden + ' public rooms.');
+    //                }
+                });
+            }, 5 * 1000);
+        });
     });
 };
 
@@ -3820,9 +3841,9 @@ var k, mobs, curRoom, breakUp, curDigits, curBase,
 };
 
 Overseer.prototype.CreateRoomRequest = function(iq) {
-    var newRoomname, roomname = iq.getChild('room').attr('name'),
+    var newRoomname, orig_roomname = iq.getChild('room').attr('name'), roomname = orig_roomname.toLowerCase(),
         maxParticipantsRequested = iq.getChild('room').attr('maxparticipants'),
-        self = this,
+        self = this, roomOk,
         iqResult, bUsingDefaultRoom = false, addRoomOptions = null;
 
     //
@@ -3873,6 +3894,29 @@ Overseer.prototype.CreateRoomRequest = function(iq) {
 
     this.log('Overseer.handleIq: Room Name of [' + roomname + '] requested by: ' + iq.attrs.from);
 
+//TODO:RMW - once we begin validating that a room exists before creating it here, we need to
+//   keep track of 'owner' and 'description' of the room if it's public and pass that along to addAssociated()
+    roomOk = function() {
+        var email, iqResult = new xmpp.Element('iq', {to: iq.attrs.from, type: 'result', id: iq.attrs.id})
+                            .c('ok', {xmlns: 'urn:xmpp:callcast', name: roomname});
+        self.log('AddTrackedRoom: INFO: result from room creation is: ' + iqResult.root().toString());
+        self.client.send(iqResult.root());
+
+        // TODO:RMW - Lookup username (iq.attrs.from) in db and add this room to their recently visited table list.
+        email = iq.attrs.from.split('@')[0];
+        email = email.replace(/~/g, '@');
+
+        if (/@/.test(email)) {
+            // We have a valid email address...assume we have a valid account.
+            accounts_db.AddAssociatedRecentRoom(email, orig_roomname, function() {
+                console.log('DEBUG: recentRoom: Added room: ' + roomname + ', for email: ' + email);
+                return;
+            }, function(err) {
+                console.log('DEBUG: ERROR recentRoom: ', err);
+            });
+        }
+    };
+
     //
     // No room by that name currently exists.
     //
@@ -3883,10 +3927,7 @@ Overseer.prototype.CreateRoomRequest = function(iq) {
         // and eventually database that information too.
         //
         this.AddTrackedRoom(roomname, addRoomOptions, function() {
-                var iqResult = new xmpp.Element('iq', {to: iq.attrs.from, type: 'result', id: iq.attrs.id})
-                                    .c('ok', {xmlns: 'urn:xmpp:callcast', name: roomname});
-                self.log('AddTrackedRoom: INFO: result from room creation is: ' + iqResult.root().toString());
-                self.client.send(iqResult.root());
+                roomOk();
 
                 self.MucRoomObjects[roomname].AddDefaultSpots();
                 self.MucRoomObjects[roomname].WelcomeChat();
@@ -3926,10 +3967,7 @@ Overseer.prototype.CreateRoomRequest = function(iq) {
         }
         else
         {
-            iqResult = new xmpp.Element('iq', {to: iq.attrs.from, type: 'result', id: iq.attrs.id})
-                            .c('ok', {xmlns: 'urn:xmpp:callcast', name: roomname});
-            self.log('AddTrackedRoom: INFO: result from room creation is: ' + iqResult.root().toString());
-            self.client.send(iqResult.root());
+            roomOk();
 
             if (this.MucRoomObjects[roomname].bSelfDestruct === true &&
                1 === size(this.MucRoomObjects[roomname].participants))

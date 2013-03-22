@@ -12,6 +12,7 @@
 var sys = require('util');
 
 var db = require('./accounts_db');
+var flow = require('flow');
 
 'use strict';
 
@@ -331,6 +332,53 @@ function reportTest1() {
 
 }
 
+function dbAssociatedTest1() {
+    var email = 'few@gocast.it';
+
+    console.log('Starting dbAssociatedTest1.');
+
+    flow.exec(
+        function() {
+            db.GetAssociatedRooms(email, this, function(err) {
+                console.log('dbAssociatedTest1: ERROR: ', err);
+                throw '1';
+            });
+        },  function(obj) {
+            console.log('dbAssociatedTest1: For: ' + email + ' got: ', obj);
+
+            email = 'many@gocast.it';
+
+            db.GetAssociatedRooms(email, this, function(err) {
+                console.log('dbAssociatedTest1: ERROR: ', err);
+                throw '2';
+            });
+        },  function(obj) {
+            console.log('dbAssociatedTest1: For: ' + email + ' got: ', obj);
+
+            console.log('All complete.');
+        }
+    );
+}
+
+function dbAssociatedTest2() {
+    var email = 'new@account.com';
+
+    flow.exec(
+        function() {
+            db.AddAssociatedRoom(email, 'newroom', 'recent', this, this);
+        },
+        function(arg) {
+            console.log('1-Answer - ', arg);
+
+            email = 'junk@junk.com';
+            db.DeleteAssociatedRoom(email, 'junkroom', this, this);
+        },
+        function(arg) {
+            console.log('2-Answer - ', arg);
+
+        }
+    );
+}
 
 //db2Test1();
 //db2Test2();
@@ -339,4 +387,6 @@ function reportTest1() {
 //dbRoomTest2();
 //dbRoomTest3();
 //dbVisitorTest1();
-reportTest1();
+//reportTest1();
+dbAssociatedTest1();
+//dbAssociatedTest2();
