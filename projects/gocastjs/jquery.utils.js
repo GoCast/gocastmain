@@ -40,7 +40,8 @@
 })(jQuery);
 
 (function($) {
-    var plugins, verstring, ver = '0';
+    var plugins, verstring, ver = '0',
+        forcePlayer = false;
 
     navigator.plugins.refresh(false);
     plugins = navigator.plugins;
@@ -61,9 +62,19 @@
         }
     }
 
-    if ($.urlvars.wrtcable &&
-        localStorage && localStorage.gcpUsePlayer) {
-        delete $.urlvars.wrtcable;
+    if ($.urlvars.wrtcable) {
+        if ($.gocastplayer &&
+            !(localStorage && localStorage.gcpForceNative)) {
+            forcePlayer = true;
+        }
+        else if (localStorage &&
+                 localStorage.gcpForcePlayer) {
+            forcePlayer = true;
+        }
+
+        if (forcePlayer) {
+            delete $.urlvars.wrtcable;
+        }
     }
 })(jQuery);
 

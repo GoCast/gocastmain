@@ -257,14 +257,14 @@ function setCarouselItemState(info)
            info.width = w;
            info.height = h;
            app.log(2, 'setCarouselItemState video on user ' + info.nick + ' dim w ' + info.width + ', h ' + info.height);
-           $(oo).css('background-image', ''); // remove any background image
+           $(oo).removeClass('videooff').css('background-image', ''); // remove any background image
            Callcast.ShowRemoteVideo(info);
        }
        else // if hasVid is null or false turn video off
        {
           info.hasVid = false;
           image = Callcast.participants[info.nick].image;
-          $(oo).css('background-image', image);
+          $(oo).addClass('videooff').css('background-image', image);
           Callcast.ShowRemoteVideo(info);
           app.log(2, 'setCarouselItemState video off user ' + info.nick + ' image ' + info.image);
        }

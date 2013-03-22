@@ -1597,6 +1597,7 @@ function changeVideo(enableVideo)
   }
   if (enable)
   {
+    jqOo.removeClass('videooff');
     if (!$.urlvars.wrtcable) {
       $('#effectsPanel > div').css({'display': 'block'});
     }
@@ -1617,6 +1618,7 @@ function changeVideo(enableVideo)
   }
   else
   {
+    jqOo.addClass('videooff');
     $('#effectsPanel > div').css({'display': 'none'});
     jqObj.removeClass('on') // change button
          .attr('title', 'Turn Video On ' + app.videoKeyAccel);
