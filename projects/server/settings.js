@@ -45,6 +45,7 @@ if (process.env.SETTINGS_DEVEL === 1 || process.env.SETTINGS_DEVEL === '1') {
         password: 'being.the.doorman.always',
 
         public_room_node: settings.CONF_SERVICE.replace(/@/,'') + '/public',
+        kill_public_room_node: '1',
 
         wbstoragelocation: '~/wbstorage'
     };
@@ -193,6 +194,7 @@ else {
         maxspotsallowed: 6,
 
         public_room_node: settings.CONF_SERVICE.replace(/@/,'') + '/public',
+        kill_public_room_node: '1',
 
         persist: true,      // Normally rooms are non-persistent.
         wbstoragelocation: '~/wbstorage'

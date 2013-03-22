@@ -3151,11 +3151,25 @@ Overseer.prototype.encodeRoomname = function(room) {
 };
 
 Overseer.prototype.SetupPublicRoomPublisher = function() {
-    var create,
+    var create, destroy,
         self = this;
 
     if (this.PublicRoomPublisherTimer) {
         clearInterval(this.PublicRoomPublisherTimer);
+    }
+
+    if (settings.roommanager.kill_public_room_node) {
+        destroy = new xmpp.Element('iq', {to: 'pubsub.' + this.SERVER, type: 'set'})
+                    .c('pubsub', {xmlns: 'http://jabber.org/protocol/pubsub#owner'})
+                    .c('delete', {node: settings.roommanager.public_room_node});
+
+        console.log('SetupPublicRoomPublisher: DELETING NODE.');
+
+        this.sendIQ(destroy, function(resp) {
+            console.log('SetupPublicRoomPublisher: DELETING NODE SUCCESSFUL.');
+        });
+
+        return;
     }
 
     // Need to create and configure a node.
