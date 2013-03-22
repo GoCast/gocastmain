@@ -809,7 +809,7 @@ var Callcast = {
                              audioin: $(jqSelector).get(0).audioinopts[0] || '',
                              autioout: $(jqSelector).get(0).audiooutopts[0] || '' };
             }
-            else {
+            else if (window.localStorage.gcpsettings) {
                 settings = JSON.parse(window.localStorage.gcpsettings);
             }
 
@@ -1076,7 +1076,7 @@ var Callcast = {
                         new GoCastJS.PeerConnectionOptions(
                             this.AddPluginResult, this.jid,
                             [ {uri: 'turn:manjeshtest2@dev.gocast.it:3478', password: 'manjeshpass2'},
-                              {uri: 'stun:stun.l.google.com:19302'}],
+                              {uri: 'stun:stun.l.google.com:19302'} ],
                             this.onicecandidate, this.onaddstream, this.onremovestream,
                             this.onsignalingstatechange, this.onconnectionstatechange,
                             $.urlvars.wrtcable ? 'native' : 'gcp'
@@ -1289,6 +1289,7 @@ var Callcast = {
                 Callcast.log('Callee:' + self.GetID() + ' Could not process ICE message. Peer_connection is invalid.');
             }
             else {
+                Callcast.log('Inbound Ice Candidate: ' + candidate);
                 try {
                     this.peer_connection.AddIceCandidate(candidate);
                 }

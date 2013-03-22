@@ -1175,9 +1175,10 @@ function readyStateCb(state, jid, nick)
         if (!participant) {throw "participant " + nick + " not found";}
         if (!participant.image) {throw "participant image for " + nick + " not found";}
         console.log("participant", participant);
-        $('object', jqOo).css('visibility', 'visible');
+        $('object, video', jqOo).css('visibility', 'visible');
         // Make the background image always your image or 'chess piece'.
         jqOo.css('background-image', participant.image);
+        app.carousel.updateAll();
       }
       else if (state === 'defunct') {
         jqOo.css("background-image", 'url("images/warning.png")');
@@ -1193,7 +1194,7 @@ function readyStateCb(state, jid, nick)
       }
       else {
         jqOo.css("background-image", 'url("images/waiting-trans.gif")');
-        $('object', jqOo).css('visibility', 'hidden');
+        $('object, video', jqOo).css('visibility', 'hidden');
       }
     }
 

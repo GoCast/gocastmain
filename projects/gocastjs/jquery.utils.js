@@ -44,31 +44,33 @@
         playerhtml = '<div id="gcpversioncheck"><object id="player" type="application/x-gocastplayer" ' +
                      'width="0" height="0"></object></div>';
 
-    navigator.plugins.refresh(false);
-	plugins = navigator.plugins;
+    if (!$.urlvars.wrtcable) {
+        navigator.plugins.refresh(false);
+        plugins = navigator.plugins;
 
-	for (var i=0; i<plugins.length; i++) {
-		if ('GoCastPlayer' === plugins[i].name) {
-            verstring = plugins[i].version||plugins[i].description;
+        for (var i=0; i<plugins.length; i++) {
+            if ('GoCastPlayer' === plugins[i].name) {
+                verstring = plugins[i].version||plugins[i].description;
 
-            if ('GCP' === verstring.split(' ')[0]) {
-                ver = verstring.split(' ')[1];
-            } else {
-                $('body').append(playerhtml);
-                setTimeout(function() {
-                    var player = document.getElementById('player')
-                    ver = player.version;
-                }, 100);
-            }
-
-            $.extend({
-                gocastplayer: {
-                    version: ver
+                if ('GCP' === verstring.split(' ')[0]) {
+                    ver = verstring.split(' ')[1];
+                } else {
+                    $('body').append(playerhtml);
+                    setTimeout(function() {
+                        var player = document.getElementById('player')
+                        ver = player.version;
+                    }, 100);
                 }
-            });
-			return;
-		}
-	}
+
+                $.extend({
+                    gocastplayer: {
+                        version: ver
+                    }
+                });
+                return;
+            }
+        }
+    }
 })(jQuery);
 
 (function($) {

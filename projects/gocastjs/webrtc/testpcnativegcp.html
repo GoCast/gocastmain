@@ -42,7 +42,7 @@
 						domRemContainer.innerHTML = remotePlayerTemplates[apitype].replace(/\{\{id\}\}/g, 'remoteVideo');
 						peerconnection = new GoCastJS.PeerConnection(new GoCastJS.PeerConnectionOptions(
 							document.getElementById('remoteVideo'), 'remoteVideo',
-							[{uri: 'turn:manjesh2@dev.gocast.it:3478', password: 'manjeshpass2'}],
+							[{uri: 'turn:manjeshtest2@dev.gocast.it:3478', password: 'manjeshpass2'}],
 							function(candidate) { 
 								console.log('Candidate: ' + candidate);
 								peerconnection.AddIceCandidate(candidate); 

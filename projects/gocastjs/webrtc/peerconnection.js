@@ -527,7 +527,7 @@ GoCastJS.PeerConnection = function(options) {
         for (i=0; i<options.iceServers.length; i++) {
             server = {url: options.iceServers[i].uri};
             if (options.iceServers[i].password) {
-                server.password = options.iceServers[i].password;
+                server.credential = options.iceServers[i].password;
             }
             iceservers.push(server);
         }
@@ -578,14 +578,16 @@ GoCastJS.PeerConnection = function(options) {
             null !== options.onSignalingStateChange) {
             options.onSignalingStateChange(newState);
         }
-        if ('stable' === newState) {
+        if ('active' === newState) {
             onicechange('connected');
         }
     };
 
     if ('native' === apitype) {
-        this.peerconn.onstatechange = function() { 
-            onstatechange(self.peerconn.readyState);
+        this.peerconn.onstatechange = function() {
+            if(self.peerconn) {
+                onstatechange(self.peerconn.readyState);
+            }
         };
     } else if ('gcp' === apitype) {
         this.player.onstatechange = onstatechange;
@@ -607,7 +609,7 @@ GoCastJS.PeerConnection = function(options) {
                 }, self.connTimeout);
             }
         }
-        if ('connected' === newState && self.connTimer) {
+        else if ('connected' === newState) {
             if (self.connTimer) {
                 clearTimeout(self.connTimer);
                 self.connTimer = null;                    
@@ -622,7 +624,9 @@ GoCastJS.PeerConnection = function(options) {
 
     if ('native' === apitype) {
         this.peerconn.onicechange = function() {
-            onicechange(self.peerconn.iceState);
+            if (self.peerconn) {
+                onicechange(self.peerconn.iceState);
+            }
         };
     } else if ('gcp' === apitype) {
         this.player.onicechange = onicechange;
