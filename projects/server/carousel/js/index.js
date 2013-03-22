@@ -80,6 +80,7 @@ var app = {
   fbTimerRunning: null,
   simPluginLoadFailed: false,
   authfail: false,
+  winTimeout: null,
 
   /**
    * Writes the specified log entry into the console HTML element, if
@@ -1596,7 +1597,9 @@ function changeVideo(enableVideo)
   }
   if (enable)
   {
-    $('#effectsPanel > div').css({'display': 'block'});
+    if (!$.urlvars.wrtcable) {
+      $('#effectsPanel > div').css({'display': 'block'});
+    }
     jqObj.addClass('on') // change button
          .attr('title', 'Turn Video Off ' + app.videoKeyAccel);
     jqObj1.addClass('on') // change button
@@ -1750,8 +1753,14 @@ function openWindow(
   /*
    * Center window. */
   jqWin = $(winId);
-  jqWin.css('top', winH / 2 - jqWin.height() / 2);
-  jqWin.css('left', winW / 2 - jqWin.width() / 2);
+
+  if (jqWin.hasClass('permission')) {
+    jqWin.css('top', '5px');
+    $('button', jqWin).css('visibility', 'hidden');
+  } else {
+    jqWin.css('top', (winH / 2 - jqWin.height() / 2) + 'px');
+  }
+  jqWin.css('left', (winW / 2 - jqWin.width() / 2) + 'px');
   /*
    * Transition effect.*/
   jqWin.fadeIn(2000);
@@ -1789,6 +1798,11 @@ function closeWindow(
     console.log("closeWindow", jqActive);
     jqActive.removeClass('active');
     deactivateWindow('#' + jqActive.attr('id'));
+
+    if (jqActive.hasClass('permission')) {
+      $('button', jqActive).css('visibility', 'visible');
+      jqActive.removeClass('permission');
+    }
   }
   /*
    * Hide mask and window. */
@@ -2478,7 +2492,6 @@ function checkForPlugin()
          app.log(2, 'checkForPlugin found player ' + name);
          $('#winWait > #status > #spinner').attr('src', 'images/green-tick.png');
          $('#winWait > #status > #msg').text('Checking for install... successful.');
-
          // display error msg after a timeout in case the plugin does not load
          app.winTimeout = setTimeout(winPluginPunt, 10000);
          return; // we're done since the plugin is in the list
@@ -2608,6 +2621,11 @@ $(document).ready(function(
 
   if (!rcode || rcode.length%4 || !$.roomcode.decipher(rcode)) {
     window.location.href = 'dashboard.html';
+  }
+
+  if ($.urlvars.wrtcable) {
+    $('div#upper-right > div#settings').css('display', 'none');
+    $('div#scarousel div#mystream > div#effectsPanel > div[effect]').css('display', 'none');
   }
 
   Callcast.init();

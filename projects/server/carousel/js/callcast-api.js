@@ -1252,7 +1252,8 @@ function pluginLoaded(
 )
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
-  var lplayersel = '#mystream > ' + ($.urlvars.wrtcable ? 'video' : 'object') + '.localplayer';
+  var lplayersel = '#mystream > ' + ($.urlvars.wrtcable ? 'video' : 'object') + '.localplayer',
+      permissionTimer = null;
   //app.log(2, 'pluginLoaded Local Plugin Loaded.');
   if (Callcast.localplayerLoaded)
   {
@@ -1285,7 +1286,13 @@ function pluginLoaded(
      Callcast.localplayer = null;
      Callcast.InitGocastPlayer(lplayersel, function(message)
      {
-        //Initialization successful.
+        if ($.urlvars.wrtcable) {
+          closeWindow();
+          if (permissionTimer) {
+            clearTimeout(permissionTimer);
+          }
+        }
+
         app.log(2, 'Local plugin successfully initialized.');
         // Set callback functions to add and remove plugins for other
         // participants and content.
@@ -1336,14 +1343,16 @@ function pluginLoaded(
         //to set up their camera and microphone if they not on MacOS.
         if ('undefined' !== typeof(Storage)) {
           if(window.localStorage && !window.localStorage.gcpsettings &&
-             !app.osPlatform.isMac) {
+             !app.osPlatform.isMac && !$.urlvars.wrtcable) {
             if(confirm('First time user... wanna setup cam and mic?')) {
               window.location.href = 'gcpsettings';
             }
           }
         }
         // </MANJESH>
-        if ($.urlvars.wrtcable) {
+        if ($.urlvars.wrtcable || app.winTimeout) {
+          clearTimeout(app.winTimeout);
+          app.winTimeout = null;
           $(document).trigger('checkCredentials');
           if (Callcast.connection.hasSavedLoginInfo()) {
             Callcast.connect();
@@ -1352,13 +1361,23 @@ function pluginLoaded(
         //handleRoomSetup();
      }, function(message) {
         // Failure to initialize.
-        app.log(4, 'Local plugin failed to initialize [' + message + ']');
-        Callcast.SendLiveLog('Local plugin failed to initialize.');
-        $('#errorMsgPlugin > h1').text('Gocast.it plugin failed to initialize');
-        $('#errorMsgPlugin > p#prompt').text(message + '\r\n[Please reload the page.]');
+        app.log(4, 'Failed to initialize user media [' + message + ']');
+        Callcast.SendLiveLog('Failed to initialize user media.');
+        $('#errorMsgPlugin > h1').text('Failed to access camera & microphone');
+        $('#errorMsgPlugin > p#prompt').text('Please reload the page.');
         closeWindow();
         openWindow('#errorMsgPlugin');
      });
+
+      if ($.urlvars.wrtcable) {
+        permissionTimer = setTimeout(function() {
+          $('#errorMsgPlugin > h1').text('GoCast requires your permission');
+          $('#errorMsgPlugin > p#prompt').text('Please permit us to use your camera ' +
+                                               'and microphone by clicking on "ALLOW" in the above toolbar.');
+          $('#errorMsgPlugin').addClass('permission');
+          openWindow('#errorMsgPlugin');
+        }, 2000);
+      }
   }
   else // pluginLoaded but out of date
   {
