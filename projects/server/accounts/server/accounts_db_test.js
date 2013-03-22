@@ -365,7 +365,7 @@ function dbAssociatedTest2() {
 
     flow.exec(
         function() {
-            db.AddAssociatedRoom(email, 'newroom', 'recent', this, this);
+            db.AddAssociatedRoom(email, 'newroom', 'The New Owner', 'recent', this, this);
         },
         function(arg) {
             console.log('1-Answer - ', arg);

@@ -3685,7 +3685,7 @@ Overseer.prototype.generateRandomRoomName = function() {
 };
 
 Overseer.prototype.AddTrackedRoom = function(roomname, obj, cbSuccess, cbFailure, bSkipDBPortion) {
-    var self = this;
+    var self = this, owneremail;
 
     if (this.active_rooms[roomname] && this.MucRoomObjects[roomname]) {
         this.log('WARNING: AddTrackedRoom - Ignoring - Room already present: ' + roomname);
@@ -3715,6 +3715,26 @@ Overseer.prototype.AddTrackedRoom = function(roomname, obj, cbSuccess, cbFailure
         this.MucRoomObjects[roomname].bSelfDestruct = true;
     }
 
+    // If there's no owner of record yet, then add one.
+    if (!this.active_rooms[roomname].owner || !this.MucRoomObjects[roomname].owner) {
+        // If we have a room name which has an email#roomname format, then lookup
+        // the user name of the associated email address and call that 'owner'
+        if (/#/.test(decodeURIComponent(roomname))) {
+            owneremail = decodeURIComponent(roomname).replace(/~/g, '@').split('#')[0];
+
+            if (owneremail) {
+                accounts_db.GetEntryByAccountName(owneremail, function(entry) {
+                    if (entry.name) {
+                        self.MucRoomObjects[roomname].owner = entry.name;
+                        self.active_rooms.owner = entry.name;
+                    }
+                }, function(err) {
+                    // Failure of getting database entry for account.
+                    self.log('AddTrackedRoom: account ' + owneremail + ' does not exist. No owner assigned.');
+                });
+            }
+        }
+    }
 //    console.log('Overseer: Adding room ' + roomname + '. New Roomlist=', this.active_rooms);
 
     if (this.roomDB && !bSkipDBPortion) {
@@ -3897,18 +3917,24 @@ Overseer.prototype.CreateRoomRequest = function(iq) {
 //TODO:RMW - once we begin validating that a room exists before creating it here, we need to
 //   keep track of 'owner' and 'description' of the room if it's public and pass that along to addAssociated()
     roomOk = function() {
-        var email, iqResult = new xmpp.Element('iq', {to: iq.attrs.from, type: 'result', id: iq.attrs.id})
+        var owner = '', email, iqResult = new xmpp.Element('iq', {to: iq.attrs.from, type: 'result', id: iq.attrs.id})
                             .c('ok', {xmlns: 'urn:xmpp:callcast', name: roomname});
-        self.log('AddTrackedRoom: INFO: result from room creation is: ' + iqResult.root().toString());
+        self.log('CreateRoomRequest: INFO: result from room creation is: ' + iqResult.root().toString());
         self.client.send(iqResult.root());
 
         // TODO:RMW - Lookup username (iq.attrs.from) in db and add this room to their recently visited table list.
         email = iq.attrs.from.split('@')[0];
         email = email.replace(/~/g, '@');
 
+        // Pull out the owner name for the room so long as the object exists.
+        if (self.MucRoomObjects[roomname]) {
+            owner = self.MucRoomObjects[roomname].owner || '';
+        }
+
+        console.log('DEBUG: recentRoom: email: ', email, ', orig_roomname: ', orig_roomname, ', owner: ', owner);
         if (/@/.test(email)) {
             // We have a valid email address...assume we have a valid account.
-            accounts_db.AddAssociatedRecentRoom(email, orig_roomname, function() {
+            accounts_db.AddAssociatedRecentRoom(email, orig_roomname, owner, function() {
                 console.log('DEBUG: recentRoom: Added room: ' + roomname + ', for email: ' + email);
                 return;
             }, function(err) {
