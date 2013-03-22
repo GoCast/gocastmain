@@ -759,7 +759,7 @@ function dbGetAssociatedRooms(accountName, cbSuccess, cbFailure) {
     queryObj = {TableName: theAssociatedRoomTable,
                   Limit: 3,
                   HashKeyValue: { S: accountName.toLowerCase() },
-                  AttributesToGet: ['room', 'roomtype']};
+                  AttributesToGet: ['room', 'roomtype', 'owner', 'lastEntry']};
 
     queryHandler = function(err, data) {
         if (err) {
@@ -786,15 +786,22 @@ function dbGetAssociatedRooms(accountName, cbSuccess, cbFailure) {
 
 }
 
-function dbAddAssociatedRoom(accountName, room, roomtype, cbSuccess, cbFailure) {
+function dbAddAssociatedRoom(accountName, room, owner, roomtype, cbSuccess, cbFailure) {
     var cur = new Date(),
         Item, obj;
 
     // First must get the # visits so far.
         // Prep the item to be stored
         Item = {};
-        obj = {roomtype: roomtype,
-               lastEntry: new Date().toString()};
+        obj = { lastEntry: new Date().toString() };
+
+        if (owner) {
+            obj.owner = owner;
+        }
+
+        if (roomtype) {
+            obj.roomtype = roomtype;
+        }
 
         dbAwsUpdateObjectPrep(Item, obj);
 
@@ -816,8 +823,8 @@ function dbAddAssociatedRoom(accountName, room, roomtype, cbSuccess, cbFailure) 
 
 }
 
-function dbAddAssociatedRecentRoom(accountName, room, cbSuccess, cbFailure) {
-    return dbAddAssociatedRoom(accountName, room, 'recent', cbSuccess, cbFailure);
+function dbAddAssociatedRecentRoom(accountName, room, owner, cbSuccess, cbFailure) {
+    return dbAddAssociatedRoom(accountName, room, owner, 'recent', cbSuccess, cbFailure);
 }
 
 function dbDeleteAssociatedRoom(accountName, roomName, cbSuccess, cbFailure) {

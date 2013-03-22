@@ -695,23 +695,58 @@ function apiListRooms(email, success, failure) {
     db.ListRooms(email, success, failure);
 }
 
+//
+// Sort the inbound recent list by most recent and cut off at a limit of 6
+//
 function apiListRecentRooms(email, success, failure) {
     db.GetAssociatedRooms(email, function(objs) {
         // We will receive an array of objects here with:
         // { room: 'roomname', roomtype: 'recent' }
         //
-        var i, rooms = [], email, roomname;
+        var compare, i, rooms = [], email, roomname, lastEntryTime, maxRecent = 6;
+
+        compare = function(a, b) {
+            // Comparison is straight forward except we want to treat '0' as a special one for the
+            // end of the array since it wasn't a valid date to start with rather than having those
+            // percolate to the top by virtue of being small numbers.
+            if (!a.lastEntry || a.lastEntry < b.lastEntry) {
+                return 1;
+            }
+            if (a.lastEntry && a.lastEntry > b.lastEntry) {
+                return -1;
+            }
+            return 0;
+        };
 
         for (i = 0 ; i < objs.length ; i += 1) {
             email = decodeURIComponent(objs[i].room).split('#')[0].replace(/~/g, '@');
             // roomname ... should always have a #, but if it doesn't, we'll not use the split()[1] so we don't wind up null.
             roomname = decodeURIComponent(objs[i].room).replace(/%27/g, '\'');
 
+            if (objs[i].lastEntry) {
+                lastEntryTime = new Date(objs[i].lastEntry).getTime();
+                if (isNaN(lastEntryTime)) {
+                    lastEntryTime = 0;
+                }
+            }
+            else {
+                lastEntryTime = 0;
+            }
+
             rooms.push({room: roomname, numparticipants: 0,
-                        description: '', owner: objs[i].owner || email });
+                        lastEntry: lastEntryTime,
+                        description: 'Last entered on ' + objs[i].lastEntry, owner: objs[i].owner || email });
         }
 
-        console.log('DEBUG: apiListRecentRooms: output: ', rooms);
+        //
+        // Now - sort the array by lastEntry
+        //
+//        console.log('DEBUG: apiListRecentRooms: pre-sort-rooms-output: ', rooms);
+        rooms.sort(compare);
+
+        // Now cut off the list @ maxEntries
+        rooms = rooms.slice(0, maxRecent);
+//        console.log('DEBUG: apiListRecentRooms: output: ', rooms);
         success(rooms);
     }, failure);
 }
