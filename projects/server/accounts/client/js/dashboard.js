@@ -23,7 +23,76 @@ var DashView = {
             this.displayform('login-form');
         }
 
+        if ($.urlvars.config || (localStorage && localStorage.gcpConfig)) {
+            localStorage.gcpConfig = 'true';
+        }
+        if (localStorage && localStorage.gcpConfig) {
+            DashView.displayConfigBar();
+        }
+
         $('body > .navbar .formlink').click(this.changeformCallback());
+    },
+    displayConfigBar: function() {
+        var $cfg = $('div.row.cfg > div.span6'),
+            cfgtmpl = '<div class="alert alert-success" align="center">' +
+                      '<a class="close" data-dismiss="alert" href="#">&times</a>' +
+                      'This browser supports native webrtc <div class="emoticon">:)</div>{{gcpinfo}}' +
+                      '<p align="left" style="padding-left: 30%; padding-top: 15px;"><input type="radio" class="forceplayer" ' +
+                      'name="group"><span style="padding-left: 5px;">Use GoCastPlayer</span><br> ' +
+                      '<input type="radio" class="forcenative" name="group"><span style="padding-left: 5px;">' +
+                      'Use Native WebRTC</span><br><input type="radio" class="nopref" name="group">' +
+                      '<span style="padding-left: 5px;">No Preference</span></p></div>';
+
+        if ($.urlvars.wrtcable) {
+            if ($.gocastplayer) {
+                $cfg.html(cfgtmpl.replace(/\{\{gcpinfo\}\}/g, '<span style="display: inline-block;">GoCastPlayer (ver ' +
+                                                              $.gocastplayer.version + ') is currently installed.</span>'));
+            } else {
+                $cfg.html(cfgtmpl.replace(/\{\{gcpinfo\}\}/g, ''));
+            }
+            
+
+            if (localStorage) {
+                if (localStorage.gcpForcePlayer) {
+                    $('input.forceplayer', $cfg).attr('checked', 'checked');
+                } else if (localStorage.gcpForceNative) {
+                    $('input.forcenative', $cfg).attr('checked', 'checked');
+                } else {
+                    $('input.nopref', $cfg).attr('checked', 'checked');
+                }
+            }
+
+            $('input[name="group"]', $cfg).change(function() {
+                if ($(this).hasClass('forceplayer')) {
+                    if (localStorage) {
+                        if (localStorage.gcpForceNative) {
+                            delete localStorage.gcpForceNative;
+                        }
+                        localStorage.gcpForcePlayer = true;
+                    }
+                } else if ($(this).hasClass('forcenative')) {
+                    if (localStorage) {
+                        if (localStorage.gcpForcePlayer) {
+                            delete localStorage.gcpForcePlayer;
+                        }
+                        localStorage.gcpForceNative = true;
+                    }
+                } else if ($(this).hasClass('nopref')) {
+                    if (localStorage) {
+                        if (localStorage.gcpForceNative) {
+                            delete localStorage.gcpForceNative;
+                        }
+                        if (localStorage.gcpForcePlayer) {
+                            delete localStorage.gcpForcePlayer;
+                        }                        
+                    }
+                }
+            });
+        } else {
+            $cfg.html('<div class="alert alert-error" align="center"> ' +
+                      '<a class="close" data-dismiss="alert" href="#">&times</a>' +
+                      'This browser does not support webrtc natively <div class="emoticon">:(</div></div>');
+        }
     },
     setupPlaceholders: function(id) {
         var $textfields, $pwdfields, $pwdfield,

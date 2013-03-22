@@ -209,3 +209,17 @@ form#rooms-form .accordion-group[participants]:after {
 form#rooms-form .accordion-group[participants].singledigit:after {
     padding: 1px 8px;
 }
+
+body .emoticon {
+    max-width: 1em;
+    display: inline-block;
+    padding-right: 0.4em;
+    padding-bottom: 0.5em;
+    transform: rotate(90deg);
+    -webkit-transform: rotate(90deg);
+    -moz-transform: rotate(90deg);
+}
+
+body input[type="radio"] {
+    margin: -4px 0 0;
+}

@@ -62,7 +62,7 @@
         }
     }
 
-    if ($.urlvars.wrtcable) {
+    if ($.urlvars.wrtcable && $.urlvars.g) {
         if ($.gocastplayer &&
             !(localStorage && localStorage.gcpForceNative)) {
             forcePlayer = true;
