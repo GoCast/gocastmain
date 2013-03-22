@@ -89,9 +89,16 @@ var DashView = {
                 }
             });
         } else {
-            $cfg.html('<div class="alert alert-error" align="center"> ' +
+            cfgtmpl = '<div class="alert alert-error" align="center"> ' +
                       '<a class="close" data-dismiss="alert" href="#">&times</a>' +
-                      'This browser does not support webrtc natively <div class="emoticon">:(</div></div>');
+                      'This browser does not support webrtc natively <div class="emoticon">' +
+                      ':(</div>{{gcpinfo}}</div>';
+            if ($.gocastplayer) {
+                $cfg.html(cfgtmpl.replace(/\{\{gcpinfo\}\}/g, '<span style="display: inline-block;">GoCastPlayer (ver ' +
+                                                              $.gocastplayer.version + ') is currently installed.</span>'));
+            } else {
+                $cfg.html(cfgtmpl.replace(/\{\{gcpinfo\}\}/g, ''));
+            }
         }
     },
     setupPlaceholders: function(id) {
