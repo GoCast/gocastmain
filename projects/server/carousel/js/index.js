@@ -2157,10 +2157,15 @@ function handleRoomSetup() {
     app.user.scheduleTitle = 'Open room';
 
     // set local spot nick todo find a better place for this
+    closeWindow();
     item = app.carousel.getItem(0);
     app.carousel.setSpotName(item, app.user.name);
     $('#mystream > .name').text(decodeURI(app.user.name) + ' (me)');
-    app.carousel.rotate(5);
+
+    if (sessionStorage && !sessionStorage.gcpStopCarouselAutorotate) {
+      app.carousel.rotate(5);
+      sessionStorage.gcpStopCarouselAutorotate = 'true';
+    }
 
     app.log(2, "Room named '" + new_name + "' has been created. Joining now.");
     app.log(2, 'window.location ' + window.location);
