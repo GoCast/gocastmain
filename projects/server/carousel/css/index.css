@@ -618,7 +618,7 @@ div.cloudcarousel > div.bringtofront {
   text-align: center;
 }
 div.cloudcarousel > div.bringtofront.hovered:before {
-  content: 'click to focus';
+  content: 'click to bring to front';
   position: absolute;
   left: 0;
   top: -1.5em;
