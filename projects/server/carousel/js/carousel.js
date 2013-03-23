@@ -92,7 +92,7 @@
           jqCurSelected.removeClass('selected').css({'z-index': curSelectedZidx});
           $('div.bringtofront.front', jqCurSelected).removeClass('front');
           jqObj.addClass('selected').attr('zindex', zindex.toString())
-               .css({'z-index': ('' + (100) + zindex)});
+               .css({'z-index': ('' + (100 + zindex).toString())});
           $(this).addClass('front');
         }
 
