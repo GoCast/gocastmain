@@ -85,14 +85,14 @@
     $('div.bringtofront', jqObj).click(function(e) {
       var jqCurSelected = $('div.cloudcarousel.selected', jqObj.parent()),
           curSelectedZidx = jqCurSelected.attr('zindex'),
-          zindex = parseInt(jqObj.css('z-index'));
+          zindex = parseInt(jqObj.css('z-index')), selectedzindex = zindex + 100;
 
       if (!jqObj.hasClass('unoccupied')) {
         if (jqObj.attr('spotnumber') !== jqCurSelected.attr('spotnumber')) {
           jqCurSelected.removeClass('selected').css({'z-index': curSelectedZidx});
           $('div.bringtofront.front', jqCurSelected).removeClass('front');
           jqObj.addClass('selected').attr('zindex', zindex.toString())
-               .css({'z-index': ('' + (100 + zindex).toString())});
+               .css({'z-index': ('' + selectedzindex)});
           $(this).addClass('front');
         }
 
