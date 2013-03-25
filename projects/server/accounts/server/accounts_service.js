@@ -41,6 +41,49 @@ var api = require('./accounts_api');
 
 var express = require('express');
 var app = express();
+var validDomains = ['gocast.it'];
+
+// -------------- URI PARSER HELPER CLASS --------------------
+// parseUri 1.2.2
+// (c) Steven Levithan <stevenlevithan.com>
+// MIT License
+
+function parseUri (str) {
+    var o   = parseUri.options,
+        m   = o.parser[o.strictMode ? "strict" : "loose"].exec(str),
+        uri = {},
+        i   = 14;
+
+/*jslint plusplus: true*/
+    while (i--) {
+        uri[o.key[i]] = m[i] || "";
+    }
+/*jslint plusplus: false*/
+
+    uri[o.q.name] = {};
+    uri[o.key[12]].replace(o.q.parser, function ($0, $1, $2) {
+        if ($1) {
+            uri[o.q.name][$1] = $2;
+        }
+    });
+
+    return uri;
+}
+
+/*jslint regexp: true*/
+parseUri.options = {
+    strictMode: false,
+    key: ["source","protocol","authority","userInfo","user","password","host","port","relative","path","directory","file","query","anchor"],
+    q:   {
+        name:   "queryKey",
+        parser: /(?:^|&)([^&=]*)=?([^&]*)/g
+    },
+    parser: {
+        strict: /^(?:([^:\/?#]+):)?(?:\/\/((?:(([^:@]*)(?::([^:@]*))?)?@)?([^:\/?#]*)(?::(\d*))?))?((((?:[^?#\/]*\/)*)([^?#]*))(?:\?([^#]*))?(?:#(.*))?)/,
+        loose:  /^(?:(?![^:@]+:[^:@\/]*@)([^:\/?#.]+):)?(?:\/\/)?((?:(([^:@]*)(?::([^:@]*))?)?@)?([^:\/?#]*)(?::(\d*))?)(((\/(?:[^?#](?![^?#\/]*\.[^?#\/.]+(?:[?#]|$)))*\/?)?([^?#\/]*))(?:\?([^#]*))?(?:#(.*))?)/
+    }
+};
+/*jslint regexp: false*/
 
 // -------------- INCLUDED EXPRESS LIBRARIES -----------------
 
@@ -48,9 +91,51 @@ app.use(express.bodyParser());
 
 // -------------- ACCT SERVICE REQUEST HANDLERS --------------
 
+//
+// Takes a url in and an array (or string) of valid 'base' url domain names
+// example: ('http://study.gocast.it/register.html', ['gocast.it', 'partner.com'])
+//
+function valid_base_domain(url, validList) {
+    var x = parseUri(url), validArr = [], host, i;
+
+    host = x.host || '';
+    host = host.toLowerCase();
+
+    if( Object.prototype.toString.call( validList ) === '[object Array]' ) {
+        validArr = validList;
+    }
+    else {
+        validArr[0] = validList;  // parameter was a string rather than an array as it should have been.
+    }
+
+    // Check each entry in the array list against our host for the right-side being equal to the valid list item.
+    for (i = 0; i < validArr.length ; i += 1) {
+        if (host.search(validArr[i]) === host.length - validArr[i].length) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 app.post('/register', function(req, res) {
     var firstRoomName = req.body.desired_roomname,
         extras = null;
+
+    // Use the headers/referer entry above the sent-in baseurl if one is present.
+    if (req.body && req.headers.referer) {
+        req.body.baseurl = req.headers.referer.split('?')[0];
+    }
+
+    if (req.body && !req.body.baseurl) {
+        gcutil.log('accounts_service [/register][error]: No referer and no baseurl passed. req.body is: ', req.body);
+    }
+
+    if (req.body && !valid_base_domain(req.body.baseurl, validDomains)) {
+        gcutil.log('accounts_service [/register][error]: Referrer domain was not valid from: ', req.body.baseurl);
+        res.send('{"result": "error"}');
+        return;
+    }
 
     if (req.body && req.body.baseurl && req.body.email && req.body.password && req.body.name) {
 //        gcutil.log('accounts_service [/register][info]: FormData = ', req.body);
@@ -285,7 +370,22 @@ app.post('/changepwd', function(req, res) {
 });
 
 app.post('/resetpasswordrequest', function(req, res) {
-    if (req.body && req.body.email) {
+    // Use the headers/referer entry above the sent-in baseurl if one is present.
+    if (req.body && req.headers.referer) {
+        req.body.baseurl = req.headers.referer.split('?')[0];
+    }
+
+    if (req.body && !req.body.baseurl) {
+        gcutil.log('accounts_service [/resetpasswordrequest][error]: No referer and no baseurl passed. req.body is: ', req.body);
+    }
+
+    if (req.body && !valid_base_domain(req.body.baseurl, validDomains)) {
+        gcutil.log('accounts_service [/resetpasswordrequest][error]: Referrer domain was not valid from: ', req.body.baseurl);
+        res.send('{"result": "error"}');
+        return;
+    }
+
+    if (req.body && req.body.email && req.body.baseurl) {
         gcutil.log('accounts_service [/resetpasswordrequest][info]: FormData = ', req.body);
         api.GenerateResetPassword(req.body.email, req.body.baseurl, function() {
             res.send('{"result": "success"}');
@@ -377,6 +477,21 @@ app.post('/visitorseen', function(req, res) {
 });
 
 app.post('/sendemailagain', function(req, res) {
+    // Use the headers/referer entry above the sent-in baseurl if one is present.
+    if (req.body && req.headers.referer) {
+        req.body.baseurl = req.headers.referer.split('?')[0];
+    }
+
+    if (req.body && !req.body.baseurl) {
+        gcutil.log('accounts_service [/sendemailagain][error]: No referer and no baseurl passed. req.body is: ', req.body);
+    }
+
+    if (req.body && !valid_base_domain(req.body.baseurl, validDomains)) {
+        gcutil.log('accounts_service [/sendemailagain][error]: Referrer domain was not valid from: ', req.body.baseurl);
+        res.send('{"result": "error"}');
+        return;
+    }
+
     if (req.body && req.body.baseurl && req.body.email) {
 //        gcutil.log('accounts_service [/sendemailagain][info]: FormData = ', req.body);
         api.SendEmailAgain(req.body.email, req.body.baseurl, function() {
