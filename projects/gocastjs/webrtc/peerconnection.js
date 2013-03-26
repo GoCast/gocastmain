@@ -586,7 +586,11 @@ GoCastJS.PeerConnection = function(options) {
     if ('native' === apitype) {
         this.peerconn.onstatechange = function() {
             if(self.peerconn) {
-                onstatechange(self.peerconn.readyState);
+                if (26 === parseInt($.browser.version)) {
+                    onstatechange(self.peerconn.signalingState);
+                } else {
+                    onstatechange(self.peerconn.readyState);
+                }
             }
         };
     } else if ('gcp' === apitype) {
@@ -625,7 +629,11 @@ GoCastJS.PeerConnection = function(options) {
     if ('native' === apitype) {
         this.peerconn.onicechange = function() {
             if (self.peerconn) {
-                onicechange(self.peerconn.iceState);
+                if (26 === parseInt($.browser.version)) {
+                    onicechange(self.peerconn.iceConnectionState);
+                } else {
+                    onicechange(self.peerconn.iceState);
+                }
             }
         };
     } else if ('gcp' === apitype) {
