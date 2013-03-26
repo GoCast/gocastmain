@@ -75,7 +75,8 @@ if (process.env.SETTINGS_DEVEL === 1 || process.env.SETTINGS_DEVEL === '1') {
         mailgunPass: '7s2ssv2l5pe3',
         inviteFromAddress: 'support@gocast.it',
         inviteFromName: 'GoCast Support',
-        inviteSubject: 'Welcome! Please validate your new GoCast account.'
+        inviteSubject: 'Welcome! Please validate your new GoCast account.',
+        cookieSecret: '2IVNoseAcNptJ1c9dyV96e8slR7d1V3p'
     };
 
     settings.overseer = {
@@ -148,7 +149,8 @@ else {
         mailgunPass: '7s2ssv2l5pe3',
         inviteFromAddress: 'support@gocast.it',
         inviteFromName: 'GoCast Support',
-        inviteSubject: 'Welcome! Please validate your new GoCast account.'
+        inviteSubject: 'Welcome! Please validate your new GoCast account.',
+        cookieSecret: 'Q9DHrCKkkubiSKZdNlu91rDEO6URQ5LF'
     };
 
     settings.overseer = {

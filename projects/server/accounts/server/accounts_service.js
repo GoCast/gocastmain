@@ -43,6 +43,11 @@ var express = require('express');
 var app = express();
 var validDomains = ['gocast.it'];
 
+var anHour = 1000 * 60 * 60;
+var aDay = anHour * 24;
+var aWeek = aDay * 7;
+var maxCookieAge = aWeek * 4;
+
 // -------------- URI PARSER HELPER CLASS --------------------
 // parseUri 1.2.2
 // (c) Steven Levithan <stevenlevithan.com>
@@ -88,6 +93,8 @@ parseUri.options = {
 // -------------- INCLUDED EXPRESS LIBRARIES -----------------
 
 app.use(express.bodyParser());
+app.use(express.cookieParser(settings.accounts.cookieSecret));
+app.use(express.cookieSession({ key: 'gcsession', secret: settings.accounts.cookieSecret,  cookie: { maxAge: maxCookieAge } }));
 
 // -------------- ACCT SERVICE REQUEST HANDLERS --------------
 
@@ -576,6 +583,20 @@ app.post('/inviteviaemail', function(req, res) {
             res.send('{"result": "error"}');
         }
     }
+});
+
+app.post('/cookietest', function(req, res) {
+    if (req.signedCookies.gcsession) {
+        console.log('Inbound cookie: ', req.signedCookies.gcsession);
+        console.log('Killing cookie.');
+        req.session = null;
+    }
+    else {
+        req.session.now = new Date().toString();
+        console.log('Creating cookie.');
+    }
+
+    res.send('{"result": "success"}');
 });
 
 app.listen(settings.accounts.serviceport || 8083);
