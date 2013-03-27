@@ -599,4 +599,133 @@ app.post('/cookietest', function(req, res) {
     res.send('{"result": "success"}');
 });
 
+// Functions to be implemented:
+// 1. api.login() -- accounts_api.js
+// 2. privateGenRandomSessionId() -- accounts_api.js
+
+app.post('/login', function(req, res) {
+    if (req.signedCookies.gcsession && req.signedCookies.gcsession.sid) {
+        api.Login({
+            sid: req.signedCookies.gcsession.sid,
+            callback: function(ret) {
+                var xs = {};
+                if ('success' === ret.result) {
+                    xs = {
+                        result: 'success',
+                        data: {
+                            rid: ret.rid,
+                            jid: ret.jid,
+                            sid, ret.sid
+                        }
+                    };
+                    res.send(JSON.stringify(xs));
+                } else {
+                    //error handling
+                }
+            }
+        });
+    } else if (req.body && req.body.email && req.body.password) {
+        api.Login({
+            email: req.body.email,
+            password: req.body.password,
+            callback: function(ret) {
+                var xs = {};
+                if ('success' === ret.result) {
+                    xs = {
+                        result: 'success',
+                        data: {
+                            rid: ret.rid,
+                            jid: ret.jid,
+                            sid, ret.sid
+                        }
+                    };
+                    req.session.sid = ret.gsid;
+                    res.send(JSON.stringify(xs));
+                } else {
+                    // error handling
+                }
+            }
+        });
+    } else if (req.body && req.body.anon) {
+        api.Login({
+            anon: true,
+            callback: function(ret) {
+                var xs = {};
+                if ('success' === ret.result) {
+                    xs = {
+                        result: 'success',
+                        data: {
+                            rid: ret.rid,
+                            jid: ret.jid,
+                            sid, ret.sid
+                        }
+                    };
+                    req.session.sid = ret.gsid;
+                    res.send(JSON.stringify(xs));
+                } else {
+                    // error handling
+                }
+            }
+        });
+    } else {
+        if (!req.body) {
+            console.log('accounts_service[/login][error]: No req.body to process.');
+            res.send('{"result": "error"}');
+        } else if (!req.body.email) {
+            console.log('accounts_service[/login][error]: No req.body.email to process.');
+            res.send('{"result": "noemail"}');
+        } else if (!req.body.password) {
+            console.log('accounts_service[/login][error]: No req.body.password to process.');
+            res.send('{"result": "nopassword"}');            
+        }
+    }
+});
+
+app.post('/logout', function(req, res) {
+    if (req.signedCookies.gcsession && req.signedCookies.gcsession.sid) {
+        api.Logout({
+            sid: req.signedCookies.gcsession.sid,
+            callback: function(ret) {
+                if ('success' === ret.result) {
+                    req.session = null;
+                    res.send('{"result": "success"}');
+                } else {
+                    // error handling
+                }
+            }
+        });
+    } else {
+        console.log('accounts_service[/logout][error]: No session id detected.');
+        res.send('{"result": "nosid"}');
+    }
+});
+
+app.post('/reqxmppconn', function(req, res) {
+    if (req.signedCookies.gcsession && req.signedCookies.gcsession.sid) {
+        api.ReqXmppConn({
+            sid: req.signedCookies.gcsession.sid,
+            callback: function(ret) {
+                var xs = {};
+                if ('success' === ret.result) {
+                    xs = {
+                        result: 'success',
+                        data: {
+                            rid: ret.rid,
+                            jid: ret.jid,
+                            sid, ret.sid
+                        }
+                    };
+                    req.session.sid = ret.gsid;
+                    res.send(JSON.stringify(xs));
+                } else {
+                    // error handling
+                }
+            }
+        });
+    } else {
+        console.log('accounts_service[/reqxmppconn][error]: No session id detected.');
+        res.send('{"result": "nosid"}');
+    }
+});
+
 app.listen(settings.accounts.serviceport || 8083);

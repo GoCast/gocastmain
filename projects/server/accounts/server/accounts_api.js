@@ -755,6 +755,43 @@ function apiVisitorSeen(email, nickName, success, failure) {
     db.VisitorSeen(email, nickName, success, failure);
 }
 
+function apiLogin(args) {
+    var res = {}, sid;
+
+    if (args.sid) {
+
+    } else if (args.email && args.password) {
+        db.GetEntryByAccountName(email, function(entry) {
+            if (entry.hpass === hash(args.password)) {
+                res.sid = privateGenRandomSessionId();
+                memdb.AddEntry('sessions', {
+                    sid: res.sid,
+                    email: args.email,
+                    hpass: entry.hpass,
+                    hpassx: hash(entry.hpass)
+                });
+                xmpp.ReqXmppConn(memdb.GetEntry('sessions', res.sid), function(xs) {
+                    if (xs.rid && xs.jid && xs.sid) {
+                        res = {
+                            result: 'success',
+                            rid: xs.rid,
+                            jid: xs.jid,
+                            sid: xs.sid
+                        };
+                        args.callback(res);
+                    }
+                });
+            }
+        }, function(err) {
+            failure();
+        });
+    } else if (args.anon) {
+
+    } else {
+
+    }
+}
+
 /* Manjesh -- These both work (separately of course)
 apiNewAccount('http://dev.gocast.it/baseURL.html', 'rwolff@gocast.it', 'rwolff', 'Bob Wolff', function() {
     gcutil.log('TEST: SUCCESS');
@@ -784,3 +821,6 @@ exports.SendEmailAgain = apiSendEmailAgain;
 exports.GenerateResetPassword = apiGenerateResetPassword;
 exports.ResetPasswordViaLink = apiResetPasswordViaLink;
 exports.SendRoomInviteEmail = apiSendRoomInviteEmail;
+exports.Login = apiLogin;
+exports.Logout = apiLogout;
+exports.ReqXmppConn = apiReqXmppConn;
