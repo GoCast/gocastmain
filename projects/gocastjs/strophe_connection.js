@@ -515,18 +515,21 @@ GoCastJS.StropheConnection.prototype = {
     //
     // @brief Utilizes the rid/jid/sid to re-login to an existing session.
     //
-    privateReattach: function(jid, sid, inRid) {
-        var rid;
+    attach: function(obj) {
+        var rid, jid, sid;
 
-        if (!jid || !sid || !inRid || !jid.split('@')[1])
+        if (!obj.jid || !obj.sid || !obj.rid || !obj.jid.split('@')[1])
         {
-            this.log('Re-attach ERROR: RID/SID/JID is null. RID=' + inRid + ', SID=' + sid + ', JID=' + jid);
+            this.log('Re-attach ERROR: RID/SID/JID is null. RID=' + obj.rid + ', SID=' + obj.sid + ', JID=' + obj.jid);
             return;
         }
 
+        jid = obj.jid;
+        sid = obj.sid;
+
         // Auto-advance the rid.
         // NOTE: Seems auto-advance causes problems. Skipping for now.
-        rid = parseInt(inRid, 10) - 1;
+        rid = parseInt(obj.rid, 10) - 1;
 //        rid = parseInt(inRid, 10);
         // rid = parseInt(inRid, 10) + 1;
 
