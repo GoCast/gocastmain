@@ -31,6 +31,10 @@ if (process.env.SETTINGS_DEVEL === 1 || process.env.SETTINGS_DEVEL === '1') {
     settings.SERVERPORT = 5222;
     settings.CONF_SERVICE = '@conference.dev.gocast.it';
 
+    settings.BOSHLOCAL = 'http://localhost:5288/nodejs-http-bind/';
+    settings.ANON_USERNAME = 'anon_conference@dev.gocast.it';
+    settings.ANON_PASSWORD = 'gocast.anon.user';
+
     settings.roommanager = {
         persist: true,      // Normally rooms are non-persistent.
         allow_overflow: true,
@@ -123,6 +127,10 @@ else {
     settings.SERVERNAME = 'video.gocast.it';
     settings.SERVERPORT = 5222;
     settings.CONF_SERVICE = '@gocastconference.video.gocast.it';
+
+    settings.BOSHLOCAL = 'http://localhost:5288/nodejs-http-bind/';
+    settings.ANON_USERNAME = 'anon_gocastconference@video.gocast.it';
+    settings.ANON_PASSWORD = 'gocast.video.anon';
 
     settings.dynamodb = {
         endpoint: 'dynamodb.us-west-1.amazonaws.com',
