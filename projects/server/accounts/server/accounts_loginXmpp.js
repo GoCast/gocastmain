@@ -105,14 +105,14 @@ XmppConn.prototype = {
         if (ltxe.is('iq') && ltxe.getChild('ping')) {
             pong = xmpp.$iq({to: ltxe.attrs.from, id: ltxe.attrs.id, type: 'result'});
             // Respond to a ping with a pong.
-            console.log('XmppConn: [' + this.client.sess_attr.jid.toString() + '] Received PING - Sending pong...');
+//            console.log('XmppConn: [' + this.client.sess_attr.jid.toString() + '] Received PING - Sending pong...');
             if (this.client) {
                 this.client.send(pong);
             }
         }
-        else {
-            console.log('XmppConn: [' + this.client.sess_attr.jid.toString() + '] Received: ' + ltxe.toString());
-        }
+//        else {
+//            console.log('XmppConn: [' + this.client.sess_attr.jid.toString() + '] Received: ' + ltxe.toString());
+//        }
     }
 };
 
