@@ -668,7 +668,7 @@ app.post('/login', function(req, res) {
                             sid: ret.sid
                         }
                     };
-                    req.session.sid = ret.gsid;
+                    req.session.anon = true;
                     res.send(JSON.stringify(xs));
                 } else {
                     res.send(JSON.stringify(ret));
@@ -689,22 +689,18 @@ app.post('/login', function(req, res) {
     }
 });
 
-/*app.post('/logout', function(req, res) {
+app.post('/logout', function(req, res) {
     if (req.signedCookies.gcsession && req.signedCookies.gcsession.sid) {
         api.Logout({
             sid: req.signedCookies.gcsession.sid,
             callback: function(ret) {
-                if ('success' === ret.result) {
-                    req.session = null;
-                    res.send('{"result": "success"}');
-                } else {
-                    // error handling
-                }
+                req.session = null;
+                res.send(JSON.stringify(ret));
             }
         });
     } else {
         console.log('accounts_service[/logout][error]: No session id detected.');
-        res.send('{"result": "nosid"}');
+        res.send('{"result": "notloggedin"}');
     }
 });
 
@@ -720,20 +716,41 @@ app.post('/reqxmppconn', function(req, res) {
                         data: {
                             rid: ret.rid,
                             jid: ret.jid,
-                            sid, ret.sid
+                            sid: ret.sid
                         }
                     };
                     req.session.sid = ret.gsid;
                     res.send(JSON.stringify(xs));
                 } else {
-                    // error handling
+                    res.send(JSON.stringify(ret));
+                }
+            }
+        });
+    } else if (req.signedCookies.gcsession && req.signedCookies.gcsession.anon) {
+        api.ReqXmppConn({
+            anon: true,
+            callback: function(ret) {
+                var xs = {};
+                if ('success' === ret.result) {
+                    xs = {
+                        result: 'success',
+                        data: {
+                            rid: ret.rid,
+                            jid: ret.jid,
+                            sid: ret.sid
+                        }
+                    };
+                    req.session.anon = 'true';
+                    res.send(JSON.stringify(xs));
+                } else {
+                    res.send(JSON.stringify(ret));
                 }
             }
         });
     } else {
         console.log('accounts_service[/reqxmppconn][error]: No session id detected.');
-        res.send('{"result": "nosid"}');
+        res.send('{"result": "notloggedin"}');
     }
-});*/
+});
 
 app.listen(settings.accounts.serviceport || 8083);

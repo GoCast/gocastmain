@@ -804,7 +804,8 @@ function apiLogin(args) {
                     }
                 }, function(err) {
                     res = {
-                        result: err
+                        result: 'xmppprob',
+                        reason: err
                     };
                     args.callback(res);
                 });
@@ -830,7 +831,8 @@ function apiLogin(args) {
                         }
                     }, function(err) {
                         res = {
-                            result: err
+                            result: 'xmppprob',
+                            reason: err
                         };
                         args.callback(res);
                     });
@@ -869,7 +871,8 @@ function apiLogin(args) {
                     }
                 }, function(err) {
                     res = {
-                        result: err
+                        result: 'xmppprob',
+                        reason: err
                     };
                     args.callback(res);
                 });
@@ -892,7 +895,74 @@ function apiLogin(args) {
             }
         }, function(err) {
             res = {
-                result: err
+                result: 'xmppprob',
+                reason: err
+            };
+            args.callback(res);
+        });
+    }
+}
+
+function apiLogout(args) {
+    var sess = mdbSessions.getentry(args.sid),
+        sessp = mdbHpwds.getentry(args.sid);
+
+    if (sessp) {
+        mdbHpwds.rementry(args.sid);
+    }
+
+    if (sess) {
+        mdbSessions.rementry(args.sid);
+        args.callback({result: 'success'});
+    } else {
+        args.callback({result: 'nosession'});
+    }
+}
+
+function apiReqXmppConn(args) {
+    var sess, sessp;
+
+    if (args.sid) {
+        sess = mdbSessions.getentry(args.sid);
+        sessp = mdbHpwds.getentry(args.sid);
+
+        if (sess && sessp) {
+            boshmgr.getLiveSession(sess.email, sessp.passx, function(u, xs, o) {
+                if (xs.rid && xs.jid && xs.sid) {
+                    res = {
+                        result: 'success',
+                        rid: xs.rid,
+                        jid: xs.jid,
+                        sid: xs.sid,
+                        gsid: args.sid
+                    };
+                    args.callback(res);
+                }
+            }, function(err) {
+                res = {
+                    result: 'xmppprob',
+                    reason: err
+                };
+                args.callback(res);
+            });
+        } else {
+            args.callback({result: 'nosession'});
+        }
+    } else if (args.anon) {
+        boshmgr.getLiveSession(null, null, function(u, xs, o) {
+            if (xs.rid && xs.jid && xs.sid) {
+                res = {
+                    result: 'success',
+                    rid: xs.rid,
+                    jid: xs.jid,
+                    sid: xs.sid,
+                };
+                args.callback(res);
+            }
+        }, function(err) {
+            res = {
+                result: 'xmppprob',
+                reason: err
             };
             args.callback(res);
         });
@@ -929,5 +999,5 @@ exports.GenerateResetPassword = apiGenerateResetPassword;
 exports.ResetPasswordViaLink = apiResetPasswordViaLink;
 exports.SendRoomInviteEmail = apiSendRoomInviteEmail;
 exports.Login = apiLogin;
-/*exports.Logout = apiLogout;
-exports.ReqXmppConn = apiReqXmppConn;*/
+exports.Logout = apiLogout;
+exports.ReqXmppConn = apiReqXmppConn;
