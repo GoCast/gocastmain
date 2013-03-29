@@ -605,6 +605,7 @@ app.post('/cookietest', function(req, res) {
 
 app.post('/login', function(req, res) {
     if (req.signedCookies.gcsession && req.signedCookies.gcsession.sid) {
+        console.log('INSID: ', req.signedCookies.gcsession.sid);
         api.Login({
             sid: req.signedCookies.gcsession.sid,
             callback: function(ret) {
@@ -615,12 +616,16 @@ app.post('/login', function(req, res) {
                         data: {
                             rid: ret.rid,
                             jid: ret.jid,
-                            sid, ret.sid
+                            sid: ret.sid,
+                            email: ret.email,
+                            name: ret.name
                         }
                     };
+                    console.log('OUTSID: ', ret.gsid);
+                    req.session.sid = ret.gsid;
                     res.send(JSON.stringify(xs));
                 } else {
-                    //error handling
+                    res.send(JSON.stringify(ret));
                 }
             }
         });
@@ -636,13 +641,16 @@ app.post('/login', function(req, res) {
                         data: {
                             rid: ret.rid,
                             jid: ret.jid,
-                            sid, ret.sid
+                            sid: ret.sid,
+                            email: ret.email,
+                            name: ret.name
                         }
                     };
+                    console.log('OUTSID: ', ret.gsid);
                     req.session.sid = ret.gsid;
                     res.send(JSON.stringify(xs));
                 } else {
-                    // error handling
+                    res.send(JSON.stringify(ret));
                 }
             }
         });
@@ -657,13 +665,13 @@ app.post('/login', function(req, res) {
                         data: {
                             rid: ret.rid,
                             jid: ret.jid,
-                            sid, ret.sid
+                            sid: ret.sid
                         }
                     };
                     req.session.sid = ret.gsid;
                     res.send(JSON.stringify(xs));
                 } else {
-                    // error handling
+                    res.send(JSON.stringify(ret));
                 }
             }
         });
@@ -681,7 +689,7 @@ app.post('/login', function(req, res) {
     }
 });
 
-app.post('/logout', function(req, res) {
+/*app.post('/logout', function(req, res) {
     if (req.signedCookies.gcsession && req.signedCookies.gcsession.sid) {
         api.Logout({
             sid: req.signedCookies.gcsession.sid,
@@ -726,6 +734,6 @@ app.post('/reqxmppconn', function(req, res) {
         console.log('accounts_service[/reqxmppconn][error]: No session id detected.');
         res.send('{"result": "nosid"}');
     }
-});
+});*/
 
 app.listen(settings.accounts.serviceport || 8083);

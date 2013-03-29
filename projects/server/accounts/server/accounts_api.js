@@ -49,8 +49,13 @@ var transport = nodemailer.createTransport('SMTP', {
 var crypto = require('crypto');
 var xmpp = require('./accounts_xmpp');
 var db = require('./accounts_db');
+var memdb = require('./accounts_memdb').memdb;
+var boshxmpp = require('./accounts_loginXmpp').BoshXmppManager;
 
 var bodyFromDisk = null;
+var mdbSessions = new memdb('./dbsessions.json');
+var mdbHpwds = new memdb();
+var boshmgr = new boshxmpp();
 
 'use strict';
 
@@ -376,7 +381,22 @@ function privateMatchActivationCodes(longCode, longOrShortCode) {
     }
 }
 
+function privateHashPassword(password) {
+    return crypto.createHash('md5').update('g0teamit!' + password).digest('hex');
+}
+
+function privateGenRandomSessionId() {
+    var bytes = crypto.randomBytes(32), id = '', i;
+    for (i=0; i<bytes.length; i++) {
+        id = id + bytes[i].toString(16);
+    }
+    return id;
+}
+
 function apiNewAccount(baseURL, email, password, name, firstRoomName, extras, success, failure, bInAppReg) {
+    var hpass = privateHashPassword(password),
+        passx = privateHashPassword(hpass);
+
     // Check if account with this email exists
     db.EntryExists(email, function(obj) {
         if (obj.validated) {
@@ -387,7 +407,8 @@ function apiNewAccount(baseURL, email, password, name, firstRoomName, extras, su
         }
     }, function() {
         // Doesn't exist, so add account
-        xmpp.AddAccount(email, password, name, function() {
+        console.log('apiNewAccount: ', {email: email, passx: passx});
+        xmpp.AddAccount(email, passx, name, function() {
             // Added account, now generate activation code
             // Note - account is disabled upon creation until activation is complete.
             var actcode = privateCalcActivationCode(email),
@@ -404,7 +425,7 @@ function apiNewAccount(baseURL, email, password, name, firstRoomName, extras, su
             }
 
             obj.validationCode = actcode;
-            obj.password = password;
+            obj.password = hpass;
             if (name) {
                 obj.name = name;
             }
@@ -618,13 +639,15 @@ function apiGenerateResetPassword(email, baseURL, success, failure) {
 }
 
 function apiChangePassword(email, newpassword, success, failure) {
-    xmpp.ChangePassword(email, newpassword, function() {
-        db.UpdateEntry(email, {password: newpassword}, success, failure);
+    var hpass = privateHashPassword(newpassword),
+        passx = privateHashPassword(hpass);
+    xmpp.ChangePassword(email, passx, function() {
+        db.UpdateEntry(email, {password: hpass}, success, failure);
     }, function() {
         // If the xmpp change failed, try to change on the db side.
         // But note - regardless of db change success, this is still a
         // failure, so both success and failure call the failure callback.
-        db.UpdateEntry(email, {password: newpassword}, success, failure);
+        db.UpdateEntry(email, {password: hpass}, success, failure);
     });
 }
 
@@ -756,39 +779,123 @@ function apiVisitorSeen(email, nickName, success, failure) {
 }
 
 function apiLogin(args) {
-    var res = {}, sid;
+    var res = {}, sid, passx, e, hp, px,
+        sess, sessp, gsid;
 
     if (args.sid) {
+        sid = args.sid;
+        sess = mdbSessions.getentry(sid);
+        sessp = mdbHpwds.getentry(sid);
 
-    } else if (args.email && args.password) {
-        db.GetEntryByAccountName(email, function(entry) {
-            if (entry.hpass === hash(args.password)) {
-                res.sid = privateGenRandomSessionId();
-                memdb.AddEntry('sessions', {
-                    sid: res.sid,
-                    email: args.email,
-                    hpass: entry.hpass,
-                    hpassx: hash(entry.hpass)
-                });
-                xmpp.ReqXmppConn(memdb.GetEntry('sessions', res.sid), function(xs) {
+        if (sess) {
+            if (sessp) {
+                boshmgr.getLiveSession(sess.email, sessp.passx, function(u, xs, o) {
                     if (xs.rid && xs.jid && xs.sid) {
                         res = {
                             result: 'success',
                             rid: xs.rid,
                             jid: xs.jid,
-                            sid: xs.sid
+                            sid: xs.sid,
+                            email: sess.email,
+                            name: sess.name,
+                            gsid: sid
                         };
                         args.callback(res);
                     }
+                }, function(err) {
+                    res = {
+                        result: err
+                    };
+                    args.callback(res);
+                });
+            } else {
+                db.GetEntryByAccountName(sess.email, function(entry) {
+                    passx = privateHashPassword(entry.password);
+                    mdbHpwds.addentry(sid, {
+                        hpass: entry.password,
+                        passx: passx
+                    });
+                    boshmgr.getLiveSession(entry.email, passx, function(u, xs, o) {
+                        if (xs.rid && xs.jid && xs.sid) {
+                            res = {
+                                result: 'success',
+                                rid: xs.rid,
+                                jid: xs.jid,
+                                sid: xs.sid,
+                                email: entry.email,
+                                name: entry.name,
+                                gsid: sid
+                            };
+                            args.callback(res);
+                        }
+                    }, function(err) {
+                        res = {
+                            result: err
+                        };
+                        args.callback(res);
+                    });
+                }, function(err) {
+                    args.callback({result: 'noaccount', email: args.email});
                 });
             }
+        } else {
+            args.callback({result: 'nosession'});
+        }
+    } else if (args.email && args.password) {
+        db.GetEntryByAccountName(args.email, function(entry) {
+            if (entry.password === privateHashPassword(args.password)) {
+                sid = privateGenRandomSessionId();
+                mdbSessions.addentry(sid, {
+                    email: entry.email,
+                    name: entry.name
+                });
+                passx = privateHashPassword(entry.password);
+                mdbHpwds.addentry(sid, {
+                    hpass: entry.password,
+                    passx: passx
+                });
+                boshmgr.getLiveSession(entry.email, passx, function(u, xs, o) {
+                    if (xs.rid && xs.jid && xs.sid) {
+                        res = {
+                            result: 'success',
+                            rid: xs.rid,
+                            jid: xs.jid,
+                            sid: xs.sid,
+                            email: entry.email,
+                            name: entry.name,
+                            gsid: sid
+                        };
+                        args.callback(res);
+                    }
+                }, function(err) {
+                    res = {
+                        result: err
+                    };
+                    args.callback(res);
+                });
+            } else {
+                args.callback({result: 'authfail', email: args.email});
+            }
         }, function(err) {
-            failure();
+            args.callback({result: 'noaccount', email: args.email});
         });
     } else if (args.anon) {
-
-    } else {
-
+        boshmgr.getLiveSession(null, null, function(u, xs, o) {
+            if (xs.rid && xs.jid && xs.sid) {
+                res = {
+                    result: 'success',
+                    rid: xs.rid,
+                    jid: xs.jid,
+                    sid: xs.sid,
+                };
+                args.callback(res);
+            }
+        }, function(err) {
+            res = {
+                result: err
+            };
+            args.callback(res);
+        });
     }
 }
 
@@ -822,5 +929,5 @@ exports.GenerateResetPassword = apiGenerateResetPassword;
 exports.ResetPasswordViaLink = apiResetPasswordViaLink;
 exports.SendRoomInviteEmail = apiSendRoomInviteEmail;
 exports.Login = apiLogin;
-exports.Logout = apiLogout;
-exports.ReqXmppConn = apiReqXmppConn;
+/*exports.Logout = apiLogout;
+exports.ReqXmppConn = apiReqXmppConn;*/
