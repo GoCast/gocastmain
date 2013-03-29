@@ -223,6 +223,10 @@ if (process.env.STANFORDDNLE === 1 || process.env.STANFORDDNLE === '1') {
     settings.SERVERPORT = 5222;
     settings.CONF_SERVICE = '@conference.dnle.gocast.it';
 
+    settings.BOSHLOCAL = 'http://localhost:5288/nodejs-http-bind/';
+    settings.ANON_USERNAME = 'anon_conference@dev.gocast.it';
+    settings.ANON_PASSWORD = 'dnle.anon.user';
+
     settings.dynamodb = {
         endpoint: 'dynamodb.us-west-1.amazonaws.com',
         awsRegion: 'us-west-1',     // aws-sdk requires short-hand region name.
@@ -295,6 +299,10 @@ else if (process.env.STANFORDCCC === 1 || process.env.STANFORDCCC === '1') {
     settings.SERVERNAME = 'dnle.gocast.it';
     settings.SERVERPORT = 5222;
     settings.CONF_SERVICE = '@ccc-conference.dnle.gocast.it';
+
+    settings.BOSHLOCAL = 'http://localhost:5288/nodejs-http-bind/';
+    settings.ANON_USERNAME = 'anon_ccc-conference@dev.gocast.it';
+    settings.ANON_PASSWORD = 'ccc.anon.user';
 
     settings.dynamodb = {
         endpoint: 'dynamodb.us-west-1.amazonaws.com',
