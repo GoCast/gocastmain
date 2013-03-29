@@ -59,7 +59,7 @@ function memdb(file, onread) {
 
     // actions
     this.readfromfile();
-    this.periodicwritetofile(1000);
+    this.periodicwritetofile();
 }
 
 memdb.prototype.readfromfile = function() {

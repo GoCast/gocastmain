@@ -132,7 +132,7 @@ function BoshXmppManager(boshurl) {
 
     setInterval(function() {
         self.printManagerReport();
-    }, 1000);
+    }, 60000);
 }
 
 BoshXmppManager.prototype = {
@@ -294,6 +294,8 @@ BoshXmppManager.prototype = {
         if (!user) {
             user = this.anon_username;
             password = this.anon_password;
+        } else {
+            user = user.replace(/@/g, '~') + '@' + settings.SERVERNAME;
         }
 
         if (this.sessions[user] && this.sessions[user].cache && this.sessions[user].cache.getStatus() === 'online') {
@@ -360,3 +362,4 @@ function test1() {
 }
 
 //test1();
+exports.BoshXmppManager = BoshXmppManager;
