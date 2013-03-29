@@ -236,6 +236,7 @@ var Callcast = {
     roomjid: '',
     roomlist: {},
     nick: '',
+    profileInfo: {},
     databaseNickname: null,
     joined: false,
     bUseVideo: true,
@@ -270,7 +271,7 @@ var Callcast = {
             server = inServer || window.location.hostname;
 
         if (this.connection) {
-            throw 'init: StropheConnection already exists. Calling init again? Not legal.';
+            throw 'init: StropheAttach already exists. Calling init again? Not legal.';
         }
 
         if (this.settings) {
@@ -280,10 +281,7 @@ var Callcast = {
         this.settings = new GoCastJS.CallcastSettings(server);
         this.settings.transferValues(this); // Set all the values in Callcast.* from settings
 
-        this.connection = new GoCastJS.StropheConnection({ boshurl: boshurl,
-                                                           xmppserver: this.CALLCAST_XMPPSERVER,
-                                                           anon_username: this.ANON_USERNAME,
-                                                           anon_password: this.ANON_PASSWORD,
+        this.connection = new GoCastJS.StropheAttach({ boshurl: boshurl,
                                                            public_room_node: this.CALLCAST_ROOMS + '/public',
                                                            statusCallback: this.connStatusHandler.bind(this),
                                                            logFn: this.log});
@@ -1360,15 +1358,12 @@ var Callcast = {
         return msg.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     },
 
-    log: function() {
-        // Need to prepend the date to the first argument.
-        arguments[0] = GoCastJS.logDate() + arguments[0] + ' ';
-
+    log: function(arg1, arg2, arg3, arg4, arg5) {
         if (logQ) {
-            logQ.log.apply(logQ, arguments);
+            logQ.log.apply(logQ, GoCastJS.logDate(), arg1 || '', arg2 || '', arg3 || '', arg4 || '', arg5 || '');
         }
 
-        console.log.apply(console, arguments);
+        console.log.apply(console, GoCastJS.logDate(), arg1 || '', arg2 || '', arg3 || '', arg4 || '', arg5 || '');
     },
 
     PluginLogCallback: function(entries) {
@@ -2252,6 +2247,10 @@ var Callcast = {
 
         // Failure callback
           function(iq) {
+              if (iq.find('reason') && iq.find('reason').find('Room_Full')) {
+                alert('No more spots allowed. Room is full. Please delete a spot before adding another.');
+                return;
+              }
               self.log('Error adding spot', iq);
               if (cb) {
                 cb('Error adding spot');
@@ -2287,6 +2286,7 @@ var Callcast = {
             console.error('ERROR: No overseer.');
         }
         //
+
         this.connection.sendIQ($iq({
             to: myOverseer,
             id: 'removespot1',
@@ -2827,42 +2827,42 @@ var Callcast = {
 
 
     ///
-    /// connect using this JID and password -- and optionally use this URL for the BOSH connection.
+    /// attach using this rid/jid/sid -- and optionally use this URL for the BOSH connection.
     ///
-    /// opts { jid: , password: }
-    ///   OR { username: , password: }
-    ///   OR null/{} for anonymous
+    /// opts { rid:, jid:, sid: }   for anonymous visitors
+    ///   OR { rid:, jid:, sid:, email:, name: }
     ///
     connect: function(opts, url) {
         var self = this,
             boshurl = url || '/xmpp-httpbind';
 
+        if (!opts || !opts.rid || !opts.jid || !opts.sid) {
+            this.log('connect: ERROR - opts object is missing or malformed: ' + JSON.stringify(opts));
+            return;
+        }
+
         if (!this.connection)
         {
             // TODO:RMW - rather than pause/reset/nullify and then re-new a new Strophe connection
             //            we should just reset the connection and re-login with connect.
-            this.connection = new GoCastJS.StropheConnection({ boshurl: boshurl,
-                                                               xmppserver: Callcast.CALLCAST_XMPPSERVER,
-                                                               anon_username: this.ANON_USERNAME,
-                                                               anon_password: this.ANON_PASSWORD,
+            this.connection = new GoCastJS.StropheAttach({ boshurl: boshurl,
                                                                public_room_node: this.CALLCAST_ROOMS + '/public',
                                                                statusCallback: this.connStatusHandler,
                                                                logFn: Callcast.log});
         }
 
-        if (!opts && this.connection.hasSavedLoginInfo()) {
-            this.connection.autoConnect();
+        // Make a copy of the profile information locally since it's being passed in to us.
+        this.profileInfo = opts;
+
+        if (opts.email) {
+            self.log('connect: Got account info: ' + opts.name + '(' + opts.email + ') - Doing XMPP Attach.');
         }
         else {
-            this.connection.connect(opts);
+            self.log('connect: Account info not present: Visitor - Doing XMPP Attach.');
         }
 
-        // This is the earliest place we can ask the database for a nickname so that we have
-        // an answer back by the time connection is complete. That's the hope anyway.
-        this.queryDatabaseName(function(name) {
-            self.databaseNickname = name;
-        });
-
+        self.connection.attach({rid: opts.rid, jid: opts.jid, sid: opts.sid});
+        return;
     },
 
     leaveIfReEntry: function(cb, reason) {
@@ -2893,39 +2893,7 @@ var Callcast = {
         }
     },
     getDatabaseNickname: function() {
-        return this.databaseNickname;
-    },
-    queryDatabaseName: function(gotName) {
-        var succCb = gotName || function(name) {},
-            email;
-
-        if (!this.connection) {
-            Callcast.log('queryDatabaseName: WARNING: No BOSH connection.');
-        }
-
-        // Make sure we've got a connection and a valid email to query.
-        if (this.connection && this.connection.getEmailFromJid()) {
-            email = this.connection.getEmailFromJid();
-            $.ajax({
-                url: '/acct/getprofile/',
-                type: 'POST',
-                dataType: 'json',
-                data: { email: email },
-                success: function(response) {
-                    if ('success' === response.result) {
-//                        Callcast.log('DEBUG: queryDatabaseName: Got name of: ' + response.data.name);
-                        succCb(response.data.name);     // This will make a null arg if no nickname is found.
-                    }
-                    else {
-                        Callcast.log('DEBUG: queryDatabaseName: ERROR.');
-                        succCb(''); // No nickname.
-                    }
-                }
-            });
-        }
-        else {
-            succCb('');   // No valid email or no connection - so no valid nickname.
-        }
+        return this.profileInfo.name;       // Database nickname
     },
     connStatusHandler: function(status) {
         switch(status) {
@@ -3002,8 +2970,8 @@ var Callcast = {
         }
 
         // Remember the email address that was used for subsequent logins. (If we're non-anonymous)
-        if (typeof (Storage) !== 'undefined' && !Callcast.connection.isAnonymous()) {
-            localStorage.gocastusername = Callcast.connection.getEmailFromJid();
+        if (typeof (Storage) !== 'undefined' && Callcast.profileInfo.email) {
+            localStorage.gocastusername = Callcast.profileInfo.email;
         }
 
         /* this.connection.debugXML(true); */
@@ -3027,29 +2995,9 @@ var Callcast = {
         this.connection.addHandler(this.onErrorStanza.bind(this), null, null, 'error');
 
         // Kick things off by refreshing the rooms list.
-        this.RefreshRooms();
+//        this.RefreshRooms();
 
-        if (this.databaseNickname === null) {
-            Callcast.log('finalizeConnect: WARNING: databaseNickname has not returned yet and we are connected already');
-
-            finalT = setTimeout(function() {
-                clearInterval(intervalT);
-                cb();   // Call the callback if we never hear back.
-            }, 3000);
-
-            intervalT = setInterval(function() {
-                if (self.databaseNickname) {
-                    Callcast.log('finalizeConnect: Got databaseNickname of: ' + self.databaseNickname);
-                    clearInterval(intervalT);
-                    clearTimeout(finalT);
-                    cb();
-                }
-            }, 200);
-        }
-        else {
-            cb();
-        }
-
+        cb();
 
     }
  };
