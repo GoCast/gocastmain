@@ -222,11 +222,6 @@ GoCastJS.StropheAttach.prototype = {
 //        this.log('StropheAttach: Received PING - Sending pong...');
         if (this.connection) {
             this.connection.send(pong);
-
-            // Periodically we get pinged (usually at a frequency of 30 seconds)
-            // When we are pinged, the rid changes...so store it in case we have a failure
-            // that doesn't manage to trigger the on-unload which also saves login info.
-            this.saveLoginInfo();
         }
 
         return true;
@@ -466,7 +461,7 @@ GoCastJS.StropheAttach.prototype = {
                 unsubTimer = null;
             }
 
-            if (self.public_room_node && (self.subCallback || localStorage.forceSubscribe)) {
+            if (self.isConnected && self.public_room_node && (self.subCallback || localStorage.forceSubscribe)) {
                 console.error('Subscribing to: ' + self.public_room_node);
                 self.connection.pubsub.subscribe(
                     self.public_room_node,

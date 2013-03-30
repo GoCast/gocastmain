@@ -19,8 +19,6 @@ var DashView = {
 
         if ($.urlvars.action && 'resetpassword' === $.urlvars.action) {
             this.displayform('resetpwd-form');
-        } else {
-            this.displayform('login-form');
         }
 
         if ($.urlvars.config || (localStorage && localStorage.gcpConfig)) {
@@ -172,7 +170,7 @@ var DashView = {
         this.setupPlaceholders(id);
 
         if ('changepwd-form' === id) {
-            $('#input-email', this.$forms[id]).val(DashApp.boshconn.getEmailFromJid());
+            $('#input-email', this.$forms[id]).val(DashApp.email);
         } else if ('login-form' === id) {
             if ($.urlvars.ecode) {
                 email = $.roomcode.decipheruname($.urlvars.ecode);
@@ -327,11 +325,11 @@ var DashView = {
                 $(this).popover('show').button('toggle').attr('popped', 'popped');
             }
         }).each(function() {
-            var rcode = $.roomcode.cipher(DashApp.boshconn.getEmailFromJid(), $(this).attr('roomname')),
+            var rcode = $.roomcode.cipher(DashApp.email, $(this).attr('roomname')),
                 _title = 'Link for ' + $(this).attr('roomname');
             $(this).popover({
                 title: _title,
-                content: linkpopoverhtml.replace(/\{\{link\}\}/, $.roomcode.roomurl(DashApp.boshconn.getEmailFromJid(),
+                content: linkpopoverhtml.replace(/\{\{link\}\}/, $.roomcode.roomurl(DashApp.email,
                                                                                     DashApp.fullname, $(this).attr('roomname')))
                                         .replace(/\{\{width\}\}/, (rcode.length*6).toString()),
                 placement: 'left',
@@ -354,7 +352,7 @@ var DashView = {
 
             $('.areyousure .btn-danger', $(this).parent()).click(function(e) {
                 var evt = e || window.event, _roomname = $(this).attr('roomname'),
-                _self = this, _email = DashApp.boshconn.getEmailFromJid();
+                _self = this, _email = DashApp.email;
 
                 evt.preventDefault();
                 $.ajax({
@@ -526,10 +524,35 @@ var DashApp = {
         'login-form': {
             success: function() {
                 return function(response) {
+                    var errmsg = '';
+
+                    DashView.cancelloader('login-form');
+                    if ('success' === response.result) {
+                        DashApp.email = response.data.email;
+                        DashApp.fullname = response.data.name || DashApp.email;
+                        DashApp.boshconn.attach({
+                            rid: response.data.rid,
+                            jid: response.data.jid,
+                            sid: response.data.sid
+                        });
+                    } else {
+                        if ('xmppprob' === response.result) {
+                            errmsg = 'There was a problem connecting to the chat server.'
+                        } else if ('noaccount' === response.result) {
+                            errmsg = 'No account exists for this email: ' + response.result.email;
+                        } else if ('authfail' === response.result) {
+                            errmsg = 'Wrong email or password.'
+                        } else {
+                            errmsg = 'There was a problem logging in.';
+                        }
+                        DashView.displayalert('login-form', 'error', errmsg);
+                    }
                 };
             },
             failure: function() {
                 return function(error) {
+                    DashView.cancelloader('login-form');
+                    DashView.displayalert('login-form', 'error', 'There was a problem contacting the server.');
                 };
             },
             beforesubmit: function() {
@@ -540,15 +563,9 @@ var DashApp = {
                     if (1 < email.split(' ').length || -1 === email.indexOf('@')) {
                         DashView.displayalert('login-form', 'error', 'Please enter a valid email address.');
                         $('#input-email', $form).focus();
-                    } else {
-                        DashApp.boshconn.connect({
-                            username: $('#input-email', $form).val(),
-                            password: $('#input-password', $form).val()
-                        });
-                        DashView.showloader('login-form');
+                        return false;
                     }
-
-                    return false;
+                    DashView.showloader('login-form');
                 };
             }
         },
@@ -592,7 +609,7 @@ var DashApp = {
 
                     DashView.cancelloader('startmeeting-form');
                     if('success' === response.result) {
-                        window.location.href = $.roomcode.roomurl(DashApp.boshconn.getEmailFromJid(),
+                        window.location.href = $.roomcode.roomurl(DashApp.email,
                                                                   DashApp.fullname, roomname);
                     } else {
                         DashView.displayalert('startmeeting-form', 'error', 'There was an error while creating your ' +
@@ -611,7 +628,7 @@ var DashApp = {
                     DashView.showloader('startmeeting-form');
                 };
             },
-            data: function() { return {email: DashApp.boshconn.getEmailFromJid()}; }
+            data: function() { return {email: DashApp.email}; }
         },
         'reqresetpwd-form': {
             success: function() {
@@ -744,7 +761,7 @@ var DashApp = {
                         when: (new Date($('#input-date', DashApp.$forms['schedulemeeting-form']).val() + ' ' +
                                         $('#input-time', DashApp.$forms['schedulemeeting-form']).val() + ' ' +
                                         $('#ampm', DashApp.$forms['schedulemeeting-form']).val())).toString(),
-                        fromemail: DashApp.boshconn.getEmailFromJid()
+                        fromemail: DashApp.email
                     }, genEmailArray = function (str, cb) {
                         var arr = [];
                         str.split(',').forEach(function(commas) {
@@ -765,7 +782,7 @@ var DashApp = {
                     });
                 }
                 if (roomname) {
-                    extradata.link = $.roomcode.roomurl(DashApp.boshconn.getEmailFromJid(),
+                    extradata.link = $.roomcode.roomurl(DashApp.email,
                                                         DashApp.fullname, roomname);
                 }
 
@@ -812,21 +829,14 @@ var DashApp = {
         this.setupForm('login-form');
         this.setupForm('reqresetpwd-form');
         this.setupForm('resetpwd-form');
-        this.boshconn = new GoCastJS.StropheConnection({
+        this.boshconn = new GoCastJS.StropheAttach({
             boshurl: '/xmpp-httpbind',
             xmppserver: this.settings.get('CALLCAST_XMPPSERVER'),
-            anon_username: this.settings.get('ANON_USERNAME'),
-            anon_password: this.settings.get('ANON_PASSWORD'),
             public_room_node: this.settings.get('CALLCAST_ROOMS') + '/public',
             statusCallback: this.boshconnstatusCallback()
         });
 
         this.boshconn.subscribePublicRooms(function(data) {
-/*            console.log('Subscribe-Callback-Dashboard: data length: ' + data.length);
-            for (i = 0 ; i < data.length ; i += 1) {
-                console.log('Subscribe-Callback-Dashboard item room: ' + ($(data[i]).attr('room') || '') + ', owner: ' + ($(data[i]).attr('owner') || '') + ', numparticipants: ' + ($(data[i]).attr('numparticipants') || ''));
-            }
-            */
             DashView.displayRoomsAccordion(data, {
                 title: 'Public Rooms',
                 container: $('#publicrooms'),
@@ -842,33 +852,41 @@ var DashApp = {
                                   'You can now login with your new account.');
         }
 
-        if ('resetpassword' !== $.urlvars.action && this.boshconn.hasSavedRegisteredLoginInfo()) {
-            this.boshconn.autoConnect();
-            DashView.showloader('login-form');
+        if ('resetpassword' !== $.urlvars.action) {
+            this.autoLogin();
         }
     },
     //RMW use queryName in index.js for finding the user's name to auto-populate nickname.
     queryName: function(gotName) {
-        var succCb = gotName || function(name) {},
-            _email = this.boshconn.getEmailFromJid(),
-            self = this;
-
+        var succCb = gotName || function(name) {};
+        succCb(DashApp.fullname);
+    },
+    autoLogin: function() {
+        var self = this;
+        
         $.ajax({
-            url: '/acct/getprofile/',
+            url: '/acct/login/',
             type: 'POST',
             dataType: 'json',
-            data: { email: _email },
+            data: {},
             success: function(response) {
                 if ('success' === response.result) {
-                    self.fullname = response.data.name || _email;
-                    succCb(response.data.name || _email);
+                    self.email = response.data.email;
+                    self.fullname = response.data.name || self.email;
+                    self.boshconn.attach({
+                        rid: response.data.rid,
+                        jid: response.data.jid,
+                        sid: response.data.sid
+                    });
+                } else {
+                    DashView.displayform('login-form');
                 }
             }
         });
     },
     queryRoomList: function(gotList) {
         var cb = gotList || function(roomlist) {},
-            _email = this.boshconn.getEmailFromJid();
+            _email = this.email;
 
         $.ajax({
             url: '/acct/listrooms/',
@@ -885,7 +903,7 @@ var DashApp = {
     },
     queryRecentRoomList: function(gotList) {
         var cb = gotList || function(roomlist) {},
-            _email = this.boshconn.getEmailFromJid();
+            _email = this.email;
 
         $.ajax({
             url: '/acct/listrecentrooms/',
@@ -906,8 +924,8 @@ var DashApp = {
         return function(status) {
             if (Strophe.Status.CONNECTED === status ||
                 Strophe.Status.ATTACHED === status) {
-                if (typeof (Storage) !== 'undefined' && !DashApp.boshconn.isAnonymous()) {
-                    localStorage.gocastusername = DashApp.boshconn.getEmailFromJid();
+                if (typeof (Storage) !== 'undefined' && DashApp.email) {
+                    localStorage.gocastusername = DashApp.email;
                 }
                 self.setupForm('startmeeting-form');
                 self.setupForm('changepwd-form');
@@ -933,20 +951,13 @@ var DashApp = {
                 });
 
             } else if (Strophe.Status.DISCONNECTED === status ||
-                       Strophe.Status.TERMINATED === status) {
-                DashView.cancelloader('login-form');
-                DashView.displayform('login-form');
+                       Strophe.Status.TERMINATED === status) {                
                 DashView.displayRoomsAccordion([], {
                     title: 'Recently Visited Rooms',
                     container: $('#visitedrooms'),
                     note: 'When you login, this list will show you where you have visited lately.'
                 });
                 $('body > .navbar .nav').removeClass('show');
-            } else if (Strophe.Status.AUTHFAIL === status) {
-                DashView.cancelloader('login-form');
-                DashView.displayform('login-form');
-                DashView.displayalert('login-form', 'error', 'Login failed. The email and/or password that you provided ' +
-                                      'is invalid.');
             } else if (Strophe.Status.CONNFAIL === status) {
                 DashView.cancelloader('login-form');
                 DashView.displayform('login-form');
@@ -959,13 +970,23 @@ var DashApp = {
 
         return function(e) {
             var evt = e || window.event;
-            self.boshconn.disconnect();
 
             if (evt.preventDefault) {
                 evt.preventDefault();
             } else {
                 evt.returnValue = false;
             }
+
+            self.boshconn.disconnect();
+            $.ajax({
+                url: '/acct/logout/',
+                type: 'POST',
+                dataType: 'json',
+                data: {},
+                success: function(response) {
+                    DashView.displayform('login-form');
+                }
+            });
         };
     }
 };
