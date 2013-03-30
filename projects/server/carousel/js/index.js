@@ -1937,7 +1937,7 @@ function onJoinNow(
       return false;
     }
 
-    if (Callcast.connection.bAnonymous) {
+    if (!Callcast.profileInfo.email) {
       if(!usrEmail.length || -1 === usrEmail.indexOf('@')) {
         $('#credentials2 > p.login-error').text('Please enter a valid email').
           fadeIn('fast');
@@ -1992,8 +1992,57 @@ function onJoinNow(
 function enterId(options)
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
+    var ajaxdata = {};
+
     app.log(2, 'enterId');
-    Callcast.connect(options);
+    if (!options.email && !options.password) {
+      ajaxdata.anon = 'true';
+    } else {
+      ajaxdata = {
+        email: options.email,
+        password: options.password
+      };
+    }
+
+    $.ajax({
+      url: '/acct/login/',
+      type: 'POST',
+      dataType: 'json',
+      data: ajaxdata,
+      success: function(response) {
+        var opts = {};
+        if ('success' === response.result) {
+          console.log('Login: success.');
+          opts.rid = response.data.rid;
+          opts.jid = response.data.jid;
+          opts.sid = response.data.sid;
+
+          if (response.data.email) {
+            opts.email = response.data.email;
+          }
+          if (response.data.name) {
+            opts.name = response.data.name;
+          }
+
+          Callcast.connect(opts);
+        } else {
+          var msg = '';
+
+          if ('xmppprob' === response.result) {
+            msg = 'Problem connecting to the chat server.';  
+          } else if ('authfail' === response.result) {
+            msg = 'Wrong email or password.';
+          } else if ('noaccount' === response.result) {
+            msg = 'No account exists for the given email address.';
+          }
+
+          showCredentialWin(msg);
+        }
+      },
+      failure: function(response) {
+        showCredentialWin('Problem logging in.');
+      }
+    });
 }
 
 function checkCredentials2() {
@@ -2027,18 +2076,11 @@ function checkCredentials2() {
     }
 
     $('#credentials2 #email').removeAttr('style');
-    if (!Callcast.connection.bAnonymous) {
+    if (Callcast.profileInfo.email) {
       $('#credentials2 #email').css({'display': 'none'});
     } else {
       $('#credentials2 #email').unbind('keypress').keypress(keyHandler);
     }
-    /*if ('undefined' !== typeof(Storage)) {
-      if (Callcast.connection.bAnonymous && window.localStorage.gcpReloadNickName) {
-        $('#name', '#credentials2').val(window.localStorage.gcpReloadNickName);
-        $('#btn', '#credentials2').click();
-        delete window.localStorage.gcpReloadNickName;
-      }
-    }*/
 } /* checkCredentials2() */
 
 function deferredCheckPlugin() {
@@ -2072,24 +2114,7 @@ function checkPlugin() {
 ///
 function checkCredentials(evt, msg)
 {
-  var keyHandler = function(event) {
-    if (event.altKey) {
-        return;
-    }
-    if (!event.ctrlKey) {
-      switch (event.which || event.keyCode) {
-        case 13:
-          app.log(2, 'Enter key pressed');
-          event.preventDefault();
-          enterId({username: document.getElementById('gcemail').value,
-                  password: document.getElementById('gcpassword').value});
-          break;
-      }
-    }
-  };
-
   app.log(2, 'checkCredentials');
-  //app.facebookInited = true;
 
   // this method is called on a fb status change
   // so do nothing if we're already logged in
@@ -2098,13 +2123,54 @@ function checkCredentials(evt, msg)
     return;
   }
 
-  // check if there's an error being displayed
-  //jqActive = $('.window.active#errorMsgPlugin');
-  //if (jqActive.length === 0)
-  //{
-    // check fb login status and prompt if not skipped and not logged in
- // RMW - Skipping facebook altogether Jan 18, 2013   if (!app.user.fbSkipped && !FB.getAuthResponse())
-//    {
+  $.ajax({
+    url: '/acct/login/',
+    type: 'POST',
+    dataType: 'json',
+    data: {},
+    success: function(response) {
+      var opts = {};
+      if ('success' === response.result) {
+        console.log('Autologin: success.');
+        opts.rid = response.data.rid;
+        opts.jid = response.data.jid;
+        opts.sid = response.data.sid;
+
+        if (response.data.email) {
+          opts.email = response.data.email;
+        }
+        if (response.data.name) {
+          opts.name = response.data.name;
+        }
+
+        Callcast.connect(opts);
+      } else {
+        showCredentialWin();
+      }
+    },
+    failure: function(response) {
+      showCredentialWin();
+    }
+  });
+} /* checkCredentials() */
+
+function showCredentialWin(msg) {
+    var keyHandler = function(event) {
+      if (event.altKey) {
+          return;
+      }
+      if (!event.ctrlKey) {
+        switch (event.which || event.keyCode) {
+          case 13:
+            app.log(2, 'Enter key pressed');
+            event.preventDefault();
+            enterId({email: document.getElementById('gcemail').value,
+                    password: document.getElementById('gcpassword').value});
+            break;
+        }
+      }
+    };
+
     closeWindow();
     openWindow('#credentials');
     $('#credentials > input').unbind('keypress').keypress(keyHandler);
@@ -2116,21 +2182,7 @@ function checkCredentials(evt, msg)
       $('#credentials > #gcemail').focus();
     }
     $('#credentials > #msg').text(msg||'');
-      /*if ('undefined' !== typeof(Storage)) {
-        if (Callcast.connection.bAnonymous && window.localStorage.gcpReloadNickName) {
-          $('#noThanks', '#credentials').click();
-        }
-      }*/
-//    }
-/*    else // fb logged in update fb logged in status
-    {
-      closeWindow();
-      app.userLoggedIn = true;
-      $(document).trigger('one-login-complete', 'checkCredentials - FB Login');
-    }
-    */
-  //}
-} /* checkCredentials() */
+}
 
 //
 // If there is a specific room listed in the URL, then create/join that room.
@@ -2304,13 +2356,8 @@ function tryPluginInstall(
 
         $('#warningMsg > button#ok').unbind('click').click(function() {
           closeWindow();
-          //handleRoomSetup();
           $(document).trigger('checkCredentials');
           $(this).unbind('click').click(closeWindow);
-
-          if (Callcast.connection.hasSavedLoginInfo()) {
-            Callcast.connect();
-          }
         });
       } else {
         // show plugin load warning and take them to the alternate webpage.
@@ -2337,10 +2384,6 @@ function tryPluginInstall(
     // Resize window.
     $(document).trigger('checkCredentials');
     $(window).resize(resizeWindows);
-
-    if (Callcast.connection.hasSavedLoginInfo()) {
-      Callcast.connect();
-    }
   }
   else { // plugin not loaded or out of date
     // prompt user to install plugin
@@ -2685,9 +2728,6 @@ $(document).ready(function(
           $(document).trigger('checkPlugin');
         }
       }, 10000);
-
-      // Login to xmpp anonymously
-      //Callcast.connect();
 
       // Write greeting into console.
       app.log(2, 'Page loaded.');
@@ -3287,8 +3327,7 @@ function fbEvent() {
 
 function leaveGoCast() {
   Callcast.LeaveSession(function() {
-    if (Callcast.connection.bAnonymous) {
-      forgetXmppConnection = function() { Callcast.connection.forgetReconnectInfo(); };
+    if (!Callcast.profileInfo.email) {
       if (document.referrer && /myroom\.html/.test(document.referrer)) {
         window.location.href = document.referrer;
       } else {
@@ -3303,9 +3342,9 @@ function leaveGoCast() {
 var forgetXmppConnection = function() {};
 
 function emailInviteDialog(e) {
-  if (Callcast.connection.bAnonymous) {
+  if (!Callcast.profileInfo.email) {
     openCopyData(e, 'Feature not available', 'You have to be a registered GoCast user to use this feature.', true);
-  } else if ($.roomcode.decipheruname($.urlvars.g || $.urlvars.roomname) !== Callcast.connection.getEmailFromJid()) {
+  } else if ($.roomcode.decipheruname($.urlvars.g || $.urlvars.roomname) !== Callcast.profileInfo.email) {
     openCopyData(e, 'Feature not available', 'Unfortunately, you can\'t invite others to this room as ' +
                                              'you are not its owner.');
   } else {
@@ -3409,7 +3448,7 @@ GoCastJS.EmailInvite = {
             link: $('#roomlink', $dlg).text(),
             when: starttime,
             toemailarray: JSON.stringify(self.invitelist),
-            fromemail: Callcast.connection.getEmailFromJid()
+            fromemail: Callcast.profileInfo.email
         };
 
         if ($('#details', $dlg).val()) {

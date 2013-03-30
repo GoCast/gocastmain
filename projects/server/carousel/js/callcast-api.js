@@ -385,18 +385,6 @@ $(document).on('connected', function(
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
   app.log(2, 'User is connected.');
-
-  /* debug
-  // Inside $(document).bind('connected'), function() { ....
-
-  Callcast.connection.debugXML();
-
-   */
-
-  /*
-   * Open waiting room in case it takes too long to join. */
-  //openWindow('#waitingToJoin');
-
   app.xmppLoggedIn = true;
   checkCredentials2();
 
@@ -408,7 +396,6 @@ $(document).on('connected', function(
 }); /* connected() */
 
 $(document).on('one-login-complete', function(event, msg) {
-
   if (msg) {
     app.log(2, 'one-login-complete: Msg: ' + msg);
   }
@@ -420,10 +407,7 @@ $(document).on('one-login-complete', function(event, msg) {
   {
     app.log(2, 'one-login-complete: opening meeting');
     handleRoomSetup();
-    //openMeeting();
-    //tryPluginInstall();
   }
-
 });
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
@@ -1354,11 +1338,7 @@ function pluginLoaded(
           clearTimeout(app.winTimeout);
           app.winTimeout = null;
           $(document).trigger('checkCredentials');
-          if (Callcast.connection.hasSavedLoginInfo()) {
-            Callcast.connect();
-          }
         }
-        //handleRoomSetup();
      }, function(message) {
         // Failure to initialize.
         app.log(4, 'Failed to initialize user media [' + message + ']');
