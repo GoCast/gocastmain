@@ -213,18 +213,20 @@ app.post('/newpurchasedaccount', function(req, res) {
     }
 
     if (req.body && !contains(validSellingAgents, req.body.selling_agent)) {
-        gcutil.log('accounts_service [/newpurchasedaccount][error]: Selling agent was not valid: ', req.body.selling_agent);
-        res.send('{"result": "error"}');
+        gcutil.log('accounts_service [/newpurchasedaccount][error]: Selling agent was not valid: ', req.body);
+        res.send('{"result": "invalid selling_agent"}');
         return;
     }
 
-    if (req.body && req.body.baseurl && req.body.email && req.body.name) {
+    if (req.body && req.body.baseurl && req.body.email && req.body.name && req.body.package_name &&
+            req.body.end_subscription_date && req.body.max_rooms_allowed && req.body.selling_agent) {
         gcutil.log('accounts_service [/newpurchasedaccount][info]: FormData = ', req.body);
         // Formulate extras from pre-expectation fields.
         extras = {
             package_name: req.body.package_name,
             end_subscription_date: req.body.end_subscription_date,
-            max_rooms_allowed: req.body.max_rooms_allowed
+            max_rooms_allowed: req.body.max_rooms_allowed,
+            selling_agent: req.body.selling_agent
         };
 
         // Create account with password which is simply the current time.
@@ -252,6 +254,15 @@ app.post('/newpurchasedaccount', function(req, res) {
         }
         else if (!req.body.email) {
             res.send('{"result": "no email"}');
+        }
+        else if (!req.body.package_name) {
+            res.send('{"result": "no package_name"}');
+        }
+        else if (!req.body.end_subscription_date) {
+            res.send('{"result": "no end_subscription_date"}');
+        }
+        else if (!req.body.max_rooms_allowed) {
+            res.send('{"result": "no max_rooms_allowed"}');
         }
         else {
             res.send('{"result": "error"}');
@@ -700,7 +711,7 @@ app.post('/login', function(req, res) {
                     if (req.session.anon) {
                         delete req.session.anon;
                     }
-                    
+
                     res.send(JSON.stringify(xs));
                 } else {
                     res.send(JSON.stringify(ret));
