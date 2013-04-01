@@ -177,8 +177,8 @@ function privateGenPasswordResetEmail(baseURL, email, name, resetcode) {
             '&email=' + email.toLowerCase();
 
     body += '\n\n';
-    body += 'Once you have reset your password, you can always come to your dashboard at: ' +
-                baseURL.substring(0, baseURL.lastIndexOf('/') + 1);
+    body += 'Once you have reset your password, you can always come to your dashboard at: ' + baseURL;
+
     body += '\n\n';
     body += 'Thanks for using GoCast - we hope you enjoy the service.\n\n';
 
@@ -206,7 +206,7 @@ function privateGenPasswordSetEmail(baseURL, email, name, resetcode) {
             '&email=' + email.toLowerCase();
 
     body += '\n\n';
-    body += 'Once you are all set, you can always come to your dashboard at: ' + baseURL.substring(0, baseURL.lastIndexOf('/') + 1);
+    body += 'Once you are all set, you can always come to your dashboard at: ' + baseURL;
     body += '\n\n';
     body += 'Thanks for signing up with GoCast - we hope you enjoy the service.\n\n';
 
