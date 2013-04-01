@@ -273,11 +273,9 @@ var RegisterApp = {
 
         this.settings = new GoCastJS.CallcastSettings(window.location.hostname);
 
-        this.boshconn = new GoCastJS.StropheConnection({
+        this.boshconn = new GoCastJS.StropheAttach({
             boshurl: '/xmpp-httpbind',
             xmppserver: this.settings.get('CALLCAST_XMPPSERVER'),
-            anon_username: this.settings.get('ANON_USERNAME'),
-            anon_password: this.settings.get('ANON_PASSWORD'),
             public_room_node: this.settings.get('CALLCAST_ROOMS') + '/public',
             statusCallback: this.boshconnstatusCallback()
         });
@@ -287,9 +285,7 @@ var RegisterApp = {
         // upon unload if it's anonymous.
         //
         $(window).on('beforeunload', function() {
-            if (self.boshconn && self.boshconn.isAnonymous()) {
-                self.boshconn.forgetReconnectInfo();
-                self.boshconn.forgetReconnectInfoInLocalStorage();
+            if (self.boshconn) {
                 self.boshconn.disconnect();
             }
         });
@@ -298,18 +294,13 @@ var RegisterApp = {
         if (!$.urlvars.utm_source || 'coursera' !== $.urlvars.utm_source.toLowerCase()) {
             $('#courseraclassesdiv').css('display', 'none');
             this.boshconn.subscribePublicRooms(function(data) {
-    /*            console.log('Subscribe-Callback-Dashboard: data length: ' + data.length);
-                for (i = 0 ; i < data.length ; i += 1) {
-                    console.log('Subscribe-Callback-Dashboard item room: ' + ($(data[i]).attr('room') || '') + ', owner: ' + ($(data[i]).attr('owner') || '') + ', numparticipants: ' + ($(data[i]).attr('numparticipants') || ''));
-                }
-                */
                 $('#publicroomsdiv publicrooms-form').addClass('show');
                 RegisterView.displayPublicRooms(data, $('#publicrooms'));
             });
         }
 
-        // Regardless of remembered or anonymous - we need a strophe connection for subscriptions to public rooms.
-        this.boshconn.autoConnect();
+        // login as anonymous to get anonymous xmpp connection.
+        this.anonlogin();
 
         for (i=0; i<document.forms.length; i++) {
             options = {
@@ -368,6 +359,25 @@ var RegisterApp = {
             $('#input-activation-code', this.$forms['activate-form']).val(urlvars.code);
             $('[type="submit"].btn', this.$forms['activate-form']).click();
         }
+    },
+    anonlogin: function() {
+        var self = this;
+        
+        $.ajax({
+            url: '/acct/login/',
+            type: 'POST',
+            dataType: 'json',
+            data: {anon: 'true'},
+            success: function(response) {
+                if ('success' === response.result) {
+                    self.boshconn.attach({
+                        rid: response.data.rid,
+                        jid: response.data.jid,
+                        sid: response.data.sid
+                    });
+                }
+            }
+        });
     },
     boshconnstatusCallback: function() {
         return function(status) {

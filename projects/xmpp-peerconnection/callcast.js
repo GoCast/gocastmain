@@ -295,9 +295,6 @@ var Callcast = {
 
             if (this.connection.connection)
             {
-                // Save rid/jid/sid inside the connection.
-                this.connection.saveLoginInfo();
-
                 sessionStorage.setItem('room', this.room);
                 sessionStorage.setItem('nick', this.nick);
                 sessionStorage.setItem('bUseVideo', this.bUseVideo);
@@ -1360,10 +1357,10 @@ var Callcast = {
 
     log: function(arg1, arg2, arg3, arg4, arg5) {
         if (logQ) {
-            logQ.log.apply(logQ, GoCastJS.logDate(), arg1 || '', arg2 || '', arg3 || '', arg4 || '', arg5 || '');
+            logQ.log.apply(logQ, [GoCastJS.logDate(), arg1 || '', arg2 || '', arg3 || '', arg4 || '', arg5 || '']);
         }
 
-        console.log.apply(console, GoCastJS.logDate(), arg1 || '', arg2 || '', arg3 || '', arg4 || '', arg5 || '');
+        console.log.apply(console, [GoCastJS.logDate(), arg1 || '', arg2 || '', arg3 || '', arg4 || '', arg5 || '']);
     },
 
     PluginLogCallback: function(entries) {

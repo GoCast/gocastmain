@@ -95,7 +95,10 @@ parseUri.options = {
 
 app.use(express.bodyParser());
 app.use(express.cookieParser(settings.accounts.cookieSecret));
-app.use(express.cookieSession({ key: 'gcsession', secret: settings.accounts.cookieSecret,  cookie: { maxAge: maxCookieAge } }));
+
+// specifying secret in cookieSession results in the cookie contents not being stored in req.session
+// so do not specify the secret... express will obtain it from the 'req' object.
+app.use(express.cookieSession({key: 'gcsession', cookie: {maxAge: maxCookieAge}}));
 
 // -------------- ACCT SERVICE REQUEST HANDLERS --------------
 
@@ -651,29 +654,11 @@ app.post('/inviteviaemail', function(req, res) {
     }
 });
 
-app.post('/cookietest', function(req, res) {
-    if (req.signedCookies.gcsession) {
-        console.log('Inbound cookie: ', req.signedCookies.gcsession);
-        console.log('Killing cookie.');
-        req.session = null;
-    }
-    else {
-        req.session.now = new Date().toString();
-        console.log('Creating cookie.');
-    }
-
-    res.send('{"result": "success"}');
-});
-
-// Functions to be implemented:
-// 1. api.login() -- accounts_api.js
-// 2. privateGenRandomSessionId() -- accounts_api.js
-
 app.post('/login', function(req, res) {
-    if (req.signedCookies.gcsession && req.signedCookies.gcsession.sid) {
-        console.log('INSID: ', req.signedCookies.gcsession.sid);
+    console.log('COOKIESESSION: ', req.session);
+    if (req.session.sid) {
         api.Login({
-            sid: req.signedCookies.gcsession.sid,
+            sid: req.session.sid,
             callback: function(ret) {
                 var xs = {};
                 if ('success' === ret.result) {
@@ -687,8 +672,6 @@ app.post('/login', function(req, res) {
                             name: ret.name
                         }
                     };
-                    console.log('OUTSID: ', ret.gsid);
-                    req.session.sid = ret.gsid;
                     res.send(JSON.stringify(xs));
                 } else {
                     res.send(JSON.stringify(ret));
@@ -712,8 +695,12 @@ app.post('/login', function(req, res) {
                             name: ret.name
                         }
                     };
-                    console.log('OUTSID: ', ret.gsid);
+
                     req.session.sid = ret.gsid;
+                    if (req.session.anon) {
+                        delete req.session.anon;
+                    }
+                    
                     res.send(JSON.stringify(xs));
                 } else {
                     res.send(JSON.stringify(ret));
@@ -756,9 +743,9 @@ app.post('/login', function(req, res) {
 });
 
 app.post('/logout', function(req, res) {
-    if (req.signedCookies.gcsession && req.signedCookies.gcsession.sid) {
+    if (req.session.sid) {
         api.Logout({
-            sid: req.signedCookies.gcsession.sid,
+            sid: req.session.sid,
             callback: function(ret) {
                 req.session = null;
                 res.send(JSON.stringify(ret));
@@ -771,9 +758,10 @@ app.post('/logout', function(req, res) {
 });
 
 app.post('/reqxmppconn', function(req, res) {
-    if (req.signedCookies.gcsession && req.signedCookies.gcsession.sid) {
+    console.log('COOKIESESSION: ', req.session);
+    if (req.session.sid) {
         api.ReqXmppConn({
-            sid: req.signedCookies.gcsession.sid,
+            sid: req.session.sid,
             callback: function(ret) {
                 var xs = {};
                 if ('success' === ret.result) {
@@ -785,14 +773,13 @@ app.post('/reqxmppconn', function(req, res) {
                             sid: ret.sid
                         }
                     };
-                    req.session.sid = ret.gsid;
                     res.send(JSON.stringify(xs));
                 } else {
                     res.send(JSON.stringify(ret));
                 }
             }
         });
-    } else if (req.signedCookies.gcsession && req.signedCookies.gcsession.anon) {
+    } else if (req.session.anon) {
         api.ReqXmppConn({
             anon: true,
             callback: function(ret) {
@@ -806,7 +793,6 @@ app.post('/reqxmppconn', function(req, res) {
                             sid: ret.sid
                         }
                     };
-                    req.session.anon = 'true';
                     res.send(JSON.stringify(xs));
                 } else {
                     res.send(JSON.stringify(ret));
