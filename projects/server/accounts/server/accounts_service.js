@@ -212,7 +212,7 @@ app.post('/newpurchasedaccount', function(req, res) {
         gcutil.log('accounts_service [/newpurchasedaccount][error]: No referer and no baseurl passed. req.body is: ', req.body);
     }
 
-    if (req.body && !contains(validSellingAgents, req.body.selling_agent)) {
+    if (req.body && req.body.selling_agent && !contains(validSellingAgents, req.body.selling_agent.toLowerCase())) {
         gcutil.log('accounts_service [/newpurchasedaccount][error]: Selling agent was not valid: ', req.body);
         res.send('{"result": "invalid selling_agent"}');
         return;
@@ -257,6 +257,9 @@ app.post('/newpurchasedaccount', function(req, res) {
         }
         else if (!req.body.package_name) {
             res.send('{"result": "no package_name"}');
+        }
+        else if (!req.body.selling_agent) {
+            res.send('{"result": "no selling_agent"}');
         }
         else if (!req.body.end_subscription_date) {
             res.send('{"result": "no end_subscription_date"}');
