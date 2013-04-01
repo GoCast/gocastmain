@@ -53,9 +53,11 @@ var memdb = require('./accounts_memdb').memdb;
 var boshxmpp = require('./accounts_loginXmpp').BoshXmppManager;
 
 var bodyFromDisk = null;
+/*jslint newcap: true */
 var mdbSessions = new memdb('./dbsessions.json');
 var mdbHpwds = new memdb();
 var boshmgr = new boshxmpp();
+/*jslint newcap: false */
 
 'use strict';
 
@@ -182,6 +184,33 @@ function privateGenPasswordResetEmail(baseURL, email, name, resetcode) {
 
     body += 'The GoCast Team.\n\n';
     body += 'This email was generated in direct response to a password reset request on the GoCast site. But you can unsubscribe from any and all further emails at any time.\n';
+
+    return body;
+}
+
+function privateGenPasswordSetEmail(baseURL, email, name, resetcode) {
+    var body;
+
+    if (name && name !== '') {
+        body = 'Welcome, ' + name + ',';
+    }
+    else {
+        body = 'Welcome ';
+    }
+
+    body += ' to GoCast. Thanks for signing up. In order to login the first time, ' +
+            'we need your help in setting a password for your new account.';
+
+    body += '\n\nYour account password setup link is: ' + baseURL + '?action=resetpassword' +
+            '&resetcode=' + resetcode +
+            '&email=' + email.toLowerCase();
+
+    body += '\n\n';
+    body += 'Once you are all set, you can always come to your dashboard at: ' + baseURL.substring(0, baseURL.lastIndexOf('/') + 1);
+    body += '\n\n';
+    body += 'Thanks for signing up with GoCast - we hope you enjoy the service.\n\n';
+
+    body += 'Thanks!\nThe GoCast Team.\n';
 
     return body;
 }
@@ -387,7 +416,7 @@ function privateHashPassword(password) {
 
 function privateGenRandomSessionId() {
     var bytes = crypto.randomBytes(32), id = '', i;
-    for (i=0; i<bytes.length; i++) {
+    for (i=0; i<bytes.length; i += 1) {
         id = id + bytes[i].toString(16);
     }
     return id;
@@ -469,6 +498,77 @@ function apiNewAccount(baseURL, email, password, name, firstRoomName, extras, su
             });
         }, function() {
             failure('apiNewAccount: Failed to add account to xmpp server.');
+        });
+    });
+}
+
+function apiNewPaidAccount(baseURL, email, password, name, firstRoomName, extras, success, failure) {
+    var hpass = privateHashPassword(password),
+        passx = privateHashPassword(hpass);
+
+    // Check if account with this email exists
+    db.EntryExists(email, function(obj) {
+        if (obj.validated) {
+            failure('apiNewPaidAccount: Failed - account already in use.');
+        }
+        else {
+            failure('apiNewPaidAccount: Failed - account registered but not activated.');
+        }
+    }, function() {
+        // Doesn't exist, so add account
+        console.log('apiNewPaidAccount: ', {email: email, passx: passx});
+        xmpp.AddAccount(email, passx, name, function() {
+            // Added account, now generate activation code
+            // Note - account is disabled upon creation until activation is complete.
+            var obj;
+
+            obj = extras || {};   // Starting point.
+
+            obj.validationCode = 'Purchased';
+            obj.password = hpass;
+            if (name) {
+                obj.name = name;
+            }
+
+            if (firstRoomName) {
+                obj.firstRoomName = firstRoomName;
+            }
+
+            //Now, add non-pending, fully activated db entry for this email
+            db.AddEntry(email, obj, function() {
+                // Now that the entry is added, we need to validate it - then send a password-set-email.
+                xmpp.EnableAccount(email, function() {
+                    db.ActivateEntry(email, function() {
+                        var resetcode, emailBody;
+                        // Now we're all set to send a password set email to the new user.
+                        resetcode = privateCalcResetPasswordCode(new Date(), email);
+                        emailBody = privateGenPasswordSetEmail(baseURL, email, name, resetcode);
+
+                        privateSendEmail(name, email, 'Setup your new GoCast account password', emailBody, function() {
+                            gcutil.log('apiNewPaidAccount: SUCCESS - for: ' + email);
+                            success();
+                        }, function(err) {
+                            gcutil.log('apiNewPaidAccount: Email send failure.');
+                            failure('apiNewPaidAccount: Email send failure.');
+                        });
+                    }, function() {
+                        gcutil.log('apiNewPaidAccount: ERROR: Activation of newly purchased account failed.');
+                        failure('apiNewPaidAccount: ERROR: Activation of newly purchased account failed.');
+                    });
+                }, function() {
+                    gcutil.log('apiNewPaidAccount: ERROR: XMPP account could not be enabled.');
+                    failure('apiNewPaidAccount: ERROR: XMPP account could not be enabled.');
+                });
+            }, function() {
+                gcutil.log('apiNewPaidAccount: Failed to Add validation entry in database. Removing pending account.');
+                xmpp.DeleteAccount(email, function() {
+                    failure('apiNewPaidAccount: Failed to Add validation entry in database. Removed pending account.');
+                }, function() {
+                    failure('apiNewPaidAccount: Double-failure. Failed to Add validation entry in database & failed removing pending account also.');
+                });
+            });
+        }, function() {
+            failure('apiNewPaidAccount: Failed to add account to xmpp server.');
         });
     });
 }
@@ -889,7 +989,7 @@ function apiLogin(args) {
                     result: 'success',
                     rid: xs.rid,
                     jid: xs.jid,
-                    sid: xs.sid,
+                    sid: xs.sid
                 };
                 args.callback(res);
             }
@@ -920,7 +1020,7 @@ function apiLogout(args) {
 }
 
 function apiReqXmppConn(args) {
-    var sess, sessp;
+    var sess, sessp, res;
 
     if (args.sid) {
         sess = mdbSessions.getentry(args.sid);
@@ -955,7 +1055,7 @@ function apiReqXmppConn(args) {
                     result: 'success',
                     rid: xs.rid,
                     jid: xs.jid,
-                    sid: xs.sid,
+                    sid: xs.sid
                 };
                 args.callback(res);
             }
@@ -985,6 +1085,7 @@ apiValidateAccount('rwolff@gocast.it', '85e25a1fea7b001911f791f13180f252', funct
 */
 
 exports.NewAccount = apiNewAccount;
+exports.NewPaidAccount = apiNewPaidAccount;
 exports.GetAccount = apiGetAccount;
 exports.ValidateAccount = apiValidateAccount;
 exports.DeleteAccount = apiDeleteAccount;
