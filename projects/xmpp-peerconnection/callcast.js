@@ -2377,7 +2377,7 @@ var Callcast = {
 //
     CreateUnlistedAndJoin: function(roomname, cb, cbError) {
         var roommanager = this.ROOMMANAGER,
-            self = this, attrs;
+            self = this, attrs, nick, oldjids;
 
         Callcast.log('CreateUnlistedAndJoin: Creating name: ' + roomname);
         if (!this.connection) {
@@ -2395,11 +2395,16 @@ var Callcast = {
             attrs.maxparticipants = $.getUrlVar('maxparticipants');
         }
 
-        //
+        nick = this.NoSpaces((localStorage && localStorage.oldnick) ? localStorage.oldnick : this.nick);
+        oldjids = JSON.stringify(this.GetOldJids() ? this.GetOldJids() : []);
         this.connection.sendIQ($iq({
             to: roommanager,
             id: 'roomcreate1',
-            type: 'set' }).c('room', attrs),
+            type: 'set' }).c('room', attrs).up()
+                          .c('subjidfornickname', {
+                                xmlns: this.NS_CALLCAST,
+                                room: roomname,
+                                nick: nick, oldjids: oldjids}),
 
         // Successful callback...
             function(iq) {
@@ -2411,6 +2416,7 @@ var Callcast = {
 
                     console.log('DEBUG: roomcreate1 success. Local roomname: ' + roomname);
                     console.log('DEBUG:    and IQ is: ', iq);
+                    self.ClearOldJids();
 
                     if (roomname === '') {
                         // Asked to create a random room - must retrieve name...
@@ -2464,7 +2470,7 @@ var Callcast = {
             roomname, nick;
 
         roomname = in_roomname.split('@')[0].toLowerCase();
-        nick = this.NoSpaces(in_nick);
+        nick = this.NoSpaces(localStorage.oldnick);
 
         ojo = this.GetOldJids();
         if (!ojo) {
@@ -2745,6 +2751,7 @@ var Callcast = {
                 localStorage.setItem('persist', JSON.stringify(persist));
             }
         }
+        delete localStorage.oldnick;
     },
 
     RememberCurrentJid: function() {
@@ -2779,6 +2786,7 @@ var Callcast = {
 
             // Now re-write out the final array regardless of change or initialization.
             persist.oldjids = ojids;
+            localStorage.setItem('oldnick', this.nick);
             localStorage.setItem('persist', JSON.stringify(persist));
         }
     },

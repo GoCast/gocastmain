@@ -854,7 +854,9 @@ MucRoom.prototype.handlePresence = function(pres) {
         self = this,
         k;
 
-//DEBUG    this.log(pres);
+    if (3 === pres.attrs.from.split('/').length) {
+        fromnick = fromnick + '/' + pres.attrs.from.split('/')[2];
+    }
 
     if (pres.getChild('x') && pres.getChild('x').getChild('item') && pres.getChild('x').getChild('item').attrs.jid) {
         fromjid = pres.getChild('x').getChild('item').attrs.jid.split('/')[0];
@@ -942,13 +944,10 @@ MucRoom.prototype.handlePresence = function(pres) {
 
                 return;
             }
-            this.SendGroupChat(fromnick + ' has entered.');
+            this.SendGroupChat(fromnick.split('/')[0] + ' has entered.');
             this.log('Adding: ' + fromjid + ' as Nickname: ' + decodeURI(fromnick));
             this.SendSpotListTo(pres.attrs.from);
         }
-//        else {
-//            this.log('Updated Presence: ' + fromjid + ' as Nickname: ' + decodeURI(fromnick));
-//        }
 
         this.participants[fromnick] = { name: fromjid || fromnick };
 
@@ -4053,6 +4052,65 @@ Overseer.prototype.createErrorIQ = function(iq_in, reason_in, err_type_in) {
     return iq_out;
 };
 
+Overseer.prototype.KickOldJids = function(iq, cb) {
+    // Need to pull out the 'info' object - which is the attributes to the 'removespot'
+    var info = {},
+        ojids, i, len, mroom, targetjid,
+        bFound = false,
+        self = this;
+
+    cb = cb || function() {};
+    if (iq.getChild('subjidfornickname')) {
+        info = iq.getChild('subjidfornickname').attrs;
+    }
+
+    // Validate room and nickname are present/valid. And there are oldjids as well.
+    if (!info.room || !this.MucRoomObjects[info.room]) {
+        this.log('SubstituteJidForNickname: ERROR: Invalid room: ' + info.room);
+        cb();
+    }
+    else if (!info.nick || !this.MucRoomObjects[info.room].participants[info.nick]) {
+        this.log('SubstituteJidForNickname: ERROR: No nickname given or nickname not found: ' + info.nick, this.MucRoomObjects[info.room].participants);
+        cb();
+    }
+    else if (!info.oldjids) {
+        this.log('SubstituteJidForNickname: ERROR: No oldjids given.');
+        cb();
+    }
+    else {
+        // Now we need to iterate through the list of oldjids...
+        mroom = this.MucRoomObjects[info.room];
+        targetjid = mroom.participants[info.nick].name.split('/')[0];
+
+        this.log('Nickname found. Target JID is: ' + targetjid);
+        this.log('SubstituteJidForNickname: INFO: Raw-oldjids: ' + info.oldjids);
+        ojids = JSON.parse(info.oldjids);
+        console.log('SubstituteJidForNickname: INFO: oldjids: ', ojids);
+
+        len = ojids.length;
+        for (i = 0; i < len; i += 1) {
+            if (ojids[i].split('/')[0] === targetjid) {
+                bFound = true;
+                i = len;    // Skip the rest.
+            }
+        }
+
+        if (!bFound) {
+            // Never found a match of the nickname and the 'oldjids' list.
+            this.log('SubstituteJidForNickname: ERROR: oldjids did not match. No substitution.');
+            cb();
+        }
+        else {
+            this.log('SubstituteJidForNickname: Found match. Kicking out nick: ' + info.nick);
+            // Kick out the nickname so the substitution can take place.
+            mroom.kick(info.nick, function() {
+                self.log('SubstituteJidForNickname: Success. Substitution ready for completion by client.');
+                cb();
+            });
+        }
+    }
+};
+
 //
 // \brief Accepts a message which must have a room name, nickname which was in conflict, and
 //          a list of old jids - any one of which may be a ghost in the room.
@@ -4138,7 +4196,7 @@ Overseer.prototype.SubstituteJidForNickname = function(iq) {
 };
 
 Overseer.prototype.handleIq = function(iq) {
-    var iqid, callback;
+    var iqid, callback, self = this;
 
     if (!iq.attrs.from) {
         this.log('ERROR: ERRANT IQ: ' + iq);
@@ -4178,7 +4236,13 @@ Overseer.prototype.handleIq = function(iq) {
     {
         // -- Handle room create request --
         if (iq.getChild('room')) {
-            this.CreateRoomRequest(iq);
+            if (iq.getChild('subjidfornickname')) {
+                this.KickOldJids(iq, function() {
+                    self.CreateRoomRequest(iq);
+                });
+            } else {
+                this.CreateRoomRequest(iq);
+            }
         }
         else if (iq.getChild('subjidfornickname')) {
             this.SubstituteJidForNickname(iq);

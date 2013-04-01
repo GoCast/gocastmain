@@ -1129,6 +1129,7 @@ function openMeeting(
    * Initialize Gocast events. */
   $(window).on('beforeunload', function() {
     app.log(2, 'On before unload.');
+    localStorage.oldnick = Callcast.nick;
     app.removeAppStamp();
     Callcast.LeaveSession();
     forgetXmppConnection();
@@ -1995,7 +1996,7 @@ function enterId(options)
     var ajaxdata = {};
 
     app.log(2, 'enterId');
-    if (!options.email && !options.password) {
+    if (!options || (!options.email && !options.password)) {
       ajaxdata.anon = 'true';
     } else {
       ajaxdata = {
