@@ -14,6 +14,7 @@ function memdb(file, onread) {
     // member variables
     this.table = {};
     this.file = file;
+    this.writeTimeout = null;
     this.callbacks = {
         fileread: function() {
             return function(err, data) {
@@ -40,10 +41,11 @@ function memdb(file, onread) {
                 }
             };
         },
-        writetimeout: function(periodms) {
+        writetimeout: function() {
             return function() {
                 console.log('writetimeout[info]: Writing to file "' +
                             self.file + '"...');
+                self.writeTimeout = null;
                 fs.writeFile(self.file, JSON.stringify(self.table), function(err) {
                     if (err) {
                         throw err;
@@ -51,7 +53,6 @@ function memdb(file, onread) {
                         console.log('writetimeout[info]: Writing to file "' +
                                     self.file + '"... done.');
                     }
-                    self.periodicwritetofile(periodms);
                 });
             };
         }
@@ -59,7 +60,6 @@ function memdb(file, onread) {
 
     // actions
     this.readfromfile();
-    this.periodicwritetofile();
 }
 
 memdb.prototype.readfromfile = function() {
@@ -69,24 +69,26 @@ memdb.prototype.readfromfile = function() {
     }
 };
 
-memdb.prototype.periodicwritetofile = function(periodms) {
+memdb.prototype.deferredwritetofile = function() {
     var self = this;
     periodms = periodms || 60000; // default period: 1 min
 
-    if (this.file) {
-        setTimeout(this.callbacks['writetimeout'](periodms), periodms);
+    if (this.file && !this.writeTimeout) {
+        this.writeTimeout = setTimeout(this.callbacks['writetimeout'](periodms), periodms);
     }
 };
 
 memdb.prototype.addentry = function(key, entry) {
     if (entry) {
         this.table[key] = entry;
+        this.deferredwritetofile();
     }
 };
 
 memdb.prototype.rementry = function(key) {
     if (key) {
         delete this.table[key];
+        this.deferredwritetofile();
     }
 };
 
