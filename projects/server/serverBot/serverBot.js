@@ -1013,7 +1013,7 @@ MucRoom.prototype.handlePresence = function(pres) {
         }
         else
         {
-            this.SendGroupChat(fromnick + ' left.');
+            this.SendGroupChat(fromnick.split('/')[0] + ' left.');
             //
             // Someone left and it wasn't ourselves.
             //
