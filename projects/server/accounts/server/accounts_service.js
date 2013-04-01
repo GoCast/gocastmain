@@ -42,6 +42,7 @@ var api = require('./accounts_api');
 var express = require('express');
 var app = express();
 var validDomains = ['gocast.it'];
+var validSellingAgents = ['mtp-usa', 'gocast-test'];
 
 var anHour = 1000 * 60 * 60;
 var aDay = anHour * 24;
@@ -128,6 +129,16 @@ function valid_base_domain(url, validList) {
     return false;
 }
 
+function contains(a, obj) {
+    var i;
+    for (i = 0; i < a.length; i += 1) {
+        if (a[i] === obj) {
+            return true;
+        }
+    }
+    return false;
+}
+
 app.post('/register', function(req, res) {
     var firstRoomName = req.body.desired_roomname,
         extras = null;
@@ -186,6 +197,61 @@ app.post('/register', function(req, res) {
         }
         else if (!req.body.password) {
             res.send('{"result": "no password"}');
+        }
+        else {
+            res.send('{"result": "error"}');
+        }
+    }
+});
+
+app.post('/newpurchasedaccount', function(req, res) {
+    var firstRoomName = req.body.desired_roomname,
+        extras = null;
+
+    if (req.body && !req.body.baseurl) {
+        gcutil.log('accounts_service [/newpurchasedaccount][error]: No referer and no baseurl passed. req.body is: ', req.body);
+    }
+
+    if (req.body && !contains(validSellingAgents, req.body.selling_agent)) {
+        gcutil.log('accounts_service [/newpurchasedaccount][error]: Selling agent was not valid: ', req.body.selling_agent);
+        res.send('{"result": "error"}');
+        return;
+    }
+
+    if (req.body && req.body.baseurl && req.body.email && req.body.name) {
+        gcutil.log('accounts_service [/newpurchasedaccount][info]: FormData = ', req.body);
+        // Formulate extras from pre-expectation fields.
+        extras = {
+            package_name: req.body.package_name,
+            end_subscription_date: req.body.end_subscription_date,
+            max_rooms_allowed: req.body.max_rooms_allowed
+        };
+
+        // Create account with password which is simply the current time.
+        api.NewPaidAccount(req.body.baseurl, req.body.email, new Date().getTime(), req.body.name, firstRoomName, extras, function() {
+            // Now the account exists...All good.
+            gcutil.log('accounts_service [/newpurchasedaccount][success]: All good for: ' + req.body.email);
+            res.send('{"result": "success"}');
+        }, function(err) {
+            gcutil.log('accounts_service [/newpurchasedaccount][error]: ', err);
+            if ('apiNewPaidAccount: Failed - account already in use.' === err) {
+                res.send('{"result": "inuse"}');
+            }
+            else if ('apiNewPaidAccount: Failed - account registered but not activated.' === err) {
+                res.send('{"result": "registered"}');
+            } else {
+                res.send('{"result": "error"}');
+            }
+        });
+    }
+    else {
+        gcutil.log('accounts_service [/newpurchasedaccount][error]: FormData problem in req.body: ', req.body);
+
+        if (!req.body.name) {
+            res.send('{"result": "no name"}');
+        }
+        else if (!req.body.email) {
+            res.send('{"result": "no email"}');
         }
         else {
             res.send('{"result": "error"}');
@@ -671,7 +737,7 @@ app.post('/login', function(req, res) {
             res.send('{"result": "noemail"}');
         } else if (!req.body.password) {
             console.log('accounts_service[/login][error]: No req.body.password to process.');
-            res.send('{"result": "nopassword"}');            
+            res.send('{"result": "nopassword"}');
         }
     }
 });
