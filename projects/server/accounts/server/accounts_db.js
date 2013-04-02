@@ -540,7 +540,11 @@ function dbConvertPasswords(pwHashFn, cbSuccess, cbFailure) {
                 if (data.LastEvaluatedKey) {
                     gcutil.log('dbConvertPasswords: Received: ' + data.Count + ' items. Continuing scan - next iteration...');
                     scanObj.ExclusiveStartKey = data.LastEvaluatedKey;
-                    ddb.client.scan(scanObj, scanHandler);
+
+                    // Throttle to two scans per second.
+                    setTimeout(function() {
+                        ddb.client.scan(scanObj, scanHandler);
+                    }, 500);
                 }
                 else {
                     gcutil.log('dbConvertPasswords: Scan complete. Found a total of: ' + outItems.length + ' items.');
