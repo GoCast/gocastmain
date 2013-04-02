@@ -685,6 +685,9 @@ app.post('/login', function(req, res) {
                     };
                     res.send(JSON.stringify(xs));
                 } else {
+                    if ('nosession' === ret.result) {
+                        req.session = null;
+                    }
                     res.send(JSON.stringify(ret));
                 }
             }
@@ -788,6 +791,9 @@ app.post('/reqxmppconn', function(req, res) {
                     };
                     res.send(JSON.stringify(xs));
                 } else {
+                    if ('nosession' === ret.result) {
+                        req.session = null;
+                    }
                     res.send(JSON.stringify(ret));
                 }
             }
