@@ -1237,7 +1237,7 @@ function pluginLoaded(
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 {
   var lplayersel = '#mystream > ' + ($.urlvars.wrtcable ? 'video' : 'object') + '.localplayer',
-      permissionTimer = null;
+      permissionTimer = null, permblinkTimer = null, $meeting = $('body > div#meeting');
   //app.log(2, 'pluginLoaded Local Plugin Loaded.');
   if (Callcast.localplayerLoaded)
   {
@@ -1271,7 +1271,10 @@ function pluginLoaded(
      Callcast.InitGocastPlayer(lplayersel, function(message)
      {
         if ($.urlvars.wrtcable) {
-          closeWindow();
+          if (permblinkTimer) {
+            clearTimeout(permblinkTimer);
+            $meeting.removeClass('permission');
+          }
           if (permissionTimer) {
             clearTimeout(permissionTimer);
           }
@@ -1350,13 +1353,10 @@ function pluginLoaded(
      });
 
       if ($.urlvars.wrtcable) {
-        permissionTimer = setTimeout(function() {
-          $('#errorMsgPlugin > h1').text('GoCast requires your permission');
-          $('#errorMsgPlugin > p#prompt').text('Please permit us to use your camera ' +
-                                               'and microphone by clicking on "ALLOW" in the above toolbar.');
-          $('#errorMsgPlugin').addClass('permission');
-          openWindow('#errorMsgPlugin');
-        }, 2000);
+        permissionTimer = setTimeout(function blinkpermission() {
+          $meeting.toggleClass('permission');
+          permblinkTimer = setTimeout(blinkpermission, 1000);
+        }, 0);
       }
   }
   else // pluginLoaded but out of date

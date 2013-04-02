@@ -97,14 +97,19 @@ body > .container > .row > .span5 > form .alert  a {
 }
 
 form .ie-pwd-placeholder,
-form#startmeeting-form .btn-inverse {
+form#startmeeting-form .btn-inverse,
+form#startmeeting-form .btn-primary {
     display: none;
     margin-right: 10px;
 }
 
-form .ie-pwd-placeholder.show,
-form#startmeeting-form .btn-inverse.show {
+form .ie-pwd-placeholder.show {
     display: block;
+}
+
+form#startmeeting-form .btn-inverse.show,
+form#startmeeting-form .btn-primary.show {
+    display: inline-block;
 }
 
 form input[type="password"].hide {

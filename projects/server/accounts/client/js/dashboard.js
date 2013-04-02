@@ -310,8 +310,13 @@ var DashView = {
             $('#roomlist table td', self.$forms[formid]).removeClass('selected');
             $(this).parent().addClass('selected');
             $('#input-roomname', self.$forms[formid]).val($(this).text());
-            if ('startmeeting-form' === formid && !$('a.btn-link', self.$forms[formid]).hasClass('show')) {
-                $('a.btn-inverse', self.$forms[formid]).addClass('show');
+            if ('startmeeting-form' === formid) {
+                if (!$('a.btn-inverse', self.$forms[formid]).hasClass('show')) {
+                    $('a.btn-inverse', self.$forms[formid]).addClass('show');
+                }
+                if (!$('button.btn-primary', self.$forms[formid]).hasClass('show')) {
+                    $('button.btn-primary', self.$forms[formid]).addClass('show');
+                }
             }
         });
 
@@ -489,6 +494,11 @@ var DashView = {
                     $('a.btn-inverse', self.$forms[id]).addClass('show');
                 } else if (!$(_self).val() && $('a.btn-inverse', self.$forms[id]).hasClass('show')) {
                     $('a.btn-inverse', self.$forms[id]).removeClass('show');
+                }
+                if ($(_self).val() && !$('button.btn-primary', self.$forms[id]).hasClass('show')) {
+                    $('button.btn-primary', self.$forms[id]).addClass('show');
+                } else if (!$(_self).val() && $('button.btn-primary', self.$forms[id]).hasClass('show')) {
+                    $('button.btn-primary', self.$forms[id]).removeClass('show');
                 }
             }, 500);
         };

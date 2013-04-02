@@ -81,6 +81,7 @@ var app = {
   simPluginLoadFailed: false,
   authfail: false,
   winTimeout: null,
+  permblinkTimeout: null,
 
   requestXmppConnection: function() {
     $.ajax({
