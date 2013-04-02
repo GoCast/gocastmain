@@ -1034,6 +1034,8 @@ function apiReqXmppConn(args) {
                         rid: xs.rid,
                         jid: xs.jid,
                         sid: xs.sid,
+                        email: sess.email,
+                        name: sess.name,
                         gsid: args.sid
                     };
                     args.callback(res);

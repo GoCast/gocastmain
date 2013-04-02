@@ -37,7 +37,7 @@
                             <a class="logoutlink" href="#">Log Out</a>
                         </li>
                         <li style="padding-top: 20px; margin-left: 5px;">
-                            <span class="label label-success lead"></span>
+                            <span class="label label-important lead"></span>
                         </li>
                     </ul>
                 </div>
@@ -126,11 +126,6 @@
                             <div class="control-group">
                                 <div class="controls" align="center">
                                     <input id="input-roomname" type="text" name="desired_roomname" placeholder=" Enter the name of your new room" required class="span4">
-                                    <br><br><span class="or"></span>
-                                </div>
-                            </div>
-                            <div class="control-group">
-                                <div id="roomlist" class="controls" align="center">
                                 </div>
                             </div>
                             <div class="alert alert-error">
@@ -141,10 +136,21 @@
                             </div>
                             <div class="control-group">
                                 <div id="controls" align="center">
-                                    <button type="submit" class="btn btn-primary pull-right"> Take me to my room </button>
-                                    <a href="javascript:void(0);" class="btn btn-inverse pull-right">
+                                    <a href="javascript:void(0);" class="btn btn-inverse" style="margin-right: 0;">
                                         Invite others&nbsp;&nbsp;<i class="icon-envelope"></i>
                                     </a>
+                                    <button type="submit" class="btn btn-primary" style="margin-right: 0;">
+                                        Take me to my room
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <div class="controls" align="center">
+                                    <span class="or"></span>
+                                </div>
+                            </div>
+                            <div class="control-group" style="margin-top: 0;">
+                                <div id="roomlist" class="controls" align="center">
                                 </div>
                             </div>
                         </fieldset>

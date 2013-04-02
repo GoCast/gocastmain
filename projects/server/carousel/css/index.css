@@ -742,6 +742,15 @@ div.cloudcarousel > div#msgBoard > div#chatOut  td.val
   color: white;
   text-shadow: 0.1em 0.1em 0.2em black;
 }
+body > div#meeting {
+  border-top: 10px solid black;
+  transition: border-top 1s;
+  -webkit-transition: border-top 1s;
+  -moz-transition: border-top 1s;
+}
+body > div#meeting.permission {
+  border-top: 10px solid yellowgreen;
+}
 body > div#meeting > div#streams {
   padding: 10px;
   top: 0px;

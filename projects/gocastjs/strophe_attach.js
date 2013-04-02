@@ -54,6 +54,8 @@ GoCastJS.StropheAttach = function(opts) {
     this.statusCallback = opts.statusCallback;
 
     this.disconnectTimer = null;
+    this.onconnlost = null;
+    this.backoffPeriod = 2000;
 
     if (opts.logFn) {
         this.log = opts.logFn;
@@ -109,6 +111,12 @@ GoCastJS.StropheAttach.prototype = {
         this.reset('Full disconnection - heading for TERMINATED.');
         this.statusCallback(Strophe.Status.TERMINATED);
 
+        if (this.causeConnfail) {
+            this.connlost();
+        } else if (!this.causeTerminating) {
+            this.connlost();
+        }
+
 //TODO:RMW REVIEW - should we print out a cause - at least in a commented-debug print?
         this.causeConnfail = false;
         this.causeTerminating = false;
@@ -160,6 +168,7 @@ GoCastJS.StropheAttach.prototype = {
             case Strophe.Status.ATTACHED:
                 this.log('GoCastJS.StropheAttach: ATTACHED');
                 this.isConnected = true;
+                this.backoffPeriod -= 2000;
 
                 this.privateDoSubscribe();
                 this.privatePingServer();
@@ -178,9 +187,13 @@ GoCastJS.StropheAttach.prototype = {
                     // by DISCONNECTED. So, we need to make a judgement call and call this 'bad'.
                     // As such, we will trigger a TERMINATED upwards and forget login info.
                     self.disconnectTimer = null;
-
                     self.reset('DISCONNECTING_TIMEOUT - Never reached DISCONNECTED.');
                     self.statusCallback(Strophe.Status.TERMINATED);
+                    if (self.causeConnfail) {
+                        self.connlost();
+                    } else if (!self.causeTerminating) {
+                        self.connlost();
+                    }
                 }, 1000);
 
                 break;
@@ -193,9 +206,13 @@ GoCastJS.StropheAttach.prototype = {
                     // by DISCONNECTED. So, we need to make a judgement call and call this 'bad'.
                     // As such, we will trigger a TERMINATED upwards and forget login info.
                     self.disconnectTimer = null;
-
                     self.reset('DISCONNECTING_TIMEOUT_CONNFAIL - Never reached DISCONNECTED.');
                     self.statusCallback(Strophe.Status.TERMINATED);
+                    if (self.causeConnfail) {
+                        self.connlost();
+                    } else if (!self.causeTerminating) {
+                        self.connlost();
+                    }
                 }, 1000);
                 break;
             case Strophe.Status.AUTHFAIL:
@@ -259,6 +276,8 @@ GoCastJS.StropheAttach.prototype = {
         }
 
         this.numConnects += 1;
+        this.causeTerminating = false;
+        this.causeConnfail = false;
         this.log('StropheAttach: Attaching(' + this.numConnects + ') -- jid=' + jid + ', sid=' + sid + ', rid=' + rid);
 
         try {
@@ -530,7 +549,16 @@ GoCastJS.StropheAttach.prototype = {
         else {
             this.log('subscribePublicRooms: INFO: Subscription deferred until connected.');
         }
+    },
 
+    connlost: function(callback) {
+        if (callback) {
+            this.onconnlost = callback;
+        } else {
+            if (this.onconnlost) {
+                setTimeout(this.onconnlost, this.backoffPeriod);
+                this.backoffPeriod += 2000;
+            }
+        }
     }
-
 };
