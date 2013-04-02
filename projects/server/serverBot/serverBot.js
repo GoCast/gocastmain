@@ -4064,17 +4064,21 @@ Overseer.prototype.KickOldJids = function(iq, cb) {
         info = iq.getChild('subjidfornickname').attrs;
     }
 
+    if (info.room) {
+        info.room = info.room.toLowerCase();
+    }
+
     // Validate room and nickname are present/valid. And there are oldjids as well.
     if (!info.room || !this.MucRoomObjects[info.room]) {
-        this.log('SubstituteJidForNickname: ERROR: Invalid room: ' + info.room);
+        this.log('KickOldJids: ERROR: Invalid room: ' + info.room);
         cb();
     }
     else if (!info.nick || !this.MucRoomObjects[info.room].participants[info.nick]) {
-        this.log('SubstituteJidForNickname: ERROR: No nickname given or nickname not found: ' + info.nick, this.MucRoomObjects[info.room].participants);
+        this.log('KickOldJids: ERROR: No nickname given or nickname not found: ' + info.nick, this.MucRoomObjects[info.room].participants);
         cb();
     }
     else if (!info.oldjids) {
-        this.log('SubstituteJidForNickname: ERROR: No oldjids given.');
+        this.log('KickOldJids: ERROR: No oldjids given.');
         cb();
     }
     else {
@@ -4082,10 +4086,10 @@ Overseer.prototype.KickOldJids = function(iq, cb) {
         mroom = this.MucRoomObjects[info.room];
         targetjid = mroom.participants[info.nick].name.split('/')[0];
 
-        this.log('Nickname found. Target JID is: ' + targetjid);
-        this.log('SubstituteJidForNickname: INFO: Raw-oldjids: ' + info.oldjids);
+        this.log('KickOldJids: Nickname found. Target JID is: ' + targetjid);
+        this.log('KickOldJids: INFO: Raw-oldjids: ' + info.oldjids);
         ojids = JSON.parse(info.oldjids);
-        console.log('SubstituteJidForNickname: INFO: oldjids: ', ojids);
+        console.log('KickOldJids: INFO: oldjids: ', ojids);
 
         len = ojids.length;
         for (i = 0; i < len; i += 1) {
@@ -4097,14 +4101,14 @@ Overseer.prototype.KickOldJids = function(iq, cb) {
 
         if (!bFound) {
             // Never found a match of the nickname and the 'oldjids' list.
-            this.log('SubstituteJidForNickname: ERROR: oldjids did not match. No substitution.');
+            this.log('KickOldJids: ERROR: oldjids did not match. No substitution.');
             cb();
         }
         else {
             this.log('SubstituteJidForNickname: Found match. Kicking out nick: ' + info.nick);
             // Kick out the nickname so the substitution can take place.
             mroom.kick(info.nick, function() {
-                self.log('SubstituteJidForNickname: Success. Substitution ready for completion by client.');
+                self.log('KickOldJids: Success. Substitution ready for completion by client.');
                 cb();
             });
         }
