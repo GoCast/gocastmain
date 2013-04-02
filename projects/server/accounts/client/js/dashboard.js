@@ -808,7 +808,7 @@ var DashApp = {
         var self = this;
 
         if(useAjaxSubmit) {
-            this.$forms[id].submit(function() {
+            this.$forms[id].unbind('submit').submit(function() {
                 $(this).ajaxSubmit(self.setupOptions(id));
                 return false;
             });
@@ -834,6 +834,10 @@ var DashApp = {
             xmppserver: this.settings.get('CALLCAST_XMPPSERVER'),
             public_room_node: this.settings.get('CALLCAST_ROOMS') + '/public',
             statusCallback: this.boshconnstatusCallback()
+        });
+
+        this.boshconn.connlost(function() {
+            self.requestXmppConnection();
         });
 
         this.boshconn.subscribePublicRooms(function(data) {
@@ -863,7 +867,7 @@ var DashApp = {
     },
     autoLogin: function() {
         var self = this;
-        
+
         $.ajax({
             url: '/acct/login/',
             type: 'POST',
@@ -880,6 +884,32 @@ var DashApp = {
                     });
                 } else {
                     DashView.displayform('login-form');
+                }
+            }
+        });
+    },
+    requestXmppConnection: function() {
+        var self = this;
+
+        $.ajax({
+            url: '/acct/reqxmppconn/',
+            type: 'POST',
+            dataType: 'json',
+            data: {},
+            success: function(response) {
+                if ('success' === response.result) {
+                    self.email = response.data.email;
+                    self.fullname = response.data.name || self.email;
+                    self.boshconn.attach({
+                        rid: response.data.rid,
+                        jid: response.data.jid,
+                        sid: response.data.sid
+                    });
+                } else {
+                    if ('xmppprob' !== response.result &&
+                        'nosession' !== response.result) {
+                        self.boshconn.connlost();
+                    }
                 }
             }
         });
@@ -933,7 +963,9 @@ var DashApp = {
                 DashView.displayform('startmeeting-form');
                 $('body > .navbar .nav').addClass('show');
                 self.queryName(function(name) {
-                    $('body > .navbar .label').html('Hi ' + name + '!');
+                    $('body > .navbar .label').removeClass('label-important')
+                                              .addClass('label-success')
+                                              .html('Hi ' + name + '!');
                 });
                 self.queryRoomList(function(roomlist) {
                     self.roomlist = roomlist;
@@ -942,7 +974,6 @@ var DashApp = {
 
                 // Need to ask the server for a list of recently entered rooms.
                 self.queryRecentRoomList(function(roomlist) {
-                    self.roomlist = roomlist;
                     DashView.displayRoomsAccordion(roomlist, {
                         title: 'Recently Visited Rooms',
                         container: $('#visitedrooms'),
@@ -951,17 +982,19 @@ var DashApp = {
                 });
 
             } else if (Strophe.Status.DISCONNECTED === status ||
-                       Strophe.Status.TERMINATED === status) {                
-                DashView.displayRoomsAccordion([], {
-                    title: 'Recently Visited Rooms',
-                    container: $('#visitedrooms'),
-                    note: 'When you login, this list will show you where you have visited lately.'
-                });
-                $('body > .navbar .nav').removeClass('show');
-            } else if (Strophe.Status.CONNFAIL === status) {
-                DashView.cancelloader('login-form');
-                DashView.displayform('login-form');
-                DashView.displayalert('login-form', 'error', 'There was a problem logging in to your account.');
+                       Strophe.Status.TERMINATED === status) {
+                if (self.boshconn.causeTerminating) {
+                    DashView.displayRoomsAccordion([], {
+                        title: 'Recently Visited Rooms',
+                        container: $('#visitedrooms'),
+                        note: 'When you login, this list will show you where you have visited lately.'
+                    });
+                    $('body > .navbar .nav').removeClass('show');
+                } else {
+                    $('body > .navbar .label').removeClass('label-success')
+                                              .addClass('label-important')
+                                              .html('Reconnecting...');
+                }
             }
         };
     },

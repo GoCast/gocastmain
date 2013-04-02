@@ -285,7 +285,10 @@ var Callcast = {
                                                            public_room_node: this.CALLCAST_ROOMS + '/public',
                                                            statusCallback: this.connStatusHandler.bind(this),
                                                            logFn: this.log});
+    },
 
+    connlost: function(callback) {
+        this.connection.connlost(callback);
     },
 
     WriteUpdatedState: function() {
@@ -2916,9 +2919,13 @@ var Callcast = {
                 Callcast.Callback_ConnectionStatus('Disconnected');
                 break;
             case Strophe.Status.TERMINATED:
-                this.log('XMPP/Strophe Terminated.');
-                $(document).trigger('disconnected');
-                Callcast.Callback_ConnectionStatus('Terminated');
+                if (Callcast.connection.causeTerminating) {
+                    this.log('XMPP/Strophe Terminated.');
+                    $(document).trigger('disconnected');
+                    Callcast.Callback_ConnectionStatus('Terminated');
+                } else {
+                    Callcast.Callback_ConnectionStatus('Reconnecting...');
+                }
                 break;
             case Strophe.Status.AUTHENTICATING:
                 this.log('XMPP/Strophe Authenticating...');

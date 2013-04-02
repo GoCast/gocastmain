@@ -82,6 +82,39 @@ var app = {
   authfail: false,
   winTimeout: null,
 
+  requestXmppConnection: function() {
+    $.ajax({
+      url: '/acct/reqxmppconn/',
+      type: 'POST',
+      dataType: 'json',
+      data: {},
+      success: function(response) {
+        var opts = {};
+
+        if ('success' === response.result) {
+          opts = {
+            rid: response.data.rid,
+            jid: response.data.jid,
+            sid: response.data.sid
+          };
+          if (response.data.email) {
+            opts.email = response.data.email;
+          }
+          if (response.data.name) {
+            opts.name = response.data.name;
+          }
+
+          Callcast.connect(opts);
+        } else {
+          if ('xmppprob' !== response.result &&
+              'nosession' !== response.result) {
+            Callcast.connlost();
+          }
+        }
+      }
+    });
+  },
+
   /**
    * Writes the specified log entry into the console HTML element, if
    * present. The meaning of logLevel is 1: debug, 2: info, 3:
@@ -2067,7 +2100,12 @@ function checkCredentials2() {
     // If we already have gotten the nickname from the database, then there is no
     // need to open this dialog box. It's already pre-populated and ready to grab from onJoinNow()
     if (!Callcast.getDatabaseNickname()) {
-      openWindow('#credentials2');
+      if ($('#credentials2 > input#name').val() &&
+          $('#credentials2 > input#email').val()) {
+        onJoinNow();
+      } else {
+        openWindow('#credentials2');
+      }
     }
     else {
       // Populate the item so it'll be picked up automatically.
@@ -2680,6 +2718,7 @@ $(document).ready(function(
   }
 
   Callcast.init();
+  Callcast.connlost(function() { app.requestXmppConnection(); });
 
   //Disable file drag/drop everywhere except fileshare spots
   $('body').bind('dragover drop', function(e) {

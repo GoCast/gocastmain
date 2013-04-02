@@ -280,6 +280,10 @@ var RegisterApp = {
             statusCallback: this.boshconnstatusCallback()
         });
 
+        this.boshconn.connlost(function() {
+            self.requestXmppConnection();
+        });
+
         //
         // Because we're potentially using anonymous connections for subscriptions, make sure we kill the connection
         // upon unload if it's anonymous.
@@ -362,7 +366,7 @@ var RegisterApp = {
     },
     anonlogin: function() {
         var self = this;
-        
+
         $.ajax({
             url: '/acct/login/',
             type: 'POST',
@@ -375,6 +379,30 @@ var RegisterApp = {
                         jid: response.data.jid,
                         sid: response.data.sid
                     });
+                }
+            }
+        });
+    },
+    requestXmppConnection: function() {
+        var self = this;
+
+        $.ajax({
+            url: '/acct/reqxmppconn/',
+            type: 'POST',
+            dataType: 'json',
+            data: {},
+            success: function(response) {
+                if ('success' === response.result) {
+                    self.boshconn.attach({
+                        rid: response.data.rid,
+                        jid: response.data.jid,
+                        sid: response.data.sid
+                    });
+                } else {
+                    if ('xmppprob' !== response.result &&
+                        'nosession' !== response.result) {
+                        self.boshconn.connlost();
+                    }
                 }
             }
         });

@@ -781,7 +781,9 @@ app.post('/reqxmppconn', function(req, res) {
                         data: {
                             rid: ret.rid,
                             jid: ret.jid,
-                            sid: ret.sid
+                            sid: ret.sid,
+                            email: ret.email,
+                            name: ret.name
                         }
                     };
                     res.send(JSON.stringify(xs));
