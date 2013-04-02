@@ -69,12 +69,11 @@ memdb.prototype.readfromfile = function() {
     }
 };
 
-memdb.prototype.deferredwritetofile = function(periodms) {
+memdb.prototype.deferredwritetofile = function() {
     var self = this;
-    periodms = periodms || 60000;
 
     if (this.file && !this.writeTimeout) {
-        this.writeTimeout = setTimeout(this.callbacks['writetimeout'](), periodms);
+        this.writeTimeout = setTimeout(this.callbacks['writetimeout'](), 60000);
     }
 };
 

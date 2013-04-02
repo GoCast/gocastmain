@@ -26,6 +26,7 @@ if (!settings.accounts) {
 var sys = require('util');
 var evt = require('events');
 var fs = require('fs');     // Need for readFile
+var async = require('async');
 
 var gcutil = require('./gcutil_node');
 
@@ -1071,6 +1072,74 @@ function apiReqXmppConn(args) {
     }
 }
 
+function apiConvertPasswords() {
+    var items, xmppOne, count = 0;
+
+    xmppOne = function(item, cb) {
+//        console.log('xmppOne[' + count + ']: Iterating XMPP change for: ' + item.email + ' to new pw: ' + item.hashedTwice);
+        count += 1;
+
+        if (item.password.length === 32) {
+            console.log('apiConvertPasswords: XMPP skipping entry likely already converted: ' + item.email);
+            cb();   // Skipping any items who already were converted previously.
+            return;
+        }
+
+        xmpp.ChangePassword(item.email,
+//            item.password,
+            item.hashedTwice,
+            function(res) {
+                if (res) {
+                    console.log('Iterative-success with res: ', res);
+                }
+                cb();
+            }, function(err) {
+                if (err === 'UserNotFoundException') {
+                    console.log('WARNING: XMPP user not found: ' + item.email);
+                    cb();
+                    return;
+                }
+
+                cb(err);
+            });
+
+    };
+
+    db.ConvertPasswords(privateHashPassword, function(post_db_converted) {
+        var i, len;
+
+        console.log('apiConvertPasswords: Main database conversion complete. Moving on to XMPP.');
+        //console.log('DEBUG: object-list: ', post_db_converted);
+        async.eachSeries(post_db_converted, xmppOne, function(res) {
+            console.log('apiConvertPasswords: Complete. Results...');
+            if (res) {
+                console.log('apiConvertPasswords: FAILURE: res: "', res, '"');
+            }
+            else {
+                console.log('apiConvertPasswords: SUCCESS.');
+            }
+        });
+    }, function(err) {
+        console.log('apiConvertPasswords: ERROR: ', err);
+    });
+}
+
+function apiShowAllAccounts(fname) {
+    db.ShowAllAccounts(fname, function() {
+        console.log('Complete.');
+    }, function() {
+        console.log('FAILED.');
+    });
+}
+
+function apiVerifyAllHashed() {
+    db.VerifyAllHashed(function() {
+        console.log('Complete.');
+    }, function() {
+        console.log('FAILED.');
+    });
+}
+
 /* Manjesh -- These both work (separately of course)
 apiNewAccount('http://dev.gocast.it/baseURL.html', 'rwolff@gocast.it', 'rwolff', 'Bob Wolff', function() {
     gcutil.log('TEST: SUCCESS');
@@ -1104,3 +1173,6 @@ exports.SendRoomInviteEmail = apiSendRoomInviteEmail;
 exports.Login = apiLogin;
 exports.Logout = apiLogout;
 exports.ReqXmppConn = apiReqXmppConn;
+exports.ConvertPasswords = apiConvertPasswords;
+exports.ShowAllAccounts = apiShowAllAccounts;
+exports.VerifyAllHashed = apiVerifyAllHashed;

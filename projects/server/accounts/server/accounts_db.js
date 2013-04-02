@@ -29,7 +29,9 @@ if (!settings.dynamodb) {
 
 var sys = require('util');
 var AWS = require('aws-sdk');
+var fs = require('fs');
 var _ = require('underscore');
+var async = require('async');
 
 var gcutil;
 try {
@@ -474,6 +476,179 @@ function dbIsEntryValidated(accountName, cbSuccess, cbFailure) {
     dbEntryGetColumn(accountName, 'validated', cbSuccess, cbFailure);
 }
 
+function dbConvertPasswords(pwHashFn, cbSuccess, cbFailure) {
+    var outItems = [],
+        scanHandler, updateItem, scanObj;
+
+    scanObj = {TableName: theUserTable,
+                  Limit: 25,
+                  AttributesToGet: ['email', 'password']};
+
+    updateItem = function(item, cb) {
+        if (item.password.length === 32) {
+            console.log('Skipping entry likely already completed: ' + item.email + ', pw: ' + item.password);
+            cb();
+            return;
+        }
+
+//        console.log('Converting entry: ' + item.email);
+
+        dbUpdateEntry(item.email,
+            {password: item.hashed},      // Make the real change.
+//            {password: item.password},      // Not actually making the true change but making the call.
+            function(res) {
+//                console.log('Itermediate success result: ', JSON.stringify(res));
+                cb();
+            }, function(msg) {
+                var msgback = 'Update failed for: ' + item.email + ', msg: ' + msg;
+                console.log(msgback);
+                cb(msgback);
+            });
+    };
+
+    scanHandler = function(err, data) {
+        var i, len, hashed, tempobj;
+
+        if (err) {
+            errOut(err);
+            cbFailure(err);
+        }
+        else {
+
+            tempobj = dbAwsObjectRead(data.Items);
+
+            len = data.Count;
+            for (i = 0; i < len; i += 1) {
+                // Convert
+                tempobj[i].hashed = pwHashFn(tempobj[i].password);
+                tempobj[i].hashedTwice = pwHashFn(tempobj[i].hashed);
+
+                console.log('Prepping: ' + tempobj[i].email + ', pw: ' + tempobj[i].password + ', hashed: ' + tempobj[i].hashed);
+            }
+
+            console.log('Batch conversion for ' + tempobj.length + ' entries.');
+            // Now update the password in each record on the main user database.
+            async.eachSeries(tempobj, updateItem, function(res) {
+                if (res) {
+                    console.log('dbConvertPasswords: FAILURE: Result: ' + res);
+                    cbFailure(res);
+                    return;
+                }
+
+                outItems.push.apply(outItems, tempobj);
+
+                if (data.LastEvaluatedKey) {
+                    gcutil.log('dbConvertPasswords: Received: ' + data.Count + ' items. Continuing scan - next iteration...');
+                    scanObj.ExclusiveStartKey = data.LastEvaluatedKey;
+                    ddb.client.scan(scanObj, scanHandler);
+                }
+                else {
+                    gcutil.log('dbConvertPasswords: Scan complete. Found a total of: ' + outItems.length + ' items.');
+                    cbSuccess(outItems);
+                }
+            });
+        }
+    };
+
+    ddb.client.scan(scanObj, scanHandler);
+}
+
+function dbVerifyAllHashed(cbSuccess, cbFailure) {
+    var numErrors = 0,
+        scanHandler, scanObj;
+
+    scanObj = {TableName: theUserTable,
+                  Limit: 25,
+                  AttributesToGet: ['email', 'password']};
+
+    scanHandler = function(err, data) {
+        var i, len, hashed, tempobj;
+
+        if (err) {
+            errOut(err);
+            cbFailure(err);
+        }
+        else {
+
+            tempobj = dbAwsObjectRead(data.Items);
+
+            len = data.Count;
+            for (i = 0; i < len; i += 1) {
+                // Verify
+                if (tempobj[i].password.length !== 32) {
+                    console.log('Non-converted account: ' + tempobj[i].email + ', pw: ' + tempobj[i].password);
+                    numErrors += 1;
+                }
+            }
+
+            if (data.LastEvaluatedKey) {
+                gcutil.log('dbConvertPasswords: Received: ' + data.Count + ' items. Continuing scan - next iteration...');
+                scanObj.ExclusiveStartKey = data.LastEvaluatedKey;
+                ddb.client.scan(scanObj, scanHandler);
+            }
+            else {
+                gcutil.log('dbConvertPasswords: Scan complete.');
+                if (!numErrors) {
+                    cbSuccess();
+                }
+                else {
+                    console.log('# of errant accounts: ' + numErrors);
+                    cbFailure();
+                }
+            }
+        }
+    };
+
+    ddb.client.scan(scanObj, scanHandler);
+}
+
+function dbShowAllAccounts(fname, cbSuccess, cbFailure) {
+    var stream, scanHandler, scanObj;
+
+    scanObj = {TableName: theUserTable,
+                  Limit: 25,
+                  AttributesToGet: ['email', 'password']};
+
+    stream = fs.createWriteStream(fname);
+
+    scanHandler = function(err, data) {
+        var i, len, hashed, tempobj;
+
+        if (err) {
+            errOut(err);
+            cbFailure(err);
+        }
+        else {
+
+            tempobj = dbAwsObjectRead(data.Items);
+
+            len = data.Count;
+            for (i = 0; i < len; i += 1) {
+                console.log('User: ' + tempobj[i].email + ', pw: ' + tempobj[i].password);
+                stream.write('User: ' + tempobj[i].email + ', pw: ' + tempobj[i].password + '\n');
+            }
+
+            if (data.LastEvaluatedKey) {
+                gcutil.log('dbConvertPasswords: Received: ' + data.Count + ' items. Continuing scan - next iteration...');
+                scanObj.ExclusiveStartKey = data.LastEvaluatedKey;
+                ddb.client.scan(scanObj, scanHandler);
+            }
+            else {
+                gcutil.log('dbConvertPasswords: Scan complete.');
+                stream.write('Dump of user database complete.');
+                stream.end();
+                cbSuccess();
+            }
+        }
+    };
+
+    stream.once('open', function(fd) {
+      stream.write('Dump of user database on: ' + new Date().toString() + '\n');
+
+      ddb.client.scan(scanObj, scanHandler);
+    });
+}
+
 function dbDeleteEntry(accountName, cbSuccess, cbFailure) {
     ddb.client.deleteItem({TableName: theUserTable, Key: {HashKeyElement: { S: accountName.toLowerCase() }}}, function(err, data) {
         if (err) {
@@ -757,7 +932,7 @@ function dbGetAssociatedRooms(accountName, cbSuccess, cbFailure) {
 
 
     queryObj = {TableName: theAssociatedRoomTable,
-                  Limit: 3,
+//                  Limit: 3,
                   HashKeyValue: { S: accountName.toLowerCase() },
                   AttributesToGet: ['room', 'roomtype', 'owner', 'lastEntry']};
 
@@ -861,3 +1036,6 @@ exports.GetAssociatedRooms = dbGetAssociatedRooms;
 exports.AddAssociatedRoom = dbAddAssociatedRoom;
 exports.AddAssociatedRecentRoom = dbAddAssociatedRecentRoom;
 exports.DeleteAssociatedRoom = dbDeleteAssociatedRoom;
+exports.ConvertPasswords = dbConvertPasswords;
+exports.ShowAllAccounts = dbShowAllAccounts;
+exports.VerifyAllHashed = dbVerifyAllHashed;

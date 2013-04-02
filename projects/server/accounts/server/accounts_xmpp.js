@@ -224,7 +224,7 @@ function xmppDeleteAccount(accountName, cbSuccess, cbFailure) {
 function xmppChangePassword(accountName, newPassword, cbSuccess, cbFailure) {
     var em = xmppPrivateEscapeEmail(accountName);
     if (!em) {
-        throw 'Invalid account Name: ' + accountName;
+        throw 'Invalid account Name.';
     }
 
     if (!cbSuccess || !cbFailure) {
