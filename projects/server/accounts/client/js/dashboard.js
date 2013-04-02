@@ -161,6 +161,7 @@ var DashView = {
                 $('.alert', this.$forms[i]).removeClass('show');
                 if ('startmeeting-form' === i) {
                     $('a.btn-inverse', this.$forms[i]).removeClass('show');
+                    $('button.btn-primary', this.$forms[i]).removeClass('show');
                 }
             }
         }
@@ -193,10 +194,14 @@ var DashView = {
             if ('undefined' !== typeof(Storage) && localStorage.gcpDesiredRoomname) {
                 $('#input-roomname', this.$forms[id]).val(decodeURI(localStorage.gcpDesiredRoomname));
                 $('a.btn-inverse', this.$forms[id]).addClass('show');
+                $('button.btn-primary', this.$forms[id]).addClass('show');
                 delete localStorage.gcpDesiredRoomname;
             }
             if (defs['input-roomname']) {
                 $('a.btn-inverse', this.$forms[id]).addClass('show');
+                $('button.btn-primary', this.$forms[id]).addClass('show');
+                $('#roomlist table td').removeClass('selected');
+                $('#roomlist table td[roomname="' + defs['input-roomname'] + '"]').addClass('selected');
             }
 
             $('#input-roomname', this.$forms[id]).unbind('keydown').keydown(this.strtmtgRoomnameValChngCallback());
@@ -273,7 +278,7 @@ var DashView = {
     },
     displayRoomList: function(formid, roomlist, dontShowMessage) {
         var template = '', i, self = this,
-            linkpopoverhtml, roomlink;
+            linkpopoverhtml, roomlink, isselected;
 
         $('.or', this.$forms[formid]).text('');
         if (roomlist && roomlist.length) {
@@ -281,8 +286,9 @@ var DashView = {
                                    '<thead><tr><th>Choose one of your existing rooms</th></tr></thead>' +
                                    '<tbody>');
             for (i=0; i<roomlist.length; i++) {
-                template = template + ('<tr><td roomname="' + roomlist[i] +
-                           '""><a class="roomname" href="javascript:void(0);">' + roomlist[i] + '</a>' +
+                isselected = ($('#input-roomname', self.$forms[formid]).val() === roomlist[i]) ? ' class="selected"' : '';
+                template = template + ('<tr><td roomname="' + roomlist[i] + '"' + isselected +
+                           '><a class="roomname" href="javascript:void(0);">' + roomlist[i] + '</a>' +
                            '<a class="deleteroom btn btn-danger btn-mini pull-right" href="#" roomname="' + roomlist[i] +
                            '" title="Destroy room"><i class="icon-trash"></i></a>' +
                            '<a class="roomlink btn btn-mini pull-right" href="#" roomname="' + roomlist[i] +
