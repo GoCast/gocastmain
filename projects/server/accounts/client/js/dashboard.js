@@ -259,21 +259,21 @@ var DashView = {
     displayformtip: function(message) {
         $('.alert-info p').html(message);
     },
-    showloader: function(formid) {
-        $('.btn[type="submit"]', this.$forms[formid]).addClass('disabled')
-                                                     .html('<i class="icon-spinner icon-spin icon-2x"></i>');
+    showloader: function(formid, $button) {
+        var $btn = $button || $('.btn[type="submit"]', this.$forms[formid]);
+        $btn.addClass('disabled').html('<i class="icon-spinner icon-spin icon-2x"></i>');
     },
-    cancelloader: function(formid) {
+    cancelloader: function(formid, $button, text) {
         var submittexts = {
-            'login-form': 'Log me in',
-            'changepwd-form': 'Change my password',
-            'startmeeting-form': 'Take me to my room',
-            'reqresetpwd-form': 'Send me a password reset email',
-            'resetpwd-form': 'Reset my password',
-            'schedulemeeting-form': 'Send invitation'
-        };
-        $('.btn[type="submit"]', this.$forms[formid]).removeClass('disabled')
-                                                          .html(submittexts[formid]);
+                'login-form': 'Log me in',
+                'changepwd-form': 'Change my password',
+                'startmeeting-form': 'Take me to my room',
+                'reqresetpwd-form': 'Send me a password reset email',
+                'resetpwd-form': 'Reset my password',
+                'schedulemeeting-form': 'Send invitation'
+            }, $btn = $button || $('.btn[type="submit"]', this.$forms[formid]),
+            btntext = text || submittexts[formid];
+        $btn.removeClass('disabled').html(btntext);
 
     },
     displayRoomList: function(formid, roomlist, dontShowMessage) {
@@ -558,6 +558,13 @@ var DashApp = {
                             errmsg = 'No account exists for this email: ' + response.result.email;
                         } else if ('authfail' === response.result) {
                             errmsg = 'Wrong email or password.'
+                        } else if ('notactivated' === response.result) {
+                            errmsg = 'This account has not been activated yet. If you have not ' +
+                                     'received an activation email yet, please click below.<br><br>' +
+                                     '<button class="btn btn-block btn-danger" onclick=' +
+                                     '"DashApp.sendactemail(event, \'' + response.email + '\', this);">' +
+                                     'Send me an activation email</button>';
+
                         } else {
                             errmsg = 'There was a problem logging in.';
                         }
@@ -961,6 +968,39 @@ var DashApp = {
             },
             failure: function(error) {
                 cb(error.data || []);
+            }
+        });
+    },
+    sendactemail: function(evt, email, sendbtn) {
+        var $sendbtn = $(sendbtn),
+            _email = email,
+            self = this;
+
+        if (evt.preventDefault) {
+            evt.preventDefault();
+        } else {
+            evt.returnValue = false;
+        }
+
+        DashView.showloader('login-form', $sendbtn);
+        $.ajax({
+            url: '/acct/sendemailagain/',
+            type: 'POST',
+            dataType: 'json',
+            data: {
+                email: _email,
+                baseurl: $.urlvars.baseurl
+            },
+            success: function(response) {
+                DashView.cancelloader('login-form', $sendbtn, 'Send me an activation email');
+                DashView.displayalert('login-form', 'success', 'Look in your inbox for an activation email ' +
+                                      'from GoCast Support, and follow the instructions in it.<br><br>' +
+                                      '<span class="label label-info">If the email isn\'t in your '+
+                                      'inbox, check your spam folder.</span>');
+            },
+            failure: function() {
+                DashView.cancelloader('login-form', $sendbtn, 'Send me an activation email');
+                DashView.displayalert('login-form', 'error', 'There was a problem sending the activation email.');
             }
         });
     },

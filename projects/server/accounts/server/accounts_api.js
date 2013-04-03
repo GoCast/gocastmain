@@ -880,7 +880,7 @@ function apiVisitorSeen(email, nickName, success, failure) {
 }
 
 function apiLogin(args) {
-    var res = {}, sid, passx, e, hp, px,
+    var res = {}, sid, passx, e, hp,
         sess, sessp, gsid;
 
     if (args.sid) {
@@ -946,7 +946,8 @@ function apiLogin(args) {
         }
     } else if (args.email && args.password) {
         db.GetEntryByAccountName(args.email, function(entry) {
-            if (entry.password === privateHashPassword(args.password)) {
+            hp = privateHashPassword(args.password);
+            if (entry.validated && entry.password === hp) {
                 sid = privateGenRandomSessionId();
                 mdbSessions.addentry(sid, {
                     email: entry.email,
@@ -978,7 +979,11 @@ function apiLogin(args) {
                     args.callback(res);
                 });
             } else {
-                args.callback({result: 'authfail', email: args.email});
+                if (entry.password !== hp) {
+                    args.callback({result: 'authfail', email: args.email});
+                } else if (!entry.validated) {
+                    args.callback({result: 'notactivated', email: args.email});
+                }
             }
         }, function(err) {
             args.callback({result: 'noaccount', email: args.email});
