@@ -229,6 +229,11 @@ app.post('/newpurchasedaccount', function(req, res) {
             selling_agent: req.body.selling_agent
         };
 
+        if (isNaN(new Date(req.body.end_subscription_date).getTime())) {
+            // end subscription date is not formatted correctly. Disallow.
+            res.send('{"result": "bad end_subscription_date"}');
+        }
+
         // Create account with password which is simply the current time.
         api.NewPaidAccount(req.body.baseurl, req.body.email, new Date().getTime(), req.body.name, firstRoomName, extras, function() {
             // Now the account exists...All good.
