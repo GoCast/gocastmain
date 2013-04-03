@@ -553,11 +553,11 @@ var DashApp = {
                         });
                     } else {
                         if ('xmppprob' === response.result) {
-                            errmsg = 'There was a problem connecting to the chat server.'
+                            errmsg = 'There was a problem connecting to the chat server.';
                         } else if ('noaccount' === response.result) {
                             errmsg = 'No account exists for this email: ' + response.result.email;
                         } else if ('authfail' === response.result) {
-                            errmsg = 'Wrong email or password.'
+                            errmsg = 'Wrong email or password.';
                         } else if ('notactivated' === response.result) {
                             errmsg = 'This account has not been activated yet. If you have not ' +
                                      'received an activation email yet, please click below.<br><br>' +
