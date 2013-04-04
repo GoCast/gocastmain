@@ -11,7 +11,7 @@ var GoCastJS = GoCastJS || {};
 //!
 //! definitions = {
 //!     constructor: function <ClassName>(args) {}
-//!     statics: { (<FunctionName>: function(args) {},)+ }
+//!     statics: { (<FunctionName>: function(args) {}, <VariableName>: value)+ }
 //!     methods: { (<FunctionName>: function(args) {},)+ }
 //! }
 //!
@@ -25,20 +25,20 @@ GoCastJS.Class = function(definition) {
         throw 'GoCastJS.Class.NoNameForConstructorException';
     }
     //!
-    //! Usage: <ClassName>.extend({ (<FunctionName>: function(args) {},)+ });
+    //! Usage: <ClassName>.extend(statics);
     //!
     //! Use this method to add one or more static functions to the class.
     //!
     constructor.extend = function(statics) {
-        var method;
-        for (method in statics) {
-            if (statics.hasOwnProperty(method)) {
-                this[method] = statics[method];
+        var prop;
+        for (prop in statics) {
+            if (statics.hasOwnProperty(prop)) {
+                this[prop] = statics[prop];
             }
         }
     };
     //!
-    //! Usage: <ClassName>.append({ (<FunctionName>: function(args) {},)+ });
+    //! Usage: <ClassName>.append(methods);
     //!
     //! Use this method to add one or more member functions to the class.
     //!
