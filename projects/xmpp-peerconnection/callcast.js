@@ -659,7 +659,9 @@ var Callcast = {
             if (this.localstream && this.localstream.audioTracks) {
                 return this.localstream.audioTracks[0].enabled;
             }
-            else {
+            else if (this.localstream && this.localstream.getAudioTracks) {
+                return this.localstream.getAudioTracks()[0].enabled;
+            } else {
                 return false;
             }
         }
@@ -767,20 +769,44 @@ var Callcast = {
     },
 
     ToggleLocalVideoCapture: function() {
+        var localvideotrack = null;
+
         if (this.localstream && this.localstream.videoTracks && this.localstream.videoTracks.length) {
-            this.localstream.videoTracks[0].enabled = !(this.localstream.videoTracks[0].enabled);
+            localvideotrack = this.localstream.videoTracks[0];
+        } else if (this.localstream && this.localstream.getVideoTracks) {
+            localvideotrack = this.localstream.getVideoTracks()[0];
+        }
+
+        if (localvideotrack) {
+            localvideotrack.enabled = !(localvideotrack.enabled);
         }
     },
 
     MuteLocalVideoCapture: function(bMute) {
+        var localvideotrack = null;
+
         if (this.localstream && this.localstream.videoTracks && this.localstream.videoTracks.length) {
-            this.localstream.videoTracks[0].enabled = (typeof (bMute) !== 'undefined') ? !bMute : false;
+            localvideotrack = this.localstream.videoTracks[0];
+        } else if (this.localstream && this.localstream.getVideoTracks) {
+            localvideotrack = this.localstream.getVideoTracks()[0];
+        }
+
+        if (localvideotrack) {
+            localvideotrack.enabled = (typeof (bMute) !== 'undefined') ? !bMute : false;
         }
     },
 
     MuteLocalAudioCapture: function(bMute) {
+        var localaudiotrack = null;
+
         if (this.localstream && this.localstream.audioTracks && this.localstream.audioTracks.length) {
-            this.localstream.audioTracks[0].enabled = (typeof (bMute) !== 'undefined') ? !bMute : false;
+            localaudiotrack = this.localstream.audioTracks[0];
+        } else if (this.localstream && this.localstream.getAudioTracks) {
+            localaudiotrack = this.localstream.getAudioTracks()[0];
+        }
+
+        if (localaudiotrack) {
+            localaudiotrack.enabled = (typeof (bMute) !== 'undefined') ? !bMute : false;
         }
 
         this.bUseMicrophone = !bMute;
