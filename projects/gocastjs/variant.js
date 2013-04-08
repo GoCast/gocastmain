@@ -57,7 +57,7 @@ GoCastJS.Variant = (function() {
                 }
             },
             //!
-            //! Custom events
+            //! Turn on custom event
             //!
             //! Usage: v.on(opts)
             //!
@@ -71,12 +71,21 @@ GoCastJS.Variant = (function() {
             //!               triggered>
             //! }
             //!
+            //! If opts.evt is either 'change' or 'touch', opts.trigger
+            //! is not needed.
+            //!
             on: function(opts) {
-                if (opts.evt && !this.events[opts.evt]) {
-                    this.events[opts.evt] = {
-                        trigger: opts.trigger || function() {return false;},
-                        callback: opts.callback || function() {}
-                    };
+                if (opts.evt) {
+                    if ('touch' === opts.evt) {
+                        this.ontouch = opts.callback || function() {};
+                    } else if ('change' === opts.evt) {
+                        this.onchange = opts.callback || function() {};
+                    } else if (!this.events[opts.evt]) {
+                        this.events[opts.evt] = {
+                            trigger: opts.trigger || function() {return false;},
+                            callback: opts.callback || function() {}
+                        };
+                    }
                 }
                 return this;
             },
@@ -84,8 +93,14 @@ GoCastJS.Variant = (function() {
             //! Usage: v.off(evt: string) <turn off a custom event>
             //!
             off: function(evt) {
-                if (evt && this.events[evt]) {
-                    delete this.events[evt];
+                if (evt) {
+                    if ('touch' === evt) {
+                        this.ontouch = function() {};
+                    } else if('change' === evt) {
+                        this.onchange = function() {};
+                    } else if (this.events[evt]) {
+                        delete this.events[evt];
+                    }
                 }
                 return this;
             },
