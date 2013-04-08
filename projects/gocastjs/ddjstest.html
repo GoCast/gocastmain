@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>DDJS</title>
+		<script type="text/javascript" src="class.js"></script>
+		<script type="text/javascript" src="variant.js"></script>
+	</head>
+	<body id="t">
+	</body>
+	<script type="text/javascript">
+		var x = new GoCastJS.Variant({
+			ontouch: function() { console.log('INIT: ' + this.val()); },
+			onchange: function() { console.log('CHANGE: ' + this.val()); }
+		}), y = x.val(), z = x.val() + 1;
+		x.on({
+			evt: 'multipleoften',
+			trigger: function() { return (0 === this.val()%10); },
+			callback: function() { console.log('MULTIPLE OF TEN: ' + this.val()); }
+		}).on({
+			evt: 'odd',
+			trigger: function() { return (1 === this.val()%2); },
+			callback: function() { console.log('ODD: ' + this.val()); }
+		}).on({
+			evt: 'fibonacci',
+			trigger: function() {
+				var fib = !this.val() || (this.val() === (y + z));
+				if (fib && this.val()) {
+					y = z;
+					z = this.val();
+				}
+				return fib;
+			},
+			callback: function() { console.log('FIBONACCI: ' + this.val()); }
+		});
+		setInterval(function() { x.val(x.val()+1); }, 1000);
+	</script>
+</html>
