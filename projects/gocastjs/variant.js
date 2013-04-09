@@ -5,6 +5,20 @@
 //!
 var GoCastJS = GoCastJS || {};
 
+GoCastJS.Event = (function() {
+    return GoCastJS.Class({
+        constructor: function GoCastJS_Event(args) {
+            //!
+            //! e.name: string <name of event>
+            //!
+            this.name = args.name;
+            //!
+            //! e.pub: GoCastJS.Variant <publisher of event>
+            //!
+            this.pub = args.pub;
+        }
+    });
+}());
 //!
 //! Usage: var v = new GoCastJS.Variant(args)
 //!
@@ -51,6 +65,7 @@ GoCastJS.Variant = (function() {
                         this.value = newvalue;
                         this.change();
                     }
+                    this.touch();
                     return this;
                 } else {
                     return this.value;
@@ -82,8 +97,9 @@ GoCastJS.Variant = (function() {
                         this.onchange = opts.callback || function() {};
                     } else if (!this.events[opts.evt]) {
                         this.events[opts.evt] = {
-                            trigger: opts.trigger || function() {return false;},
-                            callback: opts.callback || function() {}
+                            trigger: opts.trigger || function() { return false; },
+                            callback: opts.callback || function() {},
+                            subscribers: []
                         };
                     }
                 }
@@ -104,11 +120,48 @@ GoCastJS.Variant = (function() {
                 }
                 return this;
             },
+            //!
+            //! Register an event subscriber
+            //!
+            //! Usage: v.regsub(opts)
+            //!
+            //! opts = {
+            //!     evt: string <name of the event to be subscribed>
+            //!     sub: object <subscriber object>
+            //! }
+            //!
+            //! opts.sub should implement a member function as follows:
+            //! opts.sub.onsubevent = function(e: GoCastJS.Event) {...}
+            //!
+            regsub: function(opts) {
+                if (opts.evt && this.events[opts.evt]) {
+                    this.events[opts.evt].subscribers.push(opts.sub);
+                }
+                return this;
+            },
+            //!
+            //! Deregister an event subscriber
+            //!
+            //! Usage: v.deregsub(opts)
+            //!
+            //! opts = (See regsub());
+            //!
+            deregsub: function(opts) {
+                var idx = -1;
+                if (opts.evt && this.events[opts.evt]) {
+                    idx = this.events[opts.evt].subscribers.indexOf(opts.sub);
+                    if (0 <= idx) {
+                        this.events[opts.evt].subscribers.splice(idx, 1);
+                    }
+                }
+                return this;
+            },
             touch: function() {
                 var e;
                 setTimeout(this.ontouch.bind(this), 0);
                 for (e in this.events) {
-                    if (this.events.hasOwnProperty(e)) {
+                    if (this.events.hasOwnProperty(e) &&
+                        this.events[e].trigger.bind(this)()) {
                         this.emit(e);
                     }
                 }
@@ -116,16 +169,26 @@ GoCastJS.Variant = (function() {
             change: function() {
                 var e;
                 setTimeout(this.onchange.bind(this), 0);
-                for (e in this.events) {
-                    if (this.events.hasOwnProperty(e)) {
-                        this.emit(e);
-                    }
-                }
             },
             emit: function(evt) {
                 if (evt && this.events[evt]) {
-                    if (this.events[evt].trigger.bind(this)()) {
-                        setTimeout(this.events[evt].callback.bind(this), 0);
+                    setTimeout(this.events[evt].callback.bind(this), 0);
+                    this.publish(evt);
+                }
+            },
+            publish: function(evt) {
+                var i, subarray = [],
+                    pubcb = function() {
+                        subarray.pop().onsubevent(new GoCastJS.Event({
+                            name: evt,
+                            pub: this
+                        }));
+                    };
+
+                if (evt && this.events[evt]) {
+                    for (i=0;  i<this.events[evt].subscribers.length; i++) {
+                        subarray.push(this.events[evt].subscribers[i]);
+                        setTimeout(pubcb.bind(this), 0);
                     }
                 }
             }

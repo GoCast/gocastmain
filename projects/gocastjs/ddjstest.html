@@ -5,33 +5,56 @@
 		<script type="text/javascript" src="class.js"></script>
 		<script type="text/javascript" src="variant.js"></script>
 	</head>
-	<body id="t">
+	<body>
+		<button id="0" onclick="digitclicked(this.id)">0</button>
+		<button id="1" onclick="digitclicked(this.id)">1</button>
+		<button id="2" onclick="digitclicked(this.id)">2</button>
+		<button id="3" onclick="digitclicked(this.id)">3</button>
+		<button id="4" onclick="digitclicked(this.id)">4</button>
+		<button id="5" onclick="digitclicked(this.id)">5</button>
+		<button id="6" onclick="digitclicked(this.id)">6</button>
+		<button id="7" onclick="digitclicked(this.id)">7</button>
+		<button id="8" onclick="digitclicked(this.id)">8</button>
+		<button id="9" onclick="digitclicked(this.id)">9</button>
+		<button id="p" onclick="opclicked(this.id)">+</button>
+		<button id="m" onclick="opclicked(this.id)">-</button>
+		<button id="e" onclick="opclicked(this.id)">=</button>
+		<br>
+		<div id="display"></div>
 	</body>
 	<script type="text/javascript">
-		var x = new GoCastJS.Variant({
-			ontouch: function() { console.log('INIT: ' + this.val()); },
-			onchange: function() { console.log('CHANGE: ' + this.val()); }
-		}), y = x.val(), z = x.val() + 1;
-		x.on({
-			evt: 'multipleoften',
-			trigger: function() { return (0 === this.val()%10); },
-			callback: function() { console.log('MULTIPLE OF TEN: ' + this.val()); }
-		}).on({
-			evt: 'odd',
-			trigger: function() { return (1 === this.val()%2); },
-			callback: function() { console.log('ODD: ' + this.val()); }
-		}).on({
-			evt: 'fibonacci',
-			trigger: function() {
-				var fib = !this.val() || (this.val() === (y + z));
-				if (fib && this.val()) {
-					y = z;
-					z = this.val();
-				}
-				return fib;
-			},
-			callback: function() { console.log('FIBONACCI: ' + this.val()); }
-		});
-		setInterval(function() { x.val(x.val()+1); }, 1000);
+		var operand0 = 0,
+			display = document.getElementById('display'),
+			operand1 = new GoCastJS.Variant({
+				value: 0,
+				ontouch: function() { display.innerHTML = this.val().toString(); },
+				onchange: function() { display.innerHTML = this.val().toString(); }
+			}),
+			operator = new GoCastJS.Variant({
+				value: 'e',
+			}).on({
+				evt: 'equals',
+				trigger: function() { return ('e' === this.val()); },
+				callback: function() { operand1.val(operand0); }
+			}).on({
+				evt: 'otherop',
+				trigger: function() { return ('e' !== this.val()); },
+				callback: function() { operand1.val(0); }
+			});
+
+		function digitclicked(digit) {
+			operand1.val(operand1.val()*10 + parseInt(digit));
+		}
+
+		function opclicked(op) {
+			var ops = {
+				p: function(op1, op2) { return op1+op2; },
+				m: function(op1, op2) { return op1-op2; },
+				e: function(op1, op2) { return op2; }
+			};
+
+			operand0 = ops[operator.val()](operand0, operand1.val());
+			operator.val(op);
+		}
 	</script>
 </html>
