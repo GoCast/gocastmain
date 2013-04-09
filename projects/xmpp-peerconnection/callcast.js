@@ -2264,6 +2264,11 @@ var Callcast = {
 
         // Successful callback...
           function(iq) {
+              if ($(iq).find('reason') && $(iq).find('reason').text().search('No_More_Spots') !== -1) {
+                alert('No more spots allowed. Room is full. Please delete a spot before adding another.');
+                return true;
+              }
+
               if (cb) {
                 cb();
               }
@@ -2273,10 +2278,6 @@ var Callcast = {
 
         // Failure callback
           function(iq) {
-              if (iq.find('reason') && iq.find('reason').find('Room_Full')) {
-                alert('No more spots allowed. Room is full. Please delete a spot before adding another.');
-                return;
-              }
               self.log('Error adding spot', iq);
               if (cb) {
                 cb('Error adding spot');
