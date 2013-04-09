@@ -78,6 +78,7 @@ GoCastJS.Variant = (function() {
             //!
             //! opts = {
             //!     evt: string <name of custom event>,
+            //!     type: string (optional) <a 'touch' or 'change' event>
             //!     trigger: function() { ...; return true/false; }
             //!              <function that specifies the condition
             //!              for triggering event>,
@@ -98,6 +99,7 @@ GoCastJS.Variant = (function() {
                     } else if (!this.events[opts.evt]) {
                         this.events[opts.evt] = {
                             trigger: opts.trigger || function() { return false; },
+                            type: opts.type || 'touch',
                             callback: opts.callback || function() {},
                             subscribers: []
                         };
@@ -161,6 +163,7 @@ GoCastJS.Variant = (function() {
                 setTimeout(this.ontouch.bind(this), 0);
                 for (e in this.events) {
                     if (this.events.hasOwnProperty(e) &&
+                        'touch' === this.events[e].type &&
                         this.events[e].trigger.bind(this)()) {
                         this.emit(e);
                     }
@@ -169,6 +172,13 @@ GoCastJS.Variant = (function() {
             change: function() {
                 var e;
                 setTimeout(this.onchange.bind(this), 0);
+                for (e in this.events) {
+                    if (this.events.hasOwnProperty(e) &&
+                        'change' === this.events[e].type &&
+                        this.events[e].trigger.bind(this)()) {
+                        this.emit(e);
+                    }
+                }
             },
             emit: function(evt) {
                 if (evt && this.events[evt]) {
