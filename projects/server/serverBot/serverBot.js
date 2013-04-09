@@ -1265,8 +1265,7 @@ MucRoom.prototype.handleIQ = function(iq) {
 //            this.log("Received IQ 'set' -- "); // + iq.root().toString());
 
             if (iq.getChild('addspot')) {
- // TODO:RMW - if # spots > max, don't addspotreflection               this.spotList
-                this.AddSpotReflection(iq);
+                 this.AddSpotReflection(iq);
             }
             else if (iq.getChild('removespot')) {
                 this.RemoveSpotReflection(iq);
@@ -1897,7 +1896,7 @@ MucRoom.prototype.AddSpotType = function(spottype, info) {
             overseer.roomDB.AddContentToRoom(this.roomname.split('@')[0], info.spotnumber, info, function() {
                 return true;
             }, function(msg) {
-                self.log('AddSpotReflection: ERROR adding to database: ' + msg);
+                self.log('AddSpotType: ERROR adding to database: ' + msg);
             });
         }
     }
@@ -1907,6 +1906,22 @@ MucRoom.prototype.AddSpotType = function(spottype, info) {
 MucRoom.prototype.AddSpotReflection = function(iq) {
     // Need to pull out the 'info' object - which is the attributes to the 'addspot'
     var info = {};
+
+    // If we've reached maximum # spots in the room - let the client know.
+    if (settings.roommanager.maxspotsallowed && size(this.spotList) >= settings.roommanager.maxspotsallowed) {
+        // Disallow the addition and send an error back in response saying that the room is full of spots.
+//       console.log('RAW_DEBUG: No more spots allowed. INBOUND-iq=' + iq.toString());
+        iq.attrs.to = iq.attrs.from;
+        delete iq.attrs.from;
+        iq.attrs.type = 'result';   // result rather than error as 'error' isn't getting back to its destination.
+        iq.c('reason').t('No more spots allowed. No_More_Spots.');
+
+//        iq = this.createErrorIQ(iq, 'No more spots allowed. Room_Full.');
+//        console.log('RAW_DEBUG: No more spots allowed. OUTBOUND-iq=' + iq.root().toString());
+
+        this.client.send(iq.root());
+        return;
+    }
 
     if (iq.getChild('addspot')) {
         info = iq.getChild('addspot').attrs;
