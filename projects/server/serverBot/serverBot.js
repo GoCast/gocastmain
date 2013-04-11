@@ -768,7 +768,16 @@ MucRoom.prototype.notifylog = function(msg) {
 };
 
 MucRoom.prototype.log = function(msg) {
-    console.log(logDate() + ' - @' + this.roomname.split('@')[0] + ': ' + decodeURI(msg));
+    var newmsg;
+
+    try {
+        newmsg = decodeURI(msg);
+    }
+    catch(e) {
+        newmsg = msg;
+    }
+
+    console.log(logDate() + ' - @' + this.roomname.split('@')[0] + ': ' + newmsg);
 };
 
 MucRoom.prototype.IsFull = function() {
