@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en" xml:lang="en" xmlns= "http://www.w3.org/1999/xhtml">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="Content-Language" content="en" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title> Get started with GoCast! </title>
+        <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon">
+        <link rel="stylesheet" type="text/css" href="css/bootstrap.css?GOCASTTIMESTAMP">
+        <link rel="stylesheet" type="text/css" href="css/font-awesome.css?GOCASTTIMESTAMP">
+        <link rel="stylesheet" type="text/css" href="css/subscription.css?GOCASTTIMESTAMP">
+    </head>
+    <body>
+        <div class="navbar navbar-fixed-top navbar-inverse">
+            <div class="navbar-inner">
+                <div class="container">
+                    <a class="brand" href="http://www.gocast.it" target="_blank">
+                        <img src="images/gocastheaderlogo.png"></img>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="row">
+                <div id="thisspaceavailable" class="span5 offset1">
+                </div>
+                <div class="span5">
+                    <form id="subscribe-form" class="form-horizontal show">
+                        <fieldset>
+                            <legend>&nbsp;Subscribe to GoCast</legend>
+                            <div class="control-group" ph=" Your email (this will be your user name) ">
+                                <div class="controls" align="center">
+                                    <input id="input-email" type="email" name="email" required class="span4">
+                                </div>
+                            </div>
+                            <div class="control-group" ph=" Confirm your email ">
+                                <div class="controls" align="center">
+                                    <input id="input-confemail" type="email" name="conf_email" required class="span4">
+                                </div>
+                            </div>
+                            <div class="control-group" ph=" Your name ">
+                                <div class="controls" align="center">
+                                    <input id="input-name" type="text" name="name" required class="span4">
+                                </div>
+                            </div>
+                            <div class="alert alert-error">
+                               <h4><i class="icon-warning-sign"></i></h4><p style="padding-left: 25px;"></p>
+                            </div>
+                        </fieldset>
+                    </form>
+                    <div class="subscription">
+                        <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top" class="span2 pull-left" ph=" $5 per month " style="margin-left: 0;">
+                            <input type="hidden" name="cmd" value="_s-xclick">
+                            <input type="hidden" name="hosted_button_id" value="GV4M4BKDYK4QJ">
+                            <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_subscribeCC_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+                            <img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
+                        </form>
+                        <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top" class="span2 pull-right" ph=" $50 per year ">
+                            <input type="hidden" name="cmd" value="_s-xclick">
+                            <input type="hidden" name="hosted_button_id" value="UYMYJGCDP2RUN">
+                            <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_subscribeCC_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+                            <img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script type="text/javascript" src="js/jquery-1.8.1.js?GOCASTTIMESTAMP"></script>
+        <script type="text/javascript" src="js/bootstrap.js?GOCASTTIMESTAMP"></script>
+        <script type="text/javascript" src="js/jquery.utils.js?GOCASTTIMESTAMP"></script>
+        <script type="text/javascript">
+            var SubUI = {
+                alerttimeout: null,
+                $subform: null,         // subscription form
+                $email: null,           // email field
+                $confemail: null,       // confirm email field
+                $name: null,            // name field
+                $subbtns: null,
+                init: function() {
+                    this.$subform = $('body > div.container > div.row > div.span5 > form#subscribe-form');
+                    this.$email = $('input#input-email', this.$subform);
+                    this.$confemail = $('input#input-confemail', this.$subform);
+                    this.$name = $('input#input-name', this.$subform);
+                    this.$subbtns = $('body > div.container > div.row > div.span5 > div.subscription');
+
+                    this.$email.keydown(function(e) {
+                        setTimeout(SubApp.onemailfieldchange.bind(this) , 100);
+                    }).change(function(e) {
+                        setTimeout(SubApp.onemailfieldchange.bind(this) , 100);
+                    }).focus();
+                },
+                // type = 'success' or 'error'
+                // periodms (optional, default = 5000) 
+                displayalert: function(type, message, periodms) {
+                    var $alert = null, self = this,
+                        iconclass = {error: 'icon-warning-sign', success: 'icon-ok-sign'};
+
+                    clearTimeout(this.alerttimeout);
+                    $('.alert.show', this.$subform).removeClass('show');
+                    $alert = $('.alert', this.$subform).removeClass('alert-success')
+                                                       .removeClass('alert-error')
+                                                       .addClass('alert-' + type)
+                                                       .addClass('show');
+                    $('i', $alert).removeClass('icon-warning-sign')
+                                  .removeClass('icon-ok-sign')
+                                  .addClass(iconclass[type]);
+                    $('p', $alert).html(message);
+                    this.alerttimeout = setTimeout(function() {
+                        $('.alert.show', self.$subform).removeClass('show');
+                    }, periodms||5000);
+                },
+                // enable = true or false
+                displaysubscriptionbuttons: function(enable) {
+                    if (enable) {
+                        this.$subbtns.addClass('show');
+                    } else {
+                        this.$subbtns.removeClass('show');
+                    }
+                }
+            },
+            SubApp = {
+                // callback for email field change
+                // this = $email.get(0)
+                onemailfieldchange: function() {
+                    SubUI.displayalert('success', 'Changed: ' + $(this).val());
+                }
+            };
+
+            $(document).ready(function() {
+                SubUI.init();
+            });
+        </script>
+        <!-- Google Code for Remarketing tag -->
+        <!-- Remarketing tags may not be associated with personally identifiable information or placed on pages related to sensitive categories. For instructions on adding this tag and more information on the above requirements, read the setup guide: google.com/ads/remarketingsetup -->
+        <!--<script type="text/javascript">
+            /* <![CDATA[ */
+            var google_conversion_id = 989217871;
+            var google_conversion_label = "JwUyCMnOswQQz4jZ1wM";
+            var google_custom_params = window.google_tag_params;
+            var google_remarketing_only = true;
+            /* ]]> */
+        </script>
+        <script type="text/javascript" src="//www.googleadservices.com/pagead/conversion.js"></script>-->
+        <!-- Google Analytics -->
+        <!--<script type="text/javascript">
+            var _gaq = _gaq || [];
+            _gaq.push(['_setAccount', 'UA-37964802-1']);
+            _gaq.push(['_trackPageview']);
+
+            if (window.location.hostname !== 'dev.gocast.it') {
+                (function() {
+                    var ga = document.createElement('script'),
+                        s = document.getElementsByTagName('script')[0];
+
+                    ga.type = 'text/javascript';
+                    ga.async = true;
+                    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') +
+                             '.google-analytics.com/ga.js';
+                    s.parentNode.insertBefore(ga, s);
+              })();
+            }
+            else {
+              console.log('Skipped Google Analytics - dev.');
+            }
+        </script>-->
+        <!-- End Google Analytics -->
+        <!-- Facebook ad tracking for conversion - 3/4/2013 -->
+        <!--<script type="text/javascript">
+            var fb_param = {};
+            fb_param.pixel_id = '6005566649879';
+            fb_param.value = '0.00';
+            (function(){
+              var fpw = document.createElement('script');
+              if (window.location.hostname !== 'dev.gocast.it') {
+                  fpw.async = true;
+                  fpw.src = '//connect.facebook.net/en_US/fp.js';
+                  var ref = document.getElementsByTagName('script')[0];
+                  ref.parentNode.insertBefore(fpw, ref);
+              }
+              else {
+                console.log('Skipped Facebook conversion - dev.');
+              }
+            })();
+        </script>-->
+    </body>
+</html>
