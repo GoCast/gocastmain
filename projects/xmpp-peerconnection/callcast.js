@@ -229,6 +229,8 @@ var Callcast = {
     Callback_OnEffectApplied: null,
     Callback_OnNicknameInUse: null,
     connection: null,
+    localstream: null,
+    localdesktopstream: null,
     localplayer: null,
     localplayerLoaded: false,
     participants: {},
@@ -990,9 +992,18 @@ var Callcast = {
         // When a remote peer's stream has been added, I get called here.
         //
         this.onaddstream = function(stream) {
+            var screencap = (stream.videoTracks && stream.videoTracks.length &&
+                            'Screen' === stream.videoTracks[0].label) ||
+                            (stream.getVideoTracks && stream.getVideoTracks().length &&
+                             'Screen' === stream.getVideoTracks()[0].label);
+
             if ('undefined' !== typeof(stream) && null !== stream) {
                 Callcast.log('Callee:' + self.GetID() + ' onaddstream: added remote stream [' +
-                            stream.label + ']');
+                            stream.label + ']: ', stream);
+            }
+            if (screencap) {
+                Callcast.log('REMOTE DESKTOP STREAM: ', stream);
+                this.screenvid.src = webkitURL.createObjectURL(stream);
             }
         };
 
@@ -1235,6 +1246,12 @@ var Callcast = {
             }
             catch (e) {
                 Callcast.log('Callee:' + self.GetID() + ' EXCEPTION: ', e.toString(), e);
+            }
+        };
+
+        this.shareDesktop = function(stream) {
+            if (this.peer_connection && stream) {
+                this.peer_connection.AddStream(stream, this.InitiateCall.bind(this));
             }
         };
 
@@ -2929,6 +2946,14 @@ var Callcast = {
     },
     getDatabaseNickname: function() {
         return this.profileInfo.name;       // Database nickname
+    },
+    shareDesktop: function(stream) {
+        var nick;
+        for (nick in Callcast.participants) {
+            if (Callcast.participants.hasOwnProperty(nick)) {
+                Callcast.participants[nick].shareDesktop(stream);
+            }
+        }
     },
     connStatusHandler: function(status) {
         switch(status) {

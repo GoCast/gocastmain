@@ -532,6 +532,10 @@ function onSpotClose(event)
   }
 
   if (true === reallyClose) {
+    if ($(spot).hasClass('deskshare')) {
+      //Remove desktop stream from all participants
+      Callcast.localdesktopstream = null;
+    }
     if (item.spotnumber){
         Callcast.RemoveSpot({spotnumber: item.spotnumber || item.index});
       } else {
@@ -879,7 +883,7 @@ function carouselItemZoom(event)
    // get item and remove it from carousel
    var spot = $(event.currentTarget).parent(),
        item = $(spot).data('item'),
-       gcedit, editorContent;
+       gcedit, editorContent, deskshare;
 
    if (!item) {
     spot = $(event.target).parent();
@@ -888,6 +892,7 @@ function carouselItemZoom(event)
 
   //If spot is editor, save its contents
   gcedit = $(spot).data('gcEdit');
+  deskshare = $(spot).data('gcDeskShare');
   editorContent = '';
 
   if (gcedit) {
@@ -922,6 +927,9 @@ function carouselItemZoom(event)
     spot.get(0).removeChild(spot.get(0).lastChild);
     gcedit = new GoCastJS.gcEdit(spot, gcedit.info);
     gcedit.editor.setCode(editorContent);
+  } else if (deskshare) {
+    deskshare.zoom(true);
+    deskshare.screen.play();
   }
 
   var wiki = $(spot).data('wiki');
@@ -947,6 +955,7 @@ function carouselItemUnzoom(event)
    $('#meeting > #zoom').css('display', 'none'); // undisplay zoom div
    var spot = $('#meeting > #zoom > .cloudcarousel'),
        gcedit = $(spot).data('gcEdit'),
+       deskshare = $(spot).data('gcDeskShare'),
        editorContent = '';
 
   if (gcedit) {
@@ -961,6 +970,9 @@ function carouselItemUnzoom(event)
     spot.get(0).removeChild(spot.get(0).lastChild);
     gcedit = new GoCastJS.gcEdit(spot, gcedit.info);
     gcedit.editor.setCode(editorContent);
+  } else if (deskshare) {
+    deskshare.zoom(false);
+    deskshare.screen.play();
   }
 
   var wiki = $(spot).data('wiki');
@@ -1182,6 +1194,9 @@ function openMeeting(
     //alert("unload");
  //RMW-TRY   Callcast.disconnect();
   });
+
+  $(window).resize(resizeWindows);
+
   /*
    * Activate meeting window. */
   activateWindow('#meeting');
@@ -1900,6 +1915,7 @@ function resizeZoom(event)
        wb       = wbCanvas.data('wb'),
        edit     = jqDiv.data('gcEdit'),
        fs       = jqDiv.data('gcFileShare'),
+       ds       = jqDiv.data('gcDeskShare'),
        width, height, item, newWidth, newHeight,
        widthScale, heightScale, scale, left, top;
    if (jqDiv.length > 0)
@@ -1912,10 +1928,19 @@ function resizeZoom(event)
       widthScale = newWidth / item.orgWidth;
       heightScale = newHeight / item.orgHeight;
       scale = (widthScale < heightScale) ? widthScale : heightScale;
-      item.orgWidth *= scale;
-      item.orgHeight *= scale;
-      item.plgOrgWidth *= scale;
-      item.plgOrgHeight *= scale;
+
+      if (ds) {
+        item.orgWidth = width;
+        item.orgHeight = height;
+        item.plgOrgWidth = width;
+        item.plgOrgHeight = height;
+      } else {
+        item.orgWidth *= scale;
+        item.orgHeight *= scale;
+        item.plgOrgWidth *= scale;
+        item.plgOrgHeight *= scale;
+      }
+
       if (wb) // todo better wb access
       {
         wb.setScale(item.plgOrgWidth, item.plgOrgHeight);
@@ -1923,6 +1948,8 @@ function resizeZoom(event)
         edit.setScale(item.plgOrgWidth, item.plgOrgHeight);
       } else if (fs) {
         fs.setScale(item.plgOrgWidth, item.plgOrgHeight);
+      } else if (ds) {
+        ds.setScale(item.plgOrgWidth, item.plgOrgHeight);
       }
 
       // center div in zoom div
@@ -2423,7 +2450,6 @@ function tryPluginInstall(
     $('.window .close').on('click', closeWindow);
     // Resize window.
     $(document).trigger('checkCredentials');
-    $(window).resize(resizeWindows);
   }
   else { // plugin not loaded or out of date
     // prompt user to install plugin
@@ -3066,6 +3092,35 @@ function addFileShare() {
       },function() {
         console.log('carousel addFileShare callback');
       });
+}
+
+function addDeskShare() {
+  navigator.webkitGetUserMedia({
+    video: {
+      mandatory: {
+        chromeMediaSource: 'screen',
+        minWidth: 1280,
+        minHeight: 720,
+        maxWidth: 1280,
+        maxHeight: 720
+      }
+    }
+  },
+  function(stream) {
+    Callcast.localdesktopstream = stream;
+    Callcast.AddSpot({
+      spottype: 'deskshare',
+      spotreplace: 'first-unoc',
+      owner: Callcast.nick
+    }, function() {
+      console.log('carousel addDeskShare callback');
+      Callcast.shareDesktop(Callcast.localdesktopstream);
+    });
+  },
+  function(e) {
+    alert('DeskShare: Error Code = ' + e.code);
+  });
+
 }
 
 function addSlideShare() {

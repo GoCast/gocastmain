@@ -803,7 +803,8 @@ function doSpot(spotDiv, info)
   {
     var divIcon, divTitle,
         jqDiv = $(spotDiv),
-        whiteBoard, editor, wiki, fshare;
+        whiteBoard, editor,
+        wiki, fshare, deskshare;
 //    console.log('doSpot', info);
 //    console.log('spotDiv', spotDiv);
     if (!spotDiv) {throw "no spotDiv";}
@@ -894,6 +895,23 @@ function doSpot(spotDiv, info)
       if (wiki) {
         wiki.doSpot(info);
       }
+    }
+    else if (info.spottype === 'deskshare') {
+      if (info.cmdtype === 'addspot') {
+        jqDiv.attr('id', app.str2id('deskshare ' + info.spotnumber));
+        jqDiv.attr('title', 'DeskShare');
+        jqDiv.attr('alt', 'DeskShare');
+        jqDiv.attr('encname', 'deskshare');
+        jqDiv.attr('spotnumber', info.spotnumber);
+        jqDiv.removeClass('unoccupied').addClass('typeContent deskshare');
+        deskshare = new GoCastJS.gcDeskShare(spotDiv, info);
+      } else {
+        deskshare = jqDiv.data('gcDeskShare');
+      }
+
+      if (deskshare) {
+        deskshare.doSpot(info);
+      }      
     }
     else if (info.spottype === 'url')
     {

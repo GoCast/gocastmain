@@ -1896,4 +1896,9 @@ body > #tour > button#imgood {
   border: 3px white dashed;
 }
 
+.deskshare {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
 /*</MANJESH>*/

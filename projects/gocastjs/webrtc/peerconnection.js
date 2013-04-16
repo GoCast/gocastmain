@@ -520,7 +520,7 @@ GoCastJS.PeerConnection = function(options) {
     this.connState = 'preinit';
     this.pendingCandidates = [];
     this.connTimer = null;
-    this.connTimeout = 5000;
+    this.connTimeout = 15000;
     this.peerconn = null;
 
     if ('native' === apitype) {
@@ -534,14 +534,26 @@ GoCastJS.PeerConnection = function(options) {
 
         this.peerconn = new webkitRTCPeerConnection({iceServers: iceservers});
         this.peerconn.onaddstream = function(e) {
-            player.src = webkitURL.createObjectURL(e.stream);
+            var screencap = (e.stream.videoTracks && e.stream.videoTracks.length &&
+                            'Screen' === e.stream.videoTracks[0].label) ||
+                            (e.stream.getVideoTracks && e.stream.getVideoTracks().length &&
+                             'Screen' === e.stream.getVideoTracks()[0].label);
+
+            if (!screencap) {
+                player.src = webkitURL.createObjectURL(e.stream);
+            }
             if (options.onAddStream) {
                 options.onAddStream(e.stream);
             }
         }
     } else if ('gcp' === apitype) {
         this.player.onaddstream = function(stream) {
-            player.source = stream;
+            var screencap = (stream.videoTracks && stream.videoTracks.length &&
+                            'Screen' === stream.videoTracks[0].label);
+
+            if (!screencap) {
+                player.source = stream;
+            }
             if ('undefined' !== typeof(options.onAddStream) &&
                 null !== options.onAddStream) {
                 options.onAddStream(stream);
