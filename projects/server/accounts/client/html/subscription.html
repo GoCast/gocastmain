@@ -71,12 +71,15 @@
         <script type="text/javascript">
             var SubUI = {
                 alerttimeout: null,
+                kdwntimeout: null,
                 $subform: null,         // subscription form
                 $email: null,           // email field
                 $confemail: null,       // confirm email field
                 $name: null,            // name field
                 $subbtns: null,
                 init: function() {
+                    var self = this;
+
                     this.$subform = $('body > div.container > div.row > div.span5 > form#subscribe-form');
                     this.$email = $('input#input-email', this.$subform);
                     this.$confemail = $('input#input-confemail', this.$subform);
@@ -84,9 +87,10 @@
                     this.$subbtns = $('body > div.container > div.row > div.span5 > div.subscription');
 
                     this.$email.keydown(function(e) {
-                        setTimeout(SubApp.onemailfieldchange.bind(this) , 100);
+                        clearTimeout(self.kdwntimeout);
+                        self.kdwntimeout = setTimeout(SubApp.onemailfieldchange.bind(this), 1000);
                     }).change(function(e) {
-                        setTimeout(SubApp.onemailfieldchange.bind(this) , 100);
+                        setTimeout(SubApp.onemailfieldchange.bind(this), 0);
                     }).focus();
                 },
                 // type = 'success' or 'error'
