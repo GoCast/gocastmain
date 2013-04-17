@@ -63,7 +63,7 @@
  */
 
 /*jslint sloppy: false, white: true, todo: true, browser: true, devel: true */
-/*global Buffer */
+/*global Buffer, webkitURL */
 'use strict';
 
 var GoCastJS = GoCastJS || {};
@@ -965,6 +965,7 @@ var Callcast = {
         this.jid = room + '/' + nickin.replace(/ /g, '\\20');
         this.non_muc_jid = '';
         this.bAmCaller = null;
+        this.offertype = null;
         this.offer = null;  // If we are the callee, we'll wind up with the offer for CompleteCall
 
         this.callRetries = 0;       // Counter for # times we've tried making a p2p connection.
@@ -992,10 +993,8 @@ var Callcast = {
         // When a remote peer's stream has been added, I get called here.
         //
         this.onaddstream = function(stream) {
-            var screencap = (stream.videoTracks && stream.videoTracks.length &&
-                            'Screen' === stream.videoTracks[0].label) ||
-                            (stream.getVideoTracks && stream.getVideoTracks().length &&
-                             'Screen' === stream.getVideoTracks()[0].label);
+            var screencap = (stream.audioTracks && !stream.audioTracks.length) ||
+                            (stream.getAudioTracks && !stream.getAudioTracks().length);
 
             if ('undefined' !== typeof(stream) && null !== stream) {
                 Callcast.log('Callee:' + self.GetID() + ' onaddstream: added remote stream [' +
@@ -1003,7 +1002,7 @@ var Callcast = {
             }
             if (screencap) {
                 Callcast.log('REMOTE DESKTOP STREAM: ', stream);
-                this.screenvid.src = webkitURL.createObjectURL(stream);
+                self.screenvid.src = webkitURL.createObjectURL(stream);
             }
         };
 
@@ -1063,19 +1062,22 @@ var Callcast = {
             Callcast.log('Callee:' + self.GetID() + ' I am the Caller.');
         };
 
-        this.StartConnection = function(offer) {
+        this.StartConnection = function(offertype, offer) {
             // Only start the connection if:
             // a) peerconnection doesn't exist yet
             // b) We have AV available locally.
             this.bHasAV = true;
 
+            if (offertype) {
+                this.offertype = offertype;
+            }
             //
             // Only call the plugin callback and init the peer connection if we have a functional AV plugin.
             //
             if (Callcast.IsPluginLoaded()) {
                 this.offer = offer;     // If we are sent an offer, grab a copy of it for later.
 
-                if (!this.AddPluginResult) {
+                if (this.offertype === 'offer' && !this.AddPluginResult) {
                     Callcast.log('Callee: Starting peerconnection and adding plugin to carousel for: ' + nickname);
                     if (Callcast.Callback_AddPluginToParticipant) {
                         this.AddPluginResult = Callcast.Callback_AddPluginToParticipant(nickin.replace(/ /g, ''), nickname);
@@ -1084,7 +1086,10 @@ var Callcast = {
                         Callcast.log('Callee: ERROR: Init failure. No Callback_AddPluginToParticipant callback available.');
                     }
                 }
-                this.InitPeerConnection();
+
+                if (this.offertype === 'offer') {
+                    this.InitPeerConnection();
+                }
             }
         };
 
@@ -1129,6 +1134,7 @@ var Callcast = {
             this.bAmCaller = true;
             if (Callcast.IsVideoDeviceAvailable() || Callcast.IsMicrophoneDeviceAvailable()) {
                 try {
+                    this.offertype = 'offer';   // Not a desktop or other type of call.
                     this.peer_connection.AddStream(Callcast.localstream, this.InitiateCall.bind(this));
                 }
                 catch(e3) {
@@ -1138,14 +1144,21 @@ var Callcast = {
         };
 
         this.AcceptCall = function() {
-            this.bAmCaller = false;
-            if (Callcast.IsVideoDeviceAvailable() || Callcast.IsMicrophoneDeviceAvailable()) {
-                try {
-                    this.peer_connection.AddStream(Callcast.localstream, this.CompleteCall.bind(this));
+
+            if (this.offertype === 'offer') {
+                this.bAmCaller = false;
+                if (Callcast.IsVideoDeviceAvailable() || Callcast.IsMicrophoneDeviceAvailable()) {
+                    try {
+                        this.peer_connection.AddStream(Callcast.localstream, this.CompleteCall.bind(this));
+                    }
+                    catch(e3) {
+                        Callcast.log('AddStream exception: ' + e3);
+                    }
                 }
-                catch(e3) {
-                    Callcast.log('AddStream exception: ' + e3);
-                }
+            }
+            else {
+                // For non-initial offers (desktop), just complete the call.
+                this.CompleteCall();
             }
         };
 
@@ -1219,7 +1232,7 @@ var Callcast = {
                             Callcast.log('InitiateCall: CreateOffer complete.');
                             self.peer_connection.SetLocalDescription('offer', sdp, function() {
                                 var offer = $msg({to: self.jid, type: 'chat'})
-                                        .c('offer', {xmlns: Callcast.NS_CALLCAST}).t(sdp);
+                                        .c(self.offertype, {xmlns: Callcast.NS_CALLCAST}).t(sdp);
 
                                 Callcast.log('InitiateCall: SetLocalDescription complete.');
                                 Callcast.log('InitiateCall: Offer is: ' + sdp);
@@ -1251,6 +1264,7 @@ var Callcast = {
 
         this.shareDesktop = function(stream) {
             if (this.peer_connection && stream) {
+                this.offertype = 'desktopoffer';   // A desktop type of call.
                 this.peer_connection.AddStream(stream, this.InitiateCall.bind(this));
             }
         };
@@ -1274,7 +1288,7 @@ var Callcast = {
                 // the call.
                 //
                 if (!this.peer_connection) {
-                    this.StartConnection(this.offer);
+                    this.StartConnection(this.offertype, this.offer);
                     this.AcceptCall();
                 }
                 else if (this.peer_connection)
@@ -1463,22 +1477,28 @@ var Callcast = {
 
 
         // Inbound call - initiating
-        if ($(msg).find('offer').length > 0)
+        if ($(msg).find('offer').length > 0 || $(msg).find('desktopoffer').length > 0)
         {
-            Callcast.log('Got inbound call-offer from ' + $(msg).attr('from'));
-
             if (!Callcast.participants[res_nick])
             {
                 Callcast.log('ERROR: Participant for nick=' + res_nick + ' not found. Who is this guy?');
                 return true;
             }
 
+            if ($(msg).find('desktopoffer').length > 0) {
+                Callcast.log('Got inbound desktop-offer from ' + $(msg).attr('from'));
+                sdp = $(msg).children('desktopoffer').text().replace(/&quot;/g, '"');
+                Callcast.participants[res_nick].StartConnection('desktopoffer', sdp);
+            }
+            else {
+                Callcast.log('Got inbound call-offer from ' + $(msg).attr('from'));
+                sdp = $(msg).children('offer').text().replace(/&quot;/g, '"');
+                Callcast.participants[res_nick].StartConnection('offer', sdp);
+            }
+
             //
             // Otherwise, we already know this guy - so complete the call.
             //
-            sdp = $(msg).children('offer').text().replace(/&quot;/g, '"');
-
-            Callcast.participants[res_nick].StartConnection(sdp);
             Callcast.participants[res_nick].AcceptCall();
         }
         else if ($(msg).find('answer').length > 0)
@@ -2073,7 +2093,7 @@ var Callcast = {
                                 Callcast.log('PRES-INFO: New-Nick: ' + nick + ' has AV capability (plugin)');
 
                                 // They have AV -- so start up peerconnection and plugin. (so long as we have the plugin too)
-                                Callcast.participants[nick].StartConnection();
+                                Callcast.participants[nick].StartConnection('offer');
                                 Callcast.participants[nick].StartCall();
                             }
                             else {
@@ -2443,7 +2463,7 @@ var Callcast = {
         }
 
         nick = this.NoSpaces((localStorage && localStorage.oldnick) ? localStorage.oldnick : this.nick);
-        oldjids = JSON.stringify(this.GetOldJids() ? this.GetOldJids() : []);
+        oldjids = JSON.stringify(this.GetOldJids() || []);
         this.connection.sendIQ($iq({
             to: roommanager,
             id: 'roomcreate1',

@@ -38,10 +38,28 @@ GoCastJS.gcDeskShare.prototype.setScale = function(width, height) {
 }
 
 GoCastJS.gcDeskShare.prototype.doSpot = function(info) {
+	var self = this;
+
 	if (info.owner === Callcast.nick) {
-		if (Callcast.localdesktopstream) {
-			this.screen.src = webkitURL.createObjectURL(Callcast.localdesktopstream);
-		}
+	    navigator.webkitGetUserMedia({
+	      video: {
+	        mandatory: {
+	          chromeMediaSource: 'screen',
+	          minWidth: 1280,
+	          minHeight: 720,
+	          maxWidth: 1280,
+	          maxHeight: 720
+	        }
+	      }
+	    },
+	    function(stream) {
+	      Callcast.localdesktopstream = stream;
+	      self.screen.src = webkitURL.createObjectURL(stream);
+	      Callcast.shareDesktop(Callcast.localdesktopstream);
+	    },
+	    function(e) {
+	      alert('DeskShare: Error Code = ' + e.code);
+	    });
 	} else {
 		if (Callcast.participants[info.owner]) {
 			Callcast.participants[info.owner].screenvid = this.screen;

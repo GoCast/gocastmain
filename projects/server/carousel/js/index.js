@@ -2091,7 +2091,7 @@ function enterId(options)
           var msg = '';
 
           if ('xmppprob' === response.result) {
-            msg = 'Problem connecting to the chat server.';  
+            msg = 'Problem connecting to the chat server.';
           } else if ('authfail' === response.result) {
             msg = 'Wrong email or password.';
           } else if ('noaccount' === response.result) {
@@ -3095,32 +3095,13 @@ function addFileShare() {
 }
 
 function addDeskShare() {
-  navigator.webkitGetUserMedia({
-    video: {
-      mandatory: {
-        chromeMediaSource: 'screen',
-        minWidth: 1280,
-        minHeight: 720,
-        maxWidth: 1280,
-        maxHeight: 720
-      }
-    }
-  },
-  function(stream) {
-    Callcast.localdesktopstream = stream;
-    Callcast.AddSpot({
-      spottype: 'deskshare',
-      spotreplace: 'first-unoc',
-      owner: Callcast.nick
-    }, function() {
-      console.log('carousel addDeskShare callback');
-      Callcast.shareDesktop(Callcast.localdesktopstream);
-    });
-  },
-  function(e) {
-    alert('DeskShare: Error Code = ' + e.code);
+  Callcast.AddSpot({
+    spottype: 'deskshare',
+    spotreplace: 'first-unoc',
+    owner: Callcast.nick
+  }, function() {
+    console.log('carousel addDeskShare callback');
   });
-
 }
 
 function addSlideShare() {

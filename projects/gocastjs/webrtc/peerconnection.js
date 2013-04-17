@@ -534,10 +534,8 @@ GoCastJS.PeerConnection = function(options) {
 
         this.peerconn = new webkitRTCPeerConnection({iceServers: iceservers});
         this.peerconn.onaddstream = function(e) {
-            var screencap = (e.stream.videoTracks && e.stream.videoTracks.length &&
-                            'Screen' === e.stream.videoTracks[0].label) ||
-                            (e.stream.getVideoTracks && e.stream.getVideoTracks().length &&
-                             'Screen' === e.stream.getVideoTracks()[0].label);
+            var screencap = (e.stream.audioTracks && !e.stream.audioTracks.length) ||
+                            (e.stream.getAudioTracks && !e.stream.getAudioTracks().length);
 
             if (!screencap) {
                 player.src = webkitURL.createObjectURL(e.stream);
@@ -628,7 +626,7 @@ GoCastJS.PeerConnection = function(options) {
         else if ('connected' === newState) {
             if (self.connTimer) {
                 clearTimeout(self.connTimer);
-                self.connTimer = null;                    
+                self.connTimer = null;
             }
         }
         if ('undefined' !== typeof(options.onConnStateChange) &&
