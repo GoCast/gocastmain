@@ -857,6 +857,24 @@ MucRoom.prototype.EndMeeting = function() {
     this.maxParticipantsSeen = 0;
 };
 
+MucRoom.prototype.removeOwnedSpots = function(owner) {
+    var k, info;
+
+    for (k in this.spotList) {
+        if (this.spotList.hasOwnProperty(k)) {
+            info = this.spotList[k];
+            // Check to see if the owner is a match
+            if (info.owner === owner || info.author === owner) {
+                // Need to remove this spot
+                this.log('removeOwnedSpots: Removing owned spot for: ' + owner);
+//                console.log('DEBUG: Removing spot#: ', k, ', info is: ', info);
+                this.RemoveSpotNumber(k);
+                this.SendGroupCmd('removespot', info);
+            }
+        }
+    }
+};
+
 MucRoom.prototype.handlePresence = function(pres) {
     var fromnick = pres.attrs.from.split('/')[1] || '',
         fromjid = null,
@@ -977,6 +995,7 @@ MucRoom.prototype.handlePresence = function(pres) {
     else if (pres.attrs.type === 'unavailable' && this.participants[fromnick])
     {
         this.log(fromnick + ' left room.');
+        this.removeOwnedSpots(fromnick);
         delete this.participants[fromnick];
 
         //
