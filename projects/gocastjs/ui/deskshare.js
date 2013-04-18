@@ -27,6 +27,10 @@ GoCastJS.gcDeskShare.prototype.zoom = function(z) {
 GoCastJS.gcDeskShare.prototype.setScale = function(width, height) {
 	this.div.style.width = width + 'px';
 	this.div.style.height = height + 'px';
+	$('#err', this.div).css({
+		'width': width + 'px',
+		'height': height + 'px'
+	});
 
 	if (this.zoomed) {
 		this.screen.width = 1280;
@@ -45,10 +49,12 @@ GoCastJS.gcDeskShare.prototype.doSpot = function(info) {
 	      video: {
 	        mandatory: {
 	          chromeMediaSource: 'screen',
-	          minWidth: 1280,
-	          minHeight: 720,
-	          maxWidth: 1280,
-	          maxHeight: 720
+	          minWidth: '1280',
+	          minHeight: '720',
+	          maxWidth: '1280',
+	          maxHeight: '720',
+	          minFrameRate: '5',
+	          maxFrameRate: '5'
 	        }
 	      }
 	    },
@@ -58,11 +64,27 @@ GoCastJS.gcDeskShare.prototype.doSpot = function(info) {
 	      Callcast.shareDesktop(Callcast.localdesktopstream);
 	    },
 	    function(e) {
-	      alert('DeskShare: Error Code = ' + e.code);
+	      showWarning('Desktop capture disabled', 'Please enable the "screen capture" feature in Chrome by opening a new tab ' +
+	      										  'and typing "chrome://flags" in the address bar. After enabling ' +
+	      										  'the feature, hit the "Relaunch" button to restart Chrome.');
 	    });
 	} else {
-		if (Callcast.participants[info.owner]) {
-			Callcast.participants[info.owner].screenvid = this.screen;
+		if ($.urlvars.wrtcable) {
+			if (Callcast.participants[info.owner]) {
+				Callcast.participants[info.owner].screenvid = this.screen;
+				if (Callcast.participants[info.owner].desktopstream) {
+					this.screen.src = webkitURL.createObjectURL(
+						Callcast.participants[info.owner].desktopstream
+					);
+				}
+			}
+		} else {
+			$('div#gcDeskShareDiv', this.jqSpot).html('<p id="err">Your browser cannot display remote desktops. ' +
+													  'To enjoy this feature, download Chrome version 26 or above.</p>');
+			$('img#upper-left', this.jqSpot).remove();
 		}
+
+		$('img#upper-right', this.jqSpot).remove();
+		$('div.name', this.jqSpot).text(decodeURIComponent(info.owner.split('/')[0]) + '\'s Desktop');
 	}
 }

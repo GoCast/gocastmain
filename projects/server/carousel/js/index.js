@@ -527,15 +527,17 @@ function onSpotClose(event)
 
   console.log("onSpotClose", event);
 
-  if ($(spot).hasClass('typeContent') && !$(spot).hasClass('wiki')) {
+  if ($(spot).hasClass('typeContent') && !$(spot).hasClass('wiki') && !$(spot).hasClass('deskshare')) {
     reallyClose = confirm('All content in this spot will be lost. Are you sure ?');
+  } else if ($(spot).hasClass('typeContent') && $(spot).hasClass('deskshare')) {
+    reallyClose = confirm('Your desktop will no longer be shared. Are you sure ?');
+    if (reallyClose) {
+      Callcast.unshareDesktop(Callcast.localdesktopstream);
+      Callcast.localdesktopstream = null;
+    }
   }
 
   if (true === reallyClose) {
-    if ($(spot).hasClass('deskshare')) {
-      //Remove desktop stream from all participants
-      Callcast.localdesktopstream = null;
-    }
     if (item.spotnumber){
         Callcast.RemoveSpot({spotnumber: item.spotnumber || item.index});
       } else {
@@ -2741,7 +2743,10 @@ $(document).ready(function(
 
   if ($.urlvars.wrtcable) {
     $('div#upper-right > div#settings').css('display', 'none');
+    $('div#upper-right > a#gocastplayermode').css('display', 'initial');
     $('div#scarousel div#mystream > div#effectsPanel > div[effect]').css('display', 'none');
+  } else if ($.urlvars.deskshareable) {
+    $('div#upper-right > a#nativemode').css('display', 'initial');
   }
 
   Callcast.init();
@@ -3095,13 +3100,25 @@ function addFileShare() {
 }
 
 function addDeskShare() {
-  Callcast.AddSpot({
-    spottype: 'deskshare',
-    spotreplace: 'first-unoc',
-    owner: Callcast.nick
-  }, function() {
-    console.log('carousel addDeskShare callback');
-  });
+  if ($.urlvars.wrtcable && $.urlvars.deskshareable) {
+    Callcast.AddSpot({
+      spottype: 'deskshare',
+      spotreplace: 'first-unoc',
+      owner: Callcast.nick
+    }, function() {
+      console.log('carousel addDeskShare callback');
+    });
+  } else if ($.urlvars.wrtcable) {
+    showWarning('Feature not supported', 'To enable desktop sharing, please upgrade Chrome ' +
+                                         'to version 26 or above.');
+  } else if ($.urlvars.deskshareable) {
+    showWarning('Feature not supported', 'To enable desktop sharing, please click the ' +
+                                         '"GoCast HTML5" button to re-enter the room with a pure HTML5 ' +
+                                         'version of GoCast.');
+  } else {
+    showWarning('Feature not supported', 'To enable desktop sharing, please download Chrome ' +
+                                         'version 26 pr above.');
+  }
 }
 
 function addSlideShare() {
@@ -3417,6 +3434,20 @@ function leaveGoCast() {
 }
 
 var forgetXmppConnection = function() {};
+
+function nativeWebrtcMode() {
+  if (localStorage) {
+    localStorage.gcpForceNative = 'true';
+  }
+  window.location.reload();
+}
+
+function gocastPlayerMode() {
+  if (localStorage) {
+    delete localStorage.gcpForceNative;
+  }
+  window.location.reload();
+}
 
 function emailInviteDialog(e) {
   if (!Callcast.profileInfo.email) {

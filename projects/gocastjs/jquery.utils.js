@@ -21,6 +21,9 @@
     urlvarsobj['baseurl'] = urlsplit[0];
     if ($.browser.chrome && 25 <= parseInt($.browser.version)) {
         urlvarsobj['wrtcable'] = 'true';
+        if (26 <= parseInt($.browser.version)) {
+            urlvarsobj['deskshareable'] = 'true';
+        }
     }
 
     if (urlsplit[1]) {

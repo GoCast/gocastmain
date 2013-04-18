@@ -546,8 +546,7 @@ GoCastJS.PeerConnection = function(options) {
         }
     } else if ('gcp' === apitype) {
         this.player.onaddstream = function(stream) {
-            var screencap = (stream.videoTracks && stream.videoTracks.length &&
-                            'Screen' === stream.videoTracks[0].label);
+            var screencap = (stream.audioTracks && !stream.audioTracks.length);
 
             if (!screencap) {
                 player.source = stream;

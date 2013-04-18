@@ -751,6 +751,10 @@ var Callcast = {
             presobj.av = 'y';
         }
 
+        if ($.urlvars.wrtcable) {
+            presobj.wrtcable = 'true';
+        }
+
         pres = $pres(presobj).c('x', {xmlns: 'http://jabber.org/protocol/muc'});
 
         if (this.presenceBlob) {
@@ -950,13 +954,12 @@ var Callcast = {
         return rpt;
     },
 
-    Callee: function(nickin, room) {
+    Callee: function(nickin, room, wrtcable) {
         // Ojbect for participants in the call or being called (in progress)
         var nickname = nickin.split('/')[0],      //remove delim from nickin and take up front portion. nick/resource
             self = this;
 
         this.peer_connection = null;
-        this.stream = null;
 
         // Nickname must be sure to NOT have spaces here.
         nickname = nickname.replace(/ /g, '');
@@ -967,6 +970,8 @@ var Callcast = {
         this.bAmCaller = null;
         this.offertype = null;
         this.offer = null;  // If we are the callee, we'll wind up with the offer for CompleteCall
+        this.screenvid = null;
+        this.desktopstream = null;
 
         this.callRetries = 0;       // Counter for # times we've tried making a p2p connection.
         this.callRetryMax = 16;     // Maximum # times a caller will give it a shot.
@@ -975,6 +980,10 @@ var Callcast = {
         this.candidates = null;
         this.AddPluginResult = null;
         this.bHasAV = false;
+
+        if (wrtcable) {
+            this.wrtcable = 'true';
+        }
 
         if (Callcast.Callback_AddSpotForParticipant) {
             Callcast.Callback_AddSpotForParticipant(nickin.replace(/ /g, ''), nickname);
@@ -993,16 +1002,22 @@ var Callcast = {
         // When a remote peer's stream has been added, I get called here.
         //
         this.onaddstream = function(stream) {
-            var screencap = (stream.audioTracks && !stream.audioTracks.length) ||
-                            (stream.getAudioTracks && !stream.getAudioTracks().length);
+            var screencap = false;
 
             if ('undefined' !== typeof(stream) && null !== stream) {
                 Callcast.log('Callee:' + self.GetID() + ' onaddstream: added remote stream [' +
                             stream.label + ']: ', stream);
-            }
-            if (screencap) {
-                Callcast.log('REMOTE DESKTOP STREAM: ', stream);
-                self.screenvid.src = webkitURL.createObjectURL(stream);
+
+                screencap = (stream.audioTracks && !stream.audioTracks.length) ||
+                            (stream.getAudioTracks && !stream.getAudioTracks().length);
+
+                if (screencap) {
+                    Callcast.log('--- ADDED REMOTE DESKTOP STREAM ---');
+                    if (self.screenvid) {
+                        self.desktopstream = stream;
+                        self.screenvid.src = webkitURL.createObjectURL(stream);
+                    }
+                }
             }
         };
 
@@ -1010,10 +1025,20 @@ var Callcast = {
         // When a remote peer's stream gets removed, I get called here.
         //
         this.onremovestream = function(stream) {
+            var screencap = false;
+
             if ('undefined' !== typeof(stream) && null !== stream) {
                 Callcast.log('Callee:' + self.GetID() + ' onremovestream: removed remote stream [' +
                             stream.label + ']');
-                self.stream = null;
+
+                screencap = (stream.audioTracks && !stream.audioTracks.length) ||
+                            (stream.getAudioTracks && !stream.getAudioTracks().length);
+
+                if (screencap) {
+                   Callcast.log('--- REMOVED REMOTE DESKTOP STREAM ---');
+                   this.screenvid = null;
+                   this.desktopstream = null;
+                }
             }
         };
 
@@ -1149,6 +1174,9 @@ var Callcast = {
                 this.bAmCaller = false;
                 if (Callcast.IsVideoDeviceAvailable() || Callcast.IsMicrophoneDeviceAvailable()) {
                     try {
+                        if (this.wrtcable && Callcast.localdesktopstream) {
+                            this.peer_connection.AddStream(Callcast.localdesktopstream);
+                        }
                         this.peer_connection.AddStream(Callcast.localstream, this.CompleteCall.bind(this));
                     }
                     catch(e3) {
@@ -1263,11 +1291,18 @@ var Callcast = {
         };
 
         this.shareDesktop = function(stream) {
-            if (this.peer_connection && stream) {
+            if (this.wrtcable && this.peer_connection && stream) {
                 this.offertype = 'desktopoffer';   // A desktop type of call.
                 this.peer_connection.AddStream(stream, this.InitiateCall.bind(this));
             }
         };
+
+        this.unshareDesktop = function(stream) {
+            if (this.wrtcable && this.peer_connection && stream) {
+                this.offertype = 'remdesktopoffer';
+                this.peer_connection.RemoveStream(stream, this.InitiateCall.bind(this));
+            }            
+        }
 
         this.CompleteCall = function() {
             var self = this;
@@ -1477,7 +1512,8 @@ var Callcast = {
 
 
         // Inbound call - initiating
-        if ($(msg).find('offer').length > 0 || $(msg).find('desktopoffer').length > 0)
+        if ($(msg).find('offer').length > 0 || $(msg).find('desktopoffer').length > 0 ||
+            $(msg).find('remdesktopoffer').length > 0)
         {
             if (!Callcast.participants[res_nick])
             {
@@ -1490,7 +1526,11 @@ var Callcast = {
                 sdp = $(msg).children('desktopoffer').text().replace(/&quot;/g, '"');
                 Callcast.participants[res_nick].StartConnection('desktopoffer', sdp);
             }
-            else {
+            else if ($(msg).find('remdesktopoffer').length > 0) {
+                Callcast.log('Got inbound remdesktop-offer from ' + $(msg).attr('from'));
+                sdp = $(msg).children('remdesktopoffer').text().replace(/&quot;/g, '"');
+                Callcast.participants[res_nick].StartConnection('remdesktopoffer', sdp);                
+            } else {
                 Callcast.log('Got inbound call-offer from ' + $(msg).attr('from'));
                 sdp = $(msg).children('offer').text().replace(/&quot;/g, '"');
                 Callcast.participants[res_nick].StartConnection('offer', sdp);
@@ -2080,7 +2120,7 @@ var Callcast = {
                     //
                     if (nick !== Callcast.nick)
                     {
-                        Callcast.participants[nick] = new Callcast.Callee(nick, room);
+                        Callcast.participants[nick] = new Callcast.Callee(nick, room, $(presence).attr('wrtcable'));
                         if (user_jid) {
                             Callcast.participants[nick].non_muc_jid = user_jid;
                         }
@@ -2972,6 +3012,14 @@ var Callcast = {
         for (nick in Callcast.participants) {
             if (Callcast.participants.hasOwnProperty(nick)) {
                 Callcast.participants[nick].shareDesktop(stream);
+            }
+        }
+    },
+    unshareDesktop: function(stream) {
+        var nick;
+        for (nick in Callcast.participants) {
+            if (Callcast.participants.hasOwnProperty(nick)) {
+                Callcast.participants[nick].unshareDesktop(stream);
             }
         }
     },
