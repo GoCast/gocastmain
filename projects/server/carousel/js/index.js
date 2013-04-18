@@ -3436,17 +3436,27 @@ function leaveGoCast() {
 var forgetXmppConnection = function() {};
 
 function nativeWebrtcMode() {
-  if (localStorage) {
-    localStorage.gcpForceNative = 'true';
+  var ok = confirm('GoCast HTML5 allows you to share your desktop with others. ' +
+                   'You will re-enter the room with a pure HTML5 version of GoCast. Are you sure ' +
+                   'you want to preceed?');
+  if (ok) {
+    if (localStorage) {
+      localStorage.gcpForceNative = 'true';
+    }
+    window.location.reload();
   }
-  window.location.reload();
 }
 
 function gocastPlayerMode() {
-  if (localStorage) {
-    delete localStorage.gcpForceNative;
+  var ok = confirm('GoCast App allows you to choose which audio/video devices you want to use in a room. ' +
+                   'You can also apply effects to your video feed. You will re-enter the room in the GoCast App mode. ' +
+                   'Are you sure you want to proceed?');
+  if (ok) {
+    if (localStorage) {
+      delete localStorage.gcpForceNative;
+    }
+    window.location.reload();
   }
-  window.location.reload();
 }
 
 function emailInviteDialog(e) {
