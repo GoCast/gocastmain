@@ -3117,7 +3117,7 @@ function addDeskShare() {
                                          'version of GoCast.');
   } else {
     showWarning('Feature not supported', 'To enable desktop sharing, please download Chrome ' +
-                                         'version 26 pr above.');
+                                         'version 26 or above.');
   }
 }
 
