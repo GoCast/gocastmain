@@ -1390,12 +1390,8 @@ body > div#meeting > div#streams > div#scontrols > input.right {
 #effectsPanel > input#audioPreview {
   margin-right: 2%;
 }
-/*.cloudcarousel .control {
-  opacity: 0.6;
-}*/
 .cloudcarousel .control:hover {
   cursor: pointer;
-  /*opacity: 1.0;*/
 }
 #zoom > .close {
   padding: 5px;

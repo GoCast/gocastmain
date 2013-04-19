@@ -79,13 +79,20 @@ GoCastJS.gcDeskShare.prototype.doSpot = function(info) {
 					);
 				}
 			}
+			$('.zoom', this.jqSpot).css('right', '3px');
 		} else {
-			$('div#gcDeskShareDiv', this.jqSpot).html('<p id="err">Your browser cannot display remote desktops. ' +
-													  'To enjoy this feature, download Chrome version 26 or above.</p>');
-			$('img#upper-left', this.jqSpot).remove();
+			if ($.urlvars.deskshareable || /^25/.test($.browser.version)) {
+				$('div#gcDeskShareDiv', this.jqSpot).html('<p id="err">You can view this remote desktop by clicking ' +
+														  'the green "GoCast HTML5" button. You will then re-enter the '+
+														  'room with a pure HTML5 version of GoCast.</p>');
+			} else {
+				$('div#gcDeskShareDiv', this.jqSpot).html('<p id="err">Your browser cannot display remote desktops. ' +
+														  'To enjoy this feature, download Chrome version 26 or above.</p>');
+			}
+			$('.zoom', this.jqSpot).remove();
 		}
 
-		$('img#upper-right', this.jqSpot).remove();
+		$('.close', this.jqSpot).remove();
 		$('div.name', this.jqSpot).text(decodeURIComponent(info.owner.split('/')[0]) + '\'s Desktop');
 	}
 }
