@@ -74,6 +74,7 @@ if (process.env.SETTINGS_DEVEL === 1 || process.env.SETTINGS_DEVEL === '1') {
         dbVisitorTable: 'dev_VisitorTable',
         dbPublicRoomTable: 'dev_PublicRoomTable',
         dbAssociatedRoomTable: 'dev_AssociatedRoomTable',
+        dbTransactionTable: 'dev_TransactionTable',
         mailgunKey: 'key-65ism99rlme7svrn93qc-cormdknx-42',      // Bob Wolff - rwolff@gocast.it key -- standard account now.
         mailgunUser: 'postmaster@carouselmail.gocast.it',
         mailgunPass: '7s2ssv2l5pe3',
@@ -152,6 +153,7 @@ else {
         dbVisitorTable: 'main_VisitorTable',
         dbPublicRoomTable: 'main_PublicRoomTable',
         dbAssociatedRoomTable: 'main_AssociatedRoomTable',
+        dbTransactionTable: 'main_TransactionTable',
         mailgunKey: 'key-65ism99rlme7svrn93qc-cormdknx-42',      // Bob Wolff - rwolff@gocast.it key
         mailgunUser: 'postmaster@carouselmail.gocast.it',
         mailgunPass: '7s2ssv2l5pe3',

@@ -29,6 +29,7 @@ if (!settings.accounts) {
 
 var sys = require('util');
 var evt = require('events');
+var qs = require('qs');
 
 var gcutil = require('./gcutil_node');
 
@@ -39,10 +40,11 @@ var api = require('./accounts_api');
 
 'use strict';
 
+var https = require('https');
 var express = require('express');
 var app = express();
 var validDomains = ['gocast.it'];
-var validSellingAgents = ['mtp-usa', 'gocast-test'];
+var validSellingAgents = ['mtp-usa', 'gocast-direct', 'gocast-test'];
 
 var anHour = 1000 * 60 * 60;
 var aDay = anHour * 24;
@@ -93,7 +95,36 @@ parseUri.options = {
 
 // -------------- INCLUDED EXPRESS LIBRARIES -----------------
 
+/* RMW - to get RAW body, this must be done PRIOR to express.bodyParser() addition */
+app.use(function(req, res, next) {
+    var data = '', cbdata, cbend;
+    cbdata = function(chunk) {
+        data += chunk;
+    };
+    cbend = function() {
+//        console.log('got data end - rawBody is: ', data);
+        req.rawBody = data;
+        // Now that we're done with this data, we need to make sure the down-wind people
+        // get access to it. So, we remove our listener and emit a single data / end pair
+        // for the people down wind.
+        req.removeListener('data', cbdata);
+        req.removeListener('end', cbend);
+
+        next();
+        // Now that we're done with this data, we need to make sure the down-wind people
+        // get access to it. So, we remove our listener and emit a single data / end pair
+        // for the people down wind.
+        req.emit('data', data);
+        req.emit('end');
+    };
+
+    req.setEncoding('utf8');
+    req.on('data', cbdata);
+    req.on('end', cbend);
+});
 app.use(express.bodyParser());
+/* End block for bodyParser with mods */
+
 app.use(express.cookieParser(settings.accounts.cookieSecret));
 
 // specifying secret in cookieSession results in the cookie contents not being stored in req.session
@@ -568,6 +599,189 @@ app.post('/visitorseen', function(req, res) {
         else {
             res.send('{"result": "error"}');
         }
+    }
+});
+
+//
+// This is a rather blind executed function. It is only executed once all other checks have
+// been made. As such, it should not fall to failure unless there are serious issues around
+// database connectivity or other major system-wide failures. Logic or permissions should not
+// be at issue at this stage.
+//
+// Due to this, this function will only return true or false and it will not
+// contain a callback parameter upon its async database completion.
+//
+function handleTransactionNotification(req) {
+    var extras, custobj, account, name, ending, baseurl;
+
+    console.log('handleTransactionNotification: SUMMARY');
+    console.log('custom: ', req.body.custom);
+    console.log('receiver_email: ', req.body.receiver_email);
+    console.log('txn_type: ', req.body.txn_type);
+    console.log('txn_id: ', req.body.txn_id);
+    console.log('payer_email: ', req.body.payer_email);
+    console.log('payer_id: ', req.body.payer_id);
+
+    // Parse out the 'custom' field
+    custobj = qs.parse(decodeURIComponent(req.body.custom));
+    account = custobj.email;
+    name = custobj.name;
+    baseurl = custobj.baseurl;
+
+    // 30 day free trial - 'subscription' runs out in 30 days unless paid.
+    ending = new Date();
+    ending.setDate(new Date().getDate() + 30);
+
+    // Use the headers/referer entry above the sent-in baseurl if one is present.
+    if (req.headers.referer) {
+        req.body.baseurl = req.headers.referer.split('?')[0];
+    }
+    else {
+        req.body.baseurl = baseurl;
+    }
+
+    if (req.body && !req.body.baseurl) {
+        gcutil.log('accounts_service [handleTransactionNotification][error]: No referer and no baseurl passed. req.body is: ', req.body);
+        return false;
+    }
+
+    // Need to do a fulfillment here.
+    extras = {
+        package_name: req.body.item_number,
+        end_subscription_date: ending,
+        max_rooms_allowed: 1,
+        selling_agent: 'gocast-direct',
+        payer_name: req.body.first_name + ' ' + req.body.last_name
+    };
+
+    if (req.body.txn_type === 'subscr_signup') {
+        if (!req.body.txn_id) {
+            req.body.txn_id = 'SUBSCR-' + req.body.subscr_id;
+        }
+
+        // Create account with password which is simply the current time.
+        api.NewPaidAccount(req.body.baseurl, account, new Date().getTime(), name, null, extras, function() {
+            // Now the account exists...All good.
+            gcutil.log('accounts_service [/handleTransactionNotification][success]: All good for: ' + account);
+        }, function(err) {
+            gcutil.log('accounts_service [/handleTransactionNotification][error]: ', err);
+        });
+    }
+    else if (req.body.txn_type === 'subscr_cancel') {
+        if (!req.body.txn_id) {
+            req.body.txn_id = 'CANCEL-' + req.body.subscr_id;
+        }
+
+        gcutil.log('Cancel of subscription. TODO:RMW Disabling account.');
+    }
+
+    // Need to database this transaction and associate it to the account name.
+    api.storeTransaction(account, req.body.txn_id, req.body);
+
+    return true;
+}
+
+app.post('/paypalipn', function(req, res) {
+    var options, httpsreq;
+
+    if (req.body) {
+//        gcutil.log('accounts_service [/paypalipn][info]: FormData = ', req.body);
+//        gcutil.log('accounts_service [/paypalipn][info]: RawBody = ', req.rawBody);
+
+        options = {
+            hostname: 'www.paypal.com',
+            port: 443,
+            path: '/cgi-bin/webscr?cmd=_notify-validate&' + req.rawBody,
+            method: 'GET'
+        };
+
+        // If we're in the sandbox, reply/verification address is different
+        if (req.body.test_ipn === '1') {
+            options.hostname = 'www.sandbox.paypal.com';
+        }
+
+        httpsreq = https.request(options, function(hres) {
+//            console.log('statusCode: ', hres.statusCode);
+//            console.log('headers: ', hres.headers);
+
+            hres.on('data', function(d) {
+                if (d.toString() === 'VERIFIED') {
+                    console.log('VERIFIED - YES.');
+                    res.send('{"result": "success"}');
+                    handleTransactionNotification(req);
+                }
+                else if (d.toString() === 'INVALID') {
+                    console.log('NON_VERIFIED - INVALID - SPOOF?');
+                    res.send(400, '{"result": "bad validation"}');
+                }
+                else {
+                    console.log('PARTIAL-answer? Data is: ', d.toString());
+                    res.send(400, '{"result": "partial answer"}');
+                }
+            });
+        });
+        httpsreq.end();
+
+        httpsreq.on('error', function(e) {
+            console.log('DEBUG: paypalipn: ERROR: ', e);
+            res.send(400, '{"result": "general error"}');
+        });
+    }
+    else {
+        gcutil.log('accounts_service [/paypalipn][error]: FormData problem in req.body: ', req.body);
+
+        res.send(400, '{"result": "error"}');
+    }
+});
+
+//
+// Columns of interest:
+// status:
+//  non-existent - free, active account - likely early account
+//  disabled - account not allowed to login
+//  non-activated - account registered, but email validation not complete yet.
+//
+// type:
+//  non-existent - free, early account
+//  perpetual
+//  subscription
+//
+// trial:
+//  non-existent - trial not tried yet
+//  0 - not tried
+//  1 - trial already used.
+//
+// RESULTS back to caller
+//  'success' - available
+//  'trial used' - this account has already had its trial used.
+//  'unavailable' - account is already in use
+//  'disabled' -
+//
+app.post('/accountavailable', function(req, res) {
+
+    if (req.body && req.body.email) {
+//        gcutil.log('accounts_service [/accountavailable][error]: FormData = ', req.body);
+        api.GetAccount(req.body.email, function(entry) {
+            if (entry.trial === '1') {
+                res.send('{"result": "trial used"}');
+            }
+            else if (entry.status === 'disabled') {
+                res.send('{"result": "disabled"}');
+            }
+            else if (!entry.validated || entry.status === 'non-activated') {
+                res.send('{"result": "unavailable"}');
+            }
+            else {
+                res.send('{"result": "error"}');
+            }
+        }, function() {
+            gcutil.log('accounts_service [/accountavailable][info]: Account available: ' + req.body.email);
+            res.send('{"result": "success"}');      // If account does not exist, this is PERFECT.
+        });
+    }
+    else {
+        gcutil.log('accounts_service [/accountavailable][error]: FormData problem in req.body: ', req.body);
+        res.send('{"result": "error"}');
     }
 });
 

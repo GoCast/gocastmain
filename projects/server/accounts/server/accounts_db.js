@@ -52,6 +52,7 @@ var theUserRoomTable = settings.accounts.dbUserRoomTable;
 var theVisitorTable = settings.accounts.dbVisitorTable;
 var thePublicRoomTable = settings.accounts.dbPublicRoomTable;
 var theAssociatedRoomTable = settings.accounts.dbAssociatedRoomTable;
+var theTransactionTable = settings.accounts.dbTransactionTable;
 
 'use strict';
 
@@ -174,6 +175,35 @@ function errOut(err) {
         }
     });
 
+//
+// TRANSACTION TABLE - for recently visited and scheduled rooms for a user.
+//
+    ddb.client.describeTable({TableName: theTransactionTable}, function(err, data) {
+        if (err) {
+            // If it doesn't exist, then we should create it.
+            if (err.code === 'ResourceNotFoundException') {
+                // Create the table.
+                ddb.client.createTable({TableName: theTransactionTable,
+                                        KeySchema: {HashKeyElement: {AttributeName: 'email', AttributeType: 'S'},
+                                                    RangeKeyElement: {AttributeName: 'id', AttributeType: 'S'}},
+                                        ProvisionedThroughput: {ReadCapacityUnits: 2, WriteCapacityUnits: 4}}, function(err, data) {
+                    if (err) {
+                        errOut(err);
+                    }
+                    else {
+                        gcutil.log('accounts_db: Successfully inititalized New Transaction Table: ' + theTransactionTable);
+                    }
+                });
+            }
+            else {
+                errOut(err);
+            }
+        }
+        else {
+            gcutil.log('accounts_db: Transaction table found and ready.');
+        }
+    });
+
     ddb.client.describeTable({TableName: theVisitorTable}, function(err, data) {
         if (err) {
             // If it doesn't exist, then we should create it.
@@ -280,7 +310,10 @@ function dbAwsObjectPrep(outputObj, inputObj) {
 //        gcutil.log('iter: ' , iter, ', val: ', val);
         switch(typeof(val)) {
             case 'string':
-                outputObj[iter] = { S: val };
+                // We skip null/empty entries as AWS doesn't allow them.
+                if (val) {
+                    outputObj[iter] = { S: val };
+                }
                 break;
             case 'number':
                 outputObj[iter] = { N: val.toString() };
@@ -304,7 +337,10 @@ function dbAwsUpdateObjectPrep(outputObj, inputObj) {
 //        gcutil.log('iter: ' , iter, ', val: ', val);
         switch(typeof(val)) {
             case 'string':
-                outputObj[iter] = { Value: { S: val }, Action: 'PUT' };
+                // We skip null/empty entries as AWS doesn't allow them.
+                if (val) {
+                    outputObj[iter] = { Value: { S: val }, Action: 'PUT' };
+                }
                 break;
             case 'number':
                 outputObj[iter] = { Value: { N: val.toString() }, Action: 'PUT' };
@@ -1022,6 +1058,88 @@ function dbDeleteAssociatedRoom(accountName, roomName, cbSuccess, cbFailure) {
     });
 }
 
+//
+// Store: hash: account -- rangekey: id -- must be no other pair of these or this will fail.
+//
+// Additionally:
+//  entryDate: new Date()
+//  txn_type
+//  payer_email
+//  payer_id
+//  full_ipn -- The full JSON.stringify(body)
+//
+function dbStoreTransaction(accountName, id, body, cbSuccess, cbFailure) {
+    var cur = new Date(),
+        Item, obj;
+
+    // First must get the # visits so far.
+        // Prep the item to be stored
+        Item = {};
+        obj = {
+            email: accountName,
+            id: id,
+            entryDate: new Date().toString(),
+            txn_type: body.txn_type,
+            payer_email: body.payer_email,
+            payer_id: body.payer_id,
+            full_ipn: JSON.stringify(body)
+        };
+
+        dbAwsObjectPrep(Item, obj);
+
+        ddb.client.putItem({TableName: theTransactionTable, Item: Item, Expected: {email: {Exists: false} }},
+                function(err, data) {
+                    if (err) {
+                        if (err.statusCode === 400 && err.code === 'ConditionalCheckFailedException') {
+                            console.log('StoreTransaction: ERROR: account/id pair exists already: ',
+                                        accountName, " / ", id, ', entry is: ', data);
+                        }
+                        else {
+                            errOut(err);
+                        }
+                        cbFailure(err);
+                    }
+                    else {
+                        gcutil.log('StoreTransaction: Added Transaction for: ', accountName, ' / ', id);
+//                        gcutil.log('Visitor-Update-RAW: ', data);
+                        cbSuccess(data);
+                    }
+                });
+
+}
+
+function dbGetAccountTransactions(accountName, cbSuccess, cbFailure) {
+    var outItems = [],
+        queryHandler, queryObj;
+
+
+    queryObj = {TableName: theTransactionTable,
+//                  Limit: 3,
+                  HashKeyValue: { S: accountName.toLowerCase() }};
+
+    queryHandler = function(err, data) {
+        if (err) {
+            errOut(err);
+            cbFailure(err);
+        }
+        else {
+
+            outItems.push.apply(outItems, dbAwsObjectRead(data.Items));
+
+            if (data.LastEvaluatedKey) {
+//                gcutil.log('dbGetAssociatedRooms: Received: ' + data.Count + ' items. Continuing scan - next iteration...');
+                queryObj.ExclusiveStartKey = data.LastEvaluatedKey;
+                ddb.client.query(queryObj, queryHandler);
+            }
+            else {
+//                gcutil.log('dbGetAssociatedRooms: Scan complete. Found a total of: ' + outItems.length + ' items.');
+                cbSuccess(outItems);
+            }
+        }
+    };
+
+    ddb.client.query(queryObj, queryHandler);
+}
 
 exports.AddEntry = dbAddEntry;
 exports.UpdateEntry = dbUpdateEntry;
@@ -1043,3 +1161,5 @@ exports.DeleteAssociatedRoom = dbDeleteAssociatedRoom;
 exports.ConvertPasswords = dbConvertPasswords;
 exports.ShowAllAccounts = dbShowAllAccounts;
 exports.VerifyAllHashed = dbVerifyAllHashed;
+exports.StoreTransaction = dbStoreTransaction;
+exports.GetAccountTransactions = dbGetAccountTransactions;

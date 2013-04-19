@@ -691,6 +691,11 @@ function apiDeleteUserRoom(email, room, success, failure) {
     db.DeleteRoom(email, room, success, failure);
 }
 
+function apiStoreTransaction(account, id, body, success, failure) {
+    //  Store everything we might need about this transaction for later.
+    db.storeTransaction(account, id, body, success, failure);
+}
+
 function apiGenerateResetPassword(email, baseURL, success, failure) {
     var emailBody, resetcode, result;
 
@@ -1181,3 +1186,4 @@ exports.ReqXmppConn = apiReqXmppConn;
 exports.ConvertPasswords = apiConvertPasswords;
 exports.ShowAllAccounts = apiShowAllAccounts;
 exports.VerifyAllHashed = apiVerifyAllHashed;
+exports.StoreTransaction = apiStoreTransaction;

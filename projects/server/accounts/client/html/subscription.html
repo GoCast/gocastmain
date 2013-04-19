@@ -49,16 +49,20 @@
                         </fieldset>
                     </form>
                     <div class="subscription">
-                        <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top" class="span2 pull-left" ph=" $5 per month " style="margin-left: 0;">
+                        <form id="monthly" action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top" class="span2 pull-left" ph=" $5 per month " style="margin-left: 0;">
                             <input type="hidden" name="cmd" value="_s-xclick">
                             <input type="hidden" name="hosted_button_id" value="GV4M4BKDYK4QJ">
-                            <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_subscribeCC_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+<input id="custom" type="hidden" name="custom" value="email=rwolff@gocast.it;name=Big Bad Bob's">
+<input id="notify_url" type="hidden" name="notify_url" value="https://dev.gocast.it/acct/paypalipn">
+                            <input id="button" disabled type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_subscribeCC_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
                             <img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
                         </form>
-                        <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top" class="span2 pull-right" ph=" $50 per year ">
+                        <form id="annually" action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top" class="span2 pull-right" ph=" $50 per year ">
                             <input type="hidden" name="cmd" value="_s-xclick">
                             <input type="hidden" name="hosted_button_id" value="UYMYJGCDP2RUN">
-                            <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_subscribeCC_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+<input id="custom" type="hidden" name="custom" value="email=rwolff@gocast.it;name=Big Bad Bob's">
+<input id="notify_url" type="hidden" name="notify_url" value="https://dev.gocast.it/acct/paypalipn">
+                            <input id="button" disabled type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_subscribeCC_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
                             <img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
                         </form>
                     </div>
@@ -72,6 +76,8 @@
             var SubUI = {
                 alerttimeout: null,
                 kdwntimeout: null,
+                confkdwntimeout: null,
+                namekdwntimeout: null,
                 $subform: null,         // subscription form
                 $email: null,           // email field
                 $confemail: null,       // confirm email field
@@ -86,15 +92,37 @@
                     this.$name = $('input#input-name', this.$subform);
                     this.$subbtns = $('body > div.container > div.row > div.span5 > div.subscription');
 
+                    // Show buttons by default now - disabling instead.
+                    this.$subbtns.addClass('show');
+                    this.displaysubscriptionbuttons(false); // Start disabled.
+
                     this.$email.keydown(function(e) {
                         clearTimeout(self.kdwntimeout);
-                        self.kdwntimeout = setTimeout(SubApp.onemailfieldchange.bind(this), 1000);
+                        // With any change comes a prediction that the account is not available.
+                        SubUI.displaysubscriptionbuttons(false);
+                        self.kdwntimeout = setTimeout(SubApp.onemailfieldchange.bind(this), 1500);
                     }).change(function(e) {
                         setTimeout(SubApp.onemailfieldchange.bind(this), 0);
                     }).focus();
+
+                    this.$confemail.keydown(function(e) {
+                        clearTimeout(self.confkdwntimeout);
+                        // With any change comes a prediction that the account is not available.
+                        SubUI.displaysubscriptionbuttons(false);
+                        self.confkdwntimeout = setTimeout(SubApp.onconfemailfieldchange.bind(this), 1500);
+                    }).change(function(e) {
+                        setTimeout(SubApp.onconfemailfieldchange.bind(this), 0);
+                    });
+
+                    this.$name.keydown(function(e) {
+                        clearTimeout(self.namekdwntimeout);
+                        self.namekdwntimeout = setTimeout(SubApp.onnamefieldchange.bind(this), 500);
+                    }).change(function(e) {
+                        setTimeout(SubApp.onnamefieldchange.bind(this), 0);
+                    });
                 },
                 // type = 'success' or 'error'
-                // periodms (optional, default = 5000) 
+                // periodms (optional, default = 5000)
                 displayalert: function(type, message, periodms) {
                     var $alert = null, self = this,
                         iconclass = {error: 'icon-warning-sign', success: 'icon-ok-sign'};
@@ -116,17 +144,128 @@
                 // enable = true or false
                 displaysubscriptionbuttons: function(enable) {
                     if (enable) {
-                        this.$subbtns.addClass('show');
+                        this.prepForSubscription();
+                        $('#monthly > #button').removeAttr('disabled').attr('src', 'https://www.paypalobjects.com/en_US/i/btn/btn_subscribeCC_LG.gif');
+                        $('#annually > #button').removeAttr('disabled').attr('src', 'https://www.paypalobjects.com/en_US/i/btn/btn_subscribeCC_LG.gif');
+//                        this.$subbtns.addClass('show');
                     } else {
-                        this.$subbtns.removeClass('show');
+                        $('#monthly > #button').attr('disabled', '').attr('src', 'images/btn_subscribeCC_LG_grey.gif');
+                        $('#annually > #button').attr('disabled', '').attr('src', 'images/btn_subscribeCC_LG_grey.gif');
+//                        this.$subbtns.removeClass('show');
                     }
+                },
+
+                validateEmail: function(email) {
+                    var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+                    if (re.test(email)) {
+                        return true;
+                    }
+                    else {
+                        console.log('Invalid: ', email);
+                        return false;
+                    }
+//                    return re.test(email);
+                },
+
+                prepForSubscription: function() {
+                    var custom, ipn;
+
+                    ipn = window.location.origin + '/acct/paypalipn'; // + 'badtest';
+                    $('#monthly > #notify_url').attr('value', ipn);
+                    $('#annually > #notify_url').attr('value', ipn);
+
+                    custom = 'email=' + this.$email.val() + '&name=' + this.$name.val();
+                    custom += '&baseurl=' + window.location.href.replace(/[^\/]*$/, '');
+                    $('#monthly > #custom').attr('value', encodeURIComponent(custom));
+                    $('#annually > #custom').attr('value', encodeURIComponent(custom));
+                },
+
+                // If all the fields have values and at least one of the email addresses is valid, then say ok.
+                basicsOk: function() {
+                    var em = this.$email.val(), confem = this.$confemail.val(), name = this.$name.val();
+                    return (em && confem && name && (this.validateEmail(em) || this.validateEmail(confem)));
                 }
             },
             SubApp = {
                 // callback for email field change
                 // this = $email.get(0)
                 onemailfieldchange: function() {
-                    SubUI.displayalert('success', 'Changed: ' + $(this).val());
+                    var em, confem;
+
+                    em = SubUI.$email.val();
+                    confem = SubUI.$confemail.val();
+
+                    if (SubUI.basicsOk() && em === confem) {
+                        // Email addresses match. Go check with the server if this is available.
+                        SubApp.checkAvailability(em, function(availability) {
+                            if (availability === 'success') {
+                                SubUI.displaysubscriptionbuttons(true);
+                                SubUI.displayalert('success', 'Please choose your preferred subscription.');
+                            }
+                        });
+                    }
+                },
+
+                onconfemailfieldchange: function() {
+                    var em, confem;
+
+                    em = SubUI.$email.val();
+                    confem = SubUI.$confemail.val();
+
+                    if (SubUI.basicsOk() && em !== confem) {
+                        SubUI.displayalert('error', 'Email addresses must match.');
+                    }
+                    else if (SubUI.basicsOk() && em === confem) {
+                        // Email addresses match. Go check with the server if this is available.
+                        SubApp.checkAvailability(em, function(availability) {
+                            if (availability === 'success') {
+                                SubUI.displaysubscriptionbuttons(true);
+                                SubUI.displayalert('success', 'Please choose your preferred subscription.');
+                            }
+                            else {
+                                SubUI.displayalert('error', 'Username not available.');
+                            }
+                        });
+                    }
+                },
+
+                onnamefieldchange: function() {
+                    var em, confem;
+
+                    em = SubUI.$email.val();
+                    confem = SubUI.$confemail.val();
+
+                    if (SubUI.basicsOk() && em !== confem) {
+                        SubUI.displayalert('error', 'Email addresses must match.');
+                    }
+                    else if (SubUI.basicsOk() && em === confem) {
+                        // Email addresses match. Go check with the server if this is available.
+                        SubApp.checkAvailability(em, function(availability) {
+                            if (availability === 'success') {
+                                SubUI.displaysubscriptionbuttons(true);
+                                SubUI.displayalert('success', 'Please choose your preferred subscription.');
+                            }
+                            else {
+                                SubUI.displaysubscriptionbuttons(false);
+                                SubUI.displayalert('error', 'Username not available.');
+                            }
+                        });
+                    }
+                    else {
+                        SubUI.displaysubscriptionbuttons(false);
+                    }
+                },
+
+                checkAvailability: function(email, cb) {
+                    $.ajax({
+                        url: '/acct/accountavailable/',
+                        type: 'POST',
+                        dataType: 'json',
+                        data: {email: email},
+                        success: function(response) {
+                            cb(response.result);
+                        }
+                    });
                 }
             };
 
