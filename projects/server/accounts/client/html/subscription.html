@@ -52,16 +52,16 @@
                         <form id="monthly" action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top" class="span2 pull-left" ph=" $5 per month " style="margin-left: 0;">
                             <input type="hidden" name="cmd" value="_s-xclick">
                             <input type="hidden" name="hosted_button_id" value="GV4M4BKDYK4QJ">
-<input id="custom" type="hidden" name="custom" value="email=rwolff@gocast.it;name=Big Bad Bob's">
-<input id="notify_url" type="hidden" name="notify_url" value="https://dev.gocast.it/acct/paypalipn">
+                            <input id="custom" type="hidden" name="custom" value="email=rwolff@gocast.it;name=Big Bad Bob's">
+                            <input id="notify_url" type="hidden" name="notify_url" value="https://dev.gocast.it/acct/paypalipn">
                             <input id="button" disabled type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_subscribeCC_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
                             <img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
                         </form>
                         <form id="annually" action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top" class="span2 pull-right" ph=" $50 per year ">
                             <input type="hidden" name="cmd" value="_s-xclick">
                             <input type="hidden" name="hosted_button_id" value="UYMYJGCDP2RUN">
-<input id="custom" type="hidden" name="custom" value="email=rwolff@gocast.it;name=Big Bad Bob's">
-<input id="notify_url" type="hidden" name="notify_url" value="https://dev.gocast.it/acct/paypalipn">
+                            <input id="custom" type="hidden" name="custom" value="email=rwolff@gocast.it;name=Big Bad Bob's">
+                            <input id="notify_url" type="hidden" name="notify_url" value="https://dev.gocast.it/acct/paypalipn">
                             <input id="button" disabled type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_subscribeCC_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
                             <img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
                         </form>
@@ -157,25 +157,18 @@
 
                 validateEmail: function(email) {
                     var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-                    if (re.test(email)) {
-                        return true;
-                    }
-                    else {
-                        console.log('Invalid: ', email);
-                        return false;
-                    }
-//                    return re.test(email);
+                    return re.test(email);
                 },
 
                 prepForSubscription: function() {
                     var custom, ipn;
 
-                    ipn = window.location.origin + '/acct/paypalipn'; // + 'badtest';
+                    ipn = window.location.origin + '/acct/paypalipn';
                     $('#monthly > #notify_url').attr('value', ipn);
                     $('#annually > #notify_url').attr('value', ipn);
 
                     custom = 'email=' + this.$email.val() + '&name=' + this.$name.val();
-                    custom += '&baseurl=' + window.location.href.replace(/[^\/]*$/, '');
+                    custom += '&baseurl=' + window.location.href.replace(/[^\/]*$/, 'dashboard.html');
                     $('#monthly > #custom').attr('value', encodeURIComponent(custom));
                     $('#annually > #custom').attr('value', encodeURIComponent(custom));
                 },

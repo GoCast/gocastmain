@@ -372,7 +372,7 @@ app.post('/deleteroom', function(req, res) {
 app.post('/listrooms', function(req, res) {
 
     if (req.body && req.body.email) {
-        gcutil.log('accounts_service [/listrooms][info]: FormData = ', req.body);
+//        gcutil.log('accounts_service [/listrooms][info]: FormData = ', req.body);
         api.ListRooms(req.body.email, function(data) {
             res.send('{"result": "success", "data": ' + JSON.stringify(data) + '}');
         }, function(err) {
@@ -395,9 +395,9 @@ app.post('/listrooms', function(req, res) {
 app.post('/listrecentrooms', function(req, res) {
 
     if (req.body && req.body.email) {
-        gcutil.log('accounts_service [/listrecentrooms][info]: FormData = ', req.body);
+//        gcutil.log('accounts_service [/listrecentrooms][info]: FormData = ', req.body);
         api.ListRecentRooms(req.body.email, function(data) {
-            console.log('strinigify: ', JSON.stringify(data));
+//            console.log('strinigify: ', JSON.stringify(data));
             res.send('{"result": "success", "data": ' + JSON.stringify(data) + '}');
         }, function(err) {
             gcutil.log('accounts_service [/listrecentrooms][error]: ', err);
@@ -612,8 +612,9 @@ app.post('/visitorseen', function(req, res) {
 // contain a callback parameter upon its async database completion.
 //
 function handleTransactionNotification(req) {
-    var extras, custobj, account, name, ending, baseurl;
+    var extras, custobj, account, name, ending, baseurl, tofield;
 
+/*
     console.log('handleTransactionNotification: SUMMARY');
     console.log('custom: ', req.body.custom);
     console.log('receiver_email: ', req.body.receiver_email);
@@ -621,6 +622,7 @@ function handleTransactionNotification(req) {
     console.log('txn_id: ', req.body.txn_id);
     console.log('payer_email: ', req.body.payer_email);
     console.log('payer_id: ', req.body.payer_id);
+*/
 
     // Parse out the 'custom' field
     custobj = qs.parse(decodeURIComponent(req.body.custom));
@@ -632,13 +634,7 @@ function handleTransactionNotification(req) {
     ending = new Date();
     ending.setDate(new Date().getDate() + 30);
 
-    // Use the headers/referer entry above the sent-in baseurl if one is present.
-    if (req.headers.referer) {
-        req.body.baseurl = req.headers.referer.split('?')[0];
-    }
-    else {
-        req.body.baseurl = baseurl;
-    }
+    req.body.baseurl = baseurl;
 
     if (req.body && !req.body.baseurl) {
         gcutil.log('accounts_service [handleTransactionNotification][error]: No referer and no baseurl passed. req.body is: ', req.body);
@@ -648,7 +644,7 @@ function handleTransactionNotification(req) {
     // Need to do a fulfillment here.
     extras = {
         package_name: req.body.item_number,
-        end_subscription_date: ending,
+        end_subscription_date: ending.toString(),
         max_rooms_allowed: 1,
         selling_agent: 'gocast-direct',
         payer_name: req.body.first_name + ' ' + req.body.last_name
@@ -659,10 +655,17 @@ function handleTransactionNotification(req) {
             req.body.txn_id = 'SUBSCR-' + req.body.subscr_id;
         }
 
+        tofield = account;   // Assuming that the payer_email will be identical to the account name (most cases should be true)
+
+        if (account !== req.body.payer_email) {
+            // Send password-set email to both addresses
+            tofield = [account, req.body.payer_email];
+        }
+
         // Create account with password which is simply the current time.
-        api.NewPaidAccount(req.body.baseurl, account, new Date().getTime(), name, null, extras, function() {
+        api.NewPaidAccount(req.body.baseurl, tofield, new Date().getTime(), name, null, extras, function() {
             // Now the account exists...All good.
-            gcutil.log('accounts_service [/handleTransactionNotification][success]: All good for: ' + account);
+//            gcutil.log('accounts_service [/handleTransactionNotification][success]: All good for: ' + account);
         }, function(err) {
             gcutil.log('accounts_service [/handleTransactionNotification][error]: ', err);
         });
@@ -676,7 +679,7 @@ function handleTransactionNotification(req) {
     }
 
     // Need to database this transaction and associate it to the account name.
-    api.storeTransaction(account, req.body.txn_id, req.body);
+    api.StoreTransaction(account, req.body.txn_id, req.body);
 
     return true;
 }
@@ -706,7 +709,7 @@ app.post('/paypalipn', function(req, res) {
 
             hres.on('data', function(d) {
                 if (d.toString() === 'VERIFIED') {
-                    console.log('VERIFIED - YES.');
+//                    console.log('VERIFIED - YES.');
                     res.send('{"result": "success"}');
                     handleTransactionNotification(req);
                 }
@@ -888,7 +891,7 @@ app.post('/inviteviaemail', function(req, res) {
 });
 
 app.post('/login', function(req, res) {
-    console.log('COOKIESESSION: ', req.session);
+//    console.log('COOKIESESSION: ', req.session);
     if (req.session.sid) {
         api.Login({
             sid: req.session.sid,
@@ -994,7 +997,7 @@ app.post('/logout', function(req, res) {
 });
 
 app.post('/reqxmppconn', function(req, res) {
-    console.log('COOKIESESSION: ', req.session);
+//    console.log('COOKIESESSION: ', req.session);
     if (req.session.sid) {
         api.ReqXmppConn({
             sid: req.session.sid,

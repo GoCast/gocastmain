@@ -986,12 +986,12 @@ function dbGetAssociatedRooms(accountName, cbSuccess, cbFailure) {
             outItems.push.apply(outItems, dbAwsObjectRead(data.Items));
 
             if (data.LastEvaluatedKey) {
-                gcutil.log('dbGetAssociatedRooms: Received: ' + data.Count + ' items. Continuing scan - next iteration...');
+//                gcutil.log('dbGetAssociatedRooms: Received: ' + data.Count + ' items. Continuing scan - next iteration...');
                 queryObj.ExclusiveStartKey = data.LastEvaluatedKey;
                 ddb.client.query(queryObj, queryHandler);
             }
             else {
-                gcutil.log('dbGetAssociatedRooms: Scan complete. Found a total of: ' + outItems.length + ' items.');
+//                gcutil.log('dbGetAssociatedRooms: Scan complete. Found a total of: ' + outItems.length + ' items.');
                 cbSuccess(outItems);
             }
         }
