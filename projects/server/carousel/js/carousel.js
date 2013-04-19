@@ -106,31 +106,16 @@
       }
     });
 
-    // add handlers
-    jqObj.mouseover(function(event)
-    {
-      if (event.isPropagationStopped())
-      {
-        return;
-      }
-      // only show close icon on unoccupied or content spots
-      if ($(this).hasClass('unoccupied') || $(this).hasClass('typeContent')) {
+    if (jqObj.hasClass('typeContent')) {
+        $('.control', jqObj).css('visibility', 'visible');
+    } else if (jqObj.hasClass('unoccupied')) {
+      jqObj.hover(function() {
         $('.close', this).css('visibility', 'visible');
-        if ($(this).hasClass('typeContent')) {
-          $('.zoom', this).css('visibility', 'visible');
-        }
-      }
+      }, function() {
+        $('.close', this).css('visibility', 'hidden');
+      });
+    }
 
-      if ($(this).hasClass('editor')) {
-        $('.zoom', this).css({
-          'left': '1%',
-          'bottom': '1%'
-        });
-      }
-    });
-    jqObj.mouseout(function(event) {
-      $('.control', this).css('visibility', 'hidden');
-    });
   };
   ///
   /// \brief change size of spot contents when physical spot size changes (due to spin or resize)

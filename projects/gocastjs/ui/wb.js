@@ -435,7 +435,7 @@ GoCastJS.WhiteBoard.prototype.init = function()
   this.jqCanvas.mousedown(this.onMouseDown);
 
   // change the zoom icon to black for white background
-  $("img#upper-left", this.jqParent).attr("src", "images/fullscreen-black.png");
+  //$("img#upper-left", this.jqParent).attr("src", "images/fullscreen-black.png");
 
   // load a test image
   //this.loadTestImage();

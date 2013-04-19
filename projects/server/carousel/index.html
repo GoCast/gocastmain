@@ -151,7 +151,8 @@
       <input class="fbShare gc-icon" type="button" title="Share on wall." onclick="fbShare();"/>
       <input class="fbShare fbevent gc-icon" type="button" title="Create meeting event." onclick="fbEvent();"/>
       <a id="leavegocast" href="javascript:leaveGoCast();">Exit GoCast</a>
-
+      <a id="nativemode" href="javascript:nativeWebrtcMode();" class="browsermode" title="Re-enter room with pure HTML5 version of GoCast" style="display: none;">GoCast HTML5</a>
+      <a id="gocastplayermode" href="javascript:gocastPlayerMode();" class="browsermode" title="Re-enter room with GoCast App" style="display: none;">GoCast App</a>
       <div id="status-prompt" class="warning">
         <p id="message">The speaker volume is too low for you to hear!</p>
         <input id="stop-showing" type="checkbox" value="Stop"onclick="stopStatusClicked(event);"/>

@@ -812,6 +812,8 @@ function doSpot(spotDiv, info)
     if (info.spottype === 'youtube')
     {
       console.log('doSpot youtube');
+      jqDiv.unbind('hover');
+      $('.control', jqDiv).css('visibility', 'visible');
       loadVideo(spotDiv, info);
     }
     else if (info.spottype === 'whiteBoard')
@@ -823,7 +825,8 @@ function doSpot(spotDiv, info)
         jqDiv.attr('alt', 'whiteBoard');
         jqDiv.attr('encname', 'whiteBoard');
         jqDiv.attr('spotnumber', info.spotnumber);
-        jqDiv.removeClass('unoccupied').addClass('typeContent whiteBoard');
+        jqDiv.removeClass('unoccupied').addClass('typeContent whiteBoard').unbind('hover');
+        $('.control', jqDiv).css('visibility', 'visible');
         whiteBoard = new GoCastJS.WhiteBoard(spotDiv, info);
       }
       else // get existing whiteboard
@@ -850,7 +853,8 @@ function doSpot(spotDiv, info)
         jqDiv.attr('alt', 'editor');
         jqDiv.attr('encname', 'editor');
         jqDiv.attr('spotnumber', info.spotnumber);
-        jqDiv.removeClass('unoccupied').addClass('typeContent editor');
+        jqDiv.removeClass('unoccupied').addClass('typeContent editor').unbind('hover');
+        $('.control', jqDiv).css('visibility', 'visible');
         editor = new GoCastJS.gcEdit(spotDiv, info);
       }
       else
@@ -869,7 +873,8 @@ function doSpot(spotDiv, info)
         jqDiv.attr('alt', 'FileShare');
         jqDiv.attr('encname', 'fileshare');
         jqDiv.attr('spotnumber', info.spotnumber);
-        jqDiv.removeClass('unoccupied').addClass('typeContent fileshare');
+        jqDiv.removeClass('unoccupied').addClass('typeContent fileshare').unbind('hover');
+        $('.control', jqDiv).css('visibility', 'visible');
         fshare = new GoCastJS.gcFileShare(spotDiv, info);
       } else {
         fshare = jqDiv.data('gcFileShare');
@@ -886,7 +891,8 @@ function doSpot(spotDiv, info)
         jqDiv.attr('alt', 'Wikipedia');
         jqDiv.attr('encname', 'wiki');
         jqDiv.attr('spotnumber', info.spotnumber);
-        jqDiv.removeClass('unoccupied').addClass('typeContent wiki');
+        jqDiv.removeClass('unoccupied').addClass('typeContent wiki').unbind('hover');
+        $('.control', jqDiv).css('visibility', 'visible');
         wiki = new GoCastJS.WikiBrowser(spotDiv, info);
       } else {
         wiki = jqDiv.data('wiki');
@@ -903,7 +909,8 @@ function doSpot(spotDiv, info)
         jqDiv.attr('alt', 'DeskShare');
         jqDiv.attr('encname', 'deskshare');
         jqDiv.attr('spotnumber', info.spotnumber);
-        jqDiv.removeClass('unoccupied').addClass('typeContent deskshare');
+        jqDiv.removeClass('unoccupied').addClass('typeContent deskshare').unbind('hover');
+        $('.control', jqDiv).css('visibility', 'visible');
         deskshare = new GoCastJS.gcDeskShare(spotDiv, info);
       } else {
         deskshare = jqDiv.data('gcDeskShare');
@@ -920,7 +927,8 @@ function doSpot(spotDiv, info)
       jqDiv.attr('alt', info.spotdivid);
       jqDiv.attr('url', info.spoturl);
       jqDiv.attr('encname', info.spotdivid);
-      jqDiv.removeClass('unoccupied').addClass('typeContent');
+      jqDiv.removeClass('unoccupied').addClass('typeContent').unbind('hover');
+      $('.control', jqDiv).css('visibility', 'visible');
 
       // use the image in info if supplied
       // else generate one from the url
@@ -1360,6 +1368,7 @@ function pluginLoaded(
           app.winTimeout = null;
           $(document).trigger('checkCredentials');
         }
+        app.pluginLoaded = true;
      }, function(message) {
         // Failure to initialize.
         app.log(4, 'Failed to initialize user media [' + message + ']');
@@ -1383,6 +1392,4 @@ function pluginLoaded(
      app.log(2, 'Plugin upgrade available. Current version: ' + Callcast.GetVersion());
      app.pluginUpgrade = true;
   }
-
-  app.pluginLoaded = true;
 } /* pluginLoaded() */
