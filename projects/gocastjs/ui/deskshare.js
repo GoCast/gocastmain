@@ -45,6 +45,7 @@ GoCastJS.gcDeskShare.prototype.doSpot = function(info) {
 	var self = this;
 
 	if (info.owner === Callcast.nick) {
+		$('div.name', this.jqSpot).text('My Desktop');
 	    navigator.webkitGetUserMedia({
 	      video: {
 	        mandatory: {

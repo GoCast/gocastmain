@@ -121,12 +121,12 @@
         }
       }
 
-      if ($(this).hasClass('editor')) {
+      /*if ($(this).hasClass('editor')) {
         $('.zoom', this).css({
           'left': '1%',
           'bottom': '1%'
         });
-      }
+      }*/
     });
     jqObj.mouseout(function(event) {
       $('.control', this).css('visibility', 'hidden');

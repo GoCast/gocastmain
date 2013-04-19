@@ -3099,8 +3099,20 @@ function addFileShare() {
       });
 }
 
+function deskShareAlert(msg) {
+  if (!sessionStorage) {
+    return;
+  }
+  if (!sessionStorage.gcpDeskShareAlertShown) {
+    alert(msg);
+    sessionStorage.gcpDeskShareAlertShown = 'true';
+  }
+}
+
 function addDeskShare() {
   if ($.urlvars.wrtcable && $.urlvars.deskshareable) {
+    deskShareAlert('Desktop sharing is an experimental feature. Performance may vary. We are working on making ' +
+                   'this feature more user-friendly and effective.');
     Callcast.AddSpot({
       spottype: 'deskshare',
       spotreplace: 'first-unoc',
