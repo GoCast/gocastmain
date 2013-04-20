@@ -296,10 +296,18 @@ var mailOptions = {
 }
 
 function privateSendEmail(toName, toEmail, subject, body, cbSuccess, cbFailure) {
+    var tofield;
+
+    if (typeof(toEmail) === 'string') {
+        tofield = [toName + ' <' + toEmail + '>'];
+    }
+    else {
+        tofield = toEmail;  // Copy array inbound
+        tofield[0] = toName + ' <' + toEmail[0] + '>';  // Patch up the main 'to' field entry
+    }
+
     mg.sendText(settings.accounts.inviteFromName + ' <' + settings.accounts.inviteFromAddress + '>',
-        [toName + ' <' + toEmail + '>'],
-      subject,
-      body,
+      tofield, subject, body,
       settings.accounts.inviteFromAddress, {},
       function(err) {
         if (err) {
@@ -503,9 +511,25 @@ function apiNewAccount(baseURL, email, password, name, firstRoomName, extras, su
     });
 }
 
-function apiNewPaidAccount(baseURL, email, password, name, firstRoomName, extras, success, failure) {
+//
+// emailin: a string for a single 'to' or an array of strings for to/cc. 'to' entry is the [0] entry.
+//
+function apiNewPaidAccount(baseURL, emailin, password, name, firstRoomName, extras, success, failure) {
     var hpass = privateHashPassword(password),
-        passx = privateHashPassword(hpass);
+        passx = privateHashPassword(hpass), email = emailin;
+
+    if (typeof emailin !== 'string') {
+        try {
+            if (Array.isArray(emailin)) {
+                email = emailin[0];
+            }
+        }
+        catch(e) {
+            email = 'BAD_INPUT_emailin';
+            failure('bad input emailin');
+            return;
+        }
+    }
 
     // Check if account with this email exists
     db.EntryExists(email, function(obj) {
@@ -517,7 +541,7 @@ function apiNewPaidAccount(baseURL, email, password, name, firstRoomName, extras
         }
     }, function() {
         // Doesn't exist, so add account
-        console.log('apiNewPaidAccount: ', {email: email, passx: passx});
+//        console.log('apiNewPaidAccount: ', {email: email, passx: passx});
         xmpp.AddAccount(email, passx, name, function() {
             // Added account, now generate activation code
             // Note - account is disabled upon creation until activation is complete.
@@ -545,8 +569,8 @@ function apiNewPaidAccount(baseURL, email, password, name, firstRoomName, extras
                         resetcode = privateCalcResetPasswordCode(new Date(), email);
                         emailBody = privateGenPasswordSetEmail(baseURL, email, name, resetcode);
 
-                        privateSendEmail(name, email, 'Setup your new GoCast account password', emailBody, function() {
-                            gcutil.log('apiNewPaidAccount: SUCCESS - for: ' + email);
+                        privateSendEmail(name, emailin, 'Setup your new GoCast account password', emailBody, function() {
+//                            gcutil.log('apiNewPaidAccount: SUCCESS - for: ' + emailin.toString());
                             success();
                         }, function(err) {
                             gcutil.log('apiNewPaidAccount: Email send failure.');
@@ -689,6 +713,11 @@ function apiSendRoomInviteEmail(opts, success, failure) {
 function apiDeleteUserRoom(email, room, success, failure) {
     //  delete room
     db.DeleteRoom(email, room, success, failure);
+}
+
+function apiStoreTransaction(account, id, body, success, failure) {
+    //  Store everything we might need about this transaction for later.
+    db.StoreTransaction(account, id, body, success, failure);
 }
 
 function apiGenerateResetPassword(email, baseURL, success, failure) {
@@ -1181,3 +1210,4 @@ exports.ReqXmppConn = apiReqXmppConn;
 exports.ConvertPasswords = apiConvertPasswords;
 exports.ShowAllAccounts = apiShowAllAccounts;
 exports.VerifyAllHashed = apiVerifyAllHashed;
+exports.StoreTransaction = apiStoreTransaction;

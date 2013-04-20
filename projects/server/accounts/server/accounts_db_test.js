@@ -380,6 +380,39 @@ function dbAssociatedTest2() {
     );
 }
 
+function dbTransactionTest1() {
+    var email = 'new@account.com', id = 'TransID_ABC123', body;
+
+    body = {
+        txn_type: 'subscribe',
+        payer_id: 'pay_id_here',
+        payer_email: 'payer@moneybags.com'
+    };
+
+    flow.exec(
+        function() {
+            db.StoreTransaction(email, id, body, this, this);
+        },
+        function(arg) {
+            console.log('1-Answer - ', arg);
+
+            // Doing duplicate entry. Should fail.
+            body.payer_id = 'another-id-here';
+            db.StoreTransaction(email, id, body, this, this);
+        },
+        function(arg) {
+            console.log('2-Answer - ', arg);
+
+            email = 'junk@junk.com';
+            db.StoreTransaction(email, id, body, this, this);
+        },
+        function(arg) {
+            console.log('3-Answer - ', arg);
+
+        }
+    );
+}
+
 //db2Test1();
 //db2Test2();
 //db2Test3();
@@ -388,5 +421,6 @@ function dbAssociatedTest2() {
 //dbRoomTest3();
 //dbVisitorTest1();
 //reportTest1();
-dbAssociatedTest1();
+//dbAssociatedTest1();
 //dbAssociatedTest2();
+dbTransactionTest1();
