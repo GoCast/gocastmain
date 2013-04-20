@@ -489,8 +489,9 @@ function assignSpotForParticipant(nickname, shownNickname) {
   if (oo) {
     $(oo).attr('id', id).attr('encname', nickname).attr('title', dispname);
     $('div.name', oo).text(dispname);
-    $(oo).removeClass('unoccupied');
+    $(oo).removeClass('unoccupied').unbind('hover');
     $("#showChat", oo).css("display", "block"); // display showChat button
+    $('.control', oo).css('visibility', 'hidden');
 
     // set spot item name
     item = $(oo).data('item');
@@ -570,7 +571,11 @@ function unassignSpotForParticipant(nickname) {
         $('div.name', oo).text('');
         $('#msgBoard', oo).css('display', 'none');
         $('#showChat', oo).css('display', 'none');
-        $(oo).css('background-image', 'url("images/GoToken.png")');
+        $(oo).css('background-image', 'url("images/GoToken.png")').hover(function() {
+          $('.close', this).css('visibility', 'visible');
+        }, function() {
+          $('.close', this).css('visibility', 'hidden');
+        });
       }
     } catch (e) {
       app.log(4, 'unassignSpotForParticipant: ', e);
