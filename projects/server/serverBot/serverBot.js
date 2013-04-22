@@ -143,7 +143,7 @@ RoomDatabase.prototype.LoadRooms = function(cbSuccess, cbFailure) {
 //            self.log(self.roomList);
 
             if (cbSuccess) {
-                cbSuccess(self.roomList);
+                cbSuccess(self.roomList, res.count);
             }
         }
       });
@@ -234,7 +234,7 @@ RoomDatabase.prototype.validateObj = function(obj) {
     return retobj;
 };
 
-RoomDatabase.prototype.AddContentToRoom = function(roomname, spotnumber, obj, cbSuccess, cbFailure) {
+RoomDatabase.prototype.AddContentToRoom = function(roomname, spotnumber, obj, cbSuccess, cbFailure, noWriteDB) {
     var self = this,
         putobj = null;
 
@@ -271,20 +271,26 @@ RoomDatabase.prototype.AddContentToRoom = function(roomname, spotnumber, obj, cb
 //    this.log('Adding content to room: ' + roomname + ' in spotnumber: ' + spotnumber);
 //    console.log('DEBUG:Adding content to room: full validated obj: ', putobj);
 
-    ddb.putItem(this.ROOMCONTENTS, putobj, {}, function(err, res, cap) {
-        if (err)
-        {
-            if (err.statusCode === 400) {
-                self.notifylog('DynamoDB Throughput ERROR: AddContentToRoom room: ' + roomname + ' spotnumber: ' + spotnumber);
+    if (!noWriteDB) {
+        ddb.putItem(this.ROOMCONTENTS, putobj, {}, function(err, res, cap) {
+            if (err)
+            {
+                if (err.statusCode === 400) {
+                    self.notifylog('DynamoDB Throughput ERROR: AddContentToRoom room: ' + roomname + ' spotnumber: ' + spotnumber);
+                }
+                self.log('AddContentToRoom: ERROR: ' + err);
+                cbFailure(err);
+            } else {
+    //            self.log('AddContentToRoom: Success: ' + cap);
+    //            self.log(res);
+                cbSuccess(res, cap);
             }
-            self.log('AddContentToRoom: ERROR: ' + err);
-            cbFailure(err);
-        } else {
-//            self.log('AddContentToRoom: Success: ' + cap);
-//            self.log(res);
-            cbSuccess(res, cap);
-        }
-    });
+        });
+    }
+    else {
+        // Skipping the write to the database -- so we call success now.
+        cbSuccess();
+    }
 
     return true;
 };
@@ -296,7 +302,7 @@ RoomDatabase.prototype.LoadContentsFromDBForRoom = function(roomname, cbSuccess,
         i, len,
         QueryCB = null,
         batchDelay = 500,
-        maxPerBatch = 2;
+        maxPerBatch = 20;
 
     QueryCB = function(err, res, cap) {
         if (err)
@@ -337,7 +343,7 @@ RoomDatabase.prototype.LoadContentsFromDBForRoom = function(roomname, cbSuccess,
             if (res.lastEvaluatedKey.hash) {
                 options.exclusiveStartKey = res.lastEvaluatedKey;
                 setTimeout(function() {
-//                    console.log('DEBUG: Going for another iteration roomname=' + roomname);
+                    console.log('DEBUG: Going for another contents-iteration for roomname=' + roomname);
                     ddb.query(self.ROOMCONTENTS, roomname, options, QueryCB);
                 }, batchDelay);
             }
@@ -354,7 +360,7 @@ RoomDatabase.prototype.LoadContentsFromDBForRoom = function(roomname, cbSuccess,
         return false;
     }
 
-    this.log('Loading ALL contents from db for room: ' + roomname);
+//    this.log('Loading ALL contents from db for room: ' + roomname);
 
     options = { limit: maxPerBatch };
 
@@ -403,7 +409,7 @@ RoomDatabase.prototype.RemoveAllContentsFromRoom = function(roomname, cbSuccess,
         toDel = {},
         QueryCB = null,
         batchDelay = 500,
-        maxPerBatch = 2;
+        maxPerBatch = 20;
 
     QueryCB = function(err, res, cap) {
         if (err)
@@ -673,7 +679,7 @@ MucRoom.prototype.SetMaxRoomParticipants = function(max) {
     //      at some point, this becomes messy. So, this handling of it now will be just fine
     //      for now and the future.
     this.options['muc#roomconfig_maxusers'] = this.maxParticipants.toString();    // Stringify.
-    console.log('Setting maxParticipants to: ' + this.options['muc#roomconfig_maxusers']);
+//    console.log('Setting maxParticipants to: ' + this.options['muc#roomconfig_maxusers']);
 
     return true;
 };
@@ -767,7 +773,7 @@ MucRoom.prototype.notifylog = function(msg) {
     }
 };
 
-MucRoom.prototype.log = function(msg) {
+MucRoom.prototype.log = function(msg, arg2, arg3) {
     var newmsg;
 
     try {
@@ -777,7 +783,7 @@ MucRoom.prototype.log = function(msg) {
         newmsg = msg;
     }
 
-    console.log(logDate() + ' - @' + this.roomname.split('@')[0] + ': ' + newmsg);
+    console.log(logDate() + ' - @' + this.roomname.split('@')[0] + ': ' + newmsg, arg2 || '', arg3 || '');
 };
 
 MucRoom.prototype.IsFull = function() {
@@ -1107,7 +1113,10 @@ MucRoom.prototype.handlePresence = function(pres) {
             // Upon joining, use the participants list as our initial water mark of # of participants.
             //
             this.currentNumParticipants = size(this.participants) - 1;  // minus ourselves as we're already in the array.
-            this.log('On Join: # participants is: ' + this.currentNumParticipants);
+            if (this.currentNumParticipants) {
+                this.log('On Join: # participants is: ' + this.currentNumParticipants);
+            }
+
             if (this.currentNumParticipants > this.maxParticipantsSeen) {
                 this.maxParticipantsSeen = this.currentNumParticipants;
                 this.log('New maxParticipantsSeen = ' + this.maxParticipantsSeen);
@@ -1623,7 +1632,7 @@ MucRoom.prototype.LoadWhiteboardForSpot = function(spotnumber) {
 
     loc = this.wbDir + '/' + this.wbFname(spotnumber);
 
-    this.log('Loading whiteboard from: ' + loc);
+//    this.log('Loading whiteboard from: ' + loc);
 
     this.canvas[spotnumber] = new nodewb.NodeWhiteBoard(this.spotList[spotnumber].wbWidth || 500,
                                                         this.spotList[spotnumber].wbHeight || 500);
@@ -1636,7 +1645,7 @@ MucRoom.prototype.LoadWhiteboardForSpot = function(spotnumber) {
         this.canvas[spotnumber].wb.getContext('2d').drawImage(img, 0, 0);
     }
     catch (e) {
-        this.log('WARNING: Could not load whiteboard image: ' + loc + ' Err: ' + e);
+//        this.log('WARNING: Could not load whiteboard image: ' + loc + ' Err: ' + e);
     }
 };
 
@@ -1854,8 +1863,10 @@ MucRoom.prototype.AddDefaultSpots = function() {
 
 //
 // Place for coping with multitude of special spot types and any special requirements they may have.
+// Apr 19, 2013 - added noWriteDB parameter to avoid re-writing to the database things that just got loaded
+//   at re-start time - LoadContentsFromDB() ... followed by adding items to the rooms which then would write.
 //
-MucRoom.prototype.AddSpotType = function(spottype, info) {
+MucRoom.prototype.AddSpotType = function(spottype, info, noWriteDB) {
     var self = this;
 
     // Be sure to give a spot number to everyone that's consistent.
@@ -1925,7 +1936,7 @@ MucRoom.prototype.AddSpotType = function(spottype, info) {
                 return true;
             }, function(msg) {
                 self.log('AddSpotType: ERROR adding to database: ' + msg);
-            });
+            }, noWriteDB);
         }
     }
 
@@ -2953,7 +2964,7 @@ MucRoom.prototype.rejoin = function(rmname, nick) {
         self.joinTimer = null;
 
         self.rejoin(rmname, nick);
-    }, 4000);
+    }, 5000);
 };
 
 var MucroomObjectPool = {
@@ -3205,10 +3216,10 @@ Overseer.prototype.SetupPublicRoomPublisher = function() {
                     .c('pubsub', {xmlns: 'http://jabber.org/protocol/pubsub#owner'})
                     .c('delete', {node: settings.roommanager.public_room_node});
 
-        console.log('SetupPublicRoomPublisher: DELETING NODE.');
+//        console.log('SetupPublicRoomPublisher: DELETING NODE.');
 
         this.sendIQ(destroy, function(resp) {
-            console.log('SetupPublicRoomPublisher: DELETING NODE SUCCESSFUL.');
+//            console.log('SetupPublicRoomPublisher: DELETING NODE SUCCESSFUL.');
         });
 
         return;
@@ -3341,9 +3352,9 @@ Overseer.prototype.LoadActiveRoomsFromDB = function() {
         return false;
     }
 
-    this.roomDB.LoadRooms(function(rooms_in) {
+    this.roomDB.LoadRooms(function(rooms_in, count) {
         var k, addOne,
-            i, len,
+            i, len, roomNum = 0,
             batchDelay = 500;
 
         // Doing delay-load/add on rooms list.
@@ -3356,12 +3367,17 @@ Overseer.prototype.LoadActiveRoomsFromDB = function() {
         // Note: We use bSkipDBPortion on AddTrackedRoom() call here to avoid DB hits.
         for (k in rooms_in) {
             if (rooms_in.hasOwnProperty(k)) {
+                if (roomNum % 25 === 0) {
+                    self.log('Loading room ' + roomNum + ' of ' + count + '. ' + Math.floor(roomNum * 100 / count) + '% complete. ======================');
+                }
+                roomNum += 1;
+
                 if (k !== k.toLowerCase()) {
                     self.log('WARNING: LoadRooms: Upper-Case Roomname found in Database: ' + k);
                 }
 
                 self.AddTrackedRoom(k.toLowerCase(), rooms_in[k], function() {
-                    self.log('Added from DB: ' + k);
+//                    self.log('Added from DB: ' + k);
                 }, function(msg) {
                     self.log('LoadRooms: ERROR: Failed ' + k + ' with msg: ' + msg);
                 }, true);
@@ -3386,7 +3402,7 @@ Overseer.prototype.LoadActiveRoomsFromDB = function() {
                                 }
                                 else {
                                     delete contents[i].roomname;        // Dont clutter the internal memory database.
-                                    self.MucRoomObjects[temproomname].AddSpotType(contents[i].spottype, contents[i]);
+                                    self.MucRoomObjects[temproomname].AddSpotType(contents[i].spottype, contents[i], true);
                                 }
                             }
 
@@ -3453,7 +3469,16 @@ Overseer.prototype.notifylog = function(msg) {
 };
 
 Overseer.prototype.log = function(msg, arg2, arg3) {
-    console.log(logDate() + ' - Overseer: ' + decodeURI(msg), arg2 || '', arg3 || '');
+    var newmsg;
+
+    try {
+        newmsg = decodeURI(msg);
+    }
+    catch(e) {
+        newmsg = msg;
+    }
+
+    console.log(logDate() + ' - Overseer: ' + newmsg, arg2 || '', arg3 || '');
 };
 
 Overseer.prototype.sendIQ = function(iq, cb) {

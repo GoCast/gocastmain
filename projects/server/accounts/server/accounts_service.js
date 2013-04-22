@@ -679,7 +679,7 @@ function handleTransactionNotification(req) {
     }
 
     // Need to database this transaction and associate it to the account name.
-    api.StoreTransaction(account, req.body.txn_id, req.body);
+    api.StoreTransaction(account, req.body.txn_id, req.body, function() {}, function() {});
 
     return true;
 }
@@ -972,7 +972,7 @@ app.post('/login', function(req, res) {
             console.log('accounts_service[/login][error]: No req.body to process.');
             res.send('{"result": "error"}');
         } else if (!req.body.email) {
-            console.log('accounts_service[/login][error]: No req.body.email to process.');
+//            console.log('accounts_service[/login][error]: No req.body.email to process.');
             res.send('{"result": "noemail"}');
         } else if (!req.body.password) {
             console.log('accounts_service[/login][error]: No req.body.password to process.');
