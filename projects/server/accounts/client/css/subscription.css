@@ -131,3 +131,9 @@ body > .container > .row > .span5 > .subscription.show {
 .popover #carousel .item {
     height: 255px;
 }
+
+.slidenumber {
+    position: absolute;
+    right: 5px;
+    bottom: 5px;
+}

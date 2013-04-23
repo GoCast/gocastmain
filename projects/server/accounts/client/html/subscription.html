@@ -28,35 +28,52 @@
                             <span class="questionheader label label-inverse">What can I do with GoCast that I couldn't before?</span><br/><br/>
                             With GoCast, you can:<br/><br/>
                             <ul>
-                                <li>Create and manage <span class="label label-info">your own online meeting rooms</span>.</li>
+                                <li><span class="label label-info">Create your own</span> online meeting rooms.</li>
                                 <li><span class="label label-info">Invite others</span> to your rooms to share and collaborate.</li>
-                                <li><span class="label label-info">Use shared apps</span> to collaborate more effectively than just audio/video/text chat.</li>
+                                <li><span class="label label-info">Express yourself</span> with high quality audio/video and text chat.</li>
+                                <li><span class="label label-info">Collaborate effectively</span> using shared apps.</li>
+                                <li><span class="label label-info">Save and store</span> room content for later use.</li>
                             </ul>
+                            <div class="slidenumber">
+                                <span class="badge">1 / 4</span>
+                            </div>
                         </div>
                         <div class="item alert alert-error">
                             <span class="questionheader label label-inverse">How does GoCast help me get more out of my meetings?</span><br/><br/>
-                            Apart from audio/video &amp; text chat, GoCast provides the following shared apps and features:<br/><br/>
+                            In addition to audio/video &amp; text chat, GoCast provides the following shared apps and features:<br/><br/>
                             <ul>
-                                <li><span class="label label-info">Whiteboard</span>&nbsp;Quickly explain your ideas and thoughts to others.</li>
-                                <li><span class="label label-info">Notepad</span>&nbsp;Take notes and share them with others.</li>
-                                <li><span class="label label-info">WikiBrowser</span>&nbsp;Share Wikipedia articles with others.</li>
-                                <li><span class="label label-info">FileShare</span>&nbsp;Share documents, images and other files with others.</li>
-                                <li><span class="label label-info">DeskShare</span>&nbsp;Share your desktop screen (Chrome 26+ only).</li>
+                                <li><span class="label label-info">Whiteboard</span> Quickly sketch and share your ideas.</li>
+                                <li><span class="label label-info">Notepad</span> Take notes together.</li>
+                                <li><span class="label label-info">WikiBrowser</span> Browse Wikipedia articles together.</li>
+                                <li><span class="label label-info">FileShare</span> Upload, view &amp; share documents, images and other files.</li>
+                                <li><span class="label label-info">DeskShare</span> Share your screen for presentations (Chrome 26+ only).</li>
                                 <li><span class="label label-info">Persistent Rooms</span><ul><li>Access your room content anytime, even after your meeting.</li><li>Prepare your room for a meeting by pre-populating it with relevant content.</li></ul></li>
                             </ul>
+                            <div class="slidenumber">
+                                <span class="badge">2 / 4</span>
+                            </div>
                         </div>
                         <div class="item alert">
                             <span class="questionheader label label-inverse">Is GoCast the right tool for me?</span><br/><br/>
                             You can use GoCast for any kind of collaboration. When it comes to GoCast, the sky is the limit!
-                            Typical GoCast users include (but not limited to):<br/><br/>
-                            <li><span class="label label-info">Teachers</span>&nbsp; can use GoCast to conduct small classes.</li>
-                            <li><span class="label label-info">Students</span>&nbsp; can use GoCast for study group meetings.</li>
-                            <li><span class="label label-info">Family &amp; Friends</span><ul><li>Keep in touch with loved ones wherever you are.</li><li>Share pictures, plan vacations and parties, hatch weekend plans with your buddies, and much, much more!</li></ul></li>
+                            Typical GoCast users include:<br/><br/>
+                            <ul>
+                                <li><span class="label label-info">Teachers</span> use GoCast to conduct small classes.</li>
+                                <li><span class="label label-info">Students</span> use GoCast for study group meetings.</li>
+                                <li><span class="label label-info">People at work</span> use GoCast for project collaboration and document review.</li>
+                                <li><span class="label label-info">Family &amp; Friends</span><ul><li>Keep in touch with loved ones wherever you are.</li><li>Share pictures, plan vacations and parties, hatch weekend plans with your buddies, and much, much more!</li></ul></li>
+                            </ul>
+                            <div class="slidenumber">
+                                <span class="badge">3 / 4</span>
+                            </div>
                         </div>
                         <div class="item alert alert-info">
-                            <span class="questionheader label label-inverse">Wow! I'm so in on this. How do I get started?</span><br/><br/>
+                            <span class="questionheader label label-inverse">Wow! This is awesome! How do I get started?</span><br/><br/>
                             <ul><li>Sign up today for your <span class="label label-important">FREE 30 DAY TRIAL</span>.</li>
-                            <li>Once you do, we will ask you for your credit card details using Paypal.</li><li>Once your trial period expires, your credit card will be charged every month/year.</li><li>You can cancel your subscription at any time.</li></ul>
+                            <li>GoCast uses Paypal as a secure and trusted way to manage your subscription.</li><li>You can cancel your subscription at any time.</li></ul>
+                            <div class="slidenumber">
+                                <span class="badge">4 / 4</span>
+                            </div>
                         </div>
                     </div>
                     <a class="left carousel-control" href="#carousel" data-slide="prev">‹</a>
@@ -141,7 +158,12 @@
                         trigger: 'manual'
                     });
                     $(this.$subform).popover('show');
-                    $('.popover #carousel').carousel();
+                    $('.popover .carousel').carousel({interval: 10000});
+                    $('.popover .carousel .carousel-control.right').css('right', '-15px');
+                    $('.popover .carousel .carousel-control.left').css('left', '-15px');
+                    $(window).on('resize', function() {
+                        $(SubUI.$subform).popover('show');
+                    });
 
                     // Show buttons by default now - disabling instead.
                     this.$subbtns.addClass('show');
