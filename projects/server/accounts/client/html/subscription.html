@@ -128,6 +128,30 @@
         <script type="text/javascript" src="js/bootstrap.js?GOCASTTIMESTAMP"></script>
         <script type="text/javascript" src="js/jquery.utils.js?GOCASTTIMESTAMP"></script>
         <script type="text/javascript">
+            if (!Function.prototype.bind) {
+                Function.prototype.bind = function (oThis) {
+                    if (typeof this !== "function") {
+                        // closest thing possible to the ECMAScript 5 internal IsCallable function
+                        throw new TypeError("Function.prototype.bind - what is trying to be bound is not callable");
+                    }
+
+                    var aArgs = Array.prototype.slice.call(arguments, 1), 
+                        fToBind = this, 
+                        fNOP = function () {},
+                        fBound = function () {
+                            return fToBind.apply(this instanceof fNOP && oThis
+                                                 ? this
+                                                 : oThis,
+                                                 aArgs.concat(Array.prototype.slice.call(arguments)));
+                        };
+
+                    fNOP.prototype = this.prototype;
+                    fBound.prototype = new fNOP();
+
+                    return fBound;
+                };
+            }
+
             var SubUI = {
                 alerttimeout: null,
                 kdwntimeout: null,
@@ -148,6 +172,11 @@
                     this.$confemail = $('input#input-confemail', this.$subform);
                     this.$name = $('input#input-name', this.$subform);
                     this.$subbtns = $('body > div.container > div.row > div.span5 > div.subscription');
+
+                    // Opacity doesn't seem to work in IE8
+                    if ($.browser.msie) {
+                        $('body > .container > .row > .span5 > form .alert').css('visibility', 'hidden');
+                    }
 
                     // Show marketing blurb popover
                     $(this.$subform).popover({
@@ -201,17 +230,28 @@
                         iconclass = {error: 'icon-warning-sign', success: 'icon-ok-sign'};
 
                     clearTimeout(this.alerttimeout);
-                    $('.alert.show', this.$subform).removeClass('show');
-                    $alert = $('.alert', this.$subform).removeClass('alert-success')
+                    $alert = $('.alert', this.$subform).removeClass('show')
+                                                       .removeClass('alert-success')
                                                        .removeClass('alert-error')
                                                        .addClass('alert-' + type)
                                                        .addClass('show');
+
+                    // Opacity doesn't seem to work in IE8
+                    if ($.browser.msie) {
+                        $alert.css('visibility', 'visible');
+                    }
+
                     $('i', $alert).removeClass('icon-warning-sign')
                                   .removeClass('icon-ok-sign')
                                   .addClass(iconclass[type]);
                     $('p', $alert).html(message);
+
                     this.alerttimeout = setTimeout(function() {
-                        $('.alert.show', self.$subform).removeClass('show');
+                        $alert.removeClass('show');
+                        // Opacity doesn't seem to work in IE8
+                        if ($.browser.msie) {
+                            $alert.css('visibility', 'hidden');
+                        }
                     }, periodms||5000);
                 },
                 // enable = true or false
