@@ -22,12 +22,27 @@
         </div>
         <div class="container">
             <div class="row">
-                <div id="thisspaceavailable" class="span5 offset1">
+                <div id="banner" class="span7" style="visibility: hidden;">
+                    <div class="alert alert-success">
+                        <span class="questionheader">What can I do with GoCast that I couldn't before?</span>
+                        With GoCast, you can:<br/><br/>
+                        <ul>
+                            <li>Create and manage <span class="label label-info">your own online meeting rooms</span>.</li>
+                            <li><span class="label label-info">Invite others</span> to your rooms to share and collaborate.</li>
+                            <li><span class="label label-info">Use shared apps</span> to collaborate more effectively than just audio/video/text chat.</li>
+                        </ul>
+                    </div>
+                    <div class ></div>
+                    <div class="alert alert-info">
+                        <span class="questionheader">Wow! I'm so in on this. How do I get started?</span>
+                        Sign up today for your <span class="label label-important">FREE 30 DAY TRIAL</span>.
+                        Once you do, we will ask you for your credit card details. However, you can cancel at any time.
+                    </div>
                 </div>
                 <div class="span5">
                     <form id="subscribe-form" class="form-horizontal show">
                         <fieldset>
-                            <legend>&nbsp;Subscribe to GoCast</legend>
+                            <legend><strong>&nbsp;Subscribe to GoCast</strong></legend>
                             <div class="control-group" ph=" Your email (this will be your user name) ">
                                 <div class="controls" align="center">
                                     <input id="input-email" type="email" name="email" required class="span4">
@@ -84,13 +99,25 @@
                 $name: null,            // name field
                 $subbtns: null,
                 init: function() {
-                    var self = this;
+                    var popoverhtml = '<div class="span7">' + $('body > div.container > div.row > div#banner').html() +
+                                      '</div>',
+                        self = this;
 
                     this.$subform = $('body > div.container > div.row > div.span5 > form#subscribe-form');
                     this.$email = $('input#input-email', this.$subform);
                     this.$confemail = $('input#input-confemail', this.$subform);
                     this.$name = $('input#input-name', this.$subform);
                     this.$subbtns = $('body > div.container > div.row > div.span5 > div.subscription');
+
+                    // Show marketing blurb popover
+                    $(this.$subform).popover({
+                        title: '<strong>A Fast, Easy, Fun Way to Meet, Share and Collaborate Online!</strong>',
+                        content: popoverhtml,
+                        html: true,
+                        placement: 'left',
+                        trigger: 'manual'
+                    });
+                    $(this.$subform).popover('show');
 
                     // Show buttons by default now - disabling instead.
                     this.$subbtns.addClass('show');

@@ -110,3 +110,11 @@ body > .container > .row > .span5 > .subscription {
 body > .container > .row > .span5 > .subscription.show {
     display: block;
 }
+
+.popover {
+    width: auto;
+}
+
+.popover strong {
+    font-size: 1.25em;
+}
