@@ -113,8 +113,21 @@ body > .container > .row > .span5 > .subscription.show {
 
 .popover {
     width: auto;
+    height: 350px;
 }
 
 .popover strong {
     font-size: 1.25em;
+}
+
+.questionheader {
+    color: white;
+    width: 100%;
+    padding: 5px 10px;
+    font-size: 1.1em;
+    font-weight: normal;
+}
+
+.popover #carousel .item {
+    height: 255px;
 }
