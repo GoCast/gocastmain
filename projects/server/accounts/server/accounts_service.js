@@ -892,9 +892,18 @@ app.post('/inviteviaemail', function(req, res) {
 
 app.post('/login', function(req, res) {
 //    console.log('COOKIESESSION: ', req.session);
+    var refHost = null;
+    if (req.headers.referer && valid_base_domain(req.headers.referer, validDomains)) {
+        // We have a valid caller, so we can give out a stun/turn server entry to them.
+        // First parse out the hostname.
+        refHost = parseUri(req.headers.referer).host || '';
+        refHost = refHost.toLowerCase();
+    }
+
     if (req.session.sid) {
         api.Login({
             sid: req.session.sid,
+            host: refHost,
             callback: function(ret) {
                 var xs = {};
                 if ('success' === ret.result) {
@@ -908,6 +917,10 @@ app.post('/login', function(req, res) {
                             name: ret.name
                         }
                     };
+                    if (ret.stunTurnArray.length) {
+//                        console.log('DEBUG: Returning stunTurnArray of: ' + JSON.stringify(ret.stunTurnArray));
+                        xs.data.stunTurnArray = ret.stunTurnArray;
+                    }
                     res.send(JSON.stringify(xs));
                 } else {
                     if ('nosession' === ret.result) {
@@ -921,6 +934,7 @@ app.post('/login', function(req, res) {
         api.Login({
             email: req.body.email,
             password: req.body.password,
+            host: refHost,
             callback: function(ret) {
                 var xs = {};
                 if ('success' === ret.result) {
@@ -934,6 +948,11 @@ app.post('/login', function(req, res) {
                             name: ret.name
                         }
                     };
+
+                    if (ret.stunTurnArray.length) {
+//                        console.log('DEBUG: Returning stunTurnArray of: ' + JSON.stringify(ret.stunTurnArray));
+                        xs.data.stunTurnArray = ret.stunTurnArray;
+                    }
 
                     req.session.sid = ret.gsid;
                     if (req.session.anon) {
@@ -949,6 +968,7 @@ app.post('/login', function(req, res) {
     } else if (req.body && req.body.anon) {
         api.Login({
             anon: true,
+            host: refHost,
             callback: function(ret) {
                 var xs = {};
                 if ('success' === ret.result) {
@@ -960,6 +980,12 @@ app.post('/login', function(req, res) {
                             sid: ret.sid
                         }
                     };
+
+                    if (ret.stunTurnArray.length) {
+//                        console.log('DEBUG: Returning stunTurnArray of: ' + JSON.stringify(ret.stunTurnArray));
+                        xs.data.stunTurnArray = ret.stunTurnArray;
+                    }
+
                     req.session.anon = true;
                     res.send(JSON.stringify(xs));
                 } else {

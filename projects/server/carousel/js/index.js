@@ -2087,6 +2087,10 @@ function enterId(options)
           if (response.data.name) {
             opts.name = response.data.name;
           }
+          if (response.data.stunTurnArray && response.data.stunTurnArray.length) {
+//            console.log('DEBUG: stunTurnArray received: ' + JSON.stringify(response.data.stunTurnArray));
+            opts.stunTurnArray = response.data.stunTurnArray;
+          }
 
           Callcast.connect(opts);
         } else {
@@ -2210,6 +2214,10 @@ function checkCredentials(evt, msg)
         }
         if (response.data.name) {
           opts.name = response.data.name;
+        }
+        if (response.data.stunTurnArray && response.data.stunTurnArray.length) {
+//          console.log('DEBUG: stunTurnArray received: ' + JSON.stringify(response.data.stunTurnArray));
+          opts.stunTurnArray = response.data.stunTurnArray;
         }
 
         Callcast.connect(opts);

@@ -908,6 +908,37 @@ function apiVisitorSeen(email, nickName, success, failure) {
     db.VisitorSeen(email, nickName, success, failure);
 }
 
+function getStunTurnArray(email, host) {
+    var devStaticArr, studyStaticArr, lHost, retArr;
+
+    lHost = host.toLowerCase();
+    devStaticArr = [ {uri: 'turn:manjeshtest2@dev.gocast.it:3478', password: 'manjeshpass2'},
+                     {uri: 'stun:stun.l.google.com:19302'} ];
+    studyStaticArr = [ {uri: 'turn:manjeshtest2@video.gocast.it:3478', password: 'manjeshpass2'},
+                     {uri: 'stun:stun.l.google.com:19302'} ];
+
+    // Eventually, create turn account based upon type of account/email given and on which server.
+    // For now, simply hand back the appropriate static array.
+    switch(lHost) {
+        case 'dev.gocast.it':
+            retArr = devStaticArr;
+            break;
+
+        case 'study.gocast.it':
+        case 'carousel.gocast.it':
+        case 'video.gocast.it':
+            retArr = studyStaticArr;
+            break;
+
+        default:
+            retArr = [];
+            break;
+    }
+
+//    console.log('getStunTurnArray: For: ' + email + ', on: ' + lHost + ', returning: ' + JSON.stringify(retArr));
+    return retArr;
+}
+
 function apiLogin(args) {
     var res = {}, sid, passx, e, hp,
         sess, sessp, gsid;
@@ -928,7 +959,8 @@ function apiLogin(args) {
                             sid: xs.sid,
                             email: sess.email,
                             name: sess.name,
-                            gsid: sid
+                            gsid: sid,
+                            stunTurnArray: getStunTurnArray(sess.email, args.host)
                         };
                         args.callback(res);
                     }
@@ -955,7 +987,8 @@ function apiLogin(args) {
                                 sid: xs.sid,
                                 email: entry.email,
                                 name: entry.name,
-                                gsid: sid
+                                gsid: sid,
+                                stunTurnArray: getStunTurnArray(entry.email, args.host)
                             };
                             args.callback(res);
                         }
@@ -996,7 +1029,8 @@ function apiLogin(args) {
                             sid: xs.sid,
                             email: entry.email,
                             name: entry.name,
-                            gsid: sid
+                            gsid: sid,
+                            stunTurnArray: getStunTurnArray(entry.email, args.host)
                         };
                         args.callback(res);
                     }
@@ -1024,7 +1058,8 @@ function apiLogin(args) {
                     result: 'success',
                     rid: xs.rid,
                     jid: xs.jid,
-                    sid: xs.sid
+                    sid: xs.sid,
+                    stunTurnArray: getStunTurnArray('anon', args.host)
                 };
                 args.callback(res);
             }

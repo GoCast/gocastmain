@@ -260,6 +260,7 @@ var Callcast = {
     CALLCAST_ROOMS: null,
     AT_CALLCAST_ROOMS: null,
 //    STUNSERVER: 'stun.l.google.com',
+    stunTurnArray: [ {uri: 'stun:stun.l.google.com:19302'} ],
     STUNSERVER: null,
     FEEDBACK_BOT: null,
     STUNSERVERPORT: null,
@@ -568,6 +569,10 @@ var Callcast = {
         if (!this.fbsr || this.fbsr === '') {
             this.SendAdHocPres();
         }
+    },
+
+    SetStunTurnArray: function(newarr) {
+        this.stunTurnArray = newarr;    // Assumes the parameter is indeed an array of objects as expected.
     },
 
     SetUseVideo: function(v_use) {
@@ -1139,9 +1144,7 @@ var Callcast = {
                 // Create a true PeerConnection object and attach it to the DOM.
                 this.peer_connection = new GoCastJS.PeerConnection(
                         new GoCastJS.PeerConnectionOptions(
-                            this.AddPluginResult, this.jid,
-                            [ {uri: 'turn:manjeshtest2@dev.gocast.it:3478', password: 'manjeshpass2'},
-                              {uri: 'stun:stun.l.google.com:19302'} ],
+                            this.AddPluginResult, this.jid, Callcast.stunTurnArray,
                             this.onicecandidate, this.onaddstream, this.onremovestream,
                             this.onsignalingstatechange, this.onconnectionstatechange,
                             $.urlvars.wrtcable ? 'native' : 'gcp'
@@ -1301,8 +1304,8 @@ var Callcast = {
             if (this.wrtcable && this.peer_connection && stream) {
                 this.offertype = 'remdesktopoffer';
                 this.peer_connection.RemoveStream(stream, this.InitiateCall.bind(this));
-            }            
-        }
+            }
+        };
 
         this.CompleteCall = function() {
             var self = this;
@@ -1529,7 +1532,7 @@ var Callcast = {
             else if ($(msg).find('remdesktopoffer').length > 0) {
                 Callcast.log('Got inbound remdesktop-offer from ' + $(msg).attr('from'));
                 sdp = $(msg).children('remdesktopoffer').text().replace(/&quot;/g, '"');
-                Callcast.participants[res_nick].StartConnection('remdesktopoffer', sdp);                
+                Callcast.participants[res_nick].StartConnection('remdesktopoffer', sdp);
             } else {
                 Callcast.log('Got inbound call-offer from ' + $(msg).attr('from'));
                 sdp = $(msg).children('offer').text().replace(/&quot;/g, '"');
@@ -2971,6 +2974,10 @@ var Callcast = {
         }
         else {
             self.log('connect: Account info not present: Visitor - Doing XMPP Attach.');
+        }
+
+        if (opts.stunTurnArray) {
+            this.SetStunTurnArray(opts.stunTurnArray);
         }
 
         self.connection.attach({rid: opts.rid, jid: opts.jid, sid: opts.sid});
