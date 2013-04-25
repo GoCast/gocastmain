@@ -3445,7 +3445,7 @@ function leaveGoCast() {
       if (document.referrer && /myroom\.html/.test(document.referrer)) {
         window.location.href = document.referrer;
       } else {
-        window.location.href = 'register.html';
+        window.location.href = 'subscription.html';
       }
     } else {
       window.location.href = 'dashboard.html';

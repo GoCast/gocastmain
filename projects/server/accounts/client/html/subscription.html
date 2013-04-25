@@ -69,8 +69,13 @@
                         </div>
                         <div class="item alert alert-info">
                             <span class="questionheader label label-inverse">Wow! This is awesome! How do I get started?</span><br/><br/>
-                            <ul><li>Sign up today for your <span class="label label-important">FREE 30 DAY TRIAL</span>.</li>
-                            <li>GoCast uses Paypal as a secure and trusted way to manage your subscription.</li><li>You can cancel your subscription at any time.</li></ul>
+                            <ul>
+                                <li>Want to check out a GoCast room? <a class="btn btn-primary btn-mini" href="/?room=Stu's_GoCast_Visitor&g=Um9vbTpzZ2FubmVzfmdtYWlsLmNvbSUyM0dvQ2FzdCUyMFZpc2l0b3I=" target="_blank">Click here</a></li>
+                                <li>Sign up today for your <span class="label label-success">FREE! 30 DAY TRIAL</span></li>
+                                <li>GoCast uses Paypal as a secure and trusted way to manage your subscription.</li>
+                                <li>We will not charge your credit card until the trial period expires.</li>
+                                <li>You can cancel your subscription at any time by going to your Paypal account.</li>
+                            </ul>
                             <div class="slidenumber">
                                 <span class="badge">4 / 4</span>
                             </div>
@@ -96,6 +101,11 @@
                             <div class="control-group" ph=" Your name ">
                                 <div class="controls" align="center">
                                     <input id="input-name" type="text" name="name" required class="span4">
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <div class="controls" align="center">
+                                    <a href="dashboard.html" class="btn btn-link">I already have an account</a>
                                 </div>
                             </div>
                             <div class="alert alert-error">
@@ -187,11 +197,13 @@
                         trigger: 'manual'
                     });
                     $(this.$subform).popover('show');
+                    $('.popover').css('top', '140px');
                     $('.popover .carousel').carousel({interval: 10000});
                     $('.popover .carousel .carousel-control.right').css('right', '-15px');
                     $('.popover .carousel .carousel-control.left').css('left', '-15px');
                     $(window).on('resize', function() {
                         $(SubUI.$subform).popover('show');
+                        $('.popover').css('top', '140px');
                     });
 
                     // Show buttons by default now - disabling instead.
