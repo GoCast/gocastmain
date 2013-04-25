@@ -117,7 +117,8 @@ body > .container > .row > .span5 > .subscription.show {
 }
 
 .popover strong {
-    font-size: 1.25em;
+    font-size: 1.20em;
+    padding: 8px 10px;
 }
 
 .questionheader {
