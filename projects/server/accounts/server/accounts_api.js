@@ -911,6 +911,7 @@ function apiVisitorSeen(email, nickName, success, failure) {
 function getStunTurnArray(email, host) {
     var devStaticArr, studyStaticArr, lHost, retArr;
 
+    host = host || '';
     lHost = host.toLowerCase();
     devStaticArr = [ {uri: 'turn:manjeshtest2@dev.gocast.it:3478', password: 'manjeshpass2'},
                      {uri: 'stun:stun.l.google.com:19302'} ];

@@ -137,8 +137,15 @@ app.use(express.cookieSession({key: 'gcsession', cookie: {maxAge: maxCookieAge}}
 // Takes a url in and an array (or string) of valid 'base' url domain names
 // example: ('http://study.gocast.it/register.html', ['gocast.it', 'partner.com'])
 //
+// RMW: Note:
+// parser has trouble with embedded email address as it looks like a username@hostname situation.
+// Unfortunately, this is typical of our situation with a failing url of:
+// https://study.gocast.it/myroom.html?defaultaction=activate&email=kkalava@yahoo.com&utm_source=AdWords
+// So, changing parseUri(url) here to become parseUri(url.split('?'))
+// This will work for our purposes since we ONLY need the host name and not the query params.
+//
 function valid_base_domain(url, validList) {
-    var x = parseUri(url), validArr = [], host, i;
+    var x = parseUri(url.split('?')), validArr = [], host, i;
 
     host = x.host || '';
     host = host.toLowerCase();
@@ -898,6 +905,10 @@ app.post('/login', function(req, res) {
         // First parse out the hostname.
         refHost = parseUri(req.headers.referer).host || '';
         refHost = refHost.toLowerCase();
+    }
+    else {
+        refHost = '';
+        console.log('DEBUG: /login WARNING: Invalid or no req.headers.referer? "' + req.headers.referer + '" so set refHost to empty string.');
     }
 
     if (req.session.sid) {
