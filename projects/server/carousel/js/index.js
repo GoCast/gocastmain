@@ -2752,6 +2752,7 @@ $(document).ready(function(
   if ($.urlvars.wrtcable) {
     $('div#upper-right > div#settings').css('display', 'none');
     $('div#upper-right > a#gocastplayermode').css('display', 'initial');
+    $('div#upper-right > a#audiotrouble').css('display', 'initial');
     $('div#scarousel div#mystream > div#effectsPanel > div[effect]').css('display', 'none');
   } else if ($.urlvars.deskshareable) {
     $('div#upper-right > a#nativemode').css('display', 'initial');
@@ -3422,7 +3423,7 @@ function showWarning(title, message) {
   closeWindow();
   openWindow('#warningMsg');
   $('h1', $warningWin).text(title);
-  $('p#prompt', $warningWin).text(message);
+  $('p#prompt', $warningWin).html(message);
 }
 
 function fbEvent() {
@@ -3477,6 +3478,16 @@ function gocastPlayerMode() {
     }
     window.location.reload();
   }
+}
+
+function audioTrouble() {
+  showWarning('Audio problems?', 'GoCast HTML5 is a work in progress and we are working round the clock ' +
+                                 'to perfect it. If others in the room are not hearing you,try the following fixes:<br/><ul>' +
+                                 '<li>Use group chat to ask everyone to make sure their ' +
+                                 'speakers are un-muted and their volume is adequate.</li>' +
+                                 '<li>If that doesn\'t work, try restarting your browser and return to the room.</li>' +
+                                 '<li>If still you can\'t be heard by others you can click on the green ' +
+                                 '"GoCast App" button to re-enter the room.</li></ul>');
 }
 
 function emailInviteDialog(e) {

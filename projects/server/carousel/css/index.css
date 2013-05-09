@@ -1033,7 +1033,8 @@ body > div#meeting > div#streams > div#scontrols > input.right {
 #boxes #credentials #noThanks,
 #boxes #credentials #gclogin,
 #upper-right #leavegocast,
-#upper-right .browsermode
+#upper-right .browsermode,
+#upper-right #audiotrouble
 {
   /*float: right;*/
   margin-left: 10px;
@@ -1050,6 +1051,12 @@ body > div#meeting > div#streams > div#scontrols > input.right {
   background: -webkit-gradient(linear, center bottom, center top, from(rgb(139,35,35)), to(rgb(166,42,42)));
   background: -moz-linear-gradient(bottom, rgb(139,35,35), rgb(166,42,42));
 }
+#upper-right #audiotrouble {
+  border: 1px orange solid;
+  color: black;
+  background: -webkit-gradient(linear, center bottom, center top, from(rgb(255,204,0)), to(rgb(255,204,51)));
+  background: -moz-linear-gradient(bottom, rgb(255,204,0), rgb(255,204,51));  
+}
 #boxes #credentials #gclogin,
 #upper-right .browsermode {
   border: 1px darkgreen solid;
@@ -1065,6 +1072,10 @@ body > div#meeting > div#streams > div#scontrols > input.right {
 #upper-right .browsermode:hover {
   background: -webkit-gradient(linear, center bottom, center top, from(rgb(60,179,113)), to(rgb(46,139,87)));
   background: -moz-linear-gradient(bottom, rgb(60,179,113), rgb(46,139,87));
+}
+#upper-right #audiotrouble:hover {
+  background: -webkit-gradient(linear, center bottom, center top, from(rgb(255,204,51)), to(rgb(255,204,0)));
+  background: -moz-linear-gradient(bottom, rgb(255,204,51), rgb(255,204,0));  
 }
 #boxes #credentials2 {
   width: 300px;
@@ -1505,8 +1516,8 @@ body > #tour > button#imgood {
 }
 
 #boxes #warningMsg {
-  width: 300px;
-  height: 250px;
+  width: 350px;
+  height: 300px;
   padding: 0px 7px 7px 7px;
   border: 2px solid red;
   border-radius: 6px;
