@@ -1,3 +1,7 @@
+/**
+ * Global Namespace.
+ * @namespace GoCastJS
+ */
 var GoCastJS = ('undefined' !== typeof(GoCastJS)) ? GoCastJS : {};
 GoCastJS = (null !== GoCastJS) ? GoCastJS : {};
 
@@ -13,27 +17,25 @@ GoCastJS.Utils = {
     }
 };
 
-//!
-//! GoCastJS.Video.devices[]     : array of available video devices (guids)
-//! GoCastJS.Video.captureDevice : current capture device (guid)
-//!
-//! NOTE: these are populated by GoCastJS.SetDevicesChangedListener()
-//!
+/**
+ * @memberof GoCastJS
+ * @property {Array} devices        - List of available video devices.
+ * @property {String} captureDevice - Current video device guid.
+ */
 GoCastJS.Video = {
     devices: [],
     captureDevice: ''
 };
 
-//!
-//! GoCastJS.Audio.inputDevices[]  : array of available audio inputs
-//! GoCastJS.Audio.inputDevice     : current audio input
-//! GoCastJS.Audio.outputDevices[] : array of available audio outputs
-//! GoCastJS.Audio.outputDevice    : current audio output
-//! GoCastJS.Audio.spkVol          : current speaker volume
-//!
-//! NOTE: spkVol is populated by GoCastJS.SetSpkVolListener()
-//! NOTE: the rest are populated bu GoCastJS.SetDevicesChangedListener()
-//!
+/**
+ * @memberof GoCastJS
+ * @property {Array} inputDevices  - List of available microphones.
+ * @property {String} inputDevice  - Current microphone device.
+ * @property {Array} outputDevices - List of available speakers.
+ * @property {String} outputDevice - Current speaker device.
+ * @property {Number} spkVol       - Current speaker volume.
+ * @property {Number} micVol       - Current microphone volume.
+ */
 GoCastJS.Audio = {
     inputDevices: [],
     inputDevice: '',
@@ -43,13 +45,15 @@ GoCastJS.Audio = {
     micVol: 256
 };
 
-//!
-//! constructor: GoCastJS.Exception(pluginId, message)
-//!
-//! members:
-//!     pluginId <string> : unique id of exception throwing plugin instance
-//!     message  <string> : description of the exception
-//!
+/**
+ * Exception thrown by a GoCastPlayer instance.
+ * @memberof GoCastJS
+ * @class
+ * @property {String} pluginId - Unique id of exception-throwing plugin instance.
+ * @property {String} message  - Description of the exception.
+ * @param {String} pluginId    - Unique id of exception-throwing plugin instance.
+ * @param {String} message     - Description of the exception.
+ */
 GoCastJS.Exception = function(pluginId, message) {
     this.pluginId = pluginId;
     this.message = message;
@@ -59,20 +63,10 @@ GoCastJS.Exception.prototype.toString = function() {
     return ('[' + this.pluginId + ']: ' + this.message);
 };
 
-//!
-//! function: GoCastJS.CheckBrowserSupport()
-//!
-//! returns: 'true' if browser supported, 'false' if not.
-//!
 GoCastJS.CheckBrowserSupport = function() {
     return (null === navigator.userAgent.toLowerCase().match('msie'));
 };
 
-//!
-//! function: GoCastJS.CheckGoCastPlayer()
-//!
-//! returns: 'true' if 'GoCastPlayer' detected, 'false' if not.
-//!
 GoCastJS.CheckGoCastPlayer = function() {
     for (i in navigator.plugins) {
         if (navigator.plugins.hasOwnProperty(i) && 'GoCastPlayer' === navigator.plugins[i].name) {
@@ -82,15 +76,17 @@ GoCastJS.CheckGoCastPlayer = function() {
     return false;
 };
 
-//!
-//! constructor: GoCastJS.UserMediaOptions(constraints, player)
-//!
-//! arguments/members:
-//!     constraints  <obj>        : {audio: <bool>, video: <bool>
-//!                                 [, videoconstraints: object]
-//!                                 [, audioconstraints: object]}
-//!     player      <HtmlObject> : plugin instance used for local preview
-//!
+/**
+ * User media access options.
+ * @memberof GoCastJS
+ * @class
+ * @property {Object} constraints - {audio: bool, video: bool, [, videoconstraints: object] [, audioconstraints: object]}.
+ * @property {DomElement} player  - GoCastPlayer instance or video element used for local video.
+ * @property {String} apitype    - 'gcp', for GoCastPlayer API, or 'native' for Chrome 25+ WebRTC API.
+ * @param {Object} constraints - Media constraints.
+ * @param {DomElement} player  - GoCastPlayer instance or video element used for local video.
+ * @param {String} apitype    - 'gcp', for GoCastPlayer API, or 'native' for Chrome 25+ WebRTC API.
+ */
 GoCastJS.UserMediaOptions = function(constraints, player, apitype) {
     var defaultwebrtcvideoconstraints = {
         mandatory: {
@@ -120,14 +116,13 @@ GoCastJS.UserMediaOptions = function(constraints, player, apitype) {
     this.apitype = apitype || 'gcp';
 };
 
-//!
-//! function: GoCastJS.getUserMedia(options, success, failure)
-//!
-//! arguments:
-//!     options <GoCastJS.UserMediaOptions> : options for obtaining user media
-//!     success <function(stream)>          : success callback with stream obj
-//!     failure <function(message)>         : failure callback with message
-//!
+/**
+ * Request local media.
+ * @memberof GoCastJS
+ * @param {Object} options   - User media options.
+ * @param {Function} success - function(stream) {}, called when local media request is granted.
+ * @param {Function} failure - function(reason) {}, called when local media request is denied.
+ */
 GoCastJS.getUserMedia = function(options, success, failure) {
     var player = options.player,
         apitype = options.apitype;
@@ -253,18 +248,14 @@ GoCastJS.getUserMedia = function(options, success, failure) {
     }
 };
 
-//!
-//! function: GoCastJS.SetSpkVolListener(volCheckInterval,
-//!                                      localplayer,
-//!                                      onSpkVolChanged)
-//!
-//! arguments:
-//!     checkInterval    <milliseconds>     : interval for volume check
-//!     localPlayer      <HtmlObject>       : plugin used for local preview
-//!     onSpkVolChanged  <function(newVol)> : callback for volume change
-//!
-//! returns: the setInterval identifier (used to clear interval)
-//!
+/**
+ * Set callback for speaker volume changes.
+ * @memberof GoCastJS
+ * @param {Number} checkInterval - Interval in milliseconds for volume check.
+ * @param {DomElement} localplayer - GoCastPlayer instance used for local video.
+ * @param {Function} onSpkVolChanged - function(newVol) {}, called when volume changes.
+ * @param {String} apitype           - GoCastJS.SetSpkVolListener() only works with GoCastPlayer API, so apitype = 'gcp'.
+ */
 GoCastJS.SetSpkVolListener = function(checkInterval,
                                       localplayer,
                                       onSpkVolChanged,
@@ -282,18 +273,14 @@ GoCastJS.SetSpkVolListener = function(checkInterval,
     return null;
 };
 
-//!
-//! function: GoCastJS.SetMicVolListener(volCheckInterval,
-//!                                      localplayer,
-//!                                      onMicVolChanged)
-//!
-//! arguments:
-//!     checkInterval    <milliseconds>     : interval for volume check
-//!     localPlayer      <HtmlObject>       : plugin used for local preview
-//!     onMicVolChanged  <function(newVol)> : callback for volume change
-//!
-//! returns: the setInterval identifier (used to clear interval)
-//!
+/**
+ * Set callback for microphone volume changes.
+ * @memberof GoCastJS
+ * @param {Number} checkInterval - Interval in milliseconds for volume check.
+ * @param {DomElement} localplayer - GoCastPlayer instance used for local video.
+ * @param {Function} onMicVolChanged - function(newVol) {}, called when volume changes.
+ * @param {String} apitype           - GoCastJS.SetMicVolListener() only works with GoCastPlayer API, so apitype = 'gcp'.
+ */
 GoCastJS.SetMicVolListener = function(checkInterval,
                                       localplayer,
                                       onMicVolChanged,
@@ -330,13 +317,6 @@ GoCastJS.SetPluginCrashMonitor = function(checkInterval,
 };
 
 //!
-//! function: GoCastJS.SetDevicesChangedListener(checkInterval,
-//!                                              localplayer,
-//!                                              onChanged)
-//!
-//! arguments:
-//!     checkInterval <milliseconds>       : interval for check
-//!     localPlayer   <HtmlObject>         : plugin used for local preview
 //!     oChanged      <function(va, vr,
 //!                             aia, air,
 //!                             aoa, aor)> : callback with
@@ -347,8 +327,14 @@ GoCastJS.SetPluginCrashMonitor = function(checkInterval,
 //!                                          'aoa' (added audio outputs),
 //!                                          'aor' (removed audio outputs),
 //!
-//! returns: the setInterval identifier (used to clear interval)
-//!
+/**
+ * Set callback for add/remove audio/video devices.
+ * @memberof GoCastJS
+ * @param {Number} checkInterval   - Interval in milliseconds for devices check.
+ * @param {DomElement} localplayer - GoCastPlayer instance used for local video.
+ * @param {Function} onChanged     - Called when audio/video device list changes. See code for arguments to the callback.
+ * @param {String} apitype         - GoCastJS.SetDevicesChangedListener() only works with GoCastPlayer API, so apitype = 'gcp'.
+ */
 GoCastJS.SetDevicesChangedListener = function(checkInterval,
                                               localplayer,
                                               onChanged,
@@ -462,24 +448,21 @@ GoCastJS.SetDevicesChangedListener = function(checkInterval,
     return null;
 };
 
-//!
-//! constructor: GoCastJS.PeerConnectionOptions(iceConfig,
-//!                                             onIceMessage,
-//!                                             onAddStream,
-//!                                             onRemoveStream,
-//!                                             player)
-//!
-//! arguments/members:
-//!     iceServers  <Object>     : [{uri: 'stun:video.gocast.it:19302'},
-//!                                 {uri: <addr>, password: <pwd>}]
-//!     player      <HtmlObject> : width of plugin window
-//!     onIceMessage       <function(candidate)>    : new ice candidate
-//!     onAddStream        <function(stream)>       : new remote stream
-//!     onRemoveStream     <function(stream)>       : remote stream removed
-//!     onSignalingStateChange <function(newState)> : signaling state changed
-//!     onConnStateChange <function(newState)>      : connection state changed
-//!
-GoCastJS.PeerConnectionOptions = function(player,
+/**
+ * Config options for peerconnection.
+ * @memberof GoCastJS
+ * @class
+ * @property {DomElement} player               - GoCastPlayer instance (apitype == 'gcp') or video element (apitype == 'native') used for remote media.
+ * @property {String} pcid                     - Unique identifier of peerconnection.
+ * @property {Array} iceServers                - [({uri: 'stun|turn:domain:port', (password: pwd)?},)*]
+ * @property {Function} onIceMessage           - function(candidate) {}, called when a new local ice candidate is generated.
+ * @property {Function} onAddStream            - function(stream) {}, called when a remote stream is added.
+ * @property {Function} onRemoveStream         - function(stream) {}, called when a remote stream is removed.
+ * @property {Function} onSignalingStateChange - function(newState) {}, called when peerconnection's signaling state changes.
+ * @property {Function} onConnStateChange      - function(newState) {}, called when peerconnection's connection state changes.
+ * @param {String} apitype                     - 'gcp' or 'native'.
+ */
+ GoCastJS.PeerConnectionOptions = function(player,
                                           pcid, iceServers,
                                           onIceMessage,
                                           onAddStream,
@@ -498,16 +481,14 @@ GoCastJS.PeerConnectionOptions = function(player,
     this.apitype = apitype || 'gcp';
 };
 
-//!
-//! constructor: GoCastJS.PeerConnection(options)
-//!
-//! arguments:
-//!     options <GoCastJS.PeerConnectionOptions> : options to create peer
-//!                                                connection
-//!
-//! members:
-//!     player <HtmlObject> : 'GoCastPlayer' instance for this peerconnection
-//!
+/**
+ * PeerConnection Constructor.
+ * @memberof GoCastJS
+ * @class
+ * @property {String} sigState - Signaling state.
+ * @property {String} connState - Connection state.
+ * @param {Object} options - PeerConnection config options.
+ */
 GoCastJS.PeerConnection = function(options) {
     var self = this, apitype = options.apitype, server,
         player = options.player, onstatechange, i,
@@ -593,15 +574,23 @@ GoCastJS.PeerConnection = function(options) {
     };
 
     if ('native' === apitype) {
-        this.peerconn.onstatechange = function() {
-            if(self.peerconn) {
-                if (26 === parseInt($.browser.version)) {
+        if (27 <= parseInt($.browser.version)) {
+            this.peerconn.onsignalingstatechange = function() {
+                if(self.peerconn) {
                     onstatechange(self.peerconn.signalingState);
-                } else {
-                    onstatechange(self.peerconn.readyState);
                 }
-            }
-        };
+            };
+        } else {
+            this.peerconn.onstatechange = function() {
+                if(self.peerconn) {
+                    if (26 === parseInt($.browser.version)) {
+                        onstatechange(self.peerconn.signalingState);
+                    } else {
+                        onstatechange(self.peerconn.readyState);
+                    }
+                }
+            };
+        }
     } else if ('gcp' === apitype) {
         this.player.onstatechange = onstatechange;
     }
@@ -636,15 +625,23 @@ GoCastJS.PeerConnection = function(options) {
     };
 
     if ('native' === apitype) {
-        this.peerconn.onicechange = function() {
-            if (self.peerconn) {
-                if (26 === parseInt($.browser.version)) {
+        if (27 <= parseInt($.browser.version)) {
+            this.peerconn.oniceconnectionstatechange = function() {
+                if (self.peerconn) {
                     onicechange(self.peerconn.iceConnectionState);
-                } else {
-                    onicechange(self.peerconn.iceState);
                 }
-            }
-        };
+            };
+        } else {
+            this.peerconn.onicechange = function() {
+                if (self.peerconn) {
+                    if (26 === parseInt($.browser.version)) {
+                        onicechange(self.peerconn.iceConnectionState);
+                    } else {
+                        onicechange(self.peerconn.iceState);
+                    }
+                }
+            };
+        }
     } else if ('gcp' === apitype) {
         this.player.onicechange = onicechange;
     }
@@ -674,14 +671,12 @@ GoCastJS.PeerConnection = function(options) {
     this.connState = 'starting';
 };
 
-//!
-//! function: GoCastJS.PeerConnection.AddStream(stream)
-//!
-//! arguments:
-//!     stream <obj>        : stream to be added (given by GetUserMedia's
-//!                           success callback)
-//!     negotiationCallback : offer/answer negotiation function
-//!
+/**
+ * Add a local stream to a peerconnection.
+ * @memberof GoCastJS.PeerConnection
+ * @param {Object} stream - Local stream to be added.
+ * @param {Function} negotiationCallback - function() {}, Called when offer/answer negotiation is required between peers.
+ */
 GoCastJS.PeerConnection.prototype.AddStream = function(stream, negotiationCallback) {
     if ('gcp' === this.apitype) {
         this.player.onnegotiationneeded = negotiationCallback || function() {};
@@ -694,13 +689,12 @@ GoCastJS.PeerConnection.prototype.AddStream = function(stream, negotiationCallba
     }
 };
 
-//!
-//! function: GoCastJS.PeerConnection.RemoveStream(stream)
-//!
-//! arguments:
-//!     stream <obj>        : stream to be removed
-//!     negotiationCallback : offer/answer negotiation function
-//!
+/**
+ * Remove a local stream from a peerconnection.
+ * @memberof GoCastJS.PeerConnection
+ * @param {Object} stream - Local stream to be removed.
+ * @param {Function} negotiationCallback - function() {}, Called when offer/answer negotiation is required between peers.
+ */
 GoCastJS.PeerConnection.prototype.RemoveStream = function(stream, negotiationCallback) {
     if ('gcp' === this.apitype) {
         this.player.onnegotiationneeded = negotiationCallback || function() {};
@@ -713,15 +707,13 @@ GoCastJS.PeerConnection.prototype.RemoveStream = function(stream, negotiationCal
     }
 };
 
-//!
-//! function: GoCastJS.PeerConnection.CreateOffer(success, failure, constraints)
-//!
-//! arguments:
-//!     success    : function(sdp)
-//!     failure    : function(error)
-//!     constraints: {sdpconstraints: {mandatory: {OfferToReceiveAudio: 'true/false',
-//!                                                OfferToReceiveVideo: 'true/false'}}}
-//!
+/**
+ * Create an offer session description.
+ * @memberof GoCastJS.PeerConnection
+ * @param {Function} success   - function(sdp) {}, called when an offer is generated.
+ * @param {Function} failure   - function(reason) {}, called when peerconnection is unable to generate an offer.
+ * @param {Object} constraints - {sdpconstraints: {mandatory: {OfferToReceiveAudio: 'true|false', OfferToReceiveVideo: 'true|false'}}}
+ */
 GoCastJS.PeerConnection.prototype.CreateOffer = function(success, failure, constraints) {
     success = success || function(sdp) {};
     failure = failure || function(error) {};
@@ -737,15 +729,13 @@ GoCastJS.PeerConnection.prototype.CreateOffer = function(success, failure, const
     }
 };
 
-//!
-//! function: GoCastJS.PeerConnection.CreateAnswer(success, failure, constraints)
-//!
-//! arguments:
-//!     success    : function(sdp)
-//!     failure    : function(error)
-//!     constraints: {sdpconstraints: {mandatory: {OfferToReceiveAudio: 'true/false',
-//!                                                OfferToReceiveVideo: 'true/false'}}}
-//!
+/**
+ * Create an answer session description.
+ * @memberof GoCastJS.PeerConnection
+ * @param {Function} success   - function(sdp) {}, called when an answer is generated.
+ * @param {Function} failure   - function(reason) {}, called when peerconnection is unable to generate an answer.
+ * @param {Object} constraints - {sdpconstraints: {mandatory: {OfferToReceiveAudio: 'true|false', OfferToReceiveVideo: 'true|false'}}}
+ */
 GoCastJS.PeerConnection.prototype.CreateAnswer = function(success, failure, constraints) {
     success = success || function(sdp) {};
     failure = failure || function(error) {};
@@ -761,19 +751,15 @@ GoCastJS.PeerConnection.prototype.CreateAnswer = function(success, failure, cons
     }
 };
 
-//!
-//! function: GoCastJS.PeerConnection.SetLocalDescription(action,
-//!                                                       sdp,
-//!                                                       success,
-//!                                                       failure)
-//!
-//! arguments:
-//!     action <string> : 'offer' (if offer) or 'answer' (if Ôanswer)
-//!     sdp    <string> : sdp to be used as local peer's description
-//!     success <function()>        : success callback
-//!     failure <function(message)> : failure callback with message
-//!
-GoCastJS.PeerConnection.prototype.SetLocalDescription = function(action,
+/**
+ * Set session description for local media.
+ * @memberof GoCastJS.PeerConnection
+ * @param {String} action    - 'offer' or 'answer'.
+ * @param {String} sdp       - Session description to be set.
+ * @param {Function} success   - function() {}, called when local sdp is set.
+ * @param {Function} failure   - function(reason) {}, called when there is an error while setting local sdp.
+ */
+ GoCastJS.PeerConnection.prototype.SetLocalDescription = function(action,
                                                                  sdp,
                                                                  success,
                                                                  failure) {
@@ -792,18 +778,14 @@ GoCastJS.PeerConnection.prototype.SetLocalDescription = function(action,
     }
 };
 
-//!
-//! function: GoCastJS.PeerConnection.SetRemoteDescription(action,
-//!                                                        sdp,
-//!                                                        success,
-//!                                                        failure)
-//!
-//! arguments:
-//!     action <string> : 'offer' (if offer) or 'answer' (if answer)
-//!     sdp    <string> : sdp to be used as remote peer's description
-//!     success <function()>        : success callback
-//!     failure <function(message)> : failure callback with message
-//!
+/**
+ * Set session description for remote media.
+ * @memberof GoCastJS.PeerConnection
+ * @param {String} action    - 'offer' or 'answer'.
+ * @param {String} sdp       - Session description to be set.
+ * @param {Function} success   - function() {}, called when remote sdp is set.
+ * @param {Function} failure   - function(reason) {}, called when there is an error while setting remote sdp.
+ */
 GoCastJS.PeerConnection.prototype.SetRemoteDescription = function(action,
                                                                   sdp,
                                                                   success,
@@ -823,12 +805,11 @@ GoCastJS.PeerConnection.prototype.SetRemoteDescription = function(action,
     }
 };
 
-//!
-//! function: GoCastJS.PeerConnection.AddIceCandidate(sdp)
-//!
-//! arguments:
-//!     sdp <string> : sdp of remote peer's ice candidate
-//!
+/**
+ * Add remote ice candidate.
+ * @memberof GoCastJS.PeerConnection
+ * @param {String} sdp    - Session description of the ice candidate.
+ */
 GoCastJS.PeerConnection.prototype.AddIceCandidate = function(sdp) {
     var candidate = JSON.parse(sdp), candidate1 = {};
 
@@ -866,11 +847,10 @@ GoCastJS.PeerConnection.prototype.AddIceCandidate = function(sdp) {
     }
 };
 
-//!
-//! function: GoCastJS.PeerConnection.Deinit()
-//!
-//! NOTE: preferably should be called on an init-ed player instance
-//!
+/**
+ * Destroy a peerconnection.
+ * @memberof GoCastJS.PeerConnection
+ */
 GoCastJS.PeerConnection.prototype.Deinit = function() {
     if ('gcp' === this.apitype) {
         if (false === this.player.deinit()) {
@@ -882,15 +862,11 @@ GoCastJS.PeerConnection.prototype.Deinit = function() {
     }
 };
 
-//!
-//! function: GoCastJS.PeerConnection.Width([width])
-//!
-//! arguments:
-//!     width <int> (optional) : new width value for the plugin instance
-//!
-//! returns:
-//!     current width value of the plugin instance
-//!
+/**
+ * Set width of the video window associated with a peerconnection.
+ * @memberof GoCastJS.PeerConnection
+ * @param {Number} width - if provided, sets the width, otherwise returns the current width.
+ */
 GoCastJS.PeerConnection.prototype.Width = function(width) {
     if ('undefined' !== typeof(width) && null !== width) {
         this.player.width = width;
@@ -898,15 +874,11 @@ GoCastJS.PeerConnection.prototype.Width = function(width) {
     return this.player.width;
 };
 
-//!
-//! function: GoCastJS.PeerConnection.Height([height])
-//!
-//! arguments:
-//!     height <int> (optional) : new height value for the plugin instance
-//!
-//! returns:
-//!     current height value of the plugin instance
-//!
+/**
+ * Set height of the video window associated with a peerconnection.
+ * @memberof GoCastJS.PeerConnection
+ * @param {Number} height - if provided, sets the height, otherwise returns the current height.
+ */
 GoCastJS.PeerConnection.prototype.Height = function(height) {
     if ('undefined' !== typeof(height) && null !== height) {
         this.player.height = height;
@@ -914,13 +886,13 @@ GoCastJS.PeerConnection.prototype.Height = function(height) {
     return this.player.height;
 };
 
-//!
-//! function: GoCastJS.PluginLog(localplayer, logCallback)
-//!
-//! arguments:
-//!     localplayer <HtmlObject>        : plugin instance for local preview
-//!     logCallback <function(entries)> : callback with array of log entries
-//!
+/**
+ * Get plugin logs for debugging purposes.
+ * @memberof GoCastJS
+ * @param {DomElement} localplayer - GoCastPlayer instance used for local video.
+ * @param {Function} logCallback   - function(entries) {}, called when localplayer produces log entries.
+ * @param {String} apitype         - GoCastJS.PluginLog() works only with apitype == 'gcp'.
+ */
 GoCastJS.PluginLog = function(localplayer, logCallback, apitype) {
     if ('gcp' === apitype) {
         if ('undefined' === localplayer || null === localplayer) {
