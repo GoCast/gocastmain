@@ -70,7 +70,6 @@
                         <div class="item alert alert-info">
                             <span class="questionheader label label-inverse">Wow! This is awesome! How do I get started?</span><br/><br/>
                             <ul>
-                                <li>Want to check out a GoCast room? <a class="btn btn-primary btn-mini" href="/?room=Stu's_GoCast_Visitor&g=Um9vbTpzZ2FubmVzfmdtYWlsLmNvbSUyM0dvQ2FzdCUyMFZpc2l0b3I=" target="_blank">Click here</a></li>
                                 <li>Sign up today for your <span class="label label-success">FREE! 30 DAY TRIAL</span></li>
                                 <li>GoCast uses Paypal as a secure and trusted way to manage your subscription.</li>
                                 <li>We will not charge your credit card until the trial period expires.</li>
@@ -174,7 +173,10 @@
                 $subbtns: null,
                 init: function() {
                     var popoverhtml = '<div id="carousel" class="span7 carousel slide" style="height: 100%">' +
-                                      $('body > div.container > div.row > div#banner').html() + '</div>',
+                                      $('body > div.container > div.row > div#banner').html() + '</div>' +
+                                      '<br/><br/><div align="center"><a class="btn btn-primary" href="/?room=Stu\'s_GoCast_Visitor' +
+                                      '&g=Um9vbTpzZ2FubmVzfmdtYWlsLmNvbSUyM0dvQ2FzdCUyMFZpc2l0b3I=" ' +
+                                      'target="_blank">try a gocast room</a></div>',
                         self = this;
 
                     this.$subform = $('body > div.container > div.row > div.span5 > form#subscribe-form');
