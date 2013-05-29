@@ -44,7 +44,8 @@
 /* global variables and objects */
 /*++++++++++++++++++++++++++++++*/
 /**
- * \brief The main application object.
+ * The main application object.
+ * @namespace
  */
 var app = {
   GROUP_CHAT: 'div#groupChat > #msgBoard',
@@ -83,6 +84,11 @@ var app = {
   winTimeout: null,
   permblinkTimeout: null,
 
+/**
+ * As of May 2013, the server provides the actual login/connection to XMPP. The client just asks for the live
+ * credentials so it can 'attach' to the connection and take it over. If this is successful, then the ajax
+ * success will wind up calling Callcast.connect() with the appropriate rid/jid/sid credentials.
+ */
   requestXmppConnection: function() {
     $.ajax({
       url: '/acct/reqxmppconn/',
@@ -118,8 +124,10 @@ var app = {
 
   /**
    * Writes the specified log entry into the console HTML element, if
-   * present. The meaning of logLevel is 1: debug, 2: info, 3:
-   * warning, 4: error, 5: fatal. */
+   * present.
+   * @param {int} logLevel 1: debug, 2: info, 3: warning, 4: error, 5: fatal.
+   * @param {string} logMsg Message to be logged to the console.
+   */
   log: function(logLevel, logMsg) {
     var labels = ['', 'DEBUG', 'INFO', 'WARNING', 'ERROR', 'FATAL'],
         now = new Date(),
@@ -717,7 +725,7 @@ function startVideoContent()
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
- * \brief Add event listeners to opened window.
+ * Add event listeners to opened window.
  *
  *        Auxiliary function to customize features in different windows,
  *        and keep the open and close of modal window common.
@@ -2729,14 +2737,17 @@ function InvalidRoomname(roomname) {
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /**
- * \brief The document ready event handler.
- *
+ * The document ready event handler.
  * This event handler is called right after the DOM finishes loading.
+ * It is responsible for: qualifying the room argument, setup of the initial UI states, initializing Callcast,
+ * setting up a connection-list callback, setup drag-n-drop handlers, ensure we're the only running instance,
+ * and setup participant spot handlers.
+ * @global
+ * @function ready
+ *
  */
 $(document).ready(function(
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-    /**
-     * The event object. */
   event
 )
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/

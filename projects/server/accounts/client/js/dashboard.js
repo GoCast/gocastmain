@@ -48,7 +48,7 @@ var DashView = {
             } else {
                 $cfg.html(cfgtmpl.replace(/\{\{gcpinfo\}\}/g, ''));
             }
-            
+
 
             if (localStorage) {
                 if (localStorage.gcpForcePlayer) {
@@ -82,7 +82,7 @@ var DashView = {
                         }
                         if (localStorage.gcpForcePlayer) {
                             delete localStorage.gcpForcePlayer;
-                        }                        
+                        }
                     }
                 }
             });
@@ -805,6 +805,7 @@ var DashApp = {
                     });
                 }
                 if (roomname) {
+                    extradata.roomName = roomname;
                     extradata.link = $.roomcode.roomurl(DashApp.email,
                                                         DashApp.fullname, roomname);
                 }

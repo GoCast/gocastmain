@@ -1,4 +1,4 @@
-/**
+/*
  * Callcast - protocol utilizing general xmpp as well as disco and MUC.
  *
  * Copyright 2012 GoCast - www.GoCast.it
@@ -66,13 +66,18 @@
 /*global Buffer, webkitURL */
 'use strict';
 
+/**
+ * @namespace
+ */
 var GoCastJS = GoCastJS || {};
 
-//
-//
-// B Q U E U E - Buffer Queue
-//
-//
+/**
+ *
+ * B Q U E U E - Buffer Queue
+ * @constructor
+ * @param {int} maxBytes - maximum size of the queue before rolling off internally.
+ *
+ */
 GoCastJS.BQueue = function(maxBytes) {
     this.q = null;
     this.length = null;
@@ -81,6 +86,12 @@ GoCastJS.BQueue = function(maxBytes) {
     this.clear();
 };
 
+/**
+ *
+ * Empty the queue and reset the size to newMax if given
+ * @param {int} newMax - Optional new size for the queue in total bytes.
+ *
+ */
 GoCastJS.BQueue.prototype.clear = function(newMax) {
     this.q = [];
     this.length = 0;
@@ -90,7 +101,12 @@ GoCastJS.BQueue.prototype.clear = function(newMax) {
     }
 };
 
-GoCastJS.BQueue.prototype.dump = function(msg) {
+/**
+ *
+ * Create a single concatenated string of the entire queue and return it.
+ * @returns {string} Single concatenated string representing the whole queue.
+ */
+GoCastJS.BQueue.prototype.dump = function() {
     var i, all = '',
         len = this.q.length;
 
@@ -102,6 +118,10 @@ GoCastJS.BQueue.prototype.dump = function(msg) {
     return all;
 };
 
+/**
+ * Log a message into the queue
+ * @param {string} msgin - The message to be pushed onto the queue.
+**/
 GoCastJS.BQueue.prototype.log = function(msgin) {
     var msg = msgin,
         i, len;
@@ -152,16 +172,26 @@ GoCastJS.BQueue.prototype.log = function(msgin) {
 //
 //
 
+/**
+ * Returns a zero-padded string given a number. Note: Only works up to 9 digit numbers currently.
+ * Example: pad(83, 4) will return the string '0083'
+ * @param {int} num - The value to be zero-padded
+ * @param {int} size - The final # of digits desired in the string output
+ */
 GoCastJS.pad = function(num, size) {
     var s = '000000000' + num;
     return s.substr(s.length - size);
 };
 
+/**
+ * Hardwired macro-ish version of pad() above which always pads a number to 2 digits long.
+ * @param {int} num - Number to be padded to 2 positions with zeros.
+ */
 GoCastJS.pad2 = function(num) { return GoCastJS.pad(num, 2); };
 
-//
-// Return Date/Time as mm-dd-yyyy hh:mm::ss
-//
+/**
+ * Return Date/Time as mm-dd-yyyy hh:mm::ss
+ */
 GoCastJS.logDate = function() {
     var d = new Date();
 
@@ -171,11 +201,11 @@ GoCastJS.logDate = function() {
 
 
 
-//
-// Returns bytes out of the logs up to max # bytes.
-// Only returns integral line items however.
-// Returns null if no lines available.
-//
+/**
+ * Return and remove lines from the queue. Only returns integral line items however.
+ * @returns {string} Lines out of the logs up to max # bytes.
+ * Returns null if no lines available.
+ */
 GoCastJS.BQueue.prototype.removeLinesWithMaxBytes = function(max) {
     var out = '',
         removed = 0;
@@ -196,6 +226,9 @@ GoCastJS.BQueue.prototype.removeLinesWithMaxBytes = function(max) {
     return out;
 };
 
+/**
+ * @returns {int} The current length of the queue in total bytes.
+ */
 GoCastJS.BQueue.prototype.getSize = function() {
     return this.length;
 };
@@ -204,6 +237,7 @@ GoCastJS.BQueue.prototype.getSize = function() {
 // Create a 1-MB queue buffer for consolidated logging.
 var logQ = new GoCastJS.BQueue(1024*1024);
 
+/** @namespace */
 var Callcast = {
     PLUGIN_VERSION_CURRENT: 0.0,
     PLUGIN_VERSION_REQUIRED: 0.0,
@@ -269,6 +303,7 @@ var Callcast = {
     LOGCATCHER: null,
     FILECATCHER: null,
 
+/** Initialize Callcast with appropriate values based on what site we're visiting as well as setup the BOSH connection */
     init: function(inServer, url) {
         var boshurl = url || '/xmpp-httpbind',
             server = inServer || window.location.hostname;
@@ -294,6 +329,7 @@ var Callcast = {
         this.connection.connlost(callback);
     },
 
+/** Store a few states for later re-entry */
     WriteUpdatedState: function() {
         if (typeof (Storage) !== 'undefined')
         {
@@ -318,19 +354,19 @@ var Callcast = {
         }
     },
 
-    //
-    // \brief External user sets this callback to be called when the server sends an 'addspot' command
-    //      for programmatically being told to add a new spot to the carousel. The argument to this
-    //      callback is the JSON object which was given by the original 'adder' of the spot. The only
-    //      server-dicted requirement in this JSON object is the 'spotnumber' property which is used
-    //      to give unique addressing to all spots in the carousel.
-    //
+    /**
+     *  External user sets this callback to be called when the server sends an 'addspot' command
+     *      for programmatically being told to add a new spot to the carousel. The argument to this
+     *      callback is the JSON object which was given by the original 'adder' of the spot. The only
+     *      server-dicted requirement in this JSON object is the 'spotnumber' property which is used
+     *      to give unique addressing to all spots in the carousel.
+     */
     setCallbackForAddSpot: function(cb) {
         this.Callback_AddSpot = cb;
     },
 
     //
-    // \brief External user sets this callback to be called when the server sends a 'removespot' command
+    // External user sets this callback to be called when the server sends a 'removespot' command
     //      for programmatically being told to remove a spot from the carousel. The argument to this
     //      callback is the JSON object which was given by the original 'deleter' of the spot. The only
     //      requirement in this JSON object is the 'spotnumber' property which is used to give unique
@@ -342,6 +378,10 @@ var Callcast = {
         this.Callback_RemoveSpot = cb;
     },
 
+    /**
+     * UI is called when a setspot is received.
+     * @param {function} Callback to be called when a setspot is received.
+     */
     setCallbackForSetSpot: function(cb) {
         this.Callback_SetSpot = cb;
     },
