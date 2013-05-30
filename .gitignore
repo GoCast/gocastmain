@@ -1,2 +1,4 @@
 #gocast global ignores
 *.DS_Store
+projects/server/carousel/js/out
+projects/xmpp-peerconnection/out
