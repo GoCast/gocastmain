@@ -344,7 +344,7 @@
               app.getBrowser();
               if ($.urlvars.wrtcable) {
                 document.getElementById('mystream').innerHTML = '<video class="localplayer" id="GocastPlayerLocal" ' +
-                                                                'width="1" height="1" autoplay></video>';
+                                                                'width="1" height="1" autoplay muted></video>';
               } else {
                 if (app.pluginInstalled() || 'Chrome' === app.browser.name) {
                   document.getElementById('mystream').innerHTML = '<object class="localplayer" id="GocastPlayerLocal" ' +
