@@ -7,6 +7,7 @@
 //!             statics: {[<varname/funcname>: <value/definition>,]+},
 //!             methods: {[<funcname>: <definition>,]+}
 //!             base (optional): <ClassName>
+//!             init (optional): <function()> (called by the internal constructor)
 //!         });
 //!
 //!         var <InstanceName> = new <ClassName>({[<varname>: <initval>]+});
