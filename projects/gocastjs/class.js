@@ -70,6 +70,12 @@ var GoCastJS;
                     }
                 }
             }
+
+            // If init() is present, call within the context of this instance
+            if (definition.init) {
+                definition.init.call(this);
+            }
+
         }, inherit = function inherit(derived, base) {
             function fn() {
                 this.constructor = derived;
