@@ -40,7 +40,7 @@ var GoCastJS;
             // Call base class constructor if present.
             delete definition.base;
             if (base) {
-                base.call(this, arguments);
+                base.call(this, arguments[0]);
             }
 
             // Private members of the class along with their
