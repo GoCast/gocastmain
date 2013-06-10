@@ -329,6 +329,16 @@ var Callcast = {
         this.connection.connlost(callback);
     },
 
+    dumpstats: function() {
+        for (var p in this.participants) {
+            if (this.participants.hasOwnProperty(p)) {
+                this.participants[p].peer_connection.GetStats(function(stats) {
+                    Callcast.log('Stats for ' + p.split('/')[0] + ': ',  stats);
+                });
+            }
+        }
+    },
+
 /** Store a few states for later re-entry */
     WriteUpdatedState: function() {
         if (typeof (Storage) !== 'undefined')
