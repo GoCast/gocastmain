@@ -18,7 +18,7 @@ GoCastJS.FileViewer = {
 	open: function($view, $mask, fname, flink, filelist) {
 		var winW = $(window).width(),
 			winH = $(window).height(),
-			curIdx = filelist.links.indexOf(flink);
+			curIdx = filelist.links.indexOf(decodeURI(flink));
 			self = this;
 
 		$mask.css({
@@ -62,7 +62,7 @@ GoCastJS.FileViewer = {
 					$('a#prev', $view).addClass('show');
 				}
 			}
-			self.showfile($view, filelist.files[curIdx], filelist.links[curIdx]);
+			self.showfile($view, filelist.files[curIdx], encodeURI(filelist.links[curIdx]));
 		});
 
 		$('img.close', $view).unbind('click').click(this.closeclickCb($view, $mask));
@@ -104,7 +104,7 @@ GoCastJS.FileViewer = {
 			$filecontent.html('<image id="imagefile" src="' + flink + '" onload="GoCastJS.FileViewer.placeImage(this);" ' +
 							  'style="visibility: hidden;" />');
 		} else if(this.isdocument(fname)) {
-			$filecontent.html('<iframe id="docfile" src="http://docs.google.com/viewer?' +
+			$filecontent.html('<iframe id="docfile" src="' + window.location.protocol + '//docs.google.com/viewer?' +
 							  'url=http%3A%2F%2F' + window.location.hostname + '%2F' + flink.replace(/\//g, '%2F') +
 							  '&embedded=true" style="border: none; width: 100%; height: 100%;"></iframe>');
 		}

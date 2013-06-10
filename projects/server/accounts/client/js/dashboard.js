@@ -39,7 +39,9 @@ var DashView = {
                       'name="group"><span style="padding-left: 5px;">Use GoCastPlayer</span><br> ' +
                       '<input type="radio" class="forcenative" name="group"><span style="padding-left: 5px;">' +
                       'Use Native WebRTC</span><br><input type="radio" class="nopref" name="group">' +
-                      '<span style="padding-left: 5px;">No Preference</span></p></div>';
+                      '<span style="padding-left: 5px;">No Preference</span></p>' +
+                      '<select class="acodec"><option value="">No audio codec</option><option value="opus">OPUS</option>' +
+                      '<option value="ISAC">ISAC</option></select></div>';
 
         if ($.urlvars.wrtcable) {
             if ($.gocastplayer) {
@@ -90,7 +92,9 @@ var DashView = {
             cfgtmpl = '<div class="alert alert-error" align="center"> ' +
                       '<a class="close" data-dismiss="alert" href="#">&times</a>' +
                       'This browser does not support webrtc natively <div class="emoticon">' +
-                      ':(</div>{{gcpinfo}}</div>';
+                      ':(</div>{{gcpinfo}}<p></p><select class="acodec"><option value="">No audio codec</option>' +
+                      '<option value="opus">OPUS</option><option value="ISAC">ISAC</option></select></div>';
+
             if ($.gocastplayer) {
                 $cfg.html(cfgtmpl.replace(/\{\{gcpinfo\}\}/g, '<span style="display: inline-block;">GoCastPlayer (ver ' +
                                                               $.gocastplayer.version + ') is currently installed.</span>'));
@@ -98,6 +102,11 @@ var DashView = {
                 $cfg.html(cfgtmpl.replace(/\{\{gcpinfo\}\}/g, ''));
             }
         }
+
+        $('select.acodec').val(localStorage.gcpAudioCodec || '');
+        $('select.acodec').change(function() {
+            localStorage.gcpAudioCodec = $(this).val();
+        });
     },
     setupPlaceholders: function(id) {
         var $textfields, $pwdfields, $pwdfield,
