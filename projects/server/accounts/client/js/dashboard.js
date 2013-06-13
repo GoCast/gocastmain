@@ -114,14 +114,23 @@ var DashView = {
 
         $('select.acodec', $cfg).val(localStorage.gcpAudioCodec || '');
         $('select.acodec', $cfg).change(function() {
-            localStorage.gcpAudioCodec = $(this).val();
+            if ($(this).val()) {
+                localStorage.gcpAudioCodec = $(this).val();
+            } else {
+                delete localStorage.gcpAudioCodec;
+            }
         });
-        
+
         $('select.vres', $cfg).val((localStorage.capwidth && localStorage.capheight) ?
                                    (localStorage.capwidth + 'x' + localStorage.capheight) : '');
         $('select.vres', $cfg).change(function() {
-            localStorage.capwidth = $(this).val().split('x')[0];
-            localStorage.capheight = $(this).val().split('x')[1];
+            if ($(this).val()) {
+                localStorage.capwidth = $(this).val().split('x')[0];
+                localStorage.capheight = $(this).val().split('x')[1];
+            } else {
+                delete localStorage.capwidth;
+                delete localStorage.capheight;
+            }
         });
     },
     setupPlaceholders: function(id) {
