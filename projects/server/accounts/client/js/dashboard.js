@@ -40,8 +40,13 @@ var DashView = {
                       '<input type="radio" class="forcenative" name="group"><span style="padding-left: 5px;">' +
                       'Use Native WebRTC</span><br><input type="radio" class="nopref" name="group">' +
                       '<span style="padding-left: 5px;">No Preference</span></p>' +
-                      '<select class="acodec"><option value="">No audio codec</option><option value="opus">OPUS</option>' +
-                      '<option value="ISAC">ISAC</option></select></div>';
+                      '<select class="acodec"><option value="">No preferred audio codec</option>' +
+                      '<option value="opus">OPUS audio codec</option>' +
+                      '<option value="ISAC">ISAC audio codec</option></select><br>' +
+                      '<select class="vres"><option value="">No preferred video resolution</option>' +
+                      '<option value="160x120">160x120</option><option value="320x240">320x240</option>' +
+                      '<option value="640x360">640x360</option><option value="640x480">640x480</option>' +
+                      '<option value="800x600">800x600</option><option value="1280x720">1280x120</option></select></div>';
 
         if ($.urlvars.wrtcable) {
             if ($.gocastplayer) {
@@ -92,8 +97,12 @@ var DashView = {
             cfgtmpl = '<div class="alert alert-error" align="center"> ' +
                       '<a class="close" data-dismiss="alert" href="#">&times</a>' +
                       'This browser does not support webrtc natively <div class="emoticon">' +
-                      ':(</div>{{gcpinfo}}<p></p><select class="acodec"><option value="">No audio codec</option>' +
-                      '<option value="opus">OPUS</option><option value="ISAC">ISAC</option></select></div>';
+                      ':(</div>{{gcpinfo}}<p></p><select class="acodec"><option value="">No preferred audio codec</option>' +
+                      '<option value="opus">OPUS audio codec</option><option value="ISAC">ISAC audio codec</option></select><br>' +
+                      '<select class="vres"><option value="">No preferred video resolution</option>' +
+                      '<option value="160x120">160x120</option><option value="320x240">320x240</option>' +
+                      '<option value="640x360">640x360</option><option value="640x480">640x480</option>' +
+                      '<option value="800x600">800x600</option><option value="1280x720">1280x120</option></select></div>';
 
             if ($.gocastplayer) {
                 $cfg.html(cfgtmpl.replace(/\{\{gcpinfo\}\}/g, '<span style="display: inline-block;">GoCastPlayer (ver ' +
@@ -103,9 +112,16 @@ var DashView = {
             }
         }
 
-        $('select.acodec').val(localStorage.gcpAudioCodec || '');
-        $('select.acodec').change(function() {
+        $('select.acodec', $cfg).val(localStorage.gcpAudioCodec || '');
+        $('select.acodec', $cfg).change(function() {
             localStorage.gcpAudioCodec = $(this).val();
+        });
+        
+        $('select.vres', $cfg).val((localStorage.capwidth && localStorage.capheight) ?
+                                   (localStorage.capwidth + 'x' + localStorage.capheight) : '');
+        $('select.vres', $cfg).change(function() {
+            localStorage.capwidth = $(this).val().split('x')[0];
+            localStorage.capheight = $(this).val().split('x')[1];
         });
     },
     setupPlaceholders: function(id) {
