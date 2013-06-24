@@ -2,3 +2,4 @@
 *.DS_Store
 projects/server/carousel/js/out
 projects/xmpp-peerconnection/out
+projects/gocastjs/out
