@@ -111,7 +111,7 @@ var GoCastJS = GoCastJS || {};
                 throw 'no DOM location given by derived class.';
             }
             if (!this.spotParent()) {
-                console.log('SpotUIBase: init - no UI given initially. Will use default.');
+                throw 'no parent given by derived class.';
             }
         }
     });
@@ -124,22 +124,27 @@ var GoCastJS = GoCastJS || {};
 'use strict';
     module.gcEdit = module.Class({
         privates: {
+            info: {}, timeout: 1000
         },
         methods: {
 //?    getHTML: function() {},    // Get post-rendered HTML from the UI renderer
             // pure virtuals being overridden
-            getRawData: function() { return this.code; }, // gets application specific data direct
+            getRawData: function() { return this.info(); }, // gets application specific data direct
             updateInfo: function(info) {
+                if (!info) {
+                    throw 'gcEdit::updateInfo() - No info passed in.';
+                }
+
                 if (info && !info.code) {
                     throw 'gcEdit::updateInfo() - info object does not contain "code" as required.';
                 }
 
-                this.code = info.code;
+                this.info(info);
                 // Because the editor is housed in the non-UI portion, we'll update it here.
                 if (info.from !== this.networkObject().nick)
                 {
-                    console.log("gcEdit updateInfo ", info);
-                    this.editor.setCode(info.code);
+                    console.log("gcEdit updateInfo refresh: ", info);
+                    this.spotUI().refreshSpot();
                 }
 
             },
@@ -152,7 +157,7 @@ var GoCastJS = GoCastJS || {};
               {
                 // check if there's anything to send
 //                console.log("gcEdit timeout ");
-                if (self.editor.isDirty()) // if editor contents has changed
+                if (self.spotUI() && self.spotUI().isDirty()) // if editor contents has changed
                 {
                   self.sendEdits();
                 }
@@ -162,18 +167,11 @@ var GoCastJS = GoCastJS || {};
             /// \brief send editor updates
             ///
             sendEdits: function() {
-              var code = this.editor.getCode();
+              var code = this.spotUI().getCode();
               console.log("gcEdit::sendEdits ", code);
-              this.editor.clearDirty();
+
+              this.spotUI().clearDirty();
               this.networkObject().SetSpot({spottype: "editor", spotnumber: this.number(), code: code});
-            },
-            updateTextArea: function(html) {
-              console.log("gcEdit.updateTextArea ", html);
-              return html;
-            },
-            updateFrame: function(code) {
-              console.log("gcEdit.updateFrame ", code);
-              return code;
             }
         },
         init: function() {
@@ -182,41 +180,16 @@ var GoCastJS = GoCastJS || {};
 
             // Now do our specific initialization items.
             // Setup an editor.
-            this.timeout = 1000;
+            this.timeout(1000);
             if (!this.domLocation()) {
                 throw 'gcEdit: No domLocation specified.';
             }
 
-            this.jqSpot = $(this.domLocation());
-
-            this.editor = $("#gcTextArea", this.jqSpot).cleditor(
-                            {width:"100%", height:"100%",
-                             updateTextArea:function(html)
-                             {
-                               return self.updateTextArea(html);
-                             },
-                             updateFrame:function(code)
-                             {
-                               return self.updateFrame(code);
-                             },
-                             controls:     // controls to add to the toolbar
-                              "| | | | | | bullets numbering | pastetext | link unlink print source"
-                            })[0];
-            if (!this.editor) {
-                throw 'gcEdit: instantiation of editor failed. Lack of dom div id?';
-            }
-            this.jqSpot.data('gcEdit', this);
-
-            //if there's any initial editor content in info, use it
-            if (this.code) {
-              this.editor.setCode(this.code);
-            }
-
-            if (this.info) {
+            if (this.info() && this.info().spotnumber) {
                 this.number(this.info().spotnumber);
             }
 
-            setInterval(this.getTimeoutCallback(), this.timeout);
+            setInterval(this.getTimeoutCallback(), this.timeout());
             /*
             // override mouseover event, prevent showing zoom, trash icons
             // since zooming editor doesn't work yet
@@ -242,6 +215,10 @@ var GoCastJS = GoCastJS || {};
 
     module.gcEditDefaultUI = module.Class({
         privates: {
+            editor: null
+        },
+        publics: {
+            DIV: null, spot: null, jqSpot: null, jqDiv: null, div: null, item: null
         },
         methods: {
             setScale: function(width, height) {
@@ -251,10 +228,29 @@ var GoCastJS = GoCastJS || {};
             },
             refreshSpot: function() {
                 console.log('gcEditDefaultUI: refreshSpot called.');
-
+                this.editor().setCode(this.spotParent().getRawData().code);
+            },
+            isDirty: function() {
+                return this.editor().isDirty();
+            },
+            clearDirty: function() {
+                this.editor().clearDirty();
+            },
+            getCode: function() {
+                return this.editor().getCode();
+            },
+            updateTextArea: function(html) {
+              console.log("gcEditDefaultUI.updateTextArea ", html);
+              return html;
+            },
+            updateFrame: function(code) {
+              console.log("gcEdit.updateFrame ", code);
+              return code;
             }
         },
         init: function() {
+            var parInfo, self = this;
+
             console.log('gcEditDefaultUI: init() executing.');
             if (!this.domLocation()) { throw 'gcEditDefaultUI: domLocation not set.'; }
             if (!this.spotParent()) { throw 'gcEditDefaultUI: spotParent not set.'; }
@@ -265,6 +261,30 @@ var GoCastJS = GoCastJS || {};
             this.jqDiv = $(this.DIV).appendTo(this.jqSpot).css("position", "absolute");
             this.div = this.jqDiv[0];
             this.item = this.jqSpot.data('item');
+
+            this.editor( $("#gcTextArea", this.jqSpot).cleditor(
+                            {width:"100%", height:"100%",
+                             updateTextArea:function(html)
+                             {
+                               return self.updateTextArea(html);
+                             },
+                             updateFrame:function(code)
+                             {
+                               return self.updateFrame(code);
+                             },
+                             controls:     // controls to add to the toolbar
+                              "| | | | | | bullets numbering | pastetext | link unlink print source"
+                            })[0] );
+            if (!this.editor()) {
+                throw 'gcEdit: instantiation of editor failed. Lack of dom div id?';
+            }
+            this.jqSpot.data('gcEdit', this);
+
+            parInfo = this.spotParent().getRawData();
+            //if there's any initial editor content in info, use it
+            if (parInfo.code) {
+              this.editor.setCode(parInfo.code);
+            }
 
         },
         base: GoCastJS.SpotUIBase
@@ -288,7 +308,7 @@ var GoCastJS = GoCastJS || {};
         methods: {
 //?    getHTML: function() {},    // Get post-rendered HTML from the UI renderer
             // pure virtuals being overridden
-            getRawData: function() { return this.info; }, // gets application specific data direct
+            getRawData: function() { return this.info(); }, // gets application specific data direct
             updateInfo: function(info) {
                 if (info && !info.links) {
                     throw 'gcFileShare::updateInfo() - info object does not contain "links" as required.';
@@ -529,8 +549,8 @@ var GoCastJS = GoCastJS || {};
                        '<div id="status"></div>' +
                        '<div id="links"><ul></ul></div>' +
                        // TODO: REFACTOR -- prefer to not have a global function called from the script
-                       '<div id="fileinput" title="Open file">+<input id="uploadFile" type="file" name="myFile" onchange="loadAFile(' +
-                       this.jqSpot.attr('id') + ');" /></div>' +
+                       '<div id="fileinput" title="Open file">+<input id="uploadFile" type="file" name="myFile" onchange="loadAFile(\'' +
+                       this.jqSpot.attr('id') + '\');" /></div>' +
                        '</div>';
             this.jqDiv = $(this.DIV).appendTo(this.jqSpot).css("position", "absolute");
             this.div = this.jqDiv[0];
@@ -592,4 +612,236 @@ function loadAFile(spotid) {
     alert('Cannot load file. Spotid is lost: ' + spotid);
   }
 }
+
+
+(function(module) {
+'use strict';
+    module.gcDeskShare = module.Class({
+        privates: {
+            fileviewerlist: null, uploadReader: null, uploadName: null, up: null, maxFileSize: 1, info: null
+        },
+        methods: {
+//?    getHTML: function() {},    // Get post-rendered HTML from the UI renderer
+            // pure virtuals being overridden
+            canSpotBeUtilized: function() {
+                // TODAY: 07/1/13 - If we're native Chrome 26+, we can use it.
+                // SOON: If we're native Chrome26+ **OR** our plugin is >X version... then we can use it.
+                if ($.urlvars.deskshareable) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            },
+            getRawData: function() { return this.info(); }, // gets application specific data direct
+            refreshSpot: function(linksStr) {
+                var self = this;
+
+                if (info) {
+                    this.updateInfo(info);
+                }
+//TODO - think a lot of this needs to stay in logic arena but some is UI too.
+                if (info.owner === Callcast.nick) {
+                    $('div.name', this.jqSpot).text('My Desktop');
+                    navigator.webkitGetUserMedia({
+                      video: {
+                        mandatory: {
+                          chromeMediaSource: 'screen',
+                          minWidth: '1280',
+                          minHeight: '720',
+                          maxWidth: '1280',
+                          maxHeight: '720',
+                          minFrameRate: '5',
+                          maxFrameRate: '5'
+                        }
+                      }
+                    },
+                    function(stream) {
+                      Callcast.localdesktopstream = stream;
+                      self.screen.src = webkitURL.createObjectURL(stream);
+                      Callcast.shareDesktop(Callcast.localdesktopstream);
+                    },
+                    function(e) {
+                      showWarning('Desktop capture disabled', 'Please enable the "screen capture" feature in Chrome by opening a new tab ' +
+                                                              'and typing "chrome://flags" in the address bar. After enabling ' +
+                                                              'the feature, hit the "Relaunch" button to restart Chrome.');
+                    });
+                } else {
+                    if ($.urlvars.wrtcable) {
+                        if (Callcast.participants[info.owner]) {
+                            Callcast.participants[info.owner].screenvid = this.screen;
+                            if (Callcast.participants[info.owner].desktopstream) {
+                                this.screen.src = webkitURL.createObjectURL(
+                                    Callcast.participants[info.owner].desktopstream
+                                );
+                            }
+                        }
+                        $('.zoom', this.jqSpot).css('right', '3px');
+                    } else {
+                        if ($.urlvars.deskshareable || /^25/.test($.browser.version)) {
+                            $('div#gcDeskShareDiv', this.jqSpot).html('<p id="err">You can view this remote desktop by clicking ' +
+                                                                      'the green "GoCast HTML5" button. You will then re-enter the '+
+                                                                      'room with a pure HTML5 version of GoCast.</p>');
+                        } else {
+                            $('div#gcDeskShareDiv', this.jqSpot).html('<p id="err">Your browser cannot display remote desktops. ' +
+                                                                      'To enjoy this feature, download Chrome version 26 or above.</p>');
+                        }
+                        $('.zoom', this.jqSpot).remove();
+                    }
+
+                    $('.close', this.jqSpot).remove();
+                    $('div.name', this.jqSpot).text(decodeURIComponent(info.owner.split('/')[0]) + '\'s Desktop');
+                }
+
+                this.spotUI().refreshSpot(info);
+            },
+            updateInfo: function(info) {
+                if (info && !info.links) {
+                    throw 'gcDeskShare::updateInfo() - info object does not contain "links" as required.';
+                }
+
+                this.info(info);
+                // Because the editor is housed in the non-UI portion, we'll update it here.
+                if (info.from !== this.networkObject().nick)
+                {
+                    console.log("gcDeskShare updateInfo ", info);
+                    this.setLinks(info.links);
+                }
+
+            },
+        },
+        init: function() {
+            var self = this, desc;
+            console.log('gcDeskShare::init() executing.');
+
+            // Now do our specific initialization items.
+            if (!this.domLocation()) {
+                throw 'gcDeskShare: No domLocation specified.';
+            }
+
+            // Hold spot specific information as an object in a private member
+            if (this.info()) {
+                this.number(this.info().spotnumber);
+            }
+
+            // If someone hasn't already set the description for enabled...
+            if (!this.enabledDescription()) {
+                this.enabledDescription('Desktop sharing is an experimental feature. Performance may vary. We are working on making ' +
+                                        'this feature more user-friendly and effective.')
+            }
+
+            // If someone hasn't already set the description for disabled, figure what's appropriate...
+            if (!this.disabledDescription()) {
+                    if ($.urlvars.wrtcable) {
+                        desc = 'Feature not supported', 'To enable desktop sharing, please upgrade Chrome ' +
+                                                             'to version 26 or above.';
+                    } else if ($.urlvars.deskshareable) {
+                        desc = 'Feature not supported', 'To enable desktop sharing, please click the ' +
+                                                             '"GoCast HTML5" button to re-enter the room with a pure HTML5 ' +
+                                                             'version of GoCast.';
+                    } else {
+                        desc = 'Feature not supported', 'To enable desktop sharing, please download Chrome ' +
+                                                             'version 26 or above.';
+                    }
+
+                    this.disabledDescription(desc);
+            }
+
+            //
+            // The rule is - when you overload SpotBase, you'll need to make a SpotUIBase based class which is
+            // the default UI class. In your overloaded SpotBase class, you'll need to see if no spotUI is passed
+            // in. If not, then instantiate yours and setup dom location and the parent during instantiation.
+            if (!this.spotUI()) {
+                console.log('gcDeskShare::init() - Instantiating default UI - none specified.');
+                this.spotUI(new module.gcDeskShareDefaultUI({domLocation: this.domLocation(), spotParent: this }));
+            }
+
+            //if there's any initial editor content in info, use it
+            if (this.info() && this.info().links) {
+                this.refreshSpot(this.info());
+            }
+        },
+        base: GoCastJS.SpotBase
+    });
+
+    module.gcDeskShareDefaultUI = module.Class({
+        privates: {
+        },
+        methods: {
+            refreshSpot: function(linksStr) {
+//TODO
+            },
+            ///
+            /// \brief rezise the ui object, set css dimensions and scale member var
+            ///
+            /// \arg width, height the target sizes as integers
+            ///
+            setScale: function(width, height)
+            {
+              console.log('gcDeskShareDefaultUI - setting width/height');
+              this.div.style.width = width + 'px';
+              this.div.style.height = height + 'px';
+
+              $('#links', this.jqDiv).css({
+                'width': width + 'px',
+                'height': (0.9*height) + 'px'
+              });
+              $('#fileinput', this.jqDiv).css({
+                'top': (0.9*height) + 'px',
+                'width': width + 'px',
+                'height': (0.1*height) + 'px',
+                'line-height': (0.1*height) + 'px'
+              });
+              $('#status', this.jqDiv).css({
+                'line-height': height + 'px'
+              });
+            },
+            UploadFile: function(DragDropFiles) {
+              var us = $('#uploadFile', this.jqSpot).get(0),
+                  self = this,
+                  oFile;
+
+              // In the case of Drag-N-Drop, we have to get the file info from the calling parameter
+              if (!DragDropFiles) {
+                if (us.files.length === 0) { return; }
+                oFile = us.files[0];
+              }
+              else {
+                // In drag-n-drop, we are given the files array directly.
+                if (DragDropFiles.length === 0) { return; }
+                oFile = DragDropFiles[0];
+              }
+
+              if (oFile.size > this.maxFileSize) {
+                this.showStatus('File too big (Max size: ' + this.maxFileSize/1024 + ' KB)');
+                setTimeout(function() { self.hideStatus(); }, 2000);
+              }
+              else {
+                this.showStatus('Sharing: ...');
+                this.spotParent().uploadName(oFile.name);
+                this.spotParent().uploadReader().readAsBinaryString(oFile);
+              }
+            }
+        },
+        init: function() {
+            var self = this;
+
+            console.log('gcDeskShareDefaultUI: init() executing.');
+            if (!this.domLocation()) { throw 'gcDeskShareDefaultUI: domLocation not set.'; }
+            if (!this.spotParent()) { throw 'gcDeskShareDefaultUI: spotParent not set.'; }
+
+            this.spot = this.domLocation();
+            this.jqSpot = $(this.domLocation());
+            this.zoomed = false;
+            this.DIV = '<div id="gcDeskShareDiv" class="deskshare"><video autoplay muted></video></div>';
+            this.jqDiv = $(this.DIV).appendTo(this.jqSpot).css("position", "absolute");
+            this.div = this.jqDiv[0];
+            this.item = this.jqSpot.data('item');
+            this.screen = $('video', this.div).get(0);
+            this.jqSpot.data('gcDeskShare', this);
+        },
+        base: GoCastJS.SpotUIBase
+    });
+
+}(GoCastJS));
 

@@ -10,17 +10,20 @@ var Callcast = {
     }
     };
 var app = {
-    carousel: {}
+    carousel: {
+        disableMousewheel: function() {},
+        enableMousewheel: function() {}
+    }
 };
 
 $(document).ready(function() {
     console.log('Getting started with gcedit...');
 //    gc = new GoCastJS.gcEdit({});   // Invalid start.
-
+/*
     fs = new GoCastJS.gcFileShare({domLocation: $('#spot2').get(0), number: 1002, type: 'gcEdit', networkObject: Callcast,
                                 tinyIcon: '/images/logo.png', icon: '/images/logo.png',
                                 enabledDesc: 'Edit text documents collaboratively', disabledDesc: 'Cannot edit at this time.'});
-
+*/
     console.log('Getting started with gcedit...');
 //    gc = new GoCastJS.gcEdit({});   // Invalid start.
 
