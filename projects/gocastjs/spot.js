@@ -36,7 +36,8 @@ var GoCastJS = GoCastJS || {};
             enabledDesc: null, disabledDesc: null,
             spotUI: null,  // (optional)
             domLocation: null,
-            networkObject: null
+            networkObject: null,
+            nick: null
         },
         methods: {
 //?    getHTML: function() {},    // Get post-rendered HTML from the UI renderer
@@ -48,13 +49,11 @@ var GoCastJS = GoCastJS || {};
                 if (info) {
                     this.updateInfo(info);
                 }
+
                 this.spotUI().refreshSpot(info);
             },
             canSpotBeUtilized: function() {
                 return true; //  (default behavior - feel free to override)
-            },
-            dragAndDropAction: function(event) {
-                event.preventDefault(); // (default)
             },
 
             // pure virtuals to be implemented by the new class.
@@ -62,7 +61,7 @@ var GoCastJS = GoCastJS || {};
             updateInfo: function(info) { throw this.type + ':updateInfo() not implemented by child'; }
         },
         init: function() {
-            var k, reqd = ['number', 'type', 'tinyIcon', 'icon', 'enabledDesc', 'disabledDesc', 'domLocation', 'networkObject'];
+            var k, reqd = ['number', 'nick', 'type', 'tinyIcon', 'icon', 'enabledDesc', 'disabledDesc', 'domLocation', 'networkObject'];
 
             console.log('SpotBase::init() executing.');
 
@@ -72,6 +71,7 @@ var GoCastJS = GoCastJS || {};
                     throw 'required initialization item missing from derived class for: ' + reqd[k];
                 }
             }
+
             //
             // The rule is - when you overload SpotBase, you'll need to make a SpotUIBase based class which is
             // the default UI class. In your overloaded SpotBase class, you'll need to see if no spotUI is passed
@@ -104,7 +104,10 @@ var GoCastJS = GoCastJS || {};
             //               If info is null, then just refresh the spot.
             // This function should call its parent’s getRawData() and interpret it here.
             refreshSpot: function(info) { throw 'SpotUIBase::refreshSpot() not implemented by child'; },
-            setScale: function(width, height) { throw 'SpotUIBase::setScale() not implemented by child'; }
+            setScale: function(width, height) { throw 'SpotUIBase::setScale() not implemented by child'; },
+            dragAndDropAction: function(event) {
+                event.preventDefault(); // (default)
+            }
         },
         init: function() {
             if (!this.domLocation()) {
@@ -113,6 +116,12 @@ var GoCastJS = GoCastJS || {};
             if (!this.spotParent()) {
                 throw 'no parent given by derived class.';
             }
+
+            // Must be overridden if drag-n-drop is supported for a spot.
+            this.domLocation().ondragover = this.dragAndDropAction;
+            this.domLocation().ondragleave = this.dragAndDropAction;
+            this.domLocation().ondragend = this.dragAndDropAction;
+            this.domLocation().ondrop = this.dragAndDropAction;
         }
     });
 }(GoCastJS));
@@ -140,13 +149,6 @@ var GoCastJS = GoCastJS || {};
                 }
 
                 this.info(info);
-                // Because the editor is housed in the non-UI portion, we'll update it here.
-                if (info.from !== this.networkObject().nick)
-                {
-                    console.log("gcEdit updateInfo refresh: ", info);
-                    this.spotUI().refreshSpot();
-                }
-
             },
             ///
             /// \brief get method to send edit updates when timer goes off
@@ -189,6 +191,7 @@ var GoCastJS = GoCastJS || {};
                 this.number(this.info().spotnumber);
             }
 
+
             setInterval(this.getTimeoutCallback(), this.timeout());
             /*
             // override mouseover event, prevent showing zoom, trash icons
@@ -227,8 +230,10 @@ var GoCastJS = GoCastJS || {};
                 this.div.style.height = height + 'px';
             },
             refreshSpot: function() {
-                console.log('gcEditDefaultUI: refreshSpot called.');
-                this.editor().setCode(this.spotParent().getRawData().code);
+                if (this.spotParent().nick() !== this.spotParent().getRawData().from) {
+                    console.log('gcEditDefaultUI: refreshSpot called.');
+                    this.editor().setCode(this.spotParent().getRawData().code);
+                }
             },
             isDirty: function() {
                 return this.editor().isDirty();
@@ -303,20 +308,24 @@ var GoCastJS = GoCastJS || {};
     */
     module.gcFileShare = module.Class({
         privates: {
-            fileviewerlist: null, uploadReader: null, uploadName: null, up: null, maxFileSize: 1, info: null
+            fileviewerlist: null, up: null, maxFileSize: 1, info: null
         },
         methods: {
 //?    getHTML: function() {},    // Get post-rendered HTML from the UI renderer
             // pure virtuals being overridden
             getRawData: function() { return this.info(); }, // gets application specific data direct
             updateInfo: function(info) {
+                if (!info) {
+                    throw 'gcFileShare::updateInfo() - No info given as required.';
+                }
+
                 if (info && !info.links) {
                     throw 'gcFileShare::updateInfo() - info object does not contain "links" as required.';
                 }
 
                 this.info(info);
                 // Because the editor is housed in the non-UI portion, we'll update it here.
-                if (info.from !== this.networkObject().nick)
+                if (info.from !== this.nick())
                 {
                     console.log("gcFileShare updateInfo ", info);
                     this.setLinks(info.links);
@@ -339,8 +348,14 @@ var GoCastJS = GoCastJS || {};
               });
             },
             setLinks: function(linksStr) {
-              var links = JSON.parse(linksStr),
-                  k, mods, onclick, self = this;
+              var links, k, mods, onclick, self = this;
+
+              try {
+                 links = JSON.parse(linksStr);
+              }
+              catch(e) {
+                links = '';
+              }
 
               if (!linksStr || linksStr === '') {
                 return;
@@ -348,6 +363,27 @@ var GoCastJS = GoCastJS || {};
 
               // Need to update our internal representation of the list of stringified links.
               this.info().links = linksStr;
+            },
+            addNewFileToLinks: function(name, link) {
+                var links = JSON.parse(this.info().links);
+
+                // Add 'link' and uploadName to links object and call setspot
+                links[name] = link;
+                this.networkObject().SetSpot({spottype: 'fileshare', spotnumber: this.number(), links: JSON.stringify(links)}, function(msg) {
+                      console.log(msg);
+                });
+            }
+        },
+        statics: {
+            loadAFile: function(spotid) {
+              var gcfileshare = $('#' + spotid).data('gcFileShare');
+
+              if (gcfileshare) {
+                gcfileshare.UploadFile();
+              }
+              else {
+                alert('Cannot load file. Spotid is lost: ' + spotid);
+              }
             }
         },
         init: function() {
@@ -360,48 +396,14 @@ var GoCastJS = GoCastJS || {};
             }
 
             // Hold spot specific information as an object in a private member
-            if (this.info()) {
+            if (this.info() && this.info().spotnumber) {
                 this.number(this.info().spotnumber);
             }
 
             this.fileviewerlist({files: [], links: []});
-            this.uploadReader(new FileReader());
-            this.uploadName('');
 //TODO:FIX with test jig
 //            this.up(GoCastJS.SendFileToFileCatcher(this.networkObject().connection, this.networkObject().room, this.networkObject().FILECATCHER));
             this.maxFileSize(5 * 1024 * 1024); // 5MB max.
-
-            this.uploadReader().onload = function (oFREvent) {
-              self.up().SendFile(self.uploadName(), oFREvent.target.result,
-                function(msg, iq) {
-                  var links = {};
-
-                  if (self.info().links) {
-                    links = JSON.parse(self.info.links);
-                  }
-
-                  console.log('SEND SUCCESSFUL.');
-                  console.log('New link to filename: ' +  self.uploadName() + ' is: ' + $(iq).attr('link'));
-                  // Add 'link' and uploadName to links object and call setspot
-                  links[self.uploadName] = $(iq).attr('link');
-                  self.networkObject().SetSpot({spottype: 'fileshare', spotnumber: self.number(), links: JSON.stringify(links)}, function(msg) {
-                      console.log(msg);
-                    });
-
-                  self.setStatus('Sharing: DONE');
-                  setTimeout(function() { self.hideStatus(); }, 2000);
-                },
-                function() {
-                  console.log('SEND FAILED.');
-                  self.setStatus('Sharing: FAILED');
-                  setTimeout(function() { self.hideStatus(); }, 2000);
-                },
-                function(name, sent, total) {
-                  if (total) {
-                    self.setStatus('Sharing: ' + Math.floor((sent*100)/total) + '%');
-                  }
-                });
-            };
 
             //
             // The rule is - when you overload SpotBase, you'll need to make a SpotUIBase based class which is
@@ -422,19 +424,20 @@ var GoCastJS = GoCastJS || {};
 
     module.gcFileShareDefaultUI = module.Class({
         privates: {
-            links: []
+            links: [], uploadReader: null, uploadName: null
         },
         methods: {
-            refreshSpot: function(linksStr) {
-                var links = JSON.parse(linksStr),
-                    k, mods, onclick, self = this;
+            refreshSpot: function() {
+                var links = JSON.parse(this.spotParent().getRawData().links),
+                    k, mods, onclick, self = this, fvl;
 
                 console.log('gcFileShareDefaultUI: refreshSpot called.');
 
                 // Now iterate through them and put them in the div.
                 this.links().empty();
-                this.fileviewerlist = {files: [], links: []};
+                this.spotParent().fileviewerlist = {files: [], links: []};
                 mods = '';
+                fvl = this.spotParent().fileviewerlist;
 
                 this.showStatus('Drop files here...');
                 for (k in links) {
@@ -453,8 +456,8 @@ var GoCastJS = GoCastJS || {};
                                onclick + '" title="Remove: ' + k + '">x</a><a target="_blank" href="' + encodeURI(links[k]) +
                                '" class="linkaction download" title="Download: ' + k + '">&darr;</a></li>');
 
-                      this.fileviewerlist.files.push(k);
-                      this.fileviewerlist.links.push(links[k]);
+                      fvl.files.push(k);
+                      fvl.links.push(links[k]);
                     } else {
                       mods += ('<li class="linkitem"><a target="_blank" href="' + links[k] + '" class="link" title="Download: ' + k + '">' +
                                k + '</a><a href="javascript:void(0);" class="linkaction remove" onclick="' +
@@ -466,7 +469,7 @@ var GoCastJS = GoCastJS || {};
                 this.links().append(mods);
                 $('.link.viewable', $(this.links())).click(function() {
                   GoCastJS.FileViewer.open($('#fileviewer'), $('#mask'), $(this).text(),
-                                           $(this).attr('doclink'), self.fileviewerlist);
+                                           $(this).attr('doclink'), fvl);
                 });
             },
             showStatus: function(msg) {
@@ -531,8 +534,8 @@ var GoCastJS = GoCastJS || {};
               }
               else {
                 this.showStatus('Sharing: ...');
-                this.spotParent().uploadName(oFile.name);
-                this.spotParent().uploadReader().readAsBinaryString(oFile);
+                this.uploadName(oFile.name);
+                this.uploadReader().readAsBinaryString(oFile);
               }
             }
         },
@@ -549,7 +552,9 @@ var GoCastJS = GoCastJS || {};
                        '<div id="status"></div>' +
                        '<div id="links"><ul></ul></div>' +
                        // TODO: REFACTOR -- prefer to not have a global function called from the script
-                       '<div id="fileinput" title="Open file">+<input id="uploadFile" type="file" name="myFile" onchange="loadAFile(\'' +
+                       // STEP1: Make loadAFile a static inside of GoCastJS.gcFileShare and call that instead.
+                       // STEP2: Formulate the onchange to consider that 'module' name may not be GoCastJS in the future.
+                       '<div id="fileinput" title="Open file">+<input id="uploadFile" type="file" name="myFile" onchange="GoCastJS.gcFileShare.loadAFile(\'' +
                        this.jqSpot.attr('id') + '\');" /></div>' +
                        '</div>';
             this.jqDiv = $(this.DIV).appendTo(this.jqSpot).css("position", "absolute");
@@ -557,25 +562,25 @@ var GoCastJS = GoCastJS || {};
             this.item = this.jqSpot.data('item');
             this.links($('#gcFileShareDiv > #links > ul', this.jqSpot));
 
-            this.dndZone = this.jqSpot.get(0);
-
-//TODO dragAndDropAction at the logic level - override with which/what?
-            this.dndZone.ondragover = function () {
+            //
+            // Drag N Drop handlers
+            //
+            this.domLocation().ondragover  = function () {
               this.classList.add('enter');
               return false;
             };
 
-            this.dndZone.ondragleave = function() {
+            this.domLocation().ondragleave = function() {
               this.classList.remove('enter');
               return false;
             };
 
-            this.dndZone.ondragend = function () {
+            this.domLocation().ondragend = function () {
               this.classList.remove('enter');
               return false;
             };
 
-            this.dndZone.ondrop = function (e) {
+            this.domLocation().ondrop = function (e) {
               this.classList.remove('enter');
               e.preventDefault();
               self.UploadFile(e.dataTransfer.files);
@@ -586,13 +591,39 @@ var GoCastJS = GoCastJS || {};
 
             $('.name', this.jqSpot).text('Fileshare').css('position', 'absolute');
             this.jqSpot.hover(function() {
-                //TODO: REFACTOR
+                //TODO: REFACTOR -- possibly pull this out into app/carousel and have them 'do' this when a fileshare spot is instantiated
                 app.carousel.disableMousewheel();
               },
               function() {
                 //TODO: REFACTOR
                 app.carousel.enableMousewheel();
             });
+
+            this.uploadName('');
+            this.uploadReader(new FileReader());
+
+            this.uploadReader().onload = function (oFREvent) {
+              self.spotParent().up().SendFile(self.uploadName(), oFREvent.target.result,
+                function(msg, iq) {
+                  console.log('SEND SUCCESSFUL.');
+                  console.log('New link to filename: ' +  self.uploadName() + ' is: ' + $(iq).attr('link'));
+
+                  self.spotParent().addNewFileToLinks(self.uploadName(), $(iq).attr('link'));
+
+                  self.setStatus('Sharing: DONE');
+                  setTimeout(function() { self.hideStatus(); }, 2000);
+                },
+                function() {
+                  console.log('SEND FAILED.');
+                  self.setStatus('Sharing: FAILED');
+                  setTimeout(function() { self.hideStatus(); }, 2000);
+                },
+                function(name, sent, total) {
+                  if (total) {
+                    self.setStatus('Sharing: ' + Math.floor((sent*100)/total) + '%');
+                  }
+                });
+            };
 
             this.showStatus('Drop files here...');
         },
@@ -601,24 +632,11 @@ var GoCastJS = GoCastJS || {};
 
 }(GoCastJS));
 
-function loadAFile(spotid) {
-'use strict';
-  var gcfileshare = $('#' + spotid).data('gcFileShare');
-
-  if (gcfileshare) {
-    gcfileshare.UploadFile();
-  }
-  else {
-    alert('Cannot load file. Spotid is lost: ' + spotid);
-  }
-}
-
-
 (function(module) {
 'use strict';
     module.gcDeskShare = module.Class({
         privates: {
-            fileviewerlist: null, uploadReader: null, uploadName: null, up: null, maxFileSize: 1, info: null
+            info: null
         },
         methods: {
 //?    getHTML: function() {},    // Get post-rendered HTML from the UI renderer
