@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Spot Factory Test</title>
+		<script type="text/javascript" src="../class.js"></script>
+		<script type="text/javascript" src="../spotfactory.js"></script>
+	</head>
+	<body>
+		<script type="text/javascript">
+			var sf = new GoCastJS.SpotFactory();
+			(function(spotfactory) {
+				var Spot1 = GoCastJS.Class({
+					privates: {
+						p1: 1,
+						p2: '0'
+					},
+					methods: {
+						method1: function() {
+							console.log('Spot1: method1()');
+						}
+					},
+					init: function() {
+						console.log('spot1: init()');
+					}
+				}), Spot2 = GoCastJS.Class({
+					publics: {
+						pb1: 0,
+						pb2: '1'
+					},
+					methods: {
+						method2: function() {
+							console.log('Spot2: method2()');
+						}
+					},
+					init: function() {
+						console.log('spot2: init()');
+					}
+				}), spot1inst, spot2inst, spot1inst1, spot2inst1;
+
+				spotfactory.RegisterSpot('SPOT1', Spot1);
+				spotfactory.RegisterSpot('SPOT2', Spot2);
+
+				spot1inst = spotfactory.CreateSpot('SPOT1', {spotnumber: 1});
+				spot2inst = spotfactory.CreateSpot('SPOT2', {spotnumber: 2});
+				spot1inst1 = spotfactory.CreateSpot('SPOT1', {spotnumber: 3});
+				spot2inst1 = spotfactory.CreateSpot('SPOT2', {spotnumber: 4});
+			}(sf));
+		</script>
+	</body>
+</html>

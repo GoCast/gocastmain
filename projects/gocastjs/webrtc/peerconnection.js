@@ -90,9 +90,9 @@ GoCastJS.CheckGoCastPlayer = function() {
 GoCastJS.UserMediaOptions = function(constraints, player, apitype) {
     var defaultwebrtcvideoconstraints = {
         mandatory: {
-            minWidth: '160', maxWidth: '160',
-            minHeight: '120', maxHeight: '120',
-            minFrameRate: '14', maxFrameRate: '14'
+            minWidth: '640', maxWidth: '640',
+            minHeight: '480', maxHeight: '480',
+            minFrameRate: '15', maxFrameRate: '15'
         }
     }, nativeConstraints = {};
 
@@ -503,6 +503,14 @@ GoCastJS.PeerConnection = function(options) {
     this.connTimer = null;
     this.connTimeout = 15000;
     this.peerconn = null;
+    this.bandwidthmap = {
+        '160x120': 150,
+        '320x240': 300,
+        '640x360': 500,
+        '640x480': 600,
+        '800x600': 800,
+        '1280x720': 1000
+    };
 
     if ('native' === apitype) {
         for (i=0; i<options.iceServers.length; i++) {
@@ -707,6 +715,51 @@ GoCastJS.PeerConnection.prototype.RemoveStream = function(stream, negotiationCal
     }
 };
 
+GoCastJS.PeerConnection.prototype.BandwidthForResolution = function(res) {
+    var w = res.split('x')[0], h = res.split('x')[1],
+        dsq = 1280*1280, cres, diffw, diffh, diffsq;
+
+    for (var i in this.bandwidthmap) {
+        if (this.bandwidthmap.hasOwnProperty(i)) {
+            diffw = parseInt(w) - parseInt(i.split('x')[0]);
+            diffh = parseInt(h) - parseInt(i.split('x')[1]);
+            diffsq = diffw*diffw + diffh*diffh;
+            if (dsq > diffsq) {
+                dsq = diffsq;
+                cres = i;
+                if (0 === dsq) {
+                    break;
+                }
+            }
+        }
+    }
+
+    return this.bandwidthmap[cres];
+}
+
+GoCastJS.PeerConnection.prototype.SetMaxBandwidths = function(sdp, akbps, vkbps) {
+    var sdplines = sdp.split('\r\n'),
+        mkbps = null;
+
+    for (var i=0; i<sdplines.length; i++) {
+        if (/^m=/.test(sdplines[i])) {
+            if (i<(sdplines.length-1) && !(/^b=/.test(sdplines[i+1]))) {
+                if (/^m=audio/.test(sdplines[i])) {
+                    mkbps = akbps;
+                } else if (/^m=video/.test(sdplines[i])) {
+                    mkbps = vkbps;
+                }
+
+                if (mkbps) {
+                    sdplines.splice(i+1, 0, 'b=AS:' + mkbps);
+                }
+            }
+        }
+    }
+
+    return sdplines.join('\r\n');
+}
+
 /**
  * Create an offer session description.
  * @memberof GoCastJS.PeerConnection
@@ -715,16 +768,20 @@ GoCastJS.PeerConnection.prototype.RemoveStream = function(stream, negotiationCal
  * @param {Object} constraints - {sdpconstraints: {mandatory: {OfferToReceiveAudio: 'true|false', OfferToReceiveVideo: 'true|false'}}}
  */
 GoCastJS.PeerConnection.prototype.CreateOffer = function(success, failure, constraints) {
-    var acodec = constraints.sdpconstraints.mandatory.AudioCodec;
+    var acodec = constraints.sdpconstraints.mandatory.AudioCodec,
+        vres = constraints.sdpconstraints.mandatory.VideoResolution || '640x480',
+        self = this;
 
     success = success || function(sdp) {};
     failure = failure || function(error) {};
+    delete constraints.sdpconstraints.mandatory.VideoResolution;
 
     if ('gcp' === this.apitype) {
         this.player.createOffer(success, failure, constraints || {});
     } else if ('native' === this.apitype) {
         delete constraints.sdpconstraints.mandatory.AudioCodec;
         this.peerconn.createOffer(function(sdp) {
+            sdp.sdp = self.SetMaxBandwidths(sdp.sdp, 32, self.BandwidthForResolution(vres));
             if ('opus' === acodec) {
                 success(sdp.sdp.replace(/a=rtpmap:[0-9]+\s(ISAC|PCMU|PCMA|CN|telephone\-event)\/[0-9]+\r\n/g, ''));
             } else if ('ISAC' === acodec) {
@@ -747,16 +804,20 @@ GoCastJS.PeerConnection.prototype.CreateOffer = function(success, failure, const
  * @param {Object} constraints - {sdpconstraints: {mandatory: {OfferToReceiveAudio: 'true|false', OfferToReceiveVideo: 'true|false'}}}
  */
 GoCastJS.PeerConnection.prototype.CreateAnswer = function(success, failure, constraints) {
-    var acodec = constraints.sdpconstraints.mandatory.AudioCodec;
+    var acodec = constraints.sdpconstraints.mandatory.AudioCodec,
+        vres = constraints.sdpconstraints.mandatory.VideoResolution || '160x120',
+        self = this;
 
     success = success || function(sdp) {};
     failure = failure || function(error) {};
-
+    delete constraints.sdpconstraints.mandatory.VideoResolution;
+    
     if ('gcp' === this.apitype) {
         this.player.createAnswer(success, failure, constraints || {});
     } else if ('native' === this.apitype) {
         delete constraints.sdpconstraints.mandatory.AudioCodec;
         this.peerconn.createAnswer(function(sdp) {
+            sdp.sdp = self.SetMaxBandwidths(sdp.sdp, 32, self.BandwidthForResolution(vres));
             if ('opus' === acodec) {
                 success(sdp.sdp.replace(/a=rtpmap:[0-9]+\s(ISAC|PCMU|PCMA|CN|telephone\-event)\/[0-9]+\r\n/g, ''));
             } else if ('ISAC' === acodec) {

@@ -1284,7 +1284,9 @@ var Callcast = {
 
         this.InitiateCall = function() {
             var self = this,
-                calltype, bVideo;
+                calltype, bVideo,
+                w = Callcast.mediaHints.videoconstraints.webrtc.mandatory.minWidth,
+                h = Callcast.mediaHints.videoconstraints.webrtc.mandatory.minHeight;
 
             try {
                 if (this.peer_connection)
@@ -1327,7 +1329,8 @@ var Callcast = {
                             Callcast.log('InitiateCall: FAILURE of CreateOffer msg: ' + msg);
                         }, {sdpconstraints: {mandatory: {OfferToReceiveAudio: 'true',
                                                          AudioCodec: localStorage.gcpAudioCodec || 'opus',
-                                                         OfferToReceiveVideo: 'true'}}});
+                                                         OfferToReceiveVideo: 'true',
+                                                         VideoResolution: w + 'x' + h}}});
                     }
                     catch(e2) {
                         Callcast.log('CreateOffer exception: ' + e2);
@@ -1358,7 +1361,10 @@ var Callcast = {
         };
 
         this.CompleteCall = function() {
-            var self = this;
+            var self = this,
+                w = Callcast.mediaHints.videoconstraints.webrtc.mandatory.minWidth,
+                h = Callcast.mediaHints.videoconstraints.webrtc.mandatory.minHeight;
+
 
             if (!this.offer) {
                 Callcast.log('CompleteCall: No offer yet -- this should not happen.');
@@ -1403,7 +1409,8 @@ var Callcast = {
                                     Callcast.log('CompleteCall: FAILURE of CreateAnswer msg: ' + msg);
                                 }, {sdpconstraints: {mandatory: {OfferToReceiveAudio: 'true',
                                                                  AudioCodec: localStorage.gcpAudioCodec || 'opus',
-                                                                 OfferToReceiveVideo: 'true'}}});
+                                                                 OfferToReceiveVideo: 'true',
+                                                                 VideoResolution: w + 'x' + h}}});
                             }
                             catch(e3) {
                                 Callcast.log('CreateAnswer exception: ' + e3);
