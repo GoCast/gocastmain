@@ -33,15 +33,16 @@ var GoCastJS;
 							  'spot type not provided.';
 					} else {
 						throw 'GoCastJS.SpotFactory.DeregisterSpot(): ' +
-							  'spot type [' + spottype + '] does not exist.';						
+							  'spot type [' + spottype + '] does not exist.';
 					}
 				}
 			},
 			CreateSpot: function(spottype, args) {
 				if (spottype && args &&
 					this.spottypes().hasOwnProperty(spottype)) {
-					if ('number' === (typeof(args.spotnumber)).toLowerCase() &&
+					if (!isNaN(Number(args.spotnumber)) &&
 						!this.spotlist().hasOwnProperty(args.spotnumber)) {
+						args.spotnumber = Number(args.spotnumber);		// Ensure we're converted to number.
 						this.spotlist()[args.spotnumber] = new (this.spottypes()[spottype])(args);
 						return this.spotlist()[args.spotnumber];
 					} else {
@@ -51,7 +52,7 @@ var GoCastJS;
 						} else {
 							throw 'GoCastJS.SpotFactory.CreateSpot(): ' +
 								  'a spot with spot number [' + args.spotnumber + '] ' +
-								  'already exists.';							
+								  'already exists.';
 						}
 					}
 				} else {
@@ -60,7 +61,7 @@ var GoCastJS;
 							  'spot type not provided.';
 					} else if (!args) {
 						throw 'GoCastJS.SpotFactory.CreateSpot(): ' +
-							  'args object not provided.';						
+							  'args object not provided.';
 					} else {
 						throw 'GoCastJS.SpotFactory.CreateSpot(): ' +
 							  'spot type [' + spottype + '] does not exist.';
@@ -80,7 +81,7 @@ var GoCastJS;
 					} else {
 						throw 'GoCastJS.SpotFactory.DestroySpot(): ' +
 							  'spot with spot number [' + spotnumber + '] ' +
-							  'does not exist.';						
+							  'does not exist.';
 					}
 				}
 			}

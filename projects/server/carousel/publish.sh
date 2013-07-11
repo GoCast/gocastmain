@@ -133,6 +133,9 @@ cp -p ../accounts/client/deps/font-awesome/font/* $tempdest/css/font
 cp -p ../accounts/client/deps/twitter-bootstrap/img/* $tempdest/images
 cp -p ../main_website/gocastit/img/gocastheaderlogo.png $tempdest/images
 
+# remove all out/* files as these are likely from jsdoc output and should NEVER wind up on the server.
+rm -rf $tempdest/out
+rm -rf $tempdest/js/out
 
 function obfuscate() {
 # Now obfuscate and minimize files that need it.
@@ -153,6 +156,9 @@ function obfuscate() {
   cp $tempdest/js/fileviewer.js $tempjs/js
   cp $tempdest/js/strophe_connection.js $tempjs/js
   cp $tempdest/js/jquery.utils.js $tempjs/js
+  cp "$tempdest/js/class.js" "$tempjs/js"
+  cp "$tempdest/js/spotfactory.js" "$tempjs/js"
+  cp "$tempdest/js/spot.js" "$tempjs/js"
   cp "$tempdest/js/register.js" "$tempjs/js"
   cp "$tempdest/js/dashboard.js" "$tempjs/js"
   cp "$tempdest/js/index.js" "$tempjs/js"

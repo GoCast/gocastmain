@@ -30,7 +30,7 @@ var GoCastJS = GoCastJS || {};
 //
     module.SpotBase = module.Class({
         privates: {
-            number: 0,
+            spotnumber: 0,
             type: null,
             tinyIcon: null, icon: null,
             enabledDesc: null, disabledDesc: null,
@@ -47,6 +47,8 @@ var GoCastJS = GoCastJS || {};
             //               If info is null, then just refresh the spot.
             refreshSpot: function(info) {
                 if (info) {
+                    this.spotnumber(info.spotnumber);
+                    this.type(info.type);
                     this.updateInfo(info);
                 }
 
@@ -61,7 +63,8 @@ var GoCastJS = GoCastJS || {};
             updateInfo: function(info) { throw this.type + ':updateInfo() not implemented by child'; }
         },
         init: function() {
-            var k, reqd = ['number', 'nick', 'type', 'tinyIcon', 'icon', 'enabledDesc', 'disabledDesc', 'domLocation', 'networkObject'];
+            var k, reqd = ['spotnumber', 'nick', 'type', 'tinyIcon', 'icon', 'domLocation', 'networkObject'];
+            // Optional: enabledDesc, disabledDesc
 
             console.log('SpotBase::init() executing.');
 
@@ -173,7 +176,7 @@ var GoCastJS = GoCastJS || {};
               console.log("gcEdit::sendEdits ", code);
 
               this.spotUI().clearDirty();
-              this.networkObject().SetSpot({spottype: "editor", spotnumber: this.number(), code: code});
+              this.networkObject().SetSpot({spottype: "editor", spotnumber: this.spotnumber(), code: code});
             }
         },
         init: function() {
@@ -188,9 +191,16 @@ var GoCastJS = GoCastJS || {};
             }
 
             if (this.info() && this.info().spotnumber) {
-                this.number(this.info().spotnumber);
+                this.spotnumber(this.info().spotnumber);
             }
 
+            if (!this.disabledDesc()) {
+                this.disabledDesc('Cannot use Fileshare at this time.');
+            }
+
+            if (!this.enabledDesc()) {
+                this.enabledDesc('Upload and share files with all participants.');
+            }
 
             setInterval(this.getTimeoutCallback(), this.timeout());
             /*
@@ -225,11 +235,16 @@ var GoCastJS = GoCastJS || {};
         },
         methods: {
             setScale: function(width, height) {
-                console.log('gcEditDefaultUI - setting width/height');
+//                console.log('gcEditDefaultUI - setting width/height');
                 this.div.style.width = width + 'px';
                 this.div.style.height = height + 'px';
             },
-            refreshSpot: function() {
+            refreshSpot: function(info) {
+                // If we have updated info, update it in the parent before refreshing.
+                if (info && info.code) {
+                    this.spotParent().updateInfo(info);
+                }
+
                 if (this.spotParent().nick() !== this.spotParent().getRawData().from) {
                     console.log('gcEditDefaultUI: refreshSpot called.');
                     this.editor().setCode(this.spotParent().getRawData().code);
@@ -319,29 +334,25 @@ var GoCastJS = GoCastJS || {};
                     throw 'gcFileShare::updateInfo() - No info given as required.';
                 }
 
-                if (info && !info.links) {
-                    throw 'gcFileShare::updateInfo() - info object does not contain "links" as required.';
-                }
+//                if (info && !info.links) {
+//                    throw 'gcFileShare::updateInfo() - info object does not contain "links" as required.';
+//                }
 
                 this.info(info);
                 // Because the editor is housed in the non-UI portion, we'll update it here.
-                if (info.from !== this.nick())
+                if (info.from !== this.nick() && info.links)
                 {
                     console.log("gcFileShare updateInfo ", info);
                     this.setLinks(info.links);
                 }
 
             },
-            //TODO: Old implementation has the DOM with GoCastJS.gcFileShare.removeLink() calls being created
-            //      during instantiation and passing the whole link list in the DOM itself. Blech. This should
-            //      be modified so that the UI can address the parent spot via the DOM possibly through access
-            //      of the spotmanager??? manager[spotnumber].removeLink(linkkey) ?
-            removeLink: function(spotnum, links, remlinkkey) {
-              var linksobj = JSON.parse(links.replace(/\'/g, '"'));
+            removeLink: function(remlinkkey) {
+              var linksobj = JSON.parse(this.info().links.replace(/\'/g, '"'));
               delete linksobj[remlinkkey];
               this.networkObject().SetSpot({
                 spottype: 'fileshare',
-                spotnumber: spotnum,
+                spotnumber: this.spotnumber(),
                 links: JSON.stringify(linksobj)
               }, function(msg) {
                 console.log('removeLink - SetSpot callback: ', msg);
@@ -365,11 +376,19 @@ var GoCastJS = GoCastJS || {};
               this.info().links = linksStr;
             },
             addNewFileToLinks: function(name, link) {
-                var links = JSON.parse(this.info().links);
+                var links;
+
+                try {
+                    links = JSON.parse(this.info().links);
+                }
+                catch(e) {
+                    links = {};
+                }
 
                 // Add 'link' and uploadName to links object and call setspot
                 links[name] = link;
-                this.networkObject().SetSpot({spottype: 'fileshare', spotnumber: this.number(), links: JSON.stringify(links)}, function(msg) {
+                console.log('addNewFileToLinks: New links list: ', links.toString());
+                this.networkObject().SetSpot({spottype: 'fileshare', spotnumber: this.spotnumber(), links: JSON.stringify(links)}, function(msg) {
                       console.log(msg);
                 });
             }
@@ -397,12 +416,19 @@ var GoCastJS = GoCastJS || {};
 
             // Hold spot specific information as an object in a private member
             if (this.info() && this.info().spotnumber) {
-                this.number(this.info().spotnumber);
+                this.spotnumber(this.info().spotnumber);
+            }
+
+            if (!this.disabledDesc()) {
+                this.disabledDesc('Cannot edit at this time.');
+            }
+
+            if (!this.enabledDesc()) {
+                this.enabledDesc('Edit text documents collaboratively');
             }
 
             this.fileviewerlist({files: [], links: []});
-//TODO:FIX with test jig
-//            this.up(GoCastJS.SendFileToFileCatcher(this.networkObject().connection, this.networkObject().room, this.networkObject().FILECATCHER));
+            this.up(new GoCastJS.SendFileToFileCatcher(this.networkObject().connection, this.networkObject().room, this.networkObject().FILECATCHER));
             this.maxFileSize(5 * 1024 * 1024); // 5MB max.
 
             //
@@ -427,9 +453,22 @@ var GoCastJS = GoCastJS || {};
             links: [], uploadReader: null, uploadName: null
         },
         methods: {
-            refreshSpot: function() {
-                var links = JSON.parse(this.spotParent().getRawData().links),
-                    k, mods, onclick, self = this, fvl;
+            refreshSpot: function(info) {
+                var links = {}, linksStr, k, mods, onclick, self = this, fvl;
+
+                // If we have inbound changes, set those up before refreshing.
+                if (info && info.links) {
+                    this.spotParent().setLinks(info.links);
+                }
+
+                try {
+                    linksStr = this.spotParent().getRawData().links;
+                    links = JSON.parse(this.spotParent().getRawData().links);
+                }
+                catch(e) {
+                    console.log('Error: gcFileShareDefaultUI::refreshSpot - links were no good: ', this.spotParent().getRawData().links);
+                    return;
+                }
 
                 console.log('gcFileShareDefaultUI: refreshSpot called.');
 
@@ -442,11 +481,9 @@ var GoCastJS = GoCastJS || {};
                 this.showStatus('Drop files here...');
                 for (k in links) {
                   if (links.hasOwnProperty(k)) {
-                    onclick = 'GoCastJS.gcFileShare.removeLink(' +
-                                    this.number().toString() + ', \'' +
-                                    linksStr.replace(/\"/g, '\\\'') + '\', \'' +
-                                    k +
-                                  '\')';
+                    onclick = 'app.spotfactory.spotlist()[' +
+                                    this.spotParent().spotnumber().toString() + '].removeLink(\'' +
+                                    k + '\')';
 
                     this.hideStatus();
                     if (GoCastJS.FileViewer.isformatsupported(k)) {
@@ -494,7 +531,7 @@ var GoCastJS = GoCastJS || {};
             ///
             setScale: function(width, height)
             {
-              console.log('gcFileShareDefaultUI - setting width/height');
+//              console.log('gcFileShareDefaultUI - setting width/height');
               this.div.style.width = width + 'px';
               this.div.style.height = height + 'px';
 
@@ -644,15 +681,10 @@ var GoCastJS = GoCastJS || {};
             canSpotBeUtilized: function() {
                 // TODAY: 07/1/13 - If we're native Chrome 26+, we can use it.
                 // SOON: If we're native Chrome26+ **OR** our plugin is >X version... then we can use it.
-                if ($.urlvars.deskshareable) {
-                    return true;
-                }
-                else {
-                    return false;
-                }
+                return $.urlvars.deskshareable;
             },
             getRawData: function() { return this.info(); }, // gets application specific data direct
-            refreshSpot: function(linksStr) {
+            refreshSpot: function(info) {
                 var self = this;
 
                 if (info) {
@@ -739,7 +771,7 @@ var GoCastJS = GoCastJS || {};
 
             // Hold spot specific information as an object in a private member
             if (this.info()) {
-                this.number(this.info().spotnumber);
+                this.spotnumber(this.info().spotnumber);
             }
 
             // If someone hasn't already set the description for enabled...

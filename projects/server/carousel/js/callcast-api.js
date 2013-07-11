@@ -792,6 +792,11 @@ function removeContentFromCarousel(
   return false;
 } /* removeContentFromCarousel() */
 
+//TODO REFACTOR
+/*
+  If 'addspot', new the spot via spot manager
+  Find the spot in spotfactory via .spotlist()[#] and use that object to call .refreshSpot(info)
+*/
 ///
 /// \brief perform action defined in info to spot
 ///
@@ -860,7 +865,14 @@ function doSpot(spotDiv, info)
         jqDiv.attr('spotnumber', info.spotnumber);
         jqDiv.removeClass('unoccupied').addClass('typeContent editor').unbind('hover');
         $('.control', jqDiv).css('visibility', 'visible');
-        editor = new GoCastJS.gcEdit(spotDiv, info);
+
+        info.domLocation = spotDiv;
+        info.networkObject = Callcast;
+        info.nick = Callcast.nick;
+        info.type = 'gcEdit';
+        info.tinyIcon = '/images/logo.png';
+        info.icon = '/images/logo.png';
+        editor = app.spotfactory.CreateSpot('editor', info);
       }
       else
       {
@@ -868,7 +880,7 @@ function doSpot(spotDiv, info)
       }
       if (editor)
       {
-        editor.doSpot(info);
+        editor.refreshSpot(info);
       }
     }
     else if (info.spottype === 'fileshare') {
@@ -880,13 +892,20 @@ function doSpot(spotDiv, info)
         jqDiv.attr('spotnumber', info.spotnumber);
         jqDiv.removeClass('unoccupied').addClass('typeContent fileshare').unbind('hover');
         $('.control', jqDiv).css('visibility', 'visible');
-        fshare = new GoCastJS.gcFileShare(spotDiv, info);
+
+        info.domLocation = spotDiv;
+        info.networkObject = Callcast;
+        info.nick = Callcast.nick;
+        info.type = 'gcFileShare';
+        info.tinyIcon = '/images/logo.png';
+        info.icon = '/images/logo.png';
+        fshare = app.spotfactory.CreateSpot('fileshare', info);
       } else {
         fshare = jqDiv.data('gcFileShare');
       }
 
       if (fshare) {
-        fshare.doSpot(info);
+        fshare.refreshSpot(info);
       }
     }
     else if (info.spottype === 'wiki') {
@@ -923,7 +942,7 @@ function doSpot(spotDiv, info)
 
       if (deskshare) {
         deskshare.doSpot(info);
-      }      
+      }
     }
     else if (info.spottype === 'url')
     {

@@ -787,7 +787,7 @@
       }
       newDiv.data('item', item);
       items.addItem(item);
-      return newDiv;
+      return newDiv[0];
     };
     /// \brief get item by spot number
     this.getByspotnumber = function(number)

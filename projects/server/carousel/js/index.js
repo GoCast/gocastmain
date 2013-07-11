@@ -83,6 +83,7 @@ var app = {
   authfail: false,
   winTimeout: null,
   permblinkTimeout: null,
+  spotfactory: null,
 
 /**
  * As of May 2013, the server provides the actual login/connection to XMPP. The client just asks for the live
@@ -2768,6 +2769,10 @@ $(document).ready(function(
   } else if ($.urlvars.deskshareable) {
     $('div#upper-right > a#nativemode').css('display', 'initial');
   }
+
+  app.spotfactory = new GoCastJS.SpotFactory();
+  app.spotfactory.RegisterSpot('editor', GoCastJS.gcEdit);
+  app.spotfactory.RegisterSpot('fileshare', GoCastJS.gcFileShare);
 
   Callcast.init();
   Callcast.connlost(function() { app.requestXmppConnection(); });
