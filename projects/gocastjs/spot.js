@@ -12,7 +12,6 @@ var GoCastJS = GoCastJS || {};
 'use strict';
 // @module SpotBase - Abstract class.
 //   Derived classes must implement
-//   type: <string>
 //   tinyIcon: <url>
 //   icon: <url>
 //   enabledDescription: <string>
@@ -31,7 +30,6 @@ var GoCastJS = GoCastJS || {};
     module.SpotBase = module.Class({
         privates: {
             spotnumber: 0,
-            type: null,
             tinyIcon: null, icon: null,
             enabledDesc: null, disabledDesc: null,
             spotUI: null,  // (optional)
@@ -48,7 +46,6 @@ var GoCastJS = GoCastJS || {};
             refreshSpot: function(info) {
                 if (info) {
                     this.spotnumber(info.spotnumber);
-                    this.type(info.type);
                     this.updateInfo(info);
                 }
 
@@ -59,12 +56,13 @@ var GoCastJS = GoCastJS || {};
             },
 
             // pure virtuals to be implemented by the new class.
-            getRawData: function() { throw this.type + ':getRawData() not implemented by child'; }, // gets application specific data direct
-            updateInfo: function(info) { throw this.type + ':updateInfo() not implemented by child'; }
+            getRawData: function() { throw ':getRawData() not implemented by child'; }, // gets application specific data direct
+            updateInfo: function(info) { throw ':updateInfo() not implemented by child'; }
         },
         init: function() {
-            var k, reqd = ['spotnumber', 'nick', 'type', 'tinyIcon', 'icon', 'domLocation', 'networkObject'];
+            var k, reqd = ['spotnumber', 'nick', 'domLocation', 'networkObject'];
             // Optional: enabledDesc, disabledDesc
+            //           tinyIcon, icon  (must be implemented by child however)
 
             console.log('SpotBase::init() executing.');
 
@@ -184,6 +182,9 @@ var GoCastJS = GoCastJS || {};
             console.log('gcEdit::init() executing.');
 
             // Now do our specific initialization items.
+            this.tinyIcon('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAoCAYAAACM/rhtAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAf9JREFUeNrUmdFxwjAMQEmPf7xB2QBGSDfIBi0bpBuwQT2CuwEbNCO4G6QbmAlS5yr3jE42SpETqjsdRGfkF0WWHVENw7C6Z3lgjqsJm/LaEPY9KJYGfjNNxghe0f3wIxrZT2DfI7sDpXycGPNd6JpxDyqKDGXHUdlkfEyO4Bo5OWZAdl67yL6DT+3VEb47ho/eq0G2C6lgkWy92sTdzyEHAE0uknZBuPAUVA6wWbiabBIr/zcHH5H9CZWNN6+fEOn4rseceoX0CPLB9KGjPGYtklSCB3HIHhaGTYy/5sNJFurFhFMHx1JwJlaZgUfXI/v7BB/snQTLagY1aM6aGrck4Lj99TBflxoXCjU+0lT/KQdLFea47rWoVC2ag4aYzxGnokVykILLQs4JmINLQs5VqMf69xxdf2X25GbunQTDfcICOdzDVkfB1bAPGxZkwRzEOWe9KqJYu1wOlgIUgSsFKAZXAlAUThpQHE4SsAicFOCR2A1E4KQALZp8gIjeDCcBqGB8SzxmcyucBGCDGkiTTyulATXRyTJScBKANtFSMxJwufZbl3kFbWGzV9AZ2MLpxML3uNl5hmv75+MGkPYDXzTKvxClHtVBfUvkcAQ19E44siXawj1EPagTO7ChgusYR/Lwgv0CUVQlX7IqostfZ+7HikaHIdW9/w3xLcAAMHiRum9ki5gAAAAASUVORK5CYII=');
+            this.icon(this.tinyIcon());
+
             // Setup an editor.
             this.timeout(1000);
             if (!this.domLocation()) {
@@ -280,6 +281,7 @@ var GoCastJS = GoCastJS || {};
             this.jqSpot = $(this.domLocation());
             this.jqDiv = $(this.DIV).appendTo(this.jqSpot).css("position", "absolute");
             this.div = this.jqDiv[0];
+            // Used by carousel for locating.
             this.item = this.jqSpot.data('item');
 
             this.editor( $("#gcTextArea", this.jqSpot).cleditor(
@@ -298,7 +300,6 @@ var GoCastJS = GoCastJS || {};
             if (!this.editor()) {
                 throw 'gcEdit: instantiation of editor failed. Lack of dom div id?';
             }
-            this.jqSpot.data('gcEdit', this);
 
             parInfo = this.spotParent().getRawData();
             //if there's any initial editor content in info, use it
@@ -395,7 +396,7 @@ var GoCastJS = GoCastJS || {};
         },
         statics: {
             loadAFile: function(spotid) {
-              var gcfileshare = $('#' + spotid).data('gcFileShare');
+              var gcfileshare = app.spotfactory.spotlist()[Number(spotid)];
 
               if (gcfileshare) {
                 gcfileshare.UploadFile();
@@ -410,6 +411,9 @@ var GoCastJS = GoCastJS || {};
             console.log('gcFileShare::init() executing.');
 
             // Now do our specific initialization items.
+            this.icon('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAIAAAAC64paAAAC10lEQVQ4jW1TvUosTRCt/pmeRadXR3YRBDM1E0PB2AcwNlpRWdgN1kDEwFQwE0EWwcxF2EDUQHwBX8EHMBCUYccRXWVm+qduUBfxfvtV0EFXne6qc+qwo6Ojfr/PGGOMwb+BiIwxOoUQiIiIQghrrXNufX2dLS4uUs57P4qnS0QcDoc/l5VKRSnlnJNU4b0XQjjnRsEAoLVutVq1Wg0RPz8/e73e6+trEASSAJxzay2MRBAEaZo2Go1ms0mVQoiXl5dutxvHsaS36RwNRPTer6ys/G5Qa+2cQ0RurSUCqBQRAcBa6713ziVJ0mq1lpeXrbU0PJUZYwCAE6woiiRJsizLsixJEudcURRZlp2cnCwtLR0eHkopOedBEADA29sbfSA553meT09P7+3txXHMGBsMBqenp19fX/1+/+PjY3NzM4qiPM/r9ToiZll2f39fqVTyPJfOOapot9vOOcYY53xubk5r/fj4uL+/r7Uuy7Lb7VKWMRZFEckuGWPGmGq1CgBlWUoprbWrq6udTufi4mJqaoqGrFarP3tijCH9JXHzm23OOWMsz3NrLSJaaznnQoiyLAGAFolU+At+f38HAKUUtX13d9doNBYWFg4ODur1ep7nw+FQCEGwsbExKSUAsFqtZoyZmZnZ2tqanJwkMo+Pj7+/v29ubp6enjY2Nubn5zudjtYaALIsOz8/f35+FkLAxMREHMfj4+O0PfR8tVqNokgpdXt72+v1zs7OqH8aZHd3FwDiOOZ0K6WM41hrrbUmwYQQYRiura2ladpsNoui+NkNapAxxp1z3ntrbVmWxhhjTFmW9AkARFG0s7Pz8PAQhuGPbYhdROSEdP8XRC8AXF5eAoCUkjYsTVMAMMZIopf0GHWFtVYpdXV15b2fnZ1FxMFgcH19HQSBtZYppbz3nPNRM1OQH35ngyAgh/Dt7W0yEOn+n/iBBUGglFJKhWFIqXa7/QdFdCRFyhRfmwAAAABJRU5ErkJggg==');
+            this.tinyIcon(this.icon());
+
             if (!this.domLocation()) {
                 throw 'gcFileShare: No domLocation specified.';
             }
@@ -624,8 +628,6 @@ var GoCastJS = GoCastJS || {};
             };
 
             // Old init()
-            this.jqSpot.data('gcFileShare', this);
-
             $('.name', this.jqSpot).text('Fileshare').css('position', 'absolute');
             this.jqSpot.hover(function() {
                 //TODO: REFACTOR -- possibly pull this out into app/carousel and have them 'do' this when a fileshare spot is instantiated
@@ -691,8 +693,7 @@ var GoCastJS = GoCastJS || {};
                     this.updateInfo(info);
                 }
 //TODO - think a lot of this needs to stay in logic arena but some is UI too.
-                if (info.owner === Callcast.nick) {
-                    $('div.name', this.jqSpot).text('My Desktop');
+                if (info.owner === this.nick()) {
                     navigator.webkitGetUserMedia({
                       video: {
                         mandatory: {
@@ -726,21 +727,7 @@ var GoCastJS = GoCastJS || {};
                                 );
                             }
                         }
-                        $('.zoom', this.jqSpot).css('right', '3px');
-                    } else {
-                        if ($.urlvars.deskshareable || /^25/.test($.browser.version)) {
-                            $('div#gcDeskShareDiv', this.jqSpot).html('<p id="err">You can view this remote desktop by clicking ' +
-                                                                      'the green "GoCast HTML5" button. You will then re-enter the '+
-                                                                      'room with a pure HTML5 version of GoCast.</p>');
-                        } else {
-                            $('div#gcDeskShareDiv', this.jqSpot).html('<p id="err">Your browser cannot display remote desktops. ' +
-                                                                      'To enjoy this feature, download Chrome version 26 or above.</p>');
-                        }
-                        $('.zoom', this.jqSpot).remove();
                     }
-
-                    $('.close', this.jqSpot).remove();
-                    $('div.name', this.jqSpot).text(decodeURIComponent(info.owner.split('/')[0]) + '\'s Desktop');
                 }
 
                 this.spotUI().refreshSpot(info);
@@ -765,6 +752,9 @@ var GoCastJS = GoCastJS || {};
             console.log('gcDeskShare::init() executing.');
 
             // Now do our specific initialization items.
+            this.tinyIcon('data:image/png;base64,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');
+            this.icon(this.tinyIcon());
+
             if (!this.domLocation()) {
                 throw 'gcDeskShare: No domLocation specified.';
             }
@@ -807,7 +797,7 @@ var GoCastJS = GoCastJS || {};
             }
 
             //if there's any initial editor content in info, use it
-            if (this.info() && this.info().links) {
+            if (this.info() && this.info().owner) {
                 this.refreshSpot(this.info());
             }
         },
@@ -818,8 +808,31 @@ var GoCastJS = GoCastJS || {};
         privates: {
         },
         methods: {
-            refreshSpot: function(linksStr) {
-//TODO
+            refreshSpot: function(info) {
+//TODO -- did this get re-partitioned ok?
+                if (info.owner === this.spotParent().nick()) {
+                    $('div.name', this.jqSpot).text('My Desktop');
+                }
+                else {
+                    if ($.urlvars.wrtcable) {
+                        $('.zoom', this.jqSpot).css('right', '3px');
+                    }
+                    else {
+                        if ($.urlvars.deskshareable || /^25/.test($.browser.version)) {
+                            $('div#gcDeskShareDiv', this.jqSpot).html('<p id="err">You can view this remote desktop by clicking ' +
+                                                                      'the green "GoCast HTML5" button. You will then re-enter the '+
+                                                                      'room with a pure HTML5 version of GoCast.</p>');
+                        } else {
+                            $('div#gcDeskShareDiv', this.jqSpot).html('<p id="err">Your browser cannot display remote desktops. ' +
+                                                                      'To enjoy this feature, download Chrome version 26 or above.</p>');
+                        }
+                        $('.zoom', this.jqSpot).remove();
+                    }
+
+                    $('.close', this.jqSpot).remove();
+                    $('div.name', this.jqSpot).text(decodeURIComponent(info.owner.split('/')[0]) + '\'s Desktop');
+                }
+
             },
             ///
             /// \brief rezise the ui object, set css dimensions and scale member var
@@ -828,50 +841,31 @@ var GoCastJS = GoCastJS || {};
             ///
             setScale: function(width, height)
             {
-              console.log('gcDeskShareDefaultUI - setting width/height');
-              this.div.style.width = width + 'px';
-              this.div.style.height = height + 'px';
+//              console.log('gcDeskShareDefaultUI - setting width/height');
+                this.div.style.width = width + 'px';
+                this.div.style.height = height + 'px';
+                $('#err', this.div).css({
+                    'width': width + 'px',
+                    'height': height + 'px'
+                });
 
-              $('#links', this.jqDiv).css({
-                'width': width + 'px',
-                'height': (0.9*height) + 'px'
-              });
-              $('#fileinput', this.jqDiv).css({
-                'top': (0.9*height) + 'px',
-                'width': width + 'px',
-                'height': (0.1*height) + 'px',
-                'line-height': (0.1*height) + 'px'
-              });
-              $('#status', this.jqDiv).css({
-                'line-height': height + 'px'
-              });
+                if (this.zoomed()) {
+                    this.screen.width = 1280;
+                    this.screen.height = 720;
+                } else {
+                    this.screen.width = width;
+                    this.screen.height = height;
+                }
             },
-            UploadFile: function(DragDropFiles) {
-              var us = $('#uploadFile', this.jqSpot).get(0),
-                  self = this,
-                  oFile;
-
-              // In the case of Drag-N-Drop, we have to get the file info from the calling parameter
-              if (!DragDropFiles) {
-                if (us.files.length === 0) { return; }
-                oFile = us.files[0];
-              }
-              else {
-                // In drag-n-drop, we are given the files array directly.
-                if (DragDropFiles.length === 0) { return; }
-                oFile = DragDropFiles[0];
-              }
-
-              if (oFile.size > this.maxFileSize) {
-                this.showStatus('File too big (Max size: ' + this.maxFileSize/1024 + ' KB)');
-                setTimeout(function() { self.hideStatus(); }, 2000);
-              }
-              else {
-                this.showStatus('Sharing: ...');
-                this.spotParent().uploadName(oFile.name);
-                this.spotParent().uploadReader().readAsBinaryString(oFile);
-              }
+            zoom: function(z) {
+                this.zoomed(z);
+                if (z) {
+                    $(this.div).css('overflow', 'scroll');
+                } else {
+                    $(this.div).css('overflow', 'hidden');
+                }
             }
+
         },
         init: function() {
             var self = this;
@@ -882,13 +876,12 @@ var GoCastJS = GoCastJS || {};
 
             this.spot = this.domLocation();
             this.jqSpot = $(this.domLocation());
-            this.zoomed = false;
+            this.zoomed(false);
             this.DIV = '<div id="gcDeskShareDiv" class="deskshare"><video autoplay muted></video></div>';
             this.jqDiv = $(this.DIV).appendTo(this.jqSpot).css("position", "absolute");
             this.div = this.jqDiv[0];
             this.item = this.jqSpot.data('item');
             this.screen = $('video', this.div).get(0);
-            this.jqSpot.data('gcDeskShare', this);
         },
         base: GoCastJS.SpotUIBase
     });

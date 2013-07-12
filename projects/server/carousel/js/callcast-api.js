@@ -812,14 +812,48 @@ function doSpot(spotDiv, info)
   try
   {
     var divIcon, divTitle,
-        jqDiv = $(spotDiv),
+        jqDiv = $(spotDiv), spotObj,
         whiteBoard, editor,
         wiki, fshare, deskshare;
 //    console.log('doSpot', info);
 //    console.log('spotDiv', spotDiv);
     if (!spotDiv) {throw "no spotDiv";}
     if (!info || !info.spottype) {throw "spottype not defined";}
-    if (info.spottype === 'youtube')
+    // Are we dealing with one of the 'new' spot classes? If so ... go here...
+    if (info.spottype === 'editor' || info.spottype === 'fileshare') {
+      if (info.cmdtype === "addspot")
+      {
+        jqDiv.attr('id', app.str2id(info.spottype + ' ' + info.spotnumber));
+
+        jqDiv.attr('title', info.spottype);
+        jqDiv.attr('alt', info.spottype);
+        jqDiv.attr('encname', info.spottype);   // Used by Carousel to know who's who and where's where.
+        jqDiv.attr('spotnumber', info.spotnumber);
+
+        // typeContent is used by supporting UI logic for knowing whether a spot is an unoccupied or
+        // logical spot and hence how to remove it properly.
+        jqDiv.removeClass('unoccupied').addClass('typeContent ' + info.spottype).unbind('hover');
+        $('.control', jqDiv).css('visibility', 'visible');
+
+        info.domLocation = spotDiv;
+        info.networkObject = Callcast;
+        info.nick = Callcast.nick;
+
+        spotObj = app.spotfactory.CreateSpot(info.spottype, info);
+      }
+      else
+      {
+        // TODO -- how to get away from gcEdit?
+        spotObj = app.spotfactory.spotlist()[Number(info.spotnumber)];
+      }
+
+      if (spotObj)
+      {
+        spotObj.refreshSpot(info);
+      }
+
+    }
+    else if (info.spottype === 'youtube')
     {
       console.log('doSpot youtube');
       jqDiv.unbind('hover');
@@ -852,60 +886,6 @@ function doSpot(spotDiv, info)
       {
         console.log("whiteBoardCommand error, can't find wb", info);
         throw "can't find whiteboard for spot " + info.spotnumber;
-      }
-    }
-    else if (info.spottype === 'editor')
-    {
-      if (info.cmdtype === "addspot")
-      {
-        jqDiv.attr('id', app.str2id('editor ' + info.spotnumber));
-        jqDiv.attr('title', 'editor');
-        jqDiv.attr('alt', 'editor');
-        jqDiv.attr('encname', 'editor');
-        jqDiv.attr('spotnumber', info.spotnumber);
-        jqDiv.removeClass('unoccupied').addClass('typeContent editor').unbind('hover');
-        $('.control', jqDiv).css('visibility', 'visible');
-
-        info.domLocation = spotDiv;
-        info.networkObject = Callcast;
-        info.nick = Callcast.nick;
-        info.type = 'gcEdit';
-        info.tinyIcon = '/images/logo.png';
-        info.icon = '/images/logo.png';
-        editor = app.spotfactory.CreateSpot('editor', info);
-      }
-      else
-      {
-        editor = jqDiv.data('gcEdit');
-      }
-      if (editor)
-      {
-        editor.refreshSpot(info);
-      }
-    }
-    else if (info.spottype === 'fileshare') {
-      if (info.cmdtype === 'addspot') {
-        jqDiv.attr('id', app.str2id('fileshare ' + info.spotnumber));
-        jqDiv.attr('title', 'FileShare');
-        jqDiv.attr('alt', 'FileShare');
-        jqDiv.attr('encname', 'fileshare');
-        jqDiv.attr('spotnumber', info.spotnumber);
-        jqDiv.removeClass('unoccupied').addClass('typeContent fileshare').unbind('hover');
-        $('.control', jqDiv).css('visibility', 'visible');
-
-        info.domLocation = spotDiv;
-        info.networkObject = Callcast;
-        info.nick = Callcast.nick;
-        info.type = 'gcFileShare';
-        info.tinyIcon = '/images/logo.png';
-        info.icon = '/images/logo.png';
-        fshare = app.spotfactory.CreateSpot('fileshare', info);
-      } else {
-        fshare = jqDiv.data('gcFileShare');
-      }
-
-      if (fshare) {
-        fshare.refreshSpot(info);
       }
     }
     else if (info.spottype === 'wiki') {
