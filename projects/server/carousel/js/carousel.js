@@ -123,20 +123,17 @@
   Item.prototype.scale = function(scale)
   {
     var wbCanvas = $("#wbCanvas", this.object),
+        obj = app.spotfactory.spotlist()[$(this.object).attr('spotnumber')],
+        // TODO:RMW - remove wb and ds when these items are in the new spot mechanism/class.
         wb       = wbCanvas.data("wb"),
-        editor   = $(this.object).data("gcEdit"),
-        fs       = $(this.object).data('gcFileShare'),
         ds       = $(this.object).data('gcDeskShare');
+
+    if (obj && obj.setScale) {
+      obj.setScale(this.plgOrgWidth * scale, this.plgOrgHeight * scale);
+    }
     if (wb)
     {
       wb.setScale(this.plgOrgWidth * scale, this.plgOrgHeight * scale);
-    }
-    if (editor)
-    {
-      editor.setScale(this.plgOrgWidth * scale, this.plgOrgHeight * scale);
-    }
-    if (fs) {
-      fs.setScale(this.plgOrgWidth * scale, this.plgOrgHeight * scale);
     }
     if (ds) {
       ds.setScale(this.plgOrgWidth * scale, this.plgOrgHeight * scale);

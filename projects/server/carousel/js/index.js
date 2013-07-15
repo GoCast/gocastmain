@@ -901,6 +901,7 @@ function carouselItemZoom(event)
     item = $(spot).data('item');
    }
 
+   // TODO:RMW remove reference to .data() here.
   //If spot is editor, save its contents
   gcedit = $(spot).data('gcEdit');
   deskshare = $(spot).data('gcDeskShare');
