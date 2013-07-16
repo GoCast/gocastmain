@@ -41,6 +41,7 @@ var GoCastJS;
             delete definition.base;
             if (base) {
                 base.call(this, arguments[0]);
+                definition.base = base;     // Must re-populate base again.
             }
 
             // Private members of the class along with their
