@@ -71,8 +71,8 @@ var GoCastJS;
 				return null;
 			},
 			DestroySpot: function(spotnumber) {
-				if ('number' === (typeof(spotnumber)).toLowerCase() &&
-					this.spotlist().hasOwnProperty(spotnumber)) {
+				spotnumber = Number(spotnumber);
+				if (!isNaN(spotnumber) && this.spotlist().hasOwnProperty(spotnumber)) {
 						delete this.spotlist()[spotnumber];
 				} else {
 					if ('number' !== (typeof(spotnumber)).toLowerCase()) {

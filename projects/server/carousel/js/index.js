@@ -893,24 +893,19 @@ function carouselItemZoom(event)
 
    // get item and remove it from carousel
    var spot = $(event.currentTarget).parent(),
-       item = $(spot).data('item'),
-       gcedit, editorContent, deskshare;
+       item = $(spot).data('item'), spotObj,
+       deskshare, tempInfo, spotObj;
 
    if (!item) {
     spot = $(event.target).parent();
     item = $(spot).data('item');
    }
 
-   // TODO:RMW remove reference to .data() here.
-  //If spot is editor, save its contents
-  gcedit = $(spot).data('gcEdit');
-  deskshare = $(spot).data('gcDeskShare');
-  editorContent = '';
+  // If we have a new-style spot, grab it this way.
+  spotObj = app.spotfactory.spotlist()[item.spotnumber];
+  spotObj.spotUI().clearContainer();
 
-  if (gcedit) {
-    editorContent = gcedit.editor.getCode();
-    console.log('carouselItemZoom [resize gcedit]: ' + editorContent);
-  }
+  deskshare = $(spot).data('gcDeskShare');
 
   app.carousel.remove(item.index);
   /*$('#zoom > .close').css({
@@ -935,10 +930,16 @@ function carouselItemZoom(event)
           .css("z-index", "100");
    //$('#meeting > #zoom')[0].appendChild(spot[0]); // move div to zoom area, doesn't work with local, remote video spot
 
-  if (gcedit) {
-    spot.get(0).removeChild(spot.get(0).lastChild);
-    gcedit = new GoCastJS.gcEdit(spot, gcedit.info);
-    gcedit.editor.setCode(editorContent);
+  if (spotObj) {
+    // Get the rawData() from the existing one first.
+    tempInfo = spotObj.getRawData();
+    tempInfo.domLocation = spot;
+    tempInfo.networkObject = Callcast;
+    tempInfo.nick = Callcast.nick;
+
+    app.spotfactory.DestroySpot(item.spotnumber);
+    spotObj = app.spotfactory.CreateSpot(tempInfo.spottype, tempInfo);
+    spotObj.updateInfo(tempInfo);
   } else if (deskshare) {
     deskshare.zoom(true);
     deskshare.screen.play();
@@ -966,22 +967,28 @@ function carouselItemUnzoom(event)
 
    $('#meeting > #zoom').css('display', 'none'); // undisplay zoom div
    var spot = $('#meeting > #zoom > .cloudcarousel'),
-       gcedit = $(spot).data('gcEdit'),
        deskshare = $(spot).data('gcDeskShare'),
-       editorContent = '';
+       editorContent = '', spotObj, tempInfo, item;
 
-  if (gcedit) {
-    editorContent = gcedit.editor.getCode();
-    console.log('carouselItemUnzoom [resize gcedit]: ' + editorContent);
-  }
+  item = $(spot).data('item');
+
+  // If we have a new-style spot, grab it this way.
+  spotObj = app.spotfactory.spotlist()[item.spotnumber];
+  spotObj.spotUI().clearContainer();
 
    app.carousel.insertSpot(spot); // put spot back in carousel
    $('#meeting > #streams').css('height', '100%'); // zoom carousel
 
-  if (gcedit) {
-    spot.get(0).removeChild(spot.get(0).lastChild);
-    gcedit = new GoCastJS.gcEdit(spot, gcedit.info);
-    gcedit.editor.setCode(editorContent);
+  if (spotObj) {
+    // Get the rawData() from the existing one first.
+    tempInfo = spotObj.getRawData();
+    tempInfo.domLocation = spot;
+    tempInfo.networkObject = Callcast;
+    tempInfo.nick = Callcast.nick;
+
+    app.spotfactory.DestroySpot(item.spotnumber);
+    spotObj = app.spotfactory.CreateSpot(tempInfo.spottype, tempInfo);
+    spotObj.updateInfo(tempInfo);
   } else if (deskshare) {
     deskshare.zoom(false);
     deskshare.screen.play();
@@ -1925,8 +1932,7 @@ function resizeZoom(event)
    var jqDiv = $('#meeting > #zoom > .cloudcarousel'),
        wbCanvas = $("#wbCanvas", jqDiv), // todo better wb access
        wb       = wbCanvas.data('wb'),
-       edit     = jqDiv.data('gcEdit'),
-       fs       = jqDiv.data('gcFileShare'),
+       spotObj  = app.spotfactory.spotlist()[jqDiv.attr('spotnumber')],
        ds       = jqDiv.data('gcDeskShare'),
        width, height, item, newWidth, newHeight,
        widthScale, heightScale, scale, left, top;
@@ -1956,10 +1962,8 @@ function resizeZoom(event)
       if (wb) // todo better wb access
       {
         wb.setScale(item.plgOrgWidth, item.plgOrgHeight);
-      } else if (edit) {
-        edit.setScale(item.plgOrgWidth, item.plgOrgHeight);
-      } else if (fs) {
-        fs.setScale(item.plgOrgWidth, item.plgOrgHeight);
+      } else if (spotObj) {
+        spotObj.setScale(item.plgOrgWidth, item.plgOrgHeight);
       } else if (ds) {
         ds.setScale(item.plgOrgWidth, item.plgOrgHeight);
       }
