@@ -820,7 +820,7 @@ function doSpot(spotDiv, info)
     if (!spotDiv) {throw "no spotDiv";}
     if (!info || !info.spottype) {throw "spottype not defined";}
     // Are we dealing with one of the 'new' spot classes? If so ... go here...
-    if (info.spottype === 'editor' || info.spottype === 'fileshare') {
+    if (info.spottype === 'editor' || info.spottype === 'fileshare' || info.spottype === 'deskshare') {
       if (info.cmdtype === "addspot")
       {
         jqDiv.attr('id', app.str2id(info.spottype + ' ' + info.spotnumber));
@@ -904,24 +904,6 @@ function doSpot(spotDiv, info)
 
       if (wiki) {
         wiki.doSpot(info);
-      }
-    }
-    else if (info.spottype === 'deskshare') {
-      if (info.cmdtype === 'addspot') {
-        jqDiv.attr('id', app.str2id('deskshare ' + info.spotnumber));
-        jqDiv.attr('title', 'DeskShare');
-        jqDiv.attr('alt', 'DeskShare');
-        jqDiv.attr('encname', 'deskshare');
-        jqDiv.attr('spotnumber', info.spotnumber);
-        jqDiv.removeClass('unoccupied').addClass('typeContent deskshare').unbind('hover');
-        $('.control', jqDiv).css('visibility', 'visible');
-        deskshare = new GoCastJS.gcDeskShare(spotDiv, info);
-      } else {
-        deskshare = jqDiv.data('gcDeskShare');
-      }
-
-      if (deskshare) {
-        deskshare.doSpot(info);
       }
     }
     else if (info.spottype === 'url')

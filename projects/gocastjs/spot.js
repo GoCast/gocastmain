@@ -542,7 +542,7 @@ var GoCastJS = GoCastJS || {};
               $('#status', this.jqDiv).text(msg);
             },
             clearContainer: function() {
-                this.jqDiv.remove();
+                // No need now that we are detecting re-use in init() ...  this.jqDiv.remove();
             },
             ///
             /// \brief rezise the ui object, set css dimensions and scale member var
@@ -614,7 +614,14 @@ var GoCastJS = GoCastJS || {};
                        '<div id="fileinput" title="Open file">+<input id="uploadFile" type="file" name="myFile" onchange="GoCastJS.gcFileShare.loadAFile(\'' +
                        this.jqSpot.attr('id') + '\');" /></div>' +
                        '</div>';
-            this.jqDiv = $(this.DIV).appendTo(this.jqSpot).css("position", "absolute");
+            // Keep our contents if we're just switching modes rather than fully re-initializing.
+            if ($('#gcFileShareDiv', this.jqSpot).length) {
+                this.jqDiv = $('#gcFileShareDiv', this.jqSpot);
+            }
+            else {
+                this.jqDiv = $(this.DIV).appendTo(this.jqSpot).css("position", "absolute");
+                this.showStatus('Drop files here...');
+            }
             this.div = this.jqDiv[0];
             this.item = this.jqSpot.data('item');
             this.links($('#gcFileShareDiv > #links > ul', this.jqSpot));
@@ -679,8 +686,6 @@ var GoCastJS = GoCastJS || {};
                   }
                 });
             };
-
-            this.showStatus('Drop files here...');
         },
         base: GoCastJS.SpotUIBase
     });
@@ -724,7 +729,7 @@ var GoCastJS = GoCastJS || {};
                     },
                     function(stream) {
                       Callcast.localdesktopstream = stream;
-                      self.screen.src = webkitURL.createObjectURL(stream);
+                      self.spotUI().screen.src = webkitURL.createObjectURL(stream);
                       Callcast.shareDesktop(Callcast.localdesktopstream);
                     },
                     function(e) {
@@ -735,9 +740,9 @@ var GoCastJS = GoCastJS || {};
                 } else {
                     if ($.urlvars.wrtcable) {
                         if (Callcast.participants[info.owner]) {
-                            Callcast.participants[info.owner].screenvid = this.screen;
+                            Callcast.participants[info.owner].screenvid = this.spotUI().screen;
                             if (Callcast.participants[info.owner].desktopstream) {
-                                this.screen.src = webkitURL.createObjectURL(
+                                this.spotUI().screen.src = webkitURL.createObjectURL(
                                     Callcast.participants[info.owner].desktopstream
                                 );
                             }
@@ -774,13 +779,13 @@ var GoCastJS = GoCastJS || {};
             }
 
             // If someone hasn't already set the description for enabled...
-            if (!this.enabledDescription()) {
-                this.enabledDescription('Desktop sharing is an experimental feature. Performance may vary. We are working on making ' +
+            if (!this.enabledDesc()) {
+                this.enabledDesc('Desktop sharing is an experimental feature. Performance may vary. We are working on making ' +
                                         'this feature more user-friendly and effective.')
             }
 
             // If someone hasn't already set the description for disabled, figure what's appropriate...
-            if (!this.disabledDescription()) {
+            if (!this.disabledDesc()) {
                     if ($.urlvars.wrtcable) {
                         desc = 'Feature not supported', 'To enable desktop sharing, please upgrade Chrome ' +
                                                              'to version 26 or above.';
@@ -793,7 +798,7 @@ var GoCastJS = GoCastJS || {};
                                                              'version 26 or above.';
                     }
 
-                    this.disabledDescription(desc);
+                    this.disabledDesc(desc);
             }
 
             //
@@ -815,6 +820,7 @@ var GoCastJS = GoCastJS || {};
 
     module.gcDeskShareDefaultUI = module.Class({
         privates: {
+            zoomed: false
         },
         methods: {
             refreshSpot: function(info) {
@@ -844,7 +850,7 @@ var GoCastJS = GoCastJS || {};
 
             },
             clearContainer: function() {
-                this.jqDiv.remove();
+                // Cannot do this as it will remove the video element with .src as well. this.jqDiv.remove();
             },
             ///
             /// \brief rezise the ui object, set css dimensions and scale member var
@@ -876,6 +882,8 @@ var GoCastJS = GoCastJS || {};
                 } else {
                     $(this.div).css('overflow', 'hidden');
                 }
+
+                this.screen.play();
             }
 
         },
@@ -890,7 +898,13 @@ var GoCastJS = GoCastJS || {};
             this.jqSpot = $(this.domLocation());
             this.zoomed(false);
             this.DIV = '<div id="gcDeskShareDiv" class="deskshare"><video autoplay muted></video></div>';
-            this.jqDiv = $(this.DIV).appendTo(this.jqSpot).css("position", "absolute");
+            // If we are zooming and un-zooming, we'll need to re-use the video element.
+            if ($('#gcDeskShareDiv', this.jqSpot).length) {
+                this.jqDiv = $('#gcDeskShareDiv', this.jqSpot);
+            }
+            else {
+                this.jqDiv = $(this.DIV).appendTo(this.jqSpot).css("position", "absolute");
+            }
             this.div = this.jqDiv[0];
             this.item = this.jqSpot.data('item');
             this.screen = $('video', this.div).get(0);

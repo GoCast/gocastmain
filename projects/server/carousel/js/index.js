@@ -894,7 +894,7 @@ function carouselItemZoom(event)
    // get item and remove it from carousel
    var spot = $(event.currentTarget).parent(),
        item = $(spot).data('item'), spotObj,
-       deskshare, tempInfo, spotObj;
+       tempInfo, spotObj;
 
    if (!item) {
     spot = $(event.target).parent();
@@ -904,8 +904,6 @@ function carouselItemZoom(event)
   // If we have a new-style spot, grab it this way.
   spotObj = app.spotfactory.spotlist()[item.spotnumber];
   spotObj.spotUI().clearContainer();
-
-  deskshare = $(spot).data('gcDeskShare');
 
   app.carousel.remove(item.index);
   /*$('#zoom > .close').css({
@@ -940,9 +938,10 @@ function carouselItemZoom(event)
     app.spotfactory.DestroySpot(item.spotnumber);
     spotObj = app.spotfactory.CreateSpot(tempInfo.spottype, tempInfo);
     spotObj.updateInfo(tempInfo);
-  } else if (deskshare) {
-    deskshare.zoom(true);
-    deskshare.screen.play();
+
+    if (spotObj.spotUI().zoom) {
+      spotObj.spotUI().zoom(true);
+    }
   }
 
   var wiki = $(spot).data('wiki');
@@ -967,8 +966,7 @@ function carouselItemUnzoom(event)
 
    $('#meeting > #zoom').css('display', 'none'); // undisplay zoom div
    var spot = $('#meeting > #zoom > .cloudcarousel'),
-       deskshare = $(spot).data('gcDeskShare'),
-       editorContent = '', spotObj, tempInfo, item;
+       spotObj, tempInfo, item;
 
   item = $(spot).data('item');
 
@@ -989,9 +987,10 @@ function carouselItemUnzoom(event)
     app.spotfactory.DestroySpot(item.spotnumber);
     spotObj = app.spotfactory.CreateSpot(tempInfo.spottype, tempInfo);
     spotObj.updateInfo(tempInfo);
-  } else if (deskshare) {
-    deskshare.zoom(false);
-    deskshare.screen.play();
+
+    if (spotObj.spotUI().zoom) {
+      spotObj.spotUI().zoom(true);
+    }
   }
 
   var wiki = $(spot).data('wiki');
@@ -1933,7 +1932,6 @@ function resizeZoom(event)
        wbCanvas = $("#wbCanvas", jqDiv), // todo better wb access
        wb       = wbCanvas.data('wb'),
        spotObj  = app.spotfactory.spotlist()[jqDiv.attr('spotnumber')],
-       ds       = jqDiv.data('gcDeskShare'),
        width, height, item, newWidth, newHeight,
        widthScale, heightScale, scale, left, top;
    if (jqDiv.length > 0)
@@ -1947,7 +1945,7 @@ function resizeZoom(event)
       heightScale = newHeight / item.orgHeight;
       scale = (widthScale < heightScale) ? widthScale : heightScale;
 
-      if (ds) {
+      if (spotObj.getRawData().spottype === 'deskshare') {
         item.orgWidth = width;
         item.orgHeight = height;
         item.plgOrgWidth = width;
@@ -1964,8 +1962,6 @@ function resizeZoom(event)
         wb.setScale(item.plgOrgWidth, item.plgOrgHeight);
       } else if (spotObj) {
         spotObj.setScale(item.plgOrgWidth, item.plgOrgHeight);
-      } else if (ds) {
-        ds.setScale(item.plgOrgWidth, item.plgOrgHeight);
       }
 
       // center div in zoom div
@@ -2778,6 +2774,7 @@ $(document).ready(function(
   app.spotfactory = new GoCastJS.SpotFactory();
   app.spotfactory.RegisterSpot('editor', GoCastJS.gcEdit);
   app.spotfactory.RegisterSpot('fileshare', GoCastJS.gcFileShare);
+  app.spotfactory.RegisterSpot('deskshare', GoCastJS.gcDeskShare);
 
   Callcast.init();
   Callcast.connlost(function() { app.requestXmppConnection(); });
