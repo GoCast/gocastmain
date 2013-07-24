@@ -989,7 +989,7 @@ function carouselItemUnzoom(event)
     spotObj.updateInfo(tempInfo);
 
     if (spotObj.spotUI().zoom) {
-      spotObj.spotUI().zoom(true);
+      spotObj.spotUI().zoom(false);
     }
   }
 
