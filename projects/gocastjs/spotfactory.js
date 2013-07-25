@@ -73,6 +73,8 @@ var GoCastJS;
 			DestroySpot: function(spotnumber) {
 				spotnumber = Number(spotnumber);
 				if (!isNaN(spotnumber) && this.spotlist().hasOwnProperty(spotnumber)) {
+						this.spotlist()[spotnumber].spotUI().deInit();	// De-Init the UI first.
+						this.spotlist()[spotnumber].deInit();
 						delete this.spotlist()[spotnumber];
 				} else {
 					if ('number' !== (typeof(spotnumber)).toLowerCase()) {

@@ -540,10 +540,6 @@ function onSpotClose(event)
     reallyClose = confirm('All content in this spot will be lost. Are you sure ?');
   } else if ($(spot).hasClass('typeContent') && $(spot).hasClass('deskshare')) {
     reallyClose = confirm('Your desktop will no longer be shared. Are you sure ?');
-    if (reallyClose) {
-      Callcast.unshareDesktop(Callcast.localdesktopstream);
-      Callcast.localdesktopstream = null;
-    }
   }
 
   if (true === reallyClose) {

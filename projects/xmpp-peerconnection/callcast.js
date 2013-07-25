@@ -3081,6 +3081,13 @@ var Callcast = {
     },
     unshareDesktop: function(stream) {
         var nick;
+
+        // Properly stop the capture locally.
+        if (stream) {
+            stream.stop();
+// Think this will be done by the deInit() in the spot.            stream = null;
+        }
+
         for (nick in Callcast.participants) {
             if (Callcast.participants.hasOwnProperty(nick)) {
                 Callcast.participants[nick].unshareDesktop(stream);

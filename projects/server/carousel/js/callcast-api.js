@@ -1124,6 +1124,7 @@ function removeSpotCb(info)
     {
       $(item.object).remove();
       app.carousel.remove(item.index);
+      app.spotfactory.DestroySpot(info.spotnumber);
       app.carousel.updateAll();
     }
     else

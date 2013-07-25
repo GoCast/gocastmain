@@ -55,6 +55,9 @@ var GoCastJS = GoCastJS || {};
             canSpotBeUtilized: function() {
                 return true; //  (default behavior - feel free to override)
             },
+            deInit: function() {
+                // Default action is nothing. Override if you have deinit needs.
+            },
 
             // pure virtuals to be implemented by the new class
             getRawData: function() { throw ':getRawData() not implemented by child'; }, // gets application specific data direct
@@ -108,6 +111,9 @@ var GoCastJS = GoCastJS || {};
             refreshSpot: function(info) { throw 'SpotUIBase::refreshSpot() not implemented by child'; },
             setScale: function(width, height) { throw 'SpotUIBase::setScale() not implemented by child'; },
             clearContainer: function() { throw 'SpotUIBase::clearContainer() not implemented by child'; },
+            deInit: function() {
+                // Default action is nothing. Override if you have deinit needs.
+            },
             dragAndDropAction: function(event) {
                 event.preventDefault(); // (default)
             }
@@ -706,6 +712,10 @@ var GoCastJS = GoCastJS || {};
                 return $.urlvars.deskshareable;
             },
             getRawData: function() { return this.info(); }, // gets application specific data direct
+            deInit: function() {
+                Callcast.unshareDesktop(Callcast.localdesktopstream);
+                Callcast.localdesktopstream = null;
+            },
             refreshSpot: function(info) {
                 var self = this;
 
