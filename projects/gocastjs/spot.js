@@ -614,6 +614,71 @@ var GoCastJS = GoCastJS || {};
                 this.uploadName(oFile.name);
                 this.uploadReader().readAsBinaryString(oFile);
               }
+            },
+            reset: function(info) {
+                var self = this;
+                
+                if (info && info.domLocation) {
+                    this.domLocation(info.domLocation);
+                }
+
+                this.spot = this.domLocation();
+                this.jqSpot = $(this.domLocation());
+                this.DIV = '<div id="gcFileShareDiv" class="fileshare">' +
+                           '<div id="status"></div>' +
+                           '<div id="links"><ul></ul></div>' +
+                           // TODO: REFACTOR -- prefer to not have a global function called from the script
+                           // STEP1: Make loadAFile a static inside of GoCastJS.gcFileShare and call that instead.
+                           // STEP2: Formulate the onchange to consider that 'module' name may not be GoCastJS in the future.
+                           '<div id="fileinput" title="Open file">+<input id="uploadFile" type="file" name="myFile" onchange="GoCastJS.gcFileShare.loadAFile(\'' +
+                           this.jqSpot.attr('id') + '\');" /></div>' +
+                           '</div>';
+                // Keep our contents if we're just switching modes rather than fully re-initializing.
+                if ($('#gcFileShareDiv', this.jqSpot).length) {
+                    this.jqDiv = $('#gcFileShareDiv', this.jqSpot);
+                }
+                else {
+                    this.jqDiv = $(this.DIV).appendTo(this.jqSpot).css("position", "absolute");
+                    this.showStatus('Drop files here...');
+                }
+                this.div = this.jqDiv[0];
+                this.item = this.jqSpot.data('item');
+                this.links($('#gcFileShareDiv > #links > ul', this.jqSpot));
+
+                //
+                // Drag N Drop handlers
+                //
+                this.domLocation().ondragover  = function () {
+                  this.classList.add('enter');
+                  return false;
+                };
+
+                this.domLocation().ondragleave = function() {
+                  this.classList.remove('enter');
+                  return false;
+                };
+
+                this.domLocation().ondragend = function () {
+                  this.classList.remove('enter');
+                  return false;
+                };
+
+                this.domLocation().ondrop = function (e) {
+                  this.classList.remove('enter');
+                  e.preventDefault();
+                  self.UploadFile(e.dataTransfer.files);
+                };
+
+                // Old init()
+                $('.name', this.jqSpot).text('Fileshare').css('position', 'absolute');
+                this.jqSpot.hover(function() {
+                    //TODO: REFACTOR -- possibly pull this out into app/carousel and have them 'do' this when a fileshare spot is instantiated
+                    app.carousel.disableMousewheel();
+                  },
+                  function() {
+                    //TODO: REFACTOR
+                    app.carousel.enableMousewheel();
+                });
             }
         },
         init: function() {
@@ -623,63 +688,7 @@ var GoCastJS = GoCastJS || {};
             if (!this.domLocation()) { throw 'gcFileShareDefaultUI: domLocation not set.'; }
             if (!this.spotParent()) { throw 'gcFileShareDefaultUI: spotParent not set.'; }
 
-            this.spot = this.domLocation();
-            this.jqSpot = $(this.domLocation());
-            this.DIV = '<div id="gcFileShareDiv" class="fileshare">' +
-                       '<div id="status"></div>' +
-                       '<div id="links"><ul></ul></div>' +
-                       // TODO: REFACTOR -- prefer to not have a global function called from the script
-                       // STEP1: Make loadAFile a static inside of GoCastJS.gcFileShare and call that instead.
-                       // STEP2: Formulate the onchange to consider that 'module' name may not be GoCastJS in the future.
-                       '<div id="fileinput" title="Open file">+<input id="uploadFile" type="file" name="myFile" onchange="GoCastJS.gcFileShare.loadAFile(\'' +
-                       this.jqSpot.attr('id') + '\');" /></div>' +
-                       '</div>';
-            // Keep our contents if we're just switching modes rather than fully re-initializing.
-            if ($('#gcFileShareDiv', this.jqSpot).length) {
-                this.jqDiv = $('#gcFileShareDiv', this.jqSpot);
-            }
-            else {
-                this.jqDiv = $(this.DIV).appendTo(this.jqSpot).css("position", "absolute");
-                this.showStatus('Drop files here...');
-            }
-            this.div = this.jqDiv[0];
-            this.item = this.jqSpot.data('item');
-            this.links($('#gcFileShareDiv > #links > ul', this.jqSpot));
-
-            //
-            // Drag N Drop handlers
-            //
-            this.domLocation().ondragover  = function () {
-              this.classList.add('enter');
-              return false;
-            };
-
-            this.domLocation().ondragleave = function() {
-              this.classList.remove('enter');
-              return false;
-            };
-
-            this.domLocation().ondragend = function () {
-              this.classList.remove('enter');
-              return false;
-            };
-
-            this.domLocation().ondrop = function (e) {
-              this.classList.remove('enter');
-              e.preventDefault();
-              self.UploadFile(e.dataTransfer.files);
-            };
-
-            // Old init()
-            $('.name', this.jqSpot).text('Fileshare').css('position', 'absolute');
-            this.jqSpot.hover(function() {
-                //TODO: REFACTOR -- possibly pull this out into app/carousel and have them 'do' this when a fileshare spot is instantiated
-                app.carousel.disableMousewheel();
-              },
-              function() {
-                //TODO: REFACTOR
-                app.carousel.enableMousewheel();
-            });
+            this.reset();
 
             this.uploadName('');
             this.uploadReader(new FileReader());
