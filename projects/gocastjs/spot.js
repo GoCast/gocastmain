@@ -58,6 +58,10 @@ var GoCastJS = GoCastJS || {};
             deInit: function() {
                 // Default action is nothing. Override if you have deinit needs.
             },
+            reset: function(info) {
+                // Default reset function does nothing. override is likely needed.
+                // Note, if info is null, the call came from init(). Otherwise it's a change of domLocation or other reset.
+            },
 
             // pure virtuals to be implemented by the new class
             getRawData: function() { throw ':getRawData() not implemented by child'; }, // gets application specific data direct
@@ -113,6 +117,10 @@ var GoCastJS = GoCastJS || {};
             clearContainer: function() { throw 'SpotUIBase::clearContainer() not implemented by child'; },
             deInit: function() {
                 // Default action is nothing. Override if you have deinit needs.
+            },
+            reset: function(info) {
+                // Default reset function does nothing. override is likely needed.
+                // Note, if info is null, the call came from init(). Otherwise it's a change of domLocation or other reset.
             },
             dragAndDropAction: function(event) {
                 event.preventDefault(); // (default)
@@ -284,46 +292,52 @@ var GoCastJS = GoCastJS || {};
             updateFrame: function(code) {
               console.log("gcEdit.updateFrame ", code);
               return code;
+            },
+            reset: function(info) {
+                var parInfo, self = this;
+
+                if (info && info.domLocation) {
+                    this.domLocation(info.domLocation);
+                }
+
+                this.DIV = '<div id="gcEditDiv"><textarea id="gcTextArea"></textarea></div>';
+                this.spot = this.domLocation();
+                this.jqSpot = $(this.domLocation());
+                this.jqDiv = $(this.DIV).appendTo(this.jqSpot).css("position", "absolute");
+                this.div = this.jqDiv[0];
+                // Used by carousel for locating.
+                this.item = this.jqSpot.data('item');
+
+                this.editor( $("#gcTextArea", this.jqSpot).cleditor(
+                                {width:"100%", height:"100%",
+                                 updateTextArea:function(html)
+                                 {
+                                   return self.updateTextArea(html);
+                                 },
+                                 updateFrame:function(code)
+                                 {
+                                   return self.updateFrame(code);
+                                 },
+                                 controls:     // controls to add to the toolbar
+                                  "| | | | | | bullets numbering | pastetext | link unlink print source"
+                                })[0] );
+                if (!this.editor()) {
+                    throw 'gcEdit: instantiation of editor failed. Lack of dom div id?';
+                }
+
+                parInfo = this.spotParent().getRawData();
+                //if there's any initial editor content in info, use it
+                if (parInfo.code) {
+                  this.editor().setCode(parInfo.code);
+                }
             }
         },
         init: function() {
-            var parInfo, self = this;
-
             console.log('gcEditDefaultUI: init() executing.');
             if (!this.domLocation()) { throw 'gcEditDefaultUI: domLocation not set.'; }
             if (!this.spotParent()) { throw 'gcEditDefaultUI: spotParent not set.'; }
 
-            this.DIV = '<div id="gcEditDiv"><textarea id="gcTextArea"></textarea></div>';
-            this.spot = this.domLocation();
-            this.jqSpot = $(this.domLocation());
-            this.jqDiv = $(this.DIV).appendTo(this.jqSpot).css("position", "absolute");
-            this.div = this.jqDiv[0];
-            // Used by carousel for locating.
-            this.item = this.jqSpot.data('item');
-
-            this.editor( $("#gcTextArea", this.jqSpot).cleditor(
-                            {width:"100%", height:"100%",
-                             updateTextArea:function(html)
-                             {
-                               return self.updateTextArea(html);
-                             },
-                             updateFrame:function(code)
-                             {
-                               return self.updateFrame(code);
-                             },
-                             controls:     // controls to add to the toolbar
-                              "| | | | | | bullets numbering | pastetext | link unlink print source"
-                            })[0] );
-            if (!this.editor()) {
-                throw 'gcEdit: instantiation of editor failed. Lack of dom div id?';
-            }
-
-            parInfo = this.spotParent().getRawData();
-            //if there's any initial editor content in info, use it
-            if (parInfo.code) {
-              this.editor().setCode(parInfo.code);
-            }
-
+            this.reset();
         },
         base: GoCastJS.SpotUIBase
     });

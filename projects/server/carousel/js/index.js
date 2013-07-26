@@ -931,8 +931,8 @@ function carouselItemZoom(event)
     tempInfo.networkObject = Callcast;
     tempInfo.nick = Callcast.nick;
 
-    app.spotfactory.DestroySpot(item.spotnumber);
-    spotObj = app.spotfactory.CreateSpot(tempInfo.spottype, tempInfo);
+    app.spotfactory.spotlist()[item.spotnumber].reset(tempInfo);
+    app.spotfactory.spotlist()[item.spotnumber].spotUI().reset(tempInfo);
     spotObj.updateInfo(tempInfo);
 
     if (spotObj.spotUI().zoom) {
@@ -980,8 +980,8 @@ function carouselItemUnzoom(event)
     tempInfo.networkObject = Callcast;
     tempInfo.nick = Callcast.nick;
 
-    app.spotfactory.DestroySpot(item.spotnumber);
-    spotObj = app.spotfactory.CreateSpot(tempInfo.spottype, tempInfo);
+    app.spotfactory.spotlist()[item.spotnumber].reset(tempInfo);
+    app.spotfactory.spotlist()[item.spotnumber].spotUI().reset(tempInfo);
     spotObj.updateInfo(tempInfo);
 
     if (spotObj.spotUI().zoom) {
