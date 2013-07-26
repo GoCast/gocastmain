@@ -617,7 +617,7 @@ var GoCastJS = GoCastJS || {};
             },
             reset: function(info) {
                 var self = this;
-                
+
                 if (info && info.domLocation) {
                     this.domLocation(info.domLocation);
                 }
@@ -917,6 +917,34 @@ var GoCastJS = GoCastJS || {};
                 }
 
                 this.screen.play();
+            },
+            reset: function(info) {
+                var self = this;
+
+                if (info && info.domLocation) {
+                    this.domLocation(info.domLocation);
+                }
+
+                this.spot = this.domLocation();
+                this.jqSpot = $(this.domLocation());
+
+                this.DIV = '<div id="gcDeskShareDiv" class="deskshare"><video autoplay muted></video></div>';
+                // If we are zooming and un-zooming, we'll need to re-use the video element.
+                if ($('#gcDeskShareDiv', this.jqSpot).length) {
+                    this.jqDiv = $('#gcDeskShareDiv', this.jqSpot);
+                }
+                else {
+                    this.jqDiv = $(this.DIV).appendTo(this.jqSpot).css("position", "absolute");
+                }
+                this.div = this.jqDiv[0];
+                this.item = this.jqSpot.data('item');
+                this.screen = $('video', this.div).get(0);
+
+                // If we are passed a valid 'zoomed' in the info...process it here.
+                if (info && (info.zoomed === true || info.zoomed === false)) {
+                    this.zoomed(info.zoomed);
+                    this.zoom(info.zoomed);
+                }
             }
 
         },
@@ -927,20 +955,8 @@ var GoCastJS = GoCastJS || {};
             if (!this.domLocation()) { throw 'gcDeskShareDefaultUI: domLocation not set.'; }
             if (!this.spotParent()) { throw 'gcDeskShareDefaultUI: spotParent not set.'; }
 
-            this.spot = this.domLocation();
-            this.jqSpot = $(this.domLocation());
             this.zoomed(false);
-            this.DIV = '<div id="gcDeskShareDiv" class="deskshare"><video autoplay muted></video></div>';
-            // If we are zooming and un-zooming, we'll need to re-use the video element.
-            if ($('#gcDeskShareDiv', this.jqSpot).length) {
-                this.jqDiv = $('#gcDeskShareDiv', this.jqSpot);
-            }
-            else {
-                this.jqDiv = $(this.DIV).appendTo(this.jqSpot).css("position", "absolute");
-            }
-            this.div = this.jqDiv[0];
-            this.item = this.jqSpot.data('item');
-            this.screen = $('video', this.div).get(0);
+            this.reset();
         },
         base: GoCastJS.SpotUIBase
     });
