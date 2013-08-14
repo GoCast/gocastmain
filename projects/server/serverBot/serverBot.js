@@ -786,6 +786,15 @@ MucRoom.prototype.log = function(msg, arg2, arg3) {
     console.log(logDate() + ' - @' + this.roomname.split('@')[0] + ': ' + newmsg, arg2 || '', arg3 || '');
 };
 
+MucRoom.prototype.send = function(msg) {
+    if (!this.client || !this.client.socket) {
+        console.log('***ERROR*** - MucRoom.send() requested while client/socket is null. Message NOT being sent: ', msg);
+    }
+    else {
+        this.client.send(msg);
+    }
+};
+
 MucRoom.prototype.IsFull = function() {
     return size(this.participants) >= this.maxParticipants;
 };
@@ -1372,7 +1381,7 @@ MucRoom.prototype.SendSpotListTo = function(to) {
 
     if (msgToSend) {
         this.log('SendSpotListTo: msgToSend:' + msgToSend.root().toString());
-        this.client.send(msgToSend);
+        this.send(msgToSend);
     }
 
 };
@@ -1777,7 +1786,7 @@ MucRoom.prototype.SendFullWhiteboardStrokeListTo = function(spotnumber, to) {
 
     if (msgToSend) {
 //        this.log('DEBUG: SendFullWhiteboardStrokeListTo: msgToSend:' + msgToSend.root().toString());
-        this.client.send(msgToSend);
+        this.send(msgToSend);
     }
 
 };
@@ -1794,7 +1803,7 @@ MucRoom.prototype.SendGroupCmd = function(cmd, attribs_in) {
 
 //        this.log('Outbound Group Command: ' + msgToSend.root().toString());
 
-        this.client.send(msgToSend);
+        this.send(msgToSend);
 };
 
 MucRoom.prototype.SendPrivateCmd = function(to, cmd, attribs_in) {
@@ -1809,7 +1818,7 @@ MucRoom.prototype.SendPrivateCmd = function(to, cmd, attribs_in) {
 
 //        this.log('Outbound Private Command: ' + msgToSend.root().toString());
 
-        this.client.send(msgToSend);
+        this.send(msgToSend);
 };
 
 MucRoom.prototype.SendGroupChat = function(msg) {
@@ -1820,7 +1829,7 @@ MucRoom.prototype.SendGroupChat = function(msg) {
 
 //        this.log('Outbound Group Chat: ' + msgToSend.root().toString());
 
-        this.client.send(msgToSend);
+        this.send(msgToSend);
 };
 
 MucRoom.prototype.SendPrivateChat = function(to, msg) {
@@ -1831,7 +1840,7 @@ MucRoom.prototype.SendPrivateChat = function(to, msg) {
 
 //        this.log('Outbound Private Chat to ' + to + ': ' + msgToSend.root().toString());
 
-        this.client.send(msgToSend);
+        this.send(msgToSend);
 };
 
 MucRoom.prototype.WelcomeChat = function() {
@@ -1958,7 +1967,7 @@ MucRoom.prototype.AddSpotReflection = function(iq) {
 //        iq = this.createErrorIQ(iq, 'No more spots allowed. Room_Full.');
 //        console.log('RAW_DEBUG: No more spots allowed. OUTBOUND-iq=' + iq.root().toString());
 
-        this.client.send(iq.root());
+        this.send(iq.root());
         return;
     }
 
@@ -1976,7 +1985,7 @@ MucRoom.prototype.AddSpotReflection = function(iq) {
     delete iq.attrs.from;
     iq.attrs.type = 'result';
 
-    this.client.send(iq);
+    this.send(iq);
 };
 
 MucRoom.prototype.createErrorIQ = function(iq_in, reason_in, err_type_in) {
@@ -2041,7 +2050,7 @@ MucRoom.prototype.SetSpotReflection = function(iq) {
     }
 
     // Send back the IQ result.
-    this.client.send(iq);
+    this.send(iq);
 };
 
 MucRoom.prototype.WhiteboardSingleStrokeReflection = function(iq) {
@@ -2094,7 +2103,7 @@ MucRoom.prototype.WhiteboardSingleStrokeReflection = function(iq) {
     }
 
     // Send back the IQ result.
-    this.client.send(iq);
+    this.send(iq);
 };
 
 MucRoom.prototype.RemoveSpotNumber = function(spotnumber) {
@@ -2181,7 +2190,7 @@ MucRoom.prototype.RemoveSpotReflection = function(iq) {
     }
 
         // Send back the IQ result.
-        this.client.send(iq.root());
+        this.send(iq.root());
 };
 
 //
@@ -2864,7 +2873,7 @@ MucRoom.prototype.sendGroupMessage = function(msg_body) {
     var msg = new xmpp.Element('message', {to: this.roomname, type: 'groupchat'})
         .c('body').t(msg_body);
 
-    this.client.send(msg);
+    this.send(msg);
 };
 
 MucRoom.prototype.sendIQ = function(iq, cb) {
@@ -2895,7 +2904,7 @@ MucRoom.prototype.sendIQ = function(iq, cb) {
 */
 //  this.log("sendIQ: SendingIQ: " + iq.tree());
 
-    this.client.send(iq.root());
+    this.send(iq.root());
 };
 
 MucRoom.prototype.leave = function() {
@@ -2910,7 +2919,7 @@ MucRoom.prototype.leave = function() {
                     .c('x', {xmlns: 'http://jabber.org/protocol/muc'});
 
     this.log('Leaving.'); // + el.tree());
-    this.client.send(el);
+    this.send(el);
 };
 
 MucRoom.prototype.join = function(rmname, nick) {
@@ -2947,7 +2956,7 @@ MucRoom.prototype.rejoin = function(rmname, nick) {
     this.ValidateWBFolder();
 
     this.log('Joining: ' + rmname + ' as ' + nick + '. '); // + el.tree());
-    this.client.send(el);
+    this.send(el);
 
     if (this.joinTimer)
     {
@@ -3105,7 +3114,7 @@ function Overseer(user, pw, notifier, bManager, staticRoomList) {
 
         // Mark ourself as online so that we can receive messages from direct clients.
         el = new xmpp.Element('presence');
-        self.client.send(el);
+        self.send(el);
 
         // Need to join all rooms in 'rooms'
         for (k in self.static_roomnames)
@@ -3481,6 +3490,15 @@ Overseer.prototype.log = function(msg, arg2, arg3) {
     console.log(logDate() + ' - Overseer: ' + newmsg, arg2 || '', arg3 || '');
 };
 
+Overseer.prototype.send = function(msg) {
+    if (!this.client || !this.client.socket) {
+        console.log('***ERROR*** - Overseer.send() requested while client/socket is null. Message NOT being sent: ', msg);
+    }
+    else {
+        this.client.send(msg);
+    }
+};
+
 Overseer.prototype.sendIQ = function(iq, cb) {
     var iqid = 'overseer_iqid' + this.iqnum,
         self = this;
@@ -3509,14 +3527,14 @@ Overseer.prototype.sendIQ = function(iq, cb) {
 */
 //  console.log("overseer sendIQ: SendingIQ: " + iq.tree());
 
-    this.client.send(iq.root());
+    this.send(iq.root());
 };
 
 Overseer.prototype.sendGroupMessage = function(room, msg_body) {
     var msg = new xmpp.Element('message', {to: room, type: 'groupchat'})
         .c('body').t(msg_body);
 
-    this.client.send(msg);
+    this.send(msg);
 };
 
 function deentitize(instr) {
@@ -3985,7 +4003,7 @@ Overseer.prototype.CreateRoomRequest = function(iq) {
                             .c('roomfull', {xmlns: 'urn:xmpp:callcast'});
 
             self.log('CreateRoomRequest: Requested room is full: ' + roomname);
-            self.client.send(iqResult.root());
+            self.send(iqResult.root());
             return;
         }
 
@@ -4001,7 +4019,7 @@ Overseer.prototype.CreateRoomRequest = function(iq) {
         var owner = '', email, iqResult = new xmpp.Element('iq', {to: iq.attrs.from, type: 'result', id: iq.attrs.id})
                             .c('ok', {xmlns: 'urn:xmpp:callcast', name: roomname});
         self.log('CreateRoomRequest: INFO: result from room creation is: ' + iqResult.root().toString());
-        self.client.send(iqResult.root());
+        self.send(iqResult.root());
 
         // TODO:RMW - Lookup username (iq.attrs.from) in db and add this room to their recently visited table list.
         email = iq.attrs.from.split('@')[0];
@@ -4057,7 +4075,7 @@ Overseer.prototype.CreateRoomRequest = function(iq) {
                                 .c('err', {xmlns: 'urn:xmpp:callcast'});
 
                 self.log('CreateRoomRequest: ERROR: ' + msg);
-                self.client.send(iqResult.root());
+                self.send(iqResult.root());
             }
         );
 
@@ -4070,7 +4088,7 @@ Overseer.prototype.CreateRoomRequest = function(iq) {
             iqResult = new xmpp.Element('iq', {to: iq.attrs.from, type: 'error', id: iq.attrs.id})
                             .c('pendingdeletion', {xmlns: 'urn:xmpp:callcast'});
             self.log('AddTrackedRoom: INFO: result from room creation is: ' + iqResult.root().toString());
-            self.client.send(iqResult.root());
+            self.send(iqResult.root());
         }
         else
         {
@@ -4256,7 +4274,7 @@ Overseer.prototype.SubstituteJidForNickname = function(iq) {
 //                console.log('DEBUG: IQ to send back: ', iq.root().toString());
                 self.log('SubstituteJidForNickname: Success. Substitution ready for completion by client.');
                 // Send back the IQ result.
-                this.client.send(iq.root());
+                this.send(iq.root());
             });
 
             return; // Cannot let this fall out below or we'll wind up sending the result too soon.
@@ -4264,7 +4282,7 @@ Overseer.prototype.SubstituteJidForNickname = function(iq) {
     }
 
     // Send back the IQ result.
-    this.client.send(iq.root());
+    this.send(iq.root());
 };
 
 Overseer.prototype.handleIq = function(iq) {
@@ -4299,7 +4317,7 @@ Overseer.prototype.handleIq = function(iq) {
             iq.remove('ping');
         }
 //          console.log("Sending pong/result: " + iq);
-        this.client.send(iq);
+        this.send(iq);
     }
     else if (!iq.attrs.from.split('@')) {
         this.log('UNHANDLED IQ: ' + iq);
@@ -4380,7 +4398,12 @@ function FeedbackBot(feedback_jid, feedback_pw, notifier) {
                 stanza.attrs.to = stanza.attrs.from;
                 delete stanza.attrs.from;
                 // and send back.
-                client.send(stanza);
+                if (client.socket) {
+                    client.send(stanza);
+                }
+                else {
+                    console.log('***ERROR*** - FeedbackBot - client socket is NULL. Message not sent: ', stanza);
+                }
             }
 //            else {
 //                console.log('feedback-bot stanza-error: ', stanza.toString());
@@ -4450,7 +4473,12 @@ Notifier.prototype.sendMessage = function(msg) {
             if (this.informlist.hasOwnProperty(k)) {
                 msg_stanza = new xmpp.Element('message', {to: this.informlist[k], type: 'chat'})
                     .c('body').t(decodeURI(msg));
-                this.client.send(msg_stanza);
+                if (this.client && this.client.socket) {
+                    this.client.send(msg_stanza);
+                }
+                else {
+                    console.log('***ERROR*** - Notifier sendMessage() - client socket is NULL. Message not sent was: ', msg_stanza);
+                }
             }
         }
     }

@@ -91,7 +91,12 @@ GoCastJS.Notifier.prototype.sendMessage = function(msg) {
         {
             msg_stanza = new xmpp.Element('message', {to: this.informlist[i], type: 'chat'})
                 .c('body').t(GoCastJS.logDate() + ' - Notfier: ' + msg);
-            this.client.send(msg_stanza);
+            if (this.client && this.client.socket) {
+                this.client.send(msg_stanza);
+            }
+            else {
+                console.log('***ERROR*** - Notifier sendMessage() - client socket is NULL. Message not sent was: ', msg_stanza);
+            }
         }
     }
     else {
