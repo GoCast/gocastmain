@@ -78,23 +78,25 @@
                         room.addEventListener('stream-subscribed', function(e) {
                             // After subscribing to a stream, show it
                             console.log('room.subscribed(): Subscribed to remote stream: ',
-                                        e.streams[i].getID());
+                                        e.stream.getID());
                             showStream(e.stream, 'remote', e.stream.getID());
                         });
 
                         room.addEventListener('stream-added', function(e) {
-                            // After a new remote stream has been added,
-                            // subscribe to it
-                            console.log('room.added(): Subscribing to added remote stream: ',
-                                        e.streams[i].getID());
-                            room.subscribe(e.stream);
+                            // After a new stream has been added,
+                            // if it's remote, subscribe to it
+                            if (localstream.getID() !== e.stream.getID()) {
+                                console.log('room.added(): Subscribing to added remote stream: ',
+                                            e.stream.getID());
+                                room.subscribe(e.stream);
+                            }
                         });
 
                         room.addEventListener('stream-removed', function(e) {
                             // After a remote stream has been removed,
                             // stop showing it
                             console.log('room.removed(): Unsubscribing from remote stream: ',
-                                        e.streams[i].getID());
+                                        e.stream.getID());
                             stopShowingStream(e.stream);
                         });
 

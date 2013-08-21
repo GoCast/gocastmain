@@ -52,7 +52,7 @@ function gotRoom(res, uname, role) {
 
 // Init NUVE API
 console.log('relaymgr(): Initializing NUVE API...');
-N.API.init(config.nuve.superserviceID, config.nuve.superserviceKey, 'http://relay.gocast.it:3000/');
+N.API.init(config.nuve.superserviceID, config.nuve.superserviceKey, 'http://localhost:3000/');
 console.log('relaymgr(): Initializing NUVE API... DONE');
 
 // Tokens are a way for the client to establish a connection with the relay server 'room' for publishing local media.
@@ -70,7 +70,7 @@ app.post('/reqroomtoken', function(req, res) {
         });
     } else {
         console.log('[/reqroomtoken]: Searching room with id: [' + roomid + ']...');
-        N.API.createRoom(roomid, gotRoom(res, uname, role), function() {
+        N.API.getRoom(roomid, gotRoom(res, uname, role), function() {
             console.log('[/reqroomtoken]: Error searching room.');
             res.send('{"result": "error_room_search"}');
         });        
