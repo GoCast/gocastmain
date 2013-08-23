@@ -15,13 +15,16 @@
 			'action_name': 'HUDDemo.tgf',
 			'inputs': [ '../../tgf/Testbed/HUDDemo/HUDDemo.tgf', ], # inputs
 			'outputs': [ '../../dummy', ], # outputs
-			'action': [ '<@(_graphcode)', '<@(_inputs)',  '--force-update', '--machine', 'HUDDemo', '-h', '../../source/Testbed/HUDDemo/HUDDemo.h', '-cpp', '../../source/Testbed/HUDDemo/HUDDemo.cpp', ], # action
+			'action': [ '<@(_graphcode)', '<@(_inputs)',  '--force-update', '--machine', 'HUDDemo', '-h', '../../source/Testbed/HUDDemo/HUDDemo.h', '-cpp', '../../source/Testbed/HUDDemo/HUDDemo.mm', ], # action
 		},
 		],
 
 		'sources': [
-			'../../source/Testbed/HUDDemo/HUDDemo.cpp',
+			'../../source/Testbed/HUDDemo/HUDDemo.mm',
 			'../../source/Testbed/HUDDemo/HUDDemo.h',
+
+			'../../source/Testbed/HUDDemo/HUDEvent.h',
+			'../../source/Testbed/HUDDemo/HUDEventManager.h',
 
 			'../../source/Base/package.h',
 			'../../source/Base/tAlert.h',
@@ -73,6 +76,10 @@
 # 					'../../rsrc/Testbed/HUDDemo/<@(OS)/en.lproj/ViewController_iPhone5.xib',
 
 					'../../rsrc/Testbed/HUDDemo/<@(OS)/blue-gradient.jpg',
+					'../../rsrc/Testbed/HUDDemo/<@(OS)/black-button.png',
+
+					'../../rsrc/Testbed/HUDDemo/<@(OS)/button-call.png',
+					'../../rsrc/Testbed/HUDDemo/<@(OS)/button-settings.png',
 
 					'../../rsrc/Testbed/HUDDemo/<@(OS)/Icon.png',
 

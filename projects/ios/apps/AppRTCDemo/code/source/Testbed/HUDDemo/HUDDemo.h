@@ -3,11 +3,12 @@
 #include <queue>
 
 class HUDDemoMessage;
+class HUDEvent;
 
 class HUDDemo
-: public tMealy,
-// public tSubject<const OtherHUDDemoMessage&>,
-  public tObserver<const HUDDemoMessage&>
+:   public tMealy,
+    public tObserver<const HUDDemoMessage&>,
+    public tObserver<const HUDEvent&>
 {
 protected:
 
@@ -45,14 +46,19 @@ public:
 	{
 		kInvalidEvent = -2,
 		kNext = -1,
+		kActive,
+		kActiveMode,
+		kAddMember,
+		kCall,
+		kDecline,
+		kEditGroup,
 		kGo,
+		kHangup,
+		kLiveRecord,
 		kNo,
-		kPressedActive,
-		kPressedAddMember,
-		kPressedCall,
-		kPressedEditGroup,
-		kPressedHangup,
-		kPressedLiveRecord,
+		kReady,
+		kSignIn,
+		kSilent,
 		kYes,
 	};
 
@@ -79,13 +85,14 @@ protected:
 	bool HasEdgeNamedNext() const;
 
 	void update(const HUDDemoMessage& msg);
+	void update(const HUDEvent& msg);
 };
 
 class HUDDemoMessage
 {
 public:
-	HUDDemo::EventType				mEvent;
-	tSubject<const HUDDemoMessage&>*	mSource;
+	HUDDemo::EventType                  mEvent;
+	tSubject<const HUDDemoMessage&>*    mSource;
 
 public:
 	HUDDemoMessage(HUDDemo::EventType newEvent, tSubject<const HUDDemoMessage&>* newSource = NULL)

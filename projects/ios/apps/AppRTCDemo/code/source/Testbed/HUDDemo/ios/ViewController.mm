@@ -4,6 +4,9 @@
 #include "Math/package.h"
 #include "Input/package.h"
 
+#include "HUDEvent.h"
+#include "HUDEventManager.h"
+
 @interface ViewController()
 {
 }
@@ -88,6 +91,118 @@
 #pragma unused(fromInterfaceOrientation)
     [super didRotateFromInterfaceOrientation:fromInterfaceOrientation];
     [UIView setAnimationsEnabled:YES];
+}
+
+#pragma mark Button Presses
+-(IBAction) signInPressed:(id)sender
+{
+#pragma unused(sender)
+    HUDEventManager::getInstance()->notify(HUDEvent(HUDEvent::kSignInPressed));
+}
+
+-(IBAction) registerPressed:(id)sender
+{
+#pragma unused(sender)
+    HUDEventManager::getInstance()->notify(HUDEvent(HUDEvent::kRegisterPressed));
+}
+
+-(IBAction) callPressed:(id)sender
+{
+#pragma unused(sender)
+    HUDEventManager::getInstance()->notify(HUDEvent(HUDEvent::kCallPressed));
+}
+
+-(IBAction) activeModePressed:(id)sender
+{
+#pragma unused(sender)
+    HUDEventManager::getInstance()->notify(HUDEvent(HUDEvent::kActiveModePressed));
+}
+
+-(IBAction) settingsPressed:(id)sender
+{
+#pragma unused(sender)
+    HUDEventManager::getInstance()->notify(HUDEvent(HUDEvent::kSettingsPressed));
+}
+
+-(IBAction) addMemberPressed:(id)sender
+{
+#pragma unused(sender)
+    HUDEventManager::getInstance()->notify(HUDEvent(HUDEvent::kAddMemberPressed));
+}
+
+-(IBAction) editGroupPressed:(id)sender
+{
+#pragma unused(sender)
+    HUDEventManager::getInstance()->notify(HUDEvent(HUDEvent::kEditGroupPressed));
+}
+
+
+-(IBAction) liveRecordPressed:(id)sender
+{
+#pragma unused(sender)
+    HUDEventManager::getInstance()->notify(HUDEvent(HUDEvent::kLiveRecordPressed));
+}
+
+-(IBAction) livePressed:(id)sender
+{
+#pragma unused(sender)
+    HUDEventManager::getInstance()->notify(HUDEvent(HUDEvent::kLivePressed));
+}
+
+-(IBAction) recordPressed:(id)sender
+{
+#pragma unused(sender)
+    HUDEventManager::getInstance()->notify(HUDEvent(HUDEvent::kRecordPressed));
+}
+
+
+-(IBAction) activePressed:(id)sender
+{
+#pragma unused(sender)
+    HUDEventManager::getInstance()->notify(HUDEvent(HUDEvent::kActivePressed));
+}
+
+-(IBAction) silentPressed:(id)sender
+{
+#pragma unused(sender)
+    HUDEventManager::getInstance()->notify(HUDEvent(HUDEvent::kSilentPressed));
+}
+
+-(IBAction) declinePressed:(id)sender
+{
+#pragma unused(sender)
+    HUDEventManager::getInstance()->notify(HUDEvent(HUDEvent::kDeclinePressed));
+}
+
+-(IBAction) savePressed:(id)sender
+{
+#pragma unused(sender)
+    HUDEventManager::getInstance()->notify(HUDEvent(HUDEvent::kSavePressed));
+}
+
+-(IBAction) cancelPressed:(id)sender
+{
+#pragma unused(sender)
+    HUDEventManager::getInstance()->notify(HUDEvent(HUDEvent::kCancelPressed));
+}
+
+
+-(IBAction) mutePressed:(id)sender
+{
+#pragma unused(sender)
+    HUDEventManager::getInstance()->notify(HUDEvent(HUDEvent::kMutePressed));
+}
+
+-(IBAction) hangupPressed:(id)sender
+{
+#pragma unused(sender)
+    HUDEventManager::getInstance()->notify(HUDEvent(HUDEvent::kHangupPressed));
+}
+
+-(IBAction) speakerPressed:(id)sender
+{
+#pragma unused(sender)
+    HUDEventManager::getInstance()->notify(HUDEvent(HUDEvent::kSpeakerPressed));
 }
 
 @end
