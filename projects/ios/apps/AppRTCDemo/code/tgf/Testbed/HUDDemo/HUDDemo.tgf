@@ -1,0 +1,23 @@
+1 start
+2 end
+3 Login Screen*
+4 Group / Member Screen*
+5 In Call Screen*
+6 Live / Record Screen*
+7 Playback email Screen*
+8 Make new group Screen*
+9 Active Mode Screen*
+10 Add Member Screen*
+11 Edit Group Screen*
+#
+1 3
+3 4 go
+4 5 pressedCall
+5 6 pressedLiveRecord
+6 7 pressedHangup
+7 8 go
+8 4 yes, no
+4 9 pressedActive
+4 10 pressedAddMember
+4 11 pressedEditGroup
+11 4 go

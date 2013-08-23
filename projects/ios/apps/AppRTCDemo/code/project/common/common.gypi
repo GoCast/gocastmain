@@ -1,4 +1,6 @@
 {
+	'graphcode': '../../project/common/graphcode.sh',
+
 	# This is set globally for "project" level, which is required for "actions", rather than target level
 	'xcode_settings': {
 		'SYMROOT': '../../build/<@(OS)',
