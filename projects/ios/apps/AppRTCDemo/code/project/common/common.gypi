@@ -38,6 +38,34 @@
 
 			}, # debug
 
+			'testflight': {
+
+				'defines': [
+					'DEBUG=0',
+					'NDEBUG=1',
+				], #defines
+
+				'xcode_settings': {
+					'CODE_SIGN_IDENTITY': 'iPhone Distribution: TERENCE JORDAN GRANT',
+					'PROVISIONING_PROFILE': '759FDBAD-BDA8-4D82-98C2-01F5F721F5BF',
+
+					'COPY_PHASE_STRIP': 'YES',
+					'DEPLOYMENT_POSTPROCESSING': 'YES',
+					'SEPARATE_STRIP': 'YES',
+					'STRIP_INSTALLED_PRODUCT': 'YES',
+					'ONLY_ACTIVE_ARCH': 'NO',
+					'DEAD_CODE_STRIPPING': 'YES',
+					'GCC_DYNAMIC_NO_PIC': 'YES',
+					'GCC_FAST_MATH': 'YES',
+					'GCC_GENERATE_DEBUGGING_SYMBOLS': 'NO',
+					'GCC_OPTIMIZATION_LEVEL': '3',
+					'GCC_STRICT_ALIASING': 'YES',
+					'GCC_UNROLL_LOOPS': 'YES',
+					'LD_NO_PIE': 'YES',
+				}, # xcode_settings
+
+			}, # release
+
 			'release': {
 
 				'defines': [
@@ -46,6 +74,7 @@
 				], #defines
 
 				'xcode_settings': {
+
 					'COPY_PHASE_STRIP': 'YES',
 					'DEPLOYMENT_POSTPROCESSING': 'YES',
 					'SEPARATE_STRIP': 'YES',

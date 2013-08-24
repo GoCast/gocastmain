@@ -6,6 +6,8 @@
 #include "HUDEvent.h"
 #include "HUDEventManager.h"
 
+#import "TestFlight.h"
+
 AppDelegate* gAppDelegateInstance = NULL;
 
 @implementation AppDelegate
@@ -27,6 +29,10 @@ AppDelegate* gAppDelegateInstance = NULL;
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
 #pragma unused(application, launchOptions)
+    // start of your application:didFinishLaunchingWithOptions // ...
+    [TestFlight takeOff:@"64bf3141-d1a6-409a-ac0c-a4b7926fc51f"];
+    // The rest of your application:didFinishLaunchingWithOptions method// ...
+
     self.window = [[[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]] autorelease];
     // Override point for customization after application launch.
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)

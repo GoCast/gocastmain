@@ -68,6 +68,11 @@
 					'../../source/Bootstrap/<@(OS)/main.mm',
 					'../../source/Testbed/HUDDemo/<@(OS)/ViewController.h',
 					'../../source/Testbed/HUDDemo/<@(OS)/ViewController.mm',
+
+					'../../third-party/TestFlightSDK2.0.0/TestFlight.h',
+					'../../third-party/TestFlightSDK2.0.0/TestFlight+AsyncLogging.h',
+					'../../third-party/TestFlightSDK2.0.0/TestFlight+ManualSessions.h',
+
 				],	# sources
 
 				'mac_bundle_resources': [
@@ -89,6 +94,8 @@
 
 				'link_settings': {
 					'libraries': [
+						'../../third-party/TestFlightSDK2.0.0/libTestFlight.a',
+						'libz.dylib',
 						'$(SDKROOT)/System/Library/Frameworks/AVFoundation.framework',
 						'$(SDKROOT)/System/Library/Frameworks/UIKit.framework',
 						'$(SDKROOT)/System/Library/Frameworks/MessageUI.framework',
