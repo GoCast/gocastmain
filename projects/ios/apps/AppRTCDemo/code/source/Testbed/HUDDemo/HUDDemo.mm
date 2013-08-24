@@ -114,7 +114,6 @@ void HUDDemo::liveRecordScreenEntry()
 
 void HUDDemo::liveRecordScreenExit()
 {
-    [gAppDelegateInstance setLiveRecordScreenVisible:false];
 }
 
 void HUDDemo::playbackEmailScreenEntry()
@@ -124,6 +123,7 @@ void HUDDemo::playbackEmailScreenEntry()
 
 void HUDDemo::playbackEmailScreenExit()
 {
+    [gAppDelegateInstance setLiveRecordScreenVisible:false];
     [gAppDelegateInstance setPlaybackEmailScreenVisible:false];
 }
 
@@ -211,6 +211,9 @@ void HUDDemo::update(const HUDEvent& msg)
         case HUDEvent::kActivePressed:      process(kActive); break;
         case HUDEvent::kSilentPressed:      process(kSilent); break;
         case HUDEvent::kDeclinePressed:     process(kDecline); break;
+
+        case HUDEvent::kMailSent:           process(kGo); break;
+
         default:
             break;
     }

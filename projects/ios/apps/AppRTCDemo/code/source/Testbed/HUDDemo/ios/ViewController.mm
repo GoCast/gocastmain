@@ -205,4 +205,13 @@
     HUDEventManager::getInstance()->notify(HUDEvent(HUDEvent::kSpeakerPressed));
 }
 
+- (void)mailComposeController:(MFMailComposeViewController *)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError *)error
+{
+#pragma unused(controller, result, error)
+    [self dismissModalViewControllerAnimated:YES];
+
+    HUDEventManager::getInstance()->notify(HUDEvent(HUDEvent::kMailSent));
+}
+
+
 @end

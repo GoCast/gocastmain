@@ -133,7 +133,24 @@ AppDelegate* gAppDelegateInstance = NULL;
 
 -(void)setPlaybackEmailScreenVisible:(bool)newVisible
 {
-    [self.viewController.mPlaybackEmailView setHidden:(newVisible) ? NO : YES];
+    if (newVisible)
+    {
+        if ([MFMailComposeViewController canSendMail])
+        {
+            MFMailComposeViewController *mailer = [[MFMailComposeViewController alloc] init];
+            mailer.mailComposeDelegate = self.viewController;
+            [mailer setSubject:@"GoCast Talk Record"];
+//            NSArray *toRecipients = nil; //[NSArray arrayWithObjects:[NSString stringWithUTF8String:newMailTo.c_str()], nil];
+//            [mailer setToRecipients:toRecipients];
+            NSString *emailBody = @"Please click here to play back the recorded call:\n\n"
+            "http://gocast.it/talk/archive/2013-08-26\n\n"
+            "Duration 12 min 30 sec\n\n"
+            "Sent via GoCast Talk http://gocast.it/talk/";
+            [mailer setMessageBody:emailBody isHTML:NO];
+            [self.viewController presentModalViewController:mailer animated:YES];
+            [mailer release];
+        }
+    }
 }
 
 @end

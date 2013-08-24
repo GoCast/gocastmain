@@ -30,6 +30,8 @@ public:
         kMutePressed,
         kHangupPressed,
         kSpeakerPressed,
+
+        kMailSent,
     };
 
     EventType   mEvent;

@@ -91,6 +91,7 @@
 					'libraries': [
 						'$(SDKROOT)/System/Library/Frameworks/AVFoundation.framework',
 						'$(SDKROOT)/System/Library/Frameworks/UIKit.framework',
+						'$(SDKROOT)/System/Library/Frameworks/MessageUI.framework',
 						'$(SDKROOT)/System/Library/Frameworks/Foundation.framework',
 						'$(SDKROOT)/System/Library/Frameworks/CoreGraphics.framework',
 						'$(SDKROOT)/System/Library/Frameworks/QuartzCore.framework',

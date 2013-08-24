@@ -1,7 +1,7 @@
 #import <UIKit/UIKit.h>
-#import <GLKit/GLKit.h>
+#import <MessageUI/MessageUI.h>
 
-@interface ViewController : UIViewController
+@interface ViewController : UIViewController <MFMailComposeViewControllerDelegate>
 {
 }
 
@@ -37,5 +37,7 @@
 -(IBAction) mutePressed:(id)sender;
 -(IBAction) hangupPressed:(id)sender;
 -(IBAction) speakerPressed:(id)sender;
+
+- (void)mailComposeController:(MFMailComposeViewController *)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError *)error;
 
 @end
