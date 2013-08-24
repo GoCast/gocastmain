@@ -29,9 +29,14 @@ AppDelegate* gAppDelegateInstance = NULL;
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
 #pragma unused(application, launchOptions)
-    // start of your application:didFinishLaunchingWithOptions // ...
+
+#ifdef ADHOC
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+    [TestFlight setDeviceIdentifier:[[UIDevice currentDevice] uniqueIdentifier]];
+#pragma clang diagnostic pop
     [TestFlight takeOff:@"64bf3141-d1a6-409a-ac0c-a4b7926fc51f"];
-    // The rest of your application:didFinishLaunchingWithOptions method// ...
+#endif
 
     self.window = [[[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]] autorelease];
     // Override point for customization after application launch.

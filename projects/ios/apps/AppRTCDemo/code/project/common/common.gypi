@@ -43,6 +43,7 @@
 				'defines': [
 					'DEBUG=0',
 					'NDEBUG=1',
+					'ADHOC=1',
 				], #defines
 
 				'xcode_settings': {
