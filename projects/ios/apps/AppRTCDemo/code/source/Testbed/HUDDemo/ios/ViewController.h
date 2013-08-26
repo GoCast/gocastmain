@@ -1,7 +1,7 @@
 #import <UIKit/UIKit.h>
 #import <MessageUI/MessageUI.h>
 
-@interface ViewController : UIViewController <MFMailComposeViewControllerDelegate>
+@interface ViewController : UIViewController <MFMailComposeViewControllerDelegate, UITextFieldDelegate>
 {
 }
 
@@ -14,6 +14,9 @@
 @property (nonatomic, strong) IBOutlet UIView* mEditGroupView;
 @property (nonatomic, strong) IBOutlet UIView* mLiveRecordView;
 @property (nonatomic, strong) IBOutlet UIView* mPlaybackEmailView;
+
+@property (nonatomic, strong) IBOutlet UITextField* mLoginEmail;
+@property (nonatomic, strong) IBOutlet UITextField* mLoginPassword;
 
 -(IBAction) signInPressed:(id)sender;
 -(IBAction) registerPressed:(id)sender;
@@ -39,5 +42,7 @@
 -(IBAction) speakerPressed:(id)sender;
 
 - (void)mailComposeController:(MFMailComposeViewController *)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError *)error;
+
+- (BOOL)textFieldShouldReturn:(UITextField *)textField;
 
 @end

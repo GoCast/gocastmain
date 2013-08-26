@@ -1359,6 +1359,22 @@
 					<int key="connectionID">84</int>
 				</object>
 				<object class="IBConnectionRecord">
+					<object class="IBCocoaTouchOutletConnection" key="connection">
+						<string key="label">mLoginEmail</string>
+						<reference key="source" ref="841351856"/>
+						<reference key="destination" ref="501821326"/>
+					</object>
+					<int key="connectionID">103</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBCocoaTouchOutletConnection" key="connection">
+						<string key="label">mLoginPassword</string>
+						<reference key="source" ref="841351856"/>
+						<reference key="destination" ref="53029149"/>
+					</object>
+					<int key="connectionID">104</int>
+				</object>
+				<object class="IBConnectionRecord">
 					<object class="IBCocoaTouchEventConnection" key="connection">
 						<string key="label">signInPressed:</string>
 						<reference key="source" ref="994397625"/>
@@ -1375,6 +1391,22 @@
 						<int key="IBEventType">7</int>
 					</object>
 					<int key="connectionID">86</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBCocoaTouchOutletConnection" key="connection">
+						<string key="label">delegate</string>
+						<reference key="source" ref="501821326"/>
+						<reference key="destination" ref="841351856"/>
+					</object>
+					<int key="connectionID">106</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBCocoaTouchOutletConnection" key="connection">
+						<string key="label">delegate</string>
+						<reference key="source" ref="53029149"/>
+						<reference key="destination" ref="841351856"/>
+					</object>
+					<int key="connectionID">107</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBCocoaTouchEventConnection" key="connection">
@@ -1622,11 +1654,13 @@
 						<int key="objectID">15</int>
 						<reference key="object" ref="501821326"/>
 						<reference key="parent" ref="236994757"/>
+						<string key="objectName">mLoginEmail</string>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">16</int>
 						<reference key="object" ref="53029149"/>
 						<reference key="parent" ref="236994757"/>
+						<string key="objectName">mLoginPassword</string>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">17</int>
@@ -1994,7 +2028,7 @@
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">102</int>
+			<int key="maxID">107</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -2102,6 +2136,8 @@
 						<string key="mGroupMemberView">UIView</string>
 						<string key="mInCallView">UIView</string>
 						<string key="mLiveRecordView">UIView</string>
+						<string key="mLoginEmail">UITextField</string>
+						<string key="mLoginPassword">UITextField</string>
 						<string key="mLoginView">UIView</string>
 						<string key="mMakeNewGroupView">UIView</string>
 						<string key="mPlaybackEmailView">UIView</string>
@@ -2130,6 +2166,14 @@
 						<object class="IBToOneOutletInfo" key="mLiveRecordView">
 							<string key="name">mLiveRecordView</string>
 							<string key="candidateClassName">UIView</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="mLoginEmail">
+							<string key="name">mLoginEmail</string>
+							<string key="candidateClassName">UITextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="mLoginPassword">
+							<string key="name">mLoginPassword</string>
+							<string key="candidateClassName">UITextField</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="mLoginView">
 							<string key="name">mLoginView</string>

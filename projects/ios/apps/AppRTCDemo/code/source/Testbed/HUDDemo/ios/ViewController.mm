@@ -213,5 +213,20 @@
     HUDEventManager::getInstance()->notify(HUDEvent(HUDEvent::kMailSent));
 }
 
+- (BOOL)textFieldShouldReturn:(UITextField *)textField
+{
+    if (textField == self.mLoginEmail)
+    {
+        [self.mLoginEmail resignFirstResponder];
+        [self.mLoginPassword becomeFirstResponder];
+    }
+    else if (textField == self.mLoginPassword)
+    {
+        [self.mLoginPassword resignFirstResponder];
+    }
+
+    return NO;
+}
+
 
 @end
