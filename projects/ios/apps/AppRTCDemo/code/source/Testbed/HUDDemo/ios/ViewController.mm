@@ -208,7 +208,9 @@
 - (void)mailComposeController:(MFMailComposeViewController *)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError *)error
 {
 #pragma unused(controller, result, error)
-    [self dismissModalViewControllerAnimated:YES];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self dismissModalViewControllerAnimated:YES];
+    });
 
     HUDEventManager::getInstance()->notify(HUDEvent(HUDEvent::kMailSent));
 }
