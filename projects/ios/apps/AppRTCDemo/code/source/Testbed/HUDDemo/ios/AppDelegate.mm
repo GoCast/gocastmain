@@ -1,6 +1,8 @@
 #import "AppDelegate.h"
 #import "ViewController.h"
 
+#include <string>
+
 #include "Base/package.h"
 
 #include "HUDEvent.h"
@@ -129,7 +131,10 @@ AppDelegate* gAppDelegateInstance = NULL;
 
 -(void)setMakeNewGroupScreenVisible:(bool)newVisible
 {
-    [self.viewController.mMakeNewGroupView setHidden:(newVisible) ? NO : YES];
+    if (newVisible)
+    {
+        tConfirm("Do you want to make a new group?");
+    }
 }
 
 -(void)setEditGroupScreenVisible:(bool)newVisible

@@ -90,6 +90,8 @@ void HUDDemo::addMemberScreenExit()
 void HUDDemo::makeNewGroupScreenEntry()
 {
     [gAppDelegateInstance setMakeNewGroupScreenVisible:true];
+
+    process(kYes);
 }
 
 void HUDDemo::makeNewGroupScreenExit()
