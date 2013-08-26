@@ -28,12 +28,19 @@
                     req.setRequestHeader('Content-Type', 'application/json');
                     req.send(body);
                 }, showStream = function(stream, type, id) {
-                    var div = doc.createElement('div');
-
-                    div.setAttribute('style', 'width: 320px; height: 240px;');
-                    div.setAttribute('id', type + (id||''));
-                    doc.body.appendChild(div);
-                    stream.show(type + (id||''));
+                    if ('remote' === type) {
+                        var div = doc.createElement('div');
+                        div.setAttribute('style', 'width: 320px; height: 240px;');
+                        div.setAttribute('id', type + (id||''));
+                        doc.body.appendChild(div);
+                        
+                        var v = doc.createElement('video');
+                        v.src = webkitURL.createObjectURL(stream.stream);
+                        v.autoplay = 'autoplay';
+                        v.width = 320;
+                        v.height = 240;
+                        div.appendChild(v);
+                    }
                 }, stopShowingStream = function(stream) {
                     if (undefined !== stream.elementID) {
                         doc.body.removeChild(doc.getElementById(stream.elementID));
@@ -41,6 +48,7 @@
                 };
 
             localstream.addEventListener('access-accepted', function() {
+                console.log('Local Stream: ', localstream);
                 // After obtaining permission to access local media from the browser,
                 // request a token for your desired room or a new room
                 console.log('Requesting token to enter room...');
@@ -89,6 +97,9 @@
                                 console.log('room.added(): Subscribing to added remote stream: ',
                                             e.stream.getID());
                                 room.subscribe(e.stream);
+                            } else {
+                                localstream.stream.getVideoTracks()[0].enabled = false;
+                                console.log('ENABLED: ', localstream.stream.getVideoTracks()[0].enabled);
                             }
                         });
 
