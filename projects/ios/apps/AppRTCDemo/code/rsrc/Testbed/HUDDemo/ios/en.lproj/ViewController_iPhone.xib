@@ -60,7 +60,7 @@
 					</object>
 					<object class="IBUIView" id="236994757">
 						<reference key="NSNextResponder" ref="184854543"/>
-						<int key="NSvFlags">292</int>
+						<int key="NSvFlags">-2147483356</int>
 						<array class="NSMutableArray" key="NSSubviews">
 							<object class="IBUILabel" id="760246774">
 								<reference key="NSNextResponder" ref="236994757"/>
@@ -1171,7 +1171,6 @@
 								<string key="NSFrame">{{20, 402}, {280, 44}}</string>
 								<reference key="NSSuperview" ref="818689446"/>
 								<reference key="NSWindow"/>
-								<reference key="NSNextKeyView"/>
 								<string key="NSReuseIdentifierKey">_NS:9</string>
 								<bool key="IBUIOpaque">NO</bool>
 								<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
@@ -1375,6 +1374,54 @@
 					<int key="connectionID">104</int>
 				</object>
 				<object class="IBConnectionRecord">
+					<object class="IBCocoaTouchOutletConnection" key="connection">
+						<string key="label">mGroupTable</string>
+						<reference key="source" ref="841351856"/>
+						<reference key="destination" ref="108278939"/>
+					</object>
+					<int key="connectionID">112</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBCocoaTouchOutletConnection" key="connection">
+						<string key="label">mMemberTable</string>
+						<reference key="source" ref="841351856"/>
+						<reference key="destination" ref="799029659"/>
+					</object>
+					<int key="connectionID">113</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBCocoaTouchOutletConnection" key="connection">
+						<string key="label">mInCallTable</string>
+						<reference key="source" ref="841351856"/>
+						<reference key="destination" ref="277428169"/>
+					</object>
+					<int key="connectionID">116</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBCocoaTouchOutletConnection" key="connection">
+						<string key="label">mEditMembersTable</string>
+						<reference key="source" ref="841351856"/>
+						<reference key="destination" ref="965046425"/>
+					</object>
+					<int key="connectionID">119</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBCocoaTouchOutletConnection" key="connection">
+						<string key="label">mCallerTable</string>
+						<reference key="source" ref="841351856"/>
+						<reference key="destination" ref="80484584"/>
+					</object>
+					<int key="connectionID">122</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBCocoaTouchOutletConnection" key="connection">
+						<string key="label">mRecipientsTable</string>
+						<reference key="source" ref="841351856"/>
+						<reference key="destination" ref="318280335"/>
+					</object>
+					<int key="connectionID">125</int>
+				</object>
+				<object class="IBConnectionRecord">
 					<object class="IBCocoaTouchEventConnection" key="connection">
 						<string key="label">signInPressed:</string>
 						<reference key="source" ref="994397625"/>
@@ -1409,6 +1456,38 @@
 					<int key="connectionID">107</int>
 				</object>
 				<object class="IBConnectionRecord">
+					<object class="IBCocoaTouchOutletConnection" key="connection">
+						<string key="label">dataSource</string>
+						<reference key="source" ref="108278939"/>
+						<reference key="destination" ref="841351856"/>
+					</object>
+					<int key="connectionID">110</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBCocoaTouchOutletConnection" key="connection">
+						<string key="label">delegate</string>
+						<reference key="source" ref="108278939"/>
+						<reference key="destination" ref="841351856"/>
+					</object>
+					<int key="connectionID">111</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBCocoaTouchOutletConnection" key="connection">
+						<string key="label">dataSource</string>
+						<reference key="source" ref="799029659"/>
+						<reference key="destination" ref="841351856"/>
+					</object>
+					<int key="connectionID">108</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBCocoaTouchOutletConnection" key="connection">
+						<string key="label">delegate</string>
+						<reference key="source" ref="799029659"/>
+						<reference key="destination" ref="841351856"/>
+					</object>
+					<int key="connectionID">109</int>
+				</object>
+				<object class="IBConnectionRecord">
 					<object class="IBCocoaTouchEventConnection" key="connection">
 						<string key="label">callPressed:</string>
 						<reference key="source" ref="363540863"/>
@@ -1434,6 +1513,22 @@
 						<int key="IBEventType">7</int>
 					</object>
 					<int key="connectionID">89</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBCocoaTouchOutletConnection" key="connection">
+						<string key="label">dataSource</string>
+						<reference key="source" ref="277428169"/>
+						<reference key="destination" ref="841351856"/>
+					</object>
+					<int key="connectionID">114</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBCocoaTouchOutletConnection" key="connection">
+						<string key="label">delegate</string>
+						<reference key="source" ref="277428169"/>
+						<reference key="destination" ref="841351856"/>
+					</object>
+					<int key="connectionID">115</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBCocoaTouchEventConnection" key="connection">
@@ -1526,6 +1621,22 @@
 					<int key="connectionID">98</int>
 				</object>
 				<object class="IBConnectionRecord">
+					<object class="IBCocoaTouchOutletConnection" key="connection">
+						<string key="label">dataSource</string>
+						<reference key="source" ref="965046425"/>
+						<reference key="destination" ref="841351856"/>
+					</object>
+					<int key="connectionID">117</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBCocoaTouchOutletConnection" key="connection">
+						<string key="label">delegate</string>
+						<reference key="source" ref="965046425"/>
+						<reference key="destination" ref="841351856"/>
+					</object>
+					<int key="connectionID">118</int>
+				</object>
+				<object class="IBConnectionRecord">
 					<object class="IBCocoaTouchEventConnection" key="connection">
 						<string key="label">speakerPressed:</string>
 						<reference key="source" ref="1064615614"/>
@@ -1542,6 +1653,38 @@
 						<int key="IBEventType">7</int>
 					</object>
 					<int key="connectionID">100</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBCocoaTouchOutletConnection" key="connection">
+						<string key="label">dataSource</string>
+						<reference key="source" ref="80484584"/>
+						<reference key="destination" ref="841351856"/>
+					</object>
+					<int key="connectionID">120</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBCocoaTouchOutletConnection" key="connection">
+						<string key="label">delegate</string>
+						<reference key="source" ref="80484584"/>
+						<reference key="destination" ref="841351856"/>
+					</object>
+					<int key="connectionID">121</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBCocoaTouchOutletConnection" key="connection">
+						<string key="label">dataSource</string>
+						<reference key="source" ref="318280335"/>
+						<reference key="destination" ref="841351856"/>
+					</object>
+					<int key="connectionID">123</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBCocoaTouchOutletConnection" key="connection">
+						<string key="label">delegate</string>
+						<reference key="source" ref="318280335"/>
+						<reference key="destination" ref="841351856"/>
+					</object>
+					<int key="connectionID">124</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBCocoaTouchEventConnection" key="connection">
@@ -1679,11 +1822,13 @@
 						<int key="objectID">18</int>
 						<reference key="object" ref="108278939"/>
 						<reference key="parent" ref="682482738"/>
+						<string key="objectName">mGroupTable</string>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">19</int>
 						<reference key="object" ref="799029659"/>
 						<reference key="parent" ref="682482738"/>
+						<string key="objectName">mMemberTable</string>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">20</int>
@@ -1738,6 +1883,7 @@
 						<int key="objectID">32</int>
 						<reference key="object" ref="277428169"/>
 						<reference key="parent" ref="585895137"/>
+						<string key="objectName">mInCallTable</string>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">33</int>
@@ -1913,6 +2059,7 @@
 						<int key="objectID">67</int>
 						<reference key="object" ref="965046425"/>
 						<reference key="parent" ref="54447643"/>
+						<string key="objectName">mEditMembersTable</string>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">68</int>
@@ -1946,11 +2093,13 @@
 						<int key="objectID">76</int>
 						<reference key="object" ref="318280335"/>
 						<reference key="parent" ref="818689446"/>
+						<string key="objectName">mRecipientsTable</string>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">75</int>
 						<reference key="object" ref="80484584"/>
 						<reference key="parent" ref="818689446"/>
+						<string key="objectName">mCallerTable</string>
 					</object>
 				</array>
 			</object>
@@ -2028,7 +2177,7 @@
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">107</int>
+			<int key="maxID">125</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -2132,15 +2281,21 @@
 					<dictionary class="NSMutableDictionary" key="outlets">
 						<string key="mActiveModeView">UIView</string>
 						<string key="mAddMemberView">UIView</string>
+						<string key="mCallerTable">UITableView</string>
 						<string key="mEditGroupView">UIView</string>
+						<string key="mEditMembersTable">UITableView</string>
 						<string key="mGroupMemberView">UIView</string>
+						<string key="mGroupTable">UITableView</string>
+						<string key="mInCallTable">UITableView</string>
 						<string key="mInCallView">UIView</string>
 						<string key="mLiveRecordView">UIView</string>
 						<string key="mLoginEmail">UITextField</string>
 						<string key="mLoginPassword">UITextField</string>
 						<string key="mLoginView">UIView</string>
 						<string key="mMakeNewGroupView">UIView</string>
+						<string key="mMemberTable">UITableView</string>
 						<string key="mPlaybackEmailView">UIView</string>
+						<string key="mRecipientsTable">UITableView</string>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
 						<object class="IBToOneOutletInfo" key="mActiveModeView">
@@ -2151,13 +2306,29 @@
 							<string key="name">mAddMemberView</string>
 							<string key="candidateClassName">UIView</string>
 						</object>
+						<object class="IBToOneOutletInfo" key="mCallerTable">
+							<string key="name">mCallerTable</string>
+							<string key="candidateClassName">UITableView</string>
+						</object>
 						<object class="IBToOneOutletInfo" key="mEditGroupView">
 							<string key="name">mEditGroupView</string>
 							<string key="candidateClassName">UIView</string>
 						</object>
+						<object class="IBToOneOutletInfo" key="mEditMembersTable">
+							<string key="name">mEditMembersTable</string>
+							<string key="candidateClassName">UITableView</string>
+						</object>
 						<object class="IBToOneOutletInfo" key="mGroupMemberView">
 							<string key="name">mGroupMemberView</string>
 							<string key="candidateClassName">UIView</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="mGroupTable">
+							<string key="name">mGroupTable</string>
+							<string key="candidateClassName">UITableView</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="mInCallTable">
+							<string key="name">mInCallTable</string>
+							<string key="candidateClassName">UITableView</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="mInCallView">
 							<string key="name">mInCallView</string>
@@ -2183,9 +2354,17 @@
 							<string key="name">mMakeNewGroupView</string>
 							<string key="candidateClassName">UIView</string>
 						</object>
+						<object class="IBToOneOutletInfo" key="mMemberTable">
+							<string key="name">mMemberTable</string>
+							<string key="candidateClassName">UITableView</string>
+						</object>
 						<object class="IBToOneOutletInfo" key="mPlaybackEmailView">
 							<string key="name">mPlaybackEmailView</string>
 							<string key="candidateClassName">UIView</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="mRecipientsTable">
+							<string key="name">mRecipientsTable</string>
+							<string key="candidateClassName">UITableView</string>
 						</object>
 					</dictionary>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">

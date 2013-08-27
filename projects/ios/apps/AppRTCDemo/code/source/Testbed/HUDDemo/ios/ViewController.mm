@@ -230,5 +230,59 @@
     return NO;
 }
 
+-(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+#pragma unused(tableView, section)
+    return (NSInteger)5;
+}
+
+- (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
+{
+#pragma unused(tableView)
+    if (indexPath.row % 2)
+    {
+        [cell setBackgroundColor:[UIColor colorWithRed:.8f green:.8f blue:1 alpha:1]];
+    }
+    else
+    {
+        [cell setBackgroundColor:[UIColor whiteColor]];
+    }
+}
+
+-(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    const char* names[5] =
+    {
+        "Yoji Izaki",
+        "Shinzo Abe",
+        "Barack Obama",
+        "TJ Grant",
+        "Manjesh Mallavali",
+    };
+#pragma unused(indexPath)
+
+    tableView.backgroundView = nil;
+
+    static NSString *simpleTableIdentifier = @"EmotiMETableItem";
+
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:simpleTableIdentifier];
+
+    if (cell == nil)
+    {
+        cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:simpleTableIdentifier] autorelease];
+    }
+
+    cell.textLabel.text = [NSString stringWithUTF8String:names[indexPath.row]];
+
+    cell.imageView.image = nil;
+
+    return cell;
+}
+
+-(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+#pragma unused(tableView, indexPath)
+//    JSEventManager::getInstance()->notify(JSEvent(JSEvent::kLibraryRowSelected, indexPath.row + 1));
+}
 
 @end

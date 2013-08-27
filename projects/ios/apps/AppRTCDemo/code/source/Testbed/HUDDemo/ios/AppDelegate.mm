@@ -163,6 +163,7 @@ AppDelegate* gAppDelegateInstance = NULL;
             "Duration 12 min 30 sec\n\n"
             "Sent via GoCast Talk http://gocast.it/talk/";
             [mailer setMessageBody:emailBody isHTML:NO];
+//            [self.viewController presentViewController:mailer animated:YES completion:nil];
             [self.viewController presentModalViewController:mailer animated:YES];
             [mailer release];
         }

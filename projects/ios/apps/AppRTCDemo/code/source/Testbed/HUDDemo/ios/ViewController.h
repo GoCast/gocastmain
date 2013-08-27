@@ -1,7 +1,7 @@
 #import <UIKit/UIKit.h>
 #import <MessageUI/MessageUI.h>
 
-@interface ViewController : UIViewController <MFMailComposeViewControllerDelegate, UITextFieldDelegate>
+@interface ViewController : UIViewController <MFMailComposeViewControllerDelegate, UITextFieldDelegate, UITableViewDelegate, UITableViewDataSource>
 {
 }
 
@@ -17,6 +17,13 @@
 
 @property (nonatomic, strong) IBOutlet UITextField* mLoginEmail;
 @property (nonatomic, strong) IBOutlet UITextField* mLoginPassword;
+
+@property (nonatomic, strong) IBOutlet UITableView* mGroupTable;
+@property (nonatomic, strong) IBOutlet UITableView* mMemberTable;
+@property (nonatomic, strong) IBOutlet UITableView* mInCallTable;
+@property (nonatomic, strong) IBOutlet UITableView* mEditMembersTable;
+@property (nonatomic, strong) IBOutlet UITableView* mCallerTable;
+@property (nonatomic, strong) IBOutlet UITableView* mRecipientsTable;
 
 -(IBAction) signInPressed:(id)sender;
 -(IBAction) registerPressed:(id)sender;
@@ -44,5 +51,9 @@
 - (void)mailComposeController:(MFMailComposeViewController *)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError *)error;
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField;
+
+-(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section;
+-(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath;
+-(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath;
 
 @end
