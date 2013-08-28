@@ -48,7 +48,7 @@
 
 				'xcode_settings': {
 					'CODE_SIGN_IDENTITY': 'iPhone Distribution: TERENCE JORDAN GRANT',
-					'PROVISIONING_PROFILE': '759FDBAD-BDA8-4D82-98C2-01F5F721F5BF',
+					'PROVISIONING_PROFILE': 'A041E3CD-DDFC-4E55-B388-DFB52DA642EB',
 
 					'COPY_PHASE_STRIP': 'YES',
 					'DEPLOYMENT_POSTPROCESSING': 'YES',
@@ -136,6 +136,16 @@
 					'GCC_WARN_UNUSED_FUNCTION': 'YES',
 					'GCC_WARN_UNUSED_LABEL': 'YES',
 					'GCC_WARN_UNUSED_PARAMETER': 'YES',
+
+					'OTHER_LDFLAGS': [
+						'-weak_framework CoreFoundation',
+						'-weak_framework UIKit',
+						'-weak_framework AVFoundation',
+						'-weak_framework CoreMedia',
+						'-weak-lSystem',
+						'-all_load',
+						'-Obj-C',
+					],
 
 					'WARNING_CFLAGS': [
 						'-Wall',

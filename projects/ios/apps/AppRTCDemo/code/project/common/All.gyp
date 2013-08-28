@@ -10,6 +10,7 @@
 
     				'dependencies': [
     					'AppRTCDemo.gyp:*',
+    					'AudioDemo.gyp:*',
     					'HUDDemo.gyp:*',
     				], # dependencies
 
