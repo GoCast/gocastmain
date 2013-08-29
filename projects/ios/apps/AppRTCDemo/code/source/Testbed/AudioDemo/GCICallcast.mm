@@ -16,6 +16,7 @@
 {
 #pragma unused(command)
     HUDEventManager::getInstance()->tSubject<const HUDEvent&>::notify(HUDEvent(HUDEvent::kWebViewLoaded));
+    NSLog(@"Sending HUDEvent::kWebViewLoaded");
 }
 
 @end
