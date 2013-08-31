@@ -263,7 +263,7 @@
 
     tableView.backgroundView = nil;
 
-    static NSString *simpleTableIdentifier = @"EmotiMETableItem";
+    static NSString *simpleTableIdentifier = @"HUDDemoTableItem";
 
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:simpleTableIdentifier];
 

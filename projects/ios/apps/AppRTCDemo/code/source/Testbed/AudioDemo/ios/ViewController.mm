@@ -12,20 +12,11 @@
 
 #include "AudioDemo.h"
 
-const tColor4b      kBlack  (0,0,0,255);
-const tColor4b      kRed    (255,0,0,255);
-const tColor4b      kBlue   (0,0,255,255);
-const tColor4b      kOrange (255,165,0,255);
-const tColor4b      kWhite  (255,255,255,255);
-
 extern AudioDemo gAudioDemo;
 
 UIWebView* gWebViewInstance = NULL;
 
 @implementation MainViewController
-
-@synthesize mColors             = _colors;
-@synthesize mSelectedColorIndex = _selectedColorIndex;
 
 - (id)initWithNibName:(NSString*)nibNameOrNil bundle:(NSBundle*)nibBundleOrNil
 {
@@ -65,26 +56,6 @@ UIWebView* gWebViewInstance = NULL;
 {
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
-
-    self.mColors = [NSArray arrayWithObjects:@"Blue", @"Orange", @"Black", @"Red", @"Eraser", nil];
-
-    self.mSwipeLeftGesture = [[UISwipeGestureRecognizer alloc]
-                              initWithTarget:self
-                              action:@selector(handleSwipeLeft:)];
-    self.mSwipeLeftGesture.direction = UISwipeGestureRecognizerDirectionLeft;
-
-    self.mSwipeRightGesture = [[UISwipeGestureRecognizer alloc]
-                               initWithTarget:self
-                               action:@selector(handleSwipeRight:)];
-    self.mSwipeRightGesture.direction = UISwipeGestureRecognizerDirectionRight;
-
-    [self.mSwipeLeftGesture setDelegate:self];
-    [self.mSwipeRightGesture setDelegate:self];
-    [self.mWhiteboardSpotView addGestureRecognizer:self.mSwipeLeftGesture];
-    [self.mWhiteboardSpotView addGestureRecognizer:self.mSwipeRightGesture];
-
-    [self.mAnimateInSpot setHidden:YES];
-    [self.mAnimateOutSpot setHidden:YES];
 }
 
 - (void)viewDidUnload
@@ -186,6 +157,83 @@ UIWebView* gWebViewInstance = NULL;
 {
 #pragma unused(sender)
     exit(0);
+}
+
+-(IBAction)buttonPressed:(id)sender
+{
+    [self.mScreenName resignFirstResponder];
+    [self.mRoomName resignFirstResponder];
+
+    if (sender == self.mScreenNameGo)
+    {
+        HUDEventManager::getInstance()->notify(HUDEvent(HUDEvent::kScreenNameGoPressed));
+    }
+    else if (sender == self.mRoomNameGo)
+    {
+        HUDEventManager::getInstance()->notify(HUDEvent(HUDEvent::kRoomNameGoPressed));
+    }
+}
+
+- (BOOL)textFieldShouldReturn:(UITextField *)textField
+{
+    [textField resignFirstResponder];
+
+    return NO;
+}
+
+-(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+#pragma unused(tableView, section)
+    return (NSInteger)5;
+}
+
+- (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
+{
+#pragma unused(tableView)
+    if (indexPath.row % 2)
+    {
+        [cell setBackgroundColor:[UIColor colorWithRed:.8f green:.8f blue:1 alpha:1]];
+    }
+    else
+    {
+        [cell setBackgroundColor:[UIColor whiteColor]];
+    }
+}
+
+-(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    const char* names[5] =
+    {
+        "Yoji Izaki",
+        "Shinzo Abe",
+        "Barack Obama",
+        "TJ Grant",
+        "Manjesh Mallavali",
+    };
+#pragma unused(indexPath)
+
+    tableView.backgroundView = nil;
+
+    static NSString *simpleTableIdentifier = @"AudioDemoTableItem";
+
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:simpleTableIdentifier];
+
+    if (cell == nil)
+    {
+        cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:simpleTableIdentifier] autorelease];
+    }
+
+    cell.textLabel.text = [NSString stringWithUTF8String:names[indexPath.row]];
+
+    cell.imageView.image = nil;
+
+    return cell;
+}
+
+-(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+#pragma unused(tableView, indexPath)
+    //    JSEventManager::getInstance()->notify(JSEvent(JSEvent::kLibraryRowSelected, indexPath.row + 1));
 }
 
 @end

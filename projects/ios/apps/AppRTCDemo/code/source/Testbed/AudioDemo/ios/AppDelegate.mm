@@ -137,12 +137,12 @@ AppDelegate* gAppDelegateInstance = NULL;
 
 -(void)showWebLoadingView
 {
-    [self.viewController.mWebLoadingView setHidden:NO];
+//    [self.viewController.mWebLoadingView setHidden:NO];
 }
 
 -(void)hideWebLoadingView
 {
-    [self.viewController.mWebLoadingView setHidden:YES];
+//    [self.viewController.mWebLoadingView setHidden:YES];
 }
 
 #pragma mark -

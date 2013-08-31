@@ -3,33 +3,26 @@
 
 #import <Cordova/CDVViewController.h>
 
-@interface MainViewController : CDVViewController <UIGestureRecognizerDelegate>
+@interface MainViewController : CDVViewController <UIGestureRecognizerDelegate, UITextFieldDelegate, UITableViewDelegate, UITableViewDataSource>
 {
 }
-@property (nonatomic, strong) IBOutlet UIView* mWebLoadingView;
-@property (nonatomic, strong) IBOutlet UIView* mLoginView;
-@property (nonatomic, strong) IBOutlet UIView* mLoggingInView;
-@property (nonatomic, strong) IBOutlet UIView* mNicknameInUseView;
-@property (nonatomic, strong) IBOutlet UIView* mBlankSpotView;
-@property (nonatomic, strong) IBOutlet UIView* mWhiteboardSpotView;
-@property (nonatomic, strong) IBOutlet UIView* mNetworkErrorView;
+@property (nonatomic, strong) IBOutlet UILabel* mScreenNameLabel;
+@property (nonatomic, strong) IBOutlet UITextField* mScreenName;
+@property (nonatomic, strong) IBOutlet UIButton* mScreenNameGo;
 
-@property (nonatomic, strong) IBOutlet UITextField* mNickname;
-@property (nonatomic, strong) IBOutlet UITextField* mRoomname;
+@property (nonatomic, strong) IBOutlet UITextField* mRoomName;
+@property (nonatomic, strong) IBOutlet UIButton* mRoomNameGo;
 
-@property (nonatomic, strong) IBOutlet UILabel* mWhiteboardSpotLabel;
-@property (nonatomic, strong) IBOutlet UIImageView* mLeftSpot;
-@property (nonatomic, strong) IBOutlet UIImageView* mRightSpot;
-@property (nonatomic, strong) IBOutlet UIImageView* mAnimateInSpot;
-@property (nonatomic, strong) IBOutlet UIImageView* mAnimateOutSpot;
-@property (nonatomic, strong) IBOutlet UIButton* mColorButton;
-
-@property (nonatomic, retain) NSArray *mColors;
-@property (nonatomic, assign) NSInteger mSelectedColorIndex;
-
-@property (nonatomic, retain) UISwipeGestureRecognizer* mSwipeLeftGesture;
-@property (nonatomic, retain) UISwipeGestureRecognizer* mSwipeRightGesture;
+@property (nonatomic, strong) IBOutlet UITableView* mUserTable;
 
 -(IBAction)quitPressed:(id)sender;
+
+-(IBAction)buttonPressed:(id)sender;
+
+- (BOOL)textFieldShouldReturn:(UITextField *)textField;
+
+-(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section;
+-(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath;
+-(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath;
 
 @end
