@@ -10,8 +10,7 @@ public:
         kWebViewLoaded,
         kReadyState,
 
-        kScreenNameGoPressed,
-        kRoomNameGoPressed,
+        kGoPressed,
     };
 
     EventType   mEvent;

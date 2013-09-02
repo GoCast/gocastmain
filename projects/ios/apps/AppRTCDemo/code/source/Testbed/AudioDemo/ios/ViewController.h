@@ -8,7 +8,6 @@
 }
 @property (nonatomic, strong) IBOutlet UILabel* mScreenNameLabel;
 @property (nonatomic, strong) IBOutlet UITextField* mScreenName;
-@property (nonatomic, strong) IBOutlet UIButton* mScreenNameGo;
 
 @property (nonatomic, strong) IBOutlet UITextField* mRoomName;
 @property (nonatomic, strong) IBOutlet UIButton* mRoomNameGo;

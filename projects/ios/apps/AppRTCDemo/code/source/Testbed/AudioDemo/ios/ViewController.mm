@@ -164,13 +164,9 @@ UIWebView* gWebViewInstance = NULL;
     [self.mScreenName resignFirstResponder];
     [self.mRoomName resignFirstResponder];
 
-    if (sender == self.mScreenNameGo)
+    if (sender == self.mRoomNameGo)
     {
-        HUDEventManager::getInstance()->notify(HUDEvent(HUDEvent::kScreenNameGoPressed));
-    }
-    else if (sender == self.mRoomNameGo)
-    {
-        HUDEventManager::getInstance()->notify(HUDEvent(HUDEvent::kRoomNameGoPressed));
+        HUDEventManager::getInstance()->notify(HUDEvent(HUDEvent::kGoPressed));
     }
 }
 
