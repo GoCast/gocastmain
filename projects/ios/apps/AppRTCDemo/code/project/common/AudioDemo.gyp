@@ -57,6 +57,8 @@
 			'../../source/Base/<@(OS)',
 			'../../source/Bootstrap/<@(OS)',
 			'../../third-party/CordovaLib/include',
+			'../../third-party/webrtc/include/objc',
+			'../../third-party/webrtc/include/objc/public',
 		],  # include_dirs
 
 		'xcode_settings': {
@@ -112,6 +114,46 @@
 					'../../third-party/CordovaLib/include/Cordova/NSDictionary+Extensions.h',
 					'../../third-party/CordovaLib/include/Cordova/NSMutableArray+QueueAdditions.h',
 					'../../third-party/CordovaLib/include/Cordova/UIDevice+Extensions.h',
+
+					'../../third-party/webrtc/include/objc/RTCAudioTrack+Internal.h',
+					'../../third-party/webrtc/include/objc/RTCEnumConverter.h',
+					'../../third-party/webrtc/include/objc/RTCICECandidate+Internal.h',
+					'../../third-party/webrtc/include/objc/RTCICEServer+Internal.h',
+					'../../third-party/webrtc/include/objc/RTCMediaConstraints+Internal.h',
+					'../../third-party/webrtc/include/objc/RTCMediaConstraintsNative.h',
+					'../../third-party/webrtc/include/objc/RTCMediaSource+Internal.h',
+					'../../third-party/webrtc/include/objc/RTCMediaStream+Internal.h',
+					'../../third-party/webrtc/include/objc/RTCMediaStreamTrack+Internal.h',
+					'../../third-party/webrtc/include/objc/RTCPeerConnection+Internal.h',
+					'../../third-party/webrtc/include/objc/RTCPeerConnectionObserver.h',
+					'../../third-party/webrtc/include/objc/RTCSessionDescription+Internal.h',
+					'../../third-party/webrtc/include/objc/RTCVideoCapturer+Internal.h',
+					'../../third-party/webrtc/include/objc/RTCVideoRenderer+Internal.h',
+					'../../third-party/webrtc/include/objc/RTCVideoSource+Internal.h',
+					'../../third-party/webrtc/include/objc/RTCVideoTrack+Internal.h',
+
+					'../../third-party/webrtc/include/objc/public/RTCAudioSource.h',
+					'../../third-party/webrtc/include/objc/public/RTCAudioTrack.h',
+					'../../third-party/webrtc/include/objc/public/RTCI420Frame.h',
+					'../../third-party/webrtc/include/objc/public/RTCICECandidate.h',
+					'../../third-party/webrtc/include/objc/public/RTCICEServer.h',
+					'../../third-party/webrtc/include/objc/public/RTCMediaConstraints.h',
+					'../../third-party/webrtc/include/objc/public/RTCMediaSource.h',
+					'../../third-party/webrtc/include/objc/public/RTCMediaStream.h',
+					'../../third-party/webrtc/include/objc/public/RTCMediaStreamTrack.h',
+					'../../third-party/webrtc/include/objc/public/RTCPair.h',
+					'../../third-party/webrtc/include/objc/public/RTCPeerConnection.h',
+					'../../third-party/webrtc/include/objc/public/RTCPeerConnectionDelegate.h',
+					'../../third-party/webrtc/include/objc/public/RTCPeerConnectionFactory.h',
+					'../../third-party/webrtc/include/objc/public/RTCSessionDescription.h',
+					'../../third-party/webrtc/include/objc/public/RTCSessionDescriptonDelegate.h',
+					'../../third-party/webrtc/include/objc/public/RTCTypes.h',
+					'../../third-party/webrtc/include/objc/public/RTCVideoCapturer.h',
+					'../../third-party/webrtc/include/objc/public/RTCVideoRenderer.h',
+					'../../third-party/webrtc/include/objc/public/RTCVideoRendererDelegate.h',
+					'../../third-party/webrtc/include/objc/public/RTCVideoSource.h',
+					'../../third-party/webrtc/include/objc/public/RTCVideoTrack.h',
+
 				],	# sources
 
 				'mac_bundle_resources': [
