@@ -17,6 +17,27 @@
     <script type="text/javascript" src="js/client.js"></script>
 
 	<script>
-		ManjeshClient(document, window.location.pathname, window.location.href.split('?')[1] || '', Erizo);
+		var ua = navigator.userAgent.toLowerCase(); 
+
+		if (ua.indexOf('safari') != -1)
+		{ 
+			if(ua.indexOf('chrome')  > -1)
+			{
+				alert("Chrome browser");
+				console.log("Chrome browser");
+
+				ManjeshClient(document, window.location.pathname, window.location.href.split('?')[1] || '', Erizo);
+			}
+			else
+			{
+				alert("Safari browser");
+				console.log("Safari browser");
+			}
+		}
+		else
+		{
+			alert("Unknown browser");
+			console.log("Unknown browser");
+		}
 	</script>
 </html>
