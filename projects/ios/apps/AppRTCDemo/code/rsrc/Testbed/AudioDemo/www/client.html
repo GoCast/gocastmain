@@ -19,7 +19,7 @@
 	<script>
 		var ua = navigator.userAgent.toLowerCase(); 
 
-		if (ua.indexOf('safari') != -1)
+		if (ua.indexOf('safari') != -1 || navigator.userAgent.match(/(iPad|iPhone|iPod)/g))
 		{ 
 			if(ua.indexOf('chrome')  > -1)
 			{
