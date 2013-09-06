@@ -6031,7 +6031,24 @@ window.cordova = require('cordova');
     if (typeof navigator != 'undefined') {
         var CordovaNavigator = function () {};
         CordovaNavigator.prototype = navigator;
-        navigator = new CordovaNavigator();
+
+        CordovaNavigator.getUserMedia = function( constraints, successCallback, errorCallback )
+        {
+            var navigator = CordovaNavigator.prototype;
+            if (navigator.getUserMedia) return navigator.getUserMedia(constraints, successCallback, errorCallback );
+            if (navigator.webkitGetUserMedia) return navigator.webkitGetUserMedia(constraints, successCallback, errorCallback );
+            return undefined;
+        }
+
+        CordovaNavigator.webkitGetUserMedia = function( constraints, successCallback, errorCallback )
+        {
+            var navigator = CordovaNavigator.prototype;
+            if (navigator.getUserMedia) return navigator.getUserMedia(constraints, successCallback, errorCallback );
+            if (navigator.webkitGetUserMedia) return navigator.webkitGetUserMedia(constraints, successCallback, errorCallback );
+            return undefined;
+        }
+
+		navigator = new CordovaNavigator();
     }
 
     var channel = require("cordova/channel"),

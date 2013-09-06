@@ -1684,9 +1684,16 @@ Erizo.Connection = function(d) {
 Erizo.GetUserMedia = function(d, a, c) {
 	if ("undefined" !== typeof module && module.exports) L.Logger.error("Video/audio streams not supported in erizofc yet");
 	else try {
-		navigator.webkitGetUserMedia("audio, video", a, c), console.log("GetUserMedia BOWSER")
+		navigator.webkitGetUserMedia.call(Object.getPrototypeOf(navigator), "audio, video", a, c), console.log("GetUserMedia BOWSER")
 	} catch (b) {
-		navigator.webkitGetUserMedia(d, a, c), console.log("GetUserMedia CHROME", d)
+		try
+		{
+			navigator.webkitGetUserMedia.call(Object.getPrototypeOf(navigator), d, a, c), console.log("GetUserMedia CHROME", d);
+		}
+		catch(b)
+		{
+			console.log('TJG: navigator.webkitGetUserMedia failed.');
+		}
 	}
 };
 Erizo = Erizo || {};
