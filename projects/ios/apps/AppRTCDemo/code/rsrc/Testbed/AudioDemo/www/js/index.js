@@ -35,7 +35,9 @@ var app2 = {
     onDeviceReady: function() {
         app2.receivedEvent('deviceready');
 
+		console.log("Before webViewLoaded");
         cordova.exec(function(winParam) {}, function(error) {}, "GCICallcast", "webViewLoaded", [ "" ]);
+		console.log("After webViewLoaded");
 
 //        cordova.exec(function(winParam) {}, function(error) {}, "GCIWhiteboard",
 //                     "echo", ["firstArgument", "secondArgument", 42,

@@ -1,27 +1,52 @@
+<!DOCTYPE html>
 <html>
     <head>
-        <title>test-rwolff</title>
+        <title>Licode Test Client</title>
+	<link rel="stylesheet" type="text/css" href="css/client.css">
 
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="format-detection" content="telephone=no" />
         <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
-        <script type="text/javascript" src="cordova-2.2.0.js"></script>
         <script type="text/javascript" src="js/index.js"></script>
+		<script type="text/javascript" src="js/ChromeStableStack.js"></script>
+		<script type="text/javascript" src="js/ChromeCanaryStack.js"></script>
+		<script type="text/javascript" src="js/iOSGoCastTalkStack.js"></script>
+		<script type="text/javascript" src="js/erizo.js"></script>
+		<script type="text/javascript" src="js/client.js"></script>
     </head>
     <body bgcolor=#cccccc>
-
-        Login
-        <div class="app">
-            <h1>Apache Cordova</h1>
-            <div id="deviceready" class="blink">
-                <p class="event listening">Connecting to Device</p>
-                <p class="event received">Device is Ready</p>
-            </div>
+        <h4 class="participant" style="display: none;"></h4>
+        <div class="screen">
+            <h3 class="header">Licode Demo Client</h3>
         </div>
-        <script type="text/javascript">
-            app2.initialize();
-//            $(document).ready(startCallcast());
+        <script>
+		var ua = navigator.userAgent.toLowerCase(); 
+
+		if (ua.indexOf('safari') != -1 || navigator.userAgent.match(/(iPad|iPhone|iPod)/g))
+		{ 
+			if(ua.indexOf('chrome')  > -1)
+			{
+// 				alert("Chrome browser");
+				console.log("Chrome browser");
+
+				ManjeshClient(document, window.location.pathname, window.location.href.split('?')[1] || '', Erizo);
+			}
+			else
+			{
+// 				alert("Safari browser");
+				console.log("Safari browser");
+
+				document.write('<script type="text/javascript" src="cordova-2.2.0.js"><'+'/script>');
+
+				document.write('Login<div class="app"><h1>Apache Cordova</h1><div id="deviceready" class="blink"><p class="event listening">Connecting to Device</p><p class="event received">Device is Ready</p></div></div>');
+				document.write('<script type="text/javascript">app2.initialize();<'+'/script>');
+			}
+		}
+		else
+		{
+			alert("Unknown browser");
+			console.log("Unknown browser");
+		}
         </script>
     </body>
 </html>
-

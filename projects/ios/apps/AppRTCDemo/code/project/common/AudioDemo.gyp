@@ -17,6 +17,12 @@
 			'outputs': [ '../../dummy', ], # outputs
 			'action': [ '<@(_graphcode)', '<@(_inputs)',  '--force-update', '--machine', 'AudioDemo', '-h', '../../source/Testbed/AudioDemo/AudioDemo.h', '-cpp', '../../source/Testbed/AudioDemo/AudioDemo.mm', ], # action
 		},
+		{
+			'action_name': 'touch www',
+			'inputs': [ '../../rsrc/Testbed/AudioDemo/www', ], # inputs
+			'outputs': [ '../../dummy', ], # outputs
+			'action': [ '../../project/common/touch-www.sh' ], # action
+		},
 		],
 
 		'sources': [
