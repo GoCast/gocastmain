@@ -209,7 +209,7 @@
 {
 #pragma unused(controller, result, error)
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self dismissModalViewControllerAnimated:YES];
+        [self dismissViewControllerAnimated:YES completion:^{ }];
     });
 
     HUDEventManager::getInstance()->notify(HUDEvent(HUDEvent::kMailSent));

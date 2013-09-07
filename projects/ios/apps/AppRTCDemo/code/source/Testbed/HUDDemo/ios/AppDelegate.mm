@@ -164,7 +164,7 @@ AppDelegate* gAppDelegateInstance = NULL;
             "Sent via GoCast Talk http://gocast.it/talk/";
             [mailer setMessageBody:emailBody isHTML:NO];
 //            [self.viewController presentViewController:mailer animated:YES completion:nil];
-            [self.viewController presentModalViewController:mailer animated:YES];
+            [self.viewController presentViewController:mailer animated:YES completion:^{ }];
             [mailer release];
         }
     }
