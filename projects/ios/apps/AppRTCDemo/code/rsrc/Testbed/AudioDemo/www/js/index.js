@@ -1,5 +1,3 @@
-var isChrome = 0;
-
 var app2 = {
     // Application Constructor
     initialize: function() {

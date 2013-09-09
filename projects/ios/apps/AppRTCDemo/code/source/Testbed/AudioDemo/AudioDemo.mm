@@ -7,9 +7,12 @@
 #include "HUDEvent.h"
 #include "HUDEventManager.h"
 
+#include "GCIStack.h"
+
 AudioDemo gAudioDemo;
 extern AppDelegate* gAppDelegateInstance;
 extern UIWebView*   gWebViewInstance;
+extern GCIStack*    gStackInstance;
 
 #pragma mark Constructor / Destructor
 AudioDemo::AudioDemo()
@@ -25,6 +28,7 @@ AudioDemo::~AudioDemo()
 #pragma mark Start / End / Invalid
 void AudioDemo::startEntry()
 {
+    [[[GCIStack alloc] init] autorelease];
     HUDEventManager::getInstance()->attach(this);
 }
 
@@ -148,6 +152,10 @@ void AudioDemo::update(const HUDEvent& msg)
 
         case HUDEvent::kSetRoomID:
             [gAppDelegateInstance setRoomID:msg.mRoomID];
+            break;
+
+        case HUDEvent::kPCConstruct:
+            [gStackInstance pcConstruct:msg.mRTCConfig];
             break;
 
         default:

@@ -25,4 +25,48 @@
                                                                                [[command.arguments objectAtIndex:0] UTF8String]));
 }
 
+- (void) pcConstruct:(CDVInvokedUrlCommand*)command
+{
+#pragma unused(command)
+    HUDEventManager::getInstance()->tSubject<const HUDEvent&>::notify(HUDEvent(HUDEvent::kPCConstruct,
+                                                                               [[command.arguments objectAtIndex:0] UTF8String]));
+}
+
+- (void) pcAddStream:(CDVInvokedUrlCommand*)command
+{
+#pragma unused(command)
+    HUDEventManager::getInstance()->tSubject<const HUDEvent&>::notify(HUDEvent(HUDEvent::kPCAddStream));
+}
+
+- (void) pcClose:(CDVInvokedUrlCommand*)command
+{
+#pragma unused(command)
+    HUDEventManager::getInstance()->tSubject<const HUDEvent&>::notify(HUDEvent(HUDEvent::kPCClose));
+}
+
+- (void) pcCreateAnswer:(CDVInvokedUrlCommand*)command
+{
+#pragma unused(command)
+    HUDEventManager::getInstance()->tSubject<const HUDEvent&>::notify(HUDEvent(HUDEvent::kPCCreateAnswer));
+}
+
+- (void) pcCreateOffer:(CDVInvokedUrlCommand*)command
+{
+#pragma unused(command)
+    HUDEventManager::getInstance()->tSubject<const HUDEvent&>::notify(HUDEvent(HUDEvent::kPCCreateOffer));
+}
+
+- (void) pcSetLocalDescription:(CDVInvokedUrlCommand*)command
+{
+#pragma unused(command)
+    HUDEventManager::getInstance()->tSubject<const HUDEvent&>::notify(HUDEvent(HUDEvent::kPCSetLocalDescription));
+}
+
+- (void) pcSetRemoteDescription:(CDVInvokedUrlCommand*)command
+{
+#pragma unused(command)
+    HUDEventManager::getInstance()->tSubject<const HUDEvent&>::notify(HUDEvent(HUDEvent::kPCSetRemoteDescription));
+}
+
 @end
+

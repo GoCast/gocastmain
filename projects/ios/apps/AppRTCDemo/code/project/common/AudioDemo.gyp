@@ -35,6 +35,9 @@
 			'../../source/Testbed/AudioDemo/GCICallcast.mm',
 			'../../source/Testbed/AudioDemo/GCICallcast.h',
 
+			'../../source/Testbed/AudioDemo/GCIStack.mm',
+			'../../source/Testbed/AudioDemo/GCIStack.h',
+
 			'../../source/Base/package.h',
 			'../../source/Base/tAlert.h',
 			'../../source/Base/<@(OS)/tAlert.mm',

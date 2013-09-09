@@ -2,12 +2,70 @@
 
 var Erizo = Erizo || {};
 
+var GCIRTCPeerConnection = { };
+
+if (isChrome == 1)
+{
+	GCIRTCPeerConnection = webkitRTCPeerConnection;
+}
+else
+{
+	GCIRTCPeerConnection = function (pc_config)
+	{
+		cordova.exec(function(winParam) {}, function(error) {}, "GCICallcast", "pcConstruct", [ JSON.stringify(pc_config) ]);
+		console.log("ctor:'" + JSON.stringify(pc_config) + "'");
+	}
+
+	GCIRTCPeerConnection.iceGatheringState = "new";
+	GCIRTCPeerConnection.localDescription = { };
+	GCIRTCPeerConnection.localDescription.sdp = "offer";
+
+	GCIRTCPeerConnection.addStream = function( stream )
+	{
+		cordova.exec(function(winParam) {}, function(error) {}, "GCICallcast", "pcAddStream", [ JSON.stringify(stream) ]);
+		console.log("addstream:'" + stream + "'");
+	}
+	GCIRTCPeerConnection.close = function()
+	{
+		cordova.exec(function(winParam) {}, function(error) {}, "GCICallcast", "pcClose", [ "" ]);
+		console.log("close();");
+	}
+	GCIRTCPeerConnection.createAnswer = function( successCallback, errorCallback, constraints )
+	{
+		cordova.exec(function(winParam) {}, function(error) {}, "GCICallcast", "pcCreateAnswer",
+		[ JSON.stringify(successCallback), JSON.stringify(errorCallback), JSON.stringify(constraints) ]);
+		console.log("createAnswer:'" + constraints + "'");
+		successCallback();
+	}
+	GCIRTCPeerConnection.createOffer = function( successCallback, errorCallback, constraints )
+	{
+		cordova.exec(function(winParam) {}, function(error) {}, "GCICallcast", "pcCreateOffer",
+		[ JSON.stringify(successCallback), JSON.stringify(errorCallback), JSON.stringify(constraints) ]);
+		console.log("createOffer:'" + constraints + "'");
+		successCallback();
+	}
+	GCIRTCPeerConnection.setLocalDescription = function( description, successCallback, errorCallback )
+	{
+		cordova.exec(function(winParam) {}, function(error) {}, "GCICallcast", "pcSetLocalDescription",
+		[ JSON.stringify(description), JSON.stringify(successCallback), JSON.stringify(errorCallback) ]);
+		console.log("setLocalDescription:'" + constraints + "'");
+		successCallback();
+	}
+	GCIRTCPeerConnection.setRemoteDescription = function( description, successCallback, errorCallback )
+	{
+		cordova.exec(function(winParam) {}, function(error) {}, "GCICallcast", "pcSetRemoteDescription",
+		[ JSON.stringify(description), JSON.stringify(successCallback), JSON.stringify(errorCallback) ]);
+		console.log("setRemoteDescription:'" + constraints + "'");
+		successCallback();
+	}
+}
+
 Erizo.iOSGoCastTalkStack = function (spec)
 {
     "use strict";
 
     var that = {},
-        WebkitRTCPeerConnection = webkitRTCPeerConnection;
+        WebkitRTCPeerConnection = GCIRTCPeerConnection;
 
     that.pc_config = {
         "iceServers": []

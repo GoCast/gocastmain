@@ -1671,14 +1671,24 @@ Erizo.Connection = function(d) {
 	var a = {};
 	d.session_id = Erizo.sessionId += 1;
 	a.browser = "";
-	if ("undefined" !== typeof module && module.exports) L.Logger.error("Publish/subscribe video/audio streams not supported in erizofc yet"), a = Erizo.FcStack(d);
-	else if ("27" === window.navigator.appVersion.match(/Chrome\/([\w\W]*?)\./)[1] || "28" === window.navigator.appVersion.match(/Chrome\/([\w\W]*?)\./)[1]) console.log("Stable!"), a = Erizo.ChromeStableStack(d), a.browser = "chrome-stable";
-	else if ("29" === window.navigator.appVersion.match(/Chrome\/([\w\W]*?)\./)[1] || "30" === window.navigator.appVersion.match(/Chrome\/([\w\W]*?)\./)[1]) console.log("Canary!"), a = Erizo.ChromeCanaryStack(d), a.browser = "chrome-canary";
-	else if (0 <= window.navigator.userAgent.toLowerCase()
-		.indexOf("chrome")) console.log("Probably stable!"), a = Erizo.ChromeStableStack(d), a.browser = "chrome-stable";
-	else if ("25" === window.navigator.appVersion.match(/Bowser\/([\w\W]*?)\./)[1]) a.browser = "bowser";
-	else if ("25" === window.navigator.appVersion.match(/Mozilla\/([\w\W]*?)\./)[1]) a.browser = "mozilla";
-	else throw a.browser = "none", "WebRTC stack not available";
+
+	if (isChrome == 1)
+	{
+		if ("undefined" !== typeof module && module.exports) L.Logger.error("Publish/subscribe video/audio streams not supported in erizofc yet"), a = Erizo.FcStack(d);
+		else if ("27" === window.navigator.appVersion.match(/Chrome\/([\w\W]*?)\./)[1] || "28" === window.navigator.appVersion.match(/Chrome\/([\w\W]*?)\./)[1]) console.log("Stable!"), a = Erizo.ChromeStableStack(d), a.browser = "chrome-stable";
+		else if ("29" === window.navigator.appVersion.match(/Chrome\/([\w\W]*?)\./)[1] || "30" === window.navigator.appVersion.match(/Chrome\/([\w\W]*?)\./)[1]) console.log("Canary!"), a = Erizo.ChromeCanaryStack(d), a.browser = "chrome-canary";
+		else if (0 <= window.navigator.userAgent.toLowerCase()
+			.indexOf("chrome")) console.log("Probably stable!"), a = Erizo.ChromeStableStack(d), a.browser = "chrome-stable";
+		else if ("25" === window.navigator.appVersion.match(/Bowser\/([\w\W]*?)\./)[1]) a.browser = "bowser";
+		else if ("25" === window.navigator.appVersion.match(/Mozilla\/([\w\W]*?)\./)[1]) a.browser = "mozilla";
+		else throw a.browser = "none", "WebRTC stack not available";
+	}
+	else
+	{
+		console.log("iOSGoCastTalk!");
+		a = Erizo.iOSGoCastTalkStack(d);
+		a.browser = "ios-gocasttalk";
+	}
 	return a
 };
 
