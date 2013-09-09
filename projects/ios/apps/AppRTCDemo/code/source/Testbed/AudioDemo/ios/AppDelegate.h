@@ -21,4 +21,11 @@
 -(void)showWebLoadingView;
 -(void)hideWebLoadingView;
 
+-(std::string) getScreenName;
+-(std::string) getRoomID;
+
+-(void)setRoomID:(const std::string&)newRoomID;
+
+-(void)setGoButtonEnabled:(bool)newEnabled;
+
 @end

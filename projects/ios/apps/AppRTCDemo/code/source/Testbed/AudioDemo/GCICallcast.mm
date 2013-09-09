@@ -19,4 +19,10 @@
     NSLog(@"Sending HUDEvent::kWebViewLoaded");
 }
 
+- (void) setRoomID:(CDVInvokedUrlCommand*)command
+{
+    HUDEventManager::getInstance()->tSubject<const HUDEvent&>::notify(HUDEvent(HUDEvent::kSetRoomID,
+                                                                               [[command.arguments objectAtIndex:0] UTF8String]));
+}
+
 @end

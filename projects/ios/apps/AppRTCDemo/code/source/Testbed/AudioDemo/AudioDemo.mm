@@ -4,6 +4,9 @@
 
 #include "AppDelegate.h"
 
+#include "HUDEvent.h"
+#include "HUDEventManager.h"
+
 AudioDemo gAudioDemo;
 extern AppDelegate* gAppDelegateInstance;
 extern UIWebView*   gWebViewInstance;
@@ -22,6 +25,7 @@ AudioDemo::~AudioDemo()
 #pragma mark Start / End / Invalid
 void AudioDemo::startEntry()
 {
+    HUDEventManager::getInstance()->attach(this);
 }
 
 void AudioDemo::endEntry()
@@ -104,5 +108,50 @@ bool AudioDemo::HasEdgeNamedNext() const
 void AudioDemo::update(const AudioDemoMessage& msg)
 {
 	process(msg.mEvent);
+}
+
+void AudioDemo::update(const HUDEvent& msg)
+{
+    switch (msg.mEvent)
+    {
+        case HUDEvent::kGoPressed:
+            {
+                std::string screenName  = [gAppDelegateInstance getScreenName];
+                std::string roomID      = [gAppDelegateInstance getRoomID];
+
+                char outCall[1024];
+
+                if (!screenName.empty())
+                {
+                    if (!roomID.empty())
+                    {
+                        sprintf(outCall, "ManjeshClient(document, 'http://localhost/?%s_%s', '%s_%s' || '', Erizo);",
+                                screenName.c_str(), roomID.c_str(),
+                                screenName.c_str(), roomID.c_str());
+                    }
+                    else
+                    {
+                        sprintf(outCall, "ManjeshClient(document, 'http://localhost/?%s', '%s' || '', Erizo);",
+                                screenName.c_str(), screenName.c_str());
+                    }
+
+                    [gAppDelegateInstance setGoButtonEnabled:false];
+
+                    [gWebViewInstance stringByEvaluatingJavaScriptFromString: [NSString stringWithFormat:@"%s", outCall]];
+                }
+                else
+                {
+                    tAlert("Please enter a screen name.");
+                }
+            }
+            break;
+
+        case HUDEvent::kSetRoomID:
+            [gAppDelegateInstance setRoomID:msg.mRoomID];
+            break;
+
+        default:
+            break;
+    }
 }
 

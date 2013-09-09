@@ -1681,19 +1681,37 @@ Erizo.Connection = function(d) {
 	else throw a.browser = "none", "WebRTC stack not available";
 	return a
 };
-Erizo.GetUserMedia = function(d, a, c) {
-	if ("undefined" !== typeof module && module.exports) L.Logger.error("Video/audio streams not supported in erizofc yet");
-	else try {
-		navigator.webkitGetUserMedia.call(Object.getPrototypeOf(navigator), "audio, video", a, c), console.log("GetUserMedia BOWSER")
-	} catch (b) {
-		try
+
+Erizo.GetUserMedia = function(d, a, c)
+{
+	if (isChrome == 1)
+	{
+		if ("undefined" !== typeof module && module.exports)
 		{
-			navigator.webkitGetUserMedia.call(Object.getPrototypeOf(navigator), d, a, c), console.log("GetUserMedia CHROME", d);
+			L.Logger.error("Video/audio streams not supported in erizofc yet");
 		}
-		catch(b)
+		else
 		{
-			console.log('TJG: navigator.webkitGetUserMedia failed.');
+			try
+			{
+				navigator.webkitGetUserMedia.call(Object.getPrototypeOf(navigator), "audio, video", a, c), console.log("GetUserMedia BOWSER")
+			}
+			catch (b)
+			{
+				try
+				{
+					navigator.webkitGetUserMedia.call(Object.getPrototypeOf(navigator), d, a, c), console.log("GetUserMedia CHROME", d);
+				}
+				catch(b)
+				{
+					console.log('TJG: navigator.webkitGetUserMedia failed.');
+				}
+			}
 		}
+	}
+	else
+	{
+		a();
 	}
 };
 Erizo = Erizo || {};

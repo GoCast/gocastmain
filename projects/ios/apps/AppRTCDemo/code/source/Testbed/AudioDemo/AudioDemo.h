@@ -4,10 +4,13 @@
 
 class AudioDemoMessage;
 
+class HUDEvent;
+
 class AudioDemo
-: public tMealy,
-// public tSubject<const OtherAudioDemoMessage&>,
-  public tObserver<const AudioDemoMessage&>
+:   public tMealy,
+//    public tSubject<const OtherAudioDemoMessage&>,
+    public tObserver<const AudioDemoMessage&>,
+    public tObserver<const HUDEvent&>
 {
 protected:
 
@@ -50,6 +53,7 @@ protected:
 	bool HasEdgeNamedNext() const;
 
 	void update(const AudioDemoMessage& msg);
+	void update(const HUDEvent& msg);
 };
 
 class AudioDemoMessage

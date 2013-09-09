@@ -5,6 +5,6 @@
 @interface GCICallcast : CDVPlugin
 
 - (void) webViewLoaded:(CDVInvokedUrlCommand*)command;
-
+- (void) setRoomID:(CDVInvokedUrlCommand*)command;
 @end
 

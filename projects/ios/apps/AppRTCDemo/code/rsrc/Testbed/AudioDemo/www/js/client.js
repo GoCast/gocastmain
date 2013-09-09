@@ -2,12 +2,15 @@ function ManjeshClient(doc, path, params, E) {
 	var uname = params.split('_')[0] || prompt('Screen name: '), room = null,
 		roomid = params.split('_')[1] || '',
 		localstream = E.Stream({audio: true, video: true, attributes: {name: uname}}),
-		requestToken = function(uname, role, roomid, onresponse) {
+
+		requestToken = function(uname, role, roomid, onresponse)
+		{
 			var req = new XMLHttpRequest(),
 				body = JSON.stringify({'uname': uname, 'role': role, 'roomid': roomid});
 
 			req.onreadystatechange = function() {
-				if (4 === req.readyState) {
+				if (4 === req.readyState)
+				{
 					onresponse(JSON.parse(req.responseText));
 				}
 			}
@@ -16,7 +19,8 @@ function ManjeshClient(doc, path, params, E) {
 			req.open('POST', 'http://relay.gocast.it/relaymgr/reqroomtoken/', true);
 			req.setRequestHeader('Content-Type', 'application/json');
 			req.send(body);
-		}, showStream = function(stream, type, id) {
+		},
+		showStream = function(stream, type, id) {
 			if ('remote' === type) {
 				var div = doc.createElement('div');
 				div.setAttribute('style', 'width: 320px; height: 240px;');
@@ -46,16 +50,23 @@ function ManjeshClient(doc, path, params, E) {
 		// After obtaining permission to access local media from the browser,
 		// request a token for your desired room or a new room
 		console.log('Requesting token to enter room...');
-		requestToken(uname, 'role', roomid, function(response) {
+		requestToken(uname, 'role', roomid, function(response)
+		{
 			var token = response.token || '';
 			if ('' === token) {
 				console.log('requestToken(): Error: ' + JSON.stringify(response));
 			} else {
 				console.log('requestToken(): Token: ' + token);
-				if ('' === roomid) {
+				if ('' === roomid)
+				{
 					roomid = response.roomid;
-					history.replaceState(null, null, path +
-										 '?' + uname + '_' + roomid);
+
+					if (isChrome == 0)
+					{
+				        cordova.exec(function(winParam) {}, function(error) {}, "GCICallcast", "setRoomID", [ roomid.toString() ]);
+					}
+
+					history.replaceState(null, null, path + '?' + uname + '_' + roomid);
 				}
 				// After obtaining the token, use it to create the room object
 				// through which you can connect to the room, publish your

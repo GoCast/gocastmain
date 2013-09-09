@@ -145,6 +145,27 @@ AppDelegate* gAppDelegateInstance = NULL;
 //    [self.viewController.mWebLoadingView setHidden:YES];
 }
 
+-(std::string) getScreenName
+{
+    return [self.viewController.mScreenName.text UTF8String];
+}
+
+-(std::string) getRoomID
+{
+    return [self.viewController.mRoomName.text UTF8String];
+}
+
+-(void)setRoomID:(const std::string&)newRoomID
+{
+    self.viewController.mRoomName.text = [NSString stringWithUTF8String:newRoomID.c_str()];
+}
+
+-(void)setGoButtonEnabled:(bool)newEnabled
+{
+    [self.viewController.mRoomNameGo setEnabled:(newEnabled ? YES : NO)];
+    self.viewController.mRoomNameGo.alpha = (newEnabled ? 1.0f : 0.4f);
+}
+
 #pragma mark -
 
 @end

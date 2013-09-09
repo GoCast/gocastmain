@@ -2,7 +2,8 @@
 
 var Erizo = Erizo || {};
 
-Erizo.iOSGoCastTalkStack = function (spec) {
+Erizo.iOSGoCastTalkStack = function (spec)
+{
     "use strict";
 
     var that = {},
