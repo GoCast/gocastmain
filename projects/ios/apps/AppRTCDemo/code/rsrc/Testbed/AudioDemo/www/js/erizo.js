@@ -1721,7 +1721,7 @@ Erizo.GetUserMedia = function(d, a, c)
 	}
 	else
 	{
-		a();
+		a(new GCIMediaStream('gci-media-stream'));
 	}
 };
 Erizo = Erizo || {};

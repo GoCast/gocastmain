@@ -2,7 +2,45 @@
 
 var Erizo = Erizo || {};
 
+var GCIMediaStreamTrack = { };
+var GCIMediaStream = { };
 var GCIRTCPeerConnection = { };
+
+GCIMediaStreamTrack = function (newid, newkind)
+{
+	this.id = newid;
+	this.kind = newkind;
+	this.label = "gci-label";
+	this.enabled = true;
+	this.readyState = "live";
+}
+
+//--
+
+GCIMediaStream = function (newid)
+{
+	this.id = newid;
+	this.ended = false;
+}
+
+GCIMediaStream.prototype.getAudioTracks = function()
+{
+	var result = [];
+
+	result.push(new GCIMediaStreamTrack('gci-audio-stream-track', 'audio'));
+
+	return result;
+}
+
+GCIMediaStream.prototype.getVideoTracks = function()
+{
+	var result = [];
+
+	result.push(new GCIMediaStreamTrack('gci-video-stream-track', 'video'));
+
+	return result;
+}
+
 
 if (isChrome == 1)
 {
@@ -10,52 +48,54 @@ if (isChrome == 1)
 }
 else
 {
+//--	
+
 	GCIRTCPeerConnection = function (pc_config)
 	{
 		cordova.exec(function(winParam) {}, function(error) {}, "GCICallcast", "pcConstruct", [ JSON.stringify(pc_config) ]);
-		console.log("ctor:'" + JSON.stringify(pc_config) + "'");
+		console.log("TJG::ctor:'" + JSON.stringify(pc_config) + "'");
 	}
 
 	GCIRTCPeerConnection.iceGatheringState = "new";
 	GCIRTCPeerConnection.localDescription = { };
 	GCIRTCPeerConnection.localDescription.sdp = "offer";
 
-	GCIRTCPeerConnection.addStream = function( stream )
+	GCIRTCPeerConnection.prototype.addStream = function( stream )
 	{
 		cordova.exec(function(winParam) {}, function(error) {}, "GCICallcast", "pcAddStream", [ JSON.stringify(stream) ]);
-		console.log("addstream:'" + stream + "'");
+		console.log("TJG::addstream:'" + JSON.stringify(stream) + "'");
 	}
-	GCIRTCPeerConnection.close = function()
+	GCIRTCPeerConnection.prototype.close = function()
 	{
 		cordova.exec(function(winParam) {}, function(error) {}, "GCICallcast", "pcClose", [ "" ]);
-		console.log("close();");
+		console.log("TJG::close();");
 	}
-	GCIRTCPeerConnection.createAnswer = function( successCallback, errorCallback, constraints )
+	GCIRTCPeerConnection.prototype.createAnswer = function( successCallback, errorCallback, constraints )
 	{
 		cordova.exec(function(winParam) {}, function(error) {}, "GCICallcast", "pcCreateAnswer",
 		[ JSON.stringify(successCallback), JSON.stringify(errorCallback), JSON.stringify(constraints) ]);
-		console.log("createAnswer:'" + constraints + "'");
+		console.log("TJG::createAnswer:'" + JSON.stringify(constraints) + "'");
 		successCallback();
 	}
-	GCIRTCPeerConnection.createOffer = function( successCallback, errorCallback, constraints )
+	GCIRTCPeerConnection.prototype.createOffer = function( successCallback, errorCallback, constraints )
 	{
 		cordova.exec(function(winParam) {}, function(error) {}, "GCICallcast", "pcCreateOffer",
 		[ JSON.stringify(successCallback), JSON.stringify(errorCallback), JSON.stringify(constraints) ]);
-		console.log("createOffer:'" + constraints + "'");
+		console.log("TJG::createOffer:'" + JSON.stringify(constraints) + "'");
 		successCallback();
 	}
-	GCIRTCPeerConnection.setLocalDescription = function( description, successCallback, errorCallback )
+	GCIRTCPeerConnection.prototype.setLocalDescription = function( description, successCallback, errorCallback )
 	{
 		cordova.exec(function(winParam) {}, function(error) {}, "GCICallcast", "pcSetLocalDescription",
 		[ JSON.stringify(description), JSON.stringify(successCallback), JSON.stringify(errorCallback) ]);
-		console.log("setLocalDescription:'" + constraints + "'");
+		console.log("TJG::setLocalDescription:'" + JSON.stringify(description) + "'");
 		successCallback();
 	}
-	GCIRTCPeerConnection.setRemoteDescription = function( description, successCallback, errorCallback )
+	GCIRTCPeerConnection.prototype.setRemoteDescription = function( description, successCallback, errorCallback )
 	{
 		cordova.exec(function(winParam) {}, function(error) {}, "GCICallcast", "pcSetRemoteDescription",
 		[ JSON.stringify(description), JSON.stringify(successCallback), JSON.stringify(errorCallback) ]);
-		console.log("setRemoteDescription:'" + constraints + "'");
+		console.log("TJG::setRemoteDescription:'" + JSON.stringify(description) + "'");
 		successCallback();
 	}
 }
@@ -255,7 +295,8 @@ Erizo.iOSGoCastTalkStack = function (spec)
                 // See if the current offer is the same as what we already sent.
                 // If not, no change is needed.   
 
-                that.peerConnection.createOffer(function (sessionDescription) {
+                that.peerConnection.createOffer(
+                function (sessionDescription) {
 
                     var newOffer = sessionDescription.sdp;
 
