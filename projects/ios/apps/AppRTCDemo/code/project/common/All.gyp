@@ -11,6 +11,7 @@
     				'dependencies': [
     					'AppRTCDemo.gyp:*',
     					'AudioDemo.gyp:*',
+    					'ErizoClient.gyp:*',
     					'HUDDemo.gyp:*',
     				], # dependencies
 
