@@ -41,7 +41,7 @@ void GCP::StaticDeinitialize()
 {
     // Place one-time deinitialization stuff here. As of FireBreath 1.4 this should
     // always be called just before the plugin library is unloaded
-#ifdef GOCAST_WINDOWS    
+#ifdef GOCAST_WINDOWS
     FBLOG_INFO_CUSTOM("GCP::StaticDeinitalize", "Destroying RtcCenter singleton...");
     GoCast::RtcCenter::Instance(true);
     FBLOG_INFO_CUSTOM("GCP::StaticDeinitalize", "Destroying RtcCenter singleton DONE...");

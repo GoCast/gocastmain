@@ -19,9 +19,6 @@
 #include <deque>
 #include <boost/thread.hpp>
 #include <boost/thread/condition.hpp>
-
-//#include "talk/app/webrtc/mediastreaminterface.h"
-//#include "talk/base/scoped_ref_ptr.h"
 #include "GCPVideoRenderer.h"
 
 FB_FORWARD_PTR(GCP)

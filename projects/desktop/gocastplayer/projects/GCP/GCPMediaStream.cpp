@@ -88,8 +88,8 @@ namespace GoCast
     }
     
     FB::JSAPIPtr LocalMediaStreamTrack::Create(const std::string& kind,
-                                               const std::string label,
-                                               const bool enabled)
+                                          const std::string label,
+                                          const bool enabled)
     {
         return boost::make_shared<LocalMediaStreamTrack>(kind, label, enabled);
     }
@@ -106,7 +106,7 @@ namespace GoCast
     
     LocalVideoTrack::VideoDeviceList LocalVideoTrack::videoDevices;
     
-    FB::JSAPIPtr LocalVideoTrack::Create(talk_base::scoped_refptr<webrtc::LocalVideoTrackInterface>& pTrack,
+    FB::JSAPIPtr LocalVideoTrack::Create(talk_base::scoped_refptr<webrtc::VideoTrackInterface>& pTrack,
                                          GCPVideoProcessor* pProc)
     {
         return boost::make_shared<LocalVideoTrack>(pTrack, pProc);
@@ -209,7 +209,7 @@ namespace GoCast
         return NULL;
     }
     
-    LocalVideoTrack::LocalVideoTrack(const talk_base::scoped_refptr<webrtc::LocalVideoTrackInterface>& pTrack,
+    LocalVideoTrack::LocalVideoTrack(const talk_base::scoped_refptr<webrtc::VideoTrackInterface>& pTrack,
                                      GCPVideoProcessor* pProc)
     : LocalMediaStreamTrack(pTrack->kind(), pTrack->id(), pTrack->enabled())
     , m_pProc(pProc)
@@ -218,7 +218,7 @@ namespace GoCast
                                                  &LocalVideoTrack::set_effect));
     }
         
-    FB::JSAPIPtr LocalAudioTrack::Create(talk_base::scoped_refptr<webrtc::LocalAudioTrackInterface>& pTrack,
+    FB::JSAPIPtr LocalAudioTrack::Create(talk_base::scoped_refptr<webrtc::AudioTrackInterface>& pTrack,
                                          GCPVoiceProcessor* pProc)
     {
         return boost::make_shared<LocalAudioTrack>(pTrack, pProc);
@@ -255,7 +255,7 @@ namespace GoCast
         }
     }
     
-    LocalAudioTrack::LocalAudioTrack(const talk_base::scoped_refptr<webrtc::LocalAudioTrackInterface>& pTrack,
+    LocalAudioTrack::LocalAudioTrack(const talk_base::scoped_refptr<webrtc::AudioTrackInterface>& pTrack,
                                      GCPVoiceProcessor* pProc)
     : LocalMediaStreamTrack(pTrack->kind(), pTrack->id(), pTrack->enabled())
     , m_pProc(pProc)
@@ -286,14 +286,14 @@ namespace GoCast
         
     }
 
-    FB::JSAPIPtr LocalMediaStream::Create(talk_base::scoped_refptr<webrtc::LocalMediaStreamInterface>& pStream,
+    FB::JSAPIPtr LocalMediaStream::Create(talk_base::scoped_refptr<webrtc::MediaStreamInterface>& pStream,
                                           GCPVoiceProcessor* pVoiceProc,
                                           GCPVideoProcessor* pVideoProc)
     {
         return boost::make_shared<LocalMediaStream>(pStream, pVoiceProc, pVideoProc);
     }
     
-    LocalMediaStream::LocalMediaStream(const talk_base::scoped_refptr<webrtc::LocalMediaStreamInterface>& pStream,
+    LocalMediaStream::LocalMediaStream(const talk_base::scoped_refptr<webrtc::MediaStreamInterface>& pStream,
                                        GCPVoiceProcessor* pVoiceProc,
                                        GCPVideoProcessor* pVideoProc)
     : FB::JSAPIAuto("MediaStream")
@@ -305,23 +305,17 @@ namespace GoCast
         registerProperty("videoTracks", make_property(this,&LocalMediaStream::get_videoTracks));
         registerProperty("audioTracks", make_property(this, &LocalMediaStream::get_audioTracks));
         
-        for(size_t i=0; i<pStream->video_tracks()->count(); i++)
+        for(size_t i=0; i<pStream->GetVideoTracks().size(); i++)
         {
-            talk_base::scoped_refptr<webrtc::VideoTrackInterface> pTrack(pStream->video_tracks()->at(i));
-            talk_base::scoped_refptr<webrtc::LocalVideoTrackInterface> pTrack_(
-                static_cast<webrtc::LocalVideoTrackInterface*>(pTrack.get())
-            );
-            
+            talk_base::scoped_refptr<webrtc::VideoTrackInterface> pTrack(pStream->GetVideoTracks().at(i));
+            talk_base::scoped_refptr<webrtc::VideoTrackInterface> pTrack_(pTrack.get());
             AddTrack(LocalVideoTrack::Create(pTrack_, pVideoProc));
         }
         
-        for(size_t i=0; i<pStream->audio_tracks()->count(); i++)
+        for(size_t i=0; i<pStream->GetAudioTracks().size(); i++)
         {
-            talk_base::scoped_refptr<webrtc::AudioTrackInterface> pTrack(pStream->audio_tracks()->at(i));
-            talk_base::scoped_refptr<webrtc::LocalAudioTrackInterface> pTrack_(
-                static_cast<webrtc::LocalAudioTrackInterface*>(pTrack.get())
-            );
-            
+            talk_base::scoped_refptr<webrtc::AudioTrackInterface> pTrack(pStream->GetAudioTracks().at(i));
+            talk_base::scoped_refptr<webrtc::AudioTrackInterface> pTrack_(pTrack.get());
             AddTrack(LocalAudioTrack::Create(pTrack_, pVoiceProc));
         }
     }
@@ -353,15 +347,15 @@ namespace GoCast
         registerProperty("videoTracks", make_property(this,&RemoteMediaStream::get_videoTracks));
         registerProperty("audioTracks", make_property(this, &RemoteMediaStream::get_audioTracks));
         
-        for(size_t i=0; i<pStream->video_tracks()->count(); i++)
+        for(size_t i=0; i<pStream->GetVideoTracks().size(); i++)
         {
-            talk_base::scoped_refptr<webrtc::VideoTrackInterface> pTrack(pStream->video_tracks()->at(i));
+            talk_base::scoped_refptr<webrtc::VideoTrackInterface> pTrack(pStream->GetVideoTracks().at(i));
             AddTrack(RemoteVideoTrack::Create(pTrack));
         }
         
-        for(size_t i=0; i<pStream->audio_tracks()->count(); i++)
+        for(size_t i=0; i<pStream->GetAudioTracks().size(); i++)
         {
-            talk_base::scoped_refptr<webrtc::AudioTrackInterface> pTrack(pStream->audio_tracks()->at(i));
+            talk_base::scoped_refptr<webrtc::AudioTrackInterface> pTrack(pStream->GetAudioTracks().at(i));
             AddTrack(RemoteAudioTrack::Create(pTrack));
         }
     }

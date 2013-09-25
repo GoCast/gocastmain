@@ -123,7 +123,7 @@ namespace GoCast
         
         if(cricket::MPD_RX_AND_TX == dir)
         {
-            avgLevel += pFrame->Level();
+            avgLevel += pFrame->GetLevel();
             samplesCount++;
             
             if(16 == samplesCount)
@@ -281,12 +281,12 @@ namespace GoCast
     }
     
     void BuildIceServersList(FB::VariantList jsIceServers,
-                             webrtc::JsepInterface::IceServers& servers)
+                             webrtc::PeerConnectionInterface::IceServers& servers)
     {
         for(FB::VariantList::iterator it = jsIceServers.begin();
             it != jsIceServers.end(); it++)
         {
-            webrtc::JsepInterface::IceServer server;
+            webrtc::PeerConnectionInterface::IceServer server;
             FB::JSObjectPtr jsServer = (*it).convert_cast<FB::JSObjectPtr>();
             
             if(jsServer->HasProperty("uri"))
@@ -807,9 +807,9 @@ namespace GoCast
     
     bool RtcCenter::GetLocalVideoTrackEnabled() const
     {
-        if(0 < m_pLocalStream->video_tracks()->count())
+        if(0 < m_pLocalStream->GetVideoTracks().size())
         {
-            return m_pLocalStream->video_tracks()->at(0)->enabled(); 
+            return m_pLocalStream->GetVideoTracks().at(0)->enabled();
         }
         
         return false;
@@ -817,9 +817,9 @@ namespace GoCast
     
     bool RtcCenter::GetLocalAudioTrackEnabled() const
     {
-        if(0 < m_pLocalStream->audio_tracks()->count())
+        if(0 < m_pLocalStream->GetAudioTracks().size())
         {
-            return m_pLocalStream->audio_tracks()->at(0)->enabled();
+            return m_pLocalStream->GetAudioTracks().at(0)->enabled();
         }
         
         return false;
@@ -842,17 +842,17 @@ namespace GoCast
     
     void RtcCenter::SetLocalVideoTrackEnabled(bool bEnable)
     {
-        if(0 < m_pLocalStream->video_tracks()->count())
+        if(0 < m_pLocalStream->GetVideoTracks().size())
         {
-            m_pLocalStream->video_tracks()->at(0)->set_enabled(bEnable);
+            m_pLocalStream->GetVideoTracks().at(0)->set_enabled(bEnable);
         }
     }
     
     void RtcCenter::SetLocalAudioTrackEnabled(bool bEnable)
     {
-        if(0 < m_pLocalStream->audio_tracks()->count())
+        if(0 < m_pLocalStream->GetAudioTracks().size())
         {
-            m_pLocalStream->audio_tracks()->at(0)->set_enabled(bEnable);
+            m_pLocalStream->GetAudioTracks().at(0)->set_enabled(bEnable);
         }
     }
     
@@ -868,9 +868,9 @@ namespace GoCast
     
     void RtcCenter::SetLocalVideoTrackRenderer(webrtc::VideoRendererInterface* pRenderer)
     {
-        if(0 < m_pLocalStream->video_tracks()->count())
+        if(0 < m_pLocalStream->GetVideoTracks().size())
         {
-            m_pLocalStream->video_tracks()->at(0)->AddRenderer(pRenderer);
+            m_pLocalStream->GetVideoTracks().at(0)->AddRenderer(pRenderer);
         }
     }
     
@@ -879,9 +879,9 @@ namespace GoCast
     {
         if(m_remoteStreams.end() != m_remoteStreams.find(pluginId))
         {
-            if(0 < m_remoteStreams[pluginId]->video_tracks()->count())
+            if(0 < m_remoteStreams[pluginId]->GetVideoTracks().size())
             {
-                m_remoteStreams[pluginId]->video_tracks()->at(0)->AddRenderer(pRenderer);
+                m_remoteStreams[pluginId]->GetVideoTracks().at(0)->AddRenderer(pRenderer);
             }            
         }
         else
@@ -1176,9 +1176,9 @@ namespace GoCast
         msg += ": Creating new PeerConnection...";
         FBLOG_INFO_CUSTOM("RtcCenter::NewPeerConnection_w", msg);
         
-        webrtc::JsepInterface::IceServers servers;
+        webrtc::PeerConnectionInterface::IceServers servers;
         BuildIceServersList(iceServers, servers);
-        m_pPeerConns[pluginId] = m_pConnFactory->CreatePeerConnection(servers, NULL, pObserver);
+        m_pPeerConns[pluginId] = m_pConnFactory->CreatePeerConnection(servers, NULL, NULL, pObserver);
         if(NULL == m_pPeerConns[pluginId].get())
         {
             std::string msg = pluginId;
@@ -1423,17 +1423,17 @@ namespace GoCast
 
         if("localPlayer" == pluginId)
         {
-			if(0 < m_pLocalStream->audio_tracks()->count())
+			if(0 < m_pLocalStream->GetAudioTracks().size())
 			{
-				m_pLocalStream->audio_tracks()->at(0)->set_enabled(true);
+				m_pLocalStream->GetAudioTracks().at(0)->set_enabled(true);
 			}
 
-			if(0 < m_pLocalStream->video_tracks()->count())
+			if(0 < m_pLocalStream->GetVideoTracks().size())
 			{
 #ifdef GOCAST_WINDOWS
 				m_pVideoProc->Unregister();
 #endif
-				m_pLocalStream->video_tracks()->at(0)->set_enabled(false);
+				m_pLocalStream->GetVideoTracks().at(0)->set_enabled(false);
 			}
         }
         else

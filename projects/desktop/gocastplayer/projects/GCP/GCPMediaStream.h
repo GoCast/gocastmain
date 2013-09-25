@@ -141,11 +141,11 @@ namespace GoCast
         typedef std::map<std::string, cricket::VideoCapturer*> VideoDeviceList;
         
     public:
-        static FB::JSAPIPtr Create(talk_base::scoped_refptr<webrtc::LocalVideoTrackInterface>& pTrack,
+        static FB::JSAPIPtr Create(talk_base::scoped_refptr<webrtc::VideoTrackInterface>& pTrack,
                                    GCPVideoProcessor* pProc = NULL);
         static FB::VariantMap GetVideoDevices();
         static cricket::VideoCapturer* GetCaptureDevice(const std::string& uniqueId);
-        explicit LocalVideoTrack(const talk_base::scoped_refptr<webrtc::LocalVideoTrackInterface>& pTrack,
+        explicit LocalVideoTrack(const talk_base::scoped_refptr<webrtc::VideoTrackInterface>& pTrack,
                                  GCPVideoProcessor* pProc = NULL);
         ~LocalVideoTrack() { delete m_pProc; }
         
@@ -165,10 +165,10 @@ namespace GoCast
     class LocalAudioTrack : public LocalMediaStreamTrack
     {
     public:
-        static FB::JSAPIPtr Create(talk_base::scoped_refptr<webrtc::LocalAudioTrackInterface>& pTrack,
+        static FB::JSAPIPtr Create(talk_base::scoped_refptr<webrtc::AudioTrackInterface>& pTrack,
                                    GCPVoiceProcessor* pProc = NULL);
         static void GetAudioDevices(FB::VariantList& devices, bool bInput);
-        explicit LocalAudioTrack(const talk_base::scoped_refptr<webrtc::LocalAudioTrackInterface>& pTrack,
+        explicit LocalAudioTrack(const talk_base::scoped_refptr<webrtc::AudioTrackInterface>& pTrack,
                                  GCPVoiceProcessor* pProc = NULL);
         ~LocalAudioTrack() { delete m_pProc; }
         
@@ -202,10 +202,10 @@ namespace GoCast
     class LocalMediaStream : public FB::JSAPIAuto
     {
     public:
-        static FB::JSAPIPtr Create(talk_base::scoped_refptr<webrtc::LocalMediaStreamInterface>& pStream,
+        static FB::JSAPIPtr Create(talk_base::scoped_refptr<webrtc::MediaStreamInterface>& pStream,
                                    GCPVoiceProcessor* pVoiceProc = NULL,
                                    GCPVideoProcessor* pVideoProc = NULL);
-        explicit LocalMediaStream(const talk_base::scoped_refptr<webrtc::LocalMediaStreamInterface>& pStream,
+        explicit LocalMediaStream(const talk_base::scoped_refptr<webrtc::MediaStreamInterface>& pStream,
                                   GCPVoiceProcessor* pVoiceProc = NULL,
                                   GCPVideoProcessor* pVideoProc = NULL);
         ~LocalMediaStream() { }

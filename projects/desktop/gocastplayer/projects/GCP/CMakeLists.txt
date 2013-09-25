@@ -18,9 +18,9 @@ file (GLOB GENERAL RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
 
 include_directories(${PLUGIN_INCLUDE_DIRS})
 
-include_directories(../../deps/libjingle/trunk/third_party/webrtc)
-include_directories(../../deps/libjingle/trunk/third_party/libyuv/include)
-include_directories(../../deps/libjingle/trunk)
+include_directories(../../deps/webrtc/trunk/webrtc)
+include_directories(../../deps/webrtc/trunk/third_party/libyuv/include)
+include_directories(../../deps/webrtc/trunk)
 
 add_definitions(-DWEBRTC_RELATIVE_PATH)
 add_definitions(-DGTEST_RELATIVE_PATH)

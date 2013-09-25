@@ -2,6 +2,7 @@
 #define FireBreath_GCPMediaConstraints_h
 
 #include "JSAPIAuto.h"
+#include "talk/app/webrtc/mediaconstraintsinterface.h"
 #include "talk/app/webrtc/peerconnection.h"
 
 namespace GoCast

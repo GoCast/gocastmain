@@ -4,32 +4,26 @@
 # libjingle #
 #############
 
-LIBJINGLE_REV=284
+WEBRTC_REV=4527
 mkdir -p deps
 cd deps
 
-if [[ $1 = "libjingle" || $* = "" ]]; then 
-    echo "Checking for directory [libjingle]..."
-    mkdir -p libjingle
-    cd libjingle
+if [[ $1 = "webrtc" || $* = "" ]]; then 
+    echo "Checking for directory [webrtc]..."
+    mkdir -p webrtc
+    cd webrtc
 
     if [ ! -f .gclient ]; then
-        echo "Running gclient config with target url [http://libjingle.googlecode.com/svn/trunk/]"
-        gclient config http://libjingle.googlecode.com/svn/trunk/
+        echo "Running gclient config with target url [http://webrtc.googlecode.com/svn/trunk/]"
+        gclient config http://webrtc.googlecode.com/svn/trunk/
     fi
 
-    echo "Running [gclient sync -r $LIBJINGLE_REV --force] to obtain webrtc source..."
-    gclient sync -r "$LIBJINGLE_REV" --force
+    echo "Running [gclient sync -r $WEBRTC_REV --force] to obtain webrtc source..."
+    gclient sync -r "$WEBRTC_REV" --force
     cd ..
 
     echo "Patching webrtc source..."
     patch -p0 -i ../dep_mods/common/webrtc.diff
-
-    echo "Patching libjingle source..."
-    patch -p0 -i ../dep_mods/common/libjingle.diff
-
-    echo "Patching libjingle build..."
-    patch -p0 -i ../dep_mods/common/libjingle_build.diff
 fi
 
 ##############
