@@ -4,6 +4,8 @@
 #include <string>
 #include <map>
 
+#include "RTCMediaStream.h"
+
 #include "JSONUtil.h"
 #include "URLLoader.h"
 
@@ -11,9 +13,10 @@ class ErizoApp;
 class ErizoStream;
 class ErizoLicodeEvent;
 
-typedef void (*fnPtr)();
+typedef void (*fnPtr)(void* that);
 typedef void (*fnJSONPtr)(void* that, const std::string&);
 typedef void (*fnEventPtr)(void* that, const ErizoLicodeEvent*);
+typedef void (*fnMediaStreamPtr)(void* that, RTCMediaStream*);
 
 #include "ErizoEvent.h"
 #include "ErizoConnection.h"

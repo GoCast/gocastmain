@@ -26,10 +26,10 @@ void ErizoClient::RequestTokenCallback(void* that, const std::string& jsonString
 		}
         that->mRoom = new ErizoRoom(token);
 
-        ErizoEventDispatcher::getInstance()->addEventListener("room-connected",     that, &RoomConnectedListener);
-        ErizoEventDispatcher::getInstance()->addEventListener("stream-subscribed",  that, &StreamSubscribedListener);
-        ErizoEventDispatcher::getInstance()->addEventListener("stream-added",       that, &StreamAddedListener);
-        ErizoEventDispatcher::getInstance()->addEventListener("stream-removed",     that, &StreamRemovedListener);
+        that->mRoom->addEventListener("room-connected",     that, &RoomConnectedListener);
+        that->mRoom->addEventListener("stream-subscribed",  that, &StreamSubscribedListener);
+        that->mRoom->addEventListener("stream-added",       that, &StreamAddedListener);
+        that->mRoom->addEventListener("stream-removed",     that, &StreamRemovedListener);
 
 		NSLog(@"Displaying local stream: %s", that->mLocalStream->getID().c_str());
 		that->showStream(that->mLocalStream, "local", that->mLocalStream->getID().c_str());
@@ -79,7 +79,7 @@ void ErizoClient::StreamSubscribedListener(void* that, const ErizoLicodeEvent* e
 {
 #define that ((ErizoClient*)that)
 #define event ((ErizoStreamEvent*)event)
-    NSLog(@"room.subscribed(): Subscribed to remote stream: %s", JSONUtil::extract(event->mStream->getAttributes())["name"].c_str());
+    NSLog(@"room.subscribed(): Subscribed to remote stream: %s", event->mStream->getAttributesName().c_str());
     that->showStream(event->mStream, "remote", event->mStream->getID().c_str());
 #undef event
 #undef that
@@ -91,7 +91,7 @@ void ErizoClient::StreamAddedListener(void* that, const ErizoLicodeEvent* event)
 #define event ((ErizoStreamEvent*)event)
     if (that->mLocalStream->getID() != event->mStream->getID())
     {
-        NSLog(@"room.added(): Subscribing to added remote stream: %s", JSONUtil::extract(event->mStream->getAttributes())["name"].c_str());
+        NSLog(@"room.added(): Subscribing to added remote stream: %s", event->mStream->getAttributesName().c_str());
         that->mRoom->subscribe(event->mStream);
     }
     else
@@ -136,7 +136,7 @@ void ErizoClient::startClient(const std::string& uname, const std::string& roomi
     mRoomID = roomid;
 
     mLocalStream = new ErizoStream(true, true, mUname);
-    ErizoEventDispatcher::getInstance()->addEventListener("access-accepted", this, &AccessAcceptedListener);
+    mLocalStream->addEventListener("access-accepted", this, &AccessAcceptedListener);
     NSLog(@"Initializing local media...");
     mLocalStream->init();
 }
@@ -147,7 +147,7 @@ void ErizoClient::requestToken(const std::string& uname, const std::string& role
     mRTonResponse = onresponse;
 
     char body[512];
-    sprintf(body, "{'uname': %s, 'role': %s, 'roomid': %s}", uname.c_str(), role.c_str(), roomid.c_str());
+    sprintf(body, "{\"uname\":\"%s\", \"role\":\"%s\", \"roomid\": \"%s\"}", uname.c_str(), role.c_str(), roomid.c_str());
     URLLoader::getInstance()->attach(this);
 
     NSLog(@"requestToken(): Request body: %s", body);

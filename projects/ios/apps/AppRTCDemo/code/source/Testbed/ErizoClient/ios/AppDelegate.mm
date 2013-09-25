@@ -76,12 +76,14 @@ AppDelegate* gAppDelegateInstance = NULL;
 
 -(std::string) getScreenName
 {
-    return [self.viewController.mScreenName.text UTF8String];
+    const char* result = [self.viewController.mScreenName.text UTF8String];
+    return result ? result : "";
 }
 
 -(std::string) getRoomID
 {
-    return [self.viewController.mRoomName.text UTF8String];
+    const char* result = [self.viewController.mRoomName.text UTF8String];
+    return result ? result : "";
 }
 
 -(void)setRoomID:(const std::string&)newRoomID

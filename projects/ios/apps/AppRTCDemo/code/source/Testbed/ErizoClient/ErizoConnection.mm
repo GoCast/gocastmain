@@ -1,3 +1,14 @@
+#include "Base/package.h"
+
+#include "package.h"
+#include "AppDelegate.h"
+
+void ErizoConnection::getUserMedia(void* that, fnMediaStreamPtr callback, fnMediaStreamPtr error)
+{
+#pragma unused(error)
+    callback(that, NULL);
+}
+
 ///*global window, console, navigator*/
 //
 //var Erizo = Erizo || {};

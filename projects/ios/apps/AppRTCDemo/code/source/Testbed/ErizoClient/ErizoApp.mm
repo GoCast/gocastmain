@@ -26,8 +26,7 @@ void ErizoApp::update(const GUIEvent& msg)
             if (mFirstTime)
             {
                 mFirstTime = false;
-                mClient.startClient("abc", "");
-//                mClient.startClient([gAppDelegateInstance getScreenName], [gAppDelegateInstance getRoomID]);
+                mClient.startClient([gAppDelegateInstance getScreenName], [gAppDelegateInstance getRoomID]);
             }
             break;
 

@@ -1,7 +1,8 @@
 
 #import <UIKit/UIKit.h>
 
-@interface MainViewController : UIViewController <UIGestureRecognizerDelegate, UITextFieldDelegate, UITableViewDelegate, UITableViewDataSource>
+@interface MainViewController
+: UIViewController <UIGestureRecognizerDelegate, UITextFieldDelegate, UITableViewDelegate, UITableViewDataSource>
 {
 }
 @property (nonatomic, strong) IBOutlet UILabel* mScreenNameLabel;

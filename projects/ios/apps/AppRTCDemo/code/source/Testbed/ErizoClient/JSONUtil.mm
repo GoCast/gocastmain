@@ -5,6 +5,8 @@
 
 std::map<std::string, std::string> JSONUtil::extract(const std::string& newJSONString)
 {
+    NSLog(@"JSONUtil::extract: %s", newJSONString.c_str());
+
     std::map<std::string, std::string> result;
 
     NSError *error = nil;

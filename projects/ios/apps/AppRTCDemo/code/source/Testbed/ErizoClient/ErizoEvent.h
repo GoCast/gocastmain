@@ -57,7 +57,6 @@ public:
 };
 
 class ErizoEventDispatcher
-:   public tSingleton<ErizoEventDispatcher>
 {
 protected:
     std::map<std::string, std::list<std::pair<void*, fnEventPtr> > >    mEventListeners;

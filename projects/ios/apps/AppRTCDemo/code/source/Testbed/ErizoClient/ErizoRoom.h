@@ -1,6 +1,7 @@
 #pragma once
 
 class ErizoRoom
+: public ErizoEventDispatcher
 {
 protected:
     void RemoveStream(ErizoStream* stream);
@@ -24,7 +25,12 @@ public:
 #pragma unused(stream)
         //TODO
     }
-    void unpublish(ErizoStream* stream);
+    void unpublish(ErizoStream* stream)
+    {
+#pragma unused(stream)
+        //TODO
+    }
+
     void subscribe(ErizoStream* stream)
     {
 #pragma unused(stream)

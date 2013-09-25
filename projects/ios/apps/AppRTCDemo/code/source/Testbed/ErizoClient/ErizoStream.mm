@@ -1,175 +1,142 @@
-///*global ErizoGetUserMedia, L, document*/
-///*
-// * Class Stream represents a local or a remote Stream in the Room. It will handle the WebRTC stream
-// * and identify the stream and where it should be drawn.
-// */
-//var Erizo = Erizo || {};
-//Erizo.Stream = function (spec) {
-//    "use strict";
-//    var that = Erizo.EventDispatcher(spec),
-//        getFrame;
-//    that.stream = spec.stream;
-//    that.room = undefined;
-//    that.showing = false;
-//    that.local = false;
-//    that.video = spec.video;
-//    that.audio = spec.audio;
-//    that.screen = spec.screen;
-//    if (spec.local === undefined || spec.local === true) {
-//        that.local = true;
-//    }
-//
-//    // Public functions
-//
-//    that.getID = function () {
-//        return spec.streamID;
-//    };
-//
-//    that.getAttributes = function () {
-//        return spec.attributes;
-//    };
-//
-//    // Indicates if the stream has audio activated
-//    that.hasAudio = function () {
-//        return spec.audio;
-//    };
-//
-//    // Indicates if the stream has video activated
-//    that.hasVideo = function () {
-//        return spec.video;
-//    };
-//
-//    // Indicates if the stream has data activated
-//    that.hasData = function () {
-//        return spec.data;
-//    };
-//
-//    // Indicates if the stream has screen activated
-//    that.hasScreen = function () {
-//        return spec.screen;
-//    };
-//
-//    // Sends data through this stream.
-//    that.sendData = function (msg) {};
-//
-//    // Initializes the stream and tries to retrieve a stream from local video and audio
-//    // We need to call this method before we can publish it in the room.
-//    that.init = function () {
-//        try {
-//            if (spec.audio || spec.video || spec.screen) {
-//                L.Logger.debug("Requested access to local media");
-//                var opt = {video: spec.video, audio: spec.audio};
-//                if (spec.screen) {
-//                    opt = {video:{mandatory: {chromeMediaSource: 'screen'}}};
-//                }
-//                Erizo.GetUserMedia(opt, function (stream) {
-//                //navigator.webkitGetUserMedia("audio, video", function (stream) {
-//
-//                    L.Logger.info("User has granted access to local media.");
-//                    that.stream = stream;
-//
-//                    var streamEvent = Erizo.StreamEvent({type: "access-accepted"});
-//                    that.dispatchEvent(streamEvent);
-//
-//                }, function (error) {
-//                    L.Logger.error("Failed to get access to local media. Error code was " + error.code + ".");
-//                    var streamEvent = Erizo.StreamEvent({type: "access-denied"});
-//                    that.dispatchEvent(streamEvent);
-//                });
-//            } else {
-//                var streamEvent = Erizo.StreamEvent({type: "access-accepted"});
-//                that.dispatchEvent(streamEvent);
-//            }
-//        } catch (e) {
-//            L.Logger.error("Error accessing to local media");
+#include "Base/package.h"
+
+#include "package.h"
+#include "AppDelegate.h"
+
+void ErizoStream::GetUserMediaCallback(void* that, RTCMediaStream* stream)
+{
+#define that ((ErizoStream*)that)
+    NSLog(@"User has granted access to local media.");
+    that->mStream = stream;
+
+    ErizoStreamEvent streamEvent("access-accepted", NULL);
+
+    that->dispatchEvent(&streamEvent);
+#undef that
+}
+
+void ErizoStream::GetUserMediaError(void* that, RTCMediaStream* stream)
+{
+#pragma unused(stream)
+#define that ((ErizoStream*)that)
+    NSLog(@"Failed to get access to local media. Error code was N/A.");
+    ErizoStreamEvent streamEvent("access-denied", NULL);
+
+    that->dispatchEvent(&streamEvent);
+#undef that
+}
+
+ErizoStream::ErizoStream(bool audio, bool video, const std::string& uname)
+: mStream(NULL),
+mRoom(NULL),
+mAttributesName(uname),
+mLocal(true),
+mAudio(audio),
+mVideo(video),
+mData(false),
+mScreen(false)
+{
+}
+
+std::string ErizoStream::getID() const
+{
+    return mStreamID;
+}
+
+std::string ErizoStream::getAttributesName() const
+{
+    return mAttributesName;
+}
+
+bool ErizoStream::hasAudio() const
+{
+    return mAudio;
+}
+
+bool ErizoStream::hasVideo() const
+{
+    return mVideo;
+}
+
+bool ErizoStream::hasData() const
+{
+    return mData;
+}
+
+bool ErizoStream::hasScreen() const
+{
+    return mScreen;
+}
+
+void ErizoStream::sendData(void* msg)
+{
+#pragma unused(msg)
+    //TJG Note: This is actually an empty function
+}
+
+void ErizoStream::init()
+{
+    if (mAudio || mVideo || mScreen)
+    {
+        NSLog(@"Requested access to local media");
+
+        ErizoConnection::getUserMedia(this, GetUserMediaCallback, GetUserMediaError);
+    } else {
+        ErizoStreamEvent streamEvent("access-accepted", NULL);
+        dispatchEvent(&streamEvent);
+    }
+}
+
+void ErizoStream::close()
+{
+    if (mLocal)
+    {
+        if (mRoom)
+        {
+            mRoom->unpublish(this);
+        }
+        // Remove HTML element
+        hide();
+//TODO: Why don't we have a stop method like in JavaScript?
+//        if (mStream)
+//        {
+//            [mStream stop];
 //        }
-//    };
-//
-//    that.close = function () {
-//        if (that.local) {
-//            if (that.room !== undefined) {
-//                that.room.unpublish(that);
-//            }
-//            // Remove HTML element
-//            that.hide();
-//            if (that.stream !== undefined) {
-//                that.stream.stop();
-//            }
-//            that.stream = undefined;
-//        }
-//    };
-//
-//    that.show = function (elementID, options) {
-//        that.elementID = elementID;
-//        if (that.hasVideo() || this.hasScreen()) {
-//            // Draw on HTML
-//            if (elementID !== undefined) {
-//                var player = new Erizo.VideoPlayer({id: that.getID(), stream: that, elementID: elementID, options: options});
-//                that.player = player;
-//                that.showing = true;
-//            }
-//        }
-//    };
-//
-//    that.hide = function () {
-//        if (that.showing) {
-//            if (that.player !== undefined) {
-//                that.player.destroy();
-//                that.showing = false;
-//            }
-//        }
-//    };
-//
-//    getFrame = function () {
-//        if (that.player !== undefined && that.stream !== undefined) {
-//            var video = that.player.video,
-//
-//                style = document.defaultView.getComputedStyle(video),
-//                width = parseInt(style.getPropertyValue("width"), 10),
-//                height = parseInt(style.getPropertyValue("height"), 10),
-//                left = parseInt(style.getPropertyValue("left"), 10),
-//                top = parseInt(style.getPropertyValue("top"), 10),
-//
-//                div = document.getElementById(that.elementID),
-//                divStyle = document.defaultView.getComputedStyle(div),
-//                divWidth = parseInt(divStyle.getPropertyValue("width"), 10),
-//                divHeight = parseInt(divStyle.getPropertyValue("height"), 10),
-//
-//                canvas = document.createElement('canvas'),
-//                context;
-//
-//            canvas.id = "testing";
-//            canvas.width = divWidth;
-//            canvas.height = divHeight;
-//            canvas.setAttribute('style', 'display: none');
-//            //document.body.appendChild(canvas);
-//            context = canvas.getContext('2d');
-//
-//            context.drawImage(video, left, top, width, height);
-//
-//            return canvas;
-//        } else {
-//            return null;
-//        }
-//    };
-//
-//    that.getVideoFrameURL = function () {
-//        var canvas = getFrame();
-//        if (canvas !== null) {
-//            return canvas.toDataURL();
-//        } else {
-//            return null;
-//        }
-//    };
-//
-//    that.getVideoFrame = function () {
-//        var canvas = getFrame();
-//        if (canvas !== null) {
-//            return canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height);
-//        } else {
-//            return null;
-//        }
-//    };
-//
-//    return that;
-//};
+
+        [mStream release];
+        mStream = nil;
+    }
+}
+
+void ErizoStream::show(void* elementID, void* options)
+{
+#pragma unused(elementID, options)
+    //TODO: This is just for showing the video / audio player?
+}
+
+void ErizoStream::hide()
+{
+    //TODO: This is just for hiding the video / audio player?
+}
+
+void* ErizoStream::getFrame() const
+{
+    //TODO: This is regarding the video player?
+
+    return NULL;
+}
+
+void* ErizoStream::getVideoFrameURL() const
+{
+    //TODO: This is regarding the video player?
+
+    return NULL;
+}
+
+void* ErizoStream::getVideoFrame() const
+{
+    //TODO: This is regarding the video player?
+
+    return NULL;
+}
+

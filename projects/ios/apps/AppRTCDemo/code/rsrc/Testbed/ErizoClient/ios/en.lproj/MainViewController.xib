@@ -7,11 +7,11 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="MainViewController">
             <connections>
-                <outlet property="mRoomName" destination="198" id="203"/>
-                <outlet property="mRoomNameGo" destination="199" id="204"/>
-                <outlet property="mScreenName" destination="190" id="201"/>
-                <outlet property="mScreenNameLabel" destination="189" id="200"/>
-                <outlet property="mUserTable" destination="194" id="205"/>
+                <outlet property="mRoomName" destination="198" id="OF1-YW-6Nr"/>
+                <outlet property="mRoomNameGo" destination="199" id="n8m-E4-Iqg"/>
+                <outlet property="mScreenName" destination="190" id="pT8-4h-oc2"/>
+                <outlet property="mScreenNameLabel" destination="189" id="wdc-QS-Evy"/>
+                <outlet property="mUserTable" destination="194" id="R0F-tC-UpP"/>
                 <outlet property="view" destination="1" id="3"/>
             </connections>
         </placeholder>
@@ -33,7 +33,7 @@
                     <fontDescription key="fontDescription" type="system" pointSize="11"/>
                     <textInputTraits key="textInputTraits" returnKeyType="done"/>
                     <connections>
-                        <outlet property="delegate" destination="-1" id="208"/>
+                        <outlet property="delegate" destination="-1" id="oRh-kS-3CJ"/>
                     </connections>
                 </textField>
                 <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" minimumFontSize="17" id="198" userLabel="mRoomName">
@@ -42,7 +42,7 @@
                     <fontDescription key="fontDescription" type="system" pointSize="11"/>
                     <textInputTraits key="textInputTraits" returnKeyType="done"/>
                     <connections>
-                        <outlet property="delegate" destination="-1" id="207"/>
+                        <outlet property="delegate" destination="-1" id="fHg-7Y-8uJ"/>
                     </connections>
                 </textField>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="199" userLabel="mRoomNameGo">
@@ -52,7 +52,7 @@
                         <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                     </state>
                     <connections>
-                        <action selector="buttonPressed:" destination="-1" eventType="touchUpInside" id="210"/>
+                        <action selector="buttonPressed:" destination="-1" eventType="touchUpInside" id="0qb-Bt-oKC"/>
                     </connections>
                 </button>
                 <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" style="plain" separatorStyle="default" allowsSelection="NO" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="194" userLabel="mUserTable">
@@ -60,8 +60,8 @@
                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     <connections>
-                        <outlet property="dataSource" destination="-1" id="211"/>
-                        <outlet property="delegate" destination="-1" id="206"/>
+                        <outlet property="dataSource" destination="-1" id="6dz-xA-gqF"/>
+                        <outlet property="delegate" destination="-1" id="YPe-dx-RrS"/>
                     </connections>
                 </tableView>
             </subviews>

@@ -6,6 +6,6 @@ public:
     ErizoConnection(void* spec);
 
 public:
-    bool getUserMedia(void* config, void* callback, void* error);
+    static void getUserMedia(void* that, fnMediaStreamPtr callback, fnMediaStreamPtr error);
 };
 
