@@ -47,7 +47,7 @@ add_windows_plugin(${PROJECT_NAME} SOURCES)
 
 # add library dependencies here; leave ${PLUGIN_INTERNAL_DEPS} there unless you know what you're doing!
 
-find_library(LIBWEBRTC webrtc.lib ../../deps/libjingle/trunk/build/${LIBWEBRTC_BUILD_CONFIG})
+find_library(LIBWEBRTC webrtc.lib ../../deps/webrtc/trunk/build/${LIBWEBRTC_BUILD_CONFIG})
 
 target_link_libraries(${PROJECT_NAME}
     ${PLUGIN_INTERNAL_DEPS}

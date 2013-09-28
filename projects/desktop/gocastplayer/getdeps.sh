@@ -22,8 +22,10 @@ if [[ $1 = "webrtc" || $* = "" ]]; then
     gclient sync -r "$WEBRTC_REV" --force
     cd ..
 
-    echo "Patching webrtc source..."
-    patch -p0 -i ../dep_mods/common/webrtc.diff
+    if [[ $* = "" || $2 = "applypatch" ]]; then
+        echo "Patching webrtc source..."
+        patch -p0 -i ../dep_mods/common/webrtc.diff
+    fi
 fi
 
 ##############
