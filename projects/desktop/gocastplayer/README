@@ -1,11 +1,30 @@
-GoCastPlayer Build and Install Readme (all scripts should be executed from this README's current directory):
+1. Mac OSX or Ubuntu
+   =================
 
-  I. MAC:
+	a. Clone the repository: git clone https://github.com/GoCast/webrtc_plugin.git
+	b. Download the Chromium Depot Tools [http://www.chromium.org/developers/how-tos/install-depot-tools].
+	c. Run ./getdeps.sh to download dependencies (If the script breaks, run: ./getdeps.sh webrtc).
+	d. Run ./prepdeps.sh Debug|Release to build the webrtc library.
+	e. Run ./prepplugin.sh Debug|Release to build the plugin project using Firebreath 
+	   [http://www.firebreath.org/].
+	f. Run ./buildplugin.sh Debug|Release to generate GCP.plugin (Mac) or npGCP.so (Ubuntu).
 
-	1. Get dependencies: 		./getdeps.sh
-	2. Build libwebrtc: 		./prepdeps.sh [Release|Debug]
-	3. Build plugin project: 	./prepplugin.sh
-	4. Build plugin:		./buildplugin.sh [Release|Debug]
-	
-	NOTE: Plugin's location is [build/projects/GCP/<Debug|Release>/GCP.plugin]
+2. Windows 7+
+   ==========
 
+	a. Install MSysGit [http://msysgit.github.io/].
+	b. Download the Chromium Depot Tools [http://www.chromium.org/developers/how-tos/install-depot-tools].
+	c. Set up your VS2010 development environment by following these instructions 
+	   [http://www.chromium.org/developers/how-tos/build-instructions-windows].
+	d. Clone the plugin repository: git clone https://github.com/GoCast/webrtc_plugin.git
+	e. Open a git-bash terminal and run ./getdeps.sh to download dependencies.
+	f. Go to deps/libjingle/trunk and run: 
+	   python build/gyp_chromium --depth=. third_party/webrtc/build/merge_libs.gyp
+	g. Open third_party/webrtc/build/merged_lib.sln in Visual Studio 2010.
+	h. Open dllentry.cpp in the winsdk_samples project, and comment out the functions DllCanUnloadNow() and 
+	   DllGetClassObjects().
+	i. Build the project merged_lib
+	j. Open a Windows command prompt, go to the repository folder and run: deps\firebreath\prepcmd2010.exe 
+	   src\js_api\projects build
+	k. Open build\Firebreath.sln and build the project GCPWixInstall. The plugin install file will be 
+	   build\bin\GCP\Debug|Release\GCP.exe.
