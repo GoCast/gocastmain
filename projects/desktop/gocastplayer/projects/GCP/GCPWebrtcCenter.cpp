@@ -283,6 +283,20 @@ namespace GoCast
     void BuildIceServersList(FB::VariantList jsIceServers,
                              webrtc::PeerConnectionInterface::IceServers& servers)
     {
+#ifdef GOCAST_WINDOWS
+		webrtc::PeerConnectionInterface::IceServer server;
+		std::stringstream sstrm;
+		
+		server.uri = "stun:stun.l.google.com:19302";
+        sstrm << "IceServer: {" << server.uri;
+        if (!server.password.empty())
+        {
+            sstrm << ", " + server.password;
+        }
+        sstrm << "}" << std::endl;
+        FBLOG_INFO_CUSTOM("BuildIceServerList", sstrm.str());
+        servers.push_back(server);
+#else
         for(FB::VariantList::iterator it = jsIceServers.begin();
             it != jsIceServers.end(); it++)
         {
@@ -308,6 +322,7 @@ namespace GoCast
                 servers.push_back(server);
             }
         }
+#endif
     }
     
     struct GetUserMediaParams : public talk_base::MessageData
