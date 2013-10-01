@@ -31,11 +31,20 @@
         }
     </style>
     <body>
+        <!--[if IE]>
+        <object id="localplayer" type="application/x-gocastplayer" width="1" height="1"></object>
+        <object id="remoteplayer0" type="application/x-gocastplayer" width="1" height="1"></object>
+        <object id="remoteplayer1" type="application/x-gocastplayer" width="1" height="1"></object>
+        <object id="remoteplayer2" type="application/x-gocastplayer" width="1" height="1"></object>
+        <object id="remoteplayer3" type="application/x-gocastplayer" width="1" height="1"></object>
+        <object id="remoteplayer4" type="application/x-gocastplayer" width="1" height="1"></object> 
+        <![endif]-->
         <h4 class="participant" style="display: none;"></h4>
         <div class="screen">
             <h3 class="header">Licode Demo Client</h3>
         </div>
     </body>
+    <script type="text/javascript" src="js/peerconnection.js?GOCASTTIMESTAMP"></script>
     <script type="text/javascript" src="js/erizo.js?GOCASTTIMESTAMP"></script>
     <script type="text/javascript">
         (function(doc, path, params, E) {
@@ -58,17 +67,19 @@
                     req.send(body);
                 }, showStream = function(stream, type, id) {
                     if ('remote' === type) {
-                        var div = doc.createElement('div');
-                        div.setAttribute('style', 'width: 320px; height: 240px;');
-                        div.setAttribute('id', type + (id||''));
-                        doc.body.appendChild(div);
-                        
-                        var v = doc.createElement('video');
-                        v.src = webkitURL.createObjectURL(stream.stream);
-                        v.autoplay = 'autoplay';
-                        v.width = 1;
-                        v.height = 1;
-                        div.appendChild(v);
+                        if (!doc.getElementById('localplayer')) {
+                            var div = doc.createElement('div');
+                            div.setAttribute('style', 'width: 320px; height: 240px;');
+                            div.setAttribute('id', type + (id||''));
+                            doc.body.appendChild(div);
+                            
+                            var v = doc.createElement('video');
+                            v.src = webkitURL.createObjectURL(stream.stream);
+                            v.autoplay = 'autoplay';
+                            v.width = 1;
+                            v.height = 1;
+                            div.appendChild(v);
+                        }
 
                         var entry = doc.querySelector('h4.participant').cloneNode();
                         entry.id = stream.getAttributes().name;
@@ -94,8 +105,10 @@
                         console.log('requestToken(): Token: ' + token);
                         if ('' === roomid) {
                             roomid = response.roomid;
-                            history.replaceState(null, null, path +
-                                                 '?' + uname + '_' + roomid);
+                            if (history && history.replaceState) {
+                                history.replaceState(null, null, path +
+                                                     '?' + uname + '_' + roomid);
+                            }
                         }
                         // After obtaining the token, use it to create the room object
                         // through which you can connect to the room, publish your
@@ -132,7 +145,11 @@
                                             e.stream.getAttributes().name);
                                 room.subscribe(e.stream);
                             } else {
-                                localstream.stream.getVideoTracks()[0].enabled = false;
+                                if (localstream.stream.videoTracks) {
+                                    localstream.stream.videoTracks[0].enabled = false;
+                                } else {
+                                    localstream.stream.getVideoTracks()[0].enabled = false;
+                                }
                                 console.log('ENABLED: ', localstream.stream.getVideoTracks()[0].enabled);
                             }
                         });

@@ -2,11 +2,13 @@
 
 var Erizo = Erizo || {};
 
+Erizo.pccount = 0;
+
 Erizo.GoCastTalkStack = function (spec) {
     "use strict";
 
     var that = {},
-        player = document.createElement('object'), 
+        player = document.getElementById('remoteplayer' + (Erizo.pccount++)), 
         pcoptions;
 
     that.pc_config = {
@@ -14,7 +16,7 @@ Erizo.GoCastTalkStack = function (spec) {
     };
 
     if (spec.stunServerUrl !== undefined) {
-        that.pc_config.iceServers.push({"url": spec.stunServerUrl});
+        that.pc_config.iceServers.push({"uri": spec.stunServerUrl});
     } 
 
     that.mediaConstraints = {
@@ -26,15 +28,10 @@ Erizo.GoCastTalkStack = function (spec) {
 
     that.roapSessionId = 103;
 
-    // Attach a gocastplayer object to the body
-    player.width = 1;
-    player.height = 1;
-    player.type = 'application/x-gocastplayer';
-    document.body.appendChild(player);
-
     that.peerConnection = new GoCastJS.PeerConnection(
         new GoCastJS.PeerConnectionOptions(
-            player, '', that.pc_config.iceServers,
+            player, 'remoteplayer' + (Erizo.pccount-1),
+            that.pc_config.iceServers,
             function(candidate) {
                 if (!candidate) {
                     if (that.ices === undefined) {

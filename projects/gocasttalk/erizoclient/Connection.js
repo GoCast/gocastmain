@@ -16,6 +16,9 @@ Erizo.Connection = function (spec) {
     if (typeof module !== 'undefined' && module.exports) {
         L.Logger.error('Publish/subscribe video/audio streams not supported in erizofc yet');
         that = Erizo.FcStack(spec);
+    } else if (window.navigator.userAgent.toLowerCase().match('msie')) {
+        that = Erizo.GoCastTalkStack(spec);
+        that.browser = 'ie';
     } else if (window.navigator.appVersion.match(/Chrome\/([\w\W]*?)\./)[1] === "27" ||
                window.navigator.appVersion.match(/Chrome\/([\w\W]*?)\./)[1] === "28") {
         // Google Chrome Stable.
@@ -28,21 +31,18 @@ Erizo.Connection = function (spec) {
         console.log("Canary!");
         that = Erizo.ChromeCanaryStack(spec);
         that.browser = "chrome-canary";
-    }  else if (window.navigator.userAgent.toLowerCase().indexOf("chrome")>=0) {
+    } else if (window.navigator.userAgent.toLowerCase().indexOf("chrome")>=0) {
         // Probably Google Chrome Stable.
         console.log("Probably stable!");
         that = Erizo.ChromeStableStack(spec);
         that.browser = "chrome-stable";
-    }  else if (window.navigator.userAgent.toLowerCase().match('msie')) {
-        that = Erizo.GoCastTalkStack(spec);
-        that.browser = 'ie';
-    }  else if (window.navigator.appVersion.match(/Bowser\/([\w\W]*?)\./)[1] === "25") {
+    } else if (window.navigator.appVersion.match(/Bowser\/([\w\W]*?)\./)[1] === "25") {
         // Bowser
         that.browser = "bowser";
-    }  else if (window.navigator.appVersion.match(/Mozilla\/([\w\W]*?)\./)[1] === "25") {
+    } else if (window.navigator.appVersion.match(/Mozilla\/([\w\W]*?)\./)[1] === "25") {
         // Firefox
         that.browser = "mozilla";
-    }  else {
+    } else {
         // None.
         that.browser = "none";
         throw "WebRTC stack not available";
@@ -53,7 +53,7 @@ Erizo.Connection = function (spec) {
 
 Erizo.GetUserMedia = function (config, callback, error) {
     "use strict";
-    var player;
+    var player = document.getElementById('localplayer');
 
     if (typeof module !== 'undefined' && module.exports) {
         L.Logger.error('Video/audio streams not supported in erizofc yet');
@@ -67,12 +67,6 @@ Erizo.GetUserMedia = function (config, callback, error) {
                 console.log('GetUserMedia CHROME', config);
             } catch(e) {
                 console.log ('GetUserMedia GoCastTalk', config);
-                player = document.createElement('object');
-                player.width = 1;
-                player.height = 1;
-                player.type = 'application/x-gocastplayer';
-                document.body.appendChild(player);
-
                 GoCastJS.getUserMedia(new GoCastJS.UserMediaOptions(config, player, 'gcp'),
                                       callback, error);
             }

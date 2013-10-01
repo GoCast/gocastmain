@@ -22,6 +22,7 @@ cp *.html $folder/
 
 # Copy js
 cp js/*.js $folder/js/
+cp ../../../../gocastjs/webrtc/peerconnection.js $folder/js/
 
 echo "Generating timestamped html"
 
