@@ -1,7 +1,7 @@
 1. Mac OSX or Ubuntu
    =================
 
-	a. Clone the repository: git clone https://github.com/GoCast/webrtc_plugin.git
+	a. Clone the repository: git clone https://github.com/GoCast/gocastmain.git
 	b. Download the Chromium Depot Tools [http://www.chromium.org/developers/how-tos/install-depot-tools].
 	c. Run ./getdeps.sh to download dependencies (If the script breaks, run: ./getdeps.sh webrtc).
 	d. Run ./prepdeps.sh Debug|Release to build the webrtc library.
