@@ -1,7 +1,7 @@
+#include <string>
+
 #import "AppDelegate.h"
 #import "ViewController.h"
-
-#include <string>
 
 #include "Base/package.h"
 
@@ -135,7 +135,7 @@ AppDelegate* gAppDelegateInstance = NULL;
 
 -(void)setRecordAudioScreenVisible:(bool)newVisible
 {
-    [self.viewController.mTabView setHidden:(newVisible) ? NO : YES];
+    [self.viewController.mTabView setHidden:(newVisible) ? YES : NO];
     self.viewController.mTabBar.selectedItem = self.viewController.mNewMemoTab;
     [self.viewController.mRecordAudioView setHidden:(newVisible) ? NO : YES];
 }
@@ -155,8 +155,25 @@ AppDelegate* gAppDelegateInstance = NULL;
 
 -(void)setPlayRecordingScreenVisible:(bool)newVisible
 {
-    [self.viewController.mTabView setHidden:(newVisible) ? NO : YES];
+    [self.viewController.mTabView setHidden:(newVisible) ? YES : NO];
     [self.viewController.mPlayRecordingView setHidden:(newVisible) ? NO : YES];
+}
+
+-(void)setStartRecordingButtonEnabled:(bool)newEnabled
+{
+    [self.viewController.mStartRecordingButton setEnabled:(newEnabled ? YES : NO)];
+    self.viewController.mStartRecordingButton.alpha = (newEnabled ? 1.0f : 0.4f);
+}
+
+-(void)setStopRecordingButtonEnabled:(bool)newEnabled
+{
+    [self.viewController.mStopRecordingButton setEnabled:(newEnabled ? YES : NO)];
+    self.viewController.mStopRecordingButton.alpha = (newEnabled ? 1.0f : 0.4f);
+}
+
+-(void)setRecordingStatusLabel:(const std::string&)newStatus
+{
+    self.viewController.mRecordingStatusLabel.text = [NSString stringWithUTF8String:newStatus.c_str()];
 }
 
 @end

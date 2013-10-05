@@ -17,14 +17,28 @@
 			'outputs': [ '../../dummy', ], # outputs
 			'action': [ '<@(_graphcode)', '<@(_inputs)',  '--force-update', '--machine', 'MemoApp', '-h', '../../source/Testbed/MemoApp/MemoApp.h', '-cpp', '../../source/Testbed/MemoApp/MemoApp.mm', ], # action
 		},
+
+		{
+			'action_name': 'RecordAudioScreen.tgf',
+			'inputs': [ '../../tgf/Testbed/MemoApp/RecordAudioScreen.tgf', ], # inputs
+			'outputs': [ '../../dummy', ], # outputs
+			'action': [ '<@(_graphcode)', '<@(_inputs)',  '--force-update', '--machine', 'RecordAudioScreen', '-h', '../../source/Testbed/MemoApp/RecordAudioScreen.h', '-cpp', '../../source/Testbed/MemoApp/RecordAudioScreen.mm', ], # action
+		},
 		],
 
 		'sources': [
+			'../../source/Testbed/MemoApp/package.h',
+
 			'../../source/Testbed/MemoApp/MemoApp.mm',
 			'../../source/Testbed/MemoApp/MemoApp.h',
 
 			'../../source/Testbed/MemoApp/MemoEvent.h',
 			'../../source/Testbed/MemoApp/MemoEventManager.h',
+
+			'../../source/Testbed/MemoApp/Screen.h',
+
+			'../../source/Testbed/MemoApp/RecordAudioScreen.mm',
+			'../../source/Testbed/MemoApp/RecordAudioScreen.h',
 
 			'../../source/Base/package.h',
 			'../../source/Base/tAlert.h',

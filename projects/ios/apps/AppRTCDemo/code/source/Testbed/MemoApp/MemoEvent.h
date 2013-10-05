@@ -12,6 +12,10 @@ public:
         kInboxTabPressed,
         kMemosTabPressed,
         kNewMemoTabPressed,
+
+        kStartRecordingPressed,
+        kStopRecordingPressed,
+        kCancelRecordingPressed,
     };
 
     EventType   mEvent;

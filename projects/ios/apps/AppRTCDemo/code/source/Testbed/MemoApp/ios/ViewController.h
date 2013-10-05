@@ -30,8 +30,17 @@
 @property (nonatomic, strong) IBOutlet UITabBarItem* mMemosTab;
 @property (nonatomic, strong) IBOutlet UITabBarItem* mNewMemoTab;
 
+@property (nonatomic, strong) IBOutlet UIButton* mStartRecordingButton;
+@property (nonatomic, strong) IBOutlet UIButton* mStopRecordingButton;
+@property (nonatomic, strong) IBOutlet UIButton* mCancelRecordingButton;
+@property (nonatomic, strong) IBOutlet UILabel* mRecordingStatusLabel;
+
+
 
 -(IBAction) signInPressed:(id)sender;
+-(IBAction) startRecordingPressed:(id)sender;
+-(IBAction) stopRecordingPressed:(id)sender;
+-(IBAction) cancelRecordingPressed:(id)sender;
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField;
 

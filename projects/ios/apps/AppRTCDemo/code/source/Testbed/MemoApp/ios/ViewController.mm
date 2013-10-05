@@ -100,6 +100,23 @@
     MemoEventManager::getInstance()->notify(MemoEvent(MemoEvent::kSignInPressed));
 }
 
+-(IBAction) startRecordingPressed:(id)sender
+{
+#pragma unused(sender)
+    MemoEventManager::getInstance()->notify(MemoEvent(MemoEvent::kStartRecordingPressed));
+}
+-(IBAction) stopRecordingPressed:(id)sender
+{
+#pragma unused(sender)
+    MemoEventManager::getInstance()->notify(MemoEvent(MemoEvent::kStopRecordingPressed));
+}
+
+-(IBAction) cancelRecordingPressed:(id)sender
+{
+#pragma unused(sender)
+    MemoEventManager::getInstance()->notify(MemoEvent(MemoEvent::kCancelRecordingPressed));
+}
+
 - (BOOL)textFieldShouldReturn:(UITextField *)textField
 {
     if (textField == self.mLoginUsername)

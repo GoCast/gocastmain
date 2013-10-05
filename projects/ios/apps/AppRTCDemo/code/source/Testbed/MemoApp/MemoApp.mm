@@ -1,16 +1,12 @@
 #include "Base/package.h"
 
-#include "MemoApp.h"
-#include "MemoEvent.h"
-#include "MemoEventManager.h"
-
-#include "AppDelegate.h"
+#include "package.h"
 
 MemoApp gMemoApp;
-extern AppDelegate* gAppDelegateInstance;
 
 #pragma mark Constructor / Destructor
 MemoApp::MemoApp()
+:   mScreen(NULL)
 {
 	ConstructMachine();
 }
@@ -28,6 +24,7 @@ void MemoApp::startEntry()
 
 void MemoApp::endEntry()
 {
+    if (mScreen) { delete mScreen; mScreen = NULL; }
 }
 
 void MemoApp::invalidStateEntry()
@@ -75,12 +72,13 @@ void MemoApp::myInboxScreenExit()
 
 void MemoApp::recordAudioScreenEntry()
 {
-    [gAppDelegateInstance setRecordAudioScreenVisible:true];
+    mScreen = new RecordAudioScreen;
+    mScreen->attach(this);
 }
 
 void MemoApp::recordAudioScreenExit()
 {
-    [gAppDelegateInstance setRecordAudioScreenVisible:false];
+    if (mScreen) { delete mScreen; mScreen = NULL; }
 }
 
 void MemoApp::myRecordingsScreenEntry()

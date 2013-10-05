@@ -7,6 +7,7 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="ViewController">
             <connections>
+                <outlet property="mCancelRecordingButton" destination="bm9-ud-vHN" id="eTz-EW-qbL"/>
                 <outlet property="mGroupTable" destination="18" id="112"/>
                 <outlet property="mInboxTab" destination="mIS-gC-azt" id="HhR-ug-abq"/>
                 <outlet property="mLoginPassword" destination="16" id="104"/>
@@ -16,7 +17,10 @@
                 <outlet property="mMyRecordingsView" destination="ArD-9I-Trz" id="Yau-am-Ayp"/>
                 <outlet property="mNewMemoTab" destination="fNb-Yf-DE3" id="9n6-C1-mSf"/>
                 <outlet property="mRecordAudioView" destination="wD3-Wi-uv9" id="w0j-RC-GGC"/>
+                <outlet property="mRecordingStatusLabel" destination="qEK-Gu-AnZ" id="aIh-pd-NuL"/>
+                <outlet property="mStartRecordingButton" destination="Sn3-JV-aXK" id="nK7-ph-Iy7"/>
                 <outlet property="mStartView" destination="6" id="s88-cr-zv3"/>
+                <outlet property="mStopRecordingButton" destination="w94-J5-Miu" id="McL-fx-pIF"/>
                 <outlet property="mTabBar" destination="lL0-uq-o7z" id="u2g-8s-8tD"/>
                 <outlet property="mTabView" destination="f0T-z3-92b" id="W3O-QX-11W"/>
                 <outlet property="view" destination="2" id="3"/>
@@ -31,6 +35,63 @@
                     <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                 </imageView>
+                <view contentMode="scaleToFill" id="wD3-Wi-uv9" userLabel="mRecordAudioView">
+                    <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <subviews>
+                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Record Audio" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="Q75-lj-gHE">
+                            <rect key="frame" x="0.0" y="10" width="320" height="21"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                            <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="Sn3-JV-aXK" userLabel="mStartRecordingButton">
+                            <rect key="frame" x="20" y="225" width="120" height="44"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <state key="normal" title="Start Recording">
+                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                            </state>
+                            <connections>
+                                <action selector="startRecordingPressed:" destination="-1" eventType="touchUpInside" id="gf0-wW-mxf"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="w94-J5-Miu" userLabel="mStopRecordingButton">
+                            <rect key="frame" x="180" y="225" width="120" height="44"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <state key="normal" title="Stop Recording">
+                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                            </state>
+                            <connections>
+                                <action selector="stopRecordingPressed:" destination="-1" eventType="touchUpInside" id="ChT-nd-HYV"/>
+                            </connections>
+                        </button>
+                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Status:" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="Qgc-iN-Ufz">
+                            <rect key="frame" x="47" y="123" width="55" height="21"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                            <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Idle" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="qEK-Gu-AnZ" userLabel="mRecordingStatusLabel">
+                            <rect key="frame" x="110" y="123" width="190" height="21"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="bm9-ud-vHN" userLabel="mCancelRecordingButton">
+                            <rect key="frame" x="120" y="308" width="80" height="44"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <state key="normal" title="Cancel">
+                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                            </state>
+                            <connections>
+                                <action selector="cancelRecordingPressed:" destination="-1" eventType="touchUpInside" id="QS3-fO-kkG"/>
+                            </connections>
+                        </button>
+                    </subviews>
+                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                </view>
                 <view hidden="YES" contentMode="scaleToFill" id="f0T-z3-92b" userLabel="mTabView">
                     <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -40,20 +101,6 @@
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <subviews>
                                 <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="My Recordings" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="uUx-a1-ST6">
-                                    <rect key="frame" x="0.0" y="10" width="320" height="21"/>
-                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                    <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
-                                    <nil key="highlightedColor"/>
-                                </label>
-                            </subviews>
-                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                        </view>
-                        <view contentMode="scaleToFill" id="wD3-Wi-uv9" userLabel="mRecordAudioView">
-                            <rect key="frame" x="0.0" y="0.0" width="320" height="431"/>
-                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                            <subviews>
-                                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Record Audio" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="Q75-lj-gHE">
                                     <rect key="frame" x="0.0" y="10" width="320" height="21"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
@@ -103,7 +150,7 @@
                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                     <simulatedScreenMetrics key="simulatedDestinationMetrics"/>
                 </view>
-                <view contentMode="scaleToFill" id="6" userLabel="mStartView">
+                <view hidden="YES" contentMode="scaleToFill" id="6" userLabel="mStartView">
                     <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <subviews>

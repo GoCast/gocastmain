@@ -1,0 +1,18 @@
+1 start
+2 end
+3 Idle
+4 Set Status: Idle
+5 Recording Idle
+6 Send GoInbox to VC
+7 Set Status: Recording
+8 Set Status: Saving
+9 Send GoRecordings to VC
+#
+4 3
+3 7 startRecording
+7 5
+3 6 cancel
+5 6 cancel
+5 8 stopRecording
+8 9
+1 4

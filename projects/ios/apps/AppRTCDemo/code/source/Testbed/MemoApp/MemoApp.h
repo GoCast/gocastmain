@@ -11,6 +11,7 @@ class MemoApp
     public tObserver<const MemoEvent&>
 {
 protected:
+    Screen* mScreen;
 
 public:
 	MemoApp();

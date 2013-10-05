@@ -18,4 +18,8 @@
 -(void)setSendToGroupScreenVisible:(bool)newVisible;
 -(void)setPlayRecordingScreenVisible:(bool)newVisible;
 
+-(void)setStartRecordingButtonEnabled:(bool)newEnabled;
+-(void)setStopRecordingButtonEnabled:(bool)newEnabled;
+-(void)setRecordingStatusLabel:(const std::string&)newStatus;
+
 @end
