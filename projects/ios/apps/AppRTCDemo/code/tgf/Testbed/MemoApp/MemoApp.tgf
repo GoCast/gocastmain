@@ -1,0 +1,28 @@
+1 start
+2 end
+3 Start Screen*
+4 Signing in Screen*
+5 Record Audio Screen*
+6 Send to Group Screen*
+7 My Recordings Screen*
+8 My Inbox Screen*
+9 Play Recording Screen*
+10 Hide all views
+#
+1 10 ready
+3 4 signin
+4 8 success
+4 3 fail
+8 7 goRecordings
+8 5 goNewRecording
+5 7 goRecordings
+7 6 goSendGroup
+6 8 goInbox
+7 5 goNewRecording
+5 8 goInbox
+7 8 goInbox
+8 9 goPlay
+7 9 goPlay
+9 8 goInbox
+9 7 goRecordings
+10 3

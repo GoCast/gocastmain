@@ -13,6 +13,7 @@
     					'AudioDemo.gyp:*',
     					'ErizoClient.gyp:*',
     					'HUDDemo.gyp:*',
+    					'MemoApp.gyp:*',
     				], # dependencies
 
     			},	# All
