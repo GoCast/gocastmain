@@ -84,9 +84,9 @@
 					'../../source/Testbed/ErizoClient/<@(OS)/ViewController.h',
 					'../../source/Testbed/ErizoClient/<@(OS)/ViewController.mm',
 
-					'../../third-party/TestFlightSDK2.0.0/TestFlight.h',
-					'../../third-party/TestFlightSDK2.0.0/TestFlight+AsyncLogging.h',
-					'../../third-party/TestFlightSDK2.0.0/TestFlight+ManualSessions.h',
+					'../../third-party/TestFlightSDK2.0.2/TestFlight.h',
+					'../../third-party/TestFlightSDK2.0.2/TestFlight+AsyncLogging.h',
+					'../../third-party/TestFlightSDK2.0.2/TestFlight+ManualSessions.h',
 
 					'../../third-party/webrtc/include/objc/RTCAudioTrack+Internal.h',
 					'../../third-party/webrtc/include/objc/RTCEnumConverter.h',
@@ -141,7 +141,7 @@
 
 				'link_settings': {
 					'libraries': [
-						'../../third-party/TestFlightSDK2.0.0/libTestFlight.a',
+						'../../third-party/TestFlightSDK2.0.2/libTestFlight.a',
 						'libz.dylib',
 
 						'../../third-party/webrtc/lib/$(CURRENT_ARCH)/$(CONFIGURATION)/libCNG.a',

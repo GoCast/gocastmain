@@ -116,9 +116,9 @@
 					'../../source/Testbed/MemoApp/<@(OS)/ViewController.h',
 					'../../source/Testbed/MemoApp/<@(OS)/ViewController.mm',
 
-					'../../third-party/TestFlightSDK2.0.0/TestFlight.h',
-					'../../third-party/TestFlightSDK2.0.0/TestFlight+AsyncLogging.h',
-					'../../third-party/TestFlightSDK2.0.0/TestFlight+ManualSessions.h',
+					'../../third-party/TestFlightSDK2.0.2/TestFlight.h',
+					'../../third-party/TestFlightSDK2.0.2/TestFlight+AsyncLogging.h',
+					'../../third-party/TestFlightSDK2.0.2/TestFlight+ManualSessions.h',
 
 				],	# sources
 
@@ -141,7 +141,7 @@
 
 				'link_settings': {
 					'libraries': [
-						'../../third-party/TestFlightSDK2.0.0/libTestFlight.a',
+						'../../third-party/TestFlightSDK2.0.2/libTestFlight.a',
 						'libz.dylib',
 						'$(SDKROOT)/System/Library/Frameworks/AVFoundation.framework',
 						'$(SDKROOT)/System/Library/Frameworks/UIKit.framework',

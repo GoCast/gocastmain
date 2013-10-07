@@ -35,9 +35,9 @@ AppDelegate* gAppDelegateInstance = NULL;
 #ifdef ADHOC
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    [TestFlight setDeviceIdentifier:[[UIDevice currentDevice] uniqueIdentifier]];
+//    [TestFlight setDeviceIdentifier:[[UIDevice currentDevice] uniqueIdentifier]];
 #pragma clang diagnostic pop
-    [TestFlight takeOff:@"64bf3141-d1a6-409a-ac0c-a4b7926fc51f"];
+    [TestFlight takeOff:@"a2e5966d-ce00-4823-ab21-0838f794a4bc"];
 #endif
 
     self.window = [[[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]] autorelease];

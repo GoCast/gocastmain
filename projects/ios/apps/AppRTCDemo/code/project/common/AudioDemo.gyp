@@ -84,9 +84,9 @@
 					'../../source/Testbed/AudioDemo/<@(OS)/ViewController.h',
 					'../../source/Testbed/AudioDemo/<@(OS)/ViewController.mm',
 
-					'../../third-party/TestFlightSDK2.0.0/TestFlight.h',
-					'../../third-party/TestFlightSDK2.0.0/TestFlight+AsyncLogging.h',
-					'../../third-party/TestFlightSDK2.0.0/TestFlight+ManualSessions.h',
+					'../../third-party/TestFlightSDK2.0.2/TestFlight.h',
+					'../../third-party/TestFlightSDK2.0.2/TestFlight+AsyncLogging.h',
+					'../../third-party/TestFlightSDK2.0.2/TestFlight+ManualSessions.h',
 
 					'../../third-party/CordovaLib/include/Cordova/CDV.h',
 					'../../third-party/CordovaLib/include/Cordova/CDVAccelerometer.h',
@@ -180,7 +180,7 @@
 
 				'link_settings': {
 					'libraries': [
-						'../../third-party/TestFlightSDK2.0.0/libTestFlight.a',
+						'../../third-party/TestFlightSDK2.0.2/libTestFlight.a',
 						'../../third-party/CordovaLib/lib/$(CURRENT_ARCH)/$(CONFIGURATION)/libCordova.a',
 						'libz.dylib',
 
