@@ -117,6 +117,30 @@
     MemoEventManager::getInstance()->notify(MemoEvent(MemoEvent::kCancelRecordingPressed));
 }
 
+-(IBAction) playAudioPressed:(id)sender
+{
+#pragma unused(sender)
+    MemoEventManager::getInstance()->notify(MemoEvent(MemoEvent::kPlayAudioPressed));
+}
+
+-(IBAction) deleteAudioPressed:(id)sender
+{
+#pragma unused(sender)
+    MemoEventManager::getInstance()->notify(MemoEvent(MemoEvent::kDeleteAudioPressed));
+}
+
+-(IBAction) sendAudioPressed:(id)sender
+{
+#pragma unused(sender)
+    MemoEventManager::getInstance()->notify(MemoEvent(MemoEvent::kSendAudioPressed));
+}
+
+-(IBAction) cancelAudioPressed:(id)sender
+{
+#pragma unused(sender)
+    MemoEventManager::getInstance()->notify(MemoEvent(MemoEvent::kCancelAudioPressed));
+}
+
 - (BOOL)textFieldShouldReturn:(UITextField *)textField
 {
     if (textField == self.mLoginUsername)

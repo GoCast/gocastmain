@@ -24,6 +24,13 @@
 			'outputs': [ '../../dummy', ], # outputs
 			'action': [ '<@(_graphcode)', '<@(_inputs)',  '--force-update', '--machine', 'RecordAudioScreen', '-h', '../../source/Testbed/MemoApp/RecordAudioScreen.h', '-cpp', '../../source/Testbed/MemoApp/RecordAudioScreen.mm', ], # action
 		},
+
+		{
+			'action_name': 'PlayAudioScreen.tgf',
+			'inputs': [ '../../tgf/Testbed/MemoApp/PlayAudioScreen.tgf', ], # inputs
+			'outputs': [ '../../dummy', ], # outputs
+			'action': [ '<@(_graphcode)', '<@(_inputs)',  '--force-update', '--machine', 'PlayAudioScreen', '-h', '../../source/Testbed/MemoApp/PlayAudioScreen.h', '-cpp', '../../source/Testbed/MemoApp/PlayAudioScreen.mm', ], # action
+		},
 		],
 
 		'sources': [
@@ -39,6 +46,9 @@
 
 			'../../source/Testbed/MemoApp/RecordAudioScreen.mm',
 			'../../source/Testbed/MemoApp/RecordAudioScreen.h',
+
+			'../../source/Testbed/MemoApp/PlayAudioScreen.mm',
+			'../../source/Testbed/MemoApp/PlayAudioScreen.h',
 
 			'../../source/Base/package.h',
 			'../../source/Base/tAlert.h',

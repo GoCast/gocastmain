@@ -65,6 +65,7 @@ void RecordAudioScreen::setStatusSavingEntry()
 }
 
 #pragma mark Sending messages to other machines
+
 void RecordAudioScreen::sendGoInboxToVCEntry()
 {
     this->tSubject<const MemoAppMessage&>::notify(MemoAppMessage(MemoApp::kGoInbox));
@@ -73,6 +74,11 @@ void RecordAudioScreen::sendGoInboxToVCEntry()
 void RecordAudioScreen::sendGoRecordingsToVCEntry()
 {
     this->tSubject<const MemoAppMessage&>::notify(MemoAppMessage(MemoApp::kGoRecordings));
+}
+
+void RecordAudioScreen::sendGoPlayToVCEntry()
+{
+    this->tSubject<const MemoAppMessage&>::notify(MemoAppMessage(MemoApp::kGoPlay));
 }
 
 #pragma mark State wiring
@@ -85,6 +91,7 @@ void RecordAudioScreen::CallEntry()
 		case kInvalidState: invalidStateEntry(); break;
 		case kRecordingIdle: recordingIdleEntry(); break;
 		case kSendGoInboxToVC: sendGoInboxToVCEntry(); break;
+		case kSendGoPlayToVC: sendGoPlayToVCEntry(); break;
 		case kSendGoRecordingsToVC: sendGoRecordingsToVCEntry(); break;
 		case kSetStatusIdle: setStatusIdleEntry(); break;
 		case kSetStatusRecording: setStatusRecordingEntry(); break;
@@ -106,7 +113,7 @@ int  RecordAudioScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kRecordingIdle) && (evt == kStopRecording)) return kSetStatusSaving; else
 	if ((mState == kSetStatusIdle) && (evt == kNext)) return kIdle; else
 	if ((mState == kSetStatusRecording) && (evt == kNext)) return kRecordingIdle; else
-	if ((mState == kSetStatusSaving) && (evt == kNext)) return kSendGoRecordingsToVC; else
+	if ((mState == kSetStatusSaving) && (evt == kNext)) return kSendGoPlayToVC; else
 	if ((mState == kStart) && (evt == kNext)) return kSetStatusIdle;
 
 	return kInvalidState;

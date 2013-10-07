@@ -16,7 +16,7 @@
 -(void)setRecordAudioScreenVisible:(bool)newVisible;
 -(void)setMyRecordingsScreenVisible:(bool)newVisible;
 -(void)setSendToGroupScreenVisible:(bool)newVisible;
--(void)setPlayRecordingScreenVisible:(bool)newVisible;
+-(void)setPlayAudioScreenVisible:(bool)newVisible;
 
 -(void)setStartRecordingButtonEnabled:(bool)newEnabled;
 -(void)setStopRecordingButtonEnabled:(bool)newEnabled;

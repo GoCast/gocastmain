@@ -7,6 +7,7 @@
 7 Set Status: Recording
 8 Set Status: Saving
 9 Send GoRecordings to VC
+10 Send GoPlay to VC
 #
 4 3
 3 7 startRecording
@@ -14,5 +15,5 @@
 3 6 cancel
 5 6 cancel
 5 8 stopRecording
-8 9
+8 10
 1 4

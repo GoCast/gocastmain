@@ -4,6 +4,7 @@
 
 #include "Screen.h"
 #include "RecordAudioScreen.h"
+#include "PlayAudioScreen.h"
 
 #include "MemoApp.h"
 

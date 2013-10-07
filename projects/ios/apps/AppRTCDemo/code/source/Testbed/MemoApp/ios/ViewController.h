@@ -12,7 +12,7 @@
 @property (nonatomic, strong) IBOutlet UIView* mRecordAudioView;
 @property (nonatomic, strong) IBOutlet UIView* mMyRecordingsView;
 @property (nonatomic, strong) IBOutlet UIView* mSendToGroupView;
-@property (nonatomic, strong) IBOutlet UIView* mPlayRecordingView;
+@property (nonatomic, strong) IBOutlet UIView* mPlayAudioView;
 
 @property (nonatomic, strong) IBOutlet UITextField* mLoginUsername;
 @property (nonatomic, strong) IBOutlet UITextField* mLoginPassword;
@@ -35,12 +35,23 @@
 @property (nonatomic, strong) IBOutlet UIButton* mCancelRecordingButton;
 @property (nonatomic, strong) IBOutlet UILabel* mRecordingStatusLabel;
 
+@property (nonatomic, strong) IBOutlet UIButton* mPlayAudioButton;
+@property (nonatomic, strong) IBOutlet UIButton* mDeleteAudioButton;
+@property (nonatomic, strong) IBOutlet UIButton* mSendAudioButton;
+@property (nonatomic, strong) IBOutlet UIButton* mCancelAudioButton;
+
 
 
 -(IBAction) signInPressed:(id)sender;
+
 -(IBAction) startRecordingPressed:(id)sender;
 -(IBAction) stopRecordingPressed:(id)sender;
 -(IBAction) cancelRecordingPressed:(id)sender;
+
+-(IBAction) playAudioPressed:(id)sender;
+-(IBAction) deleteAudioPressed:(id)sender;
+-(IBAction) sendAudioPressed:(id)sender;
+-(IBAction) cancelAudioPressed:(id)sender;
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField;
 

@@ -16,6 +16,11 @@ public:
         kStartRecordingPressed,
         kStopRecordingPressed,
         kCancelRecordingPressed,
+
+        kPlayAudioPressed,
+        kDeleteAudioPressed,
+        kSendAudioPressed,
+        kCancelAudioPressed,
     };
 
     EventType   mEvent;

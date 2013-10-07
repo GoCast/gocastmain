@@ -7,7 +7,9 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="ViewController">
             <connections>
+                <outlet property="mCancelAudioButton" destination="yFa-2v-cNd" id="DEl-Py-EbM"/>
                 <outlet property="mCancelRecordingButton" destination="bm9-ud-vHN" id="eTz-EW-qbL"/>
+                <outlet property="mDeleteAudioButton" destination="Y27-rm-VZ9" id="wsi-AB-pbb"/>
                 <outlet property="mGroupTable" destination="18" id="112"/>
                 <outlet property="mInboxTab" destination="mIS-gC-azt" id="HhR-ug-abq"/>
                 <outlet property="mLoginPassword" destination="16" id="104"/>
@@ -16,8 +18,11 @@
                 <outlet property="mMyInboxView" destination="17" id="Uny-5C-Bg1"/>
                 <outlet property="mMyRecordingsView" destination="ArD-9I-Trz" id="Yau-am-Ayp"/>
                 <outlet property="mNewMemoTab" destination="fNb-Yf-DE3" id="9n6-C1-mSf"/>
+                <outlet property="mPlayAudioButton" destination="UEk-F0-7b1" id="D5H-pB-EPk"/>
+                <outlet property="mPlayAudioView" destination="76K-la-UKg" id="cwg-Wy-pSF"/>
                 <outlet property="mRecordAudioView" destination="wD3-Wi-uv9" id="w0j-RC-GGC"/>
                 <outlet property="mRecordingStatusLabel" destination="qEK-Gu-AnZ" id="aIh-pd-NuL"/>
+                <outlet property="mSendAudioButton" destination="kAI-4c-ka5" id="TcC-HK-6YH"/>
                 <outlet property="mStartRecordingButton" destination="Sn3-JV-aXK" id="nK7-ph-Iy7"/>
                 <outlet property="mStartView" destination="6" id="s88-cr-zv3"/>
                 <outlet property="mStopRecordingButton" destination="w94-J5-Miu" id="McL-fx-pIF"/>
@@ -35,7 +40,61 @@
                     <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                 </imageView>
-                <view contentMode="scaleToFill" id="wD3-Wi-uv9" userLabel="mRecordAudioView">
+                <view contentMode="scaleToFill" id="76K-la-UKg" userLabel="mPlayAudioView">
+                    <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <subviews>
+                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Playback Audio" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="JD1-iB-BQ1">
+                            <rect key="frame" x="0.0" y="10" width="320" height="21"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                            <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="UEk-F0-7b1" userLabel="mPlayAudioButton">
+                            <rect key="frame" x="100" y="140" width="120" height="44"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <state key="normal" title="Play">
+                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                            </state>
+                            <connections>
+                                <action selector="playAudioPressed:" destination="-1" eventType="touchUpInside" id="UKE-nn-yg0"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="Y27-rm-VZ9" userLabel="mDeleteAudioButton">
+                            <rect key="frame" x="100" y="192" width="120" height="44"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <state key="normal" title="Delete">
+                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                            </state>
+                            <connections>
+                                <action selector="deleteAudioPressed:" destination="-1" eventType="touchUpInside" id="0AS-Dp-sGx"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="kAI-4c-ka5" userLabel="mSendAudioButton">
+                            <rect key="frame" x="100" y="244" width="120" height="44"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <state key="normal" title="Send to Group">
+                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                            </state>
+                            <connections>
+                                <action selector="sendAudioPressed:" destination="-1" eventType="touchUpInside" id="5J5-9g-Tvx"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="yFa-2v-cNd" userLabel="mCancelAudioButton">
+                            <rect key="frame" x="120" y="296" width="80" height="44"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <state key="normal" title="Cancel">
+                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                            </state>
+                            <connections>
+                                <action selector="cancelAudioPressed:" destination="-1" eventType="touchUpInside" id="Ton-t5-ixY"/>
+                            </connections>
+                        </button>
+                    </subviews>
+                    <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                </view>
+                <view hidden="YES" contentMode="scaleToFill" id="wD3-Wi-uv9" userLabel="mRecordAudioView">
                     <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <subviews>

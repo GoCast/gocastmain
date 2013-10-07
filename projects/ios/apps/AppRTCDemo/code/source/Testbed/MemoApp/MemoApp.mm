@@ -101,14 +101,15 @@ void MemoApp::sendToGroupScreenExit()
     [gAppDelegateInstance setSendToGroupScreenVisible:false];
 }
 
-void MemoApp::playRecordingScreenEntry()
+void MemoApp::playAudioScreenEntry()
 {
-    [gAppDelegateInstance setPlayRecordingScreenVisible:true];
+    mScreen = new PlayAudioScreen;
+    mScreen->attach(this);
 }
 
-void MemoApp::playRecordingScreenExit()
+void MemoApp::playAudioScreenExit()
 {
-    [gAppDelegateInstance setPlayRecordingScreenVisible:false];
+    if (mScreen) { delete mScreen; mScreen = NULL; }
 }
 
 #pragma mark State wiring
@@ -121,7 +122,7 @@ void MemoApp::CallEntry()
 		case kInvalidState: invalidStateEntry(); break;
 		case kMyInboxScreen: myInboxScreenEntry(); break;
 		case kMyRecordingsScreen: myRecordingsScreenEntry(); break;
-		case kPlayRecordingScreen: playRecordingScreenEntry(); break;
+		case kPlayAudioScreen: playAudioScreenEntry(); break;
 		case kRecordAudioScreen: recordAudioScreenEntry(); break;
 		case kSendToGroupScreen: sendToGroupScreenEntry(); break;
 		case kSigningInScreen: signingInScreenEntry(); break;
@@ -137,7 +138,7 @@ void MemoApp::CallExit()
 	{
 		case kMyInboxScreen: myInboxScreenExit(); break;
 		case kMyRecordingsScreen: myRecordingsScreenExit(); break;
-		case kPlayRecordingScreen: playRecordingScreenExit(); break;
+		case kPlayAudioScreen: playAudioScreenExit(); break;
 		case kRecordAudioScreen: recordAudioScreenExit(); break;
 		case kSendToGroupScreen: sendToGroupScreenExit(); break;
 		case kSigningInScreen: signingInScreenExit(); break;
@@ -150,15 +151,16 @@ int  MemoApp::StateTransitionFunction(const int evt) const
 {
 	if ((mState == kHideAllViews) && (evt == kNext)) return kStartScreen; else
 	if ((mState == kMyInboxScreen) && (evt == kGoNewRecording)) return kRecordAudioScreen; else
-	if ((mState == kMyInboxScreen) && (evt == kGoPlay)) return kPlayRecordingScreen; else
+	if ((mState == kMyInboxScreen) && (evt == kGoPlay)) return kPlayAudioScreen; else
 	if ((mState == kMyInboxScreen) && (evt == kGoRecordings)) return kMyRecordingsScreen; else
 	if ((mState == kMyRecordingsScreen) && (evt == kGoInbox)) return kMyInboxScreen; else
 	if ((mState == kMyRecordingsScreen) && (evt == kGoNewRecording)) return kRecordAudioScreen; else
-	if ((mState == kMyRecordingsScreen) && (evt == kGoPlay)) return kPlayRecordingScreen; else
-	if ((mState == kMyRecordingsScreen) && (evt == kGoSendGroup)) return kSendToGroupScreen; else
-	if ((mState == kPlayRecordingScreen) && (evt == kGoInbox)) return kMyInboxScreen; else
-	if ((mState == kPlayRecordingScreen) && (evt == kGoRecordings)) return kMyRecordingsScreen; else
+	if ((mState == kMyRecordingsScreen) && (evt == kGoPlay)) return kPlayAudioScreen; else
+	if ((mState == kPlayAudioScreen) && (evt == kGoInbox)) return kMyInboxScreen; else
+	if ((mState == kPlayAudioScreen) && (evt == kGoRecordings)) return kMyRecordingsScreen; else
+	if ((mState == kPlayAudioScreen) && (evt == kGoSendGroup)) return kSendToGroupScreen; else
 	if ((mState == kRecordAudioScreen) && (evt == kGoInbox)) return kMyInboxScreen; else
+	if ((mState == kRecordAudioScreen) && (evt == kGoPlay)) return kPlayAudioScreen; else
 	if ((mState == kRecordAudioScreen) && (evt == kGoRecordings)) return kMyRecordingsScreen; else
 	if ((mState == kSendToGroupScreen) && (evt == kGoInbox)) return kMyInboxScreen; else
 	if ((mState == kSigningInScreen) && (evt == kFail)) return kStartScreen; else

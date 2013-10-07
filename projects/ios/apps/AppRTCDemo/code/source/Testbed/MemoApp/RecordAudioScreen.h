@@ -25,6 +25,7 @@ protected:
 	void idleEntry();
 	void recordingIdleEntry();
 	void sendGoInboxToVCEntry();
+	void sendGoPlayToVCEntry();
 	void sendGoRecordingsToVCEntry();
 	void setStatusIdleEntry();
 	void setStatusRecordingEntry();
@@ -48,6 +49,7 @@ public:
 		kIdle,
 		kRecordingIdle,
 		kSendGoInboxToVC,
+		kSendGoPlayToVC,
 		kSendGoRecordingsToVC,
 		kSetStatusIdle,
 		kSetStatusRecording,

@@ -25,7 +25,7 @@ protected:
 	void hideAllViewsEntry();
 	void myInboxScreenEntry();
 	void myRecordingsScreenEntry();
-	void playRecordingScreenEntry();
+	void playAudioScreenEntry();
 	void recordAudioScreenEntry();
 	void sendToGroupScreenEntry();
 	void signingInScreenEntry();
@@ -33,7 +33,7 @@ protected:
 
 	void myInboxScreenExit();
 	void myRecordingsScreenExit();
-	void playRecordingScreenExit();
+	void playAudioScreenExit();
 	void recordAudioScreenExit();
 	void sendToGroupScreenExit();
 	void signingInScreenExit();
@@ -63,7 +63,7 @@ public:
 		kHideAllViews,
 		kMyInboxScreen,
 		kMyRecordingsScreen,
-		kPlayRecordingScreen,
+		kPlayAudioScreen,
 		kRecordAudioScreen,
 		kSendToGroupScreen,
 		kSigningInScreen,

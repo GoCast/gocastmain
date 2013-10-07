@@ -113,7 +113,7 @@ AppDelegate* gAppDelegateInstance = NULL;
     [self.viewController.mRecordAudioView setHidden:YES];
     [self.viewController.mMyRecordingsView setHidden:YES];
     [self.viewController.mSendToGroupView setHidden:YES];
-    [self.viewController.mPlayRecordingView setHidden:YES];
+    [self.viewController.mPlayAudioView setHidden:YES];
 }
 
 -(void)setStartScreenVisible:(bool)newVisible
@@ -153,10 +153,10 @@ AppDelegate* gAppDelegateInstance = NULL;
     [self.viewController.mSendToGroupView setHidden:(newVisible) ? NO : YES];
 }
 
--(void)setPlayRecordingScreenVisible:(bool)newVisible
+-(void)setPlayAudioScreenVisible:(bool)newVisible
 {
     [self.viewController.mTabView setHidden:(newVisible) ? YES : NO];
-    [self.viewController.mPlayRecordingView setHidden:(newVisible) ? NO : YES];
+    [self.viewController.mPlayAudioView setHidden:(newVisible) ? NO : YES];
 }
 
 -(void)setStartRecordingButtonEnabled:(bool)newEnabled

@@ -6,7 +6,7 @@
 6 Send to Group Screen*
 7 My Recordings Screen*
 8 My Inbox Screen*
-9 Play Recording Screen*
+9 Play Audio Screen*
 10 Hide all views
 #
 1 10 ready
@@ -16,7 +16,7 @@
 8 7 goRecordings
 8 5 goNewRecording
 5 7 goRecordings
-7 6 goSendGroup
+9 6 goSendGroup
 6 8 goInbox
 7 5 goNewRecording
 5 8 goInbox
@@ -26,3 +26,4 @@
 9 8 goInbox
 9 7 goRecordings
 10 3
+5 9 goPlay
