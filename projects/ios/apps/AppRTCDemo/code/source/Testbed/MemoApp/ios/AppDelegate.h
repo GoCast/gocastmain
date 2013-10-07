@@ -22,4 +22,9 @@
 -(void)setStopRecordingButtonEnabled:(bool)newEnabled;
 -(void)setRecordingStatusLabel:(const std::string&)newStatus;
 
+-(void)setPlayAudioButtonEnabled:(bool)newEnabled;
+-(void)setStopAudioButtonEnabled:(bool)newEnabled;
+-(void)setDeleteAudioButtonEnabled:(bool)newEnabled;
+-(void)setSendAudioButtonEnabled:(bool)newEnabled;
+
 @end

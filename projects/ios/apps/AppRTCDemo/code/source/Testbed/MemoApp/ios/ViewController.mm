@@ -123,6 +123,12 @@
     MemoEventManager::getInstance()->notify(MemoEvent(MemoEvent::kPlayAudioPressed));
 }
 
+-(IBAction) stopAudioPressed:(id)sender
+{
+#pragma unused(sender)
+    MemoEventManager::getInstance()->notify(MemoEvent(MemoEvent::kStopAudioPressed));
+}
+
 -(IBAction) deleteAudioPressed:(id)sender
 {
 #pragma unused(sender)

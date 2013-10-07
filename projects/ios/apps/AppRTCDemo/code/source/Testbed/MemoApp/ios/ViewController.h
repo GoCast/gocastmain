@@ -36,6 +36,7 @@
 @property (nonatomic, strong) IBOutlet UILabel* mRecordingStatusLabel;
 
 @property (nonatomic, strong) IBOutlet UIButton* mPlayAudioButton;
+@property (nonatomic, strong) IBOutlet UIButton* mStopAudioButton;
 @property (nonatomic, strong) IBOutlet UIButton* mDeleteAudioButton;
 @property (nonatomic, strong) IBOutlet UIButton* mSendAudioButton;
 @property (nonatomic, strong) IBOutlet UIButton* mCancelAudioButton;
@@ -49,6 +50,7 @@
 -(IBAction) cancelRecordingPressed:(id)sender;
 
 -(IBAction) playAudioPressed:(id)sender;
+-(IBAction) stopAudioPressed:(id)sender;
 -(IBAction) deleteAudioPressed:(id)sender;
 -(IBAction) sendAudioPressed:(id)sender;
 -(IBAction) cancelAudioPressed:(id)sender;

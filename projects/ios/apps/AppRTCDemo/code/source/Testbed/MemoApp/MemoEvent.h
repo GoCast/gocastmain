@@ -18,6 +18,7 @@ public:
         kCancelRecordingPressed,
 
         kPlayAudioPressed,
+        kStopAudioPressed,
         kDeleteAudioPressed,
         kSendAudioPressed,
         kCancelAudioPressed,

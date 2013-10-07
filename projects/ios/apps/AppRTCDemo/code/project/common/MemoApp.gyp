@@ -50,6 +50,12 @@
 			'../../source/Testbed/MemoApp/PlayAudioScreen.mm',
 			'../../source/Testbed/MemoApp/PlayAudioScreen.h',
 
+			'../../source/Audio/package.h',
+			'../../source/Audio/<@(OS)/tSound.mm',
+			'../../source/Audio/<@(OS)/tSound.h',
+			'../../source/Audio/tSoundImp.cpp',
+			'../../source/Audio/tSoundImp.h',
+
 			'../../source/Base/package.h',
 			'../../source/Base/tAlert.h',
 			'../../source/Base/<@(OS)/tAlert.mm',
@@ -70,12 +76,30 @@
 			'../../source/Input/tInputManager.h',
 			'../../source/Input/tOrientationEvent.h',
 			'../../source/Input/tTouchEvent.h',
+
+			'../../source/Io/package.h',
+			'../../source/Io/<@(OS)/tFile.mm',
+			'../../source/Io/<@(OS)/tFile.h',
+			'../../source/Io/tFileImp.cpp',
+			'../../source/Io/tFileImp.h',
+			'../../source/Io/tFileInputStream.cpp',
+			'../../source/Io/tFileInputStream.h',
+			'../../source/Io/tFileOutputStream.cpp',
+			'../../source/Io/tFileOutputStream.h',
+			'../../source/Io/tInputStream.h',
+			'../../source/Io/tOutputStream.h',
 		],
+
+		'mac_bundle_resources': [
+			'../../rsrc/Testbed/MemoApp/example.m4a',
+		],	# mac_bundle_resources
 
 		'include_dirs': [
 			'../../source',
+			'../../source/Audio/<@(OS)',
 			'../../source/Base/<@(OS)',
 			'../../source/Bootstrap/<@(OS)',
+			'../../source/Io/<@(OS)',
 		 ],  # include_dirs
 
 		'xcode_settings': {

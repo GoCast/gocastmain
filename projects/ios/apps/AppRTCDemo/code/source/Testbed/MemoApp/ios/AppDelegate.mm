@@ -149,7 +149,7 @@ AppDelegate* gAppDelegateInstance = NULL;
 
 -(void)setSendToGroupScreenVisible:(bool)newVisible
 {
-    [self.viewController.mTabView setHidden:(newVisible) ? NO : YES];
+    [self.viewController.mTabView setHidden:(newVisible) ? YES : NO];
     [self.viewController.mSendToGroupView setHidden:(newVisible) ? NO : YES];
 }
 
@@ -174,6 +174,30 @@ AppDelegate* gAppDelegateInstance = NULL;
 -(void)setRecordingStatusLabel:(const std::string&)newStatus
 {
     self.viewController.mRecordingStatusLabel.text = [NSString stringWithUTF8String:newStatus.c_str()];
+}
+
+-(void)setPlayAudioButtonEnabled:(bool)newEnabled
+{
+    [self.viewController.mPlayAudioButton setEnabled:(newEnabled ? YES : NO)];
+    self.viewController.mPlayAudioButton.alpha = (newEnabled ? 1.0f : 0.4f);
+}
+
+-(void)setStopAudioButtonEnabled:(bool)newEnabled
+{
+    [self.viewController.mStopAudioButton setEnabled:(newEnabled ? YES : NO)];
+    self.viewController.mStopAudioButton.alpha = (newEnabled ? 1.0f : 0.4f);
+}
+
+-(void)setDeleteAudioButtonEnabled:(bool)newEnabled
+{
+    [self.viewController.mDeleteAudioButton setEnabled:(newEnabled ? YES : NO)];
+    self.viewController.mDeleteAudioButton.alpha = (newEnabled ? 1.0f : 0.4f);
+}
+
+-(void)setSendAudioButtonEnabled:(bool)newEnabled
+{
+    [self.viewController.mSendAudioButton setEnabled:(newEnabled ? YES : NO)];
+    self.viewController.mSendAudioButton.alpha = (newEnabled ? 1.0f : 0.4f);
 }
 
 @end

@@ -25,6 +25,7 @@
                 <outlet property="mSendAudioButton" destination="kAI-4c-ka5" id="TcC-HK-6YH"/>
                 <outlet property="mStartRecordingButton" destination="Sn3-JV-aXK" id="nK7-ph-Iy7"/>
                 <outlet property="mStartView" destination="6" id="s88-cr-zv3"/>
+                <outlet property="mStopAudioButton" destination="lHM-Qk-cbr" id="Cyu-QC-JKQ"/>
                 <outlet property="mStopRecordingButton" destination="w94-J5-Miu" id="McL-fx-pIF"/>
                 <outlet property="mTabBar" destination="lL0-uq-o7z" id="u2g-8s-8tD"/>
                 <outlet property="mTabView" destination="f0T-z3-92b" id="W3O-QX-11W"/>
@@ -52,13 +53,23 @@
                             <nil key="highlightedColor"/>
                         </label>
                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="UEk-F0-7b1" userLabel="mPlayAudioButton">
-                            <rect key="frame" x="100" y="140" width="120" height="44"/>
+                            <rect key="frame" x="20" y="140" width="120" height="44"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <state key="normal" title="Play">
                                 <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                             </state>
                             <connections>
                                 <action selector="playAudioPressed:" destination="-1" eventType="touchUpInside" id="UKE-nn-yg0"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="lHM-Qk-cbr" userLabel="mStopAudioButton">
+                            <rect key="frame" x="180" y="140" width="120" height="44"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <state key="normal" title="Stop">
+                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                            </state>
+                            <connections>
+                                <action selector="stopAudioPressed:" destination="-1" eventType="touchUpInside" id="f0e-lr-3TT"/>
                             </connections>
                         </button>
                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="Y27-rm-VZ9" userLabel="mDeleteAudioButton">
@@ -92,7 +103,7 @@
                             </connections>
                         </button>
                     </subviews>
-                    <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                 </view>
                 <view hidden="YES" contentMode="scaleToFill" id="wD3-Wi-uv9" userLabel="mRecordAudioView">
                     <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
