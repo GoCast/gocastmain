@@ -22,6 +22,9 @@ public:
         kDeleteAudioPressed,
         kSendAudioPressed,
         kCancelAudioPressed,
+
+        kOKYesAlertPressed,
+        kNoAlertPressed,
     };
 
     EventType   mEvent;

@@ -4,9 +4,15 @@
 
 #include <string>
 
+#include "../../Testbed/MemoApp/ios/AppDelegate.h"
+
+extern AppDelegate* gAppDelegateInstance;
+
 void tAlert(const std::string& msg)
 {
 	UIAlertView* alert = [[UIAlertView alloc] init];
+
+    alert.delegate = gAppDelegateInstance.viewController;
 
 	alert.title = @"Alert";
 	alert.message = [NSString stringWithUTF8String:msg.c_str()];
@@ -20,6 +26,8 @@ void tAlert(const std::string& msg)
 void tConfirm(const std::string& msg)
 {
 	UIAlertView* alert = [[UIAlertView alloc] init];
+
+    alert.delegate = gAppDelegateInstance.viewController;
 
 	alert.title = @"Confirm";
 	alert.message = [NSString stringWithUTF8String:msg.c_str()];

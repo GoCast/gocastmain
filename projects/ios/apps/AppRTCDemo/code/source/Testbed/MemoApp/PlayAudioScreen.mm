@@ -143,8 +143,6 @@ void PlayAudioScreen::stopScratchFileEntry()
 void PlayAudioScreen::showConfirmDeleteEntry()
 {
     tConfirm("Delete this recording?");
-    //TODO: Fix tConfirm
-    SetImmediateEvent(kNo);
 }
 
 void PlayAudioScreen::showCouldntCopyEntry()
@@ -261,6 +259,9 @@ void PlayAudioScreen::update(const MemoEvent& msg)
         case MemoEvent::kDeleteAudioPressed:    process(kDelete); break;
         case MemoEvent::kSendAudioPressed:      process(kSend); break;
         case MemoEvent::kCancelAudioPressed:    process(kCancel); break;
+
+        case MemoEvent::kOKYesAlertPressed:     process(kYes); break;
+        case MemoEvent::kNoAlertPressed:        process(kNo); break;
 
         default:
             break;
