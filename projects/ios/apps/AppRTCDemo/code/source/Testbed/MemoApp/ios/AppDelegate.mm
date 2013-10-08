@@ -104,6 +104,8 @@ AppDelegate* gAppDelegateInstance = NULL;
     tApplication::getInstance()->resume();
 }
 
+#pragma mark -
+
 -(void)hideAllViews
 {
     [self.viewController.mStartView setHidden:YES];
@@ -198,6 +200,16 @@ AppDelegate* gAppDelegateInstance = NULL;
 {
     [self.viewController.mSendAudioButton setEnabled:(newEnabled ? YES : NO)];
     self.viewController.mSendAudioButton.alpha = (newEnabled ? 1.0f : 0.4f);
+}
+
+-(void)startRecorder
+{
+    [self.viewController startRecorder];
+}
+
+-(void)stopRecorder
+{
+    [self.viewController stopRecorder];
 }
 
 @end

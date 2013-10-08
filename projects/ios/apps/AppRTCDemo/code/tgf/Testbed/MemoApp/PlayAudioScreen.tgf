@@ -12,16 +12,12 @@
 12 Play scratch file
 13 Set Status: Playing
 14 Show "Couldn't delete"
-15 First time on screen?
-16 Copy example to scratch
-17 Show "Couldn't copy"
-18 Stop scratch file
+15 Stop scratch file
 #
 3 5 cancel
 4 5 cancel
-1 15
 3 12 play
-4 18 stop, finishedPlaying
+4 15 stop, finishedPlaying
 6 11 yes
 3 6 delete
 3 7 send
@@ -35,9 +31,5 @@
 13 4
 11 14 fail
 14 8
-15 16 yes
-16 17 fail
-15 8 no
-17 8
-16 8 success
-18 8
+15 8
+1 8

@@ -16,8 +16,6 @@ class PlayAudioScreen
     public Screen
 {
 protected:
-    static bool mFirstTime;
-
     tSound* mScratchSound;
 
 public:
@@ -29,10 +27,8 @@ protected:
 	void endEntry();
 	void invalidStateEntry();
 
-	void copyExampleToScratchEntry();
 	void deleteScratchFileEntry();
 	void doesScratchExistEntry();
-	void firstTimeOnScreenEntry();
 	void idleEntry();
 	void playScratchFileEntry();
 	void playingIdleEntry();
@@ -42,7 +38,6 @@ protected:
 	void setStatusNoAudioEntry();
 	void setStatusPlayingEntry();
 	void showConfirmDeleteEntry();
-	void showCouldntCopyEntry();
 	void showCouldntDeleteEntry();
 	void stopScratchFileEntry();
 
@@ -67,11 +62,9 @@ public:
 	{
 		kInvalidState = 0,
 		kStart = 1,
-		kCopyExampleToScratch,
 		kDeleteScratchFile,
 		kDoesScratchExist,
 		kEnd,
-		kFirstTimeOnScreen,
 		kIdle,
 		kPlayScratchFile,
 		kPlayingIdle,
@@ -81,7 +74,6 @@ public:
 		kSetStatusNoAudio,
 		kSetStatusPlaying,
 		kShowConfirmDelete,
-		kShowCouldntCopy,
 		kShowCouldntDelete,
 		kStopScratchFile,
 	};

@@ -1,7 +1,11 @@
 #import <UIKit/UIKit.h>
 #import <MessageUI/MessageUI.h>
+#import <AVFoundation/AVFoundation.h>
 
-@interface ViewController : UIViewController <UITextFieldDelegate, UITableViewDelegate, UITableViewDataSource, UITabBarDelegate, UIAlertViewDelegate>
+@interface ViewController : UIViewController
+<UITextFieldDelegate, UITableViewDelegate,
+UITableViewDataSource, UITabBarDelegate,
+UIAlertViewDelegate, AVAudioRecorderDelegate>
 {
 }
 
@@ -41,7 +45,12 @@
 @property (nonatomic, strong) IBOutlet UIButton* mSendAudioButton;
 @property (nonatomic, strong) IBOutlet UIButton* mCancelAudioButton;
 
+@property (nonatomic, strong) AVAudioRecorder* mRecorder;
 
+-(void)ctorRecorder;
+-(void)dtorRecorder;
+-(void)startRecorder;
+-(void)stopRecorder;
 
 -(IBAction) signInPressed:(id)sender;
 

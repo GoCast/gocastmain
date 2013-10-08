@@ -30,6 +30,9 @@ protected:
 	void setStatusIdleEntry();
 	void setStatusRecordingEntry();
 	void setStatusSavingEntry();
+	void setStatusStoppingEntry();
+	void startRecordingAudioEntry();
+	void stopRecordingAudioEntry();
 
 public:
 	enum EventType
@@ -54,6 +57,9 @@ public:
 		kSetStatusIdle,
 		kSetStatusRecording,
 		kSetStatusSaving,
+		kSetStatusStopping,
+		kStartRecordingAudio,
+		kStopRecordingAudio,
 	};
 
 protected:

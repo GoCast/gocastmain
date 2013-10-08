@@ -19,11 +19,14 @@
 {
     [super viewDidLoad];
 
+    [self ctorRecorder];
     self.view.autoresizesSubviews = YES;
 }
 
 - (void)viewDidUnload
-{    
+{
+    [self dtorRecorder];
+
     [super viewDidUnload];
 }
 
@@ -92,6 +95,61 @@
     [super didRotateFromInterfaceOrientation:fromInterfaceOrientation];
     [UIView setAnimationsEnabled:YES];
 }
+
+#pragma mark Audio Recording
+-(void)ctorRecorder
+{
+    // Set the audio file
+    NSArray *pathComponents = [NSArray arrayWithObjects:
+                               [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject],
+                               @"MemoApp/scratch.m4a",
+                               nil];
+    NSURL *outputFileURL = [NSURL fileURLWithPathComponents:pathComponents];
+
+    // Setup audio session
+    AVAudioSession *session = [AVAudioSession sharedInstance];
+    [session setCategory:AVAudioSessionCategoryPlayAndRecord error:nil];
+
+    [session overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker error:nil];
+
+    // Define the recorder setting
+    NSMutableDictionary *recordSetting = [[NSMutableDictionary alloc] init];
+
+    [recordSetting setValue:[NSNumber numberWithInt:kAudioFormatMPEG4AAC] forKey:AVFormatIDKey];
+    [recordSetting setValue:[NSNumber numberWithFloat:16000.0] forKey:AVSampleRateKey];
+    [recordSetting setValue:[NSNumber numberWithInt: 1] forKey:AVNumberOfChannelsKey];
+
+    // Initiate and prepare the recorder
+    _mRecorder = [[AVAudioRecorder alloc] initWithURL:outputFileURL settings:recordSetting error:NULL];
+    _mRecorder.delegate = self;
+    _mRecorder.meteringEnabled = YES;
+    [_mRecorder prepareToRecord];
+
+    [recordSetting release];
+}
+
+-(void)dtorRecorder
+{
+    [_mRecorder release];
+}
+
+-(void)startRecorder
+{
+    AVAudioSession *session = [AVAudioSession sharedInstance];
+    [session setActive:YES error:nil];
+
+    // Start recording
+    [_mRecorder record];
+}
+
+-(void)stopRecorder
+{
+    [_mRecorder stop];
+
+    AVAudioSession *audioSession = [AVAudioSession sharedInstance];
+    [audioSession setActive:NO error:nil];
+}
+
 
 #pragma mark Button Presses
 -(IBAction) signInPressed:(id)sender

@@ -4,8 +4,6 @@
 
 #include "package.h"
 
-bool PlayAudioScreen::mFirstTime = true;
-
 #pragma mark Constructor / Destructor
 PlayAudioScreen::PlayAudioScreen()
 {
@@ -81,35 +79,7 @@ void PlayAudioScreen::doesScratchExistEntry()
     SetImmediateEvent(scratch.exists() ? kYes : kNo);
 }
 
-void PlayAudioScreen::firstTimeOnScreenEntry()
-{
-    SetImmediateEvent(mFirstTime ? kYes : kNo);
-
-    mFirstTime = false;
-}
-
 #pragma mark Actions
-
-void PlayAudioScreen::copyExampleToScratchEntry()
-{
-    tFile example("example.m4a");
-    tFile destination(tFile::kDocumentsDirectory, "scratch.m4a");
-
-    if (destination.exists())
-    {
-        destination.remove();
-    }
-
-    if (!destination.exists())
-    {
-        destination.write((std::vector<tUInt8>)example);
-        SetImmediateEvent(destination.exists() ? kSuccess : kFail);
-    }
-    else
-    {
-        SetImmediateEvent(kFail);
-    }
-}
 
 void PlayAudioScreen::deleteScratchFileEntry()
 {
@@ -145,11 +115,6 @@ void PlayAudioScreen::showConfirmDeleteEntry()
     tConfirm("Delete this recording?");
 }
 
-void PlayAudioScreen::showCouldntCopyEntry()
-{
-    tAlert("Couldn't copy example to scratch.");
-}
-
 void PlayAudioScreen::showCouldntDeleteEntry()
 {
     tAlert("Couldn't delete audio file.");
@@ -172,11 +137,9 @@ void PlayAudioScreen::CallEntry()
 {
 	switch(mState)
 	{
-		case kCopyExampleToScratch: copyExampleToScratchEntry(); break;
 		case kDeleteScratchFile: deleteScratchFileEntry(); break;
 		case kDoesScratchExist: doesScratchExistEntry(); break;
 		case kEnd: EndEntryHelper(); break;
-		case kFirstTimeOnScreen: firstTimeOnScreenEntry(); break;
 		case kIdle: idleEntry(); break;
 		case kInvalidState: invalidStateEntry(); break;
 		case kPlayScratchFile: playScratchFileEntry(); break;
@@ -187,7 +150,6 @@ void PlayAudioScreen::CallEntry()
 		case kSetStatusNoAudio: setStatusNoAudioEntry(); break;
 		case kSetStatusPlaying: setStatusPlayingEntry(); break;
 		case kShowConfirmDelete: showConfirmDeleteEntry(); break;
-		case kShowCouldntCopy: showCouldntCopyEntry(); break;
 		case kShowCouldntDelete: showCouldntDeleteEntry(); break;
 		case kStart: startEntry(); break;
 		case kStopScratchFile: stopScratchFileEntry(); break;
@@ -201,14 +163,10 @@ void PlayAudioScreen::CallExit()
 
 int  PlayAudioScreen::StateTransitionFunction(const int evt) const
 {
-	if ((mState == kCopyExampleToScratch) && (evt == kFail)) return kShowCouldntCopy; else
-	if ((mState == kCopyExampleToScratch) && (evt == kSuccess)) return kDoesScratchExist; else
 	if ((mState == kDeleteScratchFile) && (evt == kFail)) return kShowCouldntDelete; else
 	if ((mState == kDeleteScratchFile) && (evt == kSuccess)) return kDoesScratchExist; else
 	if ((mState == kDoesScratchExist) && (evt == kNo)) return kSetStatusNoAudio; else
 	if ((mState == kDoesScratchExist) && (evt == kYes)) return kSetStatusHasAudio; else
-	if ((mState == kFirstTimeOnScreen) && (evt == kNo)) return kDoesScratchExist; else
-	if ((mState == kFirstTimeOnScreen) && (evt == kYes)) return kCopyExampleToScratch; else
 	if ((mState == kIdle) && (evt == kCancel)) return kSendGoInboxToVC; else
 	if ((mState == kIdle) && (evt == kDelete)) return kShowConfirmDelete; else
 	if ((mState == kIdle) && (evt == kPlay)) return kPlayScratchFile; else
@@ -222,9 +180,8 @@ int  PlayAudioScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kSetStatusPlaying) && (evt == kNext)) return kPlayingIdle; else
 	if ((mState == kShowConfirmDelete) && (evt == kNo)) return kDoesScratchExist; else
 	if ((mState == kShowConfirmDelete) && (evt == kYes)) return kDeleteScratchFile; else
-	if ((mState == kShowCouldntCopy) && (evt == kNext)) return kDoesScratchExist; else
 	if ((mState == kShowCouldntDelete) && (evt == kNext)) return kDoesScratchExist; else
-	if ((mState == kStart) && (evt == kNext)) return kFirstTimeOnScreen; else
+	if ((mState == kStart) && (evt == kNext)) return kDoesScratchExist; else
 	if ((mState == kStopScratchFile) && (evt == kNext)) return kDoesScratchExist;
 
 	return kInvalidState;
@@ -238,7 +195,6 @@ bool PlayAudioScreen::HasEdgeNamedNext() const
 		case kSetStatusHasAudio:
 		case kSetStatusNoAudio:
 		case kSetStatusPlaying:
-		case kShowCouldntCopy:
 		case kShowCouldntDelete:
 		case kStart:
 		case kStopScratchFile:

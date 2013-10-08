@@ -1,4 +1,7 @@
+#import <AVFoundation/AVFoundation.h>
+
 #include "Base/package.h"
+#include "Io/package.h"
 
 #include "package.h"
 
@@ -64,6 +67,24 @@ void RecordAudioScreen::setStatusSavingEntry()
     [gAppDelegateInstance setRecordingStatusLabel:"Saving"];
 }
 
+void RecordAudioScreen::setStatusStoppingEntry()
+{
+    [gAppDelegateInstance setStartRecordingButtonEnabled:false];
+    [gAppDelegateInstance setStopRecordingButtonEnabled:false];
+    [gAppDelegateInstance setRecordingStatusLabel:"Stopping"];
+}
+
+#pragma mark Actions
+void RecordAudioScreen::startRecordingAudioEntry()
+{
+    [gAppDelegateInstance startRecorder];
+}
+
+void RecordAudioScreen::stopRecordingAudioEntry()
+{
+    [gAppDelegateInstance stopRecorder];
+}
+
 #pragma mark Sending messages to other machines
 
 void RecordAudioScreen::sendGoInboxToVCEntry()
@@ -96,7 +117,10 @@ void RecordAudioScreen::CallEntry()
 		case kSetStatusIdle: setStatusIdleEntry(); break;
 		case kSetStatusRecording: setStatusRecordingEntry(); break;
 		case kSetStatusSaving: setStatusSavingEntry(); break;
+		case kSetStatusStopping: setStatusStoppingEntry(); break;
 		case kStart: startEntry(); break;
+		case kStartRecordingAudio: startRecordingAudioEntry(); break;
+		case kStopRecordingAudio: stopRecordingAudioEntry(); break;
 		default: break;
 	}
 }
@@ -110,11 +134,14 @@ int  RecordAudioScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kIdle) && (evt == kCancel)) return kSendGoInboxToVC; else
 	if ((mState == kIdle) && (evt == kStartRecording)) return kSetStatusRecording; else
 	if ((mState == kRecordingIdle) && (evt == kCancel)) return kSendGoInboxToVC; else
-	if ((mState == kRecordingIdle) && (evt == kStopRecording)) return kSetStatusSaving; else
+	if ((mState == kRecordingIdle) && (evt == kStopRecording)) return kSetStatusStopping; else
 	if ((mState == kSetStatusIdle) && (evt == kNext)) return kIdle; else
-	if ((mState == kSetStatusRecording) && (evt == kNext)) return kRecordingIdle; else
+	if ((mState == kSetStatusRecording) && (evt == kNext)) return kStartRecordingAudio; else
 	if ((mState == kSetStatusSaving) && (evt == kNext)) return kSendGoPlayToVC; else
-	if ((mState == kStart) && (evt == kNext)) return kSetStatusIdle;
+	if ((mState == kSetStatusStopping) && (evt == kNext)) return kStopRecordingAudio; else
+	if ((mState == kStart) && (evt == kNext)) return kSetStatusIdle; else
+	if ((mState == kStartRecordingAudio) && (evt == kNext)) return kRecordingIdle; else
+	if ((mState == kStopRecordingAudio) && (evt == kNext)) return kSetStatusSaving;
 
 	return kInvalidState;
 }
@@ -123,14 +150,17 @@ bool RecordAudioScreen::HasEdgeNamedNext() const
 {
 	switch(mState)
 	{
-		case kSetStatusIdle:
-		case kSetStatusRecording:
-		case kSetStatusSaving:
-		case kStart:
-			return true;
+		case kEnd:
+		case kIdle:
+		case kInvalidState:
+		case kRecordingIdle:
+		case kSendGoInboxToVC:
+		case kSendGoPlayToVC:
+		case kSendGoRecordingsToVC:
+			return false;
 		default: break;
 	}
-	return false;
+	return true;
 }
 
 #pragma mark Messages

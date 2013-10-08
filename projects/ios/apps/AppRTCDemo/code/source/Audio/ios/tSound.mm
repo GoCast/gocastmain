@@ -42,6 +42,7 @@ tSound::tSound(const tFile& file)
                            [NSString stringWithFormat:@"%s",
                             file.GetFullPath().c_str()]]
                                                                 error:&err];
+        mAvaudioplayer.volume = 1.0f;
     }
 
     assert(mAvaudioplayer);

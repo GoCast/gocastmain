@@ -27,4 +27,7 @@
 -(void)setDeleteAudioButtonEnabled:(bool)newEnabled;
 -(void)setSendAudioButtonEnabled:(bool)newEnabled;
 
+-(void)startRecorder;
+-(void)stopRecorder;
+
 @end
