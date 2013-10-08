@@ -86,7 +86,7 @@ void RecordAudioScreen::stopRecordingAudioEntry()
     [gAppDelegateInstance stopRecorder];
 
     sprintf(buf, "%d.m4a", tTimer::getSystemTimeMS());
-    tFile scratch(tFile::kDocumentsDirectory, "scratch.m4a");
+    tFile scratch(tFile::kTemporaryDirectory, "scratch.m4a");
 
     result = scratch.rename(tFile::kDocumentsDirectory, buf);
 

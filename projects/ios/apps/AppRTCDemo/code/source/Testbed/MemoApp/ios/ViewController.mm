@@ -103,8 +103,8 @@ std::vector<std::string> gMyRecordingsEntries;
 {
     // Set the audio file
     NSArray *pathComponents = [NSArray arrayWithObjects:
-                               [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject],
-                               @"MemoApp/scratch.m4a",
+                               NSTemporaryDirectory(),
+                               @"scratch.m4a",
                                nil];
     NSURL *outputFileURL = [NSURL fileURLWithPathComponents:pathComponents];
 
