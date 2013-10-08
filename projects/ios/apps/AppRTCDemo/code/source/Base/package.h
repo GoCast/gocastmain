@@ -21,3 +21,7 @@
 //Application notifications
 #include "tApplicationEvent.h"
 #include "tApplication.h"
+
+#include "tTimer.h"
+#include "tTimerPeer.h"
+

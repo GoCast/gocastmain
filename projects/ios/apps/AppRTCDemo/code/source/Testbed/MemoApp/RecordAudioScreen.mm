@@ -60,18 +60,16 @@ void RecordAudioScreen::setStatusRecordingEntry()
     [gAppDelegateInstance setRecordingStatusLabel:"Recording"];
 }
 
-void RecordAudioScreen::setStatusSavingEntry()
-{
-    [gAppDelegateInstance setStartRecordingButtonEnabled:false];
-    [gAppDelegateInstance setStopRecordingButtonEnabled:false];
-    [gAppDelegateInstance setRecordingStatusLabel:"Saving"];
-}
-
 void RecordAudioScreen::setStatusStoppingEntry()
 {
     [gAppDelegateInstance setStartRecordingButtonEnabled:false];
     [gAppDelegateInstance setStopRecordingButtonEnabled:false];
     [gAppDelegateInstance setRecordingStatusLabel:"Stopping"];
+}
+
+void RecordAudioScreen::showCouldntSaveEntry()
+{
+    tAlert("Error saving audio file");
 }
 
 #pragma mark Actions
@@ -82,7 +80,17 @@ void RecordAudioScreen::startRecordingAudioEntry()
 
 void RecordAudioScreen::stopRecordingAudioEntry()
 {
+    char buf[80];
+    bool result;
+
     [gAppDelegateInstance stopRecorder];
+
+    sprintf(buf, "%d.m4a", tTimer::getSystemTimeMS());
+    tFile scratch(tFile::kDocumentsDirectory, "scratch.m4a");
+
+    result = scratch.rename(tFile::kDocumentsDirectory, buf);
+
+    SetImmediateEvent(result ? kSuccess : kFail);
 }
 
 #pragma mark Sending messages to other machines
@@ -116,8 +124,8 @@ void RecordAudioScreen::CallEntry()
 		case kSendGoRecordingsToVC: sendGoRecordingsToVCEntry(); break;
 		case kSetStatusIdle: setStatusIdleEntry(); break;
 		case kSetStatusRecording: setStatusRecordingEntry(); break;
-		case kSetStatusSaving: setStatusSavingEntry(); break;
 		case kSetStatusStopping: setStatusStoppingEntry(); break;
+		case kShowCouldntSave: showCouldntSaveEntry(); break;
 		case kStart: startEntry(); break;
 		case kStartRecordingAudio: startRecordingAudioEntry(); break;
 		case kStopRecordingAudio: stopRecordingAudioEntry(); break;
@@ -137,11 +145,12 @@ int  RecordAudioScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kRecordingIdle) && (evt == kStopRecording)) return kSetStatusStopping; else
 	if ((mState == kSetStatusIdle) && (evt == kNext)) return kIdle; else
 	if ((mState == kSetStatusRecording) && (evt == kNext)) return kStartRecordingAudio; else
-	if ((mState == kSetStatusSaving) && (evt == kNext)) return kSendGoPlayToVC; else
 	if ((mState == kSetStatusStopping) && (evt == kNext)) return kStopRecordingAudio; else
+	if ((mState == kShowCouldntSave) && (evt == kNext)) return kSetStatusIdle; else
 	if ((mState == kStart) && (evt == kNext)) return kSetStatusIdle; else
 	if ((mState == kStartRecordingAudio) && (evt == kNext)) return kRecordingIdle; else
-	if ((mState == kStopRecordingAudio) && (evt == kNext)) return kSetStatusSaving;
+	if ((mState == kStopRecordingAudio) && (evt == kFail)) return kShowCouldntSave; else
+	if ((mState == kStopRecordingAudio) && (evt == kSuccess)) return kSendGoRecordingsToVC;
 
 	return kInvalidState;
 }
@@ -150,17 +159,16 @@ bool RecordAudioScreen::HasEdgeNamedNext() const
 {
 	switch(mState)
 	{
-		case kEnd:
-		case kIdle:
-		case kInvalidState:
-		case kRecordingIdle:
-		case kSendGoInboxToVC:
-		case kSendGoPlayToVC:
-		case kSendGoRecordingsToVC:
-			return false;
+		case kSetStatusIdle:
+		case kSetStatusRecording:
+		case kSetStatusStopping:
+		case kShowCouldntSave:
+		case kStart:
+		case kStartRecordingAudio:
+			return true;
 		default: break;
 	}
-	return true;
+	return false;
 }
 
 #pragma mark Messages

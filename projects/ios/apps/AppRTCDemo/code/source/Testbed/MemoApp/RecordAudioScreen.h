@@ -29,8 +29,8 @@ protected:
 	void sendGoRecordingsToVCEntry();
 	void setStatusIdleEntry();
 	void setStatusRecordingEntry();
-	void setStatusSavingEntry();
 	void setStatusStoppingEntry();
+	void showCouldntSaveEntry();
 	void startRecordingAudioEntry();
 	void stopRecordingAudioEntry();
 
@@ -40,8 +40,10 @@ public:
 		kInvalidEvent = -2,
 		kNext = -1,
 		kCancel,
+		kFail,
 		kStartRecording,
 		kStopRecording,
+		kSuccess,
 	};
 
 	enum StateType
@@ -56,8 +58,8 @@ public:
 		kSendGoRecordingsToVC,
 		kSetStatusIdle,
 		kSetStatusRecording,
-		kSetStatusSaving,
 		kSetStatusStopping,
+		kShowCouldntSave,
 		kStartRecordingAudio,
 		kStopRecordingAudio,
 	};

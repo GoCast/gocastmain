@@ -107,6 +107,18 @@ bool        tFileImp::exists() const
     return ::access(GetFullPath().c_str(), F_OK) == 0;
 }
 
+bool        tFileImp::rename(const PathType& newPath, const std::string& newFilename)
+{
+    tFile newFile(newPath, newFilename);
+
+    if (mPathType != tFileImp::kBundleDirectory && newPath != tFileImp::kBundleDirectory && exists() && !newFile.exists())
+    {
+        return ::rename(GetFullPath().c_str(), newFile.GetFullPath().c_str()) == 0;
+    }
+
+    return false;
+}
+
 bool        tFileImp::write(const std::string& data)
 {
     return write(std::vector<tUInt8>(data.begin(), data.end()));

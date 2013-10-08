@@ -38,6 +38,8 @@ public:
     bool        remove() const;
     bool        exists() const;
 
+    bool        rename(const PathType& newPath, const std::string& newFilename);
+
     bool        write(const std::string& data);
     bool        write(const std::vector<tUInt8>& data);
 

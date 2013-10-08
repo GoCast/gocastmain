@@ -70,6 +70,10 @@
 			'../../source/Base/tMealy.h',
 			'../../source/Base/tObserver.h',
 			'../../source/Base/tSingleton.h',
+			'../../source/Base/tTimer.cpp',
+			'../../source/Base/tTimer.h',
+			'../../source/Base/<@(OS)/tTimerPeer.mm',
+			'../../source/Base/<@(OS)/tTimerPeer.h',
 			'../../source/Base/tTypes.h',
 
 			'../../source/Input/package.h',
@@ -89,10 +93,6 @@
 			'../../source/Io/tInputStream.h',
 			'../../source/Io/tOutputStream.h',
 		],
-
-		'mac_bundle_resources': [
-			'../../rsrc/Testbed/MemoApp/example.m4a',
-		],	# mac_bundle_resources
 
 		'include_dirs': [
 			'../../source',
@@ -136,7 +136,6 @@
 					'../../rsrc/Testbed/MemoApp/<@(OS)/tab-recordings.png',
 
 					'../../rsrc/Testbed/MemoApp/<@(OS)/Default.png',
-					'../../rsrc/Testbed/MemoApp/<@(OS)/Default-568h@2x.png',
 				],	# mac_bundle_resources
 
 				'link_settings': {
