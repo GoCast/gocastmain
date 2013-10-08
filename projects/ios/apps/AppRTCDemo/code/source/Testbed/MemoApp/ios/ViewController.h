@@ -22,11 +22,7 @@ UIAlertViewDelegate, AVAudioRecorderDelegate>
 @property (nonatomic, strong) IBOutlet UITextField* mLoginPassword;
 
 @property (nonatomic, strong) IBOutlet UITableView* mGroupTable;
-@property (nonatomic, strong) IBOutlet UITableView* mMemberTable;
-@property (nonatomic, strong) IBOutlet UITableView* mInCallTable;
-@property (nonatomic, strong) IBOutlet UITableView* mEditMembersTable;
-@property (nonatomic, strong) IBOutlet UITableView* mCallerTable;
-@property (nonatomic, strong) IBOutlet UITableView* mRecipientsTable;
+@property (nonatomic, strong) IBOutlet UITableView* mMyRecordingsTable;
 
 @property (nonatomic, strong) IBOutlet UITabBar* mTabBar;
 

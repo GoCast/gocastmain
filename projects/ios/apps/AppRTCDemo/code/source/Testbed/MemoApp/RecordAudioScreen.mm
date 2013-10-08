@@ -90,6 +90,8 @@ void RecordAudioScreen::stopRecordingAudioEntry()
 
     result = scratch.rename(tFile::kDocumentsDirectory, buf);
 
+    mResultFilename = buf;
+
     SetImmediateEvent(result ? kSuccess : kFail);
 }
 
@@ -107,7 +109,7 @@ void RecordAudioScreen::sendGoRecordingsToVCEntry()
 
 void RecordAudioScreen::sendGoPlayToVCEntry()
 {
-    this->tSubject<const MemoAppMessage&>::notify(MemoAppMessage(MemoApp::kGoPlay));
+    this->tSubject<const MemoAppMessage&>::notify(MemoAppMessage(MemoApp::kGoPlay, mResultFilename));
 }
 
 #pragma mark State wiring

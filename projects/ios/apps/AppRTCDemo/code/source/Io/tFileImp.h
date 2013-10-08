@@ -38,7 +38,9 @@ public:
     bool        remove() const;
     bool        exists() const;
 
+    //TODO: These are two hack methods
     bool        rename(const PathType& newPath, const std::string& newFilename);
+    std::vector<std::string> directoryListing();
 
     bool        write(const std::string& data);
     bool        write(const std::vector<tUInt8>& data);

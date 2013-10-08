@@ -7,6 +7,8 @@
 #include "MemoEvent.h"
 #include "MemoEventManager.h"
 
+std::vector<std::string> gMyRecordingsEntries;
+
 @interface ViewController()
 {
 }
@@ -222,57 +224,79 @@
 
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-#pragma unused(tableView, section)
+#pragma unused(section)
+
+    if (tableView == self.mMyRecordingsTable)
+    {
+        return (NSInteger)gMyRecordingsEntries.size();
+    }
+
     return (NSInteger)5;
 }
 
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
 {
-#pragma unused(tableView)
-    if (indexPath.row % 2)
-    {
-        [cell setBackgroundColor:[UIColor colorWithRed:.8f green:.8f blue:1 alpha:1]];
-    }
-    else
-    {
-        [cell setBackgroundColor:[UIColor whiteColor]];
-    }
+#pragma unused(tableView, indexPath)
+    [cell setBackgroundColor:[UIColor whiteColor]];
 }
 
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    const char* names[5] =
-    {
-        "Yoji Izaki",
-        "Shinzo Abe",
-        "Barack Obama",
-        "TJ Grant",
-        "Manjesh Mallavali",
-    };
 #pragma unused(indexPath)
-
-    tableView.backgroundView = nil;
-
-    static NSString *simpleTableIdentifier = @"HUDDemoTableItem";
-
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:simpleTableIdentifier];
-
-    if (cell == nil)
+    if (tableView == self.mMyRecordingsTable)
     {
-        cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:simpleTableIdentifier] autorelease];
+        tableView.backgroundView = nil;
+
+        static NSString *simpleTableIdentifier = @"MemoAppTableItem";
+
+        UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:simpleTableIdentifier];
+
+        if (cell == nil)
+        {
+            cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:simpleTableIdentifier] autorelease];
+        }
+
+        cell.textLabel.text = [NSString stringWithUTF8String:gMyRecordingsEntries[indexPath.row].c_str()];
+
+        cell.imageView.image = nil;
+        
+        return cell;
     }
+    else
+    {
+        const char* names[5] =
+        {
+            "Yoji Izaki",
+            "Shinzo Abe",
+            "Barack Obama",
+            "TJ Grant",
+            "Manjesh Mallavali",
+        };
+    #pragma unused(indexPath)
 
-    cell.textLabel.text = [NSString stringWithUTF8String:names[indexPath.row]];
+        tableView.backgroundView = nil;
 
-    cell.imageView.image = nil;
+        static NSString *simpleTableIdentifier = @"HUDDemoTableItem";
 
-    return cell;
+        UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:simpleTableIdentifier];
+
+        if (cell == nil)
+        {
+            cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:simpleTableIdentifier] autorelease];
+        }
+
+        cell.textLabel.text = [NSString stringWithUTF8String:names[indexPath.row]];
+
+        cell.imageView.image = nil;
+
+        return cell;
+    }
 }
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
 #pragma unused(tableView, indexPath)
-//    JSEventManager::getInstance()->notify(JSEvent(JSEvent::kLibraryRowSelected, indexPath.row + 1));
+    MemoEventManager::getInstance()->notify(MemoEvent(MemoEvent::kTableItemSelected, (tUInt32)indexPath.row));
 }
 
 -(void)tabBar:(UITabBar *)tabBar didSelectItem:(UITabBarItem *)item

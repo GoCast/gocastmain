@@ -1,6 +1,10 @@
 #import <UIKit/UIKit.h>
 #import <MessageUI/MessageUI.h>
 
+#include <vector>
+#include <string>
+
+
 @class ViewController;
 
 @interface AppDelegate : UIResponder <UIApplicationDelegate>
@@ -29,5 +33,7 @@
 
 -(void)startRecorder;
 -(void)stopRecorder;
+
+-(void)setMyRecordingsTable:(const std::vector<std::string>&)newEntries;
 
 @end

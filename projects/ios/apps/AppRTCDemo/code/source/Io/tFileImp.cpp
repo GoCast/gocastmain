@@ -3,6 +3,7 @@
 #include "Io/package.h"
 
 #include <sys/types.h>
+#include <dirent.h>
 #include <sys/stat.h>
 #include <stdio.h>
 
@@ -118,6 +119,32 @@ bool        tFileImp::rename(const PathType& newPath, const std::string& newFile
 
     return false;
 }
+
+std::vector<std::string> tFileImp::directoryListing()
+{
+    std::vector<std::string> result;
+
+    DIR *dp;
+    struct dirent *ep;
+
+    dp = opendir (GetFullPath().c_str());
+    if (dp != NULL)
+    {
+        ep = readdir(dp);
+        while (ep)
+        {
+            if (!std::string(ep->d_name).empty() && std::string(ep->d_name)[0] != '.')
+            {
+                result.push_back(ep->d_name);
+            }
+            ep = readdir(dp);
+        }
+        closedir (dp);
+    }
+
+    return result;
+}
+
 
 bool        tFileImp::write(const std::string& data)
 {

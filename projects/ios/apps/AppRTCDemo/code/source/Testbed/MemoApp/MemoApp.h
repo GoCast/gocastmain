@@ -11,6 +11,7 @@ class MemoApp
     public tObserver<const MemoEvent&>
 {
 protected:
+    std::string mCurAudioFilename;
     Screen* mScreen;
 
 public:
@@ -85,10 +86,13 @@ class MemoAppMessage
 public:
 	MemoApp::EventType                  mEvent;
 	tSubject<const MemoAppMessage&>*    mSource;
+    std::string                         mAudioFilename;
 
 public:
 	MemoAppMessage(MemoApp::EventType newEvent, tSubject<const MemoAppMessage&>* newSource = NULL)
 	: mEvent(newEvent), mSource(newSource) { }
+	MemoAppMessage(MemoApp::EventType newEvent, const std::string& newAudioFilename, tSubject<const MemoAppMessage&>* newSource = NULL)
+	: mEvent(newEvent), mSource(newSource), mAudioFilename(newAudioFilename) { }
 };
 
 

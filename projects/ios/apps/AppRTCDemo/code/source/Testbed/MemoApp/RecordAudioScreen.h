@@ -12,6 +12,7 @@ class RecordAudioScreen
     public Screen
 {
 protected:
+    std::string mResultFilename;
 
 public:
 	RecordAudioScreen();

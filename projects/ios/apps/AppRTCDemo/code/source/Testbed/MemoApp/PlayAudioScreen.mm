@@ -5,7 +5,8 @@
 #include "package.h"
 
 #pragma mark Constructor / Destructor
-PlayAudioScreen::PlayAudioScreen()
+PlayAudioScreen::PlayAudioScreen(const std::string& newFile)
+: mFilename(newFile)
 {
 	ConstructMachine();
 }
@@ -18,7 +19,7 @@ PlayAudioScreen::~PlayAudioScreen()
 #pragma mark Start / End / Invalid
 void PlayAudioScreen::startEntry()
 {
-    mScratchSound = NULL;
+    mSound = NULL;
 
     MemoEventManager::getInstance()->attach(this);
     [gAppDelegateInstance setPlayAudioScreenVisible:true];
@@ -28,7 +29,7 @@ void PlayAudioScreen::endEntry()
 {
     [gAppDelegateInstance setPlayAudioScreenVisible:false];
 
-    if (mScratchSound) { delete mScratchSound; mScratchSound = NULL; }
+    if (mSound) { delete mSound; mSound = NULL; }
 }
 
 void PlayAudioScreen::invalidStateEntry()
@@ -74,7 +75,7 @@ void PlayAudioScreen::setStatusPlayingEntry()
 #pragma mark Queries
 void PlayAudioScreen::doesScratchExistEntry()
 {
-    tFile scratch(tFile::kDocumentsDirectory, "scratch.m4a");
+    tFile scratch(tFile::kDocumentsDirectory, mFilename);
 
     SetImmediateEvent(scratch.exists() ? kYes : kNo);
 }
@@ -83,7 +84,7 @@ void PlayAudioScreen::doesScratchExistEntry()
 
 void PlayAudioScreen::deleteScratchFileEntry()
 {
-    tFile scratch(tFile::kDocumentsDirectory, "scratch.m4a");
+    tFile scratch(tFile::kDocumentsDirectory, mFilename);
 
     if (scratch.exists())
     {
@@ -95,18 +96,18 @@ void PlayAudioScreen::deleteScratchFileEntry()
 
 void PlayAudioScreen::playScratchFileEntry()
 {
-    if (mScratchSound) { delete mScratchSound; mScratchSound = NULL; }
+    if (mSound) { delete mSound; mSound = NULL; }
 
-    mScratchSound = new tSound(tFile(tFile::kDocumentsDirectory, "scratch.m4a"));
-    mScratchSound->attach(this);
-    mScratchSound->play();
+    mSound = new tSound(tFile(tFile::kDocumentsDirectory, mFilename));
+    mSound->attach(this);
+    mSound->play();
 }
 
 void PlayAudioScreen::stopScratchFileEntry()
 {
-    if (mScratchSound)
+    if (mSound)
     {
-        mScratchSound->stop();
+        mSound->stop();
     }
 }
 

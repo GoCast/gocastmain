@@ -1,5 +1,9 @@
 #pragma once
 
+#include <vector>
+#include <string>
+#include <queue>
+
 #include "tBuild.h"
 
 //Basic types

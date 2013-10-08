@@ -83,12 +83,13 @@ void MemoApp::recordAudioScreenExit()
 
 void MemoApp::myRecordingsScreenEntry()
 {
-    [gAppDelegateInstance setMyRecordingsScreenVisible:true];
+    mScreen = new MyRecordingsScreen;
+    mScreen->attach(this);
 }
 
 void MemoApp::myRecordingsScreenExit()
 {
-    [gAppDelegateInstance setMyRecordingsScreenVisible:false];
+    if (mScreen) { delete mScreen; mScreen = NULL; }
 }
 
 void MemoApp::sendToGroupScreenEntry()
@@ -103,7 +104,7 @@ void MemoApp::sendToGroupScreenExit()
 
 void MemoApp::playAudioScreenEntry()
 {
-    mScreen = new PlayAudioScreen;
+    mScreen = new PlayAudioScreen(mCurAudioFilename);
     mScreen->attach(this);
 }
 
@@ -149,7 +150,7 @@ void MemoApp::CallExit()
 
 int  MemoApp::StateTransitionFunction(const int evt) const
 {
-	if ((mState == kHideAllViews) && (evt == kNext)) return kStartScreen; else
+	if ((mState == kHideAllViews) && (evt == kNext)) return kMyRecordingsScreen; else
 	if ((mState == kMyInboxScreen) && (evt == kGoNewRecording)) return kRecordAudioScreen; else
 	if ((mState == kMyInboxScreen) && (evt == kGoPlay)) return kPlayAudioScreen; else
 	if ((mState == kMyInboxScreen) && (evt == kGoRecordings)) return kMyRecordingsScreen; else
@@ -218,6 +219,14 @@ void MemoApp::update(const MemoEvent& msg)
 
 void MemoApp::update(const MemoAppMessage& msg)
 {
+    switch (msg.mEvent)
+    {
+        case MemoApp::kGoPlay: mCurAudioFilename = msg.mAudioFilename; break;
+
+        default:
+            break;
+    }
+
 	process(msg.mEvent);
 }
 

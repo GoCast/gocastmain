@@ -16,10 +16,11 @@ class PlayAudioScreen
     public Screen
 {
 protected:
-    tSound* mScratchSound;
+    std::string mFilename;
+    tSound* mSound;
 
 public:
-	PlayAudioScreen();
+	PlayAudioScreen(const std::string& newFile);
 	~PlayAudioScreen();
 
 protected:

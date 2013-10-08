@@ -12,6 +12,8 @@
 
 AppDelegate* gAppDelegateInstance = NULL;
 
+extern std::vector<std::string> gMyRecordingsEntries;
+
 @implementation AppDelegate
 
 @synthesize window = mWindow;
@@ -210,6 +212,14 @@ AppDelegate* gAppDelegateInstance = NULL;
 -(void)stopRecorder
 {
     [self.viewController stopRecorder];
+}
+
+-(void)setMyRecordingsTable:(const std::vector<std::string>&)newEntries
+{
+    gMyRecordingsEntries.clear();
+    gMyRecordingsEntries.insert(gMyRecordingsEntries.end(), newEntries.begin(), newEntries.end());
+
+    [self.viewController.mMyRecordingsTable reloadData];
 }
 
 @end
