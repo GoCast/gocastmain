@@ -1,2 +1,3 @@
 #gocast global ignores
 *.DS_Store
+projects/ios/apps/AppRTCDemo/code/php/database
