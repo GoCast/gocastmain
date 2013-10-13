@@ -1,4 +1,3 @@
-<pre>
 <?php
 // error_reporting(E_ALL);
 
@@ -114,4 +113,3 @@ include 'versionRequired.php';
 		print(json_encode(errorMissingParameter("action")));
 	}
 ?>
-</pre>
