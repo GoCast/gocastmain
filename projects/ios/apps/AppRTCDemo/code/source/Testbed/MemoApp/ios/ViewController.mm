@@ -157,7 +157,19 @@ std::vector<std::string> gMyRecordingsEntries;
 -(IBAction) signInPressed:(id)sender
 {
 #pragma unused(sender)
+    [self.mLoginUsername resignFirstResponder];
+    [self.mLoginPassword resignFirstResponder];
+
     MemoEventManager::getInstance()->notify(MemoEvent(MemoEvent::kSignInPressed));
+}
+
+-(IBAction) newAccountPressed:(id)sender
+{
+#pragma unused(sender)
+    [self.mLoginUsername resignFirstResponder];
+    [self.mLoginPassword resignFirstResponder];
+
+    MemoEventManager::getInstance()->notify(MemoEvent(MemoEvent::kNewAccountPressed));
 }
 
 -(IBAction) startRecordingPressed:(id)sender
@@ -210,12 +222,16 @@ std::vector<std::string> gMyRecordingsEntries;
 -(IBAction) changePasswordPressed:(id)sender
 {
 #pragma unused(sender)
+    [self.mOldPassword resignFirstResponder];
+    [self.mNewPassword resignFirstResponder];
     MemoEventManager::getInstance()->notify(MemoEvent(MemoEvent::kChangePasswordPressed));
 }
 
 -(IBAction) logOutPressed:(id)sender
 {
 #pragma unused(sender)
+    [self.mOldPassword resignFirstResponder];
+    [self.mNewPassword resignFirstResponder];
     MemoEventManager::getInstance()->notify(MemoEvent(MemoEvent::kLogOutPressed));
 }
 

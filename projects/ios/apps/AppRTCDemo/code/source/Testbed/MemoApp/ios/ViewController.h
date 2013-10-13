@@ -10,7 +10,6 @@ UIAlertViewDelegate, AVAudioRecorderDelegate>
 }
 
 @property (nonatomic, strong) IBOutlet UIView* mStartView;
-@property (nonatomic, strong) IBOutlet UIView* mSigningInView;
 @property (nonatomic, strong) IBOutlet UIView* mTabView;
 
 @property (nonatomic, strong) IBOutlet UIView* mMyInboxView;
@@ -65,6 +64,7 @@ UIAlertViewDelegate, AVAudioRecorderDelegate>
 -(void)stopRecorder;
 
 -(IBAction) signInPressed:(id)sender;
+-(IBAction) newAccountPressed:(id)sender;
 
 -(IBAction) startRecordingPressed:(id)sender;
 -(IBAction) stopRecordingPressed:(id)sender;

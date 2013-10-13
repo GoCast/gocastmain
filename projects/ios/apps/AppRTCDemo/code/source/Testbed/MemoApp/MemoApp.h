@@ -30,7 +30,6 @@ protected:
 	void recordAudioScreenEntry();
 	void sendToGroupScreenEntry();
 	void settingsScreenEntry();
-	void signingInScreenEntry();
 	void startScreenEntry();
 
 	void myInboxScreenExit();
@@ -39,7 +38,6 @@ protected:
 	void recordAudioScreenExit();
 	void sendToGroupScreenExit();
 	void settingsScreenExit();
-	void signingInScreenExit();
 	void startScreenExit();
 
 public:
@@ -47,7 +45,6 @@ public:
 	{
 		kInvalidEvent = -2,
 		kNext = -1,
-		kFail,
 		kGoInbox,
 		kGoNewRecording,
 		kGoPlay,
@@ -56,8 +53,6 @@ public:
 		kGoSettings,
 		kReady,
 		kRestart,
-		kSignin,
-		kSuccess,
 	};
 
 	enum StateType
@@ -72,7 +67,6 @@ public:
 		kRecordAudioScreen,
 		kSendToGroupScreen,
 		kSettingsScreen,
-		kSigningInScreen,
 		kStartScreen,
 	};
 

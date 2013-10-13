@@ -1,4 +1,5 @@
 #include "Base/package.h"
+#include "Io/package.h"
 
 #include "package.h"
 
@@ -17,6 +18,8 @@ SettingsScreen::~SettingsScreen()
 void SettingsScreen::startEntry()
 {
     MemoEventManager::getInstance()->attach(this);
+    URLLoader::getInstance()->attach(this);
+
     [gAppDelegateInstance setSettingsScreenVisible:true];
 }
 
@@ -35,26 +38,99 @@ void SettingsScreen::idleEntry()
 {
 }
 
+#pragma mark Queries
+void SettingsScreen::arePasswordFormatsCorrectEntry()
+{
+    std::string str = [gAppDelegateInstance getOldPassword];
+
+    bool result = !str.empty();
+
+    for (size_t i = 0; i < str.size(); i++)
+    {
+        result &=   (str[i] >= '0' && str[i] <= '9') ||
+        (str[i] >= 'a' && str[i] <= 'z') ||
+        (str[i] >= 'A' && str[i] <= 'Z');
+    }
+
+    str = [gAppDelegateInstance getNewPassword];
+
+    result &= !str.empty();
+
+    for (size_t i = 0; i < str.size(); i++)
+    {
+        result &=   (str[i] >= '0' && str[i] <= '9') ||
+        (str[i] >= 'a' && str[i] <= 'z') ||
+        (str[i] >= 'A' && str[i] <= 'Z');
+    }
+
+    SetImmediateEvent(result ? kYes : kNo);
+}
+
+void SettingsScreen::wasChangePasswordSuccessfulEntry()
+{
+    bool result = false;
+
+    if (JSONUtil::extract(mChangePasswordJSON)["status"] == std::string("success"))
+    {
+        result = true;
+    }
+
+    SetImmediateEvent(result ? kYes : kNo);
+}
+
 #pragma mark User Interface
 void SettingsScreen::setLoginNameEntry()
 {
-    [gAppDelegateInstance setSettingsLoggedInName:"placeholder"];
+    [gAppDelegateInstance setSettingsLoggedInName:std::string(tFile(tFile::kDocumentsDirectory, "logintoken.txt"))];
 }
 
 #pragma mark Actions
-void SettingsScreen::reallyChangePasswordEntry()
+void SettingsScreen::sendChangePasswordRequestEntry()
+{
+    char buf[512];
+
+    sprintf(buf, "%s?action=changePassword&name=%s&password=%s&newpassword=%s",
+            kMemoAppServerURL,
+            std::string(tFile(tFile::kDocumentsDirectory, "logintoken.txt")).c_str(),
+            [gAppDelegateInstance getOldPassword].c_str(),
+            [gAppDelegateInstance getNewPassword].c_str());
+
+    URLLoader::getInstance()->loadString(buf);
+}
+
+void SettingsScreen::showFormatProblemEntry()
+{
+    tAlert("Passwords can only contain English letters and numbers");
+}
+
+void SettingsScreen::showReallyChangePasswordEntry()
 {
     tConfirm("Really change password?");
 }
 
-void SettingsScreen::reallyLogOutEntry()
+void SettingsScreen::showReallyLogOutEntry()
 {
     tConfirm("Really log out?");
 }
 
-void SettingsScreen::showPasswordChangedSuccessfullyEntry()
+void SettingsScreen::showRetryChangePasswordEntry()
+{
+    tConfirm("Couldn't contact server, retry password change?");
+}
+
+void SettingsScreen::showChangePasswordFailedEntry()
+{
+    tAlert("Password change failed");
+}
+
+void SettingsScreen::showChangePasswordSuccessEntry()
 {
     tAlert("Password changed successfully");
+}
+
+void SettingsScreen::deleteLoginTokenFromDiskEntry()
+{
+    tFile(tFile::kDocumentsDirectory, "logintoken.txt").remove();
 }
 
 #pragma mark Messages to other machines
@@ -68,15 +144,22 @@ void SettingsScreen::CallEntry()
 {
 	switch(mState)
 	{
+		case kArePasswordFormatsCorrect: arePasswordFormatsCorrectEntry(); break;
+		case kDeleteLoginTokenFromDisk: deleteLoginTokenFromDiskEntry(); break;
 		case kEnd: EndEntryHelper(); break;
 		case kIdle: idleEntry(); break;
 		case kInvalidState: invalidStateEntry(); break;
-		case kReallyChangePassword: reallyChangePasswordEntry(); break;
-		case kReallyLogOut: reallyLogOutEntry(); break;
+		case kSendChangePasswordRequest: sendChangePasswordRequestEntry(); break;
 		case kSendRestartToVC: sendRestartToVCEntry(); break;
 		case kSetLoginName: setLoginNameEntry(); break;
-		case kShowPasswordChangedSuccessfully: showPasswordChangedSuccessfullyEntry(); break;
+		case kShowChangePasswordFailed: showChangePasswordFailedEntry(); break;
+		case kShowChangePasswordSuccess: showChangePasswordSuccessEntry(); break;
+		case kShowFormatProblem: showFormatProblemEntry(); break;
+		case kShowReallyChangePassword: showReallyChangePasswordEntry(); break;
+		case kShowReallyLogOut: showReallyLogOutEntry(); break;
+		case kShowRetryChangePassword: showRetryChangePasswordEntry(); break;
 		case kStart: startEntry(); break;
+		case kWasChangePasswordSuccessful: wasChangePasswordSuccessfulEntry(); break;
 		default: break;
 	}
 }
@@ -87,15 +170,26 @@ void SettingsScreen::CallExit()
 
 int  SettingsScreen::StateTransitionFunction(const int evt) const
 {
-	if ((mState == kIdle) && (evt == kChangePassword)) return kReallyChangePassword; else
-	if ((mState == kIdle) && (evt == kLogOut)) return kReallyLogOut; else
-	if ((mState == kReallyChangePassword) && (evt == kNo)) return kIdle; else
-	if ((mState == kReallyChangePassword) && (evt == kYes)) return kShowPasswordChangedSuccessfully; else
-	if ((mState == kReallyLogOut) && (evt == kNo)) return kIdle; else
-	if ((mState == kReallyLogOut) && (evt == kYes)) return kSendRestartToVC; else
+	if ((mState == kArePasswordFormatsCorrect) && (evt == kNo)) return kShowFormatProblem; else
+	if ((mState == kArePasswordFormatsCorrect) && (evt == kYes)) return kShowReallyChangePassword; else
+	if ((mState == kDeleteLoginTokenFromDisk) && (evt == kNext)) return kSendRestartToVC; else
+	if ((mState == kIdle) && (evt == kChangePassword)) return kArePasswordFormatsCorrect; else
+	if ((mState == kIdle) && (evt == kLogOut)) return kShowReallyLogOut; else
+	if ((mState == kSendChangePasswordRequest) && (evt == kFail)) return kShowRetryChangePassword; else
+	if ((mState == kSendChangePasswordRequest) && (evt == kSuccess)) return kWasChangePasswordSuccessful; else
 	if ((mState == kSetLoginName) && (evt == kNext)) return kIdle; else
-	if ((mState == kShowPasswordChangedSuccessfully) && (evt == kYes)) return kIdle; else
-	if ((mState == kStart) && (evt == kNext)) return kSetLoginName;
+	if ((mState == kShowChangePasswordFailed) && (evt == kYes)) return kIdle; else
+	if ((mState == kShowChangePasswordSuccess) && (evt == kYes)) return kIdle; else
+	if ((mState == kShowFormatProblem) && (evt == kYes)) return kIdle; else
+	if ((mState == kShowReallyChangePassword) && (evt == kNo)) return kIdle; else
+	if ((mState == kShowReallyChangePassword) && (evt == kYes)) return kSendChangePasswordRequest; else
+	if ((mState == kShowReallyLogOut) && (evt == kNo)) return kIdle; else
+	if ((mState == kShowReallyLogOut) && (evt == kYes)) return kDeleteLoginTokenFromDisk; else
+	if ((mState == kShowRetryChangePassword) && (evt == kNo)) return kIdle; else
+	if ((mState == kShowRetryChangePassword) && (evt == kYes)) return kSendChangePasswordRequest; else
+	if ((mState == kStart) && (evt == kNext)) return kSetLoginName; else
+	if ((mState == kWasChangePasswordSuccessful) && (evt == kNo)) return kShowChangePasswordFailed; else
+	if ((mState == kWasChangePasswordSuccessful) && (evt == kYes)) return kShowChangePasswordSuccess;
 
 	return kInvalidState;
 }
@@ -104,6 +198,7 @@ bool SettingsScreen::HasEdgeNamedNext() const
 {
 	switch(mState)
 	{
+		case kDeleteLoginTokenFromDisk:
 		case kSetLoginName:
 		case kStart:
 			return true;
@@ -134,6 +229,31 @@ void SettingsScreen::update(const MemoEvent& msg)
         case MemoEvent::kNoAlertPressed:
             process(kNo);
             break;
+        default:
+            break;
+    }
+}
+
+void SettingsScreen::update(const URLLoaderEvent& msg)
+{
+    switch (msg.mEvent)
+    {
+        case URLLoaderEvent::kLoadFail: process(kFail); break;
+        case URLLoaderEvent::kLoadedFile:
+        {
+            switch (getState())
+            {
+                case kSendChangePasswordRequest:
+                    mChangePasswordJSON = msg.mString;
+                    break;
+
+                default:
+                    break;
+            }
+            process(kSuccess);
+        }
+            break;
+            
         default:
             break;
     }

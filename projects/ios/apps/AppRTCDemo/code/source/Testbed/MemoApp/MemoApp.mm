@@ -41,23 +41,13 @@ void MemoApp::hideAllViewsEntry()
 
 void MemoApp::startScreenEntry()
 {
-    [gAppDelegateInstance setStartScreenVisible:true];
+    mScreen = new StartScreen();
+    mScreen->attach(this);
 }
 
 void MemoApp::startScreenExit()
 {
-    [gAppDelegateInstance setStartScreenVisible:false];
-}
-
-void MemoApp::signingInScreenEntry()
-{
-    [gAppDelegateInstance setSigningInScreenVisible:true];
-    process(kSuccess);
-}
-
-void MemoApp::signingInScreenExit()
-{
-    [gAppDelegateInstance setSigningInScreenVisible:false];
+    if (mScreen) { delete mScreen; mScreen = NULL; }
 }
 
 void MemoApp::myInboxScreenEntry()
@@ -138,7 +128,6 @@ void MemoApp::CallEntry()
 		case kRecordAudioScreen: recordAudioScreenEntry(); break;
 		case kSendToGroupScreen: sendToGroupScreenEntry(); break;
 		case kSettingsScreen: settingsScreenEntry(); break;
-		case kSigningInScreen: signingInScreenEntry(); break;
 		case kStart: startEntry(); break;
 		case kStartScreen: startScreenEntry(); break;
 		default: break;
@@ -155,7 +144,6 @@ void MemoApp::CallExit()
 		case kRecordAudioScreen: recordAudioScreenExit(); break;
 		case kSendToGroupScreen: sendToGroupScreenExit(); break;
 		case kSettingsScreen: settingsScreenExit(); break;
-		case kSigningInScreen: signingInScreenExit(); break;
 		case kStartScreen: startScreenExit(); break;
 		default: break;
 	}
@@ -184,10 +172,8 @@ int  MemoApp::StateTransitionFunction(const int evt) const
 	if ((mState == kSettingsScreen) && (evt == kGoNewRecording)) return kRecordAudioScreen; else
 	if ((mState == kSettingsScreen) && (evt == kGoRecordings)) return kMyRecordingsScreen; else
 	if ((mState == kSettingsScreen) && (evt == kRestart)) return kStartScreen; else
-	if ((mState == kSigningInScreen) && (evt == kFail)) return kStartScreen; else
-	if ((mState == kSigningInScreen) && (evt == kSuccess)) return kMyInboxScreen; else
 	if ((mState == kStart) && (evt == kReady)) return kHideAllViews; else
-	if ((mState == kStartScreen) && (evt == kSignin)) return kSigningInScreen;
+	if ((mState == kStartScreen) && (evt == kGoInbox)) return kMyInboxScreen;
 
 	return kInvalidState;
 }
@@ -209,7 +195,6 @@ void MemoApp::update(const MemoEvent& msg)
     switch (msg.mEvent)
     {
         case MemoEvent::kAppDelegateInit:   process(kReady); break;
-        case MemoEvent::kSignInPressed:     process(kSignin); break;
 
         case MemoEvent::kInboxTabPressed:
             if (getState() != kMyInboxScreen)

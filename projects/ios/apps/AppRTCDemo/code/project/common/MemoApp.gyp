@@ -45,6 +45,13 @@
 			'outputs': [ '../../dummy', ], # outputs
 			'action': [ '<@(_graphcode)', '<@(_inputs)',  '--force-update', '--machine', 'SettingsScreen', '-h', '../../source/Testbed/MemoApp/SettingsScreen.h', '-cpp', '../../source/Testbed/MemoApp/SettingsScreen.mm', ], # action
 		},
+
+		{
+			'action_name': 'StartScreen.tgf',
+			'inputs': [ '../../tgf/Testbed/MemoApp/StartScreen.tgf', ], # inputs
+			'outputs': [ '../../dummy', ], # outputs
+			'action': [ '<@(_graphcode)', '<@(_inputs)',  '--force-update', '--machine', 'StartScreen', '-h', '../../source/Testbed/MemoApp/StartScreen.h', '-cpp', '../../source/Testbed/MemoApp/StartScreen.mm', ], # action
+		},
 		],
 
 		'sources': [
@@ -69,6 +76,14 @@
 
 			'../../source/Testbed/MemoApp/SettingsScreen.mm',
 			'../../source/Testbed/MemoApp/SettingsScreen.h',
+
+			'../../source/Testbed/MemoApp/StartScreen.mm',
+			'../../source/Testbed/MemoApp/StartScreen.h',
+
+			'../../source/Testbed/MemoApp/JSONUtil.mm',
+			'../../source/Testbed/MemoApp/JSONUtil.h',
+			'../../source/Testbed/MemoApp/URLLoader.mm',
+			'../../source/Testbed/MemoApp/URLLoader.h',
 
 			'../../source/Audio/package.h',
 			'../../source/Audio/<@(OS)/tSound.mm',

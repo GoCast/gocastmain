@@ -1,0 +1,59 @@
+1 start
+2 end
+3 idle
+4 Send GoInbox to VC
+5 Send versionRequired request
+6 Is this client compatible?
+7 inactive idle
+8 Show "App is out of date"
+9 server error idle
+10 Show "Retry version?"
+11 Send login request
+12 Was login successful?
+13 Show "Retry login"?
+14 Show "Login failed"
+15 Write login token to disk
+16 Does login token exist?
+17 Show "server error"
+18 Send register request
+19 Was register successful?
+20 Show "Registration failed"
+21 Show "Retry register?"
+22 Show "Registration successful"
+23 Is name and password format correct?
+24 Show "Format problem"
+#
+1 5
+3 23 login
+5 6 success
+6 8 no
+7 8 login, newAccount
+8 7 yes
+6 16 yes
+5 10 fail
+10 5 yes
+10 17 no
+11 13 fail
+11 12 success
+13 11 yes
+13 17 no
+12 15 yes
+12 14 no
+14 3 yes
+15 4
+16 3 no
+16 4 yes
+17 9 yes
+9 17 login, newAccount
+3 18 newAccount
+19 22 yes
+18 19 success
+19 20 no
+20 3 yes
+18 21 fail
+21 18 yes
+21 17 no
+22 11 yes
+23 24 no
+24 3 yes
+23 11 yes

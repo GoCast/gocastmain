@@ -111,7 +111,6 @@ extern std::vector<std::string> gMyRecordingsEntries;
 -(void)hideAllViews
 {
     [self.viewController.mStartView setHidden:YES];
-    [self.viewController.mSigningInView setHidden:YES];
     [self.viewController.mTabView setHidden:YES];
     [self.viewController.mMyInboxView setHidden:YES];
     [self.viewController.mRecordAudioView setHidden:YES];
@@ -124,11 +123,6 @@ extern std::vector<std::string> gMyRecordingsEntries;
 -(void)setStartScreenVisible:(bool)newVisible
 {
     [self.viewController.mStartView setHidden:(newVisible) ? NO : YES];
-}
-
--(void)setSigningInScreenVisible:(bool)newVisible
-{
-    [self.viewController.mSigningInView setHidden:(newVisible) ? NO : YES];
 }
 
 #pragma mark Tab Screens
@@ -214,6 +208,31 @@ extern std::vector<std::string> gMyRecordingsEntries;
 {
     [self.viewController.mSendAudioButton setEnabled:(newEnabled ? YES : NO)];
     self.viewController.mSendAudioButton.alpha = (newEnabled ? 1.0f : 0.4f);
+}
+
+//mStartView
+-(std::string) getUsername
+{
+    const char* result = [self.viewController.mLoginUsername.text UTF8String];
+    return result ? result : "";
+}
+
+-(std::string) getPassword
+{
+    const char* result = [self.viewController.mLoginPassword.text UTF8String];
+    return result ? result : "";
+}
+
+-(std::string) getOldPassword
+{
+    const char* result = [self.viewController.mOldPassword.text UTF8String];
+    return result ? result : "";
+}
+
+-(std::string) getNewPassword
+{
+    const char* result = [self.viewController.mNewPassword.text UTF8String];
+    return result ? result : "";
 }
 
 //mSettingsview

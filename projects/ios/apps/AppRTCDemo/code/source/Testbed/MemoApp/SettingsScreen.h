@@ -7,9 +7,11 @@ class SettingsScreen
 :   public tMealy,
     public tObserver<const SettingsScreenMessage&>,
     public tObserver<const MemoEvent&>,
+    public tObserver<const URLLoaderEvent&>,
     public Screen
 {
 protected:
+    std::string mChangePasswordJSON;
 
 public:
 	SettingsScreen();
@@ -20,12 +22,19 @@ protected:
 	void endEntry();
 	void invalidStateEntry();
 
+	void arePasswordFormatsCorrectEntry();
+	void deleteLoginTokenFromDiskEntry();
 	void idleEntry();
-	void reallyChangePasswordEntry();
-	void reallyLogOutEntry();
+	void sendChangePasswordRequestEntry();
 	void sendRestartToVCEntry();
 	void setLoginNameEntry();
-	void showPasswordChangedSuccessfullyEntry();
+	void showChangePasswordFailedEntry();
+	void showChangePasswordSuccessEntry();
+	void showFormatProblemEntry();
+	void showReallyChangePasswordEntry();
+	void showReallyLogOutEntry();
+	void showRetryChangePasswordEntry();
+	void wasChangePasswordSuccessfulEntry();
 
 public:
 	enum EventType
@@ -33,8 +42,10 @@ public:
 		kInvalidEvent = -2,
 		kNext = -1,
 		kChangePassword,
+		kFail,
 		kLogOut,
 		kNo,
+		kSuccess,
 		kYes,
 	};
 
@@ -42,13 +53,20 @@ public:
 	{
 		kInvalidState = 0,
 		kStart = 1,
+		kArePasswordFormatsCorrect,
+		kDeleteLoginTokenFromDisk,
 		kEnd,
 		kIdle,
-		kReallyChangePassword,
-		kReallyLogOut,
+		kSendChangePasswordRequest,
 		kSendRestartToVC,
 		kSetLoginName,
-		kShowPasswordChangedSuccessfully,
+		kShowChangePasswordFailed,
+		kShowChangePasswordSuccess,
+		kShowFormatProblem,
+		kShowReallyChangePassword,
+		kShowReallyLogOut,
+		kShowRetryChangePassword,
+		kWasChangePasswordSuccessful,
 	};
 
 protected:
@@ -59,6 +77,7 @@ protected:
 
 	void update(const SettingsScreenMessage& msg);
 	void update(const MemoEvent& msg);
+	void update(const URLLoaderEvent& msg);
 };
 
 class SettingsScreenMessage

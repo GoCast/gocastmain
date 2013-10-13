@@ -1,37 +1,34 @@
 1 start
 2 end
 3 Start Screen*
-4 Signing in Screen*
-5 Record Audio Screen*
-6 Send to Group Screen*
-7 My Recordings Screen*
-8 My Inbox Screen*
-9 Play Audio Screen*
-10 Hide all views
-11 Settings Screen*
+4 Record Audio Screen*
+5 Send to Group Screen*
+6 My Recordings Screen*
+7 My Inbox Screen*
+8 Play Audio Screen*
+9 Hide all views
+10 Settings Screen*
 #
-1 10 ready
-3 4 signin
-4 8 success
-4 3 fail
-8 7 goRecordings
-8 5 goNewRecording
-5 7 goRecordings
-9 6 goSendGroup
-6 8 goInbox
-7 5 goNewRecording
-5 8 goInbox
-7 8 goInbox
-8 9 goPlay
-7 9 goPlay
-9 8 goInbox
-9 7 goRecordings
-10 3
-5 9 goPlay
-5 11 goSettings
-7 11 goSettings
-8 11 goSettings
-11 5 goNewRecording
-11 8 goInbox
-11 7 goRecordings
-11 3 restart
+1 9 ready
+7 6 goRecordings
+7 4 goNewRecording
+4 6 goRecordings
+8 5 goSendGroup
+5 7 goInbox
+6 4 goNewRecording
+4 7 goInbox
+6 7 goInbox
+7 8 goPlay
+6 8 goPlay
+8 7 goInbox
+8 6 goRecordings
+9 3
+4 8 goPlay
+4 10 goSettings
+6 10 goSettings
+7 10 goSettings
+10 4 goNewRecording
+10 7 goInbox
+10 6 goRecordings
+10 3 restart
+3 7 goInbox

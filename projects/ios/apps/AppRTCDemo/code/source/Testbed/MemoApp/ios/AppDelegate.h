@@ -15,7 +15,6 @@
 -(void)hideAllViews;
 
 -(void)setStartScreenVisible:(bool)newVisible;
--(void)setSigningInScreenVisible:(bool)newVisible;
 
 -(void)setMyInboxScreenVisible:(bool)newVisible;
 -(void)setRecordAudioScreenVisible:(bool)newVisible;
@@ -34,8 +33,14 @@
 -(void)setDeleteAudioButtonEnabled:(bool)newEnabled;
 -(void)setSendAudioButtonEnabled:(bool)newEnabled;
 
+//mStartScreen
+-(std::string) getUsername;
+-(std::string) getPassword;
+
 //mSettingsview
 -(void)setSettingsLoggedInName:(const std::string&)newName;
+-(std::string) getOldPassword;
+-(std::string) getNewPassword;
 
 -(void)startRecorder;
 -(void)stopRecorder;

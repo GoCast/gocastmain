@@ -8,6 +8,7 @@ public:
         kAppDelegateInit,
 
         kSignInPressed,
+        kNewAccountPressed,
 
         kInboxTabPressed,
         kMemosTabPressed,
