@@ -207,6 +207,18 @@ std::vector<std::string> gMyRecordingsEntries;
     MemoEventManager::getInstance()->notify(MemoEvent(MemoEvent::kCancelAudioPressed));
 }
 
+-(IBAction) changePasswordPressed:(id)sender
+{
+#pragma unused(sender)
+    MemoEventManager::getInstance()->notify(MemoEvent(MemoEvent::kChangePasswordPressed));
+}
+
+-(IBAction) logOutPressed:(id)sender
+{
+#pragma unused(sender)
+    MemoEventManager::getInstance()->notify(MemoEvent(MemoEvent::kLogOutPressed));
+}
+
 - (BOOL)textFieldShouldReturn:(UITextField *)textField
 {
     if (textField == self.mLoginUsername)
@@ -217,6 +229,15 @@ std::vector<std::string> gMyRecordingsEntries;
     else if (textField == self.mLoginPassword)
     {
         [self.mLoginPassword resignFirstResponder];
+    }
+    else if (textField == self.mOldPassword)
+    {
+        [self.mOldPassword resignFirstResponder];
+        [self.mNewPassword becomeFirstResponder];
+    }
+    else if (textField == self.mNewPassword)
+    {
+        [self.mNewPassword resignFirstResponder];
     }
 
     return NO;
@@ -313,6 +334,10 @@ std::vector<std::string> gMyRecordingsEntries;
     else if (item == self.mNewMemoTab)
     {
         MemoEventManager::getInstance()->notify(MemoEvent(MemoEvent::kNewMemoTabPressed));
+    }
+    else if (item == self.mSettingsTab)
+    {
+        MemoEventManager::getInstance()->notify(MemoEvent(MemoEvent::kSettingsTabPressed));
     }
 }
 

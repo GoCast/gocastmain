@@ -1,0 +1,18 @@
+1 start
+2 end
+3 Set Login Name
+4 idle
+5 Really change password?
+6 Really log out?
+7 Show "Password Changed Successfully"
+8 Send "restart" to VC
+#
+1 3
+3 4
+4 5 changePassword
+4 6 logOut
+5 7 yes
+5 4 no
+6 4 no
+6 8 yes
+7 4 yes

@@ -12,34 +12,50 @@ UIAlertViewDelegate, AVAudioRecorderDelegate>
 @property (nonatomic, strong) IBOutlet UIView* mStartView;
 @property (nonatomic, strong) IBOutlet UIView* mSigningInView;
 @property (nonatomic, strong) IBOutlet UIView* mTabView;
+
 @property (nonatomic, strong) IBOutlet UIView* mMyInboxView;
 @property (nonatomic, strong) IBOutlet UIView* mRecordAudioView;
 @property (nonatomic, strong) IBOutlet UIView* mMyRecordingsView;
+@property (nonatomic, strong) IBOutlet UIView* mSettingsView;
+
 @property (nonatomic, strong) IBOutlet UIView* mSendToGroupView;
 @property (nonatomic, strong) IBOutlet UIView* mPlayAudioView;
 
+//mStartView
 @property (nonatomic, strong) IBOutlet UITextField* mLoginUsername;
 @property (nonatomic, strong) IBOutlet UITextField* mLoginPassword;
 
+//mMyRecordingsView
 @property (nonatomic, strong) IBOutlet UITableView* mGroupTable;
 @property (nonatomic, strong) IBOutlet UITableView* mMyRecordingsTable;
 
+//mTabView
 @property (nonatomic, strong) IBOutlet UITabBar* mTabBar;
-
 @property (nonatomic, strong) IBOutlet UITabBarItem* mInboxTab;
 @property (nonatomic, strong) IBOutlet UITabBarItem* mMemosTab;
 @property (nonatomic, strong) IBOutlet UITabBarItem* mNewMemoTab;
+@property (nonatomic, strong) IBOutlet UITabBarItem* mSettingsTab;
 
+//mRecordAudioView
 @property (nonatomic, strong) IBOutlet UIButton* mStartRecordingButton;
 @property (nonatomic, strong) IBOutlet UIButton* mStopRecordingButton;
 @property (nonatomic, strong) IBOutlet UIButton* mCancelRecordingButton;
 @property (nonatomic, strong) IBOutlet UILabel* mRecordingStatusLabel;
 
+//mPlayAudioView
 @property (nonatomic, strong) IBOutlet UIButton* mPlayAudioButton;
 @property (nonatomic, strong) IBOutlet UIButton* mStopAudioButton;
 @property (nonatomic, strong) IBOutlet UIButton* mDeleteAudioButton;
 @property (nonatomic, strong) IBOutlet UIButton* mSendAudioButton;
 @property (nonatomic, strong) IBOutlet UIButton* mCancelAudioButton;
+
+//mSettingsView
+@property (nonatomic, strong) IBOutlet UILabel* mLoggedInLabel;
+@property (nonatomic, strong) IBOutlet UITextField* mOldPassword;
+@property (nonatomic, strong) IBOutlet UITextField* mNewPassword;
+@property (nonatomic, strong) IBOutlet UIButton* mChangePasswordButton;
+@property (nonatomic, strong) IBOutlet UIButton* mLogOutButton;
+
 
 @property (nonatomic, strong) AVAudioRecorder* mRecorder;
 
@@ -59,6 +75,9 @@ UIAlertViewDelegate, AVAudioRecorderDelegate>
 -(IBAction) deleteAudioPressed:(id)sender;
 -(IBAction) sendAudioPressed:(id)sender;
 -(IBAction) cancelAudioPressed:(id)sender;
+
+-(IBAction) changePasswordPressed:(id)sender;
+-(IBAction) logOutPressed:(id)sender;
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField;
 

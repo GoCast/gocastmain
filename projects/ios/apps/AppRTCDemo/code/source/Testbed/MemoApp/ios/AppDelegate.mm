@@ -118,6 +118,7 @@ extern std::vector<std::string> gMyRecordingsEntries;
     [self.viewController.mMyRecordingsView setHidden:YES];
     [self.viewController.mSendToGroupView setHidden:YES];
     [self.viewController.mPlayAudioView setHidden:YES];
+    [self.viewController.mSettingsView setHidden:YES];
 }
 
 -(void)setStartScreenVisible:(bool)newVisible
@@ -129,6 +130,8 @@ extern std::vector<std::string> gMyRecordingsEntries;
 {
     [self.viewController.mSigningInView setHidden:(newVisible) ? NO : YES];
 }
+
+#pragma mark Tab Screens
 
 -(void)setMyInboxScreenVisible:(bool)newVisible
 {
@@ -150,6 +153,15 @@ extern std::vector<std::string> gMyRecordingsEntries;
     self.viewController.mTabBar.selectedItem = self.viewController.mMemosTab;
     [self.viewController.mMyRecordingsView setHidden:(newVisible) ? NO : YES];
 }
+
+-(void)setSettingsScreenVisible:(bool)newVisible
+{
+    [self.viewController.mTabView setHidden:(newVisible) ? NO : YES];
+    self.viewController.mTabBar.selectedItem = self.viewController.mSettingsTab;
+    [self.viewController.mSettingsView setHidden:(newVisible) ? NO : YES];
+}
+
+#pragma mark -
 
 -(void)setSendToGroupScreenVisible:(bool)newVisible
 {
@@ -202,6 +214,12 @@ extern std::vector<std::string> gMyRecordingsEntries;
 {
     [self.viewController.mSendAudioButton setEnabled:(newEnabled ? YES : NO)];
     self.viewController.mSendAudioButton.alpha = (newEnabled ? 1.0f : 0.4f);
+}
+
+//mSettingsview
+-(void)setSettingsLoggedInName:(const std::string&)newName
+{
+    self.viewController.mLoggedInLabel.text = [NSString stringWithUTF8String:newName.c_str()];
 }
 
 -(void)startRecorder

@@ -12,6 +12,7 @@ public:
         kInboxTabPressed,
         kMemosTabPressed,
         kNewMemoTabPressed,
+        kSettingsTabPressed,
 
         kStartRecordingPressed,
         kStopRecordingPressed,
@@ -22,6 +23,9 @@ public:
         kDeleteAudioPressed,
         kSendAudioPressed,
         kCancelAudioPressed,
+
+        kChangePasswordPressed,
+        kLogOutPressed,
 
         kOKYesAlertPressed,
         kNoAlertPressed,

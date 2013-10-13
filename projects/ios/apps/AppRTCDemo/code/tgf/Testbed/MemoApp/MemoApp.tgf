@@ -8,6 +8,7 @@
 8 My Inbox Screen*
 9 Play Audio Screen*
 10 Hide all views
+11 Settings Screen*
 #
 1 10 ready
 3 4 signin
@@ -25,5 +26,12 @@
 7 9 goPlay
 9 8 goInbox
 9 7 goRecordings
-10 7
+10 3
 5 9 goPlay
+5 11 goSettings
+7 11 goSettings
+8 11 goSettings
+11 5 goNewRecording
+11 8 goInbox
+11 7 goRecordings
+11 3 restart

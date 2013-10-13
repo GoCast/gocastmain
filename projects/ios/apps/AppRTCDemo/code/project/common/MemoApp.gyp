@@ -38,6 +38,13 @@
 			'outputs': [ '../../dummy', ], # outputs
 			'action': [ '<@(_graphcode)', '<@(_inputs)',  '--force-update', '--machine', 'PlayAudioScreen', '-h', '../../source/Testbed/MemoApp/PlayAudioScreen.h', '-cpp', '../../source/Testbed/MemoApp/PlayAudioScreen.mm', ], # action
 		},
+
+		{
+			'action_name': 'SettingsScreen.tgf',
+			'inputs': [ '../../tgf/Testbed/MemoApp/SettingsScreen.tgf', ], # inputs
+			'outputs': [ '../../dummy', ], # outputs
+			'action': [ '<@(_graphcode)', '<@(_inputs)',  '--force-update', '--machine', 'SettingsScreen', '-h', '../../source/Testbed/MemoApp/SettingsScreen.h', '-cpp', '../../source/Testbed/MemoApp/SettingsScreen.mm', ], # action
+		},
 		],
 
 		'sources': [
@@ -59,6 +66,9 @@
 
 			'../../source/Testbed/MemoApp/PlayAudioScreen.mm',
 			'../../source/Testbed/MemoApp/PlayAudioScreen.h',
+
+			'../../source/Testbed/MemoApp/SettingsScreen.mm',
+			'../../source/Testbed/MemoApp/SettingsScreen.h',
 
 			'../../source/Audio/package.h',
 			'../../source/Audio/<@(OS)/tSound.mm',
@@ -144,6 +154,7 @@
 					'../../rsrc/Testbed/MemoApp/<@(OS)/tab-inbox.png',
 					'../../rsrc/Testbed/MemoApp/<@(OS)/tab-record-audio.png',
 					'../../rsrc/Testbed/MemoApp/<@(OS)/tab-recordings.png',
+					'../../rsrc/Testbed/MemoApp/<@(OS)/tab-settings.png',
 
 					'../../rsrc/Testbed/MemoApp/<@(OS)/Default.png',
 				],	# mac_bundle_resources

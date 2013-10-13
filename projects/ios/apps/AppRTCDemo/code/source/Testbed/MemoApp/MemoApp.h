@@ -29,6 +29,7 @@ protected:
 	void playAudioScreenEntry();
 	void recordAudioScreenEntry();
 	void sendToGroupScreenEntry();
+	void settingsScreenEntry();
 	void signingInScreenEntry();
 	void startScreenEntry();
 
@@ -37,6 +38,7 @@ protected:
 	void playAudioScreenExit();
 	void recordAudioScreenExit();
 	void sendToGroupScreenExit();
+	void settingsScreenExit();
 	void signingInScreenExit();
 	void startScreenExit();
 
@@ -51,7 +53,9 @@ public:
 		kGoPlay,
 		kGoRecordings,
 		kGoSendGroup,
+		kGoSettings,
 		kReady,
+		kRestart,
 		kSignin,
 		kSuccess,
 	};
@@ -67,6 +71,7 @@ public:
 		kPlayAudioScreen,
 		kRecordAudioScreen,
 		kSendToGroupScreen,
+		kSettingsScreen,
 		kSigningInScreen,
 		kStartScreen,
 	};

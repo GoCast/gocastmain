@@ -16,9 +16,12 @@
 
 -(void)setStartScreenVisible:(bool)newVisible;
 -(void)setSigningInScreenVisible:(bool)newVisible;
+
 -(void)setMyInboxScreenVisible:(bool)newVisible;
 -(void)setRecordAudioScreenVisible:(bool)newVisible;
 -(void)setMyRecordingsScreenVisible:(bool)newVisible;
+-(void)setSettingsScreenVisible:(bool)newVisible;
+
 -(void)setSendToGroupScreenVisible:(bool)newVisible;
 -(void)setPlayAudioScreenVisible:(bool)newVisible;
 
@@ -30,6 +33,9 @@
 -(void)setStopAudioButtonEnabled:(bool)newEnabled;
 -(void)setDeleteAudioButtonEnabled:(bool)newEnabled;
 -(void)setSendAudioButtonEnabled:(bool)newEnabled;
+
+//mSettingsview
+-(void)setSettingsLoggedInName:(const std::string&)newName;
 
 -(void)startRecorder;
 -(void)stopRecorder;
