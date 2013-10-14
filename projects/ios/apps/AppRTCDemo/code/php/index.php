@@ -13,7 +13,8 @@ include 'postGroup.php';
 
 	function hasParam($x)
 	{
-		if(isset($_GET[$x]) && !empty($_GET[$x]))
+		if( (isset($_GET[$x]) && !empty($_GET[$x])) ||
+			(isset($_POST[$x]) && !empty($_POST[$x])) )
 		{
 			return true;
 		}
@@ -29,38 +30,45 @@ include 'postGroup.php';
 
 	if(hasParam("action"))
 	{
-		if ($_GET["action"] === "versionRequired")
+		if ($_SERVER['REQUEST_METHOD'] === "POST")
+		{
+			if ($_POST["action"] === "postGroup")
+			{
+				if (hasParam("from"))
+				{
+					if (hasParam("group") && is_array($_POST["group"]))
+					{
+						if (isset($_FILES["filename"]))
+						{
+							print(json_encode(postGroup($_POST["from"], $_POST["group"], $_FILES["filename"]["name"])));
+						}
+						else
+						{
+							print(json_encode(errorMissingParameter("filename")));
+						}
+					}
+					else
+					{
+						print(json_encode(errorMissingParameter("group")));
+					}
+				}
+				else
+				{
+					print(json_encode(errorMissingParameter("from")));
+				}
+			}
+			else
+			{
+				print(json_encode(array("status" => "fail", "message" => "Unknown command")));
+			}
+		}
+		else if ($_GET["action"] === "versionRequired")
 		{
 			print(json_encode(versionRequired()));
 		}
 		else if ($_GET["action"] === "userList")
 		{
 			print(json_encode(userList()));
-		}
-		else if ($_GET["action"] === "postGroup")
-		{
-			if (hasParam("from"))
-			{
-				if (hasParam("group") && is_array($_GET["group"]))
-				{
-					if (hasParam("filename"))
-					{
-						print(json_encode(postGroup($_GET["from"], $_GET["group"], $_GET["filename"])));
-					}
-					else
-					{
-						print(json_encode(errorMissingParameter("filename")));
-					}
-				}
-				else
-				{
-					print(json_encode(errorMissingParameter("group")));
-				}
-			}
-			else
-			{
-				print(json_encode(errorMissingParameter("from")));
-			}
 		}
 		else if (hasParam("name"))
 		{
