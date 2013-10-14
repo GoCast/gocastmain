@@ -28,12 +28,30 @@ function listInbox($name)
 
 		if (is_dir("database/inbox/$name"))
 		{
-			$arr = scandir("database/inbox/$name");
+			$arr2 = scandir("database/inbox/$name");
 
-			if ($arr != false)
+			if ($arr2 != false)
 			{
-				$result = array(	"status" => "pass",
-									"list" => $arr);
+				$i = 0;
+				$c = count($arr2);
+
+				$flat_list = "";
+				foreach ($arr2 as $v)
+				{
+					$i++;
+
+					if ($i < $c)
+					{
+						$flat_list = $flat_list.$v.',';
+					}
+					else
+					{
+						$flat_list = $flat_list.$v;
+					}
+				}
+
+				$result = array(	"status" => "success",
+									"list" => $flat_list);
 
 			}
 			else

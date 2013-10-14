@@ -4,7 +4,7 @@ function getFile($name, $file)
 {
 	if (is_file("database/inbox/$name/$file"))
 	{
-		$result = array(	"status" => "pass",
+		$result = array(	"status" => "success",
 							"url" => "http://".
 							$_SERVER['SERVER_NAME'].
 							":".

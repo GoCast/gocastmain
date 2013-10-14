@@ -6,7 +6,7 @@ function deleteFile($name, $file)
 	{
 		if (unlink("database/inbox/$name/$file"))
 		{
-			$result = array(	"status" => "pass",
+			$result = array(	"status" => "success",
 								"message" => "File deleted on server successfully");
 		}
 		else
