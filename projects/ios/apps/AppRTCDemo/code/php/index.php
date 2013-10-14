@@ -9,6 +9,7 @@ include 'changePassword.php';
 include 'register.php';
 include 'versionRequired.php';
 include 'userList.php';
+include 'postGroup.php';
 
 	function hasParam($x)
 	{
@@ -35,6 +36,31 @@ include 'userList.php';
 		else if ($_GET["action"] === "userList")
 		{
 			print(json_encode(userList()));
+		}
+		else if ($_GET["action"] === "postGroup")
+		{
+			if (hasParam("from"))
+			{
+				if (hasParam("group") && is_array($_GET["group"]))
+				{
+					if (hasParam("filename"))
+					{
+						print(json_encode(postGroup($_GET["from"], $_GET["group"], $_GET["filename"])));
+					}
+					else
+					{
+						print(json_encode(errorMissingParameter("filename")));
+					}
+				}
+				else
+				{
+					print(json_encode(errorMissingParameter("group")));
+				}
+			}
+			else
+			{
+				print(json_encode(errorMissingParameter("from")));
+			}
 		}
 		else if (hasParam("name"))
 		{
