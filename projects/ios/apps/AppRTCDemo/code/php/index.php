@@ -8,6 +8,7 @@ include 'login.php';
 include 'changePassword.php';
 include 'register.php';
 include 'versionRequired.php';
+include 'userList.php';
 
 	function hasParam($x)
 	{
@@ -30,6 +31,10 @@ include 'versionRequired.php';
 		if ($_GET["action"] === "versionRequired")
 		{
 			print(json_encode(versionRequired()));
+		}
+		else if ($_GET["action"] === "userList")
+		{
+			print(json_encode(userList()));
 		}
 		else if (hasParam("name"))
 		{
