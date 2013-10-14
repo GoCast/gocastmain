@@ -81,7 +81,7 @@ void SettingsScreen::wasChangePasswordSuccessfulEntry()
 #pragma mark User Interface
 void SettingsScreen::setLoginNameEntry()
 {
-    [gAppDelegateInstance setSettingsLoggedInName:std::string(tFile(tFile::kDocumentsDirectory, "logintoken.txt"))];
+    [gAppDelegateInstance setSettingsLoggedInName:std::string(tFile(tFile::kPreferencesDirectory, "logintoken.txt"))];
 }
 
 #pragma mark Actions
@@ -91,7 +91,7 @@ void SettingsScreen::sendChangePasswordRequestEntry()
 
     sprintf(buf, "%s?action=changePassword&name=%s&password=%s&newpassword=%s",
             kMemoAppServerURL,
-            std::string(tFile(tFile::kDocumentsDirectory, "logintoken.txt")).c_str(),
+            std::string(tFile(tFile::kPreferencesDirectory, "logintoken.txt")).c_str(),
             [gAppDelegateInstance getOldPassword].c_str(),
             [gAppDelegateInstance getNewPassword].c_str());
 
@@ -130,7 +130,7 @@ void SettingsScreen::showChangePasswordSuccessEntry()
 
 void SettingsScreen::deleteLoginTokenFromDiskEntry()
 {
-    tFile(tFile::kDocumentsDirectory, "logintoken.txt").remove();
+    tFile(tFile::kPreferencesDirectory, "logintoken.txt").remove();
 }
 
 #pragma mark Messages to other machines

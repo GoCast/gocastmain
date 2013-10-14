@@ -80,7 +80,7 @@ void SendToGroupScreen::sendPostGroupToServerEntry()
     std::vector<std::pair<std::string, std::string> > params;
 
     params.push_back(std::pair<std::string, std::string>("action", "postGroup"));
-    params.push_back(std::pair<std::string, std::string>("from", std::string(tFile(tFile::kDocumentsDirectory, "logintoken.txt"))));
+    params.push_back(std::pair<std::string, std::string>("from", std::string(tFile(tFile::kPreferencesDirectory, "logintoken.txt"))));
 
     for (size_t i = 0; i < mSelectedGroup.size(); i++)
     {

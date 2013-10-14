@@ -116,7 +116,7 @@ void StartScreen::wasRegisterSuccessfulEntry()
 
 void StartScreen::doesLoginTokenExistEntry()
 {
-    bool result = tFile(tFile::kDocumentsDirectory, "logintoken.txt").exists();
+    bool result = tFile(tFile::kPreferencesDirectory, "logintoken.txt").exists();
 
     SetImmediateEvent(result ? kYes : kNo);
 }
@@ -153,7 +153,7 @@ void StartScreen::sendRegisterRequestEntry()
 
 void StartScreen::writeLoginTokenToDiskEntry()
 {
-    tFile(tFile::kDocumentsDirectory, "logintoken.txt").write([gAppDelegateInstance getUsername]);
+    tFile(tFile::kPreferencesDirectory, "logintoken.txt").write([gAppDelegateInstance getUsername]);
 }
 
 #pragma mark User Interface

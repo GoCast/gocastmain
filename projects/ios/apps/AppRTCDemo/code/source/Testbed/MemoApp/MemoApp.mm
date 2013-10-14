@@ -1,4 +1,5 @@
 #include "Base/package.h"
+#include "Io/package.h"
 
 #include "package.h"
 
@@ -19,6 +20,7 @@ MemoApp::~MemoApp()
 #pragma mark Start / End / Invalid
 void MemoApp::startEntry()
 {
+    tFile(tFile::kDocumentsDirectory, "logintoken.txt").remove();
     MemoEventManager::getInstance()->attach(this);
 }
 
