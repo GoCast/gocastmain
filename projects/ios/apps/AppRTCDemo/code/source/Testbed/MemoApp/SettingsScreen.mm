@@ -239,7 +239,7 @@ void SettingsScreen::update(const URLLoaderEvent& msg)
     switch (msg.mEvent)
     {
         case URLLoaderEvent::kLoadFail: process(kFail); break;
-        case URLLoaderEvent::kLoadedFile:
+        case URLLoaderEvent::kLoadedString:
         {
             switch (getState())
             {

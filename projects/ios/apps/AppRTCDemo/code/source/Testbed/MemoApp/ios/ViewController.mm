@@ -9,6 +9,7 @@
 
 std::vector<std::string> gMyRecordingsEntries;
 std::vector<std::string> gUserListEntries;
+std::vector<std::string> gMyInboxListEntries;
 
 @interface ViewController()
 {
@@ -285,6 +286,10 @@ std::vector<std::string> gUserListEntries;
     {
         return (NSInteger)gUserListEntries.size();
     }
+    else if (tableView == self.mInboxTable)
+    {
+        return (NSInteger)gMyInboxListEntries.size();
+    }
 
     return (NSInteger)1;
 }
@@ -331,6 +336,25 @@ std::vector<std::string> gUserListEntries;
         }
 
         cell.textLabel.text = [NSString stringWithUTF8String:gUserListEntries[indexPath.row].c_str()];
+
+        cell.imageView.image = nil;
+        
+        return cell;
+    }
+    else if (tableView == self.mInboxTable)
+    {
+        tableView.backgroundView = nil;
+
+        static NSString *simpleTableIdentifier = @"MemoAppTableItem";
+
+        UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:simpleTableIdentifier];
+
+        if (cell == nil)
+        {
+            cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:simpleTableIdentifier] autorelease];
+        }
+
+        cell.textLabel.text = [NSString stringWithUTF8String:gMyInboxListEntries[indexPath.row].c_str()];
 
         cell.imageView.image = nil;
         

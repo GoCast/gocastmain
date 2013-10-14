@@ -1,6 +1,6 @@
 #pragma once
 
-#define kMemoAppServerURL "http://terencejgrant.com/memoappserver/index.php"
+#define kMemoAppServerURL "http://terencejgrant.com/memoappserver/"
 
 #include <string>
 #include <map>
@@ -15,6 +15,7 @@
 #include "SettingsScreen.h"
 #include "StartScreen.h"
 #include "SendToGroupScreen.h"
+#include "MyInboxScreen.h"
 
 #include "MemoApp.h"
 

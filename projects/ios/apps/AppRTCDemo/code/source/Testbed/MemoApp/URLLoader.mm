@@ -51,15 +51,31 @@
 
 
 URLConnection::URLConnection(const std::string& url)
-:   mURL(url)
+:   mFile(tFile::kTemporaryDirectory, ""),
+    mURL(url),
+    mUseFile(false)
 {
     mDelegate = [[PrivateDelegate alloc] initWithParent: this];
     NSMutableURLRequest* req = [NSMutableURLRequest requestWithURL: [NSURL URLWithString: [NSString stringWithUTF8String: url.c_str()]]];
     mNSURLConnection = [[NSURLConnection alloc] initWithRequest: req delegate: mDelegate];
 }
 
+URLConnection::URLConnection(const std::string& url, const tFile& newFile)
+:   mFile(newFile),
+    mURL(url),
+    mUseFile(true)
+{
+    mDelegate = [[PrivateDelegate alloc] initWithParent: this];
+    NSMutableURLRequest* req = [NSMutableURLRequest requestWithURL: [NSURL URLWithString: [NSString stringWithUTF8String: url.c_str()]]];
+    mNSURLConnection = [[NSURLConnection alloc] initWithRequest: req delegate: mDelegate];
+
+    mFOS = new tFileOutputStream(mFile);
+}
+
 URLConnection::URLConnection(const std::string& url, const std::string& body)
-:   mURL(url)
+:   mFile(tFile::kTemporaryDirectory, ""),
+    mURL(url),
+    mUseFile(false)
 {
     mDelegate = [[PrivateDelegate alloc] initWithParent: this];
     NSMutableURLRequest* req = [NSMutableURLRequest requestWithURL: [NSURL URLWithString: [NSString stringWithUTF8String: url.c_str()]]];
@@ -70,6 +86,9 @@ URLConnection::URLConnection(const std::string& url, const std::string& body)
 }
 
 URLConnection::URLConnection(const std::string& newPHP, const std::vector<std::pair<std::string, std::string> >& newParams, const tFile& newFile)
+:   mFile(tFile::kTemporaryDirectory, ""),
+    mURL(newPHP),
+    mUseFile(false)
 {
     mDelegate = [[PrivateDelegate alloc] initWithParent: this];
 
@@ -136,22 +155,41 @@ void URLConnection::DidReceiveResponse(const void* response)
 }
 void URLConnection::DidReceiveData(const void* data, uint32_t len)
 {
-    for(uint32_t i = 0; i < len; i++)
+    if (mUseFile)
     {
-        mString += ((char*)data)[i];
+        mFOS->write(data, len);
+    }
+    else
+    {
+        for(uint32_t i = 0; i < len; i++)
+        {
+            mString += ((char*)data)[i];
+        }
     }
 }
 void URLConnection::DidFailWithError(const std::string& error)
 {
 #pragma unused(error)
-    URLLoader::getInstance()->notify(URLLoaderEvent(URLLoaderEvent::kLoadedFile, mURL, mString));
+    if (mUseFile)
+    {
+        delete mFOS;
+    }
+    URLLoader::getInstance()->notify(URLLoaderEvent(URLLoaderEvent::kLoadFail, mURL, mString));
 
     delete this;
 }
 
 void URLConnection::DidFinishLoading()
 {
-    URLLoader::getInstance()->notify(URLLoaderEvent(URLLoaderEvent::kLoadedFile, mURL, mString));
+    if (mUseFile)
+    {
+        delete mFOS;
+        URLLoader::getInstance()->notify(URLLoaderEvent(URLLoaderEvent::kLoadedFile, mURL, mString));
+    }
+    else
+    {
+        URLLoader::getInstance()->notify(URLLoaderEvent(URLLoaderEvent::kLoadedString, mURL, mString));
+    }
 
     delete this;
 }
@@ -165,6 +203,13 @@ void URLLoader::loadString(const std::string& newURL)
     NSLog(@"URLLoader::loadString: \"%s\"", newURL.c_str());
 
     new URLConnection(newURL);
+}
+
+void URLLoader::loadFile(const std::string& newURL, const tFile& newFile)
+{
+    NSLog(@"URLLoader::loadFile: \"%s\"", newURL.c_str());
+
+    new URLConnection(newURL, newFile);
 }
 
 void URLLoader::postJSON(const std::string& newURL, const std::string& newBody)

@@ -1,0 +1,52 @@
+1 start
+2 end
+3 idle
+4 Send listInbox to server
+5 Show "retry listInbox?"
+6 server error idle
+7 Show "server error"
+8 Is inbox valid?
+9 Update inbox table
+10 Show "error loading inbox"
+11 Show "download message?"
+12 Set "downloading" status
+13 Set "normal" status
+14 Send download request to server
+15 Show "retry download?"
+16 Send GoRecordings to VC
+17 Copy download to destination
+18 Send delete request to server
+19 Show "retry delete?"
+20 Was delete successful?
+21 Show "delete failed"
+22 Show "File will be deleted"
+#
+1 4
+4 5 fail
+7 6 yes
+6 7 itemSelected
+5 7 no
+5 4 yes
+4 8 success
+8 9 yes
+8 10 no
+10 7 yes
+3 11 itemSelected
+9 13
+11 12 yes
+13 3
+11 13 no
+12 14
+14 15 fail
+14 17 success
+15 7 no
+15 14 yes
+17 22
+19 7 no
+18 19 fail
+18 20 success
+20 16 yes
+20 21 no
+21 16 yes
+19 18 yes
+22 18 yes

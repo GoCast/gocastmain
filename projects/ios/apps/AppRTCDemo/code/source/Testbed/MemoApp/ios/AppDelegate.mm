@@ -14,6 +14,7 @@ AppDelegate* gAppDelegateInstance = NULL;
 
 extern std::vector<std::string> gMyRecordingsEntries;
 extern std::vector<std::string> gUserListEntries;
+extern std::vector<std::string> gMyInboxListEntries;
 
 @implementation AppDelegate
 
@@ -267,6 +268,15 @@ extern std::vector<std::string> gUserListEntries;
 
     [self.viewController.mSendToGroupTable reloadData];
 }
+
+-(void)setMyInboxTable:(const std::vector<std::string>&)newEntries
+{
+    gMyInboxListEntries.clear();
+    gMyInboxListEntries.insert(gMyInboxListEntries.end(), newEntries.begin(), newEntries.end());
+
+    [self.viewController.mInboxTable reloadData];
+}
+
 
 -(std::vector<std::string>)getSelectedFromUserListTable
 {

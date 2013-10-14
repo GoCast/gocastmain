@@ -59,6 +59,13 @@
 			'outputs': [ '../../dummy', ], # outputs
 			'action': [ '<@(_graphcode)', '<@(_inputs)',  '--force-update', '--machine', 'SendToGroupScreen', '-h', '../../source/Testbed/MemoApp/SendToGroupScreen.h', '-cpp', '../../source/Testbed/MemoApp/SendToGroupScreen.mm', ], # action
 		},
+
+		{
+			'action_name': 'MyInboxScreen.tgf',
+			'inputs': [ '../../tgf/Testbed/MemoApp/MyInboxScreen.tgf', ], # inputs
+			'outputs': [ '../../dummy', ], # outputs
+			'action': [ '<@(_graphcode)', '<@(_inputs)',  '--force-update', '--machine', 'MyInboxScreen', '-h', '../../source/Testbed/MemoApp/MyInboxScreen.h', '-cpp', '../../source/Testbed/MemoApp/MyInboxScreen.mm', ], # action
+		},
 		],
 
 		'sources': [
@@ -71,6 +78,9 @@
 			'../../source/Testbed/MemoApp/MemoEventManager.h',
 
 			'../../source/Testbed/MemoApp/Screen.h',
+
+			'../../source/Testbed/MemoApp/MyInboxScreen.mm',
+			'../../source/Testbed/MemoApp/MyInboxScreen.h',
 
 			'../../source/Testbed/MemoApp/MyRecordingsScreen.mm',
 			'../../source/Testbed/MemoApp/MyRecordingsScreen.h',

@@ -13,13 +13,17 @@ class tFile;
 class URLConnection
 {
 public:
+    tFile       mFile;
     std::string mURL;
     std::string mString;
     NSURLConnection*       mNSURLConnection;
     PrivateDelegate*       mDelegate;
+    tFileOutputStream*     mFOS;
+    bool        mUseFile;
 
 public:
     URLConnection(const std::string& url);
+    URLConnection(const std::string& url, const tFile& newFile);
     URLConnection(const std::string& url, const std::string& body);
     URLConnection(const std::string& newPHP, const std::vector<std::pair<std::string, std::string> >& newParams, const tFile& newFile);
     ~URLConnection();
@@ -41,6 +45,7 @@ protected:
 
 public:
     void loadString(const std::string& newURL);
+    void loadFile(const std::string& newURL, const tFile& newFile);
     void postJSON(const std::string& newURL, const std::string& newBody);
     void postFile(const std::string& newPHP, const std::vector<std::pair<std::string, std::string> >& newParams, const tFile& newFile);
 
@@ -53,6 +58,7 @@ class URLLoaderEvent
 public:
     enum EventType
     {
+        kLoadedString,
         kLoadedFile,
         kLoadFail,
     };
