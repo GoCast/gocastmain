@@ -8,6 +8,8 @@
 #define PrivateDelegate void
 #endif
 
+class tFile;
+
 class URLConnection
 {
 public:
@@ -19,6 +21,7 @@ public:
 public:
     URLConnection(const std::string& url);
     URLConnection(const std::string& url, const std::string& body);
+    URLConnection(const std::string& newPHP, const std::vector<std::pair<std::string, std::string> >& newParams, const tFile& newFile);
     ~URLConnection();
 
     void DidReceiveResponse(const void* response);
@@ -39,6 +42,7 @@ protected:
 public:
     void loadString(const std::string& newURL);
     void postJSON(const std::string& newURL, const std::string& newBody);
+    void postFile(const std::string& newPHP, const std::vector<std::pair<std::string, std::string> >& newParams, const tFile& newFile);
 
 public:
     friend class tSingleton<URLLoader>;

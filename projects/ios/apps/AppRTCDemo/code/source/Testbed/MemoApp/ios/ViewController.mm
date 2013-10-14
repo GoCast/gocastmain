@@ -286,7 +286,7 @@ std::vector<std::string> gUserListEntries;
         return (NSInteger)gUserListEntries.size();
     }
 
-    return (NSInteger)5;
+    return (NSInteger)1;
 }
 
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
@@ -338,13 +338,9 @@ std::vector<std::string> gUserListEntries;
     }
     else
     {
-        const char* names[5] =
+        const char* names[1] =
         {
-            "Yoji Izaki",
-            "Shinzo Abe",
-            "Barack Obama",
-            "TJ Grant",
-            "Manjesh Mallavali",
+            "Unimplemented",
         };
     #pragma unused(indexPath)
 

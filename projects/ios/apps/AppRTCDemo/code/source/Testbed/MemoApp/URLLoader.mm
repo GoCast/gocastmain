@@ -1,6 +1,7 @@
 #import <UIKit/UIKit.h>
 
 #include "Base/package.h"
+#include "Io/package.h"
 
 #include "package.h"
 
@@ -68,6 +69,60 @@ URLConnection::URLConnection(const std::string& url, const std::string& body)
     mNSURLConnection = [[NSURLConnection alloc] initWithRequest: req delegate: mDelegate];
 }
 
+URLConnection::URLConnection(const std::string& newPHP, const std::vector<std::pair<std::string, std::string> >& newParams, const tFile& newFile)
+{
+    mDelegate = [[PrivateDelegate alloc] initWithParent: this];
+
+    // create request
+    NSMutableURLRequest *req = [NSMutableURLRequest requestWithURL: [NSURL URLWithString: [NSString stringWithUTF8String: newPHP.c_str()]]];
+    [req setCachePolicy:NSURLRequestReloadIgnoringLocalCacheData];
+    [req setHTTPShouldHandleCookies:NO];
+    [req setTimeoutInterval:30];
+    [req setHTTPMethod:@"POST"];
+
+    // set Content-Type in HTTP header
+    NSString *contentType = [NSString stringWithFormat:@"multipart/form-data; boundary=%@", @"abc123"];
+    [req setValue:contentType forHTTPHeaderField: @"Content-Type"];
+
+    // post body
+    NSMutableData *body = [NSMutableData data];
+
+    // add params (all params are strings)
+    for (size_t i = 0; i < newParams.size(); i++)
+    {
+        NSString* key   = [NSString stringWithUTF8String:newParams[i].first.c_str()];
+        NSString* value = [NSString stringWithUTF8String:newParams[i].second.c_str()];
+
+        [body appendData:[[NSString stringWithFormat:@"--%@\r\n", @"abc123"] dataUsingEncoding:NSUTF8StringEncoding]];
+        [body appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"%@\"\r\n\r\n", key] dataUsingEncoding:NSUTF8StringEncoding]];
+        [body appendData:[[NSString stringWithFormat:@"%@\r\n", value] dataUsingEncoding:NSUTF8StringEncoding]];
+    }
+
+    // add file data
+    NSData *fileData = [NSData dataWithContentsOfFile:[NSString stringWithUTF8String:newFile.GetFullPath().c_str()]];
+    if (fileData)
+    {
+        [body appendData:[[NSString stringWithFormat:@"--%@\r\n", @"abc123"] dataUsingEncoding:NSUTF8StringEncoding]];
+        [body appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"filename\"; filename=\"%s\"\r\n",
+                           newFile.getFilename().c_str()]
+                          dataUsingEncoding:NSUTF8StringEncoding]];
+        [body appendData:[[NSString stringWithUTF8String:"Content-Type: application/octet-stream\r\n\r\n"] dataUsingEncoding:NSUTF8StringEncoding]];
+        [body appendData:fileData];
+        [body appendData:[[NSString stringWithFormat:@"\r\n"] dataUsingEncoding:NSUTF8StringEncoding]];
+    }
+
+    [body appendData:[[NSString stringWithFormat:@"--%@--\r\n", @"abc123"] dataUsingEncoding:NSUTF8StringEncoding]];
+
+    // setting the body of the post to the reqeust
+    [req setHTTPBody:body];
+
+    // set the content-length
+    NSString *postLength = [NSString stringWithFormat:@"%d", [body length]];
+    [req setValue:postLength forHTTPHeaderField:@"Content-Length"];
+
+    mNSURLConnection = [[NSURLConnection alloc] initWithRequest: req delegate: mDelegate];
+}
+
 URLConnection::~URLConnection()
 {
     [mNSURLConnection release];
@@ -117,3 +172,7 @@ void URLLoader::postJSON(const std::string& newURL, const std::string& newBody)
     new URLConnection(newURL, newBody);
 }
 
+void URLLoader::postFile(const std::string& newPHP, const std::vector<std::pair<std::string, std::string> >& newParams, const tFile& newFile)
+{
+    new URLConnection(newPHP, newParams, newFile);
+}

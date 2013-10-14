@@ -12,10 +12,13 @@ class SendToGroupScreen
 {
 protected:
     std::vector<std::string> mUserListTable;
+    std::vector<std::string> mSelectedGroup;
     std::string mUserListJSON;
+    std::string mPostGroupJSON;
+    std::string mFilename;
 
 public:
-	SendToGroupScreen();
+	SendToGroupScreen(const std::string& newFilename);
 	~SendToGroupScreen();
 
 protected:
@@ -23,12 +26,15 @@ protected:
 	void endEntry();
 	void invalidStateEntry();
 
+	void getSelectedGroupFromUserTableEntry();
 	void idleEntry();
+	void isGroupEmptyEntry();
 	void isUserListValidEntry();
 	void sendGoInboxToVCEntry();
 	void sendPostGroupToServerEntry();
 	void sendUserListToServerEntry();
 	void serverErrorIdleEntry();
+	void showEmptySelectionEntry();
 	void showPostGroupFailedEntry();
 	void showPostGroupSuccessEntry();
 	void showReallySendEntry();
@@ -57,12 +63,15 @@ public:
 		kInvalidState = 0,
 		kStart = 1,
 		kEnd,
+		kGetSelectedGroupFromUserTable,
 		kIdle,
+		kIsGroupEmpty,
 		kIsUserListValid,
 		kSendGoInboxToVC,
 		kSendPostGroupToServer,
 		kSendUserListToServer,
 		kServerErrorIdle,
+		kShowEmptySelection,
 		kShowPostGroupFailed,
 		kShowPostGroupSuccess,
 		kShowReallySend,

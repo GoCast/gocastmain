@@ -15,6 +15,9 @@
 15 Was postGroup successful?
 16 Show "postGroup success"
 17 Show "postGroup failed"
+18 Get selected group from User Table
+19 Is group empty?
+20 Show "empty selection"
 #
 1 4
 4 5 fail
@@ -29,7 +32,7 @@
 9 11 cancel
 3 11 cancel
 9 10 send
-3 12 send
+3 18 send
 13 14 fail
 13 15 success
 12 13 yes
@@ -37,6 +40,10 @@
 15 16 yes
 16 11 yes
 15 17 no
-17 14 yes
+17 3 yes
 14 9 no
 14 13 yes
+18 19
+19 12 no
+19 20 yes
+20 3 yes

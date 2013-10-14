@@ -47,5 +47,6 @@
 
 -(void)setMyRecordingsTable:(const std::vector<std::string>&)newEntries;
 -(void)setUserListTable:(const std::vector<std::string>&)newEntries;
+-(std::vector<std::string>)getSelectedFromUserListTable;
 
 @end

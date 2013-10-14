@@ -84,7 +84,7 @@ void MemoApp::myRecordingsScreenExit()
 
 void MemoApp::sendToGroupScreenEntry()
 {
-    mScreen = new SendToGroupScreen;
+    mScreen = new SendToGroupScreen(mCurAudioFilename);
     mScreen->attach(this);
 }
 

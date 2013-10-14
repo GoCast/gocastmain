@@ -15,13 +15,13 @@ std::map<std::string, std::string> JSONUtil::extract(const std::string& newJSONS
     NSDictionary *json = [NSJSONSerialization JSONObjectWithData:responseData
                                                          options:0
                                                            error:&error];
-    assert(!error);
-
-    for (NSString* key in json)
+    if (!error)
     {
-        result[[key UTF8String]] = [[json objectForKey:key] UTF8String];
+        for (NSString* key in json)
+        {
+            result[[key UTF8String]] = [[json objectForKey:key] UTF8String];
+        }
     }
-
     return result;
 }
 

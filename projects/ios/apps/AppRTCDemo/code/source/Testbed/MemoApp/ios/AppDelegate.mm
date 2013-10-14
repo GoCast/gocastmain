@@ -268,4 +268,21 @@ extern std::vector<std::string> gUserListEntries;
     [self.viewController.mSendToGroupTable reloadData];
 }
 
+-(std::vector<std::string>)getSelectedFromUserListTable
+{
+    std::vector<std::string> result;
+
+    NSArray* selectedIndexPaths = [self.viewController.mSendToGroupTable indexPathsForSelectedRows];
+
+    if (selectedIndexPaths)
+    {
+        for (NSIndexPath* path in selectedIndexPaths)
+        {
+            result.push_back(gUserListEntries[(tUInt32)path.row]);
+        }
+    }
+    
+    return result;
+}
+
 @end

@@ -16,5 +16,6 @@ public:
     friend class tFileInputStream;
     friend class tFileOutputStream;
     friend class tSound;
+    friend class URLConnection;
 };
 

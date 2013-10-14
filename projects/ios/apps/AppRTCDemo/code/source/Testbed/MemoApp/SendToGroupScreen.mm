@@ -1,9 +1,11 @@
 #include "Base/package.h"
+#include "Io/package.h"
 
 #include "package.h"
 
 #pragma mark Constructor / Destructor
-SendToGroupScreen::SendToGroupScreen()
+SendToGroupScreen::SendToGroupScreen(const std::string& newFilename)
+: mFilename(newFilename)
 {
 	ConstructMachine();
 }
@@ -42,6 +44,12 @@ void SendToGroupScreen::serverErrorIdleEntry()
 }
 
 #pragma mark Queries
+
+void SendToGroupScreen::isGroupEmptyEntry()
+{
+    SetImmediateEvent(mSelectedGroup.empty() ? kYes : kNo);
+}
+
 void SendToGroupScreen::isUserListValidEntry()
 {
     bool result = JSONUtil::extract(mUserListJSON)["status"] == std::string("success");
@@ -51,11 +59,17 @@ void SendToGroupScreen::isUserListValidEntry()
 
 void SendToGroupScreen::wasPostGroupSuccessfulEntry()
 {
-    //TODO: Implement
-    SetImmediateEvent(kNo);
+    bool result = JSONUtil::extract(mPostGroupJSON)["status"] == std::string("success");
+
+    SetImmediateEvent(result ? kYes : kNo);
 }
 
 #pragma mark Actions
+void SendToGroupScreen::getSelectedGroupFromUserTableEntry()
+{
+    mSelectedGroup = [gAppDelegateInstance getSelectedFromUserListTable];
+}
+
 void SendToGroupScreen::sendUserListToServerEntry()
 {
     URLLoader::getInstance()->loadString(kMemoAppServerURL"?action=userList");
@@ -63,11 +77,27 @@ void SendToGroupScreen::sendUserListToServerEntry()
 
 void SendToGroupScreen::sendPostGroupToServerEntry()
 {
-    //TODO: Implement
-    SetImmediateEvent(kSuccess);
+    std::vector<std::pair<std::string, std::string> > params;
+
+    params.push_back(std::pair<std::string, std::string>("action", "postGroup"));
+    params.push_back(std::pair<std::string, std::string>("from", std::string(tFile(tFile::kDocumentsDirectory, "logintoken.txt"))));
+
+    for (size_t i = 0; i < mSelectedGroup.size(); i++)
+    {
+        params.push_back(std::pair<std::string, std::string>("group[]", mSelectedGroup[i]));
+    }
+
+    params.push_back(std::pair<std::string, std::string>("MAX_FILE_SIZE", "1048576"));
+
+    URLLoader::getInstance()->postFile(kMemoAppServerURL, params, tFile(tFile::kDocumentsDirectory, mFilename));
 }
 
 #pragma mark User Interface
+void SendToGroupScreen::showEmptySelectionEntry()
+{
+    tAlert("Must select at least one user");
+}
+
 void SendToGroupScreen::showPostGroupFailedEntry()
 {
     tAlert("Memo failed posting to group");
@@ -120,13 +150,16 @@ void SendToGroupScreen::CallEntry()
 	switch(mState)
 	{
 		case kEnd: EndEntryHelper(); break;
+		case kGetSelectedGroupFromUserTable: getSelectedGroupFromUserTableEntry(); break;
 		case kIdle: idleEntry(); break;
 		case kInvalidState: invalidStateEntry(); break;
+		case kIsGroupEmpty: isGroupEmptyEntry(); break;
 		case kIsUserListValid: isUserListValidEntry(); break;
 		case kSendGoInboxToVC: sendGoInboxToVCEntry(); break;
 		case kSendPostGroupToServer: sendPostGroupToServerEntry(); break;
 		case kSendUserListToServer: sendUserListToServerEntry(); break;
 		case kServerErrorIdle: serverErrorIdleEntry(); break;
+		case kShowEmptySelection: showEmptySelectionEntry(); break;
 		case kShowPostGroupFailed: showPostGroupFailedEntry(); break;
 		case kShowPostGroupSuccess: showPostGroupSuccessEntry(); break;
 		case kShowReallySend: showReallySendEntry(); break;
@@ -147,8 +180,11 @@ void SendToGroupScreen::CallExit()
 
 int  SendToGroupScreen::StateTransitionFunction(const int evt) const
 {
+	if ((mState == kGetSelectedGroupFromUserTable) && (evt == kNext)) return kIsGroupEmpty; else
 	if ((mState == kIdle) && (evt == kCancel)) return kSendGoInboxToVC; else
-	if ((mState == kIdle) && (evt == kSend)) return kShowReallySend; else
+	if ((mState == kIdle) && (evt == kSend)) return kGetSelectedGroupFromUserTable; else
+	if ((mState == kIsGroupEmpty) && (evt == kNo)) return kShowReallySend; else
+	if ((mState == kIsGroupEmpty) && (evt == kYes)) return kShowEmptySelection; else
 	if ((mState == kIsUserListValid) && (evt == kNo)) return kShowUserListEmpty; else
 	if ((mState == kIsUserListValid) && (evt == kYes)) return kUpdateLocalUserList; else
 	if ((mState == kSendPostGroupToServer) && (evt == kFail)) return kShowRetryPostGroup; else
@@ -157,7 +193,8 @@ int  SendToGroupScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kSendUserListToServer) && (evt == kSuccess)) return kIsUserListValid; else
 	if ((mState == kServerErrorIdle) && (evt == kCancel)) return kSendGoInboxToVC; else
 	if ((mState == kServerErrorIdle) && (evt == kSend)) return kShowServerError; else
-	if ((mState == kShowPostGroupFailed) && (evt == kYes)) return kShowRetryPostGroup; else
+	if ((mState == kShowEmptySelection) && (evt == kYes)) return kIdle; else
+	if ((mState == kShowPostGroupFailed) && (evt == kYes)) return kIdle; else
 	if ((mState == kShowPostGroupSuccess) && (evt == kYes)) return kSendGoInboxToVC; else
 	if ((mState == kShowReallySend) && (evt == kNo)) return kIdle; else
 	if ((mState == kShowReallySend) && (evt == kYes)) return kSendPostGroupToServer; else
@@ -179,6 +216,7 @@ bool SendToGroupScreen::HasEdgeNamedNext() const
 {
 	switch(mState)
 	{
+		case kGetSelectedGroupFromUserTable:
 		case kStart:
 		case kUpdateLocalUserList:
 			return true;
@@ -218,6 +256,10 @@ void SendToGroupScreen::update(const URLLoaderEvent& msg)
             {
                 case kSendUserListToServer:
                     mUserListJSON = msg.mString;
+                    break;
+
+                case kSendPostGroupToServer:
+                    mPostGroupJSON = msg.mString;
                     break;
 
                 default:
