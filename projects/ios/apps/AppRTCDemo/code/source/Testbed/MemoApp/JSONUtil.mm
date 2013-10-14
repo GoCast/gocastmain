@@ -1,6 +1,7 @@
 #import <Foundation/Foundation.h>
 
 #include "Base/package.h"
+#include "Io/package.h"
 #include "package.h"
 
 std::map<std::string, std::string> JSONUtil::extract(const std::string& newJSONString)
