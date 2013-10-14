@@ -24,3 +24,30 @@ std::map<std::string, std::string> JSONUtil::extract(const std::string& newJSONS
 
     return result;
 }
+
+std::vector<std::string> JSONUtil::explodeCommas(const std::string& newString)
+{
+    std::vector<std::string> result;
+    std::string temp;
+
+    temp = "";
+    for(size_t i = 0; i < newString.size(); i++)
+    {
+        if (newString[i] != ',')
+        {
+            temp += newString[i];
+        }
+        else
+        {
+            result.push_back(temp);
+            temp = "";
+        }
+    }
+
+    if (!temp.empty())
+    {
+        result.push_back(temp);
+    }
+
+    return result;
+}

@@ -14,6 +14,7 @@
 #include "MyRecordingsScreen.h"
 #include "SettingsScreen.h"
 #include "StartScreen.h"
+#include "SendToGroupScreen.h"
 
 #include "MemoApp.h"
 

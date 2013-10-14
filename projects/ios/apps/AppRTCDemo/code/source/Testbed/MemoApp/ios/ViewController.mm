@@ -8,6 +8,7 @@
 #include "MemoEventManager.h"
 
 std::vector<std::string> gMyRecordingsEntries;
+std::vector<std::string> gUserListEntries;
 
 @interface ViewController()
 {
@@ -235,6 +236,19 @@ std::vector<std::string> gMyRecordingsEntries;
     MemoEventManager::getInstance()->notify(MemoEvent(MemoEvent::kLogOutPressed));
 }
 
+//mSendToGroupView
+-(IBAction) sendSendToGroupPressed:(id)sender
+{
+#pragma unused(sender)
+    MemoEventManager::getInstance()->notify(MemoEvent(MemoEvent::kSendSendToGroupPressed));
+}
+
+-(IBAction) cancelSendToGroupPressed:(id)sender
+{
+#pragma unused(sender)
+    MemoEventManager::getInstance()->notify(MemoEvent(MemoEvent::kCancelSendToGroupPressed));
+}
+
 - (BOOL)textFieldShouldReturn:(UITextField *)textField
 {
     if (textField == self.mLoginUsername)
@@ -267,6 +281,10 @@ std::vector<std::string> gMyRecordingsEntries;
     {
         return (NSInteger)gMyRecordingsEntries.size();
     }
+    else if (tableView == self.mSendToGroupTable)
+    {
+        return (NSInteger)gUserListEntries.size();
+    }
 
     return (NSInteger)5;
 }
@@ -294,6 +312,25 @@ std::vector<std::string> gMyRecordingsEntries;
         }
 
         cell.textLabel.text = [NSString stringWithUTF8String:gMyRecordingsEntries[indexPath.row].c_str()];
+
+        cell.imageView.image = nil;
+        
+        return cell;
+    }
+    else if (tableView == self.mSendToGroupTable)
+    {
+        tableView.backgroundView = nil;
+
+        static NSString *simpleTableIdentifier = @"MemoAppTableItem";
+
+        UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:simpleTableIdentifier];
+
+        if (cell == nil)
+        {
+            cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:simpleTableIdentifier] autorelease];
+        }
+
+        cell.textLabel.text = [NSString stringWithUTF8String:gUserListEntries[indexPath.row].c_str()];
 
         cell.imageView.image = nil;
         

@@ -25,7 +25,7 @@ UIAlertViewDelegate, AVAudioRecorderDelegate>
 @property (nonatomic, strong) IBOutlet UITextField* mLoginPassword;
 
 //mMyRecordingsView
-@property (nonatomic, strong) IBOutlet UITableView* mGroupTable;
+@property (nonatomic, strong) IBOutlet UITableView* mInboxTable;
 @property (nonatomic, strong) IBOutlet UITableView* mMyRecordingsTable;
 
 //mTabView
@@ -55,6 +55,10 @@ UIAlertViewDelegate, AVAudioRecorderDelegate>
 @property (nonatomic, strong) IBOutlet UIButton* mChangePasswordButton;
 @property (nonatomic, strong) IBOutlet UIButton* mLogOutButton;
 
+//mSendToGroupView
+@property (nonatomic, strong) IBOutlet UITableView* mSendToGroupTable;
+@property (nonatomic, strong) IBOutlet UIButton* mSendSendtoGroupButton;
+@property (nonatomic, strong) IBOutlet UIButton* mCancelSendToGroupButton;
 
 @property (nonatomic, strong) AVAudioRecorder* mRecorder;
 
@@ -78,6 +82,10 @@ UIAlertViewDelegate, AVAudioRecorderDelegate>
 
 -(IBAction) changePasswordPressed:(id)sender;
 -(IBAction) logOutPressed:(id)sender;
+
+//mSendToGroupView
+-(IBAction) sendSendToGroupPressed:(id)sender;
+-(IBAction) cancelSendToGroupPressed:(id)sender;
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField;
 

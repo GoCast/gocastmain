@@ -46,5 +46,6 @@
 -(void)stopRecorder;
 
 -(void)setMyRecordingsTable:(const std::vector<std::string>&)newEntries;
+-(void)setUserListTable:(const std::vector<std::string>&)newEntries;
 
 @end

@@ -84,12 +84,13 @@ void MemoApp::myRecordingsScreenExit()
 
 void MemoApp::sendToGroupScreenEntry()
 {
-    [gAppDelegateInstance setSendToGroupScreenVisible:true];
+    mScreen = new SendToGroupScreen;
+    mScreen->attach(this);
 }
 
 void MemoApp::sendToGroupScreenExit()
 {
-    [gAppDelegateInstance setSendToGroupScreenVisible:false];
+    if (mScreen) { delete mScreen; mScreen = NULL; }
 }
 
 void MemoApp::playAudioScreenEntry()

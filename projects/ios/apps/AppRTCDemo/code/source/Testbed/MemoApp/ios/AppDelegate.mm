@@ -13,6 +13,7 @@
 AppDelegate* gAppDelegateInstance = NULL;
 
 extern std::vector<std::string> gMyRecordingsEntries;
+extern std::vector<std::string> gUserListEntries;
 
 @implementation AppDelegate
 
@@ -257,6 +258,14 @@ extern std::vector<std::string> gMyRecordingsEntries;
     gMyRecordingsEntries.insert(gMyRecordingsEntries.end(), newEntries.begin(), newEntries.end());
 
     [self.viewController.mMyRecordingsTable reloadData];
+}
+
+-(void)setUserListTable:(const std::vector<std::string>&)newEntries
+{
+    gUserListEntries.clear();
+    gUserListEntries.insert(gUserListEntries.end(), newEntries.begin(), newEntries.end());
+
+    [self.viewController.mSendToGroupTable reloadData];
 }
 
 @end

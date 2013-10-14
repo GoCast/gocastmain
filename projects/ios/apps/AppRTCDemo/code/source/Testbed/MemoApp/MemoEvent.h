@@ -28,6 +28,9 @@ public:
         kChangePasswordPressed,
         kLogOutPressed,
 
+        kSendSendToGroupPressed,
+        kCancelSendToGroupPressed,
+
         kOKYesAlertPressed,
         kNoAlertPressed,
 

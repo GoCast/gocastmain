@@ -9,10 +9,11 @@
             <connections>
                 <outlet property="mCancelAudioButton" destination="yFa-2v-cNd" id="DEl-Py-EbM"/>
                 <outlet property="mCancelRecordingButton" destination="bm9-ud-vHN" id="eTz-EW-qbL"/>
+                <outlet property="mCancelSendToGroupButton" destination="WDp-Dz-GmL" id="UkM-Tv-YWh"/>
                 <outlet property="mChangePasswordButton" destination="4rW-1O-dHI" id="bc7-OL-SNP"/>
                 <outlet property="mDeleteAudioButton" destination="Y27-rm-VZ9" id="wsi-AB-pbb"/>
-                <outlet property="mGroupTable" destination="18" id="112"/>
                 <outlet property="mInboxTab" destination="mIS-gC-azt" id="HhR-ug-abq"/>
+                <outlet property="mInboxTable" destination="18" id="dnQ-pC-apN"/>
                 <outlet property="mLogOutButton" destination="GYD-Ar-cyF" id="IbK-Ir-ZQc"/>
                 <outlet property="mLoggedInLabel" destination="jRu-HO-DoS" id="QvJ-HY-aCs"/>
                 <outlet property="mLoginPassword" destination="16" id="104"/>
@@ -29,6 +30,9 @@
                 <outlet property="mRecordAudioView" destination="wD3-Wi-uv9" id="w0j-RC-GGC"/>
                 <outlet property="mRecordingStatusLabel" destination="qEK-Gu-AnZ" id="aIh-pd-NuL"/>
                 <outlet property="mSendAudioButton" destination="kAI-4c-ka5" id="TcC-HK-6YH"/>
+                <outlet property="mSendSendtoGroupButton" destination="gZL-ms-lET" id="1MM-CM-4uV"/>
+                <outlet property="mSendToGroupTable" destination="jnN-v8-bzM" id="WJM-TC-A3l"/>
+                <outlet property="mSendToGroupView" destination="WcT-ul-7Mm" id="MOl-82-kfj"/>
                 <outlet property="mSettingsTab" destination="Yjj-7Y-DMv" id="IPg-al-cma"/>
                 <outlet property="mSettingsView" destination="z74-Xq-Z9u" id="Axv-RO-IEE"/>
                 <outlet property="mStartRecordingButton" destination="Sn3-JV-aXK" id="nK7-ph-Iy7"/>
@@ -49,6 +53,49 @@
                     <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                 </imageView>
+                <view contentMode="scaleToFill" id="WcT-ul-7Mm" userLabel="mSendToGroupView">
+                    <rect key="frame" x="0.0" y="25" width="320" height="431"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <subviews>
+                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Send to Group" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="aSp-I4-dME">
+                            <rect key="frame" x="0.0" y="10" width="320" height="21"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                            <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                        <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" style="plain" separatorStyle="default" allowsMultipleSelection="YES" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="jnN-v8-bzM" userLabel="mSendToGroupTable">
+                            <rect key="frame" x="0.0" y="40" width="320" height="318"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            <connections>
+                                <outlet property="dataSource" destination="-1" id="tOX-8U-sBo"/>
+                                <outlet property="delegate" destination="-1" id="t4i-9t-Rck"/>
+                            </connections>
+                        </tableView>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="gZL-ms-lET" userLabel="mSendSendToGroupButton">
+                            <rect key="frame" x="180" y="366" width="120" height="45"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <state key="normal" title="Send">
+                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                            </state>
+                            <connections>
+                                <action selector="sendSendToGroupPressed:" destination="-1" eventType="touchUpInside" id="tm6-Eq-hRI"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="WDp-Dz-GmL" userLabel="mCancelSendToGroupButton">
+                            <rect key="frame" x="20" y="366" width="120" height="45"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <state key="normal" title="Cancel">
+                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                            </state>
+                            <connections>
+                                <action selector="cancelSendToGroupPressed:" destination="-1" eventType="touchUpInside" id="2Kh-oi-blj"/>
+                            </connections>
+                        </button>
+                    </subviews>
+                    <color key="backgroundColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+                </view>
                 <view contentMode="scaleToFill" id="6" userLabel="mStartView">
                     <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>

@@ -52,6 +52,13 @@
 			'outputs': [ '../../dummy', ], # outputs
 			'action': [ '<@(_graphcode)', '<@(_inputs)',  '--force-update', '--machine', 'StartScreen', '-h', '../../source/Testbed/MemoApp/StartScreen.h', '-cpp', '../../source/Testbed/MemoApp/StartScreen.mm', ], # action
 		},
+
+		{
+			'action_name': 'SendToGroupScreen.tgf',
+			'inputs': [ '../../tgf/Testbed/MemoApp/SendToGroupScreen.tgf', ], # inputs
+			'outputs': [ '../../dummy', ], # outputs
+			'action': [ '<@(_graphcode)', '<@(_inputs)',  '--force-update', '--machine', 'SendToGroupScreen', '-h', '../../source/Testbed/MemoApp/SendToGroupScreen.h', '-cpp', '../../source/Testbed/MemoApp/SendToGroupScreen.mm', ], # action
+		},
 		],
 
 		'sources': [
@@ -79,6 +86,9 @@
 
 			'../../source/Testbed/MemoApp/StartScreen.mm',
 			'../../source/Testbed/MemoApp/StartScreen.h',
+
+			'../../source/Testbed/MemoApp/SendToGroupScreen.mm',
+			'../../source/Testbed/MemoApp/SendToGroupScreen.h',
 
 			'../../source/Testbed/MemoApp/JSONUtil.mm',
 			'../../source/Testbed/MemoApp/JSONUtil.h',
