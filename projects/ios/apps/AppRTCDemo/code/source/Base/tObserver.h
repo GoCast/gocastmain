@@ -38,10 +38,22 @@ class tSubject
 {
 protected:
     std::list<tObserver<MSGTYPE>*> mObservers;
+    std::list<tObserver<MSGTYPE>*> mNewObservers;
     bool                           mCurrentlyNotifying;
     bool*                          mSubjectDeletedPtr;
     
-    void AttachObserver(tObserver<MSGTYPE>* newOb) { mObservers.push_back(newOb); }
+    void AttachObserver(tObserver<MSGTYPE>* newOb)
+    {
+        //If we're notifying, wait until the notify is complete, then add them
+        if (!mCurrentlyNotifying)
+        {
+            mObservers.push_back(newOb);
+        }
+        else
+        {
+            mNewObservers.push_back(newOb);
+        }
+    }
 
     void DetachObserver(tObserver<MSGTYPE>* newOb)
     {
@@ -162,6 +174,8 @@ void tSubject<MSGTYPE>::notify(const MSGTYPE msg)
     mCurrentlyNotifying = false;
 
     mObservers.remove(NULL);  //Remove all NULLs from observers list
+    mObservers.insert(mObservers.end(), mNewObservers.begin(), mNewObservers.end());    //Added during notify
+    mNewObservers.clear();
 }
 
 #pragma mark tObserver

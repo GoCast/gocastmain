@@ -314,47 +314,8 @@ void StartScreen::update(const MemoEvent& msg)
         case MemoEvent::kSignInPressed:     process(kLogin); break;
         case MemoEvent::kNewAccountPressed: process(kNewAccount); break;
 
-        case MemoEvent::kOKYesAlertPressed:
-        {
-            switch (getState())
-            {
-                case kShowAppIsOutOfDate:
-                case kShowFormatProblem:
-                case kShowLoginFailed:
-                case kShowRegistrationFailed:
-                case kShowRegistrationSuccessful:
-                case kShowRetryLogin:
-                case kShowRetryRegister:
-                case kShowRetryVersion:
-                case kShowServerError:
-                    process(kYes);
-                    break;
-
-                default:
-                    break;
-            }
-        }
-            break;
-        case MemoEvent::kNoAlertPressed:
-        {
-            switch (getState())
-            {
-                case kShowAppIsOutOfDate:
-                case kShowFormatProblem:
-                case kShowLoginFailed:
-                case kShowRegistrationFailed:
-                case kShowRegistrationSuccessful:
-                case kShowRetryLogin:
-                case kShowRetryRegister:
-                case kShowRetryVersion:
-                case kShowServerError:
-                    process(kNo);
-                    break;
-
-                default:
-                    break;
-            }
-        }
+        case MemoEvent::kOKYesAlertPressed: process(kYes); break;
+        case MemoEvent::kNoAlertPressed:    process(kNo); break;
 
         default:
             break;

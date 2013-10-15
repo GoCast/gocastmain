@@ -217,18 +217,10 @@ void SettingsScreen::update(const MemoEvent& msg)
 {
     switch (msg.mEvent)
     {
-        case MemoEvent::kChangePasswordPressed:
-            process(kChangePassword);
-            break;
-        case MemoEvent::kLogOutPressed:
-            process(kLogOut);
-            break;
-        case MemoEvent::kOKYesAlertPressed:
-            process(kYes);
-            break;
-        case MemoEvent::kNoAlertPressed:
-            process(kNo);
-            break;
+        case MemoEvent::kChangePasswordPressed: process(kChangePassword); break;
+        case MemoEvent::kLogOutPressed:         process(kLogOut); break;
+        case MemoEvent::kOKYesAlertPressed:     process(kYes); break;
+        case MemoEvent::kNoAlertPressed:        process(kNo); break;
         default:
             break;
     }

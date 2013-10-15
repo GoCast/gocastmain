@@ -14,7 +14,7 @@
 7 4 goNewRecording
 4 6 goRecordings
 8 5 goSendGroup
-5 6 goInbox
+5 7 goInbox
 6 4 goNewRecording
 4 7 goInbox
 6 7 goInbox
@@ -31,4 +31,4 @@
 10 7 goInbox
 10 6 goRecordings
 10 3 restart
-3 6 goInbox
+3 7 goInbox

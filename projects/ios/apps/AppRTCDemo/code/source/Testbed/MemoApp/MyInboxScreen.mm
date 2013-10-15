@@ -306,17 +306,16 @@ void MyInboxScreen::update(const URLLoaderEvent& msg)
             {
                 case kSendListInboxToServer:
                     mListInboxJSON = msg.mString;
-                    process(kSuccess);
                     break;
 
                 case kSendDeleteRequestToServer:
                     mDeleteFileJSON = msg.mString;
-                    process(kSuccess);
                     break;
 
                 default:
                     break;
             }
+            process(kSuccess);
         }
             break;
 
