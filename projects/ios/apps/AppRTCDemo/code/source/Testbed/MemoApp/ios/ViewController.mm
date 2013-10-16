@@ -191,6 +191,18 @@ std::vector<std::string> gMyInboxListEntries;
     MemoEventManager::getInstance()->notify(MemoEvent(MemoEvent::kCancelRecordingPressed));
 }
 
+-(IBAction) saveRecordingPressed:(id)sender
+{
+#pragma unused(sender)
+    MemoEventManager::getInstance()->notify(MemoEvent(MemoEvent::kSaveRecordingPressed));
+}
+
+-(IBAction) sendRecordingPressed:(id)sender
+{
+#pragma unused(sender)
+    MemoEventManager::getInstance()->notify(MemoEvent(MemoEvent::kSendRecordingPressed));
+}
+
 -(IBAction) playAudioPressed:(id)sender
 {
 #pragma unused(sender)

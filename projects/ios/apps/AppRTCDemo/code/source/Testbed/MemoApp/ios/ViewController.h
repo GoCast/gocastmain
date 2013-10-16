@@ -39,6 +39,8 @@ UIAlertViewDelegate, AVAudioRecorderDelegate>
 @property (nonatomic, strong) IBOutlet UIButton* mStartRecordingButton;
 @property (nonatomic, strong) IBOutlet UIButton* mStopRecordingButton;
 @property (nonatomic, strong) IBOutlet UIButton* mCancelRecordingButton;
+@property (nonatomic, strong) IBOutlet UIButton* mSaveRecordingButton;
+@property (nonatomic, strong) IBOutlet UIButton* mSendRecordingButton;
 @property (nonatomic, strong) IBOutlet UILabel* mRecordingStatusLabel;
 
 //mPlayAudioView
@@ -73,6 +75,8 @@ UIAlertViewDelegate, AVAudioRecorderDelegate>
 -(IBAction) startRecordingPressed:(id)sender;
 -(IBAction) stopRecordingPressed:(id)sender;
 -(IBAction) cancelRecordingPressed:(id)sender;
+-(IBAction) saveRecordingPressed:(id)sender;
+-(IBAction) sendRecordingPressed:(id)sender;
 
 -(IBAction) playAudioPressed:(id)sender;
 -(IBAction) stopAudioPressed:(id)sender;

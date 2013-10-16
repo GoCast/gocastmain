@@ -26,6 +26,9 @@
 
 -(void)setStartRecordingButtonEnabled:(bool)newEnabled;
 -(void)setStopRecordingButtonEnabled:(bool)newEnabled;
+-(void)setCancelRecordingButtonVisible:(bool)newVisible;
+-(void)setSaveRecordingButtonVisible:(bool)newVisible;
+-(void)setSendRecordingButtonEnabled:(bool)newEnabled;
 -(void)setRecordingStatusLabel:(const std::string&)newStatus;
 
 -(void)setPlayAudioButtonEnabled:(bool)newEnabled;

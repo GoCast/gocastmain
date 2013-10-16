@@ -24,11 +24,14 @@ protected:
 	void invalidStateEntry();
 
 	void idleEntry();
+	void recordedIdleEntry();
 	void recordingIdleEntry();
 	void sendGoInboxToVCEntry();
 	void sendGoPlayToVCEntry();
 	void sendGoRecordingsToVCEntry();
+	void sendGoSendGroupToVCEntry();
 	void setStatusIdleEntry();
+	void setStatusRecordedEntry();
 	void setStatusRecordingEntry();
 	void setStatusStoppingEntry();
 	void showCouldntSaveEntry();
@@ -42,6 +45,8 @@ public:
 		kNext = -1,
 		kCancel,
 		kFail,
+		kSave,
+		kSend,
 		kStartRecording,
 		kStopRecording,
 		kSuccess,
@@ -53,11 +58,14 @@ public:
 		kStart = 1,
 		kEnd,
 		kIdle,
+		kRecordedIdle,
 		kRecordingIdle,
 		kSendGoInboxToVC,
 		kSendGoPlayToVC,
 		kSendGoRecordingsToVC,
+		kSendGoSendGroupToVC,
 		kSetStatusIdle,
+		kSetStatusRecorded,
 		kSetStatusRecording,
 		kSetStatusStopping,
 		kShowCouldntSave,

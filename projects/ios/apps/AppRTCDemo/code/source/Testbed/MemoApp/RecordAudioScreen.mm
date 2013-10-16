@@ -37,12 +37,14 @@ void RecordAudioScreen::invalidStateEntry()
 #pragma mark Idling
 void RecordAudioScreen::idleEntry()
 {
-
 }
 
 void RecordAudioScreen::recordingIdleEntry()
 {
+}
 
+void RecordAudioScreen::recordedIdleEntry()
+{
 }
 
 #pragma mark Setting status
@@ -50,13 +52,29 @@ void RecordAudioScreen::setStatusIdleEntry()
 {
     [gAppDelegateInstance setStartRecordingButtonEnabled:true];
     [gAppDelegateInstance setStopRecordingButtonEnabled:false];
+    [gAppDelegateInstance setCancelRecordingButtonVisible:true];
+    [gAppDelegateInstance setSaveRecordingButtonVisible:false];
+    [gAppDelegateInstance setSendRecordingButtonEnabled:false];
     [gAppDelegateInstance setRecordingStatusLabel:"Idle"];
+}
+
+void RecordAudioScreen::setStatusRecordedEntry()
+{
+    [gAppDelegateInstance setStartRecordingButtonEnabled:true];
+    [gAppDelegateInstance setStopRecordingButtonEnabled:false];
+    [gAppDelegateInstance setCancelRecordingButtonVisible:false];
+    [gAppDelegateInstance setSaveRecordingButtonVisible:true];
+    [gAppDelegateInstance setSendRecordingButtonEnabled:true];
+    [gAppDelegateInstance setRecordingStatusLabel:"Recorded"];
 }
 
 void RecordAudioScreen::setStatusRecordingEntry()
 {
     [gAppDelegateInstance setStartRecordingButtonEnabled:false];
     [gAppDelegateInstance setStopRecordingButtonEnabled:true];
+    [gAppDelegateInstance setCancelRecordingButtonVisible:true];
+    [gAppDelegateInstance setSaveRecordingButtonVisible:false];
+    [gAppDelegateInstance setSendRecordingButtonEnabled:false];
     [gAppDelegateInstance setRecordingStatusLabel:"Recording"];
 }
 
@@ -64,6 +82,9 @@ void RecordAudioScreen::setStatusStoppingEntry()
 {
     [gAppDelegateInstance setStartRecordingButtonEnabled:false];
     [gAppDelegateInstance setStopRecordingButtonEnabled:false];
+    [gAppDelegateInstance setCancelRecordingButtonVisible:true];
+    [gAppDelegateInstance setSaveRecordingButtonVisible:false];
+    [gAppDelegateInstance setSendRecordingButtonEnabled:false];
     [gAppDelegateInstance setRecordingStatusLabel:"Stopping"];
 }
 
@@ -112,6 +133,11 @@ void RecordAudioScreen::sendGoPlayToVCEntry()
     this->tSubject<const MemoAppMessage&>::notify(MemoAppMessage(MemoApp::kGoPlay, mResultFilename));
 }
 
+void RecordAudioScreen::sendGoSendGroupToVCEntry()
+{
+    this->tSubject<const MemoAppMessage&>::notify(MemoAppMessage(MemoApp::kGoSendGroup, mResultFilename));
+}
+
 #pragma mark State wiring
 void RecordAudioScreen::CallEntry()
 {
@@ -120,11 +146,14 @@ void RecordAudioScreen::CallEntry()
 		case kEnd: EndEntryHelper(); break;
 		case kIdle: idleEntry(); break;
 		case kInvalidState: invalidStateEntry(); break;
+		case kRecordedIdle: recordedIdleEntry(); break;
 		case kRecordingIdle: recordingIdleEntry(); break;
 		case kSendGoInboxToVC: sendGoInboxToVCEntry(); break;
 		case kSendGoPlayToVC: sendGoPlayToVCEntry(); break;
 		case kSendGoRecordingsToVC: sendGoRecordingsToVCEntry(); break;
+		case kSendGoSendGroupToVC: sendGoSendGroupToVCEntry(); break;
 		case kSetStatusIdle: setStatusIdleEntry(); break;
+		case kSetStatusRecorded: setStatusRecordedEntry(); break;
 		case kSetStatusRecording: setStatusRecordingEntry(); break;
 		case kSetStatusStopping: setStatusStoppingEntry(); break;
 		case kShowCouldntSave: showCouldntSaveEntry(); break;
@@ -141,18 +170,22 @@ void RecordAudioScreen::CallExit()
 
 int  RecordAudioScreen::StateTransitionFunction(const int evt) const
 {
-	if ((mState == kIdle) && (evt == kCancel)) return kSendGoInboxToVC; else
+	if ((mState == kIdle) && (evt == kCancel)) return kSendGoRecordingsToVC; else
 	if ((mState == kIdle) && (evt == kStartRecording)) return kSetStatusRecording; else
-	if ((mState == kRecordingIdle) && (evt == kCancel)) return kSendGoInboxToVC; else
+	if ((mState == kRecordedIdle) && (evt == kSave)) return kSendGoRecordingsToVC; else
+	if ((mState == kRecordedIdle) && (evt == kSend)) return kSendGoSendGroupToVC; else
+	if ((mState == kRecordedIdle) && (evt == kStartRecording)) return kSetStatusRecording; else
+	if ((mState == kRecordingIdle) && (evt == kCancel)) return kSendGoRecordingsToVC; else
 	if ((mState == kRecordingIdle) && (evt == kStopRecording)) return kSetStatusStopping; else
 	if ((mState == kSetStatusIdle) && (evt == kNext)) return kIdle; else
+	if ((mState == kSetStatusRecorded) && (evt == kNext)) return kRecordedIdle; else
 	if ((mState == kSetStatusRecording) && (evt == kNext)) return kStartRecordingAudio; else
 	if ((mState == kSetStatusStopping) && (evt == kNext)) return kStopRecordingAudio; else
 	if ((mState == kShowCouldntSave) && (evt == kNext)) return kSetStatusIdle; else
 	if ((mState == kStart) && (evt == kNext)) return kSetStatusIdle; else
 	if ((mState == kStartRecordingAudio) && (evt == kNext)) return kRecordingIdle; else
 	if ((mState == kStopRecordingAudio) && (evt == kFail)) return kShowCouldntSave; else
-	if ((mState == kStopRecordingAudio) && (evt == kSuccess)) return kSendGoRecordingsToVC;
+	if ((mState == kStopRecordingAudio) && (evt == kSuccess)) return kSetStatusRecorded;
 
 	return kInvalidState;
 }
@@ -162,6 +195,7 @@ bool RecordAudioScreen::HasEdgeNamedNext() const
 	switch(mState)
 	{
 		case kSetStatusIdle:
+		case kSetStatusRecorded:
 		case kSetStatusRecording:
 		case kSetStatusStopping:
 		case kShowCouldntSave:
@@ -181,6 +215,8 @@ void RecordAudioScreen::update(const MemoEvent& msg)
         case MemoEvent::kStartRecordingPressed:     process(kStartRecording); break;
         case MemoEvent::kStopRecordingPressed:      process(kStopRecording); break;
         case MemoEvent::kCancelRecordingPressed:    process(kCancel); break;
+        case MemoEvent::kSaveRecordingPressed:      process(kSave); break;
+        case MemoEvent::kSendRecordingPressed:      process(kSend); break;
 
         default:
             break;

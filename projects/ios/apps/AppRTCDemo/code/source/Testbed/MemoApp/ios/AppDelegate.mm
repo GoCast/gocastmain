@@ -183,6 +183,23 @@ extern std::vector<std::string> gMyInboxListEntries;
     self.viewController.mStopRecordingButton.alpha = (newEnabled ? 1.0f : 0.4f);
 }
 
+-(void)setCancelRecordingButtonVisible:(bool)newVisible
+{
+    [self.viewController.mCancelRecordingButton setHidden:(newVisible) ? NO : YES];
+}
+
+-(void)setSaveRecordingButtonVisible:(bool)newVisible
+{
+    [self.viewController.mSaveRecordingButton setHidden:(newVisible) ? NO : YES];
+}
+
+-(void)setSendRecordingButtonEnabled:(bool)newEnabled
+{
+    [self.viewController.mSendRecordingButton setEnabled:(newEnabled ? YES : NO)];
+    self.viewController.mSendRecordingButton.alpha = (newEnabled ? 1.0f : 0.4f);
+}
+
+
 -(void)setRecordingStatusLabel:(const std::string&)newStatus
 {
     self.viewController.mRecordingStatusLabel.text = [NSString stringWithUTF8String:newStatus.c_str()];

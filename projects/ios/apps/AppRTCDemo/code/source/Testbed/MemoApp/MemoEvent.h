@@ -18,6 +18,8 @@ public:
         kStartRecordingPressed,
         kStopRecordingPressed,
         kCancelRecordingPressed,
+        kSaveRecordingPressed,
+        kSendRecordingPressed,
 
         kPlayAudioPressed,
         kStopAudioPressed,
