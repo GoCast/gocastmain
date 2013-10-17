@@ -12,7 +12,8 @@ class MemoApp
 {
 protected:
     std::string mCurAudioFilename;
-    Screen* mScreen;
+    Screen*     mScreen;
+    bool        mExistsOnServer;
 
 public:
 	MemoApp();
@@ -25,7 +26,6 @@ protected:
 
 	void hideAllViewsEntry();
 	void myInboxScreenEntry();
-	void myRecordingsScreenEntry();
 	void playAudioScreenEntry();
 	void recordAudioScreenEntry();
 	void sendToGroupScreenEntry();
@@ -33,7 +33,6 @@ protected:
 	void startScreenEntry();
 
 	void myInboxScreenExit();
-	void myRecordingsScreenExit();
 	void playAudioScreenExit();
 	void recordAudioScreenExit();
 	void sendToGroupScreenExit();
@@ -48,7 +47,6 @@ public:
 		kGoInbox,
 		kGoNewRecording,
 		kGoPlay,
-		kGoRecordings,
 		kGoSendGroup,
 		kGoSettings,
 		kReady,
@@ -62,7 +60,6 @@ public:
 		kEnd,
 		kHideAllViews,
 		kMyInboxScreen,
-		kMyRecordingsScreen,
 		kPlayAudioScreen,
 		kRecordAudioScreen,
 		kSendToGroupScreen,
@@ -86,12 +83,14 @@ public:
 	MemoApp::EventType                  mEvent;
 	tSubject<const MemoAppMessage&>*    mSource;
     std::string                         mAudioFilename;
+    bool                                mExistsOnServer;
 
 public:
 	MemoAppMessage(MemoApp::EventType newEvent, tSubject<const MemoAppMessage&>* newSource = NULL)
 	: mEvent(newEvent), mSource(newSource) { }
 	MemoAppMessage(MemoApp::EventType newEvent, const std::string& newAudioFilename, tSubject<const MemoAppMessage&>* newSource = NULL)
 	: mEvent(newEvent), mSource(newSource), mAudioFilename(newAudioFilename) { }
+	MemoAppMessage(MemoApp::EventType newEvent, const std::string& newAudioFilename, bool newExistsOnServer, tSubject<const MemoAppMessage&>* newSource = NULL)
+	: mEvent(newEvent), mSource(newSource), mAudioFilename(newAudioFilename), mExistsOnServer(newExistsOnServer) { }
 };
-
 

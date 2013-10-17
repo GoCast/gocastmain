@@ -123,11 +123,6 @@ void RecordAudioScreen::sendGoInboxToVCEntry()
     this->tSubject<const MemoAppMessage&>::notify(MemoAppMessage(MemoApp::kGoInbox));
 }
 
-void RecordAudioScreen::sendGoRecordingsToVCEntry()
-{
-    this->tSubject<const MemoAppMessage&>::notify(MemoAppMessage(MemoApp::kGoRecordings));
-}
-
 void RecordAudioScreen::sendGoPlayToVCEntry()
 {
     this->tSubject<const MemoAppMessage&>::notify(MemoAppMessage(MemoApp::kGoPlay, mResultFilename));
@@ -150,7 +145,6 @@ void RecordAudioScreen::CallEntry()
 		case kRecordingIdle: recordingIdleEntry(); break;
 		case kSendGoInboxToVC: sendGoInboxToVCEntry(); break;
 		case kSendGoPlayToVC: sendGoPlayToVCEntry(); break;
-		case kSendGoRecordingsToVC: sendGoRecordingsToVCEntry(); break;
 		case kSendGoSendGroupToVC: sendGoSendGroupToVCEntry(); break;
 		case kSetStatusIdle: setStatusIdleEntry(); break;
 		case kSetStatusRecorded: setStatusRecordedEntry(); break;
@@ -170,12 +164,12 @@ void RecordAudioScreen::CallExit()
 
 int  RecordAudioScreen::StateTransitionFunction(const int evt) const
 {
-	if ((mState == kIdle) && (evt == kCancel)) return kSendGoRecordingsToVC; else
+	if ((mState == kIdle) && (evt == kCancel)) return kSendGoInboxToVC; else
 	if ((mState == kIdle) && (evt == kStartRecording)) return kSetStatusRecording; else
-	if ((mState == kRecordedIdle) && (evt == kSave)) return kSendGoRecordingsToVC; else
+	if ((mState == kRecordedIdle) && (evt == kSave)) return kSendGoInboxToVC; else
 	if ((mState == kRecordedIdle) && (evt == kSend)) return kSendGoSendGroupToVC; else
 	if ((mState == kRecordedIdle) && (evt == kStartRecording)) return kSetStatusRecording; else
-	if ((mState == kRecordingIdle) && (evt == kCancel)) return kSendGoRecordingsToVC; else
+	if ((mState == kRecordingIdle) && (evt == kCancel)) return kSendGoInboxToVC; else
 	if ((mState == kRecordingIdle) && (evt == kStopRecording)) return kSetStatusStopping; else
 	if ((mState == kSetStatusIdle) && (evt == kNext)) return kIdle; else
 	if ((mState == kSetStatusRecorded) && (evt == kNext)) return kRecordedIdle; else

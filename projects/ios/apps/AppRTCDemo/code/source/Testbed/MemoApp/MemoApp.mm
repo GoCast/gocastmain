@@ -74,17 +74,6 @@ void MemoApp::recordAudioScreenExit()
     if (mScreen) { delete mScreen; mScreen = NULL; }
 }
 
-void MemoApp::myRecordingsScreenEntry()
-{
-    mScreen = new MyRecordingsScreen;
-    mScreen->attach(this);
-}
-
-void MemoApp::myRecordingsScreenExit()
-{
-    if (mScreen) { delete mScreen; mScreen = NULL; }
-}
-
 void MemoApp::sendToGroupScreenEntry()
 {
     mScreen = new SendToGroupScreen(mCurAudioFilename);
@@ -98,7 +87,7 @@ void MemoApp::sendToGroupScreenExit()
 
 void MemoApp::playAudioScreenEntry()
 {
-    mScreen = new PlayAudioScreen(mCurAudioFilename);
+    mScreen = new PlayAudioScreen(mCurAudioFilename, mExistsOnServer);
     mScreen->attach(this);
 }
 
@@ -127,7 +116,6 @@ void MemoApp::CallEntry()
 		case kHideAllViews: hideAllViewsEntry(); break;
 		case kInvalidState: invalidStateEntry(); break;
 		case kMyInboxScreen: myInboxScreenEntry(); break;
-		case kMyRecordingsScreen: myRecordingsScreenEntry(); break;
 		case kPlayAudioScreen: playAudioScreenEntry(); break;
 		case kRecordAudioScreen: recordAudioScreenEntry(); break;
 		case kSendToGroupScreen: sendToGroupScreenEntry(); break;
@@ -143,7 +131,6 @@ void MemoApp::CallExit()
 	switch(mState)
 	{
 		case kMyInboxScreen: myInboxScreenExit(); break;
-		case kMyRecordingsScreen: myRecordingsScreenExit(); break;
 		case kPlayAudioScreen: playAudioScreenExit(); break;
 		case kRecordAudioScreen: recordAudioScreenExit(); break;
 		case kSendToGroupScreen: sendToGroupScreenExit(); break;
@@ -157,24 +144,16 @@ int  MemoApp::StateTransitionFunction(const int evt) const
 {
 	if ((mState == kHideAllViews) && (evt == kNext)) return kStartScreen; else
 	if ((mState == kMyInboxScreen) && (evt == kGoNewRecording)) return kRecordAudioScreen; else
-	if ((mState == kMyInboxScreen) && (evt == kGoRecordings)) return kMyRecordingsScreen; else
+	if ((mState == kMyInboxScreen) && (evt == kGoPlay)) return kPlayAudioScreen; else
 	if ((mState == kMyInboxScreen) && (evt == kGoSettings)) return kSettingsScreen; else
-	if ((mState == kMyRecordingsScreen) && (evt == kGoInbox)) return kMyInboxScreen; else
-	if ((mState == kMyRecordingsScreen) && (evt == kGoNewRecording)) return kRecordAudioScreen; else
-	if ((mState == kMyRecordingsScreen) && (evt == kGoPlay)) return kPlayAudioScreen; else
-	if ((mState == kMyRecordingsScreen) && (evt == kGoSettings)) return kSettingsScreen; else
 	if ((mState == kPlayAudioScreen) && (evt == kGoInbox)) return kMyInboxScreen; else
-	if ((mState == kPlayAudioScreen) && (evt == kGoRecordings)) return kMyRecordingsScreen; else
 	if ((mState == kPlayAudioScreen) && (evt == kGoSendGroup)) return kSendToGroupScreen; else
 	if ((mState == kRecordAudioScreen) && (evt == kGoInbox)) return kMyInboxScreen; else
-	if ((mState == kRecordAudioScreen) && (evt == kGoPlay)) return kPlayAudioScreen; else
-	if ((mState == kRecordAudioScreen) && (evt == kGoRecordings)) return kMyRecordingsScreen; else
 	if ((mState == kRecordAudioScreen) && (evt == kGoSendGroup)) return kSendToGroupScreen; else
 	if ((mState == kRecordAudioScreen) && (evt == kGoSettings)) return kSettingsScreen; else
 	if ((mState == kSendToGroupScreen) && (evt == kGoInbox)) return kMyInboxScreen; else
 	if ((mState == kSettingsScreen) && (evt == kGoInbox)) return kMyInboxScreen; else
 	if ((mState == kSettingsScreen) && (evt == kGoNewRecording)) return kRecordAudioScreen; else
-	if ((mState == kSettingsScreen) && (evt == kGoRecordings)) return kMyRecordingsScreen; else
 	if ((mState == kSettingsScreen) && (evt == kRestart)) return kStartScreen; else
 	if ((mState == kStart) && (evt == kReady)) return kHideAllViews; else
 	if ((mState == kStartScreen) && (evt == kGoInbox)) return kMyInboxScreen;
@@ -207,13 +186,6 @@ void MemoApp::update(const MemoEvent& msg)
             }
             break;
 
-        case MemoEvent::kMemosTabPressed:
-            if (getState() != kMyRecordingsScreen)
-            {
-                process(kGoRecordings);
-            }
-            break;
-
         case MemoEvent::kNewMemoTabPressed:
             if (getState() != kRecordAudioScreen)
             {
@@ -237,7 +209,10 @@ void MemoApp::update(const MemoAppMessage& msg)
 {
     switch (msg.mEvent)
     {
-        case MemoApp::kGoPlay:      mCurAudioFilename = msg.mAudioFilename; break;
+        case MemoApp::kGoPlay:
+            mCurAudioFilename   = msg.mAudioFilename;
+            mExistsOnServer     = msg.mExistsOnServer;
+            break;
         case MemoApp::kGoSendGroup: mCurAudioFilename = msg.mAudioFilename; break;
 
         default:

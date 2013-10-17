@@ -14,11 +14,12 @@
 
 -(void)hideAllViews;
 
+-(void)setBlockingViewVisible:(bool)newVisible;
+
 -(void)setStartScreenVisible:(bool)newVisible;
 
 -(void)setMyInboxScreenVisible:(bool)newVisible;
 -(void)setRecordAudioScreenVisible:(bool)newVisible;
--(void)setMyRecordingsScreenVisible:(bool)newVisible;
 -(void)setSettingsScreenVisible:(bool)newVisible;
 
 -(void)setSendToGroupScreenVisible:(bool)newVisible;

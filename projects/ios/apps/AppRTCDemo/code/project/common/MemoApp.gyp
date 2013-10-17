@@ -19,13 +19,6 @@
 		},
 
 		{
-			'action_name': 'MyRecordingsScreen.tgf',
-			'inputs': [ '../../tgf/Testbed/MemoApp/MyRecordingsScreen.tgf', ], # inputs
-			'outputs': [ '../../dummy', ], # outputs
-			'action': [ '<@(_graphcode)', '<@(_inputs)',  '--force-update', '--machine', 'MyRecordingsScreen', '-h', '../../source/Testbed/MemoApp/MyRecordingsScreen.h', '-cpp', '../../source/Testbed/MemoApp/MyRecordingsScreen.mm', ], # action
-		},
-
-		{
 			'action_name': 'RecordAudioScreen.tgf',
 			'inputs': [ '../../tgf/Testbed/MemoApp/RecordAudioScreen.tgf', ], # inputs
 			'outputs': [ '../../dummy', ], # outputs
@@ -66,6 +59,7 @@
 			'outputs': [ '../../dummy', ], # outputs
 			'action': [ '<@(_graphcode)', '<@(_inputs)',  '--force-update', '--machine', 'MyInboxScreen', '-h', '../../source/Testbed/MemoApp/MyInboxScreen.h', '-cpp', '../../source/Testbed/MemoApp/MyInboxScreen.mm', ], # action
 		},
+
 		],
 
 		'sources': [
@@ -81,9 +75,6 @@
 
 			'../../source/Testbed/MemoApp/MyInboxScreen.mm',
 			'../../source/Testbed/MemoApp/MyInboxScreen.h',
-
-			'../../source/Testbed/MemoApp/MyRecordingsScreen.mm',
-			'../../source/Testbed/MemoApp/MyRecordingsScreen.h',
 
 			'../../source/Testbed/MemoApp/RecordAudioScreen.mm',
 			'../../source/Testbed/MemoApp/RecordAudioScreen.h',

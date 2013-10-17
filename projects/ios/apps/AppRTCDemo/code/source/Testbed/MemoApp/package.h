@@ -4,6 +4,7 @@
 
 #include <string>
 #include <map>
+#include <set>
 
 #include "JSONUtil.h"
 #include "URLLoader.h"
@@ -11,7 +12,6 @@
 #include "Screen.h"
 #include "RecordAudioScreen.h"
 #include "PlayAudioScreen.h"
-#include "MyRecordingsScreen.h"
 #include "SettingsScreen.h"
 #include "StartScreen.h"
 #include "SendToGroupScreen.h"

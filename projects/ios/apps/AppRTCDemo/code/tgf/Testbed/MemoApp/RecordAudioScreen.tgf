@@ -5,29 +5,28 @@
 5 Recording Idle
 6 Send GoInbox to VC
 7 Set Status: Recording
-8 Send GoRecordings to VC
-9 Send GoPlay to VC
-10 Start recording audio
-11 Stop recording audio
-12 Set Status: Stopping
-13 Show "couldn't save"
-14 Send GoSendGroup to VC
-15 Set Status:  Recorded
-16 Recorded Idle
+8 Send GoPlay to VC
+9 Start recording audio
+10 Stop recording audio
+11 Set Status: Stopping
+12 Show "couldn't save"
+13 Send GoSendGroup to VC
+14 Set Status:  Recorded
+15 Recorded Idle
 #
 4 3
 3 7 startRecording
-7 10
-3 8 cancel
-5 8 cancel
-5 12 stopRecording
+7 9
+3 6 cancel
+5 6 cancel
+5 11 stopRecording
 1 4
-10 5
-12 11
-11 15 success
-11 13 fail
-13 4
-15 16
-16 7 startRecording
-16 8 save
-16 14 send
+9 5
+11 10
+10 14 success
+10 12 fail
+12 4
+14 15
+15 7 startRecording
+15 6 save
+15 13 send

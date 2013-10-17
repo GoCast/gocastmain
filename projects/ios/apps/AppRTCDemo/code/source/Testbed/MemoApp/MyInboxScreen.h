@@ -10,9 +10,11 @@ class MyInboxScreen
     public Screen
 {
 protected:
-    std::vector<std::string> mInboxList;
+    std::vector<std::string> mLocalFileList;
+    std::vector<std::string> mServerFileList;
+    std::vector<std::string> mMergedFileList;
+
     std::string mListInboxJSON;
-    std::string mDeleteFileJSON;
     tUInt32 mItemSelected;
 
 public:
@@ -24,26 +26,24 @@ protected:
 	void endEntry();
 	void invalidStateEntry();
 
-	void copyDownloadToDestinationEntry();
+	void calculateMergedFilesEntry();
+	void copyDownloadToLocalFilesEntry();
+	void doesSelectedItemExistLocallyEntry();
 	void idleEntry();
-	void isInboxValidEntry();
-	void sendDeleteRequestToServerEntry();
+	void makeListOfLocalFilesEntry();
 	void sendDownloadRequestToServerEntry();
-	void sendGoRecordingsToVCEntry();
+	void sendGoPlayToVCEntry();
 	void sendListInboxToServerEntry();
 	void serverErrorIdleEntry();
-	void setDownloadingStatusEntry();
-	void setNormalStatusEntry();
-	void showDeleteFailedEntry();
-	void showDownloadMessageEntry();
+	void setWaitForDownloadEntry();
+	void setWaitForListInboxEntry();
 	void showErrorLoadingInboxEntry();
-	void showFileWillBeDeletedEntry();
-	void showRetryDeleteEntry();
 	void showRetryDownloadEntry();
 	void showRetryListInboxEntry();
 	void showServerErrorEntry();
-	void updateInboxTableEntry();
-	void wasDeleteSuccessfulEntry();
+	void storeListOfServerFilesEntry();
+	void updateMergedTableEntry();
+	void wasListInboxValidEntry();
 
 public:
 	enum EventType
@@ -61,27 +61,25 @@ public:
 	{
 		kInvalidState = 0,
 		kStart = 1,
-		kCopyDownloadToDestination,
+		kCalculateMergedFiles,
+		kCopyDownloadToLocalFiles,
+		kDoesSelectedItemExistLocally,
 		kEnd,
 		kIdle,
-		kIsInboxValid,
-		kSendDeleteRequestToServer,
+		kMakeListOfLocalFiles,
 		kSendDownloadRequestToServer,
-		kSendGoRecordingsToVC,
+		kSendGoPlayToVC,
 		kSendListInboxToServer,
 		kServerErrorIdle,
-		kSetDownloadingStatus,
-		kSetNormalStatus,
-		kShowDeleteFailed,
-		kShowDownloadMessage,
+		kSetWaitForDownload,
+		kSetWaitForListInbox,
 		kShowErrorLoadingInbox,
-		kShowFileWillBeDeleted,
-		kShowRetryDelete,
 		kShowRetryDownload,
 		kShowRetryListInbox,
 		kShowServerError,
-		kUpdateInboxTable,
-		kWasDeleteSuccessful,
+		kStoreListOfServerFiles,
+		kUpdateMergedTable,
+		kWasListInboxValid,
 	};
 
 protected:
@@ -91,8 +89,8 @@ protected:
 	bool HasEdgeNamedNext() const;
 
 	void update(const MyInboxScreenMessage& msg);
-	void update(const MemoEvent& msg);
-	void update(const URLLoaderEvent& msg);
+    void update(const MemoEvent& msg);
+    void update(const URLLoaderEvent& msg);
 };
 
 class MyInboxScreenMessage

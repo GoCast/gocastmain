@@ -11,7 +11,6 @@ public:
         kNewAccountPressed,
 
         kInboxTabPressed,
-        kMemosTabPressed,
         kNewMemoTabPressed,
         kSettingsTabPressed,
 

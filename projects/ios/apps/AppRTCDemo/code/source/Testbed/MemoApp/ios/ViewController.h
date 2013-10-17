@@ -20,6 +20,8 @@ UIAlertViewDelegate, AVAudioRecorderDelegate>
 @property (nonatomic, strong) IBOutlet UIView* mSendToGroupView;
 @property (nonatomic, strong) IBOutlet UIView* mPlayAudioView;
 
+@property (nonatomic, strong) IBOutlet UIView* mBlockingView;
+
 //mStartView
 @property (nonatomic, strong) IBOutlet UITextField* mLoginUsername;
 @property (nonatomic, strong) IBOutlet UITextField* mLoginPassword;
@@ -31,7 +33,6 @@ UIAlertViewDelegate, AVAudioRecorderDelegate>
 //mTabView
 @property (nonatomic, strong) IBOutlet UITabBar* mTabBar;
 @property (nonatomic, strong) IBOutlet UITabBarItem* mInboxTab;
-@property (nonatomic, strong) IBOutlet UITabBarItem* mMemosTab;
 @property (nonatomic, strong) IBOutlet UITabBarItem* mNewMemoTab;
 @property (nonatomic, strong) IBOutlet UITabBarItem* mSettingsTab;
 

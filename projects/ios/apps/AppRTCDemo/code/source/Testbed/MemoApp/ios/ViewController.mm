@@ -412,10 +412,6 @@ std::vector<std::string> gMyInboxListEntries;
     {
         MemoEventManager::getInstance()->notify(MemoEvent(MemoEvent::kInboxTabPressed));
     }
-    else if (item == self.mMemosTab)
-    {
-        MemoEventManager::getInstance()->notify(MemoEvent(MemoEvent::kMemosTabPressed));
-    }
     else if (item == self.mNewMemoTab)
     {
         MemoEventManager::getInstance()->notify(MemoEvent(MemoEvent::kNewMemoTabPressed));
