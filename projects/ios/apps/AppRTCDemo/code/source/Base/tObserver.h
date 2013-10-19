@@ -64,6 +64,12 @@ protected:
         }
         else
         {
+            //Edge case where we've added and removed an observer during a notify.
+            if (!mNewObservers.empty())
+            {
+                mNewObservers.erase(find(mNewObservers.begin(), mNewObservers.end(), newOb));
+            }
+
             typename std::list<tObserver<MSGTYPE>*>::iterator iter = find(mObservers.begin(), mObservers.end(), newOb);
             (*iter) = NULL;
         }

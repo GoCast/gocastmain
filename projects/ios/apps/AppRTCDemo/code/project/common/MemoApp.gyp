@@ -60,6 +60,13 @@
 			'action': [ '<@(_graphcode)', '<@(_inputs)',  '--force-update', '--machine', 'MyInboxScreen', '-h', '../../source/Testbed/MemoApp/MyInboxScreen.h', '-cpp', '../../source/Testbed/MemoApp/MyInboxScreen.mm', ], # action
 		},
 
+		{
+			'action_name': 'VersionCheckScreen.tgf',
+			'inputs': [ '../../tgf/Testbed/MemoApp/VersionCheckScreen.tgf', ], # inputs
+			'outputs': [ '../../dummy', ], # outputs
+			'action': [ '<@(_graphcode)', '<@(_inputs)',  '--force-update', '--machine', 'VersionCheckScreen', '-h', '../../source/Testbed/MemoApp/VersionCheckScreen.h', '-cpp', '../../source/Testbed/MemoApp/VersionCheckScreen.mm', ], # action
+		},
+
 		],
 
 		'sources': [
@@ -90,6 +97,9 @@
 
 			'../../source/Testbed/MemoApp/SendToGroupScreen.mm',
 			'../../source/Testbed/MemoApp/SendToGroupScreen.h',
+
+			'../../source/Testbed/MemoApp/VersionCheckScreen.mm',
+			'../../source/Testbed/MemoApp/VersionCheckScreen.h',
 
 			'../../source/Testbed/MemoApp/JSONUtil.mm',
 			'../../source/Testbed/MemoApp/JSONUtil.h',

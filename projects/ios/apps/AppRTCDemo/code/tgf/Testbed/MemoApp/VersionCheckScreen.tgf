@@ -1,0 +1,17 @@
+1 start
+2 end
+3 Send success to VC
+4 Send versionRequired request
+5 Is this client compatible?
+6 Send fail to VC
+7 idle*
+8 Show "Retry version?"
+#
+1 4
+4 5 success
+5 6 no
+5 3 yes
+4 8 fail
+8 4 yes
+7 4 retry
+8 7 no

@@ -11,13 +11,14 @@ class StartScreen
     public Screen
 {
 protected:
-    std::string mVersionRequiredJSON;
     std::string mLoginJSON;
     std::string mRegisterJSON;
 
 public:
 	StartScreen();
 	~StartScreen();
+
+    void ready();
 
 protected:
 	void startEntry();
@@ -26,22 +27,17 @@ protected:
 
 	void doesLoginTokenExistEntry();
 	void idleEntry();
-	void inactiveIdleEntry();
 	void isNameAndPasswordFormatCorrectEntry();
-	void isThisClientCompatibleEntry();
 	void sendGoInboxToVCEntry();
 	void sendLoginRequestEntry();
 	void sendRegisterRequestEntry();
-	void sendVersionRequiredRequestEntry();
 	void serverErrorIdleEntry();
-	void showAppIsOutOfDateEntry();
 	void showFormatProblemEntry();
 	void showLoginFailedEntry();
 	void showRegistrationFailedEntry();
 	void showRegistrationSuccessfulEntry();
 	void showRetryLoginEntry();
 	void showRetryRegisterEntry();
-	void showRetryVersionEntry();
 	void showServerErrorEntry();
 	void wasLoginSuccessfulEntry();
 	void wasRegisterSuccessfulEntry();
@@ -56,6 +52,7 @@ public:
 		kLogin,
 		kNewAccount,
 		kNo,
+		kReady,
 		kSuccess,
 		kYes,
 	};
@@ -67,22 +64,17 @@ public:
 		kDoesLoginTokenExist,
 		kEnd,
 		kIdle,
-		kInactiveIdle,
 		kIsNameAndPasswordFormatCorrect,
-		kIsThisClientCompatible,
 		kSendGoInboxToVC,
 		kSendLoginRequest,
 		kSendRegisterRequest,
-		kSendVersionRequiredRequest,
 		kServerErrorIdle,
-		kShowAppIsOutOfDate,
 		kShowFormatProblem,
 		kShowLoginFailed,
 		kShowRegistrationFailed,
 		kShowRegistrationSuccessful,
 		kShowRetryLogin,
 		kShowRetryRegister,
-		kShowRetryVersion,
 		kShowServerError,
 		kWasLoginSuccessful,
 		kWasRegisterSuccessful,

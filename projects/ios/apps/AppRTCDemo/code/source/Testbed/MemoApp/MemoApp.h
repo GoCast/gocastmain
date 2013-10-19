@@ -26,11 +26,13 @@ protected:
 
 	void hideAllViewsEntry();
 	void myInboxScreenEntry();
+	void oldVersionScreenEntry();
 	void playAudioScreenEntry();
 	void recordAudioScreenEntry();
 	void sendToGroupScreenEntry();
 	void settingsScreenEntry();
 	void startScreenEntry();
+	void versionCheckScreenEntry();
 
 	void myInboxScreenExit();
 	void playAudioScreenExit();
@@ -38,12 +40,14 @@ protected:
 	void sendToGroupScreenExit();
 	void settingsScreenExit();
 	void startScreenExit();
+	void versionCheckScreenExit();
 
 public:
 	enum EventType
 	{
 		kInvalidEvent = -2,
 		kNext = -1,
+		kFail,
 		kGoInbox,
 		kGoNewRecording,
 		kGoPlay,
@@ -51,6 +55,7 @@ public:
 		kGoSettings,
 		kReady,
 		kRestart,
+		kSuccess,
 	};
 
 	enum StateType
@@ -60,11 +65,13 @@ public:
 		kEnd,
 		kHideAllViews,
 		kMyInboxScreen,
+		kOldVersionScreen,
 		kPlayAudioScreen,
 		kRecordAudioScreen,
 		kSendToGroupScreen,
 		kSettingsScreen,
 		kStartScreen,
+		kVersionCheckScreen,
 	};
 
 protected:

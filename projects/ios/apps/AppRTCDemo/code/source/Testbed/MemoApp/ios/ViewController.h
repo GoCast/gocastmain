@@ -20,6 +20,9 @@ UIAlertViewDelegate, AVAudioRecorderDelegate>
 @property (nonatomic, strong) IBOutlet UIView* mSendToGroupView;
 @property (nonatomic, strong) IBOutlet UIView* mPlayAudioView;
 
+@property (nonatomic, strong) IBOutlet UIView* mOldVersionView;
+@property (nonatomic, strong) IBOutlet UIView* mVersionCheckView;
+
 @property (nonatomic, strong) IBOutlet UIView* mBlockingView;
 
 //mStartView
@@ -63,6 +66,11 @@ UIAlertViewDelegate, AVAudioRecorderDelegate>
 @property (nonatomic, strong) IBOutlet UIButton* mSendSendtoGroupButton;
 @property (nonatomic, strong) IBOutlet UIButton* mCancelSendToGroupButton;
 
+//mVersionCheckView
+@property (nonatomic, strong) IBOutlet UIButton* mRetryVersionCheckButton;
+
+//mOldVersionView
+
 @property (nonatomic, strong) AVAudioRecorder* mRecorder;
 
 -(void)ctorRecorder;
@@ -91,6 +99,9 @@ UIAlertViewDelegate, AVAudioRecorderDelegate>
 //mSendToGroupView
 -(IBAction) sendSendToGroupPressed:(id)sender;
 -(IBAction) cancelSendToGroupPressed:(id)sender;
+
+//mVersionCheckView
+-(IBAction) retryVersionCheckPressed:(id)sender;
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField;
 

@@ -2,58 +2,45 @@
 2 end
 3 idle
 4 Send GoInbox to VC
-5 Send versionRequired request
-6 Is this client compatible?
-7 inactive idle
-8 Show "App is out of date"
-9 server error idle
-10 Show "Retry version?"
-11 Send login request
-12 Was login successful?
-13 Show "Retry login"?
-14 Show "Login failed"
-15 Write login token to disk
-16 Does login token exist?
-17 Show "server error"
-18 Send register request
-19 Was register successful?
-20 Show "Registration failed"
-21 Show "Retry register?"
-22 Show "Registration successful"
-23 Is name and password format correct?
-24 Show "Format problem"
+5 server error idle
+6 Send login request
+7 Was login successful?
+8 Show "Retry login"?
+9 Show "Login failed"
+10 Write login token to disk
+11 Does login token exist?
+12 Show "server error"
+13 Send register request
+14 Was register successful?
+15 Show "Registration failed"
+16 Show "Retry register?"
+17 Show "Registration successful"
+18 Is name and password format correct?
+19 Show "Format problem"
 #
-1 5
-3 23 login
-5 6 success
-6 8 no
-7 8 login, newAccount
-8 7 yes
-6 16 yes
-5 10 fail
-10 5 yes
-10 17 no
-11 13 fail
-11 12 success
-13 11 yes
-13 17 no
-12 15 yes
-12 14 no
-14 3 yes
-15 4
-16 3 no
-16 4 yes
-17 9 yes
-9 17 login, newAccount
-3 18 newAccount
-19 22 yes
-18 19 success
-19 20 no
-20 3 yes
-18 21 fail
-21 18 yes
-21 17 no
-22 11 yes
-23 24 no
-24 3 yes
-23 11 yes
+3 18 login
+6 8 fail
+6 7 success
+8 6 yes
+8 12 no
+7 10 yes
+7 9 no
+9 3 yes
+10 4
+11 3 no
+11 4 yes
+12 5 yes
+5 12 login, newAccount
+3 13 newAccount
+14 17 yes
+13 14 success
+14 15 no
+15 3 yes
+13 16 fail
+16 13 yes
+16 12 no
+17 6 yes
+18 19 no
+19 3 yes
+18 6 yes
+1 11 ready

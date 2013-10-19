@@ -32,6 +32,8 @@ public:
         kSendSendToGroupPressed,
         kCancelSendToGroupPressed,
 
+        kRetryVersionCheckPressed,
+
         kOKYesAlertPressed,
         kNoAlertPressed,
 

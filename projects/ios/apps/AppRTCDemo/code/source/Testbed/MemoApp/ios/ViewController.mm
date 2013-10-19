@@ -262,6 +262,13 @@ std::vector<std::string> gMyInboxListEntries;
     MemoEventManager::getInstance()->notify(MemoEvent(MemoEvent::kCancelSendToGroupPressed));
 }
 
+//mVersionCheckView
+-(IBAction) retryVersionCheckPressed:(id)sender
+{
+#pragma unused(sender)
+    MemoEventManager::getInstance()->notify(MemoEvent(MemoEvent::kRetryVersionCheckPressed));
+}
+
 - (BOOL)textFieldShouldReturn:(UITextField *)textField
 {
     if (textField == self.mLoginUsername)

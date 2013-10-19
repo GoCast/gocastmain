@@ -14,6 +14,11 @@ StartScreen::~StartScreen()
 	DestructMachine();
 }
 
+void StartScreen::ready()
+{
+    this->process(kReady);
+}
+
 #pragma mark Start / End / Invalid
 void StartScreen::startEntry()
 {
@@ -35,10 +40,6 @@ void StartScreen::invalidStateEntry()
 
 #pragma mark Idling
 void StartScreen::idleEntry()
-{
-}
-
-void StartScreen::inactiveIdleEntry()
 {
 }
 
@@ -70,21 +71,6 @@ void StartScreen::isNameAndPasswordFormatCorrectEntry()
         result &=   (str[i] >= '0' && str[i] <= '9') ||
         (str[i] >= 'a' && str[i] <= 'z') ||
         (str[i] >= 'A' && str[i] <= 'Z');
-    }
-
-    SetImmediateEvent(result ? kYes : kNo);
-}
-
-void StartScreen::isThisClientCompatibleEntry()
-{
-    bool result = false;
-
-    if (JSONUtil::extract(mVersionRequiredJSON)["status"] == std::string("success"))
-    {
-        if (atoi(JSONUtil::extract(mVersionRequiredJSON)["version"].c_str()) == 1)
-        {
-            result = true;
-        }
     }
 
     SetImmediateEvent(result ? kYes : kNo);
@@ -122,11 +108,6 @@ void StartScreen::doesLoginTokenExistEntry()
 }
 
 #pragma mark Actions
-void StartScreen::sendVersionRequiredRequestEntry()
-{
-    URLLoader::getInstance()->loadString(kMemoAppServerURL"?action=versionRequired");
-}
-
 void StartScreen::sendLoginRequestEntry()
 {
     char buf[512];
@@ -157,11 +138,6 @@ void StartScreen::writeLoginTokenToDiskEntry()
 }
 
 #pragma mark User Interface
-void StartScreen::showAppIsOutOfDateEntry()
-{
-    tAlert("Application is out of date. Please upgrade");
-}
-
 void StartScreen::showFormatProblemEntry()
 {
     tAlert("Username and password can only contain English letters and numbers");
@@ -192,11 +168,6 @@ void StartScreen::showRetryRegisterEntry()
     tConfirm("Couldn't contact server, retry registration?");
 }
 
-void StartScreen::showRetryVersionEntry()
-{
-    tConfirm("Couldn't contact server, retry version check?");
-}
-
 void StartScreen::showServerErrorEntry()
 {
     tAlert("There was an unrecoverable server error. Please restart application.");
@@ -217,23 +188,18 @@ void StartScreen::CallEntry()
 		case kDoesLoginTokenExist: doesLoginTokenExistEntry(); break;
 		case kEnd: EndEntryHelper(); break;
 		case kIdle: idleEntry(); break;
-		case kInactiveIdle: inactiveIdleEntry(); break;
 		case kInvalidState: invalidStateEntry(); break;
 		case kIsNameAndPasswordFormatCorrect: isNameAndPasswordFormatCorrectEntry(); break;
-		case kIsThisClientCompatible: isThisClientCompatibleEntry(); break;
 		case kSendGoInboxToVC: sendGoInboxToVCEntry(); break;
 		case kSendLoginRequest: sendLoginRequestEntry(); break;
 		case kSendRegisterRequest: sendRegisterRequestEntry(); break;
-		case kSendVersionRequiredRequest: sendVersionRequiredRequestEntry(); break;
 		case kServerErrorIdle: serverErrorIdleEntry(); break;
-		case kShowAppIsOutOfDate: showAppIsOutOfDateEntry(); break;
 		case kShowFormatProblem: showFormatProblemEntry(); break;
 		case kShowLoginFailed: showLoginFailedEntry(); break;
 		case kShowRegistrationFailed: showRegistrationFailedEntry(); break;
 		case kShowRegistrationSuccessful: showRegistrationSuccessfulEntry(); break;
 		case kShowRetryLogin: showRetryLoginEntry(); break;
 		case kShowRetryRegister: showRetryRegisterEntry(); break;
-		case kShowRetryVersion: showRetryVersionEntry(); break;
 		case kShowServerError: showServerErrorEntry(); break;
 		case kStart: startEntry(); break;
 		case kWasLoginSuccessful: wasLoginSuccessfulEntry(); break;
@@ -253,21 +219,14 @@ int  StartScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kDoesLoginTokenExist) && (evt == kYes)) return kSendGoInboxToVC; else
 	if ((mState == kIdle) && (evt == kLogin)) return kIsNameAndPasswordFormatCorrect; else
 	if ((mState == kIdle) && (evt == kNewAccount)) return kSendRegisterRequest; else
-	if ((mState == kInactiveIdle) && (evt == kLogin)) return kShowAppIsOutOfDate; else
-	if ((mState == kInactiveIdle) && (evt == kNewAccount)) return kShowAppIsOutOfDate; else
 	if ((mState == kIsNameAndPasswordFormatCorrect) && (evt == kNo)) return kShowFormatProblem; else
 	if ((mState == kIsNameAndPasswordFormatCorrect) && (evt == kYes)) return kSendLoginRequest; else
-	if ((mState == kIsThisClientCompatible) && (evt == kNo)) return kShowAppIsOutOfDate; else
-	if ((mState == kIsThisClientCompatible) && (evt == kYes)) return kDoesLoginTokenExist; else
 	if ((mState == kSendLoginRequest) && (evt == kFail)) return kShowRetryLogin; else
 	if ((mState == kSendLoginRequest) && (evt == kSuccess)) return kWasLoginSuccessful; else
 	if ((mState == kSendRegisterRequest) && (evt == kFail)) return kShowRetryRegister; else
 	if ((mState == kSendRegisterRequest) && (evt == kSuccess)) return kWasRegisterSuccessful; else
-	if ((mState == kSendVersionRequiredRequest) && (evt == kFail)) return kShowRetryVersion; else
-	if ((mState == kSendVersionRequiredRequest) && (evt == kSuccess)) return kIsThisClientCompatible; else
 	if ((mState == kServerErrorIdle) && (evt == kLogin)) return kShowServerError; else
 	if ((mState == kServerErrorIdle) && (evt == kNewAccount)) return kShowServerError; else
-	if ((mState == kShowAppIsOutOfDate) && (evt == kYes)) return kInactiveIdle; else
 	if ((mState == kShowFormatProblem) && (evt == kYes)) return kIdle; else
 	if ((mState == kShowLoginFailed) && (evt == kYes)) return kIdle; else
 	if ((mState == kShowRegistrationFailed) && (evt == kYes)) return kIdle; else
@@ -276,10 +235,8 @@ int  StartScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kShowRetryLogin) && (evt == kYes)) return kSendLoginRequest; else
 	if ((mState == kShowRetryRegister) && (evt == kNo)) return kShowServerError; else
 	if ((mState == kShowRetryRegister) && (evt == kYes)) return kSendRegisterRequest; else
-	if ((mState == kShowRetryVersion) && (evt == kNo)) return kShowServerError; else
-	if ((mState == kShowRetryVersion) && (evt == kYes)) return kSendVersionRequiredRequest; else
 	if ((mState == kShowServerError) && (evt == kYes)) return kServerErrorIdle; else
-	if ((mState == kStart) && (evt == kNext)) return kSendVersionRequiredRequest; else
+	if ((mState == kStart) && (evt == kReady)) return kDoesLoginTokenExist; else
 	if ((mState == kWasLoginSuccessful) && (evt == kNo)) return kShowLoginFailed; else
 	if ((mState == kWasLoginSuccessful) && (evt == kYes)) return kWriteLoginTokenToDisk; else
 	if ((mState == kWasRegisterSuccessful) && (evt == kNo)) return kShowRegistrationFailed; else
@@ -293,7 +250,6 @@ bool StartScreen::HasEdgeNamedNext() const
 {
 	switch(mState)
 	{
-		case kStart:
 		case kWriteLoginTokenToDisk:
 			return true;
 		default: break;
@@ -331,10 +287,6 @@ void StartScreen::update(const URLLoaderEvent& msg)
         {
             switch (getState())
             {
-                case kSendVersionRequiredRequest:
-                    mVersionRequiredJSON = msg.mString;
-                    break;
-
                 case kSendLoginRequest:
                     mLoginJSON = msg.mString;
                     break;

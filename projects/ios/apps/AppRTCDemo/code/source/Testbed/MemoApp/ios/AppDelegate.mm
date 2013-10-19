@@ -121,6 +121,8 @@ extern std::vector<std::string> gMyInboxListEntries;
     [self.viewController.mPlayAudioView setHidden:YES];
     [self.viewController.mSettingsView setHidden:YES];
     [self.viewController.mBlockingView setHidden:YES];
+    [self.viewController.mOldVersionView setHidden:YES];
+    [self.viewController.mVersionCheckView setHidden:YES];
 }
 
 -(void)setBlockingViewVisible:(bool)newVisible
@@ -226,6 +228,22 @@ extern std::vector<std::string> gMyInboxListEntries;
 {
     [self.viewController.mSendAudioButton setEnabled:(newEnabled ? YES : NO)];
     self.viewController.mSendAudioButton.alpha = (newEnabled ? 1.0f : 0.4f);
+}
+
+-(void)setVersionCheckScreenVisible:(bool)newVisible
+{
+    [self.viewController.mVersionCheckView setHidden:(newVisible) ? NO : YES];
+}
+
+-(void)setOldVersionScreenVisible:(bool)newVisible
+{
+    [self.viewController.mOldVersionView setHidden:(newVisible) ? NO : YES];
+}
+
+-(void)setRetryVersionCheckButtonEnabled:(bool)newEnabled
+{
+    [self.viewController.mRetryVersionCheckButton setEnabled:(newEnabled ? YES : NO)];
+    self.viewController.mRetryVersionCheckButton.alpha = (newEnabled ? 1.0f : 0.4f);
 }
 
 //mStartView

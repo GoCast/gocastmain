@@ -37,6 +37,10 @@
 -(void)setDeleteAudioButtonEnabled:(bool)newEnabled;
 -(void)setSendAudioButtonEnabled:(bool)newEnabled;
 
+-(void)setVersionCheckScreenVisible:(bool)newVisible;
+-(void)setOldVersionScreenVisible:(bool)newVisible;
+-(void)setRetryVersionCheckButtonEnabled:(bool)newEnabled;
+
 //mStartScreen
 -(std::string) getUsername;
 -(std::string) getPassword;

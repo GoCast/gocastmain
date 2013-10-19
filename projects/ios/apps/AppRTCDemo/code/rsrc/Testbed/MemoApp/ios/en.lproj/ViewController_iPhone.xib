@@ -25,10 +25,12 @@
                 <outlet property="mNewMemoTab" destination="fNb-Yf-DE3" id="9n6-C1-mSf"/>
                 <outlet property="mNewPassword" destination="eLf-Uh-BcQ" id="Ofk-zv-bx7"/>
                 <outlet property="mOldPassword" destination="TEx-97-45b" id="7Pr-RJ-Gci"/>
+                <outlet property="mOldVersionView" destination="C5q-O3-lhM" id="468-9R-bGs"/>
                 <outlet property="mPlayAudioButton" destination="UEk-F0-7b1" id="D5H-pB-EPk"/>
                 <outlet property="mPlayAudioView" destination="76K-la-UKg" id="cwg-Wy-pSF"/>
                 <outlet property="mRecordAudioView" destination="wD3-Wi-uv9" id="w0j-RC-GGC"/>
                 <outlet property="mRecordingStatusLabel" destination="qEK-Gu-AnZ" id="aIh-pd-NuL"/>
+                <outlet property="mRetryVersionCheckButton" destination="0LP-f4-HjY" id="LiW-RS-4sW"/>
                 <outlet property="mSaveRecordingButton" destination="6Ia-LM-tUC" id="SRt-vx-Ijf"/>
                 <outlet property="mSendAudioButton" destination="kAI-4c-ka5" id="TcC-HK-6YH"/>
                 <outlet property="mSendRecordingButton" destination="euc-77-pJ9" id="Zv7-KB-yfi"/>
@@ -43,6 +45,7 @@
                 <outlet property="mStopRecordingButton" destination="w94-J5-Miu" id="McL-fx-pIF"/>
                 <outlet property="mTabBar" destination="lL0-uq-o7z" id="u2g-8s-8tD"/>
                 <outlet property="mTabView" destination="f0T-z3-92b" id="W3O-QX-11W"/>
+                <outlet property="mVersionCheckView" destination="QO6-PK-ZgX" id="Pxt-rN-ufB"/>
                 <outlet property="view" destination="2" id="3"/>
             </connections>
         </placeholder>
@@ -55,6 +58,51 @@
                     <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                 </imageView>
+                <view contentMode="scaleToFill" id="QO6-PK-ZgX" userLabel="mVersionCheckView">
+                    <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <subviews>
+                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Checking app version with server…" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="ZTN-7l-c66">
+                            <rect key="frame" x="0.0" y="92" width="320" height="21"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                            <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="0LP-f4-HjY" userLabel="mRetryVersionCheckButton">
+                            <rect key="frame" x="120" y="217" width="80" height="45"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <state key="normal" title="Retry">
+                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                            </state>
+                            <connections>
+                                <action selector="retryVersionCheckPressed:" destination="-1" eventType="touchUpInside" id="sJf-VZ-its"/>
+                            </connections>
+                        </button>
+                    </subviews>
+                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                </view>
+                <view hidden="YES" contentMode="scaleToFill" id="C5q-O3-lhM" userLabel="mOldVersionView">
+                    <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <subviews>
+                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="This version of the app is out of date." textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="ubK-YY-1ze">
+                            <rect key="frame" x="0.0" y="215" width="320" height="21"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                            <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Please update to the latest version." textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="9RV-BT-FSv">
+                            <rect key="frame" x="0.0" y="244" width="320" height="21"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                            <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                    </subviews>
+                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                </view>
                 <view hidden="YES" contentMode="scaleToFill" id="wD3-Wi-uv9" userLabel="mRecordAudioView">
                     <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>

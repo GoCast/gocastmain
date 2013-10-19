@@ -3,10 +3,12 @@
 3 Start Screen*
 4 Record Audio Screen*
 5 Send to Group Screen*
-6 MyInboxScreen*
+6 My Inbox Screen*
 7 Play Audio Screen*
 8 Hide all views
 9 Settings Screen*
+10 Old Version Screen
+11 Version check Screen*
 #
 1 8 ready
 6 4 goNewRecording
@@ -14,12 +16,14 @@
 5 6 goInbox
 4 6 goInbox
 7 6 goInbox
-8 3
+8 11
 4 9 goSettings
 6 9 goSettings
 9 4 goNewRecording
 9 6 goInbox
-9 3 restart
+9 11 restart
 3 6 goInbox
 4 5 goSendGroup
 6 7 goPlay
+11 3 success
+11 10 fail
