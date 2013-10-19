@@ -172,6 +172,9 @@
 					'../../source/Testbed/MemoApp/<@(OS)/ViewController.h',
 					'../../source/Testbed/MemoApp/<@(OS)/ViewController.mm',
 
+					'../../source/Testbed/MemoApp/<@(OS)/InboxCell.h',
+					'../../source/Testbed/MemoApp/<@(OS)/InboxCell.mm',
+
 					'../../third-party/TestFlightSDK2.0.2/TestFlight.h',
 					'../../third-party/TestFlightSDK2.0.2/TestFlight+AsyncLogging.h',
 					'../../third-party/TestFlightSDK2.0.2/TestFlight+ManualSessions.h',
@@ -183,6 +186,8 @@
 					'../../rsrc/Testbed/MemoApp/<@(OS)/en.lproj/ViewController_iPhone.xib',
 # 					'../../rsrc/Testbed/MemoApp/<@(OS)/en.lproj/ViewController_iPhone5.xib',
 
+					'../../rsrc/Testbed/MemoApp/<@(OS)/en.lproj/InboxCell.xib',
+
 					'../../rsrc/Testbed/MemoApp/<@(OS)/blue-gradient.jpg',
 
 					'../../rsrc/Testbed/MemoApp/<@(OS)/Icon.png',
@@ -191,6 +196,13 @@
 					'../../rsrc/Testbed/MemoApp/<@(OS)/tab-record-audio.png',
 					'../../rsrc/Testbed/MemoApp/<@(OS)/tab-recordings.png',
 					'../../rsrc/Testbed/MemoApp/<@(OS)/tab-settings.png',
+
+					'../../rsrc/Testbed/MemoApp/<@(OS)/person32.png',
+					'../../rsrc/Testbed/MemoApp/<@(OS)/voicemail_16_border.png',
+
+					'../../rsrc/Testbed/MemoApp/<@(OS)/inbox_star_off.png',
+					'../../rsrc/Testbed/MemoApp/<@(OS)/inbox_star_on.png',
+					'../../rsrc/Testbed/MemoApp/<@(OS)/inbox_star_pressed.png',
 
 					'../../rsrc/Testbed/MemoApp/<@(OS)/Default.png',
 				],	# mac_bundle_resources

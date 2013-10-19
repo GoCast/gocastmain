@@ -127,6 +127,7 @@ void MyInboxScreen::sendDownloadRequestToServerEntry()
 #pragma mark User Interface
 void MyInboxScreen::updateMergedTableEntry()
 {
+    std::sort(mMergedFileList.rbegin(), mMergedFileList.rend());
     [gAppDelegateInstance setMyInboxTable:mMergedFileList];
 }
 

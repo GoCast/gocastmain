@@ -111,9 +111,10 @@ void RecordAudioScreen::stopRecordingAudioEntry()
     curTime=time(NULL);
     timeStruct = localtime(&curTime);
 
-    sprintf(buf, "%04d-%02d-%02d-%02d%02d%02d.m4a",
+    sprintf(buf, "%04d-%02d-%02d-%02d%02d%02d%02d.m4a",
             timeStruct->tm_year+1900,   timeStruct->tm_mon+1,   timeStruct->tm_mday,
-            timeStruct->tm_hour,        timeStruct->tm_min,     timeStruct->tm_sec);
+            timeStruct->tm_hour,        timeStruct->tm_min,     timeStruct->tm_sec,
+            tTimer::getSystemTimeMS() % 100);
 
     tFile scratch(tFile::kTemporaryDirectory, "scratch.m4a");
 

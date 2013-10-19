@@ -7,6 +7,8 @@
 #include "MemoEvent.h"
 #include "MemoEventManager.h"
 
+#import "InboxCell.h"
+
 std::vector<std::string> gMyRecordingsEntries;
 std::vector<std::string> gUserListEntries;
 std::vector<std::string> gMyInboxListEntries;
@@ -22,6 +24,8 @@ std::vector<std::string> gMyInboxListEntries;
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+
+    [self.mInboxTable registerNib:[UINib nibWithNibName:@"InboxCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"InboxCell"];
 
     [self ctorRecorder];
     self.view.autoresizesSubviews = YES;
@@ -364,19 +368,101 @@ std::vector<std::string> gMyInboxListEntries;
     {
         tableView.backgroundView = nil;
 
-        static NSString *simpleTableIdentifier = @"MemoAppTableItem";
+        static NSString *simpleTableIdentifier = @"InboxCell";
 
-        UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:simpleTableIdentifier];
+        InboxCell *cell = [tableView dequeueReusableCellWithIdentifier:simpleTableIdentifier];
 
         if (cell == nil)
         {
-            cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:simpleTableIdentifier] autorelease];
+            cell = [[[InboxCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:simpleTableIdentifier] autorelease];
         }
 
-        cell.textLabel.text = [NSString stringWithUTF8String:gMyInboxListEntries[indexPath.row].c_str()];
 
-        cell.imageView.image = nil;
-        
+        //TODO: fix this hack
+        std::string from;
+        std::string date;
+
+        size_t fromEndPos, yearStartPos, yearEndPos, monthStartPos, monthEndPos, dayStartPos, dayEndPos;
+        bool fromForeign = false;
+        fromEndPos = 0;
+        yearStartPos = yearEndPos = 0;
+        monthStartPos = monthEndPos = 0;
+        dayStartPos = dayEndPos = 0;
+
+        std::string str = gMyInboxListEntries[(size_t)indexPath.row];
+
+        if (!(str[0] >= '0' && str[0] <= '9'))
+        {
+            for(size_t i = 0; i < str.size(); i++)
+            {
+                if (str[i] == '-')
+                {
+                    fromEndPos = i;
+                    break;
+                }
+            }
+            fromForeign = true;
+            yearStartPos = fromEndPos + 1;
+        }
+
+        while (!(str[yearStartPos] >= '0' && str[yearStartPos] <= '9'))
+        {
+            yearStartPos++;
+        }
+
+        for(size_t i = yearStartPos; i < str.size(); i++)
+        {
+            if (str[i] == '-')
+            {
+                yearEndPos = i;
+                break;
+            }
+        }
+
+        monthStartPos = yearEndPos + 1;
+        for(size_t i = monthStartPos; i < str.size(); i++)
+        {
+            if (str[i] == '-')
+            {
+                monthEndPos = i;
+                break;
+            }
+        }
+
+        dayStartPos = monthEndPos + 1;
+        for(size_t i = dayStartPos; i < str.size(); i++)
+        {
+            if (str[i] == '-')
+            {
+//                dayEndPos = i;
+                break;
+            }
+        }
+
+        if (fromForeign)
+        {
+            from = str.substr(0, fromEndPos);
+        }
+        else
+        {
+            from = "Me";
+        }
+
+        bool isPM;
+        int hour = atoi(str.substr(dayStartPos + 3, 2).c_str());
+        isPM = hour >= 12;
+        char bufHour[10];
+        sprintf(bufHour, " %02d:", isPM ? ((hour == 12) ? 12 : hour - 12) : hour);
+
+        date = str.substr(monthStartPos, 2) + "/" + str.substr(dayStartPos, 2) + "/" + str.substr(yearStartPos + 2, 2);
+        date += bufHour + str.substr(dayStartPos + 5, 2) + (isPM ? " PM" : " AM");
+        //TODO: end hack
+
+        cell.mFrom.text = [NSString stringWithUTF8String:from.c_str()];
+        cell.mDate.text = [NSString stringWithUTF8String:date.c_str()];
+
+//        cell.imageView.image = nil;
+
         return cell;
     }
     else
