@@ -102,11 +102,19 @@ void RecordAudioScreen::startRecordingAudioEntry()
 void RecordAudioScreen::stopRecordingAudioEntry()
 {
     char buf[80];
+    time_t curTime;
+    tm*    timeStruct;
     bool result;
 
     [gAppDelegateInstance stopRecorder];
 
-    sprintf(buf, "%d.m4a", tTimer::getSystemTimeMS());
+    curTime=time(NULL);
+    timeStruct = localtime(&curTime);
+
+    sprintf(buf, "%04d-%02d-%02d-%02d%02d%02d.m4a",
+            timeStruct->tm_year+1900,   timeStruct->tm_mon+1,   timeStruct->tm_mday,
+            timeStruct->tm_hour,        timeStruct->tm_min,     timeStruct->tm_sec);
+
     tFile scratch(tFile::kTemporaryDirectory, "scratch.m4a");
 
     result = scratch.rename(tFile::kDocumentsDirectory, buf);
