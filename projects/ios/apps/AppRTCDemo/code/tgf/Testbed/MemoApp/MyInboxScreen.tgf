@@ -18,11 +18,12 @@
 18 Send GoPlay to VC
 19 Set "wait for listInbox"
 20 Set "wait for download"
+21 hack: Remove item from list
 #
 1 14
 4 5 fail
 7 6 yes
-6 7 itemSelected
+6 7 itemSelected, itemDeleted
 5 7 no
 5 19 yes
 4 8 success
@@ -43,3 +44,5 @@
 13 18
 20 11
 19 4
+3 21 itemDeleted
+21 16

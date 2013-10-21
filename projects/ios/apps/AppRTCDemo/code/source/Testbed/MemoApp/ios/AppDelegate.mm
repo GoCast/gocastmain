@@ -12,7 +12,6 @@
 
 AppDelegate* gAppDelegateInstance = NULL;
 
-extern std::vector<std::string> gMyRecordingsEntries;
 extern std::vector<std::string> gUserListEntries;
 extern std::vector<std::string> gMyInboxListEntries;
 
@@ -116,13 +115,17 @@ extern std::vector<std::string> gMyInboxListEntries;
     [self.viewController.mTabView setHidden:YES];
     [self.viewController.mMyInboxView setHidden:YES];
     [self.viewController.mRecordAudioView setHidden:YES];
-    [self.viewController.mMyRecordingsView setHidden:YES];
     [self.viewController.mSendToGroupView setHidden:YES];
     [self.viewController.mPlayAudioView setHidden:YES];
     [self.viewController.mSettingsView setHidden:YES];
     [self.viewController.mBlockingView setHidden:YES];
     [self.viewController.mOldVersionView setHidden:YES];
     [self.viewController.mVersionCheckView setHidden:YES];
+}
+
+-(void)setNavigationBarTitle:(const std::string&)newTitle
+{
+    self.viewController.mNavigationItem.title = [NSString stringWithUTF8String:newTitle.c_str()];
 }
 
 -(void)setBlockingViewVisible:(bool)newVisible
@@ -146,7 +149,7 @@ extern std::vector<std::string> gMyInboxListEntries;
 
 -(void)setRecordAudioScreenVisible:(bool)newVisible
 {
-    [self.viewController.mTabView setHidden:(newVisible) ? YES : NO];
+    [self.viewController.mTabView setHidden:(newVisible) ? NO : YES];
     self.viewController.mTabBar.selectedItem = self.viewController.mNewMemoTab;
     [self.viewController.mRecordAudioView setHidden:(newVisible) ? NO : YES];
 }
@@ -162,13 +165,13 @@ extern std::vector<std::string> gMyInboxListEntries;
 
 -(void)setSendToGroupScreenVisible:(bool)newVisible
 {
-    [self.viewController.mTabView setHidden:(newVisible) ? YES : NO];
+    [self.viewController.mTabView setHidden:(newVisible) ? NO : YES];
     [self.viewController.mSendToGroupView setHidden:(newVisible) ? NO : YES];
 }
 
 -(void)setPlayAudioScreenVisible:(bool)newVisible
 {
-    [self.viewController.mTabView setHidden:(newVisible) ? YES : NO];
+    [self.viewController.mTabView setHidden:(newVisible) ? NO : YES];
     [self.viewController.mPlayAudioView setHidden:(newVisible) ? NO : YES];
 }
 
@@ -206,22 +209,26 @@ extern std::vector<std::string> gMyInboxListEntries;
     self.viewController.mRecordingStatusLabel.text = [NSString stringWithUTF8String:newStatus.c_str()];
 }
 
--(void)setPlayAudioButtonEnabled:(bool)newEnabled
+-(void)setPlayAudioButtonImage:(bool)newPlaying
 {
-    [self.viewController.mPlayAudioButton setEnabled:(newEnabled ? YES : NO)];
-    self.viewController.mPlayAudioButton.alpha = (newEnabled ? 1.0f : 0.4f);
+    if (!newPlaying)
+    {
+        [self.viewController.mPlayAudioButton setImage:[UIImage imageNamed:@"play-button.png"] forState:UIControlStateNormal];
+    }
+    else
+    {
+        [self.viewController.mPlayAudioButton setImage:[UIImage imageNamed:@"pause-button.png"] forState:UIControlStateNormal];
+    }
 }
 
--(void)setStopAudioButtonEnabled:(bool)newEnabled
+-(void)setPlayAudioDurationLabel:(const std::string&)newLabel
 {
-    [self.viewController.mStopAudioButton setEnabled:(newEnabled ? YES : NO)];
-    self.viewController.mStopAudioButton.alpha = (newEnabled ? 1.0f : 0.4f);
+    self.viewController.mAudioDurationLabel.text =[NSString stringWithUTF8String:newLabel.c_str()];
 }
 
--(void)setDeleteAudioButtonEnabled:(bool)newEnabled
+-(void)setPlayAudioFromLabel:(const std::string&)newLabel
 {
-    [self.viewController.mDeleteAudioButton setEnabled:(newEnabled ? YES : NO)];
-    self.viewController.mDeleteAudioButton.alpha = (newEnabled ? 1.0f : 0.4f);
+    self.viewController.mFrom.text = [NSString stringWithUTF8String:newLabel.c_str()];
 }
 
 -(void)setSendAudioButtonEnabled:(bool)newEnabled
@@ -285,14 +292,6 @@ extern std::vector<std::string> gMyInboxListEntries;
 -(void)stopRecorder
 {
     [self.viewController stopRecorder];
-}
-
--(void)setMyRecordingsTable:(const std::vector<std::string>&)newEntries
-{
-    gMyRecordingsEntries.clear();
-    gMyRecordingsEntries.insert(gMyRecordingsEntries.end(), newEntries.begin(), newEntries.end());
-
-    [self.viewController.mMyRecordingsTable reloadData];
 }
 
 -(void)setUserListTable:(const std::vector<std::string>&)newEntries

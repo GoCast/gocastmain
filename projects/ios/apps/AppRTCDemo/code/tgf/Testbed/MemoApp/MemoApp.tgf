@@ -27,3 +27,7 @@
 6 7 goPlay
 11 3 success
 11 10 fail
+7 4 goNewRecording
+7 9 goSettings
+5 4 goNewRecording
+5 9 goSettings

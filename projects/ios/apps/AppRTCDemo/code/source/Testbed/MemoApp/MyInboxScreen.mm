@@ -21,6 +21,7 @@ void MyInboxScreen::startEntry()
     URLLoader::getInstance()->attach(this);
 
     [gAppDelegateInstance setMyInboxScreenVisible:true];
+    [gAppDelegateInstance setNavigationBarTitle:"Inbox"];
 }
 
 void MyInboxScreen::endEntry()
@@ -63,6 +64,22 @@ void MyInboxScreen::wasListInboxValidEntry()
 }
 
 #pragma mark Actions
+void MyInboxScreen::hackRemoveItemFromListEntry()
+{
+    std::string str = mMergedFileList[mItemSelected];
+    std::vector<std::string>::iterator iter = std::find(mLocalFileList.begin(), mLocalFileList.end(), str);
+    if (iter != mLocalFileList.end())
+    {
+        mLocalFileList.erase(iter);
+    }
+
+    iter = std::find(mServerFileList.begin(), mServerFileList.end(), str);
+    if (iter != mServerFileList.end())
+    {
+        mServerFileList.erase(iter);
+    }
+}
+
 void MyInboxScreen::makeListOfLocalFilesEntry()
 {
     mLocalFileList = tFile(tFile::kDocumentsDirectory, "").directoryListing();
@@ -178,6 +195,7 @@ void MyInboxScreen::CallEntry()
 		case kCopyDownloadToLocalFiles: copyDownloadToLocalFilesEntry(); break;
 		case kDoesSelectedItemExistLocally: doesSelectedItemExistLocallyEntry(); break;
 		case kEnd: EndEntryHelper(); break;
+		case kHackRemoveItemFromList: hackRemoveItemFromListEntry(); break;
 		case kIdle: idleEntry(); break;
 		case kInvalidState: invalidStateEntry(); break;
 		case kMakeListOfLocalFiles: makeListOfLocalFilesEntry(); break;
@@ -209,12 +227,15 @@ int  MyInboxScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kCopyDownloadToLocalFiles) && (evt == kNext)) return kSendGoPlayToVC; else
 	if ((mState == kDoesSelectedItemExistLocally) && (evt == kNo)) return kSetWaitForDownload; else
 	if ((mState == kDoesSelectedItemExistLocally) && (evt == kYes)) return kSendGoPlayToVC; else
+	if ((mState == kHackRemoveItemFromList) && (evt == kNext)) return kCalculateMergedFiles; else
+	if ((mState == kIdle) && (evt == kItemDeleted)) return kHackRemoveItemFromList; else
 	if ((mState == kIdle) && (evt == kItemSelected)) return kDoesSelectedItemExistLocally; else
 	if ((mState == kMakeListOfLocalFiles) && (evt == kNext)) return kSetWaitForListInbox; else
 	if ((mState == kSendDownloadRequestToServer) && (evt == kFail)) return kShowRetryDownload; else
 	if ((mState == kSendDownloadRequestToServer) && (evt == kSuccess)) return kCopyDownloadToLocalFiles; else
 	if ((mState == kSendListInboxToServer) && (evt == kFail)) return kShowRetryListInbox; else
 	if ((mState == kSendListInboxToServer) && (evt == kSuccess)) return kWasListInboxValid; else
+	if ((mState == kServerErrorIdle) && (evt == kItemDeleted)) return kShowServerError; else
 	if ((mState == kServerErrorIdle) && (evt == kItemSelected)) return kShowServerError; else
 	if ((mState == kSetWaitForDownload) && (evt == kNext)) return kSendDownloadRequestToServer; else
 	if ((mState == kSetWaitForListInbox) && (evt == kNext)) return kSendListInboxToServer; else
@@ -239,6 +260,7 @@ bool MyInboxScreen::HasEdgeNamedNext() const
 	{
 		case kCalculateMergedFiles:
 		case kCopyDownloadToLocalFiles:
+		case kHackRemoveItemFromList:
 		case kMakeListOfLocalFiles:
 		case kSetWaitForDownload:
 		case kSetWaitForListInbox:
@@ -264,6 +286,10 @@ void MyInboxScreen::update(const MemoEvent& msg)
         case MemoEvent::kTableItemSelected:
             mItemSelected = msg.mItemSelected;
             process(kItemSelected);
+            break;
+        case MemoEvent::kTableItemDeleted:
+            mItemSelected = msg.mItemSelected;
+            process(kItemDeleted);
             break;
 
         case MemoEvent::kOKYesAlertPressed: process(kYes); break;

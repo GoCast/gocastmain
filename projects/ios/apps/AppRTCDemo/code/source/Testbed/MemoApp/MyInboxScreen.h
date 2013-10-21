@@ -29,6 +29,7 @@ protected:
 	void calculateMergedFilesEntry();
 	void copyDownloadToLocalFilesEntry();
 	void doesSelectedItemExistLocallyEntry();
+	void hackRemoveItemFromListEntry();
 	void idleEntry();
 	void makeListOfLocalFilesEntry();
 	void sendDownloadRequestToServerEntry();
@@ -51,6 +52,7 @@ public:
 		kInvalidEvent = -2,
 		kNext = -1,
 		kFail,
+		kItemDeleted,
 		kItemSelected,
 		kNo,
 		kSuccess,
@@ -65,6 +67,7 @@ public:
 		kCopyDownloadToLocalFiles,
 		kDoesSelectedItemExistLocally,
 		kEnd,
+		kHackRemoveItemFromList,
 		kIdle,
 		kMakeListOfLocalFiles,
 		kSendDownloadRequestToServer,

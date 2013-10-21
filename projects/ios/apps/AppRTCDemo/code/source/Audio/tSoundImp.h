@@ -10,6 +10,7 @@ public:
     void OnCompleteCallback();
     
 protected:
+    tUInt32         mDuration;
     bool            mIsPlaying;
     bool            mIsPaused;
 
@@ -22,6 +23,8 @@ protected:
 public:
     explicit tSoundImp(const tFile &file);
     ~tSoundImp();
+
+    tUInt32 getDurationMS();
 
     bool    isPlaying();
     bool    isPaused();

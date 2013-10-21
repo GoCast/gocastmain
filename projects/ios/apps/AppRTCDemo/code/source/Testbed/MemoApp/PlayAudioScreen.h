@@ -18,7 +18,6 @@ class PlayAudioScreen
 {
 protected:
     std::string mFilename;
-    std::string mDeleteFileJSON;
     tSound* mSound;
     bool mExistsOnServer;
 
@@ -31,67 +30,52 @@ protected:
 	void endEntry();
 	void invalidStateEntry();
 
-	void deleteScratchFileEntry();
-	void doesFileExistOnServerEntry();
-	void doesScratchExistEntry();
 	void idleEntry();
-	void playScratchFileEntry();
+	void loadSoundEntry();
+	void pauseSoundEntry();
+	void pausedIdleEntry();
+	void playSoundEntry();
 	void playingIdleEntry();
-	void sendDeleteRequestToServerEntry();
+	void resumeSoundEntry();
 	void sendGoInboxToVCEntry();
 	void sendGoSendGroupToVCEntry();
-	void setStatusHasAudioEntry();
-	void setStatusNoAudioEntry();
+	void setStatusPausedEntry();
 	void setStatusPlayingEntry();
-	void setWaitForDeleteEntry();
-	void showConfirmDeleteEntry();
-	void showCouldntDeleteEntry();
-	void showDeleteFailedEntry();
-	void showRetryDeleteEntry();
-	void stopScratchFileEntry();
-	void wasDeleteSuccessfulEntry();
+	void setStatusResumingEntry();
+	void setStatusStoppedEntry();
+	void stopSoundEntry();
+	void updateDurationLabelEntry();
 
 public:
 	enum EventType
 	{
 		kInvalidEvent = -2,
 		kNext = -1,
-		kCancel,
-		kDelete,
-		kFail,
 		kFinishedPlaying,
-		kNo,
 		kPlay,
 		kSend,
-		kStop,
-		kSuccess,
-		kYes,
 	};
 
 	enum StateType
 	{
 		kInvalidState = 0,
 		kStart = 1,
-		kDeleteScratchFile,
-		kDoesFileExistOnServer,
-		kDoesScratchExist,
 		kEnd,
 		kIdle,
-		kPlayScratchFile,
+		kLoadSound,
+		kPauseSound,
+		kPausedIdle,
+		kPlaySound,
 		kPlayingIdle,
-		kSendDeleteRequestToServer,
+		kResumeSound,
 		kSendGoInboxToVC,
 		kSendGoSendGroupToVC,
-		kSetStatusHasAudio,
-		kSetStatusNoAudio,
+		kSetStatusPaused,
 		kSetStatusPlaying,
-		kSetWaitForDelete,
-		kShowConfirmDelete,
-		kShowCouldntDelete,
-		kShowDeleteFailed,
-		kShowRetryDelete,
-		kStopScratchFile,
-		kWasDeleteSuccessful,
+		kSetStatusResuming,
+		kSetStatusStopped,
+		kStopSound,
+		kUpdateDurationLabel,
 	};
 
 protected:

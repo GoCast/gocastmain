@@ -3,49 +3,34 @@
 3 Idle
 4 Playing Idle
 5 Send GoInbox to VC
-6 Show "Confirm Delete"
-7 Send GoSendGroup to VC
-8 Does scratch exist?
-9 Set Status: No Audio
-10 Set Status: Has Audio
-11 Delete scratch file
-12 Play scratch file
-13 Set Status: Playing
-14 Show "Couldn't delete"
-15 Stop scratch file
-16 Send delete request to server
-17 Show "retry delete?"
-18 Was delete successful?
-19 Show "delete failed"
-20 Set "wait for delete"
-21 Does file exist on server?
+6 Send GoSendGroup to VC
+7 Play sound
+8 Stop sound
+9 Pause sound
+10 Paused idle
+11 Set Status: Playing
+12 Set Status: Paused
+13 Set Status: Stopped
+14 Set Status: Resuming
+15 Resume sound
+16 Update duration label
+17 Load sound
 #
-3 5 cancel
-4 5 cancel
-3 12 play
-4 15 stop, finishedPlaying
-6 11 yes
-3 6 delete
-3 7 send
-8 9 no
-8 10 yes
-9 3
-10 3
-11 21 success
-6 8 no
-12 13
-13 4
-11 14 fail
-14 8 yes
-15 8
-1 8
-16 17 fail
-16 18 success
-18 19 no
-17 16 yes
-18 5 yes
-19 5 yes
-17 5 no
-20 16
-21 20 yes
-21 5 no
+3 11 play
+4 8 finishedPlaying
+3 6 send
+7 4
+8 13
+1 17
+4 9 play
+9 12
+10 14 play
+10 6 send
+4 6 send
+13 3
+12 10
+11 7
+14 15
+15 4
+16 13
+17 16

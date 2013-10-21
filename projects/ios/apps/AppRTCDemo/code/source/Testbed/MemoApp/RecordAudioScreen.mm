@@ -22,6 +22,7 @@ void RecordAudioScreen::startEntry()
     MemoEventManager::getInstance()->attach(this);
 
     [gAppDelegateInstance setRecordAudioScreenVisible:true];
+    [gAppDelegateInstance setNavigationBarTitle:"New Memo"];
 }
 
 void RecordAudioScreen::endEntry()

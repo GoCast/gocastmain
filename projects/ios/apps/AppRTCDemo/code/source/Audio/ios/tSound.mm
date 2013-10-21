@@ -53,6 +53,8 @@ tSound::tSound(const tFile& file)
     mAvaudioplayer.delegate = (appleAVAudioPlayerDelegate*)mAppleAVPlayerDelegate;
     
     [mAvaudioplayer prepareToPlay];
+
+    mDuration = (tUInt32)[mAvaudioplayer duration] * 1000;
 }
 
 tSound::~tSound()

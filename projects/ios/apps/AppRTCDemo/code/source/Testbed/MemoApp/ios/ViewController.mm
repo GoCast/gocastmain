@@ -9,7 +9,6 @@
 
 #import "InboxCell.h"
 
-std::vector<std::string> gMyRecordingsEntries;
 std::vector<std::string> gUserListEntries;
 std::vector<std::string> gMyInboxListEntries;
 
@@ -213,28 +212,10 @@ std::vector<std::string> gMyInboxListEntries;
     MemoEventManager::getInstance()->notify(MemoEvent(MemoEvent::kPlayAudioPressed));
 }
 
--(IBAction) stopAudioPressed:(id)sender
-{
-#pragma unused(sender)
-    MemoEventManager::getInstance()->notify(MemoEvent(MemoEvent::kStopAudioPressed));
-}
-
--(IBAction) deleteAudioPressed:(id)sender
-{
-#pragma unused(sender)
-    MemoEventManager::getInstance()->notify(MemoEvent(MemoEvent::kDeleteAudioPressed));
-}
-
 -(IBAction) sendAudioPressed:(id)sender
 {
 #pragma unused(sender)
     MemoEventManager::getInstance()->notify(MemoEvent(MemoEvent::kSendAudioPressed));
-}
-
--(IBAction) cancelAudioPressed:(id)sender
-{
-#pragma unused(sender)
-    MemoEventManager::getInstance()->notify(MemoEvent(MemoEvent::kCancelAudioPressed));
 }
 
 -(IBAction) changePasswordPressed:(id)sender
@@ -301,11 +282,7 @@ std::vector<std::string> gMyInboxListEntries;
 {
 #pragma unused(section)
 
-    if (tableView == self.mMyRecordingsTable)
-    {
-        return (NSInteger)gMyRecordingsEntries.size();
-    }
-    else if (tableView == self.mSendToGroupTable)
+    if (tableView == self.mSendToGroupTable)
     {
         return (NSInteger)gUserListEntries.size();
     }
@@ -326,26 +303,7 @@ std::vector<std::string> gMyInboxListEntries;
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
 #pragma unused(indexPath)
-    if (tableView == self.mMyRecordingsTable)
-    {
-        tableView.backgroundView = nil;
-
-        static NSString *simpleTableIdentifier = @"MemoAppTableItem";
-
-        UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:simpleTableIdentifier];
-
-        if (cell == nil)
-        {
-            cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:simpleTableIdentifier] autorelease];
-        }
-
-        cell.textLabel.text = [NSString stringWithUTF8String:gMyRecordingsEntries[indexPath.row].c_str()];
-
-        cell.imageView.image = nil;
-        
-        return cell;
-    }
-    else if (tableView == self.mSendToGroupTable)
+    if (tableView == self.mSendToGroupTable)
     {
         tableView.backgroundView = nil;
 
@@ -452,7 +410,7 @@ std::vector<std::string> gMyInboxListEntries;
         int hour = atoi(str.substr(dayStartPos + 3, 2).c_str());
         isPM = hour >= 12;
         char bufHour[10];
-        sprintf(bufHour, " %02d:", isPM ? ((hour == 12) ? 12 : hour - 12) : hour);
+        sprintf(bufHour, " %02d:", isPM ? (hour - 12) : ((hour == 0) ? 12 : hour));
 
         date = str.substr(monthStartPos, 2) + "/" + str.substr(dayStartPos, 2) + "/" + str.substr(yearStartPos + 2, 2);
         date += bufHour + str.substr(dayStartPos + 5, 2) + (isPM ? " PM" : " AM");
@@ -496,6 +454,29 @@ std::vector<std::string> gMyInboxListEntries;
 {
 #pragma unused(tableView, indexPath)
     MemoEventManager::getInstance()->notify(MemoEvent(MemoEvent::kTableItemSelected, (tUInt32)indexPath.row));
+}
+
+- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
+{
+#pragma unused(tableView, indexPath)
+    if (tableView == self.mInboxTable)
+    {
+        return YES;
+    }
+    return NO;
+}
+
+// Override to support editing the table view.
+- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
+{
+#pragma unused(tableView, indexPath)
+    if (editingStyle == UITableViewCellEditingStyleDelete)
+    {
+        if (tableView == self.mInboxTable)
+        {
+            MemoEventManager::getInstance()->notify(MemoEvent(MemoEvent::kTableItemDeleted, (tUInt32)indexPath.row));
+        }
+    }
 }
 
 -(void)tabBar:(UITabBar *)tabBar didSelectItem:(UITabBarItem *)item

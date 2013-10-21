@@ -24,6 +24,11 @@ tSoundImp::~tSoundImp()
 //    stop();
 }
 
+tUInt32 tSoundImp::getDurationMS()
+{
+    return mDuration;
+}
+
 bool    tSoundImp::isPlaying()
 {
     return mIsPlaying;

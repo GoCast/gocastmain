@@ -14,6 +14,8 @@
 
 -(void)hideAllViews;
 
+-(void)setNavigationBarTitle:(const std::string&)newTitle;
+
 -(void)setBlockingViewVisible:(bool)newVisible;
 
 -(void)setStartScreenVisible:(bool)newVisible;
@@ -32,10 +34,9 @@
 -(void)setSendRecordingButtonEnabled:(bool)newEnabled;
 -(void)setRecordingStatusLabel:(const std::string&)newStatus;
 
--(void)setPlayAudioButtonEnabled:(bool)newEnabled;
--(void)setStopAudioButtonEnabled:(bool)newEnabled;
--(void)setDeleteAudioButtonEnabled:(bool)newEnabled;
--(void)setSendAudioButtonEnabled:(bool)newEnabled;
+-(void)setPlayAudioButtonImage:(bool)newPlaying;
+-(void)setPlayAudioDurationLabel:(const std::string&)newLabel;
+-(void)setPlayAudioFromLabel:(const std::string&)newLabel;
 
 -(void)setVersionCheckScreenVisible:(bool)newVisible;
 -(void)setOldVersionScreenVisible:(bool)newVisible;
@@ -53,7 +54,6 @@
 -(void)startRecorder;
 -(void)stopRecorder;
 
--(void)setMyRecordingsTable:(const std::vector<std::string>&)newEntries;
 -(void)setUserListTable:(const std::vector<std::string>&)newEntries;
 -(void)setMyInboxTable:(const std::vector<std::string>&)newEntries;
 

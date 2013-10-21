@@ -14,7 +14,6 @@ UIAlertViewDelegate, AVAudioRecorderDelegate>
 
 @property (nonatomic, strong) IBOutlet UIView* mMyInboxView;
 @property (nonatomic, strong) IBOutlet UIView* mRecordAudioView;
-@property (nonatomic, strong) IBOutlet UIView* mMyRecordingsView;
 @property (nonatomic, strong) IBOutlet UIView* mSettingsView;
 
 @property (nonatomic, strong) IBOutlet UIView* mSendToGroupView;
@@ -31,7 +30,10 @@ UIAlertViewDelegate, AVAudioRecorderDelegate>
 
 //mMyRecordingsView
 @property (nonatomic, strong) IBOutlet UITableView* mInboxTable;
-@property (nonatomic, strong) IBOutlet UITableView* mMyRecordingsTable;
+
+//mNavigationBar
+@property (nonatomic, strong) IBOutlet UINavigationBar* mNavigationBar;
+@property (nonatomic, strong) IBOutlet UINavigationItem* mNavigationItem;
 
 //mTabView
 @property (nonatomic, strong) IBOutlet UITabBar* mTabBar;
@@ -49,10 +51,9 @@ UIAlertViewDelegate, AVAudioRecorderDelegate>
 
 //mPlayAudioView
 @property (nonatomic, strong) IBOutlet UIButton* mPlayAudioButton;
-@property (nonatomic, strong) IBOutlet UIButton* mStopAudioButton;
-@property (nonatomic, strong) IBOutlet UIButton* mDeleteAudioButton;
 @property (nonatomic, strong) IBOutlet UIButton* mSendAudioButton;
-@property (nonatomic, strong) IBOutlet UIButton* mCancelAudioButton;
+@property (nonatomic, strong) IBOutlet UILabel* mAudioDurationLabel;
+@property (nonatomic, strong) IBOutlet UILabel* mFrom;
 
 //mSettingsView
 @property (nonatomic, strong) IBOutlet UILabel* mLoggedInLabel;
@@ -88,10 +89,7 @@ UIAlertViewDelegate, AVAudioRecorderDelegate>
 -(IBAction) sendRecordingPressed:(id)sender;
 
 -(IBAction) playAudioPressed:(id)sender;
--(IBAction) stopAudioPressed:(id)sender;
--(IBAction) deleteAudioPressed:(id)sender;
 -(IBAction) sendAudioPressed:(id)sender;
--(IBAction) cancelAudioPressed:(id)sender;
 
 -(IBAction) changePasswordPressed:(id)sender;
 -(IBAction) logOutPressed:(id)sender;

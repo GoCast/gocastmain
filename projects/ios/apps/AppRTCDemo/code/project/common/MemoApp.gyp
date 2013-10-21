@@ -204,6 +204,16 @@
 					'../../rsrc/Testbed/MemoApp/<@(OS)/inbox_star_on.png',
 					'../../rsrc/Testbed/MemoApp/<@(OS)/inbox_star_pressed.png',
 
+					'../../rsrc/Testbed/MemoApp/<@(OS)/play-background-onpress.png',
+					'../../rsrc/Testbed/MemoApp/<@(OS)/play-background.png',
+					'../../rsrc/Testbed/MemoApp/<@(OS)/play-button.png',
+					'../../rsrc/Testbed/MemoApp/<@(OS)/pause-button.png',
+					'../../rsrc/Testbed/MemoApp/<@(OS)/playhead.png',
+					'../../rsrc/Testbed/MemoApp/<@(OS)/scrubber-background.png',
+
+					'../../rsrc/Testbed/MemoApp/<@(OS)/play-details-button.png',
+					'../../rsrc/Testbed/MemoApp/<@(OS)/play-translation-bg.png',
+
 					'../../rsrc/Testbed/MemoApp/<@(OS)/Default.png',
 				],	# mac_bundle_resources
 

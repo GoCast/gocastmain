@@ -21,10 +21,7 @@ public:
         kSendRecordingPressed,
 
         kPlayAudioPressed,
-        kStopAudioPressed,
-        kDeleteAudioPressed,
         kSendAudioPressed,
-        kCancelAudioPressed,
 
         kChangePasswordPressed,
         kLogOutPressed,
@@ -38,6 +35,7 @@ public:
         kNoAlertPressed,
 
         kTableItemSelected,
+        kTableItemDeleted,
     };
 
     EventType   mEvent;

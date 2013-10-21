@@ -25,6 +25,42 @@ void PlayAudioScreen::startEntry()
     URLLoader::getInstance()->attach(this);
     MemoEventManager::getInstance()->attach(this);
     [gAppDelegateInstance setPlayAudioScreenVisible:true];
+    [gAppDelegateInstance setNavigationBarTitle:"Playback Audio"];
+
+
+    //TODO: fix this hack
+    std::string from;
+    std::string date;
+
+    size_t fromEndPos;
+    bool fromForeign = false;
+    fromEndPos = 0;
+
+    std::string str = mFilename;
+
+    if (!(str[0] >= '0' && str[0] <= '9'))
+    {
+        for(size_t i = 0; i < str.size(); i++)
+        {
+            if (str[i] == '-')
+            {
+                fromEndPos = i;
+                break;
+            }
+        }
+        fromForeign = true;
+    }
+
+    if (fromForeign)
+    {
+        from = str.substr(0, fromEndPos);
+    }
+    else
+    {
+        from = "Me";
+    }
+    //TODO: end hack
+    [gAppDelegateInstance setPlayAudioFromLabel:from];
 }
 
 void PlayAudioScreen::endEntry()
@@ -49,122 +85,79 @@ void PlayAudioScreen::playingIdleEntry()
 {
 }
 
+void PlayAudioScreen::pausedIdleEntry()
+{
+}
+
 #pragma mark User Interface
-void PlayAudioScreen::setWaitForDeleteEntry()
+
+void PlayAudioScreen::updateDurationLabelEntry()
 {
-    [gAppDelegateInstance setBlockingViewVisible:true];
+    tUInt32 durationMS = mSound->getDurationMS();
+    size_t sec = (durationMS / 1000) % 60;
+    size_t min = ((durationMS / 1000) - sec) / 60;
+    char buf[10];
+    sprintf(buf, "%02d:%02d", (int)min, (int)sec);
+    [gAppDelegateInstance setPlayAudioDurationLabel:buf];
 }
 
-void PlayAudioScreen::showRetryDeleteEntry()
+void PlayAudioScreen::setStatusPausedEntry()
 {
-    tConfirm("Couldn't contact server, retry delete from inbox?");
-}
-
-void PlayAudioScreen::showDeleteFailedEntry()
-{
-    tAlert("Could not delete file from server inbox");
-}
-
-void PlayAudioScreen::setStatusHasAudioEntry()
-{
-    [gAppDelegateInstance setPlayAudioButtonEnabled:true];
-    [gAppDelegateInstance setStopAudioButtonEnabled:false];
-    [gAppDelegateInstance setDeleteAudioButtonEnabled:true];
-    [gAppDelegateInstance setSendAudioButtonEnabled:true];
-}
-
-void PlayAudioScreen::setStatusNoAudioEntry()
-{
-    [gAppDelegateInstance setPlayAudioButtonEnabled:false];
-    [gAppDelegateInstance setStopAudioButtonEnabled:false];
-    [gAppDelegateInstance setDeleteAudioButtonEnabled:false];
-    [gAppDelegateInstance setSendAudioButtonEnabled:false];
+    [gAppDelegateInstance setPlayAudioButtonImage:false];
 }
 
 void PlayAudioScreen::setStatusPlayingEntry()
 {
-    [gAppDelegateInstance setPlayAudioButtonEnabled:false];
-    [gAppDelegateInstance setStopAudioButtonEnabled:true];
-    [gAppDelegateInstance setDeleteAudioButtonEnabled:false];
-    [gAppDelegateInstance setSendAudioButtonEnabled:false];
+    [gAppDelegateInstance setPlayAudioButtonImage:true];
 }
 
-#pragma mark Queries
-void PlayAudioScreen::doesFileExistOnServerEntry()
+void PlayAudioScreen::setStatusResumingEntry()
 {
-    SetImmediateEvent(mExistsOnServer ? kYes : kNo);
+    [gAppDelegateInstance setPlayAudioButtonImage:true];
 }
 
-void PlayAudioScreen::doesScratchExistEntry()
+void PlayAudioScreen::setStatusStoppedEntry()
 {
-    tFile scratch(tFile::kDocumentsDirectory, mFilename);
-
-    SetImmediateEvent(scratch.exists() ? kYes : kNo);
-}
-
-void PlayAudioScreen::wasDeleteSuccessfulEntry()
-{
-    bool result = false;
-
-    if (JSONUtil::extract(mDeleteFileJSON)["status"] == std::string("success"))
-    {
-        result = true;
-    }
-
-    SetImmediateEvent(result ? kYes : kNo);
+    [gAppDelegateInstance setPlayAudioButtonImage:false];
 }
 
 #pragma mark Actions
 
-void PlayAudioScreen::deleteScratchFileEntry()
+void PlayAudioScreen::pauseSoundEntry()
 {
-    tFile scratch(tFile::kDocumentsDirectory, mFilename);
-
-    if (scratch.exists())
+    if (mSound)
     {
-        scratch.remove();
+        mSound->pause();
     }
-
-    SetImmediateEvent(scratch.exists() ? kFail : kSuccess);
 }
 
-void PlayAudioScreen::playScratchFileEntry()
+void PlayAudioScreen::loadSoundEntry()
 {
     if (mSound) { delete mSound; mSound = NULL; }
 
     mSound = new tSound(tFile(tFile::kDocumentsDirectory, mFilename));
     mSound->attach(this);
+}
+
+void PlayAudioScreen::playSoundEntry()
+{
     mSound->play();
 }
 
-void PlayAudioScreen::stopScratchFileEntry()
+void PlayAudioScreen::resumeSoundEntry()
+{
+    if (mSound)
+    {
+        mSound->resume();
+    }
+}
+
+void PlayAudioScreen::stopSoundEntry()
 {
     if (mSound)
     {
         mSound->stop();
     }
-}
-
-void PlayAudioScreen::showConfirmDeleteEntry()
-{
-    tConfirm("Delete this recording?");
-}
-
-void PlayAudioScreen::showCouldntDeleteEntry()
-{
-    tAlert("Couldn't delete audio file.");
-}
-
-void PlayAudioScreen::sendDeleteRequestToServerEntry()
-{
-    char buf[512];
-
-    sprintf(buf, "%s?action=deleteFile&name=%s&file=%s",
-            kMemoAppServerURL,
-            std::string(tFile(tFile::kPreferencesDirectory, "logintoken.txt")).c_str(),
-            mFilename.c_str());
-
-    URLLoader::getInstance()->loadString(buf);
 }
 
 #pragma mark Sending messages to other machines
@@ -184,28 +177,24 @@ void PlayAudioScreen::CallEntry()
 {
 	switch(mState)
 	{
-		case kDeleteScratchFile: deleteScratchFileEntry(); break;
-		case kDoesFileExistOnServer: doesFileExistOnServerEntry(); break;
-		case kDoesScratchExist: doesScratchExistEntry(); break;
 		case kEnd: EndEntryHelper(); break;
 		case kIdle: idleEntry(); break;
 		case kInvalidState: invalidStateEntry(); break;
-		case kPlayScratchFile: playScratchFileEntry(); break;
+		case kLoadSound: loadSoundEntry(); break;
+		case kPauseSound: pauseSoundEntry(); break;
+		case kPausedIdle: pausedIdleEntry(); break;
+		case kPlaySound: playSoundEntry(); break;
 		case kPlayingIdle: playingIdleEntry(); break;
-		case kSendDeleteRequestToServer: sendDeleteRequestToServerEntry(); break;
+		case kResumeSound: resumeSoundEntry(); break;
 		case kSendGoInboxToVC: sendGoInboxToVCEntry(); break;
 		case kSendGoSendGroupToVC: sendGoSendGroupToVCEntry(); break;
-		case kSetStatusHasAudio: setStatusHasAudioEntry(); break;
-		case kSetStatusNoAudio: setStatusNoAudioEntry(); break;
+		case kSetStatusPaused: setStatusPausedEntry(); break;
 		case kSetStatusPlaying: setStatusPlayingEntry(); break;
-		case kSetWaitForDelete: setWaitForDeleteEntry(); break;
-		case kShowConfirmDelete: showConfirmDeleteEntry(); break;
-		case kShowCouldntDelete: showCouldntDeleteEntry(); break;
-		case kShowDeleteFailed: showDeleteFailedEntry(); break;
-		case kShowRetryDelete: showRetryDeleteEntry(); break;
+		case kSetStatusResuming: setStatusResumingEntry(); break;
+		case kSetStatusStopped: setStatusStoppedEntry(); break;
 		case kStart: startEntry(); break;
-		case kStopScratchFile: stopScratchFileEntry(); break;
-		case kWasDeleteSuccessful: wasDeleteSuccessfulEntry(); break;
+		case kStopSound: stopSoundEntry(); break;
+		case kUpdateDurationLabel: updateDurationLabelEntry(); break;
 		default: break;
 	}
 }
@@ -216,36 +205,24 @@ void PlayAudioScreen::CallExit()
 
 int  PlayAudioScreen::StateTransitionFunction(const int evt) const
 {
-	if ((mState == kDeleteScratchFile) && (evt == kFail)) return kShowCouldntDelete; else
-	if ((mState == kDeleteScratchFile) && (evt == kSuccess)) return kDoesFileExistOnServer; else
-	if ((mState == kDoesFileExistOnServer) && (evt == kNo)) return kSendGoInboxToVC; else
-	if ((mState == kDoesFileExistOnServer) && (evt == kYes)) return kSetWaitForDelete; else
-	if ((mState == kDoesScratchExist) && (evt == kNo)) return kSetStatusNoAudio; else
-	if ((mState == kDoesScratchExist) && (evt == kYes)) return kSetStatusHasAudio; else
-	if ((mState == kIdle) && (evt == kCancel)) return kSendGoInboxToVC; else
-	if ((mState == kIdle) && (evt == kDelete)) return kShowConfirmDelete; else
-	if ((mState == kIdle) && (evt == kPlay)) return kPlayScratchFile; else
+	if ((mState == kIdle) && (evt == kPlay)) return kSetStatusPlaying; else
 	if ((mState == kIdle) && (evt == kSend)) return kSendGoSendGroupToVC; else
-	if ((mState == kPlayScratchFile) && (evt == kNext)) return kSetStatusPlaying; else
-	if ((mState == kPlayingIdle) && (evt == kCancel)) return kSendGoInboxToVC; else
-	if ((mState == kPlayingIdle) && (evt == kFinishedPlaying)) return kStopScratchFile; else
-	if ((mState == kPlayingIdle) && (evt == kStop)) return kStopScratchFile; else
-	if ((mState == kSendDeleteRequestToServer) && (evt == kFail)) return kShowRetryDelete; else
-	if ((mState == kSendDeleteRequestToServer) && (evt == kSuccess)) return kWasDeleteSuccessful; else
-	if ((mState == kSetStatusHasAudio) && (evt == kNext)) return kIdle; else
-	if ((mState == kSetStatusNoAudio) && (evt == kNext)) return kIdle; else
-	if ((mState == kSetStatusPlaying) && (evt == kNext)) return kPlayingIdle; else
-	if ((mState == kSetWaitForDelete) && (evt == kNext)) return kSendDeleteRequestToServer; else
-	if ((mState == kShowConfirmDelete) && (evt == kNo)) return kDoesScratchExist; else
-	if ((mState == kShowConfirmDelete) && (evt == kYes)) return kDeleteScratchFile; else
-	if ((mState == kShowCouldntDelete) && (evt == kYes)) return kDoesScratchExist; else
-	if ((mState == kShowDeleteFailed) && (evt == kYes)) return kSendGoInboxToVC; else
-	if ((mState == kShowRetryDelete) && (evt == kNo)) return kSendGoInboxToVC; else
-	if ((mState == kShowRetryDelete) && (evt == kYes)) return kSendDeleteRequestToServer; else
-	if ((mState == kStart) && (evt == kNext)) return kDoesScratchExist; else
-	if ((mState == kStopScratchFile) && (evt == kNext)) return kDoesScratchExist; else
-	if ((mState == kWasDeleteSuccessful) && (evt == kNo)) return kShowDeleteFailed; else
-	if ((mState == kWasDeleteSuccessful) && (evt == kYes)) return kSendGoInboxToVC;
+	if ((mState == kLoadSound) && (evt == kNext)) return kUpdateDurationLabel; else
+	if ((mState == kPauseSound) && (evt == kNext)) return kSetStatusPaused; else
+	if ((mState == kPausedIdle) && (evt == kPlay)) return kSetStatusResuming; else
+	if ((mState == kPausedIdle) && (evt == kSend)) return kSendGoSendGroupToVC; else
+	if ((mState == kPlaySound) && (evt == kNext)) return kPlayingIdle; else
+	if ((mState == kPlayingIdle) && (evt == kFinishedPlaying)) return kStopSound; else
+	if ((mState == kPlayingIdle) && (evt == kPlay)) return kPauseSound; else
+	if ((mState == kPlayingIdle) && (evt == kSend)) return kSendGoSendGroupToVC; else
+	if ((mState == kResumeSound) && (evt == kNext)) return kPlayingIdle; else
+	if ((mState == kSetStatusPaused) && (evt == kNext)) return kPausedIdle; else
+	if ((mState == kSetStatusPlaying) && (evt == kNext)) return kPlaySound; else
+	if ((mState == kSetStatusResuming) && (evt == kNext)) return kResumeSound; else
+	if ((mState == kSetStatusStopped) && (evt == kNext)) return kIdle; else
+	if ((mState == kStart) && (evt == kNext)) return kLoadSound; else
+	if ((mState == kStopSound) && (evt == kNext)) return kSetStatusStopped; else
+	if ((mState == kUpdateDurationLabel) && (evt == kNext)) return kSetStatusStopped;
 
 	return kInvalidState;
 }
@@ -254,17 +231,17 @@ bool PlayAudioScreen::HasEdgeNamedNext() const
 {
 	switch(mState)
 	{
-		case kPlayScratchFile:
-		case kSetStatusHasAudio:
-		case kSetStatusNoAudio:
-		case kSetStatusPlaying:
-		case kSetWaitForDelete:
-		case kStart:
-		case kStopScratchFile:
-			return true;
+		case kEnd:
+		case kIdle:
+		case kInvalidState:
+		case kPausedIdle:
+		case kPlayingIdle:
+		case kSendGoInboxToVC:
+		case kSendGoSendGroupToVC:
+			return false;
 		default: break;
 	}
-	return false;
+	return true;
 }
 
 #pragma mark Messages
@@ -274,13 +251,7 @@ void PlayAudioScreen::update(const MemoEvent& msg)
     switch (msg.mEvent)
     {
         case MemoEvent::kPlayAudioPressed:      process(kPlay); break;
-        case MemoEvent::kStopAudioPressed:      process(kStop); break;
-        case MemoEvent::kDeleteAudioPressed:    process(kDelete); break;
         case MemoEvent::kSendAudioPressed:      process(kSend); break;
-        case MemoEvent::kCancelAudioPressed:    process(kCancel); break;
-
-        case MemoEvent::kOKYesAlertPressed:     process(kYes); break;
-        case MemoEvent::kNoAlertPressed:        process(kNo); break;
 
         default:
             break;
@@ -309,24 +280,6 @@ void PlayAudioScreen::update(const URLLoaderEvent& msg)
 
     switch (msg.mEvent)
     {
-        case URLLoaderEvent::kLoadFail: process(kFail); break;
-        case URLLoaderEvent::kLoadedString:
-        {
-            switch (getState())
-            {
-                case kSendDeleteRequestToServer:
-                    mDeleteFileJSON = msg.mString;
-                    break;
-
-                default:
-                    break;
-            }
-            process(kSuccess);
-        }
-            break;
-
-        case URLLoaderEvent::kLoadedFile: process(kSuccess); break;
-
         default:
             break;
     }

@@ -21,6 +21,7 @@ void SettingsScreen::startEntry()
     URLLoader::getInstance()->attach(this);
 
     [gAppDelegateInstance setSettingsScreenVisible:true];
+    [gAppDelegateInstance setNavigationBarTitle:"Settings"];
 }
 
 void SettingsScreen::endEntry()

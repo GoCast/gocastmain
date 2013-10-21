@@ -167,11 +167,15 @@ int  MemoApp::StateTransitionFunction(const int evt) const
 	if ((mState == kMyInboxScreen) && (evt == kGoPlay)) return kPlayAudioScreen; else
 	if ((mState == kMyInboxScreen) && (evt == kGoSettings)) return kSettingsScreen; else
 	if ((mState == kPlayAudioScreen) && (evt == kGoInbox)) return kMyInboxScreen; else
+	if ((mState == kPlayAudioScreen) && (evt == kGoNewRecording)) return kRecordAudioScreen; else
 	if ((mState == kPlayAudioScreen) && (evt == kGoSendGroup)) return kSendToGroupScreen; else
+	if ((mState == kPlayAudioScreen) && (evt == kGoSettings)) return kSettingsScreen; else
 	if ((mState == kRecordAudioScreen) && (evt == kGoInbox)) return kMyInboxScreen; else
 	if ((mState == kRecordAudioScreen) && (evt == kGoSendGroup)) return kSendToGroupScreen; else
 	if ((mState == kRecordAudioScreen) && (evt == kGoSettings)) return kSettingsScreen; else
 	if ((mState == kSendToGroupScreen) && (evt == kGoInbox)) return kMyInboxScreen; else
+	if ((mState == kSendToGroupScreen) && (evt == kGoNewRecording)) return kRecordAudioScreen; else
+	if ((mState == kSendToGroupScreen) && (evt == kGoSettings)) return kSettingsScreen; else
 	if ((mState == kSettingsScreen) && (evt == kGoInbox)) return kMyInboxScreen; else
 	if ((mState == kSettingsScreen) && (evt == kGoNewRecording)) return kRecordAudioScreen; else
 	if ((mState == kSettingsScreen) && (evt == kRestart)) return kVersionCheckScreen; else

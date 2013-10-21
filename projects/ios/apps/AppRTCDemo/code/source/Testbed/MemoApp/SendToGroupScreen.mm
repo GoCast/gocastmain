@@ -22,6 +22,7 @@ void SendToGroupScreen::startEntry()
     URLLoader::getInstance()->attach(this);
 
     [gAppDelegateInstance setSendToGroupScreenVisible:true];
+    [gAppDelegateInstance setNavigationBarTitle:"Send to Group"];
 }
 
 void SendToGroupScreen::endEntry()
