@@ -28,6 +28,13 @@ std::vector<std::string> gMyInboxListEntries;
 
     [self ctorRecorder];
     self.view.autoresizesSubviews = YES;
+
+    if (floor(NSFoundationVersionNumber) > NSFoundationVersionNumber_iOS_6_1)
+    {
+        CGRect r = self.view.bounds;
+        r.origin.y -= 20;
+        [self.view setBounds:r];
+    }
 }
 
 - (void)viewDidUnload
