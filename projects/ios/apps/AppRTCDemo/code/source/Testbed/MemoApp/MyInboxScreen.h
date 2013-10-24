@@ -15,6 +15,7 @@ protected:
     std::vector<std::string> mMergedFileList;
 
     std::string mListInboxJSON;
+    std::string mDeleteFileJSON;
     tUInt32 mItemSelected;
 
 public:
@@ -28,22 +29,30 @@ protected:
 
 	void calculateMergedFilesEntry();
 	void copyDownloadToLocalFilesEntry();
+	void deleteLocalFileEntry();
+	void doesDeletedItemExistLocallyEntry();
+	void doesFileExistOnServerEntry();
 	void doesSelectedItemExistLocallyEntry();
-	void hackRemoveItemFromListEntry();
 	void idleEntry();
 	void makeListOfLocalFilesEntry();
+	void removeFileFromLocalAndServerListsEntry();
+	void sendDeleteRequestToServerEntry();
 	void sendDownloadRequestToServerEntry();
 	void sendGoPlayToVCEntry();
 	void sendListInboxToServerEntry();
 	void serverErrorIdleEntry();
+	void setWaitForDeleteEntry();
 	void setWaitForDownloadEntry();
 	void setWaitForListInboxEntry();
+	void showDeleteFailedEntry();
 	void showErrorLoadingInboxEntry();
+	void showRetryDeleteEntry();
 	void showRetryDownloadEntry();
 	void showRetryListInboxEntry();
 	void showServerErrorEntry();
 	void storeListOfServerFilesEntry();
 	void updateMergedTableEntry();
+	void wasDeleteSuccessfulEntry();
 	void wasListInboxValidEntry();
 
 public:
@@ -65,23 +74,31 @@ public:
 		kStart = 1,
 		kCalculateMergedFiles,
 		kCopyDownloadToLocalFiles,
+		kDeleteLocalFile,
+		kDoesDeletedItemExistLocally,
+		kDoesFileExistOnServer,
 		kDoesSelectedItemExistLocally,
 		kEnd,
-		kHackRemoveItemFromList,
 		kIdle,
 		kMakeListOfLocalFiles,
+		kRemoveFileFromLocalAndServerLists,
+		kSendDeleteRequestToServer,
 		kSendDownloadRequestToServer,
 		kSendGoPlayToVC,
 		kSendListInboxToServer,
 		kServerErrorIdle,
+		kSetWaitForDelete,
 		kSetWaitForDownload,
 		kSetWaitForListInbox,
+		kShowDeleteFailed,
 		kShowErrorLoadingInbox,
+		kShowRetryDelete,
 		kShowRetryDownload,
 		kShowRetryListInbox,
 		kShowServerError,
 		kStoreListOfServerFiles,
 		kUpdateMergedTable,
+		kWasDeleteSuccessful,
 		kWasListInboxValid,
 	};
 

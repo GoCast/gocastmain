@@ -51,6 +51,20 @@ void MyInboxScreen::doesSelectedItemExistLocallyEntry()
     SetImmediateEvent(result ? kYes : kNo);
 }
 
+void MyInboxScreen::doesDeletedItemExistLocallyEntry()
+{
+    bool result = std::find(mLocalFileList.begin(), mLocalFileList.end(), mMergedFileList[mItemSelected]) != mLocalFileList.end();
+
+    SetImmediateEvent(result ? kYes : kNo);
+}
+
+void MyInboxScreen::doesFileExistOnServerEntry()
+{
+    bool result = std::find(mServerFileList.begin(), mServerFileList.end(), mMergedFileList[mItemSelected]) != mServerFileList.end();
+
+    SetImmediateEvent(result ? kYes : kNo);
+}
+
 void MyInboxScreen::wasListInboxValidEntry()
 {
     bool result = false;
@@ -63,8 +77,20 @@ void MyInboxScreen::wasListInboxValidEntry()
     SetImmediateEvent(result ? kYes : kNo);
 }
 
+void MyInboxScreen::wasDeleteSuccessfulEntry()
+{
+    bool result = false;
+
+    if (JSONUtil::extract(mDeleteFileJSON)["status"] == std::string("success"))
+    {
+        result = true;
+    }
+
+    SetImmediateEvent(result ? kYes : kNo);
+}
+
 #pragma mark Actions
-void MyInboxScreen::hackRemoveItemFromListEntry()
+void MyInboxScreen::removeFileFromLocalAndServerListsEntry()
 {
     std::string str = mMergedFileList[mItemSelected];
     std::vector<std::string>::iterator iter = std::find(mLocalFileList.begin(), mLocalFileList.end(), str);
@@ -78,6 +104,11 @@ void MyInboxScreen::hackRemoveItemFromListEntry()
     {
         mServerFileList.erase(iter);
     }
+}
+
+void MyInboxScreen::deleteLocalFileEntry()
+{
+    tFile(tFile::kDocumentsDirectory, mMergedFileList[mItemSelected]).remove();
 }
 
 void MyInboxScreen::makeListOfLocalFilesEntry()
@@ -116,6 +147,18 @@ void MyInboxScreen::copyDownloadToLocalFilesEntry()
 {
     tFile(tFile::kTemporaryDirectory, mMergedFileList[mItemSelected].c_str()).rename(tFile::kDocumentsDirectory, mMergedFileList[mItemSelected].c_str());
     mLocalFileList.push_back(mMergedFileList[mItemSelected]);
+}
+
+void MyInboxScreen::sendDeleteRequestToServerEntry()
+{
+    char buf[512];
+
+    sprintf(buf, "%s?action=deleteFile&name=%s&file=%s",
+            kMemoAppServerURL,
+            std::string(tFile(tFile::kPreferencesDirectory, "logintoken.txt")).c_str(),
+            mMergedFileList[mItemSelected].c_str());
+
+    URLLoader::getInstance()->loadString(buf);
 }
 
 void MyInboxScreen::sendListInboxToServerEntry()
@@ -158,9 +201,24 @@ void MyInboxScreen::setWaitForListInboxEntry()
     [gAppDelegateInstance setBlockingViewVisible:true];
 }
 
+void MyInboxScreen::setWaitForDeleteEntry()
+{
+    [gAppDelegateInstance setBlockingViewVisible:true];
+}
+
+void MyInboxScreen::showDeleteFailedEntry()
+{
+    tAlert("Could not delete file from server inbox");
+}
+
 void MyInboxScreen::showErrorLoadingInboxEntry()
 {
     tAlert("There was an error loading inbox from the server");
+}
+
+void MyInboxScreen::showRetryDeleteEntry()
+{
+    tConfirm("Couldn't contact server, retry delete?");
 }
 
 void MyInboxScreen::showRetryDownloadEntry()
@@ -193,25 +251,33 @@ void MyInboxScreen::CallEntry()
 	{
 		case kCalculateMergedFiles: calculateMergedFilesEntry(); break;
 		case kCopyDownloadToLocalFiles: copyDownloadToLocalFilesEntry(); break;
+		case kDeleteLocalFile: deleteLocalFileEntry(); break;
+		case kDoesDeletedItemExistLocally: doesDeletedItemExistLocallyEntry(); break;
+		case kDoesFileExistOnServer: doesFileExistOnServerEntry(); break;
 		case kDoesSelectedItemExistLocally: doesSelectedItemExistLocallyEntry(); break;
 		case kEnd: EndEntryHelper(); break;
-		case kHackRemoveItemFromList: hackRemoveItemFromListEntry(); break;
 		case kIdle: idleEntry(); break;
 		case kInvalidState: invalidStateEntry(); break;
 		case kMakeListOfLocalFiles: makeListOfLocalFilesEntry(); break;
+		case kRemoveFileFromLocalAndServerLists: removeFileFromLocalAndServerListsEntry(); break;
+		case kSendDeleteRequestToServer: sendDeleteRequestToServerEntry(); break;
 		case kSendDownloadRequestToServer: sendDownloadRequestToServerEntry(); break;
 		case kSendGoPlayToVC: sendGoPlayToVCEntry(); break;
 		case kSendListInboxToServer: sendListInboxToServerEntry(); break;
 		case kServerErrorIdle: serverErrorIdleEntry(); break;
+		case kSetWaitForDelete: setWaitForDeleteEntry(); break;
 		case kSetWaitForDownload: setWaitForDownloadEntry(); break;
 		case kSetWaitForListInbox: setWaitForListInboxEntry(); break;
+		case kShowDeleteFailed: showDeleteFailedEntry(); break;
 		case kShowErrorLoadingInbox: showErrorLoadingInboxEntry(); break;
+		case kShowRetryDelete: showRetryDeleteEntry(); break;
 		case kShowRetryDownload: showRetryDownloadEntry(); break;
 		case kShowRetryListInbox: showRetryListInboxEntry(); break;
 		case kShowServerError: showServerErrorEntry(); break;
 		case kStart: startEntry(); break;
 		case kStoreListOfServerFiles: storeListOfServerFilesEntry(); break;
 		case kUpdateMergedTable: updateMergedTableEntry(); break;
+		case kWasDeleteSuccessful: wasDeleteSuccessfulEntry(); break;
 		case kWasListInboxValid: wasListInboxValidEntry(); break;
 		default: break;
 	}
@@ -225,21 +291,31 @@ int  MyInboxScreen::StateTransitionFunction(const int evt) const
 {
 	if ((mState == kCalculateMergedFiles) && (evt == kNext)) return kUpdateMergedTable; else
 	if ((mState == kCopyDownloadToLocalFiles) && (evt == kNext)) return kSendGoPlayToVC; else
+	if ((mState == kDeleteLocalFile) && (evt == kNext)) return kDoesFileExistOnServer; else
+	if ((mState == kDoesDeletedItemExistLocally) && (evt == kNo)) return kDoesFileExistOnServer; else
+	if ((mState == kDoesDeletedItemExistLocally) && (evt == kYes)) return kDeleteLocalFile; else
+	if ((mState == kDoesFileExistOnServer) && (evt == kNo)) return kRemoveFileFromLocalAndServerLists; else
+	if ((mState == kDoesFileExistOnServer) && (evt == kYes)) return kSetWaitForDelete; else
 	if ((mState == kDoesSelectedItemExistLocally) && (evt == kNo)) return kSetWaitForDownload; else
 	if ((mState == kDoesSelectedItemExistLocally) && (evt == kYes)) return kSendGoPlayToVC; else
-	if ((mState == kHackRemoveItemFromList) && (evt == kNext)) return kCalculateMergedFiles; else
-	if ((mState == kIdle) && (evt == kItemDeleted)) return kHackRemoveItemFromList; else
+	if ((mState == kIdle) && (evt == kItemDeleted)) return kDoesDeletedItemExistLocally; else
 	if ((mState == kIdle) && (evt == kItemSelected)) return kDoesSelectedItemExistLocally; else
 	if ((mState == kMakeListOfLocalFiles) && (evt == kNext)) return kSetWaitForListInbox; else
+	if ((mState == kRemoveFileFromLocalAndServerLists) && (evt == kNext)) return kCalculateMergedFiles; else
+	if ((mState == kSendDeleteRequestToServer) && (evt == kFail)) return kShowRetryDelete; else
+	if ((mState == kSendDeleteRequestToServer) && (evt == kSuccess)) return kWasDeleteSuccessful; else
 	if ((mState == kSendDownloadRequestToServer) && (evt == kFail)) return kShowRetryDownload; else
 	if ((mState == kSendDownloadRequestToServer) && (evt == kSuccess)) return kCopyDownloadToLocalFiles; else
 	if ((mState == kSendListInboxToServer) && (evt == kFail)) return kShowRetryListInbox; else
 	if ((mState == kSendListInboxToServer) && (evt == kSuccess)) return kWasListInboxValid; else
 	if ((mState == kServerErrorIdle) && (evt == kItemDeleted)) return kShowServerError; else
 	if ((mState == kServerErrorIdle) && (evt == kItemSelected)) return kShowServerError; else
+	if ((mState == kSetWaitForDelete) && (evt == kNext)) return kSendDeleteRequestToServer; else
 	if ((mState == kSetWaitForDownload) && (evt == kNext)) return kSendDownloadRequestToServer; else
 	if ((mState == kSetWaitForListInbox) && (evt == kNext)) return kSendListInboxToServer; else
+	if ((mState == kShowDeleteFailed) && (evt == kYes)) return kRemoveFileFromLocalAndServerLists; else
 	if ((mState == kShowErrorLoadingInbox) && (evt == kYes)) return kShowServerError; else
+	if ((mState == kShowRetryDelete) && (evt == kYes)) return kSendDeleteRequestToServer; else
 	if ((mState == kShowRetryDownload) && (evt == kNo)) return kIdle; else
 	if ((mState == kShowRetryDownload) && (evt == kYes)) return kSetWaitForDownload; else
 	if ((mState == kShowRetryListInbox) && (evt == kNo)) return kShowServerError; else
@@ -248,6 +324,8 @@ int  MyInboxScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kStart) && (evt == kNext)) return kMakeListOfLocalFiles; else
 	if ((mState == kStoreListOfServerFiles) && (evt == kNext)) return kCalculateMergedFiles; else
 	if ((mState == kUpdateMergedTable) && (evt == kNext)) return kIdle; else
+	if ((mState == kWasDeleteSuccessful) && (evt == kNo)) return kShowDeleteFailed; else
+	if ((mState == kWasDeleteSuccessful) && (evt == kYes)) return kRemoveFileFromLocalAndServerLists; else
 	if ((mState == kWasListInboxValid) && (evt == kNo)) return kShowErrorLoadingInbox; else
 	if ((mState == kWasListInboxValid) && (evt == kYes)) return kStoreListOfServerFiles;
 
@@ -260,8 +338,10 @@ bool MyInboxScreen::HasEdgeNamedNext() const
 	{
 		case kCalculateMergedFiles:
 		case kCopyDownloadToLocalFiles:
-		case kHackRemoveItemFromList:
+		case kDeleteLocalFile:
 		case kMakeListOfLocalFiles:
+		case kRemoveFileFromLocalAndServerLists:
+		case kSetWaitForDelete:
 		case kSetWaitForDownload:
 		case kSetWaitForListInbox:
 		case kStart:
@@ -313,6 +393,10 @@ void MyInboxScreen::update(const URLLoaderEvent& msg)
             {
                 case kSendListInboxToServer:
                     mListInboxJSON = msg.mString;
+                    break;
+
+                case kSendDeleteRequestToServer:
+                    mDeleteFileJSON = msg.mString;
                     break;
 
                 default:
