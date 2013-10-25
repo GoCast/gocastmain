@@ -21,14 +21,14 @@ function listInbox($name)
 {
 	if (userExists($name))
 	{
-		if (!is_dir("database/inbox/$name"))
+		if (!is_dir("database/user/$name/inbox"))
 		{
-			mkdir("database/inbox/$name", 0777, true);
+			mkdir("database/user/$name/inbox", 0777, true);
 		}
 
-		if (is_dir("database/inbox/$name"))
+		if (is_dir("database/user/$name/inbox"))
 		{
-			$arr2 = scandir("database/inbox/$name");
+			$arr2 = scandir("database/user/$name/inbox");
 
 			if ($arr2 != false)
 			{

@@ -2,7 +2,7 @@
 
 function getFile($name, $file)
 {
-	if (is_file("database/inbox/$name/$file"))
+	if (is_file("database/user/$name/inbox/$file"))
 	{
 		$result = array(	"status" => "success",
 							"url" => "http://".

@@ -2,9 +2,9 @@
 
 function deleteFile($name, $file)
 {
-	if (is_file("database/inbox/$name/$file"))
+	if (is_file("database/user/$name/inbox/$file"))
 	{
-		if (unlink("database/inbox/$name/$file"))
+		if (unlink("database/user/$name/inbox/$file"))
 		{
 			$result = array(	"status" => "success",
 								"message" => "File deleted on server successfully");

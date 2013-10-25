@@ -6,12 +6,13 @@ function postGroup($from, $group, $filename)
 
 	foreach($group as $member)
 	{
-		if (!is_dir("database/inbox/$member"))
+		if (!is_dir("database/user/$member/inbox"))
 		{
-			mkdir("database/inbox/$member", 0777, true);
+			mkdir("database/user/$member/inbox", 0777, true);
 		}
 
-		if (copy($_FILES['filename']['tmp_name'], "database/inbox/$member/$from-$filename") == false)
+		$shortfrom = substr($from, 0, strpos($from, "@"));
+		if (copy($_FILES['filename']['tmp_name'], "database/user/$member/inbox/$filename-$shortfrom") == false)
 		{
 			$anyerror = true;
 		}
