@@ -28,37 +28,19 @@ void PlayAudioScreen::startEntry()
     [gAppDelegateInstance setNavigationBarTitle:"Playback Audio"];
 
 
-    //TODO: fix this hack
     std::string from;
-    std::string date;
-
-    size_t fromEndPos;
-    bool fromForeign = false;
-    fromEndPos = 0;
 
     std::string str = mFilename;
 
-    if (!(str[0] >= '0' && str[0] <= '9'))
+    if (str.find('-', 0) != std::string::npos)
     {
-        for(size_t i = 0; i < str.size(); i++)
-        {
-            if (str[i] == '-')
-            {
-                fromEndPos = i;
-                break;
-            }
-        }
-        fromForeign = true;
-    }
-
-    if (fromForeign)
-    {
-        from = str.substr(0, fromEndPos);
+        from = str.substr(str.find('-', 0) + 1);
     }
     else
     {
         from = "Me";
     }
+
     //TODO: end hack
     [gAppDelegateInstance setPlayAudioFromLabel:from];
 }

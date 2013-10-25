@@ -21,12 +21,15 @@ protected:
 	void endEntry();
 	void invalidStateEntry();
 
+	void deleteAllLocalFilesEntry();
 	void idleEntry();
 	void isThisClientCompatibleEntry();
 	void sendFailToVCEntry();
 	void sendSuccessToVCEntry();
 	void sendVersionRequiredRequestEntry();
 	void showRetryVersionEntry();
+	void wasLastRunOldVersionEntry();
+	void writeThisVersionTokenEntry();
 
 	void idleExit();
 
@@ -46,6 +49,7 @@ public:
 	{
 		kInvalidState = 0,
 		kStart = 1,
+		kDeleteAllLocalFiles,
 		kEnd,
 		kIdle,
 		kIsThisClientCompatible,
@@ -53,6 +57,8 @@ public:
 		kSendSuccessToVC,
 		kSendVersionRequiredRequest,
 		kShowRetryVersion,
+		kWasLastRunOldVersion,
+		kWriteThisVersionToken,
 	};
 
 protected:

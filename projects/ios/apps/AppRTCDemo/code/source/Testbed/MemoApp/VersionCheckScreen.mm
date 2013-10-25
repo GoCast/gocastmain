@@ -52,7 +52,7 @@ void VersionCheckScreen::isThisClientCompatibleEntry()
 
     if (JSONUtil::extract(mVersionRequiredJSON)["status"] == std::string("success"))
     {
-        if (atoi(JSONUtil::extract(mVersionRequiredJSON)["version"].c_str()) == 1)
+        if (atoi(JSONUtil::extract(mVersionRequiredJSON)["version"].c_str()) == 2)
         {
             result = true;
         }
@@ -61,11 +61,53 @@ void VersionCheckScreen::isThisClientCompatibleEntry()
     SetImmediateEvent(result ? kYes : kNo);
 }
 
+void VersionCheckScreen::wasLastRunOldVersionEntry()
+{
+    tFile tokenFile(tFile::kPreferencesDirectory, "versiontoken.txt");
+    bool tokenExists = tokenFile.exists();
+    bool result = true;
+
+    if (tokenExists)
+    {
+        if (atoi(std::string(tokenFile).c_str()) == 2)
+        {
+            result = false;
+        }
+    }
+
+    SetImmediateEvent(result ? kYes : kNo);
+}
 
 #pragma mark Actions
 void VersionCheckScreen::sendVersionRequiredRequestEntry()
 {
     URLLoader::getInstance()->loadString(kMemoAppServerURL"?action=versionRequired");
+}
+
+void VersionCheckScreen::deleteAllLocalFilesEntry()
+{
+    tFile prefsDir(tFile::kPreferencesDirectory, "");
+
+    std::vector<std::string> fileList = prefsDir.directoryListing();
+
+    for(size_t i = 0; i < fileList.size(); i++)
+    {
+        tFile(tFile::kPreferencesDirectory, fileList[i]).remove();
+    }
+
+    tFile docsDir(tFile::kDocumentsDirectory, "");
+
+    fileList = docsDir.directoryListing();
+
+    for(size_t i = 0; i < fileList.size(); i++)
+    {
+        tFile(tFile::kDocumentsDirectory, fileList[i]).remove();
+    }
+}
+
+void VersionCheckScreen::writeThisVersionTokenEntry()
+{
+    tFile(tFile::kPreferencesDirectory, "versiontoken.txt").write("2");
 }
 
 #pragma mark User Interface
@@ -90,6 +132,7 @@ void VersionCheckScreen::CallEntry()
 {
 	switch(mState)
 	{
+		case kDeleteAllLocalFiles: deleteAllLocalFilesEntry(); break;
 		case kEnd: EndEntryHelper(); break;
 		case kIdle: idleEntry(); break;
 		case kInvalidState: invalidStateEntry(); break;
@@ -99,6 +142,8 @@ void VersionCheckScreen::CallEntry()
 		case kSendVersionRequiredRequest: sendVersionRequiredRequestEntry(); break;
 		case kShowRetryVersion: showRetryVersionEntry(); break;
 		case kStart: startEntry(); break;
+		case kWasLastRunOldVersion: wasLastRunOldVersionEntry(); break;
+		case kWriteThisVersionToken: writeThisVersionTokenEntry(); break;
 		default: break;
 	}
 }
@@ -114,14 +159,18 @@ void VersionCheckScreen::CallExit()
 
 int  VersionCheckScreen::StateTransitionFunction(const int evt) const
 {
+	if ((mState == kDeleteAllLocalFiles) && (evt == kNext)) return kWriteThisVersionToken; else
 	if ((mState == kIdle) && (evt == kRetry)) return kSendVersionRequiredRequest; else
 	if ((mState == kIsThisClientCompatible) && (evt == kNo)) return kSendFailToVC; else
-	if ((mState == kIsThisClientCompatible) && (evt == kYes)) return kSendSuccessToVC; else
+	if ((mState == kIsThisClientCompatible) && (evt == kYes)) return kWasLastRunOldVersion; else
 	if ((mState == kSendVersionRequiredRequest) && (evt == kFail)) return kShowRetryVersion; else
 	if ((mState == kSendVersionRequiredRequest) && (evt == kSuccess)) return kIsThisClientCompatible; else
 	if ((mState == kShowRetryVersion) && (evt == kNo)) return kIdle; else
 	if ((mState == kShowRetryVersion) && (evt == kYes)) return kSendVersionRequiredRequest; else
-	if ((mState == kStart) && (evt == kNext)) return kSendVersionRequiredRequest;
+	if ((mState == kStart) && (evt == kNext)) return kSendVersionRequiredRequest; else
+	if ((mState == kWasLastRunOldVersion) && (evt == kNo)) return kSendSuccessToVC; else
+	if ((mState == kWasLastRunOldVersion) && (evt == kYes)) return kDeleteAllLocalFiles; else
+	if ((mState == kWriteThisVersionToken) && (evt == kNext)) return kSendSuccessToVC;
 
 	return kInvalidState;
 }
@@ -130,7 +179,9 @@ bool VersionCheckScreen::HasEdgeNamedNext() const
 {
 	switch(mState)
 	{
+		case kDeleteAllLocalFiles:
 		case kStart:
+		case kWriteThisVersionToken:
 			return true;
 		default: break;
 	}

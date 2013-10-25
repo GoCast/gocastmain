@@ -176,7 +176,7 @@ void MyInboxScreen::sendDownloadRequestToServerEntry()
 {
     char buf[512];
 
-    sprintf(buf, "%sdatabase/inbox/%s/%s",
+    sprintf(buf, "%sdatabase/user/%s/inbox/%s",
             kMemoAppServerURL,
             std::string(tFile(tFile::kPreferencesDirectory, "logintoken.txt")).c_str(),
             mMergedFileList[mItemSelected].c_str());

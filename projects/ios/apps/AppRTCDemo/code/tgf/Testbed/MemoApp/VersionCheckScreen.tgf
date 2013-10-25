@@ -6,12 +6,19 @@
 6 Send fail to VC
 7 idle*
 8 Show "Retry version?"
+9 Was last run old version?
+10 Delete all local files
+11 Write this version token
 #
 1 4
 4 5 success
 5 6 no
-5 3 yes
+5 9 yes
 4 8 fail
 8 4 yes
 7 4 retry
 8 7 no
+9 3 no
+9 10 yes
+10 11
+11 3

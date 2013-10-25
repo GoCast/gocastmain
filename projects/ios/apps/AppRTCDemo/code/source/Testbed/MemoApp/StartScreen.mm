@@ -55,12 +55,9 @@ void StartScreen::isNameAndPasswordFormatCorrectEntry()
 
     bool result = !str.empty();
 
-    for (size_t i = 0; i < str.size(); i++)
-    {
-        result &=   (str[i] >= '0' && str[i] <= '9') ||
-                    (str[i] >= 'a' && str[i] <= 'z') ||
-                    (str[i] >= 'A' && str[i] <= 'Z');
-    }
+    NSString *emailRegex = @".+@([A-Za-z0-9]+\\.)+[A-Za-z]{2}[A-Za-z]*";
+    NSPredicate *emailTest = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", emailRegex];
+    result &= ([emailTest evaluateWithObject:[NSString stringWithUTF8String:str.c_str()]] == YES) ? true : false;
 
     str = [gAppDelegateInstance getPassword];
 

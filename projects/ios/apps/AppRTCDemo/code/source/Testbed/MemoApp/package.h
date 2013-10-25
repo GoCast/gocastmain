@@ -1,6 +1,10 @@
 #pragma once
 
+#ifdef ADHOC
 #define kMemoAppServerURL "http://terencejgrant.com/memoappserver/"
+#else
+#define kMemoAppServerURL "http://127.0.0.1:8888/"
+#endif
 
 #include <string>
 #include <map>
