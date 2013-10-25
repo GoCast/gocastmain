@@ -4,7 +4,7 @@ function register($name, $password)
 {
 	if (!is_dir("database/"))
 	{
-		mkdir("database/", 0700, true);
+		mkdir("database/", 0777, true);
 	}
 
 	$json = false;

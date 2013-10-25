@@ -16,6 +16,10 @@ function postGroup($from, $group, $filename)
 		{
 			$anyerror = true;
 		}
+		else
+		{
+			chmod("database/user/$member/inbox/$filename-$shortfrom", 0777);
+		}
 	}
 
 	if ($anyerror == false)
