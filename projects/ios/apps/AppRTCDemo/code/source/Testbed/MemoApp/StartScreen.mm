@@ -77,7 +77,7 @@ void StartScreen::wasLoginSuccessfulEntry()
 {
     bool result = false;
 
-    if (JSONUtil::extract(mLoginJSON)["status"] == std::string("success"))
+    if (JSONUtil::extract(mLoginJSON)["status"].mString == std::string("success"))
     {
         result = true;
     }
@@ -89,7 +89,7 @@ void StartScreen::wasRegisterSuccessfulEntry()
 {
     bool result = false;
 
-    if (JSONUtil::extract(mRegisterJSON)["status"] == std::string("success"))
+    if (JSONUtil::extract(mRegisterJSON)["status"].mString == std::string("success"))
     {
         result = true;
     }

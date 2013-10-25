@@ -4,25 +4,68 @@
 #include "Io/package.h"
 #include "package.h"
 
-std::map<std::string, std::string> JSONUtil::extract(const std::string& newJSONString)
+JSONObject   JSONUtil::ParseObject(JSONNODE* n)
+{
+    JSONObject result;
+
+    for (JSONNODE_ITERATOR i = json_begin(n); i != json_end(n); i++)
+    {
+        json_char* node_name = json_name(*i);
+
+        switch(json_type(*i))
+        {
+            case JSON_NODE:     result[node_name] = JSONUtil::ParseObject(*i); break;
+            case JSON_ARRAY:    result[node_name] = JSONUtil::ParseArray(*i); break;
+            case JSON_STRING:   result[node_name] = std::string(json_as_string(*i)); break;
+            case JSON_NUMBER:   result[node_name] = json_as_float(*i); break;
+            case JSON_BOOL:     result[node_name] = json_as_bool(*i) ? true : false; break;
+            case JSON_NULL:     result[node_name] = JSONValue((void*)NULL); break;
+
+            default:
+                assert(0);
+                break;
+        }
+    }
+
+    return result;
+}
+
+JSONArray    JSONUtil::ParseArray(JSONNODE* n)
+{
+    JSONArray result;
+
+    for (JSONNODE_ITERATOR i = json_begin(n); i != json_end(n); i++)
+    {
+        switch(json_type(*i))
+        {
+            case JSON_NODE:     result.push_back(JSONUtil::ParseObject(*i)); break;
+            case JSON_ARRAY:    result.push_back(JSONUtil::ParseArray(*i)); break;
+            case JSON_STRING:   result.push_back(std::string(json_as_string(*i))); break;
+            case JSON_NUMBER:   result.push_back(json_as_float(*i)); break;
+            case JSON_BOOL:     result.push_back(json_as_bool(*i) ? true : false); break;
+            case JSON_NULL:     result.push_back(JSONValue((void*)NULL)); break;
+
+            default:
+                assert(0);
+                break;
+        }
+    }
+    
+    return result;
+}
+
+JSONObject JSONUtil::extract(const std::string& newJSONString)
 {
     NSLog(@"JSONUtil::extract: %s", newJSONString.c_str());
 
-    std::map<std::string, std::string> result;
+    JSONObject result;
 
-    NSError *error = nil;
-    NSData *responseData = [NSData dataWithBytes:newJSONString.c_str() length:newJSONString.size()];
+    JSONNODE* n = json_parse(newJSONString.c_str());
 
-    NSDictionary *json = [NSJSONSerialization JSONObjectWithData:responseData
-                                                         options:0
-                                                           error:&error];
-    if (!error)
-    {
-        for (NSString* key in json)
-        {
-            result[[key UTF8String]] = [[json objectForKey:key] UTF8String];
-        }
-    }
+    result = ParseObject(n);
+
+    json_delete(n);
+
     return result;
 }
 

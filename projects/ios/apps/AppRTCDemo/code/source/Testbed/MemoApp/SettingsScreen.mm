@@ -71,7 +71,7 @@ void SettingsScreen::wasChangePasswordSuccessfulEntry()
 {
     bool result = false;
 
-    if (JSONUtil::extract(mChangePasswordJSON)["status"] == std::string("success"))
+    if (JSONUtil::extract(mChangePasswordJSON)["status"].mString == std::string("success"))
     {
         result = true;
     }

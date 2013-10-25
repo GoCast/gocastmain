@@ -53,14 +53,14 @@ void SendToGroupScreen::isGroupEmptyEntry()
 
 void SendToGroupScreen::isUserListValidEntry()
 {
-    bool result = JSONUtil::extract(mUserListJSON)["status"] == std::string("success");
+    bool result = JSONUtil::extract(mUserListJSON)["status"].mString == std::string("success");
 
     SetImmediateEvent(result ? kYes : kNo);
 }
 
 void SendToGroupScreen::wasPostGroupSuccessfulEntry()
 {
-    bool result = JSONUtil::extract(mPostGroupJSON)["status"] == std::string("success");
+    bool result = JSONUtil::extract(mPostGroupJSON)["status"].mString == std::string("success");
 
     SetImmediateEvent(result ? kYes : kNo);
 }
@@ -135,7 +135,7 @@ void SendToGroupScreen::showUserListEmptyEntry()
 
 void SendToGroupScreen::updateLocalUserListEntry()
 {
-    mUserListTable = JSONUtil::explodeCommas(JSONUtil::extract(mUserListJSON)["list"]);
+    mUserListTable = JSONUtil::explodeCommas(JSONUtil::extract(mUserListJSON)["list"].mString);
     [gAppDelegateInstance setUserListTable:mUserListTable];
 }
 

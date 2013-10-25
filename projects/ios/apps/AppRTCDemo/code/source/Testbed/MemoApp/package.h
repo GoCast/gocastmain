@@ -10,6 +10,8 @@
 #include <map>
 #include <set>
 
+#include "libjson.h"
+
 #include "JSONUtil.h"
 #include "URLLoader.h"
 
