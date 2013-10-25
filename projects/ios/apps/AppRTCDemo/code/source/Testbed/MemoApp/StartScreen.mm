@@ -77,7 +77,7 @@ void StartScreen::wasLoginSuccessfulEntry()
 {
     bool result = false;
 
-    if (JSONUtil::extract(mLoginJSON)["status"].mString == std::string("success"))
+    if (mLoginJSON["status"].mString == std::string("success"))
     {
         result = true;
     }
@@ -89,7 +89,7 @@ void StartScreen::wasRegisterSuccessfulEntry()
 {
     bool result = false;
 
-    if (JSONUtil::extract(mRegisterJSON)["status"].mString == std::string("success"))
+    if (mRegisterJSON["status"].mString == std::string("success"))
     {
         result = true;
     }
@@ -285,11 +285,11 @@ void StartScreen::update(const URLLoaderEvent& msg)
             switch (getState())
             {
                 case kSendLoginRequest:
-                    mLoginJSON = msg.mString;
+                    mLoginJSON = JSONUtil::extract(msg.mString);
                     break;
 
                 case kSendRegisterRequest:
-                    mRegisterJSON = msg.mString;
+                    mRegisterJSON = JSONUtil::extract(msg.mString);
                     break;
 
                 default:

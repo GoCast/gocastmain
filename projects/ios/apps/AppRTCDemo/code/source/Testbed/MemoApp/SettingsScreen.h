@@ -11,7 +11,7 @@ class SettingsScreen
     public Screen
 {
 protected:
-    std::string mChangePasswordJSON;
+    JSONObject mChangePasswordJSON;
 
 public:
 	SettingsScreen();

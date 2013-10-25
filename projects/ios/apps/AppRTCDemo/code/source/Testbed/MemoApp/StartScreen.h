@@ -11,8 +11,8 @@ class StartScreen
     public Screen
 {
 protected:
-    std::string mLoginJSON;
-    std::string mRegisterJSON;
+    JSONObject mLoginJSON;
+    JSONObject mRegisterJSON;
 
 public:
 	StartScreen();

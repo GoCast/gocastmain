@@ -71,7 +71,7 @@ void SettingsScreen::wasChangePasswordSuccessfulEntry()
 {
     bool result = false;
 
-    if (JSONUtil::extract(mChangePasswordJSON)["status"].mString == std::string("success"))
+    if (mChangePasswordJSON["status"].mString == std::string("success"))
     {
         result = true;
     }
@@ -237,7 +237,7 @@ void SettingsScreen::update(const URLLoaderEvent& msg)
             switch (getState())
             {
                 case kSendChangePasswordRequest:
-                    mChangePasswordJSON = msg.mString;
+                    mChangePasswordJSON = JSONUtil::extract(msg.mString);
                     break;
 
                 default:

@@ -53,14 +53,14 @@ void SendToGroupScreen::isGroupEmptyEntry()
 
 void SendToGroupScreen::isUserListValidEntry()
 {
-    bool result = JSONUtil::extract(mUserListJSON)["status"].mString == std::string("success");
+    bool result = mUserListJSON["status"].mString == std::string("success");
 
     SetImmediateEvent(result ? kYes : kNo);
 }
 
 void SendToGroupScreen::wasPostGroupSuccessfulEntry()
 {
-    bool result = JSONUtil::extract(mPostGroupJSON)["status"].mString == std::string("success");
+    bool result = mPostGroupJSON["status"].mString == std::string("success");
 
     SetImmediateEvent(result ? kYes : kNo);
 }
@@ -135,7 +135,7 @@ void SendToGroupScreen::showUserListEmptyEntry()
 
 void SendToGroupScreen::updateLocalUserListEntry()
 {
-    mUserListTable = JSONUtil::explodeCommas(JSONUtil::extract(mUserListJSON)["list"].mString);
+    mUserListTable = JSONUtil::explodeCommas(mUserListJSON["list"].mString);
     [gAppDelegateInstance setUserListTable:mUserListTable];
 }
 
@@ -256,11 +256,11 @@ void SendToGroupScreen::update(const URLLoaderEvent& msg)
             switch (getState())
             {
                 case kSendUserListToServer:
-                    mUserListJSON = msg.mString;
+                    mUserListJSON = JSONUtil::extract(msg.mString);
                     break;
 
                 case kSendPostGroupToServer:
-                    mPostGroupJSON = msg.mString;
+                    mPostGroupJSON = JSONUtil::extract(msg.mString);
                     break;
 
                 default:

@@ -50,9 +50,9 @@ void VersionCheckScreen::isThisClientCompatibleEntry()
 {
     bool result = false;
 
-    if (JSONUtil::extract(mVersionRequiredJSON)["status"].mString == std::string("success"))
+    if (mVersionRequiredJSON["status"].mString == std::string("success"))
     {
-        if (atoi(JSONUtil::extract(mVersionRequiredJSON)["version"].mString.c_str()) == 2)
+        if (atoi(mVersionRequiredJSON["version"].mString.c_str()) == 2)
         {
             result = true;
         }
@@ -218,7 +218,7 @@ void VersionCheckScreen::update(const URLLoaderEvent& msg)
             switch (getState())
             {
                 case kSendVersionRequiredRequest:
-                    mVersionRequiredJSON = msg.mString;
+                    mVersionRequiredJSON = JSONUtil::extract(msg.mString);
                     break;
 
                 default:

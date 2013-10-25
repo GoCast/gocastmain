@@ -69,7 +69,7 @@ void MyInboxScreen::wasListInboxValidEntry()
 {
     bool result = false;
 
-    if (JSONUtil::extract(mListInboxJSON)["status"].mString == std::string("success"))
+    if (mListInboxJSON["status"].mString == std::string("success"))
     {
         result = true;
     }
@@ -81,7 +81,7 @@ void MyInboxScreen::wasDeleteSuccessfulEntry()
 {
     bool result = false;
 
-    if (JSONUtil::extract(mDeleteFileJSON)["status"].mString == std::string("success"))
+    if (mDeleteFileJSON["status"].mString == std::string("success"))
     {
         result = true;
     }
@@ -118,7 +118,7 @@ void MyInboxScreen::makeListOfLocalFilesEntry()
 
 void MyInboxScreen::storeListOfServerFilesEntry()
 {
-    mServerFileList = JSONUtil::explodeCommas(JSONUtil::extract(mListInboxJSON)["list"].mString);
+    mServerFileList = JSONUtil::explodeCommas(mListInboxJSON["list"].mString);
 
     std::vector<std::string> serverListMod;
     for(size_t i = 0; i < mServerFileList.size(); i++)
@@ -392,11 +392,11 @@ void MyInboxScreen::update(const URLLoaderEvent& msg)
             switch (getState())
             {
                 case kSendListInboxToServer:
-                    mListInboxJSON = msg.mString;
+                    mListInboxJSON = JSONUtil::extract(msg.mString);
                     break;
 
                 case kSendDeleteRequestToServer:
-                    mDeleteFileJSON = msg.mString;
+                    mDeleteFileJSON = JSONUtil::extract(msg.mString);
                     break;
 
                 default:

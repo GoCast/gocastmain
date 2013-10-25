@@ -14,8 +14,8 @@ protected:
     std::vector<std::string> mServerFileList;
     std::vector<std::string> mMergedFileList;
 
-    std::string mListInboxJSON;
-    std::string mDeleteFileJSON;
+    JSONObject mListInboxJSON;
+    JSONObject mDeleteFileJSON;
     tUInt32 mItemSelected;
 
 public:

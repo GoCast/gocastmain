@@ -10,7 +10,7 @@ class VersionCheckScreen
     public Screen
 {
 protected:
-    std::string mVersionRequiredJSON;
+    JSONObject mVersionRequiredJSON;
 
 public:
 	VersionCheckScreen();
