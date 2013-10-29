@@ -2,9 +2,16 @@
 
 class JSONValue;
 typedef std::map<std::string, JSONValue> JSONObject;
-typedef std::vector<JSONValue> JSONArray;
+//typedef std::vector<JSONValue> JSONArray;
 
-#pragma once
+class JSONArray
+: public std::vector<JSONValue>
+{
+public:
+    JSONArray() { }
+    JSONArray(const std::vector<std::string>& newVec);
+    operator std::vector<std::string>() const;
+};
 
 class JSONValue
 {
@@ -90,6 +97,40 @@ public:
     JSONValue(const JSONArray& newArray) : mType(kJSONArray), mArray(newArray) { }
     JSONValue(bool newBool) : mType(newBool ? kTrue : kFalse) { }
     JSONValue(void*) : mType(kNull) { }
+
+    bool operator == (const JSONValue b) const
+    {
+        if (mType == b.mType)
+        {
+            switch (mType)
+            {
+                case kString:       return mString == b.mString; break;
+                case kNumber:       return mNumber == b.mNumber; break;
+                case kJSONObject:   return mObject == b.mObject; break;
+                case kJSONArray:    return mArray == b.mArray; break;
+                default:
+                    break;
+            }
+        }
+        return mType == b.mType;
+    }
+
+    bool operator < (const JSONValue b) const
+    {
+        if (mType == b.mType)
+        {
+            switch (mType)
+            {
+                case kString:       return mString < b.mString; break;
+                case kNumber:       return mNumber < b.mNumber; break;
+                case kJSONObject:   return mObject < b.mObject; break;
+                case kJSONArray:    return mArray < b.mArray; break;
+                default:
+                    break;
+            }
+        }
+        return mType < b.mType;
+    }
 
     std::string toString()
     {
@@ -189,7 +230,5 @@ protected:
 
 public:
     static JSONObject extract(const std::string& newJSONString);
-
-    static std::vector<std::string> explodeCommas(const std::string& newString);
 };
 

@@ -85,7 +85,7 @@ void SendToGroupScreen::sendPostGroupToServerEntry()
 
     for (size_t i = 0; i < mSelectedGroup.size(); i++)
     {
-        params.push_back(std::pair<std::string, std::string>("group[]", mSelectedGroup[i]));
+        params.push_back(std::pair<std::string, std::string>("group[]", mSelectedGroup[i].mString));
     }
 
     params.push_back(std::pair<std::string, std::string>("MAX_FILE_SIZE", "1048576"));
@@ -135,7 +135,7 @@ void SendToGroupScreen::showUserListEmptyEntry()
 
 void SendToGroupScreen::updateLocalUserListEntry()
 {
-    mUserListTable = JSONUtil::explodeCommas(mUserListJSON["list"].mString);
+    mUserListTable = mUserListJSON["list"].mArray;
     [gAppDelegateInstance setUserListTable:mUserListTable];
 }
 

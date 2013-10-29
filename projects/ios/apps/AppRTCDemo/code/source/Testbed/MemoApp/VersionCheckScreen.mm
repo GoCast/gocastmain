@@ -52,7 +52,7 @@ void VersionCheckScreen::isThisClientCompatibleEntry()
 
     if (mVersionRequiredJSON["status"].mString == std::string("success"))
     {
-        if (atoi(mVersionRequiredJSON["version"].mString.c_str()) == 2)
+        if (atoi(mVersionRequiredJSON["version"].mString.c_str()) == 3)
         {
             result = true;
         }
@@ -69,7 +69,7 @@ void VersionCheckScreen::wasLastRunOldVersionEntry()
 
     if (tokenExists)
     {
-        if (atoi(std::string(tokenFile).c_str()) == 2)
+        if (atoi(std::string(tokenFile).c_str()) == 3)
         {
             result = false;
         }
@@ -107,7 +107,7 @@ void VersionCheckScreen::deleteAllLocalFilesEntry()
 
 void VersionCheckScreen::writeThisVersionTokenEntry()
 {
-    tFile(tFile::kPreferencesDirectory, "versiontoken.txt").write("2");
+    tFile(tFile::kPreferencesDirectory, "versiontoken.txt").write("3");
 }
 
 #pragma mark User Interface

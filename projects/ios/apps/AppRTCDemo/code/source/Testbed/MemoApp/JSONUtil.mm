@@ -4,6 +4,26 @@
 #include "Io/package.h"
 #include "package.h"
 
+JSONArray::JSONArray(const std::vector<std::string>& newVec)
+{
+    for(std::vector<std::string>::const_iterator iter = newVec.begin(); iter != newVec.end(); iter++)
+    {
+        push_back(*iter);
+    }
+}
+
+JSONArray::operator std::vector<std::string>() const
+{
+    std::vector<std::string> result;
+
+    for(JSONArray::const_iterator iter = begin(); iter != end(); iter++)
+    {
+        result.push_back(iter->mString);
+    }
+
+    return result;
+}
+
 JSONObject   JSONUtil::ParseObject(JSONNODE* n)
 {
     JSONObject result;
@@ -69,29 +89,3 @@ JSONObject JSONUtil::extract(const std::string& newJSONString)
     return result;
 }
 
-std::vector<std::string> JSONUtil::explodeCommas(const std::string& newString)
-{
-    std::vector<std::string> result;
-    std::string temp;
-
-    temp = "";
-    for(size_t i = 0; i < newString.size(); i++)
-    {
-        if (newString[i] != ',')
-        {
-            temp += newString[i];
-        }
-        else
-        {
-            result.push_back(temp);
-            temp = "";
-        }
-    }
-
-    if (!temp.empty())
-    {
-        result.push_back(temp);
-    }
-
-    return result;
-}

@@ -11,8 +11,8 @@ class SendToGroupScreen
     public Screen
 {
 protected:
-    std::vector<std::string> mUserListTable;
-    std::vector<std::string> mSelectedGroup;
+    JSONArray mUserListTable;
+    JSONArray mSelectedGroup;
     JSONObject mUserListJSON;
     JSONObject mPostGroupJSON;
     std::string mFilename;

@@ -92,8 +92,8 @@ void MyInboxScreen::wasDeleteSuccessfulEntry()
 #pragma mark Actions
 void MyInboxScreen::removeFileFromLocalAndServerListsEntry()
 {
-    std::string str = mMergedFileList[mItemSelected];
-    std::vector<std::string>::iterator iter = std::find(mLocalFileList.begin(), mLocalFileList.end(), str);
+    std::string str = mMergedFileList[mItemSelected].mString;
+    JSONArray::iterator iter = std::find(mLocalFileList.begin(), mLocalFileList.end(), str);
     if (iter != mLocalFileList.end())
     {
         mLocalFileList.erase(iter);
@@ -108,7 +108,7 @@ void MyInboxScreen::removeFileFromLocalAndServerListsEntry()
 
 void MyInboxScreen::deleteLocalFileEntry()
 {
-    tFile(tFile::kDocumentsDirectory, mMergedFileList[mItemSelected]).remove();
+    tFile(tFile::kDocumentsDirectory, mMergedFileList[mItemSelected].mString).remove();
 }
 
 void MyInboxScreen::makeListOfLocalFilesEntry()
@@ -118,12 +118,12 @@ void MyInboxScreen::makeListOfLocalFilesEntry()
 
 void MyInboxScreen::storeListOfServerFilesEntry()
 {
-    mServerFileList = JSONUtil::explodeCommas(mListInboxJSON["list"].mString);
+    mServerFileList = mListInboxJSON["list"].mArray;
 
-    std::vector<std::string> serverListMod;
+    JSONArray serverListMod;
     for(size_t i = 0; i < mServerFileList.size(); i++)
     {
-        if (mServerFileList[i] != "." && mServerFileList[i] != "..")
+        if (mServerFileList[i].mString != "." && mServerFileList[i].mString != "..")
         {
             serverListMod.push_back(mServerFileList[i]);
         }
@@ -134,7 +134,7 @@ void MyInboxScreen::storeListOfServerFilesEntry()
 
 void MyInboxScreen::calculateMergedFilesEntry()
 {
-    std::set<std::string> mergedSet;
+    std::set<JSONValue> mergedSet;
 
     mergedSet.insert(mLocalFileList.begin(), mLocalFileList.end());
     mergedSet.insert(mServerFileList.begin(), mServerFileList.end());
@@ -145,7 +145,7 @@ void MyInboxScreen::calculateMergedFilesEntry()
 
 void MyInboxScreen::copyDownloadToLocalFilesEntry()
 {
-    tFile(tFile::kTemporaryDirectory, mMergedFileList[mItemSelected].c_str()).rename(tFile::kDocumentsDirectory, mMergedFileList[mItemSelected].c_str());
+    tFile(tFile::kTemporaryDirectory, mMergedFileList[mItemSelected].mString.c_str()).rename(tFile::kDocumentsDirectory, mMergedFileList[mItemSelected].mString.c_str());
     mLocalFileList.push_back(mMergedFileList[mItemSelected]);
 }
 
@@ -156,7 +156,7 @@ void MyInboxScreen::sendDeleteRequestToServerEntry()
     sprintf(buf, "%s?action=deleteFile&name=%s&file=%s",
             kMemoAppServerURL,
             std::string(tFile(tFile::kPreferencesDirectory, "logintoken.txt")).c_str(),
-            mMergedFileList[mItemSelected].c_str());
+            mMergedFileList[mItemSelected].mString.c_str());
 
     URLLoader::getInstance()->loadString(buf);
 }
@@ -179,9 +179,9 @@ void MyInboxScreen::sendDownloadRequestToServerEntry()
     sprintf(buf, "%sdatabase/user/%s/inbox/%s",
             kMemoAppServerURL,
             std::string(tFile(tFile::kPreferencesDirectory, "logintoken.txt")).c_str(),
-            mMergedFileList[mItemSelected].c_str());
+            mMergedFileList[mItemSelected].mString.c_str());
 
-    URLLoader::getInstance()->loadFile(buf, tFile(tFile::kTemporaryDirectory, mMergedFileList[mItemSelected].c_str()));
+    URLLoader::getInstance()->loadFile(buf, tFile(tFile::kTemporaryDirectory, mMergedFileList[mItemSelected].mString.c_str()));
 }
 
 #pragma mark User Interface
@@ -241,7 +241,7 @@ void MyInboxScreen::sendGoPlayToVCEntry()
 {
     bool existsOnServer = std::find(mServerFileList.begin(), mServerFileList.end(), mMergedFileList[mItemSelected]) != mServerFileList.end();
 
-    this->tSubject<const MemoAppMessage&>::notify(MemoAppMessage(MemoApp::kGoPlay, mMergedFileList[mItemSelected], existsOnServer));
+    this->tSubject<const MemoAppMessage&>::notify(MemoAppMessage(MemoApp::kGoPlay, mMergedFileList[mItemSelected].mString, existsOnServer));
 }
 
 #pragma mark State wiring

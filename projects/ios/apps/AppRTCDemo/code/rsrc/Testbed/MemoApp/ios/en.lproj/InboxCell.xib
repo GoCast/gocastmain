@@ -52,7 +52,7 @@
                         <rect key="frame" x="50" y="27" width="240" height="28"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <attributedString key="attributedText">
-                            <fragment content="Translation not available">
+                            <fragment content="Transcription not available">
                                 <attributes>
                                     <color key="NSColor" red="0.50196078431372548" green="0.50196078431372548" blue="0.50196078431372548" alpha="1" colorSpace="calibratedRGB"/>
                                     <font key="NSFont" size="12" name="HelveticaNeue"/>

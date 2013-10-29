@@ -10,9 +10,9 @@ class MyInboxScreen
     public Screen
 {
 protected:
-    std::vector<std::string> mLocalFileList;
-    std::vector<std::string> mServerFileList;
-    std::vector<std::string> mMergedFileList;
+    JSONArray mLocalFileList;
+    JSONArray mServerFileList;
+    JSONArray mMergedFileList;
 
     JSONObject mListInboxJSON;
     JSONObject mDeleteFileJSON;
