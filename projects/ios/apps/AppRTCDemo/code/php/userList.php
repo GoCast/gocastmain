@@ -9,26 +9,8 @@ function userList()
 
 		$arr2 = array_keys($arr);
 
-		$i = 0;
-		$c = count($arr2);
-
-		$flat_list = "";
-		foreach ($arr2 as $v)
-		{
-			$i++;
-
-			if ($i < $c)
-			{
-				$flat_list = $flat_list.$v.',';
-			}
-			else
-			{
-				$flat_list = $flat_list.$v;
-			}
-		}
-
 		$result = array("status" => "success",
-						"list" => $flat_list);
+						"list" => $arr2);
 	}
 	else
 	{

@@ -3,7 +3,7 @@
 function versionRequired()
 {
 	$result = array("status" => "success",
-					"version" => "2");
+					"version" => "3");
 
 	return $result;
 }
