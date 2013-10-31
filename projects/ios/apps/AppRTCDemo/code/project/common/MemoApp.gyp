@@ -156,9 +156,6 @@
 			'../../source/Base/<@(OS)',
 			'../../source/Bootstrap/<@(OS)',
 			'../../source/Io/<@(OS)',
-
-			'../../third-party/libjson/',
-			'../../third-party/libjson/_internal/Source/',
 		 ],  # include_dirs
 
 		'xcode_settings': {
@@ -181,24 +178,6 @@
 					'../../third-party/TestFlightSDK2.0.2/TestFlight.h',
 					'../../third-party/TestFlightSDK2.0.2/TestFlight+AsyncLogging.h',
 					'../../third-party/TestFlightSDK2.0.2/TestFlight+ManualSessions.h',
-
-					'../../third-party/libjson/JSONOptions.h',
-					'../../third-party/libjson/libjson.h',
-
-					'../../third-party/libjson/_internal/Source/internalJSONNode.cpp',
-					'../../third-party/libjson/_internal/Source/JSONAllocator.cpp',
-					'../../third-party/libjson/_internal/Source/JSONChildren.cpp',
-					'../../third-party/libjson/_internal/Source/JSONDebug.cpp',
-					'../../third-party/libjson/_internal/Source/JSONIterators.cpp',
-					'../../third-party/libjson/_internal/Source/JSONMemory.cpp',
-					'../../third-party/libjson/_internal/Source/JSONNode_Mutex.cpp',
-					'../../third-party/libjson/_internal/Source/JSONNode.cpp',
-					'../../third-party/libjson/_internal/Source/JSONPreparse.cpp',
-					'../../third-party/libjson/_internal/Source/JSONStream.cpp',
-					'../../third-party/libjson/_internal/Source/JSONValidator.cpp',
-					'../../third-party/libjson/_internal/Source/JSONWorker.cpp',
-					'../../third-party/libjson/_internal/Source/JSONWriter.cpp',
-					'../../third-party/libjson/_internal/Source/libjson.cpp',
 
 				],	# sources
 

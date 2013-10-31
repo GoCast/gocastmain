@@ -24,53 +24,76 @@ JSONArray::operator std::vector<std::string>() const
     return result;
 }
 
-JSONObject   JSONUtil::ParseObject(JSONNODE* n)
+JSONObject   JSONUtil::ParseObject(NSDictionary* n)
 {
     JSONObject result;
 
-    for (JSONNODE_ITERATOR i = json_begin(n); i != json_end(n); i++)
+    for (NSString* i in n)
     {
-        json_char* node_name = json_name(*i);
+        std::string node_name = [i UTF8String];
+        id o = [n objectForKey:i];
 
-        switch(json_type(*i))
+        if ([o isKindOfClass:[NSDictionary class]])
         {
-            case JSON_NODE:     result[node_name] = JSONUtil::ParseObject(*i); break;
-            case JSON_ARRAY:    result[node_name] = JSONUtil::ParseArray(*i); break;
-            case JSON_STRING:   result[node_name] = std::string(json_as_string(*i)); break;
-            case JSON_NUMBER:   result[node_name] = json_as_float(*i); break;
-            case JSON_BOOL:     result[node_name] = json_as_bool(*i) ? true : false; break;
-            case JSON_NULL:     result[node_name] = JSONValue((void*)NULL); break;
-
-            default:
-                assert(0);
-                break;
+            result[node_name] = JSONUtil::ParseObject(o);
         }
-    }
-
-    return result;
-}
-
-JSONArray    JSONUtil::ParseArray(JSONNODE* n)
-{
-    JSONArray result;
-
-    for (JSONNODE_ITERATOR i = json_begin(n); i != json_end(n); i++)
-    {
-        switch(json_type(*i))
+        else if ([o isKindOfClass:[NSArray class]])
         {
-            case JSON_NODE:     result.push_back(JSONUtil::ParseObject(*i)); break;
-            case JSON_ARRAY:    result.push_back(JSONUtil::ParseArray(*i)); break;
-            case JSON_STRING:   result.push_back(std::string(json_as_string(*i))); break;
-            case JSON_NUMBER:   result.push_back(json_as_float(*i)); break;
-            case JSON_BOOL:     result.push_back(json_as_bool(*i) ? true : false); break;
-            case JSON_NULL:     result.push_back(JSONValue((void*)NULL)); break;
-
-            default:
-                assert(0);
-                break;
+            result[node_name] = JSONUtil::ParseArray(o);
+        }
+        else if ([o isKindOfClass:[NSString class]])
+        {
+            result[node_name] = std::string([o UTF8String]);
+        }
+        else if ([o isKindOfClass:[NSNumber class]])
+        {
+            result[node_name] = double([o doubleValue]);
+        }
+        else if ([o isKindOfClass:[NSNull class]])
+        {
+            result[node_name] = JSONValue((void*)NULL);
+        }
+        else
+        {
+            assert(0);
         }
     }
     
+    return result;
+}
+
+JSONArray    JSONUtil::ParseArray(NSArray* n)
+{
+    JSONArray result;
+
+    for (id i in n)
+    {
+        if ([i isKindOfClass:[NSDictionary class]])
+        {
+            result.push_back(JSONUtil::ParseObject(i));
+        }
+        else if ([i isKindOfClass:[NSArray class]])
+        {
+            result.push_back(JSONUtil::ParseArray(i));
+        }
+        else if ([i isKindOfClass:[NSString class]])
+        {
+            result.push_back(std::string([i UTF8String]));
+        }
+        else if ([i isKindOfClass:[NSNumber class]])
+        {
+            result.push_back(double([i doubleValue]));
+        }
+        else if ([i isKindOfClass:[NSNull class]])
+        {
+            result.push_back(JSONValue((void*)NULL));
+        }
+        else
+        {
+            assert(0);
+        }
+    }
+
     return result;
 }
 
@@ -80,11 +103,16 @@ JSONObject JSONUtil::extract(const std::string& newJSONString)
 
     JSONObject result;
 
-    JSONNODE* n = json_parse(newJSONString.c_str());
+    NSData *responseData = [NSData dataWithBytes:newJSONString.c_str() length:newJSONString.size()];
 
-    result = ParseObject(n);
-
-    json_delete(n);
+    NSError *error = nil;
+    NSDictionary *n = [NSJSONSerialization JSONObjectWithData:responseData
+                                                      options:0
+                                                        error:&error];
+    if (!error)
+    {
+        result = JSONUtil::ParseObject(n);
+    }
 
     return result;
 }

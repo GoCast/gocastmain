@@ -1,5 +1,8 @@
 #pragma once
 
+@class NSDictionary;
+@class NSArray;
+
 class JSONValue;
 typedef std::map<std::string, JSONValue> JSONObject;
 //typedef std::vector<JSONValue> JSONArray;
@@ -225,8 +228,8 @@ public:
 class JSONUtil
 {
 protected:
-    static JSONObject   ParseObject(JSONNODE* n);
-    static JSONArray    ParseArray(JSONNODE* n);
+    static JSONObject   ParseObject(NSDictionary* n);
+    static JSONArray    ParseArray(NSArray* n);
 
 public:
     static JSONObject extract(const std::string& newJSONString);

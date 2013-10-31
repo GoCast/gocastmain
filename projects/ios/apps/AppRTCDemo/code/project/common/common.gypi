@@ -113,7 +113,7 @@
 					'GCC_WARN_64_TO_32_BIT_CONVERSION': 'YES',
 					'GCC_WARN_UNUSED_VARIABLE': 'YES',
 					'MACOSX_DEPLOYMENT_TARGET': '10.7',
-# 					'GCC_ENABLE_CPP_EXCEPTIONS': 'NO',
+					'GCC_ENABLE_CPP_EXCEPTIONS': 'NO',
 					'GCC_ENABLE_CPP_RTTI': 'NO',
 					'RUN_CLANG_STATIC_ANALYZER': 'YES',
 					'VALIDATE_PRODUCT': 'YES',
@@ -144,7 +144,7 @@
 
 					'WARNING_CFLAGS': [
 						'-Wall',
-#						'-Werror',
+						'-Werror',
 						'-Wextra',
 						'-Wbad-function-cast',
 						'-Wdeclaration-after-statement',
