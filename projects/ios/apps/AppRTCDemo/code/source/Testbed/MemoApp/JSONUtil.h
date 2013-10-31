@@ -2,6 +2,8 @@
 
 @class NSDictionary;
 @class NSArray;
+@class NSMutableDictionary;
+@class NSMutableArray;
 
 class JSONValue;
 typedef std::map<std::string, JSONValue> JSONObject;
@@ -135,103 +137,19 @@ public:
         return mType < b.mType;
     }
 
-    std::string toString()
-    {
-        switch (mType)
-        {
-            case kInvalid:
-                assert(0);
-                break;
-            case kString:
-                return mString;
-                break;
-            case kNumber:
-            {
-                char buf[16];
-                sprintf(buf, "%lf", mNumber);
-                return buf;
-            }
-                break;
-            case kJSONObject:
-            {
-                std::set<std::string> keys;
-
-                std::map<std::string, JSONValue>::const_iterator kiter;
-
-                for(kiter = mObject.begin(); kiter != mObject.end(); kiter++)
-                {
-                    keys.insert(kiter->first);
-                }
-
-                std::string sb = "{";
-
-                std::set<std::string>::iterator iter;
-                JSONValue val;
-                for (iter = keys.begin(); iter != keys.end(); iter++)
-                {
-                    if (sb.length() > 1)
-                    {
-                        sb += ',';
-                    }
-                    sb += quote(*iter);
-                    sb += ':';
-
-                    val = mObject[*iter];
-
-                    if (val.mType == JSONValue::kString)
-                    {
-                        sb += quote(mObject[*iter].toString());
-                    }
-                    else
-                    {
-                        sb += mObject[*iter].toString();
-                    }
-                }
-
-                sb += '}';
-
-                return sb;
-            }
-                break;
-            case kJSONArray:
-            {
-                size_t len = mArray.size();
-                std::string sb;
-
-                for (size_t i = 0; i < len; i += 1)
-                {
-                    if (i > 0)
-                    {
-                        sb += ',';
-                    }
-                    sb += mArray[i].toString();
-                }
-
-                return '[' + sb + ']';
-            }
-                break;
-            case kTrue:
-                return "true";
-                break;
-            case kFalse:
-                return "false";
-                break;
-            case kNull:
-                return "null";
-                break;
-        }
-        
-        return "";
-    }
+    std::string toString();
 };
 
 class JSONUtil
 {
 protected:
-    static JSONObject   ParseObject(NSDictionary* n);
-    static JSONArray    ParseArray(NSArray* n);
+    static NSMutableDictionary* JSONObjectToNSDictionary(const JSONObject& n);
+    static NSMutableArray*      JSONArrayToNSArray(const JSONArray& n);
+    static JSONObject           ParseObject(NSDictionary* n);
+    static JSONArray            ParseArray(NSArray* n);
 
 public:
     static JSONObject extract(const std::string& newJSONString);
+    static std::string compact(const JSONObject& newJSONObject);
 };
 

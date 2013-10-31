@@ -24,6 +24,105 @@ JSONArray::operator std::vector<std::string>() const
     return result;
 }
 
+std::string JSONValue::toString()
+{
+    switch (mType)
+    {
+        case kInvalid:
+            assert(0);
+            break;
+        case kString:
+            return mString;
+            break;
+        case kNumber:
+        {
+            char buf[16];
+            sprintf(buf, "%lf", mNumber);
+            return buf;
+        }
+            break;
+        case kJSONObject:
+            return JSONUtil::compact(mObject);
+            break;
+        case kJSONArray:
+        {
+            size_t len = mArray.size();
+            std::string sb;
+
+            for (size_t i = 0; i < len; i += 1)
+            {
+                if (i > 0)
+                {
+                    sb += ',';
+                }
+                sb += mArray[i].toString();
+            }
+
+            return '[' + sb + ']';
+        }
+            break;
+        case kTrue:
+            return "true";
+            break;
+        case kFalse:
+            return "false";
+            break;
+        case kNull:
+            return "null";
+            break;
+    }
+
+    return "";
+}
+
+
+NSMutableDictionary* JSONUtil::JSONObjectToNSDictionary(const JSONObject& n)
+{
+    NSMutableDictionary* result = [[[NSMutableDictionary alloc] init] autorelease];
+
+    for(JSONObject::const_iterator i = n.begin(); i != n.end(); i++)
+    {
+        NSString* key = [NSString stringWithUTF8String:i->first.c_str()];
+        switch(i->second.mType)
+        {
+            case JSONValue::kJSONObject:    [result setObject:JSONObjectToNSDictionary(i->second.mObject) forKey:key]; break;
+            case JSONValue::kJSONArray:     [result setObject:JSONArrayToNSArray(i->second.mArray) forKey:key]; break;
+            case JSONValue::kString:        [result setObject:[NSString stringWithUTF8String:i->second.mString.c_str()] forKey:key]; break;
+            case JSONValue::kNumber:        [result setObject:[NSNumber numberWithDouble:i->second.mNumber] forKey:key]; break;
+            case JSONValue::kNull:          [result setObject:[[[NSNull alloc] init] autorelease] forKey:key]; break;
+            case JSONValue::kTrue:          [result setObject:@"true" forKey:key]; break;
+            case JSONValue::kFalse:         [result setObject:@"false" forKey:key]; break;
+            default:
+                break;
+        }
+    }
+
+    return result;
+}
+
+NSMutableArray* JSONUtil::JSONArrayToNSArray(const JSONArray& n)
+{
+    NSMutableArray* result = [[[NSMutableArray alloc] init] autorelease];
+
+    for(size_t i = 0; i < n.size(); i++)
+    {
+        switch(n[i].mType)
+        {
+            case JSONValue::kJSONObject:    [result addObject:JSONObjectToNSDictionary(n[i].mObject)]; break;
+            case JSONValue::kJSONArray:     [result addObject:JSONArrayToNSArray(n[i].mArray)]; break;
+            case JSONValue::kString:        [result addObject:[NSString stringWithUTF8String:n[i].mString.c_str()]]; break;
+            case JSONValue::kNumber:        [result addObject:[NSNumber numberWithDouble:n[i].mNumber]]; break;
+            case JSONValue::kNull:          [result addObject:[[[NSNull alloc] init] autorelease]]; break;
+            case JSONValue::kTrue:          [result addObject:@"true"]; break;
+            case JSONValue::kFalse:         [result addObject:@"false"]; break;
+            default:
+                break;
+        }
+    }
+
+    return result;
+}
+
 JSONObject   JSONUtil::ParseObject(NSDictionary* n)
 {
     JSONObject result;
@@ -112,6 +211,23 @@ JSONObject JSONUtil::extract(const std::string& newJSONString)
     if (!error)
     {
         result = JSONUtil::ParseObject(n);
+    }
+
+    return result;
+}
+
+std::string JSONUtil::compact(const JSONObject& newJSONObject)
+{
+    std::string result;
+
+    NSDictionary* n = JSONObjectToNSDictionary(newJSONObject);
+
+    NSError *error = nil;
+    NSData* d = [NSJSONSerialization dataWithJSONObject:n options:0 error:&error];
+
+    if (!error)
+    {
+        result = [[[[NSString alloc] initWithData:d encoding:NSUTF8StringEncoding] autorelease] UTF8String];
     }
 
     return result;
