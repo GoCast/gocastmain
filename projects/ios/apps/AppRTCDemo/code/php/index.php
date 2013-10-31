@@ -10,6 +10,8 @@ include 'register.php';
 include 'versionRequired.php';
 include 'userList.php';
 include 'postGroup.php';
+include 'getProfile.php';
+include 'updateProfile.php';
 
 	function hasParam($x)
 	{
@@ -57,6 +59,24 @@ include 'postGroup.php';
 					print(json_encode(errorMissingParameter("from")));
 				}
 			}
+			else if ($_POST["action"] === "updateProfile")
+			{
+				if (hasParam("name"))
+				{
+					if (isset($_FILES["filename"]))
+					{
+						print(json_encode(updateProfile($_POST["name"], $_FILES["filename"]["name"])));
+					}
+					else
+					{
+						print(json_encode(errorMissingParameter("filename")));
+					}
+				}
+				else
+				{
+					print(json_encode(errorMissingParameter("name")));
+				}
+			}
 			else
 			{
 				print(json_encode(array("status" => "fail", "message" => "Unknown command")));
@@ -74,9 +94,14 @@ include 'postGroup.php';
 		{
 			switch($_GET["action"])
 			{
+				case "getProfile":
+					print(json_encode(getProfile($_GET["name"])));
+					break;
+
 				case "listInbox":
 					print(json_encode(listInbox($_GET["name"])));
 					break;
+
 				case "getFile":
 					if (hasParam("file"))
 					{
