@@ -4,7 +4,7 @@
 4 Send userList to server
 5 Show "retry userList?"
 6 Is userList valid?
-7 Update local userList
+7 Re-Update local userList
 8 Show "userList empty"
 9 server error idle
 10 Show "server error"
@@ -18,15 +18,24 @@
 18 Get selected group from User Table
 19 Is group empty?
 20 Show "empty selection"
+21 Send getProfile[i] to server
+22 Init i to zero
+23 Is i less than userList count?
+24 Increment i
+25 Set "Wait for userList"
+26 Show "retry getProfile?"
+27 Is profile valid?
+28 update userList[i]
+29 Set "Wait for getProfile"
+30 Update local userList
 #
-1 4
+1 25
 4 5 fail
 4 6 success
-6 7 yes
+6 30 yes
 6 8 no
 5 4 yes
 5 10 no
-7 3
 8 9 yes
 10 9 yes
 9 11 cancel
@@ -47,3 +56,18 @@
 19 12 no
 19 20 yes
 20 3 yes
+23 29 yes
+22 29
+23 3 no
+24 23
+25 4
+21 26 fail
+26 3 no
+21 27 success
+27 28 yes
+28 7
+27 26 no
+29 21
+26 29 yes
+30 22
+7 24

@@ -48,7 +48,7 @@ void EditProfileScreen::wasGetProfileValidEntry()
 {
     bool result = false;
 
-//    if (mGetProfileJSON["status"].mString == std::string("success"))
+    if (mGetProfileJSON["status"].mString == std::string("success"))
     {
         result = true;
     }

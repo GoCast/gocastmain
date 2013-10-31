@@ -65,6 +65,6 @@
 -(void)setUserListTable:(const std::vector<std::string>&)newEntries;
 -(void)setMyInboxTable:(const std::vector<std::string>&)newEntries;
 
--(std::vector<std::string>)getSelectedFromUserListTable;
+-(std::vector<size_t>)getSelectedFromUserListTable;
 
 @end

@@ -341,9 +341,9 @@ extern std::vector<std::string> gMyInboxListEntries;
 }
 
 
--(std::vector<std::string>)getSelectedFromUserListTable
+-(std::vector<size_t>)getSelectedFromUserListTable
 {
-    std::vector<std::string> result;
+    std::vector<size_t> result;
 
     NSArray* selectedIndexPaths = [self.viewController.mSendToGroupTable indexPathsForSelectedRows];
 
@@ -351,7 +351,7 @@ extern std::vector<std::string> gMyInboxListEntries;
     {
         for (NSIndexPath* path in selectedIndexPaths)
         {
-            result.push_back(gUserListEntries[(tUInt32)path.row]);
+            result.push_back((size_t)path.row);
         }
     }
     

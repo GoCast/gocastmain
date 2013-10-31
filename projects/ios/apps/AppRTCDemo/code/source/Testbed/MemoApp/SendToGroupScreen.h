@@ -11,11 +11,14 @@ class SendToGroupScreen
     public Screen
 {
 protected:
+    JSONArray mEmailListTable;
     JSONArray mUserListTable;
     JSONArray mSelectedGroup;
     JSONObject mUserListJSON;
     JSONObject mPostGroupJSON;
+    JSONObject mGetProfileJSON;
     std::string mFilename;
+    size_t      mIter;
 
 public:
 	SendToGroupScreen(const std::string& newFilename);
@@ -28,21 +31,31 @@ protected:
 
 	void getSelectedGroupFromUserTableEntry();
 	void idleEntry();
+	void incrementIEntry();
+	void initIToZeroEntry();
 	void isGroupEmptyEntry();
+	void isILessThanUserListCountEntry();
+	void isProfileValidEntry();
 	void isUserListValidEntry();
+	void reUpdateLocalUserListEntry();
+	void sendGetProfileIToServerEntry();
 	void sendGoInboxToVCEntry();
 	void sendPostGroupToServerEntry();
 	void sendUserListToServerEntry();
 	void serverErrorIdleEntry();
+	void setWaitForGetProfileEntry();
+	void setWaitForUserListEntry();
 	void showEmptySelectionEntry();
 	void showPostGroupFailedEntry();
 	void showPostGroupSuccessEntry();
 	void showReallySendEntry();
+	void showRetryGetProfileEntry();
 	void showRetryPostGroupEntry();
 	void showRetryUserListEntry();
 	void showServerErrorEntry();
 	void showUserListEmptyEntry();
 	void updateLocalUserListEntry();
+	void updateUserListIEntry();
 	void wasPostGroupSuccessfulEntry();
 
 public:
@@ -65,21 +78,31 @@ public:
 		kEnd,
 		kGetSelectedGroupFromUserTable,
 		kIdle,
+		kIncrementI,
+		kInitIToZero,
 		kIsGroupEmpty,
+		kIsILessThanUserListCount,
+		kIsProfileValid,
 		kIsUserListValid,
+		kReUpdateLocalUserList,
+		kSendGetProfileIToServer,
 		kSendGoInboxToVC,
 		kSendPostGroupToServer,
 		kSendUserListToServer,
 		kServerErrorIdle,
+		kSetWaitForGetProfile,
+		kSetWaitForUserList,
 		kShowEmptySelection,
 		kShowPostGroupFailed,
 		kShowPostGroupSuccess,
 		kShowReallySend,
+		kShowRetryGetProfile,
 		kShowRetryPostGroup,
 		kShowRetryUserList,
 		kShowServerError,
 		kShowUserListEmpty,
 		kUpdateLocalUserList,
+		kUpdateUserListI,
 		kWasPostGroupSuccessful,
 	};
 
