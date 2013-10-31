@@ -26,6 +26,7 @@ protected:
 	void deleteLoginTokenFromDiskEntry();
 	void idleEntry();
 	void sendChangePasswordRequestEntry();
+	void sendGoEditProfileToVCEntry();
 	void sendRestartToVCEntry();
 	void setLoginNameEntry();
 	void showChangePasswordFailedEntry();
@@ -42,6 +43,7 @@ public:
 		kInvalidEvent = -2,
 		kNext = -1,
 		kChangePassword,
+		kEditProfile,
 		kFail,
 		kLogOut,
 		kNo,
@@ -58,6 +60,7 @@ public:
 		kEnd,
 		kIdle,
 		kSendChangePasswordRequest,
+		kSendGoEditProfileToVC,
 		kSendRestartToVC,
 		kSetLoginName,
 		kShowChangePasswordFailed,

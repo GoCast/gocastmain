@@ -10,9 +10,13 @@
                 <outlet property="mAudioDurationLabel" destination="mvS-Bp-LwR" id="Lgx-k1-L3g"/>
                 <outlet property="mBlockingView" destination="lKM-qr-eRy" id="fVo-rI-9Pq"/>
                 <outlet property="mChangePasswordButton" destination="4rW-1O-dHI" id="bc7-OL-SNP"/>
+                <outlet property="mEditProfileButton" destination="4Jf-oD-Oe1" id="gyH-Lv-iYy"/>
+                <outlet property="mEditProfileView" destination="irV-Pm-YKq" id="1w4-Sj-4Ah"/>
                 <outlet property="mFrom" destination="ZuS-Qa-3gz" id="FBK-JL-UQu"/>
                 <outlet property="mInboxTab" destination="mIS-gC-azt" id="HhR-ug-abq"/>
                 <outlet property="mInboxTable" destination="18" id="dnQ-pC-apN"/>
+                <outlet property="mKanaName" destination="q5N-Uz-7nb" id="S7K-dj-z7W"/>
+                <outlet property="mKanjiName" destination="NAx-EP-q6u" id="lV2-YC-TXt"/>
                 <outlet property="mLogOutButton" destination="GYD-Ar-cyF" id="IbK-Ir-ZQc"/>
                 <outlet property="mLoggedInLabel" destination="jRu-HO-DoS" id="QvJ-HY-aCs"/>
                 <outlet property="mLoginPassword" destination="16" id="104"/>
@@ -29,6 +33,7 @@
                 <outlet property="mRecordAudioView" destination="wD3-Wi-uv9" id="w0j-RC-GGC"/>
                 <outlet property="mRecordingStatusLabel" destination="qEK-Gu-AnZ" id="aIh-pd-NuL"/>
                 <outlet property="mRetryVersionCheckButton" destination="0LP-f4-HjY" id="LiW-RS-4sW"/>
+                <outlet property="mSaveProfileButton" destination="Zof-qV-oW6" id="Fpn-LR-sWW"/>
                 <outlet property="mSaveRecordingButton" destination="6Ia-LM-tUC" id="SRt-vx-Ijf"/>
                 <outlet property="mSendAudioButton" destination="kAI-4c-ka5" id="TcC-HK-6YH"/>
                 <outlet property="mSendRecordingButton" destination="euc-77-pJ9" id="Zv7-KB-yfi"/>
@@ -170,6 +175,55 @@
                     <rect key="frame" x="0.0" y="0.0" width="320" height="460"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <subviews>
+                        <view contentMode="scaleToFill" id="irV-Pm-YKq" userLabel="mEditProfileView">
+                            <rect key="frame" x="0.0" y="47" width="320" height="366"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <subviews>
+                                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Kanji name:" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="bjh-32-6ZF">
+                                    <rect key="frame" x="0.0" y="20" width="320" height="21"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                    <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                    <nil key="highlightedColor"/>
+                                </label>
+                                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Kana name:" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="WWV-HD-Yht">
+                                    <rect key="frame" x="0.0" y="87" width="320" height="21"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                    <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                    <nil key="highlightedColor"/>
+                                </label>
+                                <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" minimumFontSize="17" id="NAx-EP-q6u" userLabel="mKanjiName">
+                                    <rect key="frame" x="20" y="49" width="280" height="30"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                    <textInputTraits key="textInputTraits" returnKeyType="next"/>
+                                    <connections>
+                                        <outlet property="delegate" destination="-1" id="EiM-gz-YPB"/>
+                                    </connections>
+                                </textField>
+                                <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" minimumFontSize="17" id="q5N-Uz-7nb" userLabel="mKanaName">
+                                    <rect key="frame" x="20" y="116" width="280" height="30"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                    <textInputTraits key="textInputTraits" returnKeyType="done"/>
+                                    <connections>
+                                        <outlet property="delegate" destination="-1" id="DPi-uY-WKi"/>
+                                    </connections>
+                                </textField>
+                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="Zof-qV-oW6" userLabel="mSaveProfileButton">
+                                    <rect key="frame" x="120" y="154" width="80" height="45"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                    <state key="normal" title="Save">
+                                        <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                    </state>
+                                    <connections>
+                                        <action selector="saveProfilePressed:" destination="-1" eventType="touchUpInside" id="Y46-2L-DR5"/>
+                                    </connections>
+                                </button>
+                            </subviews>
+                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                        </view>
                         <view hidden="YES" contentMode="scaleToFill" id="z74-Xq-Z9u" userLabel="mSettingsView">
                             <rect key="frame" x="0.0" y="47" width="320" height="366"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -189,21 +243,21 @@
                                     <nil key="highlightedColor"/>
                                 </label>
                                 <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Old password:" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="gX4-ww-xgi">
-                                    <rect key="frame" x="20" y="97" width="120" height="21"/>
+                                    <rect key="frame" x="20" y="125" width="120" height="21"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                     <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                     <nil key="highlightedColor"/>
                                 </label>
                                 <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="New password:" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="Fwt-SC-sDd">
-                                    <rect key="frame" x="20" y="135" width="120" height="21"/>
+                                    <rect key="frame" x="20" y="163" width="120" height="21"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                     <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                     <nil key="highlightedColor"/>
                                 </label>
                                 <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" minimumFontSize="17" id="TEx-97-45b" userLabel="mOldPassword">
-                                    <rect key="frame" x="148" y="93" width="152" height="30"/>
+                                    <rect key="frame" x="148" y="121" width="152" height="30"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                     <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                     <textInputTraits key="textInputTraits" returnKeyType="next" secureTextEntry="YES"/>
@@ -212,7 +266,7 @@
                                     </connections>
                                 </textField>
                                 <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" minimumFontSize="17" id="eLf-Uh-BcQ" userLabel="mNewPassword">
-                                    <rect key="frame" x="148" y="131" width="152" height="30"/>
+                                    <rect key="frame" x="148" y="159" width="152" height="30"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                     <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                     <textInputTraits key="textInputTraits" returnKeyType="done" secureTextEntry="YES"/>
@@ -221,7 +275,7 @@
                                     </connections>
                                 </textField>
                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="4rW-1O-dHI" userLabel="mChangePasswordButton">
-                                    <rect key="frame" x="90" y="169" width="140" height="45"/>
+                                    <rect key="frame" x="90" y="197" width="140" height="45"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                     <state key="normal" title="Change Password">
                                         <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
@@ -231,13 +285,23 @@
                                     </connections>
                                 </button>
                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="GYD-Ar-cyF" userLabel="mLogOutButton">
-                                    <rect key="frame" x="90" y="222" width="140" height="45"/>
+                                    <rect key="frame" x="90" y="250" width="140" height="45"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                     <state key="normal" title="Log out">
                                         <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                     </state>
                                     <connections>
                                         <action selector="logOutPressed:" destination="-1" eventType="touchUpInside" id="HGy-u7-y6B"/>
+                                    </connections>
+                                </button>
+                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="4Jf-oD-Oe1" userLabel="mEditProfileButton">
+                                    <rect key="frame" x="100" y="68" width="120" height="45"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                    <state key="normal" title="Edit Profile">
+                                        <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                    </state>
+                                    <connections>
+                                        <action selector="editProfilePressed:" destination="-1" eventType="touchUpInside" id="iIi-HU-44r"/>
                                     </connections>
                                 </button>
                             </subviews>

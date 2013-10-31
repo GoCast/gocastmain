@@ -23,6 +23,7 @@
 -(void)setMyInboxScreenVisible:(bool)newVisible;
 -(void)setRecordAudioScreenVisible:(bool)newVisible;
 -(void)setSettingsScreenVisible:(bool)newVisible;
+-(void)setEditProfileScreenVisible:(bool)newVisible;
 
 -(void)setSendToGroupScreenVisible:(bool)newVisible;
 -(void)setPlayAudioScreenVisible:(bool)newVisible;
@@ -50,6 +51,13 @@
 -(void)setSettingsLoggedInName:(const std::string&)newName;
 -(std::string) getOldPassword;
 -(std::string) getNewPassword;
+
+//mEditProfileView
+-(std::string) getKanjiName;
+-(std::string) getKanaName;
+-(void) setKanjiName:(const std::string&)newName;
+-(void) setKanaName:(const std::string&)newName;
+
 
 -(void)startRecorder;
 -(void)stopRecorder;

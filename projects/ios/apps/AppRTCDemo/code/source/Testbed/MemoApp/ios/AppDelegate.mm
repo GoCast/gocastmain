@@ -118,6 +118,7 @@ extern std::vector<std::string> gMyInboxListEntries;
     [self.viewController.mSendToGroupView setHidden:YES];
     [self.viewController.mPlayAudioView setHidden:YES];
     [self.viewController.mSettingsView setHidden:YES];
+    [self.viewController.mEditProfileView setHidden:YES];
     [self.viewController.mBlockingView setHidden:YES];
     [self.viewController.mOldVersionView setHidden:YES];
     [self.viewController.mVersionCheckView setHidden:YES];
@@ -159,6 +160,13 @@ extern std::vector<std::string> gMyInboxListEntries;
     [self.viewController.mTabView setHidden:(newVisible) ? NO : YES];
     self.viewController.mTabBar.selectedItem = self.viewController.mSettingsTab;
     [self.viewController.mSettingsView setHidden:(newVisible) ? NO : YES];
+}
+
+-(void)setEditProfileScreenVisible:(bool)newVisible
+{
+    [self.viewController.mTabView setHidden:(newVisible) ? NO : YES];
+    self.viewController.mTabBar.selectedItem = self.viewController.mSettingsTab;
+    [self.viewController.mEditProfileView setHidden:(newVisible) ? NO : YES];
 }
 
 #pragma mark -
@@ -276,6 +284,28 @@ extern std::vector<std::string> gMyInboxListEntries;
 {
     const char* result = [self.viewController.mNewPassword.text UTF8String];
     return result ? result : "";
+}
+
+//mEditProfileView
+-(std::string) getKanjiName
+{
+    const char* result = [self.viewController.mKanjiName.text UTF8String];
+    return result ? result : "";
+}
+-(std::string) getKanaName
+{
+    const char* result = [self.viewController.mKanaName.text UTF8String];
+    return result ? result : "";
+}
+
+-(void) setKanjiName:(const std::string&)newName
+{
+    self.viewController.mKanjiName.text = [NSString stringWithUTF8String:newName.c_str()];
+}
+
+-(void) setKanaName:(const std::string&)newName
+{
+    self.viewController.mKanaName.text = [NSString stringWithUTF8String:newName.c_str()];
 }
 
 //mSettingsview

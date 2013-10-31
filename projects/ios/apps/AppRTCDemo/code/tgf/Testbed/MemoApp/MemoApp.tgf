@@ -9,6 +9,7 @@
 9 Settings Screen*
 10 Old Version Screen
 11 Version check Screen*
+12 Edit Profile Screen*
 #
 1 8 ready
 6 4 goNewRecording
@@ -31,3 +32,7 @@
 7 9 goSettings
 5 4 goNewRecording
 5 9 goSettings
+9 12 goEditProfile
+12 9 goSettings
+12 6 goInbox
+12 4 goNewRecording

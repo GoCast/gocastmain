@@ -140,6 +140,11 @@ void SettingsScreen::sendRestartToVCEntry()
     this->tSubject<const MemoAppMessage&>::notify(MemoAppMessage(MemoApp::kRestart));
 }
 
+void SettingsScreen::sendGoEditProfileToVCEntry()
+{
+    this->tSubject<const MemoAppMessage&>::notify(MemoAppMessage(MemoApp::kGoEditProfile));
+}
+
 #pragma mark State wiring
 void SettingsScreen::CallEntry()
 {
@@ -151,6 +156,7 @@ void SettingsScreen::CallEntry()
 		case kIdle: idleEntry(); break;
 		case kInvalidState: invalidStateEntry(); break;
 		case kSendChangePasswordRequest: sendChangePasswordRequestEntry(); break;
+		case kSendGoEditProfileToVC: sendGoEditProfileToVCEntry(); break;
 		case kSendRestartToVC: sendRestartToVCEntry(); break;
 		case kSetLoginName: setLoginNameEntry(); break;
 		case kShowChangePasswordFailed: showChangePasswordFailedEntry(); break;
@@ -175,6 +181,7 @@ int  SettingsScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kArePasswordFormatsCorrect) && (evt == kYes)) return kShowReallyChangePassword; else
 	if ((mState == kDeleteLoginTokenFromDisk) && (evt == kNext)) return kSendRestartToVC; else
 	if ((mState == kIdle) && (evt == kChangePassword)) return kArePasswordFormatsCorrect; else
+	if ((mState == kIdle) && (evt == kEditProfile)) return kSendGoEditProfileToVC; else
 	if ((mState == kIdle) && (evt == kLogOut)) return kShowReallyLogOut; else
 	if ((mState == kSendChangePasswordRequest) && (evt == kFail)) return kShowRetryChangePassword; else
 	if ((mState == kSendChangePasswordRequest) && (evt == kSuccess)) return kWasChangePasswordSuccessful; else
@@ -222,6 +229,7 @@ void SettingsScreen::update(const MemoEvent& msg)
         case MemoEvent::kLogOutPressed:         process(kLogOut); break;
         case MemoEvent::kOKYesAlertPressed:     process(kYes); break;
         case MemoEvent::kNoAlertPressed:        process(kNo); break;
+        case MemoEvent::kEditProfilePressed:    process(kEditProfile); break;
         default:
             break;
     }

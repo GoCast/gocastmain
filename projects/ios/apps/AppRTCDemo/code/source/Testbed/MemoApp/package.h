@@ -10,8 +10,6 @@
 #include <map>
 #include <set>
 
-#include "libjson.h"
-
 #include "JSONUtil.h"
 #include "URLLoader.h"
 
@@ -19,6 +17,7 @@
 #include "RecordAudioScreen.h"
 #include "PlayAudioScreen.h"
 #include "SettingsScreen.h"
+#include "EditProfileScreen.h"
 #include "StartScreen.h"
 #include "SendToGroupScreen.h"
 #include "MyInboxScreen.h"

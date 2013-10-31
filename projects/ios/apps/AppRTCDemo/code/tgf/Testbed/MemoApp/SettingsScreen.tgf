@@ -13,6 +13,7 @@
 13 Was changePassword successful?
 14 Show "Retry changePassword?"
 15 Show "changePassword failed"
+16 Send "goEditProfile" to VC
 #
 1 3
 3 4
@@ -34,3 +35,4 @@
 13 7 yes
 13 15 no
 15 4 yes
+4 16 editProfile

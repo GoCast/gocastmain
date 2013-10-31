@@ -40,6 +40,13 @@
 		},
 
 		{
+			'action_name': 'EditProfileScreen.tgf',
+			'inputs': [ '../../tgf/Testbed/MemoApp/EditProfileScreen.tgf', ], # inputs
+			'outputs': [ '../../dummy', ], # outputs
+			'action': [ '<@(_graphcode)', '<@(_inputs)',  '--force-update', '--machine', 'EditProfileScreen', '-h', '../../source/Testbed/MemoApp/EditProfileScreen.h', '-cpp', '../../source/Testbed/MemoApp/EditProfileScreen.mm', ], # action
+		},
+
+		{
 			'action_name': 'StartScreen.tgf',
 			'inputs': [ '../../tgf/Testbed/MemoApp/StartScreen.tgf', ], # inputs
 			'outputs': [ '../../dummy', ], # outputs
@@ -91,6 +98,9 @@
 
 			'../../source/Testbed/MemoApp/SettingsScreen.mm',
 			'../../source/Testbed/MemoApp/SettingsScreen.h',
+
+			'../../source/Testbed/MemoApp/EditProfileScreen.mm',
+			'../../source/Testbed/MemoApp/EditProfileScreen.h',
 
 			'../../source/Testbed/MemoApp/StartScreen.mm',
 			'../../source/Testbed/MemoApp/StartScreen.h',

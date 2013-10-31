@@ -24,6 +24,7 @@ protected:
 	void endEntry();
 	void invalidStateEntry();
 
+	void editProfileScreenEntry();
 	void hideAllViewsEntry();
 	void myInboxScreenEntry();
 	void oldVersionScreenEntry();
@@ -34,6 +35,7 @@ protected:
 	void startScreenEntry();
 	void versionCheckScreenEntry();
 
+	void editProfileScreenExit();
 	void myInboxScreenExit();
 	void playAudioScreenExit();
 	void recordAudioScreenExit();
@@ -48,6 +50,7 @@ public:
 		kInvalidEvent = -2,
 		kNext = -1,
 		kFail,
+		kGoEditProfile,
 		kGoInbox,
 		kGoNewRecording,
 		kGoPlay,
@@ -62,6 +65,7 @@ public:
 	{
 		kInvalidState = 0,
 		kStart = 1,
+		kEditProfileScreen,
 		kEnd,
 		kHideAllViews,
 		kMyInboxScreen,

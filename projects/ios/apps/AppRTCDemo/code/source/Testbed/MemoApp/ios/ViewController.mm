@@ -241,6 +241,22 @@ std::vector<std::string> gMyInboxListEntries;
     MemoEventManager::getInstance()->notify(MemoEvent(MemoEvent::kLogOutPressed));
 }
 
+-(IBAction) editProfilePressed:(id)sender
+{
+#pragma unused(sender)
+    [self.mOldPassword resignFirstResponder];
+    [self.mNewPassword resignFirstResponder];
+    MemoEventManager::getInstance()->notify(MemoEvent(MemoEvent::kEditProfilePressed));
+}
+
+-(IBAction) saveProfilePressed:(id)sender
+{
+#pragma unused(sender)
+    [self.mOldPassword resignFirstResponder];
+    [self.mNewPassword resignFirstResponder];
+    MemoEventManager::getInstance()->notify(MemoEvent(MemoEvent::kSaveProfilePressed));
+}
+
 //mSendToGroupView
 -(IBAction) sendSendToGroupPressed:(id)sender
 {
@@ -280,6 +296,15 @@ std::vector<std::string> gMyInboxListEntries;
     else if (textField == self.mNewPassword)
     {
         [self.mNewPassword resignFirstResponder];
+    }
+    else if (textField == self.mKanjiName)
+    {
+        [self.mKanjiName resignFirstResponder];
+        [self.mKanaName becomeFirstResponder];
+    }
+    else if (textField == self.mKanaName)
+    {
+        [self.mKanaName resignFirstResponder];
     }
 
     return NO;

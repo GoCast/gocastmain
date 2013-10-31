@@ -16,6 +16,8 @@ UIAlertViewDelegate, AVAudioRecorderDelegate>
 @property (nonatomic, strong) IBOutlet UIView* mRecordAudioView;
 @property (nonatomic, strong) IBOutlet UIView* mSettingsView;
 
+@property (nonatomic, strong) IBOutlet UIView* mEditProfileView;
+
 @property (nonatomic, strong) IBOutlet UIView* mSendToGroupView;
 @property (nonatomic, strong) IBOutlet UIView* mPlayAudioView;
 
@@ -61,6 +63,13 @@ UIAlertViewDelegate, AVAudioRecorderDelegate>
 @property (nonatomic, strong) IBOutlet UITextField* mNewPassword;
 @property (nonatomic, strong) IBOutlet UIButton* mChangePasswordButton;
 @property (nonatomic, strong) IBOutlet UIButton* mLogOutButton;
+@property (nonatomic, strong) IBOutlet UIButton* mEditProfileButton;
+
+//mEditProfileView
+@property (nonatomic, strong) IBOutlet UITextField* mKanjiName;
+@property (nonatomic, strong) IBOutlet UITextField* mKanaName;
+@property (nonatomic, strong) IBOutlet UIButton* mSaveProfileButton;
+
 
 //mSendToGroupView
 @property (nonatomic, strong) IBOutlet UITableView* mSendToGroupTable;
@@ -93,6 +102,9 @@ UIAlertViewDelegate, AVAudioRecorderDelegate>
 
 -(IBAction) changePasswordPressed:(id)sender;
 -(IBAction) logOutPressed:(id)sender;
+-(IBAction) editProfilePressed:(id)sender;
+
+-(IBAction) saveProfilePressed:(id)sender;
 
 //mSendToGroupView
 -(IBAction) sendSendToGroupPressed:(id)sender;

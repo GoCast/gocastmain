@@ -1,0 +1,39 @@
+1 start
+2 end
+3 idle
+4 Send getProfile to server
+5 Show "retry getProfile?"
+6 server error idle
+7 Show "server error"
+8 Was getProfile valid?
+9 Show "error getting profile"
+10 Update kanji and kana
+11 Set "wait for getProfile"
+12 Send updateProfile  to server
+13 Show "retry updateProfile?"
+14 Was updateProfile successful?
+15 Show "error updating profile"
+16 Set "wait for updateProfile"
+17 Show "Profile updated successfully"
+#
+4 5 fail
+7 6 yes
+6 7 saveProfile
+5 7 no
+5 11 yes
+4 8 success
+8 10 yes
+8 9 no
+9 7 yes
+10 3
+11 4
+3 16 saveProfile
+12 13 fail
+12 14 success
+14 15 no
+13 12 yes
+16 12
+1 11
+15 7 yes
+14 17 yes
+17 3 yes

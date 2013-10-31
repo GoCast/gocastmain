@@ -25,6 +25,9 @@ public:
 
         kChangePasswordPressed,
         kLogOutPressed,
+        kEditProfilePressed,
+
+        kSaveProfilePressed,
 
         kSendSendToGroupPressed,
         kCancelSendToGroupPressed,

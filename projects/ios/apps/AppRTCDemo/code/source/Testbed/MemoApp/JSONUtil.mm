@@ -230,6 +230,8 @@ std::string JSONUtil::compact(const JSONObject& newJSONObject)
         result = [[[[NSString alloc] initWithData:d encoding:NSUTF8StringEncoding] autorelease] UTF8String];
     }
 
+    NSLog(@"JSONUtil::compact: %s", result.c_str());
+
     return result;
 }
 
