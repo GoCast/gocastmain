@@ -64,6 +64,18 @@ void MemoApp::myInboxScreenExit()
     if (mScreen) { delete mScreen; mScreen = NULL; }
 }
 
+void MemoApp::myGroupsScreenEntry()
+{
+    mScreen = new MyGroupsScreen;
+    mScreen->attach(this);
+}
+
+void MemoApp::myGroupsScreenExit()
+{
+    if (mScreen) { delete mScreen; mScreen = NULL; }
+}
+
+
 void MemoApp::recordAudioScreenEntry()
 {
     mScreen = new RecordAudioScreen;
@@ -144,6 +156,7 @@ void MemoApp::CallEntry()
 		case kEnd: EndEntryHelper(); break;
 		case kHideAllViews: hideAllViewsEntry(); break;
 		case kInvalidState: invalidStateEntry(); break;
+		case kMyGroupsScreen: myGroupsScreenEntry(); break;
 		case kMyInboxScreen: myInboxScreenEntry(); break;
 		case kOldVersionScreen: oldVersionScreenEntry(); break;
 		case kPlayAudioScreen: playAudioScreenEntry(); break;
@@ -162,6 +175,7 @@ void MemoApp::CallExit()
 	switch(mState)
 	{
 		case kEditProfileScreen: editProfileScreenExit(); break;
+		case kMyGroupsScreen: myGroupsScreenExit(); break;
 		case kMyInboxScreen: myInboxScreenExit(); break;
 		case kPlayAudioScreen: playAudioScreenExit(); break;
 		case kRecordAudioScreen: recordAudioScreenExit(); break;
@@ -175,24 +189,33 @@ void MemoApp::CallExit()
 
 int  MemoApp::StateTransitionFunction(const int evt) const
 {
+	if ((mState == kEditProfileScreen) && (evt == kGoGroups)) return kMyGroupsScreen; else
 	if ((mState == kEditProfileScreen) && (evt == kGoInbox)) return kMyInboxScreen; else
 	if ((mState == kEditProfileScreen) && (evt == kGoNewRecording)) return kRecordAudioScreen; else
 	if ((mState == kEditProfileScreen) && (evt == kGoSettings)) return kSettingsScreen; else
 	if ((mState == kHideAllViews) && (evt == kNext)) return kVersionCheckScreen; else
+	if ((mState == kMyGroupsScreen) && (evt == kGoInbox)) return kMyInboxScreen; else
+	if ((mState == kMyGroupsScreen) && (evt == kGoNewRecording)) return kRecordAudioScreen; else
+	if ((mState == kMyGroupsScreen) && (evt == kGoSettings)) return kSettingsScreen; else
+	if ((mState == kMyInboxScreen) && (evt == kGoGroups)) return kMyGroupsScreen; else
 	if ((mState == kMyInboxScreen) && (evt == kGoNewRecording)) return kRecordAudioScreen; else
 	if ((mState == kMyInboxScreen) && (evt == kGoPlay)) return kPlayAudioScreen; else
 	if ((mState == kMyInboxScreen) && (evt == kGoSettings)) return kSettingsScreen; else
+	if ((mState == kPlayAudioScreen) && (evt == kGoGroups)) return kMyGroupsScreen; else
 	if ((mState == kPlayAudioScreen) && (evt == kGoInbox)) return kMyInboxScreen; else
 	if ((mState == kPlayAudioScreen) && (evt == kGoNewRecording)) return kRecordAudioScreen; else
 	if ((mState == kPlayAudioScreen) && (evt == kGoSendGroup)) return kSendToGroupScreen; else
 	if ((mState == kPlayAudioScreen) && (evt == kGoSettings)) return kSettingsScreen; else
+	if ((mState == kRecordAudioScreen) && (evt == kGoGroups)) return kMyGroupsScreen; else
 	if ((mState == kRecordAudioScreen) && (evt == kGoInbox)) return kMyInboxScreen; else
 	if ((mState == kRecordAudioScreen) && (evt == kGoSendGroup)) return kSendToGroupScreen; else
 	if ((mState == kRecordAudioScreen) && (evt == kGoSettings)) return kSettingsScreen; else
+	if ((mState == kSendToGroupScreen) && (evt == kGoGroups)) return kMyGroupsScreen; else
 	if ((mState == kSendToGroupScreen) && (evt == kGoInbox)) return kMyInboxScreen; else
 	if ((mState == kSendToGroupScreen) && (evt == kGoNewRecording)) return kRecordAudioScreen; else
 	if ((mState == kSendToGroupScreen) && (evt == kGoSettings)) return kSettingsScreen; else
 	if ((mState == kSettingsScreen) && (evt == kGoEditProfile)) return kEditProfileScreen; else
+	if ((mState == kSettingsScreen) && (evt == kGoGroups)) return kMyGroupsScreen; else
 	if ((mState == kSettingsScreen) && (evt == kGoInbox)) return kMyInboxScreen; else
 	if ((mState == kSettingsScreen) && (evt == kGoNewRecording)) return kRecordAudioScreen; else
 	if ((mState == kSettingsScreen) && (evt == kRestart)) return kVersionCheckScreen; else
@@ -233,6 +256,13 @@ void MemoApp::update(const MemoEvent& msg)
             if (getState() != kRecordAudioScreen)
             {
                 process(kGoNewRecording);
+            }
+            break;
+
+        case MemoEvent::kGroupsTabPressed:
+            if (getState() != kMyGroupsScreen)
+            {
+                process(kGoGroups);
             }
             break;
 

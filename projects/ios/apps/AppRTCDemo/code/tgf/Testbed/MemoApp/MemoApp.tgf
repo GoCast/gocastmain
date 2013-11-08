@@ -10,6 +10,7 @@
 10 Old Version Screen
 11 Version check Screen*
 12 Edit Profile Screen*
+13 My Groups Screen*
 #
 1 8 ready
 6 4 goNewRecording
@@ -36,3 +37,12 @@
 12 9 goSettings
 12 6 goInbox
 12 4 goNewRecording
+6 13 goGroups
+4 13 goGroups
+5 13 goGroups
+7 13 goGroups
+12 13 goGroups
+13 6 goInbox
+13 4 goNewRecording
+9 13 goGroups
+13 9 goSettings

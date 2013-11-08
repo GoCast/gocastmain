@@ -26,6 +26,7 @@ protected:
 
 	void editProfileScreenEntry();
 	void hideAllViewsEntry();
+	void myGroupsScreenEntry();
 	void myInboxScreenEntry();
 	void oldVersionScreenEntry();
 	void playAudioScreenEntry();
@@ -36,6 +37,7 @@ protected:
 	void versionCheckScreenEntry();
 
 	void editProfileScreenExit();
+	void myGroupsScreenExit();
 	void myInboxScreenExit();
 	void playAudioScreenExit();
 	void recordAudioScreenExit();
@@ -51,6 +53,7 @@ public:
 		kNext = -1,
 		kFail,
 		kGoEditProfile,
+		kGoGroups,
 		kGoInbox,
 		kGoNewRecording,
 		kGoPlay,
@@ -68,6 +71,7 @@ public:
 		kEditProfileScreen,
 		kEnd,
 		kHideAllViews,
+		kMyGroupsScreen,
 		kMyInboxScreen,
 		kOldVersionScreen,
 		kPlayAudioScreen,

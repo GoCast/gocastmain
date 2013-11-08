@@ -257,6 +257,25 @@ std::vector<std::string> gMyInboxListEntries;
     MemoEventManager::getInstance()->notify(MemoEvent(MemoEvent::kSaveProfilePressed));
 }
 
+//mMyGroupsView
+-(IBAction) addGroupPressed:(id)sender
+{
+#pragma unused(sender)
+    MemoEventManager::getInstance()->notify(MemoEvent(MemoEvent::kAddGroupPressed));
+}
+
+-(IBAction) editGroupPressed:(id)sender
+{
+#pragma unused(sender)
+    MemoEventManager::getInstance()->notify(MemoEvent(MemoEvent::kEditGroupPressed));
+}
+
+-(IBAction) deleteGroupPressed:(id)sender
+{
+#pragma unused(sender)
+    MemoEventManager::getInstance()->notify(MemoEvent(MemoEvent::kDeleteGroupPressed));
+}
+
 //mSendToGroupView
 -(IBAction) sendSendToGroupPressed:(id)sender
 {
@@ -461,6 +480,10 @@ std::vector<std::string> gMyInboxListEntries;
     else if (item == self.mNewMemoTab)
     {
         MemoEventManager::getInstance()->notify(MemoEvent(MemoEvent::kNewMemoTabPressed));
+    }
+    else if (item == self.mGroupsTab)
+    {
+        MemoEventManager::getInstance()->notify(MemoEvent(MemoEvent::kGroupsTabPressed));
     }
     else if (item == self.mSettingsTab)
     {

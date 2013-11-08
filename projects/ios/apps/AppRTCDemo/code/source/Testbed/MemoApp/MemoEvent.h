@@ -12,6 +12,7 @@ public:
 
         kInboxTabPressed,
         kNewMemoTabPressed,
+        kGroupsTabPressed,
         kSettingsTabPressed,
 
         kStartRecordingPressed,
@@ -22,6 +23,10 @@ public:
 
         kPlayAudioPressed,
         kSendAudioPressed,
+
+        kAddGroupPressed,
+        kEditGroupPressed,
+        kDeleteGroupPressed,
 
         kChangePasswordPressed,
         kLogOutPressed,

@@ -2,17 +2,22 @@
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="4514" systemVersion="13A603" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none">
     <dependencies>
         <deployment defaultVersion="1536" identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="3746"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="3747"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="ViewController">
             <connections>
+                <outlet property="mAddGroupButton" destination="Db6-e7-xn3" id="uNe-DV-fwv"/>
                 <outlet property="mAudioDurationLabel" destination="mvS-Bp-LwR" id="Lgx-k1-L3g"/>
                 <outlet property="mBlockingView" destination="lKM-qr-eRy" id="fVo-rI-9Pq"/>
                 <outlet property="mChangePasswordButton" destination="4rW-1O-dHI" id="bc7-OL-SNP"/>
+                <outlet property="mCurrentGroupsTable" destination="4m7-Ig-dpw" id="zQQ-0b-Ye4"/>
+                <outlet property="mDeleteGroupButton" destination="6fo-po-ise" id="qS8-xK-IPO"/>
+                <outlet property="mEditGroupButton" destination="pqx-Yq-icw" id="FNX-p7-7JB"/>
                 <outlet property="mEditProfileButton" destination="4Jf-oD-Oe1" id="gyH-Lv-iYy"/>
                 <outlet property="mEditProfileView" destination="irV-Pm-YKq" id="1w4-Sj-4Ah"/>
                 <outlet property="mFrom" destination="ZuS-Qa-3gz" id="FBK-JL-UQu"/>
+                <outlet property="mGroupsTab" destination="fZ0-gr-obC" id="aeR-8K-glb"/>
                 <outlet property="mInboxTab" destination="mIS-gC-azt" id="HhR-ug-abq"/>
                 <outlet property="mInboxTable" destination="18" id="dnQ-pC-apN"/>
                 <outlet property="mKanaName" destination="q5N-Uz-7nb" id="S7K-dj-z7W"/>
@@ -21,6 +26,7 @@
                 <outlet property="mLoggedInLabel" destination="jRu-HO-DoS" id="QvJ-HY-aCs"/>
                 <outlet property="mLoginPassword" destination="16" id="104"/>
                 <outlet property="mLoginUsername" destination="15" id="hIK-L5-1Pi"/>
+                <outlet property="mMyGroupsView" destination="g7c-hR-jHd" id="7HJ-eu-lyg"/>
                 <outlet property="mMyInboxView" destination="17" id="Uny-5C-Bg1"/>
                 <outlet property="mNavigationBar" destination="apr-ZZ-bEJ" id="yhL-94-d6b"/>
                 <outlet property="mNavigationItem" destination="Ccl-OD-D5t" id="hva-l2-Zs0"/>
@@ -171,11 +177,57 @@
                     </subviews>
                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                 </view>
-                <view hidden="YES" contentMode="scaleToFill" id="f0T-z3-92b" userLabel="mTabView">
+                <view contentMode="scaleToFill" id="f0T-z3-92b" userLabel="mTabView">
                     <rect key="frame" x="0.0" y="0.0" width="320" height="460"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <subviews>
-                        <view contentMode="scaleToFill" id="irV-Pm-YKq" userLabel="mEditProfileView">
+                        <view contentMode="scaleToFill" id="g7c-hR-jHd" userLabel="mMyGroupsView">
+                            <rect key="frame" x="0.0" y="47" width="320" height="366"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <subviews>
+                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="Db6-e7-xn3" userLabel="mAddGroupButton">
+                                    <rect key="frame" x="0.0" y="0.0" width="80" height="45"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                    <state key="normal" title="Add">
+                                        <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                    </state>
+                                    <connections>
+                                        <action selector="addGroupPressed:" destination="-1" eventType="touchUpInside" id="BWT-6i-7Jv"/>
+                                    </connections>
+                                </button>
+                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="pqx-Yq-icw" userLabel="mEditGroupButton">
+                                    <rect key="frame" x="120" y="0.0" width="80" height="45"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                    <state key="normal" title="Edit">
+                                        <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                    </state>
+                                    <connections>
+                                        <action selector="editGroupPressed:" destination="-1" eventType="touchUpInside" id="jpr-kH-0WJ"/>
+                                    </connections>
+                                </button>
+                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="6fo-po-ise" userLabel="mDeleteGroupButton">
+                                    <rect key="frame" x="240" y="0.0" width="80" height="45"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                    <state key="normal" title="Delete">
+                                        <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                    </state>
+                                    <connections>
+                                        <action selector="deleteGroupPressed:" destination="-1" eventType="touchUpInside" id="kwU-1S-ly8"/>
+                                    </connections>
+                                </button>
+                                <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="4m7-Ig-dpw" userLabel="mCurrentGroupsTable">
+                                    <rect key="frame" x="0.0" y="45" width="320" height="321"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                    <connections>
+                                        <outlet property="dataSource" destination="-1" id="TBF-2B-ZbU"/>
+                                        <outlet property="delegate" destination="-1" id="deF-tV-pgi"/>
+                                    </connections>
+                                </tableView>
+                            </subviews>
+                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                        </view>
+                        <view hidden="YES" contentMode="scaleToFill" id="irV-Pm-YKq" userLabel="mEditProfileView">
                             <rect key="frame" x="0.0" y="47" width="320" height="366"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <subviews>
@@ -489,6 +541,7 @@
                             <items>
                                 <tabBarItem title="Inbox" image="tab-inbox.png" id="mIS-gC-azt" userLabel="mInboxTab"/>
                                 <tabBarItem title="New Memo" image="tab-record-audio.png" id="fNb-Yf-DE3" userLabel="mNewMemoTab"/>
+                                <tabBarItem title="Groups" id="fZ0-gr-obC" userLabel="mGroupsTab"/>
                                 <tabBarItem title="Settings" image="tab-settings.png" id="Yjj-7Y-DMv" userLabel="mSettingsTab"/>
                             </items>
                             <connections>
