@@ -44,6 +44,13 @@ void MyGroupsScreen::showReallyDeleteEntry()
     tConfirm("Really delete this group?");
 }
 
+#pragma mark Sending messages to other machines
+
+void MyGroupsScreen::sendGoEditGroupToVCEntry()
+{
+    this->tSubject<const MemoAppMessage&>::notify(MemoAppMessage(MemoApp::kGoEditGroup));
+}
+
 #pragma mark State wiring
 void MyGroupsScreen::CallEntry()
 {
@@ -52,6 +59,7 @@ void MyGroupsScreen::CallEntry()
 		case kEnd: EndEntryHelper(); break;
 		case kIdle: idleEntry(); break;
 		case kInvalidState: invalidStateEntry(); break;
+		case kSendGoEditGroupToVC: sendGoEditGroupToVCEntry(); break;
 		case kShowReallyDelete: showReallyDeleteEntry(); break;
 		case kStart: startEntry(); break;
 		default: break;
@@ -64,9 +72,9 @@ void MyGroupsScreen::CallExit()
 
 int  MyGroupsScreen::StateTransitionFunction(const int evt) const
 {
-	if ((mState == kIdle) && (evt == kAdd)) return kIdle; else
+	if ((mState == kIdle) && (evt == kAdd)) return kSendGoEditGroupToVC; else
 	if ((mState == kIdle) && (evt == kDelete)) return kShowReallyDelete; else
-	if ((mState == kIdle) && (evt == kEdit)) return kIdle; else
+	if ((mState == kIdle) && (evt == kEdit)) return kSendGoEditGroupToVC; else
 	if ((mState == kShowReallyDelete) && (evt == kNo)) return kIdle; else
 	if ((mState == kShowReallyDelete) && (evt == kYes)) return kIdle; else
 	if ((mState == kStart) && (evt == kNext)) return kIdle;

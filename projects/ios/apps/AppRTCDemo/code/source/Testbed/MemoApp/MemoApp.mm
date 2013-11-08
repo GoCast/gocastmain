@@ -75,6 +75,16 @@ void MemoApp::myGroupsScreenExit()
     if (mScreen) { delete mScreen; mScreen = NULL; }
 }
 
+void MemoApp::editGroupScreenEntry()
+{
+    mScreen = new EditGroupScreen;
+    mScreen->attach(this);
+}
+
+void MemoApp::editGroupScreenExit()
+{
+    if (mScreen) { delete mScreen; mScreen = NULL; }
+}
 
 void MemoApp::recordAudioScreenEntry()
 {
@@ -152,6 +162,7 @@ void MemoApp::CallEntry()
 {
 	switch(mState)
 	{
+		case kEditGroupScreen: editGroupScreenEntry(); break;
 		case kEditProfileScreen: editProfileScreenEntry(); break;
 		case kEnd: EndEntryHelper(); break;
 		case kHideAllViews: hideAllViewsEntry(); break;
@@ -174,6 +185,7 @@ void MemoApp::CallExit()
 {
 	switch(mState)
 	{
+		case kEditGroupScreen: editGroupScreenExit(); break;
 		case kEditProfileScreen: editProfileScreenExit(); break;
 		case kMyGroupsScreen: myGroupsScreenExit(); break;
 		case kMyInboxScreen: myInboxScreenExit(); break;
@@ -189,11 +201,16 @@ void MemoApp::CallExit()
 
 int  MemoApp::StateTransitionFunction(const int evt) const
 {
+	if ((mState == kEditGroupScreen) && (evt == kGoGroups)) return kMyGroupsScreen; else
+	if ((mState == kEditGroupScreen) && (evt == kGoInbox)) return kMyInboxScreen; else
+	if ((mState == kEditGroupScreen) && (evt == kGoNewRecording)) return kRecordAudioScreen; else
+	if ((mState == kEditGroupScreen) && (evt == kGoSettings)) return kSettingsScreen; else
 	if ((mState == kEditProfileScreen) && (evt == kGoGroups)) return kMyGroupsScreen; else
 	if ((mState == kEditProfileScreen) && (evt == kGoInbox)) return kMyInboxScreen; else
 	if ((mState == kEditProfileScreen) && (evt == kGoNewRecording)) return kRecordAudioScreen; else
 	if ((mState == kEditProfileScreen) && (evt == kGoSettings)) return kSettingsScreen; else
 	if ((mState == kHideAllViews) && (evt == kNext)) return kVersionCheckScreen; else
+	if ((mState == kMyGroupsScreen) && (evt == kGoEditGroup)) return kEditGroupScreen; else
 	if ((mState == kMyGroupsScreen) && (evt == kGoInbox)) return kMyInboxScreen; else
 	if ((mState == kMyGroupsScreen) && (evt == kGoNewRecording)) return kRecordAudioScreen; else
 	if ((mState == kMyGroupsScreen) && (evt == kGoSettings)) return kSettingsScreen; else

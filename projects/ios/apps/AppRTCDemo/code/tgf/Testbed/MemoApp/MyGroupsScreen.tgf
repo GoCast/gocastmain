@@ -2,8 +2,9 @@
 2 end
 3 idle
 4 Show "really delete?"
+5 Send "goEditGroup" to VC
 #
 1 3
 4 3 yes, no
 3 4 delete
-3 3 add, edit
+3 5 add, edit

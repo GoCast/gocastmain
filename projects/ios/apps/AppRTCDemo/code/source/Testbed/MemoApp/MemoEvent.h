@@ -28,6 +28,8 @@ public:
         kEditGroupPressed,
         kDeleteGroupPressed,
 
+        kSaveGroupPressed,
+
         kChangePasswordPressed,
         kLogOutPressed,
         kEditProfilePressed,

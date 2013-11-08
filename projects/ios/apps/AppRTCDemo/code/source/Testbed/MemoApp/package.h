@@ -22,6 +22,7 @@
 #include "SendToGroupScreen.h"
 #include "MyInboxScreen.h"
 #include "MyGroupsScreen.h"
+#include "EditGroupScreen.h"
 #include "VersionCheckScreen.h"
 
 #include "MemoApp.h"

@@ -19,6 +19,7 @@ UIAlertViewDelegate, AVAudioRecorderDelegate>
 @property (nonatomic, strong) IBOutlet UIView* mEditProfileView;
 
 @property (nonatomic, strong) IBOutlet UIView* mMyGroupsView;
+@property (nonatomic, strong) IBOutlet UIView* mEditGroupView;
 
 @property (nonatomic, strong) IBOutlet UIView* mSendToGroupView;
 @property (nonatomic, strong) IBOutlet UIView* mPlayAudioView;
@@ -73,11 +74,16 @@ UIAlertViewDelegate, AVAudioRecorderDelegate>
 @property (nonatomic, strong) IBOutlet UITextField* mKanaName;
 @property (nonatomic, strong) IBOutlet UIButton* mSaveProfileButton;
 
-//mEditGroupsView
+//mMyGroupsView
 @property (nonatomic, strong) IBOutlet UITableView* mCurrentGroupsTable;
 @property (nonatomic, strong) IBOutlet UIButton* mAddGroupButton;
 @property (nonatomic, strong) IBOutlet UIButton* mEditGroupButton;
 @property (nonatomic, strong) IBOutlet UIButton* mDeleteGroupButton;
+
+//mEditGroupView
+@property (nonatomic, strong) IBOutlet UITextField* mGroupName;
+@property (nonatomic, strong) IBOutlet UITableView* mEditGroupTable;
+@property (nonatomic, strong) IBOutlet UIButton*    mSaveGroupButton;
 
 //mSendToGroupView
 @property (nonatomic, strong) IBOutlet UITableView* mSendToGroupTable;
@@ -118,6 +124,9 @@ UIAlertViewDelegate, AVAudioRecorderDelegate>
 -(IBAction) addGroupPressed:(id)sender;
 -(IBAction) editGroupPressed:(id)sender;
 -(IBAction) deleteGroupPressed:(id)sender;
+
+//mEditGroupView
+-(IBAction) saveGroupPressed:(id)sender;
 
 //mSendToGroupView
 -(IBAction) sendSendToGroupPressed:(id)sender;

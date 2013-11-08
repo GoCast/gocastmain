@@ -75,6 +75,13 @@
 		},
 
 		{
+			'action_name': 'EditGroupScreen.tgf',
+			'inputs': [ '../../tgf/Testbed/MemoApp/EditGroupScreen.tgf', ], # inputs
+			'outputs': [ '../../dummy', ], # outputs
+			'action': [ '<@(_graphcode)', '<@(_inputs)',  '--force-update', '--machine', 'EditGroupScreen', '-h', '../../source/Testbed/MemoApp/EditGroupScreen.h', '-cpp', '../../source/Testbed/MemoApp/EditGroupScreen.mm', ], # action
+		},
+
+		{
 			'action_name': 'VersionCheckScreen.tgf',
 			'inputs': [ '../../tgf/Testbed/MemoApp/VersionCheckScreen.tgf', ], # inputs
 			'outputs': [ '../../dummy', ], # outputs
@@ -105,6 +112,9 @@
 
 			'../../source/Testbed/MemoApp/MyGroupsScreen.mm',
 			'../../source/Testbed/MemoApp/MyGroupsScreen.h',
+
+			'../../source/Testbed/MemoApp/EditGroupScreen.mm',
+			'../../source/Testbed/MemoApp/EditGroupScreen.h',
 
 			'../../source/Testbed/MemoApp/SettingsScreen.mm',
 			'../../source/Testbed/MemoApp/SettingsScreen.h',

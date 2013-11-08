@@ -14,9 +14,12 @@
                 <outlet property="mCurrentGroupsTable" destination="4m7-Ig-dpw" id="zQQ-0b-Ye4"/>
                 <outlet property="mDeleteGroupButton" destination="6fo-po-ise" id="qS8-xK-IPO"/>
                 <outlet property="mEditGroupButton" destination="pqx-Yq-icw" id="FNX-p7-7JB"/>
+                <outlet property="mEditGroupTable" destination="yCp-cM-tmv" id="IAs-b4-lp1"/>
+                <outlet property="mEditGroupView" destination="GSG-Ol-APG" id="x8f-zR-iMa"/>
                 <outlet property="mEditProfileButton" destination="4Jf-oD-Oe1" id="gyH-Lv-iYy"/>
                 <outlet property="mEditProfileView" destination="irV-Pm-YKq" id="1w4-Sj-4Ah"/>
                 <outlet property="mFrom" destination="ZuS-Qa-3gz" id="FBK-JL-UQu"/>
+                <outlet property="mGroupName" destination="DC3-eF-jph" id="fxX-Ys-NNk"/>
                 <outlet property="mGroupsTab" destination="fZ0-gr-obC" id="aeR-8K-glb"/>
                 <outlet property="mInboxTab" destination="mIS-gC-azt" id="HhR-ug-abq"/>
                 <outlet property="mInboxTable" destination="18" id="dnQ-pC-apN"/>
@@ -39,6 +42,7 @@
                 <outlet property="mRecordAudioView" destination="wD3-Wi-uv9" id="w0j-RC-GGC"/>
                 <outlet property="mRecordingStatusLabel" destination="qEK-Gu-AnZ" id="aIh-pd-NuL"/>
                 <outlet property="mRetryVersionCheckButton" destination="0LP-f4-HjY" id="LiW-RS-4sW"/>
+                <outlet property="mSaveGroupButton" destination="y8Y-Nc-EZE" id="ro5-MD-fV6"/>
                 <outlet property="mSaveProfileButton" destination="Zof-qV-oW6" id="Fpn-LR-sWW"/>
                 <outlet property="mSaveRecordingButton" destination="6Ia-LM-tUC" id="SRt-vx-Ijf"/>
                 <outlet property="mSendAudioButton" destination="kAI-4c-ka5" id="TcC-HK-6YH"/>
@@ -181,6 +185,53 @@
                     <rect key="frame" x="0.0" y="0.0" width="320" height="460"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <subviews>
+                        <view contentMode="scaleToFill" id="GSG-Ol-APG" userLabel="mEditGroupView">
+                            <rect key="frame" x="0.0" y="47" width="320" height="366"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <subviews>
+                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="y8Y-Nc-EZE" userLabel="mSaveGroupButton">
+                                    <rect key="frame" x="240" y="321" width="80" height="45"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                    <state key="normal" title="Save">
+                                        <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                    </state>
+                                    <connections>
+                                        <action selector="saveGroupPressed:" destination="-1" eventType="touchUpInside" id="jGv-QG-v0W"/>
+                                    </connections>
+                                </button>
+                                <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" style="plain" separatorStyle="default" allowsSelection="NO" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="yCp-cM-tmv" userLabel="mEditGroupTable">
+                                    <rect key="frame" x="20" y="135" width="280" height="186"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                    <connections>
+                                        <outlet property="dataSource" destination="-1" id="ngA-Bu-gru"/>
+                                        <outlet property="delegate" destination="-1" id="R91-ki-hTf"/>
+                                    </connections>
+                                </tableView>
+                                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Members:" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="dEB-XR-q9Q">
+                                    <rect key="frame" x="20" y="106" width="78" height="21"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                    <nil key="highlightedColor"/>
+                                </label>
+                                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Group name:" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="LVL-FM-V0d">
+                                    <rect key="frame" x="20" y="20" width="100" height="21"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                    <nil key="highlightedColor"/>
+                                </label>
+                                <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" minimumFontSize="17" id="DC3-eF-jph" userLabel="mGroupName">
+                                    <rect key="frame" x="23" y="49" width="277" height="30"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                    <textInputTraits key="textInputTraits"/>
+                                    <connections>
+                                        <outlet property="delegate" destination="-1" id="GSf-Jg-Eip"/>
+                                    </connections>
+                                </textField>
+                            </subviews>
+                            <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                        </view>
                         <view contentMode="scaleToFill" id="g7c-hR-jHd" userLabel="mMyGroupsView">
                             <rect key="frame" x="0.0" y="47" width="320" height="366"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -215,7 +266,7 @@
                                         <action selector="deleteGroupPressed:" destination="-1" eventType="touchUpInside" id="kwU-1S-ly8"/>
                                     </connections>
                                 </button>
-                                <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="4m7-Ig-dpw" userLabel="mCurrentGroupsTable">
+                                <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" style="plain" separatorStyle="default" allowsSelectionDuringEditing="YES" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="4m7-Ig-dpw" userLabel="mCurrentGroupsTable">
                                     <rect key="frame" x="0.0" y="45" width="320" height="321"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>

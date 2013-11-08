@@ -276,6 +276,12 @@ std::vector<std::string> gMyInboxListEntries;
     MemoEventManager::getInstance()->notify(MemoEvent(MemoEvent::kDeleteGroupPressed));
 }
 
+-(IBAction) saveGroupPressed:(id)sender
+{
+#pragma unused(sender)
+    MemoEventManager::getInstance()->notify(MemoEvent(MemoEvent::kSaveGroupPressed));
+}
+
 //mSendToGroupView
 -(IBAction) sendSendToGroupPressed:(id)sender
 {
@@ -324,6 +330,10 @@ std::vector<std::string> gMyInboxListEntries;
     else if (textField == self.mKanaName)
     {
         [self.mKanaName resignFirstResponder];
+    }
+    else if (textField == self.mGroupName)
+    {
+        [self.mGroupName resignFirstResponder];
     }
 
     return NO;
@@ -454,6 +464,14 @@ std::vector<std::string> gMyInboxListEntries;
     {
         return YES;
     }
+    else if (tableView == self.mCurrentGroupsTable)
+    {
+        return YES;
+    }
+    else if (tableView == self.mEditGroupTable)
+    {
+        return YES;
+    }
     return NO;
 }
 
@@ -464,6 +482,14 @@ std::vector<std::string> gMyInboxListEntries;
     if (editingStyle == UITableViewCellEditingStyleDelete)
     {
         if (tableView == self.mInboxTable)
+        {
+            MemoEventManager::getInstance()->notify(MemoEvent(MemoEvent::kTableItemDeleted, (tUInt32)indexPath.row));
+        }
+        if (tableView == self.mCurrentGroupsTable)
+        {
+            MemoEventManager::getInstance()->notify(MemoEvent(MemoEvent::kTableItemDeleted, (tUInt32)indexPath.row));
+        }
+        if (tableView == self.mEditGroupTable)
         {
             MemoEventManager::getInstance()->notify(MemoEvent(MemoEvent::kTableItemDeleted, (tUInt32)indexPath.row));
         }

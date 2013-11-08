@@ -24,6 +24,7 @@ protected:
 	void endEntry();
 	void invalidStateEntry();
 
+	void editGroupScreenEntry();
 	void editProfileScreenEntry();
 	void hideAllViewsEntry();
 	void myGroupsScreenEntry();
@@ -36,6 +37,7 @@ protected:
 	void startScreenEntry();
 	void versionCheckScreenEntry();
 
+	void editGroupScreenExit();
 	void editProfileScreenExit();
 	void myGroupsScreenExit();
 	void myInboxScreenExit();
@@ -52,6 +54,7 @@ public:
 		kInvalidEvent = -2,
 		kNext = -1,
 		kFail,
+		kGoEditGroup,
 		kGoEditProfile,
 		kGoGroups,
 		kGoInbox,
@@ -68,6 +71,7 @@ public:
 	{
 		kInvalidState = 0,
 		kStart = 1,
+		kEditGroupScreen,
 		kEditProfileScreen,
 		kEnd,
 		kHideAllViews,

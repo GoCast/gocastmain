@@ -118,6 +118,7 @@ extern std::vector<std::string> gMyInboxListEntries;
     [self.viewController.mSendToGroupView setHidden:YES];
     [self.viewController.mPlayAudioView setHidden:YES];
     [self.viewController.mMyGroupsView setHidden:YES];
+    [self.viewController.mEditGroupView setHidden:YES];
     [self.viewController.mSettingsView setHidden:YES];
     [self.viewController.mEditProfileView setHidden:YES];
     [self.viewController.mBlockingView setHidden:YES];
@@ -161,6 +162,13 @@ extern std::vector<std::string> gMyInboxListEntries;
     [self.viewController.mTabView setHidden:(newVisible) ? NO : YES];
     self.viewController.mTabBar.selectedItem = self.viewController.mGroupsTab;
     [self.viewController.mMyGroupsView setHidden:(newVisible) ? NO : YES];
+}
+
+-(void)setEditGroupScreenVisible:(bool)newVisible
+{
+    [self.viewController.mTabView setHidden:(newVisible) ? NO : YES];
+    self.viewController.mTabBar.selectedItem = self.viewController.mGroupsTab;
+    [self.viewController.mEditGroupView setHidden:(newVisible) ? NO : YES];
 }
 
 -(void)setSettingsScreenVisible:(bool)newVisible

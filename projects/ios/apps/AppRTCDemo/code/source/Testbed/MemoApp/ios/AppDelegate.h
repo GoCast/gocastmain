@@ -23,6 +23,7 @@
 -(void)setMyInboxScreenVisible:(bool)newVisible;
 -(void)setRecordAudioScreenVisible:(bool)newVisible;
 -(void)setMyGroupsScreenVisible:(bool)newVisible;
+-(void)setEditGroupScreenVisible:(bool)newVisible;
 -(void)setSettingsScreenVisible:(bool)newVisible;
 -(void)setEditProfileScreenVisible:(bool)newVisible;
 

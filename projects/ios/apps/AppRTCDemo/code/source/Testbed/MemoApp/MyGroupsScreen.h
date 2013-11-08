@@ -23,6 +23,7 @@ protected:
 	void invalidStateEntry();
 
 	void idleEntry();
+	void sendGoEditGroupToVCEntry();
 	void showReallyDeleteEntry();
 
 public:
@@ -43,6 +44,7 @@ public:
 		kStart = 1,
 		kEnd,
 		kIdle,
+		kSendGoEditGroupToVC,
 		kShowReallyDelete,
 	};
 
