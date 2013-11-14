@@ -1,10 +1,45 @@
 1 start
 2 end
 3 idle
-4 Show "really delete?"
-5 Send "goEditGroup" to VC
+4 Send "goEditGroup" to VC
+5 Send "getGroups" to server
+6 Set "wait for getGroups"
+7 Show "retry getGroups?"
+8 Was getGroups successful?
+9 Show "error loading groups"
+10 Update groups table
+11 Calculate group list
+12 Is an item selected?
+13 Show "please select an item"
+14 Remove Selected Item from JSON
+15 Set "wait for updateGroups"
+16 Send "updateGroups" to server
+17 Was updateGroups successful?
+18 Show "error updating groups"
+19 Show "retry updateGroups?"
 #
-1 3
-4 3 yes, no
-3 4 delete
-3 5 add, edit
+1 6
+3 4 add
+6 5
+5 7 fail
+7 3 no
+5 8 success
+8 9 no
+8 11 yes
+10 3
+9 11 yes
+11 10
+3 12 edit
+12 13 no
+12 4 yes
+13 3 yes
+3 14 itemDeleted
+18 6 yes
+17 18 no
+17 6 yes
+15 16
+16 17 success
+16 19 fail
+19 6 no
+19 15 yes
+14 15

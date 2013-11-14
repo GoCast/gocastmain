@@ -12,6 +12,11 @@ class MyGroupsScreen
     public Screen
 {
 protected:
+    JSONObject                  mGetGroupsJSON;
+    JSONObject                  mUpdateGroupsJSON;
+    std::vector<std::string>    mGroupList;
+    tUInt32                     mItemSelected;
+    bool                        mHasSelection;
 
 public:
 	MyGroupsScreen();
@@ -22,9 +27,23 @@ protected:
 	void endEntry();
 	void invalidStateEntry();
 
+	void calculateGroupListEntry();
 	void idleEntry();
+	void isAnItemSelectedEntry();
+	void removeSelectedItemFromJSONEntry();
+	void sendGetGroupsToServerEntry();
 	void sendGoEditGroupToVCEntry();
-	void showReallyDeleteEntry();
+	void sendUpdateGroupsToServerEntry();
+	void setWaitForGetGroupsEntry();
+	void setWaitForUpdateGroupsEntry();
+	void showErrorLoadingGroupsEntry();
+	void showErrorUpdatingGroupsEntry();
+	void showPleaseSelectAnItemEntry();
+	void showRetryGetGroupsEntry();
+	void showRetryUpdateGroupsEntry();
+	void updateGroupsTableEntry();
+	void wasGetGroupsSuccessfulEntry();
+	void wasUpdateGroupsSuccessfulEntry();
 
 public:
 	enum EventType
@@ -32,9 +51,11 @@ public:
 		kInvalidEvent = -2,
 		kNext = -1,
 		kAdd,
-		kDelete,
 		kEdit,
+		kFail,
+		kItemDeleted,
 		kNo,
+		kSuccess,
 		kYes,
 	};
 
@@ -42,10 +63,24 @@ public:
 	{
 		kInvalidState = 0,
 		kStart = 1,
+		kCalculateGroupList,
 		kEnd,
 		kIdle,
+		kIsAnItemSelected,
+		kRemoveSelectedItemFromJSON,
+		kSendGetGroupsToServer,
 		kSendGoEditGroupToVC,
-		kShowReallyDelete,
+		kSendUpdateGroupsToServer,
+		kSetWaitForGetGroups,
+		kSetWaitForUpdateGroups,
+		kShowErrorLoadingGroups,
+		kShowErrorUpdatingGroups,
+		kShowPleaseSelectAnItem,
+		kShowRetryGetGroups,
+		kShowRetryUpdateGroups,
+		kUpdateGroupsTable,
+		kWasGetGroupsSuccessful,
+		kWasUpdateGroupsSuccessful,
 	};
 
 protected:

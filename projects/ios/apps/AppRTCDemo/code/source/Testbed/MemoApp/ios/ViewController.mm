@@ -11,6 +11,7 @@
 
 std::vector<std::string> gUserListEntries;
 std::vector<std::string> gMyInboxListEntries;
+std::vector<std::string> gMyGroupsListEntries;
 
 @interface ViewController()
 {
@@ -270,12 +271,6 @@ std::vector<std::string> gMyInboxListEntries;
     MemoEventManager::getInstance()->notify(MemoEvent(MemoEvent::kEditGroupPressed));
 }
 
--(IBAction) deleteGroupPressed:(id)sender
-{
-#pragma unused(sender)
-    MemoEventManager::getInstance()->notify(MemoEvent(MemoEvent::kDeleteGroupPressed));
-}
-
 -(IBAction) saveGroupPressed:(id)sender
 {
 #pragma unused(sender)
@@ -351,6 +346,10 @@ std::vector<std::string> gMyInboxListEntries;
     {
         return (NSInteger)gMyInboxListEntries.size();
     }
+    else if (tableView == self.mCurrentGroupsTable)
+    {
+        return (NSInteger)gMyGroupsListEntries.size();
+    }
 
     return (NSInteger)1;
 }
@@ -378,6 +377,25 @@ std::vector<std::string> gMyInboxListEntries;
         }
 
         cell.textLabel.text = [NSString stringWithUTF8String:gUserListEntries[indexPath.row].c_str()];
+
+        cell.imageView.image = nil;
+        
+        return cell;
+    }
+    else if (tableView == self.mCurrentGroupsTable)
+    {
+        tableView.backgroundView = nil;
+
+        static NSString *simpleTableIdentifier = @"MemoAppTableItem";
+
+        UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:simpleTableIdentifier];
+
+        if (cell == nil)
+        {
+            cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:simpleTableIdentifier] autorelease];
+        }
+
+        cell.textLabel.text = [NSString stringWithUTF8String:gMyGroupsListEntries[indexPath.row].c_str()];
 
         cell.imageView.image = nil;
         

@@ -78,7 +78,6 @@ UIAlertViewDelegate, AVAudioRecorderDelegate>
 @property (nonatomic, strong) IBOutlet UITableView* mCurrentGroupsTable;
 @property (nonatomic, strong) IBOutlet UIButton* mAddGroupButton;
 @property (nonatomic, strong) IBOutlet UIButton* mEditGroupButton;
-@property (nonatomic, strong) IBOutlet UIButton* mDeleteGroupButton;
 
 //mEditGroupView
 @property (nonatomic, strong) IBOutlet UITextField* mGroupName;
@@ -123,7 +122,6 @@ UIAlertViewDelegate, AVAudioRecorderDelegate>
 //mMyGroupsView
 -(IBAction) addGroupPressed:(id)sender;
 -(IBAction) editGroupPressed:(id)sender;
--(IBAction) deleteGroupPressed:(id)sender;
 
 //mEditGroupView
 -(IBAction) saveGroupPressed:(id)sender;

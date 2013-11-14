@@ -26,7 +26,6 @@ public:
 
         kAddGroupPressed,
         kEditGroupPressed,
-        kDeleteGroupPressed,
 
         kSaveGroupPressed,
 
