@@ -12,6 +12,8 @@ include 'userList.php';
 include 'postGroup.php';
 include 'getProfile.php';
 include 'updateProfile.php';
+include 'getGroups.php';
+include 'updateGroups.php';
 
 	function hasParam($x)
 	{
@@ -77,6 +79,24 @@ include 'updateProfile.php';
 					print(json_encode(errorMissingParameter("name")));
 				}
 			}
+			else if ($_POST["action"] === "updateGroups")
+			{
+				if (hasParam("name"))
+				{
+					if (isset($_FILES["filename"]))
+					{
+						print(json_encode(updateGroups($_POST["name"], $_FILES["filename"]["name"])));
+					}
+					else
+					{
+						print(json_encode(errorMissingParameter("filename")));
+					}
+				}
+				else
+				{
+					print(json_encode(errorMissingParameter("name")));
+				}
+			}
 			else
 			{
 				print(json_encode(array("status" => "fail", "message" => "Unknown command")));
@@ -96,6 +116,10 @@ include 'updateProfile.php';
 			{
 				case "getProfile":
 					print(json_encode(getProfile($_GET["name"])));
+					break;
+
+				case "getGroups":
+					print(json_encode(getGroups($_GET["name"])));
 					break;
 
 				case "listInbox":
