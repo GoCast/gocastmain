@@ -1,5 +1,59 @@
 1 start
 2 end
 3 idle
+4 Send "getGroups" to server
+5 Set "wait for getGroups"
+6 Show "retry getGroups?"
+7 Was getGroups successful?
+8 Show "error loading groups"
+9 Update member table
+10 Calculate selection
+11 Update JSON with selection
+12 Set "wait for updateGroups"
+13 Send "updateGroups" to server
+14 Was updateGroups successful?
+15 Show "error updating groups"
+16 Show "retry updateGroups?"
+17 Set "wait for userList"
+18 Send "userList" to server
+19 Show "retry userList?"
+20 Was userList successful?
+21 Show "error getting user list"
+22 Send "goGroups" to VC
+23 Update member selection
+24 server error idle
+25 Show "won't save"
+26 Get selected group from member table
 #
-1 3
+1 17
+5 4
+4 6 fail
+6 24 no
+4 7 success
+7 8 no
+7 10 yes
+9 23
+8 24 yes
+10 9
+3 26 save
+15 25 yes
+14 15 no
+14 22 yes
+12 13
+13 14 success
+13 16 fail
+16 25 no
+16 12 yes
+17 18
+18 19 fail
+19 17 yes
+18 20 success
+20 21 no
+21 24 yes
+19 24 no
+20 5 yes
+23 3
+11 12
+24 25 save
+25 22
+26 11

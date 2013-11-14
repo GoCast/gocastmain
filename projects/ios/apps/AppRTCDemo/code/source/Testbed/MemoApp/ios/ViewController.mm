@@ -12,6 +12,7 @@
 std::vector<std::string> gUserListEntries;
 std::vector<std::string> gMyInboxListEntries;
 std::vector<std::string> gMyGroupsListEntries;
+std::vector<std::string> gMemberListEntries;
 
 @interface ViewController()
 {
@@ -350,6 +351,10 @@ std::vector<std::string> gMyGroupsListEntries;
     {
         return (NSInteger)gMyGroupsListEntries.size();
     }
+    else if (tableView == self.mEditGroupTable)
+    {
+        return (NSInteger)gMemberListEntries.size();
+    }
 
     return (NSInteger)1;
 }
@@ -377,6 +382,25 @@ std::vector<std::string> gMyGroupsListEntries;
         }
 
         cell.textLabel.text = [NSString stringWithUTF8String:gUserListEntries[indexPath.row].c_str()];
+
+        cell.imageView.image = nil;
+        
+        return cell;
+    }
+    else if (tableView == self.mEditGroupTable)
+    {
+        tableView.backgroundView = nil;
+
+        static NSString *simpleTableIdentifier = @"MemoAppTableItem";
+
+        UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:simpleTableIdentifier];
+
+        if (cell == nil)
+        {
+            cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:simpleTableIdentifier] autorelease];
+        }
+
+        cell.textLabel.text = [NSString stringWithUTF8String:gMemberListEntries[indexPath.row].c_str()];
 
         cell.imageView.image = nil;
         
@@ -488,7 +512,7 @@ std::vector<std::string> gMyGroupsListEntries;
     }
     else if (tableView == self.mEditGroupTable)
     {
-        return YES;
+        return NO;
     }
     return NO;
 }

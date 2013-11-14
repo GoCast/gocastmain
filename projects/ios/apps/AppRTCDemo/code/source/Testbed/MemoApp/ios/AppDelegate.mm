@@ -15,6 +15,7 @@ AppDelegate* gAppDelegateInstance = NULL;
 extern std::vector<std::string> gUserListEntries;
 extern std::vector<std::string> gMyInboxListEntries;
 extern std::vector<std::string> gMyGroupsListEntries;
+extern std::vector<std::string> gMemberListEntries;
 
 @implementation AppDelegate
 
@@ -325,6 +326,18 @@ extern std::vector<std::string> gMyGroupsListEntries;
     self.viewController.mKanaName.text = [NSString stringWithUTF8String:newName.c_str()];
 }
 
+//mEditGroupView
+-(std::string) getGroupName
+{
+    const char* result = [self.viewController.mGroupName.text UTF8String];
+    return result ? result : "";
+}
+
+-(void) setGroupName:(const std::string&)newName
+{
+    self.viewController.mGroupName.text = [NSString stringWithUTF8String:newName.c_str()];
+}
+
 //mSettingsview
 -(void)setSettingsLoggedInName:(const std::string&)newName
 {
@@ -348,6 +361,15 @@ extern std::vector<std::string> gMyGroupsListEntries;
 
     [self.viewController.mSendToGroupTable reloadData];
 }
+
+-(void)setMemberListTable:(const std::vector<std::string>&)newEntries
+{
+    gMemberListEntries.clear();
+    gMemberListEntries.insert(gMemberListEntries.end(), newEntries.begin(), newEntries.end());
+
+    [self.viewController.mEditGroupTable reloadData];
+}
+
 
 -(void)setMyInboxTable:(const std::vector<std::string>&)newEntries
 {
@@ -381,6 +403,36 @@ extern std::vector<std::string> gMyGroupsListEntries;
     }
     
     return result;
+}
+
+-(std::vector<size_t>)getSelectedFromMemberListTable
+{
+    std::vector<size_t> result;
+
+    NSArray* selectedIndexPaths = [self.viewController.mEditGroupTable indexPathsForSelectedRows];
+
+    if (selectedIndexPaths)
+    {
+        for (NSIndexPath* path in selectedIndexPaths)
+        {
+            result.push_back((size_t)path.row);
+        }
+    }
+
+    return result;
+}
+
+-(void)setSelectedInMemberListTable:(const std::vector<size_t>&)newSelected
+{
+    for(size_t i = 0; i < gMemberListEntries.size(); i++)
+    {
+        [self.viewController.mEditGroupTable deselectRowAtIndexPath:[NSIndexPath indexPathForRow:(int)i inSection:0] animated:NO];
+    }
+
+    for(size_t i = 0; i < newSelected.size(); i++)
+    {
+        [self.viewController.mEditGroupTable selectRowAtIndexPath:[NSIndexPath indexPathForRow:(int)newSelected[i] inSection:0] animated:NO scrollPosition:UITableViewScrollPositionNone];
+    }
 }
 
 @end

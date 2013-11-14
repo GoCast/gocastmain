@@ -60,14 +60,21 @@
 -(void) setKanjiName:(const std::string&)newName;
 -(void) setKanaName:(const std::string&)newName;
 
+//mEditGroupView
+-(std::string) getGroupName;
+-(void) setGroupName:(const std::string&)newName;
+
 
 -(void)startRecorder;
 -(void)stopRecorder;
 
 -(void)setUserListTable:(const std::vector<std::string>&)newEntries;
+-(void)setMemberListTable:(const std::vector<std::string>&)newEntries;
 -(void)setMyInboxTable:(const std::vector<std::string>&)newEntries;
 -(void)setMyGroupsTable:(const std::vector<std::string>&)newEntries;
 
 -(std::vector<size_t>)getSelectedFromUserListTable;
+-(std::vector<size_t>)getSelectedFromMemberListTable;
+-(void)setSelectedInMemberListTable:(const std::vector<size_t>&)newSelected;
 
 @end

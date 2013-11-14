@@ -32,7 +32,8 @@ protected:
 	void isAnItemSelectedEntry();
 	void removeSelectedItemFromJSONEntry();
 	void sendGetGroupsToServerEntry();
-	void sendGoEditGroupToVCEntry();
+	void sendGoEditGroupForAddToVCEntry();
+	void sendGoEditGroupForEditToVCEntry();
 	void sendUpdateGroupsToServerEntry();
 	void setWaitForGetGroupsEntry();
 	void setWaitForUpdateGroupsEntry();
@@ -69,7 +70,8 @@ public:
 		kIsAnItemSelected,
 		kRemoveSelectedItemFromJSON,
 		kSendGetGroupsToServer,
-		kSendGoEditGroupToVC,
+		kSendGoEditGroupForAddToVC,
+		kSendGoEditGroupForEditToVC,
 		kSendUpdateGroupsToServer,
 		kSetWaitForGetGroups,
 		kSetWaitForUpdateGroups,

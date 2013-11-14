@@ -77,7 +77,7 @@ void MemoApp::myGroupsScreenExit()
 
 void MemoApp::editGroupScreenEntry()
 {
-    mScreen = new EditGroupScreen;
+    mScreen = new EditGroupScreen(mGroupToEdit, mIsEditing);
     mScreen->attach(this);
 }
 
@@ -303,6 +303,12 @@ void MemoApp::update(const MemoAppMessage& msg)
             mCurAudioFilename   = msg.mAudioFilename;
             mExistsOnServer     = msg.mExistsOnServer;
             break;
+
+        case MemoApp::kGoEditGroup:
+            mGroupToEdit        = msg.mGroupToEdit;
+            mIsEditing          = msg.mIsEditing;
+            break;
+
         case MemoApp::kGoSendGroup: mCurAudioFilename = msg.mAudioFilename; break;
 
         default:

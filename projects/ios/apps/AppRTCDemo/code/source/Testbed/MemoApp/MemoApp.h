@@ -12,8 +12,10 @@ class MemoApp
 {
 protected:
     std::string mCurAudioFilename;
+    std::string mGroupToEdit;
     Screen*     mScreen;
     bool        mExistsOnServer;
+    bool        mIsEditing;
 
 public:
 	MemoApp();
@@ -102,7 +104,9 @@ public:
 	MemoApp::EventType                  mEvent;
 	tSubject<const MemoAppMessage&>*    mSource;
     std::string                         mAudioFilename;
+    std::string                         mGroupToEdit;
     bool                                mExistsOnServer;
+    bool                                mIsEditing;
 
 public:
 	MemoAppMessage(MemoApp::EventType newEvent, tSubject<const MemoAppMessage&>* newSource = NULL)
@@ -110,6 +114,7 @@ public:
 	MemoAppMessage(MemoApp::EventType newEvent, const std::string& newAudioFilename, tSubject<const MemoAppMessage&>* newSource = NULL)
 	: mEvent(newEvent), mSource(newSource), mAudioFilename(newAudioFilename) { }
 	MemoAppMessage(MemoApp::EventType newEvent, const std::string& newAudioFilename, bool newExistsOnServer, tSubject<const MemoAppMessage&>* newSource = NULL)
-	: mEvent(newEvent), mSource(newSource), mAudioFilename(newAudioFilename), mExistsOnServer(newExistsOnServer) { }
+	: mEvent(newEvent), mSource(newSource),
+    mAudioFilename(newAudioFilename), mGroupToEdit(newAudioFilename), mExistsOnServer(newExistsOnServer), mIsEditing(newExistsOnServer) { }
 };
 

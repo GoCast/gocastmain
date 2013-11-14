@@ -111,6 +111,7 @@ void MyGroupsScreen::calculateGroupListEntry()
     {
         mGroupList.push_back(mGetGroupsJSON["groups"].mArray[i].mObject["name"].mString);
     }
+    std::sort(mGroupList.begin(), mGroupList.end());
 }
 
 void MyGroupsScreen::removeSelectedItemFromJSONEntry()
@@ -161,9 +162,14 @@ void MyGroupsScreen::showRetryUpdateGroupsEntry()
 
 #pragma mark Sending messages to other machines
 
-void MyGroupsScreen::sendGoEditGroupToVCEntry()
+void MyGroupsScreen::sendGoEditGroupForAddToVCEntry()
 {
-    this->tSubject<const MemoAppMessage&>::notify(MemoAppMessage(MemoApp::kGoEditGroup));
+    this->tSubject<const MemoAppMessage&>::notify(MemoAppMessage(MemoApp::kGoEditGroup, "" , false));
+}
+
+void MyGroupsScreen::sendGoEditGroupForEditToVCEntry()
+{
+    this->tSubject<const MemoAppMessage&>::notify(MemoAppMessage(MemoApp::kGoEditGroup, mGroupList[mItemSelected], true));
 }
 
 #pragma mark State wiring
@@ -178,7 +184,8 @@ void MyGroupsScreen::CallEntry()
 		case kIsAnItemSelected: isAnItemSelectedEntry(); break;
 		case kRemoveSelectedItemFromJSON: removeSelectedItemFromJSONEntry(); break;
 		case kSendGetGroupsToServer: sendGetGroupsToServerEntry(); break;
-		case kSendGoEditGroupToVC: sendGoEditGroupToVCEntry(); break;
+		case kSendGoEditGroupForAddToVC: sendGoEditGroupForAddToVCEntry(); break;
+		case kSendGoEditGroupForEditToVC: sendGoEditGroupForEditToVCEntry(); break;
 		case kSendUpdateGroupsToServer: sendUpdateGroupsToServerEntry(); break;
 		case kSetWaitForGetGroups: setWaitForGetGroupsEntry(); break;
 		case kSetWaitForUpdateGroups: setWaitForUpdateGroupsEntry(); break;
@@ -202,11 +209,11 @@ void MyGroupsScreen::CallExit()
 int  MyGroupsScreen::StateTransitionFunction(const int evt) const
 {
 	if ((mState == kCalculateGroupList) && (evt == kNext)) return kUpdateGroupsTable; else
-	if ((mState == kIdle) && (evt == kAdd)) return kSendGoEditGroupToVC; else
+	if ((mState == kIdle) && (evt == kAdd)) return kSendGoEditGroupForAddToVC; else
 	if ((mState == kIdle) && (evt == kEdit)) return kIsAnItemSelected; else
 	if ((mState == kIdle) && (evt == kItemDeleted)) return kRemoveSelectedItemFromJSON; else
 	if ((mState == kIsAnItemSelected) && (evt == kNo)) return kShowPleaseSelectAnItem; else
-	if ((mState == kIsAnItemSelected) && (evt == kYes)) return kSendGoEditGroupToVC; else
+	if ((mState == kIsAnItemSelected) && (evt == kYes)) return kSendGoEditGroupForEditToVC; else
 	if ((mState == kRemoveSelectedItemFromJSON) && (evt == kNext)) return kSetWaitForUpdateGroups; else
 	if ((mState == kSendGetGroupsToServer) && (evt == kFail)) return kShowRetryGetGroups; else
 	if ((mState == kSendGetGroupsToServer) && (evt == kSuccess)) return kWasGetGroupsSuccessful; else
@@ -218,6 +225,7 @@ int  MyGroupsScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kShowErrorUpdatingGroups) && (evt == kYes)) return kSetWaitForGetGroups; else
 	if ((mState == kShowPleaseSelectAnItem) && (evt == kYes)) return kIdle; else
 	if ((mState == kShowRetryGetGroups) && (evt == kNo)) return kIdle; else
+	if ((mState == kShowRetryGetGroups) && (evt == kYes)) return kSetWaitForGetGroups; else
 	if ((mState == kShowRetryUpdateGroups) && (evt == kNo)) return kSetWaitForGetGroups; else
 	if ((mState == kShowRetryUpdateGroups) && (evt == kYes)) return kSetWaitForUpdateGroups; else
 	if ((mState == kStart) && (evt == kNext)) return kSetWaitForGetGroups; else

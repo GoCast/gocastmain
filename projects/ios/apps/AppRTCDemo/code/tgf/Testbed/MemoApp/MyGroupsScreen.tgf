@@ -1,7 +1,7 @@
 1 start
 2 end
 3 idle
-4 Send "goEditGroup" to VC
+4 Send "goEditGroup" for edit to VC
 5 Send "getGroups" to server
 6 Set "wait for getGroups"
 7 Show "retry getGroups?"
@@ -17,9 +17,10 @@
 17 Was updateGroups successful?
 18 Show "error updating groups"
 19 Show "retry updateGroups?"
+20 Send "goEditGroup" for add to VC
 #
 1 6
-3 4 add
+3 20 add
 6 5
 5 7 fail
 7 3 no
@@ -43,3 +44,4 @@
 19 6 no
 19 15 yes
 14 15
+7 6 yes
