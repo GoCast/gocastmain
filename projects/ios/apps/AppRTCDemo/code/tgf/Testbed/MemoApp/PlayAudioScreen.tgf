@@ -2,35 +2,46 @@
 2 end
 3 Idle
 4 Playing Idle
-5 Send GoInbox to VC
-6 Send GoSendGroup to VC
-7 Play sound
-8 Stop sound
-9 Pause sound
-10 Paused idle
-11 Set Status: Playing
-12 Set Status: Paused
-13 Set Status: Stopped
-14 Set Status: Resuming
-15 Resume sound
-16 Update duration label
-17 Load sound
+5 Send GoSendGroup to VC
+6 Play sound
+7 Stop sound
+8 Pause sound
+9 Paused idle
+10 Set Status: Playing
+11 Set Status: Paused
+12 Set Status: Stopped
+13 Set Status: Resuming
+14 Resume sound
+15 Update duration label
+16 Load sound
+17 Send "getTranscription" to server
+18 Was "getTranscription" successful?
+19 Update transcription
+20 Set Status: Initial
+21 Set "wait for getTranscription"
 #
-3 11 play
-4 8 finishedPlaying
-3 6 send
-7 4
-8 13
-1 17
-4 9 play
-9 12
-10 14 play
-10 6 send
-4 6 send
-13 3
-12 10
-11 7
-14 15
-15 4
-16 13
-17 16
+3 10 play
+4 7 finishedPlaying
+3 5 send
+6 4
+7 12
+1 16
+4 8 play
+8 11
+9 13 play
+9 5 send
+4 5 send
+15 20
+11 9
+10 6
+13 14
+14 4
+12 3
+16 15
+17 18 success
+17 3 fail
+18 3 no
+18 19 yes
+19 3
+20 21
+21 17

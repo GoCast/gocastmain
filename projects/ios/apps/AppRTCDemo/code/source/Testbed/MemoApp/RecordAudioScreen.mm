@@ -117,7 +117,7 @@ void RecordAudioScreen::stopRecordingAudioEntry()
             timeStruct->tm_hour,        timeStruct->tm_min,     timeStruct->tm_sec,
             tTimer::getSystemTimeMS() % 100);
 
-    tFile scratch(tFile::kTemporaryDirectory, "scratch.m4a");
+    tFile scratch(tFile::kTemporaryDirectory, "scratch.wav");
 
     result = scratch.rename(tFile::kDocumentsDirectory, buf);
 

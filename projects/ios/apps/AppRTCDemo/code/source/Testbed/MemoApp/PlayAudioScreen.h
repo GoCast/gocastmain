@@ -17,6 +17,7 @@ class PlayAudioScreen
     public Screen
 {
 protected:
+    JSONObject mGetTranscriptJSON;
     std::string mFilename;
     tSound* mSound;
     bool mExistsOnServer;
@@ -37,23 +38,31 @@ protected:
 	void playSoundEntry();
 	void playingIdleEntry();
 	void resumeSoundEntry();
-	void sendGoInboxToVCEntry();
+	void sendGetTranscriptionToServerEntry();
 	void sendGoSendGroupToVCEntry();
+	void setStatusInitialEntry();
 	void setStatusPausedEntry();
 	void setStatusPlayingEntry();
 	void setStatusResumingEntry();
 	void setStatusStoppedEntry();
+	void setWaitForGetTranscriptionEntry();
 	void stopSoundEntry();
 	void updateDurationLabelEntry();
+	void updateTranscriptionEntry();
+	void wasGetTranscriptionSuccessfulEntry();
 
 public:
 	enum EventType
 	{
 		kInvalidEvent = -2,
 		kNext = -1,
+		kFail,
 		kFinishedPlaying,
+		kNo,
 		kPlay,
 		kSend,
+		kSuccess,
+		kYes,
 	};
 
 	enum StateType
@@ -68,14 +77,18 @@ public:
 		kPlaySound,
 		kPlayingIdle,
 		kResumeSound,
-		kSendGoInboxToVC,
+		kSendGetTranscriptionToServer,
 		kSendGoSendGroupToVC,
+		kSetStatusInitial,
 		kSetStatusPaused,
 		kSetStatusPlaying,
 		kSetStatusResuming,
 		kSetStatusStopped,
+		kSetWaitForGetTranscription,
 		kStopSound,
 		kUpdateDurationLabel,
+		kUpdateTranscription,
+		kWasGetTranscriptionSuccessful,
 	};
 
 protected:

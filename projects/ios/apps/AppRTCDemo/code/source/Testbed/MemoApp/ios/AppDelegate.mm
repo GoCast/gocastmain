@@ -257,6 +257,11 @@ extern std::vector<std::string> gMemberListEntries;
     self.viewController.mFrom.text = [NSString stringWithUTF8String:newLabel.c_str()];
 }
 
+-(void)setTranscriptionText:(const std::string&)newLabel
+{
+    self.viewController.mTranscriptionLabel.text = [NSString stringWithUTF8String:newLabel.c_str()];
+}
+
 -(void)setSendAudioButtonEnabled:(bool)newEnabled
 {
     [self.viewController.mSendAudioButton setEnabled:(newEnabled ? YES : NO)];

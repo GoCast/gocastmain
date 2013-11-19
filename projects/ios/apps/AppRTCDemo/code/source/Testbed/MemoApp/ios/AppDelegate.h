@@ -40,6 +40,7 @@
 -(void)setPlayAudioButtonImage:(bool)newPlaying;
 -(void)setPlayAudioDurationLabel:(const std::string&)newLabel;
 -(void)setPlayAudioFromLabel:(const std::string&)newLabel;
+-(void)setTranscriptionText:(const std::string&)newLabel;
 
 -(void)setVersionCheckScreenVisible:(bool)newVisible;
 -(void)setOldVersionScreenVisible:(bool)newVisible;

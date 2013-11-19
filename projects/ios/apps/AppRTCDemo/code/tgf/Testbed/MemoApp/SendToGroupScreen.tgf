@@ -28,6 +28,11 @@
 28 update userList[i]
 29 Set "Wait for getProfile"
 30 Update local userList
+31 Send audio file to AmiVoice
+32 Was AmiVoice successful?
+33 Show "AmiVoice Failed"
+34 Set "Wait for postGroup"
+35 Set "Wait for AmiVoice"
 #
 1 25
 4 5 fail
@@ -44,9 +49,9 @@
 3 18 send
 13 14 fail
 13 15 success
-12 13 yes
+12 34 yes
 12 3 no
-15 16 yes
+15 35 yes
 16 11 yes
 15 17 no
 17 3 yes
@@ -71,3 +76,10 @@
 26 29 yes
 30 22
 7 24
+31 32 success
+31 33 fail
+32 33 no
+33 16 yes
+32 16 yes
+34 13
+35 31

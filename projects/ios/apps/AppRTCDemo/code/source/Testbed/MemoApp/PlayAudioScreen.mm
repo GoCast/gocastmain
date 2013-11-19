@@ -73,6 +73,11 @@ void PlayAudioScreen::pausedIdleEntry()
 
 #pragma mark User Interface
 
+void PlayAudioScreen::setWaitForGetTranscriptionEntry()
+{
+    [gAppDelegateInstance setBlockingViewVisible:true];
+}
+
 void PlayAudioScreen::updateDurationLabelEntry()
 {
     tUInt32 durationMS = mSound->getDurationMS();
@@ -101,6 +106,30 @@ void PlayAudioScreen::setStatusResumingEntry()
 void PlayAudioScreen::setStatusStoppedEntry()
 {
     [gAppDelegateInstance setPlayAudioButtonImage:false];
+}
+
+void PlayAudioScreen::setStatusInitialEntry()
+{
+    [gAppDelegateInstance setTranscriptionText:"Transcription not available."];
+    [gAppDelegateInstance setPlayAudioButtonImage:false];
+}
+
+void PlayAudioScreen::updateTranscriptionEntry()
+{
+    [gAppDelegateInstance setTranscriptionText:mGetTranscriptJSON["ja"].mString];
+}
+
+#pragma mark Queries
+void PlayAudioScreen::wasGetTranscriptionSuccessfulEntry()
+{
+    bool result = false;
+
+    if (mGetTranscriptJSON["ja"].mType == JSONValue::kString)
+    {
+        result = true;
+    }
+
+    SetImmediateEvent(result ? kYes : kNo);
 }
 
 #pragma mark Actions
@@ -142,12 +171,18 @@ void PlayAudioScreen::stopSoundEntry()
     }
 }
 
-#pragma mark Sending messages to other machines
-
-void PlayAudioScreen::sendGoInboxToVCEntry()
+void PlayAudioScreen::sendGetTranscriptionToServerEntry()
 {
-    this->tSubject<const MemoAppMessage&>::notify(MemoAppMessage(MemoApp::kGoInbox));
+    char buf[512];
+
+    sprintf(buf, "%sdatabase/transcriptions/%s",
+            kMemoAppServerRealURL,
+            (mFilename + ".json").c_str());
+
+    URLLoader::getInstance()->loadString(buf);
 }
+
+#pragma mark Sending messages to other machines
 
 void PlayAudioScreen::sendGoSendGroupToVCEntry()
 {
@@ -168,15 +203,19 @@ void PlayAudioScreen::CallEntry()
 		case kPlaySound: playSoundEntry(); break;
 		case kPlayingIdle: playingIdleEntry(); break;
 		case kResumeSound: resumeSoundEntry(); break;
-		case kSendGoInboxToVC: sendGoInboxToVCEntry(); break;
+		case kSendGetTranscriptionToServer: sendGetTranscriptionToServerEntry(); break;
 		case kSendGoSendGroupToVC: sendGoSendGroupToVCEntry(); break;
+		case kSetStatusInitial: setStatusInitialEntry(); break;
 		case kSetStatusPaused: setStatusPausedEntry(); break;
 		case kSetStatusPlaying: setStatusPlayingEntry(); break;
 		case kSetStatusResuming: setStatusResumingEntry(); break;
 		case kSetStatusStopped: setStatusStoppedEntry(); break;
+		case kSetWaitForGetTranscription: setWaitForGetTranscriptionEntry(); break;
 		case kStart: startEntry(); break;
 		case kStopSound: stopSoundEntry(); break;
 		case kUpdateDurationLabel: updateDurationLabelEntry(); break;
+		case kUpdateTranscription: updateTranscriptionEntry(); break;
+		case kWasGetTranscriptionSuccessful: wasGetTranscriptionSuccessfulEntry(); break;
 		default: break;
 	}
 }
@@ -198,13 +237,20 @@ int  PlayAudioScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kPlayingIdle) && (evt == kPlay)) return kPauseSound; else
 	if ((mState == kPlayingIdle) && (evt == kSend)) return kSendGoSendGroupToVC; else
 	if ((mState == kResumeSound) && (evt == kNext)) return kPlayingIdle; else
+	if ((mState == kSendGetTranscriptionToServer) && (evt == kFail)) return kIdle; else
+	if ((mState == kSendGetTranscriptionToServer) && (evt == kSuccess)) return kWasGetTranscriptionSuccessful; else
+	if ((mState == kSetStatusInitial) && (evt == kNext)) return kSetWaitForGetTranscription; else
 	if ((mState == kSetStatusPaused) && (evt == kNext)) return kPausedIdle; else
 	if ((mState == kSetStatusPlaying) && (evt == kNext)) return kPlaySound; else
 	if ((mState == kSetStatusResuming) && (evt == kNext)) return kResumeSound; else
 	if ((mState == kSetStatusStopped) && (evt == kNext)) return kIdle; else
+	if ((mState == kSetWaitForGetTranscription) && (evt == kNext)) return kSendGetTranscriptionToServer; else
 	if ((mState == kStart) && (evt == kNext)) return kLoadSound; else
 	if ((mState == kStopSound) && (evt == kNext)) return kSetStatusStopped; else
-	if ((mState == kUpdateDurationLabel) && (evt == kNext)) return kSetStatusStopped;
+	if ((mState == kUpdateDurationLabel) && (evt == kNext)) return kSetStatusInitial; else
+	if ((mState == kUpdateTranscription) && (evt == kNext)) return kIdle; else
+	if ((mState == kWasGetTranscriptionSuccessful) && (evt == kNo)) return kIdle; else
+	if ((mState == kWasGetTranscriptionSuccessful) && (evt == kYes)) return kUpdateTranscription;
 
 	return kInvalidState;
 }
@@ -218,8 +264,9 @@ bool PlayAudioScreen::HasEdgeNamedNext() const
 		case kInvalidState:
 		case kPausedIdle:
 		case kPlayingIdle:
-		case kSendGoInboxToVC:
+		case kSendGetTranscriptionToServer:
 		case kSendGoSendGroupToVC:
+		case kWasGetTranscriptionSuccessful:
 			return false;
 		default: break;
 	}
@@ -262,6 +309,24 @@ void PlayAudioScreen::update(const URLLoaderEvent& msg)
 
     switch (msg.mEvent)
     {
+        case URLLoaderEvent::kLoadFail: process(kFail); break;
+        case URLLoaderEvent::kLoadedString:
+        {
+            switch (getState())
+            {
+                case kSendGetTranscriptionToServer:
+                    mGetTranscriptJSON = JSONUtil::extract(msg.mString);
+                    break;
+
+                default:
+                    break;
+            }
+            process(kSuccess);
+        }
+            break;
+
+        case URLLoaderEvent::kLoadedFile: process(kSuccess); break;
+            
         default:
             break;
     }

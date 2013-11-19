@@ -118,7 +118,7 @@ std::vector<std::string> gMemberListEntries;
     // Set the audio file
     NSArray *pathComponents = [NSArray arrayWithObjects:
                                NSTemporaryDirectory(),
-                               @"scratch.m4a",
+                               @"scratch.wav",
                                nil];
     NSURL *outputFileURL = [NSURL fileURLWithPathComponents:pathComponents];
 
@@ -131,7 +131,7 @@ std::vector<std::string> gMemberListEntries;
     // Define the recorder setting
     NSMutableDictionary *recordSetting = [[NSMutableDictionary alloc] init];
 
-    [recordSetting setValue:[NSNumber numberWithInt:kAudioFormatMPEG4AAC] forKey:AVFormatIDKey];
+    [recordSetting setValue:[NSNumber numberWithInt:kAudioFormatLinearPCM] forKey:AVFormatIDKey];
     [recordSetting setValue:[NSNumber numberWithFloat:16000.0] forKey:AVSampleRateKey];
     [recordSetting setValue:[NSNumber numberWithInt: 1] forKey:AVNumberOfChannelsKey];
 
