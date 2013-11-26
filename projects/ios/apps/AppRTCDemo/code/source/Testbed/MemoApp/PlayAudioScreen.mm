@@ -116,7 +116,18 @@ void PlayAudioScreen::setStatusInitialEntry()
 
 void PlayAudioScreen::updateTranscriptionEntry()
 {
-    [gAppDelegateInstance setTranscriptionText:mGetTranscriptJSON["ja"].mString];
+    std::string result = "";
+    if (mGetTranscriptJSON["ja"].mType == JSONValue::kString)
+    {
+        result += "AmiVoice: ";
+        result += mGetTranscriptJSON["ja"].mString;
+    }
+    if (mGetTranscriptJSON["ja2"].mType == JSONValue::kString)
+    {
+        result += "Nuance: ";
+        result += mGetTranscriptJSON["ja2"].mString;
+    }
+    [gAppDelegateInstance setTranscriptionText:result];
 }
 
 #pragma mark Queries
@@ -124,7 +135,8 @@ void PlayAudioScreen::wasGetTranscriptionSuccessfulEntry()
 {
     bool result = false;
 
-    if (mGetTranscriptJSON["ja"].mType == JSONValue::kString)
+    if (mGetTranscriptJSON["ja"].mType == JSONValue::kString ||
+        mGetTranscriptJSON["ja2"].mType == JSONValue::kString)
     {
         result = true;
     }
