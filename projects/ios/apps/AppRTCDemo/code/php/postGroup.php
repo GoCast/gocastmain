@@ -2,6 +2,11 @@
 
 function postGroup($from, $group, $filename)
 {
+	if (!is_dir("database/audiocache/"))
+	{
+		mkdir("database/audiocache/", 0777, true);
+	}
+
 	$anyerror = false;
 
 	foreach($group as $member)
@@ -18,9 +23,14 @@ function postGroup($from, $group, $filename)
 		}
 		else
 		{
+			copy($_FILES['filename']['tmp_name'], "database/audiocache/$filename-$shortfrom");
+
 			chmod("database/user/$member/inbox/$filename-$shortfrom", 0777);
+			chmod("database/audiocache/$filename-$shortfrom", 0777);
 		}
 	}
+
+	nuancePost("$filename-$shortfrom");
 
 	if ($anyerror == false)
 	{

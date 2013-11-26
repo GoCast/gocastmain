@@ -9,6 +9,7 @@ include 'changePassword.php';
 include 'register.php';
 include 'versionRequired.php';
 include 'userList.php';
+include 'nuancePost.php';
 include 'postGroup.php';
 include 'getProfile.php';
 include 'updateProfile.php';
