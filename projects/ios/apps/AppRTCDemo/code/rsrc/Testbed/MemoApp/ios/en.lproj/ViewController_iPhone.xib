@@ -56,7 +56,7 @@
                 <outlet property="mStopRecordingButton" destination="w94-J5-Miu" id="McL-fx-pIF"/>
                 <outlet property="mTabBar" destination="lL0-uq-o7z" id="u2g-8s-8tD"/>
                 <outlet property="mTabView" destination="f0T-z3-92b" id="W3O-QX-11W"/>
-                <outlet property="mTranscriptionLabel" destination="wSo-Xb-BF6" id="WCD-ZX-5XV"/>
+                <outlet property="mTranscriptionLabel" destination="mWs-dY-YWT" id="Raq-zj-K08"/>
                 <outlet property="mVersionCheckView" destination="QO6-PK-ZgX" id="Pxt-rN-ufB"/>
                 <outlet property="view" destination="2" id="3"/>
             </connections>
@@ -549,13 +549,14 @@
                                     <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
                                     <nil key="highlightedColor"/>
                                 </label>
-                                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Transcription not available" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="wSo-Xb-BF6" userLabel="mTranscriptionLabel">
-                                    <rect key="frame" x="10" y="68" width="298" height="260"/>
+                                <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" id="mWs-dY-YWT" userLabel="mTranscriptionLabel">
+                                    <rect key="frame" x="10" y="68" width="298" height="220"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
-                                    <nil key="highlightedColor"/>
-                                </label>
+                                    <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                    <string key="text">Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda.</string>
+                                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                    <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                                </textView>
                             </subviews>
                             <color key="backgroundColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
                         </view>

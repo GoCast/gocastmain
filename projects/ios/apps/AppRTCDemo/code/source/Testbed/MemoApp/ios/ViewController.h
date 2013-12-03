@@ -60,7 +60,7 @@ UIAlertViewDelegate, AVAudioRecorderDelegate>
 @property (nonatomic, strong) IBOutlet UIButton* mSendAudioButton;
 @property (nonatomic, strong) IBOutlet UILabel* mAudioDurationLabel;
 @property (nonatomic, strong) IBOutlet UILabel* mFrom;
-@property (nonatomic, strong) IBOutlet UILabel* mTranscriptionLabel;
+@property (nonatomic, strong) IBOutlet UITextView* mTranscriptionLabel;
 
 //mSettingsView
 @property (nonatomic, strong) IBOutlet UILabel* mLoggedInLabel;
