@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="4514" systemVersion="13A603" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none">
+    <dependencies>
+        <deployment defaultVersion="1536" identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="3747"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="ViewController">
+            <connections>
+                <outlet property="mBlockingView" destination="lKM-qr-eRy" id="fVo-rI-9Pq"/>
+                <outlet property="mContactsTab" destination="6DJ-Aw-Egg" id="2nK-P6-U47"/>
+                <outlet property="mGroupsTab" destination="fZ0-gr-obC" id="aeR-8K-glb"/>
+                <outlet property="mInboxTab" destination="mIS-gC-azt" id="HhR-ug-abq"/>
+                <outlet property="mNavigationBar" destination="apr-ZZ-bEJ" id="yhL-94-d6b"/>
+                <outlet property="mNavigationItem" destination="Ccl-OD-D5t" id="hva-l2-Zs0"/>
+                <outlet property="mNewMemoTab" destination="fNb-Yf-DE3" id="9n6-C1-mSf"/>
+                <outlet property="mSettingsTab" destination="Yjj-7Y-DMv" id="IPg-al-cma"/>
+                <outlet property="mTabBar" destination="lL0-uq-o7z" id="u2g-8s-8tD"/>
+                <outlet property="mTabView" destination="f0T-z3-92b" id="W3O-QX-11W"/>
+                <outlet property="view" destination="2" id="3"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view clipsSubviews="YES" clearsContextBeforeDrawing="NO" multipleTouchEnabled="YES" contentMode="scaleToFill" id="2">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <view contentMode="scaleToFill" id="f0T-z3-92b" userLabel="mTabView">
+                    <rect key="frame" x="0.0" y="0.0" width="320" height="460"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <subviews>
+                        <tabBar contentMode="scaleToFill" id="lL0-uq-o7z" userLabel="mTabBar">
+                            <rect key="frame" x="0.0" y="411" width="320" height="49"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                            <items>
+                                <tabBarItem title="Inbox" id="mIS-gC-azt" userLabel="mInboxTab"/>
+                                <tabBarItem title="New Memo" id="fNb-Yf-DE3" userLabel="mNewMemoTab"/>
+                                <tabBarItem title="Contacts" id="6DJ-Aw-Egg" userLabel="mContactsTab"/>
+                                <tabBarItem title="Groups" id="fZ0-gr-obC" userLabel="mGroupsTab"/>
+                                <tabBarItem title="Settings" id="Yjj-7Y-DMv" userLabel="mSettingsTab"/>
+                            </items>
+                            <connections>
+                                <outlet property="delegate" destination="-1" id="G3n-Dc-pHD"/>
+                            </connections>
+                        </tabBar>
+                        <navigationBar contentMode="scaleToFill" id="apr-ZZ-bEJ" userLabel="mNavigationBar">
+                            <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                            <items>
+                                <navigationItem title="Inbox" id="Ccl-OD-D5t" userLabel="mNavigationItem"/>
+                            </items>
+                        </navigationBar>
+                    </subviews>
+                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                    <simulatedScreenMetrics key="simulatedDestinationMetrics"/>
+                </view>
+                <view hidden="YES" alpha="0.29999999999999999" contentMode="scaleToFill" id="lKM-qr-eRy" userLabel="mBlockingView">
+                    <rect key="frame" x="0.0" y="0.0" width="320" height="460"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <subviews>
+                        <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" animating="YES" style="whiteLarge" id="axY-xc-fIB">
+                            <rect key="frame" x="141" y="222" width="37" height="37"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <color key="color" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                        </activityIndicatorView>
+                    </subviews>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                </view>
+            </subviews>
+            <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+            <simulatedStatusBarMetrics key="simulatedStatusBarMetrics"/>
+            <simulatedScreenMetrics key="simulatedDestinationMetrics"/>
+        </view>
+    </objects>
+</document>

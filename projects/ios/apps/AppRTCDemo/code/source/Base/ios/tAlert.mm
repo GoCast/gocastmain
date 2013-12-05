@@ -4,7 +4,7 @@
 
 #include <string>
 
-#include "../../Testbed/MemoApp/ios/AppDelegate.h"
+#include "../../Testbed/GoCastTalk/ios/AppDelegate.h"
 
 extern AppDelegate* gAppDelegateInstance;
 
