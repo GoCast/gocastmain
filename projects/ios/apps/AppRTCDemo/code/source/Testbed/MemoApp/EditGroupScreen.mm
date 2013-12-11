@@ -94,7 +94,7 @@ void EditGroupScreen::sendUpdateGroupsToServerEntry()
     params.push_back(std::pair<std::string, std::string>("action", "updateGroups"));
     params.push_back(std::pair<std::string, std::string>("name", std::string(tFile(tFile::kPreferencesDirectory, "logintoken.txt"))));
 
-    params.push_back(std::pair<std::string, std::string>("MAX_FILE_SIZE", "1048576"));
+    params.push_back(std::pair<std::string, std::string>("MAX_FILE_SIZE", "10485760"));
 
     URLLoader::getInstance()->postFile(kMemoAppServerURL, params, tempProfile);
 }

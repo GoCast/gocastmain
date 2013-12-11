@@ -173,7 +173,7 @@ void SendToGroupScreen::sendPostGroupToServerEntry()
         params.push_back(std::pair<std::string, std::string>("group[]", mSelectedGroup[i].mString));
     }
 
-    params.push_back(std::pair<std::string, std::string>("MAX_FILE_SIZE", "1048576"));
+    params.push_back(std::pair<std::string, std::string>("MAX_FILE_SIZE", "10485760"));
 
     URLLoader::getInstance()->postFile(kMemoAppServerURL, params, tFile(tFile::kDocumentsDirectory, mFilename));
 }
