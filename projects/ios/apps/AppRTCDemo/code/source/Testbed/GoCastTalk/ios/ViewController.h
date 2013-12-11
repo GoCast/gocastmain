@@ -24,6 +24,12 @@ UIAlertViewDelegate, AVAudioRecorderDelegate>
 @property (nonatomic, strong) IBOutlet UITabBarItem* mGroupsTab;
 @property (nonatomic, strong) IBOutlet UITabBarItem* mSettingsTab;
 
+@property (nonatomic, strong) IBOutlet UIView* mInboxView;
+@property (nonatomic, strong) IBOutlet UIView* mNewMemoView;
+@property (nonatomic, strong) IBOutlet UIView* mContactsView;
+@property (nonatomic, strong) IBOutlet UIView* mGroupsView;
+@property (nonatomic, strong) IBOutlet UIView* mSettingsView;
+
 @property (nonatomic, strong) AVAudioRecorder* mRecorder;
 
 -(void)ctorRecorder;

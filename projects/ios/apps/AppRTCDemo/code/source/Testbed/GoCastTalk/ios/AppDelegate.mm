@@ -55,7 +55,7 @@ extern std::vector<std::string> gMemberListEntries;
 //        }
 //        else
         {
-            self.viewController = [[[ViewController alloc] initWithNibName:@"ViewController_iPhone" bundle:nil] autorelease];
+            self.viewController = [[[ViewController alloc] initWithNibName:@"GoCastTalkVC" bundle:nil] autorelease];
         }
     }
 //    else
@@ -115,7 +115,39 @@ extern std::vector<std::string> gMemberListEntries;
 {
     self.viewController.mTabBar.selectedItem = self.viewController.mInboxTab;
     [self.viewController.mTabView setHidden:YES];
+
+    [self.viewController.mInboxView setHidden:YES];
+    [self.viewController.mNewMemoView setHidden:YES];
+    [self.viewController.mContactsView setHidden:YES];
+    [self.viewController.mGroupsView setHidden:YES];
+    [self.viewController.mSettingsView setHidden:YES];
+
     [self.viewController.mBlockingView setHidden:YES];
+}
+
+-(void)setInboxViewVisible:(bool)newVisible
+{
+    [self.viewController.mInboxView setHidden:(newVisible ? NO : YES)];
+}
+
+-(void)setNewMemoViewVisible:(bool)newVisible
+{
+    [self.viewController.mNewMemoView setHidden:(newVisible ? NO : YES)];
+}
+
+-(void)setContactsViewVisible:(bool)newVisible
+{
+    [self.viewController.mContactsView setHidden:(newVisible ? NO : YES)];
+}
+
+-(void)setGroupsViewVisible:(bool)newVisible
+{
+    [self.viewController.mGroupsView setHidden:(newVisible ? NO : YES)];
+}
+
+-(void)setSettingsViewVisible:(bool)newVisible
+{
+    [self.viewController.mSettingsView setHidden:(newVisible ? NO : YES)];
 }
 
 -(void)setNavigationBarTitle:(const std::string&)newTitle

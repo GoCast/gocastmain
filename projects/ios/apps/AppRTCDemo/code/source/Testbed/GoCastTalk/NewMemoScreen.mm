@@ -18,10 +18,12 @@ NewMemoScreen::~NewMemoScreen()
 void NewMemoScreen::startEntry()
 {
     [gAppDelegateInstance setNavigationBarTitle:"New Memo"];
+    [gAppDelegateInstance setNewMemoViewVisible:true];
 }
 
 void NewMemoScreen::endEntry()
 {
+    [gAppDelegateInstance setNewMemoViewVisible:false];
 }
 
 void NewMemoScreen::idleEntry()

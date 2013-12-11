@@ -18,10 +18,12 @@ ContactsScreen::~ContactsScreen()
 void ContactsScreen::startEntry()
 {
     [gAppDelegateInstance setNavigationBarTitle:"Contacts"];
+    [gAppDelegateInstance setContactsViewVisible:true];
 }
 
 void ContactsScreen::endEntry()
 {
+    [gAppDelegateInstance setContactsViewVisible:false];
 }
 
 void ContactsScreen::idleEntry()

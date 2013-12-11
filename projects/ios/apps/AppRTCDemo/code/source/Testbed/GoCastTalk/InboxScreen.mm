@@ -18,10 +18,12 @@ InboxScreen::~InboxScreen()
 void InboxScreen::startEntry()
 {
     [gAppDelegateInstance setNavigationBarTitle:"Inbox"];
+    [gAppDelegateInstance setInboxViewVisible:true];
 }
 
 void InboxScreen::endEntry()
 {
+    [gAppDelegateInstance setInboxViewVisible:false];
 }
 
 void InboxScreen::idleEntry()

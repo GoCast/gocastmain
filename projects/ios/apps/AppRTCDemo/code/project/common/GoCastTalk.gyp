@@ -159,10 +159,15 @@
 
 				'mac_bundle_resources': [
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/en.lproj/InfoPlist.strings',
-					'../../rsrc/Testbed/GoCastTalk/<@(OS)/en.lproj/ViewController_iPhone.xib',
-# 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/en.lproj/ViewController_iPhone5.xib',
+					'../../rsrc/Testbed/GoCastTalk/<@(OS)/en.lproj/GoCastTalkVC.xib',
 
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/banner.png',
+
+					'../../rsrc/Testbed/GoCastTalk/<@(OS)/tab-inbox.png',
+					'../../rsrc/Testbed/GoCastTalk/<@(OS)/tab-newmemo.png',
+					'../../rsrc/Testbed/GoCastTalk/<@(OS)/tab-contacts.png',
+					'../../rsrc/Testbed/GoCastTalk/<@(OS)/tab-groups.png',
+					'../../rsrc/Testbed/GoCastTalk/<@(OS)/tab-settings.png',
 
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/Icon.png',
 

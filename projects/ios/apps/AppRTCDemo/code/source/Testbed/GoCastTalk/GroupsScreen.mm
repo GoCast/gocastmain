@@ -18,10 +18,12 @@ GroupsScreen::~GroupsScreen()
 void GroupsScreen::startEntry()
 {
     [gAppDelegateInstance setNavigationBarTitle:"Groups"];
+    [gAppDelegateInstance setGroupsViewVisible:true];
 }
 
 void GroupsScreen::endEntry()
 {
+    [gAppDelegateInstance setGroupsViewVisible:false];
 }
 
 void GroupsScreen::idleEntry()

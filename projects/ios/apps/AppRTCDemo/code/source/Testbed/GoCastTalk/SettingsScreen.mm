@@ -18,10 +18,12 @@ SettingsScreen::~SettingsScreen()
 void SettingsScreen::startEntry()
 {
     [gAppDelegateInstance setNavigationBarTitle:"Settings"];
+    [gAppDelegateInstance setSettingsViewVisible:true];
 }
 
 void SettingsScreen::endEntry()
 {
+    [gAppDelegateInstance setSettingsViewVisible:false];
 }
 
 void SettingsScreen::idleEntry()
