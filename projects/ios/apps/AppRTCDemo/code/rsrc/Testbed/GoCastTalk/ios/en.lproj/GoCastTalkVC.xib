@@ -9,9 +9,11 @@
             <connections>
                 <outlet property="mBlockingView" destination="lKM-qr-eRy" id="fVo-rI-9Pq"/>
                 <outlet property="mContactsTab" destination="6DJ-Aw-Egg" id="2nK-P6-U47"/>
+                <outlet property="mContactsView" destination="8X3-rk-235" id="SP2-K6-pX1"/>
                 <outlet property="mGroupsTab" destination="fZ0-gr-obC" id="aeR-8K-glb"/>
                 <outlet property="mGroupsView" destination="VyD-3t-lrM" id="lhC-Qr-MJ9"/>
                 <outlet property="mInboxTab" destination="mIS-gC-azt" id="HhR-ug-abq"/>
+                <outlet property="mInboxTable" destination="Hm8-pU-XUI" id="slz-Tw-KmS"/>
                 <outlet property="mInboxView" destination="AFi-2V-tqY" id="Rwf-f1-tgY"/>
                 <outlet property="mNavigationBar" destination="apr-ZZ-bEJ" id="yhL-94-d6b"/>
                 <outlet property="mNavigationItem" destination="Ccl-OD-D5t" id="hva-l2-Zs0"/>
@@ -37,7 +39,7 @@
                             <rect key="frame" x="0.0" y="44" width="320" height="387"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
-                                <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="Hm8-pU-XUI">
+                                <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" style="plain" separatorStyle="default" rowHeight="82" sectionHeaderHeight="22" sectionFooterHeight="22" id="Hm8-pU-XUI" userLabel="mInboxTable">
                                     <rect key="frame" x="0.0" y="0.0" width="320" height="387"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -57,6 +59,10 @@
                                     <rect key="frame" x="0.0" y="0.0" width="320" height="407"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                    <connections>
+                                        <outlet property="dataSource" destination="-1" id="FTC-PD-fyt"/>
+                                        <outlet property="delegate" destination="-1" id="Vit-uK-AKe"/>
+                                    </connections>
                                 </tableView>
                             </subviews>
                             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
@@ -69,6 +75,10 @@
                                     <rect key="frame" x="0.0" y="0.0" width="320" height="407"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                    <connections>
+                                        <outlet property="dataSource" destination="-1" id="QFG-95-m2a"/>
+                                        <outlet property="delegate" destination="-1" id="m1h-PX-P0t"/>
+                                    </connections>
                                 </tableView>
                             </subviews>
                             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
@@ -81,6 +91,10 @@
                                     <rect key="frame" x="0.0" y="0.0" width="320" height="407"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                    <connections>
+                                        <outlet property="dataSource" destination="-1" id="hQ7-xT-Ai0"/>
+                                        <outlet property="delegate" destination="-1" id="kRN-fq-42b"/>
+                                    </connections>
                                 </tableView>
                             </subviews>
                             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
@@ -93,6 +107,10 @@
                                     <rect key="frame" x="0.0" y="0.0" width="320" height="407"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                    <connections>
+                                        <outlet property="dataSource" destination="-1" id="FoZ-IH-kXe"/>
+                                        <outlet property="delegate" destination="-1" id="bjz-db-Fhw"/>
+                                    </connections>
                                 </tableView>
                             </subviews>
                             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>

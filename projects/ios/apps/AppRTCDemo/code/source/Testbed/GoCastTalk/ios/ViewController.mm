@@ -7,6 +7,8 @@
 #include "GCTEvent.h"
 #include "GCTEventManager.h"
 
+#import "InboxEntryCell.h"
+
 std::vector<std::string> gUserListEntries;
 std::vector<std::string> gMyInboxListEntries;
 std::vector<std::string> gMyGroupsListEntries;
@@ -23,6 +25,8 @@ std::vector<std::string> gMemberListEntries;
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+
+    [self.mInboxTable registerNib:[UINib nibWithNibName:@"InboxEntryCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"InboxEntryCell"];
 
     [self ctorRecorder];
     self.view.autoresizesSubviews = YES;
@@ -174,6 +178,11 @@ std::vector<std::string> gMemberListEntries;
 {
 #pragma unused(tableView, section)
 
+    if (tableView == self.mInboxTable)
+    {
+        return (NSInteger)3;
+    }
+
     return (NSInteger)1;
 }
 
@@ -191,22 +200,82 @@ std::vector<std::string> gMemberListEntries;
         "Unimplemented",
     };
 
-    tableView.backgroundView = nil;
-
-    static NSString *simpleTableIdentifier = @"TableItem";
-
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:simpleTableIdentifier];
-
-    if (cell == nil)
+    if (tableView == self.mInboxTable)
     {
-        cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:simpleTableIdentifier] autorelease];
+        const char* from[] =
+        {
+            "Sato Taro",
+            "Yamada Hanako",
+            "Planning 2",
+        };
+
+        const char* date[] =
+        {
+            "12/21 12:24",
+            "12/20 12:12",
+            "12/18 11:43",
+        };
+
+        const char* transcription[] =
+        {
+            "「知りません。日本語で何か…",
+            "「でもでもそんなの関係ねえ…",
+            "「ニューヨークで入浴…",
+        };
+
+        const bool recv[] =
+        {
+            true,
+            false,
+            false,
+        };
+
+        const bool isGroup[] =
+        {
+            false,
+            false,
+            true,
+        };
+
+        tableView.backgroundView = nil;
+
+        static NSString *simpleTableIdentifier = @"InboxEntryCell";
+
+        InboxEntryCell *cell = [tableView dequeueReusableCellWithIdentifier:simpleTableIdentifier];
+
+        if (cell == nil)
+        {
+            cell = [[[InboxEntryCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:simpleTableIdentifier] autorelease];
+        }
+
+        cell.mFrom.text = [NSString stringWithUTF8String:from[indexPath.row]];
+        cell.mDate.text = [NSString stringWithUTF8String:date[indexPath.row]];
+        cell.mTranscription.text = [NSString stringWithUTF8String:transcription[indexPath.row]];
+        cell.mStatusIcon.image = [UIImage imageNamed:(recv[indexPath.row] ? @"icon-receive.png" : @"icon-sent.png")];
+        cell.mFrom.textColor =  isGroup[indexPath.row] ?
+            [UIColor colorWithRed:0.0f green:0.47f blue:1.0f alpha:1.0f] :
+            [UIColor colorWithRed:0.0f green:0.0f  blue:0.0f alpha:1.0f];
+        return cell;
     }
+    else
+    {
+        tableView.backgroundView = nil;
 
-    cell.textLabel.text = [NSString stringWithUTF8String:names[indexPath.row]];
+        static NSString *simpleTableIdentifier = @"TableItem";
 
-    cell.imageView.image = nil;
+        UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:simpleTableIdentifier];
 
-    return cell;
+        if (cell == nil)
+        {
+            cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:simpleTableIdentifier] autorelease];
+        }
+
+        cell.textLabel.text = [NSString stringWithUTF8String:names[indexPath.row]];
+
+        cell.imageView.image = nil;
+
+        return cell;
+    }
 }
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath

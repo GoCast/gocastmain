@@ -30,6 +30,9 @@ UIAlertViewDelegate, AVAudioRecorderDelegate>
 @property (nonatomic, strong) IBOutlet UIView* mGroupsView;
 @property (nonatomic, strong) IBOutlet UIView* mSettingsView;
 
+//mInboxView
+@property (nonatomic, strong) IBOutlet UITableView* mInboxTable;
+
 @property (nonatomic, strong) AVAudioRecorder* mRecorder;
 
 -(void)ctorRecorder;

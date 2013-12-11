@@ -151,6 +151,9 @@
 					'../../source/Testbed/GoCastTalk/<@(OS)/ViewController.h',
 					'../../source/Testbed/GoCastTalk/<@(OS)/ViewController.mm',
 
+					'../../source/Testbed/GoCastTalk/<@(OS)/InboxEntryCell.h',
+					'../../source/Testbed/GoCastTalk/<@(OS)/InboxEntryCell.mm',
+
 					'../../third-party/TestFlightSDK2.0.2/TestFlight.h',
 					'../../third-party/TestFlightSDK2.0.2/TestFlight+AsyncLogging.h',
 					'../../third-party/TestFlightSDK2.0.2/TestFlight+ManualSessions.h',
@@ -161,6 +164,8 @@
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/en.lproj/InfoPlist.strings',
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/en.lproj/GoCastTalkVC.xib',
 
+					'../../rsrc/Testbed/GoCastTalk/<@(OS)/en.lproj/InboxEntryCell.xib',
+
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/banner.png',
 
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/tab-inbox.png',
@@ -168,6 +173,9 @@
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/tab-contacts.png',
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/tab-groups.png',
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/tab-settings.png',
+
+					'../../rsrc/Testbed/GoCastTalk/<@(OS)/icon-receive.png',
+					'../../rsrc/Testbed/GoCastTalk/<@(OS)/icon-sent.png',
 
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/Icon.png',
 
