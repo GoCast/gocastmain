@@ -122,12 +122,20 @@ extern std::vector<std::string> gMemberListEntries;
     [self.viewController.mGroupsView setHidden:YES];
     [self.viewController.mSettingsView setHidden:YES];
 
+    [self.viewController.mInboxMessageView setHidden:YES];
+
     [self.viewController.mBlockingView setHidden:YES];
 }
 
 -(void)setInboxViewVisible:(bool)newVisible
 {
     [self.viewController.mInboxView setHidden:(newVisible ? NO : YES)];
+
+    NSIndexPath *indexPath = self.viewController.mInboxTable.indexPathForSelectedRow;
+    if (indexPath)
+    {
+        [self.viewController.mInboxTable deselectRowAtIndexPath:indexPath animated:NO];
+    }
 }
 
 -(void)setNewMemoViewVisible:(bool)newVisible
@@ -148,6 +156,18 @@ extern std::vector<std::string> gMemberListEntries;
 -(void)setSettingsViewVisible:(bool)newVisible
 {
     [self.viewController.mSettingsView setHidden:(newVisible ? NO : YES)];
+}
+
+-(void)setInboxMessageViewVisible:(bool)newVisible
+{
+    [self.viewController.mInboxMessageView setHidden:(newVisible ? NO : YES)];
+    [self.viewController.mInboxMessageView setContentOffset:CGPointZero animated:NO];
+
+    NSIndexPath *indexPath = self.viewController.mInboxMessageOptionsTable.indexPathForSelectedRow;
+    if (indexPath)
+    {
+        [self.viewController.mInboxMessageOptionsTable deselectRowAtIndexPath:indexPath animated:NO];
+    }
 }
 
 -(void)setNavigationBarTitle:(const std::string&)newTitle

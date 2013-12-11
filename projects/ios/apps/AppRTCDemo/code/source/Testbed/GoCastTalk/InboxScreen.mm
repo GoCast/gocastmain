@@ -17,17 +17,41 @@ InboxScreen::~InboxScreen()
 #pragma mark Start / End / Invalid
 void InboxScreen::startEntry()
 {
+    GCTEventManager::getInstance()->attach(this);
     [gAppDelegateInstance setNavigationBarTitle:"Inbox"];
-    [gAppDelegateInstance setInboxViewVisible:true];
 }
 
 void InboxScreen::endEntry()
 {
+}
+
+void InboxScreen::inboxViewEntry()
+{
+    [gAppDelegateInstance setInboxViewVisible:true];
+}
+
+void InboxScreen::inboxViewExit()
+{
     [gAppDelegateInstance setInboxViewVisible:false];
 }
 
-void InboxScreen::idleEntry()
+void InboxScreen::showInboxMessageViewEntry()
 {
+    [gAppDelegateInstance setInboxMessageViewVisible:true];
+}
+
+void InboxScreen::hideInboxMessageViewEntry()
+{
+    [gAppDelegateInstance setInboxMessageViewVisible:false];
+}
+
+void InboxScreen::inboxMessageViewIdleEntry()
+{
+}
+
+void InboxScreen::showConfirmDeleteEntry()
+{
+    tConfirm("Delete this message?");
 }
 
 void InboxScreen::invalidStateEntry()
@@ -41,8 +65,12 @@ void InboxScreen::CallEntry()
 	switch(mState)
 	{
 		case kEnd: EndEntryHelper(); break;
-		case kIdle: idleEntry(); break;
+		case kHideInboxMessageView: hideInboxMessageViewEntry(); break;
+		case kInboxMessageViewIdle: inboxMessageViewIdleEntry(); break;
+		case kInboxView: inboxViewEntry(); break;
 		case kInvalidState: invalidStateEntry(); break;
+		case kShowConfirmDelete: showConfirmDeleteEntry(); break;
+		case kShowInboxMessageView: showInboxMessageViewEntry(); break;
 		case kStart: startEntry(); break;
 		default: break;
 	}
@@ -50,11 +78,22 @@ void InboxScreen::CallEntry()
 
 void InboxScreen::CallExit()
 {
+	switch(mState)
+	{
+		case kInboxView: inboxViewExit(); break;
+		default: break;
+	}
 }
 
 int  InboxScreen::StateTransitionFunction(const int evt) const
 {
-	if ((mState == kStart) && (evt == kNext)) return kIdle;
+	if ((mState == kHideInboxMessageView) && (evt == kNext)) return kInboxView; else
+	if ((mState == kInboxMessageViewIdle) && (evt == kDeletePressed)) return kShowConfirmDelete; else
+	if ((mState == kInboxView) && (evt == kItemSelected)) return kShowInboxMessageView; else
+	if ((mState == kShowConfirmDelete) && (evt == kNo)) return kInboxMessageViewIdle; else
+	if ((mState == kShowConfirmDelete) && (evt == kYes)) return kHideInboxMessageView; else
+	if ((mState == kShowInboxMessageView) && (evt == kNext)) return kInboxMessageViewIdle; else
+	if ((mState == kStart) && (evt == kNext)) return kInboxView;
 
 	return kInvalidState;
 }
@@ -63,6 +102,8 @@ bool InboxScreen::HasEdgeNamedNext() const
 {
 	switch(mState)
 	{
+		case kHideInboxMessageView:
+		case kShowInboxMessageView:
 		case kStart:
 			return true;
 		default: break;
@@ -78,6 +119,27 @@ void InboxScreen::update(const InboxScreenMessage& msg)
 
 void InboxScreen::update(const GCTEvent &msg)
 {
-#pragma unused(msg)
+    switch (msg.mEvent)
+    {
+        case GCTEvent::kOKYesAlertPressed:  process(kYes); break;
+        case GCTEvent::kNoAlertPressed:     process(kNo); break;
+
+        case GCTEvent::kTableItemSelected:
+            if (getState() == kInboxView)
+            {
+                process(kItemSelected);
+            }
+            else if (getState() == kInboxMessageViewIdle)
+            {
+                if (msg.mItemSelected == 2)
+                {
+                    process(kDeletePressed);
+                }
+            }
+            break;
+
+        default:
+            break;
+    }
 }
 

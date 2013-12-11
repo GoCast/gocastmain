@@ -145,27 +145,32 @@ void GoCastTalkApp::CallExit()
 
 int  GoCastTalkApp::StateTransitionFunction(const int evt) const
 {
+	if ((mState == kContactsScreen) && (evt == kGoContacts)) return kContactsScreen; else
 	if ((mState == kContactsScreen) && (evt == kGoGroups)) return kGroupsScreen; else
 	if ((mState == kContactsScreen) && (evt == kGoInbox)) return kInboxScreen; else
 	if ((mState == kContactsScreen) && (evt == kGoNewMemo)) return kNewMemoScreen; else
 	if ((mState == kContactsScreen) && (evt == kGoSettings)) return kSettingsScreen; else
 	if ((mState == kGroupsScreen) && (evt == kGoContacts)) return kContactsScreen; else
+	if ((mState == kGroupsScreen) && (evt == kGoGroups)) return kGroupsScreen; else
 	if ((mState == kGroupsScreen) && (evt == kGoInbox)) return kInboxScreen; else
 	if ((mState == kGroupsScreen) && (evt == kGoNewMemo)) return kNewMemoScreen; else
 	if ((mState == kGroupsScreen) && (evt == kGoSettings)) return kSettingsScreen; else
 	if ((mState == kHideAllViews) && (evt == kNext)) return kStartScreen; else
 	if ((mState == kInboxScreen) && (evt == kGoContacts)) return kContactsScreen; else
 	if ((mState == kInboxScreen) && (evt == kGoGroups)) return kGroupsScreen; else
+	if ((mState == kInboxScreen) && (evt == kGoInbox)) return kInboxScreen; else
 	if ((mState == kInboxScreen) && (evt == kGoNewMemo)) return kNewMemoScreen; else
 	if ((mState == kInboxScreen) && (evt == kGoSettings)) return kSettingsScreen; else
 	if ((mState == kNewMemoScreen) && (evt == kGoContacts)) return kContactsScreen; else
 	if ((mState == kNewMemoScreen) && (evt == kGoGroups)) return kGroupsScreen; else
 	if ((mState == kNewMemoScreen) && (evt == kGoInbox)) return kInboxScreen; else
+	if ((mState == kNewMemoScreen) && (evt == kGoNewMemo)) return kNewMemoScreen; else
 	if ((mState == kNewMemoScreen) && (evt == kGoSettings)) return kSettingsScreen; else
 	if ((mState == kSettingsScreen) && (evt == kGoContacts)) return kContactsScreen; else
 	if ((mState == kSettingsScreen) && (evt == kGoGroups)) return kGroupsScreen; else
 	if ((mState == kSettingsScreen) && (evt == kGoInbox)) return kInboxScreen; else
 	if ((mState == kSettingsScreen) && (evt == kGoNewMemo)) return kNewMemoScreen; else
+	if ((mState == kSettingsScreen) && (evt == kGoSettings)) return kSettingsScreen; else
 	if ((mState == kStart) && (evt == kReady)) return kHideAllViews; else
 	if ((mState == kStartScreen) && (evt == kGoInbox)) return kInboxScreen;
 
@@ -191,38 +196,23 @@ void GoCastTalkApp::update(const GCTEvent& msg)
         case GCTEvent::kAppDelegateInit:   process(kReady); break;
 
         case GCTEvent::kInboxTabPressed:
-            if (getState() != kInboxScreen)
-            {
-                process(kGoInbox);
-            }
+            process(kGoInbox);
             break;
 
         case GCTEvent::kNewMemoTabPressed:
-            if (getState() != kNewMemoScreen)
-            {
-                process(kGoNewMemo);
-            }
+            process(kGoNewMemo);
             break;
 
         case GCTEvent::kContactsTabPressed:
-            if (getState() != kContactsScreen)
-            {
-                process(kGoContacts);
-            }
+            process(kGoContacts);
             break;
 
         case GCTEvent::kGroupsTabPressed:
-            if (getState() != kGroupsScreen)
-            {
-                process(kGoGroups);
-            }
+            process(kGoGroups);
             break;
 
         case GCTEvent::kSettingsTabPressed:
-            if (getState() != kSettingsScreen)
-            {
-                process(kGoSettings);
-            }
+            process(kGoSettings);
             break;
 
         default:

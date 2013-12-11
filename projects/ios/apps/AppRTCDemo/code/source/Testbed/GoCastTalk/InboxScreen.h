@@ -22,13 +22,23 @@ protected:
 	void endEntry();
 	void invalidStateEntry();
 
-	void idleEntry();
+	void hideInboxMessageViewEntry();
+	void inboxMessageViewIdleEntry();
+	void inboxViewEntry();
+	void showConfirmDeleteEntry();
+	void showInboxMessageViewEntry();
+
+	void inboxViewExit();
 
 public:
 	enum EventType
 	{
 		kInvalidEvent = -2,
 		kNext = -1,
+		kDeletePressed,
+		kItemSelected,
+		kNo,
+		kYes,
 	};
 
 	enum StateType
@@ -36,7 +46,11 @@ public:
 		kInvalidState = 0,
 		kStart = 1,
 		kEnd,
-		kIdle,
+		kHideInboxMessageView,
+		kInboxMessageViewIdle,
+		kInboxView,
+		kShowConfirmDelete,
+		kShowInboxMessageView,
 	};
 
 protected:

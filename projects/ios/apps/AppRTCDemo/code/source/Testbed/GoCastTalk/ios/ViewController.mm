@@ -8,6 +8,7 @@
 #include "GCTEventManager.h"
 
 #import "InboxEntryCell.h"
+#import "HeadingSubCell.h"
 
 std::vector<std::string> gUserListEntries;
 std::vector<std::string> gMyInboxListEntries;
@@ -27,6 +28,7 @@ std::vector<std::string> gMemberListEntries;
     [super viewDidLoad];
 
     [self.mInboxTable registerNib:[UINib nibWithNibName:@"InboxEntryCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"InboxEntryCell"];
+    [self.mInboxMessageOptionsTable registerNib:[UINib nibWithNibName:@"HeadingSubCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"HeadingSubCell"];
 
     [self ctorRecorder];
     self.view.autoresizesSubviews = YES;
@@ -38,6 +40,8 @@ std::vector<std::string> gMemberListEntries;
 //        r.origin.y += 20;
 //        [self.view setBounds:r];
     }
+
+    self.mInboxMessageView.contentSize = CGSizeMake(320, 593);
 }
 
 - (void)viewDidUnload
@@ -182,8 +186,12 @@ std::vector<std::string> gMemberListEntries;
     {
         return (NSInteger)3;
     }
+    else if (tableView == self.mInboxMessageOptionsTable)
+    {
+        return (NSInteger)3;
+    }
 
-    return (NSInteger)1;
+    return (NSInteger)3;
 }
 
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
@@ -255,6 +263,47 @@ std::vector<std::string> gMemberListEntries;
         cell.mFrom.textColor =  isGroup[indexPath.row] ?
             [UIColor colorWithRed:0.0f green:0.47f blue:1.0f alpha:1.0f] :
             [UIColor colorWithRed:0.0f green:0.0f  blue:0.0f alpha:1.0f];
+
+        return cell;
+    }
+    else if (tableView == self.mInboxMessageOptionsTable)
+    {
+        const char* heading[] =
+        {
+            "Reply Message",
+            "Quick Chat",
+            "Delete",
+        };
+
+        const char* subheading[] =
+        {
+            "Send recorded message",
+            "Send pre-composed message",
+            "Delete this message",
+        };
+
+        const bool hasRightArrow[] =
+        {
+            true,
+            true,
+            false,
+        };
+
+        tableView.backgroundView = nil;
+
+        static NSString *simpleTableIdentifier = @"HeadingSubCell";
+
+        HeadingSubCell *cell = [tableView dequeueReusableCellWithIdentifier:simpleTableIdentifier];
+
+        if (cell == nil)
+        {
+            cell = [[[HeadingSubCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:simpleTableIdentifier] autorelease];
+        }
+
+        cell.mHeading.text = [NSString stringWithUTF8String:heading[indexPath.row]];
+        cell.mSub.text = [NSString stringWithUTF8String:subheading[indexPath.row]];
+        cell.mRightArrow.hidden = hasRightArrow[indexPath.row] ? NO : YES;
+
         return cell;
     }
     else
@@ -270,7 +319,7 @@ std::vector<std::string> gMemberListEntries;
             cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:simpleTableIdentifier] autorelease];
         }
 
-        cell.textLabel.text = [NSString stringWithUTF8String:names[indexPath.row]];
+        cell.textLabel.text = [NSString stringWithUTF8String:names[0]];
 
         cell.imageView.image = nil;
 
