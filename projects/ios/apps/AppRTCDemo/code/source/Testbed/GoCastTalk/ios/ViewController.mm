@@ -29,6 +29,7 @@ std::vector<std::string> gMemberListEntries;
 
     [self.mInboxTable registerNib:[UINib nibWithNibName:@"InboxEntryCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"InboxEntryCell"];
     [self.mInboxMessageOptionsTable registerNib:[UINib nibWithNibName:@"HeadingSubCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"HeadingSubCell"];
+    [self.mSettingsTable registerNib:[UINib nibWithNibName:@"HeadingSubCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"HeadingSubCell"];
 
     [self ctorRecorder];
     self.view.autoresizesSubviews = YES;
@@ -175,7 +176,8 @@ std::vector<std::string> gMemberListEntries;
 - (BOOL)textFieldShouldReturn:(UITextField *)textField
 {
 #pragma unused(textField)
-    return NO;
+    [textField endEditing:YES];
+    return YES;
 }
 
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
@@ -190,8 +192,12 @@ std::vector<std::string> gMemberListEntries;
     {
         return (NSInteger)3;
     }
+    else if (tableView == self.mSettingsTable)
+    {
+        return (NSInteger)4;
+    }
 
-    return (NSInteger)3;
+    return (NSInteger)1;
 }
 
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
@@ -304,6 +310,49 @@ std::vector<std::string> gMemberListEntries;
         cell.mSub.text = [NSString stringWithUTF8String:subheading[indexPath.row]];
         cell.mRightArrow.hidden = hasRightArrow[indexPath.row] ? NO : YES;
 
+        return cell;
+    }
+    else if (tableView == self.mSettingsTable)
+    {
+        const char* heading[] =
+        {
+            "Registered Name",
+            "Change Password",
+            "Log Out",
+            "About this app",
+        };
+
+        const char* subheading[] =
+        {
+            "Change registered name",
+            "Change user's password",
+            "Log out from current user",
+            "About GoCastTalk",
+        };
+
+        const bool hasRightArrow[] =
+        {
+            true,
+            true,
+            false,
+            true,
+        };
+
+        tableView.backgroundView = nil;
+
+        static NSString *simpleTableIdentifier = @"HeadingSubCell";
+
+        HeadingSubCell *cell = [tableView dequeueReusableCellWithIdentifier:simpleTableIdentifier];
+
+        if (cell == nil)
+        {
+            cell = [[[HeadingSubCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:simpleTableIdentifier] autorelease];
+        }
+
+        cell.mHeading.text = [NSString stringWithUTF8String:heading[indexPath.row]];
+        cell.mSub.text = [NSString stringWithUTF8String:subheading[indexPath.row]];
+        cell.mRightArrow.hidden = hasRightArrow[indexPath.row] ? NO : YES;
+        
         return cell;
     }
     else

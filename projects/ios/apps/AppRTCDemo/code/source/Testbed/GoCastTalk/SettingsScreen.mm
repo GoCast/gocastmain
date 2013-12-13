@@ -17,17 +17,34 @@ SettingsScreen::~SettingsScreen()
 #pragma mark Start / End / Invalid
 void SettingsScreen::startEntry()
 {
+    GCTEventManager::getInstance()->attach(this);
     [gAppDelegateInstance setNavigationBarTitle:"Settings"];
-    [gAppDelegateInstance setSettingsViewVisible:true];
 }
 
 void SettingsScreen::endEntry()
 {
     [gAppDelegateInstance setSettingsViewVisible:false];
+    [gAppDelegateInstance setChangeRegisteredNameViewVisible:false];
 }
 
-void SettingsScreen::idleEntry()
+void SettingsScreen::settingsViewEntry()
 {
+    [gAppDelegateInstance setSettingsViewVisible:true];
+}
+
+void SettingsScreen::settingsViewExit()
+{
+    [gAppDelegateInstance setSettingsViewVisible:false];
+}
+
+void SettingsScreen::changeRegisteredNameViewEntry()
+{
+    [gAppDelegateInstance setChangeRegisteredNameViewVisible:true];
+}
+
+void SettingsScreen::changeRegisteredNameViewExit()
+{
+    [gAppDelegateInstance setChangeRegisteredNameViewVisible:false];
 }
 
 void SettingsScreen::invalidStateEntry()
@@ -40,9 +57,10 @@ void SettingsScreen::CallEntry()
 {
 	switch(mState)
 	{
+		case kChangeRegisteredNameView: changeRegisteredNameViewEntry(); break;
 		case kEnd: EndEntryHelper(); break;
-		case kIdle: idleEntry(); break;
 		case kInvalidState: invalidStateEntry(); break;
+		case kSettingsView: settingsViewEntry(); break;
 		case kStart: startEntry(); break;
 		default: break;
 	}
@@ -50,11 +68,18 @@ void SettingsScreen::CallEntry()
 
 void SettingsScreen::CallExit()
 {
+	switch(mState)
+	{
+		case kChangeRegisteredNameView: changeRegisteredNameViewExit(); break;
+		case kSettingsView: settingsViewExit(); break;
+		default: break;
+	}
 }
 
 int  SettingsScreen::StateTransitionFunction(const int evt) const
 {
-	if ((mState == kStart) && (evt == kNext)) return kIdle;
+	if ((mState == kSettingsView) && (evt == kItemSelected)) return kChangeRegisteredNameView; else
+	if ((mState == kStart) && (evt == kNext)) return kSettingsView;
 
 	return kInvalidState;
 }
@@ -78,6 +103,20 @@ void SettingsScreen::update(const SettingsScreenMessage& msg)
 
 void SettingsScreen::update(const GCTEvent &msg)
 {
-#pragma unused(msg)
+    switch (msg.mEvent)
+    {
+        case GCTEvent::kTableItemSelected:
+            if (getState() == kSettingsView)
+            {
+                if (msg.mItemSelected == 0)
+                {
+                    process(kItemSelected);
+                }
+            }
+            break;
+
+        default:
+            break;
+    }
 }
 

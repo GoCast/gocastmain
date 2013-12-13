@@ -22,21 +22,27 @@ protected:
 	void endEntry();
 	void invalidStateEntry();
 
-	void idleEntry();
+	void changeRegisteredNameViewEntry();
+	void settingsViewEntry();
+
+	void changeRegisteredNameViewExit();
+	void settingsViewExit();
 
 public:
 	enum EventType
 	{
 		kInvalidEvent = -2,
 		kNext = -1,
+		kItemSelected,
 	};
 
 	enum StateType
 	{
 		kInvalidState = 0,
 		kStart = 1,
+		kChangeRegisteredNameView,
 		kEnd,
-		kIdle,
+		kSettingsView,
 	};
 
 protected:

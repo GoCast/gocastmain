@@ -23,6 +23,8 @@ void InboxScreen::startEntry()
 
 void InboxScreen::endEntry()
 {
+    [gAppDelegateInstance setInboxViewVisible:false];
+    [gAppDelegateInstance setInboxMessageViewVisible:false];
 }
 
 void InboxScreen::inboxViewEntry()

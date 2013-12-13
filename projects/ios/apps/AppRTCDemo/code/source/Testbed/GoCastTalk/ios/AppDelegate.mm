@@ -123,6 +123,7 @@ extern std::vector<std::string> gMemberListEntries;
     [self.viewController.mSettingsView setHidden:YES];
 
     [self.viewController.mInboxMessageView setHidden:YES];
+    [self.viewController.mChangeRegisteredNameView setHidden:YES];
 
     [self.viewController.mBlockingView setHidden:YES];
 }
@@ -156,8 +157,15 @@ extern std::vector<std::string> gMemberListEntries;
 -(void)setSettingsViewVisible:(bool)newVisible
 {
     [self.viewController.mSettingsView setHidden:(newVisible ? NO : YES)];
+
+    NSIndexPath *indexPath = self.viewController.mSettingsTable.indexPathForSelectedRow;
+    if (indexPath)
+    {
+        [self.viewController.mSettingsTable deselectRowAtIndexPath:indexPath animated:NO];
+    }
 }
 
+//mInboxView
 -(void)setInboxMessageViewVisible:(bool)newVisible
 {
     [self.viewController.mInboxMessageView setHidden:(newVisible ? NO : YES)];
@@ -168,6 +176,12 @@ extern std::vector<std::string> gMemberListEntries;
     {
         [self.viewController.mInboxMessageOptionsTable deselectRowAtIndexPath:indexPath animated:NO];
     }
+}
+
+//mSettingsView
+-(void)setChangeRegisteredNameViewVisible:(bool)newVisible
+{
+    [self.viewController.mChangeRegisteredNameView setHidden:(newVisible ? NO : YES)];
 }
 
 -(void)setNavigationBarTitle:(const std::string&)newTitle

@@ -20,7 +20,11 @@
 -(void)setGroupsViewVisible:(bool)newVisible;
 -(void)setSettingsViewVisible:(bool)newVisible;
 
+//mInboxView
 -(void)setInboxMessageViewVisible:(bool)newVisible;
+
+//mSettingsView
+-(void)setChangeRegisteredNameViewVisible:(bool)newVisible;
 
 -(void)setNavigationBarTitle:(const std::string&)newTitle;
 
