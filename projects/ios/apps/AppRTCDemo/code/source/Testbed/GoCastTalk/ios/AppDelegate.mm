@@ -122,10 +122,16 @@ extern std::vector<std::string> gMemberListEntries;
     [self.viewController.mGroupsView setHidden:YES];
     [self.viewController.mSettingsView setHidden:YES];
 
+    //mInboxView
     [self.viewController.mInboxMessageView setHidden:YES];
     [self.viewController.mRecordMessageView setHidden:YES];
-    [self.viewController.mChangeRegisteredNameView setHidden:YES];
     [self.viewController.mMessageHistoryView setHidden:YES];
+
+    //mContactsView
+    [self.viewController.mContactDetailsView setHidden:YES];
+
+    //mSettingsView
+    [self.viewController.mChangeRegisteredNameView setHidden:YES];
 
     [self.viewController.mBlockingView setHidden:YES];
 }
@@ -149,6 +155,12 @@ extern std::vector<std::string> gMemberListEntries;
 -(void)setContactsViewVisible:(bool)newVisible
 {
     [self.viewController.mContactsView setHidden:(newVisible ? NO : YES)];
+
+    NSIndexPath *indexPath = self.viewController.mContactsTable.indexPathForSelectedRow;
+    if (indexPath)
+    {
+        [self.viewController.mContactsTable deselectRowAtIndexPath:indexPath animated:NO];
+    }
 }
 
 -(void)setGroupsViewVisible:(bool)newVisible
@@ -195,6 +207,19 @@ extern std::vector<std::string> gMemberListEntries;
 {
     [self.viewController.mMessageHistoryView setHidden:(newVisible ? NO : YES)];
 }
+
+//mContactsView
+-(void)setContactDetailsViewVisible:(bool)newVisible
+{
+    [self.viewController.mContactDetailsView setHidden:(newVisible ? NO : YES)];
+
+    NSIndexPath *indexPath = self.viewController.mContactDetailsOptionsTable.indexPathForSelectedRow;
+    if (indexPath)
+    {
+        [self.viewController.mContactDetailsOptionsTable deselectRowAtIndexPath:indexPath animated:NO];
+    }
+}
+
 
 //mSettingsView
 -(void)setChangeRegisteredNameViewVisible:(bool)newVisible

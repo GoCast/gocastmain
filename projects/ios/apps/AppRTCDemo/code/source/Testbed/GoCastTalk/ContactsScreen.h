@@ -22,21 +22,35 @@ protected:
 	void endEntry();
 	void invalidStateEntry();
 
-	void idleEntry();
+	void contactDetailsViewEntry();
+	void contactsViewEntry();
+	void messageHistoryViewEntry();
+	void recordMessageViewEntry();
+
+	void contactDetailsViewExit();
+	void contactsViewExit();
+	void messageHistoryViewExit();
+	void recordMessageViewExit();
 
 public:
 	enum EventType
 	{
 		kInvalidEvent = -2,
 		kNext = -1,
+		kHistoryPressed,
+		kItemSelected,
+		kReplyPressed,
 	};
 
 	enum StateType
 	{
 		kInvalidState = 0,
 		kStart = 1,
+		kContactDetailsView,
+		kContactsView,
 		kEnd,
-		kIdle,
+		kMessageHistoryView,
+		kRecordMessageView,
 	};
 
 protected:

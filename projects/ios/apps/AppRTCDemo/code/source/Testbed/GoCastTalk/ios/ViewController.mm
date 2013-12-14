@@ -29,9 +29,11 @@ std::vector<std::string> gMemberListEntries;
 
     [self.mInboxTable registerNib:[UINib nibWithNibName:@"InboxEntryCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"InboxEntryCell"];
     [self.mHistoryTable registerNib:[UINib nibWithNibName:@"InboxEntryCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"InboxEntryCell"];
+    [self.mContactsTable registerNib:[UINib nibWithNibName:@"HeadingSubCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"HeadingSubCell"];
     [self.mInboxMessageOptionsTable registerNib:[UINib nibWithNibName:@"HeadingSubCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"HeadingSubCell"];
     [self.mRecordMessageOptionsTable registerNib:[UINib nibWithNibName:@"HeadingSubCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"HeadingSubCell"];
     [self.mMessageHistoryOptionsTable registerNib:[UINib nibWithNibName:@"HeadingSubCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"HeadingSubCell"];
+    [self.mContactDetailsOptionsTable registerNib:[UINib nibWithNibName:@"HeadingSubCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"HeadingSubCell"];
     [self.mSettingsTable registerNib:[UINib nibWithNibName:@"HeadingSubCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"HeadingSubCell"];
 
     [self ctorRecorder];
@@ -196,6 +198,14 @@ std::vector<std::string> gMemberListEntries;
     {
         return (NSInteger)3;
     }
+    else if (tableView == self.mContactsTable)
+    {
+        return (NSInteger)4;
+    }
+    else if (tableView == self.mContactDetailsOptionsTable)
+    {
+        return (NSInteger)2;
+    }
     else if (tableView == self.mInboxMessageOptionsTable)
     {
         return (NSInteger)3;
@@ -322,7 +332,7 @@ std::vector<std::string> gMemberListEntries;
         {
             false,
             false,
-            true,
+            false,
         };
 
         tableView.backgroundView = nil;
@@ -343,6 +353,33 @@ std::vector<std::string> gMemberListEntries;
         cell.mFrom.textColor =  isGroup[indexPath.row] ?
         [UIColor colorWithRed:0.0f green:0.47f blue:1.0f alpha:1.0f] :
         [UIColor colorWithRed:0.0f green:0.0f  blue:0.0f alpha:1.0f];
+        
+        return cell;
+    }
+    else if (tableView == self.mContactsTable)
+    {
+        const char* heading[] =
+        {
+            "Self",
+            "Sato Taro",
+            "Yamada Hanako",
+            "Yoshida Jirou",
+        };
+
+        tableView.backgroundView = nil;
+
+        static NSString *simpleTableIdentifier = @"HeadingSubCell";
+
+        HeadingSubCell *cell = [tableView dequeueReusableCellWithIdentifier:simpleTableIdentifier];
+
+        if (cell == nil)
+        {
+            cell = [[[HeadingSubCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:simpleTableIdentifier] autorelease];
+        }
+
+        cell.mHeading.text = [NSString stringWithUTF8String:heading[indexPath.row]];
+        cell.mSub.text = [NSString stringWithUTF8String:""];
+        cell.mRightArrow.hidden = YES;
         
         return cell;
     }
@@ -384,6 +421,43 @@ std::vector<std::string> gMemberListEntries;
         cell.mSub.text = [NSString stringWithUTF8String:subheading[indexPath.row]];
         cell.mRightArrow.hidden = hasRightArrow[indexPath.row] ? NO : YES;
 
+        return cell;
+    }
+    else if (tableView == self.mContactDetailsOptionsTable)
+    {
+        const char* heading[] =
+        {
+            "Past Messages",
+            "Send Message",
+        };
+
+        const char* subheading[] =
+        {
+            "Show message history",
+            "Send recorded message",
+        };
+
+        const bool hasRightArrow[] =
+        {
+            true,
+            true,
+        };
+
+        tableView.backgroundView = nil;
+
+        static NSString *simpleTableIdentifier = @"HeadingSubCell";
+
+        HeadingSubCell *cell = [tableView dequeueReusableCellWithIdentifier:simpleTableIdentifier];
+
+        if (cell == nil)
+        {
+            cell = [[[HeadingSubCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:simpleTableIdentifier] autorelease];
+        }
+
+        cell.mHeading.text = [NSString stringWithUTF8String:heading[indexPath.row]];
+        cell.mSub.text = [NSString stringWithUTF8String:subheading[indexPath.row]];
+        cell.mRightArrow.hidden = hasRightArrow[indexPath.row] ? NO : YES;
+        
         return cell;
     }
     else if (tableView == self.mMessageHistoryOptionsTable)

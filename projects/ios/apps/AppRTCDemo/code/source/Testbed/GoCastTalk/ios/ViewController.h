@@ -40,6 +40,11 @@ UIAlertViewDelegate, AVAudioRecorderDelegate>
 @property (nonatomic, strong) IBOutlet UIScrollView*    mMessageHistoryView;
 @property (nonatomic, strong) IBOutlet UITableView*     mHistoryTable;
 @property (nonatomic, strong) IBOutlet UITableView*     mMessageHistoryOptionsTable;
+@property (nonatomic, strong) IBOutlet UITableView*     mContactsTable;
+
+//mContactsView
+@property (nonatomic, strong) IBOutlet UIView*          mContactDetailsView;
+@property (nonatomic, strong) IBOutlet UITableView*     mContactDetailsOptionsTable;
 
 //mSettingsView
 @property (nonatomic, strong) IBOutlet UITableView*     mSettingsTable;

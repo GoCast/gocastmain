@@ -159,7 +159,10 @@ void InboxScreen::update(const GCTEvent &msg)
         case GCTEvent::kTableItemSelected:
             if (getState() == kInboxView)
             {
-                process(kItemSelected);
+                if (msg.mItemSelected == 0)
+                {
+                    process(kItemSelected);
+                }
             }
             else if (getState() == kRecordMessageView)
             {

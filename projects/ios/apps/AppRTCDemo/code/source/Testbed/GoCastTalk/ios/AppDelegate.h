@@ -25,6 +25,9 @@
 -(void)setRecordMessageViewVisible:(bool)newVisible;
 -(void)setMessageHistoryViewVisible:(bool)newVisible;
 
+//mContactsView
+-(void)setContactDetailsViewVisible:(bool)newVisible;
+
 //mSettingsView
 -(void)setChangeRegisteredNameViewVisible:(bool)newVisible;
 
