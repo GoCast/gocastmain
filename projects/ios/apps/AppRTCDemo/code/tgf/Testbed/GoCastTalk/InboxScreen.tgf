@@ -5,6 +5,7 @@
 5 Show "confirm delete"
 6 Hide Inbox Message View
 7 Inbox Message View Idle
+8 Record Message View*
 #
 1 3
 3 4 itemSelected
@@ -13,3 +14,5 @@
 7 5 deletePressed
 4 7
 6 3
+7 8 replyPressed
+8 4 itemSelected

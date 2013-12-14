@@ -35,6 +35,8 @@ UIAlertViewDelegate, AVAudioRecorderDelegate>
 @property (nonatomic, strong) IBOutlet UITableView*     mInboxTable;
 @property (nonatomic, strong) IBOutlet UIScrollView*    mInboxMessageView;
 @property (nonatomic, strong) IBOutlet UITableView*     mInboxMessageOptionsTable;
+@property (nonatomic, strong) IBOutlet UIView*          mRecordMessageView;
+@property (nonatomic, strong) IBOutlet UITableView*     mRecordMessageOptionsTable;
 
 //mSettingsView
 @property (nonatomic, strong) IBOutlet UITableView*     mSettingsTable;

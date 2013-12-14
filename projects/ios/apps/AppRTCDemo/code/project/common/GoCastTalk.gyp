@@ -182,7 +182,9 @@
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/icon-sent.png',
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/icon-right.png',
 
+					'../../rsrc/Testbed/GoCastTalk/<@(OS)/button-pause.png',
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/button-play.png',
+					'../../rsrc/Testbed/GoCastTalk/<@(OS)/button-record.png',
 
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/Icon.png',
 

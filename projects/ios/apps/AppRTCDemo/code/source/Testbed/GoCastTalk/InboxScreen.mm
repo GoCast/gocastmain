@@ -37,6 +37,17 @@ void InboxScreen::inboxViewExit()
     [gAppDelegateInstance setInboxViewVisible:false];
 }
 
+void InboxScreen::recordMessageViewEntry()
+{
+    [gAppDelegateInstance setInboxMessageViewVisible:false];
+    [gAppDelegateInstance setRecordMessageViewVisible:true];
+}
+
+void InboxScreen::recordMessageViewExit()
+{
+    [gAppDelegateInstance setRecordMessageViewVisible:false];
+}
+
 void InboxScreen::showInboxMessageViewEntry()
 {
     [gAppDelegateInstance setInboxMessageViewVisible:true];
@@ -71,6 +82,7 @@ void InboxScreen::CallEntry()
 		case kInboxMessageViewIdle: inboxMessageViewIdleEntry(); break;
 		case kInboxView: inboxViewEntry(); break;
 		case kInvalidState: invalidStateEntry(); break;
+		case kRecordMessageView: recordMessageViewEntry(); break;
 		case kShowConfirmDelete: showConfirmDeleteEntry(); break;
 		case kShowInboxMessageView: showInboxMessageViewEntry(); break;
 		case kStart: startEntry(); break;
@@ -83,6 +95,7 @@ void InboxScreen::CallExit()
 	switch(mState)
 	{
 		case kInboxView: inboxViewExit(); break;
+		case kRecordMessageView: recordMessageViewExit(); break;
 		default: break;
 	}
 }
@@ -91,7 +104,9 @@ int  InboxScreen::StateTransitionFunction(const int evt) const
 {
 	if ((mState == kHideInboxMessageView) && (evt == kNext)) return kInboxView; else
 	if ((mState == kInboxMessageViewIdle) && (evt == kDeletePressed)) return kShowConfirmDelete; else
+	if ((mState == kInboxMessageViewIdle) && (evt == kReplyPressed)) return kRecordMessageView; else
 	if ((mState == kInboxView) && (evt == kItemSelected)) return kShowInboxMessageView; else
+	if ((mState == kRecordMessageView) && (evt == kItemSelected)) return kShowInboxMessageView; else
 	if ((mState == kShowConfirmDelete) && (evt == kNo)) return kInboxMessageViewIdle; else
 	if ((mState == kShowConfirmDelete) && (evt == kYes)) return kHideInboxMessageView; else
 	if ((mState == kShowInboxMessageView) && (evt == kNext)) return kInboxMessageViewIdle; else
@@ -131,9 +146,17 @@ void InboxScreen::update(const GCTEvent &msg)
             {
                 process(kItemSelected);
             }
+            else if (getState() == kRecordMessageView)
+            {
+                process(kItemSelected);
+            }
             else if (getState() == kInboxMessageViewIdle)
             {
-                if (msg.mItemSelected == 2)
+                if (msg.mItemSelected == 0)
+                {
+                    process(kReplyPressed);
+                }
+                else if (msg.mItemSelected == 2)
                 {
                     process(kDeletePressed);
                 }

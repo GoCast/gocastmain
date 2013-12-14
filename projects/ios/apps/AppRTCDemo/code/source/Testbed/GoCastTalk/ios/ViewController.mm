@@ -29,6 +29,7 @@ std::vector<std::string> gMemberListEntries;
 
     [self.mInboxTable registerNib:[UINib nibWithNibName:@"InboxEntryCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"InboxEntryCell"];
     [self.mInboxMessageOptionsTable registerNib:[UINib nibWithNibName:@"HeadingSubCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"HeadingSubCell"];
+    [self.mRecordMessageOptionsTable registerNib:[UINib nibWithNibName:@"HeadingSubCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"HeadingSubCell"];
     [self.mSettingsTable registerNib:[UINib nibWithNibName:@"HeadingSubCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"HeadingSubCell"];
 
     [self ctorRecorder];
@@ -192,6 +193,10 @@ std::vector<std::string> gMemberListEntries;
     {
         return (NSInteger)3;
     }
+    else if (tableView == self.mRecordMessageOptionsTable)
+    {
+        return (NSInteger)2;
+    }
     else if (tableView == self.mSettingsTable)
     {
         return (NSInteger)4;
@@ -310,6 +315,31 @@ std::vector<std::string> gMemberListEntries;
         cell.mSub.text = [NSString stringWithUTF8String:subheading[indexPath.row]];
         cell.mRightArrow.hidden = hasRightArrow[indexPath.row] ? NO : YES;
 
+        return cell;
+    }
+    else if (tableView == self.mRecordMessageOptionsTable)
+    {
+        const char* heading[] =
+        {
+            "Done, Send",
+            "Cancel and Delete",
+        };
+
+        tableView.backgroundView = nil;
+
+        static NSString *simpleTableIdentifier = @"HeadingSubCell";
+
+        HeadingSubCell *cell = [tableView dequeueReusableCellWithIdentifier:simpleTableIdentifier];
+
+        if (cell == nil)
+        {
+            cell = [[[HeadingSubCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:simpleTableIdentifier] autorelease];
+        }
+
+        cell.mHeading.text = [NSString stringWithUTF8String:heading[indexPath.row]];
+        cell.mSub.text = [NSString stringWithUTF8String:""];
+        cell.mRightArrow.hidden = YES;
+        
         return cell;
     }
     else if (tableView == self.mSettingsTable)

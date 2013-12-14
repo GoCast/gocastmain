@@ -123,6 +123,7 @@ extern std::vector<std::string> gMemberListEntries;
     [self.viewController.mSettingsView setHidden:YES];
 
     [self.viewController.mInboxMessageView setHidden:YES];
+    [self.viewController.mRecordMessageView setHidden:YES];
     [self.viewController.mChangeRegisteredNameView setHidden:YES];
 
     [self.viewController.mBlockingView setHidden:YES];
@@ -175,6 +176,17 @@ extern std::vector<std::string> gMemberListEntries;
     if (indexPath)
     {
         [self.viewController.mInboxMessageOptionsTable deselectRowAtIndexPath:indexPath animated:NO];
+    }
+}
+
+-(void)setRecordMessageViewVisible:(bool)newVisible
+{
+    [self.viewController.mRecordMessageView setHidden:(newVisible ? NO : YES)];
+
+    NSIndexPath *indexPath = self.viewController.mRecordMessageOptionsTable.indexPathForSelectedRow;
+    if (indexPath)
+    {
+        [self.viewController.mRecordMessageOptionsTable deselectRowAtIndexPath:indexPath animated:NO];
     }
 }
 

@@ -22,6 +22,7 @@
 
 //mInboxView
 -(void)setInboxMessageViewVisible:(bool)newVisible;
+-(void)setRecordMessageViewVisible:(bool)newVisible;
 
 //mSettingsView
 -(void)setChangeRegisteredNameViewVisible:(bool)newVisible;

@@ -25,10 +25,12 @@ protected:
 	void hideInboxMessageViewEntry();
 	void inboxMessageViewIdleEntry();
 	void inboxViewEntry();
+	void recordMessageViewEntry();
 	void showConfirmDeleteEntry();
 	void showInboxMessageViewEntry();
 
 	void inboxViewExit();
+	void recordMessageViewExit();
 
 public:
 	enum EventType
@@ -38,6 +40,7 @@ public:
 		kDeletePressed,
 		kItemSelected,
 		kNo,
+		kReplyPressed,
 		kYes,
 	};
 
@@ -49,6 +52,7 @@ public:
 		kHideInboxMessageView,
 		kInboxMessageViewIdle,
 		kInboxView,
+		kRecordMessageView,
 		kShowConfirmDelete,
 		kShowInboxMessageView,
 	};
