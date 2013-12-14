@@ -125,6 +125,7 @@ extern std::vector<std::string> gMemberListEntries;
     [self.viewController.mInboxMessageView setHidden:YES];
     [self.viewController.mRecordMessageView setHidden:YES];
     [self.viewController.mChangeRegisteredNameView setHidden:YES];
+    [self.viewController.mMessageHistoryView setHidden:YES];
 
     [self.viewController.mBlockingView setHidden:YES];
 }
@@ -188,6 +189,11 @@ extern std::vector<std::string> gMemberListEntries;
     {
         [self.viewController.mRecordMessageOptionsTable deselectRowAtIndexPath:indexPath animated:NO];
     }
+}
+
+-(void)setMessageHistoryViewVisible:(bool)newVisible
+{
+    [self.viewController.mMessageHistoryView setHidden:(newVisible ? NO : YES)];
 }
 
 //mSettingsView

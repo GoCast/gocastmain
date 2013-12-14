@@ -25,11 +25,13 @@ protected:
 	void hideInboxMessageViewEntry();
 	void inboxMessageViewIdleEntry();
 	void inboxViewEntry();
+	void messageHistoryViewEntry();
 	void recordMessageViewEntry();
 	void showConfirmDeleteEntry();
 	void showInboxMessageViewEntry();
 
 	void inboxViewExit();
+	void messageHistoryViewExit();
 	void recordMessageViewExit();
 
 public:
@@ -38,6 +40,7 @@ public:
 		kInvalidEvent = -2,
 		kNext = -1,
 		kDeletePressed,
+		kHistoryPressed,
 		kItemSelected,
 		kNo,
 		kReplyPressed,
@@ -52,6 +55,7 @@ public:
 		kHideInboxMessageView,
 		kInboxMessageViewIdle,
 		kInboxView,
+		kMessageHistoryView,
 		kRecordMessageView,
 		kShowConfirmDelete,
 		kShowInboxMessageView,

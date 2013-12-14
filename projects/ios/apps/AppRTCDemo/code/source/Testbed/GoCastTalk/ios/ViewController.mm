@@ -28,8 +28,10 @@ std::vector<std::string> gMemberListEntries;
     [super viewDidLoad];
 
     [self.mInboxTable registerNib:[UINib nibWithNibName:@"InboxEntryCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"InboxEntryCell"];
+    [self.mHistoryTable registerNib:[UINib nibWithNibName:@"InboxEntryCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"InboxEntryCell"];
     [self.mInboxMessageOptionsTable registerNib:[UINib nibWithNibName:@"HeadingSubCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"HeadingSubCell"];
     [self.mRecordMessageOptionsTable registerNib:[UINib nibWithNibName:@"HeadingSubCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"HeadingSubCell"];
+    [self.mMessageHistoryOptionsTable registerNib:[UINib nibWithNibName:@"HeadingSubCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"HeadingSubCell"];
     [self.mSettingsTable registerNib:[UINib nibWithNibName:@"HeadingSubCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"HeadingSubCell"];
 
     [self ctorRecorder];
@@ -44,6 +46,7 @@ std::vector<std::string> gMemberListEntries;
     }
 
     self.mInboxMessageView.contentSize = CGSizeMake(320, 593);
+    self.mMessageHistoryView.contentSize = CGSizeMake(320, 429);
 }
 
 - (void)viewDidUnload
@@ -189,9 +192,17 @@ std::vector<std::string> gMemberListEntries;
     {
         return (NSInteger)3;
     }
+    else if (tableView == self.mHistoryTable)
+    {
+        return (NSInteger)3;
+    }
     else if (tableView == self.mInboxMessageOptionsTable)
     {
         return (NSInteger)3;
+    }
+    else if (tableView == self.mMessageHistoryOptionsTable)
+    {
+        return (NSInteger)1;
     }
     else if (tableView == self.mRecordMessageOptionsTable)
     {
@@ -277,19 +288,77 @@ std::vector<std::string> gMemberListEntries;
 
         return cell;
     }
+    else if (tableView == self.mHistoryTable)
+    {
+        const char* from[] =
+        {
+            "Self",
+            "Self",
+            "Sato Taro",
+        };
+
+        const char* date[] =
+        {
+            "12/18 11:43",
+            "12/17 10:12",
+            "12/15  8:45",
+        };
+
+        const char* transcription[] =
+        {
+            "「何でもいい…",
+            "「任せる…",
+            "「明日何時に電話していい…",
+        };
+
+        const bool recv[] =
+        {
+            true,
+            false,
+            false,
+        };
+
+        const bool isGroup[] =
+        {
+            false,
+            false,
+            true,
+        };
+
+        tableView.backgroundView = nil;
+
+        static NSString *simpleTableIdentifier = @"InboxEntryCell";
+
+        InboxEntryCell *cell = [tableView dequeueReusableCellWithIdentifier:simpleTableIdentifier];
+
+        if (cell == nil)
+        {
+            cell = [[[InboxEntryCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:simpleTableIdentifier] autorelease];
+        }
+
+        cell.mFrom.text = [NSString stringWithUTF8String:from[indexPath.row]];
+        cell.mDate.text = [NSString stringWithUTF8String:date[indexPath.row]];
+        cell.mTranscription.text = [NSString stringWithUTF8String:transcription[indexPath.row]];
+        cell.mStatusIcon.image = [UIImage imageNamed:(recv[indexPath.row] ? @"icon-receive.png" : @"icon-sent.png")];
+        cell.mFrom.textColor =  isGroup[indexPath.row] ?
+        [UIColor colorWithRed:0.0f green:0.47f blue:1.0f alpha:1.0f] :
+        [UIColor colorWithRed:0.0f green:0.0f  blue:0.0f alpha:1.0f];
+        
+        return cell;
+    }
     else if (tableView == self.mInboxMessageOptionsTable)
     {
         const char* heading[] =
         {
+            "Past Messages",
             "Reply Message",
-            "Quick Chat",
             "Delete",
         };
 
         const char* subheading[] =
         {
+            "Show message history",
             "Send recorded message",
-            "Send pre-composed message",
             "Delete this message",
         };
 
@@ -315,6 +384,40 @@ std::vector<std::string> gMemberListEntries;
         cell.mSub.text = [NSString stringWithUTF8String:subheading[indexPath.row]];
         cell.mRightArrow.hidden = hasRightArrow[indexPath.row] ? NO : YES;
 
+        return cell;
+    }
+    else if (tableView == self.mMessageHistoryOptionsTable)
+    {
+        const char* heading[] =
+        {
+            "Reply Message",
+        };
+
+        const char* subheading[] =
+        {
+            "Send recorded message",
+        };
+
+        const bool hasRightArrow[] =
+        {
+            true,
+        };
+
+        tableView.backgroundView = nil;
+
+        static NSString *simpleTableIdentifier = @"HeadingSubCell";
+
+        HeadingSubCell *cell = [tableView dequeueReusableCellWithIdentifier:simpleTableIdentifier];
+
+        if (cell == nil)
+        {
+            cell = [[[HeadingSubCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:simpleTableIdentifier] autorelease];
+        }
+
+        cell.mHeading.text = [NSString stringWithUTF8String:heading[indexPath.row]];
+        cell.mSub.text = [NSString stringWithUTF8String:subheading[indexPath.row]];
+        cell.mRightArrow.hidden = hasRightArrow[indexPath.row] ? NO : YES;
+        
         return cell;
     }
     else if (tableView == self.mRecordMessageOptionsTable)
