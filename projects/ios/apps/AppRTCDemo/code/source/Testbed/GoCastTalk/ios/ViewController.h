@@ -15,6 +15,7 @@ UIAlertViewDelegate, AVAudioRecorderDelegate>
 //mNavigationBar
 @property (nonatomic, strong) IBOutlet UINavigationBar* mNavigationBar;
 @property (nonatomic, strong) IBOutlet UINavigationItem* mNavigationItem;
+@property (nonatomic, strong) IBOutlet UIBarButtonItem* mNavigationButton;
 
 //mTabView
 @property (nonatomic, strong) IBOutlet UITabBar* mTabBar;
@@ -45,6 +46,8 @@ UIAlertViewDelegate, AVAudioRecorderDelegate>
 //mContactsView
 @property (nonatomic, strong) IBOutlet UIView*          mContactDetailsView;
 @property (nonatomic, strong) IBOutlet UITableView*     mContactDetailsOptionsTable;
+@property (nonatomic, strong) IBOutlet UIView*          mEditContactsView;
+@property (nonatomic, strong) IBOutlet UITableView*     mEditContactsTable;
 
 //mSettingsView
 @property (nonatomic, strong) IBOutlet UITableView*     mSettingsTable;
@@ -56,6 +59,8 @@ UIAlertViewDelegate, AVAudioRecorderDelegate>
 -(void)dtorRecorder;
 -(void)startRecorder;
 -(void)stopRecorder;
+
+-(IBAction)helpButton:(UIBarButtonItem*)sender;
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField;
 

@@ -113,6 +113,8 @@ extern std::vector<std::string> gMemberListEntries;
 
 -(void)hideAllViews
 {
+    [self setNavigationButtonVisible:false];
+
     self.viewController.mTabBar.selectedItem = self.viewController.mInboxTab;
     [self.viewController.mTabView setHidden:YES];
 
@@ -129,6 +131,7 @@ extern std::vector<std::string> gMemberListEntries;
 
     //mContactsView
     [self.viewController.mContactDetailsView setHidden:YES];
+    [self.viewController.mEditContactsView setHidden:YES];
 
     //mSettingsView
     [self.viewController.mChangeRegisteredNameView setHidden:YES];
@@ -220,6 +223,17 @@ extern std::vector<std::string> gMemberListEntries;
     }
 }
 
+-(void)setEditContactsViewVisible:(bool)newVisible
+{
+    [self.viewController.mEditContactsView setHidden:(newVisible ? NO : YES)];
+
+    NSIndexPath *indexPath = self.viewController.mEditContactsTable.indexPathForSelectedRow;
+    if (indexPath)
+    {
+        [self.viewController.mEditContactsTable deselectRowAtIndexPath:indexPath animated:NO];
+    }
+}
+
 
 //mSettingsView
 -(void)setChangeRegisteredNameViewVisible:(bool)newVisible
@@ -232,6 +246,23 @@ extern std::vector<std::string> gMemberListEntries;
     [self.viewController.mTabView setHidden:NO];
     self.viewController.mNavigationItem.title = [NSString stringWithUTF8String:newTitle.c_str()];
     [self.viewController.mNavigationBar setBackgroundImage:[UIImage imageNamed:@"banner.png"] forBarMetrics:UIBarMetricsDefault];
+}
+
+-(void)setNavigationButtonTitle:(const std::string&)newTitle
+{
+    self.viewController.mNavigationButton.title = [NSString stringWithUTF8String:newTitle.c_str()];
+}
+
+-(void)setNavigationButtonVisible:(bool)newVisible
+{
+    if (newVisible)
+    {
+        self.viewController.mNavigationItem.rightBarButtonItem = self.viewController.mNavigationButton;
+    }
+    else
+    {
+        self.viewController.mNavigationItem.rightBarButtonItem = nil;
+    }
 }
 
 -(void)setBlockingViewVisible:(bool)newVisible

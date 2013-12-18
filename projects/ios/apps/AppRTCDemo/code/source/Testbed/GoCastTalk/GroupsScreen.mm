@@ -23,7 +23,7 @@ void GroupsScreen::startEntry()
 
 void GroupsScreen::endEntry()
 {
-    [gAppDelegateInstance setGroupsViewVisible:false];
+    [gAppDelegateInstance hideAllViews];
 }
 
 void GroupsScreen::idleEntry()

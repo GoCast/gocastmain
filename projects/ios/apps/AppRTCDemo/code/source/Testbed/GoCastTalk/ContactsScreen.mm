@@ -20,6 +20,7 @@ void ContactsScreen::startEntry()
     GCTEventManager::getInstance()->attach(this);
 
     [gAppDelegateInstance setNavigationBarTitle:"Contacts"];
+
     [gAppDelegateInstance setContactsViewVisible:true];
 }
 
@@ -31,11 +32,14 @@ void ContactsScreen::endEntry()
 void ContactsScreen::contactsViewEntry()
 {
     [gAppDelegateInstance setContactsViewVisible:true];
+    [gAppDelegateInstance setNavigationButtonVisible:true];
+    [gAppDelegateInstance setNavigationButtonTitle:"Edit"];
 }
 
 void ContactsScreen::contactsViewExit()
 {
     [gAppDelegateInstance setContactsViewVisible:false];
+    [gAppDelegateInstance setNavigationButtonVisible:false];
 }
 
 void ContactsScreen::contactDetailsViewEntry()
@@ -46,6 +50,19 @@ void ContactsScreen::contactDetailsViewEntry()
 void ContactsScreen::contactDetailsViewExit()
 {
     [gAppDelegateInstance setContactDetailsViewVisible:false];
+}
+
+void ContactsScreen::editContactsViewEntry()
+{
+    [gAppDelegateInstance setEditContactsViewVisible:true];
+    [gAppDelegateInstance setNavigationButtonVisible:true];
+    [gAppDelegateInstance setNavigationButtonTitle:"Done"];
+}
+
+void ContactsScreen::editContactsViewExit()
+{
+    [gAppDelegateInstance setEditContactsViewVisible:false];
+    [gAppDelegateInstance setNavigationButtonVisible:false];
 }
 
 void ContactsScreen::messageHistoryViewEntry()
@@ -80,6 +97,7 @@ void ContactsScreen::CallEntry()
 	{
 		case kContactDetailsView: contactDetailsViewEntry(); break;
 		case kContactsView: contactsViewEntry(); break;
+		case kEditContactsView: editContactsViewEntry(); break;
 		case kEnd: EndEntryHelper(); break;
 		case kInvalidState: invalidStateEntry(); break;
 		case kMessageHistoryView: messageHistoryViewEntry(); break;
@@ -95,6 +113,7 @@ void ContactsScreen::CallExit()
 	{
 		case kContactDetailsView: contactDetailsViewExit(); break;
 		case kContactsView: contactsViewExit(); break;
+		case kEditContactsView: editContactsViewExit(); break;
 		case kMessageHistoryView: messageHistoryViewExit(); break;
 		case kRecordMessageView: recordMessageViewExit(); break;
 		default: break;
@@ -105,7 +124,9 @@ int  ContactsScreen::StateTransitionFunction(const int evt) const
 {
 	if ((mState == kContactDetailsView) && (evt == kHistoryPressed)) return kMessageHistoryView; else
 	if ((mState == kContactDetailsView) && (evt == kReplyPressed)) return kRecordMessageView; else
+	if ((mState == kContactsView) && (evt == kEditPressed)) return kEditContactsView; else
 	if ((mState == kContactsView) && (evt == kItemSelected)) return kContactDetailsView; else
+	if ((mState == kEditContactsView) && (evt == kDonePressed)) return kContactsView; else
 	if ((mState == kMessageHistoryView) && (evt == kReplyPressed)) return kRecordMessageView; else
 	if ((mState == kRecordMessageView) && (evt == kItemSelected)) return kContactsView; else
 	if ((mState == kStart) && (evt == kNext)) return kContactsView;
@@ -134,6 +155,17 @@ void ContactsScreen::update(const GCTEvent &msg)
 {
     switch (msg.mEvent)
     {
+        case GCTEvent::kNavButtonPressed:
+            if (getState() == kContactsView)
+            {
+                process(kEditPressed);
+            }
+            else if (getState() == kEditContactsView)
+            {
+                process(kDonePressed);
+            }
+            break;
+
         case GCTEvent::kTableItemSelected:
             if (getState() == kContactsView)
             {

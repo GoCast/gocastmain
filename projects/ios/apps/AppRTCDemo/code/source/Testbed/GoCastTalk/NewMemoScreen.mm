@@ -23,7 +23,7 @@ void NewMemoScreen::startEntry()
 
 void NewMemoScreen::endEntry()
 {
-    [gAppDelegateInstance setNewMemoViewVisible:false];
+    [gAppDelegateInstance hideAllViews];
 }
 
 void NewMemoScreen::idleEntry()

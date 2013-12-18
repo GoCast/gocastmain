@@ -24,11 +24,13 @@ protected:
 
 	void contactDetailsViewEntry();
 	void contactsViewEntry();
+	void editContactsViewEntry();
 	void messageHistoryViewEntry();
 	void recordMessageViewEntry();
 
 	void contactDetailsViewExit();
 	void contactsViewExit();
+	void editContactsViewExit();
 	void messageHistoryViewExit();
 	void recordMessageViewExit();
 
@@ -37,6 +39,8 @@ public:
 	{
 		kInvalidEvent = -2,
 		kNext = -1,
+		kDonePressed,
+		kEditPressed,
 		kHistoryPressed,
 		kItemSelected,
 		kReplyPressed,
@@ -48,6 +52,7 @@ public:
 		kStart = 1,
 		kContactDetailsView,
 		kContactsView,
+		kEditContactsView,
 		kEnd,
 		kMessageHistoryView,
 		kRecordMessageView,

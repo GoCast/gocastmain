@@ -27,11 +27,14 @@
 
 //mContactsView
 -(void)setContactDetailsViewVisible:(bool)newVisible;
+-(void)setEditContactsViewVisible:(bool)newVisible;
 
 //mSettingsView
 -(void)setChangeRegisteredNameViewVisible:(bool)newVisible;
 
 -(void)setNavigationBarTitle:(const std::string&)newTitle;
+-(void)setNavigationButtonTitle:(const std::string&)newTitle;
+-(void)setNavigationButtonVisible:(bool)newVisible;
 
 -(void)setBlockingViewVisible:(bool)newVisible;
 

@@ -18,6 +18,8 @@ public:
 
         kTableItemSelected,
         kTableItemDeleted,
+
+        kNavButtonPressed,
     };
 
     EventType   mEvent;

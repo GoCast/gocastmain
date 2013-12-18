@@ -30,6 +30,7 @@ std::vector<std::string> gMemberListEntries;
     [self.mInboxTable registerNib:[UINib nibWithNibName:@"InboxEntryCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"InboxEntryCell"];
     [self.mHistoryTable registerNib:[UINib nibWithNibName:@"InboxEntryCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"InboxEntryCell"];
     [self.mContactsTable registerNib:[UINib nibWithNibName:@"HeadingSubCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"HeadingSubCell"];
+    [self.mEditContactsTable registerNib:[UINib nibWithNibName:@"HeadingSubCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"HeadingSubCell"];
     [self.mInboxMessageOptionsTable registerNib:[UINib nibWithNibName:@"HeadingSubCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"HeadingSubCell"];
     [self.mRecordMessageOptionsTable registerNib:[UINib nibWithNibName:@"HeadingSubCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"HeadingSubCell"];
     [self.mMessageHistoryOptionsTable registerNib:[UINib nibWithNibName:@"HeadingSubCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"HeadingSubCell"];
@@ -178,6 +179,11 @@ std::vector<std::string> gMemberListEntries;
     [audioSession setActive:NO error:nil];
 }
 
+-(IBAction)helpButton:(UIBarButtonItem*)sender
+{
+#pragma unused(sender)
+    GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kNavButtonPressed));
+}
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField
 {
@@ -199,6 +205,10 @@ std::vector<std::string> gMemberListEntries;
         return (NSInteger)3;
     }
     else if (tableView == self.mContactsTable)
+    {
+        return (NSInteger)4;
+    }
+    else if (tableView == self.mEditContactsTable)
     {
         return (NSInteger)4;
     }
@@ -380,6 +390,49 @@ std::vector<std::string> gMemberListEntries;
         cell.mHeading.text = [NSString stringWithUTF8String:heading[indexPath.row]];
         cell.mSub.text = [NSString stringWithUTF8String:""];
         cell.mRightArrow.hidden = YES;
+        
+        return cell;
+    }
+    else if (tableView == self.mEditContactsTable)
+    {
+        const char* heading[] =
+        {
+            "Create a new contact",
+            "Self",
+            "Sato Taro",
+            "Yamada Hanako",
+        };
+
+        const char* subheading[] =
+        {
+            "",
+            "学生",
+            "すかないやつ",
+            "最高経営責任者",
+        };
+
+        const bool hasRightArrow[] =
+        {
+            true,
+            false,
+            false,
+            false,
+        };
+
+        tableView.backgroundView = nil;
+
+        static NSString *simpleTableIdentifier = @"HeadingSubCell";
+
+        HeadingSubCell *cell = [tableView dequeueReusableCellWithIdentifier:simpleTableIdentifier];
+
+        if (cell == nil)
+        {
+            cell = [[[HeadingSubCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:simpleTableIdentifier] autorelease];
+        }
+
+        cell.mHeading.text = [NSString stringWithUTF8String:heading[indexPath.row]];
+        cell.mSub.text = [NSString stringWithUTF8String:subheading[indexPath.row]];
+        cell.mRightArrow.hidden = hasRightArrow[indexPath.row];
         
         return cell;
     }

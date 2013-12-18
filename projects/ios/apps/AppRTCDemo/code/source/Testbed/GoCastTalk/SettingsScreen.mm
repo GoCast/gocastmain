@@ -23,8 +23,7 @@ void SettingsScreen::startEntry()
 
 void SettingsScreen::endEntry()
 {
-    [gAppDelegateInstance setSettingsViewVisible:false];
-    [gAppDelegateInstance setChangeRegisteredNameViewVisible:false];
+    [gAppDelegateInstance hideAllViews];
 }
 
 void SettingsScreen::settingsViewEntry()

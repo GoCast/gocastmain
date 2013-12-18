@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="4514" systemVersion="13A603" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="4514" systemVersion="13B42" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none">
     <dependencies>
         <deployment defaultVersion="1536" identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="3747"/>
@@ -14,6 +14,8 @@
                 <outlet property="mContactsTab" destination="6DJ-Aw-Egg" id="2nK-P6-U47"/>
                 <outlet property="mContactsTable" destination="z21-Cl-G0s" id="jvh-Zt-dJy"/>
                 <outlet property="mContactsView" destination="8X3-rk-235" id="SP2-K6-pX1"/>
+                <outlet property="mEditContactsTable" destination="euV-LW-Ngz" id="Gab-7e-c9b"/>
+                <outlet property="mEditContactsView" destination="Ioe-56-tat" id="MDp-EM-sjM"/>
                 <outlet property="mGroupsTab" destination="fZ0-gr-obC" id="aeR-8K-glb"/>
                 <outlet property="mGroupsView" destination="VyD-3t-lrM" id="lhC-Qr-MJ9"/>
                 <outlet property="mHistoryTable" destination="vbA-pJ-gX0" id="cUr-Do-TnW"/>
@@ -25,6 +27,7 @@
                 <outlet property="mMessageHistoryOptionsTable" destination="fdD-Cc-cFn" id="3sr-ee-iNx"/>
                 <outlet property="mMessageHistoryView" destination="1pv-BY-GVW" id="bZg-WR-g8P"/>
                 <outlet property="mNavigationBar" destination="apr-ZZ-bEJ" id="yhL-94-d6b"/>
+                <outlet property="mNavigationButton" destination="WNh-yi-sBr" id="NQ0-3n-5Xs"/>
                 <outlet property="mNavigationItem" destination="Ccl-OD-D5t" id="hva-l2-Zs0"/>
                 <outlet property="mNewMemoTab" destination="fNb-Yf-DE3" id="9n6-C1-mSf"/>
                 <outlet property="mNewMemoView" destination="Xow-Jx-387" id="LbS-8k-6RT"/>
@@ -47,6 +50,22 @@
                     <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <subviews>
+                        <view contentMode="scaleToFill" id="Ioe-56-tat" userLabel="mEditContactsView">
+                            <rect key="frame" x="0.0" y="44" width="320" height="387"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <subviews>
+                                <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" style="plain" separatorStyle="default" rowHeight="82" sectionHeaderHeight="22" sectionFooterHeight="22" id="euV-LW-Ngz" userLabel="mEditContactsTable">
+                                    <rect key="frame" x="0.0" y="0.0" width="320" height="430"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                    <connections>
+                                        <outlet property="dataSource" destination="-1" id="dh8-ik-7wS"/>
+                                        <outlet property="delegate" destination="-1" id="ZAL-cy-Z96"/>
+                                    </connections>
+                                </tableView>
+                            </subviews>
+                            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                        </view>
                         <view contentMode="scaleToFill" id="4fe-2I-8qh" userLabel="mContactDetailsView">
                             <rect key="frame" x="0.0" y="44" width="320" height="387"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -454,7 +473,13 @@
                             <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                             <items>
-                                <navigationItem title="Inbox" id="Ccl-OD-D5t" userLabel="mNavigationItem"/>
+                                <navigationItem title="Inbox" id="Ccl-OD-D5t" userLabel="mNavigationItem">
+                                    <barButtonItem key="rightBarButtonItem" title="Edit" id="WNh-yi-sBr">
+                                        <connections>
+                                            <action selector="helpButton:" destination="-1" id="w9z-6V-E6L"/>
+                                        </connections>
+                                    </barButtonItem>
+                                </navigationItem>
                             </items>
                         </navigationBar>
                     </subviews>
