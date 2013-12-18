@@ -22,12 +22,14 @@ protected:
 	void endEntry();
 	void invalidStateEntry();
 
+	void changeRegisteredNameViewEntry();
 	void contactDetailsViewEntry();
 	void contactsViewEntry();
 	void editContactsViewEntry();
 	void messageHistoryViewEntry();
 	void recordMessageViewEntry();
 
+	void changeRegisteredNameViewExit();
 	void contactDetailsViewExit();
 	void contactsViewExit();
 	void editContactsViewExit();
@@ -50,6 +52,7 @@ public:
 	{
 		kInvalidState = 0,
 		kStart = 1,
+		kChangeRegisteredNameView,
 		kContactDetailsView,
 		kContactsView,
 		kEditContactsView,

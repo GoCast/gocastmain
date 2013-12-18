@@ -29,6 +29,19 @@ void ContactsScreen::endEntry()
     [gAppDelegateInstance hideAllViews];
 }
 
+void ContactsScreen::changeRegisteredNameViewEntry()
+{
+    [gAppDelegateInstance setChangeRegisteredNameViewVisible:true];
+    [gAppDelegateInstance setNavigationButtonVisible:true];
+    [gAppDelegateInstance setNavigationButtonTitle:"Done"];
+}
+
+void ContactsScreen::changeRegisteredNameViewExit()
+{
+    [gAppDelegateInstance setChangeRegisteredNameViewVisible:false];
+    [gAppDelegateInstance setNavigationButtonVisible:false];
+}
+
 void ContactsScreen::contactsViewEntry()
 {
     [gAppDelegateInstance setContactsViewVisible:true];
@@ -95,6 +108,7 @@ void ContactsScreen::CallEntry()
 {
 	switch(mState)
 	{
+		case kChangeRegisteredNameView: changeRegisteredNameViewEntry(); break;
 		case kContactDetailsView: contactDetailsViewEntry(); break;
 		case kContactsView: contactsViewEntry(); break;
 		case kEditContactsView: editContactsViewEntry(); break;
@@ -111,6 +125,7 @@ void ContactsScreen::CallExit()
 {
 	switch(mState)
 	{
+		case kChangeRegisteredNameView: changeRegisteredNameViewExit(); break;
 		case kContactDetailsView: contactDetailsViewExit(); break;
 		case kContactsView: contactsViewExit(); break;
 		case kEditContactsView: editContactsViewExit(); break;
@@ -122,11 +137,13 @@ void ContactsScreen::CallExit()
 
 int  ContactsScreen::StateTransitionFunction(const int evt) const
 {
+	if ((mState == kChangeRegisteredNameView) && (evt == kDonePressed)) return kEditContactsView; else
 	if ((mState == kContactDetailsView) && (evt == kHistoryPressed)) return kMessageHistoryView; else
 	if ((mState == kContactDetailsView) && (evt == kReplyPressed)) return kRecordMessageView; else
 	if ((mState == kContactsView) && (evt == kEditPressed)) return kEditContactsView; else
 	if ((mState == kContactsView) && (evt == kItemSelected)) return kContactDetailsView; else
 	if ((mState == kEditContactsView) && (evt == kDonePressed)) return kContactsView; else
+	if ((mState == kEditContactsView) && (evt == kItemSelected)) return kChangeRegisteredNameView; else
 	if ((mState == kMessageHistoryView) && (evt == kReplyPressed)) return kRecordMessageView; else
 	if ((mState == kRecordMessageView) && (evt == kItemSelected)) return kContactsView; else
 	if ((mState == kStart) && (evt == kNext)) return kContactsView;
@@ -164,12 +181,23 @@ void ContactsScreen::update(const GCTEvent &msg)
             {
                 process(kDonePressed);
             }
+            else if (getState() == kChangeRegisteredNameView)
+            {
+                process(kDonePressed);
+            }
             break;
 
         case GCTEvent::kTableItemSelected:
             if (getState() == kContactsView)
             {
                 if (msg.mItemSelected == 1)
+                {
+                    process(kItemSelected);
+                }
+            }
+            else if (getState() == kEditContactsView)
+            {
+                if (msg.mItemSelected == 0)
                 {
                     process(kItemSelected);
                 }
