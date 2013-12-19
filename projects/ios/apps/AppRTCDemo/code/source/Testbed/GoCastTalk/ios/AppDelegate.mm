@@ -153,6 +153,12 @@ extern std::vector<std::string> gMemberListEntries;
 -(void)setNewMemoViewVisible:(bool)newVisible
 {
     [self.viewController.mNewMemoView setHidden:(newVisible ? NO : YES)];
+
+    NSIndexPath *indexPath = self.viewController.mNewMemoOptionsTable.indexPathForSelectedRow;
+    if (indexPath)
+    {
+        [self.viewController.mNewMemoOptionsTable deselectRowAtIndexPath:indexPath animated:NO];
+    }
 }
 
 -(void)setContactsViewVisible:(bool)newVisible

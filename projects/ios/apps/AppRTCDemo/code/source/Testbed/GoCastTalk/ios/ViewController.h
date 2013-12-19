@@ -41,13 +41,22 @@ UIAlertViewDelegate, AVAudioRecorderDelegate>
 @property (nonatomic, strong) IBOutlet UIScrollView*    mMessageHistoryView;
 @property (nonatomic, strong) IBOutlet UITableView*     mHistoryTable;
 @property (nonatomic, strong) IBOutlet UITableView*     mMessageHistoryOptionsTable;
-@property (nonatomic, strong) IBOutlet UITableView*     mContactsTable;
+
+//mNewMemoView
+@property (nonatomic, strong) IBOutlet UITableView*     mNewMemoOptionsTable;
+@property (nonatomic, strong) IBOutlet UIButton*        mAddContactsButton;
+@property (nonatomic, strong) IBOutlet UIButton*        mAddGroupsButton;
 
 //mContactsView
+@property (nonatomic, strong) IBOutlet UITableView*     mContactsTable;
 @property (nonatomic, strong) IBOutlet UIView*          mContactDetailsView;
 @property (nonatomic, strong) IBOutlet UITableView*     mContactDetailsOptionsTable;
 @property (nonatomic, strong) IBOutlet UIView*          mEditContactsView;
 @property (nonatomic, strong) IBOutlet UITableView*     mEditContactsTable;
+
+//mGroupsView
+@property (nonatomic, strong) IBOutlet UITableView*     mGroupsTable;
+
 
 //mSettingsView
 @property (nonatomic, strong) IBOutlet UITableView*     mSettingsTable;
@@ -61,6 +70,8 @@ UIAlertViewDelegate, AVAudioRecorderDelegate>
 -(void)stopRecorder;
 
 -(IBAction)helpButton:(UIBarButtonItem*)sender;
+
+-(IBAction)buttonPressed:(UIButton*)sender;
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField;
 

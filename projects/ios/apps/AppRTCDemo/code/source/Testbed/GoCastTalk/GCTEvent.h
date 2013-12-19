@@ -20,6 +20,8 @@ public:
         kTableItemDeleted,
 
         kNavButtonPressed,
+        kAddContactsButtonPressed,
+        kAddGroupsButtonPressed,
     };
 
     EventType   mEvent;

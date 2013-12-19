@@ -7,6 +7,8 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="ViewController">
             <connections>
+                <outlet property="mAddContactsButton" destination="Sth-hr-S5H" id="MLs-6a-kJT"/>
+                <outlet property="mAddGroupsButton" destination="05i-1v-Vph" id="brd-7S-hK8"/>
                 <outlet property="mBlockingView" destination="lKM-qr-eRy" id="fVo-rI-9Pq"/>
                 <outlet property="mChangeRegisteredNameView" destination="iZO-0w-3NL" id="Ztr-2U-VCl"/>
                 <outlet property="mContactDetailsOptionsTable" destination="NuD-48-8bX" id="8lT-Ye-8HJ"/>
@@ -17,6 +19,7 @@
                 <outlet property="mEditContactsTable" destination="euV-LW-Ngz" id="Gab-7e-c9b"/>
                 <outlet property="mEditContactsView" destination="Ioe-56-tat" id="MDp-EM-sjM"/>
                 <outlet property="mGroupsTab" destination="fZ0-gr-obC" id="aeR-8K-glb"/>
+                <outlet property="mGroupsTable" destination="kzg-kc-fkP" id="YC8-Pn-fiH"/>
                 <outlet property="mGroupsView" destination="VyD-3t-lrM" id="lhC-Qr-MJ9"/>
                 <outlet property="mHistoryTable" destination="vbA-pJ-gX0" id="cUr-Do-TnW"/>
                 <outlet property="mInboxMessageOptionsTable" destination="jyR-4V-xqO" id="alG-Ju-7gw"/>
@@ -29,6 +32,7 @@
                 <outlet property="mNavigationBar" destination="apr-ZZ-bEJ" id="yhL-94-d6b"/>
                 <outlet property="mNavigationButton" destination="WNh-yi-sBr" id="NQ0-3n-5Xs"/>
                 <outlet property="mNavigationItem" destination="Ccl-OD-D5t" id="hva-l2-Zs0"/>
+                <outlet property="mNewMemoOptionsTable" destination="8ij-9V-vnt" id="M9q-Ou-Xcj"/>
                 <outlet property="mNewMemoTab" destination="fNb-Yf-DE3" id="9n6-C1-mSf"/>
                 <outlet property="mNewMemoView" destination="Xow-Jx-387" id="LbS-8k-6RT"/>
                 <outlet property="mRecordMessageOptionsTable" destination="7Nf-WR-x4o" id="Uc3-6M-MXs"/>
@@ -50,6 +54,49 @@
                     <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <subviews>
+                        <view contentMode="scaleToFill" id="Xow-Jx-387" userLabel="mNewMemoView">
+                            <rect key="frame" x="0.0" y="47" width="320" height="387"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <subviews>
+                                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="to:" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="KvR-Ra-wgG">
+                                    <rect key="frame" x="20" y="17" width="44" height="27"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                    <fontDescription key="fontDescription" name="Verdana" family="Verdana" pointSize="22"/>
+                                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                    <color key="highlightedColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                </label>
+                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="Sth-hr-S5H" userLabel="mAddContactsButton">
+                                    <rect key="frame" x="72" y="17" width="95" height="30"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                    <state key="normal" title="Add Contacts">
+                                        <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                    </state>
+                                    <connections>
+                                        <action selector="buttonPressed:" destination="-1" eventType="touchUpInside" id="q91-SW-5MZ"/>
+                                    </connections>
+                                </button>
+                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="05i-1v-Vph" userLabel="mAddGroupsButton">
+                                    <rect key="frame" x="72" y="55" width="95" height="30"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                    <state key="normal" title="Add Groups">
+                                        <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                    </state>
+                                    <connections>
+                                        <action selector="buttonPressed:" destination="-1" eventType="touchUpInside" id="Iws-m6-pD7"/>
+                                    </connections>
+                                </button>
+                                <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" style="plain" separatorStyle="default" rowHeight="82" sectionHeaderHeight="22" sectionFooterHeight="22" id="8ij-9V-vnt" userLabel="mNewMemoOptionsTable">
+                                    <rect key="frame" x="0.0" y="93" width="320" height="82"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                    <connections>
+                                        <outlet property="dataSource" destination="-1" id="FTC-PD-fyt"/>
+                                        <outlet property="delegate" destination="-1" id="Vit-uK-AKe"/>
+                                    </connections>
+                                </tableView>
+                            </subviews>
+                            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                        </view>
                         <view contentMode="scaleToFill" id="Ioe-56-tat" userLabel="mEditContactsView">
                             <rect key="frame" x="0.0" y="44" width="320" height="387"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -390,22 +437,6 @@
                             </subviews>
                             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         </view>
-                        <view hidden="YES" contentMode="scaleToFill" id="Xow-Jx-387" userLabel="mNewMemoView">
-                            <rect key="frame" x="0.0" y="44" width="320" height="387"/>
-                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                            <subviews>
-                                <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="8ij-9V-vnt">
-                                    <rect key="frame" x="0.0" y="0.0" width="320" height="407"/>
-                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                    <connections>
-                                        <outlet property="dataSource" destination="-1" id="FTC-PD-fyt"/>
-                                        <outlet property="delegate" destination="-1" id="Vit-uK-AKe"/>
-                                    </connections>
-                                </tableView>
-                            </subviews>
-                            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
-                        </view>
                         <view hidden="YES" contentMode="scaleToFill" id="8X3-rk-235" userLabel="mContactsView">
                             <rect key="frame" x="0.0" y="44" width="320" height="387"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -426,7 +457,7 @@
                             <rect key="frame" x="0.0" y="44" width="320" height="387"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <subviews>
-                                <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="kzg-kc-fkP">
+                                <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" style="plain" separatorStyle="default" rowHeight="82" sectionHeaderHeight="22" sectionFooterHeight="22" id="kzg-kc-fkP" userLabel="mGroupsTable">
                                     <rect key="frame" x="0.0" y="0.0" width="320" height="407"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>

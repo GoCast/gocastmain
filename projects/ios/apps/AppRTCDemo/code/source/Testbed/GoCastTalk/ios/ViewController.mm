@@ -30,8 +30,10 @@ std::vector<std::string> gMemberListEntries;
     [self.mInboxTable registerNib:[UINib nibWithNibName:@"InboxEntryCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"InboxEntryCell"];
     [self.mHistoryTable registerNib:[UINib nibWithNibName:@"InboxEntryCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"InboxEntryCell"];
     [self.mContactsTable registerNib:[UINib nibWithNibName:@"HeadingSubCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"HeadingSubCell"];
+    [self.mGroupsTable registerNib:[UINib nibWithNibName:@"HeadingSubCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"HeadingSubCell"];
     [self.mEditContactsTable registerNib:[UINib nibWithNibName:@"HeadingSubCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"HeadingSubCell"];
     [self.mInboxMessageOptionsTable registerNib:[UINib nibWithNibName:@"HeadingSubCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"HeadingSubCell"];
+    [self.mNewMemoOptionsTable registerNib:[UINib nibWithNibName:@"HeadingSubCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"HeadingSubCell"];
     [self.mRecordMessageOptionsTable registerNib:[UINib nibWithNibName:@"HeadingSubCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"HeadingSubCell"];
     [self.mMessageHistoryOptionsTable registerNib:[UINib nibWithNibName:@"HeadingSubCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"HeadingSubCell"];
     [self.mContactDetailsOptionsTable registerNib:[UINib nibWithNibName:@"HeadingSubCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"HeadingSubCell"];
@@ -179,6 +181,18 @@ std::vector<std::string> gMemberListEntries;
     [audioSession setActive:NO error:nil];
 }
 
+-(IBAction)buttonPressed:(UIButton *)sender
+{
+    if (sender == self.mAddContactsButton)
+    {
+        GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kAddContactsButtonPressed));
+    }
+    else if (sender == self.mAddGroupsButton)
+    {
+        GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kAddGroupsButtonPressed));
+    }
+}
+
 -(IBAction)helpButton:(UIBarButtonItem*)sender
 {
 #pragma unused(sender)
@@ -208,6 +222,10 @@ std::vector<std::string> gMemberListEntries;
     {
         return (NSInteger)4;
     }
+    else if (tableView == self.mGroupsTable)
+    {
+        return (NSInteger)2;
+    }
     else if (tableView == self.mEditContactsTable)
     {
         return (NSInteger)4;
@@ -219,6 +237,10 @@ std::vector<std::string> gMemberListEntries;
     else if (tableView == self.mInboxMessageOptionsTable)
     {
         return (NSInteger)3;
+    }
+    else if (tableView == self.mNewMemoOptionsTable)
+    {
+        return (NSInteger)1;
     }
     else if (tableView == self.mMessageHistoryOptionsTable)
     {
@@ -393,6 +415,38 @@ std::vector<std::string> gMemberListEntries;
         
         return cell;
     }
+    else if (tableView == self.mGroupsTable)
+    {
+        const char* heading[] =
+        {
+            "Planning 1",
+            "Planning 2",
+        };
+
+        const char* subheading[] =
+        {
+            "４人",
+            "１０人",
+        };
+
+        tableView.backgroundView = nil;
+
+        static NSString *simpleTableIdentifier = @"HeadingSubCell";
+
+        HeadingSubCell *cell = [tableView dequeueReusableCellWithIdentifier:simpleTableIdentifier];
+
+        if (cell == nil)
+        {
+            cell = [[[HeadingSubCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:simpleTableIdentifier] autorelease];
+        }
+
+        cell.mHeading.text = [NSString stringWithUTF8String:heading[indexPath.row]];
+        cell.mSub.text = [NSString stringWithUTF8String:subheading[indexPath.row]];
+        cell.mRightArrow.hidden = YES;
+        cell.mHeading.textColor = [UIColor colorWithRed:0.0f green:0.47f blue:1.0f alpha:1.0f];
+
+        return cell;
+    }
     else if (tableView == self.mEditContactsTable)
     {
         const char* heading[] =
@@ -474,6 +528,40 @@ std::vector<std::string> gMemberListEntries;
         cell.mSub.text = [NSString stringWithUTF8String:subheading[indexPath.row]];
         cell.mRightArrow.hidden = hasRightArrow[indexPath.row] ? NO : YES;
 
+        return cell;
+    }
+    else if (tableView == self.mNewMemoOptionsTable)
+    {
+        const char* heading[] =
+        {
+            "Record Message",
+        };
+
+        const char* subheading[] =
+        {
+            "Send a voice message",
+        };
+
+        const bool hasRightArrow[] =
+        {
+            true,
+        };
+
+        tableView.backgroundView = nil;
+
+        static NSString *simpleTableIdentifier = @"HeadingSubCell";
+
+        HeadingSubCell *cell = [tableView dequeueReusableCellWithIdentifier:simpleTableIdentifier];
+
+        if (cell == nil)
+        {
+            cell = [[[HeadingSubCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:simpleTableIdentifier] autorelease];
+        }
+
+        cell.mHeading.text = [NSString stringWithUTF8String:heading[indexPath.row]];
+        cell.mSub.text = [NSString stringWithUTF8String:subheading[indexPath.row]];
+        cell.mRightArrow.hidden = hasRightArrow[indexPath.row] ? NO : YES;
+        
         return cell;
     }
     else if (tableView == self.mContactDetailsOptionsTable)
