@@ -1,7 +1,7 @@
 #include <string>
 
 #import "AppDelegate.h"
-#import "ViewController.h"
+#import "GoCastTalkVC.h"
 
 #include "Base/package.h"
 
@@ -45,25 +45,7 @@ extern std::vector<std::string> gMemberListEntries;
     [TestFlight takeOff:@"9d7d1e2c-62c3-45d9-8506-cb0a9752ca47"];
 #endif
 
-    self.window = [[[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]] autorelease];
-    // Override point for customization after application launch.
-    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
-    {
-//        if([[UIScreen mainScreen] bounds].size.height == 568)
-//        {
-//            self.viewController = [[[ViewController alloc] initWithNibName:@"ViewController_iPhone5" bundle:nil] autorelease];
-//        }
-//        else
-        {
-            self.viewController = [[[ViewController alloc] initWithNibName:@"GoCastTalkVC" bundle:nil] autorelease];
-        }
-    }
-//    else
-//    {
-//        self.viewController = [[[ViewController alloc] initWithNibName:@"ViewController_iPad" bundle:nil] autorelease];
-//    }
-
-    self.window.rootViewController = self.viewController;
+    [self.window setRootViewController:self.tabBarController];
     [self.window makeKeyAndVisible];
 
     GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kAppDelegateInit));
@@ -285,6 +267,35 @@ extern std::vector<std::string> gMemberListEntries;
 -(void)stopRecorder
 {
     [self.viewController stopRecorder];
+}
+
+#pragma mark -
+
+- (void)tabBarController:(UITabBarController *)tabBarController didSelectViewController:(UIViewController *)viewController
+{
+    if (tabBarController == self.tabBarController)
+    {
+        if (viewController == self.mInboxVC)
+        {
+            GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kInboxTabPressed));
+        }
+        else if (viewController == self.mNewMemoVC)
+        {
+            GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kNewMemoTabPressed));
+        }
+        else if (viewController == self.mContactsVC)
+        {
+            GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kContactsTabPressed));
+        }
+        else if (viewController == self.mGroupsVC)
+        {
+            GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kGroupsTabPressed));
+        }
+        else if (viewController == self.mSettingsVC)
+        {
+            GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kSettingsTabPressed));
+        }
+    }
 }
 
 @end

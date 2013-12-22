@@ -148,8 +148,20 @@
 					'../../source/Testbed/GoCastTalk/<@(OS)/AppDelegate.h',
 					'../../source/Testbed/GoCastTalk/<@(OS)/AppDelegate.mm',
 					'../../source/Bootstrap/<@(OS)/main.mm',
-					'../../source/Testbed/GoCastTalk/<@(OS)/ViewController.h',
-					'../../source/Testbed/GoCastTalk/<@(OS)/ViewController.mm',
+
+					'../../source/Testbed/GoCastTalk/<@(OS)/VC/InboxVC.h',
+					'../../source/Testbed/GoCastTalk/<@(OS)/VC/InboxVC.mm',
+					'../../source/Testbed/GoCastTalk/<@(OS)/VC/NewMemoVC.h',
+					'../../source/Testbed/GoCastTalk/<@(OS)/VC/NewMemoVC.mm',
+					'../../source/Testbed/GoCastTalk/<@(OS)/VC/ContactsVC.h',
+					'../../source/Testbed/GoCastTalk/<@(OS)/VC/ContactsVC.mm',
+					'../../source/Testbed/GoCastTalk/<@(OS)/VC/GroupsVC.h',
+					'../../source/Testbed/GoCastTalk/<@(OS)/VC/GroupsVC.mm',
+					'../../source/Testbed/GoCastTalk/<@(OS)/VC/SettingsVC.h',
+					'../../source/Testbed/GoCastTalk/<@(OS)/VC/SettingsVC.mm',
+
+					'../../source/Testbed/GoCastTalk/<@(OS)/GoCastTalkVC.h',
+					'../../source/Testbed/GoCastTalk/<@(OS)/GoCastTalkVC.mm',
 
 					'../../source/Testbed/GoCastTalk/<@(OS)/InboxEntryCell.h',
 					'../../source/Testbed/GoCastTalk/<@(OS)/InboxEntryCell.mm',
@@ -165,6 +177,22 @@
 
 				'mac_bundle_resources': [
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/en.lproj/InfoPlist.strings',
+
+					'../../rsrc/Testbed/GoCastTalk/<@(OS)/MainWindow.xib',
+
+					'../../rsrc/Testbed/GoCastTalk/<@(OS)/VC/InboxVC.xib',
+					'../../rsrc/Testbed/GoCastTalk/<@(OS)/VC/NewMemoVC.xib',
+					'../../rsrc/Testbed/GoCastTalk/<@(OS)/VC/ContactsVC.xib',
+					'../../rsrc/Testbed/GoCastTalk/<@(OS)/VC/GroupsVC.xib',
+					'../../rsrc/Testbed/GoCastTalk/<@(OS)/VC/SettingsVC.xib',
+
+					'../../rsrc/Testbed/GoCastTalk/<@(OS)/SubVC/EditContactsVC.xib',
+					'../../rsrc/Testbed/GoCastTalk/<@(OS)/SubVC/ContactDetailsVC.xib',
+					'../../rsrc/Testbed/GoCastTalk/<@(OS)/SubVC/MessageHistoryVC.xib',
+					'../../rsrc/Testbed/GoCastTalk/<@(OS)/SubVC/RecordMessageVC.xib',
+					'../../rsrc/Testbed/GoCastTalk/<@(OS)/SubVC/ChangeRegisteredNameVC.xib',
+					'../../rsrc/Testbed/GoCastTalk/<@(OS)/SubVC/InboxMessageVC.xib',
+
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/en.lproj/GoCastTalkVC.xib',
 
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/en.lproj/InboxEntryCell.xib',

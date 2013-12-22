@@ -2,7 +2,7 @@
 #import <MessageUI/MessageUI.h>
 #import <AVFoundation/AVFoundation.h>
 
-@interface ViewController : UIViewController
+@interface GoCastTalkVC : UIViewController
 <UITextFieldDelegate, UITableViewDelegate,
 UITableViewDataSource, UITabBarDelegate,
 UIAlertViewDelegate, AVAudioRecorderDelegate>

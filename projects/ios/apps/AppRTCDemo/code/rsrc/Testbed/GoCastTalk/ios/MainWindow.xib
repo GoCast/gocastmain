@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="4514" systemVersion="13B42" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none">
+    <dependencies>
+        <deployment defaultVersion="1536" identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="3747"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="UIApplication">
+            <connections>
+                <outlet property="delegate" destination="3" id="99"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <customObject id="3" customClass="AppDelegate">
+            <connections>
+                <outlet property="mContactsVC" destination="Mgh-Ot-I1K" id="9d9-8U-qVG"/>
+                <outlet property="mGroupsVC" destination="Cw4-Qx-cBd" id="XuX-49-OKF"/>
+                <outlet property="mNewMemoVC" destination="VLa-JM-EXn" id="Z1t-7Y-lhb"/>
+                <outlet property="mSettingsVC" destination="jTc-kh-eHo" id="B2O-63-rUD"/>
+                <outlet property="tabBarController" destination="106" id="113"/>
+                <outlet property="window" destination="2" id="9"/>
+            </connections>
+        </customObject>
+        <window opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" visibleAtLaunch="YES" resizesToFullScreen="NO" id="2">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+            <simulatedStatusBarMetrics key="simulatedStatusBarMetrics"/>
+        </window>
+        <tabBarController id="106">
+            <extendedEdge key="edgesForExtendedLayout"/>
+            <simulatedStatusBarMetrics key="simulatedStatusBarMetrics"/>
+            <nil key="simulatedTopBarMetrics"/>
+            <nil key="simulatedBottomBarMetrics"/>
+            <simulatedOrientationMetrics key="simulatedOrientationMetrics"/>
+            <nil key="simulatedDestinationMetrics"/>
+            <tabBar key="tabBar" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="107">
+                <rect key="frame" x="0.0" y="431" width="320" height="49"/>
+                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+            </tabBar>
+            <viewControllers>
+                <navigationController nibName="" id="ZYU-wO-oys">
+                    <extendedEdge key="edgesForExtendedLayout"/>
+                    <tabBarItem key="tabBarItem" title="Inbox" image="tab-inbox.png" id="Dn2-6j-wxY"/>
+                    <simulatedStatusBarMetrics key="simulatedStatusBarMetrics"/>
+                    <nil key="simulatedTopBarMetrics"/>
+                    <nil key="simulatedBottomBarMetrics"/>
+                    <simulatedOrientationMetrics key="simulatedOrientationMetrics"/>
+                    <nil key="simulatedDestinationMetrics"/>
+                    <navigationBar key="navigationBar" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" id="nIO-dD-zjx">
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <viewControllers>
+                        <viewController nibName="InboxVC" id="oSL-zh-zct" customClass="InboxVC">
+                            <extendedEdge key="edgesForExtendedLayout"/>
+                            <navigationItem key="navigationItem" title="Inbox" id="8bZ-Xp-3K9"/>
+                            <simulatedStatusBarMetrics key="simulatedStatusBarMetrics"/>
+                            <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
+                            <nil key="simulatedBottomBarMetrics"/>
+                            <simulatedOrientationMetrics key="simulatedOrientationMetrics"/>
+                            <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina4"/>
+                        </viewController>
+                    </viewControllers>
+                </navigationController>
+                <navigationController nibName="" id="VLa-JM-EXn">
+                    <extendedEdge key="edgesForExtendedLayout"/>
+                    <tabBarItem key="tabBarItem" title="New Memo" image="tab-newmemo.png" id="jsd-Cn-1Pi"/>
+                    <simulatedStatusBarMetrics key="simulatedStatusBarMetrics"/>
+                    <nil key="simulatedTopBarMetrics"/>
+                    <nil key="simulatedBottomBarMetrics"/>
+                    <simulatedOrientationMetrics key="simulatedOrientationMetrics"/>
+                    <nil key="simulatedDestinationMetrics"/>
+                    <navigationBar key="navigationBar" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" id="Zh3-rl-VP4">
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <viewControllers>
+                        <viewController nibName="NewMemoVC" id="whs-FZ-FTF" customClass="NewMemoVC">
+                            <extendedEdge key="edgesForExtendedLayout"/>
+                            <navigationItem key="navigationItem" title="New Memo" id="VPO-6u-tWk"/>
+                            <simulatedStatusBarMetrics key="simulatedStatusBarMetrics"/>
+                            <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
+                            <nil key="simulatedBottomBarMetrics"/>
+                            <simulatedOrientationMetrics key="simulatedOrientationMetrics"/>
+                            <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina4"/>
+                        </viewController>
+                    </viewControllers>
+                </navigationController>
+                <navigationController nibName="" id="Mgh-Ot-I1K">
+                    <extendedEdge key="edgesForExtendedLayout"/>
+                    <tabBarItem key="tabBarItem" title="Contacts" image="tab-contacts.png" id="dbY-ly-kAZ"/>
+                    <simulatedStatusBarMetrics key="simulatedStatusBarMetrics"/>
+                    <nil key="simulatedTopBarMetrics"/>
+                    <nil key="simulatedBottomBarMetrics"/>
+                    <simulatedOrientationMetrics key="simulatedOrientationMetrics"/>
+                    <nil key="simulatedDestinationMetrics"/>
+                    <navigationBar key="navigationBar" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" id="ObQ-8o-kBL">
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <viewControllers>
+                        <viewController nibName="ContactsVC" id="Mmv-uP-JdY" customClass="ContactsVC">
+                            <extendedEdge key="edgesForExtendedLayout"/>
+                            <navigationItem key="navigationItem" title="Contacts" id="6H9-FF-9SR"/>
+                            <simulatedStatusBarMetrics key="simulatedStatusBarMetrics"/>
+                            <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
+                            <nil key="simulatedBottomBarMetrics"/>
+                            <simulatedOrientationMetrics key="simulatedOrientationMetrics"/>
+                            <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina4"/>
+                        </viewController>
+                    </viewControllers>
+                </navigationController>
+                <navigationController nibName="" id="Cw4-Qx-cBd">
+                    <extendedEdge key="edgesForExtendedLayout"/>
+                    <tabBarItem key="tabBarItem" title="Groups" image="tab-groups.png" id="hOI-sK-alM"/>
+                    <simulatedStatusBarMetrics key="simulatedStatusBarMetrics"/>
+                    <nil key="simulatedTopBarMetrics"/>
+                    <nil key="simulatedBottomBarMetrics"/>
+                    <simulatedOrientationMetrics key="simulatedOrientationMetrics"/>
+                    <nil key="simulatedDestinationMetrics"/>
+                    <navigationBar key="navigationBar" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" id="KeA-iV-2aA">
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <viewControllers>
+                        <viewController nibName="GroupsVC" id="DXz-hl-suJ" customClass="GroupsVC">
+                            <extendedEdge key="edgesForExtendedLayout"/>
+                            <navigationItem key="navigationItem" title="Groups" id="CC9-gf-Z8x"/>
+                            <simulatedStatusBarMetrics key="simulatedStatusBarMetrics"/>
+                            <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
+                            <nil key="simulatedBottomBarMetrics"/>
+                            <simulatedOrientationMetrics key="simulatedOrientationMetrics"/>
+                            <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina4"/>
+                        </viewController>
+                    </viewControllers>
+                </navigationController>
+                <navigationController nibName="" id="jTc-kh-eHo">
+                    <extendedEdge key="edgesForExtendedLayout"/>
+                    <tabBarItem key="tabBarItem" title="Settings" image="tab-settings.png" id="BoI-s5-DnK"/>
+                    <simulatedStatusBarMetrics key="simulatedStatusBarMetrics"/>
+                    <nil key="simulatedTopBarMetrics"/>
+                    <nil key="simulatedBottomBarMetrics"/>
+                    <simulatedOrientationMetrics key="simulatedOrientationMetrics"/>
+                    <nil key="simulatedDestinationMetrics"/>
+                    <navigationBar key="navigationBar" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" id="bnE-Eg-wAZ">
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <viewControllers>
+                        <viewController nibName="SettingsVC" id="7G2-Jh-Bks" customClass="SettingsVC">
+                            <extendedEdge key="edgesForExtendedLayout"/>
+                            <navigationItem key="navigationItem" title="Settings" id="xF9-qy-dOZ"/>
+                            <simulatedStatusBarMetrics key="simulatedStatusBarMetrics"/>
+                            <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
+                            <nil key="simulatedBottomBarMetrics"/>
+                            <simulatedOrientationMetrics key="simulatedOrientationMetrics"/>
+                            <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina4"/>
+                        </viewController>
+                    </viewControllers>
+                </navigationController>
+            </viewControllers>
+            <connections>
+                <outlet property="delegate" destination="3" id="GQS-J5-iHC"/>
+            </connections>
+        </tabBarController>
+    </objects>
+    <resources>
+        <image name="tab-contacts.png" width="30" height="30"/>
+        <image name="tab-groups.png" width="30" height="30"/>
+        <image name="tab-inbox.png" width="34" height="29"/>
+        <image name="tab-newmemo.png" width="30" height="30"/>
+        <image name="tab-settings.png" width="30" height="30"/>
+    </resources>
+</document>

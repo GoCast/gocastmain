@@ -5,7 +5,7 @@
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="3747"/>
     </dependencies>
     <objects>
-        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="ViewController">
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="GoCastTalkVC">
             <connections>
                 <outlet property="mAddContactsButton" destination="Sth-hr-S5H" id="MLs-6a-kJT"/>
                 <outlet property="mAddGroupsButton" destination="05i-1v-Vph" id="brd-7S-hK8"/>

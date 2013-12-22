@@ -5,12 +5,30 @@
 #include <string>
 
 
-@class ViewController;
+@class GoCastTalkVC;
 
-@interface AppDelegate : UIResponder <UIApplicationDelegate>
+@interface AppDelegate : UIResponder
+<
+UIApplicationDelegate,
+UITabBarControllerDelegate
+>
 
-@property (strong, nonatomic) UIWindow*         window;
-@property (strong, nonatomic) ViewController*   viewController;
+@property (nonatomic, retain) IBOutlet UIWindow *window;
+@property (nonatomic, retain) IBOutlet UITabBarController *tabBarController;
+@property (strong, nonatomic) GoCastTalkVC*   viewController;
+
+@property (nonatomic, strong) IBOutlet UIViewController* mInboxVC;
+@property (nonatomic, strong) IBOutlet UINavigationController* mNewMemoVC;
+@property (nonatomic, strong) IBOutlet UIViewController* mContactsVC;
+@property (nonatomic, strong) IBOutlet UIViewController* mGroupsVC;
+@property (nonatomic, strong) IBOutlet UIViewController* mSettingsVC;
+
+@property (nonatomic, strong) IBOutlet UITabBar* mTabBar;
+@property (nonatomic, strong) IBOutlet UITabBarItem* mInboxTab;
+@property (nonatomic, strong) IBOutlet UITabBarItem* mNewMemoTab;
+@property (nonatomic, strong) IBOutlet UITabBarItem* mContactsTab;
+@property (nonatomic, strong) IBOutlet UITabBarItem* mGroupsTab;
+@property (nonatomic, strong) IBOutlet UITabBarItem* mSettingsTab;
 
 -(void)hideAllViews;
 
@@ -40,5 +58,9 @@
 
 -(void)startRecorder;
 -(void)stopRecorder;
+
+//--
+
+- (void)tabBarController:(UITabBarController *)tabBarController didSelectViewController:(UIViewController *)viewController;
 
 @end

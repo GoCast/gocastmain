@@ -1,4 +1,4 @@
-#include "ViewController.h"
+#include "GoCastTalkVC.h"
 
 #include "Base/package.h"
 #include "Math/package.h"
@@ -15,12 +15,12 @@ std::vector<std::string> gMyInboxListEntries;
 std::vector<std::string> gMyGroupsListEntries;
 std::vector<std::string> gMemberListEntries;
 
-@interface ViewController()
+@interface GoCastTalkVC()
 {
 }
 @end
 
-@implementation ViewController
+@implementation GoCastTalkVC
 
 #pragma mark Construction / Destruction
 - (void)viewDidLoad
