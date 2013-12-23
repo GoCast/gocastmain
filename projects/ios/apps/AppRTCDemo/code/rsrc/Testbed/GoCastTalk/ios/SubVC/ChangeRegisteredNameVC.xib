@@ -5,9 +5,9 @@
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="3747"/>
     </dependencies>
     <objects>
-        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="GoCastTalkVC">
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="ChangeRegisteredNameVC">
             <connections>
-                <outlet property="mChangeRegisteredNameView" destination="iZO-0w-3NL" id="Ztr-2U-VCl"/>
+                <outlet property="view" destination="iZO-0w-3NL" id="ifl-fD-qix"/>
             </connections>
         </placeholder>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>

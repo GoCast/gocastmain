@@ -5,10 +5,9 @@
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="3747"/>
     </dependencies>
     <objects>
-        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="GoCastTalkVC">
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="RecordMessageVC">
             <connections>
-                <outlet property="mRecordMessageOptionsTable" destination="7Nf-WR-x4o" id="Uc3-6M-MXs"/>
-                <outlet property="mRecordMessageView" destination="5fe-Uz-o8f" id="P8I-4t-vf4"/>
+                <outlet property="view" destination="5fe-Uz-o8f" id="JHI-zm-AEJ"/>
             </connections>
         </placeholder>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>

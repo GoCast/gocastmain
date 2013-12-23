@@ -22,17 +22,17 @@ protected:
 	void endEntry();
 	void invalidStateEntry();
 
-	void hideInboxMessageViewEntry();
-	void inboxMessageViewIdleEntry();
-	void inboxViewEntry();
-	void messageHistoryViewEntry();
-	void recordMessageViewEntry();
+	void inboxIdleEntry();
+	void inboxMessageIdleEntry();
+	void messageHistoryIdleEntry();
+	void popInboxMessageEntry();
+	void popMessageHistoryEntry();
+	void popRecordMessageEntry();
+	void pushInboxMessageEntry();
+	void pushMessageHistoryEntry();
+	void pushRecordMessageEntry();
+	void recordMessageIdleEntry();
 	void showConfirmDeleteEntry();
-	void showInboxMessageViewEntry();
-
-	void inboxViewExit();
-	void messageHistoryViewExit();
-	void recordMessageViewExit();
 
 public:
 	enum EventType
@@ -52,13 +52,17 @@ public:
 		kInvalidState = 0,
 		kStart = 1,
 		kEnd,
-		kHideInboxMessageView,
-		kInboxMessageViewIdle,
-		kInboxView,
-		kMessageHistoryView,
-		kRecordMessageView,
+		kInboxIdle,
+		kInboxMessageIdle,
+		kMessageHistoryIdle,
+		kPopInboxMessage,
+		kPopMessageHistory,
+		kPopRecordMessage,
+		kPushInboxMessage,
+		kPushMessageHistory,
+		kPushRecordMessage,
+		kRecordMessageIdle,
 		kShowConfirmDelete,
-		kShowInboxMessageView,
 	};
 
 protected:

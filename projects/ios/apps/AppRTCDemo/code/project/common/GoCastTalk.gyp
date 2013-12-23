@@ -160,6 +160,19 @@
 					'../../source/Testbed/GoCastTalk/<@(OS)/VC/SettingsVC.h',
 					'../../source/Testbed/GoCastTalk/<@(OS)/VC/SettingsVC.mm',
 
+					'../../source/Testbed/GoCastTalk/<@(OS)/SubVC/EditContactsVC.h',
+					'../../source/Testbed/GoCastTalk/<@(OS)/SubVC/EditContactsVC.mm',
+					'../../source/Testbed/GoCastTalk/<@(OS)/SubVC/ContactDetailsVC.h',
+					'../../source/Testbed/GoCastTalk/<@(OS)/SubVC/ContactDetailsVC.mm',
+					'../../source/Testbed/GoCastTalk/<@(OS)/SubVC/MessageHistoryVC.h',
+					'../../source/Testbed/GoCastTalk/<@(OS)/SubVC/MessageHistoryVC.mm',
+					'../../source/Testbed/GoCastTalk/<@(OS)/SubVC/RecordMessageVC.h',
+					'../../source/Testbed/GoCastTalk/<@(OS)/SubVC/RecordMessageVC.mm',
+					'../../source/Testbed/GoCastTalk/<@(OS)/SubVC/ChangeRegisteredNameVC.h',
+					'../../source/Testbed/GoCastTalk/<@(OS)/SubVC/ChangeRegisteredNameVC.mm',
+					'../../source/Testbed/GoCastTalk/<@(OS)/SubVC/InboxMessageVC.h',
+					'../../source/Testbed/GoCastTalk/<@(OS)/SubVC/InboxMessageVC.mm',
+
 					'../../source/Testbed/GoCastTalk/<@(OS)/GoCastTalkVC.h',
 					'../../source/Testbed/GoCastTalk/<@(OS)/GoCastTalkVC.mm',
 

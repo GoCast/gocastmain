@@ -5,10 +5,9 @@
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="3747"/>
     </dependencies>
     <objects>
-        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="GoCastTalkVC">
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="InboxMessageVC">
             <connections>
-                <outlet property="mInboxMessageOptionsTable" destination="jyR-4V-xqO" id="alG-Ju-7gw"/>
-                <outlet property="mInboxMessageView" destination="F9I-Kw-uRX" id="7nT-Ad-NpS"/>
+                <outlet property="view" destination="F9I-Kw-uRX" id="rxg-gs-gat"/>
             </connections>
         </placeholder>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
@@ -83,7 +82,13 @@
                     </connections>
                 </tableView>
             </subviews>
+            <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
             <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina4"/>
+            <userDefinedRuntimeAttributes>
+                <userDefinedRuntimeAttribute type="size" keyPath="contentSize">
+                    <size key="value" width="320" height="593"/>
+                </userDefinedRuntimeAttribute>
+            </userDefinedRuntimeAttributes>
         </scrollView>
     </objects>
     <resources>

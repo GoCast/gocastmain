@@ -3,6 +3,13 @@
 #import "AppDelegate.h"
 #import "GoCastTalkVC.h"
 
+#import "SubVC/ChangeRegisteredNameVC.h"
+#import "SubVC/ContactDetailsVC.h"
+#import "SubVC/EditContactsVC.h"
+#import "SubVC/InboxMessageVC.h"
+#import "SubVC/MessageHistoryVC.h"
+#import "SubVC/RecordMessageVC.h"
+
 #include "Base/package.h"
 
 #include "GCTEvent.h"
@@ -296,6 +303,47 @@ extern std::vector<std::string> gMemberListEntries;
             GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kSettingsTabPressed));
         }
     }
+}
+
+-(void)pushChangeRegisterdName
+{
+    ChangeRegisteredNameVC* nextVC = [[[ChangeRegisteredNameVC alloc] initWithNibName:@"ChangeRegistedNameVC" bundle:nil] autorelease];
+    [self.mInboxVC pushViewController:nextVC animated:YES];
+}
+
+-(void)pushContactDetails
+{
+    ContactDetailsVC* nextVC = [[[ContactDetailsVC alloc] initWithNibName:@"ContactDetailsVC" bundle:nil] autorelease];
+    [self.mInboxVC pushViewController:nextVC animated:YES];
+}
+
+-(void)pushEditContacts
+{
+    EditContactsVC* nextVC = [[[EditContactsVC alloc] initWithNibName:@"EditContactsVC" bundle:nil] autorelease];
+    [self.mInboxVC pushViewController:nextVC animated:YES];
+}
+
+-(void)pushInboxMessage
+{
+    InboxMessageVC* nextVC = [[[InboxMessageVC alloc] initWithNibName:@"InboxMessageVC" bundle:nil] autorelease];
+    [self.mInboxVC pushViewController:nextVC animated:YES];
+}
+
+-(void)pushMessageHistory
+{
+    MessageHistoryVC* nextVC = [[[MessageHistoryVC alloc] initWithNibName:@"MessageHistoryVC" bundle:nil] autorelease];
+    [self.mInboxVC pushViewController:nextVC animated:YES];
+}
+
+-(void)pushRecordMessage
+{
+    RecordMessageVC* nextVC = [[[RecordMessageVC alloc] initWithNibName:@"RecordMessageVC" bundle:nil] autorelease];
+    [self.mInboxVC pushViewController:nextVC animated:YES];
+}
+
+-(void)pop:(bool)animated
+{
+    [self.mInboxVC popViewControllerAnimated:((animated) ? TRUE : FALSE)];
 }
 
 @end

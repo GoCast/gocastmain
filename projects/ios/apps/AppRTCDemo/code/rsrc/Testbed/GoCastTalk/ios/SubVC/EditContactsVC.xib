@@ -5,10 +5,9 @@
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="3747"/>
     </dependencies>
     <objects>
-        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="GoCastTalkVC">
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="EditContactsVC">
             <connections>
-                <outlet property="mEditContactsTable" destination="euV-LW-Ngz" id="Gab-7e-c9b"/>
-                <outlet property="mEditContactsView" destination="Ioe-56-tat" id="MDp-EM-sjM"/>
+                <outlet property="view" destination="Ioe-56-tat" id="tcQ-ue-557"/>
             </connections>
         </placeholder>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>

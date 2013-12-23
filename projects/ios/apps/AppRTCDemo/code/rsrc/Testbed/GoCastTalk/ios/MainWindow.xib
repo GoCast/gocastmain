@@ -15,6 +15,7 @@
             <connections>
                 <outlet property="mContactsVC" destination="Mgh-Ot-I1K" id="9d9-8U-qVG"/>
                 <outlet property="mGroupsVC" destination="Cw4-Qx-cBd" id="XuX-49-OKF"/>
+                <outlet property="mInboxVC" destination="ZYU-wO-oys" id="R8U-8a-Yen"/>
                 <outlet property="mNewMemoVC" destination="VLa-JM-EXn" id="Z1t-7Y-lhb"/>
                 <outlet property="mSettingsVC" destination="jTc-kh-eHo" id="B2O-63-rUD"/>
                 <outlet property="tabBarController" destination="106" id="113"/>

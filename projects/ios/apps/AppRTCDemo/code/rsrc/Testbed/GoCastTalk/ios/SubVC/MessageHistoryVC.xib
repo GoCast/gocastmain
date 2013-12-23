@@ -5,11 +5,9 @@
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="3747"/>
     </dependencies>
     <objects>
-        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="GoCastTalkVC">
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="MessageHistoryVC">
             <connections>
-                <outlet property="mHistoryTable" destination="vbA-pJ-gX0" id="cUr-Do-TnW"/>
-                <outlet property="mMessageHistoryOptionsTable" destination="fdD-Cc-cFn" id="3sr-ee-iNx"/>
-                <outlet property="mMessageHistoryView" destination="1pv-BY-GVW" id="bZg-WR-g8P"/>
+                <outlet property="view" destination="1pv-BY-GVW" id="oTW-ip-CJK"/>
             </connections>
         </placeholder>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
@@ -69,7 +67,13 @@
                     </connections>
                 </tableView>
             </subviews>
+            <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
             <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina4"/>
+            <userDefinedRuntimeAttributes>
+                <userDefinedRuntimeAttribute type="size" keyPath="contentSize">
+                    <size key="value" width="320" height="429"/>
+                </userDefinedRuntimeAttribute>
+            </userDefinedRuntimeAttributes>
             <connections>
                 <outlet property="delegate" destination="-1" id="rTO-3e-HbX"/>
             </connections>

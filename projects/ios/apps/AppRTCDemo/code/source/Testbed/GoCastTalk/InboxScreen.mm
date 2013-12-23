@@ -26,50 +26,41 @@ void InboxScreen::endEntry()
     [gAppDelegateInstance hideAllViews];
 }
 
-void InboxScreen::inboxViewEntry()
+#pragma mark Idling
+void InboxScreen::inboxIdleEntry() { }
+void InboxScreen::inboxMessageIdleEntry() { }
+void InboxScreen::messageHistoryIdleEntry() { }
+void InboxScreen::recordMessageIdleEntry() { }
+
+#pragma mark Push Pop UI
+void InboxScreen::pushInboxMessageEntry()
 {
-    [gAppDelegateInstance setInboxViewVisible:true];
+    [gAppDelegateInstance pushInboxMessage];
 }
 
-void InboxScreen::inboxViewExit()
+void InboxScreen::pushMessageHistoryEntry()
 {
-    [gAppDelegateInstance setInboxViewVisible:false];
+    [gAppDelegateInstance pushMessageHistory];
 }
 
-void InboxScreen::recordMessageViewEntry()
+void InboxScreen::pushRecordMessageEntry()
 {
-    [gAppDelegateInstance setInboxMessageViewVisible:false];
-    [gAppDelegateInstance setRecordMessageViewVisible:true];
+    [gAppDelegateInstance pushRecordMessage];
 }
 
-void InboxScreen::recordMessageViewExit()
+void InboxScreen::popInboxMessageEntry()
 {
-    [gAppDelegateInstance setRecordMessageViewVisible:false];
+    
 }
 
-void InboxScreen::messageHistoryViewEntry()
+void InboxScreen::popMessageHistoryEntry()
 {
-    [gAppDelegateInstance setInboxMessageViewVisible:false];
-    [gAppDelegateInstance setMessageHistoryViewVisible:true];
+
 }
 
-void InboxScreen::messageHistoryViewExit()
+void InboxScreen::popRecordMessageEntry()
 {
-    [gAppDelegateInstance setMessageHistoryViewVisible:false];
-}
 
-void InboxScreen::showInboxMessageViewEntry()
-{
-    [gAppDelegateInstance setInboxMessageViewVisible:true];
-}
-
-void InboxScreen::hideInboxMessageViewEntry()
-{
-    [gAppDelegateInstance setInboxMessageViewVisible:false];
-}
-
-void InboxScreen::inboxMessageViewIdleEntry()
-{
 }
 
 void InboxScreen::showConfirmDeleteEntry()
@@ -88,14 +79,18 @@ void InboxScreen::CallEntry()
 	switch(mState)
 	{
 		case kEnd: EndEntryHelper(); break;
-		case kHideInboxMessageView: hideInboxMessageViewEntry(); break;
-		case kInboxMessageViewIdle: inboxMessageViewIdleEntry(); break;
-		case kInboxView: inboxViewEntry(); break;
+		case kInboxIdle: inboxIdleEntry(); break;
+		case kInboxMessageIdle: inboxMessageIdleEntry(); break;
 		case kInvalidState: invalidStateEntry(); break;
-		case kMessageHistoryView: messageHistoryViewEntry(); break;
-		case kRecordMessageView: recordMessageViewEntry(); break;
+		case kMessageHistoryIdle: messageHistoryIdleEntry(); break;
+		case kPopInboxMessage: popInboxMessageEntry(); break;
+		case kPopMessageHistory: popMessageHistoryEntry(); break;
+		case kPopRecordMessage: popRecordMessageEntry(); break;
+		case kPushInboxMessage: pushInboxMessageEntry(); break;
+		case kPushMessageHistory: pushMessageHistoryEntry(); break;
+		case kPushRecordMessage: pushRecordMessageEntry(); break;
+		case kRecordMessageIdle: recordMessageIdleEntry(); break;
 		case kShowConfirmDelete: showConfirmDeleteEntry(); break;
-		case kShowInboxMessageView: showInboxMessageViewEntry(); break;
 		case kStart: startEntry(); break;
 		default: break;
 	}
@@ -103,28 +98,25 @@ void InboxScreen::CallEntry()
 
 void InboxScreen::CallExit()
 {
-	switch(mState)
-	{
-		case kInboxView: inboxViewExit(); break;
-		case kMessageHistoryView: messageHistoryViewExit(); break;
-		case kRecordMessageView: recordMessageViewExit(); break;
-		default: break;
-	}
 }
 
 int  InboxScreen::StateTransitionFunction(const int evt) const
 {
-	if ((mState == kHideInboxMessageView) && (evt == kNext)) return kInboxView; else
-	if ((mState == kInboxMessageViewIdle) && (evt == kDeletePressed)) return kShowConfirmDelete; else
-	if ((mState == kInboxMessageViewIdle) && (evt == kHistoryPressed)) return kMessageHistoryView; else
-	if ((mState == kInboxMessageViewIdle) && (evt == kReplyPressed)) return kRecordMessageView; else
-	if ((mState == kInboxView) && (evt == kItemSelected)) return kShowInboxMessageView; else
-	if ((mState == kMessageHistoryView) && (evt == kReplyPressed)) return kRecordMessageView; else
-	if ((mState == kRecordMessageView) && (evt == kItemSelected)) return kShowInboxMessageView; else
-	if ((mState == kShowConfirmDelete) && (evt == kNo)) return kInboxMessageViewIdle; else
-	if ((mState == kShowConfirmDelete) && (evt == kYes)) return kHideInboxMessageView; else
-	if ((mState == kShowInboxMessageView) && (evt == kNext)) return kInboxMessageViewIdle; else
-	if ((mState == kStart) && (evt == kNext)) return kInboxView;
+	if ((mState == kInboxIdle) && (evt == kItemSelected)) return kPushInboxMessage; else
+	if ((mState == kInboxMessageIdle) && (evt == kDeletePressed)) return kShowConfirmDelete; else
+	if ((mState == kInboxMessageIdle) && (evt == kHistoryPressed)) return kPushMessageHistory; else
+	if ((mState == kInboxMessageIdle) && (evt == kReplyPressed)) return kRecordMessageIdle; else
+	if ((mState == kMessageHistoryIdle) && (evt == kReplyPressed)) return kPushRecordMessage; else
+	if ((mState == kPopInboxMessage) && (evt == kNext)) return kInboxIdle; else
+	if ((mState == kPopMessageHistory) && (evt == kNext)) return kInboxMessageIdle; else
+	if ((mState == kPopRecordMessage) && (evt == kNext)) return kPopMessageHistory; else
+	if ((mState == kPushInboxMessage) && (evt == kNext)) return kInboxMessageIdle; else
+	if ((mState == kPushMessageHistory) && (evt == kNext)) return kMessageHistoryIdle; else
+	if ((mState == kPushRecordMessage) && (evt == kNext)) return kRecordMessageIdle; else
+	if ((mState == kRecordMessageIdle) && (evt == kItemSelected)) return kPopRecordMessage; else
+	if ((mState == kShowConfirmDelete) && (evt == kNo)) return kInboxMessageIdle; else
+	if ((mState == kShowConfirmDelete) && (evt == kYes)) return kPopInboxMessage; else
+	if ((mState == kStart) && (evt == kNext)) return kInboxIdle;
 
 	return kInvalidState;
 }
@@ -133,13 +125,17 @@ bool InboxScreen::HasEdgeNamedNext() const
 {
 	switch(mState)
 	{
-		case kHideInboxMessageView:
-		case kShowInboxMessageView:
-		case kStart:
-			return true;
+		case kEnd:
+		case kInboxIdle:
+		case kInboxMessageIdle:
+		case kInvalidState:
+		case kMessageHistoryIdle:
+		case kRecordMessageIdle:
+		case kShowConfirmDelete:
+			return false;
 		default: break;
 	}
-	return false;
+	return true;
 }
 
 #pragma mark Messages
@@ -156,18 +152,18 @@ void InboxScreen::update(const GCTEvent &msg)
         case GCTEvent::kNoAlertPressed:     process(kNo); break;
 
         case GCTEvent::kTableItemSelected:
-            if (getState() == kInboxView)
+            if (getState() == kInboxIdle)
             {
                 if (msg.mItemSelected == 0)
                 {
                     process(kItemSelected);
                 }
             }
-            else if (getState() == kRecordMessageView)
+            else if (getState() == kRecordMessageIdle)
             {
                 process(kItemSelected);
             }
-            else if (getState() == kInboxMessageViewIdle)
+            else if (getState() == kInboxMessageIdle)
             {
                 if (msg.mItemSelected == 0)
                 {
@@ -182,7 +178,7 @@ void InboxScreen::update(const GCTEvent &msg)
                     process(kDeletePressed);
                 }
             }
-            else if (getState() == kMessageHistoryView)
+            else if (getState() == kMessageHistoryIdle)
             {
                 process(kReplyPressed);
             }

@@ -17,11 +17,11 @@ UITabBarControllerDelegate
 @property (nonatomic, retain) IBOutlet UITabBarController *tabBarController;
 @property (strong, nonatomic) GoCastTalkVC*   viewController;
 
-@property (nonatomic, strong) IBOutlet UIViewController* mInboxVC;
+@property (nonatomic, strong) IBOutlet UINavigationController* mInboxVC;
 @property (nonatomic, strong) IBOutlet UINavigationController* mNewMemoVC;
-@property (nonatomic, strong) IBOutlet UIViewController* mContactsVC;
-@property (nonatomic, strong) IBOutlet UIViewController* mGroupsVC;
-@property (nonatomic, strong) IBOutlet UIViewController* mSettingsVC;
+@property (nonatomic, strong) IBOutlet UINavigationController* mContactsVC;
+@property (nonatomic, strong) IBOutlet UINavigationController* mGroupsVC;
+@property (nonatomic, strong) IBOutlet UINavigationController* mSettingsVC;
 
 @property (nonatomic, strong) IBOutlet UITabBar* mTabBar;
 @property (nonatomic, strong) IBOutlet UITabBarItem* mInboxTab;
@@ -62,5 +62,15 @@ UITabBarControllerDelegate
 //--
 
 - (void)tabBarController:(UITabBarController *)tabBarController didSelectViewController:(UIViewController *)viewController;
+
+
+-(void)pushChangeRegisterdName;
+-(void)pushContactDetails;
+-(void)pushEditContacts;
+-(void)pushInboxMessage;
+-(void)pushMessageHistory;
+-(void)pushRecordMessage;
+
+-(void)pop:(bool)animated;
 
 @end
