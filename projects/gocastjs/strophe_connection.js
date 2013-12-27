@@ -211,7 +211,7 @@ GoCastJS.StropheConnection.prototype = {
     //
     autoConnect: function() {
         this.log('StropheConnection: Auto-Connecting.');
-        throw 'Not ok with xmpp cache manager now.';
+// hufftr       throw 'Not ok with xmpp cache manager now.';
 
         if (this.hasSavedLoginInfo()) {
             this.log('autoConnect: Saved user info found.');
@@ -262,7 +262,7 @@ GoCastJS.StropheConnection.prototype = {
     },
 
     connect: function(opts) {
-        throw 'Not ok with xmpp cache manager now.';
+// hufftr        throw 'Not ok with xmpp cache manager now.';
         if (opts) {
             if (typeof(opts) !== 'object') {
                 throw 'connect: ERROR: opts must be an object if given.';
