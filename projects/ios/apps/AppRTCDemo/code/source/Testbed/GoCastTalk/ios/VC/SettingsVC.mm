@@ -26,6 +26,16 @@
     self.view.autoresizesSubviews = YES;
 }
 
+- (void)viewWillDisappear:(BOOL)animated
+{
+    if ([self isMovingFromParentViewController])
+    {
+        GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kPop));
+    }
+
+    [super viewWillDisappear:animated];
+}
+
 - (void)dealloc
 {
     [super dealloc];

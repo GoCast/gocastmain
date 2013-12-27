@@ -16,6 +16,7 @@
 
 #pragma mark Construction / Destruction
 - (void)viewDidLoad;
+- (void)viewWillDisappear:(BOOL)animated;
 
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section;
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath;

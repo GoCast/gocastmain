@@ -43,6 +43,7 @@ public:
 		kHistoryPressed,
 		kItemSelected,
 		kNo,
+		kPopHappened,
 		kReplyPressed,
 		kYes,
 	};

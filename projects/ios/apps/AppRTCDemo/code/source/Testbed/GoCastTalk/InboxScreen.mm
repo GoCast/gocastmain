@@ -105,15 +105,18 @@ int  InboxScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kInboxIdle) && (evt == kItemSelected)) return kPushInboxMessage; else
 	if ((mState == kInboxMessageIdle) && (evt == kDeletePressed)) return kShowConfirmDelete; else
 	if ((mState == kInboxMessageIdle) && (evt == kHistoryPressed)) return kPushMessageHistory; else
+	if ((mState == kInboxMessageIdle) && (evt == kPopHappened)) return kInboxIdle; else
 	if ((mState == kInboxMessageIdle) && (evt == kReplyPressed)) return kRecordMessageIdle; else
+	if ((mState == kMessageHistoryIdle) && (evt == kPopHappened)) return kInboxMessageIdle; else
 	if ((mState == kMessageHistoryIdle) && (evt == kReplyPressed)) return kPushRecordMessage; else
-	if ((mState == kPopInboxMessage) && (evt == kNext)) return kInboxIdle; else
-	if ((mState == kPopMessageHistory) && (evt == kNext)) return kInboxMessageIdle; else
-	if ((mState == kPopRecordMessage) && (evt == kNext)) return kPopMessageHistory; else
+	if ((mState == kPopInboxMessage) && (evt == kPopHappened)) return kInboxIdle; else
+	if ((mState == kPopMessageHistory) && (evt == kPopHappened)) return kInboxMessageIdle; else
+	if ((mState == kPopRecordMessage) && (evt == kPopHappened)) return kPopMessageHistory; else
 	if ((mState == kPushInboxMessage) && (evt == kNext)) return kInboxMessageIdle; else
 	if ((mState == kPushMessageHistory) && (evt == kNext)) return kMessageHistoryIdle; else
 	if ((mState == kPushRecordMessage) && (evt == kNext)) return kRecordMessageIdle; else
 	if ((mState == kRecordMessageIdle) && (evt == kItemSelected)) return kPopRecordMessage; else
+	if ((mState == kRecordMessageIdle) && (evt == kPopHappened)) return kInboxMessageIdle; else
 	if ((mState == kShowConfirmDelete) && (evt == kNo)) return kInboxMessageIdle; else
 	if ((mState == kShowConfirmDelete) && (evt == kYes)) return kPopInboxMessage; else
 	if ((mState == kStart) && (evt == kNext)) return kInboxIdle;
@@ -125,17 +128,14 @@ bool InboxScreen::HasEdgeNamedNext() const
 {
 	switch(mState)
 	{
-		case kEnd:
-		case kInboxIdle:
-		case kInboxMessageIdle:
-		case kInvalidState:
-		case kMessageHistoryIdle:
-		case kRecordMessageIdle:
-		case kShowConfirmDelete:
-			return false;
+		case kPushInboxMessage:
+		case kPushMessageHistory:
+		case kPushRecordMessage:
+		case kStart:
+			return true;
 		default: break;
 	}
-	return true;
+	return false;
 }
 
 #pragma mark Messages
@@ -150,6 +150,8 @@ void InboxScreen::update(const GCTEvent &msg)
     {
         case GCTEvent::kOKYesAlertPressed:  process(kYes); break;
         case GCTEvent::kNoAlertPressed:     process(kNo); break;
+
+        case GCTEvent::kPop:                process(kPopHappened); break;
 
         case GCTEvent::kTableItemSelected:
             if (getState() == kInboxIdle)
