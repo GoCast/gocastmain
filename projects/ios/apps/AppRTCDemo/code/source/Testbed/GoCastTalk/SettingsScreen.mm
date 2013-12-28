@@ -102,20 +102,23 @@ void SettingsScreen::update(const SettingsScreenMessage& msg)
 
 void SettingsScreen::update(const GCTEvent &msg)
 {
-    switch (msg.mEvent)
+    if (mActiveTab)
     {
-        case GCTEvent::kTableItemSelected:
-            if (getState() == kSettingsView)
-            {
-                if (msg.mItemSelected == 0)
+        switch (msg.mEvent)
+        {
+            case GCTEvent::kTableItemSelected:
+                if (getState() == kSettingsView)
                 {
-                    process(kItemSelected);
+                    if (msg.mItemSelected == 0)
+                    {
+                        process(kItemSelected);
+                    }
                 }
-            }
-            break;
+                break;
 
-        default:
-            break;
+            default:
+                break;
+        }
     }
 }
 

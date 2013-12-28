@@ -7,7 +7,6 @@ GoCastTalkApp gGoCastTalkApp;
 
 #pragma mark Constructor / Destructor
 GoCastTalkApp::GoCastTalkApp()
-:   mScreen(NULL)
 {
 	ConstructMachine();
 }
@@ -26,7 +25,15 @@ void GoCastTalkApp::startEntry()
 
 void GoCastTalkApp::endEntry()
 {
-    if (mScreen) { delete mScreen; mScreen = NULL; }
+    delete mTabs[4];
+    delete mTabs[3];
+    delete mTabs[2];
+    delete mTabs[1];
+    delete mTabs[0];
+}
+
+void GoCastTalkApp::idleEntry()
+{
 }
 
 void GoCastTalkApp::invalidStateEntry()
@@ -34,80 +41,22 @@ void GoCastTalkApp::invalidStateEntry()
 	assert("Event is invalid for this state" && 0);
 }
 
-#pragma mark Screens
+#pragma mark Tabs
 
-void GoCastTalkApp::hideAllViewsEntry()
+void GoCastTalkApp::createAllTabsEntry()
 {
-    [gAppDelegateInstance hideAllViews];
-}
+    mTabs[0] = new InboxScreen;
+    mTabs[1] = new NewMemoScreen;
+    mTabs[2] = new ContactsScreen;
+    mTabs[3] = new GroupsScreen;
+    mTabs[4] = new SettingsScreen;
 
-void GoCastTalkApp::startScreenEntry()
-{
-//    mScreen = new StartScreen();
-//    mScreen->attach(this);
-//    ((StartScreen*)mScreen)->ready();
+    for (int i = 0; i < 5; i++)
+    {
+        mTabs[i]->attach(this);
+    }
 
-    SetImmediateEvent(kGoInbox);
-}
-
-void GoCastTalkApp::startScreenExit()
-{
-    if (mScreen) { delete mScreen; mScreen = NULL; }
-}
-
-void GoCastTalkApp::inboxScreenEntry()
-{
-    mScreen = new InboxScreen;
-    mScreen->attach(this);
-}
-
-void GoCastTalkApp::inboxScreenExit()
-{
-    if (mScreen) { delete mScreen; mScreen = NULL; }
-}
-
-void GoCastTalkApp::newMemoScreenEntry()
-{
-    mScreen = new NewMemoScreen;
-    mScreen->attach(this);
-}
-
-void GoCastTalkApp::newMemoScreenExit()
-{
-    if (mScreen) { delete mScreen; mScreen = NULL; }
-}
-
-void GoCastTalkApp::contactsScreenEntry()
-{
-    mScreen = new ContactsScreen();
-    mScreen->attach(this);
-}
-
-void GoCastTalkApp::contactsScreenExit()
-{
-    if (mScreen) { delete mScreen; mScreen = NULL; }
-}
-
-void GoCastTalkApp::groupsScreenEntry()
-{
-    mScreen = new GroupsScreen;
-    mScreen->attach(this);
-}
-
-void GoCastTalkApp::groupsScreenExit()
-{
-    if (mScreen) { delete mScreen; mScreen = NULL; }
-}
-
-void GoCastTalkApp::settingsScreenEntry()
-{
-    mScreen = new SettingsScreen();
-    mScreen->attach(this);
-}
-
-void GoCastTalkApp::settingsScreenExit()
-{
-    if (mScreen) { delete mScreen; mScreen = NULL; }
+    mTabs[0]->setActiveTab(true);
 }
 
 #pragma mark State wiring
@@ -115,64 +64,23 @@ void GoCastTalkApp::CallEntry()
 {
 	switch(mState)
 	{
-		case kContactsScreen: contactsScreenEntry(); break;
+		case kCreateAllTabs: createAllTabsEntry(); break;
 		case kEnd: EndEntryHelper(); break;
-		case kGroupsScreen: groupsScreenEntry(); break;
-		case kHideAllViews: hideAllViewsEntry(); break;
-		case kInboxScreen: inboxScreenEntry(); break;
+		case kIdle: idleEntry(); break;
 		case kInvalidState: invalidStateEntry(); break;
-		case kNewMemoScreen: newMemoScreenEntry(); break;
-		case kSettingsScreen: settingsScreenEntry(); break;
 		case kStart: startEntry(); break;
-		case kStartScreen: startScreenEntry(); break;
 		default: break;
 	}
 }
 
 void GoCastTalkApp::CallExit()
 {
-	switch(mState)
-	{
-		case kContactsScreen: contactsScreenExit(); break;
-		case kGroupsScreen: groupsScreenExit(); break;
-		case kInboxScreen: inboxScreenExit(); break;
-		case kNewMemoScreen: newMemoScreenExit(); break;
-		case kSettingsScreen: settingsScreenExit(); break;
-		case kStartScreen: startScreenExit(); break;
-		default: break;
-	}
 }
 
 int  GoCastTalkApp::StateTransitionFunction(const int evt) const
 {
-	if ((mState == kContactsScreen) && (evt == kGoContacts)) return kContactsScreen; else
-	if ((mState == kContactsScreen) && (evt == kGoGroups)) return kGroupsScreen; else
-	if ((mState == kContactsScreen) && (evt == kGoInbox)) return kInboxScreen; else
-	if ((mState == kContactsScreen) && (evt == kGoNewMemo)) return kNewMemoScreen; else
-	if ((mState == kContactsScreen) && (evt == kGoSettings)) return kSettingsScreen; else
-	if ((mState == kGroupsScreen) && (evt == kGoContacts)) return kContactsScreen; else
-	if ((mState == kGroupsScreen) && (evt == kGoGroups)) return kGroupsScreen; else
-	if ((mState == kGroupsScreen) && (evt == kGoInbox)) return kInboxScreen; else
-	if ((mState == kGroupsScreen) && (evt == kGoNewMemo)) return kNewMemoScreen; else
-	if ((mState == kGroupsScreen) && (evt == kGoSettings)) return kSettingsScreen; else
-	if ((mState == kHideAllViews) && (evt == kNext)) return kStartScreen; else
-	if ((mState == kInboxScreen) && (evt == kGoContacts)) return kContactsScreen; else
-	if ((mState == kInboxScreen) && (evt == kGoGroups)) return kGroupsScreen; else
-	if ((mState == kInboxScreen) && (evt == kGoInbox)) return kInboxScreen; else
-	if ((mState == kInboxScreen) && (evt == kGoNewMemo)) return kNewMemoScreen; else
-	if ((mState == kInboxScreen) && (evt == kGoSettings)) return kSettingsScreen; else
-	if ((mState == kNewMemoScreen) && (evt == kGoContacts)) return kContactsScreen; else
-	if ((mState == kNewMemoScreen) && (evt == kGoGroups)) return kGroupsScreen; else
-	if ((mState == kNewMemoScreen) && (evt == kGoInbox)) return kInboxScreen; else
-	if ((mState == kNewMemoScreen) && (evt == kGoNewMemo)) return kNewMemoScreen; else
-	if ((mState == kNewMemoScreen) && (evt == kGoSettings)) return kSettingsScreen; else
-	if ((mState == kSettingsScreen) && (evt == kGoContacts)) return kContactsScreen; else
-	if ((mState == kSettingsScreen) && (evt == kGoGroups)) return kGroupsScreen; else
-	if ((mState == kSettingsScreen) && (evt == kGoInbox)) return kInboxScreen; else
-	if ((mState == kSettingsScreen) && (evt == kGoNewMemo)) return kNewMemoScreen; else
-	if ((mState == kSettingsScreen) && (evt == kGoSettings)) return kSettingsScreen; else
-	if ((mState == kStart) && (evt == kReady)) return kHideAllViews; else
-	if ((mState == kStartScreen) && (evt == kGoInbox)) return kInboxScreen;
+	if ((mState == kCreateAllTabs) && (evt == kNext)) return kIdle; else
+	if ((mState == kStart) && (evt == kReady)) return kCreateAllTabs;
 
 	return kInvalidState;
 }
@@ -181,7 +89,7 @@ bool GoCastTalkApp::HasEdgeNamedNext() const
 {
 	switch(mState)
 	{
-		case kHideAllViews:
+		case kCreateAllTabs:
 			return true;
 		default: break;
 	}
@@ -196,23 +104,43 @@ void GoCastTalkApp::update(const GCTEvent& msg)
         case GCTEvent::kAppDelegateInit:   process(kReady); break;
 
         case GCTEvent::kInboxTabPressed:
-            process(kGoInbox);
+            for(int i = 0; i < 5; i++)
+            {
+                mTabs[i]->setActiveTab(false);
+            }
+            mTabs[0]->setActiveTab(true);
             break;
 
         case GCTEvent::kNewMemoTabPressed:
-            process(kGoNewMemo);
+            for(int i = 0; i < 5; i++)
+            {
+                mTabs[i]->setActiveTab(false);
+            }
+            mTabs[1]->setActiveTab(true);
             break;
 
         case GCTEvent::kContactsTabPressed:
-            process(kGoContacts);
+            for(int i = 0; i < 5; i++)
+            {
+                mTabs[i]->setActiveTab(false);
+            }
+            mTabs[2]->setActiveTab(true);
             break;
 
         case GCTEvent::kGroupsTabPressed:
-            process(kGoGroups);
+            for(int i = 0; i < 5; i++)
+            {
+                mTabs[i]->setActiveTab(false);
+            }
+            mTabs[3]->setActiveTab(true);
             break;
 
         case GCTEvent::kSettingsTabPressed:
-            process(kGoSettings);
+            for(int i = 0; i < 5; i++)
+            {
+                mTabs[i]->setActiveTab(false);
+            }
+            mTabs[4]->setActiveTab(true);
             break;
 
         default:

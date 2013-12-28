@@ -170,61 +170,64 @@ void ContactsScreen::update(const ContactsScreenMessage& msg)
 
 void ContactsScreen::update(const GCTEvent &msg)
 {
-    switch (msg.mEvent)
+    if (mActiveTab)
     {
-        case GCTEvent::kNavButtonPressed:
-            if (getState() == kContactsView)
-            {
-                process(kEditPressed);
-            }
-            else if (getState() == kEditContactsView)
-            {
-                process(kDonePressed);
-            }
-            else if (getState() == kChangeRegisteredNameView)
-            {
-                process(kDonePressed);
-            }
-            break;
+        switch (msg.mEvent)
+        {
+            case GCTEvent::kNavButtonPressed:
+                if (getState() == kContactsView)
+                {
+                    process(kEditPressed);
+                }
+                else if (getState() == kEditContactsView)
+                {
+                    process(kDonePressed);
+                }
+                else if (getState() == kChangeRegisteredNameView)
+                {
+                    process(kDonePressed);
+                }
+                break;
 
-        case GCTEvent::kTableItemSelected:
-            if (getState() == kContactsView)
-            {
-                if (msg.mItemSelected == 1)
+            case GCTEvent::kTableItemSelected:
+                if (getState() == kContactsView)
                 {
-                    process(kItemSelected);
+                    if (msg.mItemSelected == 1)
+                    {
+                        process(kItemSelected);
+                    }
                 }
-            }
-            else if (getState() == kEditContactsView)
-            {
-                if (msg.mItemSelected == 0)
+                else if (getState() == kEditContactsView)
                 {
-                    process(kItemSelected);
+                    if (msg.mItemSelected == 0)
+                    {
+                        process(kItemSelected);
+                    }
                 }
-            }
-            else if (getState() == kContactDetailsView)
-            {
-                if (msg.mItemSelected == 0)
+                else if (getState() == kContactDetailsView)
                 {
-                    process(kHistoryPressed);
+                    if (msg.mItemSelected == 0)
+                    {
+                        process(kHistoryPressed);
+                    }
+                    else if (msg.mItemSelected == 1)
+                    {
+                        process(kReplyPressed);
+                    }
                 }
-                else if (msg.mItemSelected == 1)
+                else if (getState() == kMessageHistoryView)
                 {
                     process(kReplyPressed);
                 }
-            }
-            else if (getState() == kMessageHistoryView)
-            {
-                process(kReplyPressed);
-            }
-            else if (getState() == kRecordMessageView)
-            {
-                process(kItemSelected);
-            }
-            break;
-
-        default:
-            break;
+                else if (getState() == kRecordMessageView)
+                {
+                    process(kItemSelected);
+                }
+                break;
+                
+            default:
+                break;
+        }
     }
 }
 

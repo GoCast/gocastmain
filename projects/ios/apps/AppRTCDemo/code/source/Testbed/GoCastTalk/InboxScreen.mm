@@ -177,48 +177,51 @@ void InboxScreen::update(const InboxScreenMessage& msg)
 
 void InboxScreen::update(const GCTEvent &msg)
 {
-    switch (msg.mEvent)
+    if (mActiveTab)
     {
-        case GCTEvent::kOKYesAlertPressed:  process(kYes); break;
-        case GCTEvent::kNoAlertPressed:     process(kNo); break;
+        switch (msg.mEvent)
+        {
+            case GCTEvent::kOKYesAlertPressed:  process(kYes); break;
+            case GCTEvent::kNoAlertPressed:     process(kNo); break;
 
-        case GCTEvent::kPop:                process(kPopHappened); break;
+            case GCTEvent::kPop:                process(kPopHappened); break;
 
-        case GCTEvent::kTableItemSelected:
-            if (getState() == kInboxIdle)
-            {
-                if (msg.mItemSelected == 0)
+            case GCTEvent::kTableItemSelected:
+                if (getState() == kInboxIdle)
+                {
+                    if (msg.mItemSelected == 0)
+                    {
+                        process(kItemSelected);
+                    }
+                }
+                else if (getState() == kRecordMessageIdle)
                 {
                     process(kItemSelected);
                 }
-            }
-            else if (getState() == kRecordMessageIdle)
-            {
-                process(kItemSelected);
-            }
-            else if (getState() == kInboxMessageIdle)
-            {
-                if (msg.mItemSelected == 0)
+                else if (getState() == kInboxMessageIdle)
                 {
-                    process(kHistoryPressed);
+                    if (msg.mItemSelected == 0)
+                    {
+                        process(kHistoryPressed);
+                    }
+                    else if (msg.mItemSelected == 1)
+                    {
+                        process(kReplyPressed);
+                    }
+                    else if (msg.mItemSelected == 2)
+                    {
+                        process(kDeletePressed);
+                    }
                 }
-                else if (msg.mItemSelected == 1)
+                else if (getState() == kMessageHistoryIdle)
                 {
                     process(kReplyPressed);
                 }
-                else if (msg.mItemSelected == 2)
-                {
-                    process(kDeletePressed);
-                }
-            }
-            else if (getState() == kMessageHistoryIdle)
-            {
-                process(kReplyPressed);
-            }
-            break;
-
-        default:
-            break;
+                break;
+                
+            default:
+                break;
+        }
     }
 }
 

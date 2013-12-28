@@ -132,14 +132,17 @@ void NewMemoScreen::update(const NewMemoScreenMessage& msg)
 
 void NewMemoScreen::update(const GCTEvent &msg)
 {
-    switch (msg.mEvent)
+    if (mActiveTab)
     {
-        case GCTEvent::kTableItemSelected: process(kItemSelected); break;
-        case GCTEvent::kAddContactsButtonPressed: process(kAddContactsPressed); break;
-        case GCTEvent::kAddGroupsButtonPressed: process(kAddGroupsPressed); break;
+        switch (msg.mEvent)
+        {
+            case GCTEvent::kTableItemSelected: process(kItemSelected); break;
+            case GCTEvent::kAddContactsButtonPressed: process(kAddContactsPressed); break;
+            case GCTEvent::kAddGroupsButtonPressed: process(kAddGroupsPressed); break;
 
-        default:
-            break;
+            default:
+                break;
+        }
     }
 }
 

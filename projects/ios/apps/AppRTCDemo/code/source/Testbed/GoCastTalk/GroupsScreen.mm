@@ -79,5 +79,9 @@ void GroupsScreen::update(const GroupsScreenMessage& msg)
 void GroupsScreen::update(const GCTEvent &msg)
 {
 #pragma unused(msg)
+    if (mActiveTab)
+    {
+
+    }
 }
 

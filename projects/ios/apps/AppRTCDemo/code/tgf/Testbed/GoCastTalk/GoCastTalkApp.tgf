@@ -1,38 +1,7 @@
 1 start
 2 end
-3 Start Screen*
-4 New Memo Screen*
-5 Inbox Screen*
-6 Hide all views
-7 Settings Screen*
-8 Groups Screen*
-9 Contacts Screen*
+3 Create all tabs
+4 idle
 #
-1 6 ready
-6 3
-3 5 goInbox
-7 5 goInbox
-4 5 goInbox
-8 5 goInbox
-9 5 goInbox
-5 4 goNewMemo
-7 4 goNewMemo
-8 4 goNewMemo
-9 4 goNewMemo
-4 9 goContacts
-5 9 goContacts
-7 9 goContacts
-8 9 goContacts
-4 8 goGroups
-7 8 goGroups
-9 8 goGroups
-5 8 goGroups
-9 7 goSettings
-4 7 goSettings
-8 7 goSettings
-5 7 goSettings
-5 5 goInbox
-4 4 goNewMemo
-9 9 goContacts
-7 7 goSettings
-8 8 goGroups
+1 3 ready
+3 4
