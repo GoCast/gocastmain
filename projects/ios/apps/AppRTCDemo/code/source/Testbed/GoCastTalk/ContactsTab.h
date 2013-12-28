@@ -2,20 +2,20 @@
 
 #include <queue>
 
-class ContactsScreenMessage;
+class ContactsTabMessage;
 class GCTEvent;
 
-class ContactsScreen
+class ContactsTab
 :   public tMealy,
-    public Screen,
-    public tObserver<const ContactsScreenMessage&>,
+    public Tab,
+    public tObserver<const ContactsTabMessage&>,
     public tObserver<const GCTEvent&>
 {
 protected:
 
 public:
-	ContactsScreen();
-	~ContactsScreen();
+	ContactsTab();
+	~ContactsTab();
 
 protected:
 	void startEntry();
@@ -67,18 +67,18 @@ protected:
 	int  StateTransitionFunction(const int evt) const;
 	bool HasEdgeNamedNext() const;
 
-	void update(const ContactsScreenMessage& msg);
+	void update(const ContactsTabMessage& msg);
     void update(const GCTEvent& msg);
 };
 
-class ContactsScreenMessage
+class ContactsTabMessage
 {
 public:
-	ContactsScreen::EventType				mEvent;
-	tSubject<const ContactsScreenMessage&>*	mSource;
+	ContactsTab::EventType				mEvent;
+	tSubject<const ContactsTabMessage&>*	mSource;
 
 public:
-	ContactsScreenMessage(ContactsScreen::EventType newEvent, tSubject<const ContactsScreenMessage&>* newSource = NULL)
+	ContactsTabMessage(ContactsTab::EventType newEvent, tSubject<const ContactsTabMessage&>* newSource = NULL)
 	: mEvent(newEvent), mSource(newSource) { }
 };
 

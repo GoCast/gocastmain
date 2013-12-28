@@ -16,13 +16,13 @@
 #include "JSONUtil.h"
 #include "URLLoader.h"
 
-#include "Screen.h"
+#include "Tab.h"
 
-#include "InboxScreen.h"
-#include "NewMemoScreen.h"
-#include "ContactsScreen.h"
-#include "GroupsScreen.h"
-#include "SettingsScreen.h"
+#include "InboxTab.h"
+#include "NewMemoTab.h"
+#include "ContactsTab.h"
+#include "GroupsTab.h"
+#include "SettingsTab.h"
 
 #include "GoCastTalkApp.h"
 

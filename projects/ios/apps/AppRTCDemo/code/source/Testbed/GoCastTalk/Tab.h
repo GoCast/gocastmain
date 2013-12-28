@@ -2,15 +2,15 @@
 
 class GoCastTalkAppMessage;
 
-class Screen : public tSubject<const GoCastTalkAppMessage&>
+class Tab : public tSubject<const GoCastTalkAppMessage&>
 {
 protected:
     bool mActiveTab;
 
 public:
-    Screen()
+    Tab()
     : mActiveTab(false) { }
-    virtual ~Screen() { }
+    virtual ~Tab() { }
 
     void setActiveTab(bool newActive)
     {

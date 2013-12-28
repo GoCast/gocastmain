@@ -4,55 +4,55 @@
 #include "package.h"
 
 #pragma mark Constructor / Destructor
-SettingsScreen::SettingsScreen()
+SettingsTab::SettingsTab()
 {
 	ConstructMachine();
 }
 
-SettingsScreen::~SettingsScreen()
+SettingsTab::~SettingsTab()
 {
 	DestructMachine();
 }
 
 #pragma mark Start / End / Invalid
-void SettingsScreen::startEntry()
+void SettingsTab::startEntry()
 {
     GCTEventManager::getInstance()->attach(this);
     [gAppDelegateInstance setNavigationBarTitle:"Settings"];
 }
 
-void SettingsScreen::endEntry()
+void SettingsTab::endEntry()
 {
     [gAppDelegateInstance hideAllViews];
 }
 
-void SettingsScreen::settingsViewEntry()
+void SettingsTab::settingsViewEntry()
 {
     [gAppDelegateInstance setSettingsViewVisible:true];
 }
 
-void SettingsScreen::settingsViewExit()
+void SettingsTab::settingsViewExit()
 {
     [gAppDelegateInstance setSettingsViewVisible:false];
 }
 
-void SettingsScreen::changeRegisteredNameViewEntry()
+void SettingsTab::changeRegisteredNameViewEntry()
 {
     [gAppDelegateInstance setChangeRegisteredNameViewVisible:true];
 }
 
-void SettingsScreen::changeRegisteredNameViewExit()
+void SettingsTab::changeRegisteredNameViewExit()
 {
     [gAppDelegateInstance setChangeRegisteredNameViewVisible:false];
 }
 
-void SettingsScreen::invalidStateEntry()
+void SettingsTab::invalidStateEntry()
 {
 	assert("Event is invalid for this state" && 0);
 }
 
 #pragma mark State wiring
-void SettingsScreen::CallEntry()
+void SettingsTab::CallEntry()
 {
 	switch(mState)
 	{
@@ -65,7 +65,7 @@ void SettingsScreen::CallEntry()
 	}
 }
 
-void SettingsScreen::CallExit()
+void SettingsTab::CallExit()
 {
 	switch(mState)
 	{
@@ -75,7 +75,7 @@ void SettingsScreen::CallExit()
 	}
 }
 
-int  SettingsScreen::StateTransitionFunction(const int evt) const
+int  SettingsTab::StateTransitionFunction(const int evt) const
 {
 	if ((mState == kSettingsView) && (evt == kItemSelected)) return kChangeRegisteredNameView; else
 	if ((mState == kStart) && (evt == kNext)) return kSettingsView;
@@ -83,7 +83,7 @@ int  SettingsScreen::StateTransitionFunction(const int evt) const
 	return kInvalidState;
 }
 
-bool SettingsScreen::HasEdgeNamedNext() const
+bool SettingsTab::HasEdgeNamedNext() const
 {
 	switch(mState)
 	{
@@ -95,12 +95,12 @@ bool SettingsScreen::HasEdgeNamedNext() const
 }
 
 #pragma mark Messages
-void SettingsScreen::update(const SettingsScreenMessage& msg)
+void SettingsTab::update(const SettingsTabMessage& msg)
 {
 	process(msg.mEvent);
 }
 
-void SettingsScreen::update(const GCTEvent &msg)
+void SettingsTab::update(const GCTEvent &msg)
 {
     if (mActiveTab)
     {

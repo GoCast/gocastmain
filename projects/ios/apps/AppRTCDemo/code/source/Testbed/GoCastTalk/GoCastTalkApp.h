@@ -13,7 +13,7 @@ class GoCastTalkApp
 protected:
     std::string mCurAudioFilename;
     std::string mGroupToEdit;
-    Screen*     mTabs[5];
+    Tab*     mTabs[5];
     bool        mExistsOnServer;
     bool        mIsEditing;
 

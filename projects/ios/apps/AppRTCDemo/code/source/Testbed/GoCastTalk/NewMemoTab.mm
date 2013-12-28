@@ -4,76 +4,76 @@
 #include "package.h"
 
 #pragma mark Constructor / Destructor
-NewMemoScreen::NewMemoScreen()
+NewMemoTab::NewMemoTab()
 {
 	ConstructMachine();
 }
 
-NewMemoScreen::~NewMemoScreen()
+NewMemoTab::~NewMemoTab()
 {
 	DestructMachine();
 }
 
 #pragma mark Start / End / Invalid
-void NewMemoScreen::startEntry()
+void NewMemoTab::startEntry()
 {
     GCTEventManager::getInstance()->attach(this);
 
     [gAppDelegateInstance setNavigationBarTitle:"New Memo"];
 }
 
-void NewMemoScreen::endEntry()
+void NewMemoTab::endEntry()
 {
     [gAppDelegateInstance hideAllViews];
 }
 
-void NewMemoScreen::newMemoViewEntry()
+void NewMemoTab::newMemoViewEntry()
 {
     [gAppDelegateInstance setNewMemoViewVisible:true];
 }
 
-void NewMemoScreen::newMemoViewExit()
+void NewMemoTab::newMemoViewExit()
 {
     [gAppDelegateInstance setNewMemoViewVisible:false];
 }
 
-void NewMemoScreen::recordMessageViewEntry()
+void NewMemoTab::recordMessageViewEntry()
 {
     [gAppDelegateInstance setRecordMessageViewVisible:true];
 }
 
-void NewMemoScreen::recordMessageViewExit()
+void NewMemoTab::recordMessageViewExit()
 {
     [gAppDelegateInstance setRecordMessageViewVisible:false];
 }
 
-void NewMemoScreen::contactsViewEntry()
+void NewMemoTab::contactsViewEntry()
 {
     [gAppDelegateInstance setContactsViewVisible:true];
 }
 
-void NewMemoScreen::contactsViewExit()
+void NewMemoTab::contactsViewExit()
 {
     [gAppDelegateInstance setContactsViewVisible:false];
 }
 
-void NewMemoScreen::groupsViewEntry()
+void NewMemoTab::groupsViewEntry()
 {
     [gAppDelegateInstance setGroupsViewVisible:true];
 }
 
-void NewMemoScreen::groupsViewExit()
+void NewMemoTab::groupsViewExit()
 {
     [gAppDelegateInstance setGroupsViewVisible:false];
 }
 
-void NewMemoScreen::invalidStateEntry()
+void NewMemoTab::invalidStateEntry()
 {
 	assert("Event is invalid for this state" && 0);
 }
 
 #pragma mark State wiring
-void NewMemoScreen::CallEntry()
+void NewMemoTab::CallEntry()
 {
 	switch(mState)
 	{
@@ -88,7 +88,7 @@ void NewMemoScreen::CallEntry()
 	}
 }
 
-void NewMemoScreen::CallExit()
+void NewMemoTab::CallExit()
 {
 	switch(mState)
 	{
@@ -100,7 +100,7 @@ void NewMemoScreen::CallExit()
 	}
 }
 
-int  NewMemoScreen::StateTransitionFunction(const int evt) const
+int  NewMemoTab::StateTransitionFunction(const int evt) const
 {
 	if ((mState == kContactsView) && (evt == kItemSelected)) return kNewMemoView; else
 	if ((mState == kGroupsView) && (evt == kItemSelected)) return kNewMemoView; else
@@ -113,7 +113,7 @@ int  NewMemoScreen::StateTransitionFunction(const int evt) const
 	return kInvalidState;
 }
 
-bool NewMemoScreen::HasEdgeNamedNext() const
+bool NewMemoTab::HasEdgeNamedNext() const
 {
 	switch(mState)
 	{
@@ -125,12 +125,12 @@ bool NewMemoScreen::HasEdgeNamedNext() const
 }
 
 #pragma mark Messages
-void NewMemoScreen::update(const NewMemoScreenMessage& msg)
+void NewMemoTab::update(const NewMemoTabMessage& msg)
 {
 	process(msg.mEvent);
 }
 
-void NewMemoScreen::update(const GCTEvent &msg)
+void NewMemoTab::update(const GCTEvent &msg)
 {
     if (mActiveTab)
     {

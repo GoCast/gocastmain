@@ -4,18 +4,18 @@
 #include "package.h"
 
 #pragma mark Constructor / Destructor
-ContactsScreen::ContactsScreen()
+ContactsTab::ContactsTab()
 {
 	ConstructMachine();
 }
 
-ContactsScreen::~ContactsScreen()
+ContactsTab::~ContactsTab()
 {
 	DestructMachine();
 }
 
 #pragma mark Start / End / Invalid
-void ContactsScreen::startEntry()
+void ContactsTab::startEntry()
 {
     GCTEventManager::getInstance()->attach(this);
 
@@ -24,87 +24,87 @@ void ContactsScreen::startEntry()
     [gAppDelegateInstance setContactsViewVisible:true];
 }
 
-void ContactsScreen::endEntry()
+void ContactsTab::endEntry()
 {
     [gAppDelegateInstance hideAllViews];
 }
 
-void ContactsScreen::changeRegisteredNameViewEntry()
+void ContactsTab::changeRegisteredNameViewEntry()
 {
     [gAppDelegateInstance setChangeRegisteredNameViewVisible:true];
     [gAppDelegateInstance setNavigationButtonVisible:true];
     [gAppDelegateInstance setNavigationButtonTitle:"Done"];
 }
 
-void ContactsScreen::changeRegisteredNameViewExit()
+void ContactsTab::changeRegisteredNameViewExit()
 {
     [gAppDelegateInstance setChangeRegisteredNameViewVisible:false];
     [gAppDelegateInstance setNavigationButtonVisible:false];
 }
 
-void ContactsScreen::contactsViewEntry()
+void ContactsTab::contactsViewEntry()
 {
     [gAppDelegateInstance setContactsViewVisible:true];
     [gAppDelegateInstance setNavigationButtonVisible:true];
     [gAppDelegateInstance setNavigationButtonTitle:"Edit"];
 }
 
-void ContactsScreen::contactsViewExit()
+void ContactsTab::contactsViewExit()
 {
     [gAppDelegateInstance setContactsViewVisible:false];
     [gAppDelegateInstance setNavigationButtonVisible:false];
 }
 
-void ContactsScreen::contactDetailsViewEntry()
+void ContactsTab::contactDetailsViewEntry()
 {
     [gAppDelegateInstance setContactDetailsViewVisible:true];
 }
 
-void ContactsScreen::contactDetailsViewExit()
+void ContactsTab::contactDetailsViewExit()
 {
     [gAppDelegateInstance setContactDetailsViewVisible:false];
 }
 
-void ContactsScreen::editContactsViewEntry()
+void ContactsTab::editContactsViewEntry()
 {
     [gAppDelegateInstance setEditContactsViewVisible:true];
     [gAppDelegateInstance setNavigationButtonVisible:true];
     [gAppDelegateInstance setNavigationButtonTitle:"Done"];
 }
 
-void ContactsScreen::editContactsViewExit()
+void ContactsTab::editContactsViewExit()
 {
     [gAppDelegateInstance setEditContactsViewVisible:false];
     [gAppDelegateInstance setNavigationButtonVisible:false];
 }
 
-void ContactsScreen::messageHistoryViewEntry()
+void ContactsTab::messageHistoryViewEntry()
 {
     [gAppDelegateInstance setMessageHistoryViewVisible:true];
 }
 
-void ContactsScreen::messageHistoryViewExit()
+void ContactsTab::messageHistoryViewExit()
 {
     [gAppDelegateInstance setMessageHistoryViewVisible:false];
 }
 
-void ContactsScreen::recordMessageViewEntry()
+void ContactsTab::recordMessageViewEntry()
 {
     [gAppDelegateInstance setRecordMessageViewVisible:true];
 }
 
-void ContactsScreen::recordMessageViewExit()
+void ContactsTab::recordMessageViewExit()
 {
     [gAppDelegateInstance setRecordMessageViewVisible:false];
 }
 
-void ContactsScreen::invalidStateEntry()
+void ContactsTab::invalidStateEntry()
 {
 	assert("Event is invalid for this state" && 0);
 }
 
 #pragma mark State wiring
-void ContactsScreen::CallEntry()
+void ContactsTab::CallEntry()
 {
 	switch(mState)
 	{
@@ -121,7 +121,7 @@ void ContactsScreen::CallEntry()
 	}
 }
 
-void ContactsScreen::CallExit()
+void ContactsTab::CallExit()
 {
 	switch(mState)
 	{
@@ -135,7 +135,7 @@ void ContactsScreen::CallExit()
 	}
 }
 
-int  ContactsScreen::StateTransitionFunction(const int evt) const
+int  ContactsTab::StateTransitionFunction(const int evt) const
 {
 	if ((mState == kChangeRegisteredNameView) && (evt == kDonePressed)) return kEditContactsView; else
 	if ((mState == kContactDetailsView) && (evt == kHistoryPressed)) return kMessageHistoryView; else
@@ -151,7 +151,7 @@ int  ContactsScreen::StateTransitionFunction(const int evt) const
 	return kInvalidState;
 }
 
-bool ContactsScreen::HasEdgeNamedNext() const
+bool ContactsTab::HasEdgeNamedNext() const
 {
 	switch(mState)
 	{
@@ -163,12 +163,12 @@ bool ContactsScreen::HasEdgeNamedNext() const
 }
 
 #pragma mark Messages
-void ContactsScreen::update(const ContactsScreenMessage& msg)
+void ContactsTab::update(const ContactsTabMessage& msg)
 {
 	process(msg.mEvent);
 }
 
-void ContactsScreen::update(const GCTEvent &msg)
+void ContactsTab::update(const GCTEvent &msg)
 {
     if (mActiveTab)
     {

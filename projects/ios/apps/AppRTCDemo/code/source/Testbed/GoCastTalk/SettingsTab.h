@@ -2,20 +2,20 @@
 
 #include <queue>
 
-class SettingsScreenMessage;
+class SettingsTabMessage;
 class GCTEvent;
 
-class SettingsScreen
+class SettingsTab
 :   public tMealy,
-    public Screen,
-    public tObserver<const SettingsScreenMessage&>,
+    public Tab,
+    public tObserver<const SettingsTabMessage&>,
     public tObserver<const GCTEvent&>
 {
 protected:
 
 public:
-	SettingsScreen();
-	~SettingsScreen();
+	SettingsTab();
+	~SettingsTab();
 
 protected:
 	void startEntry();
@@ -51,18 +51,18 @@ protected:
 	int  StateTransitionFunction(const int evt) const;
 	bool HasEdgeNamedNext() const;
 
-	void update(const SettingsScreenMessage& msg);
+	void update(const SettingsTabMessage& msg);
     void update(const GCTEvent& msg);
 };
 
-class SettingsScreenMessage
+class SettingsTabMessage
 {
 public:
-	SettingsScreen::EventType				mEvent;
-	tSubject<const SettingsScreenMessage&>*	mSource;
+	SettingsTab::EventType				mEvent;
+	tSubject<const SettingsTabMessage&>*	mSource;
 
 public:
-	SettingsScreenMessage(SettingsScreen::EventType newEvent, tSubject<const SettingsScreenMessage&>* newSource = NULL)
+	SettingsTabMessage(SettingsTab::EventType newEvent, tSubject<const SettingsTabMessage&>* newSource = NULL)
 	: mEvent(newEvent), mSource(newSource) { }
 };
 

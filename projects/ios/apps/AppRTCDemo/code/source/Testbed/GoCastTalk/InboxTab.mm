@@ -4,18 +4,18 @@
 #include "package.h"
 
 #pragma mark Constructor / Destructor
-InboxScreen::InboxScreen()
+InboxTab::InboxTab()
 {
 	ConstructMachine();
 }
 
-InboxScreen::~InboxScreen()
+InboxTab::~InboxTab()
 {
 	DestructMachine();
 }
 
 #pragma mark Start / End / Invalid
-void InboxScreen::startEntry()
+void InboxTab::startEntry()
 {
     GCTEventManager::getInstance()->attach(this);
     [gAppDelegateInstance setNavigationBarTitle:"Inbox"];
@@ -23,58 +23,58 @@ void InboxScreen::startEntry()
     mCameFromMessageHistory = false;
 }
 
-void InboxScreen::endEntry()
+void InboxTab::endEntry()
 {
     [gAppDelegateInstance hideAllViews];
 }
 
 #pragma mark Idling
-void InboxScreen::inboxIdleEntry()
+void InboxTab::inboxIdleEntry()
 {
     mCameFromMessageHistory = false;
 }
 
-void InboxScreen::inboxMessageIdleEntry()
+void InboxTab::inboxMessageIdleEntry()
 {
 }
 
-void InboxScreen::messageHistoryIdleEntry()
+void InboxTab::messageHistoryIdleEntry()
 {
     mCameFromMessageHistory = true;
 }
 
-void InboxScreen::recordMessageIdleEntry()
+void InboxTab::recordMessageIdleEntry()
 {
 }
 
 #pragma mark Queries
-void InboxScreen::didWeComeFromMessageHistoryEntry()
+void InboxTab::didWeComeFromMessageHistoryEntry()
 {
     SetImmediateEvent(mCameFromMessageHistory ? kYes : kNo);
 }
 
 #pragma mark Push Pop UI
-void InboxScreen::pushInboxMessageEntry()
+void InboxTab::pushInboxMessageEntry()
 {
     [gAppDelegateInstance pushInboxMessage];
 }
 
-void InboxScreen::pushMessageHistoryEntry()
+void InboxTab::pushMessageHistoryEntry()
 {
     [gAppDelegateInstance pushMessageHistory];
 }
 
-void InboxScreen::pushRecordMessageEntry()
+void InboxTab::pushRecordMessageEntry()
 {
     [gAppDelegateInstance pushRecordMessage];
 }
 
-void InboxScreen::popInboxMessageEntry()
+void InboxTab::popInboxMessageEntry()
 {
     [gAppDelegateInstance pop:true];
 }
 
-void InboxScreen::popIfWeCameFromMessageHistoryEntry()
+void InboxTab::popIfWeCameFromMessageHistoryEntry()
 {
     if (mCameFromMessageHistory)
     {
@@ -86,23 +86,23 @@ void InboxScreen::popIfWeCameFromMessageHistoryEntry()
     }
 }
 
-void InboxScreen::popRecordMessageEntry()
+void InboxTab::popRecordMessageEntry()
 {
     [gAppDelegateInstance pop:false];
 }
 
-void InboxScreen::showConfirmDeleteEntry()
+void InboxTab::showConfirmDeleteEntry()
 {
     tConfirm("Delete this message?");
 }
 
-void InboxScreen::invalidStateEntry()
+void InboxTab::invalidStateEntry()
 {
 	assert("Event is invalid for this state" && 0);
 }
 
 #pragma mark State wiring
-void InboxScreen::CallEntry()
+void InboxTab::CallEntry()
 {
 	switch(mState)
 	{
@@ -125,11 +125,11 @@ void InboxScreen::CallEntry()
 	}
 }
 
-void InboxScreen::CallExit()
+void InboxTab::CallExit()
 {
 }
 
-int  InboxScreen::StateTransitionFunction(const int evt) const
+int  InboxTab::StateTransitionFunction(const int evt) const
 {
 	if ((mState == kDidWeComeFromMessageHistory) && (evt == kNo)) return kInboxMessageIdle; else
 	if ((mState == kDidWeComeFromMessageHistory) && (evt == kYes)) return kMessageHistoryIdle; else
@@ -155,7 +155,7 @@ int  InboxScreen::StateTransitionFunction(const int evt) const
 	return kInvalidState;
 }
 
-bool InboxScreen::HasEdgeNamedNext() const
+bool InboxTab::HasEdgeNamedNext() const
 {
 	switch(mState)
 	{
@@ -170,12 +170,12 @@ bool InboxScreen::HasEdgeNamedNext() const
 }
 
 #pragma mark Messages
-void InboxScreen::update(const InboxScreenMessage& msg)
+void InboxTab::update(const InboxTabMessage& msg)
 {
 	process(msg.mEvent);
 }
 
-void InboxScreen::update(const GCTEvent &msg)
+void InboxTab::update(const GCTEvent &msg)
 {
     if (mActiveTab)
     {

@@ -2,20 +2,20 @@
 
 #include <queue>
 
-class NewMemoScreenMessage;
+class NewMemoTabMessage;
 class GCTEvent;
 
-class NewMemoScreen
+class NewMemoTab
 :   public tMealy,
-    public Screen,
-    public tObserver<const NewMemoScreenMessage&>,
+    public Tab,
+    public tObserver<const NewMemoTabMessage&>,
     public tObserver<const GCTEvent&>
 {
 protected:
 
 public:
-	NewMemoScreen();
-	~NewMemoScreen();
+	NewMemoTab();
+	~NewMemoTab();
 
 protected:
 	void startEntry();
@@ -59,18 +59,18 @@ protected:
 	int  StateTransitionFunction(const int evt) const;
 	bool HasEdgeNamedNext() const;
 
-	void update(const NewMemoScreenMessage& msg);
+	void update(const NewMemoTabMessage& msg);
     void update(const GCTEvent& msg);
 };
 
-class NewMemoScreenMessage
+class NewMemoTabMessage
 {
 public:
-	NewMemoScreen::EventType				mEvent;
-	tSubject<const NewMemoScreenMessage&>*	mSource;
+	NewMemoTab::EventType				mEvent;
+	tSubject<const NewMemoTabMessage&>*	mSource;
 
 public:
-	NewMemoScreenMessage(NewMemoScreen::EventType newEvent, tSubject<const NewMemoScreenMessage&>* newSource = NULL)
+	NewMemoTabMessage(NewMemoTab::EventType newEvent, tSubject<const NewMemoTabMessage&>* newSource = NULL)
 	: mEvent(newEvent), mSource(newSource) { }
 };
 

@@ -2,21 +2,21 @@
 
 #include <queue>
 
-class InboxScreenMessage;
+class InboxTabMessage;
 class GCTEvent;
 
-class InboxScreen
+class InboxTab
 :   public tMealy,
-    public Screen,
-    public tObserver<const InboxScreenMessage&>,
+    public Tab,
+    public tObserver<const InboxTabMessage&>,
     public tObserver<const GCTEvent&>
 {
 protected:
     bool mCameFromMessageHistory;
 
 public:
-	InboxScreen();
-	~InboxScreen();
+	InboxTab();
+	~InboxTab();
 
 protected:
 	void startEntry();
@@ -75,18 +75,18 @@ protected:
 	int  StateTransitionFunction(const int evt) const;
 	bool HasEdgeNamedNext() const;
 
-	void update(const InboxScreenMessage& msg);
+	void update(const InboxTabMessage& msg);
     void update(const GCTEvent& msg);
 };
 
-class InboxScreenMessage
+class InboxTabMessage
 {
 public:
-	InboxScreen::EventType				mEvent;
-	tSubject<const InboxScreenMessage&>*	mSource;
+	InboxTab::EventType				mEvent;
+	tSubject<const InboxTabMessage&>*	mSource;
 
 public:
-	InboxScreenMessage(InboxScreen::EventType newEvent, tSubject<const InboxScreenMessage&>* newSource = NULL)
+	InboxTabMessage(InboxTab::EventType newEvent, tSubject<const InboxTabMessage&>* newSource = NULL)
 	: mEvent(newEvent), mSource(newSource) { }
 };
 

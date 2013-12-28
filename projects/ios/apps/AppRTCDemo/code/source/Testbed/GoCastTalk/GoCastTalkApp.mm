@@ -45,11 +45,11 @@ void GoCastTalkApp::invalidStateEntry()
 
 void GoCastTalkApp::createAllTabsEntry()
 {
-    mTabs[0] = new InboxScreen;
-    mTabs[1] = new NewMemoScreen;
-    mTabs[2] = new ContactsScreen;
-    mTabs[3] = new GroupsScreen;
-    mTabs[4] = new SettingsScreen;
+    mTabs[0] = new InboxTab;
+    mTabs[1] = new NewMemoTab;
+    mTabs[2] = new ContactsTab;
+    mTabs[3] = new GroupsTab;
+    mTabs[4] = new SettingsTab;
 
     for (int i = 0; i < 5; i++)
     {

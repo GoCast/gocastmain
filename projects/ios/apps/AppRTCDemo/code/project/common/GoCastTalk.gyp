@@ -19,38 +19,38 @@
 			},
 
 			{
-				'action_name': 'InboxScreen.tgf',
-				'inputs': [ '../../tgf/Testbed/GoCastTalk/InboxScreen.tgf', ], # inputs
+				'action_name': 'InboxTab.tgf',
+				'inputs': [ '../../tgf/Testbed/GoCastTalk/InboxTab.tgf', ], # inputs
 				'outputs': [ '../../dummy', ], # outputs
-				'action': [ '<@(_graphcode)', '<@(_inputs)',  '--force-update', '--machine', 'InboxScreen', '-h', '../../source/Testbed/GoCastTalk/InboxScreen.h', '-cpp', '../../source/Testbed/GoCastTalk/InboxScreen.mm', ], # action
+				'action': [ '<@(_graphcode)', '<@(_inputs)',  '--force-update', '--machine', 'InboxTab', '-h', '../../source/Testbed/GoCastTalk/InboxTab.h', '-cpp', '../../source/Testbed/GoCastTalk/InboxTab.mm', ], # action
 			},
 
 			{
-				'action_name': 'NewMemoScreen.tgf',
-				'inputs': [ '../../tgf/Testbed/GoCastTalk/NewMemoScreen.tgf', ], # inputs
+				'action_name': 'NewMemoTab.tgf',
+				'inputs': [ '../../tgf/Testbed/GoCastTalk/NewMemoTab.tgf', ], # inputs
 				'outputs': [ '../../dummy', ], # outputs
-				'action': [ '<@(_graphcode)', '<@(_inputs)',  '--force-update', '--machine', 'NewMemoScreen', '-h', '../../source/Testbed/GoCastTalk/NewMemoScreen.h', '-cpp', '../../source/Testbed/GoCastTalk/NewMemoScreen.mm', ], # action
+				'action': [ '<@(_graphcode)', '<@(_inputs)',  '--force-update', '--machine', 'NewMemoTab', '-h', '../../source/Testbed/GoCastTalk/NewMemoTab.h', '-cpp', '../../source/Testbed/GoCastTalk/NewMemoTab.mm', ], # action
 			},
 
 			{
-				'action_name': 'ContactsScreen.tgf',
-				'inputs': [ '../../tgf/Testbed/GoCastTalk/ContactsScreen.tgf', ], # inputs
+				'action_name': 'ContactsTab.tgf',
+				'inputs': [ '../../tgf/Testbed/GoCastTalk/ContactsTab.tgf', ], # inputs
 				'outputs': [ '../../dummy', ], # outputs
-				'action': [ '<@(_graphcode)', '<@(_inputs)',  '--force-update', '--machine', 'ContactsScreen', '-h', '../../source/Testbed/GoCastTalk/ContactsScreen.h', '-cpp', '../../source/Testbed/GoCastTalk/ContactsScreen.mm', ], # action
+				'action': [ '<@(_graphcode)', '<@(_inputs)',  '--force-update', '--machine', 'ContactsTab', '-h', '../../source/Testbed/GoCastTalk/ContactsTab.h', '-cpp', '../../source/Testbed/GoCastTalk/ContactsTab.mm', ], # action
 			},
 
 			{
-				'action_name': 'GroupsScreen.tgf',
-				'inputs': [ '../../tgf/Testbed/GoCastTalk/GroupsScreen.tgf', ], # inputs
+				'action_name': 'GroupsTab.tgf',
+				'inputs': [ '../../tgf/Testbed/GoCastTalk/GroupsTab.tgf', ], # inputs
 				'outputs': [ '../../dummy', ], # outputs
-				'action': [ '<@(_graphcode)', '<@(_inputs)',  '--force-update', '--machine', 'GroupsScreen', '-h', '../../source/Testbed/GoCastTalk/GroupsScreen.h', '-cpp', '../../source/Testbed/GoCastTalk/GroupsScreen.mm', ], # action
+				'action': [ '<@(_graphcode)', '<@(_inputs)',  '--force-update', '--machine', 'GroupsTab', '-h', '../../source/Testbed/GoCastTalk/GroupsTab.h', '-cpp', '../../source/Testbed/GoCastTalk/GroupsTab.mm', ], # action
 			},
 
 			{
-				'action_name': 'SettingsScreen.tgf',
-				'inputs': [ '../../tgf/Testbed/GoCastTalk/SettingsScreen.tgf', ], # inputs
+				'action_name': 'SettingsTab.tgf',
+				'inputs': [ '../../tgf/Testbed/GoCastTalk/SettingsTab.tgf', ], # inputs
 				'outputs': [ '../../dummy', ], # outputs
-				'action': [ '<@(_graphcode)', '<@(_inputs)',  '--force-update', '--machine', 'SettingsScreen', '-h', '../../source/Testbed/GoCastTalk/SettingsScreen.h', '-cpp', '../../source/Testbed/GoCastTalk/SettingsScreen.mm', ], # action
+				'action': [ '<@(_graphcode)', '<@(_inputs)',  '--force-update', '--machine', 'SettingsTab', '-h', '../../source/Testbed/GoCastTalk/SettingsTab.h', '-cpp', '../../source/Testbed/GoCastTalk/SettingsTab.mm', ], # action
 			},
 		],
 
@@ -63,18 +63,18 @@
 			'../../source/Testbed/GoCastTalk/GCTEvent.h',
 			'../../source/Testbed/GoCastTalk/GCTEventManager.h',
 
-			'../../source/Testbed/GoCastTalk/Screen.h',
+			'../../source/Testbed/GoCastTalk/Tab.h',
 
-			'../../source/Testbed/GoCastTalk/InboxScreen.h',
-			'../../source/Testbed/GoCastTalk/InboxScreen.mm',
-			'../../source/Testbed/GoCastTalk/NewMemoScreen.h',
-			'../../source/Testbed/GoCastTalk/NewMemoScreen.mm',
-			'../../source/Testbed/GoCastTalk/ContactsScreen.h',
-			'../../source/Testbed/GoCastTalk/ContactsScreen.mm',
-			'../../source/Testbed/GoCastTalk/GroupsScreen.h',
-			'../../source/Testbed/GoCastTalk/GroupsScreen.mm',
-			'../../source/Testbed/GoCastTalk/SettingsScreen.h',
-			'../../source/Testbed/GoCastTalk/SettingsScreen.mm',
+			'../../source/Testbed/GoCastTalk/InboxTab.h',
+			'../../source/Testbed/GoCastTalk/InboxTab.mm',
+			'../../source/Testbed/GoCastTalk/NewMemoTab.h',
+			'../../source/Testbed/GoCastTalk/NewMemoTab.mm',
+			'../../source/Testbed/GoCastTalk/ContactsTab.h',
+			'../../source/Testbed/GoCastTalk/ContactsTab.mm',
+			'../../source/Testbed/GoCastTalk/GroupsTab.h',
+			'../../source/Testbed/GoCastTalk/GroupsTab.mm',
+			'../../source/Testbed/GoCastTalk/SettingsTab.h',
+			'../../source/Testbed/GoCastTalk/SettingsTab.mm',
 
 #--
 
