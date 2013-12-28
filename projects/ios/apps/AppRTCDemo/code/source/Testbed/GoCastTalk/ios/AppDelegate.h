@@ -10,7 +10,8 @@
 @interface AppDelegate : UIResponder
 <
 UIApplicationDelegate,
-UITabBarControllerDelegate
+UITabBarControllerDelegate,
+UIAlertViewDelegate
 >
 
 @property (nonatomic, retain) IBOutlet UIWindow *window;
@@ -72,5 +73,7 @@ UITabBarControllerDelegate
 -(void)pushRecordMessage;
 
 -(void)pop:(bool)animated;
+
+-(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex;
 
 @end

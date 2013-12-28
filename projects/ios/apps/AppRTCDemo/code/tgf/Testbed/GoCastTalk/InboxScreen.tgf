@@ -10,14 +10,15 @@
 10 Push Record Message
 11 Pop Record Message
 12 Pop Inbox Message
-13 Pop Message History
+13 Pop if we came from Message History
+14 Did we come from Message History?
 #
 1 3
 3 8 itemSelected
 4 5 no
 4 12 yes
 5 4 deletePressed
-5 6 replyPressed
+5 10 replyPressed
 6 11 itemSelected
 7 10 replyPressed
 5 9 historyPressed
@@ -29,4 +30,6 @@
 13 5 popHappened
 5 3 popHappened
 7 5 popHappened
-6 5 popHappened
+6 14 popHappened
+14 7 yes
+14 5 no

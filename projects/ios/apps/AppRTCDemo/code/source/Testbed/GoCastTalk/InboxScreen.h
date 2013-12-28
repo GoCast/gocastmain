@@ -12,6 +12,7 @@ class InboxScreen
     public tObserver<const GCTEvent&>
 {
 protected:
+    bool mCameFromMessageHistory;
 
 public:
 	InboxScreen();
@@ -22,11 +23,12 @@ protected:
 	void endEntry();
 	void invalidStateEntry();
 
+	void didWeComeFromMessageHistoryEntry();
 	void inboxIdleEntry();
 	void inboxMessageIdleEntry();
 	void messageHistoryIdleEntry();
+	void popIfWeCameFromMessageHistoryEntry();
 	void popInboxMessageEntry();
-	void popMessageHistoryEntry();
 	void popRecordMessageEntry();
 	void pushInboxMessageEntry();
 	void pushMessageHistoryEntry();
@@ -52,12 +54,13 @@ public:
 	{
 		kInvalidState = 0,
 		kStart = 1,
+		kDidWeComeFromMessageHistory,
 		kEnd,
 		kInboxIdle,
 		kInboxMessageIdle,
 		kMessageHistoryIdle,
+		kPopIfWeCameFromMessageHistory,
 		kPopInboxMessage,
-		kPopMessageHistory,
 		kPopRecordMessage,
 		kPushInboxMessage,
 		kPushMessageHistory,

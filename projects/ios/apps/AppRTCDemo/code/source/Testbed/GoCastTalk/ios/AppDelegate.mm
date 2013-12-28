@@ -346,4 +346,17 @@ extern std::vector<std::string> gMemberListEntries;
     [self.mInboxVC popViewControllerAnimated:((animated) ? TRUE : FALSE)];
 }
 
+-(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+#pragma unused(alertView)
+    if (buttonIndex == 0)
+    {
+        GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kOKYesAlertPressed));
+    }
+    else
+    {
+        GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kNoAlertPressed));
+    }
+}
+
 @end

@@ -5,14 +5,14 @@
 @interface MessageHistoryVC : UIViewController
 <
     UITableViewDelegate,
-    UITableViewDataSource,
-    UIAlertViewDelegate
+    UITableViewDataSource
 >
 {
 }
 
 //mInboxView
 @property (nonatomic, strong) IBOutlet UITableView*     mTable;
+@property (nonatomic, strong) IBOutlet UITableView*     mOptionsTable;
 
 #pragma mark Construction / Destruction
 - (void)viewDidLoad;
@@ -21,7 +21,5 @@
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section;
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath;
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath;
-
--(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex;
 
 @end

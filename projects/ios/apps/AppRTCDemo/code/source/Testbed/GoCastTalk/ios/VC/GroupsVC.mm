@@ -28,12 +28,12 @@
 
 - (void)viewWillDisappear:(BOOL)animated
 {
-    if ([self isMovingFromParentViewController])
+    [super viewWillDisappear:animated];
+
+    if (![[self.navigationController viewControllers] containsObject:self])
     {
         GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kPop));
     }
-
-    [super viewWillDisappear:animated];
 }
 
 - (void)dealloc
@@ -142,19 +142,6 @@
 //        {
 //            GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kTableItemDeleted, (tUInt32)indexPath.row));
 //        }
-    }
-}
-
--(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
-{
-#pragma unused(alertView)
-    if (buttonIndex == 0)
-    {
-        GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kOKYesAlertPressed));
-    }
-    else
-    {
-        GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kNoAlertPressed));
     }
 }
 

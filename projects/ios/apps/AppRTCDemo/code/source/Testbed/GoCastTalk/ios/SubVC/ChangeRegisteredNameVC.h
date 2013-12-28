@@ -5,8 +5,7 @@
 @interface ChangeRegisteredNameVC : UIViewController
 <
     UITableViewDelegate,
-    UITableViewDataSource,
-    UIAlertViewDelegate
+    UITableViewDataSource
 >
 {
 }
@@ -21,7 +20,5 @@
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section;
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath;
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath;
-
--(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex;
 
 @end
