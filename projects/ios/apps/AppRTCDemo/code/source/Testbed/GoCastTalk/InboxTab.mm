@@ -71,14 +71,14 @@ void InboxTab::pushRecordMessageEntry()
 
 void InboxTab::popInboxMessageEntry()
 {
-    [gAppDelegateInstance pop:true];
+    [gAppDelegateInstance popInbox:true];
 }
 
 void InboxTab::popIfWeCameFromMessageHistoryEntry()
 {
     if (mCameFromMessageHistory)
     {
-        [gAppDelegateInstance pop:false];
+        [gAppDelegateInstance popInbox:false];
     }
     else
     {
@@ -88,7 +88,7 @@ void InboxTab::popIfWeCameFromMessageHistoryEntry()
 
 void InboxTab::popRecordMessageEntry()
 {
-    [gAppDelegateInstance pop:false];
+    [gAppDelegateInstance popInbox:false];
 }
 
 void InboxTab::showConfirmDeleteEntry()

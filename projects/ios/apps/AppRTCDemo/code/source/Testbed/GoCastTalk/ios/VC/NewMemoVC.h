@@ -12,6 +12,8 @@
 
 //mInboxView
 @property (nonatomic, strong) IBOutlet UITableView*     mTable;
+@property (nonatomic, strong) IBOutlet UIButton*        mAddContactsButton;
+@property (nonatomic, strong) IBOutlet UIButton*        mAddGroupsButton;
 
 #pragma mark Construction / Destruction
 - (void)viewDidLoad;
@@ -20,5 +22,7 @@
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section;
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath;
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath;
+
+-(IBAction)buttonPressed:(UIButton*)sender;
 
 @end

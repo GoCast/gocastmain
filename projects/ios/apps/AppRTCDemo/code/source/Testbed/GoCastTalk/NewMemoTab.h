@@ -22,15 +22,14 @@ protected:
 	void endEntry();
 	void invalidStateEntry();
 
-	void contactsViewEntry();
-	void groupsViewEntry();
-	void newMemoViewEntry();
-	void recordMessageViewEntry();
-
-	void contactsViewExit();
-	void groupsViewExit();
-	void newMemoViewExit();
-	void recordMessageViewExit();
+	void contactsIdleEntry();
+	void groupsIdleEntry();
+	void newMemoIdleEntry();
+	void popWhateverEntry();
+	void pushContactsEntry();
+	void pushGroupsEntry();
+	void pushRecordMessageEntry();
+	void recordMessageIdleEntry();
 
 public:
 	enum EventType
@@ -40,17 +39,22 @@ public:
 		kAddContactsPressed,
 		kAddGroupsPressed,
 		kItemSelected,
+		kPopHappened,
 	};
 
 	enum StateType
 	{
 		kInvalidState = 0,
 		kStart = 1,
-		kContactsView,
+		kContactsIdle,
 		kEnd,
-		kGroupsView,
-		kNewMemoView,
-		kRecordMessageView,
+		kGroupsIdle,
+		kNewMemoIdle,
+		kPopWhatever,
+		kPushContacts,
+		kPushGroups,
+		kPushRecordMessage,
+		kRecordMessageIdle,
 	};
 
 protected:

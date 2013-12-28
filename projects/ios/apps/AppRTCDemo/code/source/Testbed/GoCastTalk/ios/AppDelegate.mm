@@ -10,6 +10,9 @@
 #import "SubVC/MessageHistoryVC.h"
 #import "SubVC/RecordMessageVC.h"
 
+#import "VC/ContactsVC.h"
+#import "VC/GroupsVC.h"
+
 #include "Base/package.h"
 
 #include "GCTEvent.h"
@@ -341,9 +344,47 @@ extern std::vector<std::string> gMemberListEntries;
     [self.mInboxVC pushViewController:nextVC animated:YES];
 }
 
--(void)pop:(bool)animated
+-(void)pushRecordMessageOnNewMemo
+{
+    RecordMessageVC* nextVC = [[[RecordMessageVC alloc] initWithNibName:@"RecordMessageVC" bundle:nil] autorelease];
+    [self.mNewMemoVC pushViewController:nextVC animated:YES];
+}
+
+-(void)pushContacts
+{
+    ContactsVC* nextVC = [[[ContactsVC alloc] initWithNibName:@"ContactsVC" bundle:nil] autorelease];
+    [self.mNewMemoVC pushViewController:nextVC animated:YES];
+}
+
+-(void)pushGroups
+{
+    GroupsVC* nextVC = [[[GroupsVC alloc] initWithNibName:@"ContactsVC" bundle:nil] autorelease];
+    [self.mNewMemoVC pushViewController:nextVC animated:YES];
+}
+
+-(void)popInbox:(bool)animated
 {
     [self.mInboxVC popViewControllerAnimated:((animated) ? TRUE : FALSE)];
+}
+
+-(void)popNewMemo:(bool)animated
+{
+    [self.mNewMemoVC popViewControllerAnimated:((animated) ? TRUE : FALSE)];
+}
+
+-(void)popContacts:(bool)animated
+{
+    [self.mContactsVC popViewControllerAnimated:((animated) ? TRUE : FALSE)];
+}
+
+-(void)popGroups:(bool)animated
+{
+    [self.mGroupsVC popViewControllerAnimated:((animated) ? TRUE : FALSE)];
+}
+
+-(void)popSettings:(bool)animated
+{
+    [self.mSettingsVC popViewControllerAnimated:((animated) ? TRUE : FALSE)];
 }
 
 -(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex

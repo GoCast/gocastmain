@@ -1,14 +1,25 @@
 1 start
 2 end
-3 New Memo View*
-4 Record Message View*
-5 Contacts View*
-6 Groups View*
+3 New Memo Idle
+4 Push Record Message
+5 Push Contacts
+6 Push Groups
+7 Pop whatever
+8 Record Message Idle
+9 Groups Idle
+10 Contacts Idle
 #
 1 3
 3 4 itemSelected
-4 3 itemSelected
+8 7 itemSelected
 3 5 addContactsPressed
-5 3 itemSelected
+10 7 itemSelected
 3 6 addGroupsPressed
-6 3 itemSelected
+9 7 itemSelected
+7 3 popHappened
+4 8
+6 9
+5 10
+8 3 popHappened
+10 3 popHappened
+9 3 popHappened

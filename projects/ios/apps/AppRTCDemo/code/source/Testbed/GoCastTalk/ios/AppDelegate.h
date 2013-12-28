@@ -72,7 +72,15 @@ UIAlertViewDelegate
 -(void)pushMessageHistory;
 -(void)pushRecordMessage;
 
--(void)pop:(bool)animated;
+-(void)pushRecordMessageOnNewMemo;
+-(void)pushContacts;
+-(void)pushGroups;
+
+-(void)popInbox:(bool)animated;
+-(void)popNewMemo:(bool)animated;
+-(void)popContacts:(bool)animated;
+-(void)popGroups:(bool)animated;
+-(void)popSettings:(bool)animated;
 
 -(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex;
 

@@ -27,44 +27,22 @@ void NewMemoTab::endEntry()
     [gAppDelegateInstance hideAllViews];
 }
 
-void NewMemoTab::newMemoViewEntry()
+#pragma mark Idle
+
+void NewMemoTab::newMemoIdleEntry()
 {
-    [gAppDelegateInstance setNewMemoViewVisible:true];
 }
 
-void NewMemoTab::newMemoViewExit()
+void NewMemoTab::recordMessageIdleEntry()
 {
-    [gAppDelegateInstance setNewMemoViewVisible:false];
 }
 
-void NewMemoTab::recordMessageViewEntry()
+void NewMemoTab::groupsIdleEntry()
 {
-    [gAppDelegateInstance setRecordMessageViewVisible:true];
 }
 
-void NewMemoTab::recordMessageViewExit()
+void NewMemoTab::contactsIdleEntry()
 {
-    [gAppDelegateInstance setRecordMessageViewVisible:false];
-}
-
-void NewMemoTab::contactsViewEntry()
-{
-    [gAppDelegateInstance setContactsViewVisible:true];
-}
-
-void NewMemoTab::contactsViewExit()
-{
-    [gAppDelegateInstance setContactsViewVisible:false];
-}
-
-void NewMemoTab::groupsViewEntry()
-{
-    [gAppDelegateInstance setGroupsViewVisible:true];
-}
-
-void NewMemoTab::groupsViewExit()
-{
-    [gAppDelegateInstance setGroupsViewVisible:false];
 }
 
 void NewMemoTab::invalidStateEntry()
@@ -72,17 +50,43 @@ void NewMemoTab::invalidStateEntry()
 	assert("Event is invalid for this state" && 0);
 }
 
+#pragma mark UI
+
+void NewMemoTab::pushContactsEntry()
+{
+    [gAppDelegateInstance pushContacts];
+}
+
+void NewMemoTab::pushGroupsEntry()
+{
+    [gAppDelegateInstance pushGroups];
+}
+
+void NewMemoTab::pushRecordMessageEntry()
+{
+    [gAppDelegateInstance pushRecordMessageOnNewMemo];
+}
+
+void NewMemoTab::popWhateverEntry()
+{
+    [gAppDelegateInstance popNewMemo:true];
+}
+
 #pragma mark State wiring
 void NewMemoTab::CallEntry()
 {
 	switch(mState)
 	{
-		case kContactsView: contactsViewEntry(); break;
+		case kContactsIdle: contactsIdleEntry(); break;
 		case kEnd: EndEntryHelper(); break;
-		case kGroupsView: groupsViewEntry(); break;
+		case kGroupsIdle: groupsIdleEntry(); break;
 		case kInvalidState: invalidStateEntry(); break;
-		case kNewMemoView: newMemoViewEntry(); break;
-		case kRecordMessageView: recordMessageViewEntry(); break;
+		case kNewMemoIdle: newMemoIdleEntry(); break;
+		case kPopWhatever: popWhateverEntry(); break;
+		case kPushContacts: pushContactsEntry(); break;
+		case kPushGroups: pushGroupsEntry(); break;
+		case kPushRecordMessage: pushRecordMessageEntry(); break;
+		case kRecordMessageIdle: recordMessageIdleEntry(); break;
 		case kStart: startEntry(); break;
 		default: break;
 	}
@@ -90,25 +94,24 @@ void NewMemoTab::CallEntry()
 
 void NewMemoTab::CallExit()
 {
-	switch(mState)
-	{
-		case kContactsView: contactsViewExit(); break;
-		case kGroupsView: groupsViewExit(); break;
-		case kNewMemoView: newMemoViewExit(); break;
-		case kRecordMessageView: recordMessageViewExit(); break;
-		default: break;
-	}
 }
 
 int  NewMemoTab::StateTransitionFunction(const int evt) const
 {
-	if ((mState == kContactsView) && (evt == kItemSelected)) return kNewMemoView; else
-	if ((mState == kGroupsView) && (evt == kItemSelected)) return kNewMemoView; else
-	if ((mState == kNewMemoView) && (evt == kAddContactsPressed)) return kContactsView; else
-	if ((mState == kNewMemoView) && (evt == kAddGroupsPressed)) return kGroupsView; else
-	if ((mState == kNewMemoView) && (evt == kItemSelected)) return kRecordMessageView; else
-	if ((mState == kRecordMessageView) && (evt == kItemSelected)) return kNewMemoView; else
-	if ((mState == kStart) && (evt == kNext)) return kNewMemoView;
+	if ((mState == kContactsIdle) && (evt == kItemSelected)) return kPopWhatever; else
+	if ((mState == kContactsIdle) && (evt == kPopHappened)) return kNewMemoIdle; else
+	if ((mState == kGroupsIdle) && (evt == kItemSelected)) return kPopWhatever; else
+	if ((mState == kGroupsIdle) && (evt == kPopHappened)) return kNewMemoIdle; else
+	if ((mState == kNewMemoIdle) && (evt == kAddContactsPressed)) return kPushContacts; else
+	if ((mState == kNewMemoIdle) && (evt == kAddGroupsPressed)) return kPushGroups; else
+	if ((mState == kNewMemoIdle) && (evt == kItemSelected)) return kPushRecordMessage; else
+	if ((mState == kPopWhatever) && (evt == kPopHappened)) return kNewMemoIdle; else
+	if ((mState == kPushContacts) && (evt == kNext)) return kContactsIdle; else
+	if ((mState == kPushGroups) && (evt == kNext)) return kGroupsIdle; else
+	if ((mState == kPushRecordMessage) && (evt == kNext)) return kRecordMessageIdle; else
+	if ((mState == kRecordMessageIdle) && (evt == kItemSelected)) return kPopWhatever; else
+	if ((mState == kRecordMessageIdle) && (evt == kPopHappened)) return kNewMemoIdle; else
+	if ((mState == kStart) && (evt == kNext)) return kNewMemoIdle;
 
 	return kInvalidState;
 }
@@ -117,6 +120,9 @@ bool NewMemoTab::HasEdgeNamedNext() const
 {
 	switch(mState)
 	{
+		case kPushContacts:
+		case kPushGroups:
+		case kPushRecordMessage:
 		case kStart:
 			return true;
 		default: break;
@@ -139,6 +145,7 @@ void NewMemoTab::update(const GCTEvent &msg)
             case GCTEvent::kTableItemSelected: process(kItemSelected); break;
             case GCTEvent::kAddContactsButtonPressed: process(kAddContactsPressed); break;
             case GCTEvent::kAddGroupsButtonPressed: process(kAddGroupsPressed); break;
+            case GCTEvent::kPop: process(kPopHappened); break;
 
             default:
                 break;

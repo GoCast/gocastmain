@@ -147,4 +147,17 @@
     }
 }
 
+-(IBAction)buttonPressed:(UIButton*)sender
+{
+    if (sender == self.mAddContactsButton)
+    {
+        GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kAddContactsButtonPressed));
+    }
+    else if (sender == self.mAddGroupsButton)
+    {
+        GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kAddGroupsButtonPressed));
+    }
+}
+
+
 @end
