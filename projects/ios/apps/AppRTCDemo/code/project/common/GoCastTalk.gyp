@@ -230,6 +230,7 @@
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/Icon.png',
 
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/Default.png',
+					'../../rsrc/Testbed/GoCastTalk/<@(OS)/Default-568h@2x.png',
 				],	# mac_bundle_resources
 
 				'link_settings': {
