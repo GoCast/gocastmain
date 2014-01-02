@@ -60,6 +60,12 @@ extern std::vector<std::string> gMemberListEntries;
 	[vcs removeObjectAtIndex:3];
 	[self.tabBarController setViewControllers:vcs];
 
+    [self.mInboxNavBar      setBackgroundImage:[UIImage imageNamed:@"banner.png"] forBarMetrics:UIBarMetricsDefault];
+    [self.mNewMemoNavBar    setBackgroundImage:[UIImage imageNamed:@"banner.png"] forBarMetrics:UIBarMetricsDefault];
+    [self.mContactsNavBar   setBackgroundImage:[UIImage imageNamed:@"banner.png"] forBarMetrics:UIBarMetricsDefault];
+    [self.mGroupsNavBar     setBackgroundImage:[UIImage imageNamed:@"banner.png"] forBarMetrics:UIBarMetricsDefault];
+    [self.mSettingsNavBar   setBackgroundImage:[UIImage imageNamed:@"banner.png"] forBarMetrics:UIBarMetricsDefault];
+
     [self.window setRootViewController:self.tabBarController];
     [self.window makeKeyAndVisible];
 

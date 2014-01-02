@@ -86,6 +86,7 @@
                     </connections>
                 </tableView>
             </subviews>
+            <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
             <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina4"/>
             <userDefinedRuntimeAttributes>
                 <userDefinedRuntimeAttribute type="size" keyPath="contentSize">
@@ -95,8 +96,8 @@
         </scrollView>
     </objects>
     <resources>
-        <image name="button-pause.png" width="48" height="48"/>
-        <image name="button-play.png" width="48" height="48"/>
-        <image name="button-record.png" width="48" height="64"/>
+        <image name="button-pause.png" width="64" height="64"/>
+        <image name="button-play.png" width="64" height="64"/>
+        <image name="button-record.png" width="96" height="128"/>
     </resources>
 </document>

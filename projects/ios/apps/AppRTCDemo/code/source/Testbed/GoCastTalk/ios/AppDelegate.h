@@ -27,6 +27,12 @@
 @property (nonatomic, strong) IBOutlet UINavigationController* mGroupsVC;
 @property (nonatomic, strong) IBOutlet UINavigationController* mSettingsVC;
 
+@property (nonatomic, strong) IBOutlet UINavigationBar* mInboxNavBar;
+@property (nonatomic, strong) IBOutlet UINavigationBar* mNewMemoNavBar;
+@property (nonatomic, strong) IBOutlet UINavigationBar* mContactsNavBar;
+@property (nonatomic, strong) IBOutlet UINavigationBar* mGroupsNavBar;
+@property (nonatomic, strong) IBOutlet UINavigationBar* mSettingsNavBar;
+
 @property (nonatomic, strong) IBOutlet UITabBar* mTabBar;
 @property (nonatomic, strong) IBOutlet UITabBarItem* mInboxTab;
 @property (nonatomic, strong) IBOutlet UITabBarItem* mNewMemoTab;
