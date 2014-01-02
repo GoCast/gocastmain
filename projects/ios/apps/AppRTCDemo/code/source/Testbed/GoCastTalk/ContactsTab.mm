@@ -31,7 +31,10 @@ void ContactsTab::endEntry()
     [gAppDelegateInstance hideAllViews];
 }
 
-void ContactsTab::contactsIdleEntry() { }
+void ContactsTab::contactsIdleEntry()
+{
+    mStackSize = 0;
+}
 void ContactsTab::contactDetailsIdleEntry()
 {
     mCameFromMessageHistory = false;
@@ -59,7 +62,6 @@ void ContactsTab::didWeComeFromMessageHistoryEntry()
 void ContactsTab::pushChangeRegisteredNameEntry()
 {
     [gAppDelegateInstance pushChangeRegisterdName:2];
-    mStackSize++;
 }
 
 void ContactsTab::pushContactDetailsEntry()
@@ -71,7 +73,6 @@ void ContactsTab::pushContactDetailsEntry()
 void ContactsTab::pushEditContactsEntry()
 {
     [gAppDelegateInstance pushEditContacts:2];
-    mStackSize++;
 }
 
 void ContactsTab::pushMessageHistoryEntry()
@@ -84,12 +85,6 @@ void ContactsTab::pushRecordMessageEntry()
 {
     [gAppDelegateInstance pushRecordMessage:2];
     mStackSize++;
-}
-
-void ContactsTab::popChangeRegisteredNameEntry()
-{
-    [gAppDelegateInstance popContacts:true];
-    mStackSize--;
 }
 
 void ContactsTab::popTo0Entry()
@@ -114,7 +109,6 @@ void ContactsTab::CallEntry()
 		case kEnd: EndEntryHelper(); break;
 		case kInvalidState: invalidStateEntry(); break;
 		case kMessageHistoryIdle: messageHistoryIdleEntry(); break;
-		case kPopChangeRegisteredName: popChangeRegisteredNameEntry(); break;
 		case kPopTo0: popTo0Entry(); break;
 		case kPushChangeRegisteredName: pushChangeRegisteredNameEntry(); break;
 		case kPushContactDetails: pushContactDetailsEntry(); break;
@@ -133,7 +127,6 @@ void ContactsTab::CallExit()
 
 int  ContactsTab::StateTransitionFunction(const int evt) const
 {
-	if ((mState == kChangeRegisteredNameIdle) && (evt == kDonePressed)) return kPopChangeRegisteredName; else
 	if ((mState == kChangeRegisteredNameIdle) && (evt == kPopHappened)) return kEditContactsIdle; else
 	if ((mState == kContactDetailsIdle) && (evt == kHistoryPressed)) return kPushMessageHistory; else
 	if ((mState == kContactDetailsIdle) && (evt == kPopHappened)) return kContactsIdle; else
@@ -142,12 +135,10 @@ int  ContactsTab::StateTransitionFunction(const int evt) const
 	if ((mState == kContactsIdle) && (evt == kItemSelected)) return kPushContactDetails; else
 	if ((mState == kDidWeComeFromMessageHistory) && (evt == kNo)) return kContactDetailsIdle; else
 	if ((mState == kDidWeComeFromMessageHistory) && (evt == kYes)) return kMessageHistoryIdle; else
-	if ((mState == kEditContactsIdle) && (evt == kDonePressed)) return kPopTo0; else
 	if ((mState == kEditContactsIdle) && (evt == kItemSelected)) return kPushChangeRegisteredName; else
 	if ((mState == kEditContactsIdle) && (evt == kPopHappened)) return kContactsIdle; else
 	if ((mState == kMessageHistoryIdle) && (evt == kPopHappened)) return kContactDetailsIdle; else
 	if ((mState == kMessageHistoryIdle) && (evt == kReplyPressed)) return kPushRecordMessage; else
-	if ((mState == kPopChangeRegisteredName) && (evt == kPopHappened)) return kEditContactsIdle; else
 	if ((mState == kPopTo0) && (evt == kPopHappened)) return kContactsIdle; else
 	if ((mState == kPushChangeRegisteredName) && (evt == kNext)) return kChangeRegisteredNameIdle; else
 	if ((mState == kPushContactDetails) && (evt == kNext)) return kContactDetailsIdle; else
@@ -195,14 +186,6 @@ void ContactsTab::update(const GCTEvent &msg)
                 if (getState() == kContactsIdle)
                 {
                     process(kEditPressed);
-                }
-                else if (getState() == kEditContactsIdle)
-                {
-                    process(kDonePressed);
-                }
-                else if (getState() == kChangeRegisteredNameIdle)
-                {
-                    process(kDonePressed);
                 }
                 break;
 

@@ -30,7 +30,6 @@ protected:
 	void didWeComeFromMessageHistoryEntry();
 	void editContactsIdleEntry();
 	void messageHistoryIdleEntry();
-	void popChangeRegisteredNameEntry();
 	void popTo0Entry();
 	void pushChangeRegisteredNameEntry();
 	void pushContactDetailsEntry();
@@ -44,7 +43,6 @@ public:
 	{
 		kInvalidEvent = -2,
 		kNext = -1,
-		kDonePressed,
 		kEditPressed,
 		kHistoryPressed,
 		kItemSelected,
@@ -65,7 +63,6 @@ public:
 		kEditContactsIdle,
 		kEnd,
 		kMessageHistoryIdle,
-		kPopChangeRegisteredName,
 		kPopTo0,
 		kPushChangeRegisteredName,
 		kPushContactDetails,

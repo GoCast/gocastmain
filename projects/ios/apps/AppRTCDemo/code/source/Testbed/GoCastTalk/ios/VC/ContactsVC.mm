@@ -23,6 +23,9 @@
 
     [self.mTable registerNib:[UINib nibWithNibName:@"HeadingSubCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"HeadingSubCell"];
 
+    UIBarButtonItem *anotherButton = [[[UIBarButtonItem alloc] initWithTitle:@"Edit" style:UIBarButtonItemStylePlain target:self action:@selector(helpButton:)] autorelease];
+    self.navigationItem.rightBarButtonItem = anotherButton;
+
     self.view.autoresizesSubviews = YES;
 }
 
@@ -138,6 +141,12 @@
 //            GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kTableItemDeleted, (tUInt32)indexPath.row));
 //        }
     }
+}
+
+-(IBAction)helpButton:(UIBarButtonItem *)sender
+{
+#pragma unused(sender)
+    GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kNavButtonPressed));
 }
 
 @end

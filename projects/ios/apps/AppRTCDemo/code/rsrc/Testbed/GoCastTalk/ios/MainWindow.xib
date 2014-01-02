@@ -102,10 +102,11 @@
                     <viewControllers>
                         <viewController nibName="ContactsVC" id="Mmv-uP-JdY" customClass="ContactsVC">
                             <extendedEdge key="edgesForExtendedLayout"/>
+                            <toolbarItems/>
                             <navigationItem key="navigationItem" title="Contacts" id="6H9-FF-9SR"/>
                             <simulatedStatusBarMetrics key="simulatedStatusBarMetrics"/>
                             <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
-                            <nil key="simulatedBottomBarMetrics"/>
+                            <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
                             <simulatedOrientationMetrics key="simulatedOrientationMetrics"/>
                             <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina4"/>
                         </viewController>
