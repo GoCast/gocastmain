@@ -171,4 +171,11 @@
     }
 }
 
+- (BOOL)textFieldShouldReturn:(UITextField *)textField
+{
+#pragma unused(textField)
+    [textField endEditing:YES];
+    return YES;
+}
+
 @end

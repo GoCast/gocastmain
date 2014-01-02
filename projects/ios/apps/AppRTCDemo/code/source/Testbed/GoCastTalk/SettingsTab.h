@@ -22,11 +22,9 @@ protected:
 	void endEntry();
 	void invalidStateEntry();
 
-	void changeRegisteredNameViewEntry();
-	void settingsViewEntry();
-
-	void changeRegisteredNameViewExit();
-	void settingsViewExit();
+	void changeRegisteredNameIdleEntry();
+	void pushChangeRegisteredNameEntry();
+	void settingsIdleEntry();
 
 public:
 	enum EventType
@@ -34,15 +32,17 @@ public:
 		kInvalidEvent = -2,
 		kNext = -1,
 		kItemSelected,
+		kPopHappened,
 	};
 
 	enum StateType
 	{
 		kInvalidState = 0,
 		kStart = 1,
-		kChangeRegisteredNameView,
+		kChangeRegisteredNameIdle,
 		kEnd,
-		kSettingsView,
+		kPushChangeRegisteredName,
+		kSettingsIdle,
 	};
 
 protected:

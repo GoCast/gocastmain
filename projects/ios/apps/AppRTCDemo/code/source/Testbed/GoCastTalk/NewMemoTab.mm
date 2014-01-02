@@ -54,17 +54,17 @@ void NewMemoTab::invalidStateEntry()
 
 void NewMemoTab::pushContactsEntry()
 {
-    [gAppDelegateInstance pushContacts];
+    [gAppDelegateInstance pushContacts:1];
 }
 
 void NewMemoTab::pushGroupsEntry()
 {
-    [gAppDelegateInstance pushGroups];
+    [gAppDelegateInstance pushGroups:1];
 }
 
 void NewMemoTab::pushRecordMessageEntry()
 {
-    [gAppDelegateInstance pushRecordMessageOnNewMemo];
+    [gAppDelegateInstance pushRecordMessage:1];
 }
 
 void NewMemoTab::popWhateverEntry()

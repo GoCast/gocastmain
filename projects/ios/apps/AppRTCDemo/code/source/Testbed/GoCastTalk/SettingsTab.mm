@@ -26,29 +26,21 @@ void SettingsTab::endEntry()
     [gAppDelegateInstance hideAllViews];
 }
 
-void SettingsTab::settingsViewEntry()
-{
-    [gAppDelegateInstance setSettingsViewVisible:true];
-}
+#pragma mark Idle
 
-void SettingsTab::settingsViewExit()
-{
-    [gAppDelegateInstance setSettingsViewVisible:false];
-}
-
-void SettingsTab::changeRegisteredNameViewEntry()
-{
-    [gAppDelegateInstance setChangeRegisteredNameViewVisible:true];
-}
-
-void SettingsTab::changeRegisteredNameViewExit()
-{
-    [gAppDelegateInstance setChangeRegisteredNameViewVisible:false];
-}
+void SettingsTab::settingsIdleEntry() { }
+void SettingsTab::changeRegisteredNameIdleEntry() { }
 
 void SettingsTab::invalidStateEntry()
 {
 	assert("Event is invalid for this state" && 0);
+}
+
+#pragma mark UI
+
+void SettingsTab::pushChangeRegisteredNameEntry()
+{
+    [gAppDelegateInstance pushChangeRegisterdName:4];
 }
 
 #pragma mark State wiring
@@ -56,10 +48,11 @@ void SettingsTab::CallEntry()
 {
 	switch(mState)
 	{
-		case kChangeRegisteredNameView: changeRegisteredNameViewEntry(); break;
+		case kChangeRegisteredNameIdle: changeRegisteredNameIdleEntry(); break;
 		case kEnd: EndEntryHelper(); break;
 		case kInvalidState: invalidStateEntry(); break;
-		case kSettingsView: settingsViewEntry(); break;
+		case kPushChangeRegisteredName: pushChangeRegisteredNameEntry(); break;
+		case kSettingsIdle: settingsIdleEntry(); break;
 		case kStart: startEntry(); break;
 		default: break;
 	}
@@ -67,18 +60,14 @@ void SettingsTab::CallEntry()
 
 void SettingsTab::CallExit()
 {
-	switch(mState)
-	{
-		case kChangeRegisteredNameView: changeRegisteredNameViewExit(); break;
-		case kSettingsView: settingsViewExit(); break;
-		default: break;
-	}
 }
 
 int  SettingsTab::StateTransitionFunction(const int evt) const
 {
-	if ((mState == kSettingsView) && (evt == kItemSelected)) return kChangeRegisteredNameView; else
-	if ((mState == kStart) && (evt == kNext)) return kSettingsView;
+	if ((mState == kChangeRegisteredNameIdle) && (evt == kPopHappened)) return kSettingsIdle; else
+	if ((mState == kPushChangeRegisteredName) && (evt == kNext)) return kChangeRegisteredNameIdle; else
+	if ((mState == kSettingsIdle) && (evt == kItemSelected)) return kPushChangeRegisteredName; else
+	if ((mState == kStart) && (evt == kNext)) return kSettingsIdle;
 
 	return kInvalidState;
 }
@@ -87,6 +76,7 @@ bool SettingsTab::HasEdgeNamedNext() const
 {
 	switch(mState)
 	{
+		case kPushChangeRegisteredName:
 		case kStart:
 			return true;
 		default: break;
@@ -106,8 +96,10 @@ void SettingsTab::update(const GCTEvent &msg)
     {
         switch (msg.mEvent)
         {
+            case GCTEvent::kPop: process(kPopHappened); break;
+
             case GCTEvent::kTableItemSelected:
-                if (getState() == kSettingsView)
+                if (getState() == kSettingsIdle)
                 {
                     if (msg.mItemSelected == 0)
                     {

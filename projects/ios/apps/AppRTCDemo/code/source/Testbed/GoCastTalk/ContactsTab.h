@@ -12,6 +12,8 @@ class ContactsTab
     public tObserver<const GCTEvent&>
 {
 protected:
+    tUInt8  mStackSize;
+    bool    mCameFromMessageHistory;
 
 public:
 	ContactsTab();
@@ -22,19 +24,20 @@ protected:
 	void endEntry();
 	void invalidStateEntry();
 
-	void changeRegisteredNameViewEntry();
-	void contactDetailsViewEntry();
-	void contactsViewEntry();
-	void editContactsViewEntry();
-	void messageHistoryViewEntry();
-	void recordMessageViewEntry();
-
-	void changeRegisteredNameViewExit();
-	void contactDetailsViewExit();
-	void contactsViewExit();
-	void editContactsViewExit();
-	void messageHistoryViewExit();
-	void recordMessageViewExit();
+	void changeRegisteredNameIdleEntry();
+	void contactDetailsIdleEntry();
+	void contactsIdleEntry();
+	void didWeComeFromMessageHistoryEntry();
+	void editContactsIdleEntry();
+	void messageHistoryIdleEntry();
+	void popChangeRegisteredNameEntry();
+	void popTo0Entry();
+	void pushChangeRegisteredNameEntry();
+	void pushContactDetailsEntry();
+	void pushEditContactsEntry();
+	void pushMessageHistoryEntry();
+	void pushRecordMessageEntry();
+	void recordMessageIdleEntry();
 
 public:
 	enum EventType
@@ -45,20 +48,31 @@ public:
 		kEditPressed,
 		kHistoryPressed,
 		kItemSelected,
+		kNo,
+		kPopHappened,
 		kReplyPressed,
+		kYes,
 	};
 
 	enum StateType
 	{
 		kInvalidState = 0,
 		kStart = 1,
-		kChangeRegisteredNameView,
-		kContactDetailsView,
-		kContactsView,
-		kEditContactsView,
+		kChangeRegisteredNameIdle,
+		kContactDetailsIdle,
+		kContactsIdle,
+		kDidWeComeFromMessageHistory,
+		kEditContactsIdle,
 		kEnd,
-		kMessageHistoryView,
-		kRecordMessageView,
+		kMessageHistoryIdle,
+		kPopChangeRegisteredName,
+		kPopTo0,
+		kPushChangeRegisteredName,
+		kPushContactDetails,
+		kPushEditContacts,
+		kPushMessageHistory,
+		kPushRecordMessage,
+		kRecordMessageIdle,
 	};
 
 protected:

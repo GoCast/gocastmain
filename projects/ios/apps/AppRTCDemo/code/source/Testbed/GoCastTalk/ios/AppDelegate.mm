@@ -55,8 +55,19 @@ extern std::vector<std::string> gMemberListEntries;
     [TestFlight takeOff:@"9d7d1e2c-62c3-45d9-8506-cb0a9752ca47"];
 #endif
 
+    //TODO: This removes the "groups" tab, for now; so remove it later
+    NSMutableArray * vcs = [NSMutableArray arrayWithArray:[self.tabBarController viewControllers]];
+	[vcs removeObjectAtIndex:3];
+	[self.tabBarController setViewControllers:vcs];
+
     [self.window setRootViewController:self.tabBarController];
     [self.window makeKeyAndVisible];
+
+    mTabVC[0] = self.mInboxVC;
+    mTabVC[1] = self.mNewMemoVC;
+    mTabVC[2] = self.mContactsVC;
+    mTabVC[3] = self.mGroupsVC;
+    mTabVC[4] = self.mSettingsVC;
 
     GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kAppDelegateInit));
 
@@ -308,58 +319,52 @@ extern std::vector<std::string> gMemberListEntries;
     }
 }
 
--(void)pushChangeRegisterdName
+-(void)pushChangeRegisterdName:(int)tabID
 {
-    ChangeRegisteredNameVC* nextVC = [[[ChangeRegisteredNameVC alloc] initWithNibName:@"ChangeRegistedNameVC" bundle:nil] autorelease];
-    [self.mInboxVC pushViewController:nextVC animated:YES];
+    ChangeRegisteredNameVC* nextVC = [[[ChangeRegisteredNameVC alloc] initWithNibName:@"ChangeRegisteredNameVC" bundle:nil] autorelease];
+    [mTabVC[tabID] pushViewController:nextVC animated:YES];
 }
 
--(void)pushContactDetails
+-(void)pushContactDetails:(int)tabID
 {
     ContactDetailsVC* nextVC = [[[ContactDetailsVC alloc] initWithNibName:@"ContactDetailsVC" bundle:nil] autorelease];
-    [self.mInboxVC pushViewController:nextVC animated:YES];
+    [mTabVC[tabID] pushViewController:nextVC animated:YES];
 }
 
--(void)pushEditContacts
+-(void)pushEditContacts:(int)tabID
 {
     EditContactsVC* nextVC = [[[EditContactsVC alloc] initWithNibName:@"EditContactsVC" bundle:nil] autorelease];
-    [self.mInboxVC pushViewController:nextVC animated:YES];
+    [mTabVC[tabID] pushViewController:nextVC animated:YES];
 }
 
--(void)pushInboxMessage
+-(void)pushInboxMessage:(int)tabID
 {
     InboxMessageVC* nextVC = [[[InboxMessageVC alloc] initWithNibName:@"InboxMessageVC" bundle:nil] autorelease];
-    [self.mInboxVC pushViewController:nextVC animated:YES];
+    [mTabVC[tabID] pushViewController:nextVC animated:YES];
 }
 
--(void)pushMessageHistory
+-(void)pushMessageHistory:(int)tabID
 {
     MessageHistoryVC* nextVC = [[[MessageHistoryVC alloc] initWithNibName:@"MessageHistoryVC" bundle:nil] autorelease];
-    [self.mInboxVC pushViewController:nextVC animated:YES];
+    [mTabVC[tabID] pushViewController:nextVC animated:YES];
 }
 
--(void)pushRecordMessage
+-(void)pushRecordMessage:(int)tabID
 {
     RecordMessageVC* nextVC = [[[RecordMessageVC alloc] initWithNibName:@"RecordMessageVC" bundle:nil] autorelease];
-    [self.mInboxVC pushViewController:nextVC animated:YES];
+    [mTabVC[tabID] pushViewController:nextVC animated:YES];
 }
 
--(void)pushRecordMessageOnNewMemo
-{
-    RecordMessageVC* nextVC = [[[RecordMessageVC alloc] initWithNibName:@"RecordMessageVC" bundle:nil] autorelease];
-    [self.mNewMemoVC pushViewController:nextVC animated:YES];
-}
-
--(void)pushContacts
+-(void)pushContacts:(int)tabID
 {
     ContactsVC* nextVC = [[[ContactsVC alloc] initWithNibName:@"ContactsVC" bundle:nil] autorelease];
-    [self.mNewMemoVC pushViewController:nextVC animated:YES];
+    [mTabVC[tabID] pushViewController:nextVC animated:YES];
 }
 
--(void)pushGroups
+-(void)pushGroups:(int)tabID
 {
     GroupsVC* nextVC = [[[GroupsVC alloc] initWithNibName:@"ContactsVC" bundle:nil] autorelease];
-    [self.mNewMemoVC pushViewController:nextVC animated:YES];
+    [mTabVC[tabID] pushViewController:nextVC animated:YES];
 }
 
 -(void)popInbox:(bool)animated

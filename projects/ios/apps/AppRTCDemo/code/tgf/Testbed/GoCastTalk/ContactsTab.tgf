@@ -1,19 +1,41 @@
 1 start
 2 end
-3 Contacts View*
-4 Contact Details View*
-5 Message History View*
-6 Record Message View*
-7 Edit Contacts View*
-8 Change Registered Name View*
+3 Contacts Idle
+4 Contact Details Idle
+5 Message History Idle
+6 Record Message Idle
+7 Edit Contacts Idle
+8 Change Registered Name Idle
+9 Pop to 0
+10 Push Edit Contacts
+11 Push Contact Details
+12 Push Message History
+13 Push Record Message
+14 Push Change Registered Name
+15 Pop Change Registered Name
+16 Did we come from Message History?
 #
 1 3
-3 4 itemSelected
-4 5 historyPressed
-5 6 replyPressed
-6 3 itemSelected
-4 6 replyPressed
-3 7 editPressed
-7 3 donePressed
-7 8 itemSelected
-8 7 donePressed
+3 11 itemSelected
+4 12 historyPressed
+5 13 replyPressed
+6 9 itemSelected
+4 13 replyPressed
+3 10 editPressed
+7 9 donePressed
+7 14 itemSelected
+8 15 donePressed
+9 3 popHappened
+10 7
+11 4
+12 5
+13 6
+14 8
+15 7 popHappened
+4 3 popHappened
+5 4 popHappened
+6 16 popHappened
+16 5 yes
+16 4 no
+7 3 popHappened
+8 7 popHappened

@@ -9,10 +9,13 @@
 
 @interface AppDelegate : UIResponder
 <
-UIApplicationDelegate,
-UITabBarControllerDelegate,
-UIAlertViewDelegate
+    UIApplicationDelegate,
+    UITabBarControllerDelegate,
+    UIAlertViewDelegate
 >
+{
+    UINavigationController* mTabVC[5];
+}
 
 @property (nonatomic, retain) IBOutlet UIWindow *window;
 @property (nonatomic, retain) IBOutlet UITabBarController *tabBarController;
@@ -65,16 +68,15 @@ UIAlertViewDelegate
 - (void)tabBarController:(UITabBarController *)tabBarController didSelectViewController:(UIViewController *)viewController;
 
 
--(void)pushChangeRegisterdName;
--(void)pushContactDetails;
--(void)pushEditContacts;
--(void)pushInboxMessage;
--(void)pushMessageHistory;
--(void)pushRecordMessage;
+-(void)pushChangeRegisterdName:(int)tabID;
+-(void)pushContactDetails:(int)tabID;
+-(void)pushEditContacts:(int)tabID;
+-(void)pushInboxMessage:(int)tabID;
+-(void)pushMessageHistory:(int)tabID;
+-(void)pushRecordMessage:(int)tabID;
 
--(void)pushRecordMessageOnNewMemo;
--(void)pushContacts;
--(void)pushGroups;
+-(void)pushContacts:(int)tabID;
+-(void)pushGroups:(int)tabID;
 
 -(void)popInbox:(bool)animated;
 -(void)popNewMemo:(bool)animated;

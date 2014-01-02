@@ -56,17 +56,17 @@ void InboxTab::didWeComeFromMessageHistoryEntry()
 #pragma mark Push Pop UI
 void InboxTab::pushInboxMessageEntry()
 {
-    [gAppDelegateInstance pushInboxMessage];
+    [gAppDelegateInstance pushInboxMessage:0];
 }
 
 void InboxTab::pushMessageHistoryEntry()
 {
-    [gAppDelegateInstance pushMessageHistory];
+    [gAppDelegateInstance pushMessageHistory:0];
 }
 
 void InboxTab::pushRecordMessageEntry()
 {
-    [gAppDelegateInstance pushRecordMessage];
+    [gAppDelegateInstance pushRecordMessage:0];
 }
 
 void InboxTab::popInboxMessageEntry()
