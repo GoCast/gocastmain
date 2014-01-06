@@ -27,8 +27,7 @@ protected:
 	void inboxIdleEntry();
 	void inboxMessageIdleEntry();
 	void messageHistoryIdleEntry();
-	void popInboxMessageEntry();
-	void popRecordMessageEntry();
+	void popTabEntry();
 	void pushInboxMessageEntry();
 	void pushMessageHistoryEntry();
 	void pushRecordMessageEntry();
@@ -62,8 +61,7 @@ public:
 		kInboxIdle,
 		kInboxMessageIdle,
 		kMessageHistoryIdle,
-		kPopInboxMessage,
-		kPopRecordMessage,
+		kPopTab,
 		kPushInboxMessage,
 		kPushMessageHistory,
 		kPushRecordMessage,

@@ -71,26 +71,9 @@ void InboxTab::pushRecordMessageEntry()
     [gAppDelegateInstance pushRecordMessage:0];
 }
 
-void InboxTab::popInboxMessageEntry()
+void InboxTab::popTabEntry()
 {
     [gAppDelegateInstance popInbox:true];
-}
-
-void InboxTab::popIfWeCameFromMessageHistoryEntry()
-{
-    if (mViewStack.top() == kMessageHistory)
-    {
-        [gAppDelegateInstance popInbox:false];
-    }
-    else
-    {
-        process(kPopHappened);
-    }
-}
-
-void InboxTab::popRecordMessageEntry()
-{
-    [gAppDelegateInstance popInbox:false];
 }
 
 void InboxTab::showConfirmDeleteEntry()
@@ -113,8 +96,7 @@ void InboxTab::CallEntry()
 		case kInboxMessageIdle: inboxMessageIdleEntry(); break;
 		case kInvalidState: invalidStateEntry(); break;
 		case kMessageHistoryIdle: messageHistoryIdleEntry(); break;
-		case kPopInboxMessage: popInboxMessageEntry(); break;
-		case kPopRecordMessage: popRecordMessageEntry(); break;
+		case kPopTab: popTabEntry(); break;
 		case kPushInboxMessage: pushInboxMessageEntry(); break;
 		case kPushMessageHistory: pushMessageHistoryEntry(); break;
 		case kPushRecordMessage: pushRecordMessageEntry(); break;
@@ -139,15 +121,14 @@ int  InboxTab::StateTransitionFunction(const int evt) const
 	if ((mState == kInboxMessageIdle) && (evt == kReplyPressed)) return kPushRecordMessage; else
 	if ((mState == kMessageHistoryIdle) && (evt == kPopHappened)) return kWhereAreWeOnTheStack; else
 	if ((mState == kMessageHistoryIdle) && (evt == kReplyPressed)) return kPushRecordMessage; else
-	if ((mState == kPopInboxMessage) && (evt == kPopHappened)) return kWhereAreWeOnTheStack; else
-	if ((mState == kPopRecordMessage) && (evt == kPopHappened)) return kWhereAreWeOnTheStack; else
+	if ((mState == kPopTab) && (evt == kPopHappened)) return kWhereAreWeOnTheStack; else
 	if ((mState == kPushInboxMessage) && (evt == kNext)) return kInboxMessageIdle; else
 	if ((mState == kPushMessageHistory) && (evt == kNext)) return kMessageHistoryIdle; else
 	if ((mState == kPushRecordMessage) && (evt == kNext)) return kRecordMessageIdle; else
-	if ((mState == kRecordMessageIdle) && (evt == kItemSelected)) return kPopRecordMessage; else
+	if ((mState == kRecordMessageIdle) && (evt == kItemSelected)) return kPopTab; else
 	if ((mState == kRecordMessageIdle) && (evt == kPopHappened)) return kWhereAreWeOnTheStack; else
 	if ((mState == kShowConfirmDelete) && (evt == kNo)) return kInboxMessageIdle; else
-	if ((mState == kShowConfirmDelete) && (evt == kYes)) return kPopInboxMessage; else
+	if ((mState == kShowConfirmDelete) && (evt == kYes)) return kPopTab; else
 	if ((mState == kStart) && (evt == kNext)) return kInboxIdle; else
 	if ((mState == kWhereAreWeOnTheStack) && (evt == kInbox)) return kInboxIdle; else
 	if ((mState == kWhereAreWeOnTheStack) && (evt == kInboxMessage)) return kInboxMessageIdle; else
