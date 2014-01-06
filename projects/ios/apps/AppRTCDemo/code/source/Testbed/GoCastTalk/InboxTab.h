@@ -1,6 +1,7 @@
 #pragma once
 
 #include <queue>
+#include <stack>
 
 class InboxTabMessage;
 class GCTEvent;
@@ -12,7 +13,7 @@ class InboxTab
     public tObserver<const GCTEvent&>
 {
 protected:
-    bool mCameFromMessageHistory;
+    std::stack<int> mViewStack;
 
 public:
 	InboxTab();
@@ -23,11 +24,9 @@ protected:
 	void endEntry();
 	void invalidStateEntry();
 
-	void didWeComeFromMessageHistoryEntry();
 	void inboxIdleEntry();
 	void inboxMessageIdleEntry();
 	void messageHistoryIdleEntry();
-	void popIfWeCameFromMessageHistoryEntry();
 	void popInboxMessageEntry();
 	void popRecordMessageEntry();
 	void pushInboxMessageEntry();
@@ -35,6 +34,7 @@ protected:
 	void pushRecordMessageEntry();
 	void recordMessageIdleEntry();
 	void showConfirmDeleteEntry();
+	void whereAreWeOnTheStackEntry();
 
 public:
 	enum EventType
@@ -43,9 +43,13 @@ public:
 		kNext = -1,
 		kDeletePressed,
 		kHistoryPressed,
+		kInbox,
+		kInboxMessage,
 		kItemSelected,
+		kMessageHistory,
 		kNo,
 		kPopHappened,
+		kRecordMessage,
 		kReplyPressed,
 		kYes,
 	};
@@ -54,12 +58,10 @@ public:
 	{
 		kInvalidState = 0,
 		kStart = 1,
-		kDidWeComeFromMessageHistory,
 		kEnd,
 		kInboxIdle,
 		kInboxMessageIdle,
 		kMessageHistoryIdle,
-		kPopIfWeCameFromMessageHistory,
 		kPopInboxMessage,
 		kPopRecordMessage,
 		kPushInboxMessage,
@@ -67,6 +69,7 @@ public:
 		kPushRecordMessage,
 		kRecordMessageIdle,
 		kShowConfirmDelete,
+		kWhereAreWeOnTheStack,
 	};
 
 protected:

@@ -20,7 +20,7 @@ void InboxTab::startEntry()
     GCTEventManager::getInstance()->attach(this);
     [gAppDelegateInstance setNavigationBarTitle:"Inbox"];
 
-    mCameFromMessageHistory = false;
+    mViewStack.push(kInbox);
 }
 
 void InboxTab::endEntry()
@@ -31,7 +31,6 @@ void InboxTab::endEntry()
 #pragma mark Idling
 void InboxTab::inboxIdleEntry()
 {
-    mCameFromMessageHistory = false;
 }
 
 void InboxTab::inboxMessageIdleEntry()
@@ -40,7 +39,6 @@ void InboxTab::inboxMessageIdleEntry()
 
 void InboxTab::messageHistoryIdleEntry()
 {
-    mCameFromMessageHistory = true;
 }
 
 void InboxTab::recordMessageIdleEntry()
@@ -48,24 +46,28 @@ void InboxTab::recordMessageIdleEntry()
 }
 
 #pragma mark Queries
-void InboxTab::didWeComeFromMessageHistoryEntry()
+void InboxTab::whereAreWeOnTheStackEntry()
 {
-    SetImmediateEvent(mCameFromMessageHistory ? kYes : kNo);
+    mViewStack.pop();
+    SetImmediateEvent(mViewStack.top());
 }
 
 #pragma mark Push Pop UI
 void InboxTab::pushInboxMessageEntry()
 {
+    mViewStack.push(kInboxMessage);
     [gAppDelegateInstance pushInboxMessage:0];
 }
 
 void InboxTab::pushMessageHistoryEntry()
 {
+    mViewStack.push(kMessageHistory);
     [gAppDelegateInstance pushMessageHistory:0];
 }
 
 void InboxTab::pushRecordMessageEntry()
 {
+    mViewStack.push(kRecordMessage);
     [gAppDelegateInstance pushRecordMessage:0];
 }
 
@@ -76,7 +78,7 @@ void InboxTab::popInboxMessageEntry()
 
 void InboxTab::popIfWeCameFromMessageHistoryEntry()
 {
-    if (mCameFromMessageHistory)
+    if (mViewStack.top() == kMessageHistory)
     {
         [gAppDelegateInstance popInbox:false];
     }
@@ -106,13 +108,11 @@ void InboxTab::CallEntry()
 {
 	switch(mState)
 	{
-		case kDidWeComeFromMessageHistory: didWeComeFromMessageHistoryEntry(); break;
 		case kEnd: EndEntryHelper(); break;
 		case kInboxIdle: inboxIdleEntry(); break;
 		case kInboxMessageIdle: inboxMessageIdleEntry(); break;
 		case kInvalidState: invalidStateEntry(); break;
 		case kMessageHistoryIdle: messageHistoryIdleEntry(); break;
-		case kPopIfWeCameFromMessageHistory: popIfWeCameFromMessageHistoryEntry(); break;
 		case kPopInboxMessage: popInboxMessageEntry(); break;
 		case kPopRecordMessage: popRecordMessageEntry(); break;
 		case kPushInboxMessage: pushInboxMessageEntry(); break;
@@ -121,6 +121,7 @@ void InboxTab::CallEntry()
 		case kRecordMessageIdle: recordMessageIdleEntry(); break;
 		case kShowConfirmDelete: showConfirmDeleteEntry(); break;
 		case kStart: startEntry(); break;
+		case kWhereAreWeOnTheStack: whereAreWeOnTheStackEntry(); break;
 		default: break;
 	}
 }
@@ -131,26 +132,27 @@ void InboxTab::CallExit()
 
 int  InboxTab::StateTransitionFunction(const int evt) const
 {
-	if ((mState == kDidWeComeFromMessageHistory) && (evt == kNo)) return kInboxMessageIdle; else
-	if ((mState == kDidWeComeFromMessageHistory) && (evt == kYes)) return kMessageHistoryIdle; else
 	if ((mState == kInboxIdle) && (evt == kItemSelected)) return kPushInboxMessage; else
 	if ((mState == kInboxMessageIdle) && (evt == kDeletePressed)) return kShowConfirmDelete; else
 	if ((mState == kInboxMessageIdle) && (evt == kHistoryPressed)) return kPushMessageHistory; else
-	if ((mState == kInboxMessageIdle) && (evt == kPopHappened)) return kInboxIdle; else
+	if ((mState == kInboxMessageIdle) && (evt == kPopHappened)) return kWhereAreWeOnTheStack; else
 	if ((mState == kInboxMessageIdle) && (evt == kReplyPressed)) return kPushRecordMessage; else
-	if ((mState == kMessageHistoryIdle) && (evt == kPopHappened)) return kInboxMessageIdle; else
+	if ((mState == kMessageHistoryIdle) && (evt == kPopHappened)) return kWhereAreWeOnTheStack; else
 	if ((mState == kMessageHistoryIdle) && (evt == kReplyPressed)) return kPushRecordMessage; else
-	if ((mState == kPopIfWeCameFromMessageHistory) && (evt == kPopHappened)) return kInboxMessageIdle; else
-	if ((mState == kPopInboxMessage) && (evt == kPopHappened)) return kInboxIdle; else
-	if ((mState == kPopRecordMessage) && (evt == kPopHappened)) return kPopIfWeCameFromMessageHistory; else
+	if ((mState == kPopInboxMessage) && (evt == kPopHappened)) return kWhereAreWeOnTheStack; else
+	if ((mState == kPopRecordMessage) && (evt == kPopHappened)) return kWhereAreWeOnTheStack; else
 	if ((mState == kPushInboxMessage) && (evt == kNext)) return kInboxMessageIdle; else
 	if ((mState == kPushMessageHistory) && (evt == kNext)) return kMessageHistoryIdle; else
 	if ((mState == kPushRecordMessage) && (evt == kNext)) return kRecordMessageIdle; else
 	if ((mState == kRecordMessageIdle) && (evt == kItemSelected)) return kPopRecordMessage; else
-	if ((mState == kRecordMessageIdle) && (evt == kPopHappened)) return kDidWeComeFromMessageHistory; else
+	if ((mState == kRecordMessageIdle) && (evt == kPopHappened)) return kWhereAreWeOnTheStack; else
 	if ((mState == kShowConfirmDelete) && (evt == kNo)) return kInboxMessageIdle; else
 	if ((mState == kShowConfirmDelete) && (evt == kYes)) return kPopInboxMessage; else
-	if ((mState == kStart) && (evt == kNext)) return kInboxIdle;
+	if ((mState == kStart) && (evt == kNext)) return kInboxIdle; else
+	if ((mState == kWhereAreWeOnTheStack) && (evt == kInbox)) return kInboxIdle; else
+	if ((mState == kWhereAreWeOnTheStack) && (evt == kInboxMessage)) return kInboxMessageIdle; else
+	if ((mState == kWhereAreWeOnTheStack) && (evt == kMessageHistory)) return kMessageHistoryIdle; else
+	if ((mState == kWhereAreWeOnTheStack) && (evt == kRecordMessage)) return kRecordMessageIdle;
 
 	return kInvalidState;
 }
