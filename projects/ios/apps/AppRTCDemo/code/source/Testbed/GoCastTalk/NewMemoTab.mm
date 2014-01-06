@@ -20,6 +20,8 @@ void NewMemoTab::startEntry()
     GCTEventManager::getInstance()->attach(this);
 
     [gAppDelegateInstance setNavigationBarTitle:"New Memo"];
+
+    mViewStack.push(kNewMemo);
 }
 
 void NewMemoTab::endEntry()
@@ -50,24 +52,34 @@ void NewMemoTab::invalidStateEntry()
 	assert("Event is invalid for this state" && 0);
 }
 
+#pragma mark Queries
+void NewMemoTab::whereAreWeOnTheStackEntry()
+{
+    mViewStack.pop();
+    SetImmediateEvent(mViewStack.top());
+}
+
 #pragma mark UI
 
 void NewMemoTab::pushContactsEntry()
 {
+    mViewStack.push(kContacts);
     [gAppDelegateInstance pushContacts:1];
 }
 
 void NewMemoTab::pushGroupsEntry()
 {
+    mViewStack.push(kGroups);
     [gAppDelegateInstance pushGroups:1];
 }
 
 void NewMemoTab::pushRecordMessageEntry()
 {
+    mViewStack.push(kRecordMessage);
     [gAppDelegateInstance pushRecordMessage:1];
 }
 
-void NewMemoTab::popWhateverEntry()
+void NewMemoTab::popTabEntry()
 {
     [gAppDelegateInstance popNewMemo:true];
 }
@@ -82,12 +94,13 @@ void NewMemoTab::CallEntry()
 		case kGroupsIdle: groupsIdleEntry(); break;
 		case kInvalidState: invalidStateEntry(); break;
 		case kNewMemoIdle: newMemoIdleEntry(); break;
-		case kPopWhatever: popWhateverEntry(); break;
+		case kPopTab: popTabEntry(); break;
 		case kPushContacts: pushContactsEntry(); break;
 		case kPushGroups: pushGroupsEntry(); break;
 		case kPushRecordMessage: pushRecordMessageEntry(); break;
 		case kRecordMessageIdle: recordMessageIdleEntry(); break;
 		case kStart: startEntry(); break;
+		case kWhereAreWeOnTheStack: whereAreWeOnTheStackEntry(); break;
 		default: break;
 	}
 }
@@ -98,20 +111,24 @@ void NewMemoTab::CallExit()
 
 int  NewMemoTab::StateTransitionFunction(const int evt) const
 {
-	if ((mState == kContactsIdle) && (evt == kItemSelected)) return kPopWhatever; else
-	if ((mState == kContactsIdle) && (evt == kPopHappened)) return kNewMemoIdle; else
-	if ((mState == kGroupsIdle) && (evt == kItemSelected)) return kPopWhatever; else
-	if ((mState == kGroupsIdle) && (evt == kPopHappened)) return kNewMemoIdle; else
+	if ((mState == kContactsIdle) && (evt == kItemSelected)) return kPopTab; else
+	if ((mState == kContactsIdle) && (evt == kPopHappened)) return kWhereAreWeOnTheStack; else
+	if ((mState == kGroupsIdle) && (evt == kItemSelected)) return kPopTab; else
+	if ((mState == kGroupsIdle) && (evt == kPopHappened)) return kWhereAreWeOnTheStack; else
 	if ((mState == kNewMemoIdle) && (evt == kAddContactsPressed)) return kPushContacts; else
 	if ((mState == kNewMemoIdle) && (evt == kAddGroupsPressed)) return kPushGroups; else
 	if ((mState == kNewMemoIdle) && (evt == kItemSelected)) return kPushRecordMessage; else
-	if ((mState == kPopWhatever) && (evt == kPopHappened)) return kNewMemoIdle; else
+	if ((mState == kPopTab) && (evt == kPopHappened)) return kWhereAreWeOnTheStack; else
 	if ((mState == kPushContacts) && (evt == kNext)) return kContactsIdle; else
 	if ((mState == kPushGroups) && (evt == kNext)) return kGroupsIdle; else
 	if ((mState == kPushRecordMessage) && (evt == kNext)) return kRecordMessageIdle; else
-	if ((mState == kRecordMessageIdle) && (evt == kItemSelected)) return kPopWhatever; else
-	if ((mState == kRecordMessageIdle) && (evt == kPopHappened)) return kNewMemoIdle; else
-	if ((mState == kStart) && (evt == kNext)) return kNewMemoIdle;
+	if ((mState == kRecordMessageIdle) && (evt == kItemSelected)) return kPopTab; else
+	if ((mState == kRecordMessageIdle) && (evt == kPopHappened)) return kWhereAreWeOnTheStack; else
+	if ((mState == kStart) && (evt == kNext)) return kNewMemoIdle; else
+	if ((mState == kWhereAreWeOnTheStack) && (evt == kContacts)) return kContactsIdle; else
+	if ((mState == kWhereAreWeOnTheStack) && (evt == kGroups)) return kGroupsIdle; else
+	if ((mState == kWhereAreWeOnTheStack) && (evt == kNewMemo)) return kNewMemoIdle; else
+	if ((mState == kWhereAreWeOnTheStack) && (evt == kRecordMessage)) return kRecordMessageIdle;
 
 	return kInvalidState;
 }

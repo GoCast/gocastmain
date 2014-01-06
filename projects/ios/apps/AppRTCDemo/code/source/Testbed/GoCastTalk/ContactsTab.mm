@@ -17,13 +17,13 @@ ContactsTab::~ContactsTab()
 #pragma mark Start / End / Invalid
 void ContactsTab::startEntry()
 {
+    mViewStack.push(kContacts);
+
     GCTEventManager::getInstance()->attach(this);
 
     [gAppDelegateInstance setNavigationBarTitle:"Contacts"];
 
     [gAppDelegateInstance setContactsViewVisible:true];
-
-    mStackSize = 0;
 }
 
 void ContactsTab::endEntry()
@@ -31,19 +31,10 @@ void ContactsTab::endEntry()
     [gAppDelegateInstance hideAllViews];
 }
 
-void ContactsTab::contactsIdleEntry()
-{
-    mStackSize = 0;
-}
-void ContactsTab::contactDetailsIdleEntry()
-{
-    mCameFromMessageHistory = false;
-}
+void ContactsTab::contactsIdleEntry() { }
+void ContactsTab::contactDetailsIdleEntry() { }
 void ContactsTab::editContactsIdleEntry() { }
-void ContactsTab::messageHistoryIdleEntry()
-{
-    mCameFromMessageHistory = true;
-}
+void ContactsTab::messageHistoryIdleEntry() { }
 void ContactsTab::recordMessageIdleEntry() { }
 void ContactsTab::changeRegisteredNameIdleEntry() { }
 
@@ -53,47 +44,46 @@ void ContactsTab::invalidStateEntry()
 }
 
 #pragma mark Queries
-void ContactsTab::didWeComeFromMessageHistoryEntry()
+void ContactsTab::whereAreWeOnTheStackEntry()
 {
-    SetImmediateEvent(mCameFromMessageHistory ? kYes : kNo);
+    mViewStack.pop();
+    SetImmediateEvent(mViewStack.top());
 }
 
 #pragma mark UI
 void ContactsTab::pushChangeRegisteredNameEntry()
 {
+    mViewStack.push(kChangeRegisteredName);
     [gAppDelegateInstance pushChangeRegisterdName:2];
 }
 
 void ContactsTab::pushContactDetailsEntry()
 {
+    mViewStack.push(kContactDetails);
     [gAppDelegateInstance pushContactDetails:2];
-    mStackSize++;
 }
 
 void ContactsTab::pushEditContactsEntry()
 {
+    mViewStack.push(kEditContacts);
     [gAppDelegateInstance pushEditContacts:2];
 }
 
 void ContactsTab::pushMessageHistoryEntry()
 {
+    mViewStack.push(kMessageHistory);
     [gAppDelegateInstance pushMessageHistory:2];
-    mStackSize++;
 }
 
 void ContactsTab::pushRecordMessageEntry()
 {
+    mViewStack.push(kRecordMessage);
     [gAppDelegateInstance pushRecordMessage:2];
-    mStackSize++;
 }
 
-void ContactsTab::popTo0Entry()
+void ContactsTab::popTabEntry()
 {
-    while (mStackSize != 0)
-    {
-        [gAppDelegateInstance popContacts:false];
-        mStackSize--;
-    }
+    [gAppDelegateInstance popContacts:true];
 }
 
 #pragma mark State wiring
@@ -104,12 +94,11 @@ void ContactsTab::CallEntry()
 		case kChangeRegisteredNameIdle: changeRegisteredNameIdleEntry(); break;
 		case kContactDetailsIdle: contactDetailsIdleEntry(); break;
 		case kContactsIdle: contactsIdleEntry(); break;
-		case kDidWeComeFromMessageHistory: didWeComeFromMessageHistoryEntry(); break;
 		case kEditContactsIdle: editContactsIdleEntry(); break;
 		case kEnd: EndEntryHelper(); break;
 		case kInvalidState: invalidStateEntry(); break;
 		case kMessageHistoryIdle: messageHistoryIdleEntry(); break;
-		case kPopTo0: popTo0Entry(); break;
+		case kPopTab: popTabEntry(); break;
 		case kPushChangeRegisteredName: pushChangeRegisteredNameEntry(); break;
 		case kPushContactDetails: pushContactDetailsEntry(); break;
 		case kPushEditContacts: pushEditContactsEntry(); break;
@@ -117,6 +106,7 @@ void ContactsTab::CallEntry()
 		case kPushRecordMessage: pushRecordMessageEntry(); break;
 		case kRecordMessageIdle: recordMessageIdleEntry(); break;
 		case kStart: startEntry(); break;
+		case kWhereAreWeOnTheStack: whereAreWeOnTheStackEntry(); break;
 		default: break;
 	}
 }
@@ -127,27 +117,31 @@ void ContactsTab::CallExit()
 
 int  ContactsTab::StateTransitionFunction(const int evt) const
 {
-	if ((mState == kChangeRegisteredNameIdle) && (evt == kPopHappened)) return kEditContactsIdle; else
+	if ((mState == kChangeRegisteredNameIdle) && (evt == kPopHappened)) return kWhereAreWeOnTheStack; else
 	if ((mState == kContactDetailsIdle) && (evt == kHistoryPressed)) return kPushMessageHistory; else
-	if ((mState == kContactDetailsIdle) && (evt == kPopHappened)) return kContactsIdle; else
+	if ((mState == kContactDetailsIdle) && (evt == kPopHappened)) return kWhereAreWeOnTheStack; else
 	if ((mState == kContactDetailsIdle) && (evt == kReplyPressed)) return kPushRecordMessage; else
 	if ((mState == kContactsIdle) && (evt == kEditPressed)) return kPushEditContacts; else
 	if ((mState == kContactsIdle) && (evt == kItemSelected)) return kPushContactDetails; else
-	if ((mState == kDidWeComeFromMessageHistory) && (evt == kNo)) return kContactDetailsIdle; else
-	if ((mState == kDidWeComeFromMessageHistory) && (evt == kYes)) return kMessageHistoryIdle; else
 	if ((mState == kEditContactsIdle) && (evt == kItemSelected)) return kPushChangeRegisteredName; else
-	if ((mState == kEditContactsIdle) && (evt == kPopHappened)) return kContactsIdle; else
-	if ((mState == kMessageHistoryIdle) && (evt == kPopHappened)) return kContactDetailsIdle; else
+	if ((mState == kEditContactsIdle) && (evt == kPopHappened)) return kWhereAreWeOnTheStack; else
+	if ((mState == kMessageHistoryIdle) && (evt == kPopHappened)) return kWhereAreWeOnTheStack; else
 	if ((mState == kMessageHistoryIdle) && (evt == kReplyPressed)) return kPushRecordMessage; else
-	if ((mState == kPopTo0) && (evt == kPopHappened)) return kContactsIdle; else
+	if ((mState == kPopTab) && (evt == kPopHappened)) return kWhereAreWeOnTheStack; else
 	if ((mState == kPushChangeRegisteredName) && (evt == kNext)) return kChangeRegisteredNameIdle; else
 	if ((mState == kPushContactDetails) && (evt == kNext)) return kContactDetailsIdle; else
 	if ((mState == kPushEditContacts) && (evt == kNext)) return kEditContactsIdle; else
 	if ((mState == kPushMessageHistory) && (evt == kNext)) return kMessageHistoryIdle; else
 	if ((mState == kPushRecordMessage) && (evt == kNext)) return kRecordMessageIdle; else
-	if ((mState == kRecordMessageIdle) && (evt == kItemSelected)) return kPopTo0; else
-	if ((mState == kRecordMessageIdle) && (evt == kPopHappened)) return kDidWeComeFromMessageHistory; else
-	if ((mState == kStart) && (evt == kNext)) return kContactsIdle;
+	if ((mState == kRecordMessageIdle) && (evt == kItemSelected)) return kPopTab; else
+	if ((mState == kRecordMessageIdle) && (evt == kPopHappened)) return kWhereAreWeOnTheStack; else
+	if ((mState == kStart) && (evt == kNext)) return kContactsIdle; else
+	if ((mState == kWhereAreWeOnTheStack) && (evt == kChangeRegisteredName)) return kChangeRegisteredNameIdle; else
+	if ((mState == kWhereAreWeOnTheStack) && (evt == kContactDetails)) return kContactDetailsIdle; else
+	if ((mState == kWhereAreWeOnTheStack) && (evt == kContacts)) return kContactsIdle; else
+	if ((mState == kWhereAreWeOnTheStack) && (evt == kEditContacts)) return kEditContactsIdle; else
+	if ((mState == kWhereAreWeOnTheStack) && (evt == kMessageHistory)) return kMessageHistoryIdle; else
+	if ((mState == kWhereAreWeOnTheStack) && (evt == kRecordMessage)) return kRecordMessageIdle;
 
 	return kInvalidState;
 }

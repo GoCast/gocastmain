@@ -12,6 +12,7 @@ class SettingsTab
     public tObserver<const GCTEvent&>
 {
 protected:
+    std::stack<int> mViewStack;
 
 public:
 	SettingsTab();
@@ -25,14 +26,17 @@ protected:
 	void changeRegisteredNameIdleEntry();
 	void pushChangeRegisteredNameEntry();
 	void settingsIdleEntry();
+	void whereAreWeOnTheStackEntry();
 
 public:
 	enum EventType
 	{
 		kInvalidEvent = -2,
 		kNext = -1,
+		kChangeRegisteredName,
 		kItemSelected,
 		kPopHappened,
+		kSettings,
 	};
 
 	enum StateType
@@ -43,6 +47,7 @@ public:
 		kEnd,
 		kPushChangeRegisteredName,
 		kSettingsIdle,
+		kWhereAreWeOnTheStack,
 	};
 
 protected:

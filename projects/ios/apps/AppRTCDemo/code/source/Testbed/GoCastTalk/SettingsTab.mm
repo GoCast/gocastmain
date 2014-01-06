@@ -17,6 +17,8 @@ SettingsTab::~SettingsTab()
 #pragma mark Start / End / Invalid
 void SettingsTab::startEntry()
 {
+    mViewStack.push(kSettings);
+
     GCTEventManager::getInstance()->attach(this);
     [gAppDelegateInstance setNavigationBarTitle:"Settings"];
 }
@@ -36,10 +38,18 @@ void SettingsTab::invalidStateEntry()
 	assert("Event is invalid for this state" && 0);
 }
 
+#pragma mark Queries
+void SettingsTab::whereAreWeOnTheStackEntry()
+{
+    mViewStack.pop();
+    SetImmediateEvent(mViewStack.top());
+}
+
 #pragma mark UI
 
 void SettingsTab::pushChangeRegisteredNameEntry()
 {
+    mViewStack.push(kChangeRegisteredName);
     [gAppDelegateInstance pushChangeRegisterdName:4];
 }
 
@@ -54,6 +64,7 @@ void SettingsTab::CallEntry()
 		case kPushChangeRegisteredName: pushChangeRegisteredNameEntry(); break;
 		case kSettingsIdle: settingsIdleEntry(); break;
 		case kStart: startEntry(); break;
+		case kWhereAreWeOnTheStack: whereAreWeOnTheStackEntry(); break;
 		default: break;
 	}
 }
@@ -64,10 +75,12 @@ void SettingsTab::CallExit()
 
 int  SettingsTab::StateTransitionFunction(const int evt) const
 {
-	if ((mState == kChangeRegisteredNameIdle) && (evt == kPopHappened)) return kSettingsIdle; else
+	if ((mState == kChangeRegisteredNameIdle) && (evt == kPopHappened)) return kWhereAreWeOnTheStack; else
 	if ((mState == kPushChangeRegisteredName) && (evt == kNext)) return kChangeRegisteredNameIdle; else
 	if ((mState == kSettingsIdle) && (evt == kItemSelected)) return kPushChangeRegisteredName; else
-	if ((mState == kStart) && (evt == kNext)) return kSettingsIdle;
+	if ((mState == kStart) && (evt == kNext)) return kSettingsIdle; else
+	if ((mState == kWhereAreWeOnTheStack) && (evt == kChangeRegisteredName)) return kChangeRegisteredNameIdle; else
+	if ((mState == kWhereAreWeOnTheStack) && (evt == kSettings)) return kSettingsIdle;
 
 	return kInvalidState;
 }

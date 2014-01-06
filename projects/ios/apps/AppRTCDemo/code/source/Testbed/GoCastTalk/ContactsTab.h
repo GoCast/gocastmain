@@ -12,8 +12,7 @@ class ContactsTab
     public tObserver<const GCTEvent&>
 {
 protected:
-    tUInt8  mStackSize;
-    bool    mCameFromMessageHistory;
+    std::stack<int> mViewStack;
 
 public:
 	ContactsTab();
@@ -27,29 +26,33 @@ protected:
 	void changeRegisteredNameIdleEntry();
 	void contactDetailsIdleEntry();
 	void contactsIdleEntry();
-	void didWeComeFromMessageHistoryEntry();
 	void editContactsIdleEntry();
 	void messageHistoryIdleEntry();
-	void popTo0Entry();
+	void popTabEntry();
 	void pushChangeRegisteredNameEntry();
 	void pushContactDetailsEntry();
 	void pushEditContactsEntry();
 	void pushMessageHistoryEntry();
 	void pushRecordMessageEntry();
 	void recordMessageIdleEntry();
+	void whereAreWeOnTheStackEntry();
 
 public:
 	enum EventType
 	{
 		kInvalidEvent = -2,
 		kNext = -1,
+		kChangeRegisteredName,
+		kContactDetails,
+		kContacts,
+		kEditContacts,
 		kEditPressed,
 		kHistoryPressed,
 		kItemSelected,
-		kNo,
+		kMessageHistory,
 		kPopHappened,
+		kRecordMessage,
 		kReplyPressed,
-		kYes,
 	};
 
 	enum StateType
@@ -59,17 +62,17 @@ public:
 		kChangeRegisteredNameIdle,
 		kContactDetailsIdle,
 		kContactsIdle,
-		kDidWeComeFromMessageHistory,
 		kEditContactsIdle,
 		kEnd,
 		kMessageHistoryIdle,
-		kPopTo0,
+		kPopTab,
 		kPushChangeRegisteredName,
 		kPushContactDetails,
 		kPushEditContacts,
 		kPushMessageHistory,
 		kPushRecordMessage,
 		kRecordMessageIdle,
+		kWhereAreWeOnTheStack,
 	};
 
 protected:

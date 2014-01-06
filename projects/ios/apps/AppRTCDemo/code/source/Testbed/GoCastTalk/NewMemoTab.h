@@ -12,6 +12,7 @@ class NewMemoTab
     public tObserver<const GCTEvent&>
 {
 protected:
+    std::stack<int> mViewStack;
 
 public:
 	NewMemoTab();
@@ -25,11 +26,12 @@ protected:
 	void contactsIdleEntry();
 	void groupsIdleEntry();
 	void newMemoIdleEntry();
-	void popWhateverEntry();
+	void popTabEntry();
 	void pushContactsEntry();
 	void pushGroupsEntry();
 	void pushRecordMessageEntry();
 	void recordMessageIdleEntry();
+	void whereAreWeOnTheStackEntry();
 
 public:
 	enum EventType
@@ -38,8 +40,12 @@ public:
 		kNext = -1,
 		kAddContactsPressed,
 		kAddGroupsPressed,
+		kContacts,
+		kGroups,
 		kItemSelected,
+		kNewMemo,
 		kPopHappened,
+		kRecordMessage,
 	};
 
 	enum StateType
@@ -50,11 +56,12 @@ public:
 		kEnd,
 		kGroupsIdle,
 		kNewMemoIdle,
-		kPopWhatever,
+		kPopTab,
 		kPushContacts,
 		kPushGroups,
 		kPushRecordMessage,
 		kRecordMessageIdle,
+		kWhereAreWeOnTheStack,
 	};
 
 protected:
