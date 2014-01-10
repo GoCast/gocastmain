@@ -58,11 +58,6 @@ void SendToGroupScreen::isUserListValidEntry()
     SetImmediateEvent(result ? kYes : kNo);
 }
 
-void SendToGroupScreen::wasAmiVoiceSuccessfulEntry()
-{
-    SetImmediateEvent(mAmiVoiceResponse[0] == '0' ? kYes : kNo);
-}
-
 void SendToGroupScreen::wasPostGroupSuccessfulEntry()
 {
     bool result = mPostGroupJSON["status"].mString == std::string("success");
@@ -143,19 +138,6 @@ void SendToGroupScreen::getSelectedGroupFromUserTableEntry()
     }
 }
 
-void SendToGroupScreen::sendAudioFileToAmiVoiceEntry()
-{
-    std::vector<std::pair<std::string, std::string> > params;
-    std::string emailAddr = std::string(tFile(tFile::kPreferencesDirectory, "logintoken.txt"));
-    std::string taskID = mFilename + "-" + emailAddr.substr(0, emailAddr.find('@'));
-
-    params.push_back(std::pair<std::string, std::string>("PresetId", "ee36c3d8-0479-49a2-9570-fbde605231b9"));
-    params.push_back(std::pair<std::string, std::string>("TaskId", taskID));
-    params.push_back(std::pair<std::string, std::string>("ReplyTo", kAmiVoiceReplyURL));
-
-    URLLoader::getInstance()->postFile(kAmiVoiceAcceptURL, params, tFile(tFile::kDocumentsDirectory, mFilename), true);
-}
-
 void SendToGroupScreen::sendUserListToServerEntry()
 {
     URLLoader::getInstance()->loadString(kMemoAppServerURL"?action=userList");
@@ -184,19 +166,9 @@ void SendToGroupScreen::setWaitForUserListEntry()
     [gAppDelegateInstance setBlockingViewVisible:true];
 }
 
-void SendToGroupScreen::setWaitForAmiVoiceEntry()
-{
-    [gAppDelegateInstance setBlockingViewVisible:true];
-}
-
 void SendToGroupScreen::setWaitForPostGroupEntry()
 {
     [gAppDelegateInstance setBlockingViewVisible:true];
-}
-
-void SendToGroupScreen::showAmiVoiceFailedEntry()
-{
-    tAlert("Failed to send audio file to Transcription service.");
 }
 
 void SendToGroupScreen::showEmptySelectionEntry()
@@ -272,17 +244,14 @@ void SendToGroupScreen::CallEntry()
 		case kIsProfileValid: isProfileValidEntry(); break;
 		case kIsUserListValid: isUserListValidEntry(); break;
 		case kReUpdateLocalUserList: reUpdateLocalUserListEntry(); break;
-		case kSendAudioFileToAmiVoice: sendAudioFileToAmiVoiceEntry(); break;
 		case kSendGetProfileIToServer: sendGetProfileIToServerEntry(); break;
 		case kSendGoInboxToVC: sendGoInboxToVCEntry(); break;
 		case kSendPostGroupToServer: sendPostGroupToServerEntry(); break;
 		case kSendUserListToServer: sendUserListToServerEntry(); break;
 		case kServerErrorIdle: serverErrorIdleEntry(); break;
-		case kSetWaitForAmiVoice: setWaitForAmiVoiceEntry(); break;
 		case kSetWaitForGetProfile: setWaitForGetProfileEntry(); break;
 		case kSetWaitForPostGroup: setWaitForPostGroupEntry(); break;
 		case kSetWaitForUserList: setWaitForUserListEntry(); break;
-		case kShowAmiVoiceFailed: showAmiVoiceFailedEntry(); break;
 		case kShowEmptySelection: showEmptySelectionEntry(); break;
 		case kShowPostGroupFailed: showPostGroupFailedEntry(); break;
 		case kShowPostGroupSuccess: showPostGroupSuccessEntry(); break;
@@ -295,7 +264,6 @@ void SendToGroupScreen::CallEntry()
 		case kStart: startEntry(); break;
 		case kUpdateLocalUserList: updateLocalUserListEntry(); break;
 		case kUpdateUserListI: updateUserListIEntry(); break;
-		case kWasAmiVoiceSuccessful: wasAmiVoiceSuccessfulEntry(); break;
 		case kWasPostGroupSuccessful: wasPostGroupSuccessfulEntry(); break;
 		default: break;
 	}
@@ -321,8 +289,6 @@ int  SendToGroupScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kIsUserListValid) && (evt == kNo)) return kShowUserListEmpty; else
 	if ((mState == kIsUserListValid) && (evt == kYes)) return kUpdateLocalUserList; else
 	if ((mState == kReUpdateLocalUserList) && (evt == kNext)) return kIncrementI; else
-	if ((mState == kSendAudioFileToAmiVoice) && (evt == kFail)) return kShowAmiVoiceFailed; else
-	if ((mState == kSendAudioFileToAmiVoice) && (evt == kSuccess)) return kWasAmiVoiceSuccessful; else
 	if ((mState == kSendGetProfileIToServer) && (evt == kFail)) return kShowRetryGetProfile; else
 	if ((mState == kSendGetProfileIToServer) && (evt == kSuccess)) return kIsProfileValid; else
 	if ((mState == kSendPostGroupToServer) && (evt == kFail)) return kShowRetryPostGroup; else
@@ -331,11 +297,9 @@ int  SendToGroupScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kSendUserListToServer) && (evt == kSuccess)) return kIsUserListValid; else
 	if ((mState == kServerErrorIdle) && (evt == kCancel)) return kSendGoInboxToVC; else
 	if ((mState == kServerErrorIdle) && (evt == kSend)) return kShowServerError; else
-	if ((mState == kSetWaitForAmiVoice) && (evt == kNext)) return kSendAudioFileToAmiVoice; else
 	if ((mState == kSetWaitForGetProfile) && (evt == kNext)) return kSendGetProfileIToServer; else
 	if ((mState == kSetWaitForPostGroup) && (evt == kNext)) return kSendPostGroupToServer; else
 	if ((mState == kSetWaitForUserList) && (evt == kNext)) return kSendUserListToServer; else
-	if ((mState == kShowAmiVoiceFailed) && (evt == kYes)) return kShowPostGroupSuccess; else
 	if ((mState == kShowEmptySelection) && (evt == kYes)) return kIdle; else
 	if ((mState == kShowPostGroupFailed) && (evt == kYes)) return kIdle; else
 	if ((mState == kShowPostGroupSuccess) && (evt == kYes)) return kSendGoInboxToVC; else
@@ -352,10 +316,8 @@ int  SendToGroupScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kStart) && (evt == kNext)) return kSetWaitForUserList; else
 	if ((mState == kUpdateLocalUserList) && (evt == kNext)) return kInitIToZero; else
 	if ((mState == kUpdateUserListI) && (evt == kNext)) return kReUpdateLocalUserList; else
-	if ((mState == kWasAmiVoiceSuccessful) && (evt == kNo)) return kShowAmiVoiceFailed; else
-	if ((mState == kWasAmiVoiceSuccessful) && (evt == kYes)) return kShowPostGroupSuccess; else
 	if ((mState == kWasPostGroupSuccessful) && (evt == kNo)) return kShowPostGroupFailed; else
-	if ((mState == kWasPostGroupSuccessful) && (evt == kYes)) return kSetWaitForAmiVoice;
+	if ((mState == kWasPostGroupSuccessful) && (evt == kYes)) return kShowPostGroupSuccess;
 
 	return kInvalidState;
 }
@@ -368,7 +330,6 @@ bool SendToGroupScreen::HasEdgeNamedNext() const
 		case kIncrementI:
 		case kInitIToZero:
 		case kReUpdateLocalUserList:
-		case kSetWaitForAmiVoice:
 		case kSetWaitForGetProfile:
 		case kSetWaitForPostGroup:
 		case kSetWaitForUserList:
@@ -412,10 +373,6 @@ void SendToGroupScreen::update(const URLLoaderEvent& msg)
         {
             switch (getState())
             {
-                case kSendAudioFileToAmiVoice:
-                    mAmiVoiceResponse = msg.mString;
-                    break;
-
                 case kSendUserListToServer:
                     mUserListJSON = JSONUtil::extract(msg.mString);
                     break;
