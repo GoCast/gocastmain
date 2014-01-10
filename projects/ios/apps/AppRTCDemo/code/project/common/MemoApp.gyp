@@ -186,6 +186,7 @@
 			'../../source/Base/<@(OS)',
 			'../../source/Bootstrap/<@(OS)',
 			'../../source/Io/<@(OS)',
+			'../../source/Testbed/GoCastTalk/<@(OS)',
 		 ],  # include_dirs
 
 		'xcode_settings': {
