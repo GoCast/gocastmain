@@ -139,7 +139,7 @@
 
 		'xcode_settings': {
 			'TARGETED_DEVICE_FAMILY': '1',
-			'INFOPLIST_FILE': '../../rsrc/<@(OS)/portrait.plist',
+			'INFOPLIST_FILE': '../../rsrc/Testbed/GoCastTalk/<@(OS)/portrait.plist',
 		},	# xcode_settings
 
 		'conditions': [

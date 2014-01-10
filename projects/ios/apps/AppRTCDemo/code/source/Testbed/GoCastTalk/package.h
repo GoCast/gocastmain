@@ -1,10 +1,10 @@
 #pragma once
 
 #define kAmiVoiceAcceptURL "http://amivoiceap.cloudapp.net/api/accept.php"
-#define kAmiVoiceReplyURL "http://terencejgrant.com/memoappserver/amivoice-reply.php"
-#define kMemoAppServerRealURL "http://terencejgrant.com/memoappserver/"
+#define kAmiVoiceReplyURL "https://chat.gocast.it/memoappserver/amivoice-reply.php"
+#define kMemoAppServerRealURL "https://chat.gocast.it/memoappserver/"
 #ifdef ADHOC
-#define kMemoAppServerURL "http://terencejgrant.com/memoappserver/"
+#define kMemoAppServerURL "https://chat.gocast.it/memoappserver/"
 #else
 #define kMemoAppServerURL "http://127.0.0.1:8888/"
 #endif
