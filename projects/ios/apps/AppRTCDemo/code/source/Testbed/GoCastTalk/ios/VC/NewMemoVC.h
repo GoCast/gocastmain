@@ -5,22 +5,24 @@
 @interface NewMemoVC : UIViewController
 <
     UITableViewDelegate,
-    UITableViewDataSource,
-    UIAlertViewDelegate
+    UITableViewDataSource
 >
 {
 }
 
 //mInboxView
 @property (nonatomic, strong) IBOutlet UITableView*     mTable;
+@property (nonatomic, strong) IBOutlet UIButton*        mAddContactsButton;
+@property (nonatomic, strong) IBOutlet UIButton*        mAddGroupsButton;
 
 #pragma mark Construction / Destruction
 - (void)viewDidLoad;
+- (void)viewWillDisappear:(BOOL)animated;
 
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section;
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath;
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath;
 
--(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex;
+-(IBAction)buttonPressed:(UIButton*)sender;
 
 @end

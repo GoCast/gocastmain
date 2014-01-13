@@ -7,6 +7,8 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="NewMemoVC">
             <connections>
+                <outlet property="mAddContactsButton" destination="Sth-hr-S5H" id="Ovx-Jq-W57"/>
+                <outlet property="mAddGroupsButton" destination="05i-1v-Vph" id="Bwv-ry-FUJ"/>
                 <outlet property="mTable" destination="8ij-9V-vnt" id="1Gw-Y1-S8d"/>
                 <outlet property="view" destination="Xow-Jx-387" id="AQV-WU-uEa"/>
             </connections>
@@ -24,20 +26,26 @@
                     <color key="highlightedColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                 </label>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="Sth-hr-S5H" userLabel="mAddContactsButton">
-                    <rect key="frame" x="72" y="17" width="95" height="30"/>
+                    <rect key="frame" x="72" y="17" width="110" height="30"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <state key="normal" title="Add Contacts">
                         <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                     </state>
+                    <connections>
+                        <action selector="buttonPressed:" destination="-1" eventType="touchUpInside" id="xaS-8i-cwW"/>
+                    </connections>
                 </button>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="05i-1v-Vph" userLabel="mAddGroupsButton">
-                    <rect key="frame" x="72" y="55" width="95" height="30"/>
+                    <rect key="frame" x="72" y="55" width="110" height="30"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <state key="normal" title="Add Groups">
                         <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                     </state>
+                    <connections>
+                        <action selector="buttonPressed:" destination="-1" eventType="touchUpInside" id="Z6u-UW-fEh"/>
+                    </connections>
                 </button>
-                <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" style="plain" separatorStyle="default" rowHeight="82" sectionHeaderHeight="22" sectionFooterHeight="22" id="8ij-9V-vnt" userLabel="mNewMemoOptionsTable">
+                <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" style="plain" separatorStyle="default" rowHeight="82" sectionHeaderHeight="22" sectionFooterHeight="22" id="8ij-9V-vnt" userLabel="mTable">
                     <rect key="frame" x="0.0" y="93" width="320" height="263"/>
                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>

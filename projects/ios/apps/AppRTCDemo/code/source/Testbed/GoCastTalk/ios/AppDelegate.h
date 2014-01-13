@@ -9,9 +9,13 @@
 
 @interface AppDelegate : UIResponder
 <
-UIApplicationDelegate,
-UITabBarControllerDelegate
+    UIApplicationDelegate,
+    UITabBarControllerDelegate,
+    UIAlertViewDelegate
 >
+{
+    UINavigationController* mTabVC[5];
+}
 
 @property (nonatomic, retain) IBOutlet UIWindow *window;
 @property (nonatomic, retain) IBOutlet UITabBarController *tabBarController;
@@ -22,6 +26,12 @@ UITabBarControllerDelegate
 @property (nonatomic, strong) IBOutlet UINavigationController* mContactsVC;
 @property (nonatomic, strong) IBOutlet UINavigationController* mGroupsVC;
 @property (nonatomic, strong) IBOutlet UINavigationController* mSettingsVC;
+
+@property (nonatomic, strong) IBOutlet UINavigationBar* mInboxNavBar;
+@property (nonatomic, strong) IBOutlet UINavigationBar* mNewMemoNavBar;
+@property (nonatomic, strong) IBOutlet UINavigationBar* mContactsNavBar;
+@property (nonatomic, strong) IBOutlet UINavigationBar* mGroupsNavBar;
+@property (nonatomic, strong) IBOutlet UINavigationBar* mSettingsNavBar;
 
 @property (nonatomic, strong) IBOutlet UITabBar* mTabBar;
 @property (nonatomic, strong) IBOutlet UITabBarItem* mInboxTab;
@@ -64,13 +74,22 @@ UITabBarControllerDelegate
 - (void)tabBarController:(UITabBarController *)tabBarController didSelectViewController:(UIViewController *)viewController;
 
 
--(void)pushChangeRegisterdName;
--(void)pushContactDetails;
--(void)pushEditContacts;
--(void)pushInboxMessage;
--(void)pushMessageHistory;
--(void)pushRecordMessage;
+-(void)pushChangeRegisterdName:(int)tabID;
+-(void)pushContactDetails:(int)tabID;
+-(void)pushEditContacts:(int)tabID;
+-(void)pushInboxMessage:(int)tabID;
+-(void)pushMessageHistory:(int)tabID;
+-(void)pushRecordMessage:(int)tabID;
 
--(void)pop:(bool)animated;
+-(void)pushContacts:(int)tabID;
+-(void)pushGroups:(int)tabID;
+
+-(void)popInbox:(bool)animated;
+-(void)popNewMemo:(bool)animated;
+-(void)popContacts:(bool)animated;
+-(void)popGroups:(bool)animated;
+-(void)popSettings:(bool)animated;
+
+-(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex;
 
 @end

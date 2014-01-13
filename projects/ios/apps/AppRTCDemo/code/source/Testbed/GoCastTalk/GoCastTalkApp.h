@@ -13,7 +13,7 @@ class GoCastTalkApp
 protected:
     std::string mCurAudioFilename;
     std::string mGroupToEdit;
-    Screen*     mScreen;
+    Tab*     mTabs[5];
     bool        mExistsOnServer;
     bool        mIsEditing;
 
@@ -26,31 +26,14 @@ protected:
 	void endEntry();
 	void invalidStateEntry();
 
-	void contactsScreenEntry();
-	void groupsScreenEntry();
-	void hideAllViewsEntry();
-	void inboxScreenEntry();
-	void newMemoScreenEntry();
-	void settingsScreenEntry();
-	void startScreenEntry();
-
-	void contactsScreenExit();
-	void groupsScreenExit();
-	void inboxScreenExit();
-	void newMemoScreenExit();
-	void settingsScreenExit();
-	void startScreenExit();
+	void createAllTabsEntry();
+	void idleEntry();
 
 public:
 	enum EventType
 	{
 		kInvalidEvent = -2,
 		kNext = -1,
-		kGoContacts,
-		kGoGroups,
-		kGoInbox,
-		kGoNewMemo,
-		kGoSettings,
 		kReady,
 	};
 
@@ -58,14 +41,9 @@ public:
 	{
 		kInvalidState = 0,
 		kStart = 1,
-		kContactsScreen,
+		kCreateAllTabs,
 		kEnd,
-		kGroupsScreen,
-		kHideAllViews,
-		kInboxScreen,
-		kNewMemoScreen,
-		kSettingsScreen,
-		kStartScreen,
+		kIdle,
 	};
 
 protected:

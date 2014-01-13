@@ -1,21 +1,23 @@
 #pragma once
 
 #include <queue>
+#include <stack>
 
-class InboxScreenMessage;
+class InboxTabMessage;
 class GCTEvent;
 
-class InboxScreen
+class InboxTab
 :   public tMealy,
-    public Screen,
-    public tObserver<const InboxScreenMessage&>,
+    public Tab,
+    public tObserver<const InboxTabMessage&>,
     public tObserver<const GCTEvent&>
 {
 protected:
+    std::stack<int> mViewStack;
 
 public:
-	InboxScreen();
-	~InboxScreen();
+	InboxTab();
+	~InboxTab();
 
 protected:
 	void startEntry();
@@ -25,14 +27,13 @@ protected:
 	void inboxIdleEntry();
 	void inboxMessageIdleEntry();
 	void messageHistoryIdleEntry();
-	void popInboxMessageEntry();
-	void popMessageHistoryEntry();
-	void popRecordMessageEntry();
+	void popTabEntry();
 	void pushInboxMessageEntry();
 	void pushMessageHistoryEntry();
 	void pushRecordMessageEntry();
 	void recordMessageIdleEntry();
 	void showConfirmDeleteEntry();
+	void whereAreWeOnTheStackEntry();
 
 public:
 	enum EventType
@@ -41,8 +42,13 @@ public:
 		kNext = -1,
 		kDeletePressed,
 		kHistoryPressed,
+		kInbox,
+		kInboxMessage,
 		kItemSelected,
+		kMessageHistory,
 		kNo,
+		kPopHappened,
+		kRecordMessage,
 		kReplyPressed,
 		kYes,
 	};
@@ -55,14 +61,13 @@ public:
 		kInboxIdle,
 		kInboxMessageIdle,
 		kMessageHistoryIdle,
-		kPopInboxMessage,
-		kPopMessageHistory,
-		kPopRecordMessage,
+		kPopTab,
 		kPushInboxMessage,
 		kPushMessageHistory,
 		kPushRecordMessage,
 		kRecordMessageIdle,
 		kShowConfirmDelete,
+		kWhereAreWeOnTheStack,
 	};
 
 protected:
@@ -71,18 +76,18 @@ protected:
 	int  StateTransitionFunction(const int evt) const;
 	bool HasEdgeNamedNext() const;
 
-	void update(const InboxScreenMessage& msg);
+	void update(const InboxTabMessage& msg);
     void update(const GCTEvent& msg);
 };
 
-class InboxScreenMessage
+class InboxTabMessage
 {
 public:
-	InboxScreen::EventType				mEvent;
-	tSubject<const InboxScreenMessage&>*	mSource;
+	InboxTab::EventType				mEvent;
+	tSubject<const InboxTabMessage&>*	mSource;
 
 public:
-	InboxScreenMessage(InboxScreen::EventType newEvent, tSubject<const InboxScreenMessage&>* newSource = NULL)
+	InboxTabMessage(InboxTab::EventType newEvent, tSubject<const InboxTabMessage&>* newSource = NULL)
 	: mEvent(newEvent), mSource(newSource) { }
 };
 

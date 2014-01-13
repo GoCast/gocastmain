@@ -22,6 +22,8 @@ public:
         kNavButtonPressed,
         kAddContactsButtonPressed,
         kAddGroupsButtonPressed,
+
+        kPop,
     };
 
     EventType   mEvent;

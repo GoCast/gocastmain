@@ -559,17 +559,4 @@ std::vector<std::string> gMemberListEntries;
     }
 }
 
--(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
-{
-#pragma unused(alertView)
-    if (buttonIndex == 0)
-    {
-        MemoEventManager::getInstance()->notify(MemoEvent(MemoEvent::kOKYesAlertPressed));
-    }
-    else
-    {
-        MemoEventManager::getInstance()->notify(MemoEvent(MemoEvent::kNoAlertPressed));
-    }
-}
-
 @end

@@ -5,7 +5,7 @@
 @interface ViewController : UIViewController
 <UITextFieldDelegate, UITableViewDelegate,
 UITableViewDataSource, UITabBarDelegate,
-UIAlertViewDelegate, AVAudioRecorderDelegate>
+AVAudioRecorderDelegate>
 {
 }
 
@@ -141,7 +141,5 @@ UIAlertViewDelegate, AVAudioRecorderDelegate>
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath;
 
 -(void)tabBar:(UITabBar *)tabBar didSelectItem:(UITabBarItem *)item;
-
--(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex;
 
 @end

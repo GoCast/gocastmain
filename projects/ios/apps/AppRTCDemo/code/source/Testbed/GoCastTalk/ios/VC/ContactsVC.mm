@@ -23,7 +23,20 @@
 
     [self.mTable registerNib:[UINib nibWithNibName:@"HeadingSubCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"HeadingSubCell"];
 
+    UIBarButtonItem *anotherButton = [[[UIBarButtonItem alloc] initWithTitle:@"Edit" style:UIBarButtonItemStylePlain target:self action:@selector(helpButton:)] autorelease];
+    self.navigationItem.rightBarButtonItem = anotherButton;
+
     self.view.autoresizesSubviews = YES;
+}
+
+- (void)viewWillDisappear:(BOOL)animated
+{
+    [super viewWillDisappear:animated];
+
+    if (![[self.navigationController viewControllers] containsObject:self])
+    {
+        GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kPop));
+    }
 }
 
 - (void)dealloc
@@ -130,17 +143,10 @@
     }
 }
 
--(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+-(IBAction)helpButton:(UIBarButtonItem *)sender
 {
-#pragma unused(alertView)
-    if (buttonIndex == 0)
-    {
-        GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kOKYesAlertPressed));
-    }
-    else
-    {
-        GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kNoAlertPressed));
-    }
+#pragma unused(sender)
+    GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kNavButtonPressed));
 }
 
 @end

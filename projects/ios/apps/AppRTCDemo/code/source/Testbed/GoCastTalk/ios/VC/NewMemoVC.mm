@@ -26,6 +26,16 @@
     self.view.autoresizesSubviews = YES;
 }
 
+- (void)viewWillDisappear:(BOOL)animated
+{
+    [super viewWillDisappear:animated];
+
+    if (![[self.navigationController viewControllers] containsObject:self])
+    {
+        GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kPop));
+    }
+}
+
 - (void)dealloc
 {
     [super dealloc];
@@ -137,17 +147,17 @@
     }
 }
 
--(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+-(IBAction)buttonPressed:(UIButton*)sender
 {
-#pragma unused(alertView)
-    if (buttonIndex == 0)
+    if (sender == self.mAddContactsButton)
     {
-        GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kOKYesAlertPressed));
+        GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kAddContactsButtonPressed));
     }
-    else
+    else if (sender == self.mAddGroupsButton)
     {
-        GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kNoAlertPressed));
+        GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kAddGroupsButtonPressed));
     }
 }
+
 
 @end

@@ -26,6 +26,16 @@
     self.view.autoresizesSubviews = YES;
 }
 
+- (void)viewWillDisappear:(BOOL)animated
+{
+    [super viewWillDisappear:animated];
+
+    if (![[self.navigationController viewControllers] containsObject:self])
+    {
+        GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kPop));
+    }
+}
+
 - (void)dealloc
 {
     [super dealloc];
@@ -161,17 +171,11 @@
     }
 }
 
--(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+- (BOOL)textFieldShouldReturn:(UITextField *)textField
 {
-#pragma unused(alertView)
-    if (buttonIndex == 0)
-    {
-        GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kOKYesAlertPressed));
-    }
-    else
-    {
-        GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kNoAlertPressed));
-    }
+#pragma unused(textField)
+    [textField endEditing:YES];
+    return YES;
 }
 
 @end

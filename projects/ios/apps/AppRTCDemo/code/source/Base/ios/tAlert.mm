@@ -4,7 +4,7 @@
 
 #include <string>
 
-#include "../../Testbed/GoCastTalk/ios/AppDelegate.h"
+#include "AppDelegate.h"
 
 extern AppDelegate* gAppDelegateInstance;
 
@@ -12,7 +12,7 @@ void tAlert(const std::string& msg)
 {
 	UIAlertView* alert = [[UIAlertView alloc] init];
 
-    alert.delegate = gAppDelegateInstance.viewController;
+    alert.delegate = gAppDelegateInstance;
 
 	alert.title = @"Alert";
 	alert.message = [NSString stringWithUTF8String:msg.c_str()];
@@ -27,7 +27,7 @@ void tConfirm(const std::string& msg)
 {
 	UIAlertView* alert = [[UIAlertView alloc] init];
 
-    alert.delegate = gAppDelegateInstance.viewController;
+    alert.delegate = gAppDelegateInstance;
 
 	alert.title = @"Confirm";
 	alert.message = [NSString stringWithUTF8String:msg.c_str()];

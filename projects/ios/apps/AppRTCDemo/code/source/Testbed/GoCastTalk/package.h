@@ -1,10 +1,10 @@
 #pragma once
 
 #define kAmiVoiceAcceptURL "http://amivoiceap.cloudapp.net/api/accept.php"
-#define kAmiVoiceReplyURL "http://terencejgrant.com/memoappserver/amivoice-reply.php"
-#define kMemoAppServerRealURL "http://terencejgrant.com/memoappserver/"
+#define kAmiVoiceReplyURL "https://chat.gocast.it/memoappserver/amivoice-reply.php"
+#define kMemoAppServerRealURL "https://chat.gocast.it/memoappserver/"
 #ifdef ADHOC
-#define kMemoAppServerURL "http://terencejgrant.com/memoappserver/"
+#define kMemoAppServerURL "https://chat.gocast.it/memoappserver/"
 #else
 #define kMemoAppServerURL "http://127.0.0.1:8888/"
 #endif
@@ -16,13 +16,13 @@
 #include "JSONUtil.h"
 #include "URLLoader.h"
 
-#include "Screen.h"
+#include "Tab.h"
 
-#include "InboxScreen.h"
-#include "NewMemoScreen.h"
-#include "ContactsScreen.h"
-#include "GroupsScreen.h"
-#include "SettingsScreen.h"
+#include "InboxTab.h"
+#include "NewMemoTab.h"
+#include "ContactsTab.h"
+#include "GroupsTab.h"
+#include "SettingsTab.h"
 
 #include "GoCastTalkApp.h"
 

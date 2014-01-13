@@ -117,11 +117,6 @@ void PlayAudioScreen::setStatusInitialEntry()
 void PlayAudioScreen::updateTranscriptionEntry()
 {
     std::string result = "";
-    if (mGetTranscriptJSON["ja"].mType == JSONValue::kString)
-    {
-        result += "AmiVoice: ";
-        result += mGetTranscriptJSON["ja"].mString;
-    }
     if (mGetTranscriptJSON["ja2"].mType == JSONValue::kString)
     {
         result += "Nuance: ";

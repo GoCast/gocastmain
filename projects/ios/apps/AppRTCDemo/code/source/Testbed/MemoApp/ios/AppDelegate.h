@@ -7,7 +7,11 @@
 
 @class ViewController;
 
-@interface AppDelegate : UIResponder <UIApplicationDelegate>
+@interface AppDelegate : UIResponder
+<
+    UIApplicationDelegate,
+    UIAlertViewDelegate
+>
 
 @property (strong, nonatomic) UIWindow*         window;
 @property (strong, nonatomic) ViewController*   viewController;
@@ -77,5 +81,7 @@
 -(std::vector<size_t>)getSelectedFromUserListTable;
 -(std::vector<size_t>)getSelectedFromMemberListTable;
 -(void)setSelectedInMemberListTable:(const std::vector<size_t>&)newSelected;
+
+-(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex;
 
 @end

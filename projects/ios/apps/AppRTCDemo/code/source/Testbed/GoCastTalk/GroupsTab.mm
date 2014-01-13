@@ -4,39 +4,39 @@
 #include "package.h"
 
 #pragma mark Constructor / Destructor
-GroupsScreen::GroupsScreen()
+GroupsTab::GroupsTab()
 {
 	ConstructMachine();
 }
 
-GroupsScreen::~GroupsScreen()
+GroupsTab::~GroupsTab()
 {
 	DestructMachine();
 }
 
 #pragma mark Start / End / Invalid
-void GroupsScreen::startEntry()
+void GroupsTab::startEntry()
 {
     [gAppDelegateInstance setNavigationBarTitle:"Groups"];
     [gAppDelegateInstance setGroupsViewVisible:true];
 }
 
-void GroupsScreen::endEntry()
+void GroupsTab::endEntry()
 {
     [gAppDelegateInstance hideAllViews];
 }
 
-void GroupsScreen::idleEntry()
+void GroupsTab::idleEntry()
 {
 }
 
-void GroupsScreen::invalidStateEntry()
+void GroupsTab::invalidStateEntry()
 {
 	assert("Event is invalid for this state" && 0);
 }
 
 #pragma mark State wiring
-void GroupsScreen::CallEntry()
+void GroupsTab::CallEntry()
 {
 	switch(mState)
 	{
@@ -48,18 +48,18 @@ void GroupsScreen::CallEntry()
 	}
 }
 
-void GroupsScreen::CallExit()
+void GroupsTab::CallExit()
 {
 }
 
-int  GroupsScreen::StateTransitionFunction(const int evt) const
+int  GroupsTab::StateTransitionFunction(const int evt) const
 {
 	if ((mState == kStart) && (evt == kNext)) return kIdle;
 
 	return kInvalidState;
 }
 
-bool GroupsScreen::HasEdgeNamedNext() const
+bool GroupsTab::HasEdgeNamedNext() const
 {
 	switch(mState)
 	{
@@ -71,13 +71,17 @@ bool GroupsScreen::HasEdgeNamedNext() const
 }
 
 #pragma mark Messages
-void GroupsScreen::update(const GroupsScreenMessage& msg)
+void GroupsTab::update(const GroupsTabMessage& msg)
 {
 	process(msg.mEvent);
 }
 
-void GroupsScreen::update(const GCTEvent &msg)
+void GroupsTab::update(const GCTEvent &msg)
 {
 #pragma unused(msg)
+    if (mActiveTab)
+    {
+
+    }
 }
 

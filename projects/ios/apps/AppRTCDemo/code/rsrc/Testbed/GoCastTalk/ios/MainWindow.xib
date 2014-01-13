@@ -13,20 +13,27 @@
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
         <customObject id="3" customClass="AppDelegate">
             <connections>
+                <outlet property="mContactsNavBar" destination="ObQ-8o-kBL" id="ZMA-OE-0SK"/>
                 <outlet property="mContactsVC" destination="Mgh-Ot-I1K" id="9d9-8U-qVG"/>
+                <outlet property="mGroupsNavBar" destination="KeA-iV-2aA" id="3oy-SM-1CM"/>
                 <outlet property="mGroupsVC" destination="Cw4-Qx-cBd" id="XuX-49-OKF"/>
+                <outlet property="mInboxNavBar" destination="nIO-dD-zjx" id="VJf-fU-qsO"/>
                 <outlet property="mInboxVC" destination="ZYU-wO-oys" id="R8U-8a-Yen"/>
+                <outlet property="mNewMemoNavBar" destination="Zh3-rl-VP4" id="vTg-ZV-IQT"/>
                 <outlet property="mNewMemoVC" destination="VLa-JM-EXn" id="Z1t-7Y-lhb"/>
+                <outlet property="mSettingsNavBar" destination="bnE-Eg-wAZ" id="6k0-Ia-Elc"/>
                 <outlet property="mSettingsVC" destination="jTc-kh-eHo" id="B2O-63-rUD"/>
+                <outlet property="mTabBar" destination="107" id="prr-Lr-IHt"/>
                 <outlet property="tabBarController" destination="106" id="113"/>
                 <outlet property="window" destination="2" id="9"/>
             </connections>
         </customObject>
         <window opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" visibleAtLaunch="YES" resizesToFullScreen="NO" id="2">
-            <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+            <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
             <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
             <simulatedStatusBarMetrics key="simulatedStatusBarMetrics"/>
+            <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina4"/>
         </window>
         <tabBarController id="106">
             <extendedEdge key="edgesForExtendedLayout"/>
@@ -34,9 +41,9 @@
             <nil key="simulatedTopBarMetrics"/>
             <nil key="simulatedBottomBarMetrics"/>
             <simulatedOrientationMetrics key="simulatedOrientationMetrics"/>
-            <nil key="simulatedDestinationMetrics"/>
-            <tabBar key="tabBar" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="107">
-                <rect key="frame" x="0.0" y="431" width="320" height="49"/>
+            <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina4"/>
+            <tabBar key="tabBar" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" selectedItem="Dn2-6j-wxY" id="107" userLabel="mTabBar">
+                <rect key="frame" x="0.0" y="519" width="320" height="49"/>
                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
             </tabBar>
@@ -101,10 +108,11 @@
                     <viewControllers>
                         <viewController nibName="ContactsVC" id="Mmv-uP-JdY" customClass="ContactsVC">
                             <extendedEdge key="edgesForExtendedLayout"/>
+                            <toolbarItems/>
                             <navigationItem key="navigationItem" title="Contacts" id="6H9-FF-9SR"/>
                             <simulatedStatusBarMetrics key="simulatedStatusBarMetrics"/>
                             <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
-                            <nil key="simulatedBottomBarMetrics"/>
+                            <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
                             <simulatedOrientationMetrics key="simulatedOrientationMetrics"/>
                             <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina4"/>
                         </viewController>
@@ -165,7 +173,7 @@
     <resources>
         <image name="tab-contacts.png" width="30" height="30"/>
         <image name="tab-groups.png" width="30" height="30"/>
-        <image name="tab-inbox.png" width="34" height="29"/>
+        <image name="tab-inbox.png" width="30" height="30"/>
         <image name="tab-newmemo.png" width="30" height="30"/>
         <image name="tab-settings.png" width="30" height="30"/>
     </resources>

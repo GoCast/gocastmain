@@ -17,7 +17,6 @@ protected:
     JSONObject mUserListJSON;
     JSONObject mPostGroupJSON;
     JSONObject mGetProfileJSON;
-    std::string mAmiVoiceResponse;
     std::string mFilename;
     size_t      mIter;
 
@@ -39,17 +38,14 @@ protected:
 	void isProfileValidEntry();
 	void isUserListValidEntry();
 	void reUpdateLocalUserListEntry();
-	void sendAudioFileToAmiVoiceEntry();
 	void sendGetProfileIToServerEntry();
 	void sendGoInboxToVCEntry();
 	void sendPostGroupToServerEntry();
 	void sendUserListToServerEntry();
 	void serverErrorIdleEntry();
-	void setWaitForAmiVoiceEntry();
 	void setWaitForGetProfileEntry();
 	void setWaitForPostGroupEntry();
 	void setWaitForUserListEntry();
-	void showAmiVoiceFailedEntry();
 	void showEmptySelectionEntry();
 	void showPostGroupFailedEntry();
 	void showPostGroupSuccessEntry();
@@ -61,7 +57,6 @@ protected:
 	void showUserListEmptyEntry();
 	void updateLocalUserListEntry();
 	void updateUserListIEntry();
-	void wasAmiVoiceSuccessfulEntry();
 	void wasPostGroupSuccessfulEntry();
 
 public:
@@ -91,17 +86,14 @@ public:
 		kIsProfileValid,
 		kIsUserListValid,
 		kReUpdateLocalUserList,
-		kSendAudioFileToAmiVoice,
 		kSendGetProfileIToServer,
 		kSendGoInboxToVC,
 		kSendPostGroupToServer,
 		kSendUserListToServer,
 		kServerErrorIdle,
-		kSetWaitForAmiVoice,
 		kSetWaitForGetProfile,
 		kSetWaitForPostGroup,
 		kSetWaitForUserList,
-		kShowAmiVoiceFailed,
 		kShowEmptySelection,
 		kShowPostGroupFailed,
 		kShowPostGroupSuccess,
@@ -113,7 +105,6 @@ public:
 		kShowUserListEmpty,
 		kUpdateLocalUserList,
 		kUpdateUserListI,
-		kWasAmiVoiceSuccessful,
 		kWasPostGroupSuccessful,
 	};
 

@@ -22,8 +22,19 @@
     [super viewDidLoad];
 
     [self.mTable registerNib:[UINib nibWithNibName:@"InboxEntryCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"InboxEntryCell"];
+    [self.mOptionsTable registerNib:[UINib nibWithNibName:@"HeadingSubCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"HeadingSubCell"];
 
     self.view.autoresizesSubviews = YES;
+}
+
+- (void)viewWillDisappear:(BOOL)animated
+{
+    [super viewWillDisappear:animated];
+
+    if (![[self.navigationController viewControllers] containsObject:self])
+    {
+        GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kPop));
+    }
 }
 
 - (void)dealloc
@@ -38,6 +49,10 @@
     if (tableView == self.mTable)
     {
         return (NSInteger)3;
+    }
+    else if (tableView == self.mOptionsTable)
+    {
+        return (NSInteger)1;
     }
 
     return (NSInteger)1;
@@ -61,23 +76,23 @@
     {
         const char* from[] =
         {
+            "Self",
+            "Self",
             "Sato Taro",
-            "Yamada Hanako",
-            "Planning 2",
         };
 
         const char* date[] =
         {
-            "12/21 12:24",
-            "12/20 12:12",
             "12/18 11:43",
+            "12/17 10:12",
+            "12/15  8:45",
         };
 
         const char* transcription[] =
         {
-            "「知りません。日本語で何か…",
-            "「でもでもそんなの関係ねえ…",
-            "「ニューヨークで入浴…",
+            "「何でもいい…",
+            "「任せる…",
+            "「明日何時に電話していい…",
         };
 
         const bool recv[] =
@@ -91,7 +106,7 @@
         {
             false,
             false,
-            true,
+            false,
         };
 
         tableView.backgroundView = nil;
@@ -110,9 +125,43 @@
         cell.mTranscription.text = [NSString stringWithUTF8String:transcription[indexPath.row]];
         cell.mStatusIcon.image = [UIImage imageNamed:(recv[indexPath.row] ? @"icon-receive.png" : @"icon-sent.png")];
         cell.mFrom.textColor =  isGroup[indexPath.row] ?
-            [UIColor colorWithRed:0.0f green:0.47f blue:1.0f alpha:1.0f] :
-            [UIColor colorWithRed:0.0f green:0.0f  blue:0.0f alpha:1.0f];
+        [UIColor colorWithRed:0.0f green:0.47f blue:1.0f alpha:1.0f] :
+        [UIColor colorWithRed:0.0f green:0.0f  blue:0.0f alpha:1.0f];
+        
+        return cell;
+    }
+    else if (tableView == self.mOptionsTable)
+    {
+        const char* heading[] =
+        {
+            "Reply Message",
+        };
 
+        const char* subheading[] =
+        {
+            "Send recorded message",
+        };
+
+        const bool hasRightArrow[] =
+        {
+            true,
+        };
+
+        tableView.backgroundView = nil;
+
+        static NSString *simpleTableIdentifier = @"HeadingSubCell";
+
+        HeadingSubCell *cell = [tableView dequeueReusableCellWithIdentifier:simpleTableIdentifier];
+
+        if (cell == nil)
+        {
+            cell = [[[HeadingSubCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:simpleTableIdentifier] autorelease];
+        }
+
+        cell.mHeading.text = [NSString stringWithUTF8String:heading[indexPath.row]];
+        cell.mSub.text = [NSString stringWithUTF8String:subheading[indexPath.row]];
+        cell.mRightArrow.hidden = hasRightArrow[indexPath.row] ? NO : YES;
+        
         return cell;
     }
     else
@@ -158,19 +207,6 @@
 //        {
 //            GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kTableItemDeleted, (tUInt32)indexPath.row));
 //        }
-    }
-}
-
--(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
-{
-#pragma unused(alertView)
-    if (buttonIndex == 0)
-    {
-        GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kOKYesAlertPressed));
-    }
-    else
-    {
-        GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kNoAlertPressed));
     }
 }
 

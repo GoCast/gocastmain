@@ -21,9 +21,19 @@
 {
     [super viewDidLoad];
 
-    [self.mTable registerNib:[UINib nibWithNibName:@"InboxEntryCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"InboxEntryCell"];
+    [self.mTable registerNib:[UINib nibWithNibName:@"HeadingSubCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"HeadingSubCell"];
 
     self.view.autoresizesSubviews = YES;
+}
+
+- (void)viewWillDisappear:(BOOL)animated
+{
+    [super viewWillDisappear:animated];
+
+    if (![[self.navigationController viewControllers] containsObject:self])
+    {
+        GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kPop));
+    }
 }
 
 - (void)dealloc
@@ -59,60 +69,42 @@
 
     if (tableView == self.mTable)
     {
-        const char* from[] =
+        const char* heading[] =
         {
-            "Sato Taro",
-            "Yamada Hanako",
-            "Planning 2",
+            "Past Messages",
+            "Reply Message",
+            "Delete",
         };
 
-        const char* date[] =
+        const char* subheading[] =
         {
-            "12/21 12:24",
-            "12/20 12:12",
-            "12/18 11:43",
+            "Show message history",
+            "Send recorded message",
+            "Delete this message",
         };
 
-        const char* transcription[] =
-        {
-            "「知りません。日本語で何か…",
-            "「でもでもそんなの関係ねえ…",
-            "「ニューヨークで入浴…",
-        };
-
-        const bool recv[] =
+        const bool hasRightArrow[] =
         {
             true,
-            false,
-            false,
-        };
-
-        const bool isGroup[] =
-        {
-            false,
-            false,
             true,
+            false,
         };
 
         tableView.backgroundView = nil;
 
-        static NSString *simpleTableIdentifier = @"InboxEntryCell";
+        static NSString *simpleTableIdentifier = @"HeadingSubCell";
 
-        InboxEntryCell *cell = [tableView dequeueReusableCellWithIdentifier:simpleTableIdentifier];
+        HeadingSubCell *cell = [tableView dequeueReusableCellWithIdentifier:simpleTableIdentifier];
 
         if (cell == nil)
         {
-            cell = [[[InboxEntryCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:simpleTableIdentifier] autorelease];
+            cell = [[[HeadingSubCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:simpleTableIdentifier] autorelease];
         }
 
-        cell.mFrom.text = [NSString stringWithUTF8String:from[indexPath.row]];
-        cell.mDate.text = [NSString stringWithUTF8String:date[indexPath.row]];
-        cell.mTranscription.text = [NSString stringWithUTF8String:transcription[indexPath.row]];
-        cell.mStatusIcon.image = [UIImage imageNamed:(recv[indexPath.row] ? @"icon-receive.png" : @"icon-sent.png")];
-        cell.mFrom.textColor =  isGroup[indexPath.row] ?
-            [UIColor colorWithRed:0.0f green:0.47f blue:1.0f alpha:1.0f] :
-            [UIColor colorWithRed:0.0f green:0.0f  blue:0.0f alpha:1.0f];
-
+        cell.mHeading.text = [NSString stringWithUTF8String:heading[indexPath.row]];
+        cell.mSub.text = [NSString stringWithUTF8String:subheading[indexPath.row]];
+        cell.mRightArrow.hidden = hasRightArrow[indexPath.row] ? NO : YES;
+        
         return cell;
     }
     else
@@ -158,19 +150,6 @@
 //        {
 //            GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kTableItemDeleted, (tUInt32)indexPath.row));
 //        }
-    }
-}
-
--(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
-{
-#pragma unused(alertView)
-    if (buttonIndex == 0)
-    {
-        GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kOKYesAlertPressed));
-    }
-    else
-    {
-        GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kNoAlertPressed));
     }
 }
 

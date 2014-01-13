@@ -2,20 +2,20 @@
 
 #include <queue>
 
-class GroupsScreenMessage;
+class GroupsTabMessage;
 class GCTEvent;
 
-class GroupsScreen
+class GroupsTab
 :   public tMealy,
-    public Screen,
-    public tObserver<const GroupsScreenMessage&>,
+    public Tab,
+    public tObserver<const GroupsTabMessage&>,
     public tObserver<const GCTEvent&>
 {
 protected:
 
 public:
-	GroupsScreen();
-	~GroupsScreen();
+	GroupsTab();
+	~GroupsTab();
 
 protected:
 	void startEntry();
@@ -45,18 +45,18 @@ protected:
 	int  StateTransitionFunction(const int evt) const;
 	bool HasEdgeNamedNext() const;
 
-	void update(const GroupsScreenMessage& msg);
+	void update(const GroupsTabMessage& msg);
     void update(const GCTEvent& msg);
 };
 
-class GroupsScreenMessage
+class GroupsTabMessage
 {
 public:
-	GroupsScreen::EventType				mEvent;
-	tSubject<const GroupsScreenMessage&>*	mSource;
+	GroupsTab::EventType				mEvent;
+	tSubject<const GroupsTabMessage&>*	mSource;
 
 public:
-	GroupsScreenMessage(GroupsScreen::EventType newEvent, tSubject<const GroupsScreenMessage&>* newSource = NULL)
+	GroupsTabMessage(GroupsTab::EventType newEvent, tSubject<const GroupsTabMessage&>* newSource = NULL)
 	: mEvent(newEvent), mSource(newSource) { }
 };
 

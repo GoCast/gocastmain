@@ -10,6 +10,9 @@
 #import "SubVC/MessageHistoryVC.h"
 #import "SubVC/RecordMessageVC.h"
 
+#import "VC/ContactsVC.h"
+#import "VC/GroupsVC.h"
+
 #include "Base/package.h"
 
 #include "GCTEvent.h"
@@ -52,8 +55,28 @@ extern std::vector<std::string> gMemberListEntries;
     [TestFlight takeOff:@"9d7d1e2c-62c3-45d9-8506-cb0a9752ca47"];
 #endif
 
+    //TODO: This removes the "groups" tab, for now; so remove it later
+    NSMutableArray * vcs = [NSMutableArray arrayWithArray:[self.tabBarController viewControllers]];
+	[vcs removeObjectAtIndex:3];
+	[self.tabBarController setViewControllers:vcs];
+
+    if (floor(NSFoundationVersionNumber) > NSFoundationVersionNumber_iOS_6_1)
+    {
+        [self.mInboxNavBar      setBackgroundImage:[UIImage imageNamed:@"banner.png"] forBarMetrics:UIBarMetricsDefault];
+        [self.mNewMemoNavBar    setBackgroundImage:[UIImage imageNamed:@"banner.png"] forBarMetrics:UIBarMetricsDefault];
+        [self.mContactsNavBar   setBackgroundImage:[UIImage imageNamed:@"banner.png"] forBarMetrics:UIBarMetricsDefault];
+        [self.mGroupsNavBar     setBackgroundImage:[UIImage imageNamed:@"banner.png"] forBarMetrics:UIBarMetricsDefault];
+        [self.mSettingsNavBar   setBackgroundImage:[UIImage imageNamed:@"banner.png"] forBarMetrics:UIBarMetricsDefault];
+    }
+
     [self.window setRootViewController:self.tabBarController];
     [self.window makeKeyAndVisible];
+
+    mTabVC[0] = self.mInboxVC;
+    mTabVC[1] = self.mNewMemoVC;
+    mTabVC[2] = self.mContactsVC;
+    mTabVC[3] = self.mGroupsVC;
+    mTabVC[4] = self.mSettingsVC;
 
     GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kAppDelegateInit));
 
@@ -305,45 +328,90 @@ extern std::vector<std::string> gMemberListEntries;
     }
 }
 
--(void)pushChangeRegisterdName
+-(void)pushChangeRegisterdName:(int)tabID
 {
-    ChangeRegisteredNameVC* nextVC = [[[ChangeRegisteredNameVC alloc] initWithNibName:@"ChangeRegistedNameVC" bundle:nil] autorelease];
-    [self.mInboxVC pushViewController:nextVC animated:YES];
+    ChangeRegisteredNameVC* nextVC = [[[ChangeRegisteredNameVC alloc] initWithNibName:@"ChangeRegisteredNameVC" bundle:nil] autorelease];
+    [mTabVC[tabID] pushViewController:nextVC animated:YES];
 }
 
--(void)pushContactDetails
+-(void)pushContactDetails:(int)tabID
 {
     ContactDetailsVC* nextVC = [[[ContactDetailsVC alloc] initWithNibName:@"ContactDetailsVC" bundle:nil] autorelease];
-    [self.mInboxVC pushViewController:nextVC animated:YES];
+    [mTabVC[tabID] pushViewController:nextVC animated:YES];
 }
 
--(void)pushEditContacts
+-(void)pushEditContacts:(int)tabID
 {
     EditContactsVC* nextVC = [[[EditContactsVC alloc] initWithNibName:@"EditContactsVC" bundle:nil] autorelease];
-    [self.mInboxVC pushViewController:nextVC animated:YES];
+    [mTabVC[tabID] pushViewController:nextVC animated:YES];
 }
 
--(void)pushInboxMessage
+-(void)pushInboxMessage:(int)tabID
 {
     InboxMessageVC* nextVC = [[[InboxMessageVC alloc] initWithNibName:@"InboxMessageVC" bundle:nil] autorelease];
-    [self.mInboxVC pushViewController:nextVC animated:YES];
+    [mTabVC[tabID] pushViewController:nextVC animated:YES];
 }
 
--(void)pushMessageHistory
+-(void)pushMessageHistory:(int)tabID
 {
     MessageHistoryVC* nextVC = [[[MessageHistoryVC alloc] initWithNibName:@"MessageHistoryVC" bundle:nil] autorelease];
-    [self.mInboxVC pushViewController:nextVC animated:YES];
+    [mTabVC[tabID] pushViewController:nextVC animated:YES];
 }
 
--(void)pushRecordMessage
+-(void)pushRecordMessage:(int)tabID
 {
     RecordMessageVC* nextVC = [[[RecordMessageVC alloc] initWithNibName:@"RecordMessageVC" bundle:nil] autorelease];
-    [self.mInboxVC pushViewController:nextVC animated:YES];
+    [mTabVC[tabID] pushViewController:nextVC animated:YES];
 }
 
--(void)pop:(bool)animated
+-(void)pushContacts:(int)tabID
+{
+    ContactsVC* nextVC = [[[ContactsVC alloc] initWithNibName:@"ContactsVC" bundle:nil] autorelease];
+    [mTabVC[tabID] pushViewController:nextVC animated:YES];
+}
+
+-(void)pushGroups:(int)tabID
+{
+    GroupsVC* nextVC = [[[GroupsVC alloc] initWithNibName:@"ContactsVC" bundle:nil] autorelease];
+    [mTabVC[tabID] pushViewController:nextVC animated:YES];
+}
+
+-(void)popInbox:(bool)animated
 {
     [self.mInboxVC popViewControllerAnimated:((animated) ? TRUE : FALSE)];
+}
+
+-(void)popNewMemo:(bool)animated
+{
+    [self.mNewMemoVC popViewControllerAnimated:((animated) ? TRUE : FALSE)];
+}
+
+-(void)popContacts:(bool)animated
+{
+    [self.mContactsVC popViewControllerAnimated:((animated) ? TRUE : FALSE)];
+}
+
+-(void)popGroups:(bool)animated
+{
+    [self.mGroupsVC popViewControllerAnimated:((animated) ? TRUE : FALSE)];
+}
+
+-(void)popSettings:(bool)animated
+{
+    [self.mSettingsVC popViewControllerAnimated:((animated) ? TRUE : FALSE)];
+}
+
+-(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+#pragma unused(alertView)
+    if (buttonIndex == 0)
+    {
+        GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kOKYesAlertPressed));
+    }
+    else
+    {
+        GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kNoAlertPressed));
+    }
 }
 
 @end

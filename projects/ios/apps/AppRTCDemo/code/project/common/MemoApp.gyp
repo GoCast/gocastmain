@@ -186,11 +186,12 @@
 			'../../source/Base/<@(OS)',
 			'../../source/Bootstrap/<@(OS)',
 			'../../source/Io/<@(OS)',
+			'../../source/Testbed/GoCastTalk/<@(OS)',
 		 ],  # include_dirs
 
 		'xcode_settings': {
 			'TARGETED_DEVICE_FAMILY': '1',
-			'INFOPLIST_FILE': '../../rsrc/<@(OS)/portrait.plist',
+			'INFOPLIST_FILE': '../../rsrc/Testbed/MemoApp/<@(OS)/portrait.plist',
 		},	# xcode_settings
 
 		'conditions': [
