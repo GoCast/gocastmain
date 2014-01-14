@@ -30,7 +30,7 @@ function postGroup($from, $group, $filename)
 		}
 	}
 
-	nuancePost("$filename-$shortfrom");
+// 	nuancePost("$filename-$shortfrom");
 
 	if ($anyerror == false)
 	{

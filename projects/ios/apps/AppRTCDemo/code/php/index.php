@@ -10,6 +10,7 @@ include 'register.php';
 include 'versionRequired.php';
 include 'userList.php';
 include 'nuancePost.php';
+include 'postTranscription.php';
 include 'postGroup.php';
 include 'getProfile.php';
 include 'updateProfile.php';
@@ -87,6 +88,24 @@ include 'updateGroups.php';
 					if (isset($_FILES["filename"]))
 					{
 						print(json_encode(updateGroups($_POST["name"], $_FILES["filename"]["name"])));
+					}
+					else
+					{
+						print(json_encode(errorMissingParameter("filename")));
+					}
+				}
+				else
+				{
+					print(json_encode(errorMissingParameter("name")));
+				}
+			}
+			else if ($_POST["action"] === "postTranscription")
+			{
+				if (hasParam("name"))
+				{
+					if (isset($_FILES["filename"]))
+					{
+						print(json_encode(postTranscription($_POST["name"], $_FILES["filename"]["name"])));
 					}
 					else
 					{
