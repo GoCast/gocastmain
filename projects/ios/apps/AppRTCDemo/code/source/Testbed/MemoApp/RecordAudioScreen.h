@@ -13,6 +13,7 @@ class RecordAudioScreen
 {
 protected:
     std::string mResultFilename;
+    std::string mTranscription;
 
 public:
 	RecordAudioScreen();
@@ -26,6 +27,7 @@ protected:
 	void idleEntry();
 	void recordedIdleEntry();
 	void recordingIdleEntry();
+	void saveTranscriptionEntry();
 	void sendGoInboxToVCEntry();
 	void sendGoPlayToVCEntry();
 	void sendGoSendGroupToVCEntry();
@@ -49,6 +51,7 @@ public:
 		kStartRecording,
 		kStopRecording,
 		kSuccess,
+		kTranscriptionReady,
 	};
 
 	enum StateType
@@ -59,6 +62,7 @@ public:
 		kIdle,
 		kRecordedIdle,
 		kRecordingIdle,
+		kSaveTranscription,
 		kSendGoInboxToVC,
 		kSendGoPlayToVC,
 		kSendGoSendGroupToVC,

@@ -45,13 +45,19 @@ public:
 
         kTableItemSelected,
         kTableItemDeleted,
+
+        kNuanceTranscriptionReady,
     };
 
     EventType   mEvent;
+    std::string mTranscription;
     tUInt32     mItemSelected;
 
     MemoEvent(EventType evt)
     : mEvent(evt) { }
     MemoEvent(EventType evt, tUInt32 newItemSelected)
     : mEvent(evt), mItemSelected(newItemSelected) { }
+    MemoEvent(EventType evt, const std::string& newTranscription)
+    : mEvent(evt), mTranscription(newTranscription) { }
 };
+

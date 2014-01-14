@@ -1,6 +1,5 @@
 #pragma once
 
-#define kMemoAppServerRealURL "https://chat.gocast.it/memoappserver/"
 #ifdef ADHOC
 #define kMemoAppServerURL "https://chat.gocast.it/memoappserver/"
 #else

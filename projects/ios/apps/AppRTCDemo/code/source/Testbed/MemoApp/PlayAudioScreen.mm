@@ -183,7 +183,7 @@ void PlayAudioScreen::sendGetTranscriptionToServerEntry()
     char buf[512];
 
     sprintf(buf, "%sdatabase/transcriptions/%s",
-            kMemoAppServerRealURL,
+            kMemoAppServerURL,
             (mFilename + ".json").c_str());
 
     URLLoader::getInstance()->loadString(buf);

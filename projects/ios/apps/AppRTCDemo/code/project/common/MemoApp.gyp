@@ -248,16 +248,25 @@
 					'../../rsrc/Testbed/MemoApp/<@(OS)/Default.png',
 				],	# mac_bundle_resources
 
+				'mac_framework_dirs': [
+					'../../third-party/DragonMobileSDK_1.4.9',
+				],
+
 				'link_settings': {
 					'libraries': [
 						'../../third-party/TestFlightSDK2.0.2/libTestFlight.a',
 						'libz.dylib',
+						'../../third-party/DragonMobileSDK_1.4.9/SpeechKit.framework',
+						'$(SDKROOT)/System/Library/Frameworks/AudioToolbox.framework',
 						'$(SDKROOT)/System/Library/Frameworks/AVFoundation.framework',
+						'$(SDKROOT)/System/Library/Frameworks/CFNetwork.framework',
 						'$(SDKROOT)/System/Library/Frameworks/UIKit.framework',
 						'$(SDKROOT)/System/Library/Frameworks/MessageUI.framework',
 						'$(SDKROOT)/System/Library/Frameworks/Foundation.framework',
 						'$(SDKROOT)/System/Library/Frameworks/CoreGraphics.framework',
 						'$(SDKROOT)/System/Library/Frameworks/QuartzCore.framework',
+						'$(SDKROOT)/System/Library/Frameworks/Security.framework',
+						'$(SDKROOT)/System/Library/Frameworks/SystemConfiguration.framework',
 					],	# libraries
 				},	# link_settings
 			}],  # OS=="ios"

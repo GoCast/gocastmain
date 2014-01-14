@@ -13,6 +13,7 @@
 13 Send GoSendGroup to VC
 14 Set Status:  Recorded
 15 Recorded Idle
+16 Save Transcription
 #
 4 3
 3 7 startRecording
@@ -30,3 +31,5 @@
 15 7 startRecording
 15 6 save
 15 13 send
+15 16 transcriptionReady
+16 15

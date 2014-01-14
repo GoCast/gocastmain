@@ -14,12 +14,24 @@ std::vector<std::string> gMyInboxListEntries;
 std::vector<std::string> gMyGroupsListEntries;
 std::vector<std::string> gMemberListEntries;
 
+const unsigned char SpeechKitApplicationKey[] =
+{
+    0xe1, 0x4e, 0xf3, 0x80, 0x7d, 0x6a, 0xc2, 0x69, 0xbd, 0xa9,
+    0xd4, 0xc1, 0x2e, 0xdf, 0xcf, 0x0e, 0x97, 0xd3, 0x07, 0x7a,
+    0x33, 0x41, 0xd3, 0xb0, 0xf8, 0x77, 0x6f, 0x16, 0x79, 0x80,
+    0x49, 0x5a, 0xcf, 0x3c, 0xdb, 0x4c, 0xa6, 0x9d, 0xb5, 0x64,
+    0x46, 0x89, 0x25, 0x75, 0x69, 0xf4, 0x83, 0x00, 0xc8, 0x8b,
+    0x7a, 0xfb, 0xcc, 0x4d, 0xab, 0xc4, 0xc4, 0x1a, 0xda, 0x3d,
+    0x9b, 0x23, 0x98, 0x6a
+};
+
 @interface ViewController()
 {
 }
 @end
 
 @implementation ViewController
+@synthesize voiceSearch;
 
 #pragma mark Construction / Destruction
 - (void)viewDidLoad
@@ -48,6 +60,8 @@ std::vector<std::string> gMemberListEntries;
 
 - (void)dealloc
 {
+    [voiceSearch release];
+
     [super dealloc];
 }
 
@@ -115,6 +129,12 @@ std::vector<std::string> gMemberListEntries;
 #pragma mark Audio Recording
 -(void)ctorRecorder
 {
+    [SpeechKit setupWithID:@"NMDPTRIAL_hmizusawa20131113014320"
+                      host:@"sandbox.nmdp.nuancemobility.net"
+                      port:443
+                    useSSL:NO
+                  delegate:self];
+
     // Set the audio file
     NSArray *pathComponents = [NSArray arrayWithObjects:
                                NSTemporaryDirectory(),
@@ -151,6 +171,21 @@ std::vector<std::string> gMemberListEntries;
 
 -(void)startRecorder
 {
+    if (voiceSearch) [voiceSearch release];
+
+    voiceSearch = [[SKRecognizer alloc] initWithType:SKDictationRecognizerType
+                                           detection:SKNoEndOfSpeechDetection
+                                            language:@"ja_jp"
+                                            delegate:self];
+}
+
+-(void)stopRecorder
+{
+    [voiceSearch stopRecording];
+}
+
+-(void)startRecorderInternal
+{
     AVAudioSession *session = [AVAudioSession sharedInstance];
     [session setActive:YES error:nil];
 
@@ -158,14 +193,13 @@ std::vector<std::string> gMemberListEntries;
     [_mRecorder record];
 }
 
--(void)stopRecorder
+-(void)stopRecorderInternal
 {
     [_mRecorder stop];
 
     AVAudioSession *audioSession = [AVAudioSession sharedInstance];
     [audioSession setActive:NO error:nil];
 }
-
 
 #pragma mark Button Presses
 -(IBAction) signInPressed:(id)sender
@@ -557,6 +591,114 @@ std::vector<std::string> gMemberListEntries;
     {
         MemoEventManager::getInstance()->notify(MemoEvent(MemoEvent::kSettingsTabPressed));
     }
+}
+
+#pragma mark -
+#pragma mark SpeechKitDelegate methods
+
+- (void) destroyed {
+    // Debug - Uncomment this code and fill in your app ID below, and set
+    // the Main Window nib to MainWindow_Debug (in DMRecognizer-Info.plist)
+    // if you need the ability to change servers in DMRecognizer
+    //
+    //[SpeechKit setupWithID:INSERT_YOUR_APPLICATION_ID_HERE
+    //                  host:INSERT_YOUR_HOST_ADDRESS_HERE
+    //                  port:INSERT_YOUR_HOST_PORT_HERE[[portBox text] intValue]
+    //                useSSL:NO
+    //              delegate:self];
+    //
+	// Set earcons to play
+	//SKEarcon* earconStart	= [SKEarcon earconWithName:@"earcon_listening.wav"];
+	//SKEarcon* earconStop	= [SKEarcon earconWithName:@"earcon_done_listening.wav"];
+	//SKEarcon* earconCancel	= [SKEarcon earconWithName:@"earcon_cancel.wav"];
+	//
+	//[SpeechKit setEarcon:earconStart forType:SKStartRecordingEarconType];
+	//[SpeechKit setEarcon:earconStop forType:SKStopRecordingEarconType];
+	//[SpeechKit setEarcon:earconCancel forType:SKCancelRecordingEarconType];
+}
+
+#pragma mark -
+#pragma mark SKRecognizerDelegate methods
+
+- (void)recognizerDidBeginRecording:(SKRecognizer *)recognizer
+{
+#pragma unused(recognizer)
+    NSLog(@"Recording started.");
+    [self startRecorderInternal];
+}
+
+- (void)recognizerDidFinishRecording:(SKRecognizer *)recognizer
+{
+#pragma unused(recognizer)
+    NSLog(@"Recording finished.");
+    [self stopRecorderInternal];
+}
+
+- (void)recognizer:(SKRecognizer *)recognizer didFinishWithResults:(SKRecognition *)results
+{
+#pragma unused(recognizer)
+    NSString* result = [NSString stringWithUTF8String:""];
+
+    NSLog(@"Got results.");
+    NSLog(@"Session id [%@].", [SpeechKit sessionID]); // for debugging purpose: printing out the speechkit session id
+
+    size_t numOfResults = [results.results count];
+
+    if (numOfResults > 0)
+    {
+        result = [results firstResult];
+    }
+
+    NSLog(@"Result %@", result);
+
+    MemoEventManager::getInstance()->notify(MemoEvent(MemoEvent::kNuanceTranscriptionReady, [result UTF8String]));
+
+//	if (numOfResults > 1)
+//		alternativesDisplay.text = [[results.results subarrayWithRange:NSMakeRange(1, numOfResults-1)] componentsJoinedByString:@"\n"];
+
+//    if (results.suggestion) {
+//        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Suggestion"
+//                                                        message:results.suggestion
+//                                                       delegate:nil
+//                                              cancelButtonTitle:@"OK"
+//                                              otherButtonTitles:nil];
+//        [alert show];
+//        [alert release];
+//
+//    }
+
+	[voiceSearch release];
+	voiceSearch = nil;
+}
+
+- (void)recognizer:(SKRecognizer *)recognizer didFinishWithError:(NSError *)error suggestion:(NSString *)suggestion
+{
+#pragma unused(recognizer, error, suggestion)
+
+    NSLog(@"Got error.");
+    NSLog(@"Session id [%@].", [SpeechKit sessionID]); // for debugging purpose: printing out the speechkit session id
+
+//    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error"
+//                                                    message:[error localizedDescription]
+//                                                   delegate:nil
+//                                          cancelButtonTitle:@"OK"
+//                                          otherButtonTitles:nil];
+//    [alert show];
+//    [alert release];
+//
+//    if (suggestion) {
+//        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Suggestion"
+//                                                        message:suggestion
+//                                                       delegate:nil
+//                                              cancelButtonTitle:@"OK"
+//                                              otherButtonTitles:nil];
+//        [alert show];
+//        [alert release];
+//
+//    }
+
+	[voiceSearch release];
+	voiceSearch = nil;
 }
 
 @end

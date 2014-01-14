@@ -41,6 +41,7 @@ protected:
 	void sendGetProfileIToServerEntry();
 	void sendGoInboxToVCEntry();
 	void sendPostGroupToServerEntry();
+	void sendPostTranscriptionToServerEntry();
 	void sendUserListToServerEntry();
 	void serverErrorIdleEntry();
 	void setWaitForGetProfileEntry();
@@ -89,6 +90,7 @@ public:
 		kSendGetProfileIToServer,
 		kSendGoInboxToVC,
 		kSendPostGroupToServer,
+		kSendPostTranscriptionToServer,
 		kSendUserListToServer,
 		kServerErrorIdle,
 		kSetWaitForGetProfile,
