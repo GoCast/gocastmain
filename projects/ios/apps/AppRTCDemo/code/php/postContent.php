@@ -1,6 +1,6 @@
 <?php
 
-function postGroup($from, $group, $filename)
+function postContent($from, $group, $filename)
 {
 	if (!is_dir("database/audiocache/"))
 	{
