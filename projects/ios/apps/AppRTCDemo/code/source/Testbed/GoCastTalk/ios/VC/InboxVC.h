@@ -2,12 +2,15 @@
 #import <MessageUI/MessageUI.h>
 #import <AVFoundation/AVFoundation.h>
 
+class InboxScreen;
+
 @interface InboxVC : UIViewController
 <
     UITableViewDelegate,
     UITableViewDataSource
 >
 {
+    InboxScreen* mPeer;
 }
 
 //mInboxView
@@ -20,5 +23,10 @@
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section;
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath;
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath;
+
+#pragma mark -
+
+-(void) reloadTable;
+-(void) pushInboxMessage;
 
 @end

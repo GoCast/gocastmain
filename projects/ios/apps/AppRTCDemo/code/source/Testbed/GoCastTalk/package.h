@@ -16,15 +16,7 @@
 #include "JSONUtil.h"
 #include "URLLoader.h"
 
-#include "Tab.h"
-
-#include "InboxTab.h"
-#include "NewMemoTab.h"
-#include "ContactsTab.h"
-#include "GroupsTab.h"
-#include "SettingsTab.h"
-
-#include "GoCastTalkApp.h"
+#include "InboxScreen.h"
 
 #include "GCTEvent.h"
 #include "GCTEventManager.h"

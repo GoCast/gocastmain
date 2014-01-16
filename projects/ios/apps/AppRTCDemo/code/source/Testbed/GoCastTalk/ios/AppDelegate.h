@@ -14,7 +14,6 @@
     UIAlertViewDelegate
 >
 {
-    UINavigationController* mTabVC[5];
 }
 
 @property (nonatomic, retain) IBOutlet UIWindow *window;
