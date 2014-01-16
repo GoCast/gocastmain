@@ -12,8 +12,7 @@ class InboxScreen
 protected:
     InboxVC* mPeer;
 
-    JSONArray   mInbox;
-    JSONObject  mListInboxJSON;
+    JSONObject  mListMessagesJSON;
     size_t      mItemSelected;
 
 public:
@@ -38,11 +37,11 @@ protected:
 	void idleEntry();
 	void peerPushInboxMessageEntry();
 	void peerReloadTableEntry();
-	void sendListInboxToServerEntry();
-	void setWaitForListInboxEntry();
+	void sendListMessagesToServerEntry();
+	void setWaitForListMessagesEntry();
 	void showErrorLoadingInboxEntry();
-	void showRetryListInboxEntry();
-	void wasListInboxValidEntry();
+	void showRetryListMessagesEntry();
+	void wasListMessagesValidEntry();
 
 public:
 	enum EventType
@@ -65,11 +64,11 @@ public:
 		kIdle,
 		kPeerPushInboxMessage,
 		kPeerReloadTable,
-		kSendListInboxToServer,
-		kSetWaitForListInbox,
+		kSendListMessagesToServer,
+		kSetWaitForListMessages,
 		kShowErrorLoadingInbox,
-		kShowRetryListInbox,
-		kWasListInboxValid,
+		kShowRetryListMessages,
+		kWasListMessagesValid,
 	};
 
 protected:

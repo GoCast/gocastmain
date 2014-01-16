@@ -20,37 +20,46 @@ InboxScreen::~InboxScreen()
 #pragma mark public methods
 size_t  InboxScreen::getInboxSize()
 {
-    return mListInboxJSON["list"].mArray.size();
+    return mListMessagesJSON["list"].mArray.size();
 }
 
 std::string InboxScreen::getFrom(const size_t& i)
 {
 #pragma unused(i)
-    return mListInboxJSON["list"].mArray[i].mString;
+    return mListMessagesJSON["list"].mArray[i].mObject["from"].mString;
 }
 
 std::string InboxScreen::getDate(const size_t& i)
 {
 #pragma unused(i)
-    return "Date";
+    std::string date = mListMessagesJSON["list"].mArray[i].mObject["date"].mString;
+
+    std::string result = "xx/xx xx:xx";
+
+    if (date.size() == 16)
+    {
+        result = date.substr(4,2) + "/" + date.substr(6,2) + " " + date.substr(8,2) + ":" + date.substr(10,2);
+    }
+
+    return result;
 }
 
 std::string InboxScreen::getTranscription(const size_t& i)
 {
 #pragma unused(i)
-    return "Transcription";
+    return mListMessagesJSON["list"].mArray[i].mObject["transcription"].mObject["ja"].mString;
 }
 
 bool        InboxScreen::getIsReceive(const size_t& i)
 {
 #pragma unused(i)
-    return i & 0x01;
+    return mListMessagesJSON["list"].mArray[i].mObject["from"].mString != "tjgrant@tatewake.com";
 }
 
 bool        InboxScreen::getIsGroup(const size_t& i)
 {
 #pragma unused(i)
-    return i & 0x02;
+    return false;
 }
 
 void        InboxScreen::selectItem(const size_t& i)
@@ -81,11 +90,11 @@ void InboxScreen::idleEntry()
 }
 
 #pragma mark Queries
-void InboxScreen::wasListInboxValidEntry()
+void InboxScreen::wasListMessagesValidEntry()
 {
     bool result = false;
 
-    if (mListInboxJSON["status"].mString == std::string("success"))
+    if (mListMessagesJSON["status"].mString == std::string("success"))
     {
         result = true;
     }
@@ -104,11 +113,11 @@ void InboxScreen::peerPushInboxMessageEntry()
     [mPeer pushInboxMessage];
 }
 
-void InboxScreen::sendListInboxToServerEntry()
+void InboxScreen::sendListMessagesToServerEntry()
 {
     char buf[512];
 
-    sprintf(buf, "%s?action=listInbox&name=%s",
+    sprintf(buf, "%s?action=listMessages&name=%s",
             kMemoAppServerURL,
             "tjgrant@tatewake.com");
 
@@ -116,7 +125,7 @@ void InboxScreen::sendListInboxToServerEntry()
 }
 
 #pragma mark User Interface
-void InboxScreen::setWaitForListInboxEntry()
+void InboxScreen::setWaitForListMessagesEntry()
 {
     //TODO
 }
@@ -126,7 +135,7 @@ void InboxScreen::showErrorLoadingInboxEntry()
     tAlert("There was an error loading inbox from the server");
 }
 
-void InboxScreen::showRetryListInboxEntry()
+void InboxScreen::showRetryListMessagesEntry()
 {
     tConfirm("Couldn't contact server, retry refresh inbox?");
 }
@@ -141,12 +150,12 @@ void InboxScreen::CallEntry()
 		case kInvalidState: invalidStateEntry(); break;
 		case kPeerPushInboxMessage: peerPushInboxMessageEntry(); break;
 		case kPeerReloadTable: peerReloadTableEntry(); break;
-		case kSendListInboxToServer: sendListInboxToServerEntry(); break;
-		case kSetWaitForListInbox: setWaitForListInboxEntry(); break;
+		case kSendListMessagesToServer: sendListMessagesToServerEntry(); break;
+		case kSetWaitForListMessages: setWaitForListMessagesEntry(); break;
 		case kShowErrorLoadingInbox: showErrorLoadingInboxEntry(); break;
-		case kShowRetryListInbox: showRetryListInboxEntry(); break;
+		case kShowRetryListMessages: showRetryListMessagesEntry(); break;
 		case kStart: startEntry(); break;
-		case kWasListInboxValid: wasListInboxValidEntry(); break;
+		case kWasListMessagesValid: wasListMessagesValidEntry(); break;
 		default: break;
 	}
 }
@@ -158,18 +167,18 @@ void InboxScreen::CallExit()
 int  InboxScreen::StateTransitionFunction(const int evt) const
 {
 	if ((mState == kIdle) && (evt == kItemSelected)) return kPeerPushInboxMessage; else
-	if ((mState == kIdle) && (evt == kRefreshSelected)) return kSetWaitForListInbox; else
+	if ((mState == kIdle) && (evt == kRefreshSelected)) return kSetWaitForListMessages; else
 	if ((mState == kPeerPushInboxMessage) && (evt == kNext)) return kIdle; else
 	if ((mState == kPeerReloadTable) && (evt == kNext)) return kIdle; else
-	if ((mState == kSendListInboxToServer) && (evt == kFail)) return kShowRetryListInbox; else
-	if ((mState == kSendListInboxToServer) && (evt == kSuccess)) return kWasListInboxValid; else
-	if ((mState == kSetWaitForListInbox) && (evt == kNext)) return kSendListInboxToServer; else
+	if ((mState == kSendListMessagesToServer) && (evt == kFail)) return kShowRetryListMessages; else
+	if ((mState == kSendListMessagesToServer) && (evt == kSuccess)) return kWasListMessagesValid; else
+	if ((mState == kSetWaitForListMessages) && (evt == kNext)) return kSendListMessagesToServer; else
 	if ((mState == kShowErrorLoadingInbox) && (evt == kYes)) return kPeerReloadTable; else
-	if ((mState == kShowRetryListInbox) && (evt == kNo)) return kPeerReloadTable; else
-	if ((mState == kShowRetryListInbox) && (evt == kYes)) return kSetWaitForListInbox; else
-	if ((mState == kStart) && (evt == kNext)) return kSetWaitForListInbox; else
-	if ((mState == kWasListInboxValid) && (evt == kNo)) return kShowErrorLoadingInbox; else
-	if ((mState == kWasListInboxValid) && (evt == kYes)) return kPeerReloadTable;
+	if ((mState == kShowRetryListMessages) && (evt == kNo)) return kPeerReloadTable; else
+	if ((mState == kShowRetryListMessages) && (evt == kYes)) return kSetWaitForListMessages; else
+	if ((mState == kStart) && (evt == kNext)) return kSetWaitForListMessages; else
+	if ((mState == kWasListMessagesValid) && (evt == kNo)) return kShowErrorLoadingInbox; else
+	if ((mState == kWasListMessagesValid) && (evt == kYes)) return kPeerReloadTable;
 
 	return kInvalidState;
 }
@@ -180,7 +189,7 @@ bool InboxScreen::HasEdgeNamedNext() const
 	{
 		case kPeerPushInboxMessage:
 		case kPeerReloadTable:
-		case kSetWaitForListInbox:
+		case kSetWaitForListMessages:
 		case kStart:
 			return true;
 		default: break;
@@ -205,8 +214,8 @@ void InboxScreen::update(const URLLoaderEvent& msg)
         {
             switch (getState())
             {
-                case kSendListInboxToServer:
-                    mListInboxJSON = JSONUtil::extract(msg.mString);
+                case kSendListMessagesToServer:
+                    mListMessagesJSON = JSONUtil::extract(msg.mString);
                     break;
 
                 default:

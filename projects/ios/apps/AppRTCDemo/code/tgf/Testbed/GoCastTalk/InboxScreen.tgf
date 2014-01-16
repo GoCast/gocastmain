@@ -1,11 +1,11 @@
 1 start
 2 end
 3 idle
-4 Set "wait for listInbox"
-5 Send listInbox to server
-6 Was listInbox valid?
+4 Set "wait for listMessages"
+5 Send listMessages to server
+6 Was listMessages valid?
 7 Show "error loading inbox"
-8 Show "retry listInbox?"
+8 Show "retry listMessages?"
 9 Peer: reload table
 10 Peer: push InboxMessage
 #
