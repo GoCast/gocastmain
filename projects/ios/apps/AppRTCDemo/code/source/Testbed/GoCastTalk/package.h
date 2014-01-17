@@ -16,10 +16,11 @@
 #include "JSONUtil.h"
 #include "URLLoader.h"
 
-#include "InboxScreen.h"
-
 #include "GCTEvent.h"
 #include "GCTEventManager.h"
+
+#include "InboxScreen.h"
+#include "InboxMessageScreen.h"
 
 #include "ios/AppDelegate.h"
 

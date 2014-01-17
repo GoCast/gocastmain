@@ -41,9 +41,9 @@
 
 - (void)dealloc
 {
-    [super dealloc];
-
     delete mPeer;
+
+    [super dealloc];
 }
 
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
@@ -146,9 +146,10 @@
     [self.mTable reloadData];
 }
 
--(void) pushInboxMessage
+-(void) pushInboxMessage:(const JSONObject&)newObject
 {
     InboxMessageVC* nextVC = [[[InboxMessageVC alloc] initWithNibName:@"InboxMessageVC" bundle:nil] autorelease];
+    [nextVC customInit:newObject];
     [(UINavigationController*)self.parentViewController  pushViewController:nextVC animated:YES];
 }
 

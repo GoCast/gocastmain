@@ -13,6 +13,7 @@ class tFile;
 class URLConnection
 {
 public:
+    size_t      mId;
     tFile       mFile;
     std::string mURL;
     std::string mString;
@@ -20,15 +21,16 @@ public:
     PrivateDelegate*       mDelegate;
     tFileOutputStream*     mFOS;
     bool        mUseFile;
+    bool        mBadResponse;
 
 public:
-    URLConnection(const std::string& url);
-    URLConnection(const std::string& url, const tFile& newFile);
-    URLConnection(const std::string& url, const std::string& body);
-    URLConnection(const std::string& newPHP, const std::vector<std::pair<std::string, std::string> >& newParams, const tFile& newFile, bool isAmiVoice = false);
+    URLConnection(size_t newId, const std::string& url);
+    URLConnection(size_t newId, const std::string& url, const tFile& newFile);
+    URLConnection(size_t newId, const std::string& url, const std::string& body);
+    URLConnection(size_t newId, const std::string& newPHP, const std::vector<std::pair<std::string, std::string> >& newParams, const tFile& newFile, bool isAmiVoice = false);
     ~URLConnection();
 
-    void DidReceiveResponse(const void* response);
+    void DidReceiveResponse(const void* response, int responseCode);
     void DidReceiveData(const void* data, uint32_t len);
     void DidFailWithError(const std::string& error);
     void DidFinishLoading();
@@ -44,10 +46,10 @@ protected:
     URLLoader();
 
 public:
-    void loadString(const std::string& newURL);
-    void loadFile(const std::string& newURL, const tFile& newFile);
-    void postJSON(const std::string& newURL, const std::string& newBody);
-    void postFile(const std::string& newPHP, const std::vector<std::pair<std::string, std::string> >& newParams, const tFile& newFile, bool isAmiVoice = false);
+    void loadString(size_t newId, const std::string& newURL);
+    void loadFile(size_t newId, const std::string& newURL, const tFile& newFile);
+    void postJSON(size_t newId, const std::string& newURL, const std::string& newBody);
+    void postFile(size_t newId, const std::string& newPHP, const std::vector<std::pair<std::string, std::string> >& newParams, const tFile& newFile, bool isAmiVoice = false);
 
 public:
     friend class tSingleton<URLLoader>;
@@ -64,13 +66,14 @@ public:
     };
 
 public:
+    size_t      mId;
     EventType   mEvent;
     std::string mURL;
     std::string mString;
 
 public:
-    URLLoaderEvent(EventType newEvent, const std::string& newURL)
-    : mEvent(newEvent), mURL(newURL), mString("") { }
-    URLLoaderEvent(EventType newEvent, const std::string& newURL, const std::string& newString)
-    : mEvent(newEvent), mURL(newURL), mString(newString) { }
+    URLLoaderEvent(size_t newID, EventType newEvent, const std::string& newURL)
+    : mId(newID), mEvent(newEvent), mURL(newURL), mString("") { }
+    URLLoaderEvent(size_t newID, EventType newEvent, const std::string& newURL, const std::string& newString)
+    : mId(newID), mEvent(newEvent), mURL(newURL), mString(newString) { }
 };

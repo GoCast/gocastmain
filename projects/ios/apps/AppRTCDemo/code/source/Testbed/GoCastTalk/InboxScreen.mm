@@ -73,6 +73,7 @@ void        InboxScreen::selectItem(const size_t& i)
 void InboxScreen::startEntry()
 {
     URLLoader::getInstance()->attach(this);
+    GCTEventManager::getInstance()->attach(this);
 }
 
 void InboxScreen::endEntry()
@@ -110,7 +111,7 @@ void InboxScreen::peerReloadTableEntry()
 
 void InboxScreen::peerPushInboxMessageEntry()
 {
-    [mPeer pushInboxMessage];
+    [mPeer pushInboxMessage:mListMessagesJSON["list"].mArray[mItemSelected].mObject];
 }
 
 void InboxScreen::sendListMessagesToServerEntry()
@@ -121,7 +122,7 @@ void InboxScreen::sendListMessagesToServerEntry()
             kMemoAppServerURL,
             "tjgrant@tatewake.com");
 
-    URLLoader::getInstance()->loadString(buf);
+    URLLoader::getInstance()->loadString(1, buf);
 }
 
 #pragma mark User Interface
@@ -205,29 +206,50 @@ void InboxScreen::update(const InboxScreenMessage& msg)
 
 void InboxScreen::update(const URLLoaderEvent& msg)
 {
-    [gAppDelegateInstance setBlockingViewVisible:false];
-
-    switch (msg.mEvent)
+    if (msg.mId == 1)
     {
-        case URLLoaderEvent::kLoadFail: process(kFail); break;
-        case URLLoaderEvent::kLoadedString:
+        [gAppDelegateInstance setBlockingViewVisible:false];
+
+        switch (msg.mEvent)
         {
-            switch (getState())
+            case URLLoaderEvent::kLoadFail: process(kFail); break;
+            case URLLoaderEvent::kLoadedString:
             {
-                case kSendListMessagesToServer:
-                    mListMessagesJSON = JSONUtil::extract(msg.mString);
-                    break;
+                switch (getState())
+                {
+                    case kSendListMessagesToServer:
+                        mListMessagesJSON = JSONUtil::extract(msg.mString);
+                        break;
+
+                    default:
+                        break;
+                }
+                process(kSuccess);
+            }
+                break;
+
+            case URLLoaderEvent::kLoadedFile: process(kSuccess); break;
+
+            default:
+                break;
+        }
+    }
+}
+
+void InboxScreen::update(const GCTEvent& msg)
+{
+    switch(getState())
+    {
+        case kShowErrorLoadingInbox:
+        case kShowRetryListMessages:
+            switch(msg.mEvent)
+            {
+                case GCTEvent::kOKYesAlertPressed:  process(kYes); break;
+                case GCTEvent::kNoAlertPressed:     process(kNo); break;
 
                 default:
                     break;
             }
-            process(kSuccess);
-        }
-            break;
-
-        case URLLoaderEvent::kLoadedFile: process(kSuccess); break;
-
-        default:
             break;
     }
 }

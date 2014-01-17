@@ -7,7 +7,8 @@ class InboxScreenMessage;
 class InboxScreen
 :   public tMealy,
     public tObserver<const InboxScreenMessage&>,
-    public tObserver<const URLLoaderEvent&>
+    public tObserver<const URLLoaderEvent&>,
+    public tObserver<const GCTEvent&>
 {
 protected:
     InboxVC* mPeer;
@@ -79,6 +80,7 @@ protected:
 
 	void update(const InboxScreenMessage& msg);
     void update(const URLLoaderEvent& msg);
+    void update(const GCTEvent& msg);
 };
 
 class InboxScreenMessage

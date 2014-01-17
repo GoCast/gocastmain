@@ -17,6 +17,12 @@
 				'outputs': [ '../../dummy', ],
 				'action': [ '<@(_graphcode)', '<@(_inputs)',  '--force-update', '--machine', 'InboxScreen', '-h', '../../source/Testbed/GoCastTalk/InboxScreen.h', '-cpp', '../../source/Testbed/GoCastTalk/InboxScreen.mm', ],
 			},
+			{
+				'action_name': 'InboxMessageScreen.tgf',
+				'inputs': [ '../../tgf/Testbed/GoCastTalk/InboxMessageScreen.tgf', ],
+				'outputs': [ '../../dummy', ],
+				'action': [ '<@(_graphcode)', '<@(_inputs)',  '--force-update', '--machine', 'InboxMessageScreen', '-h', '../../source/Testbed/GoCastTalk/InboxMessageScreen.h', '-cpp', '../../source/Testbed/GoCastTalk/InboxMessageScreen.mm', ],
+			},
 		],
 
 		'sources': [
@@ -27,6 +33,9 @@
 
 			'../../source/Testbed/GoCastTalk/InboxScreen.mm',
 			'../../source/Testbed/GoCastTalk/InboxScreen.h',
+
+			'../../source/Testbed/GoCastTalk/InboxMessageScreen.mm',
+			'../../source/Testbed/GoCastTalk/InboxMessageScreen.h',
 
 #--
 

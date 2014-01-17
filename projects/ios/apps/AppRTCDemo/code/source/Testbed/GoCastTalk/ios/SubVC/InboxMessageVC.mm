@@ -1,10 +1,10 @@
 #include "InboxMessageVC.h"
 
 #include "Base/package.h"
+#include "Io/package.h"
 #include "Math/package.h"
 
-#include "GCTEvent.h"
-#include "GCTEventManager.h"
+#include "Testbed/GoCastTalk/package.h"
 
 #import "InboxEntryCell.h"
 #import "HeadingSubCell.h"
@@ -24,6 +24,21 @@
     [self.mTable registerNib:[UINib nibWithNibName:@"HeadingSubCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"HeadingSubCell"];
 
     self.view.autoresizesSubviews = YES;
+
+    mPeer = new InboxMessageScreen(self, mInitObject);
+
+    std::string date    = mInitObject["date"].mString;
+    std::string result  = "xx/xx xx:xx";
+
+    if (date.size() == 16)
+    {
+        result = date.substr(4,2) + "/" + date.substr(6,2) + " " + date.substr(8,2) + ":" + date.substr(10,2);
+    }
+
+    self.mReceive.image = [UIImage imageNamed:((mInitObject["from"].mString != "tjgrant@tatewake.com") ? @"icon-receive.png" : @"icon-sent.png")];
+    self.mFrom.text = [NSString stringWithUTF8String:mInitObject["from"].mString.c_str()];
+    self.mDate.text = [NSString stringWithUTF8String:result.c_str()];
+    self.mTranscription.text = [NSString stringWithUTF8String:mInitObject["transcription"].mObject["ja"].mString.c_str()];
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -38,6 +53,8 @@
 
 - (void)dealloc
 {
+    delete mPeer;
+
     [super dealloc];
 }
 
@@ -130,8 +147,17 @@
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-#pragma unused(tableView, indexPath)
-    GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kTableItemSelected, (tUInt32)indexPath.row));
+#pragma unused(tableView)
+
+    switch (indexPath.row)
+    {
+        case 0: mPeer->pastPressed(); break;
+        case 1: mPeer->replyPressed(); break;
+        case 2: mPeer->deletePressed(); break;
+
+        default:
+            break;
+    }
 }
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
@@ -153,4 +179,30 @@
     }
 }
 
+-(void)customInit:(const JSONObject&)newObject
+{
+    mInitObject = newObject;
+}
+
+-(IBAction)playPressed
+{
+    mPeer->playPressed();
+}
+
+-(void)setButtonImagePlay
+{
+    [self.mPlayButton setImage:[UIImage imageNamed:@"button-play.png"] forState:UIControlStateNormal];
+}
+
+-(void)setButtonImagePause
+{
+    [self.mPlayButton setImage:[UIImage imageNamed:@"button-pause.png"] forState:UIControlStateNormal];
+}
+
+-(void)setTimeLabel:(const std::string&)newLabel
+{
+    self.mTime.text = [NSString stringWithUTF8String:newLabel.c_str()];
+}
+
 @end
+

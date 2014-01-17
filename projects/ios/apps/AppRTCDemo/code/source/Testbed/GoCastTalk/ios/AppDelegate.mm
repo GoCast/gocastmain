@@ -57,7 +57,10 @@ extern std::vector<std::string> gMemberListEntries;
 
     //TODO: This removes the "groups" tab, for now; so remove it later
     NSMutableArray * vcs = [NSMutableArray arrayWithArray:[self.tabBarController viewControllers]];
+	[vcs removeObjectAtIndex:4];
 	[vcs removeObjectAtIndex:3];
+	[vcs removeObjectAtIndex:2];
+	[vcs removeObjectAtIndex:1];
 	[self.tabBarController setViewControllers:vcs];
 
     if (floor(NSFoundationVersionNumber) > NSFoundationVersionNumber_iOS_6_1)

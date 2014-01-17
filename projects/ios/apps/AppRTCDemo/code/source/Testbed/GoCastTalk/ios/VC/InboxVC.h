@@ -2,6 +2,10 @@
 #import <MessageUI/MessageUI.h>
 #import <AVFoundation/AVFoundation.h>
 
+#include <map>
+class JSONValue;
+typedef std::map<std::string, JSONValue> JSONObject;
+
 class InboxScreen;
 
 @interface InboxVC : UIViewController
@@ -27,6 +31,6 @@ class InboxScreen;
 #pragma mark -
 
 -(void) reloadTable;
--(void) pushInboxMessage;
+-(void) pushInboxMessage:(const JSONObject&)newObject;
 
 @end
