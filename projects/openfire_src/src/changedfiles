@@ -1,0 +1,5 @@
+./java/org/jivesoftware/admin/AuthCheckFilter.java
+./java/org/jivesoftware/openfire/container/PluginManager.java
+./java/org/jivesoftware/openfire/container/PluginServlet.java
+./plugins/userservice/src/java/org/jivesoftware/openfire/plugin/UserServicePlugin.java
+./plugins/userservice/src/java/org/jivesoftware/openfire/plugin/userService/UserServiceServlet.java
