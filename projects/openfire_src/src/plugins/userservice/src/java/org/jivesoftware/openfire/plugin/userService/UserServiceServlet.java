@@ -37,6 +37,7 @@ import org.jivesoftware.openfire.XMPPServer;
 import org.jivesoftware.openfire.plugin.UserServicePlugin;
 import org.jivesoftware.openfire.user.UserAlreadyExistsException;
 import org.jivesoftware.openfire.user.UserNotFoundException;
+import org.jivesoftware.openfire.auth.UnauthorizedException;
 import org.jivesoftware.util.Log;
 import org.xmpp.packet.JID;
 
@@ -114,9 +115,11 @@ public class UserServiceServlet extends HttpServlet {
             return;
         }
        
+/*
         Log.error("show secret: " + secret);
         Log.error("show secret plugin: " + plugin.getSecret());
         Log.error("contentType:["+contentType+"]");
+*/
         // Check this request is authorised
         if (secret == null || !secret.equals(plugin.getSecret())){
             Log.warn("An unauthorised user service request was received: " + request.getQueryString());
@@ -144,60 +147,64 @@ public class UserServiceServlet extends HttpServlet {
             username = Stringprep.nodeprep(username);
             if ("login".equals(type)) {
                 String userStr = plugin.loginUser(username, password);
-                replyMessage("ok"+" "+userStr,response,out);
+                replyMessage(replyStatus("ok")+", "+userStr,response,out);
                 //xmlProvider.sendInfo(request, response, presence);
             }
             else if ("validate".equals(type)) {
                     plugin.validateUser(username);
-                    replyMessage("ok",response,out);
+                    replyMessage(replyStatus("ok"),response,out);
                     //xmlProvider.sendInfo(request, response, presence);
             }
             else if ("add".equals(type)) {
                     plugin.createUser(username, password, name, email, groupNames);
-                    replyMessage("ok",response, out);
+                    replyMessage(replyStatus("ok"),response, out);
                     //imageProvider.sendInfo(request, response, presence);
             }
             else if (plugin.checkAuthToken(authToken)) {
                 if ("delete".equals(type)) {
                     plugin.deleteUser(username);
-                    replyMessage("ok",response,out);
+                    replyMessage(replyStatus("ok"),response,out);
                     //xmlProvider.sendInfo(request, response, presence);
                 }
                 else if ("enable".equals(type)) {
                     plugin.enableUser(username);
-                    replyMessage("ok",response,out);
+                    replyMessage(replyStatus("ok"),response,out);
                 }
                 else if ("disable".equals(type)) {
                     plugin.disableUser(username);
-                    replyMessage("ok",response,out);
+                    replyMessage(replyStatus("ok"),response,out);
                 }
                 else if ("update".equals(type)) {
                     plugin.updateUser(username, password,name,email, groupNames);
-                    replyMessage("ok",response,out);
+                    replyMessage(replyStatus("ok"),response,out);
                     //xmlProvider.sendInfo(request, response, presence);
                 }
                 else if ("add_roster".equals(type)) {
                     plugin.addRosterItem(username, item_jid, name, sub, groupNames);
-                    replyMessage("ok",response, out);
+                    replyMessage(replyStatus("ok"),response, out);
                 }
                 else if ("update_roster".equals(type)) {
                     plugin.updateRosterItem(username, item_jid, name, sub, groupNames);
-                    replyMessage("ok",response, out);
+                    replyMessage(replyStatus("ok"),response, out);
                 }
                 else if ("delete_roster".equals(type)) {
                     plugin.deleteRosterItem(username, item_jid);
-                    replyMessage("ok",response, out);
+                    replyMessage(replyStatus("ok"),response, out);
+                }
+                else if ("get_roster".equals(type)) {
+                    String roster=plugin.getRoster(username);
+                    replyMessage(replyStatus("ok")+","+roster,response, out);
                 }
                 else {
                     Log.warn("The userService servlet received an invalid request of type: " + type);
-                    replyMessage("401",response, out);
+                    replyMessage(replyStatus("401"),response, out);
                     // TODO Do something
                 }
             }
             else
             {
                 Log.warn("The userService servlet authToken invalid: " + type);
-                replyMessage("404",response, out);
+                replyMessage(replyStatus("404"),response, out);
                 // TODO Do something
             }
         }
@@ -206,6 +213,9 @@ public class UserServiceServlet extends HttpServlet {
         }
         catch (UserNotFoundException e) {
             replyError("UserNotFoundException",response, out);
+        }
+        catch (UnauthorizedException e) {
+            replyError("UnauthorizedException",response, out);
         }
         catch (IllegalArgumentException e) {
             
@@ -219,28 +229,38 @@ public class UserServiceServlet extends HttpServlet {
             replyError(e.toString(),response, out);
         }
     }
-
-    private void replyMessage(String message,HttpServletResponse response, PrintWriter out){
-        response.setContentType("text/xml");
+    private String replyStatus(String status)
+    {
         if ("application/json".equals(contentType))
         {
-           out.println("[ result:" + message + "]");
+            return "\""+status+"\"";
+        }
+        return status;
+    }
+
+    private void replyMessage(String message,HttpServletResponse response, PrintWriter out){
+        if ("application/json".equals(contentType))
+        {
+           response.setContentType("application/json");
+           out.println("{ result:" + message + " }");
         }
         else
         {
+           response.setContentType("text/xml");
            out.println("<result>" + message + "</result>");
         }
         out.flush();
     }
 
     private void replyError(String error,HttpServletResponse response, PrintWriter out){
-        response.setContentType("text/xml");        
         if ("application/json".equals(contentType))
         {
-           out.println("[ error:" + error + "]");
+           response.setContentType("application/json");
+           out.println("{ error:\"" + error + "\" }");
         }
         else
         {
+           response.setContentType("text/xml");        
            out.println("<error>" + error + "</error>");
         }
         out.flush();

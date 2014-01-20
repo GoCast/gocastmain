@@ -164,7 +164,6 @@ public class AuthCheckFilter implements Filter {
                 return;
             }
         }
-        Log.error("DOCHAIN:");
         chain.doFilter(req, res);
     }
 

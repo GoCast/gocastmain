@@ -119,27 +119,15 @@ public class UserServicePlugin implements Plugin, PropertyEventListener {
             throws UserNotFoundException, UnauthorizedException, ConnectionException, InternalUnauthenticatedException
     {
         AuthToken authToken = AuthFactory.authenticate(username, password);
-        //Log.error("loginUser:authToken:"+authToken.toString());
-/*
-        String className = userManager.getClass().getName(); 
-        //Log.error("userManager:"+className);
-        for (Class c = userManager.getClass(); c != null; c = c.getSuperclass()) {
-          for (Method method : c.getDeclaredMethods()) {
-            // if (method.getAnnotation(PostConstruct.class) != null) {
-              Log.error("  method:"+c.getName() + "." + method.getName());
-            //}
-          }
-        }
-*/
         if (authToken == null)
         {
-            return "404";
+            return "\"404\"";
         }
         User user = getUser(username);
         String genToken = RandomStringUtils.randomAlphanumeric(64);
         userManager.setAuthToken(genToken, username);
-        String outstr = "{ email:\""+user.getEmail()+"\", authToken:\""+genToken+"\", username:\""+
-          authToken.getUsername()+"\", domain:\""+authToken.getDomain()+"\" anonymous:\""+authToken.isAnonymous()+" }";
+        String outstr = "user:{ email:\""+user.getEmail()+"\", authToken:\""+genToken+"\", username:\""+
+          authToken.getUsername()+"\", domain:\""+authToken.getDomain()+"\" anonymous:\""+authToken.isAnonymous()+"\" }";
         return outstr;
     }
     /*
@@ -329,6 +317,59 @@ public class UserServicePlugin implements Plugin, PropertyEventListener {
         //r.getRosterItem(j);
         
         r.deleteRosterItem(j, true);
+    }
+
+    /**
+     * List roster items for specified user
+     * 
+     * @param username the username of the local user to add roster item to.
+     * @throws UserNotFoundException if the user does not exist in the local server.
+     * @throws UserAlreadyExistsException if roster item with the same JID already exists.
+     * @throws SharedGroupException if roster item cannot be added to a shared group.
+     */
+    public String getRoster(String username)
+            throws UserNotFoundException, UserAlreadyExistsException, SharedGroupException
+    {
+        getUser(username);
+        Roster r = rosterManager.getRoster(username);
+        Collection<RosterItem> rosterItems = r.getRosterItems();
+        StringBuilder roster = new StringBuilder("roster:[ ");
+        Boolean first = true;
+        for (RosterItem ri: rosterItems) {
+           if (!first)
+           {
+              roster.append(",");
+           }
+           String nickName = ri.getNickname();
+           if (nickName == null)
+           {
+              nickName = "";
+           }
+           List<String> groups = ri.getGroups();
+           StringBuilder groupRoster = new StringBuilder("groups:[ ");
+           Boolean firstGroup = true;
+           for (String group: groups)
+           {
+               if (!firstGroup)
+               {
+                   groupRoster.append(",");
+               }
+               groupRoster.append("\""+group+"\"");
+               firstGroup = false;
+           }
+           if (firstGroup)
+           {
+               roster.append("{ name:\""+ri.getJid()+"\", nickName:\""+nickName+"\" }" );
+           }
+           else
+           {
+               groupRoster.append(" ]");
+               roster.append("{ name:\""+ri.getJid()+"\", nickName:\""+nickName+"\", "+groupRoster.toString()+" }" );
+           }
+           first = false;
+        }
+        roster.append(" ]");
+        return roster.toString();
     }
 
     /**
