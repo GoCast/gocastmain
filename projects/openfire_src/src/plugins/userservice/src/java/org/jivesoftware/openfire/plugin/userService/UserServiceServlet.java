@@ -242,7 +242,7 @@ public class UserServiceServlet extends HttpServlet {
         if ("application/json".equals(contentType))
         {
            response.setContentType("application/json");
-           out.println("{ result:" + message + " }");
+           out.println("{ \"status\":\"success\", \"message\":" + message + " }");
         }
         else
         {
@@ -256,7 +256,7 @@ public class UserServiceServlet extends HttpServlet {
         if ("application/json".equals(contentType))
         {
            response.setContentType("application/json");
-           out.println("{ error:\"" + error + "\" }");
+           out.println("{ \"status\":\"fail\",\"message\":\"" + error + "\" }");
         }
         else
         {

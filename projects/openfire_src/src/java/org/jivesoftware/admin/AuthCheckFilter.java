@@ -111,7 +111,7 @@ public class AuthCheckFilter implements Filter {
                 url = url.substring(0, paramIndex);
             }
             if (url.equals(exclude)) {
-            	Log.error("EXCLUDE WORKED:"+exclude+":URL:"+url);
+//            	Log.error("EXCLUDE WORKED:"+exclude+":URL:"+url);
                 return true;
             }
 //            Log.error("EXCLUDE FAILED:"+exclude+":URL:"+url);
