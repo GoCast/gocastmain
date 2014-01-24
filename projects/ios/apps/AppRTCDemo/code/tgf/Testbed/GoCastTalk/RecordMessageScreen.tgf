@@ -1,0 +1,74 @@
+1 start
+2 end
+3 Did we record?
+4 Wait to record idle
+5 Start recording audio
+6 Wait to play idle
+7 Recording idle
+8 Stop recording audio
+9 Playing idle
+10 Play audio
+11 Pause audio
+12 Paused idle
+13 Stop audio
+14 Peer: pop self
+15 Stop recording before pop
+16 Stop playing before pop
+17 Wait for transcription
+18 Stop recording before send
+19 Stop playing before send
+20 Set "Wait for postAudio"
+21 Show "postAudio failed"
+22 Send postAudio to server
+23 Send postTranscript to server
+24 Was postAudio successful?
+25 Was postTranscript successful?
+26 Show "no audio to send"
+27 Resume audio
+28 Let didRecord be false
+29 Let didRecord be true
+#
+3 4 no
+4 5 recordPressed
+3 6 yes
+5 7
+7 8 recordPressed
+1 28
+8 17
+6 10 playPressed
+10 9
+9 11 pausePressed
+11 12
+9 13 finishedPlaying
+13 3
+12 27 playPressed
+15 14
+16 14
+4 14 cancelPressed
+7 15 cancelPressed
+6 14 cancelPressed
+12 16 cancelPressed
+9 16 cancelPressed
+17 29 transcriptionReady
+20 22
+22 21 fail
+22 24 success
+24 23 yes
+24 21 no
+18 20
+19 20
+23 25 success
+23 21 fail
+21 14 yes
+25 14 yes
+25 21 no
+4 26 sendPressed
+26 4 yes
+9 19 sendPressed
+12 19 sendPressed
+6 20 sendPressed
+7 18 sendPressed
+27 9
+17 17 sendPressed, cancelPressed
+28 3
+29 3

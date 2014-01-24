@@ -73,6 +73,12 @@ void InboxMessageScreen::playingIdleEntry()
 {
 }
 
+#pragma mark Peer Communication
+void InboxMessageScreen::peerPushRecordMessageEntry()
+{
+    [mPeer pushRecordMessage:mInitObject];
+}
+
 #pragma mark Queries
 void InboxMessageScreen::doesAudioExistLocallyEntry()
 {
@@ -201,6 +207,7 @@ void InboxMessageScreen::CallEntry()
 		case kInvalidState: invalidStateEntry(); break;
 		case kPauseSound: pauseSoundEntry(); break;
 		case kPausedIdle: pausedIdleEntry(); break;
+		case kPeerPushRecordMessage: peerPushRecordMessageEntry(); break;
 		case kPlaySound: playSoundEntry(); break;
 		case kPlayingIdle: playingIdleEntry(); break;
 		case kResumeSound: resumeSoundEntry(); break;
@@ -230,9 +237,10 @@ int  InboxMessageScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kIdle) && (evt == kDeleteSelected)) return kShowNotImplementedYet; else
 	if ((mState == kIdle) && (evt == kPastSelected)) return kShowNotImplementedYet; else
 	if ((mState == kIdle) && (evt == kPlayPressed)) return kSetWasPlayingToTrue; else
-	if ((mState == kIdle) && (evt == kReplySelected)) return kShowNotImplementedYet; else
+	if ((mState == kIdle) && (evt == kReplySelected)) return kPeerPushRecordMessage; else
 	if ((mState == kPauseSound) && (evt == kNext)) return kPausedIdle; else
 	if ((mState == kPausedIdle) && (evt == kPlayPressed)) return kResumeSound; else
+	if ((mState == kPeerPushRecordMessage) && (evt == kNext)) return kIdle; else
 	if ((mState == kPlaySound) && (evt == kNext)) return kPlayingIdle; else
 	if ((mState == kPlayingIdle) && (evt == kFinishedPlaying)) return kStopSound; else
 	if ((mState == kPlayingIdle) && (evt == kPlayPressed)) return kPauseSound; else
@@ -310,8 +318,8 @@ void InboxMessageScreen::update(const URLLoaderEvent& msg)
                     default:
                         break;
                 }
-                process(kSuccess);
             }
+                process(kSuccess);
                 break;
 
             case URLLoaderEvent::kLoadedFile: process(kSuccess); break;

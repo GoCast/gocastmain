@@ -1,10 +1,9 @@
 #include "RecordMessageVC.h"
 
 #include "Base/package.h"
-#include "Math/package.h"
+#include "Io/package.h"
 
-#include "GCTEvent.h"
-#include "GCTEventManager.h"
+#include "Testbed/GoCastTalk/package.h"
 
 #import "InboxEntryCell.h"
 #import "HeadingSubCell.h"
@@ -24,6 +23,8 @@
     [self.mTable registerNib:[UINib nibWithNibName:@"HeadingSubCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"HeadingSubCell"];
 
     self.view.autoresizesSubviews = YES;
+
+    mPeer = new RecordMessageScreen(self, mInitObject);
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -38,6 +39,8 @@
 
 - (void)dealloc
 {
+    delete mPeer;
+
     [super dealloc];
 }
 
@@ -116,7 +119,14 @@
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
 #pragma unused(tableView, indexPath)
-    GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kTableItemSelected, (tUInt32)indexPath.row));
+    switch (indexPath.row)
+    {
+        case 0: mPeer->donePressed(); break;
+        case 1: mPeer->cancelPressed(); break;
+
+        default:
+            break;
+    }
 }
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
@@ -138,4 +148,72 @@
     }
 }
 
+-(IBAction)pausePressed
+{
+    mPeer->pausePressed();
+}
+
+-(IBAction)recordPressed
+{
+    mPeer->recordPressed();
+}
+
+-(IBAction)playPressed
+{
+    mPeer->playPressed();
+}
+
+-(void)customInit:(const JSONObject&)newObject
+{
+    mInitObject = newObject;
+}
+
+-(void)popSelf
+{
+    [(UINavigationController*)self.parentViewController popViewControllerAnimated:TRUE];
+}
+
+-(void) setWaitToRecordUI
+{
+    [self.mPauseButton  setEnabled:NO];
+    [self.mRecordButton setEnabled:YES];
+    [self.mPlayButton   setEnabled:NO];
+}
+
+-(void) setWaitToPlayUI
+{
+    [self.mPauseButton  setEnabled:NO];
+    [self.mRecordButton setEnabled:NO];
+    [self.mPlayButton   setEnabled:YES];
+}
+
+-(void) setPlayingUI
+{
+    [self.mPauseButton  setEnabled:YES];
+    [self.mRecordButton setEnabled:NO];
+    [self.mPlayButton   setEnabled:NO];
+}
+
+-(void) setPausedUI
+{
+    [self.mPauseButton  setEnabled:NO];
+    [self.mRecordButton setEnabled:NO];
+    [self.mPlayButton   setEnabled:YES];
+}
+
+-(void) setRecordingUI
+{
+    [self.mPauseButton  setEnabled:NO];
+    [self.mRecordButton setEnabled:YES];
+    [self.mPlayButton   setEnabled:NO];
+}
+
+-(void) setWaitForTranscriptUI
+{
+    [self.mPauseButton  setEnabled:NO];
+    [self.mRecordButton setEnabled:NO];
+    [self.mPlayButton   setEnabled:NO];
+}
+
 @end
+

@@ -1,4 +1,5 @@
 #include "InboxMessageVC.h"
+#include "RecordMessageVC.h"
 
 #include "Base/package.h"
 #include "Io/package.h"
@@ -202,6 +203,13 @@
 -(void)setTimeLabel:(const std::string&)newLabel
 {
     self.mTime.text = [NSString stringWithUTF8String:newLabel.c_str()];
+}
+
+-(void) pushRecordMessage:(const JSONObject &)newObject
+{
+    RecordMessageVC* nextVC = [[[RecordMessageVC alloc] initWithNibName:@"RecordMessageVC" bundle:nil] autorelease];
+    [nextVC customInit:newObject];
+    [(UINavigationController*)self.parentViewController  pushViewController:nextVC animated:YES];
 }
 
 @end
