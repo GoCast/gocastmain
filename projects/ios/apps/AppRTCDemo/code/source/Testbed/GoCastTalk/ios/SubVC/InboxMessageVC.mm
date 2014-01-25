@@ -1,5 +1,6 @@
 #include "InboxMessageVC.h"
 #include "RecordMessageVC.h"
+#include "MessageHistoryVC.h"
 
 #include "Base/package.h"
 #include "Io/package.h"
@@ -208,6 +209,13 @@
 -(void) pushRecordMessage:(const JSONObject &)newObject
 {
     RecordMessageVC* nextVC = [[[RecordMessageVC alloc] initWithNibName:@"RecordMessageVC" bundle:nil] autorelease];
+    [nextVC customInit:newObject];
+    [(UINavigationController*)self.parentViewController  pushViewController:nextVC animated:YES];
+}
+
+-(void) pushMessageHistory:(const JSONObject &)newObject
+{
+    MessageHistoryVC* nextVC = [[[MessageHistoryVC alloc] initWithNibName:@"MessageHistoryVC" bundle:nil] autorelease];
     [nextVC customInit:newObject];
     [(UINavigationController*)self.parentViewController  pushViewController:nextVC animated:YES];
 }

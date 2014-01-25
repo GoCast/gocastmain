@@ -29,6 +29,12 @@
 				'outputs': [ '../../dummy', ],
 				'action': [ '<@(_graphcode)', '<@(_inputs)',  '--force-update', '--machine', 'RecordMessageScreen', '-h', '../../source/Testbed/GoCastTalk/RecordMessageScreen.h', '-cpp', '../../source/Testbed/GoCastTalk/RecordMessageScreen.mm', ],
 			},
+			{
+				'action_name': 'MessageHistoryScreen.tgf',
+				'inputs': [ '../../tgf/Testbed/GoCastTalk/MessageHistoryScreen.tgf', ],
+				'outputs': [ '../../dummy', ],
+				'action': [ '<@(_graphcode)', '<@(_inputs)',  '--force-update', '--machine', 'MessageHistoryScreen', '-h', '../../source/Testbed/GoCastTalk/MessageHistoryScreen.h', '-cpp', '../../source/Testbed/GoCastTalk/MessageHistoryScreen.mm', ],
+			},
 		],
 
 		'sources': [
@@ -45,6 +51,9 @@
 
 			'../../source/Testbed/GoCastTalk/RecordMessageScreen.mm',
 			'../../source/Testbed/GoCastTalk/RecordMessageScreen.h',
+
+			'../../source/Testbed/GoCastTalk/MessageHistoryScreen.mm',
+			'../../source/Testbed/GoCastTalk/MessageHistoryScreen.h',
 
 #--
 

@@ -22,6 +22,7 @@
 #include "InboxScreen.h"
 #include "InboxMessageScreen.h"
 #include "RecordMessageScreen.h"
+#include "MessageHistoryScreen.h"
 
 #include "ios/AppDelegate.h"
 

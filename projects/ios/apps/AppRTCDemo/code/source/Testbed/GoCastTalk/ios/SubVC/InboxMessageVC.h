@@ -47,5 +47,6 @@ class InboxMessageScreen;
 -(void)setTimeLabel:(const std::string&)newLabel;
 
 -(void) pushRecordMessage:(const JSONObject&)newObject;
+-(void) pushMessageHistory:(const JSONObject &)newObject;
 
 @end

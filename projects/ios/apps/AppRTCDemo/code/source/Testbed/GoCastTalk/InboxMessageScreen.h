@@ -39,6 +39,7 @@ protected:
 	void idleEntry();
 	void pauseSoundEntry();
 	void pausedIdleEntry();
+	void peerPushMessageHistoryEntry();
 	void peerPushRecordMessageEntry();
 	void playSoundEntry();
 	void playingIdleEntry();
@@ -79,6 +80,7 @@ public:
 		kIdle,
 		kPauseSound,
 		kPausedIdle,
+		kPeerPushMessageHistory,
 		kPeerPushRecordMessage,
 		kPlaySound,
 		kPlayingIdle,

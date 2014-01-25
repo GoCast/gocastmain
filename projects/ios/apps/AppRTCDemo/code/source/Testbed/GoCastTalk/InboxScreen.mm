@@ -5,6 +5,8 @@
 
 #include "InboxVC.h"
 
+JSONArray InboxScreen::mInbox;
+
 #pragma mark Constructor / Destructor
 InboxScreen::InboxScreen(InboxVC* newVC)
 : mPeer(newVC)
@@ -20,19 +22,19 @@ InboxScreen::~InboxScreen()
 #pragma mark public methods
 size_t  InboxScreen::getInboxSize()
 {
-    return mListMessagesJSON["list"].mArray.size();
+    return mInbox.size();
 }
 
 std::string InboxScreen::getFrom(const size_t& i)
 {
 #pragma unused(i)
-    return mListMessagesJSON["list"].mArray[i].mObject["from"].mString;
+    return mInbox[i].mObject["from"].mString;
 }
 
 std::string InboxScreen::getDate(const size_t& i)
 {
 #pragma unused(i)
-    std::string date = mListMessagesJSON["list"].mArray[i].mObject["date"].mString;
+    std::string date = mInbox[i].mObject["date"].mString;
 
     std::string result = "xx/xx xx:xx";
 
@@ -47,13 +49,13 @@ std::string InboxScreen::getDate(const size_t& i)
 std::string InboxScreen::getTranscription(const size_t& i)
 {
 #pragma unused(i)
-    return mListMessagesJSON["list"].mArray[i].mObject["transcription"].mObject["ja"].mString;
+    return mInbox[i].mObject["transcription"].mObject["ja"].mString;
 }
 
 bool        InboxScreen::getIsReceive(const size_t& i)
 {
 #pragma unused(i)
-    return mListMessagesJSON["list"].mArray[i].mObject["from"].mString != "tjgrant@tatewake.com";
+    return mInbox[i].mObject["from"].mString != "tjgrant@tatewake.com";
 }
 
 bool        InboxScreen::getIsGroup(const size_t& i)
@@ -98,6 +100,8 @@ void InboxScreen::wasListMessagesValidEntry()
     if (mListMessagesJSON["status"].mString == std::string("success"))
     {
         result = true;
+
+        mInbox = mListMessagesJSON["list"].mArray;
     }
 
     SetImmediateEvent(result ? kYes : kNo);
@@ -111,7 +115,7 @@ void InboxScreen::peerReloadTableEntry()
 
 void InboxScreen::peerPushInboxMessageEntry()
 {
-    [mPeer pushInboxMessage:mListMessagesJSON["list"].mArray[mItemSelected].mObject];
+    [mPeer pushInboxMessage:mInbox[mItemSelected].mObject];
 }
 
 void InboxScreen::sendListMessagesToServerEntry()

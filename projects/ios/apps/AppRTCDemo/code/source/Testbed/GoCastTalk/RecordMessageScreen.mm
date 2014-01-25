@@ -451,7 +451,6 @@ void RecordMessageScreen::update(const URLLoaderEvent& msg)
 
 void RecordMessageScreen::update(const GCTEvent& msg)
 {
-#pragma unused(msg)
     switch (getState())
     {
         case kShowNoAudioToSend:

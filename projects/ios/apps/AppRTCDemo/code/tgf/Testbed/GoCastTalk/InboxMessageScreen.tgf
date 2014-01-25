@@ -18,6 +18,7 @@
 18 Update time label
 19 Show "not implemented yet"
 20 Peer: push RecordMessage
+21 Peer: push MessageHistory
 #
 4 5 fail
 4 6 success
@@ -41,7 +42,9 @@
 16 3 no
 17 14
 18 16
-3 19 pastSelected, deleteSelected
+3 19 deleteSelected
 19 3 yes
 3 20 replySelected
 20 3
+3 21 pastSelected
+21 3

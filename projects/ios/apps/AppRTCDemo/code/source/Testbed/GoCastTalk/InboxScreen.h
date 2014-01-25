@@ -17,6 +17,9 @@ protected:
     size_t      mItemSelected;
 
 public:
+    static JSONArray mInbox;
+
+public:
 	InboxScreen(InboxVC* newVC);
 	~InboxScreen();
 

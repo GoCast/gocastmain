@@ -79,6 +79,11 @@ void InboxMessageScreen::peerPushRecordMessageEntry()
     [mPeer pushRecordMessage:mInitObject];
 }
 
+void InboxMessageScreen::peerPushMessageHistoryEntry()
+{
+    [mPeer pushMessageHistory:mInitObject];
+}
+
 #pragma mark Queries
 void InboxMessageScreen::doesAudioExistLocallyEntry()
 {
@@ -207,6 +212,7 @@ void InboxMessageScreen::CallEntry()
 		case kInvalidState: invalidStateEntry(); break;
 		case kPauseSound: pauseSoundEntry(); break;
 		case kPausedIdle: pausedIdleEntry(); break;
+		case kPeerPushMessageHistory: peerPushMessageHistoryEntry(); break;
 		case kPeerPushRecordMessage: peerPushRecordMessageEntry(); break;
 		case kPlaySound: playSoundEntry(); break;
 		case kPlayingIdle: playingIdleEntry(); break;
@@ -235,11 +241,12 @@ int  InboxMessageScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kDoesAudioExistLocally) && (evt == kNo)) return kSetWaitForDownload; else
 	if ((mState == kDoesAudioExistLocally) && (evt == kYes)) return kUpdateTimeLabel; else
 	if ((mState == kIdle) && (evt == kDeleteSelected)) return kShowNotImplementedYet; else
-	if ((mState == kIdle) && (evt == kPastSelected)) return kShowNotImplementedYet; else
+	if ((mState == kIdle) && (evt == kPastSelected)) return kPeerPushMessageHistory; else
 	if ((mState == kIdle) && (evt == kPlayPressed)) return kSetWasPlayingToTrue; else
 	if ((mState == kIdle) && (evt == kReplySelected)) return kPeerPushRecordMessage; else
 	if ((mState == kPauseSound) && (evt == kNext)) return kPausedIdle; else
 	if ((mState == kPausedIdle) && (evt == kPlayPressed)) return kResumeSound; else
+	if ((mState == kPeerPushMessageHistory) && (evt == kNext)) return kIdle; else
 	if ((mState == kPeerPushRecordMessage) && (evt == kNext)) return kIdle; else
 	if ((mState == kPlaySound) && (evt == kNext)) return kPlayingIdle; else
 	if ((mState == kPlayingIdle) && (evt == kFinishedPlaying)) return kStopSound; else

@@ -1,10 +1,10 @@
 #include "MessageHistoryVC.h"
+#include "RecordMessageVC.h"
 
 #include "Base/package.h"
-#include "Math/package.h"
+#include "Io/package.h"
 
-#include "GCTEvent.h"
-#include "GCTEventManager.h"
+#include "Testbed/GoCastTalk/package.h"
 
 #import "InboxEntryCell.h"
 #import "HeadingSubCell.h"
@@ -25,6 +25,21 @@
     [self.mOptionsTable registerNib:[UINib nibWithNibName:@"HeadingSubCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"HeadingSubCell"];
 
     self.view.autoresizesSubviews = YES;
+
+    mPeer = new MessageHistoryScreen(self, mInitObject);
+
+    std::string date    = mInitObject["date"].mString;
+    std::string result  = "xx/xx xx:xx";
+
+    if (date.size() == 16)
+    {
+        result = date.substr(4,2) + "/" + date.substr(6,2) + " " + date.substr(8,2) + ":" + date.substr(10,2);
+    }
+
+    self.mReceive.image = [UIImage imageNamed:((mInitObject["from"].mString != "tjgrant@tatewake.com") ? @"icon-receive.png" : @"icon-sent.png")];
+    self.mFrom.text = [NSString stringWithUTF8String:mInitObject["from"].mString.c_str()];
+    self.mDate.text = [NSString stringWithUTF8String:result.c_str()];
+    self.mTranscription.text = [NSString stringWithUTF8String:mInitObject["transcription"].mObject["ja"].mString.c_str()];
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -48,7 +63,7 @@
 
     if (tableView == self.mTable)
     {
-        return (NSInteger)3;
+        return (NSInteger)mPeer->getInboxSize() - 1;
     }
     else if (tableView == self.mOptionsTable)
     {
@@ -74,41 +89,6 @@
 
     if (tableView == self.mTable)
     {
-        const char* from[] =
-        {
-            "Self",
-            "Self",
-            "Sato Taro",
-        };
-
-        const char* date[] =
-        {
-            "12/18 11:43",
-            "12/17 10:12",
-            "12/15  8:45",
-        };
-
-        const char* transcription[] =
-        {
-            "「何でもいい…",
-            "「任せる…",
-            "「明日何時に電話していい…",
-        };
-
-        const bool recv[] =
-        {
-            true,
-            false,
-            false,
-        };
-
-        const bool isGroup[] =
-        {
-            false,
-            false,
-            false,
-        };
-
         tableView.backgroundView = nil;
 
         static NSString *simpleTableIdentifier = @"InboxEntryCell";
@@ -120,15 +100,16 @@
             cell = [[[InboxEntryCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:simpleTableIdentifier] autorelease];
         }
 
-        cell.mFrom.text = [NSString stringWithUTF8String:from[indexPath.row]];
-        cell.mDate.text = [NSString stringWithUTF8String:date[indexPath.row]];
-        cell.mTranscription.text = [NSString stringWithUTF8String:transcription[indexPath.row]];
-        cell.mStatusIcon.image = [UIImage imageNamed:(recv[indexPath.row] ? @"icon-receive.png" : @"icon-sent.png")];
-        cell.mFrom.textColor =  isGroup[indexPath.row] ?
+        cell.mFrom.text = [NSString stringWithUTF8String:mPeer->getFrom(indexPath.row + 1).c_str()];
+        cell.mDate.text = [NSString stringWithUTF8String:mPeer->getDate(indexPath.row + 1).c_str()];
+        cell.mTranscription.text = [NSString stringWithUTF8String:mPeer->getTranscription(indexPath.row + 1).c_str()];
+        cell.mStatusIcon.image = [UIImage imageNamed:(mPeer->getIsReceive(indexPath.row + 1) ? @"icon-receive.png" : @"icon-sent.png")];
+        cell.mFrom.textColor =  mPeer->getIsGroup(indexPath.row + 1) ?
         [UIColor colorWithRed:0.0f green:0.47f blue:1.0f alpha:1.0f] :
         [UIColor colorWithRed:0.0f green:0.0f  blue:0.0f alpha:1.0f];
         
         return cell;
+
     }
     else if (tableView == self.mOptionsTable)
     {
@@ -187,8 +168,16 @@
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-#pragma unused(tableView, indexPath)
-    GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kTableItemSelected, (tUInt32)indexPath.row));
+    if (tableView == self.mOptionsTable)
+    {
+        switch (indexPath.row)
+        {
+            case 0: mPeer->replyPressed(); break;
+
+            default:
+                break;
+        }
+    }
 }
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
@@ -208,6 +197,18 @@
 //            GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kTableItemDeleted, (tUInt32)indexPath.row));
 //        }
     }
+}
+
+-(void)customInit:(const JSONObject&)newObject
+{
+    mInitObject = newObject;
+}
+
+-(void) pushRecordMessage:(const JSONObject &)newObject
+{
+    RecordMessageVC* nextVC = [[[RecordMessageVC alloc] initWithNibName:@"RecordMessageVC" bundle:nil] autorelease];
+    [nextVC customInit:newObject];
+    [(UINavigationController*)self.parentViewController  pushViewController:nextVC animated:YES];
 }
 
 @end
