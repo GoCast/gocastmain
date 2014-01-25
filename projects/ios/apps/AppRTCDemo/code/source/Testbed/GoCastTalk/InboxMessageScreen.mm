@@ -74,6 +74,12 @@ void InboxMessageScreen::playingIdleEntry()
 }
 
 #pragma mark Peer Communication
+
+void InboxMessageScreen::peerPopSelfEntry()
+{
+    [mPeer popSelf];
+}
+
 void InboxMessageScreen::peerPushRecordMessageEntry()
 {
     [mPeer pushRecordMessage:mInitObject];
@@ -90,12 +96,38 @@ void InboxMessageScreen::doesAudioExistLocallyEntry()
     SetImmediateEvent(tFile(tFile::kDocumentsDirectory, mInitObject["audio"].mString).exists() ? kYes : kNo);
 }
 
+void InboxMessageScreen::wasDeleteMessageValidEntry()
+{
+    bool result = false;
+
+    if (mDeleteMessageJSON["status"].mString == std::string("success"))
+    {
+        result = true;
+    }
+
+    SetImmediateEvent(result ? kYes : kNo);
+}
+
+
 void InboxMessageScreen::wereWeGoingToPlayEntry()
 {
     SetImmediateEvent(mWasPlaying ? kYes : kNo);
 }
 
 #pragma mark Actions
+void InboxMessageScreen::sendDeleteMessageToServerEntry()
+{
+    char buf[512];
+
+    sprintf(buf, "%s?action=deleteMessage&name=%s&audio=%s",
+            kMemoAppServerURL,
+            "tjgrant@tatewake.com",
+            mInitObject["audio"].mString.c_str());
+
+    URLLoader::getInstance()->loadString(2, buf);
+}
+
+
 void InboxMessageScreen::sendDownloadRequestToServerEntry()
 {
     char buf[512];
@@ -185,9 +217,19 @@ void InboxMessageScreen::updateTimeLabelEntry()
     [mPeer setTimeLabel:buf];
 }
 
+void InboxMessageScreen::setWaitForDeleteMessageEntry()
+{
+    //TODO
+}
+
 void InboxMessageScreen::setWaitForDownloadEntry()
 {
     //TODO
+}
+
+void InboxMessageScreen::showErrorDeletingMessageEntry()
+{
+    tAlert("There was an error deleting a message from the server");
 }
 
 void InboxMessageScreen::showRetryDownloadEntry()
@@ -195,9 +237,10 @@ void InboxMessageScreen::showRetryDownloadEntry()
     tConfirm("Couldn't contact server, retry download?");
 }
 
-void InboxMessageScreen::showNotImplementedYetEntry()
+#pragma mark Sending messages to other machines
+void InboxMessageScreen::sendReloadInboxToVCEntry()
 {
-    tAlert("Not implemented yet");
+    GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kReloadInbox));
 }
 
 #pragma mark State wiring
@@ -212,20 +255,25 @@ void InboxMessageScreen::CallEntry()
 		case kInvalidState: invalidStateEntry(); break;
 		case kPauseSound: pauseSoundEntry(); break;
 		case kPausedIdle: pausedIdleEntry(); break;
+		case kPeerPopSelf: peerPopSelfEntry(); break;
 		case kPeerPushMessageHistory: peerPushMessageHistoryEntry(); break;
 		case kPeerPushRecordMessage: peerPushRecordMessageEntry(); break;
 		case kPlaySound: playSoundEntry(); break;
 		case kPlayingIdle: playingIdleEntry(); break;
 		case kResumeSound: resumeSoundEntry(); break;
+		case kSendDeleteMessageToServer: sendDeleteMessageToServerEntry(); break;
 		case kSendDownloadRequestToServer: sendDownloadRequestToServerEntry(); break;
+		case kSendReloadInboxToVC: sendReloadInboxToVCEntry(); break;
+		case kSetWaitForDeleteMessage: setWaitForDeleteMessageEntry(); break;
 		case kSetWaitForDownload: setWaitForDownloadEntry(); break;
 		case kSetWasPlayingToFalse: setWasPlayingToFalseEntry(); break;
 		case kSetWasPlayingToTrue: setWasPlayingToTrueEntry(); break;
-		case kShowNotImplementedYet: showNotImplementedYetEntry(); break;
+		case kShowErrorDeletingMessage: showErrorDeletingMessageEntry(); break;
 		case kShowRetryDownload: showRetryDownloadEntry(); break;
 		case kStart: startEntry(); break;
 		case kStopSound: stopSoundEntry(); break;
 		case kUpdateTimeLabel: updateTimeLabelEntry(); break;
+		case kWasDeleteMessageValid: wasDeleteMessageValidEntry(); break;
 		case kWereWeGoingToPlay: wereWeGoingToPlayEntry(); break;
 		default: break;
 	}
@@ -240,7 +288,7 @@ int  InboxMessageScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kCopyDownloadToLocalFiles) && (evt == kNext)) return kUpdateTimeLabel; else
 	if ((mState == kDoesAudioExistLocally) && (evt == kNo)) return kSetWaitForDownload; else
 	if ((mState == kDoesAudioExistLocally) && (evt == kYes)) return kUpdateTimeLabel; else
-	if ((mState == kIdle) && (evt == kDeleteSelected)) return kShowNotImplementedYet; else
+	if ((mState == kIdle) && (evt == kDeleteSelected)) return kSetWaitForDeleteMessage; else
 	if ((mState == kIdle) && (evt == kPastSelected)) return kPeerPushMessageHistory; else
 	if ((mState == kIdle) && (evt == kPlayPressed)) return kSetWasPlayingToTrue; else
 	if ((mState == kIdle) && (evt == kReplySelected)) return kPeerPushRecordMessage; else
@@ -252,17 +300,23 @@ int  InboxMessageScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kPlayingIdle) && (evt == kFinishedPlaying)) return kStopSound; else
 	if ((mState == kPlayingIdle) && (evt == kPlayPressed)) return kPauseSound; else
 	if ((mState == kResumeSound) && (evt == kNext)) return kPlayingIdle; else
+	if ((mState == kSendDeleteMessageToServer) && (evt == kFail)) return kShowErrorDeletingMessage; else
+	if ((mState == kSendDeleteMessageToServer) && (evt == kSuccess)) return kWasDeleteMessageValid; else
 	if ((mState == kSendDownloadRequestToServer) && (evt == kFail)) return kShowRetryDownload; else
 	if ((mState == kSendDownloadRequestToServer) && (evt == kSuccess)) return kCopyDownloadToLocalFiles; else
+	if ((mState == kSendReloadInboxToVC) && (evt == kNext)) return kPeerPopSelf; else
+	if ((mState == kSetWaitForDeleteMessage) && (evt == kNext)) return kSendDeleteMessageToServer; else
 	if ((mState == kSetWaitForDownload) && (evt == kNext)) return kSendDownloadRequestToServer; else
 	if ((mState == kSetWasPlayingToFalse) && (evt == kNext)) return kDoesAudioExistLocally; else
 	if ((mState == kSetWasPlayingToTrue) && (evt == kNext)) return kDoesAudioExistLocally; else
-	if ((mState == kShowNotImplementedYet) && (evt == kYes)) return kIdle; else
+	if ((mState == kShowErrorDeletingMessage) && (evt == kYes)) return kIdle; else
 	if ((mState == kShowRetryDownload) && (evt == kNo)) return kIdle; else
 	if ((mState == kShowRetryDownload) && (evt == kYes)) return kSetWaitForDownload; else
 	if ((mState == kStart) && (evt == kNext)) return kSetWasPlayingToFalse; else
 	if ((mState == kStopSound) && (evt == kNext)) return kSetWasPlayingToFalse; else
 	if ((mState == kUpdateTimeLabel) && (evt == kNext)) return kWereWeGoingToPlay; else
+	if ((mState == kWasDeleteMessageValid) && (evt == kNo)) return kShowErrorDeletingMessage; else
+	if ((mState == kWasDeleteMessageValid) && (evt == kYes)) return kSendReloadInboxToVC; else
 	if ((mState == kWereWeGoingToPlay) && (evt == kNo)) return kIdle; else
 	if ((mState == kWereWeGoingToPlay) && (evt == kYes)) return kPlaySound;
 
@@ -278,10 +332,13 @@ bool InboxMessageScreen::HasEdgeNamedNext() const
 		case kIdle:
 		case kInvalidState:
 		case kPausedIdle:
+		case kPeerPopSelf:
 		case kPlayingIdle:
+		case kSendDeleteMessageToServer:
 		case kSendDownloadRequestToServer:
-		case kShowNotImplementedYet:
+		case kShowErrorDeletingMessage:
 		case kShowRetryDownload:
+		case kWasDeleteMessageValid:
 		case kWereWeGoingToPlay:
 			return false;
 		default: break;
@@ -319,7 +376,8 @@ void InboxMessageScreen::update(const URLLoaderEvent& msg)
             {
                 switch (getState())
                 {
-                    case kSendDownloadRequestToServer:
+                    case kSendDeleteMessageToServer:
+                        mDeleteMessageJSON = JSONUtil::extract(msg.mString);
                         break;
 
                     default:
@@ -341,7 +399,7 @@ void InboxMessageScreen::update(const GCTEvent& msg)
 {
     switch (getState())
     {
-        case kShowNotImplementedYet:
+        case kShowErrorDeletingMessage:
         case kShowRetryDownload:
             switch(msg.mEvent)
             {

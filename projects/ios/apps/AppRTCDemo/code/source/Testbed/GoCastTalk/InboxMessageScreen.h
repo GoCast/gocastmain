@@ -17,6 +17,7 @@ class InboxMessageScreen
 protected:
     InboxMessageVC* mPeer;
     JSONObject      mInitObject;
+    JSONObject      mDeleteMessageJSON;
     tSound*         mSound;
     bool            mWasPlaying;
 
@@ -39,19 +40,24 @@ protected:
 	void idleEntry();
 	void pauseSoundEntry();
 	void pausedIdleEntry();
+	void peerPopSelfEntry();
 	void peerPushMessageHistoryEntry();
 	void peerPushRecordMessageEntry();
 	void playSoundEntry();
 	void playingIdleEntry();
 	void resumeSoundEntry();
+	void sendDeleteMessageToServerEntry();
 	void sendDownloadRequestToServerEntry();
+	void sendReloadInboxToVCEntry();
+	void setWaitForDeleteMessageEntry();
 	void setWaitForDownloadEntry();
 	void setWasPlayingToFalseEntry();
 	void setWasPlayingToTrueEntry();
-	void showNotImplementedYetEntry();
+	void showErrorDeletingMessageEntry();
 	void showRetryDownloadEntry();
 	void stopSoundEntry();
 	void updateTimeLabelEntry();
+	void wasDeleteMessageValidEntry();
 	void wereWeGoingToPlayEntry();
 
 public:
@@ -80,19 +86,24 @@ public:
 		kIdle,
 		kPauseSound,
 		kPausedIdle,
+		kPeerPopSelf,
 		kPeerPushMessageHistory,
 		kPeerPushRecordMessage,
 		kPlaySound,
 		kPlayingIdle,
 		kResumeSound,
+		kSendDeleteMessageToServer,
 		kSendDownloadRequestToServer,
+		kSendReloadInboxToVC,
+		kSetWaitForDeleteMessage,
 		kSetWaitForDownload,
 		kSetWasPlayingToFalse,
 		kSetWasPlayingToTrue,
-		kShowNotImplementedYet,
+		kShowErrorDeletingMessage,
 		kShowRetryDownload,
 		kStopSound,
 		kUpdateTimeLabel,
+		kWasDeleteMessageValid,
 		kWereWeGoingToPlay,
 	};
 

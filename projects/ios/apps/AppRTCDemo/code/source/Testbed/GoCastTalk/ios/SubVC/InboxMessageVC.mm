@@ -206,6 +206,11 @@
     self.mTime.text = [NSString stringWithUTF8String:newLabel.c_str()];
 }
 
+-(void) popSelf
+{
+    [(UINavigationController*)self.parentViewController popViewControllerAnimated:TRUE];
+}
+
 -(void) pushRecordMessage:(const JSONObject &)newObject
 {
     RecordMessageVC* nextVC = [[[RecordMessageVC alloc] initWithNibName:@"RecordMessageVC" bundle:nil] autorelease];

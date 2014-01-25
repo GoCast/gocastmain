@@ -311,6 +311,16 @@ void InboxScreen::update(const GCTEvent& msg)
 {
     switch(getState())
     {
+        case kIdle:
+            switch (msg.mEvent)
+            {
+                case GCTEvent::kReloadInbox:        refreshPressed(); break;
+                        
+                default:
+                    break;
+            }
+            break;
+
         case kShowErrorDeletingMessage:
         case kShowErrorLoadingInbox:
         case kShowRetryListMessages:

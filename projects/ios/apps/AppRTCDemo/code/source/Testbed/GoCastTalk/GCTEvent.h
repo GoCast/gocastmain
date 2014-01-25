@@ -26,6 +26,8 @@ public:
         kPop,
 
         kTranscriptFinished,
+
+        kReloadInbox,
     };
 
     EventType   mEvent;
