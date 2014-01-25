@@ -11,6 +11,7 @@
                 <outlet property="mPlayButton" destination="XC1-hX-Hev" id="1Gr-sM-96W"/>
                 <outlet property="mRecordButton" destination="ye6-Tb-ad9" id="NCM-m8-7iA"/>
                 <outlet property="mTable" destination="Ydj-Rn-oZK" id="KsU-zf-prK"/>
+                <outlet property="mToLabel" destination="Bf7-YR-rzF" id="iqc-Ry-Fm4"/>
                 <outlet property="view" destination="UWH-Nu-2CC" id="CGV-5u-hR4"/>
             </connections>
         </placeholder>
@@ -19,7 +20,7 @@
             <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
-                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="to: Sato Taro" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="Bf7-YR-rzF">
+                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="to: Sato Taro" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="Bf7-YR-rzF" userLabel="mToLabel">
                     <rect key="frame" x="58" y="16" width="192" height="27"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <fontDescription key="fontDescription" name="Verdana" family="Verdana" pointSize="22"/>

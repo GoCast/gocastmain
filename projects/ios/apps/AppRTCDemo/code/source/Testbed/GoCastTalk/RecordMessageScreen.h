@@ -24,6 +24,8 @@ public:
     RecordMessageScreen(RecordMessageVC* newVC, const JSONObject& initObject);
 	~RecordMessageScreen();
 
+    std::string getTo();
+
     void donePressed();
     void cancelPressed();
 

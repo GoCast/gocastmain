@@ -25,6 +25,8 @@ class RecordMessageScreen;
 @property (nonatomic, strong) IBOutlet UIButton*        mRecordButton;
 @property (nonatomic, strong) IBOutlet UIButton*        mPlayButton;
 
+@property (nonatomic, strong) IBOutlet UILabel*         mToLabel;
+
 #pragma mark Construction / Destruction
 - (void)viewDidLoad;
 - (void)viewWillDisappear:(BOOL)animated;

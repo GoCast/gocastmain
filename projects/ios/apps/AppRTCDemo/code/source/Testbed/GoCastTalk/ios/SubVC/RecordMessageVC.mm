@@ -25,6 +25,8 @@
     self.view.autoresizesSubviews = YES;
 
     mPeer = new RecordMessageScreen(self, mInitObject);
+
+    self.mToLabel.text = [NSString stringWithUTF8String:("to: " + mPeer->getTo()).c_str()];
 }
 
 - (void)viewWillDisappear:(BOOL)animated

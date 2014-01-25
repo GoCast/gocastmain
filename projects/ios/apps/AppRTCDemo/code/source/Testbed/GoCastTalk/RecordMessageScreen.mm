@@ -20,6 +20,11 @@ RecordMessageScreen::~RecordMessageScreen()
 }
 
 #pragma mark Public methods
+std::string RecordMessageScreen::getTo()
+{
+    return mInitObject["from"].mString;
+}
+
 void RecordMessageScreen::donePressed()
 {
     update(kSendPressed);
