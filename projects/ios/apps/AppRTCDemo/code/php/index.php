@@ -4,6 +4,7 @@
 include 'utils.php';
 
 include 'listMessages.php';
+include 'deleteMessage.php';
 include 'postContent.php';
 include 'postTranscription.php';
 
@@ -65,6 +66,17 @@ if(hasParam("action"))
 		{
 			case "listMessages":
 				print(json_encode(listMessages($_GET["name"])));
+				break;
+
+			case "deleteMessage":
+				if (hasParam("audio"))
+				{
+					print(json_encode(deleteMessage($_GET["name"], $_GET["audio"])));
+				}
+				else
+				{
+					print(json_encode(errorMissingParameter("audio")));
+				}
 				break;
 
 			default:
