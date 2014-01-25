@@ -1,24 +1,26 @@
 <?php
 
-function postTranscription($from, $filename)
+function postTranscription($name, $audio)
 {
-	$shortfrom = substr($from, 0, strpos($from, "@"));
-
-	if (copy($_FILES['filename']['tmp_name'], "database/transcriptions/$filename-$shortfrom.json"))
+	if (!is_dir("database/global/text"))
 	{
-		chmod("database/transcriptions/$filename-$shortfrom.json", 0777);
+		mkdir("database/global/text", 0777, true);
+	}
+
+	if (copy($_FILES['filename']['tmp_name'], "database/global/text/$audio".".json"))
+	{
+		chmod("database/global/text/$audio".".json", 0777);
 
 		$result = array("status" => "success",
-						"message" => "Post transcription successfully");
+						"message" => "Upload and move successful");
 	}
 	else
 	{
 		$result = array("status" => "fail",
-						"message" => "Could not copy upload to transcription");
+						"message" => "Upload success but move failed");
 	}
 
 	return $result;
-
 }
 
 ?>

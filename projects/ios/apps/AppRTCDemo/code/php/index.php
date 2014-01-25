@@ -5,49 +5,54 @@ include 'utils.php';
 
 include 'listMessages.php';
 include 'deleteMessage.php';
-include 'postContent.php';
+include 'postAudio.php';
+include 'postMessage.php';
 include 'postTranscription.php';
 
 if(hasParam("action"))
 {
 	if ($_SERVER['REQUEST_METHOD'] === "POST")
 	{
-		if ($_POST["action"] === "postContent")
+		if ($_POST["action"] === "postAudio")
 		{
-			if (hasParam("from"))
+			if (hasParam("name"))
 			{
-				if (hasParam("group") && is_array($_POST["group"]))
+				if (hasParam("audio"))
 				{
-					if (isset($_FILES["filename"]))
-					{
-						print(json_encode(postContent($_POST["from"], $_POST["group"], $_FILES["filename"]["name"])));
-					}
-					else
-					{
-						print(json_encode(errorMissingParameter("filename")));
-					}
+					print(json_encode(postAudio($_POST["name"], $_POST["audio"])));
 				}
 				else
 				{
-					print(json_encode(errorMissingParameter("group")));
+					print(json_encode(errorMissingParameter("audio")));
 				}
 			}
 			else
 			{
-				print(json_encode(errorMissingParameter("from")));
+				print(json_encode(errorMissingParameter("name")));
+			}
+		}
+		else if ($_POST["action"] === "postMessage")
+		{
+			if (hasParam("name"))
+			{
+				print(json_encode(postMessage($_POST["name"])));
+			}
+			else
+			{
+				print(json_encode(errorMissingParameter("name")));
 			}
 		}
 		else if ($_POST["action"] === "postTranscription")
 		{
 			if (hasParam("name"))
 			{
-				if (isset($_FILES["filename"]))
+				if (hasParam("audio"))
 				{
-					print(json_encode(postTranscription($_POST["name"], $_FILES["filename"]["name"])));
+					print(json_encode(postTranscription($_POST["name"], $_POST["audio"])));
 				}
 				else
 				{
-					print(json_encode(errorMissingParameter("filename")));
+					print(json_encode(errorMissingParameter("audio")));
 				}
 			}
 			else
