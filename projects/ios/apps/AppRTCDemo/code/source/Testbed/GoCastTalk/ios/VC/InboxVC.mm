@@ -120,6 +120,11 @@
     }
 }
 
++ (Class)layerClass
+{
+    return [CAGradientLayer class];
+}
+
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
 #pragma unused(tableView, indexPath)
@@ -129,7 +134,7 @@
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
 {
 #pragma unused(tableView, indexPath)
-    return NO;
+    return YES;
 }
 
 // Override to support editing the table view.
@@ -138,7 +143,8 @@
 #pragma unused(tableView, indexPath)
     if (editingStyle == UITableViewCellEditingStyleDelete)
     {
-//        if (tableView == self.mTable)
+        mPeer->deletePressed((size_t)indexPath.row);
+        //        if (tableView == self.mTable)
 //        {
 //            GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kTableItemDeleted, (tUInt32)indexPath.row));
 //        }

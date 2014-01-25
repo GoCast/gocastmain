@@ -14,7 +14,9 @@ protected:
     InboxVC* mPeer;
 
     JSONObject  mListMessagesJSON;
+    JSONObject  mDeleteMessageJSON;
     size_t      mItemSelected;
+    size_t      mDeleteSelected;
 
 public:
     static JSONArray mInbox;
@@ -34,6 +36,7 @@ public:
     void        selectItem(const size_t& i);
 
     void        refreshPressed();
+    void        deletePressed(const size_t& i);
 
 protected:
 	void startEntry();
@@ -43,10 +46,14 @@ protected:
 	void idleEntry();
 	void peerPushInboxMessageEntry();
 	void peerReloadTableEntry();
+	void sendDeleteMessageToServerEntry();
 	void sendListMessagesToServerEntry();
+	void setWaitForDeleteMessageEntry();
 	void setWaitForListMessagesEntry();
+	void showErrorDeletingMessageEntry();
 	void showErrorLoadingInboxEntry();
 	void showRetryListMessagesEntry();
+	void wasDeleteMessageValidEntry();
 	void wasListMessagesValidEntry();
 
 public:
@@ -54,6 +61,7 @@ public:
 	{
 		kInvalidEvent = -2,
 		kNext = -1,
+		kDeleteSelected,
 		kFail,
 		kItemSelected,
 		kNo,
@@ -70,10 +78,14 @@ public:
 		kIdle,
 		kPeerPushInboxMessage,
 		kPeerReloadTable,
+		kSendDeleteMessageToServer,
 		kSendListMessagesToServer,
+		kSetWaitForDeleteMessage,
 		kSetWaitForListMessages,
+		kShowErrorDeletingMessage,
 		kShowErrorLoadingInbox,
 		kShowRetryListMessages,
+		kWasDeleteMessageValid,
 		kWasListMessagesValid,
 	};
 

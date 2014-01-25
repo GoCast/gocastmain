@@ -79,6 +79,15 @@ void       InboxScreen::refreshPressed()
     }
 }
 
+void       InboxScreen::deletePressed(const size_t& i)
+{
+    if (getState() == kIdle)
+    {
+        mDeleteSelected = i;
+        process(kDeleteSelected);
+    }
+}
+
 #pragma mark Start / End / Invalid
 void InboxScreen::startEntry()
 {
@@ -101,6 +110,18 @@ void InboxScreen::idleEntry()
 }
 
 #pragma mark Queries
+void InboxScreen::wasDeleteMessageValidEntry()
+{
+    bool result = false;
+
+    if (mDeleteMessageJSON["status"].mString == std::string("success"))
+    {
+        result = true;
+    }
+
+    SetImmediateEvent(result ? kYes : kNo);
+}
+
 void InboxScreen::wasListMessagesValidEntry()
 {
     bool result = false;
@@ -137,10 +158,32 @@ void InboxScreen::sendListMessagesToServerEntry()
     URLLoader::getInstance()->loadString(1, buf);
 }
 
+void InboxScreen::sendDeleteMessageToServerEntry()
+{
+    char buf[512];
+
+    sprintf(buf, "%s?action=deleteMessage&name=%s&audio=%s",
+            kMemoAppServerURL,
+            "tjgrant@tatewake.com",
+            mInbox[mDeleteSelected].mObject["audio"].mString.c_str());
+
+    URLLoader::getInstance()->loadString(1, buf);
+}
+
 #pragma mark User Interface
+void InboxScreen::setWaitForDeleteMessageEntry()
+{
+    //TODO
+}
+
 void InboxScreen::setWaitForListMessagesEntry()
 {
     //TODO
+}
+
+void InboxScreen::showErrorDeletingMessageEntry()
+{
+    tAlert("There was an error deleting a message from the server");
 }
 
 void InboxScreen::showErrorLoadingInboxEntry()
@@ -163,11 +206,15 @@ void InboxScreen::CallEntry()
 		case kInvalidState: invalidStateEntry(); break;
 		case kPeerPushInboxMessage: peerPushInboxMessageEntry(); break;
 		case kPeerReloadTable: peerReloadTableEntry(); break;
+		case kSendDeleteMessageToServer: sendDeleteMessageToServerEntry(); break;
 		case kSendListMessagesToServer: sendListMessagesToServerEntry(); break;
+		case kSetWaitForDeleteMessage: setWaitForDeleteMessageEntry(); break;
 		case kSetWaitForListMessages: setWaitForListMessagesEntry(); break;
+		case kShowErrorDeletingMessage: showErrorDeletingMessageEntry(); break;
 		case kShowErrorLoadingInbox: showErrorLoadingInboxEntry(); break;
 		case kShowRetryListMessages: showRetryListMessagesEntry(); break;
 		case kStart: startEntry(); break;
+		case kWasDeleteMessageValid: wasDeleteMessageValidEntry(); break;
 		case kWasListMessagesValid: wasListMessagesValidEntry(); break;
 		default: break;
 	}
@@ -179,17 +226,24 @@ void InboxScreen::CallExit()
 
 int  InboxScreen::StateTransitionFunction(const int evt) const
 {
+	if ((mState == kIdle) && (evt == kDeleteSelected)) return kSetWaitForDeleteMessage; else
 	if ((mState == kIdle) && (evt == kItemSelected)) return kPeerPushInboxMessage; else
 	if ((mState == kIdle) && (evt == kRefreshSelected)) return kSetWaitForListMessages; else
 	if ((mState == kPeerPushInboxMessage) && (evt == kNext)) return kIdle; else
 	if ((mState == kPeerReloadTable) && (evt == kNext)) return kIdle; else
+	if ((mState == kSendDeleteMessageToServer) && (evt == kFail)) return kShowErrorDeletingMessage; else
+	if ((mState == kSendDeleteMessageToServer) && (evt == kSuccess)) return kWasDeleteMessageValid; else
 	if ((mState == kSendListMessagesToServer) && (evt == kFail)) return kShowRetryListMessages; else
 	if ((mState == kSendListMessagesToServer) && (evt == kSuccess)) return kWasListMessagesValid; else
+	if ((mState == kSetWaitForDeleteMessage) && (evt == kNext)) return kSendDeleteMessageToServer; else
 	if ((mState == kSetWaitForListMessages) && (evt == kNext)) return kSendListMessagesToServer; else
+	if ((mState == kShowErrorDeletingMessage) && (evt == kYes)) return kPeerReloadTable; else
 	if ((mState == kShowErrorLoadingInbox) && (evt == kYes)) return kPeerReloadTable; else
 	if ((mState == kShowRetryListMessages) && (evt == kNo)) return kPeerReloadTable; else
 	if ((mState == kShowRetryListMessages) && (evt == kYes)) return kSetWaitForListMessages; else
 	if ((mState == kStart) && (evt == kNext)) return kSetWaitForListMessages; else
+	if ((mState == kWasDeleteMessageValid) && (evt == kNo)) return kShowErrorDeletingMessage; else
+	if ((mState == kWasDeleteMessageValid) && (evt == kYes)) return kSetWaitForListMessages; else
 	if ((mState == kWasListMessagesValid) && (evt == kNo)) return kShowErrorLoadingInbox; else
 	if ((mState == kWasListMessagesValid) && (evt == kYes)) return kPeerReloadTable;
 
@@ -202,6 +256,7 @@ bool InboxScreen::HasEdgeNamedNext() const
 	{
 		case kPeerPushInboxMessage:
 		case kPeerReloadTable:
+		case kSetWaitForDeleteMessage:
 		case kSetWaitForListMessages:
 		case kStart:
 			return true;
@@ -233,6 +288,10 @@ void InboxScreen::update(const URLLoaderEvent& msg)
                         mListMessagesJSON = JSONUtil::extract(msg.mString);
                         break;
 
+                    case kSendDeleteMessageToServer:
+                        mDeleteMessageJSON = JSONUtil::extract(msg.mString);
+                        break;
+
                     default:
                         break;
                 }
@@ -252,6 +311,7 @@ void InboxScreen::update(const GCTEvent& msg)
 {
     switch(getState())
     {
+        case kShowErrorDeletingMessage:
         case kShowErrorLoadingInbox:
         case kShowRetryListMessages:
             switch(msg.mEvent)
