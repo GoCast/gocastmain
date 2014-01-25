@@ -33,4 +33,6 @@ class InboxScreen;
 -(void) reloadTable;
 -(void) pushInboxMessage:(const JSONObject&)newObject;
 
+-(void)refresh:(UIRefreshControl *)refreshControl;
+
 @end

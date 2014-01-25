@@ -33,6 +33,8 @@ public:
 
     void        selectItem(const size_t& i);
 
+    void        refreshPressed();
+
 protected:
 	void startEntry();
 	void endEntry();

@@ -71,6 +71,14 @@ void        InboxScreen::selectItem(const size_t& i)
     update(InboxScreenMessage(InboxScreen::kItemSelected));
 }
 
+void       InboxScreen::refreshPressed()
+{
+    if (getState() == kIdle)
+    {
+        process(kRefreshSelected);
+    }
+}
+
 #pragma mark Start / End / Invalid
 void InboxScreen::startEntry()
 {

@@ -24,6 +24,10 @@
 
     [self.mTable registerNib:[UINib nibWithNibName:@"InboxEntryCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"InboxEntryCell"];
 
+    UIRefreshControl *refreshControl = [[UIRefreshControl alloc] init];
+    [refreshControl addTarget:self action:@selector(refresh:) forControlEvents:UIControlEventValueChanged];
+    [self.mTable addSubview:refreshControl];
+
     self.view.autoresizesSubviews = YES;
 
     mPeer = new InboxScreen(self);
@@ -153,5 +157,12 @@
     [(UINavigationController*)self.parentViewController  pushViewController:nextVC animated:YES];
 }
 
+- (void)refresh:(UIRefreshControl *)refreshControl
+{
+    [refreshControl endRefreshing];
+
+    mPeer->refreshPressed();
+}
 
 @end
+
