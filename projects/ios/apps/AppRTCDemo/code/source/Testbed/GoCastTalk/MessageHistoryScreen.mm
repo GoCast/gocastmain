@@ -26,6 +26,13 @@ void MessageHistoryScreen::replyPressed()
     process(kReplySelected);
 }
 
+void MessageHistoryScreen::selectItem(const size_t& i)
+{
+    mItemSelected = i;
+
+    update(MessageHistoryScreenMessage(MessageHistoryScreen::kItemSelected));
+}
+
 size_t  MessageHistoryScreen::getInboxSize()
 {
     return mHistory.size();
@@ -71,6 +78,11 @@ bool        MessageHistoryScreen::getIsGroup(const size_t& i)
 }
 
 #pragma mark Peer communication
+void MessageHistoryScreen::peerPushInboxMessageEntry()
+{
+    [mPeer pushInboxMessage:mHistory[mItemSelected].mObject];
+}
+
 void MessageHistoryScreen::peerPushRecordMessageEntry()
 {
     [mPeer pushRecordMessage:mInitObject];
@@ -130,6 +142,7 @@ void MessageHistoryScreen::CallEntry()
 		case kEnd: EndEntryHelper(); break;
 		case kIdle: idleEntry(); break;
 		case kInvalidState: invalidStateEntry(); break;
+		case kPeerPushInboxMessage: peerPushInboxMessageEntry(); break;
 		case kPeerPushRecordMessage: peerPushRecordMessageEntry(); break;
 		case kStart: startEntry(); break;
 		default: break;
@@ -143,7 +156,9 @@ void MessageHistoryScreen::CallExit()
 int  MessageHistoryScreen::StateTransitionFunction(const int evt) const
 {
 	if ((mState == kBuildMessageHistory) && (evt == kNext)) return kIdle; else
+	if ((mState == kIdle) && (evt == kItemSelected)) return kPeerPushInboxMessage; else
 	if ((mState == kIdle) && (evt == kReplySelected)) return kPeerPushRecordMessage; else
+	if ((mState == kPeerPushInboxMessage) && (evt == kNext)) return kIdle; else
 	if ((mState == kPeerPushRecordMessage) && (evt == kNext)) return kIdle; else
 	if ((mState == kStart) && (evt == kNext)) return kBuildMessageHistory;
 

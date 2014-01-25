@@ -1,5 +1,6 @@
 #include "MessageHistoryVC.h"
 #include "RecordMessageVC.h"
+#include "InboxMessageVC.h"
 
 #include "Base/package.h"
 #include "Io/package.h"
@@ -174,7 +175,11 @@
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    if (tableView == self.mOptionsTable)
+    if (tableView == self.mTable)
+    {
+        mPeer->selectItem((size_t)indexPath.row + 1);
+    }
+    else if (tableView == self.mOptionsTable)
     {
         switch (indexPath.row)
         {
@@ -208,6 +213,13 @@
 -(void)customInit:(const JSONObject&)newObject
 {
     mInitObject = newObject;
+}
+
+-(void) pushInboxMessage:(const JSONObject&)newObject
+{
+    InboxMessageVC* nextVC = [[[InboxMessageVC alloc] initWithNibName:@"InboxMessageVC" bundle:nil] autorelease];
+    [nextVC customInit:newObject];
+    [(UINavigationController*)self.parentViewController  pushViewController:nextVC animated:YES];
 }
 
 -(void) pushRecordMessage:(const JSONObject &)newObject

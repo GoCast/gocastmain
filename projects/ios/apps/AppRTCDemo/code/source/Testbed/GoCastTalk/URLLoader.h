@@ -13,7 +13,7 @@ class tFile;
 class URLConnection
 {
 public:
-    size_t      mId;
+    void*       mId;
     tFile       mFile;
     std::string mURL;
     std::string mString;
@@ -24,10 +24,10 @@ public:
     bool        mBadResponse;
 
 public:
-    URLConnection(size_t newId, const std::string& url);
-    URLConnection(size_t newId, const std::string& url, const tFile& newFile);
-    URLConnection(size_t newId, const std::string& url, const std::string& body);
-    URLConnection(size_t newId, const std::string& newPHP, const std::vector<std::pair<std::string, std::string> >& newParams, const tFile& newFile);
+    URLConnection(void* newId, const std::string& url);
+    URLConnection(void* newId, const std::string& url, const tFile& newFile);
+    URLConnection(void* newId, const std::string& url, const std::string& body);
+    URLConnection(void* newId, const std::string& newPHP, const std::vector<std::pair<std::string, std::string> >& newParams, const tFile& newFile);
     ~URLConnection();
 
     void DidReceiveResponse(const void* response, int responseCode);
@@ -46,10 +46,10 @@ protected:
     URLLoader();
 
 public:
-    void loadString(size_t newId, const std::string& newURL);
-    void loadFile(size_t newId, const std::string& newURL, const tFile& newFile);
-    void postJSON(size_t newId, const std::string& newURL, const std::string& newBody);
-    void postFile(size_t newId, const std::string& newPHP, const std::vector<std::pair<std::string, std::string> >& newParams, const tFile& newFile);
+    void loadString(void* newId, const std::string& newURL);
+    void loadFile(void* newId, const std::string& newURL, const tFile& newFile);
+    void postJSON(void* newId, const std::string& newURL, const std::string& newBody);
+    void postFile(void* newId, const std::string& newPHP, const std::vector<std::pair<std::string, std::string> >& newParams, const tFile& newFile);
 
 public:
     friend class tSingleton<URLLoader>;
@@ -66,14 +66,14 @@ public:
     };
 
 public:
-    size_t      mId;
+    void*       mId;
     EventType   mEvent;
     std::string mURL;
     std::string mString;
 
 public:
-    URLLoaderEvent(size_t newID, EventType newEvent, const std::string& newURL)
+    URLLoaderEvent(void* newID, EventType newEvent, const std::string& newURL)
     : mId(newID), mEvent(newEvent), mURL(newURL), mString("") { }
-    URLLoaderEvent(size_t newID, EventType newEvent, const std::string& newURL, const std::string& newString)
+    URLLoaderEvent(void* newID, EventType newEvent, const std::string& newURL, const std::string& newString)
     : mId(newID), mEvent(newEvent), mURL(newURL), mString(newString) { }
 };

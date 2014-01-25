@@ -3,8 +3,11 @@
 3 idle
 4 Peer: push RecordMessage
 5 Build message history
+6 Peer: push InboxMessage
 #
 1 5
 3 4 replySelected
 4 3
 5 3
+3 6 itemSelected
+6 3

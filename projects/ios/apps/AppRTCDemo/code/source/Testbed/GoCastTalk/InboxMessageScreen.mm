@@ -124,7 +124,7 @@ void InboxMessageScreen::sendDeleteMessageToServerEntry()
             "tjgrant@tatewake.com",
             mInitObject["audio"].mString.c_str());
 
-    URLLoader::getInstance()->loadString(2, buf);
+    URLLoader::getInstance()->loadString(this, buf);
 }
 
 
@@ -136,7 +136,7 @@ void InboxMessageScreen::sendDownloadRequestToServerEntry()
             kMemoAppServerURL,
             mInitObject["audio"].mString.c_str());
 
-    URLLoader::getInstance()->loadFile(2, buf, tFile(tFile::kTemporaryDirectory, mInitObject["audio"].mString.c_str()));
+    URLLoader::getInstance()->loadFile(this, buf, tFile(tFile::kTemporaryDirectory, mInitObject["audio"].mString.c_str()));
 }
 
 void InboxMessageScreen::setWasPlayingToFalseEntry()
@@ -365,7 +365,7 @@ void InboxMessageScreen::update(const tSoundEvent& msg)
 
 void InboxMessageScreen::update(const URLLoaderEvent& msg)
 {
-    if (msg.mId == 2)
+    if (msg.mId == this)
     {
         [gAppDelegateInstance setBlockingViewVisible:false];
 

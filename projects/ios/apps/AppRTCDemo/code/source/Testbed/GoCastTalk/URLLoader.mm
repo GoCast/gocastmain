@@ -53,7 +53,7 @@
 @end
 
 
-URLConnection::URLConnection(size_t newId, const std::string& url)
+URLConnection::URLConnection(void* newId, const std::string& url)
 :   mId(newId),
     mFile(tFile::kTemporaryDirectory, ""),
     mURL(url),
@@ -65,7 +65,7 @@ URLConnection::URLConnection(size_t newId, const std::string& url)
     mNSURLConnection = [[NSURLConnection alloc] initWithRequest: req delegate: mDelegate];
 }
 
-URLConnection::URLConnection(size_t newId, const std::string& url, const tFile& newFile)
+URLConnection::URLConnection(void* newId, const std::string& url, const tFile& newFile)
 :   mId(newId),
     mFile(newFile),
     mURL(url),
@@ -79,7 +79,7 @@ URLConnection::URLConnection(size_t newId, const std::string& url, const tFile& 
     mFOS = new tFileOutputStream(mFile);
 }
 
-URLConnection::URLConnection(size_t newId, const std::string& url, const std::string& body)
+URLConnection::URLConnection(void* newId, const std::string& url, const std::string& body)
 :   mId(newId),
     mFile(tFile::kTemporaryDirectory, ""),
     mURL(url),
@@ -94,7 +94,7 @@ URLConnection::URLConnection(size_t newId, const std::string& url, const std::st
     mNSURLConnection = [[NSURLConnection alloc] initWithRequest: req delegate: mDelegate];
 }
 
-URLConnection::URLConnection(size_t newId, const std::string& newPHP, const std::vector<std::pair<std::string, std::string> >& newParams, const tFile& newFile)
+URLConnection::URLConnection(void* newId, const std::string& newPHP, const std::vector<std::pair<std::string, std::string> >& newParams, const tFile& newFile)
 :   mId(newId),
     mFile(tFile::kTemporaryDirectory, ""),
     mURL(newPHP),
@@ -212,26 +212,26 @@ URLLoader::URLLoader()
 {
 }
 
-void URLLoader::loadString(size_t newId, const std::string& newURL)
+void URLLoader::loadString(void* newId, const std::string& newURL)
 {
     NSLog(@"URLLoader::loadString: \"%s\"", newURL.c_str());
 
     new URLConnection(newId, newURL);
 }
 
-void URLLoader::loadFile(size_t newId, const std::string& newURL, const tFile& newFile)
+void URLLoader::loadFile(void* newId, const std::string& newURL, const tFile& newFile)
 {
     NSLog(@"URLLoader::loadFile: \"%s\"", newURL.c_str());
 
     new URLConnection(newId, newURL, newFile);
 }
 
-void URLLoader::postJSON(size_t newId, const std::string& newURL, const std::string& newBody)
+void URLLoader::postJSON(void* newId, const std::string& newURL, const std::string& newBody)
 {
     new URLConnection(newId, newURL, newBody);
 }
 
-void URLLoader::postFile(size_t newId, const std::string& newPHP, const std::vector<std::pair<std::string, std::string> >& newParams, const tFile& newFile)
+void URLLoader::postFile(void* newId, const std::string& newPHP, const std::vector<std::pair<std::string, std::string> >& newParams, const tFile& newFile)
 {
     new URLConnection(newId, newPHP, newParams, newFile);
 }

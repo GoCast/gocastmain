@@ -13,12 +13,14 @@ protected:
     MessageHistoryVC*   mPeer;
     JSONObject          mInitObject;
     JSONArray           mHistory;
+    size_t              mItemSelected;
 
 public:
 	MessageHistoryScreen(MessageHistoryVC* newVC, const JSONObject& initObject);
 	~MessageHistoryScreen();
 
     void replyPressed();
+    void selectItem(const size_t& i);
 
     size_t      getInboxSize();
 
@@ -35,6 +37,7 @@ protected:
 
 	void buildMessageHistoryEntry();
 	void idleEntry();
+	void peerPushInboxMessageEntry();
 	void peerPushRecordMessageEntry();
 
 public:
@@ -42,6 +45,7 @@ public:
 	{
 		kInvalidEvent = -2,
 		kNext = -1,
+		kItemSelected,
 		kReplySelected,
 	};
 
@@ -52,6 +56,7 @@ public:
 		kBuildMessageHistory,
 		kEnd,
 		kIdle,
+		kPeerPushInboxMessage,
 		kPeerPushRecordMessage,
 	};
 

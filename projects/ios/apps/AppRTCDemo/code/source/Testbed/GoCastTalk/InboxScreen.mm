@@ -169,7 +169,7 @@ void InboxScreen::sendListMessagesToServerEntry()
             kMemoAppServerURL,
             "tjgrant@tatewake.com");
 
-    URLLoader::getInstance()->loadString(1, buf);
+    URLLoader::getInstance()->loadString(this, buf);
 }
 
 void InboxScreen::sendDeleteMessageToServerEntry()
@@ -181,7 +181,7 @@ void InboxScreen::sendDeleteMessageToServerEntry()
             "tjgrant@tatewake.com",
             mInbox[mDeleteSelected].mObject["audio"].mString.c_str());
 
-    URLLoader::getInstance()->loadString(1, buf);
+    URLLoader::getInstance()->loadString(this, buf);
 }
 
 #pragma mark User Interface
@@ -290,7 +290,7 @@ void InboxScreen::update(const InboxScreenMessage& msg)
 
 void InboxScreen::update(const URLLoaderEvent& msg)
 {
-    if (msg.mId == 1)
+    if (msg.mId == this)
     {
         [gAppDelegateInstance setBlockingViewVisible:false];
 

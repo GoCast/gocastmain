@@ -299,7 +299,7 @@ void RecordMessageScreen::sendPostAudioToServerEntry()
 
     params.push_back(std::pair<std::string, std::string>("MAX_FILE_SIZE", "10485760"));
 
-    URLLoader::getInstance()->postFile(3, kMemoAppServerURL, params, tFile(tFile::kTemporaryDirectory, "scratch.wav"));
+    URLLoader::getInstance()->postFile(this, kMemoAppServerURL, params, tFile(tFile::kTemporaryDirectory, "scratch.wav"));
 }
 
 void RecordMessageScreen::sendPostTranscriptToServerEntry()
@@ -312,7 +312,7 @@ void RecordMessageScreen::sendPostTranscriptToServerEntry()
 
     params.push_back(std::pair<std::string, std::string>("MAX_FILE_SIZE", "10485760"));
 
-    URLLoader::getInstance()->postFile(3, kMemoAppServerURL, params, tFile(tFile::kTemporaryDirectory, "transcript.json"));
+    URLLoader::getInstance()->postFile(this, kMemoAppServerURL, params, tFile(tFile::kTemporaryDirectory, "transcript.json"));
 }
 
 void RecordMessageScreen::sendPostMessageToServerEntry()
@@ -324,7 +324,7 @@ void RecordMessageScreen::sendPostMessageToServerEntry()
 
     params.push_back(std::pair<std::string, std::string>("MAX_FILE_SIZE", "10485760"));
 
-    URLLoader::getInstance()->postFile(3, kMemoAppServerURL, params, tFile(tFile::kTemporaryDirectory, "message.json"));
+    URLLoader::getInstance()->postFile(this, kMemoAppServerURL, params, tFile(tFile::kTemporaryDirectory, "message.json"));
 }
 
 
@@ -500,7 +500,7 @@ void RecordMessageScreen::update(const tSoundEvent& msg)
 
 void RecordMessageScreen::update(const URLLoaderEvent& msg)
 {
-    if (msg.mId == 3)
+    if (msg.mId == this)
     {
         [gAppDelegateInstance setBlockingViewVisible:false];
 

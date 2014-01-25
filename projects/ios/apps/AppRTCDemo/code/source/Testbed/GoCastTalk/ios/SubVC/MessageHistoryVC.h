@@ -37,6 +37,7 @@ class MessageHistoryScreen;
 
 -(void)customInit:(const JSONObject&)newObject;
 
+-(void) pushInboxMessage:(const JSONObject&)newObject;
 -(void) pushRecordMessage:(const JSONObject&)newObject;
 
 @end
