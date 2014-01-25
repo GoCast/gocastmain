@@ -12,6 +12,7 @@
 12 Send deleteMessage to server
 13 Was deleteMessage valid?
 14 Show "error deleting message"
+15 Sort table by date
 #
 1 4
 5 6 success
@@ -21,7 +22,7 @@
 5 8 fail
 8 9 no
 8 4 yes
-6 9 yes
+6 15 yes
 9 3
 3 10 itemSelected
 10 3
@@ -33,3 +34,4 @@
 14 9 yes
 13 14 no
 13 4 yes
+15 9

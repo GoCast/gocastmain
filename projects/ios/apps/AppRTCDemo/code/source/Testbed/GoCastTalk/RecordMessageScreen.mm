@@ -145,7 +145,67 @@ void RecordMessageScreen::wasPostTranscriptSuccessfulEntry()
     SetImmediateEvent(result ? kYes : kNo);
 }
 
+void RecordMessageScreen::wasPostMessageSuccessfulEntry()
+{
+    bool result = false;
+
+    if (mPostMessageJSON["status"].mString == std::string("success"))
+    {
+        result = true;
+    }
+
+    SetImmediateEvent(result ? kYes : kNo);
+}
+
 #pragma mark Actions
+void RecordMessageScreen::calculateMessageJSONEntry()
+{
+    char buf[80];
+    std::string date;
+    std::string audioName;
+    time_t curTime;
+    tm*    timeStruct;
+
+    //0. Clear results
+    mMessageJSON.clear();
+
+    //1. Calculate date and audio file name
+    curTime=time(NULL);
+    timeStruct = localtime(&curTime);
+
+    sprintf(buf, "%04d%02d%02d%02d%02d%02d%02d",
+            timeStruct->tm_year+1900,   timeStruct->tm_mon+1,   timeStruct->tm_mday,
+            timeStruct->tm_hour,        timeStruct->tm_min,     timeStruct->tm_sec,
+            tTimer::getSystemTimeMS() % 100);
+
+    date = buf;
+    audioName = date + "-tjgrant@tatewake.com";
+
+    //2. Treat as "reply all", calculate the "to"
+    //   based on the original "from" and all other recipients
+    mMessageJSON["to"]          = JSONArray();
+    mMessageJSON["to"].mArray.push_back(mInitObject["from"].mString);
+
+    std::string iter;
+    for (size_t i = 0; i < mInitObject["to"].mArray.size(); i++)
+    {
+        iter = mInitObject["to"].mArray[i].mString;
+
+        if (iter != "tjgrant@tatewake.com")
+        {
+            mMessageJSON["to"].mArray.push_back(JSONValue(iter));
+        }
+    }
+
+    //3. Fill in results
+    mMessageJSON["from"]        = std::string("tjgrant@tatewake.com");
+    mMessageJSON["date"]        = date;
+    mMessageJSON["audio"]       = audioName;
+    mMessageJSON["in-reply-to"] = mInitObject["audio"];
+
+    tFile(tFile::kTemporaryDirectory, "message.json").write(JSONValue(mMessageJSON).toString().c_str());
+}
+
 void RecordMessageScreen::letDidRecordBeFalseEntry()
 {
     mDidRecord = false;
@@ -234,12 +294,8 @@ void RecordMessageScreen::sendPostAudioToServerEntry()
     std::vector<std::pair<std::string, std::string> > params;
 
     params.push_back(std::pair<std::string, std::string>("action", "postAudio"));
-    params.push_back(std::pair<std::string, std::string>("from", "tjgrant@tatewake.com"));
-
-//    for (size_t i = 0; i < mSelectedGroup.size(); i++)
-//    {
-//        params.push_back(std::pair<std::string, std::string>("group[]", mSelectedGroup[i].mString));
-//    }
+    params.push_back(std::pair<std::string, std::string>("name", "tjgrant@tatewake.com"));
+    params.push_back(std::pair<std::string, std::string>("audio", mMessageJSON["audio"].mString));
 
     params.push_back(std::pair<std::string, std::string>("MAX_FILE_SIZE", "10485760"));
 
@@ -248,24 +304,29 @@ void RecordMessageScreen::sendPostAudioToServerEntry()
 
 void RecordMessageScreen::sendPostTranscriptToServerEntry()
 {
-    //TODO: Implement
-    //    std::vector<std::pair<std::string, std::string> > params;
-    //
-    //    params.push_back(std::pair<std::string, std::string>("action", "postTranscript"));
-    //    params.push_back(std::pair<std::string, std::string>("from", "tjgrant@tatewake.com"));
-    //
-    //    for (size_t i = 0; i < mSelectedGroup.size(); i++)
-    //    {
-    //        params.push_back(std::pair<std::string, std::string>("group[]", mSelectedGroup[i].mString));
-    //    }
-    //
-    //    params.push_back(std::pair<std::string, std::string>("MAX_FILE_SIZE", "10485760"));
-    //
-    //    URLLoader::getInstance()->postFile(kMemoAppServerURL, params, tFile(tFile::kTemporaryDirectory, "transcript.json"));
+    std::vector<std::pair<std::string, std::string> > params;
 
-    //TODO: Hack
-    update(kSuccess);
+    params.push_back(std::pair<std::string, std::string>("action", "postTranscription"));
+    params.push_back(std::pair<std::string, std::string>("name", "tjgrant@tatewake.com"));
+    params.push_back(std::pair<std::string, std::string>("audio", mMessageJSON["audio"].mString));
+
+    params.push_back(std::pair<std::string, std::string>("MAX_FILE_SIZE", "10485760"));
+
+    URLLoader::getInstance()->postFile(3, kMemoAppServerURL, params, tFile(tFile::kTemporaryDirectory, "transcript.json"));
 }
+
+void RecordMessageScreen::sendPostMessageToServerEntry()
+{
+    std::vector<std::pair<std::string, std::string> > params;
+
+    params.push_back(std::pair<std::string, std::string>("action", "postMessage"));
+    params.push_back(std::pair<std::string, std::string>("name", "tjgrant@tatewake.com"));
+
+    params.push_back(std::pair<std::string, std::string>("MAX_FILE_SIZE", "10485760"));
+
+    URLLoader::getInstance()->postFile(3, kMemoAppServerURL, params, tFile(tFile::kTemporaryDirectory, "message.json"));
+}
+
 
 #pragma mark UI
 
@@ -284,11 +345,18 @@ void RecordMessageScreen::showPostAudioFailedEntry()
     tAlert("Could not send audio to server.");
 }
 
+#pragma mark Sending messages to other machines
+void RecordMessageScreen::sendReloadInboxToVCEntry()
+{
+    GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kReloadInbox));
+}
+
 #pragma mark State wiring
 void RecordMessageScreen::CallEntry()
 {
 	switch(mState)
 	{
+		case kCalculateMessageJSON: calculateMessageJSONEntry(); break;
 		case kDidWeRecord: didWeRecordEntry(); break;
 		case kEnd: EndEntryHelper(); break;
 		case kInvalidState: invalidStateEntry(); break;
@@ -302,7 +370,9 @@ void RecordMessageScreen::CallEntry()
 		case kRecordingIdle: recordingIdleEntry(); break;
 		case kResumeAudio: resumeAudioEntry(); break;
 		case kSendPostAudioToServer: sendPostAudioToServerEntry(); break;
+		case kSendPostMessageToServer: sendPostMessageToServerEntry(); break;
 		case kSendPostTranscriptToServer: sendPostTranscriptToServerEntry(); break;
+		case kSendReloadInboxToVC: sendReloadInboxToVCEntry(); break;
 		case kSetWaitForPostAudio: setWaitForPostAudioEntry(); break;
 		case kShowNoAudioToSend: showNoAudioToSendEntry(); break;
 		case kShowPostAudioFailed: showPostAudioFailedEntry(); break;
@@ -318,6 +388,7 @@ void RecordMessageScreen::CallEntry()
 		case kWaitToPlayIdle: waitToPlayIdleEntry(); break;
 		case kWaitToRecordIdle: waitToRecordIdleEntry(); break;
 		case kWasPostAudioSuccessful: wasPostAudioSuccessfulEntry(); break;
+		case kWasPostMessageSuccessful: wasPostMessageSuccessfulEntry(); break;
 		case kWasPostTranscriptSuccessful: wasPostTranscriptSuccessfulEntry(); break;
 		default: break;
 	}
@@ -329,6 +400,7 @@ void RecordMessageScreen::CallExit()
 
 int  RecordMessageScreen::StateTransitionFunction(const int evt) const
 {
+	if ((mState == kCalculateMessageJSON) && (evt == kNext)) return kLetDidRecordBeFalse; else
 	if ((mState == kDidWeRecord) && (evt == kNo)) return kWaitToRecordIdle; else
 	if ((mState == kDidWeRecord) && (evt == kYes)) return kWaitToPlayIdle; else
 	if ((mState == kLetDidRecordBeFalse) && (evt == kNext)) return kDidWeRecord; else
@@ -348,32 +420,37 @@ int  RecordMessageScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kResumeAudio) && (evt == kNext)) return kPlayingIdle; else
 	if ((mState == kSendPostAudioToServer) && (evt == kFail)) return kShowPostAudioFailed; else
 	if ((mState == kSendPostAudioToServer) && (evt == kSuccess)) return kWasPostAudioSuccessful; else
+	if ((mState == kSendPostMessageToServer) && (evt == kFail)) return kShowPostAudioFailed; else
+	if ((mState == kSendPostMessageToServer) && (evt == kSuccess)) return kWasPostMessageSuccessful; else
 	if ((mState == kSendPostTranscriptToServer) && (evt == kFail)) return kShowPostAudioFailed; else
 	if ((mState == kSendPostTranscriptToServer) && (evt == kSuccess)) return kWasPostTranscriptSuccessful; else
+	if ((mState == kSendReloadInboxToVC) && (evt == kNext)) return kPeerPopSelf; else
 	if ((mState == kSetWaitForPostAudio) && (evt == kNext)) return kSendPostAudioToServer; else
 	if ((mState == kShowNoAudioToSend) && (evt == kYes)) return kWaitToRecordIdle; else
-	if ((mState == kShowPostAudioFailed) && (evt == kYes)) return kPeerPopSelf; else
-	if ((mState == kStart) && (evt == kNext)) return kLetDidRecordBeFalse; else
+	if ((mState == kShowPostAudioFailed) && (evt == kYes)) return kSendReloadInboxToVC; else
+	if ((mState == kStart) && (evt == kNext)) return kCalculateMessageJSON; else
 	if ((mState == kStartRecordingAudio) && (evt == kNext)) return kRecordingIdle; else
 	if ((mState == kStopAudio) && (evt == kNext)) return kDidWeRecord; else
-	if ((mState == kStopPlayingBeforePop) && (evt == kNext)) return kPeerPopSelf; else
+	if ((mState == kStopPlayingBeforePop) && (evt == kNext)) return kSendReloadInboxToVC; else
 	if ((mState == kStopPlayingBeforeSend) && (evt == kNext)) return kSetWaitForPostAudio; else
 	if ((mState == kStopRecordingAudio) && (evt == kNext)) return kWaitForTranscription; else
-	if ((mState == kStopRecordingBeforePop) && (evt == kNext)) return kPeerPopSelf; else
+	if ((mState == kStopRecordingBeforePop) && (evt == kNext)) return kSendReloadInboxToVC; else
 	if ((mState == kStopRecordingBeforeSend) && (evt == kNext)) return kSetWaitForPostAudio; else
 	if ((mState == kWaitForTranscription) && (evt == kCancelPressed)) return kWaitForTranscription; else
 	if ((mState == kWaitForTranscription) && (evt == kSendPressed)) return kWaitForTranscription; else
 	if ((mState == kWaitForTranscription) && (evt == kTranscriptionReady)) return kLetDidRecordBeTrue; else
-	if ((mState == kWaitToPlayIdle) && (evt == kCancelPressed)) return kPeerPopSelf; else
+	if ((mState == kWaitToPlayIdle) && (evt == kCancelPressed)) return kSendReloadInboxToVC; else
 	if ((mState == kWaitToPlayIdle) && (evt == kPlayPressed)) return kPlayAudio; else
 	if ((mState == kWaitToPlayIdle) && (evt == kSendPressed)) return kSetWaitForPostAudio; else
-	if ((mState == kWaitToRecordIdle) && (evt == kCancelPressed)) return kPeerPopSelf; else
+	if ((mState == kWaitToRecordIdle) && (evt == kCancelPressed)) return kSendReloadInboxToVC; else
 	if ((mState == kWaitToRecordIdle) && (evt == kRecordPressed)) return kStartRecordingAudio; else
 	if ((mState == kWaitToRecordIdle) && (evt == kSendPressed)) return kShowNoAudioToSend; else
 	if ((mState == kWasPostAudioSuccessful) && (evt == kNo)) return kShowPostAudioFailed; else
 	if ((mState == kWasPostAudioSuccessful) && (evt == kYes)) return kSendPostTranscriptToServer; else
+	if ((mState == kWasPostMessageSuccessful) && (evt == kNo)) return kShowPostAudioFailed; else
+	if ((mState == kWasPostMessageSuccessful) && (evt == kYes)) return kSendReloadInboxToVC; else
 	if ((mState == kWasPostTranscriptSuccessful) && (evt == kNo)) return kShowPostAudioFailed; else
-	if ((mState == kWasPostTranscriptSuccessful) && (evt == kYes)) return kPeerPopSelf;
+	if ((mState == kWasPostTranscriptSuccessful) && (evt == kYes)) return kSendPostMessageToServer;
 
 	return kInvalidState;
 }
@@ -382,11 +459,13 @@ bool RecordMessageScreen::HasEdgeNamedNext() const
 {
 	switch(mState)
 	{
+		case kCalculateMessageJSON:
 		case kLetDidRecordBeFalse:
 		case kLetDidRecordBeTrue:
 		case kPauseAudio:
 		case kPlayAudio:
 		case kResumeAudio:
+		case kSendReloadInboxToVC:
 		case kSetWaitForPostAudio:
 		case kStart:
 		case kStartRecordingAudio:
@@ -435,6 +514,11 @@ void RecordMessageScreen::update(const URLLoaderEvent& msg)
                     case kSendPostAudioToServer:
                         mPostAudioJSON = JSONUtil::extract(msg.mString);
                         break;
+
+                    case kSendPostMessageToServer:
+                        mPostMessageJSON = JSONUtil::extract(msg.mString);
+                        break;
+
                     case kSendPostTranscriptToServer:
                         mPostTranscriptJSON = JSONUtil::extract(msg.mString);
                         break;
@@ -474,8 +558,8 @@ void RecordMessageScreen::update(const GCTEvent& msg)
             switch (msg.mEvent)
             {
                 case GCTEvent::kTranscriptFinished:
-                    mTranscription = msg.mTranscription;
-                    printf("*** Got transcription: %s\n", mTranscription.c_str());
+                    mTranscription["ja"] = msg.mTranscription;
+                    tFile(tFile::kTemporaryDirectory, "transcript.json").write(JSONValue(mTranscription).toString().c_str());
                     process(kTranscriptionReady);
                     break;
 

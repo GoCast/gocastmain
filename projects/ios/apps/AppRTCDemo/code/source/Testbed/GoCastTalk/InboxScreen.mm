@@ -7,6 +7,12 @@
 
 JSONArray InboxScreen::mInbox;
 
+bool sortByDate (JSONValue i, JSONValue j);
+bool sortByDate (JSONValue i, JSONValue j)
+{
+    return i.mObject["date"].mString > j.mObject["date"].mString;
+}
+
 #pragma mark Constructor / Destructor
 InboxScreen::InboxScreen(InboxVC* newVC)
 : mPeer(newVC)
@@ -129,14 +135,13 @@ void InboxScreen::wasListMessagesValidEntry()
     if (mListMessagesJSON["status"].mString == std::string("success"))
     {
         result = true;
-
-        mInbox = mListMessagesJSON["list"].mArray;
     }
 
     SetImmediateEvent(result ? kYes : kNo);
 }
 
-#pragma mark Actions
+#pragma mark Peer communication
+
 void InboxScreen::peerReloadTableEntry()
 {
     [mPeer reloadTable];
@@ -145,6 +150,15 @@ void InboxScreen::peerReloadTableEntry()
 void InboxScreen::peerPushInboxMessageEntry()
 {
     [mPeer pushInboxMessage:mInbox[mItemSelected].mObject];
+}
+
+#pragma mark Actions
+
+void InboxScreen::sortTableByDateEntry()
+{
+    mInbox = mListMessagesJSON["list"].mArray;
+
+    std::sort(mInbox.begin(), mInbox.end(), sortByDate);
 }
 
 void InboxScreen::sendListMessagesToServerEntry()
@@ -213,6 +227,7 @@ void InboxScreen::CallEntry()
 		case kShowErrorDeletingMessage: showErrorDeletingMessageEntry(); break;
 		case kShowErrorLoadingInbox: showErrorLoadingInboxEntry(); break;
 		case kShowRetryListMessages: showRetryListMessagesEntry(); break;
+		case kSortTableByDate: sortTableByDateEntry(); break;
 		case kStart: startEntry(); break;
 		case kWasDeleteMessageValid: wasDeleteMessageValidEntry(); break;
 		case kWasListMessagesValid: wasListMessagesValidEntry(); break;
@@ -241,11 +256,12 @@ int  InboxScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kShowErrorLoadingInbox) && (evt == kYes)) return kPeerReloadTable; else
 	if ((mState == kShowRetryListMessages) && (evt == kNo)) return kPeerReloadTable; else
 	if ((mState == kShowRetryListMessages) && (evt == kYes)) return kSetWaitForListMessages; else
+	if ((mState == kSortTableByDate) && (evt == kNext)) return kPeerReloadTable; else
 	if ((mState == kStart) && (evt == kNext)) return kSetWaitForListMessages; else
 	if ((mState == kWasDeleteMessageValid) && (evt == kNo)) return kShowErrorDeletingMessage; else
 	if ((mState == kWasDeleteMessageValid) && (evt == kYes)) return kSetWaitForListMessages; else
 	if ((mState == kWasListMessagesValid) && (evt == kNo)) return kShowErrorLoadingInbox; else
-	if ((mState == kWasListMessagesValid) && (evt == kYes)) return kPeerReloadTable;
+	if ((mState == kWasListMessagesValid) && (evt == kYes)) return kSortTableByDate;
 
 	return kInvalidState;
 }
@@ -258,6 +274,7 @@ bool InboxScreen::HasEdgeNamedNext() const
 		case kPeerReloadTable:
 		case kSetWaitForDeleteMessage:
 		case kSetWaitForListMessages:
+		case kSortTableByDate:
 		case kStart:
 			return true;
 		default: break;

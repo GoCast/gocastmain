@@ -94,7 +94,7 @@ URLConnection::URLConnection(size_t newId, const std::string& url, const std::st
     mNSURLConnection = [[NSURLConnection alloc] initWithRequest: req delegate: mDelegate];
 }
 
-URLConnection::URLConnection(size_t newId, const std::string& newPHP, const std::vector<std::pair<std::string, std::string> >& newParams, const tFile& newFile, bool isAmiVoice)
+URLConnection::URLConnection(size_t newId, const std::string& newPHP, const std::vector<std::pair<std::string, std::string> >& newParams, const tFile& newFile)
 :   mId(newId),
     mFile(tFile::kTemporaryDirectory, ""),
     mURL(newPHP),
@@ -134,20 +134,10 @@ URLConnection::URLConnection(size_t newId, const std::string& newPHP, const std:
     {
         [body appendData:[[NSString stringWithFormat:@"--%@\r\n", @"abc123"] dataUsingEncoding:NSUTF8StringEncoding]];
 
-        if (isAmiVoice)
-        {
-            [body appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"AudioFile\"; filename=\"%s.wav\"\r\n",
-                               newFile.getFilename().c_str()]
-                              dataUsingEncoding:NSUTF8StringEncoding]];
-            [body appendData:[[NSString stringWithUTF8String:"Content-Type: audio/x-wav\r\n\r\n"] dataUsingEncoding:NSUTF8StringEncoding]];
-        }
-        else
-        {
-            [body appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"filename\"; filename=\"%s\"\r\n",
-                               newFile.getFilename().c_str()]
-                              dataUsingEncoding:NSUTF8StringEncoding]];
-            [body appendData:[[NSString stringWithUTF8String:"Content-Type: application/octet-stream\r\n\r\n"] dataUsingEncoding:NSUTF8StringEncoding]];
-        }
+        [body appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"filename\"; filename=\"%s\"\r\n",
+                           newFile.getFilename().c_str()]
+                          dataUsingEncoding:NSUTF8StringEncoding]];
+        [body appendData:[[NSString stringWithUTF8String:"Content-Type: application/octet-stream\r\n\r\n"] dataUsingEncoding:NSUTF8StringEncoding]];
 
         [body appendData:fileData];
         [body appendData:[[NSString stringWithFormat:@"\r\n"] dataUsingEncoding:NSUTF8StringEncoding]];
@@ -241,7 +231,7 @@ void URLLoader::postJSON(size_t newId, const std::string& newURL, const std::str
     new URLConnection(newId, newURL, newBody);
 }
 
-void URLLoader::postFile(size_t newId, const std::string& newPHP, const std::vector<std::pair<std::string, std::string> >& newParams, const tFile& newFile, bool isAmiVoice)
+void URLLoader::postFile(size_t newId, const std::string& newPHP, const std::vector<std::pair<std::string, std::string> >& newParams, const tFile& newFile)
 {
-    new URLConnection(newId, newPHP, newParams, newFile, isAmiVoice);
+    new URLConnection(newId, newPHP, newParams, newFile);
 }

@@ -14,9 +14,11 @@ class RecordMessageScreen
 protected:
     RecordMessageVC*    mPeer;
     JSONObject          mInitObject;
+    JSONObject          mMessageJSON;
     JSONObject          mPostAudioJSON;
     JSONObject          mPostTranscriptJSON;
-    std::string         mTranscription;
+    JSONObject          mPostMessageJSON;
+    JSONObject          mTranscription;
     tSound*             mSound;
     bool                mDidRecord;
 
@@ -38,6 +40,7 @@ protected:
 	void endEntry();
 	void invalidStateEntry();
 
+	void calculateMessageJSONEntry();
 	void didWeRecordEntry();
 	void letDidRecordBeFalseEntry();
 	void letDidRecordBeTrueEntry();
@@ -49,7 +52,9 @@ protected:
 	void recordingIdleEntry();
 	void resumeAudioEntry();
 	void sendPostAudioToServerEntry();
+	void sendPostMessageToServerEntry();
 	void sendPostTranscriptToServerEntry();
+	void sendReloadInboxToVCEntry();
 	void setWaitForPostAudioEntry();
 	void showNoAudioToSendEntry();
 	void showPostAudioFailedEntry();
@@ -64,6 +69,7 @@ protected:
 	void waitToPlayIdleEntry();
 	void waitToRecordIdleEntry();
 	void wasPostAudioSuccessfulEntry();
+	void wasPostMessageSuccessfulEntry();
 	void wasPostTranscriptSuccessfulEntry();
 
 public:
@@ -88,6 +94,7 @@ public:
 	{
 		kInvalidState = 0,
 		kStart = 1,
+		kCalculateMessageJSON,
 		kDidWeRecord,
 		kEnd,
 		kLetDidRecordBeFalse,
@@ -100,7 +107,9 @@ public:
 		kRecordingIdle,
 		kResumeAudio,
 		kSendPostAudioToServer,
+		kSendPostMessageToServer,
 		kSendPostTranscriptToServer,
+		kSendReloadInboxToVC,
 		kSetWaitForPostAudio,
 		kShowNoAudioToSend,
 		kShowPostAudioFailed,
@@ -115,6 +124,7 @@ public:
 		kWaitToPlayIdle,
 		kWaitToRecordIdle,
 		kWasPostAudioSuccessful,
+		kWasPostMessageSuccessful,
 		kWasPostTranscriptSuccessful,
 	};
 

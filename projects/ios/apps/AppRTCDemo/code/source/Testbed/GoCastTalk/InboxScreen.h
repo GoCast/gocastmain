@@ -53,6 +53,7 @@ protected:
 	void showErrorDeletingMessageEntry();
 	void showErrorLoadingInboxEntry();
 	void showRetryListMessagesEntry();
+	void sortTableByDateEntry();
 	void wasDeleteMessageValidEntry();
 	void wasListMessagesValidEntry();
 
@@ -85,6 +86,7 @@ public:
 		kShowErrorDeletingMessage,
 		kShowErrorLoadingInbox,
 		kShowRetryListMessages,
+		kSortTableByDate,
 		kWasDeleteMessageValid,
 		kWasListMessagesValid,
 	};

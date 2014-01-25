@@ -27,7 +27,7 @@ public:
     URLConnection(size_t newId, const std::string& url);
     URLConnection(size_t newId, const std::string& url, const tFile& newFile);
     URLConnection(size_t newId, const std::string& url, const std::string& body);
-    URLConnection(size_t newId, const std::string& newPHP, const std::vector<std::pair<std::string, std::string> >& newParams, const tFile& newFile, bool isAmiVoice = false);
+    URLConnection(size_t newId, const std::string& newPHP, const std::vector<std::pair<std::string, std::string> >& newParams, const tFile& newFile);
     ~URLConnection();
 
     void DidReceiveResponse(const void* response, int responseCode);
@@ -49,7 +49,7 @@ public:
     void loadString(size_t newId, const std::string& newURL);
     void loadFile(size_t newId, const std::string& newURL, const tFile& newFile);
     void postJSON(size_t newId, const std::string& newURL, const std::string& newBody);
-    void postFile(size_t newId, const std::string& newPHP, const std::vector<std::pair<std::string, std::string> >& newParams, const tFile& newFile, bool isAmiVoice = false);
+    void postFile(size_t newId, const std::string& newPHP, const std::vector<std::pair<std::string, std::string> >& newParams, const tFile& newFile);
 
 public:
     friend class tSingleton<URLLoader>;

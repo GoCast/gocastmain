@@ -11,7 +11,7 @@
 11 Pause audio
 12 Paused idle
 13 Stop audio
-14 Peer: pop self
+14 Send ReloadInbox to VC
 15 Stop recording before pop
 16 Stop playing before pop
 17 Wait for transcription
@@ -27,13 +27,17 @@
 27 Resume audio
 28 Let didRecord be false
 29 Let didRecord be true
+30 Send postMessage to server
+31 Was postMessage successful?
+32 Calculate Message JSON
+33 Peer: pop self
 #
 3 4 no
 4 5 recordPressed
 3 6 yes
 5 7
 7 8 recordPressed
-1 28
+1 32
 8 17
 6 10 playPressed
 10 9
@@ -60,7 +64,7 @@
 23 25 success
 23 21 fail
 21 14 yes
-25 14 yes
+25 30 yes
 25 21 no
 4 26 sendPressed
 26 4 yes
@@ -72,3 +76,9 @@
 17 17 sendPressed, cancelPressed
 28 3
 29 3
+30 31 success
+31 14 yes
+31 21 no
+30 21 fail
+32 28
+14 33

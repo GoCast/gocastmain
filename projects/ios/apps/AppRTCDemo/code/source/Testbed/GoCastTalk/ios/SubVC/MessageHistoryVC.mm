@@ -40,6 +40,9 @@
     self.mFrom.text = [NSString stringWithUTF8String:mInitObject["from"].mString.c_str()];
     self.mDate.text = [NSString stringWithUTF8String:result.c_str()];
     self.mTranscription.text = [NSString stringWithUTF8String:mInitObject["transcription"].mObject["ja"].mString.c_str()];
+
+    self.mTranscription.numberOfLines = 0;
+    [self.mTranscription sizeToFit];
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -107,7 +110,10 @@
         cell.mFrom.textColor =  mPeer->getIsGroup(indexPath.row + 1) ?
         [UIColor colorWithRed:0.0f green:0.47f blue:1.0f alpha:1.0f] :
         [UIColor colorWithRed:0.0f green:0.0f  blue:0.0f alpha:1.0f];
-        
+
+        cell.mTranscription.numberOfLines = 0;
+        [cell.mTranscription sizeToFit];
+
         return cell;
 
     }
