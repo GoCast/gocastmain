@@ -7,6 +7,7 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="RecordMessageVC">
             <connections>
+                <outlet property="mBlockingView" destination="EWU-Pp-LmE" id="BVg-8Y-0gQ"/>
                 <outlet property="mPauseButton" destination="7wX-n2-oF0" id="Azc-ld-PjZ"/>
                 <outlet property="mPlayButton" destination="XC1-hX-Hev" id="1Gr-sM-96W"/>
                 <outlet property="mRecordButton" destination="ye6-Tb-ad9" id="NCM-m8-7iA"/>
@@ -98,6 +99,18 @@
                         <outlet property="delegate" destination="-1" id="PGl-Qd-cXo"/>
                     </connections>
                 </tableView>
+                <view hidden="YES" alpha="0.20000000298023224" contentMode="scaleToFill" id="EWU-Pp-LmE" userLabel="mBlockingView">
+                    <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                    <subviews>
+                        <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" animating="YES" style="whiteLarge" id="mPG-3f-PJy">
+                            <rect key="frame" x="142" y="221" width="37" height="37"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <color key="color" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                        </activityIndicatorView>
+                    </subviews>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                </view>
             </subviews>
             <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
             <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina4"/>

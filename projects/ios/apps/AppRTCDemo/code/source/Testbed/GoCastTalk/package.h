@@ -19,6 +19,10 @@
 #include "GCTEvent.h"
 #include "GCTEventManager.h"
 
+//Screens
+
+#include "LoginScreen.h"
+
 #include "InboxScreen.h"
 #include "InboxMessageScreen.h"
 #include "RecordMessageScreen.h"

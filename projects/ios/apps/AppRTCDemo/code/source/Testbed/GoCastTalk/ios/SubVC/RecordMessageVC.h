@@ -26,6 +26,7 @@ class RecordMessageScreen;
 @property (nonatomic, strong) IBOutlet UIButton*        mPlayButton;
 
 @property (nonatomic, strong) IBOutlet UILabel*         mToLabel;
+@property (nonatomic, strong) IBOutlet UIView*          mBlockingView;
 
 #pragma mark Construction / Destruction
 - (void)viewDidLoad;
@@ -34,6 +35,8 @@ class RecordMessageScreen;
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section;
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath;
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath;
+
+-(void)setBlockingViewVisible:(bool)newVisible;
 
 -(IBAction)pausePressed;
 -(IBAction)recordPressed;

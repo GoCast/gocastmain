@@ -37,7 +37,7 @@
         result = date.substr(4,2) + "/" + date.substr(6,2) + " " + date.substr(8,2) + ":" + date.substr(10,2);
     }
 
-    self.mReceive.image = [UIImage imageNamed:((mInitObject["from"].mString != "tjgrant@tatewake.com") ? @"icon-receive.png" : @"icon-sent.png")];
+    self.mReceive.image = [UIImage imageNamed:((mInitObject["from"].mString != InboxScreen::mToken) ? @"icon-receive.png" : @"icon-sent.png")];
     self.mFrom.text = [NSString stringWithUTF8String:mInitObject["from"].mString.c_str()];
     self.mDate.text = [NSString stringWithUTF8String:result.c_str()];
     self.mTranscription.text = [NSString stringWithUTF8String:mInitObject["transcription"].mObject["ja"].mString.c_str()];
@@ -179,6 +179,11 @@
 //            GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kTableItemDeleted, (tUInt32)indexPath.row));
 //        }
     }
+}
+
+-(void)setBlockingViewVisible:(bool)newVisible
+{
+    [self.mBlockingView setHidden:newVisible ? NO : YES];
 }
 
 -(void)customInit:(const JSONObject&)newObject

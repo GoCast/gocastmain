@@ -179,7 +179,7 @@ void RecordMessageScreen::calculateMessageJSONEntry()
             tTimer::getSystemTimeMS() % 100);
 
     date = buf;
-    audioName = date + "-tjgrant@tatewake.com";
+    audioName = date + "-" + InboxScreen::mToken;
 
     //2. Treat as "reply all", calculate the "to"
     //   based on the original "from" and all other recipients
@@ -191,14 +191,14 @@ void RecordMessageScreen::calculateMessageJSONEntry()
     {
         iter = mInitObject["to"].mArray[i].mString;
 
-        if (iter != "tjgrant@tatewake.com")
+        if (iter != InboxScreen::mToken)
         {
             mMessageJSON["to"].mArray.push_back(JSONValue(iter));
         }
     }
 
     //3. Fill in results
-    mMessageJSON["from"]        = std::string("tjgrant@tatewake.com");
+    mMessageJSON["from"]        = std::string(InboxScreen::mToken);
     mMessageJSON["date"]        = date;
     mMessageJSON["audio"]       = audioName;
     mMessageJSON["in-reply-to"] = mInitObject["audio"];
@@ -291,10 +291,12 @@ void RecordMessageScreen::stopRecordingBeforeSendEntry()
 
 void RecordMessageScreen::sendPostAudioToServerEntry()
 {
+    [mPeer setBlockingViewVisible:true];
+
     std::vector<std::pair<std::string, std::string> > params;
 
     params.push_back(std::pair<std::string, std::string>("action", "postAudio"));
-    params.push_back(std::pair<std::string, std::string>("name", "tjgrant@tatewake.com"));
+    params.push_back(std::pair<std::string, std::string>("name", InboxScreen::mToken));
     params.push_back(std::pair<std::string, std::string>("audio", mMessageJSON["audio"].mString));
 
     params.push_back(std::pair<std::string, std::string>("MAX_FILE_SIZE", "10485760"));
@@ -304,10 +306,12 @@ void RecordMessageScreen::sendPostAudioToServerEntry()
 
 void RecordMessageScreen::sendPostTranscriptToServerEntry()
 {
+    [mPeer setBlockingViewVisible:true];
+
     std::vector<std::pair<std::string, std::string> > params;
 
     params.push_back(std::pair<std::string, std::string>("action", "postTranscription"));
-    params.push_back(std::pair<std::string, std::string>("name", "tjgrant@tatewake.com"));
+    params.push_back(std::pair<std::string, std::string>("name", InboxScreen::mToken));
     params.push_back(std::pair<std::string, std::string>("audio", mMessageJSON["audio"].mString));
 
     params.push_back(std::pair<std::string, std::string>("MAX_FILE_SIZE", "10485760"));
@@ -317,10 +321,12 @@ void RecordMessageScreen::sendPostTranscriptToServerEntry()
 
 void RecordMessageScreen::sendPostMessageToServerEntry()
 {
+    [mPeer setBlockingViewVisible:true];
+
     std::vector<std::pair<std::string, std::string> > params;
 
     params.push_back(std::pair<std::string, std::string>("action", "postMessage"));
-    params.push_back(std::pair<std::string, std::string>("name", "tjgrant@tatewake.com"));
+    params.push_back(std::pair<std::string, std::string>("name", InboxScreen::mToken));
 
     params.push_back(std::pair<std::string, std::string>("MAX_FILE_SIZE", "10485760"));
 
@@ -332,7 +338,7 @@ void RecordMessageScreen::sendPostMessageToServerEntry()
 
 void RecordMessageScreen::setWaitForPostAudioEntry()
 {
-    //TODO
+    [mPeer setBlockingViewVisible:true];
 }
 
 void RecordMessageScreen::showNoAudioToSendEntry()
@@ -502,7 +508,7 @@ void RecordMessageScreen::update(const URLLoaderEvent& msg)
 {
     if (msg.mId == this)
     {
-        [gAppDelegateInstance setBlockingViewVisible:false];
+        [mPeer setBlockingViewVisible:false];
 
         switch (msg.mEvent)
         {

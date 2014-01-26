@@ -7,6 +7,7 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="InboxMessageVC">
             <connections>
+                <outlet property="mBlockingView" destination="F6P-ko-7cm" id="K7Q-li-6iz"/>
                 <outlet property="mDate" destination="KEK-6W-lqA" id="8cW-lu-laH"/>
                 <outlet property="mFrom" destination="Igm-Lq-a8l" id="SUJ-ub-WON"/>
                 <outlet property="mPlayButton" destination="1Hg-ZM-0CY" id="JZO-4Q-dQ9"/>
@@ -92,6 +93,18 @@
                         <outlet property="delegate" destination="-1" id="S7b-cg-whM"/>
                     </connections>
                 </tableView>
+                <view hidden="YES" alpha="0.20000000000000001" contentMode="scaleToFill" id="F6P-ko-7cm" userLabel="mBlockingView">
+                    <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                    <subviews>
+                        <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" animating="YES" style="whiteLarge" id="F59-bj-jlm">
+                            <rect key="frame" x="142" y="221" width="37" height="37"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <color key="color" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                        </activityIndicatorView>
+                    </subviews>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                </view>
             </subviews>
             <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
             <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina4"/>

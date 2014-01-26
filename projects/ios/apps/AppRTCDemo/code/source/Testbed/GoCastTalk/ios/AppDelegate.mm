@@ -13,6 +13,8 @@
 #import "VC/ContactsVC.h"
 #import "VC/GroupsVC.h"
 
+#import "VC/LoginVC.h"
+
 #include "Base/package.h"
 
 #include "GCTEvent.h"
@@ -73,7 +75,7 @@ const unsigned char SpeechKitApplicationKey[] =
 	[vcs removeObjectAtIndex:4];
 	[vcs removeObjectAtIndex:3];
 	[vcs removeObjectAtIndex:2];
-	[vcs removeObjectAtIndex:1];
+
 	[self.tabBarController setViewControllers:vcs];
 
     if (floor(NSFoundationVersionNumber) > NSFoundationVersionNumber_iOS_6_1)
@@ -87,6 +89,8 @@ const unsigned char SpeechKitApplicationKey[] =
 
     [self.window setRootViewController:self.tabBarController];
     [self.window makeKeyAndVisible];
+
+    [self.tabBarController presentViewController:[[[LoginVC alloc] init] autorelease] animated:YES completion:nil];
 
     GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kAppDelegateInit));
 

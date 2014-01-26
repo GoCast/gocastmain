@@ -5,7 +5,8 @@
 
 #include "InboxVC.h"
 
-JSONArray InboxScreen::mInbox;
+JSONArray   InboxScreen::mInbox;
+std::string InboxScreen::mToken;
 
 bool sortByDate (JSONValue i, JSONValue j);
 bool sortByDate (JSONValue i, JSONValue j)
@@ -61,7 +62,7 @@ std::string InboxScreen::getTranscription(const size_t& i)
 bool        InboxScreen::getIsReceive(const size_t& i)
 {
 #pragma unused(i)
-    return mInbox[i].mObject["from"].mString != "tjgrant@tatewake.com";
+    return mInbox[i].mObject["from"].mString != InboxScreen::mToken;
 }
 
 bool        InboxScreen::getIsGroup(const size_t& i)
@@ -116,6 +117,11 @@ void InboxScreen::idleEntry()
 }
 
 #pragma mark Queries
+void InboxScreen::doWeHaveATokenEntry()
+{
+    SetImmediateEvent(InboxScreen::mToken.empty() ? kNo : kYes);
+}
+
 void InboxScreen::wasDeleteMessageValidEntry()
 {
     bool result = false;
@@ -154,6 +160,11 @@ void InboxScreen::peerPushInboxMessageEntry()
 
 #pragma mark Actions
 
+void InboxScreen::clearInboxEntry()
+{
+    mInbox.clear();
+}
+
 void InboxScreen::sortTableByDateEntry()
 {
     mInbox = mListMessagesJSON["list"].mArray;
@@ -167,7 +178,7 @@ void InboxScreen::sendListMessagesToServerEntry()
 
     sprintf(buf, "%s?action=listMessages&name=%s",
             kMemoAppServerURL,
-            "tjgrant@tatewake.com");
+            InboxScreen::mToken.c_str());
 
     URLLoader::getInstance()->loadString(this, buf);
 }
@@ -178,7 +189,7 @@ void InboxScreen::sendDeleteMessageToServerEntry()
 
     sprintf(buf, "%s?action=deleteMessage&name=%s&audio=%s",
             kMemoAppServerURL,
-            "tjgrant@tatewake.com",
+            InboxScreen::mToken.c_str(),
             mInbox[mDeleteSelected].mObject["audio"].mString.c_str());
 
     URLLoader::getInstance()->loadString(this, buf);
@@ -187,12 +198,12 @@ void InboxScreen::sendDeleteMessageToServerEntry()
 #pragma mark User Interface
 void InboxScreen::setWaitForDeleteMessageEntry()
 {
-    //TODO
+    [mPeer setBlockingViewVisible:true];
 }
 
 void InboxScreen::setWaitForListMessagesEntry()
 {
-    //TODO
+    [mPeer setBlockingViewVisible:true];
 }
 
 void InboxScreen::showErrorDeletingMessageEntry()
@@ -215,6 +226,8 @@ void InboxScreen::CallEntry()
 {
 	switch(mState)
 	{
+		case kClearInbox: clearInboxEntry(); break;
+		case kDoWeHaveAToken: doWeHaveATokenEntry(); break;
 		case kEnd: EndEntryHelper(); break;
 		case kIdle: idleEntry(); break;
 		case kInvalidState: invalidStateEntry(); break;
@@ -241,9 +254,12 @@ void InboxScreen::CallExit()
 
 int  InboxScreen::StateTransitionFunction(const int evt) const
 {
+	if ((mState == kClearInbox) && (evt == kNext)) return kPeerReloadTable; else
+	if ((mState == kDoWeHaveAToken) && (evt == kNo)) return kClearInbox; else
+	if ((mState == kDoWeHaveAToken) && (evt == kYes)) return kSetWaitForListMessages; else
 	if ((mState == kIdle) && (evt == kDeleteSelected)) return kSetWaitForDeleteMessage; else
 	if ((mState == kIdle) && (evt == kItemSelected)) return kPeerPushInboxMessage; else
-	if ((mState == kIdle) && (evt == kRefreshSelected)) return kSetWaitForListMessages; else
+	if ((mState == kIdle) && (evt == kRefreshSelected)) return kDoWeHaveAToken; else
 	if ((mState == kPeerPushInboxMessage) && (evt == kNext)) return kIdle; else
 	if ((mState == kPeerReloadTable) && (evt == kNext)) return kIdle; else
 	if ((mState == kSendDeleteMessageToServer) && (evt == kFail)) return kShowErrorDeletingMessage; else
@@ -255,11 +271,11 @@ int  InboxScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kShowErrorDeletingMessage) && (evt == kYes)) return kPeerReloadTable; else
 	if ((mState == kShowErrorLoadingInbox) && (evt == kYes)) return kPeerReloadTable; else
 	if ((mState == kShowRetryListMessages) && (evt == kNo)) return kPeerReloadTable; else
-	if ((mState == kShowRetryListMessages) && (evt == kYes)) return kSetWaitForListMessages; else
+	if ((mState == kShowRetryListMessages) && (evt == kYes)) return kDoWeHaveAToken; else
 	if ((mState == kSortTableByDate) && (evt == kNext)) return kPeerReloadTable; else
-	if ((mState == kStart) && (evt == kNext)) return kSetWaitForListMessages; else
+	if ((mState == kStart) && (evt == kNext)) return kDoWeHaveAToken; else
 	if ((mState == kWasDeleteMessageValid) && (evt == kNo)) return kShowErrorDeletingMessage; else
-	if ((mState == kWasDeleteMessageValid) && (evt == kYes)) return kSetWaitForListMessages; else
+	if ((mState == kWasDeleteMessageValid) && (evt == kYes)) return kDoWeHaveAToken; else
 	if ((mState == kWasListMessagesValid) && (evt == kNo)) return kShowErrorLoadingInbox; else
 	if ((mState == kWasListMessagesValid) && (evt == kYes)) return kSortTableByDate;
 
@@ -270,6 +286,7 @@ bool InboxScreen::HasEdgeNamedNext() const
 {
 	switch(mState)
 	{
+		case kClearInbox:
 		case kPeerPushInboxMessage:
 		case kPeerReloadTable:
 		case kSetWaitForDeleteMessage:
@@ -292,7 +309,7 @@ void InboxScreen::update(const URLLoaderEvent& msg)
 {
     if (msg.mId == this)
     {
-        [gAppDelegateInstance setBlockingViewVisible:false];
+        [mPeer setBlockingViewVisible:false];
 
         switch (msg.mEvent)
         {

@@ -28,6 +28,7 @@ class InboxMessageScreen;
 @property (nonatomic, strong) IBOutlet UILabel*         mTime;
 
 @property (nonatomic, strong) IBOutlet UITableView*     mTable;
+@property (nonatomic, strong) IBOutlet UIView*          mBlockingView;
 
 #pragma mark Construction / Destruction
 - (void)viewDidLoad;
@@ -36,6 +37,8 @@ class InboxMessageScreen;
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section;
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath;
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath;
+
+-(void)setBlockingViewVisible:(bool)newVisible;
 
 -(void)customInit:(const JSONObject&)newObject;
 

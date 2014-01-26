@@ -150,6 +150,11 @@
     }
 }
 
+-(void)setBlockingViewVisible:(bool)newVisible
+{
+    [self.mBlockingView setHidden:newVisible ? NO : YES];
+}
+
 -(IBAction)pausePressed
 {
     mPeer->pausePressed();

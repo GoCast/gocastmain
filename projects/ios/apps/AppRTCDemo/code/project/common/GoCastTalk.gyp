@@ -12,6 +12,12 @@
 
 		'actions': [
 			{
+				'action_name': 'LoginScreen.tgf',
+				'inputs': [ '../../tgf/Testbed/GoCastTalk/LoginScreen.tgf', ],
+				'outputs': [ '../../dummy', ],
+				'action': [ '<@(_graphcode)', '<@(_inputs)',  '--force-update', '--machine', 'LoginScreen', '-h', '../../source/Testbed/GoCastTalk/LoginScreen.h', '-cpp', '../../source/Testbed/GoCastTalk/LoginScreen.mm', ],
+			},
+			{
 				'action_name': 'InboxScreen.tgf',
 				'inputs': [ '../../tgf/Testbed/GoCastTalk/InboxScreen.tgf', ],
 				'outputs': [ '../../dummy', ],
@@ -42,6 +48,9 @@
 
 			'../../source/Testbed/GoCastTalk/GCTEvent.h',
 			'../../source/Testbed/GoCastTalk/GCTEventManager.h',
+
+			'../../source/Testbed/GoCastTalk/LoginScreen.mm',
+			'../../source/Testbed/GoCastTalk/LoginScreen.h',
 
 			'../../source/Testbed/GoCastTalk/InboxScreen.mm',
 			'../../source/Testbed/GoCastTalk/InboxScreen.h',
@@ -129,6 +138,9 @@
 					'../../source/Testbed/GoCastTalk/<@(OS)/AppDelegate.mm',
 					'../../source/Bootstrap/<@(OS)/main.mm',
 
+					'../../source/Testbed/GoCastTalk/<@(OS)/VC/LoginVC.h',
+					'../../source/Testbed/GoCastTalk/<@(OS)/VC/LoginVC.mm',
+
 					'../../source/Testbed/GoCastTalk/<@(OS)/VC/InboxVC.h',
 					'../../source/Testbed/GoCastTalk/<@(OS)/VC/InboxVC.mm',
 					'../../source/Testbed/GoCastTalk/<@(OS)/VC/NewMemoVC.h',
@@ -173,6 +185,8 @@
 
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/MainWindow.xib',
 
+					'../../rsrc/Testbed/GoCastTalk/<@(OS)/VC/LoginVC.xib',
+
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/VC/InboxVC.xib',
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/VC/NewMemoVC.xib',
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/VC/ContactsVC.xib',
@@ -190,6 +204,9 @@
 
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/en.lproj/InboxEntryCell.xib',
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/en.lproj/HeadingSubCell.xib',
+
+					'../../rsrc/Testbed/GoCastTalk/<@(OS)/bg-login.png',
+					'../../rsrc/Testbed/GoCastTalk/<@(OS)/bg-button.png',
 
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/banner.png',
 

@@ -121,7 +121,7 @@ void InboxMessageScreen::sendDeleteMessageToServerEntry()
 
     sprintf(buf, "%s?action=deleteMessage&name=%s&audio=%s",
             kMemoAppServerURL,
-            "tjgrant@tatewake.com",
+            InboxScreen::mToken.c_str(),
             mInitObject["audio"].mString.c_str());
 
     URLLoader::getInstance()->loadString(this, buf);
@@ -219,12 +219,12 @@ void InboxMessageScreen::updateTimeLabelEntry()
 
 void InboxMessageScreen::setWaitForDeleteMessageEntry()
 {
-    //TODO
+    [mPeer setBlockingViewVisible:true];
 }
 
 void InboxMessageScreen::setWaitForDownloadEntry()
 {
-    //TODO
+    [mPeer setBlockingViewVisible:true];
 }
 
 void InboxMessageScreen::showErrorDeletingMessageEntry()
@@ -367,7 +367,7 @@ void InboxMessageScreen::update(const URLLoaderEvent& msg)
 {
     if (msg.mId == this)
     {
-        [gAppDelegateInstance setBlockingViewVisible:false];
+        [mPeer setBlockingViewVisible:false];
 
         switch (msg.mEvent)
         {

@@ -6,20 +6,21 @@
 class JSONValue;
 typedef std::map<std::string, JSONValue> JSONObject;
 
-class InboxScreen;
+class LoginScreen;
 
-@interface InboxVC : UIViewController
+@interface LoginVC : UIViewController
 <
     UITableViewDelegate,
     UITableViewDataSource
 >
 {
-    InboxScreen* mPeer;
+    LoginScreen* mPeer;
 }
 
 //mInboxView
-@property (nonatomic, strong) IBOutlet UITableView*     mTable;
-@property (nonatomic, strong) IBOutlet UIView*          mBlockingView;
+@property (nonatomic, strong) IBOutlet UITextField* mEmail;
+@property (nonatomic, strong) IBOutlet UITextField* mPassword;
+@property (nonatomic, strong) IBOutlet UIView*      mBlockingView;
 
 #pragma mark Construction / Destruction
 - (void)viewDidLoad;
@@ -33,9 +34,11 @@ class InboxScreen;
 
 #pragma mark -
 
--(void) reloadTable;
--(void) pushInboxMessage:(const JSONObject&)newObject;
+-(IBAction) signInPressed;
+-(IBAction) signUpPressed;
+-(IBAction) troublePressed;
 
--(void)refresh:(UIRefreshControl *)refreshControl;
+-(void) setLoginName:(const std::string&)newName;
+-(void) popSelf;
 
 @end

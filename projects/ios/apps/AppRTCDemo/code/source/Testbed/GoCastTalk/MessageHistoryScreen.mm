@@ -68,7 +68,7 @@ std::string MessageHistoryScreen::getTranscription(const size_t& i)
 bool        MessageHistoryScreen::getIsReceive(const size_t& i)
 {
 #pragma unused(i)
-    return mHistory[i].mObject["from"].mString != "tjgrant@tatewake.com";
+    return mHistory[i].mObject["from"].mString != InboxScreen::mToken;
 }
 
 bool        MessageHistoryScreen::getIsGroup(const size_t& i)

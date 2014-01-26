@@ -19,7 +19,8 @@ protected:
     size_t      mDeleteSelected;
 
 public:
-    static JSONArray mInbox;
+    static JSONArray    mInbox;
+    static std::string  mToken;
 
 public:
 	InboxScreen(InboxVC* newVC);
@@ -43,6 +44,8 @@ protected:
 	void endEntry();
 	void invalidStateEntry();
 
+	void clearInboxEntry();
+	void doWeHaveATokenEntry();
 	void idleEntry();
 	void peerPushInboxMessageEntry();
 	void peerReloadTableEntry();
@@ -75,6 +78,8 @@ public:
 	{
 		kInvalidState = 0,
 		kStart = 1,
+		kClearInbox,
+		kDoWeHaveAToken,
 		kEnd,
 		kIdle,
 		kPeerPushInboxMessage,
