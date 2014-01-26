@@ -3,8 +3,11 @@
 
 include 'utils.php';
 
+include 'login.php';
+include 'register.php';
 include 'listMessages.php';
 include 'deleteMessage.php';
+
 include 'postAudio.php';
 include 'postMessage.php';
 include 'postTranscription.php';
@@ -69,6 +72,28 @@ if(hasParam("action"))
 	{
 		switch($_GET["action"])
 		{
+			case "register":
+				if (hasParam("password"))
+				{
+					print(json_encode(register($_GET["name"], $_GET["password"])));
+				}
+				else
+				{
+					print(json_encode(errorMissingParameter("password")));
+				}
+				break;
+
+			case "login":
+				if (hasParam("password"))
+				{
+					print(json_encode(login($_GET["name"], $_GET["password"])));
+				}
+				else
+				{
+					print(json_encode(errorMissingParameter("password")));
+				}
+				break;
+
 			case "listMessages":
 				print(json_encode(listMessages($_GET["name"])));
 				break;
