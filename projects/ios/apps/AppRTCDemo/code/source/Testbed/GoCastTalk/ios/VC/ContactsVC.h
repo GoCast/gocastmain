@@ -15,6 +15,7 @@ class ContactsScreen;
 >
 {
     ContactsScreen* mPeer;
+    bool            mIsChild;
 }
 
 //mInboxView
@@ -34,6 +35,10 @@ class ContactsScreen;
 
 -(void) pushContactDetails:(const JSONObject&)newObject;
 -(void) pushEditContacts;
+
+-(void) customInit:(bool)newIsChild;
+
+-(void) popSelf;
 
 @end
 

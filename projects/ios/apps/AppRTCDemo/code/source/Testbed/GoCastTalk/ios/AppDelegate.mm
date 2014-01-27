@@ -75,8 +75,6 @@ const unsigned char SpeechKitApplicationKey[] =
 
 	[vcs removeObjectAtIndex:3];
 
-	[vcs removeObjectAtIndex:1];
-
 	[self.tabBarController setViewControllers:vcs];
 
     if (floor(NSFoundationVersionNumber) > NSFoundationVersionNumber_iOS_6_1)

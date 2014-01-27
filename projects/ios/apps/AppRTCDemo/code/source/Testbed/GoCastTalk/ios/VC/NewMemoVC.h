@@ -2,18 +2,24 @@
 #import <MessageUI/MessageUI.h>
 #import <AVFoundation/AVFoundation.h>
 
+#include <map>
+class JSONValue;
+typedef std::map<std::string, JSONValue> JSONObject;
+
+class NewMemoScreen;
+
 @interface NewMemoVC : UIViewController
 <
     UITableViewDelegate,
     UITableViewDataSource
 >
 {
+    NewMemoScreen* mPeer;
 }
 
 //mInboxView
 @property (nonatomic, strong) IBOutlet UITableView*     mTable;
-@property (nonatomic, strong) IBOutlet UIButton*        mAddContactsButton;
-@property (nonatomic, strong) IBOutlet UIButton*        mAddGroupsButton;
+@property (nonatomic, strong) IBOutlet UITextView*      mToList;
 
 #pragma mark Construction / Destruction
 - (void)viewDidLoad;
@@ -23,6 +29,13 @@
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath;
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath;
 
--(IBAction)buttonPressed:(UIButton*)sender;
+-(IBAction)addContactsPressed;
+-(IBAction)addGroupsPressed;
+-(IBAction)clearPressed;
+
+-(void) pushRecordMessage:(const JSONObject&)newObject;
+-(void) pushContacts;
+
+-(void)updateToList:(const std::string&) newToList;
 
 @end

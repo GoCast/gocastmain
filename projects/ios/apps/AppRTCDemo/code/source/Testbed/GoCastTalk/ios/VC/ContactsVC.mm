@@ -25,12 +25,15 @@
 
     [self.mTable registerNib:[UINib nibWithNibName:@"HeadingSubCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"HeadingSubCell"];
 
-    UIBarButtonItem *anotherButton = [[[UIBarButtonItem alloc] initWithTitle:@"Edit" style:UIBarButtonItemStylePlain target:self action:@selector(helpButton:)] autorelease];
-    self.navigationItem.rightBarButtonItem = anotherButton;
+    if (!self->mIsChild)
+    {
+        UIBarButtonItem *anotherButton = [[[UIBarButtonItem alloc] initWithTitle:@"Edit" style:UIBarButtonItemStylePlain target:self action:@selector(helpButton:)] autorelease];
+        self.navigationItem.rightBarButtonItem = anotherButton;
+    }
 
     self.view.autoresizesSubviews = YES;
 
-    mPeer = new ContactsScreen(self);
+    mPeer = new ContactsScreen(self, self->mIsChild);
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -41,6 +44,18 @@
     {
         GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kPop));
     }
+}
+
+- (id)init
+{
+    self = [super init];
+
+    if (self)
+    {
+        self->mIsChild = false;
+    }
+
+    return self;
 }
 
 - (void)dealloc
@@ -172,6 +187,16 @@
 {
     EditContactsVC* nextVC = [[[EditContactsVC alloc] initWithNibName:@"EditContactsVC" bundle:nil] autorelease];
     [(UINavigationController*)self.parentViewController  pushViewController:nextVC animated:YES];
+}
+
+-(void) customInit:(bool)newIsChild
+{
+    mIsChild = newIsChild;
+}
+
+-(void) popSelf
+{
+    [(UINavigationController*)self.parentViewController popViewControllerAnimated:TRUE];
 }
 
 @end

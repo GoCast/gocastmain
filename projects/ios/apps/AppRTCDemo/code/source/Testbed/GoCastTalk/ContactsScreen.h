@@ -12,9 +12,10 @@ class ContactsScreen
 protected:
     ContactsVC* mPeer;
     size_t      mItemSelected;
+    bool        mIsChild;
 
 public:
-	ContactsScreen(ContactsVC* newVC);
+	ContactsScreen(ContactsVC* newVC, bool newIsChild);
 	~ContactsScreen();
 
     void        itemPressed(const size_t& i);
@@ -27,8 +28,11 @@ protected:
 	void invalidStateEntry();
 
 	void idleEntry();
+	void isThisAChildScreenEntry();
+	void peerPopSelfEntry();
 	void peerPushEditContactsEntry();
 	void peerReloadTableEntry();
+	void sendAppendNewContactToVCEntry();
 	void showNotImplementedYetEntry();
 
 public:
@@ -38,6 +42,7 @@ public:
 		kNext = -1,
 		kHelpPressed,
 		kItemSelected,
+		kNo,
 		kRefreshSelected,
 		kYes,
 	};
@@ -48,8 +53,11 @@ public:
 		kStart = 1,
 		kEnd,
 		kIdle,
+		kIsThisAChildScreen,
+		kPeerPopSelf,
 		kPeerPushEditContacts,
 		kPeerReloadTable,
+		kSendAppendNewContactToVC,
 		kShowNotImplementedYet,
 	};
 

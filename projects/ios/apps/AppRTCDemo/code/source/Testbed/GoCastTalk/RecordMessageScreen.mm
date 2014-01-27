@@ -160,6 +160,8 @@ void RecordMessageScreen::wasPostMessageSuccessfulEntry()
 #pragma mark Actions
 void RecordMessageScreen::calculateMessageJSONEntry()
 {
+    std::map<std::string, int> calculated;
+
     char buf[80];
     std::string date;
     std::string audioName;
@@ -184,17 +186,17 @@ void RecordMessageScreen::calculateMessageJSONEntry()
     //2. Treat as "reply all", calculate the "to"
     //   based on the original "from" and all other recipients
     mMessageJSON["to"]          = JSONArray();
-    mMessageJSON["to"].mArray.push_back(mInitObject["from"].mString);
 
-    std::string iter;
+    calculated[mInitObject["from"].mString]++;
+
     for (size_t i = 0; i < mInitObject["to"].mArray.size(); i++)
     {
-        iter = mInitObject["to"].mArray[i].mString;
+        calculated[mInitObject["to"].mArray[i].mString]++;
+    }
 
-        if (iter != InboxScreen::mToken)
-        {
-            mMessageJSON["to"].mArray.push_back(JSONValue(iter));
-        }
+    for (std::map<std::string, int>::iterator iter = calculated.begin(); iter != calculated.end(); iter++)
+    {
+        mMessageJSON["to"].mArray.push_back(JSONValue(iter->first));
     }
 
     //3. Fill in results

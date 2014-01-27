@@ -94,8 +94,8 @@ void ChangeRegisteredNameScreen::updateGlobalContactsAndContactmapEntry()
     {
         if (InboxScreen::mContacts[i].mObject["email"].mString == mInitObject["email"].mString)
         {
-            InboxScreen::mContacts[i].mObject["kanji"].mString   = mInitObject["kanji"].mString;
-            InboxScreen::mContacts[i].mObject["kana"].mString    = mInitObject["kana"].mString;
+            InboxScreen::mContacts[i].mObject["kanji"]   = mInitObject["kanji"].mString;
+            InboxScreen::mContacts[i].mObject["kana"]    = mInitObject["kana"].mString;
 
             found = true;
             break;

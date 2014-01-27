@@ -43,6 +43,13 @@
 			},
 
 			{
+				'action_name': 'NewMemoScreen.tgf',
+				'inputs': [ '../../tgf/Testbed/GoCastTalk/NewMemoScreen.tgf', ],
+				'outputs': [ '../../dummy', ],
+				'action': [ '<@(_graphcode)', '<@(_inputs)',  '--force-update', '--machine', 'NewMemoScreen', '-h', '../../source/Testbed/GoCastTalk/NewMemoScreen.h', '-cpp', '../../source/Testbed/GoCastTalk/NewMemoScreen.mm', ],
+			},
+
+			{
 				'action_name': 'ContactsScreen.tgf',
 				'inputs': [ '../../tgf/Testbed/GoCastTalk/ContactsScreen.tgf', ],
 				'outputs': [ '../../dummy', ],
@@ -95,6 +102,9 @@
 
 			'../../source/Testbed/GoCastTalk/MessageHistoryScreen.mm',
 			'../../source/Testbed/GoCastTalk/MessageHistoryScreen.h',
+
+			'../../source/Testbed/GoCastTalk/NewMemoScreen.mm',
+			'../../source/Testbed/GoCastTalk/NewMemoScreen.h',
 
 			'../../source/Testbed/GoCastTalk/ContactsScreen.mm',
 			'../../source/Testbed/GoCastTalk/ContactsScreen.h',
