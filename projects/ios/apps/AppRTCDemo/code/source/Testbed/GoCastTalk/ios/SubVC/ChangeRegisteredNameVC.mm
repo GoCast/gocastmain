@@ -1,10 +1,10 @@
 #include "ChangeRegisteredNameVC.h"
 
 #include "Base/package.h"
+#include "Io/package.h"
 #include "Math/package.h"
 
-#include "GCTEvent.h"
-#include "GCTEventManager.h"
+#include "Testbed/GoCastTalk/package.h"
 
 #import "InboxEntryCell.h"
 #import "HeadingSubCell.h"
@@ -21,9 +21,13 @@
 {
     [super viewDidLoad];
 
-    [self.mTable registerNib:[UINib nibWithNibName:@"InboxEntryCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"InboxEntryCell"];
-
     self.view.autoresizesSubviews = YES;
+
+    mPeer = new ChangeRegisteredNameScreen(self, mInitObject);
+
+    self.mKanji.text    = [NSString stringWithUTF8String:mInitObject["kanji"].mString.c_str()];
+    self.mKana.text     = [NSString stringWithUTF8String:mInitObject["kana"].mString.c_str()];
+    self.mEmail.text    = [NSString stringWithUTF8String:mInitObject["email"].mString.c_str()];
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -38,6 +42,8 @@
 
 - (void)dealloc
 {
+    delete mPeer;
+
     [super dealloc];
 }
 
@@ -171,11 +177,32 @@
     }
 }
 
+-(void)setBlockingViewVisible:(bool)newVisible
+{
+    [self.mBlockingView setHidden:newVisible ? NO : YES];
+}
+
 - (BOOL)textFieldShouldReturn:(UITextField *)textField
 {
 #pragma unused(textField)
     [textField endEditing:YES];
     return YES;
+}
+
+-(void)customInit:(const JSONObject&)newObject
+{
+    mInitObject = newObject;
+}
+
+-(IBAction)savePressed
+{
+    const char* kanji   = [self.mKanji.text UTF8String];
+    const char* kana    = [self.mKana.text  UTF8String];
+
+    mInitObject["kanji"]    = JSONValue(kanji ? kanji : std::string(""));
+    mInitObject["kana"]     = JSONValue(kana  ? kana  : std::string(""));
+
+    mPeer->savePressed(mInitObject);
 }
 
 @end

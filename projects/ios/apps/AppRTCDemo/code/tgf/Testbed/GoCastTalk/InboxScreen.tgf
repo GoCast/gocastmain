@@ -15,6 +15,12 @@
 15 Sort table by date
 16 Do we have a token?
 17 Clear inbox
+18 Set "wait for getContacts"
+19 Send getContacts to server
+20 Was getContacts valid?
+21 Show "error loading contacts"
+22 Did we download contacts?
+23 Build contact map
 #
 1 16
 5 6 success
@@ -36,7 +42,16 @@
 14 9 yes
 13 14 no
 13 16 yes
-15 9
+15 23
 16 17 no
-16 4 yes
+16 22 yes
 17 9
+20 21 no
+22 4 yes
+22 18 no
+18 19
+19 20 success
+19 21 fail
+20 4 yes
+21 4 yes
+23 9

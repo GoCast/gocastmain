@@ -1,0 +1,20 @@
+1 start
+2 end
+3 idle
+4 Set wait for setContacts
+5 Send setContacts to server
+6 Was setContacts successful?
+7 Show "Error with setContacts"
+8 Update global contacts and contactmap
+9 Send ReloadInbox to VC
+#
+1 3
+6 7 no
+5 6 success
+4 5
+5 7 fail
+7 3 yes
+3 8 saveSelected
+6 9 yes
+8 4
+9 3

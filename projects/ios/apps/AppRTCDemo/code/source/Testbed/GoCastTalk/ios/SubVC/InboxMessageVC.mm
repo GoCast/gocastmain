@@ -38,7 +38,16 @@
     }
 
     self.mReceive.image = [UIImage imageNamed:((mInitObject["from"].mString != InboxScreen::mToken) ? @"icon-receive.png" : @"icon-sent.png")];
-    self.mFrom.text = [NSString stringWithUTF8String:mInitObject["from"].mString.c_str()];
+
+    std::string email   = mInitObject["from"].mString;
+    std::string from    = InboxScreen::mContactMap[email];
+
+    if (from.empty())
+    {
+        from = email;
+    }
+
+    self.mFrom.text = [NSString stringWithUTF8String:from.c_str()];
     self.mDate.text = [NSString stringWithUTF8String:result.c_str()];
     self.mTranscription.text = [NSString stringWithUTF8String:mInitObject["transcription"].mObject["ja"].mString.c_str()];
 }

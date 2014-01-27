@@ -13,6 +13,7 @@ class InboxScreen
 protected:
     InboxVC* mPeer;
 
+    JSONObject  mGetContactsJSON;
     JSONObject  mListMessagesJSON;
     JSONObject  mDeleteMessageJSON;
     size_t      mItemSelected;
@@ -20,6 +21,8 @@ protected:
 
 public:
     static JSONArray    mInbox;
+    static JSONArray    mContacts;
+    static std::map<std::string, std::string> mContactMap;
     static std::string  mToken;
 
 public:
@@ -44,20 +47,26 @@ protected:
 	void endEntry();
 	void invalidStateEntry();
 
+	void buildContactMapEntry();
 	void clearInboxEntry();
+	void didWeDownloadContactsEntry();
 	void doWeHaveATokenEntry();
 	void idleEntry();
 	void peerPushInboxMessageEntry();
 	void peerReloadTableEntry();
 	void sendDeleteMessageToServerEntry();
+	void sendGetContactsToServerEntry();
 	void sendListMessagesToServerEntry();
 	void setWaitForDeleteMessageEntry();
+	void setWaitForGetContactsEntry();
 	void setWaitForListMessagesEntry();
 	void showErrorDeletingMessageEntry();
+	void showErrorLoadingContactsEntry();
 	void showErrorLoadingInboxEntry();
 	void showRetryListMessagesEntry();
 	void sortTableByDateEntry();
 	void wasDeleteMessageValidEntry();
+	void wasGetContactsValidEntry();
 	void wasListMessagesValidEntry();
 
 public:
@@ -78,21 +87,27 @@ public:
 	{
 		kInvalidState = 0,
 		kStart = 1,
+		kBuildContactMap,
 		kClearInbox,
+		kDidWeDownloadContacts,
 		kDoWeHaveAToken,
 		kEnd,
 		kIdle,
 		kPeerPushInboxMessage,
 		kPeerReloadTable,
 		kSendDeleteMessageToServer,
+		kSendGetContactsToServer,
 		kSendListMessagesToServer,
 		kSetWaitForDeleteMessage,
+		kSetWaitForGetContacts,
 		kSetWaitForListMessages,
 		kShowErrorDeletingMessage,
+		kShowErrorLoadingContacts,
 		kShowErrorLoadingInbox,
 		kShowRetryListMessages,
 		kSortTableByDate,
 		kWasDeleteMessageValid,
+		kWasGetContactsValid,
 		kWasListMessagesValid,
 	};
 

@@ -1,0 +1,11 @@
+1 start
+2 end
+3 idle
+4 Peer: push ChangeRegisteredName
+5 Show "not yet implemented"
+#
+1 3
+3 4 registeredNameSelected
+4 3
+3 5 changePasswordSelected, logOutSelected, aboutThisAppSelected
+5 3 yes

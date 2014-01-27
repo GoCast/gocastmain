@@ -41,7 +41,15 @@ size_t  MessageHistoryScreen::getInboxSize()
 std::string MessageHistoryScreen::getFrom(const size_t& i)
 {
 #pragma unused(i)
-    return mHistory[i].mObject["from"].mString;
+    std::string email   = mHistory[i].mObject["from"].mString;
+    std::string result  = InboxScreen::mContactMap[email];
+
+    if (result.empty())
+    {
+        result = email;
+    }
+
+    return result;
 }
 
 std::string MessageHistoryScreen::getDate(const size_t& i)

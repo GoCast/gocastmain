@@ -28,6 +28,9 @@
 #include "RecordMessageScreen.h"
 #include "MessageHistoryScreen.h"
 
+#include "SettingsScreen.h"
+#include "ChangeRegisteredNameScreen.h"
+
 #include "ios/AppDelegate.h"
 
 extern AppDelegate* gAppDelegateInstance;

@@ -41,6 +41,19 @@
 				'outputs': [ '../../dummy', ],
 				'action': [ '<@(_graphcode)', '<@(_inputs)',  '--force-update', '--machine', 'MessageHistoryScreen', '-h', '../../source/Testbed/GoCastTalk/MessageHistoryScreen.h', '-cpp', '../../source/Testbed/GoCastTalk/MessageHistoryScreen.mm', ],
 			},
+
+			{
+				'action_name': 'SettingsScreen.tgf',
+				'inputs': [ '../../tgf/Testbed/GoCastTalk/SettingsScreen.tgf', ],
+				'outputs': [ '../../dummy', ],
+				'action': [ '<@(_graphcode)', '<@(_inputs)',  '--force-update', '--machine', 'SettingsScreen', '-h', '../../source/Testbed/GoCastTalk/SettingsScreen.h', '-cpp', '../../source/Testbed/GoCastTalk/SettingsScreen.mm', ],
+			},
+			{
+				'action_name': 'ChangeRegisteredNameScreen.tgf',
+				'inputs': [ '../../tgf/Testbed/GoCastTalk/ChangeRegisteredNameScreen.tgf', ],
+				'outputs': [ '../../dummy', ],
+				'action': [ '<@(_graphcode)', '<@(_inputs)',  '--force-update', '--machine', 'ChangeRegisteredNameScreen', '-h', '../../source/Testbed/GoCastTalk/ChangeRegisteredNameScreen.h', '-cpp', '../../source/Testbed/GoCastTalk/ChangeRegisteredNameScreen.mm', ],
+			},
 		],
 
 		'sources': [
@@ -63,6 +76,12 @@
 
 			'../../source/Testbed/GoCastTalk/MessageHistoryScreen.mm',
 			'../../source/Testbed/GoCastTalk/MessageHistoryScreen.h',
+
+			'../../source/Testbed/GoCastTalk/SettingsScreen.mm',
+			'../../source/Testbed/GoCastTalk/SettingsScreen.h',
+
+			'../../source/Testbed/GoCastTalk/ChangeRegisteredNameScreen.mm',
+			'../../source/Testbed/GoCastTalk/ChangeRegisteredNameScreen.h',
 
 #--
 

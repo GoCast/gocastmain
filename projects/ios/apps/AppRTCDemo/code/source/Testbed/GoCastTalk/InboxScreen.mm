@@ -6,6 +6,8 @@
 #include "InboxVC.h"
 
 JSONArray   InboxScreen::mInbox;
+JSONArray   InboxScreen::mContacts;
+std::map<std::string, std::string> InboxScreen::mContactMap;
 std::string InboxScreen::mToken;
 
 bool sortByDate (JSONValue i, JSONValue j);
@@ -34,8 +36,15 @@ size_t  InboxScreen::getInboxSize()
 
 std::string InboxScreen::getFrom(const size_t& i)
 {
-#pragma unused(i)
-    return mInbox[i].mObject["from"].mString;
+    std::string email   = mInbox[i].mObject["from"].mString;
+    std::string result  = mContactMap[email];
+
+    if (result.empty())
+    {
+        result = email;
+    }
+
+    return result;
 }
 
 std::string InboxScreen::getDate(const size_t& i)
@@ -117,6 +126,11 @@ void InboxScreen::idleEntry()
 }
 
 #pragma mark Queries
+void InboxScreen::didWeDownloadContactsEntry()
+{
+    SetImmediateEvent(!mContacts.empty() ? kYes : kNo);
+}
+
 void InboxScreen::doWeHaveATokenEntry()
 {
     SetImmediateEvent(InboxScreen::mToken.empty() ? kNo : kYes);
@@ -128,6 +142,23 @@ void InboxScreen::wasDeleteMessageValidEntry()
 
     if (mDeleteMessageJSON["status"].mString == std::string("success"))
     {
+        result = true;
+    }
+
+    SetImmediateEvent(result ? kYes : kNo);
+}
+
+void InboxScreen::wasGetContactsValidEntry()
+{
+    bool result = false;
+
+    mContacts.clear();
+    mContactMap.clear();
+
+    if (mGetContactsJSON["status"].mString == std::string("success"))
+    {
+        mContacts = mGetContactsJSON["contacts"].mArray;
+
         result = true;
     }
 
@@ -159,10 +190,21 @@ void InboxScreen::peerPushInboxMessageEntry()
 }
 
 #pragma mark Actions
+void InboxScreen::buildContactMapEntry()
+{
+    mContactMap.clear();
+
+    for (size_t i = 0; i < mContacts.size(); i++)
+    {
+        mContactMap[mContacts[i].mObject["email"].mString] = mContacts[i].mObject["kanji"].mString;
+    }
+}
 
 void InboxScreen::clearInboxEntry()
 {
     mInbox.clear();
+    mContacts.clear();
+    mContactMap.clear();
 }
 
 void InboxScreen::sortTableByDateEntry()
@@ -170,6 +212,17 @@ void InboxScreen::sortTableByDateEntry()
     mInbox = mListMessagesJSON["list"].mArray;
 
     std::sort(mInbox.begin(), mInbox.end(), sortByDate);
+}
+
+void InboxScreen::sendGetContactsToServerEntry()
+{
+    char buf[512];
+
+    sprintf(buf, "%s?action=getContacts&name=%s",
+            kMemoAppServerURL,
+            InboxScreen::mToken.c_str());
+
+    URLLoader::getInstance()->loadString(this, buf);
 }
 
 void InboxScreen::sendListMessagesToServerEntry()
@@ -196,6 +249,11 @@ void InboxScreen::sendDeleteMessageToServerEntry()
 }
 
 #pragma mark User Interface
+void InboxScreen::setWaitForGetContactsEntry()
+{
+    [mPeer setBlockingViewVisible:true];
+}
+
 void InboxScreen::setWaitForDeleteMessageEntry()
 {
     [mPeer setBlockingViewVisible:true];
@@ -209,6 +267,11 @@ void InboxScreen::setWaitForListMessagesEntry()
 void InboxScreen::showErrorDeletingMessageEntry()
 {
     tAlert("There was an error deleting a message from the server");
+}
+
+void InboxScreen::showErrorLoadingContactsEntry()
+{
+    tAlert("There was an error loading contacts from the server");
 }
 
 void InboxScreen::showErrorLoadingInboxEntry()
@@ -226,7 +289,9 @@ void InboxScreen::CallEntry()
 {
 	switch(mState)
 	{
+		case kBuildContactMap: buildContactMapEntry(); break;
 		case kClearInbox: clearInboxEntry(); break;
+		case kDidWeDownloadContacts: didWeDownloadContactsEntry(); break;
 		case kDoWeHaveAToken: doWeHaveATokenEntry(); break;
 		case kEnd: EndEntryHelper(); break;
 		case kIdle: idleEntry(); break;
@@ -234,15 +299,19 @@ void InboxScreen::CallEntry()
 		case kPeerPushInboxMessage: peerPushInboxMessageEntry(); break;
 		case kPeerReloadTable: peerReloadTableEntry(); break;
 		case kSendDeleteMessageToServer: sendDeleteMessageToServerEntry(); break;
+		case kSendGetContactsToServer: sendGetContactsToServerEntry(); break;
 		case kSendListMessagesToServer: sendListMessagesToServerEntry(); break;
 		case kSetWaitForDeleteMessage: setWaitForDeleteMessageEntry(); break;
+		case kSetWaitForGetContacts: setWaitForGetContactsEntry(); break;
 		case kSetWaitForListMessages: setWaitForListMessagesEntry(); break;
 		case kShowErrorDeletingMessage: showErrorDeletingMessageEntry(); break;
+		case kShowErrorLoadingContacts: showErrorLoadingContactsEntry(); break;
 		case kShowErrorLoadingInbox: showErrorLoadingInboxEntry(); break;
 		case kShowRetryListMessages: showRetryListMessagesEntry(); break;
 		case kSortTableByDate: sortTableByDateEntry(); break;
 		case kStart: startEntry(); break;
 		case kWasDeleteMessageValid: wasDeleteMessageValidEntry(); break;
+		case kWasGetContactsValid: wasGetContactsValidEntry(); break;
 		case kWasListMessagesValid: wasListMessagesValidEntry(); break;
 		default: break;
 	}
@@ -254,9 +323,12 @@ void InboxScreen::CallExit()
 
 int  InboxScreen::StateTransitionFunction(const int evt) const
 {
+	if ((mState == kBuildContactMap) && (evt == kNext)) return kPeerReloadTable; else
 	if ((mState == kClearInbox) && (evt == kNext)) return kPeerReloadTable; else
+	if ((mState == kDidWeDownloadContacts) && (evt == kNo)) return kSetWaitForGetContacts; else
+	if ((mState == kDidWeDownloadContacts) && (evt == kYes)) return kSetWaitForListMessages; else
 	if ((mState == kDoWeHaveAToken) && (evt == kNo)) return kClearInbox; else
-	if ((mState == kDoWeHaveAToken) && (evt == kYes)) return kSetWaitForListMessages; else
+	if ((mState == kDoWeHaveAToken) && (evt == kYes)) return kDidWeDownloadContacts; else
 	if ((mState == kIdle) && (evt == kDeleteSelected)) return kSetWaitForDeleteMessage; else
 	if ((mState == kIdle) && (evt == kItemSelected)) return kPeerPushInboxMessage; else
 	if ((mState == kIdle) && (evt == kRefreshSelected)) return kDoWeHaveAToken; else
@@ -264,18 +336,24 @@ int  InboxScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kPeerReloadTable) && (evt == kNext)) return kIdle; else
 	if ((mState == kSendDeleteMessageToServer) && (evt == kFail)) return kShowErrorDeletingMessage; else
 	if ((mState == kSendDeleteMessageToServer) && (evt == kSuccess)) return kWasDeleteMessageValid; else
+	if ((mState == kSendGetContactsToServer) && (evt == kFail)) return kShowErrorLoadingContacts; else
+	if ((mState == kSendGetContactsToServer) && (evt == kSuccess)) return kWasGetContactsValid; else
 	if ((mState == kSendListMessagesToServer) && (evt == kFail)) return kShowRetryListMessages; else
 	if ((mState == kSendListMessagesToServer) && (evt == kSuccess)) return kWasListMessagesValid; else
 	if ((mState == kSetWaitForDeleteMessage) && (evt == kNext)) return kSendDeleteMessageToServer; else
+	if ((mState == kSetWaitForGetContacts) && (evt == kNext)) return kSendGetContactsToServer; else
 	if ((mState == kSetWaitForListMessages) && (evt == kNext)) return kSendListMessagesToServer; else
 	if ((mState == kShowErrorDeletingMessage) && (evt == kYes)) return kPeerReloadTable; else
+	if ((mState == kShowErrorLoadingContacts) && (evt == kYes)) return kSetWaitForListMessages; else
 	if ((mState == kShowErrorLoadingInbox) && (evt == kYes)) return kPeerReloadTable; else
 	if ((mState == kShowRetryListMessages) && (evt == kNo)) return kPeerReloadTable; else
 	if ((mState == kShowRetryListMessages) && (evt == kYes)) return kDoWeHaveAToken; else
-	if ((mState == kSortTableByDate) && (evt == kNext)) return kPeerReloadTable; else
+	if ((mState == kSortTableByDate) && (evt == kNext)) return kBuildContactMap; else
 	if ((mState == kStart) && (evt == kNext)) return kDoWeHaveAToken; else
 	if ((mState == kWasDeleteMessageValid) && (evt == kNo)) return kShowErrorDeletingMessage; else
 	if ((mState == kWasDeleteMessageValid) && (evt == kYes)) return kDoWeHaveAToken; else
+	if ((mState == kWasGetContactsValid) && (evt == kNo)) return kShowErrorLoadingContacts; else
+	if ((mState == kWasGetContactsValid) && (evt == kYes)) return kSetWaitForListMessages; else
 	if ((mState == kWasListMessagesValid) && (evt == kNo)) return kShowErrorLoadingInbox; else
 	if ((mState == kWasListMessagesValid) && (evt == kYes)) return kSortTableByDate;
 
@@ -286,10 +364,12 @@ bool InboxScreen::HasEdgeNamedNext() const
 {
 	switch(mState)
 	{
+		case kBuildContactMap:
 		case kClearInbox:
 		case kPeerPushInboxMessage:
 		case kPeerReloadTable:
 		case kSetWaitForDeleteMessage:
+		case kSetWaitForGetContacts:
 		case kSetWaitForListMessages:
 		case kSortTableByDate:
 		case kStart:
@@ -318,6 +398,10 @@ void InboxScreen::update(const URLLoaderEvent& msg)
             {
                 switch (getState())
                 {
+                    case kSendGetContactsToServer:
+                        mGetContactsJSON = JSONUtil::extract(msg.mString);
+                        break;
+
                     case kSendListMessagesToServer:
                         mListMessagesJSON = JSONUtil::extract(msg.mString);
                         break;
