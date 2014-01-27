@@ -33,6 +33,7 @@
 
 #include "SettingsScreen.h"
 #include "ChangeRegisteredNameScreen.h"
+#include "CreateContactScreen.h"
 
 #include "ios/AppDelegate.h"
 

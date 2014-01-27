@@ -6,19 +6,22 @@
 class JSONValue;
 typedef std::map<std::string, JSONValue> JSONObject;
 
-class EditContactsScreen;
+class CreateContactScreen;
 
-@interface EditContactsVC : UIViewController
+@interface CreateContactVC : UIViewController
 <
+    UITextFieldDelegate,
     UITableViewDelegate,
     UITableViewDataSource
 >
 {
-    EditContactsScreen* mPeer;
+    CreateContactScreen* mPeer;
 }
 
 //mInboxView
 @property (nonatomic, strong) IBOutlet UITableView*     mTable;
+
+@property (nonatomic, strong) IBOutlet UITextField*     mEmail;
 @property (nonatomic, strong) IBOutlet UIView*          mBlockingView;
 
 #pragma mark Construction / Destruction
@@ -31,11 +34,10 @@ class EditContactsScreen;
 
 -(void)setBlockingViewVisible:(bool)newVisible;
 
--(void) reloadTable;
+-(void) popSelf;
 
--(IBAction)helpButton:(UIBarButtonItem*)sender;
+- (BOOL)textFieldShouldReturn:(UITextField *)textField;
 
--(void) pushCreateContact;
--(void) pushChangeRegisteredName:(const JSONObject&)newObject;
+-(IBAction)savePressed;
 
 @end

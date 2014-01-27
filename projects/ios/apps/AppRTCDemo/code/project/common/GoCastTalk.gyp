@@ -54,6 +54,12 @@
 				'outputs': [ '../../dummy', ],
 				'action': [ '<@(_graphcode)', '<@(_inputs)',  '--force-update', '--machine', 'EditContactsScreen', '-h', '../../source/Testbed/GoCastTalk/EditContactsScreen.h', '-cpp', '../../source/Testbed/GoCastTalk/EditContactsScreen.mm', ],
 			},
+			{
+				'action_name': 'CreateContactScreen.tgf',
+				'inputs': [ '../../tgf/Testbed/GoCastTalk/CreateContactScreen.tgf', ],
+				'outputs': [ '../../dummy', ],
+				'action': [ '<@(_graphcode)', '<@(_inputs)',  '--force-update', '--machine', 'CreateContactScreen', '-h', '../../source/Testbed/GoCastTalk/CreateContactScreen.h', '-cpp', '../../source/Testbed/GoCastTalk/CreateContactScreen.mm', ],
+			},
 
 			{
 				'action_name': 'SettingsScreen.tgf',
@@ -95,6 +101,9 @@
 
 			'../../source/Testbed/GoCastTalk/EditContactsScreen.mm',
 			'../../source/Testbed/GoCastTalk/EditContactsScreen.h',
+
+			'../../source/Testbed/GoCastTalk/CreateContactScreen.mm',
+			'../../source/Testbed/GoCastTalk/CreateContactScreen.h',
 
 			'../../source/Testbed/GoCastTalk/SettingsScreen.mm',
 			'../../source/Testbed/GoCastTalk/SettingsScreen.h',
@@ -194,6 +203,8 @@
 					'../../source/Testbed/GoCastTalk/<@(OS)/SubVC/EditContactsVC.mm',
 					'../../source/Testbed/GoCastTalk/<@(OS)/SubVC/ContactDetailsVC.h',
 					'../../source/Testbed/GoCastTalk/<@(OS)/SubVC/ContactDetailsVC.mm',
+					'../../source/Testbed/GoCastTalk/<@(OS)/SubVC/CreateContactVC.h',
+					'../../source/Testbed/GoCastTalk/<@(OS)/SubVC/CreateContactVC.mm',
 					'../../source/Testbed/GoCastTalk/<@(OS)/SubVC/MessageHistoryVC.h',
 					'../../source/Testbed/GoCastTalk/<@(OS)/SubVC/MessageHistoryVC.mm',
 					'../../source/Testbed/GoCastTalk/<@(OS)/SubVC/RecordMessageVC.h',
@@ -231,6 +242,7 @@
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/VC/GroupsVC.xib',
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/VC/SettingsVC.xib',
 
+					'../../rsrc/Testbed/GoCastTalk/<@(OS)/SubVC/CreateContactVC.xib',
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/SubVC/EditContactsVC.xib',
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/SubVC/ContactDetailsVC.xib',
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/SubVC/MessageHistoryVC.xib',

@@ -81,7 +81,7 @@ void EditContactsScreen::peerPushChangeRegisteredNameEntry()
 
 void EditContactsScreen::peerPushCreateContactEntry()
 {
-    //TODO
+    [mPeer pushCreateContact];
 }
 
 void EditContactsScreen::peerReloadTableEntry()

@@ -27,9 +27,9 @@ protected:
 	void invalidStateEntry();
 
 	void idleEntry();
-	void peerPushContactDetailsEntry();
 	void peerPushEditContactsEntry();
 	void peerReloadTableEntry();
+	void showNotImplementedYetEntry();
 
 public:
 	enum EventType
@@ -39,6 +39,7 @@ public:
 		kHelpPressed,
 		kItemSelected,
 		kRefreshSelected,
+		kYes,
 	};
 
 	enum StateType
@@ -47,9 +48,9 @@ public:
 		kStart = 1,
 		kEnd,
 		kIdle,
-		kPeerPushContactDetails,
 		kPeerPushEditContacts,
 		kPeerReloadTable,
+		kShowNotImplementedYet,
 	};
 
 protected:

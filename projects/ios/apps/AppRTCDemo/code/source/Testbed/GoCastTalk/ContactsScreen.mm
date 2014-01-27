@@ -64,11 +64,6 @@ void ContactsScreen::idleEntry()
 }
 
 #pragma mark Peer communication
-void ContactsScreen::peerPushContactDetailsEntry()
-{
-    [mPeer pushContactDetails:InboxScreen::mContacts[mItemSelected].mObject];
-}
-
 void ContactsScreen::peerPushEditContactsEntry()
 {
     [mPeer pushEditContacts];
@@ -79,6 +74,13 @@ void ContactsScreen::peerReloadTableEntry()
     [mPeer reloadTable];
 }
 
+#pragma mark UI
+
+void ContactsScreen::showNotImplementedYetEntry()
+{
+    tAlert("Not yet implemented");
+}
+
 #pragma mark State wiring
 void ContactsScreen::CallEntry()
 {
@@ -87,9 +89,9 @@ void ContactsScreen::CallEntry()
 		case kEnd: EndEntryHelper(); break;
 		case kIdle: idleEntry(); break;
 		case kInvalidState: invalidStateEntry(); break;
-		case kPeerPushContactDetails: peerPushContactDetailsEntry(); break;
 		case kPeerPushEditContacts: peerPushEditContactsEntry(); break;
 		case kPeerReloadTable: peerReloadTableEntry(); break;
+		case kShowNotImplementedYet: showNotImplementedYetEntry(); break;
 		case kStart: startEntry(); break;
 		default: break;
 	}
@@ -102,11 +104,11 @@ void ContactsScreen::CallExit()
 int  ContactsScreen::StateTransitionFunction(const int evt) const
 {
 	if ((mState == kIdle) && (evt == kHelpPressed)) return kPeerPushEditContacts; else
-	if ((mState == kIdle) && (evt == kItemSelected)) return kPeerPushContactDetails; else
+	if ((mState == kIdle) && (evt == kItemSelected)) return kShowNotImplementedYet; else
 	if ((mState == kIdle) && (evt == kRefreshSelected)) return kPeerReloadTable; else
-	if ((mState == kPeerPushContactDetails) && (evt == kNext)) return kIdle; else
 	if ((mState == kPeerPushEditContacts) && (evt == kNext)) return kIdle; else
 	if ((mState == kPeerReloadTable) && (evt == kNext)) return kIdle; else
+	if ((mState == kShowNotImplementedYet) && (evt == kYes)) return kIdle; else
 	if ((mState == kStart) && (evt == kNext)) return kIdle;
 
 	return kInvalidState;
@@ -116,13 +118,13 @@ bool ContactsScreen::HasEdgeNamedNext() const
 {
 	switch(mState)
 	{
-		case kEnd:
-		case kIdle:
-		case kInvalidState:
-			return false;
+		case kPeerPushEditContacts:
+		case kPeerReloadTable:
+		case kStart:
+			return true;
 		default: break;
 	}
-	return true;
+	return false;
 }
 
 #pragma mark Messages
@@ -139,6 +141,17 @@ void ContactsScreen::update(const GCTEvent& msg)
             switch (msg.mEvent)
             {
                 case GCTEvent::kReloadInbox:        refreshPressed(); break;
+
+                default:
+                    break;
+            }
+            break;
+
+        case kShowNotImplementedYet:
+            switch(msg.mEvent)
+            {
+                case GCTEvent::kOKYesAlertPressed:  process(kYes); break;
+//                case GCTEvent::kNoAlertPressed:     process(kNo); break;
 
                 default:
                     break;
