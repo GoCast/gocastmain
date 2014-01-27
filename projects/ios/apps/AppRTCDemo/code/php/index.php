@@ -8,6 +8,9 @@ include 'register.php';
 include 'listMessages.php';
 include 'deleteMessage.php';
 
+include 'getContacts.php';
+include 'setContacts.php';
+
 include 'postAudio.php';
 include 'postMessage.php';
 include 'postTranscription.php';
@@ -16,7 +19,14 @@ if(hasParam("action"))
 {
 	if ($_SERVER['REQUEST_METHOD'] === "POST")
 	{
-		if ($_POST["action"] === "postAudio")
+		if ($_POST["action"] === "setContacts")
+		{
+			if (hasParam("name"))
+			{
+				print(json_encode(setContacts($_POST["name"])));
+			}
+		}
+		else if ($_POST["action"] === "postAudio")
 		{
 			if (hasParam("name"))
 			{
@@ -92,6 +102,10 @@ if(hasParam("action"))
 				{
 					print(json_encode(errorMissingParameter("password")));
 				}
+				break;
+
+			case "getContacts":
+				print(json_encode(getContacts($_GET["name"])));
 				break;
 
 			case "listMessages":
