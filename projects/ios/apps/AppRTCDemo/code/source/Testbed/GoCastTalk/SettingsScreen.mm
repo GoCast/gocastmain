@@ -74,6 +74,8 @@ void SettingsScreen::peerPushChangeRegisteredNameEntry()
         }
     }
 
+    initObject["email"] = InboxScreen::mToken;
+
     [mPeer pushChangeRegisteredName:initObject];
 }
 

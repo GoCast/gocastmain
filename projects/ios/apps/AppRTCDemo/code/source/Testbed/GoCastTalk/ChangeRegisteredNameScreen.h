@@ -27,6 +27,7 @@ protected:
 	void invalidStateEntry();
 
 	void idleEntry();
+	void peerPopSelfEntry();
 	void sendReloadInboxToVCEntry();
 	void sendSetContactsToServerEntry();
 	void setWaitForSetContactsEntry();
@@ -52,6 +53,7 @@ public:
 		kStart = 1,
 		kEnd,
 		kIdle,
+		kPeerPopSelf,
 		kSendReloadInboxToVC,
 		kSendSetContactsToServer,
 		kSetWaitForSetContacts,

@@ -28,6 +28,9 @@
 #include "RecordMessageScreen.h"
 #include "MessageHistoryScreen.h"
 
+#include "ContactsScreen.h"
+#include "EditContactsScreen.h"
+
 #include "SettingsScreen.h"
 #include "ChangeRegisteredNameScreen.h"
 

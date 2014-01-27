@@ -37,6 +37,8 @@ class ChangeRegisteredNameScreen;
 
 -(void)setBlockingViewVisible:(bool)newVisible;
 
+-(void) popSelf;
+
 - (BOOL)textFieldShouldReturn:(UITextField *)textField;
 
 -(void)customInit:(const JSONObject&)newObject;

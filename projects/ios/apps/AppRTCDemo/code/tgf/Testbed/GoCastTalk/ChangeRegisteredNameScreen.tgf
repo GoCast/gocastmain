@@ -7,6 +7,7 @@
 7 Show "Error with setContacts"
 8 Update global contacts and contactmap
 9 Send ReloadInbox to VC
+10 Peer: pop self
 #
 1 3
 6 7 no
@@ -17,4 +18,5 @@
 3 8 saveSelected
 6 9 yes
 8 4
-9 3
+9 10
+10 3

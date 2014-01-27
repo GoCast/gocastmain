@@ -182,6 +182,11 @@
     [self.mBlockingView setHidden:newVisible ? NO : YES];
 }
 
+-(void) popSelf
+{
+    [(UINavigationController*)self.parentViewController popViewControllerAnimated:TRUE];
+}
+
 - (BOOL)textFieldShouldReturn:(UITextField *)textField
 {
 #pragma unused(textField)

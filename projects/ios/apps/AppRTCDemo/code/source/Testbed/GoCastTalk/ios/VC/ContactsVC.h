@@ -2,12 +2,19 @@
 #import <MessageUI/MessageUI.h>
 #import <AVFoundation/AVFoundation.h>
 
+#include <map>
+class JSONValue;
+typedef std::map<std::string, JSONValue> JSONObject;
+
+class ContactsScreen;
+
 @interface ContactsVC : UIViewController
 <
     UITableViewDelegate,
     UITableViewDataSource
 >
 {
+    ContactsScreen* mPeer;
 }
 
 //mInboxView
@@ -21,6 +28,12 @@
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath;
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath;
 
+-(void) reloadTable;
+
 -(IBAction)helpButton:(UIBarButtonItem*)sender;
 
+-(void) pushContactDetails:(const JSONObject&)newObject;
+-(void) pushEditContacts;
+
 @end
+

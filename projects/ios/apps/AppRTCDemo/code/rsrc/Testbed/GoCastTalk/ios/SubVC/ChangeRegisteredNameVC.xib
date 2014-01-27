@@ -7,6 +7,7 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="ChangeRegisteredNameVC">
             <connections>
+                <outlet property="mBlockingView" destination="AAn-uA-hmO" id="NAQ-4J-RUk"/>
                 <outlet property="mEmail" destination="jZk-W1-eJT" id="pxp-XK-XO9"/>
                 <outlet property="mKana" destination="g9u-vr-Trb" id="zeA-3y-Vmn"/>
                 <outlet property="mKanji" destination="8K4-9J-m2d" id="ljf-FE-dpT"/>
@@ -72,6 +73,18 @@
                         <action selector="savePressed" destination="-1" eventType="touchUpInside" id="5ap-pj-Qdj"/>
                     </connections>
                 </button>
+                <view hidden="YES" alpha="0.20000000298023224" contentMode="scaleToFill" id="AAn-uA-hmO" userLabel="mBlockingView">
+                    <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                    <subviews>
+                        <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" animating="YES" style="whiteLarge" id="V6w-3J-hVD">
+                            <rect key="frame" x="142" y="221" width="37" height="37"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <color key="color" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                        </activityIndicatorView>
+                    </subviews>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                </view>
             </subviews>
             <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
             <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina4"/>

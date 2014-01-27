@@ -43,6 +43,19 @@
 			},
 
 			{
+				'action_name': 'ContactsScreen.tgf',
+				'inputs': [ '../../tgf/Testbed/GoCastTalk/ContactsScreen.tgf', ],
+				'outputs': [ '../../dummy', ],
+				'action': [ '<@(_graphcode)', '<@(_inputs)',  '--force-update', '--machine', 'ContactsScreen', '-h', '../../source/Testbed/GoCastTalk/ContactsScreen.h', '-cpp', '../../source/Testbed/GoCastTalk/ContactsScreen.mm', ],
+			},
+			{
+				'action_name': 'EditContactsScreen.tgf',
+				'inputs': [ '../../tgf/Testbed/GoCastTalk/EditContactsScreen.tgf', ],
+				'outputs': [ '../../dummy', ],
+				'action': [ '<@(_graphcode)', '<@(_inputs)',  '--force-update', '--machine', 'EditContactsScreen', '-h', '../../source/Testbed/GoCastTalk/EditContactsScreen.h', '-cpp', '../../source/Testbed/GoCastTalk/EditContactsScreen.mm', ],
+			},
+
+			{
 				'action_name': 'SettingsScreen.tgf',
 				'inputs': [ '../../tgf/Testbed/GoCastTalk/SettingsScreen.tgf', ],
 				'outputs': [ '../../dummy', ],
@@ -76,6 +89,12 @@
 
 			'../../source/Testbed/GoCastTalk/MessageHistoryScreen.mm',
 			'../../source/Testbed/GoCastTalk/MessageHistoryScreen.h',
+
+			'../../source/Testbed/GoCastTalk/ContactsScreen.mm',
+			'../../source/Testbed/GoCastTalk/ContactsScreen.h',
+
+			'../../source/Testbed/GoCastTalk/EditContactsScreen.mm',
+			'../../source/Testbed/GoCastTalk/EditContactsScreen.h',
 
 			'../../source/Testbed/GoCastTalk/SettingsScreen.mm',
 			'../../source/Testbed/GoCastTalk/SettingsScreen.h',

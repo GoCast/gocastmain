@@ -4,60 +4,93 @@
 
 #include "package.h"
 
-#include "ChangeRegisteredNameVC.h"
+#include "EditContactsVC.h"
 
 #pragma mark Constructor / Destructor
-ChangeRegisteredNameScreen::ChangeRegisteredNameScreen(ChangeRegisteredNameVC* newVC, const JSONObject& initObject)
-:   mPeer(newVC),
-    mInitObject(initObject)
+EditContactsScreen::EditContactsScreen(EditContactsVC* newVC)
+: mPeer(newVC)
 {
 	ConstructMachine();
 }
 
-ChangeRegisteredNameScreen::~ChangeRegisteredNameScreen()
+EditContactsScreen::~EditContactsScreen()
 {
 	DestructMachine();
 }
 
-#pragma mark Public methods
-
-void ChangeRegisteredNameScreen::savePressed(const JSONObject& initObject)
+void EditContactsScreen::createPressed()
 {
-    mInitObject = initObject;
+    if (getState() == kIdle)
+    {
+        process(kCreateSelected);
+    }
+}
 
-    update(ChangeRegisteredNameScreenMessage(kSaveSelected));
+void EditContactsScreen::itemPressed(const size_t& i)
+{
+    if (getState() == kIdle)
+    {
+        mItemSelected = i;
+        process(kItemSelected);
+    }
+}
+
+void EditContactsScreen::deletePressed(const size_t& i)
+{
+    if (getState() == kIdle)
+    {
+        mDeleteSelected = i;
+        process(kDeleteSelected);
+    }
+}
+
+void EditContactsScreen::refreshPressed()
+{
+    if (getState() == kIdle)
+    {
+        process(kRefreshSelected);
+    }
 }
 
 #pragma mark Start / End / Invalid
-void ChangeRegisteredNameScreen::startEntry()
+void EditContactsScreen::startEntry()
 {
-    GCTEventManager::getInstance()->attach(this);
     URLLoader::getInstance()->attach(this);
+    GCTEventManager::getInstance()->attach(this);
 }
 
-void ChangeRegisteredNameScreen::endEntry()
+void EditContactsScreen::endEntry()
 {
 }
 
-void ChangeRegisteredNameScreen::invalidStateEntry()
+void EditContactsScreen::invalidStateEntry()
 {
 	assert("Event is invalid for this state" && 0);
 }
 
 #pragma mark Idling
-void ChangeRegisteredNameScreen::idleEntry()
+void EditContactsScreen::idleEntry()
 {
-
 }
 
 #pragma mark Peer communication
-void ChangeRegisteredNameScreen::peerPopSelfEntry()
+void EditContactsScreen::peerPushChangeRegisteredNameEntry()
 {
-    [mPeer popSelf];
+    [mPeer pushChangeRegisteredName:InboxScreen::mContacts[mItemSelected].mObject];
+}
+
+void EditContactsScreen::peerPushCreateContactEntry()
+{
+    //TODO
+}
+
+void EditContactsScreen::peerReloadTableEntry()
+{
+    [mPeer reloadTable];
 }
 
 #pragma mark Queries
-void ChangeRegisteredNameScreen::wasSetContactsSuccessfulEntry()
+void EditContactsScreen::wasSetContactsSuccessfulEntry()
 {
     bool result = false;
 
@@ -70,7 +103,16 @@ void ChangeRegisteredNameScreen::wasSetContactsSuccessfulEntry()
 }
 
 #pragma mark Actions
-void ChangeRegisteredNameScreen::sendSetContactsToServerEntry()
+void EditContactsScreen::deleteLocalContactEntry()
+{
+    std::string email = InboxScreen::mContacts[mDeleteSelected].mObject["email"].mString;
+
+    InboxScreen::mContactMap[email] = "";
+
+    InboxScreen::mContacts.erase(InboxScreen::mContacts.begin() + (int)mDeleteSelected);
+}
+
+void EditContactsScreen::sendSetContactsToServerEntry()
 {
     [mPeer setBlockingViewVisible:true];
 
@@ -86,111 +128,95 @@ void ChangeRegisteredNameScreen::sendSetContactsToServerEntry()
     URLLoader::getInstance()->postFile(this, kMemoAppServerURL, params, tFile(tFile::kTemporaryDirectory, "contacts.json"));
 }
 
-void ChangeRegisteredNameScreen::updateGlobalContactsAndContactmapEntry()
-{
-    bool found = false;
-
-    for(size_t i = 0; i < InboxScreen::mContacts.size(); i++)
-    {
-        if (InboxScreen::mContacts[i].mObject["email"].mString == mInitObject["email"].mString)
-        {
-            InboxScreen::mContacts[i].mObject["kanji"].mString   = mInitObject["kanji"].mString;
-            InboxScreen::mContacts[i].mObject["kana"].mString    = mInitObject["kana"].mString;
-
-            found = true;
-            break;
-        }
-    }
-
-    if (!found)
-    {
-        InboxScreen::mContacts.push_back(mInitObject);
-        InboxScreen::mContactMap[mInitObject["email"].mString] = mInitObject["kanji"].mString;
-    }
-
-    InboxScreen::mContactMap[mInitObject["email"].mString] = mInitObject["kanji"].mString;
-}
 
 #pragma mark UI
-void ChangeRegisteredNameScreen::setWaitForSetContactsEntry()
+void EditContactsScreen::setWaitForSetContactsEntry()
 {
     [mPeer setBlockingViewVisible:true];
 }
 
-void ChangeRegisteredNameScreen::showErrorWithSetContactsEntry()
+void EditContactsScreen::showErrorWithSetContactsEntry()
 {
     tAlert("Error save contact details");
 }
 
 #pragma mark Sending messages to other machines
-void ChangeRegisteredNameScreen::sendReloadInboxToVCEntry()
+void EditContactsScreen::sendReloadInboxToVCEntry()
 {
     GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kReloadInbox));
 }
 
 #pragma mark State wiring
-void ChangeRegisteredNameScreen::CallEntry()
+void EditContactsScreen::CallEntry()
 {
 	switch(mState)
 	{
+		case kDeleteLocalContact: deleteLocalContactEntry(); break;
 		case kEnd: EndEntryHelper(); break;
 		case kIdle: idleEntry(); break;
 		case kInvalidState: invalidStateEntry(); break;
-		case kPeerPopSelf: peerPopSelfEntry(); break;
+		case kPeerPushChangeRegisteredName: peerPushChangeRegisteredNameEntry(); break;
+		case kPeerPushCreateContact: peerPushCreateContactEntry(); break;
+		case kPeerReloadTable: peerReloadTableEntry(); break;
 		case kSendReloadInboxToVC: sendReloadInboxToVCEntry(); break;
 		case kSendSetContactsToServer: sendSetContactsToServerEntry(); break;
 		case kSetWaitForSetContacts: setWaitForSetContactsEntry(); break;
 		case kShowErrorWithSetContacts: showErrorWithSetContactsEntry(); break;
 		case kStart: startEntry(); break;
-		case kUpdateGlobalContactsAndContactmap: updateGlobalContactsAndContactmapEntry(); break;
 		case kWasSetContactsSuccessful: wasSetContactsSuccessfulEntry(); break;
 		default: break;
 	}
 }
 
-void ChangeRegisteredNameScreen::CallExit()
+void EditContactsScreen::CallExit()
 {
 }
 
-int  ChangeRegisteredNameScreen::StateTransitionFunction(const int evt) const
+int  EditContactsScreen::StateTransitionFunction(const int evt) const
 {
-	if ((mState == kIdle) && (evt == kSaveSelected)) return kUpdateGlobalContactsAndContactmap; else
-	if ((mState == kPeerPopSelf) && (evt == kNext)) return kIdle; else
-	if ((mState == kSendReloadInboxToVC) && (evt == kNext)) return kPeerPopSelf; else
+	if ((mState == kDeleteLocalContact) && (evt == kNext)) return kSetWaitForSetContacts; else
+	if ((mState == kIdle) && (evt == kCreateSelected)) return kPeerPushCreateContact; else
+	if ((mState == kIdle) && (evt == kDeleteSelected)) return kDeleteLocalContact; else
+	if ((mState == kIdle) && (evt == kItemSelected)) return kPeerPushChangeRegisteredName; else
+	if ((mState == kIdle) && (evt == kRefreshSelected)) return kPeerReloadTable; else
+	if ((mState == kPeerPushChangeRegisteredName) && (evt == kNext)) return kIdle; else
+	if ((mState == kPeerPushCreateContact) && (evt == kNext)) return kIdle; else
+	if ((mState == kPeerReloadTable) && (evt == kNext)) return kIdle; else
+	if ((mState == kSendReloadInboxToVC) && (evt == kNext)) return kPeerReloadTable; else
 	if ((mState == kSendSetContactsToServer) && (evt == kFail)) return kShowErrorWithSetContacts; else
 	if ((mState == kSendSetContactsToServer) && (evt == kSuccess)) return kWasSetContactsSuccessful; else
 	if ((mState == kSetWaitForSetContacts) && (evt == kNext)) return kSendSetContactsToServer; else
 	if ((mState == kShowErrorWithSetContacts) && (evt == kYes)) return kIdle; else
 	if ((mState == kStart) && (evt == kNext)) return kIdle; else
-	if ((mState == kUpdateGlobalContactsAndContactmap) && (evt == kNext)) return kSetWaitForSetContacts; else
 	if ((mState == kWasSetContactsSuccessful) && (evt == kNo)) return kShowErrorWithSetContacts; else
 	if ((mState == kWasSetContactsSuccessful) && (evt == kYes)) return kSendReloadInboxToVC;
 
 	return kInvalidState;
 }
 
-bool ChangeRegisteredNameScreen::HasEdgeNamedNext() const
+bool EditContactsScreen::HasEdgeNamedNext() const
 {
 	switch(mState)
 	{
-		case kPeerPopSelf:
-		case kSendReloadInboxToVC:
-		case kSetWaitForSetContacts:
-		case kStart:
-		case kUpdateGlobalContactsAndContactmap:
-			return true;
+		case kEnd:
+		case kIdle:
+		case kInvalidState:
+		case kSendSetContactsToServer:
+		case kShowErrorWithSetContacts:
+		case kWasSetContactsSuccessful:
+			return false;
 		default: break;
 	}
-	return false;
+	return true;
 }
 
 #pragma mark Messages
-void ChangeRegisteredNameScreen::update(const ChangeRegisteredNameScreenMessage& msg)
+void EditContactsScreen::update(const EditContactsScreenMessage& msg)
 {
 	process(msg.mEvent);
 }
 
-void ChangeRegisteredNameScreen::update(const URLLoaderEvent& msg)
+void EditContactsScreen::update(const URLLoaderEvent& msg)
 {
     if (msg.mId == this)
     {
@@ -222,9 +248,9 @@ void ChangeRegisteredNameScreen::update(const URLLoaderEvent& msg)
     }
 }
 
-void ChangeRegisteredNameScreen::update(const GCTEvent& msg)
+void EditContactsScreen::update(const GCTEvent& msg)
 {
-    switch (getState())
+    switch(getState())
     {
         case kShowErrorWithSetContacts:
             switch(msg.mEvent)
@@ -236,9 +262,15 @@ void ChangeRegisteredNameScreen::update(const GCTEvent& msg)
                     break;
             }
             break;
-            
-        default:
+
+        case kIdle:
+            switch (msg.mEvent)
+            {
+                case GCTEvent::kReloadInbox:        refreshPressed(); break;
+
+                default:
+                    break;
+            }
             break;
     }
 }
-

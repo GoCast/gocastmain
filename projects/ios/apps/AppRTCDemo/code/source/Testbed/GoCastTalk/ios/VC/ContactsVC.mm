@@ -1,10 +1,12 @@
 #include "ContactsVC.h"
+#include "ContactDetailsVC.h"
+#include "EditContactsVC.h"
 
 #include "Base/package.h"
 #include "Math/package.h"
+#include "Io/package.h"
 
-#include "GCTEvent.h"
-#include "GCTEventManager.h"
+#include "Testbed/GoCastTalk/package.h"
 
 #import "InboxEntryCell.h"
 #import "HeadingSubCell.h"
@@ -27,6 +29,8 @@
     self.navigationItem.rightBarButtonItem = anotherButton;
 
     self.view.autoresizesSubviews = YES;
+
+    mPeer = new ContactsScreen(self);
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -41,6 +45,8 @@
 
 - (void)dealloc
 {
+    delete mPeer;
+
     [super dealloc];
 }
 
@@ -50,7 +56,7 @@
 
     if (tableView == self.mTable)
     {
-        return (NSInteger)4;
+        return (NSInteger)InboxScreen::mContacts.size();
     }
 
     return (NSInteger)1;
@@ -72,14 +78,6 @@
 
     if (tableView == self.mTable)
     {
-        const char* heading[] =
-        {
-            "Self",
-            "Sato Taro",
-            "Yamada Hanako",
-            "Yoshida Jirou",
-        };
-
         tableView.backgroundView = nil;
 
         static NSString *simpleTableIdentifier = @"HeadingSubCell";
@@ -91,7 +89,14 @@
             cell = [[[HeadingSubCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:simpleTableIdentifier] autorelease];
         }
 
-        cell.mHeading.text = [NSString stringWithUTF8String:heading[indexPath.row]];
+        std::string heading = InboxScreen::mContacts[(size_t)indexPath.row].mObject["kanji"].mString;
+
+        if (heading.empty())
+        {
+            heading = InboxScreen::mContacts[(size_t)indexPath.row].mObject["email"].mString;
+        }
+
+        cell.mHeading.text = [NSString stringWithUTF8String:heading.c_str()];
         cell.mSub.text = [NSString stringWithUTF8String:""];
         cell.mRightArrow.hidden = YES;
         
@@ -120,8 +125,10 @@
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-#pragma unused(tableView, indexPath)
-    GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kTableItemSelected, (tUInt32)indexPath.row));
+    if (tableView == self.mTable)
+    {
+        mPeer->itemPressed((size_t)indexPath.row);
+    }
 }
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
@@ -143,10 +150,29 @@
     }
 }
 
+-(void) reloadTable
+{
+    [self.mTable reloadData];
+}
+
 -(IBAction)helpButton:(UIBarButtonItem *)sender
 {
 #pragma unused(sender)
-    GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kNavButtonPressed));
+    mPeer->editPressed();
+}
+
+-(void) pushContactDetails:(const JSONObject&)newObject
+{
+    ContactDetailsVC* nextVC = [[[ContactDetailsVC alloc] initWithNibName:@"ContactDetailsVC" bundle:nil] autorelease];
+    [nextVC customInit:newObject];
+    [(UINavigationController*)self.parentViewController  pushViewController:nextVC animated:YES];
+}
+
+-(void) pushEditContacts
+{
+    EditContactsVC* nextVC = [[[EditContactsVC alloc] initWithNibName:@"EditContactsVC" bundle:nil] autorelease];
+    [(UINavigationController*)self.parentViewController  pushViewController:nextVC animated:YES];
 }
 
 @end
+

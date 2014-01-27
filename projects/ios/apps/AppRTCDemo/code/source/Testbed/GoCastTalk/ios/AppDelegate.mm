@@ -74,7 +74,7 @@ const unsigned char SpeechKitApplicationKey[] =
     NSMutableArray * vcs = [NSMutableArray arrayWithArray:[self.tabBarController viewControllers]];
 
 	[vcs removeObjectAtIndex:3];
-	[vcs removeObjectAtIndex:2];
+
 	[vcs removeObjectAtIndex:1];
 
 	[self.tabBarController setViewControllers:vcs];
