@@ -1,0 +1,57 @@
+1 start
+2 end
+3 idle
+4 Set "wait for listMessages"
+5 Send listMessages to server
+6 Was listMessages valid?
+7 Show "error loading inbox"
+8 Show "retry listMessages?"
+9 Peer: reload table
+10 Peer: push InboxMessage
+11 Set "wait for deleteMessage"
+12 Send deleteMessage to server
+13 Was deleteMessage valid?
+14 Show "error deleting message"
+15 Sort table by date
+16 Do we have a token?
+17 Clear inbox
+18 Set "wait for getContacts"
+19 Send getContacts to server
+20 Was getContacts valid?
+21 Show "error loading contacts"
+22 Did we download contacts?
+23 Build contact map
+#
+1 16
+5 6 success
+6 7 no
+4 5
+7 9 yes
+5 8 fail
+8 9 no
+8 16 yes
+6 15 yes
+9 3
+3 10 itemSelected
+10 3
+3 16 refreshSelected
+3 11 deleteSelected
+11 12
+12 13 success
+12 14 fail
+14 9 yes
+13 14 no
+13 16 yes
+15 23
+16 17 no
+16 22 yes
+17 9
+20 21 no
+22 4 yes
+22 18 no
+18 19
+19 20 success
+19 21 fail
+20 4 yes
+21 4 yes
+23 9

@@ -26,7 +26,10 @@
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response
 {
 #pragma unused(connection)
-    mParent->DidReceiveResponse(response);
+    NSHTTPURLResponse* httpResponse = (NSHTTPURLResponse*)response;
+    int responseStatusCode = [httpResponse statusCode];
+
+    mParent->DidReceiveResponse(response, responseStatusCode);
 }
 
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
@@ -50,20 +53,24 @@
 @end
 
 
-URLConnection::URLConnection(const std::string& url)
-:   mFile(tFile::kTemporaryDirectory, ""),
+URLConnection::URLConnection(void* newId, const std::string& url)
+:   mId(newId),
+    mFile(tFile::kTemporaryDirectory, ""),
     mURL(url),
-    mUseFile(false)
+    mUseFile(false),
+    mBadResponse(true)
 {
     mDelegate = [[PrivateDelegate alloc] initWithParent: this];
     NSMutableURLRequest* req = [NSMutableURLRequest requestWithURL: [NSURL URLWithString: [NSString stringWithUTF8String: url.c_str()]]];
     mNSURLConnection = [[NSURLConnection alloc] initWithRequest: req delegate: mDelegate];
 }
 
-URLConnection::URLConnection(const std::string& url, const tFile& newFile)
-:   mFile(newFile),
+URLConnection::URLConnection(void* newId, const std::string& url, const tFile& newFile)
+:   mId(newId),
+    mFile(newFile),
     mURL(url),
-    mUseFile(true)
+    mUseFile(true),
+    mBadResponse(true)
 {
     mDelegate = [[PrivateDelegate alloc] initWithParent: this];
     NSMutableURLRequest* req = [NSMutableURLRequest requestWithURL: [NSURL URLWithString: [NSString stringWithUTF8String: url.c_str()]]];
@@ -72,10 +79,12 @@ URLConnection::URLConnection(const std::string& url, const tFile& newFile)
     mFOS = new tFileOutputStream(mFile);
 }
 
-URLConnection::URLConnection(const std::string& url, const std::string& body)
-:   mFile(tFile::kTemporaryDirectory, ""),
+URLConnection::URLConnection(void* newId, const std::string& url, const std::string& body)
+:   mId(newId),
+    mFile(tFile::kTemporaryDirectory, ""),
     mURL(url),
-    mUseFile(false)
+    mUseFile(false),
+    mBadResponse(true)
 {
     mDelegate = [[PrivateDelegate alloc] initWithParent: this];
     NSMutableURLRequest* req = [NSMutableURLRequest requestWithURL: [NSURL URLWithString: [NSString stringWithUTF8String: url.c_str()]]];
@@ -85,10 +94,12 @@ URLConnection::URLConnection(const std::string& url, const std::string& body)
     mNSURLConnection = [[NSURLConnection alloc] initWithRequest: req delegate: mDelegate];
 }
 
-URLConnection::URLConnection(const std::string& newPHP, const std::vector<std::pair<std::string, std::string> >& newParams, const tFile& newFile, bool isAmiVoice)
-:   mFile(tFile::kTemporaryDirectory, ""),
+URLConnection::URLConnection(void* newId, const std::string& newPHP, const std::vector<std::pair<std::string, std::string> >& newParams, const tFile& newFile)
+:   mId(newId),
+    mFile(tFile::kTemporaryDirectory, ""),
     mURL(newPHP),
-    mUseFile(false)
+    mUseFile(false),
+    mBadResponse(true)
 {
     mDelegate = [[PrivateDelegate alloc] initWithParent: this];
 
@@ -123,20 +134,10 @@ URLConnection::URLConnection(const std::string& newPHP, const std::vector<std::p
     {
         [body appendData:[[NSString stringWithFormat:@"--%@\r\n", @"abc123"] dataUsingEncoding:NSUTF8StringEncoding]];
 
-        if (isAmiVoice)
-        {
-            [body appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"AudioFile\"; filename=\"%s.wav\"\r\n",
-                               newFile.getFilename().c_str()]
-                              dataUsingEncoding:NSUTF8StringEncoding]];
-            [body appendData:[[NSString stringWithUTF8String:"Content-Type: audio/x-wav\r\n\r\n"] dataUsingEncoding:NSUTF8StringEncoding]];
-        }
-        else
-        {
-            [body appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"filename\"; filename=\"%s\"\r\n",
-                               newFile.getFilename().c_str()]
-                              dataUsingEncoding:NSUTF8StringEncoding]];
-            [body appendData:[[NSString stringWithUTF8String:"Content-Type: application/octet-stream\r\n\r\n"] dataUsingEncoding:NSUTF8StringEncoding]];
-        }
+        [body appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"filename\"; filename=\"%s\"\r\n",
+                           newFile.getFilename().c_str()]
+                          dataUsingEncoding:NSUTF8StringEncoding]];
+        [body appendData:[[NSString stringWithUTF8String:"Content-Type: application/octet-stream\r\n\r\n"] dataUsingEncoding:NSUTF8StringEncoding]];
 
         [body appendData:fileData];
         [body appendData:[[NSString stringWithFormat:@"\r\n"] dataUsingEncoding:NSUTF8StringEncoding]];
@@ -160,11 +161,12 @@ URLConnection::~URLConnection()
     [mDelegate release];
 }
 
-void URLConnection::DidReceiveResponse(const void* response)
+void URLConnection::DidReceiveResponse(const void* response, int responseCode)
 {
 #pragma unused(response)
-    // Do something...
+    mBadResponse = (responseCode != 200);
 }
+
 void URLConnection::DidReceiveData(const void* data, uint32_t len)
 {
     if (mUseFile)
@@ -186,7 +188,7 @@ void URLConnection::DidFailWithError(const std::string& error)
     {
         delete mFOS;
     }
-    URLLoader::getInstance()->notify(URLLoaderEvent(URLLoaderEvent::kLoadFail, mURL, mString));
+    URLLoader::getInstance()->notify(URLLoaderEvent(mId, URLLoaderEvent::kLoadFail, mURL, mString));
 
     delete this;
 }
@@ -196,11 +198,11 @@ void URLConnection::DidFinishLoading()
     if (mUseFile)
     {
         delete mFOS;
-        URLLoader::getInstance()->notify(URLLoaderEvent(URLLoaderEvent::kLoadedFile, mURL, mString));
+        URLLoader::getInstance()->notify(URLLoaderEvent(mId, mBadResponse ?  URLLoaderEvent::kLoadFail : URLLoaderEvent::kLoadedFile, mURL, mString));
     }
     else
     {
-        URLLoader::getInstance()->notify(URLLoaderEvent(URLLoaderEvent::kLoadedString, mURL, mString));
+        URLLoader::getInstance()->notify(URLLoaderEvent(mId, mBadResponse ?  URLLoaderEvent::kLoadFail : URLLoaderEvent::kLoadedString, mURL, mString));
     }
 
     delete this;
@@ -210,26 +212,26 @@ URLLoader::URLLoader()
 {
 }
 
-void URLLoader::loadString(const std::string& newURL)
+void URLLoader::loadString(void* newId, const std::string& newURL)
 {
     NSLog(@"URLLoader::loadString: \"%s\"", newURL.c_str());
 
-    new URLConnection(newURL);
+    new URLConnection(newId, newURL);
 }
 
-void URLLoader::loadFile(const std::string& newURL, const tFile& newFile)
+void URLLoader::loadFile(void* newId, const std::string& newURL, const tFile& newFile)
 {
     NSLog(@"URLLoader::loadFile: \"%s\"", newURL.c_str());
 
-    new URLConnection(newURL, newFile);
+    new URLConnection(newId, newURL, newFile);
 }
 
-void URLLoader::postJSON(const std::string& newURL, const std::string& newBody)
+void URLLoader::postJSON(void* newId, const std::string& newURL, const std::string& newBody)
 {
-    new URLConnection(newURL, newBody);
+    new URLConnection(newId, newURL, newBody);
 }
 
-void URLLoader::postFile(const std::string& newPHP, const std::vector<std::pair<std::string, std::string> >& newParams, const tFile& newFile, bool isAmiVoice)
+void URLLoader::postFile(void* newId, const std::string& newPHP, const std::vector<std::pair<std::string, std::string> >& newParams, const tFile& newFile)
 {
-    new URLConnection(newPHP, newParams, newFile, isAmiVoice);
+    new URLConnection(newId, newPHP, newParams, newFile);
 }

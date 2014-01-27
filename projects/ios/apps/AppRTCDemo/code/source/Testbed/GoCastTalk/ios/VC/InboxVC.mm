@@ -1,10 +1,11 @@
 #include "InboxVC.h"
+#include "InboxMessageVC.h"
 
 #include "Base/package.h"
 #include "Math/package.h"
+#include "Io/package.h"
 
-#include "GCTEvent.h"
-#include "GCTEventManager.h"
+#include "Testbed/GoCastTalk/package.h"
 
 #import "InboxEntryCell.h"
 #import "HeadingSubCell.h"
@@ -23,7 +24,13 @@
 
     [self.mTable registerNib:[UINib nibWithNibName:@"InboxEntryCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"InboxEntryCell"];
 
+    UIRefreshControl *refreshControl = [[UIRefreshControl alloc] init];
+    [refreshControl addTarget:self action:@selector(refresh:) forControlEvents:UIControlEventValueChanged];
+    [self.mTable addSubview:refreshControl];
+
     self.view.autoresizesSubviews = YES;
+
+    mPeer = new InboxScreen(self);
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -38,6 +45,8 @@
 
 - (void)dealloc
 {
+    delete mPeer;
+
     [super dealloc];
 }
 
@@ -47,7 +56,7 @@
 
     if (tableView == self.mTable)
     {
-        return (NSInteger)3;
+        return (NSInteger)mPeer->getInboxSize();
     }
 
     return (NSInteger)1;
@@ -69,41 +78,6 @@
 
     if (tableView == self.mTable)
     {
-        const char* from[] =
-        {
-            "Sato Taro",
-            "Yamada Hanako",
-            "Planning 2",
-        };
-
-        const char* date[] =
-        {
-            "12/21 12:24",
-            "12/20 12:12",
-            "12/18 11:43",
-        };
-
-        const char* transcription[] =
-        {
-            "「知りません。日本語で何か…",
-            "「でもでもそんなの関係ねえ…",
-            "「ニューヨークで入浴…",
-        };
-
-        const bool recv[] =
-        {
-            true,
-            false,
-            false,
-        };
-
-        const bool isGroup[] =
-        {
-            false,
-            false,
-            true,
-        };
-
         tableView.backgroundView = nil;
 
         static NSString *simpleTableIdentifier = @"InboxEntryCell";
@@ -115,13 +89,16 @@
             cell = [[[InboxEntryCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:simpleTableIdentifier] autorelease];
         }
 
-        cell.mFrom.text = [NSString stringWithUTF8String:from[indexPath.row]];
-        cell.mDate.text = [NSString stringWithUTF8String:date[indexPath.row]];
-        cell.mTranscription.text = [NSString stringWithUTF8String:transcription[indexPath.row]];
-        cell.mStatusIcon.image = [UIImage imageNamed:(recv[indexPath.row] ? @"icon-receive.png" : @"icon-sent.png")];
-        cell.mFrom.textColor =  isGroup[indexPath.row] ?
+        cell.mFrom.text = [NSString stringWithUTF8String:mPeer->getFrom(indexPath.row).c_str()];
+        cell.mDate.text = [NSString stringWithUTF8String:mPeer->getDate(indexPath.row).c_str()];
+        cell.mTranscription.text = [NSString stringWithUTF8String:mPeer->getTranscription(indexPath.row).c_str()];
+        cell.mStatusIcon.image = [UIImage imageNamed:(mPeer->getIsReceive(indexPath.row) ? @"icon-receive.png" : @"icon-sent.png")];
+        cell.mFrom.textColor =  mPeer->getIsGroup(indexPath.row) ?
             [UIColor colorWithRed:0.0f green:0.47f blue:1.0f alpha:1.0f] :
             [UIColor colorWithRed:0.0f green:0.0f  blue:0.0f alpha:1.0f];
+
+        cell.mTranscription.numberOfLines = 0;
+        [cell.mTranscription sizeToFit];
 
         return cell;
     }
@@ -146,16 +123,21 @@
     }
 }
 
++ (Class)layerClass
+{
+    return [CAGradientLayer class];
+}
+
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
 #pragma unused(tableView, indexPath)
-    GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kTableItemSelected, (tUInt32)indexPath.row));
+    mPeer->selectItem((size_t)indexPath.row);
 }
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
 {
 #pragma unused(tableView, indexPath)
-    return NO;
+    return YES;
 }
 
 // Override to support editing the table view.
@@ -164,11 +146,37 @@
 #pragma unused(tableView, indexPath)
     if (editingStyle == UITableViewCellEditingStyleDelete)
     {
-//        if (tableView == self.mTable)
+        mPeer->deletePressed((size_t)indexPath.row);
+        //        if (tableView == self.mTable)
 //        {
 //            GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kTableItemDeleted, (tUInt32)indexPath.row));
 //        }
     }
 }
 
+-(void)setBlockingViewVisible:(bool)newVisible
+{
+    [self.mBlockingView setHidden:newVisible ? NO : YES];
+}
+
+-(void) reloadTable
+{
+    [self.mTable reloadData];
+}
+
+-(void) pushInboxMessage:(const JSONObject&)newObject
+{
+    InboxMessageVC* nextVC = [[[InboxMessageVC alloc] initWithNibName:@"InboxMessageVC" bundle:nil] autorelease];
+    [nextVC customInit:newObject];
+    [(UINavigationController*)self.parentViewController  pushViewController:nextVC animated:YES];
+}
+
+- (void)refresh:(UIRefreshControl *)refreshControl
+{
+    [refreshControl endRefreshing];
+
+    mPeer->refreshPressed();
+}
+
 @end
+

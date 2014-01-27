@@ -12,69 +12,114 @@
 
 		'actions': [
 			{
-				'action_name': 'GoCastTalkApp.tgf',
-				'inputs': [ '../../tgf/Testbed/GoCastTalk/GoCastTalkApp.tgf', ], # inputs
-				'outputs': [ '../../dummy', ], # outputs
-				'action': [ '<@(_graphcode)', '<@(_inputs)',  '--force-update', '--machine', 'GoCastTalkApp', '-h', '../../source/Testbed/GoCastTalk/GoCastTalkApp.h', '-cpp', '../../source/Testbed/GoCastTalk/GoCastTalkApp.mm', ], # action
+				'action_name': 'LoginScreen.tgf',
+				'inputs': [ '../../tgf/Testbed/GoCastTalk/LoginScreen.tgf', ],
+				'outputs': [ '../../dummy', ],
+				'action': [ '<@(_graphcode)', '<@(_inputs)',  '--force-update', '--machine', 'LoginScreen', '-h', '../../source/Testbed/GoCastTalk/LoginScreen.h', '-cpp', '../../source/Testbed/GoCastTalk/LoginScreen.mm', ],
+			},
+			{
+				'action_name': 'InboxScreen.tgf',
+				'inputs': [ '../../tgf/Testbed/GoCastTalk/InboxScreen.tgf', ],
+				'outputs': [ '../../dummy', ],
+				'action': [ '<@(_graphcode)', '<@(_inputs)',  '--force-update', '--machine', 'InboxScreen', '-h', '../../source/Testbed/GoCastTalk/InboxScreen.h', '-cpp', '../../source/Testbed/GoCastTalk/InboxScreen.mm', ],
+			},
+			{
+				'action_name': 'InboxMessageScreen.tgf',
+				'inputs': [ '../../tgf/Testbed/GoCastTalk/InboxMessageScreen.tgf', ],
+				'outputs': [ '../../dummy', ],
+				'action': [ '<@(_graphcode)', '<@(_inputs)',  '--force-update', '--machine', 'InboxMessageScreen', '-h', '../../source/Testbed/GoCastTalk/InboxMessageScreen.h', '-cpp', '../../source/Testbed/GoCastTalk/InboxMessageScreen.mm', ],
+			},
+			{
+				'action_name': 'RecordMessageScreen.tgf',
+				'inputs': [ '../../tgf/Testbed/GoCastTalk/RecordMessageScreen.tgf', ],
+				'outputs': [ '../../dummy', ],
+				'action': [ '<@(_graphcode)', '<@(_inputs)',  '--force-update', '--machine', 'RecordMessageScreen', '-h', '../../source/Testbed/GoCastTalk/RecordMessageScreen.h', '-cpp', '../../source/Testbed/GoCastTalk/RecordMessageScreen.mm', ],
+			},
+			{
+				'action_name': 'MessageHistoryScreen.tgf',
+				'inputs': [ '../../tgf/Testbed/GoCastTalk/MessageHistoryScreen.tgf', ],
+				'outputs': [ '../../dummy', ],
+				'action': [ '<@(_graphcode)', '<@(_inputs)',  '--force-update', '--machine', 'MessageHistoryScreen', '-h', '../../source/Testbed/GoCastTalk/MessageHistoryScreen.h', '-cpp', '../../source/Testbed/GoCastTalk/MessageHistoryScreen.mm', ],
 			},
 
 			{
-				'action_name': 'InboxTab.tgf',
-				'inputs': [ '../../tgf/Testbed/GoCastTalk/InboxTab.tgf', ], # inputs
-				'outputs': [ '../../dummy', ], # outputs
-				'action': [ '<@(_graphcode)', '<@(_inputs)',  '--force-update', '--machine', 'InboxTab', '-h', '../../source/Testbed/GoCastTalk/InboxTab.h', '-cpp', '../../source/Testbed/GoCastTalk/InboxTab.mm', ], # action
+				'action_name': 'NewMemoScreen.tgf',
+				'inputs': [ '../../tgf/Testbed/GoCastTalk/NewMemoScreen.tgf', ],
+				'outputs': [ '../../dummy', ],
+				'action': [ '<@(_graphcode)', '<@(_inputs)',  '--force-update', '--machine', 'NewMemoScreen', '-h', '../../source/Testbed/GoCastTalk/NewMemoScreen.h', '-cpp', '../../source/Testbed/GoCastTalk/NewMemoScreen.mm', ],
 			},
 
 			{
-				'action_name': 'NewMemoTab.tgf',
-				'inputs': [ '../../tgf/Testbed/GoCastTalk/NewMemoTab.tgf', ], # inputs
-				'outputs': [ '../../dummy', ], # outputs
-				'action': [ '<@(_graphcode)', '<@(_inputs)',  '--force-update', '--machine', 'NewMemoTab', '-h', '../../source/Testbed/GoCastTalk/NewMemoTab.h', '-cpp', '../../source/Testbed/GoCastTalk/NewMemoTab.mm', ], # action
+				'action_name': 'ContactsScreen.tgf',
+				'inputs': [ '../../tgf/Testbed/GoCastTalk/ContactsScreen.tgf', ],
+				'outputs': [ '../../dummy', ],
+				'action': [ '<@(_graphcode)', '<@(_inputs)',  '--force-update', '--machine', 'ContactsScreen', '-h', '../../source/Testbed/GoCastTalk/ContactsScreen.h', '-cpp', '../../source/Testbed/GoCastTalk/ContactsScreen.mm', ],
+			},
+			{
+				'action_name': 'EditContactsScreen.tgf',
+				'inputs': [ '../../tgf/Testbed/GoCastTalk/EditContactsScreen.tgf', ],
+				'outputs': [ '../../dummy', ],
+				'action': [ '<@(_graphcode)', '<@(_inputs)',  '--force-update', '--machine', 'EditContactsScreen', '-h', '../../source/Testbed/GoCastTalk/EditContactsScreen.h', '-cpp', '../../source/Testbed/GoCastTalk/EditContactsScreen.mm', ],
+			},
+			{
+				'action_name': 'CreateContactScreen.tgf',
+				'inputs': [ '../../tgf/Testbed/GoCastTalk/CreateContactScreen.tgf', ],
+				'outputs': [ '../../dummy', ],
+				'action': [ '<@(_graphcode)', '<@(_inputs)',  '--force-update', '--machine', 'CreateContactScreen', '-h', '../../source/Testbed/GoCastTalk/CreateContactScreen.h', '-cpp', '../../source/Testbed/GoCastTalk/CreateContactScreen.mm', ],
 			},
 
 			{
-				'action_name': 'ContactsTab.tgf',
-				'inputs': [ '../../tgf/Testbed/GoCastTalk/ContactsTab.tgf', ], # inputs
-				'outputs': [ '../../dummy', ], # outputs
-				'action': [ '<@(_graphcode)', '<@(_inputs)',  '--force-update', '--machine', 'ContactsTab', '-h', '../../source/Testbed/GoCastTalk/ContactsTab.h', '-cpp', '../../source/Testbed/GoCastTalk/ContactsTab.mm', ], # action
+				'action_name': 'SettingsScreen.tgf',
+				'inputs': [ '../../tgf/Testbed/GoCastTalk/SettingsScreen.tgf', ],
+				'outputs': [ '../../dummy', ],
+				'action': [ '<@(_graphcode)', '<@(_inputs)',  '--force-update', '--machine', 'SettingsScreen', '-h', '../../source/Testbed/GoCastTalk/SettingsScreen.h', '-cpp', '../../source/Testbed/GoCastTalk/SettingsScreen.mm', ],
 			},
-
 			{
-				'action_name': 'GroupsTab.tgf',
-				'inputs': [ '../../tgf/Testbed/GoCastTalk/GroupsTab.tgf', ], # inputs
-				'outputs': [ '../../dummy', ], # outputs
-				'action': [ '<@(_graphcode)', '<@(_inputs)',  '--force-update', '--machine', 'GroupsTab', '-h', '../../source/Testbed/GoCastTalk/GroupsTab.h', '-cpp', '../../source/Testbed/GoCastTalk/GroupsTab.mm', ], # action
-			},
-
-			{
-				'action_name': 'SettingsTab.tgf',
-				'inputs': [ '../../tgf/Testbed/GoCastTalk/SettingsTab.tgf', ], # inputs
-				'outputs': [ '../../dummy', ], # outputs
-				'action': [ '<@(_graphcode)', '<@(_inputs)',  '--force-update', '--machine', 'SettingsTab', '-h', '../../source/Testbed/GoCastTalk/SettingsTab.h', '-cpp', '../../source/Testbed/GoCastTalk/SettingsTab.mm', ], # action
+				'action_name': 'ChangeRegisteredNameScreen.tgf',
+				'inputs': [ '../../tgf/Testbed/GoCastTalk/ChangeRegisteredNameScreen.tgf', ],
+				'outputs': [ '../../dummy', ],
+				'action': [ '<@(_graphcode)', '<@(_inputs)',  '--force-update', '--machine', 'ChangeRegisteredNameScreen', '-h', '../../source/Testbed/GoCastTalk/ChangeRegisteredNameScreen.h', '-cpp', '../../source/Testbed/GoCastTalk/ChangeRegisteredNameScreen.mm', ],
 			},
 		],
 
 		'sources': [
 			'../../source/Testbed/GoCastTalk/package.h',
 
-			'../../source/Testbed/GoCastTalk/GoCastTalkApp.mm',
-			'../../source/Testbed/GoCastTalk/GoCastTalkApp.h',
-
 			'../../source/Testbed/GoCastTalk/GCTEvent.h',
 			'../../source/Testbed/GoCastTalk/GCTEventManager.h',
 
-			'../../source/Testbed/GoCastTalk/Tab.h',
+			'../../source/Testbed/GoCastTalk/LoginScreen.mm',
+			'../../source/Testbed/GoCastTalk/LoginScreen.h',
 
-			'../../source/Testbed/GoCastTalk/InboxTab.h',
-			'../../source/Testbed/GoCastTalk/InboxTab.mm',
-			'../../source/Testbed/GoCastTalk/NewMemoTab.h',
-			'../../source/Testbed/GoCastTalk/NewMemoTab.mm',
-			'../../source/Testbed/GoCastTalk/ContactsTab.h',
-			'../../source/Testbed/GoCastTalk/ContactsTab.mm',
-			'../../source/Testbed/GoCastTalk/GroupsTab.h',
-			'../../source/Testbed/GoCastTalk/GroupsTab.mm',
-			'../../source/Testbed/GoCastTalk/SettingsTab.h',
-			'../../source/Testbed/GoCastTalk/SettingsTab.mm',
+			'../../source/Testbed/GoCastTalk/InboxScreen.mm',
+			'../../source/Testbed/GoCastTalk/InboxScreen.h',
+
+			'../../source/Testbed/GoCastTalk/InboxMessageScreen.mm',
+			'../../source/Testbed/GoCastTalk/InboxMessageScreen.h',
+
+			'../../source/Testbed/GoCastTalk/RecordMessageScreen.mm',
+			'../../source/Testbed/GoCastTalk/RecordMessageScreen.h',
+
+			'../../source/Testbed/GoCastTalk/MessageHistoryScreen.mm',
+			'../../source/Testbed/GoCastTalk/MessageHistoryScreen.h',
+
+			'../../source/Testbed/GoCastTalk/NewMemoScreen.mm',
+			'../../source/Testbed/GoCastTalk/NewMemoScreen.h',
+
+			'../../source/Testbed/GoCastTalk/ContactsScreen.mm',
+			'../../source/Testbed/GoCastTalk/ContactsScreen.h',
+
+			'../../source/Testbed/GoCastTalk/EditContactsScreen.mm',
+			'../../source/Testbed/GoCastTalk/EditContactsScreen.h',
+
+			'../../source/Testbed/GoCastTalk/CreateContactScreen.mm',
+			'../../source/Testbed/GoCastTalk/CreateContactScreen.h',
+
+			'../../source/Testbed/GoCastTalk/SettingsScreen.mm',
+			'../../source/Testbed/GoCastTalk/SettingsScreen.h',
+
+			'../../source/Testbed/GoCastTalk/ChangeRegisteredNameScreen.mm',
+			'../../source/Testbed/GoCastTalk/ChangeRegisteredNameScreen.h',
 
 #--
 
@@ -150,6 +195,9 @@
 					'../../source/Testbed/GoCastTalk/<@(OS)/AppDelegate.mm',
 					'../../source/Bootstrap/<@(OS)/main.mm',
 
+					'../../source/Testbed/GoCastTalk/<@(OS)/VC/LoginVC.h',
+					'../../source/Testbed/GoCastTalk/<@(OS)/VC/LoginVC.mm',
+
 					'../../source/Testbed/GoCastTalk/<@(OS)/VC/InboxVC.h',
 					'../../source/Testbed/GoCastTalk/<@(OS)/VC/InboxVC.mm',
 					'../../source/Testbed/GoCastTalk/<@(OS)/VC/NewMemoVC.h',
@@ -165,6 +213,8 @@
 					'../../source/Testbed/GoCastTalk/<@(OS)/SubVC/EditContactsVC.mm',
 					'../../source/Testbed/GoCastTalk/<@(OS)/SubVC/ContactDetailsVC.h',
 					'../../source/Testbed/GoCastTalk/<@(OS)/SubVC/ContactDetailsVC.mm',
+					'../../source/Testbed/GoCastTalk/<@(OS)/SubVC/CreateContactVC.h',
+					'../../source/Testbed/GoCastTalk/<@(OS)/SubVC/CreateContactVC.mm',
 					'../../source/Testbed/GoCastTalk/<@(OS)/SubVC/MessageHistoryVC.h',
 					'../../source/Testbed/GoCastTalk/<@(OS)/SubVC/MessageHistoryVC.mm',
 					'../../source/Testbed/GoCastTalk/<@(OS)/SubVC/RecordMessageVC.h',
@@ -194,12 +244,15 @@
 
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/MainWindow.xib',
 
+					'../../rsrc/Testbed/GoCastTalk/<@(OS)/VC/LoginVC.xib',
+
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/VC/InboxVC.xib',
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/VC/NewMemoVC.xib',
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/VC/ContactsVC.xib',
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/VC/GroupsVC.xib',
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/VC/SettingsVC.xib',
 
+					'../../rsrc/Testbed/GoCastTalk/<@(OS)/SubVC/CreateContactVC.xib',
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/SubVC/EditContactsVC.xib',
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/SubVC/ContactDetailsVC.xib',
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/SubVC/MessageHistoryVC.xib',
@@ -211,6 +264,9 @@
 
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/en.lproj/InboxEntryCell.xib',
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/en.lproj/HeadingSubCell.xib',
+
+					'../../rsrc/Testbed/GoCastTalk/<@(OS)/bg-login.png',
+					'../../rsrc/Testbed/GoCastTalk/<@(OS)/bg-button.png',
 
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/banner.png',
 
@@ -234,16 +290,25 @@
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/Default-568h@2x.png',
 				],	# mac_bundle_resources
 
+                'mac_framework_dirs': [
+                '../../third-party/DragonMobileSDK_1.4.9',
+                ],
+
 				'link_settings': {
 					'libraries': [
 						'../../third-party/TestFlightSDK2.0.2/libTestFlight.a',
 						'libz.dylib',
+						'../../third-party/DragonMobileSDK_1.4.9/SpeechKit.framework',
+						'$(SDKROOT)/System/Library/Frameworks/AudioToolbox.framework',
 						'$(SDKROOT)/System/Library/Frameworks/AVFoundation.framework',
+						'$(SDKROOT)/System/Library/Frameworks/CFNetwork.framework',
 						'$(SDKROOT)/System/Library/Frameworks/UIKit.framework',
 						'$(SDKROOT)/System/Library/Frameworks/MessageUI.framework',
 						'$(SDKROOT)/System/Library/Frameworks/Foundation.framework',
 						'$(SDKROOT)/System/Library/Frameworks/CoreGraphics.framework',
 						'$(SDKROOT)/System/Library/Frameworks/QuartzCore.framework',
+						'$(SDKROOT)/System/Library/Frameworks/Security.framework',
+						'$(SDKROOT)/System/Library/Frameworks/SystemConfiguration.framework',
 					],	# libraries
 				},	# link_settings
 			}],  # OS=="ios"

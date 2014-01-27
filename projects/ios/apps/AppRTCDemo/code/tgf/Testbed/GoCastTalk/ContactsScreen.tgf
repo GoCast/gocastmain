@@ -1,0 +1,20 @@
+1 start
+2 end
+3 idle
+4 Peer: reload table
+5 Peer: push EditContacts
+6 Show "Not implemented yet"
+7 Is this a child screen?
+8 Send AppendNewContact to VC
+9 Peer: pop self
+#
+1 3
+3 4 refreshSelected
+4 3
+3 5 helpPressed
+5 3
+3 7 itemSelected
+6 3 yes
+7 6 no
+7 8 yes
+8 9

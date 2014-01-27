@@ -1,10 +1,12 @@
 #include "EditContactsVC.h"
+#include "ChangeRegisteredNameVC.h"
+#include "CreateContactVC.h"
 
 #include "Base/package.h"
 #include "Math/package.h"
+#include "Io/package.h"
 
-#include "GCTEvent.h"
-#include "GCTEventManager.h"
+#include "Testbed/GoCastTalk/package.h"
 
 #import "InboxEntryCell.h"
 #import "HeadingSubCell.h"
@@ -27,6 +29,8 @@
 //    self.navigationItem.rightBarButtonItem = anotherButton;
 
     self.view.autoresizesSubviews = YES;
+
+    mPeer = new EditContactsScreen(self);
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -41,6 +45,8 @@
 
 - (void)dealloc
 {
+    delete mPeer;
+
     [super dealloc];
 }
 
@@ -50,7 +56,7 @@
 
     if (tableView == self.mTable)
     {
-        return (NSInteger)4;
+        return (NSInteger)InboxScreen::mContacts.size() + 1;
     }
 
     return (NSInteger)1;
@@ -72,30 +78,6 @@
 
     if (tableView == self.mTable)
     {
-        const char* heading[] =
-        {
-            "Create a new contact",
-            "Self",
-            "Sato Taro",
-            "Yamada Hanako",
-        };
-
-        const char* subheading[] =
-        {
-            "",
-            "学生",
-            "すかないやつ",
-            "最高経営責任者",
-        };
-
-        const bool hasRightArrow[] =
-        {
-            true,
-            false,
-            false,
-            false,
-        };
-
         tableView.backgroundView = nil;
 
         static NSString *simpleTableIdentifier = @"HeadingSubCell";
@@ -107,9 +89,25 @@
             cell = [[[HeadingSubCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:simpleTableIdentifier] autorelease];
         }
 
-        cell.mHeading.text = [NSString stringWithUTF8String:heading[indexPath.row]];
-        cell.mSub.text = [NSString stringWithUTF8String:subheading[indexPath.row]];
-        cell.mRightArrow.hidden = hasRightArrow[indexPath.row];
+        std::string heading;
+
+        if (indexPath.row != 0)
+        {
+            heading = InboxScreen::mContacts[(size_t)indexPath.row - 1].mObject["kanji"].mString;
+
+            if (heading.empty())
+            {
+                heading = InboxScreen::mContacts[(size_t)indexPath.row - 1].mObject["email"].mString;
+            }
+        }
+        else
+        {
+            heading = "Create new contact";
+        }
+
+        cell.mHeading.text = [NSString stringWithUTF8String:heading.c_str()];
+        cell.mSub.text = [NSString stringWithUTF8String:""];
+        cell.mRightArrow.hidden = YES;
         
         return cell;
     }
@@ -137,12 +135,24 @@
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
 #pragma unused(tableView, indexPath)
-    GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kTableItemSelected, (tUInt32)indexPath.row));
+    switch (indexPath.row)
+    {
+        case 0:     mPeer->createPressed(); break;
+        default:    mPeer->itemPressed((size_t)indexPath.row - 1); break;
+    }
 }
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
 {
 #pragma unused(tableView, indexPath)
+    if (tableView == self.mTable)
+    {
+        if (indexPath.row != 0)
+        {
+            return YES;
+        }
+    }
+
     return NO;
 }
 
@@ -152,6 +162,7 @@
 #pragma unused(tableView, indexPath)
     if (editingStyle == UITableViewCellEditingStyleDelete)
     {
+        mPeer->deletePressed((size_t)indexPath.row - 1);
 //        if (tableView == self.mTable)
 //        {
 //            GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kTableItemDeleted, (tUInt32)indexPath.row));
@@ -159,10 +170,33 @@
     }
 }
 
+-(void)setBlockingViewVisible:(bool)newVisible
+{
+    [self.mBlockingView setHidden:newVisible ? NO : YES];
+}
+
+-(void) reloadTable
+{
+    [self.mTable reloadData];
+}
+
 -(IBAction)helpButton:(UIBarButtonItem *)sender
 {
 #pragma unused(sender)
     GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kNavButtonPressed));
+}
+
+-(void) pushCreateContact
+{
+    CreateContactVC* nextVC = [[[CreateContactVC alloc] initWithNibName:@"CreateContactVC" bundle:nil] autorelease];
+    [(UINavigationController*)self.parentViewController  pushViewController:nextVC animated:YES];
+}
+
+-(void) pushChangeRegisteredName:(const JSONObject&)newObject
+{
+    ChangeRegisteredNameVC* nextVC = [[[ChangeRegisteredNameVC alloc] initWithNibName:@"ChangeRegisteredNameVC" bundle:nil] autorelease];
+    [nextVC customInit:newObject];
+    [(UINavigationController*)self.parentViewController  pushViewController:nextVC animated:YES];
 }
 
 @end

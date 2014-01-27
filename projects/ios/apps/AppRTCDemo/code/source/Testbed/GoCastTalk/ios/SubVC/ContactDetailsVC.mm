@@ -2,9 +2,9 @@
 
 #include "Base/package.h"
 #include "Math/package.h"
+#include "Io/package.h"
 
-#include "GCTEvent.h"
-#include "GCTEventManager.h"
+#include "Testbed/GoCastTalk/package.h"
 
 #import "InboxEntryCell.h"
 #import "HeadingSubCell.h"
@@ -148,6 +148,11 @@
 //            GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kTableItemDeleted, (tUInt32)indexPath.row));
 //        }
     }
+}
+
+-(void)customInit:(const JSONObject&)newObject
+{
+    mInitObject = newObject;
 }
 
 @end

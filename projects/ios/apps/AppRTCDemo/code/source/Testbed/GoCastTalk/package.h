@@ -16,18 +16,26 @@
 #include "JSONUtil.h"
 #include "URLLoader.h"
 
-#include "Tab.h"
-
-#include "InboxTab.h"
-#include "NewMemoTab.h"
-#include "ContactsTab.h"
-#include "GroupsTab.h"
-#include "SettingsTab.h"
-
-#include "GoCastTalkApp.h"
-
 #include "GCTEvent.h"
 #include "GCTEventManager.h"
+
+//Screens
+
+#include "LoginScreen.h"
+
+#include "InboxScreen.h"
+#include "InboxMessageScreen.h"
+#include "RecordMessageScreen.h"
+#include "MessageHistoryScreen.h"
+
+#include "NewMemoScreen.h"
+
+#include "ContactsScreen.h"
+#include "EditContactsScreen.h"
+
+#include "SettingsScreen.h"
+#include "ChangeRegisteredNameScreen.h"
+#include "CreateContactScreen.h"
 
 #include "ios/AppDelegate.h"
 

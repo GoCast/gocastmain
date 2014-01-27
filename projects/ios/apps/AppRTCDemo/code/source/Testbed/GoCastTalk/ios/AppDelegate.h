@@ -1,5 +1,7 @@
 #import <UIKit/UIKit.h>
 #import <MessageUI/MessageUI.h>
+#import <AVFoundation/AVFoundation.h>
+#import <SpeechKit/SpeechKit.h>
 
 #include <vector>
 #include <string>
@@ -11,10 +13,13 @@
 <
     UIApplicationDelegate,
     UITabBarControllerDelegate,
-    UIAlertViewDelegate
+    UIAlertViewDelegate,
+    AVAudioRecorderDelegate,
+    SpeechKitDelegate,
+    SKRecognizerDelegate
 >
 {
-    UINavigationController* mTabVC[5];
+    SKRecognizer* voiceSearch;
 }
 
 @property (nonatomic, retain) IBOutlet UIWindow *window;
@@ -66,6 +71,10 @@
 
 -(void)setBlockingViewVisible:(bool)newVisible;
 
+@property (nonatomic, strong) AVAudioRecorder* mRecorder;
+
+-(void)ctorRecorder;
+-(void)dtorRecorder;
 -(void)startRecorder;
 -(void)stopRecorder;
 
@@ -91,5 +100,7 @@
 -(void)popSettings:(bool)animated;
 
 -(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex;
+
+-(void)audioRecorderDidFinishRecording:(AVAudioRecorder *)recorder successfully:(BOOL)flag;
 
 @end

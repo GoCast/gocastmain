@@ -126,6 +126,14 @@ void RecordAudioScreen::stopRecordingAudioEntry()
     SetImmediateEvent(result ? kSuccess : kFail);
 }
 
+void RecordAudioScreen::saveTranscriptionEntry()
+{
+    JSONObject output;
+    output["ja2"] = mTranscription;
+
+    tFile(tFile::kTemporaryDirectory, mResultFilename).write(JSONValue(output).toString());
+}
+
 #pragma mark Sending messages to other machines
 
 void RecordAudioScreen::sendGoInboxToVCEntry()
@@ -153,6 +161,7 @@ void RecordAudioScreen::CallEntry()
 		case kInvalidState: invalidStateEntry(); break;
 		case kRecordedIdle: recordedIdleEntry(); break;
 		case kRecordingIdle: recordingIdleEntry(); break;
+		case kSaveTranscription: saveTranscriptionEntry(); break;
 		case kSendGoInboxToVC: sendGoInboxToVCEntry(); break;
 		case kSendGoPlayToVC: sendGoPlayToVCEntry(); break;
 		case kSendGoSendGroupToVC: sendGoSendGroupToVCEntry(); break;
@@ -179,8 +188,10 @@ int  RecordAudioScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kRecordedIdle) && (evt == kSave)) return kSendGoInboxToVC; else
 	if ((mState == kRecordedIdle) && (evt == kSend)) return kSendGoSendGroupToVC; else
 	if ((mState == kRecordedIdle) && (evt == kStartRecording)) return kSetStatusRecording; else
+	if ((mState == kRecordedIdle) && (evt == kTranscriptionReady)) return kSaveTranscription; else
 	if ((mState == kRecordingIdle) && (evt == kCancel)) return kSendGoInboxToVC; else
 	if ((mState == kRecordingIdle) && (evt == kStopRecording)) return kSetStatusStopping; else
+	if ((mState == kSaveTranscription) && (evt == kNext)) return kRecordedIdle; else
 	if ((mState == kSetStatusIdle) && (evt == kNext)) return kIdle; else
 	if ((mState == kSetStatusRecorded) && (evt == kNext)) return kRecordedIdle; else
 	if ((mState == kSetStatusRecording) && (evt == kNext)) return kStartRecordingAudio; else
@@ -198,6 +209,7 @@ bool RecordAudioScreen::HasEdgeNamedNext() const
 {
 	switch(mState)
 	{
+		case kSaveTranscription:
 		case kSetStatusIdle:
 		case kSetStatusRecorded:
 		case kSetStatusRecording:
@@ -216,6 +228,14 @@ void RecordAudioScreen::update(const MemoEvent& msg)
 {
     switch (msg.mEvent)
     {
+        case MemoEvent::kNuanceTranscriptionReady:
+            if (getState() == kRecordedIdle)
+            {
+                mTranscription = msg.mTranscription;
+                process(kTranscriptionReady);
+            }
+            break;
+
         case MemoEvent::kStartRecordingPressed:     process(kStartRecording); break;
         case MemoEvent::kStopRecordingPressed:      process(kStopRecording); break;
         case MemoEvent::kCancelRecordingPressed:    process(kCancel); break;

@@ -29,6 +29,7 @@
 29 Update local userList
 30 Set "Wait for postGroup"
 31 Show "postGroup success"
+32 Send postTranscription to server
 #
 1 24
 4 5 fail
@@ -47,7 +48,7 @@
 13 15 success
 12 30 yes
 12 3 no
-15 31 yes
+15 32 yes
 31 11 yes
 15 16 no
 16 3 yes
@@ -73,3 +74,4 @@
 29 21
 7 23
 30 13
+32 31 success, fail

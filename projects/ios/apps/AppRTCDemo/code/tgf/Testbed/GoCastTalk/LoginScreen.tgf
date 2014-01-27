@@ -1,0 +1,56 @@
+1 start
+2 end
+3 idle
+4 Show "Not yet implemented"
+5 Send login to server
+6 Was login valid?
+7 Show "Could not login"
+8 Show "Retry login?"
+9 Store token information
+10 Peer: pop self
+11 Send ReloadInbox to VC
+12 Send register to server
+13 Show "Retry register?"
+14 Was register valid?
+15 Show "Could not register"
+16 Ensure signin info
+17 Ensure signup info
+18 Show "Incorrect format"
+19 Save login name
+20 Load login name
+21 Peer: set Login Name
+22 Set "wait for register"
+23 Set "wait for login"
+#
+1 20
+3 4 troublePressed
+4 3 yes
+3 16 signInPressed
+5 6 success
+6 7 no
+6 9 yes
+9 19
+8 7 no
+5 8 fail
+7 3 yes
+11 10
+3 17 signUpPressed
+12 13 fail
+12 14 success
+13 15 no
+14 15 no
+15 3 yes
+14 9 yes
+8 5 yes
+13 12 yes
+16 23 success
+18 3 yes
+16 18 fail
+17 18 fail
+17 22 success
+19 11
+20 21 success
+20 3 fail
+21 3
+22 12
+23 5

@@ -1,13 +1,17 @@
 #import <UIKit/UIKit.h>
 #import <MessageUI/MessageUI.h>
 #import <AVFoundation/AVFoundation.h>
+#import <SpeechKit/SpeechKit.h>
 
 @interface ViewController : UIViewController
 <UITextFieldDelegate, UITableViewDelegate,
 UITableViewDataSource, UITabBarDelegate,
-AVAudioRecorderDelegate>
+AVAudioRecorderDelegate,
+SpeechKitDelegate, SKRecognizerDelegate>
 {
+    SKRecognizer* voiceSearch;
 }
+@property(readonly) SKRecognizer* voiceSearch;
 
 @property (nonatomic, strong) IBOutlet UIView* mStartView;
 @property (nonatomic, strong) IBOutlet UIView* mTabView;
@@ -101,6 +105,9 @@ AVAudioRecorderDelegate>
 -(void)dtorRecorder;
 -(void)startRecorder;
 -(void)stopRecorder;
+
+-(void)startRecorderInternal;
+-(void)stopRecorderInternal;
 
 -(IBAction) signInPressed:(id)sender;
 -(IBAction) newAccountPressed:(id)sender;

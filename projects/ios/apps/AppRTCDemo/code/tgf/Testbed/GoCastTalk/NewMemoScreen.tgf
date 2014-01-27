@@ -1,0 +1,22 @@
+1 start
+2 end
+3 idle
+4 Peer: push Contacts
+5 Show "Not yet implemented"
+6 Clear "To List"
+7 Peer: update "to list"
+8 Append "To List"
+9 Peer: push Record Message
+#
+3 4 addContactsSelected
+4 3
+3 5 addGroupsSelected
+5 3 yes
+3 6 clearSelected
+6 7
+7 3
+3 8 appendContact
+8 7
+3 9 replySelected
+9 3
+1 6

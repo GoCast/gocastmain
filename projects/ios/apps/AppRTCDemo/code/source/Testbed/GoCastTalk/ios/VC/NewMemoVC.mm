@@ -1,10 +1,12 @@
 #include "NewMemoVC.h"
+#include "RecordMessageVC.h"
+#include "ContactsVC.h"
 
 #include "Base/package.h"
 #include "Math/package.h"
+#include "Io/package.h"
 
-#include "GCTEvent.h"
-#include "GCTEventManager.h"
+#include "Testbed/GoCastTalk/package.h"
 
 #import "InboxEntryCell.h"
 #import "HeadingSubCell.h"
@@ -24,6 +26,8 @@
     [self.mTable registerNib:[UINib nibWithNibName:@"HeadingSubCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"HeadingSubCell"];
 
     self.view.autoresizesSubviews = YES;
+
+    mPeer = new NewMemoScreen(self);
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -38,6 +42,8 @@
 
 - (void)dealloc
 {
+    delete mPeer;
+
     [super dealloc];
 }
 
@@ -125,7 +131,7 @@
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
 #pragma unused(tableView, indexPath)
-    GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kTableItemSelected, (tUInt32)indexPath.row));
+    mPeer->replyPressed();
 }
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
@@ -147,17 +153,38 @@
     }
 }
 
--(IBAction)buttonPressed:(UIButton*)sender
+-(IBAction)addContactsPressed
 {
-    if (sender == self.mAddContactsButton)
-    {
-        GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kAddContactsButtonPressed));
-    }
-    else if (sender == self.mAddGroupsButton)
-    {
-        GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kAddGroupsButtonPressed));
-    }
+    mPeer->addContactsPressed();
 }
 
+-(IBAction)addGroupsPressed
+{
+    mPeer->addGroupsPressed();
+}
+
+-(IBAction)clearPressed
+{
+    mPeer->clearPressed();
+}
+
+-(void) pushRecordMessage:(const JSONObject&)newObject
+{
+    RecordMessageVC* nextVC = [[[RecordMessageVC alloc] initWithNibName:@"RecordMessageVC" bundle:nil] autorelease];
+    [nextVC customInit:newObject];
+    [(UINavigationController*)self.parentViewController  pushViewController:nextVC animated:YES];
+}
+
+-(void) pushContacts
+{
+    ContactsVC* nextVC = [[[ContactsVC alloc] initWithNibName:@"ContactsVC" bundle:nil] autorelease];
+    [nextVC customInit:true];
+    [(UINavigationController*)self.parentViewController  pushViewController:nextVC animated:YES];
+}
+
+-(void)updateToList:(const std::string&) newToList
+{
+    self.mToList.text = [NSString stringWithUTF8String:newToList.c_str()];
+}
 
 @end

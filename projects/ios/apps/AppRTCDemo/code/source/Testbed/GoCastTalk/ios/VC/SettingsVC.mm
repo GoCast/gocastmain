@@ -1,10 +1,11 @@
 #include "SettingsVC.h"
+#include "ChangeRegisteredNameVC.h"
 
 #include "Base/package.h"
 #include "Math/package.h"
+#include "Io/package.h"
 
-#include "GCTEvent.h"
-#include "GCTEventManager.h"
+#include "Testbed/GoCastTalk/package.h"
 
 #import "InboxEntryCell.h"
 #import "HeadingSubCell.h"
@@ -24,6 +25,8 @@
     [self.mTable registerNib:[UINib nibWithNibName:@"HeadingSubCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"HeadingSubCell"];
 
     self.view.autoresizesSubviews = YES;
+
+    mPeer = new SettingsScreen(self);
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -38,6 +41,8 @@
 
 - (void)dealloc
 {
+    delete mPeer;
+
     [super dealloc];
 }
 
@@ -134,7 +139,16 @@
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
 #pragma unused(tableView, indexPath)
-    GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kTableItemSelected, (tUInt32)indexPath.row));
+    switch (indexPath.row)
+    {
+        case 0: mPeer->registeredNamePressed(); break;
+        case 1: mPeer->changePasswordPressed(); break;
+        case 2: mPeer->logOutPressed(); break;
+        case 3: mPeer->aboutThisAppPressed(); break;
+
+        default:
+            break;
+    }
 }
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
@@ -154,6 +168,13 @@
 //            GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kTableItemDeleted, (tUInt32)indexPath.row));
 //        }
     }
+}
+
+-(void) pushChangeRegisteredName:(const JSONObject&)newObject
+{
+    ChangeRegisteredNameVC* nextVC = [[[ChangeRegisteredNameVC alloc] initWithNibName:@"ChangeRegisteredNameVC" bundle:nil] autorelease];
+    [nextVC customInit:newObject];
+    [(UINavigationController*)self.parentViewController  pushViewController:nextVC animated:YES];
 }
 
 @end

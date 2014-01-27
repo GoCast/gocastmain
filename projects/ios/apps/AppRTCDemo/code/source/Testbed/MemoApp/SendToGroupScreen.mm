@@ -160,6 +160,20 @@ void SendToGroupScreen::sendPostGroupToServerEntry()
     URLLoader::getInstance()->postFile(kMemoAppServerURL, params, tFile(tFile::kDocumentsDirectory, mFilename));
 }
 
+void SendToGroupScreen::sendPostTranscriptionToServerEntry()
+{
+    tFile tempFile(tFile::kTemporaryDirectory, mFilename);
+
+    std::vector<std::pair<std::string, std::string> > params;
+
+    params.push_back(std::pair<std::string, std::string>("action", "postTranscription"));
+    params.push_back(std::pair<std::string, std::string>("name", std::string(tFile(tFile::kPreferencesDirectory, "logintoken.txt"))));
+
+    params.push_back(std::pair<std::string, std::string>("MAX_FILE_SIZE", "10485760"));
+
+    URLLoader::getInstance()->postFile(kMemoAppServerURL, params, tempFile);
+}
+
 #pragma mark User Interface
 void SendToGroupScreen::setWaitForUserListEntry()
 {
@@ -247,6 +261,7 @@ void SendToGroupScreen::CallEntry()
 		case kSendGetProfileIToServer: sendGetProfileIToServerEntry(); break;
 		case kSendGoInboxToVC: sendGoInboxToVCEntry(); break;
 		case kSendPostGroupToServer: sendPostGroupToServerEntry(); break;
+		case kSendPostTranscriptionToServer: sendPostTranscriptionToServerEntry(); break;
 		case kSendUserListToServer: sendUserListToServerEntry(); break;
 		case kServerErrorIdle: serverErrorIdleEntry(); break;
 		case kSetWaitForGetProfile: setWaitForGetProfileEntry(); break;
@@ -293,6 +308,8 @@ int  SendToGroupScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kSendGetProfileIToServer) && (evt == kSuccess)) return kIsProfileValid; else
 	if ((mState == kSendPostGroupToServer) && (evt == kFail)) return kShowRetryPostGroup; else
 	if ((mState == kSendPostGroupToServer) && (evt == kSuccess)) return kWasPostGroupSuccessful; else
+	if ((mState == kSendPostTranscriptionToServer) && (evt == kFail)) return kShowPostGroupSuccess; else
+	if ((mState == kSendPostTranscriptionToServer) && (evt == kSuccess)) return kShowPostGroupSuccess; else
 	if ((mState == kSendUserListToServer) && (evt == kFail)) return kShowRetryUserList; else
 	if ((mState == kSendUserListToServer) && (evt == kSuccess)) return kIsUserListValid; else
 	if ((mState == kServerErrorIdle) && (evt == kCancel)) return kSendGoInboxToVC; else
@@ -317,7 +334,7 @@ int  SendToGroupScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kUpdateLocalUserList) && (evt == kNext)) return kInitIToZero; else
 	if ((mState == kUpdateUserListI) && (evt == kNext)) return kReUpdateLocalUserList; else
 	if ((mState == kWasPostGroupSuccessful) && (evt == kNo)) return kShowPostGroupFailed; else
-	if ((mState == kWasPostGroupSuccessful) && (evt == kYes)) return kShowPostGroupSuccess;
+	if ((mState == kWasPostGroupSuccessful) && (evt == kYes)) return kSendPostTranscriptionToServer;
 
 	return kInvalidState;
 }

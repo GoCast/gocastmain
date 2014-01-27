@@ -13,6 +13,8 @@
 #import "VC/ContactsVC.h"
 #import "VC/GroupsVC.h"
 
+#import "VC/LoginVC.h"
+
 #include "Base/package.h"
 
 #include "GCTEvent.h"
@@ -26,6 +28,17 @@ extern std::vector<std::string> gUserListEntries;
 extern std::vector<std::string> gMyInboxListEntries;
 extern std::vector<std::string> gMyGroupsListEntries;
 extern std::vector<std::string> gMemberListEntries;
+
+const unsigned char SpeechKitApplicationKey[] =
+{
+    0xe1, 0x4e, 0xf3, 0x80, 0x7d, 0x6a, 0xc2, 0x69, 0xbd, 0xa9,
+    0xd4, 0xc1, 0x2e, 0xdf, 0xcf, 0x0e, 0x97, 0xd3, 0x07, 0x7a,
+    0x33, 0x41, 0xd3, 0xb0, 0xf8, 0x77, 0x6f, 0x16, 0x79, 0x80,
+    0x49, 0x5a, 0xcf, 0x3c, 0xdb, 0x4c, 0xa6, 0x9d, 0xb5, 0x64,
+    0x46, 0x89, 0x25, 0x75, 0x69, 0xf4, 0x83, 0x00, 0xc8, 0x8b,
+    0x7a, 0xfb, 0xcc, 0x4d, 0xab, 0xc4, 0xc4, 0x1a, 0xda, 0x3d,
+    0x9b, 0x23, 0x98, 0x6a
+};
 
 @implementation AppDelegate
 
@@ -55,9 +68,13 @@ extern std::vector<std::string> gMemberListEntries;
     [TestFlight takeOff:@"9d7d1e2c-62c3-45d9-8506-cb0a9752ca47"];
 #endif
 
+    [self ctorRecorder];
+
     //TODO: This removes the "groups" tab, for now; so remove it later
     NSMutableArray * vcs = [NSMutableArray arrayWithArray:[self.tabBarController viewControllers]];
+
 	[vcs removeObjectAtIndex:3];
+
 	[self.tabBarController setViewControllers:vcs];
 
     if (floor(NSFoundationVersionNumber) > NSFoundationVersionNumber_iOS_6_1)
@@ -72,11 +89,7 @@ extern std::vector<std::string> gMemberListEntries;
     [self.window setRootViewController:self.tabBarController];
     [self.window makeKeyAndVisible];
 
-    mTabVC[0] = self.mInboxVC;
-    mTabVC[1] = self.mNewMemoVC;
-    mTabVC[2] = self.mContactsVC;
-    mTabVC[3] = self.mGroupsVC;
-    mTabVC[4] = self.mSettingsVC;
+    [self.tabBarController presentViewController:[[[LoginVC alloc] init] autorelease] animated:YES completion:nil];
 
     GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kAppDelegateInit));
 
@@ -91,6 +104,8 @@ extern std::vector<std::string> gMemberListEntries;
 
 - (void)dealloc
 {
+    [self dtorRecorder];
+
     [mWindow release];
     [mViewController release];
     [super dealloc];
@@ -289,14 +304,82 @@ extern std::vector<std::string> gMemberListEntries;
 }
 
 
+#pragma mark Audio Recording
+-(void)ctorRecorder
+{
+    [SpeechKit setupWithID:@"NMDPTRIAL_hmizusawa20131113014320"
+                      host:@"sandbox.nmdp.nuancemobility.net"
+                      port:443
+                    useSSL:NO
+                  delegate:self];
+
+    // Set the audio file
+    NSArray *pathComponents = [NSArray arrayWithObjects:
+                               NSTemporaryDirectory(),
+                               @"scratch.wav",
+                               nil];
+    NSURL *outputFileURL = [NSURL fileURLWithPathComponents:pathComponents];
+
+    // Setup audio session
+    AVAudioSession *session = [AVAudioSession sharedInstance];
+    [session setCategory:AVAudioSessionCategoryPlayAndRecord error:nil];
+
+    [session overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker error:nil];
+
+    // Define the recorder setting
+    NSMutableDictionary *recordSetting = [[NSMutableDictionary alloc] init];
+
+    [recordSetting setValue:[NSNumber numberWithInt:kAudioFormatLinearPCM] forKey:AVFormatIDKey];
+    [recordSetting setValue:[NSNumber numberWithFloat:16000.0] forKey:AVSampleRateKey];
+    [recordSetting setValue:[NSNumber numberWithInt: 1] forKey:AVNumberOfChannelsKey];
+
+    // Initiate and prepare the recorder
+    _mRecorder = [[AVAudioRecorder alloc] initWithURL:outputFileURL settings:recordSetting error:NULL];
+    _mRecorder.delegate = self;
+    _mRecorder.meteringEnabled = YES;
+    [_mRecorder prepareToRecord];
+
+    [recordSetting release];
+}
+
+-(void)dtorRecorder
+{
+    [_mRecorder release];
+}
+
 -(void)startRecorder
 {
-    [self.viewController startRecorder];
+    if (voiceSearch) [voiceSearch release];
+
+    voiceSearch = [[SKRecognizer alloc] initWithType:SKDictationRecognizerType
+                                           detection:SKNoEndOfSpeechDetection
+                                            language:@"ja_jp"
+                                            delegate:self];
 }
 
 -(void)stopRecorder
 {
-    [self.viewController stopRecorder];
+    [voiceSearch stopRecording];
+
+    AVAudioSession *audioSession = [AVAudioSession sharedInstance];
+    [audioSession setActive:NO error:nil];
+}
+
+-(void)startRecorderInternal
+{
+    AVAudioSession *session = [AVAudioSession sharedInstance];
+    [session setActive:YES error:nil];
+
+    // Start recording
+    [_mRecorder record];
+}
+
+-(void)stopRecorderInternal
+{
+    [_mRecorder stop];
+
+    AVAudioSession *audioSession = [AVAudioSession sharedInstance];
+    [audioSession setActive:NO error:nil];
 }
 
 #pragma mark -
@@ -330,50 +413,58 @@ extern std::vector<std::string> gMemberListEntries;
 
 -(void)pushChangeRegisterdName:(int)tabID
 {
-    ChangeRegisteredNameVC* nextVC = [[[ChangeRegisteredNameVC alloc] initWithNibName:@"ChangeRegisteredNameVC" bundle:nil] autorelease];
-    [mTabVC[tabID] pushViewController:nextVC animated:YES];
+#pragma unused(tabID)
+//    ChangeRegisteredNameVC* nextVC = [[[ChangeRegisteredNameVC alloc] initWithNibName:@"ChangeRegisteredNameVC" bundle:nil] autorelease];
+//    [mTabVC[tabID] pushViewController:nextVC animated:YES];
 }
 
 -(void)pushContactDetails:(int)tabID
 {
-    ContactDetailsVC* nextVC = [[[ContactDetailsVC alloc] initWithNibName:@"ContactDetailsVC" bundle:nil] autorelease];
-    [mTabVC[tabID] pushViewController:nextVC animated:YES];
+#pragma unused(tabID)
+//    ContactDetailsVC* nextVC = [[[ContactDetailsVC alloc] initWithNibName:@"ContactDetailsVC" bundle:nil] autorelease];
+//    [mTabVC[tabID] pushViewController:nextVC animated:YES];
 }
 
 -(void)pushEditContacts:(int)tabID
 {
-    EditContactsVC* nextVC = [[[EditContactsVC alloc] initWithNibName:@"EditContactsVC" bundle:nil] autorelease];
-    [mTabVC[tabID] pushViewController:nextVC animated:YES];
+#pragma unused(tabID)
+//    EditContactsVC* nextVC = [[[EditContactsVC alloc] initWithNibName:@"EditContactsVC" bundle:nil] autorelease];
+//    [mTabVC[tabID] pushViewController:nextVC animated:YES];
 }
 
 -(void)pushInboxMessage:(int)tabID
 {
-    InboxMessageVC* nextVC = [[[InboxMessageVC alloc] initWithNibName:@"InboxMessageVC" bundle:nil] autorelease];
-    [mTabVC[tabID] pushViewController:nextVC animated:YES];
+#pragma unused(tabID)
+//    InboxMessageVC* nextVC = [[[InboxMessageVC alloc] initWithNibName:@"InboxMessageVC" bundle:nil] autorelease];
+//    [mTabVC[tabID] pushViewController:nextVC animated:YES];
 }
 
 -(void)pushMessageHistory:(int)tabID
 {
-    MessageHistoryVC* nextVC = [[[MessageHistoryVC alloc] initWithNibName:@"MessageHistoryVC" bundle:nil] autorelease];
-    [mTabVC[tabID] pushViewController:nextVC animated:YES];
+#pragma unused(tabID)
+//    MessageHistoryVC* nextVC = [[[MessageHistoryVC alloc] initWithNibName:@"MessageHistoryVC" bundle:nil] autorelease];
+//    [mTabVC[tabID] pushViewController:nextVC animated:YES];
 }
 
 -(void)pushRecordMessage:(int)tabID
 {
-    RecordMessageVC* nextVC = [[[RecordMessageVC alloc] initWithNibName:@"RecordMessageVC" bundle:nil] autorelease];
-    [mTabVC[tabID] pushViewController:nextVC animated:YES];
+#pragma unused(tabID)
+//    RecordMessageVC* nextVC = [[[RecordMessageVC alloc] initWithNibName:@"RecordMessageVC" bundle:nil] autorelease];
+//    [mTabVC[tabID] pushViewController:nextVC animated:YES];
 }
 
 -(void)pushContacts:(int)tabID
 {
-    ContactsVC* nextVC = [[[ContactsVC alloc] initWithNibName:@"ContactsVC" bundle:nil] autorelease];
-    [mTabVC[tabID] pushViewController:nextVC animated:YES];
+#pragma unused(tabID)
+//    ContactsVC* nextVC = [[[ContactsVC alloc] initWithNibName:@"ContactsVC" bundle:nil] autorelease];
+//    [mTabVC[tabID] pushViewController:nextVC animated:YES];
 }
 
 -(void)pushGroups:(int)tabID
 {
-    GroupsVC* nextVC = [[[GroupsVC alloc] initWithNibName:@"ContactsVC" bundle:nil] autorelease];
-    [mTabVC[tabID] pushViewController:nextVC animated:YES];
+#pragma unused(tabID)
+//    GroupsVC* nextVC = [[[GroupsVC alloc] initWithNibName:@"ContactsVC" bundle:nil] autorelease];
+//    [mTabVC[tabID] pushViewController:nextVC animated:YES];
 }
 
 -(void)popInbox:(bool)animated
@@ -414,4 +505,94 @@ extern std::vector<std::string> gMemberListEntries;
     }
 }
 
+-(void)audioRecorderDidFinishRecording:(AVAudioRecorder *)recorder successfully:(BOOL)flag
+{
+#pragma unused(recorder, flag)
+}
+
+#pragma mark -
+#pragma mark SKRecognizerDelegate methods
+
+- (void)recognizerDidBeginRecording:(SKRecognizer *)recognizer
+{
+#pragma unused(recognizer)
+    NSLog(@"Recording started.");
+    [self startRecorderInternal];
+}
+
+- (void)recognizerDidFinishRecording:(SKRecognizer *)recognizer
+{
+#pragma unused(recognizer)
+    NSLog(@"Recording finished.");
+    [self stopRecorderInternal];
+}
+
+- (void)recognizer:(SKRecognizer *)recognizer didFinishWithResults:(SKRecognition *)results
+{
+#pragma unused(recognizer)
+    NSString* result = [NSString stringWithUTF8String:""];
+
+    NSLog(@"Got results.");
+    NSLog(@"Session id [%@].", [SpeechKit sessionID]); // for debugging purpose: printing out the speechkit session id
+
+    size_t numOfResults = [results.results count];
+
+    if (numOfResults > 0)
+    {
+        result = [results firstResult];
+    }
+
+    NSLog(@"Result %@", result);
+
+    GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kTranscriptFinished, [result UTF8String]));
+
+    //	if (numOfResults > 1)
+    //		alternativesDisplay.text = [[results.results subarrayWithRange:NSMakeRange(1, numOfResults-1)] componentsJoinedByString:@"\n"];
+
+    //    if (results.suggestion) {
+    //        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Suggestion"
+    //                                                        message:results.suggestion
+    //                                                       delegate:nil
+    //                                              cancelButtonTitle:@"OK"
+    //                                              otherButtonTitles:nil];
+    //        [alert show];
+    //        [alert release];
+    //
+    //    }
+
+	[voiceSearch release];
+	voiceSearch = nil;
+}
+
+- (void)recognizer:(SKRecognizer *)recognizer didFinishWithError:(NSError *)error suggestion:(NSString *)suggestion
+{
+#pragma unused(recognizer, error, suggestion)
+
+    NSLog(@"Got error.");
+    NSLog(@"Session id [%@].", [SpeechKit sessionID]); // for debugging purpose: printing out the speechkit session id
+
+    //    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error"
+    //                                                    message:[error localizedDescription]
+    //                                                   delegate:nil
+    //                                          cancelButtonTitle:@"OK"
+    //                                          otherButtonTitles:nil];
+    //    [alert show];
+    //    [alert release];
+    //
+    //    if (suggestion) {
+    //        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Suggestion"
+    //                                                        message:suggestion
+    //                                                       delegate:nil
+    //                                              cancelButtonTitle:@"OK"
+    //                                              otherButtonTitles:nil];
+    //        [alert show];
+    //        [alert release];
+    //
+    //    }
+    
+	[voiceSearch release];
+	voiceSearch = nil;
+}
+
 @end
+

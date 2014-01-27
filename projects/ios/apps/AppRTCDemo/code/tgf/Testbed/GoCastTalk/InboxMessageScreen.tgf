@@ -1,0 +1,61 @@
+1 start
+2 end
+3 idle
+4 Send download request to server
+5 Show "retry download?"
+6 Copy download to local files
+7 Set "wait for download"
+8 Play Sound
+9 Playing Idle
+10 Does audio exist locally?
+11 Pause Sound
+12 Paused Idle
+13 Resume Sound
+14 Set WasPlaying to false
+15 Set WasPlaying to true
+16 Were we going to play?
+17 Stop Sound
+18 Update time label
+19 Peer: push RecordMessage
+20 Peer: push MessageHistory
+21 Peer: pop self
+22 Set "wait for deleteMessage"
+23 Send deleteMessage to server
+24 Was deleteMessage valid?
+25 Show "error deleting message"
+26 Send ReloadInbox to VC
+#
+4 5 fail
+4 6 success
+5 7 yes
+7 4
+5 3 no
+6 18
+8 9
+10 7 no
+1 14
+10 18 yes
+3 15 playPressed
+9 11 playPressed
+11 12
+12 13 playPressed
+13 9
+9 17 finishedPlaying
+14 10
+15 10
+16 8 yes
+16 3 no
+17 14
+18 16
+3 22 deleteSelected
+3 19 replySelected
+19 3
+3 20 pastSelected
+20 3
+22 23
+23 24 success
+23 25 fail
+25 3 yes
+24 25 no
+24 26 yes
+26 21

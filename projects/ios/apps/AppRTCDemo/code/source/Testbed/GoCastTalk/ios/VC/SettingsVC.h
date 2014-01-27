@@ -2,12 +2,19 @@
 #import <MessageUI/MessageUI.h>
 #import <AVFoundation/AVFoundation.h>
 
+#include <map>
+class JSONValue;
+typedef std::map<std::string, JSONValue> JSONObject;
+
+class SettingsScreen;
+
 @interface SettingsVC : UIViewController
 <
     UITableViewDelegate,
     UITableViewDataSource
 >
 {
+    SettingsScreen* mPeer;
 }
 
 //mInboxView
@@ -20,5 +27,7 @@
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section;
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath;
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath;
+
+-(void) pushChangeRegisteredName:(const JSONObject&)newObject;
 
 @end
