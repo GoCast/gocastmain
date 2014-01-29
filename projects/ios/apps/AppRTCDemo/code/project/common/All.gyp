@@ -13,7 +13,6 @@
     					'AudioDemo.gyp:*',
     					'ErizoClient.gyp:*',
     					'HUDDemo.gyp:*',
-    					'MemoApp.gyp:*',
     					'GoCastTalk.gyp:*',
     				], # dependencies
 
