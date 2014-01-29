@@ -12,7 +12,6 @@
     					'AppRTCDemo.gyp:*',
     					'AudioDemo.gyp:*',
     					'ErizoClient.gyp:*',
-    					'HUDDemo.gyp:*',
     					'GoCastTalk.gyp:*',
     				], # dependencies
 
