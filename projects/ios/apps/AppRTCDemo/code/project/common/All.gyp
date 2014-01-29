@@ -10,7 +10,6 @@
 
     				'dependencies': [
     					'AppRTCDemo.gyp:*',
-    					'AudioDemo.gyp:*',
     					'ErizoClient.gyp:*',
     					'GoCastTalk.gyp:*',
     				], # dependencies
