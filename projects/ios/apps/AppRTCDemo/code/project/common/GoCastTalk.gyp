@@ -224,9 +224,6 @@
 					'../../source/Testbed/GoCastTalk/<@(OS)/SubVC/InboxMessageVC.h',
 					'../../source/Testbed/GoCastTalk/<@(OS)/SubVC/InboxMessageVC.mm',
 
-					'../../source/Testbed/GoCastTalk/<@(OS)/GoCastTalkVC.h',
-					'../../source/Testbed/GoCastTalk/<@(OS)/GoCastTalkVC.mm',
-
 					'../../source/Testbed/GoCastTalk/<@(OS)/InboxEntryCell.h',
 					'../../source/Testbed/GoCastTalk/<@(OS)/InboxEntryCell.mm',
 
@@ -259,8 +256,6 @@
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/SubVC/RecordMessageVC.xib',
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/SubVC/ChangeRegisteredNameVC.xib',
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/SubVC/InboxMessageVC.xib',
-
-					'../../rsrc/Testbed/GoCastTalk/<@(OS)/en.lproj/GoCastTalkVC.xib',
 
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/en.lproj/InboxEntryCell.xib',
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/en.lproj/HeadingSubCell.xib',
