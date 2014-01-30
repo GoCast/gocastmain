@@ -55,11 +55,6 @@
 - (void)viewWillDisappear:(BOOL)animated
 {
     [super viewWillDisappear:animated];
-
-    if (![[self.navigationController viewControllers] containsObject:self])
-    {
-        GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kPop));
-    }
 }
 
 - (void)dealloc

@@ -13,24 +13,12 @@ public:
         kGroupsTabPressed,
         kSettingsTabPressed,
 
+//--
         kOKYesAlertPressed,
         kNoAlertPressed,
-
-        kTableItemSelected,
-        kTableItemDeleted,
-
-        kNavButtonPressed,
-        kAddContactsButtonPressed,
-        kAddGroupsButtonPressed,
-
-        kPop,
-
 //--
-
         kTranscriptFinished,
-
         kReloadInbox,
-
         kAppendNewContact,
     };
 

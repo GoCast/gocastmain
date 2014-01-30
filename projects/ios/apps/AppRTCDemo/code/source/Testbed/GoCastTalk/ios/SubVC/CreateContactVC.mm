@@ -29,11 +29,6 @@
 - (void)viewWillDisappear:(BOOL)animated
 {
     [super viewWillDisappear:animated];
-
-    if (![[self.navigationController viewControllers] containsObject:self])
-    {
-        GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kPop));
-    }
 }
 
 - (void)dealloc
@@ -151,7 +146,6 @@
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
 #pragma unused(tableView, indexPath)
-    GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kTableItemSelected, (tUInt32)indexPath.row));
 }
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
