@@ -75,6 +75,12 @@
             "Cancel and Delete",
         };
 
+        UIColor* colors[] =
+        {
+            [UIColor colorWithRed:0.42f green:0.75f blue:0.87f alpha:1.0f],
+            [UIColor colorWithRed:1.0f green:0.6f blue:0.8f alpha:1.0f],
+        };
+
         tableView.backgroundView = nil;
 
         static NSString *simpleTableIdentifier = @"HeadingSubCell";
@@ -89,7 +95,10 @@
         cell.mHeading.text = [NSString stringWithUTF8String:heading[indexPath.row]];
         cell.mSub.text = [NSString stringWithUTF8String:""];
         cell.mRightArrow.hidden = YES;
-        
+
+        cell.mHeading.textColor = [UIColor whiteColor];
+        cell.mContentView.backgroundColor = colors[indexPath.row];
+
         return cell;
     }
     else

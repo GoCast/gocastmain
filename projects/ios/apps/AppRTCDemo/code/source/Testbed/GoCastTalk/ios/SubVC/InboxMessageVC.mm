@@ -127,7 +127,14 @@
         cell.mHeading.text = [NSString stringWithUTF8String:heading[indexPath.row]];
         cell.mSub.text = [NSString stringWithUTF8String:subheading[indexPath.row]];
         cell.mRightArrow.hidden = hasRightArrow[indexPath.row] ? NO : YES;
-        
+
+        if (indexPath.row == 2)
+        {
+            cell.mHeading.textColor = [UIColor whiteColor];
+            cell.mSub.textColor     = [UIColor whiteColor];
+            cell.mContentView.backgroundColor = [UIColor colorWithRed:1.0f green:0.6f blue:0.8f alpha:1.0f];
+        }
+
         return cell;
     }
     else
