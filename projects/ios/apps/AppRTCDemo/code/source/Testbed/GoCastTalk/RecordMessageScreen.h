@@ -34,6 +34,7 @@ public:
     void pausePressed();
     void recordPressed();
     void playPressed();
+    void stopPressed();
 
 protected:
 	void startEntry();
@@ -56,6 +57,7 @@ protected:
 	void sendPostTranscriptToServerEntry();
 	void sendReloadInboxToVCEntry();
 	void setWaitForPostAudioEntry();
+	void setWaitForTranscriptionEntry();
 	void showNoAudioToSendEntry();
 	void showPostAudioFailedEntry();
 	void startRecordingAudioEntry();
@@ -85,6 +87,7 @@ public:
 		kPlayPressed,
 		kRecordPressed,
 		kSendPressed,
+		kStopPressed,
 		kSuccess,
 		kTranscriptionReady,
 		kYes,
@@ -111,6 +114,7 @@ public:
 		kSendPostTranscriptToServer,
 		kSendReloadInboxToVC,
 		kSetWaitForPostAudio,
+		kSetWaitForTranscription,
 		kShowNoAudioToSend,
 		kShowPostAudioFailed,
 		kStartRecordingAudio,

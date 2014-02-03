@@ -165,6 +165,11 @@
     mPeer->playPressed();
 }
 
+-(IBAction)stopPressed
+{
+    mPeer->stopPressed();
+}
+
 -(void)customInit:(const JSONObject&)newObject
 {
     mInitObject = newObject;
@@ -177,44 +182,54 @@
 
 -(void) setWaitToRecordUI
 {
-    [self.mPauseButton  setEnabled:NO];
-    [self.mRecordButton setEnabled:YES];
-    [self.mPlayButton   setEnabled:NO];
+    [self.mPauseButton  setHidden:YES];
+    [self.mRecordButton setHidden:NO];
+    [self.mPlayButton   setHidden:YES];
+    [self.mStopButton   setHidden:YES];
 }
 
 -(void) setWaitToPlayUI
 {
-    [self.mPauseButton  setEnabled:NO];
-    [self.mRecordButton setEnabled:NO];
     [self.mPlayButton   setEnabled:YES];
+
+    [self.mPauseButton  setHidden:YES];
+    [self.mRecordButton setHidden:YES];
+    [self.mPlayButton   setHidden:NO];
+    [self.mStopButton   setHidden:YES];
 }
 
 -(void) setPlayingUI
 {
-    [self.mPauseButton  setEnabled:YES];
-    [self.mRecordButton setEnabled:NO];
-    [self.mPlayButton   setEnabled:NO];
+    [self.mPauseButton  setHidden:NO];
+    [self.mRecordButton setHidden:YES];
+    [self.mPlayButton   setHidden:YES];
+    [self.mStopButton   setHidden:YES];
 }
 
 -(void) setPausedUI
 {
-    [self.mPauseButton  setEnabled:NO];
-    [self.mRecordButton setEnabled:NO];
-    [self.mPlayButton   setEnabled:YES];
+    [self.mPauseButton  setHidden:YES];
+    [self.mRecordButton setHidden:YES];
+    [self.mPlayButton   setHidden:NO];
+    [self.mStopButton   setHidden:YES];
 }
 
 -(void) setRecordingUI
 {
-    [self.mPauseButton  setEnabled:NO];
-    [self.mRecordButton setEnabled:YES];
-    [self.mPlayButton   setEnabled:NO];
+    [self.mPauseButton  setHidden:YES];
+    [self.mRecordButton setHidden:YES];
+    [self.mPlayButton   setHidden:YES];
+    [self.mStopButton   setHidden:NO];
 }
 
 -(void) setWaitForTranscriptUI
 {
-    [self.mPauseButton  setEnabled:NO];
-    [self.mRecordButton setEnabled:NO];
     [self.mPlayButton   setEnabled:NO];
+
+    [self.mPauseButton  setHidden:YES];
+    [self.mRecordButton setHidden:YES];
+    [self.mPlayButton   setHidden:NO];
+    [self.mStopButton   setHidden:YES];
 }
 
 @end

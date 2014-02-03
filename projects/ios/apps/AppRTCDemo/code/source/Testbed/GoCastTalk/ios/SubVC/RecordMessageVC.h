@@ -24,6 +24,7 @@ class RecordMessageScreen;
 @property (nonatomic, strong) IBOutlet UIButton*        mPauseButton;
 @property (nonatomic, strong) IBOutlet UIButton*        mRecordButton;
 @property (nonatomic, strong) IBOutlet UIButton*        mPlayButton;
+@property (nonatomic, strong) IBOutlet UIButton*        mStopButton;
 
 @property (nonatomic, strong) IBOutlet UILabel*         mToLabel;
 @property (nonatomic, strong) IBOutlet UIView*          mBlockingView;
@@ -41,6 +42,7 @@ class RecordMessageScreen;
 -(IBAction)pausePressed;
 -(IBAction)recordPressed;
 -(IBAction)playPressed;
+-(IBAction)stopPressed;
 
 -(void)customInit:(const JSONObject&)newObject;
 

@@ -50,6 +50,11 @@ void RecordMessageScreen::playPressed()
     update(kPlayPressed);
 }
 
+void RecordMessageScreen::stopPressed()
+{
+    update(kStopPressed);
+}
+
 #pragma mark Start / End / Invalid
 void RecordMessageScreen::startEntry()
 {
@@ -216,6 +221,8 @@ void RecordMessageScreen::letDidRecordBeFalseEntry()
 void RecordMessageScreen::letDidRecordBeTrueEntry()
 {
     mDidRecord = true;
+
+    [mPeer setBlockingViewVisible:false];
 }
 
 void RecordMessageScreen::pauseAudioEntry()
@@ -343,6 +350,11 @@ void RecordMessageScreen::setWaitForPostAudioEntry()
     [mPeer setBlockingViewVisible:true];
 }
 
+void RecordMessageScreen::setWaitForTranscriptionEntry()
+{
+    [mPeer setBlockingViewVisible:true];
+}
+
 void RecordMessageScreen::showNoAudioToSendEntry()
 {
     tAlert("Please record audio first.");
@@ -382,6 +394,7 @@ void RecordMessageScreen::CallEntry()
 		case kSendPostTranscriptToServer: sendPostTranscriptToServerEntry(); break;
 		case kSendReloadInboxToVC: sendReloadInboxToVCEntry(); break;
 		case kSetWaitForPostAudio: setWaitForPostAudioEntry(); break;
+		case kSetWaitForTranscription: setWaitForTranscriptionEntry(); break;
 		case kShowNoAudioToSend: showNoAudioToSendEntry(); break;
 		case kShowPostAudioFailed: showPostAudioFailedEntry(); break;
 		case kStart: startEntry(); break;
@@ -423,8 +436,8 @@ int  RecordMessageScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kPlayingIdle) && (evt == kPausePressed)) return kPauseAudio; else
 	if ((mState == kPlayingIdle) && (evt == kSendPressed)) return kStopPlayingBeforeSend; else
 	if ((mState == kRecordingIdle) && (evt == kCancelPressed)) return kStopRecordingBeforePop; else
-	if ((mState == kRecordingIdle) && (evt == kRecordPressed)) return kStopRecordingAudio; else
 	if ((mState == kRecordingIdle) && (evt == kSendPressed)) return kStopRecordingBeforeSend; else
+	if ((mState == kRecordingIdle) && (evt == kStopPressed)) return kStopRecordingAudio; else
 	if ((mState == kResumeAudio) && (evt == kNext)) return kPlayingIdle; else
 	if ((mState == kSendPostAudioToServer) && (evt == kFail)) return kShowPostAudioFailed; else
 	if ((mState == kSendPostAudioToServer) && (evt == kSuccess)) return kWasPostAudioSuccessful; else
@@ -434,6 +447,7 @@ int  RecordMessageScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kSendPostTranscriptToServer) && (evt == kSuccess)) return kWasPostTranscriptSuccessful; else
 	if ((mState == kSendReloadInboxToVC) && (evt == kNext)) return kPeerPopSelf; else
 	if ((mState == kSetWaitForPostAudio) && (evt == kNext)) return kSendPostAudioToServer; else
+	if ((mState == kSetWaitForTranscription) && (evt == kNext)) return kWaitForTranscription; else
 	if ((mState == kShowNoAudioToSend) && (evt == kYes)) return kWaitToRecordIdle; else
 	if ((mState == kShowPostAudioFailed) && (evt == kYes)) return kSendReloadInboxToVC; else
 	if ((mState == kStart) && (evt == kNext)) return kCalculateMessageJSON; else
@@ -441,11 +455,9 @@ int  RecordMessageScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kStopAudio) && (evt == kNext)) return kDidWeRecord; else
 	if ((mState == kStopPlayingBeforePop) && (evt == kNext)) return kSendReloadInboxToVC; else
 	if ((mState == kStopPlayingBeforeSend) && (evt == kNext)) return kSetWaitForPostAudio; else
-	if ((mState == kStopRecordingAudio) && (evt == kNext)) return kWaitForTranscription; else
+	if ((mState == kStopRecordingAudio) && (evt == kNext)) return kSetWaitForTranscription; else
 	if ((mState == kStopRecordingBeforePop) && (evt == kNext)) return kSendReloadInboxToVC; else
 	if ((mState == kStopRecordingBeforeSend) && (evt == kNext)) return kSetWaitForPostAudio; else
-	if ((mState == kWaitForTranscription) && (evt == kCancelPressed)) return kWaitForTranscription; else
-	if ((mState == kWaitForTranscription) && (evt == kSendPressed)) return kWaitForTranscription; else
 	if ((mState == kWaitForTranscription) && (evt == kTranscriptionReady)) return kLetDidRecordBeTrue; else
 	if ((mState == kWaitToPlayIdle) && (evt == kCancelPressed)) return kSendReloadInboxToVC; else
 	if ((mState == kWaitToPlayIdle) && (evt == kPlayPressed)) return kPlayAudio; else
@@ -475,6 +487,7 @@ bool RecordMessageScreen::HasEdgeNamedNext() const
 		case kResumeAudio:
 		case kSendReloadInboxToVC:
 		case kSetWaitForPostAudio:
+		case kSetWaitForTranscription:
 		case kStart:
 		case kStartRecordingAudio:
 		case kStopAudio:

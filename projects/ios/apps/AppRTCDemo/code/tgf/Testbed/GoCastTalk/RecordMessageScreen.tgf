@@ -31,14 +31,15 @@
 31 Was postMessage successful?
 32 Calculate Message JSON
 33 Peer: pop self
+34 Set "Wait for transcription"
 #
 3 4 no
 4 5 recordPressed
 3 6 yes
 5 7
-7 8 recordPressed
+7 8 stopPressed
 1 32
-8 17
+8 34
 6 10 playPressed
 10 9
 9 11 pausePressed
@@ -73,7 +74,6 @@
 6 20 sendPressed
 7 18 sendPressed
 27 9
-17 17 sendPressed, cancelPressed
 28 3
 29 3
 30 31 success
@@ -82,3 +82,4 @@
 30 21 fail
 32 28
 14 33
+34 17
