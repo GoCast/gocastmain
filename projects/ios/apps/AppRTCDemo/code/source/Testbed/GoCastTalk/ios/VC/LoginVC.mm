@@ -10,6 +10,8 @@
 #import "InboxEntryCell.h"
 #import "HeadingSubCell.h"
 
+extern std::string kBaseURL;
+
 @interface LoginVC()
 {
 }
@@ -125,6 +127,9 @@
 {
     const char* email = [self.mEmail.text UTF8String];
     const char* password = [self.mPassword.text UTF8String];
+    const char* baseURL = [self.mBaseURL.text UTF8String];
+
+    LoginScreen::mBaseURL = baseURL ? baseURL : kBaseURL;
 
     mPeer->signInPressed(email ? email : "", password ? password : "");
 }
@@ -145,6 +150,7 @@
 -(void) setLoginName:(const std::string&)newName
 {
     self.mEmail.text = [NSString stringWithUTF8String:newName.c_str()];
+    self.mBaseURL.text = [NSString stringWithUTF8String:LoginScreen::mBaseURL.c_str()];
 }
 
 -(void) popSelf

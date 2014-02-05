@@ -5,6 +5,14 @@
 
 #include "LoginVC.h"
 
+#ifdef ADHOC
+std::string kBaseURL("https://chat.gocast.it/memoappserver/");
+#else
+std::string kBaseURL("http://127.0.0.1:8888/");
+#endif
+
+std::string LoginScreen::mBaseURL(kBaseURL);
+
 bool LoginScreen::EnsureInfo(const std::string& newName, const std::string& newPassword)
 {
     bool result = !newName.empty();
@@ -135,12 +143,20 @@ void LoginScreen::loadLoginNameEntry()
         result = !mEmail.empty();
     }
 
+    loginInfo = tFile(tFile::kPreferencesDirectory, "baseURL.txt");
+
+    if (loginInfo.exists())
+    {
+        mBaseURL = loginInfo;
+    }
+
     SetImmediateEvent(result ? kSuccess : kFail);
 }
 
 void LoginScreen::saveLoginNameEntry()
 {
     tFile (tFile::kPreferencesDirectory, "login.txt").write(mEmail);
+    tFile (tFile::kPreferencesDirectory, "baseURL.txt").write(mBaseURL);
 }
 
 void LoginScreen::ensureSigninInfoEntry()

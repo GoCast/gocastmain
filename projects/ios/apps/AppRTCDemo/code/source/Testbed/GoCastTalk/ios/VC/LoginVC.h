@@ -18,6 +18,7 @@ class LoginScreen;
 }
 
 //mInboxView
+@property (nonatomic, strong) IBOutlet UITextField* mBaseURL;
 @property (nonatomic, strong) IBOutlet UITextField* mEmail;
 @property (nonatomic, strong) IBOutlet UITextField* mPassword;
 @property (nonatomic, strong) IBOutlet UIView*      mBlockingView;

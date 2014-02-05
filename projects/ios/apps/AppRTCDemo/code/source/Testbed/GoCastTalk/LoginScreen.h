@@ -17,6 +17,9 @@ protected:
     std::string mEmail;
     std::string mPassword;
 
+public:
+    static std::string mBaseURL;
+
 protected:
     bool EnsureInfo(const std::string& newName, const std::string& newPassword);
 
