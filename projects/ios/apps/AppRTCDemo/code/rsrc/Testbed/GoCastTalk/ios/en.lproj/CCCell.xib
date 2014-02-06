@@ -25,11 +25,17 @@
                         <rect key="frame" x="284" y="5" width="16" height="16"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <state key="normal" backgroundImage="button-add.png"/>
+                        <connections>
+                            <action selector="addPressed" destination="3" eventType="touchUpInside" id="NUY-0M-yLa"/>
+                        </connections>
                     </button>
                     <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="YEA-1J-aJf" userLabel="mDelButton">
                         <rect key="frame" x="284" y="5" width="16" height="16"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <state key="normal" backgroundImage="button-del.png"/>
+                        <connections>
+                            <action selector="delPressed" destination="3" eventType="touchUpInside" id="EgV-fg-UeN"/>
+                        </connections>
                     </button>
                     <imageView hidden="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="icon-tri-right.png" id="SMy-cZ-lo7" userLabel="mArrowRight">
                         <rect key="frame" x="8" y="5" width="16" height="16"/>

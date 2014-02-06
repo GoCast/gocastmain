@@ -1,6 +1,7 @@
 #import <UIKit/UIKit.h>
 #import <MessageUI/MessageUI.h>
 #import <AVFoundation/AVFoundation.h>
+#import <CCCell.h>
 
 #include <map>
 class JSONValue;
@@ -11,7 +12,8 @@ class RecordMessageScreen;
 @interface RecordMessageVC : UIViewController
 <
     UITableViewDelegate,
-    UITableViewDataSource
+    UITableViewDataSource,
+    CCCellDelegate
 >
 {
     JSONObject mInitObject;
@@ -42,6 +44,10 @@ class RecordMessageScreen;
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section;
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath;
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath;
+
+#pragma mark CCCellDelegate stuff
+-(void)onAddPressed;
+-(void)onDelPressed:(const size_t &)i;
 
 -(void)setBlockingViewVisible:(bool)newVisible;
 

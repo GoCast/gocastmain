@@ -70,37 +70,6 @@
     }
 }
 
-void cellZero(bool expanded, CCCell* cell);
-void cellZero(bool expanded, CCCell* cell)
-{
-    cell.mTo.text = [NSString stringWithUTF8String:"to: ..."];
-
-    if (!expanded)
-    {
-        [cell.mArrowRight setHidden:NO];
-        [cell.mArrowDown setHidden:YES];
-    }
-    else
-    {
-        [cell.mArrowRight setHidden:YES];
-        [cell.mArrowDown setHidden:NO];
-    }
-    [cell.mAddButton setHidden:NO];
-    [cell.mDelButton setHidden:YES];
-}
-
-void cellNonZero(CCCell* cell, size_t i, const std::string& label);
-void cellNonZero(CCCell* cell, size_t i, const std::string& label)
-{
-#pragma unused(i)
-    cell.mTo.text = [NSString stringWithUTF8String:label.c_str()];
-
-    [cell.mArrowRight setHidden:YES];
-    [cell.mArrowDown setHidden:YES];
-    [cell.mAddButton setHidden:YES];
-    [cell.mDelButton setHidden:NO];
-}
-
 #pragma mark Construction / Destruction
 - (void)viewDidLoad
 {
@@ -213,14 +182,16 @@ void cellNonZero(CCCell* cell, size_t i, const std::string& label)
             cell = [[[CCCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:simpleTableIdentifier] autorelease];
         }
 
+        [cell setDelegate:self];
+
         switch (indexPath.row)
         {
             case 0:
-                cellZero(self->mToExpanded, cell);
+                [cell setAsZero:self->mToExpanded];
                 break;
                 
             default:
-                cellNonZero(cell, (size_t)indexPath.row, mPeer->getTo((size_t)indexPath.row - 1));
+                [cell setAsNonZero:(size_t)indexPath.row - 1 withLabel:mPeer->getTo((size_t)indexPath.row - 1)];
                 break;
         }
 
@@ -289,6 +260,18 @@ void cellNonZero(CCCell* cell, size_t i, const std::string& label)
 //            GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kTableItemDeleted, (tUInt32)indexPath.row));
 //        }
     }
+}
+
+#pragma mark CCCellDelegate stuff
+-(void)onAddPressed
+{
+//TODO: Implement
+}
+
+-(void)onDelPressed:(const size_t &)i
+{
+    mPeer->deleteTo(i);
+    [self expandTo];
 }
 
 -(void)setBlockingViewVisible:(bool)newVisible

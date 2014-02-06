@@ -28,6 +28,7 @@ public:
 
     size_t getToCount();
     std::string getTo(const size_t& i);
+    void deleteTo(const size_t& i);
 
     void donePressed();
     void cancelPressed();

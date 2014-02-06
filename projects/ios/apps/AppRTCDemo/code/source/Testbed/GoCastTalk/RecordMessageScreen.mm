@@ -31,6 +31,11 @@ std::string RecordMessageScreen::getTo(const size_t& i)
     return mInitObject["to"].mArray[i].mString;
 }
 
+void RecordMessageScreen::deleteTo(const size_t& i)
+{
+    mInitObject["to"].mArray.erase(mInitObject["to"].mArray.begin() + (const int)i);
+}
+
 void RecordMessageScreen::donePressed()
 {
     update(kSendPressed);
