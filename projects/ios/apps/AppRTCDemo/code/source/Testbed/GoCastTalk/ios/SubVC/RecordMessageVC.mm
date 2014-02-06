@@ -7,6 +7,7 @@
 
 #import "InboxEntryCell.h"
 #import "HeadingSubCell.h"
+#import "CCCell.h"
 
 @interface RecordMessageVC()
 {
@@ -15,18 +16,107 @@
 
 @implementation RecordMessageVC
 
+#pragma mark CCCell helper methods
+-(void)expandTo
+{
+    CGRect f;
+    size_t count = mPeer->getToCount() + 1;
+
+    f = self.mToTable.frame;
+    f.size.height = 27 * count;
+    [self.mToTable setFrame:f];
+
+    f = self.mBottomHalf.frame;
+    f.origin.y = 27 * count;
+    [self.mBottomHalf setFrame:f];
+
+    self->mToExpanded = true;
+    [self.mToTable reloadData];
+
+    CGSize s = self->mScrollPreExpansion;
+
+    s.height += 27 * (count - 1);
+
+    [self.mScrollView setContentSize:s];
+}
+
+-(void)contractTo
+{
+    CGRect f;
+
+    f = self.mToTable.frame;
+    f.size.height = 27;
+    [self.mToTable setFrame:f];
+
+    f = self.mBottomHalf.frame;
+    f.origin.y = 27;
+    [self.mBottomHalf setFrame:f];
+
+    self->mToExpanded = false;
+    [self.mToTable reloadData];
+
+    [self.mScrollView setContentSize:self->mScrollPreExpansion];
+}
+
+-(void)toggleExpand
+{
+    if (self->mToExpanded)
+    {
+        [self contractTo];
+    }
+    else
+    {
+        [self expandTo];
+    }
+}
+
+void cellZero(bool expanded, CCCell* cell);
+void cellZero(bool expanded, CCCell* cell)
+{
+    cell.mTo.text = [NSString stringWithUTF8String:"to: ..."];
+
+    if (!expanded)
+    {
+        [cell.mArrowRight setHidden:NO];
+        [cell.mArrowDown setHidden:YES];
+    }
+    else
+    {
+        [cell.mArrowRight setHidden:YES];
+        [cell.mArrowDown setHidden:NO];
+    }
+    [cell.mAddButton setHidden:NO];
+    [cell.mDelButton setHidden:YES];
+}
+
+void cellNonZero(CCCell* cell, size_t i, const std::string& label);
+void cellNonZero(CCCell* cell, size_t i, const std::string& label)
+{
+#pragma unused(i)
+    cell.mTo.text = [NSString stringWithUTF8String:label.c_str()];
+
+    [cell.mArrowRight setHidden:YES];
+    [cell.mArrowDown setHidden:YES];
+    [cell.mAddButton setHidden:YES];
+    [cell.mDelButton setHidden:NO];
+}
+
 #pragma mark Construction / Destruction
 - (void)viewDidLoad
 {
     [super viewDidLoad];
 
     [self.mTable registerNib:[UINib nibWithNibName:@"HeadingSubCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"HeadingSubCell"];
+    [self.mToTable registerNib:[UINib nibWithNibName:@"CCCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"CCCell"];
 
     self.view.autoresizesSubviews = YES;
 
     mPeer = new RecordMessageScreen(self, mInitObject);
 
-    self.mToLabel.text = [NSString stringWithUTF8String:("to: " + mPeer->getTo()).c_str()];
+    self->mScrollPreExpansion = self.mScrollView.contentSize;
+    [self contractTo];
+
+//    self.mToLabel.text = [NSString stringWithUTF8String:("to: " + mPeer->getTo()).c_str()];
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -48,6 +138,15 @@
     if (tableView == self.mTable)
     {
         return (NSInteger)2;
+    }
+    else if (tableView == self.mToTable)
+    {
+        if (!self->mToExpanded)
+        {
+            return (NSInteger)1;
+        }
+
+        return (NSInteger)mPeer->getToCount() + 1;
     }
 
     return (NSInteger)1;
@@ -101,6 +200,32 @@
 
         return cell;
     }
+    else if (tableView == self.mToTable)
+    {
+        tableView.backgroundView = nil;
+
+        static NSString *simpleTableIdentifier = @"CCCell";
+
+        CCCell *cell = [tableView dequeueReusableCellWithIdentifier:simpleTableIdentifier];
+
+        if (cell == nil)
+        {
+            cell = [[[CCCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:simpleTableIdentifier] autorelease];
+        }
+
+        switch (indexPath.row)
+        {
+            case 0:
+                cellZero(self->mToExpanded, cell);
+                break;
+                
+            default:
+                cellNonZero(cell, (size_t)indexPath.row, mPeer->getTo((size_t)indexPath.row - 1));
+                break;
+        }
+
+        return cell;
+    }
     else
     {
         tableView.backgroundView = nil;
@@ -117,21 +242,33 @@
         cell.textLabel.text = [NSString stringWithUTF8String:names[0]];
 
         cell.imageView.image = nil;
-
+        
         return cell;
     }
 }
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-#pragma unused(tableView, indexPath)
-    switch (indexPath.row)
+    if (tableView == self.mTable)
     {
-        case 0: mPeer->donePressed(); break;
-        case 1: mPeer->cancelPressed(); break;
+        switch (indexPath.row)
+        {
+            case 0: mPeer->donePressed(); break;
+            case 1: mPeer->cancelPressed(); break;
 
-        default:
-            break;
+            default:
+                break;
+        }
+    }
+    else if (tableView == self.mToTable)
+    {
+        switch (indexPath.row)
+        {
+            case 0: [self toggleExpand]; break;
+
+            default:
+                break;
+        }
     }
 }
 

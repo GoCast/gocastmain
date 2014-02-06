@@ -16,17 +16,23 @@ class RecordMessageScreen;
 {
     JSONObject mInitObject;
     RecordMessageScreen* mPeer;
+    bool    mToExpanded;
+    CGSize  mScrollPreExpansion;
 }
 
 //mInboxView
+@property (nonatomic, strong) IBOutlet UIScrollView*    mScrollView;
+
+@property (nonatomic, strong) IBOutlet UIView*          mBottomHalf;
+
 @property (nonatomic, strong) IBOutlet UITableView*     mTable;
+@property (nonatomic, strong) IBOutlet UITableView*     mToTable;
 
 @property (nonatomic, strong) IBOutlet UIButton*        mPauseButton;
 @property (nonatomic, strong) IBOutlet UIButton*        mRecordButton;
 @property (nonatomic, strong) IBOutlet UIButton*        mPlayButton;
 @property (nonatomic, strong) IBOutlet UIButton*        mStopButton;
 
-@property (nonatomic, strong) IBOutlet UILabel*         mToLabel;
 @property (nonatomic, strong) IBOutlet UIView*          mBlockingView;
 
 #pragma mark Construction / Destruction

@@ -20,9 +20,15 @@ RecordMessageScreen::~RecordMessageScreen()
 }
 
 #pragma mark Public methods
-std::string RecordMessageScreen::getTo()
+size_t RecordMessageScreen::getToCount()
 {
-    return mInitObject["from"].mString;
+    return mInitObject["to"].mArray.size();
+}
+
+std::string RecordMessageScreen::getTo(const size_t& i)
+{
+//    return mInitObject["from"].mString;
+    return mInitObject["to"].mArray[i].mString;
 }
 
 void RecordMessageScreen::donePressed()
