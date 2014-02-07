@@ -15,6 +15,7 @@ class ContactsScreen;
 >
 {
     ContactsScreen* mPeer;
+    void*           mIdentifier;
     bool            mIsChild;
 }
 
@@ -36,7 +37,7 @@ class ContactsScreen;
 -(void) pushContactDetails:(const JSONObject&)newObject;
 -(void) pushEditContacts;
 
--(void) customInit:(bool)newIsChild;
+-(void) customInit:(bool)newIsChild withIdentifier:(void*)newIdentifier;
 
 -(void) popSelf;
 

@@ -45,6 +45,7 @@ protected:
 
 	void calculateMessageJSONEntry();
 	void didWeRecordEntry();
+	void doWeHaveContactsToSendToEntry();
 	void letDidRecordBeFalseEntry();
 	void letDidRecordBeTrueEntry();
 	void pauseAudioEntry();
@@ -61,6 +62,7 @@ protected:
 	void setWaitForPostAudioEntry();
 	void setWaitForTranscriptionEntry();
 	void showNoAudioToSendEntry();
+	void showNoContactsToSendToEntry();
 	void showPostAudioFailedEntry();
 	void startRecordingAudioEntry();
 	void stopAudioEntry();
@@ -101,6 +103,7 @@ public:
 		kStart = 1,
 		kCalculateMessageJSON,
 		kDidWeRecord,
+		kDoWeHaveContactsToSendTo,
 		kEnd,
 		kLetDidRecordBeFalse,
 		kLetDidRecordBeTrue,
@@ -118,6 +121,7 @@ public:
 		kSetWaitForPostAudio,
 		kSetWaitForTranscription,
 		kShowNoAudioToSend,
+		kShowNoContactsToSendTo,
 		kShowPostAudioFailed,
 		kStartRecordingAudio,
 		kStopAudio,

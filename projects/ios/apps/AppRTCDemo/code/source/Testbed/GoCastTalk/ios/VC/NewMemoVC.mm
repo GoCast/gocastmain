@@ -170,10 +170,10 @@
     [(UINavigationController*)self.parentViewController  pushViewController:nextVC animated:YES];
 }
 
--(void) pushContacts
+-(void) pushContacts:(void*)identifier
 {
     ContactsVC* nextVC = [[[ContactsVC alloc] initWithNibName:@"ContactsVC" bundle:nil] autorelease];
-    [nextVC customInit:true];
+    [nextVC customInit:true withIdentifier:identifier];
     [(UINavigationController*)self.parentViewController  pushViewController:nextVC animated:YES];
 }
 

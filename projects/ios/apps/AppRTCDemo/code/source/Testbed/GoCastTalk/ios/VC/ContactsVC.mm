@@ -33,7 +33,7 @@
 
     self.view.autoresizesSubviews = YES;
 
-    mPeer = new ContactsScreen(self, self->mIsChild);
+    mPeer = new ContactsScreen(self, self->mIsChild, self->mIdentifier);
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -48,6 +48,7 @@
     if (self)
     {
         self->mIsChild = false;
+        self->mIdentifier = NULL;
     }
 
     return self;
@@ -184,9 +185,10 @@
     [(UINavigationController*)self.parentViewController  pushViewController:nextVC animated:YES];
 }
 
--(void) customInit:(bool)newIsChild
+-(void) customInit:(bool)newIsChild withIdentifier:(void *)newIdentifier
 {
     mIsChild = newIsChild;
+    mIdentifier = newIdentifier;
 }
 
 -(void) popSelf

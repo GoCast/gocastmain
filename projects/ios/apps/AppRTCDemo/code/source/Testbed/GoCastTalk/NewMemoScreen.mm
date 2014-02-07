@@ -73,7 +73,7 @@ void NewMemoScreen::idleEntry()
 #pragma mark Peer communication
 void NewMemoScreen::peerPushContactsEntry()
 {
-    [mPeer pushContacts];
+    [mPeer pushContacts:this];
 }
 
 void NewMemoScreen::peerPushRecordMessageEntry()
@@ -200,8 +200,11 @@ void NewMemoScreen::update(const GCTEvent& msg)
             switch (msg.mEvent)
             {
                 case GCTEvent::kAppendNewContact:
-                    mIncomingAppendAddr = msg.mContact;
-                    process(kAppendContact);
+                    if (msg.mIdentifier == this)
+                    {
+                        mIncomingAppendAddr = msg.mContact;
+                        process(kAppendContact);
+                    }
                     break;
 
                 default:

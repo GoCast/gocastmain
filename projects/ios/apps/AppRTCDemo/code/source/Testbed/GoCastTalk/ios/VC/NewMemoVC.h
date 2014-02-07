@@ -34,7 +34,7 @@ class NewMemoScreen;
 -(IBAction)clearPressed;
 
 -(void) pushRecordMessage:(const JSONObject&)newObject;
--(void) pushContacts;
+-(void) pushContacts:(void*)identifier;
 
 -(void)updateToList:(const std::string&) newToList;
 

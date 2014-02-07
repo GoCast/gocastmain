@@ -1,4 +1,5 @@
 #include "RecordMessageVC.h"
+#include "ContactsVC.h"
 
 #include "Base/package.h"
 #include "Io/package.h"
@@ -265,7 +266,7 @@
 #pragma mark CCCellDelegate stuff
 -(void)onAddPressed
 {
-//TODO: Implement
+    [self pushContacts];
 }
 
 -(void)onDelPressed:(const size_t &)i
@@ -304,9 +305,21 @@
     mInitObject = newObject;
 }
 
+-(void) pushContacts
+{
+    ContactsVC* nextVC = [[[ContactsVC alloc] initWithNibName:@"ContactsVC" bundle:nil] autorelease];
+    [nextVC customInit:true withIdentifier:mPeer];
+    [(UINavigationController*)self.parentViewController  pushViewController:nextVC animated:YES];
+}
+
 -(void)popSelf
 {
     [(UINavigationController*)self.parentViewController popViewControllerAnimated:TRUE];
+}
+
+-(void)refreshExpanded
+{
+    [self expandTo];
 }
 
 -(void) setWaitToRecordUI

@@ -58,7 +58,10 @@ class RecordMessageScreen;
 
 -(void)customInit:(const JSONObject&)newObject;
 
+-(void)pushContacts;
 -(void)popSelf;
+
+-(void)refreshExpanded;
 
 -(void) setWaitToRecordUI;
 -(void) setWaitToPlayUI;

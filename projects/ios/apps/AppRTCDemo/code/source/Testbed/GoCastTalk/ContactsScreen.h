@@ -12,10 +12,11 @@ class ContactsScreen
 protected:
     ContactsVC* mPeer;
     size_t      mItemSelected;
+    void*       mIdentifier;
     bool        mIsChild;
 
 public:
-	ContactsScreen(ContactsVC* newVC, bool newIsChild);
+	ContactsScreen(ContactsVC* newVC, bool newIsChild, void* newIdentifier);
 	~ContactsScreen();
 
     void        itemPressed(const size_t& i);

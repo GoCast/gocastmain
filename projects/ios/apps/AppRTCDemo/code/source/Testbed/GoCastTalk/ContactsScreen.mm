@@ -7,8 +7,9 @@
 #include "ContactsVC.h"
 
 #pragma mark Constructor / Destructor
-ContactsScreen::ContactsScreen(ContactsVC* newVC, bool newIsChild)
+ContactsScreen::ContactsScreen(ContactsVC* newVC, bool newIsChild, void* newIdentifier)
 :   mPeer(newVC),
+    mIdentifier(newIdentifier),
     mIsChild(newIsChild)
 {
 	ConstructMachine();
@@ -96,7 +97,7 @@ void ContactsScreen::showNotImplementedYetEntry()
 #pragma mark Sending messages to other machines
 void ContactsScreen::sendAppendNewContactToVCEntry()
 {
-    GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kAppendNewContact, InboxScreen::mContacts[mItemSelected].mObject["email"].mString));
+    GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kAppendNewContact, InboxScreen::mContacts[mItemSelected].mObject["email"].mString, mIdentifier));
 }
 
 #pragma mark State wiring
