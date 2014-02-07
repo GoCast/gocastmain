@@ -49,7 +49,15 @@
 
     self.mFrom.text = [NSString stringWithUTF8String:from.c_str()];
     self.mDate.text = [NSString stringWithUTF8String:result.c_str()];
-    self.mTranscription.text = [NSString stringWithUTF8String:mInitObject["transcription"].mObject["ja"].mString.c_str()];
+
+    if (!mInitObject["transcription"].mObject["ja"].mString.empty())
+    {
+        self.mTranscription.text = [NSString stringWithUTF8String:mInitObject["transcription"].mObject["ja"].mString.c_str()];
+    }
+    else
+    {
+        self.mTranscription.text = [NSString stringWithUTF8String:"Transcription not available"];
+    }
 }
 
 - (void)viewWillDisappear:(BOOL)animated

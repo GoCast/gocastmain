@@ -64,8 +64,12 @@ std::string InboxScreen::getDate(const size_t& i)
 
 std::string InboxScreen::getTranscription(const size_t& i)
 {
-#pragma unused(i)
-    return mInbox[i].mObject["transcription"].mObject["ja"].mString;
+    if (!mInbox[i].mObject["transcription"].mObject["ja"].mString.empty())
+    {
+        return mInbox[i].mObject["transcription"].mObject["ja"].mString;
+    }
+
+    return "Transcription not available";
 }
 
 bool        InboxScreen::getIsReceive(const size_t& i)
