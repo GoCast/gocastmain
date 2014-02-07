@@ -194,7 +194,7 @@ void RecordMessageScreen::calculateMessageJSONEntry()
 
     //1. Calculate date and audio file name
     curTime=time(NULL);
-    timeStruct = localtime(&curTime);
+    timeStruct = gmtime(&curTime);
 
     sprintf(buf, "%04d%02d%02d%02d%02d%02d%02d",
             timeStruct->tm_year+1900,   timeStruct->tm_mon+1,   timeStruct->tm_mday,
