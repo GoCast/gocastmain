@@ -18,17 +18,20 @@
 @implementation RecordMessageVC
 
 #pragma mark CCCell helper methods
+
+#define kCellSize 40
+
 -(void)expandTo
 {
     CGRect f;
     size_t count = mPeer->getToCount() + 1;
 
     f = self.mToTable.frame;
-    f.size.height = 27 * count;
+    f.size.height = kCellSize * count;
     [self.mToTable setFrame:f];
 
     f = self.mBottomHalf.frame;
-    f.origin.y = 27 * count;
+    f.origin.y = kCellSize * count;
     [self.mBottomHalf setFrame:f];
 
     self->mToExpanded = true;
@@ -36,7 +39,7 @@
 
     CGSize s = self->mScrollPreExpansion;
 
-    s.height += 27 * (count - 1);
+    s.height += kCellSize * (count - 1);
 
     [self.mScrollView setContentSize:s];
 }
@@ -46,11 +49,11 @@
     CGRect f;
 
     f = self.mToTable.frame;
-    f.size.height = 27;
+    f.size.height = kCellSize;
     [self.mToTable setFrame:f];
 
     f = self.mBottomHalf.frame;
-    f.origin.y = 27;
+    f.origin.y = kCellSize;
     [self.mBottomHalf setFrame:f];
 
     self->mToExpanded = false;
