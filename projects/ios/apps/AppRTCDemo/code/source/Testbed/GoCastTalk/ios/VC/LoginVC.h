@@ -18,10 +18,11 @@ class LoginScreen;
 }
 
 //mInboxView
-@property (nonatomic, strong) IBOutlet UITextField* mBaseURL;
-@property (nonatomic, strong) IBOutlet UITextField* mEmail;
-@property (nonatomic, strong) IBOutlet UITextField* mPassword;
-@property (nonatomic, strong) IBOutlet UIView*      mBlockingView;
+@property (nonatomic, strong) IBOutlet UIScrollView*    mScrollView;
+@property (nonatomic, strong) IBOutlet UITextField*     mBaseURL;
+@property (nonatomic, strong) IBOutlet UITextField*     mEmail;
+@property (nonatomic, strong) IBOutlet UITextField*     mPassword;
+@property (nonatomic, strong) IBOutlet UIView*          mBlockingView;
 
 #pragma mark Construction / Destruction
 - (void)viewDidLoad;

@@ -116,10 +116,20 @@ extern std::string kBaseURL;
     [self.mBlockingView setHidden:newVisible ? NO : YES];
 }
 
+-(void)textFieldDidBeginEditing:(UITextField *)textField
+{
+    if ((textField == self.mEmail) ||
+        (textField == self.mPassword))
+    {
+        [self.mScrollView setContentOffset:CGPointMake(0, self.mEmail.frame.origin.y - 60) animated:YES];
+    }
+}
+
 - (BOOL)textFieldShouldReturn:(UITextField *)textField
 {
 #pragma unused(textField)
     [textField endEditing:YES];
+    [self.mScrollView setContentOffset:CGPointMake(0, 0) animated:YES];
     return YES;
 }
 
