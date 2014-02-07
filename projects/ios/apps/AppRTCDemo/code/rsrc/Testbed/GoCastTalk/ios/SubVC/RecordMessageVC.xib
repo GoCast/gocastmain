@@ -105,7 +105,7 @@
                             </connections>
                         </tableView>
                     </subviews>
-                    <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                    <color key="backgroundColor" red="0.93333333333333335" green="0.93333333333333335" blue="0.93333333333333335" alpha="1" colorSpace="calibratedRGB"/>
                 </view>
                 <view hidden="YES" alpha="0.20000000298023224" contentMode="scaleToFill" id="EWU-Pp-LmE" userLabel="mBlockingView">
                     <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
