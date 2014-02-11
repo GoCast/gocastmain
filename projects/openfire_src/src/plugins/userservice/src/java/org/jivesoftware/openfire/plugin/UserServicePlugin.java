@@ -94,8 +94,23 @@ public class UserServicePlugin implements Plugin, PropertyEventListener {
         PropertyEventDispatcher.removeListener(this);
     }
 
-    public void createUser(String username, String password, String name, String email, String groupNames)
-            throws UserAlreadyExistsException
+    private String userResponse(String username, AuthToken authToken)
+            throws UserNotFoundException
+    {
+        User user = getUser(username);
+        String genToken = RandomStringUtils.randomAlphanumeric(64);
+        userManager.setAuthToken(genToken, username);
+// worked        String outstr = "\"user\": { \"email\":\""+user.getEmail()+"\", \"authToken\":\""+genToken+"\" }";
+        String userName = user.getUsername();
+        userName = userName.replaceAll("\\\\40","@");
+        String outstr = "\"user\": { \"email\":\""+user.getEmail()+"\", \"authToken\":\""+genToken+"\", \"username\":\""+userName+"\", \"name\":\""+user.getName()+"\" }";
+ //       String outstr = "\"user\": { \"email\":\""+user.getEmail()+"\", \"authToken\":\""+genToken+"\", \"username\":\""+authToken.getUsername()+"\" }";
+ //         authToken.getUsername()+"\", \"domain\":\""+authToken.getDomain()+"\", \"anonymous\":\""+authToken.isAnonymous()+"\" }";
+        return outstr;
+    }
+
+    public String createUser(String username, String password, String name, String email, String groupNames)
+            throws UserNotFoundException, UnauthorizedException, ConnectionException, InternalUnauthenticatedException, UserAlreadyExistsException
     {
         userManager.createUser(username, password, name, email);
 
@@ -113,6 +128,12 @@ public class UserServicePlugin implements Plugin, PropertyEventListener {
                 group.getMembers().add(server.createJID(username, null));
             }
         }
+        AuthToken authToken = AuthFactory.authenticate(username, password);
+        if (authToken == null)
+        {
+            return "\"404\"";
+        }
+        return userResponse(username, authToken);
     }
     
     public String loginUser(String username, String password)
@@ -123,13 +144,9 @@ public class UserServicePlugin implements Plugin, PropertyEventListener {
         {
             return "\"404\"";
         }
-        User user = getUser(username);
-        String genToken = RandomStringUtils.randomAlphanumeric(64);
-        userManager.setAuthToken(genToken, username);
-        String outstr = "user:{ email:\""+user.getEmail()+"\", authToken:\""+genToken+"\", username:\""+
-          authToken.getUsername()+"\", domain:\""+authToken.getDomain()+"\" anonymous:\""+authToken.isAnonymous()+"\" }";
-        return outstr;
+        return userResponse(username, authToken);
     }
+
     /*
      * check if an authTokenis valid
      *

@@ -151,14 +151,14 @@ public class UserServiceServlet extends HttpServlet {
                 //xmlProvider.sendInfo(request, response, presence);
             }
             else if ("validate".equals(type)) {
-                    plugin.validateUser(username);
-                    replyMessage(replyStatus("ok"),response,out);
-                    //xmlProvider.sendInfo(request, response, presence);
+                plugin.validateUser(username);
+                replyMessage(replyStatus("ok"),response,out);
+                //xmlProvider.sendInfo(request, response, presence);
             }
             else if ("add".equals(type)) {
-                    plugin.createUser(username, password, name, email, groupNames);
-                    replyMessage(replyStatus("ok"),response, out);
-                    //imageProvider.sendInfo(request, response, presence);
+                String userStr=plugin.createUser(username, password, name, email, groupNames);
+                replyMessage(replyStatus("ok")+", "+userStr,response, out);
+                //imageProvider.sendInfo(request, response, presence);
             }
             else if (plugin.checkAuthToken(authToken)) {
                 if ("delete".equals(type)) {
@@ -233,7 +233,7 @@ public class UserServiceServlet extends HttpServlet {
     {
         if ("application/json".equals(contentType))
         {
-            return "\""+status+"\"";
+            return '"'+status+'"';
         }
         return status;
     }
@@ -242,7 +242,7 @@ public class UserServiceServlet extends HttpServlet {
         if ("application/json".equals(contentType))
         {
            response.setContentType("application/json");
-           out.println("{ \"status\":\"success\", \"message\":" + message + " }");
+           out.print("{ \"status\":\"success\", \"message\":"+message+" }");
         }
         else
         {
@@ -256,7 +256,7 @@ public class UserServiceServlet extends HttpServlet {
         if ("application/json".equals(contentType))
         {
            response.setContentType("application/json");
-           out.println("{ \"status\":\"fail\",\"message\":\"" + error + "\" }");
+           out.print("{ \"status\":\"fail\",\"message\":"+error+" }");
         }
         else
         {
