@@ -119,17 +119,13 @@
 
         cell.mFrom.text = [NSString stringWithUTF8String:mPeer->getFrom(indexPath.row + 1).c_str()];
         cell.mDate.text = [NSString stringWithUTF8String:mPeer->getDate(indexPath.row + 1).c_str()];
-        cell.mTranscription.text = [NSString stringWithUTF8String:mPeer->getTranscription(indexPath.row + 1).c_str()];
+        [cell setTranscription:mPeer->getTranscription((size_t)indexPath.row + 1)];
         cell.mStatusIcon.image = [UIImage imageNamed:(mPeer->getIsReceive(indexPath.row + 1) ? @"icon-receive.png" : @"icon-sent.png")];
         cell.mFrom.textColor =  mPeer->getIsGroup(indexPath.row + 1) ?
         [UIColor colorWithRed:0.0f green:0.47f blue:1.0f alpha:1.0f] :
         [UIColor colorWithRed:0.0f green:0.0f  blue:0.0f alpha:1.0f];
 
-        cell.mTranscription.numberOfLines = 0;
-        [cell.mTranscription sizeToFit];
-
         return cell;
-
     }
     else if (tableView == self.mOptionsTable)
     {
