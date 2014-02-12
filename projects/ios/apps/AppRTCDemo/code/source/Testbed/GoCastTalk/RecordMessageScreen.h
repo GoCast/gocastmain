@@ -21,9 +21,10 @@ protected:
     JSONObject          mTranscription;
     tSound*             mSound;
     bool                mDidRecord;
+    bool                mIsForwarded;
 
 public:
-    RecordMessageScreen(RecordMessageVC* newVC, const JSONObject& initObject);
+    RecordMessageScreen(RecordMessageVC* newVC, const JSONObject& initObject, bool newIsForwarded);
 	~RecordMessageScreen();
 
     size_t getToCount();
@@ -46,7 +47,8 @@ protected:
 	void calculateMessageJSONEntry();
 	void didWeRecordEntry();
 	void doWeHaveContactsToSendToEntry();
-	void letDidRecordBeFalseEntry();
+	void isForwardingMessageEntry();
+	void letDidRecordBeIsForwardedValueEntry();
 	void letDidRecordBeTrueEntry();
 	void pauseAudioEntry();
 	void pausedIdleEntry();
@@ -105,7 +107,8 @@ public:
 		kDidWeRecord,
 		kDoWeHaveContactsToSendTo,
 		kEnd,
-		kLetDidRecordBeFalse,
+		kIsForwardingMessage,
+		kLetDidRecordBeIsForwardedValue,
 		kLetDidRecordBeTrue,
 		kPauseAudio,
 		kPausedIdle,

@@ -84,7 +84,7 @@
 
     self.view.autoresizesSubviews = YES;
 
-    mPeer = new RecordMessageScreen(self, mInitObject);
+    mPeer = new RecordMessageScreen(self, mInitObject, mIsForwarded);
 
     self->mScrollPreExpansion = self.mScrollView.contentSize;
     [self contractTo];
@@ -303,9 +303,10 @@
     mPeer->stopPressed();
 }
 
--(void)customInit:(const JSONObject&)newObject
+-(void)customInit:(const JSONObject&)newObject isForwarded:(bool)newIsForwarded
 {
     mInitObject = newObject;
+    mIsForwarded = newIsForwarded;
 }
 
 -(void) pushContacts

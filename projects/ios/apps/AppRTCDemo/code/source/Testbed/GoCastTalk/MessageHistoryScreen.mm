@@ -134,7 +134,9 @@ void MessageHistoryScreen::buildMessageHistoryEntry()
             {
                 mHistory.push_back(InboxScreen::mInbox[i].mObject);
                 item = InboxScreen::mInbox[i].mObject["in-reply-to"].mString;
-                found = true;
+
+                //Only if not self-referencing
+                found = mInitObject["in-reply-to"].mString != item;
                 break;
             }
         }

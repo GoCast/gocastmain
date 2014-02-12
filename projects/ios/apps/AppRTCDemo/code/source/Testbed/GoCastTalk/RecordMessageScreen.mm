@@ -7,9 +7,10 @@
 #include "RecordMessageVC.h"
 
 #pragma mark Constructor / Destructor
-RecordMessageScreen::RecordMessageScreen(RecordMessageVC* newVC, const JSONObject& initObject)
+RecordMessageScreen::RecordMessageScreen(RecordMessageVC* newVC, const JSONObject& initObject, bool newIsForwarded)
 :   mPeer(newVC),
-    mInitObject(initObject)
+    mInitObject(initObject),
+    mIsForwarded(newIsForwarded)
 {
 	ConstructMachine();
 }
@@ -142,6 +143,11 @@ void RecordMessageScreen::doWeHaveContactsToSendToEntry()
     SetImmediateEvent(!mInitObject["to"].mArray.empty() ? kYes : kNo);
 }
 
+void RecordMessageScreen::isForwardingMessageEntry()
+{
+    SetImmediateEvent(mIsForwarded ? kYes : kNo);
+}
+
 void RecordMessageScreen::wasPostAudioSuccessfulEntry()
 {
     bool result = false;
@@ -202,7 +208,15 @@ void RecordMessageScreen::calculateMessageJSONEntry()
             tTimer::getSystemTimeMS() % 100);
 
     date = buf;
-    audioName = date + "-" + InboxScreen::mToken;
+
+    if (mIsForwarded)
+    {
+        audioName = mInitObject["audio"].mString;
+    }
+    else
+    {
+        audioName = date + "-" + InboxScreen::mToken;
+    }
 
     //2. Treat as "reply all", calculate the "to"
     //   based on the original "from" and all other recipients
@@ -229,9 +243,9 @@ void RecordMessageScreen::calculateMessageJSONEntry()
     tFile(tFile::kTemporaryDirectory, "message.json").write(JSONValue(mMessageJSON).toString().c_str());
 }
 
-void RecordMessageScreen::letDidRecordBeFalseEntry()
+void RecordMessageScreen::letDidRecordBeIsForwardedValueEntry()
 {
-    mDidRecord = false;
+    mDidRecord = mIsForwarded;
 }
 
 void RecordMessageScreen::letDidRecordBeTrueEntry()
@@ -253,7 +267,14 @@ void RecordMessageScreen::playAudioEntry()
 {
     if (!mSound)
     {
-        mSound = new tSound(tFile(tFile::kTemporaryDirectory, "scratch.wav"));
+        if (mIsForwarded)
+        {
+            mSound = new tSound(tFile(tFile::kDocumentsDirectory, mInitObject["audio"].mString));
+        }
+        else
+        {
+            mSound = new tSound(tFile(tFile::kTemporaryDirectory, "scratch.wav"));
+        }
         mSound->attach(this);
     }
 
@@ -402,7 +423,8 @@ void RecordMessageScreen::CallEntry()
 		case kDoWeHaveContactsToSendTo: doWeHaveContactsToSendToEntry(); break;
 		case kEnd: EndEntryHelper(); break;
 		case kInvalidState: invalidStateEntry(); break;
-		case kLetDidRecordBeFalse: letDidRecordBeFalseEntry(); break;
+		case kIsForwardingMessage: isForwardingMessageEntry(); break;
+		case kLetDidRecordBeIsForwardedValue: letDidRecordBeIsForwardedValueEntry(); break;
 		case kLetDidRecordBeTrue: letDidRecordBeTrueEntry(); break;
 		case kPauseAudio: pauseAudioEntry(); break;
 		case kPausedIdle: pausedIdleEntry(); break;
@@ -444,12 +466,14 @@ void RecordMessageScreen::CallExit()
 
 int  RecordMessageScreen::StateTransitionFunction(const int evt) const
 {
-	if ((mState == kCalculateMessageJSON) && (evt == kNext)) return kSendPostAudioToServer; else
+	if ((mState == kCalculateMessageJSON) && (evt == kNext)) return kIsForwardingMessage; else
 	if ((mState == kDidWeRecord) && (evt == kNo)) return kWaitToRecordIdle; else
 	if ((mState == kDidWeRecord) && (evt == kYes)) return kWaitToPlayIdle; else
 	if ((mState == kDoWeHaveContactsToSendTo) && (evt == kNo)) return kShowNoContactsToSendTo; else
 	if ((mState == kDoWeHaveContactsToSendTo) && (evt == kYes)) return kSetWaitForPostAudio; else
-	if ((mState == kLetDidRecordBeFalse) && (evt == kNext)) return kDidWeRecord; else
+	if ((mState == kIsForwardingMessage) && (evt == kNo)) return kSendPostAudioToServer; else
+	if ((mState == kIsForwardingMessage) && (evt == kYes)) return kSendPostMessageToServer; else
+	if ((mState == kLetDidRecordBeIsForwardedValue) && (evt == kNext)) return kDidWeRecord; else
 	if ((mState == kLetDidRecordBeTrue) && (evt == kNext)) return kDidWeRecord; else
 	if ((mState == kPauseAudio) && (evt == kNext)) return kPausedIdle; else
 	if ((mState == kPausedIdle) && (evt == kCancelPressed)) return kStopPlayingBeforePop; else
@@ -476,7 +500,7 @@ int  RecordMessageScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kShowNoAudioToSend) && (evt == kYes)) return kWaitToRecordIdle; else
 	if ((mState == kShowNoContactsToSendTo) && (evt == kYes)) return kWaitToPlayIdle; else
 	if ((mState == kShowPostAudioFailed) && (evt == kYes)) return kSendReloadInboxToVC; else
-	if ((mState == kStart) && (evt == kNext)) return kLetDidRecordBeFalse; else
+	if ((mState == kStart) && (evt == kNext)) return kLetDidRecordBeIsForwardedValue; else
 	if ((mState == kStartRecordingAudio) && (evt == kNext)) return kRecordingIdle; else
 	if ((mState == kStopAudio) && (evt == kNext)) return kDidWeRecord; else
 	if ((mState == kStopPlayingBeforePop) && (evt == kNext)) return kSendReloadInboxToVC; else
@@ -506,7 +530,7 @@ bool RecordMessageScreen::HasEdgeNamedNext() const
 	switch(mState)
 	{
 		case kCalculateMessageJSON:
-		case kLetDidRecordBeFalse:
+		case kLetDidRecordBeIsForwardedValue:
 		case kLetDidRecordBeTrue:
 		case kPauseAudio:
 		case kPlayAudio:

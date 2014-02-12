@@ -35,6 +35,11 @@ void InboxMessageScreen::replyPressed()
     update(kReplySelected);
 }
 
+void InboxMessageScreen::forwardPressed()
+{
+    update(kForwardSelected);
+}
+
 void InboxMessageScreen::deletePressed()
 {
     update(kDeleteSelected);
@@ -78,6 +83,11 @@ void InboxMessageScreen::playingIdleEntry()
 void InboxMessageScreen::peerPopSelfEntry()
 {
     [mPeer popSelf];
+}
+
+void InboxMessageScreen::peerPushForwardMessageEntry()
+{
+    [mPeer pushForwardMessage:mInitObject];
 }
 
 void InboxMessageScreen::peerPushRecordMessageEntry()
@@ -256,6 +266,7 @@ void InboxMessageScreen::CallEntry()
 		case kPauseSound: pauseSoundEntry(); break;
 		case kPausedIdle: pausedIdleEntry(); break;
 		case kPeerPopSelf: peerPopSelfEntry(); break;
+		case kPeerPushForwardMessage: peerPushForwardMessageEntry(); break;
 		case kPeerPushMessageHistory: peerPushMessageHistoryEntry(); break;
 		case kPeerPushRecordMessage: peerPushRecordMessageEntry(); break;
 		case kPlaySound: playSoundEntry(); break;
@@ -289,11 +300,13 @@ int  InboxMessageScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kDoesAudioExistLocally) && (evt == kNo)) return kSetWaitForDownload; else
 	if ((mState == kDoesAudioExistLocally) && (evt == kYes)) return kUpdateTimeLabel; else
 	if ((mState == kIdle) && (evt == kDeleteSelected)) return kSetWaitForDeleteMessage; else
+	if ((mState == kIdle) && (evt == kForwardSelected)) return kPeerPushForwardMessage; else
 	if ((mState == kIdle) && (evt == kPastSelected)) return kPeerPushMessageHistory; else
 	if ((mState == kIdle) && (evt == kPlayPressed)) return kSetWasPlayingToTrue; else
 	if ((mState == kIdle) && (evt == kReplySelected)) return kPeerPushRecordMessage; else
 	if ((mState == kPauseSound) && (evt == kNext)) return kPausedIdle; else
 	if ((mState == kPausedIdle) && (evt == kPlayPressed)) return kResumeSound; else
+	if ((mState == kPeerPushForwardMessage) && (evt == kNext)) return kIdle; else
 	if ((mState == kPeerPushMessageHistory) && (evt == kNext)) return kIdle; else
 	if ((mState == kPeerPushRecordMessage) && (evt == kNext)) return kIdle; else
 	if ((mState == kPlaySound) && (evt == kNext)) return kPlayingIdle; else

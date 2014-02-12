@@ -51,6 +51,7 @@ class InboxMessageScreen;
 
 -(void) popSelf;
 
+-(void) pushForwardMessage:(const JSONObject&)newObject;
 -(void) pushRecordMessage:(const JSONObject&)newObject;
 -(void) pushMessageHistory:(const JSONObject &)newObject;
 

@@ -85,7 +85,7 @@
                     <color key="highlightedColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                 </label>
                 <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" scrollEnabled="NO" style="plain" separatorStyle="default" rowHeight="82" sectionHeaderHeight="22" sectionFooterHeight="22" id="jyR-4V-xqO" userLabel="mTable">
-                    <rect key="frame" x="0.0" y="347" width="320" height="427"/>
+                    <rect key="frame" x="0.0" y="347" width="320" height="509"/>
                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     <connections>
@@ -110,7 +110,7 @@
             <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina4"/>
             <userDefinedRuntimeAttributes>
                 <userDefinedRuntimeAttribute type="size" keyPath="contentSize">
-                    <size key="value" width="320" height="573"/>
+                    <size key="value" width="320" height="655"/>
                 </userDefinedRuntimeAttribute>
             </userDefinedRuntimeAttributes>
         </scrollView>

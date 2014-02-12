@@ -78,7 +78,7 @@
 
     if (tableView == self.mTable)
     {
-        return (NSInteger)3;
+        return (NSInteger)4;
     }
 
     return (NSInteger)1;
@@ -104,6 +104,7 @@
         {
             "Past Messages",
             "Reply Message",
+            "Forward Message",
             "Delete",
         };
 
@@ -111,11 +112,13 @@
         {
             "Show message history",
             "Send recorded message",
+            "Resend this message",
             "Delete this message",
         };
 
         const bool hasRightArrow[] =
         {
+            true,
             true,
             true,
             false,
@@ -136,7 +139,7 @@
         cell.mSub.text = [NSString stringWithUTF8String:subheading[indexPath.row]];
         cell.mRightArrow.hidden = hasRightArrow[indexPath.row] ? NO : YES;
 
-        if (indexPath.row == 2)
+        if (indexPath.row == 3)
         {
             cell.mHeading.textColor = [UIColor whiteColor];
             cell.mSub.textColor     = [UIColor whiteColor];
@@ -174,7 +177,8 @@
     {
         case 0: mPeer->pastPressed(); break;
         case 1: mPeer->replyPressed(); break;
-        case 2: mPeer->deletePressed(); break;
+        case 2: mPeer->forwardPressed(); break;
+        case 3: mPeer->deletePressed(); break;
 
         default:
             break;
@@ -235,10 +239,17 @@
     [(UINavigationController*)self.parentViewController popViewControllerAnimated:TRUE];
 }
 
+-(void) pushForwardMessage:(const JSONObject&)newObject
+{
+    RecordMessageVC* nextVC = [[[RecordMessageVC alloc] initWithNibName:@"RecordMessageVC" bundle:nil] autorelease];
+    [nextVC customInit:newObject isForwarded:true];
+    [(UINavigationController*)self.parentViewController  pushViewController:nextVC animated:YES];
+}
+
 -(void) pushRecordMessage:(const JSONObject &)newObject
 {
     RecordMessageVC* nextVC = [[[RecordMessageVC alloc] initWithNibName:@"RecordMessageVC" bundle:nil] autorelease];
-    [nextVC customInit:newObject];
+    [nextVC customInit:newObject isForwarded:false];
     [(UINavigationController*)self.parentViewController  pushViewController:nextVC animated:YES];
 }
 

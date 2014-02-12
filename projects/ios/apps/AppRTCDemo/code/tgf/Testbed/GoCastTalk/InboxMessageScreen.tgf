@@ -24,6 +24,7 @@
 24 Was deleteMessage valid?
 25 Show "error deleting message"
 26 Send ReloadInbox to VC
+27 Peer: push ForwardMessage
 #
 4 5 fail
 4 6 success
@@ -59,3 +60,5 @@
 24 25 no
 24 26 yes
 26 21
+3 27 forwardSelected
+27 3
