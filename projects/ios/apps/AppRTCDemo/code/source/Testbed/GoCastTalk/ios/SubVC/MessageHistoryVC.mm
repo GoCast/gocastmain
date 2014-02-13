@@ -66,15 +66,20 @@
     self.mTranscription.numberOfLines = 0;
     [self.mTranscription sizeToFit];
 
+    CGRect r = self.mTranscription.frame;
+
+    r.origin.x      = 50;
+    r.origin.y      = 50;
+
+    r.size.width    = 255;
+    r.size.height   = 28;
+
     if (floor(NSFoundationVersionNumber) <= NSFoundationVersionNumber_iOS_6_1)
     {
-        CGRect r = self.mTranscription.frame;
-
-        r.size.width    = 255;
-        r.size.height   = 14;
-
-        [self.mTranscription setFrame:r];
+        r.origin.y  += 25;
     }
+
+    [self.mTranscription setFrame:r];
 }
 
 - (void)viewWillDisappear:(BOOL)animated
