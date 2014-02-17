@@ -215,7 +215,7 @@ void RecordMessageScreen::calculateMessageJSONEntry()
     }
     else
     {
-        audioName = date + "-" + InboxScreen::mToken;
+        audioName = date + "-" + InboxScreen::mEmailAddress;
     }
 
     //2. Treat as "reply all", calculate the "to"
@@ -235,7 +235,7 @@ void RecordMessageScreen::calculateMessageJSONEntry()
     }
 
     //3. Fill in results
-    mMessageJSON["from"]        = std::string(InboxScreen::mToken);
+    mMessageJSON["from"]        = std::string(InboxScreen::mEmailAddress);
     mMessageJSON["date"]        = date;
     mMessageJSON["audio"]       = audioName;
     mMessageJSON["in-reply-to"] = mInitObject["audio"];
@@ -342,7 +342,7 @@ void RecordMessageScreen::sendPostAudioToServerEntry()
     std::vector<std::pair<std::string, std::string> > params;
 
     params.push_back(std::pair<std::string, std::string>("action", "postAudio"));
-    params.push_back(std::pair<std::string, std::string>("name", InboxScreen::mToken));
+    params.push_back(std::pair<std::string, std::string>("name", InboxScreen::mEmailAddress));
     params.push_back(std::pair<std::string, std::string>("audio", mMessageJSON["audio"].mString));
 
     params.push_back(std::pair<std::string, std::string>("MAX_FILE_SIZE", "10485760"));
@@ -357,7 +357,7 @@ void RecordMessageScreen::sendPostTranscriptToServerEntry()
     std::vector<std::pair<std::string, std::string> > params;
 
     params.push_back(std::pair<std::string, std::string>("action", "postTranscription"));
-    params.push_back(std::pair<std::string, std::string>("name", InboxScreen::mToken));
+    params.push_back(std::pair<std::string, std::string>("name", InboxScreen::mEmailAddress));
     params.push_back(std::pair<std::string, std::string>("audio", mMessageJSON["audio"].mString));
 
     params.push_back(std::pair<std::string, std::string>("MAX_FILE_SIZE", "10485760"));
@@ -372,7 +372,7 @@ void RecordMessageScreen::sendPostMessageToServerEntry()
     std::vector<std::pair<std::string, std::string> > params;
 
     params.push_back(std::pair<std::string, std::string>("action", "postMessage"));
-    params.push_back(std::pair<std::string, std::string>("name", InboxScreen::mToken));
+    params.push_back(std::pair<std::string, std::string>("name", InboxScreen::mEmailAddress));
 
     params.push_back(std::pair<std::string, std::string>("MAX_FILE_SIZE", "10485760"));
 

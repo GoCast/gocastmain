@@ -195,7 +195,7 @@ void LoginScreen::sendRegisterToServerEntry()
 
 void LoginScreen::storeTokenInformationEntry()
 {
-    InboxScreen::mToken = mEmail;
+    InboxScreen::mEmailAddress = mEmail;
 }
 
 #pragma mark UI

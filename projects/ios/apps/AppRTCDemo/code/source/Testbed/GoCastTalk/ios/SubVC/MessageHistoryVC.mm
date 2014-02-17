@@ -45,7 +45,7 @@
         from = email;
     }
 
-    self.mReceive.image = [UIImage imageNamed:((mInitObject["from"].mString != InboxScreen::mToken) ? @"icon-receive.png" : @"icon-sent.png")];
+    self.mReceive.image = [UIImage imageNamed:((mInitObject["from"].mString != InboxScreen::mEmailAddress) ? @"icon-receive.png" : @"icon-sent.png")];
     self.mFrom.text = [NSString stringWithUTF8String:from.c_str()];
     self.mDate.text = [NSString stringWithUTF8String:result.c_str()];
 

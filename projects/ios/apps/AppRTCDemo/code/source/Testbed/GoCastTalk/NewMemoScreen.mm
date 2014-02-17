@@ -80,7 +80,7 @@ void NewMemoScreen::peerPushRecordMessageEntry()
 {
     JSONObject newMessage;
 
-    newMessage["from"] = InboxScreen::mToken;
+    newMessage["from"] = InboxScreen::mEmailAddress;
     newMessage["to"] = mToList;
 
     [mPeer pushRecordMessage:newMessage];

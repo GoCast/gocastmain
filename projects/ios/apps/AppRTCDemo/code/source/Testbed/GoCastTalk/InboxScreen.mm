@@ -8,7 +8,7 @@
 JSONArray   InboxScreen::mInbox;
 JSONArray   InboxScreen::mContacts;
 std::map<std::string, std::string> InboxScreen::mContactMap;
-std::string InboxScreen::mToken;
+std::string InboxScreen::mEmailAddress;
 
 bool sortByDate (JSONValue i, JSONValue j);
 bool sortByDate (JSONValue i, JSONValue j)
@@ -75,7 +75,7 @@ std::string InboxScreen::getTranscription(const size_t& i)
 bool        InboxScreen::getIsReceive(const size_t& i)
 {
 #pragma unused(i)
-    return mInbox[i].mObject["from"].mString != InboxScreen::mToken;
+    return mInbox[i].mObject["from"].mString != InboxScreen::mEmailAddress;
 }
 
 bool        InboxScreen::getIsGroup(const size_t& i)
@@ -137,7 +137,7 @@ void InboxScreen::didWeDownloadContactsEntry()
 
 void InboxScreen::doWeHaveATokenEntry()
 {
-    SetImmediateEvent(InboxScreen::mToken.empty() ? kNo : kYes);
+    SetImmediateEvent(InboxScreen::mEmailAddress.empty() ? kNo : kYes);
 }
 
 void InboxScreen::wasDeleteMessageValidEntry()
@@ -224,7 +224,7 @@ void InboxScreen::sendGetContactsToServerEntry()
 
     sprintf(buf, "%s?action=getContacts&name=%s",
             kMemoAppServerURL,
-            InboxScreen::mToken.c_str());
+            InboxScreen::mEmailAddress.c_str());
 
     URLLoader::getInstance()->loadString(this, buf);
 }
@@ -235,7 +235,7 @@ void InboxScreen::sendListMessagesToServerEntry()
 
     sprintf(buf, "%s?action=listMessages&name=%s",
             kMemoAppServerURL,
-            InboxScreen::mToken.c_str());
+            InboxScreen::mEmailAddress.c_str());
 
     URLLoader::getInstance()->loadString(this, buf);
 }
@@ -246,7 +246,7 @@ void InboxScreen::sendDeleteMessageToServerEntry()
 
     sprintf(buf, "%s?action=deleteMessage&name=%s&audio=%s",
             kMemoAppServerURL,
-            InboxScreen::mToken.c_str(),
+            InboxScreen::mEmailAddress.c_str(),
             mInbox[mDeleteSelected].mObject["audio"].mString.c_str());
 
     URLLoader::getInstance()->loadString(this, buf);

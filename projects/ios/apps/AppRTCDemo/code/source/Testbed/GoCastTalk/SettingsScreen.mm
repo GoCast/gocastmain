@@ -67,14 +67,14 @@ void SettingsScreen::peerPushChangeRegisteredNameEntry()
 
     for(size_t i = 0; i < InboxScreen::mContacts.size(); i++)
     {
-        if (InboxScreen::mContacts[i].mObject["email"].mString == InboxScreen::mToken)
+        if (InboxScreen::mContacts[i].mObject["email"].mString == InboxScreen::mEmailAddress)
         {
             initObject = InboxScreen::mContacts[i].mObject;
             break;
         }
     }
 
-    initObject["email"] = InboxScreen::mToken;
+    initObject["email"] = InboxScreen::mEmailAddress;
 
     [mPeer pushChangeRegisteredName:initObject];
 }

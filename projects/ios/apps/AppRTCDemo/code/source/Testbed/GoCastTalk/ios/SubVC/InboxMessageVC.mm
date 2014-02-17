@@ -37,7 +37,7 @@
         result = date.substr(4,2) + "/" + date.substr(6,2) + " " + date.substr(8,2) + ":" + date.substr(10,2);
     }
 
-    self.mReceive.image = [UIImage imageNamed:((mInitObject["from"].mString != InboxScreen::mToken) ? @"icon-receive.png" : @"icon-sent.png")];
+    self.mReceive.image = [UIImage imageNamed:((mInitObject["from"].mString != InboxScreen::mEmailAddress) ? @"icon-receive.png" : @"icon-sent.png")];
 
     std::string email   = mInitObject["from"].mString;
     std::string from    = InboxScreen::mContactMap[email];
