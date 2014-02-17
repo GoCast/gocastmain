@@ -77,6 +77,7 @@ void CreateContactScreen::sendSetContactsToServerEntry()
 
     params.push_back(std::pair<std::string, std::string>("action", "setContacts"));
     params.push_back(std::pair<std::string, std::string>("name", InboxScreen::mEmailAddress));
+    params.push_back(std::pair<std::string, std::string>("authToken", InboxScreen::mToken));
 
     params.push_back(std::pair<std::string, std::string>("MAX_FILE_SIZE", "10485760"));
 

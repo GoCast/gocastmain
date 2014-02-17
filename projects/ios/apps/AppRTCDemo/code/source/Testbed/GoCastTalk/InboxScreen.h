@@ -24,6 +24,7 @@ public:
     static JSONArray    mContacts;
     static std::map<std::string, std::string> mContactMap;
     static std::string  mEmailAddress;
+    static std::string  mToken;
 
 public:
 	InboxScreen(InboxVC* newVC);

@@ -196,6 +196,17 @@ void LoginScreen::sendRegisterToServerEntry()
 void LoginScreen::storeTokenInformationEntry()
 {
     InboxScreen::mEmailAddress = mEmail;
+
+    InboxScreen::mToken = "";
+
+    if (mLoginJSON["user"].mType == JSONValue::kJSONObject)
+    {
+        InboxScreen::mToken = mLoginJSON["user"].mObject["authToken"].mString;
+    }
+    else if (mRegisterJSON["user"].mType == JSONValue::kJSONObject)
+    {
+        InboxScreen::mToken = mRegisterJSON["user"].mObject["authToken"].mString;
+    }
 }
 
 #pragma mark UI

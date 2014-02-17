@@ -9,6 +9,7 @@ JSONArray   InboxScreen::mInbox;
 JSONArray   InboxScreen::mContacts;
 std::map<std::string, std::string> InboxScreen::mContactMap;
 std::string InboxScreen::mEmailAddress;
+std::string InboxScreen::mToken;
 
 bool sortByDate (JSONValue i, JSONValue j);
 bool sortByDate (JSONValue i, JSONValue j)
@@ -222,9 +223,10 @@ void InboxScreen::sendGetContactsToServerEntry()
 {
     char buf[512];
 
-    sprintf(buf, "%s?action=getContacts&name=%s",
+    sprintf(buf, "%s?action=getContacts&name=%s&authToken=%s",
             kMemoAppServerURL,
-            InboxScreen::mEmailAddress.c_str());
+            InboxScreen::mEmailAddress.c_str(),
+            InboxScreen::mToken.c_str());
 
     URLLoader::getInstance()->loadString(this, buf);
 }
@@ -233,9 +235,10 @@ void InboxScreen::sendListMessagesToServerEntry()
 {
     char buf[512];
 
-    sprintf(buf, "%s?action=listMessages&name=%s",
+    sprintf(buf, "%s?action=listMessages&name=%s&authToken=%s",
             kMemoAppServerURL,
-            InboxScreen::mEmailAddress.c_str());
+            InboxScreen::mEmailAddress.c_str(),
+            InboxScreen::mToken.c_str());
 
     URLLoader::getInstance()->loadString(this, buf);
 }
@@ -244,10 +247,11 @@ void InboxScreen::sendDeleteMessageToServerEntry()
 {
     char buf[512];
 
-    sprintf(buf, "%s?action=deleteMessage&name=%s&audio=%s",
+    sprintf(buf, "%s?action=deleteMessage&name=%s&audio=%s&authToken=%s",
             kMemoAppServerURL,
             InboxScreen::mEmailAddress.c_str(),
-            mInbox[mDeleteSelected].mObject["audio"].mString.c_str());
+            mInbox[mDeleteSelected].mObject["audio"].mString.c_str(),
+            InboxScreen::mToken.c_str());
 
     URLLoader::getInstance()->loadString(this, buf);
 }

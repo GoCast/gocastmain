@@ -129,10 +129,11 @@ void InboxMessageScreen::sendDeleteMessageToServerEntry()
 {
     char buf[512];
 
-    sprintf(buf, "%s?action=deleteMessage&name=%s&audio=%s",
+    sprintf(buf, "%s?action=deleteMessage&name=%s&audio=%s&authToken=%s",
             kMemoAppServerURL,
             InboxScreen::mEmailAddress.c_str(),
-            mInitObject["audio"].mString.c_str());
+            mInitObject["audio"].mString.c_str(),
+            InboxScreen::mToken.c_str());
 
     URLLoader::getInstance()->loadString(this, buf);
 }

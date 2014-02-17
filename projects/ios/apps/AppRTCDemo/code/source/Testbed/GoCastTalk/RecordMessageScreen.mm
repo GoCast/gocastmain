@@ -344,6 +344,7 @@ void RecordMessageScreen::sendPostAudioToServerEntry()
     params.push_back(std::pair<std::string, std::string>("action", "postAudio"));
     params.push_back(std::pair<std::string, std::string>("name", InboxScreen::mEmailAddress));
     params.push_back(std::pair<std::string, std::string>("audio", mMessageJSON["audio"].mString));
+    params.push_back(std::pair<std::string, std::string>("authToken", InboxScreen::mToken));
 
     params.push_back(std::pair<std::string, std::string>("MAX_FILE_SIZE", "10485760"));
 
@@ -359,6 +360,7 @@ void RecordMessageScreen::sendPostTranscriptToServerEntry()
     params.push_back(std::pair<std::string, std::string>("action", "postTranscription"));
     params.push_back(std::pair<std::string, std::string>("name", InboxScreen::mEmailAddress));
     params.push_back(std::pair<std::string, std::string>("audio", mMessageJSON["audio"].mString));
+    params.push_back(std::pair<std::string, std::string>("authToken", InboxScreen::mToken));
 
     params.push_back(std::pair<std::string, std::string>("MAX_FILE_SIZE", "10485760"));
 
@@ -373,6 +375,7 @@ void RecordMessageScreen::sendPostMessageToServerEntry()
 
     params.push_back(std::pair<std::string, std::string>("action", "postMessage"));
     params.push_back(std::pair<std::string, std::string>("name", InboxScreen::mEmailAddress));
+    params.push_back(std::pair<std::string, std::string>("authToken", InboxScreen::mToken));
 
     params.push_back(std::pair<std::string, std::string>("MAX_FILE_SIZE", "10485760"));
 
