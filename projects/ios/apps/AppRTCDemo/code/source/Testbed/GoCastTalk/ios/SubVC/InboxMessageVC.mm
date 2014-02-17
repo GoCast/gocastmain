@@ -78,7 +78,7 @@
 
     if (tableView == self.mTable)
     {
-        return (NSInteger)4;
+        return (NSInteger)3;
     }
 
     return (NSInteger)1;
@@ -104,7 +104,6 @@
         {
             "Past Messages",
             "Reply Message",
-            "Forward Message",
             "Delete",
         };
 
@@ -112,13 +111,11 @@
         {
             "Show message history",
             "Send recorded message",
-            "Resend this message",
             "Delete this message",
         };
 
         const bool hasRightArrow[] =
         {
-            true,
             true,
             true,
             false,
@@ -177,8 +174,7 @@
     {
         case 0: mPeer->pastPressed(); break;
         case 1: mPeer->replyPressed(); break;
-        case 2: mPeer->forwardPressed(); break;
-        case 3: mPeer->deletePressed(); break;
+        case 2: mPeer->deletePressed(); break;
 
         default:
             break;
