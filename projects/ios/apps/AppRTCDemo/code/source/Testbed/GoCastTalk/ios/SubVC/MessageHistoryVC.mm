@@ -76,7 +76,7 @@
 
     if (floor(NSFoundationVersionNumber) <= NSFoundationVersionNumber_iOS_6_1)
     {
-        r.origin.y  += 25;
+//        r.origin.y  += 25;
     }
 
     [self.mTranscription setFrame:r];
@@ -151,12 +151,12 @@
     {
         const char* heading[] =
         {
-            "Reply Message",
+            "返信", // "Reply Message",
         };
 
         const char* subheading[] =
         {
-            "Send recorded message",
+            "メッセージを録音して送信", // "Send recorded message",
         };
 
         const bool hasRightArrow[] =

@@ -102,16 +102,16 @@
     {
         const char* heading[] =
         {
-            "Past Messages",
-            "Reply Message",
-            "Delete",
+            "履歴", // "Past Messages",
+            "返信", // "Reply Message",
+            "削除", // "Delete",
         };
 
         const char* subheading[] =
         {
-            "Show message history",
-            "Send recorded message",
-            "Delete this message",
+            "過去のメッセージを表示",      // "Show message history",
+            "メッセージを録音して送信",     // "Send recorded message",
+            "このメッセージを削除",       // "Delete this message",
         };
 
         const bool hasRightArrow[] =
@@ -136,11 +136,17 @@
         cell.mSub.text = [NSString stringWithUTF8String:subheading[indexPath.row]];
         cell.mRightArrow.hidden = hasRightArrow[indexPath.row] ? NO : YES;
 
-        if (indexPath.row == 3)
+        cell.mHeading.textColor = [UIColor whiteColor];
+        cell.mSub.textColor     = [UIColor whiteColor];
+
+        switch (indexPath.row)
         {
-            cell.mHeading.textColor = [UIColor whiteColor];
-            cell.mSub.textColor     = [UIColor whiteColor];
-            cell.mContentView.backgroundColor = [UIColor colorWithRed:1.0f green:0.6f blue:0.8f alpha:1.0f];
+            case 0: cell.mContentView.backgroundColor = [UIColor colorWithRed:0.6f green:0.6f blue:1.0f alpha:1.0f]; break;
+            case 1: cell.mContentView.backgroundColor = [UIColor colorWithRed:0.8f green:0.6f blue:1.0f alpha:1.0f]; break;
+            case 2: cell.mContentView.backgroundColor = [UIColor colorWithRed:1.0f green:0.6f blue:0.8f alpha:1.0f]; break;
+
+            default:
+                break;
         }
 
         return cell;

@@ -57,7 +57,7 @@
                     <rect key="frame" x="90" y="342" width="140" height="30"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <fontDescription key="fontDescription" name="Verdana" family="Verdana" pointSize="18"/>
-                    <state key="normal" title="Sign In" backgroundImage="bg-button.png"/>
+                    <state key="normal" title="サインイン" backgroundImage="bg-button.png"/>
                     <connections>
                         <action selector="signInPressed" destination="-1" eventType="touchUpInside" id="Faf-Tx-w0R"/>
                     </connections>
@@ -66,7 +66,7 @@
                     <rect key="frame" x="90" y="380" width="140" height="30"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <fontDescription key="fontDescription" name="Verdana" family="Verdana" pointSize="18"/>
-                    <state key="normal" title="Sign Up" backgroundImage="bg-button.png"/>
+                    <state key="normal" title="新規登録" backgroundImage="bg-button.png"/>
                     <connections>
                         <action selector="signUpPressed" destination="-1" eventType="touchUpInside" id="0RS-vn-Wua"/>
                     </connections>
@@ -74,7 +74,7 @@
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="jOu-bw-iHX">
                     <rect key="frame" x="70" y="430" width="180" height="30"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                    <state key="normal" title="Trouble Signing In?">
+                    <state key="normal" title="サインインできない場合">
                         <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                     </state>
                     <connections>

@@ -72,12 +72,12 @@
     {
         const char* heading[] =
         {
-            "Record Message",
+            "録音", // "Record Message",
         };
 
         const char* subheading[] =
         {
-            "Send a voice message",
+            "ボイスメッセージ送信", // "Send a voice message",
         };
 
         const bool hasRightArrow[] =

@@ -71,18 +71,18 @@
     {
         const char* heading[] =
         {
-            "Registered Name",
-            "Change Password",
-            "Log Out",
-            "About this app",
+            "登録情報", // "Registered Name",
+            "パスワード変更", // "Change Password",
+            "ログアウト", // "Log Out",
+            "このアプリについて", // "About this app",
         };
 
         const char* subheading[] =
         {
-            "Change registered name",
-            "Change user's password",
-            "Log out from current user",
-            "About GoCastTalk",
+            "", // "Change registered name",
+            "", // "Change user's password",
+            "", // "Log out from current user",
+            "", // "About GoCastTalk",
         };
 
         const bool hasRightArrow[] =

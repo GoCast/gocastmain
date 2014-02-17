@@ -143,8 +143,8 @@
     {
         const char* heading[] =
         {
-            "Done, Send",
-            "Cancel and Delete",
+            "完了して送信",   // "Done, Send",
+            "中止して削除",   // "Cancel and Delete",
         };
 
         UIColor* colors[] =

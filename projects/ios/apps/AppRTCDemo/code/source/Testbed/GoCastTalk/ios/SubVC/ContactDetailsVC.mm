@@ -66,14 +66,14 @@
     {
         const char* heading[] =
         {
-            "Past Messages",
-            "Send Message",
+            "履歴",               // "Past Messages",
+            "ボイスメッセージ送信",   // "Send Message",
         };
 
         const char* subheading[] =
         {
-            "Show message history",
-            "Send recorded message",
+            "過去のメッセージを表示",  // "Show message history",
+            "メッセージを録音して送信", // "Send recorded message",
         };
 
         const bool hasRightArrow[] =

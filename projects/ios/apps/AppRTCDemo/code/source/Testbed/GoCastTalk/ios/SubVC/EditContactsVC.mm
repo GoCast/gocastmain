@@ -97,7 +97,7 @@
         }
         else
         {
-            heading = "Create new contact";
+            heading = "メンバー作成"; // "Create new contact";
         }
 
         cell.mHeading.text = [NSString stringWithUTF8String:heading.c_str()];
