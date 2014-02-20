@@ -172,16 +172,25 @@
     [self.mBlockingView setHidden:newVisible ? NO : YES];
 }
 
--(void) popSelf
+-(void)textFieldDidBeginEditing:(UITextField *)textField
 {
-    [(UINavigationController*)self.parentViewController popViewControllerAnimated:TRUE];
+    if (textField == self.mEmail)
+    {
+        [self.mScrollView setContentOffset:CGPointMake(0, self.mEmail.frame.origin.y - 60) animated:YES];
+    }
 }
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField
 {
 #pragma unused(textField)
     [textField endEditing:YES];
+    [self.mScrollView setContentOffset:CGPointMake(0, 0) animated:YES];
     return YES;
+}
+
+-(void) popSelf
+{
+    [(UINavigationController*)self.parentViewController popViewControllerAnimated:TRUE];
 }
 
 -(IBAction)savePressed
@@ -189,8 +198,12 @@
     JSONObject saveObject;
 
     const char* email   = [self.mEmail.text UTF8String];
+    const char* kanji   = [self.mKanji.text UTF8String];
+    const char* kana    = [self.mKana.text  UTF8String];
 
-    saveObject["email"]    = JSONValue(email ? email : std::string(""));
+    saveObject["email"] = JSONValue(email ? email : std::string(""));
+    saveObject["kanji"] = JSONValue(kanji ? kanji : std::string(""));
+    saveObject["kana"]  = JSONValue(kana  ? kana  : std::string(""));
 
     mPeer->savePressed(saveObject);
 }

@@ -19,8 +19,11 @@ class CreateContactScreen;
 }
 
 //mInboxView
+@property (nonatomic, strong) IBOutlet UIScrollView*    mScrollView;
 @property (nonatomic, strong) IBOutlet UITableView*     mTable;
 
+@property (nonatomic, strong) IBOutlet UITextField*     mKanji;
+@property (nonatomic, strong) IBOutlet UITextField*     mKana;
 @property (nonatomic, strong) IBOutlet UITextField*     mEmail;
 @property (nonatomic, strong) IBOutlet UIView*          mBlockingView;
 
