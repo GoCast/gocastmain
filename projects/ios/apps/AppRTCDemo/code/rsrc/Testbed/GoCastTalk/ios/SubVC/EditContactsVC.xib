@@ -8,6 +8,8 @@
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="EditContactsVC">
             <connections>
                 <outlet property="mBlockingView" destination="qX5-Ew-UPj" id="5Sa-Kt-fD2"/>
+                <outlet property="mCreateButton" destination="448-1G-fVf" id="yt2-q7-yzU"/>
+                <outlet property="mImportButton" destination="Gft-2H-bdk" id="QEj-v9-6hF"/>
                 <outlet property="mTable" destination="euV-LW-Ngz" id="mbu-SI-QzS"/>
                 <outlet property="view" destination="Ioe-56-tat" id="tcQ-ue-557"/>
             </connections>
@@ -18,14 +20,34 @@
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
             <subviews>
                 <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" style="plain" separatorStyle="default" allowsSelectionDuringEditing="YES" rowHeight="82" sectionHeaderHeight="22" sectionFooterHeight="22" id="euV-LW-Ngz" userLabel="mTable">
-                    <rect key="frame" x="0.0" y="0.0" width="320" height="611"/>
-                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                    <rect key="frame" x="0.0" y="69" width="320" height="500"/>
+                    <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" heightSizable="YES" flexibleMaxY="YES"/>
                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     <connections>
                         <outlet property="dataSource" destination="-1" id="dh8-ik-7wS"/>
                         <outlet property="delegate" destination="-1" id="ZAL-cy-Z96"/>
                     </connections>
                 </tableView>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="448-1G-fVf" userLabel="mCreateButton">
+                    <rect key="frame" x="20" y="20" width="130" height="30"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <state key="normal" title="メンバー作成">
+                        <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                    </state>
+                    <connections>
+                        <action selector="createButton:" destination="-1" eventType="touchUpInside" id="Z11-vV-N5u"/>
+                    </connections>
+                </button>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="Gft-2H-bdk" userLabel="mImportButton">
+                    <rect key="frame" x="170" y="20" width="130" height="30"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <state key="normal" title="Import">
+                        <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                    </state>
+                    <connections>
+                        <action selector="importButton:" destination="-1" eventType="touchUpInside" id="kKH-am-gQi"/>
+                    </connections>
+                </button>
                 <view hidden="YES" alpha="0.20000000298023224" contentMode="scaleToFill" id="qX5-Ew-UPj" userLabel="mBlockingView">
                     <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>

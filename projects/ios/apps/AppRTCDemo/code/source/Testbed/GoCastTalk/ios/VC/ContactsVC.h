@@ -17,10 +17,13 @@ class ContactsScreen;
     ContactsScreen* mPeer;
     void*           mIdentifier;
     bool            mIsChild;
+    BOOL            mInGroupsView;
 }
 
 //mInboxView
-@property (nonatomic, strong) IBOutlet UITableView*     mTable;
+@property (nonatomic, strong) IBOutlet UITableView*         mTable;
+@property (nonatomic, strong) IBOutlet UISegmentedControl*  mContactsGroupsSegment;
+@property (nonatomic, strong) IBOutlet UIView*          mBlockingView;
 
 #pragma mark Construction / Destruction
 - (void)viewDidLoad;
@@ -30,12 +33,17 @@ class ContactsScreen;
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath;
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath;
 
+-(void)setBlockingViewVisible:(bool)newVisible;
+
 -(void) reloadTable;
 
 -(IBAction)helpButton:(UIBarButtonItem*)sender;
 
+-(IBAction)contactsGroupsValueChanged:(id)sender;
+
 -(void) pushContactDetails:(const JSONObject&)newObject;
 -(void) pushEditContacts;
+-(void) pushChangeRegisteredName:(const JSONObject&)newObject;
 
 -(void) customInit:(bool)newIsChild withIdentifier:(void*)newIdentifier;
 

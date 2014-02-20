@@ -305,6 +305,8 @@
 						'../../third-party/TestFlightSDK2.0.2/libTestFlight.a',
 						'libz.dylib',
 						'../../third-party/DragonMobileSDK_1.4.9/SpeechKit.framework',
+						'$(SDKROOT)/System/Library/Frameworks/AddressBook.framework',
+						'$(SDKROOT)/System/Library/Frameworks/AddressBookUI.framework',
 						'$(SDKROOT)/System/Library/Frameworks/AudioToolbox.framework',
 						'$(SDKROOT)/System/Library/Frameworks/AVFoundation.framework',
 						'$(SDKROOT)/System/Library/Frameworks/CFNetwork.framework',

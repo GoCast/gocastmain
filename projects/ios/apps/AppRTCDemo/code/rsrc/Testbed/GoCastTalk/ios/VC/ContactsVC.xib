@@ -7,6 +7,8 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="ContactsVC">
             <connections>
+                <outlet property="mBlockingView" destination="1im-HR-Sn2" id="p7U-yV-E5J"/>
+                <outlet property="mContactsGroupsSegment" destination="0Ev-Q4-7uV" id="1Bd-D6-uBJ"/>
                 <outlet property="mTable" destination="z21-Cl-G0s" id="0iK-XB-0fR"/>
                 <outlet property="view" destination="8X3-rk-235" id="S1R-L2-DpG"/>
             </connections>
@@ -16,8 +18,8 @@
             <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
             <subviews>
-                <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" style="plain" separatorStyle="default" rowHeight="82" sectionHeaderHeight="22" sectionFooterHeight="22" id="z21-Cl-G0s" userLabel="mContactsTable">
-                    <rect key="frame" x="0.0" y="0.0" width="320" height="611"/>
+                <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" style="plain" separatorStyle="default" allowsSelectionDuringEditing="YES" rowHeight="82" sectionHeaderHeight="22" sectionFooterHeight="22" id="z21-Cl-G0s" userLabel="mContactsTable">
+                    <rect key="frame" x="0.0" y="69" width="320" height="499"/>
                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     <connections>
@@ -25,6 +27,29 @@
                         <outlet property="delegate" destination="-1" id="bkq-vg-Q8G"/>
                     </connections>
                 </tableView>
+                <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="bar" selectedSegmentIndex="0" id="0Ev-Q4-7uV" userLabel="mContactsGroupsSegment">
+                    <rect key="frame" x="20" y="20" width="280" height="29"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <segments>
+                        <segment title="メンバー"/>
+                        <segment title="グループ"/>
+                    </segments>
+                    <connections>
+                        <action selector="contactsGroupsValueChanged:" destination="-1" eventType="valueChanged" id="v4D-2K-Sfl"/>
+                    </connections>
+                </segmentedControl>
+                <view hidden="YES" alpha="0.20000000298023224" contentMode="scaleToFill" id="1im-HR-Sn2" userLabel="mBlockingView">
+                    <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                    <subviews>
+                        <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" animating="YES" style="whiteLarge" id="z4g-xd-qBf">
+                            <rect key="frame" x="142" y="221" width="37" height="37"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <color key="color" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                        </activityIndicatorView>
+                    </subviews>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                </view>
             </subviews>
             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
             <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina4"/>

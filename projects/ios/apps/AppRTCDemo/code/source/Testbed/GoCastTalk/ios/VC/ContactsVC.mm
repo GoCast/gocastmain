@@ -1,6 +1,7 @@
 #include "ContactsVC.h"
 #include "ContactDetailsVC.h"
 #include "EditContactsVC.h"
+#include "ChangeRegisteredNameVC.h"
 
 #include "Base/package.h"
 #include "Math/package.h"
@@ -49,6 +50,7 @@
     {
         self->mIsChild = false;
         self->mIdentifier = NULL;
+        self->mInGroupsView = false;
     }
 
     return self;
@@ -67,6 +69,12 @@
 
     if (tableView == self.mTable)
     {
+        if (self->mInGroupsView)
+        {
+            //TODO: Groups support
+            return 0;
+        }
+
         return (NSInteger)InboxScreen::mContacts.size();
     }
 
@@ -138,13 +146,25 @@
 {
     if (tableView == self.mTable)
     {
-        mPeer->itemPressed((size_t)indexPath.row);
+        if (self->mInGroupsView)
+        {
+            //TODO: Groups pressed support
+        }
+        else
+        {
+            mPeer->contactPressed((size_t)indexPath.row);
+        }
     }
 }
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
 {
 #pragma unused(tableView, indexPath)
+    if (tableView == self.mTable)
+    {
+        return self->mIsChild ? NO : YES;
+    }
+
     return NO;
 }
 
@@ -154,11 +174,13 @@
 #pragma unused(tableView, indexPath)
     if (editingStyle == UITableViewCellEditingStyleDelete)
     {
-//        if (tableView == self.mTable)
-//        {
-//            GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kTableItemDeleted, (tUInt32)indexPath.row));
-//        }
+        mPeer->deletePressed((size_t)indexPath.row);
     }
+}
+
+-(void)setBlockingViewVisible:(bool)newVisible
+{
+    [self.mBlockingView setHidden:newVisible ? NO : YES];
 }
 
 -(void) reloadTable
@@ -172,6 +194,13 @@
     mPeer->editPressed();
 }
 
+-(IBAction)contactsGroupsValueChanged:(id)sender
+{
+#pragma unused(sender)
+    self->mInGroupsView = !self->mInGroupsView;
+    [self.mTable reloadData];
+}
+
 -(void) pushContactDetails:(const JSONObject&)newObject
 {
     ContactDetailsVC* nextVC = [[[ContactDetailsVC alloc] initWithNibName:@"ContactDetailsVC" bundle:nil] autorelease];
@@ -182,6 +211,13 @@
 -(void) pushEditContacts
 {
     EditContactsVC* nextVC = [[[EditContactsVC alloc] initWithNibName:@"EditContactsVC" bundle:nil] autorelease];
+    [(UINavigationController*)self.parentViewController  pushViewController:nextVC animated:YES];
+}
+
+-(void) pushChangeRegisteredName:(const JSONObject&)newObject
+{
+    ChangeRegisteredNameVC* nextVC = [[[ChangeRegisteredNameVC alloc] initWithNibName:@"ChangeRegisteredNameVC" bundle:nil] autorelease];
+    [nextVC customInit:newObject];
     [(UINavigationController*)self.parentViewController  pushViewController:nextVC animated:YES];
 }
 

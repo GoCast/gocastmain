@@ -51,7 +51,7 @@
 
     if (tableView == self.mTable)
     {
-        return (NSInteger)InboxScreen::mContacts.size() + 1;
+        return (NSInteger)InboxScreen::mContacts.size();
     }
 
     return (NSInteger)1;
@@ -86,18 +86,11 @@
 
         std::string heading;
 
-        if (indexPath.row != 0)
-        {
-            heading = InboxScreen::mContacts[(size_t)indexPath.row - 1].mObject["kanji"].mString;
+        heading = InboxScreen::mContacts[(size_t)indexPath.row].mObject["kanji"].mString;
 
-            if (heading.empty())
-            {
-                heading = InboxScreen::mContacts[(size_t)indexPath.row - 1].mObject["email"].mString;
-            }
-        }
-        else
+        if (heading.empty())
         {
-            heading = "メンバー作成"; // "Create new contact";
+            heading = InboxScreen::mContacts[(size_t)indexPath.row].mObject["email"].mString;
         }
 
         cell.mHeading.text = [NSString stringWithUTF8String:heading.c_str()];
@@ -130,11 +123,7 @@
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
 #pragma unused(tableView, indexPath)
-    switch (indexPath.row)
-    {
-        case 0:     mPeer->createPressed(); break;
-        default:    mPeer->itemPressed((size_t)indexPath.row - 1); break;
-    }
+    mPeer->itemPressed((size_t)indexPath.row);
 }
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
@@ -142,10 +131,7 @@
 #pragma unused(tableView, indexPath)
     if (tableView == self.mTable)
     {
-        if (indexPath.row != 0)
-        {
-            return YES;
-        }
+        return YES;
     }
 
     return NO;
@@ -157,17 +143,88 @@
 #pragma unused(tableView, indexPath)
     if (editingStyle == UITableViewCellEditingStyleDelete)
     {
-        mPeer->deletePressed((size_t)indexPath.row - 1);
-//        if (tableView == self.mTable)
-//        {
-//            GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kTableItemDeleted, (tUInt32)indexPath.row));
-//        }
+        mPeer->deletePressed((size_t)indexPath.row);
     }
 }
 
 -(void)setBlockingViewVisible:(bool)newVisible
 {
     [self.mBlockingView setHidden:newVisible ? NO : YES];
+}
+
+- (void)peoplePickerNavigationControllerDidCancel:(ABPeoplePickerNavigationController *)peoplePicker
+{
+#pragma unused(peoplePicker)
+    [self dismissViewControllerAnimated:YES completion:nil];
+}
+
+
+- (BOOL)peoplePickerNavigationController:(ABPeoplePickerNavigationController *)peoplePicker
+      shouldContinueAfterSelectingPerson:(ABRecordRef)person
+{
+#pragma unused(peoplePicker, person)
+
+    NSString* nsKanjiGiven      = (__bridge NSString*)ABRecordCopyValue(person, kABPersonFirstNameProperty);
+    NSString* nsKanjiSurname    = (__bridge NSString*)ABRecordCopyValue(person, kABPersonLastNameProperty);
+    NSString* nsKanaGiven       = (__bridge NSString*)ABRecordCopyValue(person, kABPersonFirstNamePhoneticProperty);
+    NSString* nsKanaSurname     = (__bridge NSString*)ABRecordCopyValue(person, kABPersonLastNamePhoneticProperty);
+
+    std::string kanjiGiven      = nsKanjiGiven      ? [[nsKanjiGiven autorelease] UTF8String] : "";
+    std::string kanjiSurname    = nsKanjiSurname    ? [[nsKanjiSurname autorelease] UTF8String] : "";
+    std::string kanaGiven       = nsKanaGiven       ? [[nsKanaGiven autorelease] UTF8String] : "";
+    std::string kanaSurname     = nsKanaSurname     ? [[nsKanaSurname autorelease] UTF8String] : "";
+
+    JSONObject newContact;
+
+    newContact["email"] = std::string("");
+
+    ABMultiValueRef emailMultiValue = ABRecordCopyValue(person, kABPersonEmailProperty);
+    NSArray *emailAddresses = [(NSArray *)ABMultiValueCopyArrayOfAllValues(emailMultiValue) autorelease];
+    if ([emailAddresses count] != 0)
+    {
+        NSString* nsEmail = [emailAddresses objectAtIndex:0];
+        newContact["email"] = (nsEmail ? [nsEmail UTF8String] : std::string(""));
+    }
+    CFRelease(emailMultiValue);
+
+    newContact["kanji"]     = kanjiSurname + ((!kanjiSurname.empty() && !kanjiGiven.empty()) ? " " : "") + kanjiGiven;
+    newContact["kana"]      = kanaSurname  + ((!kanaSurname.empty()  && !kanaGiven.empty())  ? " " : "") + kanaGiven;
+
+    if (!newContact["email"].mString.empty())
+    {
+        [self dismissViewControllerAnimated:YES completion:^
+         {
+             [self pushChangeRegisteredName:newContact];
+         }
+         ];
+    }
+    else
+    {
+        [self dismissViewControllerAnimated:YES completion:^
+         {
+             UIAlertView* alert = [[UIAlertView alloc] init];
+
+             alert.title = @"Alert";
+             alert.message = [NSString stringWithUTF8String:"Contact does not have an email address"];
+             [alert addButtonWithTitle:@"Okay"];
+
+             [alert performSelectorOnMainThread:@selector(show) withObject:nil waitUntilDone:YES];
+             
+             [alert release];
+         }
+         ];
+    }
+
+    return NO;
+}
+
+- (BOOL)peoplePickerNavigationController:(ABPeoplePickerNavigationController *)peoplePicker
+      shouldContinueAfterSelectingPerson:(ABRecordRef)person
+                                property:(ABPropertyID)property
+                              identifier:(ABMultiValueIdentifier)identifier
+{
+#pragma unused(peoplePicker, person, property, identifier)
+    return NO;
 }
 
 -(void) reloadTable
@@ -178,6 +235,22 @@
 -(IBAction)helpButton:(UIBarButtonItem *)sender
 {
 #pragma unused(sender)
+}
+
+-(IBAction)createButton:(id)sender
+{
+#pragma unused(sender)
+    mPeer->createPressed();
+}
+
+-(IBAction)importButton:(id)sender
+{
+#pragma unused(sender)
+    ABPeoplePickerNavigationController *picker =
+    [[ABPeoplePickerNavigationController alloc] init];
+    picker.peoplePickerDelegate = self;
+
+    [self presentViewController:picker animated:YES completion:nil];
 }
 
 -(void) pushCreateContact
