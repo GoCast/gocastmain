@@ -347,6 +347,7 @@
 -(void) setWaitToRecordUI
 {
     self.mStatusLabel.text = @"録音開始";
+    [self setTimeLabel:"録音開始"];
 
     [self.mPauseButton  setHidden:YES];
     [self.mRecordButton setHidden:NO];
@@ -402,6 +403,11 @@
     [self.mRecordButton setHidden:YES];
     [self.mPlayButton   setHidden:NO];
     [self.mStopButton   setHidden:YES];
+}
+
+-(void) setTimeLabel:(const std::string&)newLabel
+{
+    self.mTime.text = [NSString stringWithUTF8String:newLabel.c_str()];
 }
 
 @end

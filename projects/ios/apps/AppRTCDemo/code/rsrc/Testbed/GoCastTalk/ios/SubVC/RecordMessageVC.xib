@@ -16,6 +16,7 @@
                 <outlet property="mStatusLabel" destination="jUQ-iJ-nrj" id="pkV-YZ-fT1"/>
                 <outlet property="mStopButton" destination="qVU-9n-Seb" id="4yp-Ce-fHk"/>
                 <outlet property="mTable" destination="Ydj-Rn-oZK" id="KsU-zf-prK"/>
+                <outlet property="mTime" destination="Qig-Zc-L0c" id="kyt-ID-Ffa"/>
                 <outlet property="mToTable" destination="Z7s-oj-wRd" id="3eF-dk-bto"/>
                 <outlet property="view" destination="UWH-Nu-2CC" id="CGV-5u-hR4"/>
             </connections>
@@ -89,7 +90,7 @@
                             <rect key="frame" x="18" y="115" width="284" height="34"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         </slider>
-                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="1:23 Recorded" textAlignment="right" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="Qig-Zc-L0c">
+                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="1:23 Recorded" textAlignment="right" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="Qig-Zc-L0c" userLabel="mTime">
                             <rect key="frame" x="20" y="156" width="280" height="17"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <fontDescription key="fontDescription" type="system" pointSize="14"/>

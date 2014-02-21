@@ -99,6 +99,33 @@ void RecordMessageScreen::waitToRecordIdleEntry()
 void RecordMessageScreen::waitToPlayIdleEntry()
 {
     [mPeer setWaitToPlayUI];
+
+    if (!mSound)
+    {
+        if (mIsForwarded)
+        {
+            mSound = new tSound(tFile(tFile::kDocumentsDirectory, mInitObject["audio"].mString));
+        }
+        else
+        {
+            mSound = new tSound(tFile(tFile::kTemporaryDirectory, "scratch.wav"));
+        }
+        mSound->attach(this);
+    }
+
+    if (mSound)
+    {
+        tUInt32 durationMS = mSound->getDurationMS();
+
+        size_t sec = (durationMS / 1000) % 60;
+        size_t min = ((durationMS / 1000) - sec) / 60;
+
+        char buf[10];
+        sprintf(buf, "%02d:%02d", (int)min, (int)sec);
+
+        [mPeer setTimeLabel:buf];
+    }
+
     printf("%s\n", "wait to play");
 }
 
@@ -287,20 +314,10 @@ void RecordMessageScreen::pauseAudioEntry()
 
 void RecordMessageScreen::playAudioEntry()
 {
-    if (!mSound)
+    if (mSound)
     {
-        if (mIsForwarded)
-        {
-            mSound = new tSound(tFile(tFile::kDocumentsDirectory, mInitObject["audio"].mString));
-        }
-        else
-        {
-            mSound = new tSound(tFile(tFile::kTemporaryDirectory, "scratch.wav"));
-        }
-        mSound->attach(this);
+        mSound->play();
     }
-
-    mSound->play();
 }
 
 void RecordMessageScreen::resumeAudioEntry()

@@ -38,6 +38,8 @@ class RecordMessageScreen;
 @property (nonatomic, strong) IBOutlet UIButton*        mPlayButton;
 @property (nonatomic, strong) IBOutlet UIButton*        mStopButton;
 
+@property (nonatomic, strong) IBOutlet UILabel*         mTime;
+
 @property (nonatomic, strong) IBOutlet UIView*          mBlockingView;
 
 #pragma mark Construction / Destruction
@@ -74,5 +76,7 @@ class RecordMessageScreen;
 -(void) setRecordingUI;
 
 -(void) setWaitForTranscriptUI;
+
+-(void) setTimeLabel:(const std::string&)newLabel;
 
 @end
