@@ -346,6 +346,8 @@
 
 -(void) setWaitToRecordUI
 {
+    self.mStatusLabel.text = @"録音開始";
+
     [self.mPauseButton  setHidden:YES];
     [self.mRecordButton setHidden:NO];
     [self.mPlayButton   setHidden:YES];
@@ -354,6 +356,8 @@
 
 -(void) setWaitToPlayUI
 {
+    self.mStatusLabel.text = @"再生";
+
     [self.mPlayButton   setEnabled:YES];
 
     [self.mPauseButton  setHidden:YES];
@@ -364,6 +368,8 @@
 
 -(void) setPlayingUI
 {
+    self.mStatusLabel.text = @"一時停止";
+
     [self.mPauseButton  setHidden:NO];
     [self.mRecordButton setHidden:YES];
     [self.mPlayButton   setHidden:YES];
@@ -372,6 +378,7 @@
 
 -(void) setPausedUI
 {
+    self.mStatusLabel.text = @"再生";
     [self.mPauseButton  setHidden:YES];
     [self.mRecordButton setHidden:YES];
     [self.mPlayButton   setHidden:NO];
@@ -380,6 +387,7 @@
 
 -(void) setRecordingUI
 {
+    self.mStatusLabel.text = @"録音終了";
     [self.mPauseButton  setHidden:YES];
     [self.mRecordButton setHidden:YES];
     [self.mPlayButton   setHidden:YES];

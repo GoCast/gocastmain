@@ -32,6 +32,7 @@ class RecordMessageScreen;
 @property (nonatomic, strong) IBOutlet UITableView*     mTable;
 @property (nonatomic, strong) IBOutlet UITableView*     mToTable;
 
+@property (nonatomic, strong) IBOutlet UILabel*         mStatusLabel;
 @property (nonatomic, strong) IBOutlet UIButton*        mPauseButton;
 @property (nonatomic, strong) IBOutlet UIButton*        mRecordButton;
 @property (nonatomic, strong) IBOutlet UIButton*        mPlayButton;
