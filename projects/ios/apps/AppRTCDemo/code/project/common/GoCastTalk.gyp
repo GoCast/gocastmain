@@ -43,13 +43,6 @@
 			},
 
 			{
-				'action_name': 'NewMemoScreen.tgf',
-				'inputs': [ '../../tgf/Testbed/GoCastTalk/NewMemoScreen.tgf', ],
-				'outputs': [ '../../dummy', ],
-				'action': [ '<@(_graphcode)', '<@(_inputs)',  '--force-update', '--machine', 'NewMemoScreen', '-h', '../../source/Testbed/GoCastTalk/NewMemoScreen.h', '-cpp', '../../source/Testbed/GoCastTalk/NewMemoScreen.mm', ],
-			},
-
-			{
 				'action_name': 'ContactsScreen.tgf',
 				'inputs': [ '../../tgf/Testbed/GoCastTalk/ContactsScreen.tgf', ],
 				'outputs': [ '../../dummy', ],
@@ -102,9 +95,6 @@
 
 			'../../source/Testbed/GoCastTalk/MessageHistoryScreen.mm',
 			'../../source/Testbed/GoCastTalk/MessageHistoryScreen.h',
-
-			'../../source/Testbed/GoCastTalk/NewMemoScreen.mm',
-			'../../source/Testbed/GoCastTalk/NewMemoScreen.h',
 
 			'../../source/Testbed/GoCastTalk/ContactsScreen.mm',
 			'../../source/Testbed/GoCastTalk/ContactsScreen.h',
@@ -200,8 +190,6 @@
 
 					'../../source/Testbed/GoCastTalk/<@(OS)/VC/InboxVC.h',
 					'../../source/Testbed/GoCastTalk/<@(OS)/VC/InboxVC.mm',
-					'../../source/Testbed/GoCastTalk/<@(OS)/VC/NewMemoVC.h',
-					'../../source/Testbed/GoCastTalk/<@(OS)/VC/NewMemoVC.mm',
 					'../../source/Testbed/GoCastTalk/<@(OS)/VC/ContactsVC.h',
 					'../../source/Testbed/GoCastTalk/<@(OS)/VC/ContactsVC.mm',
 					'../../source/Testbed/GoCastTalk/<@(OS)/VC/GroupsVC.h',
@@ -223,6 +211,8 @@
 					'../../source/Testbed/GoCastTalk/<@(OS)/SubVC/ChangeRegisteredNameVC.mm',
 					'../../source/Testbed/GoCastTalk/<@(OS)/SubVC/InboxMessageVC.h',
 					'../../source/Testbed/GoCastTalk/<@(OS)/SubVC/InboxMessageVC.mm',
+					'../../source/Testbed/GoCastTalk/<@(OS)/SubVC/MessageSentVC.h',
+					'../../source/Testbed/GoCastTalk/<@(OS)/SubVC/MessageSentVC.mm',
 
 					'../../source/Testbed/GoCastTalk/<@(OS)/InboxEntryCell.h',
 					'../../source/Testbed/GoCastTalk/<@(OS)/InboxEntryCell.mm',
@@ -247,7 +237,6 @@
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/VC/LoginVC.xib',
 
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/VC/InboxVC.xib',
-					'../../rsrc/Testbed/GoCastTalk/<@(OS)/VC/NewMemoVC.xib',
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/VC/ContactsVC.xib',
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/VC/GroupsVC.xib',
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/VC/SettingsVC.xib',
@@ -259,6 +248,7 @@
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/SubVC/RecordMessageVC.xib',
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/SubVC/ChangeRegisteredNameVC.xib',
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/SubVC/InboxMessageVC.xib',
+					'../../rsrc/Testbed/GoCastTalk/<@(OS)/SubVC/MessageSentVC.xib',
 
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/en.lproj/InboxEntryCell.xib',
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/en.lproj/HeadingSubCell.xib',

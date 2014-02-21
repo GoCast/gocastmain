@@ -51,5 +51,7 @@
 
 -(void)audioRecorderDidFinishRecording:(AVAudioRecorder *)recorder successfully:(BOOL)flag;
 
+-(void)pushMessageSent;
+
 @end
 

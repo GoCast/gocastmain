@@ -26,6 +26,8 @@
 
     [self.mTable registerNib:[UINib nibWithNibName:@"HeadingSubCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"HeadingSubCell"];
 
+    self.navigationController.navigationBar.translucent = NO;
+
     if (!self->mIsChild)
     {
         UIBarButtonItem *anotherButton = [[[UIBarButtonItem alloc] initWithTitle:@"編集" style:UIBarButtonItemStylePlain target:self action:@selector(helpButton:)] autorelease];

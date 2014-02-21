@@ -84,7 +84,7 @@
 
     self.view.autoresizesSubviews = YES;
 
-    mPeer = new RecordMessageScreen(self, mInitObject, mIsForwarded);
+    mPeer = new RecordMessageScreen(self, mInitObject, mIsForwarded, mIsChild);
 
     self->mScrollPreExpansion = self.mScrollView.contentSize;
     [self contractTo];
@@ -95,6 +95,18 @@
 - (void)viewWillDisappear:(BOOL)animated
 {
     [super viewWillDisappear:animated];
+}
+
+- (id)init
+{
+    self = [super init];
+
+    if (self)
+    {
+        self->mIsChild = false;
+    }
+
+    return self;
 }
 
 - (void)dealloc
@@ -305,8 +317,9 @@
 
 -(void)customInit:(const JSONObject&)newObject isForwarded:(bool)newIsForwarded
 {
-    mInitObject = newObject;
-    mIsForwarded = newIsForwarded;
+    mInitObject     = newObject;
+    mIsForwarded    = newIsForwarded;
+    mIsChild        = true;
 }
 
 -(void) pushContacts
@@ -319,6 +332,11 @@
 -(void)popSelf
 {
     [(UINavigationController*)self.parentViewController popViewControllerAnimated:TRUE];
+}
+
+-(void)pushMessageSent
+{
+    [gAppDelegateInstance pushMessageSent];
 }
 
 -(void)refreshExpanded

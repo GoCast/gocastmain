@@ -30,8 +30,6 @@
 #include "RecordMessageScreen.h"
 #include "MessageHistoryScreen.h"
 
-#include "NewMemoScreen.h"
-
 #include "ContactsScreen.h"
 #include "EditContactsScreen.h"
 

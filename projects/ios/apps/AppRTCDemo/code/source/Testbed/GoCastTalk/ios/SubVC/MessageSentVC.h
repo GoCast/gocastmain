@@ -6,20 +6,17 @@
 class JSONValue;
 typedef std::map<std::string, JSONValue> JSONObject;
 
-class NewMemoScreen;
+class LoginScreen;
 
-@interface NewMemoVC : UIViewController
+@interface MessageSentVC : UIViewController
 <
     UITableViewDelegate,
     UITableViewDataSource
 >
 {
-    NewMemoScreen* mPeer;
 }
 
 //mInboxView
-@property (nonatomic, strong) IBOutlet UITableView*     mTable;
-@property (nonatomic, strong) IBOutlet UITextView*      mToList;
 
 #pragma mark Construction / Destruction
 - (void)viewDidLoad;
@@ -29,13 +26,10 @@ class NewMemoScreen;
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath;
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath;
 
--(IBAction)addContactsPressed;
--(IBAction)addGroupsPressed;
--(IBAction)clearPressed;
+#pragma mark -
 
--(void) pushRecordMessage:(const JSONObject&)newObject;
--(void) pushContacts:(void*)identifier;
+-(IBAction) okayPressed;
 
--(void)updateToList:(const std::string&) newToList;
+-(void) popSelf;
 
 @end

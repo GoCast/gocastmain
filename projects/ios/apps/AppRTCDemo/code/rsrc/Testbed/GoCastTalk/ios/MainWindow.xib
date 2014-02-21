@@ -83,7 +83,7 @@
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <viewControllers>
-                        <viewController nibName="NewMemoVC" id="whs-FZ-FTF" customClass="NewMemoVC">
+                        <viewController nibName="RecordMessageVC" id="whs-FZ-FTF" customClass="RecordMessageVC">
                             <extendedEdge key="edgesForExtendedLayout"/>
                             <navigationItem key="navigationItem" title="新規作成" id="VPO-6u-tWk"/>
                             <simulatedStatusBarMetrics key="simulatedStatusBarMetrics"/>

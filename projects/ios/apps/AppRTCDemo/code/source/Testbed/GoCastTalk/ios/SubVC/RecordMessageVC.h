@@ -21,6 +21,7 @@ class RecordMessageScreen;
     bool    mToExpanded;
     CGSize  mScrollPreExpansion;
     bool    mIsForwarded;
+    bool    mIsChild;
 }
 
 //mInboxView
@@ -61,6 +62,7 @@ class RecordMessageScreen;
 
 -(void)pushContacts;
 -(void)popSelf;
+-(void)pushMessageSent;
 
 -(void)refreshExpanded;
 

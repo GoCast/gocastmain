@@ -22,9 +22,10 @@ protected:
     tSound*             mSound;
     bool                mDidRecord;
     bool                mIsForwarded;
+    bool                mIsChild;
 
 public:
-    RecordMessageScreen(RecordMessageVC* newVC, const JSONObject& initObject, bool newIsForwarded);
+    RecordMessageScreen(RecordMessageVC* newVC, const JSONObject& initObject, bool newIsForwarded, bool newIsChild);
 	~RecordMessageScreen();
 
     size_t getToCount();
@@ -44,7 +45,9 @@ protected:
 	void endEntry();
 	void invalidStateEntry();
 
+	void areWeTheNewMemoTabEntry();
 	void calculateMessageJSONEntry();
+	void clearDataAndReloadTableEntry();
 	void didWeRecordEntry();
 	void doWeHaveContactsToSendToEntry();
 	void isForwardingMessageEntry();
@@ -53,6 +56,7 @@ protected:
 	void pauseAudioEntry();
 	void pausedIdleEntry();
 	void peerPopSelfEntry();
+	void peerPushMessageSentEntry();
 	void playAudioEntry();
 	void playingIdleEntry();
 	void recordingIdleEntry();
@@ -103,7 +107,9 @@ public:
 	{
 		kInvalidState = 0,
 		kStart = 1,
+		kAreWeTheNewMemoTab,
 		kCalculateMessageJSON,
+		kClearDataAndReloadTable,
 		kDidWeRecord,
 		kDoWeHaveContactsToSendTo,
 		kEnd,
@@ -113,6 +119,7 @@ public:
 		kPauseAudio,
 		kPausedIdle,
 		kPeerPopSelf,
+		kPeerPushMessageSent,
 		kPlayAudio,
 		kPlayingIdle,
 		kRecordingIdle,
