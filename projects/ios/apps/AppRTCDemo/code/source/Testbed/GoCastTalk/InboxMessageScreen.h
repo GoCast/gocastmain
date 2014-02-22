@@ -52,6 +52,7 @@ protected:
 	void sendDownloadRequestToServerEntry();
 	void sendMarkReadToServerEntry();
 	void sendReloadInboxToVCEntry();
+	void sendReloadInboxToVCForMarkReadEntry();
 	void setWaitForDeleteMessageEntry();
 	void setWaitForDownloadEntry();
 	void setWaitForMarkReadEntry();
@@ -102,6 +103,7 @@ public:
 		kSendDownloadRequestToServer,
 		kSendMarkReadToServer,
 		kSendReloadInboxToVC,
+		kSendReloadInboxToVCForMarkRead,
 		kSetWaitForDeleteMessage,
 		kSetWaitForDownload,
 		kSetWaitForMarkRead,

@@ -272,6 +272,11 @@ void InboxMessageScreen::sendReloadInboxToVCEntry()
     GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kReloadInbox));
 }
 
+void InboxMessageScreen::sendReloadInboxToVCForMarkReadEntry()
+{
+    GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kReloadInbox));
+}
+
 #pragma mark State wiring
 void InboxMessageScreen::CallEntry()
 {
@@ -295,6 +300,7 @@ void InboxMessageScreen::CallEntry()
 		case kSendDownloadRequestToServer: sendDownloadRequestToServerEntry(); break;
 		case kSendMarkReadToServer: sendMarkReadToServerEntry(); break;
 		case kSendReloadInboxToVC: sendReloadInboxToVCEntry(); break;
+		case kSendReloadInboxToVCForMarkRead: sendReloadInboxToVCForMarkReadEntry(); break;
 		case kSetWaitForDeleteMessage: setWaitForDeleteMessageEntry(); break;
 		case kSetWaitForDownload: setWaitForDownloadEntry(); break;
 		case kSetWaitForMarkRead: setWaitForMarkReadEntry(); break;
@@ -339,8 +345,9 @@ int  InboxMessageScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kSendDownloadRequestToServer) && (evt == kFail)) return kShowRetryDownload; else
 	if ((mState == kSendDownloadRequestToServer) && (evt == kSuccess)) return kCopyDownloadToLocalFiles; else
 	if ((mState == kSendMarkReadToServer) && (evt == kFail)) return kDoesAudioExistLocally; else
-	if ((mState == kSendMarkReadToServer) && (evt == kSuccess)) return kDoesAudioExistLocally; else
+	if ((mState == kSendMarkReadToServer) && (evt == kSuccess)) return kSendReloadInboxToVCForMarkRead; else
 	if ((mState == kSendReloadInboxToVC) && (evt == kNext)) return kPeerPopSelf; else
+	if ((mState == kSendReloadInboxToVCForMarkRead) && (evt == kNext)) return kDoesAudioExistLocally; else
 	if ((mState == kSetWaitForDeleteMessage) && (evt == kNext)) return kSendDeleteMessageToServer; else
 	if ((mState == kSetWaitForDownload) && (evt == kNext)) return kSendDownloadRequestToServer; else
 	if ((mState == kSetWaitForMarkRead) && (evt == kNext)) return kSendMarkReadToServer; else

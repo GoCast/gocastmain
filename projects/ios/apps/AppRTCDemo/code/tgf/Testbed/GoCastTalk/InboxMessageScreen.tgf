@@ -27,6 +27,7 @@
 27 Peer: push ForwardMessage
 28 Send markRead to server
 29 Set "wait for markRead"
+30 Send ReloadInbox to VC for markRead
 #
 4 5 fail
 4 6 success
@@ -65,4 +66,6 @@
 3 27 forwardSelected
 27 3
 29 28
-28 10 success, fail
+28 10 fail
+28 30 success
+30 10
