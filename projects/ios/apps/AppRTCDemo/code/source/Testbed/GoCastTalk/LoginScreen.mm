@@ -149,6 +149,10 @@ void LoginScreen::loadLoginNameEntry()
     {
         mBaseURL = loginInfo;
     }
+    else
+    {
+        mBaseURL = "http://chat.gocast.it/memoappserver/";
+    }
 
     SetImmediateEvent(result ? kSuccess : kFail);
 }
