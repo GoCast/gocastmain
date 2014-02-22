@@ -7,6 +7,7 @@ include 'login.php';
 include 'register.php';
 include 'listMessages.php';
 include 'deleteMessage.php';
+include 'markRead.php';
 
 include 'getContacts.php';
 include 'setContacts.php';
@@ -116,6 +117,17 @@ if(hasParam("action"))
 				if (hasParam("audio"))
 				{
 					print(json_encode(deleteMessage($_GET["name"], $_GET["audio"])));
+				}
+				else
+				{
+					print(json_encode(errorMissingParameter("audio")));
+				}
+				break;
+
+			case "markRead":
+				if (hasParam("audio"))
+				{
+					print(json_encode(markRead($_GET["name"], $_GET["audio"])));
 				}
 				else
 				{
