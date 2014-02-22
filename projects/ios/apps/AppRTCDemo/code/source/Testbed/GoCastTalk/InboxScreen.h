@@ -37,6 +37,7 @@ public:
     std::string getTranscription(const size_t& i);
     bool        getIsReceive(const size_t& i);
     bool        getIsGroup(const size_t& i);
+    bool        getIsRead(const size_t& i);
 
     void        selectItem(const size_t& i);
 

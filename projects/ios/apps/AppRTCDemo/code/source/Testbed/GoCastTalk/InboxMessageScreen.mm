@@ -138,6 +138,19 @@ void InboxMessageScreen::sendDeleteMessageToServerEntry()
     URLLoader::getInstance()->loadString(this, buf);
 }
 
+void InboxMessageScreen::sendMarkReadToServerEntry()
+{
+    char buf[512];
+
+    sprintf(buf, "%s?action=markRead&name=%s&audio=%s&authToken=%s",
+            kMemoAppServerURL,
+            InboxScreen::mEmailAddress.c_str(),
+            mInitObject["audio"].mString.c_str(),
+            InboxScreen::mToken.c_str());
+
+    URLLoader::getInstance()->loadString(this, buf);
+}
+
 
 void InboxMessageScreen::sendDownloadRequestToServerEntry()
 {
@@ -238,6 +251,11 @@ void InboxMessageScreen::setWaitForDownloadEntry()
     [mPeer setBlockingViewVisible:true];
 }
 
+void InboxMessageScreen::setWaitForMarkReadEntry()
+{
+    [mPeer setBlockingViewVisible:true];
+}
+
 void InboxMessageScreen::showErrorDeletingMessageEntry()
 {
     tAlert("There was an error deleting a message from the server");
@@ -275,9 +293,11 @@ void InboxMessageScreen::CallEntry()
 		case kResumeSound: resumeSoundEntry(); break;
 		case kSendDeleteMessageToServer: sendDeleteMessageToServerEntry(); break;
 		case kSendDownloadRequestToServer: sendDownloadRequestToServerEntry(); break;
+		case kSendMarkReadToServer: sendMarkReadToServerEntry(); break;
 		case kSendReloadInboxToVC: sendReloadInboxToVCEntry(); break;
 		case kSetWaitForDeleteMessage: setWaitForDeleteMessageEntry(); break;
 		case kSetWaitForDownload: setWaitForDownloadEntry(); break;
+		case kSetWaitForMarkRead: setWaitForMarkReadEntry(); break;
 		case kSetWasPlayingToFalse: setWasPlayingToFalseEntry(); break;
 		case kSetWasPlayingToTrue: setWasPlayingToTrueEntry(); break;
 		case kShowErrorDeletingMessage: showErrorDeletingMessageEntry(); break;
@@ -318,10 +338,13 @@ int  InboxMessageScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kSendDeleteMessageToServer) && (evt == kSuccess)) return kWasDeleteMessageValid; else
 	if ((mState == kSendDownloadRequestToServer) && (evt == kFail)) return kShowRetryDownload; else
 	if ((mState == kSendDownloadRequestToServer) && (evt == kSuccess)) return kCopyDownloadToLocalFiles; else
+	if ((mState == kSendMarkReadToServer) && (evt == kFail)) return kDoesAudioExistLocally; else
+	if ((mState == kSendMarkReadToServer) && (evt == kSuccess)) return kDoesAudioExistLocally; else
 	if ((mState == kSendReloadInboxToVC) && (evt == kNext)) return kPeerPopSelf; else
 	if ((mState == kSetWaitForDeleteMessage) && (evt == kNext)) return kSendDeleteMessageToServer; else
 	if ((mState == kSetWaitForDownload) && (evt == kNext)) return kSendDownloadRequestToServer; else
-	if ((mState == kSetWasPlayingToFalse) && (evt == kNext)) return kDoesAudioExistLocally; else
+	if ((mState == kSetWaitForMarkRead) && (evt == kNext)) return kSendMarkReadToServer; else
+	if ((mState == kSetWasPlayingToFalse) && (evt == kNext)) return kSetWaitForMarkRead; else
 	if ((mState == kSetWasPlayingToTrue) && (evt == kNext)) return kDoesAudioExistLocally; else
 	if ((mState == kShowErrorDeletingMessage) && (evt == kYes)) return kIdle; else
 	if ((mState == kShowRetryDownload) && (evt == kNo)) return kIdle; else
@@ -350,6 +373,7 @@ bool InboxMessageScreen::HasEdgeNamedNext() const
 		case kPlayingIdle:
 		case kSendDeleteMessageToServer:
 		case kSendDownloadRequestToServer:
+		case kSendMarkReadToServer:
 		case kShowErrorDeletingMessage:
 		case kShowRetryDownload:
 		case kWasDeleteMessageValid:

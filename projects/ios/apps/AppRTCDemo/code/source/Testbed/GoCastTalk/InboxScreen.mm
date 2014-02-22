@@ -75,7 +75,6 @@ std::string InboxScreen::getTranscription(const size_t& i)
 
 bool        InboxScreen::getIsReceive(const size_t& i)
 {
-#pragma unused(i)
     return mInbox[i].mObject["from"].mString != InboxScreen::mEmailAddress;
 }
 
@@ -83,6 +82,11 @@ bool        InboxScreen::getIsGroup(const size_t& i)
 {
 #pragma unused(i)
     return false;
+}
+
+bool        InboxScreen::getIsRead(const size_t& i)
+{
+    return mInbox[i].mObject["read"].mString == "yes";
 }
 
 void        InboxScreen::selectItem(const size_t& i)

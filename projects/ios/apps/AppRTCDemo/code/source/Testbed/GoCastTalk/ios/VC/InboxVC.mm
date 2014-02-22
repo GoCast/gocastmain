@@ -84,6 +84,12 @@
             cell = [[[InboxEntryCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:simpleTableIdentifier] autorelease];
         }
 
+        cell.mFrom.font = [UIFont fontWithName:(mPeer->getIsRead((size_t)indexPath.row) ? @"Verdana" : @"Verdana-Bold") size:18.0f];
+        cell.mContentView.backgroundColor = mPeer->getIsRead((size_t)indexPath.row) ?
+            [UIColor colorWithRed:0.95f green:0.95f  blue:0.95f alpha:1.0f] :
+            [UIColor colorWithRed:1.0f green:1.0f  blue:1.0f alpha:1.0f];
+
+
         cell.mFrom.text = [NSString stringWithUTF8String:mPeer->getFrom(indexPath.row).c_str()];
         cell.mDate.text = [NSString stringWithUTF8String:mPeer->getDate(indexPath.row).c_str()];
         [cell setTranscription:mPeer->getTranscription((size_t)indexPath.row)];

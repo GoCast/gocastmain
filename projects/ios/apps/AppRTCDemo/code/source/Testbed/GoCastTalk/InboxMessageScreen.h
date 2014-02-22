@@ -50,9 +50,11 @@ protected:
 	void resumeSoundEntry();
 	void sendDeleteMessageToServerEntry();
 	void sendDownloadRequestToServerEntry();
+	void sendMarkReadToServerEntry();
 	void sendReloadInboxToVCEntry();
 	void setWaitForDeleteMessageEntry();
 	void setWaitForDownloadEntry();
+	void setWaitForMarkReadEntry();
 	void setWasPlayingToFalseEntry();
 	void setWasPlayingToTrueEntry();
 	void showErrorDeletingMessageEntry();
@@ -98,9 +100,11 @@ public:
 		kResumeSound,
 		kSendDeleteMessageToServer,
 		kSendDownloadRequestToServer,
+		kSendMarkReadToServer,
 		kSendReloadInboxToVC,
 		kSetWaitForDeleteMessage,
 		kSetWaitForDownload,
+		kSetWaitForMarkRead,
 		kSetWasPlayingToFalse,
 		kSetWasPlayingToTrue,
 		kShowErrorDeletingMessage,

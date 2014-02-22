@@ -12,6 +12,7 @@
 @property (nonatomic, strong) IBOutlet UILabel *mDate;
 @property (nonatomic, strong) IBOutlet UILabel *mTranscription;
 @property (nonatomic, strong) IBOutlet UIImageView *mStatusIcon;
+@property (nonatomic, strong) IBOutlet UIView *mContentView;
 
 -(void) setTranscription:(const std::string&)newTr;
 
