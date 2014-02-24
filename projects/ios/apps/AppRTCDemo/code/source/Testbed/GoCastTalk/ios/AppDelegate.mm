@@ -146,7 +146,7 @@ const unsigned char SpeechKitApplicationKey[] =
     // Set the audio file
     NSArray *pathComponents = [NSArray arrayWithObjects:
                                NSTemporaryDirectory(),
-                               @"scratch.wav",
+                               @"scratch.caf",
                                nil];
     NSURL *outputFileURL = [NSURL fileURLWithPathComponents:pathComponents];
 
@@ -159,9 +159,11 @@ const unsigned char SpeechKitApplicationKey[] =
     // Define the recorder setting
     NSMutableDictionary *recordSetting = [[NSMutableDictionary alloc] init];
 
-    [recordSetting setValue:[NSNumber numberWithInt:kAudioFormatLinearPCM] forKey:AVFormatIDKey];
-    [recordSetting setValue:[NSNumber numberWithFloat:16000.0] forKey:AVSampleRateKey];
-    [recordSetting setValue:[NSNumber numberWithInt: 1] forKey:AVNumberOfChannelsKey];
+    [recordSetting setValue:[NSNumber numberWithInt:    kAudioFormatMPEG4AAC]   forKey:AVFormatIDKey];
+    [recordSetting setValue:[NSNumber numberWithFloat:  16000.0]                forKey:AVSampleRateKey];
+    [recordSetting setValue:[NSNumber numberWithInt:    1]                      forKey:AVNumberOfChannelsKey];
+    [recordSetting setValue:[NSNumber numberWithInt:    16]                     forKey:AVLinearPCMBitDepthKey];
+    [recordSetting setValue:[NSNumber numberWithInt:    AVAudioQualityMin]      forKey:AVEncoderAudioQualityKey];
 
     // Initiate and prepare the recorder
     _mRecorder = [[AVAudioRecorder alloc] initWithURL:outputFileURL settings:recordSetting error:NULL];
@@ -339,6 +341,8 @@ const unsigned char SpeechKitApplicationKey[] =
     //
     //    }
     
+    GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kTranscriptFinished, "Transcription not available."));
+
 	[voiceSearch release];
 	voiceSearch = nil;
 }

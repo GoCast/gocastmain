@@ -108,7 +108,7 @@ void RecordMessageScreen::waitToPlayIdleEntry()
         }
         else
         {
-            mSound = new tSound(tFile(tFile::kTemporaryDirectory, "scratch.wav"));
+            mSound = new tSound(tFile(tFile::kTemporaryDirectory, "scratch.caf"));
         }
         mSound->attach(this);
     }
@@ -387,7 +387,7 @@ void RecordMessageScreen::sendPostAudioToServerEntry()
 
     params.push_back(std::pair<std::string, std::string>("MAX_FILE_SIZE", "10485760"));
 
-    URLLoader::getInstance()->postFile(this, kMemoAppServerURL, params, tFile(tFile::kTemporaryDirectory, "scratch.wav"));
+    URLLoader::getInstance()->postFile(this, kMemoAppServerURL, params, tFile(tFile::kTemporaryDirectory, "scratch.caf"));
 }
 
 void RecordMessageScreen::sendPostTranscriptToServerEntry()
