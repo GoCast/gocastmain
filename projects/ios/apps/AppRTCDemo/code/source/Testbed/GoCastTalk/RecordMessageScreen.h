@@ -23,6 +23,7 @@ protected:
     bool                mDidRecord;
     bool                mIsForwarded;
     bool                mIsChild;
+    bool                mDidPost;
 
 public:
     RecordMessageScreen(RecordMessageVC* newVC, const JSONObject& initObject, bool newIsForwarded, bool newIsChild);
@@ -50,7 +51,10 @@ protected:
 	void clearDataAndReloadTableEntry();
 	void didWeRecordEntry();
 	void doWeHaveContactsToSendToEntry();
+	void isDidPostTrueEntry();
 	void isForwardingMessageEntry();
+	void letDidPostBeFalseEntry();
+	void letDidPostBeTrueEntry();
 	void letDidRecordBeIsForwardedValueEntry();
 	void letDidRecordBeTrueEntry();
 	void pauseAudioEntry();
@@ -113,7 +117,10 @@ public:
 		kDidWeRecord,
 		kDoWeHaveContactsToSendTo,
 		kEnd,
+		kIsDidPostTrue,
 		kIsForwardingMessage,
+		kLetDidPostBeFalse,
+		kLetDidPostBeTrue,
 		kLetDidRecordBeIsForwardedValue,
 		kLetDidRecordBeTrue,
 		kPauseAudio,
