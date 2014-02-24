@@ -56,7 +56,9 @@ protected:
 	void showNotYetImplementedEntry();
 	void showRetryLoginEntry();
 	void showRetryRegisterEntry();
+	void showURLMissingSlashEntry();
 	void storeTokenInformationEntry();
+	void validateURLEntry();
 	void wasLoginValidEntry();
 	void wasRegisterValidEntry();
 
@@ -97,7 +99,9 @@ public:
 		kShowNotYetImplemented,
 		kShowRetryLogin,
 		kShowRetryRegister,
+		kShowURLMissingSlash,
 		kStoreTokenInformation,
+		kValidateURL,
 		kWasLoginValid,
 		kWasRegisterValid,
 	};

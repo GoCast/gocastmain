@@ -21,11 +21,13 @@
 21 Peer: set Login Name
 22 Set "wait for register"
 23 Set "wait for login"
+24 Show "URL missing slash"
+25 Validate URL
 #
 1 20
 3 4 troublePressed
 4 3 yes
-3 16 signInPressed
+3 25 signInPressed
 5 6 success
 6 7 no
 6 9 yes
@@ -54,3 +56,7 @@
 21 3
 22 12
 23 5
+25 24 fail
+24 16 yes
+24 3 no
+25 16 success

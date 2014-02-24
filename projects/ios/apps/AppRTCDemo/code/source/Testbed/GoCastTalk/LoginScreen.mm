@@ -213,6 +213,18 @@ void LoginScreen::storeTokenInformationEntry()
     }
 }
 
+void LoginScreen::validateURLEntry()
+{
+    if (!mBaseURL.empty())
+    {
+        SetImmediateEvent(mBaseURL[mBaseURL.size() - 1] == '/' ? kSuccess : kFail);
+    }
+    else
+    {
+        SetImmediateEvent(kFail);
+    }
+}
+
 #pragma mark UI
 void LoginScreen::setWaitForLoginEntry()
 {
@@ -237,6 +249,11 @@ void LoginScreen::showCouldNotRegisterEntry()
 void LoginScreen::showIncorrectFormatEntry()
 {
     tAlert("User name must be email address format, and password must be letters and numbers only.");
+}
+
+void LoginScreen::showURLMissingSlashEntry()
+{
+    tConfirm("URL missing trailing slash. Continue?");
 }
 
 void LoginScreen::showNotYetImplementedEntry()
@@ -286,8 +303,10 @@ void LoginScreen::CallEntry()
 		case kShowNotYetImplemented: showNotYetImplementedEntry(); break;
 		case kShowRetryLogin: showRetryLoginEntry(); break;
 		case kShowRetryRegister: showRetryRegisterEntry(); break;
+		case kShowURLMissingSlash: showURLMissingSlashEntry(); break;
 		case kStart: startEntry(); break;
 		case kStoreTokenInformation: storeTokenInformationEntry(); break;
+		case kValidateURL: validateURLEntry(); break;
 		case kWasLoginValid: wasLoginValidEntry(); break;
 		case kWasRegisterValid: wasRegisterValidEntry(); break;
 		default: break;
@@ -304,7 +323,7 @@ int  LoginScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kEnsureSigninInfo) && (evt == kSuccess)) return kSetWaitForLogin; else
 	if ((mState == kEnsureSignupInfo) && (evt == kFail)) return kShowIncorrectFormat; else
 	if ((mState == kEnsureSignupInfo) && (evt == kSuccess)) return kSetWaitForRegister; else
-	if ((mState == kIdle) && (evt == kSignInPressed)) return kEnsureSigninInfo; else
+	if ((mState == kIdle) && (evt == kSignInPressed)) return kValidateURL; else
 	if ((mState == kIdle) && (evt == kSignUpPressed)) return kEnsureSignupInfo; else
 	if ((mState == kIdle) && (evt == kTroublePressed)) return kShowNotYetImplemented; else
 	if ((mState == kLoadLoginName) && (evt == kFail)) return kIdle; else
@@ -326,8 +345,12 @@ int  LoginScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kShowRetryLogin) && (evt == kYes)) return kSendLoginToServer; else
 	if ((mState == kShowRetryRegister) && (evt == kNo)) return kShowCouldNotRegister; else
 	if ((mState == kShowRetryRegister) && (evt == kYes)) return kSendRegisterToServer; else
+	if ((mState == kShowURLMissingSlash) && (evt == kNo)) return kIdle; else
+	if ((mState == kShowURLMissingSlash) && (evt == kYes)) return kEnsureSigninInfo; else
 	if ((mState == kStart) && (evt == kNext)) return kLoadLoginName; else
 	if ((mState == kStoreTokenInformation) && (evt == kNext)) return kSaveLoginName; else
+	if ((mState == kValidateURL) && (evt == kFail)) return kShowURLMissingSlash; else
+	if ((mState == kValidateURL) && (evt == kSuccess)) return kEnsureSigninInfo; else
 	if ((mState == kWasLoginValid) && (evt == kNo)) return kShowCouldNotLogin; else
 	if ((mState == kWasLoginValid) && (evt == kYes)) return kStoreTokenInformation; else
 	if ((mState == kWasRegisterValid) && (evt == kNo)) return kShowCouldNotRegister; else
@@ -403,6 +426,7 @@ void LoginScreen::update(const GCTEvent& msg)
         case kShowIncorrectFormat:
         case kShowNotYetImplemented:
         case kShowRetryLogin:
+        case kShowURLMissingSlash:
             switch(msg.mEvent)
             {
                 case GCTEvent::kOKYesAlertPressed:  process(kYes); break;
