@@ -29,7 +29,7 @@
 
     mPeer = new MessageHistoryScreen(self, mInitObject);
 
-    std::string date    = mInitObject["date"].mString;
+    std::string date    = InboxScreen::gmtToLocal(mInitObject["date"].mString);
     std::string result  = "xx/xx xx:xx";
 
     if (date.size() == 16)

@@ -27,6 +27,10 @@ public:
     static std::string  mToken;
 
 public:
+    static std::string getGmtString();
+    static std::string gmtToLocal(const std::string& gmtTime);
+
+public:
 	InboxScreen(InboxVC* newVC);
 	~InboxScreen();
 

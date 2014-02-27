@@ -232,26 +232,14 @@ void RecordMessageScreen::wasPostMessageSuccessfulEntry()
 void RecordMessageScreen::calculateMessageJSONEntry()
 {
     std::map<std::string, int> calculated;
-
-    char buf[80];
     std::string date;
     std::string audioName;
-    time_t curTime;
-    tm*    timeStruct;
 
     //0. Clear results
     mMessageJSON.clear();
 
     //1. Calculate date and audio file name
-    curTime=time(NULL);
-    timeStruct = gmtime(&curTime);
-
-    sprintf(buf, "%04d%02d%02d%02d%02d%02d%02d",
-            timeStruct->tm_year+1900,   timeStruct->tm_mon+1,   timeStruct->tm_mday,
-            timeStruct->tm_hour,        timeStruct->tm_min,     timeStruct->tm_sec,
-            tTimer::getSystemTimeMS() % 100);
-
-    date = buf;
+    date = InboxScreen::getGmtString();
 
     if (mIsForwarded)
     {

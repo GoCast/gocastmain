@@ -55,7 +55,7 @@ std::string MessageHistoryScreen::getFrom(const size_t& i)
 std::string MessageHistoryScreen::getDate(const size_t& i)
 {
 #pragma unused(i)
-    std::string date = mHistory[i].mObject["date"].mString;
+    std::string date = InboxScreen::gmtToLocal(mHistory[i].mObject["date"].mString);
 
     std::string result = "xx/xx xx:xx";
 
