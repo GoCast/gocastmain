@@ -70,7 +70,6 @@ protected:
 	void sendPostTranscriptToServerEntry();
 	void sendReloadInboxToVCEntry();
 	void setWaitForPostAudioEntry();
-	void setWaitForTranscriptionEntry();
 	void showNoAudioToSendEntry();
 	void showNoContactsToSendToEntry();
 	void showPostAudioFailedEntry();
@@ -81,7 +80,6 @@ protected:
 	void stopRecordingAudioEntry();
 	void stopRecordingBeforePopEntry();
 	void stopRecordingBeforeSendEntry();
-	void waitForTranscriptionEntry();
 	void waitToPlayIdleEntry();
 	void waitToRecordIdleEntry();
 	void wasPostAudioSuccessfulEntry();
@@ -103,7 +101,6 @@ public:
 		kSendPressed,
 		kStopPressed,
 		kSuccess,
-		kTranscriptionReady,
 		kYes,
 	};
 
@@ -136,7 +133,6 @@ public:
 		kSendPostTranscriptToServer,
 		kSendReloadInboxToVC,
 		kSetWaitForPostAudio,
-		kSetWaitForTranscription,
 		kShowNoAudioToSend,
 		kShowNoContactsToSendTo,
 		kShowPostAudioFailed,
@@ -147,7 +143,6 @@ public:
 		kStopRecordingAudio,
 		kStopRecordingBeforePop,
 		kStopRecordingBeforeSend,
-		kWaitForTranscription,
 		kWaitToPlayIdle,
 		kWaitToRecordIdle,
 		kWasPostAudioSuccessful,
