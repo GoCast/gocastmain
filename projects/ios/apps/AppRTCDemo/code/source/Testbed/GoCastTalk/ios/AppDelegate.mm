@@ -67,6 +67,11 @@ const unsigned char SpeechKitApplicationKey[] =
     [TestFlight takeOff:@"9d7d1e2c-62c3-45d9-8506-cb0a9752ca47"];
 #endif
 
+    self->mTabBarHeight     = (size_t)self.tabBarController.tabBar.frame.size.height;
+    self->mScreenHeight     = (size_t)[[UIScreen mainScreen] bounds].size.height;
+    self->mNavBarHeight     = (size_t)self.mInboxNavBar.frame.size.height;
+    self->mStatusBarHeight  = (size_t)[UIApplication sharedApplication].statusBarFrame.size.height;
+
     [self ctorRecorder];
 
     //TODO: This removes the "groups" tab, for now; so remove it later

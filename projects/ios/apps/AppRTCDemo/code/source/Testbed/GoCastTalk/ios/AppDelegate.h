@@ -16,7 +16,12 @@
     SKRecognizerDelegate
 >
 {
-    SKRecognizer* voiceSearch;
+@public
+    SKRecognizer*   voiceSearch;
+    size_t          mTabBarHeight;
+    size_t          mScreenHeight;
+    size_t          mNavBarHeight;
+    size_t          mStatusBarHeight;
 }
 
 @property (nonatomic, retain) IBOutlet UIWindow *window;

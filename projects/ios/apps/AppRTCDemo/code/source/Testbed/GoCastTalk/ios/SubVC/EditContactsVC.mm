@@ -178,29 +178,34 @@
 
     JSONObject newContact;
 
-    newContact["email"] = std::string("");
-
     ABMultiValueRef emailMultiValue = ABRecordCopyValue(person, kABPersonEmailProperty);
     NSArray *emailAddresses = [(NSArray *)ABMultiValueCopyArrayOfAllValues(emailMultiValue) autorelease];
-    if ([emailAddresses count] != 0)
+    NSString* nsEmail;
+
+    switch ([emailAddresses count])
     {
-        NSString* nsEmail = [emailAddresses objectAtIndex:0];
-        newContact["email"] = (nsEmail ? [nsEmail UTF8String] : std::string(""));
+        case 0: newContact["email"] = std::string(""); break;
+        case 1:
+            nsEmail = [emailAddresses objectAtIndex:0];
+            newContact["email"] = (nsEmail ? [nsEmail UTF8String] : std::string(""));
+            break;
+
+        default:
+            newContact["email"] = JSONArray();
+
+            for(size_t i = 0; i < [emailAddresses count]; i++)
+            {
+                newContact["email"].mArray.push_back(JSONValue(std::string([[emailAddresses objectAtIndex: i] UTF8String])));
+            }
+            break;
     }
+
     CFRelease(emailMultiValue);
 
     newContact["kanji"]     = kanjiSurname + ((!kanjiSurname.empty() && !kanjiGiven.empty()) ? " " : "") + kanjiGiven;
     newContact["kana"]      = kanaSurname  + ((!kanaSurname.empty()  && !kanaGiven.empty())  ? " " : "") + kanaGiven;
 
-    if (!newContact["email"].mString.empty())
-    {
-        [self dismissViewControllerAnimated:YES completion:^
-         {
-             [self pushChangeRegisteredName:newContact];
-         }
-         ];
-    }
-    else
+    if ([emailAddresses count] == 0 || ([emailAddresses count] == 1 && newContact["email"].mString.empty()))
     {
         [self dismissViewControllerAnimated:YES completion:^
          {
@@ -211,8 +216,16 @@
              [alert addButtonWithTitle:@"Okay"];
 
              [alert performSelectorOnMainThread:@selector(show) withObject:nil waitUntilDone:YES];
-             
+
              [alert release];
+         }
+         ];
+    }
+    else
+    {
+        [self dismissViewControllerAnimated:YES completion:^
+         {
+             [self pushChangeRegisteredName:newContact];
          }
          ];
     }
