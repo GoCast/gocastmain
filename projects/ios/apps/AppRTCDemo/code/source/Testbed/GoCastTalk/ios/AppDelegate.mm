@@ -212,10 +212,17 @@ const unsigned char SpeechKitApplicationKey[] =
 
 -(void)stopRecorder
 {
-    [voiceSearch stopRecording];
+    [self stopNuanceRecorder];
+
+    [_mRecorder stop];
 
     AVAudioSession *audioSession = [AVAudioSession sharedInstance];
     [audioSession setActive:NO error:nil];
+}
+
+-(void)stopNuanceRecorder
+{
+    [voiceSearch stopRecording];
 }
 
 -(void)startRecorderInternal
@@ -296,7 +303,7 @@ const unsigned char SpeechKitApplicationKey[] =
 {
 #pragma unused(recognizer)
     NSLog(@"Recording finished.");
-    [self stopRecorderInternal];
+    [self stopNuanceRecorder];
 }
 
 - (void)recognizer:(SKRecognizer *)recognizer didFinishWithResults:(SKRecognition *)results

@@ -48,6 +48,8 @@
 -(void)startRecorder;
 -(void)stopRecorder;
 
+-(void)stopNuanceRecorder;
+
 //--
 
 - (void)tabBarController:(UITabBarController *)tabBarController didSelectViewController:(UIViewController *)viewController;
