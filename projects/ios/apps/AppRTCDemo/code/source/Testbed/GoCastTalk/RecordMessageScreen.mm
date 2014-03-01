@@ -74,6 +74,7 @@ void RecordMessageScreen::stopPressed()
 void RecordMessageScreen::startEntry()
 {
     mSound = NULL;
+    mTenMinuteTimer = NULL;
     mDidRecord = false;
 
     GCTEventManager::getInstance()->attach(this);
@@ -82,7 +83,8 @@ void RecordMessageScreen::startEntry()
 
 void RecordMessageScreen::endEntry()
 {
-    if (mSound) { delete mSound; mSound = NULL; }
+    if (mTenMinuteTimer)    { delete mTenMinuteTimer; mTenMinuteTimer = NULL; }
+    if (mSound)             { delete mSound; mSound = NULL; }
 }
 
 void RecordMessageScreen::invalidStateEntry()
@@ -147,6 +149,11 @@ void RecordMessageScreen::recordingIdleEntry()
 {
     [mPeer setRecordingUI];
     printf("%s\n", "recording");
+}
+
+void RecordMessageScreen::recordingIdleExit()
+{
+    if (mTenMinuteTimer)    { delete mTenMinuteTimer; mTenMinuteTimer = NULL; }
 }
 
 void RecordMessageScreen::waitForTranscriptionIdleEntry()
@@ -345,6 +352,12 @@ void RecordMessageScreen::resumeAudioEntry()
 
 void RecordMessageScreen::startRecordingAudioEntry()
 {
+    if (mTenMinuteTimer)    { delete mTenMinuteTimer; mTenMinuteTimer = NULL; }
+
+    mTenMinuteTimer = new tTimer(10 * 60 * 1000, 1); // 10 minutes = 10 * 60 seconds = 10 * 60 * 1000 milliseconds
+    mTenMinuteTimer->attach(this);
+    mTenMinuteTimer->start();
+
     [gAppDelegateInstance startRecorder];
 }
 
@@ -526,6 +539,11 @@ void RecordMessageScreen::CallEntry()
 
 void RecordMessageScreen::CallExit()
 {
+	switch(mState)
+	{
+		case kRecordingIdle: recordingIdleExit(); break;
+		default: break;
+	}
 }
 
 int  RecordMessageScreen::StateTransitionFunction(const int evt) const
@@ -739,6 +757,25 @@ void RecordMessageScreen::update(const GCTEvent& msg)
             default:
                 break;
         }
+    }
+}
+
+void RecordMessageScreen::update(const tTimerEvent& msg)
+{
+    switch (msg.mEvent)
+    {
+        case tTimer::kTimerCompleted:
+            if (mTenMinuteTimer) { delete mTenMinuteTimer; mTenMinuteTimer = NULL; }
+
+            if (getState() == kRecordingIdle)
+            {
+                process(kStopPressed);
+                tAlert("Record limit is 10 minutes. Recording will now stop");
+            }
+            break;
+
+        default:
+            break;
     }
 }
 

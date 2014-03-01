@@ -9,7 +9,8 @@ class RecordMessageScreen
     public tObserver<const RecordMessageScreenMessage&>,
     public tObserver<const tSoundEvent&>,
     public tObserver<const URLLoaderEvent&>,
-    public tObserver<const GCTEvent&>
+    public tObserver<const GCTEvent&>,
+    public tObserver<const tTimerEvent&>
 {
 protected:
     RecordMessageVC*    mPeer;
@@ -20,6 +21,7 @@ protected:
     JSONObject          mPostMessageJSON;
     JSONObject          mTranscription;
     tSound*             mSound;
+    tTimer*             mTenMinuteTimer;
     bool                mDidRecord;
     bool                mIsForwarded;
     bool                mIsChild;
@@ -89,6 +91,8 @@ protected:
 	void wasPostAudioSuccessfulEntry();
 	void wasPostMessageSuccessfulEntry();
 	void wasPostTranscriptSuccessfulEntry();
+
+	void recordingIdleExit();
 
 public:
 	enum EventType
@@ -168,6 +172,7 @@ protected:
 	void update(const tSoundEvent& msg);
 	void update(const URLLoaderEvent& msg);
 	void update(const GCTEvent& msg);
+	void update(const tTimerEvent& msg);
 };
 
 class RecordMessageScreenMessage
