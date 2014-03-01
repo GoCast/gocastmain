@@ -166,7 +166,7 @@ const unsigned char SpeechKitApplicationKey[] =
     // Define the recorder setting
     NSMutableDictionary *recordSetting = [[NSMutableDictionary alloc] init];
 
-    [recordSetting setValue :[NSNumber numberWithInt: kAudioFormatULaw]     forKey:AVFormatIDKey];
+    [recordSetting setValue :[NSNumber numberWithInt: kAudioFormatAppleIMA4]   forKey:AVFormatIDKey];
     [recordSetting setValue :[NSNumber numberWithFloat: 16000.0]            forKey:AVSampleRateKey];
     [recordSetting setValue :[NSNumber numberWithInt: 1]                    forKey:AVNumberOfChannelsKey];
     [recordSetting setValue :[NSNumber numberWithInt: 8]                    forKey:AVLinearPCMBitDepthKey];
@@ -176,14 +176,6 @@ const unsigned char SpeechKitApplicationKey[] =
     [recordSetting setValue :[NSNumber numberWithInt: 8]                    forKey:AVEncoderBitDepthHintKey];
     [recordSetting setValue :[NSNumber numberWithInt: 8]                    forKey:AVEncoderBitRatePerChannelKey];
     [recordSetting setValue :[NSNumber numberWithInt: AVAudioQualityMin]    forKey:AVEncoderAudioQualityKey];
-
-//    [recordSetting setValue :[NSNumber numberWithInt:kAudioFormatLinearPCM] forKey:AVFormatIDKey];
-//    [recordSetting setValue: [NSNumber numberWithFloat:16000.0]         forKey:AVSampleRateKey];
-//    [recordSetting setValue: [NSNumber numberWithInt: 1]                forKey:AVNumberOfChannelsKey];
-//    [recordSetting setValue :[NSNumber numberWithInt:16]                forKey:AVLinearPCMBitDepthKey];
-//    [recordSetting setValue :[NSNumber numberWithBool:NO]               forKey:AVLinearPCMIsBigEndianKey];
-//    [recordSetting setValue :[NSNumber numberWithBool:NO]               forKey:AVLinearPCMIsFloatKey];
-//    [recordSetting setValue :[NSNumber numberWithInt:AVAudioQualityMin] forKey:AVEncoderAudioQualityKey];
 
     NSError* err = nil;
 
