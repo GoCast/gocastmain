@@ -24,6 +24,7 @@ protected:
     bool                mIsForwarded;
     bool                mIsChild;
     bool                mDidPost;
+    bool                mGotTranscriptionEvent;
 
 public:
     RecordMessageScreen(RecordMessageVC* newVC, const JSONObject& initObject, bool newIsForwarded, bool newIsChild);
@@ -51,6 +52,7 @@ protected:
 	void clearDataAndReloadTableEntry();
 	void didWeRecordEntry();
 	void doWeHaveContactsToSendToEntry();
+	void doWeNeedToWaitForTranscriptionEntry();
 	void isDidPostTrueEntry();
 	void isForwardingMessageEntry();
 	void letDidPostBeFalseEntry();
@@ -70,6 +72,7 @@ protected:
 	void sendPostTranscriptToServerEntry();
 	void sendReloadInboxToVCEntry();
 	void setWaitForPostAudioEntry();
+	void setWaitForTranscriptionEntry();
 	void showNoAudioToSendEntry();
 	void showNoContactsToSendToEntry();
 	void showPostAudioFailedEntry();
@@ -80,6 +83,7 @@ protected:
 	void stopRecordingAudioEntry();
 	void stopRecordingBeforePopEntry();
 	void stopRecordingBeforeSendEntry();
+	void waitForTranscriptionIdleEntry();
 	void waitToPlayIdleEntry();
 	void waitToRecordIdleEntry();
 	void wasPostAudioSuccessfulEntry();
@@ -101,6 +105,7 @@ public:
 		kSendPressed,
 		kStopPressed,
 		kSuccess,
+		kTranscriptionReady,
 		kYes,
 	};
 
@@ -113,6 +118,7 @@ public:
 		kClearDataAndReloadTable,
 		kDidWeRecord,
 		kDoWeHaveContactsToSendTo,
+		kDoWeNeedToWaitForTranscription,
 		kEnd,
 		kIsDidPostTrue,
 		kIsForwardingMessage,
@@ -133,6 +139,7 @@ public:
 		kSendPostTranscriptToServer,
 		kSendReloadInboxToVC,
 		kSetWaitForPostAudio,
+		kSetWaitForTranscription,
 		kShowNoAudioToSend,
 		kShowNoContactsToSendTo,
 		kShowPostAudioFailed,
@@ -143,6 +150,7 @@ public:
 		kStopRecordingAudio,
 		kStopRecordingBeforePop,
 		kStopRecordingBeforeSend,
+		kWaitForTranscriptionIdle,
 		kWaitToPlayIdle,
 		kWaitToRecordIdle,
 		kWasPostAudioSuccessful,

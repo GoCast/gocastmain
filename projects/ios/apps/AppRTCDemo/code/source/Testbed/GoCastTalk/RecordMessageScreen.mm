@@ -12,7 +12,8 @@ RecordMessageScreen::RecordMessageScreen(RecordMessageVC* newVC, const JSONObjec
     mInitObject(initObject),
     mIsForwarded(newIsForwarded),
     mIsChild(newIsChild),
-    mDidPost(false)
+    mDidPost(false),
+    mGotTranscriptionEvent(false)
 {
 	ConstructMachine();
 }
@@ -90,9 +91,9 @@ void RecordMessageScreen::invalidStateEntry()
 }
 
 #pragma mark Idling
-
 void RecordMessageScreen::waitToRecordIdleEntry()
 {
+    mGotTranscriptionEvent = false;
     [mPeer setWaitToRecordUI];
     printf("%s\n", "wait to record");
 }
@@ -148,6 +149,12 @@ void RecordMessageScreen::recordingIdleEntry()
     printf("%s\n", "recording");
 }
 
+void RecordMessageScreen::waitForTranscriptionIdleEntry()
+{
+    [mPeer setWaitForTranscriptUI];
+    printf("%s\n", "waiting for transcript");
+}
+
 #pragma mark Peer communication
 void RecordMessageScreen::peerPopSelfEntry()
 {
@@ -174,6 +181,11 @@ void RecordMessageScreen::didWeRecordEntry()
 void RecordMessageScreen::doWeHaveContactsToSendToEntry()
 {
     SetImmediateEvent(!mInitObject["to"].mArray.empty() ? kYes : kNo);
+}
+
+void RecordMessageScreen::doWeNeedToWaitForTranscriptionEntry()
+{
+    SetImmediateEvent(mGotTranscriptionEvent ? kNo : kYes);
 }
 
 void RecordMessageScreen::isDidPostTrueEntry()
@@ -432,6 +444,11 @@ void RecordMessageScreen::setWaitForPostAudioEntry()
     [mPeer setBlockingViewVisible:true];
 }
 
+void RecordMessageScreen::setWaitForTranscriptionEntry()
+{
+    [mPeer setBlockingViewVisible:true];
+}
+
 void RecordMessageScreen::showNoAudioToSendEntry()
 {
     tAlert("Please record audio first.");
@@ -463,6 +480,7 @@ void RecordMessageScreen::CallEntry()
 		case kClearDataAndReloadTable: clearDataAndReloadTableEntry(); break;
 		case kDidWeRecord: didWeRecordEntry(); break;
 		case kDoWeHaveContactsToSendTo: doWeHaveContactsToSendToEntry(); break;
+		case kDoWeNeedToWaitForTranscription: doWeNeedToWaitForTranscriptionEntry(); break;
 		case kEnd: EndEntryHelper(); break;
 		case kInvalidState: invalidStateEntry(); break;
 		case kIsDidPostTrue: isDidPostTrueEntry(); break;
@@ -484,6 +502,7 @@ void RecordMessageScreen::CallEntry()
 		case kSendPostTranscriptToServer: sendPostTranscriptToServerEntry(); break;
 		case kSendReloadInboxToVC: sendReloadInboxToVCEntry(); break;
 		case kSetWaitForPostAudio: setWaitForPostAudioEntry(); break;
+		case kSetWaitForTranscription: setWaitForTranscriptionEntry(); break;
 		case kShowNoAudioToSend: showNoAudioToSendEntry(); break;
 		case kShowNoContactsToSendTo: showNoContactsToSendToEntry(); break;
 		case kShowPostAudioFailed: showPostAudioFailedEntry(); break;
@@ -495,6 +514,7 @@ void RecordMessageScreen::CallEntry()
 		case kStopRecordingAudio: stopRecordingAudioEntry(); break;
 		case kStopRecordingBeforePop: stopRecordingBeforePopEntry(); break;
 		case kStopRecordingBeforeSend: stopRecordingBeforeSendEntry(); break;
+		case kWaitForTranscriptionIdle: waitForTranscriptionIdleEntry(); break;
 		case kWaitToPlayIdle: waitToPlayIdleEntry(); break;
 		case kWaitToRecordIdle: waitToRecordIdleEntry(); break;
 		case kWasPostAudioSuccessful: wasPostAudioSuccessfulEntry(); break;
@@ -518,6 +538,8 @@ int  RecordMessageScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kDidWeRecord) && (evt == kYes)) return kWaitToPlayIdle; else
 	if ((mState == kDoWeHaveContactsToSendTo) && (evt == kNo)) return kShowNoContactsToSendTo; else
 	if ((mState == kDoWeHaveContactsToSendTo) && (evt == kYes)) return kSetWaitForPostAudio; else
+	if ((mState == kDoWeNeedToWaitForTranscription) && (evt == kNo)) return kLetDidRecordBeTrue; else
+	if ((mState == kDoWeNeedToWaitForTranscription) && (evt == kYes)) return kSetWaitForTranscription; else
 	if ((mState == kIsDidPostTrue) && (evt == kNo)) return kAreWeTheNewMemoTab; else
 	if ((mState == kIsDidPostTrue) && (evt == kYes)) return kPeerPushMessageSent; else
 	if ((mState == kIsForwardingMessage) && (evt == kNo)) return kSendPostAudioToServer; else
@@ -548,6 +570,7 @@ int  RecordMessageScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kSendPostTranscriptToServer) && (evt == kSuccess)) return kWasPostTranscriptSuccessful; else
 	if ((mState == kSendReloadInboxToVC) && (evt == kNext)) return kIsDidPostTrue; else
 	if ((mState == kSetWaitForPostAudio) && (evt == kNext)) return kCalculateMessageJSON; else
+	if ((mState == kSetWaitForTranscription) && (evt == kNext)) return kWaitForTranscriptionIdle; else
 	if ((mState == kShowNoAudioToSend) && (evt == kYes)) return kWaitToRecordIdle; else
 	if ((mState == kShowNoContactsToSendTo) && (evt == kYes)) return kWaitToPlayIdle; else
 	if ((mState == kShowPostAudioFailed) && (evt == kYes)) return kSendReloadInboxToVC; else
@@ -556,9 +579,10 @@ int  RecordMessageScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kStopAudio) && (evt == kNext)) return kDidWeRecord; else
 	if ((mState == kStopPlayingBeforePop) && (evt == kNext)) return kSendReloadInboxToVC; else
 	if ((mState == kStopPlayingBeforeSend) && (evt == kNext)) return kDoWeHaveContactsToSendTo; else
-	if ((mState == kStopRecordingAudio) && (evt == kNext)) return kLetDidRecordBeTrue; else
+	if ((mState == kStopRecordingAudio) && (evt == kNext)) return kDoWeNeedToWaitForTranscription; else
 	if ((mState == kStopRecordingBeforePop) && (evt == kNext)) return kSendReloadInboxToVC; else
 	if ((mState == kStopRecordingBeforeSend) && (evt == kNext)) return kDoWeHaveContactsToSendTo; else
+	if ((mState == kWaitForTranscriptionIdle) && (evt == kTranscriptionReady)) return kLetDidRecordBeTrue; else
 	if ((mState == kWaitToPlayIdle) && (evt == kCancelPressed)) return kSendReloadInboxToVC; else
 	if ((mState == kWaitToPlayIdle) && (evt == kPlayPressed)) return kPlayAudio; else
 	if ((mState == kWaitToPlayIdle) && (evt == kSendPressed)) return kDoWeHaveContactsToSendTo; else
@@ -591,6 +615,7 @@ bool RecordMessageScreen::HasEdgeNamedNext() const
 		case kResumeAudio:
 		case kSendReloadInboxToVC:
 		case kSetWaitForPostAudio:
+		case kSetWaitForTranscription:
 		case kStart:
 		case kStartRecordingAudio:
 		case kStopAudio:
@@ -684,8 +709,15 @@ void RecordMessageScreen::update(const GCTEvent& msg)
     }
     else if (msg.mEvent == GCTEvent::kTranscriptFinished)
     {
+        mGotTranscriptionEvent = true;
+
         mTranscription["ja"] = msg.mTranscription;
         tFile(tFile::kTemporaryDirectory, "transcript.json").write(JSONValue(mTranscription).toString().c_str());
+
+        if (getState() == kWaitForTranscriptionIdle)
+        {
+            process(kTranscriptionReady);
+        }
     }
     else
     {
