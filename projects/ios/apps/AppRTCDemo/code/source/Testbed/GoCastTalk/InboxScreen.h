@@ -14,6 +14,7 @@ protected:
     InboxVC* mPeer;
 
     JSONObject  mGetContactsJSON;
+    JSONObject  mGetGroupsJSON;
     JSONObject  mListMessagesJSON;
     JSONObject  mDeleteMessageJSON;
     size_t      mItemSelected;
@@ -22,6 +23,7 @@ protected:
 public:
     static JSONArray    mInbox;
     static JSONArray    mContacts;
+    static JSONArray    mGroups;
     static std::map<std::string, std::string> mContactMap;
     static std::string  mEmailAddress;
     static std::string  mToken;
@@ -56,23 +58,28 @@ protected:
 	void buildContactMapEntry();
 	void clearInboxEntry();
 	void didWeDownloadContactsEntry();
+	void didWeDownloadGroupsEntry();
 	void doWeHaveATokenEntry();
 	void idleEntry();
 	void peerPushInboxMessageEntry();
 	void peerReloadTableEntry();
 	void sendDeleteMessageToServerEntry();
 	void sendGetContactsToServerEntry();
+	void sendGetGroupsToServerEntry();
 	void sendListMessagesToServerEntry();
 	void setWaitForDeleteMessageEntry();
 	void setWaitForGetContactsEntry();
+	void setWaitForGetGroupsEntry();
 	void setWaitForListMessagesEntry();
 	void showErrorDeletingMessageEntry();
 	void showErrorLoadingContactsEntry();
+	void showErrorLoadingGroupsEntry();
 	void showErrorLoadingInboxEntry();
 	void showRetryListMessagesEntry();
 	void sortTableByDateEntry();
 	void wasDeleteMessageValidEntry();
 	void wasGetContactsValidEntry();
+	void wasGetGroupsValidEntry();
 	void wasListMessagesValidEntry();
 
 public:
@@ -96,6 +103,7 @@ public:
 		kBuildContactMap,
 		kClearInbox,
 		kDidWeDownloadContacts,
+		kDidWeDownloadGroups,
 		kDoWeHaveAToken,
 		kEnd,
 		kIdle,
@@ -103,17 +111,21 @@ public:
 		kPeerReloadTable,
 		kSendDeleteMessageToServer,
 		kSendGetContactsToServer,
+		kSendGetGroupsToServer,
 		kSendListMessagesToServer,
 		kSetWaitForDeleteMessage,
 		kSetWaitForGetContacts,
+		kSetWaitForGetGroups,
 		kSetWaitForListMessages,
 		kShowErrorDeletingMessage,
 		kShowErrorLoadingContacts,
+		kShowErrorLoadingGroups,
 		kShowErrorLoadingInbox,
 		kShowRetryListMessages,
 		kSortTableByDate,
 		kWasDeleteMessageValid,
 		kWasGetContactsValid,
+		kWasGetGroupsValid,
 		kWasListMessagesValid,
 	};
 

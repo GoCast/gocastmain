@@ -7,6 +7,8 @@
 
 JSONArray   InboxScreen::mInbox;
 JSONArray   InboxScreen::mContacts;
+JSONArray   InboxScreen::mGroups;
+
 std::map<std::string, std::string> InboxScreen::mContactMap;
 std::string InboxScreen::mEmailAddress;
 std::string InboxScreen::mToken;
@@ -187,6 +189,11 @@ void InboxScreen::didWeDownloadContactsEntry()
     SetImmediateEvent(!mContacts.empty() ? kYes : kNo);
 }
 
+void InboxScreen::didWeDownloadGroupsEntry()
+{
+    SetImmediateEvent(!mGroups.empty() ? kYes : kNo);
+}
+
 void InboxScreen::doWeHaveATokenEntry()
 {
     SetImmediateEvent(InboxScreen::mEmailAddress.empty() ? kNo : kYes);
@@ -214,6 +221,22 @@ void InboxScreen::wasGetContactsValidEntry()
     if (mGetContactsJSON["status"].mString == std::string("success"))
     {
         mContacts = mGetContactsJSON["contacts"].mArray;
+
+        result = true;
+    }
+
+    SetImmediateEvent(result ? kYes : kNo);
+}
+
+void InboxScreen::wasGetGroupsValidEntry()
+{
+    bool result = false;
+
+    mGroups.clear();
+
+    if (mGetGroupsJSON["status"].mString == std::string("success"))
+    {
+        mGroups = mGetGroupsJSON["groups"].mArray;
 
         result = true;
     }
@@ -282,6 +305,18 @@ void InboxScreen::sendGetContactsToServerEntry()
     URLLoader::getInstance()->loadString(this, buf);
 }
 
+void InboxScreen::sendGetGroupsToServerEntry()
+{
+    char buf[512];
+
+    sprintf(buf, "%s?action=getGroups&name=%s&authToken=%s",
+            kMemoAppServerURL,
+            InboxScreen::mEmailAddress.c_str(),
+            InboxScreen::mToken.c_str());
+
+    URLLoader::getInstance()->loadString(this, buf);
+}
+
 void InboxScreen::sendListMessagesToServerEntry()
 {
     char buf[512];
@@ -313,6 +348,11 @@ void InboxScreen::setWaitForGetContactsEntry()
     [mPeer setBlockingViewVisible:true];
 }
 
+void InboxScreen::setWaitForGetGroupsEntry()
+{
+    [mPeer setBlockingViewVisible:true];
+}
+
 void InboxScreen::setWaitForDeleteMessageEntry()
 {
     [mPeer setBlockingViewVisible:true];
@@ -333,6 +373,11 @@ void InboxScreen::showErrorLoadingContactsEntry()
     tAlert("There was an error loading contacts from the server");
 }
 
+void InboxScreen::showErrorLoadingGroupsEntry()
+{
+    tAlert("There was an error loading groups from the server");
+}
+
 void InboxScreen::showErrorLoadingInboxEntry()
 {
     tAlert("There was an error loading inbox from the server");
@@ -351,6 +396,7 @@ void InboxScreen::CallEntry()
 		case kBuildContactMap: buildContactMapEntry(); break;
 		case kClearInbox: clearInboxEntry(); break;
 		case kDidWeDownloadContacts: didWeDownloadContactsEntry(); break;
+		case kDidWeDownloadGroups: didWeDownloadGroupsEntry(); break;
 		case kDoWeHaveAToken: doWeHaveATokenEntry(); break;
 		case kEnd: EndEntryHelper(); break;
 		case kIdle: idleEntry(); break;
@@ -359,18 +405,22 @@ void InboxScreen::CallEntry()
 		case kPeerReloadTable: peerReloadTableEntry(); break;
 		case kSendDeleteMessageToServer: sendDeleteMessageToServerEntry(); break;
 		case kSendGetContactsToServer: sendGetContactsToServerEntry(); break;
+		case kSendGetGroupsToServer: sendGetGroupsToServerEntry(); break;
 		case kSendListMessagesToServer: sendListMessagesToServerEntry(); break;
 		case kSetWaitForDeleteMessage: setWaitForDeleteMessageEntry(); break;
 		case kSetWaitForGetContacts: setWaitForGetContactsEntry(); break;
+		case kSetWaitForGetGroups: setWaitForGetGroupsEntry(); break;
 		case kSetWaitForListMessages: setWaitForListMessagesEntry(); break;
 		case kShowErrorDeletingMessage: showErrorDeletingMessageEntry(); break;
 		case kShowErrorLoadingContacts: showErrorLoadingContactsEntry(); break;
+		case kShowErrorLoadingGroups: showErrorLoadingGroupsEntry(); break;
 		case kShowErrorLoadingInbox: showErrorLoadingInboxEntry(); break;
 		case kShowRetryListMessages: showRetryListMessagesEntry(); break;
 		case kSortTableByDate: sortTableByDateEntry(); break;
 		case kStart: startEntry(); break;
 		case kWasDeleteMessageValid: wasDeleteMessageValidEntry(); break;
 		case kWasGetContactsValid: wasGetContactsValidEntry(); break;
+		case kWasGetGroupsValid: wasGetGroupsValidEntry(); break;
 		case kWasListMessagesValid: wasListMessagesValidEntry(); break;
 		default: break;
 	}
@@ -385,7 +435,9 @@ int  InboxScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kBuildContactMap) && (evt == kNext)) return kPeerReloadTable; else
 	if ((mState == kClearInbox) && (evt == kNext)) return kPeerReloadTable; else
 	if ((mState == kDidWeDownloadContacts) && (evt == kNo)) return kSetWaitForGetContacts; else
-	if ((mState == kDidWeDownloadContacts) && (evt == kYes)) return kSetWaitForListMessages; else
+	if ((mState == kDidWeDownloadContacts) && (evt == kYes)) return kDidWeDownloadGroups; else
+	if ((mState == kDidWeDownloadGroups) && (evt == kNo)) return kSetWaitForGetGroups; else
+	if ((mState == kDidWeDownloadGroups) && (evt == kYes)) return kSetWaitForListMessages; else
 	if ((mState == kDoWeHaveAToken) && (evt == kNo)) return kClearInbox; else
 	if ((mState == kDoWeHaveAToken) && (evt == kYes)) return kDidWeDownloadContacts; else
 	if ((mState == kIdle) && (evt == kDeleteSelected)) return kSetWaitForDeleteMessage; else
@@ -397,13 +449,17 @@ int  InboxScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kSendDeleteMessageToServer) && (evt == kSuccess)) return kWasDeleteMessageValid; else
 	if ((mState == kSendGetContactsToServer) && (evt == kFail)) return kShowErrorLoadingContacts; else
 	if ((mState == kSendGetContactsToServer) && (evt == kSuccess)) return kWasGetContactsValid; else
+	if ((mState == kSendGetGroupsToServer) && (evt == kFail)) return kShowErrorLoadingGroups; else
+	if ((mState == kSendGetGroupsToServer) && (evt == kSuccess)) return kWasGetGroupsValid; else
 	if ((mState == kSendListMessagesToServer) && (evt == kFail)) return kShowRetryListMessages; else
 	if ((mState == kSendListMessagesToServer) && (evt == kSuccess)) return kWasListMessagesValid; else
 	if ((mState == kSetWaitForDeleteMessage) && (evt == kNext)) return kSendDeleteMessageToServer; else
 	if ((mState == kSetWaitForGetContacts) && (evt == kNext)) return kSendGetContactsToServer; else
+	if ((mState == kSetWaitForGetGroups) && (evt == kNext)) return kSendGetGroupsToServer; else
 	if ((mState == kSetWaitForListMessages) && (evt == kNext)) return kSendListMessagesToServer; else
 	if ((mState == kShowErrorDeletingMessage) && (evt == kYes)) return kPeerReloadTable; else
-	if ((mState == kShowErrorLoadingContacts) && (evt == kYes)) return kSetWaitForListMessages; else
+	if ((mState == kShowErrorLoadingContacts) && (evt == kYes)) return kDidWeDownloadGroups; else
+	if ((mState == kShowErrorLoadingGroups) && (evt == kYes)) return kSetWaitForListMessages; else
 	if ((mState == kShowErrorLoadingInbox) && (evt == kYes)) return kPeerReloadTable; else
 	if ((mState == kShowRetryListMessages) && (evt == kNo)) return kPeerReloadTable; else
 	if ((mState == kShowRetryListMessages) && (evt == kYes)) return kDoWeHaveAToken; else
@@ -412,7 +468,9 @@ int  InboxScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kWasDeleteMessageValid) && (evt == kNo)) return kShowErrorDeletingMessage; else
 	if ((mState == kWasDeleteMessageValid) && (evt == kYes)) return kDoWeHaveAToken; else
 	if ((mState == kWasGetContactsValid) && (evt == kNo)) return kShowErrorLoadingContacts; else
-	if ((mState == kWasGetContactsValid) && (evt == kYes)) return kSetWaitForListMessages; else
+	if ((mState == kWasGetContactsValid) && (evt == kYes)) return kDidWeDownloadGroups; else
+	if ((mState == kWasGetGroupsValid) && (evt == kNo)) return kShowErrorLoadingGroups; else
+	if ((mState == kWasGetGroupsValid) && (evt == kYes)) return kSetWaitForListMessages; else
 	if ((mState == kWasListMessagesValid) && (evt == kNo)) return kShowErrorLoadingInbox; else
 	if ((mState == kWasListMessagesValid) && (evt == kYes)) return kSortTableByDate;
 
@@ -429,6 +487,7 @@ bool InboxScreen::HasEdgeNamedNext() const
 		case kPeerReloadTable:
 		case kSetWaitForDeleteMessage:
 		case kSetWaitForGetContacts:
+		case kSetWaitForGetGroups:
 		case kSetWaitForListMessages:
 		case kSortTableByDate:
 		case kStart:
@@ -459,6 +518,10 @@ void InboxScreen::update(const URLLoaderEvent& msg)
                 {
                     case kSendGetContactsToServer:
                         mGetContactsJSON = JSONUtil::extract(msg.mString);
+                        break;
+
+                    case kSendGetGroupsToServer:
+                        mGetGroupsJSON = JSONUtil::extract(msg.mString);
                         break;
 
                     case kSendListMessagesToServer:
@@ -500,6 +563,8 @@ void InboxScreen::update(const GCTEvent& msg)
 
         case kShowErrorDeletingMessage:
         case kShowErrorLoadingInbox:
+        case kShowErrorLoadingContacts:
+        case kShowErrorLoadingGroups:
         case kShowRetryListMessages:
             switch(msg.mEvent)
             {
