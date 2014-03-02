@@ -12,6 +12,9 @@ include 'markRead.php';
 include 'getContacts.php';
 include 'setContacts.php';
 
+include 'getGroups.php';
+include 'setGroups.php';
+
 include 'postAudio.php';
 include 'postMessage.php';
 include 'postTranscription.php';
@@ -25,6 +28,13 @@ if(hasParam("action"))
 			if (hasParam("name"))
 			{
 				print(json_encode(setContacts($_POST["name"])));
+			}
+		}
+		else if ($_POST["action"] === "setGroups")
+		{
+			if (hasParam("name"))
+			{
+				print(json_encode(setGroups($_POST["name"])));
 			}
 		}
 		else if ($_POST["action"] === "postAudio")
@@ -106,6 +116,10 @@ if(hasParam("action"))
 				break;
 
 			case "getContacts":
+				print(json_encode(getContacts($_GET["name"])));
+				break;
+
+			case "getGroups":
 				print(json_encode(getContacts($_GET["name"])));
 				break;
 
