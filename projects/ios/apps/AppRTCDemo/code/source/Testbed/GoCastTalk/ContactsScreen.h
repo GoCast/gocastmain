@@ -23,6 +23,7 @@ public:
 	~ContactsScreen();
 
     void        contactPressed(const size_t& i);
+    void        groupPressed(const size_t& i);
     void        editPressed();
     void        deletePressed(const size_t& i);
     void        refreshPressed();

@@ -73,8 +73,7 @@
     {
         if (self->mInGroupsView)
         {
-            //TODO: Groups support
-            return 0;
+            return (NSInteger)InboxScreen::mGroups.size();
         }
 
         return (NSInteger)InboxScreen::mContacts.size();
@@ -110,15 +109,34 @@
             cell = [[[HeadingSubCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:simpleTableIdentifier] autorelease];
         }
 
-        std::string heading = InboxScreen::mContacts[(size_t)indexPath.row].mObject["kanji"].mString;
+        std::string heading;
+        std::string subheading;
 
-        if (heading.empty())
+        if (!self->mInGroupsView)
         {
-            heading = InboxScreen::mContacts[(size_t)indexPath.row].mObject["email"].mString;
+            heading = InboxScreen::mContacts[(size_t)indexPath.row].mObject["kanji"].mString;
+
+            if (heading.empty())
+            {
+                heading = InboxScreen::mContacts[(size_t)indexPath.row].mObject["email"].mString;
+            }
+        }
+        else
+        {
+            heading = InboxScreen::mGroups[(size_t)indexPath.row].mObject["name"].mString;
+
+            for(size_t i = 0; i < InboxScreen::mGroups[(size_t)indexPath.row].mObject["emails"].mArray.size(); i++)
+            {
+                subheading += InboxScreen::mGroups[(size_t)indexPath.row].mObject["emails"].mArray[i].mString;
+                if (i != InboxScreen::mGroups[(size_t)indexPath.row].mObject["emails"].mArray.size() - 1)
+                {
+                    subheading += ", ";
+                }
+            }
         }
 
         cell.mHeading.text = [NSString stringWithUTF8String:heading.c_str()];
-        cell.mSub.text = [NSString stringWithUTF8String:""];
+        cell.mSub.text = [NSString stringWithUTF8String:subheading.c_str()];
         cell.mRightArrow.hidden = YES;
         
         return cell;
@@ -150,7 +168,7 @@
     {
         if (self->mInGroupsView)
         {
-            //TODO: Groups pressed support
+            mPeer->groupPressed((size_t)indexPath.row);
         }
         else
         {

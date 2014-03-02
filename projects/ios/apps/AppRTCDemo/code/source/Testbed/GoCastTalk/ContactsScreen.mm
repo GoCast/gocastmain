@@ -29,6 +29,11 @@ void ContactsScreen::contactPressed(const size_t& i)
     }
 }
 
+void ContactsScreen::groupPressed(const size_t& i)
+{
+#pragma unused(i)
+    //TODO: Implement
+}
 void ContactsScreen::editPressed()
 {
     if (getState() == kIdle)
