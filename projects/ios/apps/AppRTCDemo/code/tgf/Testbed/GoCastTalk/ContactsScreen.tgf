@@ -13,13 +13,19 @@
 13 Was setContacts successful?
 14 Show "Error with setContacts"
 15 Send ReloadInbox to VC
+16 Delete local group
+17 Set wait for setGroups
+18 Send setGroups to server
+19 Was setGroups successful?
+20 Show "Error with setGroups"
+21 Show "not yet implemented"
 #
 1 3
 3 4 refreshSelected
 4 3
-3 5 helpPressed
+3 5 editContactsPressed
 5 3
-3 7 itemSelected
+3 7 contactSelected
 6 3 yes
 7 6 no
 7 8 yes
@@ -31,6 +37,16 @@
 12 14 fail
 13 15 yes
 10 11
-3 10 deleteSelected
+3 10 deleteContact
 15 4
 14 3 yes
+19 20 no
+18 19 success
+17 18
+18 20 fail
+19 15 yes
+16 17
+3 16 deleteGroup
+20 3 yes
+3 21 groupSelected, editGroupsPressed
+21 3 yes

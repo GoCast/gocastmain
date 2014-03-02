@@ -194,7 +194,14 @@
 #pragma unused(tableView, indexPath)
     if (editingStyle == UITableViewCellEditingStyleDelete)
     {
-        mPeer->deletePressed((size_t)indexPath.row);
+        if (!self->mInGroupsView)
+        {
+            mPeer->deleteContactPressed((size_t)indexPath.row);
+        }
+        else
+        {
+            mPeer->deleteGroupPressed((size_t)indexPath.row);
+        }
     }
 }
 
@@ -211,7 +218,14 @@
 -(IBAction)helpButton:(UIBarButtonItem *)sender
 {
 #pragma unused(sender)
-    mPeer->editPressed();
+    if (!self->mInGroupsView)
+    {
+        mPeer->editContactsPressed();
+    }
+    else
+    {
+        mPeer->editGroupsPressed();
+    }
 }
 
 -(IBAction)contactsGroupsValueChanged:(id)sender

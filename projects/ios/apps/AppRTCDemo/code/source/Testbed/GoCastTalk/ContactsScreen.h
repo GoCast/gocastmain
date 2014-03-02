@@ -13,6 +13,7 @@ class ContactsScreen
 protected:
     ContactsVC* mPeer;
     JSONObject  mSetContactsJSON;
+    JSONObject  mSetGroupsJSON;
     size_t      mItemSelected;
     size_t      mDeleteSelected;
     void*       mIdentifier;
@@ -24,8 +25,10 @@ public:
 
     void        contactPressed(const size_t& i);
     void        groupPressed(const size_t& i);
-    void        editPressed();
-    void        deletePressed(const size_t& i);
+    void        editContactsPressed();
+    void        editGroupsPressed();
+    void        deleteContactPressed(const size_t& i);
+    void        deleteGroupPressed(const size_t& i);
     void        refreshPressed();
 
 protected:
@@ -34,6 +37,7 @@ protected:
 	void invalidStateEntry();
 
 	void deleteLocalContactEntry();
+	void deleteLocalGroupEntry();
 	void idleEntry();
 	void isThisAChildScreenEntry();
 	void peerPopSelfEntry();
@@ -43,19 +47,27 @@ protected:
 	void sendAppendNewContactToVCEntry();
 	void sendReloadInboxToVCEntry();
 	void sendSetContactsToServerEntry();
+	void sendSetGroupsToServerEntry();
 	void setWaitForSetContactsEntry();
+	void setWaitForSetGroupsEntry();
 	void showErrorWithSetContactsEntry();
+	void showErrorWithSetGroupsEntry();
+	void showNotYetImplementedEntry();
 	void wasSetContactsSuccessfulEntry();
+	void wasSetGroupsSuccessfulEntry();
 
 public:
 	enum EventType
 	{
 		kInvalidEvent = -2,
 		kNext = -1,
-		kDeleteSelected,
+		kContactSelected,
+		kDeleteContact,
+		kDeleteGroup,
+		kEditContactsPressed,
+		kEditGroupsPressed,
 		kFail,
-		kHelpPressed,
-		kItemSelected,
+		kGroupSelected,
 		kNo,
 		kRefreshSelected,
 		kSuccess,
@@ -67,6 +79,7 @@ public:
 		kInvalidState = 0,
 		kStart = 1,
 		kDeleteLocalContact,
+		kDeleteLocalGroup,
 		kEnd,
 		kIdle,
 		kIsThisAChildScreen,
@@ -77,9 +90,14 @@ public:
 		kSendAppendNewContactToVC,
 		kSendReloadInboxToVC,
 		kSendSetContactsToServer,
+		kSendSetGroupsToServer,
 		kSetWaitForSetContacts,
+		kSetWaitForSetGroups,
 		kShowErrorWithSetContacts,
+		kShowErrorWithSetGroups,
+		kShowNotYetImplemented,
 		kWasSetContactsSuccessful,
+		kWasSetGroupsSuccessful,
 	};
 
 protected:
