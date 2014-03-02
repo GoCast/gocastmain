@@ -10,7 +10,6 @@ public:
         kInboxTabPressed,
         kNewMemoTabPressed,
         kContactsTabPressed,
-        kGroupsTabPressed,
         kSettingsTabPressed,
 
 //--

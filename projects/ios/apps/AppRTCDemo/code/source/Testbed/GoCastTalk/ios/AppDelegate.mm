@@ -10,7 +10,6 @@
 #import "SubVC/RecordMessageVC.h"
 
 #import "VC/ContactsVC.h"
-#import "VC/GroupsVC.h"
 
 #import "VC/LoginVC.h"
 #import "SubVC/MessageSentVC.h"
@@ -74,19 +73,11 @@ const unsigned char SpeechKitApplicationKey[] =
 
     [self ctorRecorder];
 
-    //TODO: This removes the "groups" tab, for now; so remove it later
-    NSMutableArray * vcs = [NSMutableArray arrayWithArray:[self.tabBarController viewControllers]];
-
-	[vcs removeObjectAtIndex:3];
-
-	[self.tabBarController setViewControllers:vcs];
-
     if (floor(NSFoundationVersionNumber) > NSFoundationVersionNumber_iOS_6_1)
     {
         [self.mInboxNavBar      setBackgroundImage:[UIImage imageNamed:@"banner.png"] forBarMetrics:UIBarMetricsDefault];
         [self.mNewMemoNavBar    setBackgroundImage:[UIImage imageNamed:@"banner.png"] forBarMetrics:UIBarMetricsDefault];
         [self.mContactsNavBar   setBackgroundImage:[UIImage imageNamed:@"banner.png"] forBarMetrics:UIBarMetricsDefault];
-        [self.mGroupsNavBar     setBackgroundImage:[UIImage imageNamed:@"banner.png"] forBarMetrics:UIBarMetricsDefault];
         [self.mSettingsNavBar   setBackgroundImage:[UIImage imageNamed:@"banner.png"] forBarMetrics:UIBarMetricsDefault];
     }
 
@@ -259,10 +250,6 @@ const unsigned char SpeechKitApplicationKey[] =
         else if (viewController == self.mContactsVC)
         {
             GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kContactsTabPressed));
-        }
-        else if (viewController == self.mGroupsVC)
-        {
-            GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kGroupsTabPressed));
         }
         else if (viewController == self.mSettingsVC)
         {

@@ -192,8 +192,6 @@
 					'../../source/Testbed/GoCastTalk/<@(OS)/VC/InboxVC.mm',
 					'../../source/Testbed/GoCastTalk/<@(OS)/VC/ContactsVC.h',
 					'../../source/Testbed/GoCastTalk/<@(OS)/VC/ContactsVC.mm',
-					'../../source/Testbed/GoCastTalk/<@(OS)/VC/GroupsVC.h',
-					'../../source/Testbed/GoCastTalk/<@(OS)/VC/GroupsVC.mm',
 					'../../source/Testbed/GoCastTalk/<@(OS)/VC/SettingsVC.h',
 					'../../source/Testbed/GoCastTalk/<@(OS)/VC/SettingsVC.mm',
 
@@ -238,7 +236,6 @@
 
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/VC/InboxVC.xib',
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/VC/ContactsVC.xib',
-					'../../rsrc/Testbed/GoCastTalk/<@(OS)/VC/GroupsVC.xib',
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/VC/SettingsVC.xib',
 
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/SubVC/CreateContactVC.xib',
@@ -262,7 +259,6 @@
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/tab-inbox.png',
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/tab-newmemo.png',
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/tab-contacts.png',
-					'../../rsrc/Testbed/GoCastTalk/<@(OS)/tab-groups.png',
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/tab-settings.png',
 
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/icon-receive.png',
