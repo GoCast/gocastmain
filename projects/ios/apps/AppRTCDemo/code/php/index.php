@@ -120,7 +120,7 @@ if(hasParam("action"))
 				break;
 
 			case "getGroups":
-				print(json_encode(getContacts($_GET["name"])));
+				print(json_encode(getGroups($_GET["name"])));
 				break;
 
 			case "listMessages":
