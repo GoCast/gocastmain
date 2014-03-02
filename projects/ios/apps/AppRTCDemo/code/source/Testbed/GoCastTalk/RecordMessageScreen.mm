@@ -707,56 +707,81 @@ void RecordMessageScreen::update(const URLLoaderEvent& msg)
 
 void RecordMessageScreen::update(const GCTEvent& msg)
 {
-    if (msg.mEvent == GCTEvent::kAppendNewContact)
+    switch(msg.mEvent)
     {
-        if (msg.mIdentifier == this)
-        {
-            bool found = false;
-
-            for(size_t i = 0; i < mInitObject["to"].mArray.size(); i++)
+        case GCTEvent::kAppendNewContact:
+            if (msg.mIdentifier == this)
             {
-                found |= (mInitObject["to"].mArray[i].mString == msg.mContact);
+                bool found = false;
+
+                for(size_t i = 0; i < mInitObject["to"].mArray.size(); i++)
+                {
+                    found |= (mInitObject["to"].mArray[i].mString == msg.mContact);
+                }
+
+                if (!found)
+                {
+                    mInitObject["to"].mArray.push_back(msg.mContact);
+                    [mPeer refreshExpanded];
+                }
             }
+            break;
 
-            if (!found)
+        case GCTEvent::kAppendNewGroup:
+            if (msg.mIdentifier == this)
             {
-                mInitObject["to"].mArray.push_back(msg.mContact);
+                for(size_t j = 0; j < msg.mGroup.size(); j++)
+                {
+                    bool found = false;
+
+                    for(size_t i = 0; i < mInitObject["to"].mArray.size(); i++)
+                    {
+                        found |= (mInitObject["to"].mArray[i].mString == msg.mGroup[j].mString);
+                    }
+
+                    if (!found)
+                    {
+                        mInitObject["to"].mArray.push_back(msg.mGroup[j].mString);
+                    }
+                }
                 [mPeer refreshExpanded];
             }
-        }
-    }
-    else if (msg.mEvent == GCTEvent::kTranscriptFinished)
-    {
-        mGotTranscriptionEvent = true;
+            break;
 
-        mTranscription["ja"] = msg.mTranscription;
-        tFile(tFile::kTemporaryDirectory, "transcript.json").write(JSONValue(mTranscription).toString().c_str());
+        case GCTEvent::kTranscriptFinished:
+            {
+                mGotTranscriptionEvent = true;
 
-        if (getState() == kWaitForTranscriptionIdle)
-        {
-            process(kTranscriptionReady);
-        }
-    }
-    else
-    {
-        switch (getState())
-        {
-            case kShowNoAudioToSend:
-            case kShowPostAudioFailed:
-            case kShowNoContactsToSendTo:
-                switch(msg.mEvent)
+                mTranscription["ja"] = msg.mTranscription;
+                tFile(tFile::kTemporaryDirectory, "transcript.json").write(JSONValue(mTranscription).toString().c_str());
+
+                if (getState() == kWaitForTranscriptionIdle)
                 {
-                    case GCTEvent::kOKYesAlertPressed:  process(kYes); break;
-                    case GCTEvent::kNoAlertPressed:     process(kNo); break;
-
-                    default:
-                        break;
+                    process(kTranscriptionReady);
                 }
-                break;
+            }
+            break;
 
-            default:
-                break;
-        }
+        default:
+            switch (getState())
+            {
+                case kShowNoAudioToSend:
+                case kShowPostAudioFailed:
+                case kShowNoContactsToSendTo:
+                    switch(msg.mEvent)
+                    {
+                        case GCTEvent::kOKYesAlertPressed:  process(kYes); break;
+                        case GCTEvent::kNoAlertPressed:     process(kNo); break;
+
+                        default:
+                            break;
+                    }
+                    break;
+
+                default:
+                    break;
+            }
+            break;
     }
 }
 

@@ -40,11 +40,13 @@ protected:
 	void deleteLocalGroupEntry();
 	void idleEntry();
 	void isThisAChildScreenEntry();
+	void isThisAChildScreenGroupsEntry();
 	void peerPopSelfEntry();
 	void peerPushChangeRegisteredNameEntry();
 	void peerPushEditContactsEntry();
 	void peerReloadTableEntry();
 	void sendAppendNewContactToVCEntry();
+	void sendAppendNewGroupToVCEntry();
 	void sendReloadInboxToVCEntry();
 	void sendSetContactsToServerEntry();
 	void sendSetGroupsToServerEntry();
@@ -83,11 +85,13 @@ public:
 		kEnd,
 		kIdle,
 		kIsThisAChildScreen,
+		kIsThisAChildScreenGroups,
 		kPeerPopSelf,
 		kPeerPushChangeRegisteredName,
 		kPeerPushEditContacts,
 		kPeerReloadTable,
 		kSendAppendNewContactToVC,
+		kSendAppendNewGroupToVC,
 		kSendReloadInboxToVC,
 		kSendSetContactsToServer,
 		kSendSetGroupsToServer,

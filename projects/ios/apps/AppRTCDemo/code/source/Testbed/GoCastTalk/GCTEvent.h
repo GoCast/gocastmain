@@ -1,5 +1,7 @@
 #pragma once
 
+#include "JSONUtil.h"
+
 class GCTEvent
 {
 public:
@@ -19,9 +21,11 @@ public:
         kTranscriptFinished,
         kReloadInbox,
         kAppendNewContact,
+        kAppendNewGroup,
     };
 
     EventType   mEvent;
+    JSONArray   mGroup;
     std::string mTranscription;
     std::string mContact;
     tUInt32     mItemSelected;
@@ -35,5 +39,7 @@ public:
     : mEvent(evt), mTranscription(newTranscription), mContact(newTranscription) { }
     GCTEvent(EventType evt, const std::string& newTranscription, void* newIdentifier)
     : mEvent(evt), mContact(newTranscription), mIdentifier(newIdentifier) { }
+    GCTEvent(EventType evt, const JSONArray& newGroup, void* newIdentifier)
+    : mEvent(evt), mGroup(newGroup), mIdentifier(newIdentifier) { }
 };
 
