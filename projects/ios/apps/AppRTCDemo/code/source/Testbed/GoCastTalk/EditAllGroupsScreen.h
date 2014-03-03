@@ -32,12 +32,13 @@ protected:
 
 	void deleteLocalGroupEntry();
 	void idleEntry();
+	void peerPushEditOneGroupForExistingEntry();
+	void peerPushEditOneGroupForNewEntry();
 	void peerReloadTableEntry();
 	void sendReloadInboxToVCEntry();
 	void sendSetGroupsToServerEntry();
 	void setWaitForSetGroupsEntry();
 	void showErrorWithSetGroupsEntry();
-	void showNotYetImplementedEntry();
 	void wasSetGroupsSuccessfulEntry();
 
 public:
@@ -62,12 +63,13 @@ public:
 		kDeleteLocalGroup,
 		kEnd,
 		kIdle,
+		kPeerPushEditOneGroupForExisting,
+		kPeerPushEditOneGroupForNew,
 		kPeerReloadTable,
 		kSendReloadInboxToVC,
 		kSendSetGroupsToServer,
 		kSetWaitForSetGroups,
 		kShowErrorWithSetGroups,
-		kShowNotYetImplemented,
 		kWasSetGroupsSuccessful,
 	};
 

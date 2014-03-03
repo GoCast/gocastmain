@@ -1,5 +1,5 @@
-#include "EditAllGroupsVC.h"
 #include "EditOneGroupVC.h"
+#include "RecordMessageVC.h"
 
 #include "Base/package.h"
 #include "Io/package.h"
@@ -10,12 +10,12 @@
 #import "InboxEntryCell.h"
 #import "HeadingSubCell.h"
 
-@interface EditAllGroupsVC()
+@interface EditOneGroupVC()
 {
 }
 @end
 
-@implementation EditAllGroupsVC
+@implementation EditOneGroupVC
 
 #pragma mark Construction / Destruction
 - (void)viewDidLoad
@@ -29,11 +29,28 @@
     self.view.autoresizesSubviews = YES;
     self.view.opaque = NO;
 
-    mPeer = new EditAllGroupsScreen(self);
+    mPeer = new EditOneGroupScreen(self, mInitObject);
+
+    self.mGroupName.text = [NSString stringWithUTF8String:mInitObject["name"].mString.c_str()];
 }
 
 - (void)viewDidLayoutSubviews
 {
+    CGRect q, r;
+
+    q = [self.mTable frame];
+    r = [self.mButton frame];
+
+    r.origin.y   = gAppDelegateInstance->mScreenHeight;
+    r.origin.y  -= gAppDelegateInstance->mTabBarHeight;
+    r.origin.y  -= gAppDelegateInstance->mNavBarHeight;
+    r.origin.y  -= gAppDelegateInstance->mStatusBarHeight;
+    r.origin.y  -= 40;
+
+    q.size.height = r.origin.y - q.origin.y - 5;
+
+    [self.mTable setFrame:q];
+    [self.mButton setFrame:r];
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -54,7 +71,7 @@
 
     if (tableView == self.mTable)
     {
-        return (NSInteger)InboxScreen::mGroups.size();
+        return (NSInteger)InboxScreen::mContacts.size();
     }
 
     return (NSInteger)1;
@@ -88,22 +105,10 @@
             cell = [[[HeadingSubCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:simpleTableIdentifier] autorelease];
         }
 
-        std::string heading;
-        std::string subheading;
+        cell.mHeading.text  = [NSString stringWithUTF8String:InboxScreen::mContacts[(size_t)indexPath.row].mObject["email"].mString.c_str()];
+        cell.mSub.text      = [NSString stringWithUTF8String:InboxScreen::mContacts[(size_t)indexPath.row].mObject["email"].mString.c_str()];
 
-        heading = InboxScreen::mGroups[(size_t)indexPath.row].mObject["name"].mString;
-
-        for(size_t i = 0; i < InboxScreen::mGroups[(size_t)indexPath.row].mObject["emails"].mArray.size(); i++)
-        {
-            subheading += InboxScreen::mGroups[(size_t)indexPath.row].mObject["emails"].mArray[i].mString;
-            if (i != InboxScreen::mGroups[(size_t)indexPath.row].mObject["emails"].mArray.size() - 1)
-            {
-                subheading += ", ";
-            }
-        }
-
-        cell.mHeading.text = [NSString stringWithUTF8String:heading.c_str()];
-        cell.mSub.text = [NSString stringWithUTF8String:subheading.c_str()];
+        [cell.mCheckbox setHidden: mPeer->isChecked((size_t)indexPath.row) ? NO : YES];
         [cell.mRightArrow setHidden:YES];
 
         return cell;
@@ -133,14 +138,14 @@
 {
     if (tableView == self.mTable)
     {
-        mPeer->groupPressed((size_t)indexPath.row);
+        mPeer->contactPressed((size_t)indexPath.row);
     }
 }
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
 {
 #pragma unused(tableView, indexPath)
-    return YES;
+    return NO;
 }
 
 // Override to support editing the table view.
@@ -149,7 +154,10 @@
 #pragma unused(tableView, indexPath)
     if (editingStyle == UITableViewCellEditingStyleDelete)
     {
-        mPeer->deleteGroupPressed((size_t)indexPath.row);
+//        if (tableView == self.mTable)
+//        {
+//            GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kTableItemDeleted, (tUInt32)indexPath.row));
+//        }
     }
 }
 
@@ -163,14 +171,6 @@
     [self.mTable reloadData];
 }
 
--(void) pushEditOneGroup:(const JSONObject &)newObject
-{
-    EditOneGroupVC* nextVC = [[[EditOneGroupVC alloc] initWithNibName:@"EditOneGroupVC" bundle:nil] autorelease];
-    [nextVC customInit:newObject];
-    [(UINavigationController*)self.parentViewController  pushViewController:nextVC animated:YES];
-}
-
-
 -(void) popSelf
 {
     [(UINavigationController*)self.parentViewController popViewControllerAnimated:TRUE];
@@ -183,9 +183,23 @@
     return YES;
 }
 
--(IBAction)createPressed
+-(void)customInit:(const JSONObject&)newObject
 {
-    mPeer->pressCreate();
+    mInitObject = newObject;
+}
+
+-(void) pushRecordMessage:(const JSONObject &)newObject
+{
+    RecordMessageVC* nextVC = [[[RecordMessageVC alloc] initWithNibName:@"RecordMessageVC" bundle:nil] autorelease];
+    [nextVC customInit:newObject isForwarded:false];
+    [(UINavigationController*)self.parentViewController  pushViewController:nextVC animated:YES];
+}
+
+-(IBAction)donePressed
+{
+    const char* result = [self.mGroupName.text UTF8String];
+
+    mPeer->pressDone(result ? result : "");
 }
 
 @end

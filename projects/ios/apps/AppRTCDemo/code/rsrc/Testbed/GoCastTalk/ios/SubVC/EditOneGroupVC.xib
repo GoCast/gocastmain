@@ -5,9 +5,11 @@
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="3747"/>
     </dependencies>
     <objects>
-        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="EditAllGroupsVC">
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="EditOneGroupVC">
             <connections>
-                <outlet property="mBlockingView" destination="Gc4-Qg-p6m" id="arz-sM-3QP"/>
+                <outlet property="mBlockingView" destination="EPg-20-j34" id="P8e-40-fp8"/>
+                <outlet property="mButton" destination="VNh-az-C5P" id="Q8x-xI-tBL"/>
+                <outlet property="mGroupName" destination="0mA-VC-yiz" id="odc-je-vNa"/>
                 <outlet property="mTable" destination="z21-Cl-G0s" id="0iK-XB-0fR"/>
                 <outlet property="view" destination="8X3-rk-235" id="S1R-L2-DpG"/>
             </connections>
@@ -17,30 +19,39 @@
             <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
             <subviews>
-                <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" style="plain" separatorStyle="default" allowsSelectionDuringEditing="YES" rowHeight="82" sectionHeaderHeight="22" sectionFooterHeight="22" id="z21-Cl-G0s" userLabel="mTable">
-                    <rect key="frame" x="0.0" y="69" width="320" height="499"/>
-                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" style="plain" separatorStyle="default" allowsSelectionDuringEditing="YES" showsSelectionImmediatelyOnTouchBegin="NO" rowHeight="82" sectionHeaderHeight="22" sectionFooterHeight="22" id="z21-Cl-G0s" userLabel="mTable">
+                    <rect key="frame" x="0.0" y="69" width="320" height="419"/>
+                    <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" heightSizable="YES" flexibleMaxY="YES"/>
                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     <connections>
                         <outlet property="dataSource" destination="-1" id="7Wv-Gn-kuF"/>
                         <outlet property="delegate" destination="-1" id="bkq-vg-Q8G"/>
                     </connections>
                 </tableView>
-                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="Qbh-eJ-3Ym">
-                    <rect key="frame" x="70" y="20" width="180" height="30"/>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="VNh-az-C5P" userLabel="mButton">
+                    <rect key="frame" x="85" y="507" width="150" height="30"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                    <state key="normal" title="Create a New Group">
+                    <state key="normal" title="Done">
                         <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                     </state>
                     <connections>
-                        <action selector="createPressed" destination="-1" eventType="touchUpInside" id="Grh-by-qhD"/>
+                        <action selector="donePressed" destination="-1" eventType="touchUpInside" id="Weo-sY-o4f"/>
                     </connections>
                 </button>
-                <view hidden="YES" alpha="0.20000000298023224" contentMode="scaleToFill" id="Gc4-Qg-p6m" userLabel="mBlockingView">
+                <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="center" minimumFontSize="17" id="0mA-VC-yiz" userLabel="mGroupName">
+                    <rect key="frame" x="20" y="20" width="280" height="30"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                    <textInputTraits key="textInputTraits"/>
+                    <connections>
+                        <outlet property="delegate" destination="-1" id="KWx-Jb-7nk"/>
+                    </connections>
+                </textField>
+                <view hidden="YES" alpha="0.20000000298023224" contentMode="scaleToFill" id="EPg-20-j34" userLabel="mBlockingView">
                     <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                     <subviews>
-                        <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" animating="YES" style="whiteLarge" id="O9V-gc-1Bo">
+                        <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" animating="YES" style="whiteLarge" id="XT6-BW-Iea">
                             <rect key="frame" x="142" y="221" width="37" height="37"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <color key="color" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
@@ -49,7 +60,7 @@
                     <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                 </view>
             </subviews>
-            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+            <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
             <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina4"/>
         </view>
     </objects>

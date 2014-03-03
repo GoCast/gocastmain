@@ -77,6 +77,16 @@ void EditAllGroupsScreen::peerReloadTableEntry()
     [mPeer reloadTable];
 }
 
+void EditAllGroupsScreen::peerPushEditOneGroupForExistingEntry()
+{
+    [mPeer pushEditOneGroup:InboxScreen::mGroups[mItemSelected].mObject];
+}
+
+void EditAllGroupsScreen::peerPushEditOneGroupForNewEntry()
+{
+    [mPeer pushEditOneGroup:JSONObject()];
+}
+
 #pragma mark Queries
 void EditAllGroupsScreen::wasSetGroupsSuccessfulEntry()
 {
@@ -125,11 +135,6 @@ void EditAllGroupsScreen::showErrorWithSetGroupsEntry()
     tAlert("Error saving group details");
 }
 
-void EditAllGroupsScreen::showNotYetImplementedEntry()
-{
-    tAlert("Not yet implemented");
-}
-
 #pragma mark Sending messages to other machines
 void EditAllGroupsScreen::sendReloadInboxToVCEntry()
 {
@@ -145,12 +150,13 @@ void EditAllGroupsScreen::CallEntry()
 		case kEnd: EndEntryHelper(); break;
 		case kIdle: idleEntry(); break;
 		case kInvalidState: invalidStateEntry(); break;
+		case kPeerPushEditOneGroupForExisting: peerPushEditOneGroupForExistingEntry(); break;
+		case kPeerPushEditOneGroupForNew: peerPushEditOneGroupForNewEntry(); break;
 		case kPeerReloadTable: peerReloadTableEntry(); break;
 		case kSendReloadInboxToVC: sendReloadInboxToVCEntry(); break;
 		case kSendSetGroupsToServer: sendSetGroupsToServerEntry(); break;
 		case kSetWaitForSetGroups: setWaitForSetGroupsEntry(); break;
 		case kShowErrorWithSetGroups: showErrorWithSetGroupsEntry(); break;
-		case kShowNotYetImplemented: showNotYetImplementedEntry(); break;
 		case kStart: startEntry(); break;
 		case kWasSetGroupsSuccessful: wasSetGroupsSuccessfulEntry(); break;
 		default: break;
@@ -164,20 +170,20 @@ void EditAllGroupsScreen::CallExit()
 int  EditAllGroupsScreen::StateTransitionFunction(const int evt) const
 {
 	if ((mState == kDeleteLocalGroup) && (evt == kNext)) return kSetWaitForSetGroups; else
-	if ((mState == kIdle) && (evt == kCreatePressed)) return kShowNotYetImplemented; else
+	if ((mState == kIdle) && (evt == kCreatePressed)) return kPeerPushEditOneGroupForNew; else
 	if ((mState == kIdle) && (evt == kDeleteGroup)) return kDeleteLocalGroup; else
 	if ((mState == kIdle) && (evt == kFail)) return kIdle; else
-	if ((mState == kIdle) && (evt == kGroupSelected)) return kShowNotYetImplemented; else
+	if ((mState == kIdle) && (evt == kGroupSelected)) return kPeerPushEditOneGroupForExisting; else
 	if ((mState == kIdle) && (evt == kRefreshSelected)) return kPeerReloadTable; else
 	if ((mState == kIdle) && (evt == kSuccess)) return kIdle; else
+	if ((mState == kPeerPushEditOneGroupForExisting) && (evt == kNext)) return kIdle; else
+	if ((mState == kPeerPushEditOneGroupForNew) && (evt == kNext)) return kIdle; else
 	if ((mState == kPeerReloadTable) && (evt == kNext)) return kIdle; else
 	if ((mState == kSendReloadInboxToVC) && (evt == kNext)) return kPeerReloadTable; else
 	if ((mState == kSendSetGroupsToServer) && (evt == kFail)) return kShowErrorWithSetGroups; else
 	if ((mState == kSendSetGroupsToServer) && (evt == kSuccess)) return kWasSetGroupsSuccessful; else
 	if ((mState == kSetWaitForSetGroups) && (evt == kNext)) return kSendSetGroupsToServer; else
 	if ((mState == kShowErrorWithSetGroups) && (evt == kYes)) return kIdle; else
-	if ((mState == kShowNotYetImplemented) && (evt == kNo)) return kIdle; else
-	if ((mState == kShowNotYetImplemented) && (evt == kYes)) return kIdle; else
 	if ((mState == kStart) && (evt == kNext)) return kIdle; else
 	if ((mState == kWasSetGroupsSuccessful) && (evt == kNo)) return kShowErrorWithSetGroups; else
 	if ((mState == kWasSetGroupsSuccessful) && (evt == kYes)) return kSendReloadInboxToVC;
@@ -189,15 +195,16 @@ bool EditAllGroupsScreen::HasEdgeNamedNext() const
 {
 	switch(mState)
 	{
-		case kDeleteLocalGroup:
-		case kPeerReloadTable:
-		case kSendReloadInboxToVC:
-		case kSetWaitForSetGroups:
-		case kStart:
-			return true;
+		case kEnd:
+		case kIdle:
+		case kInvalidState:
+		case kSendSetGroupsToServer:
+		case kShowErrorWithSetGroups:
+		case kWasSetGroupsSuccessful:
+			return false;
 		default: break;
 	}
-	return false;
+	return true;
 }
 
 #pragma mark Messages
@@ -253,7 +260,6 @@ void EditAllGroupsScreen::update(const GCTEvent& msg)
             break;
 
         case kShowErrorWithSetGroups:
-        case kShowNotYetImplemented:
             switch(msg.mEvent)
             {
                 case GCTEvent::kOKYesAlertPressed:  process(kYes); break;

@@ -6,21 +6,24 @@
 class JSONValue;
 typedef std::map<std::string, JSONValue> JSONObject;
 
-class EditAllGroupsScreen;
+class EditOneGroupScreen;
 
-@interface EditAllGroupsVC : UIViewController
+@interface EditOneGroupVC : UIViewController
 <
     UITextFieldDelegate,
     UITableViewDelegate,
     UITableViewDataSource
 >
 {
-    EditAllGroupsScreen*    mPeer;
+    EditOneGroupScreen* mPeer;
+    JSONObject          mInitObject;
 }
 
 //mInboxView
 
 @property (nonatomic, strong) IBOutlet UITableView*     mTable;
+@property (nonatomic, strong) IBOutlet UITextField*     mGroupName;
+@property (nonatomic, strong) IBOutlet UIButton*        mButton;
 @property (nonatomic, strong) IBOutlet UIView*          mBlockingView;
 
 #pragma mark Construction / Destruction
@@ -33,14 +36,16 @@ class EditAllGroupsScreen;
 
 -(void)setBlockingViewVisible:(bool)newVisible;
 
--(void)reloadTable;
-
--(void) pushEditOneGroup:(const JSONObject&)newObject;
+-(void) reloadTable;
 
 -(void) popSelf;
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField;
 
--(IBAction)createPressed;
+-(void)customInit:(const JSONObject&)newObject;
+
+-(void) pushRecordMessage:(const JSONObject&)newObject;
+
+-(IBAction)donePressed;
 
 @end

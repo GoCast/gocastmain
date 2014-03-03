@@ -85,6 +85,12 @@
 				'outputs': [ '../../dummy', ],
 				'action': [ '<@(_graphcode)', '<@(_inputs)',  '--force-update', '--machine', 'EditAllGroupsScreen', '-h', '../../source/Testbed/GoCastTalk/EditAllGroupsScreen.h', '-cpp', '../../source/Testbed/GoCastTalk/EditAllGroupsScreen.mm', ],
 			},
+			{
+				'action_name': 'EditOneGroupScreen.tgf',
+				'inputs': [ '../../tgf/Testbed/GoCastTalk/EditOneGroupScreen.tgf', ],
+				'outputs': [ '../../dummy', ],
+				'action': [ '<@(_graphcode)', '<@(_inputs)',  '--force-update', '--machine', 'EditOneGroupScreen', '-h', '../../source/Testbed/GoCastTalk/EditOneGroupScreen.h', '-cpp', '../../source/Testbed/GoCastTalk/EditOneGroupScreen.mm', ],
+			},
 		],
 
 		'sources': [
@@ -116,6 +122,9 @@
 
 			'../../source/Testbed/GoCastTalk/EditAllGroupsScreen.mm',
 			'../../source/Testbed/GoCastTalk/EditAllGroupsScreen.h',
+
+			'../../source/Testbed/GoCastTalk/EditOneGroupScreen.mm',
+			'../../source/Testbed/GoCastTalk/EditOneGroupScreen.h',
 
 			'../../source/Testbed/GoCastTalk/CreateContactScreen.mm',
 			'../../source/Testbed/GoCastTalk/CreateContactScreen.h',
@@ -214,6 +223,8 @@
 
 					'../../source/Testbed/GoCastTalk/<@(OS)/SubVC/EditAllGroupsVC.h',
 					'../../source/Testbed/GoCastTalk/<@(OS)/SubVC/EditAllGroupsVC.mm',
+					'../../source/Testbed/GoCastTalk/<@(OS)/SubVC/EditOneGroupVC.h',
+					'../../source/Testbed/GoCastTalk/<@(OS)/SubVC/EditOneGroupVC.mm',
 					'../../source/Testbed/GoCastTalk/<@(OS)/SubVC/EditContactsVC.h',
 					'../../source/Testbed/GoCastTalk/<@(OS)/SubVC/EditContactsVC.mm',
 					'../../source/Testbed/GoCastTalk/<@(OS)/SubVC/ContactDetailsVC.h',
@@ -261,6 +272,7 @@
 
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/SubVC/CreateContactVC.xib',
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/SubVC/EditAllGroupsVC.xib',
+					'../../rsrc/Testbed/GoCastTalk/<@(OS)/SubVC/EditOneGroupVC.xib',
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/SubVC/EditContactsVC.xib',
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/SubVC/ContactDetailsVC.xib',
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/SubVC/MessageHistoryVC.xib',

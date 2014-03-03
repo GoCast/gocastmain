@@ -39,6 +39,7 @@
 
 #include "GroupViewScreen.h"
 #include "EditAllGroupsScreen.h"
+#include "EditOneGroupScreen.h"
 
 #include "ios/AppDelegate.h"
 
