@@ -45,6 +45,7 @@ class ContactsScreen;
 -(void) pushEditContacts;
 -(void) pushChangeRegisteredName:(const JSONObject&)newObject;
 -(void) pushGroupView:(const JSONObject&)newObject;
+-(void) pushEditAllGroups;
 
 -(void) customInit:(bool)newIsChild withIdentifier:(void*)newIdentifier;
 

@@ -79,6 +79,12 @@
 				'outputs': [ '../../dummy', ],
 				'action': [ '<@(_graphcode)', '<@(_inputs)',  '--force-update', '--machine', 'GroupViewScreen', '-h', '../../source/Testbed/GoCastTalk/GroupViewScreen.h', '-cpp', '../../source/Testbed/GoCastTalk/GroupViewScreen.mm', ],
 			},
+			{
+				'action_name': 'EditAllGroupsScreen.tgf',
+				'inputs': [ '../../tgf/Testbed/GoCastTalk/EditAllGroupsScreen.tgf', ],
+				'outputs': [ '../../dummy', ],
+				'action': [ '<@(_graphcode)', '<@(_inputs)',  '--force-update', '--machine', 'EditAllGroupsScreen', '-h', '../../source/Testbed/GoCastTalk/EditAllGroupsScreen.h', '-cpp', '../../source/Testbed/GoCastTalk/EditAllGroupsScreen.mm', ],
+			},
 		],
 
 		'sources': [
@@ -107,6 +113,9 @@
 
 			'../../source/Testbed/GoCastTalk/EditContactsScreen.mm',
 			'../../source/Testbed/GoCastTalk/EditContactsScreen.h',
+
+			'../../source/Testbed/GoCastTalk/EditAllGroupsScreen.mm',
+			'../../source/Testbed/GoCastTalk/EditAllGroupsScreen.h',
 
 			'../../source/Testbed/GoCastTalk/CreateContactScreen.mm',
 			'../../source/Testbed/GoCastTalk/CreateContactScreen.h',
@@ -203,6 +212,8 @@
 					'../../source/Testbed/GoCastTalk/<@(OS)/VC/SettingsVC.h',
 					'../../source/Testbed/GoCastTalk/<@(OS)/VC/SettingsVC.mm',
 
+					'../../source/Testbed/GoCastTalk/<@(OS)/SubVC/EditAllGroupsVC.h',
+					'../../source/Testbed/GoCastTalk/<@(OS)/SubVC/EditAllGroupsVC.mm',
 					'../../source/Testbed/GoCastTalk/<@(OS)/SubVC/EditContactsVC.h',
 					'../../source/Testbed/GoCastTalk/<@(OS)/SubVC/EditContactsVC.mm',
 					'../../source/Testbed/GoCastTalk/<@(OS)/SubVC/ContactDetailsVC.h',
@@ -249,6 +260,7 @@
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/VC/SettingsVC.xib',
 
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/SubVC/CreateContactVC.xib',
+					'../../rsrc/Testbed/GoCastTalk/<@(OS)/SubVC/EditAllGroupsVC.xib',
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/SubVC/EditContactsVC.xib',
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/SubVC/ContactDetailsVC.xib',
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/SubVC/MessageHistoryVC.xib',
@@ -275,6 +287,7 @@
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/icon-receive.png',
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/icon-sent.png',
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/icon-right.png',
+					'../../rsrc/Testbed/GoCastTalk/<@(OS)/icon-check.png',
 
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/icon-tri-down.png',
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/icon-tri-right.png',

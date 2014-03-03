@@ -38,6 +38,7 @@
 #include "CreateContactScreen.h"
 
 #include "GroupViewScreen.h"
+#include "EditAllGroupsScreen.h"
 
 #include "ios/AppDelegate.h"
 

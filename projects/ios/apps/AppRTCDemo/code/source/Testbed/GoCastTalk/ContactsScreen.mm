@@ -112,6 +112,11 @@ void ContactsScreen::peerPushChangeRegisteredNameEntry()
     [mPeer pushChangeRegisteredName:InboxScreen::mContacts[mItemSelected].mObject];
 }
 
+void ContactsScreen::peerPushEditAllGroupsEntry()
+{
+    [mPeer pushEditAllGroups];
+}
+
 void ContactsScreen::peerPushEditContactsEntry()
 {
     [mPeer pushEditContacts];
@@ -232,11 +237,6 @@ void ContactsScreen::showErrorWithSetGroupsEntry()
     tAlert("Error saving group details");
 }
 
-void ContactsScreen::showNotYetImplementedEntry()
-{
-    tAlert("Not yet implemented");
-}
-
 #pragma mark Sending messages to other machines
 void ContactsScreen::sendAppendNewContactToVCEntry()
 {
@@ -267,6 +267,7 @@ void ContactsScreen::CallEntry()
 		case kIsThisAChildScreenGroups: isThisAChildScreenGroupsEntry(); break;
 		case kPeerPopSelf: peerPopSelfEntry(); break;
 		case kPeerPushChangeRegisteredName: peerPushChangeRegisteredNameEntry(); break;
+		case kPeerPushEditAllGroups: peerPushEditAllGroupsEntry(); break;
 		case kPeerPushEditContacts: peerPushEditContactsEntry(); break;
 		case kPeerPushGroupView: peerPushGroupViewEntry(); break;
 		case kPeerReloadTable: peerReloadTableEntry(); break;
@@ -279,7 +280,6 @@ void ContactsScreen::CallEntry()
 		case kSetWaitForSetGroups: setWaitForSetGroupsEntry(); break;
 		case kShowErrorWithSetContacts: showErrorWithSetContactsEntry(); break;
 		case kShowErrorWithSetGroups: showErrorWithSetGroupsEntry(); break;
-		case kShowNotYetImplemented: showNotYetImplementedEntry(); break;
 		case kStart: startEntry(); break;
 		case kWasSetContactsSuccessful: wasSetContactsSuccessfulEntry(); break;
 		case kWasSetGroupsSuccessful: wasSetGroupsSuccessfulEntry(); break;
@@ -299,7 +299,7 @@ int  ContactsScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kIdle) && (evt == kDeleteContact)) return kDeleteLocalContact; else
 	if ((mState == kIdle) && (evt == kDeleteGroup)) return kDeleteLocalGroup; else
 	if ((mState == kIdle) && (evt == kEditContactsPressed)) return kPeerPushEditContacts; else
-	if ((mState == kIdle) && (evt == kEditGroupsPressed)) return kShowNotYetImplemented; else
+	if ((mState == kIdle) && (evt == kEditGroupsPressed)) return kPeerPushEditAllGroups; else
 	if ((mState == kIdle) && (evt == kGroupSelected)) return kIsThisAChildScreenGroups; else
 	if ((mState == kIdle) && (evt == kRefreshSelected)) return kPeerReloadTable; else
 	if ((mState == kIsThisAChildScreen) && (evt == kNo)) return kPeerPushChangeRegisteredName; else
@@ -307,6 +307,7 @@ int  ContactsScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kIsThisAChildScreenGroups) && (evt == kNo)) return kPeerPushGroupView; else
 	if ((mState == kIsThisAChildScreenGroups) && (evt == kYes)) return kSendAppendNewGroupToVC; else
 	if ((mState == kPeerPushChangeRegisteredName) && (evt == kNext)) return kIdle; else
+	if ((mState == kPeerPushEditAllGroups) && (evt == kNext)) return kIdle; else
 	if ((mState == kPeerPushEditContacts) && (evt == kNext)) return kIdle; else
 	if ((mState == kPeerPushGroupView) && (evt == kNext)) return kIdle; else
 	if ((mState == kPeerReloadTable) && (evt == kNext)) return kIdle; else
@@ -321,7 +322,6 @@ int  ContactsScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kSetWaitForSetGroups) && (evt == kNext)) return kSendSetGroupsToServer; else
 	if ((mState == kShowErrorWithSetContacts) && (evt == kYes)) return kIdle; else
 	if ((mState == kShowErrorWithSetGroups) && (evt == kYes)) return kIdle; else
-	if ((mState == kShowNotYetImplemented) && (evt == kYes)) return kIdle; else
 	if ((mState == kStart) && (evt == kNext)) return kIdle; else
 	if ((mState == kWasSetContactsSuccessful) && (evt == kNo)) return kShowErrorWithSetContacts; else
 	if ((mState == kWasSetContactsSuccessful) && (evt == kYes)) return kSendReloadInboxToVC; else
@@ -335,22 +335,22 @@ bool ContactsScreen::HasEdgeNamedNext() const
 {
 	switch(mState)
 	{
-		case kDeleteLocalContact:
-		case kDeleteLocalGroup:
-		case kPeerPushChangeRegisteredName:
-		case kPeerPushEditContacts:
-		case kPeerPushGroupView:
-		case kPeerReloadTable:
-		case kSendAppendNewContactToVC:
-		case kSendAppendNewGroupToVC:
-		case kSendReloadInboxToVC:
-		case kSetWaitForSetContacts:
-		case kSetWaitForSetGroups:
-		case kStart:
-			return true;
+		case kEnd:
+		case kIdle:
+		case kInvalidState:
+		case kIsThisAChildScreen:
+		case kIsThisAChildScreenGroups:
+		case kPeerPopSelf:
+		case kSendSetContactsToServer:
+		case kSendSetGroupsToServer:
+		case kShowErrorWithSetContacts:
+		case kShowErrorWithSetGroups:
+		case kWasSetContactsSuccessful:
+		case kWasSetGroupsSuccessful:
+			return false;
 		default: break;
 	}
-	return false;
+	return true;
 }
 
 #pragma mark Messages
@@ -411,7 +411,6 @@ void ContactsScreen::update(const GCTEvent& msg)
 
         case kShowErrorWithSetContacts:
         case kShowErrorWithSetGroups:
-        case kShowNotYetImplemented:
             switch(msg.mEvent)
             {
                 case GCTEvent::kOKYesAlertPressed:  process(kYes); break;

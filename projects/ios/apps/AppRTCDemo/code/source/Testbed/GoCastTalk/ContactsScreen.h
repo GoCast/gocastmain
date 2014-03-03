@@ -43,6 +43,7 @@ protected:
 	void isThisAChildScreenGroupsEntry();
 	void peerPopSelfEntry();
 	void peerPushChangeRegisteredNameEntry();
+	void peerPushEditAllGroupsEntry();
 	void peerPushEditContactsEntry();
 	void peerPushGroupViewEntry();
 	void peerReloadTableEntry();
@@ -55,7 +56,6 @@ protected:
 	void setWaitForSetGroupsEntry();
 	void showErrorWithSetContactsEntry();
 	void showErrorWithSetGroupsEntry();
-	void showNotYetImplementedEntry();
 	void wasSetContactsSuccessfulEntry();
 	void wasSetGroupsSuccessfulEntry();
 
@@ -89,6 +89,7 @@ public:
 		kIsThisAChildScreenGroups,
 		kPeerPopSelf,
 		kPeerPushChangeRegisteredName,
+		kPeerPushEditAllGroups,
 		kPeerPushEditContacts,
 		kPeerPushGroupView,
 		kPeerReloadTable,
@@ -101,7 +102,6 @@ public:
 		kSetWaitForSetGroups,
 		kShowErrorWithSetContacts,
 		kShowErrorWithSetGroups,
-		kShowNotYetImplemented,
 		kWasSetContactsSuccessful,
 		kWasSetGroupsSuccessful,
 	};

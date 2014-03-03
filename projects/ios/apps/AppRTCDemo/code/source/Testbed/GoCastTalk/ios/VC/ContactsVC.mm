@@ -3,6 +3,7 @@
 #include "EditContactsVC.h"
 #include "ChangeRegisteredNameVC.h"
 #include "GroupViewVC.h"
+#include "EditAllGroupsVC.h"
 
 #include "Base/package.h"
 #include "Math/package.h"
@@ -260,6 +261,12 @@
 {
     GroupViewVC* nextVC = [[[GroupViewVC alloc] initWithNibName:@"GroupViewVC" bundle:nil] autorelease];
     [nextVC customInit:newObject];
+    [(UINavigationController*)self.parentViewController  pushViewController:nextVC animated:YES];
+}
+
+-(void) pushEditAllGroups
+{
+    EditAllGroupsVC* nextVC = [[[EditAllGroupsVC alloc] initWithNibName:@"EditAllGroupsVC" bundle:nil] autorelease];
     [(UINavigationController*)self.parentViewController  pushViewController:nextVC animated:YES];
 }
 
