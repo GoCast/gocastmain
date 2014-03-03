@@ -73,6 +73,12 @@
 				'outputs': [ '../../dummy', ],
 				'action': [ '<@(_graphcode)', '<@(_inputs)',  '--force-update', '--machine', 'ChangeRegisteredNameScreen', '-h', '../../source/Testbed/GoCastTalk/ChangeRegisteredNameScreen.h', '-cpp', '../../source/Testbed/GoCastTalk/ChangeRegisteredNameScreen.mm', ],
 			},
+			{
+				'action_name': 'GroupViewScreen.tgf',
+				'inputs': [ '../../tgf/Testbed/GoCastTalk/GroupViewScreen.tgf', ],
+				'outputs': [ '../../dummy', ],
+				'action': [ '<@(_graphcode)', '<@(_inputs)',  '--force-update', '--machine', 'GroupViewScreen', '-h', '../../source/Testbed/GoCastTalk/GroupViewScreen.h', '-cpp', '../../source/Testbed/GoCastTalk/GroupViewScreen.mm', ],
+			},
 		],
 
 		'sources': [
@@ -111,6 +117,8 @@
 			'../../source/Testbed/GoCastTalk/ChangeRegisteredNameScreen.mm',
 			'../../source/Testbed/GoCastTalk/ChangeRegisteredNameScreen.h',
 
+			'../../source/Testbed/GoCastTalk/GroupViewScreen.mm',
+			'../../source/Testbed/GoCastTalk/GroupViewScreen.h',
 #--
 
 			'../../source/Testbed/GoCastTalk/JSONUtil.mm',
@@ -207,6 +215,8 @@
 					'../../source/Testbed/GoCastTalk/<@(OS)/SubVC/RecordMessageVC.mm',
 					'../../source/Testbed/GoCastTalk/<@(OS)/SubVC/ChangeRegisteredNameVC.h',
 					'../../source/Testbed/GoCastTalk/<@(OS)/SubVC/ChangeRegisteredNameVC.mm',
+					'../../source/Testbed/GoCastTalk/<@(OS)/SubVC/GroupViewVC.h',
+					'../../source/Testbed/GoCastTalk/<@(OS)/SubVC/GroupViewVC.mm',
 					'../../source/Testbed/GoCastTalk/<@(OS)/SubVC/InboxMessageVC.h',
 					'../../source/Testbed/GoCastTalk/<@(OS)/SubVC/InboxMessageVC.mm',
 					'../../source/Testbed/GoCastTalk/<@(OS)/SubVC/MessageSentVC.h',
@@ -244,6 +254,7 @@
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/SubVC/MessageHistoryVC.xib',
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/SubVC/RecordMessageVC.xib',
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/SubVC/ChangeRegisteredNameVC.xib',
+					'../../rsrc/Testbed/GoCastTalk/<@(OS)/SubVC/GroupViewVC.xib',
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/SubVC/InboxMessageVC.xib',
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/SubVC/MessageSentVC.xib',
 

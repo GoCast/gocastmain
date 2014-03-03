@@ -44,6 +44,7 @@ protected:
 	void peerPopSelfEntry();
 	void peerPushChangeRegisteredNameEntry();
 	void peerPushEditContactsEntry();
+	void peerPushGroupViewEntry();
 	void peerReloadTableEntry();
 	void sendAppendNewContactToVCEntry();
 	void sendAppendNewGroupToVCEntry();
@@ -89,6 +90,7 @@ public:
 		kPeerPopSelf,
 		kPeerPushChangeRegisteredName,
 		kPeerPushEditContacts,
+		kPeerPushGroupView,
 		kPeerReloadTable,
 		kSendAppendNewContactToVC,
 		kSendAppendNewGroupToVC,

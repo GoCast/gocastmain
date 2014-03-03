@@ -117,6 +117,11 @@ void ContactsScreen::peerPushEditContactsEntry()
     [mPeer pushEditContacts];
 }
 
+void ContactsScreen::peerPushGroupViewEntry()
+{
+    [mPeer pushGroupView:InboxScreen::mGroups[mItemSelected].mObject];
+}
+
 void ContactsScreen::peerReloadTableEntry()
 {
     [mPeer reloadTable];
@@ -263,6 +268,7 @@ void ContactsScreen::CallEntry()
 		case kPeerPopSelf: peerPopSelfEntry(); break;
 		case kPeerPushChangeRegisteredName: peerPushChangeRegisteredNameEntry(); break;
 		case kPeerPushEditContacts: peerPushEditContactsEntry(); break;
+		case kPeerPushGroupView: peerPushGroupViewEntry(); break;
 		case kPeerReloadTable: peerReloadTableEntry(); break;
 		case kSendAppendNewContactToVC: sendAppendNewContactToVCEntry(); break;
 		case kSendAppendNewGroupToVC: sendAppendNewGroupToVCEntry(); break;
@@ -298,11 +304,11 @@ int  ContactsScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kIdle) && (evt == kRefreshSelected)) return kPeerReloadTable; else
 	if ((mState == kIsThisAChildScreen) && (evt == kNo)) return kPeerPushChangeRegisteredName; else
 	if ((mState == kIsThisAChildScreen) && (evt == kYes)) return kSendAppendNewContactToVC; else
-	if ((mState == kIsThisAChildScreenGroups) && (evt == kNo)) return kShowNotYetImplemented; else
+	if ((mState == kIsThisAChildScreenGroups) && (evt == kNo)) return kPeerPushGroupView; else
 	if ((mState == kIsThisAChildScreenGroups) && (evt == kYes)) return kSendAppendNewGroupToVC; else
 	if ((mState == kPeerPushChangeRegisteredName) && (evt == kNext)) return kIdle; else
-	if ((mState == kPeerPushChangeRegisteredName) && (evt == kYes)) return kIdle; else
 	if ((mState == kPeerPushEditContacts) && (evt == kNext)) return kIdle; else
+	if ((mState == kPeerPushGroupView) && (evt == kNext)) return kIdle; else
 	if ((mState == kPeerReloadTable) && (evt == kNext)) return kIdle; else
 	if ((mState == kSendAppendNewContactToVC) && (evt == kNext)) return kPeerPopSelf; else
 	if ((mState == kSendAppendNewGroupToVC) && (evt == kNext)) return kPeerPopSelf; else
@@ -333,6 +339,7 @@ bool ContactsScreen::HasEdgeNamedNext() const
 		case kDeleteLocalGroup:
 		case kPeerPushChangeRegisteredName:
 		case kPeerPushEditContacts:
+		case kPeerPushGroupView:
 		case kPeerReloadTable:
 		case kSendAppendNewContactToVC:
 		case kSendAppendNewGroupToVC:

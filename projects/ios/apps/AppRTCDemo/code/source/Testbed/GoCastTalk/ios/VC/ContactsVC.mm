@@ -2,6 +2,7 @@
 #include "ContactDetailsVC.h"
 #include "EditContactsVC.h"
 #include "ChangeRegisteredNameVC.h"
+#include "GroupViewVC.h"
 
 #include "Base/package.h"
 #include "Math/package.h"
@@ -251,6 +252,13 @@
 -(void) pushChangeRegisteredName:(const JSONObject&)newObject
 {
     ChangeRegisteredNameVC* nextVC = [[[ChangeRegisteredNameVC alloc] initWithNibName:@"ChangeRegisteredNameVC" bundle:nil] autorelease];
+    [nextVC customInit:newObject];
+    [(UINavigationController*)self.parentViewController  pushViewController:nextVC animated:YES];
+}
+
+-(void) pushGroupView:(const JSONObject&)newObject
+{
+    GroupViewVC* nextVC = [[[GroupViewVC alloc] initWithNibName:@"GroupViewVC" bundle:nil] autorelease];
     [nextVC customInit:newObject];
     [(UINavigationController*)self.parentViewController  pushViewController:nextVC animated:YES];
 }

@@ -37,6 +37,8 @@
 #include "ChangeRegisteredNameScreen.h"
 #include "CreateContactScreen.h"
 
+#include "GroupViewScreen.h"
+
 #include "ios/AppDelegate.h"
 
 extern AppDelegate* gAppDelegateInstance;
