@@ -17,13 +17,14 @@
     size_t              mIdentifier;
 }
 
--(void) setAsZero:(bool)expanded;
+-(void) setAsZero:(bool)expanded withLabel:(const std::string&)newLabel;
 -(void) setAsNonZero:(size_t)ident withLabel:(const std::string&)newLabel;
 
 -(void) setDelegate:(id <CCCellDelegate>)newDelegate;
 
 @property (nonatomic, strong) IBOutlet UIView       *mContentView;
 @property (nonatomic, strong) IBOutlet UILabel      *mTo;
+@property (nonatomic, strong) IBOutlet UILabel      *mToPrefix;
 @property (nonatomic, strong) IBOutlet UIButton     *mAddButton;
 @property (nonatomic, strong) IBOutlet UIButton     *mDelButton;
 @property (nonatomic, strong) IBOutlet UIImageView  *mArrowRight;

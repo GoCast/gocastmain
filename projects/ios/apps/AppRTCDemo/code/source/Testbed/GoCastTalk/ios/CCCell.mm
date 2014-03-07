@@ -16,11 +16,20 @@
     // Configure the view for the selected state
 }
 
--(void) setAsZero:(bool)expanded
+-(void) setAsZero:(bool)expanded withLabel:(const std::string&)newLabel
 {
     self->mIdentifier = 0;
 
-    self.mTo.text = [NSString stringWithUTF8String:"to: ..."];
+    self.mTo.text = [NSString stringWithUTF8String:newLabel.c_str()];
+    self.mTo.textColor = [UIColor lightGrayColor];
+
+    CGRect r = [self.mToPrefix frame];
+    CGRect q = [self.mTo frame];
+
+    q.origin.x = r.origin.x + 36;
+    [self.mTo setFrame:q];
+
+    [self.mToPrefix setHidden:NO];
 
     if (!expanded)
     {
@@ -41,6 +50,15 @@
     self->mIdentifier = ident;
 
     self.mTo.text = [NSString stringWithUTF8String:newLabel.c_str()];
+    self.mTo.textColor = [UIColor blackColor];
+
+    CGRect r = [self.mToPrefix frame];
+    CGRect q = [self.mTo frame];
+
+    q.origin.x = r.origin.x;
+    [self.mTo setFrame:q];
+
+    [self.mToPrefix setHidden:YES];
 
     [self.mArrowRight setHidden:YES];
     [self.mArrowDown setHidden:YES];

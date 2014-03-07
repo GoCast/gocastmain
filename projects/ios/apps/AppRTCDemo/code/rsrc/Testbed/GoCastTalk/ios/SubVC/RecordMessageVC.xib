@@ -144,7 +144,7 @@
             <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina4"/>
             <userDefinedRuntimeAttributes>
                 <userDefinedRuntimeAttribute type="size" keyPath="contentSize">
-                    <size key="value" width="320" height="449"/>
+                    <size key="value" width="320" height="489"/>
                 </userDefinedRuntimeAttribute>
             </userDefinedRuntimeAttributes>
         </scrollView>
