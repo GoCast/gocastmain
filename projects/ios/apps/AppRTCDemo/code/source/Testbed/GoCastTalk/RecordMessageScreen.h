@@ -64,7 +64,6 @@ protected:
 	void pauseAudioEntry();
 	void pausedIdleEntry();
 	void peerPopSelfEntry();
-	void peerPushMessageSentEntry();
 	void playAudioEntry();
 	void playingIdleEntry();
 	void recordingIdleEntry();
@@ -75,6 +74,8 @@ protected:
 	void sendReloadInboxToVCEntry();
 	void setWaitForPostAudioEntry();
 	void setWaitForTranscriptionEntry();
+	void showConfirmSendEntry();
+	void showMessageSentEntry();
 	void showNoContactsToSendToEntry();
 	void showPostAudioFailedEntry();
 	void startRecordingAudioEntry();
@@ -130,7 +131,6 @@ public:
 		kPauseAudio,
 		kPausedIdle,
 		kPeerPopSelf,
-		kPeerPushMessageSent,
 		kPlayAudio,
 		kPlayingIdle,
 		kRecordingIdle,
@@ -141,6 +141,8 @@ public:
 		kSendReloadInboxToVC,
 		kSetWaitForPostAudio,
 		kSetWaitForTranscription,
+		kShowConfirmSend,
+		kShowMessageSent,
 		kShowNoContactsToSendTo,
 		kShowPostAudioFailed,
 		kStartRecordingAudio,

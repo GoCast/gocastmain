@@ -31,14 +31,15 @@
 31 Show "no contacts to send to"
 32 Is forwarding message?
 33 Are we the "new memo" tab?
-34 Peer: push Message Sent
-35 Clear data and reload table
-36 Let "did post" be true
-37 Let "did post" be false
-38 Is "did post" true?
-39 Wait for transcription idle
-40 Set "Wait for transcription"
-41 Do we need to wait for transcription?
+34 Clear data and reload table
+35 Let "did post" be true
+36 Let "did post" be false
+37 Is "did post" true?
+38 Wait for transcription idle
+39 Set "Wait for transcription"
+40 Do we need to wait for transcription?
+41 Show "confirm send?"
+42 Show "Message sent"
 #
 3 4 no
 4 5 recordPressed
@@ -46,7 +47,7 @@
 5 7
 7 8 stopPressed
 1 24
-8 41
+8 40
 6 10 playPressed
 10 9
 9 11 pausePressed
@@ -75,26 +76,28 @@
 23 9
 25 3
 26 27 success
-27 36 yes
+27 35 yes
 27 18 no
 26 18 fail
 28 32
-14 38
-30 17 yes
+14 37
+30 41 yes
 31 6 yes
 30 31 no
 32 26 yes
 32 19 no
 33 29 no
-34 33
-33 35 yes
-35 24
-24 37
-36 14
-38 34 yes
-38 33 no
-37 3
-40 39
-39 25 transcriptionReady
-41 40 yes
-41 25 no
+33 34 yes
+34 24
+24 36
+35 14
+37 42 yes
+37 33 no
+36 3
+39 38
+38 25 transcriptionReady
+40 39 yes
+40 25 no
+41 17 yes
+41 6 no
+42 33 yes
