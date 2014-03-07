@@ -393,16 +393,6 @@ void RecordMessageScreen::stopRecordingAudioEntry()
     [gAppDelegateInstance stopRecorder];
 }
 
-void RecordMessageScreen::stopRecordingBeforePopEntry()
-{
-    [gAppDelegateInstance stopRecorder];
-}
-
-void RecordMessageScreen::stopRecordingBeforeSendEntry()
-{
-    [gAppDelegateInstance stopRecorder];
-}
-
 #pragma mark Sending to server
 
 void RecordMessageScreen::sendPostAudioToServerEntry()
@@ -468,11 +458,6 @@ void RecordMessageScreen::setWaitForTranscriptionEntry()
     [mPeer setBlockingViewVisible:true];
 }
 
-void RecordMessageScreen::showNoAudioToSendEntry()
-{
-    tAlert("Please record audio first.");
-}
-
 void RecordMessageScreen::showNoContactsToSendToEntry()
 {
     tAlert("Please add some recipients first.");
@@ -522,7 +507,6 @@ void RecordMessageScreen::CallEntry()
 		case kSendReloadInboxToVC: sendReloadInboxToVCEntry(); break;
 		case kSetWaitForPostAudio: setWaitForPostAudioEntry(); break;
 		case kSetWaitForTranscription: setWaitForTranscriptionEntry(); break;
-		case kShowNoAudioToSend: showNoAudioToSendEntry(); break;
 		case kShowNoContactsToSendTo: showNoContactsToSendToEntry(); break;
 		case kShowPostAudioFailed: showPostAudioFailedEntry(); break;
 		case kStart: startEntry(); break;
@@ -531,8 +515,6 @@ void RecordMessageScreen::CallEntry()
 		case kStopPlayingBeforePop: stopPlayingBeforePopEntry(); break;
 		case kStopPlayingBeforeSend: stopPlayingBeforeSendEntry(); break;
 		case kStopRecordingAudio: stopRecordingAudioEntry(); break;
-		case kStopRecordingBeforePop: stopRecordingBeforePopEntry(); break;
-		case kStopRecordingBeforeSend: stopRecordingBeforeSendEntry(); break;
 		case kWaitForTranscriptionIdle: waitForTranscriptionIdleEntry(); break;
 		case kWaitToPlayIdle: waitToPlayIdleEntry(); break;
 		case kWaitToRecordIdle: waitToRecordIdleEntry(); break;
@@ -582,8 +564,6 @@ int  RecordMessageScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kPlayingIdle) && (evt == kFinishedPlaying)) return kStopAudio; else
 	if ((mState == kPlayingIdle) && (evt == kPausePressed)) return kPauseAudio; else
 	if ((mState == kPlayingIdle) && (evt == kSendPressed)) return kStopPlayingBeforeSend; else
-	if ((mState == kRecordingIdle) && (evt == kCancelPressed)) return kStopRecordingBeforePop; else
-	if ((mState == kRecordingIdle) && (evt == kSendPressed)) return kStopRecordingBeforeSend; else
 	if ((mState == kRecordingIdle) && (evt == kStopPressed)) return kStopRecordingAudio; else
 	if ((mState == kResumeAudio) && (evt == kNext)) return kPlayingIdle; else
 	if ((mState == kSendPostAudioToServer) && (evt == kFail)) return kShowPostAudioFailed; else
@@ -595,7 +575,6 @@ int  RecordMessageScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kSendReloadInboxToVC) && (evt == kNext)) return kIsDidPostTrue; else
 	if ((mState == kSetWaitForPostAudio) && (evt == kNext)) return kCalculateMessageJSON; else
 	if ((mState == kSetWaitForTranscription) && (evt == kNext)) return kWaitForTranscriptionIdle; else
-	if ((mState == kShowNoAudioToSend) && (evt == kYes)) return kWaitToRecordIdle; else
 	if ((mState == kShowNoContactsToSendTo) && (evt == kYes)) return kWaitToPlayIdle; else
 	if ((mState == kShowPostAudioFailed) && (evt == kYes)) return kSendReloadInboxToVC; else
 	if ((mState == kStart) && (evt == kNext)) return kLetDidRecordBeIsForwardedValue; else
@@ -604,15 +583,11 @@ int  RecordMessageScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kStopPlayingBeforePop) && (evt == kNext)) return kSendReloadInboxToVC; else
 	if ((mState == kStopPlayingBeforeSend) && (evt == kNext)) return kDoWeHaveContactsToSendTo; else
 	if ((mState == kStopRecordingAudio) && (evt == kNext)) return kDoWeNeedToWaitForTranscription; else
-	if ((mState == kStopRecordingBeforePop) && (evt == kNext)) return kSendReloadInboxToVC; else
-	if ((mState == kStopRecordingBeforeSend) && (evt == kNext)) return kDoWeHaveContactsToSendTo; else
 	if ((mState == kWaitForTranscriptionIdle) && (evt == kTranscriptionReady)) return kLetDidRecordBeTrue; else
 	if ((mState == kWaitToPlayIdle) && (evt == kCancelPressed)) return kSendReloadInboxToVC; else
 	if ((mState == kWaitToPlayIdle) && (evt == kPlayPressed)) return kPlayAudio; else
 	if ((mState == kWaitToPlayIdle) && (evt == kSendPressed)) return kDoWeHaveContactsToSendTo; else
-	if ((mState == kWaitToRecordIdle) && (evt == kCancelPressed)) return kSendReloadInboxToVC; else
 	if ((mState == kWaitToRecordIdle) && (evt == kRecordPressed)) return kStartRecordingAudio; else
-	if ((mState == kWaitToRecordIdle) && (evt == kSendPressed)) return kShowNoAudioToSend; else
 	if ((mState == kWasPostAudioSuccessful) && (evt == kNo)) return kShowPostAudioFailed; else
 	if ((mState == kWasPostAudioSuccessful) && (evt == kYes)) return kSendPostTranscriptToServer; else
 	if ((mState == kWasPostMessageSuccessful) && (evt == kNo)) return kShowPostAudioFailed; else
@@ -646,8 +621,6 @@ bool RecordMessageScreen::HasEdgeNamedNext() const
 		case kStopPlayingBeforePop:
 		case kStopPlayingBeforeSend:
 		case kStopRecordingAudio:
-		case kStopRecordingBeforePop:
-		case kStopRecordingBeforeSend:
 			return true;
 		default: break;
 	}
@@ -774,7 +747,6 @@ void RecordMessageScreen::update(const GCTEvent& msg)
         default:
             switch (getState())
             {
-                case kShowNoAudioToSend:
                 case kShowPostAudioFailed:
                 case kShowNoContactsToSendTo:
                     switch(msg.mEvent)

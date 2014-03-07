@@ -1,5 +1,5 @@
 {
-	'graphcode': '../../project/common/graphcode.sh',
+	'graphcode': '/Volumes/Tatemode/libtate/code/project/common/graphcode.sh',
 
 	# This is set globally for "project" level, which is required for "actions", rather than target level
 	'xcode_settings': {

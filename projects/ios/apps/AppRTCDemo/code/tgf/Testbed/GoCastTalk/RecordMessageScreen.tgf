@@ -12,99 +12,89 @@
 12 Paused idle
 13 Stop audio
 14 Send ReloadInbox to VC
-15 Stop recording before pop
-16 Stop playing before pop
-17 Stop recording before send
-18 Stop playing before send
-19 Set "Wait for postAudio"
-20 Show "postAudio failed"
-21 Send postAudio to server
-22 Send postTranscript to server
-23 Was postAudio successful?
-24 Was postTranscript successful?
-25 Show "no audio to send"
-26 Resume audio
-27 Let didRecord be isForwarded value
-28 Let didRecord be true
-29 Send postMessage to server
-30 Was postMessage successful?
-31 Calculate Message JSON
-32 Peer: pop self
-33 Do we have contacts to send to?
-34 Show "no contacts to send to"
-35 Is forwarding message?
-36 Are we the "new memo" tab?
-37 Peer: push Message Sent
-38 Clear data and reload table
-39 Let "did post" be true
-40 Let "did post" be false
-41 Is "did post" true?
-42 Wait for transcription idle
-43 Set "Wait for transcription"
-44 Do we need to wait for transcription?
+15 Stop playing before pop
+16 Stop playing before send
+17 Set "Wait for postAudio"
+18 Show "postAudio failed"
+19 Send postAudio to server
+20 Send postTranscript to server
+21 Was postAudio successful?
+22 Was postTranscript successful?
+23 Resume audio
+24 Let didRecord be isForwarded value
+25 Let didRecord be true
+26 Send postMessage to server
+27 Was postMessage successful?
+28 Calculate Message JSON
+29 Peer: pop self
+30 Do we have contacts to send to?
+31 Show "no contacts to send to"
+32 Is forwarding message?
+33 Are we the "new memo" tab?
+34 Peer: push Message Sent
+35 Clear data and reload table
+36 Let "did post" be true
+37 Let "did post" be false
+38 Is "did post" true?
+39 Wait for transcription idle
+40 Set "Wait for transcription"
+41 Do we need to wait for transcription?
 #
 3 4 no
 4 5 recordPressed
 3 6 yes
 5 7
 7 8 stopPressed
-1 27
-8 44
+1 24
+8 41
 6 10 playPressed
 10 9
 9 11 pausePressed
 11 12
 9 13 finishedPlaying
 13 3
-12 26 playPressed
+12 23 playPressed
 15 14
-16 14
-4 14 cancelPressed
-7 15 cancelPressed
 6 14 cancelPressed
-12 16 cancelPressed
-9 16 cancelPressed
-19 31
-21 20 fail
-21 23 success
-23 22 yes
-23 20 no
-17 33
-18 33
-22 24 success
-22 20 fail
-20 14 yes
-24 29 yes
-24 20 no
-4 25 sendPressed
-25 4 yes
-9 18 sendPressed
-12 18 sendPressed
-6 33 sendPressed
-7 17 sendPressed
-26 9
-28 3
-29 30 success
-30 39 yes
-30 20 no
-29 20 fail
-31 35
-14 41
-33 19 yes
-34 6 yes
-33 34 no
-35 29 yes
-35 21 no
-36 32 no
-37 36
-36 38 yes
-38 27
-27 40
-39 14
-41 37 yes
-41 36 no
-40 3
-43 42
-42 28 transcriptionReady
-44 43 yes
-44 28 no
+12 15 cancelPressed
+9 15 cancelPressed
+17 28
+19 18 fail
+19 21 success
+21 20 yes
+21 18 no
+16 30
+20 22 success
+20 18 fail
+18 14 yes
+22 26 yes
+22 18 no
+9 16 sendPressed
+12 16 sendPressed
+6 30 sendPressed
+23 9
+25 3
+26 27 success
+27 36 yes
+27 18 no
+26 18 fail
+28 32
+14 38
+30 17 yes
+31 6 yes
+30 31 no
+32 26 yes
+32 19 no
+33 29 no
+34 33
+33 35 yes
+35 24
+24 37
+36 14
+38 34 yes
+38 33 no
+37 3
+40 39
+39 25 transcriptionReady
+41 40 yes
+41 25 no
