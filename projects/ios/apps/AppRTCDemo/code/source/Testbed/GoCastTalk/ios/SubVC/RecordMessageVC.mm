@@ -278,6 +278,19 @@
     }
 }
 
+-(BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text
+{
+#pragma unused(range)
+
+    if([text isEqualToString:@"\n"])
+    {
+        [textView resignFirstResponder];
+        return NO;
+    }
+
+    return YES;
+}
+
 #pragma mark CCCellDelegate stuff
 -(void)onAddPressed
 {
@@ -408,6 +421,23 @@
 -(void) setTimeLabel:(const std::string&)newLabel
 {
     self.mTime.text = [NSString stringWithUTF8String:newLabel.c_str()];
+}
+
+-(void) setTranscription:(const std::string&)newLabel
+{
+    self.mTranscription.text = [NSString stringWithUTF8String:newLabel.c_str()];
+}
+
+-(std::string) getTranscription
+{
+    NSString* result = self.mTranscription.text;
+
+    return result ? [result UTF8String] : "";
+}
+
+-(void) setTranscriptionEnabled:(bool)newEnabled
+{
+    [self.mTranscription setEditable:newEnabled];
 }
 
 @end

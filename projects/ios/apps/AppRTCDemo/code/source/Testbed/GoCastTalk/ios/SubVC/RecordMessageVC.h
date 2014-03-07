@@ -39,6 +39,7 @@ class RecordMessageScreen;
 @property (nonatomic, strong) IBOutlet UIButton*        mStopButton;
 
 @property (nonatomic, strong) IBOutlet UILabel*         mTime;
+@property (nonatomic, strong) IBOutlet UITextView*      mTranscription;
 
 @property (nonatomic, strong) IBOutlet UIView*          mBlockingView;
 
@@ -78,5 +79,8 @@ class RecordMessageScreen;
 -(void) setWaitForTranscriptUI;
 
 -(void) setTimeLabel:(const std::string&)newLabel;
+-(void) setTranscription:(const std::string&)newLabel;
+-(std::string) getTranscription;
+-(void) setTranscriptionEnabled:(bool)newEnabled;
 
 @end

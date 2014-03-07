@@ -97,6 +97,9 @@ void RecordMessageScreen::waitToRecordIdleEntry()
 {
     mGotTranscriptionEvent = false;
     [mPeer setWaitToRecordUI];
+    [mPeer setTranscription:"Transcription pending"];
+    [mPeer setTranscriptionEnabled:false];
+
     printf("%s\n", "wait to record");
 }
 
@@ -431,6 +434,9 @@ void RecordMessageScreen::sendPostTranscriptToServerEntry()
 
     params.push_back(std::pair<std::string, std::string>("MAX_FILE_SIZE", "10485760"));
 
+    mTranscription["ja"] = [mPeer getTranscription];
+    tFile(tFile::kTemporaryDirectory, "transcript.json").write(JSONValue(mTranscription).toString().c_str());
+
     URLLoader::getInstance()->postFile(this, kMemoAppServerURL, params, tFile(tFile::kTemporaryDirectory, "transcript.json"));
 }
 
@@ -751,6 +757,9 @@ void RecordMessageScreen::update(const GCTEvent& msg)
         case GCTEvent::kTranscriptFinished:
             {
                 mGotTranscriptionEvent = true;
+
+                [mPeer setTranscription:msg.mTranscription];
+                [mPeer setTranscriptionEnabled:true];
 
                 mTranscription["ja"] = msg.mTranscription;
                 tFile(tFile::kTemporaryDirectory, "transcript.json").write(JSONValue(mTranscription).toString().c_str());

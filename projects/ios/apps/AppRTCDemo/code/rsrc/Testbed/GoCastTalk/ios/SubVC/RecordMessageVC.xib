@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="4514" systemVersion="13B42" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="4514" systemVersion="13C64" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none">
     <dependencies>
         <deployment defaultVersion="1536" identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="3747"/>
@@ -18,6 +18,7 @@
                 <outlet property="mTable" destination="Ydj-Rn-oZK" id="KsU-zf-prK"/>
                 <outlet property="mTime" destination="Qig-Zc-L0c" id="kyt-ID-Ffa"/>
                 <outlet property="mToTable" destination="Z7s-oj-wRd" id="3eF-dk-bto"/>
+                <outlet property="mTranscription" destination="VaE-vT-xWH" id="ERG-zM-076"/>
                 <outlet property="view" destination="UWH-Nu-2CC" id="CGV-5u-hR4"/>
             </connections>
         </placeholder>
@@ -98,7 +99,7 @@
                             <color key="highlightedColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         </label>
                         <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" style="plain" separatorStyle="default" rowHeight="82" sectionHeaderHeight="22" sectionFooterHeight="22" id="Ydj-Rn-oZK" userLabel="mTable">
-                            <rect key="frame" x="0.0" y="181" width="320" height="164"/>
+                            <rect key="frame" x="0.0" y="285" width="320" height="164"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             <connections>
@@ -106,6 +107,22 @@
                                 <outlet property="delegate" destination="-1" id="PGl-Qd-cXo"/>
                             </connections>
                         </tableView>
+                        <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" id="VaE-vT-xWH" userLabel="mTranscription">
+                            <rect key="frame" x="20" y="181" width="280" height="96"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                            <string key="text">大食いのたけし君も、宇宙ではあまり物を食べられないよ。
+なぜ? 
+宇宙には空気(食う気)がない。
+向こうの通りにヘイができたんだってね。
+へぇー。</string>
+                            <color key="textColor" red="0.50196078430000002" green="0.50196078430000002" blue="0.50196078430000002" alpha="1" colorSpace="calibratedRGB"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                            <textInputTraits key="textInputTraits" autocorrectionType="no" returnKeyType="done" enablesReturnKeyAutomatically="YES"/>
+                            <connections>
+                                <outlet property="delegate" destination="-1" id="fe5-Fv-VXy"/>
+                            </connections>
+                        </textView>
                     </subviews>
                     <color key="backgroundColor" red="0.93333333333333335" green="0.93333333333333335" blue="0.93333333333333335" alpha="1" colorSpace="calibratedRGB"/>
                 </view>
@@ -126,7 +143,7 @@
             <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina4"/>
             <userDefinedRuntimeAttributes>
                 <userDefinedRuntimeAttribute type="size" keyPath="contentSize">
-                    <size key="value" width="320" height="372"/>
+                    <size key="value" width="320" height="449"/>
                 </userDefinedRuntimeAttribute>
             </userDefinedRuntimeAttributes>
         </scrollView>
