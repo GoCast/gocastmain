@@ -73,16 +73,21 @@ void RecordMessageScreen::stopPressed()
 #pragma mark Start / End / Invalid
 void RecordMessageScreen::startEntry()
 {
-    mSound = NULL;
+    mSound          = NULL;
     mTenMinuteTimer = NULL;
-    mDidRecord = false;
+    mDidRecord      = false;
 
     GCTEventManager::getInstance()->attach(this);
     URLLoader::getInstance()->attach(this);
+
+    mSliderUpdateTimer = new tTimer(30);
+    mSliderUpdateTimer->attach(this);
+    mSliderUpdateTimer->start();
 }
 
 void RecordMessageScreen::endEntry()
 {
+    if (mSliderUpdateTimer) { delete mSliderUpdateTimer; mSliderUpdateTimer = NULL; }
     if (mTenMinuteTimer)    { delete mTenMinuteTimer; mTenMinuteTimer = NULL; }
     if (mSound)             { delete mSound; mSound = NULL; }
 }
@@ -328,6 +333,8 @@ void RecordMessageScreen::pauseAudioEntry()
 {
     if (mSound)
     {
+        mAlreadyPlayedTimeMS = tTimer::getTimeMS() - mStartTimeMS;
+
         mSound->pause();
     }
 }
@@ -336,6 +343,8 @@ void RecordMessageScreen::playAudioEntry()
 {
     if (mSound)
     {
+        mStartTimeMS = tTimer::getTimeMS();
+
         mSound->play();
     }
 }
@@ -344,6 +353,8 @@ void RecordMessageScreen::resumeAudioEntry()
 {
     if (mSound)
     {
+        mStartTimeMS = tTimer::getTimeMS() - mAlreadyPlayedTimeMS;
+
         mSound->resume();
     }
 }
@@ -361,6 +372,8 @@ void RecordMessageScreen::startRecordingAudioEntry()
 
 void RecordMessageScreen::stopAudioEntry()
 {
+    if (mSliderUpdateTimer) { delete mSliderUpdateTimer; mSliderUpdateTimer = NULL; }
+
     if (mSound)
     {
         mSound->stop();
@@ -779,13 +792,25 @@ void RecordMessageScreen::update(const tTimerEvent& msg)
 {
     switch (msg.mEvent)
     {
-        case tTimer::kTimerCompleted:
-            if (mTenMinuteTimer) { delete mTenMinuteTimer; mTenMinuteTimer = NULL; }
-
-            if (getState() == kRecordingIdle)
+        case tTimer::kTimerTick:
+            if (getState() == kPlayingIdle)
             {
-                process(kStopPressed);
-                tAlert("Record limit is 10 minutes. Recording will now stop");
+                if (mSound)
+                {
+                    [mPeer setSliderPercentage: float(tTimer::getTimeMS() - mStartTimeMS) / float(mSound->getDurationMS()) * 100.0f];
+                }
+            }
+            break;
+        case tTimer::kTimerCompleted:
+            if (msg.mTimer == mTenMinuteTimer)
+            {
+                if (mTenMinuteTimer) { delete mTenMinuteTimer; mTenMinuteTimer = NULL; }
+
+                if (getState() == kRecordingIdle)
+                {
+                    process(kStopPressed);
+                    tAlert("Record limit is 10 minutes. Recording will now stop");
+                }
             }
             break;
 

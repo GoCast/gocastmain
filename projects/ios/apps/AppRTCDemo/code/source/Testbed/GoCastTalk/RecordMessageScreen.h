@@ -22,6 +22,9 @@ protected:
     JSONObject          mTranscription;
     tSound*             mSound;
     tTimer*             mTenMinuteTimer;
+    tTimer*             mSliderUpdateTimer;
+    int32_t             mStartTimeMS;
+    int32_t             mAlreadyPlayedTimeMS;
     bool                mDidRecord;
     bool                mIsForwarded;
     bool                mIsChild;

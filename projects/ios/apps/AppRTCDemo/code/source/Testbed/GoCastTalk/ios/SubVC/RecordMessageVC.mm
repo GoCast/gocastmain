@@ -375,6 +375,9 @@
 
     self.mTable.allowsSelection = NO;
     [self.mTable reloadData];
+
+    [self.mSlider setEnabled:NO];
+    [self.mSlider setValue:0];
 }
 
 -(void) setWaitToPlayUI
@@ -390,6 +393,8 @@
 
     self.mTable.allowsSelection = YES;
     [self.mTable reloadData];
+
+    [self.mSlider setEnabled:YES];
 }
 
 -(void) setPlayingUI
@@ -403,6 +408,8 @@
 
     self.mTable.allowsSelection = YES;
     [self.mTable reloadData];
+
+    [self.mSlider setEnabled:YES];
 }
 
 -(void) setPausedUI
@@ -415,6 +422,8 @@
 
     self.mTable.allowsSelection = YES;
     [self.mTable reloadData];
+
+    [self.mSlider setEnabled:YES];
 }
 
 -(void) setRecordingUI
@@ -427,6 +436,9 @@
 
     self.mTable.allowsSelection = NO;
     [self.mTable reloadData];
+
+    [self.mSlider setEnabled:NO];
+    [self.mSlider setValue:0];
 }
 
 -(void) setWaitForTranscriptUI
@@ -440,6 +452,8 @@
 
     self.mTable.allowsSelection = YES;
     [self.mTable reloadData];
+
+    [self.mSlider setEnabled:YES];
 }
 
 -(void) setTimeLabel:(const std::string&)newLabel
@@ -462,6 +476,11 @@
 -(void) setTranscriptionEnabled:(bool)newEnabled
 {
     [self.mTranscription setEditable:newEnabled];
+}
+
+-(void) setSliderPercentage:(float)newPercentage
+{
+    [self.mSlider setValue:newPercentage];
 }
 
 @end

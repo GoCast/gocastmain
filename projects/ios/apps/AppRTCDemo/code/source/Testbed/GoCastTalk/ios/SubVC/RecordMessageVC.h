@@ -41,6 +41,8 @@ class RecordMessageScreen;
 @property (nonatomic, strong) IBOutlet UILabel*         mTime;
 @property (nonatomic, strong) IBOutlet UITextView*      mTranscription;
 
+@property (nonatomic, strong) IBOutlet UISlider*        mSlider;
+
 @property (nonatomic, strong) IBOutlet UIView*          mBlockingView;
 
 #pragma mark Construction / Destruction
@@ -82,5 +84,7 @@ class RecordMessageScreen;
 -(void) setTranscription:(const std::string&)newLabel;
 -(std::string) getTranscription;
 -(void) setTranscriptionEnabled:(bool)newEnabled;
+
+-(void) setSliderPercentage:(float)newPercentage;
 
 @end

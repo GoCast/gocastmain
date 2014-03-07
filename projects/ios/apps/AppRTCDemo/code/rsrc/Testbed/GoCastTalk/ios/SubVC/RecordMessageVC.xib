@@ -13,6 +13,7 @@
                 <outlet property="mPlayButton" destination="XC1-hX-Hev" id="1Gr-sM-96W"/>
                 <outlet property="mRecordButton" destination="ye6-Tb-ad9" id="NCM-m8-7iA"/>
                 <outlet property="mScrollView" destination="UWH-Nu-2CC" id="jk4-h8-T2J"/>
+                <outlet property="mSlider" destination="YV1-P2-97Y" id="8a1-EM-GYJ"/>
                 <outlet property="mStatusLabel" destination="jUQ-iJ-nrj" id="pkV-YZ-fT1"/>
                 <outlet property="mStopButton" destination="qVU-9n-Seb" id="4yp-Ce-fHk"/>
                 <outlet property="mTable" destination="Ydj-Rn-oZK" id="KsU-zf-prK"/>
@@ -87,7 +88,7 @@
                             <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                             <color key="highlightedColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         </label>
-                        <slider opaque="NO" contentMode="scaleToFill" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" minValue="0.0" maxValue="1" id="YV1-P2-97Y">
+                        <slider opaque="NO" userInteractionEnabled="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" minValue="0.0" maxValue="100" id="YV1-P2-97Y" userLabel="mSlider">
                             <rect key="frame" x="18" y="115" width="284" height="34"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         </slider>
