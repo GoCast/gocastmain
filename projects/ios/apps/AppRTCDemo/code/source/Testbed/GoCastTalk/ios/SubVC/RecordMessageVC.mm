@@ -165,6 +165,12 @@
             [UIColor colorWithRed:1.0f green:0.6f blue:0.8f alpha:1.0f],
         };
 
+        UIColor* grayColors[] =
+        {
+            [UIColor colorWithRed:0.71f green:0.87f blue:0.93f alpha:1.0f],
+            [UIColor colorWithRed:1.0f green:0.8f blue:0.9f alpha:1.0f],
+        };
+
         tableView.backgroundView = nil;
 
         static NSString *simpleTableIdentifier = @"HeadingSubCell";
@@ -180,8 +186,8 @@
         cell.mSub.text = [NSString stringWithUTF8String:""];
         cell.mRightArrow.hidden = YES;
 
-        cell.mHeading.textColor = [UIColor whiteColor];
-        cell.mContentView.backgroundColor = colors[indexPath.row];
+        cell.mHeading.textColor = self.mTable.allowsSelection == YES ? [UIColor whiteColor] : [UIColor lightGrayColor];
+        cell.mContentView.backgroundColor = self.mTable.allowsSelection == YES ? colors[indexPath.row] : grayColors[indexPath.row];
 
         return cell;
     }
@@ -366,6 +372,9 @@
     [self.mRecordButton setHidden:NO];
     [self.mPlayButton   setHidden:YES];
     [self.mStopButton   setHidden:YES];
+
+    self.mTable.allowsSelection = NO;
+    [self.mTable reloadData];
 }
 
 -(void) setWaitToPlayUI
@@ -378,6 +387,9 @@
     [self.mRecordButton setHidden:YES];
     [self.mPlayButton   setHidden:NO];
     [self.mStopButton   setHidden:YES];
+
+    self.mTable.allowsSelection = YES;
+    [self.mTable reloadData];
 }
 
 -(void) setPlayingUI
@@ -388,6 +400,9 @@
     [self.mRecordButton setHidden:YES];
     [self.mPlayButton   setHidden:YES];
     [self.mStopButton   setHidden:YES];
+
+    self.mTable.allowsSelection = YES;
+    [self.mTable reloadData];
 }
 
 -(void) setPausedUI
@@ -397,6 +412,9 @@
     [self.mRecordButton setHidden:YES];
     [self.mPlayButton   setHidden:NO];
     [self.mStopButton   setHidden:YES];
+
+    self.mTable.allowsSelection = YES;
+    [self.mTable reloadData];
 }
 
 -(void) setRecordingUI
@@ -406,6 +424,9 @@
     [self.mRecordButton setHidden:YES];
     [self.mPlayButton   setHidden:YES];
     [self.mStopButton   setHidden:NO];
+
+    self.mTable.allowsSelection = NO;
+    [self.mTable reloadData];
 }
 
 -(void) setWaitForTranscriptUI
@@ -416,6 +437,9 @@
     [self.mRecordButton setHidden:YES];
     [self.mPlayButton   setHidden:NO];
     [self.mStopButton   setHidden:YES];
+
+    self.mTable.allowsSelection = YES;
+    [self.mTable reloadData];
 }
 
 -(void) setTimeLabel:(const std::string&)newLabel
