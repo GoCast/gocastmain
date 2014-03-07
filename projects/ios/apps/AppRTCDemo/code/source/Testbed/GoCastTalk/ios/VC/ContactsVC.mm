@@ -116,12 +116,7 @@
 
         if (!self->mInGroupsView)
         {
-            heading = InboxScreen::mContacts[(size_t)indexPath.row].mObject["kanji"].mString;
-
-            if (heading.empty())
-            {
-                heading = InboxScreen::mContacts[(size_t)indexPath.row].mObject["email"].mString;
-            }
+            heading = InboxScreen::nameFromEmail(InboxScreen::mContacts[(size_t)indexPath.row].mObject["email"].mString);
         }
         else
         {

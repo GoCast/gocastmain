@@ -89,7 +89,9 @@
     self->mScrollPreExpansion = self.mScrollView.contentSize;
     [self contractTo];
 
-//    self.mToLabel.text = [NSString stringWithUTF8String:("to: " + mPeer->getTo()).c_str()];
+    [self setTranscriptionEnabled:false];
+
+    //    self.mToLabel.text = [NSString stringWithUTF8String:("to: " + mPeer->getTo()).c_str()];
 }
 
 - (void)viewWillDisappear:(BOOL)animated

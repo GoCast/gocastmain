@@ -88,12 +88,7 @@
 
         std::string heading;
 
-        heading = InboxScreen::mContacts[(size_t)indexPath.row].mObject["kanji"].mString;
-
-        if (heading.empty())
-        {
-            heading = InboxScreen::mContacts[(size_t)indexPath.row].mObject["email"].mString;
-        }
+        heading = InboxScreen::nameFromEmail(InboxScreen::mContacts[(size_t)indexPath.row].mObject["email"].mString);
 
         cell.mHeading.text = [NSString stringWithUTF8String:heading.c_str()];
         cell.mSub.text = [NSString stringWithUTF8String:""];
