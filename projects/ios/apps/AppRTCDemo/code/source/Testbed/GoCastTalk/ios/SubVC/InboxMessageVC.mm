@@ -40,7 +40,7 @@
     self.mReceive.image = [UIImage imageNamed:((mInitObject["from"].mString != InboxScreen::mEmailAddress) ? @"icon-receive.png" : @"icon-sent.png")];
 
     std::string email   = mInitObject["from"].mString;
-    std::string from    = InboxScreen::mContactMap[email];
+    std::string from    = InboxScreen::nameFromEmail(email);
 
     if (from.empty())
     {

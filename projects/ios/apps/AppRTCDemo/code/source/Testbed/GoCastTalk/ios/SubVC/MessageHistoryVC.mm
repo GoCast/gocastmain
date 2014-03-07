@@ -38,7 +38,7 @@
     }
 
     std::string email   = mInitObject["from"].mString;
-    std::string from    = InboxScreen::mContactMap[email];
+    std::string from    = InboxScreen::nameFromEmail(email);
 
     if (from.empty())
     {

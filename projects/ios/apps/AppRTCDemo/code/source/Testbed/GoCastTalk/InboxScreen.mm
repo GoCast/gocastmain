@@ -9,7 +9,6 @@ JSONArray   InboxScreen::mInbox;
 JSONArray   InboxScreen::mContacts;
 JSONArray   InboxScreen::mGroups;
 
-std::map<std::string, std::string> InboxScreen::mContactMap;
 std::string InboxScreen::mEmailAddress;
 std::string InboxScreen::mToken;
 
@@ -66,6 +65,38 @@ std::string InboxScreen::gmtToLocal(const std::string& gmtTime)
 //    return buf;
 }
 
+std::string InboxScreen::nameFromEmail(const std::string& email)
+{
+    bool found = false;
+    size_t i;
+
+    for(i = 0; i < mContacts.size(); i++)
+    {
+        if (mContacts[i].mObject["email"].mType == JSONValue::kString &&
+            mContacts[i].mObject["email"].mString == email)
+        {
+            found = true;
+            break;
+        }
+    }
+
+    if (found)
+    {
+        if (mContacts[i].mObject["kanji"].mType == JSONValue::kString &&
+            !mContacts[i].mObject["kanji"].mString.empty())
+        {
+            return mContacts[i].mObject["kanji"].mString;
+        }
+        if (mContacts[i].mObject["kana"].mType == JSONValue::kString &&
+            !mContacts[i].mObject["kana"].mString.empty())
+        {
+            return mContacts[i].mObject["kana"].mString;
+        }
+    }
+
+    return email;
+}
+
 #pragma mark Constructor / Destructor
 InboxScreen::InboxScreen(InboxVC* newVC)
 : mPeer(newVC)
@@ -87,7 +118,7 @@ size_t  InboxScreen::getInboxSize()
 std::string InboxScreen::getFrom(const size_t& i)
 {
     std::string email   = mInbox[i].mObject["from"].mString;
-    std::string result  = mContactMap[email];
+    std::string result  = InboxScreen::nameFromEmail(email);
 
     if (result.empty())
     {
@@ -216,7 +247,6 @@ void InboxScreen::wasGetContactsValidEntry()
     bool result = false;
 
     mContacts.clear();
-    mContactMap.clear();
 
     if (mGetContactsJSON["status"].mString == std::string("success"))
     {
@@ -269,21 +299,10 @@ void InboxScreen::peerPushInboxMessageEntry()
 }
 
 #pragma mark Actions
-void InboxScreen::buildContactMapEntry()
-{
-    mContactMap.clear();
-
-    for (size_t i = 0; i < mContacts.size(); i++)
-    {
-        mContactMap[mContacts[i].mObject["email"].mString] = mContacts[i].mObject["kanji"].mString;
-    }
-}
-
 void InboxScreen::clearInboxEntry()
 {
     mInbox.clear();
     mContacts.clear();
-    mContactMap.clear();
 }
 
 void InboxScreen::sortTableByDateEntry()
@@ -393,7 +412,6 @@ void InboxScreen::CallEntry()
 {
 	switch(mState)
 	{
-		case kBuildContactMap: buildContactMapEntry(); break;
 		case kClearInbox: clearInboxEntry(); break;
 		case kDidWeDownloadContacts: didWeDownloadContactsEntry(); break;
 		case kDidWeDownloadGroups: didWeDownloadGroupsEntry(); break;
@@ -432,7 +450,6 @@ void InboxScreen::CallExit()
 
 int  InboxScreen::StateTransitionFunction(const int evt) const
 {
-	if ((mState == kBuildContactMap) && (evt == kNext)) return kPeerReloadTable; else
 	if ((mState == kClearInbox) && (evt == kNext)) return kPeerReloadTable; else
 	if ((mState == kDidWeDownloadContacts) && (evt == kNo)) return kSetWaitForGetContacts; else
 	if ((mState == kDidWeDownloadContacts) && (evt == kYes)) return kDidWeDownloadGroups; else
@@ -463,7 +480,7 @@ int  InboxScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kShowErrorLoadingInbox) && (evt == kYes)) return kPeerReloadTable; else
 	if ((mState == kShowRetryListMessages) && (evt == kNo)) return kPeerReloadTable; else
 	if ((mState == kShowRetryListMessages) && (evt == kYes)) return kDoWeHaveAToken; else
-	if ((mState == kSortTableByDate) && (evt == kNext)) return kBuildContactMap; else
+	if ((mState == kSortTableByDate) && (evt == kNext)) return kPeerReloadTable; else
 	if ((mState == kStart) && (evt == kNext)) return kDoWeHaveAToken; else
 	if ((mState == kWasDeleteMessageValid) && (evt == kNo)) return kShowErrorDeletingMessage; else
 	if ((mState == kWasDeleteMessageValid) && (evt == kYes)) return kDoWeHaveAToken; else
@@ -481,7 +498,6 @@ bool InboxScreen::HasEdgeNamedNext() const
 {
 	switch(mState)
 	{
-		case kBuildContactMap:
 		case kClearInbox:
 		case kPeerPushInboxMessage:
 		case kPeerReloadTable:

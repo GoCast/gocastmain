@@ -42,7 +42,7 @@ std::string MessageHistoryScreen::getFrom(const size_t& i)
 {
 #pragma unused(i)
     std::string email   = mHistory[i].mObject["from"].mString;
-    std::string result  = InboxScreen::mContactMap[email];
+    std::string result  = InboxScreen::nameFromEmail(email);
 
     if (result.empty())
     {

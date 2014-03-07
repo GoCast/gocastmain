@@ -20,12 +20,11 @@
 20 Was getContacts valid?
 21 Show "error loading contacts"
 22 Did we download contacts?
-23 Build contact map
-24 Set "wait for getGroups"
-25 Send getGroups to server
-26 Was getGroups valid?
-27 Show "error loading groups"
-28 Did we download groups?
+23 Set "wait for getGroups"
+24 Send getGroups to server
+25 Was getGroups valid?
+26 Show "error loading groups"
+27 Did we download groups?
 #
 1 16
 5 6 success
@@ -47,24 +46,23 @@
 14 9 yes
 13 14 no
 13 16 yes
-15 23
+15 9
 16 17 no
 16 22 yes
 17 9
 20 21 no
-22 28 yes
+22 27 yes
 22 18 no
 18 19
 19 20 success
 19 21 fail
-20 28 yes
-21 28 yes
-23 9
-26 27 no
-24 25
-25 26 success
-25 27 fail
+20 27 yes
+21 27 yes
+25 26 no
+23 24
+24 25 success
+24 26 fail
+25 4 yes
 26 4 yes
+27 23 no
 27 4 yes
-28 24 no
-28 4 yes

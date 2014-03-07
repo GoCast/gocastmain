@@ -87,7 +87,7 @@ void ChangeRegisteredNameScreen::sendSetContactsToServerEntry()
     URLLoader::getInstance()->postFile(this, kMemoAppServerURL, params, tFile(tFile::kTemporaryDirectory, "contacts.json"));
 }
 
-void ChangeRegisteredNameScreen::updateGlobalContactsAndContactmapEntry()
+void ChangeRegisteredNameScreen::updateGlobalContactsEntry()
 {
     bool found = false;
 
@@ -106,10 +106,7 @@ void ChangeRegisteredNameScreen::updateGlobalContactsAndContactmapEntry()
     if (!found)
     {
         InboxScreen::mContacts.push_back(mInitObject);
-        InboxScreen::mContactMap[mInitObject["email"].mString] = mInitObject["kanji"].mString;
     }
-
-    InboxScreen::mContactMap[mInitObject["email"].mString] = mInitObject["kanji"].mString;
 }
 
 #pragma mark UI
@@ -143,7 +140,7 @@ void ChangeRegisteredNameScreen::CallEntry()
 		case kSetWaitForSetContacts: setWaitForSetContactsEntry(); break;
 		case kShowErrorWithSetContacts: showErrorWithSetContactsEntry(); break;
 		case kStart: startEntry(); break;
-		case kUpdateGlobalContactsAndContactmap: updateGlobalContactsAndContactmapEntry(); break;
+		case kUpdateGlobalContacts: updateGlobalContactsEntry(); break;
 		case kWasSetContactsSuccessful: wasSetContactsSuccessfulEntry(); break;
 		default: break;
 	}
@@ -155,7 +152,7 @@ void ChangeRegisteredNameScreen::CallExit()
 
 int  ChangeRegisteredNameScreen::StateTransitionFunction(const int evt) const
 {
-	if ((mState == kIdle) && (evt == kSaveSelected)) return kUpdateGlobalContactsAndContactmap; else
+	if ((mState == kIdle) && (evt == kSaveSelected)) return kUpdateGlobalContacts; else
 	if ((mState == kPeerPopSelf) && (evt == kNext)) return kIdle; else
 	if ((mState == kSendReloadInboxToVC) && (evt == kNext)) return kPeerPopSelf; else
 	if ((mState == kSendSetContactsToServer) && (evt == kFail)) return kShowErrorWithSetContacts; else
@@ -163,7 +160,7 @@ int  ChangeRegisteredNameScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kSetWaitForSetContacts) && (evt == kNext)) return kSendSetContactsToServer; else
 	if ((mState == kShowErrorWithSetContacts) && (evt == kYes)) return kIdle; else
 	if ((mState == kStart) && (evt == kNext)) return kIdle; else
-	if ((mState == kUpdateGlobalContactsAndContactmap) && (evt == kNext)) return kSetWaitForSetContacts; else
+	if ((mState == kUpdateGlobalContacts) && (evt == kNext)) return kSetWaitForSetContacts; else
 	if ((mState == kWasSetContactsSuccessful) && (evt == kNo)) return kShowErrorWithSetContacts; else
 	if ((mState == kWasSetContactsSuccessful) && (evt == kYes)) return kSendReloadInboxToVC;
 
@@ -178,7 +175,7 @@ bool ChangeRegisteredNameScreen::HasEdgeNamedNext() const
 		case kSendReloadInboxToVC:
 		case kSetWaitForSetContacts:
 		case kStart:
-		case kUpdateGlobalContactsAndContactmap:
+		case kUpdateGlobalContacts:
 			return true;
 		default: break;
 	}

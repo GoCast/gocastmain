@@ -213,7 +213,7 @@
                 break;
                 
             default:
-                [cell setAsNonZero:(size_t)indexPath.row - 1 withLabel:mPeer->getTo((size_t)indexPath.row - 1)];
+                [cell setAsNonZero:(size_t)indexPath.row - 1 withLabel:InboxScreen::nameFromEmail(mPeer->getTo((size_t)indexPath.row - 1))];
                 break;
         }
 

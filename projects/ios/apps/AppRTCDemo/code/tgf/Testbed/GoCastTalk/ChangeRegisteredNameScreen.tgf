@@ -5,7 +5,7 @@
 5 Send setContacts to server
 6 Was setContacts successful?
 7 Show "Error with setContacts"
-8 Update global contacts and contactmap
+8 Update global contacts
 9 Send ReloadInbox to VC
 10 Peer: pop self
 #

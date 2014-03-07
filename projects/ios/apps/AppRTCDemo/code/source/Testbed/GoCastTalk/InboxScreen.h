@@ -24,13 +24,13 @@ public:
     static JSONArray    mInbox;
     static JSONArray    mContacts;
     static JSONArray    mGroups;
-    static std::map<std::string, std::string> mContactMap;
     static std::string  mEmailAddress;
     static std::string  mToken;
 
 public:
     static std::string getGmtString();
     static std::string gmtToLocal(const std::string& gmtTime);
+    static std::string nameFromEmail(const std::string& email);
 
 public:
 	InboxScreen(InboxVC* newVC);
@@ -55,7 +55,6 @@ protected:
 	void endEntry();
 	void invalidStateEntry();
 
-	void buildContactMapEntry();
 	void clearInboxEntry();
 	void didWeDownloadContactsEntry();
 	void didWeDownloadGroupsEntry();
@@ -100,7 +99,6 @@ public:
 	{
 		kInvalidState = 0,
 		kStart = 1,
-		kBuildContactMap,
 		kClearInbox,
 		kDidWeDownloadContacts,
 		kDidWeDownloadGroups,

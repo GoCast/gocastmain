@@ -32,7 +32,7 @@ protected:
 	void sendSetContactsToServerEntry();
 	void setWaitForSetContactsEntry();
 	void showErrorWithSetContactsEntry();
-	void updateGlobalContactsAndContactmapEntry();
+	void updateGlobalContactsEntry();
 	void wasSetContactsSuccessfulEntry();
 
 public:
@@ -58,7 +58,7 @@ public:
 		kSendSetContactsToServer,
 		kSetWaitForSetContacts,
 		kShowErrorWithSetContacts,
-		kUpdateGlobalContactsAndContactmap,
+		kUpdateGlobalContacts,
 		kWasSetContactsSuccessful,
 	};
 

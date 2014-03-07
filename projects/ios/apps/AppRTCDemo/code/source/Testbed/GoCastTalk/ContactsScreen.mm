@@ -172,8 +172,6 @@ void ContactsScreen::deleteLocalContactEntry()
 {
     std::string email = InboxScreen::mContacts[mDeleteSelected].mObject["email"].mString;
 
-    InboxScreen::mContactMap[email] = "";
-
     InboxScreen::mContacts.erase(InboxScreen::mContacts.begin() + (int)mDeleteSelected);
 }
 

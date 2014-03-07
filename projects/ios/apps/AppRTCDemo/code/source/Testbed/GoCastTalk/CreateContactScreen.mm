@@ -89,7 +89,6 @@ void CreateContactScreen::sendSetContactsToServerEntry()
 void CreateContactScreen::addToContactsEntry()
 {
     InboxScreen::mContacts.push_back(mSaveObject);
-    InboxScreen::mContactMap[mSaveObject["email"].mString] = mSaveObject["kanji"].mString;
 }
 
 #pragma mark UI
