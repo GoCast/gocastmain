@@ -160,6 +160,19 @@
 -(void) reloadTable
 {
     [self.mTable reloadData];
+
+    size_t size = mPeer->getInboxSize();
+    size_t count= 0;
+    for(size_t i = 0; i < size; i++)
+    {
+        count += mPeer->getIsRead(i) ? 0 : 1;
+    }
+
+    char buf[80];
+    sprintf(buf, "%d", (int32_t)count);
+
+    [((UITabBarItem *)[gAppDelegateInstance.mTabBar.items objectAtIndex:0]) setBadgeValue:(count ? [NSString stringWithUTF8String:buf] : nil)];
+    [UIApplication sharedApplication].applicationIconBadgeNumber = count;
 }
 
 -(void) pushInboxMessage:(const JSONObject&)newObject
