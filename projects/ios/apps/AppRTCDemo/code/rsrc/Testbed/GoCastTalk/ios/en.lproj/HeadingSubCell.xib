@@ -36,19 +36,25 @@
                         <rect key="frame" x="274" y="22" width="32" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     </imageView>
+                    <imageView hidden="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="icon-nocheck.png" id="6hh-eE-EsI" userLabel="mNoCheckbox">
+                        <rect key="frame" x="274" y="22" width="32" height="32"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    </imageView>
                 </subviews>
             </tableViewCellContentView>
             <connections>
                 <outlet property="mCheckbox" destination="tx4-iX-eff" id="nQe-gu-h6c"/>
                 <outlet property="mContentView" destination="3Nf-7e-D9Q" id="Bo4-He-eGD"/>
                 <outlet property="mHeading" destination="14" id="h89-C2-abd"/>
+                <outlet property="mNoCheckbox" destination="6hh-eE-EsI" id="dGO-QZ-QK8"/>
                 <outlet property="mRightArrow" destination="onB-HJ-etA" id="MfU-W8-sgI"/>
                 <outlet property="mSub" destination="CQg-rT-KAu" id="K1f-aI-Ywz"/>
             </connections>
         </tableViewCell>
     </objects>
     <resources>
-        <image name="icon-check.png" width="64" height="64"/>
+        <image name="icon-check.png" width="96" height="96"/>
+        <image name="icon-nocheck.png" width="96" height="96"/>
         <image name="icon-right.png" width="64" height="64"/>
     </resources>
 </document>

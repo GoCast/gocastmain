@@ -300,6 +300,7 @@
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/icon-sent.png',
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/icon-right.png',
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/icon-check.png',
+					'../../rsrc/Testbed/GoCastTalk/<@(OS)/icon-nocheck.png',
 
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/icon-tri-down.png',
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/icon-tri-right.png',

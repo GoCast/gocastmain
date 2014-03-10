@@ -109,6 +109,7 @@
         cell.mSub.text      = [NSString stringWithUTF8String:InboxScreen::mContacts[(size_t)indexPath.row].mObject["email"].mString.c_str()];
 
         [cell.mCheckbox setHidden: mPeer->isChecked((size_t)indexPath.row) ? NO : YES];
+        [cell.mNoCheckbox setHidden: mPeer->isChecked((size_t)indexPath.row) ? YES : NO];
         [cell.mRightArrow setHidden:YES];
 
         return cell;
