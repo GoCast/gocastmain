@@ -82,7 +82,6 @@ void RecordMessageScreen::startEntry()
 
     mSliderUpdateTimer = new tTimer(30);
     mSliderUpdateTimer->attach(this);
-    mSliderUpdateTimer->start();
 }
 
 void RecordMessageScreen::endEntry()
@@ -344,6 +343,7 @@ void RecordMessageScreen::playAudioEntry()
     if (mSound)
     {
         mStartTimeMS = tTimer::getTimeMS();
+        mSliderUpdateTimer->start();
 
         mSound->play();
     }
@@ -372,10 +372,9 @@ void RecordMessageScreen::startRecordingAudioEntry()
 
 void RecordMessageScreen::stopAudioEntry()
 {
-    if (mSliderUpdateTimer) { delete mSliderUpdateTimer; mSliderUpdateTimer = NULL; }
-
     if (mSound)
     {
+        mSliderUpdateTimer->stop();
         mSound->stop();
     }
 }
@@ -384,6 +383,7 @@ void RecordMessageScreen::stopPlayingBeforePopEntry()
 {
     if (mSound)
     {
+        mSliderUpdateTimer->stop();
         mSound->stop();
     }
 }
@@ -392,6 +392,7 @@ void RecordMessageScreen::stopPlayingBeforeSendEntry()
 {
     if (mSound)
     {
+        mSliderUpdateTimer->stop();
         mSound->stop();
     }
 }
