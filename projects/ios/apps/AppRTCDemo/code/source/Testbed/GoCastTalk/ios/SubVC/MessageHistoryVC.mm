@@ -137,11 +137,11 @@
             cell = [[[InboxEntryCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:simpleTableIdentifier] autorelease];
         }
 
-        cell.mFrom.text = [NSString stringWithUTF8String:mPeer->getFrom(indexPath.row + 1).c_str()];
-        cell.mDate.text = [NSString stringWithUTF8String:mPeer->getDate(indexPath.row + 1).c_str()];
+        cell.mFrom.text = [NSString stringWithUTF8String:mPeer->getFrom((size_t)indexPath.row + 1).c_str()];
+        cell.mDate.text = [NSString stringWithUTF8String:mPeer->getDate((size_t)indexPath.row + 1).c_str()];
         [cell setTranscription:mPeer->getTranscription((size_t)indexPath.row + 1)];
-        cell.mStatusIcon.image = [UIImage imageNamed:(mPeer->getIsReceive(indexPath.row + 1) ? @"icon-receive.png" : @"icon-sent.png")];
-        cell.mFrom.textColor =  mPeer->getIsGroup(indexPath.row + 1) ?
+        cell.mStatusIcon.image = [UIImage imageNamed:(mPeer->getIsReceive((size_t)indexPath.row + 1) ? @"icon-receive.png" : @"icon-sent.png")];
+        cell.mFrom.textColor =  mPeer->getIsGroup((size_t)indexPath.row + 1) ?
         [UIColor colorWithRed:0.0f green:0.47f blue:1.0f alpha:1.0f] :
         [UIColor colorWithRed:0.0f green:0.0f  blue:0.0f alpha:1.0f];
 

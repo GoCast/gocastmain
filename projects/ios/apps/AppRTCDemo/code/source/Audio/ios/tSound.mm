@@ -70,7 +70,7 @@ bool    tSound::PlayImp(tFloat32 startTimeMS, tUInt32 nloops)
 {
     assert(mAvaudioplayer);
     
-    mAvaudioplayer.numberOfLoops = nloops;
+    mAvaudioplayer.numberOfLoops = (int)nloops;
     
     return [mAvaudioplayer playAtTime:mAvaudioplayer.deviceCurrentTime + startTimeMS / 1000.0f];
 }

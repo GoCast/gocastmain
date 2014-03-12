@@ -90,11 +90,11 @@
             [UIColor colorWithRed:1.0f green:1.0f  blue:1.0f alpha:1.0f];
 
 
-        cell.mFrom.text = [NSString stringWithUTF8String:InboxScreen::nameFromEmail(mPeer->getFrom(indexPath.row)).c_str()];
-        cell.mDate.text = [NSString stringWithUTF8String:mPeer->getDate(indexPath.row).c_str()];
+        cell.mFrom.text = [NSString stringWithUTF8String:InboxScreen::nameFromEmail(mPeer->getFrom((size_t)indexPath.row)).c_str()];
+        cell.mDate.text = [NSString stringWithUTF8String:mPeer->getDate((size_t)indexPath.row).c_str()];
         [cell setTranscription:mPeer->getTranscription((size_t)indexPath.row)];
-        cell.mStatusIcon.image = [UIImage imageNamed:(mPeer->getIsReceive(indexPath.row) ? @"icon-receive.png" : @"icon-sent.png")];
-        cell.mFrom.textColor =  mPeer->getIsGroup(indexPath.row) ?
+        cell.mStatusIcon.image = [UIImage imageNamed:(mPeer->getIsReceive((size_t)indexPath.row) ? @"icon-receive.png" : @"icon-sent.png")];
+        cell.mFrom.textColor =  mPeer->getIsGroup((size_t)indexPath.row) ?
             [UIColor colorWithRed:0.0f green:0.47f blue:1.0f alpha:1.0f] :
             [UIColor colorWithRed:0.0f green:0.0f  blue:0.0f alpha:1.0f];
 
@@ -172,7 +172,7 @@
     sprintf(buf, "%d", (int32_t)count);
 
     [((UITabBarItem *)[gAppDelegateInstance.mTabBar.items objectAtIndex:0]) setBadgeValue:(count ? [NSString stringWithUTF8String:buf] : nil)];
-    [UIApplication sharedApplication].applicationIconBadgeNumber = count;
+    [UIApplication sharedApplication].applicationIconBadgeNumber = (int)count;
 }
 
 -(void) pushInboxMessage:(const JSONObject&)newObject

@@ -136,7 +136,7 @@ void EditContactsScreen::setWaitForSetContactsEntry()
 
 void EditContactsScreen::showErrorWithSetContactsEntry()
 {
-    tAlert("Error save contact details");
+    tAlert("Error saving contact details");
 }
 
 #pragma mark Sending messages to other machines
