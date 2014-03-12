@@ -12,13 +12,17 @@ class InboxMessageScreen
     public tObserver<const InboxMessageScreenMessage&>,
     public tObserver<const tSoundEvent&>,
     public tObserver<const URLLoaderEvent&>,
-    public tObserver<const GCTEvent&>
+    public tObserver<const GCTEvent&>,
+    public tObserver<const tTimerEvent&>
 {
 protected:
     InboxMessageVC* mPeer;
     JSONObject      mInitObject;
     JSONObject      mDeleteMessageJSON;
     tSound*         mSound;
+    tTimer*         mSliderUpdateTimer;
+    int32_t         mStartTimeMS;
+    int32_t         mAlreadyPlayedTimeMS;
     bool            mWasPlaying;
 
 public:
@@ -127,6 +131,7 @@ protected:
     void update(const tSoundEvent& msg);
     void update(const URLLoaderEvent& msg);
     void update(const GCTEvent& msg);
+    void update(const tTimerEvent& msg);
 };
 
 class InboxMessageScreenMessage

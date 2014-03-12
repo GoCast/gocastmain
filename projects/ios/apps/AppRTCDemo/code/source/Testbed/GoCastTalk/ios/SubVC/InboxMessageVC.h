@@ -55,4 +55,6 @@ class InboxMessageScreen;
 -(void) pushRecordMessage:(const JSONObject&)newObject;
 -(void) pushMessageHistory:(const JSONObject &)newObject;
 
+-(void) setSliderPercentage:(float)newPercentage;
+
 @end

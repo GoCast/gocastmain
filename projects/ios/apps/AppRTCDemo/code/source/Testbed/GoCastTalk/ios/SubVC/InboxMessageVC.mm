@@ -58,6 +58,8 @@
     {
         self.mTranscription.text = [NSString stringWithUTF8String:"Transcription not available"];
     }
+
+    [self.mSlider setValue:0];
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -260,6 +262,11 @@
     MessageHistoryVC* nextVC = [[[MessageHistoryVC alloc] initWithNibName:@"MessageHistoryVC" bundle:nil] autorelease];
     [nextVC customInit:newObject];
     [(UINavigationController*)self.parentViewController  pushViewController:nextVC animated:YES];
+}
+
+-(void) setSliderPercentage:(float)newPercentage
+{
+    [self.mSlider setValue:newPercentage];
 }
 
 @end

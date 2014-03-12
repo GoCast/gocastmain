@@ -53,10 +53,14 @@ void InboxMessageScreen::startEntry()
 
     GCTEventManager::getInstance()->attach(this);
     URLLoader::getInstance()->attach(this);
+
+    mSliderUpdateTimer = new tTimer(30);
+    mSliderUpdateTimer->attach(this);
 }
 
 void InboxMessageScreen::endEntry()
 {
+    if (mSliderUpdateTimer) { delete mSliderUpdateTimer; mSliderUpdateTimer = NULL; }
     if (mSound) { delete mSound; mSound = NULL; }
 }
 
@@ -179,6 +183,8 @@ void InboxMessageScreen::pauseSoundEntry()
 
     if (mSound)
     {
+        mAlreadyPlayedTimeMS = tTimer::getTimeMS() - mStartTimeMS;
+
         mSound->pause();
     }
 }
@@ -189,6 +195,8 @@ void InboxMessageScreen::resumeSoundEntry()
 
     if (mSound)
     {
+        mStartTimeMS = tTimer::getTimeMS() - mAlreadyPlayedTimeMS;
+
         mSound->resume();
     }
 }
@@ -199,11 +207,15 @@ void InboxMessageScreen::playSoundEntry()
 
     if (!mSound)
     {
+
         mSound = new tSound(tFile(tFile::kDocumentsDirectory, mInitObject["audio"].mString));
         mSound->attach(this);
     }
 
     mSound->play();
+
+    mStartTimeMS = tTimer::getTimeMS();
+    mSliderUpdateTimer->start();
 }
 
 void InboxMessageScreen::stopSoundEntry()
@@ -212,6 +224,8 @@ void InboxMessageScreen::stopSoundEntry()
 
     if (mSound)
     {
+        mSliderUpdateTimer->stop();
+
         mSound->stop();
     }
 }
@@ -461,3 +475,21 @@ void InboxMessageScreen::update(const GCTEvent& msg)
     }
 }
 
+void InboxMessageScreen::update(const tTimerEvent& msg)
+{
+    switch (msg.mEvent)
+    {
+        case tTimer::kTimerTick:
+            if (getState() == kPlayingIdle)
+            {
+                if (mSound)
+                {
+                    [mPeer setSliderPercentage: float(tTimer::getTimeMS() - mStartTimeMS) / float(mSound->getDurationMS()) * 100.0f];
+                }
+            }
+            break;
+
+        default:
+            break;
+    }
+}
