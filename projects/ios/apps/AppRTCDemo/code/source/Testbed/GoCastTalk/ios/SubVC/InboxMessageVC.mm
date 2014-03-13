@@ -104,15 +104,15 @@
     {
         const char* heading[] =
         {
-            "履歴", // "Past Messages",
             "返信", // "Reply Message",
+            "履歴", // "Past Messages",
             "削除", // "Delete",
         };
 
         const char* subheading[] =
         {
-            "過去のメッセージを表示",      // "Show message history",
             "メッセージを録音して送信",     // "Send recorded message",
+            "過去のメッセージを表示",      // "Show message history",
             "このメッセージを削除",       // "Delete this message",
         };
 
@@ -143,8 +143,8 @@
 
         switch (indexPath.row)
         {
-            case 0: cell.mContentView.backgroundColor = [UIColor colorWithRed:0.6f green:0.6f blue:1.0f alpha:1.0f]; break;
-            case 1: cell.mContentView.backgroundColor = [UIColor colorWithRed:0.8f green:0.6f blue:1.0f alpha:1.0f]; break;
+            case 0: cell.mContentView.backgroundColor = [UIColor colorWithRed:0.8f green:0.6f blue:1.0f alpha:1.0f]; break;
+            case 1: cell.mContentView.backgroundColor = [UIColor colorWithRed:0.6f green:0.6f blue:1.0f alpha:1.0f]; break;
             case 2: cell.mContentView.backgroundColor = [UIColor colorWithRed:1.0f green:0.6f blue:0.8f alpha:1.0f]; break;
 
             default:
@@ -180,8 +180,8 @@
 
     switch (indexPath.row)
     {
-        case 0: mPeer->pastPressed(); break;
-        case 1: mPeer->replyPressed(); break;
+        case 0: mPeer->replyPressed(); break;
+        case 1: mPeer->pastPressed(); break;
         case 2: mPeer->deletePressed(); break;
 
         default:
