@@ -66,7 +66,7 @@
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="1Hg-ZM-0CY" userLabel="mPlayButton">
                     <rect key="frame" x="136" y="225" width="48" height="48"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                    <state key="normal" image="button-play.png">
+                    <state key="normal" image="button-play-white.png">
                         <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                     </state>
                     <connections>
@@ -116,7 +116,7 @@
         </scrollView>
     </objects>
     <resources>
-        <image name="button-play.png" width="64" height="64"/>
+        <image name="button-play-white.png" width="64" height="64"/>
         <image name="icon-receive.png" width="64" height="64"/>
     </resources>
 </document>

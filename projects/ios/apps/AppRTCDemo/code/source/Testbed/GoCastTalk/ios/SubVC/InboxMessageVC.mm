@@ -225,12 +225,12 @@
 
 -(void)setButtonImagePlay
 {
-    [self.mPlayButton setImage:[UIImage imageNamed:@"button-play.png"] forState:UIControlStateNormal];
+    [self.mPlayButton setImage:[UIImage imageNamed:@"button-play-white.png"] forState:UIControlStateNormal];
 }
 
 -(void)setButtonImagePause
 {
-    [self.mPlayButton setImage:[UIImage imageNamed:@"button-pause.png"] forState:UIControlStateNormal];
+    [self.mPlayButton setImage:[UIImage imageNamed:@"button-pause-white.png"] forState:UIControlStateNormal];
 }
 
 -(void)setTimeLabel:(const std::string&)newLabel

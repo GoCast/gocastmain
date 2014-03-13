@@ -313,6 +313,9 @@
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/button-record.png',
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/button-stop.png',
 
+					'../../rsrc/Testbed/GoCastTalk/<@(OS)/button-pause-white.png',
+					'../../rsrc/Testbed/GoCastTalk/<@(OS)/button-play-white.png',
+
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/Icon.png',
 
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/Default.png',
