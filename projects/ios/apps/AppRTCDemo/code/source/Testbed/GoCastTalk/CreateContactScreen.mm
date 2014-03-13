@@ -99,7 +99,8 @@ void CreateContactScreen::setWaitForSetContactsEntry()
 
 void CreateContactScreen::showErrorWithSetContactsEntry()
 {
-    tAlert("Error save contact details");
+    // "Error saving contact details"
+    tAlert("メンバーの保存に失敗しました");
 }
 
 #pragma mark Sending messages to other machines

@@ -384,27 +384,32 @@ void InboxScreen::setWaitForListMessagesEntry()
 
 void InboxScreen::showErrorDeletingMessageEntry()
 {
-    tAlert("There was an error deleting a message from the server");
+    //"There was an error deleting a message from the server"
+    tAlert("メッセージの削除に失敗しました");
 }
 
 void InboxScreen::showErrorLoadingContactsEntry()
 {
-    tAlert("There was an error loading contacts from the server");
+    //"There was an error loading contacts from the server"
+    tAlert("メンバーの取得に失敗しました");
 }
 
 void InboxScreen::showErrorLoadingGroupsEntry()
 {
-    tAlert("There was an error loading groups from the server");
+    //"There was an error loading groups from the server"
+    tAlert("グループの取得に失敗しました");
 }
 
 void InboxScreen::showErrorLoadingInboxEntry()
 {
-    tAlert("There was an error loading inbox from the server");
+    //"There was an error loading inbox from the server"
+    tAlert("メッセージの取得に失敗しました");
 }
 
 void InboxScreen::showRetryListMessagesEntry()
 {
-    tConfirm("Couldn't contact server, retry refresh inbox?");
+    //"Couldn't contact server, retry refresh inbox?"
+    tConfirm("メッセージ取り込み中に接続エラーが発生しました。リトライしますか？");
 }
 
 #pragma mark State wiring

@@ -82,7 +82,8 @@ void SettingsScreen::peerPushChangeRegisteredNameEntry()
 #pragma mark UI
 void SettingsScreen::showNotYetImplementedEntry()
 {
-    tAlert("Not yet implemented");
+    //"Not yet implemented"
+    tAlert("現在未実装です");
 }
 
 #pragma mark State wiring

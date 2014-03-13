@@ -177,17 +177,20 @@ void EditOneGroupScreen::setWaitForSetGroupsEntry()
 
 void EditOneGroupScreen::showErrorWithSetGroupsEntry()
 {
-    tAlert("Error saving group details");
+    //"Error saving group details"
+    tAlert("グループの保存に失敗しました");
 }
 
 void EditOneGroupScreen::showMustSelectMembersEntry()
 {
-    tAlert("No group members selected");
+    //"No group members selected"
+    tAlert("メンバーが選択されていません");
 }
 
 void EditOneGroupScreen::showNameCantBeEmptyEntry()
 {
-    tAlert("Group name must not be empty");
+    //"Group name must not be empty"
+    tAlert("グループ名が入力されていません");
 }
 
 #pragma mark Sending messages to other machines

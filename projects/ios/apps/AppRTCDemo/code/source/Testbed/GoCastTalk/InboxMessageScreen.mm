@@ -272,12 +272,14 @@ void InboxMessageScreen::setWaitForMarkReadEntry()
 
 void InboxMessageScreen::showErrorDeletingMessageEntry()
 {
-    tAlert("There was an error deleting a message from the server");
+    //"There was an error deleting a message from the server"
+    tAlert("メッセージの削除に失敗しました");
 }
 
 void InboxMessageScreen::showRetryDownloadEntry()
 {
-    tConfirm("Couldn't contact server, retry download?");
+    //"Couldn't contact server, retry download?"
+    tConfirm("ダウンロード中に接続エラーが発生しました。リトライしますか？");
 }
 
 #pragma mark Sending messages to other machines

@@ -238,17 +238,20 @@ void LoginScreen::setWaitForRegisterEntry()
 
 void LoginScreen::showCouldNotLoginEntry()
 {
-    tAlert("Could not sign in");
+    //"Could not sign in"
+    tAlert("サインインできませんでした");
 }
 
 void LoginScreen::showCouldNotRegisterEntry()
 {
-    tAlert("Could not sign up");
+    //"Could not sign up"
+    tAlert("新規登録できませんでした");
 }
 
 void LoginScreen::showIncorrectFormatEntry()
 {
-    tAlert("User name must be email address format, and password must be letters and numbers only.");
+    //"User name must be email address format, and password must be letters and numbers only."
+    tAlert("ユーザー名はEmailアドレス形式、パスワードは半角英数字のみをご使用ください");
 }
 
 void LoginScreen::showURLMissingSlashEntry()
@@ -258,17 +261,20 @@ void LoginScreen::showURLMissingSlashEntry()
 
 void LoginScreen::showNotYetImplementedEntry()
 {
-    tAlert("Not yet implemented");
+    //"Not yet implemented"
+    tAlert("現在未実装です");
 }
 
 void LoginScreen::showRetryLoginEntry()
 {
-    tConfirm("Error contacting server. Retry sign in?");
+    //"Error contacting server. Retry sign in?"
+    tConfirm("サインイン中に接続エラーが発生しました。リトライしますか？");
 }
 
 void LoginScreen::showRetryRegisterEntry()
 {
-    tConfirm("Error contacting server. Retry sign up?");
+    //"Error contacting server. Retry sign up?"
+    tConfirm("新規登録中に接続エラーが発生しました。リトライしますか？");
 }
 
 

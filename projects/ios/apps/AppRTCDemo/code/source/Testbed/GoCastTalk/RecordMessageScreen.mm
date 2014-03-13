@@ -469,22 +469,26 @@ void RecordMessageScreen::setWaitForTranscriptionEntry()
 
 void RecordMessageScreen::showConfirmSendEntry()
 {
-    tConfirm("Do you want to send this message?");
+    //"Do you want to send this message?"
+    tConfirm("このメッセージを送信してよろしいですか？");
 }
 
 void RecordMessageScreen::showMessageSentEntry()
 {
-    tAlert("Message sent");
+    //"Message sent"
+    tAlert("メッセージを送信しました");
 }
 
 void RecordMessageScreen::showNoContactsToSendToEntry()
 {
-    tAlert("Please add some recipients first.");
+    //"Please add some recipients first."
+    tAlert("先に宛先のメンバーを指定してください");
 }
 
 void RecordMessageScreen::showPostAudioFailedEntry()
 {
-    tAlert("Could not send audio to server.");
+    //"Could not send audio to server."
+    tAlert("音声データをサーバに送信できませんでした");
 }
 
 #pragma mark Sending messages to other machines
@@ -810,7 +814,8 @@ void RecordMessageScreen::update(const tTimerEvent& msg)
                 if (getState() == kRecordingIdle)
                 {
                     process(kStopPressed);
-                    tAlert("Record limit is 10 minutes. Recording will now stop");
+                    //"Record limit is 10 minutes. Recording will now stop"
+                    tAlert("録音時間は最大１０分です。録音を終了します。");
                 }
             }
             break;

@@ -227,12 +227,14 @@ void ContactsScreen::setWaitForSetGroupsEntry()
 
 void ContactsScreen::showErrorWithSetContactsEntry()
 {
-    tAlert("Error saving contact details");
+    // "Error saving contact details"
+    tAlert("メンバーの保存に失敗しました");
 }
 
 void ContactsScreen::showErrorWithSetGroupsEntry()
 {
-    tAlert("Error saving group details");
+    //"Error saving group details"
+    tAlert("グループの保存に失敗しました");
 }
 
 #pragma mark Sending messages to other machines

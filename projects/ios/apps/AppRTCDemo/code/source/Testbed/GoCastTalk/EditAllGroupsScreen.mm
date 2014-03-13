@@ -132,7 +132,8 @@ void EditAllGroupsScreen::setWaitForSetGroupsEntry()
 
 void EditAllGroupsScreen::showErrorWithSetGroupsEntry()
 {
-    tAlert("Error saving group details");
+    //"Error saving group details"
+    tAlert("グループの保存に失敗しました");
 }
 
 #pragma mark Sending messages to other machines
