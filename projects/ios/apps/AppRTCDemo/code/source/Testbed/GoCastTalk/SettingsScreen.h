@@ -28,6 +28,7 @@ protected:
 
 	void idleEntry();
 	void peerPushAboutEntry();
+	void peerPushChangePasswordEntry();
 	void peerPushChangeRegisteredNameEntry();
 	void showNotYetImplementedEntry();
 
@@ -50,6 +51,7 @@ public:
 		kEnd,
 		kIdle,
 		kPeerPushAbout,
+		kPeerPushChangePassword,
 		kPeerPushChangeRegisteredName,
 		kShowNotYetImplemented,
 	};

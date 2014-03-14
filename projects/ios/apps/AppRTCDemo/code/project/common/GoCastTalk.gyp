@@ -74,6 +74,12 @@
 				'action': [ '<@(_graphcode)', '<@(_inputs)', '--machine', 'ChangeRegisteredNameScreen', '-h', '../../source/Testbed/GoCastTalk/ChangeRegisteredNameScreen.h', '-cpp', '../../source/Testbed/GoCastTalk/ChangeRegisteredNameScreen.mm', ],
 			},
 			{
+				'action_name': 'ChangePasswordScreen.tgf',
+				'inputs': [ '../../tgf/Testbed/GoCastTalk/ChangePasswordScreen.tgf', ],
+				'outputs': [ '../../dummy', ],
+				'action': [ '<@(_graphcode)', '<@(_inputs)', '--machine', 'ChangePasswordScreen', '-h', '../../source/Testbed/GoCastTalk/ChangePasswordScreen.h', '-cpp', '../../source/Testbed/GoCastTalk/ChangePasswordScreen.mm', ],
+			},
+			{
 				'action_name': 'GroupViewScreen.tgf',
 				'inputs': [ '../../tgf/Testbed/GoCastTalk/GroupViewScreen.tgf', ],
 				'outputs': [ '../../dummy', ],
@@ -134,6 +140,9 @@
 
 			'../../source/Testbed/GoCastTalk/ChangeRegisteredNameScreen.mm',
 			'../../source/Testbed/GoCastTalk/ChangeRegisteredNameScreen.h',
+
+			'../../source/Testbed/GoCastTalk/ChangePasswordScreen.mm',
+			'../../source/Testbed/GoCastTalk/ChangePasswordScreen.h',
 
 			'../../source/Testbed/GoCastTalk/GroupViewScreen.mm',
 			'../../source/Testbed/GoCastTalk/GroupViewScreen.h',
@@ -247,6 +256,9 @@
 					'../../source/Testbed/GoCastTalk/<@(OS)/SubVC/AboutVC.h',
 					'../../source/Testbed/GoCastTalk/<@(OS)/SubVC/AboutVC.mm',
 
+					'../../source/Testbed/GoCastTalk/<@(OS)/SubVC/ChangePasswordVC.h',
+					'../../source/Testbed/GoCastTalk/<@(OS)/SubVC/ChangePasswordVC.mm',
+
 					'../../source/Testbed/GoCastTalk/<@(OS)/InboxEntryCell.h',
 					'../../source/Testbed/GoCastTalk/<@(OS)/InboxEntryCell.mm',
 
@@ -286,6 +298,7 @@
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/SubVC/MessageSentVC.xib',
 
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/SubVC/AboutVC.xib',
+					'../../rsrc/Testbed/GoCastTalk/<@(OS)/SubVC/ChangePasswordVC.xib',
 
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/en.lproj/InboxEntryCell.xib',
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/en.lproj/HeadingSubCell.xib',

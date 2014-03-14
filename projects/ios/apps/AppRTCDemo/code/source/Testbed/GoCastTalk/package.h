@@ -41,6 +41,8 @@
 #include "EditAllGroupsScreen.h"
 #include "EditOneGroupScreen.h"
 
+#include "ChangePasswordScreen.h"
+
 #include "ios/AppDelegate.h"
 
 extern AppDelegate* gAppDelegateInstance;

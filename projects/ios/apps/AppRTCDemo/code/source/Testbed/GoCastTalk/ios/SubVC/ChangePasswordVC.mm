@@ -1,34 +1,32 @@
-#include "SettingsVC.h"
-#include "ChangeRegisteredNameVC.h"
 #include "ChangePasswordVC.h"
-#include "AboutVC.h"
 
 #include "Base/package.h"
-#include "Math/package.h"
 #include "Io/package.h"
+#include "Math/package.h"
 
 #include "Testbed/GoCastTalk/package.h"
 
 #import "InboxEntryCell.h"
 #import "HeadingSubCell.h"
 
-@interface SettingsVC()
+@interface ChangePasswordVC()
 {
 }
 @end
 
-@implementation SettingsVC
+@implementation ChangePasswordVC
 
 #pragma mark Construction / Destruction
 - (void)viewDidLoad
 {
     [super viewDidLoad];
 
-    [self.mTable registerNib:[UINib nibWithNibName:@"HeadingSubCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"HeadingSubCell"];
-
     self.view.autoresizesSubviews = YES;
+    self.view.opaque = NO;
 
-    mPeer = new SettingsScreen(self);
+    self->mPickedIndex = 0;
+
+    mPeer = new ChangePasswordScreen(self);
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -49,7 +47,7 @@
 
     if (tableView == self.mTable)
     {
-        return (NSInteger)4;
+        return (NSInteger)3;
     }
 
     return (NSInteger)1;
@@ -71,45 +69,60 @@
 
     if (tableView == self.mTable)
     {
-        const char* heading[] =
+        const char* from[] =
         {
-            "登録情報", // "Registered Name",
-            "パスワード変更", // "Change Password",
-            "ログアウト", // "Log Out",
-            "このアプリについて", // "About this app",
+            "Sato Taro",
+            "Yamada Hanako",
+            "Planning 2",
         };
 
-        const char* subheading[] =
+        const char* date[] =
         {
-            "", // "Change registered name",
-            "", // "Change user's password",
-            "", // "Log out from current user",
-            "", // "About GoCastTalk",
+            "12/21 12:24",
+            "12/20 12:12",
+            "12/18 11:43",
         };
 
-        const bool hasRightArrow[] =
+        const char* transcription[] =
+        {
+            "「知りません。日本語で何か…",
+            "「でもでもそんなの関係ねえ…",
+            "「ニューヨークで入浴…",
+        };
+
+        const bool recv[] =
         {
             true,
-            true,
+            false,
+            false,
+        };
+
+        const bool isGroup[] =
+        {
+            false,
             false,
             true,
         };
 
         tableView.backgroundView = nil;
 
-        static NSString *simpleTableIdentifier = @"HeadingSubCell";
+        static NSString *simpleTableIdentifier = @"InboxEntryCell";
 
-        HeadingSubCell *cell = [tableView dequeueReusableCellWithIdentifier:simpleTableIdentifier];
+        InboxEntryCell *cell = [tableView dequeueReusableCellWithIdentifier:simpleTableIdentifier];
 
         if (cell == nil)
         {
-            cell = [[[HeadingSubCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:simpleTableIdentifier] autorelease];
+            cell = [[[InboxEntryCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:simpleTableIdentifier] autorelease];
         }
 
-        cell.mHeading.text = [NSString stringWithUTF8String:heading[indexPath.row]];
-        cell.mSub.text = [NSString stringWithUTF8String:subheading[indexPath.row]];
-        cell.mRightArrow.hidden = hasRightArrow[indexPath.row] ? NO : YES;
-        
+        cell.mFrom.text = [NSString stringWithUTF8String:from[indexPath.row]];
+        cell.mDate.text = [NSString stringWithUTF8String:date[indexPath.row]];
+        [cell setTranscription:transcription[indexPath.row]];
+        cell.mStatusIcon.image = [UIImage imageNamed:(recv[indexPath.row] ? @"icon-receive.png" : @"icon-sent.png")];
+        cell.mFrom.textColor =  isGroup[indexPath.row] ?
+            [UIColor colorWithRed:0.0f green:0.47f blue:1.0f alpha:1.0f] :
+            [UIColor colorWithRed:0.0f green:0.0f  blue:0.0f alpha:1.0f];
+
         return cell;
     }
     else
@@ -136,16 +149,6 @@
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
 #pragma unused(tableView, indexPath)
-    switch (indexPath.row)
-    {
-        case 0: mPeer->registeredNamePressed(); break;
-        case 1: mPeer->changePasswordPressed(); break;
-        case 2: mPeer->logOutPressed(); break;
-        case 3: mPeer->aboutThisAppPressed(); break;
-
-        default:
-            break;
-    }
 }
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
@@ -167,23 +170,27 @@
     }
 }
 
--(void) pushChangeRegisteredName:(const JSONObject&)newObject
+-(void)setBlockingViewVisible:(bool)newVisible
 {
-    ChangeRegisteredNameVC* nextVC = [[[ChangeRegisteredNameVC alloc] initWithNibName:@"ChangeRegisteredNameVC" bundle:nil] autorelease];
-    [nextVC customInit:newObject];
-    [(UINavigationController*)self.parentViewController  pushViewController:nextVC animated:YES];
+    [self.mBlockingView setHidden:newVisible ? NO : YES];
 }
 
--(void) pushAbout
+-(void) popSelf
 {
-    AboutVC* nextVC = [[[AboutVC alloc] initWithNibName:@"AboutVC" bundle:nil] autorelease];
-    [(UINavigationController*)self.parentViewController  pushViewController:nextVC animated:YES];
+    [(UINavigationController*)self.parentViewController popViewControllerAnimated:TRUE];
 }
 
--(void) pushChangePassword
+- (BOOL)textFieldShouldReturn:(UITextField *)textField
 {
-    ChangePasswordVC* nextVC = [[[ChangePasswordVC alloc] initWithNibName:@"ChangePasswordVC" bundle:nil] autorelease];
-    [(UINavigationController*)self.parentViewController  pushViewController:nextVC animated:YES];
+#pragma unused(textField)
+    [textField endEditing:YES];
+    return YES;
+}
+
+
+-(IBAction)savePressed
+{
+    mPeer->savePressed();
 }
 
 @end

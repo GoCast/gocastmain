@@ -66,6 +66,11 @@ void SettingsScreen::peerPushAboutEntry()
     [mPeer pushAbout];
 }
 
+void SettingsScreen::peerPushChangePasswordEntry()
+{
+    [mPeer pushChangePassword];
+}
+
 void SettingsScreen::peerPushChangeRegisteredNameEntry()
 {
     JSONObject initObject;
@@ -100,6 +105,7 @@ void SettingsScreen::CallEntry()
 		case kIdle: idleEntry(); break;
 		case kInvalidState: invalidStateEntry(); break;
 		case kPeerPushAbout: peerPushAboutEntry(); break;
+		case kPeerPushChangePassword: peerPushChangePasswordEntry(); break;
 		case kPeerPushChangeRegisteredName: peerPushChangeRegisteredNameEntry(); break;
 		case kShowNotYetImplemented: showNotYetImplementedEntry(); break;
 		case kStart: startEntry(); break;
@@ -114,10 +120,11 @@ void SettingsScreen::CallExit()
 int  SettingsScreen::StateTransitionFunction(const int evt) const
 {
 	if ((mState == kIdle) && (evt == kAboutThisAppSelected)) return kPeerPushAbout; else
-	if ((mState == kIdle) && (evt == kChangePasswordSelected)) return kShowNotYetImplemented; else
+	if ((mState == kIdle) && (evt == kChangePasswordSelected)) return kPeerPushChangePassword; else
 	if ((mState == kIdle) && (evt == kLogOutSelected)) return kShowNotYetImplemented; else
 	if ((mState == kIdle) && (evt == kRegisteredNameSelected)) return kPeerPushChangeRegisteredName; else
 	if ((mState == kPeerPushAbout) && (evt == kNext)) return kIdle; else
+	if ((mState == kPeerPushChangePassword) && (evt == kNext)) return kIdle; else
 	if ((mState == kPeerPushChangeRegisteredName) && (evt == kNext)) return kIdle; else
 	if ((mState == kShowNotYetImplemented) && (evt == kYes)) return kIdle; else
 	if ((mState == kStart) && (evt == kNext)) return kIdle;
@@ -129,13 +136,14 @@ bool SettingsScreen::HasEdgeNamedNext() const
 {
 	switch(mState)
 	{
-		case kPeerPushAbout:
-		case kPeerPushChangeRegisteredName:
-		case kStart:
-			return true;
+		case kEnd:
+		case kIdle:
+		case kInvalidState:
+		case kShowNotYetImplemented:
+			return false;
 		default: break;
 	}
-	return false;
+	return true;
 }
 
 #pragma mark Messages
