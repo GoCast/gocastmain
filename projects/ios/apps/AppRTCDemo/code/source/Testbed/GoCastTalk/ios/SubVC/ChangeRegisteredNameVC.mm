@@ -43,6 +43,10 @@
 
     [self.mPicker setFrame:r];
 
+    CGRect q = self.mAbovePickerView.frame;
+    q.origin.y = r.origin.y - 30;
+    [self.mAbovePickerView setFrame:q];
+
     if (mInitObject["email"].mType == JSONValue::kString)
     {
         self.mEmail.text        = [NSString stringWithUTF8String:mInitObject["email"].mString.c_str()];

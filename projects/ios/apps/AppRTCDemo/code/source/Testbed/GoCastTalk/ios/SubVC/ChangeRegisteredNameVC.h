@@ -32,6 +32,7 @@ class ChangeRegisteredNameScreen;
 @property (nonatomic, strong) IBOutlet UITextField*     mKana;
 @property (nonatomic, strong) IBOutlet UILabel*         mEmail;
 
+@property (nonatomic, strong) IBOutlet UIView*          mAbovePickerView;
 @property (nonatomic, strong) IBOutlet UIPickerView*    mPicker;
 
 @property (nonatomic, strong) IBOutlet UIView*          mPickerType;
