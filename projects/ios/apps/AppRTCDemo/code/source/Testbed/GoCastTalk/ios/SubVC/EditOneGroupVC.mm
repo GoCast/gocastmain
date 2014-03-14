@@ -31,7 +31,7 @@
 
     mPeer = new EditOneGroupScreen(self, mInitObject);
 
-    self.mGroupName.text = [NSString stringWithUTF8String:mInitObject["name"].mString.c_str()];
+    [self setDisplayGroupName:mInitObject["name"].mString];
 }
 
 - (void)viewDidLayoutSubviews
@@ -184,6 +184,59 @@
     return YES;
 }
 
+- (void)textFieldDidBeginEditing:(UITextField *)textField
+{
+#pragma unused(textField)
+    if (textField == self.mGroupName)
+    {
+        if (self.mGroupName.textColor == [UIColor lightGrayColor])
+        {
+            self.mGroupName.text = @"";
+            self.mGroupName.textColor = [UIColor blackColor];
+        }
+    }
+}
+
+- (void)textFieldDidEndEditing:(UITextField *)textField
+{
+#pragma unused(textField)
+    if (textField == self.mGroupName)
+    {
+        if ([self.mGroupName.text length] == 0)
+        {
+            [self setDisplayGroupName:""];
+        }
+        else
+        {
+            [self setDisplayGroupName:[self.mGroupName.text UTF8String]];
+        }
+    }
+}
+
+-(void)setDisplayGroupName:(const std::string&)newString
+{
+    if (newString.empty())
+    {
+        self.mGroupName.text = @"Enter group name";
+        self.mGroupName.textColor = [UIColor lightGrayColor];
+    }
+    else
+    {
+        self.mGroupName.text = [NSString stringWithUTF8String:newString.c_str()];
+        self.mGroupName.textColor = [UIColor blackColor];
+    }
+}
+
+-(std::string)getDisplayGroupName
+{
+    if (self.mGroupName.textColor == [UIColor blackColor])
+    {
+        return [self.mGroupName.text UTF8String] ? [self.mGroupName.text UTF8String] : "";
+    }
+
+    return "";
+}
+
 -(void)customInit:(const JSONObject&)newObject
 {
     mInitObject = newObject;
@@ -198,9 +251,9 @@
 
 -(IBAction)donePressed
 {
-    const char* result = [self.mGroupName.text UTF8String];
+    std::string result = [self getDisplayGroupName];
 
-    mPeer->pressDone(result ? result : "");
+    mPeer->pressDone(result);
 }
 
 @end

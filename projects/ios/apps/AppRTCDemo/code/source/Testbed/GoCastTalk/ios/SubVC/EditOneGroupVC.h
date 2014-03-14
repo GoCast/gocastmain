@@ -41,6 +41,11 @@ class EditOneGroupScreen;
 -(void) popSelf;
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField;
+- (void)textFieldDidBeginEditing:(UITextField *)textField;
+- (void)textFieldDidEndEditing:(UITextField *)textField;
+
+-(void)setDisplayGroupName:(const std::string&)newString;
+-(std::string)getDisplayGroupName;
 
 -(void)customInit:(const JSONObject&)newObject;
 
