@@ -37,32 +37,19 @@ std::string InboxScreen::getGmtString()
 
 std::string InboxScreen::gmtToLocal(const std::string& gmtTime)
 {
+    if (gmtTime.size() == 16)
+    {
+        std::string appleTime = gmtTime.substr(0, 14) + " UTC";
+        NSDateFormatter *fmt = [[[NSDateFormatter alloc] init] autorelease];
+        fmt.dateFormat = @"yyyyMMddHHmmss zzz";
+        NSDate *utc = [fmt dateFromString:[NSString stringWithUTF8String:appleTime.c_str()]];
+        fmt.timeZone = [NSTimeZone systemTimeZone];
+        std::string local = [[fmt stringFromDate:utc] UTF8String];
+
+        return local.substr(0, 14) + "00";
+    }
+
     return gmtTime;
-//    char buf[80];
-//    time_t rawtime;
-//    time_t newtime;
-//    tm* timeStruct;
-//
-//    time(&rawtime);
-//    timeStruct = localtime(&rawtime);
-//
-//    timeStruct->tm_year = atoi(gmtTime.substr(0, 4).c_str()) - 1900;
-//    timeStruct->tm_mon  = atoi(gmtTime.substr(4, 2).c_str()) - 1;
-//    timeStruct->tm_mday = atoi(gmtTime.substr(6, 2).c_str());
-//    timeStruct->tm_hour = atoi(gmtTime.substr(8, 2).c_str());
-//    timeStruct->tm_min  = atoi(gmtTime.substr(10, 2).c_str());
-//    timeStruct->tm_sec  = atoi(gmtTime.substr(12, 2).c_str()) + timeStruct->tm_gmtoff;
-//    timeStruct->tm_gmtoff = 0;
-//
-//    newtime = mktime(timeStruct);
-//
-//    sprintf(buf, "%04d%02d%02d%02d%02d%02d00",
-//            timeStruct->tm_year+1900,   timeStruct->tm_mon+1,   timeStruct->tm_mday,
-//            timeStruct->tm_hour,        timeStruct->tm_min,     timeStruct->tm_sec);
-//
-//    printf("*** %s -> %s\n", gmtTime.c_str(), buf);
-//
-//    return buf;
 }
 
 std::string InboxScreen::nameFromEmail(const std::string& email)
