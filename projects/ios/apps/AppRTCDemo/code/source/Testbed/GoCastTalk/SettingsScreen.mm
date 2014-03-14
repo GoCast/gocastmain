@@ -61,6 +61,11 @@ void SettingsScreen::idleEntry()
 }
 
 #pragma mark Peer Communication
+void SettingsScreen::peerPushAboutEntry()
+{
+    [mPeer pushAbout];
+}
+
 void SettingsScreen::peerPushChangeRegisteredNameEntry()
 {
     JSONObject initObject;
@@ -94,6 +99,7 @@ void SettingsScreen::CallEntry()
 		case kEnd: EndEntryHelper(); break;
 		case kIdle: idleEntry(); break;
 		case kInvalidState: invalidStateEntry(); break;
+		case kPeerPushAbout: peerPushAboutEntry(); break;
 		case kPeerPushChangeRegisteredName: peerPushChangeRegisteredNameEntry(); break;
 		case kShowNotYetImplemented: showNotYetImplementedEntry(); break;
 		case kStart: startEntry(); break;
@@ -107,10 +113,11 @@ void SettingsScreen::CallExit()
 
 int  SettingsScreen::StateTransitionFunction(const int evt) const
 {
-	if ((mState == kIdle) && (evt == kAboutThisAppSelected)) return kShowNotYetImplemented; else
+	if ((mState == kIdle) && (evt == kAboutThisAppSelected)) return kPeerPushAbout; else
 	if ((mState == kIdle) && (evt == kChangePasswordSelected)) return kShowNotYetImplemented; else
 	if ((mState == kIdle) && (evt == kLogOutSelected)) return kShowNotYetImplemented; else
 	if ((mState == kIdle) && (evt == kRegisteredNameSelected)) return kPeerPushChangeRegisteredName; else
+	if ((mState == kPeerPushAbout) && (evt == kNext)) return kIdle; else
 	if ((mState == kPeerPushChangeRegisteredName) && (evt == kNext)) return kIdle; else
 	if ((mState == kShowNotYetImplemented) && (evt == kYes)) return kIdle; else
 	if ((mState == kStart) && (evt == kNext)) return kIdle;
@@ -122,6 +129,7 @@ bool SettingsScreen::HasEdgeNamedNext() const
 {
 	switch(mState)
 	{
+		case kPeerPushAbout:
 		case kPeerPushChangeRegisteredName:
 		case kStart:
 			return true;

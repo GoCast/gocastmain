@@ -27,6 +27,7 @@ protected:
 	void invalidStateEntry();
 
 	void idleEntry();
+	void peerPushAboutEntry();
 	void peerPushChangeRegisteredNameEntry();
 	void showNotYetImplementedEntry();
 
@@ -48,6 +49,7 @@ public:
 		kStart = 1,
 		kEnd,
 		kIdle,
+		kPeerPushAbout,
 		kPeerPushChangeRegisteredName,
 		kShowNotYetImplemented,
 	};

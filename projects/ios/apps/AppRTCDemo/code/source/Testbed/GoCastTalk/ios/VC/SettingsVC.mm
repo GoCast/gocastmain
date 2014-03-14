@@ -1,5 +1,6 @@
 #include "SettingsVC.h"
 #include "ChangeRegisteredNameVC.h"
+#include "AboutVC.h"
 
 #include "Base/package.h"
 #include "Math/package.h"
@@ -169,6 +170,12 @@
 {
     ChangeRegisteredNameVC* nextVC = [[[ChangeRegisteredNameVC alloc] initWithNibName:@"ChangeRegisteredNameVC" bundle:nil] autorelease];
     [nextVC customInit:newObject];
+    [(UINavigationController*)self.parentViewController  pushViewController:nextVC animated:YES];
+}
+
+-(void) pushAbout
+{
+    AboutVC* nextVC = [[[AboutVC alloc] initWithNibName:@"AboutVC" bundle:nil] autorelease];
     [(UINavigationController*)self.parentViewController  pushViewController:nextVC animated:YES];
 }
 

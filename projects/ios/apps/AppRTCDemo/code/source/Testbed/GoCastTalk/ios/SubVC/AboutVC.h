@@ -6,19 +6,16 @@
 class JSONValue;
 typedef std::map<std::string, JSONValue> JSONObject;
 
-class SettingsScreen;
-
-@interface SettingsVC : UIViewController
+@interface AboutVC : UIViewController
 <
     UITableViewDelegate,
     UITableViewDataSource
 >
 {
-    SettingsScreen* mPeer;
 }
 
 //mInboxView
-@property (nonatomic, strong) IBOutlet UITableView*     mTable;
+@property (nonatomic, strong) IBOutlet UIScrollView*    mScrollView;
 
 #pragma mark Construction / Destruction
 - (void)viewDidLoad;
@@ -28,8 +25,8 @@ class SettingsScreen;
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath;
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath;
 
--(void) pushChangeRegisteredName:(const JSONObject&)newObject;
+#pragma mark -
 
--(void) pushAbout;
+-(void) popSelf;
 
 @end
