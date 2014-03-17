@@ -20,18 +20,8 @@
 {
     self.mTranscription.text = [NSString stringWithUTF8String:newTr.c_str()];
 
-    self.mTranscription.numberOfLines = 0;
+    self.mTranscription.numberOfLines = 1;
     [self.mTranscription sizeToFit];
-
-    if (floor(NSFoundationVersionNumber) <= NSFoundationVersionNumber_iOS_6_1)
-    {
-        CGRect r = self.mTranscription.frame;
-
-        r.size.width    = 255;
-        r.size.height   = 14;
-
-        [self.mTranscription setFrame:r];
-    }
 }
 
 @end
