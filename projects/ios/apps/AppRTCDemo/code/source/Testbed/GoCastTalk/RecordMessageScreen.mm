@@ -713,6 +713,20 @@ void RecordMessageScreen::update(const GCTEvent& msg)
 {
     switch(msg.mEvent)
     {
+        case GCTEvent::kInboxTabPressed:
+        case GCTEvent::kNewMemoTabPressed:
+        case GCTEvent::kContactsTabPressed:
+        case GCTEvent::kSettingsTabPressed:
+            switch (getState())
+            {
+                case kPlayingIdle:   process(kPausePressed); break;
+                case kRecordingIdle: process(kStopPressed); break;
+
+                default:
+                    break;
+            }
+            break;
+
         case GCTEvent::kAppendNewContact:
             if (msg.mIdentifier == this)
             {

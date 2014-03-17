@@ -460,6 +460,21 @@ void InboxMessageScreen::update(const GCTEvent& msg)
 {
     switch (getState())
     {
+        case kPlayingIdle:
+            switch (msg.mEvent)
+            {
+                case GCTEvent::kInboxTabPressed:
+                case GCTEvent::kNewMemoTabPressed:
+                case GCTEvent::kContactsTabPressed:
+                case GCTEvent::kSettingsTabPressed:
+                    process(kPlayPressed);
+                        break;
+                        
+                    default:
+                        break;
+            }
+            break;
+
         case kShowErrorDeletingMessage:
         case kShowRetryDownload:
             switch(msg.mEvent)
