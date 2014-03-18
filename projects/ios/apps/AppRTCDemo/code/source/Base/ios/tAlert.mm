@@ -14,9 +14,9 @@ void tAlert(const std::string& msg)
 
     alert.delegate = gAppDelegateInstance;
 
-	alert.title = @"Alert";
+	alert.title = @"警告"; // "Alert"
 	alert.message = [NSString stringWithUTF8String:msg.c_str()];
-    [alert addButtonWithTitle:@"Okay"];
+    [alert addButtonWithTitle:@"オーケー"]; // "Okay"
 
     [alert performSelectorOnMainThread:@selector(show) withObject:nil waitUntilDone:YES];
     
@@ -29,10 +29,10 @@ void tConfirm(const std::string& msg)
 
     alert.delegate = gAppDelegateInstance;
 
-	alert.title = @"Confirm";
+	alert.title = @"ベリファイ"; // "Confirm"
 	alert.message = [NSString stringWithUTF8String:msg.c_str()];
-    [alert addButtonWithTitle:@"Yes"];
-    [alert addButtonWithTitle:@"No"];
+    [alert addButtonWithTitle:@"はい"];   // "Yes"
+    [alert addButtonWithTitle:@"いいえ"];  // "No"
 
     [alert performSelectorOnMainThread:@selector(show) withObject:nil waitUntilDone:YES];
 

@@ -206,9 +206,9 @@
          {
              UIAlertView* alert = [[UIAlertView alloc] init];
 
-             alert.title = @"Alert";
+             alert.title = @"警告"; // "Alert"
              alert.message = [NSString stringWithUTF8String:"Contact does not have an email address"];
-             [alert addButtonWithTitle:@"Okay"];
+             [alert addButtonWithTitle:@"オーケー"]; // "Okay"
 
              [alert performSelectorOnMainThread:@selector(show) withObject:nil waitUntilDone:YES];
 
