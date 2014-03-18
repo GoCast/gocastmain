@@ -27,9 +27,6 @@
 
     self.navigationController.navigationBar.translucent = NO;
 
-//    UIBarButtonItem *anotherButton = [[[UIBarButtonItem alloc] initWithTitle:@"Done" style:UIBarButtonItemStylePlain target:self action:@selector(helpButton:)] autorelease];
-//    self.navigationItem.rightBarButtonItem = anotherButton;
-
     self.view.autoresizesSubviews = YES;
 
     mPeer = new EditContactsScreen(self);

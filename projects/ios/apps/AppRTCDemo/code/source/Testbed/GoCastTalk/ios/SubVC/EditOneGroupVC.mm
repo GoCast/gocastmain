@@ -217,7 +217,7 @@
 {
     if (newString.empty())
     {
-        self.mGroupName.text = @"Enter group name";
+        self.mGroupName.text = @"グループ名を入力"; // "Enter group name"
         self.mGroupName.textColor = [UIColor lightGrayColor];
     }
     else

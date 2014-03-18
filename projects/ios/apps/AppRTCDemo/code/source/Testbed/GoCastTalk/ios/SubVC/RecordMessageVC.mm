@@ -373,8 +373,9 @@
 
 -(void) setWaitToRecordUI
 {
-    self.mStatusLabel.text = @"録音開始";
-    [self setTimeLabel:"録音開始"];
+    self.mStatusLabel.text = @"メッセージを録音";
+    self.mStatusLabel.textColor = [UIColor blackColor];
+    [self setTimeLabel:"メッセージを録音"];
 
     [self.mPauseButton  setHidden:YES];
     [self.mRecordButton setHidden:NO];
@@ -390,7 +391,8 @@
 
 -(void) setWaitToPlayUI
 {
-    self.mStatusLabel.text = @"再生";
+    self.mStatusLabel.text = @"メッセージを再生";
+    self.mStatusLabel.textColor = [UIColor blackColor];
 
     [self.mPlayButton   setEnabled:YES];
 
@@ -407,7 +409,8 @@
 
 -(void) setPlayingUI
 {
-    self.mStatusLabel.text = @"一時停止";
+    self.mStatusLabel.text = @"再生中・・・";
+    self.mStatusLabel.textColor = [UIColor blackColor];
 
     [self.mPauseButton  setHidden:NO];
     [self.mRecordButton setHidden:YES];
@@ -422,7 +425,8 @@
 
 -(void) setPausedUI
 {
-    self.mStatusLabel.text = @"再生";
+    self.mStatusLabel.text = @"メッセージを再生";
+    self.mStatusLabel.textColor = [UIColor blackColor];
     [self.mPauseButton  setHidden:YES];
     [self.mRecordButton setHidden:YES];
     [self.mPlayButton   setHidden:NO];
@@ -436,7 +440,10 @@
 
 -(void) setRecordingUI
 {
-    self.mStatusLabel.text = @"録音終了";
+    self.mStatusLabel.text = @"録音中・・・";
+    self.mStatusLabel.textColor = [UIColor redColor];
+    [self setTimeLabel:"録音中・・・"];
+
     [self.mPauseButton  setHidden:YES];
     [self.mRecordButton setHidden:YES];
     [self.mPlayButton   setHidden:YES];
