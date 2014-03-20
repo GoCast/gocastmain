@@ -22,6 +22,8 @@ public:
         kReloadInbox,
         kAppendNewContact,
         kAppendNewGroup,
+
+        kNewMessageToGroup,
     };
 
     EventType   mEvent;

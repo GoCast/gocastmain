@@ -20,6 +20,7 @@ protected:
     JSONObject          mPostTranscriptJSON;
     JSONObject          mPostMessageJSON;
     JSONObject          mTranscription;
+    JSONArray           mNewMessageRecipients;
     tSound*             mSound;
     tTimer*             mTenMinuteTimer;
     tTimer*             mSliderUpdateTimer;
@@ -55,8 +56,10 @@ protected:
 	void areWeTheNewMemoTabEntry();
 	void calculateMessageJSONEntry();
 	void clearDataAndReloadTableEntry();
+	void copyRecipientsAndReloadTableEntry();
 	void didWeRecordEntry();
 	void doWeHaveContactsToSendToEntry();
+	void doWeHaveRecipientsOrARecordingEntry();
 	void doWeNeedToWaitForTranscriptionEntry();
 	void fixRecipientListEntry();
 	void isDidPostTrueEntry();
@@ -69,6 +72,7 @@ protected:
 	void pausedIdleEntry();
 	void peerPopSelfEntry();
 	void peerSwitchToInboxTabEntry();
+	void peerSwitchToNewMemoTabEntry();
 	void playAudioEntry();
 	void playingIdleEntry();
 	void recordingIdleEntry();
@@ -79,6 +83,7 @@ protected:
 	void sendReloadInboxToVCEntry();
 	void setWaitForPostAudioEntry();
 	void setWaitForTranscriptionEntry();
+	void showComposeNewMessageEntry();
 	void showConfirmSendEntry();
 	void showMessageSentEntry();
 	void showNoContactsToSendToEntry();
@@ -105,6 +110,7 @@ public:
 		kCancelPressed,
 		kFail,
 		kFinishedPlaying,
+		kNewMessage,
 		kNo,
 		kPausePressed,
 		kPlayPressed,
@@ -123,8 +129,10 @@ public:
 		kAreWeTheNewMemoTab,
 		kCalculateMessageJSON,
 		kClearDataAndReloadTable,
+		kCopyRecipientsAndReloadTable,
 		kDidWeRecord,
 		kDoWeHaveContactsToSendTo,
+		kDoWeHaveRecipientsOrARecording,
 		kDoWeNeedToWaitForTranscription,
 		kEnd,
 		kFixRecipientList,
@@ -138,6 +146,7 @@ public:
 		kPausedIdle,
 		kPeerPopSelf,
 		kPeerSwitchToInboxTab,
+		kPeerSwitchToNewMemoTab,
 		kPlayAudio,
 		kPlayingIdle,
 		kRecordingIdle,
@@ -148,6 +157,7 @@ public:
 		kSendReloadInboxToVC,
 		kSetWaitForPostAudio,
 		kSetWaitForTranscription,
+		kShowComposeNewMessage,
 		kShowConfirmSend,
 		kShowMessageSent,
 		kShowNoContactsToSendTo,

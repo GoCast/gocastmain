@@ -66,6 +66,9 @@ const unsigned char SpeechKitApplicationKey[] =
     [TestFlight takeOff:@"9d7d1e2c-62c3-45d9-8506-cb0a9752ca47"];
 #endif
 
+    //Force new memo tab to load
+    [self.tabBarController setSelectedIndex:1];
+
     self->mTabBarHeight     = (size_t)self.tabBarController.tabBar.frame.size.height;
     self->mScreenHeight     = (size_t)[[UIScreen mainScreen] bounds].size.height;
     self->mNavBarHeight     = (size_t)self.mInboxNavBar.frame.size.height;

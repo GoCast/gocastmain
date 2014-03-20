@@ -52,13 +52,13 @@ protected:
 	void peerPopSelfEntry();
 	void peerPushForwardMessageEntry();
 	void peerPushMessageHistoryEntry();
-	void peerPushRecordMessageEntry();
 	void playSoundEntry();
 	void playingIdleEntry();
 	void resumeSoundEntry();
 	void sendDeleteMessageToServerEntry();
 	void sendDownloadRequestToServerEntry();
 	void sendMarkReadToServerEntry();
+	void sendNewMessageToGroupToVCEntry();
 	void sendReloadInboxToVCEntry();
 	void sendReloadInboxToVCForMarkReadEntry();
 	void setWaitForDeleteMessageEntry();
@@ -104,13 +104,13 @@ public:
 		kPeerPopSelf,
 		kPeerPushForwardMessage,
 		kPeerPushMessageHistory,
-		kPeerPushRecordMessage,
 		kPlaySound,
 		kPlayingIdle,
 		kResumeSound,
 		kSendDeleteMessageToServer,
 		kSendDownloadRequestToServer,
 		kSendMarkReadToServer,
+		kSendNewMessageToGroupToVC,
 		kSendReloadInboxToVC,
 		kSendReloadInboxToVCForMarkRead,
 		kSetWaitForDeleteMessage,

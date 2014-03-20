@@ -91,6 +91,7 @@
 
     [self setTranscriptionEnabled:false];
 
+    [self switchToInboxTab];
     //    self.mToLabel.text = [NSString stringWithUTF8String:("to: " + mPeer->getTo()).c_str()];
 }
 
@@ -364,6 +365,11 @@
 -(void)switchToInboxTab
 {
     [gAppDelegateInstance.tabBarController setSelectedIndex:0];
+}
+
+-(void)switchToNewMemoTab
+{
+    [gAppDelegateInstance.tabBarController setSelectedIndex:1];
 }
 
 -(void)pushMessageSent

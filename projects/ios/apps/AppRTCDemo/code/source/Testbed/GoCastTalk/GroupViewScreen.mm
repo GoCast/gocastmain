@@ -45,17 +45,24 @@ void GroupViewScreen::idleEntry()
 {
 }
 
-#pragma mark Peer communication
-void GroupViewScreen::peerPushRecordMessageEntry()
+//#pragma mark Peer communication
+//void GroupViewScreen::peerPushRecordMessageEntry()
+//{
+//    JSONObject toAddresses;
+//
+//    toAddresses["to"] = JSONArray();
+//
+//    toAddresses["to"].mArray = mInitObject["emails"].mArray;
+//
+//    [mPeer pushRecordMessage:toAddresses];
+//}
+
+#pragma mark Sending messages to other machines
+void GroupViewScreen::sendNewMessageToGroupToVCEntry()
 {
-    JSONObject toAddresses;
-
-    toAddresses["to"] = JSONArray();
-
-    toAddresses["to"].mArray = mInitObject["emails"].mArray;
-
-    [mPeer pushRecordMessage:toAddresses];
+    GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kNewMessageToGroup, mInitObject["emails"].mArray, NULL));
 }
+
 
 #pragma mark State wiring
 void GroupViewScreen::CallEntry()
@@ -65,7 +72,7 @@ void GroupViewScreen::CallEntry()
 		case kEnd: EndEntryHelper(); break;
 		case kIdle: idleEntry(); break;
 		case kInvalidState: invalidStateEntry(); break;
-		case kPeerPushRecordMessage: peerPushRecordMessageEntry(); break;
+		case kSendNewMessageToGroupToVC: sendNewMessageToGroupToVCEntry(); break;
 		case kStart: startEntry(); break;
 		default: break;
 	}
@@ -77,8 +84,8 @@ void GroupViewScreen::CallExit()
 
 int  GroupViewScreen::StateTransitionFunction(const int evt) const
 {
-	if ((mState == kIdle) && (evt == kSendMessagePressed)) return kPeerPushRecordMessage; else
-	if ((mState == kPeerPushRecordMessage) && (evt == kNext)) return kIdle; else
+	if ((mState == kIdle) && (evt == kSendMessagePressed)) return kSendNewMessageToGroupToVC; else
+	if ((mState == kSendNewMessageToGroupToVC) && (evt == kNext)) return kIdle; else
 	if ((mState == kStart) && (evt == kNext)) return kIdle;
 
 	return kInvalidState;
@@ -88,7 +95,7 @@ bool GroupViewScreen::HasEdgeNamedNext() const
 {
 	switch(mState)
 	{
-		case kPeerPushRecordMessage:
+		case kSendNewMessageToGroupToVC:
 		case kStart:
 			return true;
 		default: break;

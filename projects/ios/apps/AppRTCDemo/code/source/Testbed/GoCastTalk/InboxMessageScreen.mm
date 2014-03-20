@@ -104,10 +104,10 @@ void InboxMessageScreen::peerPushForwardMessageEntry()
     [mPeer pushForwardMessage:mInitObject];
 }
 
-void InboxMessageScreen::peerPushRecordMessageEntry()
-{
-    [mPeer pushRecordMessage:mInitObject];
-}
+//void InboxMessageScreen::peerPushRecordMessageEntry()
+//{
+//    [mPeer pushRecordMessage:mInitObject];
+//}
 
 void InboxMessageScreen::peerPushMessageHistoryEntry()
 {
@@ -309,6 +309,14 @@ void InboxMessageScreen::showRetryDownloadEntry()
 }
 
 #pragma mark Sending messages to other machines
+void InboxMessageScreen::sendNewMessageToGroupToVCEntry()
+{
+    JSONArray arr = mInitObject["to"].mArray;
+    arr.push_back(mInitObject["from"].mString);
+
+    GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kNewMessageToGroup, arr, NULL));
+}
+
 void InboxMessageScreen::sendReloadInboxToVCEntry()
 {
     GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kReloadInbox));
@@ -335,13 +343,13 @@ void InboxMessageScreen::CallEntry()
 		case kPeerPopSelf: peerPopSelfEntry(); break;
 		case kPeerPushForwardMessage: peerPushForwardMessageEntry(); break;
 		case kPeerPushMessageHistory: peerPushMessageHistoryEntry(); break;
-		case kPeerPushRecordMessage: peerPushRecordMessageEntry(); break;
 		case kPlaySound: playSoundEntry(); break;
 		case kPlayingIdle: playingIdleEntry(); break;
 		case kResumeSound: resumeSoundEntry(); break;
 		case kSendDeleteMessageToServer: sendDeleteMessageToServerEntry(); break;
 		case kSendDownloadRequestToServer: sendDownloadRequestToServerEntry(); break;
 		case kSendMarkReadToServer: sendMarkReadToServerEntry(); break;
+		case kSendNewMessageToGroupToVC: sendNewMessageToGroupToVCEntry(); break;
 		case kSendReloadInboxToVC: sendReloadInboxToVCEntry(); break;
 		case kSendReloadInboxToVCForMarkRead: sendReloadInboxToVCForMarkReadEntry(); break;
 		case kSetWaitForDeleteMessage: setWaitForDeleteMessageEntry(); break;
@@ -374,12 +382,11 @@ int  InboxMessageScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kIdle) && (evt == kForwardSelected)) return kPeerPushForwardMessage; else
 	if ((mState == kIdle) && (evt == kPastSelected)) return kPeerPushMessageHistory; else
 	if ((mState == kIdle) && (evt == kPlayPressed)) return kSetWasPlayingToTrue; else
-	if ((mState == kIdle) && (evt == kReplySelected)) return kPeerPushRecordMessage; else
+	if ((mState == kIdle) && (evt == kReplySelected)) return kSendNewMessageToGroupToVC; else
 	if ((mState == kPauseSound) && (evt == kNext)) return kPausedIdle; else
 	if ((mState == kPausedIdle) && (evt == kPlayPressed)) return kResumeSound; else
 	if ((mState == kPeerPushForwardMessage) && (evt == kNext)) return kIdle; else
 	if ((mState == kPeerPushMessageHistory) && (evt == kNext)) return kIdle; else
-	if ((mState == kPeerPushRecordMessage) && (evt == kNext)) return kIdle; else
 	if ((mState == kPlaySound) && (evt == kNext)) return kPlayingIdle; else
 	if ((mState == kPlayingIdle) && (evt == kFinishedPlaying)) return kStopSound; else
 	if ((mState == kPlayingIdle) && (evt == kPlayPressed)) return kPauseSound; else
@@ -390,6 +397,7 @@ int  InboxMessageScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kSendDownloadRequestToServer) && (evt == kSuccess)) return kCopyDownloadToLocalFiles; else
 	if ((mState == kSendMarkReadToServer) && (evt == kFail)) return kDoesAudioExistLocally; else
 	if ((mState == kSendMarkReadToServer) && (evt == kSuccess)) return kSendReloadInboxToVCForMarkRead; else
+	if ((mState == kSendNewMessageToGroupToVC) && (evt == kNext)) return kIdle; else
 	if ((mState == kSendReloadInboxToVC) && (evt == kNext)) return kPeerPopSelf; else
 	if ((mState == kSendReloadInboxToVCForMarkRead) && (evt == kNext)) return kDoesAudioExistLocally; else
 	if ((mState == kSetWaitForDeleteMessage) && (evt == kNext)) return kSendDeleteMessageToServer; else

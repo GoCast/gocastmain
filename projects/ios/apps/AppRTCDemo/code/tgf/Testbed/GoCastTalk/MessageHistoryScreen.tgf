@@ -1,13 +1,13 @@
 1 start
 2 end
 3 idle
-4 Peer: push RecordMessage
-5 Build message history
-6 Peer: push InboxMessage
+4 Build message history
+5 Peer: push InboxMessage
+6 Send NewMessageToGroup to VC
 #
-1 5
-3 4 replySelected
-4 3
-5 3
-3 6 itemSelected
+1 4
+3 6 replySelected
 6 3
+4 3
+3 5 itemSelected
+5 3

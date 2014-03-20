@@ -16,19 +16,19 @@
 16 Were we going to play?
 17 Stop Sound
 18 Update time label
-19 Peer: push RecordMessage
-20 Peer: push MessageHistory
-21 Peer: pop self
-22 Set "wait for deleteMessage"
-23 Send deleteMessage to server
-24 Was deleteMessage valid?
-25 Show "error deleting message"
-26 Send ReloadInbox to VC
-27 Peer: push ForwardMessage
-28 Send markRead to server
-29 Set "wait for markRead"
-30 Send ReloadInbox to VC for markRead
-31 Fix recipient list
+19 Peer: push MessageHistory
+20 Peer: pop self
+21 Set "wait for deleteMessage"
+22 Send deleteMessage to server
+23 Was deleteMessage valid?
+24 Show "error deleting message"
+25 Send ReloadInbox to VC
+26 Peer: push ForwardMessage
+27 Send markRead to server
+28 Set "wait for markRead"
+29 Send ReloadInbox to VC for markRead
+30 Fix recipient list
+31 Send NewMessageToGroup to VC
 #
 4 5 fail
 4 6 success
@@ -38,7 +38,7 @@
 6 18
 8 9
 10 7 no
-1 31
+1 30
 10 18 yes
 3 15 playPressed
 9 11 playPressed
@@ -46,28 +46,28 @@
 12 13 playPressed
 13 9
 9 17 finishedPlaying
-14 29
+14 28
 15 10
 16 8 yes
 16 3 no
 17 14
 18 16
-3 22 deleteSelected
-3 19 replySelected
+3 21 deleteSelected
+3 31 replySelected
+3 19 pastSelected
 19 3
-3 20 pastSelected
-20 3
-22 23
-23 24 success
-23 25 fail
-25 3 yes
-24 25 no
-24 26 yes
-26 21
-3 27 forwardSelected
-27 3
-29 28
-28 10 fail
-28 30 success
-30 10
-31 14
+21 22
+22 23 success
+22 24 fail
+24 3 yes
+23 24 no
+23 25 yes
+25 20
+3 26 forwardSelected
+26 3
+28 27
+27 10 fail
+27 29 success
+29 10
+30 14
+31 3

@@ -91,10 +91,10 @@ void MessageHistoryScreen::peerPushInboxMessageEntry()
     [mPeer pushInboxMessage:mHistory[mItemSelected].mObject];
 }
 
-void MessageHistoryScreen::peerPushRecordMessageEntry()
-{
-    [mPeer pushRecordMessage:mInitObject];
-}
+//void MessageHistoryScreen::peerPushRecordMessageEntry()
+//{
+//    [mPeer pushRecordMessage:mInitObject];
+//}
 
 #pragma mark Start / End / Invalid
 void MessageHistoryScreen::startEntry()
@@ -143,6 +143,15 @@ void MessageHistoryScreen::buildMessageHistoryEntry()
     }
 }
 
+#pragma mark Sending messages to other machines
+void MessageHistoryScreen::sendNewMessageToGroupToVCEntry()
+{
+    JSONArray arr = mInitObject["to"].mArray;
+    arr.push_back(mInitObject["from"].mString);
+
+    GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kNewMessageToGroup, arr, NULL));
+}
+
 #pragma mark State wiring
 void MessageHistoryScreen::CallEntry()
 {
@@ -153,7 +162,7 @@ void MessageHistoryScreen::CallEntry()
 		case kIdle: idleEntry(); break;
 		case kInvalidState: invalidStateEntry(); break;
 		case kPeerPushInboxMessage: peerPushInboxMessageEntry(); break;
-		case kPeerPushRecordMessage: peerPushRecordMessageEntry(); break;
+		case kSendNewMessageToGroupToVC: sendNewMessageToGroupToVCEntry(); break;
 		case kStart: startEntry(); break;
 		default: break;
 	}
@@ -167,9 +176,9 @@ int  MessageHistoryScreen::StateTransitionFunction(const int evt) const
 {
 	if ((mState == kBuildMessageHistory) && (evt == kNext)) return kIdle; else
 	if ((mState == kIdle) && (evt == kItemSelected)) return kPeerPushInboxMessage; else
-	if ((mState == kIdle) && (evt == kReplySelected)) return kPeerPushRecordMessage; else
+	if ((mState == kIdle) && (evt == kReplySelected)) return kSendNewMessageToGroupToVC; else
 	if ((mState == kPeerPushInboxMessage) && (evt == kNext)) return kIdle; else
-	if ((mState == kPeerPushRecordMessage) && (evt == kNext)) return kIdle; else
+	if ((mState == kSendNewMessageToGroupToVC) && (evt == kNext)) return kIdle; else
 	if ((mState == kStart) && (evt == kNext)) return kBuildMessageHistory;
 
 	return kInvalidState;

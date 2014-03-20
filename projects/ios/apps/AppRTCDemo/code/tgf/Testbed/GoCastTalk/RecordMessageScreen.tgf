@@ -42,6 +42,10 @@
 42 Show "Message sent"
 43 Fix recipient list
 44 Peer: switch to Inbox tab
+45 Show "Compose new message?"
+46 Copy recipients and reload table
+47 Peer: switch to New Memo Tab
+48 Do we have recipients or a recording?
 #
 3 4 no
 4 5 recordPressed
@@ -105,3 +109,13 @@
 42 33 yes
 43 24
 44 34
+45 3 no
+4 47 newMessage
+6 47 newMessage
+12 47 newMessage
+45 46 yes
+46 43
+47 48
+38 47 newMessage
+48 45 yes
+48 46 no

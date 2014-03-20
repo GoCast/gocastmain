@@ -25,7 +25,7 @@ protected:
 	void invalidStateEntry();
 
 	void idleEntry();
-	void peerPushRecordMessageEntry();
+	void sendNewMessageToGroupToVCEntry();
 
 public:
 	enum EventType
@@ -41,7 +41,7 @@ public:
 		kStart = 1,
 		kEnd,
 		kIdle,
-		kPeerPushRecordMessage,
+		kSendNewMessageToGroupToVC,
 	};
 
 protected:

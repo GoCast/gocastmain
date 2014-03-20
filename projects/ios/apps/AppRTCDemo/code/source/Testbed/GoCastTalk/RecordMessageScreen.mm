@@ -180,6 +180,11 @@ void RecordMessageScreen::peerSwitchToInboxTabEntry()
     [mPeer switchToInboxTab];
 }
 
+void RecordMessageScreen::peerSwitchToNewMemoTabEntry()
+{
+    [mPeer switchToNewMemoTab];
+}
+
 #pragma mark Queries
 
 void RecordMessageScreen::areWeTheNewMemoTabEntry()
@@ -195,6 +200,11 @@ void RecordMessageScreen::didWeRecordEntry()
 void RecordMessageScreen::doWeHaveContactsToSendToEntry()
 {
     SetImmediateEvent(!mInitObject["to"].mArray.empty() ? kYes : kNo);
+}
+
+void RecordMessageScreen::doWeHaveRecipientsOrARecordingEntry()
+{
+    SetImmediateEvent((mDidRecord || !mInitObject["to"].mArray.empty()) ? kYes : kNo);
 }
 
 void RecordMessageScreen::doWeNeedToWaitForTranscriptionEntry()
@@ -256,13 +266,18 @@ void RecordMessageScreen::fixRecipientListEntry()
 
     for (size_t i = 0; i < arr.size(); i++)
     {
-        if (!arr[i].mString.empty())
+        if (!arr[i].mString.empty() && (arr[i].mString != InboxScreen::mEmailAddress))
         {
             arr2.push_back(arr[i]);
         }
     }
 
     mInitObject["to"].mArray = arr2;
+
+    if (!mNewMessageRecipients.empty())
+    {
+        [mPeer refreshExpanded];
+    }
 }
 
 void RecordMessageScreen::calculateMessageJSONEntry()
@@ -318,6 +333,19 @@ void RecordMessageScreen::clearDataAndReloadTableEntry()
 {
     mInitObject = JSONObject();
     mInitObject["to"] = JSONArray();
+
+    if (mSound)
+    {
+        delete mSound; mSound = NULL;
+    }
+
+    [mPeer refreshExpanded];
+}
+
+void RecordMessageScreen::copyRecipientsAndReloadTableEntry()
+{
+    mInitObject = JSONObject();
+    mInitObject["to"] = mNewMessageRecipients;
 
     if (mSound)
     {
@@ -488,6 +516,12 @@ void RecordMessageScreen::setWaitForTranscriptionEntry()
     [mPeer setBlockingViewVisible:true];
 }
 
+void RecordMessageScreen::showComposeNewMessageEntry()
+{
+    //"Compose new message? Old message will be discarded."
+    tConfirm("Compose new message? Old message will be discarded.");
+}
+
 void RecordMessageScreen::showConfirmSendEntry()
 {
     //"Do you want to send this message?"
@@ -526,8 +560,10 @@ void RecordMessageScreen::CallEntry()
 		case kAreWeTheNewMemoTab: areWeTheNewMemoTabEntry(); break;
 		case kCalculateMessageJSON: calculateMessageJSONEntry(); break;
 		case kClearDataAndReloadTable: clearDataAndReloadTableEntry(); break;
+		case kCopyRecipientsAndReloadTable: copyRecipientsAndReloadTableEntry(); break;
 		case kDidWeRecord: didWeRecordEntry(); break;
 		case kDoWeHaveContactsToSendTo: doWeHaveContactsToSendToEntry(); break;
+		case kDoWeHaveRecipientsOrARecording: doWeHaveRecipientsOrARecordingEntry(); break;
 		case kDoWeNeedToWaitForTranscription: doWeNeedToWaitForTranscriptionEntry(); break;
 		case kEnd: EndEntryHelper(); break;
 		case kFixRecipientList: fixRecipientListEntry(); break;
@@ -542,6 +578,7 @@ void RecordMessageScreen::CallEntry()
 		case kPausedIdle: pausedIdleEntry(); break;
 		case kPeerPopSelf: peerPopSelfEntry(); break;
 		case kPeerSwitchToInboxTab: peerSwitchToInboxTabEntry(); break;
+		case kPeerSwitchToNewMemoTab: peerSwitchToNewMemoTabEntry(); break;
 		case kPlayAudio: playAudioEntry(); break;
 		case kPlayingIdle: playingIdleEntry(); break;
 		case kRecordingIdle: recordingIdleEntry(); break;
@@ -552,6 +589,7 @@ void RecordMessageScreen::CallEntry()
 		case kSendReloadInboxToVC: sendReloadInboxToVCEntry(); break;
 		case kSetWaitForPostAudio: setWaitForPostAudioEntry(); break;
 		case kSetWaitForTranscription: setWaitForTranscriptionEntry(); break;
+		case kShowComposeNewMessage: showComposeNewMessageEntry(); break;
 		case kShowConfirmSend: showConfirmSendEntry(); break;
 		case kShowMessageSent: showMessageSentEntry(); break;
 		case kShowNoContactsToSendTo: showNoContactsToSendToEntry(); break;
@@ -587,10 +625,13 @@ int  RecordMessageScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kAreWeTheNewMemoTab) && (evt == kYes)) return kPeerSwitchToInboxTab; else
 	if ((mState == kCalculateMessageJSON) && (evt == kNext)) return kIsForwardingMessage; else
 	if ((mState == kClearDataAndReloadTable) && (evt == kNext)) return kLetDidRecordBeIsForwardedValue; else
+	if ((mState == kCopyRecipientsAndReloadTable) && (evt == kNext)) return kFixRecipientList; else
 	if ((mState == kDidWeRecord) && (evt == kNo)) return kWaitToRecordIdle; else
 	if ((mState == kDidWeRecord) && (evt == kYes)) return kWaitToPlayIdle; else
 	if ((mState == kDoWeHaveContactsToSendTo) && (evt == kNo)) return kShowNoContactsToSendTo; else
 	if ((mState == kDoWeHaveContactsToSendTo) && (evt == kYes)) return kShowConfirmSend; else
+	if ((mState == kDoWeHaveRecipientsOrARecording) && (evt == kNo)) return kCopyRecipientsAndReloadTable; else
+	if ((mState == kDoWeHaveRecipientsOrARecording) && (evt == kYes)) return kShowComposeNewMessage; else
 	if ((mState == kDoWeNeedToWaitForTranscription) && (evt == kNo)) return kLetDidRecordBeTrue; else
 	if ((mState == kDoWeNeedToWaitForTranscription) && (evt == kYes)) return kSetWaitForTranscription; else
 	if ((mState == kFixRecipientList) && (evt == kNext)) return kLetDidRecordBeIsForwardedValue; else
@@ -604,9 +645,11 @@ int  RecordMessageScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kLetDidRecordBeTrue) && (evt == kNext)) return kDidWeRecord; else
 	if ((mState == kPauseAudio) && (evt == kNext)) return kPausedIdle; else
 	if ((mState == kPausedIdle) && (evt == kCancelPressed)) return kStopPlayingBeforePop; else
+	if ((mState == kPausedIdle) && (evt == kNewMessage)) return kPeerSwitchToNewMemoTab; else
 	if ((mState == kPausedIdle) && (evt == kPlayPressed)) return kResumeAudio; else
 	if ((mState == kPausedIdle) && (evt == kSendPressed)) return kStopPlayingBeforeSend; else
 	if ((mState == kPeerSwitchToInboxTab) && (evt == kNext)) return kClearDataAndReloadTable; else
+	if ((mState == kPeerSwitchToNewMemoTab) && (evt == kNext)) return kDoWeHaveRecipientsOrARecording; else
 	if ((mState == kPlayAudio) && (evt == kNext)) return kPlayingIdle; else
 	if ((mState == kPlayingIdle) && (evt == kCancelPressed)) return kStopPlayingBeforePop; else
 	if ((mState == kPlayingIdle) && (evt == kFinishedPlaying)) return kStopAudio; else
@@ -623,6 +666,8 @@ int  RecordMessageScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kSendReloadInboxToVC) && (evt == kNext)) return kIsDidPostTrue; else
 	if ((mState == kSetWaitForPostAudio) && (evt == kNext)) return kCalculateMessageJSON; else
 	if ((mState == kSetWaitForTranscription) && (evt == kNext)) return kWaitForTranscriptionIdle; else
+	if ((mState == kShowComposeNewMessage) && (evt == kNo)) return kDidWeRecord; else
+	if ((mState == kShowComposeNewMessage) && (evt == kYes)) return kCopyRecipientsAndReloadTable; else
 	if ((mState == kShowConfirmSend) && (evt == kNo)) return kWaitToPlayIdle; else
 	if ((mState == kShowConfirmSend) && (evt == kYes)) return kSetWaitForPostAudio; else
 	if ((mState == kShowMessageSent) && (evt == kYes)) return kAreWeTheNewMemoTab; else
@@ -634,10 +679,13 @@ int  RecordMessageScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kStopPlayingBeforePop) && (evt == kNext)) return kSendReloadInboxToVC; else
 	if ((mState == kStopPlayingBeforeSend) && (evt == kNext)) return kDoWeHaveContactsToSendTo; else
 	if ((mState == kStopRecordingAudio) && (evt == kNext)) return kDoWeNeedToWaitForTranscription; else
+	if ((mState == kWaitForTranscriptionIdle) && (evt == kNewMessage)) return kPeerSwitchToNewMemoTab; else
 	if ((mState == kWaitForTranscriptionIdle) && (evt == kTranscriptionReady)) return kLetDidRecordBeTrue; else
 	if ((mState == kWaitToPlayIdle) && (evt == kCancelPressed)) return kSendReloadInboxToVC; else
+	if ((mState == kWaitToPlayIdle) && (evt == kNewMessage)) return kPeerSwitchToNewMemoTab; else
 	if ((mState == kWaitToPlayIdle) && (evt == kPlayPressed)) return kPlayAudio; else
 	if ((mState == kWaitToPlayIdle) && (evt == kSendPressed)) return kDoWeHaveContactsToSendTo; else
+	if ((mState == kWaitToRecordIdle) && (evt == kNewMessage)) return kPeerSwitchToNewMemoTab; else
 	if ((mState == kWaitToRecordIdle) && (evt == kRecordPressed)) return kStartRecordingAudio; else
 	if ((mState == kWasPostAudioSuccessful) && (evt == kNo)) return kShowPostAudioFailed; else
 	if ((mState == kWasPostAudioSuccessful) && (evt == kYes)) return kSendPostTranscriptToServer; else
@@ -655,6 +703,7 @@ bool RecordMessageScreen::HasEdgeNamedNext() const
 	{
 		case kCalculateMessageJSON:
 		case kClearDataAndReloadTable:
+		case kCopyRecipientsAndReloadTable:
 		case kFixRecipientList:
 		case kLetDidPostBeFalse:
 		case kLetDidPostBeTrue:
@@ -662,6 +711,7 @@ bool RecordMessageScreen::HasEdgeNamedNext() const
 		case kLetDidRecordBeTrue:
 		case kPauseAudio:
 		case kPeerSwitchToInboxTab:
+		case kPeerSwitchToNewMemoTab:
 		case kPlayAudio:
 		case kResumeAudio:
 		case kSendReloadInboxToVC:
@@ -754,6 +804,12 @@ void RecordMessageScreen::update(const GCTEvent& msg)
             }
             break;
 
+        case GCTEvent::kNewMessageToGroup:
+            mNewMessageRecipients = msg.mGroup;
+            [mPeer setBlockingViewVisible:false];
+            process(kNewMessage);
+            break;
+
         case GCTEvent::kAppendNewContact:
             if (msg.mIdentifier == this)
             {
@@ -813,6 +869,7 @@ void RecordMessageScreen::update(const GCTEvent& msg)
         default:
             switch (getState())
             {
+                case kShowComposeNewMessage:
                 case kShowConfirmSend:
                 case kShowMessageSent:
                 case kShowNoContactsToSendTo:

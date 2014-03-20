@@ -38,7 +38,7 @@ protected:
 	void buildMessageHistoryEntry();
 	void idleEntry();
 	void peerPushInboxMessageEntry();
-	void peerPushRecordMessageEntry();
+	void sendNewMessageToGroupToVCEntry();
 
 public:
 	enum EventType
@@ -57,7 +57,7 @@ public:
 		kEnd,
 		kIdle,
 		kPeerPushInboxMessage,
-		kPeerPushRecordMessage,
+		kSendNewMessageToGroupToVC,
 	};
 
 protected:
