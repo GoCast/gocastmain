@@ -70,6 +70,7 @@ protected:
 	void letDidRecordBeTrueEntry();
 	void pauseAudioEntry();
 	void pausedIdleEntry();
+	void peerPopAllInboxViewsEntry();
 	void peerPopSelfEntry();
 	void peerSwitchToInboxTabEntry();
 	void peerSwitchToNewMemoTabEntry();
@@ -144,6 +145,7 @@ public:
 		kLetDidRecordBeTrue,
 		kPauseAudio,
 		kPausedIdle,
+		kPeerPopAllInboxViews,
 		kPeerPopSelf,
 		kPeerSwitchToInboxTab,
 		kPeerSwitchToNewMemoTab,

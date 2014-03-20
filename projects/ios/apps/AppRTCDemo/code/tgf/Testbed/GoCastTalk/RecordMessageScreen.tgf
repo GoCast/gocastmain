@@ -46,6 +46,7 @@
 46 Copy recipients and reload table
 47 Peer: switch to New Memo Tab
 48 Do we have recipients or a recording?
+49 Peer: pop all Inbox views
 #
 3 4 no
 4 5 recordPressed
@@ -93,7 +94,7 @@
 32 26 yes
 32 19 no
 33 29 no
-33 44 yes
+33 49 yes
 34 24
 24 36
 35 14
@@ -119,3 +120,4 @@
 38 47 newMessage
 48 45 yes
 48 46 no
+49 44

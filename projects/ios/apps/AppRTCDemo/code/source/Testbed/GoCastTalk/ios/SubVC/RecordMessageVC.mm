@@ -1,5 +1,6 @@
 #include "RecordMessageVC.h"
 #include "ContactsVC.h"
+#include "InboxVC.h"
 
 #include "Base/package.h"
 #include "Io/package.h"
@@ -360,6 +361,12 @@
 -(void)popSelf
 {
     [(UINavigationController*)self.parentViewController popViewControllerAnimated:TRUE];
+}
+
+-(void)popAllInboxViews
+{
+    [gAppDelegateInstance.mInboxVC popToRootViewControllerAnimated:NO];
+    [((InboxVC*)gAppDelegateInstance.mInboxVC.topViewController).mTable scrollRectToVisible:CGRectMake(0, 0, 1, 1) animated:YES];
 }
 
 -(void)switchToInboxTab
