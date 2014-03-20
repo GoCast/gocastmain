@@ -16,6 +16,9 @@ class InboxMessageScreen;
 {
     JSONObject mInitObject;
     InboxMessageScreen* mPeer;
+    bool    mToExpanded;
+    CGSize  mScrollPreExpansion;
+    float   mOriginalBottomY;
 }
 
 //mInboxView
@@ -27,7 +30,11 @@ class InboxMessageScreen;
 @property (nonatomic, strong) IBOutlet UISlider*        mSlider;
 @property (nonatomic, strong) IBOutlet UILabel*         mTime;
 
+@property (nonatomic, strong) IBOutlet UIScrollView*    mScrollView;
+@property (nonatomic, strong) IBOutlet UIScrollView*    mBottomHalf;
+
 @property (nonatomic, strong) IBOutlet UITableView*     mTable;
+@property (nonatomic, strong) IBOutlet UITableView*     mToTable;
 @property (nonatomic, strong) IBOutlet UIView*          mBlockingView;
 
 #pragma mark Construction / Destruction

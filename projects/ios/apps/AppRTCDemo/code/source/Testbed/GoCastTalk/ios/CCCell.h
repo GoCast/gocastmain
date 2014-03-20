@@ -20,6 +20,8 @@
 -(void) setAsZero:(bool)expanded withLabel:(const std::string&)newLabel;
 -(void) setAsNonZero:(size_t)ident withLabel:(const std::string&)newLabel;
 
+-(void) noButtons;
+
 -(void) setDelegate:(id <CCCellDelegate>)newDelegate;
 
 @property (nonatomic, strong) IBOutlet UIView       *mContentView;

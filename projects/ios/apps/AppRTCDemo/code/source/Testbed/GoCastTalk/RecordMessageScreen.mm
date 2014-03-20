@@ -244,6 +244,22 @@ void RecordMessageScreen::wasPostMessageSuccessfulEntry()
 }
 
 #pragma mark Actions
+void RecordMessageScreen::fixRecipientListEntry()
+{
+    JSONArray arr = mInitObject["to"].mArray;
+    JSONArray arr2;
+
+    for (size_t i = 0; i < arr.size(); i++)
+    {
+        if (!arr[i].mString.empty())
+        {
+            arr2.push_back(arr[i]);
+        }
+    }
+
+    mInitObject["to"].mArray = arr2;
+}
+
 void RecordMessageScreen::calculateMessageJSONEntry()
 {
     std::map<std::string, int> calculated;
@@ -509,6 +525,7 @@ void RecordMessageScreen::CallEntry()
 		case kDoWeHaveContactsToSendTo: doWeHaveContactsToSendToEntry(); break;
 		case kDoWeNeedToWaitForTranscription: doWeNeedToWaitForTranscriptionEntry(); break;
 		case kEnd: EndEntryHelper(); break;
+		case kFixRecipientList: fixRecipientListEntry(); break;
 		case kInvalidState: invalidStateEntry(); break;
 		case kIsDidPostTrue: isDidPostTrueEntry(); break;
 		case kIsForwardingMessage: isForwardingMessageEntry(); break;
@@ -570,6 +587,7 @@ int  RecordMessageScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kDoWeHaveContactsToSendTo) && (evt == kYes)) return kShowConfirmSend; else
 	if ((mState == kDoWeNeedToWaitForTranscription) && (evt == kNo)) return kLetDidRecordBeTrue; else
 	if ((mState == kDoWeNeedToWaitForTranscription) && (evt == kYes)) return kSetWaitForTranscription; else
+	if ((mState == kFixRecipientList) && (evt == kNext)) return kLetDidRecordBeIsForwardedValue; else
 	if ((mState == kIsDidPostTrue) && (evt == kNo)) return kAreWeTheNewMemoTab; else
 	if ((mState == kIsDidPostTrue) && (evt == kYes)) return kShowMessageSent; else
 	if ((mState == kIsForwardingMessage) && (evt == kNo)) return kSendPostAudioToServer; else
@@ -603,7 +621,7 @@ int  RecordMessageScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kShowMessageSent) && (evt == kYes)) return kAreWeTheNewMemoTab; else
 	if ((mState == kShowNoContactsToSendTo) && (evt == kYes)) return kWaitToPlayIdle; else
 	if ((mState == kShowPostAudioFailed) && (evt == kYes)) return kSendReloadInboxToVC; else
-	if ((mState == kStart) && (evt == kNext)) return kLetDidRecordBeIsForwardedValue; else
+	if ((mState == kStart) && (evt == kNext)) return kFixRecipientList; else
 	if ((mState == kStartRecordingAudio) && (evt == kNext)) return kRecordingIdle; else
 	if ((mState == kStopAudio) && (evt == kNext)) return kDidWeRecord; else
 	if ((mState == kStopPlayingBeforePop) && (evt == kNext)) return kSendReloadInboxToVC; else
@@ -630,6 +648,7 @@ bool RecordMessageScreen::HasEdgeNamedNext() const
 	{
 		case kCalculateMessageJSON:
 		case kClearDataAndReloadTable:
+		case kFixRecipientList:
 		case kLetDidPostBeFalse:
 		case kLetDidPostBeTrue:
 		case kLetDidRecordBeIsForwardedValue:

@@ -28,6 +28,7 @@
 28 Send markRead to server
 29 Set "wait for markRead"
 30 Send ReloadInbox to VC for markRead
+31 Fix recipient list
 #
 4 5 fail
 4 6 success
@@ -37,7 +38,7 @@
 6 18
 8 9
 10 7 no
-1 14
+1 31
 10 18 yes
 3 15 playPressed
 9 11 playPressed
@@ -69,3 +70,4 @@
 28 10 fail
 28 30 success
 30 10
+31 14

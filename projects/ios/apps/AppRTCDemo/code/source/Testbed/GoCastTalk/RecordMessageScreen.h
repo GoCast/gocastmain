@@ -58,6 +58,7 @@ protected:
 	void didWeRecordEntry();
 	void doWeHaveContactsToSendToEntry();
 	void doWeNeedToWaitForTranscriptionEntry();
+	void fixRecipientListEntry();
 	void isDidPostTrueEntry();
 	void isForwardingMessageEntry();
 	void letDidPostBeFalseEntry();
@@ -125,6 +126,7 @@ public:
 		kDoWeHaveContactsToSendTo,
 		kDoWeNeedToWaitForTranscription,
 		kEnd,
+		kFixRecipientList,
 		kIsDidPostTrue,
 		kIsForwardingMessage,
 		kLetDidPostBeFalse,

@@ -40,13 +40,14 @@
 40 Do we need to wait for transcription?
 41 Show "confirm send?"
 42 Show "Message sent"
+43 Fix recipient list
 #
 3 4 no
 4 5 recordPressed
 3 6 yes
 5 7
 7 8 stopPressed
-1 24
+1 43
 8 40
 6 10 playPressed
 10 9
@@ -101,3 +102,4 @@
 41 17 yes
 41 6 no
 42 33 yes
+43 24

@@ -66,6 +66,12 @@
     [self.mDelButton setHidden:NO];
 }
 
+-(void) noButtons
+{
+    [self.mAddButton setHidden:YES];
+    [self.mDelButton setHidden:YES];
+}
+
 -(void) setDelegate:(id <CCCellDelegate>)newDelegate
 {
     self->mDelegate = newDelegate;

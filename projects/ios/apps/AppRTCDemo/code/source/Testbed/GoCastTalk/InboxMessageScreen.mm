@@ -20,6 +20,16 @@ InboxMessageScreen::~InboxMessageScreen()
 }
 
 #pragma mark Public methods
+size_t InboxMessageScreen::getToCount()
+{
+    return mInitObject["to"].mArray.size();
+}
+
+std::string InboxMessageScreen::getTo(const size_t& i)
+{
+    return mInitObject["to"].mArray[i].mString;
+}
+
 void InboxMessageScreen::playPressed()
 {
     update(kPlayPressed);
@@ -129,6 +139,22 @@ void InboxMessageScreen::wereWeGoingToPlayEntry()
 }
 
 #pragma mark Actions
+void InboxMessageScreen::fixRecipientListEntry()
+{
+    JSONArray arr = mInitObject["to"].mArray;
+    JSONArray arr2;
+
+    for (size_t i = 0; i < arr.size(); i++)
+    {
+        if (!arr[i].mString.empty())
+        {
+            arr2.push_back(arr[i]);
+        }
+    }
+
+    mInitObject["to"].mArray = arr2;
+}
+
 void InboxMessageScreen::sendDeleteMessageToServerEntry()
 {
     char buf[512];
@@ -301,6 +327,7 @@ void InboxMessageScreen::CallEntry()
 		case kCopyDownloadToLocalFiles: copyDownloadToLocalFilesEntry(); break;
 		case kDoesAudioExistLocally: doesAudioExistLocallyEntry(); break;
 		case kEnd: EndEntryHelper(); break;
+		case kFixRecipientList: fixRecipientListEntry(); break;
 		case kIdle: idleEntry(); break;
 		case kInvalidState: invalidStateEntry(); break;
 		case kPauseSound: pauseSoundEntry(); break;
@@ -342,6 +369,7 @@ int  InboxMessageScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kCopyDownloadToLocalFiles) && (evt == kNext)) return kUpdateTimeLabel; else
 	if ((mState == kDoesAudioExistLocally) && (evt == kNo)) return kSetWaitForDownload; else
 	if ((mState == kDoesAudioExistLocally) && (evt == kYes)) return kUpdateTimeLabel; else
+	if ((mState == kFixRecipientList) && (evt == kNext)) return kSetWasPlayingToFalse; else
 	if ((mState == kIdle) && (evt == kDeleteSelected)) return kSetWaitForDeleteMessage; else
 	if ((mState == kIdle) && (evt == kForwardSelected)) return kPeerPushForwardMessage; else
 	if ((mState == kIdle) && (evt == kPastSelected)) return kPeerPushMessageHistory; else
@@ -372,7 +400,7 @@ int  InboxMessageScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kShowErrorDeletingMessage) && (evt == kYes)) return kIdle; else
 	if ((mState == kShowRetryDownload) && (evt == kNo)) return kIdle; else
 	if ((mState == kShowRetryDownload) && (evt == kYes)) return kSetWaitForDownload; else
-	if ((mState == kStart) && (evt == kNext)) return kSetWasPlayingToFalse; else
+	if ((mState == kStart) && (evt == kNext)) return kFixRecipientList; else
 	if ((mState == kStopSound) && (evt == kNext)) return kSetWasPlayingToFalse; else
 	if ((mState == kUpdateTimeLabel) && (evt == kNext)) return kWereWeGoingToPlay; else
 	if ((mState == kWasDeleteMessageValid) && (evt == kNo)) return kShowErrorDeletingMessage; else

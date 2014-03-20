@@ -29,6 +29,9 @@ public:
 	InboxMessageScreen(InboxMessageVC* newVC, const JSONObject& initObject);
 	~InboxMessageScreen();
 
+    size_t getToCount();
+    std::string getTo(const size_t& i);
+
     void playPressed();
     void pastPressed();
     void replyPressed();
@@ -42,6 +45,7 @@ protected:
 
 	void copyDownloadToLocalFilesEntry();
 	void doesAudioExistLocallyEntry();
+	void fixRecipientListEntry();
 	void idleEntry();
 	void pauseSoundEntry();
 	void pausedIdleEntry();
@@ -93,6 +97,7 @@ public:
 		kCopyDownloadToLocalFiles,
 		kDoesAudioExistLocally,
 		kEnd,
+		kFixRecipientList,
 		kIdle,
 		kPauseSound,
 		kPausedIdle,

@@ -18,16 +18,78 @@
 
 @implementation InboxMessageVC
 
+#pragma mark CCCell helper methods
+
+#define kCellSize 40
+
+-(void)expandTo
+{
+    CGRect f;
+    size_t count = mPeer->getToCount() + 1;
+
+    f = self.mToTable.frame;
+    f.size.height = kCellSize * count;
+    [self.mToTable setFrame:f];
+
+    f = self.mBottomHalf.frame;
+    f.origin.y = mOriginalBottomY + kCellSize * (count - 1);
+    [self.mBottomHalf setFrame:f];
+
+    self->mToExpanded = true;
+    [self.mToTable reloadData];
+
+    CGSize s = self->mScrollPreExpansion;
+
+    s.height += kCellSize * (count - 1);
+
+    [self.mScrollView setContentSize:s];
+}
+
+-(void)contractTo
+{
+    CGRect f;
+
+    f = self.mToTable.frame;
+    f.size.height = kCellSize;
+    [self.mToTable setFrame:f];
+
+    f = self.mBottomHalf.frame;
+    f.origin.y = mOriginalBottomY;
+    [self.mBottomHalf setFrame:f];
+
+    self->mToExpanded = false;
+    [self.mToTable reloadData];
+
+    [self.mScrollView setContentSize:self->mScrollPreExpansion];
+}
+
+-(void)toggleExpand
+{
+    if (self->mToExpanded)
+    {
+        [self contractTo];
+    }
+    else
+    {
+        [self expandTo];
+    }
+}
+
 #pragma mark Construction / Destruction
 - (void)viewDidLoad
 {
     [super viewDidLoad];
 
     [self.mTable registerNib:[UINib nibWithNibName:@"HeadingSubCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"HeadingSubCell"];
+    [self.mToTable registerNib:[UINib nibWithNibName:@"CCCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"CCCell"];
 
     self.view.autoresizesSubviews = YES;
 
     mPeer = new InboxMessageScreen(self, mInitObject);
+
+    self->mScrollPreExpansion   = self.mScrollView.contentSize;
+    self->mOriginalBottomY      = self.mBottomHalf.frame.origin.y;
+    [self contractTo];
 
     std::string date    = InboxScreen::gmtToLocal(mInitObject["date"].mString);
     std::string result  = "xx/xx xx:xx";
@@ -82,14 +144,30 @@
     {
         return (NSInteger)3;
     }
+    else if (tableView == self.mToTable)
+    {
+        if (!self->mToExpanded)
+        {
+            return (NSInteger)1;
+        }
+
+        return (NSInteger)mPeer->getToCount() + 1;
+    }
 
     return (NSInteger)1;
 }
 
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
 {
-#pragma unused(tableView, indexPath)
-    [cell setBackgroundColor:[UIColor whiteColor]];
+#pragma unused(indexPath)
+    if (tableView == self.mTable)
+    {
+        [cell setBackgroundColor:[UIColor whiteColor]];
+    }
+    else if (tableView == self.mToTable)
+    {
+        [cell setBackgroundColor:[UIColor colorWithRed:0.9f green:0.9f blue:0.9f alpha:1.0f]];
+    }
 }
 
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -153,6 +231,35 @@
 
         return cell;
     }
+    else if (tableView == self.mToTable)
+    {
+        tableView.backgroundView = nil;
+
+        static NSString *simpleTableIdentifier = @"CCCell";
+
+        CCCell *cell = [tableView dequeueReusableCellWithIdentifier:simpleTableIdentifier];
+
+        if (cell == nil)
+        {
+            cell = [[[CCCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:simpleTableIdentifier] autorelease];
+        }
+
+        [cell setDelegate:nil];
+
+        switch (indexPath.row)
+        {
+            case 0:
+                [cell setAsZero:self->mToExpanded withLabel:"Recipients"];
+                break;
+
+            default:
+                [cell setAsNonZero:(size_t)indexPath.row - 1 withLabel:InboxScreen::nameFromEmail(mPeer->getTo((size_t)indexPath.row - 1))];
+                break;
+        }
+        [cell noButtons];
+
+        return cell;
+    }
     else
     {
         tableView.backgroundView = nil;
@@ -178,14 +285,27 @@
 {
 #pragma unused(tableView)
 
-    switch (indexPath.row)
+    if (tableView == self.mTable)
     {
-        case 0: mPeer->replyPressed(); break;
-        case 1: mPeer->pastPressed(); break;
-        case 2: mPeer->deletePressed(); break;
+        switch (indexPath.row)
+        {
+            case 0: mPeer->replyPressed(); break;
+            case 1: mPeer->pastPressed(); break;
+            case 2: mPeer->deletePressed(); break;
 
-        default:
-            break;
+            default:
+                break;
+        }
+    }
+    else if (tableView == self.mToTable)
+    {
+        switch (indexPath.row)
+        {
+            case 0: [self toggleExpand]; break;
+
+            default:
+                break;
+        }
     }
 }
 
