@@ -175,6 +175,11 @@ void RecordMessageScreen::peerPopSelfEntry()
     [mPeer popSelf];
 }
 
+void RecordMessageScreen::peerSwitchToInboxTabEntry()
+{
+    [mPeer switchToInboxTab];
+}
+
 #pragma mark Queries
 
 void RecordMessageScreen::areWeTheNewMemoTabEntry()
@@ -536,6 +541,7 @@ void RecordMessageScreen::CallEntry()
 		case kPauseAudio: pauseAudioEntry(); break;
 		case kPausedIdle: pausedIdleEntry(); break;
 		case kPeerPopSelf: peerPopSelfEntry(); break;
+		case kPeerSwitchToInboxTab: peerSwitchToInboxTabEntry(); break;
 		case kPlayAudio: playAudioEntry(); break;
 		case kPlayingIdle: playingIdleEntry(); break;
 		case kRecordingIdle: recordingIdleEntry(); break;
@@ -578,7 +584,7 @@ void RecordMessageScreen::CallExit()
 int  RecordMessageScreen::StateTransitionFunction(const int evt) const
 {
 	if ((mState == kAreWeTheNewMemoTab) && (evt == kNo)) return kPeerPopSelf; else
-	if ((mState == kAreWeTheNewMemoTab) && (evt == kYes)) return kClearDataAndReloadTable; else
+	if ((mState == kAreWeTheNewMemoTab) && (evt == kYes)) return kPeerSwitchToInboxTab; else
 	if ((mState == kCalculateMessageJSON) && (evt == kNext)) return kIsForwardingMessage; else
 	if ((mState == kClearDataAndReloadTable) && (evt == kNext)) return kLetDidRecordBeIsForwardedValue; else
 	if ((mState == kDidWeRecord) && (evt == kNo)) return kWaitToRecordIdle; else
@@ -600,6 +606,7 @@ int  RecordMessageScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kPausedIdle) && (evt == kCancelPressed)) return kStopPlayingBeforePop; else
 	if ((mState == kPausedIdle) && (evt == kPlayPressed)) return kResumeAudio; else
 	if ((mState == kPausedIdle) && (evt == kSendPressed)) return kStopPlayingBeforeSend; else
+	if ((mState == kPeerSwitchToInboxTab) && (evt == kNext)) return kClearDataAndReloadTable; else
 	if ((mState == kPlayAudio) && (evt == kNext)) return kPlayingIdle; else
 	if ((mState == kPlayingIdle) && (evt == kCancelPressed)) return kStopPlayingBeforePop; else
 	if ((mState == kPlayingIdle) && (evt == kFinishedPlaying)) return kStopAudio; else
@@ -654,6 +661,7 @@ bool RecordMessageScreen::HasEdgeNamedNext() const
 		case kLetDidRecordBeIsForwardedValue:
 		case kLetDidRecordBeTrue:
 		case kPauseAudio:
+		case kPeerSwitchToInboxTab:
 		case kPlayAudio:
 		case kResumeAudio:
 		case kSendReloadInboxToVC:

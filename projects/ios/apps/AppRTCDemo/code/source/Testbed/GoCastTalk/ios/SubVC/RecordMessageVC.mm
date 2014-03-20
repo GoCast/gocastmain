@@ -361,6 +361,11 @@
     [(UINavigationController*)self.parentViewController popViewControllerAnimated:TRUE];
 }
 
+-(void)switchToInboxTab
+{
+    [gAppDelegateInstance.tabBarController setSelectedIndex:0];
+}
+
 -(void)pushMessageSent
 {
     [gAppDelegateInstance pushMessageSent];

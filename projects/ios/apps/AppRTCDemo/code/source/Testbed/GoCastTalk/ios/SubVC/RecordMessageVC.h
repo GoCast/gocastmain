@@ -68,6 +68,7 @@ class RecordMessageScreen;
 
 -(void)pushContacts;
 -(void)popSelf;
+-(void)switchToInboxTab;
 -(void)pushMessageSent;
 
 -(void)refreshExpanded;

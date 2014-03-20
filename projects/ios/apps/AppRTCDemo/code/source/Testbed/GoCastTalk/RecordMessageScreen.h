@@ -68,6 +68,7 @@ protected:
 	void pauseAudioEntry();
 	void pausedIdleEntry();
 	void peerPopSelfEntry();
+	void peerSwitchToInboxTabEntry();
 	void playAudioEntry();
 	void playingIdleEntry();
 	void recordingIdleEntry();
@@ -136,6 +137,7 @@ public:
 		kPauseAudio,
 		kPausedIdle,
 		kPeerPopSelf,
+		kPeerSwitchToInboxTab,
 		kPlayAudio,
 		kPlayingIdle,
 		kRecordingIdle,
