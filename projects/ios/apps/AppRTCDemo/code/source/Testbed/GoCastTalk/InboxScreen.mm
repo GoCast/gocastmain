@@ -239,6 +239,14 @@ void InboxScreen::wasGetContactsValidEntry()
     {
         mContacts = mGetContactsJSON["contacts"].mArray;
 
+        JSONObject misterFeedback;
+
+        misterFeedback["kanji"] = std::string("Mr. 饋還");
+        misterFeedback["kana"] = std::string("ミスターフィードバック");
+        misterFeedback["email"] = std::string("feedback@gocast.it");
+
+        mContacts.push_back(misterFeedback);
+
         result = true;
     }
 
@@ -295,6 +303,20 @@ void InboxScreen::clearInboxEntry()
 void InboxScreen::sortTableByDateEntry()
 {
     mInbox = mListMessagesJSON["list"].mArray;
+
+//Fake message
+    JSONObject welcomeMessage;
+    welcomeMessage["from"]  = std::string("feedback@gocast.it");
+    welcomeMessage["date"]  = std::string("2001010201010101");
+    welcomeMessage["to"]    = JSONArray();
+    welcomeMessage["to"].mArray.push_back(InboxScreen::mEmailAddress);
+    welcomeMessage["audio"] = std::string("welcome-feedback@gocast.it");
+    welcomeMessage["read"]  = std::string("yes");
+    welcomeMessage["transcription"] = JSONObject();
+    welcomeMessage["transcription"].mObject["ja"] =
+    std::string("ようこそ。\nこのアプリはGoCastTalkです。\nこれは完璧なエンジニアリングの例です。ハハハ。\n真剣に、それは完璧だ。\nあなたはすでにこれを知っていた。");
+
+    mInbox.push_back(welcomeMessage);
 
     std::sort(mInbox.begin(), mInbox.end(), sortByDate);
 }
