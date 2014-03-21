@@ -2,6 +2,7 @@
 // error_reporting(E_ALL);
 
 include 'utils.php';
+include 'token.php';
 
 include 'login.php';
 include 'register.php';
