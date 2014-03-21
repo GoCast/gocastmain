@@ -11,12 +11,20 @@ function login($name, $password)
 		{
 			if ($arr[$name] === $password)
 			{
-				$user_json	= '{ "authToken": "' . add_new_token($name) . '" }';
-				$user		= json_decode( $user_json, true);
+				$token = add_new_token($name);
+				if ($token != false)
+				{
+					$user		= json_decode( '{ "authToken": "' . $token . '" }', true);
 
-				$result = array("status" => "success",
-								"message" => "Login was successful",
-								"user" => $user);
+					$result = array("status" => "success",
+									"message" => "Login was successful",
+									"user" => $user);
+				}
+				else
+				{
+					$result = array("status" => "fail",
+									"message" => "Token generation failed");
+				}
 			}
 			else
 			{

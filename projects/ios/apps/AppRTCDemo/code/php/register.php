@@ -32,12 +32,21 @@ function register($name, $password)
 
 		if (atomic_put_contents("database/accounts.json", json_encode($arr)) != false)
 		{
-			$user_json	= '{ "authToken": "' . add_new_token($name) . '" }';
-			$user		= json_decode( $user_json, true);
+			$token = add_new_token($name);
 
-			$result = array("status" => "success",
-							"message" => "User successfully registered",
-							"user" => $user);
+			if ($token != false)
+			{
+				$user		= json_decode( '{ "authToken": "' . $token . '" }', true);
+
+				$result = array("status" => "success",
+								"message" => "User successfully registered",
+								"user" => $user);
+			}
+			else
+			{
+				$result = array("status" => "fail",
+								"message" => "Token generation failed");
+			}
 		}
 		else
 		{
