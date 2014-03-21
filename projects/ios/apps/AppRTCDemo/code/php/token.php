@@ -62,6 +62,39 @@ function write_token_global($name, $token)
 	return $result;
 }
 
+function verify_token_user($name, $token)
+{
+	$result	= false;
+	$json	= false;
+	$arr	= array();
+
+	if (!is_dir("database/user/$name"))
+	{
+		mkdir("database/user/$name", 0777, true);
+	}
+
+	if (is_file("database/user/$name/tokens.json"))
+	{
+		$json = atomic_get_contents("database/user/$name/tokens.json");
+	}
+
+	if ($json != false)
+	{
+		$arr = json_decode($json, true);
+	}
+
+	foreach($arr as $iter)
+	{
+		if ($iter["token"] === $token)
+		{
+			$result = true;
+			break;
+		}
+	}
+
+	return $result;
+}
+
 function add_new_token($name)
 {
 	$token = bin2hex(openssl_random_pseudo_bytes(32));

@@ -24,115 +24,107 @@ if(hasParam("action"))
 {
 	if (hasParam("authToken"))
 	{
-		if ($_SERVER['REQUEST_METHOD'] === "POST")
+		if (hasParam("name"))
 		{
-			if ($_POST["action"] === "setContacts")
+			if ($_SERVER['REQUEST_METHOD'] === "POST")
 			{
-				if (hasParam("name"))
+				if (verify_token_user($_POST["name"], $_POST["authToken"]))
 				{
-					print(json_encode(setContacts($_POST["name"])));
-				}
-			}
-			else if ($_POST["action"] === "setGroups")
-			{
-				if (hasParam("name"))
-				{
-					print(json_encode(setGroups($_POST["name"])));
-				}
-			}
-			else if ($_POST["action"] === "postAudio")
-			{
-				if (hasParam("name"))
-				{
-					if (hasParam("audio"))
+					switch($_POST["action"])
 					{
-						print(json_encode(postAudio($_POST["name"], $_POST["audio"])));
-					}
-					else
-					{
-						print(json_encode(errorMissingParameter("audio")));
-					}
-				}
-				else
-				{
-					print(json_encode(errorMissingParameter("name")));
-				}
-			}
-			else if ($_POST["action"] === "postMessage")
-			{
-				if (hasParam("name"))
-				{
-					print(json_encode(postMessage($_POST["name"])));
-				}
-				else
-				{
-					print(json_encode(errorMissingParameter("name")));
-				}
-			}
-			else if ($_POST["action"] === "postTranscription")
-			{
-				if (hasParam("name"))
-				{
-					if (hasParam("audio"))
-					{
-						print(json_encode(postTranscription($_POST["name"], $_POST["audio"])));
-					}
-					else
-					{
-						print(json_encode(errorMissingParameter("audio")));
+						case "setContacts":
+							print(json_encode(setContacts($_POST["name"])));
+							break;
+
+						case "setGroups":
+							print(json_encode(setGroups($_POST["name"])));
+							break;
+
+						case "postAudio":
+							if (hasParam("audio"))
+							{
+								print(json_encode(postAudio($_POST["name"], $_POST["audio"])));
+							}
+							else
+							{
+								print(json_encode(errorMissingParameter("audio")));
+							}
+							break;
+
+						case "postMessage":
+							print(json_encode(postMessage($_POST["name"])));
+							break;
+
+						case "postTranscription":
+							if (hasParam("audio"))
+							{
+								print(json_encode(postTranscription($_POST["name"], $_POST["audio"])));
+							}
+							else
+							{
+								print(json_encode(errorMissingParameter("audio")));
+							}
+							break;
+
+						default:
+							print(json_encode(array("status" => "fail", "message" => "Unknown command")));
+							break;
 					}
 				}
 				else
 				{
-					print(json_encode(errorMissingParameter("name")));
+					print(json_encode(errorAuthToken()));
 				}
 			}
 			else
 			{
-				print(json_encode(array("status" => "fail", "message" => "Unknown command")));
-			}
-		}
-		else if (hasParam("name"))
-		{
-			switch($_GET["action"])
-			{
-				case "getContacts":
-					print(json_encode(getContacts($_GET["name"])));
-					break;
-
-				case "getGroups":
-					print(json_encode(getGroups($_GET["name"])));
-					break;
-
-				case "listMessages":
-					print(json_encode(listMessages($_GET["name"])));
-					break;
-
-				case "deleteMessage":
-					if (hasParam("audio"))
+				if (verify_token_user($_GET["name"], $_GET["authToken"]))
+				{
+					switch($_GET["action"])
 					{
-						print(json_encode(deleteMessage($_GET["name"], $_GET["audio"])));
-					}
-					else
-					{
-						print(json_encode(errorMissingParameter("audio")));
-					}
-					break;
+						case "getContacts":
+							print(json_encode(getContacts($_GET["name"])));
+							break;
 
-				case "markRead":
-					if (hasParam("audio"))
-					{
-						print(json_encode(markRead($_GET["name"], $_GET["audio"])));
-					}
-					else
-					{
-						print(json_encode(errorMissingParameter("audio")));
-					}
-					break;
+						case "getGroups":
+							print(json_encode(getGroups($_GET["name"])));
+							break;
 
-				default:
-					print(json_encode(array("status" => "fail", "message" => "Unknown command")));
-					break;
+						case "listMessages":
+							print(json_encode(listMessages($_GET["name"])));
+							break;
+
+						case "deleteMessage":
+							if (hasParam("audio"))
+							{
+								print(json_encode(deleteMessage($_GET["name"], $_GET["audio"])));
+							}
+							else
+							{
+								print(json_encode(errorMissingParameter("audio")));
+							}
+							break;
+
+						case "markRead":
+							if (hasParam("audio"))
+							{
+								print(json_encode(markRead($_GET["name"], $_GET["audio"])));
+							}
+							else
+							{
+								print(json_encode(errorMissingParameter("audio")));
+							}
+							break;
+
+						default:
+							print(json_encode(array("status" => "fail", "message" => "Unknown command")));
+							break;
+					}
+				}
+				else
+				{
+					print(json_encode(errorAuthToken()));
+				}
 			}
 		}
 		else

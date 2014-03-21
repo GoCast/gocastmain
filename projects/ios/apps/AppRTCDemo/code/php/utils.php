@@ -77,4 +77,10 @@ function errorMissingParameter($x)
 					"message" => "Missing parameter: $x");
 }
 
+function errorAuthToken()
+{
+	return array(	"status" => "expired",
+					"message" => "Invalid or expired token");
+}
+
 ?>
