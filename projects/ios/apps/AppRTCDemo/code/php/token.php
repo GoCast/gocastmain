@@ -62,6 +62,52 @@ function write_token_global($name, $token)
 	return $result;
 }
 
+function remove_token_user($name, $token)
+{
+	$result	= false;
+	$json	= false;
+	$arr	= array();
+	$arr2	= array();
+	$found	= false;
+
+	if (!is_dir("database/user/$name"))
+	{
+		mkdir("database/user/$name", 0777, true);
+	}
+
+	if (is_file("database/user/$name/tokens.json"))
+	{
+		$json = atomic_get_contents("database/user/$name/tokens.json");
+	}
+
+	if ($json != false)
+	{
+		$arr = json_decode($json, true);
+	}
+
+	foreach($arr as $iter)
+	{
+		if ($iter["token"] === $token)
+		{
+			$found = true;
+		}
+		else
+		{
+			array_push($arr2, $iter);
+		}
+	}
+
+	if ($found)
+	{
+		if (atomic_put_contents("database/user/$name/tokens.json", json_encode($arr2)) != false)
+		{
+			$result = true;
+		}
+	}
+
+	return $result;
+}
+
 function verify_token_user($name, $token)
 {
 	$result	= false;
@@ -105,6 +151,11 @@ function add_new_token($name)
 	}
 
 	return false;
+}
+
+function remove_new_token($name, $token)
+{
+	return remove_token_user($name, $token);
 }
 
 ?>

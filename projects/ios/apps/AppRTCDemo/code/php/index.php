@@ -82,6 +82,17 @@ if(hasParam("action"))
 				{
 					switch($_GET["action"])
 					{
+						case "logout":
+							if (remove_new_token($_GET["name"], $_GET["authToken"]))
+							{
+								print(json_encode(array("status" => "success", "message" => "Logout succeeded")));
+							}
+							else
+							{
+								print(json_encode(array("status" => "fail", "message" => "Could not remove token from server")));
+							}
+							break;
+
 						case "getContacts":
 							print(json_encode(getContacts($_GET["name"])));
 							break;
