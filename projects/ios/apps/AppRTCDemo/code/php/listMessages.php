@@ -15,7 +15,7 @@ function listMessages($name)
 
 			if (is_file("database/user/$name/messages.json"))
 			{
-				$json = file_get_contents("database/user/$name/messages.json");
+				$json = atomic_get_contents("database/user/$name/messages.json");
 			}
 
 			if ($json != false)
@@ -35,7 +35,7 @@ function listMessages($name)
 
 				if (is_file($trans_file))
 				{
-					$item["transcription"] = json_decode(file_get_contents($trans_file), true);
+					$item["transcription"] = json_decode(atomic_get_contents($trans_file), true);
 				}
 				else
 				{

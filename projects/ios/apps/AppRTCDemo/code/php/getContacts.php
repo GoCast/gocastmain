@@ -13,7 +13,7 @@ function getContacts($name)
 		$arr["contacts"] = array();
 		if (is_file("database/user/$name/contacts.json"))
 		{
-			$json = file_get_contents("database/user/$name/contacts.json");
+			$json = atomic_get_contents("database/user/$name/contacts.json");
 			$arr = json_decode($json, true);
 		}
 

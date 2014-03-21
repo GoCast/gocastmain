@@ -13,7 +13,7 @@ function getGroups($name)
 		$arr["groups"] = array();
 		if (is_file("database/user/$name/groups.json"))
 		{
-			$json = file_get_contents("database/user/$name/groups.json");
+			$json = atomic_get_contents("database/user/$name/groups.json");
 			$arr = json_decode($json, true);
 		}
 

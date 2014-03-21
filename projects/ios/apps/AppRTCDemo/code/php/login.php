@@ -4,7 +4,7 @@ function login($name, $password)
 {
 	if (is_file("database/accounts.json"))
 	{
-		$json = file_get_contents("database/accounts.json");
+		$json = atomic_get_contents("database/accounts.json");
 		$arr = json_decode($json, true);
 
 		if(isset($arr[$name]) && !empty($arr[$name]))

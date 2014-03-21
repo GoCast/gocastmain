@@ -14,7 +14,7 @@ function pmAppend($user, $data)
 
 	if (is_file("database/user/$user/messages.json"))
 	{
-		$json = file_get_contents("database/user/$user/messages.json");
+		$json = atomic_get_contents("database/user/$user/messages.json");
 	}
 
 	if ($json != false)
@@ -24,7 +24,7 @@ function pmAppend($user, $data)
 
 	array_push($arr, json_decode($data, true));
 
-	if (file_put_contents("database/user/$user/messages.json", json_encode($arr, true)))
+	if (atomic_put_contents("database/user/$user/messages.json", json_encode($arr, true)))
 	{
 		$result = true;
 	}
@@ -46,7 +46,7 @@ function postMessage($name)
 	
 	if (is_file($_FILES['filename']['tmp_name']))
 	{
-		$json = file_get_contents($_FILES['filename']['tmp_name']);
+		$json = atomic_get_contents($_FILES['filename']['tmp_name']);
 		
 		if ($json != false)
 		{

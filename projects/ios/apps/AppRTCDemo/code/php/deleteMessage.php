@@ -15,7 +15,7 @@ function deleteMessage($name, $audio)
 
 			if (is_file("database/user/$name/messages.json"))
 			{
-				$json = file_get_contents("database/user/$name/messages.json");
+				$json = atomic_get_contents("database/user/$name/messages.json");
 
 				if ($json != false)
 				{
@@ -39,7 +39,7 @@ function deleteMessage($name, $audio)
 					
 					if ($found)
 					{
-						if (file_put_contents("database/user/$name/messages.json", json_encode($arr2, true)))
+						if (atomic_put_contents("database/user/$name/messages.json", json_encode($arr2, true)))
 						{
 							$result = array("status" => "success",
 											"message" => "Delete successful");

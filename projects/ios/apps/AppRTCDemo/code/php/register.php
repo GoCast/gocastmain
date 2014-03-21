@@ -11,7 +11,7 @@ function register($name, $password)
 
 	if (is_file("database/accounts.json"))
 	{
-		$json = file_get_contents("database/accounts.json");
+		$json = atomic_get_contents("database/accounts.json");
 	}
 
 	if ($json != false)
@@ -30,7 +30,7 @@ function register($name, $password)
 
 		ksort($arr);
 
-		if (file_put_contents("database/accounts.json", json_encode($arr)) != false)
+		if (atomic_put_contents("database/accounts.json", json_encode($arr)) != false)
 		{
 			$result = array("status" => "success",
 							"message" => "User successfully registered");
