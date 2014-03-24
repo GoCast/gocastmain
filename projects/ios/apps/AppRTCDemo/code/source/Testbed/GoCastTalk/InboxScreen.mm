@@ -1,5 +1,6 @@
 #include "Base/package.h"
 #include "Io/package.h"
+#include "Audio/package.h"
 
 #include "package.h"
 
@@ -86,7 +87,8 @@ std::string InboxScreen::nameFromEmail(const std::string& email)
 
 #pragma mark Constructor / Destructor
 InboxScreen::InboxScreen(InboxVC* newVC)
-: mPeer(newVC)
+:   mPeer(newVC),
+    mNewMessageSound(NULL)
 {
 	ConstructMachine();
 }
@@ -185,10 +187,13 @@ void InboxScreen::startEntry()
 {
     URLLoader::getInstance()->attach(this);
     GCTEventManager::getInstance()->attach(this);
+
+    mNewMessageSound = new tSound(tFile(tFile::kBundleDirectory, "newmessage.wav"));
 }
 
 void InboxScreen::endEntry()
 {
+    if (mNewMessageSound) { delete mNewMessageSound; mNewMessageSound = NULL; }
 }
 
 void InboxScreen::invalidStateEntry()
@@ -202,6 +207,21 @@ void InboxScreen::idleEntry()
 }
 
 #pragma mark Queries
+void InboxScreen::areThereNewMessagesEntry()
+{
+    size_t newUnread = 0;
+
+    for(size_t i = 0; i < mInbox.size(); i++)
+    {
+        if (!getIsRead(i))
+        {
+            newUnread++;
+        }
+    }
+
+    SetImmediateEvent((newUnread > mPriorUnreadCount) ? kYes : kNo);
+}
+
 void InboxScreen::didWeDownloadContactsEntry()
 {
     SetImmediateEvent(!mContacts.empty() ? kYes : kNo);
@@ -300,6 +320,14 @@ void InboxScreen::clearInboxEntry()
     mContacts.clear();
 }
 
+void InboxScreen::playNewMessageSoundEntry()
+{
+    if (mNewMessageSound)
+    {
+        mNewMessageSound->play();
+    }
+}
+
 void InboxScreen::sortTableByDateEntry()
 {
     mInbox = mListMessagesJSON["list"].mArray;
@@ -347,6 +375,15 @@ void InboxScreen::sendGetGroupsToServerEntry()
 
 void InboxScreen::sendListMessagesToServerEntry()
 {
+    mPriorUnreadCount = 0;
+    for(size_t i = 0; i < mInbox.size(); i++)
+    {
+        if (!getIsRead(i))
+        {
+            mPriorUnreadCount++;
+        }
+    }
+
     char buf[512];
 
     sprintf(buf, "%s?action=listMessages&name=%s&authToken=%s",
@@ -426,6 +463,7 @@ void InboxScreen::CallEntry()
 {
 	switch(mState)
 	{
+		case kAreThereNewMessages: areThereNewMessagesEntry(); break;
 		case kClearInbox: clearInboxEntry(); break;
 		case kDidWeDownloadContacts: didWeDownloadContactsEntry(); break;
 		case kDidWeDownloadGroups: didWeDownloadGroupsEntry(); break;
@@ -435,6 +473,7 @@ void InboxScreen::CallEntry()
 		case kInvalidState: invalidStateEntry(); break;
 		case kPeerPushInboxMessage: peerPushInboxMessageEntry(); break;
 		case kPeerReloadTable: peerReloadTableEntry(); break;
+		case kPlayNewMessageSound: playNewMessageSoundEntry(); break;
 		case kSendDeleteMessageToServer: sendDeleteMessageToServerEntry(); break;
 		case kSendGetContactsToServer: sendGetContactsToServerEntry(); break;
 		case kSendGetGroupsToServer: sendGetGroupsToServerEntry(); break;
@@ -464,6 +503,8 @@ void InboxScreen::CallExit()
 
 int  InboxScreen::StateTransitionFunction(const int evt) const
 {
+	if ((mState == kAreThereNewMessages) && (evt == kNo)) return kPeerReloadTable; else
+	if ((mState == kAreThereNewMessages) && (evt == kYes)) return kPlayNewMessageSound; else
 	if ((mState == kClearInbox) && (evt == kNext)) return kPeerReloadTable; else
 	if ((mState == kDidWeDownloadContacts) && (evt == kNo)) return kSetWaitForGetContacts; else
 	if ((mState == kDidWeDownloadContacts) && (evt == kYes)) return kDidWeDownloadGroups; else
@@ -476,6 +517,7 @@ int  InboxScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kIdle) && (evt == kRefreshSelected)) return kDoWeHaveAToken; else
 	if ((mState == kPeerPushInboxMessage) && (evt == kNext)) return kIdle; else
 	if ((mState == kPeerReloadTable) && (evt == kNext)) return kIdle; else
+	if ((mState == kPlayNewMessageSound) && (evt == kNext)) return kPeerReloadTable; else
 	if ((mState == kSendDeleteMessageToServer) && (evt == kFail)) return kShowErrorDeletingMessage; else
 	if ((mState == kSendDeleteMessageToServer) && (evt == kSuccess)) return kWasDeleteMessageValid; else
 	if ((mState == kSendGetContactsToServer) && (evt == kFail)) return kShowErrorLoadingContacts; else
@@ -494,7 +536,7 @@ int  InboxScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kShowErrorLoadingInbox) && (evt == kYes)) return kPeerReloadTable; else
 	if ((mState == kShowRetryListMessages) && (evt == kNo)) return kPeerReloadTable; else
 	if ((mState == kShowRetryListMessages) && (evt == kYes)) return kDoWeHaveAToken; else
-	if ((mState == kSortTableByDate) && (evt == kNext)) return kPeerReloadTable; else
+	if ((mState == kSortTableByDate) && (evt == kNext)) return kAreThereNewMessages; else
 	if ((mState == kStart) && (evt == kNext)) return kDoWeHaveAToken; else
 	if ((mState == kWasDeleteMessageValid) && (evt == kNo)) return kShowErrorDeletingMessage; else
 	if ((mState == kWasDeleteMessageValid) && (evt == kYes)) return kDoWeHaveAToken; else
@@ -515,6 +557,7 @@ bool InboxScreen::HasEdgeNamedNext() const
 		case kClearInbox:
 		case kPeerPushInboxMessage:
 		case kPeerReloadTable:
+		case kPlayNewMessageSound:
 		case kSetWaitForDeleteMessage:
 		case kSetWaitForGetContacts:
 		case kSetWaitForGetGroups:

@@ -25,6 +25,8 @@
 25 Was getGroups valid?
 26 Show "error loading groups"
 27 Did we download groups?
+28 Are there new messages?
+29 Play "new message" sound
 #
 1 16
 5 6 success
@@ -46,7 +48,7 @@
 14 9 yes
 13 14 no
 13 16 yes
-15 9
+15 28
 16 17 no
 16 22 yes
 17 9
@@ -66,3 +68,6 @@
 26 4 yes
 27 23 no
 27 4 yes
+28 29 yes
+28 9 no
+29 9

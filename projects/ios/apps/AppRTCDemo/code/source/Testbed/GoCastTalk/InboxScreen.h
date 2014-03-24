@@ -1,6 +1,7 @@
 #pragma once
 
 @class InboxVC;
+class tSound;
 
 class InboxScreenMessage;
 
@@ -11,14 +12,16 @@ class InboxScreen
     public tObserver<const GCTEvent&>
 {
 protected:
-    InboxVC* mPeer;
+    InboxVC*    mPeer;
 
     JSONObject  mGetContactsJSON;
     JSONObject  mGetGroupsJSON;
     JSONObject  mListMessagesJSON;
     JSONObject  mDeleteMessageJSON;
+    tSound*     mNewMessageSound;
     size_t      mItemSelected;
     size_t      mDeleteSelected;
+    size_t      mPriorUnreadCount;
 
 public:
     static JSONArray    mInbox;
@@ -55,6 +58,7 @@ protected:
 	void endEntry();
 	void invalidStateEntry();
 
+	void areThereNewMessagesEntry();
 	void clearInboxEntry();
 	void didWeDownloadContactsEntry();
 	void didWeDownloadGroupsEntry();
@@ -62,6 +66,7 @@ protected:
 	void idleEntry();
 	void peerPushInboxMessageEntry();
 	void peerReloadTableEntry();
+	void playNewMessageSoundEntry();
 	void sendDeleteMessageToServerEntry();
 	void sendGetContactsToServerEntry();
 	void sendGetGroupsToServerEntry();
@@ -99,6 +104,7 @@ public:
 	{
 		kInvalidState = 0,
 		kStart = 1,
+		kAreThereNewMessages,
 		kClearInbox,
 		kDidWeDownloadContacts,
 		kDidWeDownloadGroups,
@@ -107,6 +113,7 @@ public:
 		kIdle,
 		kPeerPushInboxMessage,
 		kPeerReloadTable,
+		kPlayNewMessageSound,
 		kSendDeleteMessageToServer,
 		kSendGetContactsToServer,
 		kSendGetGroupsToServer,

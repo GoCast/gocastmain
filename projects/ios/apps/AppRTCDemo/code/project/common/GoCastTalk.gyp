@@ -310,6 +310,8 @@
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/en.lproj/HeadingSubCell.xib',
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/en.lproj/CCCell.xib',
 
+					'../../rsrc/Testbed/GoCastTalk/<@(OS)/newmessage.wav',
+
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/bg-login.png',
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/bg-button.png',
 
