@@ -9,7 +9,8 @@ class InboxScreen
 :   public tMealy,
     public tObserver<const InboxScreenMessage&>,
     public tObserver<const URLLoaderEvent&>,
-    public tObserver<const GCTEvent&>
+    public tObserver<const GCTEvent&>,
+    public tObserver<const tTimerEvent&>
 {
 protected:
     InboxVC*    mPeer;
@@ -19,6 +20,7 @@ protected:
     JSONObject  mListMessagesJSON;
     JSONObject  mDeleteMessageJSON;
     tSound*     mNewMessageSound;
+    tTimer*     mRefreshTimer;
     size_t      mItemSelected;
     size_t      mDeleteSelected;
     size_t      mPriorUnreadCount;
@@ -143,6 +145,7 @@ protected:
 	void update(const InboxScreenMessage& msg);
     void update(const URLLoaderEvent& msg);
     void update(const GCTEvent& msg);
+    void update(const tTimerEvent& msg);
 };
 
 class InboxScreenMessage

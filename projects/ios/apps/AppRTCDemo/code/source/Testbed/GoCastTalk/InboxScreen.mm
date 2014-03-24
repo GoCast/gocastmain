@@ -189,10 +189,15 @@ void InboxScreen::startEntry()
     GCTEventManager::getInstance()->attach(this);
 
     mNewMessageSound = new tSound(tFile(tFile::kBundleDirectory, "newmessage.wav"));
+
+    mRefreshTimer = new tTimer(30000);
+    mRefreshTimer->attach(this);
+    mRefreshTimer->start();
 }
 
 void InboxScreen::endEntry()
 {
+    if (mRefreshTimer) { delete mRefreshTimer; mRefreshTimer = NULL; }
     if (mNewMessageSound) { delete mNewMessageSound; mNewMessageSound = NULL; }
 }
 
@@ -647,6 +652,25 @@ void InboxScreen::update(const GCTEvent& msg)
                 default:
                     break;
             }
+            break;
+    }
+}
+
+void InboxScreen::update(const tTimerEvent& msg)
+{
+    switch (msg.mEvent)
+    {
+        case tTimer::kTimerTick:
+            if (msg.mTimer == mRefreshTimer)
+            {
+                if (getState() == kIdle)
+                {
+                    refreshPressed();
+                }
+            }
+            break;
+
+        default:
             break;
     }
 }
