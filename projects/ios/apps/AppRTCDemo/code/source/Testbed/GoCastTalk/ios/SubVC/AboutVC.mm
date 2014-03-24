@@ -23,6 +23,8 @@ extern std::string kBaseURL;
 {
     [super viewDidLoad];
 
+    self.mBuildDate.text = [NSString stringWithUTF8String:__DATE__ " @ " __TIME__];
+
     self.view.autoresizesSubviews = YES;
 }
 

@@ -12,6 +12,12 @@
 
 		'actions': [
 			{
+				'action_name': 'touch AboutVC.mm for Build Date',
+				'inputs': [ '../../source/Testbed/GoCastTalk/ios/SubVC/AboutVC.mm', ],
+				'outputs': [ '../../dummy', ],
+				'action': [ 'touch', '<@(_inputs)'],
+			},
+			{
 				'action_name': 'LoginScreen.tgf',
 				'inputs': [ '../../tgf/Testbed/GoCastTalk/LoginScreen.tgf', ],
 				'outputs': [ '../../dummy', ],
