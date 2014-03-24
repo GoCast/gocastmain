@@ -85,6 +85,9 @@
 
     self.view.autoresizesSubviews = YES;
 
+    UIBarButtonItem *anotherButton = [[[UIBarButtonItem alloc] initWithTitle:@"削除" style:UIBarButtonItemStylePlain target:self action:@selector(helpButton:)] autorelease];
+    self.navigationItem.rightBarButtonItem = anotherButton;
+
     mPeer = new RecordMessageScreen(self, mInitObject, mIsForwarded, mIsChild);
 
     self->mScrollPreExpansion = self.mScrollView.contentSize;
@@ -344,6 +347,12 @@
     mPeer->stopPressed();
 }
 
+-(IBAction)helpButton:(UIBarButtonItem*)sender
+{
+#pragma unused(sender)
+    mPeer->cancelPressed();
+}
+
 -(void)customInit:(const JSONObject&)newObject isForwarded:(bool)newIsForwarded
 {
     mInitObject     = newObject;
@@ -401,6 +410,8 @@
     [self.mStopButton   setHidden:YES];
 
     self.mTable.allowsSelection = NO;
+    [self.navigationItem.rightBarButtonItem setEnabled:NO];
+
     [self.mTable reloadData];
 
     [self.mSlider setEnabled:NO];
@@ -420,6 +431,8 @@
     [self.mStopButton   setHidden:YES];
 
     self.mTable.allowsSelection = YES;
+    [self.navigationItem.rightBarButtonItem setEnabled:YES];
+
     [self.mTable reloadData];
 
     [self.mSlider setEnabled:YES];
@@ -436,6 +449,8 @@
     [self.mStopButton   setHidden:YES];
 
     self.mTable.allowsSelection = YES;
+    [self.navigationItem.rightBarButtonItem setEnabled:YES];
+
     [self.mTable reloadData];
 
     [self.mSlider setEnabled:YES];
@@ -451,6 +466,8 @@
     [self.mStopButton   setHidden:YES];
 
     self.mTable.allowsSelection = YES;
+    [self.navigationItem.rightBarButtonItem setEnabled:YES];
+
     [self.mTable reloadData];
 
     [self.mSlider setEnabled:YES];
@@ -468,6 +485,8 @@
     [self.mStopButton   setHidden:NO];
 
     self.mTable.allowsSelection = NO;
+    [self.navigationItem.rightBarButtonItem setEnabled:NO];
+
     [self.mTable reloadData];
 
     [self.mSlider setEnabled:NO];
@@ -484,6 +503,8 @@
     [self.mStopButton   setHidden:YES];
 
     self.mTable.allowsSelection = YES;
+    [self.navigationItem.rightBarButtonItem setEnabled:YES];
+
     [self.mTable reloadData];
 
     [self.mSlider setEnabled:YES];

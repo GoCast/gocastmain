@@ -64,6 +64,8 @@ class RecordMessageScreen;
 -(IBAction)playPressed;
 -(IBAction)stopPressed;
 
+-(IBAction)helpButton:(UIBarButtonItem*)sender;
+
 -(void)customInit:(const JSONObject&)newObject isForwarded:(bool)newIsForwarded;
 
 -(void)pushContacts;
