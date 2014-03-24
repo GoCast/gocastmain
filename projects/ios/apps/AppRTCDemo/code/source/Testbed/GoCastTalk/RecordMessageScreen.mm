@@ -533,12 +533,6 @@ void RecordMessageScreen::showConfirmSendEntry()
     tConfirm("このメッセージを送信してよろしいですか？");
 }
 
-void RecordMessageScreen::showMessageSentEntry()
-{
-    //"Message sent"
-    tAlert("メッセージを送信しました");
-}
-
 void RecordMessageScreen::showNoContactsToSendToEntry()
 {
     //"Please add some recipients first."
@@ -597,7 +591,6 @@ void RecordMessageScreen::CallEntry()
 		case kSetWaitForTranscription: setWaitForTranscriptionEntry(); break;
 		case kShowComposeNewMessage: showComposeNewMessageEntry(); break;
 		case kShowConfirmSend: showConfirmSendEntry(); break;
-		case kShowMessageSent: showMessageSentEntry(); break;
 		case kShowNoContactsToSendTo: showNoContactsToSendToEntry(); break;
 		case kShowPostAudioFailed: showPostAudioFailedEntry(); break;
 		case kStart: startEntry(); break;
@@ -642,7 +635,7 @@ int  RecordMessageScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kDoWeNeedToWaitForTranscription) && (evt == kYes)) return kSetWaitForTranscription; else
 	if ((mState == kFixRecipientList) && (evt == kNext)) return kLetDidRecordBeIsForwardedValue; else
 	if ((mState == kIsDidPostTrue) && (evt == kNo)) return kAreWeTheNewMemoTab; else
-	if ((mState == kIsDidPostTrue) && (evt == kYes)) return kShowMessageSent; else
+	if ((mState == kIsDidPostTrue) && (evt == kYes)) return kAreWeTheNewMemoTab; else
 	if ((mState == kIsForwardingMessage) && (evt == kNo)) return kSendPostAudioToServer; else
 	if ((mState == kIsForwardingMessage) && (evt == kYes)) return kSendPostMessageToServer; else
 	if ((mState == kLetDidPostBeFalse) && (evt == kNext)) return kDidWeRecord; else
@@ -677,7 +670,6 @@ int  RecordMessageScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kShowComposeNewMessage) && (evt == kYes)) return kCopyRecipientsAndReloadTable; else
 	if ((mState == kShowConfirmSend) && (evt == kNo)) return kWaitToPlayIdle; else
 	if ((mState == kShowConfirmSend) && (evt == kYes)) return kSetWaitForPostAudio; else
-	if ((mState == kShowMessageSent) && (evt == kYes)) return kAreWeTheNewMemoTab; else
 	if ((mState == kShowNoContactsToSendTo) && (evt == kYes)) return kWaitToPlayIdle; else
 	if ((mState == kShowPostAudioFailed) && (evt == kYes)) return kSendReloadInboxToVC; else
 	if ((mState == kStart) && (evt == kNext)) return kFixRecipientList; else
@@ -879,7 +871,6 @@ void RecordMessageScreen::update(const GCTEvent& msg)
             {
                 case kShowComposeNewMessage:
                 case kShowConfirmSend:
-                case kShowMessageSent:
                 case kShowNoContactsToSendTo:
                 case kShowPostAudioFailed:
                     switch(msg.mEvent)

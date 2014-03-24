@@ -86,7 +86,6 @@ protected:
 	void setWaitForTranscriptionEntry();
 	void showComposeNewMessageEntry();
 	void showConfirmSendEntry();
-	void showMessageSentEntry();
 	void showNoContactsToSendToEntry();
 	void showPostAudioFailedEntry();
 	void startRecordingAudioEntry();
@@ -161,7 +160,6 @@ public:
 		kSetWaitForTranscription,
 		kShowComposeNewMessage,
 		kShowConfirmSend,
-		kShowMessageSent,
 		kShowNoContactsToSendTo,
 		kShowPostAudioFailed,
 		kStartRecordingAudio,
