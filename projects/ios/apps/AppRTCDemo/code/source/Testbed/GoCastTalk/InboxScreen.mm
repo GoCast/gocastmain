@@ -266,11 +266,16 @@ void InboxScreen::wasGetContactsValidEntry()
 
         JSONObject misterFeedback;
 
-        misterFeedback["kanji"] = std::string("Mr. 饋還");
-        misterFeedback["kana"] = std::string("ミスターフィードバック");
+        misterFeedback["kana"] = std::string("フィードバック");
         misterFeedback["email"] = std::string("feedback@gocast.it");
 
+        JSONObject welcomingCommittee;
+
+        welcomingCommittee["kana"] = std::string("ゴーキャスト　チーム");
+        welcomingCommittee["email"] = std::string("gocast.team@gocast.it");
+
         mContacts.push_back(misterFeedback);
+        mContacts.push_back(welcomingCommittee);
 
         result = true;
     }
@@ -339,7 +344,7 @@ void InboxScreen::sortTableByDateEntry()
 
 //Fake message
     JSONObject welcomeMessage;
-    welcomeMessage["from"]  = std::string("feedback@gocast.it");
+    welcomeMessage["from"]  = std::string("gocast.team@gocast.it");
     welcomeMessage["date"]  = std::string("2001010201010101");
     welcomeMessage["to"]    = JSONArray();
     welcomeMessage["to"].mArray.push_back(InboxScreen::mEmailAddress);
