@@ -81,10 +81,14 @@ void RecordMessageScreen::startEntry()
 
     mSliderUpdateTimer = new tTimer(30);
     mSliderUpdateTimer->attach(this);
+
+    mRecordTimer = new tTimer(1000);
+    mRecordTimer->attach(this);
 }
 
 void RecordMessageScreen::endEntry()
 {
+    if (mRecordTimer)       { delete mRecordTimer; mRecordTimer = NULL; }
     if (mSliderUpdateTimer) { delete mSliderUpdateTimer; mSliderUpdateTimer = NULL; }
     if (mTenMinuteTimer)    { delete mTenMinuteTimer; mTenMinuteTimer = NULL; }
     if (mSound)             { delete mSound; mSound = NULL; }
@@ -396,6 +400,9 @@ void RecordMessageScreen::startRecordingAudioEntry()
     mTenMinuteTimer->attach(this);
     mTenMinuteTimer->start();
 
+    mRecrodSeconds = 0;
+    mRecordTimer->start();
+
     [gAppDelegateInstance startRecorder];
 }
 
@@ -428,6 +435,7 @@ void RecordMessageScreen::stopPlayingBeforeSendEntry()
 
 void RecordMessageScreen::stopRecordingAudioEntry()
 {
+    mRecordTimer->stop();
     [gAppDelegateInstance stopRecorder];
 }
 
@@ -866,11 +874,21 @@ void RecordMessageScreen::update(const tTimerEvent& msg)
     switch (msg.mEvent)
     {
         case tTimer::kTimerTick:
-            if (getState() == kPlayingIdle)
+            if (msg.mTimer == mRecordTimer)
             {
-                if (mSound)
+                mRecrodSeconds++;
+                char buf[80];
+                sprintf(buf, "%02lu:%02lu", mRecrodSeconds / 60, mRecrodSeconds % 60);
+                [mPeer setTimeLabel:buf];
+            }
+            else
+            {
+                if (getState() == kPlayingIdle)
                 {
-                    [mPeer setSliderPercentage: float(tTimer::getTimeMS() - mStartTimeMS) / float(mSound->getDurationMS()) * 100.0f];
+                    if (mSound)
+                    {
+                        [mPeer setSliderPercentage: float(tTimer::getTimeMS() - mStartTimeMS) / float(mSound->getDurationMS()) * 100.0f];
+                    }
                 }
             }
             break;

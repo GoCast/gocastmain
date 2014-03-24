@@ -24,6 +24,8 @@ protected:
     tSound*             mSound;
     tTimer*             mTenMinuteTimer;
     tTimer*             mSliderUpdateTimer;
+    tTimer*             mRecordTimer;
+    size_t              mRecrodSeconds;
     int32_t             mStartTimeMS;
     int32_t             mAlreadyPlayedTimeMS;
     bool                mDidRecord;

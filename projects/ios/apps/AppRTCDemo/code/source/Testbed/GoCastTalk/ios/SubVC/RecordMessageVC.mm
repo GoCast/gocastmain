@@ -477,7 +477,7 @@
 {
     self.mStatusLabel.text = @"録音中・・・";
     self.mStatusLabel.textColor = [UIColor redColor];
-    [self setTimeLabel:"録音中・・・"];
+    [self setTimeLabel:"00:00"];
 
     [self.mPauseButton  setHidden:YES];
     [self.mRecordButton setHidden:YES];
