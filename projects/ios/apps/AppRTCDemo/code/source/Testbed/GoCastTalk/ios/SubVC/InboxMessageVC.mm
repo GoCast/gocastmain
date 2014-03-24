@@ -249,7 +249,7 @@
         switch (indexPath.row)
         {
             case 0:
-                [cell setAsZero:self->mToExpanded withLabel:"Recipients"];
+                [cell setAsZero:self->mToExpanded withLabel:"Click to view recipients"];
                 break;
 
             default:
