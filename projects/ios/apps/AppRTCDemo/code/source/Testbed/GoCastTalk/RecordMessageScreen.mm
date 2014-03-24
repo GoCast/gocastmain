@@ -170,10 +170,6 @@ void RecordMessageScreen::waitForTranscriptionIdleEntry()
 }
 
 #pragma mark Peer communication
-void RecordMessageScreen::peerPopSelfEntry()
-{
-    [mPeer popSelf];
-}
 
 void RecordMessageScreen::peerPopAllInboxViewsEntry()
 {
@@ -191,11 +187,6 @@ void RecordMessageScreen::peerSwitchToNewMemoTabEntry()
 }
 
 #pragma mark Queries
-
-void RecordMessageScreen::areWeTheNewMemoTabEntry()
-{
-    SetImmediateEvent(!mIsChild ? kYes : kNo);
-}
 
 void RecordMessageScreen::didWeRecordEntry()
 {
@@ -556,7 +547,6 @@ void RecordMessageScreen::CallEntry()
 {
 	switch(mState)
 	{
-		case kAreWeTheNewMemoTab: areWeTheNewMemoTabEntry(); break;
 		case kCalculateMessageJSON: calculateMessageJSONEntry(); break;
 		case kClearDataAndReloadTable: clearDataAndReloadTableEntry(); break;
 		case kCopyRecipientsAndReloadTable: copyRecipientsAndReloadTableEntry(); break;
@@ -576,7 +566,6 @@ void RecordMessageScreen::CallEntry()
 		case kPauseAudio: pauseAudioEntry(); break;
 		case kPausedIdle: pausedIdleEntry(); break;
 		case kPeerPopAllInboxViews: peerPopAllInboxViewsEntry(); break;
-		case kPeerPopSelf: peerPopSelfEntry(); break;
 		case kPeerSwitchToInboxTab: peerSwitchToInboxTabEntry(); break;
 		case kPeerSwitchToNewMemoTab: peerSwitchToNewMemoTabEntry(); break;
 		case kPlayAudio: playAudioEntry(); break;
@@ -620,8 +609,6 @@ void RecordMessageScreen::CallExit()
 
 int  RecordMessageScreen::StateTransitionFunction(const int evt) const
 {
-	if ((mState == kAreWeTheNewMemoTab) && (evt == kNo)) return kPeerPopSelf; else
-	if ((mState == kAreWeTheNewMemoTab) && (evt == kYes)) return kPeerPopAllInboxViews; else
 	if ((mState == kCalculateMessageJSON) && (evt == kNext)) return kIsForwardingMessage; else
 	if ((mState == kClearDataAndReloadTable) && (evt == kNext)) return kLetDidRecordBeIsForwardedValue; else
 	if ((mState == kCopyRecipientsAndReloadTable) && (evt == kNext)) return kFixRecipientList; else
@@ -634,8 +621,8 @@ int  RecordMessageScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kDoWeNeedToWaitForTranscription) && (evt == kNo)) return kLetDidRecordBeTrue; else
 	if ((mState == kDoWeNeedToWaitForTranscription) && (evt == kYes)) return kSetWaitForTranscription; else
 	if ((mState == kFixRecipientList) && (evt == kNext)) return kLetDidRecordBeIsForwardedValue; else
-	if ((mState == kIsDidPostTrue) && (evt == kNo)) return kAreWeTheNewMemoTab; else
-	if ((mState == kIsDidPostTrue) && (evt == kYes)) return kAreWeTheNewMemoTab; else
+	if ((mState == kIsDidPostTrue) && (evt == kNo)) return kPeerPopAllInboxViews; else
+	if ((mState == kIsDidPostTrue) && (evt == kYes)) return kPeerPopAllInboxViews; else
 	if ((mState == kIsForwardingMessage) && (evt == kNo)) return kSendPostAudioToServer; else
 	if ((mState == kIsForwardingMessage) && (evt == kYes)) return kSendPostMessageToServer; else
 	if ((mState == kLetDidPostBeFalse) && (evt == kNext)) return kDidWeRecord; else

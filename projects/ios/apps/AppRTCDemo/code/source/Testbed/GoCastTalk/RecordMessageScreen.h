@@ -53,7 +53,6 @@ protected:
 	void endEntry();
 	void invalidStateEntry();
 
-	void areWeTheNewMemoTabEntry();
 	void calculateMessageJSONEntry();
 	void clearDataAndReloadTableEntry();
 	void copyRecipientsAndReloadTableEntry();
@@ -71,7 +70,6 @@ protected:
 	void pauseAudioEntry();
 	void pausedIdleEntry();
 	void peerPopAllInboxViewsEntry();
-	void peerPopSelfEntry();
 	void peerSwitchToInboxTabEntry();
 	void peerSwitchToNewMemoTabEntry();
 	void playAudioEntry();
@@ -126,7 +124,6 @@ public:
 	{
 		kInvalidState = 0,
 		kStart = 1,
-		kAreWeTheNewMemoTab,
 		kCalculateMessageJSON,
 		kClearDataAndReloadTable,
 		kCopyRecipientsAndReloadTable,
@@ -145,7 +142,6 @@ public:
 		kPauseAudio,
 		kPausedIdle,
 		kPeerPopAllInboxViews,
-		kPeerPopSelf,
 		kPeerSwitchToInboxTab,
 		kPeerSwitchToNewMemoTab,
 		kPlayAudio,
