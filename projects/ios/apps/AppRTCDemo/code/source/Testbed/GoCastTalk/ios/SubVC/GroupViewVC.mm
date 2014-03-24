@@ -110,7 +110,7 @@
             cell = [[[HeadingSubCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:simpleTableIdentifier] autorelease];
         }
 
-        cell.mHeading.text  = [NSString stringWithUTF8String:mInitObject["emails"].mArray[(size_t)indexPath.row].mString.c_str()];
+        cell.mHeading.text  = [NSString stringWithUTF8String:InboxScreen::nameFromEmail(mInitObject["emails"].mArray[(size_t)indexPath.row].mString).c_str()];
         cell.mSub.text      = [NSString stringWithUTF8String:mInitObject["emails"].mArray[(size_t)indexPath.row].mString.c_str()];
 
         [cell.mRightArrow setHidden:YES];

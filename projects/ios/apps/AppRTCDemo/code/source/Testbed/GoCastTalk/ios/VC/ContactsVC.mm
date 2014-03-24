@@ -117,6 +117,7 @@
         if (!self->mInGroupsView)
         {
             heading = InboxScreen::nameFromEmail(InboxScreen::mContacts[(size_t)indexPath.row].mObject["email"].mString);
+            subheading = InboxScreen::mContacts[(size_t)indexPath.row].mObject["email"].mString;
         }
         else
         {
@@ -124,7 +125,7 @@
 
             for(size_t i = 0; i < InboxScreen::mGroups[(size_t)indexPath.row].mObject["emails"].mArray.size(); i++)
             {
-                subheading += InboxScreen::mGroups[(size_t)indexPath.row].mObject["emails"].mArray[i].mString;
+                subheading += InboxScreen::nameFromEmail(InboxScreen::mGroups[(size_t)indexPath.row].mObject["emails"].mArray[i].mString);
                 if (i != InboxScreen::mGroups[(size_t)indexPath.row].mObject["emails"].mArray.size() - 1)
                 {
                     subheading += ", ";
