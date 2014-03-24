@@ -29,7 +29,6 @@ protected:
     bool                mDidRecord;
     bool                mIsForwarded;
     bool                mIsChild;
-    bool                mDidPost;
     bool                mGotTranscriptionEvent;
 
 public:
@@ -61,10 +60,7 @@ protected:
 	void doWeHaveRecipientsOrARecordingEntry();
 	void doWeNeedToWaitForTranscriptionEntry();
 	void fixRecipientListEntry();
-	void isDidPostTrueEntry();
 	void isForwardingMessageEntry();
-	void letDidPostBeFalseEntry();
-	void letDidPostBeTrueEntry();
 	void letDidRecordBeIsForwardedValueEntry();
 	void letDidRecordBeTrueEntry();
 	void pauseAudioEntry();
@@ -83,6 +79,7 @@ protected:
 	void setWaitForPostAudioEntry();
 	void setWaitForTranscriptionEntry();
 	void showComposeNewMessageEntry();
+	void showConfirmDeleteEntry();
 	void showConfirmSendEntry();
 	void showNoContactsToSendToEntry();
 	void showPostAudioFailedEntry();
@@ -133,10 +130,7 @@ public:
 		kDoWeNeedToWaitForTranscription,
 		kEnd,
 		kFixRecipientList,
-		kIsDidPostTrue,
 		kIsForwardingMessage,
-		kLetDidPostBeFalse,
-		kLetDidPostBeTrue,
 		kLetDidRecordBeIsForwardedValue,
 		kLetDidRecordBeTrue,
 		kPauseAudio,
@@ -155,6 +149,7 @@ public:
 		kSetWaitForPostAudio,
 		kSetWaitForTranscription,
 		kShowComposeNewMessage,
+		kShowConfirmDelete,
 		kShowConfirmSend,
 		kShowNoContactsToSendTo,
 		kShowPostAudioFailed,

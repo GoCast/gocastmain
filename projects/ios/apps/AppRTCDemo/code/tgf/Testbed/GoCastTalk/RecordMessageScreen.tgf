@@ -30,28 +30,26 @@
 30 Show "no contacts to send to"
 31 Is forwarding message?
 32 Clear data and reload table
-33 Let "did post" be true
-34 Let "did post" be false
-35 Is "did post" true?
-36 Wait for transcription idle
-37 Set "Wait for transcription"
-38 Do we need to wait for transcription?
-39 Show "confirm send?"
-40 Fix recipient list
-41 Peer: switch to Inbox tab
-42 Show "Compose new message?"
-43 Copy recipients and reload table
-44 Peer: switch to New Memo Tab
-45 Do we have recipients or a recording?
-46 Peer: pop all Inbox views
+33 Wait for transcription idle
+34 Set "Wait for transcription"
+35 Do we need to wait for transcription?
+36 Show "confirm send?"
+37 Fix recipient list
+38 Peer: switch to Inbox tab
+39 Show "Compose new message?"
+40 Copy recipients and reload table
+41 Peer: switch to New Memo Tab
+42 Do we have recipients or a recording?
+43 Peer: pop all Inbox views
+44 Show "confirm delete?"
 #
 3 4 no
 4 5 recordPressed
 3 6 yes
 5 7
 7 8 stopPressed
-1 40
-8 38
+1 37
+8 35
 6 10 playPressed
 10 9
 9 11 pausePressed
@@ -59,8 +57,8 @@
 9 13 finishedPlaying
 13 3
 12 23 playPressed
-15 14
-6 14 cancelPressed
+15 44
+6 44 cancelPressed
 12 15 cancelPressed
 9 15 cancelPressed
 17 28
@@ -80,38 +78,36 @@
 23 9
 25 3
 26 27 success
-27 33 yes
+27 14 yes
 27 18 no
 26 18 fail
 28 31
-14 35
-29 39 yes
+29 36 yes
 30 6 yes
 29 30 no
 31 26 yes
 31 19 no
 32 24
-24 34
-33 14
-35 46 yes
-35 46 no
-34 3
-37 36
-36 25 transcriptionReady
-38 37 yes
-38 25 no
-39 17 yes
-39 6 no
-40 24
-41 32
-42 3 no
-4 44 newMessage
-6 44 newMessage
-12 44 newMessage
-42 43 yes
-43 40
-44 45
-36 44 newMessage
-45 42 yes
-45 43 no
-46 41
+34 33
+33 25 transcriptionReady
+35 34 yes
+35 25 no
+36 17 yes
+36 6 no
+37 24
+38 32
+39 3 no
+4 41 newMessage
+6 41 newMessage
+12 41 newMessage
+39 40 yes
+40 37
+41 42
+33 41 newMessage
+42 39 yes
+42 40 no
+43 38
+44 32 yes
+44 3 no
+14 43
+24 3
