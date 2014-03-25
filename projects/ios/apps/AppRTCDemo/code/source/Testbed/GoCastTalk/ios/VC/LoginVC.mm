@@ -154,7 +154,9 @@ extern std::string kBaseURL;
 
 -(IBAction) troublePressed
 {
-    mPeer->troublePressed();
+    const char* email = [self.mEmail.text UTF8String];
+
+    mPeer->troublePressed(email ? email : "");
 }
 
 -(void) setLoginName:(const std::string&)newName

@@ -31,7 +31,7 @@ public:
 
     void signInPressed(const std::string& newName, const std::string& newPassword);
     void signUpPressed(const std::string& newName, const std::string& newPassword);
-    void troublePressed();
+    void troublePressed(const std::string& newName);
 
 protected:
 	void startEntry();
@@ -41,6 +41,7 @@ protected:
 	void ensureSigninInfoEntry();
 	void ensureSignupInfoEntry();
 	void idleEntry();
+	void isEmailBlankEntry();
 	void loadLoginNameEntry();
 	void peerPopSelfEntry();
 	void peerSetLoginNameEntry();
@@ -50,12 +51,16 @@ protected:
 	void sendRegisterToServerEntry();
 	void setWaitForLoginEntry();
 	void setWaitForRegisterEntry();
+	void showAResetEmailHasBeenSentEntry();
 	void showCouldNotLoginEntry();
 	void showCouldNotRegisterEntry();
+	void showEnterEmailFirstEntry();
+	void showEnterResetCodeEntry();
 	void showIncorrectFormatEntry();
 	void showNotYetImplementedEntry();
 	void showRetryLoginEntry();
 	void showRetryRegisterEntry();
+	void showSendResetEmailEntry();
 	void showURLMissingSlashEntry();
 	void storeTokenInformationEntry();
 	void validateURLEntry();
@@ -84,6 +89,7 @@ public:
 		kEnsureSigninInfo,
 		kEnsureSignupInfo,
 		kIdle,
+		kIsEmailBlank,
 		kLoadLoginName,
 		kPeerPopSelf,
 		kPeerSetLoginName,
@@ -93,12 +99,16 @@ public:
 		kSendRegisterToServer,
 		kSetWaitForLogin,
 		kSetWaitForRegister,
+		kShowAResetEmailHasBeenSent,
 		kShowCouldNotLogin,
 		kShowCouldNotRegister,
+		kShowEnterEmailFirst,
+		kShowEnterResetCode,
 		kShowIncorrectFormat,
 		kShowNotYetImplemented,
 		kShowRetryLogin,
 		kShowRetryRegister,
+		kShowSendResetEmail,
 		kShowURLMissingSlash,
 		kStoreTokenInformation,
 		kValidateURL,

@@ -23,9 +23,14 @@
 23 Set "wait for login"
 24 Show "URL missing slash"
 25 Validate URL
+26 Show "Send reset email?"
+27 Show "A reset email has been sent"
+28 Show "Enter reset code"
+29 Is email blank?
+30 Show "Enter email first"
 #
 1 20
-3 4 troublePressed
+3 29 troublePressed
 4 3 yes
 3 25 signInPressed
 5 6 success
@@ -60,3 +65,11 @@
 24 16 yes
 24 3 no
 25 16 success
+26 27 yes
+26 3 no
+28 3 no
+27 28 yes
+28 4 yes
+29 26 no
+29 30 yes
+30 3 yes

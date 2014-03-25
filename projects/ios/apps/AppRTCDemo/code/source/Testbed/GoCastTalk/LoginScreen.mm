@@ -67,8 +67,10 @@ void LoginScreen::signUpPressed(const std::string& newName, const std::string& n
     update(LoginScreenMessage(LoginScreen::kSignUpPressed));
 }
 
-void LoginScreen::troublePressed()
+void LoginScreen::troublePressed(const std::string& newName)
 {
+    mEmail      = newName;
+
     update(LoginScreenMessage(LoginScreen::kTroublePressed));
 }
 
@@ -105,6 +107,15 @@ void LoginScreen::peerSetLoginNameEntry()
 }
 
 #pragma mark Queries
+void LoginScreen::isEmailBlankEntry()
+{
+    bool result = false;
+
+    result = EnsureInfo(mEmail, "abc123");
+
+    SetImmediateEvent(result ? kNo : kYes);
+}
+
 void LoginScreen::wasLoginValidEntry()
 {
     bool result = false;
@@ -238,6 +249,27 @@ void LoginScreen::setWaitForRegisterEntry()
     [mPeer setBlockingViewVisible:true];
 }
 
+
+void LoginScreen::showAResetEmailHasBeenSentEntry()
+{
+    tAlert("A reset email has been sent to the email provided.");
+}
+
+void LoginScreen::showEnterResetCodeEntry()
+{
+    tPrompt("Please enter the 6-digit reset code:");
+}
+
+void LoginScreen::showSendResetEmailEntry()
+{
+    tConfirm("Send a reset code to the provided email address?");
+}
+
+void LoginScreen::showEnterEmailFirstEntry()
+{
+    tAlert("Please enter an email address first.");
+}
+
 void LoginScreen::showCouldNotLoginEntry()
 {
     //"Could not sign in"
@@ -296,6 +328,7 @@ void LoginScreen::CallEntry()
 		case kEnsureSignupInfo: ensureSignupInfoEntry(); break;
 		case kIdle: idleEntry(); break;
 		case kInvalidState: invalidStateEntry(); break;
+		case kIsEmailBlank: isEmailBlankEntry(); break;
 		case kLoadLoginName: loadLoginNameEntry(); break;
 		case kPeerPopSelf: peerPopSelfEntry(); break;
 		case kPeerSetLoginName: peerSetLoginNameEntry(); break;
@@ -305,12 +338,16 @@ void LoginScreen::CallEntry()
 		case kSendRegisterToServer: sendRegisterToServerEntry(); break;
 		case kSetWaitForLogin: setWaitForLoginEntry(); break;
 		case kSetWaitForRegister: setWaitForRegisterEntry(); break;
+		case kShowAResetEmailHasBeenSent: showAResetEmailHasBeenSentEntry(); break;
 		case kShowCouldNotLogin: showCouldNotLoginEntry(); break;
 		case kShowCouldNotRegister: showCouldNotRegisterEntry(); break;
+		case kShowEnterEmailFirst: showEnterEmailFirstEntry(); break;
+		case kShowEnterResetCode: showEnterResetCodeEntry(); break;
 		case kShowIncorrectFormat: showIncorrectFormatEntry(); break;
 		case kShowNotYetImplemented: showNotYetImplementedEntry(); break;
 		case kShowRetryLogin: showRetryLoginEntry(); break;
 		case kShowRetryRegister: showRetryRegisterEntry(); break;
+		case kShowSendResetEmail: showSendResetEmailEntry(); break;
 		case kShowURLMissingSlash: showURLMissingSlashEntry(); break;
 		case kStart: startEntry(); break;
 		case kStoreTokenInformation: storeTokenInformationEntry(); break;
@@ -333,7 +370,9 @@ int  LoginScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kEnsureSignupInfo) && (evt == kSuccess)) return kSetWaitForRegister; else
 	if ((mState == kIdle) && (evt == kSignInPressed)) return kValidateURL; else
 	if ((mState == kIdle) && (evt == kSignUpPressed)) return kEnsureSignupInfo; else
-	if ((mState == kIdle) && (evt == kTroublePressed)) return kShowNotYetImplemented; else
+	if ((mState == kIdle) && (evt == kTroublePressed)) return kIsEmailBlank; else
+	if ((mState == kIsEmailBlank) && (evt == kNo)) return kShowSendResetEmail; else
+	if ((mState == kIsEmailBlank) && (evt == kYes)) return kShowEnterEmailFirst; else
 	if ((mState == kLoadLoginName) && (evt == kFail)) return kIdle; else
 	if ((mState == kLoadLoginName) && (evt == kSuccess)) return kPeerSetLoginName; else
 	if ((mState == kPeerSetLoginName) && (evt == kNext)) return kIdle; else
@@ -345,14 +384,20 @@ int  LoginScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kSendRegisterToServer) && (evt == kSuccess)) return kWasRegisterValid; else
 	if ((mState == kSetWaitForLogin) && (evt == kNext)) return kSendLoginToServer; else
 	if ((mState == kSetWaitForRegister) && (evt == kNext)) return kSendRegisterToServer; else
+	if ((mState == kShowAResetEmailHasBeenSent) && (evt == kYes)) return kShowEnterResetCode; else
 	if ((mState == kShowCouldNotLogin) && (evt == kYes)) return kIdle; else
 	if ((mState == kShowCouldNotRegister) && (evt == kYes)) return kIdle; else
+	if ((mState == kShowEnterEmailFirst) && (evt == kYes)) return kIdle; else
+	if ((mState == kShowEnterResetCode) && (evt == kNo)) return kIdle; else
+	if ((mState == kShowEnterResetCode) && (evt == kYes)) return kShowNotYetImplemented; else
 	if ((mState == kShowIncorrectFormat) && (evt == kYes)) return kIdle; else
 	if ((mState == kShowNotYetImplemented) && (evt == kYes)) return kIdle; else
 	if ((mState == kShowRetryLogin) && (evt == kNo)) return kShowCouldNotLogin; else
 	if ((mState == kShowRetryLogin) && (evt == kYes)) return kSendLoginToServer; else
 	if ((mState == kShowRetryRegister) && (evt == kNo)) return kShowCouldNotRegister; else
 	if ((mState == kShowRetryRegister) && (evt == kYes)) return kSendRegisterToServer; else
+	if ((mState == kShowSendResetEmail) && (evt == kNo)) return kIdle; else
+	if ((mState == kShowSendResetEmail) && (evt == kYes)) return kShowAResetEmailHasBeenSent; else
 	if ((mState == kShowURLMissingSlash) && (evt == kNo)) return kIdle; else
 	if ((mState == kShowURLMissingSlash) && (evt == kYes)) return kEnsureSigninInfo; else
 	if ((mState == kStart) && (evt == kNext)) return kLoadLoginName; else
@@ -430,12 +475,16 @@ void LoginScreen::update(const GCTEvent& msg)
 {
     switch (getState())
     {
+        case kShowAResetEmailHasBeenSent:
         case kShowCouldNotLogin:
         case kShowCouldNotRegister:
+        case kShowEnterEmailFirst:
+        case kShowEnterResetCode:
         case kShowIncorrectFormat:
         case kShowNotYetImplemented:
         case kShowRetryLogin:
         case kShowRetryRegister:
+        case kShowSendResetEmail:
         case kShowURLMissingSlash:
             switch(msg.mEvent)
             {

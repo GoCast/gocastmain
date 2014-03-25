@@ -38,3 +38,21 @@ void tConfirm(const std::string& msg)
 
     [alert release];
 }
+
+void tPrompt(const std::string& msg)
+{
+	UIAlertView* alert = [[UIAlertView alloc] init];
+
+    alert.alertViewStyle = UIAlertViewStylePlainTextInput;
+
+    alert.delegate = gAppDelegateInstance;
+	alert.title = @""; // "Prompt"
+	alert.message = [NSString stringWithUTF8String:msg.c_str()];
+    [alert addButtonWithTitle:@"オーケー"];   // "Okay"
+    [alert addButtonWithTitle:@"キャンセル"];  // "Cancel"
+
+    [alert performSelectorOnMainThread:@selector(show) withObject:nil waitUntilDone:YES];
+
+    [alert release];
+}
+
