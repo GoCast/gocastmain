@@ -431,9 +431,11 @@ void LoginScreen::update(const GCTEvent& msg)
     switch (getState())
     {
         case kShowCouldNotLogin:
+        case kShowCouldNotRegister:
         case kShowIncorrectFormat:
         case kShowNotYetImplemented:
         case kShowRetryLogin:
+        case kShowRetryRegister:
         case kShowURLMissingSlash:
             switch(msg.mEvent)
             {
