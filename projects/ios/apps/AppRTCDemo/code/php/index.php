@@ -6,6 +6,8 @@ include 'token.php';
 
 include 'login.php';
 include 'register.php';
+include 'changePassword.php';
+
 include 'listMessages.php';
 include 'deleteMessage.php';
 include 'markRead.php';
@@ -82,6 +84,24 @@ if(hasParam("action"))
 				{
 					switch($_GET["action"])
 					{
+						case "changePassword":
+							if (hasParam("oldpassword"))
+							{
+								if (hasParam("newpassword"))
+								{
+									print(json_encode(changePassword($_GET["name"], $_GET["oldpassword"], $_GET["newpassword"])));
+								}
+								else
+								{
+									print(json_encode(errorMissingParameter("newpassword")));
+								}
+							}
+							else
+							{
+								print(json_encode(errorMissingParameter("oldpassword")));
+							}
+							break;
+
 						case "logout":
 							if (remove_new_token($_GET["name"], $_GET["authToken"]))
 							{
