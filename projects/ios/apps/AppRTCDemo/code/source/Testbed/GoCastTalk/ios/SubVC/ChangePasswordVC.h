@@ -38,6 +38,9 @@ class ChangePasswordScreen;
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath;
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath;
 
+-(std::string)getOldPassword;
+-(std::string)getNewPassword;
+
 -(void)setBlockingViewVisible:(bool)newVisible;
 
 -(void) popSelf;

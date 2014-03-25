@@ -7,10 +7,12 @@ class ChangePasswordScreenMessage;
 class ChangePasswordScreen
 :   public tMealy,
     public tObserver<const ChangePasswordScreenMessage&>,
+    public tObserver<const URLLoaderEvent&>,
     public tObserver<const GCTEvent&>
 {
 protected:
-    ChangePasswordVC* mPeer;
+    ChangePasswordVC*   mPeer;
+    JSONObject          mChangePasswordJSON;
 
 public:
 	ChangePasswordScreen(ChangePasswordVC* newVC);
@@ -25,15 +27,22 @@ protected:
 
 	void idleEntry();
 	void peerPopSelfEntry();
-	void showNotYetImplementdEntry();
+	void sendChangePasswordToServerEntry();
+	void sendForceLogoutToVCEntry();
+	void showErrorWithChangePasswordEntry();
+	void showSuccessChangedPasswordEntry();
+	void wasLogoutSuccessfulEntry();
 
 public:
 	enum EventType
 	{
 		kInvalidEvent = -2,
 		kNext = -1,
+		kExpired,
+		kFail,
 		kNo,
 		kSaveSelected,
+		kSuccess,
 		kYes,
 	};
 
@@ -44,7 +53,11 @@ public:
 		kEnd,
 		kIdle,
 		kPeerPopSelf,
-		kShowNotYetImplementd,
+		kSendChangePasswordToServer,
+		kSendForceLogoutToVC,
+		kShowErrorWithChangePassword,
+		kShowSuccessChangedPassword,
+		kWasLogoutSuccessful,
 	};
 
 protected:
@@ -54,6 +67,7 @@ protected:
 	bool HasEdgeNamedNext() const;
 
 	void update(const ChangePasswordScreenMessage& msg);
+	void update(const URLLoaderEvent& msg);
 	void update(const GCTEvent& msg);
 };
 

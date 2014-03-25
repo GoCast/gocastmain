@@ -175,6 +175,18 @@
     [self.mBlockingView setHidden:newVisible ? NO : YES];
 }
 
+-(std::string)getOldPassword
+{
+    const char* result = [self.mOldPassword.text UTF8String];
+    return result ? result : "";
+}
+
+-(std::string)getNewPassword
+{
+    const char* result = [self.mNewPassword.text UTF8String];
+    return result ? result : "";
+}
+
 -(void) popSelf
 {
     [(UINavigationController*)self.parentViewController popViewControllerAnimated:TRUE];
