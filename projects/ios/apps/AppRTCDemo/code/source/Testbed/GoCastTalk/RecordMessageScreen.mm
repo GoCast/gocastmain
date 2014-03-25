@@ -108,8 +108,6 @@ void RecordMessageScreen::waitToRecordIdleEntry()
     [mPeer setWaitToRecordUI];
     [mPeer setTranscription:"Transcription pending"];
     [mPeer setTranscriptionEnabled:false];
-
-    printf("%s\n", "wait to record");
 }
 
 void RecordMessageScreen::waitToPlayIdleEntry()
@@ -142,8 +140,6 @@ void RecordMessageScreen::waitToPlayIdleEntry()
         [mPeer setTimeLabel:buf];
     }
 
-    printf("%s\n", "wait to play");
-
     if (mForceLogout)
     {
         process(kCancelPressed);
@@ -153,7 +149,6 @@ void RecordMessageScreen::waitToPlayIdleEntry()
 void RecordMessageScreen::playingIdleEntry()
 {
     [mPeer setPlayingUI];
-    printf("%s\n", "playing");
 
     if (mForceLogout)
     {
@@ -164,7 +159,6 @@ void RecordMessageScreen::playingIdleEntry()
 void RecordMessageScreen::pausedIdleEntry()
 {
     [mPeer setPausedUI];
-    printf("%s\n", "paused");
 
     if (mForceLogout)
     {
@@ -175,7 +169,6 @@ void RecordMessageScreen::pausedIdleEntry()
 void RecordMessageScreen::recordingIdleEntry()
 {
     [mPeer setRecordingUI];
-    printf("%s\n", "recording");
 }
 
 void RecordMessageScreen::recordingIdleExit()
@@ -186,7 +179,6 @@ void RecordMessageScreen::recordingIdleExit()
 void RecordMessageScreen::waitForTranscriptionIdleEntry()
 {
     [mPeer setWaitForTranscriptUI];
-    printf("%s\n", "waiting for transcript");
 }
 
 #pragma mark Peer communication
