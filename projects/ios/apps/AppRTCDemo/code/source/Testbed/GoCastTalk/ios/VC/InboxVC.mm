@@ -196,12 +196,10 @@
     InboxVC*            tab0 = (InboxVC*)[gAppDelegateInstance.mInboxVC.viewControllers objectAtIndex:0];
     RecordMessageVC*    tab1 = (RecordMessageVC*)[gAppDelegateInstance.mNewMemoVC.viewControllers objectAtIndex:0];
     ContactsVC*         tab2 = (ContactsVC*)[gAppDelegateInstance.mContactsVC.viewControllers objectAtIndex:0];
-    SettingsVC*         tab3 = (SettingsVC*)[gAppDelegateInstance.mSettingsVC.viewControllers objectAtIndex:0];
 
     [tab0.mTable scrollRectToVisible:CGRectMake(0, 0, 1, 1) animated:YES];
     [tab1.mScrollView scrollRectToVisible:CGRectMake(0, 0, 1, 1) animated:YES];
     [tab2.mTable scrollRectToVisible:CGRectMake(0, 0, 1, 1) animated:YES];
-    [tab3.mTable scrollRectToVisible:CGRectMake(0, 0, 1, 1) animated:YES];
 
     [gAppDelegateInstance.mInboxVC      popToRootViewControllerAnimated:NO];
     [gAppDelegateInstance.mNewMemoVC    popToRootViewControllerAnimated:NO];
