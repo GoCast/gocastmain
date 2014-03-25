@@ -72,6 +72,8 @@ protected:
 	void peerPushInboxMessageEntry();
 	void peerPushLoginScreenEntry();
 	void peerReloadTableEntry();
+	void peerResetAllTabsEntry();
+	void peerSwitchToInboxTabEntry();
 	void playNewMessageSoundEntry();
 	void sendDeleteMessageToServerEntry();
 	void sendGetContactsToServerEntry();
@@ -129,6 +131,8 @@ public:
 		kPeerPushInboxMessage,
 		kPeerPushLoginScreen,
 		kPeerReloadTable,
+		kPeerResetAllTabs,
+		kPeerSwitchToInboxTab,
 		kPlayNewMessageSound,
 		kSendDeleteMessageToServer,
 		kSendGetContactsToServer,

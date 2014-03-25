@@ -37,6 +37,9 @@ class InboxScreen;
 -(void) pushInboxMessage:(const JSONObject&)newObject;
 -(void) pushLoginScreen;
 
+-(void) resetAllTabs;
+-(void) switchToInboxTab;
+
 -(void)refresh:(UIRefreshControl *)refreshControl;
 
 @end

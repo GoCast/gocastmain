@@ -367,6 +367,16 @@ void InboxScreen::peerReloadTableEntry()
     [mPeer reloadTable];
 }
 
+void InboxScreen::peerResetAllTabsEntry()
+{
+    [mPeer resetAllTabs];
+}
+
+void InboxScreen::peerSwitchToInboxTabEntry()
+{
+    [mPeer switchToInboxTab];
+}
+
 #pragma mark Actions
 void InboxScreen::addFakeContactsEntry()
 {
@@ -623,6 +633,8 @@ void InboxScreen::CallEntry()
 		case kPeerPushInboxMessage: peerPushInboxMessageEntry(); break;
 		case kPeerPushLoginScreen: peerPushLoginScreenEntry(); break;
 		case kPeerReloadTable: peerReloadTableEntry(); break;
+		case kPeerResetAllTabs: peerResetAllTabsEntry(); break;
+		case kPeerSwitchToInboxTab: peerSwitchToInboxTabEntry(); break;
 		case kPlayNewMessageSound: playNewMessageSoundEntry(); break;
 		case kSendDeleteMessageToServer: sendDeleteMessageToServerEntry(); break;
 		case kSendGetContactsToServer: sendGetContactsToServerEntry(); break;
@@ -674,8 +686,10 @@ int  InboxScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kLoadLoginNameAndToken) && (evt == kFail)) return kClearAllDataAndReloadTable; else
 	if ((mState == kLoadLoginNameAndToken) && (evt == kSuccess)) return kDoWeHaveAToken; else
 	if ((mState == kPeerPushInboxMessage) && (evt == kNext)) return kIdle; else
-	if ((mState == kPeerPushLoginScreen) && (evt == kNext)) return kShowYourTokenExpired; else
+	if ((mState == kPeerPushLoginScreen) && (evt == kNext)) return kPeerSwitchToInboxTab; else
 	if ((mState == kPeerReloadTable) && (evt == kNext)) return kIdle; else
+	if ((mState == kPeerResetAllTabs) && (evt == kNext)) return kShowYourTokenExpired; else
+	if ((mState == kPeerSwitchToInboxTab) && (evt == kNext)) return kPeerResetAllTabs; else
 	if ((mState == kPlayNewMessageSound) && (evt == kNext)) return kPeerReloadTable; else
 	if ((mState == kSendDeleteMessageToServer) && (evt == kFail)) return kShowErrorDeletingMessage; else
 	if ((mState == kSendDeleteMessageToServer) && (evt == kSuccess)) return kWasDeleteMessageValid; else
@@ -726,6 +740,8 @@ bool InboxScreen::HasEdgeNamedNext() const
 		case kPeerPushInboxMessage:
 		case kPeerPushLoginScreen:
 		case kPeerReloadTable:
+		case kPeerResetAllTabs:
+		case kPeerSwitchToInboxTab:
 		case kPlayNewMessageSound:
 		case kSetWaitForDeleteMessage:
 		case kSetWaitForGetContacts:
