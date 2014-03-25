@@ -19,6 +19,7 @@ class SettingsScreen;
 
 //mInboxView
 @property (nonatomic, strong) IBOutlet UITableView*     mTable;
+@property (nonatomic, strong) IBOutlet UIView*          mBlockingView;
 
 #pragma mark Construction / Destruction
 - (void)viewDidLoad;
@@ -27,6 +28,8 @@ class SettingsScreen;
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section;
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath;
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath;
+
+-(void)setBlockingViewVisible:(bool)newVisible;
 
 -(void) pushChangeRegisteredName:(const JSONObject&)newObject;
 

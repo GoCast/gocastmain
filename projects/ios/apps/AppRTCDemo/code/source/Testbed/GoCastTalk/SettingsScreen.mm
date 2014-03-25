@@ -43,6 +43,7 @@ void SettingsScreen::aboutThisAppPressed()
 #pragma mark Start / End / Invalid
 void SettingsScreen::startEntry()
 {
+    URLLoader::getInstance()->attach(this);
     GCTEventManager::getInstance()->attach(this);
 }
 
@@ -89,11 +90,58 @@ void SettingsScreen::peerPushChangeRegisteredNameEntry()
     [mPeer pushChangeRegisteredName:initObject];
 }
 
-#pragma mark UI
-void SettingsScreen::showNotYetImplementedEntry()
+#pragma mark Queries
+void SettingsScreen::wasLogoutSuccessfulEntry()
 {
-    //"Not yet implemented"
-    tAlert("現在未実装です");
+    bool result = false;
+
+    if (mLogoutJSON["status"].mString == std::string("success"))
+    {
+        result = true;
+    }
+
+    SetImmediateEvent(result ? kYes : kNo);
+}
+
+#pragma mark Actions
+void SettingsScreen::destroyStoredTokenEntry()
+{
+    tFile(tFile::kPreferencesDirectory, "token.txt").remove();
+    InboxScreen::mToken.clear();
+}
+
+void SettingsScreen::sendLogoutToServerEntry()
+{
+    char buf[512];
+
+    sprintf(buf, "%s?action=logout&name=%s&authToken=%s",
+            kMemoAppServerURL,
+            InboxScreen::mEmailAddress.c_str(),
+            InboxScreen::mToken.c_str());
+
+    URLLoader::getInstance()->loadString(this, buf);
+}
+
+#pragma mark UI
+void SettingsScreen::setWaitForLogoutEntry()
+{
+    [mPeer setBlockingViewVisible:true];
+}
+
+void SettingsScreen::showErrorWithLogoutEntry()
+{
+    tAlert("Logout failed");
+}
+
+void SettingsScreen::showSuccessWithLogoutEntry()
+{
+    tAlert("You have been successfully logged out");
+}
+
+#pragma mark Sending messages to other machines
+void SettingsScreen::sendForceLogoutToVCEntry()
+{
+    GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kForceLogout));
 }
 
 #pragma mark State wiring
@@ -101,14 +149,20 @@ void SettingsScreen::CallEntry()
 {
 	switch(mState)
 	{
+		case kDestroyStoredToken: destroyStoredTokenEntry(); break;
 		case kEnd: EndEntryHelper(); break;
 		case kIdle: idleEntry(); break;
 		case kInvalidState: invalidStateEntry(); break;
 		case kPeerPushAbout: peerPushAboutEntry(); break;
 		case kPeerPushChangePassword: peerPushChangePasswordEntry(); break;
 		case kPeerPushChangeRegisteredName: peerPushChangeRegisteredNameEntry(); break;
-		case kShowNotYetImplemented: showNotYetImplementedEntry(); break;
+		case kSendForceLogoutToVC: sendForceLogoutToVCEntry(); break;
+		case kSendLogoutToServer: sendLogoutToServerEntry(); break;
+		case kSetWaitForLogout: setWaitForLogoutEntry(); break;
+		case kShowErrorWithLogout: showErrorWithLogoutEntry(); break;
+		case kShowSuccessWithLogout: showSuccessWithLogoutEntry(); break;
 		case kStart: startEntry(); break;
+		case kWasLogoutSuccessful: wasLogoutSuccessfulEntry(); break;
 		default: break;
 	}
 }
@@ -119,15 +173,23 @@ void SettingsScreen::CallExit()
 
 int  SettingsScreen::StateTransitionFunction(const int evt) const
 {
+	if ((mState == kDestroyStoredToken) && (evt == kNext)) return kShowSuccessWithLogout; else
 	if ((mState == kIdle) && (evt == kAboutThisAppSelected)) return kPeerPushAbout; else
 	if ((mState == kIdle) && (evt == kChangePasswordSelected)) return kPeerPushChangePassword; else
-	if ((mState == kIdle) && (evt == kLogOutSelected)) return kShowNotYetImplemented; else
+	if ((mState == kIdle) && (evt == kLogOutSelected)) return kSetWaitForLogout; else
 	if ((mState == kIdle) && (evt == kRegisteredNameSelected)) return kPeerPushChangeRegisteredName; else
 	if ((mState == kPeerPushAbout) && (evt == kNext)) return kIdle; else
 	if ((mState == kPeerPushChangePassword) && (evt == kNext)) return kIdle; else
 	if ((mState == kPeerPushChangeRegisteredName) && (evt == kNext)) return kIdle; else
-	if ((mState == kShowNotYetImplemented) && (evt == kYes)) return kIdle; else
-	if ((mState == kStart) && (evt == kNext)) return kIdle;
+	if ((mState == kSendForceLogoutToVC) && (evt == kNext)) return kIdle; else
+	if ((mState == kSendLogoutToServer) && (evt == kFail)) return kShowErrorWithLogout; else
+	if ((mState == kSendLogoutToServer) && (evt == kSuccess)) return kWasLogoutSuccessful; else
+	if ((mState == kSetWaitForLogout) && (evt == kNext)) return kSendLogoutToServer; else
+	if ((mState == kShowErrorWithLogout) && (evt == kYes)) return kIdle; else
+	if ((mState == kShowSuccessWithLogout) && (evt == kYes)) return kSendForceLogoutToVC; else
+	if ((mState == kStart) && (evt == kNext)) return kIdle; else
+	if ((mState == kWasLogoutSuccessful) && (evt == kNo)) return kShowErrorWithLogout; else
+	if ((mState == kWasLogoutSuccessful) && (evt == kYes)) return kDestroyStoredToken;
 
 	return kInvalidState;
 }
@@ -139,7 +201,10 @@ bool SettingsScreen::HasEdgeNamedNext() const
 		case kEnd:
 		case kIdle:
 		case kInvalidState:
-		case kShowNotYetImplemented:
+		case kSendLogoutToServer:
+		case kShowErrorWithLogout:
+		case kShowSuccessWithLogout:
+		case kWasLogoutSuccessful:
 			return false;
 		default: break;
 	}
@@ -152,15 +217,48 @@ void SettingsScreen::update(const SettingsScreenMessage& msg)
 	process(msg.mEvent);
 }
 
+void SettingsScreen::update(const URLLoaderEvent& msg)
+{
+    if (msg.mId == this)
+    {
+        [mPeer setBlockingViewVisible:false];
+
+        switch (msg.mEvent)
+        {
+            case URLLoaderEvent::kLoadFail: process(kFail); break;
+            case URLLoaderEvent::kLoadedString:
+            {
+                switch (getState())
+                {
+                    case kSendLogoutToServer:
+                        mLogoutJSON = JSONUtil::extract(msg.mString);
+                        break;
+
+                    default:
+                        break;
+                }
+                process(kSuccess);
+            }
+                break;
+
+            case URLLoaderEvent::kLoadedFile: process(kSuccess); break;
+
+            default:
+                break;
+        }
+    }
+}
+
 void SettingsScreen::update(const GCTEvent& msg)
 {
     switch(getState())
     {
-        case kShowNotYetImplemented:
+        case kShowErrorWithLogout:
+        case kShowSuccessWithLogout:
             switch(msg.mEvent)
             {
                 case GCTEvent::kOKYesAlertPressed:  process(kYes); break;
-//                case GCTEvent::kNoAlertPressed:     process(kNo); break;
+                case GCTEvent::kNoAlertPressed:     process(kNo); break;
 
                 default:
                     break;

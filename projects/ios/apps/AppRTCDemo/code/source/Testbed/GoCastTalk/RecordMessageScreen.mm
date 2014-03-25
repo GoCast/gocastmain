@@ -219,37 +219,55 @@ void RecordMessageScreen::isForwardingMessageEntry()
 void RecordMessageScreen::wasPostAudioSuccessfulEntry()
 {
     bool result = false;
+    bool expired = false;
 
     if (mPostAudioJSON["status"].mString == std::string("success"))
     {
         result = true;
     }
 
-    SetImmediateEvent(result ? kYes : kNo);
+    if (mPostAudioJSON["status"].mString == std::string("expired"))
+    {
+        expired = true;
+    }
+
+    SetImmediateEvent(expired ? kExpired : (result ? kYes : kNo));
 }
 
 void RecordMessageScreen::wasPostTranscriptSuccessfulEntry()
 {
     bool result = false;
+    bool expired = false;
 
     if (mPostTranscriptJSON["status"].mString == std::string("success"))
     {
         result = true;
     }
 
-    SetImmediateEvent(result ? kYes : kNo);
+    if (mPostTranscriptJSON["status"].mString == std::string("expired"))
+    {
+        expired = true;
+    }
+
+    SetImmediateEvent(expired ? kExpired : (result ? kYes : kNo));
 }
 
 void RecordMessageScreen::wasPostMessageSuccessfulEntry()
 {
     bool result = false;
+    bool expired = false;
 
     if (mPostMessageJSON["status"].mString == std::string("success"))
     {
         result = true;
     }
 
-    SetImmediateEvent(result ? kYes : kNo);
+    if (mPostMessageJSON["status"].mString == std::string("expired"))
+    {
+        expired = true;
+    }
+
+    SetImmediateEvent(expired ? kExpired : (result ? kYes : kNo));
 }
 
 #pragma mark Actions
@@ -534,6 +552,11 @@ void RecordMessageScreen::showPostAudioFailedEntry()
 }
 
 #pragma mark Sending messages to other machines
+void RecordMessageScreen::sendForceLogoutToVCEntry()
+{
+    GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kForceLogout));
+}
+
 void RecordMessageScreen::sendReloadInboxToVCEntry()
 {
     GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kReloadInbox));
@@ -566,6 +589,7 @@ void RecordMessageScreen::CallEntry()
 		case kPlayingIdle: playingIdleEntry(); break;
 		case kRecordingIdle: recordingIdleEntry(); break;
 		case kResumeAudio: resumeAudioEntry(); break;
+		case kSendForceLogoutToVC: sendForceLogoutToVCEntry(); break;
 		case kSendPostAudioToServer: sendPostAudioToServerEntry(); break;
 		case kSendPostMessageToServer: sendPostMessageToServerEntry(); break;
 		case kSendPostTranscriptToServer: sendPostTranscriptToServerEntry(); break;
@@ -635,6 +659,7 @@ int  RecordMessageScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kPlayingIdle) && (evt == kSendPressed)) return kStopPlayingBeforeSend; else
 	if ((mState == kRecordingIdle) && (evt == kStopPressed)) return kStopRecordingAudio; else
 	if ((mState == kResumeAudio) && (evt == kNext)) return kPlayingIdle; else
+	if ((mState == kSendForceLogoutToVC) && (evt == kNext)) return kClearDataAndReloadTable; else
 	if ((mState == kSendPostAudioToServer) && (evt == kFail)) return kShowPostAudioFailed; else
 	if ((mState == kSendPostAudioToServer) && (evt == kSuccess)) return kWasPostAudioSuccessful; else
 	if ((mState == kSendPostMessageToServer) && (evt == kFail)) return kShowPostAudioFailed; else
@@ -666,10 +691,13 @@ int  RecordMessageScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kWaitToPlayIdle) && (evt == kSendPressed)) return kDoWeHaveContactsToSendTo; else
 	if ((mState == kWaitToRecordIdle) && (evt == kNewMessage)) return kPeerSwitchToNewMemoTab; else
 	if ((mState == kWaitToRecordIdle) && (evt == kRecordPressed)) return kStartRecordingAudio; else
+	if ((mState == kWasPostAudioSuccessful) && (evt == kExpired)) return kSendForceLogoutToVC; else
 	if ((mState == kWasPostAudioSuccessful) && (evt == kNo)) return kShowPostAudioFailed; else
 	if ((mState == kWasPostAudioSuccessful) && (evt == kYes)) return kSendPostTranscriptToServer; else
+	if ((mState == kWasPostMessageSuccessful) && (evt == kExpired)) return kSendForceLogoutToVC; else
 	if ((mState == kWasPostMessageSuccessful) && (evt == kNo)) return kShowPostAudioFailed; else
 	if ((mState == kWasPostMessageSuccessful) && (evt == kYes)) return kSendReloadInboxToVC; else
+	if ((mState == kWasPostTranscriptSuccessful) && (evt == kExpired)) return kSendForceLogoutToVC; else
 	if ((mState == kWasPostTranscriptSuccessful) && (evt == kNo)) return kShowPostAudioFailed; else
 	if ((mState == kWasPostTranscriptSuccessful) && (evt == kYes)) return kSendPostMessageToServer;
 
@@ -692,6 +720,7 @@ bool RecordMessageScreen::HasEdgeNamedNext() const
 		case kPeerSwitchToNewMemoTab:
 		case kPlayAudio:
 		case kResumeAudio:
+		case kSendForceLogoutToVC:
 		case kSendReloadInboxToVC:
 		case kSetWaitForPostAudio:
 		case kSetWaitForTranscription:

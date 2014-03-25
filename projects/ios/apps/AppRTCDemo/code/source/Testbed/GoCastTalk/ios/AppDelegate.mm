@@ -87,8 +87,6 @@ const unsigned char SpeechKitApplicationKey[] =
     [self.window setRootViewController:self.tabBarController];
     [self.window makeKeyAndVisible];
 
-    [self.tabBarController presentViewController:[[[LoginVC alloc] init] autorelease] animated:YES completion:nil];
-
     GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kAppDelegateInit));
 
     return YES;

@@ -7,10 +7,12 @@ class SettingsScreenMessage;
 class SettingsScreen
 :   public tMealy,
     public tObserver<const SettingsScreenMessage&>,
+    public tObserver<const URLLoaderEvent&>,
     public tObserver<const GCTEvent&>
 {
 protected:
     SettingsVC* mPeer;
+    JSONObject  mLogoutJSON;
 
 public:
 	SettingsScreen(SettingsVC* newVC);
@@ -26,11 +28,17 @@ protected:
 	void endEntry();
 	void invalidStateEntry();
 
+	void destroyStoredTokenEntry();
 	void idleEntry();
 	void peerPushAboutEntry();
 	void peerPushChangePasswordEntry();
 	void peerPushChangeRegisteredNameEntry();
-	void showNotYetImplementedEntry();
+	void sendForceLogoutToVCEntry();
+	void sendLogoutToServerEntry();
+	void setWaitForLogoutEntry();
+	void showErrorWithLogoutEntry();
+	void showSuccessWithLogoutEntry();
+	void wasLogoutSuccessfulEntry();
 
 public:
 	enum EventType
@@ -39,8 +47,11 @@ public:
 		kNext = -1,
 		kAboutThisAppSelected,
 		kChangePasswordSelected,
+		kFail,
 		kLogOutSelected,
+		kNo,
 		kRegisteredNameSelected,
+		kSuccess,
 		kYes,
 	};
 
@@ -48,12 +59,18 @@ public:
 	{
 		kInvalidState = 0,
 		kStart = 1,
+		kDestroyStoredToken,
 		kEnd,
 		kIdle,
 		kPeerPushAbout,
 		kPeerPushChangePassword,
 		kPeerPushChangeRegisteredName,
-		kShowNotYetImplemented,
+		kSendForceLogoutToVC,
+		kSendLogoutToServer,
+		kSetWaitForLogout,
+		kShowErrorWithLogout,
+		kShowSuccessWithLogout,
+		kWasLogoutSuccessful,
 	};
 
 protected:
@@ -63,6 +80,7 @@ protected:
 	bool HasEdgeNamedNext() const;
 
 	void update(const SettingsScreenMessage& msg);
+	void update(const URLLoaderEvent& msg);
 	void update(const GCTEvent& msg);
 };
 

@@ -74,6 +74,7 @@ protected:
 	void playingIdleEntry();
 	void recordingIdleEntry();
 	void resumeAudioEntry();
+	void sendForceLogoutToVCEntry();
 	void sendPostAudioToServerEntry();
 	void sendPostMessageToServerEntry();
 	void sendPostTranscriptToServerEntry();
@@ -105,6 +106,7 @@ public:
 		kInvalidEvent = -2,
 		kNext = -1,
 		kCancelPressed,
+		kExpired,
 		kFail,
 		kFinishedPlaying,
 		kNewMessage,
@@ -144,6 +146,7 @@ public:
 		kPlayingIdle,
 		kRecordingIdle,
 		kResumeAudio,
+		kSendForceLogoutToVC,
 		kSendPostAudioToServer,
 		kSendPostMessageToServer,
 		kSendPostTranscriptToServer,

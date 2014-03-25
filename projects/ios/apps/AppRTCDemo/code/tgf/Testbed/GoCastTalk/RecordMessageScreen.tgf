@@ -42,6 +42,7 @@
 42 Do we have recipients or a recording?
 43 Peer: pop all Inbox views
 44 Show "confirm delete?"
+45 Send ForceLogout to VC
 #
 3 4 no
 4 5 recordPressed
@@ -111,3 +112,7 @@
 44 3 no
 14 43
 24 3
+22 45 expired
+21 45 expired
+27 45 expired
+45 32

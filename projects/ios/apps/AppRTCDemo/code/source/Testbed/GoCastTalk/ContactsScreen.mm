@@ -146,25 +146,37 @@ void ContactsScreen::isThisAChildScreenGroupsEntry()
 void ContactsScreen::wasSetContactsSuccessfulEntry()
 {
     bool result = false;
+    bool expired = false;
 
     if (mSetContactsJSON["status"].mString == std::string("success"))
     {
         result = true;
     }
 
-    SetImmediateEvent(result ? kYes : kNo);
+    if (mSetContactsJSON["status"].mString == std::string("expired"))
+    {
+        expired = true;
+    }
+
+    SetImmediateEvent(expired ? kExpired : (result ? kYes : kNo));
 }
 
 void ContactsScreen::wasSetGroupsSuccessfulEntry()
 {
     bool result = false;
+    bool expired = false;
 
     if (mSetGroupsJSON["status"].mString == std::string("success"))
     {
         result = true;
     }
 
-    SetImmediateEvent(result ? kYes : kNo);
+    if (mSetGroupsJSON["status"].mString == std::string("expired"))
+    {
+        expired = true;
+    }
+
+    SetImmediateEvent(expired ? kExpired : (result ? kYes : kNo));
 }
 
 #pragma mark Actions
@@ -248,6 +260,11 @@ void ContactsScreen::sendAppendNewGroupToVCEntry()
     GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kAppendNewGroup, InboxScreen::mGroups[mItemSelected].mObject["emails"].mArray, mIdentifier));
 }
 
+void ContactsScreen::sendForceLogoutToVCEntry()
+{
+    GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kForceLogout));
+}
+
 void ContactsScreen::sendReloadInboxToVCEntry()
 {
     GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kReloadInbox));
@@ -273,6 +290,7 @@ void ContactsScreen::CallEntry()
 		case kPeerReloadTable: peerReloadTableEntry(); break;
 		case kSendAppendNewContactToVC: sendAppendNewContactToVCEntry(); break;
 		case kSendAppendNewGroupToVC: sendAppendNewGroupToVCEntry(); break;
+		case kSendForceLogoutToVC: sendForceLogoutToVCEntry(); break;
 		case kSendReloadInboxToVC: sendReloadInboxToVCEntry(); break;
 		case kSendSetContactsToServer: sendSetContactsToServerEntry(); break;
 		case kSendSetGroupsToServer: sendSetGroupsToServerEntry(); break;
@@ -313,6 +331,7 @@ int  ContactsScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kPeerReloadTable) && (evt == kNext)) return kIdle; else
 	if ((mState == kSendAppendNewContactToVC) && (evt == kNext)) return kPeerPopSelf; else
 	if ((mState == kSendAppendNewGroupToVC) && (evt == kNext)) return kPeerPopSelf; else
+	if ((mState == kSendForceLogoutToVC) && (evt == kNext)) return kIdle; else
 	if ((mState == kSendReloadInboxToVC) && (evt == kNext)) return kPeerReloadTable; else
 	if ((mState == kSendSetContactsToServer) && (evt == kFail)) return kShowErrorWithSetContacts; else
 	if ((mState == kSendSetContactsToServer) && (evt == kSuccess)) return kWasSetContactsSuccessful; else
@@ -323,8 +342,10 @@ int  ContactsScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kShowErrorWithSetContacts) && (evt == kYes)) return kIdle; else
 	if ((mState == kShowErrorWithSetGroups) && (evt == kYes)) return kIdle; else
 	if ((mState == kStart) && (evt == kNext)) return kIdle; else
+	if ((mState == kWasSetContactsSuccessful) && (evt == kExpired)) return kSendForceLogoutToVC; else
 	if ((mState == kWasSetContactsSuccessful) && (evt == kNo)) return kShowErrorWithSetContacts; else
 	if ((mState == kWasSetContactsSuccessful) && (evt == kYes)) return kSendReloadInboxToVC; else
+	if ((mState == kWasSetGroupsSuccessful) && (evt == kExpired)) return kSendForceLogoutToVC; else
 	if ((mState == kWasSetGroupsSuccessful) && (evt == kNo)) return kShowErrorWithSetGroups; else
 	if ((mState == kWasSetGroupsSuccessful) && (evt == kYes)) return kSendReloadInboxToVC;
 

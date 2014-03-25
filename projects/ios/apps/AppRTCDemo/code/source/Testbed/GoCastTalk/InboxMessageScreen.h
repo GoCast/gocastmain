@@ -57,6 +57,7 @@ protected:
 	void resumeSoundEntry();
 	void sendDeleteMessageToServerEntry();
 	void sendDownloadRequestToServerEntry();
+	void sendForceLogoutToVCEntry();
 	void sendMarkReadToServerEntry();
 	void sendNewMessageToGroupToVCEntry();
 	void sendReloadInboxToVCEntry();
@@ -79,6 +80,7 @@ public:
 		kInvalidEvent = -2,
 		kNext = -1,
 		kDeleteSelected,
+		kExpired,
 		kFail,
 		kFinishedPlaying,
 		kForwardSelected,
@@ -109,6 +111,7 @@ public:
 		kResumeSound,
 		kSendDeleteMessageToServer,
 		kSendDownloadRequestToServer,
+		kSendForceLogoutToVC,
 		kSendMarkReadToServer,
 		kSendNewMessageToGroupToVC,
 		kSendReloadInboxToVC,

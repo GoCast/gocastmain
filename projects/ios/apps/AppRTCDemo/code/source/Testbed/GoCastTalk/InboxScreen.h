@@ -24,6 +24,7 @@ protected:
     size_t      mItemSelected;
     size_t      mDeleteSelected;
     size_t      mPriorUnreadCount;
+    bool        mForceLogout;
 
 public:
     static JSONArray    mInbox;
@@ -62,12 +63,14 @@ protected:
 
 	void addFakeContactsEntry();
 	void areThereNewMessagesEntry();
-	void clearInboxEntry();
+	void clearAllDataAndReloadTableEntry();
 	void didWeDownloadContactsEntry();
 	void didWeDownloadGroupsEntry();
 	void doWeHaveATokenEntry();
 	void idleEntry();
+	void loadLoginNameAndTokenEntry();
 	void peerPushInboxMessageEntry();
+	void peerPushLoginScreenEntry();
 	void peerReloadTableEntry();
 	void playNewMessageSoundEntry();
 	void sendDeleteMessageToServerEntry();
@@ -83,9 +86,11 @@ protected:
 	void showErrorLoadingGroupsEntry();
 	void showErrorLoadingInboxEntry();
 	void showRetryListMessagesEntry();
+	void showYourTokenExpiredEntry();
 	void sortContactsByKanaEntry();
 	void sortGroupsByGroupNameEntry();
 	void sortTableByDateEntry();
+	void waitForLoginSuccessIdleEntry();
 	void wasDeleteMessageValidEntry();
 	void wasGetContactsValidEntry();
 	void wasGetGroupsValidEntry();
@@ -97,8 +102,11 @@ public:
 		kInvalidEvent = -2,
 		kNext = -1,
 		kDeleteSelected,
+		kExpired,
 		kFail,
+		kForceLogout,
 		kItemSelected,
+		kLoginSucceeded,
 		kNo,
 		kRefreshSelected,
 		kSuccess,
@@ -111,13 +119,15 @@ public:
 		kStart = 1,
 		kAddFakeContacts,
 		kAreThereNewMessages,
-		kClearInbox,
+		kClearAllDataAndReloadTable,
 		kDidWeDownloadContacts,
 		kDidWeDownloadGroups,
 		kDoWeHaveAToken,
 		kEnd,
 		kIdle,
+		kLoadLoginNameAndToken,
 		kPeerPushInboxMessage,
+		kPeerPushLoginScreen,
 		kPeerReloadTable,
 		kPlayNewMessageSound,
 		kSendDeleteMessageToServer,
@@ -133,9 +143,11 @@ public:
 		kShowErrorLoadingGroups,
 		kShowErrorLoadingInbox,
 		kShowRetryListMessages,
+		kShowYourTokenExpired,
 		kSortContactsByKana,
 		kSortGroupsByGroupName,
 		kSortTableByDate,
+		kWaitForLoginSuccessIdle,
 		kWasDeleteMessageValid,
 		kWasGetContactsValid,
 		kWasGetGroupsValid,

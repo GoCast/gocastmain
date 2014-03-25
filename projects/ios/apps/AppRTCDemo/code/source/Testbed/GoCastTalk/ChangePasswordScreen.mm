@@ -27,6 +27,7 @@ void ChangePasswordScreen::savePressed()
 #pragma mark Start / End / Invalid
 void ChangePasswordScreen::startEntry()
 {
+    GCTEventManager::getInstance()->attach(this);
 }
 
 void ChangePasswordScreen::endEntry()

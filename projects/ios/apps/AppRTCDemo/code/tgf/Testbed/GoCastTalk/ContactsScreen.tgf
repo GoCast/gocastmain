@@ -22,6 +22,7 @@
 22 Send AppendNewGroup to VC
 23 Peer: push GroupView
 24 Peer: push EditAllGroups
+25 Send ForceLogout to VC
 #
 1 3
 3 4 refreshSelected
@@ -57,3 +58,6 @@
 21 23 no
 23 3
 24 3
+13 25 expired
+19 25 expired
+25 3

@@ -91,13 +91,19 @@ void EditOneGroupScreen::isNewNameEmptyEntry()
 void EditOneGroupScreen::wasSetGroupsSuccessfulEntry()
 {
     bool result = false;
+    bool expired = false;
 
     if (mSetGroupsJSON["status"].mString == std::string("success"))
     {
         result = true;
     }
 
-    SetImmediateEvent(result ? kYes : kNo);
+    if (mSetGroupsJSON["status"].mString == std::string("expired"))
+    {
+        expired = true;
+    }
+
+    SetImmediateEvent(expired ? kExpired : (result ? kYes : kNo));
 }
 
 #pragma mark Actions
@@ -194,6 +200,10 @@ void EditOneGroupScreen::showNameCantBeEmptyEntry()
 }
 
 #pragma mark Sending messages to other machines
+void EditOneGroupScreen::sendForceLogoutToVCEntry()
+{
+    GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kForceLogout));
+}
 void EditOneGroupScreen::sendReloadInboxToVCEntry()
 {
     GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kReloadInbox));
@@ -212,6 +222,7 @@ void EditOneGroupScreen::CallEntry()
 		case kInvalidState: invalidStateEntry(); break;
 		case kIsNewNameEmpty: isNewNameEmptyEntry(); break;
 		case kPeerPopSelf: peerPopSelfEntry(); break;
+		case kSendForceLogoutToVC: sendForceLogoutToVCEntry(); break;
 		case kSendReloadInboxToVC: sendReloadInboxToVCEntry(); break;
 		case kSendSetGroupsToServer: sendSetGroupsToServerEntry(); break;
 		case kSetWaitForSetGroups: setWaitForSetGroupsEntry(); break;
@@ -238,6 +249,7 @@ int  EditOneGroupScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kIdle) && (evt == kDonePressed)) return kIsNewNameEmpty; else
 	if ((mState == kIsNewNameEmpty) && (evt == kNo)) return kAreAnyMembersSelected; else
 	if ((mState == kIsNewNameEmpty) && (evt == kYes)) return kShowNameCantBeEmpty; else
+	if ((mState == kSendForceLogoutToVC) && (evt == kNext)) return kPeerPopSelf; else
 	if ((mState == kSendReloadInboxToVC) && (evt == kNext)) return kPeerPopSelf; else
 	if ((mState == kSendSetGroupsToServer) && (evt == kFail)) return kShowErrorWithSetGroups; else
 	if ((mState == kSendSetGroupsToServer) && (evt == kSuccess)) return kWasSetGroupsSuccessful; else
@@ -246,6 +258,7 @@ int  EditOneGroupScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kShowMustSelectMembers) && (evt == kYes)) return kIdle; else
 	if ((mState == kShowNameCantBeEmpty) && (evt == kYes)) return kIdle; else
 	if ((mState == kStart) && (evt == kNext)) return kCalculateChecks; else
+	if ((mState == kWasSetGroupsSuccessful) && (evt == kExpired)) return kSendForceLogoutToVC; else
 	if ((mState == kWasSetGroupsSuccessful) && (evt == kNo)) return kShowErrorWithSetGroups; else
 	if ((mState == kWasSetGroupsSuccessful) && (evt == kYes)) return kSendReloadInboxToVC; else
 	if ((mState == kWriteNewLocalGroup) && (evt == kNext)) return kSetWaitForSetGroups;
@@ -259,6 +272,7 @@ bool EditOneGroupScreen::HasEdgeNamedNext() const
 	{
 		case kCalculateChecks:
 		case kDeleteOldLocalGroup:
+		case kSendForceLogoutToVC:
 		case kSendReloadInboxToVC:
 		case kSetWaitForSetGroups:
 		case kStart:

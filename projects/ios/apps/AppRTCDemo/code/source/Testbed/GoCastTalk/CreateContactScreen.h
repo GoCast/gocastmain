@@ -29,6 +29,7 @@ protected:
 	void addToContactsEntry();
 	void idleEntry();
 	void peerPopSelfEntry();
+	void sendForceLogoutToVCEntry();
 	void sendReloadInboxToVCEntry();
 	void sendSetContactsToServerEntry();
 	void setWaitForSetContactsEntry();
@@ -40,6 +41,7 @@ public:
 	{
 		kInvalidEvent = -2,
 		kNext = -1,
+		kExpired,
 		kFail,
 		kNo,
 		kSaveSelected,
@@ -55,6 +57,7 @@ public:
 		kEnd,
 		kIdle,
 		kPeerPopSelf,
+		kSendForceLogoutToVC,
 		kSendReloadInboxToVC,
 		kSendSetContactsToServer,
 		kSetWaitForSetContacts,

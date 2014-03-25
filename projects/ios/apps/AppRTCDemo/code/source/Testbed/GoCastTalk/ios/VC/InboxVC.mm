@@ -1,5 +1,6 @@
 #include "InboxVC.h"
 #include "InboxMessageVC.h"
+#include "LoginVC.h"
 
 #include "Base/package.h"
 #include "Math/package.h"
@@ -180,6 +181,11 @@
     InboxMessageVC* nextVC = [[[InboxMessageVC alloc] initWithNibName:@"InboxMessageVC" bundle:nil] autorelease];
     [nextVC customInit:newObject];
     [(UINavigationController*)self.parentViewController  pushViewController:nextVC animated:YES];
+}
+
+-(void) pushLoginScreen
+{
+    [gAppDelegateInstance.tabBarController presentViewController:[[[LoginVC alloc] init] autorelease] animated:YES completion:nil];
 }
 
 - (void)refresh:(UIRefreshControl *)refreshControl

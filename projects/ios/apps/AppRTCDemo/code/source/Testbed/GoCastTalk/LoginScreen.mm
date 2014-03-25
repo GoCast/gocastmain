@@ -211,6 +211,8 @@ void LoginScreen::storeTokenInformationEntry()
     {
         InboxScreen::mToken = mRegisterJSON["user"].mObject["authToken"].mString;
     }
+
+    tFile (tFile::kPreferencesDirectory, "token.txt").write(InboxScreen::mToken);
 }
 
 void LoginScreen::validateURLEntry()
@@ -279,9 +281,9 @@ void LoginScreen::showRetryRegisterEntry()
 
 
 #pragma mark Sending messages to other machines
-void LoginScreen::sendReloadInboxToVCEntry()
+void LoginScreen::sendLoginSucceededToVCEntry()
 {
-    GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kReloadInbox));
+    GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kLoginSucceeded));
 }
 
 #pragma mark State wiring
@@ -298,9 +300,9 @@ void LoginScreen::CallEntry()
 		case kPeerPopSelf: peerPopSelfEntry(); break;
 		case kPeerSetLoginName: peerSetLoginNameEntry(); break;
 		case kSaveLoginName: saveLoginNameEntry(); break;
+		case kSendLoginSucceededToVC: sendLoginSucceededToVCEntry(); break;
 		case kSendLoginToServer: sendLoginToServerEntry(); break;
 		case kSendRegisterToServer: sendRegisterToServerEntry(); break;
-		case kSendReloadInboxToVC: sendReloadInboxToVCEntry(); break;
 		case kSetWaitForLogin: setWaitForLoginEntry(); break;
 		case kSetWaitForRegister: setWaitForRegisterEntry(); break;
 		case kShowCouldNotLogin: showCouldNotLoginEntry(); break;
@@ -335,12 +337,12 @@ int  LoginScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kLoadLoginName) && (evt == kFail)) return kIdle; else
 	if ((mState == kLoadLoginName) && (evt == kSuccess)) return kPeerSetLoginName; else
 	if ((mState == kPeerSetLoginName) && (evt == kNext)) return kIdle; else
-	if ((mState == kSaveLoginName) && (evt == kNext)) return kSendReloadInboxToVC; else
+	if ((mState == kSaveLoginName) && (evt == kNext)) return kSendLoginSucceededToVC; else
+	if ((mState == kSendLoginSucceededToVC) && (evt == kNext)) return kPeerPopSelf; else
 	if ((mState == kSendLoginToServer) && (evt == kFail)) return kShowRetryLogin; else
 	if ((mState == kSendLoginToServer) && (evt == kSuccess)) return kWasLoginValid; else
 	if ((mState == kSendRegisterToServer) && (evt == kFail)) return kShowRetryRegister; else
 	if ((mState == kSendRegisterToServer) && (evt == kSuccess)) return kWasRegisterValid; else
-	if ((mState == kSendReloadInboxToVC) && (evt == kNext)) return kPeerPopSelf; else
 	if ((mState == kSetWaitForLogin) && (evt == kNext)) return kSendLoginToServer; else
 	if ((mState == kSetWaitForRegister) && (evt == kNext)) return kSendRegisterToServer; else
 	if ((mState == kShowCouldNotLogin) && (evt == kYes)) return kIdle; else
@@ -371,7 +373,7 @@ bool LoginScreen::HasEdgeNamedNext() const
 	{
 		case kPeerSetLoginName:
 		case kSaveLoginName:
-		case kSendReloadInboxToVC:
+		case kSendLoginSucceededToVC:
 		case kSetWaitForLogin:
 		case kSetWaitForRegister:
 		case kStart:

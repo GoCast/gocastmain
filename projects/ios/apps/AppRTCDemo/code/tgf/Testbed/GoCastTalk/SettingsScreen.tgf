@@ -2,16 +2,30 @@
 2 end
 3 idle
 4 Peer: push ChangeRegisteredName
-5 Show "not yet implemented"
-6 Peer: push About
-7 Peer: push ChangePassword
+5 Peer: push About
+6 Peer: push ChangePassword
+7 Set wait for logout
+8 Send logout to server
+9 Was logout successful?
+10 Show "Error with logout"
+11 Send ForceLogout to VC
+12 Show "Success with logout"
+13 Destroy stored token
 #
 1 3
 3 4 registeredNameSelected
 4 3
-3 5 logOutSelected
-5 3 yes
-3 6 aboutThisAppSelected
+3 7 logOutSelected
+3 5 aboutThisAppSelected
+5 3
+3 6 changePasswordSelected
 6 3
-3 7 changePasswordSelected
-7 3
+9 10 no
+8 9 success
+7 8
+8 10 fail
+9 13 yes
+10 3 yes
+11 3
+12 11 yes
+13 12

@@ -93,13 +93,19 @@ void EditContactsScreen::peerReloadTableEntry()
 void EditContactsScreen::wasSetContactsSuccessfulEntry()
 {
     bool result = false;
+    bool expired = false;
 
     if (mSetContactsJSON["status"].mString == std::string("success"))
     {
         result = true;
     }
 
-    SetImmediateEvent(result ? kYes : kNo);
+    if (mSetContactsJSON["status"].mString == std::string("expired"))
+    {
+        expired = true;
+    }
+
+    SetImmediateEvent(expired ? kExpired : (result ? kYes : kNo));
 }
 
 #pragma mark Actions
@@ -141,6 +147,10 @@ void EditContactsScreen::showErrorWithSetContactsEntry()
 }
 
 #pragma mark Sending messages to other machines
+void EditContactsScreen::sendForceLogoutToVCEntry()
+{
+    GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kForceLogout));
+}
 void EditContactsScreen::sendReloadInboxToVCEntry()
 {
     GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kReloadInbox));
@@ -158,6 +168,7 @@ void EditContactsScreen::CallEntry()
 		case kPeerPushChangeRegisteredName: peerPushChangeRegisteredNameEntry(); break;
 		case kPeerPushCreateContact: peerPushCreateContactEntry(); break;
 		case kPeerReloadTable: peerReloadTableEntry(); break;
+		case kSendForceLogoutToVC: sendForceLogoutToVCEntry(); break;
 		case kSendReloadInboxToVC: sendReloadInboxToVCEntry(); break;
 		case kSendSetContactsToServer: sendSetContactsToServerEntry(); break;
 		case kSetWaitForSetContacts: setWaitForSetContactsEntry(); break;
@@ -182,12 +193,14 @@ int  EditContactsScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kPeerPushChangeRegisteredName) && (evt == kNext)) return kIdle; else
 	if ((mState == kPeerPushCreateContact) && (evt == kNext)) return kIdle; else
 	if ((mState == kPeerReloadTable) && (evt == kNext)) return kIdle; else
+	if ((mState == kSendForceLogoutToVC) && (evt == kNext)) return kPeerReloadTable; else
 	if ((mState == kSendReloadInboxToVC) && (evt == kNext)) return kPeerReloadTable; else
 	if ((mState == kSendSetContactsToServer) && (evt == kFail)) return kShowErrorWithSetContacts; else
 	if ((mState == kSendSetContactsToServer) && (evt == kSuccess)) return kWasSetContactsSuccessful; else
 	if ((mState == kSetWaitForSetContacts) && (evt == kNext)) return kSendSetContactsToServer; else
 	if ((mState == kShowErrorWithSetContacts) && (evt == kYes)) return kIdle; else
 	if ((mState == kStart) && (evt == kNext)) return kIdle; else
+	if ((mState == kWasSetContactsSuccessful) && (evt == kExpired)) return kSendForceLogoutToVC; else
 	if ((mState == kWasSetContactsSuccessful) && (evt == kNo)) return kShowErrorWithSetContacts; else
 	if ((mState == kWasSetContactsSuccessful) && (evt == kYes)) return kSendReloadInboxToVC;
 

@@ -8,7 +8,7 @@
 8 Show "Retry login?"
 9 Store token information
 10 Peer: pop self
-11 Send ReloadInbox to VC
+11 Send LoginSucceeded to VC
 12 Send register to server
 13 Show "Retry register?"
 14 Was register valid?

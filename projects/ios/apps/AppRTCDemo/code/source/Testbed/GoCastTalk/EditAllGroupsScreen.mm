@@ -91,13 +91,19 @@ void EditAllGroupsScreen::peerPushEditOneGroupForNewEntry()
 void EditAllGroupsScreen::wasSetGroupsSuccessfulEntry()
 {
     bool result = false;
+    bool expired = false;
 
     if (mSetGroupsJSON["status"].mString == std::string("success"))
     {
         result = true;
     }
 
-    SetImmediateEvent(result ? kYes : kNo);
+    if (mSetGroupsJSON["status"].mString == std::string("expired"))
+    {
+        expired = true;
+    }
+
+    SetImmediateEvent(expired ? kExpired : (result ? kYes : kNo));
 }
 
 
@@ -137,6 +143,10 @@ void EditAllGroupsScreen::showErrorWithSetGroupsEntry()
 }
 
 #pragma mark Sending messages to other machines
+void EditAllGroupsScreen::sendForceLogoutToVCEntry()
+{
+    GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kForceLogout));
+}
 void EditAllGroupsScreen::sendReloadInboxToVCEntry()
 {
     GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kReloadInbox));
@@ -154,6 +164,7 @@ void EditAllGroupsScreen::CallEntry()
 		case kPeerPushEditOneGroupForExisting: peerPushEditOneGroupForExistingEntry(); break;
 		case kPeerPushEditOneGroupForNew: peerPushEditOneGroupForNewEntry(); break;
 		case kPeerReloadTable: peerReloadTableEntry(); break;
+		case kSendForceLogoutToVC: sendForceLogoutToVCEntry(); break;
 		case kSendReloadInboxToVC: sendReloadInboxToVCEntry(); break;
 		case kSendSetGroupsToServer: sendSetGroupsToServerEntry(); break;
 		case kSetWaitForSetGroups: setWaitForSetGroupsEntry(); break;
@@ -180,12 +191,14 @@ int  EditAllGroupsScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kPeerPushEditOneGroupForExisting) && (evt == kNext)) return kIdle; else
 	if ((mState == kPeerPushEditOneGroupForNew) && (evt == kNext)) return kIdle; else
 	if ((mState == kPeerReloadTable) && (evt == kNext)) return kIdle; else
+	if ((mState == kSendForceLogoutToVC) && (evt == kNext)) return kPeerReloadTable; else
 	if ((mState == kSendReloadInboxToVC) && (evt == kNext)) return kPeerReloadTable; else
 	if ((mState == kSendSetGroupsToServer) && (evt == kFail)) return kShowErrorWithSetGroups; else
 	if ((mState == kSendSetGroupsToServer) && (evt == kSuccess)) return kWasSetGroupsSuccessful; else
 	if ((mState == kSetWaitForSetGroups) && (evt == kNext)) return kSendSetGroupsToServer; else
 	if ((mState == kShowErrorWithSetGroups) && (evt == kYes)) return kIdle; else
 	if ((mState == kStart) && (evt == kNext)) return kIdle; else
+	if ((mState == kWasSetGroupsSuccessful) && (evt == kExpired)) return kSendForceLogoutToVC; else
 	if ((mState == kWasSetGroupsSuccessful) && (evt == kNo)) return kShowErrorWithSetGroups; else
 	if ((mState == kWasSetGroupsSuccessful) && (evt == kYes)) return kSendReloadInboxToVC;
 

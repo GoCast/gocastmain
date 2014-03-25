@@ -10,6 +10,7 @@
 10 Show "Error with setGroups"
 11 Peer: push EditOneGroup for existing
 12 Peer: push EditOneGroup for new
+13 Send ForceLogout to VC
 #
 1 3
 3 3 success, fail
@@ -28,3 +29,5 @@
 12 3
 3 11 groupSelected
 11 3
+9 13 expired
+13 4

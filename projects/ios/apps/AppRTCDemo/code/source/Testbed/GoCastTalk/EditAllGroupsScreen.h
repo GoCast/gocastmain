@@ -35,6 +35,7 @@ protected:
 	void peerPushEditOneGroupForExistingEntry();
 	void peerPushEditOneGroupForNewEntry();
 	void peerReloadTableEntry();
+	void sendForceLogoutToVCEntry();
 	void sendReloadInboxToVCEntry();
 	void sendSetGroupsToServerEntry();
 	void setWaitForSetGroupsEntry();
@@ -48,6 +49,7 @@ public:
 		kNext = -1,
 		kCreatePressed,
 		kDeleteGroup,
+		kExpired,
 		kFail,
 		kGroupSelected,
 		kNo,
@@ -66,6 +68,7 @@ public:
 		kPeerPushEditOneGroupForExisting,
 		kPeerPushEditOneGroupForNew,
 		kPeerReloadTable,
+		kSendForceLogoutToVC,
 		kSendReloadInboxToVC,
 		kSendSetGroupsToServer,
 		kSetWaitForSetGroups,

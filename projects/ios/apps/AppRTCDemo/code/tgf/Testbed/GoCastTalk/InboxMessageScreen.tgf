@@ -29,6 +29,7 @@
 29 Send ReloadInbox to VC for markRead
 30 Fix recipient list
 31 Send NewMessageToGroup to VC
+32 Send ForceLogout to VC
 #
 4 5 fail
 4 6 success
@@ -71,3 +72,5 @@
 29 10
 30 14
 31 3
+23 32 expired
+32 20

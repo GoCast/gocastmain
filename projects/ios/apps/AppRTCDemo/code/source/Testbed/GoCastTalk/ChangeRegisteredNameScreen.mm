@@ -60,13 +60,19 @@ void ChangeRegisteredNameScreen::peerPopSelfEntry()
 void ChangeRegisteredNameScreen::wasSetContactsSuccessfulEntry()
 {
     bool result = false;
+    bool expired = false;
 
     if (mSetContactsJSON["status"].mString == std::string("success"))
     {
         result = true;
     }
 
-    SetImmediateEvent(result ? kYes : kNo);
+    if (mSetContactsJSON["status"].mString == std::string("expired"))
+    {
+        expired = true;
+    }
+
+    SetImmediateEvent(expired ? kExpired : (result ? kYes : kNo));
 }
 
 #pragma mark Actions
@@ -122,6 +128,11 @@ void ChangeRegisteredNameScreen::showErrorWithSetContactsEntry()
 }
 
 #pragma mark Sending messages to other machines
+void ChangeRegisteredNameScreen::sendForceLogoutToVCEntry()
+{
+    GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kForceLogout));
+}
+
 void ChangeRegisteredNameScreen::sendReloadInboxToVCEntry()
 {
     GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kReloadInbox));
@@ -136,6 +147,7 @@ void ChangeRegisteredNameScreen::CallEntry()
 		case kIdle: idleEntry(); break;
 		case kInvalidState: invalidStateEntry(); break;
 		case kPeerPopSelf: peerPopSelfEntry(); break;
+		case kSendForceLogoutToVC: sendForceLogoutToVCEntry(); break;
 		case kSendReloadInboxToVC: sendReloadInboxToVCEntry(); break;
 		case kSendSetContactsToServer: sendSetContactsToServerEntry(); break;
 		case kSetWaitForSetContacts: setWaitForSetContactsEntry(); break;
@@ -155,6 +167,7 @@ int  ChangeRegisteredNameScreen::StateTransitionFunction(const int evt) const
 {
 	if ((mState == kIdle) && (evt == kSaveSelected)) return kUpdateGlobalContacts; else
 	if ((mState == kPeerPopSelf) && (evt == kNext)) return kIdle; else
+	if ((mState == kSendForceLogoutToVC) && (evt == kNext)) return kPeerPopSelf; else
 	if ((mState == kSendReloadInboxToVC) && (evt == kNext)) return kPeerPopSelf; else
 	if ((mState == kSendSetContactsToServer) && (evt == kFail)) return kShowErrorWithSetContacts; else
 	if ((mState == kSendSetContactsToServer) && (evt == kSuccess)) return kWasSetContactsSuccessful; else
@@ -162,6 +175,7 @@ int  ChangeRegisteredNameScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kShowErrorWithSetContacts) && (evt == kYes)) return kIdle; else
 	if ((mState == kStart) && (evt == kNext)) return kIdle; else
 	if ((mState == kUpdateGlobalContacts) && (evt == kNext)) return kSetWaitForSetContacts; else
+	if ((mState == kWasSetContactsSuccessful) && (evt == kExpired)) return kSendForceLogoutToVC; else
 	if ((mState == kWasSetContactsSuccessful) && (evt == kNo)) return kShowErrorWithSetContacts; else
 	if ((mState == kWasSetContactsSuccessful) && (evt == kYes)) return kSendReloadInboxToVC;
 
@@ -172,15 +186,16 @@ bool ChangeRegisteredNameScreen::HasEdgeNamedNext() const
 {
 	switch(mState)
 	{
-		case kPeerPopSelf:
-		case kSendReloadInboxToVC:
-		case kSetWaitForSetContacts:
-		case kStart:
-		case kUpdateGlobalContacts:
-			return true;
+		case kEnd:
+		case kIdle:
+		case kInvalidState:
+		case kSendSetContactsToServer:
+		case kShowErrorWithSetContacts:
+		case kWasSetContactsSuccessful:
+			return false;
 		default: break;
 	}
-	return false;
+	return true;
 }
 
 #pragma mark Messages

@@ -202,6 +202,8 @@ void       InboxScreen::deletePressed(const size_t& i)
 #pragma mark Start / End / Invalid
 void InboxScreen::startEntry()
 {
+    mForceLogout = false;
+
     URLLoader::getInstance()->attach(this);
     GCTEventManager::getInstance()->attach(this);
 
@@ -226,6 +228,15 @@ void InboxScreen::invalidStateEntry()
 #pragma mark Idling
 void InboxScreen::idleEntry()
 {
+    if (mForceLogout)
+    {
+        SetImmediateEvent(kForceLogout);
+    }
+}
+
+void InboxScreen::waitForLoginSuccessIdleEntry()
+{
+    mForceLogout = false;
 }
 
 #pragma mark Queries
@@ -262,18 +273,25 @@ void InboxScreen::doWeHaveATokenEntry()
 void InboxScreen::wasDeleteMessageValidEntry()
 {
     bool result = false;
+    bool expired = false;
 
     if (mDeleteMessageJSON["status"].mString == std::string("success"))
     {
         result = true;
     }
 
-    SetImmediateEvent(result ? kYes : kNo);
+    if (mDeleteMessageJSON["status"].mString == std::string("expired"))
+    {
+        expired = true;
+    }
+
+    SetImmediateEvent(expired ? kExpired : (result ? kYes : kNo));
 }
 
 void InboxScreen::wasGetContactsValidEntry()
 {
     bool result = false;
+    bool expired = false;
 
     mContacts.clear();
 
@@ -284,12 +302,18 @@ void InboxScreen::wasGetContactsValidEntry()
         result = true;
     }
 
-    SetImmediateEvent(result ? kYes : kNo);
+    if (mGetContactsJSON["status"].mString == std::string("expired"))
+    {
+        expired = true;
+    }
+
+    SetImmediateEvent(expired ? kExpired : (result ? kYes : kNo));
 }
 
 void InboxScreen::wasGetGroupsValidEntry()
 {
     bool result = false;
+    bool expired = false;
 
     mGroups.clear();
 
@@ -300,31 +324,47 @@ void InboxScreen::wasGetGroupsValidEntry()
         result = true;
     }
 
-    SetImmediateEvent(result ? kYes : kNo);
+    if (mGetGroupsJSON["status"].mString == std::string("expired"))
+    {
+        expired = true;
+    }
+
+    SetImmediateEvent(expired ? kExpired : (result ? kYes : kNo));
 }
 
 void InboxScreen::wasListMessagesValidEntry()
 {
-    bool result = false;
+    bool result     = false;
+    bool expired    = false;
 
     if (mListMessagesJSON["status"].mString == std::string("success"))
     {
         result = true;
     }
 
-    SetImmediateEvent(result ? kYes : kNo);
+    if (mListMessagesJSON["status"].mString == std::string("expired"))
+    {
+        expired = true;
+    }
+
+    SetImmediateEvent(expired ? kExpired : (result ? kYes : kNo));
 }
 
 #pragma mark Peer communication
 
-void InboxScreen::peerReloadTableEntry()
-{
-    [mPeer reloadTable];
-}
-
 void InboxScreen::peerPushInboxMessageEntry()
 {
     [mPeer pushInboxMessage:mInbox[mItemSelected].mObject];
+}
+
+void InboxScreen::peerPushLoginScreenEntry()
+{
+    [mPeer pushLoginScreen];
+}
+
+void InboxScreen::peerReloadTableEntry()
+{
+    [mPeer reloadTable];
 }
 
 #pragma mark Actions
@@ -364,10 +404,52 @@ void InboxScreen::addFakeContactsEntry()
 
 }
 
-void InboxScreen::clearInboxEntry()
+void InboxScreen::clearAllDataAndReloadTableEntry()
 {
     mInbox.clear();
     mContacts.clear();
+    mGroups.clear();
+
+    [mPeer reloadTable];
+}
+
+void InboxScreen::loadLoginNameAndTokenEntry()
+{
+    bool result = true;
+
+    mEmailAddress.clear();
+    mToken.clear();
+
+    tFile loginInfo(tFile::kPreferencesDirectory, "login.txt");
+
+    if (loginInfo.exists())
+    {
+        mEmailAddress = loginInfo;
+    }
+
+    loginInfo = tFile(tFile::kPreferencesDirectory, "token.txt");
+
+    if (loginInfo.exists())
+    {
+        mToken = loginInfo;
+
+    }
+
+    loginInfo = tFile(tFile::kPreferencesDirectory, "baseURL.txt");
+
+    if (loginInfo.exists())
+    {
+        LoginScreen::mBaseURL = loginInfo;
+    }
+    else
+    {
+        LoginScreen::mBaseURL = "http://chat.gocast.it/memoappserver/";
+    }
+
+    result &= !mEmailAddress.empty();
+    result &= !mToken.empty();
+
+    SetImmediateEvent(result ? kSuccess : kFail);
 }
 
 void InboxScreen::playNewMessageSoundEntry()
@@ -518,6 +600,11 @@ void InboxScreen::showRetryListMessagesEntry()
     tConfirm("メッセージ取り込み中に接続エラーが発生しました。リトライしますか？");
 }
 
+void InboxScreen::showYourTokenExpiredEntry()
+{
+    tAlert("Your session has expired.");
+}
+
 #pragma mark State wiring
 void InboxScreen::CallEntry()
 {
@@ -525,14 +612,16 @@ void InboxScreen::CallEntry()
 	{
 		case kAddFakeContacts: addFakeContactsEntry(); break;
 		case kAreThereNewMessages: areThereNewMessagesEntry(); break;
-		case kClearInbox: clearInboxEntry(); break;
+		case kClearAllDataAndReloadTable: clearAllDataAndReloadTableEntry(); break;
 		case kDidWeDownloadContacts: didWeDownloadContactsEntry(); break;
 		case kDidWeDownloadGroups: didWeDownloadGroupsEntry(); break;
 		case kDoWeHaveAToken: doWeHaveATokenEntry(); break;
 		case kEnd: EndEntryHelper(); break;
 		case kIdle: idleEntry(); break;
 		case kInvalidState: invalidStateEntry(); break;
+		case kLoadLoginNameAndToken: loadLoginNameAndTokenEntry(); break;
 		case kPeerPushInboxMessage: peerPushInboxMessageEntry(); break;
+		case kPeerPushLoginScreen: peerPushLoginScreenEntry(); break;
 		case kPeerReloadTable: peerReloadTableEntry(); break;
 		case kPlayNewMessageSound: playNewMessageSoundEntry(); break;
 		case kSendDeleteMessageToServer: sendDeleteMessageToServerEntry(); break;
@@ -548,10 +637,12 @@ void InboxScreen::CallEntry()
 		case kShowErrorLoadingGroups: showErrorLoadingGroupsEntry(); break;
 		case kShowErrorLoadingInbox: showErrorLoadingInboxEntry(); break;
 		case kShowRetryListMessages: showRetryListMessagesEntry(); break;
+		case kShowYourTokenExpired: showYourTokenExpiredEntry(); break;
 		case kSortContactsByKana: sortContactsByKanaEntry(); break;
 		case kSortGroupsByGroupName: sortGroupsByGroupNameEntry(); break;
 		case kSortTableByDate: sortTableByDateEntry(); break;
 		case kStart: startEntry(); break;
+		case kWaitForLoginSuccessIdle: waitForLoginSuccessIdleEntry(); break;
 		case kWasDeleteMessageValid: wasDeleteMessageValidEntry(); break;
 		case kWasGetContactsValid: wasGetContactsValidEntry(); break;
 		case kWasGetGroupsValid: wasGetGroupsValidEntry(); break;
@@ -569,17 +660,21 @@ int  InboxScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kAddFakeContacts) && (evt == kNext)) return kSortContactsByKana; else
 	if ((mState == kAreThereNewMessages) && (evt == kNo)) return kPeerReloadTable; else
 	if ((mState == kAreThereNewMessages) && (evt == kYes)) return kPlayNewMessageSound; else
-	if ((mState == kClearInbox) && (evt == kNext)) return kPeerReloadTable; else
+	if ((mState == kClearAllDataAndReloadTable) && (evt == kNext)) return kPeerPushLoginScreen; else
 	if ((mState == kDidWeDownloadContacts) && (evt == kNo)) return kSetWaitForGetContacts; else
 	if ((mState == kDidWeDownloadContacts) && (evt == kYes)) return kDidWeDownloadGroups; else
 	if ((mState == kDidWeDownloadGroups) && (evt == kNo)) return kSetWaitForGetGroups; else
 	if ((mState == kDidWeDownloadGroups) && (evt == kYes)) return kSetWaitForListMessages; else
-	if ((mState == kDoWeHaveAToken) && (evt == kNo)) return kClearInbox; else
+	if ((mState == kDoWeHaveAToken) && (evt == kNo)) return kClearAllDataAndReloadTable; else
 	if ((mState == kDoWeHaveAToken) && (evt == kYes)) return kDidWeDownloadContacts; else
 	if ((mState == kIdle) && (evt == kDeleteSelected)) return kSetWaitForDeleteMessage; else
+	if ((mState == kIdle) && (evt == kForceLogout)) return kClearAllDataAndReloadTable; else
 	if ((mState == kIdle) && (evt == kItemSelected)) return kPeerPushInboxMessage; else
 	if ((mState == kIdle) && (evt == kRefreshSelected)) return kDoWeHaveAToken; else
+	if ((mState == kLoadLoginNameAndToken) && (evt == kFail)) return kClearAllDataAndReloadTable; else
+	if ((mState == kLoadLoginNameAndToken) && (evt == kSuccess)) return kDoWeHaveAToken; else
 	if ((mState == kPeerPushInboxMessage) && (evt == kNext)) return kIdle; else
+	if ((mState == kPeerPushLoginScreen) && (evt == kNext)) return kShowYourTokenExpired; else
 	if ((mState == kPeerReloadTable) && (evt == kNext)) return kIdle; else
 	if ((mState == kPlayNewMessageSound) && (evt == kNext)) return kPeerReloadTable; else
 	if ((mState == kSendDeleteMessageToServer) && (evt == kFail)) return kShowErrorDeletingMessage; else
@@ -600,16 +695,22 @@ int  InboxScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kShowErrorLoadingInbox) && (evt == kYes)) return kPeerReloadTable; else
 	if ((mState == kShowRetryListMessages) && (evt == kNo)) return kPeerReloadTable; else
 	if ((mState == kShowRetryListMessages) && (evt == kYes)) return kDoWeHaveAToken; else
+	if ((mState == kShowYourTokenExpired) && (evt == kYes)) return kWaitForLoginSuccessIdle; else
 	if ((mState == kSortContactsByKana) && (evt == kNext)) return kDidWeDownloadGroups; else
 	if ((mState == kSortGroupsByGroupName) && (evt == kNext)) return kSetWaitForListMessages; else
 	if ((mState == kSortTableByDate) && (evt == kNext)) return kAreThereNewMessages; else
-	if ((mState == kStart) && (evt == kNext)) return kDoWeHaveAToken; else
+	if ((mState == kStart) && (evt == kNext)) return kLoadLoginNameAndToken; else
+	if ((mState == kWaitForLoginSuccessIdle) && (evt == kLoginSucceeded)) return kDoWeHaveAToken; else
+	if ((mState == kWasDeleteMessageValid) && (evt == kExpired)) return kClearAllDataAndReloadTable; else
 	if ((mState == kWasDeleteMessageValid) && (evt == kNo)) return kShowErrorDeletingMessage; else
 	if ((mState == kWasDeleteMessageValid) && (evt == kYes)) return kDoWeHaveAToken; else
+	if ((mState == kWasGetContactsValid) && (evt == kExpired)) return kClearAllDataAndReloadTable; else
 	if ((mState == kWasGetContactsValid) && (evt == kNo)) return kShowErrorLoadingContacts; else
 	if ((mState == kWasGetContactsValid) && (evt == kYes)) return kAddFakeContacts; else
+	if ((mState == kWasGetGroupsValid) && (evt == kExpired)) return kClearAllDataAndReloadTable; else
 	if ((mState == kWasGetGroupsValid) && (evt == kNo)) return kShowErrorLoadingGroups; else
 	if ((mState == kWasGetGroupsValid) && (evt == kYes)) return kSortGroupsByGroupName; else
+	if ((mState == kWasListMessagesValid) && (evt == kExpired)) return kClearAllDataAndReloadTable; else
 	if ((mState == kWasListMessagesValid) && (evt == kNo)) return kShowErrorLoadingInbox; else
 	if ((mState == kWasListMessagesValid) && (evt == kYes)) return kSortTableByDate;
 
@@ -621,8 +722,9 @@ bool InboxScreen::HasEdgeNamedNext() const
 	switch(mState)
 	{
 		case kAddFakeContacts:
-		case kClearInbox:
+		case kClearAllDataAndReloadTable:
 		case kPeerPushInboxMessage:
+		case kPeerPushLoginScreen:
 		case kPeerReloadTable:
 		case kPlayNewMessageSound:
 		case kSetWaitForDeleteMessage:
@@ -691,15 +793,28 @@ void InboxScreen::update(const URLLoaderEvent& msg)
 
 void InboxScreen::update(const GCTEvent& msg)
 {
+    if (msg.mEvent == GCTEvent::kForceLogout)
+    {
+        mForceLogout = true;
+    }
+
     switch(getState())
     {
         case kIdle:
             switch (msg.mEvent)
             {
                 case GCTEvent::kReloadInbox:        refreshPressed(); break;
-                        
+                case GCTEvent::kForceLogout:        process(kForceLogout); break;
+
                 default:
                     break;
+            }
+            break;
+
+        case kWaitForLoginSuccessIdle:
+            if (msg.mEvent == GCTEvent::kLoginSucceeded)
+            {
+                process(kLoginSucceeded);
             }
             break;
 
@@ -708,6 +823,7 @@ void InboxScreen::update(const GCTEvent& msg)
         case kShowErrorLoadingContacts:
         case kShowErrorLoadingGroups:
         case kShowRetryListMessages:
+        case kShowYourTokenExpired:
             switch(msg.mEvent)
             {
                 case GCTEvent::kOKYesAlertPressed:  process(kYes); break;

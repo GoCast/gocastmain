@@ -14,24 +14,28 @@
 14 Show "error deleting message"
 15 Sort table by date
 16 Do we have a token?
-17 Clear inbox
-18 Set "wait for getContacts"
-19 Send getContacts to server
-20 Was getContacts valid?
-21 Show "error loading contacts"
-22 Did we download contacts?
-23 Set "wait for getGroups"
-24 Send getGroups to server
-25 Was getGroups valid?
-26 Show "error loading groups"
-27 Did we download groups?
-28 Are there new messages?
-29 Play "new message" sound
-30 Sort contacts by kana
-31 Sort groups by group name
-32 Add fake contacts
+17 Set "wait for getContacts"
+18 Send getContacts to server
+19 Was getContacts valid?
+20 Show "error loading contacts"
+21 Did we download contacts?
+22 Set "wait for getGroups"
+23 Send getGroups to server
+24 Was getGroups valid?
+25 Show "error loading groups"
+26 Did we download groups?
+27 Are there new messages?
+28 Play "new message" sound
+29 Sort contacts by kana
+30 Sort groups by group name
+31 Add fake contacts
+32 Clear all data and reload table
+33 peer: push login screen
+34 Show "Your token expired"
+35 Wait for login success idle
+36 Load login name and token
 #
-1 16
+1 36
 5 6 success
 6 7 no
 4 5
@@ -51,29 +55,39 @@
 14 9 yes
 13 14 no
 13 16 yes
-15 28
-16 17 no
-16 22 yes
-17 9
-20 21 no
-22 27 yes
-22 18 no
-18 19
-19 20 success
-19 21 fail
-20 32 yes
-21 27 yes
-25 26 no
-23 24
-24 25 success
-24 26 fail
-25 31 yes
+15 27
+16 32 no
+16 21 yes
+19 20 no
+21 26 yes
+21 17 no
+17 18
+18 19 success
+18 20 fail
+19 31 yes
+20 26 yes
+24 25 no
+22 23
+23 24 success
+23 25 fail
+24 30 yes
+25 4 yes
+26 22 no
 26 4 yes
-27 23 no
-27 4 yes
-28 29 yes
-28 9 no
-29 9
-30 27
-31 4
-32 30
+27 28 yes
+27 9 no
+28 9
+29 26
+30 4
+31 29
+32 33
+35 16 loginSucceeded
+3 32 forceLogout
+34 35 yes
+33 34
+6 32 expired
+36 16 success
+36 32 fail
+13 32 expired
+19 32 expired
+24 32 expired

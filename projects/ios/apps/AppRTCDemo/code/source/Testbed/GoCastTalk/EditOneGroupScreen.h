@@ -36,6 +36,7 @@ protected:
 	void idleEntry();
 	void isNewNameEmptyEntry();
 	void peerPopSelfEntry();
+	void sendForceLogoutToVCEntry();
 	void sendReloadInboxToVCEntry();
 	void sendSetGroupsToServerEntry();
 	void setWaitForSetGroupsEntry();
@@ -51,6 +52,7 @@ public:
 		kInvalidEvent = -2,
 		kNext = -1,
 		kDonePressed,
+		kExpired,
 		kFail,
 		kNo,
 		kSuccess,
@@ -68,6 +70,7 @@ public:
 		kIdle,
 		kIsNewNameEmpty,
 		kPeerPopSelf,
+		kSendForceLogoutToVC,
 		kSendReloadInboxToVC,
 		kSendSetGroupsToServer,
 		kSetWaitForSetGroups,

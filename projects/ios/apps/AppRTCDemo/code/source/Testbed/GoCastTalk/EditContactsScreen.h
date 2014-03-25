@@ -35,6 +35,7 @@ protected:
 	void peerPushChangeRegisteredNameEntry();
 	void peerPushCreateContactEntry();
 	void peerReloadTableEntry();
+	void sendForceLogoutToVCEntry();
 	void sendReloadInboxToVCEntry();
 	void sendSetContactsToServerEntry();
 	void setWaitForSetContactsEntry();
@@ -48,6 +49,7 @@ public:
 		kNext = -1,
 		kCreateSelected,
 		kDeleteSelected,
+		kExpired,
 		kFail,
 		kItemSelected,
 		kNo,
@@ -66,6 +68,7 @@ public:
 		kPeerPushChangeRegisteredName,
 		kPeerPushCreateContact,
 		kPeerReloadTable,
+		kSendForceLogoutToVC,
 		kSendReloadInboxToVC,
 		kSendSetContactsToServer,
 		kSetWaitForSetContacts,

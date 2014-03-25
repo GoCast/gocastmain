@@ -123,13 +123,19 @@ void InboxMessageScreen::doesAudioExistLocallyEntry()
 void InboxMessageScreen::wasDeleteMessageValidEntry()
 {
     bool result = false;
+    bool expired = false;
 
     if (mDeleteMessageJSON["status"].mString == std::string("success"))
     {
         result = true;
     }
 
-    SetImmediateEvent(result ? kYes : kNo);
+    if (mDeleteMessageJSON["status"].mString == std::string("expired"))
+    {
+        expired = true;
+    }
+
+    SetImmediateEvent(expired ? kExpired : (result ? kYes : kNo));
 }
 
 
@@ -309,6 +315,10 @@ void InboxMessageScreen::showRetryDownloadEntry()
 }
 
 #pragma mark Sending messages to other machines
+void InboxMessageScreen::sendForceLogoutToVCEntry()
+{
+    GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kForceLogout));
+}
 void InboxMessageScreen::sendNewMessageToGroupToVCEntry()
 {
     JSONArray arr = mInitObject["to"].mArray;
@@ -348,6 +358,7 @@ void InboxMessageScreen::CallEntry()
 		case kResumeSound: resumeSoundEntry(); break;
 		case kSendDeleteMessageToServer: sendDeleteMessageToServerEntry(); break;
 		case kSendDownloadRequestToServer: sendDownloadRequestToServerEntry(); break;
+		case kSendForceLogoutToVC: sendForceLogoutToVCEntry(); break;
 		case kSendMarkReadToServer: sendMarkReadToServerEntry(); break;
 		case kSendNewMessageToGroupToVC: sendNewMessageToGroupToVCEntry(); break;
 		case kSendReloadInboxToVC: sendReloadInboxToVCEntry(); break;
@@ -395,6 +406,7 @@ int  InboxMessageScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kSendDeleteMessageToServer) && (evt == kSuccess)) return kWasDeleteMessageValid; else
 	if ((mState == kSendDownloadRequestToServer) && (evt == kFail)) return kShowRetryDownload; else
 	if ((mState == kSendDownloadRequestToServer) && (evt == kSuccess)) return kCopyDownloadToLocalFiles; else
+	if ((mState == kSendForceLogoutToVC) && (evt == kNext)) return kPeerPopSelf; else
 	if ((mState == kSendMarkReadToServer) && (evt == kFail)) return kDoesAudioExistLocally; else
 	if ((mState == kSendMarkReadToServer) && (evt == kSuccess)) return kSendReloadInboxToVCForMarkRead; else
 	if ((mState == kSendNewMessageToGroupToVC) && (evt == kNext)) return kIdle; else
@@ -411,6 +423,7 @@ int  InboxMessageScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kStart) && (evt == kNext)) return kFixRecipientList; else
 	if ((mState == kStopSound) && (evt == kNext)) return kSetWasPlayingToFalse; else
 	if ((mState == kUpdateTimeLabel) && (evt == kNext)) return kWereWeGoingToPlay; else
+	if ((mState == kWasDeleteMessageValid) && (evt == kExpired)) return kSendForceLogoutToVC; else
 	if ((mState == kWasDeleteMessageValid) && (evt == kNo)) return kShowErrorDeletingMessage; else
 	if ((mState == kWasDeleteMessageValid) && (evt == kYes)) return kSendReloadInboxToVC; else
 	if ((mState == kWereWeGoingToPlay) && (evt == kNo)) return kIdle; else

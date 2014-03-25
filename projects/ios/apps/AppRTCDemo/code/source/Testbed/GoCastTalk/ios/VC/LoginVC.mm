@@ -165,7 +165,7 @@ extern std::string kBaseURL;
 
 -(void) popSelf
 {
-    [gAppDelegateInstance.tabBarController dismissViewControllerAnimated:YES completion:nil];
+    [gAppDelegateInstance.tabBarController dismissViewControllerAnimated:NO completion:nil];
 }
 
 @end

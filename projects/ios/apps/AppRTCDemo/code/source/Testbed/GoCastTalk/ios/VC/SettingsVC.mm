@@ -167,6 +167,11 @@
     }
 }
 
+-(void)setBlockingViewVisible:(bool)newVisible
+{
+    [self.mBlockingView setHidden:newVisible ? NO : YES];
+}
+
 -(void) pushChangeRegisteredName:(const JSONObject&)newObject
 {
     ChangeRegisteredNameVC* nextVC = [[[ChangeRegisteredNameVC alloc] initWithNibName:@"ChangeRegisteredNameVC" bundle:nil] autorelease];

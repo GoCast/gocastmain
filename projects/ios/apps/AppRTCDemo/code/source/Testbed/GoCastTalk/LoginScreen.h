@@ -45,9 +45,9 @@ protected:
 	void peerPopSelfEntry();
 	void peerSetLoginNameEntry();
 	void saveLoginNameEntry();
+	void sendLoginSucceededToVCEntry();
 	void sendLoginToServerEntry();
 	void sendRegisterToServerEntry();
-	void sendReloadInboxToVCEntry();
 	void setWaitForLoginEntry();
 	void setWaitForRegisterEntry();
 	void showCouldNotLoginEntry();
@@ -88,9 +88,9 @@ public:
 		kPeerPopSelf,
 		kPeerSetLoginName,
 		kSaveLoginName,
+		kSendLoginSucceededToVC,
 		kSendLoginToServer,
 		kSendRegisterToServer,
-		kSendReloadInboxToVC,
 		kSetWaitForLogin,
 		kSetWaitForRegister,
 		kShowCouldNotLogin,

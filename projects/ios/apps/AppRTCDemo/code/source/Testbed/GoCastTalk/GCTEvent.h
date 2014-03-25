@@ -24,6 +24,9 @@ public:
         kAppendNewGroup,
 
         kNewMessageToGroup,
+
+        kLoginSucceeded,
+        kForceLogout,
     };
 
     EventType   mEvent;

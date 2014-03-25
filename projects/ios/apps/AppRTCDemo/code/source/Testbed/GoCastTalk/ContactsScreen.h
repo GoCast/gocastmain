@@ -49,6 +49,7 @@ protected:
 	void peerReloadTableEntry();
 	void sendAppendNewContactToVCEntry();
 	void sendAppendNewGroupToVCEntry();
+	void sendForceLogoutToVCEntry();
 	void sendReloadInboxToVCEntry();
 	void sendSetContactsToServerEntry();
 	void sendSetGroupsToServerEntry();
@@ -69,6 +70,7 @@ public:
 		kDeleteGroup,
 		kEditContactsPressed,
 		kEditGroupsPressed,
+		kExpired,
 		kFail,
 		kGroupSelected,
 		kNo,
@@ -95,6 +97,7 @@ public:
 		kPeerReloadTable,
 		kSendAppendNewContactToVC,
 		kSendAppendNewGroupToVC,
+		kSendForceLogoutToVC,
 		kSendReloadInboxToVC,
 		kSendSetContactsToServer,
 		kSendSetGroupsToServer,
