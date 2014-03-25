@@ -381,11 +381,13 @@
 -(void)switchToInboxTab
 {
     [gAppDelegateInstance.tabBarController setSelectedIndex:0];
+    GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kInboxTabPressed));
 }
 
 -(void)switchToNewMemoTab
 {
     [gAppDelegateInstance.tabBarController setSelectedIndex:1];
+    GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kNewMemoTabPressed));
 }
 
 -(void)pushMessageSent

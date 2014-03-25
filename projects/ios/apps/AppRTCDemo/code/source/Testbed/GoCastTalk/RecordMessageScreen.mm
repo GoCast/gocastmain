@@ -72,6 +72,8 @@ void RecordMessageScreen::stopPressed()
 #pragma mark Start / End / Invalid
 void RecordMessageScreen::startEntry()
 {
+    mForceLogout    = false;
+
     mSound          = NULL;
     mTenMinuteTimer = NULL;
     mDidRecord      = false;
@@ -141,18 +143,33 @@ void RecordMessageScreen::waitToPlayIdleEntry()
     }
 
     printf("%s\n", "wait to play");
+
+    if (mForceLogout)
+    {
+        process(kCancelPressed);
+    }
 }
 
 void RecordMessageScreen::playingIdleEntry()
 {
     [mPeer setPlayingUI];
     printf("%s\n", "playing");
+
+    if (mForceLogout)
+    {
+        process(kCancelPressed);
+    }
 }
 
 void RecordMessageScreen::pausedIdleEntry()
 {
     [mPeer setPausedUI];
     printf("%s\n", "paused");
+
+    if (mForceLogout)
+    {
+        process(kCancelPressed);
+    }
 }
 
 void RecordMessageScreen::recordingIdleEntry()
@@ -214,6 +231,11 @@ void RecordMessageScreen::doWeNeedToWaitForTranscriptionEntry()
 void RecordMessageScreen::isForwardingMessageEntry()
 {
     SetImmediateEvent(mIsForwarded ? kYes : kNo);
+}
+
+void RecordMessageScreen::isThisAForcedCancelEntry()
+{
+    SetImmediateEvent(mForceLogout ? kYes : kNo);
 }
 
 void RecordMessageScreen::wasPostAudioSuccessfulEntry()
@@ -343,6 +365,8 @@ void RecordMessageScreen::calculateMessageJSONEntry()
 
 void RecordMessageScreen::clearDataAndReloadTableEntry()
 {
+    mForceLogout = false;
+
     mInitObject = JSONObject();
     mInitObject["to"] = JSONArray();
 
@@ -578,6 +602,7 @@ void RecordMessageScreen::CallEntry()
 		case kFixRecipientList: fixRecipientListEntry(); break;
 		case kInvalidState: invalidStateEntry(); break;
 		case kIsForwardingMessage: isForwardingMessageEntry(); break;
+		case kIsThisAForcedCancel: isThisAForcedCancelEntry(); break;
 		case kLetDidRecordBeIsForwardedValue: letDidRecordBeIsForwardedValueEntry(); break;
 		case kLetDidRecordBeTrue: letDidRecordBeTrueEntry(); break;
 		case kPauseAudio: pauseAudioEntry(); break;
@@ -642,6 +667,8 @@ int  RecordMessageScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kFixRecipientList) && (evt == kNext)) return kLetDidRecordBeIsForwardedValue; else
 	if ((mState == kIsForwardingMessage) && (evt == kNo)) return kSendPostAudioToServer; else
 	if ((mState == kIsForwardingMessage) && (evt == kYes)) return kSendPostMessageToServer; else
+	if ((mState == kIsThisAForcedCancel) && (evt == kNo)) return kShowConfirmDelete; else
+	if ((mState == kIsThisAForcedCancel) && (evt == kYes)) return kClearDataAndReloadTable; else
 	if ((mState == kLetDidRecordBeIsForwardedValue) && (evt == kNext)) return kDidWeRecord; else
 	if ((mState == kLetDidRecordBeTrue) && (evt == kNext)) return kDidWeRecord; else
 	if ((mState == kPauseAudio) && (evt == kNext)) return kPausedIdle; else
@@ -680,12 +707,12 @@ int  RecordMessageScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kStart) && (evt == kNext)) return kFixRecipientList; else
 	if ((mState == kStartRecordingAudio) && (evt == kNext)) return kRecordingIdle; else
 	if ((mState == kStopAudio) && (evt == kNext)) return kDidWeRecord; else
-	if ((mState == kStopPlayingBeforePop) && (evt == kNext)) return kShowConfirmDelete; else
+	if ((mState == kStopPlayingBeforePop) && (evt == kNext)) return kIsThisAForcedCancel; else
 	if ((mState == kStopPlayingBeforeSend) && (evt == kNext)) return kDoWeHaveContactsToSendTo; else
 	if ((mState == kStopRecordingAudio) && (evt == kNext)) return kDoWeNeedToWaitForTranscription; else
 	if ((mState == kWaitForTranscriptionIdle) && (evt == kNewMessage)) return kPeerSwitchToNewMemoTab; else
 	if ((mState == kWaitForTranscriptionIdle) && (evt == kTranscriptionReady)) return kLetDidRecordBeTrue; else
-	if ((mState == kWaitToPlayIdle) && (evt == kCancelPressed)) return kShowConfirmDelete; else
+	if ((mState == kWaitToPlayIdle) && (evt == kCancelPressed)) return kIsThisAForcedCancel; else
 	if ((mState == kWaitToPlayIdle) && (evt == kNewMessage)) return kPeerSwitchToNewMemoTab; else
 	if ((mState == kWaitToPlayIdle) && (evt == kPlayPressed)) return kPlayAudio; else
 	if ((mState == kWaitToPlayIdle) && (evt == kSendPressed)) return kDoWeHaveContactsToSendTo; else
@@ -797,6 +824,10 @@ void RecordMessageScreen::update(const GCTEvent& msg)
 {
     switch(msg.mEvent)
     {
+        case GCTEvent::kForceLogout:
+            mForceLogout = true;
+            break;
+
         case GCTEvent::kInboxTabPressed:
         case GCTEvent::kNewMemoTabPressed:
         case GCTEvent::kContactsTabPressed:

@@ -32,6 +32,7 @@ protected:
     bool                mIsForwarded;
     bool                mIsChild;
     bool                mGotTranscriptionEvent;
+    bool                mForceLogout;
 
 public:
     RecordMessageScreen(RecordMessageVC* newVC, const JSONObject& initObject, bool newIsForwarded, bool newIsChild);
@@ -63,6 +64,7 @@ protected:
 	void doWeNeedToWaitForTranscriptionEntry();
 	void fixRecipientListEntry();
 	void isForwardingMessageEntry();
+	void isThisAForcedCancelEntry();
 	void letDidRecordBeIsForwardedValueEntry();
 	void letDidRecordBeTrueEntry();
 	void pauseAudioEntry();
@@ -135,6 +137,7 @@ public:
 		kEnd,
 		kFixRecipientList,
 		kIsForwardingMessage,
+		kIsThisAForcedCancel,
 		kLetDidRecordBeIsForwardedValue,
 		kLetDidRecordBeTrue,
 		kPauseAudio,

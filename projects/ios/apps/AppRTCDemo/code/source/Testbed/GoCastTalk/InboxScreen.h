@@ -76,6 +76,7 @@ protected:
 	void peerSwitchToInboxTabEntry();
 	void playNewMessageSoundEntry();
 	void sendDeleteMessageToServerEntry();
+	void sendForceLogoutToVCEntry();
 	void sendGetContactsToServerEntry();
 	void sendGetGroupsToServerEntry();
 	void sendListMessagesToServerEntry();
@@ -135,6 +136,7 @@ public:
 		kPeerSwitchToInboxTab,
 		kPlayNewMessageSound,
 		kSendDeleteMessageToServer,
+		kSendForceLogoutToVC,
 		kSendGetContactsToServer,
 		kSendGetGroupsToServer,
 		kSendListMessagesToServer,

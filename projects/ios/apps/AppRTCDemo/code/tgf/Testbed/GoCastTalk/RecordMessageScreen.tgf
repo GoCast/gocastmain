@@ -43,6 +43,7 @@
 43 Peer: pop all Inbox views
 44 Show "confirm delete?"
 45 Send ForceLogout to VC
+46 Is this a forced cancel?
 #
 3 4 no
 4 5 recordPressed
@@ -58,8 +59,8 @@
 9 13 finishedPlaying
 13 3
 12 23 playPressed
-15 44
-6 44 cancelPressed
+15 46
+6 46 cancelPressed
 12 15 cancelPressed
 9 15 cancelPressed
 17 28
@@ -116,3 +117,5 @@
 21 45 expired
 27 45 expired
 45 32
+46 44 no
+46 32 yes

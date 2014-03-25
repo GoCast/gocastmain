@@ -615,6 +615,12 @@ void InboxScreen::showYourTokenExpiredEntry()
     tAlert("Your session has expired.");
 }
 
+#pragma mark Sending messages to other machines
+void InboxScreen::sendForceLogoutToVCEntry()
+{
+    GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kForceLogout));
+}
+
 #pragma mark State wiring
 void InboxScreen::CallEntry()
 {
@@ -637,6 +643,7 @@ void InboxScreen::CallEntry()
 		case kPeerSwitchToInboxTab: peerSwitchToInboxTabEntry(); break;
 		case kPlayNewMessageSound: playNewMessageSoundEntry(); break;
 		case kSendDeleteMessageToServer: sendDeleteMessageToServerEntry(); break;
+		case kSendForceLogoutToVC: sendForceLogoutToVCEntry(); break;
 		case kSendGetContactsToServer: sendGetContactsToServerEntry(); break;
 		case kSendGetGroupsToServer: sendGetGroupsToServerEntry(); break;
 		case kSendListMessagesToServer: sendListMessagesToServerEntry(); break;
@@ -693,6 +700,7 @@ int  InboxScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kPlayNewMessageSound) && (evt == kNext)) return kPeerReloadTable; else
 	if ((mState == kSendDeleteMessageToServer) && (evt == kFail)) return kShowErrorDeletingMessage; else
 	if ((mState == kSendDeleteMessageToServer) && (evt == kSuccess)) return kWasDeleteMessageValid; else
+	if ((mState == kSendForceLogoutToVC) && (evt == kNext)) return kIdle; else
 	if ((mState == kSendGetContactsToServer) && (evt == kFail)) return kShowErrorLoadingContacts; else
 	if ((mState == kSendGetContactsToServer) && (evt == kSuccess)) return kWasGetContactsValid; else
 	if ((mState == kSendGetGroupsToServer) && (evt == kFail)) return kShowErrorLoadingGroups; else
@@ -715,16 +723,16 @@ int  InboxScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kSortTableByDate) && (evt == kNext)) return kAreThereNewMessages; else
 	if ((mState == kStart) && (evt == kNext)) return kLoadLoginNameAndToken; else
 	if ((mState == kWaitForLoginSuccessIdle) && (evt == kLoginSucceeded)) return kDoWeHaveAToken; else
-	if ((mState == kWasDeleteMessageValid) && (evt == kExpired)) return kClearAllDataAndReloadTable; else
+	if ((mState == kWasDeleteMessageValid) && (evt == kExpired)) return kSendForceLogoutToVC; else
 	if ((mState == kWasDeleteMessageValid) && (evt == kNo)) return kShowErrorDeletingMessage; else
 	if ((mState == kWasDeleteMessageValid) && (evt == kYes)) return kDoWeHaveAToken; else
-	if ((mState == kWasGetContactsValid) && (evt == kExpired)) return kClearAllDataAndReloadTable; else
+	if ((mState == kWasGetContactsValid) && (evt == kExpired)) return kSendForceLogoutToVC; else
 	if ((mState == kWasGetContactsValid) && (evt == kNo)) return kShowErrorLoadingContacts; else
 	if ((mState == kWasGetContactsValid) && (evt == kYes)) return kAddFakeContacts; else
 	if ((mState == kWasGetGroupsValid) && (evt == kExpired)) return kClearAllDataAndReloadTable; else
 	if ((mState == kWasGetGroupsValid) && (evt == kNo)) return kShowErrorLoadingGroups; else
 	if ((mState == kWasGetGroupsValid) && (evt == kYes)) return kSortGroupsByGroupName; else
-	if ((mState == kWasListMessagesValid) && (evt == kExpired)) return kClearAllDataAndReloadTable; else
+	if ((mState == kWasListMessagesValid) && (evt == kExpired)) return kSendForceLogoutToVC; else
 	if ((mState == kWasListMessagesValid) && (evt == kNo)) return kShowErrorLoadingInbox; else
 	if ((mState == kWasListMessagesValid) && (evt == kYes)) return kSortTableByDate;
 
@@ -743,6 +751,7 @@ bool InboxScreen::HasEdgeNamedNext() const
 		case kPeerResetAllTabs:
 		case kPeerSwitchToInboxTab:
 		case kPlayNewMessageSound:
+		case kSendForceLogoutToVC:
 		case kSetWaitForDeleteMessage:
 		case kSetWaitForGetContacts:
 		case kSetWaitForGetGroups:

@@ -212,6 +212,7 @@
 -(void) switchToInboxTab
 {
     [gAppDelegateInstance.tabBarController setSelectedIndex:0];
+    GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kInboxTabPressed));
 }
 
 - (void)refresh:(UIRefreshControl *)refreshControl

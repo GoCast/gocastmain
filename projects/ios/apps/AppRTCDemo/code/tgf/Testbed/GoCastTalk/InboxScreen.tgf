@@ -36,6 +36,7 @@
 36 Load login name and token
 37 Peer: reset all tabs
 38 Peer: switch to Inbox Tab
+39 Send ForceLogout to VC
 #
 1 36
 5 6 success
@@ -87,11 +88,12 @@
 3 32 forceLogout
 34 35 yes
 33 38
-6 32 expired
+6 39 expired
 36 16 success
 36 32 fail
-13 32 expired
-19 32 expired
+13 39 expired
+19 39 expired
 24 32 expired
 38 37
 37 34
+39 3
