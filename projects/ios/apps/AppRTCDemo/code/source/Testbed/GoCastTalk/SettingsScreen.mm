@@ -128,6 +128,11 @@ void SettingsScreen::setWaitForLogoutEntry()
     [mPeer setBlockingViewVisible:true];
 }
 
+void SettingsScreen::showConfirmLogoutEntry()
+{
+    tConfirm("Are you sure you want to logout?");
+}
+
 void SettingsScreen::showErrorWithLogoutEntry()
 {
     tAlert("Logout failed");
@@ -159,6 +164,7 @@ void SettingsScreen::CallEntry()
 		case kSendForceLogoutToVC: sendForceLogoutToVCEntry(); break;
 		case kSendLogoutToServer: sendLogoutToServerEntry(); break;
 		case kSetWaitForLogout: setWaitForLogoutEntry(); break;
+		case kShowConfirmLogout: showConfirmLogoutEntry(); break;
 		case kShowErrorWithLogout: showErrorWithLogoutEntry(); break;
 		case kShowSuccessWithLogout: showSuccessWithLogoutEntry(); break;
 		case kStart: startEntry(); break;
@@ -176,7 +182,7 @@ int  SettingsScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kDestroyStoredToken) && (evt == kNext)) return kShowSuccessWithLogout; else
 	if ((mState == kIdle) && (evt == kAboutThisAppSelected)) return kPeerPushAbout; else
 	if ((mState == kIdle) && (evt == kChangePasswordSelected)) return kPeerPushChangePassword; else
-	if ((mState == kIdle) && (evt == kLogOutSelected)) return kSetWaitForLogout; else
+	if ((mState == kIdle) && (evt == kLogOutSelected)) return kShowConfirmLogout; else
 	if ((mState == kIdle) && (evt == kRegisteredNameSelected)) return kPeerPushChangeRegisteredName; else
 	if ((mState == kPeerPushAbout) && (evt == kNext)) return kIdle; else
 	if ((mState == kPeerPushChangePassword) && (evt == kNext)) return kIdle; else
@@ -185,6 +191,8 @@ int  SettingsScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kSendLogoutToServer) && (evt == kFail)) return kShowErrorWithLogout; else
 	if ((mState == kSendLogoutToServer) && (evt == kSuccess)) return kWasLogoutSuccessful; else
 	if ((mState == kSetWaitForLogout) && (evt == kNext)) return kSendLogoutToServer; else
+	if ((mState == kShowConfirmLogout) && (evt == kNo)) return kIdle; else
+	if ((mState == kShowConfirmLogout) && (evt == kYes)) return kSetWaitForLogout; else
 	if ((mState == kShowErrorWithLogout) && (evt == kYes)) return kIdle; else
 	if ((mState == kShowSuccessWithLogout) && (evt == kYes)) return kSendForceLogoutToVC; else
 	if ((mState == kStart) && (evt == kNext)) return kIdle; else
@@ -198,17 +206,17 @@ bool SettingsScreen::HasEdgeNamedNext() const
 {
 	switch(mState)
 	{
-		case kEnd:
-		case kIdle:
-		case kInvalidState:
-		case kSendLogoutToServer:
-		case kShowErrorWithLogout:
-		case kShowSuccessWithLogout:
-		case kWasLogoutSuccessful:
-			return false;
+		case kDestroyStoredToken:
+		case kPeerPushAbout:
+		case kPeerPushChangePassword:
+		case kPeerPushChangeRegisteredName:
+		case kSendForceLogoutToVC:
+		case kSetWaitForLogout:
+		case kStart:
+			return true;
 		default: break;
 	}
-	return true;
+	return false;
 }
 
 #pragma mark Messages
@@ -253,6 +261,7 @@ void SettingsScreen::update(const GCTEvent& msg)
 {
     switch(getState())
     {
+        case kShowConfirmLogout:
         case kShowErrorWithLogout:
         case kShowSuccessWithLogout:
             switch(msg.mEvent)

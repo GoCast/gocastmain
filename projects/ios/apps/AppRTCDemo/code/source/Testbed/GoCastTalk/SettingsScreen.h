@@ -36,6 +36,7 @@ protected:
 	void sendForceLogoutToVCEntry();
 	void sendLogoutToServerEntry();
 	void setWaitForLogoutEntry();
+	void showConfirmLogoutEntry();
 	void showErrorWithLogoutEntry();
 	void showSuccessWithLogoutEntry();
 	void wasLogoutSuccessfulEntry();
@@ -68,6 +69,7 @@ public:
 		kSendForceLogoutToVC,
 		kSendLogoutToServer,
 		kSetWaitForLogout,
+		kShowConfirmLogout,
 		kShowErrorWithLogout,
 		kShowSuccessWithLogout,
 		kWasLogoutSuccessful,

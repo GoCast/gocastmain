@@ -11,11 +11,12 @@
 11 Send ForceLogout to VC
 12 Show "Success with logout"
 13 Destroy stored token
+14 Show "confirm logout?"
 #
 1 3
 3 4 registeredNameSelected
 4 3
-3 7 logOutSelected
+3 14 logOutSelected
 3 5 aboutThisAppSelected
 5 3
 3 6 changePasswordSelected
@@ -29,3 +30,5 @@
 11 3
 12 11 yes
 13 12
+14 7 yes
+14 3 no
