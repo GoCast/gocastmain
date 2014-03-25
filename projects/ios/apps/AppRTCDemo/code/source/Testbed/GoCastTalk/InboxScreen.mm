@@ -156,7 +156,8 @@ std::string InboxScreen::getTranscription(const size_t& i)
         return mInbox[i].mObject["transcription"].mObject["ja"].mString;
     }
 
-    return "Transcription not available";
+    //"Transcription not available";
+    return "(テキストはありません)";
 }
 
 bool        InboxScreen::getIsReceive(const size_t& i)
@@ -625,7 +626,8 @@ void InboxScreen::showRetryListMessagesEntry()
 
 void InboxScreen::showYourTokenExpiredEntry()
 {
-    tAlert("Your session has expired.");
+    //"Your session has expired."
+    tAlert("接続がタイムアウトしました");
 }
 
 #pragma mark Sending messages to other machines

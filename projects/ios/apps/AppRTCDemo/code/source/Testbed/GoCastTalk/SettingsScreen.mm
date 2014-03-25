@@ -130,17 +130,20 @@ void SettingsScreen::setWaitForLogoutEntry()
 
 void SettingsScreen::showConfirmLogoutEntry()
 {
-    tConfirm("Are you sure you want to logout?");
+    //"Are you sure you want to logout?"
+    tConfirm("ログアウトしてよろしいですか？");
 }
 
 void SettingsScreen::showErrorWithLogoutEntry()
 {
-    tAlert("Logout failed");
+    //"Logout failed"
+    tAlert("ログアウトに失敗しました");
 }
 
 void SettingsScreen::showSuccessWithLogoutEntry()
 {
-    tAlert("You have been successfully logged out");
+    //"You have been successfully logged out"
+    tAlert("ログアウトしました");
 }
 
 #pragma mark Sending messages to other machines

@@ -23,7 +23,8 @@ extern std::string kBaseURL;
 {
     [super viewDidLoad];
 
-    self.mBuildDate.text = [NSString stringWithUTF8String:"Build date:\n"__DATE__ " @ " __TIME__ " PST"];
+    //"Build date"
+    self.mBuildDate.text = [NSString stringWithUTF8String:"ビルド日時:\n"__DATE__ " @ " __TIME__ " PST"];
 
     CGRect r = self.mAboutText.frame;
 

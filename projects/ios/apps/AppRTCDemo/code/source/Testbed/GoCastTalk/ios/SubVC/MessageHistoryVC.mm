@@ -55,7 +55,8 @@
     }
     else
     {
-        [self setTranscription:"Transcription not available"];
+        //"Transcription not available"
+        [self setTranscription:"(テキストはありません)"];
     }
 }
 

@@ -118,7 +118,8 @@
     }
     else
     {
-        self.mTranscription.text = [NSString stringWithUTF8String:"Transcription not available"];
+        //"Transcription not available."
+        self.mTranscription.text = [NSString stringWithUTF8String:"(テキストはありません)"];
     }
 
     [self.mSlider setValue:0];

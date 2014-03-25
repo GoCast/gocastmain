@@ -106,7 +106,7 @@ void RecordMessageScreen::waitToRecordIdleEntry()
 {
     mGotTranscriptionEvent = false;
     [mPeer setWaitToRecordUI];
-    [mPeer setTranscription:"Transcription pending"];
+    [mPeer setTranscription:"(テキストはまだありません)"]; //"Transcription pending"
     [mPeer setTranscriptionEnabled:false];
 }
 
@@ -541,12 +541,13 @@ void RecordMessageScreen::setWaitForTranscriptionEntry()
 void RecordMessageScreen::showComposeNewMessageEntry()
 {
     //"Compose new message? Old message will be discarded."
-    tConfirm("Compose new message? Old message will be discarded.");
+    tConfirm("現在のメッセージを破棄し、新しいメッセージを作成しますか？");
 }
 
 void RecordMessageScreen::showConfirmDeleteEntry()
 {
-    tConfirm("Delete this message?");
+    //"Delete this message?"
+    tConfirm("削除してよろしいですか？");
 }
 
 void RecordMessageScreen::showConfirmSendEntry()

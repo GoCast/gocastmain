@@ -356,8 +356,9 @@ const unsigned char SpeechKitApplicationKey[] =
     //        [alert release];
     //
     //    }
-    
-    GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kTranscriptFinished, "Transcription not available."));
+
+    //"Transcription not available."
+    GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kTranscriptFinished, "(テキストはありません)"));
 
 	[voiceSearch release];
 	voiceSearch = nil;
