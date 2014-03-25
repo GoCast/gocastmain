@@ -27,6 +27,9 @@
 27 Did we download groups?
 28 Are there new messages?
 29 Play "new message" sound
+30 Sort contacts by kana
+31 Sort groups by group name
+32 Add fake contacts
 #
 1 16
 5 6 success
@@ -58,16 +61,19 @@
 18 19
 19 20 success
 19 21 fail
-20 27 yes
+20 32 yes
 21 27 yes
 25 26 no
 23 24
 24 25 success
 24 26 fail
-25 4 yes
+25 31 yes
 26 4 yes
 27 23 no
 27 4 yes
 28 29 yes
 28 9 no
 29 9
+30 27
+31 4
+32 30

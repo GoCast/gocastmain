@@ -19,6 +19,23 @@ bool sortByDate (JSONValue i, JSONValue j)
     return i.mObject["date"].mString > j.mObject["date"].mString;
 }
 
+bool sortByKana (JSONValue i, JSONValue j);
+bool sortByKana (JSONValue i, JSONValue j)
+{
+    if (i.mObject["kana"].mString == j.mObject["kana"].mString)
+    {
+        return i.mObject["email"].mString < j.mObject["email"].mString;
+    }
+
+    return i.mObject["kana"].mString < j.mObject["kana"].mString;
+}
+
+bool sortByGroupName (JSONValue i, JSONValue j);
+bool sortByGroupName (JSONValue i, JSONValue j)
+{
+    return i.mObject["name"].mString < j.mObject["name"].mString;
+}
+
 std::string InboxScreen::getGmtString()
 {
     char buf[80];
@@ -264,19 +281,6 @@ void InboxScreen::wasGetContactsValidEntry()
     {
         mContacts = mGetContactsJSON["contacts"].mArray;
 
-        JSONObject misterFeedback;
-
-        misterFeedback["kana"] = std::string("フィードバック");
-        misterFeedback["email"] = std::string("feedback@gocast.it");
-
-        JSONObject welcomingCommittee;
-
-        welcomingCommittee["kana"] = std::string("ゴーキャスト　チーム");
-        welcomingCommittee["email"] = std::string("gocast.team@gocast.it");
-
-        mContacts.push_back(misterFeedback);
-        mContacts.push_back(welcomingCommittee);
-
         result = true;
     }
 
@@ -324,6 +328,42 @@ void InboxScreen::peerPushInboxMessageEntry()
 }
 
 #pragma mark Actions
+void InboxScreen::addFakeContactsEntry()
+{
+    JSONObject  entry;
+    bool        hasFeedback = false;
+    bool        hasWelcome  = false;
+
+    for (size_t i = 0; i < mContacts.size(); i++)
+    {
+        if (mContacts[i].mObject["email"].mString == "feedback@gocast.it")
+        {
+            hasFeedback = true;
+        }
+        else if (mContacts[i].mObject["email"].mString == "gocast.team@gocast.it")
+        {
+            hasWelcome = true;
+        }
+    }
+
+    if (!hasFeedback)
+    {
+        entry["kana"] = std::string("フィードバック");
+        entry["email"] = std::string("feedback@gocast.it");
+
+        mContacts.push_back(entry);
+    }
+
+    if (!hasWelcome)
+    {
+        entry["kana"] = std::string("ゴーキャスト　チーム");
+        entry["email"] = std::string("gocast.team@gocast.it");
+
+        mContacts.push_back(entry);
+    }
+
+}
+
 void InboxScreen::clearInboxEntry()
 {
     mInbox.clear();
@@ -336,6 +376,16 @@ void InboxScreen::playNewMessageSoundEntry()
     {
         mNewMessageSound->play();
     }
+}
+
+void InboxScreen::sortContactsByKanaEntry()
+{
+    std::sort(mContacts.begin(), mContacts.end(), sortByKana);
+}
+
+void InboxScreen::sortGroupsByGroupNameEntry()
+{
+    std::sort(mGroups.begin(), mGroups.end(), sortByGroupName);
 }
 
 void InboxScreen::sortTableByDateEntry()
@@ -473,6 +523,7 @@ void InboxScreen::CallEntry()
 {
 	switch(mState)
 	{
+		case kAddFakeContacts: addFakeContactsEntry(); break;
 		case kAreThereNewMessages: areThereNewMessagesEntry(); break;
 		case kClearInbox: clearInboxEntry(); break;
 		case kDidWeDownloadContacts: didWeDownloadContactsEntry(); break;
@@ -497,6 +548,8 @@ void InboxScreen::CallEntry()
 		case kShowErrorLoadingGroups: showErrorLoadingGroupsEntry(); break;
 		case kShowErrorLoadingInbox: showErrorLoadingInboxEntry(); break;
 		case kShowRetryListMessages: showRetryListMessagesEntry(); break;
+		case kSortContactsByKana: sortContactsByKanaEntry(); break;
+		case kSortGroupsByGroupName: sortGroupsByGroupNameEntry(); break;
 		case kSortTableByDate: sortTableByDateEntry(); break;
 		case kStart: startEntry(); break;
 		case kWasDeleteMessageValid: wasDeleteMessageValidEntry(); break;
@@ -513,6 +566,7 @@ void InboxScreen::CallExit()
 
 int  InboxScreen::StateTransitionFunction(const int evt) const
 {
+	if ((mState == kAddFakeContacts) && (evt == kNext)) return kSortContactsByKana; else
 	if ((mState == kAreThereNewMessages) && (evt == kNo)) return kPeerReloadTable; else
 	if ((mState == kAreThereNewMessages) && (evt == kYes)) return kPlayNewMessageSound; else
 	if ((mState == kClearInbox) && (evt == kNext)) return kPeerReloadTable; else
@@ -546,14 +600,16 @@ int  InboxScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kShowErrorLoadingInbox) && (evt == kYes)) return kPeerReloadTable; else
 	if ((mState == kShowRetryListMessages) && (evt == kNo)) return kPeerReloadTable; else
 	if ((mState == kShowRetryListMessages) && (evt == kYes)) return kDoWeHaveAToken; else
+	if ((mState == kSortContactsByKana) && (evt == kNext)) return kDidWeDownloadGroups; else
+	if ((mState == kSortGroupsByGroupName) && (evt == kNext)) return kSetWaitForListMessages; else
 	if ((mState == kSortTableByDate) && (evt == kNext)) return kAreThereNewMessages; else
 	if ((mState == kStart) && (evt == kNext)) return kDoWeHaveAToken; else
 	if ((mState == kWasDeleteMessageValid) && (evt == kNo)) return kShowErrorDeletingMessage; else
 	if ((mState == kWasDeleteMessageValid) && (evt == kYes)) return kDoWeHaveAToken; else
 	if ((mState == kWasGetContactsValid) && (evt == kNo)) return kShowErrorLoadingContacts; else
-	if ((mState == kWasGetContactsValid) && (evt == kYes)) return kDidWeDownloadGroups; else
+	if ((mState == kWasGetContactsValid) && (evt == kYes)) return kAddFakeContacts; else
 	if ((mState == kWasGetGroupsValid) && (evt == kNo)) return kShowErrorLoadingGroups; else
-	if ((mState == kWasGetGroupsValid) && (evt == kYes)) return kSetWaitForListMessages; else
+	if ((mState == kWasGetGroupsValid) && (evt == kYes)) return kSortGroupsByGroupName; else
 	if ((mState == kWasListMessagesValid) && (evt == kNo)) return kShowErrorLoadingInbox; else
 	if ((mState == kWasListMessagesValid) && (evt == kYes)) return kSortTableByDate;
 
@@ -564,6 +620,7 @@ bool InboxScreen::HasEdgeNamedNext() const
 {
 	switch(mState)
 	{
+		case kAddFakeContacts:
 		case kClearInbox:
 		case kPeerPushInboxMessage:
 		case kPeerReloadTable:
@@ -572,6 +629,8 @@ bool InboxScreen::HasEdgeNamedNext() const
 		case kSetWaitForGetContacts:
 		case kSetWaitForGetGroups:
 		case kSetWaitForListMessages:
+		case kSortContactsByKana:
+		case kSortGroupsByGroupName:
 		case kSortTableByDate:
 		case kStart:
 			return true;

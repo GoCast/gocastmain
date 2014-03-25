@@ -60,6 +60,7 @@ protected:
 	void endEntry();
 	void invalidStateEntry();
 
+	void addFakeContactsEntry();
 	void areThereNewMessagesEntry();
 	void clearInboxEntry();
 	void didWeDownloadContactsEntry();
@@ -82,6 +83,8 @@ protected:
 	void showErrorLoadingGroupsEntry();
 	void showErrorLoadingInboxEntry();
 	void showRetryListMessagesEntry();
+	void sortContactsByKanaEntry();
+	void sortGroupsByGroupNameEntry();
 	void sortTableByDateEntry();
 	void wasDeleteMessageValidEntry();
 	void wasGetContactsValidEntry();
@@ -106,6 +109,7 @@ public:
 	{
 		kInvalidState = 0,
 		kStart = 1,
+		kAddFakeContacts,
 		kAreThereNewMessages,
 		kClearInbox,
 		kDidWeDownloadContacts,
@@ -129,6 +133,8 @@ public:
 		kShowErrorLoadingGroups,
 		kShowErrorLoadingInbox,
 		kShowRetryListMessages,
+		kSortContactsByKana,
+		kSortGroupsByGroupName,
 		kSortTableByDate,
 		kWasDeleteMessageValid,
 		kWasGetContactsValid,
