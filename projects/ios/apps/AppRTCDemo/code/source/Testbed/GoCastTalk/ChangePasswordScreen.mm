@@ -6,6 +6,21 @@
 
 #include "ChangePasswordVC.h"
 
+#pragma mark Helper methods
+bool ChangePasswordScreen::EnsurePassword(const std::string &password)
+{
+    bool result = !password.empty();
+
+    for (size_t i = 0; i < password.size(); i++)
+    {
+        result &=   (password[i] >= '0' && password[i] <= '9') ||
+        (password[i] >= 'a' && password[i] <= 'z') ||
+        (password[i] >= 'A' && password[i] <= 'Z');
+    }
+
+    return result;
+}
+
 #pragma mark Constructor / Destructor
 ChangePasswordScreen::ChangePasswordScreen(ChangePasswordVC* newVC)
 : mPeer(newVC)
@@ -71,6 +86,17 @@ void ChangePasswordScreen::wasLogoutSuccessfulEntry()
 }
 
 #pragma mark Actions
+void ChangePasswordScreen::ensurePasswordsEntry()
+{
+    bool result;
+
+    result  = EnsurePassword([mPeer getOldPassword]);
+    result &= EnsurePassword([mPeer getNewPassword]);
+    result &= [mPeer getOldPassword] != [mPeer getNewPassword];
+
+    SetImmediateEvent(result ? kSuccess : kFail);
+}
+
 void ChangePasswordScreen::sendChangePasswordToServerEntry()
 {
     char buf[512];
@@ -86,9 +112,20 @@ void ChangePasswordScreen::sendChangePasswordToServerEntry()
 }
 
 #pragma mark UI
+void ChangePasswordScreen::setWaitForChangePasswordEntry()
+{
+    [mPeer setBlockingViewVisible:true];
+}
+
 void ChangePasswordScreen::showErrorWithChangePasswordEntry()
 {
-    tAlert("Could not change password");
+    tAlert("Cannot change password; old password is incorrect.");
+}
+
+void ChangePasswordScreen::showIncorrectFormatEntry()
+{
+    //"Password must be letters and numbers only."
+    tAlert("Password must be letters and numbers only, and new password must be different from old password.");
 }
 
 void ChangePasswordScreen::showSuccessChangedPasswordEntry()
@@ -108,12 +145,15 @@ void ChangePasswordScreen::CallEntry()
 	switch(mState)
 	{
 		case kEnd: EndEntryHelper(); break;
+		case kEnsurePasswords: ensurePasswordsEntry(); break;
 		case kIdle: idleEntry(); break;
 		case kInvalidState: invalidStateEntry(); break;
 		case kPeerPopSelf: peerPopSelfEntry(); break;
 		case kSendChangePasswordToServer: sendChangePasswordToServerEntry(); break;
 		case kSendForceLogoutToVC: sendForceLogoutToVCEntry(); break;
+		case kSetWaitForChangePassword: setWaitForChangePasswordEntry(); break;
 		case kShowErrorWithChangePassword: showErrorWithChangePasswordEntry(); break;
+		case kShowIncorrectFormat: showIncorrectFormatEntry(); break;
 		case kShowSuccessChangedPassword: showSuccessChangedPasswordEntry(); break;
 		case kStart: startEntry(); break;
 		case kWasLogoutSuccessful: wasLogoutSuccessfulEntry(); break;
@@ -127,11 +167,15 @@ void ChangePasswordScreen::CallExit()
 
 int  ChangePasswordScreen::StateTransitionFunction(const int evt) const
 {
-	if ((mState == kIdle) && (evt == kSaveSelected)) return kSendChangePasswordToServer; else
+	if ((mState == kEnsurePasswords) && (evt == kFail)) return kShowIncorrectFormat; else
+	if ((mState == kEnsurePasswords) && (evt == kSuccess)) return kSetWaitForChangePassword; else
+	if ((mState == kIdle) && (evt == kSaveSelected)) return kEnsurePasswords; else
 	if ((mState == kSendChangePasswordToServer) && (evt == kFail)) return kShowErrorWithChangePassword; else
 	if ((mState == kSendChangePasswordToServer) && (evt == kSuccess)) return kWasLogoutSuccessful; else
-	if ((mState == kSendForceLogoutToVC) && (evt == kNext)) return kIdle; else
+	if ((mState == kSendForceLogoutToVC) && (evt == kNext)) return kPeerPopSelf; else
+	if ((mState == kSetWaitForChangePassword) && (evt == kNext)) return kSendChangePasswordToServer; else
 	if ((mState == kShowErrorWithChangePassword) && (evt == kYes)) return kIdle; else
+	if ((mState == kShowIncorrectFormat) && (evt == kYes)) return kIdle; else
 	if ((mState == kShowSuccessChangedPassword) && (evt == kYes)) return kPeerPopSelf; else
 	if ((mState == kStart) && (evt == kNext)) return kIdle; else
 	if ((mState == kWasLogoutSuccessful) && (evt == kExpired)) return kSendForceLogoutToVC; else
@@ -146,6 +190,7 @@ bool ChangePasswordScreen::HasEdgeNamedNext() const
 	switch(mState)
 	{
 		case kSendForceLogoutToVC:
+		case kSetWaitForChangePassword:
 		case kStart:
 			return true;
 		default: break;
@@ -196,6 +241,7 @@ void ChangePasswordScreen::update(const GCTEvent& msg)
     switch (getState())
     {
         case kShowErrorWithChangePassword:
+        case kShowIncorrectFormat:
         case kShowSuccessChangedPassword:
             switch(msg.mEvent)
             {

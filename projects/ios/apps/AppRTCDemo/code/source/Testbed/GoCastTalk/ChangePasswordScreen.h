@@ -14,6 +14,9 @@ protected:
     ChangePasswordVC*   mPeer;
     JSONObject          mChangePasswordJSON;
 
+protected:
+    bool EnsurePassword(const std::string& password);
+
 public:
 	ChangePasswordScreen(ChangePasswordVC* newVC);
 	~ChangePasswordScreen();
@@ -25,11 +28,14 @@ protected:
 	void endEntry();
 	void invalidStateEntry();
 
+	void ensurePasswordsEntry();
 	void idleEntry();
 	void peerPopSelfEntry();
 	void sendChangePasswordToServerEntry();
 	void sendForceLogoutToVCEntry();
+	void setWaitForChangePasswordEntry();
 	void showErrorWithChangePasswordEntry();
+	void showIncorrectFormatEntry();
 	void showSuccessChangedPasswordEntry();
 	void wasLogoutSuccessfulEntry();
 
@@ -51,11 +57,14 @@ public:
 		kInvalidState = 0,
 		kStart = 1,
 		kEnd,
+		kEnsurePasswords,
 		kIdle,
 		kPeerPopSelf,
 		kSendChangePasswordToServer,
 		kSendForceLogoutToVC,
+		kSetWaitForChangePassword,
 		kShowErrorWithChangePassword,
+		kShowIncorrectFormat,
 		kShowSuccessChangedPassword,
 		kWasLogoutSuccessful,
 	};
