@@ -146,7 +146,7 @@ void SettingsScreen::showSuccessWithLogoutEntry()
 #pragma mark Sending messages to other machines
 void SettingsScreen::sendForceLogoutToVCEntry()
 {
-    GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kForceLogout));
+    GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kForceLogout, "true"));
 }
 
 #pragma mark State wiring

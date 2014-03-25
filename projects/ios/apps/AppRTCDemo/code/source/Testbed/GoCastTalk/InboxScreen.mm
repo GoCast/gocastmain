@@ -202,7 +202,9 @@ void       InboxScreen::deletePressed(const size_t& i)
 #pragma mark Start / End / Invalid
 void InboxScreen::startEntry()
 {
-    mForceLogout = false;
+    mForceLogout    = false;
+    mManualLogout   = false;
+    mFirstLogin     = true;
 
     URLLoader::getInstance()->attach(this);
     GCTEventManager::getInstance()->attach(this);
@@ -237,6 +239,7 @@ void InboxScreen::idleEntry()
 void InboxScreen::waitForLoginSuccessIdleEntry()
 {
     mForceLogout = false;
+    mManualLogout = false;
 }
 
 #pragma mark Queries
@@ -268,6 +271,11 @@ void InboxScreen::didWeDownloadGroupsEntry()
 void InboxScreen::doWeHaveATokenEntry()
 {
     SetImmediateEvent(InboxScreen::mEmailAddress.empty() ? kNo : kYes);
+}
+
+void InboxScreen::isThisTheFirstLoginEntry()
+{
+    SetImmediateEvent(mFirstLogin ? kYes : kNo);
 }
 
 void InboxScreen::wasDeleteMessageValidEntry()
@@ -348,6 +356,11 @@ void InboxScreen::wasListMessagesValidEntry()
     }
 
     SetImmediateEvent(expired ? kExpired : (result ? kYes : kNo));
+}
+
+void InboxScreen::wasThisAManualLogoutEntry()
+{
+    SetImmediateEvent(mManualLogout ? kYes : kNo);
 }
 
 #pragma mark Peer communication
@@ -635,6 +648,7 @@ void InboxScreen::CallEntry()
 		case kEnd: EndEntryHelper(); break;
 		case kIdle: idleEntry(); break;
 		case kInvalidState: invalidStateEntry(); break;
+		case kIsThisTheFirstLogin: isThisTheFirstLoginEntry(); break;
 		case kLoadLoginNameAndToken: loadLoginNameAndTokenEntry(); break;
 		case kPeerPushInboxMessage: peerPushInboxMessageEntry(); break;
 		case kPeerPushLoginScreen: peerPushLoginScreenEntry(); break;
@@ -666,6 +680,7 @@ void InboxScreen::CallEntry()
 		case kWasGetContactsValid: wasGetContactsValidEntry(); break;
 		case kWasGetGroupsValid: wasGetGroupsValidEntry(); break;
 		case kWasListMessagesValid: wasListMessagesValidEntry(); break;
+		case kWasThisAManualLogout: wasThisAManualLogoutEntry(); break;
 		default: break;
 	}
 }
@@ -690,12 +705,14 @@ int  InboxScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kIdle) && (evt == kForceLogout)) return kClearAllDataAndReloadTable; else
 	if ((mState == kIdle) && (evt == kItemSelected)) return kPeerPushInboxMessage; else
 	if ((mState == kIdle) && (evt == kRefreshSelected)) return kDoWeHaveAToken; else
+	if ((mState == kIsThisTheFirstLogin) && (evt == kNo)) return kShowYourTokenExpired; else
+	if ((mState == kIsThisTheFirstLogin) && (evt == kYes)) return kWaitForLoginSuccessIdle; else
 	if ((mState == kLoadLoginNameAndToken) && (evt == kFail)) return kClearAllDataAndReloadTable; else
 	if ((mState == kLoadLoginNameAndToken) && (evt == kSuccess)) return kDoWeHaveAToken; else
 	if ((mState == kPeerPushInboxMessage) && (evt == kNext)) return kIdle; else
 	if ((mState == kPeerPushLoginScreen) && (evt == kNext)) return kPeerSwitchToInboxTab; else
 	if ((mState == kPeerReloadTable) && (evt == kNext)) return kIdle; else
-	if ((mState == kPeerResetAllTabs) && (evt == kNext)) return kShowYourTokenExpired; else
+	if ((mState == kPeerResetAllTabs) && (evt == kNext)) return kWasThisAManualLogout; else
 	if ((mState == kPeerSwitchToInboxTab) && (evt == kNext)) return kPeerResetAllTabs; else
 	if ((mState == kPlayNewMessageSound) && (evt == kNext)) return kPeerReloadTable; else
 	if ((mState == kSendDeleteMessageToServer) && (evt == kFail)) return kShowErrorDeletingMessage; else
@@ -734,7 +751,9 @@ int  InboxScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kWasGetGroupsValid) && (evt == kYes)) return kSortGroupsByGroupName; else
 	if ((mState == kWasListMessagesValid) && (evt == kExpired)) return kSendForceLogoutToVC; else
 	if ((mState == kWasListMessagesValid) && (evt == kNo)) return kShowErrorLoadingInbox; else
-	if ((mState == kWasListMessagesValid) && (evt == kYes)) return kSortTableByDate;
+	if ((mState == kWasListMessagesValid) && (evt == kYes)) return kSortTableByDate; else
+	if ((mState == kWasThisAManualLogout) && (evt == kNo)) return kIsThisTheFirstLogin; else
+	if ((mState == kWasThisAManualLogout) && (evt == kYes)) return kWaitForLoginSuccessIdle;
 
 	return kInvalidState;
 }
@@ -821,6 +840,7 @@ void InboxScreen::update(const GCTEvent& msg)
     if (msg.mEvent == GCTEvent::kForceLogout)
     {
         mForceLogout = true;
+        mManualLogout = msg.mManualLogout;
     }
 
     switch(getState())
@@ -839,6 +859,7 @@ void InboxScreen::update(const GCTEvent& msg)
         case kWaitForLoginSuccessIdle:
             if (msg.mEvent == GCTEvent::kLoginSucceeded)
             {
+                mFirstLogin = false;
                 process(kLoginSucceeded);
             }
             break;

@@ -25,6 +25,8 @@ protected:
     size_t      mDeleteSelected;
     size_t      mPriorUnreadCount;
     bool        mForceLogout;
+    bool        mManualLogout;
+    bool        mFirstLogin;
 
 public:
     static JSONArray    mInbox;
@@ -68,6 +70,7 @@ protected:
 	void didWeDownloadGroupsEntry();
 	void doWeHaveATokenEntry();
 	void idleEntry();
+	void isThisTheFirstLoginEntry();
 	void loadLoginNameAndTokenEntry();
 	void peerPushInboxMessageEntry();
 	void peerPushLoginScreenEntry();
@@ -98,6 +101,7 @@ protected:
 	void wasGetContactsValidEntry();
 	void wasGetGroupsValidEntry();
 	void wasListMessagesValidEntry();
+	void wasThisAManualLogoutEntry();
 
 public:
 	enum EventType
@@ -128,6 +132,7 @@ public:
 		kDoWeHaveAToken,
 		kEnd,
 		kIdle,
+		kIsThisTheFirstLogin,
 		kLoadLoginNameAndToken,
 		kPeerPushInboxMessage,
 		kPeerPushLoginScreen,
@@ -158,6 +163,7 @@ public:
 		kWasGetContactsValid,
 		kWasGetGroupsValid,
 		kWasListMessagesValid,
+		kWasThisAManualLogout,
 	};
 
 protected:
