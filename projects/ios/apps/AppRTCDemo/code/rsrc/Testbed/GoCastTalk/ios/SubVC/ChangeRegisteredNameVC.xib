@@ -132,10 +132,14 @@
                         </pickerView>
                     </subviews>
                 </view>
-                <view hidden="YES" alpha="0.20000000298023224" contentMode="scaleToFill" id="AAn-uA-hmO" userLabel="mBlockingView">
+                <view hidden="YES" alpha="0.5" contentMode="scaleToFill" id="AAn-uA-hmO" userLabel="mBlockingView">
                     <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                     <subviews>
+                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="bg-throbber.png" id="vHB-5c-Iae">
+                            <rect key="frame" x="121" y="200" width="78" height="78"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        </imageView>
                         <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" animating="YES" style="whiteLarge" id="V6w-3J-hVD">
                             <rect key="frame" x="142" y="221" width="37" height="37"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -150,4 +154,7 @@
             <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina4"/>
         </scrollView>
     </objects>
+    <resources>
+        <image name="bg-throbber.png" width="154" height="154"/>
+    </resources>
 </document>

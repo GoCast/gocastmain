@@ -314,6 +314,7 @@
 
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/bg-login.png',
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/bg-button.png',
+					'../../rsrc/Testbed/GoCastTalk/<@(OS)/bg-throbber.png',
 
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/banner.png',
 
