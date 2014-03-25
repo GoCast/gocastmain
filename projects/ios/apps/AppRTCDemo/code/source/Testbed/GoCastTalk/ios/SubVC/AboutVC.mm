@@ -25,7 +25,18 @@ extern std::string kBaseURL;
 
     self.mBuildDate.text = [NSString stringWithUTF8String:"Build date:\n"__DATE__ " @ " __TIME__ " PST"];
 
-    self.view.autoresizesSubviews = YES;
+    CGRect r = self.mAboutText.frame;
+
+    r.size.height  = gAppDelegateInstance->mScreenHeight;
+    r.size.height -= gAppDelegateInstance->mStatusBarHeight;
+    r.size.height -= gAppDelegateInstance->mNavBarHeight;
+    r.size.height -= gAppDelegateInstance->mTabBarHeight;
+    r.size.height -= r.origin.y;
+    r.size.height -= 20;
+
+    [self.mAboutText setFrame:r];
+
+    self.view.autoresizesSubviews = NO;
 }
 
 - (void)viewWillDisappear:(BOOL)animated

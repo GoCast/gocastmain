@@ -17,6 +17,7 @@ typedef std::map<std::string, JSONValue> JSONObject;
 //mInboxView
 @property (nonatomic, strong) IBOutlet UIScrollView*    mScrollView;
 @property (nonatomic, strong) IBOutlet UILabel*         mBuildDate;
+@property (nonatomic, strong) IBOutlet UITextView*      mAboutText;
 
 #pragma mark Construction / Destruction
 - (void)viewDidLoad;
