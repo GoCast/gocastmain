@@ -119,18 +119,20 @@ void ChangePasswordScreen::setWaitForChangePasswordEntry()
 
 void ChangePasswordScreen::showErrorWithChangePasswordEntry()
 {
-    tAlert("Cannot change password; old password is incorrect.");
+    // "Cannot change password; old password is incorrect."
+    tAlert("古いパスワードが正しくありません。パスワードは変更されませんでした。");
 }
 
 void ChangePasswordScreen::showIncorrectFormatEntry()
 {
-    //"Password must be letters and numbers only."
-    tAlert("Password must be letters and numbers only, and new password must be different from old password.");
+    // "Password must be letters and numbers only, and new password must be different from old password."
+    tAlert("パスワードは半角英数字のみをご使用ください。新しいパスワードは古いパスワードと異なるものにしてください。");
 }
 
 void ChangePasswordScreen::showSuccessChangedPasswordEntry()
 {
-    tAlert("Changed password successfully.");
+    // "Changed password successfully."
+    tAlert("パスワードが変更されました");
 }
 
 #pragma mark Sending messages to other machines
