@@ -312,6 +312,8 @@
 
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/newmessage.wav',
 
+					'../../rsrc/Testbed/GoCastTalk/<@(OS)/nuancelogo.png',
+
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/bg-login.png',
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/bg-button.png',
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/bg-throbber.png',

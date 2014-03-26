@@ -131,6 +131,10 @@
                                 <outlet property="delegate" destination="-1" id="fe5-Fv-VXy"/>
                             </connections>
                         </textView>
+                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="nuancelogo.png" id="RYJ-cK-tB5">
+                            <rect key="frame" x="200" y="43" width="108" height="55"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        </imageView>
                     </subviews>
                     <color key="backgroundColor" red="0.93333333333333335" green="0.93333333333333335" blue="0.93333333333333335" alpha="1" colorSpace="calibratedRGB"/>
                 </view>
@@ -166,5 +170,6 @@
         <image name="button-play.png" width="64" height="64"/>
         <image name="button-record.png" width="96" height="128"/>
         <image name="button-stop.png" width="64" height="64"/>
+        <image name="nuancelogo.png" width="288" height="144"/>
     </resources>
 </document>

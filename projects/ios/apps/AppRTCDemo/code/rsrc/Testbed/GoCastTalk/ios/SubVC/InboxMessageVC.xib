@@ -109,6 +109,10 @@
                                 <outlet property="delegate" destination="-1" id="S7b-cg-whM"/>
                             </connections>
                         </tableView>
+                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="nuancelogo.png" id="kZL-Vx-qTn">
+                            <rect key="frame" x="200" y="161" width="108" height="55"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        </imageView>
                     </subviews>
                     <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina4"/>
                 </scrollView>
@@ -142,5 +146,6 @@
         <image name="bg-throbber.png" width="154" height="154"/>
         <image name="button-play-white.png" width="64" height="64"/>
         <image name="icon-receive.png" width="64" height="64"/>
+        <image name="nuancelogo.png" width="288" height="144"/>
     </resources>
 </document>
