@@ -508,7 +508,21 @@ void InboxScreen::sortTableByDateEntry()
     welcomeMessage["read"]  = std::string("yes");
     welcomeMessage["transcription"] = JSONObject();
     welcomeMessage["transcription"].mObject["ja"] =
-    std::string("ようこそ。");
+    std::string(
+                "GoCast Talk へようこそ。\n"
+                "\n"
+                "GoCast Talk はビジネス向けのメッセージアプリです。\n"
+                "\n"
+                "特定の相手やグループに対して、簡単にボイスメッセージを送ることができます。\n"
+                "ボイスメッセージは自動的に日本語テキストに変換、表示されるため、すぐに内容が把握できます。\n"
+                "受け取ったメッセージに対して、さらにボイスだけで返信することも簡単にできます。\n"
+                "\n"
+                "まずは、下の返信ボタンを押して、ボイスメッセージを録音し、送信してみてください。\n"
+                "\n"
+                "このアプリを使ってみてのご感想を是非お聞かせください。\n"
+                "メンバーのリストに入っている「フィードバック」宛にボイスメッセージをお送りください。\n"
+                "\n"
+                "それでは、どうぞご利用ください。\n");
 
     mInbox.push_back(welcomeMessage);
 
