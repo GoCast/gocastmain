@@ -214,7 +214,7 @@ void InboxScreen::startEntry()
 
     mRefreshTimer = new tTimer(30000);
     mRefreshTimer->attach(this);
-    mRefreshTimer->start();
+//    mRefreshTimer->start();
 }
 
 void InboxScreen::endEntry()
