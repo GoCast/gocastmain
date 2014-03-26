@@ -508,7 +508,7 @@ void InboxScreen::sortTableByDateEntry()
     welcomeMessage["read"]  = std::string("yes");
     welcomeMessage["transcription"] = JSONObject();
     welcomeMessage["transcription"].mObject["ja"] =
-    std::string("ようこそ。\nこのアプリはGoCastTalkです。\nこれは完璧なエンジニアリングの例です。ハハハ。\n真剣に、それは完璧だ。\nあなたはすでにこれを知っていた。");
+    std::string("ようこそ。");
 
     mInbox.push_back(welcomeMessage);
 

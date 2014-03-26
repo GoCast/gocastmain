@@ -184,12 +184,18 @@ void ContactsScreen::deleteLocalContactEntry()
 {
     std::string email = InboxScreen::mContacts[mDeleteSelected].mObject["email"].mString;
 
-    InboxScreen::mContacts.erase(InboxScreen::mContacts.begin() + (int)mDeleteSelected);
+    if (!InboxScreen::mContacts.empty())
+    {
+        InboxScreen::mContacts.erase(InboxScreen::mContacts.begin() + (int)mDeleteSelected);
+    }
 }
 
 void ContactsScreen::deleteLocalGroupEntry()
 {
-    InboxScreen::mGroups.erase(InboxScreen::mGroups.begin() + (int)mDeleteSelected);
+    if (!InboxScreen::mGroups.empty())
+    {
+        InboxScreen::mGroups.erase(InboxScreen::mGroups.begin() + (int)mDeleteSelected);
+    }
 }
 
 void ContactsScreen::sendSetContactsToServerEntry()
