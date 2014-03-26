@@ -216,7 +216,7 @@
         switch (indexPath.row)
         {
             case 0:
-                [cell setAsZero:self->mToExpanded withLabel:"Add recipients"];
+                [cell setAsZero:self->mToExpanded withLabel:"宛先を追加"]; //"Add recipients"
                 break;
                 
             default:

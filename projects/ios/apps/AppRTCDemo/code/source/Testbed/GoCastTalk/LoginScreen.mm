@@ -251,27 +251,32 @@ void LoginScreen::setWaitForRegisterEntry()
 
 void LoginScreen::showUserRegistraionSuccessfulEntry()
 {
-    tAlert("New account registered successfully");
+    // "New account registered successfully"
+    tAlert("新規登録しました");
 }
 
 void LoginScreen::showAResetEmailHasBeenSentEntry()
 {
-    tAlert("A reset email has been sent to the email provided.");
+    // "A reset email has been sent to the email provided."
+    tAlert("リセット番号を登録のEmailアドレスに送信しました");
 }
 
 void LoginScreen::showEnterResetCodeEntry()
 {
-    tPrompt("Please enter the 6-digit reset code:");
+    // "Please enter the 6-digit reset code:"
+    tPrompt("６ケタのリセット番号を入力してください");
 }
 
 void LoginScreen::showSendResetEmailEntry()
 {
-    tConfirm("Send a reset code to the provided email address?");
+    // "Send a reset code to the provided email address?"
+    tConfirm("リセットのための番号を登録のEmailアドレスに送信してよろしいですか？");
 }
 
 void LoginScreen::showEnterEmailFirstEntry()
 {
-    tAlert("Please enter an email address first.");
+    // "Please enter an email address first."
+    tAlert("Emailアドレスを先に入力してください");
 }
 
 void LoginScreen::showCouldNotLoginEntry()
