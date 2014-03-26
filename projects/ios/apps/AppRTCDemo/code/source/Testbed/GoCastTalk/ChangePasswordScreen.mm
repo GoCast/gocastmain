@@ -120,13 +120,13 @@ void ChangePasswordScreen::setWaitForChangePasswordEntry()
 void ChangePasswordScreen::showErrorWithChangePasswordEntry()
 {
     // "Cannot change password; old password is incorrect."
-    tAlert("古いパスワードが正しくありません。パスワードは変更されませんでした。");
+    tAlert("現在のパスワードが正しくありません。パスワードは変更されませんでした。");
 }
 
 void ChangePasswordScreen::showIncorrectFormatEntry()
 {
     // "Password must be letters and numbers only, and new password must be different from old password."
-    tAlert("パスワードは半角英数字のみをご使用ください。新しいパスワードは古いパスワードと異なるものにしてください。");
+    tAlert("パスワードは半角英数字のみをご使用ください。新しいパスワードは現在のパスワードと異なるものにしてください。");
 }
 
 void ChangePasswordScreen::showSuccessChangedPasswordEntry()

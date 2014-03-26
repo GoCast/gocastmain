@@ -541,7 +541,7 @@ void RecordMessageScreen::setWaitForTranscriptionEntry()
 void RecordMessageScreen::showComposeNewMessageEntry()
 {
     //"Compose new message? Old message will be discarded."
-    tConfirm("現在のメッセージを破棄し、新しいメッセージを作成しますか？");
+    tConfirm("作成中のメッセージを破棄し、新しくメッセージを作成してよろしいですか？");
 }
 
 void RecordMessageScreen::showConfirmDeleteEntry()
