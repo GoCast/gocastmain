@@ -62,6 +62,7 @@ protected:
 	void showRetryRegisterEntry();
 	void showSendResetEmailEntry();
 	void showURLMissingSlashEntry();
+	void showUserRegistraionSuccessfulEntry();
 	void storeTokenInformationEntry();
 	void validateURLEntry();
 	void wasLoginValidEntry();
@@ -110,6 +111,7 @@ public:
 		kShowRetryRegister,
 		kShowSendResetEmail,
 		kShowURLMissingSlash,
+		kShowUserRegistraionSuccessful,
 		kStoreTokenInformation,
 		kValidateURL,
 		kWasLoginValid,

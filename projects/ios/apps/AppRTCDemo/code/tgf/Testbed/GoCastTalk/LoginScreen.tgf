@@ -28,6 +28,7 @@
 28 Show "Enter reset code"
 29 Is email blank?
 30 Show "Enter email first"
+31 Show "user registraion successful"
 #
 1 20
 3 29 troublePressed

@@ -249,6 +249,10 @@ void LoginScreen::setWaitForRegisterEntry()
     [mPeer setBlockingViewVisible:true];
 }
 
+void LoginScreen::showUserRegistraionSuccessfulEntry()
+{
+    tAlert("New account registered successfully");
+}
 
 void LoginScreen::showAResetEmailHasBeenSentEntry()
 {
@@ -349,6 +353,7 @@ void LoginScreen::CallEntry()
 		case kShowRetryRegister: showRetryRegisterEntry(); break;
 		case kShowSendResetEmail: showSendResetEmailEntry(); break;
 		case kShowURLMissingSlash: showURLMissingSlashEntry(); break;
+		case kShowUserRegistraionSuccessful: showUserRegistraionSuccessfulEntry(); break;
 		case kStart: startEntry(); break;
 		case kStoreTokenInformation: storeTokenInformationEntry(); break;
 		case kValidateURL: validateURLEntry(); break;
@@ -486,6 +491,7 @@ void LoginScreen::update(const GCTEvent& msg)
         case kShowRetryRegister:
         case kShowSendResetEmail:
         case kShowURLMissingSlash:
+        case kShowUserRegistraionSuccessful:
             switch(msg.mEvent)
             {
                 case GCTEvent::kOKYesAlertPressed:  process(kYes); break;
