@@ -2,62 +2,72 @@
 
 function register($name, $password)
 {
-	if (!is_dir("database/"))
+	$name = trim($name);
+	
+	if ($name !== '')
 	{
-		mkdir("database/", 0777, true);
-	}
-
-	$json = false;
-
-	if (is_file("database/accounts.json"))
-	{
-		$json = atomic_get_contents("database/accounts.json");
-	}
-
-	if ($json != false)
-	{
-		$arr = json_decode($json, true);
-	}
-	else
-	{
-		$json = "";
-		$arr = array();
-	}
-
-	if(!isset($arr[$name]) || empty($arr[$name]))
-	{
-		$arr[$name] = $password;
-
-		ksort($arr);
-
-		if (atomic_put_contents("database/accounts.json", json_encode($arr)) != false)
+		if (!is_dir("database/"))
 		{
-			$token = add_new_token($name);
+			mkdir("database/", 0777, true);
+		}
 
-			if ($token != false)
+		$json = false;
+
+		if (is_file("database/accounts.json"))
+		{
+			$json = atomic_get_contents("database/accounts.json");
+		}
+
+		if ($json != false)
+		{
+			$arr = json_decode($json, true);
+		}
+		else
+		{
+			$json = "";
+			$arr = array();
+		}
+
+		if(!isset($arr[$name]) || empty($arr[$name]))
+		{
+			$arr[$name] = $password;
+
+			ksort($arr);
+
+			if (atomic_put_contents("database/accounts.json", json_encode($arr)) != false)
 			{
-				$user		= json_decode( '{ "authToken": "' . $token . '" }', true);
+				$token = add_new_token($name);
 
-				$result = array("status" => "success",
-								"message" => "User successfully registered",
-								"user" => $user);
+				if ($token != false)
+				{
+					$user		= json_decode( '{ "authToken": "' . $token . '" }', true);
+
+					$result = array("status" => "success",
+									"message" => "User successfully registered",
+									"user" => $user);
+				}
+				else
+				{
+					$result = array("status" => "fail",
+									"message" => "Token generation failed");
+				}
 			}
 			else
 			{
 				$result = array("status" => "fail",
-								"message" => "Token generation failed");
+								"message" => "Could not write user to database");
 			}
 		}
 		else
 		{
 			$result = array("status" => "fail",
-							"message" => "Could not write user to database");
+							"message" => "User already exists");
 		}
 	}
 	else
 	{
 		$result = array("status" => "fail",
-						"message" => "User already exists");
+						"message" => "User name invalid");
 	}
 
 	return $result;
