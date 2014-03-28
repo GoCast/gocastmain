@@ -192,9 +192,11 @@ void InboxMessageScreen::sendDownloadRequestToServerEntry()
 {
     char buf[512];
 
-    sprintf(buf, "%sdatabase/global/audio/%s",
+    sprintf(buf, "%s?action=getFile&name=%s&audio=%s&authToken=%s",
             kMemoAppServerURL,
-            mInitObject["audio"].mString.c_str());
+            InboxScreen::mEmailAddress.c_str(),
+            mInitObject["audio"].mString.c_str(),
+            InboxScreen::mToken.c_str());
 
     URLLoader::getInstance()->loadFile(this, buf, tFile(tFile::kTemporaryDirectory, mInitObject["audio"].mString.c_str()));
 }
