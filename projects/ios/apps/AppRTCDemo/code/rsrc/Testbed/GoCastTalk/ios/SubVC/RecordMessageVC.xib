@@ -38,7 +38,7 @@
                     </connections>
                 </tableView>
                 <view contentMode="scaleToFill" id="r9X-1a-Mew" userLabel="mBottomHalf">
-                    <rect key="frame" x="0.0" y="40" width="320" height="528"/>
+                    <rect key="frame" x="0.0" y="40" width="320" height="591"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <subviews>
                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="7wX-n2-oF0" userLabel="mPauseButton">
@@ -132,7 +132,7 @@
                             </connections>
                         </textView>
                         <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="nuancelogo.png" id="RYJ-cK-tB5">
-                            <rect key="frame" x="200" y="43" width="108" height="55"/>
+                            <rect key="frame" x="106" y="457" width="108" height="55"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         </imageView>
                     </subviews>
@@ -159,7 +159,7 @@
             <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina4"/>
             <userDefinedRuntimeAttributes>
                 <userDefinedRuntimeAttribute type="size" keyPath="contentSize">
-                    <size key="value" width="320" height="489"/>
+                    <size key="value" width="320" height="552"/>
                 </userDefinedRuntimeAttribute>
             </userDefinedRuntimeAttributes>
         </scrollView>
