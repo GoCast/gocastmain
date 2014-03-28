@@ -18,6 +18,8 @@ include 'setContacts.php';
 include 'getGroups.php';
 include 'setGroups.php';
 
+include 'getFile.php';
+
 include 'postAudio.php';
 include 'postMessage.php';
 include 'postTranscription.php';
@@ -84,6 +86,18 @@ if(hasParam("action"))
 				{
 					switch($_GET["action"])
 					{
+						case "getFile":
+							if (hasParam("audio"))
+							{
+								print(json_encode(getFile($_GET["audio"])));
+							}
+							else
+							{
+								http_response_code(404);
+								exit;
+							}
+							break;
+
 						case "changePassword":
 							if (hasParam("oldpassword"))
 							{
@@ -154,6 +168,12 @@ if(hasParam("action"))
 				}
 				else
 				{
+					if ($_GET["action"] === "getFile")
+					{
+						http_response_code(401);
+						exit;
+					}
+
 					print(json_encode(errorAuthToken()));
 				}
 			}

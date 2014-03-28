@@ -13,3 +13,6 @@
 
 /apps/AppRTCDemo/code/build/
 /apps/AppRTCDemo/code/project/ios
+/apps/AppRTCDemo/code/php/database/accounts.json
+/apps/AppRTCDemo/code/php/database/global
+/apps/AppRTCDemo/code/php/database/user
