@@ -9,17 +9,28 @@ function setGroups($name)
 			mkdir("database/user/$name", 0777, true);
 		}
 
-		if (copy($_FILES['filename']['tmp_name'], "database/user/$name/groups.json"))
-		{
-			chmod("database/user/$name/groups.json", 0777);
+		$json = atomic_get_contents($_FILES['filename']['tmp_name']);
+		json_decode($json, true);
 
-			$result = array("status" => "success",
-							"message" => "Updated profile successfully");
+		if (json_last_error() == JSON_ERROR_NONE)
+		{
+			if (copy($_FILES['filename']['tmp_name'], "database/user/$name/groups.json"))
+			{
+				chmod("database/user/$name/groups.json", 0777);
+
+				$result = array("status" => "success",
+								"message" => "Updated profile successfully");
+			}
+			else
+			{
+				$result = array("status" => "fail",
+								"message" => "Could not copy upload to $name's groups.json");
+			}
 		}
 		else
 		{
 			$result = array("status" => "fail",
-							"message" => "Could not copy upload to $name's groups.json");
+							"message" => "Invalid format");
 		}
 	}
 	else
