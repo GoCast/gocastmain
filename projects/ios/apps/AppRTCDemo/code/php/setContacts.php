@@ -4,9 +4,9 @@ function setContacts($name)
 {
 	if (userExists($name))
 	{
-		if (!is_dir("database/user/$name"))
+		if (!is_dir($GLOBALS['database']."/user/$name"))
 		{
-			mkdir("database/user/$name", 0777, true);
+			mkdir($GLOBALS['database']."/user/$name", 0777, true);
 		}
 
 		$json = atomic_get_contents($_FILES['filename']['tmp_name']);
@@ -14,9 +14,9 @@ function setContacts($name)
 
 		if (json_last_error() == JSON_ERROR_NONE)
 		{
-			if (copy($_FILES['filename']['tmp_name'], "database/user/$name/contacts.json"))
+			if (copy($_FILES['filename']['tmp_name'], $GLOBALS['database']."/user/$name/contacts.json"))
 			{
-				chmod("database/user/$name/contacts.json", 0777);
+				chmod($GLOBALS['database']."/user/$name/contacts.json", 0777);
 
 				$result = array("status" => "success",
 								"message" => "Updated profile successfully");

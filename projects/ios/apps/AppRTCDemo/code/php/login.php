@@ -2,9 +2,9 @@
 
 function login($name, $password)
 {
-	if (is_file("database/accounts.json"))
+	if (is_file($GLOBALS['database']."/accounts.json"))
 	{
-		$json = atomic_get_contents("database/accounts.json");
+		$json = atomic_get_contents($GLOBALS['database']."/accounts.json");
 		$arr = json_decode($json, true);
 
 		if(isset($arr[$name]) && !empty($arr[$name]))

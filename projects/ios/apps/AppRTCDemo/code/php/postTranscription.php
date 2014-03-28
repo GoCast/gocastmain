@@ -2,14 +2,14 @@
 
 function postTranscription($name, $audio)
 {
-	if (!is_dir("database/global/text"))
+	if (!is_dir($GLOBALS['database']."/global/text"))
 	{
-		mkdir("database/global/text", 0777, true);
+		mkdir($GLOBALS['database']."/global/text", 0777, true);
 	}
 
-	if (copy($_FILES['filename']['tmp_name'], "database/global/text/$audio".".json"))
+	if (copy($_FILES['filename']['tmp_name'], $GLOBALS['database']."/global/text/$audio".".json"))
 	{
-		chmod("database/global/text/$audio".".json", 0777);
+		chmod($GLOBALS['database']."/global/text/$audio".".json", 0777);
 
 		$result = array("status" => "success",
 						"message" => "Upload and move successful");

@@ -4,16 +4,16 @@ function getContacts($name)
 {
 	if (userExists($name))
 	{
-		if (!is_dir("database/user/$name"))
+		if (!is_dir($GLOBALS['database']."/user/$name"))
 		{
-			mkdir("database/user/$name", 0777, true);
+			mkdir($GLOBALS['database']."/user/$name", 0777, true);
 		}
 
 		$arr = array();
 		$arr["contacts"] = array();
-		if (is_file("database/user/$name/contacts.json"))
+		if (is_file($GLOBALS['database']."/user/$name/contacts.json"))
 		{
-			$json = atomic_get_contents("database/user/$name/contacts.json");
+			$json = atomic_get_contents($GLOBALS['database']."/user/$name/contacts.json");
 			$arr = json_decode($json, true);
 		}
 

@@ -4,18 +4,18 @@ function markRead($name, $audio)
 {
 	if (userExists($name))
 	{
-		if (!is_dir("database/user/$name"))
+		if (!is_dir($GLOBALS['database']."/user/$name"))
 		{
-			mkdir("database/user/$name", 0777, true);
+			mkdir($GLOBALS['database']."/user/$name", 0777, true);
 		}
 
-		if (is_dir("database/user/$name"))
+		if (is_dir($GLOBALS['database']."/user/$name"))
 		{
 			$json = false;
 
-			if (is_file("database/user/$name/messages.json"))
+			if (is_file($GLOBALS['database']."/user/$name/messages.json"))
 			{
-				$json = atomic_get_contents("database/user/$name/messages.json");
+				$json = atomic_get_contents($GLOBALS['database']."/user/$name/messages.json");
 
 				if ($json != false)
 				{
@@ -38,7 +38,7 @@ function markRead($name, $audio)
 					
 					if ($found)
 					{
-						if (atomic_put_contents("database/user/$name/messages.json", json_encode($arr2, true)))
+						if (atomic_put_contents($GLOBALS['database']."/user/$name/messages.json", json_encode($arr2, true)))
 						{
 							$result = array("status" => "success",
 											"message" => "Mark read successful");

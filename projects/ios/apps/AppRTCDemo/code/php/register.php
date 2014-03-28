@@ -6,16 +6,16 @@ function register($name, $password)
 	
 	if ($name !== '')
 	{
-		if (!is_dir("database/"))
+		if (!is_dir($GLOBALS['database']."/"))
 		{
-			mkdir("database/", 0777, true);
+			mkdir($GLOBALS['database']."/", 0777, true);
 		}
 
 		$json = false;
 
-		if (is_file("database/accounts.json"))
+		if (is_file($GLOBALS['database']."/accounts.json"))
 		{
-			$json = atomic_get_contents("database/accounts.json");
+			$json = atomic_get_contents($GLOBALS['database']."/accounts.json");
 		}
 
 		if ($json != false)
@@ -34,7 +34,7 @@ function register($name, $password)
 
 			ksort($arr);
 
-			if (atomic_put_contents("database/accounts.json", json_encode($arr)) != false)
+			if (atomic_put_contents($GLOBALS['database']."/accounts.json", json_encode($arr)) != false)
 			{
 				$token = add_new_token($name);
 

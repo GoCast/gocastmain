@@ -6,14 +6,14 @@ function write_token_user($name, $token)
 	$json	= false;
 	$arr	= array();
 
-	if (!is_dir("database/user/$name"))
+	if (!is_dir($GLOBALS['database']."/user/$name"))
 	{
-		mkdir("database/user/$name", 0777, true);
+		mkdir($GLOBALS['database']."/user/$name", 0777, true);
 	}
 
-	if (is_file("database/user/$name/tokens.json"))
+	if (is_file($GLOBALS['database']."/user/$name/tokens.json"))
 	{
-		$json = atomic_get_contents("database/user/$name/tokens.json");
+		$json = atomic_get_contents($GLOBALS['database']."/user/$name/tokens.json");
 	}
 
 	if ($json != false)
@@ -23,7 +23,7 @@ function write_token_user($name, $token)
 
 	array_push($arr, json_decode('{"token": "'.$token.'", "date": "1999010101010101"}', true));
 
-	if (atomic_put_contents("database/user/$name/tokens.json", json_encode($arr)) != false)
+	if (atomic_put_contents($GLOBALS['database']."/user/$name/tokens.json", json_encode($arr)) != false)
 	{
 		$result = true;
 	}
@@ -37,14 +37,14 @@ function write_token_global($name, $token)
 	$json	= false;
 	$arr	= array();
 
-	if (!is_dir("database/global"))
+	if (!is_dir($GLOBALS['database']."/global"))
 	{
-		mkdir("database/global", 0777, true);
+		mkdir($GLOBALS['database']."/global", 0777, true);
 	}
 
-	if (is_file("database/global/tokens.json"))
+	if (is_file($GLOBALS['database']."/global/tokens.json"))
 	{
-		$json = atomic_get_contents("database/global/tokens.json");
+		$json = atomic_get_contents($GLOBALS['database']."/global/tokens.json");
 	}
 
 	if ($json != false)
@@ -54,7 +54,7 @@ function write_token_global($name, $token)
 
 	array_push($arr, json_decode('{"name":"'.$name.'", "token": "'.$token.'", "date": "1999010101010101"}', true));
 
-	if (atomic_put_contents("database/global/tokens.json", json_encode($arr)) != false)
+	if (atomic_put_contents($GLOBALS['database']."/global/tokens.json", json_encode($arr)) != false)
 	{
 		$result = true;
 	}
@@ -70,14 +70,14 @@ function remove_token_user($name, $token)
 	$arr2	= array();
 	$found	= false;
 
-	if (!is_dir("database/user/$name"))
+	if (!is_dir($GLOBALS['database']."/user/$name"))
 	{
-		mkdir("database/user/$name", 0777, true);
+		mkdir($GLOBALS['database']."/user/$name", 0777, true);
 	}
 
-	if (is_file("database/user/$name/tokens.json"))
+	if (is_file($GLOBALS['database']."/user/$name/tokens.json"))
 	{
-		$json = atomic_get_contents("database/user/$name/tokens.json");
+		$json = atomic_get_contents($GLOBALS['database']."/user/$name/tokens.json");
 	}
 
 	if ($json != false)
@@ -99,7 +99,7 @@ function remove_token_user($name, $token)
 
 	if ($found)
 	{
-		if (atomic_put_contents("database/user/$name/tokens.json", json_encode($arr2)) != false)
+		if (atomic_put_contents($GLOBALS['database']."/user/$name/tokens.json", json_encode($arr2)) != false)
 		{
 			$result = true;
 		}
@@ -114,14 +114,14 @@ function verify_token_user($name, $token)
 	$json	= false;
 	$arr	= array();
 
-	if (!is_dir("database/user/$name"))
+	if (!is_dir($GLOBALS['database']."/user/$name"))
 	{
-		mkdir("database/user/$name", 0777, true);
+		mkdir($GLOBALS['database']."/user/$name", 0777, true);
 	}
 
-	if (is_file("database/user/$name/tokens.json"))
+	if (is_file($GLOBALS['database']."/user/$name/tokens.json"))
 	{
-		$json = atomic_get_contents("database/user/$name/tokens.json");
+		$json = atomic_get_contents($GLOBALS['database']."/user/$name/tokens.json");
 	}
 
 	if ($json != false)

@@ -1,6 +1,8 @@
 <?php
 // error_reporting(E_ALL);
 
+$GLOBALS['database'] = 'database';
+
 include 'utils.php';
 include 'token.php';
 

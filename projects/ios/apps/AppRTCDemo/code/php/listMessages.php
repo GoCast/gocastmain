@@ -4,18 +4,18 @@ function listMessages($name)
 {
 	if (userExists($name))
 	{
-		if (!is_dir("database/user/$name"))
+		if (!is_dir($GLOBALS['database']."/user/$name"))
 		{
-			mkdir("database/user/$name", 0777, true);
+			mkdir($GLOBALS['database']."/user/$name", 0777, true);
 		}
 
-		if (is_dir("database/user/$name"))
+		if (is_dir($GLOBALS['database']."/user/$name"))
 		{
 			$json = false;
 
-			if (is_file("database/user/$name/messages.json"))
+			if (is_file($GLOBALS['database']."/user/$name/messages.json"))
 			{
-				$json = atomic_get_contents("database/user/$name/messages.json");
+				$json = atomic_get_contents($GLOBALS['database']."/user/$name/messages.json");
 			}
 
 			if ($json != false)
@@ -31,7 +31,7 @@ function listMessages($name)
 			$arr2 = array();
 			foreach($arr as $item)
 			{
-				$trans_file = "database/global/text/".$item["audio"].".json";
+				$trans_file = $GLOBALS['database']."/global/text/".$item["audio"].".json";
 
 				if (is_file($trans_file))
 				{

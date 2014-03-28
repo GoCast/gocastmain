@@ -4,17 +4,17 @@ function pmAppend($user, $data)
 {
 	$result = false;
 
-	if (!is_dir("database/user/$user"))
+	if (!is_dir($GLOBALS['database']."/user/$user"))
 	{
-		mkdir("database/user/$user", 0777, true);
+		mkdir($GLOBALS['database']."/user/$user", 0777, true);
 	}
 
 	$json = false;
 	$arr  = array();
 
-	if (is_file("database/user/$user/messages.json"))
+	if (is_file($GLOBALS['database']."/user/$user/messages.json"))
 	{
-		$json = atomic_get_contents("database/user/$user/messages.json");
+		$json = atomic_get_contents($GLOBALS['database']."/user/$user/messages.json");
 	}
 
 	if ($json != false)
@@ -24,7 +24,7 @@ function pmAppend($user, $data)
 
 	array_push($arr, json_decode($data, true));
 
-	if (atomic_put_contents("database/user/$user/messages.json", json_encode($arr, true)))
+	if (atomic_put_contents($GLOBALS['database']."/user/$user/messages.json", json_encode($arr, true)))
 	{
 		$result = true;
 	}
@@ -36,9 +36,9 @@ function postMessage($name)
 {
 	$hadErrors = false;
 
-	if (!is_dir("database/global/text"))
+	if (!is_dir($GLOBALS['database']."/global/text"))
 	{
-		mkdir("database/global/text", 0777, true);
+		mkdir($GLOBALS['database']."/global/text", 0777, true);
 	}
 
 	$json = false;
