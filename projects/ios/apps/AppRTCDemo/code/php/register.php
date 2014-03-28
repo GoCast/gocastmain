@@ -3,8 +3,9 @@
 function register($name, $password)
 {
 	$name = trim($name);
-	
-	if ($name !== '')
+	$password = trim($password);
+
+	if ($name !== '' && $password !== '')
 	{
 		if (!is_dir($GLOBALS['database']."/"))
 		{
@@ -67,7 +68,7 @@ function register($name, $password)
 	else
 	{
 		$result = array("status" => "fail",
-						"message" => "User name invalid");
+						"message" => "User name or password invalid");
 	}
 
 	return $result;
