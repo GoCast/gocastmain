@@ -117,7 +117,7 @@
                     <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina4"/>
                 </scrollView>
                 <view hidden="YES" alpha="0.5" contentMode="scaleToFill" id="F6P-ko-7cm" userLabel="mBlockingView">
-                    <rect key="frame" x="0.0" y="0.0" width="320" height="1216"/>
+                    <rect key="frame" x="0.0" y="0.0" width="320" height="696"/>
                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                     <subviews>
                         <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="bg-throbber.png" id="Gm2-Nz-gEs">
