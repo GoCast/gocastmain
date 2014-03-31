@@ -189,35 +189,49 @@ if(hasParam("action"))
 	}
 	else
 	{
-		if ($_SERVER['REQUEST_METHOD'] === "GET" && hasParam("name"))
+		if ($_SERVER['REQUEST_METHOD'] === "GET")
 		{
-			switch($_GET["action"])
+			if (hasParam("name"))
 			{
-				case "register":
-					if (hasParam("password"))
-					{
-						print(json_encode(register($_GET["name"], $_GET["password"])));
-					}
-					else
-					{
-						print(json_encode(errorMissingParameter("password")));
-					}
-					break;
+				switch($_GET["action"])
+				{
+					case "register":
+						if (hasParam("password"))
+						{
+							print(json_encode(register($_GET["name"], $_GET["password"])));
+						}
+						else
+						{
+							print(json_encode(errorMissingParameter("password")));
+						}
+						break;
 
-				case "login":
-					if (hasParam("password"))
-					{
-						print(json_encode(login($_GET["name"], $_GET["password"])));
-					}
-					else
-					{
-						print(json_encode(errorMissingParameter("password")));
-					}
-					break;
+					case "login":
+						if (hasParam("password"))
+						{
+							print(json_encode(login($_GET["name"], $_GET["password"])));
+						}
+						else
+						{
+							print(json_encode(errorMissingParameter("password")));
+						}
+						break;
 
-				default:
-					print(json_encode(array("status" => "fail", "message" => "Unknown command")));
-					break;
+					default:
+						print(json_encode(array("status" => "fail", "message" => "Unknown command")));
+						break;
+				}
+			}
+			else
+			{
+				if ($_GET["action"] === "version")
+				{
+					print('{ "version": "1" }');
+				}
+				else
+				{
+					print(json_encode(errorMissingParameter("name")));
+				}
 			}
 		}
 		else
