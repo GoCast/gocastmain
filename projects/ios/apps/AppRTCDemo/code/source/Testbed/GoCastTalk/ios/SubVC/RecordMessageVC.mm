@@ -438,6 +438,7 @@
     [self.mTable reloadData];
 
     [self.mSlider setEnabled:YES];
+    [self setSliderPercentage:0.0f];
 }
 
 -(void) setPlayingUI

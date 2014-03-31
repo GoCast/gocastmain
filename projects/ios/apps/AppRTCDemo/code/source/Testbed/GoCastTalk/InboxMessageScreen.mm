@@ -82,6 +82,7 @@ void InboxMessageScreen::invalidStateEntry()
 #pragma mark Idling
 void InboxMessageScreen::idleEntry()
 {
+    [mPeer setSliderPercentage:0.0f];
 }
 
 void InboxMessageScreen::pausedIdleEntry()
