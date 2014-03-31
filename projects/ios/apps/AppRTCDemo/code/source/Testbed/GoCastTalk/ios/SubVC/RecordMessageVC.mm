@@ -404,7 +404,7 @@
 {
     self.mStatusLabel.text = @"メッセージを録音";
     self.mStatusLabel.textColor = [UIColor blackColor];
-    [self setTimeLabel:"メッセージを録音"];
+    [self setTimeLabel:""];
 
     [self.mPauseButton  setHidden:YES];
     [self.mRecordButton setHidden:NO];
