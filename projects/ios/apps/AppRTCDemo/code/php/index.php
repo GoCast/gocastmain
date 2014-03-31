@@ -26,6 +26,8 @@ include 'postAudio.php';
 include 'postMessage.php';
 include 'postTranscription.php';
 
+appendLog();
+
 if(hasParam("action"))
 {
 	if (hasParam("authToken"))

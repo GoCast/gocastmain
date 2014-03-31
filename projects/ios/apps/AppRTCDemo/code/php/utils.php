@@ -20,6 +20,26 @@ function atomic_put_contents($filename, $data)
 	return FALSE;
 }
 
+function atomic_append_contents($filename, $data)
+{
+    $fp = fopen($filename, "a+");
+
+	if ($fp != FALSE)
+	{
+		$count = 0;
+		if (flock($fp, LOCK_EX))
+		{
+			$count = fwrite($fp, $data);
+			flock($fp, LOCK_UN);
+		}
+		fclose($fp);
+
+		return $count;
+	}
+	
+	return FALSE;
+}
+
 function atomic_get_contents($filename)
 {
     $fp = fopen($filename, "r+");
@@ -81,6 +101,12 @@ function errorAuthToken()
 {
 	return array(	"status" => "expired",
 					"message" => "Invalid or expired token");
+}
+
+function appendLog()
+{
+	$data = "TIME: ".date("Y-m-d_H:i:s",$_SERVER['REQUEST_TIME'])." IP: ".$_SERVER['REMOTE_ADDR']." URL: ".$_SERVER['REQUEST_URI']."\n";
+	atomic_append_contents($GLOBALS['database']."/global/log.txt", $data);
 }
 
 ?>
