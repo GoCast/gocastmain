@@ -88,7 +88,8 @@
         heading = InboxScreen::nameFromEmail(InboxScreen::mContacts[(size_t)indexPath.row].mObject["email"].mString);
 
         cell.mHeading.text = [NSString stringWithUTF8String:heading.c_str()];
-        cell.mSub.text = [NSString stringWithUTF8String:""];
+        cell.mSub.text = [NSString stringWithUTF8String:InboxScreen::mContacts[(size_t)indexPath.row].mObject["email"].mString.c_str()];
+
         cell.mRightArrow.hidden = YES;
         
         return cell;
