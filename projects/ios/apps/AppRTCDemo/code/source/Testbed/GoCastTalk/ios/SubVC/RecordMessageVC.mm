@@ -96,7 +96,7 @@
     [self setTranscriptionEnabled:false];
 
     [self switchToInboxTab];
-    //    self.mToLabel.text = [NSString stringWithUTF8String:("to: " + mPeer->getTo()).c_str()];
+    //    self.mToLabel.text = [NSString stringWithUTF8String:("宛先: " + mPeer->getTo()).c_str()];
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -216,7 +216,7 @@
         switch (indexPath.row)
         {
             case 0:
-                [cell setAsZero:self->mToExpanded withLabel:"宛先を追加"]; //"Add recipients"
+                [cell setAsZero:self->mToExpanded withLabel:"クリックして宛先を表示"]; //"Add recipients"
                 break;
                 
             default:
