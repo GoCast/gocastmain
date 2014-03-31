@@ -467,7 +467,7 @@ void InboxScreen::loadLoginNameAndTokenEntry()
     }
     else
     {
-        LoginScreen::mBaseURL = "http://chat.gocast.it/memoappserver/";
+        LoginScreen::mBaseURL = "https://chat.gocast.it/memoappserver/";
     }
 
     result &= !mEmailAddress.empty();

@@ -162,7 +162,7 @@ void LoginScreen::loadLoginNameEntry()
     }
     else
     {
-        mBaseURL = "http://chat.gocast.it/memoappserver/";
+        mBaseURL = "https://chat.gocast.it/memoappserver/";
     }
 
     SetImmediateEvent(result ? kSuccess : kFail);
