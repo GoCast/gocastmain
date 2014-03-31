@@ -36,10 +36,9 @@
 
 ご注意
 ・1回あたりのボイスメッセージの録音時間は最長約10分です。また、自動テキスト化の対象は、約1分の録音までとなっております。それ以上の録音内容については、自動テキスト化されませんのでご承知下さい。
-・本無料サービスでご利用頂ける自動テキスト化の回数は、1日あたり20件までとなっております。
+・本無料サービスでご利用頂ける自動テキスト化の回数は、1日あたり20回までとなっております。20回を超えても録音は可能です。
 
-Nuance Communications, Inc が提供する音声認識。
-</mutableString>
+Nuance Communications, Inc が提供する音声認識技術を使用しています。</mutableString>
                     <fontDescription key="fontDescription" type="system" pointSize="14"/>
                     <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                 </textView>
