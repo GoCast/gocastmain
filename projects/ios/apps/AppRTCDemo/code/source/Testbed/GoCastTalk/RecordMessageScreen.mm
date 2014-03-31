@@ -188,6 +188,11 @@ void RecordMessageScreen::peerPopAllInboxViewsEntry()
     [mPeer popAllInboxViews];
 }
 
+void RecordMessageScreen::peerStartEditingTranscriptionEntry()
+{
+    [mPeer startEditingTranscription];
+}
+
 void RecordMessageScreen::peerSwitchToInboxTabEntry()
 {
     [mPeer switchToInboxTab];
@@ -607,6 +612,7 @@ void RecordMessageScreen::CallEntry()
 		case kPauseAudio: pauseAudioEntry(); break;
 		case kPausedIdle: pausedIdleEntry(); break;
 		case kPeerPopAllInboxViews: peerPopAllInboxViewsEntry(); break;
+		case kPeerStartEditingTranscription: peerStartEditingTranscriptionEntry(); break;
 		case kPeerSwitchToInboxTab: peerSwitchToInboxTabEntry(); break;
 		case kPeerSwitchToNewMemoTab: peerSwitchToNewMemoTabEntry(); break;
 		case kPlayAudio: playAudioEntry(); break;
@@ -677,6 +683,7 @@ int  RecordMessageScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kPausedIdle) && (evt == kPlayPressed)) return kResumeAudio; else
 	if ((mState == kPausedIdle) && (evt == kSendPressed)) return kStopPlayingBeforeSend; else
 	if ((mState == kPeerPopAllInboxViews) && (evt == kNext)) return kPeerSwitchToInboxTab; else
+	if ((mState == kPeerStartEditingTranscription) && (evt == kNext)) return kLetDidRecordBeTrue; else
 	if ((mState == kPeerSwitchToInboxTab) && (evt == kNext)) return kClearDataAndReloadTable; else
 	if ((mState == kPeerSwitchToNewMemoTab) && (evt == kNext)) return kDoWeHaveRecipientsOrARecording; else
 	if ((mState == kPlayAudio) && (evt == kNext)) return kPlayingIdle; else
@@ -712,7 +719,7 @@ int  RecordMessageScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kStopPlayingBeforeSend) && (evt == kNext)) return kDoWeHaveContactsToSendTo; else
 	if ((mState == kStopRecordingAudio) && (evt == kNext)) return kDoWeNeedToWaitForTranscription; else
 	if ((mState == kWaitForTranscriptionIdle) && (evt == kNewMessage)) return kPeerSwitchToNewMemoTab; else
-	if ((mState == kWaitForTranscriptionIdle) && (evt == kTranscriptionReady)) return kLetDidRecordBeTrue; else
+	if ((mState == kWaitForTranscriptionIdle) && (evt == kTranscriptionReady)) return kPeerStartEditingTranscription; else
 	if ((mState == kWaitToPlayIdle) && (evt == kCancelPressed)) return kIsThisAForcedCancel; else
 	if ((mState == kWaitToPlayIdle) && (evt == kNewMessage)) return kPeerSwitchToNewMemoTab; else
 	if ((mState == kWaitToPlayIdle) && (evt == kPlayPressed)) return kPlayAudio; else
@@ -746,6 +753,7 @@ bool RecordMessageScreen::HasEdgeNamedNext() const
 		case kLetDidRecordBeTrue:
 		case kPauseAudio:
 		case kPeerPopAllInboxViews:
+		case kPeerStartEditingTranscription:
 		case kPeerSwitchToInboxTab:
 		case kPeerSwitchToNewMemoTab:
 		case kPlayAudio:

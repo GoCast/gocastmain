@@ -378,6 +378,13 @@
     [((InboxVC*)gAppDelegateInstance.mInboxVC.topViewController).mTable scrollRectToVisible:CGRectMake(0, 0, 1, 1) animated:YES];
 }
 
+-(void)startEditingTranscription
+{
+    CGRect r = self.mTranscription.frame;
+    [self.mScrollView scrollRectToVisible:r animated:YES];
+    [self.mTranscription becomeFirstResponder];
+}
+
 -(void)switchToInboxTab
 {
     [gAppDelegateInstance.tabBarController setSelectedIndex:0];

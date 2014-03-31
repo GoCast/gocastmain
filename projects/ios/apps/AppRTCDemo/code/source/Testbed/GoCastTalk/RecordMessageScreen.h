@@ -70,6 +70,7 @@ protected:
 	void pauseAudioEntry();
 	void pausedIdleEntry();
 	void peerPopAllInboxViewsEntry();
+	void peerStartEditingTranscriptionEntry();
 	void peerSwitchToInboxTabEntry();
 	void peerSwitchToNewMemoTabEntry();
 	void playAudioEntry();
@@ -144,6 +145,7 @@ public:
 		kPauseAudio,
 		kPausedIdle,
 		kPeerPopAllInboxViews,
+		kPeerStartEditingTranscription,
 		kPeerSwitchToInboxTab,
 		kPeerSwitchToNewMemoTab,
 		kPlayAudio,

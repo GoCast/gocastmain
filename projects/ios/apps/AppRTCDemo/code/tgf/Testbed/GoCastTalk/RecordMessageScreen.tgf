@@ -45,6 +45,7 @@
 45 Send ForceLogout to VC
 46 Is this a forced cancel?
 47 Show "no audio to send"
+48 Peer: start editing transcription
 #
 3 4 no
 4 5 recordPressed
@@ -92,7 +93,7 @@
 31 19 no
 32 24
 34 33
-33 25 transcriptionReady
+33 48 transcriptionReady
 35 34 yes
 35 25 no
 36 17 yes
@@ -123,3 +124,4 @@
 4 46 cancelPressed
 4 47 sendPressed
 47 4 yes
+48 25

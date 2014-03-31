@@ -72,6 +72,8 @@ class RecordMessageScreen;
 -(void)popSelf;
 -(void)popAllInboxViews;
 
+-(void)startEditingTranscription;
+
 -(void)switchToInboxTab;
 -(void)switchToNewMemoTab;
 -(void)pushMessageSent;
