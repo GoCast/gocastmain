@@ -411,8 +411,8 @@
     [self.mPlayButton   setHidden:YES];
     [self.mStopButton   setHidden:YES];
 
-    self.mTable.allowsSelection = NO;
-    [self.navigationItem.rightBarButtonItem setEnabled:NO];
+    self.mTable.allowsSelection = YES;
+    [self.navigationItem.rightBarButtonItem setEnabled:YES];
 
     [self.mTable reloadData];
 

@@ -86,6 +86,7 @@ protected:
 	void showComposeNewMessageEntry();
 	void showConfirmDeleteEntry();
 	void showConfirmSendEntry();
+	void showNoAudioToSendEntry();
 	void showNoContactsToSendToEntry();
 	void showPostAudioFailedEntry();
 	void startRecordingAudioEntry();
@@ -159,6 +160,7 @@ public:
 		kShowComposeNewMessage,
 		kShowConfirmDelete,
 		kShowConfirmSend,
+		kShowNoAudioToSend,
 		kShowNoContactsToSendTo,
 		kShowPostAudioFailed,
 		kStartRecordingAudio,

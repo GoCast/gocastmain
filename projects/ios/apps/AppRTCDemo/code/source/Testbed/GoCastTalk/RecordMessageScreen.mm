@@ -556,6 +556,12 @@ void RecordMessageScreen::showConfirmSendEntry()
     tConfirm("このメッセージを送信してよろしいですか？");
 }
 
+void RecordMessageScreen::showNoAudioToSendEntry()
+{
+    //"Please add audio first."
+    tAlert("先に音声データを指定してください");
+}
+
 void RecordMessageScreen::showNoContactsToSendToEntry()
 {
     //"Please add some recipients first."
@@ -617,6 +623,7 @@ void RecordMessageScreen::CallEntry()
 		case kShowComposeNewMessage: showComposeNewMessageEntry(); break;
 		case kShowConfirmDelete: showConfirmDeleteEntry(); break;
 		case kShowConfirmSend: showConfirmSendEntry(); break;
+		case kShowNoAudioToSend: showNoAudioToSendEntry(); break;
 		case kShowNoContactsToSendTo: showNoContactsToSendToEntry(); break;
 		case kShowPostAudioFailed: showPostAudioFailedEntry(); break;
 		case kStart: startEntry(); break;
@@ -695,6 +702,7 @@ int  RecordMessageScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kShowConfirmDelete) && (evt == kYes)) return kClearDataAndReloadTable; else
 	if ((mState == kShowConfirmSend) && (evt == kNo)) return kWaitToPlayIdle; else
 	if ((mState == kShowConfirmSend) && (evt == kYes)) return kSetWaitForPostAudio; else
+	if ((mState == kShowNoAudioToSend) && (evt == kYes)) return kWaitToRecordIdle; else
 	if ((mState == kShowNoContactsToSendTo) && (evt == kYes)) return kWaitToPlayIdle; else
 	if ((mState == kShowPostAudioFailed) && (evt == kYes)) return kSendReloadInboxToVC; else
 	if ((mState == kStart) && (evt == kNext)) return kFixRecipientList; else
@@ -709,8 +717,10 @@ int  RecordMessageScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kWaitToPlayIdle) && (evt == kNewMessage)) return kPeerSwitchToNewMemoTab; else
 	if ((mState == kWaitToPlayIdle) && (evt == kPlayPressed)) return kPlayAudio; else
 	if ((mState == kWaitToPlayIdle) && (evt == kSendPressed)) return kDoWeHaveContactsToSendTo; else
+	if ((mState == kWaitToRecordIdle) && (evt == kCancelPressed)) return kIsThisAForcedCancel; else
 	if ((mState == kWaitToRecordIdle) && (evt == kNewMessage)) return kPeerSwitchToNewMemoTab; else
 	if ((mState == kWaitToRecordIdle) && (evt == kRecordPressed)) return kStartRecordingAudio; else
+	if ((mState == kWaitToRecordIdle) && (evt == kSendPressed)) return kShowNoAudioToSend; else
 	if ((mState == kWasPostAudioSuccessful) && (evt == kExpired)) return kSendForceLogoutToVC; else
 	if ((mState == kWasPostAudioSuccessful) && (evt == kNo)) return kShowPostAudioFailed; else
 	if ((mState == kWasPostAudioSuccessful) && (evt == kYes)) return kSendPostTranscriptToServer; else
@@ -903,6 +913,7 @@ void RecordMessageScreen::update(const GCTEvent& msg)
                 case kShowComposeNewMessage:
                 case kShowConfirmDelete:
                 case kShowConfirmSend:
+                case kShowNoAudioToSend:
                 case kShowNoContactsToSendTo:
                 case kShowPostAudioFailed:
                     switch(msg.mEvent)

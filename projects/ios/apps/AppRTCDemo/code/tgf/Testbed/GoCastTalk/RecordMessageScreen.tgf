@@ -44,6 +44,7 @@
 44 Show "confirm delete?"
 45 Send ForceLogout to VC
 46 Is this a forced cancel?
+47 Show "no audio to send"
 #
 3 4 no
 4 5 recordPressed
@@ -119,3 +120,6 @@
 45 32
 46 44 no
 46 32 yes
+4 46 cancelPressed
+4 47 sendPressed
+47 4 yes
