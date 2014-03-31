@@ -119,7 +119,7 @@
     else
     {
         //"Transcription not available."
-        self.mTranscription.text = [NSString stringWithUTF8String:"(テキストはありません)"];
+        self.mTranscription.text = [NSString stringWithUTF8String:"(テキストはまだありません)\n\n無料サービス期間中は、自動テキスト化は１日あたり２０回までご利用いただけます。"];
     }
 
     [self.mSlider setValue:0];

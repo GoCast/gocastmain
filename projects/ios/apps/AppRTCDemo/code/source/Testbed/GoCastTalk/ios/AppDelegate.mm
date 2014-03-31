@@ -358,7 +358,7 @@ const unsigned char SpeechKitApplicationKey[] =
     //    }
 
     //"Transcription not available."
-    GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kTranscriptFinished, "(テキストはありません)"));
+    GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kTranscriptFinished, "(テキストはまだありません)\n\n無料サービス期間中は、自動テキスト化は１日あたり２０回までご利用いただけます。"));
 
 	[voiceSearch release];
 	voiceSearch = nil;

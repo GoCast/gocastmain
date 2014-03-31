@@ -56,7 +56,7 @@
     else
     {
         //"Transcription not available"
-        [self setTranscription:"(テキストはありません)"];
+        [self setTranscription:"(テキストはまだありません)\n\n無料サービス期間中は、自動テキスト化は１日あたり２０回までご利用いただけます。"];
     }
 }
 

@@ -157,7 +157,7 @@ std::string InboxScreen::getTranscription(const size_t& i)
     }
 
     //"Transcription not available";
-    return "(テキストはありません)";
+    return "(テキストはまだありません)\n\n無料サービス期間中は、自動テキスト化は１日あたり２０回までご利用いただけます。";
 }
 
 bool        InboxScreen::getIsReceive(const size_t& i)

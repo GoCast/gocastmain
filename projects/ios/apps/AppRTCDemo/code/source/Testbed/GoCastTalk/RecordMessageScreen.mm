@@ -106,7 +106,7 @@ void RecordMessageScreen::waitToRecordIdleEntry()
 {
     mGotTranscriptionEvent = false;
     [mPeer setWaitToRecordUI];
-    [mPeer setTranscription:"(テキストはまだありません)"]; //"Transcription pending"
+    [mPeer setTranscription:"(テキストはまだありません)\n\n無料サービス期間中は、自動テキスト化は１日あたり２０回までご利用いただけます。"]; //"Transcription pending"
     [mPeer setTranscriptionEnabled:false];
 }
 
