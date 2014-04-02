@@ -165,12 +165,12 @@ extern std::string kBaseURL;
 {
     if ([MFMailComposeViewController canSendMail])
     {
-        std::string body = "Please reset my password. My email is ";
+        std::string body;// = "Please reset my password. My email is ";
         body += (self.mEmail.text) ? [self.mEmail.text UTF8String] : "";
-
+        body += " のパスワード再設定をお願いします。";
         MFMailComposeViewController *mailer = [[MFMailComposeViewController alloc] init];
         mailer.mailComposeDelegate = self;
-        [mailer setSubject:[NSString stringWithUTF8String:"Password reset request"]];
+        [mailer setSubject:[NSString stringWithUTF8String:"パスワード再設定依頼"]]; // "Password reset request"
         NSArray *toRecipients = [NSArray arrayWithObjects:[NSString stringWithUTF8String:newTo.c_str()], nil];
         [mailer setToRecipients:toRecipients];
         NSString *emailBody = [NSString stringWithUTF8String:body.c_str()];

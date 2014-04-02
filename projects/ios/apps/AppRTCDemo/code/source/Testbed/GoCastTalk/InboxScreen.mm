@@ -685,7 +685,8 @@ void InboxScreen::showErrorContactVersionEntry()
 
 void InboxScreen::showMustUpgradeEntry()
 {
-    tAlert("Please upgrade to the latest version of GoCast Talk in the App Store.");
+    // "Please upgrade to the latest version of GoCast Talk in the App Store."
+    tAlert("最新バージョンのGoCast Talkにアップデートしてください。");
 }
 
 #pragma mark Sending messages to other machines
