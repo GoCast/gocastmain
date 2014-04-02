@@ -226,7 +226,7 @@ if(hasParam("action"))
 			{
 				if ($_GET["action"] === "version")
 				{
-					print('{ "version": "1" }');
+					print('{ "status": "success", "version": "1" }');
 				}
 				else
 				{
