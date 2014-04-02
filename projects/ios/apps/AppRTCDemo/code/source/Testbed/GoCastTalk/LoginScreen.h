@@ -50,18 +50,12 @@ protected:
 	void sendLoginSucceededToVCEntry();
 	void sendLoginToServerEntry();
 	void sendRegisterToServerEntry();
-	void setWaitForLoginEntry();
-	void setWaitForRegisterEntry();
-	void showAResetEmailHasBeenSentEntry();
 	void showCouldNotLoginEntry();
 	void showCouldNotRegisterEntry();
 	void showEnterEmailFirstEntry();
-	void showEnterResetCodeEntry();
 	void showIncorrectFormatEntry();
-	void showNotYetImplementedEntry();
 	void showRetryLoginEntry();
 	void showRetryRegisterEntry();
-	void showSendResetEmailEntry();
 	void showURLMissingSlashEntry();
 	void showUserRegistraionSuccessfulEntry();
 	void storeTokenInformationEntry();
@@ -80,7 +74,6 @@ public:
 		kSignUpPressed,
 		kSuccess,
 		kTroublePressed,
-		kUnsupported,
 		kYes,
 	};
 
@@ -101,18 +94,12 @@ public:
 		kSendLoginSucceededToVC,
 		kSendLoginToServer,
 		kSendRegisterToServer,
-		kSetWaitForLogin,
-		kSetWaitForRegister,
-		kShowAResetEmailHasBeenSent,
 		kShowCouldNotLogin,
 		kShowCouldNotRegister,
 		kShowEnterEmailFirst,
-		kShowEnterResetCode,
 		kShowIncorrectFormat,
-		kShowNotYetImplemented,
 		kShowRetryLogin,
 		kShowRetryRegister,
-		kShowSendResetEmail,
 		kShowURLMissingSlash,
 		kShowUserRegistraionSuccessful,
 		kStoreTokenInformation,
