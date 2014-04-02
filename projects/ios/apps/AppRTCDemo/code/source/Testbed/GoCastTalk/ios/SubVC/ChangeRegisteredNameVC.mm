@@ -203,6 +203,26 @@
     }
 }
 
+-(void)textFieldDidBeginEditing:(UITextField *)textField
+{
+    if (textField == self.mKanji)
+    {
+        [self.mScrollView setContentOffset:CGPointMake(0, self.mKanji.frame.origin.y - 60) animated:YES];
+    }
+    else if (textField == self.mKana)
+    {
+        [self.mScrollView setContentOffset:CGPointMake(0, self.mKana.frame.origin.y - 60) animated:YES];
+    }
+}
+
+- (BOOL)textFieldShouldReturn:(UITextField *)textField
+{
+#pragma unused(textField)
+    [textField endEditing:YES];
+    [self.mScrollView setContentOffset:CGPointMake(0, 0) animated:YES];
+    return YES;
+}
+
 // returns the number of 'columns' to display.
 - (NSInteger)numberOfComponentsInPickerView:(UIPickerView *)pickerView
 {
@@ -254,13 +274,6 @@
 -(void) popSelf
 {
     [(UINavigationController*)self.parentViewController popViewControllerAnimated:TRUE];
-}
-
-- (BOOL)textFieldShouldReturn:(UITextField *)textField
-{
-#pragma unused(textField)
-    [textField endEditing:YES];
-    return YES;
 }
 
 -(void)customInit:(const JSONObject&)newObject

@@ -170,6 +170,26 @@
     }
 }
 
+-(void)textFieldDidBeginEditing:(UITextField *)textField
+{
+    if (textField == self.mOldPassword)
+    {
+        [self.mScrollView setContentOffset:CGPointMake(0, self.mOldPassword.frame.origin.y - 60) animated:YES];
+    }
+    else if (textField == self.mNewPassword)
+    {
+        [self.mScrollView setContentOffset:CGPointMake(0, self.mNewPassword.frame.origin.y - 60) animated:YES];
+    }
+}
+
+- (BOOL)textFieldShouldReturn:(UITextField *)textField
+{
+#pragma unused(textField)
+    [textField endEditing:YES];
+    [self.mScrollView setContentOffset:CGPointMake(0, 0) animated:YES];
+    return YES;
+}
+
 -(void)setBlockingViewVisible:(bool)newVisible
 {
     [self.mBlockingView setHidden:newVisible ? NO : YES];
@@ -191,14 +211,6 @@
 {
     [(UINavigationController*)self.parentViewController popViewControllerAnimated:TRUE];
 }
-
-- (BOOL)textFieldShouldReturn:(UITextField *)textField
-{
-#pragma unused(textField)
-    [textField endEditing:YES];
-    return YES;
-}
-
 
 -(IBAction)savePressed
 {

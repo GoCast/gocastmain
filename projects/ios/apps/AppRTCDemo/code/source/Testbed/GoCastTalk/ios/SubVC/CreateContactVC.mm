@@ -174,7 +174,15 @@
 
 -(void)textFieldDidBeginEditing:(UITextField *)textField
 {
-    if (textField == self.mEmail)
+    if (textField == self.mKanji)
+    {
+        [self.mScrollView setContentOffset:CGPointMake(0, self.mKanji.frame.origin.y - 60) animated:YES];
+    }
+    else if (textField == self.mKana)
+    {
+        [self.mScrollView setContentOffset:CGPointMake(0, self.mKana.frame.origin.y - 60) animated:YES];
+    }
+    else if (textField == self.mEmail)
     {
         [self.mScrollView setContentOffset:CGPointMake(0, self.mEmail.frame.origin.y - 60) animated:YES];
     }
