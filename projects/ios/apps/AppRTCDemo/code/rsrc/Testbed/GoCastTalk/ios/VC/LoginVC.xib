@@ -36,7 +36,6 @@
                 <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" minimumFontSize="17" id="eeY-AL-fqF" userLabel="mEmail">
                     <rect key="frame" x="45" y="245" width="230" height="30"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                    <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                     <fontDescription key="fontDescription" name="Verdana" family="Verdana" pointSize="18"/>
                     <textInputTraits key="textInputTraits" autocorrectionType="no" keyboardType="emailAddress"/>
                     <connections>
@@ -46,7 +45,6 @@
                 <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" minimumFontSize="17" id="eXC-1m-4OB" userLabel="mPassword">
                     <rect key="frame" x="45" y="283" width="230" height="30"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                    <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                     <fontDescription key="fontDescription" name="Verdana" family="Verdana" pointSize="18"/>
                     <textInputTraits key="textInputTraits" secureTextEntry="YES"/>
                     <connections>
