@@ -19,6 +19,7 @@ protected:
     JSONObject  mGetGroupsJSON;
     JSONObject  mListMessagesJSON;
     JSONObject  mDeleteMessageJSON;
+    JSONObject  mVersionJSON;
     tSound*     mNewMessageSound;
     tTimer*     mRefreshTimer;
     size_t      mItemSelected;
@@ -27,6 +28,7 @@ protected:
     bool        mForceLogout;
     bool        mManualLogout;
     bool        mFirstLogin;
+    bool        mDidVersionCheck;
 
 public:
     static JSONArray    mInbox;
@@ -66,11 +68,14 @@ protected:
 	void addFakeContactsEntry();
 	void areThereNewMessagesEntry();
 	void clearAllDataAndReloadTableEntry();
+	void didWeDoAVersionCheckEntry();
 	void didWeDownloadContactsEntry();
 	void didWeDownloadGroupsEntry();
 	void doWeHaveATokenEntry();
 	void idleEntry();
+	void isThisTheCorrectVersionEntry();
 	void isThisTheFirstLoginEntry();
+	void launchAppStoreEntry();
 	void loadLoginNameAndTokenEntry();
 	void peerPushInboxMessageEntry();
 	void peerPushLoginScreenEntry();
@@ -83,14 +88,18 @@ protected:
 	void sendGetContactsToServerEntry();
 	void sendGetGroupsToServerEntry();
 	void sendListMessagesToServerEntry();
+	void sendVersionToServerEntry();
 	void setWaitForDeleteMessageEntry();
 	void setWaitForGetContactsEntry();
 	void setWaitForGetGroupsEntry();
 	void setWaitForListMessagesEntry();
+	void setWaitForVersionEntry();
+	void showErrorContactVersionEntry();
 	void showErrorDeletingMessageEntry();
 	void showErrorLoadingContactsEntry();
 	void showErrorLoadingGroupsEntry();
 	void showErrorLoadingInboxEntry();
+	void showMustUpgradeEntry();
 	void showRetryListMessagesEntry();
 	void showYourTokenExpiredEntry();
 	void sortContactsByKanaEntry();
@@ -102,6 +111,9 @@ protected:
 	void wasGetGroupsValidEntry();
 	void wasListMessagesValidEntry();
 	void wasThisAManualLogoutEntry();
+	void wasVersionValidEntry();
+
+	void didWeDoAVersionCheckExit();
 
 public:
 	enum EventType
@@ -127,12 +139,15 @@ public:
 		kAddFakeContacts,
 		kAreThereNewMessages,
 		kClearAllDataAndReloadTable,
+		kDidWeDoAVersionCheck,
 		kDidWeDownloadContacts,
 		kDidWeDownloadGroups,
 		kDoWeHaveAToken,
 		kEnd,
 		kIdle,
+		kIsThisTheCorrectVersion,
 		kIsThisTheFirstLogin,
+		kLaunchAppStore,
 		kLoadLoginNameAndToken,
 		kPeerPushInboxMessage,
 		kPeerPushLoginScreen,
@@ -145,14 +160,18 @@ public:
 		kSendGetContactsToServer,
 		kSendGetGroupsToServer,
 		kSendListMessagesToServer,
+		kSendVersionToServer,
 		kSetWaitForDeleteMessage,
 		kSetWaitForGetContacts,
 		kSetWaitForGetGroups,
 		kSetWaitForListMessages,
+		kSetWaitForVersion,
+		kShowErrorContactVersion,
 		kShowErrorDeletingMessage,
 		kShowErrorLoadingContacts,
 		kShowErrorLoadingGroups,
 		kShowErrorLoadingInbox,
+		kShowMustUpgrade,
 		kShowRetryListMessages,
 		kShowYourTokenExpired,
 		kSortContactsByKana,
@@ -164,6 +183,7 @@ public:
 		kWasGetGroupsValid,
 		kWasListMessagesValid,
 		kWasThisAManualLogout,
+		kWasVersionValid,
 	};
 
 protected:

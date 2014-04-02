@@ -30,7 +30,7 @@
 30 Sort groups by group name
 31 Add fake contacts
 32 Clear all data and reload table
-33 peer: push login screen
+33 Peer: push login screen
 34 Show "Your token expired"
 35 Wait for login success idle
 36 Load login name and token
@@ -39,6 +39,14 @@
 39 Send ForceLogout to VC
 40 Was this a manual logout?
 41 Is this the first login?
+42 Did we do a version check?*
+43 Set "wait for version"
+44 Send version to server
+45 Was version valid?
+46 Show "error contact version"
+47 Is this the correct version?
+48 Show "must upgrade"
+49 Launch app store
 #
 1 36
 5 6 success
@@ -62,7 +70,7 @@
 13 16 yes
 15 27
 16 32 no
-16 21 yes
+16 42 yes
 19 20 no
 21 26 yes
 21 17 no
@@ -103,3 +111,15 @@
 40 35 yes
 41 34 no
 41 35 yes
+45 46 no
+43 44
+44 45 success
+44 46 fail
+42 43 no
+46 43 yes
+47 48 no
+48 49 yes
+49 48
+47 21 yes
+42 21 yes
+45 47 yes

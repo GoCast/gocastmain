@@ -203,9 +203,10 @@ void       InboxScreen::deletePressed(const size_t& i)
 #pragma mark Start / End / Invalid
 void InboxScreen::startEntry()
 {
-    mForceLogout    = false;
-    mManualLogout   = false;
-    mFirstLogin     = true;
+    mForceLogout        = false;
+    mManualLogout       = false;
+    mFirstLogin         = true;
+    mDidVersionCheck    = false;
 
     URLLoader::getInstance()->attach(this);
     GCTEventManager::getInstance()->attach(this);
@@ -244,6 +245,21 @@ void InboxScreen::waitForLoginSuccessIdleEntry()
 }
 
 #pragma mark Queries
+void InboxScreen::isThisTheCorrectVersionEntry()
+{
+    SetImmediateEvent((mVersionJSON["version"].mString == "1") ? kYes : kNo);
+}
+
+void InboxScreen::didWeDoAVersionCheckEntry()
+{
+    SetImmediateEvent(mDidVersionCheck ? kYes : kNo);
+}
+
+void InboxScreen::didWeDoAVersionCheckExit()
+{
+    mDidVersionCheck = true;
+}
+
 void InboxScreen::areThereNewMessagesEntry()
 {
     size_t newUnread = 0;
@@ -359,6 +375,18 @@ void InboxScreen::wasListMessagesValidEntry()
     SetImmediateEvent(expired ? kExpired : (result ? kYes : kNo));
 }
 
+void InboxScreen::wasVersionValidEntry()
+{
+    bool result     = false;
+
+    if (mVersionJSON["status"].mString == std::string("success"))
+    {
+        result = true;
+    }
+
+    SetImmediateEvent(result ? kYes : kNo);
+}
+
 void InboxScreen::wasThisAManualLogoutEntry()
 {
     SetImmediateEvent(mManualLogout ? kYes : kNo);
@@ -392,6 +420,11 @@ void InboxScreen::peerSwitchToInboxTabEntry()
 }
 
 #pragma mark Actions
+void InboxScreen::launchAppStoreEntry()
+{
+    tLaunchBrowser("http://gocast.it/");
+}
+
 void InboxScreen::addFakeContactsEntry()
 {
     JSONObject  entry;
@@ -587,7 +620,22 @@ void InboxScreen::sendDeleteMessageToServerEntry()
     URLLoader::getInstance()->loadString(this, buf);
 }
 
+void InboxScreen::sendVersionToServerEntry()
+{
+    char buf[512];
+
+    sprintf(buf, "%s?action=version",
+            kMemoAppServerURL);
+
+    URLLoader::getInstance()->loadString(this, buf);
+}
+
 #pragma mark User Interface
+void InboxScreen::setWaitForVersionEntry()
+{
+    [mPeer setBlockingViewVisible:true];
+}
+
 void InboxScreen::setWaitForGetContactsEntry()
 {
     [mPeer setBlockingViewVisible:true];
@@ -644,6 +692,17 @@ void InboxScreen::showYourTokenExpiredEntry()
     tAlert("接続がタイムアウトしました");
 }
 
+void InboxScreen::showErrorContactVersionEntry()
+{
+    //"Error contacting server"
+    tAlert("接続エラーが発生しました。");
+}
+
+void InboxScreen::showMustUpgradeEntry()
+{
+    tAlert("Please upgrade to the latest version of GoCast Talk in the App Store.");
+}
+
 #pragma mark Sending messages to other machines
 void InboxScreen::sendForceLogoutToVCEntry()
 {
@@ -658,13 +717,16 @@ void InboxScreen::CallEntry()
 		case kAddFakeContacts: addFakeContactsEntry(); break;
 		case kAreThereNewMessages: areThereNewMessagesEntry(); break;
 		case kClearAllDataAndReloadTable: clearAllDataAndReloadTableEntry(); break;
+		case kDidWeDoAVersionCheck: didWeDoAVersionCheckEntry(); break;
 		case kDidWeDownloadContacts: didWeDownloadContactsEntry(); break;
 		case kDidWeDownloadGroups: didWeDownloadGroupsEntry(); break;
 		case kDoWeHaveAToken: doWeHaveATokenEntry(); break;
 		case kEnd: EndEntryHelper(); break;
 		case kIdle: idleEntry(); break;
 		case kInvalidState: invalidStateEntry(); break;
+		case kIsThisTheCorrectVersion: isThisTheCorrectVersionEntry(); break;
 		case kIsThisTheFirstLogin: isThisTheFirstLoginEntry(); break;
+		case kLaunchAppStore: launchAppStoreEntry(); break;
 		case kLoadLoginNameAndToken: loadLoginNameAndTokenEntry(); break;
 		case kPeerPushInboxMessage: peerPushInboxMessageEntry(); break;
 		case kPeerPushLoginScreen: peerPushLoginScreenEntry(); break;
@@ -677,14 +739,18 @@ void InboxScreen::CallEntry()
 		case kSendGetContactsToServer: sendGetContactsToServerEntry(); break;
 		case kSendGetGroupsToServer: sendGetGroupsToServerEntry(); break;
 		case kSendListMessagesToServer: sendListMessagesToServerEntry(); break;
+		case kSendVersionToServer: sendVersionToServerEntry(); break;
 		case kSetWaitForDeleteMessage: setWaitForDeleteMessageEntry(); break;
 		case kSetWaitForGetContacts: setWaitForGetContactsEntry(); break;
 		case kSetWaitForGetGroups: setWaitForGetGroupsEntry(); break;
 		case kSetWaitForListMessages: setWaitForListMessagesEntry(); break;
+		case kSetWaitForVersion: setWaitForVersionEntry(); break;
+		case kShowErrorContactVersion: showErrorContactVersionEntry(); break;
 		case kShowErrorDeletingMessage: showErrorDeletingMessageEntry(); break;
 		case kShowErrorLoadingContacts: showErrorLoadingContactsEntry(); break;
 		case kShowErrorLoadingGroups: showErrorLoadingGroupsEntry(); break;
 		case kShowErrorLoadingInbox: showErrorLoadingInboxEntry(); break;
+		case kShowMustUpgrade: showMustUpgradeEntry(); break;
 		case kShowRetryListMessages: showRetryListMessagesEntry(); break;
 		case kShowYourTokenExpired: showYourTokenExpiredEntry(); break;
 		case kSortContactsByKana: sortContactsByKanaEntry(); break;
@@ -697,12 +763,18 @@ void InboxScreen::CallEntry()
 		case kWasGetGroupsValid: wasGetGroupsValidEntry(); break;
 		case kWasListMessagesValid: wasListMessagesValidEntry(); break;
 		case kWasThisAManualLogout: wasThisAManualLogoutEntry(); break;
+		case kWasVersionValid: wasVersionValidEntry(); break;
 		default: break;
 	}
 }
 
 void InboxScreen::CallExit()
 {
+	switch(mState)
+	{
+		case kDidWeDoAVersionCheck: didWeDoAVersionCheckExit(); break;
+		default: break;
+	}
 }
 
 int  InboxScreen::StateTransitionFunction(const int evt) const
@@ -711,18 +783,23 @@ int  InboxScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kAreThereNewMessages) && (evt == kNo)) return kPeerReloadTable; else
 	if ((mState == kAreThereNewMessages) && (evt == kYes)) return kPlayNewMessageSound; else
 	if ((mState == kClearAllDataAndReloadTable) && (evt == kNext)) return kPeerPushLoginScreen; else
+	if ((mState == kDidWeDoAVersionCheck) && (evt == kNo)) return kSetWaitForVersion; else
+	if ((mState == kDidWeDoAVersionCheck) && (evt == kYes)) return kDidWeDownloadContacts; else
 	if ((mState == kDidWeDownloadContacts) && (evt == kNo)) return kSetWaitForGetContacts; else
 	if ((mState == kDidWeDownloadContacts) && (evt == kYes)) return kDidWeDownloadGroups; else
 	if ((mState == kDidWeDownloadGroups) && (evt == kNo)) return kSetWaitForGetGroups; else
 	if ((mState == kDidWeDownloadGroups) && (evt == kYes)) return kSetWaitForListMessages; else
 	if ((mState == kDoWeHaveAToken) && (evt == kNo)) return kClearAllDataAndReloadTable; else
-	if ((mState == kDoWeHaveAToken) && (evt == kYes)) return kDidWeDownloadContacts; else
+	if ((mState == kDoWeHaveAToken) && (evt == kYes)) return kDidWeDoAVersionCheck; else
 	if ((mState == kIdle) && (evt == kDeleteSelected)) return kSetWaitForDeleteMessage; else
 	if ((mState == kIdle) && (evt == kForceLogout)) return kClearAllDataAndReloadTable; else
 	if ((mState == kIdle) && (evt == kItemSelected)) return kPeerPushInboxMessage; else
 	if ((mState == kIdle) && (evt == kRefreshSelected)) return kDoWeHaveAToken; else
+	if ((mState == kIsThisTheCorrectVersion) && (evt == kNo)) return kShowMustUpgrade; else
+	if ((mState == kIsThisTheCorrectVersion) && (evt == kYes)) return kDidWeDownloadContacts; else
 	if ((mState == kIsThisTheFirstLogin) && (evt == kNo)) return kShowYourTokenExpired; else
 	if ((mState == kIsThisTheFirstLogin) && (evt == kYes)) return kWaitForLoginSuccessIdle; else
+	if ((mState == kLaunchAppStore) && (evt == kNext)) return kShowMustUpgrade; else
 	if ((mState == kLoadLoginNameAndToken) && (evt == kFail)) return kClearAllDataAndReloadTable; else
 	if ((mState == kLoadLoginNameAndToken) && (evt == kSuccess)) return kDoWeHaveAToken; else
 	if ((mState == kPeerPushInboxMessage) && (evt == kNext)) return kIdle; else
@@ -740,14 +817,19 @@ int  InboxScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kSendGetGroupsToServer) && (evt == kSuccess)) return kWasGetGroupsValid; else
 	if ((mState == kSendListMessagesToServer) && (evt == kFail)) return kShowRetryListMessages; else
 	if ((mState == kSendListMessagesToServer) && (evt == kSuccess)) return kWasListMessagesValid; else
+	if ((mState == kSendVersionToServer) && (evt == kFail)) return kShowErrorContactVersion; else
+	if ((mState == kSendVersionToServer) && (evt == kSuccess)) return kWasVersionValid; else
 	if ((mState == kSetWaitForDeleteMessage) && (evt == kNext)) return kSendDeleteMessageToServer; else
 	if ((mState == kSetWaitForGetContacts) && (evt == kNext)) return kSendGetContactsToServer; else
 	if ((mState == kSetWaitForGetGroups) && (evt == kNext)) return kSendGetGroupsToServer; else
 	if ((mState == kSetWaitForListMessages) && (evt == kNext)) return kSendListMessagesToServer; else
+	if ((mState == kSetWaitForVersion) && (evt == kNext)) return kSendVersionToServer; else
+	if ((mState == kShowErrorContactVersion) && (evt == kYes)) return kSetWaitForVersion; else
 	if ((mState == kShowErrorDeletingMessage) && (evt == kYes)) return kPeerReloadTable; else
 	if ((mState == kShowErrorLoadingContacts) && (evt == kYes)) return kDidWeDownloadGroups; else
 	if ((mState == kShowErrorLoadingGroups) && (evt == kYes)) return kSetWaitForListMessages; else
 	if ((mState == kShowErrorLoadingInbox) && (evt == kYes)) return kPeerReloadTable; else
+	if ((mState == kShowMustUpgrade) && (evt == kYes)) return kLaunchAppStore; else
 	if ((mState == kShowRetryListMessages) && (evt == kNo)) return kPeerReloadTable; else
 	if ((mState == kShowRetryListMessages) && (evt == kYes)) return kDoWeHaveAToken; else
 	if ((mState == kShowYourTokenExpired) && (evt == kYes)) return kWaitForLoginSuccessIdle; else
@@ -769,7 +851,9 @@ int  InboxScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kWasListMessagesValid) && (evt == kNo)) return kShowErrorLoadingInbox; else
 	if ((mState == kWasListMessagesValid) && (evt == kYes)) return kSortTableByDate; else
 	if ((mState == kWasThisAManualLogout) && (evt == kNo)) return kIsThisTheFirstLogin; else
-	if ((mState == kWasThisAManualLogout) && (evt == kYes)) return kWaitForLoginSuccessIdle;
+	if ((mState == kWasThisAManualLogout) && (evt == kYes)) return kWaitForLoginSuccessIdle; else
+	if ((mState == kWasVersionValid) && (evt == kNo)) return kShowErrorContactVersion; else
+	if ((mState == kWasVersionValid) && (evt == kYes)) return kIsThisTheCorrectVersion;
 
 	return kInvalidState;
 }
@@ -780,6 +864,7 @@ bool InboxScreen::HasEdgeNamedNext() const
 	{
 		case kAddFakeContacts:
 		case kClearAllDataAndReloadTable:
+		case kLaunchAppStore:
 		case kPeerPushInboxMessage:
 		case kPeerPushLoginScreen:
 		case kPeerReloadTable:
@@ -791,6 +876,7 @@ bool InboxScreen::HasEdgeNamedNext() const
 		case kSetWaitForGetContacts:
 		case kSetWaitForGetGroups:
 		case kSetWaitForListMessages:
+		case kSetWaitForVersion:
 		case kSortContactsByKana:
 		case kSortGroupsByGroupName:
 		case kSortTableByDate:
@@ -834,6 +920,10 @@ void InboxScreen::update(const URLLoaderEvent& msg)
 
                     case kSendDeleteMessageToServer:
                         mDeleteMessageJSON = JSONUtil::extract(msg.mString);
+                        break;
+
+                    case kSendVersionToServer:
+                        mVersionJSON = JSONUtil::extract(msg.mString);
                         break;
 
                     default:
@@ -886,6 +976,8 @@ void InboxScreen::update(const GCTEvent& msg)
         case kShowErrorLoadingGroups:
         case kShowRetryListMessages:
         case kShowYourTokenExpired:
+        case kShowErrorContactVersion:
+        case kShowMustUpgrade:
             switch(msg.mEvent)
             {
                 case GCTEvent::kOKYesAlertPressed:  process(kYes); break;
