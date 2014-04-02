@@ -42,6 +42,7 @@
 42 Is this the correct version?
 43 Show "must upgrade"
 44 Launch app store
+45 Send ForceLogin to VC
 #
 1 32
 4 5 success
@@ -85,7 +86,7 @@
 26 4
 27 25
 28 29
-31 14 loginSucceeded
+31 45 loginSucceeded
 3 28 forceLogout
 30 31 yes
 29 34
@@ -113,3 +114,4 @@
 42 18 yes
 38 18 yes
 40 42 yes
+45 14

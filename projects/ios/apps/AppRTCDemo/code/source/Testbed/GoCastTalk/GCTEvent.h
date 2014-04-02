@@ -27,6 +27,7 @@ public:
 
         kLoginSucceeded,
         kForceLogout,
+        kForceLogin,
     };
 
     EventType   mEvent;

@@ -819,6 +819,10 @@ void RecordMessageScreen::update(const GCTEvent& msg)
 {
     switch(msg.mEvent)
     {
+        case GCTEvent::kForceLogin:
+            mForceLogout = false;
+            break;
+
         case GCTEvent::kForceLogout:
             mForceLogout = true;
             break;

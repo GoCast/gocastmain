@@ -215,7 +215,7 @@ void InboxScreen::startEntry()
 
     mRefreshTimer = new tTimer(30000);
     mRefreshTimer->attach(this);
-//    mRefreshTimer->start();
+    mRefreshTimer->start();
 }
 
 void InboxScreen::endEntry()
@@ -689,6 +689,11 @@ void InboxScreen::showMustUpgradeEntry()
 }
 
 #pragma mark Sending messages to other machines
+void InboxScreen::sendForceLoginToVCEntry()
+{
+    GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kForceLogin));
+}
+
 void InboxScreen::sendForceLogoutToVCEntry()
 {
     GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kForceLogout));
@@ -720,6 +725,7 @@ void InboxScreen::CallEntry()
 		case kPeerSwitchToInboxTab: peerSwitchToInboxTabEntry(); break;
 		case kPlayNewMessageSound: playNewMessageSoundEntry(); break;
 		case kSendDeleteMessageToServer: sendDeleteMessageToServerEntry(); break;
+		case kSendForceLoginToVC: sendForceLoginToVCEntry(); break;
 		case kSendForceLogoutToVC: sendForceLogoutToVCEntry(); break;
 		case kSendGetContactsToServer: sendGetContactsToServerEntry(); break;
 		case kSendGetGroupsToServer: sendGetGroupsToServerEntry(); break;
@@ -790,6 +796,7 @@ int  InboxScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kPlayNewMessageSound) && (evt == kNext)) return kPeerReloadTable; else
 	if ((mState == kSendDeleteMessageToServer) && (evt == kFail)) return kShowErrorDeletingMessage; else
 	if ((mState == kSendDeleteMessageToServer) && (evt == kSuccess)) return kWasDeleteMessageValid; else
+	if ((mState == kSendForceLoginToVC) && (evt == kNext)) return kDoWeHaveAToken; else
 	if ((mState == kSendForceLogoutToVC) && (evt == kNext)) return kIdle; else
 	if ((mState == kSendGetContactsToServer) && (evt == kFail)) return kShowErrorLoadingContacts; else
 	if ((mState == kSendGetContactsToServer) && (evt == kSuccess)) return kWasGetContactsValid; else
@@ -812,7 +819,7 @@ int  InboxScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kSortGroupsByGroupName) && (evt == kNext)) return kSendListMessagesToServer; else
 	if ((mState == kSortTableByDate) && (evt == kNext)) return kAreThereNewMessages; else
 	if ((mState == kStart) && (evt == kNext)) return kLoadLoginNameAndToken; else
-	if ((mState == kWaitForLoginSuccessIdle) && (evt == kLoginSucceeded)) return kDoWeHaveAToken; else
+	if ((mState == kWaitForLoginSuccessIdle) && (evt == kLoginSucceeded)) return kSendForceLoginToVC; else
 	if ((mState == kWasDeleteMessageValid) && (evt == kExpired)) return kSendForceLogoutToVC; else
 	if ((mState == kWasDeleteMessageValid) && (evt == kNo)) return kShowErrorDeletingMessage; else
 	if ((mState == kWasDeleteMessageValid) && (evt == kYes)) return kDoWeHaveAToken; else
@@ -846,6 +853,7 @@ bool InboxScreen::HasEdgeNamedNext() const
 		case kPeerResetAllTabs:
 		case kPeerSwitchToInboxTab:
 		case kPlayNewMessageSound:
+		case kSendForceLoginToVC:
 		case kSendForceLogoutToVC:
 		case kSortContactsByKana:
 		case kSortGroupsByGroupName:
