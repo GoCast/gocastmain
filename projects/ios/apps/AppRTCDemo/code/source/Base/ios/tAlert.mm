@@ -16,7 +16,7 @@ void tAlert(const std::string& msg)
 
 	alert.title = @""; // "Alert"
 	alert.message = [NSString stringWithUTF8String:msg.c_str()];
-    [alert addButtonWithTitle:@"オーケー"]; // "Okay"
+    [alert addButtonWithTitle:@"OK"]; // "Okay"
 
     [alert performSelectorOnMainThread:@selector(show) withObject:nil waitUntilDone:YES];
     
@@ -48,7 +48,7 @@ void tPrompt(const std::string& msg)
     alert.delegate = gAppDelegateInstance;
 	alert.title = @""; // "Prompt"
 	alert.message = [NSString stringWithUTF8String:msg.c_str()];
-    [alert addButtonWithTitle:@"オーケー"];   // "Okay"
+    [alert addButtonWithTitle:@"OK"];   // "Okay"
     [alert addButtonWithTitle:@"キャンセル"];  // "Cancel"
 
     [alert performSelectorOnMainThread:@selector(show) withObject:nil waitUntilDone:YES];
