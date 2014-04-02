@@ -82,8 +82,6 @@ protected:
 	void sendPostMessageToServerEntry();
 	void sendPostTranscriptToServerEntry();
 	void sendReloadInboxToVCEntry();
-	void setWaitForPostAudioEntry();
-	void setWaitForTranscriptionEntry();
 	void showComposeNewMessageEntry();
 	void showConfirmDeleteEntry();
 	void showConfirmSendEntry();
@@ -157,8 +155,6 @@ public:
 		kSendPostMessageToServer,
 		kSendPostTranscriptToServer,
 		kSendReloadInboxToVC,
-		kSetWaitForPostAudio,
-		kSetWaitForTranscription,
 		kShowComposeNewMessage,
 		kShowConfirmDelete,
 		kShowConfirmSend,

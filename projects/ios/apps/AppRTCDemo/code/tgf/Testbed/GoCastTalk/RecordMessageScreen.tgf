@@ -14,114 +14,110 @@
 14 Send ReloadInbox to VC
 15 Stop playing before pop
 16 Stop playing before send
-17 Set "Wait for postAudio"
-18 Show "postAudio failed"
-19 Send postAudio to server
-20 Send postTranscript to server
-21 Was postAudio successful?
-22 Was postTranscript successful?
-23 Resume audio
-24 Let didRecord be isForwarded value
-25 Let didRecord be true
-26 Send postMessage to server
-27 Was postMessage successful?
-28 Calculate Message JSON
-29 Do we have contacts to send to?
-30 Show "no contacts to send to"
-31 Is forwarding message?
-32 Clear data and reload table
-33 Wait for transcription idle
-34 Set "Wait for transcription"
-35 Do we need to wait for transcription?
-36 Show "confirm send?"
-37 Fix recipient list
-38 Peer: switch to Inbox tab
-39 Show "Compose new message?"
-40 Copy recipients and reload table
-41 Peer: switch to New Memo Tab
-42 Do we have recipients or a recording?
-43 Peer: pop all Inbox views
-44 Show "confirm delete?"
-45 Send ForceLogout to VC
-46 Is this a forced cancel?
-47 Show "no audio to send"
-48 Peer: start editing transcription
+17 Show "postAudio failed"
+18 Send postAudio to server
+19 Send postTranscript to server
+20 Was postAudio successful?
+21 Was postTranscript successful?
+22 Resume audio
+23 Let didRecord be isForwarded value
+24 Let didRecord be true
+25 Send postMessage to server
+26 Was postMessage successful?
+27 Calculate Message JSON
+28 Do we have contacts to send to?
+29 Show "no contacts to send to"
+30 Is forwarding message?
+31 Clear data and reload table
+32 Wait for transcription idle
+33 Do we need to wait for transcription?
+34 Show "confirm send?"
+35 Fix recipient list
+36 Peer: switch to Inbox tab
+37 Show "Compose new message?"
+38 Copy recipients and reload table
+39 Peer: switch to New Memo Tab
+40 Do we have recipients or a recording?
+41 Peer: pop all Inbox views
+42 Show "confirm delete?"
+43 Send ForceLogout to VC
+44 Is this a forced cancel?
+45 Show "no audio to send"
+46 Peer: start editing transcription
 #
 3 4 no
 4 5 recordPressed
 3 6 yes
 5 7
 7 8 stopPressed
-1 37
-8 35
+1 35
+8 33
 6 10 playPressed
 10 9
 9 11 pausePressed
 11 12
 9 13 finishedPlaying
 13 3
-12 23 playPressed
-15 46
-6 46 cancelPressed
+12 22 playPressed
+15 44
+6 44 cancelPressed
 12 15 cancelPressed
 9 15 cancelPressed
-17 28
-19 18 fail
+18 17 fail
+18 20 success
+20 19 yes
+20 17 no
+16 28
 19 21 success
-21 20 yes
-21 18 no
-16 29
-20 22 success
-20 18 fail
-18 14 yes
-22 26 yes
-22 18 no
+19 17 fail
+17 14 yes
+21 25 yes
+21 17 no
 9 16 sendPressed
 12 16 sendPressed
-6 29 sendPressed
-23 9
-25 3
-26 27 success
-27 14 yes
-27 18 no
-26 18 fail
-28 31
-29 36 yes
-30 6 yes
-29 30 no
-31 26 yes
-31 19 no
-32 24
-34 33
-33 48 transcriptionReady
-35 34 yes
-35 25 no
-36 17 yes
-36 6 no
-37 24
-38 32
-39 3 no
-4 41 newMessage
-6 41 newMessage
-12 41 newMessage
-39 40 yes
-40 37
-41 42
-33 41 newMessage
-42 39 yes
-42 40 no
-43 38
-44 32 yes
-44 3 no
-14 43
+6 28 sendPressed
+22 9
 24 3
-22 45 expired
-21 45 expired
-27 45 expired
-45 32
-46 44 no
-46 32 yes
-4 46 cancelPressed
-4 47 sendPressed
-47 4 yes
-48 25
+25 26 success
+26 14 yes
+26 17 no
+25 17 fail
+27 30
+28 34 yes
+29 6 yes
+28 29 no
+30 25 yes
+30 18 no
+31 23
+32 46 transcriptionReady
+33 32 yes
+33 24 no
+34 27 yes
+34 6 no
+35 23
+36 31
+37 3 no
+4 39 newMessage
+6 39 newMessage
+12 39 newMessage
+37 38 yes
+38 35
+39 40
+32 39 newMessage
+40 37 yes
+40 38 no
+41 36
+42 31 yes
+42 3 no
+14 41
+23 3
+21 43 expired
+20 43 expired
+26 43 expired
+43 31
+44 42 no
+44 31 yes
+4 44 cancelPressed
+4 45 sendPressed
+45 4 yes
+46 24
