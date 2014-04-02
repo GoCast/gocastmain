@@ -319,6 +319,7 @@
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/bg-throbber.png',
 
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/banner.png',
+					'../../rsrc/Testbed/GoCastTalk/<@(OS)/banner2.png',
 
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/tab-inbox.png',
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/tab-newmemo.png',

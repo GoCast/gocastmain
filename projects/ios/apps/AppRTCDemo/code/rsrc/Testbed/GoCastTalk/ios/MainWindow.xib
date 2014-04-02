@@ -60,7 +60,7 @@
                     <viewControllers>
                         <viewController nibName="InboxVC" id="oSL-zh-zct" customClass="InboxVC">
                             <extendedEdge key="edgesForExtendedLayout"/>
-                            <navigationItem key="navigationItem" title="メッセージ" id="8bZ-Xp-3K9"/>
+                            <navigationItem key="navigationItem" id="8bZ-Xp-3K9"/>
                             <simulatedStatusBarMetrics key="simulatedStatusBarMetrics"/>
                             <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
                             <nil key="simulatedBottomBarMetrics"/>
@@ -83,7 +83,7 @@
                     <viewControllers>
                         <viewController nibName="RecordMessageVC" id="whs-FZ-FTF" customClass="RecordMessageVC">
                             <extendedEdge key="edgesForExtendedLayout"/>
-                            <navigationItem key="navigationItem" title="新規作成" id="VPO-6u-tWk"/>
+                            <navigationItem key="navigationItem" id="VPO-6u-tWk"/>
                             <simulatedStatusBarMetrics key="simulatedStatusBarMetrics"/>
                             <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
                             <nil key="simulatedBottomBarMetrics"/>
@@ -107,7 +107,7 @@
                         <viewController nibName="ContactsVC" id="Mmv-uP-JdY" customClass="ContactsVC">
                             <extendedEdge key="edgesForExtendedLayout"/>
                             <toolbarItems/>
-                            <navigationItem key="navigationItem" title="メンバー" id="6H9-FF-9SR"/>
+                            <navigationItem key="navigationItem" id="6H9-FF-9SR"/>
                             <simulatedStatusBarMetrics key="simulatedStatusBarMetrics"/>
                             <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
                             <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
@@ -130,7 +130,7 @@
                     <viewControllers>
                         <viewController nibName="SettingsVC" id="7G2-Jh-Bks" customClass="SettingsVC">
                             <extendedEdge key="edgesForExtendedLayout"/>
-                            <navigationItem key="navigationItem" title="設定" id="xF9-qy-dOZ"/>
+                            <navigationItem key="navigationItem" id="xF9-qy-dOZ"/>
                             <simulatedStatusBarMetrics key="simulatedStatusBarMetrics"/>
                             <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
                             <nil key="simulatedBottomBarMetrics"/>
