@@ -422,7 +422,7 @@ void InboxScreen::peerSwitchToInboxTabEntry()
 #pragma mark Actions
 void InboxScreen::launchAppStoreEntry()
 {
-    tLaunchBrowser("http://gocast.it/");
+    tLaunchBrowser("https://itunes.apple.com/us/app/gocast-talk/id853983927?ls=1&mt=8");
 }
 
 void InboxScreen::addFakeContactsEntry()
