@@ -564,7 +564,7 @@ void RecordMessageScreen::showConfirmSendEntry()
 void RecordMessageScreen::showNoAudioToSendEntry()
 {
     //"Please add audio first."
-    tAlert("メッセージを送信する前に音声を録音してください");
+    tAlert("送信前に録音してください。");
 }
 
 void RecordMessageScreen::showNoContactsToSendToEntry()
