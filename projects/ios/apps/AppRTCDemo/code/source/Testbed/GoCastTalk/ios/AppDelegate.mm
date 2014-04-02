@@ -85,6 +85,8 @@ const unsigned char SpeechKitApplicationKey[] =
     }
     else
     {
+        [[UISegmentedControl appearance] setTintColor:[UIColor colorWithRed:0.6f green:0.8f blue:0.8f alpha:1.0f]];
+        [[UINavigationBar appearance] setTintColor:[UIColor colorWithRed:0.6f green:0.8f blue:0.8f alpha:1.0f]];
         [[UIBarButtonItem appearance] setTintColor:[UIColor colorWithRed:0.6f green:0.8f blue:0.8f alpha:1.0f]];
         [self.mInboxNavBar      setBackgroundImage:[UIImage imageNamed:@"banner.png"] forBarMetrics:UIBarMetricsDefault];
         [self.mNewMemoNavBar    setBackgroundImage:[UIImage imageNamed:@"banner.png"] forBarMetrics:UIBarMetricsDefault];
