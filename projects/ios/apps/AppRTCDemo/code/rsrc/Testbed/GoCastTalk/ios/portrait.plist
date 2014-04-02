@@ -8,6 +8,16 @@
 	<string>${PRODUCT_NAME}</string>
 	<key>CFBundleExecutable</key>
 	<string>${EXECUTABLE_NAME}</string>
+	<key>CFBundleIconFiles</key>
+	<array>
+		<string>Icon.png</string>
+		<string>icon_29.png</string>
+		<string>icon_57.png</string>
+		<string>icon_58.png</string>
+		<string>icon_80.png</string>
+		<string>icon_114.png</string>
+		<string>icon_120.png</string>
+	</array>
 	<key>CFBundleIdentifier</key>
 	<string>com.tatemode.${PRODUCT_NAME:rfc1034identifier}</string>
 	<key>CFBundleInfoDictionaryVersion</key>

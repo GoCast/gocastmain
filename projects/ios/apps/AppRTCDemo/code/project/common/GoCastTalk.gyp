@@ -347,8 +347,15 @@
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/button-play-white.png',
 
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/Icon.png',
+					'../../rsrc/Testbed/GoCastTalk/<@(OS)/icon_29.png',
+					'../../rsrc/Testbed/GoCastTalk/<@(OS)/icon_57.png',
+					'../../rsrc/Testbed/GoCastTalk/<@(OS)/icon_58.png',
+					'../../rsrc/Testbed/GoCastTalk/<@(OS)/icon_80.png',
+					'../../rsrc/Testbed/GoCastTalk/<@(OS)/icon_114.png',
+					'../../rsrc/Testbed/GoCastTalk/<@(OS)/icon_120.png',
 
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/Default.png',
+					'../../rsrc/Testbed/GoCastTalk/<@(OS)/Default@2x.png',
 					'../../rsrc/Testbed/GoCastTalk/<@(OS)/Default-568h@2x.png',
 				],	# mac_bundle_resources
 
