@@ -1,6 +1,8 @@
 #include "LoginVC.h"
 #include "InboxMessageVC.h"
 
+#import <MessageUI/MessageUI.h>
+
 #include "Base/package.h"
 #include "Math/package.h"
 #include "Io/package.h"
@@ -157,6 +159,33 @@ extern std::string kBaseURL;
     const char* email = [self.mEmail.text UTF8String];
 
     mPeer->troublePressed(email ? email : "");
+}
+
+-(void) sendEmailTo:(const std::string&)newTo
+{
+    if ([MFMailComposeViewController canSendMail])
+    {
+        std::string body = "Please reset my password. My email is ";
+        body += (self.mEmail.text) ? [self.mEmail.text UTF8String] : "";
+
+        MFMailComposeViewController *mailer = [[MFMailComposeViewController alloc] init];
+        mailer.mailComposeDelegate = self;
+        [mailer setSubject:[NSString stringWithUTF8String:"Password reset request"]];
+        NSArray *toRecipients = [NSArray arrayWithObjects:[NSString stringWithUTF8String:newTo.c_str()], nil];
+        [mailer setToRecipients:toRecipients];
+        NSString *emailBody = [NSString stringWithUTF8String:body.c_str()];
+        [mailer setMessageBody:emailBody isHTML:NO];
+        [self presentViewController:mailer animated:YES completion:nil];
+        [mailer release];
+    }
+}
+
+- (void)mailComposeController:(MFMailComposeViewController *)controller
+          didFinishWithResult:(MFMailComposeResult)result
+                        error:(NSError *)error
+{
+#pragma unused(controller, result, error)
+    [self dismissViewControllerAnimated:YES completion:NULL];
 }
 
 -(void) setLoginName:(const std::string&)newName

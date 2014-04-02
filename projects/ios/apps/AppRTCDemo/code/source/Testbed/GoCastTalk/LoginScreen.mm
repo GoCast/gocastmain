@@ -96,6 +96,11 @@ void LoginScreen::idleEntry()
 }
 
 #pragma mark Peer Communication
+void LoginScreen::peerSendEmailToSupportEntry()
+{
+    [mPeer sendEmailTo:"feedback@gocast.it"];
+}
+
 void LoginScreen::peerPopSelfEntry()
 {
     [mPeer popSelf];
@@ -340,6 +345,7 @@ void LoginScreen::CallEntry()
 		case kIsEmailBlank: isEmailBlankEntry(); break;
 		case kLoadLoginName: loadLoginNameEntry(); break;
 		case kPeerPopSelf: peerPopSelfEntry(); break;
+		case kPeerSendEmailToSupport: peerSendEmailToSupportEntry(); break;
 		case kPeerSetLoginName: peerSetLoginNameEntry(); break;
 		case kSaveLoginName: saveLoginNameEntry(); break;
 		case kSendLoginSucceededToVC: sendLoginSucceededToVCEntry(); break;
@@ -381,10 +387,12 @@ int  LoginScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kIdle) && (evt == kSignInPressed)) return kValidateURL; else
 	if ((mState == kIdle) && (evt == kSignUpPressed)) return kEnsureSignupInfo; else
 	if ((mState == kIdle) && (evt == kTroublePressed)) return kIsEmailBlank; else
-	if ((mState == kIsEmailBlank) && (evt == kNo)) return kShowSendResetEmail; else
+	if ((mState == kIsEmailBlank) && (evt == kNo)) return kPeerSendEmailToSupport; else
+	if ((mState == kIsEmailBlank) && (evt == kUnsupported)) return kShowSendResetEmail; else
 	if ((mState == kIsEmailBlank) && (evt == kYes)) return kShowEnterEmailFirst; else
 	if ((mState == kLoadLoginName) && (evt == kFail)) return kIdle; else
 	if ((mState == kLoadLoginName) && (evt == kSuccess)) return kPeerSetLoginName; else
+	if ((mState == kPeerSendEmailToSupport) && (evt == kNext)) return kIdle; else
 	if ((mState == kPeerSetLoginName) && (evt == kNext)) return kIdle; else
 	if ((mState == kSaveLoginName) && (evt == kNext)) return kSendLoginSucceededToVC; else
 	if ((mState == kSendLoginSucceededToVC) && (evt == kNext)) return kPeerPopSelf; else
@@ -426,6 +434,7 @@ bool LoginScreen::HasEdgeNamedNext() const
 {
 	switch(mState)
 	{
+		case kPeerSendEmailToSupport:
 		case kPeerSetLoginName:
 		case kSaveLoginName:
 		case kSendLoginSucceededToVC:

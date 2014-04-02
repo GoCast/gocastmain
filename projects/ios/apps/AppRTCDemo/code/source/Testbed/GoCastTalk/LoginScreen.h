@@ -44,6 +44,7 @@ protected:
 	void isEmailBlankEntry();
 	void loadLoginNameEntry();
 	void peerPopSelfEntry();
+	void peerSendEmailToSupportEntry();
 	void peerSetLoginNameEntry();
 	void saveLoginNameEntry();
 	void sendLoginSucceededToVCEntry();
@@ -79,6 +80,7 @@ public:
 		kSignUpPressed,
 		kSuccess,
 		kTroublePressed,
+		kUnsupported,
 		kYes,
 	};
 
@@ -93,6 +95,7 @@ public:
 		kIsEmailBlank,
 		kLoadLoginName,
 		kPeerPopSelf,
+		kPeerSendEmailToSupport,
 		kPeerSetLoginName,
 		kSaveLoginName,
 		kSendLoginSucceededToVC,

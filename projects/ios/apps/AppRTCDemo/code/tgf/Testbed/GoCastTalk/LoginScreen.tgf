@@ -29,6 +29,7 @@
 29 Is email blank?
 30 Show "Enter email first"
 31 Show "user registraion successful"
+32 Peer: send email to support
 #
 1 20
 3 29 troublePressed
@@ -71,6 +72,8 @@
 28 3 no
 27 28 yes
 28 4 yes
-29 26 no
+29 32 no
 29 30 yes
 30 3 yes
+32 3
+29 26 unsupported

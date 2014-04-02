@@ -11,7 +11,8 @@ class LoginScreen;
 @interface LoginVC : UIViewController
 <
     UITableViewDelegate,
-    UITableViewDataSource
+    UITableViewDataSource,
+    MFMailComposeViewControllerDelegate
 >
 {
     LoginScreen* mPeer;
@@ -39,6 +40,8 @@ class LoginScreen;
 -(IBAction) signInPressed;
 -(IBAction) signUpPressed;
 -(IBAction) troublePressed;
+
+-(void) sendEmailTo:(const std::string&)newTo;
 
 -(void) setLoginName:(const std::string&)newName;
 -(void) popSelf;
