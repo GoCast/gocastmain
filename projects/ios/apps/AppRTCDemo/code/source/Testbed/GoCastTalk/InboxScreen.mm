@@ -564,6 +564,8 @@ void InboxScreen::sortTableByDateEntry()
 
 void InboxScreen::sendGetContactsToServerEntry()
 {
+    [mPeer setBlockingViewVisible:true];
+
     char buf[512];
 
     sprintf(buf, "%s?action=getContacts&name=%s&authToken=%s",
@@ -576,6 +578,8 @@ void InboxScreen::sendGetContactsToServerEntry()
 
 void InboxScreen::sendGetGroupsToServerEntry()
 {
+    [mPeer setBlockingViewVisible:true];
+
     char buf[512];
 
     sprintf(buf, "%s?action=getGroups&name=%s&authToken=%s",
@@ -588,6 +592,8 @@ void InboxScreen::sendGetGroupsToServerEntry()
 
 void InboxScreen::sendListMessagesToServerEntry()
 {
+    [mPeer setBlockingViewVisible:true];
+
     mPriorUnreadCount = 0;
     for(size_t i = 0; i < mInbox.size(); i++)
     {
@@ -609,6 +615,8 @@ void InboxScreen::sendListMessagesToServerEntry()
 
 void InboxScreen::sendDeleteMessageToServerEntry()
 {
+    [mPeer setBlockingViewVisible:true];
+
     char buf[512];
 
     sprintf(buf, "%s?action=deleteMessage&name=%s&audio=%s&authToken=%s",
@@ -622,6 +630,8 @@ void InboxScreen::sendDeleteMessageToServerEntry()
 
 void InboxScreen::sendVersionToServerEntry()
 {
+    [mPeer setBlockingViewVisible:true];
+
     char buf[512];
 
     sprintf(buf, "%s?action=version",
@@ -631,31 +641,6 @@ void InboxScreen::sendVersionToServerEntry()
 }
 
 #pragma mark User Interface
-void InboxScreen::setWaitForVersionEntry()
-{
-    [mPeer setBlockingViewVisible:true];
-}
-
-void InboxScreen::setWaitForGetContactsEntry()
-{
-    [mPeer setBlockingViewVisible:true];
-}
-
-void InboxScreen::setWaitForGetGroupsEntry()
-{
-    [mPeer setBlockingViewVisible:true];
-}
-
-void InboxScreen::setWaitForDeleteMessageEntry()
-{
-    [mPeer setBlockingViewVisible:true];
-}
-
-void InboxScreen::setWaitForListMessagesEntry()
-{
-    [mPeer setBlockingViewVisible:true];
-}
-
 void InboxScreen::showErrorDeletingMessageEntry()
 {
     //"There was an error deleting a message from the server"
@@ -740,11 +725,6 @@ void InboxScreen::CallEntry()
 		case kSendGetGroupsToServer: sendGetGroupsToServerEntry(); break;
 		case kSendListMessagesToServer: sendListMessagesToServerEntry(); break;
 		case kSendVersionToServer: sendVersionToServerEntry(); break;
-		case kSetWaitForDeleteMessage: setWaitForDeleteMessageEntry(); break;
-		case kSetWaitForGetContacts: setWaitForGetContactsEntry(); break;
-		case kSetWaitForGetGroups: setWaitForGetGroupsEntry(); break;
-		case kSetWaitForListMessages: setWaitForListMessagesEntry(); break;
-		case kSetWaitForVersion: setWaitForVersionEntry(); break;
 		case kShowErrorContactVersion: showErrorContactVersionEntry(); break;
 		case kShowErrorDeletingMessage: showErrorDeletingMessageEntry(); break;
 		case kShowErrorLoadingContacts: showErrorLoadingContactsEntry(); break;
@@ -783,15 +763,15 @@ int  InboxScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kAreThereNewMessages) && (evt == kNo)) return kPeerReloadTable; else
 	if ((mState == kAreThereNewMessages) && (evt == kYes)) return kPlayNewMessageSound; else
 	if ((mState == kClearAllDataAndReloadTable) && (evt == kNext)) return kPeerPushLoginScreen; else
-	if ((mState == kDidWeDoAVersionCheck) && (evt == kNo)) return kSetWaitForVersion; else
+	if ((mState == kDidWeDoAVersionCheck) && (evt == kNo)) return kSendVersionToServer; else
 	if ((mState == kDidWeDoAVersionCheck) && (evt == kYes)) return kDidWeDownloadContacts; else
-	if ((mState == kDidWeDownloadContacts) && (evt == kNo)) return kSetWaitForGetContacts; else
+	if ((mState == kDidWeDownloadContacts) && (evt == kNo)) return kSendGetContactsToServer; else
 	if ((mState == kDidWeDownloadContacts) && (evt == kYes)) return kDidWeDownloadGroups; else
-	if ((mState == kDidWeDownloadGroups) && (evt == kNo)) return kSetWaitForGetGroups; else
-	if ((mState == kDidWeDownloadGroups) && (evt == kYes)) return kSetWaitForListMessages; else
+	if ((mState == kDidWeDownloadGroups) && (evt == kNo)) return kSendGetGroupsToServer; else
+	if ((mState == kDidWeDownloadGroups) && (evt == kYes)) return kSendListMessagesToServer; else
 	if ((mState == kDoWeHaveAToken) && (evt == kNo)) return kClearAllDataAndReloadTable; else
 	if ((mState == kDoWeHaveAToken) && (evt == kYes)) return kDidWeDoAVersionCheck; else
-	if ((mState == kIdle) && (evt == kDeleteSelected)) return kSetWaitForDeleteMessage; else
+	if ((mState == kIdle) && (evt == kDeleteSelected)) return kSendDeleteMessageToServer; else
 	if ((mState == kIdle) && (evt == kForceLogout)) return kClearAllDataAndReloadTable; else
 	if ((mState == kIdle) && (evt == kItemSelected)) return kPeerPushInboxMessage; else
 	if ((mState == kIdle) && (evt == kRefreshSelected)) return kDoWeHaveAToken; else
@@ -819,22 +799,17 @@ int  InboxScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kSendListMessagesToServer) && (evt == kSuccess)) return kWasListMessagesValid; else
 	if ((mState == kSendVersionToServer) && (evt == kFail)) return kShowErrorContactVersion; else
 	if ((mState == kSendVersionToServer) && (evt == kSuccess)) return kWasVersionValid; else
-	if ((mState == kSetWaitForDeleteMessage) && (evt == kNext)) return kSendDeleteMessageToServer; else
-	if ((mState == kSetWaitForGetContacts) && (evt == kNext)) return kSendGetContactsToServer; else
-	if ((mState == kSetWaitForGetGroups) && (evt == kNext)) return kSendGetGroupsToServer; else
-	if ((mState == kSetWaitForListMessages) && (evt == kNext)) return kSendListMessagesToServer; else
-	if ((mState == kSetWaitForVersion) && (evt == kNext)) return kSendVersionToServer; else
-	if ((mState == kShowErrorContactVersion) && (evt == kYes)) return kSetWaitForVersion; else
+	if ((mState == kShowErrorContactVersion) && (evt == kYes)) return kSendVersionToServer; else
 	if ((mState == kShowErrorDeletingMessage) && (evt == kYes)) return kPeerReloadTable; else
 	if ((mState == kShowErrorLoadingContacts) && (evt == kYes)) return kDidWeDownloadGroups; else
-	if ((mState == kShowErrorLoadingGroups) && (evt == kYes)) return kSetWaitForListMessages; else
+	if ((mState == kShowErrorLoadingGroups) && (evt == kYes)) return kSendListMessagesToServer; else
 	if ((mState == kShowErrorLoadingInbox) && (evt == kYes)) return kPeerReloadTable; else
 	if ((mState == kShowMustUpgrade) && (evt == kYes)) return kLaunchAppStore; else
 	if ((mState == kShowRetryListMessages) && (evt == kNo)) return kPeerReloadTable; else
 	if ((mState == kShowRetryListMessages) && (evt == kYes)) return kDoWeHaveAToken; else
 	if ((mState == kShowYourTokenExpired) && (evt == kYes)) return kWaitForLoginSuccessIdle; else
 	if ((mState == kSortContactsByKana) && (evt == kNext)) return kDidWeDownloadGroups; else
-	if ((mState == kSortGroupsByGroupName) && (evt == kNext)) return kSetWaitForListMessages; else
+	if ((mState == kSortGroupsByGroupName) && (evt == kNext)) return kSendListMessagesToServer; else
 	if ((mState == kSortTableByDate) && (evt == kNext)) return kAreThereNewMessages; else
 	if ((mState == kStart) && (evt == kNext)) return kLoadLoginNameAndToken; else
 	if ((mState == kWaitForLoginSuccessIdle) && (evt == kLoginSucceeded)) return kDoWeHaveAToken; else
@@ -872,11 +847,6 @@ bool InboxScreen::HasEdgeNamedNext() const
 		case kPeerSwitchToInboxTab:
 		case kPlayNewMessageSound:
 		case kSendForceLogoutToVC:
-		case kSetWaitForDeleteMessage:
-		case kSetWaitForGetContacts:
-		case kSetWaitForGetGroups:
-		case kSetWaitForListMessages:
-		case kSetWaitForVersion:
 		case kSortContactsByKana:
 		case kSortGroupsByGroupName:
 		case kSortTableByDate:

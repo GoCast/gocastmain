@@ -89,11 +89,6 @@ protected:
 	void sendGetGroupsToServerEntry();
 	void sendListMessagesToServerEntry();
 	void sendVersionToServerEntry();
-	void setWaitForDeleteMessageEntry();
-	void setWaitForGetContactsEntry();
-	void setWaitForGetGroupsEntry();
-	void setWaitForListMessagesEntry();
-	void setWaitForVersionEntry();
 	void showErrorContactVersionEntry();
 	void showErrorDeletingMessageEntry();
 	void showErrorLoadingContactsEntry();
@@ -161,11 +156,6 @@ public:
 		kSendGetGroupsToServer,
 		kSendListMessagesToServer,
 		kSendVersionToServer,
-		kSetWaitForDeleteMessage,
-		kSetWaitForGetContacts,
-		kSetWaitForGetGroups,
-		kSetWaitForListMessages,
-		kSetWaitForVersion,
 		kShowErrorContactVersion,
 		kShowErrorDeletingMessage,
 		kShowErrorLoadingContacts,

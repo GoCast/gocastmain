@@ -1,125 +1,115 @@
 1 start
 2 end
 3 idle
-4 Set "wait for listMessages"
-5 Send listMessages to server
-6 Was listMessages valid?
-7 Show "error loading inbox"
-8 Show "retry listMessages?"
-9 Peer: reload table
-10 Peer: push InboxMessage
-11 Set "wait for deleteMessage"
-12 Send deleteMessage to server
-13 Was deleteMessage valid?
-14 Show "error deleting message"
-15 Sort table by date
-16 Do we have a token?
-17 Set "wait for getContacts"
-18 Send getContacts to server
-19 Was getContacts valid?
-20 Show "error loading contacts"
-21 Did we download contacts?
-22 Set "wait for getGroups"
-23 Send getGroups to server
-24 Was getGroups valid?
-25 Show "error loading groups"
-26 Did we download groups?
-27 Are there new messages?
-28 Play "new message" sound
-29 Sort contacts by kana
-30 Sort groups by group name
-31 Add fake contacts
-32 Clear all data and reload table
-33 Peer: push login screen
-34 Show "Your token expired"
-35 Wait for login success idle
-36 Load login name and token
-37 Peer: reset all tabs
-38 Peer: switch to Inbox Tab
-39 Send ForceLogout to VC
-40 Was this a manual logout?
-41 Is this the first login?
-42 Did we do a version check?*
-43 Set "wait for version"
-44 Send version to server
-45 Was version valid?
-46 Show "error contact version"
-47 Is this the correct version?
-48 Show "must upgrade"
-49 Launch app store
+4 Send listMessages to server
+5 Was listMessages valid?
+6 Show "error loading inbox"
+7 Show "retry listMessages?"
+8 Peer: reload table
+9 Peer: push InboxMessage
+10 Send deleteMessage to server
+11 Was deleteMessage valid?
+12 Show "error deleting message"
+13 Sort table by date
+14 Do we have a token?
+15 Send getContacts to server
+16 Was getContacts valid?
+17 Show "error loading contacts"
+18 Did we download contacts?
+19 Send getGroups to server
+20 Was getGroups valid?
+21 Show "error loading groups"
+22 Did we download groups?
+23 Are there new messages?
+24 Play "new message" sound
+25 Sort contacts by kana
+26 Sort groups by group name
+27 Add fake contacts
+28 Clear all data and reload table
+29 Peer: push login screen
+30 Show "Your token expired"
+31 Wait for login success idle
+32 Load login name and token
+33 Peer: reset all tabs
+34 Peer: switch to Inbox Tab
+35 Send ForceLogout to VC
+36 Was this a manual logout?
+37 Is this the first login?
+38 Did we do a version check?*
+39 Send version to server
+40 Was version valid?
+41 Show "error contact version"
+42 Is this the correct version?
+43 Show "must upgrade"
+44 Launch app store
 #
-1 36
-5 6 success
-6 7 no
-4 5
-7 9 yes
-5 8 fail
-8 9 no
-8 16 yes
-6 15 yes
+1 32
+4 5 success
+5 6 no
+6 8 yes
+4 7 fail
+7 8 no
+7 14 yes
+5 13 yes
+8 3
+3 9 itemSelected
 9 3
-3 10 itemSelected
-10 3
-3 16 refreshSelected
-3 11 deleteSelected
-11 12
-12 13 success
-12 14 fail
-14 9 yes
-13 14 no
-13 16 yes
-15 27
-16 32 no
-16 42 yes
-19 20 no
-21 26 yes
-21 17 no
-17 18
-18 19 success
-18 20 fail
-19 31 yes
+3 14 refreshSelected
+3 10 deleteSelected
+10 11 success
+10 12 fail
+12 8 yes
+11 12 no
+11 14 yes
+13 23
+14 28 no
+14 38 yes
+16 17 no
+18 22 yes
+18 15 no
+15 16 success
+15 17 fail
+16 27 yes
+17 22 yes
+20 21 no
+19 20 success
+19 21 fail
 20 26 yes
-24 25 no
-22 23
-23 24 success
-23 25 fail
-24 30 yes
-25 4 yes
-26 22 no
-26 4 yes
-27 28 yes
-27 9 no
-28 9
-29 26
-30 4
-31 29
-32 33
-35 16 loginSucceeded
-3 32 forceLogout
-34 35 yes
-33 38
-6 39 expired
-36 16 success
-36 32 fail
-13 39 expired
-19 39 expired
-24 32 expired
-38 37
-37 40
-39 3
+21 4 yes
+22 19 no
+22 4 yes
+23 24 yes
+23 8 no
+24 8
+25 22
+26 4
+27 25
+28 29
+31 14 loginSucceeded
+3 28 forceLogout
+30 31 yes
+29 34
+5 35 expired
+32 14 success
+32 28 fail
+11 35 expired
+16 35 expired
+20 28 expired
+34 33
+33 36
+35 3
+36 37 no
+36 31 yes
+37 30 no
+37 31 yes
 40 41 no
-40 35 yes
-41 34 no
-41 35 yes
-45 46 no
-43 44
-44 45 success
-44 46 fail
+39 40 success
+39 41 fail
+38 39 no
+41 39 yes
 42 43 no
-46 43 yes
-47 48 no
-48 49 yes
-49 48
-47 21 yes
-42 21 yes
-45 47 yes
+43 44 yes
+44 43
+42 18 yes
+38 18 yes
+40 42 yes
