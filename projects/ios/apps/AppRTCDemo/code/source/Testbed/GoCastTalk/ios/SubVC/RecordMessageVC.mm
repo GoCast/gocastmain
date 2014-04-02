@@ -216,7 +216,7 @@
         switch (indexPath.row)
         {
             case 0:
-                [cell setAsZero:self->mToExpanded withLabel:"クリックして宛先を表示"]; //"Add recipients"
+                [cell setAsZero:self->mToExpanded withLabel:(mToExpanded ? "" : "クリックして宛先を表示")]; //"Add recipients"
                 break;
                 
             default:
