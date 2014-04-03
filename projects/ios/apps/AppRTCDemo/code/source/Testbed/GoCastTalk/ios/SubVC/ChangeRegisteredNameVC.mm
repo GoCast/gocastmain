@@ -207,11 +207,11 @@
 {
     if (textField == self.mKanji)
     {
-        [self.mScrollView setContentOffset:CGPointMake(0, self.mKanji.frame.origin.y - 60) animated:YES];
+        [self.mScrollView setContentOffset:CGPointMake(0, self.mKanji.frame.origin.y - 64) animated:YES];
     }
     else if (textField == self.mKana)
     {
-        [self.mScrollView setContentOffset:CGPointMake(0, self.mKana.frame.origin.y - 60) animated:YES];
+        [self.mScrollView setContentOffset:CGPointMake(0, self.mKana.frame.origin.y - 64) animated:YES];
     }
 }
 
@@ -219,7 +219,7 @@
 {
 #pragma unused(textField)
     [textField endEditing:YES];
-    [self.mScrollView setContentOffset:CGPointMake(0, 0) animated:YES];
+    [self.mScrollView setContentOffset:CGPointMake(0, -64) animated:YES];
     return YES;
 }
 

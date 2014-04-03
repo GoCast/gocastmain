@@ -123,7 +123,7 @@ extern std::string kBaseURL;
     if ((textField == self.mEmail) ||
         (textField == self.mPassword))
     {
-        [self.mScrollView setContentOffset:CGPointMake(0, self.mEmail.frame.origin.y - 60) animated:YES];
+        [self.mScrollView setContentOffset:CGPointMake(0, self.mEmail.frame.origin.y - 64) animated:YES];
     }
 }
 
@@ -131,7 +131,7 @@ extern std::string kBaseURL;
 {
 #pragma unused(textField)
     [textField endEditing:YES];
-    [self.mScrollView setContentOffset:CGPointMake(0, 0) animated:YES];
+    [self.mScrollView setContentOffset:CGPointMake(0, -64) animated:YES];
     return YES;
 }
 

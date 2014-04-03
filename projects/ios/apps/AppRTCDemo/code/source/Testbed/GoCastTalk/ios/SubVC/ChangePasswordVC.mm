@@ -174,11 +174,11 @@
 {
     if (textField == self.mOldPassword)
     {
-        [self.mScrollView setContentOffset:CGPointMake(0, self.mOldPassword.frame.origin.y - 60) animated:YES];
+        [self.mScrollView setContentOffset:CGPointMake(0, self.mOldPassword.frame.origin.y - 64) animated:YES];
     }
     else if (textField == self.mNewPassword)
     {
-        [self.mScrollView setContentOffset:CGPointMake(0, self.mNewPassword.frame.origin.y - 60) animated:YES];
+        [self.mScrollView setContentOffset:CGPointMake(0, self.mNewPassword.frame.origin.y - 64) animated:YES];
     }
 }
 
@@ -186,7 +186,7 @@
 {
 #pragma unused(textField)
     [textField endEditing:YES];
-    [self.mScrollView setContentOffset:CGPointMake(0, 0) animated:YES];
+    [self.mScrollView setContentOffset:CGPointMake(0, -64) animated:YES];
     return YES;
 }
 

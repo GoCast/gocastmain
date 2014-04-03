@@ -294,7 +294,7 @@
 -(void)textViewDidBeginEditing:(UITextView *)textView
 {
 #pragma unused(textView)
-    [self.mScrollView setContentOffset:CGPointMake(0, self.mTranscription.frame.origin.y - 60) animated:YES];
+    [self.mScrollView setContentOffset:CGPointMake(0, self.mTranscription.frame.origin.y - 64) animated:YES];
 }
 
 -(BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text
