@@ -40,6 +40,7 @@
                 <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="Kanji" borderStyle="roundedRect" minimumFontSize="17" id="8K4-9J-m2d" userLabel="mKanji">
                     <rect key="frame" x="40" y="54" width="240" height="30"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <color key="tintColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                     <fontDescription key="fontDescription" name="Verdana" family="Verdana" pointSize="22"/>
                     <textInputTraits key="textInputTraits" returnKeyType="done"/>
                     <connections>
@@ -55,6 +56,7 @@
                 <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="Kana" borderStyle="roundedRect" minimumFontSize="17" id="g9u-vr-Trb" userLabel="mKana">
                     <rect key="frame" x="40" y="121" width="240" height="30"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <color key="tintColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                     <fontDescription key="fontDescription" name="Verdana" family="Verdana" pointSize="22"/>
                     <textInputTraits key="textInputTraits" returnKeyType="done"/>
                     <connections>
