@@ -39,7 +39,7 @@ function listMessages($name)
 				}
 				else
 				{
-					$item["transcription"] = json_decode("{\"ja\":\"Transcription not available\"}", true);
+					$item["transcription"] = json_decode("{\"ja\":\"\"}", true);
 				}
 
 				array_push($arr2, $item);
