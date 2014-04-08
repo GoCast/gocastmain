@@ -26,6 +26,8 @@ include 'postAudio.php';
 include 'postMessage.php';
 include 'postTranscription.php';
 
+include 'validUsers.php';
+
 appendLog();
 
 if(hasParam("action"))
@@ -40,6 +42,10 @@ if(hasParam("action"))
 				{
 					switch($_POST["action"])
 					{
+						case "validUsers":
+							print(json_encode(validUsers()));
+							break;
+
 						case "setContacts":
 							print(json_encode(setContacts($_POST["name"])));
 							break;
