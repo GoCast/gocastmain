@@ -19,6 +19,7 @@ protected:
     JSONObject          mPostAudioJSON;
     JSONObject          mPostTranscriptJSON;
     JSONObject          mPostMessageJSON;
+    JSONObject          mValidUsersJSON;
     JSONObject          mTranscription;
     JSONArray           mNewMessageRecipients;
     tSound*             mSound;
@@ -67,6 +68,7 @@ protected:
 	void pauseAudioEntry();
 	void pausedIdleEntry();
 	void peerPopAllInboxViewsEntry();
+	void peerSendEmailToNonMembersEntry();
 	void peerStartEditingTranscriptionEntry();
 	void peerSwitchToInboxTabEntry();
 	void peerSwitchToNewMemoTabEntry();
@@ -79,12 +81,15 @@ protected:
 	void sendPostMessageToServerEntry();
 	void sendPostTranscriptToServerEntry();
 	void sendReloadInboxToVCEntry();
+	void sendValidUsersToServerEntry();
 	void showComposeNewMessageEntry();
 	void showConfirmDeleteEntry();
 	void showConfirmSendEntry();
 	void showNoAudioToSendEntry();
 	void showNoContactsToSendToEntry();
 	void showPostAudioFailedEntry();
+	void showThereWereNonMembersEntry();
+	void showValidUsersFailedEntry();
 	void startRecordingAudioEntry();
 	void stopAudioEntry();
 	void stopPlayingBeforePopEntry();
@@ -96,6 +101,8 @@ protected:
 	void wasPostAudioSuccessfulEntry();
 	void wasPostMessageSuccessfulEntry();
 	void wasPostTranscriptSuccessfulEntry();
+	void wasValidUsersSuccessfulEntry();
+	void wereThereAnyNonMembersEntry();
 
 	void recordingIdleExit();
 
@@ -139,6 +146,7 @@ public:
 		kPauseAudio,
 		kPausedIdle,
 		kPeerPopAllInboxViews,
+		kPeerSendEmailToNonMembers,
 		kPeerStartEditingTranscription,
 		kPeerSwitchToInboxTab,
 		kPeerSwitchToNewMemoTab,
@@ -151,12 +159,15 @@ public:
 		kSendPostMessageToServer,
 		kSendPostTranscriptToServer,
 		kSendReloadInboxToVC,
+		kSendValidUsersToServer,
 		kShowComposeNewMessage,
 		kShowConfirmDelete,
 		kShowConfirmSend,
 		kShowNoAudioToSend,
 		kShowNoContactsToSendTo,
 		kShowPostAudioFailed,
+		kShowThereWereNonMembers,
+		kShowValidUsersFailed,
 		kStartRecordingAudio,
 		kStopAudio,
 		kStopPlayingBeforePop,
@@ -168,6 +179,8 @@ public:
 		kWasPostAudioSuccessful,
 		kWasPostMessageSuccessful,
 		kWasPostTranscriptSuccessful,
+		kWasValidUsersSuccessful,
+		kWereThereAnyNonMembers,
 	};
 
 protected:

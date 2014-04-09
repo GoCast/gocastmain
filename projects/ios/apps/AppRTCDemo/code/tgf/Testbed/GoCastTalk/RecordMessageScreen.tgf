@@ -43,6 +43,12 @@
 43 Is this a forced cancel?
 44 Show "no audio to send"
 45 Peer: start editing transcription
+46 send validUsers to server
+47 show "validUsers failed"
+48 Was validUsers successful?
+49 Were there any non-members?
+50 Show "there were non members"
+51 Peer: send email to non-members
 #
 3 4 no
 4 5 recordPressed
@@ -78,7 +84,7 @@
 22 9
 24 3
 25 26 success
-26 14 yes
+26 46 yes
 26 17 no
 25 17 fail
 27 18
@@ -118,3 +124,14 @@
 4 44 sendPressed
 44 4 yes
 45 24
+46 48 success
+46 47 fail
+46 42 expired
+48 47 no
+48 49 yes
+47 14 yes
+49 14 no
+49 50 yes
+50 14 no
+50 51 yes
+51 14

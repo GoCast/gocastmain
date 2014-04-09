@@ -179,6 +179,11 @@ void RecordMessageScreen::peerPopAllInboxViewsEntry()
     [mPeer popAllInboxViews];
 }
 
+void RecordMessageScreen::peerSendEmailToNonMembersEntry()
+{
+    [mPeer sendEmailTo:mValidUsersJSON["unregistered"].mArray withAttachment:tFile(tFile::kTemporaryDirectory, "scratch.caf") usingName:"voice_message.wav"];
+}
+
 void RecordMessageScreen::peerStartEditingTranscriptionEntry()
 {
     [mPeer startEditingTranscription];
@@ -275,6 +280,31 @@ void RecordMessageScreen::wasPostMessageSuccessfulEntry()
     SetImmediateEvent(expired ? kExpired : (result ? kYes : kNo));
 }
 
+void RecordMessageScreen::wasValidUsersSuccessfulEntry()
+{
+    bool result = false;
+    bool expired = false;
+
+    if (mValidUsersJSON["status"].mString == std::string("success"))
+    {
+        result = true;
+    }
+
+    if (mValidUsersJSON["status"].mString == std::string("expired"))
+    {
+        expired = true;
+    }
+
+    SetImmediateEvent(expired ? kExpired : (result ? kYes : kNo));
+}
+
+void RecordMessageScreen::wereThereAnyNonMembersEntry()
+{
+    bool result = mValidUsersJSON["unregistered"].mType == JSONValue::kJSONArray && !mValidUsersJSON["unregistered"].mArray.empty();
+
+    SetImmediateEvent(result ? kYes : kNo);
+}
+
 #pragma mark Actions
 void RecordMessageScreen::fixRecipientListEntry()
 {
@@ -299,6 +329,7 @@ void RecordMessageScreen::fixRecipientListEntry()
 
 void RecordMessageScreen::calculateMessageJSONEntry()
 {
+    JSONObject validUsers;
     std::map<std::string, int> calculated;
     std::string date;
     std::string audioName;
@@ -335,7 +366,12 @@ void RecordMessageScreen::calculateMessageJSONEntry()
     mMessageJSON["audio"]       = audioName;
     mMessageJSON["in-reply-to"] = mInitObject["audio"];
 
+    //4. Copy "to" results for validUsers check
+    validUsers["users"] = JSONArray();
+    validUsers["users"].mArray = mMessageJSON["to"].mArray;
+
     tFile(tFile::kTemporaryDirectory, "message.json").write(JSONValue(mMessageJSON).toString().c_str());
+    tFile(tFile::kTemporaryDirectory, "validUsers.json").write(JSONValue(validUsers).toString().c_str());
 }
 
 void RecordMessageScreen::clearDataAndReloadTableEntry()
@@ -508,6 +544,20 @@ void RecordMessageScreen::sendPostMessageToServerEntry()
     URLLoader::getInstance()->postFile(this, kMemoAppServerURL, params, tFile(tFile::kTemporaryDirectory, "message.json"));
 }
 
+void RecordMessageScreen::sendValidUsersToServerEntry()
+{
+    [mPeer setBlockingViewVisible:true];
+
+    std::vector<std::pair<std::string, std::string> > params;
+
+    params.push_back(std::pair<std::string, std::string>("action", "validUsers"));
+    params.push_back(std::pair<std::string, std::string>("name", InboxScreen::mEmailAddress));
+    params.push_back(std::pair<std::string, std::string>("authToken", InboxScreen::mToken));
+
+    params.push_back(std::pair<std::string, std::string>("MAX_FILE_SIZE", "10485760"));
+
+    URLLoader::getInstance()->postFile(this, kMemoAppServerURL, params, tFile(tFile::kTemporaryDirectory, "validUsers.json"));
+}
 
 #pragma mark UI
 
@@ -547,6 +597,16 @@ void RecordMessageScreen::showPostAudioFailedEntry()
     tAlert("音声データをサーバに送信できませんでした");
 }
 
+void RecordMessageScreen::showThereWereNonMembersEntry()
+{
+    tConfirm("Some recipients were unregistered GoCast Talk users. Send those users the voice message as an email?");
+}
+
+void RecordMessageScreen::showValidUsersFailedEntry()
+{
+    tAlert("Message was sent, but we could not verify recipients at this time.");
+}
+
 #pragma mark Sending messages to other machines
 void RecordMessageScreen::sendForceLogoutToVCEntry()
 {
@@ -579,6 +639,7 @@ void RecordMessageScreen::CallEntry()
 		case kPauseAudio: pauseAudioEntry(); break;
 		case kPausedIdle: pausedIdleEntry(); break;
 		case kPeerPopAllInboxViews: peerPopAllInboxViewsEntry(); break;
+		case kPeerSendEmailToNonMembers: peerSendEmailToNonMembersEntry(); break;
 		case kPeerStartEditingTranscription: peerStartEditingTranscriptionEntry(); break;
 		case kPeerSwitchToInboxTab: peerSwitchToInboxTabEntry(); break;
 		case kPeerSwitchToNewMemoTab: peerSwitchToNewMemoTabEntry(); break;
@@ -591,12 +652,15 @@ void RecordMessageScreen::CallEntry()
 		case kSendPostMessageToServer: sendPostMessageToServerEntry(); break;
 		case kSendPostTranscriptToServer: sendPostTranscriptToServerEntry(); break;
 		case kSendReloadInboxToVC: sendReloadInboxToVCEntry(); break;
+		case kSendValidUsersToServer: sendValidUsersToServerEntry(); break;
 		case kShowComposeNewMessage: showComposeNewMessageEntry(); break;
 		case kShowConfirmDelete: showConfirmDeleteEntry(); break;
 		case kShowConfirmSend: showConfirmSendEntry(); break;
 		case kShowNoAudioToSend: showNoAudioToSendEntry(); break;
 		case kShowNoContactsToSendTo: showNoContactsToSendToEntry(); break;
 		case kShowPostAudioFailed: showPostAudioFailedEntry(); break;
+		case kShowThereWereNonMembers: showThereWereNonMembersEntry(); break;
+		case kShowValidUsersFailed: showValidUsersFailedEntry(); break;
 		case kStart: startEntry(); break;
 		case kStartRecordingAudio: startRecordingAudioEntry(); break;
 		case kStopAudio: stopAudioEntry(); break;
@@ -609,6 +673,8 @@ void RecordMessageScreen::CallEntry()
 		case kWasPostAudioSuccessful: wasPostAudioSuccessfulEntry(); break;
 		case kWasPostMessageSuccessful: wasPostMessageSuccessfulEntry(); break;
 		case kWasPostTranscriptSuccessful: wasPostTranscriptSuccessfulEntry(); break;
+		case kWasValidUsersSuccessful: wasValidUsersSuccessfulEntry(); break;
+		case kWereThereAnyNonMembers: wereThereAnyNonMembersEntry(); break;
 		default: break;
 	}
 }
@@ -646,6 +712,7 @@ int  RecordMessageScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kPausedIdle) && (evt == kPlayPressed)) return kResumeAudio; else
 	if ((mState == kPausedIdle) && (evt == kSendPressed)) return kStopPlayingBeforeSend; else
 	if ((mState == kPeerPopAllInboxViews) && (evt == kNext)) return kPeerSwitchToInboxTab; else
+	if ((mState == kPeerSendEmailToNonMembers) && (evt == kNext)) return kSendReloadInboxToVC; else
 	if ((mState == kPeerStartEditingTranscription) && (evt == kNext)) return kLetDidRecordBeTrue; else
 	if ((mState == kPeerSwitchToInboxTab) && (evt == kNext)) return kClearDataAndReloadTable; else
 	if ((mState == kPeerSwitchToNewMemoTab) && (evt == kNext)) return kDoWeHaveRecipientsOrARecording; else
@@ -664,6 +731,9 @@ int  RecordMessageScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kSendPostTranscriptToServer) && (evt == kFail)) return kShowPostAudioFailed; else
 	if ((mState == kSendPostTranscriptToServer) && (evt == kSuccess)) return kWasPostTranscriptSuccessful; else
 	if ((mState == kSendReloadInboxToVC) && (evt == kNext)) return kPeerPopAllInboxViews; else
+	if ((mState == kSendValidUsersToServer) && (evt == kExpired)) return kSendForceLogoutToVC; else
+	if ((mState == kSendValidUsersToServer) && (evt == kFail)) return kShowValidUsersFailed; else
+	if ((mState == kSendValidUsersToServer) && (evt == kSuccess)) return kWasValidUsersSuccessful; else
 	if ((mState == kShowComposeNewMessage) && (evt == kNo)) return kDidWeRecord; else
 	if ((mState == kShowComposeNewMessage) && (evt == kYes)) return kCopyRecipientsAndReloadTable; else
 	if ((mState == kShowConfirmDelete) && (evt == kNo)) return kDidWeRecord; else
@@ -673,6 +743,9 @@ int  RecordMessageScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kShowNoAudioToSend) && (evt == kYes)) return kWaitToRecordIdle; else
 	if ((mState == kShowNoContactsToSendTo) && (evt == kYes)) return kWaitToPlayIdle; else
 	if ((mState == kShowPostAudioFailed) && (evt == kYes)) return kSendReloadInboxToVC; else
+	if ((mState == kShowThereWereNonMembers) && (evt == kNo)) return kSendReloadInboxToVC; else
+	if ((mState == kShowThereWereNonMembers) && (evt == kYes)) return kPeerSendEmailToNonMembers; else
+	if ((mState == kShowValidUsersFailed) && (evt == kYes)) return kSendReloadInboxToVC; else
 	if ((mState == kStart) && (evt == kNext)) return kFixRecipientList; else
 	if ((mState == kStartRecordingAudio) && (evt == kNext)) return kRecordingIdle; else
 	if ((mState == kStopAudio) && (evt == kNext)) return kDidWeRecord; else
@@ -694,10 +767,14 @@ int  RecordMessageScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kWasPostAudioSuccessful) && (evt == kYes)) return kSendPostTranscriptToServer; else
 	if ((mState == kWasPostMessageSuccessful) && (evt == kExpired)) return kSendForceLogoutToVC; else
 	if ((mState == kWasPostMessageSuccessful) && (evt == kNo)) return kShowPostAudioFailed; else
-	if ((mState == kWasPostMessageSuccessful) && (evt == kYes)) return kSendReloadInboxToVC; else
+	if ((mState == kWasPostMessageSuccessful) && (evt == kYes)) return kSendValidUsersToServer; else
 	if ((mState == kWasPostTranscriptSuccessful) && (evt == kExpired)) return kSendForceLogoutToVC; else
 	if ((mState == kWasPostTranscriptSuccessful) && (evt == kNo)) return kShowPostAudioFailed; else
-	if ((mState == kWasPostTranscriptSuccessful) && (evt == kYes)) return kSendPostMessageToServer;
+	if ((mState == kWasPostTranscriptSuccessful) && (evt == kYes)) return kSendPostMessageToServer; else
+	if ((mState == kWasValidUsersSuccessful) && (evt == kNo)) return kShowValidUsersFailed; else
+	if ((mState == kWasValidUsersSuccessful) && (evt == kYes)) return kWereThereAnyNonMembers; else
+	if ((mState == kWereThereAnyNonMembers) && (evt == kNo)) return kSendReloadInboxToVC; else
+	if ((mState == kWereThereAnyNonMembers) && (evt == kYes)) return kShowThereWereNonMembers;
 
 	return kInvalidState;
 }
@@ -714,6 +791,7 @@ bool RecordMessageScreen::HasEdgeNamedNext() const
 		case kLetDidRecordBeTrue:
 		case kPauseAudio:
 		case kPeerPopAllInboxViews:
+		case kPeerSendEmailToNonMembers:
 		case kPeerStartEditingTranscription:
 		case kPeerSwitchToInboxTab:
 		case kPeerSwitchToNewMemoTab:
@@ -773,6 +851,10 @@ void RecordMessageScreen::update(const URLLoaderEvent& msg)
 
                     case kSendPostTranscriptToServer:
                         mPostTranscriptJSON = JSONUtil::extract(msg.mString);
+                        break;
+
+                    case kSendValidUsersToServer:
+                        mValidUsersJSON = JSONUtil::extract(msg.mString);
                         break;
 
                     default:
@@ -887,6 +969,8 @@ void RecordMessageScreen::update(const GCTEvent& msg)
                 case kShowNoAudioToSend:
                 case kShowNoContactsToSendTo:
                 case kShowPostAudioFailed:
+                case kShowThereWereNonMembers:
+                case kShowValidUsersFailed:
                     switch(msg.mEvent)
                     {
                         case GCTEvent::kOKYesAlertPressed:  process(kYes); break;

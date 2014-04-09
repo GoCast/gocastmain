@@ -540,5 +540,42 @@
     [self.mSlider setValue:newPercentage];
 }
 
+-(void) sendEmailTo:(const JSONArray&)newTo withAttachment:(const tFile&)audioFile usingName:(const std::string&)newName
+{
+    if ([MFMailComposeViewController canSendMail])
+    {
+        std::string body;
+        body += "I've sent you a voice memo via GoCast Talk.\n";
+        body += "Since you're not a member, I've sent you this email with the audio attached\n";
+        body += "You can sign up for GoCast Talk via http://gocast.it/talk/ and then we can send voice mails to each other.";
+        MFMailComposeViewController *mailer = [[MFMailComposeViewController alloc] init];
+        mailer.mailComposeDelegate = self;
+        [mailer setSubject:[NSString stringWithUTF8String:"GoCast Talk Voice Memo"]];
+        NSMutableArray *toRecipients = [NSMutableArray array];// [NSArray arrayWithObjects:[NSString stringWithUTF8String:newTo.c_str()], nil];
+
+        for(size_t i = 0; i < newTo.size(); i++)
+        {
+            [toRecipients addObject:[NSString stringWithUTF8String:newTo[i].mString.c_str()]];
+        }
+
+        [mailer setToRecipients:toRecipients];
+        NSString *emailBody = [NSString stringWithUTF8String:body.c_str()];
+        [mailer setMessageBody:emailBody isHTML:NO];
+
+        NSData* data = [NSData dataWithContentsOfFile:[NSString stringWithUTF8String:audioFile.GetFullPath().c_str()]];
+        [mailer addAttachmentData:data mimeType:@"audio/wav" fileName:[NSString stringWithUTF8String:newName.c_str()]];
+        [self presentViewController:mailer animated:YES completion:nil];
+        [mailer release];
+    }
+}
+
+- (void)mailComposeController:(MFMailComposeViewController *)controller
+          didFinishWithResult:(MFMailComposeResult)result
+                        error:(NSError *)error
+{
+#pragma unused(controller, result, error)
+    [self dismissViewControllerAnimated:YES completion:NULL];
+}
+
 @end
 

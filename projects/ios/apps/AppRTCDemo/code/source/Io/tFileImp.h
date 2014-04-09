@@ -23,6 +23,7 @@ protected:
     virtual std::string GetPathNameFromTypeImp() const = 0;
     virtual std::vector<tUInt8> FileToVectorImp() const = 0;
     virtual bool WriteVectorToFileImp(const std::vector<tUInt8>& data) const = 0;
+public:
     std::string GetFullPath() const;
 
 public:

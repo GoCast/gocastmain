@@ -5,7 +5,10 @@
 
 #include <map>
 class JSONValue;
+class JSONArray;
 typedef std::map<std::string, JSONValue> JSONObject;
+
+class tFile;
 
 class RecordMessageScreen;
 
@@ -13,7 +16,8 @@ class RecordMessageScreen;
 <
     UITableViewDelegate,
     UITableViewDataSource,
-    CCCellDelegate
+    CCCellDelegate,
+    MFMailComposeViewControllerDelegate
 >
 {
     JSONObject mInitObject;
@@ -92,5 +96,7 @@ class RecordMessageScreen;
 -(void) setTranscriptionEnabled:(bool)newEnabled;
 
 -(void) setSliderPercentage:(float)newPercentage;
+
+-(void) sendEmailTo:(const JSONArray&)newTo withAttachment:(const tFile&)audioFile usingName:(const std::string&)newName;
 
 @end
