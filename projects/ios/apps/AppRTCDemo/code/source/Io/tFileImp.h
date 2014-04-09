@@ -11,6 +11,7 @@ public:
         kDocumentsDirectory,
         kPreferencesDirectory,
         kTemporaryDirectory,
+        kCacheDirectory,
         kRawDirectory,
     };
 

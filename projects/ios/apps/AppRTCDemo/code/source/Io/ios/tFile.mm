@@ -57,6 +57,13 @@ std::string tFile::GetPathNameFromTypeImp() const
                 return std::string([NSTemporaryDirectory() UTF8String]) + "/";
                 break;
 
+            case tFile::kCacheDirectory:
+                result =    std::string([[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] UTF8String]) + "/" +
+                GetExecutableName() + "/";
+                CreatePathIfNonExistant(result);
+                return result;
+                break;
+
             case tFile::kRawDirectory:
                 return std::string("");
                 break;
