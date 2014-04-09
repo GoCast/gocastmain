@@ -118,7 +118,7 @@ void RecordMessageScreen::waitToPlayIdleEntry()
     {
         if (mIsForwarded)
         {
-            mSound = new tSound(tFile(tFile::kDocumentsDirectory, mInitObject["audio"].mString));
+            mSound = new tSound(tFile(tFile::kTemporaryDirectory, mInitObject["audio"].mString));
         }
         else
         {

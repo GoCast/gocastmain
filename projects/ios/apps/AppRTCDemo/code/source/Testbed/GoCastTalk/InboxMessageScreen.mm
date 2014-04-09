@@ -118,7 +118,7 @@ void InboxMessageScreen::peerPushMessageHistoryEntry()
 #pragma mark Queries
 void InboxMessageScreen::doesAudioExistLocallyEntry()
 {
-    SetImmediateEvent(tFile(tFile::kDocumentsDirectory, mInitObject["audio"].mString).exists() ? kYes : kNo);
+    SetImmediateEvent(tFile(tFile::kTemporaryDirectory, mInitObject["audio"].mString).exists() ? kYes : kNo);
 }
 
 void InboxMessageScreen::wasDeleteMessageValidEntry()
@@ -243,7 +243,7 @@ void InboxMessageScreen::playSoundEntry()
     if (!mSound)
     {
 
-        mSound = new tSound(tFile(tFile::kDocumentsDirectory, mInitObject["audio"].mString));
+        mSound = new tSound(tFile(tFile::kTemporaryDirectory, mInitObject["audio"].mString));
         mSound->attach(this);
     }
 
@@ -267,7 +267,7 @@ void InboxMessageScreen::stopSoundEntry()
 
 void InboxMessageScreen::copyDownloadToLocalFilesEntry()
 {
-    tFile(tFile::kTemporaryDirectory, mInitObject["audio"].mString).rename(tFile::kDocumentsDirectory, mInitObject["audio"].mString);
+//    tFile(tFile::kTemporaryDirectory, mInitObject["audio"].mString).rename(tFile::kTemporaryDirectory, mInitObject["audio"].mString);
 }
 
 #pragma mark User Interface
@@ -275,7 +275,7 @@ void InboxMessageScreen::updateTimeLabelEntry()
 {
     if (!mSound)
     {
-        mSound = new tSound(tFile(tFile::kDocumentsDirectory, mInitObject["audio"].mString));
+        mSound = new tSound(tFile(tFile::kTemporaryDirectory, mInitObject["audio"].mString));
         mSound->attach(this);
     }
 
