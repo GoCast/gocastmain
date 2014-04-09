@@ -45,11 +45,6 @@ void InboxMessageScreen::replyPressed()
     update(kReplySelected);
 }
 
-void InboxMessageScreen::forwardPressed()
-{
-    update(kForwardSelected);
-}
-
 void InboxMessageScreen::deletePressed()
 {
     update(kDeleteSelected);
@@ -99,16 +94,6 @@ void InboxMessageScreen::peerPopSelfEntry()
 {
     [mPeer popSelf];
 }
-
-void InboxMessageScreen::peerPushForwardMessageEntry()
-{
-    [mPeer pushForwardMessage:mInitObject];
-}
-
-//void InboxMessageScreen::peerPushRecordMessageEntry()
-//{
-//    [mPeer pushRecordMessage:mInitObject];
-//}
 
 void InboxMessageScreen::peerPushMessageHistoryEntry()
 {
@@ -354,7 +339,6 @@ void InboxMessageScreen::CallEntry()
 		case kPauseSound: pauseSoundEntry(); break;
 		case kPausedIdle: pausedIdleEntry(); break;
 		case kPeerPopSelf: peerPopSelfEntry(); break;
-		case kPeerPushForwardMessage: peerPushForwardMessageEntry(); break;
 		case kPeerPushMessageHistory: peerPushMessageHistoryEntry(); break;
 		case kPlaySound: playSoundEntry(); break;
 		case kPlayingIdle: playingIdleEntry(); break;
@@ -393,13 +377,11 @@ int  InboxMessageScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kDoesAudioExistLocally) && (evt == kYes)) return kUpdateTimeLabel; else
 	if ((mState == kFixRecipientList) && (evt == kNext)) return kSetWasPlayingToFalse; else
 	if ((mState == kIdle) && (evt == kDeleteSelected)) return kSetWaitForDeleteMessage; else
-	if ((mState == kIdle) && (evt == kForwardSelected)) return kPeerPushForwardMessage; else
 	if ((mState == kIdle) && (evt == kPastSelected)) return kPeerPushMessageHistory; else
 	if ((mState == kIdle) && (evt == kPlayPressed)) return kSetWasPlayingToTrue; else
 	if ((mState == kIdle) && (evt == kReplySelected)) return kSendNewMessageToGroupToVC; else
 	if ((mState == kPauseSound) && (evt == kNext)) return kPausedIdle; else
 	if ((mState == kPausedIdle) && (evt == kPlayPressed)) return kResumeSound; else
-	if ((mState == kPeerPushForwardMessage) && (evt == kNext)) return kIdle; else
 	if ((mState == kPeerPushMessageHistory) && (evt == kNext)) return kIdle; else
 	if ((mState == kPlaySound) && (evt == kNext)) return kPlayingIdle; else
 	if ((mState == kPlayingIdle) && (evt == kFinishedPlaying)) return kStopSound; else

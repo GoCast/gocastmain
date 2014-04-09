@@ -20,8 +20,6 @@ class RecordMessageScreen;
     RecordMessageScreen* mPeer;
     bool    mToExpanded;
     CGSize  mScrollPreExpansion;
-    bool    mIsForwarded;
-    bool    mIsChild;
 }
 
 //mInboxView
@@ -66,7 +64,7 @@ class RecordMessageScreen;
 
 -(IBAction)helpButton:(UIBarButtonItem*)sender;
 
--(void)customInit:(const JSONObject&)newObject isForwarded:(bool)newIsForwarded;
+-(void)customInit:(const JSONObject&)newObject;
 
 -(void)pushContacts;
 -(void)popSelf;

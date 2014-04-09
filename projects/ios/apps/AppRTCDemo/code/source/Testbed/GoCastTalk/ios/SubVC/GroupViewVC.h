@@ -40,8 +40,6 @@ class GroupViewScreen;
 
 -(void)customInit:(const JSONObject&)newObject;
 
--(void) pushRecordMessage:(const JSONObject&)newObject;
-
 -(IBAction)sendMessagePressed;
 
 @end

@@ -29,13 +29,11 @@ protected:
     int32_t             mStartTimeMS;
     int32_t             mAlreadyPlayedTimeMS;
     bool                mDidRecord;
-    bool                mIsForwarded;
-    bool                mIsChild;
     bool                mGotTranscriptionEvent;
     bool                mForceLogout;
 
 public:
-    RecordMessageScreen(RecordMessageVC* newVC, const JSONObject& initObject, bool newIsForwarded, bool newIsChild);
+    RecordMessageScreen(RecordMessageVC* newVC, const JSONObject& initObject);
 	~RecordMessageScreen();
 
     size_t getToCount();
@@ -63,9 +61,8 @@ protected:
 	void doWeHaveRecipientsOrARecordingEntry();
 	void doWeNeedToWaitForTranscriptionEntry();
 	void fixRecipientListEntry();
-	void isForwardingMessageEntry();
 	void isThisAForcedCancelEntry();
-	void letDidRecordBeIsForwardedValueEntry();
+	void letDidRecordBeFalseEntry();
 	void letDidRecordBeTrueEntry();
 	void pauseAudioEntry();
 	void pausedIdleEntry();
@@ -136,9 +133,8 @@ public:
 		kDoWeNeedToWaitForTranscription,
 		kEnd,
 		kFixRecipientList,
-		kIsForwardingMessage,
 		kIsThisAForcedCancel,
-		kLetDidRecordBeIsForwardedValue,
+		kLetDidRecordBeFalse,
 		kLetDidRecordBeTrue,
 		kPauseAudio,
 		kPausedIdle,

@@ -364,20 +364,6 @@
     [(UINavigationController*)self.parentViewController popViewControllerAnimated:TRUE];
 }
 
--(void) pushForwardMessage:(const JSONObject&)newObject
-{
-    RecordMessageVC* nextVC = [[[RecordMessageVC alloc] initWithNibName:@"RecordMessageVC" bundle:nil] autorelease];
-    [nextVC customInit:newObject isForwarded:true];
-    [(UINavigationController*)self.parentViewController  pushViewController:nextVC animated:YES];
-}
-
--(void) pushRecordMessage:(const JSONObject &)newObject
-{
-    RecordMessageVC* nextVC = [[[RecordMessageVC alloc] initWithNibName:@"RecordMessageVC" bundle:nil] autorelease];
-    [nextVC customInit:newObject isForwarded:false];
-    [(UINavigationController*)self.parentViewController  pushViewController:nextVC animated:YES];
-}
-
 -(void) pushMessageHistory:(const JSONObject &)newObject
 {
     MessageHistoryVC* nextVC = [[[MessageHistoryVC alloc] initWithNibName:@"MessageHistoryVC" bundle:nil] autorelease];

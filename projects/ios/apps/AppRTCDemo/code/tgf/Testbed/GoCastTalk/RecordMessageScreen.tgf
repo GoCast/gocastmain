@@ -20,38 +20,37 @@
 20 Was postAudio successful?
 21 Was postTranscript successful?
 22 Resume audio
-23 Let didRecord be isForwarded value
+23 Let didRecord be false
 24 Let didRecord be true
 25 Send postMessage to server
 26 Was postMessage successful?
 27 Calculate Message JSON
 28 Do we have contacts to send to?
 29 Show "no contacts to send to"
-30 Is forwarding message?
-31 Clear data and reload table
-32 Wait for transcription idle
-33 Do we need to wait for transcription?
-34 Show "confirm send?"
-35 Fix recipient list
-36 Peer: switch to Inbox tab
-37 Show "Compose new message?"
-38 Copy recipients and reload table
-39 Peer: switch to New Memo Tab
-40 Do we have recipients or a recording?
-41 Peer: pop all Inbox views
-42 Show "confirm delete?"
-43 Send ForceLogout to VC
-44 Is this a forced cancel?
-45 Show "no audio to send"
-46 Peer: start editing transcription
+30 Clear data and reload table
+31 Wait for transcription idle
+32 Do we need to wait for transcription?
+33 Show "confirm send?"
+34 Fix recipient list
+35 Peer: switch to Inbox tab
+36 Show "Compose new message?"
+37 Copy recipients and reload table
+38 Peer: switch to New Memo Tab
+39 Do we have recipients or a recording?
+40 Peer: pop all Inbox views
+41 Show "confirm delete?"
+42 Send ForceLogout to VC
+43 Is this a forced cancel?
+44 Show "no audio to send"
+45 Peer: start editing transcription
 #
 3 4 no
 4 5 recordPressed
 3 6 yes
 5 7
 7 8 stopPressed
-1 35
-8 33
+1 34
+8 32
 6 10 playPressed
 10 9
 9 11 pausePressed
@@ -59,8 +58,8 @@
 9 13 finishedPlaying
 13 3
 12 22 playPressed
-15 44
-6 44 cancelPressed
+15 43
+6 43 cancelPressed
 12 15 cancelPressed
 9 15 cancelPressed
 18 17 fail
@@ -82,42 +81,40 @@
 26 14 yes
 26 17 no
 25 17 fail
-27 30
-28 34 yes
+27 18
+28 33 yes
 29 6 yes
 28 29 no
-30 25 yes
-30 18 no
-31 23
-32 46 transcriptionReady
-33 32 yes
-33 24 no
-34 27 yes
-34 6 no
-35 23
-36 31
-37 3 no
-4 39 newMessage
-6 39 newMessage
-12 39 newMessage
-37 38 yes
-38 35
-39 40
-32 39 newMessage
-40 37 yes
-40 38 no
-41 36
-42 31 yes
-42 3 no
-14 41
+30 23
+31 45 transcriptionReady
+32 31 yes
+32 24 no
+33 27 yes
+33 6 no
+34 23
+35 30
+36 3 no
+4 38 newMessage
+6 38 newMessage
+12 38 newMessage
+36 37 yes
+37 34
+38 39
+31 38 newMessage
+39 36 yes
+39 37 no
+40 35
+41 30 yes
+41 3 no
+14 40
 23 3
-21 43 expired
-20 43 expired
-26 43 expired
-43 31
-44 42 no
-44 31 yes
-4 44 cancelPressed
-4 45 sendPressed
-45 4 yes
-46 24
+21 42 expired
+20 42 expired
+26 42 expired
+42 30
+43 41 no
+43 30 yes
+4 43 cancelPressed
+4 44 sendPressed
+44 4 yes
+45 24

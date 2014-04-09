@@ -35,7 +35,6 @@ public:
     void playPressed();
     void pastPressed();
     void replyPressed();
-    void forwardPressed();
     void deletePressed();
 
 protected:
@@ -50,7 +49,6 @@ protected:
 	void pauseSoundEntry();
 	void pausedIdleEntry();
 	void peerPopSelfEntry();
-	void peerPushForwardMessageEntry();
 	void peerPushMessageHistoryEntry();
 	void playSoundEntry();
 	void playingIdleEntry();
@@ -83,7 +81,6 @@ public:
 		kExpired,
 		kFail,
 		kFinishedPlaying,
-		kForwardSelected,
 		kNo,
 		kPastSelected,
 		kPlayPressed,
@@ -104,7 +101,6 @@ public:
 		kPauseSound,
 		kPausedIdle,
 		kPeerPopSelf,
-		kPeerPushForwardMessage,
 		kPeerPushMessageHistory,
 		kPlaySound,
 		kPlayingIdle,

@@ -88,7 +88,7 @@
     UIBarButtonItem *anotherButton = [[[UIBarButtonItem alloc] initWithTitle:@"削除" style:UIBarButtonItemStylePlain target:self action:@selector(helpButton:)] autorelease];
     self.navigationItem.rightBarButtonItem = anotherButton;
 
-    mPeer = new RecordMessageScreen(self, mInitObject, mIsForwarded, mIsChild);
+    mPeer = new RecordMessageScreen(self, mInitObject);
 
     self->mScrollPreExpansion = self.mScrollView.contentSize;
     [self contractTo];
@@ -107,11 +107,6 @@
 - (id)init
 {
     self = [super init];
-
-    if (self)
-    {
-        self->mIsChild = false;
-    }
 
     return self;
 }
@@ -353,11 +348,9 @@
     mPeer->cancelPressed();
 }
 
--(void)customInit:(const JSONObject&)newObject isForwarded:(bool)newIsForwarded
+-(void)customInit:(const JSONObject&)newObject
 {
     mInitObject     = newObject;
-    mIsForwarded    = newIsForwarded;
-    mIsChild        = true;
 }
 
 -(void) pushContacts

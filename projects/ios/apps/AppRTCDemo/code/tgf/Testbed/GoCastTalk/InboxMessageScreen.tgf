@@ -23,13 +23,12 @@
 23 Was deleteMessage valid?
 24 Show "error deleting message"
 25 Send ReloadInbox to VC
-26 Peer: push ForwardMessage
-27 Send markRead to server
-28 Set "wait for markRead"
-29 Send ReloadInbox to VC for markRead
-30 Fix recipient list
-31 Send NewMessageToGroup to VC
-32 Send ForceLogout to VC
+26 Send markRead to server
+27 Set "wait for markRead"
+28 Send ReloadInbox to VC for markRead
+29 Fix recipient list
+30 Send NewMessageToGroup to VC
+31 Send ForceLogout to VC
 #
 4 5 fail
 4 6 success
@@ -39,7 +38,7 @@
 6 18
 8 9
 10 7 no
-1 30
+1 29
 10 18 yes
 3 15 playPressed
 9 11 playPressed
@@ -47,14 +46,14 @@
 12 13 playPressed
 13 9
 9 17 finishedPlaying
-14 28
+14 27
 15 10
 16 8 yes
 16 3 no
 17 14
 18 16
 3 21 deleteSelected
-3 31 replySelected
+3 30 replySelected
 3 19 pastSelected
 19 3
 21 22
@@ -64,13 +63,11 @@
 23 24 no
 23 25 yes
 25 20
-3 26 forwardSelected
-26 3
-28 27
-27 10 fail
-27 29 success
-29 10
-30 14
-31 3
-23 32 expired
-32 20
+27 26
+26 10 fail
+26 28 success
+28 10
+29 14
+30 3
+23 31 expired
+31 20

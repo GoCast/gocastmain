@@ -240,7 +240,7 @@
 -(void) pushRecordMessage:(const JSONObject &)newObject
 {
     RecordMessageVC* nextVC = [[[RecordMessageVC alloc] initWithNibName:@"RecordMessageVC" bundle:nil] autorelease];
-    [nextVC customInit:newObject isForwarded:false];
+    [nextVC customInit:newObject];
     [(UINavigationController*)self.parentViewController  pushViewController:nextVC animated:YES];
 }
 

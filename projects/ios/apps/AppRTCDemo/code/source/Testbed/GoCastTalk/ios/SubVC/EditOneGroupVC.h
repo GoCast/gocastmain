@@ -49,8 +49,6 @@ class EditOneGroupScreen;
 
 -(void)customInit:(const JSONObject&)newObject;
 
--(void) pushRecordMessage:(const JSONObject&)newObject;
-
 -(IBAction)donePressed;
 
 @end
