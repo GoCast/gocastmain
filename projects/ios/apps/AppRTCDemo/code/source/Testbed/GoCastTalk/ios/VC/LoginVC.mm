@@ -131,7 +131,7 @@ extern std::string kBaseURL;
 {
 #pragma unused(textField)
     [textField endEditing:YES];
-    [self.mScrollView setContentOffset:CGPointMake(0, -64) animated:YES];
+    [self.mScrollView setContentOffset:CGPointMake(0, 0) animated:YES];
     return YES;
 }
 
