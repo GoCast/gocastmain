@@ -114,7 +114,7 @@ void RecordMessageScreen::waitToPlayIdleEntry()
 
     if (!mSound)
     {
-        mSound = new tSound(tFile(tFile::kTemporaryDirectory, "scratch.caf"));
+        mSound = new tSound(tFile(tFile::kTemporaryDirectory, "scratch.wav"));
         mSound->attach(this);
     }
 
@@ -181,7 +181,7 @@ void RecordMessageScreen::peerPopAllInboxViewsEntry()
 
 void RecordMessageScreen::peerSendEmailToNonMembersEntry()
 {
-    [mPeer sendEmailTo:mValidUsersJSON["unregistered"].mArray withAttachment:tFile(tFile::kTemporaryDirectory, "scratch.caf") usingName:"voice_message.wav"];
+    [mPeer sendEmailTo:mValidUsersJSON["unregistered"].mArray withAttachment:tFile(tFile::kTemporaryDirectory, "scratch.wav") usingName:"voice_message.wav"];
 }
 
 void RecordMessageScreen::peerStartEditingTranscriptionEntry()
@@ -507,7 +507,7 @@ void RecordMessageScreen::sendPostAudioToServerEntry()
 
     params.push_back(std::pair<std::string, std::string>("MAX_FILE_SIZE", "10485760"));
 
-    URLLoader::getInstance()->postFile(this, kMemoAppServerURL, params, tFile(tFile::kTemporaryDirectory, "scratch.caf"));
+    URLLoader::getInstance()->postFile(this, kMemoAppServerURL, params, tFile(tFile::kTemporaryDirectory, "scratch.wav"));
 }
 
 void RecordMessageScreen::sendPostTranscriptToServerEntry()

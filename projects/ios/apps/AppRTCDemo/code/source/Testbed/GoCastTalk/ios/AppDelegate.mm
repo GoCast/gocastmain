@@ -155,7 +155,7 @@ const unsigned char SpeechKitApplicationKey[] =
     // Set the audio file
     NSArray *pathComponents = [NSArray arrayWithObjects:
                                NSTemporaryDirectory(),
-                               @"scratch.caf",
+                               @"scratch.wav",
                                nil];
     NSURL *outputFileURL = [NSURL fileURLWithPathComponents:pathComponents];
 
@@ -168,7 +168,8 @@ const unsigned char SpeechKitApplicationKey[] =
     // Define the recorder setting
     NSMutableDictionary *recordSetting = [[NSMutableDictionary alloc] init];
 
-    [recordSetting setValue :[NSNumber numberWithInt: kAudioFormatAppleIMA4]   forKey:AVFormatIDKey];
+    //Changed codec slightly so .WAV emails work
+    [recordSetting setValue :[NSNumber numberWithInt: kAudioFormatLinearPCM]   forKey:AVFormatIDKey];
     [recordSetting setValue :[NSNumber numberWithFloat: 16000.0]            forKey:AVSampleRateKey];
     [recordSetting setValue :[NSNumber numberWithInt: 1]                    forKey:AVNumberOfChannelsKey];
     [recordSetting setValue :[NSNumber numberWithInt: 8]                    forKey:AVLinearPCMBitDepthKey];
