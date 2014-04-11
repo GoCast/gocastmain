@@ -599,12 +599,14 @@ void RecordMessageScreen::showPostAudioFailedEntry()
 
 void RecordMessageScreen::showThereWereNonMembersEntry()
 {
-    tConfirm("Some recipients were unregistered GoCast Talk users. Send those users the voice message as an email?");
+    //"Some recipients were unregistered GoCast Talk users. Send those users the voice message as an email?"
+    tConfirm("いくつかの宛先が、GoCast Talkのメンバーに登録されていません。これらの宛先に 電子メールでメッセージを送ってもよろしいですか？");
 }
 
 void RecordMessageScreen::showValidUsersFailedEntry()
 {
-    tAlert("Message was sent, but we could not verify recipients at this time.");
+    //"Message was sent, but we could not verify recipients at this time."
+    tAlert("メッセージを送信しましたが、現時点で受信者を確認することができませんでした。");
 }
 
 #pragma mark Sending messages to other machines

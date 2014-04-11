@@ -545,12 +545,16 @@
     if ([MFMailComposeViewController canSendMail])
     {
         std::string body;
-        body += "I've sent you a voice memo via GoCast Talk.\n";
-        body += "Since you're not a member, I've sent you this email with the audio attached\n";
-        body += "You can sign up for GoCast Talk via http://gocast.it/talk/ and then we can send voice mails to each other.";
+        body += "GoCast Talkよりボイスメッセージをお届けします。\n";
+        body += "再生するには、添付オーディオファイルをクリックしてください。\n";
+        body += "自動テキスト変換：\n\n「 ";
+        body += [self.mTranscription.text UTF8String] ? [self.mTranscription.text UTF8String] : "";
+        body += " 」\n\n";
+        body += "GoCast TalkはiPhoneアプリです。http://gocast.it/talk/ よりインストールできます。\n";
+        body += "インストールの後ユーザ登録を行うと、ボイスメッセージをやり取りすることができるようになります。\n";
         MFMailComposeViewController *mailer = [[MFMailComposeViewController alloc] init];
         mailer.mailComposeDelegate = self;
-        [mailer setSubject:[NSString stringWithUTF8String:"GoCast Talk Voice Memo"]];
+        [mailer setSubject:[NSString stringWithUTF8String:"GoCast Talk ボイスメッセージ"]];//"GoCast Talk Voice Memo"
         NSMutableArray *toRecipients = [NSMutableArray array];// [NSArray arrayWithObjects:[NSString stringWithUTF8String:newTo.c_str()], nil];
 
         for(size_t i = 0; i < newTo.size(); i++)
