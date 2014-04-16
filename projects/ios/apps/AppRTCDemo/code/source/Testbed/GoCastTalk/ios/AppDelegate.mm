@@ -170,12 +170,12 @@ const unsigned char SpeechKitApplicationKey[] =
 
     //Changed codec slightly so .WAV emails work
     [recordSetting setValue :[NSNumber numberWithInt: kAudioFormatLinearPCM]   forKey:AVFormatIDKey];
-    [recordSetting setValue :[NSNumber numberWithFloat: 16000.0]            forKey:AVSampleRateKey];
+    [recordSetting setValue :[NSNumber numberWithFloat: 32000.0]            forKey:AVSampleRateKey];
     [recordSetting setValue :[NSNumber numberWithInt: 1]                    forKey:AVNumberOfChannelsKey];
     [recordSetting setValue :[NSNumber numberWithInt: 8]                    forKey:AVLinearPCMBitDepthKey];
     [recordSetting setValue :[NSNumber numberWithBool: NO]                  forKey:AVLinearPCMIsBigEndianKey];
     [recordSetting setValue :[NSNumber numberWithBool: NO]                  forKey:AVLinearPCMIsFloatKey];
-    [recordSetting setValue :[NSNumber numberWithInt: 12000]                forKey:AVEncoderBitRateKey];
+    [recordSetting setValue :[NSNumber numberWithInt: 24000]                forKey:AVEncoderBitRateKey];
     [recordSetting setValue :[NSNumber numberWithInt: 8]                    forKey:AVEncoderBitDepthHintKey];
     [recordSetting setValue :[NSNumber numberWithInt: 8]                    forKey:AVEncoderBitRatePerChannelKey];
     [recordSetting setValue :[NSNumber numberWithInt: AVAudioQualityMin]    forKey:AVEncoderAudioQualityKey];
