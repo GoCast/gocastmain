@@ -39,7 +39,8 @@
 
 @property (nonatomic, strong) IBOutlet UITabBar* mTabBar;
 
-@property (nonatomic, strong) AVAudioRecorder* mRecorder;
+@property (nonatomic, strong) AVAudioRecorder* mServerRecorder;
+@property (nonatomic, strong) AVAudioRecorder* mEmailRecorder;
 
 -(void)ctorRecorder;
 -(void)dtorRecorder;

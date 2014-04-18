@@ -142,7 +142,7 @@ const unsigned char SpeechKitApplicationKey[] =
 }
 
 #pragma mark Audio Recording
--(void)ctorRecorder
+-(void)ctorEmailRecorder
 {
     [UIDevice currentDevice].proximityMonitoringEnabled = YES;
 
@@ -153,10 +153,7 @@ const unsigned char SpeechKitApplicationKey[] =
                   delegate:self];
 
     // Set the audio file
-    NSArray *pathComponents = [NSArray arrayWithObjects:
-                               NSTemporaryDirectory(),
-                               @"scratch.wav",
-                               nil];
+    NSArray *pathComponents = [NSArray arrayWithObjects: NSTemporaryDirectory(), @"scratch.wav", nil];
     NSURL *outputFileURL = [NSURL fileURLWithPathComponents:pathComponents];
 
     // Setup audio session
@@ -170,20 +167,11 @@ const unsigned char SpeechKitApplicationKey[] =
 
     //Changed codec slightly so .WAV emails work
     [recordSetting setValue :[NSNumber numberWithInt: kAudioFormatLinearPCM]   forKey:AVFormatIDKey];
-    [recordSetting setValue :[NSNumber numberWithFloat: 32000.0]            forKey:AVSampleRateKey];
-    [recordSetting setValue :[NSNumber numberWithInt: 1]                    forKey:AVNumberOfChannelsKey];
-    [recordSetting setValue :[NSNumber numberWithInt: 8]                    forKey:AVLinearPCMBitDepthKey];
-    [recordSetting setValue :[NSNumber numberWithBool: NO]                  forKey:AVLinearPCMIsBigEndianKey];
-    [recordSetting setValue :[NSNumber numberWithBool: NO]                  forKey:AVLinearPCMIsFloatKey];
-    [recordSetting setValue :[NSNumber numberWithInt: 24000]                forKey:AVEncoderBitRateKey];
-    [recordSetting setValue :[NSNumber numberWithInt: 8]                    forKey:AVEncoderBitDepthHintKey];
-    [recordSetting setValue :[NSNumber numberWithInt: 8]                    forKey:AVEncoderBitRatePerChannelKey];
-    [recordSetting setValue :[NSNumber numberWithInt: AVAudioQualityMin]    forKey:AVEncoderAudioQualityKey];
 
     NSError* err = nil;
 
     // Initiate and prepare the recorder
-    _mRecorder = [[AVAudioRecorder alloc] initWithURL:outputFileURL settings:recordSetting error:&err];
+    _mEmailRecorder = [[AVAudioRecorder alloc] initWithURL:outputFileURL settings:recordSetting error:&err];
 
     if (err)
     {
@@ -191,16 +179,76 @@ const unsigned char SpeechKitApplicationKey[] =
         assert(0);
     }
 
-    _mRecorder.delegate = self;
-    _mRecorder.meteringEnabled = YES;
-    [_mRecorder prepareToRecord];
+    _mEmailRecorder.delegate = self;
+    _mEmailRecorder.meteringEnabled = YES;
+    [_mEmailRecorder prepareToRecord];
 
     [recordSetting release];
 }
 
+-(void)ctorServerRecorder
+{
+    [UIDevice currentDevice].proximityMonitoringEnabled = YES;
+
+    [SpeechKit setupWithID:@"NMDPTRIAL_gocast20140310195109"
+                      host:@"sandbox.nmdp.nuancemobility.net"
+                      port:443
+                    useSSL:NO
+                  delegate:self];
+
+    // Set the audio file
+    NSArray *pathComponents = [NSArray arrayWithObjects: NSTemporaryDirectory(), @"scratch.caf", nil];
+    NSURL *outputFileURL = [NSURL fileURLWithPathComponents:pathComponents];
+
+    // Setup audio session
+    AVAudioSession *session = [AVAudioSession sharedInstance];
+    [session setCategory:AVAudioSessionCategoryPlayAndRecord error:nil];
+
+    [session overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker error:nil];
+
+    // Define the recorder setting
+    NSMutableDictionary *recordSetting = [[NSMutableDictionary alloc] init];
+
+    //Changed codec slightly so .WAV emails work
+    [recordSetting setValue :[NSNumber numberWithInt: kAudioFormatAppleIMA4]   forKey:AVFormatIDKey];
+    [recordSetting setValue :[NSNumber numberWithFloat: 16000.0]            forKey:AVSampleRateKey];
+    [recordSetting setValue :[NSNumber numberWithInt: 1]                    forKey:AVNumberOfChannelsKey];
+    [recordSetting setValue :[NSNumber numberWithInt: 8]                    forKey:AVLinearPCMBitDepthKey];
+    [recordSetting setValue :[NSNumber numberWithBool: NO]                  forKey:AVLinearPCMIsBigEndianKey];
+    [recordSetting setValue :[NSNumber numberWithBool: NO]                  forKey:AVLinearPCMIsFloatKey];
+    [recordSetting setValue :[NSNumber numberWithInt: 12000]                forKey:AVEncoderBitRateKey];
+    [recordSetting setValue :[NSNumber numberWithInt: 8]                    forKey:AVEncoderBitDepthHintKey];
+    [recordSetting setValue :[NSNumber numberWithInt: 8]                    forKey:AVEncoderBitRatePerChannelKey];
+    [recordSetting setValue :[NSNumber numberWithInt: AVAudioQualityMin]    forKey:AVEncoderAudioQualityKey];
+
+    NSError* err = nil;
+
+    // Initiate and prepare the recorder
+    _mServerRecorder = [[AVAudioRecorder alloc] initWithURL:outputFileURL settings:recordSetting error:&err];
+
+    if (err)
+    {
+        NSLog(@"%@",[err localizedDescription]);
+        assert(0);
+    }
+
+    _mServerRecorder.delegate = self;
+    _mServerRecorder.meteringEnabled = YES;
+    [_mServerRecorder prepareToRecord];
+    
+    [recordSetting release];
+}
+
+-(void)ctorRecorder
+{
+    [self ctorEmailRecorder];
+    [self ctorServerRecorder];
+}
+
 -(void)dtorRecorder
 {
-    [_mRecorder release];
+    [_mServerRecorder release];
+    [_mEmailRecorder release];
 }
 
 -(void)startRecorder
@@ -217,7 +265,8 @@ const unsigned char SpeechKitApplicationKey[] =
 {
     [self stopNuanceRecorder];
 
-    [_mRecorder stop];
+    [_mEmailRecorder stop];
+    [_mServerRecorder stop];
 
     AVAudioSession *audioSession = [AVAudioSession sharedInstance];
     [audioSession setActive:NO error:nil];
@@ -234,12 +283,14 @@ const unsigned char SpeechKitApplicationKey[] =
     [session setActive:YES error:nil];
 
     // Start recording
-    [_mRecorder record];
+    [_mEmailRecorder record];
+    [_mServerRecorder record];
 }
 
 -(void)stopRecorderInternal
 {
-    [_mRecorder stop];
+    [_mEmailRecorder stop];
+    [_mServerRecorder stop];
 
     AVAudioSession *audioSession = [AVAudioSession sharedInstance];
     [audioSession setActive:NO error:nil];
