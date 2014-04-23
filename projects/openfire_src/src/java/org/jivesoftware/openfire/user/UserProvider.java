@@ -49,10 +49,11 @@ public interface UserProvider {
      * @param password the plain-text password.
      * @param name the user's name, which can be <tt>null</tt>, unless isNameRequired is set to true.
      * @param email the user's email address, which can be <tt>null</tt>, unless isEmailRequired is set to true.
+     * @param prop1 the user's prop1 address, which can be <tt>null</tt>.
      * @return a new User.
      * @throws UserAlreadyExistsException if the username is already in use.
      */
-    public User createUser(String username, String password, String name, String email)
+    public User createUser(String username, String password, String name, String email, String prop1)
             throws UserAlreadyExistsException;
 
     /**
@@ -126,6 +127,17 @@ public interface UserProvider {
      * @throws UserNotFoundException if the user could not be found.
      */
     public void setEmail(String username, String email) throws UserNotFoundException;
+
+    /**
+     * Sets the user's prop1. This method should throw an
+     * UnsupportedOperationException if this operation is not supported
+     * by the backend user store.
+     *
+     * @param username the username.
+     * @param prop1 the prop1.
+     * @throws UserNotFoundException if the user could not be found.
+     */
+    public void setProp1(String username, String prop1) throws UserNotFoundException;
 
     /**
      * Sets the date the user was created. This method should throw an

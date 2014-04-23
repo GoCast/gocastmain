@@ -235,7 +235,7 @@
 	            <label for="IDL02"><fmt:message key="client.connections.settings.idle.enable" /></label>
 	        	<br />
 	            <input type="text" name="clientIdle" value="<%= (clientIdle > 0 ? String.valueOf((clientIdle/1000)) : "") %>"
-	             size="5" maxlength="5">&nbsp;<fmt:message key="global.seconds" />.
+	             size="9" maxlength="9">&nbsp;<fmt:message key="global.seconds" />.
             <%  if (errors.containsKey("clientIdle")) { %>
                 <br>
                 <span class="jive-error-text">

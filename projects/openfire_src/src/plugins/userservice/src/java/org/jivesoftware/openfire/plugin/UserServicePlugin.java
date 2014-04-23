@@ -51,6 +51,7 @@ import org.jivesoftware.util.StringUtils;
 import org.jivesoftware.util.Log;
 import org.xmpp.packet.JID;
 import org.apache.commons.lang.RandomStringUtils;
+import org.json.*;
 
 /**
  * Plugin that allows the administration of users via HTTP requests.
@@ -100,26 +101,37 @@ public class UserServicePlugin implements Plugin, PropertyEventListener {
         User user = getUser(username);
         String genToken = RandomStringUtils.randomAlphanumeric(64);
         userManager.setAuthToken(genToken, username);
-// worked        String outstr = "\"user\": { \"email\":\""+user.getEmail()+"\", \"authToken\":\""+genToken+"\" }";
+/*
         String userName = user.getUsername();
         userName = userName.replaceAll("\\\\40","@");
-        String outstr = "\"user\": { \"email\":\""+user.getEmail()+"\", \"authToken\":\""+genToken+"\", \"username\":\""+userName+"\", \"name\":\""+user.getName()+"\" }";
- //       String outstr = "\"user\": { \"email\":\""+user.getEmail()+"\", \"authToken\":\""+genToken+"\", \"username\":\""+authToken.getUsername()+"\" }";
- //         authToken.getUsername()+"\", \"domain\":\""+authToken.getDomain()+"\", \"anonymous\":\""+authToken.isAnonymous()+"\" }";
+        String prop1 = wrapProp1(user.getProp1());
+        String outstr = "\"user\": { \"email\":\""+user.getEmail()+"\", \"authToken\":\""+genToken+"\", \"username\":\""+userName+
+            "\", \"name\":\""+user.getName()+"\", "+prop1+" }";
+*/
+        String outstr = "\"user\": { \"authToken\":\""+genToken+"\" }";
         return outstr;
     }
 
-    public String createUser(String username, String password, String name, String email, String groupNames)
+    public String resetResponse(String username)
+            throws UserNotFoundException
+    {
+        User user = getUser(username);
+        String genToken = RandomStringUtils.randomNumeric(7);
+        userManager.setResetToken(genToken, username);
+        return "\"resetToken\":\""+genToken+"\"";
+    }
+    public String createUser(String username, String password, String name, String email, String prop1, String groupNames)
             throws UserNotFoundException, UnauthorizedException, ConnectionException, InternalUnauthenticatedException, UserAlreadyExistsException
     {
-        userManager.createUser(username, password, name, email);
+        userManager.createUser(username, password, name, email, prop1);
 
-        if (groupNames != null) {
+        if (!empty(groupNames)) {
             Collection<Group> groups = new ArrayList<Group>();
             StringTokenizer tkn = new StringTokenizer(groupNames, ",");
             while (tkn.hasMoreTokens()) {
                 try {
-                    groups.add(GroupManager.getInstance().getGroup(tkn.nextToken()));
+                    String grp = CnvUTF8(tkn.nextToken());
+                    groups.add(GroupManager.getInstance().getGroup(grp));
                 } catch (GroupNotFoundException e) {
                     // Ignore this group
                 }
@@ -131,7 +143,7 @@ public class UserServicePlugin implements Plugin, PropertyEventListener {
         AuthToken authToken = AuthFactory.authenticate(username, password);
         if (authToken == null)
         {
-            return "\"404\"";
+            return "\"httpCode\":\"401\"";
         }
         return userResponse(username, authToken);
     }
@@ -142,22 +154,84 @@ public class UserServicePlugin implements Plugin, PropertyEventListener {
         AuthToken authToken = AuthFactory.authenticate(username, password);
         if (authToken == null)
         {
-            return "\"404\"";
+            return "expired";
         }
         return userResponse(username, authToken);
     }
 
+    public Boolean checkPassword(String username, String password)
+            throws UserNotFoundException, UnauthorizedException, ConnectionException, InternalUnauthenticatedException
+    {
+        return (AuthFactory.authenticate(username, password) != null);
+    }
+
+    public String logoutUser(String username, String authToken)
+            throws UserNotFoundException, UnauthorizedException, ConnectionException, InternalUnauthenticatedException
+    {
+        if (!removeAuthToken(authToken))
+        {
+            return "expired";
+        }
+        return "logged out";
+    }
     /*
-     * check if an authTokenis valid
+     * check if an authToken is valid
      *
      * @param String authToken
      *
      * @returns Boolean
      *
      */
-    public Boolean checkAuthToken(String authToken) {
-        String username = userManager.getAuthToken(authToken);
-        return (username != null);
+    public Boolean checkAuthToken(String username, String authToken) {
+        String tokenName = userManager.getAuthToken(authToken);
+        if (tokenName == null)
+        {
+            return false;
+        }
+        return username.equals(tokenName);
+    }
+
+    /*
+     * remove an authToken, logout
+     *
+     * @param String authToken
+     *
+     * @returns Boolean
+     *
+     */
+    public Boolean removeAuthToken(String authToken) {
+        userManager.removeAuthToken(authToken);
+        return true;
+    }
+
+    /*
+     * check if an resetToken is valid
+     *
+     * @param String resetToken
+     *
+     * @returns Boolean
+     *
+     */
+    public Boolean checkResetToken(String username, String resetToken) {
+        String tokenName = userManager.getResetToken(resetToken);
+        if (tokenName == null)
+        {
+            return false;
+        }
+        return username.equals(tokenName);
+    }
+
+    /*
+     * remove an resetToken, logout
+     *
+     * @param String resetToken
+     *
+     * @returns Boolean
+     *
+     */
+    public Boolean removeResetToken(String resetToken) {
+        userManager.removeResetToken(resetToken);
+        return true;
     }
 
     public void deleteUser(String username) throws UserNotFoundException{
@@ -195,20 +269,22 @@ public class UserServicePlugin implements Plugin, PropertyEventListener {
         LockOutManager.getInstance().enableAccount(username);
     }
     
-    public void updateUser(String username, String password, String name, String email, String groupNames)
+    public void updateUser(String username, String password, String name, String email, String prop1, String groupNames)
             throws UserNotFoundException
     {
         User user = getUser(username);
-        if (password != null) user.setPassword(password);
-        if (name != null) user.setName(name);
-        if (email != null) user.setEmail(email);
+        if (!empty(password)) user.setPassword(password);
+        if (!empty(name)) user.setName(name);
+        if (!empty(email)) user.setEmail(email);
+        if (!empty(prop1)) user.setProp1(prop1);
 
-        if (groupNames != null) {
+        if (!empty(groupNames)) {
             Collection<Group> newGroups = new ArrayList<Group>();
             StringTokenizer tkn = new StringTokenizer(groupNames, ",");
             while (tkn.hasMoreTokens()) {
                 try {
-                    newGroups.add(GroupManager.getInstance().getGroup(tkn.nextToken()));
+                    String grp = CnvUTF8(tkn.nextToken());
+                    newGroups.add(GroupManager.getInstance().getGroup(grp));
                 } catch (GroupNotFoundException e) {
                     // Ignore this group
                 }
@@ -240,18 +316,18 @@ public class UserServicePlugin implements Plugin, PropertyEventListener {
      * @param itemJID the JID of the roster item to be added.
      * @param itemName the nickname of the roster item.
      * @param subscription the type of subscription of the roster item. Possible values are: -1(remove), 0(none), 1(to), 2(from), 3(both).
+     * @param prop1 the type of prop1 of the roster item. contains "kana, kanjji names"
      * @param groupNames the name of a group to place contact into.
      * @throws UserNotFoundException if the user does not exist in the local server.
      * @throws UserAlreadyExistsException if roster item with the same JID already exists.
      * @throws SharedGroupException if roster item cannot be added to a shared group.
      */
-    public void addRosterItem(String username, String itemJID, String itemName, String subscription, String groupNames)
+    public void addRosterItem(String username, String itemJID, String itemName, String subscription, String prop1, String groupNames)
             throws UserNotFoundException, UserAlreadyExistsException, SharedGroupException
     {
         getUser(username);
         Roster r = rosterManager.getRoster(username);
         JID j = new JID(itemJID);
-        
         try {
             r.getRosterItem(j);
             throw new UserAlreadyExistsException(j.toBareJID());
@@ -262,15 +338,23 @@ public class UserServicePlugin implements Plugin, PropertyEventListener {
             
         if (r != null) {
             List<String> groups = new ArrayList<String>();
-            if (groupNames != null) {
+            if (!empty(groupNames)) {
                 StringTokenizer tkn = new StringTokenizer(groupNames, ",");
                 while (tkn.hasMoreTokens()) {
-                    groups.add(tkn.nextToken());
+                    groups.add(CnvUTF8(tkn.nextToken()));
                 }
             }
-            RosterItem ri = r.createRosterItem(j, itemName, groups, false, true);
-            if (subscription == null) {
+            else
+            {
+                groups = null;
+            }
+            RosterItem ri = r.createRosterItem(j, itemName, prop1, groups, false, true);
+            if (empty(subscription)) {
                 subscription = "0";
+            }
+            if (!empty(prop1))
+            {
+                ri.setProp1(prop1);
             }
             ri.setSubStatus(RosterItem.SubType.getTypeFromInt(Integer.parseInt(subscription)));
             r.updateRosterItem(ri);
@@ -284,11 +368,12 @@ public class UserServicePlugin implements Plugin, PropertyEventListener {
      * @param itemJID the JID of the roster item to be updated.
      * @param itemName the nickname of the roster item.
      * @param subscription the type of subscription of the roster item. Possible values are: -1(remove), 0(none), 1(to), 2(from), 3(both).
+     * @param prop1 the type of prop1 of the roster item. 
      * @param groupNames the name of a group.
      * @throws UserNotFoundException if the user does not exist in the local server or roster item does not exist.
      * @throws SharedGroupException if roster item cannot be added to a shared group.
      */
-    public void updateRosterItem(String username, String itemJID, String itemName, String subscription, String groupNames)
+    public void updateRosterItem(String username, String itemJID, String itemName, String subscription, String prop1, String groupNames)
             throws UserNotFoundException, SharedGroupException
     {
         getUser(username);
@@ -297,18 +382,23 @@ public class UserServicePlugin implements Plugin, PropertyEventListener {
         
         RosterItem ri = r.getRosterItem(j);
 
-        List<String> groups = new ArrayList<String>();
-        if (groupNames != null) {
+        if (!empty(groupNames))
+        {
+            List<String> groups = new ArrayList<String>();
             StringTokenizer tkn = new StringTokenizer(groupNames, ",");
             while (tkn.hasMoreTokens()) {
-                groups.add(tkn.nextToken());
+                groups.add(CnvUTF8(tkn.nextToken()));
             }
+            ri.setGroups(groups);
         }
         
-        ri.setGroups(groups);
         ri.setNickname(itemName);
+        if (!empty(prop1))
+        {
+             ri.setProp1(prop1);
+        }
         
-        if (subscription == null) {
+        if (empty(subscription)) {
             subscription = "0";
         }
         ri.setSubStatus(RosterItem.SubType.getTypeFromInt(Integer.parseInt(subscription)));
@@ -350,7 +440,7 @@ public class UserServicePlugin implements Plugin, PropertyEventListener {
         getUser(username);
         Roster r = rosterManager.getRoster(username);
         Collection<RosterItem> rosterItems = r.getRosterItems();
-        StringBuilder roster = new StringBuilder("roster:[ ");
+        StringBuilder roster = new StringBuilder("\"contacts\":[ ");
         Boolean first = true;
         for (RosterItem ri: rosterItems) {
            if (!first)
@@ -358,12 +448,13 @@ public class UserServicePlugin implements Plugin, PropertyEventListener {
               roster.append(",");
            }
            String nickName = ri.getNickname();
-           if (nickName == null)
+           if (empty(nickName))
            {
               nickName = "";
            }
+           String prop1 = wrapProp1(ri.getProp1());
            List<String> groups = ri.getGroups();
-           StringBuilder groupRoster = new StringBuilder("groups:[ ");
+           StringBuilder groupRoster = new StringBuilder("\"groups\":[ ");
            Boolean firstGroup = true;
            for (String group: groups)
            {
@@ -376,17 +467,26 @@ public class UserServicePlugin implements Plugin, PropertyEventListener {
            }
            if (firstGroup)
            {
-               roster.append("{ name:\""+ri.getJid()+"\", nickName:\""+nickName+"\" }" );
+               roster.append("{ \"name\":\""+ri.getJid()+"\", \"nickName\":\""+nickName+"\", "+prop1+" }" );
            }
            else
            {
                groupRoster.append(" ]");
-               roster.append("{ name:\""+ri.getJid()+"\", nickName:\""+nickName+"\", "+groupRoster.toString()+" }" );
+               roster.append("{ \"name\":\""+ri.getJid()+"\", \"nickName\":\""+nickName+"\", "+prop1+", "+groupRoster.toString()+" }" );
            }
            first = false;
         }
         roster.append(" ]");
         return roster.toString();
+    }
+    private String wrapProp1(String prop1)
+    {
+       prop1 = prop1.trim();
+       if (empty(prop1))
+       {
+          return "\"prop1\":{}";
+       }
+       return "\"prop1\":"+prop1;
     }
 
     /**
@@ -487,5 +587,39 @@ public class UserServicePlugin implements Plugin, PropertyEventListener {
 
     public void xmlPropertyDeleted(String property, Map<String, Object> params) {
         // Do nothing
+    }
+    public Boolean empty(String s)
+    {
+        return (s == null) || s.equals("");
+    }
+    public String CnvUTF8(String poo)
+    {
+        // See http://www.fileformat.info/info/unicode/char/1f4a9/index.htm
+        // System.out.println(poo);
+        // Length of chars doesn't equals the "real" length, that is: the number of actual codepoints
+        // System.out.println(poo.length() + " vs " + poo.codePointCount(0, poo.length()));
+        // Iterating over all chars
+        String out = "";
+        for(int i=0; i<poo.length();++i) {
+            char ca[] = { poo.charAt(i) };
+            // If there's a char left, we chan check if the current and the next char
+            // form a surrogate pair
+            if(i<poo.length()-1 && Character.isSurrogatePair(ca[0], poo.charAt(i+1))) {
+                // if so, the codepoint must be stored on a 32bit int as char is only 16bit
+                int codePoint = poo.codePointAt(i);
+                // show the code point and the char
+                //out +=String.format("%6d:%s", codePoint, new String(new int[]{codePoint}, 0, 1));
+                out += new String(new int[]{codePoint}, 0, 1);
+            }
+            // else this can only be a "normal" char
+            else
+            {
+                //System.out.println(String.format("%6d:%s", (int)c, c));
+                out += new String(ca);
+            }
+        }
+        // constructing a string constant with two \\u unicode escape sequences
+        //return "\ud83d\udca9";
+        return out;
     }
 }

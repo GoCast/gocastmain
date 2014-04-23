@@ -159,10 +159,14 @@ public class CacheFactory {
         cacheProps.put("cache.listsCache.size", 512 * 1024l);
         cacheProps.put("cache.offlinePresence.size", 512 * 1024l);
         cacheProps.put("cache.lastActivity.size", 128 * 1024l);
-        cacheProps.put("cache.userCache.size", 512 * 1024l);
-        cacheProps.put("cache.userCache.maxLifetime", JiveConstants.MINUTE * 30);
-        cacheProps.put("cache.remoteUsersCache.size", 512 * 1024l);
-        cacheProps.put("cache.remoteUsersCache.maxLifetime", JiveConstants.MINUTE * 30);
+        //cacheProps.put("cache.userCache.size", 512 * 1024l);
+        //cacheProps.put("cache.userCache.maxLifetime", JiveConstants.MINUTE * 30);
+        cacheProps.put("cache.userCache.size", 1024l * 1024l);
+        cacheProps.put("cache.userCache.maxLifetime", -1l);
+        //cacheProps.put("cache.remoteUsersCache.maxLifetime", JiveConstants.MINUTE * 30);
+        //cacheProps.put("cache.remoteUsersCache.maxLifetime", JiveConstants.MINUTE * 30);
+        cacheProps.put("cache.remoteUsersCache.size", 1024l * 1024l);
+        cacheProps.put("cache.remoteUsersCache.maxLifetime", -1l);
         cacheProps.put("cache.vcardCache.size", 512 * 1024l);
         cacheProps.put("cache.faviconHits.size", 128 * 1024l);
         cacheProps.put("cache.faviconMisses.size", 128 * 1024l);
@@ -208,8 +212,9 @@ public class CacheFactory {
         cacheProps.put("cache.pepServiceManager.maxLifetime", JiveConstants.MINUTE * 30);
         cacheProps.put("cache.publishedItems.size", 1024l * 1024 * 10);
         cacheProps.put("cache.publishedItems.maxLifetime", JiveConstants.MINUTE * 15);
+        //cacheProps.put("cache.authToken.maxLifetime", JiveConstants.MINUTE * 6);
         cacheProps.put("cache.authToken.size", 1024l * 10);
-        cacheProps.put("cache.authToken.maxLifetime", JiveConstants.MINUTE * 60);
+        cacheProps.put("cache.authToken.maxLifetime", -1l);
     }
 
     private CacheFactory() {

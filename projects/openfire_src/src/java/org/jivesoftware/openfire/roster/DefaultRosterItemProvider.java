@@ -58,10 +58,10 @@ public class DefaultRosterItemProvider implements RosterItemProvider {
 	private static final Logger Log = LoggerFactory.getLogger(DefaultRosterItemProvider.class);
 
     private static final String CREATE_ROSTER_ITEM =
-            "INSERT INTO ofRoster (username, rosterID, jid, sub, ask, recv, nick) " +
-            "VALUES (?, ?, ?, ?, ?, ?, ?)";
+            "INSERT INTO ofRoster (username, rosterID, jid, sub, ask, recv, nick, prop1) " +
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
     private static final String UPDATE_ROSTER_ITEM =
-            "UPDATE ofRoster SET sub=?, ask=?, recv=?, nick=? WHERE rosterID=?";
+            "UPDATE ofRoster SET sub=?, ask=?, recv=?, nick=?, prop1=? WHERE rosterID=?";
     private static final String DELETE_ROSTER_ITEM_GROUPS =
             "DELETE FROM ofRosterGroups WHERE rosterID=?";
     private static final String CREATE_ROSTER_ITEM_GROUPS =
@@ -73,7 +73,7 @@ public class DefaultRosterItemProvider implements RosterItemProvider {
     private static final String COUNT_ROSTER_ITEMS =
             "SELECT COUNT(rosterID) FROM ofRoster WHERE username=?";
      private static final String LOAD_ROSTER =
-             "SELECT jid, rosterID, sub, ask, recv, nick FROM ofRoster WHERE username=?";
+             "SELECT jid, rosterID, sub, ask, recv, nick, prop1 FROM ofRoster WHERE username=?";
     private static final String LOAD_ROSTER_ITEM_GROUPS =
             "SELECT rosterID,groupName FROM ofRosterGroups";
 
@@ -96,6 +96,7 @@ public class DefaultRosterItemProvider implements RosterItemProvider {
             pstmt.setInt(5, item.getAskStatus().getValue());
             pstmt.setInt(6, item.getRecvStatus().getValue());
             pstmt.setString(7, item.getNickname());
+            pstmt.setString(8, item.getProp1());
             pstmt.executeUpdate();
 
             item.setID(rosterID);
@@ -126,7 +127,8 @@ public class DefaultRosterItemProvider implements RosterItemProvider {
             pstmt.setInt(2, item.getAskStatus().getValue());
             pstmt.setInt(3, item.getRecvStatus().getValue());
             pstmt.setString(4, item.getNickname());
-            pstmt.setLong(5, rosterID);
+            pstmt.setString(5, item.getProp1());
+            pstmt.setLong(6, rosterID);
             pstmt.executeUpdate();
             // Close now the statement (do not wait to be GC'ed)
             DbConnectionManager.fastcloseStmt(pstmt);
@@ -252,6 +254,7 @@ public class DefaultRosterItemProvider implements RosterItemProvider {
                         RosterItem.AskType.getTypeFromInt(rs.getInt(4)),
                         RosterItem.RecvType.getTypeFromInt(rs.getInt(5)),
                         rs.getString(6),
+                        rs.getString(7),
                         null);
                 // Add the loaded RosterItem (ie. user contact) to the result
                 itemList.add(item);

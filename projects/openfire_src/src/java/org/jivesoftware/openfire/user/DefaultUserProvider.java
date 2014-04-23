@@ -62,14 +62,14 @@ public class DefaultUserProvider implements UserProvider {
 	private static final Logger Log = LoggerFactory.getLogger(DefaultUserProvider.class);
 
     private static final String LOAD_USER =
-            "SELECT name, email, creationDate, modificationDate FROM ofUser WHERE username=?";
+            "SELECT name, email, prop1, creationDate, modificationDate FROM ofUser WHERE username=?";
     private static final String USER_COUNT =
             "SELECT count(*) FROM ofUser";
     private static final String ALL_USERS =
             "SELECT username FROM ofUser ORDER BY username";
     private static final String INSERT_USER =
-            "INSERT INTO ofUser (username,plainPassword,encryptedPassword,name,email,creationDate,modificationDate) " +
-            "VALUES (?,?,?,?,?,?,?)";
+            "INSERT INTO ofUser (username,plainPassword,encryptedPassword,name,email,prop1,creationDate,modificationDate) " +
+            "VALUES (?,?,?,?,?,?,?,?)";
     private static final String DELETE_USER_FLAGS =
             "DELETE FROM ofUserFlag WHERE username=?";
     private static final String DELETE_USER_PROPS =
@@ -80,6 +80,8 @@ public class DefaultUserProvider implements UserProvider {
             "UPDATE ofUser SET name=? WHERE username=?";
     private static final String UPDATE_EMAIL =
             "UPDATE ofUser SET email=? WHERE username=?";
+    private static final String UPDATE_PROP1 =
+            "UPDATE ofUser SET prop1=? WHERE username=?";
     private static final String UPDATE_CREATION_DATE =
             "UPDATE ofUser SET creationDate=? WHERE username=?";
     private static final String UPDATE_MODIFICATION_DATE =
@@ -106,10 +108,11 @@ public class DefaultUserProvider implements UserProvider {
             }
             String name = rs.getString(1);
             String email = rs.getString(2);
-            Date creationDate = new Date(Long.parseLong(rs.getString(3).trim()));
-            Date modificationDate = new Date(Long.parseLong(rs.getString(4).trim()));
+            String prop1 = rs.getString(3);
+            Date creationDate = new Date(Long.parseLong(rs.getString(4).trim()));
+            Date modificationDate = new Date(Long.parseLong(rs.getString(5).trim()));
 
-            return new User(username, name, email, creationDate, modificationDate);
+            return new User(username, name, email, prop1, creationDate, modificationDate);
         }
         catch (Exception e) {
             throw new UserNotFoundException(e);
@@ -119,7 +122,7 @@ public class DefaultUserProvider implements UserProvider {
         }
     }
 
-    public User createUser(String username, String password, String name, String email)
+    public User createUser(String username, String password, String name, String email, String prop1)
             throws UserAlreadyExistsException
     {
         try {
@@ -176,8 +179,12 @@ public class DefaultUserProvider implements UserProvider {
                 else {
                     pstmt.setString(5, email);
                 }
-                pstmt.setString(6, StringUtils.dateToMillis(now));
+                if (prop1 == null ) {
+                    prop1="";
+                }
+                pstmt.setString(6, prop1);
                 pstmt.setString(7, StringUtils.dateToMillis(now));
+                pstmt.setString(8, StringUtils.dateToMillis(now));
                 pstmt.execute();
             }
             catch (Exception e) {
@@ -186,7 +193,7 @@ public class DefaultUserProvider implements UserProvider {
             finally {
                 DbConnectionManager.closeConnection(pstmt, con);
             }
-            return new User(username, name, email, now, now);
+            return new User(username, name, email, prop1, now, now);
         }
     }
 
@@ -335,6 +342,29 @@ public class DefaultUserProvider implements UserProvider {
             } 
             else {
             	pstmt.setString(1, email);
+            }
+            pstmt.setString(2, username);
+            pstmt.executeUpdate();
+        }
+        catch (SQLException sqle) {
+            throw new UserNotFoundException(sqle);
+        }
+        finally {
+            DbConnectionManager.closeConnection(pstmt, con);
+        }
+    }
+
+    public void setProp1(String username, String prop1) throws UserNotFoundException {
+        Connection con = null;
+        PreparedStatement pstmt = null;
+        try {
+            con = DbConnectionManager.getConnection();
+            pstmt = con.prepareStatement(UPDATE_PROP1);
+            if (prop1 == null ) {
+            	pstmt.setNull(1, Types.VARCHAR);
+            } 
+            else {
+            	pstmt.setString(1, prop1);
             }
             pstmt.setString(2, username);
             pstmt.executeUpdate();

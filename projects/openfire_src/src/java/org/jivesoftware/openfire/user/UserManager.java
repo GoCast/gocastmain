@@ -88,6 +88,7 @@ public class UserManager implements IQResultListener {
     private Cache<String, Boolean> remoteUsersCache;
     /** Cache of authtokens. */
     private Cache<String, String> authTokenCache;
+    private Cache<String, String> resetTokenCache;
     private UserProvider provider;
 
     private UserManager() {
@@ -95,6 +96,7 @@ public class UserManager implements IQResultListener {
         userCache = CacheFactory.createCache("User");
         remoteUsersCache = CacheFactory.createCache("Remote Users Existence");
         authTokenCache = CacheFactory.createCache("Auth Token");
+        resetTokenCache = CacheFactory.createCache("Reset Token");
 
         // Load a user provider.
         initProvider();
@@ -129,6 +131,7 @@ public class UserManager implements IQResultListener {
 
             public void userDeleting(User user, Map<String, Object> params) {
                 // Since the user could be deleted by the provider, remove it possible again
+		Log.error("REMOVE FROM UserCache userDeleting:"+user.getUsername());
                 userCache.remove(user.getUsername());
             }
 
@@ -157,7 +160,7 @@ public class UserManager implements IQResultListener {
      * @throws UnsupportedOperationException if the provider does not support the
      *      operation.
      */
-    public User createUser(String username, String password, String name, String email)
+    public User createUser(String username, String password, String name, String email, String prop1)
             throws UserAlreadyExistsException
     {
         if (provider.isReadOnly()) {
@@ -178,7 +181,7 @@ public class UserManager implements IQResultListener {
             throw new IllegalArgumentException("Invalid or empty email address specified with provider that requires email address. User: "
                                                 + username + " Email: " + email);
         }
-        User user = provider.createUser(username, password, name, email);
+        User user = provider.createUser(username, password, name, email, prop1);
         userCache.put(username, user);
 
         // Fire event.
@@ -363,6 +366,7 @@ public class UserManager implements IQResultListener {
      */
     public void setAuthToken(String authToken, String username)
     {
+	Log.error("setAuthToken:"+authToken);
         authTokenCache.put(authToken, username);
     }
     /**
@@ -374,6 +378,7 @@ public class UserManager implements IQResultListener {
      */
     public String getAuthToken(String authToken)
     {
+	Log.error("getAuthToken:"+authToken);
         return authTokenCache.get(authToken);
     }
     /**
@@ -385,7 +390,41 @@ public class UserManager implements IQResultListener {
      */
     public void removeAuthToken(String authToken)
     {
+	Log.error("removeAuthToken:"+authToken);
         authTokenCache.remove(authToken);
+    }
+    /**
+     *
+     * This method sets the resetToken in cache
+     * @param resetToken the random alphanumeric string
+     * @param username  the login username
+     *
+     */
+    public void setResetToken(String resetToken, String username)
+    {
+        resetTokenCache.put(resetToken, username);
+    }
+    /**
+     *
+     * This method gets the resetToken from  cache
+     * @param resetToken the random alphanumeric string
+     * @return username  the login username
+     *
+     */
+    public String getResetToken(String resetToken)
+    {
+        return resetTokenCache.get(resetToken);
+    }
+    /**
+     *
+     * This method removes the resetToken from  cache
+     * @param resetToken the random alphanumeric string
+     * @return username  the login username
+     *
+     */
+    public void removeResetToken(String resetToken)
+    {
+        resetTokenCache.remove(resetToken);
     }
     /**
      * Returns true if the specified local username belongs to a registered local user.

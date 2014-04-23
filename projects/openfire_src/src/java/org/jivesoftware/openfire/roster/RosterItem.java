@@ -47,6 +47,7 @@ import java.util.*;
  * <p/>
  * <ul>
  * <li>nick   - A nickname for the user when used in this roster</li>
+ * <li>prop1  - A prop1 for the user when used in this roster</li>
  * <li>sub    - A subscription type: to, from, none, both</li>
  * <li>ask    - An optional subscription ask status: subscribe, unsubscribe</li>
  * <li>groups - A list of groups to organize roster entries under (e.g. friends, co-workers, etc)</li>
@@ -141,6 +142,7 @@ public class RosterItem implements Cacheable, Externalizable {
     protected RecvType recvStatus;
     protected JID jid;
     protected String nickname;
+    protected String prop1;
     protected List<String> groups;
     protected Set<String> sharedGroups = new HashSet<String>();
     protected Set<String> invisibleSharedGroups = new HashSet<String>();
@@ -164,8 +166,9 @@ public class RosterItem implements Cacheable, Externalizable {
                                 AskType askStatus,
                                 RecvType recvStatus,
                                 String nickname,
+                                String prop1,
                                 List<String> groups) {
-        this(jid, subStatus, askStatus, recvStatus, nickname, groups);
+        this(jid, subStatus, askStatus, recvStatus, nickname, prop1, groups);
         this.rosterID = id;
     }
 
@@ -174,12 +177,14 @@ public class RosterItem implements Cacheable, Externalizable {
                            AskType askStatus,
                            RecvType recvStatus,
                            String nickname,
+                           String prop1,
                            List<String> groups) {
         this.jid = jid;
         this.subStatus = subStatus;
         this.askStatus = askStatus;
         this.recvStatus = recvStatus;
         this.nickname = nickname;
+        this.prop1 = prop1;
         this.groups = new LinkedList<String>();
         if (groups != null) {
             for (String group : groups) {
@@ -199,6 +204,7 @@ public class RosterItem implements Cacheable, Externalizable {
                 getAskStatus(item),
                 RosterItem.RECV_NONE,
                 item.getName(),
+                "", // prop1
                 new LinkedList<String>(item.getGroups()));
     }
 
@@ -326,6 +332,24 @@ public class RosterItem implements Cacheable, Externalizable {
      */
     public void setNickname(String nickname) {
         this.nickname = nickname;
+    }
+
+    /**
+     * <p>Obtain the current prop1 for the item.</p>
+     *
+     * @return The subscription status of the item
+     */
+    public String getProp1() {
+        return prop1;
+    }
+
+    /**
+     * <p>Set the current prop1 for the item.</p>
+     *
+     * @param prop1 The subscription status of the item
+     */
+    public void setProp1(String prop1) {
+        this.prop1 = prop1;
     }
 
     /**
@@ -534,6 +558,7 @@ public class RosterItem implements Cacheable, Externalizable {
         size += CacheSizes.sizeOfInt(); // askStatus
         size += CacheSizes.sizeOfInt(); // recvStatus
         size += CacheSizes.sizeOfLong(); // id
+        size += CacheSizes.sizeOfString(prop1);
         return size;
     }
 
@@ -550,6 +575,10 @@ public class RosterItem implements Cacheable, Externalizable {
         ExternalizableUtil.getInstance().writeInt(out, subStatus.getValue());
         ExternalizableUtil.getInstance().writeInt(out, askStatus.getValue());
         ExternalizableUtil.getInstance().writeLong(out, rosterID);
+        ExternalizableUtil.getInstance().writeBoolean(out, prop1 != null);
+        if (prop1 != null) {
+            ExternalizableUtil.getInstance().writeSafeUTF(out, prop1);
+        }
     }
 
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {

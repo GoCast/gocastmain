@@ -84,6 +84,7 @@ public class User implements Cacheable, Externalizable, Result {
     private String username;
     private String name;
     private String email;
+    private String prop1;
     private Date creationDate;
     private Date modificationDate;
 
@@ -137,10 +138,11 @@ public class User implements Cacheable, Externalizable, Result {
      * @param username the username.
      * @param name the name.
      * @param email the email address.
+     * @param prop1 the prop1 address.
      * @param creationDate the date the user was created.
      * @param modificationDate the date the user was last modified.
      */
-    public User(String username, String name, String email, Date creationDate,
+    public User(String username, String name, String email, String prop1, Date creationDate,
             Date modificationDate)
     {
         if (username == null) {
@@ -156,6 +158,7 @@ public class User implements Cacheable, Externalizable, Result {
                                                 + username + " Email: " + email);
         }
         this.email = email;
+        this.prop1 = prop1;
         this.creationDate = creationDate;
         this.modificationDate = modificationDate;
     }
@@ -255,6 +258,15 @@ public class User implements Cacheable, Externalizable, Result {
         return email;
     }
 
+    /**
+     * Returns the prop1 of the user or <tt>null</tt> if none is defined.
+     *
+     * @return the prop1 of the user or null if none is defined.
+     */
+    public String getProp1() {
+        return prop1;
+    }
+
     public void setEmail(String email) {
         if (UserManager.getUserProvider().isReadOnly()) {
             throw new UnsupportedOperationException("User provider is read-only.");
@@ -278,6 +290,26 @@ public class User implements Cacheable, Externalizable, Result {
             params.put("originalValue", originalEmail);
             UserEventDispatcher.dispatchEvent(this, UserEventDispatcher.EventType.user_modified,
                     params);
+        }
+        catch (UserNotFoundException unfe) {
+            Log.error(unfe.getMessage(), unfe);
+        }
+    }
+    public void setProp1(String prop1) {
+        if (UserManager.getUserProvider().isReadOnly()) {
+            throw new UnsupportedOperationException("User provider is read-only.");
+        }
+
+        try {
+            UserManager.getUserProvider().setProp1(username, prop1);
+            this.prop1 = prop1;
+            // Fire event.
+/*
+            Map<String,Object> params = new HashMap<String,Object>();
+            params.put("type", "prop1Modified");
+            params.put("originalValue", originalEmail);
+            UserEventDispatcher.dispatchEvent(this, UserEventDispatcher.EventType.user_modified, params);
+*/
         }
         catch (UserNotFoundException unfe) {
             Log.error(unfe.getMessage(), unfe);
@@ -398,6 +430,7 @@ public class User implements Cacheable, Externalizable, Result {
         size += CacheSizes.sizeOfString(username);      // username
         size += CacheSizes.sizeOfString(name);          // name
         size += CacheSizes.sizeOfString(email);         // email
+        size += CacheSizes.sizeOfString(prop1);         // prop1
         size += CacheSizes.sizeOfDate() * 2;            // creationDate and modificationDate
         size += CacheSizes.sizeOfMap(properties);       // properties
         return size;
@@ -594,6 +627,9 @@ public class User implements Cacheable, Externalizable, Result {
         if (email != null) {
             ExternalizableUtil.getInstance().writeSafeUTF(out, email);
         }
+        if (prop1 != null) {
+            ExternalizableUtil.getInstance().writeSafeUTF(out, prop1);
+        }
         ExternalizableUtil.getInstance().writeLong(out, creationDate.getTime());
         ExternalizableUtil.getInstance().writeLong(out, modificationDate.getTime());
     }
@@ -604,6 +640,7 @@ public class User implements Cacheable, Externalizable, Result {
         if (ExternalizableUtil.getInstance().readBoolean(in)) {
             email = ExternalizableUtil.getInstance().readSafeUTF(in);
         }
+        prop1 = ExternalizableUtil.getInstance().readSafeUTF(in);
         creationDate = new Date(ExternalizableUtil.getInstance().readLong(in));
         modificationDate = new Date(ExternalizableUtil.getInstance().readLong(in));
     }

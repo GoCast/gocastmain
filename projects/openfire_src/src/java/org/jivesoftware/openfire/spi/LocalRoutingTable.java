@@ -172,6 +172,7 @@ class LocalRoutingTable {
             // Do nothing if this feature is disabled
             int idleTime = SessionManager.getInstance().getServerSessionIdleTime();
             if (idleTime == -1) {
+                Log.error("ServerTaskCleanup:no timeout");
                 return;
             }
             final long deadline = System.currentTimeMillis() - idleTime;

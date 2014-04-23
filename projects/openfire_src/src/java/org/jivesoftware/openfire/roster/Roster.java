@@ -152,8 +152,9 @@ public class Roster implements Cacheable, Externalizable {
             try {
                 Collection<Group> itemGroups = new ArrayList<Group>();
                 String nickname = "";
+                String prop1 = "";
                 RosterItem item = new RosterItem(jid, RosterItem.SUB_TO, RosterItem.ASK_NONE,
-                        RosterItem.RECV_NONE, nickname, null);
+                        RosterItem.RECV_NONE, nickname, prop1, null);
                 // Add the shared groups to the new roster item
                 for (Group group : groups) {
                     if (group.isUser(jid)) {
@@ -263,7 +264,7 @@ public class Roster implements Cacheable, Externalizable {
         Set<String> invisibleSharedGroups = implicitFrom.get(user.toBareJID());
         if (invisibleSharedGroups != null) {
             RosterItem rosterItem = new RosterItem(user, RosterItem.SUB_FROM, RosterItem.ASK_NONE,
-                    RosterItem.RECV_NONE, "", null);
+                    RosterItem.RECV_NONE, "", "", null);
             rosterItem.setInvisibleSharedGroupsNames(invisibleSharedGroups);
             return rosterItem;
         }
@@ -280,7 +281,7 @@ public class Roster implements Cacheable, Externalizable {
      */
     public RosterItem createRosterItem(JID user, boolean push, boolean persistent)
             throws UserAlreadyExistsException, SharedGroupException {
-        return createRosterItem(user, null, null, push, persistent);
+        return createRosterItem(user, null, null, null, push, persistent);
     }
 
     /**
@@ -289,14 +290,15 @@ public class Roster implements Cacheable, Externalizable {
      *
      * @param user       The item to add to the roster.
      * @param nickname   The nickname for the roster entry (can be null).
+     * @param prop1      The prop1 for the roster entry (can be null).
      * @param push       True if the new item must be push to the user.
      * @param persistent True if the new roster item should be persisted to the DB.
      * @param groups     The list of groups to assign this roster item to (can be null)
      */
-    public RosterItem createRosterItem(JID user, String nickname, List<String> groups, boolean push,
+    public RosterItem createRosterItem(JID user, String nickname, String prop1, List<String> groups, boolean push,
                                        boolean persistent)
             throws UserAlreadyExistsException, SharedGroupException {
-        return provideRosterItem(user, nickname, groups, push, persistent);
+        return provideRosterItem(user, nickname, prop1, groups, push, persistent);
     }
 
     /**
@@ -308,7 +310,7 @@ public class Roster implements Cacheable, Externalizable {
      */
     public void createRosterItem(org.xmpp.packet.Roster.Item item)
             throws UserAlreadyExistsException, SharedGroupException {
-        provideRosterItem(item.getJID(), item.getName(), new ArrayList<String>(item.getGroups()), true, true);
+        provideRosterItem(item.getJID(), item.getName(), "", new ArrayList<String>(item.getGroups()), true, true);
     }
 
     /**
@@ -316,12 +318,13 @@ public class Roster implements Cacheable, Externalizable {
      *
      * @param user       The roster jid address to create the roster item for.
      * @param nickname   The nickname to assign the item (or null for none).
+     * @param prop1      The prop1 for the roster entry (can be null).
      * @param groups     The groups the item belongs to (or null for none).
      * @param push       True if the new item must be push to the user.
      * @param persistent True if the new roster item should be persisted to the DB.
      * @return The newly created roster items ready to be stored by the Roster item's hash table
      */
-    protected RosterItem provideRosterItem(JID user, String nickname, List<String> groups,
+    protected RosterItem provideRosterItem(JID user, String nickname, String prop1, List<String> groups,
                                            boolean push, boolean persistent)
             throws UserAlreadyExistsException, SharedGroupException {
         if (groups != null && !groups.isEmpty()) {
@@ -342,6 +345,7 @@ public class Roster implements Cacheable, Externalizable {
         }
         org.xmpp.packet.Roster roster = new org.xmpp.packet.Roster();
         roster.setType(IQ.Type.set);
+        // warning where does prop1 go?
         org.xmpp.packet.Roster.Item item = roster.addItem(user, nickname, null,
                 org.xmpp.packet.Roster.Subscription.none, groups);
 
@@ -770,9 +774,10 @@ public class Roster implements Cacheable, Externalizable {
             try {
                 // Create a new RosterItem for this new user
                 String nickname = UserNameManager.getUserName(addedUser);
+                String prop1 = "";
                 item =
                         new RosterItem(addedUser, RosterItem.SUB_BOTH, RosterItem.ASK_NONE,
-                                RosterItem.RECV_NONE, nickname, null);
+                                RosterItem.RECV_NONE, nickname, prop1, null);
                 // Add the new item to the list of items
                 rosterItems.put(item.getJid().toBareJID(), item);
                 newItem = true;
@@ -874,9 +879,10 @@ public class Roster implements Cacheable, Externalizable {
             try {
                 // Create a new RosterItem for this new user
                 String nickname = UserNameManager.getUserName(addedUser);
+                String prop1 = "";
                 item =
                         new RosterItem(addedUser, RosterItem.SUB_BOTH, RosterItem.ASK_NONE,
-                                RosterItem.RECV_NONE, nickname, null);
+                                RosterItem.RECV_NONE, nickname, prop1, null);
                 // Add the new item to the list of items
                 rosterItems.put(item.getJid().toBareJID(), item);
                 newItem = true;

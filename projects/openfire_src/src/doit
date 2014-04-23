@@ -1,0 +1,4 @@
+cd ../build
+./make.sh
+cd ../src
+vi ../build/tmp.err

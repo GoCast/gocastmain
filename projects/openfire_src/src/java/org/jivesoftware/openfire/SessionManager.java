@@ -1413,6 +1413,7 @@ public class SessionManager extends BasicModule implements ClusterEventListener 
      * @param timeout the number of milliseconds to elapse between clearings.
      */
     public void setServerSessionTimeout(int timeout) {
+        Log.error("setServerSessionTimeout:"+timeout);
         if (getServerSessionTimeout() == timeout) {
             return;
         }
@@ -1426,10 +1427,16 @@ public class SessionManager extends BasicModule implements ClusterEventListener 
      * @return the number of milliseconds to elapse between clearing of idle server sessions.
      */
     public int getServerSessionTimeout() {
-        return JiveGlobals.getIntProperty("xmpp.server.session.timeout", 5 * 60 * 1000);
+        int timeout = JiveGlobals.getIntProperty("xmpp.server.session.timeout", 30 * 24 * 60  * 60 * 1000);
+        //Log.error("SERVER_SESSION_TIMEOUT:"+timeout);
+        Throwable t = new Throwable();
+        t.printStackTrace();
+        //return timeout;
+        return -1;
     }
 
     public void setServerSessionIdleTime(int idleTime) {
+        //Log.error("setServerSessionIdleTimeout:"+idleTime);
         if (getServerSessionIdleTime() == idleTime) {
             return;
         }
@@ -1446,7 +1453,29 @@ public class SessionManager extends BasicModule implements ClusterEventListener 
     }
 
     public int getServerSessionIdleTime() {
-        return JiveGlobals.getIntProperty("xmpp.server.session.idle", 10 * 60 * 1000);
+        //int timeout = JiveGlobals.getIntProperty("xmpp.server.session.idle", 30 * 24 *60 * 60 * 1000);
+        int timeout = JiveGlobals.getIntProperty("xmpp.server.session.idle", 60 * 60 * 1000);
+        //Log.error("SERVER_SESSION_IDLE_TIMEOUT STACKSTART:"+timeout);
+        //Throwable t = new Throwable();
+        //t.fillInStackTrace();
+	int y = 0;
+	try {
+        	//Log.error("SERVER_SESSION_IDLE_TIMEOUT LOOP:"+timeout);
+                /*
+		for (StackTraceElement ste : Thread.currentThread().getStackTrace()) {
+			Log.error("STACK:"+ste.toString());
+		}
+                */
+        	//Log.error("SERVER_SESSION_IDLE_TIMEOUT ENDLOOP:"+timeout);
+	}
+	catch (Exception e)
+	{
+        	//Log.error("exception:"+e.getStackTrace());
+        	e.printStackTrace();
+	}
+        //Log.error("SERVER_SESSION_IDLE_TIMEOUT STACKEND:"+timeout);
+        //return timeout;
+	return -1;
     }
 
     public Cache<String, ClientSessionInfo> getSessionInfoCache() {
