@@ -24,6 +24,12 @@ extern std::string kBaseURL;
 #pragma mark Construction / Destruction
 - (void)viewDidLoad
 {
+#if (ADHOC || DEBUG)
+    [self.mBaseURL setHidden:NO];
+#else
+    [self.mBaseURL setHidden:YES];
+#endif
+
     [super viewDidLoad];
 
     self.view.autoresizesSubviews = YES;
