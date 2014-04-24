@@ -43,6 +43,8 @@
 43 Show "must upgrade"
 44 Launch app store
 45 Send ForceLogin to VC
+46 Is this adhoc and first run?
+47 Show "This is adhoc"
 #
 1 32
 4 5 success
@@ -52,7 +54,7 @@
 7 8 no
 7 14 yes
 5 13 yes
-8 3
+8 46
 3 9 itemSelected
 9 3
 3 14 refreshSelected
@@ -115,3 +117,6 @@
 38 18 yes
 40 42 yes
 45 14
+46 47 yes
+47 3 yes
+46 3 no

@@ -6,6 +6,8 @@
 
 #include "InboxVC.h"
 
+bool InboxScreen::mFirstRun = true;
+
 JSONArray   InboxScreen::mInbox;
 JSONArray   InboxScreen::mContacts;
 JSONArray   InboxScreen::mGroups;
@@ -245,6 +247,16 @@ void InboxScreen::waitForLoginSuccessIdleEntry()
 }
 
 #pragma mark Queries
+void InboxScreen::isThisAdhocAndFirstRunEntry()
+{
+#ifdef ADHOC
+    SetImmediateEvent(mFirstRun ? kYes : kNo);
+#else
+    SetImmediateEvent(kNo);
+#endif
+    mFirstRun = false;
+}
+
 void InboxScreen::isThisTheCorrectVersionEntry()
 {
     SetImmediateEvent((mVersionJSON["version"].mString == "1") ? kYes : kNo);
@@ -689,6 +701,12 @@ void InboxScreen::showMustUpgradeEntry()
     tAlert("最新バージョンのGoCast Talkにアップデートしてください。");
 }
 
+void InboxScreen::showThisIsAdhocEntry()
+{
+    // "TestFlight version."
+    tAlert("TestFlightバージョンです。");
+}
+
 #pragma mark Sending messages to other machines
 void InboxScreen::sendForceLoginToVCEntry()
 {
@@ -715,6 +733,7 @@ void InboxScreen::CallEntry()
 		case kEnd: EndEntryHelper(); break;
 		case kIdle: idleEntry(); break;
 		case kInvalidState: invalidStateEntry(); break;
+		case kIsThisAdhocAndFirstRun: isThisAdhocAndFirstRunEntry(); break;
 		case kIsThisTheCorrectVersion: isThisTheCorrectVersionEntry(); break;
 		case kIsThisTheFirstLogin: isThisTheFirstLoginEntry(); break;
 		case kLaunchAppStore: launchAppStoreEntry(); break;
@@ -739,6 +758,7 @@ void InboxScreen::CallEntry()
 		case kShowErrorLoadingInbox: showErrorLoadingInboxEntry(); break;
 		case kShowMustUpgrade: showMustUpgradeEntry(); break;
 		case kShowRetryListMessages: showRetryListMessagesEntry(); break;
+		case kShowThisIsAdhoc: showThisIsAdhocEntry(); break;
 		case kShowYourTokenExpired: showYourTokenExpiredEntry(); break;
 		case kSortContactsByKana: sortContactsByKanaEntry(); break;
 		case kSortGroupsByGroupName: sortGroupsByGroupNameEntry(); break;
@@ -782,6 +802,8 @@ int  InboxScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kIdle) && (evt == kForceLogout)) return kClearAllDataAndReloadTable; else
 	if ((mState == kIdle) && (evt == kItemSelected)) return kPeerPushInboxMessage; else
 	if ((mState == kIdle) && (evt == kRefreshSelected)) return kDoWeHaveAToken; else
+	if ((mState == kIsThisAdhocAndFirstRun) && (evt == kNo)) return kIdle; else
+	if ((mState == kIsThisAdhocAndFirstRun) && (evt == kYes)) return kShowThisIsAdhoc; else
 	if ((mState == kIsThisTheCorrectVersion) && (evt == kNo)) return kShowMustUpgrade; else
 	if ((mState == kIsThisTheCorrectVersion) && (evt == kYes)) return kDidWeDownloadContacts; else
 	if ((mState == kIsThisTheFirstLogin) && (evt == kNo)) return kShowYourTokenExpired; else
@@ -791,7 +813,7 @@ int  InboxScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kLoadLoginNameAndToken) && (evt == kSuccess)) return kDoWeHaveAToken; else
 	if ((mState == kPeerPushInboxMessage) && (evt == kNext)) return kIdle; else
 	if ((mState == kPeerPushLoginScreen) && (evt == kNext)) return kPeerSwitchToInboxTab; else
-	if ((mState == kPeerReloadTable) && (evt == kNext)) return kIdle; else
+	if ((mState == kPeerReloadTable) && (evt == kNext)) return kIsThisAdhocAndFirstRun; else
 	if ((mState == kPeerResetAllTabs) && (evt == kNext)) return kWasThisAManualLogout; else
 	if ((mState == kPeerSwitchToInboxTab) && (evt == kNext)) return kPeerResetAllTabs; else
 	if ((mState == kPlayNewMessageSound) && (evt == kNext)) return kPeerReloadTable; else
@@ -815,6 +837,7 @@ int  InboxScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kShowMustUpgrade) && (evt == kYes)) return kLaunchAppStore; else
 	if ((mState == kShowRetryListMessages) && (evt == kNo)) return kPeerReloadTable; else
 	if ((mState == kShowRetryListMessages) && (evt == kYes)) return kDoWeHaveAToken; else
+	if ((mState == kShowThisIsAdhoc) && (evt == kYes)) return kIdle; else
 	if ((mState == kShowYourTokenExpired) && (evt == kYes)) return kWaitForLoginSuccessIdle; else
 	if ((mState == kSortContactsByKana) && (evt == kNext)) return kDidWeDownloadGroups; else
 	if ((mState == kSortGroupsByGroupName) && (evt == kNext)) return kSendListMessagesToServer; else
@@ -954,6 +977,7 @@ void InboxScreen::update(const GCTEvent& msg)
         case kShowErrorLoadingContacts:
         case kShowErrorLoadingGroups:
         case kShowRetryListMessages:
+        case kShowThisIsAdhoc:
         case kShowYourTokenExpired:
         case kShowErrorContactVersion:
         case kShowMustUpgrade:

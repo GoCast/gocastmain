@@ -29,6 +29,7 @@ protected:
     bool        mManualLogout;
     bool        mFirstLogin;
     bool        mDidVersionCheck;
+    static bool mFirstRun;
 
 public:
     static JSONArray    mInbox;
@@ -73,6 +74,7 @@ protected:
 	void didWeDownloadGroupsEntry();
 	void doWeHaveATokenEntry();
 	void idleEntry();
+	void isThisAdhocAndFirstRunEntry();
 	void isThisTheCorrectVersionEntry();
 	void isThisTheFirstLoginEntry();
 	void launchAppStoreEntry();
@@ -97,6 +99,7 @@ protected:
 	void showErrorLoadingInboxEntry();
 	void showMustUpgradeEntry();
 	void showRetryListMessagesEntry();
+	void showThisIsAdhocEntry();
 	void showYourTokenExpiredEntry();
 	void sortContactsByKanaEntry();
 	void sortGroupsByGroupNameEntry();
@@ -141,6 +144,7 @@ public:
 		kDoWeHaveAToken,
 		kEnd,
 		kIdle,
+		kIsThisAdhocAndFirstRun,
 		kIsThisTheCorrectVersion,
 		kIsThisTheFirstLogin,
 		kLaunchAppStore,
@@ -165,6 +169,7 @@ public:
 		kShowErrorLoadingInbox,
 		kShowMustUpgrade,
 		kShowRetryListMessages,
+		kShowThisIsAdhoc,
 		kShowYourTokenExpired,
 		kSortContactsByKana,
 		kSortGroupsByGroupName,
