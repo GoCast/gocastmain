@@ -1,6 +1,6 @@
 <?php
 
-function register($name, $password)
+function register($name, $password, $device)
 {
 	$name = trim($name);
 	$password = trim($password);
@@ -42,6 +42,8 @@ function register($name, $password)
 				if ($token != false)
 				{
 					$user		= json_decode( '{ "authToken": "' . $token . '" }', true);
+
+					$add_new_device($name, $device);
 
 					$result = array("status" => "success",
 									"message" => "User successfully registered",

@@ -1,6 +1,6 @@
 <?php
 
-function login($name, $password)
+function login($name, $password, $device)
 {
 	$name = trim($name);
 	$password = trim($password);
@@ -20,6 +20,8 @@ function login($name, $password)
 					if ($token != false)
 					{
 						$user		= json_decode( '{ "authToken": "' . $token . '" }', true);
+
+						add_new_device($name, $device);
 
 						$result = array("status" => "success",
 										"message" => "Login was successful",

@@ -5,6 +5,7 @@ $GLOBALS['database'] = 'database';
 
 include 'utils.php';
 include 'token.php';
+include 'deviceToken.php';
 
 include 'login.php';
 include 'register.php';
@@ -29,6 +30,12 @@ include 'postTranscription.php';
 include 'validUsers.php';
 
 appendLog();
+
+$device = "";
+if (hasParam("device"))
+{
+	$device = $_GET["device"];
+}
 
 if(hasParam("action"))
 {
@@ -126,9 +133,16 @@ if(hasParam("action"))
 							}
 							break;
 
+						case "registerDevice":
+							add_new_device($_GET["name"], $device);
+							print(json_encode(array("status" => "success", "message" => "Register Device succeeded")));
+							break;
+
 						case "logout":
 							if (remove_new_token($_GET["name"], $_GET["authToken"]))
 							{
+								remove_new_device($_GET["name"], $device);
+
 								print(json_encode(array("status" => "success", "message" => "Logout succeeded")));
 							}
 							else
@@ -204,7 +218,7 @@ if(hasParam("action"))
 					case "register":
 						if (hasParam("password"))
 						{
-							print(json_encode(register($_GET["name"], $_GET["password"])));
+							print(json_encode(register($_GET["name"], $_GET["password"], $device)));
 						}
 						else
 						{
@@ -215,7 +229,7 @@ if(hasParam("action"))
 					case "login":
 						if (hasParam("password"))
 						{
-							print(json_encode(login($_GET["name"], $_GET["password"])));
+							print(json_encode(login($_GET["name"], $_GET["password"], $device)));
 						}
 						else
 						{
