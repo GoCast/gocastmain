@@ -1,3 +1,4 @@
+#import <TargetConditionals.h>
 #include <string>
 
 #import "AppDelegate.h"
@@ -15,6 +16,7 @@
 #import "SubVC/MessageSentVC.h"
 
 #include "Base/package.h"
+#include "Io/package.h"
 
 #include "GCTEvent.h"
 #include "GCTEventManager.h"
@@ -54,9 +56,41 @@ const unsigned char SpeechKitApplicationKey[] =
     return self;
 }
 
+- (void)application:(UIApplication*)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData*)deviceToken
+{
+#pragma unused(application)
+    NSString *devToken = [[[[deviceToken description]
+                            stringByReplacingOccurrencesOfString:@"<" withString:@""]
+                           stringByReplacingOccurrencesOfString:@">" withString:@""]
+                          stringByReplacingOccurrencesOfString:@" " withString:@""];
+
+	NSLog(@"My token is: %@", devToken);
+
+    const char* devTokenStr = [devToken UTF8String];
+
+    tFile deviceTokenFile(tFile::kPreferencesDirectory, "device.txt");
+
+    if (devTokenStr && !deviceTokenFile.exists())
+    {
+        deviceTokenFile.write(devTokenStr);
+    }
+}
+
+- (void)application:(UIApplication*)application didFailToRegisterForRemoteNotificationsWithError:(NSError*)error
+{
+#pragma unused(application)
+	NSLog(@"Failed to get token, error: %@", error);
+}
+
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
 #pragma unused(application, launchOptions)
+
+#if !(TARGET_IPHONE_SIMULATOR)
+    [[UIApplication sharedApplication] registerForRemoteNotificationTypes: (UIRemoteNotificationTypeBadge |
+                                                                            UIRemoteNotificationTypeSound |
+                                                                            UIRemoteNotificationTypeAlert)];
+#endif
 
 #ifdef ADHOC
 #pragma clang diagnostic push

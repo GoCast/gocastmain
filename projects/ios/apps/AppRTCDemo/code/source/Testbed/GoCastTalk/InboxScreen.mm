@@ -6,14 +6,15 @@
 
 #include "InboxVC.h"
 
-bool InboxScreen::mFirstRun = true;
-
 JSONArray   InboxScreen::mInbox;
 JSONArray   InboxScreen::mContacts;
 JSONArray   InboxScreen::mGroups;
 
 std::string InboxScreen::mEmailAddress;
 std::string InboxScreen::mToken;
+std::string InboxScreen::mDeviceToken;
+
+bool InboxScreen::mFirstRun                         = true;
 
 bool sortByDate (JSONValue i, JSONValue j);
 bool sortByDate (JSONValue i, JSONValue j)
@@ -247,6 +248,18 @@ void InboxScreen::waitForLoginSuccessIdleEntry()
 }
 
 #pragma mark Queries
+void InboxScreen::canRegisterDeviceEntry()
+{
+    tFile deviceTokenFile(tFile::kPreferencesDirectory, "device.txt");
+
+    if (deviceTokenFile.exists())
+    {
+        mDeviceToken = deviceTokenFile;
+    }
+
+    SetImmediateEvent(!mDeviceToken.empty() ? kYes : kNo);
+}
+
 void InboxScreen::isThisAdhocAndFirstRunEntry()
 {
 #ifdef ADHOC
@@ -501,7 +514,6 @@ void InboxScreen::loadLoginNameAndTokenEntry()
     if (loginInfo.exists())
     {
         mToken = loginInfo;
-
     }
 
     loginInfo = tFile(tFile::kPreferencesDirectory, "baseURL.txt");
@@ -640,6 +652,21 @@ void InboxScreen::sendDeleteMessageToServerEntry()
     URLLoader::getInstance()->loadString(this, buf);
 }
 
+void InboxScreen::sendRegisterDeviceToServerEntry()
+{
+    [mPeer setBlockingViewVisible:true];
+
+    char buf[512];
+
+    sprintf(buf, "%s?action=registerDevice&name=%s&authToken=%s&device=%s",
+            kMemoAppServerURL,
+            InboxScreen::mEmailAddress.c_str(),
+            InboxScreen::mToken.c_str(),
+            InboxScreen::mDeviceToken.c_str());
+
+    URLLoader::getInstance()->loadString(this, buf);
+}
+
 void InboxScreen::sendVersionToServerEntry()
 {
     [mPeer setBlockingViewVisible:true];
@@ -725,6 +752,7 @@ void InboxScreen::CallEntry()
 	{
 		case kAddFakeContacts: addFakeContactsEntry(); break;
 		case kAreThereNewMessages: areThereNewMessagesEntry(); break;
+		case kCanRegisterDevice: canRegisterDeviceEntry(); break;
 		case kClearAllDataAndReloadTable: clearAllDataAndReloadTableEntry(); break;
 		case kDidWeDoAVersionCheck: didWeDoAVersionCheckEntry(); break;
 		case kDidWeDownloadContacts: didWeDownloadContactsEntry(); break;
@@ -750,6 +778,7 @@ void InboxScreen::CallEntry()
 		case kSendGetContactsToServer: sendGetContactsToServerEntry(); break;
 		case kSendGetGroupsToServer: sendGetGroupsToServerEntry(); break;
 		case kSendListMessagesToServer: sendListMessagesToServerEntry(); break;
+		case kSendRegisterDeviceToServer: sendRegisterDeviceToServerEntry(); break;
 		case kSendVersionToServer: sendVersionToServerEntry(); break;
 		case kShowErrorContactVersion: showErrorContactVersionEntry(); break;
 		case kShowErrorDeletingMessage: showErrorDeletingMessageEntry(); break;
@@ -789,6 +818,8 @@ int  InboxScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kAddFakeContacts) && (evt == kNext)) return kSortContactsByKana; else
 	if ((mState == kAreThereNewMessages) && (evt == kNo)) return kPeerReloadTable; else
 	if ((mState == kAreThereNewMessages) && (evt == kYes)) return kPlayNewMessageSound; else
+	if ((mState == kCanRegisterDevice) && (evt == kNo)) return kDidWeDownloadContacts; else
+	if ((mState == kCanRegisterDevice) && (evt == kYes)) return kSendRegisterDeviceToServer; else
 	if ((mState == kClearAllDataAndReloadTable) && (evt == kNext)) return kPeerPushLoginScreen; else
 	if ((mState == kDidWeDoAVersionCheck) && (evt == kNo)) return kSendVersionToServer; else
 	if ((mState == kDidWeDoAVersionCheck) && (evt == kYes)) return kDidWeDownloadContacts; else
@@ -805,7 +836,7 @@ int  InboxScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kIsThisAdhocAndFirstRun) && (evt == kNo)) return kIdle; else
 	if ((mState == kIsThisAdhocAndFirstRun) && (evt == kYes)) return kShowThisIsAdhoc; else
 	if ((mState == kIsThisTheCorrectVersion) && (evt == kNo)) return kShowMustUpgrade; else
-	if ((mState == kIsThisTheCorrectVersion) && (evt == kYes)) return kDidWeDownloadContacts; else
+	if ((mState == kIsThisTheCorrectVersion) && (evt == kYes)) return kCanRegisterDevice; else
 	if ((mState == kIsThisTheFirstLogin) && (evt == kNo)) return kShowYourTokenExpired; else
 	if ((mState == kIsThisTheFirstLogin) && (evt == kYes)) return kWaitForLoginSuccessIdle; else
 	if ((mState == kLaunchAppStore) && (evt == kNext)) return kShowMustUpgrade; else
@@ -827,6 +858,8 @@ int  InboxScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kSendGetGroupsToServer) && (evt == kSuccess)) return kWasGetGroupsValid; else
 	if ((mState == kSendListMessagesToServer) && (evt == kFail)) return kShowRetryListMessages; else
 	if ((mState == kSendListMessagesToServer) && (evt == kSuccess)) return kWasListMessagesValid; else
+	if ((mState == kSendRegisterDeviceToServer) && (evt == kFail)) return kDidWeDownloadContacts; else
+	if ((mState == kSendRegisterDeviceToServer) && (evt == kSuccess)) return kDidWeDownloadContacts; else
 	if ((mState == kSendVersionToServer) && (evt == kFail)) return kShowErrorContactVersion; else
 	if ((mState == kSendVersionToServer) && (evt == kSuccess)) return kWasVersionValid; else
 	if ((mState == kShowErrorContactVersion) && (evt == kYes)) return kSendVersionToServer; else

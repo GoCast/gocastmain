@@ -200,6 +200,15 @@ void LoginScreen::sendLoginToServerEntry()
             mEmail.c_str(),
             mPassword.c_str());
 
+    if (!InboxScreen::mDeviceToken.empty())
+    {
+        sprintf(buf, "%s?action=login&name=%s&password=%s&device=%s",
+                kMemoAppServerURL,
+                mEmail.c_str(),
+                mPassword.c_str(),
+                InboxScreen::mDeviceToken.c_str());
+    }
+
     URLLoader::getInstance()->loadString(this, buf);
 }
 

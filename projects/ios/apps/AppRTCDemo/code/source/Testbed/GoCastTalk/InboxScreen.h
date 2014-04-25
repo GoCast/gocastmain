@@ -20,6 +20,7 @@ protected:
     JSONObject  mListMessagesJSON;
     JSONObject  mDeleteMessageJSON;
     JSONObject  mVersionJSON;
+
     tSound*     mNewMessageSound;
     tTimer*     mRefreshTimer;
     size_t      mItemSelected;
@@ -29,7 +30,6 @@ protected:
     bool        mManualLogout;
     bool        mFirstLogin;
     bool        mDidVersionCheck;
-    static bool mFirstRun;
 
 public:
     static JSONArray    mInbox;
@@ -37,6 +37,8 @@ public:
     static JSONArray    mGroups;
     static std::string  mEmailAddress;
     static std::string  mToken;
+    static std::string  mDeviceToken;
+    static bool mFirstRun;
 
 public:
     static std::string getGmtString();
@@ -68,6 +70,7 @@ protected:
 
 	void addFakeContactsEntry();
 	void areThereNewMessagesEntry();
+	void canRegisterDeviceEntry();
 	void clearAllDataAndReloadTableEntry();
 	void didWeDoAVersionCheckEntry();
 	void didWeDownloadContactsEntry();
@@ -91,6 +94,7 @@ protected:
 	void sendGetContactsToServerEntry();
 	void sendGetGroupsToServerEntry();
 	void sendListMessagesToServerEntry();
+	void sendRegisterDeviceToServerEntry();
 	void sendVersionToServerEntry();
 	void showErrorContactVersionEntry();
 	void showErrorDeletingMessageEntry();
@@ -137,6 +141,7 @@ public:
 		kStart = 1,
 		kAddFakeContacts,
 		kAreThereNewMessages,
+		kCanRegisterDevice,
 		kClearAllDataAndReloadTable,
 		kDidWeDoAVersionCheck,
 		kDidWeDownloadContacts,
@@ -161,6 +166,7 @@ public:
 		kSendGetContactsToServer,
 		kSendGetGroupsToServer,
 		kSendListMessagesToServer,
+		kSendRegisterDeviceToServer,
 		kSendVersionToServer,
 		kShowErrorContactVersion,
 		kShowErrorDeletingMessage,

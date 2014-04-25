@@ -119,6 +119,15 @@ void SettingsScreen::sendLogoutToServerEntry()
             InboxScreen::mEmailAddress.c_str(),
             InboxScreen::mToken.c_str());
 
+    if (!InboxScreen::mDeviceToken.empty())
+    {
+        sprintf(buf, "%s?action=logout&name=%s&authToken=%s&device=%s",
+                kMemoAppServerURL,
+                InboxScreen::mEmailAddress.c_str(),
+                InboxScreen::mToken.c_str(),
+                InboxScreen::mDeviceToken.c_str());
+    }
+
     URLLoader::getInstance()->loadString(this, buf);
 }
 

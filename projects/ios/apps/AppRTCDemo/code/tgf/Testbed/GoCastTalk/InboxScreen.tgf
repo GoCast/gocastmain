@@ -45,6 +45,8 @@
 45 Send ForceLogin to VC
 46 Is this adhoc and first run?
 47 Show "This is adhoc"
+48 Send registerDevice to server
+49 Can register device?
 #
 1 32
 4 5 success
@@ -113,10 +115,13 @@
 42 43 no
 43 44 yes
 44 43
-42 18 yes
+42 49 yes
 38 18 yes
 40 42 yes
 45 14
 46 47 yes
 47 3 yes
 46 3 no
+48 18 success, fail
+49 48 yes
+49 18 no
