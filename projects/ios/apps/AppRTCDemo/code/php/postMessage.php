@@ -38,7 +38,9 @@ function getTranscriptForPostMessage($audio)
 
 	if (is_file($trans_file))
 	{
-		return json_decode(atomic_get_contents($trans_file), true)["ja"];
+		$result = json_decode(atomic_get_contents($trans_file), true);
+
+		return $result["ja"];
 	}
 
 	return "";
