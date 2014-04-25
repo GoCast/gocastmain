@@ -274,9 +274,9 @@
 					'../../source/Testbed/GoCastTalk/<@(OS)/CCCell.h',
 					'../../source/Testbed/GoCastTalk/<@(OS)/CCCell.mm',
 
-					'../../third-party/TestFlightSDK2.0.2/TestFlight.h',
-					'../../third-party/TestFlightSDK2.0.2/TestFlight+AsyncLogging.h',
-					'../../third-party/TestFlightSDK2.0.2/TestFlight+ManualSessions.h',
+					'../../third-party/TestFlightSDK3.0.0/TestFlight.h',
+					'../../third-party/TestFlightSDK3.0.0/TestFlight+AsyncLogging.h',
+					'../../third-party/TestFlightSDK3.0.0/TestFlight+ManualSessions.h',
 
 				],	# sources
 
@@ -365,7 +365,7 @@
 
 				'link_settings': {
 					'libraries': [
-						'../../third-party/TestFlightSDK2.0.2/libTestFlight.a',
+						'../../third-party/TestFlightSDK3.0.0/libTestFlight.a',
 						'libz.dylib',
 						'../../third-party/DragonMobileSDK_1.4.9/SpeechKit.framework',
 						'$(SDKROOT)/System/Library/Frameworks/AddressBook.framework',
