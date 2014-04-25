@@ -25,6 +25,9 @@
 				], #defines
 
 				'xcode_settings': {
+					'CODE_SIGN_IDENTITY': 'iPhone Developer: YOJI IZAKI (D54FT6256A)',
+					'PROVISIONING_PROFILE': '454315B3-1E16-4F94-8D4F-1F46D83BE760',
+
 					'ONLY_ACTIVE_ARCH': 'YES',
 					'DEAD_CODE_STRIPPING': 'NO',
 					'GCC_DYNAMIC_NO_PIC': 'NO',
@@ -47,8 +50,8 @@
 				], #defines
 
 				'xcode_settings': {
-					'CODE_SIGN_IDENTITY': 'iPhone Distribution: TERENCE JORDAN GRANT',
-					'PROVISIONING_PROFILE': 'E26781EB-2D99-4EED-80A1-9783E096101E',
+					'CODE_SIGN_IDENTITY': 'iPhone Distribution: Go Cast.it Inc. (CXZBC3NTHG)',
+					'PROVISIONING_PROFILE': 'F008933A-9D03-49A2-BA7D-F8F59E9078E2',
 
 					'COPY_PHASE_STRIP': 'YES',
 					'DEPLOYMENT_POSTPROCESSING': 'YES',
@@ -75,6 +78,8 @@
 				], #defines
 
 				'xcode_settings': {
+					'CODE_SIGN_IDENTITY': 'iPhone Distribution: Go Cast.it Inc. (CXZBC3NTHG)',
+					'PROVISIONING_PROFILE': 'E07315C2-16B7-4751-8769-A0D3D1C3FEEA',
 
 					'COPY_PHASE_STRIP': 'YES',
 					'DEPLOYMENT_POSTPROCESSING': 'YES',
