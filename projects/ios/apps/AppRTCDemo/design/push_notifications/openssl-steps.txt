@@ -1,0 +1,4 @@
+openssl x509 -in aps_development.cer -inform der -out GoCastTalkCert.pem
+openssl pkcs12 -nocerts -out GoCastTalkKey.pem -in GoCastTalk.p12
+cat GoCastTalkCert.pem GoCastTalkKey.pem > ck.pem
+openssl s_client -connect gateway.sandbox.push.apple.com:2195 -cert GoCastTalkCert.pem -key GoCastTalkKey.pem

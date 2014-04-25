@@ -5,7 +5,9 @@ $GLOBALS['database'] = 'database';
 
 include 'utils.php';
 include 'token.php';
+
 include 'deviceToken.php';
+include 'applePush.php';
 
 include 'login.php';
 include 'register.php';

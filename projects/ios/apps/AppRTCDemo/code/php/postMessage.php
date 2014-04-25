@@ -32,6 +32,18 @@ function pmAppend($user, $data)
 	return $result;
 }
 
+function getTranscriptForPostMessage($audio)
+{
+	$trans_file = $GLOBALS['database']."/global/text/".$audio.".json";
+
+	if (is_file($trans_file))
+	{
+		return json_decode(atomic_get_contents($trans_file), true)["ja"];
+	}
+
+	return "";
+}
+
 function postMessage($name)
 {
 	$hadErrors = false;
@@ -54,10 +66,20 @@ function postMessage($name)
 		
 			if (pmAppend($arr["from"], $json))
 			{
+				$trans = getTranscriptForPostMessage($arr["audio"]);
+// 				$message = "New message from ". $arr["from"];
+				$message = $arr["from"]."からの新しいメッセージ";
+				if (!empty($trans))
+				{
+					$message = $message . ": \n「 " . $trans . " 」";
+				}
+
 				foreach($arr["to"] as $item)
 				{
 					if (strcmp($item, $arr["from"]) != 0)
 					{
+						push_to_name($item, $message);
+
 						if (!pmAppend($item, $json))
 						{
 							$hadErrors = true;
