@@ -63,7 +63,7 @@ const unsigned char SpeechKitApplicationKey[] =
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
 //    [TestFlight setDeviceIdentifier:[[UIDevice currentDevice] uniqueIdentifier]];
 #pragma clang diagnostic pop
-    [TestFlight takeOff:@"9d7d1e2c-62c3-45d9-8506-cb0a9752ca47"];
+    [TestFlight takeOff:@"b4ca7930-29f0-4250-8e3a-2cbd7d7fcc0b"];
 #endif
 
     //Force new memo tab to load
