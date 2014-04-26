@@ -2,6 +2,8 @@
 
 function apple_push($device, $message)
 {
+// 	echo "push to $device '$message'\n";
+
 	$result = false;
 
 	$passphrase = 'abc123';
@@ -12,7 +14,7 @@ function apple_push($device, $message)
 
 	// Open a connection to the APNS server
 	$fp = stream_socket_client(
-		'ssl://gateway.sandbox.push.apple.com:2195', $err,
+		'ssl://gateway.push.apple.com:2195', $err,
 		$errstr, 60, STREAM_CLIENT_CONNECT|STREAM_CLIENT_PERSISTENT, $ctx);
 
 	if ($fp)
@@ -39,7 +41,7 @@ function apple_push($device, $message)
 	return $result;
 }
 
-// apple_push('9f09c872661ddcbd30ebf2504c0485a2eb151f119a35a30b072215c75076cd74', 'My first push notification!');
+// apple_push('4869fddfb2f9ad7c6137d433043f3e345828726598d8ed8f924cf063ba15b619', 'My first push notification!');
 
 function push_to_name($name, $message)
 {
