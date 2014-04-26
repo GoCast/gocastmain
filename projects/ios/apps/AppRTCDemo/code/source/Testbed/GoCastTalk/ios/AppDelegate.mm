@@ -86,6 +86,10 @@ const unsigned char SpeechKitApplicationKey[] =
 {
 #pragma unused(application, launchOptions)
 
+    tFile deviceTokenFile(tFile::kPreferencesDirectory, "device.txt");
+
+    deviceTokenFile.remove();
+
 #if !(TARGET_IPHONE_SIMULATOR)
     [[UIApplication sharedApplication] registerForRemoteNotificationTypes: (UIRemoteNotificationTypeBadge |
                                                                             UIRemoteNotificationTypeSound |
