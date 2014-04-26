@@ -69,8 +69,9 @@ function postMessage($name)
 			if (pmAppend($arr["from"], $json))
 			{
 				$trans = getTranscriptForPostMessage($arr["audio"]);
-// 				$message = "New message from ". $arr["from"];
-				$message = $arr["from"]."からの新しいメッセージ";
+
+				$message = $arr["from"];
+
 				if (!empty($trans))
 				{
 					$message = $message . ": \n「 " . $trans . " 」";
