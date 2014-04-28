@@ -1,8 +1,0 @@
-/build/
-/bin/
-/CMakeFiles/
-/CMakeScripts/
-/cmdline_audio_peer.build/
-/cmdline_audio_peer.xcodeproj/
-/.DS_Store
-/DerivedData/

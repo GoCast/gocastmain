@@ -9,8 +9,6 @@
     				'type': 'none',
 
     				'dependencies': [
-    					'AppRTCDemo.gyp:*',
-    					'ErizoClient.gyp:*',
     					'GoCastTalk.gyp:*',
     				], # dependencies
 
