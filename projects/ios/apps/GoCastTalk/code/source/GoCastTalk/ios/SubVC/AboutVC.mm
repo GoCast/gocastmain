@@ -1,30 +1,43 @@
-#include "MessageSentVC.h"
-#include "InboxMessageVC.h"
+#include "AboutVC.h"
 
 #include "Base/package.h"
 #include "Math/package.h"
 #include "Io/package.h"
 
-#include "Testbed/GoCastTalk/package.h"
+#include "GoCastTalk/package.h"
 
 #import "InboxEntryCell.h"
 #import "HeadingSubCell.h"
 
 extern std::string kBaseURL;
 
-@interface MessageSentVC()
+@interface AboutVC()
 {
 }
 @end
 
-@implementation MessageSentVC
+@implementation AboutVC
 
 #pragma mark Construction / Destruction
 - (void)viewDidLoad
 {
     [super viewDidLoad];
 
-    self.view.autoresizesSubviews = YES;
+    //"Build date"
+    self.mBuildDate.text = [NSString stringWithUTF8String:"Build date:\n"__DATE__ " @ " __TIME__ " PST"];
+
+    CGRect r = self.mAboutText.frame;
+
+    r.size.height  = gAppDelegateInstance->mScreenHeight;
+    r.size.height -= gAppDelegateInstance->mStatusBarHeight;
+    r.size.height -= gAppDelegateInstance->mNavBarHeight;
+    r.size.height -= gAppDelegateInstance->mTabBarHeight;
+    r.size.height -= r.origin.y;
+    r.size.height -= 20;
+
+    [self.mAboutText setFrame:r];
+
+    self.view.autoresizesSubviews = NO;
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -107,22 +120,12 @@ extern std::string kBaseURL;
     }
 }
 
--(void)textFieldDidBeginEditing:(UITextField *)textField
-{
-#pragma unused(textField)
-}
-
 - (BOOL)textFieldShouldReturn:(UITextField *)textField
 {
 #pragma unused(textField)
     [textField endEditing:YES];
-
+    [self.mScrollView setContentOffset:CGPointMake(0, 0) animated:YES];
     return YES;
-}
-
--(IBAction) okayPressed
-{
-    [self popSelf];
 }
 
 -(void) popSelf

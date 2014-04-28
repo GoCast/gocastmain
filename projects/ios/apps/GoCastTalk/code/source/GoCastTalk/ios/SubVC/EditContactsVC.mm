@@ -6,7 +6,7 @@
 #include "Math/package.h"
 #include "Io/package.h"
 
-#include "Testbed/GoCastTalk/package.h"
+#include "GoCastTalk/package.h"
 
 #import "InboxEntryCell.h"
 #import "HeadingSubCell.h"

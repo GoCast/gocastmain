@@ -1,20 +1,20 @@
-#include "ChangePasswordVC.h"
+#include "CreateContactVC.h"
 
 #include "Base/package.h"
 #include "Io/package.h"
 #include "Math/package.h"
 
-#include "Testbed/GoCastTalk/package.h"
+#include "GoCastTalk/package.h"
 
 #import "InboxEntryCell.h"
 #import "HeadingSubCell.h"
 
-@interface ChangePasswordVC()
+@interface CreateContactVC()
 {
 }
 @end
 
-@implementation ChangePasswordVC
+@implementation CreateContactVC
 
 #pragma mark Construction / Destruction
 - (void)viewDidLoad
@@ -22,11 +22,8 @@
     [super viewDidLoad];
 
     self.view.autoresizesSubviews = YES;
-    self.view.opaque = NO;
 
-    self->mPickedIndex = 0;
-
-    mPeer = new ChangePasswordScreen(self);
+    mPeer = new CreateContactScreen(self);
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -170,15 +167,24 @@
     }
 }
 
+-(void)setBlockingViewVisible:(bool)newVisible
+{
+    [self.mBlockingView setHidden:newVisible ? NO : YES];
+}
+
 -(void)textFieldDidBeginEditing:(UITextField *)textField
 {
-    if (textField == self.mOldPassword)
+    if (textField == self.mKanji)
     {
-        [self.mScrollView setContentOffset:CGPointMake(0, self.mOldPassword.frame.origin.y - 64) animated:YES];
+        [self.mScrollView setContentOffset:CGPointMake(0, self.mKanji.frame.origin.y - 60) animated:YES];
     }
-    else if (textField == self.mNewPassword)
+    else if (textField == self.mKana)
     {
-        [self.mScrollView setContentOffset:CGPointMake(0, self.mNewPassword.frame.origin.y - 64) animated:YES];
+        [self.mScrollView setContentOffset:CGPointMake(0, self.mKana.frame.origin.y - 60) animated:YES];
+    }
+    else if (textField == self.mEmail)
+    {
+        [self.mScrollView setContentOffset:CGPointMake(0, self.mEmail.frame.origin.y - 60) animated:YES];
     }
 }
 
@@ -186,25 +192,8 @@
 {
 #pragma unused(textField)
     [textField endEditing:YES];
-    [self.mScrollView setContentOffset:CGPointMake(0, -64) animated:YES];
+    [self.mScrollView setContentOffset:CGPointMake(0, 0) animated:YES];
     return YES;
-}
-
--(void)setBlockingViewVisible:(bool)newVisible
-{
-    [self.mBlockingView setHidden:newVisible ? NO : YES];
-}
-
--(std::string)getOldPassword
-{
-    const char* result = [self.mOldPassword.text UTF8String];
-    return result ? result : "";
-}
-
--(std::string)getNewPassword
-{
-    const char* result = [self.mNewPassword.text UTF8String];
-    return result ? result : "";
 }
 
 -(void) popSelf
@@ -214,7 +203,17 @@
 
 -(IBAction)savePressed
 {
-    mPeer->savePressed();
+    JSONObject saveObject;
+
+    const char* email   = [self.mEmail.text UTF8String];
+    const char* kanji   = [self.mKanji.text UTF8String];
+    const char* kana    = [self.mKana.text  UTF8String];
+
+    saveObject["email"] = JSONValue(email ? email : std::string(""));
+    saveObject["kanji"] = JSONValue(kanji ? kanji : std::string(""));
+    saveObject["kana"]  = JSONValue(kana  ? kana  : std::string(""));
+
+    mPeer->savePressed(saveObject);
 }
 
 @end

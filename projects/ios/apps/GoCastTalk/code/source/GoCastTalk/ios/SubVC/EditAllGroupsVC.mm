@@ -1,34 +1,39 @@
-#include "SettingsVC.h"
-#include "ChangeRegisteredNameVC.h"
-#include "ChangePasswordVC.h"
-#include "AboutVC.h"
+#include "EditAllGroupsVC.h"
+#include "EditOneGroupVC.h"
 
 #include "Base/package.h"
-#include "Math/package.h"
 #include "Io/package.h"
+#include "Math/package.h"
 
-#include "Testbed/GoCastTalk/package.h"
+#include "GoCastTalk/package.h"
 
 #import "InboxEntryCell.h"
 #import "HeadingSubCell.h"
 
-@interface SettingsVC()
+@interface EditAllGroupsVC()
 {
 }
 @end
 
-@implementation SettingsVC
+@implementation EditAllGroupsVC
 
 #pragma mark Construction / Destruction
 - (void)viewDidLoad
 {
     [super viewDidLoad];
 
+    self.navigationController.navigationBar.translucent = NO;
+
     [self.mTable registerNib:[UINib nibWithNibName:@"HeadingSubCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"HeadingSubCell"];
 
     self.view.autoresizesSubviews = YES;
+    self.view.opaque = NO;
 
-    mPeer = new SettingsScreen(self);
+    mPeer = new EditAllGroupsScreen(self);
+}
+
+- (void)viewDidLayoutSubviews
+{
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -49,7 +54,7 @@
 
     if (tableView == self.mTable)
     {
-        return (NSInteger)4;
+        return (NSInteger)InboxScreen::mGroups.size();
     }
 
     return (NSInteger)1;
@@ -64,6 +69,7 @@
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
 #pragma unused(indexPath)
+
     const char* names[1] =
     {
         "Unimplemented",
@@ -71,30 +77,6 @@
 
     if (tableView == self.mTable)
     {
-        const char* heading[] =
-        {
-            "登録情報", // "Registered Name",
-            "パスワード変更", // "Change Password",
-            "ログアウト", // "Log Out",
-            "このアプリについて", // "About this app",
-        };
-
-        const char* subheading[] =
-        {
-            "", // "Change registered name",
-            "", // "Change user's password",
-            "", // "Log out from current user",
-            "", // "About GoCastTalk",
-        };
-
-        const bool hasRightArrow[] =
-        {
-            true,
-            true,
-            false,
-            true,
-        };
-
         tableView.backgroundView = nil;
 
         static NSString *simpleTableIdentifier = @"HeadingSubCell";
@@ -106,10 +88,24 @@
             cell = [[[HeadingSubCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:simpleTableIdentifier] autorelease];
         }
 
-        cell.mHeading.text = [NSString stringWithUTF8String:heading[indexPath.row]];
-        cell.mSub.text = [NSString stringWithUTF8String:subheading[indexPath.row]];
-        cell.mRightArrow.hidden = hasRightArrow[indexPath.row] ? NO : YES;
-        
+        std::string heading;
+        std::string subheading;
+
+        heading = InboxScreen::mGroups[(size_t)indexPath.row].mObject["name"].mString;
+
+        for(size_t i = 0; i < InboxScreen::mGroups[(size_t)indexPath.row].mObject["emails"].mArray.size(); i++)
+        {
+            subheading += InboxScreen::nameFromEmail(InboxScreen::mGroups[(size_t)indexPath.row].mObject["emails"].mArray[i].mString);
+            if (i != InboxScreen::mGroups[(size_t)indexPath.row].mObject["emails"].mArray.size() - 1)
+            {
+                subheading += ", ";
+            }
+        }
+
+        cell.mHeading.text = [NSString stringWithUTF8String:heading.c_str()];
+        cell.mSub.text = [NSString stringWithUTF8String:subheading.c_str()];
+        [cell.mRightArrow setHidden:YES];
+
         return cell;
     }
     else
@@ -135,23 +131,16 @@
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-#pragma unused(tableView, indexPath)
-    switch (indexPath.row)
+    if (tableView == self.mTable)
     {
-        case 0: mPeer->registeredNamePressed(); break;
-        case 1: mPeer->changePasswordPressed(); break;
-        case 2: mPeer->logOutPressed(); break;
-        case 3: mPeer->aboutThisAppPressed(); break;
-
-        default:
-            break;
+        mPeer->groupPressed((size_t)indexPath.row);
     }
 }
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
 {
 #pragma unused(tableView, indexPath)
-    return NO;
+    return YES;
 }
 
 // Override to support editing the table view.
@@ -160,10 +149,7 @@
 #pragma unused(tableView, indexPath)
     if (editingStyle == UITableViewCellEditingStyleDelete)
     {
-//        if (tableView == self.mTable)
-//        {
-//            GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kTableItemDeleted, (tUInt32)indexPath.row));
-//        }
+        mPeer->deleteGroupPressed((size_t)indexPath.row);
     }
 }
 
@@ -172,23 +158,34 @@
     [self.mBlockingView setHidden:newVisible ? NO : YES];
 }
 
--(void) pushChangeRegisteredName:(const JSONObject&)newObject
+-(void) reloadTable
 {
-    ChangeRegisteredNameVC* nextVC = [[[ChangeRegisteredNameVC alloc] initWithNibName:@"ChangeRegisteredNameVC" bundle:nil] autorelease];
+    [self.mTable reloadData];
+}
+
+-(void) pushEditOneGroup:(const JSONObject &)newObject
+{
+    EditOneGroupVC* nextVC = [[[EditOneGroupVC alloc] initWithNibName:@"EditOneGroupVC" bundle:nil] autorelease];
     [nextVC customInit:newObject];
     [(UINavigationController*)self.parentViewController  pushViewController:nextVC animated:YES];
 }
 
--(void) pushAbout
+
+-(void) popSelf
 {
-    AboutVC* nextVC = [[[AboutVC alloc] initWithNibName:@"AboutVC" bundle:nil] autorelease];
-    [(UINavigationController*)self.parentViewController  pushViewController:nextVC animated:YES];
+    [(UINavigationController*)self.parentViewController popViewControllerAnimated:TRUE];
 }
 
--(void) pushChangePassword
+- (BOOL)textFieldShouldReturn:(UITextField *)textField
 {
-    ChangePasswordVC* nextVC = [[[ChangePasswordVC alloc] initWithNibName:@"ChangePasswordVC" bundle:nil] autorelease];
-    [(UINavigationController*)self.parentViewController  pushViewController:nextVC animated:YES];
+#pragma unused(textField)
+    [textField endEditing:YES];
+    return YES;
+}
+
+-(IBAction)createPressed
+{
+    mPeer->pressCreate();
 }
 
 @end

@@ -1,20 +1,20 @@
-#include "CreateContactVC.h"
+#include "ChangeRegisteredNameVC.h"
 
 #include "Base/package.h"
 #include "Io/package.h"
 #include "Math/package.h"
 
-#include "Testbed/GoCastTalk/package.h"
+#include "GoCastTalk/package.h"
 
 #import "InboxEntryCell.h"
 #import "HeadingSubCell.h"
 
-@interface CreateContactVC()
+@interface ChangeRegisteredNameVC()
 {
 }
 @end
 
-@implementation CreateContactVC
+@implementation ChangeRegisteredNameVC
 
 #pragma mark Construction / Destruction
 - (void)viewDidLoad
@@ -22,8 +22,44 @@
     [super viewDidLoad];
 
     self.view.autoresizesSubviews = YES;
+    self.view.opaque = NO;
 
-    mPeer = new CreateContactScreen(self);
+    self->mPickedIndex = 0;
+
+    mPeer = new ChangeRegisteredNameScreen(self, mInitObject);
+
+    self.mKanji.text    = [NSString stringWithUTF8String:mInitObject["kanji"].mString.c_str()];
+    self.mKana.text     = [NSString stringWithUTF8String:mInitObject["kana"].mString.c_str()];
+
+    [self setPickerViewVisible:false];
+
+    CGRect r = self.mPicker.frame;
+    r.origin.y  = gAppDelegateInstance->mScreenHeight;
+    r.origin.y -= gAppDelegateInstance->mTabBarHeight;
+    r.origin.y -= gAppDelegateInstance->mStatusBarHeight;
+    r.origin.y -= gAppDelegateInstance->mNavBarHeight;
+    r.origin.y -= self.mPickerType.frame.origin.y;
+    r.origin.y -= r.size.height;
+
+    [self.mPicker setFrame:r];
+
+    CGRect q = self.mAbovePickerView.frame;
+    q.origin.y = r.origin.y - 30;
+    [self.mAbovePickerView setFrame:q];
+
+    if (mInitObject["email"].mType == JSONValue::kString)
+    {
+        self.mEmail.text        = [NSString stringWithUTF8String:mInitObject["email"].mString.c_str()];
+    }
+    else if (mInitObject["email"].mType == JSONValue::kJSONArray)
+    {
+        if (!mInitObject["email"].mArray.empty())
+        {
+            [self setPickerViewVisible:true];
+
+            self.mEmail.text    = [NSString stringWithUTF8String:mInitObject["email"].mArray[0].mString.c_str()];
+        }
+    }
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -167,24 +203,15 @@
     }
 }
 
--(void)setBlockingViewVisible:(bool)newVisible
-{
-    [self.mBlockingView setHidden:newVisible ? NO : YES];
-}
-
 -(void)textFieldDidBeginEditing:(UITextField *)textField
 {
     if (textField == self.mKanji)
     {
-        [self.mScrollView setContentOffset:CGPointMake(0, self.mKanji.frame.origin.y - 60) animated:YES];
+        [self.mScrollView setContentOffset:CGPointMake(0, self.mKanji.frame.origin.y - 64) animated:YES];
     }
     else if (textField == self.mKana)
     {
-        [self.mScrollView setContentOffset:CGPointMake(0, self.mKana.frame.origin.y - 60) animated:YES];
-    }
-    else if (textField == self.mEmail)
-    {
-        [self.mScrollView setContentOffset:CGPointMake(0, self.mEmail.frame.origin.y - 60) animated:YES];
+        [self.mScrollView setContentOffset:CGPointMake(0, self.mKana.frame.origin.y - 64) animated:YES];
     }
 }
 
@@ -192,8 +219,56 @@
 {
 #pragma unused(textField)
     [textField endEditing:YES];
-    [self.mScrollView setContentOffset:CGPointMake(0, 0) animated:YES];
+    [self.mScrollView setContentOffset:CGPointMake(0, -64) animated:YES];
     return YES;
+}
+
+// returns the number of 'columns' to display.
+- (NSInteger)numberOfComponentsInPickerView:(UIPickerView *)pickerView
+{
+#pragma unused(pickerView)
+
+    return 1;
+}
+
+// returns the # of rows in each component..
+- (NSInteger)pickerView:(UIPickerView *)pickerView numberOfRowsInComponent:(NSInteger)component
+{
+#pragma unused(pickerView, component)
+    if (mInitObject["email"].mType == JSONValue::kJSONArray)
+    {
+        return (NSInteger)mInitObject["email"].mArray.size();
+    }
+
+    return 1;
+}
+
+- (NSString *)pickerView:(UIPickerView *)pickerView titleForRow:(NSInteger)row forComponent:(NSInteger)component
+{
+#pragma unused(pickerView, row, component)
+    if (mInitObject["email"].mType == JSONValue::kJSONArray)
+    {
+        return [NSString stringWithUTF8String:mInitObject["email"].mArray[(size_t)row].mString.c_str()];
+    }
+
+    return [NSString stringWithUTF8String:mInitObject["email"].mString.c_str()];
+}
+
+- (void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component
+{
+#pragma unused(pickerView, component)
+    self->mPickedIndex = (size_t)row;
+}
+
+-(void)setPickerViewVisible:(bool)newVisible
+{
+    [self.mPickerType setHidden:newVisible ? NO : YES];
+    [self.mNonPickerType setHidden:newVisible ? YES : NO];
+}
+
+-(void)setBlockingViewVisible:(bool)newVisible
+{
+    [self.mBlockingView setHidden:newVisible ? NO : YES];
 }
 
 -(void) popSelf
@@ -201,19 +276,25 @@
     [(UINavigationController*)self.parentViewController popViewControllerAnimated:TRUE];
 }
 
+-(void)customInit:(const JSONObject&)newObject
+{
+    mInitObject = newObject;
+}
+
 -(IBAction)savePressed
 {
-    JSONObject saveObject;
-
-    const char* email   = [self.mEmail.text UTF8String];
     const char* kanji   = [self.mKanji.text UTF8String];
     const char* kana    = [self.mKana.text  UTF8String];
 
-    saveObject["email"] = JSONValue(email ? email : std::string(""));
-    saveObject["kanji"] = JSONValue(kanji ? kanji : std::string(""));
-    saveObject["kana"]  = JSONValue(kana  ? kana  : std::string(""));
+    mInitObject["kanji"]    = JSONValue(kanji ? kanji : std::string(""));
+    mInitObject["kana"]     = JSONValue(kana  ? kana  : std::string(""));
 
-    mPeer->savePressed(saveObject);
+    if (mInitObject["email"].mType == JSONValue::kJSONArray)
+    {
+        mInitObject["email"] = JSONValue(mInitObject["email"].mArray[self->mPickedIndex]);
+    }
+
+    mPeer->savePressed(mInitObject);
 }
 
 @end
