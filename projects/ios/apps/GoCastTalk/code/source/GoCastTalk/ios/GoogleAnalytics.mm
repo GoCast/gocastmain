@@ -60,7 +60,7 @@ void GoogleAnalytics::trackAlert(const std::string& screenName, const std::strin
 
 void GoogleAnalytics::trackAlertOkay(const std::string& screenName, const std::string& label)
 {
-    trackAction(screenName, "Alert", "OK", label);
+    trackAction(screenName, "Alert", "Pressed-OK", label);
 }
 
 void GoogleAnalytics::trackConfirm(const std::string& screenName, const std::string& label)
@@ -70,10 +70,10 @@ void GoogleAnalytics::trackConfirm(const std::string& screenName, const std::str
 
 void GoogleAnalytics::trackConfirmYes(const std::string& screenName, const std::string& label)
 {
-    trackAction(screenName, "Confirm", "YES", label);
+    trackAction(screenName, "Confirm", "Pressed-YES", label);
 }
 
 void GoogleAnalytics::trackConfirmNo(const std::string& screenName, const std::string& label)
 {
-    trackAction(screenName, "Confirm", "NO", label);
+    trackAction(screenName, "Confirm", "Pressed-NO", label);
 }

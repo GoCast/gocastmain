@@ -450,6 +450,19 @@ bool InboxMessageScreen::HasEdgeNamedNext() const
 #pragma mark Messages
 void InboxMessageScreen::update(const InboxMessageScreenMessage& msg)
 {
+    switch (msg.mEvent)
+    {
+        case kYes:
+            GoogleAnalytics::getInstance()->trackConfirmYes(kScreenName, "showRetryDownloadEntry");
+            break;
+        case kNo:
+            GoogleAnalytics::getInstance()->trackConfirmNo(kScreenName, "showRetryDownloadEntry");
+            break;
+
+        default:
+            break;
+    }
+
 	process(msg.mEvent);
 }
 
@@ -519,8 +532,8 @@ void InboxMessageScreen::update(const GCTEvent& msg)
         case kShowRetryDownload:
             switch(msg.mEvent)
             {
-                case GCTEvent::kOKYesAlertPressed:  process(kYes); break;
-                case GCTEvent::kNoAlertPressed:     process(kNo); break;
+                case GCTEvent::kOKYesAlertPressed:  update(kYes); break;
+                case GCTEvent::kNoAlertPressed:     update(kNo); break;
 
                 default:
                     break;

@@ -828,6 +828,53 @@ bool RecordMessageScreen::HasEdgeNamedNext() const
 #pragma mark Messages
 void RecordMessageScreen::update(const RecordMessageScreenMessage& msg)
 {
+    switch (msg.mEvent)
+    {
+        case kYes:
+            switch (getState())
+            {
+                case kShowComposeNewMessage:
+                    GoogleAnalytics::getInstance()->trackConfirmYes(kScreenName, "showComposeNewMessageEntry");
+                    break;
+                case kShowConfirmDelete:
+                    GoogleAnalytics::getInstance()->trackConfirmYes(kScreenName, "showConfirmDeleteEntry");
+                    break;
+                case kShowConfirmSend:
+                    GoogleAnalytics::getInstance()->trackConfirmYes(kScreenName, "showConfirmSendEntry");
+                    break;
+                case kShowThereWereNonMembers:
+                    GoogleAnalytics::getInstance()->trackConfirmYes(kScreenName, "showThereWereNonMembersEntry");
+                    break;
+
+                default:
+                    break;
+            }
+            break;
+        case kNo:
+            switch (getState())
+            {
+                case kShowComposeNewMessage:
+                    GoogleAnalytics::getInstance()->trackConfirmNo(kScreenName, "showComposeNewMessageEntry");
+                    break;
+                case kShowConfirmDelete:
+                    GoogleAnalytics::getInstance()->trackConfirmNo(kScreenName, "showConfirmDeleteEntry");
+                    break;
+                case kShowConfirmSend:
+                    GoogleAnalytics::getInstance()->trackConfirmNo(kScreenName, "showConfirmSendEntry");
+                    break;
+                case kShowThereWereNonMembers:
+                    GoogleAnalytics::getInstance()->trackConfirmNo(kScreenName, "showThereWereNonMembersEntry");
+                    break;
+
+                default:
+                    break;
+            }
+            break;
+
+        default:
+            break;
+    }
+
 	process(msg.mEvent);
 }
 
@@ -987,8 +1034,8 @@ void RecordMessageScreen::update(const GCTEvent& msg)
                 case kShowValidUsersFailed:
                     switch(msg.mEvent)
                     {
-                        case GCTEvent::kOKYesAlertPressed:  process(kYes); break;
-                        case GCTEvent::kNoAlertPressed:     process(kNo); break;
+                        case GCTEvent::kOKYesAlertPressed:  update(kYes); break;
+                        case GCTEvent::kNoAlertPressed:     update(kNo); break;
 
                         default:
                             break;

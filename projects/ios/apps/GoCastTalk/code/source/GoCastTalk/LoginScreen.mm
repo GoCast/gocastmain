@@ -443,6 +443,47 @@ bool LoginScreen::HasEdgeNamedNext() const
 #pragma mark Messages
 void LoginScreen::update(const LoginScreenMessage& msg)
 {
+    switch (msg.mEvent)
+    {
+        case kYes:
+            switch (getState())
+            {
+                case kShowURLMissingSlash:
+                    GoogleAnalytics::getInstance()->trackConfirmYes(kScreenName, "showURLMissingSlashEntry");
+                    break;
+                case kShowRetryLogin:
+                    GoogleAnalytics::getInstance()->trackConfirmYes(kScreenName, "showRetryLoginEntry");
+                    break;
+                case kShowRetryRegister:
+                    GoogleAnalytics::getInstance()->trackConfirmYes(kScreenName, "showRetryRegisterEntry");
+                    break;
+
+                default:
+                    break;
+            }
+            break;
+        case kNo:
+            switch (getState())
+            {
+                case kShowURLMissingSlash:
+                    GoogleAnalytics::getInstance()->trackConfirmNo(kScreenName, "showURLMissingSlashEntry");
+                    break;
+                case kShowRetryLogin:
+                    GoogleAnalytics::getInstance()->trackConfirmNo(kScreenName, "showRetryLoginEntry");
+                    break;
+                case kShowRetryRegister:
+                    GoogleAnalytics::getInstance()->trackConfirmNo(kScreenName, "showRetryRegisterEntry");
+                    break;
+
+                default:
+                    break;
+            }
+            break;
+
+        default:
+            break;
+    }
+
 	process(msg.mEvent);
 }
 
@@ -500,8 +541,8 @@ void LoginScreen::update(const GCTEvent& msg)
         case kShowUserRegistraionSuccessful:
             switch(msg.mEvent)
             {
-                case GCTEvent::kOKYesAlertPressed:  process(kYes); break;
-                case GCTEvent::kNoAlertPressed:     process(kNo); break;
+                case GCTEvent::kOKYesAlertPressed:  update(kYes); break;
+                case GCTEvent::kNoAlertPressed:     update(kNo); break;
 
                 default:
                     break;

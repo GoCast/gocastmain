@@ -248,8 +248,8 @@ void ChangeRegisteredNameScreen::update(const GCTEvent& msg)
         case kShowErrorWithSetContacts:
             switch(msg.mEvent)
             {
-                case GCTEvent::kOKYesAlertPressed:  process(kYes); break;
-                case GCTEvent::kNoAlertPressed:     process(kNo); break;
+                case GCTEvent::kOKYesAlertPressed:  update(kYes); break;
+                case GCTEvent::kNoAlertPressed:     update(kNo); break;
 
                 default:
                     break;

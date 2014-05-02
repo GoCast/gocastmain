@@ -241,6 +241,19 @@ bool SettingsScreen::HasEdgeNamedNext() const
 #pragma mark Messages
 void SettingsScreen::update(const SettingsScreenMessage& msg)
 {
+    switch (msg.mEvent)
+    {
+        case kYes:
+            GoogleAnalytics::getInstance()->trackConfirmYes(kScreenName, "showConfirmLogoutEntry");
+            break;
+        case kNo:
+            GoogleAnalytics::getInstance()->trackConfirmNo(kScreenName, "showConfirmLogoutEntry");
+            break;
+
+        default:
+            break;
+    }
+    
 	process(msg.mEvent);
 }
 
@@ -285,8 +298,8 @@ void SettingsScreen::update(const GCTEvent& msg)
         case kShowSuccessWithLogout:
             switch(msg.mEvent)
             {
-                case GCTEvent::kOKYesAlertPressed:  process(kYes); break;
-                case GCTEvent::kNoAlertPressed:     process(kNo); break;
+                case GCTEvent::kOKYesAlertPressed:  update(kYes); break;
+                case GCTEvent::kNoAlertPressed:     update(kNo); break;
 
                 default:
                     break;
