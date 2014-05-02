@@ -137,7 +137,7 @@ void RecordMessageScreen::waitToPlayIdleEntry()
 
     if (mForceLogout)
     {
-        process(kCancelPressed);
+        update(kCancelPressed);
     }
 }
 
@@ -147,7 +147,7 @@ void RecordMessageScreen::playingIdleEntry()
 
     if (mForceLogout)
     {
-        process(kCancelPressed);
+        update(kCancelPressed);
     }
 }
 
@@ -157,7 +157,7 @@ void RecordMessageScreen::pausedIdleEntry()
 
     if (mForceLogout)
     {
-        process(kCancelPressed);
+        update(kCancelPressed);
     }
 }
 
@@ -882,7 +882,7 @@ void RecordMessageScreen::update(const tSoundEvent& msg)
 {
     switch (msg.mEvent)
     {
-        case tSoundEvent::kSoundPlayingComplete:    process(kFinishedPlaying); break;
+        case tSoundEvent::kSoundPlayingComplete:    update(kFinishedPlaying); break;
 
         default:
             break;
@@ -897,7 +897,7 @@ void RecordMessageScreen::update(const URLLoaderEvent& msg)
 
         switch (msg.mEvent)
         {
-            case URLLoaderEvent::kLoadFail: process(kFail); break;
+            case URLLoaderEvent::kLoadFail: update(kFail); break;
             case URLLoaderEvent::kLoadedString:
             {
                 switch (getState())
@@ -922,10 +922,10 @@ void RecordMessageScreen::update(const URLLoaderEvent& msg)
                         break;
                 }
             }
-                process(kSuccess);
+                update(kSuccess);
                 break;
 
-            case URLLoaderEvent::kLoadedFile: process(kSuccess); break;
+            case URLLoaderEvent::kLoadedFile: update(kSuccess); break;
 
             default:
                 break;
@@ -951,8 +951,8 @@ void RecordMessageScreen::update(const GCTEvent& msg)
         case GCTEvent::kSettingsTabPressed:
             switch (getState())
             {
-                case kPlayingIdle:   process(kPausePressed); break;
-                case kRecordingIdle: process(kStopPressed); break;
+                case kPlayingIdle:   update(kPausePressed); break;
+                case kRecordingIdle: update(kStopPressed); break;
 
                 default:
                     break;
@@ -962,7 +962,7 @@ void RecordMessageScreen::update(const GCTEvent& msg)
         case GCTEvent::kNewMessageToGroup:
             mNewMessageRecipients = msg.mGroup;
             [mPeer setBlockingViewVisible:false];
-            process(kNewMessage);
+            update(kNewMessage);
             break;
 
         case GCTEvent::kAppendNewContact:
@@ -1016,7 +1016,7 @@ void RecordMessageScreen::update(const GCTEvent& msg)
 
                 if (getState() == kWaitForTranscriptionIdle)
                 {
-                    process(kTranscriptionReady);
+                    update(kTranscriptionReady);
                 }
             }
             break;
@@ -1079,7 +1079,7 @@ void RecordMessageScreen::update(const tTimerEvent& msg)
 
                 if (getState() == kRecordingIdle)
                 {
-                    process(kStopPressed);
+                    update(kStopPressed);
                     GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showRecordLimitIs10MinutesEntry");
                     //"Record limit is 10 minutes. Recording will now stop"
                     tAlert("録音時間は最大１０分です。録音を終了します。");

@@ -23,7 +23,7 @@ EditAllGroupsScreen::~EditAllGroupsScreen()
 #pragma mark Public methods
 void EditAllGroupsScreen::pressCreate()
 {
-    process(kCreatePressed);
+    update(kCreatePressed);
 }
 
 void EditAllGroupsScreen::groupPressed(const size_t& i)
@@ -31,7 +31,7 @@ void EditAllGroupsScreen::groupPressed(const size_t& i)
     if (getState() == kIdle)
     {
         mItemSelected = i;
-        process(kGroupSelected);
+        update(kGroupSelected);
     }
 }
 
@@ -40,7 +40,7 @@ void EditAllGroupsScreen::deleteGroupPressed(const size_t& i)
     if (getState() == kIdle)
     {
         mDeleteSelected = i;
-        process(kDeleteGroup);
+        update(kDeleteGroup);
     }
 }
 
@@ -48,7 +48,7 @@ void EditAllGroupsScreen::refreshPressed()
 {
     if (getState() == kIdle)
     {
-        process(kRefreshSelected);
+        update(kRefreshSelected);
     }
 }
 
@@ -240,7 +240,7 @@ void EditAllGroupsScreen::update(const URLLoaderEvent& msg)
 
         switch (msg.mEvent)
         {
-            case URLLoaderEvent::kLoadFail: process(kFail); break;
+            case URLLoaderEvent::kLoadFail: update(kFail); break;
             case URLLoaderEvent::kLoadedString:
             {
                 switch (getState())
@@ -253,10 +253,10 @@ void EditAllGroupsScreen::update(const URLLoaderEvent& msg)
                         break;
                 }
             }
-                process(kSuccess);
+                update(kSuccess);
                 break;
 
-            case URLLoaderEvent::kLoadedFile: process(kSuccess); break;
+            case URLLoaderEvent::kLoadedFile: update(kSuccess); break;
 
             default:
                 break;

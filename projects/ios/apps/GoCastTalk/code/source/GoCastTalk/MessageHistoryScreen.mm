@@ -25,7 +25,7 @@ MessageHistoryScreen::~MessageHistoryScreen()
 
 void MessageHistoryScreen::replyPressed()
 {
-    process(kReplySelected);
+    update(kReplySelected);
 }
 
 void MessageHistoryScreen::selectItem(const size_t& i)

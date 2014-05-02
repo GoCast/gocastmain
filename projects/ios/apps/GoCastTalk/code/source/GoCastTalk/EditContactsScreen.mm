@@ -24,7 +24,7 @@ void EditContactsScreen::createPressed()
 {
     if (getState() == kIdle)
     {
-        process(kCreateSelected);
+        update(kCreateSelected);
     }
 }
 
@@ -33,7 +33,7 @@ void EditContactsScreen::itemPressed(const size_t& i)
     if (getState() == kIdle)
     {
         mItemSelected = i;
-        process(kItemSelected);
+        update(kItemSelected);
     }
 }
 
@@ -42,7 +42,7 @@ void EditContactsScreen::deletePressed(const size_t& i)
     if (getState() == kIdle)
     {
         mDeleteSelected = i;
-        process(kDeleteSelected);
+        update(kDeleteSelected);
     }
 }
 
@@ -50,7 +50,7 @@ void EditContactsScreen::refreshPressed()
 {
     if (getState() == kIdle)
     {
-        process(kRefreshSelected);
+        update(kRefreshSelected);
     }
 }
 
@@ -242,7 +242,7 @@ void EditContactsScreen::update(const URLLoaderEvent& msg)
 
         switch (msg.mEvent)
         {
-            case URLLoaderEvent::kLoadFail: process(kFail); break;
+            case URLLoaderEvent::kLoadFail: update(kFail); break;
             case URLLoaderEvent::kLoadedString:
             {
                 switch (getState())
@@ -255,10 +255,10 @@ void EditContactsScreen::update(const URLLoaderEvent& msg)
                         break;
                 }
             }
-                process(kSuccess);
+                update(kSuccess);
                 break;
 
-            case URLLoaderEvent::kLoadedFile: process(kSuccess); break;
+            case URLLoaderEvent::kLoadedFile: update(kSuccess); break;
 
             default:
                 break;

@@ -192,7 +192,7 @@ void       InboxScreen::refreshPressed()
 {
     if (getState() == kIdle)
     {
-        process(kRefreshSelected);
+        update(kRefreshSelected);
     }
 }
 
@@ -201,7 +201,7 @@ void       InboxScreen::deletePressed(const size_t& i)
     if (getState() == kIdle)
     {
         mDeleteSelected = i;
-        process(kDeleteSelected);
+        update(kDeleteSelected);
     }
 }
 
@@ -962,7 +962,7 @@ void InboxScreen::update(const URLLoaderEvent& msg)
 
         switch (msg.mEvent)
         {
-            case URLLoaderEvent::kLoadFail: process(kFail); break;
+            case URLLoaderEvent::kLoadFail: update(kFail); break;
             case URLLoaderEvent::kLoadedString:
             {
                 switch (getState())
@@ -990,11 +990,11 @@ void InboxScreen::update(const URLLoaderEvent& msg)
                     default:
                         break;
                 }
-                process(kSuccess);
+                update(kSuccess);
             }
                 break;
 
-            case URLLoaderEvent::kLoadedFile: process(kSuccess); break;
+            case URLLoaderEvent::kLoadedFile: update(kSuccess); break;
 
             default:
                 break;
@@ -1016,7 +1016,7 @@ void InboxScreen::update(const GCTEvent& msg)
             switch (msg.mEvent)
             {
                 case GCTEvent::kReloadInbox:        refreshPressed(); break;
-                case GCTEvent::kForceLogout:        process(kForceLogout); break;
+                case GCTEvent::kForceLogout:        update(kForceLogout); break;
 
                 default:
                     break;
@@ -1027,7 +1027,7 @@ void InboxScreen::update(const GCTEvent& msg)
             if (msg.mEvent == GCTEvent::kLoginSucceeded)
             {
                 mFirstLogin = false;
-                process(kLoginSucceeded);
+                update(kLoginSucceeded);
             }
             break;
 

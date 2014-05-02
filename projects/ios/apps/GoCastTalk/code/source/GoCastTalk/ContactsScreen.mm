@@ -27,7 +27,7 @@ void ContactsScreen::contactPressed(const size_t& i)
     if (getState() == kIdle)
     {
         mItemSelected = i;
-        process(kContactSelected);
+        update(kContactSelected);
     }
 }
 
@@ -36,7 +36,7 @@ void ContactsScreen::groupPressed(const size_t& i)
     if (getState() == kIdle)
     {
         mItemSelected = i;
-        process(kGroupSelected);
+        update(kGroupSelected);
     }
 }
 
@@ -44,7 +44,7 @@ void ContactsScreen::editContactsPressed()
 {
     if (getState() == kIdle)
     {
-        process(kEditContactsPressed);
+        update(kEditContactsPressed);
     }
 }
 
@@ -52,7 +52,7 @@ void ContactsScreen::editGroupsPressed()
 {
     if (getState() == kIdle)
     {
-        process(kEditGroupsPressed);
+        update(kEditGroupsPressed);
     }
 }
 
@@ -61,7 +61,7 @@ void ContactsScreen::deleteContactPressed(const size_t& i)
     if (getState() == kIdle)
     {
         mDeleteSelected = i;
-        process(kDeleteContact);
+        update(kDeleteContact);
     }
 }
 
@@ -70,7 +70,7 @@ void ContactsScreen::deleteGroupPressed(const size_t& i)
     if (getState() == kIdle)
     {
         mDeleteSelected = i;
-        process(kDeleteGroup);
+        update(kDeleteGroup);
     }
 }
 
@@ -78,7 +78,7 @@ void ContactsScreen::refreshPressed()
 {
     if (getState() == kIdle)
     {
-        process(kRefreshSelected);
+        update(kRefreshSelected);
     }
 }
 
@@ -400,7 +400,7 @@ void ContactsScreen::update(const URLLoaderEvent& msg)
 
         switch (msg.mEvent)
         {
-            case URLLoaderEvent::kLoadFail: process(kFail); break;
+            case URLLoaderEvent::kLoadFail: update(kFail); break;
             case URLLoaderEvent::kLoadedString:
             {
                 switch (getState())
@@ -417,10 +417,10 @@ void ContactsScreen::update(const URLLoaderEvent& msg)
                         break;
                 }
             }
-                process(kSuccess);
+                update(kSuccess);
                 break;
 
-            case URLLoaderEvent::kLoadedFile: process(kSuccess); break;
+            case URLLoaderEvent::kLoadedFile: update(kSuccess); break;
 
             default:
                 break;

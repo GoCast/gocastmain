@@ -40,7 +40,7 @@ void GroupViewScreen::invalidStateEntry()
 
 void GroupViewScreen::pressSendMessage()
 {
-    process(kSendMessagePressed);
+    update(kSendMessagePressed);
 }
 
 #pragma mark Idling

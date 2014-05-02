@@ -217,7 +217,7 @@ void ChangeRegisteredNameScreen::update(const URLLoaderEvent& msg)
 
         switch (msg.mEvent)
         {
-            case URLLoaderEvent::kLoadFail: process(kFail); break;
+            case URLLoaderEvent::kLoadFail: update(kFail); break;
             case URLLoaderEvent::kLoadedString:
             {
                 switch (getState())
@@ -230,10 +230,10 @@ void ChangeRegisteredNameScreen::update(const URLLoaderEvent& msg)
                         break;
                 }
             }
-                process(kSuccess);
+                update(kSuccess);
                 break;
 
-            case URLLoaderEvent::kLoadedFile: process(kSuccess); break;
+            case URLLoaderEvent::kLoadedFile: update(kSuccess); break;
 
             default:
                 break;

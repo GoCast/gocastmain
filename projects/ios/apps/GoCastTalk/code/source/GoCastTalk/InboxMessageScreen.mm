@@ -470,7 +470,7 @@ void InboxMessageScreen::update(const tSoundEvent& msg)
 {
     switch (msg.mEvent)
     {
-        case tSoundEvent::kSoundPlayingComplete:    process(kFinishedPlaying); break;
+        case tSoundEvent::kSoundPlayingComplete:    update(kFinishedPlaying); break;
 
         default:
             break;
@@ -485,7 +485,7 @@ void InboxMessageScreen::update(const URLLoaderEvent& msg)
 
         switch (msg.mEvent)
         {
-            case URLLoaderEvent::kLoadFail: process(kFail); break;
+            case URLLoaderEvent::kLoadFail: update(kFail); break;
             case URLLoaderEvent::kLoadedString:
             {
                 switch (getState())
@@ -498,10 +498,10 @@ void InboxMessageScreen::update(const URLLoaderEvent& msg)
                         break;
                 }
             }
-                process(kSuccess);
+                update(kSuccess);
                 break;
 
-            case URLLoaderEvent::kLoadedFile: process(kSuccess); break;
+            case URLLoaderEvent::kLoadedFile: update(kSuccess); break;
 
             default:
                 break;
@@ -520,7 +520,7 @@ void InboxMessageScreen::update(const GCTEvent& msg)
                 case GCTEvent::kNewMemoTabPressed:
                 case GCTEvent::kContactsTabPressed:
                 case GCTEvent::kSettingsTabPressed:
-                    process(kPlayPressed);
+                    update(kPlayPressed);
                         break;
                         
                     default:
