@@ -940,6 +940,16 @@ void InboxScreen::update(const InboxScreenMessage& msg)
 {
     switch (msg.mEvent)
     {
+        case kLoginSucceeded:   GoogleAnalytics::getInstance()->trackEvent(kScreenName,  "kLoginSucceeded"); break;
+        case kForceLogout:      GoogleAnalytics::getInstance()->trackEvent(kScreenName,  "kForceLogout"); break;
+        case kDeleteSelected:   GoogleAnalytics::getInstance()->trackButton(kScreenName, "kDeleteSelected"); break;
+        case kRefreshSelected:  GoogleAnalytics::getInstance()->trackEvent(kScreenName,  "kRefreshSelected"); break;
+        case kItemSelected:     GoogleAnalytics::getInstance()->trackButton(kScreenName, "kItemSelected"); break;
+        default: break;
+    }
+
+    switch (msg.mEvent)
+    {
         case kYes:
             GoogleAnalytics::getInstance()->trackConfirmYes(kScreenName, "showRetryListMessagesEntry");
             break;

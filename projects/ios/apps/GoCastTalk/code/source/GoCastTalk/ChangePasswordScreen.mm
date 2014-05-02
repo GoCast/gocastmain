@@ -210,6 +210,12 @@ bool ChangePasswordScreen::HasEdgeNamedNext() const
 #pragma mark Messages
 void ChangePasswordScreen::update(const ChangePasswordScreenMessage& msg)
 {
+    switch (msg.mEvent)
+    {
+        case kSaveSelected: GoogleAnalytics::getInstance()->trackButton(kScreenName, "kSaveSelected"); break;
+        default: break;
+    }
+
 	process(msg.mEvent);
 }
 

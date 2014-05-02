@@ -109,6 +109,12 @@ bool GroupViewScreen::HasEdgeNamedNext() const
 #pragma mark Messages
 void GroupViewScreen::update(const GroupViewScreenMessage& msg)
 {
+    switch (msg.mEvent)
+    {
+        case kSendMessagePressed:   GoogleAnalytics::getInstance()->trackButton(kScreenName, "kSendMessagePressed"); break;
+        default: break;
+    }
+
 	process(msg.mEvent);
 }
 

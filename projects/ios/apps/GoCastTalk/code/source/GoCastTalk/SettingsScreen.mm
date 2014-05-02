@@ -243,6 +243,15 @@ void SettingsScreen::update(const SettingsScreenMessage& msg)
 {
     switch (msg.mEvent)
     {
+        case kAboutThisAppSelected:     GoogleAnalytics::getInstance()->trackButton(kScreenName, "kAboutThisAppSelected"); break;
+        case kChangePasswordSelected:   GoogleAnalytics::getInstance()->trackButton(kScreenName, "kChangePasswordSelected"); break;
+        case kLogOutSelected:           GoogleAnalytics::getInstance()->trackButton(kScreenName, "kLogOutSelected"); break;
+        case kRegisteredNameSelected:   GoogleAnalytics::getInstance()->trackButton(kScreenName, "kRegisteredNameSelected"); break;
+        default: break;
+    }
+
+    switch (msg.mEvent)
+    {
         case kYes:
             GoogleAnalytics::getInstance()->trackConfirmYes(kScreenName, "showConfirmLogoutEntry");
             break;

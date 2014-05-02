@@ -48,6 +48,11 @@ void GoogleAnalytics::trackAction(const std::string& screenName, const std::stri
     [tracker set:kGAIScreenName value:nil];
 }
 
+void GoogleAnalytics::trackEvent(const std::string& screenName, const std::string& label)
+{
+    trackAction(screenName, "Event", "Trigger", label);
+}
+
 void GoogleAnalytics::trackButton(const std::string& screenName, const std::string& label)
 {
     trackAction(screenName, "Button", "Press", label);

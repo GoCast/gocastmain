@@ -293,6 +293,12 @@ bool EditOneGroupScreen::HasEdgeNamedNext() const
 #pragma mark Messages
 void EditOneGroupScreen::update(const EditOneGroupScreenMessage& msg)
 {
+    switch (msg.mEvent)
+    {
+        case kDonePressed:  GoogleAnalytics::getInstance()->trackButton(kScreenName, "kDonePressed"); break;
+        default: break;
+    }
+
 	process(msg.mEvent);
 }
 

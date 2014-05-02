@@ -231,6 +231,15 @@ bool EditContactsScreen::HasEdgeNamedNext() const
 #pragma mark Messages
 void EditContactsScreen::update(const EditContactsScreenMessage& msg)
 {
+    switch (msg.mEvent)
+    {
+        case kDeleteSelected:   GoogleAnalytics::getInstance()->trackButton(kScreenName, "kDeleteSelected"); break;
+        case kItemSelected:     GoogleAnalytics::getInstance()->trackButton(kScreenName, "kItemSelected"); break;
+        case kCreateSelected:   GoogleAnalytics::getInstance()->trackButton(kScreenName, "kCreateSelected"); break;
+        case kRefreshSelected:  GoogleAnalytics::getInstance()->trackButton(kScreenName, "kRefreshSelected"); break;
+        default: break;
+    }
+
 	process(msg.mEvent);
 }
 

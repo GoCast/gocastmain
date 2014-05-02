@@ -203,6 +203,13 @@ bool MessageHistoryScreen::HasEdgeNamedNext() const
 #pragma mark Messages
 void MessageHistoryScreen::update(const MessageHistoryScreenMessage& msg)
 {
+    switch (msg.mEvent)
+    {
+        case kItemSelected:     GoogleAnalytics::getInstance()->trackButton(kScreenName, "kItemSelected"); break;
+        case kReplySelected:    GoogleAnalytics::getInstance()->trackButton(kScreenName, "kReplySelected"); break;
+        default: break;
+    }
+
 	process(msg.mEvent);
 }
 

@@ -452,6 +452,16 @@ void InboxMessageScreen::update(const InboxMessageScreenMessage& msg)
 {
     switch (msg.mEvent)
     {
+        case kPlayPressed:      GoogleAnalytics::getInstance()->trackButton(kScreenName, "kPlayPressed"); break;
+        case kFinishedPlaying:  GoogleAnalytics::getInstance()->trackEvent(kScreenName,  "kFinishedPlaying"); break;
+        case kReplySelected:    GoogleAnalytics::getInstance()->trackButton(kScreenName, "kReplySelected"); break;
+        case kDeleteSelected:   GoogleAnalytics::getInstance()->trackButton(kScreenName, "kDeleteSelected"); break;
+        case kPastSelected:     GoogleAnalytics::getInstance()->trackButton(kScreenName, "kPastSelected"); break;
+        default: break;
+    }
+
+    switch (msg.mEvent)
+    {
         case kYes:
             GoogleAnalytics::getInstance()->trackConfirmYes(kScreenName, "showRetryDownloadEntry");
             break;

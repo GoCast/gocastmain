@@ -146,6 +146,12 @@ void LoginScreen::wasRegisterValidEntry()
         result = true;
     }
 
+    //TODO: Remove this hack once we can show "registration successful" dialog properly
+    if (result)
+    {
+        GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showUserRegistraionSuccessfulEntry");
+    }
+
     SetImmediateEvent(result ? kYes : kNo);
 }
 
@@ -443,6 +449,14 @@ bool LoginScreen::HasEdgeNamedNext() const
 #pragma mark Messages
 void LoginScreen::update(const LoginScreenMessage& msg)
 {
+    switch (msg.mEvent)
+    {
+        case kSignUpPressed:    GoogleAnalytics::getInstance()->trackButton(kScreenName, "kSignUpPressed"); break;
+        case kSignInPressed:    GoogleAnalytics::getInstance()->trackButton(kScreenName, "kSignInPressed"); break;
+        case kTroublePressed:   GoogleAnalytics::getInstance()->trackButton(kScreenName, "kTroublePressed"); break;
+        default: break;
+    }
+
     switch (msg.mEvent)
     {
         case kYes:

@@ -206,6 +206,12 @@ bool ChangeRegisteredNameScreen::HasEdgeNamedNext() const
 #pragma mark Messages
 void ChangeRegisteredNameScreen::update(const ChangeRegisteredNameScreenMessage& msg)
 {
+    switch (msg.mEvent)
+    {
+        case kSaveSelected: GoogleAnalytics::getInstance()->trackButton(kScreenName, "kSaveSelected"); break;
+        default: break;
+    }
+
 	process(msg.mEvent);
 }
 

@@ -229,6 +229,15 @@ bool EditAllGroupsScreen::HasEdgeNamedNext() const
 #pragma mark Messages
 void EditAllGroupsScreen::update(const EditAllGroupsScreenMessage& msg)
 {
+    switch (msg.mEvent)
+    {
+        case kGroupSelected:        GoogleAnalytics::getInstance()->trackButton(kScreenName, "kGroupSelected"); break;
+        case kCreatePressed:        GoogleAnalytics::getInstance()->trackButton(kScreenName, "kCreatePressed"); break;
+        case kDeleteGroup:          GoogleAnalytics::getInstance()->trackButton(kScreenName, "kDeleteGroup"); break;
+        case kRefreshSelected:      GoogleAnalytics::getInstance()->trackButton(kScreenName, "kRefreshSelected"); break;
+        default: break;
+    }
+
 	process(msg.mEvent);
 }
 

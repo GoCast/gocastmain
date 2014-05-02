@@ -204,6 +204,8 @@
          {
              UIAlertView* alert = [[UIAlertView alloc] init];
 
+             GoogleAnalytics::getInstance()->trackAlert("EditContacts", "showContactDoesNotHaveAnEmailAddressEntry");
+
              alert.message = [NSString stringWithUTF8String:"選択したコンタクト情報にEmailアドレスがありませんでした"]; // "Contact does not have an email address"
              [alert addButtonWithTitle:@"OK"]; // "Okay"
 

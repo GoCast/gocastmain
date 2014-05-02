@@ -187,6 +187,12 @@ bool CreateContactScreen::HasEdgeNamedNext() const
 #pragma mark Messages
 void CreateContactScreen::update(const CreateContactScreenMessage& msg)
 {
+    switch (msg.mEvent)
+    {
+        case kSaveSelected:        GoogleAnalytics::getInstance()->trackButton(kScreenName, "kSaveSelected"); break;
+        default: break;
+    }
+
 	process(msg.mEvent);
 }
 

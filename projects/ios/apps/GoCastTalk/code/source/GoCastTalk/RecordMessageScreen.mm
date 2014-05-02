@@ -830,6 +830,21 @@ void RecordMessageScreen::update(const RecordMessageScreenMessage& msg)
 {
     switch (msg.mEvent)
     {
+        case kFinishedPlaying:      GoogleAnalytics::getInstance()->trackEvent(kScreenName,  "kFinishedPlaying"); break;
+        case kNewMessage:           GoogleAnalytics::getInstance()->trackEvent(kScreenName,  "kNewMessage"); break;
+        case kTranscriptionReady:   GoogleAnalytics::getInstance()->trackEvent(kScreenName,  "kTranscriptionReady"); break;
+
+        case kCancelPressed:        GoogleAnalytics::getInstance()->trackButton(kScreenName, "kCancelPressed"); break;
+        case kPausePressed:         GoogleAnalytics::getInstance()->trackButton(kScreenName, "kPausePressed"); break;
+        case kPlayPressed:          GoogleAnalytics::getInstance()->trackButton(kScreenName, "kPlayPressed"); break;
+        case kRecordPressed:        GoogleAnalytics::getInstance()->trackButton(kScreenName, "kRecordPressed"); break;
+        case kSendPressed:          GoogleAnalytics::getInstance()->trackButton(kScreenName, "kSendPressed"); break;
+        case kStopPressed:          GoogleAnalytics::getInstance()->trackButton(kScreenName, "kStopPressed"); break;
+        default: break;
+    }
+
+    switch (msg.mEvent)
+    {
         case kYes:
             switch (getState())
             {
