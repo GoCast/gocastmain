@@ -11,6 +11,8 @@
 
 #define kMemoAppServerURL LoginScreen::mBaseURL.c_str()
 
+#include "GoogleAnalytics.h"
+
 #include <string>
 #include <map>
 #include <set>

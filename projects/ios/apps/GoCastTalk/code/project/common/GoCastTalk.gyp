@@ -274,6 +274,9 @@
 					'../../source/GoCastTalk/<@(OS)/CCCell.h',
 					'../../source/GoCastTalk/<@(OS)/CCCell.mm',
 
+					'../../source/GoCastTalk/<@(OS)/GoogleAnalytics.h',
+					'../../source/GoCastTalk/<@(OS)/GoogleAnalytics.mm',
+
 					'../../third-party/TestFlightSDK3.0.0/TestFlight.h',
 					'../../third-party/TestFlightSDK3.0.0/TestFlight+AsyncLogging.h',
 					'../../third-party/TestFlightSDK3.0.0/TestFlight+ManualSessions.h',

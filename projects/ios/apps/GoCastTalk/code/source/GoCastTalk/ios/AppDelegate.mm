@@ -23,6 +23,8 @@
 
 #import "TestFlight.h"
 
+#include "GoogleAnalytics.h"
+
 AppDelegate* gAppDelegateInstance = NULL;
 
 extern std::vector<std::string> gUserListEntries;
@@ -95,6 +97,8 @@ const unsigned char SpeechKitApplicationKey[] =
                                                                             UIRemoteNotificationTypeSound |
                                                                             UIRemoteNotificationTypeAlert)];
 #endif
+
+    GoogleAnalytics::getInstance();
 
 #ifdef ADHOC
 #pragma clang diagnostic push
