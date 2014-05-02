@@ -278,6 +278,19 @@
 					'../../third-party/TestFlightSDK3.0.0/TestFlight+AsyncLogging.h',
 					'../../third-party/TestFlightSDK3.0.0/TestFlight+ManualSessions.h',
 
+					'../../third-party/GoogleAnalyticsServicesiOS_3.06/GoogleAnalytics/Library/GAI.h',
+					'../../third-party/GoogleAnalyticsServicesiOS_3.06/GoogleAnalytics/Library/GAIDictionaryBuilder.h',
+					'../../third-party/GoogleAnalyticsServicesiOS_3.06/GoogleAnalytics/Library/GAIFields.h',
+					'../../third-party/GoogleAnalyticsServicesiOS_3.06/GoogleAnalytics/Library/GAILogger.h',
+					'../../third-party/GoogleAnalyticsServicesiOS_3.06/GoogleAnalytics/Library/GAITrackedViewController.h',
+					'../../third-party/GoogleAnalyticsServicesiOS_3.06/GoogleAnalytics/Library/GAITracker.h',
+
+					'../../third-party/GoogleAnalyticsServicesiOS_3.06/GoogleTagManager/Library/TAGContainer.h',
+					'../../third-party/GoogleAnalyticsServicesiOS_3.06/GoogleTagManager/Library/TAGContainerOpener.h',
+					'../../third-party/GoogleAnalyticsServicesiOS_3.06/GoogleTagManager/Library/TAGDataLayer.h',
+					'../../third-party/GoogleAnalyticsServicesiOS_3.06/GoogleTagManager/Library/TAGLogger.h',
+					'../../third-party/GoogleAnalyticsServicesiOS_3.06/GoogleTagManager/Library/TAGManager.h',
+
 				],	# sources
 
 				'mac_bundle_resources': [
@@ -360,7 +373,10 @@
 				],	# mac_bundle_resources
 
                 'mac_framework_dirs': [
-                '../../third-party/DragonMobileSDK_1.4.9',
+					'../../third-party/DragonMobileSDK_1.4.9',
+					'../../third-party/GoogleAnalyticsServicesiOS_3.06',
+					'../../third-party/GoogleAnalyticsServicesiOS_3.06/GoogleAnalytics/Library',
+					'../../third-party/GoogleAnalyticsServicesiOS_3.06/GoogleTagManager/Library',
                 ],
 
 				'link_settings': {
@@ -368,10 +384,15 @@
 						'../../third-party/TestFlightSDK3.0.0/libTestFlight.a',
 						'libz.dylib',
 						'../../third-party/DragonMobileSDK_1.4.9/SpeechKit.framework',
+						'../../third-party/GoogleAnalyticsServicesiOS_3.06/libAdIdAccess.a',
+						'../../third-party/GoogleAnalyticsServicesiOS_3.06/libGoogleAnalyticsServices.a',
+						'libsqlite3.dylib',
 						'$(SDKROOT)/System/Library/Frameworks/AddressBook.framework',
 						'$(SDKROOT)/System/Library/Frameworks/AddressBookUI.framework',
+						'$(SDKROOT)/System/Library/Frameworks/AdSupport.framework',
 						'$(SDKROOT)/System/Library/Frameworks/AudioToolbox.framework',
 						'$(SDKROOT)/System/Library/Frameworks/AVFoundation.framework',
+						'$(SDKROOT)/System/Library/Frameworks/CoreData.framework',
 						'$(SDKROOT)/System/Library/Frameworks/CFNetwork.framework',
 						'$(SDKROOT)/System/Library/Frameworks/UIKit.framework',
 						'$(SDKROOT)/System/Library/Frameworks/MessageUI.framework',
