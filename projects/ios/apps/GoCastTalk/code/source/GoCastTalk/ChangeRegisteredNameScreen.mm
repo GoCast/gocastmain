@@ -6,6 +6,8 @@
 
 #include "ChangeRegisteredNameVC.h"
 
+#define kScreenName "ChangeRegisteredName"
+
 #pragma mark Constructor / Destructor
 ChangeRegisteredNameScreen::ChangeRegisteredNameScreen(ChangeRegisteredNameVC* newVC, const JSONObject& initObject)
 :   mPeer(newVC),
@@ -31,6 +33,8 @@ void ChangeRegisteredNameScreen::savePressed(const JSONObject& initObject)
 #pragma mark Start / End / Invalid
 void ChangeRegisteredNameScreen::startEntry()
 {
+    GoogleAnalytics::getInstance()->trackScreenEntry(kScreenName);
+
     GCTEventManager::getInstance()->attach(this);
     URLLoader::getInstance()->attach(this);
 }
@@ -123,6 +127,7 @@ void ChangeRegisteredNameScreen::setWaitForSetContactsEntry()
 
 void ChangeRegisteredNameScreen::showErrorWithSetContactsEntry()
 {
+    GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showErrorWithSetContactsEntry");
     // "Error saving contact details"
     tAlert("メンバーの保存に失敗しました");
 }

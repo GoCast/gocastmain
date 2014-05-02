@@ -6,6 +6,8 @@
 
 #include "GroupViewVC.h"
 
+#define kScreenName "GroupView"
+
 #pragma mark Constructor / Destructor
 GroupViewScreen::GroupViewScreen(GroupViewVC* newVC, const JSONObject& initObject)
 :   mPeer(newVC),
@@ -22,6 +24,7 @@ GroupViewScreen::~GroupViewScreen()
 #pragma mark Start / End / Invalid
 void GroupViewScreen::startEntry()
 {
+    GoogleAnalytics::getInstance()->trackScreenEntry(kScreenName);
 }
 
 void GroupViewScreen::endEntry()

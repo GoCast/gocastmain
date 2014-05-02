@@ -9,6 +9,8 @@
 #import "InboxEntryCell.h"
 #import "HeadingSubCell.h"
 
+#define kScreenName "About"
+
 extern std::string kBaseURL;
 
 @interface AboutVC()
@@ -21,6 +23,8 @@ extern std::string kBaseURL;
 #pragma mark Construction / Destruction
 - (void)viewDidLoad
 {
+    GoogleAnalytics::getInstance()->trackScreenEntry(kScreenName);
+
     [super viewDidLoad];
 
     //"Build date"

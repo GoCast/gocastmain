@@ -6,6 +6,8 @@
 
 #include "EditOneGroupVC.h"
 
+#define kScreenName "EditOneGroup"
+
 #pragma mark Constructor / Destructor
 EditOneGroupScreen::EditOneGroupScreen(EditOneGroupVC* newVC, const JSONObject& initObject)
 :   mPeer(newVC),
@@ -48,6 +50,8 @@ void EditOneGroupScreen::peerPopSelfEntry()
 #pragma mark Start / End / Invalid
 void EditOneGroupScreen::startEntry()
 {
+    GoogleAnalytics::getInstance()->trackScreenEntry(kScreenName);
+
     GCTEventManager::getInstance()->attach(this);
     URLLoader::getInstance()->attach(this);
 }
@@ -183,18 +187,21 @@ void EditOneGroupScreen::setWaitForSetGroupsEntry()
 
 void EditOneGroupScreen::showErrorWithSetGroupsEntry()
 {
+    GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showErrorWithSetGroupsEntry");
     //"Error saving group details"
     tAlert("グループの保存に失敗しました");
 }
 
 void EditOneGroupScreen::showMustSelectMembersEntry()
 {
+    GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showMustSelectMembersEntry");
     //"No group members selected"
     tAlert("メンバーが選択されていません");
 }
 
 void EditOneGroupScreen::showNameCantBeEmptyEntry()
 {
+    GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showNameCantBeEmptyEntry");
     //"Group name must not be empty"
     tAlert("グループ名が入力されていません");
 }

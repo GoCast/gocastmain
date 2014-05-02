@@ -6,6 +6,8 @@
 
 #include "InboxVC.h"
 
+#define kScreenName "Inbox"
+
 JSONArray   InboxScreen::mInbox;
 JSONArray   InboxScreen::mContacts;
 JSONArray   InboxScreen::mGroups;
@@ -206,6 +208,8 @@ void       InboxScreen::deletePressed(const size_t& i)
 #pragma mark Start / End / Invalid
 void InboxScreen::startEntry()
 {
+    GoogleAnalytics::getInstance()->trackScreenEntry(kScreenName);
+
     mForceLogout        = false;
     mManualLogout       = false;
     mFirstLogin         = true;
@@ -682,54 +686,63 @@ void InboxScreen::sendVersionToServerEntry()
 #pragma mark User Interface
 void InboxScreen::showErrorDeletingMessageEntry()
 {
+    GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showErrorDeletingMessageEntry");
     //"There was an error deleting a message from the server"
     tAlert("メッセージの削除に失敗しました");
 }
 
 void InboxScreen::showErrorLoadingContactsEntry()
 {
+    GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showErrorLoadingContactsEntry");
     //"There was an error loading contacts from the server"
     tAlert("メンバーの取得に失敗しました");
 }
 
 void InboxScreen::showErrorLoadingGroupsEntry()
 {
+    GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showErrorLoadingGroupsEntry");
     //"There was an error loading groups from the server"
     tAlert("グループの取得に失敗しました");
 }
 
 void InboxScreen::showErrorLoadingInboxEntry()
 {
+    GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showErrorLoadingInboxEntry");
     //"There was an error loading inbox from the server"
     tAlert("メッセージの取得に失敗しました");
 }
 
 void InboxScreen::showRetryListMessagesEntry()
 {
+    GoogleAnalytics::getInstance()->trackConfirm(kScreenName, "showRetryListMessagesEntry");
     //"Couldn't contact server, retry refresh inbox?"
     tConfirm("メッセージ取り込み中に接続エラーが発生しました。リトライしますか？");
 }
 
 void InboxScreen::showYourTokenExpiredEntry()
 {
+    GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showYourTokenExpiredEntry");
     //"Your session has expired."
     tAlert("接続がタイムアウトしました");
 }
 
 void InboxScreen::showErrorContactVersionEntry()
 {
+    GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showErrorContactVersionEntry");
     //"Error contacting server"
     tAlert("接続エラーが発生しました。");
 }
 
 void InboxScreen::showMustUpgradeEntry()
 {
+    GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showMustUpgradeEntry");
     // "Please upgrade to the latest version of GoCast Talk in the App Store."
     tAlert("最新バージョンのGoCast Talkにアップデートしてください。");
 }
 
 void InboxScreen::showThisIsAdhocEntry()
 {
+    GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showThisIsAdhocEntry");
     // "TestFlight version."
     tAlert("TestFlightバージョンです。");
 }

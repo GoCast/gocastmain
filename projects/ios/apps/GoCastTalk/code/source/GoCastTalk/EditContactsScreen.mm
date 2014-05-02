@@ -6,6 +6,8 @@
 
 #include "EditContactsVC.h"
 
+#define kScreenName "EditContacts"
+
 #pragma mark Constructor / Destructor
 EditContactsScreen::EditContactsScreen(EditContactsVC* newVC)
 : mPeer(newVC)
@@ -55,6 +57,8 @@ void EditContactsScreen::refreshPressed()
 #pragma mark Start / End / Invalid
 void EditContactsScreen::startEntry()
 {
+    GoogleAnalytics::getInstance()->trackScreenEntry(kScreenName);
+
     URLLoader::getInstance()->attach(this);
     GCTEventManager::getInstance()->attach(this);
 }
@@ -142,6 +146,7 @@ void EditContactsScreen::setWaitForSetContactsEntry()
 
 void EditContactsScreen::showErrorWithSetContactsEntry()
 {
+    GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showErrorWithSetContactsEntry");
     // "Error saving contact details"
     tAlert("メンバーの保存に失敗しました");
 }

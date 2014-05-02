@@ -6,6 +6,8 @@
 
 #include "SettingsVC.h"
 
+#define kScreenName "Settings"
+
 #pragma mark Constructor / Destructor
 SettingsScreen::SettingsScreen(SettingsVC* newVC)
 : mPeer(newVC)
@@ -43,6 +45,8 @@ void SettingsScreen::aboutThisAppPressed()
 #pragma mark Start / End / Invalid
 void SettingsScreen::startEntry()
 {
+    GoogleAnalytics::getInstance()->trackScreenEntry(kScreenName);
+
     URLLoader::getInstance()->attach(this);
     GCTEventManager::getInstance()->attach(this);
 }
@@ -139,18 +143,21 @@ void SettingsScreen::setWaitForLogoutEntry()
 
 void SettingsScreen::showConfirmLogoutEntry()
 {
+    GoogleAnalytics::getInstance()->trackConfirm(kScreenName, "showConfirmLogoutEntry");
     //"Are you sure you want to logout?"
     tConfirm("ログアウトしてよろしいですか？");
 }
 
 void SettingsScreen::showErrorWithLogoutEntry()
 {
+    GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showErrorWithLogoutEntry");
     //"Logout failed"
     tAlert("ログアウトに失敗しました");
 }
 
 void SettingsScreen::showSuccessWithLogoutEntry()
 {
+    GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showSuccessWithLogoutEntry");
     //"You have been successfully logged out"
     tAlert("ログアウトしました");
 }

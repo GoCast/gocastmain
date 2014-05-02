@@ -6,6 +6,8 @@
 
 #include "MessageHistoryVC.h"
 
+#define kScreenName "MessageHistory"
+
 #pragma mark Constructor / Destructor
 MessageHistoryScreen::MessageHistoryScreen(MessageHistoryVC* newVC, const JSONObject& initObject)
 :   mPeer(newVC),
@@ -99,6 +101,7 @@ void MessageHistoryScreen::peerPushInboxMessageEntry()
 #pragma mark Start / End / Invalid
 void MessageHistoryScreen::startEntry()
 {
+    GoogleAnalytics::getInstance()->trackScreenEntry(kScreenName);
 }
 
 void MessageHistoryScreen::endEntry()

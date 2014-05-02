@@ -5,6 +5,8 @@
 
 #include "LoginVC.h"
 
+#define kScreenName "Login"
+
 #ifdef ADHOC
 std::string kBaseURL("https://chat.gocast.it/memoappserver/");
 #else
@@ -77,6 +79,8 @@ void LoginScreen::troublePressed(const std::string& newName)
 #pragma mark Start / End / Invalid
 void LoginScreen::startEntry()
 {
+    GoogleAnalytics::getInstance()->trackScreenEntry(kScreenName);
+
     URLLoader::getInstance()->attach(this);
     GCTEventManager::getInstance()->attach(this);
 }
@@ -259,6 +263,7 @@ void LoginScreen::validateURLEntry()
 #pragma mark UI
 void LoginScreen::showUserRegistraionSuccessfulEntry()
 {
+    GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showUserRegistraionSuccessfulEntry");
     // "New account registered successfully"
     tAlert("新規登録しました");
 }
@@ -283,41 +288,48 @@ void LoginScreen::showUserRegistraionSuccessfulEntry()
 
 void LoginScreen::showEnterEmailFirstEntry()
 {
+    GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showEnterEmailFirstEntry");
     // "Please enter an email address first."
     tAlert("Emailアドレスを先に入力してください");
 }
 
 void LoginScreen::showCouldNotLoginEntry()
 {
+    GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showCouldNotLoginEntry");
     //"Could not sign in"
     tAlert("サインインできませんでした");
 }
 
 void LoginScreen::showCouldNotRegisterEntry()
 {
+    GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showCouldNotRegisterEntry");
     //"Could not sign up"
     tAlert("新規登録できませんでした");
 }
 
 void LoginScreen::showIncorrectFormatEntry()
 {
+    GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showIncorrectFormatEntry");
     //"User name must be email address format, and password must be letters and numbers only."
     tAlert("ユーザー名はEmailアドレス形式、パスワードは半角英数字のみをご使用ください");
 }
 
 void LoginScreen::showURLMissingSlashEntry()
 {
+    GoogleAnalytics::getInstance()->trackConfirm(kScreenName, "showURLMissingSlashEntry");
     tConfirm("URL missing trailing slash. Continue?");
 }
 
 void LoginScreen::showRetryLoginEntry()
 {
+    GoogleAnalytics::getInstance()->trackConfirm(kScreenName, "showRetryLoginEntry");
     //"Error contacting server. Retry sign in?"
     tConfirm("サインイン中に接続エラーが発生しました。リトライしますか？");
 }
 
 void LoginScreen::showRetryRegisterEntry()
 {
+    GoogleAnalytics::getInstance()->trackConfirm(kScreenName, "showRetryRegisterEntry");
     //"Error contacting server. Retry sign up?"
     tConfirm("新規登録中に接続エラーが発生しました。リトライしますか？");
 }

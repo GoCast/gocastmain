@@ -6,6 +6,8 @@
 
 #include "ChangePasswordVC.h"
 
+#define kScreenName "ChangePassword"
+
 #pragma mark Helper methods
 bool ChangePasswordScreen::EnsurePassword(const std::string &password)
 {
@@ -42,6 +44,8 @@ void ChangePasswordScreen::savePressed()
 #pragma mark Start / End / Invalid
 void ChangePasswordScreen::startEntry()
 {
+    GoogleAnalytics::getInstance()->trackScreenEntry(kScreenName);
+
     URLLoader::getInstance()->attach(this);
     GCTEventManager::getInstance()->attach(this);
 }
@@ -119,18 +123,21 @@ void ChangePasswordScreen::setWaitForChangePasswordEntry()
 
 void ChangePasswordScreen::showErrorWithChangePasswordEntry()
 {
+    GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showErrorWithChangePasswordEntry");
     // "Cannot change password; old password is incorrect."
     tAlert("現在のパスワードが正しくありません。パスワードは変更されませんでした。");
 }
 
 void ChangePasswordScreen::showIncorrectFormatEntry()
 {
+    GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showIncorrectFormatEntry");
     // "Password must be letters and numbers only, and new password must be different from old password."
     tAlert("パスワードは半角英数字のみをご使用ください。新しいパスワードは現在のパスワードと異なるものにしてください。");
 }
 
 void ChangePasswordScreen::showSuccessChangedPasswordEntry()
 {
+    GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showSuccessChangedPasswordEntry");
     // "Changed password successfully."
     tAlert("パスワードが変更されました");
 }

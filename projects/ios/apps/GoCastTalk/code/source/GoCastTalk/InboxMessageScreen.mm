@@ -6,6 +6,8 @@
 
 #include "InboxMessageVC.h"
 
+#define kScreenName "InboxMessage"
+
 #pragma mark Constructor / Destructor
 InboxMessageScreen::InboxMessageScreen(InboxMessageVC* newVC, const JSONObject& initObject)
 :   mPeer(newVC),
@@ -53,6 +55,8 @@ void InboxMessageScreen::deletePressed()
 #pragma mark Start / End / Invalid
 void InboxMessageScreen::startEntry()
 {
+    GoogleAnalytics::getInstance()->trackScreenEntry(kScreenName);
+
     mWasPlaying = false;
     mSound = NULL;
 
@@ -292,12 +296,14 @@ void InboxMessageScreen::setWaitForMarkReadEntry()
 
 void InboxMessageScreen::showErrorDeletingMessageEntry()
 {
+    GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showErrorDeletingMessageEntry");
     //"There was an error deleting a message from the server"
     tAlert("メッセージの削除に失敗しました");
 }
 
 void InboxMessageScreen::showRetryDownloadEntry()
 {
+    GoogleAnalytics::getInstance()->trackConfirm(kScreenName, "showRetryDownloadEntry");
     //"Couldn't contact server, retry download?"
     tConfirm("ダウンロード中に接続エラーが発生しました。リトライしますか？");
 }

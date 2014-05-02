@@ -6,6 +6,8 @@
 
 #include "RecordMessageVC.h"
 
+#define kScreenName "RecordMessage"
+
 #pragma mark Constructor / Destructor
 RecordMessageScreen::RecordMessageScreen(RecordMessageVC* newVC, const JSONObject& initObject)
 :   mPeer(newVC),
@@ -70,6 +72,8 @@ void RecordMessageScreen::stopPressed()
 #pragma mark Start / End / Invalid
 void RecordMessageScreen::startEntry()
 {
+    GoogleAnalytics::getInstance()->trackScreenEntry(kScreenName);
+
     mForceLogout    = false;
 
     mSound          = NULL;
@@ -563,48 +567,56 @@ void RecordMessageScreen::sendValidUsersToServerEntry()
 
 void RecordMessageScreen::showComposeNewMessageEntry()
 {
+    GoogleAnalytics::getInstance()->trackConfirm(kScreenName, "showComposeNewMessageEntry");
     //"Compose new message? Old message will be discarded."
     tConfirm("作成中のメッセージを破棄し、新しくメッセージを作成してよろしいですか？");
 }
 
 void RecordMessageScreen::showConfirmDeleteEntry()
 {
+    GoogleAnalytics::getInstance()->trackConfirm(kScreenName, "showConfirmDeleteEntry");
     //"Delete this message?"
     tConfirm("削除してよろしいですか？");
 }
 
 void RecordMessageScreen::showConfirmSendEntry()
 {
+    GoogleAnalytics::getInstance()->trackConfirm(kScreenName, "showConfirmSendEntry");
     //"Do you want to send this message?"
     tConfirm("このメッセージを送信してよろしいですか？");
 }
 
 void RecordMessageScreen::showNoAudioToSendEntry()
 {
+    GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showNoAudioToSendEntry");
     //"Please add audio first."
     tAlert("送信前に録音してください。");
 }
 
 void RecordMessageScreen::showNoContactsToSendToEntry()
 {
+    GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showNoContactsToSendToEntry");
     //"Please add some recipients first."
     tAlert("先に宛先のメンバーを指定してください");
 }
 
 void RecordMessageScreen::showPostAudioFailedEntry()
 {
+    GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showPostAudioFailedEntry");
     //"Could not send audio to server."
     tAlert("音声データをサーバに送信できませんでした");
 }
 
 void RecordMessageScreen::showThereWereNonMembersEntry()
 {
+    GoogleAnalytics::getInstance()->trackConfirm(kScreenName, "showThereWereNonMembersEntry");
     //"Some recipients were unregistered GoCast Talk users. Send those users the voice message as an email?"
     tConfirm("いくつかの宛先が、GoCast Talkのメンバーに登録されていません。これらの宛先に 電子メールでメッセージを送ってもよろしいですか？");
 }
 
 void RecordMessageScreen::showValidUsersFailedEntry()
 {
+    GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showValidUsersFailedEntry");
     //"Message was sent, but we could not verify recipients at this time."
     tAlert("メッセージを送信しましたが、現時点で受信者を確認することができませんでした。");
 }
@@ -1021,6 +1033,7 @@ void RecordMessageScreen::update(const tTimerEvent& msg)
                 if (getState() == kRecordingIdle)
                 {
                     process(kStopPressed);
+                    GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showRecordLimitIs10MinutesEntry");
                     //"Record limit is 10 minutes. Recording will now stop"
                     tAlert("録音時間は最大１０分です。録音を終了します。");
                 }

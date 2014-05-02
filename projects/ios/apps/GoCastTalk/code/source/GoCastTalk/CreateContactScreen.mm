@@ -6,6 +6,8 @@
 
 #include "CreateContactVC.h"
 
+#define kScreenName "CreateContact"
+
 #pragma mark Constructor / Destructor
 CreateContactScreen::CreateContactScreen(CreateContactVC* newVC)
 :   mPeer(newVC)
@@ -30,6 +32,8 @@ void CreateContactScreen::savePressed(const JSONObject& saveObject)
 #pragma mark Start / End / Invalid
 void CreateContactScreen::startEntry()
 {
+    GoogleAnalytics::getInstance()->trackScreenEntry(kScreenName);
+
     GCTEventManager::getInstance()->attach(this);
     URLLoader::getInstance()->attach(this);
 }
@@ -105,6 +109,7 @@ void CreateContactScreen::setWaitForSetContactsEntry()
 
 void CreateContactScreen::showErrorWithSetContactsEntry()
 {
+    GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showErrorWithSetContactsEntry");
     // "Error saving contact details"
     tAlert("メンバーの保存に失敗しました");
 }

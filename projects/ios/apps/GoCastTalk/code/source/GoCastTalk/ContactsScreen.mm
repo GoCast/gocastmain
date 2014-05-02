@@ -6,6 +6,8 @@
 
 #include "ContactsVC.h"
 
+#define kScreenName "Contacts"
+
 #pragma mark Constructor / Destructor
 ContactsScreen::ContactsScreen(ContactsVC* newVC, bool newIsChild, void* newIdentifier)
 :   mPeer(newVC),
@@ -83,6 +85,8 @@ void ContactsScreen::refreshPressed()
 #pragma mark Start / End / Invalid
 void ContactsScreen::startEntry()
 {
+    GoogleAnalytics::getInstance()->trackScreenEntry(kScreenName);
+
     URLLoader::getInstance()->attach(this);
     GCTEventManager::getInstance()->attach(this);
 }
@@ -245,12 +249,14 @@ void ContactsScreen::setWaitForSetGroupsEntry()
 
 void ContactsScreen::showErrorWithSetContactsEntry()
 {
+    GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showErrorWithSetContactsEntry");
     // "Error saving contact details"
     tAlert("メンバーの保存に失敗しました");
 }
 
 void ContactsScreen::showErrorWithSetGroupsEntry()
 {
+    GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showErrorWithSetGroupsEntry");
     //"Error saving group details"
     tAlert("グループの保存に失敗しました");
 }
