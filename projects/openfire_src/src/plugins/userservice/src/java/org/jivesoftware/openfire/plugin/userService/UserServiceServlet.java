@@ -197,7 +197,7 @@ public class UserServiceServlet extends HttpServlet {
                     }
                     else
                     {
-                        replyExpired("User not Authorized",response, out);
+                        replyError("Old password is incorrect",null,response, out);
                     }
                     //xmlProvider.sendInfo(request, response, presence);
                 }
