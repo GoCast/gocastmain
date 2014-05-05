@@ -1,0 +1,19 @@
+<form enctype="multipart/form-data" action="https://test.chat.gocast.it/memoappserver/index.php" method="POST">
+
+ <input type="hidden" name="action" value="setContacts">
+
+ <input type="hidden" name="name" value="Sandra.carrico@gocast.it">
+
+ <input type="hidden" name="authToken" value="MG0CbDDRT2p5ZlULto447hqSwRzHbihQTs6kca4jnuIzLUTkFCfNgZQHBrrnaAik">
+
+ <!-- MAX_FILE_SIZE must precede the file input field -->
+
+ <input type="hidden" name="MAX_FILE_SIZE" value="1048576" />
+
+ <!-- Name of input element determines name in $_FILES array -->
+
+ Send this file: <input name="filename" type="file" />
+
+ <input type="submit" value="Send File" />
+
+</form>
