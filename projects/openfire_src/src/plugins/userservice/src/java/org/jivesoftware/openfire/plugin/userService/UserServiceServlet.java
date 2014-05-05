@@ -190,12 +190,18 @@ public class UserServiceServlet extends HttpServlet {
                     //xmlProvider.sendInfo(request, response, presence);
                 }
                 else if ("changePassword".equals(type)) {
-                    if (plugin.checkPassword(username, oldPassword))
-                    {
-                        plugin.updateUser(username, password,null,null,null,null);
-                        replyMessage(replyStatus("ok"),response,out);
+                    try {
+                        if (plugin.checkPassword(username, oldPassword))
+                        {
+                            plugin.updateUser(username, password,null,null,null,null);
+                            replyMessage(replyStatus("ok"),response,out);
+                        }
+                        else
+                        {
+                            replyError("Old password is incorrect",null,response, out);
+                        }
                     }
-                    else
+                    catch (Exception e)
                     {
                         replyError("Old password is incorrect",null,response, out);
                     }
