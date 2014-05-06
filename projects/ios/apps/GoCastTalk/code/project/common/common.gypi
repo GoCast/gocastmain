@@ -26,7 +26,7 @@
 
 				'xcode_settings': {
 					'CODE_SIGN_IDENTITY': 'iPhone Developer: YOJI IZAKI (D54FT6256A)',
-					'PROVISIONING_PROFILE': 'GoCast Dev Provisioning Profile',
+					'PROVISIONING_PROFILE': '454315B3-1E16-4F94-8D4F-1F46D83BE760',
 
 					'ONLY_ACTIVE_ARCH': 'YES',
 					'DEAD_CODE_STRIPPING': 'NO',
@@ -51,7 +51,7 @@
 
 				'xcode_settings': {
 					'CODE_SIGN_IDENTITY': 'iPhone Distribution: Go Cast.it Inc. (CXZBC3NTHG)',
-					'PROVISIONING_PROFILE': 'GoCast AdHoc Provisioning Profile',
+					'PROVISIONING_PROFILE': 'BAD108F5-0E0E-490C-864C-33B9767096A8',
 
 					'COPY_PHASE_STRIP': 'YES',
 					'DEPLOYMENT_POSTPROCESSING': 'YES',
@@ -79,7 +79,7 @@
 
 				'xcode_settings': {
 					'CODE_SIGN_IDENTITY': 'iPhone Distribution: Go Cast.it Inc. (CXZBC3NTHG)',
-					'PROVISIONING_PROFILE': 'GoCast AppStore Provisioning Profile',
+					'PROVISIONING_PROFILE': 'E07315C2-16B7-4751-8769-A0D3D1C3FEEA',
 
 					'COPY_PHASE_STRIP': 'YES',
 					'DEPLOYMENT_POSTPROCESSING': 'YES',
