@@ -379,7 +379,7 @@
 					'../../third-party/DragonMobileSDK_1.4.9',
 					'../../third-party/GoogleAnalyticsServicesiOS_3.06',
 					'../../third-party/GoogleAnalyticsServicesiOS_3.06/GoogleAnalytics/Library',
-					'../../third-party/GoogleAnalyticsServicesiOS_3.06/GoogleTagManager/Library',
+# 					'../../third-party/GoogleAnalyticsServicesiOS_3.06/GoogleTagManager/Library',
                 ],
 
 				'link_settings': {
@@ -392,7 +392,7 @@
 						'libsqlite3.dylib',
 						'$(SDKROOT)/System/Library/Frameworks/AddressBook.framework',
 						'$(SDKROOT)/System/Library/Frameworks/AddressBookUI.framework',
-						'$(SDKROOT)/System/Library/Frameworks/AdSupport.framework',
+# 						'$(SDKROOT)/System/Library/Frameworks/AdSupport.framework',
 						'$(SDKROOT)/System/Library/Frameworks/AudioToolbox.framework',
 						'$(SDKROOT)/System/Library/Frameworks/AVFoundation.framework',
 						'$(SDKROOT)/System/Library/Frameworks/CoreData.framework',

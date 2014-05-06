@@ -144,7 +144,7 @@
 					'GCC_WARN_UNUSED_PARAMETER': 'YES',
 
 					'OTHER_LDFLAGS': [
-						'-ObjC',
+#  						'-ObjC',
 					],
 
 					'WARNING_CFLAGS': [
