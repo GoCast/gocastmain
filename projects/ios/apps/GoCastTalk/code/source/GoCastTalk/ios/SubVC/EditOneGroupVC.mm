@@ -105,7 +105,7 @@
             cell = [[[HeadingSubCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:simpleTableIdentifier] autorelease];
         }
 
-        cell.mHeading.text  = [NSString stringWithUTF8String:InboxScreen::mContacts[(size_t)indexPath.row].mObject["email"].mString.c_str()];
+        cell.mHeading.text  = [NSString stringWithUTF8String:InboxScreen::nameFromEmail(InboxScreen::mContacts[(size_t)indexPath.row].mObject["email"].mString).c_str()];
         cell.mSub.text      = [NSString stringWithUTF8String:InboxScreen::mContacts[(size_t)indexPath.row].mObject["email"].mString.c_str()];
 
         [cell.mCheckbox setHidden: mPeer->isChecked((size_t)indexPath.row) ? NO : YES];
