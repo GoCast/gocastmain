@@ -160,6 +160,8 @@
 			'../../source/GoCastTalk/URLLoader.h',
 
 #--
+			'../../source/GoCastTalk/I18N.h',
+			'../../source/GoCastTalk/I18N.mm',
 
 			'../../source/Audio/package.h',
 			'../../source/Audio/<@(OS)/tSound.mm',
