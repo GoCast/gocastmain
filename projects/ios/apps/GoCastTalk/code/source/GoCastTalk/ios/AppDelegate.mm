@@ -24,6 +24,7 @@
 #import "TestFlight.h"
 
 #include "GoogleAnalytics.h"
+#include "I18N.h"
 
 AppDelegate* gAppDelegateInstance = NULL;
 
@@ -99,6 +100,11 @@ const unsigned char SpeechKitApplicationKey[] =
 #endif
 
     GoogleAnalytics::getInstance();
+
+    I18N::getInstance();
+    I18N::getInstance()->storeJSON("en", JSONUtil::extract(std::string(tFile(tFile::kBundleDirectory, "lang.en.json"))));
+    I18N::getInstance()->storeJSON("ja", JSONUtil::extract(std::string(tFile(tFile::kBundleDirectory, "lang.ja.json"))));
+    // { \"a\":\"b\", \"c\":\"d\" }
 
 #ifdef ADHOC
 #pragma clang diagnostic push
@@ -299,7 +305,7 @@ const unsigned char SpeechKitApplicationKey[] =
 
     voiceSearch = [[SKRecognizer alloc] initWithType:SKDictationRecognizerType
                                            detection:SKNoEndOfSpeechDetection
-                                            language:@"ja_jp"
+                                            language:(I18N::getInstance()->getLocale() == "ja") ? @"ja_jp" : @"en_US"
                                             delegate:self];
 }
 
@@ -417,20 +423,6 @@ const unsigned char SpeechKitApplicationKey[] =
 
     GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kTranscriptFinished, [result UTF8String]));
 
-    //	if (numOfResults > 1)
-    //		alternativesDisplay.text = [[results.results subarrayWithRange:NSMakeRange(1, numOfResults-1)] componentsJoinedByString:@"\n"];
-
-    //    if (results.suggestion) {
-    //        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Suggestion"
-    //                                                        message:results.suggestion
-    //                                                       delegate:nil
-    //                                              cancelButtonTitle:@"OK"
-    //                                              otherButtonTitles:nil];
-    //        [alert show];
-    //        [alert release];
-    //
-    //    }
-
 	[voiceSearch release];
 	voiceSearch = nil;
 }
@@ -442,27 +434,7 @@ const unsigned char SpeechKitApplicationKey[] =
     NSLog(@"Got error.");
     NSLog(@"Session id [%@].", [SpeechKit sessionID]); // for debugging purpose: printing out the speechkit session id
 
-    //    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error"
-    //                                                    message:[error localizedDescription]
-    //                                                   delegate:nil
-    //                                          cancelButtonTitle:@"OK"
-    //                                          otherButtonTitles:nil];
-    //    [alert show];
-    //    [alert release];
-    //
-    //    if (suggestion) {
-    //        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Suggestion"
-    //                                                        message:suggestion
-    //                                                       delegate:nil
-    //                                              cancelButtonTitle:@"OK"
-    //                                              otherButtonTitles:nil];
-    //        [alert show];
-    //        [alert release];
-    //
-    //    }
-
-    //"Transcription not available."
-    GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kTranscriptFinished, "(テキストはまだありません)\n\n無料サービス期間中は、自動テキスト化は１日あたり２０回までご利用いただけます。"));
+    GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kTranscriptFinished, I18N::getInstance()->retrieve("Transcription not available")));
 
 	[voiceSearch release];
 	voiceSearch = nil;

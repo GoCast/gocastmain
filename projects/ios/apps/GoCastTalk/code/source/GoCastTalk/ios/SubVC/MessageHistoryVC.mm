@@ -55,8 +55,7 @@
     }
     else
     {
-        //"Transcription not available"
-        [self setTranscription:"(テキストはまだありません)\n\n無料サービス期間中は、自動テキスト化は１日あたり２０回までご利用いただけます。"];
+        [self setTranscription:I18N::getInstance()->retrieve("Transcription not available").c_str()];
     }
 }
 
@@ -137,12 +136,12 @@
     {
         const char* heading[] =
         {
-            "返信", // "Reply Message",
+            "Reply Message",
         };
 
         const char* subheading[] =
         {
-            "メッセージを録音して送信", // "Send recorded message",
+            "Send recorded message",
         };
 
         const bool hasRightArrow[] =
@@ -161,8 +160,8 @@
             cell = [[[HeadingSubCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:simpleTableIdentifier] autorelease];
         }
 
-        cell.mHeading.text = [NSString stringWithUTF8String:heading[indexPath.row]];
-        cell.mSub.text = [NSString stringWithUTF8String:subheading[indexPath.row]];
+        cell.mHeading.text = [NSString stringWithUTF8String:I18N::getInstance()->retrieve(heading[indexPath.row]).c_str()];
+        cell.mSub.text = [NSString stringWithUTF8String:I18N::getInstance()->retrieve(subheading[indexPath.row]).c_str()];
         cell.mRightArrow.hidden = hasRightArrow[indexPath.row] ? NO : YES;
         
         return cell;

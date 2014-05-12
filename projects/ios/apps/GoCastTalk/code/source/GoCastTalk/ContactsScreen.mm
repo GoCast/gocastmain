@@ -250,15 +250,13 @@ void ContactsScreen::setWaitForSetGroupsEntry()
 void ContactsScreen::showErrorWithSetContactsEntry()
 {
     GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showErrorWithSetContactsEntry");
-    // "Error saving contact details"
-    tAlert("メンバーの保存に失敗しました");
+    tAlert("Error saving contact details");
 }
 
 void ContactsScreen::showErrorWithSetGroupsEntry()
 {
     GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showErrorWithSetGroupsEntry");
-    //"Error saving group details"
-    tAlert("グループの保存に失敗しました");
+    tAlert("Error saving group details");
 }
 
 #pragma mark Sending messages to other machines

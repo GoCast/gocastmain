@@ -330,6 +330,9 @@
 
 					'../../rsrc/GoCastTalk/<@(OS)/newmessage.wav',
 
+					'../../rsrc/GoCastTalk/<@(OS)/lang.en.json',
+					'../../rsrc/GoCastTalk/<@(OS)/lang.ja.json',
+
 					'../../rsrc/GoCastTalk/<@(OS)/nuancelogo.png',
 
 					'../../rsrc/GoCastTalk/<@(OS)/bg-login.png',

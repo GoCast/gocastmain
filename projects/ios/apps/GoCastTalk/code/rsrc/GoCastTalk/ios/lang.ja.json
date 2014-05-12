@@ -1,0 +1,90 @@
+{
+    "A reset email has been sent to the email provided.": "リセット番号を登録のEmailアドレスに送信しました",
+    "About this app": "このアプリについて",
+    "Alert": "",
+    "Are you sure you want to logout?": "ログアウトしてよろしいですか？",
+
+    "Cancel": "キャンセル",
+    "Cancel and Delete": "中止して削除",
+    "Cannot change password; old password is incorrect.": "現在のパスワードが正しくありません。パスワードは変更されませんでした。",
+    "Change Password": "パスワード変更",
+    "Changed password successfully.": "パスワードが変更されました",
+    "Click to view recipients": "クリックして宛先を表示",
+    "Compose new message? Old message will be discarded.": "作成中のメッセージを破棄し、新しくメッセージを作成してよろしいですか？",
+    "Confirm": "",
+    "Contact does not have an email address": "選択したコンタクト情報にEmailアドレスがありませんでした",
+    "Could not send audio to server.": "音声データをサーバに送信できませんでした",
+    "Could not sign in": "サインインできませんでした",
+    "Could not sign up": "新規登録できませんでした",
+    "Couldn't contact server, retry download?": "ダウンロード中に接続エラーが発生しました。リトライしますか？",
+    "Couldn't contact server, retry refresh inbox?": "メッセージ取り込み中に接続エラーが発生しました。リトライしますか？",
+
+    "Delete": "削除",
+    "Delete this message?": "削除してよろしいですか？",
+    "Delete this message": "このメッセージを削除",
+    "Do you want to send this message?": "このメッセージを送信してよろしいですか？",
+    "Done, Send": "完了して送信",
+
+    "Edit": "編集",
+    "Error contacting server": "接続エラーが発生しました。",
+    "Error contacting server. Retry sign in?": "サインイン中に接続エラーが発生しました。リトライしますか？",
+    "Error contacting server. Retry sign up?": "新規登録中に接続エラーが発生しました。リトライしますか？",
+    "Error saving contact details": "メンバーの保存に失敗しました",
+    "Error saving group details": "グループの保存に失敗しました",
+
+    "Feedback": "フィードバック",
+
+    "GoCast Talk Voice Memo": "GoCast Talk ボイスメッセージ",
+    "GoCast Team": "ゴーキャスト　チーム",
+    "Group name must not be empty": "グループ名が入力されていません",
+    "Log Out": "ログアウト",
+    "Logout failed": "ログアウトに失敗しました",
+    "Message was sent, but we could not verify recipients at this time.": "メッセージを送信しましたが、現時点で受信者を確認することができませんでした。",
+    "New account registered successfully": "新規登録しました",
+    "no": "いいえ",
+    "No group members selected": "メンバーが選択されていません",
+
+    "Okay": "OK",
+
+    "Password must be letters and numbers only, and new password must be different from old password.": "パスワードは半角英数字のみをご使用ください。新しいパスワードは現在のパスワードと異なるものにしてください。",
+    "Password reset request": "パスワード再設定依頼",
+    "Past Messages": "履歴",
+    "Please add some recipients first.": "先に宛先のメンバーを指定してください",
+    "Please add audio first.": "送信前に録音してください。",
+    "Please enter an email address first.": "Emailアドレスを先に入力してください",
+    "Please enter the 6-digit reset code:": "６ケタのリセット番号を入力してください",
+    "Please reset my password. My email is ": " のパスワード再設定をお願いします。",
+    "Please upgrade to the latest version of GoCast Talk in the App Store.": "最新バージョンのGoCast Talkにアップデートしてください。",
+
+    "Prompt": "",
+
+    "Record limit is 10 minutes. Recording will now stop": "録音時間は最大１０分です。録音を終了します。",
+    "Registered Name": "登録情報",
+    "Reply Message": "返信",
+
+    "Send a reset code to the provided email address?": "リセットのための番号を登録のEmailアドレスに送信してよろしいですか？",
+    "Send Message": "ボイスメッセージ送信",
+    "Send recorded message": "メッセージを録音して送信",
+    "Show message history": "過去のメッセージを表示",
+    "Some recipients were unregistered GoCast Talk users. Send those users the voice message as an email?": "いくつかの宛先が、GoCast Talkのメンバーに登録されていません。これらの宛先に 電子メールでメッセージを送ってもよろしいですか？",
+
+    "TestFlight version.": "TestFlightバージョンです。",
+    "There was an error deleting a message from the server": "メッセージの削除に失敗しました",
+    "There was an error loading contacts from the server": "メンバーの取得に失敗しました",
+    "There was an error loading groups from the server": "グループの取得に失敗しました",
+    "There was an error loading inbox from the server": "メッセージの取得に失敗しました",
+    "Transcription not available": "(テキストはまだありません)\n\n無料サービス期間中は、自動テキスト化は１日あたり２０回までご利用いただけます。",
+
+    "User name must be email address format, and password must be letters and numbers only.": "ユーザー名はEmailアドレス形式、パスワードは半角英数字のみをご使用ください",
+
+    "voice email post": " 」\nGoCast TalkはiPhoneアプリです。http://gocast.it/talk/ よりインストールできます。インストールの後ユーザ登録を行うと、ボイスメッセージをやり取りすることができるようになります。\n",
+    "voice email pre": "GoCast Talkよりボイスメッセージをお届けします。再生するには、添付オーディオファイルをクリックしてください。自動テキスト変換：\n\n「 ",
+
+    "welcome message": "GoCast Talk へようこそ。\n\nGoCast Talk はビジネス向けのメッセージアプリです。\n\n特定の相手やグループに対して、簡単にボイスメッセージを送ることができます。\nボイスメッセージは自動的に日本語テキストに変換、表示されるため、すぐに内容が把握できます。\n受け取ったメッセージに対して、さらにボイスだけで返信することも簡単にできます。\n\nまずは、下の返信ボタンを押して、ボイスメッセージを録音し、送信してみてください。\n\nこのアプリを使ってみてのご感想を是非お聞かせください。\nメンバーのリストに入っている「フィードバック」宛にボイスメッセージをお送りください。\n\nそれでは、どうぞご利用ください。\n",
+
+    "yes": "はい",
+    "You have been successfully logged out": "ログアウトしました",
+    "Your session has expired.": "接続がタイムアウトしました",
+
+    "x": "x"
+}

@@ -85,7 +85,7 @@
 
     self.view.autoresizesSubviews = YES;
 
-    UIBarButtonItem *anotherButton = [[[UIBarButtonItem alloc] initWithTitle:@"削除" style:UIBarButtonItemStylePlain target:self action:@selector(helpButton:)] autorelease];
+    UIBarButtonItem *anotherButton = [[[UIBarButtonItem alloc] initWithTitle:[NSString stringWithUTF8String:I18N::getInstance()->retrieve("Delete").c_str()] style:UIBarButtonItemStylePlain target:self action:@selector(helpButton:)] autorelease];
     self.navigationItem.rightBarButtonItem = anotherButton;
 
     mPeer = new RecordMessageScreen(self, mInitObject);
@@ -157,8 +157,8 @@
     {
         const char* heading[] =
         {
-            "完了して送信",   // "Done, Send",
-            "中止して削除",   // "Cancel and Delete",
+            "Done, Send",
+            "Cancel and Delete",
         };
 
         UIColor* colors[] =
@@ -184,7 +184,7 @@
             cell = [[[HeadingSubCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:simpleTableIdentifier] autorelease];
         }
 
-        cell.mHeading.text = [NSString stringWithUTF8String:heading[indexPath.row]];
+        cell.mHeading.text = [NSString stringWithUTF8String:I18N::getInstance()->retrieve(heading[indexPath.row]).c_str()];
         cell.mSub.text = [NSString stringWithUTF8String:""];
         cell.mRightArrow.hidden = YES;
 
@@ -211,7 +211,7 @@
         switch (indexPath.row)
         {
             case 0:
-                [cell setAsZero:self->mToExpanded withLabel:(mToExpanded ? "" : "クリックして宛先を表示")]; //"Add recipients"
+                [cell setAsZero:self->mToExpanded withLabel:(mToExpanded ? "" : I18N::getInstance()->retrieve("Click to view recipients"))];
                 break;
                 
             default:
@@ -545,17 +545,14 @@
     if ([MFMailComposeViewController canSendMail])
     {
         std::string body;
-        body += "GoCast Talkよりボイスメッセージをお届けします。\n";
-        body += "再生するには、添付オーディオファイルをクリックしてください。\n";
-        body += "自動テキスト変換：\n\n「 ";
+        body += I18N::getInstance()->retrieve("voice email pre");
         body += [self.mTranscription.text UTF8String] ? [self.mTranscription.text UTF8String] : "";
-        body += " 」\n\n";
-        body += "GoCast TalkはiPhoneアプリです。http://gocast.it/talk/ よりインストールできます。\n";
-        body += "インストールの後ユーザ登録を行うと、ボイスメッセージをやり取りすることができるようになります。\n";
+        body += I18N::getInstance()->retrieve("voice email post");
+
         MFMailComposeViewController *mailer = [[MFMailComposeViewController alloc] init];
         mailer.mailComposeDelegate = self;
-        [mailer setSubject:[NSString stringWithUTF8String:"GoCast Talk ボイスメッセージ"]];//"GoCast Talk Voice Memo"
-        NSMutableArray *toRecipients = [NSMutableArray array];// [NSArray arrayWithObjects:[NSString stringWithUTF8String:newTo.c_str()], nil];
+        [mailer setSubject:[NSString stringWithUTF8String:"GoCast Talk Voice Memo"]];
+        NSMutableArray *toRecipients = [NSMutableArray array];
 
         for(size_t i = 0; i < newTo.size(); i++)
         {

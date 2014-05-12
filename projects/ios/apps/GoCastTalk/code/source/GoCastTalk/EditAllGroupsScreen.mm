@@ -143,8 +143,7 @@ void EditAllGroupsScreen::setWaitForSetGroupsEntry()
 void EditAllGroupsScreen::showErrorWithSetGroupsEntry()
 {
     GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showErrorWithSetGroupsEntry");
-    //"Error saving group details"
-    tAlert("グループの保存に失敗しました");
+    tAlert("Error saving group details");
 }
 
 #pragma mark Sending messages to other machines

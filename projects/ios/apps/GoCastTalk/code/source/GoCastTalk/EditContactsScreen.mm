@@ -147,8 +147,7 @@ void EditContactsScreen::setWaitForSetContactsEntry()
 void EditContactsScreen::showErrorWithSetContactsEntry()
 {
     GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showErrorWithSetContactsEntry");
-    // "Error saving contact details"
-    tAlert("メンバーの保存に失敗しました");
+    tAlert("Error saving contact details");
 }
 
 #pragma mark Sending messages to other machines

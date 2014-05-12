@@ -66,14 +66,14 @@
     {
         const char* heading[] =
         {
-            "履歴",               // "Past Messages",
-            "ボイスメッセージ送信",   // "Send Message",
+            "Past Messages",
+            "Send Message",
         };
 
         const char* subheading[] =
         {
-            "過去のメッセージを表示",  // "Show message history",
-            "メッセージを録音して送信", // "Send recorded message",
+            "Show message history",
+            "Send recorded message",
         };
 
         const bool hasRightArrow[] =
@@ -93,8 +93,8 @@
             cell = [[[HeadingSubCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:simpleTableIdentifier] autorelease];
         }
 
-        cell.mHeading.text = [NSString stringWithUTF8String:heading[indexPath.row]];
-        cell.mSub.text = [NSString stringWithUTF8String:subheading[indexPath.row]];
+        cell.mHeading.text = [NSString stringWithUTF8String:I18N::getInstance()->retrieve(heading[indexPath.row]).c_str()];
+        cell.mSub.text = [NSString stringWithUTF8String:I18N::getInstance()->retrieve(subheading[indexPath.row]).c_str()];
         cell.mRightArrow.hidden = hasRightArrow[indexPath.row] ? NO : YES;
         
         return cell;

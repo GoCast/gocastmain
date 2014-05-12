@@ -6,6 +6,8 @@
 
 #include "AppDelegate.h"
 
+#include "I18N.h"
+
 extern AppDelegate* gAppDelegateInstance;
 
 void tAlert(const std::string& msg)
@@ -14,9 +16,9 @@ void tAlert(const std::string& msg)
 
     alert.delegate = gAppDelegateInstance;
 
-	alert.title = @""; // "Alert"
-	alert.message = [NSString stringWithUTF8String:msg.c_str()];
-    [alert addButtonWithTitle:@"OK"]; // "Okay"
+	alert.title = [NSString stringWithUTF8String:I18N::getInstance()->retrieve("Alert").c_str()];
+	alert.message = [NSString stringWithUTF8String:I18N::getInstance()->retrieve(msg).c_str()];
+    [alert addButtonWithTitle:[NSString stringWithUTF8String:I18N::getInstance()->retrieve("Okay").c_str()]];
 
     [alert performSelectorOnMainThread:@selector(show) withObject:nil waitUntilDone:YES];
     
@@ -29,10 +31,10 @@ void tConfirm(const std::string& msg)
 
     alert.delegate = gAppDelegateInstance;
 
-	alert.title = @""; // "Confirm"
-	alert.message = [NSString stringWithUTF8String:msg.c_str()];
-    [alert addButtonWithTitle:@"はい"];   // "Yes"
-    [alert addButtonWithTitle:@"いいえ"];  // "No"
+	alert.title = [NSString stringWithUTF8String:I18N::getInstance()->retrieve("Confirm").c_str()];
+	alert.message = [NSString stringWithUTF8String:I18N::getInstance()->retrieve(msg).c_str()];
+    [alert addButtonWithTitle:[NSString stringWithUTF8String:I18N::getInstance()->retrieve("Yes").c_str()]];
+    [alert addButtonWithTitle:[NSString stringWithUTF8String:I18N::getInstance()->retrieve("No").c_str()]];
 
     [alert performSelectorOnMainThread:@selector(show) withObject:nil waitUntilDone:YES];
 
@@ -46,10 +48,10 @@ void tPrompt(const std::string& msg)
     alert.alertViewStyle = UIAlertViewStylePlainTextInput;
 
     alert.delegate = gAppDelegateInstance;
-	alert.title = @""; // "Prompt"
-	alert.message = [NSString stringWithUTF8String:msg.c_str()];
-    [alert addButtonWithTitle:@"OK"];   // "Okay"
-    [alert addButtonWithTitle:@"キャンセル"];  // "Cancel"
+	alert.title = [NSString stringWithUTF8String:I18N::getInstance()->retrieve("Prompt").c_str()];
+	alert.message = [NSString stringWithUTF8String:I18N::getInstance()->retrieve(msg).c_str()];
+    [alert addButtonWithTitle:[NSString stringWithUTF8String:I18N::getInstance()->retrieve("Okay").c_str()]];
+    [alert addButtonWithTitle:[NSString stringWithUTF8String:I18N::getInstance()->retrieve("Cancel").c_str()]];
 
     [alert performSelectorOnMainThread:@selector(show) withObject:nil waitUntilDone:YES];
 

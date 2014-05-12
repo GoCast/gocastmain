@@ -16,6 +16,11 @@ std::string I18N::toLower(const std::string& s)
 I18N::I18N()
 {
     mLocale = [[[NSLocale preferredLanguages] objectAtIndex:0] UTF8String];
+
+    if (mLocale != "ja")
+    {
+        mLocale = "en";
+    }
 }
 
 I18N::~I18N()

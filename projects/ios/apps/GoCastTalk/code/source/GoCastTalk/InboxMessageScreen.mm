@@ -297,15 +297,13 @@ void InboxMessageScreen::setWaitForMarkReadEntry()
 void InboxMessageScreen::showErrorDeletingMessageEntry()
 {
     GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showErrorDeletingMessageEntry");
-    //"There was an error deleting a message from the server"
-    tAlert("メッセージの削除に失敗しました");
+    tAlert("There was an error deleting a message from the server");
 }
 
 void InboxMessageScreen::showRetryDownloadEntry()
 {
     GoogleAnalytics::getInstance()->trackConfirm(kScreenName, "showRetryDownloadEntry");
-    //"Couldn't contact server, retry download?"
-    tConfirm("ダウンロード中に接続エラーが発生しました。リトライしますか？");
+    tConfirm("Couldn't contact server, retry download?");
 }
 
 #pragma mark Sending messages to other machines

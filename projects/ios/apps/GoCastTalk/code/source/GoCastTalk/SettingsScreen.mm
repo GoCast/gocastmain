@@ -144,22 +144,19 @@ void SettingsScreen::setWaitForLogoutEntry()
 void SettingsScreen::showConfirmLogoutEntry()
 {
     GoogleAnalytics::getInstance()->trackConfirm(kScreenName, "showConfirmLogoutEntry");
-    //"Are you sure you want to logout?"
-    tConfirm("ログアウトしてよろしいですか？");
+    tConfirm("Are you sure you want to logout?");
 }
 
 void SettingsScreen::showErrorWithLogoutEntry()
 {
     GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showErrorWithLogoutEntry");
-    //"Logout failed"
-    tAlert("ログアウトに失敗しました");
+    tAlert("Logout failed");
 }
 
 void SettingsScreen::showSuccessWithLogoutEntry()
 {
     GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showSuccessWithLogoutEntry");
-    //"You have been successfully logged out"
-    tAlert("ログアウトしました");
+    tAlert("You have been successfully logged out");
 }
 
 #pragma mark Sending messages to other machines

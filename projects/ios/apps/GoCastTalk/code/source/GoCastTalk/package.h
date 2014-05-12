@@ -20,6 +20,8 @@
 #include "JSONUtil.h"
 #include "URLLoader.h"
 
+#include "I18N.h"
+
 #include "GCTEvent.h"
 #include "GCTEventManager.h"
 

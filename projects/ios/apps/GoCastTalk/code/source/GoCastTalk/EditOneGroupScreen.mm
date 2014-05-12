@@ -188,22 +188,19 @@ void EditOneGroupScreen::setWaitForSetGroupsEntry()
 void EditOneGroupScreen::showErrorWithSetGroupsEntry()
 {
     GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showErrorWithSetGroupsEntry");
-    //"Error saving group details"
-    tAlert("グループの保存に失敗しました");
+    tAlert("Error saving group details");
 }
 
 void EditOneGroupScreen::showMustSelectMembersEntry()
 {
     GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showMustSelectMembersEntry");
-    //"No group members selected"
-    tAlert("メンバーが選択されていません");
+    tAlert("No group members selected");
 }
 
 void EditOneGroupScreen::showNameCantBeEmptyEntry()
 {
     GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showNameCantBeEmptyEntry");
-    //"Group name must not be empty"
-    tAlert("グループ名が入力されていません");
+    tAlert("Group name must not be empty");
 }
 
 #pragma mark Sending messages to other machines

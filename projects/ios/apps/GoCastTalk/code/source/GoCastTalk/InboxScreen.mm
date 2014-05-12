@@ -161,8 +161,7 @@ std::string InboxScreen::getTranscription(const size_t& i)
         return mInbox[i].mObject["transcription"].mObject["ja"].mString;
     }
 
-    //"Transcription not available";
-    return "(テキストはまだありません)\n\n無料サービス期間中は、自動テキスト化は１日あたり２０回までご利用いただけます。";
+    return I18N::getInstance()->retrieve("Transcription not available");
 }
 
 bool        InboxScreen::getIsReceive(const size_t& i)
@@ -474,7 +473,7 @@ void InboxScreen::addFakeContactsEntry()
 
     if (!hasFeedback)
     {
-        entry["kana"] = std::string("フィードバック");
+        entry["kana"] = I18N::getInstance()->retrieve("Feedback");
         entry["email"] = std::string("feedback@gocast.it");
 
         mContacts.push_back(entry);
@@ -482,7 +481,7 @@ void InboxScreen::addFakeContactsEntry()
 
     if (!hasWelcome)
     {
-        entry["kana"] = std::string("ゴーキャスト　チーム");
+        entry["kana"] = I18N::getInstance()->retrieve("GoCast Team");
         entry["email"] = std::string("gocast.team@gocast.it");
 
         mContacts.push_back(entry);
@@ -568,22 +567,7 @@ void InboxScreen::sortTableByDateEntry()
     welcomeMessage["audio"] = std::string("welcome-feedback@gocast.it");
     welcomeMessage["read"]  = std::string("yes");
     welcomeMessage["transcription"] = JSONObject();
-    welcomeMessage["transcription"].mObject["ja"] =
-    std::string(
-                "GoCast Talk へようこそ。\n"
-                "\n"
-                "GoCast Talk はビジネス向けのメッセージアプリです。\n"
-                "\n"
-                "特定の相手やグループに対して、簡単にボイスメッセージを送ることができます。\n"
-                "ボイスメッセージは自動的に日本語テキストに変換、表示されるため、すぐに内容が把握できます。\n"
-                "受け取ったメッセージに対して、さらにボイスだけで返信することも簡単にできます。\n"
-                "\n"
-                "まずは、下の返信ボタンを押して、ボイスメッセージを録音し、送信してみてください。\n"
-                "\n"
-                "このアプリを使ってみてのご感想を是非お聞かせください。\n"
-                "メンバーのリストに入っている「フィードバック」宛にボイスメッセージをお送りください。\n"
-                "\n"
-                "それでは、どうぞご利用ください。\n");
+    welcomeMessage["transcription"].mObject["ja"] = I18N::getInstance()->retrieve("welcome message");
 
     mInbox.push_back(welcomeMessage);
 
@@ -687,64 +671,55 @@ void InboxScreen::sendVersionToServerEntry()
 void InboxScreen::showErrorDeletingMessageEntry()
 {
     GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showErrorDeletingMessageEntry");
-    //"There was an error deleting a message from the server"
-    tAlert("メッセージの削除に失敗しました");
+    tAlert("There was an error deleting a message from the server");
 }
 
 void InboxScreen::showErrorLoadingContactsEntry()
 {
     GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showErrorLoadingContactsEntry");
-    //"There was an error loading contacts from the server"
-    tAlert("メンバーの取得に失敗しました");
+    tAlert("There was an error loading contacts from the server");
 }
 
 void InboxScreen::showErrorLoadingGroupsEntry()
 {
     GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showErrorLoadingGroupsEntry");
-    //"There was an error loading groups from the server"
-    tAlert("グループの取得に失敗しました");
+    tAlert("There was an error loading groups from the server");
 }
 
 void InboxScreen::showErrorLoadingInboxEntry()
 {
     GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showErrorLoadingInboxEntry");
-    //"There was an error loading inbox from the server"
-    tAlert("メッセージの取得に失敗しました");
+    tAlert("There was an error loading inbox from the server");
 }
 
 void InboxScreen::showRetryListMessagesEntry()
 {
     GoogleAnalytics::getInstance()->trackConfirm(kScreenName, "showRetryListMessagesEntry");
-    //"Couldn't contact server, retry refresh inbox?"
-    tConfirm("メッセージ取り込み中に接続エラーが発生しました。リトライしますか？");
+    tConfirm("Couldn't contact server, retry refresh inbox?");
 }
 
 void InboxScreen::showYourTokenExpiredEntry()
 {
     GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showYourTokenExpiredEntry");
-    //"Your session has expired."
-    tAlert("接続がタイムアウトしました");
+    tAlert("Your session has expired.");
 }
 
 void InboxScreen::showErrorContactVersionEntry()
 {
     GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showErrorContactVersionEntry");
-    //"Error contacting server"
-    tAlert("接続エラーが発生しました。");
+    tAlert("Error contacting server");
 }
 
 void InboxScreen::showMustUpgradeEntry()
 {
     GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showMustUpgradeEntry");
-    // "Please upgrade to the latest version of GoCast Talk in the App Store."
-    tAlert("最新バージョンのGoCast Talkにアップデートしてください。");
+    tAlert("Please upgrade to the latest version of GoCast Talk in the App Store.");
 }
 
 void InboxScreen::showThisIsAdhocEntry()
 {
     GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showThisIsAdhocEntry");
-    // "TestFlight version."
-    tAlert("TestFlightバージョンです。");
+    tAlert("TestFlight version.");
 }
 
 #pragma mark Sending messages to other machines

@@ -32,7 +32,7 @@
 
     if (!self->mIsChild)
     {
-        UIBarButtonItem *anotherButton = [[[UIBarButtonItem alloc] initWithTitle:@"編集" style:UIBarButtonItemStylePlain target:self action:@selector(helpButton:)] autorelease];
+        UIBarButtonItem *anotherButton = [[[UIBarButtonItem alloc] initWithTitle:[NSString stringWithUTF8String:I18N::getInstance()->retrieve("Edit").c_str()] style:UIBarButtonItemStylePlain target:self action:@selector(helpButton:)] autorelease];
         self.navigationItem.rightBarButtonItem = anotherButton;
     }
 

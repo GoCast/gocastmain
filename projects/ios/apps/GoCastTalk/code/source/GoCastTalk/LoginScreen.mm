@@ -270,54 +270,46 @@ void LoginScreen::validateURLEntry()
 void LoginScreen::showUserRegistraionSuccessfulEntry()
 {
     GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showUserRegistraionSuccessfulEntry");
-    // "New account registered successfully"
-    tAlert("新規登録しました");
+    tAlert("New account registered successfully");
 }
 
 //void LoginScreen::showAResetEmailHasBeenSentEntry()
 //{
-//    // "A reset email has been sent to the email provided."
-//    tAlert("リセット番号を登録のEmailアドレスに送信しました");
+//    tAlert("A reset email has been sent to the email provided.");
 //}
 //
 //void LoginScreen::showEnterResetCodeEntry()
 //{
-//    // "Please enter the 6-digit reset code:"
-//    tPrompt("６ケタのリセット番号を入力してください");
+//    tPrompt("Please enter the 6-digit reset code:");
 //}
 //
 //void LoginScreen::showSendResetEmailEntry()
 //{
-//    // "Send a reset code to the provided email address?"
-//    tConfirm("リセットのための番号を登録のEmailアドレスに送信してよろしいですか？");
+//    tConfirm("Send a reset code to the provided email address?");
 //}
 
 void LoginScreen::showEnterEmailFirstEntry()
 {
     GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showEnterEmailFirstEntry");
-    // "Please enter an email address first."
-    tAlert("Emailアドレスを先に入力してください");
+    tAlert("Please enter an email address first.");
 }
 
 void LoginScreen::showCouldNotLoginEntry()
 {
     GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showCouldNotLoginEntry");
-    //"Could not sign in"
-    tAlert("サインインできませんでした");
+    tAlert("Could not sign in");
 }
 
 void LoginScreen::showCouldNotRegisterEntry()
 {
     GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showCouldNotRegisterEntry");
-    //"Could not sign up"
-    tAlert("新規登録できませんでした");
+    tAlert("Could not sign up");
 }
 
 void LoginScreen::showIncorrectFormatEntry()
 {
     GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showIncorrectFormatEntry");
-    //"User name must be email address format, and password must be letters and numbers only."
-    tAlert("ユーザー名はEmailアドレス形式、パスワードは半角英数字のみをご使用ください");
+    tAlert("User name must be email address format, and password must be letters and numbers only.");
 }
 
 void LoginScreen::showURLMissingSlashEntry()
@@ -329,15 +321,13 @@ void LoginScreen::showURLMissingSlashEntry()
 void LoginScreen::showRetryLoginEntry()
 {
     GoogleAnalytics::getInstance()->trackConfirm(kScreenName, "showRetryLoginEntry");
-    //"Error contacting server. Retry sign in?"
-    tConfirm("サインイン中に接続エラーが発生しました。リトライしますか？");
+    tConfirm("Error contacting server. Retry sign in?");
 }
 
 void LoginScreen::showRetryRegisterEntry()
 {
     GoogleAnalytics::getInstance()->trackConfirm(kScreenName, "showRetryRegisterEntry");
-    //"Error contacting server. Retry sign up?"
-    tConfirm("新規登録中に接続エラーが発生しました。リトライしますか？");
+    tConfirm("Error contacting server. Retry sign up?");
 }
 
 

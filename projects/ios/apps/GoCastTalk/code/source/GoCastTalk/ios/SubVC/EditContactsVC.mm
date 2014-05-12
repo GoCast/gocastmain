@@ -206,8 +206,8 @@
 
              GoogleAnalytics::getInstance()->trackAlert("EditContacts", "showContactDoesNotHaveAnEmailAddressEntry");
 
-             alert.message = [NSString stringWithUTF8String:"選択したコンタクト情報にEmailアドレスがありませんでした"]; // "Contact does not have an email address"
-             [alert addButtonWithTitle:@"OK"]; // "Okay"
+             alert.message = [NSString stringWithUTF8String:I18N::getInstance()->retrieve("Contact does not have an email address").c_str()];
+             [alert addButtonWithTitle:[NSString stringWithUTF8String:I18N::getInstance()->retrieve("Okay").c_str()]];
 
              [alert performSelectorOnMainThread:@selector(show) withObject:nil waitUntilDone:YES];
 
