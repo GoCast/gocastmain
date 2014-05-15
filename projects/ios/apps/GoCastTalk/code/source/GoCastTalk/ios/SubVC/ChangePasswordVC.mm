@@ -21,6 +21,11 @@
 {
     [super viewDidLoad];
 
+    self.mChangePasswordLabel.text      = [NSString stringWithUTF8String:I18N::getInstance()->retrieve("Change Password").c_str()];
+    self.mCurrentPasswordLabel.text     = [NSString stringWithUTF8String:I18N::getInstance()->retrieve("Current Password").c_str()];
+    self.mNewPasswordLabel.text         = [NSString stringWithUTF8String:I18N::getInstance()->retrieve("New Password").c_str()];
+    [self.mDoneButton setTitle:[NSString stringWithUTF8String:I18N::getInstance()->retrieve("Done").c_str()] forState:UIControlStateNormal];
+
     self.view.autoresizesSubviews = YES;
     self.view.opaque = NO;
 

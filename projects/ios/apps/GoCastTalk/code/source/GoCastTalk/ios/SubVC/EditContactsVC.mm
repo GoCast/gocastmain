@@ -23,6 +23,9 @@
 {
     [super viewDidLoad];
 
+    [self.mCreateButton setTitle:[NSString stringWithUTF8String:I18N::getInstance()->retrieve("Create Contact").c_str()] forState:UIControlStateNormal];
+    [self.mImportButton setTitle:[NSString stringWithUTF8String:I18N::getInstance()->retrieve("Import Contact").c_str()] forState:UIControlStateNormal];
+
     [self.mTable registerNib:[UINib nibWithNibName:@"HeadingSubCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"HeadingSubCell"];
 
     self.navigationController.navigationBar.translucent = NO;
@@ -195,8 +198,16 @@
 
     CFRelease(emailMultiValue);
 
-    newContact["kanji"]     = kanjiSurname + ((!kanjiSurname.empty() && !kanjiGiven.empty()) ? " " : "") + kanjiGiven;
-    newContact["kana"]      = kanaSurname  + ((!kanaSurname.empty()  && !kanaGiven.empty())  ? " " : "") + kanaGiven;
+    if (I18N::getInstance()->getLocale() == "ja")
+    {
+        newContact["kanji"]     = kanjiSurname + ((!kanjiSurname.empty() && !kanjiGiven.empty()) ? " " : "") + kanjiGiven;
+        newContact["kana"]      = kanaSurname  + ((!kanaSurname.empty()  && !kanaGiven.empty())  ? " " : "") + kanaGiven;
+    }
+    else
+    {
+        newContact["kanji"]     = kanjiGiven + ((!kanjiSurname.empty() && !kanjiGiven.empty()) ? " " : "") + kanjiSurname;
+        newContact["kana"]      = kanaGiven  + ((!kanaSurname.empty()  && !kanaGiven.empty())  ? " " : "") + kanaSurname;
+    }
 
     if ([emailAddresses count] == 0 || ([emailAddresses count] == 1 && newContact["email"].mString.empty()))
     {

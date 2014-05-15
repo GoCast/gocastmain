@@ -27,6 +27,8 @@ class MessageHistoryScreen;
 @property (nonatomic, strong) IBOutlet UILabel*     mDate;
 @property (nonatomic, strong) IBOutlet UILabel*     mTranscription;
 
+@property (nonatomic, strong) IBOutlet UILabel*     mHistoryLabel;
+
 #pragma mark Construction / Destruction
 - (void)viewDidLoad;
 - (void)viewWillDisappear:(BOOL)animated;

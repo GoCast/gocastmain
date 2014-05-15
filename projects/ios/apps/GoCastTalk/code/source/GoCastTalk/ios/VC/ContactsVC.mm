@@ -26,6 +26,9 @@
 {
     [super viewDidLoad];
 
+    [self.mContactsGroupsSegment setTitle:[NSString stringWithUTF8String:I18N::getInstance()->retrieve("Contacts").c_str()] forSegmentAtIndex:0];
+    [self.mContactsGroupsSegment setTitle:[NSString stringWithUTF8String:I18N::getInstance()->retrieve("Groups").c_str()] forSegmentAtIndex:1];
+
     [self.mTable registerNib:[UINib nibWithNibName:@"HeadingSubCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"HeadingSubCell"];
 
     self.navigationController.navigationBar.translucent = NO;

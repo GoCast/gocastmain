@@ -23,6 +23,8 @@ class EditAllGroupsScreen;
 @property (nonatomic, strong) IBOutlet UITableView*     mTable;
 @property (nonatomic, strong) IBOutlet UIView*          mBlockingView;
 
+@property (nonatomic, strong) IBOutlet UIButton*        mCreateNewGroupButton;
+
 #pragma mark Construction / Destruction
 - (void)viewDidLoad;
 - (void)viewWillDisappear:(BOOL)animated;

@@ -80,6 +80,8 @@
 {
     [super viewDidLoad];
 
+    self.mTranscriptionLabel.text = [NSString stringWithUTF8String:I18N::getInstance()->retrieve("Automatic Transcription").c_str()];
+
     [self.mTable registerNib:[UINib nibWithNibName:@"HeadingSubCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"HeadingSubCell"];
     [self.mToTable registerNib:[UINib nibWithNibName:@"CCCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"CCCell"];
 
@@ -402,7 +404,7 @@
 
 -(void) setWaitToRecordUI
 {
-    self.mStatusLabel.text = @"メッセージを録音";
+    self.mStatusLabel.text = [NSString stringWithUTF8String:I18N::getInstance()->retrieve("Record a message").c_str()];
     self.mStatusLabel.textColor = [UIColor blackColor];
     [self setTimeLabel:""];
 
@@ -422,7 +424,7 @@
 
 -(void) setWaitToPlayUI
 {
-    self.mStatusLabel.text = @"メッセージを再生";
+    self.mStatusLabel.text = [NSString stringWithUTF8String:I18N::getInstance()->retrieve("Playback Message").c_str()];
     self.mStatusLabel.textColor = [UIColor blackColor];
 
     [self.mPlayButton   setEnabled:YES];
@@ -443,7 +445,7 @@
 
 -(void) setPlayingUI
 {
-    self.mStatusLabel.text = @"再生中・・・";
+    self.mStatusLabel.text = [NSString stringWithUTF8String:I18N::getInstance()->retrieve("Playing...").c_str()];
     self.mStatusLabel.textColor = [UIColor blackColor];
 
     [self.mPauseButton  setHidden:NO];
@@ -461,7 +463,7 @@
 
 -(void) setPausedUI
 {
-    self.mStatusLabel.text = @"メッセージを再生";
+    self.mStatusLabel.text = [NSString stringWithUTF8String:I18N::getInstance()->retrieve("Playback Message").c_str()];
     self.mStatusLabel.textColor = [UIColor blackColor];
     [self.mPauseButton  setHidden:YES];
     [self.mRecordButton setHidden:YES];
@@ -478,7 +480,7 @@
 
 -(void) setRecordingUI
 {
-    self.mStatusLabel.text = @"録音中・・・";
+    self.mStatusLabel.text = [NSString stringWithUTF8String:I18N::getInstance()->retrieve("Recording...").c_str()];
     self.mStatusLabel.textColor = [UIColor redColor];
     [self setTimeLabel:"00:00"];
 

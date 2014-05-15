@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="5053" systemVersion="13C64" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="5056" systemVersion="13C1021" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none">
     <dependencies>
         <deployment defaultVersion="1536" identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="3733"/>
@@ -12,6 +12,9 @@
                 <outlet property="mEmail" destination="eeY-AL-fqF" id="nSX-uM-Pnl"/>
                 <outlet property="mPassword" destination="eXC-1m-4OB" id="pZS-w6-N3S"/>
                 <outlet property="mScrollView" destination="1ni-td-7rO" id="vaR-oz-aM5"/>
+                <outlet property="mSignInButton" destination="ymr-Tl-5yr" id="ieP-oB-MFp"/>
+                <outlet property="mSignUpButton" destination="tar-bt-5gG" id="pZa-Ld-5bZ"/>
+                <outlet property="mTroubleButton" destination="jOu-bw-iHX" id="8s3-mD-VRc"/>
                 <outlet property="view" destination="1ni-td-7rO" id="FJp-SR-nJQ"/>
             </connections>
         </placeholder>
@@ -51,28 +54,28 @@
                         <outlet property="delegate" destination="-1" id="qpN-cv-6OI"/>
                     </connections>
                 </textField>
-                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="ymr-Tl-5yr">
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="ymr-Tl-5yr" userLabel="mSignInButton">
                     <rect key="frame" x="90" y="342" width="140" height="30"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <fontDescription key="fontDescription" name="Verdana" family="Verdana" pointSize="18"/>
-                    <state key="normal" title="サインイン" backgroundImage="bg-button.png"/>
+                    <state key="normal" title="Sign In" backgroundImage="bg-button.png"/>
                     <connections>
                         <action selector="signInPressed" destination="-1" eventType="touchUpInside" id="Faf-Tx-w0R"/>
                     </connections>
                 </button>
-                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="tar-bt-5gG">
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="tar-bt-5gG" userLabel="mSignUpButton">
                     <rect key="frame" x="90" y="380" width="140" height="30"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <fontDescription key="fontDescription" name="Verdana" family="Verdana" pointSize="18"/>
-                    <state key="normal" title="新規登録" backgroundImage="bg-button.png"/>
+                    <state key="normal" title="Sign Up" backgroundImage="bg-button.png"/>
                     <connections>
                         <action selector="signUpPressed" destination="-1" eventType="touchUpInside" id="0RS-vn-Wua"/>
                     </connections>
                 </button>
-                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="jOu-bw-iHX">
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="jOu-bw-iHX" userLabel="mTroubleButton">
                     <rect key="frame" x="70" y="430" width="180" height="30"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                    <state key="normal" title="サインインできない場合">
+                    <state key="normal" title="Trouble Signing In?">
                         <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                     </state>
                     <connections>

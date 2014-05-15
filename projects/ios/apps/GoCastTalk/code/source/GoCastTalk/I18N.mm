@@ -17,6 +17,9 @@ I18N::I18N()
 {
     mLocale = [[[NSLocale preferredLanguages] objectAtIndex:0] UTF8String];
 
+    // HACK
+//    mLocale = "ja";
+
     if (mLocale != "ja")
     {
         mLocale = "en";

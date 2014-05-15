@@ -22,6 +22,8 @@
 {
     [super viewDidLoad];
 
+    [self.mButton setTitle:[NSString stringWithUTF8String:I18N::getInstance()->retrieve("Done").c_str()] forState:UIControlStateNormal];
+
     self.navigationController.navigationBar.translucent = NO;
 
     [self.mTable registerNib:[UINib nibWithNibName:@"HeadingSubCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"HeadingSubCell"];
@@ -217,7 +219,7 @@
 {
     if (newString.empty())
     {
-        self.mGroupName.text = @"グループ名を入力"; // "Enter group name"
+        self.mGroupName.text =  [NSString stringWithUTF8String:I18N::getInstance()->retrieve("Enter group name").c_str()];
         self.mGroupName.textColor = [UIColor lightGrayColor];
     }
     else

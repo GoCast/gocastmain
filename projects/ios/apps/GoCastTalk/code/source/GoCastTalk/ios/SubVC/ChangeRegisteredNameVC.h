@@ -40,6 +40,15 @@ class ChangeRegisteredNameScreen;
 
 @property (nonatomic, strong) IBOutlet UIView*          mBlockingView;
 
+@property (nonatomic, strong) IBOutlet UILabel*         mTitleLabel;
+@property (nonatomic, strong) IBOutlet UILabel*         mFullNameLabel;
+@property (nonatomic, strong) IBOutlet UILabel*         mNickNameLabel;
+@property (nonatomic, strong) IBOutlet UILabel*         mEmailAddress1Label;
+@property (nonatomic, strong) IBOutlet UILabel*         mEmailAddress2Label;
+@property (nonatomic, strong) IBOutlet UIButton*        mDone1Button;
+@property (nonatomic, strong) IBOutlet UIButton*        mDone2Button;
+
+
 #pragma mark Construction / Destruction
 - (void)viewDidLoad;
 - (void)viewWillDisappear:(BOOL)animated;

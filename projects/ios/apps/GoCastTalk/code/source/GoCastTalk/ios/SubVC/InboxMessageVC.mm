@@ -80,6 +80,8 @@
 {
     [super viewDidLoad];
 
+    self.mTranscriptionLabel.text = [NSString stringWithUTF8String:I18N::getInstance()->retrieve("Transcription (automatically generated)").c_str()];
+
     [self.mTable registerNib:[UINib nibWithNibName:@"HeadingSubCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"HeadingSubCell"];
     [self.mToTable registerNib:[UINib nibWithNibName:@"CCCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"CCCell"];
 

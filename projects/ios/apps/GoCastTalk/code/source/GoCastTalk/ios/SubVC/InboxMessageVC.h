@@ -37,6 +37,8 @@ class InboxMessageScreen;
 @property (nonatomic, strong) IBOutlet UITableView*     mToTable;
 @property (nonatomic, strong) IBOutlet UIView*          mBlockingView;
 
+@property (nonatomic, strong) IBOutlet UILabel*         mTranscriptionLabel;
+
 #pragma mark Construction / Destruction
 - (void)viewDidLoad;
 - (void)viewWillDisappear:(BOOL)animated;

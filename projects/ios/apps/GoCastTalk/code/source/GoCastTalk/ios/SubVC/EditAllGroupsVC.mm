@@ -22,6 +22,8 @@
 {
     [super viewDidLoad];
 
+    [self.mCreateNewGroupButton setTitle:[NSString stringWithUTF8String:I18N::getInstance()->retrieve("Create New Group").c_str()] forState:UIControlStateNormal];
+
     self.navigationController.navigationBar.translucent = NO;
 
     [self.mTable registerNib:[UINib nibWithNibName:@"HeadingSubCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"HeadingSubCell"];

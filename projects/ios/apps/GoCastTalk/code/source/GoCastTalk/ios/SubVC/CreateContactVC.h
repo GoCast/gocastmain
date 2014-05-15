@@ -27,6 +27,12 @@ class CreateContactScreen;
 @property (nonatomic, strong) IBOutlet UITextField*     mEmail;
 @property (nonatomic, strong) IBOutlet UIView*          mBlockingView;
 
+@property (nonatomic, strong) IBOutlet UILabel*         mTitleLabel;
+@property (nonatomic, strong) IBOutlet UILabel*         mFullNameLabel;
+@property (nonatomic, strong) IBOutlet UILabel*         mNickNameLabel;
+@property (nonatomic, strong) IBOutlet UILabel*         mEmailAddressLabel;
+@property (nonatomic, strong) IBOutlet UIButton*        mDoneButton;
+
 #pragma mark Construction / Destruction
 - (void)viewDidLoad;
 - (void)viewWillDisappear:(BOOL)animated;

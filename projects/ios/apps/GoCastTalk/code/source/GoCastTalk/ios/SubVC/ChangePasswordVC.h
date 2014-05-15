@@ -23,6 +23,11 @@ class ChangePasswordScreen;
 
 @property (nonatomic, strong) IBOutlet UIScrollView*    mScrollView;
 
+@property (nonatomic, strong) IBOutlet UILabel*         mChangePasswordLabel;
+@property (nonatomic, strong) IBOutlet UILabel*         mCurrentPasswordLabel;
+@property (nonatomic, strong) IBOutlet UILabel*         mNewPasswordLabel;
+@property (nonatomic, strong) IBOutlet UIButton*        mDoneButton;
+
 @property (nonatomic, strong) IBOutlet UITableView*     mTable;
 
 @property (nonatomic, strong) IBOutlet UITextField*     mOldPassword;

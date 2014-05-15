@@ -25,6 +25,10 @@ class LoginScreen;
 @property (nonatomic, strong) IBOutlet UITextField*     mPassword;
 @property (nonatomic, strong) IBOutlet UIView*          mBlockingView;
 
+@property (nonatomic, strong) IBOutlet UIButton*        mSignInButton;
+@property (nonatomic, strong) IBOutlet UIButton*        mSignUpButton;
+@property (nonatomic, strong) IBOutlet UIButton*        mTroubleButton;
+
 #pragma mark Construction / Destruction
 - (void)viewDidLoad;
 - (void)viewWillDisappear:(BOOL)animated;

@@ -21,6 +21,14 @@
 {
     [super viewDidLoad];
 
+    self.mTitleLabel.text           = [NSString stringWithUTF8String:I18N::getInstance()->retrieve("Change Registration").c_str()];
+    self.mFullNameLabel.text        = [NSString stringWithUTF8String:I18N::getInstance()->retrieve("Full Name").c_str()];
+    self.mNickNameLabel.text        = [NSString stringWithUTF8String:I18N::getInstance()->retrieve("Nick Name").c_str()];
+    self.mEmailAddress1Label.text   = [NSString stringWithUTF8String:I18N::getInstance()->retrieve("Email Address").c_str()];
+    self.mEmailAddress2Label.text   = [NSString stringWithUTF8String:I18N::getInstance()->retrieve("Email Address").c_str()];
+    [self.mDone1Button setTitle:[NSString stringWithUTF8String:I18N::getInstance()->retrieve("Done").c_str()] forState:UIControlStateNormal];
+    [self.mDone2Button setTitle:[NSString stringWithUTF8String:I18N::getInstance()->retrieve("Done").c_str()] forState:UIControlStateNormal];
+
     self.view.autoresizesSubviews = YES;
     self.view.opaque = NO;
 

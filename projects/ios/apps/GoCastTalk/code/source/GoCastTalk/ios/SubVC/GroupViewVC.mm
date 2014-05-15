@@ -24,6 +24,8 @@
 
     [super viewDidLoad];
 
+    [self.mButton setTitle:[NSString stringWithUTF8String:I18N::getInstance()->retrieve("Send Message to Group").c_str()] forState:UIControlStateNormal];
+
     self.navigationController.navigationBar.translucent = NO;
 
     [self.mTable registerNib:[UINib nibWithNibName:@"HeadingSubCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"HeadingSubCell"];
@@ -33,10 +35,10 @@
 
     mPeer = new GroupViewScreen(self, mInitObject);
 
-    sprintf(buf, "%d people", (int)mInitObject["emails"].mArray.size());
+    sprintf(buf, "%d ", (int)mInitObject["emails"].mArray.size());
 
     self.mTitle.text = [NSString stringWithUTF8String:mInitObject["name"].mString.c_str()];
-    self.mCount.text = [NSString stringWithUTF8String:buf];
+    self.mCount.text = [NSString stringWithUTF8String:(std::string(buf) + I18N::getInstance()->retrieve("people")).c_str()];
 }
 
 - (void)viewDidLayoutSubviews

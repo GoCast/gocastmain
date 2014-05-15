@@ -22,6 +22,8 @@
 {
     [super viewDidLoad];
 
+    self.mHistoryLabel.text = [NSString stringWithUTF8String:I18N::getInstance()->retrieve("History").c_str()];
+
     [self.mTable registerNib:[UINib nibWithNibName:@"InboxEntryCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"InboxEntryCell"];
     [self.mOptionsTable registerNib:[UINib nibWithNibName:@"HeadingSubCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"HeadingSubCell"];
 

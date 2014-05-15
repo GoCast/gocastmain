@@ -1,5 +1,8 @@
 #import "CCCell.h"
 
+#include "Base/package.h"
+#include "I18N.h"
+
 @implementation CCCell
 
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier
@@ -29,6 +32,7 @@
     q.origin.x = r.origin.x + 36;
     [self.mTo setFrame:q];
 
+    self.mToPrefix.text = [NSString stringWithUTF8String:I18N::getInstance()->retrieve("to:").c_str()];
     [self.mToPrefix setHidden:NO];
 
     if (!expanded)
