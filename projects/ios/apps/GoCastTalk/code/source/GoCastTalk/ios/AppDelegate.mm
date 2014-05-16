@@ -4,7 +4,6 @@
 #import "AppDelegate.h"
 
 #import "SubVC/ChangeRegisteredNameVC.h"
-#import "SubVC/ContactDetailsVC.h"
 #import "SubVC/EditContactsVC.h"
 #import "SubVC/InboxMessageVC.h"
 #import "SubVC/MessageHistoryVC.h"

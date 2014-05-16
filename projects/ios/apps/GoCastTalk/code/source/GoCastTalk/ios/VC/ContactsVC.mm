@@ -1,5 +1,4 @@
 #include "ContactsVC.h"
-#include "ContactDetailsVC.h"
 #include "EditContactsVC.h"
 #include "ChangeRegisteredNameVC.h"
 #include "GroupViewVC.h"
@@ -241,13 +240,6 @@
 #pragma unused(sender)
     self->mInGroupsView = !self->mInGroupsView;
     [self.mTable reloadData];
-}
-
--(void) pushContactDetails:(const JSONObject&)newObject
-{
-    ContactDetailsVC* nextVC = [[[ContactDetailsVC alloc] initWithNibName:@"ContactDetailsVC" bundle:nil] autorelease];
-    [nextVC customInit:newObject];
-    [(UINavigationController*)self.parentViewController  pushViewController:nextVC animated:YES];
 }
 
 -(void) pushEditContacts

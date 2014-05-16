@@ -41,7 +41,6 @@ class ContactsScreen;
 
 -(IBAction)contactsGroupsValueChanged:(id)sender;
 
--(void) pushContactDetails:(const JSONObject&)newObject;
 -(void) pushEditContacts;
 -(void) pushChangeRegisteredName:(const JSONObject&)newObject;
 -(void) pushGroupView:(const JSONObject&)newObject;
