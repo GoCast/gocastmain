@@ -267,8 +267,6 @@
 					'../../source/GoCastTalk/<@(OS)/SubVC/GroupViewVC.mm',
 					'../../source/GoCastTalk/<@(OS)/SubVC/InboxMessageVC.h',
 					'../../source/GoCastTalk/<@(OS)/SubVC/InboxMessageVC.mm',
-					'../../source/GoCastTalk/<@(OS)/SubVC/MessageSentVC.h',
-					'../../source/GoCastTalk/<@(OS)/SubVC/MessageSentVC.mm',
 
 					'../../source/GoCastTalk/<@(OS)/SubVC/AboutVC.h',
 					'../../source/GoCastTalk/<@(OS)/SubVC/AboutVC.mm',
@@ -331,7 +329,6 @@
 					'../../rsrc/GoCastTalk/<@(OS)/SubVC/ChangeRegisteredNameVC.xib',
 					'../../rsrc/GoCastTalk/<@(OS)/SubVC/GroupViewVC.xib',
 					'../../rsrc/GoCastTalk/<@(OS)/SubVC/InboxMessageVC.xib',
-					'../../rsrc/GoCastTalk/<@(OS)/SubVC/MessageSentVC.xib',
 
 					'../../rsrc/GoCastTalk/<@(OS)/SubVC/AboutVC.xib',
 					'../../rsrc/GoCastTalk/<@(OS)/SubVC/ChangeLanguageVC.xib',

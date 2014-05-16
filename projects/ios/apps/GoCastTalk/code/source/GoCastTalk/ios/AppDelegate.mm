@@ -13,7 +13,6 @@
 #import "VC/ContactsVC.h"
 
 #import "VC/LoginVC.h"
-#import "SubVC/MessageSentVC.h"
 
 #include "Base/package.h"
 #include "Io/package.h"
@@ -438,11 +437,6 @@ const unsigned char SpeechKitApplicationKey[] =
 
 	[voiceSearch release];
 	voiceSearch = nil;
-}
-
--(void)pushMessageSent
-{
-    [self.tabBarController presentViewController:[[[MessageSentVC alloc] init] autorelease] animated:YES completion:nil];
 }
 
 @end

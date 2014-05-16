@@ -80,7 +80,6 @@ class RecordMessageScreen;
 
 -(void)switchToInboxTab;
 -(void)switchToNewMemoTab;
--(void)pushMessageSent;
 
 -(void)refreshExpanded;
 

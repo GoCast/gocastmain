@@ -400,11 +400,6 @@
     GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kNewMemoTabPressed));
 }
 
--(void)pushMessageSent
-{
-    [gAppDelegateInstance pushMessageSent];
-}
-
 -(void)refreshExpanded
 {
     [self expandTo];
