@@ -66,6 +66,12 @@
     "Playback Message": "メッセージを再生",
 
     "Message was sent, but we could not verify recipients at this time.": "メッセージを送信しましたが、現時点で受信者を確認することができませんでした。",
+
+    "Messages": "メッセージ",
+    "New Memo": "新規作成",
+    "Contacts": "メンバー",
+    "Settings": "設定",
+
     "New account registered successfully": "新規登録しました",
 
     "New Password": "新しいパスワード",

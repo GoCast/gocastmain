@@ -114,6 +114,11 @@ const unsigned char SpeechKitApplicationKey[] =
     [TestFlight takeOff:@"acdfdb22-9897-4439-979e-d7665c9ab7e5"];
 #endif
 
+    self.mInboxItem.title       = [NSString stringWithUTF8String:I18N::getInstance()->retrieve("Messages").c_str()];
+    self.mNewMemoItem.title     = [NSString stringWithUTF8String:I18N::getInstance()->retrieve("New Memo").c_str()];
+    self.mContactsItem.title    = [NSString stringWithUTF8String:I18N::getInstance()->retrieve("Contacts").c_str()];
+    self.mSettingsItem.title    = [NSString stringWithUTF8String:I18N::getInstance()->retrieve("Settings").c_str()];
+
     //Force new memo tab to load
     [self.tabBarController setSelectedIndex:1];
 

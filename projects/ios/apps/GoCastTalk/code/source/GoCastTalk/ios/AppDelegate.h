@@ -39,6 +39,11 @@
 
 @property (nonatomic, strong) IBOutlet UITabBar* mTabBar;
 
+@property (nonatomic, strong) IBOutlet UITabBarItem* mInboxItem;
+@property (nonatomic, strong) IBOutlet UITabBarItem* mNewMemoItem;
+@property (nonatomic, strong) IBOutlet UITabBarItem* mContactsItem;
+@property (nonatomic, strong) IBOutlet UITabBarItem* mSettingsItem;
+
 @property (nonatomic, strong) AVAudioRecorder* mServerRecorder;
 @property (nonatomic, strong) AVAudioRecorder* mEmailRecorder;
 
