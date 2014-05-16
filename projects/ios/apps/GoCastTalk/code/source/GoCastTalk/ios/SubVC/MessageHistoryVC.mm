@@ -47,7 +47,7 @@
         from = email;
     }
 
-    self.mReceive.image = [UIImage imageNamed:((mInitObject["from"].mString != InboxScreen::mEmailAddress) ? @"icon-receive.png" : @"icon-sent.png")];
+    self.mReceive.image = [UIImage imageNamed:([NSString stringWithUTF8String:I18N::getInstance()->retrieve((mInitObject["from"].mString != InboxScreen::mEmailAddress) ? "icon-receive.png" : "icon-sent.png").c_str()])];
     self.mFrom.text = [NSString stringWithUTF8String:from.c_str()];
     self.mDate.text = [NSString stringWithUTF8String:result.c_str()];
 
@@ -127,7 +127,7 @@
         cell.mFrom.text = [NSString stringWithUTF8String:mPeer->getFrom((size_t)indexPath.row + 1).c_str()];
         cell.mDate.text = [NSString stringWithUTF8String:mPeer->getDate((size_t)indexPath.row + 1).c_str()];
         [cell setTranscription:mPeer->getTranscription((size_t)indexPath.row + 1)];
-        cell.mStatusIcon.image = [UIImage imageNamed:(mPeer->getIsReceive((size_t)indexPath.row + 1) ? @"icon-receive.png" : @"icon-sent.png")];
+        cell.mStatusIcon.image = [UIImage imageNamed:([NSString stringWithUTF8String:I18N::getInstance()->retrieve(mPeer->getIsReceive((size_t)indexPath.row + 1) ? "icon-receive.png" : "icon-sent.png").c_str()])];
         cell.mFrom.textColor =  mPeer->getIsGroup((size_t)indexPath.row + 1) ?
         [UIColor colorWithRed:0.0f green:0.47f blue:1.0f alpha:1.0f] :
         [UIColor colorWithRed:0.0f green:0.0f  blue:0.0f alpha:1.0f];

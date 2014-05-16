@@ -101,7 +101,7 @@
         result = date.substr(4,2) + "/" + date.substr(6,2) + " " + date.substr(8,2) + ":" + date.substr(10,2);
     }
 
-    self.mReceive.image = [UIImage imageNamed:((mInitObject["from"].mString != InboxScreen::mEmailAddress) ? @"icon-receive.png" : @"icon-sent.png")];
+    self.mReceive.image = [UIImage imageNamed:([NSString stringWithUTF8String:I18N::getInstance()->retrieve((mInitObject["from"].mString != InboxScreen::mEmailAddress) ? "icon-receive.png" : "icon-sent.png").c_str()])];
 
     std::string email   = mInitObject["from"].mString;
     std::string from    = InboxScreen::nameFromEmail(email);

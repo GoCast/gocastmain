@@ -97,7 +97,7 @@
         cell.mFrom.text = [NSString stringWithUTF8String:InboxScreen::nameFromEmail(mPeer->getFrom((size_t)indexPath.row)).c_str()];
         cell.mDate.text = [NSString stringWithUTF8String:mPeer->getDate((size_t)indexPath.row).c_str()];
         [cell setTranscription:mPeer->getTranscription((size_t)indexPath.row)];
-        cell.mStatusIcon.image = [UIImage imageNamed:(mPeer->getIsReceive((size_t)indexPath.row) ? @"icon-receive.png" : @"icon-sent.png")];
+        cell.mStatusIcon.image = [UIImage imageNamed:([NSString stringWithUTF8String:I18N::getInstance()->retrieve(mPeer->getIsReceive((size_t)indexPath.row) ? "icon-receive.png" : "icon-sent.png").c_str()])];
         cell.mFrom.textColor =  mPeer->getIsGroup((size_t)indexPath.row) ?
             [UIColor colorWithRed:0.0f green:0.47f blue:1.0f alpha:1.0f] :
             [UIColor colorWithRed:0.0f green:0.0f  blue:0.0f alpha:1.0f];

@@ -7,6 +7,7 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="LoginVC">
             <connections>
+                <outlet property="mBackgroundImage" destination="GOP-M1-Zwm" id="dp8-Jy-tlY"/>
                 <outlet property="mBaseURL" destination="hq0-pH-pG1" id="d3Q-rn-ft3"/>
                 <outlet property="mBlockingView" destination="wFV-Xf-1nb" id="OTi-O6-n29"/>
                 <outlet property="mEmail" destination="eeY-AL-fqF" id="nSX-uM-Pnl"/>
@@ -23,7 +24,7 @@
             <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
-                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="bg-login.png" id="GOP-M1-Zwm">
+                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="bg-login.en.png" id="GOP-M1-Zwm" userLabel="mBackgroundImage">
                     <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                 </imageView>
@@ -110,7 +111,7 @@
     </objects>
     <resources>
         <image name="bg-button.png" width="260" height="60"/>
-        <image name="bg-login.png" width="640" height="960"/>
+        <image name="bg-login.en.png" width="640" height="960"/>
         <image name="bg-throbber.png" width="154" height="154"/>
     </resources>
 </document>

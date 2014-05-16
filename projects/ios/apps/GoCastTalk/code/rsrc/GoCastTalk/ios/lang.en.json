@@ -11,5 +11,9 @@
 
     "welcome message": "Welcome to GoCast Talk.\n\nGoCast Talk is the message app for business.\n\nYou can easily send a voice message to a specific contact or group.\n\nVoice messages are transcribed automatically and available immediately.\n\nYou can easily reply to the received message with your own voice message.\n\nFirst, press the \"reply\" button below to record a voice message, and try to send it.\n\nSend a voice message that to the \"feedback\" contact.\n\nPlease let us know what you think!\n\n--GoCast Team\n",
 
+    "bg-login.png": "bg-login.en.png",
+    "icon-receive.png": "icon-receive.en.png",
+    "icon-sent.png": "icon-sent.en.png",
+
     "x": "x"
 }

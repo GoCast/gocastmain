@@ -324,9 +324,9 @@
 					'../../rsrc/GoCastTalk/<@(OS)/SubVC/AboutVC.xib',
 					'../../rsrc/GoCastTalk/<@(OS)/SubVC/ChangePasswordVC.xib',
 
-					'../../rsrc/GoCastTalk/<@(OS)/en.lproj/InboxEntryCell.xib',
-					'../../rsrc/GoCastTalk/<@(OS)/en.lproj/HeadingSubCell.xib',
-					'../../rsrc/GoCastTalk/<@(OS)/en.lproj/CCCell.xib',
+					'../../rsrc/GoCastTalk/<@(OS)/InboxEntryCell.xib',
+					'../../rsrc/GoCastTalk/<@(OS)/HeadingSubCell.xib',
+					'../../rsrc/GoCastTalk/<@(OS)/CCCell.xib',
 
 					'../../rsrc/GoCastTalk/<@(OS)/newmessage.wav',
 
@@ -335,7 +335,8 @@
 
 					'../../rsrc/GoCastTalk/<@(OS)/nuancelogo.png',
 
-					'../../rsrc/GoCastTalk/<@(OS)/bg-login.png',
+					'../../rsrc/GoCastTalk/<@(OS)/bg-login.en.png',
+					'../../rsrc/GoCastTalk/<@(OS)/bg-login.ja.png',
 					'../../rsrc/GoCastTalk/<@(OS)/bg-button.png',
 					'../../rsrc/GoCastTalk/<@(OS)/bg-throbber.png',
 
@@ -347,8 +348,10 @@
 					'../../rsrc/GoCastTalk/<@(OS)/tab-contacts.png',
 					'../../rsrc/GoCastTalk/<@(OS)/tab-settings.png',
 
-					'../../rsrc/GoCastTalk/<@(OS)/icon-receive.png',
-					'../../rsrc/GoCastTalk/<@(OS)/icon-sent.png',
+					'../../rsrc/GoCastTalk/<@(OS)/icon-receive.en.png',
+					'../../rsrc/GoCastTalk/<@(OS)/icon-receive.ja.png',
+					'../../rsrc/GoCastTalk/<@(OS)/icon-sent.en.png',
+					'../../rsrc/GoCastTalk/<@(OS)/icon-sent.ja.png',
 					'../../rsrc/GoCastTalk/<@(OS)/icon-right.png',
 					'../../rsrc/GoCastTalk/<@(OS)/icon-check.png',
 					'../../rsrc/GoCastTalk/<@(OS)/icon-nocheck.png',

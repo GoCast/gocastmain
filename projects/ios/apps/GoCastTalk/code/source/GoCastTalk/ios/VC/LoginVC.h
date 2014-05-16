@@ -28,6 +28,7 @@ class LoginScreen;
 @property (nonatomic, strong) IBOutlet UIButton*        mSignInButton;
 @property (nonatomic, strong) IBOutlet UIButton*        mSignUpButton;
 @property (nonatomic, strong) IBOutlet UIButton*        mTroubleButton;
+@property (nonatomic, strong) IBOutlet UIImageView*     mBackgroundImage;
 
 #pragma mark Construction / Destruction
 - (void)viewDidLoad;

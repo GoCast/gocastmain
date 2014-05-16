@@ -143,5 +143,9 @@
     "You have been successfully logged out": "ログアウトしました",
     "Your session has expired.": "接続がタイムアウトしました",
 
+    "bg-login.png": "bg-login.ja.png",
+    "icon-receive.png": "icon-receive.ja.png",
+    "icon-sent.png": "icon-sent.ja.png",
+
     "x": "x"
 }

@@ -159,7 +159,7 @@
         cell.mFrom.text = [NSString stringWithUTF8String:from[indexPath.row]];
         cell.mDate.text = [NSString stringWithUTF8String:date[indexPath.row]];
         [cell setTranscription:transcription[indexPath.row]];
-        cell.mStatusIcon.image = [UIImage imageNamed:(recv[indexPath.row] ? @"icon-receive.png" : @"icon-sent.png")];
+        cell.mStatusIcon.image = [UIImage imageNamed:([NSString stringWithUTF8String:I18N::getInstance()->retrieve(recv[indexPath.row] ? "icon-receive.png" : "icon-sent.png").c_str()])];
         cell.mFrom.textColor =  isGroup[indexPath.row] ?
             [UIColor colorWithRed:0.0f green:0.47f blue:1.0f alpha:1.0f] :
             [UIColor colorWithRed:0.0f green:0.0f  blue:0.0f alpha:1.0f];
