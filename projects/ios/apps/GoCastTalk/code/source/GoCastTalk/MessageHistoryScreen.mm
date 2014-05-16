@@ -215,7 +215,11 @@ void MessageHistoryScreen::update(const MessageHistoryScreenMessage& msg)
 
 void MessageHistoryScreen::update(const GCTEvent& msg)
 {
-#pragma unused(msg)
+    if (msg.mEvent == GCTEvent::kLanguageChanged)
+    {
+        [mPeer refreshLanguage];
+    }
+
     switch (getState())
     {
 //        case kShowNoAudioToSend:

@@ -24,6 +24,8 @@ GroupViewScreen::~GroupViewScreen()
 #pragma mark Start / End / Invalid
 void GroupViewScreen::startEntry()
 {
+    GCTEventManager::getInstance()->attach(this);
+
     GoogleAnalytics::getInstance()->trackScreenEntry(kScreenName);
 }
 
@@ -118,3 +120,10 @@ void GroupViewScreen::update(const GroupViewScreenMessage& msg)
 	process(msg.mEvent);
 }
 
+void GroupViewScreen::update(const GCTEvent& msg)
+{
+    if (msg.mEvent == GCTEvent::kLanguageChanged)
+    {
+        [mPeer refreshLanguage];
+    }
+}

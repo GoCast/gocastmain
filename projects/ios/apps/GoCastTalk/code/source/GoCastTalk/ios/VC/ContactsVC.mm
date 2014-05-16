@@ -21,23 +21,30 @@
 
 @implementation ContactsVC
 
-#pragma mark Construction / Destruction
-- (void)viewDidLoad
+-(void)refreshLanguage
 {
-    [super viewDidLoad];
-
     [self.mContactsGroupsSegment setTitle:[NSString stringWithUTF8String:I18N::getInstance()->retrieve("Contacts").c_str()] forSegmentAtIndex:0];
     [self.mContactsGroupsSegment setTitle:[NSString stringWithUTF8String:I18N::getInstance()->retrieve("Groups").c_str()] forSegmentAtIndex:1];
-
-    [self.mTable registerNib:[UINib nibWithNibName:@"HeadingSubCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"HeadingSubCell"];
-
-    self.navigationController.navigationBar.translucent = NO;
 
     if (!self->mIsChild)
     {
         UIBarButtonItem *anotherButton = [[[UIBarButtonItem alloc] initWithTitle:[NSString stringWithUTF8String:I18N::getInstance()->retrieve("Edit").c_str()] style:UIBarButtonItemStylePlain target:self action:@selector(helpButton:)] autorelease];
         self.navigationItem.rightBarButtonItem = anotherButton;
     }
+
+    [self.mTable reloadData];
+}
+
+#pragma mark Construction / Destruction
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+
+    [self refreshLanguage];
+
+    [self.mTable registerNib:[UINib nibWithNibName:@"HeadingSubCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"HeadingSubCell"];
+
+    self.navigationController.navigationBar.translucent = NO;
 
     self.view.autoresizesSubviews = YES;
 

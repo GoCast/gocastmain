@@ -942,6 +942,11 @@ void RecordMessageScreen::update(const URLLoaderEvent& msg)
 
 void RecordMessageScreen::update(const GCTEvent& msg)
 {
+    if (msg.mEvent == GCTEvent::kLanguageChanged)
+    {
+        [mPeer refreshLanguage];
+    }
+
     switch(msg.mEvent)
     {
         case GCTEvent::kForceLogin:

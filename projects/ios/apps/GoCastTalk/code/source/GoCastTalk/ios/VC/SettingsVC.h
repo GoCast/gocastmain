@@ -37,4 +37,6 @@ class SettingsScreen;
 -(void) pushChangePassword;
 -(void) pushChangeLanguage;
 
+-(void) refreshLanguage;
+
 @end

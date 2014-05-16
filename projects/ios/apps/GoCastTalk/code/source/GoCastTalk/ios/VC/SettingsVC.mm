@@ -20,10 +20,17 @@
 
 @implementation SettingsVC
 
+-(void)refreshLanguage
+{
+    [self.mTable reloadData];
+}
+
 #pragma mark Construction / Destruction
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+
+    [self refreshLanguage];
 
     [self.mTable registerNib:[UINib nibWithNibName:@"HeadingSubCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"HeadingSubCell"];
 

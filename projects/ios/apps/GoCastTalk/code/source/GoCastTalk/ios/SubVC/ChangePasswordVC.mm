@@ -16,15 +16,22 @@
 
 @implementation ChangePasswordVC
 
+-(void) refreshLanguage
+{
+    self.mChangePasswordLabel.text      = [NSString stringWithUTF8String:I18N::getInstance()->retrieve("Change Password").c_str()];
+    self.mCurrentPasswordLabel.text     = [NSString stringWithUTF8String:I18N::getInstance()->retrieve("Current Password").c_str()];
+    self.mNewPasswordLabel.text         = [NSString stringWithUTF8String:I18N::getInstance()->retrieve("New Password").c_str()];
+    [self.mDoneButton setTitle:[NSString stringWithUTF8String:I18N::getInstance()->retrieve("Done").c_str()] forState:UIControlStateNormal];
+
+    [self.mTable reloadData];
+}
+
 #pragma mark Construction / Destruction
 - (void)viewDidLoad
 {
     [super viewDidLoad];
 
-    self.mChangePasswordLabel.text      = [NSString stringWithUTF8String:I18N::getInstance()->retrieve("Change Password").c_str()];
-    self.mCurrentPasswordLabel.text     = [NSString stringWithUTF8String:I18N::getInstance()->retrieve("Current Password").c_str()];
-    self.mNewPasswordLabel.text         = [NSString stringWithUTF8String:I18N::getInstance()->retrieve("New Password").c_str()];
-    [self.mDoneButton setTitle:[NSString stringWithUTF8String:I18N::getInstance()->retrieve("Done").c_str()] forState:UIControlStateNormal];
+    [self refreshLanguage];
 
     self.view.autoresizesSubviews = YES;
     self.view.opaque = NO;

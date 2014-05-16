@@ -229,6 +229,11 @@ void CreateContactScreen::update(const URLLoaderEvent& msg)
 
 void CreateContactScreen::update(const GCTEvent& msg)
 {
+    if (msg.mEvent == GCTEvent::kLanguageChanged)
+    {
+        [mPeer refreshLanguage];
+    }
+
     switch (getState())
     {
         case kShowErrorWithSetContacts:

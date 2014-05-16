@@ -989,6 +989,11 @@ void InboxScreen::update(const URLLoaderEvent& msg)
 
 void InboxScreen::update(const GCTEvent& msg)
 {
+    if (msg.mEvent == GCTEvent::kLanguageChanged)
+    {
+        [mPeer refreshLanguage];
+    }
+
     if (msg.mEvent == GCTEvent::kForceLogout)
     {
         mForceLogout = true;

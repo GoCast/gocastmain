@@ -64,4 +64,6 @@ class InboxMessageScreen;
 
 -(void) setSliderPercentage:(float)newPercentage;
 
+-(void) refreshLanguage;
+
 @end

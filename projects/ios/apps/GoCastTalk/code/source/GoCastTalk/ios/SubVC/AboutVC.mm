@@ -20,6 +20,11 @@ extern std::string kBaseURL;
 
 @implementation AboutVC
 
+-(void) refreshLanguage
+{
+    self.mAboutText.text = [NSString stringWithUTF8String:I18N::getInstance()->retrieve("about text").c_str()];
+}
+
 #pragma mark Construction / Destruction
 - (void)viewDidLoad
 {
@@ -27,7 +32,7 @@ extern std::string kBaseURL;
 
     [super viewDidLoad];
 
-    self.mAboutText.text = [NSString stringWithUTF8String:I18N::getInstance()->retrieve("about text").c_str()];
+    [self refreshLanguage];
 
     //"Build date"
     self.mBuildDate.text = [NSString stringWithUTF8String:"Build date:\n"__DATE__ " @ " __TIME__ " PST"];

@@ -56,4 +56,6 @@ class EditContactsScreen;
 -(void) pushCreateContact;
 -(void) pushChangeRegisteredName:(const JSONObject&)newObject;
 
+-(void) refreshLanguage;
+
 @end

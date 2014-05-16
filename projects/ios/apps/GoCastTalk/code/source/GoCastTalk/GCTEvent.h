@@ -28,6 +28,8 @@ public:
         kLoginSucceeded,
         kForceLogout,
         kForceLogin,
+
+        kLanguageChanged,
     };
 
     EventType   mEvent;

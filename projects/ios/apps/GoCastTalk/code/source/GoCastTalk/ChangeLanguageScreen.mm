@@ -70,6 +70,12 @@ void ChangeLanguageScreen::setLanguageToJapaneseEntry()
     I18N::getInstance()->setLocale("ja");
 }
 
+#pragma mark Sending Messages to Other Machines
+void ChangeLanguageScreen::sendLanguageChangedToVCEntry()
+{
+    GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kLanguageChanged));
+}
+
 #pragma mark State wiring
 void ChangeLanguageScreen::CallEntry()
 {
@@ -79,6 +85,7 @@ void ChangeLanguageScreen::CallEntry()
 		case kIdle: idleEntry(); break;
 		case kInvalidState: invalidStateEntry(); break;
 		case kPeerPopSelf: peerPopSelfEntry(); break;
+		case kSendLanguageChangedToVC: sendLanguageChangedToVCEntry(); break;
 		case kSetLanguageToEnglish: setLanguageToEnglishEntry(); break;
 		case kSetLanguageToJapanese: setLanguageToJapaneseEntry(); break;
 		case kStart: startEntry(); break;
@@ -94,8 +101,9 @@ int  ChangeLanguageScreen::StateTransitionFunction(const int evt) const
 {
 	if ((mState == kIdle) && (evt == kEnglishSelected)) return kSetLanguageToEnglish; else
 	if ((mState == kIdle) && (evt == kJapaneseSelected)) return kSetLanguageToJapanese; else
-	if ((mState == kSetLanguageToEnglish) && (evt == kNext)) return kPeerPopSelf; else
-	if ((mState == kSetLanguageToJapanese) && (evt == kNext)) return kPeerPopSelf; else
+	if ((mState == kSendLanguageChangedToVC) && (evt == kNext)) return kPeerPopSelf; else
+	if ((mState == kSetLanguageToEnglish) && (evt == kNext)) return kSendLanguageChangedToVC; else
+	if ((mState == kSetLanguageToJapanese) && (evt == kNext)) return kSendLanguageChangedToVC; else
 	if ((mState == kStart) && (evt == kNext)) return kIdle;
 
 	return kInvalidState;
@@ -105,13 +113,14 @@ bool ChangeLanguageScreen::HasEdgeNamedNext() const
 {
 	switch(mState)
 	{
-		case kSetLanguageToEnglish:
-		case kSetLanguageToJapanese:
-		case kStart:
-			return true;
+		case kEnd:
+		case kIdle:
+		case kInvalidState:
+		case kPeerPopSelf:
+			return false;
 		default: break;
 	}
-	return false;
+	return true;
 }
 
 #pragma mark Messages
@@ -130,6 +139,11 @@ void ChangeLanguageScreen::update(const ChangeLanguageScreenMessage& msg)
 void ChangeLanguageScreen::update(const GCTEvent& msg)
 {
 #pragma unused(msg)
+
+    if (msg.mEvent == GCTEvent::kLanguageChanged)
+    {
+        [mPeer refreshLanguage];
+    }
 
 //    switch (getState())
 //    {

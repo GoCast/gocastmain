@@ -17,12 +17,20 @@
 
 @implementation MessageHistoryVC
 
+-(void)refreshLanguage
+{
+    self.mHistoryLabel.text = [NSString stringWithUTF8String:I18N::getInstance()->retrieve("History").c_str()];
+
+    [self.mTable reloadData];
+    [self.mOptionsTable reloadData];
+}
+
 #pragma mark Construction / Destruction
 - (void)viewDidLoad
 {
     [super viewDidLoad];
 
-    self.mHistoryLabel.text = [NSString stringWithUTF8String:I18N::getInstance()->retrieve("History").c_str()];
+    [self refreshLanguage];
 
     [self.mTable registerNib:[UINib nibWithNibName:@"InboxEntryCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"InboxEntryCell"];
     [self.mOptionsTable registerNib:[UINib nibWithNibName:@"HeadingSubCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"HeadingSubCell"];

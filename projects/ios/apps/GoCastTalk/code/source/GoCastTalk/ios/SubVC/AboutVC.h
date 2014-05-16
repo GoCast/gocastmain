@@ -31,4 +31,7 @@ typedef std::map<std::string, JSONValue> JSONObject;
 
 -(void) popSelf;
 
+
+-(void) refreshLanguage;
+
 @end

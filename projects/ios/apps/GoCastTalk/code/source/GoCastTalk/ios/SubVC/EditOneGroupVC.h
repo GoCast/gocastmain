@@ -51,4 +51,6 @@ class EditOneGroupScreen;
 
 -(IBAction)donePressed;
 
+-(void) refreshLanguage;
+
 @end

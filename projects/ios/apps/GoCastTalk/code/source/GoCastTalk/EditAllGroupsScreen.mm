@@ -274,6 +274,11 @@ void EditAllGroupsScreen::update(const URLLoaderEvent& msg)
 
 void EditAllGroupsScreen::update(const GCTEvent& msg)
 {
+    if (msg.mEvent == GCTEvent::kLanguageChanged)
+    {
+        [mPeer refreshLanguage];
+    }
+
     switch (getState())
     {
         case kIdle:

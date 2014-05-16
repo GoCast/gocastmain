@@ -51,5 +51,7 @@ class ContactsScreen;
 
 -(void) popSelf;
 
+-(void) refreshLanguage;
+
 @end
 

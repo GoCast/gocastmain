@@ -45,4 +45,6 @@ class EditAllGroupsScreen;
 
 -(IBAction)createPressed;
 
+-(void) refreshLanguage;
+
 @end

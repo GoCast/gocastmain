@@ -519,6 +519,11 @@ void InboxMessageScreen::update(const URLLoaderEvent& msg)
 
 void InboxMessageScreen::update(const GCTEvent& msg)
 {
+    if (msg.mEvent == GCTEvent::kLanguageChanged)
+    {
+        [mPeer refreshLanguage];
+    }
+
     switch (getState())
     {
         case kPlayingIdle:

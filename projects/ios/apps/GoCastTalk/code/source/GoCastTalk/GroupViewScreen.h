@@ -7,7 +7,8 @@ class GroupViewScreenMessage;
 class GroupViewScreen
 : public tMealy,
 // public tSubject<const OtherGroupViewScreenMessage&>,
-  public tObserver<const GroupViewScreenMessage&>
+    public tObserver<const GroupViewScreenMessage&>,
+    public tObserver<const GCTEvent&>
 {
 protected:
     GroupViewVC*    mPeer;
@@ -51,6 +52,7 @@ protected:
 	bool HasEdgeNamedNext() const;
 
 	void update(const GroupViewScreenMessage& msg);
+    void update(const GCTEvent& msg);
 };
 
 class GroupViewScreenMessage

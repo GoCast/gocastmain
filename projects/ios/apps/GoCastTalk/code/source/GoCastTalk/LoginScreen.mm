@@ -529,6 +529,11 @@ void LoginScreen::update(const URLLoaderEvent& msg)
 
 void LoginScreen::update(const GCTEvent& msg)
 {
+    if (msg.mEvent == GCTEvent::kLanguageChanged)
+    {
+        [mPeer refreshLanguage];
+    }
+
     switch (getState())
     {
 //        case kShowAResetEmailHasBeenSent:

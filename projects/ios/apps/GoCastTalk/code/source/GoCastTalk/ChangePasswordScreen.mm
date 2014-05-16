@@ -250,6 +250,11 @@ void ChangePasswordScreen::update(const URLLoaderEvent& msg)
 
 void ChangePasswordScreen::update(const GCTEvent& msg)
 {
+    if (msg.mEvent == GCTEvent::kLanguageChanged)
+    {
+        [mPeer refreshLanguage];
+    }
+
     switch (getState())
     {
         case kShowErrorWithChangePassword:

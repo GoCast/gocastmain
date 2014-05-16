@@ -21,6 +21,14 @@ extern std::string kBaseURL;
 
 @implementation LoginVC
 
+- (void) refreshLanguage
+{
+    [self.mSignInButton setTitle:[NSString stringWithUTF8String:I18N::getInstance()->retrieve("Sign In").c_str()] forState:UIControlStateNormal];
+    [self.mSignUpButton setTitle:[NSString stringWithUTF8String:I18N::getInstance()->retrieve("Sign Up").c_str()] forState:UIControlStateNormal];
+    [self.mTroubleButton setTitle:[NSString stringWithUTF8String:I18N::getInstance()->retrieve("Trouble Signing In?").c_str()] forState:UIControlStateNormal];
+    self.mBackgroundImage.image = [UIImage imageNamed:[NSString stringWithUTF8String:I18N::getInstance()->retrieve("bg-login.png").c_str()]];
+}
+
 #pragma mark Construction / Destruction
 - (void)viewDidLoad
 {
@@ -32,10 +40,7 @@ extern std::string kBaseURL;
 
     [super viewDidLoad];
 
-    [self.mSignInButton setTitle:[NSString stringWithUTF8String:I18N::getInstance()->retrieve("Sign In").c_str()] forState:UIControlStateNormal];
-    [self.mSignUpButton setTitle:[NSString stringWithUTF8String:I18N::getInstance()->retrieve("Sign Up").c_str()] forState:UIControlStateNormal];
-    [self.mTroubleButton setTitle:[NSString stringWithUTF8String:I18N::getInstance()->retrieve("Trouble Signing In?").c_str()] forState:UIControlStateNormal];
-    self.mBackgroundImage.image = [UIImage imageNamed:[NSString stringWithUTF8String:I18N::getInstance()->retrieve("bg-login.png").c_str()]];
+    [self refreshLanguage];
 
     self.view.autoresizesSubviews = YES;
 

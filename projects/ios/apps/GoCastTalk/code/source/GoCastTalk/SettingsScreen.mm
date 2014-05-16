@@ -311,6 +311,11 @@ void SettingsScreen::update(const URLLoaderEvent& msg)
 
 void SettingsScreen::update(const GCTEvent& msg)
 {
+    if (msg.mEvent == GCTEvent::kLanguageChanged)
+    {
+        [mPeer refreshLanguage];
+    }
+
     switch(getState())
     {
         case kShowConfirmLogout:

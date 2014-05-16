@@ -18,13 +18,20 @@
 
 @implementation EditContactsVC
 
+-(void)refreshLanguage
+{
+    [self.mCreateButton setTitle:[NSString stringWithUTF8String:I18N::getInstance()->retrieve("Create Contact").c_str()] forState:UIControlStateNormal];
+    [self.mImportButton setTitle:[NSString stringWithUTF8String:I18N::getInstance()->retrieve("Import Contact").c_str()] forState:UIControlStateNormal];
+
+    [self.mTable reloadData];
+}
+
 #pragma mark Construction / Destruction
 - (void)viewDidLoad
 {
     [super viewDidLoad];
 
-    [self.mCreateButton setTitle:[NSString stringWithUTF8String:I18N::getInstance()->retrieve("Create Contact").c_str()] forState:UIControlStateNormal];
-    [self.mImportButton setTitle:[NSString stringWithUTF8String:I18N::getInstance()->retrieve("Import Contact").c_str()] forState:UIControlStateNormal];
+    [self refreshLanguage];
 
     [self.mTable registerNib:[UINib nibWithNibName:@"HeadingSubCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"HeadingSubCell"];
 

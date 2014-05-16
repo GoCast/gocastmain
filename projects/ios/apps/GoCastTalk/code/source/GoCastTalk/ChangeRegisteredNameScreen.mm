@@ -248,6 +248,11 @@ void ChangeRegisteredNameScreen::update(const URLLoaderEvent& msg)
 
 void ChangeRegisteredNameScreen::update(const GCTEvent& msg)
 {
+    if (msg.mEvent == GCTEvent::kLanguageChanged)
+    {
+        [mPeer refreshLanguage];
+    }
+
     switch (getState())
     {
         case kShowErrorWithSetContacts:

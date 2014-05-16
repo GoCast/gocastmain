@@ -42,4 +42,6 @@ class GroupViewScreen;
 
 -(IBAction)sendMessagePressed;
 
+-(void) refreshLanguage;
+
 @end

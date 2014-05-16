@@ -18,6 +18,14 @@
 
 @implementation InboxMessageVC
 
+-(void) refreshLanguage
+{
+    self.mTranscriptionLabel.text = [NSString stringWithUTF8String:I18N::getInstance()->retrieve("Transcription (automatically generated)").c_str()];
+
+    [self.mTable reloadData];
+    [self.mToTable reloadData];
+}
+
 #pragma mark CCCell helper methods
 
 #define kCellSize 40
@@ -80,7 +88,7 @@
 {
     [super viewDidLoad];
 
-    self.mTranscriptionLabel.text = [NSString stringWithUTF8String:I18N::getInstance()->retrieve("Transcription (automatically generated)").c_str()];
+    [self refreshLanguage];
 
     [self.mTable registerNib:[UINib nibWithNibName:@"HeadingSubCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"HeadingSubCell"];
     [self.mToTable registerNib:[UINib nibWithNibName:@"CCCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"CCCell"];

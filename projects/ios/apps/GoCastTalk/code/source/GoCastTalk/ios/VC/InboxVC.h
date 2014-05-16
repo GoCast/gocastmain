@@ -42,4 +42,6 @@ class InboxScreen;
 
 -(void)refresh:(UIRefreshControl *)refreshControl;
 
+-(void)refreshLanguage;
+
 @end

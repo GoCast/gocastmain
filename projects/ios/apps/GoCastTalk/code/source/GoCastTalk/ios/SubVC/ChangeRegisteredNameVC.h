@@ -78,4 +78,6 @@ class ChangeRegisteredNameScreen;
 
 -(IBAction)savePressed;
 
+-(void) refreshLanguage;
+
 @end

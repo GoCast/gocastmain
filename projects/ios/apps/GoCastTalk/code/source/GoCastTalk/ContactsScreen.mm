@@ -440,6 +440,11 @@ void ContactsScreen::update(const URLLoaderEvent& msg)
 
 void ContactsScreen::update(const GCTEvent& msg)
 {
+    if (msg.mEvent == GCTEvent::kLanguageChanged)
+    {
+        [mPeer refreshLanguage];
+    }
+
     switch(getState())
     {
         case kIdle:

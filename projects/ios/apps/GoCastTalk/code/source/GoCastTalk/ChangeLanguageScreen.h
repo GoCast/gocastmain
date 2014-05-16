@@ -26,6 +26,7 @@ protected:
 
 	void idleEntry();
 	void peerPopSelfEntry();
+	void sendLanguageChangedToVCEntry();
 	void setLanguageToEnglishEntry();
 	void setLanguageToJapaneseEntry();
 
@@ -45,6 +46,7 @@ public:
 		kEnd,
 		kIdle,
 		kPeerPopSelf,
+		kSendLanguageChangedToVC,
 		kSetLanguageToEnglish,
 		kSetLanguageToJapanese,
 	};

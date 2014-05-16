@@ -19,12 +19,19 @@
 
 @implementation ChangeLanguageVC
 
+-(void) refreshLanguage
+{
+    self.mChangeLanguageLabel.text = [NSString stringWithUTF8String:I18N::getInstance()->retrieve("Language").c_str()];
+
+    [self.mTable reloadData];
+}
+
 #pragma mark Construction / Destruction
 - (void)viewDidLoad
 {
     [super viewDidLoad];
 
-    self.mChangeLanguageLabel.text = [NSString stringWithUTF8String:I18N::getInstance()->retrieve("Language").c_str()];
+    [self refreshLanguage];
 
     [self.mTable registerNib:[UINib nibWithNibName:@"HeadingSubCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"HeadingSubCell"];
 

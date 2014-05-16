@@ -49,4 +49,6 @@ class CreateContactScreen;
 
 -(IBAction)savePressed;
 
+-(void) refreshLanguage;
+
 @end

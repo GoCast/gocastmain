@@ -54,4 +54,6 @@ class ChangePasswordScreen;
 
 -(IBAction)savePressed;
 
+-(void) refreshLanguage;
+
 @end

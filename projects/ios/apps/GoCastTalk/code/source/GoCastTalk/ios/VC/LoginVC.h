@@ -51,4 +51,6 @@ class LoginScreen;
 -(void) setLoginName:(const std::string&)newName;
 -(void) popSelf;
 
+-(void) refreshLanguage;
+
 @end

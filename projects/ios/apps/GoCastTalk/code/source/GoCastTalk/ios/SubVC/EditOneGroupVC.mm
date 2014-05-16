@@ -17,12 +17,19 @@
 
 @implementation EditOneGroupVC
 
+-(void) refreshLanguage
+{
+    [self.mButton setTitle:[NSString stringWithUTF8String:I18N::getInstance()->retrieve("Done").c_str()] forState:UIControlStateNormal];
+
+    [self.mTable reloadData];
+}
+
 #pragma mark Construction / Destruction
 - (void)viewDidLoad
 {
     [super viewDidLoad];
 
-    [self.mButton setTitle:[NSString stringWithUTF8String:I18N::getInstance()->retrieve("Done").c_str()] forState:UIControlStateNormal];
+    [self refreshLanguage];
 
     self.navigationController.navigationBar.translucent = NO;
 

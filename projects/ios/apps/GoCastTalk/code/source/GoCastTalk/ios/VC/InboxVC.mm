@@ -21,6 +21,16 @@
 
 @implementation InboxVC
 
+-(void)refreshLanguage
+{
+    gAppDelegateInstance.mInboxItem.title       = [NSString stringWithUTF8String:I18N::getInstance()->retrieve("Messages").c_str()];
+    gAppDelegateInstance.mNewMemoItem.title     = [NSString stringWithUTF8String:I18N::getInstance()->retrieve("New Memo").c_str()];
+    gAppDelegateInstance.mContactsItem.title    = [NSString stringWithUTF8String:I18N::getInstance()->retrieve("Contacts").c_str()];
+    gAppDelegateInstance.mSettingsItem.title    = [NSString stringWithUTF8String:I18N::getInstance()->retrieve("Settings").c_str()];
+
+    [self.mTable reloadData];
+}
+
 #pragma mark Construction / Destruction
 - (void)viewDidLoad
 {

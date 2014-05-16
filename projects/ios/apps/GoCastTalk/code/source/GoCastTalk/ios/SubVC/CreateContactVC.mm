@@ -16,16 +16,23 @@
 
 @implementation CreateContactVC
 
-#pragma mark Construction / Destruction
-- (void)viewDidLoad
+- (void)refreshLanguage
 {
-    [super viewDidLoad];
-
     self.mTitleLabel.text           = [NSString stringWithUTF8String:I18N::getInstance()->retrieve("Create Contact").c_str()];
     self.mFullNameLabel.text        = [NSString stringWithUTF8String:I18N::getInstance()->retrieve("Full Name").c_str()];
     self.mNickNameLabel.text        = [NSString stringWithUTF8String:I18N::getInstance()->retrieve("Nick Name").c_str()];
     self.mEmailAddressLabel.text   = [NSString stringWithUTF8String:I18N::getInstance()->retrieve("Email Address").c_str()];
     [self.mDoneButton setTitle:[NSString stringWithUTF8String:I18N::getInstance()->retrieve("Done").c_str()] forState:UIControlStateNormal];
+
+    [self.mTable reloadData];
+}
+
+#pragma mark Construction / Destruction
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+
+    [self refreshLanguage];
 
     self.view.autoresizesSubviews = YES;
 

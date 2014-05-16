@@ -101,4 +101,6 @@ class RecordMessageScreen;
 
 -(void) sendEmailTo:(const JSONArray&)newTo withAttachment:(const tFile&)audioFile usingName:(const std::string&)newName;
 
+-(void) refreshLanguage;
+
 @end

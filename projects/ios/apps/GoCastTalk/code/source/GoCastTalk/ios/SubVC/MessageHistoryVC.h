@@ -42,4 +42,6 @@ class MessageHistoryScreen;
 -(void) pushInboxMessage:(const JSONObject&)newObject;
 -(void) pushRecordMessage:(const JSONObject&)newObject;
 
+-(void) refreshLanguage;
+
 @end

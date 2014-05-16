@@ -32,4 +32,6 @@ UITableViewDataSource
 
 -(void) popSelf;
 
+-(void) refreshLanguage;
+
 @end
