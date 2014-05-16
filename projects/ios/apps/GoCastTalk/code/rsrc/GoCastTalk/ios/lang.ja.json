@@ -147,5 +147,9 @@
     "icon-receive.png": "icon-receive.ja.png",
     "icon-sent.png": "icon-sent.ja.png",
 
+    "Language": "言語",
+    "English": "English",
+    "Japanese": "日本語",
+
     "x": "x"
 }

@@ -1,7 +1,6 @@
-#include "SettingsVC.h"
+#include "ChangeLanguageVC.h"
 #include "ChangeRegisteredNameVC.h"
 #include "ChangePasswordVC.h"
-#include "ChangeLanguageVC.h"
 #include "AboutVC.h"
 
 #include "Base/package.h"
@@ -13,23 +12,26 @@
 #import "InboxEntryCell.h"
 #import "HeadingSubCell.h"
 
-@interface SettingsVC()
+@interface ChangeLanguageVC()
 {
 }
 @end
 
-@implementation SettingsVC
+@implementation ChangeLanguageVC
 
 #pragma mark Construction / Destruction
 - (void)viewDidLoad
 {
     [super viewDidLoad];
 
+    self.mChangeLanguageLabel.text = [NSString stringWithUTF8String:I18N::getInstance()->retrieve("Language").c_str()];
+
     [self.mTable registerNib:[UINib nibWithNibName:@"HeadingSubCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"HeadingSubCell"];
 
-    self.view.autoresizesSubviews = YES;
+    self.view.autoresizesSubviews = NO;
+    self.view.opaque = NO;
 
-    mPeer = new SettingsScreen(self);
+    mPeer = new ChangeLanguageScreen(self);
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -50,7 +52,7 @@
 
     if (tableView == self.mTable)
     {
-        return (NSInteger)5;
+        return (NSInteger)2;
     }
 
     return (NSInteger)1;
@@ -74,29 +76,20 @@
     {
         const char* heading[] =
         {
-            "Language",
-            "Registered Name",
-            "Change Password",
-            "Log Out",
-            "About this app",
+            "Japanese",
+            "English",
         };
 
         const char* subheading[] =
         {
             "",
             "",
-            "",
-            "",
-            "",
         };
 
         const bool hasRightArrow[] =
         {
-            true,
-            true,
-            true,
             false,
-            true,
+            false,
         };
 
         tableView.backgroundView = nil;
@@ -113,7 +106,7 @@
         cell.mHeading.text = [NSString stringWithUTF8String:I18N::getInstance()->retrieve(heading[indexPath.row]).c_str()];
         cell.mSub.text = [NSString stringWithUTF8String:I18N::getInstance()->retrieve(subheading[indexPath.row]).c_str()];
         cell.mRightArrow.hidden = hasRightArrow[indexPath.row] ? NO : YES;
-        
+
         return cell;
     }
     else
@@ -142,11 +135,8 @@
 #pragma unused(tableView, indexPath)
     switch (indexPath.row)
     {
-        case 0: mPeer->changeLanguagePressed(); break;
-        case 1: mPeer->registeredNamePressed(); break;
-        case 2: mPeer->changePasswordPressed(); break;
-        case 3: mPeer->logOutPressed(); break;
-        case 4: mPeer->aboutThisAppPressed(); break;
+        case 0: mPeer->japanesePressed(); break;
+        case 1: mPeer->englishPressed(); break;
 
         default:
             break;
@@ -165,41 +155,16 @@
 #pragma unused(tableView, indexPath)
     if (editingStyle == UITableViewCellEditingStyleDelete)
     {
-//        if (tableView == self.mTable)
-//        {
-//            GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kTableItemDeleted, (tUInt32)indexPath.row));
-//        }
+        //        if (tableView == self.mTable)
+        //        {
+        //            GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kTableItemDeleted, (tUInt32)indexPath.row));
+        //        }
     }
 }
 
--(void)setBlockingViewVisible:(bool)newVisible
+-(void) popSelf
 {
-    [self.mBlockingView setHidden:newVisible ? NO : YES];
-}
-
--(void) pushChangeRegisteredName:(const JSONObject&)newObject
-{
-    ChangeRegisteredNameVC* nextVC = [[[ChangeRegisteredNameVC alloc] initWithNibName:@"ChangeRegisteredNameVC" bundle:nil] autorelease];
-    [nextVC customInit:newObject];
-    [(UINavigationController*)self.parentViewController  pushViewController:nextVC animated:YES];
-}
-
--(void) pushAbout
-{
-    AboutVC* nextVC = [[[AboutVC alloc] initWithNibName:@"AboutVC" bundle:nil] autorelease];
-    [(UINavigationController*)self.parentViewController  pushViewController:nextVC animated:YES];
-}
-
--(void) pushChangePassword
-{
-    ChangePasswordVC* nextVC = [[[ChangePasswordVC alloc] initWithNibName:@"ChangePasswordVC" bundle:nil] autorelease];
-    [(UINavigationController*)self.parentViewController  pushViewController:nextVC animated:YES];
-}
-
--(void) pushChangeLanguage
-{
-    ChangeLanguageVC* nextVC = [[[ChangeLanguageVC alloc] initWithNibName:@"ChangeLanguageVC" bundle:nil] autorelease];
-    [(UINavigationController*)self.parentViewController  pushViewController:nextVC animated:YES];
+    [(UINavigationController*)self.parentViewController popViewControllerAnimated:TRUE];
 }
 
 @end

@@ -22,6 +22,11 @@ SettingsScreen::~SettingsScreen()
 
 #pragma mark Public methods
 
+void SettingsScreen::changeLanguagePressed()
+{
+    update(SettingsScreenMessage(kChangeLanguageSelected));
+}
+
 void SettingsScreen::registeredNamePressed()
 {
     update(SettingsScreenMessage(kRegisteredNameSelected));
@@ -69,6 +74,11 @@ void SettingsScreen::idleEntry()
 void SettingsScreen::peerPushAboutEntry()
 {
     [mPeer pushAbout];
+}
+
+void SettingsScreen::peerPushChangeLanguageEntry()
+{
+    [mPeer pushChangeLanguage];
 }
 
 void SettingsScreen::peerPushChangePasswordEntry()
@@ -175,6 +185,7 @@ void SettingsScreen::CallEntry()
 		case kIdle: idleEntry(); break;
 		case kInvalidState: invalidStateEntry(); break;
 		case kPeerPushAbout: peerPushAboutEntry(); break;
+		case kPeerPushChangeLanguage: peerPushChangeLanguageEntry(); break;
 		case kPeerPushChangePassword: peerPushChangePasswordEntry(); break;
 		case kPeerPushChangeRegisteredName: peerPushChangeRegisteredNameEntry(); break;
 		case kSendForceLogoutToVC: sendForceLogoutToVCEntry(); break;
@@ -197,10 +208,12 @@ int  SettingsScreen::StateTransitionFunction(const int evt) const
 {
 	if ((mState == kDestroyStoredToken) && (evt == kNext)) return kShowSuccessWithLogout; else
 	if ((mState == kIdle) && (evt == kAboutThisAppSelected)) return kPeerPushAbout; else
+	if ((mState == kIdle) && (evt == kChangeLanguageSelected)) return kPeerPushChangeLanguage; else
 	if ((mState == kIdle) && (evt == kChangePasswordSelected)) return kPeerPushChangePassword; else
 	if ((mState == kIdle) && (evt == kLogOutSelected)) return kShowConfirmLogout; else
 	if ((mState == kIdle) && (evt == kRegisteredNameSelected)) return kPeerPushChangeRegisteredName; else
 	if ((mState == kPeerPushAbout) && (evt == kNext)) return kIdle; else
+	if ((mState == kPeerPushChangeLanguage) && (evt == kNext)) return kIdle; else
 	if ((mState == kPeerPushChangePassword) && (evt == kNext)) return kIdle; else
 	if ((mState == kPeerPushChangeRegisteredName) && (evt == kNext)) return kIdle; else
 	if ((mState == kSendForceLogoutToVC) && (evt == kNext)) return kIdle; else
@@ -222,17 +235,18 @@ bool SettingsScreen::HasEdgeNamedNext() const
 {
 	switch(mState)
 	{
-		case kDestroyStoredToken:
-		case kPeerPushAbout:
-		case kPeerPushChangePassword:
-		case kPeerPushChangeRegisteredName:
-		case kSendForceLogoutToVC:
-		case kSetWaitForLogout:
-		case kStart:
-			return true;
+		case kEnd:
+		case kIdle:
+		case kInvalidState:
+		case kSendLogoutToServer:
+		case kShowConfirmLogout:
+		case kShowErrorWithLogout:
+		case kShowSuccessWithLogout:
+		case kWasLogoutSuccessful:
+			return false;
 		default: break;
 	}
-	return false;
+	return true;
 }
 
 #pragma mark Messages

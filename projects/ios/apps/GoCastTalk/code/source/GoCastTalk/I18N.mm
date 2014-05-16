@@ -15,10 +15,12 @@ std::string I18N::toLower(const std::string& s)
 
 I18N::I18N()
 {
-    mLocale = [[[NSLocale preferredLanguages] objectAtIndex:0] UTF8String];
+    mLocale = tFile(tFile::kPreferencesDirectory, "lang.txt");
 
-    // HACK
-//    mLocale = "ja";
+    if (mLocale == "")
+    {
+        mLocale = [[[NSLocale preferredLanguages] objectAtIndex:0] UTF8String];
+    }
 
     if (mLocale != "ja")
     {
@@ -33,6 +35,8 @@ I18N::~I18N()
 void I18N::setLocale(const std::string& newLocale)
 {
     mLocale = newLocale;
+
+    tFile(tFile::kPreferencesDirectory, "lang.txt").write(newLocale);
 }
 
 std::string I18N::getLocale() const

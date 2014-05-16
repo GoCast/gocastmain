@@ -46,6 +46,7 @@
 #include "EditOneGroupScreen.h"
 
 #include "ChangePasswordScreen.h"
+#include "ChangeLanguageScreen.h"
 
 #include "ios/AppDelegate.h"
 

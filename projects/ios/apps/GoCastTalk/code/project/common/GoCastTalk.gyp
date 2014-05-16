@@ -80,6 +80,12 @@
 				'action': [ '<@(_graphcode)', '<@(_inputs)', '--machine', 'ChangeRegisteredNameScreen', '-h', '../../source/GoCastTalk/ChangeRegisteredNameScreen.h', '-cpp', '../../source/GoCastTalk/ChangeRegisteredNameScreen.mm', ],
 			},
 			{
+				'action_name': 'ChangeLanguageScreen.tgf',
+				'inputs': [ '../../tgf/GoCastTalk/ChangeLanguageScreen.tgf', ],
+				'outputs': [ '../../dummy', ],
+				'action': [ '<@(_graphcode)', '<@(_inputs)', '--machine', 'ChangeLanguageScreen', '-h', '../../source/GoCastTalk/ChangeLanguageScreen.h', '-cpp', '../../source/GoCastTalk/ChangeLanguageScreen.mm', ],
+			},
+			{
 				'action_name': 'ChangePasswordScreen.tgf',
 				'inputs': [ '../../tgf/GoCastTalk/ChangePasswordScreen.tgf', ],
 				'outputs': [ '../../dummy', ],
@@ -146,6 +152,9 @@
 
 			'../../source/GoCastTalk/ChangeRegisteredNameScreen.mm',
 			'../../source/GoCastTalk/ChangeRegisteredNameScreen.h',
+
+			'../../source/GoCastTalk/ChangeLanguageScreen.mm',
+			'../../source/GoCastTalk/ChangeLanguageScreen.h',
 
 			'../../source/GoCastTalk/ChangePasswordScreen.mm',
 			'../../source/GoCastTalk/ChangePasswordScreen.h',
@@ -264,6 +273,9 @@
 					'../../source/GoCastTalk/<@(OS)/SubVC/AboutVC.h',
 					'../../source/GoCastTalk/<@(OS)/SubVC/AboutVC.mm',
 
+					'../../source/GoCastTalk/<@(OS)/SubVC/ChangeLanguageVC.h',
+					'../../source/GoCastTalk/<@(OS)/SubVC/ChangeLanguageVC.mm',
+
 					'../../source/GoCastTalk/<@(OS)/SubVC/ChangePasswordVC.h',
 					'../../source/GoCastTalk/<@(OS)/SubVC/ChangePasswordVC.mm',
 
@@ -322,6 +334,7 @@
 					'../../rsrc/GoCastTalk/<@(OS)/SubVC/MessageSentVC.xib',
 
 					'../../rsrc/GoCastTalk/<@(OS)/SubVC/AboutVC.xib',
+					'../../rsrc/GoCastTalk/<@(OS)/SubVC/ChangeLanguageVC.xib',
 					'../../rsrc/GoCastTalk/<@(OS)/SubVC/ChangePasswordVC.xib',
 
 					'../../rsrc/GoCastTalk/<@(OS)/InboxEntryCell.xib',

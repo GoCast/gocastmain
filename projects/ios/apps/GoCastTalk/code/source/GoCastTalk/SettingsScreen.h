@@ -18,6 +18,7 @@ public:
 	SettingsScreen(SettingsVC* newVC);
 	~SettingsScreen();
 
+    void changeLanguagePressed();
     void registeredNamePressed();
     void changePasswordPressed();
     void logOutPressed();
@@ -31,6 +32,7 @@ protected:
 	void destroyStoredTokenEntry();
 	void idleEntry();
 	void peerPushAboutEntry();
+	void peerPushChangeLanguageEntry();
 	void peerPushChangePasswordEntry();
 	void peerPushChangeRegisteredNameEntry();
 	void sendForceLogoutToVCEntry();
@@ -47,6 +49,7 @@ public:
 		kInvalidEvent = -2,
 		kNext = -1,
 		kAboutThisAppSelected,
+		kChangeLanguageSelected,
 		kChangePasswordSelected,
 		kFail,
 		kLogOutSelected,
@@ -64,6 +67,7 @@ public:
 		kEnd,
 		kIdle,
 		kPeerPushAbout,
+		kPeerPushChangeLanguage,
 		kPeerPushChangePassword,
 		kPeerPushChangeRegisteredName,
 		kSendForceLogoutToVC,

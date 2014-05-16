@@ -6,20 +6,21 @@
 class JSONValue;
 typedef std::map<std::string, JSONValue> JSONObject;
 
-class SettingsScreen;
+class ChangeLanguageScreen;
 
-@interface SettingsVC : UIViewController
+@interface ChangeLanguageVC : UIViewController
 <
-    UITableViewDelegate,
-    UITableViewDataSource
+UITableViewDelegate,
+UITableViewDataSource
 >
 {
-    SettingsScreen* mPeer;
+    ChangeLanguageScreen* mPeer;
 }
 
 //mInboxView
 @property (nonatomic, strong) IBOutlet UITableView*     mTable;
-@property (nonatomic, strong) IBOutlet UIView*          mBlockingView;
+
+@property (nonatomic, strong) IBOutlet UILabel*         mChangeLanguageLabel;
 
 #pragma mark Construction / Destruction
 - (void)viewDidLoad;
@@ -29,12 +30,6 @@ class SettingsScreen;
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath;
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath;
 
--(void)setBlockingViewVisible:(bool)newVisible;
-
--(void) pushChangeRegisteredName:(const JSONObject&)newObject;
-
--(void) pushAbout;
--(void) pushChangePassword;
--(void) pushChangeLanguage;
+-(void) popSelf;
 
 @end
