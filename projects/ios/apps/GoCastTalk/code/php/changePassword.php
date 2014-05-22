@@ -1,7 +1,9 @@
 <?php
 
-function changePassword($name, $password, $newpassword)
+function getPassword($name)
 {
+	$result = "";
+
 	if (is_file($GLOBALS['database']."/accounts.json"))
 	{
 		$json = atomic_get_contents($GLOBALS['database']."/accounts.json");
@@ -9,28 +11,59 @@ function changePassword($name, $password, $newpassword)
 
 		if(isset($arr[$name]) && !empty($arr[$name]))
 		{
-			if ($arr[$name] === $password)
+			$result = $arr[$name];
+		}
+	}
+
+	return $result;
+}
+
+function setPassword($name, $newpassword)
+{
+	$result = false;
+
+	if (is_file($GLOBALS['database']."/accounts.json"))
+	{
+		$json = atomic_get_contents($GLOBALS['database']."/accounts.json");
+		$arr = json_decode($json, true);
+
+		$arr[$name] = $newpassword;
+
+		ksort($arr);
+
+		if (atomic_put_contents($GLOBALS['database']."/accounts.json", json_encode($arr)) != false)
+		{
+			$result = true;
+		}
+	}
+
+	return $result;
+}
+
+function changePassword($name, $password, $newpassword)
+{
+	$result = "";
+	$oldpassword = getPassword($name);
+
+	if (isset($oldpassword) && !empty($oldpassword))
+	{
+		if ($password === $oldpassword)
+		{
+			if (setPassword($name, $newpassword))
 			{
-				$arr[$name] = $newpassword;
-
-				ksort($arr);
-
-				if (atomic_put_contents($GLOBALS['database']."/accounts.json", json_encode($arr)) != false)
-				{
-					$result = array("status" => "success",
-									"message" => "Password was changed");
-				}
+				$result = array("status" => "success",
+								"message" => "Password was changed");
 			}
 			else
 			{
 				$result = array("status" => "fail",
-								"message" => "Old password is incorrect");
+								"message" => "Couldn't write to login file");
 			}
 		}
 		else
 		{
 			$result = array("status" => "fail",
-							"message" => "User does not exist");
+							"message" => "Old password is incorrect");
 		}
 	}
 	else
@@ -38,6 +71,7 @@ function changePassword($name, $password, $newpassword)
 		$result = array("status" => "fail",
 						"message" => "No login file found");
 	}
+
 	return $result;
 }
 

@@ -11,6 +11,9 @@ include 'applePush.php';
 
 include 'login.php';
 include 'register.php';
+
+include 'sendResetEmail.php';
+
 include 'changePassword.php';
 
 include 'listMessages.php';
@@ -217,6 +220,28 @@ if(hasParam("action"))
 			{
 				switch($_GET["action"])
 				{
+					case "resetEmail":
+						if (hasParam("lang"))
+						{
+							print(json_encode(sendResetEmail($_GET["name"], $_GET["lang"])));
+						}
+						else
+						{
+							print(json_encode(sendResetEmail($_GET["name"], "en")));
+						}
+						break;
+
+					case "verifyPin":
+						if (hasParam("pin"))
+						{
+							print(json_encode(verifyPin($_GET["name"], $_GET["pin"])));
+						}
+						else
+						{
+							print(json_encode(errorMissingParameter("pin")));
+						}
+						break;
+
 					case "register":
 						if (hasParam("password"))
 						{
@@ -236,6 +261,24 @@ if(hasParam("action"))
 						else
 						{
 							print(json_encode(errorMissingParameter("password")));
+						}
+						break;
+
+					case "changePassword":
+						if (hasParam("oldpassword"))
+						{
+							if (hasParam("newpassword"))
+							{
+								print(json_encode(changePassword($_GET["name"], $_GET["oldpassword"], $_GET["newpassword"])));
+							}
+							else
+							{
+								print(json_encode(errorMissingParameter("newpassword")));
+							}
+						}
+						else
+						{
+							print(json_encode(errorMissingParameter("oldpassword")));
 						}
 						break;
 
