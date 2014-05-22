@@ -14,8 +14,14 @@ protected:
     LoginVC*    mPeer;
     JSONObject  mLoginJSON;
     JSONObject  mRegisterJSON;
+    JSONObject  mVerifyPinJSON;
+    JSONObject  mChangePasswordJSON;
+    JSONObject  mResetEmailJSON;
+
     std::string mEmail;
     std::string mPassword;
+    std::string mPin;
+    std::string mNewPassword;
 
 public:
     static std::string mBaseURL;
@@ -38,30 +44,47 @@ protected:
 	void endEntry();
 	void invalidStateEntry();
 
+	void didAppRelaunchToPinStateEntry();
 	void ensureSigninInfoEntry();
 	void ensureSignupInfoEntry();
 	void idleEntry();
 	void isEmailBlankEntry();
 	void loadLoginNameEntry();
 	void peerPopSelfEntry();
-	void peerSendEmailToSupportEntry();
 	void peerSetLoginNameEntry();
 	void saveLoginNameEntry();
+	void sendChangePasswordToServerEntry();
 	void sendLoginSucceededToVCEntry();
 	void sendLoginToServerEntry();
 	void sendRegisterToServerEntry();
+	void sendResetEmailToServerEntry();
+	void sendVerifyPinToServerEntry();
+	void showAResetEmailHasBeenSentEntry();
 	void showCouldNotLoginEntry();
 	void showCouldNotRegisterEntry();
+	void showCouldNotResetPasswordEntry();
 	void showEnterEmailFirstEntry();
+	void showEnterNewPasswordEntry();
+	void showEnterResetCodeEntry();
 	void showIncorrectFormatEntry();
+	void showRetryChangePasswordEntry();
 	void showRetryLoginEntry();
 	void showRetryRegisterEntry();
+	void showRetryResetEmailEntry();
+	void showRetryVerifyPinEntry();
+	void showSendResetEmailEntry();
+	void showSuccessChangedPasswordEntry();
 	void showURLMissingSlashEntry();
 	void showUserRegistraionSuccessfulEntry();
 	void storeTokenInformationEntry();
 	void validateURLEntry();
+	void wasChangePasswordSuccessfulEntry();
 	void wasLoginValidEntry();
 	void wasRegisterValidEntry();
+	void wasResetEmailValidEntry();
+	void wasVerifyPinValidEntry();
+
+	void showEnterResetCodeExit();
 
 public:
 	enum EventType
@@ -81,6 +104,7 @@ public:
 	{
 		kInvalidState = 0,
 		kStart = 1,
+		kDidAppRelaunchToPinState,
 		kEnd,
 		kEnsureSigninInfo,
 		kEnsureSignupInfo,
@@ -88,24 +112,38 @@ public:
 		kIsEmailBlank,
 		kLoadLoginName,
 		kPeerPopSelf,
-		kPeerSendEmailToSupport,
 		kPeerSetLoginName,
 		kSaveLoginName,
+		kSendChangePasswordToServer,
 		kSendLoginSucceededToVC,
 		kSendLoginToServer,
 		kSendRegisterToServer,
+		kSendResetEmailToServer,
+		kSendVerifyPinToServer,
+		kShowAResetEmailHasBeenSent,
 		kShowCouldNotLogin,
 		kShowCouldNotRegister,
+		kShowCouldNotResetPassword,
 		kShowEnterEmailFirst,
+		kShowEnterNewPassword,
+		kShowEnterResetCode,
 		kShowIncorrectFormat,
+		kShowRetryChangePassword,
 		kShowRetryLogin,
 		kShowRetryRegister,
+		kShowRetryResetEmail,
+		kShowRetryVerifyPin,
+		kShowSendResetEmail,
+		kShowSuccessChangedPassword,
 		kShowURLMissingSlash,
 		kShowUserRegistraionSuccessful,
 		kStoreTokenInformation,
 		kValidateURL,
+		kWasChangePasswordSuccessful,
 		kWasLoginValid,
 		kWasRegisterValid,
+		kWasResetEmailValid,
+		kWasVerifyPinValid,
 	};
 
 protected:

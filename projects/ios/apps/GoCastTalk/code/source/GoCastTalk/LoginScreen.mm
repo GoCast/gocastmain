@@ -100,10 +100,6 @@ void LoginScreen::idleEntry()
 }
 
 #pragma mark Peer Communication
-void LoginScreen::peerSendEmailToSupportEntry()
-{
-    [mPeer sendEmailTo:"feedback@gocast.it"];
-}
 
 void LoginScreen::peerPopSelfEntry()
 {
@@ -116,6 +112,11 @@ void LoginScreen::peerSetLoginNameEntry()
 }
 
 #pragma mark Queries
+void LoginScreen::didAppRelaunchToPinStateEntry()
+{
+    SetImmediateEvent(tFile(tFile::kPreferencesDirectory, "pin.txt").exists() ? kYes : kNo);
+}
+
 void LoginScreen::isEmailBlankEntry()
 {
     bool result = false;
@@ -123,6 +124,18 @@ void LoginScreen::isEmailBlankEntry()
     result = EnsureInfo(mEmail, "abc123");
 
     SetImmediateEvent(result ? kNo : kYes);
+}
+
+void LoginScreen::wasChangePasswordSuccessfulEntry()
+{
+    bool result = false;
+
+    if (mChangePasswordJSON["status"].mString == std::string("success"))
+    {
+        result = true;
+    }
+
+    SetImmediateEvent(result ? kYes : kNo);
 }
 
 void LoginScreen::wasLoginValidEntry()
@@ -150,6 +163,30 @@ void LoginScreen::wasRegisterValidEntry()
     if (result)
     {
         GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showUserRegistraionSuccessfulEntry");
+    }
+
+    SetImmediateEvent(result ? kYes : kNo);
+}
+
+void LoginScreen::wasResetEmailValidEntry()
+{
+    bool result = false;
+
+    if (mResetEmailJSON["status"].mString == std::string("success"))
+    {
+        result = true;
+    }
+
+    SetImmediateEvent(result ? kYes : kNo);
+}
+
+void LoginScreen::wasVerifyPinValidEntry()
+{
+    bool result = false;
+
+    if (mVerifyPinJSON["status"].mString == std::string("success"))
+    {
+        result = true;
     }
 
     SetImmediateEvent(result ? kYes : kNo);
@@ -236,6 +273,45 @@ void LoginScreen::sendRegisterToServerEntry()
     URLLoader::getInstance()->loadString(this, buf);
 }
 
+void LoginScreen::sendVerifyPinToServerEntry()
+{
+    [mPeer setBlockingViewVisible:true];
+
+    char buf[512];
+
+    sprintf(buf, "%s?action=verifyPin&name=%s&pin=%s",
+            kMemoAppServerURL,
+            mEmail.c_str(),
+            mPin.c_str());
+
+    URLLoader::getInstance()->loadString(this, buf);
+}
+
+void LoginScreen::sendChangePasswordToServerEntry()
+{
+    char buf[512];
+
+    sprintf(buf, "%s?action=changePassword&name=%s&oldpassword=pin%s&newpassword=%s",
+            kMemoAppServerURL,
+            InboxScreen::mEmailAddress.c_str(),
+            mPin.c_str(),
+            mNewPassword.c_str());
+
+    URLLoader::getInstance()->loadString(this, buf);
+}
+
+void LoginScreen::sendResetEmailToServerEntry()
+{
+    char buf[512];
+
+    sprintf(buf, "%s?action=resetEmail&name=%s&lang=%s",
+            kMemoAppServerURL,
+            InboxScreen::mEmailAddress.c_str(),
+            I18N::getInstance()->getLocale().c_str());
+
+    URLLoader::getInstance()->loadString(this, buf);
+}
+
 void LoginScreen::storeTokenInformationEntry()
 {
     InboxScreen::mEmailAddress = mEmail;
@@ -273,20 +349,31 @@ void LoginScreen::showUserRegistraionSuccessfulEntry()
     tAlert("New account registered successfully");
 }
 
-//void LoginScreen::showAResetEmailHasBeenSentEntry()
-//{
-//    tAlert("A reset email has been sent to the email provided.");
-//}
-//
-//void LoginScreen::showEnterResetCodeEntry()
-//{
-//    tPrompt("Please enter the 6-digit reset code:");
-//}
-//
-//void LoginScreen::showSendResetEmailEntry()
-//{
-//    tConfirm("Send a reset code to the provided email address?");
-//}
+void LoginScreen::showAResetEmailHasBeenSentEntry()
+{
+    tAlert("A reset email has been sent to the email provided.");
+}
+
+void LoginScreen::showEnterNewPasswordEntry()
+{
+    tPrompt("Please enter a new password:");
+}
+
+void LoginScreen::showEnterResetCodeEntry()
+{
+    tFile(tFile::kPreferencesDirectory, "pin.txt").write("yes");
+    tPrompt("Please enter the 6-digit reset code:");
+}
+
+void LoginScreen::showEnterResetCodeExit()
+{
+    tFile(tFile::kPreferencesDirectory, "pin.txt").remove();
+}
+
+void LoginScreen::showSendResetEmailEntry()
+{
+    tConfirm("Send a reset code to the provided email address?");
+}
 
 void LoginScreen::showEnterEmailFirstEntry()
 {
@@ -306,6 +393,12 @@ void LoginScreen::showCouldNotRegisterEntry()
     tAlert("Could not sign up");
 }
 
+void LoginScreen::showCouldNotResetPasswordEntry()
+{
+    GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showCouldNotResetPasswordEntry");
+    tAlert("Could not reset password");
+}
+
 void LoginScreen::showIncorrectFormatEntry()
 {
     GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showIncorrectFormatEntry");
@@ -316,6 +409,24 @@ void LoginScreen::showURLMissingSlashEntry()
 {
     GoogleAnalytics::getInstance()->trackConfirm(kScreenName, "showURLMissingSlashEntry");
     tConfirm("URL missing trailing slash. Continue?");
+}
+
+void LoginScreen::showRetryChangePasswordEntry()
+{
+    GoogleAnalytics::getInstance()->trackConfirm(kScreenName, "showRetryChangePasswordEntry");
+    tConfirm("Error contacting server. Retry change password?");
+}
+
+void LoginScreen::showRetryResetEmailEntry()
+{
+    GoogleAnalytics::getInstance()->trackConfirm(kScreenName, "showRetryResetEmailEntry");
+    tConfirm("Error contacting server. Retry send email?");
+}
+
+void LoginScreen::showRetryVerifyPinEntry()
+{
+    GoogleAnalytics::getInstance()->trackConfirm(kScreenName, "showRetryVerifyPinEntry");
+    tConfirm("Error contacting server. Retry verify pin?");
 }
 
 void LoginScreen::showRetryLoginEntry()
@@ -330,6 +441,12 @@ void LoginScreen::showRetryRegisterEntry()
     tConfirm("Error contacting server. Retry sign up?");
 }
 
+void LoginScreen::showSuccessChangedPasswordEntry()
+{
+    GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showSuccessChangedPasswordEntry");
+    tAlert("Changed password successfully.");
+}
+
 
 #pragma mark Sending messages to other machines
 void LoginScreen::sendLoginSucceededToVCEntry()
@@ -342,6 +459,7 @@ void LoginScreen::CallEntry()
 {
 	switch(mState)
 	{
+		case kDidAppRelaunchToPinState: didAppRelaunchToPinStateEntry(); break;
 		case kEnd: EndEntryHelper(); break;
 		case kEnsureSigninInfo: ensureSigninInfoEntry(); break;
 		case kEnsureSignupInfo: ensureSignupInfoEntry(); break;
@@ -350,35 +468,56 @@ void LoginScreen::CallEntry()
 		case kIsEmailBlank: isEmailBlankEntry(); break;
 		case kLoadLoginName: loadLoginNameEntry(); break;
 		case kPeerPopSelf: peerPopSelfEntry(); break;
-		case kPeerSendEmailToSupport: peerSendEmailToSupportEntry(); break;
 		case kPeerSetLoginName: peerSetLoginNameEntry(); break;
 		case kSaveLoginName: saveLoginNameEntry(); break;
+		case kSendChangePasswordToServer: sendChangePasswordToServerEntry(); break;
 		case kSendLoginSucceededToVC: sendLoginSucceededToVCEntry(); break;
 		case kSendLoginToServer: sendLoginToServerEntry(); break;
 		case kSendRegisterToServer: sendRegisterToServerEntry(); break;
+		case kSendResetEmailToServer: sendResetEmailToServerEntry(); break;
+		case kSendVerifyPinToServer: sendVerifyPinToServerEntry(); break;
+		case kShowAResetEmailHasBeenSent: showAResetEmailHasBeenSentEntry(); break;
 		case kShowCouldNotLogin: showCouldNotLoginEntry(); break;
 		case kShowCouldNotRegister: showCouldNotRegisterEntry(); break;
+		case kShowCouldNotResetPassword: showCouldNotResetPasswordEntry(); break;
 		case kShowEnterEmailFirst: showEnterEmailFirstEntry(); break;
+		case kShowEnterNewPassword: showEnterNewPasswordEntry(); break;
+		case kShowEnterResetCode: showEnterResetCodeEntry(); break;
 		case kShowIncorrectFormat: showIncorrectFormatEntry(); break;
+		case kShowRetryChangePassword: showRetryChangePasswordEntry(); break;
 		case kShowRetryLogin: showRetryLoginEntry(); break;
 		case kShowRetryRegister: showRetryRegisterEntry(); break;
+		case kShowRetryResetEmail: showRetryResetEmailEntry(); break;
+		case kShowRetryVerifyPin: showRetryVerifyPinEntry(); break;
+		case kShowSendResetEmail: showSendResetEmailEntry(); break;
+		case kShowSuccessChangedPassword: showSuccessChangedPasswordEntry(); break;
 		case kShowURLMissingSlash: showURLMissingSlashEntry(); break;
 		case kShowUserRegistraionSuccessful: showUserRegistraionSuccessfulEntry(); break;
 		case kStart: startEntry(); break;
 		case kStoreTokenInformation: storeTokenInformationEntry(); break;
 		case kValidateURL: validateURLEntry(); break;
+		case kWasChangePasswordSuccessful: wasChangePasswordSuccessfulEntry(); break;
 		case kWasLoginValid: wasLoginValidEntry(); break;
 		case kWasRegisterValid: wasRegisterValidEntry(); break;
+		case kWasResetEmailValid: wasResetEmailValidEntry(); break;
+		case kWasVerifyPinValid: wasVerifyPinValidEntry(); break;
 		default: break;
 	}
 }
 
 void LoginScreen::CallExit()
 {
+	switch(mState)
+	{
+		case kShowEnterResetCode: showEnterResetCodeExit(); break;
+		default: break;
+	}
 }
 
 int  LoginScreen::StateTransitionFunction(const int evt) const
 {
+	if ((mState == kDidAppRelaunchToPinState) && (evt == kNo)) return kIdle; else
+	if ((mState == kDidAppRelaunchToPinState) && (evt == kYes)) return kShowEnterResetCode; else
 	if ((mState == kEnsureSigninInfo) && (evt == kFail)) return kShowIncorrectFormat; else
 	if ((mState == kEnsureSigninInfo) && (evt == kSuccess)) return kSendLoginToServer; else
 	if ((mState == kEnsureSignupInfo) && (evt == kFail)) return kShowIncorrectFormat; else
@@ -386,36 +525,62 @@ int  LoginScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kIdle) && (evt == kSignInPressed)) return kValidateURL; else
 	if ((mState == kIdle) && (evt == kSignUpPressed)) return kEnsureSignupInfo; else
 	if ((mState == kIdle) && (evt == kTroublePressed)) return kIsEmailBlank; else
-	if ((mState == kIsEmailBlank) && (evt == kNo)) return kPeerSendEmailToSupport; else
+	if ((mState == kIsEmailBlank) && (evt == kNo)) return kShowSendResetEmail; else
 	if ((mState == kIsEmailBlank) && (evt == kYes)) return kShowEnterEmailFirst; else
-	if ((mState == kLoadLoginName) && (evt == kFail)) return kIdle; else
+	if ((mState == kLoadLoginName) && (evt == kFail)) return kDidAppRelaunchToPinState; else
 	if ((mState == kLoadLoginName) && (evt == kSuccess)) return kPeerSetLoginName; else
-	if ((mState == kPeerSendEmailToSupport) && (evt == kNext)) return kIdle; else
-	if ((mState == kPeerSetLoginName) && (evt == kNext)) return kIdle; else
+	if ((mState == kPeerSetLoginName) && (evt == kNext)) return kDidAppRelaunchToPinState; else
 	if ((mState == kSaveLoginName) && (evt == kNext)) return kSendLoginSucceededToVC; else
+	if ((mState == kSendChangePasswordToServer) && (evt == kFail)) return kShowRetryChangePassword; else
+	if ((mState == kSendChangePasswordToServer) && (evt == kSuccess)) return kWasChangePasswordSuccessful; else
 	if ((mState == kSendLoginSucceededToVC) && (evt == kNext)) return kPeerPopSelf; else
 	if ((mState == kSendLoginToServer) && (evt == kFail)) return kShowRetryLogin; else
 	if ((mState == kSendLoginToServer) && (evt == kSuccess)) return kWasLoginValid; else
 	if ((mState == kSendRegisterToServer) && (evt == kFail)) return kShowRetryRegister; else
 	if ((mState == kSendRegisterToServer) && (evt == kSuccess)) return kWasRegisterValid; else
+	if ((mState == kSendResetEmailToServer) && (evt == kFail)) return kShowRetryResetEmail; else
+	if ((mState == kSendResetEmailToServer) && (evt == kSuccess)) return kWasResetEmailValid; else
+	if ((mState == kSendVerifyPinToServer) && (evt == kFail)) return kShowRetryVerifyPin; else
+	if ((mState == kSendVerifyPinToServer) && (evt == kSuccess)) return kWasVerifyPinValid; else
+	if ((mState == kShowAResetEmailHasBeenSent) && (evt == kYes)) return kShowEnterResetCode; else
 	if ((mState == kShowCouldNotLogin) && (evt == kYes)) return kIdle; else
 	if ((mState == kShowCouldNotRegister) && (evt == kYes)) return kIdle; else
+	if ((mState == kShowCouldNotResetPassword) && (evt == kYes)) return kIdle; else
 	if ((mState == kShowEnterEmailFirst) && (evt == kYes)) return kIdle; else
+	if ((mState == kShowEnterNewPassword) && (evt == kNo)) return kShowCouldNotResetPassword; else
+	if ((mState == kShowEnterNewPassword) && (evt == kYes)) return kSendChangePasswordToServer; else
+	if ((mState == kShowEnterResetCode) && (evt == kNo)) return kShowCouldNotResetPassword; else
+	if ((mState == kShowEnterResetCode) && (evt == kYes)) return kSendVerifyPinToServer; else
 	if ((mState == kShowIncorrectFormat) && (evt == kYes)) return kIdle; else
+	if ((mState == kShowRetryChangePassword) && (evt == kNo)) return kShowCouldNotResetPassword; else
+	if ((mState == kShowRetryChangePassword) && (evt == kYes)) return kSendChangePasswordToServer; else
 	if ((mState == kShowRetryLogin) && (evt == kNo)) return kShowCouldNotLogin; else
 	if ((mState == kShowRetryLogin) && (evt == kYes)) return kSendLoginToServer; else
 	if ((mState == kShowRetryRegister) && (evt == kNo)) return kShowCouldNotRegister; else
 	if ((mState == kShowRetryRegister) && (evt == kYes)) return kSendRegisterToServer; else
+	if ((mState == kShowRetryResetEmail) && (evt == kNo)) return kShowCouldNotResetPassword; else
+	if ((mState == kShowRetryResetEmail) && (evt == kYes)) return kSendResetEmailToServer; else
+	if ((mState == kShowRetryVerifyPin) && (evt == kNo)) return kShowCouldNotResetPassword; else
+	if ((mState == kShowRetryVerifyPin) && (evt == kYes)) return kSendVerifyPinToServer; else
+	if ((mState == kShowSendResetEmail) && (evt == kNo)) return kIdle; else
+	if ((mState == kShowSendResetEmail) && (evt == kYes)) return kSendResetEmailToServer; else
+	if ((mState == kShowSuccessChangedPassword) && (evt == kYes)) return kIdle; else
 	if ((mState == kShowURLMissingSlash) && (evt == kNo)) return kIdle; else
 	if ((mState == kShowURLMissingSlash) && (evt == kYes)) return kEnsureSigninInfo; else
 	if ((mState == kStart) && (evt == kNext)) return kLoadLoginName; else
 	if ((mState == kStoreTokenInformation) && (evt == kNext)) return kSaveLoginName; else
 	if ((mState == kValidateURL) && (evt == kFail)) return kShowURLMissingSlash; else
 	if ((mState == kValidateURL) && (evt == kSuccess)) return kEnsureSigninInfo; else
+	if ((mState == kWasChangePasswordSuccessful) && (evt == kNo)) return kShowCouldNotResetPassword; else
+	if ((mState == kWasChangePasswordSuccessful) && (evt == kYes)) return kShowSuccessChangedPassword; else
 	if ((mState == kWasLoginValid) && (evt == kNo)) return kShowCouldNotLogin; else
 	if ((mState == kWasLoginValid) && (evt == kYes)) return kStoreTokenInformation; else
 	if ((mState == kWasRegisterValid) && (evt == kNo)) return kShowCouldNotRegister; else
-	if ((mState == kWasRegisterValid) && (evt == kYes)) return kStoreTokenInformation;
+	if ((mState == kWasRegisterValid) && (evt == kYes)) return kStoreTokenInformation; else
+	if ((mState == kWasResetEmailValid) && (evt == kNo)) return kShowCouldNotResetPassword; else
+	if ((mState == kWasResetEmailValid) && (evt == kYes)) return kShowAResetEmailHasBeenSent; else
+	if ((mState == kWasVerifyPinValid) && (evt == kNo)) return kShowCouldNotResetPassword; else
+	if ((mState == kWasVerifyPinValid) && (evt == kYes)) return kShowEnterNewPassword;
 
 	return kInvalidState;
 }
@@ -424,7 +589,6 @@ bool LoginScreen::HasEdgeNamedNext() const
 {
 	switch(mState)
 	{
-		case kPeerSendEmailToSupport:
 		case kPeerSetLoginName:
 		case kSaveLoginName:
 		case kSendLoginSucceededToVC:
@@ -504,12 +668,24 @@ void LoginScreen::update(const URLLoaderEvent& msg)
             {
                 switch (getState())
                 {
+                    case kSendChangePasswordToServer:
+                        mChangePasswordJSON = JSONUtil::extract(msg.mString);
+                        break;
+
                     case kSendLoginToServer:
                         mLoginJSON = JSONUtil::extract(msg.mString);
                         break;
 
                     case kSendRegisterToServer:
                         mRegisterJSON = JSONUtil::extract(msg.mString);
+                        break;
+
+                    case kSendResetEmailToServer:
+                        mResetEmailJSON = JSONUtil::extract(msg.mString);
+                        break;
+
+                    case kSendVerifyPinToServer:
+                        mVerifyPinJSON = JSONUtil::extract(msg.mString);
                         break;
 
                     default:
@@ -534,18 +710,33 @@ void LoginScreen::update(const GCTEvent& msg)
         [mPeer refreshLanguage];
     }
 
+    if (msg.mEvent == GCTEvent::kOKYesAlertPressed)
+    {
+        switch (getState())
+        {
+            case kShowEnterResetCode:   mPin            = msg.mPromptResponse; break;
+            case kShowEnterNewPassword: mNewPassword    = msg.mPromptResponse; break;
+            default: break;
+        }
+    }
+
     switch (getState())
     {
-//        case kShowAResetEmailHasBeenSent:
+        case kShowAResetEmailHasBeenSent:
         case kShowCouldNotLogin:
         case kShowCouldNotRegister:
+        case kShowCouldNotResetPassword:
         case kShowEnterEmailFirst:
-//        case kShowEnterResetCode:
+        case kShowEnterNewPassword:
+        case kShowEnterResetCode:
         case kShowIncorrectFormat:
-//        case kShowNotYetImplemented:
+        case kShowRetryChangePassword:
         case kShowRetryLogin:
         case kShowRetryRegister:
-//        case kShowSendResetEmail:
+        case kShowRetryResetEmail:
+        case kShowRetryVerifyPin:
+        case kShowSendResetEmail:
+        case kShowSuccessChangedPassword:
         case kShowURLMissingSlash:
         case kShowUserRegistraionSuccessful:
             switch(msg.mEvent)

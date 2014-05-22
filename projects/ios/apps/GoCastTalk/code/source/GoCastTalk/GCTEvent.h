@@ -36,6 +36,7 @@ public:
     JSONArray   mGroup;
     std::string mTranscription;
     std::string mContact;
+    std::string mPromptResponse;
     tUInt32     mItemSelected;
     void*       mIdentifier;
     bool        mManualLogout;
@@ -45,7 +46,7 @@ public:
     GCTEvent(EventType evt, tUInt32 newItemSelected)
     : mEvent(evt), mItemSelected(newItemSelected) { }
     GCTEvent(EventType evt, const std::string& newTranscription)
-    : mEvent(evt), mTranscription(newTranscription), mContact(newTranscription), mManualLogout(newTranscription == "true") { }
+    : mEvent(evt), mTranscription(newTranscription), mContact(newTranscription), mPromptResponse(newTranscription), mManualLogout(newTranscription == "true") { }
     GCTEvent(EventType evt, const std::string& newTranscription, void* newIdentifier)
     : mEvent(evt), mContact(newTranscription), mIdentifier(newIdentifier) { }
     GCTEvent(EventType evt, const JSONArray& newGroup, void* newIdentifier)

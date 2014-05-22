@@ -23,7 +23,22 @@
 23 Is email blank?
 24 Show "Enter email first"
 25 Show "user registraion successful"
-26 Peer: send email to support
+26 Show "Send reset email?"
+27 Show "A reset email has been sent"
+28 Show "Enter reset code"*
+29 Send resetEmail to server
+30 Show "Retry resetEmail?"
+31 Show "Could not reset password"
+32 Send verifyPin to server
+33 Was resetEmail valid?
+34 Show "Retry verifyPin?"
+35 Was verifyPin valid?
+36 Show "Enter new password"
+37 Send changePassword to server
+38 Was changePassword successful?
+39 Show "Success changed password"
+40 Show "Retry changePassword?"
+41 Did app relaunch to pin state?
 #
 1 19
 3 23 troublePressed
@@ -52,8 +67,8 @@
 16 11 success
 18 10
 19 20 success
-19 3 fail
-20 3
+19 41 fail
+20 41
 22 21 fail
 21 15 yes
 21 3 no
@@ -61,4 +76,32 @@
 23 26 no
 23 24 yes
 24 3 yes
-26 3
+26 3 no
+26 29 yes
+27 28 yes
+28 32 yes
+29 30 fail
+30 29 yes
+30 31 no
+31 3 yes
+29 33 success
+28 31 no
+33 27 yes
+33 31 no
+32 34 fail
+34 32 yes
+34 31 no
+32 35 success
+35 31 no
+35 36 yes
+36 37 yes
+36 31 no
+38 39 yes
+37 38 success
+38 31 no
+39 3 yes
+37 40 fail
+40 37 yes
+40 31 no
+41 3 no
+41 28 yes

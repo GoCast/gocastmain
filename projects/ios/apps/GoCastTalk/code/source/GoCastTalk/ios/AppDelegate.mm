@@ -372,7 +372,14 @@ const unsigned char SpeechKitApplicationKey[] =
 #pragma unused(alertView)
     if (buttonIndex == 0)
     {
-        GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kOKYesAlertPressed));
+        if (alertView.alertViewStyle == UIAlertViewStylePlainTextInput)
+        {
+            GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kOKYesAlertPressed, [[alertView textFieldAtIndex:0].text UTF8String]));
+        }
+        else
+        {
+            GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kOKYesAlertPressed));
+        }
     }
     else
     {
