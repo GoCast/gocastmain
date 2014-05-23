@@ -139,6 +139,7 @@ function gzip_file($file)
 	atomic_gzput_contents($file.'.gz', atomic_get_contents($file));
 
 	@unlink($file);
+	@unlink($file.".lock");
 }
 
 function check_roll_yesterday($time)
@@ -149,7 +150,11 @@ function check_roll_yesterday($time)
 
 	if (is_file($GLOBALS['database']."/global/logs/".$date.".txt"))
 	{
-		gzip_file($GLOBALS['database']."/global/logs/".$date.".txt");
+		if (!is_file($GLOBALS['database']."/global/logs/".$date.".txt.lock"))
+		{
+			atomic_put_contents($GLOBALS['database']."/global/logs/".$date.".txt.lock", "lock");
+			gzip_file($GLOBALS['database']."/global/logs/".$date.".txt");
+		}
 	}
 }
 
