@@ -151,5 +151,11 @@
     "English": "英語",
     "Japanese": "日本語",
 
+    "Please enter a new password:": "新しいパスワードを入力してください。",
+    "Could not reset password": "パスワードがリセットできませんでした。",
+    "Error contacting server. Retry change password?": "サーバーに接続できませんでした。もう一度パスワードを設定しますか？",
+    "Error contacting server. Retry send email?": "サーバーに接続できませんでした。eメールを再送しますか？",
+    "Error contacting server. Retry verify pin?": "サーバーに接続できませんでした。確認番号を再送しますか？",
+
     "x": "x"
 }
