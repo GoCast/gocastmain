@@ -20,6 +20,22 @@ function atomic_put_contents($filename, $data)
 	return FALSE;
 }
 
+function atomic_gzput_contents($filename, $data)
+{
+    $fp = gzopen($filename, "wb");
+
+	if ($fp != FALSE)
+	{
+		$count = gzwrite($fp, $data);
+
+		gzclose($fp);
+
+		return $count;
+	}
+	
+	return FALSE;
+}
+
 function atomic_append_contents($filename, $data)
 {
     $fp = fopen($filename, "a+");
@@ -103,10 +119,70 @@ function errorAuthToken()
 					"message" => "Invalid or expired token");
 }
 
-function appendLog()
+function udate()
 {
-	$data = "TIME: ".date("Y-m-d_H:i:s",$_SERVER['REQUEST_TIME'])." IP: ".$_SERVER['REMOTE_ADDR']." URL: ".$_SERVER['REQUEST_URI']."\n";
-	atomic_append_contents($GLOBALS['database']."/global/log.txt", $data);
+	$utimestamp = microtime(true);
+
+	$timestamp = floor($utimestamp);
+	$milliseconds = round(($utimestamp - $timestamp) * 100);
+
+	if (strlen($milliseconds) == 1)
+	{
+		$milliseconds = '0'.$milliseconds;
+	}
+
+	return $milliseconds;
+}
+
+function gzip_file($file)
+{
+	atomic_gzput_contents($file.'.gz', atomic_get_contents($file));
+
+	@unlink($file);
+}
+
+function check_roll_yesterday($time)
+{
+	date_default_timezone_set("UTC");
+
+	$date = date("Ymd", $time - 60 * 60 * 24);
+
+	if (is_file($GLOBALS['database']."/global/logs/".$date.".txt"))
+	{
+		gzip_file($GLOBALS['database']."/global/logs/".$date.".txt");
+	}
+}
+
+function print_and_log($result)
+{
+	date_default_timezone_set("UTC");
+
+	$time = time();
+	$date = date("Ymd", $time);
+	$key  = $date.date("His").udate();
+	check_roll_yesterday($time);
+
+	$arr = array();
+	
+	array_push($arr, array("ip" => $_SERVER['REMOTE_ADDR']));
+
+	if ($_SERVER['REQUEST_METHOD'] === "GET")
+	{
+		array_push($arr, array("GET" => $_GET));
+	}
+	else
+	{
+		array_push($arr, array("POST" => $_POST));
+	}
+
+	array_push($arr, array("result" => json_decode($result)));
+
+	$json = json_encode($arr);
+
+	$data = '"'.$key.'": '.$json.", \n";
+	atomic_append_contents($GLOBALS['database']."/global/logs/".$date.".txt", $data);
+
+	print($result);
 }
 
 ?>

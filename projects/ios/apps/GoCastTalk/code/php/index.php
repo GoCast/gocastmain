@@ -34,8 +34,6 @@ include 'postTranscription.php';
 
 include 'validUsers.php';
 
-appendLog();
-
 $device = "";
 if (hasParam("device"))
 {
@@ -55,51 +53,51 @@ if(hasParam("action"))
 					switch($_POST["action"])
 					{
 						case "validUsers":
-							print(json_encode(validUsers()));
+							print_and_log(json_encode(validUsers()));
 							break;
 
 						case "setContacts":
-							print(json_encode(setContacts($_POST["name"])));
+							print_and_log(json_encode(setContacts($_POST["name"])));
 							break;
 
 						case "setGroups":
-							print(json_encode(setGroups($_POST["name"])));
+							print_and_log(json_encode(setGroups($_POST["name"])));
 							break;
 
 						case "postAudio":
 							if (hasParam("audio"))
 							{
-								print(json_encode(postAudio($_POST["name"], $_POST["audio"])));
+								print_and_log(json_encode(postAudio($_POST["name"], $_POST["audio"])));
 							}
 							else
 							{
-								print(json_encode(errorMissingParameter("audio")));
+								print_and_log(json_encode(errorMissingParameter("audio")));
 							}
 							break;
 
 						case "postMessage":
-							print(json_encode(postMessage($_POST["name"])));
+							print_and_log(json_encode(postMessage($_POST["name"])));
 							break;
 
 						case "postTranscription":
 							if (hasParam("audio"))
 							{
-								print(json_encode(postTranscription($_POST["name"], $_POST["audio"])));
+								print_and_log(json_encode(postTranscription($_POST["name"], $_POST["audio"])));
 							}
 							else
 							{
-								print(json_encode(errorMissingParameter("audio")));
+								print_and_log(json_encode(errorMissingParameter("audio")));
 							}
 							break;
 
 						default:
-							print(json_encode(array("status" => "fail", "message" => "Unknown command")));
+							print_and_log(json_encode(array("status" => "fail", "message" => "Unknown command")));
 							break;
 					}
 				}
 				else
 				{
-					print(json_encode(errorAuthToken()));
+					print_and_log(json_encode(errorAuthToken()));
 				}
 			}
 			else
@@ -111,7 +109,7 @@ if(hasParam("action"))
 						case "getFile":
 							if (hasParam("audio"))
 							{
-								print(json_encode(getFile($_GET["audio"])));
+								print_and_log(json_encode(getFile($_GET["audio"])));
 							}
 							else
 							{
@@ -125,22 +123,22 @@ if(hasParam("action"))
 							{
 								if (hasParam("newpassword"))
 								{
-									print(json_encode(changePassword($_GET["name"], $_GET["oldpassword"], $_GET["newpassword"])));
+									print_and_log(json_encode(changePassword($_GET["name"], $_GET["oldpassword"], $_GET["newpassword"])));
 								}
 								else
 								{
-									print(json_encode(errorMissingParameter("newpassword")));
+									print_and_log(json_encode(errorMissingParameter("newpassword")));
 								}
 							}
 							else
 							{
-								print(json_encode(errorMissingParameter("oldpassword")));
+								print_and_log(json_encode(errorMissingParameter("oldpassword")));
 							}
 							break;
 
 						case "registerDevice":
 							add_new_device($_GET["name"], $device);
-							print(json_encode(array("status" => "success", "message" => "Register Device succeeded")));
+							print_and_log(json_encode(array("status" => "success", "message" => "Register Device succeeded")));
 							break;
 
 						case "logout":
@@ -148,50 +146,50 @@ if(hasParam("action"))
 							{
 								remove_new_device($_GET["name"], $device);
 
-								print(json_encode(array("status" => "success", "message" => "Logout succeeded")));
+								print_and_log(json_encode(array("status" => "success", "message" => "Logout succeeded")));
 							}
 							else
 							{
-								print(json_encode(array("status" => "fail", "message" => "Could not remove token from server")));
+								print_and_log(json_encode(array("status" => "fail", "message" => "Could not remove token from server")));
 							}
 							break;
 
 						case "getContacts":
-							print(json_encode(getContacts($_GET["name"])));
+							print_and_log(json_encode(getContacts($_GET["name"])));
 							break;
 
 						case "getGroups":
-							print(json_encode(getGroups($_GET["name"])));
+							print_and_log(json_encode(getGroups($_GET["name"])));
 							break;
 
 						case "listMessages":
-							print(json_encode(listMessages($_GET["name"])));
+							print_and_log(json_encode(listMessages($_GET["name"])));
 							break;
 
 						case "deleteMessage":
 							if (hasParam("audio"))
 							{
-								print(json_encode(deleteMessage($_GET["name"], $_GET["audio"])));
+								print_and_log(json_encode(deleteMessage($_GET["name"], $_GET["audio"])));
 							}
 							else
 							{
-								print(json_encode(errorMissingParameter("audio")));
+								print_and_log(json_encode(errorMissingParameter("audio")));
 							}
 							break;
 
 						case "markRead":
 							if (hasParam("audio"))
 							{
-								print(json_encode(markRead($_GET["name"], $_GET["audio"])));
+								print_and_log(json_encode(markRead($_GET["name"], $_GET["audio"])));
 							}
 							else
 							{
-								print(json_encode(errorMissingParameter("audio")));
+								print_and_log(json_encode(errorMissingParameter("audio")));
 							}
 							break;
 
 						default:
-							print(json_encode(array("status" => "fail", "message" => "Unknown command")));
+							print_and_log(json_encode(array("status" => "fail", "message" => "Unknown command")));
 							break;
 					}
 				}
@@ -203,13 +201,13 @@ if(hasParam("action"))
 						exit;
 					}
 
-					print(json_encode(errorAuthToken()));
+					print_and_log(json_encode(errorAuthToken()));
 				}
 			}
 		}
 		else
 		{
-			print(json_encode(errorMissingParameter("name")));
+			print_and_log(json_encode(errorMissingParameter("name")));
 		}
 	}
 	else
@@ -223,44 +221,44 @@ if(hasParam("action"))
 					case "resetEmail":
 						if (hasParam("lang"))
 						{
-							print(json_encode(sendResetEmail($_GET["name"], $_GET["lang"])));
+							print_and_log(json_encode(sendResetEmail($_GET["name"], $_GET["lang"])));
 						}
 						else
 						{
-							print(json_encode(sendResetEmail($_GET["name"], "en")));
+							print_and_log(json_encode(sendResetEmail($_GET["name"], "en")));
 						}
 						break;
 
 					case "verifyPin":
 						if (hasParam("pin"))
 						{
-							print(json_encode(verifyPin($_GET["name"], $_GET["pin"])));
+							print_and_log(json_encode(verifyPin($_GET["name"], $_GET["pin"])));
 						}
 						else
 						{
-							print(json_encode(errorMissingParameter("pin")));
+							print_and_log(json_encode(errorMissingParameter("pin")));
 						}
 						break;
 
 					case "register":
 						if (hasParam("password"))
 						{
-							print(json_encode(register($_GET["name"], $_GET["password"], $device)));
+							print_and_log(json_encode(register($_GET["name"], $_GET["password"], $device)));
 						}
 						else
 						{
-							print(json_encode(errorMissingParameter("password")));
+							print_and_log(json_encode(errorMissingParameter("password")));
 						}
 						break;
 
 					case "login":
 						if (hasParam("password"))
 						{
-							print(json_encode(login($_GET["name"], $_GET["password"], $device)));
+							print_and_log(json_encode(login($_GET["name"], $_GET["password"], $device)));
 						}
 						else
 						{
-							print(json_encode(errorMissingParameter("password")));
+							print_and_log(json_encode(errorMissingParameter("password")));
 						}
 						break;
 
@@ -269,21 +267,21 @@ if(hasParam("action"))
 						{
 							if (hasParam("newpassword"))
 							{
-								print(json_encode(changePassword($_GET["name"], $_GET["oldpassword"], $_GET["newpassword"])));
+								print_and_log(json_encode(changePassword($_GET["name"], $_GET["oldpassword"], $_GET["newpassword"])));
 							}
 							else
 							{
-								print(json_encode(errorMissingParameter("newpassword")));
+								print_and_log(json_encode(errorMissingParameter("newpassword")));
 							}
 						}
 						else
 						{
-							print(json_encode(errorMissingParameter("oldpassword")));
+							print_and_log(json_encode(errorMissingParameter("oldpassword")));
 						}
 						break;
 
 					default:
-						print(json_encode(array("status" => "fail", "message" => "Unknown command")));
+						print_and_log(json_encode(array("status" => "fail", "message" => "Unknown command")));
 						break;
 				}
 			}
@@ -291,22 +289,22 @@ if(hasParam("action"))
 			{
 				if ($_GET["action"] === "version")
 				{
-					print('{ "status": "success", "version": "1" }');
+					print_and_log('{ "status": "success", "version": "1" }');
 				}
 				else
 				{
-					print(json_encode(errorMissingParameter("name")));
+					print_and_log(json_encode(errorMissingParameter("name")));
 				}
 			}
 		}
 		else
 		{
-			print(json_encode(errorMissingParameter("name")));
+			print_and_log(json_encode(errorMissingParameter("name")));
 		}
 	}
 }
 else
 {
-	print(json_encode(errorMissingParameter("action")));
+	print_and_log(json_encode(errorMissingParameter("action")));
 }
 ?>
