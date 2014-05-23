@@ -185,6 +185,12 @@ function print_and_log($result)
 	$json = json_encode($arr);
 
 	$data = '"'.$key.'": '.$json.", \n";
+
+	if (!is_dir($GLOBALS['database']."/global/logs"))
+	{
+		mkdir($GLOBALS['database']."/global/logs", 0777, true);
+	}
+
 	atomic_append_contents($GLOBALS['database']."/global/logs/".$date.".txt", $data);
 
 	print($result);
