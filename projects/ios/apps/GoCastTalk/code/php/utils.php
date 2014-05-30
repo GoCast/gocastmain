@@ -98,7 +98,7 @@ function userExists($name)
 
 function isntEmpty($x)
 {
-	if(isset($x) && !empty($x))
+	if(isset($x) && !empty($x) && !is_null($x))
 	{
 		return true;
 	}
