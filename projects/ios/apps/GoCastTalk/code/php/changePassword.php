@@ -45,7 +45,7 @@ function changePassword($name, $password, $newpassword)
 	$result = "";
 	$oldpassword = getPassword($name);
 
-	if (isset($oldpassword) && !empty($oldpassword))
+	if (isntEmpty($name) && isntEmpty($password) && isntEmpty($newpassword))
 	{
 		if ($password === $oldpassword)
 		{

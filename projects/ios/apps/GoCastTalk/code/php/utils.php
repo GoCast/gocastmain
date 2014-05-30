@@ -96,10 +96,19 @@ function userExists($name)
 	return false;
 }
 
+function isntEmpty($x)
+{
+	if(isset($x) && !empty($x))
+	{
+		return true;
+	}
+	
+	return false;
+}
+
 function hasParam($x)
 {
-	if( (isset($_GET[$x]) && !empty($_GET[$x])) ||
-		(isset($_POST[$x]) && !empty($_POST[$x])) )
+	if( isntEmpty($_GET[$x]) || isntEmpty($_POST[$x]) )
 	{
 		return true;
 	}

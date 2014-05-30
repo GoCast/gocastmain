@@ -5,7 +5,7 @@ function login($name, $password, $device)
 	$name = trim($name);
 	$password = trim($password);
 
-	if ($name !== '' && $password !== '')
+	if (isntEmpty($name) && isntEmpty($password))
 	{
 		if (is_file($GLOBALS['database']."/accounts.json"))
 		{
