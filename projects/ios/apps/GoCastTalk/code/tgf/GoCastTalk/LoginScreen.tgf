@@ -39,6 +39,8 @@
 39 Show "Success changed password"
 40 Show "Retry changePassword?"
 41 Did app relaunch to pin state?
+42 Show "login Locked"
+43 Show "resetEmail Locked"
 #
 1 19
 3 23 troublePressed
@@ -105,3 +107,7 @@
 40 31 no
 41 3 no
 41 28 yes
+5 42 locked
+42 6 yes
+33 43 locked
+43 31 yes

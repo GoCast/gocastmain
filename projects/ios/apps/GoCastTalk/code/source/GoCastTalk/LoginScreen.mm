@@ -141,13 +141,18 @@ void LoginScreen::wasChangePasswordSuccessfulEntry()
 void LoginScreen::wasLoginValidEntry()
 {
     bool result = false;
+    bool locked = false;
 
     if (mLoginJSON["status"].mString == std::string("success"))
     {
         result = true;
     }
+    else if (mLoginJSON["status"].mString == std::string("locked"))
+    {
+        locked = true;
+    }
 
-    SetImmediateEvent(result ? kYes : kNo);
+    SetImmediateEvent(locked ? kLocked : (result ? kYes : kNo));
 }
 
 void LoginScreen::wasRegisterValidEntry()
@@ -171,13 +176,18 @@ void LoginScreen::wasRegisterValidEntry()
 void LoginScreen::wasResetEmailValidEntry()
 {
     bool result = false;
+    bool locked = false;
 
     if (mResetEmailJSON["status"].mString == std::string("success"))
     {
         result = true;
     }
+    else if (mResetEmailJSON["status"].mString == std::string("locked"))
+    {
+        locked = true;
+    }
 
-    SetImmediateEvent(result ? kYes : kNo);
+    SetImmediateEvent(locked ? kLocked : (result ? kYes : kNo));
 }
 
 void LoginScreen::wasVerifyPinValidEntry()
@@ -343,6 +353,18 @@ void LoginScreen::validateURLEntry()
 }
 
 #pragma mark UI
+void LoginScreen::showLoginLockedEntry()
+{
+    GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showLoginLockedEntry");
+    tAlert("Five unsuccessful login attempts occurred. Your account will be locked for a half hour.");
+}
+
+void LoginScreen::showResetEmailLockedEntry()
+{
+    GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showResetEmailLockedEntry");
+    tAlert("Five unsuccessful password reset attempts occurred. Your account will be locked for a half hour.");
+}
+
 void LoginScreen::showUserRegistraionSuccessfulEntry()
 {
     GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showUserRegistraionSuccessfulEntry");
@@ -351,27 +373,32 @@ void LoginScreen::showUserRegistraionSuccessfulEntry()
 
 void LoginScreen::showAResetEmailHasBeenSentEntry()
 {
+    GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showAResetEmailHasBeenSentEntry");
     tAlert("A reset email has been sent to the email provided.");
 }
 
 void LoginScreen::showEnterNewPasswordEntry()
 {
+    GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showEnterNewPasswordEntry");
     tPrompt("Please enter a new password:");
 }
 
 void LoginScreen::showEnterResetCodeEntry()
 {
+    GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showEnterResetCodeEntry");
     tFile(tFile::kPreferencesDirectory, "pin.txt").write("yes");
     tPrompt("Please enter the 6-digit reset code:");
 }
 
 void LoginScreen::showEnterResetCodeExit()
 {
+    GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showEnterResetCodeExit");
     tFile(tFile::kPreferencesDirectory, "pin.txt").remove();
 }
 
 void LoginScreen::showSendResetEmailEntry()
 {
+    GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showSendResetEmailEntry");
     tConfirm("Send a reset code to the provided email address?");
 }
 
@@ -484,6 +511,8 @@ void LoginScreen::CallEntry()
 		case kShowEnterNewPassword: showEnterNewPasswordEntry(); break;
 		case kShowEnterResetCode: showEnterResetCodeEntry(); break;
 		case kShowIncorrectFormat: showIncorrectFormatEntry(); break;
+		case kShowLoginLocked: showLoginLockedEntry(); break;
+		case kShowResetEmailLocked: showResetEmailLockedEntry(); break;
 		case kShowRetryChangePassword: showRetryChangePasswordEntry(); break;
 		case kShowRetryLogin: showRetryLoginEntry(); break;
 		case kShowRetryRegister: showRetryRegisterEntry(); break;
@@ -552,6 +581,8 @@ int  LoginScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kShowEnterResetCode) && (evt == kNo)) return kShowCouldNotResetPassword; else
 	if ((mState == kShowEnterResetCode) && (evt == kYes)) return kSendVerifyPinToServer; else
 	if ((mState == kShowIncorrectFormat) && (evt == kYes)) return kIdle; else
+	if ((mState == kShowLoginLocked) && (evt == kYes)) return kShowCouldNotLogin; else
+	if ((mState == kShowResetEmailLocked) && (evt == kYes)) return kShowCouldNotResetPassword; else
 	if ((mState == kShowRetryChangePassword) && (evt == kNo)) return kShowCouldNotResetPassword; else
 	if ((mState == kShowRetryChangePassword) && (evt == kYes)) return kSendChangePasswordToServer; else
 	if ((mState == kShowRetryLogin) && (evt == kNo)) return kShowCouldNotLogin; else
@@ -573,10 +604,12 @@ int  LoginScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kValidateURL) && (evt == kSuccess)) return kEnsureSigninInfo; else
 	if ((mState == kWasChangePasswordSuccessful) && (evt == kNo)) return kShowCouldNotResetPassword; else
 	if ((mState == kWasChangePasswordSuccessful) && (evt == kYes)) return kShowSuccessChangedPassword; else
+	if ((mState == kWasLoginValid) && (evt == kLocked)) return kShowLoginLocked; else
 	if ((mState == kWasLoginValid) && (evt == kNo)) return kShowCouldNotLogin; else
 	if ((mState == kWasLoginValid) && (evt == kYes)) return kStoreTokenInformation; else
 	if ((mState == kWasRegisterValid) && (evt == kNo)) return kShowCouldNotRegister; else
 	if ((mState == kWasRegisterValid) && (evt == kYes)) return kStoreTokenInformation; else
+	if ((mState == kWasResetEmailValid) && (evt == kLocked)) return kShowResetEmailLocked; else
 	if ((mState == kWasResetEmailValid) && (evt == kNo)) return kShowCouldNotResetPassword; else
 	if ((mState == kWasResetEmailValid) && (evt == kYes)) return kShowAResetEmailHasBeenSent; else
 	if ((mState == kWasVerifyPinValid) && (evt == kNo)) return kShowCouldNotResetPassword; else
@@ -730,6 +763,8 @@ void LoginScreen::update(const GCTEvent& msg)
         case kShowEnterNewPassword:
         case kShowEnterResetCode:
         case kShowIncorrectFormat:
+        case kShowLoginLocked:
+        case kShowResetEmailLocked:
         case kShowRetryChangePassword:
         case kShowRetryLogin:
         case kShowRetryRegister:

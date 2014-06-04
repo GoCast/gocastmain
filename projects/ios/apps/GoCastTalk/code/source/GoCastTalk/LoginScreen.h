@@ -67,6 +67,8 @@ protected:
 	void showEnterNewPasswordEntry();
 	void showEnterResetCodeEntry();
 	void showIncorrectFormatEntry();
+	void showLoginLockedEntry();
+	void showResetEmailLockedEntry();
 	void showRetryChangePasswordEntry();
 	void showRetryLoginEntry();
 	void showRetryRegisterEntry();
@@ -92,6 +94,7 @@ public:
 		kInvalidEvent = -2,
 		kNext = -1,
 		kFail,
+		kLocked,
 		kNo,
 		kSignInPressed,
 		kSignUpPressed,
@@ -128,6 +131,8 @@ public:
 		kShowEnterNewPassword,
 		kShowEnterResetCode,
 		kShowIncorrectFormat,
+		kShowLoginLocked,
+		kShowResetEmailLocked,
 		kShowRetryChangePassword,
 		kShowRetryLogin,
 		kShowRetryRegister,
