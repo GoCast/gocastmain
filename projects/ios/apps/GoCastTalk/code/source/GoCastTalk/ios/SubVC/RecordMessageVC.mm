@@ -20,6 +20,7 @@
 
 -(void) refreshLanguage
 {
+    self.navigationItem.rightBarButtonItem.title = [NSString stringWithUTF8String:I18N::getInstance()->retrieve("Delete").c_str()];
     self.mTranscriptionLabel.text = [NSString stringWithUTF8String:I18N::getInstance()->retrieve("Automatic Transcription").c_str()];
 
     [self.mTable reloadData];
@@ -88,15 +89,15 @@
 {
     [super viewDidLoad];
 
+    UIBarButtonItem *anotherButton = [[[UIBarButtonItem alloc] initWithTitle:[NSString stringWithUTF8String:I18N::getInstance()->retrieve("Delete").c_str()] style:UIBarButtonItemStylePlain target:self action:@selector(helpButton:)] autorelease];
+    self.navigationItem.rightBarButtonItem = anotherButton;
+
     [self refreshLanguage];
 
     [self.mTable registerNib:[UINib nibWithNibName:@"HeadingSubCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"HeadingSubCell"];
     [self.mToTable registerNib:[UINib nibWithNibName:@"CCCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"CCCell"];
 
     self.view.autoresizesSubviews = YES;
-
-    UIBarButtonItem *anotherButton = [[[UIBarButtonItem alloc] initWithTitle:[NSString stringWithUTF8String:I18N::getInstance()->retrieve("Delete").c_str()] style:UIBarButtonItemStylePlain target:self action:@selector(helpButton:)] autorelease];
-    self.navigationItem.rightBarButtonItem = anotherButton;
 
     mPeer = new RecordMessageScreen(self, mInitObject);
 
