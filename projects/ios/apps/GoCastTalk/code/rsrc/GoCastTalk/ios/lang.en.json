@@ -1,6 +1,6 @@
 {
 
-    "about text": "GoCast Talk\nThe Messaging App for Business\n\nFeatures:\n• Easily send voice messages to a specific party or group.\n• Voice messages are converted to text automatically and displayed, so recipients can grasp the content immediately.\n• Easily reply to received messages, returning voice messages with automatic text transcriptions back.\n\nNotes:\n• Voice messages can be up to 10 minutes in length. Automated transcriptions will only cover the first minute of audio.\n• Automatic text transcriptions are a free service, up to 20 transcriptions per day.\n\nVoice recognition technology by Nuance Communications, Inc.\n",
+    "about text": "GoCast Talk\nVoice Messaging\n\nFeatures:\n• Easily sends voice messages to a specific contact or group.\n• Automatically transcribes your recording so recipients can either read or hear your message.\n• Enables replies to messages with recordings and transcriptions.\n• Integrates with e-mail for recipients on other devices.\n\nNotes:\n• Supports voice messages up to ten minutes.\n• Transcribes the first minute of the recorded message.\n• Allows 20 free transcriptions per day.\n\nVoice recognition technology by Nuance Communications, Inc.\n",
 
     "Alert": "Alert",
 
