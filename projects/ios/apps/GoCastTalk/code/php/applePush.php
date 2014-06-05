@@ -1,6 +1,6 @@
 <?php
 
-function apple_push($device, $message)
+function apple_push($device, $message, $pem)
 {
 // 	echo "push to $device '$message'\n";
 
@@ -9,7 +9,7 @@ function apple_push($device, $message)
 	$passphrase = 'abc123';
 
 	$ctx = stream_context_create();
-	stream_context_set_option($ctx, 'ssl', 'local_cert', 'applePush.pem');
+	stream_context_set_option($ctx, 'ssl', 'local_cert', $pem);
 	stream_context_set_option($ctx, 'ssl', 'passphrase', $passphrase);
 
 	// Open a connection to the APNS server
@@ -41,7 +41,7 @@ function apple_push($device, $message)
 	return $result;
 }
 
-// apple_push('4869fddfb2f9ad7c6137d433043f3e345828726598d8ed8f924cf063ba15b619', 'My first push notification!');
+// apple_push('601a5c2415c49b9112cef0b24574bf0f061f2b80a7d1b06397f50928be33bcf6', 'My first push notification!', 'applePushEn.pem');
 
 function push_to_name($name, $message)
 {
@@ -65,7 +65,8 @@ function push_to_name($name, $message)
 
 	foreach($arr as $iter)
 	{
-		apple_push($iter["device"], $message);
+		apple_push($iter["device"], $message, 'applePush.pem');
+		apple_push($iter["device"], $message, 'applePushEn.pem');
 	}
 }
 
