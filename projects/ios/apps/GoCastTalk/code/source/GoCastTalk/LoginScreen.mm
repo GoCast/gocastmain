@@ -380,7 +380,7 @@ void LoginScreen::showAResetEmailHasBeenSentEntry()
 void LoginScreen::showEnterNewPasswordEntry()
 {
     GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showEnterNewPasswordEntry");
-    tPrompt("Please enter a new password:");
+    tPasswordPrompt("Please enter a new password:");
 }
 
 void LoginScreen::showEnterResetCodeEntry()
