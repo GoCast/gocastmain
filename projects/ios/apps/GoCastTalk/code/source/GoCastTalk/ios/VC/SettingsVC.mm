@@ -57,7 +57,11 @@
 
     if (tableView == self.mTable)
     {
+#if ENGLISH_ONLY
+        return (NSInteger)4;
+#else
         return (NSInteger)5;
+#endif
     }
 
     return (NSInteger)1;
@@ -81,7 +85,9 @@
     {
         const char* heading[] =
         {
+#if !ENGLISH_ONLY
             "Language",
+#endif
             "Registered Name",
             "Change Password",
             "Log Out",
@@ -90,7 +96,9 @@
 
         const char* subheading[] =
         {
+#if !ENGLISH_ONLY
             "",
+#endif
             "",
             "",
             "",
@@ -99,7 +107,9 @@
 
         const bool hasRightArrow[] =
         {
+#if !ENGLISH_ONLY
             true,
+#endif
             true,
             true,
             false,
@@ -149,12 +159,18 @@
 #pragma unused(tableView, indexPath)
     switch (indexPath.row)
     {
+#if ENGLISH_ONLY
+        case 0: mPeer->registeredNamePressed(); break;
+        case 1: mPeer->changePasswordPressed(); break;
+        case 2: mPeer->logOutPressed(); break;
+        case 3: mPeer->aboutThisAppPressed(); break;
+#else
         case 0: mPeer->changeLanguagePressed(); break;
         case 1: mPeer->registeredNamePressed(); break;
         case 2: mPeer->changePasswordPressed(); break;
         case 3: mPeer->logOutPressed(); break;
         case 4: mPeer->aboutThisAppPressed(); break;
-
+#endif
         default:
             break;
     }

@@ -15,6 +15,9 @@ std::string I18N::toLower(const std::string& s)
 
 I18N::I18N()
 {
+#if ENGLISH_ONLY
+    mLocale = "en";
+#else
     mLocale = tFile(tFile::kPreferencesDirectory, "lang.txt");
 
     if (mLocale == "")
@@ -26,6 +29,7 @@ I18N::I18N()
     {
         mLocale = "en";
     }
+#endif
 }
 
 I18N::~I18N()
