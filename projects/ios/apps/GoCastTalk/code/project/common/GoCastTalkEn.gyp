@@ -5,8 +5,8 @@
 
 	'targets': [{
 
-		'target_name': 'GoCastTalk',
-		'product_name': 'GoCastTalk',
+		'target_name': 'GoCastTalkEn',
+		'product_name': 'GoCastTalkEn',
 		'type': 'executable',
 		'mac_bundle': 1,
 

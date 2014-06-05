@@ -10,6 +10,7 @@
 
     				'dependencies': [
     					'GoCastTalk.gyp:*',
+    					'GoCastTalkEn.gyp:*',
     				], # dependencies
 
     			},	# All
