@@ -1,6 +1,6 @@
 {
 	'includes': [
-		'common.gypi',
+		'commonEn.gypi',
 	], # includes
 
 	'targets': [{
