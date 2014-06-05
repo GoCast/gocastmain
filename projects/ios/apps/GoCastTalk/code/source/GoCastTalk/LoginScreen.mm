@@ -303,7 +303,7 @@ void LoginScreen::sendChangePasswordToServerEntry()
 
     sprintf(buf, "%s?action=changePassword&name=%s&oldpassword=pin%s&newpassword=%s",
             kMemoAppServerURL,
-            InboxScreen::mEmailAddress.c_str(),
+            mEmail.c_str(),
             mPin.c_str(),
             mNewPassword.c_str());
 
@@ -316,7 +316,7 @@ void LoginScreen::sendResetEmailToServerEntry()
 
     sprintf(buf, "%s?action=resetEmail&name=%s&lang=%s",
             kMemoAppServerURL,
-            InboxScreen::mEmailAddress.c_str(),
+            mEmail.c_str(),
             I18N::getInstance()->getLocale().c_str());
 
     URLLoader::getInstance()->loadString(this, buf);
