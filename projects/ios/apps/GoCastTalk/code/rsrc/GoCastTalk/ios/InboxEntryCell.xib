@@ -14,7 +14,7 @@
                 <rect key="frame" x="0.0" y="0.0" width="320" height="81"/>
                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                 <subviews>
-                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="icon-receive.png" id="4" userLabel="mStatusIcon">
+                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="icon-receive.en.png" id="4" userLabel="mStatusIcon">
                         <rect key="frame" x="7" y="12" width="32" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     </imageView>
@@ -52,6 +52,6 @@
         </tableViewCell>
     </objects>
     <resources>
-        <image name="icon-receive.png" width="64" height="64"/>
+        <image name="icon-receive.en.png" width="64" height="64"/>
     </resources>
 </document>

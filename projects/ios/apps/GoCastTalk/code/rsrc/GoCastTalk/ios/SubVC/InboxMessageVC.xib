@@ -28,7 +28,7 @@
             <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
-                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="icon-receive.png" id="hNu-cT-feW" userLabel="mReceive">
+                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="icon-receive.en.png" id="hNu-cT-feW" userLabel="mReceive">
                     <rect key="frame" x="7" y="12" width="32" height="32"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                 </imageView>
@@ -141,7 +141,7 @@
     <resources>
         <image name="bg-throbber.png" width="154" height="154"/>
         <image name="button-play-white.png" width="64" height="64"/>
-        <image name="icon-receive.png" width="64" height="64"/>
+        <image name="icon-receive.en.png" width="64" height="64"/>
         <image name="nuancelogo.png" width="288" height="144"/>
     </resources>
 </document>
