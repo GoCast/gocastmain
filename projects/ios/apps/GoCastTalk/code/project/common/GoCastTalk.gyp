@@ -11,7 +11,7 @@
 		'mac_bundle': 1,
 
 		'defines': [
-			'ENGLISH_ONLY=1',
+			'ENGLISH_ONLY=0',
 		], #defines
 
 		'actions': [
