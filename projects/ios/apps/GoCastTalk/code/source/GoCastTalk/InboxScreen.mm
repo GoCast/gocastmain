@@ -564,7 +564,16 @@ void InboxScreen::sortTableByDateEntry()
     welcomeMessage["date"]  = std::string("2001010201010101");
     welcomeMessage["to"]    = JSONArray();
     welcomeMessage["to"].mArray.push_back(InboxScreen::mEmailAddress);
-    welcomeMessage["audio"] = std::string("welcome-feedback@gocast.it");
+
+    if (I18N::getInstance()->getLocale() != "en")
+    {
+        welcomeMessage["audio"] = std::string("welcome-feedback@gocast.it");
+    }
+    else
+    {
+        welcomeMessage["audio"] = std::string("welcome-en-feedback@gocast.it");
+    }
+
     welcomeMessage["read"]  = std::string("yes");
     welcomeMessage["transcription"] = JSONObject();
     welcomeMessage["transcription"].mObject["ja"] = I18N::getInstance()->retrieve("welcome message");
