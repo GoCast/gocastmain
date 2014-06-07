@@ -3,6 +3,9 @@
 
 $GLOBALS['database'] = 'database';
 
+$GLOBALS['SGET']	= array();
+$GLOBALS['SPOST']	= array();
+
 include 'utils.php';
 include 'token.php';
 
@@ -34,10 +37,13 @@ include 'postTranscription.php';
 
 include 'validUsers.php';
 
+$GLOBALS['SGET']	= sanitize_array($_GET);
+$GLOBALS['SPOST']	= sanitize_array($_POST);
+
 $device = "";
 if (hasParam("device"))
 {
-	$device = $_GET["device"];
+	$device = $GLOBALS['SGET']["device"];
 }
 
 if(hasParam("action"))
@@ -48,26 +54,26 @@ if(hasParam("action"))
 		{
 			if ($_SERVER['REQUEST_METHOD'] === "POST")
 			{
-				if (verify_token_user($_POST["name"], $_POST["authToken"]))
+				if (verify_token_user($GLOBALS['SPOST']["name"], $GLOBALS['SPOST']["authToken"]))
 				{
-					switch($_POST["action"])
+					switch($GLOBALS['SPOST']["action"])
 					{
 						case "validUsers":
 							print_and_log(json_encode(validUsers()));
 							break;
 
 						case "setContacts":
-							print_and_log(json_encode(setContacts($_POST["name"])));
+							print_and_log(json_encode(setContacts($GLOBALS['SPOST']["name"])));
 							break;
 
 						case "setGroups":
-							print_and_log(json_encode(setGroups($_POST["name"])));
+							print_and_log(json_encode(setGroups($GLOBALS['SPOST']["name"])));
 							break;
 
 						case "postAudio":
 							if (hasParam("audio"))
 							{
-								print_and_log(json_encode(postAudio($_POST["name"], $_POST["audio"])));
+								print_and_log(json_encode(postAudio($GLOBALS['SPOST']["name"], $GLOBALS['SPOST']["audio"])));
 							}
 							else
 							{
@@ -76,13 +82,13 @@ if(hasParam("action"))
 							break;
 
 						case "postMessage":
-							print_and_log(json_encode(postMessage($_POST["name"])));
+							print_and_log(json_encode(postMessage($GLOBALS['SPOST']["name"])));
 							break;
 
 						case "postTranscription":
 							if (hasParam("audio"))
 							{
-								print_and_log(json_encode(postTranscription($_POST["name"], $_POST["audio"])));
+								print_and_log(json_encode(postTranscription($GLOBALS['SPOST']["name"], $GLOBALS['SPOST']["audio"])));
 							}
 							else
 							{
@@ -102,14 +108,14 @@ if(hasParam("action"))
 			}
 			else
 			{
-				if (verify_token_user($_GET["name"], $_GET["authToken"]))
+				if (verify_token_user($GLOBALS['SGET']["name"], $GLOBALS['SGET']["authToken"]))
 				{
-					switch($_GET["action"])
+					switch($GLOBALS['SGET']["action"])
 					{
 						case "getFile":
 							if (hasParam("audio"))
 							{
-								print_and_log(json_encode(getFile($_GET["audio"])));
+								print_and_log(json_encode(getFile($GLOBALS['SGET']["audio"])));
 							}
 							else
 							{
@@ -123,7 +129,7 @@ if(hasParam("action"))
 							{
 								if (hasParam("newpassword"))
 								{
-									print_and_log(json_encode(changePassword($_GET["name"], $_GET["oldpassword"], $_GET["newpassword"])));
+									print_and_log(json_encode(changePassword($GLOBALS['SGET']["name"], $GLOBALS['SGET']["oldpassword"], $GLOBALS['SGET']["newpassword"])));
 								}
 								else
 								{
@@ -137,14 +143,14 @@ if(hasParam("action"))
 							break;
 
 						case "registerDevice":
-							add_new_device($_GET["name"], $device);
+							add_new_device($GLOBALS['SGET']["name"], $device);
 							print_and_log(json_encode(array("status" => "success", "message" => "Register Device succeeded")));
 							break;
 
 						case "logout":
-							if (remove_new_token($_GET["name"], $_GET["authToken"]))
+							if (remove_new_token($GLOBALS['SGET']["name"], $GLOBALS['SGET']["authToken"]))
 							{
-								remove_new_device($_GET["name"], $device);
+								remove_new_device($GLOBALS['SGET']["name"], $device);
 
 								print_and_log(json_encode(array("status" => "success", "message" => "Logout succeeded")));
 							}
@@ -155,21 +161,21 @@ if(hasParam("action"))
 							break;
 
 						case "getContacts":
-							print_and_log(json_encode(getContacts($_GET["name"])));
+							print_and_log(json_encode(getContacts($GLOBALS['SGET']["name"])));
 							break;
 
 						case "getGroups":
-							print_and_log(json_encode(getGroups($_GET["name"])));
+							print_and_log(json_encode(getGroups($GLOBALS['SGET']["name"])));
 							break;
 
 						case "listMessages":
-							print_and_log(json_encode(listMessages($_GET["name"])));
+							print_and_log(json_encode(listMessages($GLOBALS['SGET']["name"])));
 							break;
 
 						case "deleteMessage":
 							if (hasParam("audio"))
 							{
-								print_and_log(json_encode(deleteMessage($_GET["name"], $_GET["audio"])));
+								print_and_log(json_encode(deleteMessage($GLOBALS['SGET']["name"], $GLOBALS['SGET']["audio"])));
 							}
 							else
 							{
@@ -180,7 +186,7 @@ if(hasParam("action"))
 						case "markRead":
 							if (hasParam("audio"))
 							{
-								print_and_log(json_encode(markRead($_GET["name"], $_GET["audio"])));
+								print_and_log(json_encode(markRead($GLOBALS['SGET']["name"], $GLOBALS['SGET']["audio"])));
 							}
 							else
 							{
@@ -195,7 +201,7 @@ if(hasParam("action"))
 				}
 				else
 				{
-					if ($_GET["action"] === "getFile")
+					if ($GLOBALS['SGET']["action"] === "getFile")
 					{
 						http_response_code(401);
 						exit;
@@ -216,23 +222,23 @@ if(hasParam("action"))
 		{
 			if (hasParam("name"))
 			{
-				switch($_GET["action"])
+				switch($GLOBALS['SGET']["action"])
 				{
 					case "resetEmail":
 						if (hasParam("lang"))
 						{
-							print_and_log(json_encode(sendResetEmail($_GET["name"], $_GET["lang"])));
+							print_and_log(json_encode(sendResetEmail($GLOBALS['SGET']["name"], $GLOBALS['SGET']["lang"])));
 						}
 						else
 						{
-							print_and_log(json_encode(sendResetEmail($_GET["name"], "en")));
+							print_and_log(json_encode(sendResetEmail($GLOBALS['SGET']["name"], "en")));
 						}
 						break;
 
 					case "verifyPin":
 						if (hasParam("pin"))
 						{
-							print_and_log(json_encode(verifyPin($_GET["name"], $_GET["pin"])));
+							print_and_log(json_encode(verifyPin($GLOBALS['SGET']["name"], $GLOBALS['SGET']["pin"])));
 						}
 						else
 						{
@@ -243,7 +249,7 @@ if(hasParam("action"))
 					case "register":
 						if (hasParam("password"))
 						{
-							print_and_log(json_encode(register($_GET["name"], $_GET["password"], $device)));
+							print_and_log(json_encode(register($GLOBALS['SGET']["name"], $GLOBALS['SGET']["password"], $device)));
 						}
 						else
 						{
@@ -254,7 +260,7 @@ if(hasParam("action"))
 					case "login":
 						if (hasParam("password"))
 						{
-							print_and_log(json_encode(login($_GET["name"], $_GET["password"], $device)));
+							print_and_log(json_encode(login($GLOBALS['SGET']["name"], $GLOBALS['SGET']["password"], $device)));
 						}
 						else
 						{
@@ -267,7 +273,7 @@ if(hasParam("action"))
 						{
 							if (hasParam("newpassword"))
 							{
-								print_and_log(json_encode(changePassword($_GET["name"], $_GET["oldpassword"], $_GET["newpassword"])));
+								print_and_log(json_encode(changePassword($GLOBALS['SGET']["name"], $GLOBALS['SGET']["oldpassword"], $GLOBALS['SGET']["newpassword"])));
 							}
 							else
 							{
@@ -287,7 +293,7 @@ if(hasParam("action"))
 			}
 			else
 			{
-				if ($_GET["action"] === "version")
+				if ($GLOBALS['SGET']["action"] === "version")
 				{
 					print_and_log('{ "status": "success", "version": "1" }');
 				}

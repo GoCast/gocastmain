@@ -1,5 +1,41 @@
 <?php
 
+function sanitize_array( array $array )
+{
+	$result = array();
+
+	foreach( $array as $key => $val )
+	{
+		if( is_array( $val ) )
+		{
+			$result[$key] = sanitize_array( $val );
+		}
+		else if ( is_object( $val ) )
+		{
+			$result[$key] = clone $val;
+		}
+		else
+		{
+// 				$result[$key] = $val;
+
+			if ($key === 'name')
+			{
+				$name	= filter_var($val, FILTER_SANITIZE_EMAIL, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH);
+
+				if (filter_var($name, FILTER_VALIDATE_EMAIL))
+				{
+					$result[$key] = $name;
+				}
+			}
+			else
+			{
+				$result[$key] = filter_var($val, FILTER_SANITIZE_SPECIAL_CHARS, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH);
+			}
+		}
+	}
+	return $result;
+}
+
 function atomic_put_contents($filename, $data)
 {
     $fp = fopen($filename, "w+");
@@ -108,7 +144,7 @@ function isntEmpty($x)
 
 function hasParam($x)
 {
-	if( isntEmpty($_GET[$x]) || isntEmpty($_POST[$x]) )
+	if( isntEmpty($GLOBALS['SGET'][$x]) || isntEmpty($GLOBALS['SPOST'][$x]) )
 	{
 		return true;
 	}
@@ -182,11 +218,11 @@ function print_and_log($result)
 
 	if ($_SERVER['REQUEST_METHOD'] === "GET")
 	{
-		array_push($arr, array("GET" => $_GET));
+		array_push($arr, array("GET" => $GLOBALS['SGET']));
 	}
 	else
 	{
-		array_push($arr, array("POST" => $_POST));
+		array_push($arr, array("POST" => $GLOBALS['SPOST']));
 	}
 
 	array_push($arr, array("result" => json_decode($result)));
