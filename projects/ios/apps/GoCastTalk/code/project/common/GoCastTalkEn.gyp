@@ -344,6 +344,9 @@
 					'../../rsrc/GoCastTalk/<@(OS)/lang.en.json',
 					'../../rsrc/GoCastTalk/<@(OS)/lang.ja.json',
 
+					'../../rsrc/GoCastTalk/<@(OS)/begin_record.caf',
+					'../../rsrc/GoCastTalk/<@(OS)/end_record.caf',
+
 					'../../rsrc/GoCastTalk/<@(OS)/nuancelogo.png',
 
 					'../../rsrc/GoCastTalk/<@(OS)/bg-login.en.png',

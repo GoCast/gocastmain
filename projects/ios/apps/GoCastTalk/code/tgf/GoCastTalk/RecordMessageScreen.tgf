@@ -49,14 +49,16 @@
 49 Were there any non-members?
 50 Show "there were non members"
 51 Peer: send email to non-members
+52 Play "begin recording" indicator
+53 Play "end recording" indicator
 #
 3 4 no
-4 5 recordPressed
+4 52 recordPressed
 3 6 yes
 5 7
 7 8 stopPressed
 1 34
-8 32
+8 53
 6 10 playPressed
 10 9
 9 11 pausePressed
@@ -135,3 +137,5 @@
 50 14 no
 50 51 yes
 51 14
+52 5 indicatorFinished
+53 32

@@ -51,22 +51,34 @@ void RecordMessageScreen::cancelPressed()
 
 void RecordMessageScreen::pausePressed()
 {
-    update(kPausePressed);
+    if (getState() == kPlayingIdle)
+    {
+        update(kPausePressed);
+    }
 }
 
 void RecordMessageScreen::recordPressed()
 {
-    update(kRecordPressed);
+    if (getState() == kWaitToRecordIdle)
+    {
+        update(kRecordPressed);
+    }
 }
 
 void RecordMessageScreen::playPressed()
 {
-    update(kPlayPressed);
+    if (getState() == kWaitToPlayIdle || getState() == kPausedIdle)
+    {
+        update(kPlayPressed);
+    }
 }
 
 void RecordMessageScreen::stopPressed()
 {
-    update(kStopPressed);
+    if (getState() == kRecordingIdle)
+    {
+        update(kStopPressed);
+    }
 }
 
 #pragma mark Start / End / Invalid
@@ -77,6 +89,8 @@ void RecordMessageScreen::startEntry()
     mForceLogout    = false;
 
     mSound          = NULL;
+    mBeginRecordingIndicator    = NULL;
+    mEndRecordingIndicator      = NULL;
     mTenMinuteTimer = NULL;
     mDidRecord      = false;
 
@@ -88,14 +102,21 @@ void RecordMessageScreen::startEntry()
 
     mRecordTimer = new tTimer(1000);
     mRecordTimer->attach(this);
+
+    mBeginRecordingIndicator    = new tSound(tFile(tFile::kBundleDirectory, "begin_record.caf"));
+    mEndRecordingIndicator      = new tSound(tFile(tFile::kBundleDirectory, "end_record.caf"));
+
+    mBeginRecordingIndicator->attach(this);
 }
 
 void RecordMessageScreen::endEntry()
 {
-    if (mRecordTimer)       { delete mRecordTimer; mRecordTimer = NULL; }
-    if (mSliderUpdateTimer) { delete mSliderUpdateTimer; mSliderUpdateTimer = NULL; }
-    if (mTenMinuteTimer)    { delete mTenMinuteTimer; mTenMinuteTimer = NULL; }
-    if (mSound)             { delete mSound; mSound = NULL; }
+    if (mEndRecordingIndicator)     { delete mEndRecordingIndicator; mEndRecordingIndicator = NULL; }
+    if (mBeginRecordingIndicator)   { delete mBeginRecordingIndicator; mBeginRecordingIndicator = NULL; }
+    if (mRecordTimer)               { delete mRecordTimer; mRecordTimer = NULL; }
+    if (mSliderUpdateTimer)         { delete mSliderUpdateTimer; mSliderUpdateTimer = NULL; }
+    if (mTenMinuteTimer)            { delete mTenMinuteTimer; mTenMinuteTimer = NULL; }
+    if (mSound)                     { delete mSound; mSound = NULL; }
 }
 
 void RecordMessageScreen::invalidStateEntry()
@@ -439,6 +460,22 @@ void RecordMessageScreen::playAudioEntry()
     }
 }
 
+void RecordMessageScreen::playBeginRecordingIndicatorEntry()
+{
+    if (mBeginRecordingIndicator)
+    {
+        mBeginRecordingIndicator->play();
+    }
+}
+
+void RecordMessageScreen::playEndRecordingIndicatorEntry()
+{
+    if (mEndRecordingIndicator)
+    {
+        mEndRecordingIndicator->play();
+    }
+}
+
 void RecordMessageScreen::resumeAudioEntry()
 {
     if (mSound)
@@ -650,6 +687,8 @@ void RecordMessageScreen::CallEntry()
 		case kPeerSwitchToInboxTab: peerSwitchToInboxTabEntry(); break;
 		case kPeerSwitchToNewMemoTab: peerSwitchToNewMemoTabEntry(); break;
 		case kPlayAudio: playAudioEntry(); break;
+		case kPlayBeginRecordingIndicator: playBeginRecordingIndicatorEntry(); break;
+		case kPlayEndRecordingIndicator: playEndRecordingIndicatorEntry(); break;
 		case kPlayingIdle: playingIdleEntry(); break;
 		case kRecordingIdle: recordingIdleEntry(); break;
 		case kResumeAudio: resumeAudioEntry(); break;
@@ -723,6 +762,8 @@ int  RecordMessageScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kPeerSwitchToInboxTab) && (evt == kNext)) return kClearDataAndReloadTable; else
 	if ((mState == kPeerSwitchToNewMemoTab) && (evt == kNext)) return kDoWeHaveRecipientsOrARecording; else
 	if ((mState == kPlayAudio) && (evt == kNext)) return kPlayingIdle; else
+	if ((mState == kPlayBeginRecordingIndicator) && (evt == kIndicatorFinished)) return kStartRecordingAudio; else
+	if ((mState == kPlayEndRecordingIndicator) && (evt == kNext)) return kDoWeNeedToWaitForTranscription; else
 	if ((mState == kPlayingIdle) && (evt == kCancelPressed)) return kStopPlayingBeforePop; else
 	if ((mState == kPlayingIdle) && (evt == kFinishedPlaying)) return kStopAudio; else
 	if ((mState == kPlayingIdle) && (evt == kPausePressed)) return kPauseAudio; else
@@ -757,7 +798,7 @@ int  RecordMessageScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kStopAudio) && (evt == kNext)) return kDidWeRecord; else
 	if ((mState == kStopPlayingBeforePop) && (evt == kNext)) return kIsThisAForcedCancel; else
 	if ((mState == kStopPlayingBeforeSend) && (evt == kNext)) return kDoWeHaveContactsToSendTo; else
-	if ((mState == kStopRecordingAudio) && (evt == kNext)) return kDoWeNeedToWaitForTranscription; else
+	if ((mState == kStopRecordingAudio) && (evt == kNext)) return kPlayEndRecordingIndicator; else
 	if ((mState == kWaitForTranscriptionIdle) && (evt == kNewMessage)) return kPeerSwitchToNewMemoTab; else
 	if ((mState == kWaitForTranscriptionIdle) && (evt == kTranscriptionReady)) return kPeerStartEditingTranscription; else
 	if ((mState == kWaitToPlayIdle) && (evt == kCancelPressed)) return kIsThisAForcedCancel; else
@@ -766,7 +807,7 @@ int  RecordMessageScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kWaitToPlayIdle) && (evt == kSendPressed)) return kDoWeHaveContactsToSendTo; else
 	if ((mState == kWaitToRecordIdle) && (evt == kCancelPressed)) return kIsThisAForcedCancel; else
 	if ((mState == kWaitToRecordIdle) && (evt == kNewMessage)) return kPeerSwitchToNewMemoTab; else
-	if ((mState == kWaitToRecordIdle) && (evt == kRecordPressed)) return kStartRecordingAudio; else
+	if ((mState == kWaitToRecordIdle) && (evt == kRecordPressed)) return kPlayBeginRecordingIndicator; else
 	if ((mState == kWaitToRecordIdle) && (evt == kSendPressed)) return kShowNoAudioToSend; else
 	if ((mState == kWasPostAudioSuccessful) && (evt == kExpired)) return kSendForceLogoutToVC; else
 	if ((mState == kWasPostAudioSuccessful) && (evt == kNo)) return kShowPostAudioFailed; else
@@ -802,6 +843,7 @@ bool RecordMessageScreen::HasEdgeNamedNext() const
 		case kPeerSwitchToInboxTab:
 		case kPeerSwitchToNewMemoTab:
 		case kPlayAudio:
+		case kPlayEndRecordingIndicator:
 		case kResumeAudio:
 		case kSendForceLogoutToVC:
 		case kSendReloadInboxToVC:
@@ -889,7 +931,19 @@ void RecordMessageScreen::update(const tSoundEvent& msg)
 {
     switch (msg.mEvent)
     {
-        case tSoundEvent::kSoundPlayingComplete:    update(kFinishedPlaying); break;
+        case tSoundEvent::kSoundPlayingComplete:
+            if (msg.mSource == mBeginRecordingIndicator)
+            {
+                if (getState() == kPlayBeginRecordingIndicator)
+                {
+                    update(kIndicatorFinished);
+                }
+            }
+            else
+            {
+                update(kFinishedPlaying);
+            }
+            break;
 
         default:
             break;

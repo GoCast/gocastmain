@@ -23,6 +23,8 @@ protected:
     JSONObject          mTranscription;
     JSONArray           mNewMessageRecipients;
     tSound*             mSound;
+    tSound*             mBeginRecordingIndicator;
+    tSound*             mEndRecordingIndicator;
     tTimer*             mTenMinuteTimer;
     tTimer*             mSliderUpdateTimer;
     tTimer*             mRecordTimer;
@@ -73,6 +75,8 @@ protected:
 	void peerSwitchToInboxTabEntry();
 	void peerSwitchToNewMemoTabEntry();
 	void playAudioEntry();
+	void playBeginRecordingIndicatorEntry();
+	void playEndRecordingIndicatorEntry();
 	void playingIdleEntry();
 	void recordingIdleEntry();
 	void resumeAudioEntry();
@@ -115,6 +119,7 @@ public:
 		kExpired,
 		kFail,
 		kFinishedPlaying,
+		kIndicatorFinished,
 		kNewMessage,
 		kNo,
 		kPausePressed,
@@ -151,6 +156,8 @@ public:
 		kPeerSwitchToInboxTab,
 		kPeerSwitchToNewMemoTab,
 		kPlayAudio,
+		kPlayBeginRecordingIndicator,
+		kPlayEndRecordingIndicator,
 		kPlayingIdle,
 		kRecordingIdle,
 		kResumeAudio,
