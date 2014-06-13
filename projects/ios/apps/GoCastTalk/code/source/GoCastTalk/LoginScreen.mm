@@ -129,13 +129,18 @@ void LoginScreen::isEmailBlankEntry()
 void LoginScreen::wasChangePasswordSuccessfulEntry()
 {
     bool result = false;
+    bool locked = false;
 
     if (mChangePasswordJSON["status"].mString == std::string("success"))
     {
         result = true;
     }
+    else if (mChangePasswordJSON["status"].mString == std::string("locked"))
+    {
+        locked = true;
+    }
 
-    SetImmediateEvent(result ? kYes : kNo);
+    SetImmediateEvent(locked ? kLocked : (result ? kYes : kNo));
 }
 
 void LoginScreen::wasLoginValidEntry()
@@ -193,13 +198,18 @@ void LoginScreen::wasResetEmailValidEntry()
 void LoginScreen::wasVerifyPinValidEntry()
 {
     bool result = false;
+    bool locked = false;
 
     if (mVerifyPinJSON["status"].mString == std::string("success"))
     {
         result = true;
     }
+    else if (mVerifyPinJSON["status"].mString == std::string("locked"))
+    {
+        locked = true;
+    }
 
-    SetImmediateEvent(result ? kYes : kNo);
+    SetImmediateEvent(locked ? kLocked : (result ? kYes : kNo));
 }
 
 #pragma mark Actions
