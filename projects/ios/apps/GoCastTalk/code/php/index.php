@@ -6,36 +6,36 @@ $GLOBALS['database'] = 'database';
 $GLOBALS['SGET']	= array();
 $GLOBALS['SPOST']	= array();
 
-include 'php/utils.php';
-include 'php/token.php';
+include 'code/utils.php';
+include 'code/token.php';
 
-include 'php/deviceToken.php';
-include 'php/applePush.php';
+include 'code/deviceToken.php';
+include 'code/applePush.php';
 
-include 'php/login.php';
-include 'php/register.php';
+include 'code/login.php';
+include 'code/register.php';
 
-include 'php/sendResetEmail.php';
+include 'code/sendResetEmail.php';
 
-include 'php/changePassword.php';
+include 'code/changePassword.php';
 
-include 'php/listMessages.php';
-include 'php/deleteMessage.php';
-include 'php/markRead.php';
+include 'code/listMessages.php';
+include 'code/deleteMessage.php';
+include 'code/markRead.php';
 
-include 'php/getContacts.php';
-include 'php/setContacts.php';
+include 'code/getContacts.php';
+include 'code/setContacts.php';
 
-include 'php/getGroups.php';
-include 'php/setGroups.php';
+include 'code/getGroups.php';
+include 'code/setGroups.php';
 
-include 'php/getFile.php';
+include 'code/getFile.php';
 
-include 'php/postAudio.php';
-include 'php/postMessage.php';
-include 'php/postTranscription.php';
+include 'code/postAudio.php';
+include 'code/postMessage.php';
+include 'code/postTranscription.php';
 
-include 'php/validUsers.php';
+include 'code/validUsers.php';
 
 $GLOBALS['SGET']	= sanitize_array($_GET);
 $GLOBALS['SPOST']	= sanitize_array($_POST);
