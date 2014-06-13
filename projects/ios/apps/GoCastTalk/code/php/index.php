@@ -6,36 +6,36 @@ $GLOBALS['database'] = 'database';
 $GLOBALS['SGET']	= array();
 $GLOBALS['SPOST']	= array();
 
-include 'utils.php';
-include 'token.php';
+include 'php/utils.php';
+include 'php/token.php';
 
-include 'deviceToken.php';
-include 'applePush.php';
+include 'php/deviceToken.php';
+include 'php/applePush.php';
 
-include 'login.php';
-include 'register.php';
+include 'php/login.php';
+include 'php/register.php';
 
-include 'sendResetEmail.php';
+include 'php/sendResetEmail.php';
 
-include 'changePassword.php';
+include 'php/changePassword.php';
 
-include 'listMessages.php';
-include 'deleteMessage.php';
-include 'markRead.php';
+include 'php/listMessages.php';
+include 'php/deleteMessage.php';
+include 'php/markRead.php';
 
-include 'getContacts.php';
-include 'setContacts.php';
+include 'php/getContacts.php';
+include 'php/setContacts.php';
 
-include 'getGroups.php';
-include 'setGroups.php';
+include 'php/getGroups.php';
+include 'php/setGroups.php';
 
-include 'getFile.php';
+include 'php/getFile.php';
 
-include 'postAudio.php';
-include 'postMessage.php';
-include 'postTranscription.php';
+include 'php/postAudio.php';
+include 'php/postMessage.php';
+include 'php/postTranscription.php';
 
-include 'validUsers.php';
+include 'php/validUsers.php';
 
 $GLOBALS['SGET']	= sanitize_array($_GET);
 $GLOBALS['SPOST']	= sanitize_array($_POST);

@@ -91,7 +91,7 @@ function sendResetEmail($name, $lang)
 	$pin = generate_pin();
 	
 	write_pin_user($name, $pin);
-	$shresult = shell_exec('./mailgun.'.$lang.'.sh '.$name.' '.$pin);
+	$shresult = shell_exec('./sh/mailgun.'.$lang.'.sh '.$name.' '.$pin);
 
 	$result = array("status" => "success",
 					"message" => "Pin created");
