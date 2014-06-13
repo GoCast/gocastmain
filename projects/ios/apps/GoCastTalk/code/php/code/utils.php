@@ -16,20 +16,15 @@ function sanitize_array( array $array )
 		}
 		else
 		{
-// 				$result[$key] = $val;
+			$sanitized = filter_var($val, FILTER_SANITIZE_SPECIAL_CHARS, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH);
 
-			if ($key === 'name')
+			if ($sanitized === $val)
 			{
-				$name	= filter_var($val, FILTER_SANITIZE_EMAIL, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH);
-
-				if (filter_var($name, FILTER_VALIDATE_EMAIL))
-				{
-					$result[$key] = $name;
-				}
+				$result[$key] = $sanitized;
 			}
 			else
 			{
-				$result[$key] = filter_var($val, FILTER_SANITIZE_SPECIAL_CHARS, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH);
+				$GLOBALS['invalid_input'] = true;
 			}
 		}
 	}
