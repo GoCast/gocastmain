@@ -22,12 +22,13 @@ I18N::I18N()
 
     if (mLocale == "")
     {
-        mLocale = [[[NSLocale preferredLanguages] objectAtIndex:0] UTF8String];
+        mLocale = "ja";
+//        mLocale = [[[NSLocale preferredLanguages] objectAtIndex:0] UTF8String];
     }
 
-    if (mLocale != "ja")
+    if (mLocale != "en")
     {
-        mLocale = "en";
+        mLocale = "ja";
     }
 #endif
 }
