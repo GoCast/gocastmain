@@ -3,6 +3,8 @@
 
 $GLOBALS['invalid_input'] = false;
 $GLOBALS['database'] = 'database';
+$GLOBALS['dmode'] = 0777;
+$GLOBALS['fmode'] = 0777;
 
 $GLOBALS['SGET']	= array();
 $GLOBALS['SPOST']	= array();

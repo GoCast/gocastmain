@@ -6,10 +6,7 @@ function write_token_user($name, $token)
 	$json	= false;
 	$arr	= array();
 
-	if (!is_dir($GLOBALS['database']."/user/$name"))
-	{
-		mkdir($GLOBALS['database']."/user/$name", 0777, true);
-	}
+	ensure_database_dir("/user/$name");
 
 	if (is_file($GLOBALS['database']."/user/$name/tokens.json"))
 	{
@@ -37,10 +34,7 @@ function write_token_global($name, $token)
 	$json	= false;
 	$arr	= array();
 
-	if (!is_dir($GLOBALS['database']."/global"))
-	{
-		mkdir($GLOBALS['database']."/global", 0777, true);
-	}
+	ensure_database_dir("/global");
 
 	if (is_file($GLOBALS['database']."/global/tokens.json"))
 	{
@@ -70,10 +64,7 @@ function remove_token_user($name, $token)
 	$arr2	= array();
 	$found	= false;
 
-	if (!is_dir($GLOBALS['database']."/user/$name"))
-	{
-		mkdir($GLOBALS['database']."/user/$name", 0777, true);
-	}
+	ensure_database_dir("/user/$name");
 
 	if (is_file($GLOBALS['database']."/user/$name/tokens.json"))
 	{
@@ -114,10 +105,7 @@ function verify_token_user($name, $token)
 	$json	= false;
 	$arr	= array();
 
-	if (!is_dir($GLOBALS['database']."/user/$name"))
-	{
-		mkdir($GLOBALS['database']."/user/$name", 0777, true);
-	}
+	ensure_database_dir("/user/$name");
 
 	if (is_file($GLOBALS['database']."/user/$name/tokens.json"))
 	{

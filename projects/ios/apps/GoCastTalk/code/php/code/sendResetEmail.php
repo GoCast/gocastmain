@@ -5,10 +5,7 @@ function write_pin_user($name, $pin)
 	$result	= false;
 	$json	= "";
 
-	if (!is_dir($GLOBALS['database']."/user/$name"))
-	{
-		mkdir($GLOBALS['database']."/user/$name", 0777, true);
-	}
+	ensure_database_dir("/user/$name");
 
 	$json = '[{"pin" : "'.$pin.'"}]';
 
@@ -38,10 +35,7 @@ function verify_pin_user($name, $pin)
 	$json	= false;
 	$arr	= array();
 
-	if (!is_dir($GLOBALS['database']."/user/$name"))
-	{
-		mkdir($GLOBALS['database']."/user/$name", 0777, true);
-	}
+	ensure_database_dir("/user/$name");
 
 	if (is_file($GLOBALS['database']."/user/$name/pin.json"))
 	{

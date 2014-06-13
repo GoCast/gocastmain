@@ -4,10 +4,7 @@ function getContacts($name)
 {
 	if (userExists($name))
 	{
-		if (!is_dir($GLOBALS['database']."/user/$name"))
-		{
-			mkdir($GLOBALS['database']."/user/$name", 0777, true);
-		}
+		ensure_database_dir("/user/$name");
 
 		$arr = array();
 		$arr["contacts"] = array();

@@ -4,10 +4,7 @@ function pmAppend($user, $data)
 {
 	$result = false;
 
-	if (!is_dir($GLOBALS['database']."/user/$user"))
-	{
-		mkdir($GLOBALS['database']."/user/$user", 0777, true);
-	}
+	ensure_database_dir("/user/$user");
 
 	$json = false;
 	$arr  = array();
@@ -50,10 +47,7 @@ function postMessage($name)
 {
 	$hadErrors = false;
 
-	if (!is_dir($GLOBALS['database']."/global/text"))
-	{
-		mkdir($GLOBALS['database']."/global/text", 0777, true);
-	}
+	ensure_database_dir("/global/text");
 
 	$json = false;
 	$arr  = array();

@@ -7,10 +7,7 @@ function register($name, $password, $device)
 
 	if (isntEmpty($name) && isntEmpty($password))
 	{
-		if (!is_dir($GLOBALS['database']."/"))
-		{
-			mkdir($GLOBALS['database']."/", 0777, true);
-		}
+		ensure_database_dir("/");
 
 		$json = false;
 

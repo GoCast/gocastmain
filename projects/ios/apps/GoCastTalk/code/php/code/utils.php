@@ -1,5 +1,13 @@
 <?php
 
+function ensure_database_dir($dir)
+{
+	if (!is_dir($GLOBALS['database'].$dir))
+	{
+		mkdir($GLOBALS['database'].$dir, $GLOBALS['dmode'], true);
+	}
+}
+
 function sanitize_array( array $array )
 {
 	$result = array();
@@ -226,10 +234,7 @@ function print_and_log($result)
 
 	$data = '"'.$key.'": '.$json.", \n";
 
-	if (!is_dir($GLOBALS['database']."/global/logs"))
-	{
-		mkdir($GLOBALS['database']."/global/logs", 0777, true);
-	}
+	ensure_database_dir("/global/logs");
 
 	atomic_append_contents($GLOBALS['database']."/global/logs/".$date.".txt", $data);
 

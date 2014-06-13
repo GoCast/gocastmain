@@ -2,14 +2,11 @@
 
 function postAudio($name, $audio)
 {
-	if (!is_dir($GLOBALS['database']."/global/audio"))
-	{
-		mkdir($GLOBALS['database']."/global/audio", 0777, true);
-	}
+	ensure_database_dir("/global/audio");
 
 	if (copy($_FILES['filename']['tmp_name'], $GLOBALS['database']."/global/audio/$audio"))
 	{
-		chmod($GLOBALS['database']."/global/audio/$audio", 0777);
+		chmod($GLOBALS['database']."/global/audio/$audio", $GLOBALS['fmode']);
 
 		$result = array("status" => "success",
 						"message" => "Upload and move successful");

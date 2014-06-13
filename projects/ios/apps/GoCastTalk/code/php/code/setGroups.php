@@ -4,10 +4,7 @@ function setGroups($name)
 {
 	if (userExists($name))
 	{
-		if (!is_dir($GLOBALS['database']."/user/$name"))
-		{
-			mkdir($GLOBALS['database']."/user/$name", 0777, true);
-		}
+		ensure_database_dir("/user/$name");
 
 		$json = atomic_get_contents($_FILES['filename']['tmp_name']);
 		json_decode($json, true);
@@ -16,7 +13,7 @@ function setGroups($name)
 		{
 			if (copy($_FILES['filename']['tmp_name'], $GLOBALS['database']."/user/$name/groups.json"))
 			{
-				chmod($GLOBALS['database']."/user/$name/groups.json", 0777);
+				chmod($GLOBALS['database']."/user/$name/groups.json", $GLOBALS['fmode']);
 
 				$result = array("status" => "success",
 								"message" => "Updated profile successfully");
