@@ -22,14 +22,14 @@ function validUsers()
 		$json = atomic_get_contents($GLOBALS['database']."/accounts.json");
 		$list = json_decode($json, true);
 
-		if (is_file($_FILES['filename']['tmp_name']))
+		if (get_file_size($_FILES['filename']['tmp_name']) < (2 * 1024 * 1024))
 		{
 			$json = atomic_get_contents($_FILES['filename']['tmp_name']);
-		
+	
 			if ($json != false)
 			{
 				$arr = json_decode($json, true);
-		
+	
 				if (isset($arr["users"]))
 				{
 					foreach($arr["users"] as $item)
@@ -64,7 +64,7 @@ function validUsers()
 		else
 		{
 			$result = array("status" => "fail",
-							"message" => "Could not open uploaded file");
+							"message" => "File is too large");
 		}
 	}
 	else

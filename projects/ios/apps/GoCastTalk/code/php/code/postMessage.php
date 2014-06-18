@@ -52,14 +52,14 @@ function postMessage($name)
 	$json = false;
 	$arr  = array();
 	
-	if (is_file($_FILES['filename']['tmp_name']))
+	if (get_file_size($_FILES['filename']['tmp_name']) < (2 * 1024 * 1024))
 	{
 		$json = atomic_get_contents($_FILES['filename']['tmp_name']);
-		
+	
 		if ($json != false)
 		{
 			$arr = json_decode($json, true);
-		
+	
 			if (pmAppend($arr["from"], $json))
 			{
 				$trans = getTranscriptForPostMessage($arr["audio"]);

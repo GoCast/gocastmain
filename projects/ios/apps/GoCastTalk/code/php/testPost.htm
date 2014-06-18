@@ -1,10 +1,10 @@
 <form enctype="multipart/form-data" action="index.php" method="POST">
-	<input type="hidden" name="action" value="postMessage">
+	<input type="hidden" name="action" value="setContacts">
 	<input type="hidden" name="name" value="tjgrant@tatewake.com">
-	<input type="hidden" name="audio" value="abc123">
+	<input type="hidden" name="authToken" value="92213ed23401128d6e0fc7feaa1696261b6bb161aac3bcf19e9108cb00673c43">
 
     <!-- MAX_FILE_SIZE must precede the file input field -->
-    <input type="hidden" name="MAX_FILE_SIZE" value="1048576" />
+    <input type="hidden" name="MAX_FILE_SIZE" value="10485760" />
     <!-- Name of input element determines name in $_FILES array -->
     Send this file: <input name="filename" type="file" />
     <input type="submit" value="Send File" />

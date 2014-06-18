@@ -8,6 +8,18 @@ function ensure_database_dir($dir)
 	}
 }
 
+function get_file_size($file)
+{
+	$result = 0;
+
+	if (is_file($file))
+	{
+		$result = filesize($file);
+	}
+	
+	return $result;
+}
+
 function sanitize_array( array $array )
 {
 	$result = array();
