@@ -1,5 +1,42 @@
 <?php
 
+function timestamp_to_readabletime($t1)
+{
+	date_default_timezone_set("UTC");
+
+	$date = date("Ymd", $t1);
+	$t2  = $date.date("Hi", $t1);
+
+	return $t2;
+}
+
+function readabletime_to_timestamp($t1)
+{
+	date_default_timezone_set("UTC");
+
+	$time	= time();
+
+	$year	= substr($t1, 0, 4);
+	$month	= substr($t1, 4, 2);
+	$day	= substr($t1, 6, 2);
+	$hour	= substr($t1, 8, 2);
+	$min	= substr($t1, 10, 2);
+
+	return strtotime("$month/$day/$year $hour:$min:00" , $time);
+}
+
+function has_thirty_minutes_passed($t1, $t2)
+{
+	return abs(readabletime_to_timestamp($t1) - readabletime_to_timestamp($t2)) >= 30*60;
+}
+
+function has_two_weeks_passed($t1, $t2)
+{
+	return abs(readabletime_to_timestamp($t1) - readabletime_to_timestamp($t2)) >= 14*24*60*60;
+}
+
+// echo (has_two_weeks_passed("201401010534", "201401150534")) ? "true\n" : "false\n";
+
 function ensure_database_dir($dir)
 {
 	if (!is_dir($GLOBALS['database'].$dir))

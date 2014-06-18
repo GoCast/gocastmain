@@ -18,37 +18,9 @@ function write_token_user($name, $token)
 		$arr = json_decode($json, true);
 	}
 
-	array_push($arr, json_decode('{"token": "'.$token.'", "date": "1999010101010101"}', true));
+	array_push($arr, json_decode('{"token": "'.$token.'", "date": "'.timestamp_to_readabletime(time()).'"}', true));
 
 	if (atomic_put_contents($GLOBALS['database']."/user/$name/tokens.json", json_encode($arr)) != false)
-	{
-		$result = true;
-	}
-
-	return $result;
-}
-
-function write_token_global($name, $token)
-{
-	$result	= false;
-	$json	= false;
-	$arr	= array();
-
-	ensure_database_dir("/global");
-
-	if (is_file($GLOBALS['database']."/global/tokens.json"))
-	{
-		$json = atomic_get_contents($GLOBALS['database']."/global/tokens.json");
-	}
-
-	if ($json != false)
-	{
-		$arr = json_decode($json, true);
-	}
-
-	array_push($arr, json_decode('{"name":"'.$name.'", "token": "'.$token.'", "date": "1999010101010101"}', true));
-
-	if (atomic_put_contents($GLOBALS['database']."/global/tokens.json", json_encode($arr)) != false)
 	{
 		$result = true;
 	}
@@ -104,6 +76,8 @@ function verify_token_user($name, $token)
 	$result	= false;
 	$json	= false;
 	$arr	= array();
+	$prune	= array();
+	$t1		= timestamp_to_readabletime(time());
 
 	ensure_database_dir("/user/$name");
 
@@ -119,11 +93,23 @@ function verify_token_user($name, $token)
 
 	foreach($arr as $iter)
 	{
-		if ($iter["token"] === $token)
+		if (has_two_weeks_passed($iter["date"], $t1) == false)
 		{
-			$result = true;
-			break;
+			if ($iter["token"] === $token)
+			{
+				$result = true;
+				break;
+			}
 		}
+		else
+		{
+			array_push($prune, $iter["token"]);
+		}
+	}
+
+	foreach($prune as $iter)
+	{
+		remove_token_user($name, $iter);
 	}
 
 	return $result;
