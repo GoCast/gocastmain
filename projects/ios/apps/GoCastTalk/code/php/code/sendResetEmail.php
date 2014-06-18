@@ -82,13 +82,23 @@ function generate_pin()
 
 function sendResetEmail($name, $lang)
 {
-	$pin = generate_pin();
-	
-	write_pin_user($name, $pin);
-	$shresult = shell_exec('./sh/mailgun.'.$lang.'.sh '.$name.' '.$pin);
+	if (can_attempt_dangerous_action($name, "resetEmail"))
+	{
+		note_dangerous_action($name, "resetEmail");
 
-	$result = array("status" => "success",
-					"message" => "Pin created");
+		$pin = generate_pin();
+	
+		write_pin_user($name, $pin);
+		$shresult = shell_exec('./sh/mailgun.'.$lang.'.sh '.$name.' '.$pin);
+
+		$result = array("status" => "success",
+						"message" => "Pin created");
+	}
+	else
+	{
+		$result = array("status" => "locked",
+						"message" => "Account locked");
+	}
 
 	return $result;
 }

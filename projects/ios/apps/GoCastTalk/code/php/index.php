@@ -15,6 +15,8 @@ include 'code/token.php';
 include 'code/deviceToken.php';
 include 'code/applePush.php';
 
+include 'code/attempts.php';
+
 include 'code/login.php';
 include 'code/register.php';
 
