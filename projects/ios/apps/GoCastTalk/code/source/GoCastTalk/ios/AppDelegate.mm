@@ -348,6 +348,11 @@ const unsigned char SpeechKitApplicationKey[] =
 
 #pragma mark -
 
+- (BOOL)tabBarController:(UITabBarController *)theTabBarController shouldSelectViewController:(UIViewController *)viewController
+{
+    return (theTabBarController.selectedViewController != viewController);
+}
+
 - (void)tabBarController:(UITabBarController *)tabBarController didSelectViewController:(UIViewController *)viewController
 {
     if (tabBarController == self.tabBarController)
