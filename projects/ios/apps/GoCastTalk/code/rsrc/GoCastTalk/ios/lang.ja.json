@@ -159,6 +159,7 @@
 
     "Five unsuccessful login attempts occurred. Your account will be locked for a half hour." : "５回続けてログインに失敗したため、このアカウントはロックされました。３０分後に再度お試しください。",
     "Five unsuccessful password reset attempts occurred. Your account will be locked for a half hour." : "５回続けてパスワードリセットに失敗したため、このアカウントはロックされました。３０分後に再度お試しください。",
+    "Five unsuccessful change password attempts occurred. Your account will be locked for a half hour." : "５回続けてパスワード変更に失敗したため、このアカウントはロックされました。３０分後に再度お試しください。",
 
     "x": "x"
 }
