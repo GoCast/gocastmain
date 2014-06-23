@@ -71,10 +71,11 @@ void ChangePasswordScreen::peerPopSelfEntry()
 }
 
 #pragma mark Queries
-void ChangePasswordScreen::wasLogoutSuccessfulEntry()
+void ChangePasswordScreen::wasChangePasswordSuccessfulEntry()
 {
     bool result     = false;
     bool expired    = false;
+    bool locked     = false;
 
     if (mChangePasswordJSON["status"].mString == std::string("success"))
     {
@@ -86,7 +87,12 @@ void ChangePasswordScreen::wasLogoutSuccessfulEntry()
         expired = true;
     }
 
-    SetImmediateEvent(expired ? kExpired : (result ? kYes : kNo));
+    if (mChangePasswordJSON["status"].mString == std::string("locked"))
+    {
+        locked = true;
+    }
+
+    SetImmediateEvent(expired ? kExpired : (locked ? kLocked : (result ? kYes : kNo)));
 }
 
 #pragma mark Actions
@@ -119,6 +125,12 @@ void ChangePasswordScreen::sendChangePasswordToServerEntry()
 void ChangePasswordScreen::setWaitForChangePasswordEntry()
 {
     [mPeer setBlockingViewVisible:true];
+}
+
+void ChangePasswordScreen::showChangePasswordLockedEntry()
+{
+    GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showChangePasswordLockedEntry");
+    tAlert("Five unsuccessful change password attempts occurred. Your account will be locked for a half hour.");
 }
 
 void ChangePasswordScreen::showErrorWithChangePasswordEntry()
@@ -158,11 +170,12 @@ void ChangePasswordScreen::CallEntry()
 		case kSendChangePasswordToServer: sendChangePasswordToServerEntry(); break;
 		case kSendForceLogoutToVC: sendForceLogoutToVCEntry(); break;
 		case kSetWaitForChangePassword: setWaitForChangePasswordEntry(); break;
+		case kShowChangePasswordLocked: showChangePasswordLockedEntry(); break;
 		case kShowErrorWithChangePassword: showErrorWithChangePasswordEntry(); break;
 		case kShowIncorrectFormat: showIncorrectFormatEntry(); break;
 		case kShowSuccessChangedPassword: showSuccessChangedPasswordEntry(); break;
 		case kStart: startEntry(); break;
-		case kWasLogoutSuccessful: wasLogoutSuccessfulEntry(); break;
+		case kWasChangePasswordSuccessful: wasChangePasswordSuccessfulEntry(); break;
 		default: break;
 	}
 }
@@ -177,16 +190,18 @@ int  ChangePasswordScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kEnsurePasswords) && (evt == kSuccess)) return kSetWaitForChangePassword; else
 	if ((mState == kIdle) && (evt == kSaveSelected)) return kEnsurePasswords; else
 	if ((mState == kSendChangePasswordToServer) && (evt == kFail)) return kShowErrorWithChangePassword; else
-	if ((mState == kSendChangePasswordToServer) && (evt == kSuccess)) return kWasLogoutSuccessful; else
+	if ((mState == kSendChangePasswordToServer) && (evt == kSuccess)) return kWasChangePasswordSuccessful; else
 	if ((mState == kSendForceLogoutToVC) && (evt == kNext)) return kPeerPopSelf; else
 	if ((mState == kSetWaitForChangePassword) && (evt == kNext)) return kSendChangePasswordToServer; else
+	if ((mState == kShowChangePasswordLocked) && (evt == kYes)) return kIdle; else
 	if ((mState == kShowErrorWithChangePassword) && (evt == kYes)) return kIdle; else
 	if ((mState == kShowIncorrectFormat) && (evt == kYes)) return kIdle; else
 	if ((mState == kShowSuccessChangedPassword) && (evt == kYes)) return kPeerPopSelf; else
 	if ((mState == kStart) && (evt == kNext)) return kIdle; else
-	if ((mState == kWasLogoutSuccessful) && (evt == kExpired)) return kSendForceLogoutToVC; else
-	if ((mState == kWasLogoutSuccessful) && (evt == kNo)) return kShowErrorWithChangePassword; else
-	if ((mState == kWasLogoutSuccessful) && (evt == kYes)) return kShowSuccessChangedPassword;
+	if ((mState == kWasChangePasswordSuccessful) && (evt == kExpired)) return kSendForceLogoutToVC; else
+	if ((mState == kWasChangePasswordSuccessful) && (evt == kLocked)) return kShowChangePasswordLocked; else
+	if ((mState == kWasChangePasswordSuccessful) && (evt == kNo)) return kShowErrorWithChangePassword; else
+	if ((mState == kWasChangePasswordSuccessful) && (evt == kYes)) return kShowSuccessChangedPassword;
 
 	return kInvalidState;
 }
@@ -257,6 +272,7 @@ void ChangePasswordScreen::update(const GCTEvent& msg)
 
     switch (getState())
     {
+        case kShowChangePasswordLocked:
         case kShowErrorWithChangePassword:
         case kShowIncorrectFormat:
         case kShowSuccessChangedPassword:

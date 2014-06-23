@@ -363,6 +363,13 @@ void LoginScreen::validateURLEntry()
 }
 
 #pragma mark UI
+
+void LoginScreen::showChangePasswordLockedEntry()
+{
+    GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showChangePasswordLockedEntry");
+    tAlert("Five unsuccessful change password attempts occurred. Your account will be locked for a half hour.");
+}
+
 void LoginScreen::showLoginLockedEntry()
 {
     GoogleAnalytics::getInstance()->trackAlert(kScreenName, "showLoginLockedEntry");
@@ -514,6 +521,7 @@ void LoginScreen::CallEntry()
 		case kSendResetEmailToServer: sendResetEmailToServerEntry(); break;
 		case kSendVerifyPinToServer: sendVerifyPinToServerEntry(); break;
 		case kShowAResetEmailHasBeenSent: showAResetEmailHasBeenSentEntry(); break;
+		case kShowChangePasswordLocked: showChangePasswordLockedEntry(); break;
 		case kShowCouldNotLogin: showCouldNotLoginEntry(); break;
 		case kShowCouldNotRegister: showCouldNotRegisterEntry(); break;
 		case kShowCouldNotResetPassword: showCouldNotResetPasswordEntry(); break;
@@ -582,6 +590,7 @@ int  LoginScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kSendVerifyPinToServer) && (evt == kFail)) return kShowRetryVerifyPin; else
 	if ((mState == kSendVerifyPinToServer) && (evt == kSuccess)) return kWasVerifyPinValid; else
 	if ((mState == kShowAResetEmailHasBeenSent) && (evt == kYes)) return kShowEnterResetCode; else
+	if ((mState == kShowChangePasswordLocked) && (evt == kYes)) return kShowCouldNotResetPassword; else
 	if ((mState == kShowCouldNotLogin) && (evt == kYes)) return kIdle; else
 	if ((mState == kShowCouldNotRegister) && (evt == kYes)) return kIdle; else
 	if ((mState == kShowCouldNotResetPassword) && (evt == kYes)) return kIdle; else
@@ -612,6 +621,7 @@ int  LoginScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kStoreTokenInformation) && (evt == kNext)) return kSaveLoginName; else
 	if ((mState == kValidateURL) && (evt == kFail)) return kShowURLMissingSlash; else
 	if ((mState == kValidateURL) && (evt == kSuccess)) return kEnsureSigninInfo; else
+	if ((mState == kWasChangePasswordSuccessful) && (evt == kLocked)) return kShowChangePasswordLocked; else
 	if ((mState == kWasChangePasswordSuccessful) && (evt == kNo)) return kShowCouldNotResetPassword; else
 	if ((mState == kWasChangePasswordSuccessful) && (evt == kYes)) return kShowSuccessChangedPassword; else
 	if ((mState == kWasLoginValid) && (evt == kLocked)) return kShowLoginLocked; else
@@ -766,6 +776,7 @@ void LoginScreen::update(const GCTEvent& msg)
     switch (getState())
     {
         case kShowAResetEmailHasBeenSent:
+        case kShowChangePasswordLocked:
         case kShowCouldNotLogin:
         case kShowCouldNotRegister:
         case kShowCouldNotResetPassword:

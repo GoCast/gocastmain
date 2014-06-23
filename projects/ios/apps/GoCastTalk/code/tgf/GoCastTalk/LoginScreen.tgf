@@ -41,6 +41,7 @@
 41 Did app relaunch to pin state?
 42 Show "login Locked"
 43 Show "resetEmail Locked"
+44 Show "changePassword locked"
 #
 1 19
 3 23 troublePressed
@@ -111,3 +112,5 @@
 42 6 yes
 33 43 locked
 43 31 yes
+38 44 locked
+44 31 yes

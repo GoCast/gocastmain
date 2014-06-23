@@ -34,10 +34,11 @@ protected:
 	void sendChangePasswordToServerEntry();
 	void sendForceLogoutToVCEntry();
 	void setWaitForChangePasswordEntry();
+	void showChangePasswordLockedEntry();
 	void showErrorWithChangePasswordEntry();
 	void showIncorrectFormatEntry();
 	void showSuccessChangedPasswordEntry();
-	void wasLogoutSuccessfulEntry();
+	void wasChangePasswordSuccessfulEntry();
 
 public:
 	enum EventType
@@ -46,6 +47,7 @@ public:
 		kNext = -1,
 		kExpired,
 		kFail,
+		kLocked,
 		kNo,
 		kSaveSelected,
 		kSuccess,
@@ -63,10 +65,11 @@ public:
 		kSendChangePasswordToServer,
 		kSendForceLogoutToVC,
 		kSetWaitForChangePassword,
+		kShowChangePasswordLocked,
 		kShowErrorWithChangePassword,
 		kShowIncorrectFormat,
 		kShowSuccessChangedPassword,
-		kWasLogoutSuccessful,
+		kWasChangePasswordSuccessful,
 	};
 
 protected:

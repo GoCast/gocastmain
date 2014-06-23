@@ -60,6 +60,7 @@ protected:
 	void sendResetEmailToServerEntry();
 	void sendVerifyPinToServerEntry();
 	void showAResetEmailHasBeenSentEntry();
+	void showChangePasswordLockedEntry();
 	void showCouldNotLoginEntry();
 	void showCouldNotRegisterEntry();
 	void showCouldNotResetPasswordEntry();
@@ -124,6 +125,7 @@ public:
 		kSendResetEmailToServer,
 		kSendVerifyPinToServer,
 		kShowAResetEmailHasBeenSent,
+		kShowChangePasswordLocked,
 		kShowCouldNotLogin,
 		kShowCouldNotRegister,
 		kShowCouldNotResetPassword,
