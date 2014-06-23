@@ -119,6 +119,13 @@ function add_new_token($name)
 {
 	$token = bin2hex(openssl_random_pseudo_bytes(32));
 
+	$fp = fopen('/dev/urandom','rb');
+	if ($fp != FALSE)
+	{
+		$token = bin2hex(fread($fp,32));
+		fclose($fp);
+	}
+
 	if (write_token_user($name, $token))
 	{
 		return $token;
