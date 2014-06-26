@@ -1,0 +1,8 @@
+/*.DS_Store
+/code/build/
+/code/project/ios
+/code/server/database/accounts.json
+/code/server/database/global/audio/2*
+/code/server/database/global/logs/
+/code/server/database/global/text/
+/code/server/database/user

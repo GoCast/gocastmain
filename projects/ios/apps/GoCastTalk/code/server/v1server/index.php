@@ -2,45 +2,47 @@
 // error_reporting(E_ALL);
 
 $GLOBALS['invalid_input'] = false;
-$GLOBALS['database'] = 'database';
+$GLOBALS['database'] = '/home/ec2-user/database';
+$GLOBALS['pem'] = '/home/ec2-user/pem';
+$GLOBALS['sh'] = '/home/ec2-user/sh';
 $GLOBALS['dmode'] = 0777;
 $GLOBALS['fmode'] = 0777;
 
 $GLOBALS['SGET']	= array();
 $GLOBALS['SPOST']	= array();
 
-include 'code/utils.php';
-include 'code/token.php';
+include 'utils.php';
+include 'token.php';
 
-include 'code/deviceToken.php';
-include 'code/applePush.php';
+include 'deviceToken.php';
+include 'applePush.php';
 
-include 'code/attempts.php';
+include 'attempts.php';
 
-include 'code/login.php';
-include 'code/register.php';
+include 'login.php';
+include 'register.php';
 
-include 'code/sendResetEmail.php';
+include 'sendResetEmail.php';
 
-include 'code/changePassword.php';
+include 'changePassword.php';
 
-include 'code/listMessages.php';
-include 'code/deleteMessage.php';
-include 'code/markRead.php';
+include 'listMessages.php';
+include 'deleteMessage.php';
+include 'markRead.php';
 
-include 'code/getContacts.php';
-include 'code/setContacts.php';
+include 'getContacts.php';
+include 'setContacts.php';
 
-include 'code/getGroups.php';
-include 'code/setGroups.php';
+include 'getGroups.php';
+include 'setGroups.php';
 
-include 'code/getFile.php';
+include 'getFile.php';
 
-include 'code/postAudio.php';
-include 'code/postMessage.php';
-include 'code/postTranscription.php';
+include 'postAudio.php';
+include 'postMessage.php';
+include 'postTranscription.php';
 
-include 'code/validUsers.php';
+include 'validUsers.php';
 
 $GLOBALS['SGET']	= sanitize_array($_GET);
 $GLOBALS['SPOST']	= sanitize_array($_POST);

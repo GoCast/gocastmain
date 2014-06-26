@@ -60,10 +60,10 @@ function push_to_name($name, $message)
 
 	foreach($arr as $iter)
 	{
-		apple_push($iter["device"], $message, 'pem/applePush.pem');
-		apple_push($iter["device"], $message, 'pem/applePushEn.pem');
+		apple_push($iter["device"], $message, $GLOBALS['pem'].'/applePush.pem');
+		apple_push($iter["device"], $message, $GLOBALS['pem'].'/applePushEn.pem');
 	}
 }
 
 // apple_push('4869fddfb2f9ad7c6137d433043f3e345828726598d8ed8f924cf063ba15b619', 'My first push notification!', 'pem/applePush.pem');
-// push_to_name('tjgrant@tatewake.com', 'abc123');
+// push_to_name('tjgrant@tatewake.com', 'seriously?');
