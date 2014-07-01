@@ -97,7 +97,7 @@ function atomic_put_contents($filename, $data)
 		$count = 0;
 		if (flock($fp, LOCK_EX))
 		{
-			$count = fwrite($fp, $data);
+			$count = file_put_contents($filename, $data);
 			flock($fp, LOCK_UN);
 		}
 		fclose($fp);
@@ -133,7 +133,15 @@ function atomic_append_contents($filename, $data)
 		$count = 0;
 		if (flock($fp, LOCK_EX))
 		{
-			$count = fwrite($fp, $data);
+			$predata = file_get_contents($filename);
+			if ($predata)
+			{
+				$count = file_put_contents($filename, $predata.$data);
+			}
+			else
+			{
+				$count = file_put_contents($filename, $data);
+			}
 			flock($fp, LOCK_UN);
 		}
 		fclose($fp);
@@ -154,9 +162,10 @@ function atomic_get_contents($filename)
 
 		if (flock($fp, LOCK_EX))
 		{
-			if (filesize($filename) != 0)
+			$size = filesize($filename);
+			if ($size != 0)
 			{
-				$data = fread($fp, filesize($filename));
+				$data = file_get_contents($filename);
 			}
 			flock($fp, LOCK_UN);
 		}
