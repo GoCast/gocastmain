@@ -179,9 +179,9 @@ function atomic_get_contents($filename)
 
 function userExists($name)
 {
-	if (is_file($GLOBALS['database']."/accounts.json"))
+	if (is_file($GLOBALS['database']."/accounts-hashed.json"))
 	{
-		$json = atomic_get_contents($GLOBALS['database']."/accounts.json");
+		$json = atomic_get_contents($GLOBALS['database']."/accounts-hashed.json");
 		$arr = json_decode($json, true);
 
 		if(isset($arr[$name]) && !empty($arr[$name]))

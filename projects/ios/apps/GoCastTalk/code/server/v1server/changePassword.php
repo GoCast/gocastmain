@@ -1,45 +1,5 @@
 <?php
 
-function getPassword($name)
-{
-	$result = "";
-
-	if (is_file($GLOBALS['database']."/accounts.json"))
-	{
-		$json = atomic_get_contents($GLOBALS['database']."/accounts.json");
-		$arr = json_decode($json, true);
-
-		if(isset($arr[$name]) && !empty($arr[$name]))
-		{
-			$result = $arr[$name];
-		}
-	}
-
-	return $result;
-}
-
-function setPassword($name, $newpassword)
-{
-	$result = false;
-
-	if (is_file($GLOBALS['database']."/accounts.json"))
-	{
-		$json = atomic_get_contents($GLOBALS['database']."/accounts.json");
-		$arr = json_decode($json, true);
-
-		$arr[$name] = $newpassword;
-
-		ksort($arr);
-
-		if (atomic_put_contents($GLOBALS['database']."/accounts.json", json_encode($arr)) != false)
-		{
-			$result = true;
-		}
-	}
-
-	return $result;
-}
-
 function changePassword($name, $password, $newpassword)
 {
 	if (can_attempt_dangerous_action($name, "changePassword"))
@@ -47,11 +7,10 @@ function changePassword($name, $password, $newpassword)
 		$note = true;
 
 		$result = "";
-		$oldpassword = getPassword($name);
 
 		if (isntEmpty($name) && isntEmpty($password) && isntEmpty($newpassword))
 		{
-			if ($password === $oldpassword)
+			if (verifyPassword($name, $password))
 			{
 				if (setPassword($name, $newpassword))
 				{

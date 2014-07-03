@@ -11,50 +11,42 @@ function login($name, $password, $device)
 
 		if (isntEmpty($name) && isntEmpty($password))
 		{
-			if (is_file($GLOBALS['database']."/accounts.json"))
+			$exists = userExists($name);
+
+			if ($exists != false)
 			{
-				$json = atomic_get_contents($GLOBALS['database']."/accounts.json");
-				$arr = json_decode($json, true);
-
-				if(isset($arr[$name]) && !empty($arr[$name]))
+				if (verifyPassword($name, $password))
 				{
-					if ($arr[$name] === $password)
+					$token = add_new_token($name);
+
+					if ($token != false)
 					{
-						$token = add_new_token($name);
-						if ($token != false)
-						{
-							$user		= json_decode( '{ "authToken": "' . $token . '" }', true);
+						$user		= json_decode( '{ "authToken": "' . $token . '" }', true);
 
-							add_new_device($name, $device);
+						add_new_device($name, $device);
 
-							$result = array("status" => "success",
-											"message" => "Login was successful",
-											"user" => $user);
+						$result = array("status" => "success",
+										"message" => "Login was successful",
+										"user" => $user);
 
-							$note = false;
-						}
-						else
-						{
-							$result = array("status" => "fail",
-											"message" => "Token generation failed");
-						}
+						$note = false;
 					}
 					else
 					{
 						$result = array("status" => "fail",
-										"message" => "Password is incorrect");
+										"message" => "Token generation failed");
 					}
 				}
 				else
 				{
 					$result = array("status" => "fail",
-									"message" => "User does not exist");
+									"message" => "Password is incorrect");
 				}
 			}
 			else
 			{
 				$result = array("status" => "fail",
-								"message" => "No login file found");
+								"message" => "User does not exist");
 			}
 		}
 		else

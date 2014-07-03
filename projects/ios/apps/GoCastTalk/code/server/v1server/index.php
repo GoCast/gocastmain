@@ -13,6 +13,7 @@ $GLOBALS['SPOST']	= array();
 
 include 'utils.php';
 include 'token.php';
+include 'utils-accounts.php';
 
 include 'deviceToken.php';
 include 'applePush.php';

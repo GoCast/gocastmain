@@ -2,6 +2,8 @@
 
 function register($name, $password, $device)
 {
+	$result = "";
+
 	$name = trim($name);
 	$password = trim($password);
 
@@ -9,30 +11,13 @@ function register($name, $password, $device)
 	{
 		ensure_database_dir("/");
 
-		$json = false;
+		$exists = userExists($name);
 
-		if (is_file($GLOBALS['database']."/accounts.json"))
+		if ($exists == false)
 		{
-			$json = atomic_get_contents($GLOBALS['database']."/accounts.json");
-		}
+			$exists = setPassword($name, $password);
 
-		if ($json != false)
-		{
-			$arr = json_decode($json, true);
-		}
-		else
-		{
-			$json = "";
-			$arr = array();
-		}
-
-		if(!isset($arr[$name]) || empty($arr[$name]))
-		{
-			$arr[$name] = $password;
-
-			ksort($arr);
-
-			if (atomic_put_contents($GLOBALS['database']."/accounts.json", json_encode($arr)) != false)
+			if ($exists != false)
 			{
 				$token = add_new_token($name);
 

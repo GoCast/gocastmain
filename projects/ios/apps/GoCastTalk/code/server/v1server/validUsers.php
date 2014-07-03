@@ -14,12 +14,12 @@ function validateOneUser($list, $user)
 
 function validUsers()
 {
-	if (is_file($GLOBALS['database']."/accounts.json"))
+	if (is_file($GLOBALS['database']."/accounts-hashed.json"))
 	{
 		$members = array();
 		$nonmembers = array();
 
-		$json = atomic_get_contents($GLOBALS['database']."/accounts.json");
+		$json = atomic_get_contents($GLOBALS['database']."/accounts-hashed.json");
 		$list = json_decode($json, true);
 
 		if (get_file_size($_FILES['filename']['tmp_name']) < (2 * 1024 * 1024))
