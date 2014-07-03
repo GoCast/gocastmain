@@ -88,6 +88,39 @@ function sanitize_array( array $array )
 	return $result;
 }
 
+function remove_password( array $array )
+{
+	$result = array();
+
+	foreach( $array as $key => $val )
+	{
+		if( is_array( $val ) )
+		{
+			$result[$key] = remove_password( $val );
+		}
+		else if ( is_object( $val ) )
+		{
+			$result[$key] = clone $val;
+		}
+		else
+		{
+			switch ($key)
+			{
+				case "password":
+				case "newpassword":
+				case "oldpassword":
+					$result[$key] = "N.A.";
+					break;
+
+				default:
+					$result[$key] = $val;
+					break;
+			}
+		}
+	}
+	return $result;
+}
+
 function atomic_put_contents($filename, $data)
 {
     $fp = fopen($filename, "w+");
@@ -279,11 +312,11 @@ function print_and_log($result)
 
 	if ($_SERVER['REQUEST_METHOD'] === "GET")
 	{
-		array_push($arr, array("GET" => $GLOBALS['SGET']));
+		array_push($arr, array("GET" => remove_password($GLOBALS['SGET'])));
 	}
 	else
 	{
-		array_push($arr, array("POST" => $GLOBALS['SPOST']));
+		array_push($arr, array("POST" => remove_password($GLOBALS['SPOST'])));
 	}
 
 	array_push($arr, array("result" => json_decode($result)));
