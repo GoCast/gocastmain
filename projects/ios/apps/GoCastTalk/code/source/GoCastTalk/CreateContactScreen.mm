@@ -89,8 +89,6 @@ void CreateContactScreen::sendSetContactsToServerEntry()
     params.push_back(std::pair<std::string, std::string>("name", InboxScreen::mEmailAddress));
     params.push_back(std::pair<std::string, std::string>("authToken", InboxScreen::mToken));
 
-    params.push_back(std::pair<std::string, std::string>("MAX_FILE_SIZE", "10485760"));
-
     tFile(tFile::kTemporaryDirectory, "contacts.json").write(JSONValue(InboxScreen::mContacts).toString());
 
     URLLoader::getInstance()->postFile(this, kMemoAppServerURL, params, tFile(tFile::kTemporaryDirectory, "contacts.json"));

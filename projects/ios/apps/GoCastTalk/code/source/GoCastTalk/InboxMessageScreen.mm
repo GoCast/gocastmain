@@ -153,42 +153,39 @@ void InboxMessageScreen::fixRecipientListEntry()
 
 void InboxMessageScreen::sendDeleteMessageToServerEntry()
 {
-    char buf[512];
+    std::vector<std::pair<std::string, std::string> > params;
 
-    sprintf(buf, "%s?action=deleteMessage&name=%s&audio=%s&authToken=%s",
-            kMemoAppServerURL,
-            InboxScreen::mEmailAddress.c_str(),
-            mInitObject["audio"].mString.c_str(),
-            InboxScreen::mToken.c_str());
+    params.push_back(std::pair<std::string, std::string>("action", "deleteMessage"));
+    params.push_back(std::pair<std::string, std::string>("name", InboxScreen::mEmailAddress.c_str()));
+    params.push_back(std::pair<std::string, std::string>("audio", mInitObject["audio"].mString.c_str()));
+    params.push_back(std::pair<std::string, std::string>("authToken", InboxScreen::mToken.c_str()));
 
-    URLLoader::getInstance()->loadString(this, buf);
+    URLLoader::getInstance()->postLoadString(this, kMemoAppServerURL, params);
 }
 
 void InboxMessageScreen::sendMarkReadToServerEntry()
 {
-    char buf[512];
+    std::vector<std::pair<std::string, std::string> > params;
 
-    sprintf(buf, "%s?action=markRead&name=%s&audio=%s&authToken=%s",
-            kMemoAppServerURL,
-            InboxScreen::mEmailAddress.c_str(),
-            mInitObject["audio"].mString.c_str(),
-            InboxScreen::mToken.c_str());
+    params.push_back(std::pair<std::string, std::string>("action", "markRead"));
+    params.push_back(std::pair<std::string, std::string>("name", InboxScreen::mEmailAddress.c_str()));
+    params.push_back(std::pair<std::string, std::string>("audio", mInitObject["audio"].mString.c_str()));
+    params.push_back(std::pair<std::string, std::string>("authToken", InboxScreen::mToken.c_str()));
 
-    URLLoader::getInstance()->loadString(this, buf);
+    URLLoader::getInstance()->postLoadString(this, kMemoAppServerURL, params);
 }
 
 
 void InboxMessageScreen::sendDownloadRequestToServerEntry()
 {
-    char buf[512];
+    std::vector<std::pair<std::string, std::string> > params;
 
-    sprintf(buf, "%s?action=getFile&name=%s&audio=%s&authToken=%s",
-            kMemoAppServerURL,
-            InboxScreen::mEmailAddress.c_str(),
-            mInitObject["audio"].mString.c_str(),
-            InboxScreen::mToken.c_str());
+    params.push_back(std::pair<std::string, std::string>("action", "getFile"));
+    params.push_back(std::pair<std::string, std::string>("name", InboxScreen::mEmailAddress));
+    params.push_back(std::pair<std::string, std::string>("audio", mInitObject["audio"].mString));
+    params.push_back(std::pair<std::string, std::string>("authToken", InboxScreen::mToken));
 
-    URLLoader::getInstance()->loadFile(this, buf, tFile(tFile::kTemporaryDirectory, mInitObject["audio"].mString.c_str()));
+    URLLoader::getInstance()->postLoadFile(this, kMemoAppServerURL, params, tFile(tFile::kTemporaryDirectory, mInitObject["audio"].mString.c_str()));
 }
 
 void InboxMessageScreen::setWasPlayingToFalseEntry()

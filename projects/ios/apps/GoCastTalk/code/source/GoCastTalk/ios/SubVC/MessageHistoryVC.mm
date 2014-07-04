@@ -28,6 +28,8 @@
 #pragma mark Construction / Destruction
 - (void)viewDidLoad
 {
+    mPeer = new MessageHistoryScreen(self, mInitObject);
+
     [super viewDidLoad];
 
     [self refreshLanguage];
@@ -36,8 +38,6 @@
     [self.mOptionsTable registerNib:[UINib nibWithNibName:@"HeadingSubCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"HeadingSubCell"];
 
     self.view.autoresizesSubviews = YES;
-
-    mPeer = new MessageHistoryScreen(self, mInitObject);
 
     std::string date    = InboxScreen::gmtToLocal(mInitObject["date"].mString);
     std::string result  = "xx/xx xx:xx";

@@ -126,23 +126,19 @@ void SettingsScreen::destroyStoredTokenEntry()
 
 void SettingsScreen::sendLogoutToServerEntry()
 {
-    char buf[512];
+    std::vector<std::pair<std::string, std::string> > params;
 
-    sprintf(buf, "%s?action=logout&name=%s&authToken=%s",
-            kMemoAppServerURL,
-            InboxScreen::mEmailAddress.c_str(),
-            InboxScreen::mToken.c_str());
+    params.push_back(std::pair<std::string, std::string>("action", "logout"));
+
+    params.push_back(std::pair<std::string, std::string>("name", InboxScreen::mEmailAddress.c_str()));
+    params.push_back(std::pair<std::string, std::string>("authToken", InboxScreen::mToken.c_str()));
 
     if (!InboxScreen::mDeviceToken.empty())
     {
-        sprintf(buf, "%s?action=logout&name=%s&authToken=%s&device=%s",
-                kMemoAppServerURL,
-                InboxScreen::mEmailAddress.c_str(),
-                InboxScreen::mToken.c_str(),
-                InboxScreen::mDeviceToken.c_str());
+        params.push_back(std::pair<std::string, std::string>("device", InboxScreen::mDeviceToken.c_str()));
     }
 
-    URLLoader::getInstance()->loadString(this, buf);
+    URLLoader::getInstance()->postLoadString(this, kMemoAppServerURL, params);
 }
 
 #pragma mark UI

@@ -72,10 +72,9 @@
 19 20 success
 19 41 fail
 20 41
-22 21 fail
 21 15 yes
 21 3 no
-22 15 success
+22 15 success, fail
 23 26 no
 23 24 yes
 24 3 yes

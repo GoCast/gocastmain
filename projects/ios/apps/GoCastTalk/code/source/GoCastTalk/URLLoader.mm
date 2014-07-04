@@ -65,6 +65,52 @@ URLConnection::URLConnection(void* newId, const std::string& url)
     mNSURLConnection = [[NSURLConnection alloc] initWithRequest: req delegate: mDelegate];
 }
 
+URLConnection::URLConnection(void* newId, const std::string& url, const std::vector<std::pair<std::string, std::string> >& newParams)
+:   mId(newId),
+    mFile(tFile::kTemporaryDirectory, ""),
+    mURL(url),
+    mUseFile(false),
+    mBadResponse(true)
+{
+    mDelegate = [[PrivateDelegate alloc] initWithParent: this];
+
+    // create request
+    NSMutableURLRequest *req = [NSMutableURLRequest requestWithURL: [NSURL URLWithString: [NSString stringWithUTF8String: url.c_str()]]];
+    [req setCachePolicy:NSURLRequestReloadIgnoringLocalCacheData];
+    [req setHTTPShouldHandleCookies:NO];
+    [req setTimeoutInterval:30];
+    [req setHTTPMethod:@"POST"];
+
+    // set Content-Type in HTTP header
+    NSString *contentType = [NSString stringWithFormat:@"multipart/form-data; boundary=%@", @"abc123"];
+    [req setValue:contentType forHTTPHeaderField: @"Content-Type"];
+
+    // post body
+    NSMutableData *body = [NSMutableData data];
+
+    // add params (all params are strings)
+    for (size_t i = 0; i < newParams.size(); i++)
+    {
+        NSString* key   = [NSString stringWithUTF8String:newParams[i].first.c_str()];
+        NSString* value = [NSString stringWithUTF8String:newParams[i].second.c_str()];
+
+        [body appendData:[[NSString stringWithFormat:@"--%@\r\n", @"abc123"] dataUsingEncoding:NSUTF8StringEncoding]];
+        [body appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"%@\"\r\n\r\n", key] dataUsingEncoding:NSUTF8StringEncoding]];
+        [body appendData:[[NSString stringWithFormat:@"%@\r\n", value] dataUsingEncoding:NSUTF8StringEncoding]];
+    }
+
+    [body appendData:[[NSString stringWithFormat:@"--%@--\r\n", @"abc123"] dataUsingEncoding:NSUTF8StringEncoding]];
+
+    // setting the body of the post to the reqeust
+    [req setHTTPBody:body];
+
+    // set the content-length
+    NSString *postLength = [NSString stringWithFormat:@"%d", [body length]];
+    [req setValue:postLength forHTTPHeaderField:@"Content-Length"];
+
+    mNSURLConnection = [[NSURLConnection alloc] initWithRequest: req delegate: mDelegate];
+}
+
 URLConnection::URLConnection(void* newId, const std::string& url, const tFile& newFile)
 :   mId(newId),
     mFile(newFile),
@@ -94,13 +140,18 @@ URLConnection::URLConnection(void* newId, const std::string& url, const std::str
     mNSURLConnection = [[NSURLConnection alloc] initWithRequest: req delegate: mDelegate];
 }
 
-URLConnection::URLConnection(void* newId, const std::string& newPHP, const std::vector<std::pair<std::string, std::string> >& newParams, const tFile& newFile)
+URLConnection::URLConnection(void* newId, const std::string& newPHP, const std::vector<std::pair<std::string, std::string> >& newParams, const tFile& newFile, bool newUseFile)
 :   mId(newId),
-    mFile(tFile::kTemporaryDirectory, ""),
+    mFile(newFile),
     mURL(newPHP),
-    mUseFile(false),
+    mUseFile(newUseFile),
     mBadResponse(true)
 {
+    if (mUseFile)
+    {
+        mFOS = new tFileOutputStream(mFile);
+    }
+
     mDelegate = [[PrivateDelegate alloc] initWithParent: this];
 
     // create request
@@ -117,16 +168,26 @@ URLConnection::URLConnection(void* newId, const std::string& newPHP, const std::
     // post body
     NSMutableData *body = [NSMutableData data];
 
+    NSString* key;
+    NSString* value;
+
     // add params (all params are strings)
     for (size_t i = 0; i < newParams.size(); i++)
     {
-        NSString* key   = [NSString stringWithUTF8String:newParams[i].first.c_str()];
-        NSString* value = [NSString stringWithUTF8String:newParams[i].second.c_str()];
+        key   = [NSString stringWithUTF8String:newParams[i].first.c_str()];
+        value = [NSString stringWithUTF8String:newParams[i].second.c_str()];
 
         [body appendData:[[NSString stringWithFormat:@"--%@\r\n", @"abc123"] dataUsingEncoding:NSUTF8StringEncoding]];
         [body appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"%@\"\r\n\r\n", key] dataUsingEncoding:NSUTF8StringEncoding]];
         [body appendData:[[NSString stringWithFormat:@"%@\r\n", value] dataUsingEncoding:NSUTF8StringEncoding]];
     }
+
+    key   = @"MAX_FILE_SIZE";
+    value = @"10485760";
+
+    [body appendData:[[NSString stringWithFormat:@"--%@\r\n", @"abc123"] dataUsingEncoding:NSUTF8StringEncoding]];
+    [body appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"%@\"\r\n\r\n", key] dataUsingEncoding:NSUTF8StringEncoding]];
+    [body appendData:[[NSString stringWithFormat:@"%@\r\n", value] dataUsingEncoding:NSUTF8StringEncoding]];
 
     // add file data
     NSData *fileData = [NSData dataWithContentsOfFile:[NSString stringWithUTF8String:newFile.GetFullPath().c_str()]];
@@ -224,6 +285,20 @@ void URLLoader::loadFile(void* newId, const std::string& newURL, const tFile& ne
     NSLog(@"URLLoader::loadFile: \"%s\"", newURL.c_str());
 
     new URLConnection(newId, newURL, newFile);
+}
+
+void URLLoader::postLoadString(void* newId, const std::string& newURL, const std::vector<std::pair<std::string, std::string> >& newParams)
+{
+    NSLog(@"URLLoader::postLoadString: \"%s\"", newURL.c_str());
+
+    new URLConnection(newId, newURL, newParams);
+}
+
+void URLLoader::postLoadFile(void* newId, const std::string& newURL, const std::vector<std::pair<std::string, std::string> >& newParams, const tFile& newFile)
+{
+    NSLog(@"URLLoader::postLoadFile: \"%s\"", newURL.c_str());
+
+    new URLConnection(newId, newURL, newParams, newFile, true);
 }
 
 void URLLoader::postJSON(void* newId, const std::string& newURL, const std::string& newBody)

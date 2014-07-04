@@ -109,16 +109,16 @@ void ChangePasswordScreen::ensurePasswordsEntry()
 
 void ChangePasswordScreen::sendChangePasswordToServerEntry()
 {
-    char buf[512];
+    std::vector<std::pair<std::string, std::string> > params;
 
-    sprintf(buf, "%s?action=changePassword&name=%s&oldpassword=%s&newpassword=%s&authToken=%s",
-            kMemoAppServerURL,
-            InboxScreen::mEmailAddress.c_str(),
-            [mPeer getOldPassword].c_str(),
-            [mPeer getNewPassword].c_str(),
-            InboxScreen::mToken.c_str());
+    params.push_back(std::pair<std::string, std::string>("action", "changePassword"));
 
-    URLLoader::getInstance()->loadString(this, buf);
+    params.push_back(std::pair<std::string, std::string>("name", InboxScreen::mEmailAddress.c_str()));
+    params.push_back(std::pair<std::string, std::string>("oldpassword", [mPeer getOldPassword].c_str()));
+    params.push_back(std::pair<std::string, std::string>("newpassword", [mPeer getNewPassword].c_str()));
+    params.push_back(std::pair<std::string, std::string>("authToken", InboxScreen::mToken.c_str()));
+
+    URLLoader::getInstance()->postLoadString(this, kMemoAppServerURL, params);
 }
 
 #pragma mark UI

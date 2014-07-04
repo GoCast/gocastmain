@@ -8,7 +8,7 @@
 #define kScreenName "Login"
 
 #ifdef ADHOC
-std::string kBaseURL("https://chat.gocast.it/memoappserver/");
+std::string kBaseURL("https://chat.gocast.it/v2server.php");
 #else
 std::string kBaseURL("http://127.0.0.1:8888/");
 #endif
@@ -226,7 +226,7 @@ void LoginScreen::loadLoginNameEntry()
         result = !mEmail.empty();
     }
 
-    loginInfo = tFile(tFile::kPreferencesDirectory, "baseURL.txt");
+    loginInfo = tFile(tFile::kPreferencesDirectory, "baseURL2.txt");
 
     if (loginInfo.exists())
     {
@@ -234,7 +234,7 @@ void LoginScreen::loadLoginNameEntry()
     }
     else
     {
-        mBaseURL = "https://chat.gocast.it/memoappserver/";
+        mBaseURL = "https://chat.gocast.it/v2server.php";
     }
 
     SetImmediateEvent(result ? kSuccess : kFail);
@@ -243,7 +243,7 @@ void LoginScreen::loadLoginNameEntry()
 void LoginScreen::saveLoginNameEntry()
 {
     tFile (tFile::kPreferencesDirectory, "login.txt").write(mEmail);
-    tFile (tFile::kPreferencesDirectory, "baseURL.txt").write(mBaseURL);
+    tFile (tFile::kPreferencesDirectory, "baseURL2.txt").write(mBaseURL);
 }
 
 void LoginScreen::ensureSigninInfoEntry()
@@ -260,76 +260,68 @@ void LoginScreen::sendLoginToServerEntry()
 {
     [mPeer setBlockingViewVisible:true];
 
-    char buf[512];
+    std::vector<std::pair<std::string, std::string> > params;
 
-    sprintf(buf, "%s?action=login&name=%s&password=%s",
-            kMemoAppServerURL,
-            mEmail.c_str(),
-            mPassword.c_str());
+    params.push_back(std::pair<std::string, std::string>("action", "login"));
+    params.push_back(std::pair<std::string, std::string>("name", mEmail));
+    params.push_back(std::pair<std::string, std::string>("password", mPassword));
 
     if (!InboxScreen::mDeviceToken.empty())
     {
-        sprintf(buf, "%s?action=login&name=%s&password=%s&device=%s",
-                kMemoAppServerURL,
-                mEmail.c_str(),
-                mPassword.c_str(),
-                InboxScreen::mDeviceToken.c_str());
+        params.push_back(std::pair<std::string, std::string>("device", InboxScreen::mDeviceToken));
     }
 
-    URLLoader::getInstance()->loadString(this, buf);
+    URLLoader::getInstance()->postLoadString(this, kMemoAppServerURL, params);
 }
 
 void LoginScreen::sendRegisterToServerEntry()
 {
     [mPeer setBlockingViewVisible:true];
 
-    char buf[512];
+    std::vector<std::pair<std::string, std::string> > params;
 
-    sprintf(buf, "%s?action=register&name=%s&password=%s",
-            kMemoAppServerURL,
-            mEmail.c_str(),
-            mPassword.c_str());
+    params.push_back(std::pair<std::string, std::string>("action", "register"));
+    params.push_back(std::pair<std::string, std::string>("name", mEmail));
+    params.push_back(std::pair<std::string, std::string>("password", mPassword));
 
-    URLLoader::getInstance()->loadString(this, buf);
+    URLLoader::getInstance()->postLoadString(this, kMemoAppServerURL, params);
 }
 
 void LoginScreen::sendVerifyPinToServerEntry()
 {
     [mPeer setBlockingViewVisible:true];
 
-    char buf[512];
+    std::vector<std::pair<std::string, std::string> > params;
 
-    sprintf(buf, "%s?action=verifyPin&name=%s&pin=%s",
-            kMemoAppServerURL,
-            mEmail.c_str(),
-            mPin.c_str());
+    params.push_back(std::pair<std::string, std::string>("action", "verifyPin"));
+    params.push_back(std::pair<std::string, std::string>("name", mEmail));
+    params.push_back(std::pair<std::string, std::string>("pin", mPin));
 
-    URLLoader::getInstance()->loadString(this, buf);
+    URLLoader::getInstance()->postLoadString(this, kMemoAppServerURL, params);
 }
 
 void LoginScreen::sendChangePasswordToServerEntry()
 {
-    char buf[512];
+    std::vector<std::pair<std::string, std::string> > params;
 
-    sprintf(buf, "%s?action=changePassword&name=%s&oldpassword=pin%s&newpassword=%s",
-            kMemoAppServerURL,
-            mEmail.c_str(),
-            mPin.c_str(),
-            mNewPassword.c_str());
+    params.push_back(std::pair<std::string, std::string>("action", "changePassword"));
 
-    URLLoader::getInstance()->loadString(this, buf);
+    params.push_back(std::pair<std::string, std::string>("name", mEmail));
+    params.push_back(std::pair<std::string, std::string>("oldpassword", "pin" + mPin));
+    params.push_back(std::pair<std::string, std::string>("newpassword", mNewPassword));
+
+    URLLoader::getInstance()->postLoadString(this, kMemoAppServerURL, params);
 }
 
 void LoginScreen::sendResetEmailToServerEntry()
 {
-    char buf[512];
+    std::vector<std::pair<std::string, std::string> > params;
 
-    sprintf(buf, "%s?action=resetEmail&name=%s&lang=%s",
-            kMemoAppServerURL,
-            mEmail.c_str(),
-            I18N::getInstance()->getLocale().c_str());
+    params.push_back(std::pair<std::string, std::string>("action", "resetEmail"));
+    params.push_back(std::pair<std::string, std::string>("name", mEmail));
+    params.push_back(std::pair<std::string, std::string>("lang", I18N::getInstance()->getLocale()));
 
-    URLLoader::getInstance()->loadString(this, buf);
+    URLLoader::getInstance()->postLoadString(this, kMemoAppServerURL, params);
 }
 
 void LoginScreen::storeTokenInformationEntry()
@@ -619,7 +611,7 @@ int  LoginScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kShowURLMissingSlash) && (evt == kYes)) return kEnsureSigninInfo; else
 	if ((mState == kStart) && (evt == kNext)) return kLoadLoginName; else
 	if ((mState == kStoreTokenInformation) && (evt == kNext)) return kSaveLoginName; else
-	if ((mState == kValidateURL) && (evt == kFail)) return kShowURLMissingSlash; else
+	if ((mState == kValidateURL) && (evt == kFail)) return kEnsureSigninInfo; else
 	if ((mState == kValidateURL) && (evt == kSuccess)) return kEnsureSigninInfo; else
 	if ((mState == kWasChangePasswordSuccessful) && (evt == kLocked)) return kShowChangePasswordLocked; else
 	if ((mState == kWasChangePasswordSuccessful) && (evt == kNo)) return kShowCouldNotResetPassword; else

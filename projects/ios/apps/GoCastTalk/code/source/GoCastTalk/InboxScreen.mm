@@ -519,7 +519,7 @@ void InboxScreen::loadLoginNameAndTokenEntry()
         mToken = loginInfo;
     }
 
-    loginInfo = tFile(tFile::kPreferencesDirectory, "baseURL.txt");
+    loginInfo = tFile(tFile::kPreferencesDirectory, "baseURL2.txt");
 
     if (loginInfo.exists())
     {
@@ -527,7 +527,7 @@ void InboxScreen::loadLoginNameAndTokenEntry()
     }
     else
     {
-        LoginScreen::mBaseURL = "https://chat.gocast.it/memoappserver/";
+        LoginScreen::mBaseURL = "https://chat.gocast.it/v2server.php";
     }
 
     result &= !mEmailAddress.empty();
@@ -587,28 +587,26 @@ void InboxScreen::sendGetContactsToServerEntry()
 {
     [mPeer setBlockingViewVisible:true];
 
-    char buf[512];
+    std::vector<std::pair<std::string, std::string> > params;
 
-    sprintf(buf, "%s?action=getContacts&name=%s&authToken=%s",
-            kMemoAppServerURL,
-            InboxScreen::mEmailAddress.c_str(),
-            InboxScreen::mToken.c_str());
+    params.push_back(std::pair<std::string, std::string>("action", "getContacts"));
+    params.push_back(std::pair<std::string, std::string>("name", InboxScreen::mEmailAddress));
+    params.push_back(std::pair<std::string, std::string>("authToken", InboxScreen::mToken));
 
-    URLLoader::getInstance()->loadString(this, buf);
+    URLLoader::getInstance()->postLoadString(this, kMemoAppServerURL, params);
 }
 
 void InboxScreen::sendGetGroupsToServerEntry()
 {
     [mPeer setBlockingViewVisible:true];
 
-    char buf[512];
+    std::vector<std::pair<std::string, std::string> > params;
 
-    sprintf(buf, "%s?action=getGroups&name=%s&authToken=%s",
-            kMemoAppServerURL,
-            InboxScreen::mEmailAddress.c_str(),
-            InboxScreen::mToken.c_str());
+    params.push_back(std::pair<std::string, std::string>("action", "getGroups"));
+    params.push_back(std::pair<std::string, std::string>("name", InboxScreen::mEmailAddress));
+    params.push_back(std::pair<std::string, std::string>("authToken", InboxScreen::mToken));
 
-    URLLoader::getInstance()->loadString(this, buf);
+    URLLoader::getInstance()->postLoadString(this, kMemoAppServerURL, params);
 }
 
 void InboxScreen::sendListMessagesToServerEntry()
@@ -624,56 +622,52 @@ void InboxScreen::sendListMessagesToServerEntry()
         }
     }
 
-    char buf[512];
+    std::vector<std::pair<std::string, std::string> > params;
 
-    sprintf(buf, "%s?action=listMessages&name=%s&authToken=%s",
-            kMemoAppServerURL,
-            InboxScreen::mEmailAddress.c_str(),
-            InboxScreen::mToken.c_str());
+    params.push_back(std::pair<std::string, std::string>("action", "listMessages"));
+    params.push_back(std::pair<std::string, std::string>("name", InboxScreen::mEmailAddress));
+    params.push_back(std::pair<std::string, std::string>("authToken", InboxScreen::mToken));
 
-    URLLoader::getInstance()->loadString(this, buf);
+    URLLoader::getInstance()->postLoadString(this, kMemoAppServerURL, params);
 }
 
 void InboxScreen::sendDeleteMessageToServerEntry()
 {
     [mPeer setBlockingViewVisible:true];
 
-    char buf[512];
+    std::vector<std::pair<std::string, std::string> > params;
 
-    sprintf(buf, "%s?action=deleteMessage&name=%s&audio=%s&authToken=%s",
-            kMemoAppServerURL,
-            InboxScreen::mEmailAddress.c_str(),
-            mInbox[mDeleteSelected].mObject["audio"].mString.c_str(),
-            InboxScreen::mToken.c_str());
+    params.push_back(std::pair<std::string, std::string>("action", "deleteMessage"));
+    params.push_back(std::pair<std::string, std::string>("name", InboxScreen::mEmailAddress.c_str()));
+    params.push_back(std::pair<std::string, std::string>("audio", mInbox[mDeleteSelected].mObject["audio"].mString.c_str()));
+    params.push_back(std::pair<std::string, std::string>("authToken", InboxScreen::mToken.c_str()));
 
-    URLLoader::getInstance()->loadString(this, buf);
+    URLLoader::getInstance()->postLoadString(this, kMemoAppServerURL, params);
 }
 
 void InboxScreen::sendRegisterDeviceToServerEntry()
 {
     [mPeer setBlockingViewVisible:true];
 
-    char buf[512];
+    std::vector<std::pair<std::string, std::string> > params;
 
-    sprintf(buf, "%s?action=registerDevice&name=%s&authToken=%s&device=%s",
-            kMemoAppServerURL,
-            InboxScreen::mEmailAddress.c_str(),
-            InboxScreen::mToken.c_str(),
-            InboxScreen::mDeviceToken.c_str());
+    params.push_back(std::pair<std::string, std::string>("action", "registerDevice"));
+    params.push_back(std::pair<std::string, std::string>("name", InboxScreen::mEmailAddress));
+    params.push_back(std::pair<std::string, std::string>("authToken", InboxScreen::mToken));
+    params.push_back(std::pair<std::string, std::string>("device", InboxScreen::mDeviceToken));
 
-    URLLoader::getInstance()->loadString(this, buf);
+    URLLoader::getInstance()->postLoadString(this, kMemoAppServerURL, params);
 }
 
 void InboxScreen::sendVersionToServerEntry()
 {
     [mPeer setBlockingViewVisible:true];
 
-    char buf[512];
+    std::vector<std::pair<std::string, std::string> > params;
 
-    sprintf(buf, "%s?action=version",
-            kMemoAppServerURL);
+    params.push_back(std::pair<std::string, std::string>("action", "version"));
 
-    URLLoader::getInstance()->loadString(this, buf);
+    URLLoader::getInstance()->postLoadString(this, kMemoAppServerURL, params);
 }
 
 #pragma mark User Interface

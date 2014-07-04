@@ -546,8 +546,6 @@ void RecordMessageScreen::sendPostAudioToServerEntry()
     params.push_back(std::pair<std::string, std::string>("audio", mMessageJSON["audio"].mString));
     params.push_back(std::pair<std::string, std::string>("authToken", InboxScreen::mToken));
 
-    params.push_back(std::pair<std::string, std::string>("MAX_FILE_SIZE", "10485760"));
-
     URLLoader::getInstance()->postFile(this, kMemoAppServerURL, params, tFile(tFile::kTemporaryDirectory, "scratch.caf"));
 }
 
@@ -561,8 +559,6 @@ void RecordMessageScreen::sendPostTranscriptToServerEntry()
     params.push_back(std::pair<std::string, std::string>("name", InboxScreen::mEmailAddress));
     params.push_back(std::pair<std::string, std::string>("audio", mMessageJSON["audio"].mString));
     params.push_back(std::pair<std::string, std::string>("authToken", InboxScreen::mToken));
-
-    params.push_back(std::pair<std::string, std::string>("MAX_FILE_SIZE", "10485760"));
 
     mTranscription["ja"] = [mPeer getTranscription];
     tFile(tFile::kTemporaryDirectory, "transcript.json").write(JSONValue(mTranscription).toString().c_str());
@@ -580,8 +576,6 @@ void RecordMessageScreen::sendPostMessageToServerEntry()
     params.push_back(std::pair<std::string, std::string>("name", InboxScreen::mEmailAddress));
     params.push_back(std::pair<std::string, std::string>("authToken", InboxScreen::mToken));
 
-    params.push_back(std::pair<std::string, std::string>("MAX_FILE_SIZE", "10485760"));
-
     URLLoader::getInstance()->postFile(this, kMemoAppServerURL, params, tFile(tFile::kTemporaryDirectory, "message.json"));
 }
 
@@ -594,8 +588,6 @@ void RecordMessageScreen::sendValidUsersToServerEntry()
     params.push_back(std::pair<std::string, std::string>("action", "validUsers"));
     params.push_back(std::pair<std::string, std::string>("name", InboxScreen::mEmailAddress));
     params.push_back(std::pair<std::string, std::string>("authToken", InboxScreen::mToken));
-
-    params.push_back(std::pair<std::string, std::string>("MAX_FILE_SIZE", "10485760"));
 
     URLLoader::getInstance()->postFile(this, kMemoAppServerURL, params, tFile(tFile::kTemporaryDirectory, "validUsers.json"));
 }

@@ -25,9 +25,10 @@ public:
 
 public:
     URLConnection(void* newId, const std::string& url);
+    URLConnection(void* newId, const std::string& url, const std::vector<std::pair<std::string, std::string> >& newParams);
     URLConnection(void* newId, const std::string& url, const tFile& newFile);
     URLConnection(void* newId, const std::string& url, const std::string& body);
-    URLConnection(void* newId, const std::string& newPHP, const std::vector<std::pair<std::string, std::string> >& newParams, const tFile& newFile);
+    URLConnection(void* newId, const std::string& newPHP, const std::vector<std::pair<std::string, std::string> >& newParams, const tFile& newFile, bool newUseFile = false);
     ~URLConnection();
 
     void DidReceiveResponse(const void* response, int responseCode);
@@ -48,6 +49,8 @@ protected:
 public:
     void loadString(void* newId, const std::string& newURL);
     void loadFile(void* newId, const std::string& newURL, const tFile& newFile);
+    void postLoadString(void* newId, const std::string& newURL, const std::vector<std::pair<std::string, std::string> >& newParams);
+    void postLoadFile(void* newId, const std::string& newURL, const std::vector<std::pair<std::string, std::string> >& newParams, const tFile& newFile);
     void postJSON(void* newId, const std::string& newURL, const std::string& newBody);
     void postFile(void* newId, const std::string& newPHP, const std::vector<std::pair<std::string, std::string> >& newParams, const tFile& newFile);
 
