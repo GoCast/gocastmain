@@ -238,7 +238,7 @@ function isntEmpty($x)
 
 function hasParam($x)
 {
-	if( isntEmpty($GLOBALS['SGET'][$x]) || isntEmpty($GLOBALS['SPOST'][$x]) )
+	if( isntEmpty($GLOBALS['SPOST'][$x]) )
 	{
 		return true;
 	}
@@ -309,16 +309,7 @@ function print_and_log($result)
 	$arr = array();
 	
 	array_push($arr, array("ip" => $_SERVER['REMOTE_ADDR']));
-
-	if ($_SERVER['REQUEST_METHOD'] === "GET")
-	{
-		array_push($arr, array("GET" => remove_password($GLOBALS['SGET'])));
-	}
-	else
-	{
-		array_push($arr, array("POST" => remove_password($GLOBALS['SPOST'])));
-	}
-
+	array_push($arr, array("POST" => remove_password($GLOBALS['SPOST'])));
 	array_push($arr, array("result" => json_decode($result)));
 
 	$json = json_encode($arr);
