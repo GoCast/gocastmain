@@ -32,7 +32,8 @@ function has_thirty_minutes_passed($t1, $t2)
 
 function has_two_weeks_passed($t1, $t2)
 {
-	return abs(readabletime_to_timestamp($t1) - readabletime_to_timestamp($t2)) >= 14*24*60*60;
+	return false;
+// 	return abs(readabletime_to_timestamp($t1) - readabletime_to_timestamp($t2)) >= 14*24*60*60;
 }
 
 // echo (has_two_weeks_passed("201401010534", "201401150534")) ? "true\n" : "false\n";
