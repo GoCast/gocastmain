@@ -30,14 +30,14 @@
 {
     [super viewDidLoad];
 
+    mPeer = new MessageHistoryScreen(self, mInitObject);
+
     [self refreshLanguage];
 
     [self.mTable registerNib:[UINib nibWithNibName:@"InboxEntryCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"InboxEntryCell"];
     [self.mOptionsTable registerNib:[UINib nibWithNibName:@"HeadingSubCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"HeadingSubCell"];
 
     self.view.autoresizesSubviews = YES;
-
-    mPeer = new MessageHistoryScreen(self, mInitObject);
 
     std::string date    = InboxScreen::gmtToLocal(mInitObject["date"].mString);
     std::string result  = "xx/xx xx:xx";
