@@ -23,62 +23,28 @@ RecordMessageScreen::~RecordMessageScreen()
 }
 
 #pragma mark Public methods
-size_t RecordMessageScreen::getToCount()
-{
-    return mInitObject["to"].mArray.size();
-}
-
-std::string RecordMessageScreen::getTo(const size_t& i)
-{
-//    return mInitObject["from"].mString;
-    return mInitObject["to"].mArray[i].mString;
-}
-
-void RecordMessageScreen::deleteTo(const size_t& i)
-{
-    mInitObject["to"].mArray.erase(mInitObject["to"].mArray.begin() + (const int)i);
-}
-
-void RecordMessageScreen::donePressed()
-{
-//    update(kSendPressed);
-}
-
-void RecordMessageScreen::cancelPressed()
-{
-//    update(kCancelPressed);
-}
-
-void RecordMessageScreen::pausePressed()
-{
-//    if (getState() == kPlayingIdle)
-//    {
-//        update(kPausePressed);
-//    }
-}
-
 void RecordMessageScreen::recordPressed()
 {
-//    if (getState() == kWaitToRecordIdle)
-//    {
-//        update(kRecordPressed);
-//    }
+    if (getState() == kIdle)
+    {
+        update(kRecordButtonPressed);
+    }
 }
 
-void RecordMessageScreen::playPressed()
+void RecordMessageScreen::composePressed()
 {
-//    if (getState() == kWaitToPlayIdle || getState() == kPausedIdle)
-//    {
-//        update(kPlayPressed);
-//    }
+    if (getState() == kIdle)
+    {
+        update(kComposeButtonPressed);
+    }
 }
 
-void RecordMessageScreen::stopPressed()
+void RecordMessageScreen::readPressed()
 {
-//    if (getState() == kRecordingIdle)
-//    {
-//        update(kStopPressed);
-//    }
+    if (getState() == kIdle)
+    {
+        update(kReadButtonPressed);
+    }
 }
 
 #pragma mark Start / End / Invalid
@@ -123,9 +89,10 @@ void RecordMessageScreen::invalidStateEntry()
 }
 
 #pragma mark Idling
-void RecordMessageScreen::idleEntry()
-{
-}
+void RecordMessageScreen::idleEntry() { }
+void RecordMessageScreen::idleComposeMessageEntry() { }
+void RecordMessageScreen::idleReadMessageEntry() { }
+void RecordMessageScreen::idleRecordVoiceCommandEntry() { }
 
 #pragma mark Queries
 
@@ -145,6 +112,9 @@ void RecordMessageScreen::CallEntry()
 	{
 		case kEnd: EndEntryHelper(); break;
 		case kIdle: idleEntry(); break;
+		case kIdleComposeMessage: idleComposeMessageEntry(); break;
+		case kIdleReadMessage: idleReadMessageEntry(); break;
+		case kIdleRecordVoiceCommand: idleRecordVoiceCommandEntry(); break;
 		case kInvalidState: invalidStateEntry(); break;
 		case kStart: startEntry(); break;
 		default: break;
@@ -157,6 +127,12 @@ void RecordMessageScreen::CallExit()
 
 int  RecordMessageScreen::StateTransitionFunction(const int evt) const
 {
+	if ((mState == kIdle) && (evt == kComposeButtonPressed)) return kIdleComposeMessage; else
+	if ((mState == kIdle) && (evt == kReadButtonPressed)) return kIdleReadMessage; else
+	if ((mState == kIdle) && (evt == kRecordButtonPressed)) return kIdleRecordVoiceCommand; else
+	if ((mState == kIdleComposeMessage) && (evt == kNext)) return kIdle; else
+	if ((mState == kIdleReadMessage) && (evt == kNext)) return kIdle; else
+	if ((mState == kIdleRecordVoiceCommand) && (evt == kNext)) return kIdle; else
 	if ((mState == kStart) && (evt == kNext)) return kIdle;
 
 	return kInvalidState;
@@ -166,11 +142,13 @@ bool RecordMessageScreen::HasEdgeNamedNext() const
 {
 	switch(mState)
 	{
-		case kStart:
-			return true;
+		case kEnd:
+		case kIdle:
+		case kInvalidState:
+			return false;
 		default: break;
 	}
-	return false;
+	return true;
 }
 
 #pragma mark Messages
@@ -225,11 +203,6 @@ void RecordMessageScreen::update(const URLLoaderEvent& msg)
 
 void RecordMessageScreen::update(const GCTEvent& msg)
 {
-    if (msg.mEvent == GCTEvent::kLanguageChanged)
-    {
-        [mPeer refreshLanguage];
-    }
-
     switch(msg.mEvent)
     {
         case GCTEvent::kForceLogin:

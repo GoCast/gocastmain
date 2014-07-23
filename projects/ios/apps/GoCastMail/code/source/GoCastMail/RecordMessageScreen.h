@@ -39,30 +39,28 @@ public:
     RecordMessageScreen(RecordMessageVC* newVC, const JSONObject& initObject);
 	~RecordMessageScreen();
 
-    size_t getToCount();
-    std::string getTo(const size_t& i);
-    void deleteTo(const size_t& i);
-
-    void donePressed();
-    void cancelPressed();
-
-    void pausePressed();
     void recordPressed();
-    void playPressed();
-    void stopPressed();
+    void readPressed();
+    void composePressed();
 
 protected:
 	void startEntry();
 	void endEntry();
 	void invalidStateEntry();
 
+	void idleComposeMessageEntry();
 	void idleEntry();
+	void idleReadMessageEntry();
+	void idleRecordVoiceCommandEntry();
 
 public:
 	enum EventType
 	{
 		kInvalidEvent = -2,
 		kNext = -1,
+		kComposeButtonPressed,
+		kReadButtonPressed,
+		kRecordButtonPressed,
 	};
 
 	enum StateType
@@ -71,6 +69,9 @@ public:
 		kStart = 1,
 		kEnd,
 		kIdle,
+		kIdleComposeMessage,
+		kIdleReadMessage,
+		kIdleRecordVoiceCommand,
 	};
 
 protected:

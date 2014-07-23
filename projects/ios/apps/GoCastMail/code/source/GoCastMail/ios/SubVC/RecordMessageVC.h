@@ -31,23 +31,12 @@ class RecordMessageScreen;
 
 @property (nonatomic, strong) IBOutlet UIView*          mBottomHalf;
 
-@property (nonatomic, strong) IBOutlet UITableView*     mTable;
-@property (nonatomic, strong) IBOutlet UITableView*     mToTable;
-
-@property (nonatomic, strong) IBOutlet UILabel*         mStatusLabel;
-@property (nonatomic, strong) IBOutlet UIButton*        mPauseButton;
 @property (nonatomic, strong) IBOutlet UIButton*        mRecordButton;
-@property (nonatomic, strong) IBOutlet UIButton*        mPlayButton;
-@property (nonatomic, strong) IBOutlet UIButton*        mStopButton;
+@property (nonatomic, strong) IBOutlet UIButton*        mReadButton;
+@property (nonatomic, strong) IBOutlet UIButton*        mComposeButton;
 
-@property (nonatomic, strong) IBOutlet UILabel*         mTime;
 @property (nonatomic, strong) IBOutlet UITextView*      mTranscription;
-
-@property (nonatomic, strong) IBOutlet UISlider*        mSlider;
-
-@property (nonatomic, strong) IBOutlet UIView*          mBlockingView;
-
-@property (nonatomic, strong) IBOutlet UILabel*         mTranscriptionLabel;
+@property (nonatomic, strong) IBOutlet UITextView*      mMessage;
 
 #pragma mark Construction / Destruction
 - (void)viewDidLoad;
@@ -63,12 +52,9 @@ class RecordMessageScreen;
 
 -(void)setBlockingViewVisible:(bool)newVisible;
 
--(IBAction)pausePressed;
 -(IBAction)recordPressed;
--(IBAction)playPressed;
--(IBAction)stopPressed;
-
--(IBAction)helpButton:(UIBarButtonItem*)sender;
+-(IBAction)readPressed;
+-(IBAction)composePressed;
 
 -(void)customInit:(const JSONObject&)newObject;
 
@@ -83,14 +69,6 @@ class RecordMessageScreen;
 
 -(void)refreshExpanded;
 
--(void) setWaitToRecordUI;
--(void) setWaitToPlayUI;
--(void) setPlayingUI;
--(void) setPausedUI;
--(void) setRecordingUI;
-
--(void) setWaitForTranscriptUI;
-
 -(void) setTimeLabel:(const std::string&)newLabel;
 -(void) setTranscription:(const std::string&)newLabel;
 -(std::string) getTranscription;
@@ -99,7 +77,5 @@ class RecordMessageScreen;
 -(void) setSliderPercentage:(float)newPercentage;
 
 -(void) sendEmailTo:(const JSONArray&)newTo withAttachment:(const tFile&)audioFile usingName:(const std::string&)newName;
-
--(void) refreshLanguage;
 
 @end
