@@ -53,7 +53,6 @@ protected:
 	void idleEntry();
 	void idleListeningEntry();
 	void idleRecordingEntry();
-	void idleSpeakingEntry();
 	void idleWaitForListeningTranscriptionEntry();
 	void idleWaitForRecordingTranscriptionEntry();
 	void playBeginListeningIndicatorEntry();
@@ -70,6 +69,7 @@ protected:
 	void stopRecordingMessageEntry();
 	void whatDoesTranscriptionSayEntry();
 
+	void idleExit();
 	void idleListeningExit();
 	void idleRecordingExit();
 
@@ -101,7 +101,6 @@ public:
 		kIdle,
 		kIdleListening,
 		kIdleRecording,
-		kIdleSpeaking,
 		kIdleWaitForListeningTranscription,
 		kIdleWaitForRecordingTranscription,
 		kPlayBeginListeningIndicator,

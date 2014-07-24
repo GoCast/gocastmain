@@ -197,7 +197,7 @@ const unsigned char SpeechKitApplicationKey[] =
 	if (pocketsphinxController == nil) {
 		pocketsphinxController = [[PocketsphinxController alloc] init];
         //pocketsphinxController.verbosePocketSphinx = TRUE; // Uncomment me for verbose debug output
-        pocketsphinxController.outputAudio = TRUE;
+        pocketsphinxController.outputAudio = FALSE;
 #ifdef kGetNbest
         pocketsphinxController.returnNbest = TRUE;
         pocketsphinxController.nBestNumber = 5;
@@ -392,12 +392,12 @@ const unsigned char SpeechKitApplicationKey[] =
 
 -(void)openEars
 {
-
+	[self.pocketsphinxController resumeRecognition];
 }
 
 -(void)closeEars
 {
-
+	[self.pocketsphinxController suspendRecognition];
 }
 
 -(void)ctorRecorder

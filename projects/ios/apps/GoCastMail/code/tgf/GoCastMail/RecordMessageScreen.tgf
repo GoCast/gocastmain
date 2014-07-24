@@ -1,6 +1,6 @@
 1 start
 2 end
-3 idle
+3 idle*
 4 Start listening for commands
 5 idle: listening*
 6 Stop listening for commands
@@ -10,22 +10,21 @@
 10 Play "end listening" indicator
 11 What does transcription say?
 12 Start speaking message
-13 idle: speaking
-14 Start recording message
-15 Stop recording message
-16 idle: recording*
-17 Play "begin recording" indicator
-18 Play "end recording" indicator
-19 Do we need to wait for recording transcription?
-20 idle: wait for recording transcription
-21 Speak "What can I do?"
-22 Speak "Okay, let me read that message for you"
-23 Speak "Okay, begin recording a new message after the tone"
+13 Start recording message
+14 Stop recording message
+15 idle: recording*
+16 Play "begin recording" indicator
+17 Play "end recording" indicator
+18 Do we need to wait for recording transcription?
+19 idle: wait for recording transcription
+20 Speak "What can I do?"
+21 Speak "Okay, let me read that message for you"
+22 Speak "Okay, begin recording a new message after the tone"
 #
 1 3
 3 9 recordButtonPressed
 3 12 readButtonPressed
-3 17 composeButtonPressed
+3 16 composeButtonPressed
 4 5
 5 6 stopPressed, transcriptionReady
 6 10
@@ -34,20 +33,19 @@
 10 8
 7 11 transcriptionReady
 8 11 no
-11 22 readButtonPressed
-11 23 composeButtonPressed
+11 21 readButtonPressed
+11 22 composeButtonPressed
 11 3 noneOfTheAbove
-13 3 speakingDone
-12 13
-14 16
-16 15 stopPressed, transcriptionReady
-17 14 indicatorFinished
-15 18
-18 19
-19 20 yes
-20 3 transcriptionReady
-19 3 no
-3 21 voiceCommandHeard
-21 9 speakingDone
-22 12 speakingDone
-23 17 speakingDone
+12 3 speakingDone
+13 15
+15 14 stopPressed, transcriptionReady
+16 13 indicatorFinished
+14 17
+17 18
+18 19 yes
+19 3 transcriptionReady
+18 3 no
+3 20 voiceCommandHeard
+20 9 speakingDone
+21 12 speakingDone
+22 16 speakingDone

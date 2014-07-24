@@ -91,13 +91,21 @@ void RecordMessageScreen::invalidStateEntry()
 }
 
 #pragma mark Idling
-void RecordMessageScreen::idleEntry() { }
+void RecordMessageScreen::idleEntry()
+{
+    [gAppDelegateInstance openEars];
+}
+
+void RecordMessageScreen::idleExit()
+{
+    [gAppDelegateInstance closeEars];
+}
+
 void RecordMessageScreen::idleListeningEntry() { }
 void RecordMessageScreen::idleListeningExit() { }
 void RecordMessageScreen::idleRecordingEntry() { }
 void RecordMessageScreen::idleRecordingExit() { }
 
-void RecordMessageScreen::idleSpeakingEntry() { }
 void RecordMessageScreen::idleWaitForListeningTranscriptionEntry() { }
 void RecordMessageScreen::idleWaitForRecordingTranscriptionEntry() { }
 
@@ -269,7 +277,6 @@ void RecordMessageScreen::CallEntry()
 		case kIdle: idleEntry(); break;
 		case kIdleListening: idleListeningEntry(); break;
 		case kIdleRecording: idleRecordingEntry(); break;
-		case kIdleSpeaking: idleSpeakingEntry(); break;
 		case kIdleWaitForListeningTranscription: idleWaitForListeningTranscriptionEntry(); break;
 		case kIdleWaitForRecordingTranscription: idleWaitForRecordingTranscriptionEntry(); break;
 		case kInvalidState: invalidStateEntry(); break;
@@ -295,6 +302,7 @@ void RecordMessageScreen::CallExit()
 {
 	switch(mState)
 	{
+		case kIdle: idleExit(); break;
 		case kIdleListening: idleListeningExit(); break;
 		case kIdleRecording: idleRecordingExit(); break;
 		default: break;
@@ -315,7 +323,6 @@ int  RecordMessageScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kIdleListening) && (evt == kTranscriptionReady)) return kStopListeningForCommands; else
 	if ((mState == kIdleRecording) && (evt == kStopPressed)) return kStopRecordingMessage; else
 	if ((mState == kIdleRecording) && (evt == kTranscriptionReady)) return kStopRecordingMessage; else
-	if ((mState == kIdleSpeaking) && (evt == kSpeakingDone)) return kIdle; else
 	if ((mState == kIdleWaitForListeningTranscription) && (evt == kTranscriptionReady)) return kWhatDoesTranscriptionSay; else
 	if ((mState == kIdleWaitForRecordingTranscription) && (evt == kTranscriptionReady)) return kIdle; else
 	if ((mState == kPlayBeginListeningIndicator) && (evt == kIndicatorFinished)) return kStartListeningForCommands; else
@@ -328,7 +335,7 @@ int  RecordMessageScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kStart) && (evt == kNext)) return kIdle; else
 	if ((mState == kStartListeningForCommands) && (evt == kNext)) return kIdleListening; else
 	if ((mState == kStartRecordingMessage) && (evt == kNext)) return kIdleRecording; else
-	if ((mState == kStartSpeakingMessage) && (evt == kNext)) return kIdleSpeaking; else
+	if ((mState == kStartSpeakingMessage) && (evt == kSpeakingDone)) return kIdle; else
 	if ((mState == kStopListeningForCommands) && (evt == kNext)) return kPlayEndListeningIndicator; else
 	if ((mState == kStopRecordingMessage) && (evt == kNext)) return kPlayEndRecordingIndicator; else
 	if ((mState == kWhatDoesTranscriptionSay) && (evt == kComposeButtonPressed)) return kSpeakOkayBeginRecordingANewMessageAfterTheTone; else
@@ -347,7 +354,6 @@ bool RecordMessageScreen::HasEdgeNamedNext() const
 		case kStart:
 		case kStartListeningForCommands:
 		case kStartRecordingMessage:
-		case kStartSpeakingMessage:
 		case kStopListeningForCommands:
 		case kStopRecordingMessage:
 			return true;
@@ -441,7 +447,7 @@ void RecordMessageScreen::update(const GCTEvent& msg)
         case GCTEvent::kSpeakingFinished:
             switch (getState())
             {
-                case kIdleSpeaking:
+                case kStartSpeakingMessage:
                 case kSpeakWhatCanIDo:
                 case kSpeakOkayBeginRecordingANewMessageAfterTheTone:
                 case kSpeakOkayLetMeReadThatMessageForYou:
