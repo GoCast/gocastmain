@@ -20,6 +20,8 @@ public:
         kTranscriptFinished,
 
         kSpeakingFinished,
+
+        kHeyGoCastWasSaid,
     };
 
     EventType   mEvent;

@@ -13,6 +13,12 @@
 
 #import "TestFlight.h"
 
+#import <OpenEars/PocketsphinxController.h> // Please note that unlike in previous versions of OpenEars, we now link the headers through the framework.
+#import <OpenEars/FliteController.h>
+#import <OpenEars/LanguageModelGenerator.h>
+#import <OpenEars/OpenEarsLogging.h>
+#import <OpenEars/AcousticModel.h>
+
 AppDelegate* gAppDelegateInstance = NULL;
 
 extern std::vector<std::string> gUserListEntries;
@@ -34,6 +40,12 @@ const unsigned char SpeechKitApplicationKey[] =
 @implementation AppDelegate
 
 @synthesize window = mWindow;
+
+@synthesize pocketsphinxController;
+@synthesize openEarsEventsObserver;
+@synthesize slt;
+@synthesize pathToFirstDynamicallyGeneratedLanguageModel;
+@synthesize pathToFirstDynamicallyGeneratedDictionary;
 
 #pragma mark Constructor / Destructor
 
@@ -106,6 +118,7 @@ const unsigned char SpeechKitApplicationKey[] =
     self->mNavBarHeight     = (size_t)self.mInboxNavBar.frame.size.height;
     self->mStatusBarHeight  = (size_t)[UIApplication sharedApplication].statusBarFrame.size.height;
 
+    [self ctorEars];
     [self ctorRecorder];
     [self ctorSynth];
 
@@ -145,6 +158,7 @@ const unsigned char SpeechKitApplicationKey[] =
 {
     [self dtorSynth];
     [self dtorRecorder];
+    [self dtorEars];
 
     [mWindow release];
     [super dealloc];
@@ -173,6 +187,61 @@ const unsigned char SpeechKitApplicationKey[] =
 {
 #pragma unused(application)
     tApplication::getInstance()->resume();
+}
+
+#pragma mark -
+#pragma mark Lazy Allocation
+
+// Lazily allocated PocketsphinxController.
+- (PocketsphinxController *)pocketsphinxController {
+	if (pocketsphinxController == nil) {
+		pocketsphinxController = [[PocketsphinxController alloc] init];
+        //pocketsphinxController.verbosePocketSphinx = TRUE; // Uncomment me for verbose debug output
+        pocketsphinxController.outputAudio = TRUE;
+#ifdef kGetNbest
+        pocketsphinxController.returnNbest = TRUE;
+        pocketsphinxController.nBestNumber = 5;
+#endif
+	}
+	return pocketsphinxController;
+}
+
+// Lazily allocated slt voice.
+- (Slt *)slt {
+	if (slt == nil) {
+		slt = [[Slt alloc] init];
+	}
+	return slt;
+}
+
+// Lazily allocated OpenEarsEventsObserver.
+- (OpenEarsEventsObserver *)openEarsEventsObserver {
+	if (openEarsEventsObserver == nil) {
+		openEarsEventsObserver = [[OpenEarsEventsObserver alloc] init];
+	}
+	return openEarsEventsObserver;
+}
+
+// The last class we're using here is LanguageModelGenerator but I don't think it's advantageous to lazily instantiate it. You can see how it's used below.
+
+- (void) startEars
+{
+
+    // startListeningWithLanguageModelAtPath:dictionaryAtPath:languageModelIsJSGF always needs to know the grammar file being used,
+    // the dictionary file being used, and whether the grammar is a JSGF. You must put in the correct value for languageModelIsJSGF.
+    // Inside of a single recognition loop, you can only use JSGF grammars or ARPA grammars, you can't switch between the two types.
+
+    // An ARPA grammar is the kind with a .languagemodel or .DMP file, and a JSGF grammar is the kind with a .gram file.
+
+    // If you wanted to just perform recognition on an isolated wav file for testing, you could do it as follows:
+
+    // NSString *wavPath = [NSString stringWithFormat:@"%@/%@",[[NSBundle mainBundle] resourcePath], @"test.wav"];
+    //[self.pocketsphinxController runRecognitionOnWavFileAtPath:wavPath usingLanguageModelAtPath:self.pathToGrammarToStartAppWith dictionaryAtPath:self.pathToDictionaryToStartAppWith languageModelIsJSGF:FALSE];  // Starts the recognition loop.
+
+    // But under normal circumstances you'll probably want to do continuous recognition as follows:
+
+    [self.pocketsphinxController startListeningWithLanguageModelAtPath:self.pathToFirstDynamicallyGeneratedLanguageModel dictionaryAtPath:self.pathToFirstDynamicallyGeneratedDictionary acousticModelAtPath:[AcousticModel pathToModel:@"AcousticModelEnglish"] languageModelIsJSGF:FALSE]; // Change "AcousticModelEnglish" to "AcousticModelSpanish" in order to perform Spanish recognition instead of English.
+
 }
 
 #pragma mark Audio Recording
@@ -273,6 +342,64 @@ const unsigned char SpeechKitApplicationKey[] =
     [recordSetting release];
 }
 
+-(void)ctorEars
+{
+	[self.openEarsEventsObserver setDelegate:self]; // Make this class the delegate of OpenEarsObserver so we can get all of the messages about what OpenEars is doing.
+
+
+
+    // This is the language model we're going to start up with. The only reason I'm making it a class property is that I reuse it a bunch of times in this example,
+	// but you can pass the string contents directly to PocketsphinxController:startListeningWithLanguageModelAtPath:dictionaryAtPath:languageModelIsJSGF:
+
+    NSArray *firstLanguageArray = [[[NSArray alloc] initWithArray:[NSArray arrayWithObjects: // All capital letters.
+                                                                  @"HEY",
+                                                                  @"GO",
+                                                                  @"CAST",
+                                                                  @"MAIL",
+                                                                  @"TALK",
+                                                                  nil]] autorelease];
+
+	LanguageModelGenerator *languageModelGenerator = [[[LanguageModelGenerator alloc] init] autorelease];
+
+    NSError *error = [languageModelGenerator generateLanguageModelFromArray:firstLanguageArray
+                                                             withFilesNamed:@"FirstOpenEarsDynamicLanguageModel"
+                                                     forAcousticModelAtPath:[AcousticModel pathToModel:@"AcousticModelEnglish"]]; // Change "AcousticModelEnglish" to "AcousticModelSpanish" in order to create a language model for Spanish recognition instead of English.
+
+	NSDictionary *firstDynamicLanguageGenerationResultsDictionary = nil;
+    if([error code] != noErr) {
+        NSLog(@"Dynamic language generator reported error %@", [error description]);
+    } else {
+		firstDynamicLanguageGenerationResultsDictionary = [error userInfo];
+
+		NSString *lmFile = [firstDynamicLanguageGenerationResultsDictionary objectForKey:@"LMFile"];
+		NSString *dictionaryFile = [firstDynamicLanguageGenerationResultsDictionary objectForKey:@"DictionaryFile"];
+		NSString *lmPath = [firstDynamicLanguageGenerationResultsDictionary objectForKey:@"LMPath"];
+		NSString *dictionaryPath = [firstDynamicLanguageGenerationResultsDictionary objectForKey:@"DictionaryPath"];
+
+		NSLog(@"Dynamic language generator completed successfully, you can find your new files %@\n and \n%@\n at the paths \n%@ \nand \n%@", lmFile,dictionaryFile,lmPath,dictionaryPath);
+
+		self.pathToFirstDynamicallyGeneratedLanguageModel = lmPath;
+		self.pathToFirstDynamicallyGeneratedDictionary = dictionaryPath;
+
+        [self startEars];
+    }
+}
+
+-(void)dtorEars
+{
+	openEarsEventsObserver.delegate = nil;
+}
+
+-(void)openEars
+{
+
+}
+
+-(void)closeEars
+{
+
+}
+
 -(void)ctorRecorder
 {
     [self ctorEmailRecorder];
@@ -327,10 +454,10 @@ const unsigned char SpeechKitApplicationKey[] =
     [_mSynthesizer release];
 }
 
--(void)startSpeaking:(std::string&)text
+-(void)startSpeaking:(const std::string&)text
 {
     AVSpeechUtterance *utterance = [[[AVSpeechUtterance alloc] initWithString:[NSString stringWithUTF8String:text.c_str()]] autorelease];
-    utterance.rate = AVSpeechUtteranceDefaultSpeechRate;
+    utterance.rate = AVSpeechUtteranceDefaultSpeechRate * 0.60f;
     utterance.voice = [AVSpeechSynthesisVoice voiceWithLanguage:@"en-us"];
     [_mSynthesizer speakUtterance:utterance];
 }
@@ -479,6 +606,47 @@ const unsigned char SpeechKitApplicationKey[] =
 {
 #pragma unused(synthesizer, utterance)
     GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kSpeakingFinished));
+}
+
+- (void) pocketsphinxRecognitionLoopDidStart
+{
+	NSLog(@"Pocketsphinx is starting up."); // Log it.
+}
+
+- (void) pocketsphinxDidStartCalibration
+{
+	NSLog(@"Pocketsphinx calibration has started."); // Log it.
+}
+
+- (void) pocketsphinxDidCompleteCalibration
+{
+	NSLog(@"Pocketsphinx calibration is complete."); // Log it.
+}
+
+- (void) pocketsphinxDidStartListening
+{
+	NSLog(@"Pocketsphinx is now listening."); // Log it.
+}
+
+- (void) pocketsphinxDidResumeRecognition
+{
+    NSLog(@"*** PocketSphinx is ready.");
+}
+
+- (void) pocketsphinxDidReceiveHypothesis:(NSString *)hypothesis recognitionScore:(NSString *)recognitionScore utteranceID:(NSString *)utteranceID
+{
+	NSLog(@"The received hypothesis is %@ with a score of %@ and an ID of %@", hypothesis, recognitionScore, utteranceID); // Log it.
+
+    std::string heard = [hypothesis UTF8String];
+    std::transform(heard.begin(), heard.end(), heard.begin(), ::tolower);
+
+    if ((heard == std::string("hey go cast talk")) ||
+        (heard == std::string("hey go cast mail")) ||
+        (heard == std::string("hey go cast")))
+    {
+        GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kHeyGoCastWasSaid));
+    }
+//	self.heardTextView.text = [NSString stringWithFormat:@"Heard: \"%@\"", hypothesis]; // Show it in the status box.
 }
 
 @end

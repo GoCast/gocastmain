@@ -240,6 +240,21 @@ void RecordMessageScreen::startSpeakingMessageEntry()
 
 #pragma mark UI
 
+void RecordMessageScreen::speakWhatCanIDoEntry()
+{
+    [gAppDelegateInstance startSpeaking:"Hey there. What can I do for you?"];
+}
+
+void RecordMessageScreen::speakOkayBeginRecordingANewMessageAfterTheToneEntry()
+{
+    [gAppDelegateInstance startSpeaking:"Okay, begin recording a new message after the tone."];
+}
+
+void RecordMessageScreen::speakOkayLetMeReadThatMessageForYouEntry()
+{
+    [gAppDelegateInstance startSpeaking:"Okay, let me read that message for you."];
+}
+
 #pragma mark Sending messages to other machines
 
 #pragma mark State wiring
@@ -262,6 +277,9 @@ void RecordMessageScreen::CallEntry()
 		case kPlayBeginRecordingIndicator: playBeginRecordingIndicatorEntry(); break;
 		case kPlayEndListeningIndicator: playEndListeningIndicatorEntry(); break;
 		case kPlayEndRecordingIndicator: playEndRecordingIndicatorEntry(); break;
+		case kSpeakOkayBeginRecordingANewMessageAfterTheTone: speakOkayBeginRecordingANewMessageAfterTheToneEntry(); break;
+		case kSpeakOkayLetMeReadThatMessageForYou: speakOkayLetMeReadThatMessageForYouEntry(); break;
+		case kSpeakWhatCanIDo: speakWhatCanIDoEntry(); break;
 		case kStart: startEntry(); break;
 		case kStartListeningForCommands: startListeningForCommandsEntry(); break;
 		case kStartRecordingMessage: startRecordingMessageEntry(); break;
@@ -292,6 +310,7 @@ int  RecordMessageScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kIdle) && (evt == kComposeButtonPressed)) return kPlayBeginRecordingIndicator; else
 	if ((mState == kIdle) && (evt == kReadButtonPressed)) return kStartSpeakingMessage; else
 	if ((mState == kIdle) && (evt == kRecordButtonPressed)) return kPlayBeginListeningIndicator; else
+	if ((mState == kIdle) && (evt == kVoiceCommandHeard)) return kSpeakWhatCanIDo; else
 	if ((mState == kIdleListening) && (evt == kStopPressed)) return kStopListeningForCommands; else
 	if ((mState == kIdleListening) && (evt == kTranscriptionReady)) return kStopListeningForCommands; else
 	if ((mState == kIdleRecording) && (evt == kStopPressed)) return kStopRecordingMessage; else
@@ -303,15 +322,18 @@ int  RecordMessageScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kPlayBeginRecordingIndicator) && (evt == kIndicatorFinished)) return kStartRecordingMessage; else
 	if ((mState == kPlayEndListeningIndicator) && (evt == kNext)) return kDoWeNeedToWaitForTranscription; else
 	if ((mState == kPlayEndRecordingIndicator) && (evt == kNext)) return kDoWeNeedToWaitForRecordingTranscription; else
+	if ((mState == kSpeakOkayBeginRecordingANewMessageAfterTheTone) && (evt == kSpeakingDone)) return kPlayBeginRecordingIndicator; else
+	if ((mState == kSpeakOkayLetMeReadThatMessageForYou) && (evt == kSpeakingDone)) return kStartSpeakingMessage; else
+	if ((mState == kSpeakWhatCanIDo) && (evt == kSpeakingDone)) return kPlayBeginListeningIndicator; else
 	if ((mState == kStart) && (evt == kNext)) return kIdle; else
 	if ((mState == kStartListeningForCommands) && (evt == kNext)) return kIdleListening; else
 	if ((mState == kStartRecordingMessage) && (evt == kNext)) return kIdleRecording; else
 	if ((mState == kStartSpeakingMessage) && (evt == kNext)) return kIdleSpeaking; else
 	if ((mState == kStopListeningForCommands) && (evt == kNext)) return kPlayEndListeningIndicator; else
 	if ((mState == kStopRecordingMessage) && (evt == kNext)) return kPlayEndRecordingIndicator; else
-	if ((mState == kWhatDoesTranscriptionSay) && (evt == kComposeButtonPressed)) return kPlayBeginRecordingIndicator; else
+	if ((mState == kWhatDoesTranscriptionSay) && (evt == kComposeButtonPressed)) return kSpeakOkayBeginRecordingANewMessageAfterTheTone; else
 	if ((mState == kWhatDoesTranscriptionSay) && (evt == kNoneOfTheAbove)) return kIdle; else
-	if ((mState == kWhatDoesTranscriptionSay) && (evt == kReadButtonPressed)) return kStartSpeakingMessage;
+	if ((mState == kWhatDoesTranscriptionSay) && (evt == kReadButtonPressed)) return kSpeakOkayLetMeReadThatMessageForYou;
 
 	return kInvalidState;
 }
@@ -409,10 +431,25 @@ void RecordMessageScreen::update(const GCTEvent& msg)
             }
             break;
 
-        case GCTEvent::kSpeakingFinished:
-            if (getState() == kIdleSpeaking)
+        case GCTEvent::kHeyGoCastWasSaid:
+            if (getState() == kIdle)
             {
-                update(kSpeakingDone);
+                update(kVoiceCommandHeard);
+            }
+            break;
+
+        case GCTEvent::kSpeakingFinished:
+            switch (getState())
+            {
+                case kIdleSpeaking:
+                case kSpeakWhatCanIDo:
+                case kSpeakOkayBeginRecordingANewMessageAfterTheTone:
+                case kSpeakOkayLetMeReadThatMessageForYou:
+                    update(kSpeakingDone);
+                    break;
+
+                default:
+                    break;
             }
             break;
 

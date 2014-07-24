@@ -60,10 +60,15 @@
                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                             <nil key="highlightedColor"/>
                         </label>
-                        <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" text="Sample Message" id="J0e-N8-ZLE" userLabel="mMessage">
+                        <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" id="J0e-N8-ZLE" userLabel="mMessage">
                             <rect key="frame" x="20" y="150" width="280" height="128"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                            <string key="text">First, say "Hey GoCast Mail".
+
+When asked for a command, you can say "read" to "read" the message to you, or "compose" to create a new message.
+
+Speakable commands include: "read message", "say message", "speak message", "compose message", "new message", or "reply".</string>
                             <fontDescription key="fontDescription" type="system" pointSize="14"/>
                             <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                         </textView>

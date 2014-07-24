@@ -88,6 +88,7 @@
 			'../../source/Bootstrap/<@(OS)',
 			'../../source/Io/<@(OS)',
 			'../../source/GoCastMail/<@(OS)',
+			'../../third-party/OpenEarsDistribution/Framework/OpenEars.framework/Headers',
 		 ],  # include_dirs
 
 		'xcode_settings': {
@@ -117,7 +118,6 @@
 					'../../third-party/TestFlightSDK3.0.0/TestFlight.h',
 					'../../third-party/TestFlightSDK3.0.0/TestFlight+AsyncLogging.h',
 					'../../third-party/TestFlightSDK3.0.0/TestFlight+ManualSessions.h',
-
 				],	# sources
 
 				'mac_bundle_resources': [
@@ -185,10 +185,14 @@
 					'../../rsrc/GoCastMail/<@(OS)/Default.png',
 					'../../rsrc/GoCastMail/<@(OS)/Default@2x.png',
 					'../../rsrc/GoCastMail/<@(OS)/Default-568h@2x.png',
+
+					'../../third-party/OpenEarsDistribution/Framework/AcousticModelEnglish.bundle',
+					'../../third-party/OpenEarsDistribution/Framework/AcousticModelSpanish.bundle',
 				],	# mac_bundle_resources
 
                 'mac_framework_dirs': [
 					'../../third-party/DragonMobileSDK_1.4.9',
+					'../../third-party/OpenEarsDistribution/Framework',
                 ],
 
 				'link_settings': {
@@ -197,6 +201,8 @@
 						'libz.dylib',
 						'../../third-party/DragonMobileSDK_1.4.9/SpeechKit.framework',
 						'libsqlite3.dylib',
+						'../../third-party/OpenEarsDistribution/Framework/OpenEars.framework',
+						'../../third-party/OpenEarsDistribution/Framework/Slt.framework',
 						'$(SDKROOT)/System/Library/Frameworks/AddressBook.framework',
 						'$(SDKROOT)/System/Library/Frameworks/AddressBookUI.framework',
 # 						'$(SDKROOT)/System/Library/Frameworks/AdSupport.framework',

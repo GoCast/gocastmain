@@ -2,6 +2,11 @@
 #import <MessageUI/MessageUI.h>
 #import <AVFoundation/AVFoundation.h>
 #import <SpeechKit/SpeechKit.h>
+#import <Slt/Slt.h>
+
+@class PocketsphinxController;
+@class FliteController;
+#import <OpenEars/OpenEarsEventsObserver.h> // We need to import this here in order to use the delegate.
 
 #include <vector>
 #include <string>
@@ -14,7 +19,8 @@
     AVAudioRecorderDelegate,
     SpeechKitDelegate,
     SKRecognizerDelegate,
-    AVSpeechSynthesizerDelegate
+    AVSpeechSynthesizerDelegate,
+    OpenEarsEventsObserverDelegate
 >
 {
 @public
@@ -24,6 +30,14 @@
     size_t          mNavBarHeight;
     size_t          mStatusBarHeight;
 }
+
+@property (nonatomic, retain) Slt *slt;
+@property (nonatomic, retain) OpenEarsEventsObserver *openEarsEventsObserver; // A class whose delegate methods which will allow us to stay informed of changes in the Flite and Pocketsphinx statuses.
+@property (nonatomic, retain) PocketsphinxController *pocketsphinxController; // The controller for Pocketsphinx (voice recognition).
+
+@property (nonatomic, copy) NSString *pathToFirstDynamicallyGeneratedLanguageModel;
+@property (nonatomic, copy) NSString *pathToFirstDynamicallyGeneratedDictionary;
+
 
 @property (nonatomic, retain) IBOutlet UIWindow *window;
 @property (nonatomic, retain) IBOutlet UITabBarController *tabBarController;
@@ -50,6 +64,11 @@
 
 @property (strong, nonatomic) AVSpeechSynthesizer *mSynthesizer;
 
+-(void)ctorEars;
+-(void)dtorEars;
+-(void)openEars;
+-(void)closeEars;
+
 -(void)ctorRecorder;
 -(void)dtorRecorder;
 -(void)startListening;
@@ -58,7 +77,7 @@
 
 -(void)ctorSynth;
 -(void)dtorSynth;
--(void)startSpeaking:(std::string&)text;
+-(void)startSpeaking:(const std::string&)text;
 -(void)stopSpeaking;
 
 -(void)stopNuanceRecorder;

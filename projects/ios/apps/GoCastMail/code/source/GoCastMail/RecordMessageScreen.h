@@ -60,6 +60,9 @@ protected:
 	void playBeginRecordingIndicatorEntry();
 	void playEndListeningIndicatorEntry();
 	void playEndRecordingIndicatorEntry();
+	void speakOkayBeginRecordingANewMessageAfterTheToneEntry();
+	void speakOkayLetMeReadThatMessageForYouEntry();
+	void speakWhatCanIDoEntry();
 	void startListeningForCommandsEntry();
 	void startRecordingMessageEntry();
 	void startSpeakingMessageEntry();
@@ -84,6 +87,7 @@ public:
 		kSpeakingDone,
 		kStopPressed,
 		kTranscriptionReady,
+		kVoiceCommandHeard,
 		kYes,
 	};
 
@@ -104,6 +108,9 @@ public:
 		kPlayBeginRecordingIndicator,
 		kPlayEndListeningIndicator,
 		kPlayEndRecordingIndicator,
+		kSpeakOkayBeginRecordingANewMessageAfterTheTone,
+		kSpeakOkayLetMeReadThatMessageForYou,
+		kSpeakWhatCanIDo,
 		kStartListeningForCommands,
 		kStartRecordingMessage,
 		kStartSpeakingMessage,
