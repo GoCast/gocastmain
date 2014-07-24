@@ -300,7 +300,7 @@ const unsigned char SpeechKitApplicationKey[] =
     if (voiceSearch) [voiceSearch release];
 
     voiceSearch = [[SKRecognizer alloc] initWithType:SKDictationRecognizerType
-                                           detection:SKNoEndOfSpeechDetection
+                                           detection:SKLongEndOfSpeechDetection
                                             language:@"en_US"
                                             delegate:self];
 }

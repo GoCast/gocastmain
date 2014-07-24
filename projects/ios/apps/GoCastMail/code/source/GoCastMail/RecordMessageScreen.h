@@ -26,7 +26,6 @@ protected:
     tSound*             mSound;
     tSound*             mBeginRecordingIndicator;
     tSound*             mEndRecordingIndicator;
-    tTimer*             mTenMinuteTimer;
     tTimer*             mSliderUpdateTimer;
     tTimer*             mRecordTimer;
     size_t              mRecrodSeconds;
@@ -34,6 +33,7 @@ protected:
     int32_t             mAlreadyPlayedTimeMS;
     bool                mDidRecord;
     bool                mGotTranscriptionEvent;
+    bool                mRecordingCommand;
 
 public:
     RecordMessageScreen(RecordMessageVC* newVC, const JSONObject& initObject);
@@ -48,20 +48,27 @@ protected:
 	void endEntry();
 	void invalidStateEntry();
 
+	void doWeNeedToWaitForRecordingTranscriptionEntry();
 	void doWeNeedToWaitForTranscriptionEntry();
 	void idleEntry();
 	void idleListeningEntry();
+	void idleRecordingEntry();
 	void idleSpeakingEntry();
 	void idleWaitForListeningTranscriptionEntry();
+	void idleWaitForRecordingTranscriptionEntry();
 	void playBeginListeningIndicatorEntry();
+	void playBeginRecordingIndicatorEntry();
 	void playEndListeningIndicatorEntry();
-	void showComposeMessageEntry();
+	void playEndRecordingIndicatorEntry();
 	void startListeningForCommandsEntry();
+	void startRecordingMessageEntry();
 	void startSpeakingMessageEntry();
 	void stopListeningForCommandsEntry();
+	void stopRecordingMessageEntry();
 	void whatDoesTranscriptionSayEntry();
 
 	void idleListeningExit();
+	void idleRecordingExit();
 
 public:
 	enum EventType
@@ -84,18 +91,24 @@ public:
 	{
 		kInvalidState = 0,
 		kStart = 1,
+		kDoWeNeedToWaitForRecordingTranscription,
 		kDoWeNeedToWaitForTranscription,
 		kEnd,
 		kIdle,
 		kIdleListening,
+		kIdleRecording,
 		kIdleSpeaking,
 		kIdleWaitForListeningTranscription,
+		kIdleWaitForRecordingTranscription,
 		kPlayBeginListeningIndicator,
+		kPlayBeginRecordingIndicator,
 		kPlayEndListeningIndicator,
-		kShowComposeMessage,
+		kPlayEndRecordingIndicator,
 		kStartListeningForCommands,
+		kStartRecordingMessage,
 		kStartSpeakingMessage,
 		kStopListeningForCommands,
+		kStopRecordingMessage,
 		kWhatDoesTranscriptionSay,
 	};
 
