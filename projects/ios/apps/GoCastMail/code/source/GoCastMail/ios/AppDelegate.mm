@@ -22,13 +22,13 @@ extern std::vector<std::string> gMemberListEntries;
 
 const unsigned char SpeechKitApplicationKey[] =
 {
-    0x9c, 0xf2, 0x24, 0xb9, 0xdf, 0x9b, 0x4d, 0x92, 0x98, 0x7b,
-    0x8e, 0x56, 0x60, 0x20, 0x03, 0xb1, 0xd7, 0x5f, 0xb7, 0x55,
-    0x8b, 0x04, 0x8e, 0xd9, 0x8b, 0x81, 0xf8, 0xe1, 0xcd, 0x61,
-    0x9d, 0x69, 0x53, 0xc1, 0x22, 0x32, 0x5c, 0x6f, 0xc4, 0xf4,
-    0xeb, 0x53, 0x4a, 0x4b, 0x73, 0x4d, 0xfd, 0x4a, 0xac, 0xb4,
-    0x9f, 0x38, 0xb8, 0x2e, 0x11, 0x43, 0xaf, 0x09, 0x24, 0x7c,
-    0x6a, 0xc1, 0xe6, 0xbd
+    0xb2, 0x46, 0xb7, 0x88, 0x47, 0x17, 0xfe, 0x71, 0x34, 0xe7,
+    0xc3, 0x58, 0xce, 0x38, 0xf3, 0xc1, 0xbf, 0x20, 0x07, 0x7b,
+    0x5d, 0x7d, 0xe9, 0x93, 0xe8, 0xaa, 0xbb, 0x46, 0xc2, 0x49,
+    0xb2, 0x74, 0x8f, 0x69, 0xfc, 0xd6, 0x80, 0xfa, 0x47, 0xb5,
+    0xe1, 0x0a, 0x0d, 0xb0, 0x42, 0x00, 0x71, 0x02, 0x21, 0x79,
+    0x7d, 0x7e, 0xf6, 0x66, 0x11, 0xde, 0x10, 0xcc, 0x24, 0xd2,
+    0x15, 0xd7, 0x46, 0xa5
 };
 
 @implementation AppDelegate
@@ -107,6 +107,7 @@ const unsigned char SpeechKitApplicationKey[] =
     self->mStatusBarHeight  = (size_t)[UIApplication sharedApplication].statusBarFrame.size.height;
 
     [self ctorRecorder];
+    [self ctorSynth];
 
     if (floor(NSFoundationVersionNumber) > NSFoundationVersionNumber_iOS_6_1)
     {
@@ -142,6 +143,7 @@ const unsigned char SpeechKitApplicationKey[] =
 
 - (void)dealloc
 {
+    [self dtorSynth];
     [self dtorRecorder];
 
     [mWindow release];
@@ -178,8 +180,8 @@ const unsigned char SpeechKitApplicationKey[] =
 {
     [UIDevice currentDevice].proximityMonitoringEnabled = YES;
 
-    [SpeechKit setupWithID:@"NMDPPRODUCTION_GoCast_Inc_GoCast_Talk_20140310195747"
-                      host:@"biy.nmdp.nuancemobility.net"
+    [SpeechKit setupWithID:@"NMDPTRIAL_gocast20140310195109"
+                      host:@"sandbox.nmdp.nuancemobility.net"
                       port:443
                     useSSL:NO
                   delegate:self];
@@ -314,6 +316,30 @@ const unsigned char SpeechKitApplicationKey[] =
     [audioSession setActive:NO error:nil];
 }
 
+-(void)ctorSynth
+{
+    _mSynthesizer = [[AVSpeechSynthesizer alloc] init];
+    _mSynthesizer.delegate = self;
+}
+
+-(void)dtorSynth
+{
+    [_mSynthesizer release];
+}
+
+-(void)startSpeaking:(std::string&)text
+{
+    AVSpeechUtterance *utterance = [[[AVSpeechUtterance alloc] initWithString:[NSString stringWithUTF8String:text.c_str()]] autorelease];
+    utterance.rate = AVSpeechUtteranceDefaultSpeechRate;
+    utterance.voice = [AVSpeechSynthesisVoice voiceWithLanguage:@"en-us"];
+    [_mSynthesizer speakUtterance:utterance];
+}
+
+-(void)stopSpeaking
+{
+    [_mSynthesizer pauseSpeakingAtBoundary:AVSpeechBoundaryImmediate];
+}
+
 -(void)stopNuanceRecorder
 {
     [voiceSearch stopRecording];
@@ -445,6 +471,14 @@ const unsigned char SpeechKitApplicationKey[] =
 
 	[voiceSearch release];
 	voiceSearch = nil;
+}
+
+#pragma mark AVSpeechSynthesizerDelegate methods
+
+-(void)speechSynthesizer:(AVSpeechSynthesizer *)synthesizer didFinishSpeechUtterance:(AVSpeechUtterance *)utterance
+{
+#pragma unused(synthesizer, utterance)
+    GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kSpeakingFinished));
 }
 
 @end

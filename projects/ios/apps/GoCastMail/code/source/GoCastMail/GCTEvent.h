@@ -13,23 +13,13 @@ public:
         kNewMemoTabPressed,
         kContactsTabPressed,
         kSettingsTabPressed,
-
 //--
         kOKYesAlertPressed,
         kNoAlertPressed,
 //--
         kTranscriptFinished,
-        kReloadInbox,
-        kAppendNewContact,
-        kAppendNewGroup,
 
-        kNewMessageToGroup,
-
-        kLoginSucceeded,
-        kForceLogout,
-        kForceLogin,
-
-        kLanguageChanged,
+        kSpeakingFinished,
     };
 
     EventType   mEvent;

@@ -242,6 +242,18 @@
     [self.mTranscription setEditable:newEnabled];
 }
 
+-(void) setMessage:(const std::string&)newLabel
+{
+    self.mMessage.text = [NSString stringWithUTF8String:newLabel.c_str()];
+}
+
+-(std::string) getMessage
+{
+    NSString* result = self.mMessage.text;
+
+    return result ? [result UTF8String] : "";
+}
+
 -(void) setSliderPercentage:(float)newPercentage
 {
 #pragma unused(newPercentage)

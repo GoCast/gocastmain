@@ -15,6 +15,7 @@ class RecordMessageScreen
 protected:
     RecordMessageVC*    mPeer;
     std::string         mTranscription;
+    std::string         mMessage;
     JSONObject          mInitObject;
     JSONObject          mMessageJSON;
     JSONObject          mPostAudioJSON;
@@ -50,12 +51,13 @@ protected:
 	void doWeNeedToWaitForTranscriptionEntry();
 	void idleEntry();
 	void idleListeningEntry();
+	void idleSpeakingEntry();
 	void idleWaitForListeningTranscriptionEntry();
 	void playBeginListeningIndicatorEntry();
 	void playEndListeningIndicatorEntry();
 	void showComposeMessageEntry();
-	void showReadMessageEntry();
 	void startListeningForCommandsEntry();
+	void startSpeakingMessageEntry();
 	void stopListeningForCommandsEntry();
 	void whatDoesTranscriptionSayEntry();
 
@@ -72,6 +74,7 @@ public:
 		kNoneOfTheAbove,
 		kReadButtonPressed,
 		kRecordButtonPressed,
+		kSpeakingDone,
 		kStopPressed,
 		kTranscriptionReady,
 		kYes,
@@ -85,12 +88,13 @@ public:
 		kEnd,
 		kIdle,
 		kIdleListening,
+		kIdleSpeaking,
 		kIdleWaitForListeningTranscription,
 		kPlayBeginListeningIndicator,
 		kPlayEndListeningIndicator,
 		kShowComposeMessage,
-		kShowReadMessage,
 		kStartListeningForCommands,
+		kStartSpeakingMessage,
 		kStopListeningForCommands,
 		kWhatDoesTranscriptionSay,
 	};

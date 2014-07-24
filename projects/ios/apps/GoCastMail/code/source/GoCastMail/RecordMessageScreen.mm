@@ -54,6 +54,8 @@ void RecordMessageScreen::readPressed()
 #pragma mark Start / End / Invalid
 void RecordMessageScreen::startEntry()
 {
+    mMessage        = [mPeer getMessage];
+
     mSound          = NULL;
     mBeginRecordingIndicator    = NULL;
     mEndRecordingIndicator      = NULL;
@@ -97,6 +99,7 @@ void RecordMessageScreen::idleListeningExit()
 {
     if (mTenMinuteTimer)    { delete mTenMinuteTimer; mTenMinuteTimer = NULL; }
 }
+void RecordMessageScreen::idleSpeakingEntry() { }
 void RecordMessageScreen::idleWaitForListeningTranscriptionEntry() { }
 
 #pragma mark Queries
@@ -197,16 +200,16 @@ void RecordMessageScreen::stopListeningForCommandsEntry()
     [gAppDelegateInstance stopRecorder];
 }
 
+void RecordMessageScreen::startSpeakingMessageEntry()
+{
+    [gAppDelegateInstance startSpeaking:mMessage];
+}
+
 #pragma mark UI
 
 void RecordMessageScreen::showComposeMessageEntry()
 {
     tAlert("Compose Message");
-}
-
-void RecordMessageScreen::showReadMessageEntry()
-{
-    tAlert("Read Message");
 }
 
 #pragma mark Sending messages to other machines
@@ -221,14 +224,15 @@ void RecordMessageScreen::CallEntry()
 		case kEnd: EndEntryHelper(); break;
 		case kIdle: idleEntry(); break;
 		case kIdleListening: idleListeningEntry(); break;
+		case kIdleSpeaking: idleSpeakingEntry(); break;
 		case kIdleWaitForListeningTranscription: idleWaitForListeningTranscriptionEntry(); break;
 		case kInvalidState: invalidStateEntry(); break;
 		case kPlayBeginListeningIndicator: playBeginListeningIndicatorEntry(); break;
 		case kPlayEndListeningIndicator: playEndListeningIndicatorEntry(); break;
 		case kShowComposeMessage: showComposeMessageEntry(); break;
-		case kShowReadMessage: showReadMessageEntry(); break;
 		case kStart: startEntry(); break;
 		case kStartListeningForCommands: startListeningForCommandsEntry(); break;
+		case kStartSpeakingMessage: startSpeakingMessageEntry(); break;
 		case kStopListeningForCommands: stopListeningForCommandsEntry(); break;
 		case kWhatDoesTranscriptionSay: whatDoesTranscriptionSayEntry(); break;
 		default: break;
@@ -249,21 +253,22 @@ int  RecordMessageScreen::StateTransitionFunction(const int evt) const
 	if ((mState == kDoWeNeedToWaitForTranscription) && (evt == kNo)) return kWhatDoesTranscriptionSay; else
 	if ((mState == kDoWeNeedToWaitForTranscription) && (evt == kYes)) return kIdleWaitForListeningTranscription; else
 	if ((mState == kIdle) && (evt == kComposeButtonPressed)) return kShowComposeMessage; else
-	if ((mState == kIdle) && (evt == kReadButtonPressed)) return kShowReadMessage; else
+	if ((mState == kIdle) && (evt == kReadButtonPressed)) return kStartSpeakingMessage; else
 	if ((mState == kIdle) && (evt == kRecordButtonPressed)) return kPlayBeginListeningIndicator; else
 	if ((mState == kIdleListening) && (evt == kStopPressed)) return kStopListeningForCommands; else
 	if ((mState == kIdleListening) && (evt == kTranscriptionReady)) return kStopListeningForCommands; else
+	if ((mState == kIdleSpeaking) && (evt == kSpeakingDone)) return kIdle; else
 	if ((mState == kIdleWaitForListeningTranscription) && (evt == kTranscriptionReady)) return kWhatDoesTranscriptionSay; else
 	if ((mState == kPlayBeginListeningIndicator) && (evt == kIndicatorFinished)) return kStartListeningForCommands; else
 	if ((mState == kPlayEndListeningIndicator) && (evt == kNext)) return kDoWeNeedToWaitForTranscription; else
 	if ((mState == kShowComposeMessage) && (evt == kYes)) return kIdle; else
-	if ((mState == kShowReadMessage) && (evt == kYes)) return kIdle; else
 	if ((mState == kStart) && (evt == kNext)) return kIdle; else
 	if ((mState == kStartListeningForCommands) && (evt == kNext)) return kIdleListening; else
+	if ((mState == kStartSpeakingMessage) && (evt == kNext)) return kIdleSpeaking; else
 	if ((mState == kStopListeningForCommands) && (evt == kNext)) return kPlayEndListeningIndicator; else
 	if ((mState == kWhatDoesTranscriptionSay) && (evt == kComposeButtonPressed)) return kShowComposeMessage; else
 	if ((mState == kWhatDoesTranscriptionSay) && (evt == kNoneOfTheAbove)) return kIdle; else
-	if ((mState == kWhatDoesTranscriptionSay) && (evt == kReadButtonPressed)) return kShowReadMessage;
+	if ((mState == kWhatDoesTranscriptionSay) && (evt == kReadButtonPressed)) return kStartSpeakingMessage;
 
 	return kInvalidState;
 }
@@ -275,6 +280,7 @@ bool RecordMessageScreen::HasEdgeNamedNext() const
 		case kPlayEndListeningIndicator:
 		case kStart:
 		case kStartListeningForCommands:
+		case kStartSpeakingMessage:
 		case kStopListeningForCommands:
 			return true;
 		default: break;
@@ -356,6 +362,13 @@ void RecordMessageScreen::update(const GCTEvent& msg)
             }
             break;
 
+        case GCTEvent::kSpeakingFinished:
+            if (getState() == kIdleSpeaking)
+            {
+                update(kSpeakingDone);
+            }
+            break;
+
         case GCTEvent::kTranscriptFinished:
             {
                 mGotTranscriptionEvent = true;
@@ -375,7 +388,6 @@ void RecordMessageScreen::update(const GCTEvent& msg)
             switch (getState())
             {
                 case kShowComposeMessage:
-                case kShowReadMessage:
                     switch(msg.mEvent)
                     {
                         case GCTEvent::kOKYesAlertPressed:  update(kYes); break;

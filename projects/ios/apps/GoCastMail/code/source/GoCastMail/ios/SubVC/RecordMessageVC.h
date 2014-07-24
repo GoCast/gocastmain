@@ -74,6 +74,9 @@ class RecordMessageScreen;
 -(std::string) getTranscription;
 -(void) setTranscriptionEnabled:(bool)newEnabled;
 
+-(void) setMessage:(const std::string&)newLabel;
+-(std::string) getMessage;
+
 -(void) setSliderPercentage:(float)newPercentage;
 
 -(void) sendEmailTo:(const JSONArray&)newTo withAttachment:(const tFile&)audioFile usingName:(const std::string&)newName;

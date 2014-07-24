@@ -13,7 +13,8 @@
     UIAlertViewDelegate,
     AVAudioRecorderDelegate,
     SpeechKitDelegate,
-    SKRecognizerDelegate
+    SKRecognizerDelegate,
+    AVSpeechSynthesizerDelegate
 >
 {
 @public
@@ -47,11 +48,18 @@
 @property (nonatomic, strong) AVAudioRecorder* mServerRecorder;
 @property (nonatomic, strong) AVAudioRecorder* mEmailRecorder;
 
+@property (strong, nonatomic) AVSpeechSynthesizer *mSynthesizer;
+
 -(void)ctorRecorder;
 -(void)dtorRecorder;
 -(void)startListening;
 -(void)startRecorder;
 -(void)stopRecorder;
+
+-(void)ctorSynth;
+-(void)dtorSynth;
+-(void)startSpeaking:(std::string&)text;
+-(void)stopSpeaking;
 
 -(void)stopNuanceRecorder;
 

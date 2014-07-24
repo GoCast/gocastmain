@@ -1,31 +1,33 @@
 1 start
 2 end
 3 idle
-4 show: "read message"
-5 show: "compose message"
-6 Start listening for commands
-7 idle: listening*
-8 Stop listening for commands
-9 idle: wait for listening transcription
-10 Do we need to wait for transcription?
-11 Play "begin listening" indicator
-12 Play "end listening" indicator
-13 What does transcription say?
+4 show: "compose message"
+5 Start listening for commands
+6 idle: listening*
+7 Stop listening for commands
+8 idle: wait for listening transcription
+9 Do we need to wait for transcription?
+10 Play "begin listening" indicator
+11 Play "end listening" indicator
+12 What does transcription say?
+13 Start speaking message
+14 idle: speaking
 #
 1 3
-3 11 recordButtonPressed
-3 4 readButtonPressed
-3 5 composeButtonPressed
+3 10 recordButtonPressed
+3 13 readButtonPressed
+3 4 composeButtonPressed
 4 3 yes
-5 3 yes
-6 7
-7 8 stopPressed, transcriptionReady
-8 12
-10 9 yes
-11 6 indicatorFinished
-12 10
-9 13 transcriptionReady
-10 13 no
-13 4 readButtonPressed
-13 5 composeButtonPressed
-13 3 noneOfTheAbove
+5 6
+6 7 stopPressed, transcriptionReady
+7 11
+9 8 yes
+10 5 indicatorFinished
+11 9
+8 12 transcriptionReady
+9 12 no
+12 13 readButtonPressed
+12 4 composeButtonPressed
+12 3 noneOfTheAbove
+14 3 speakingDone
+13 14
