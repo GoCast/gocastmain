@@ -14,13 +14,13 @@ class RecordMessageScreen
 {
 protected:
     RecordMessageVC*    mPeer;
+    std::string         mTranscription;
     JSONObject          mInitObject;
     JSONObject          mMessageJSON;
     JSONObject          mPostAudioJSON;
     JSONObject          mPostTranscriptJSON;
     JSONObject          mPostMessageJSON;
     JSONObject          mValidUsersJSON;
-    JSONObject          mTranscription;
     JSONArray           mNewMessageRecipients;
     tSound*             mSound;
     tSound*             mBeginRecordingIndicator;
@@ -33,7 +33,6 @@ protected:
     int32_t             mAlreadyPlayedTimeMS;
     bool                mDidRecord;
     bool                mGotTranscriptionEvent;
-    bool                mForceLogout;
 
 public:
     RecordMessageScreen(RecordMessageVC* newVC, const JSONObject& initObject);
@@ -48,10 +47,19 @@ protected:
 	void endEntry();
 	void invalidStateEntry();
 
-	void idleComposeMessageEntry();
+	void doWeNeedToWaitForTranscriptionEntry();
 	void idleEntry();
-	void idleReadMessageEntry();
-	void idleRecordVoiceCommandEntry();
+	void idleListeningEntry();
+	void idleWaitForListeningTranscriptionEntry();
+	void playBeginListeningIndicatorEntry();
+	void playEndListeningIndicatorEntry();
+	void showComposeMessageEntry();
+	void showReadMessageEntry();
+	void startListeningForCommandsEntry();
+	void stopListeningForCommandsEntry();
+	void whatDoesTranscriptionSayEntry();
+
+	void idleListeningExit();
 
 public:
 	enum EventType
@@ -59,19 +67,32 @@ public:
 		kInvalidEvent = -2,
 		kNext = -1,
 		kComposeButtonPressed,
+		kIndicatorFinished,
+		kNo,
+		kNoneOfTheAbove,
 		kReadButtonPressed,
 		kRecordButtonPressed,
+		kStopPressed,
+		kTranscriptionReady,
+		kYes,
 	};
 
 	enum StateType
 	{
 		kInvalidState = 0,
 		kStart = 1,
+		kDoWeNeedToWaitForTranscription,
 		kEnd,
 		kIdle,
-		kIdleComposeMessage,
-		kIdleReadMessage,
-		kIdleRecordVoiceCommand,
+		kIdleListening,
+		kIdleWaitForListeningTranscription,
+		kPlayBeginListeningIndicator,
+		kPlayEndListeningIndicator,
+		kShowComposeMessage,
+		kShowReadMessage,
+		kStartListeningForCommands,
+		kStopListeningForCommands,
+		kWhatDoesTranscriptionSay,
 	};
 
 protected:

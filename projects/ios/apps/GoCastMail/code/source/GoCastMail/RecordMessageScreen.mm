@@ -29,6 +29,10 @@ void RecordMessageScreen::recordPressed()
     {
         update(kRecordButtonPressed);
     }
+    else if (getState() == kIdleListening)
+    {
+        update(kStopPressed);
+    }
 }
 
 void RecordMessageScreen::composePressed()
@@ -50,8 +54,6 @@ void RecordMessageScreen::readPressed()
 #pragma mark Start / End / Invalid
 void RecordMessageScreen::startEntry()
 {
-    mForceLogout    = false;
-
     mSound          = NULL;
     mBeginRecordingIndicator    = NULL;
     mEndRecordingIndicator      = NULL;
@@ -90,17 +92,122 @@ void RecordMessageScreen::invalidStateEntry()
 
 #pragma mark Idling
 void RecordMessageScreen::idleEntry() { }
-void RecordMessageScreen::idleComposeMessageEntry() { }
-void RecordMessageScreen::idleReadMessageEntry() { }
-void RecordMessageScreen::idleRecordVoiceCommandEntry() { }
+void RecordMessageScreen::idleListeningEntry() { }
+void RecordMessageScreen::idleListeningExit()
+{
+    if (mTenMinuteTimer)    { delete mTenMinuteTimer; mTenMinuteTimer = NULL; }
+}
+void RecordMessageScreen::idleWaitForListeningTranscriptionEntry() { }
 
 #pragma mark Queries
 
+void RecordMessageScreen::doWeNeedToWaitForTranscriptionEntry()
+{
+    SetImmediateEvent(mGotTranscriptionEvent ? kNo : kYes);
+}
+
+void RecordMessageScreen::whatDoesTranscriptionSayEntry()
+{
+    static std::string readCandidates[] =
+    {
+        "read",
+        "read mail",
+        "read memo",
+        "read message",
+        "say",
+        "say mail",
+        "say memo",
+        "say message",
+        "speak",
+        "speak mail",
+        "speak memo",
+        "speak message",
+    };
+
+    static std::string composeCandidates[] =
+    {
+        "compose",
+        "compose mail",
+        "compose memo",
+        "compose message",
+        "new",
+        "new mail",
+        "new memo",
+        "new message",
+        "reply",
+        "reply mail",
+        "reply memo",
+        "reply message",
+    };
+
+    bool readMessage = false;
+    bool composeMessage = false;
+
+    std::transform(mTranscription.begin(), mTranscription.end(), mTranscription.begin(), ::tolower);
+
+    for (size_t i = 0; i < sizeof(readCandidates) / sizeof(std::string); i++)
+    {
+        readMessage |= (mTranscription == readCandidates[i]);
+    }
+
+    for (size_t i = 0; i < sizeof(composeCandidates) / sizeof(std::string); i++)
+    {
+        composeMessage |= (mTranscription == composeCandidates[i]);
+    }
+
+    SetImmediateEvent(readMessage ? kReadButtonPressed : (composeMessage ? kComposeButtonPressed : kNoneOfTheAbove));
+}
+
 #pragma mark Actions
 
-#pragma mark Sending to server
+void RecordMessageScreen::playBeginListeningIndicatorEntry()
+{
+    if (mBeginRecordingIndicator)
+    {
+        mBeginRecordingIndicator->play();
+    }
+}
+
+void RecordMessageScreen::playEndListeningIndicatorEntry()
+{
+    if (mEndRecordingIndicator)
+    {
+        mEndRecordingIndicator->play();
+    }
+}
+
+void RecordMessageScreen::startListeningForCommandsEntry()
+{
+    if (mTenMinuteTimer)    { delete mTenMinuteTimer; mTenMinuteTimer = NULL; }
+
+    mTenMinuteTimer = new tTimer(10 * 60 * 1000, 1); // 10 minutes = 10 * 60 seconds = 10 * 60 * 1000 milliseconds
+    mTenMinuteTimer->attach(this);
+    mTenMinuteTimer->start();
+
+    mRecrodSeconds = 0;
+    mRecordTimer->start();
+
+    mGotTranscriptionEvent = false;
+    [gAppDelegateInstance startListening];
+}
+
+void RecordMessageScreen::stopListeningForCommandsEntry()
+{
+    mRecordTimer->stop();
+    [gAppDelegateInstance stopRecorder];
+}
 
 #pragma mark UI
+
+void RecordMessageScreen::showComposeMessageEntry()
+{
+    tAlert("Compose Message");
+}
+
+void RecordMessageScreen::showReadMessageEntry()
+{
+    tAlert("Read Message");
+}
 
 #pragma mark Sending messages to other machines
 
@@ -110,30 +217,53 @@ void RecordMessageScreen::CallEntry()
 {
 	switch(mState)
 	{
+		case kDoWeNeedToWaitForTranscription: doWeNeedToWaitForTranscriptionEntry(); break;
 		case kEnd: EndEntryHelper(); break;
 		case kIdle: idleEntry(); break;
-		case kIdleComposeMessage: idleComposeMessageEntry(); break;
-		case kIdleReadMessage: idleReadMessageEntry(); break;
-		case kIdleRecordVoiceCommand: idleRecordVoiceCommandEntry(); break;
+		case kIdleListening: idleListeningEntry(); break;
+		case kIdleWaitForListeningTranscription: idleWaitForListeningTranscriptionEntry(); break;
 		case kInvalidState: invalidStateEntry(); break;
+		case kPlayBeginListeningIndicator: playBeginListeningIndicatorEntry(); break;
+		case kPlayEndListeningIndicator: playEndListeningIndicatorEntry(); break;
+		case kShowComposeMessage: showComposeMessageEntry(); break;
+		case kShowReadMessage: showReadMessageEntry(); break;
 		case kStart: startEntry(); break;
+		case kStartListeningForCommands: startListeningForCommandsEntry(); break;
+		case kStopListeningForCommands: stopListeningForCommandsEntry(); break;
+		case kWhatDoesTranscriptionSay: whatDoesTranscriptionSayEntry(); break;
 		default: break;
 	}
 }
 
 void RecordMessageScreen::CallExit()
 {
+	switch(mState)
+	{
+		case kIdleListening: idleListeningExit(); break;
+		default: break;
+	}
 }
 
 int  RecordMessageScreen::StateTransitionFunction(const int evt) const
 {
-	if ((mState == kIdle) && (evt == kComposeButtonPressed)) return kIdleComposeMessage; else
-	if ((mState == kIdle) && (evt == kReadButtonPressed)) return kIdleReadMessage; else
-	if ((mState == kIdle) && (evt == kRecordButtonPressed)) return kIdleRecordVoiceCommand; else
-	if ((mState == kIdleComposeMessage) && (evt == kNext)) return kIdle; else
-	if ((mState == kIdleReadMessage) && (evt == kNext)) return kIdle; else
-	if ((mState == kIdleRecordVoiceCommand) && (evt == kNext)) return kIdle; else
-	if ((mState == kStart) && (evt == kNext)) return kIdle;
+	if ((mState == kDoWeNeedToWaitForTranscription) && (evt == kNo)) return kWhatDoesTranscriptionSay; else
+	if ((mState == kDoWeNeedToWaitForTranscription) && (evt == kYes)) return kIdleWaitForListeningTranscription; else
+	if ((mState == kIdle) && (evt == kComposeButtonPressed)) return kShowComposeMessage; else
+	if ((mState == kIdle) && (evt == kReadButtonPressed)) return kShowReadMessage; else
+	if ((mState == kIdle) && (evt == kRecordButtonPressed)) return kPlayBeginListeningIndicator; else
+	if ((mState == kIdleListening) && (evt == kStopPressed)) return kStopListeningForCommands; else
+	if ((mState == kIdleListening) && (evt == kTranscriptionReady)) return kStopListeningForCommands; else
+	if ((mState == kIdleWaitForListeningTranscription) && (evt == kTranscriptionReady)) return kWhatDoesTranscriptionSay; else
+	if ((mState == kPlayBeginListeningIndicator) && (evt == kIndicatorFinished)) return kStartListeningForCommands; else
+	if ((mState == kPlayEndListeningIndicator) && (evt == kNext)) return kDoWeNeedToWaitForTranscription; else
+	if ((mState == kShowComposeMessage) && (evt == kYes)) return kIdle; else
+	if ((mState == kShowReadMessage) && (evt == kYes)) return kIdle; else
+	if ((mState == kStart) && (evt == kNext)) return kIdle; else
+	if ((mState == kStartListeningForCommands) && (evt == kNext)) return kIdleListening; else
+	if ((mState == kStopListeningForCommands) && (evt == kNext)) return kPlayEndListeningIndicator; else
+	if ((mState == kWhatDoesTranscriptionSay) && (evt == kComposeButtonPressed)) return kShowComposeMessage; else
+	if ((mState == kWhatDoesTranscriptionSay) && (evt == kNoneOfTheAbove)) return kIdle; else
+	if ((mState == kWhatDoesTranscriptionSay) && (evt == kReadButtonPressed)) return kShowReadMessage;
 
 	return kInvalidState;
 }
@@ -142,13 +272,14 @@ bool RecordMessageScreen::HasEdgeNamedNext() const
 {
 	switch(mState)
 	{
-		case kEnd:
-		case kIdle:
-		case kInvalidState:
-			return false;
+		case kPlayEndListeningIndicator:
+		case kStart:
+		case kStartListeningForCommands:
+		case kStopListeningForCommands:
+			return true;
 		default: break;
 	}
-	return true;
+	return false;
 }
 
 #pragma mark Messages
@@ -162,7 +293,13 @@ void RecordMessageScreen::update(const tSoundEvent& msg)
     switch (msg.mEvent)
     {
         case tSoundEvent::kSoundPlayingComplete:
-//            update(kFinishedPlaying);
+            if (msg.mSource == mBeginRecordingIndicator)
+            {
+                if (getState() == kPlayBeginListeningIndicator)
+                {
+                    update(kIndicatorFinished);
+                }
+            }
             break;
 
         default:
@@ -205,14 +342,6 @@ void RecordMessageScreen::update(const GCTEvent& msg)
 {
     switch(msg.mEvent)
     {
-        case GCTEvent::kForceLogin:
-            mForceLogout = false;
-            break;
-
-        case GCTEvent::kForceLogout:
-            mForceLogout = true;
-            break;
-
         case GCTEvent::kInboxTabPressed:
         case GCTEvent::kNewMemoTabPressed:
         case GCTEvent::kContactsTabPressed:
@@ -220,7 +349,7 @@ void RecordMessageScreen::update(const GCTEvent& msg)
             switch (getState())
             {
 //                case kPlayingIdle:   update(kPausePressed); break;
-//                case kRecordingIdle: update(kStopPressed); break;
+                case kIdleListening: update(kStopPressed); break;
 
                 default:
                     break;
@@ -228,36 +357,35 @@ void RecordMessageScreen::update(const GCTEvent& msg)
             break;
 
         case GCTEvent::kTranscriptFinished:
-//            {
-//                mGotTranscriptionEvent = true;
-//
-//                [mPeer setTranscription:msg.mTranscription];
-//                [mPeer setTranscriptionEnabled:true];
-//
-//                mTranscription["ja"] = msg.mTranscription;
-//                tFile(tFile::kTemporaryDirectory, "transcript.json").write(JSONValue(mTranscription).toString().c_str());
-//
-//                if (getState() == kWaitForTranscriptionIdle)
-//                {
-//                    update(kTranscriptionReady);
-//                }
-//            }
+            {
+                mGotTranscriptionEvent = true;
+                mTranscription = msg.mTranscription;
+
+                [mPeer setTranscription:msg.mTranscription];
+
+                if ((getState() == kIdleWaitForListeningTranscription) ||
+                    (getState() == kIdleListening))
+                {
+                    update(kTranscriptionReady);
+                }
+            }
             break;
 
         default:
             switch (getState())
             {
-//                case kShowComposeNewMessage:
-//                    switch(msg.mEvent)
-//                    {
-//                        case GCTEvent::kOKYesAlertPressed:  update(kYes); break;
-//                        case GCTEvent::kNoAlertPressed:     update(kNo); break;
-//
-//                        default:
-//                            break;
-//                    }
-//                    break;
-//
+                case kShowComposeMessage:
+                case kShowReadMessage:
+                    switch(msg.mEvent)
+                    {
+                        case GCTEvent::kOKYesAlertPressed:  update(kYes); break;
+                        case GCTEvent::kNoAlertPressed:     update(kNo); break;
+
+                        default:
+                            break;
+                    }
+                    break;
+
                 default:
                     break;
             }
@@ -269,25 +397,6 @@ void RecordMessageScreen::update(const tTimerEvent& msg)
 {
     switch (msg.mEvent)
     {
-        case tTimer::kTimerTick:
-            if (msg.mTimer == mRecordTimer)
-            {
-                mRecrodSeconds++;
-                char buf[80];
-                sprintf(buf, "%02lu:%02lu", mRecrodSeconds / 60, mRecrodSeconds % 60);
-                [mPeer setTimeLabel:buf];
-            }
-            else
-            {
-//                if (getState() == kPlayingIdle)
-//                {
-//                    if (mSound)
-//                    {
-//                        [mPeer setSliderPercentage: float(tTimer::getTimeMS() - mStartTimeMS) / float(mSound->getDurationMS()) * 100.0f];
-//                    }
-//                }
-            }
-            break;
         case tTimer::kTimerCompleted:
             if (msg.mTimer == mTenMinuteTimer)
             {

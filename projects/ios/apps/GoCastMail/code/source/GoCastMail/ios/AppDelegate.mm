@@ -283,6 +283,16 @@ const unsigned char SpeechKitApplicationKey[] =
     [_mEmailRecorder release];
 }
 
+-(void)startListening
+{
+    if (voiceSearch) [voiceSearch release];
+
+    voiceSearch = [[SKRecognizer alloc] initWithType:SKDictationRecognizerType
+                                           detection:SKShortEndOfSpeechDetection
+                                            language:@"en_US"
+                                            delegate:self];
+}
+
 -(void)startRecorder
 {
     if (voiceSearch) [voiceSearch release];

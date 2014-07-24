@@ -49,6 +49,7 @@
 
 -(void)ctorRecorder;
 -(void)dtorRecorder;
+-(void)startListening;
 -(void)startRecorder;
 -(void)stopRecorder;
 
