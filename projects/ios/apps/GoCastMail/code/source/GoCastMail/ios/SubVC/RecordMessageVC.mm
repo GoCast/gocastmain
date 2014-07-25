@@ -297,5 +297,53 @@
     [self dismissViewControllerAnimated:YES completion:NULL];
 }
 
+-(void) setImage:(const size_t)i
+{
+    switch(i)
+    {
+        case 1:
+            [_mInbox        setHidden:NO];
+            [_mNewMessage   setHidden:YES];
+            [_mBeforeVoice  setHidden:YES];
+            [_mAfterVoice   setHidden:YES];
+            [_mRevisedInbox setHidden:YES];
+            break;
+
+        case 2:
+            [_mInbox        setHidden:YES];
+            [_mNewMessage   setHidden:NO];
+            [_mBeforeVoice  setHidden:YES];
+            [_mAfterVoice   setHidden:YES];
+            [_mRevisedInbox setHidden:YES];
+            break;
+
+        case 3:
+            [_mInbox        setHidden:YES];
+            [_mNewMessage   setHidden:YES];
+            [_mBeforeVoice  setHidden:NO];
+            [_mAfterVoice   setHidden:YES];
+            [_mRevisedInbox setHidden:YES];
+            break;
+
+        case 4:
+            [_mInbox        setHidden:YES];
+            [_mNewMessage   setHidden:YES];
+            [_mBeforeVoice  setHidden:YES];
+            [_mAfterVoice   setHidden:NO];
+            [_mRevisedInbox setHidden:YES];
+            break;
+
+        case 5:
+            [_mInbox        setHidden:YES];
+            [_mNewMessage   setHidden:YES];
+            [_mBeforeVoice  setHidden:YES];
+            [_mAfterVoice   setHidden:YES];
+            [_mRevisedInbox setHidden:NO];
+            break;
+
+        default: break;
+    }
+}
+
 @end
 

@@ -7,13 +7,12 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="RecordMessageVC">
             <connections>
-                <outlet property="mBottomHalf" destination="r9X-1a-Mew" id="eqe-ra-P77"/>
-                <outlet property="mComposeButton" destination="bVI-ho-VUs" id="5AC-tN-8rf"/>
-                <outlet property="mMessage" destination="J0e-N8-ZLE" id="dc0-8F-3db"/>
-                <outlet property="mReadButton" destination="AXI-4v-1EX" id="PQj-M8-OSK"/>
-                <outlet property="mRecordButton" destination="ye6-Tb-ad9" id="NCM-m8-7iA"/>
+                <outlet property="mAfterVoice" destination="80b-IV-RrZ" id="d1u-zs-91z"/>
+                <outlet property="mBeforeVoice" destination="GoS-wM-ZST" id="KSv-p0-7LH"/>
+                <outlet property="mInbox" destination="aJs-2x-Bdj" id="v2q-4d-slT"/>
+                <outlet property="mNewMessage" destination="IOG-CH-3Jr" id="lgE-ur-xCn"/>
+                <outlet property="mRevisedInbox" destination="NcV-28-b9C" id="BC4-91-1Dr"/>
                 <outlet property="mScrollView" destination="UWH-Nu-2CC" id="jk4-h8-T2J"/>
-                <outlet property="mTranscription" destination="VaE-vT-xWH" id="ERG-zM-076"/>
                 <outlet property="view" destination="UWH-Nu-2CC" id="CGV-5u-hR4"/>
             </connections>
         </placeholder>
@@ -22,79 +21,26 @@
             <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
-                <view contentMode="scaleToFill" id="r9X-1a-Mew" userLabel="mBottomHalf">
-                    <rect key="frame" x="0.0" y="0.0" width="320" height="591"/>
+                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="image-10.png" id="aJs-2x-Bdj" userLabel="mInbox">
+                    <rect key="frame" x="0.0" y="0.0" width="320" height="416"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                    <subviews>
-                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="ye6-Tb-ad9" userLabel="mRecordButton">
-                            <rect key="frame" x="20" y="49" width="48" height="64"/>
-                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                            <state key="normal" image="button-record.png">
-                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                            </state>
-                            <connections>
-                                <action selector="recordPressed" destination="-1" eventType="touchUpInside" id="6nP-d2-Ock"/>
-                            </connections>
-                        </button>
-                        <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" text="Transcription not available" id="VaE-vT-xWH" userLabel="mTranscription">
-                            <rect key="frame" x="76" y="49" width="224" height="64"/>
-                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                            <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
-                            <color key="textColor" red="0.50196078430000002" green="0.50196078430000002" blue="0.50196078430000002" alpha="1" colorSpace="calibratedRGB"/>
-                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                            <textInputTraits key="textInputTraits" autocorrectionType="no" returnKeyType="done"/>
-                            <connections>
-                                <outlet property="delegate" destination="-1" id="fe5-Fv-VXy"/>
-                            </connections>
-                        </textView>
-                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Audio Commands" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="ej7-iu-lvv">
-                            <rect key="frame" x="20" y="20" width="280" height="21"/>
-                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                            <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
-                            <nil key="highlightedColor"/>
-                        </label>
-                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Sample Message" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="1hh-y3-8B2">
-                            <rect key="frame" x="20" y="121" width="280" height="21"/>
-                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                            <nil key="highlightedColor"/>
-                        </label>
-                        <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" id="J0e-N8-ZLE" userLabel="mMessage">
-                            <rect key="frame" x="20" y="150" width="280" height="128"/>
-                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                            <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
-                            <string key="text">First, say "Hey GoCast Mail".
-
-When asked for a command, you can say "read" to "read" the message to you, or "compose" to create a new message.
-
-Speakable commands include: "read message", "say message", "speak message", "compose message", "new message", or "reply".</string>
-                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                            <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
-                        </textView>
-                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="AXI-4v-1EX" userLabel="mReadButton">
-                            <rect key="frame" x="20" y="286" width="120" height="30"/>
-                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                            <state key="normal" title="Read Message">
-                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                            </state>
-                            <connections>
-                                <action selector="readPressed" destination="-1" eventType="touchUpInside" id="Rkz-2c-6qz"/>
-                            </connections>
-                        </button>
-                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="bVI-ho-VUs" userLabel="mComposeButton">
-                            <rect key="frame" x="150" y="286" width="150" height="30"/>
-                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                            <state key="normal" title="Compose Message">
-                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                            </state>
-                            <connections>
-                                <action selector="composePressed" destination="-1" eventType="touchUpInside" id="615-iH-2L8"/>
-                            </connections>
-                        </button>
-                    </subviews>
-                    <color key="backgroundColor" red="0.93333333333333335" green="0.93333333333333335" blue="0.93333333333333335" alpha="1" colorSpace="calibratedRGB"/>
-                </view>
+                </imageView>
+                <imageView hidden="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="image-11.png" id="IOG-CH-3Jr" userLabel="mNewMessage">
+                    <rect key="frame" x="0.0" y="0.0" width="320" height="416"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                </imageView>
+                <imageView hidden="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="image-12.png" id="GoS-wM-ZST" userLabel="mBeforeVoice">
+                    <rect key="frame" x="0.0" y="0.0" width="320" height="416"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                </imageView>
+                <imageView hidden="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="image-13.png" id="80b-IV-RrZ" userLabel="mAfterVoice">
+                    <rect key="frame" x="0.0" y="0.0" width="320" height="416"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                </imageView>
+                <imageView hidden="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="image-14.png" id="NcV-28-b9C" userLabel="mRevisedInbox">
+                    <rect key="frame" x="0.0" y="0.0" width="320" height="416"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                </imageView>
             </subviews>
             <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
             <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina4"/>
@@ -106,6 +52,10 @@ Speakable commands include: "read message", "say message", "speak message", "com
         </scrollView>
     </objects>
     <resources>
-        <image name="button-record.png" width="96" height="128"/>
+        <image name="image-10.png" width="640" height="832"/>
+        <image name="image-11.png" width="640" height="832"/>
+        <image name="image-12.png" width="640" height="832"/>
+        <image name="image-13.png" width="640" height="832"/>
+        <image name="image-14.png" width="640" height="832"/>
     </resources>
 </document>

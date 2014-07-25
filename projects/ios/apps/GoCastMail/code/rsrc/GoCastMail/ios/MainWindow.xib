@@ -43,7 +43,7 @@
             <viewControllers>
                 <navigationController nibName="" id="VLa-JM-EXn" userLabel="Navigation Controller - New Memo">
                     <extendedEdge key="edgesForExtendedLayout"/>
-                    <tabBarItem key="tabBarItem" title="New Memo" image="tab-newmemo.png" id="jsd-Cn-1Pi"/>
+                    <tabBarItem key="tabBarItem" title="Inbox" image="tab-inbox.png" id="jsd-Cn-1Pi"/>
                     <simulatedStatusBarMetrics key="simulatedStatusBarMetrics"/>
                     <nil key="simulatedTopBarMetrics"/>
                     <nil key="simulatedBottomBarMetrics"/>
@@ -71,6 +71,6 @@
         </tabBarController>
     </objects>
     <resources>
-        <image name="tab-newmemo.png" width="30" height="30"/>
+        <image name="tab-inbox.png" width="30" height="30"/>
     </resources>
 </document>

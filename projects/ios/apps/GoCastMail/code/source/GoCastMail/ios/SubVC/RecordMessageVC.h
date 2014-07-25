@@ -29,6 +29,12 @@ class RecordMessageScreen;
 //mInboxView
 @property (nonatomic, strong) IBOutlet UIScrollView*    mScrollView;
 
+@property (nonatomic, strong) IBOutlet UIImageView*     mInbox;
+@property (nonatomic, strong) IBOutlet UIImageView*     mNewMessage;
+@property (nonatomic, strong) IBOutlet UIImageView*     mBeforeVoice;
+@property (nonatomic, strong) IBOutlet UIImageView*     mAfterVoice;
+@property (nonatomic, strong) IBOutlet UIImageView*     mRevisedInbox;
+
 @property (nonatomic, strong) IBOutlet UIView*          mBottomHalf;
 
 @property (nonatomic, strong) IBOutlet UIButton*        mRecordButton;
@@ -80,5 +86,7 @@ class RecordMessageScreen;
 -(void) setSliderPercentage:(float)newPercentage;
 
 -(void) sendEmailTo:(const JSONArray&)newTo withAttachment:(const tFile&)audioFile usingName:(const std::string&)newName;
+
+-(void) setImage:(const size_t)i;
 
 @end

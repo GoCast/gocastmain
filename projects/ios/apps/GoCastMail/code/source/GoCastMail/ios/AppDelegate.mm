@@ -652,6 +652,16 @@ const unsigned char SpeechKitApplicationKey[] =
     NSLog(@"*** PocketSphinx is ready.");
 }
 
+bool hasEnding (std::string const &fullString, std::string const &ending);
+bool hasEnding (std::string const &fullString, std::string const &ending)
+{
+    if (fullString.length() >= ending.length()) {
+        return (0 == fullString.compare (fullString.length() - ending.length(), ending.length(), ending));
+    } else {
+        return false;
+    }
+}
+
 - (void) pocketsphinxDidReceiveHypothesis:(NSString *)hypothesis recognitionScore:(NSString *)recognitionScore utteranceID:(NSString *)utteranceID
 {
     typedef std::pair<std::string, GCTEvent::EventType> xp;
@@ -670,13 +680,30 @@ const unsigned char SpeechKitApplicationKey[] =
 
     std::string heard = [hypothesis UTF8String];
     std::transform(heard.begin(), heard.end(), heard.begin(), ::tolower);
-
+    bool found = false;
     for(size_t i = 0; i < sizeof(vocab) / sizeof(xp); i++)
     {
         if (heard == vocab[i].first)
         {
             GCTEventManager::getInstance()->notify(GCTEvent(vocab[i].second));
+            found = true;
             break;
+        }
+    }
+
+    if (found == false)
+    {
+        if (hasEnding(heard, "new messages"))
+        {
+            GCTEventManager::getInstance()->notify(GCTEvent::kSaidReadMyNewMessages);
+        }
+        else if (hasEnding(heard, "second email"))
+        {
+            GCTEventManager::getInstance()->notify(GCTEvent::kSaidReadMeTheSecondEmail);
+        }
+        else if (hasEnding(heard, "five"))
+        {
+            GCTEventManager::getInstance()->notify(GCTEvent::kSaidReadFive);
         }
     }
 }

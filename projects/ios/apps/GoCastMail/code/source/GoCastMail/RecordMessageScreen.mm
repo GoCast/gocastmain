@@ -81,8 +81,8 @@ void RecordMessageScreen::invalidStateEntry()
 #pragma mark Idling
 
 void RecordMessageScreen::idleDoneEntry() { if (mBeginRecordingIndicator) mBeginRecordingIndicator->play(); }
-void RecordMessageScreen::idleWaitForHeyGocastEntry() { if (mBeginRecordingIndicator) mBeginRecordingIndicator->play(); }
-void RecordMessageScreen::idleWaitForOkayImFinishedEntry() { if (mBeginRecordingIndicator) mBeginRecordingIndicator->play(); }
+void RecordMessageScreen::idleWaitForHeyGocastEntry() { [mPeer setImage:1]; if (mBeginRecordingIndicator) mBeginRecordingIndicator->play(); }
+void RecordMessageScreen::idleWaitForOkayImFinishedEntry() { [mPeer setImage:3]; if (mBeginRecordingIndicator) mBeginRecordingIndicator->play(); }
 void RecordMessageScreen::idleWaitForReadFiveEntry() { if (mBeginRecordingIndicator) mBeginRecordingIndicator->play(); }
 void RecordMessageScreen::idleWaitForReadMeTheSecondEmailEntry() { if (mBeginRecordingIndicator) mBeginRecordingIndicator->play(); }
 void RecordMessageScreen::idleWaitForReadMyNewMessagesEntry() { if (mBeginRecordingIndicator) mBeginRecordingIndicator->play(); }
@@ -105,6 +105,8 @@ void RecordMessageScreen::playSendingSoundEntry()
 
 void RecordMessageScreen::speakDemoEmailEntry()
 {
+    [mPeer setImage:2];
+
     [gAppDelegateInstance startSpeaking:
      "TJ, Sandra, Another meeting will start at 5PM, let's cancel today's meeting."
      "I'll be back on July 29th (Tuesday), but will check e-mail occasionally."
@@ -149,11 +151,14 @@ void RecordMessageScreen::speakReadBackEmailEntry()
 
 void RecordMessageScreen::speakReviewOtherFourEntry()
 {
+    [mPeer setImage:5];
     [gAppDelegateInstance startSpeaking:"Mail sent. Would you like to review the other four messages?"];
 }
 
 void RecordMessageScreen::speakWouldYouLikeReadBackEntry()
 {
+    [mPeer setImage:4];
+
     [gAppDelegateInstance startSpeaking:"Would you like your reply red back to you?"];
 }
 

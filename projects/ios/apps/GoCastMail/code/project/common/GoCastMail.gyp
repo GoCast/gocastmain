@@ -137,6 +137,12 @@
 					'../../rsrc/GoCastMail/<@(OS)/begin_record.caf',
 					'../../rsrc/GoCastMail/<@(OS)/end_record.caf',
 
+					'../../rsrc/GoCastMail/<@(OS)/image-10.png',
+					'../../rsrc/GoCastMail/<@(OS)/image-11.png',
+					'../../rsrc/GoCastMail/<@(OS)/image-12.png',
+					'../../rsrc/GoCastMail/<@(OS)/image-13.png',
+					'../../rsrc/GoCastMail/<@(OS)/image-14.png',
+
 					'../../rsrc/GoCastMail/<@(OS)/nuancelogo.png',
 
 					'../../rsrc/GoCastMail/<@(OS)/bg-login.en.png',
