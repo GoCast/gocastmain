@@ -21,7 +21,12 @@ public:
 
         kSpeakingFinished,
 
-        kHeyGoCastWasSaid,
+        kSaidHeyGoCast,
+        kSaidReadMyNewMessages,
+        kSaidReadFive,
+        kSaidReadMeTheSecondEmail,
+        kSaidYes,
+        kSaidOkayFinished,
     };
 
     EventType   mEvent;

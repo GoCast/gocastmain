@@ -25,30 +25,14 @@ RecordMessageScreen::~RecordMessageScreen()
 #pragma mark Public methods
 void RecordMessageScreen::recordPressed()
 {
-    if (getState() == kIdle)
-    {
-        update(kRecordButtonPressed);
-    }
-    else if (getState() == kIdleListening)
-    {
-        update(kStopPressed);
-    }
 }
 
 void RecordMessageScreen::composePressed()
 {
-    if (getState() == kIdle)
-    {
-        update(kComposeButtonPressed);
-    }
 }
 
 void RecordMessageScreen::readPressed()
 {
-    if (getState() == kIdle)
-    {
-        update(kReadButtonPressed);
-    }
 }
 
 #pragma mark Start / End / Invalid
@@ -57,6 +41,7 @@ void RecordMessageScreen::startEntry()
     mMessage        = [mPeer getMessage];
 
     mSound          = NULL;
+    mNewMessage                 = NULL;
     mBeginRecordingIndicator    = NULL;
     mEndRecordingIndicator      = NULL;
     mDidRecord      = false;
@@ -70,16 +55,19 @@ void RecordMessageScreen::startEntry()
     mRecordTimer = new tTimer(1000);
     mRecordTimer->attach(this);
 
+    mNewMessage                 = new tSound(tFile(tFile::kBundleDirectory, "newmessage.wav"));
     mBeginRecordingIndicator    = new tSound(tFile(tFile::kBundleDirectory, "begin_record.caf"));
     mEndRecordingIndicator      = new tSound(tFile(tFile::kBundleDirectory, "end_record.caf"));
 
     mBeginRecordingIndicator->attach(this);
+    mNewMessage->attach(this);
 }
 
 void RecordMessageScreen::endEntry()
 {
     if (mEndRecordingIndicator)     { delete mEndRecordingIndicator; mEndRecordingIndicator = NULL; }
     if (mBeginRecordingIndicator)   { delete mBeginRecordingIndicator; mBeginRecordingIndicator = NULL; }
+    if (mNewMessage)                { delete mNewMessage; mNewMessage = NULL; }
     if (mRecordTimer)               { delete mRecordTimer; mRecordTimer = NULL; }
     if (mSliderUpdateTimer)         { delete mSliderUpdateTimer; mSliderUpdateTimer = NULL; }
     if (mSound)                     { delete mSound; mSound = NULL; }
@@ -91,176 +79,87 @@ void RecordMessageScreen::invalidStateEntry()
 }
 
 #pragma mark Idling
-void RecordMessageScreen::idleEntry()
-{
-    [gAppDelegateInstance openEars];
-}
 
-void RecordMessageScreen::idleExit()
-{
-    [gAppDelegateInstance closeEars];
-}
-
-void RecordMessageScreen::idleListeningEntry() { }
-void RecordMessageScreen::idleListeningExit() { }
-void RecordMessageScreen::idleRecordingEntry() { }
-void RecordMessageScreen::idleRecordingExit() { }
-
-void RecordMessageScreen::idleWaitForListeningTranscriptionEntry() { }
-void RecordMessageScreen::idleWaitForRecordingTranscriptionEntry() { }
+void RecordMessageScreen::idleDoneEntry() { if (mBeginRecordingIndicator) mBeginRecordingIndicator->play(); }
+void RecordMessageScreen::idleWaitForHeyGocastEntry() { if (mBeginRecordingIndicator) mBeginRecordingIndicator->play(); }
+void RecordMessageScreen::idleWaitForOkayImFinishedEntry() { if (mBeginRecordingIndicator) mBeginRecordingIndicator->play(); }
+void RecordMessageScreen::idleWaitForReadFiveEntry() { if (mBeginRecordingIndicator) mBeginRecordingIndicator->play(); }
+void RecordMessageScreen::idleWaitForReadMeTheSecondEmailEntry() { if (mBeginRecordingIndicator) mBeginRecordingIndicator->play(); }
+void RecordMessageScreen::idleWaitForReadMyNewMessagesEntry() { if (mBeginRecordingIndicator) mBeginRecordingIndicator->play(); }
+void RecordMessageScreen::idleWaitForYesLetsReplyEntry() { if (mBeginRecordingIndicator) mBeginRecordingIndicator->play(); }
+void RecordMessageScreen::idleWaitForYesLetsReviewEntry() { if (mBeginRecordingIndicator) mBeginRecordingIndicator->play(); }
+void RecordMessageScreen::idleWaitForYesReadItBackEntry() { if (mBeginRecordingIndicator) mBeginRecordingIndicator->play(); }
+void RecordMessageScreen::idleWaitForYesSendThisEmailEntry() { if (mBeginRecordingIndicator) mBeginRecordingIndicator->play(); }
 
 #pragma mark Queries
 
-void RecordMessageScreen::doWeNeedToWaitForTranscriptionEntry()
-{
-    SetImmediateEvent(mGotTranscriptionEvent ? kNo : kYes);
-}
-
-void RecordMessageScreen::doWeNeedToWaitForRecordingTranscriptionEntry()
-{
-    SetImmediateEvent(mGotTranscriptionEvent ? kNo : kYes);
-}
-
-void RecordMessageScreen::whatDoesTranscriptionSayEntry()
-{
-    static std::string readCandidates[] =
-    {
-        "read",
-        "read mail",
-        "read memo",
-        "read message",
-        "say",
-        "say mail",
-        "say memo",
-        "say message",
-        "speak",
-        "speak mail",
-        "speak memo",
-        "speak message",
-    };
-
-    static std::string composeCandidates[] =
-    {
-        "compose",
-        "compose mail",
-        "compose memo",
-        "compose message",
-        "new",
-        "new mail",
-        "new memo",
-        "new message",
-        "reply",
-        "reply mail",
-        "reply memo",
-        "reply message",
-    };
-
-    bool readMessage = false;
-    bool composeMessage = false;
-
-    std::transform(mTranscription.begin(), mTranscription.end(), mTranscription.begin(), ::tolower);
-
-    for (size_t i = 0; i < sizeof(readCandidates) / sizeof(std::string); i++)
-    {
-        readMessage |= (mTranscription == readCandidates[i]);
-    }
-
-    for (size_t i = 0; i < sizeof(composeCandidates) / sizeof(std::string); i++)
-    {
-        composeMessage |= (mTranscription == composeCandidates[i]);
-    }
-
-    SetImmediateEvent(readMessage ? kReadButtonPressed : (composeMessage ? kComposeButtonPressed : kNoneOfTheAbove));
-}
-
 #pragma mark Actions
-
-void RecordMessageScreen::playBeginListeningIndicatorEntry()
+void RecordMessageScreen::playSendingSoundEntry()
 {
-    if (mBeginRecordingIndicator)
+    if (mNewMessage)
     {
-        mBeginRecordingIndicator->play();
+        mNewMessage->play();
     }
 }
-
-void RecordMessageScreen::playEndListeningIndicatorEntry()
-{
-    if (mEndRecordingIndicator)
-    {
-        mEndRecordingIndicator->play();
-    }
-}
-
-void RecordMessageScreen::playBeginRecordingIndicatorEntry()
-{
-    if (mBeginRecordingIndicator)
-    {
-        mBeginRecordingIndicator->play();
-    }
-}
-
-void RecordMessageScreen::playEndRecordingIndicatorEntry()
-{
-    if (mEndRecordingIndicator)
-    {
-        mEndRecordingIndicator->play();
-    }
-}
-
-void RecordMessageScreen::startListeningForCommandsEntry()
-{
-    mRecordingCommand = true;
-
-    mRecrodSeconds = 0;
-    mRecordTimer->start();
-
-    mGotTranscriptionEvent = false;
-    [gAppDelegateInstance startListening];
-}
-
-void RecordMessageScreen::stopListeningForCommandsEntry()
-{
-    mRecordTimer->stop();
-    [gAppDelegateInstance stopRecorder];
-}
-
-void RecordMessageScreen::startRecordingMessageEntry()
-{
-    mRecordingCommand = false;
-
-    mRecrodSeconds = 0;
-    mRecordTimer->start();
-
-    mGotTranscriptionEvent = false;
-    [gAppDelegateInstance startRecorder];
-}
-
-void RecordMessageScreen::stopRecordingMessageEntry()
-{
-    mRecordTimer->stop();
-    [gAppDelegateInstance stopRecorder];
-}
-
-void RecordMessageScreen::startSpeakingMessageEntry()
-{
-    [gAppDelegateInstance startSpeaking:mMessage];
-}
-
 #pragma mark UI
 
-void RecordMessageScreen::speakWhatCanIDoEntry()
+void RecordMessageScreen::speakDemoEmailEntry()
 {
-    [gAppDelegateInstance startSpeaking:"Hey there. What can I do for you?"];
+    [gAppDelegateInstance startSpeaking:
+     "TJ, Sandra, Another meeting will start at 5PM, let's cancel today's meeting."
+     "I'll be back on July 29th (Tuesday), but will check e-mail occasionally."
+     "Hee day. Would you like to reply to this email?"];
 }
 
-void RecordMessageScreen::speakOkayBeginRecordingANewMessageAfterTheToneEntry()
+void RecordMessageScreen::speakFiveSubjectLinesEntry()
 {
-    [gAppDelegateInstance startSpeaking:"Okay, begin recording a new message after the tone."];
+    [gAppDelegateInstance startSpeaking:
+     "From: Yoji, Kyoko, and Sandra. Subject: Meeting on Skype."
+     "From: Sandra and Hideyuki. Subject: Cancel today's meeting?"
+     "From: Sandra Carrico. Subject: Re: Skype today."
+     "From: Hideyuki Mizusawa. Subject: New build of GoCast Talk and GoCast Talk En."
+     "From: Sandra Carrico. Subject: I'll call in via GoCast Study."
+     ];
 }
 
-void RecordMessageScreen::speakOkayLetMeReadThatMessageForYouEntry()
+void RecordMessageScreen::speakFourSubjectLinesEntry()
 {
-    [gAppDelegateInstance startSpeaking:"Okay, let me read that message for you."];
+    [gAppDelegateInstance startSpeaking:
+     "From: Yoji, Kyoko, and Sandra. Subject: Meeting on Skype."
+     "From: Sandra Carrico. Subject: Re: Skype today."
+     "From: Hideyuki Mizusawa. Subject: New build of GoCast Talk and GoCast Talk En."
+     "From: Sandra Carrico. Subject: I'll call in via GoCast Study."
+     ];
+}
+
+void RecordMessageScreen::speakHeyHowCanIHelpYouEntry()
+{
+    [gAppDelegateInstance startSpeaking:"Hey TJ, how can I help you?"];
+}
+
+void RecordMessageScreen::speakPleaseReplyToEmailEntry()
+{
+    [gAppDelegateInstance startSpeaking:"Okay, replying to the message. Begin speaking after the tone."];
+}
+
+void RecordMessageScreen::speakReadBackEmailEntry()
+{
+    [gAppDelegateInstance startSpeaking:"Okay, sounds good. I'll talk to you later. Would you like to send this email?"];
+}
+
+void RecordMessageScreen::speakReviewOtherFourEntry()
+{
+    [gAppDelegateInstance startSpeaking:"Mail sent. Would you like to review the other four messages?"];
+}
+
+void RecordMessageScreen::speakWouldYouLikeReadBackEntry()
+{
+    [gAppDelegateInstance startSpeaking:"Would you like your reply red back to you?"];
+}
+
+void RecordMessageScreen::speakYouHave20NewMessagesEntry()
+{
+    [gAppDelegateInstance startSpeaking:"You have twenty new messages"];
 }
 
 #pragma mark Sending messages to other machines
@@ -271,76 +170,59 @@ void RecordMessageScreen::CallEntry()
 {
 	switch(mState)
 	{
-		case kDoWeNeedToWaitForRecordingTranscription: doWeNeedToWaitForRecordingTranscriptionEntry(); break;
-		case kDoWeNeedToWaitForTranscription: doWeNeedToWaitForTranscriptionEntry(); break;
 		case kEnd: EndEntryHelper(); break;
-		case kIdle: idleEntry(); break;
-		case kIdleListening: idleListeningEntry(); break;
-		case kIdleRecording: idleRecordingEntry(); break;
-		case kIdleWaitForListeningTranscription: idleWaitForListeningTranscriptionEntry(); break;
-		case kIdleWaitForRecordingTranscription: idleWaitForRecordingTranscriptionEntry(); break;
+		case kIdleDone: idleDoneEntry(); break;
+		case kIdleWaitForHeyGocast: idleWaitForHeyGocastEntry(); break;
+		case kIdleWaitForOkayImFinished: idleWaitForOkayImFinishedEntry(); break;
+		case kIdleWaitForReadFive: idleWaitForReadFiveEntry(); break;
+		case kIdleWaitForReadMeTheSecondEmail: idleWaitForReadMeTheSecondEmailEntry(); break;
+		case kIdleWaitForReadMyNewMessages: idleWaitForReadMyNewMessagesEntry(); break;
+		case kIdleWaitForYesLetsReply: idleWaitForYesLetsReplyEntry(); break;
+		case kIdleWaitForYesLetsReview: idleWaitForYesLetsReviewEntry(); break;
+		case kIdleWaitForYesReadItBack: idleWaitForYesReadItBackEntry(); break;
+		case kIdleWaitForYesSendThisEmail: idleWaitForYesSendThisEmailEntry(); break;
 		case kInvalidState: invalidStateEntry(); break;
-		case kPlayBeginListeningIndicator: playBeginListeningIndicatorEntry(); break;
-		case kPlayBeginRecordingIndicator: playBeginRecordingIndicatorEntry(); break;
-		case kPlayEndListeningIndicator: playEndListeningIndicatorEntry(); break;
-		case kPlayEndRecordingIndicator: playEndRecordingIndicatorEntry(); break;
-		case kSpeakOkayBeginRecordingANewMessageAfterTheTone: speakOkayBeginRecordingANewMessageAfterTheToneEntry(); break;
-		case kSpeakOkayLetMeReadThatMessageForYou: speakOkayLetMeReadThatMessageForYouEntry(); break;
-		case kSpeakWhatCanIDo: speakWhatCanIDoEntry(); break;
+		case kPlaySendingSound: playSendingSoundEntry(); break;
+		case kSpeakDemoEmail: speakDemoEmailEntry(); break;
+		case kSpeakFiveSubjectLines: speakFiveSubjectLinesEntry(); break;
+		case kSpeakFourSubjectLines: speakFourSubjectLinesEntry(); break;
+		case kSpeakHeyHowCanIHelpYou: speakHeyHowCanIHelpYouEntry(); break;
+		case kSpeakPleaseReplyToEmail: speakPleaseReplyToEmailEntry(); break;
+		case kSpeakReadBackEmail: speakReadBackEmailEntry(); break;
+		case kSpeakReviewOtherFour: speakReviewOtherFourEntry(); break;
+		case kSpeakWouldYouLikeReadBack: speakWouldYouLikeReadBackEntry(); break;
+		case kSpeakYouHave20NewMessages: speakYouHave20NewMessagesEntry(); break;
 		case kStart: startEntry(); break;
-		case kStartListeningForCommands: startListeningForCommandsEntry(); break;
-		case kStartRecordingMessage: startRecordingMessageEntry(); break;
-		case kStartSpeakingMessage: startSpeakingMessageEntry(); break;
-		case kStopListeningForCommands: stopListeningForCommandsEntry(); break;
-		case kStopRecordingMessage: stopRecordingMessageEntry(); break;
-		case kWhatDoesTranscriptionSay: whatDoesTranscriptionSayEntry(); break;
 		default: break;
 	}
 }
 
 void RecordMessageScreen::CallExit()
 {
-	switch(mState)
-	{
-		case kIdle: idleExit(); break;
-		case kIdleListening: idleListeningExit(); break;
-		case kIdleRecording: idleRecordingExit(); break;
-		default: break;
-	}
 }
 
 int  RecordMessageScreen::StateTransitionFunction(const int evt) const
 {
-	if ((mState == kDoWeNeedToWaitForRecordingTranscription) && (evt == kNo)) return kIdle; else
-	if ((mState == kDoWeNeedToWaitForRecordingTranscription) && (evt == kYes)) return kIdleWaitForRecordingTranscription; else
-	if ((mState == kDoWeNeedToWaitForTranscription) && (evt == kNo)) return kWhatDoesTranscriptionSay; else
-	if ((mState == kDoWeNeedToWaitForTranscription) && (evt == kYes)) return kIdleWaitForListeningTranscription; else
-	if ((mState == kIdle) && (evt == kComposeButtonPressed)) return kPlayBeginRecordingIndicator; else
-	if ((mState == kIdle) && (evt == kReadButtonPressed)) return kStartSpeakingMessage; else
-	if ((mState == kIdle) && (evt == kRecordButtonPressed)) return kPlayBeginListeningIndicator; else
-	if ((mState == kIdle) && (evt == kVoiceCommandHeard)) return kSpeakWhatCanIDo; else
-	if ((mState == kIdleListening) && (evt == kStopPressed)) return kStopListeningForCommands; else
-	if ((mState == kIdleListening) && (evt == kTranscriptionReady)) return kStopListeningForCommands; else
-	if ((mState == kIdleRecording) && (evt == kStopPressed)) return kStopRecordingMessage; else
-	if ((mState == kIdleRecording) && (evt == kTranscriptionReady)) return kStopRecordingMessage; else
-	if ((mState == kIdleWaitForListeningTranscription) && (evt == kTranscriptionReady)) return kWhatDoesTranscriptionSay; else
-	if ((mState == kIdleWaitForRecordingTranscription) && (evt == kTranscriptionReady)) return kIdle; else
-	if ((mState == kPlayBeginListeningIndicator) && (evt == kIndicatorFinished)) return kStartListeningForCommands; else
-	if ((mState == kPlayBeginRecordingIndicator) && (evt == kIndicatorFinished)) return kStartRecordingMessage; else
-	if ((mState == kPlayEndListeningIndicator) && (evt == kNext)) return kDoWeNeedToWaitForTranscription; else
-	if ((mState == kPlayEndRecordingIndicator) && (evt == kNext)) return kDoWeNeedToWaitForRecordingTranscription; else
-	if ((mState == kSpeakOkayBeginRecordingANewMessageAfterTheTone) && (evt == kSpeakingDone)) return kPlayBeginRecordingIndicator; else
-	if ((mState == kSpeakOkayLetMeReadThatMessageForYou) && (evt == kSpeakingDone)) return kStartSpeakingMessage; else
-	if ((mState == kSpeakWhatCanIDo) && (evt == kSpeakingDone)) return kPlayBeginListeningIndicator; else
-	if ((mState == kStart) && (evt == kNext)) return kIdle; else
-	if ((mState == kStartListeningForCommands) && (evt == kNext)) return kIdleListening; else
-	if ((mState == kStartRecordingMessage) && (evt == kNext)) return kIdleRecording; else
-	if ((mState == kStartSpeakingMessage) && (evt == kSpeakingDone)) return kIdle; else
-	if ((mState == kStopListeningForCommands) && (evt == kNext)) return kPlayEndListeningIndicator; else
-	if ((mState == kStopRecordingMessage) && (evt == kNext)) return kPlayEndRecordingIndicator; else
-	if ((mState == kWhatDoesTranscriptionSay) && (evt == kComposeButtonPressed)) return kSpeakOkayBeginRecordingANewMessageAfterTheTone; else
-	if ((mState == kWhatDoesTranscriptionSay) && (evt == kNoneOfTheAbove)) return kIdle; else
-	if ((mState == kWhatDoesTranscriptionSay) && (evt == kReadButtonPressed)) return kSpeakOkayLetMeReadThatMessageForYou;
+	if ((mState == kIdleWaitForHeyGocast) && (evt == kHeardHey)) return kSpeakHeyHowCanIHelpYou; else
+	if ((mState == kIdleWaitForOkayImFinished) && (evt == kHeardOkay)) return kSpeakWouldYouLikeReadBack; else
+	if ((mState == kIdleWaitForReadFive) && (evt == kHeardFive)) return kSpeakFiveSubjectLines; else
+	if ((mState == kIdleWaitForReadMeTheSecondEmail) && (evt == kHeardReadMeSecond)) return kSpeakDemoEmail; else
+	if ((mState == kIdleWaitForReadMyNewMessages) && (evt == kHeardReadNew)) return kSpeakYouHave20NewMessages; else
+	if ((mState == kIdleWaitForYesLetsReply) && (evt == kHeardYes)) return kSpeakPleaseReplyToEmail; else
+	if ((mState == kIdleWaitForYesLetsReview) && (evt == kHeardYes)) return kSpeakFourSubjectLines; else
+	if ((mState == kIdleWaitForYesReadItBack) && (evt == kHeardYes)) return kSpeakReadBackEmail; else
+	if ((mState == kIdleWaitForYesSendThisEmail) && (evt == kHeardYes)) return kPlaySendingSound; else
+	if ((mState == kPlaySendingSound) && (evt == kIndicatorFinished)) return kSpeakReviewOtherFour; else
+	if ((mState == kSpeakDemoEmail) && (evt == kSpeakingDone)) return kIdleWaitForYesLetsReply; else
+	if ((mState == kSpeakFiveSubjectLines) && (evt == kSpeakingDone)) return kIdleWaitForReadMeTheSecondEmail; else
+	if ((mState == kSpeakFourSubjectLines) && (evt == kSpeakingDone)) return kIdleDone; else
+	if ((mState == kSpeakHeyHowCanIHelpYou) && (evt == kSpeakingDone)) return kIdleWaitForReadMyNewMessages; else
+	if ((mState == kSpeakPleaseReplyToEmail) && (evt == kSpeakingDone)) return kIdleWaitForOkayImFinished; else
+	if ((mState == kSpeakReadBackEmail) && (evt == kSpeakingDone)) return kIdleWaitForYesSendThisEmail; else
+	if ((mState == kSpeakReviewOtherFour) && (evt == kSpeakingDone)) return kIdleWaitForYesLetsReview; else
+	if ((mState == kSpeakWouldYouLikeReadBack) && (evt == kSpeakingDone)) return kIdleWaitForYesReadItBack; else
+	if ((mState == kSpeakYouHave20NewMessages) && (evt == kSpeakingDone)) return kIdleWaitForReadFive; else
+	if ((mState == kStart) && (evt == kNext)) return kIdleWaitForHeyGocast;
 
 	return kInvalidState;
 }
@@ -349,13 +231,7 @@ bool RecordMessageScreen::HasEdgeNamedNext() const
 {
 	switch(mState)
 	{
-		case kPlayEndListeningIndicator:
-		case kPlayEndRecordingIndicator:
 		case kStart:
-		case kStartListeningForCommands:
-		case kStartRecordingMessage:
-		case kStopListeningForCommands:
-		case kStopRecordingMessage:
 			return true;
 		default: break;
 	}
@@ -373,10 +249,9 @@ void RecordMessageScreen::update(const tSoundEvent& msg)
     switch (msg.mEvent)
     {
         case tSoundEvent::kSoundPlayingComplete:
-            if (msg.mSource == mBeginRecordingIndicator)
+            if (msg.mSource == mNewMessage)
             {
-                if ((getState() == kPlayBeginListeningIndicator) ||
-                    (getState() == kPlayBeginRecordingIndicator))
+                if (getState() == kPlaySendingSound)
                 {
                     update(kIndicatorFinished);
                 }
@@ -430,27 +305,72 @@ void RecordMessageScreen::update(const GCTEvent& msg)
             switch (getState())
             {
 //                case kPlayingIdle:   update(kPausePressed); break;
-                case kIdleListening: update(kStopPressed); break;
+//                case kIdleListening: update(kStopPressed); break;
 
                 default:
                     break;
             }
             break;
 
-        case GCTEvent::kHeyGoCastWasSaid:
-            if (getState() == kIdle)
+        case GCTEvent::kSaidHeyGoCast:
+            if (getState() == kIdleWaitForHeyGocast)
             {
-                update(kVoiceCommandHeard);
+                update(kHeardHey);
+            }
+            break;
+
+        case GCTEvent::kSaidReadMyNewMessages:
+            if (getState() == kIdleWaitForReadMyNewMessages)
+            {
+                update(kHeardReadNew);
+            }
+            break;
+
+        case GCTEvent::kSaidReadFive:
+            if (getState() == kIdleWaitForReadFive)
+            {
+                update(kHeardFive);
+            }
+            break;
+        case GCTEvent::kSaidReadMeTheSecondEmail:
+            if (getState() == kIdleWaitForReadMeTheSecondEmail)
+            {
+                update(kHeardReadMeSecond);
+            }
+            break;
+        case GCTEvent::kSaidYes:
+            switch (getState())
+            {
+                case kIdleWaitForYesLetsReply:
+                case kIdleWaitForYesLetsReview:
+                case kIdleWaitForYesReadItBack:
+                case kIdleWaitForYesSendThisEmail:
+                    update(kHeardYes);
+                    break;
+                    
+                default:
+                    break;
+            }
+            break;
+        case GCTEvent::kSaidOkayFinished:
+            if (getState() == kIdleWaitForOkayImFinished)
+            {
+                update(kHeardOkay);
             }
             break;
 
         case GCTEvent::kSpeakingFinished:
             switch (getState())
             {
-                case kStartSpeakingMessage:
-                case kSpeakWhatCanIDo:
-                case kSpeakOkayBeginRecordingANewMessageAfterTheTone:
-                case kSpeakOkayLetMeReadThatMessageForYou:
+                case kSpeakDemoEmail:
+                case kSpeakFiveSubjectLines:
+                case kSpeakFourSubjectLines:
+                case kSpeakHeyHowCanIHelpYou:
+                case kSpeakPleaseReplyToEmail:
+                case kSpeakReadBackEmail:
+                case kSpeakReviewOtherFour:
+                case kSpeakWouldYouLikeReadBack:
+                case kSpeakYouHave20NewMessages:
                     update(kSpeakingDone);
                     break;
 
@@ -460,28 +380,28 @@ void RecordMessageScreen::update(const GCTEvent& msg)
             break;
 
         case GCTEvent::kTranscriptFinished:
-            mGotTranscriptionEvent = true;
-
-            if (mRecordingCommand)
-            {
-                mTranscription = msg.mTranscription;
-
-                [mPeer setTranscription:msg.mTranscription];
-            }
-            else
-            {
-                mMessage = msg.mTranscription;
-
-                [mPeer setMessage:msg.mTranscription];
-            }
-
-            if ((getState() == kIdleWaitForListeningTranscription) ||
-                (getState() == kIdleListening) ||
-                (getState() == kIdleWaitForRecordingTranscription) ||
-                (getState() == kIdleRecording))
-            {
-                update(kTranscriptionReady);
-            }
+//            mGotTranscriptionEvent = true;
+//
+//            if (mRecordingCommand)
+//            {
+//                mTranscription = msg.mTranscription;
+//
+//                [mPeer setTranscription:msg.mTranscription];
+//            }
+//            else
+//            {
+//                mMessage = msg.mTranscription;
+//
+//                [mPeer setMessage:msg.mTranscription];
+//            }
+//
+//            if ((getState() == kIdleWaitForListeningTranscription) ||
+//                (getState() == kIdleListening) ||
+//                (getState() == kIdleWaitForRecordingTranscription) ||
+//                (getState() == kIdleRecording))
+//            {
+//                update(kTranscriptionReady);
+//            }
             break;
 
         default:

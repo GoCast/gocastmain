@@ -16,8 +16,8 @@
 
 		'actions': [
 			{
-				'action_name': 'RecordMessageScreen.tgf',
-				'inputs': [ '../../tgf/GoCastMail/RecordMessageScreen.tgf', ],
+				'action_name': 'Prototype.tgf',
+				'inputs': [ '../../tgf/GoCastMail/Prototype.tgf', ],
 				'outputs': [ '../../dummy', ],
 				'action': [ '<@(_graphcode)', '<@(_inputs)', '--machine', 'RecordMessageScreen', '-h', '../../source/GoCastMail/RecordMessageScreen.h', '-cpp', '../../source/GoCastMail/RecordMessageScreen.mm', ],
 			},

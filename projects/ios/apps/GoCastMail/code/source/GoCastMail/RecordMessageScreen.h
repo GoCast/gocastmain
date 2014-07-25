@@ -24,6 +24,7 @@ protected:
     JSONObject          mValidUsersJSON;
     JSONArray           mNewMessageRecipients;
     tSound*             mSound;
+    tSound*             mNewMessage;
     tSound*             mBeginRecordingIndicator;
     tSound*             mEndRecordingIndicator;
     tTimer*             mSliderUpdateTimer;
@@ -48,74 +49,67 @@ protected:
 	void endEntry();
 	void invalidStateEntry();
 
-	void doWeNeedToWaitForRecordingTranscriptionEntry();
-	void doWeNeedToWaitForTranscriptionEntry();
-	void idleEntry();
-	void idleListeningEntry();
-	void idleRecordingEntry();
-	void idleWaitForListeningTranscriptionEntry();
-	void idleWaitForRecordingTranscriptionEntry();
-	void playBeginListeningIndicatorEntry();
-	void playBeginRecordingIndicatorEntry();
-	void playEndListeningIndicatorEntry();
-	void playEndRecordingIndicatorEntry();
-	void speakOkayBeginRecordingANewMessageAfterTheToneEntry();
-	void speakOkayLetMeReadThatMessageForYouEntry();
-	void speakWhatCanIDoEntry();
-	void startListeningForCommandsEntry();
-	void startRecordingMessageEntry();
-	void startSpeakingMessageEntry();
-	void stopListeningForCommandsEntry();
-	void stopRecordingMessageEntry();
-	void whatDoesTranscriptionSayEntry();
-
-	void idleExit();
-	void idleListeningExit();
-	void idleRecordingExit();
+	void idleDoneEntry();
+	void idleWaitForHeyGocastEntry();
+	void idleWaitForOkayImFinishedEntry();
+	void idleWaitForReadFiveEntry();
+	void idleWaitForReadMeTheSecondEmailEntry();
+	void idleWaitForReadMyNewMessagesEntry();
+	void idleWaitForYesLetsReplyEntry();
+	void idleWaitForYesLetsReviewEntry();
+	void idleWaitForYesReadItBackEntry();
+	void idleWaitForYesSendThisEmailEntry();
+	void playSendingSoundEntry();
+	void speakDemoEmailEntry();
+	void speakFiveSubjectLinesEntry();
+	void speakFourSubjectLinesEntry();
+	void speakHeyHowCanIHelpYouEntry();
+	void speakPleaseReplyToEmailEntry();
+	void speakReadBackEmailEntry();
+	void speakReviewOtherFourEntry();
+	void speakWouldYouLikeReadBackEntry();
+	void speakYouHave20NewMessagesEntry();
 
 public:
 	enum EventType
 	{
 		kInvalidEvent = -2,
 		kNext = -1,
-		kComposeButtonPressed,
+		kHeardFive,
+		kHeardHey,
+		kHeardOkay,
+		kHeardReadMeSecond,
+		kHeardReadNew,
+		kHeardYes,
 		kIndicatorFinished,
-		kNo,
-		kNoneOfTheAbove,
-		kReadButtonPressed,
-		kRecordButtonPressed,
 		kSpeakingDone,
-		kStopPressed,
-		kTranscriptionReady,
-		kVoiceCommandHeard,
-		kYes,
 	};
 
 	enum StateType
 	{
 		kInvalidState = 0,
 		kStart = 1,
-		kDoWeNeedToWaitForRecordingTranscription,
-		kDoWeNeedToWaitForTranscription,
 		kEnd,
-		kIdle,
-		kIdleListening,
-		kIdleRecording,
-		kIdleWaitForListeningTranscription,
-		kIdleWaitForRecordingTranscription,
-		kPlayBeginListeningIndicator,
-		kPlayBeginRecordingIndicator,
-		kPlayEndListeningIndicator,
-		kPlayEndRecordingIndicator,
-		kSpeakOkayBeginRecordingANewMessageAfterTheTone,
-		kSpeakOkayLetMeReadThatMessageForYou,
-		kSpeakWhatCanIDo,
-		kStartListeningForCommands,
-		kStartRecordingMessage,
-		kStartSpeakingMessage,
-		kStopListeningForCommands,
-		kStopRecordingMessage,
-		kWhatDoesTranscriptionSay,
+		kIdleDone,
+		kIdleWaitForHeyGocast,
+		kIdleWaitForOkayImFinished,
+		kIdleWaitForReadFive,
+		kIdleWaitForReadMeTheSecondEmail,
+		kIdleWaitForReadMyNewMessages,
+		kIdleWaitForYesLetsReply,
+		kIdleWaitForYesLetsReview,
+		kIdleWaitForYesReadItBack,
+		kIdleWaitForYesSendThisEmail,
+		kPlaySendingSound,
+		kSpeakDemoEmail,
+		kSpeakFiveSubjectLines,
+		kSpeakFourSubjectLines,
+		kSpeakHeyHowCanIHelpYou,
+		kSpeakPleaseReplyToEmail,
+		kSpeakReadBackEmail,
+		kSpeakReviewOtherFour,
+		kSpeakWouldYouLikeReadBack,
+		kSpeakYouHave20NewMessages,
 	};
 
 protected:

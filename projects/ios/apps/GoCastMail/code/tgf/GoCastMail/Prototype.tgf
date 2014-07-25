@@ -1,0 +1,43 @@
+1 start
+2 end
+3 idle: wait for "hey gocast"
+4 idle: wait for "read my new messages"
+5 idle: wait for "read five"
+6 idle: wait for "read me the second email"
+7 idle: wait for "yes, let's reply"
+8 idle: wait for "okay I'm finished"
+9 idle: wait for "yes, read it back"
+10 idle: wait for "yes, send this email"
+11 idle: wait for "yes, let's review"
+12 idle: done
+13 speak: "hey, how can I help you?"
+14 speak: "you have 20 new messages"
+15 speak: "five subject lines"
+16 speak: "demo email"
+17 speak: "please reply to email"
+18 speak: "would you like read back?"
+19 speak: "read back email"
+20 play "sending sound"
+21 speak: "review other four?"
+22 speak: "four subject lines"
+#
+1 3
+3 13 heardHey
+4 14 heardReadNew
+5 15 heardFive
+6 16 heardReadMeSecond
+7 17 heardYes
+8 18 heardOkay
+9 19 heardYes
+10 20 heardYes
+11 22 heardYes
+13 4 speakingDone
+14 5 speakingDone
+15 6 speakingDone
+16 7 speakingDone
+17 8 speakingDone
+18 9 speakingDone
+19 10 speakingDone
+20 21 indicatorFinished
+21 11 speakingDone
+22 12 speakingDone

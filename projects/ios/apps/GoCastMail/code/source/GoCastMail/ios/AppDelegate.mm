@@ -351,12 +351,31 @@ const unsigned char SpeechKitApplicationKey[] =
     // This is the language model we're going to start up with. The only reason I'm making it a class property is that I reuse it a bunch of times in this example,
 	// but you can pass the string contents directly to PocketsphinxController:startListeningWithLanguageModelAtPath:dictionaryAtPath:languageModelIsJSGF:
 
+//    HEY GO CAST
+//    READ MY NEW MESSAGES
+//    READ FIVE
+//    READ ME THE SECOND EMAIL
+//    YES
+//    OKAY FINISHED
+
     NSArray *firstLanguageArray = [[[NSArray alloc] initWithArray:[NSArray arrayWithObjects: // All capital letters.
-                                                                  @"HEY",
-                                                                  @"GO",
-                                                                  @"CAST",
-                                                                  @"MAIL",
-                                                                  @"TALK",
+                                                                   @"CAST",
+                                                                   @"EMAIL",
+                                                                   @"FINISHED",
+                                                                   @"FIVE",
+                                                                   @"GO",
+                                                                   @"HEY",
+                                                                   @"MAIL",
+                                                                   @"MESSAGES",
+                                                                   @"ME",
+                                                                   @"MY",
+                                                                   @"NEW",
+                                                                   @"OKAY",
+                                                                   @"READ",
+                                                                   @"SECOND",
+                                                                   @"TALK",
+                                                                   @"THE",
+                                                                   @"YES",
                                                                   nil]] autorelease];
 
 	LanguageModelGenerator *languageModelGenerator = [[[LanguageModelGenerator alloc] init] autorelease];
@@ -635,18 +654,31 @@ const unsigned char SpeechKitApplicationKey[] =
 
 - (void) pocketsphinxDidReceiveHypothesis:(NSString *)hypothesis recognitionScore:(NSString *)recognitionScore utteranceID:(NSString *)utteranceID
 {
+    typedef std::pair<std::string, GCTEvent::EventType> xp;
+
+    static xp vocab[] =
+    {
+        xp("hey go cast", GCTEvent::kSaidHeyGoCast),
+        xp("read my new messages", GCTEvent::kSaidReadMyNewMessages),
+        xp("read five", GCTEvent::kSaidReadFive),
+        xp("read me the second email", GCTEvent::kSaidReadMeTheSecondEmail),
+        xp("yes", GCTEvent::kSaidYes),
+        xp("okay finished", GCTEvent::kSaidOkayFinished),
+    };
+
 	NSLog(@"The received hypothesis is %@ with a score of %@ and an ID of %@", hypothesis, recognitionScore, utteranceID); // Log it.
 
     std::string heard = [hypothesis UTF8String];
     std::transform(heard.begin(), heard.end(), heard.begin(), ::tolower);
 
-    if ((heard == std::string("hey go cast talk")) ||
-        (heard == std::string("hey go cast mail")) ||
-        (heard == std::string("hey go cast")))
+    for(size_t i = 0; i < sizeof(vocab) / sizeof(xp); i++)
     {
-        GCTEventManager::getInstance()->notify(GCTEvent(GCTEvent::kHeyGoCastWasSaid));
+        if (heard == vocab[i].first)
+        {
+            GCTEventManager::getInstance()->notify(GCTEvent(vocab[i].second));
+            break;
+        }
     }
-//	self.heardTextView.text = [NSString stringWithFormat:@"Heard: \"%@\"", hypothesis]; // Show it in the status box.
 }
 
 @end
