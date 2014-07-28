@@ -28,9 +28,9 @@
 #pragma mark Construction / Destruction
 - (void)viewDidLoad
 {
-    mPeer = new MessageHistoryScreen(self, mInitObject);
-
     [super viewDidLoad];
+
+    mPeer = new MessageHistoryScreen(self, mInitObject);
 
     [self refreshLanguage];
 
